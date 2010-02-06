@@ -14,8 +14,25 @@ class UserTest < ActiveSupport::TestCase
       assert(!User.authenticate_hash(@user.name, "xxxx"), "Authentication should not have succeeded")
     end
     
+    context "name" do
+      should "be #{Danbooru.config.default_guest_name} given an invalid user id" do
+        assert_equal(Danbooru.config.default_guest_name, User.find_name(-1))
+      end
+      
+      should "be fetched given a user id" do
+        @user = Factory.create(:user)
+        assert_equal(@user.name, User.find_name(@user.id))
+      end
+      
+      should "be updated" do
+        @user = Factory.create(:user)
+        @user.update_attribute(:name, "danzig")
+        assert_equal("danzig", User.find_name(@user.id))
+      end
+    end
+    
     context "password" do
-      should "confirm its password" do
+      should "match the confirmation" do
         @user = Factory.create(:user)
         @user.password = "zugzug5"
         @user.password_confirmation = "zugzug5"
@@ -24,7 +41,7 @@ class UserTest < ActiveSupport::TestCase
         assert(User.authenticate(@user.name, "zugzug5"), "Authentication should have succeeded")
       end
     
-      should "must match the confirmation" do
+      should "match the confirmation" do
         @user = Factory.create(:user)
         @user.password = "zugzug6"
         @user.password_confirmation = "zugzug5"
