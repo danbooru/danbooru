@@ -1,0 +1,132 @@
+#!/bin/bash
+
+echo "This script is out of date; please read the INSTALL document"
+exit 1
+
+if [ $USER != root ] ; then
+  echo "You must run this script as root"
+  exit 1
+fi
+
+echo "Danbooru Install"
+echo "This script will install Ruby, Rails, PostgreSQL, and Nginx. By the end,"
+echo "you should be able to connect to the server and create an account."
+echo
+echo "It will create a new user called danbooru which will run the Danbooru"
+echo "processes. It will download the latest trunk copy and install it in"
+echo "/var/www/danbooru. It will run three Mongrel processes, starting on port"
+echo "8050."
+echo
+echo -n "Enter the hostname for this server (ex: danbooru.donmai.us): "
+read hostname
+
+if [ -z $hostname ] ; then
+  echo "Must enter a hostname"
+  exit 1
+fi
+
+echo -n "Enter a name for the site (default: Danbooru): "
+read sitename
+
+if [ -z $sitename ] ; then
+  sitename=Danbooru
+fi
+
+# Install packages
+apt-get -y install sudo gcc g++ make libreadline5-dev zlib1g-dev flex bison libgd2-noxpm libgd2-noxpm-dev bzip2 postgresql-8.3 postgresql-contrib-8.3 libpq-dev ruby ruby1.8-dev ri irb rdoc rubygems ragel memcached libmemcache-dev subversion nginx rake libopenssl-ruby mongrel
+
+# Install Ruby gems
+for i in postgres diff-lcs html5 mongrel mongrel_cluster memcache-client aws-s3 json ; do gem install $i ; done
+gem install rails --version=2.1.0
+gem install acts_as_versioned
+
+# Create user account
+useradd -m danbooru
+PG_HBA_FILE="/etc/postgresql/8.3/main/pg_hba.conf"
+echo "local    all         postgres,danbooru                              trust" > $PG_HBA_FILE
+echo "host     all         postgres,danbooru          127.0.0.1/32        trust" >> $PG_HBA_FILE
+/etc/init.d/postgresql-8.3 restart
+
+# Install Danbooru
+cd /var/www
+svn export svn://donmai.us/danbooru/trunk danbooru
+chown -R danbooru:danbooru danbooru
+cd danbooru
+mkdir -p public/data/sample
+cd config
+cp database.yml.example database.yml
+cp local_config.rb.example local_config.rb
+sed -i -e "s/DAN_HOSTNAME/$hostname/g" local_config.rb
+sed -i -e "s/DAN_SITENAME/$sitename/g" local_config.rb
+echo "--- " > mongrel_cluster.yml
+echo "cwd: /var/www/danbooru" >> mongrel_cluster.yml
+echo "port: \"8050\"" >> mongrel_cluster.yml
+echo "environment: production" >> mongrel_cluster.yml
+echo "address: 127.0.0.1" >> mongrel_cluster.yml
+echo "servers: 3" >> mongrel_cluster.yml
+echo "num_processors: 10" >> mongrel_cluster.yml
+cd ../lib/danbooru_image_resizer
+ruby extconf.rb
+make
+cd ../..
+sudo -u postgres createuser -s danbooru
+sudo -u danbooru createdb danbooru
+sudo -u danbooru psql danbooru < db/postgres.sql
+sudo -u danbooru rake db:migrate RAILS_ENV=production
+script/donmai/upbooru
+
+# Set up nginx
+DANBOORU_CONF_FILE="/etc/nginx/sites-enabled/danbooru.conf"
+echo "upstream mongrel {" > $DANBOORU_CONF_FILE
+echo "  server 127.0.0.1:8050;" >> $DANBOORU_CONF_FILE
+echo "  server 127.0.0.1:8051;" >> $DANBOORU_CONF_FILE
+echo "  server 127.0.0.1:8052;" >> $DANBOORU_CONF_FILE
+echo "}" >> $DANBOORU_CONF_FILE
+echo "server {" >> $DANBOORU_CONF_FILE
+echo "  listen 80;" >> $DANBOORU_CONF_FILE
+echo "  server_name $hostname;" >> $DANBOORU_CONF_FILE
+echo "  root /var/www/danbooru/public;" >> $DANBOORU_CONF_FILE
+echo "  index index.html;" >> $DANBOORU_CONF_FILE
+echo "  access_log /var/www/danbooru/log/server.access.log;" >> $DANBOORU_CONF_FILE
+echo "  error_log /var/www/danbooru/log/server.error.log;" >> $DANBOORU_CONF_FILE
+echo "  client_max_body_size 30m;" >> $DANBOORU_CONF_FILE
+echo "  location /stylesheets {" >> $DANBOORU_CONF_FILE
+echo "    expires max;" >> $DANBOORU_CONF_FILE
+echo "    break;" >> $DANBOORU_CONF_FILE
+echo "  }" >> $DANBOORU_CONF_FILE
+echo "  location /javascripts {" >> $DANBOORU_CONF_FILE
+echo "    expires max;" >> $DANBOORU_CONF_FILE
+echo "    break;" >> $DANBOORU_CONF_FILE
+echo "  }" >> $DANBOORU_CONF_FILE
+echo "  location /data {" >> $DANBOORU_CONF_FILE
+echo "    valid_referers none $hostname;" >> $DANBOORU_CONF_FILE
+echo "    if (\$invalid_referer) {" >> $DANBOORU_CONF_FILE
+echo "      return 403;" >> $DANBOORU_CONF_FILE
+echo "    }" >> $DANBOORU_CONF_FILE
+echo "    expires max;" >> $DANBOORU_CONF_FILE
+echo "    break;" >> $DANBOORU_CONF_FILE
+echo "  }" >> $DANBOORU_CONF_FILE
+echo "  location /maintenance.html {" >> $DANBOORU_CONF_FILE
+echo "    expires 10;" >> $DANBOORU_CONF_FILE
+echo "   }" >> $DANBOORU_CONF_FILE
+echo "  if (-f \$document_root/maintenance.html) {" >> $DANBOORU_CONF_FILE
+echo "    rewrite ^(.*)\$ /maintenance.html last;" >> $DANBOORU_CONF_FILE
+echo "    break;" >> $DANBOORU_CONF_FILE
+echo "  }" >> $DANBOORU_CONF_FILE
+echo "  location / {" >> $DANBOORU_CONF_FILE
+echo "    proxy_set_header X-Real-IP \$remote_addr;" >> $DANBOORU_CONF_FILE
+echo "    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;" >> $DANBOORU_CONF_FILE
+echo "    proxy_set_header Host \$http_host;" >> $DANBOORU_CONF_FILE
+echo "    proxy_redirect false;" >> $DANBOORU_CONF_FILE
+echo "    if (!-f \$request_filename) {" >> $DANBOORU_CONF_FILE
+echo "      proxy_pass http://mongrel;" >> $DANBOORU_CONF_FILE
+echo "    }" >> $DANBOORU_CONF_FILE
+echo "  }" >> $DANBOORU_CONF_FILE
+echo "  error_page 404 /404.html;" >> $DANBOORU_CONF_FILE
+echo "  error_page 500 502 503 504 /500.html;" >> $DANBOORU_CONF_FILE
+echo "}" >> $DANBOORU_CONF_FILE
+/etc/init.d/nginx restart
+
+echo
+echo "I'm done!"
+echo "You should probably set the password for the danbooru account (run passwd danbooru)."

@@ -1,4 +1,4 @@
-Danbooru2::Application.routes.draw do |map|
+Danbooru::Application.routes.draw do |map|
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

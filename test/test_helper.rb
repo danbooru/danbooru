@@ -1,13 +1,12 @@
 ENV["RAILS_ENV"] = "test"
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
+require 'shoulda'
+require 'factory_girl'
+require 'mocha'
+require 'faker'
 require 'rails/test_help'
 
-class ActiveSupport::TestCase
-  # Setup all fixtures in test/fixtures/*.(yml|csv) for all tests in alphabetical order.
-  #
-  # Note: You'll currently still have to declare fixtures explicitly in integration tests
-  # -- they do not yet inherit this setting
-  fixtures :all
+Dir[File.expand_path(File.dirname(__FILE__) + "/factories/*.rb")].each {|file| require file}
 
-  # Add more helper methods to be used by all tests here...
+class ActiveSupport::TestCase
 end

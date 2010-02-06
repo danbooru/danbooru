@@ -2,4 +2,4 @@
 require File.expand_path('../application', __FILE__)
 
 # Initialize the rails application
-Danbooru2::Application.initialize!
+Danbooru::Application.initialize!
