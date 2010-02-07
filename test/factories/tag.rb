@@ -1,5 +1,5 @@
 Factory.define(:tag) do |f|
-  f.name {Faker::Name.first_name}
+  f.name {Faker::Name.first_name.downcase}
   f.post_count 0
   f.category Tag.categories.general
   f.related_tags ""

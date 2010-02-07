@@ -43,10 +43,11 @@ class Tag < ActiveRecord::Base
   
   def self.find_or_create_by_name(name, options = {})
     name = normalize_name(name)
-    category = self.class.types.general
+    category = categories.general
     
     if name =~ /\A(#{categories.regexp}):(.+)\Z/
-      category = self.class.types.value_for($1)
+      category = categories.value_for($1)
+      name = $2
     end
     
     tag = find_by_name(name)
@@ -90,7 +91,7 @@ class Tag < ActiveRecord::Base
   end
   
   def self.scan_tags(tags)
-    tags.to_s.downcase.gsub(/[&,;]/, "").scan(/\S+/).uniq
+    tags.to_s.downcase.gsub(/[,;*]/, "_").scan(/\S+/).uniq
   end
   
   def self.parse_cast(object, type)
@@ -157,11 +158,7 @@ class Tag < ActiveRecord::Base
 
     scan_query(query).each do |token|
       if token =~ /^(sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|change|status|tagcount|gentagcount|arttagcount|chartagcount|copytagcount):(.+)$/
-        if $1 == "user"
-          q[:user] = $2
-        elsif $1 == "fav"
-          q[:fav] = $2
-        elsif $1 == "sub"
+        if $1 == "sub"
           q[:subscriptions] = $2
         elsif $1 == "md5"
           q[:md5] = $2
@@ -215,10 +212,14 @@ class Tag < ActiveRecord::Base
       end
     end
 
-    q[:exclude] = TagAlias.to_aliased(q[:exclude], :strip_prefix => true) if q.has_key?(:exclude)
-    q[:include] = TagAlias.to_aliased(q[:include], :strip_prefix => true) if q.has_key?(:include)
-    q[:related] = TagAlias.to_aliased(q[:related]) if q.has_key?(:related)
+    normalize_tags_in_query(q)
 
     return q
+  end
+  
+  def self.normalize_tags_in_query(query_hash)
+    query_hash[:exclude] = TagAlias.to_aliased(query_hash[:exclude], :strip_prefix => true) if query_hash.has_key?(:exclude)
+    query_hash[:include] = TagAlias.to_aliased(query_hash[:include], :strip_prefix => true) if query_hash.has_key?(:include)
+    query_hash[:related] = TagAlias.to_aliased(query_hash[:related]) if query_hash.has_key?(:related)
   end
 end
