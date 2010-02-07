@@ -4,26 +4,26 @@ Factory.define(:user) do |f|
   f.email {Faker::Internet.email}
 end
 
-Factory.define(:banned_user) do |f|
+Factory.define(:banned_user, :parent => :user) do |f|
   f.is_banned true
 end
 
-Factory.define(:privileged_user) do |f|
+Factory.define(:privileged_user, :parent => :user) do |f|
   f.is_privileged true
 end
 
-Factory.define(:contributor_user) do |f|
+Factory.define(:contributor_user, :parent => :user) do |f|
   f.is_contributor true
 end
 
-Factory.define(:janitor_user) do |f|
+Factory.define(:janitor_user, :parent => :user) do |f|
   f.is_janitor true
 end
 
-Factory.define(:moderator_user) do |f|
+Factory.define(:moderator_user, :parent => :user) do |f|
   f.is_moderator true
 end
 
-Factory.define(:admin_user) do |f|
+Factory.define(:admin_user, :parent => :user) do |f|
   f.is_admin true
 end

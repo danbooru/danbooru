@@ -3,6 +3,8 @@ require 'digest/sha1'
 class User < ActiveRecord::Base
   attr_accessor :password
   
+  attr_accessible :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags
+  
   validates_length_of :name, :within => 2..20, :on => :create
   validates_format_of :name, :with => /\A[^\s;,]+\Z/, :on => :create, :message => "cannot have whitespace, commas, or semicolons"
   validates_uniqueness_of :name, :case_sensitive => false, :on => :create
