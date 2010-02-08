@@ -10,6 +10,11 @@ module Danbooru
       "Danbooru"
     end
     
+    # Stripped of any special characters.
+    def safe_app_name
+      app_name.gsub(/[^a-zA-Z0-9_-]/, "_")
+    end
+    
     # The default name to use for anyone who isn't logged in.
     def default_guest_name
       "Anonymous"
@@ -47,14 +52,14 @@ module Danbooru
       150
     end
     
-    # Medium resize image width
+    # Medium resize image width. Set to nil to disable.
     def medium_image_width
-      500
+      480
     end
     
-    # Large resize image width
+    # Large resize image width. Set to nil to disable.
     def large_image_width
-      1024
+      1280
     end
     
     # When calculating statistics based on the posts table, gather this many posts to sample from.
@@ -107,9 +112,21 @@ module Danbooru
       5
     end
     
+    # Maximum size of an upload.
+    def max_file_size
+      5.megabytes
+    end
+    
     # The name of the server the app is hosted on.
     def server_host
       Socket.gethostname
+    end
+    
+    # Names of other Danbooru servers which serve out of the same common database.
+    # Used in conjunction with load balancing to distribute files from one server to
+    # the others. This should match whatever gethostname returns on the other servers.
+    def other_server_hosts
+      []
     end
     
     # Returns a hash mapping various tag categories to a numerical value.

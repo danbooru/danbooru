@@ -4,246 +4,251 @@ class Post < ActiveRecord::Base
   end
   
   class Pending < ActiveRecord::Base
+    class Error < Exception ; end
+    
+    class Download
+      class Error < Exception ; end
+      
+      attr_accessible :source, :content_type
+      
+      def initialize(source, file_path)
+        @source = source
+        @file_path = file_path
+      end
+
+      # Downloads to @file_path
+      def download!
+        http_get_streaming(@source) do |response|
+          self.content_type = response["Content-Type"]
+          File.open(@file_path, "wb") do |out|
+            response.read_body(out)
+          end
+        end
+        @source = fix_image_board_sources(@source)
+      end
+  
+    private
+      def handle_pixiv(source, headers)
+        if source =~ /pixiv\.net/
+          headers["Referer"] = "http://www.pixiv.net"
+
+          # Don't download the small version
+          if source =~ %r!(/img/.+?/.+?)_m.+$!
+            match = $1
+            source.sub!(match + "_m", match)
+          end
+        end
+      
+        source
+      end
+    
+      def http_get_streaming(source, options = {})
+        max_size = options[:max_size] || Danbooru.config.max_file_size
+        max_size = nil if max_size == 0 # unlimited
+        limit = 4
+
+        while true
+          url = URI.parse(source)
+
+          unless url.is_a?(URI::HTTP)
+            raise Error.new("URL must be HTTP")
+          end
+
+          Net::HTTP.start(url.host, url.port) do |http|
+            http.read_timeout = 10
+            headers = {
+              "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
+            }
+            source = handle_pixiv(source, headers)
+            http.request_get(url.request_uri, headers) do |res|
+              case res
+              when Net::HTTPSuccess then
+                if max_size
+                  len = res["Content-Length"]
+                  raise Error.new("File is too large (#{len} bytes)") if len && len.to_i > max_size
+                end
+                yield(res)
+                return
+
+              when Net::HTTPRedirection then
+                if limit == 0 then
+                  raise Error.new("Too many redirects")
+                end
+                source = res["location"]
+                limit -= 1
+
+              else
+                raise Error.new("HTTP error code: #{res.code} #{res.message}")
+              end
+            end # http.request_get
+          end # http.start
+        end # while
+      end # def
+    
+      def fix_image_board_sources(source)
+        if source =~ /\/src\/\d{12,}|urnc\.yi\.org|yui\.cynthia\.bne\.jp/
+          "Image board"
+        else
+          source
+        end
+      end
+    end # download
+    
     set_table_name "pending_posts"
+    belongs_to :post
+    attr_accessible :file, :image_width, :image_height
     
     def process!
       update_attribute(:status, "processing")
+      
+      if file
+        convert_cgi_file(temp_file_path)
+      elsif is_downloadable?
+        download_from_source(temp_file_path)
+      end
+      
+      calculate_hash(temp_file_path)
       move_file
-      calculate_hash
       calculate_dimensions
       generate_resizes
       convert_to_post
       update_attribute(:status, "finished")
     end
     
-    def move_file
-      # Download the file
-      # Move the tempfile into the data store
-      # Distribute to other servers
-    end
-    
-    def calculate_hash
-      # Calculate the MD5 hash of the file
-    end
-    
-    def calculate_dimensions
-      # Calculate the dimensions of the image
-    end
-    
+  private
     def generate_resizes
-      # Generate width=150
-      # Generate width=1000
-      # 
+      generate_resize_for(Danbooru.config.small_image_width)
+      generate_resize_for(Danbooru.config.medium_image_width)
+      generate_resize_for(Danbooru.config.large_image_width)
+    end
+  
+    def create_resize_for(width)
+      return if width.nil?
+      return unless image_width > width
+
+      unless File.exists?(final_file_path)
+        raise Error.new("file not found")
+      end
+
+      size = Danbooru.reduce_to({:width => image_width, :height => image_height}, {:width => width})
+
+      # If we're not reducing the resolution, only reencode if the source image larger than
+      # 200 kilobytes.
+      if size[:width] == width && size[:height] == height && File.size?(path) > 200.kilobytes
+        return true
+      end
+
+      begin
+        Danbooru.resize(file_ext, final_file_path, resize_file_path_for(width), size, 90)
+      rescue Exception => x
+        errors.add "sample", "couldn't be created: #{x}"
+        return false
+      end
+
+      self.sample_width = size[:width]
+      self.sample_height = size[:height]
+      return true
+    end
+    
+    def resize_file_path_for(width)
+      case width
+      when Danbooru.config.small_image_width
+        "#{Rails.root}/public/data/preview"
+        
+      when Danbooru.config.medium_image_width
+        "#{Rails.root}/public/data/medium"        
+        
+      when Danbooru.config.large_image_width
+        "#{Rails.root}/public/data/large"
+      end
     end
     
     def convert_to_post
+      returning Post.new do |p|
+        p.tag_string = tag_string
+        p.md5 = md5
+        p.file_ext = file_ext
+        p.image_width = image_width
+        p.image_height = image_height
+        p.uploader_id = uploader_id
+        p.uploader_ip_addr = uploader_ip_addr
+        p.rating = rating
+        p.source = source
+      end
     end
-  
-  private
-    def download_from_source
-      self.source = "" if source.nil?
-    
-      return if source !~ /^http:\/\// || !file_ext.blank?
-    
-      begin
-        Danbooru.http_get_streaming(source) do |response|
-          File.open(tempfile_path, "wb") do |out|
-            response.read_body do |block|
-              out.write(block)
-            end
-          end
-        end
-      
-        if source.to_s =~ /\/src\/\d{12,}|urnc\.yi\.org|yui\.cynthia\.bne\.jp/
-          self.source = "Image board"
-        end
-      
-        return true
-      rescue SocketError, URI::Error, SystemCallError => x
-        delete_tempfile
-        errors.add "source", "couldn't be opened: #{x}"
-        return false
+
+    def calculate_dimensions(post)
+      if has_dimensions?
+        image_size = ImageSize.new(File.open(final_file_path, "rb"))
+        self.image_width = image_size.get_width
+        self.image_hegiht = image_hegiht.get_height
       end
     end
     
-    def move_tempfile
+    def has_dimensions?
+      %w(jpg gif png swf).include?(file_ext)
     end
     
-    def distribute_file
-    end
-    
-    def generate_resize_for(width)
-    end
-  end
-  
-  class Version < ActiveRecord::Base
-    set_table_name "post_versions"
-  end
-  
-  module FileMethods    
-    def self.included(m)
-      m.before_validation_on_create :download_source
-      m.before_validation_on_create :validate_tempfile_exists
-      m.before_validation_on_create :determine_content_type
-      m.before_validation_on_create :validate_content_type
-      m.before_validation_on_create :generate_hash
-      m.before_validation_on_create :set_image_dimensions
-      m.before_validation_on_create :generate_sample
-      m.before_validation_on_create :generate_preview
-      m.before_validation_on_create :move_file
+    def move_file
+      FileUtils.mv(temp_file_path, final_file_path)
     end
   
-    def validate_tempfile_exists
-      unless File.exists?(tempfile_path)
-        errors.add :file, "not found, try uploading again"
-        return false
-      end
+    def final_file_path
+      "#{Rails.root}/public/data/original/#{md5}.#{file_ext}"
     end
   
-    def validate_content_type
-      unless %w(jpg png gif swf).include?(file_ext.downcase)
-        errors.add(:file, "is an invalid content type: " + file_ext.downcase)
-        return false
-      end
+    # Calculates the MD5 based on whatever is in temp_file_path
+    def calculate_hash(file_path)
+      self.md5 = Digest::MD5.file(file_path).hexdigest
     end
   
-    def file_name
-      md5 + "." + file_ext
-    end
+    # Moves the cgi file to file_path
+    def convert_cgi_file(file_path)
+      return if file.blank? || file.size == 0
 
-    def delete_tempfile
-      FileUtils.rm_f(tempfile_path)
-      FileUtils.rm_f(tempfile_preview_path)
-      FileUtils.rm_f(tempfile_sample_path)
-    end
-
-    def tempfile_path
-      "#{RAILS_ROOT}/public/data/#{$PROCESS_ID}.upload"
-    end
-
-    def tempfile_preview_path
-      "#{RAILS_ROOT}/public/data/#{$PROCESS_ID}-preview.jpg"
-    end
-
-    # def file_size
-    #   File.size(file_path) rescue 0
-    # end
-
-    # Generate an MD5 hash for the file.
-    def generate_hash
-      unless File.exists?(tempfile_path)
-        errors.add(:file, "not found")
-        return false
-      end
-
-      self.md5 = File.open(tempfile_path, 'rb') {|fp| Digest::MD5.hexdigest(fp.read)}
-      self.file_size = File.size(tempfile_path)
-
-      if Post.exists?(["md5 = ?", md5])
-        delete_tempfile
-        errors.add "md5", "already exists"
-        return false
+      if file.local_path
+        FileUtils.mv(file.local_path, file_path)
       else
-        return true
-      end
-    end
-
-    def generate_preview
-      return true unless image? && width && height
-
-      unless File.exists?(tempfile_path)
-        errors.add(:file, "not found")
-        return false
-      end
-
-      size = Danbooru.reduce_to({:width=>width, :height=>height}, {:width=>150, :height=>150})
-
-      # Generate the preview from the new sample if we have one to save CPU, otherwise from the image.
-      if File.exists?(tempfile_sample_path)
-        path, ext = tempfile_sample_path, "jpg"
-      else
-        path, ext = tempfile_path, file_ext
-      end
-
-      begin
-        Danbooru.resize(ext, path, tempfile_preview_path, size, 95)
-      rescue Exception => x
-        errors.add "preview", "couldn't be generated (#{x})"
-        return false
-      end
-
-      return true
-    end
-
-    # Automatically download from the source if it's a URL.
-    def download_source
-      self.source = "" if source.nil?
-    
-      return if source !~ /^http:\/\// || !file_ext.blank?
-    
-      begin
-        Danbooru.http_get_streaming(source) do |response|
-          File.open(tempfile_path, "wb") do |out|
-            response.read_body do |block|
-              out.write(block)
-            end
-          end
+        File.open(file_path, 'wb') do |out| 
+          out.write(file.read)
         end
-      
-        if source.to_s =~ /\/src\/\d{12,}|urnc\.yi\.org|yui\.cynthia\.bne\.jp/
-          self.source = "Image board"
-        end
-      
-        return true
-      rescue SocketError, URI::Error, SystemCallError => x
-        delete_tempfile
-        errors.add "source", "couldn't be opened: #{x}"
-        return false
       end
-    end
-  
-    def determine_content_type
-      imgsize = ImageSize.new(File.open(tempfile_path, "rb"))
-
-      unless imgsize.get_width.nil?
-        self.file_ext = imgsize.get_type.gsub(/JPEG/, "JPG").downcase
-      end
+      self.file_ext = content_type_to_file_ext(file.content_type) || find_ext(file.original_filename)
     end
 
-    # Assigns a CGI file to the post. This writes the file to disk and generates a unique file name.
-    def file=(f)
-      return if f.nil? || f.size == 0
+    # Determines whether the source is downloadable
+    def is_downloadable?
+      source =~ /^http:\/\// && file.blank?
+    end
 
-      self.file_ext = content_type_to_file_ext(f.content_type) || find_ext(f.original_filename)
+    # Downloads the file to file_path
+    def download_from_source(file_path)
+      download = Download.new(source, file_path)
+      download.download!
+      self.file_ext = content_type_to_file_ext(download.content_type) || find_ext(source)
+    end
+    
+    # Converts a content type string to a file extension
+    def content_type_to_file_ext(content_type)
+      case content_type
+      when /jpeg/
+        return "jpg"
 
-      if f.local_path
-        # Large files are stored in the temp directory, so instead of
-        # reading/rewriting through Ruby, just rely on system calls to
-        # copy the file to danbooru's directory.
-        FileUtils.cp(f.local_path, tempfile_path)
+      when /gif/
+        return "gif"
+
+      when /png/
+        return "png"
+
+      when /x-shockwave-flash/
+        return "swf"
+
       else
-        File.open(tempfile_path, 'wb') {|nf| nf.write(f.read)}
+        nil
       end
     end
 
-    def set_image_dimensions
-      if image? or flash?
-        imgsize = ImageSize.new(File.open(tempfile_path, "rb"))
-        self.width = imgsize.get_width
-        self.height = imgsize.get_height
-      end
-    end
-
-    # Returns true if the post is an image format that GD can handle.
-    def image?
-      %w(jpg jpeg gif png).include?(file_ext.downcase)
-    end
-
-    # Returns true if the post is a Flash movie.
-    def flash?
-      file_ext == "swf"
-    end
-
+    # Determines the file extention based on a path, normalizing if necessary
     def find_ext(file_path)
       ext = File.extname(file_path)
       if ext.blank?
@@ -254,137 +259,11 @@ class Post < ActiveRecord::Base
         return ext
       end
     end
-
-    def content_type_to_file_ext(content_type)
-      case content_type.chomp
-      when "image/jpeg"
-        return "jpg"
-
-      when "image/gif"
-        return "gif"
-
-      when "image/png"
-        return "png"
-
-      when "application/x-shockwave-flash"
-        return "swf"
-
-      else
-        nil
-      end
-    end
-  
-    def preview_dimensions
-      if image?
-        dim = Danbooru.reduce_to({:width => width, :height => height}, {:width => 150, :height => 150})
-        return [dim[:width], dim[:height]]
-      else
-        return [150, 150]
-      end
-    end
-  
-    def tempfile_sample_path
-      "#{RAILS_ROOT}/public/data/#{$PROCESS_ID}-sample.jpg"
-    end
-
-    def regenerate_sample
-      return false unless image?
-
-      if generate_sample && File.exists?(tempfile_sample_path)
-        FileUtils.mkdir_p(File.dirname(sample_path), :mode => 0775)
-        FileUtils.mv(tempfile_sample_path, sample_path)
-        FileUtils.chmod(0775, sample_path)
-        puts "Fixed sample for #{id}"
-        return true
-      else
-        puts "Error generating sample for #{id}"
-        return false
-      end
-    end
-
-    def generate_sample
-      return true unless image?
-      return true unless CONFIG["image_samples"]
-      return true unless (width && height)
-      return true if (file_ext.downcase == "gif")
-
-      size = Danbooru.reduce_to({:width => width, :height => height}, {:width => CONFIG["sample_width"], :height => CONFIG["sample_height"]}, CONFIG["sample_ratio"])
-
-      # We can generate the sample image during upload or offline.  Use tempfile_path
-      # if it exists, otherwise use file_path.
-      path = tempfile_path
-      path = file_path unless File.exists?(path)
-      unless File.exists?(path)
-        errors.add(:file, "not found")
-        return false
-      end
-
-      # If we're not reducing the resolution for the sample image, only reencode if the
-      # source image is above the reencode threshold.  Anything smaller won't be reduced
-      # enough by the reencode to bother, so don't reencode it and save disk space.
-      if size[:width] == width && size[:height] == height && File.size?(path) < CONFIG["sample_always_generate_size"]
-        return true
-      end
-
-      # If we already have a sample image, and the parameters havn't changed,
-      # don't regenerate it.
-      if size[:width] == sample_width && size[:height] == sample_height
-        return true
-      end
-
-      size = Danbooru.reduce_to({:width => width, :height => height}, {:width => CONFIG["sample_width"], :height => CONFIG["sample_height"]})
-      begin
-        Danbooru.resize(file_ext, path, tempfile_sample_path, size, 90)
-      rescue Exception => x
-        errors.add "sample", "couldn't be created: #{x}"
-        return false
-      end
-
-      self.sample_width = size[:width]
-      self.sample_height = size[:height]
-      return true
-    end
-
-    # Returns true if the post has a sample image.
-    def has_sample?
-      sample_width.is_a?(Integer)
-    end
-
-    # Returns true if the post has a sample image, and we're going to use it.
-    def use_sample?(user = nil)
-      if user && !user.show_samples?
-        false
-      else
-        CONFIG["image_samples"] && has_sample?
-      end
-    end
-
-    def sample_url(user = nil)
-      if use_sample?(user)
-        store_sample_url
-      else
-        file_url
-      end
-    end
-
-    def get_sample_width(user = nil)
-      if use_sample?(user)
-        sample_width
-      else
-        width
-      end
-    end
-
-    def get_sample_height(user = nil)
-      if use_sample?(user)
-        sample_height
-      else
-        height
-      end
-    end
-  
-    def sample_percentage
-      100 * get_sample_width.to_f / width
+    
+    # Path to a temporary file
+    def temp_file_path
+      @temp_file ||= Tempfile.new("danbooru-upload-#{$PROCESS_ID}")
+      @temp_file.path
     end
   end
 end
