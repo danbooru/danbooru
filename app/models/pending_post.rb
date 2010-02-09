@@ -6,10 +6,14 @@ class PendingPost < ActiveRecord::Base
   
   attr_accessor :file, :image_width, :image_height, :file_ext, :md5, :file_size
   belongs_to :uploader, :class_name => "User"
+  before_save :convert_cgi_file
   
   def process!
-    update_attribute(:status, "processing")    
-    download_from_source(temp_file_path) if is_downloadable?
+    update_attribute(:status, "processing")
+    if is_downloadable?
+      download_from_source(temp_file_path)
+    end
+    self.file_ext = content_type_to_file_ext(content_type)
     calculate_hash(file_path)
     calculate_file_size(file_path)
     calculate_dimensions(file_path) if has_dimensions?
@@ -150,18 +154,18 @@ class PendingPost < ActiveRecord::Base
   end
 
   module CgiFileMethods
-    # Moves the cgi file to file_path
-    def convert_cgi_file(destination_path)
+    def convert_cgi_file
       return if file.blank? || file.size == 0
 
       if file.local_path
-        FileUtils.mv(file.local_path, destination_path)
+        self.file_path = file.local_path
       else
-        File.open(destination_path, 'wb') do |out| 
+        self.file_path = temp_file_path
+        
+        File.open(file_path, 'wb') do |out| 
           out.write(file.read)
         end
       end
-      self.file_path = destination_path
       self.content_type = file.content_type || file_ext_to_content_type(file.original_filename)
       self.file_ext = content_type_to_file_ext(content_type)
     end

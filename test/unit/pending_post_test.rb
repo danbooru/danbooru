@@ -66,11 +66,10 @@ class PendingPostTest < ActiveSupport::TestCase
       should "parse and process a cgi file representation" do
         FileUtils.cp("#{Rails.root}/test/files/test.jpg", "#{Rails.root}/tmp")
         @pending_post = PendingPost.new(:file => upload_jpeg("#{Rails.root}/tmp/test.jpg"))
-        assert_nothing_raised {@pending_post.convert_cgi_file("#{Rails.root}/tmp/test.converted.jpg")}
+        assert_nothing_raised {@pending_post.convert_cgi_file}
         assert_equal("image/jpeg", @pending_post.content_type)
-        assert_equal("#{Rails.root}/tmp/test.converted.jpg", @pending_post.file_path)
-        assert(File.exists?("#{Rails.root}/tmp/test.converted.jpg"))
-        assert_equal(28086, File.size("#{Rails.root}/tmp/test.converted.jpg"))
+        assert(File.exists?(@pending_post.file_path))
+        assert_equal(28086, File.size(@pending_post.file_path))
         assert_equal("jpg", @pending_post.file_ext)
       end
     end
@@ -128,5 +127,29 @@ class PendingPostTest < ActiveSupport::TestCase
       assert_equal(post.id, @pending_post.post_id)
       assert_equal("finished", @pending_post.status)
     end
+  end
+  
+  should "process completely for an uploaded image" do
+    @pending_post = Factory.create(:uploaded_jpg_pending_post,
+      :rating => "s",
+      :uploader_ip_addr => "127.0.0.1",
+      :tag_string => "hoge foo"
+    )
+    @pending_post.file = upload_jpeg("#{Rails.root}/test/files/test.jpg")
+    @pending_post.convert_cgi_file
+
+    assert_difference("Post.count") do
+      assert_nothing_raised {@pending_post.process!}
+    end
+    post = Post.last
+    assert_equal("hoge foo", post.tag_string)
+    assert_equal("s", post.rating)
+    assert_equal(@pending_post.uploader_id, post.uploader_id)
+    assert_equal("127.0.0.1", post.uploader_ip_addr)
+    assert_equal(@pending_post.md5, post.md5)
+    assert_equal("jpg", post.file_ext)
+    assert(File.exists?(post.file_path))
+    assert_equal(post.id, @pending_post.post_id)
+    assert_equal("finished", @pending_post.status)    
   end
 end
