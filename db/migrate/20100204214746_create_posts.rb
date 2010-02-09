@@ -11,6 +11,7 @@ class CreatePosts < ActiveRecord::Migration
       t.column :is_rating_locked, :boolean, :null => false, :default => false
       t.column :is_pending, :boolean, :null => false, :default => false
       t.column :is_flagged, :boolean, :null => false, :default => false
+      t.column :is_deleted, :boolean, :null => false, :default => false
       t.column :approver_id, :integer
       t.column :change_seq, :integer, :default => "nextval('post_change_seq'::regclass)"
 
@@ -19,6 +20,7 @@ class CreatePosts < ActiveRecord::Migration
       t.column :uploader_ip_addr, "inet", :null => false
 
       # Cached
+      t.column :fav_count, :integer
       t.column :last_noted_at, :datetime
       t.column :last_commented_at, :datetime
 

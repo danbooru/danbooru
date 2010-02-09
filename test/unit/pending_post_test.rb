@@ -149,6 +149,7 @@ class PendingPostTest < ActiveSupport::TestCase
     assert_equal(@pending_post.md5, post.md5)
     assert_equal("jpg", post.file_ext)
     assert(File.exists?(post.file_path))
+    assert_equal(28086, File.size(post.file_path))
     assert_equal(post.id, @pending_post.post_id)
     assert_equal("finished", @pending_post.status)    
   end
