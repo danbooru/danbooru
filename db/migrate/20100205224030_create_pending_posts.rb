@@ -3,6 +3,9 @@ class CreatePendingPosts < ActiveRecord::Migration
     create_table :pending_posts do |t|
       t.timestamps
       t.column :source, :string
+      t.column :file_path, :string
+      t.column :content_type, :string
+      
       t.column :rating, :character, :null => false
       t.column :uploader_id, :integer, :null => false
       t.column :uploader_ip_addr, "inet", :null => false

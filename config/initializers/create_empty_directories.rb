@@ -1,6 +1,6 @@
 require 'fileutils'
 
-FileUtils.mkdir_p("#{Rails.root}/public/data/size_thumbnail")
-FileUtils.mkdir_p("#{Rails.root}/public/data/size_medium")
-FileUtils.mkdir_p("#{Rails.root}/public/data/size_large")
-FileUtils.mkdir_p("#{Rails.root}/public/data/size_original")
+FileUtils.mkdir_p("#{Rails.root}/public/data/thumb")
+FileUtils.mkdir_p("#{Rails.root}/public/data/medium")
+FileUtils.mkdir_p("#{Rails.root}/public/data/large")
+FileUtils.mkdir_p("#{Rails.root}/public/data/original")

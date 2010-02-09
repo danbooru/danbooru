@@ -83,6 +83,8 @@ CREATE TABLE pending_posts (
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     source character varying(255),
+    file_path character varying(255),
+    content_type character varying(255),
     rating character(1) NOT NULL,
     uploader_id integer NOT NULL,
     uploader_ip_addr inet NOT NULL,
@@ -452,8 +454,8 @@ CREATE TRIGGER trigger_posts_on_tag_index_update
 
 INSERT INTO schema_migrations (version) VALUES ('20100204211522');
 
-INSERT INTO schema_migrations (version) VALUES ('20100205162521');
-
 INSERT INTO schema_migrations (version) VALUES ('20100204214746');
+
+INSERT INTO schema_migrations (version) VALUES ('20100205162521');
 
 INSERT INTO schema_migrations (version) VALUES ('20100205224030');
