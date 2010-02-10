@@ -2,8 +2,6 @@ require "danbooru_image_resizer/danbooru_image_resizer"
 require "tmpdir"
 
 class PendingPost < ActiveRecord::Base
-  class Error < Exception ; end
-  
   attr_accessor :file, :image_width, :image_height, :file_ext, :md5, :file_size
   belongs_to :uploader, :class_name => "User"
   before_save :convert_cgi_file
@@ -26,24 +24,56 @@ class PendingPost < ActiveRecord::Base
       update_attribute(:status, "error: " + post.errors.full_messages.join(", "))
     end
   end
+
+  def convert_to_post
+    returning Post.new do |p|
+      p.tag_string = tag_string
+      p.md5 = md5
+      p.file_ext = file_ext
+      p.image_width = image_width
+      p.image_height = image_height
+      p.uploader_id = uploader_id
+      p.uploader_ip_addr = uploader_ip_addr
+      p.updater_id = uploader_id
+      p.updater_ip_addr = uploader_ip_addr
+      p.rating = rating
+      p.source = source
+      p.file_size = file_size      
+    end
+  end
   
-  # private
+  def move_file
+    FileUtils.mv(file_path, md5_file_path)
+  end
+  
+  def calculate_file_size(source_path)
+    self.file_size = File.size(source_path)
+  end
+  
+  # Calculates the MD5 based on whatever is in temp_file_path
+  def calculate_hash(source_path)
+    self.md5 = Digest::MD5.file(source_path).hexdigest
+  end
+
+  class Error < Exception ; end
+  
   module ResizerMethods
     def generate_resizes(source_path)
-      generate_resize_for(Danbooru.config.small_image_width, source_path)
-      generate_resize_for(Danbooru.config.medium_image_width, source_path)
-      generate_resize_for(Danbooru.config.large_image_width, source_path)
+      generate_resize_for(Danbooru.config.small_image_width, Danbooru.config.small_image_width, source_path)
+      generate_resize_for(Danbooru.config.medium_image_width, nil, source_path)
+      generate_resize_for(Danbooru.config.large_image_width, nil, source_path)
     end
 
-    def generate_resize_for(width, source_path)
+    def generate_resize_for(width, height, source_path)
       return if width.nil?
       return unless image_width > width
+      return unless height.nil? || image_height > height
 
       unless File.exists?(source_path)
         raise Error.new("file not found")
       end
 
-      size = Danbooru.reduce_to({:width => image_width, :height => image_height}, {:width => width})
+      size = Danbooru.reduce_to({:width => image_width, :height => image_height}, {:width => width, :height => height})
 
       # If we're not reducing the resolution, only reencode if the source image larger than
       # 200 kilobytes.
@@ -177,33 +207,4 @@ class PendingPost < ActiveRecord::Base
   include DownloaderMethods
   include FilePathMethods
   include CgiFileMethods
-
-# private
-  def convert_to_post
-    returning Post.new do |p|
-      p.tag_string = tag_string
-      p.md5 = md5
-      p.file_ext = file_ext
-      p.image_width = image_width
-      p.image_height = image_height
-      p.uploader_id = uploader_id
-      p.uploader_ip_addr = uploader_ip_addr
-      p.rating = rating
-      p.source = source
-      p.file_size = file_size
-    end
-  end
-  
-  def move_file
-    FileUtils.mv(file_path, md5_file_path)
-  end
-  
-  def calculate_file_size(source_path)
-    self.file_size = File.size(source_path)
-  end
-  
-  # Calculates the MD5 based on whatever is in temp_file_path
-  def calculate_hash(source_path)
-    self.md5 = Digest::MD5.file(source_path).hexdigest
-  end
 end

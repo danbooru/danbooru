@@ -2,6 +2,7 @@ Factory.define(:user) do |f|
   f.name {Faker::Name.first_name}
   f.password_hash {User.sha1("password")}
   f.email {Faker::Internet.email}
+  f.default_image_size "medium"
 end
 
 Factory.define(:banned_user, :parent => :user) do |f|

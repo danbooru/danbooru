@@ -1,6 +1,31 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class TagTest < ActiveSupport::TestCase
+  context "A tag category fetcher" do
+    setup do
+      MEMCACHE.flush_all
+    end
+    
+    should "fetch for a single tag" do
+      Factory.create(:artist_tag, :name => "test")
+      assert_equal(Tag.categories.artist, Tag.category_for("test"))
+    end
+
+    should "fetch for a single tag with strange markup" do
+      Factory.create(:artist_tag, :name => "!@$%")
+      assert_equal(Tag.categories.artist, Tag.category_for("!@$%"))
+    end
+    
+    should "fetch for multiple tags" do
+      Factory.create(:artist_tag, :name => "aaa")
+      Factory.create(:copyright_tag, :name => "bbb")
+      categories = Tag.categories_for(%w(aaa bbb ccc))
+      assert_equal(Tag.categories.artist, categories["aaa"])
+      assert_equal(Tag.categories.copyright, categories["bbb"])
+      assert_equal(0, categories["ccc"])
+    end
+  end
+  
   context "A tag category mapping" do
     setup do
       MEMCACHE.flush_all
@@ -51,17 +76,12 @@ class TagTest < ActiveSupport::TestCase
       assert_equal("Artist", @tag.category_name)
     end
     
-    should "know its cache safe name" do
-      tag = Tag.new
-      
-      tag.name = "tag"
-      assert_equal("tag", tag.cache_safe_name)
-      
-      tag.name = "tag%"
-      assert_equal("tag_", tag.cache_safe_name)
-      
-      tag.name = "tag%%"
-      assert_equal("tag__", tag.cache_safe_name)
+    should "reset its category after updating" do
+      tag = Factory.create(:artist_tag)
+      assert_equal(Tag.categories.artist, MEMCACHE.get("tc:#{tag.name}"))
+
+      tag.update_attribute(:category, Tag.categories.copyright)
+      assert_equal(Tag.categories.copyright, MEMCACHE.get("tc:#{tag.name}"))
     end
   end
   

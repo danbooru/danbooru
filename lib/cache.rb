@@ -14,16 +14,13 @@ module Cache
     end
   end
     
-  def incr(key)
-    val = Cache.get(key)
+  def incr(key, expiry = 0)
+    val = Cache.get(key, expiry)
     Cache.put(key, val.to_i + 1)
     ActiveRecord::Base.logger.debug('MemCache Incr %s' % [key])
   end
   
   def get(key, expiry = 0)
-    key.gsub!(/\s/, "_")
-    key = key[0, 200]
-    
     if block_given?
       return yield
     else
@@ -79,8 +76,8 @@ module Cache
     end
   end
   
-  def sanitize_key(key)
-    key.gsub(/\W/, "_").slice(0, 220)
+  def sanitize(key)
+    key.gsub(/\W/) {|x| "%#{x.ord}"}.slice(0, 240)
   end
   
   module_function :get
@@ -88,5 +85,5 @@ module Cache
   module_function :incr
   module_function :put
   module_function :delete
-  module_function :sanitize_key
+  module_function :sanitize
 end

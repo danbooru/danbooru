@@ -114,6 +114,42 @@ ALTER SEQUENCE pending_posts_id_seq OWNED BY pending_posts.id;
 
 
 --
+-- Name: post_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE post_versions (
+    id integer NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
+    post_id integer NOT NULL,
+    source character varying(255),
+    rating character(1) DEFAULT 'q'::bpchar NOT NULL,
+    tag_string text NOT NULL,
+    updater_id integer NOT NULL,
+    updater_ip_addr inet NOT NULL
+);
+
+
+--
+-- Name: post_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE post_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: post_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE post_versions_id_seq OWNED BY post_versions.id;
+
+
+--
 -- Name: posts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -129,10 +165,13 @@ CREATE TABLE posts (
     is_rating_locked boolean DEFAULT false NOT NULL,
     is_pending boolean DEFAULT false NOT NULL,
     is_flagged boolean DEFAULT false NOT NULL,
-    approver_id integer,
-    change_seq integer DEFAULT 0,
-    uploader_id integer NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL,
+    uploader_string character varying(255) NOT NULL,
     uploader_ip_addr inet NOT NULL,
+    approver_string character varying(255) DEFAULT ''::character varying NOT NULL,
+    fav_string text DEFAULT ''::text NOT NULL,
+    pool_string text DEFAULT ''::text NOT NULL,
+    view_count integer DEFAULT 0 NOT NULL,
     last_noted_at timestamp without time zone,
     last_commented_at timestamp without time zone,
     tag_string text NOT NULL,
@@ -143,9 +182,9 @@ CREATE TABLE posts (
     tag_count_character integer DEFAULT 0 NOT NULL,
     tag_count_copyright integer DEFAULT 0 NOT NULL,
     file_ext character varying(255) NOT NULL,
+    file_size integer NOT NULL,
     image_width integer NOT NULL,
-    image_height integer NOT NULL,
-    file_size integer NOT NULL
+    image_height integer NOT NULL
 );
 
 
@@ -185,6 +224,7 @@ CREATE TABLE tags (
     id integer NOT NULL,
     name character varying(255) NOT NULL,
     post_count integer DEFAULT 0 NOT NULL,
+    view_count integer DEFAULT 0 NOT NULL,
     category integer DEFAULT 0 NOT NULL,
     related_tags text,
     created_at timestamp without time zone,
@@ -212,6 +252,40 @@ ALTER SEQUENCE tags_id_seq OWNED BY tags.id;
 
 
 --
+-- Name: unapprovals; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE unapprovals (
+    id integer NOT NULL,
+    post_id integer NOT NULL,
+    reason text,
+    unapprover_id integer NOT NULL,
+    unapprover_ip_addr inet NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: unapprovals_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE unapprovals_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: unapprovals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE unapprovals_id_seq OWNED BY unapprovals.id;
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -235,6 +309,7 @@ CREATE TABLE users (
     receive_email_notifications boolean DEFAULT false NOT NULL,
     comment_threshold integer DEFAULT (-1) NOT NULL,
     always_resize_images boolean DEFAULT false NOT NULL,
+    default_image_size character varying(255) DEFAULT 'medium'::character varying NOT NULL,
     favorite_tags text,
     blacklisted_tags text
 );
@@ -270,6 +345,13 @@ ALTER TABLE pending_posts ALTER COLUMN id SET DEFAULT nextval('pending_posts_id_
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE post_versions ALTER COLUMN id SET DEFAULT nextval('post_versions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE posts ALTER COLUMN id SET DEFAULT nextval('posts_id_seq'::regclass);
 
 
@@ -278,6 +360,13 @@ ALTER TABLE posts ALTER COLUMN id SET DEFAULT nextval('posts_id_seq'::regclass);
 --
 
 ALTER TABLE tags ALTER COLUMN id SET DEFAULT nextval('tags_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE unapprovals ALTER COLUMN id SET DEFAULT nextval('unapprovals_id_seq'::regclass);
 
 
 --
@@ -293,6 +382,14 @@ ALTER TABLE users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
 
 ALTER TABLE ONLY pending_posts
     ADD CONSTRAINT pending_posts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: post_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY post_versions
+    ADD CONSTRAINT post_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -312,6 +409,14 @@ ALTER TABLE ONLY tags
 
 
 --
+-- Name: unapprovals_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY unapprovals
+    ADD CONSTRAINT unapprovals_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -320,17 +425,17 @@ ALTER TABLE ONLY users
 
 
 --
--- Name: index_posts_on_approver_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_post_versions_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_posts_on_approver_id ON posts USING btree (approver_id);
+CREATE INDEX index_post_versions_on_post_id ON post_versions USING btree (post_id);
 
 
 --
--- Name: index_posts_on_change_seq; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_post_versions_on_updater_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_posts_on_change_seq ON posts USING btree (change_seq);
+CREATE INDEX index_post_versions_on_updater_id ON post_versions USING btree (updater_id);
 
 
 --
@@ -404,10 +509,10 @@ CREATE INDEX index_posts_on_tags_index ON posts USING gin (tag_index);
 
 
 --
--- Name: index_posts_on_uploader_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_posts_on_view_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_posts_on_uploader_id ON posts USING btree (uploader_id);
+CREATE INDEX index_posts_on_view_count ON posts USING btree (view_count);
 
 
 --
@@ -415,6 +520,13 @@ CREATE INDEX index_posts_on_uploader_id ON posts USING btree (uploader_id);
 --
 
 CREATE UNIQUE INDEX index_tags_on_name ON tags USING btree (name);
+
+
+--
+-- Name: index_unapprovals_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_unapprovals_on_post_id ON unapprovals USING btree (post_id);
 
 
 --
@@ -445,7 +557,7 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 CREATE TRIGGER trigger_posts_on_tag_index_update
     BEFORE INSERT OR UPDATE ON posts
     FOR EACH ROW
-    EXECUTE PROCEDURE tsvector_update_trigger('tag_index', 'public.danbooru', 'tag_string');
+    EXECUTE PROCEDURE tsvector_update_trigger('tag_index', 'public.danbooru', 'tag_string', 'fav_string', 'pool_string', 'uploader_string', 'approver_string');
 
 
 --
@@ -458,4 +570,8 @@ INSERT INTO schema_migrations (version) VALUES ('20100204214746');
 
 INSERT INTO schema_migrations (version) VALUES ('20100205162521');
 
+INSERT INTO schema_migrations (version) VALUES ('20100205163027');
+
 INSERT INTO schema_migrations (version) VALUES ('20100205224030');
+
+INSERT INTO schema_migrations (version) VALUES ('20100209201251');
