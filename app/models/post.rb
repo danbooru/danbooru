@@ -1,7 +1,6 @@
 class Post < ActiveRecord::Base
   attr_accessor :updater_id, :updater_ip_addr, :old_tag_string
   belongs_to :updater, :class_name => "User"
-  belongs_to :uploader, :class_name => "User"
   has_one :unapproval
   after_destroy :delete_files
   after_save :create_version
@@ -461,6 +460,14 @@ class Post < ActiveRecord::Base
     
     def uploader_id
       uploader_string[5, 100].to_i
+    end
+    
+    def uploader
+      User.find(uploader_id)
+    end
+    
+    def uploader=(user)
+      self.uploader_id = user.id
     end
   end
   

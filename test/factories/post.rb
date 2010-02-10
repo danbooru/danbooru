@@ -1,7 +1,9 @@
 Factory.define(:post) do |f|
-  f.md5 "abcd"
+  f.md5 {|x| Time.now.to_f.to_s}
   f.uploader {|x| x.association(:user)}
   f.uploader_ip_addr "127.0.0.1"
+  f.updater_id {|x| x.uploader_id}
+  f.updater_ip_addr "127.0.0.1"
   f.tag_string "tag1 tag2"
   f.tag_count 2
   f.tag_count_general 2
