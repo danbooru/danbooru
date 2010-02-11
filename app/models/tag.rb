@@ -1,6 +1,7 @@
 class Tag < ActiveRecord::Base
   attr_accessible :category
   after_save :update_category_cache
+  named_scope :by_pattern, lambda {|name| where(["name LIKE ? ESCAPE E'\\\\'", name.to_escaped_for_sql_like])}
 
   class CategoryMapping
     Danbooru.config.reverse_tag_category_mapping.each do |value, category|
@@ -30,26 +31,19 @@ class Tag < ActiveRecord::Base
         @category_mapping ||= CategoryMapping.new
       end
       
+      def select_category_for(tag_name)
+        select_value_sql("SELECT category FROM tags WHERE name = ?", tag_name).to_i
+      end
+      
       def category_for(tag_name)
         Cache.get("tc:#{Cache.sanitize(tag_name)}") do
-          select_value_sql("SELECT category FROM tags WHERE name = ?", tag_name).to_i
+          select_category_for(tag_name)
         end
       end
       
       def categories_for(tag_names)
-        key_hash = tag_names.inject({}) do |hash, x|
-          hash[x] = "tc:#{Cache.sanitize(x)}"
-          hash
-        end
-        categories_hash = MEMCACHE.get_multi(key_hash.values)
-        returning({}) do |result_hash|
-          key_hash.each do |tag_name, hash_key|
-            if categories_hash.has_key?(hash_key)
-              result_hash[tag_name] = categories_hash[hash_key]
-            else
-              result_hash[tag_name] = category_for(tag_name)
-            end
-          end
+        Cache.get_multi(tag_names, "tc") do |name|
+          select_category_for(name)
         end
       end
     end
@@ -191,63 +185,110 @@ class Tag < ActiveRecord::Base
 
       end
     end
+    
+    def parse_tag(tag, output)
+      if tag[0] == "-" && tag.size > 1
+        output[:exclude] << tag[1..-1]
+        
+      elsif tag =~ /\*/
+        matches = Tag.by_pattern(tag).all(:select => "name", :limit => 25, :order => "post_count DESC").map(&:name)
+        matches = ["~no_matches~"] if matches.empty?
+        output[:include] += matches
+        
+      else
+        output[:related] << token
+      end
+    end
 
     def parse_query(query, options = {})
       q = Hash.new {|h, k| h[k] = []}
+      q[:tags] = {
+        :related => [],
+        :include => [],
+        :exclude => []
+      }
 
       scan_query(query).each do |token|
-        if token =~ /\A(sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|change|status|tagcount|gentagcount|arttagcount|chartagcount|copytagcount):(.+)\Z/
-          if $1 == "sub"
-            q[:subscriptions] = $2
-          elsif $1 == "md5"
-            q[:md5] = $2
-          elsif $1 == "-rating"
+        if token =~ /\A(-uploader|uploader|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|status|tagcount|gentags|arttags|chartags|copytags):(.+)\Z/
+          case $1
+          when "-uploader"
+            q[:tags][:exclude] << token[1..-1]
+            
+          when "uploader"
+            q[:tags][:related] << token
+            
+          when "-pool"
+            q[:tags][:exclude] << token[1..-1]
+            
+          when "pool"
+            q[:tags][:related] << token
+          
+          when "-fav"
+            q[:tags][:exclude] << token[1..-1]
+
+          when "fav"
+            q[:tags][:related] << token
+
+          when "sub"
+            q[:subscriptions] << $2
+
+          when "md5"
+            q[:md5] = $2.split(/,/)
+
+          when "-rating"
             q[:rating_negated] = $2
-          elsif $1 == "rating"
+
+          when "rating"
             q[:rating] = $2
-          elsif $1 == "id"
+            
+          when "id"
             q[:post_id] = parse_helper($2)
-          elsif $1 == "width"
+            
+          when "width"
             q[:width] = parse_helper($2)
-          elsif $1 == "height"
+            
+          when "height"
             q[:height] = parse_helper($2)
-          elsif $1 == "mpixels"
+            
+          when "mpixels"
             q[:mpixels] = parse_helper($2, :float)
-          elsif $1 == "score"
+
+          when "score"
             q[:score] = parse_helper($2)
-      	  elsif $1 == "filesize"
+
+          when "filesize"
       	    q[:filesize] = parse_helper($2, :filesize)
-          elsif $1 == "source"
+
+          when "source"
             q[:source] = $2.to_escaped_for_sql_like + "%"
-          elsif $1 == "date"
+
+          when "date"
             q[:date] = parse_helper($2, :date)
-          elsif $1 == "tagcount"
+
+          when "tagcount"
             q[:tag_count] = parse_helper($2)
-          elsif $1 == "gentagcount"
+            
+          when "gentags"
             q[:general_tag_count] = parse_helper($2)
-          elsif $1 == "arttagcount"
+
+          when "arttags"
             q[:artist_tag_count] = parse_helper($2)
-          elsif $1 == "chartagcount"
+
+          when "chartags"
             q[:character_tag_count] = parse_helper($2)
-          elsif $1 == "copytagcount"
+
+          when "copytags"
             q[:copyright_tag_count] = parse_helper($2)
-          elsif $1 == "order"
+            
+          when "order"
             q[:order] = $2
-          elsif $1 == "change"
-            q[:change] = parse_helper($2)
-          elsif $1 == "status"
+
+          when "status"
             q[:status] = $2
           end
-        elsif token[0] == "-" && token.size > 1
-          q[:exclude] << token[1..-1]
-        elsif token[0] == "~" && token.size > 1
-          q[:include] << token[1..-1]
-        elsif token.include?("*")
-          matches = where(["name LIKE ? ESCAPE E'\\\\'", token.to_escaped_for_sql_like]).all(:select => "name", :limit => 25, :order => "post_count DESC").map(&:name)
-          matches = ["~no_matches~"] if matches.empty?
-          q[:include] += matches
+          
         else
-          q[:related] << token
+          parse_tag(token, q[:tags])
         end
       end
 
@@ -257,9 +298,9 @@ class Tag < ActiveRecord::Base
     end
 
     def normalize_tags_in_query(query_hash)
-      query_hash[:exclude] = TagAlias.to_aliased(query_hash[:exclude], :strip_prefix => true) if query_hash.has_key?(:exclude)
-      query_hash[:include] = TagAlias.to_aliased(query_hash[:include], :strip_prefix => true) if query_hash.has_key?(:include)
-      query_hash[:related] = TagAlias.to_aliased(query_hash[:related]) if query_hash.has_key?(:related)
+      query_hash[:tags][:exclude] = TagAlias.to_aliased(query_hash[:tags][:exclude])
+      query_hash[:tags][:include] = TagAlias.to_aliased(query_hash[:tags][:include])
+      query_hash[:tags][:related] = TagAlias.to_aliased(query_hash[:tags][:related])
     end
   end
   

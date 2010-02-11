@@ -114,6 +114,76 @@ ALTER SEQUENCE pending_posts_id_seq OWNED BY pending_posts.id;
 
 
 --
+-- Name: pool_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE pool_versions (
+    id integer NOT NULL,
+    pool_id integer,
+    post_ids text DEFAULT ''::text NOT NULL,
+    updater_id integer NOT NULL,
+    updater_ip_addr inet NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: pool_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE pool_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: pool_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE pool_versions_id_seq OWNED BY pool_versions.id;
+
+
+--
+-- Name: pools; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE pools (
+    id integer NOT NULL,
+    name character varying(255),
+    creator_id integer NOT NULL,
+    description text,
+    is_public boolean DEFAULT true NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    post_ids text DEFAULT ''::text NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: pools_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE pools_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: pools_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE pools_id_seq OWNED BY pools.id;
+
+
+--
 -- Name: post_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -174,7 +244,7 @@ CREATE TABLE posts (
     view_count integer DEFAULT 0 NOT NULL,
     last_noted_at timestamp without time zone,
     last_commented_at timestamp without time zone,
-    tag_string text NOT NULL,
+    tag_string text DEFAULT ''::text NOT NULL,
     tag_index tsvector,
     tag_count integer DEFAULT 0 NOT NULL,
     tag_count_general integer DEFAULT 0 NOT NULL,
@@ -345,6 +415,20 @@ ALTER TABLE pending_posts ALTER COLUMN id SET DEFAULT nextval('pending_posts_id_
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE pool_versions ALTER COLUMN id SET DEFAULT nextval('pool_versions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE pools ALTER COLUMN id SET DEFAULT nextval('pools_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE post_versions ALTER COLUMN id SET DEFAULT nextval('post_versions_id_seq'::regclass);
 
 
@@ -385,6 +469,22 @@ ALTER TABLE ONLY pending_posts
 
 
 --
+-- Name: pool_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY pool_versions
+    ADD CONSTRAINT pool_versions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pools_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY pools
+    ADD CONSTRAINT pools_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: post_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -422,6 +522,27 @@ ALTER TABLE ONLY unapprovals
 
 ALTER TABLE ONLY users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: index_pool_versions_on_pool_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_pool_versions_on_pool_id ON pool_versions USING btree (pool_id);
+
+
+--
+-- Name: index_pools_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_pools_on_creator_id ON pools USING btree (creator_id);
+
+
+--
+-- Name: index_pools_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_pools_on_name ON pools USING btree (name);
 
 
 --
@@ -575,3 +696,5 @@ INSERT INTO schema_migrations (version) VALUES ('20100205163027');
 INSERT INTO schema_migrations (version) VALUES ('20100205224030');
 
 INSERT INTO schema_migrations (version) VALUES ('20100209201251');
+
+INSERT INTO schema_migrations (version) VALUES ('20100211025616');

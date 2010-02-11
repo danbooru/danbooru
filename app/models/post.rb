@@ -6,6 +6,7 @@ class Post < ActiveRecord::Base
   after_save :create_version
   before_save :merge_old_tags
   before_save :normalize_tags
+  before_save :set_tag_counts
   has_many :versions, :class_name => "PostVersion"
   
   module FileMethods
@@ -133,11 +134,7 @@ class Post < ActiveRecord::Base
   
   module TagMethods
     def tag_array(reload = false)
-      if @tag_array.nil? || reload
-        @tag_array = Tag.scan_tags(tag_string)
-      end
-      
-      @tag_array
+      Tag.scan_tags(tag_string)
     end
     
     def set_tag_counts
@@ -171,10 +168,10 @@ class Post < ActiveRecord::Base
       if old_tag_string
         # If someone else committed changes to this post before we did,
         # then try to merge the tag changes together.
-        db_tags = Tag.scan_tags(tag_string_was)
+        current_tags = Tag.scan_tags(tag_string_was)
         new_tags = tag_array()
         old_tags = Tag.scan_tags(old_tag_string)        
-        self.tag_string = (db_tags + (new_tags - old_tags) - (old_tags - new_tags)).uniq.join(" ")
+        self.tag_string = ((current_tags + new_tags) - old_tags + (current_tags & new_tags)).uniq.join(" ")
       end
     end
     
@@ -182,87 +179,24 @@ class Post < ActiveRecord::Base
       normalized_tags = Tag.scan_tags(tag_string)
       # normalized_tags = TagAlias.to_aliased(normalized_tags)
       # normalized_tags = TagImplication.with_implications(normalized_tags)
-      normalized_tags = parse_metatags(normalized_tags)
+      normalized_tags = filter_metatags(normalized_tags)
       self.tag_string = normalized_tags.uniq.join(" ")
     end
     
-    def parse_metatags(tags)
-      tags.map do |tag|
-        if tag =~ /^(?:pool|rating|fav|user|uploader):(.+)/
-          case $1
-          when "pool"
-            parse_pool_tag($2)
-            
-          when "rating"
-            parse_rating_tag($2)
-            
-          when "fav"
-            parse_fav_tag($2)
-            
-          when "uploader"
-            # ignore
-            
-          when "user"
-            # ignore
-          end
-          
-          nil
-        else
-          tag
-        end
-      end.compact
-    end
-    
-    def parse_pool_tag(text)
-      case text
-      when "new"
-        pool = Pool.create_anonymous
-        pool.posts << self
-        
-      when "recent"
-        raise NotImplementedError
-        
-      when /^\d+$/
-        pool = Pool.find_by_id(text.to_i)
-        pool.posts << self if pool
-        
-      else
-        pool = Pool.find_by_name(text)
-        pool.posts << self if pool
-      end
-    end
-    
-    def parse_rating_tag(rating)
-      case rating
-      when /q/
-        self.rating = "q"
-        
-      when /e/
-        self.rating = "e"
-        
-      when /s/
-        self.rating = "s"
-      end
-    end
-    
-    def parse_fav_tag(text)
-      case text
-      when "add", "new"
-        add_favorite(updater_id)
-        
-      when "remove", "rem", "del"
-        remove_favorite(updater_id)
-      end
+    def filter_metatags(tags)
+      tags.reject {|tag| tag =~ /\A(?:pool|rating|fav|approver|uploader):/}
     end
   end
   
   module FavoriteMethods
-    def add_favorite(user_id)
-      self.fav_string += " fav:#{user_id}"
+    def add_favorite(user)
+      self.fav_string += " fav:#{user.name}"
+      self.fav_string.strip!
     end
     
-    def remove_favorite(user_id)
-      self.fav_string.gsub!(/user:#{user_id}\b\s*/, " ")
+    def remove_favorite(user)
+      self.fav_string.gsub!(/fav:#{user.name}\b\s*/, " ")
+      self.fav_string.strip!
     end
   end
   
@@ -300,6 +234,48 @@ class Post < ActiveRecord::Base
         "''" + escaped_token + "''"
       end
     end
+    
+    def add_tag_string_search_relation(tags, relation)
+      tag_query_sql = []
+
+      if tags[:include].any?
+        tag_query_sql << "(" + escape_string_for_tsquery(tags[:include]).join(" | ") + ")"
+      end
+  
+      if tags[:related].any?
+        raise SearchError.new("You cannot search for more than #{Danbooru.config.tag_query_limit} tags at a time") if tags[:related].size > Danbooru.config.tag_query_limit
+        tag_query_sql << "(" + escape_string_for_tsquery(tags[:related]).join(" & ") + ")"
+      end
+
+      if tags[:exclude].any?
+        raise SearchError.new("You cannot search for more than #{Danbooru.config.tag_query_limit} tags at a time") if tags[:exclude].size > Danbooru.config.tag_query_limit
+
+        if tags[:related].any? || tags[:include].any?
+          tag_query_sql << "!(" + escape_string_for_tsquery(tags[:exclude]).join(" | ") + ")"
+        else
+          raise SearchError.new("You cannot search for only excluded tags")
+        end
+      end
+
+      if tag_query_sql.any?
+        relation.where("posts.tag_index @@ to_tsquery('danbooru', E'" + tag_query_sql.join(" & ") + "')")
+      end
+    end
+    
+    def add_tag_subscription_relation(subscriptions, relation)
+      subscriptions.each do |subscription|
+        subscription =~ /^(.+?):(.+)$/
+        user_name = $1 || subscription
+        subscription_name = $2
+
+        user = User.find_by_name(user_name)
+
+        if user
+          post_ids = TagSubscription.find_post_ids(user.id, subscription_name)
+          relation.where(["posts.id IN (?)", post_ids])
+        end
+      end
+    end
 
     def build_relation(q, options = {})
       unless q.is_a?(Hash)
@@ -326,7 +302,7 @@ class Post < ActiveRecord::Base
       end
 
       if q[:md5].is_a?(String)
-        relation.where(["posts.md5 IN (?)", q[:md5].split(/,/)])
+        relation.where(["posts.md5 IN (?)", q[:md5]])
       end
 
       if q[:status] == "deleted"
@@ -343,45 +319,11 @@ class Post < ActiveRecord::Base
         relation.where(["posts.source LIKE ? ESCAPE E'\\\\", q[:source]])
       end
 
-      if q[:subscriptions].is_a?(String)
-        raise NotImplementedError
-        
-        q[:subscriptions] =~ /^(.+?):(.+)$/
-        username = $1 || q[:subscriptions]
-        subscription_name = $2
-
-        user = User.find_by_name(username)
-
-        if user
-          post_ids = TagSubscription.find_post_ids(user.id, subscription_name)
-          relation.where(["posts.id IN (?)", post_ids])
-        end
+      if q[:subscriptions].any?
+        add_tag_subscription_relation(q[:subscriptions], relation)
       end
 
-      tag_query_sql = []
-
-      if q[:include].any?
-        tag_query_sql << "(" + escape_string_for_tsquery(q[:include]).join(" | ") + ")"
-      end
-  
-      if q[:related].any?
-        raise SearchError.new("You cannot search for more than #{Danbooru.config.tag_query_limit} tags at a time") if q[:related].size > Danbooru.config.tag_query_limit
-        tag_query_sql << "(" + escape_string_for_tsquery(q[:related]).join(" & ") + ")"
-      end
-
-      if q[:exclude].any?
-        raise SearchError.new("You cannot search for more than #{Danbooru.config.tag_query_limit} tags at a time") if q[:exclude].size > Danbooru.config.tag_query_limit
-
-        if q[:related].any? || q[:include].any?
-          tag_query_sql << "!(" + escape_string_for_tsquery(q[:exclude]).join(" | ") + ")"
-        else
-          raise SearchError.new("You cannot search for only excluded tags")
-        end
-      end
-
-      if tag_query_sql.any?
-        relation.where("posts.tag_index @@ to_tsquery('danbooru', E'" + tag_query_sql.join(" & ") + "')")
-      end
+      add_tag_string_search_relation(q[:tags], relation)
 
       if q[:rating] == "q"
         relation.where("posts.rating = 'q'")
@@ -398,7 +340,7 @@ class Post < ActiveRecord::Base
       elsif q[:rating_negated] == "e"
         relation.where("posts.rating <> 'e'")
       end
-
+      
       case q[:order]
       when "id", "id_asc"
         relation.order("posts.id")
@@ -455,19 +397,35 @@ class Post < ActiveRecord::Base
   
   module UploaderMethods
     def uploader_id=(user_id)
-      self.uploader_string = "user:#{user_id}"
+      self.uploader = User.find(user_id)
     end
     
     def uploader_id
-      uploader_string[5, 100].to_i
+      uploader.id
+    end
+    
+    def uploader_name
+      uploader_string[5..-1]
     end
     
     def uploader
-      User.find(uploader_id)
+      User.find_by_name(uploader_name)
     end
     
     def uploader=(user)
-      self.uploader_id = user.id
+      self.uploader_string = "user:#{usern.name}"
+    end
+  end
+  
+  module PoolMethods
+    def add_pool(pool)
+      self.pool_string += " pool:#{pool.name}"
+      self.pool_string.strip!
+    end
+    
+    def remove_pool(user_id)
+      self.pool_string.gsub!(/pool:#{pool.name}\b\s*/, " ")
+      self.pool_string.strip!
     end
   end
   
@@ -479,4 +437,5 @@ class Post < ActiveRecord::Base
   include TagMethods
   include FavoriteMethods
   include UploaderMethods
+  include PoolMethods
 end

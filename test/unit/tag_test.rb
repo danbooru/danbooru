@@ -108,15 +108,15 @@ class TagTest < ActiveSupport::TestCase
       tag1 = Factory.create(:tag, :name => "abc")
       tag2 = Factory.create(:tag, :name => "acb")
 
-      assert_equal({md5: "abc"}, Tag.parse_query("md5:abc"))
-      assert_equal({:post_id => [:between, 1, 2]}, Tag.parse_query("id:1..2"))
-      assert_equal({:post_id => [:gte, 1]}, Tag.parse_query("id:1.."))
-      assert_equal({:post_id => [:lte, 2]}, Tag.parse_query("id:..2"))
-      assert_equal({:post_id => [:gt, 2]}, Tag.parse_query("id:>2"))
-      assert_equal({:post_id => [:lt, 3]}, Tag.parse_query("id:<3"))
+      assert_equal(["abc"], Tag.parse_query("md5:abc")[:md5])
+      assert_equal([:between, 1, 2], Tag.parse_query("id:1..2")[:post_id])
+      assert_equal([:gte, 1], Tag.parse_query("id:1..")[:post_id])
+      assert_equal([:lte, 2], Tag.parse_query("id:..2")[:post_id])
+      assert_equal([:gt, 2], Tag.parse_query("id:>2")[:post_id])
+      assert_equal([:lt, 3], Tag.parse_query("id:<3")[:post_id])
 
       Tag.expects(:normalize_tags_in_query).returns(nil)
-      assert_equal({:include => ["acb"]}, Tag.parse_query("a*b"))      
+      assert_equal(["acb"], Tag.parse_query("a*b")[:tags][:include])
     end
   end
   

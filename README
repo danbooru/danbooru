@@ -1,55 +1,121 @@
 === Installation
 
-It is recommended that you install Danbooru on a Debian-based system (Lenny or newer) since most of the required packages are available on APT. Although Danbooru has been successfully installed on Fedora, CentOS, FreeBSD, and OS X, the following instructions will assume you're installing on Debian. The Debian install script is straightforward and should be simple to adapt for other platforms. Install docs for other platforms are provided, but these are user contributed and may not be up to date. If you want something similar to Danbooru that is easier to install, try Shimmie (http://trac.shishnet.org/shimmie2). Shimmie uses PHP and MySQL and should be straightforward to install on most hosts.
+It is recommended that you install Danbooru on a Debian-based system (Lenny or
+newer) since most of the required packages are available on APT. Although
+Danbooru has been successfully installed on Fedora, CentOS, FreeBSD, and OS X,
+the following instructions will assume you're installing on Debian. The Debian
+install script is straightforward and should be simple to adapt for other
+platforms. Install docs for other platforms are provided, but these are user
+contributed and may not be up to date. If you want something similar to
+Danbooru that is easier to install, try Shimmie
+(http://trac.shishnet.org/shimmie2). Shimmie uses PHP and MySQL and should be
+straightforward to install on most hosts.
 
-For best performance, you will need at least 256MB of RAM for PostgreSQL and Rails. The memory requirement will grow as your database gets bigger; the main Danbooru database takes up around 1GB of memory by itself.
+For best performance, you will need at least 256MB of RAM for PostgreSQL and
+Rails. The memory requirement will grow as your database gets bigger; the main
+Danbooru database takes up around 1GB of memory by itself.
 
-- Danbooru has the following general dependencies: gcc, g++, make, readline, zlib, flex, bison, gd2, bzip2, postgresql-8.4, postgresql-contrib-8.4, ruby, rubygems, memcached, subversion, apache, and phusion passenger. Use your operating system's package management system whenever possible. This will simplify the process of installing init scripts, which will not always happen when compiling from source.
-- Please read the section below about PostgreSQL and test_parser before proceeding.
-- Danbooru has the following Ruby gem dependencies: pg, diff-lcs, html5, memcache-client, aws-s3, json, rails (version 3.0)
-  - You may need to specify the path to your PostgreSQL libraries and includes when building the postgres gem. The general format for this is: "gem install postgres -- --with-pgsql-dir=/usr/local/pgsql". Experiment with the other configure settings if this doesn't work.
-- It's recommended you create a dedicated account for running the Danbooru database and/or web processes. If you go this route:
-  - Use the createuser command while logged in as postgres to grant database access to the danbooru account.
-  - You will need to update the pg_hba.conf file to grant your danbooru account trusted localhost access. Make sure to restart the database server (/etc/init.d/postgresql-8.3 restart) after making any changes.
-- You now have to check out the Danbooru source code. It's recommended you create it in the /var/www directory, but you can put the code anywhere. 
-  - To export from Subversion: "svn export svn://donmai.us/danbooru/trunk danbooru"
-  - Recursively change the owner of this directory to the danbooru account: "chown -R danbooru:danbooru danbooru"
-  - Create a public/data/sample directory.
-  - Compile the resizer at lib/danbooru_image_resizer: "ruby extconf.rb && make". Do not make install it. If this fails you will need to figure out your gd2/libjpeg/libpng dependencies.
-  - Create new database.yml and local_config.rb files in the config directory. Example files are provided.
-  - Create the database: "createdb danbooru"
-  - Load the schema: "psql danbooru < db/postgres.sql"
-  - Run the migrations: "RAILS_ENV=production rake db:migrate"
-  - Start the job daemon: "RAILS_ENV=production app/daemons/job_task_processor_ctl.rb start"
-  - You now need a way of managing the Rails process. The preferred method is using the Phusion Passenger module (see section below). Alternatively you can use Mongrel or fastcgi, there are several examples on the web.
-- You should now be able to connect to your Danbooru instance. The first account you create will automatically become the administrator, so you should do this first.
+Danbooru has the following general dependencies: gcc, g++, make, readline,
+zlib, flex, bison, gd2, bzip2, postgresql-8.4, postgresql-contrib-8.4,
+ruby1.9, rubygems, memcached, subversion, nginx, and phusion passenger.
+
+Use your operating system's package management system whenever possible.
+This will simplify the process of installing init scripts, which will not
+always happen when compiling from source.
+
+Please read the section below about PostgreSQL and test_parser before
+proceeding.
+
+It's recommended you create a dedicated account for running the Danbooru
+database and/or web processes. If you go this route:
+- Use the createuser command while logged in as postgres to grant database
+  access to the danbooru account.
+- You will need to update the pg_hba.conf file to grant your danbooru
+  account trusted localhost access. Make sure to restart the database server
+  (/etc/init.d/postgresql restart) after making any changes.
+    
+You now have to check out the Danbooru source code. It's recommended you
+create it in the /var/www directory, but you can put the code anywhere. 
+To export from Git: git clone git://github.com/r888888888/danbooru.git
+
+Recursively change the owner of this directory to the danbooru account:
+chown -R danbooru:danbooru danbooru
+
+Compile the resizer at lib/danbooru_image_resizer: ruby extconf.rb && make
+
+Create new database.yml and danbooru_local_config.rb files in the config
+directory. Example files are provided.
+
+Create the database: createdb danbooru
+
+Load the schema: psql danbooru < db/development_structure.sql
+
+Start the job daemon: RAILS_ENV=production 
+app/daemons/job_task_processor_ctl.rb start
+
+You now need a way of managing the Rails process. The preferred method is
+using the Phusion Passenger module (see section below). Alternatively you
+can use Mongrel or fastcgi, there are several examples on the web.
+
+You should now be able to connect to your Danbooru instance. The first
+account you create will automatically become the administrator, so you
+should do this first.
 
 === PostgreSQL and test_parser
 
-Starting with version 1.16, Danbooru relies on PostgreSQL's full text search feature to speed up tag queries. The gains are especially noticeable on tags with large post counts and for multi-tag joins. Unfortunately in order to adapt it for Danbooru a custom parser is required.
+Starting with version 1.16, Danbooru relies on PostgreSQL's full text search
+feature to speed up tag queries. The gains are especially noticeable on tags
+with large post counts and for multi-tag joins. Unfortunately in order to
+adapt it for Danbooru a custom parser is required.
 
-The easiest way of doing this on Debian is installing the the postgresql-contrib-8.4 package. You should do this prior to running the Danbooru database migrations.
+The easiest way of doing this on Debian is installing the the
+postgresql-contrib-8.4 package. You should do this prior to running the
+Danbooru database migrations.
 
-=== Apache and Phusion Passenger
+=== Nginx and Phusion Passenger
 
-Phusion Passenger is essentially mod_rails, a compiled module for Apache that is similar in functionality to fastcgi. It is used instead of fastcgi or Mongrel to proxy requests between Rails processes that Passenger manages. When used in conjunction with Ruby Enterprise Edition you can see improved performance and memory efficiency. Passenger also makes deployments much easier, requiring that you only touch a file called "restart.txt" in your tmp directory.
+Nginx is a web server, similar in purpose to Apache. Its event-oriented
+architecture makes it better at serving static content than Apache, but
+Danbooru work just as well with Apache if you'd rather use that.
 
-Installing Passenger on Debian is relatively painless; you can follow the instructions here: http://www.modrails.com/install.html. Passenger will automatically detect Rails folders so the Apache configuration for your site will be basic; the Passenger website explains in detail.
+Phusion Passenger is essentially mod_rails, a compiled module for Nginx that
+is similar in functionality to fastcgi. It is used instead of fastcgi or
+Mongrel to proxy requests between Rails processes that Passenger manages. When
+used in conjunction with Ruby Enterprise Edition you can see improved
+performance and memory efficiency. Passenger also makes deployments much
+easier, requiring that you only touch a file called "restart.txt" in your tmp
+directory.
+
+Installing Passenger on Debian is relatively painless; you can follow the
+instructions here: http://www.modrails.com/install.html. Passenger will
+automatically detect Rails folders so the Nginx configuration for your site
+will be basic; the Passenger website explains in detail.
 
 === Ruby Enterprise Edition
 
-REE is a special version of the Ruby interpreter that, among other things, uses a more intelligent malloc routine and performs copy-on-write garbage collection. The end result is better memory usage, up to 30% in ideal cases.
+REE is a special version of the Ruby interpreter that, among other things,
+uses a more intelligent malloc routine and performs copy-on-write garbage
+collection. The end result is better memory usage, up to 30% in ideal cases.
 
-It is fairly straightforward to install and won't override your existing Ruby installation. Find out more here: http://www.rubyenterpriseedition.com
+It is fairly straightforward to install and won't override your existing Ruby
+installation. Find out more here: http://www.rubyenterpriseedition.com
 
 === Troubleshooting
 
-These instructions won't work for everyone. If your setup is not working, here are the steps I usually reccommend to people:
+These instructions won't work for everyone. If your setup is not working, here
+are the steps I usually recommend to people:
 
-1) Test the database. Make sure you can connect to it using psql. Make sure the tables exist. If this fails, you need to work on correctly installing PostgreSQL, importing the initial schema, and running the migrations.
+1) Test the database. Make sure you can connect to it using psql. Make sure
+the tables exist. If this fails, you need to work on correctly installing
+PostgreSQL, importing the initial schema, and running the migrations.
 
-2) Test the Rails database connection by using ruby script/console. Run Post.count to make sure Rails can connect to the database. If this fails, you need to make sure your Danbooru configuration files are correct.
+2) Test the Rails database connection by using rails console. Run
+Post.count to make sure Rails can connect to the database. If this fails, you
+need to make sure your Danbooru configuration files are correct.
 
-3) If you're using Mongrel, test connecting directly to the Mongrel process by running elinks http://localhost:PORT. If this fails, you need to debug your Mongrel configuration file.
+3) If you're using Mongrel, test connecting directly to the Mongrel process by
+running elinks http://localhost:PORT. If this fails, you need to debug your
+Mongrel configuration file.
 
-4) Test Apache to make sure it's proxying requests correctly. If this fails, you need to debug your Apache configuration file.
+4) Test Nginx to make sure it's proxying requests correctly. If this fails,
+you need to debug your Nginx configuration file.

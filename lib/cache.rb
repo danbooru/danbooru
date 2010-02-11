@@ -20,6 +20,24 @@ module Cache
     ActiveRecord::Base.logger.debug('MemCache Incr %s' % [key])
   end
   
+  def get_multi(keys, prefix, expiry = 0)
+    key_to_sanitized_key_hash = keys.inject({}) do |hash, x|
+      hash[x] = "#{prefix}:#{Cache.sanitize(x)}"
+      hash
+    end
+    sanitized_key_to_value_hash = MEMCACHE.get_multi(key_to_sanitized_key_hash.values)
+    returning({}) do |result_hash|
+      key_to_sanitized_key_hash.each do |key, sanitized_key|
+        if sanitized_key_to_value_hash.has_key?(sanitized_key)
+          result_hash[key] = sanitized_key_to_value_hash[sanitized_key]
+        else
+          result_hash[key] = yield(key)
+          Cache.put(sanitized_key, result_hash[key], expiry)
+        end
+      end
+    end
+  end
+  
   def get(key, expiry = 0)
     if block_given?
       return yield
@@ -81,6 +99,7 @@ module Cache
   end
   
   module_function :get
+  module_function :get_multi
   module_function :expire
   module_function :incr
   module_function :put
