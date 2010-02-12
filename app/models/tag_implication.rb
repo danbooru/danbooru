@@ -47,7 +47,6 @@ class TagImplication < ActiveRecord::Base
   
   def update_descendant_names
     self.descendant_names = descendants.join(" ")
-    self.class.logger.debug "#{antecedent_name}> updating descendants to #{descendant_names}"
   end
   
   def update_descendant_names!(updater_id, updater_ip_addr)
@@ -59,7 +58,6 @@ class TagImplication < ActiveRecord::Base
   
   def update_descendant_names_for_parent
     if parent
-      self.class.logger.debug "#{antecedent_name}> updating parent #{parent.antecedent_name}"
       parent.update_descendant_names!(updater_id, updater_ip_addr)
     end
   end
