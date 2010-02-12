@@ -194,6 +194,34 @@ class PostTest < ActiveSupport::TestCase
       assert_equal("", @post.fav_string)
     end
   end
+  
+  context "Pooling a post" do
+    should "work" do
+      post = Factory.create(:post)
+      pool = Factory.create(:pool)
+      post.add_pool(pool)
+      assert_equal("pool:#{pool.name}", post.pool_string)
+      post.remove_pool(pool)
+      assert_equal("", post.pool_string)
+    end
+  end
+  
+  context "A post's uploader" do
+    should "be defined" do
+      post = Factory.create(:post)
+      user1 = Factory.create(:user)
+      user2 = Factory.create(:user)
+      user3 = Factory.create(:user)
+      
+      post.uploader = user1
+      assert_equal("uploader:#{user1.name}", post.uploader_string)
+      
+      post.uploader_id = user2.id
+      assert_equal("uploader:#{user2.name}", post.uploader_string)
+      assert_equal(user2.id, post.uploader_id)
+      assert_equal(user2.name, post.uploader_name)
+    end
+  end
 
   context "A tag search" do
     should "return posts for 1 tag" do

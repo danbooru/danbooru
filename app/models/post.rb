@@ -187,7 +187,7 @@ class Post < ActiveRecord::Base
       if old_tag_string
         # If someone else committed changes to this post before we did,
         # then try to merge the tag changes together.
-        current_tags = Tag.scan_tags(tag_string_was)
+        current_tags = tag_array_was()
         new_tags = tag_array()
         old_tags = Tag.scan_tags(old_tag_string)        
         set_tag_string(((current_tags + new_tags) - old_tags + (current_tags & new_tags)).uniq.join(" "))
@@ -451,7 +451,7 @@ class Post < ActiveRecord::Base
       self.pool_string.strip!
     end
     
-    def remove_pool(user_id)
+    def remove_pool(pool)
       self.pool_string.gsub!(/pool:#{pool.name}\b\s*/, " ")
       self.pool_string.strip!
     end
