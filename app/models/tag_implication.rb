@@ -12,7 +12,9 @@ class TagImplication < ActiveRecord::Base
   validate :absence_of_circular_relation
   
   def self.with_descendants(names)
-    ([names] + where(["antecedent_name IN (?)", Array(names)]).all.map {|x| x.descendant_names_array}).flatten
+    Cache.get_multi(names.flatten, "ti") do |name|
+      ([name] + where(["antecedent_name = ?", name]).all.map {|x| x.descendant_names_array}).flatten
+    end.values.flatten.uniq
   end
   
   def absence_of_circular_relation

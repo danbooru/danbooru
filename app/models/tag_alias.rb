@@ -18,7 +18,7 @@ class TagAlias < ActiveRecord::Base
       end
     end
     
-    alias_hash.values.uniq
+    alias_hash.values.flatten.uniq
   end
   
   def absence_of_transitive_relation
