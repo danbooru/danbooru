@@ -225,7 +225,7 @@ class Post < ActiveRecord::Base
     end
     
     def remove_favorite(user)
-      self.fav_string.gsub!(/fav:#{user.name}\b\s*/, " ")
+      self.fav_string.gsub!(/(?:\A| )fav:#{user.name}(?:\Z| )/, " ")
       self.fav_string.strip!
       Favorite.destroy(user, self)
     end
@@ -454,7 +454,7 @@ class Post < ActiveRecord::Base
     end
     
     def remove_pool(pool)
-      self.pool_string.gsub!(/pool:#{pool.name}\b\s*/, " ")
+      self.pool_string.gsub!(/(?:\A| )pool:#{pool.name}(?:\Z| )/, " ")
       self.pool_string.strip!
     end
   end
