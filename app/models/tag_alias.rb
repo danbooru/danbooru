@@ -10,6 +10,8 @@ class TagAlias < ActiveRecord::Base
         name
       end
     end
+    
+    alias_hash.values
   end
   
   def update_posts

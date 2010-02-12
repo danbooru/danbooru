@@ -196,7 +196,7 @@ class Tag < ActiveRecord::Base
         output[:include] += matches
         
       else
-        output[:related] << token
+        output[:related] << tag
       end
     end
 

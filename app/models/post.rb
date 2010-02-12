@@ -4,9 +4,13 @@ class Post < ActiveRecord::Base
   has_one :unapproval
   after_destroy :delete_files
   after_save :create_version
+  
   before_save :merge_old_tags
   before_save :normalize_tags
+  before_save :create_tags
+  before_save :update_tag_post_counts
   before_save :set_tag_counts
+
   has_many :versions, :class_name => "PostVersion"
   
   module FileMethods
@@ -133,8 +137,23 @@ class Post < ActiveRecord::Base
   end
   
   module TagMethods
-    def tag_array(reload = false)
-      Tag.scan_tags(tag_string)
+    def tag_array
+      @tag_array ||= Tag.scan_tags(tag_string)
+    end
+    
+    def tag_array_was
+      @tag_array_was ||= Tag.scan_tags(tag_string_was)
+    end
+    
+    def create_tags
+      set_tag_string(tag_array.map {|x| Tag.find_or_create_by_name(x).name}.join(" "))
+    end
+    
+    def update_tag_post_counts
+      decrement_tags = tag_array_was - tag_array
+      increment_tags = tag_array - tag_array_was
+      execute_sql("UPDATE tags SET post_count = post_count - 1 WHERE name IN (?)", decrement_tags) if decrement_tags.any?
+      execute_sql("UPDATE tags SET post_count = post_count + 1 WHERE name IN (?)", increment_tags) if increment_tags.any?
     end
     
     def set_tag_counts
@@ -171,16 +190,26 @@ class Post < ActiveRecord::Base
         current_tags = Tag.scan_tags(tag_string_was)
         new_tags = tag_array()
         old_tags = Tag.scan_tags(old_tag_string)        
-        self.tag_string = ((current_tags + new_tags) - old_tags + (current_tags & new_tags)).uniq.join(" ")
+        set_tag_string(((current_tags + new_tags) - old_tags + (current_tags & new_tags)).uniq.join(" "))
       end
+    end
+    
+    def reset_tag_array_cache
+      @tag_array = nil
+      @tag_array_was = nil
+    end
+    
+    def set_tag_string(string)
+      self.tag_string = string
+      reset_tag_array_cache
     end
     
     def normalize_tags
       normalized_tags = Tag.scan_tags(tag_string)
-      # normalized_tags = TagAlias.to_aliased(normalized_tags)
-      # normalized_tags = TagImplication.with_implications(normalized_tags)
+      normalized_tags = TagAlias.to_aliased(normalized_tags)
+      normalized_tags = TagImplication.with_descendants(normalized_tags)
       normalized_tags = filter_metatags(normalized_tags)
-      self.tag_string = normalized_tags.uniq.join(" ")
+      set_tag_string(normalized_tags.uniq.join(" "))
     end
     
     def filter_metatags(tags)
@@ -203,28 +232,28 @@ class Post < ActiveRecord::Base
   module SearchMethods
     class SearchError < Exception ; end
     
-    def add_range_relation(arr, field, arel)
+    def add_range_relation(arr, field, relation)
       case arr[0]
       when :eq
-        arel.where(["#{field} = ?", arr[1]])
+        relation.where(["#{field} = ?", arr[1]])
 
       when :gt
-        arel.where(["#{field} > ?"], arr[1])
+        relation.where(["#{field} > ?", arr[1]])
 
       when :gte
-        arel.where(["#{field} >= ?", arr[1]])
+        relation.where(["#{field} >= ?", arr[1]])
 
       when :lt
-        arel.where(["#{field} < ?", arr[1]])
+        relation.where(["#{field} < ?", arr[1]])
 
       when :lte
-        arel.where(["#{field} <= ?", arr[1]])
+        relation.where(["#{field} <= ?", arr[1]])
 
       when :between
-        arel.where(["#{field} BETWEEN ? AND ?", arr[1], arr[2]])
+        relation.where(["#{field} BETWEEN ? AND ?", arr[1], arr[2]])
 
       else
-        # do nothing
+        relation
       end
     end
 
@@ -258,8 +287,10 @@ class Post < ActiveRecord::Base
       end
 
       if tag_query_sql.any?
-        relation.where("posts.tag_index @@ to_tsquery('danbooru', E'" + tag_query_sql.join(" & ") + "')")
+        relation = relation.where("posts.tag_index @@ to_tsquery('danbooru', E'" + tag_query_sql.join(" & ") + "')")
       end
+      
+      relation
     end
     
     def add_tag_subscription_relation(subscriptions, relation)
@@ -272,126 +303,123 @@ class Post < ActiveRecord::Base
 
         if user
           post_ids = TagSubscription.find_post_ids(user.id, subscription_name)
-          relation.where(["posts.id IN (?)", post_ids])
+          relation = relation.where(["posts.id IN (?)", post_ids])
         end
-      end
-    end
-
-    def build_relation(q, options = {})
-      unless q.is_a?(Hash)
-        q = Tag.parse_query(q)
-      end
-
-      relation = where()
-
-      add_range_relation(q[:post_id], "posts.id", relation)
-      add_range_relation(q[:mpixels], "posts.width * posts.height / 1000000.0", relation)
-      add_range_relation(q[:width], "posts.image_width", relation)
-      add_range_relation(q[:height], "posts.image_height", relation)
-      add_range_relation(q[:score], "posts.score", relation)
-      add_range_relation(q[:filesize], "posts.file_size", relation)
-      add_range_relation(q[:date], "posts.created_at::date", relation)
-      add_range_relation(q[:general_tag_count], "posts.tag_count_general", relation)
-      add_range_relation(q[:artist_tag_count], "posts.tag_count_artist", relation)
-      add_range_relation(q[:copyright_tag_count], "posts.tag_count_copyright", relation)
-      add_range_relation(q[:character_tag_count], "posts.tag_count_character", relation)
-      add_range_relation(q[:tag_count], "posts.tag_count", relation)      
-
-      if options[:before_id]
-        relation.where(["posts.id < ?", options[:before_id]])
-      end
-
-      if q[:md5].is_a?(String)
-        relation.where(["posts.md5 IN (?)", q[:md5]])
-      end
-
-      if q[:status] == "deleted"
-        relation.where("posts.is_deleted = TRUE")
-      elsif q[:status] == "pending"
-        relation.where("posts.is_pending = TRUE")
-      elsif q[:status] == "flagged"
-        relation.where("posts.is_flagged = TRUE")
-      else
-        relation.where("posts.is_deleted = FALSE")
-      end
-
-      if q[:source].is_a?(String)
-        relation.where(["posts.source LIKE ? ESCAPE E'\\\\", q[:source]])
-      end
-
-      if q[:subscriptions].any?
-        add_tag_subscription_relation(q[:subscriptions], relation)
-      end
-
-      add_tag_string_search_relation(q[:tags], relation)
-
-      if q[:rating] == "q"
-        relation.where("posts.rating = 'q'")
-      elsif q[:rating] == "s"
-        relation.where("posts.rating = 's'")
-      elsif q[:rating] == "e"
-        relation.where("posts.rating = 'e'")
-      end
-
-      if q[:rating_negated] == "q"
-        relation.where("posts.rating <> 'q'")
-      elsif q[:rating_negated] == "s"
-        relation.where("posts.rating <> 's'")
-      elsif q[:rating_negated] == "e"
-        relation.where("posts.rating <> 'e'")
-      end
-      
-      case q[:order]
-      when "id", "id_asc"
-        relation.order("posts.id")
-
-      when "id_desc"
-        relation.order("posts.id DESC")
-
-      when "score", "score_desc"
-        relation.order("posts.score DESC, posts.id DESC")
-
-      when "score_asc"
-        relation.order("posts.score, posts.id DESC")
-
-      when "mpixels", "mpixels_desc"
-        # Use "w*h/1000000", even though "w*h" would give the same result, so this can use
-        # the posts_mpixels index.
-        relation.order("posts.image_width * posts.image_height / 1000000.0 DESC, posts.id DESC")
-
-      when "mpixels_asc"
-        relation.order("posts.image_width * posts.image_height / 1000000.0, posts.id DESC")
-
-      when "portrait"
-        relation.order("1.0 * image_width / GREATEST(1, image_height), posts.id DESC")
-
-      when "landscape"
-        relation.order("1.0 * image_width / GREATEST(1, image_height) DESC, p.id DESC")
-
-    	when "filesize", "filesize_desc"
-    	  relation.order("posts.file_size DESC")
-
-    	when "filesize_asc"
-    	  relation.order("posts.file_size")
-
-      else
-        relation.order("posts.id DESC")
-      end
-
-      if options[:limit]
-        relation.limit(options[:limit])
-      end
-
-      if options[:offset]
-        relation.offset(options[:offset])
       end
       
       relation
     end
-    
-    def find_by_tags(tags, options)
-      hash = Tag.parse_query(tags)
-      build_relation(hash, options)
+
+    def find_by_tags(q, options = {})
+      unless q.is_a?(Hash)
+        q = Tag.parse_query(q)
+      end
+      
+      relation = where()
+
+      relation = add_range_relation(q[:post_id], "posts.id", relation)
+      relation = add_range_relation(q[:mpixels], "posts.width * posts.height / 1000000.0", relation)
+      relation = add_range_relation(q[:width], "posts.image_width", relation)
+      relation = add_range_relation(q[:height], "posts.image_height", relation)
+      relation = add_range_relation(q[:score], "posts.score", relation)
+      relation = add_range_relation(q[:filesize], "posts.file_size", relation)
+      relation = add_range_relation(q[:date], "posts.created_at::date", relation)
+      relation = add_range_relation(q[:general_tag_count], "posts.tag_count_general", relation)
+      relation = add_range_relation(q[:artist_tag_count], "posts.tag_count_artist", relation)
+      relation = add_range_relation(q[:copyright_tag_count], "posts.tag_count_copyright", relation)
+      relation = add_range_relation(q[:character_tag_count], "posts.tag_count_character", relation)
+      relation = add_range_relation(q[:tag_count], "posts.tag_count", relation)      
+
+      if options[:before_id]
+        relation = relation.where(["posts.id < ?", options[:before_id]])
+      end
+
+      if q[:md5].any?
+        relation = relation.where(["posts.md5 IN (?)", q[:md5]])
+      end
+
+      if q[:status] == "deleted"
+        relation = relation.where("posts.is_deleted = TRUE")
+      elsif q[:status] == "pending"
+        relation = relation.where("posts.is_pending = TRUE")
+      elsif q[:status] == "flagged"
+        relation = relation.where("posts.is_flagged = TRUE")
+      else
+        relation = relation.where("posts.is_deleted = FALSE")
+      end
+
+      if q[:source].is_a?(String)
+        relation = relation.where(["posts.source LIKE ? ESCAPE E'\\\\'", q[:source]])
+      end
+
+      if q[:subscriptions].any?
+        relation = add_tag_subscription_relation(q[:subscriptions], relation)
+      end
+
+      relation = add_tag_string_search_relation(q[:tags], relation)
+
+      if q[:rating] == "q"
+        relation = relation.where("posts.rating = 'q'")
+      elsif q[:rating] == "s"
+        relation = relation.where("posts.rating = 's'")
+      elsif q[:rating] == "e"
+        relation = relation.where("posts.rating = 'e'")
+      end
+
+      if q[:rating_negated] == "q"
+        relation = relation.where("posts.rating <> 'q'")
+      elsif q[:rating_negated] == "s"
+        relation = relation.where("posts.rating <> 's'")
+      elsif q[:rating_negated] == "e"
+        relation = relation.where("posts.rating <> 'e'")
+      end
+      
+      case q[:order]
+      when "id", "id_asc"
+        relation = relation.order("posts.id")
+
+      when "id_desc"
+        relation = relation.order("posts.id DESC")
+
+      when "score", "score_desc"
+        relation = relation.order("posts.score DESC, posts.id DESC")
+
+      when "score_asc"
+        relation = relation.order("posts.score, posts.id DESC")
+
+      when "mpixels", "mpixels_desc"
+        # Use "w*h/1000000", even though "w*h" would give the same result, so this can use
+        # the posts_mpixels index.
+        relation = relation.order("posts.image_width * posts.image_height / 1000000.0 DESC, posts.id DESC")
+
+      when "mpixels_asc"
+        relation = relation.order("posts.image_width * posts.image_height / 1000000.0, posts.id DESC")
+
+      when "portrait"
+        relation = relation.order("1.0 * image_width / GREATEST(1, image_height), posts.id DESC")
+
+      when "landscape"
+        relation = relation.order("1.0 * image_width / GREATEST(1, image_height) DESC, posts.id DESC")
+
+      when "filesize", "filesize_desc"
+        relation = relation.order("posts.file_size DESC")
+
+      when "filesize_asc"
+        relation = relation.order("posts.file_size")
+
+      else
+        relation = relation.order("posts.id DESC")
+      end
+
+      if options[:limit]
+        relation = relation.limit(options[:limit])
+      end
+
+      if options[:offset]
+        relation = relation.offset(options[:offset])
+      end
+      
+      relation
     end
   end
   
@@ -405,7 +433,7 @@ class Post < ActiveRecord::Base
     end
     
     def uploader_name
-      uploader_string[5..-1]
+      uploader_string[9..-1]
     end
     
     def uploader
@@ -413,7 +441,7 @@ class Post < ActiveRecord::Base
     end
     
     def uploader=(user)
-      self.uploader_string = "user:#{usern.name}"
+      self.uploader_string = "uploader:#{user.name}"
     end
   end
   
@@ -438,4 +466,10 @@ class Post < ActiveRecord::Base
   include FavoriteMethods
   include UploaderMethods
   include PoolMethods
+  extend SearchMethods
+  
+  def reload(options = nil)
+    super
+    reset_tag_array_cache
+  end
 end
