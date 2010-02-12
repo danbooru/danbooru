@@ -1,7 +1,7 @@
 class Tag < ActiveRecord::Base
   attr_accessible :category
   after_save :update_category_cache
-  named_scope :by_pattern, lambda {|name| where(["name LIKE ? ESCAPE E'\\\\'", name.to_escaped_for_sql_like])}
+  scope :by_pattern, lambda {|name| where(["name LIKE ? ESCAPE E'\\\\'", name.to_escaped_for_sql_like])}
 
   class CategoryMapping
     Danbooru.config.reverse_tag_category_mapping.each do |value, category|

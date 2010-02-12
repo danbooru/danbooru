@@ -83,9 +83,21 @@ class PostTest < ActiveSupport::TestCase
       post1 = Factory.create(:post, :tag_string => "aaa bbb ccc")
       post2 = Factory.create(:post, :tag_string => "bbb ccc ddd")
       post3 = Factory.create(:post, :tag_string => "ccc ddd eee")
+      user = Factory.create(:user)
       assert_equal(1, Tag.find_by_name("aaa").post_count)
       assert_equal(2, Tag.find_by_name("bbb").post_count)
       assert_equal(3, Tag.find_by_name("ccc").post_count)
+      post3.update_attributes(
+        :tag_string => "xxx",
+        :updater_id => user.id,
+        :updater_ip_addr => "127.0.0.1"
+      )
+      assert_equal(1, Tag.find_by_name("aaa").post_count)
+      assert_equal(2, Tag.find_by_name("bbb").post_count)
+      assert_equal(2, Tag.find_by_name("ccc").post_count)      
+      assert_equal(1, Tag.find_by_name("ddd").post_count)      
+      assert_equal(0, Tag.find_by_name("eee").post_count)
+      assert_equal(1, Tag.find_by_name("xxx").post_count)
     end
 
     should "be counted" do
