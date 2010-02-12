@@ -9,6 +9,7 @@ class CreateTagAliases < ActiveRecord::Migration
     end
     
     add_index :tag_aliases, :antecedent_name
+    add_index :tag_aliases, :consequent_name
   end
 
   def self.down

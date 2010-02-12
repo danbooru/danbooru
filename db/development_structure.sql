@@ -375,45 +375,6 @@ ALTER SEQUENCE favorites_9_id_seq OWNED BY favorites_9.id;
 
 
 --
--- Name: pending_posts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE pending_posts (
-    id integer NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    source character varying(255),
-    file_path character varying(255),
-    content_type character varying(255),
-    rating character(1) NOT NULL,
-    uploader_id integer NOT NULL,
-    uploader_ip_addr inet NOT NULL,
-    tag_string text NOT NULL,
-    status character varying(255) DEFAULT 'pending'::character varying NOT NULL,
-    post_id integer
-);
-
-
---
--- Name: pending_posts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE pending_posts_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: pending_posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE pending_posts_id_seq OWNED BY pending_posts.id;
-
-
---
 -- Name: pool_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -725,6 +686,45 @@ ALTER SEQUENCE unapprovals_id_seq OWNED BY unapprovals.id;
 
 
 --
+-- Name: uploads; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE uploads (
+    id integer NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
+    source character varying(255),
+    file_path character varying(255),
+    content_type character varying(255),
+    rating character(1) NOT NULL,
+    uploader_id integer NOT NULL,
+    uploader_ip_addr inet NOT NULL,
+    tag_string text NOT NULL,
+    status character varying(255) DEFAULT 'pending'::character varying NOT NULL,
+    post_id integer
+);
+
+
+--
+-- Name: uploads_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE uploads_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: uploads_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE uploads_id_seq OWNED BY uploads.id;
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -847,13 +847,6 @@ ALTER TABLE favorites_9 ALTER COLUMN id SET DEFAULT nextval('favorites_9_id_seq'
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE pending_posts ALTER COLUMN id SET DEFAULT nextval('pending_posts_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE pool_versions ALTER COLUMN id SET DEFAULT nextval('pool_versions_id_seq'::regclass);
 
 
@@ -904,6 +897,13 @@ ALTER TABLE tags ALTER COLUMN id SET DEFAULT nextval('tags_id_seq'::regclass);
 --
 
 ALTER TABLE unapprovals ALTER COLUMN id SET DEFAULT nextval('unapprovals_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE uploads ALTER COLUMN id SET DEFAULT nextval('uploads_id_seq'::regclass);
 
 
 --
@@ -994,14 +994,6 @@ ALTER TABLE ONLY favorites_9
 
 
 --
--- Name: pending_posts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY pending_posts
-    ADD CONSTRAINT pending_posts_pkey PRIMARY KEY (id);
-
-
---
 -- Name: pool_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1063,6 +1055,14 @@ ALTER TABLE ONLY tags
 
 ALTER TABLE ONLY unapprovals
     ADD CONSTRAINT unapprovals_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: uploads_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY uploads
+    ADD CONSTRAINT uploads_pkey PRIMARY KEY (id);
 
 
 --

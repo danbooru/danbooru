@@ -1,9 +1,10 @@
 class TagAlias < ActiveRecord::Base
   attr_accessor :updater_id, :updater_ip_addr
   after_save :update_posts
-  after_save :update_cache
+  after_destroy :clear_cache
   validates_presence_of :updater_id, :updater_ip_addr
   validates_uniqueness_of :antecedent_name
+  validate :absence_of_transitive_relation
   belongs_to :updater, :class_name => "User"
   belongs_to :creator, :class_name => "User"
   
@@ -20,8 +21,20 @@ class TagAlias < ActiveRecord::Base
     alias_hash.values.uniq
   end
   
+  def absence_of_transitive_relation
+    # We don't want a -> b && b -> c chains
+    if self.class.exists?(["antecedent_name = ?", consequent_name]) || self.class.exists?(["consequent_name = ?", antecedent_name])
+      self.errors[:base] << "Tag alias can not create a transitive relation with another tag alias"
+      false
+    end
+  end
+
+  def clear_cache
+    Cache.delete("ta:#{Cache.sanitize(antecedent_name)}")
+  end
+  
   def update_cache
-    Cache.put("ta:#{Cache.sanitize(antecedent_name)}", consequent_name, 24.hours)
+    Cache.put("ta:#{Cache.sanitize(antecedent_name)}", consequent_name)
   end
   
   def update_posts

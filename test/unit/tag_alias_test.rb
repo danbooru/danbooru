@@ -19,6 +19,8 @@ class TagAliasTest < ActiveSupport::TestCase
       tag2 = Factory.create(:tag, :name => "bbb")
       ta = Factory.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
       assert_equal("bbb", MEMCACHE.get("ta:aaa"))
+      ta.destroy
+      assert_nil(MEMCACHE.get("ta:aaa"))
     end
     
     should "update any affected posts when saved" do
@@ -32,6 +34,15 @@ class TagAliasTest < ActiveSupport::TestCase
       post2.reload
       assert_equal("ccc bbb", post1.tag_string)
       assert_equal("ccc ddd", post2.tag_string)
+    end
+    
+    should "not validate for transitive relations" do
+      ta1 = Factory.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+      assert_difference("TagAlias.count", 0) do
+        ta3 = TagAlias.create(:antecedent_name => "bbb", :consequent_name => "ddd", :updater_id => ta1.creator_id, :updater_ip_addr => "127.0.0.1")
+        assert(ta3.errors.any?, "Tag alias should be invalid")
+        assert_equal("Tag alias can not create a transitive relation with another tag alias", ta3.errors.full_messages.join)
+      end
     end
   end
 end

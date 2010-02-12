@@ -25,7 +25,9 @@ module Cache
       hash[x] = "#{prefix}:#{Cache.sanitize(x)}"
       hash
     end
+    start_time = Time.now
     sanitized_key_to_value_hash = MEMCACHE.get_multi(key_to_sanitized_key_hash.values)
+    elapsed = Time.now - start_time
     returning({}) do |result_hash|
       key_to_sanitized_key_hash.each do |key, sanitized_key|
         if sanitized_key_to_value_hash.has_key?(sanitized_key)
@@ -35,16 +37,12 @@ module Cache
           Cache.put(sanitized_key, result_hash[key], expiry)
         end
       end
+      
+      ActiveRecord::Base.logger.debug('MemCache Multi-Get (%0.6f)  %s' % [elapsed, keys.join(",")])
     end
   end
   
   def get(key, expiry = 0)
-    if block_given?
-      return yield
-    else
-      return nil
-    end
-    
     begin
       start_time = Time.now
       value = MEMCACHE.get key

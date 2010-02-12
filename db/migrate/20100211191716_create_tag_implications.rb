@@ -10,6 +10,7 @@ class CreateTagImplications < ActiveRecord::Migration
     end
     
     add_index :tag_implications, :antecedent_name
+    add_index :tag_implications, :consequent_name
   end
 
   def self.down
