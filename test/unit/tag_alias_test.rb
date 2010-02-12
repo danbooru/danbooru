@@ -39,7 +39,8 @@ class TagAliasTest < ActiveSupport::TestCase
     should "not validate for transitive relations" do
       ta1 = Factory.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
       assert_difference("TagAlias.count", 0) do
-        ta3 = TagAlias.create(:antecedent_name => "bbb", :consequent_name => "ddd", :updater_id => ta1.creator_id, :updater_ip_addr => "127.0.0.1")
+        ta3 = Factory.build(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ddd")
+        ta3.save
         assert(ta3.errors.any?, "Tag alias should be invalid")
         assert_equal("Tag alias can not create a transitive relation with another tag alias", ta3.errors.full_messages.join)
       end
