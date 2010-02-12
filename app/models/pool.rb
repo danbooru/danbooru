@@ -3,6 +3,7 @@ class Pool < ActiveRecord::Base
   validates_presence_of :name
   validates_format_of :name, :with => /\A[^\s;,]+\Z/, :on => :create, :message => "cannot have whitespace, commas, or semicolons"
   belongs_to :creator, :class_name => "User"
+  has_many :versions, :class_name => "PoolVersion"
   
   def self.create_anonymous(creator)
     pool = Pool.create(:name => "TEMP - #{Time.now.to_f}.#{rand(1_000_000)}", :creator => creator)

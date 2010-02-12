@@ -221,11 +221,13 @@ class Post < ActiveRecord::Base
     def add_favorite(user)
       self.fav_string += " fav:#{user.name}"
       self.fav_string.strip!
+      Favorite.create(user, self)
     end
     
     def remove_favorite(user)
       self.fav_string.gsub!(/fav:#{user.name}\b\s*/, " ")
       self.fav_string.strip!
+      Favorite.destroy(user, self)
     end
   end
   

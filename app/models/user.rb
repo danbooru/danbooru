@@ -71,8 +71,30 @@ class User < ActiveRecord::Base
     end
   end
   
+  module FavoriteMethods
+    def favorite_posts(options = {})
+      favorites_table = Favorite.table_name_for(self)
+      before_id = options[:before]
+      before_id_sql_fragment = "AND favorites.id < #{before_id.to_i}" if before_id
+      limit = options[:limit] || 20
+      
+      sql = <<-EOS
+        SELECT posts.*, favorites.id AS favorite_id
+        FROM posts
+        JOIN #{favorites_table} AS favorites ON favorites.post_id = posts.id
+        WHERE
+          favorites.user_id = #{id}
+          #{before_id_sql_fragment}
+        ORDER BY favorite_id DESC
+        LIMIT #{limit.to_i}
+      EOS
+      Post.find_by_sql(sql)
+    end
+  end
+  
   include NameMethods
   include PasswordMethods
   extend AuthenticationMethods
+  include FavoriteMethods
 end
 
