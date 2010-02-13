@@ -11,4 +11,5 @@ Factory.define(:post) do |f|
   f.image_width 100
   f.image_height 200
   f.file_size 2000
+  f.rating "q"
 end

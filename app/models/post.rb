@@ -134,6 +134,13 @@ class Post < ActiveRecord::Base
       
       raise PostVersion::Error.new(version.errors.full_messages.join("; ")) if version.errors.any?
     end
+    
+    def revert_to!(version)
+      self.source = version.source
+      self.rating = version.rating
+      self.tag_string = version.tag_string
+      save
+    end
   end
   
   module TagMethods
@@ -451,11 +458,13 @@ class Post < ActiveRecord::Base
     def add_pool(pool)
       self.pool_string += " pool:#{pool.name}"
       self.pool_string.strip!
+      pool.add_post!(self)
     end
     
     def remove_pool(pool)
       self.pool_string.gsub!(/(?:\A| )pool:#{pool.name}(?:\Z| )/, " ")
       self.pool_string.strip!
+      pool.remove_post!(self)
     end
   end
   

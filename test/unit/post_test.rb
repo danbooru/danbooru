@@ -45,6 +45,10 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(2, @post.versions.size)
       assert_equal(@user.id, @post.versions.last.updater_id)
       assert_equal("125.0.0.0", @post.versions.last.updater_ip_addr)
+      
+      @post.revert_to!(PostVersion.first)
+      assert_equal("tag1 tag2", @post.tag_string)
+      assert_equal("q", @post.rating)
     end
   end
 
