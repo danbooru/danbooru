@@ -12,6 +12,7 @@ class Post < ActiveRecord::Base
   has_one :unapproval, :dependent => :destroy
   has_one :upload, :dependent => :destroy
   has_many :versions, :class_name => "PostVersion", :dependent => :destroy  
+  has_many :votes, :class_name => "PostVote", :dependent => :destroy
   attr_accessible :source, :rating, :tag_string, :old_tag_string
   
   module FileMethods
@@ -140,7 +141,7 @@ class Post < ActiveRecord::Base
       self.source = version.source
       self.rating = version.rating
       self.tag_string = version.tag_string
-      save
+      save!
     end
   end
   
@@ -473,6 +474,26 @@ class Post < ActiveRecord::Base
     end
   end
   
+  module VoteMethods
+    def can_be_voted_by?(user)
+      !votes.exists?(["user_id = ?", user.id])
+    end
+
+    def vote!(user, is_positive)
+      if can_be_voted_by?(user)
+        if is_positive
+          increment!(:score)
+        else
+          decrement!(:score)
+        end
+
+        votes.create(:user_id => user.id)
+      else
+        raise PostVote::Error.new("You have already voted for this comment")
+      end
+    end
+  end
+  
   include FileMethods
   include ImageMethods
   include ModerationMethods
@@ -483,6 +504,7 @@ class Post < ActiveRecord::Base
   include UploaderMethods
   include PoolMethods
   extend SearchMethods
+  include VoteMethods
   
   def reload(options = nil)
     super

@@ -405,4 +405,16 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(post3.id, relation.first.id)      
     end
   end
+
+  context "Voting on a post" do
+    should "not allow duplicate votes" do
+      user = Factory.create(:user)
+      post = Factory.create(:post)
+      assert_nothing_raised {post.vote!(user, true)}
+      assert_raise(PostVote::Error) {post.vote!(user, true)}
+      post.reload
+      assert_equal(1, PostVote.count)
+      assert_equal(1, post.score)
+    end
+  end
 end

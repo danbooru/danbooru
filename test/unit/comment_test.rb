@@ -38,7 +38,7 @@ class CommentTest < ActiveSupport::TestCase
       post = Factory.create(:post)
       c1 = Factory.create(:comment, :post => post)
       assert_nothing_raised {c1.vote!(user, true)}
-      assert_raise(Comment::VotingError) {c1.vote!(user, true)}
+      assert_raise(CommentVote::Error) {c1.vote!(user, true)}
       assert_equal(1, CommentVote.count)
     
       c2 = Factory.create(:comment, :post => post)

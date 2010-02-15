@@ -1,6 +1,4 @@
-class Comment < ActiveRecord::Base
-  class VotingError < Exception ; end
-  
+class Comment < ActiveRecord::Base  
   validates_format_of :body, :with => /\S/, :message => 'has no content'
   belongs_to :post
   belongs_to :creator, :class_name => "User"
@@ -35,7 +33,7 @@ class Comment < ActiveRecord::Base
       
       votes.create(:user_id => user.id)
     else
-      raise VotingError.new("You have already voted for this comment")
+      raise CommentVote::Error.new("You have already voted for this comment")
     end
   end
 end

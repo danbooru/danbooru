@@ -1,4 +1,6 @@
 class CommentVote < ActiveRecord::Base
+  class Error < Exception ; end
+
   belongs_to :comment
   belongs_to :user
   

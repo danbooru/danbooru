@@ -14,10 +14,6 @@ class User < ActiveRecord::Base
   after_save :update_cache
   scope :named, lambda {|name| where(["lower(name) = ?", name])}  
   
-  def can_update?(object, foreign_key = :user_id)
-    is_moderator? || is_admin? || object.__send__(foreign_key) == id
-  end
-
   module NameMethods
     module ClassMethods
       def find_name(user_id)
@@ -100,5 +96,9 @@ class User < ActiveRecord::Base
   include PasswordMethods
   extend AuthenticationMethods
   include FavoriteMethods
+
+  def can_update?(object, foreign_key = :user_id)
+    is_moderator? || is_admin? || object.__send__(foreign_key) == id
+  end
 end
 

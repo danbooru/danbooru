@@ -656,6 +656,38 @@ ALTER SEQUENCE post_versions_id_seq OWNED BY post_versions.id;
 
 
 --
+-- Name: post_votes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE post_votes (
+    id integer NOT NULL,
+    post_id integer NOT NULL,
+    user_id integer NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: post_votes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE post_votes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: post_votes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE post_votes_id_seq OWNED BY post_votes.id;
+
+
+--
 -- Name: posts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1149,6 +1181,13 @@ ALTER TABLE post_versions ALTER COLUMN id SET DEFAULT nextval('post_versions_id_
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE post_votes ALTER COLUMN id SET DEFAULT nextval('post_votes_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE posts ALTER COLUMN id SET DEFAULT nextval('posts_id_seq'::regclass);
 
 
@@ -1350,6 +1389,14 @@ ALTER TABLE ONLY pools
 
 ALTER TABLE ONLY post_versions
     ADD CONSTRAINT post_versions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: post_votes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY post_votes
+    ADD CONSTRAINT post_votes_pkey PRIMARY KEY (id);
 
 
 --
@@ -1914,3 +1961,5 @@ INSERT INTO schema_migrations (version) VALUES ('20100214080605');
 INSERT INTO schema_migrations (version) VALUES ('20100215182234');
 
 INSERT INTO schema_migrations (version) VALUES ('20100215213756');
+
+INSERT INTO schema_migrations (version) VALUES ('20100215223541');
