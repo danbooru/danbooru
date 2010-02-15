@@ -7,17 +7,17 @@ class ArtistUrl < ActiveRecord::Base
     if url.nil?
       nil
     else
-      url.gsub!(/^http:\/\/blog\d+\.fc2/, "http://blog.fc2")
-      url.gsub!(/^http:\/\/blog-imgs-\d+\.fc2/, "http://blog.fc2")
-      url.gsub!(/^http:\/\/blog-imgs-\d+-\w+\.fc2/, "http://blog.fc2")
-      url.gsub!(/^http:\/\/img\d+\.pixiv\.net/, "http://img.pixiv.net")
-      url.gsub!(/\/+$/, "")
+      url = url.gsub(/^http:\/\/blog\d+\.fc2/, "http://blog.fc2")
+      url = url.gsub(/^http:\/\/blog-imgs-\d+\.fc2/, "http://blog.fc2")
+      url = url.gsub(/^http:\/\/blog-imgs-\d+-\w+\.fc2/, "http://blog.fc2")
+      url = url.gsub(/^http:\/\/img\d+\.pixiv\.net/, "http://img.pixiv.net")
+      url = url.gsub(/\/+\Z/, "")
       url + "/"
     end
   end
   
   def self.normalize_for_search(url)
-    if url =~ /\.\w+$/ && url =~ /\w\/\w/
+    if url =~ /\.\w+\Z/ && url =~ /\w\/\w/
       url = File.dirname(url)
     end
     
