@@ -2,18 +2,17 @@ class Post < ActiveRecord::Base
   attr_accessor :updater_id, :updater_ip_addr, :old_tag_string
   after_destroy :delete_files
   after_destroy :delete_favorites
-  after_save :create_version
-  
+  after_save :create_version  
   before_save :merge_old_tags
   before_save :normalize_tags
   before_save :create_tags
   before_save :update_tag_post_counts
   before_save :set_tag_counts
-
   belongs_to :updater, :class_name => "User"
   has_one :unapproval, :dependent => :destroy
   has_one :upload, :dependent => :destroy
-  has_many :versions, :class_name => "PostVersion", :dependent => :destroy
+  has_many :versions, :class_name => "PostVersion", :dependent => :destroy  
+  attr_accessible :source, :rating, :tag_string, :old_tag_string
   
   module FileMethods
     def delete_files

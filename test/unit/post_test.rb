@@ -41,7 +41,10 @@ class PostTest < ActiveSupport::TestCase
       @post = Factory.create(:post)
       assert_equal(1, @post.versions.size)
     
-      @post.update_attributes(:rating => "e", :updater_id => @user.id, :updater_ip_addr => "125.0.0.0")
+      @post.rating = "e"
+      @post.updater_id = @user.id
+      @post.updater_ip_addr = "125.0.0.0"
+      @post.save
       assert_equal(2, @post.versions.size)
       assert_equal(@user.id, @post.versions.last.updater_id)
       assert_equal("125.0.0.0", @post.versions.last.updater_ip_addr)
@@ -68,11 +71,10 @@ class PostTest < ActiveSupport::TestCase
       user = Factory.create(:user)
       assert_equal(%w(aaa bbb ccc), post.tag_array)
       post.tag_string = "ddd eee fff"
-      post.update_attributes(
-        :updater_id => user.id,
-        :updater_ip_addr => "127.0.0.1",
-        :tag_string => "ddd eee fff"
-      )
+      post.updater_id = user.id
+      post.updater_ip_addr = "127.0.0.1"
+      post.tag_string = "ddd eee fff"
+      post.save
       assert_equal("ddd eee fff", post.tag_string)
       assert_equal(%w(ddd eee fff), post.tag_array)
     end
@@ -91,11 +93,10 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(1, Tag.find_by_name("aaa").post_count)
       assert_equal(2, Tag.find_by_name("bbb").post_count)
       assert_equal(3, Tag.find_by_name("ccc").post_count)
-      post3.update_attributes(
-        :tag_string => "xxx",
-        :updater_id => user.id,
-        :updater_ip_addr => "127.0.0.1"
-      )
+      post3.tag_string = "xxx"
+      post3.updater_id = user.id
+      post3.updater_ip_addr = "127.0.0.1"
+      post3.save
       assert_equal(1, Tag.find_by_name("aaa").post_count)
       assert_equal(2, Tag.find_by_name("bbb").post_count)
       assert_equal(2, Tag.find_by_name("ccc").post_count)      
@@ -116,7 +117,10 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(0, @new_post.tag_count_character)
       assert_equal(3, @new_post.tag_count)
 
-      @new_post.update_attributes(:tag_string => "babs", :updater_id => @user.id, :updater_ip_addr => "127.0.0.1")
+      @new_post.tag_string = "babs"
+      @new_post.updater_id = @user.id
+      @new_post.updater_ip_addr = "127.0.0.1"
+      @new_post.save
       assert_equal(0, @new_post.tag_count_artist)
       assert_equal(0, @new_post.tag_count_copyright)
       assert_equal(1, @new_post.tag_count_general)
@@ -130,21 +134,20 @@ class PostTest < ActiveSupport::TestCase
           
       # user a adds <ddd>
       @post_edited_by_user_a = Post.find(@post.id)
-      @post_edited_by_user_a.update_attributes(
-        :updater_id => @user.id,
-        :updater_ip_addr => "127.0.0.1",
-        :old_tag_string => "aaa bbb ccc",
-        :tag_string => "aaa bbb ccc ddd"
-      )
+      @post_edited_by_user_a.old_tag_string = "aaa bbb ccc"
+      @post_edited_by_user_a.tag_string = "aaa bbb ccc ddd"
+      @post_edited_by_user_a.updater_id = @user.id
+      @post_edited_by_user_a.updater_ip_addr = "127.0.0.1"
+      @post_edited_by_user_a.save
+      
     
       # user b removes <ccc> adds <eee>
       @post_edited_by_user_b = Post.find(@post.id)
-      @post_edited_by_user_b.update_attributes(
-        :updater_id => @user.id,
-        :updater_ip_addr => "127.0.0.1",
-        :old_tag_string => "aaa bbb ccc",
-        :tag_string => "aaa bbb eee"
-      )
+      @post_edited_by_user_b.old_tag_string = "aaa bbb ccc"
+      @post_edited_by_user_b.tag_string = "aaa bbb eee"
+      @post_edited_by_user_b.updater_id = @user.id
+      @post_edited_by_user_b.updater_ip_addr = "127.0.0.1"
+      @post_edited_by_user_b.save
     
       # final should be <aaa>, <bbb>, <ddd>, <eee>
       @final_post = Post.find(@post.id)      
@@ -160,21 +163,19 @@ class PostTest < ActiveSupport::TestCase
           
       # user a removes <ccc> adds <eee>
       @post_edited_by_user_a = Post.find(@post.id)
-      @post_edited_by_user_a.update_attributes(
-        :updater_id => @user.id,
-        :updater_ip_addr => "127.0.0.1",
-        :old_tag_string => "aaa bbb ccc",
-        :tag_string => "aaa bbb eee"
-      )
+      @post_edited_by_user_a.old_tag_string = "aaa bbb ccc"
+      @post_edited_by_user_a.tag_string = "aaa bbb eee"
+      @post_edited_by_user_a.updater_id = @user.id
+      @post_edited_by_user_a.updater_ip_addr = "127.0.0.1"
+      @post_edited_by_user_a.save
     
       # user b adds <ddd>
       @post_edited_by_user_b = Post.find(@post.id)
-      @post_edited_by_user_b.update_attributes(
-        :updater_id => @user.id,
-        :updater_ip_addr => "127.0.0.1",
-        :old_tag_string => "aaa bbb ccc",
-        :tag_string => "aaa bbb ccc ddd"
-      )
+      @post_edited_by_user_b.old_tag_string = "aaa bbb ccc"
+      @post_edited_by_user_b.tag_string = "aaa bbb ccc ddd"
+      @post_edited_by_user_b.updater_id = @user.id
+      @post_edited_by_user_b.updater_ip_addr = "127.0.0.1"
+      @post_edited_by_user_b.save
     
       # final should be <aaa>, <bbb>, <ddd>, <eee>
       @final_post = Post.find(@post.id)      
@@ -190,11 +191,10 @@ class PostTest < ActiveSupport::TestCase
     should "be ignored" do
       @user = Factory.create(:user)
     
-      @post.update_attributes(
-        :updater_id => @user.id,
-        :updater_ip_addr => "127.0.0.1",
-        :tag_string => "aaa pool:1234 pool:test rating:s fav:bob"
-      )
+      @post.updater_id = @user.id
+      @post.updater_ip_addr = "127.0.0.1"
+      @post.tag_string = "aaa pool:1234 pool:test rating:s fav:bob"
+      @post.save
       assert_equal("aaa", @post.tag_string)
     end
   end

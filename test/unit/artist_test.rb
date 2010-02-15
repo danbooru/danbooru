@@ -87,5 +87,27 @@ class ArtistTest < ActiveSupport::TestCase
       artist.update_attributes(:wiki_page_attributes => {:id => artist.wiki_page.id, :body => "this is hoge mark ii", :updater_id => user.id, :updater_ip_addr => "127.0.0.1"})
       assert_equal("this is hoge mark ii", artist.wiki_page(true).body)
     end
+    
+    should "revert to prior versions" do
+      user = Factory.create(:user)
+      artist = nil
+      assert_difference("ArtistVersion.count") do
+        artist = Factory.create(:artist, :other_names => "yyy")
+      end
+      
+      assert_difference("ArtistVersion.count") do
+        artist.update_attributes(
+          :updater_id => user.id,
+          :updater_ip_addr => "127.0.0.1",
+          :other_names => "xxx"
+        )
+      end
+      
+      first_version = ArtistVersion.first
+      assert_equal("yyy", first_version.other_names)
+      artist.revert_to!(first_version)
+      artist.reload
+      assert_equal("yyy", artist.other_names)
+    end
   end
 end
