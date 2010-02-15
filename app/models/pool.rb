@@ -5,7 +5,7 @@ class Pool < ActiveRecord::Base
   validates_format_of :name, :with => /\A[^\s;,]+\Z/, :on => :create, :message => "cannot have whitespace, commas, or semicolons"
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
-  has_many :versions, :class_name => "PoolVersion"
+  has_many :versions, :class_name => "PoolVersion", :dependent => :destroy
   after_save :create_version
   
   def self.create_anonymous(creator, creator_ip_addr)

@@ -10,4 +10,12 @@ class Favorite
   def self.destroy(user, post)
     ActiveRecord::Base.connection.execute("DELETE FROM #{table_name_for(user)} WHERE user_id = #{user.id} AND post_id = #{post.id}")
   end
+  
+  def self.destroy_all_for_post(post)
+    ActiveRecord::Base.connection.execute("DELETE FROM #{table_name_for(user)} WHERE post_id = #{post.id}")
+  end
+  
+  def self.destroy_all_for_user(user)
+    ActiveRecord::Base.connection.execute("DELETE FROM #{table_name_for(user)} WHERE user_id = #{user.id}")
+  end
 end

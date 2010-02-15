@@ -1,8 +1,7 @@
 class Post < ActiveRecord::Base
   attr_accessor :updater_id, :updater_ip_addr, :old_tag_string
-  belongs_to :updater, :class_name => "User"
-  has_one :unapproval
   after_destroy :delete_files
+  after_destroy :delete_favorites
   after_save :create_version
   
   before_save :merge_old_tags
@@ -11,7 +10,10 @@ class Post < ActiveRecord::Base
   before_save :update_tag_post_counts
   before_save :set_tag_counts
 
-  has_many :versions, :class_name => "PostVersion"
+  belongs_to :updater, :class_name => "User"
+  has_one :unapproval, :dependent => :destroy
+  has_one :upload, :dependent => :destroy
+  has_many :versions, :class_name => "PostVersion", :dependent => :destroy
   
   module FileMethods
     def delete_files
@@ -225,6 +227,10 @@ class Post < ActiveRecord::Base
   end
   
   module FavoriteMethods
+    def delete_favorites
+      Favorite.destroy_all_for_post(self)
+    end
+    
     def add_favorite(user)
       self.fav_string += " fav:#{user.name}"
       self.fav_string.strip!

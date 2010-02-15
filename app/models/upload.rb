@@ -4,6 +4,7 @@ require "tmpdir"
 class Upload < ActiveRecord::Base
   attr_accessor :file, :image_width, :image_height, :file_ext, :md5, :file_size
   belongs_to :uploader, :class_name => "User"
+  belongs_to :post
   before_save :convert_cgi_file
   
   def process!

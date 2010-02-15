@@ -75,6 +75,181 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: artist_urls; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE artist_urls (
+    id integer NOT NULL,
+    artist_id integer NOT NULL,
+    url text NOT NULL,
+    normalized_url text NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: artist_urls_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE artist_urls_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: artist_urls_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE artist_urls_id_seq OWNED BY artist_urls.id;
+
+
+--
+-- Name: artist_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE artist_versions (
+    id integer NOT NULL,
+    artist_id integer NOT NULL,
+    name character varying(255) NOT NULL,
+    updater_id integer NOT NULL,
+    updater_ip_addr inet NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    other_names text,
+    group_name character varying(255),
+    url_string text,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: artist_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE artist_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: artist_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE artist_versions_id_seq OWNED BY artist_versions.id;
+
+
+--
+-- Name: artists; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE artists (
+    id integer NOT NULL,
+    name character varying(255) NOT NULL,
+    creator_id integer NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    other_names text,
+    other_names_index tsvector,
+    group_name character varying(255),
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: artists_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE artists_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: artists_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE artists_id_seq OWNED BY artists.id;
+
+
+--
+-- Name: comment_votes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE comment_votes (
+    id integer NOT NULL,
+    comment_id integer NOT NULL,
+    user_id integer NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: comment_votes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE comment_votes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: comment_votes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE comment_votes_id_seq OWNED BY comment_votes.id;
+
+
+--
+-- Name: comments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE comments (
+    id integer NOT NULL,
+    post_id integer NOT NULL,
+    creator_id integer NOT NULL,
+    body text NOT NULL,
+    ip_addr inet NOT NULL,
+    body_index tsvector NOT NULL,
+    score integer DEFAULT 0 NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: comments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE comments_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: comments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE comments_id_seq OWNED BY comments.id;
+
+
+--
 -- Name: favorites_0; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -774,6 +949,76 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 
 
 --
+-- Name: wiki_pages; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE wiki_pages (
+    id integer NOT NULL,
+    creator_id integer NOT NULL,
+    title character varying(255) NOT NULL,
+    body text NOT NULL,
+    body_index tsvector NOT NULL,
+    is_locked boolean DEFAULT false NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: wiki_pages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE wiki_pages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: wiki_pages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE wiki_pages_id_seq OWNED BY wiki_pages.id;
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE artist_urls ALTER COLUMN id SET DEFAULT nextval('artist_urls_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE artist_versions ALTER COLUMN id SET DEFAULT nextval('artist_versions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE artists ALTER COLUMN id SET DEFAULT nextval('artists_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE comment_votes ALTER COLUMN id SET DEFAULT nextval('comment_votes_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE comments ALTER COLUMN id SET DEFAULT nextval('comments_id_seq'::regclass);
+
+
+--
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -911,6 +1156,53 @@ ALTER TABLE uploads ALTER COLUMN id SET DEFAULT nextval('uploads_id_seq'::regcla
 --
 
 ALTER TABLE users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE wiki_pages ALTER COLUMN id SET DEFAULT nextval('wiki_pages_id_seq'::regclass);
+
+
+--
+-- Name: artist_urls_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY artist_urls
+    ADD CONSTRAINT artist_urls_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: artist_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY artist_versions
+    ADD CONSTRAINT artist_versions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: artists_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY artists
+    ADD CONSTRAINT artists_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: comment_votes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY comment_votes
+    ADD CONSTRAINT comment_votes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: comments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY comments
+    ADD CONSTRAINT comments_pkey PRIMARY KEY (id);
 
 
 --
@@ -1071,6 +1363,91 @@ ALTER TABLE ONLY uploads
 
 ALTER TABLE ONLY users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: wiki_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY wiki_pages
+    ADD CONSTRAINT wiki_pages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: index_artist_urls_on_artist_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_artist_urls_on_artist_id ON artist_urls USING btree (artist_id);
+
+
+--
+-- Name: index_artist_urls_on_normalized_url; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_artist_urls_on_normalized_url ON artist_urls USING btree (normalized_url);
+
+
+--
+-- Name: index_artist_versions_on_artist_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_artist_versions_on_artist_id ON artist_versions USING btree (artist_id);
+
+
+--
+-- Name: index_artist_versions_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_artist_versions_on_name ON artist_versions USING btree (name);
+
+
+--
+-- Name: index_artist_versions_on_updater_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_artist_versions_on_updater_id ON artist_versions USING btree (updater_id);
+
+
+--
+-- Name: index_artists_on_group_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_artists_on_group_name ON artists USING btree (group_name);
+
+
+--
+-- Name: index_artists_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_artists_on_name ON artists USING btree (name);
+
+
+--
+-- Name: index_artists_on_other_names_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_artists_on_other_names_index ON artists USING gin (other_names_index);
+
+
+--
+-- Name: index_comment_votes_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_comment_votes_on_user_id ON comment_votes USING btree (user_id);
+
+
+--
+-- Name: index_comments_on_body_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_comments_on_body_index ON comments USING gin (body_index);
+
+
+--
+-- Name: index_comments_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_comments_on_post_id ON comments USING btree (post_id);
 
 
 --
@@ -1333,10 +1710,24 @@ CREATE INDEX index_tag_aliases_on_antecedent_name ON tag_aliases USING btree (an
 
 
 --
+-- Name: index_tag_aliases_on_consequent_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_tag_aliases_on_consequent_name ON tag_aliases USING btree (consequent_name);
+
+
+--
 -- Name: index_tag_implications_on_antecedent_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_tag_implications_on_antecedent_name ON tag_implications USING btree (antecedent_name);
+
+
+--
+-- Name: index_tag_implications_on_consequent_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_tag_implications_on_consequent_name ON tag_implications USING btree (consequent_name);
 
 
 --
@@ -1368,10 +1759,44 @@ CREATE UNIQUE INDEX index_users_on_name ON users USING btree (lower((name)::text
 
 
 --
+-- Name: index_wiki_pages_on_body_index_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_wiki_pages_on_body_index_index ON wiki_pages USING gin (body_index);
+
+
+--
+-- Name: index_wiki_pages_on_title; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_wiki_pages_on_title ON wiki_pages USING btree (title);
+
+
+--
 -- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
+
+
+--
+-- Name: trigger_artists_on_update; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER trigger_artists_on_update
+    BEFORE INSERT OR UPDATE ON artists
+    FOR EACH ROW
+    EXECUTE PROCEDURE tsvector_update_trigger('other_names_index', 'public.danbooru', 'other_names');
+
+
+--
+-- Name: trigger_comments_on_update; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER trigger_comments_on_update
+    BEFORE INSERT OR UPDATE ON comments
+    FOR EACH ROW
+    EXECUTE PROCEDURE tsvector_update_trigger('body_index', 'pg_catalog.english', 'body');
 
 
 --
@@ -1382,6 +1807,16 @@ CREATE TRIGGER trigger_posts_on_tag_index_update
     BEFORE INSERT OR UPDATE ON posts
     FOR EACH ROW
     EXECUTE PROCEDURE tsvector_update_trigger('tag_index', 'public.danbooru', 'tag_string', 'fav_string', 'pool_string', 'uploader_string', 'approver_string');
+
+
+--
+-- Name: trigger_wiki_pages_on_update; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER trigger_wiki_pages_on_update
+    BEFORE INSERT OR UPDATE ON wiki_pages
+    FOR EACH ROW
+    EXECUTE PROCEDURE tsvector_update_trigger('body_index', 'public.danbooru', 'body', 'title');
 
 
 --
@@ -1407,3 +1842,15 @@ INSERT INTO schema_migrations (version) VALUES ('20100211181944');
 INSERT INTO schema_migrations (version) VALUES ('20100211191709');
 
 INSERT INTO schema_migrations (version) VALUES ('20100211191716');
+
+INSERT INTO schema_migrations (version) VALUES ('20100213181847');
+
+INSERT INTO schema_migrations (version) VALUES ('20100213183712');
+
+INSERT INTO schema_migrations (version) VALUES ('20100214080549');
+
+INSERT INTO schema_migrations (version) VALUES ('20100214080557');
+
+INSERT INTO schema_migrations (version) VALUES ('20100214080605');
+
+INSERT INTO schema_migrations (version) VALUES ('20100215182234');

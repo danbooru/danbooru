@@ -11,7 +11,7 @@ class User < ActiveRecord::Base
   validates_inclusion_of :default_image_size, :in => %w(medium large original)
   validates_confirmation_of :password
   before_save :encrypt_password
-  after_save {|rec| Cache.put("user_name:#{rec.id}", rec.name)}
+  after_save :update_cache
   scope :named, lambda {|name| where(["lower(name) = ?", name])}  
   
   def can_update?(object, foreign_key = :user_id)
@@ -21,7 +21,7 @@ class User < ActiveRecord::Base
   module NameMethods
     module ClassMethods
       def find_name(user_id)
-        Cache.get("user_name:#{user_id}", 24.hours) do
+        Cache.get("un:#{user_id}") do
           select_value_sql("SELECT name FROM users WHERE id = ?", user_id) || Danbooru.config.default_guest_name
         end
       end
@@ -33,6 +33,10 @@ class User < ActiveRecord::Base
 
     def pretty_name
       name.tr("_", " ")
+    end
+    
+    def update_cache
+      Cache.put("un:#{id}", name)
     end
   end
   
