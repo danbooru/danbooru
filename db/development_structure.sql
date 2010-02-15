@@ -75,6 +75,75 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: advertisement_hits; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE advertisement_hits (
+    id integer NOT NULL,
+    advertisement_id integer NOT NULL,
+    ip_addr inet NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: advertisement_hits_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE advertisement_hits_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: advertisement_hits_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE advertisement_hits_id_seq OWNED BY advertisement_hits.id;
+
+
+--
+-- Name: advertisements; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE advertisements (
+    id integer NOT NULL,
+    referral_url text NOT NULL,
+    ad_type character varying(255) NOT NULL,
+    status character varying(255) NOT NULL,
+    hit_count integer DEFAULT 0 NOT NULL,
+    width integer NOT NULL,
+    height integer NOT NULL,
+    file_name character varying(255) NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: advertisements_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE advertisements_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: advertisements_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE advertisements_id_seq OWNED BY advertisements.id;
+
+
+--
 -- Name: artist_urls; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1055,6 +1124,20 @@ ALTER SEQUENCE wiki_pages_id_seq OWNED BY wiki_pages.id;
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE advertisement_hits ALTER COLUMN id SET DEFAULT nextval('advertisement_hits_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE advertisements ALTER COLUMN id SET DEFAULT nextval('advertisements_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE artist_urls ALTER COLUMN id SET DEFAULT nextval('artist_urls_id_seq'::regclass);
 
 
@@ -1245,6 +1328,22 @@ ALTER TABLE wiki_page_versions ALTER COLUMN id SET DEFAULT nextval('wiki_page_ve
 --
 
 ALTER TABLE wiki_pages ALTER COLUMN id SET DEFAULT nextval('wiki_pages_id_seq'::regclass);
+
+
+--
+-- Name: advertisement_hits_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY advertisement_hits
+    ADD CONSTRAINT advertisement_hits_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: advertisements_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY advertisements
+    ADD CONSTRAINT advertisements_pkey PRIMARY KEY (id);
 
 
 --
@@ -1469,6 +1568,27 @@ ALTER TABLE ONLY wiki_page_versions
 
 ALTER TABLE ONLY wiki_pages
     ADD CONSTRAINT wiki_pages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: index_advertisement_hits_on_advertisement_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_advertisement_hits_on_advertisement_id ON advertisement_hits USING btree (advertisement_id);
+
+
+--
+-- Name: index_advertisement_hits_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_advertisement_hits_on_created_at ON advertisement_hits USING btree (created_at);
+
+
+--
+-- Name: index_advertisements_on_ad_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_advertisements_on_ad_type ON advertisements USING btree (ad_type);
 
 
 --
@@ -1963,3 +2083,7 @@ INSERT INTO schema_migrations (version) VALUES ('20100215182234');
 INSERT INTO schema_migrations (version) VALUES ('20100215213756');
 
 INSERT INTO schema_migrations (version) VALUES ('20100215223541');
+
+INSERT INTO schema_migrations (version) VALUES ('20100215224629');
+
+INSERT INTO schema_migrations (version) VALUES ('20100215224635');
