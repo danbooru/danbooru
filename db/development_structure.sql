@@ -949,6 +949,42 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 
 
 --
+-- Name: wiki_page_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE wiki_page_versions (
+    id integer NOT NULL,
+    wiki_page_id integer NOT NULL,
+    updater_id integer NOT NULL,
+    updater_ip_addr inet NOT NULL,
+    title character varying(255) NOT NULL,
+    body text NOT NULL,
+    is_locked boolean NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: wiki_page_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE wiki_page_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: wiki_page_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE wiki_page_versions_id_seq OWNED BY wiki_page_versions.id;
+
+
+--
 -- Name: wiki_pages; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1162,6 +1198,13 @@ ALTER TABLE users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE wiki_page_versions ALTER COLUMN id SET DEFAULT nextval('wiki_page_versions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE wiki_pages ALTER COLUMN id SET DEFAULT nextval('wiki_pages_id_seq'::regclass);
 
 
@@ -1363,6 +1406,14 @@ ALTER TABLE ONLY uploads
 
 ALTER TABLE ONLY users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: wiki_page_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY wiki_page_versions
+    ADD CONSTRAINT wiki_page_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -1759,6 +1810,13 @@ CREATE UNIQUE INDEX index_users_on_name ON users USING btree (lower((name)::text
 
 
 --
+-- Name: index_wiki_page_versions_on_wiki_page_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_wiki_page_versions_on_wiki_page_id ON wiki_page_versions USING btree (wiki_page_id);
+
+
+--
 -- Name: index_wiki_pages_on_body_index_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1854,3 +1912,5 @@ INSERT INTO schema_migrations (version) VALUES ('20100214080557');
 INSERT INTO schema_migrations (version) VALUES ('20100214080605');
 
 INSERT INTO schema_migrations (version) VALUES ('20100215182234');
+
+INSERT INTO schema_migrations (version) VALUES ('20100215213756');

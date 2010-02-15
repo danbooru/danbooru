@@ -7,6 +7,7 @@ class Pool < ActiveRecord::Base
   belongs_to :updater, :class_name => "User"
   has_many :versions, :class_name => "PoolVersion", :dependent => :destroy
   after_save :create_version
+  attr_accessible :name, :description, :post_ids, :is_public, :is_active
   
   def self.create_anonymous(creator, creator_ip_addr)
     pool = Pool.create(:name => "TEMP:#{Time.now.to_f}.#{rand(1_000_000)}", :creator => creator, :updater_id => creator.id, :updater_ip_addr => creator_ip_addr)
