@@ -251,6 +251,41 @@ ALTER SEQUENCE artists_id_seq OWNED BY artists.id;
 
 
 --
+-- Name: bans; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE bans (
+    id integer NOT NULL,
+    user_id integer,
+    ip_addr inet,
+    reason text NOT NULL,
+    banner_id integer NOT NULL,
+    expires_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: bans_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE bans_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: bans_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE bans_id_seq OWNED BY bans.id;
+
+
+--
 -- Name: comment_votes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1001,6 +1036,40 @@ ALTER SEQUENCE uploads_id_seq OWNED BY uploads.id;
 
 
 --
+-- Name: user_feedback; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE user_feedback (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    creator_id integer NOT NULL,
+    is_positive boolean NOT NULL,
+    body text NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: user_feedback_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE user_feedback_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_feedback_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE user_feedback_id_seq OWNED BY user_feedback.id;
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1153,6 +1222,13 @@ ALTER TABLE artist_versions ALTER COLUMN id SET DEFAULT nextval('artist_versions
 --
 
 ALTER TABLE artists ALTER COLUMN id SET DEFAULT nextval('artists_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE bans ALTER COLUMN id SET DEFAULT nextval('bans_id_seq'::regclass);
 
 
 --
@@ -1313,6 +1389,13 @@ ALTER TABLE uploads ALTER COLUMN id SET DEFAULT nextval('uploads_id_seq'::regcla
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE user_feedback ALTER COLUMN id SET DEFAULT nextval('user_feedback_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
 
 
@@ -1368,6 +1451,14 @@ ALTER TABLE ONLY artist_versions
 
 ALTER TABLE ONLY artists
     ADD CONSTRAINT artists_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bans_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY bans
+    ADD CONSTRAINT bans_pkey PRIMARY KEY (id);
 
 
 --
@@ -1547,6 +1638,14 @@ ALTER TABLE ONLY uploads
 
 
 --
+-- Name: user_feedback_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY user_feedback
+    ADD CONSTRAINT user_feedback_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1645,6 +1744,27 @@ CREATE UNIQUE INDEX index_artists_on_name ON artists USING btree (name);
 --
 
 CREATE INDEX index_artists_on_other_names_index ON artists USING gin (other_names_index);
+
+
+--
+-- Name: index_bans_on_expires_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_bans_on_expires_at ON bans USING btree (expires_at);
+
+
+--
+-- Name: index_bans_on_ip_addr; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_bans_on_ip_addr ON bans USING btree (ip_addr);
+
+
+--
+-- Name: index_bans_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_bans_on_user_id ON bans USING btree (user_id);
 
 
 --
@@ -1963,6 +2083,13 @@ CREATE INDEX index_unapprovals_on_post_id ON unapprovals USING btree (post_id);
 
 
 --
+-- Name: index_user_feedback_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_user_feedback_on_user_id ON user_feedback USING btree (user_id);
+
+
+--
 -- Name: index_users_on_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2087,3 +2214,7 @@ INSERT INTO schema_migrations (version) VALUES ('20100215223541');
 INSERT INTO schema_migrations (version) VALUES ('20100215224629');
 
 INSERT INTO schema_migrations (version) VALUES ('20100215224635');
+
+INSERT INTO schema_migrations (version) VALUES ('20100215225710');
+
+INSERT INTO schema_migrations (version) VALUES ('20100215230642');

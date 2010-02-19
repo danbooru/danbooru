@@ -12,6 +12,8 @@ class User < ActiveRecord::Base
   validates_confirmation_of :password
   before_save :encrypt_password
   after_save :update_cache
+  before_create :normalize_level
+  has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
   scope :named, lambda {|name| where(["lower(name) = ?", name])}  
   
   module NameMethods
@@ -92,10 +94,29 @@ class User < ActiveRecord::Base
     end
   end
   
+  module LevelMethods
+    def normalize_level
+      if is_admin?
+        self.is_moderator = true
+        self.is_janitor = true
+        self.is_contributor = true
+        self.is_privileged = true
+      elsif is_moderator?
+        self.is_janitor = true
+        self.is_privileged = true
+      elsif is_janitor?
+        self.is_privileged = true
+      elsif is_contributor?
+        self.is_privileged = true
+      end
+    end
+  end
+  
   include NameMethods
   include PasswordMethods
   extend AuthenticationMethods
   include FavoriteMethods
+  include LevelMethods
 
   def can_update?(object, foreign_key = :user_id)
     is_moderator? || is_admin? || object.__send__(foreign_key) == id

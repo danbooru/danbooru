@@ -14,6 +14,49 @@ class UserTest < ActiveSupport::TestCase
       assert(!User.authenticate_hash(@user.name, "xxxx"), "Authentication should not have succeeded")
     end
     
+    should "normalize its level" do
+      user = Factory.create(:user, :is_admin => true)
+      assert(user.is_moderator?)
+      assert(user.is_janitor?)
+      assert(user.is_contributor?)
+      assert(user.is_privileged?)
+      
+      user = Factory.create(:user, :is_moderator => true)      
+      assert(!user.is_admin?)
+      assert(user.is_moderator?)
+      assert(user.is_janitor?)
+      assert(!user.is_contributor?)
+      assert(user.is_privileged?)
+
+      user = Factory.create(:user, :is_janitor => true)      
+      assert(!user.is_admin?)
+      assert(!user.is_moderator?)
+      assert(user.is_janitor?)
+      assert(!user.is_contributor?)
+      assert(user.is_privileged?)
+
+      user = Factory.create(:user, :is_contributor => true)      
+      assert(!user.is_admin?)
+      assert(!user.is_moderator?)
+      assert(!user.is_janitor?)
+      assert(user.is_contributor?)
+      assert(user.is_privileged?)
+
+      user = Factory.create(:user, :is_privileged => true)      
+      assert(!user.is_admin?)
+      assert(!user.is_moderator?)
+      assert(!user.is_janitor?)
+      assert(!user.is_contributor?)
+      assert(user.is_privileged?)
+
+      user = Factory.create(:user)      
+      assert(!user.is_admin?)
+      assert(!user.is_moderator?)
+      assert(!user.is_janitor?)
+      assert(!user.is_contributor?)
+      assert(!user.is_privileged?)
+    end
+    
     context "name" do
       should "be #{Danbooru.config.default_guest_name} given an invalid user id" do
         assert_equal(Danbooru.config.default_guest_name, User.find_name(-1))
