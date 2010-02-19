@@ -2,13 +2,23 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 class PoolTest < ActiveSupport::TestCase
   context "A pool" do
+    setup do
+      MEMCACHE.flush_all
+    end
+    
     should "create versions for each distinct user" do
       pool = Factory.create(:pool)
       user = Factory.create(:user)
       assert_equal(1, pool.versions(true).size)
-      pool.update_attributes(:post_ids => "1", :updater_id => user.id, :updater_ip_addr => "128.0.0.1")
+      pool.post_ids = "1"
+      pool.updater_id = user.id
+      pool.updater_ip_addr = "128.0.0.1"
+      pool.save
       assert_equal(2, pool.versions(true).size)
-      pool.update_attributes(:post_ids => "1 2", :updater_id => user.id, :updater_ip_addr => "128.0.0.1")
+      pool.post_ids = "1 2"
+      pool.updater_id = user.id
+      pool.updater_ip_addr = "128.0.0.1"
+      pool.save
       assert_equal(2, pool.versions(true).size)
       pool.revert_to!(PoolVersion.first)
       assert_equal("", pool.post_ids)
@@ -59,7 +69,6 @@ class PoolTest < ActiveSupport::TestCase
       user = Factory.create(:user)
       pool = Pool.create_anonymous(user, "127.0.0.1")
       assert_match(/^anonymous:\d+$/, pool.name)
-      
     end
   end
 end

@@ -13,7 +13,7 @@ class Post < ActiveRecord::Base
   has_one :upload, :dependent => :destroy
   has_many :versions, :class_name => "PostVersion", :dependent => :destroy  
   has_many :votes, :class_name => "PostVote", :dependent => :destroy
-  attr_accessible :source, :rating, :tag_string, :old_tag_string
+  attr_accessible :source, :rating, :tag_string, :old_tag_string, :updater_id, :updater_ip_addr
   
   module FileMethods
     def delete_files

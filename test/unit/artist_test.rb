@@ -27,11 +27,10 @@ class ArtistTest < ActiveSupport::TestCase
     
     should "make sure old urls are deleted" do
       artist = Factory.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/test.jpg")
-      artist.update_attributes(
-        :updater_id => artist.creator_id,
-        :updater_ip_addr => "127.0.0.1",
-        :url_string => "http://not.rembrandt.com/test.jpg"
-      )
+      artist.updater_id = artist.creator_id
+      artist.updater_ip_addr = "127.0.0.1"
+      artist.url_string = "http://not.rembrandt.com/test.jpg"
+      artist.save
       artist.reload
       assert_equal(["http://not.rembrandt.com/test.jpg"], artist.artist_urls.map(&:to_s).sort)
     end
@@ -80,11 +79,11 @@ class ArtistTest < ActiveSupport::TestCase
     
     should "have an associated wiki" do
       user = Factory.create(:user)
-      artist = Factory.create(:artist, :name => "max", :wiki_page_attributes => {:body => "this is max", :creator_id => user.id, :updater_id => user.id, :updater_ip_addr => "127.0.0.1"})
+      artist = Factory.create(:artist, :name => "max", :wiki_page_attributes => {:body => "this is max", :updater_id => user.id, :updater_ip_addr => "127.0.0.1"})
       assert_not_nil(artist.wiki_page)
       assert_equal("this is max", artist.wiki_page.body)
     
-      artist.update_attributes(:wiki_page_attributes => {:id => artist.wiki_page.id, :body => "this is hoge mark ii", :updater_id => user.id, :updater_ip_addr => "127.0.0.1"})
+      artist.update_attributes(:wiki_page_attributes => {:id => artist.wiki_page.id, :body => "this is hoge mark ii", :creator_id => user.id, :updater_id => user.id, :updater_ip_addr => "127.0.0.1"})
       assert_equal("this is hoge mark ii", artist.wiki_page(true).body)
     end
     
@@ -96,11 +95,10 @@ class ArtistTest < ActiveSupport::TestCase
       end
       
       assert_difference("ArtistVersion.count") do
-        artist.update_attributes(
-          :updater_id => user.id,
-          :updater_ip_addr => "127.0.0.1",
-          :other_names => "xxx"
-        )
+        artist.updater_id = user.id
+        artist.updater_ip_addr = "127.0.0.1"
+        artist.other_names = "xxx"
+        artist.save
       end
       
       first_version = ArtistVersion.first

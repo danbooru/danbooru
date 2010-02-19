@@ -1,12 +1,13 @@
 class WikiPage < ActiveRecord::Base
   attr_accessor :updater_id, :updater_ip_addr
   before_save :normalize_title
+  before_create :initialize_creator
   after_save :create_version
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
   validates_uniqueness_of :title, :case_sensitive => false
   validates_presence_of :body, :updater_id, :updater_ip_addr
-  attr_protected :text_search_index, :is_locked, :version
+  attr_accessible :title, :body, :updater_id, :updater_ip_addr
   scope :titled, lambda {|title| where(["title = ?", title.downcase.tr(" ", "_")])}
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, :foreign_key => "name", :primary_key => "title"
@@ -57,5 +58,11 @@ class WikiPage < ActiveRecord::Base
       :body => body,
       :is_locked => is_locked
     )
+  end
+  
+  def initialize_creator
+    if creator.nil?
+      self.creator_id = updater_id
+    end
   end
 end

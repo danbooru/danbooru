@@ -1,5 +1,6 @@
 class Artist < ActiveRecord::Base
   attr_accessor :updater_id, :updater_ip_addr
+  before_create :initialize_creator
   before_save :normalize_name
   after_save :create_version
   after_save :commit_url_string
@@ -11,7 +12,7 @@ class Artist < ActiveRecord::Base
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :tag_alias, :foreign_key => "antecedent_name", :primary_key => "name"
   accepts_nested_attributes_for :wiki_page
-  attr_accessible :name, :url_string, :other_names, :group_name, :wiki_page_attributes
+  attr_accessible :name, :url_string, :other_names, :group_name, :wiki_page_attributes, :updater_id, :updater_ip_addr
   
   module UrlMethods
     module ClassMethods
@@ -152,5 +153,11 @@ class Artist < ActiveRecord::Base
   include UpdaterMethods
   extend SearchMethods  
   include VersionMethods
+  
+  def initialize_creator
+    if creator.nil?
+      self.creator_id = updater_id
+    end
+  end
 end
 

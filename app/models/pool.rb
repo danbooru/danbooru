@@ -10,9 +10,15 @@ class Pool < ActiveRecord::Base
   attr_accessible :name, :description, :post_ids, :is_public, :is_active
   
   def self.create_anonymous(creator, creator_ip_addr)
-    pool = Pool.create(:name => "TEMP:#{Time.now.to_f}.#{rand(1_000_000)}", :creator => creator, :updater_id => creator.id, :updater_ip_addr => creator_ip_addr)
-    pool.update_attribute(:name, "anonymous:#{pool.id}")
-    pool
+    Pool.new do |pool|
+      pool.name = "TEMP:#{Time.now.to_f}.#{rand(1_000_000)}"
+      pool.creator = creator
+      pool.updater_id = creator.id
+      pool.updater_ip_addr = creator_ip_addr
+      pool.save
+      pool.name = "anonymous:#{pool.id}"
+      pool.save
+    end
   end
   
   def revert_to!(version)
@@ -63,7 +69,7 @@ class Pool < ActiveRecord::Base
   
   def create_version
     last_version = versions.last
-    
+
     if last_version && updater_ip_addr == last_version.updater_ip_addr && updater_id == last_version.updater_id
       last_version.update_attribute(:post_ids, post_ids)
     else

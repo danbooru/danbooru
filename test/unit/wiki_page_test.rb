@@ -27,7 +27,10 @@ class WikiPageTest < ActiveSupport::TestCase
       end
 
       assert_difference("WikiPageVersion.count") do
-        wp.update_attributes(:title => "yyy", :updater_id => user.id, :updater_ip_addr => "127.0.0.1")
+        wp.title = "yyy"
+        wp.updater_id = user.id
+        wp.updater_ip_addr = "127.0.0.1"
+        wp.save
       end
       
       version = WikiPageVersion.first
