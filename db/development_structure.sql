@@ -354,6 +354,44 @@ ALTER SEQUENCE comments_id_seq OWNED BY comments.id;
 
 
 --
+-- Name: dmails; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE dmails (
+    id integer NOT NULL,
+    owner_id integer NOT NULL,
+    from_id integer NOT NULL,
+    to_id integer NOT NULL,
+    parent_id integer,
+    title character varying(255) NOT NULL,
+    body text NOT NULL,
+    message_index tsvector NOT NULL,
+    is_read boolean DEFAULT false NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: dmails_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE dmails_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: dmails_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE dmails_id_seq OWNED BY dmails.id;
+
+
+--
 -- Name: favorites_0; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1249,6 +1287,13 @@ ALTER TABLE comments ALTER COLUMN id SET DEFAULT nextval('comments_id_seq'::regc
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE dmails ALTER COLUMN id SET DEFAULT nextval('dmails_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE favorites_0 ALTER COLUMN id SET DEFAULT nextval('favorites_0_id_seq'::regclass);
 
 
@@ -1475,6 +1520,14 @@ ALTER TABLE ONLY comment_votes
 
 ALTER TABLE ONLY comments
     ADD CONSTRAINT comments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: dmails_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY dmails
+    ADD CONSTRAINT dmails_pkey PRIMARY KEY (id);
 
 
 --
@@ -1786,6 +1839,27 @@ CREATE INDEX index_comments_on_body_index ON comments USING gin (body_index);
 --
 
 CREATE INDEX index_comments_on_post_id ON comments USING btree (post_id);
+
+
+--
+-- Name: index_dmails_on_message_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_dmails_on_message_index ON dmails USING gin (message_index);
+
+
+--
+-- Name: index_dmails_on_owner_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_dmails_on_owner_id ON dmails USING btree (owner_id);
+
+
+--
+-- Name: index_dmails_on_parent_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_dmails_on_parent_id ON dmails USING btree (parent_id);
 
 
 --
@@ -2152,6 +2226,16 @@ CREATE TRIGGER trigger_comments_on_update
 
 
 --
+-- Name: trigger_dmails_on_update; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER trigger_dmails_on_update
+    BEFORE INSERT OR UPDATE ON dmails
+    FOR EACH ROW
+    EXECUTE PROCEDURE tsvector_update_trigger('message_index', 'pg_catalog.english', 'title', 'body');
+
+
+--
 -- Name: trigger_posts_on_tag_index_update; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -2218,3 +2302,5 @@ INSERT INTO schema_migrations (version) VALUES ('20100215224635');
 INSERT INTO schema_migrations (version) VALUES ('20100215225710');
 
 INSERT INTO schema_migrations (version) VALUES ('20100215230642');
+
+INSERT INTO schema_migrations (version) VALUES ('20100219230537');

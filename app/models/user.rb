@@ -23,6 +23,10 @@ class User < ActiveRecord::Base
           select_value_sql("SELECT name FROM users WHERE id = ?", user_id) || Danbooru.config.default_guest_name
         end
       end
+      
+      def find_pretty_name(user_id)
+        find_name.tr("_", " ")
+      end
     end
     
     def self.included(m)
