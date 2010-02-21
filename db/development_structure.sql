@@ -367,6 +367,7 @@ CREATE TABLE dmails (
     body text NOT NULL,
     message_index tsvector NOT NULL,
     is_read boolean DEFAULT false NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -689,6 +690,76 @@ CREATE SEQUENCE favorites_9_id_seq
 --
 
 ALTER SEQUENCE favorites_9_id_seq OWNED BY favorites_9.id;
+
+
+--
+-- Name: forum_posts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE forum_posts (
+    id integer NOT NULL,
+    topic_id integer NOT NULL,
+    creator_id integer NOT NULL,
+    body text NOT NULL,
+    text_index tsvector NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: forum_posts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE forum_posts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: forum_posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE forum_posts_id_seq OWNED BY forum_posts.id;
+
+
+--
+-- Name: forum_topics; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE forum_topics (
+    id integer NOT NULL,
+    creator_id integer NOT NULL,
+    title character varying(255) NOT NULL,
+    response_count integer DEFAULT 0 NOT NULL,
+    is_sticky boolean DEFAULT false NOT NULL,
+    is_locked boolean DEFAULT false NOT NULL,
+    text_index tsvector NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: forum_topics_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE forum_topics_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: forum_topics_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE forum_topics_id_seq OWNED BY forum_topics.id;
 
 
 --
@@ -1364,6 +1435,20 @@ ALTER TABLE favorites_9 ALTER COLUMN id SET DEFAULT nextval('favorites_9_id_seq'
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE forum_posts ALTER COLUMN id SET DEFAULT nextval('forum_posts_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE forum_topics ALTER COLUMN id SET DEFAULT nextval('forum_topics_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE pool_versions ALTER COLUMN id SET DEFAULT nextval('pool_versions_id_seq'::regclass);
 
 
@@ -1608,6 +1693,22 @@ ALTER TABLE ONLY favorites_8
 
 ALTER TABLE ONLY favorites_9
     ADD CONSTRAINT favorites_9_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: forum_posts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY forum_posts
+    ADD CONSTRAINT forum_posts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: forum_topics_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY forum_topics
+    ADD CONSTRAINT forum_topics_pkey PRIMARY KEY (id);
 
 
 --
@@ -2003,6 +2104,41 @@ CREATE INDEX index_favorites_9_on_user_id ON favorites_9 USING btree (user_id);
 
 
 --
+-- Name: index_forum_posts_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_forum_posts_on_creator_id ON forum_posts USING btree (creator_id);
+
+
+--
+-- Name: index_forum_posts_on_text_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_forum_posts_on_text_index ON forum_posts USING gin (text_index);
+
+
+--
+-- Name: index_forum_posts_on_topic_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_forum_posts_on_topic_id ON forum_posts USING btree (topic_id);
+
+
+--
+-- Name: index_forum_topics_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_forum_topics_on_creator_id ON forum_topics USING btree (creator_id);
+
+
+--
+-- Name: index_forum_topics_on_text_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_forum_topics_on_text_index ON forum_topics USING gin (text_index);
+
+
+--
 -- Name: index_pool_versions_on_pool_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2236,6 +2372,26 @@ CREATE TRIGGER trigger_dmails_on_update
 
 
 --
+-- Name: trigger_forum_posts_on_update; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER trigger_forum_posts_on_update
+    BEFORE INSERT OR UPDATE ON forum_posts
+    FOR EACH ROW
+    EXECUTE PROCEDURE tsvector_update_trigger('text_index', 'pg_catalog.english', 'body');
+
+
+--
+-- Name: trigger_forum_topics_on_update; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER trigger_forum_topics_on_update
+    BEFORE INSERT OR UPDATE ON forum_topics
+    FOR EACH ROW
+    EXECUTE PROCEDURE tsvector_update_trigger('text_index', 'pg_catalog.english', 'title');
+
+
+--
 -- Name: trigger_posts_on_tag_index_update; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -2304,3 +2460,7 @@ INSERT INTO schema_migrations (version) VALUES ('20100215225710');
 INSERT INTO schema_migrations (version) VALUES ('20100215230642');
 
 INSERT INTO schema_migrations (version) VALUES ('20100219230537');
+
+INSERT INTO schema_migrations (version) VALUES ('20100221003655');
+
+INSERT INTO schema_migrations (version) VALUES ('20100221005812');
