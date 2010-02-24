@@ -42,9 +42,9 @@ class Note < ActiveRecord::Base
 
   def update_post
     if Note.exists?(["is_active = ? AND post_id = ?", true, post_id])
-      Post.update(post_id, :last_noted_at => updated_at, :updater_id => updater_id, :updater_ip_addr => updater_ip_addr)
+      execute_sql("UPDATE posts SET last_noted_at = ? WHERE id = ?", updated_at, post_id)
     else
-      Post.update(post_id, :last_noted_at => nil, :updater_id => updater_id, :updater_ip_addr => updater_ip_addr)
+      execute_sql("UPDATE posts SET last_noted_at = NULL WHERE id = ?", post_id)
     end
   end
   

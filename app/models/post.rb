@@ -499,6 +499,20 @@ class Post < ActiveRecord::Base
     end
   end
   
+  module CountMethods
+    def fast_count(tags)
+      Cache.get("pfc:#{Cache.sanitize(tags)}", 24.hours) do
+        Post.find_by_tags(tags).count
+      end
+    end
+    
+    def fast_delete_count(tags)
+      Cache.get("pfdc:#{Cache.sanitize(tags)}", 24.hours) do
+        Post.find_by_tags("#{tags} status:deleted").count
+      end
+    end
+  end
+
   include FileMethods
   include ImageMethods
   include ModerationMethods
@@ -510,6 +524,7 @@ class Post < ActiveRecord::Base
   include PoolMethods
   extend SearchMethods
   include VoteMethods
+  extend CountMethods
   
   def reload(options = nil)
     super
