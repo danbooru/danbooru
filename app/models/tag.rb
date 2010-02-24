@@ -305,6 +305,35 @@ class Tag < ActiveRecord::Base
     end
   end
   
+  module RelationMethods
+    def update_related
+      calculator = RelatedTagCalculator.new
+      counts = calculator.calculate_from_sample(Danbooru.config.post_sample_size, name)
+      self.related_tags = calculator.convert_hash_to_string(counts)
+    end
+    
+    def update_related_if_outdated
+      updated_related if should_update_related?
+    end
+    
+    def related_cache_expiry
+      base = Math.sqrt(post_count)
+      if base > 24
+        24
+      else
+        base
+      end
+    end
+    
+    def should_update_related?
+      related_tags.blank? || related_tags_updated_at < related_cache_expiry.hours.ago
+    end
+    
+    def related_tag_array
+      related_tags.split(/ /).in_groups_of(2)
+    end
+  end
+  
   extend ViewCountMethods
   include CategoryMethods
   extend StatisticsMethods

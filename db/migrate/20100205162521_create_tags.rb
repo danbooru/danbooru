@@ -6,6 +6,7 @@ class CreateTags < ActiveRecord::Migration
       t.column :view_count, :integer, :null => false, :default => 0
       t.column :category, :integer, :null => false, :default => 0
       t.column :related_tags, :text
+      t.column :related_tags_updated_at, :datetime
       t.timestamps
     end
     

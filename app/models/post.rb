@@ -11,6 +11,7 @@ class Post < ActiveRecord::Base
   belongs_to :updater, :class_name => "User"
   has_one :unapproval, :dependent => :destroy
   has_one :upload, :dependent => :destroy
+  has_one :moderation_detail, :class_name => "PostModerationDetail", :dependent => :destroy
   has_many :versions, :class_name => "PostVersion", :dependent => :destroy  
   has_many :votes, :class_name => "PostVote", :dependent => :destroy
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :updater_id, :updater_ip_addr

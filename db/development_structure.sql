@@ -763,6 +763,41 @@ ALTER SEQUENCE forum_topics_id_seq OWNED BY forum_topics.id;
 
 
 --
+-- Name: jobs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE jobs (
+    id integer NOT NULL,
+    category character varying(255) NOT NULL,
+    status character varying(255) NOT NULL,
+    message text NOT NULL,
+    data_as_json text NOT NULL,
+    repeat_count integer NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: jobs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE jobs_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: jobs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE jobs_id_seq OWNED BY jobs.id;
+
+
+--
 -- Name: pool_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -830,6 +865,38 @@ CREATE SEQUENCE pools_id_seq
 --
 
 ALTER SEQUENCE pools_id_seq OWNED BY pools.id;
+
+
+--
+-- Name: post_moderation_details; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE post_moderation_details (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    post_id integer NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: post_moderation_details_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE post_moderation_details_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: post_moderation_details_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE post_moderation_details_id_seq OWNED BY post_moderation_details.id;
 
 
 --
@@ -1047,6 +1114,7 @@ CREATE TABLE tags (
     view_count integer DEFAULT 0 NOT NULL,
     category integer DEFAULT 0 NOT NULL,
     related_tags text,
+    related_tags_updated_at timestamp without time zone,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -1449,6 +1517,13 @@ ALTER TABLE forum_topics ALTER COLUMN id SET DEFAULT nextval('forum_topics_id_se
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE jobs ALTER COLUMN id SET DEFAULT nextval('jobs_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE pool_versions ALTER COLUMN id SET DEFAULT nextval('pool_versions_id_seq'::regclass);
 
 
@@ -1457,6 +1532,13 @@ ALTER TABLE pool_versions ALTER COLUMN id SET DEFAULT nextval('pool_versions_id_
 --
 
 ALTER TABLE pools ALTER COLUMN id SET DEFAULT nextval('pools_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE post_moderation_details ALTER COLUMN id SET DEFAULT nextval('post_moderation_details_id_seq'::regclass);
 
 
 --
@@ -1712,6 +1794,14 @@ ALTER TABLE ONLY forum_topics
 
 
 --
+-- Name: jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY jobs
+    ADD CONSTRAINT jobs_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: pool_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1725,6 +1815,14 @@ ALTER TABLE ONLY pool_versions
 
 ALTER TABLE ONLY pools
     ADD CONSTRAINT pools_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: post_moderation_details_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY post_moderation_details
+    ADD CONSTRAINT post_moderation_details_pkey PRIMARY KEY (id);
 
 
 --
@@ -2160,6 +2258,20 @@ CREATE INDEX index_pools_on_name ON pools USING btree (name);
 
 
 --
+-- Name: index_post_moderation_details_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_post_moderation_details_on_post_id ON post_moderation_details USING btree (post_id);
+
+
+--
+-- Name: index_post_moderation_details_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_post_moderation_details_on_user_id ON post_moderation_details USING btree (user_id);
+
+
+--
 -- Name: index_post_versions_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2464,3 +2576,7 @@ INSERT INTO schema_migrations (version) VALUES ('20100219230537');
 INSERT INTO schema_migrations (version) VALUES ('20100221003655');
 
 INSERT INTO schema_migrations (version) VALUES ('20100221005812');
+
+INSERT INTO schema_migrations (version) VALUES ('20100221012656');
+
+INSERT INTO schema_migrations (version) VALUES ('20100223001012');
