@@ -5,6 +5,7 @@ class Artist < ActiveRecord::Base
   after_save :create_version
   after_save :commit_url_string
   validates_uniqueness_of :name
+  validates_presence_of :updater_id, :updater_ip_addr
   belongs_to :updater, :class_name => "User"
   belongs_to :creator, :class_name => "User"
   has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
@@ -137,12 +138,14 @@ class Artist < ActiveRecord::Base
       )
     end
     
-    def revert_to!(version)
+    def revert_to!(version, reverter_id, reverter_ip_addr)
       self.name = version.name
       self.url_string = version.url_string
       self.is_active = version.is_active
       self.other_names = version.other_names
       self.group_name = version.group_name
+      self.updater_id = reverter_id
+      self.updater_ip_addr = reverter_ip_addr
       save      
     end
   end

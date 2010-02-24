@@ -27,14 +27,16 @@ class WikiPage < ActiveRecord::Base
     relation
   end
   
-  def revert_to(version)
+  def revert_to(version, reverter_id, reverter_ip_addr)
     self.title = version.title
     self.body = version.body
     self.is_locked = version.is_locked
+    self.updater_id = reverter_id
+    self.updater_ip_addr = reverter_ip_addr
   end
   
-  def revert_to!(version)
-    revert_to(version)
+  def revert_to!(version, reverter_id, reverter_ip_addr)
+    revert_to(version, reverter_id, reverter_ip_addr)
     save!
   end
 
@@ -51,13 +53,15 @@ class WikiPage < ActiveRecord::Base
   end
   
   def create_version
-    versions.create(
-      :updater_id => updater_id,
-      :updater_ip_addr => updater_ip_addr,
-      :title => title,
-      :body => body,
-      :is_locked => is_locked
-    )
+    if title_changed? || body_changed? || is_locked_changed?
+      versions.create(
+        :updater_id => updater_id,
+        :updater_ip_addr => updater_ip_addr,
+        :title => title,
+        :body => body,
+        :is_locked => is_locked
+      )
+    end
   end
   
   def initialize_creator

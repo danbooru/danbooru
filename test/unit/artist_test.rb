@@ -89,6 +89,7 @@ class ArtistTest < ActiveSupport::TestCase
     
     should "revert to prior versions" do
       user = Factory.create(:user)
+      reverter = Factory.create(:user)
       artist = nil
       assert_difference("ArtistVersion.count") do
         artist = Factory.create(:artist, :other_names => "yyy")
@@ -103,7 +104,7 @@ class ArtistTest < ActiveSupport::TestCase
       
       first_version = ArtistVersion.first
       assert_equal("yyy", first_version.other_names)
-      artist.revert_to!(first_version)
+      artist.revert_to!(first_version, reverter.id, "127.0.0.1")
       artist.reload
       assert_equal("yyy", artist.other_names)
     end

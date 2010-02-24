@@ -14,7 +14,9 @@ class Post < ActiveRecord::Base
   has_one :moderation_detail, :class_name => "PostModerationDetail", :dependent => :destroy
   has_many :versions, :class_name => "PostVersion", :dependent => :destroy  
   has_many :votes, :class_name => "PostVote", :dependent => :destroy
-  attr_accessible :source, :rating, :tag_string, :old_tag_string, :updater_id, :updater_ip_addr
+  has_many :notes, :dependent => :destroy
+  validates_presence_of :updater_id, :updater_ip_addr
+  attr_accessible :source, :rating, :tag_string, :old_tag_string, :updater_id, :updater_ip_addr, :last_noted_at
   
   module FileMethods
     def delete_files
@@ -134,14 +136,16 @@ class Post < ActiveRecord::Base
         :updater_id => updater_id,
         :updater_ip_addr => updater_ip_addr
       )
-      
+    
       raise PostVersion::Error.new(version.errors.full_messages.join("; ")) if version.errors.any?
     end
     
-    def revert_to!(version)
+    def revert_to!(version, reverter_id, reverter_ip_addr)
       self.source = version.source
       self.rating = version.rating
       self.tag_string = version.tag_string
+      self.updater_id = reverter_id
+      self.updater_ip_addr = reverter_ip_addr
       save!
     end
   end

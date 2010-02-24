@@ -10,7 +10,7 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
       
       tag = Tag.find_by_name("aaa")
       calculator = RelatedTagCalculator.new
-      assert_equal({"bbb" => 3, "ccc" => 2, "ddd" => 1}, calculator.calculate_from_sample("aaa"))
+      assert_equal({"bbb" => 3, "ccc" => 2, "ddd" => 1}, calculator.calculate_from_sample("aaa", 10))
     end
 
     should "calculate related tags for a tag" do
@@ -21,9 +21,9 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
       
       tag = Tag.find_by_name("aaa")
       calculator = RelatedTagCalculator.new
-      assert_equal({"ccc" => 2}, calculator.calculate_from_sample("aaa", Tag.categories.artist))
+      assert_equal({"ccc" => 2}, calculator.calculate_from_sample("aaa", 10, Tag.categories.artist))
       calculator = RelatedTagCalculator.new
-      assert_equal({"ddd" => 1}, calculator.calculate_from_sample("aaa", Tag.categories.copyright))
+      assert_equal({"ddd" => 1}, calculator.calculate_from_sample("aaa", 10, Tag.categories.copyright))
     end
     
     should "convert a hash into string format" do
@@ -34,7 +34,7 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
       
       tag = Tag.find_by_name("aaa")
       calculator = RelatedTagCalculator.new
-      counts = calculator.calculate_from_sample("aaa")
+      counts = calculator.calculate_from_sample("aaa", 10)
       assert_equal("bbb 3 ccc 2 ddd 1", calculator.convert_hash_to_string(counts))
     end
   end

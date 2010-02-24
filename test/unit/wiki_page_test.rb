@@ -21,6 +21,7 @@ class WikiPageTest < ActiveSupport::TestCase
     should "create versions" do
       wp = nil
       user = Factory.create(:user)
+      reverter = Factory.create(:user)
       
       assert_difference("WikiPageVersion.count") do
         wp = Factory.create(:wiki_page, :title => "xxx")
@@ -34,7 +35,7 @@ class WikiPageTest < ActiveSupport::TestCase
       end
       
       version = WikiPageVersion.first
-      wp.revert_to!(version)
+      wp.revert_to!(version, reverter.id, "127.0.0.1")
       
       assert_equal("xxx", wp.title)
     end

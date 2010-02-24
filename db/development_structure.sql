@@ -798,6 +798,84 @@ ALTER SEQUENCE jobs_id_seq OWNED BY jobs.id;
 
 
 --
+-- Name: note_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE note_versions (
+    id integer NOT NULL,
+    note_id integer NOT NULL,
+    updater_id integer NOT NULL,
+    updater_ip_addr inet NOT NULL,
+    x integer NOT NULL,
+    y integer NOT NULL,
+    width integer NOT NULL,
+    height integer NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    body text NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: note_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE note_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: note_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE note_versions_id_seq OWNED BY note_versions.id;
+
+
+--
+-- Name: notes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE notes (
+    id integer NOT NULL,
+    creator_id integer NOT NULL,
+    post_id integer NOT NULL,
+    x integer NOT NULL,
+    y integer NOT NULL,
+    width integer NOT NULL,
+    height integer NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    body text NOT NULL,
+    text_index tsvector NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: notes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE notes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: notes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE notes_id_seq OWNED BY notes.id;
+
+
+--
 -- Name: pool_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1524,6 +1602,20 @@ ALTER TABLE jobs ALTER COLUMN id SET DEFAULT nextval('jobs_id_seq'::regclass);
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE note_versions ALTER COLUMN id SET DEFAULT nextval('note_versions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE notes ALTER COLUMN id SET DEFAULT nextval('notes_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE pool_versions ALTER COLUMN id SET DEFAULT nextval('pool_versions_id_seq'::regclass);
 
 
@@ -1799,6 +1891,22 @@ ALTER TABLE ONLY forum_topics
 
 ALTER TABLE ONLY jobs
     ADD CONSTRAINT jobs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: note_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY note_versions
+    ADD CONSTRAINT note_versions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: notes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY notes
+    ADD CONSTRAINT notes_pkey PRIMARY KEY (id);
 
 
 --
@@ -2237,6 +2345,41 @@ CREATE INDEX index_forum_topics_on_text_index ON forum_topics USING gin (text_in
 
 
 --
+-- Name: index_note_versions_on_note_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_note_versions_on_note_id ON note_versions USING btree (note_id);
+
+
+--
+-- Name: index_note_versions_on_updater_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_note_versions_on_updater_id ON note_versions USING btree (updater_id);
+
+
+--
+-- Name: index_notes_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_notes_on_creator_id ON notes USING btree (creator_id);
+
+
+--
+-- Name: index_notes_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_notes_on_post_id ON notes USING btree (post_id);
+
+
+--
+-- Name: index_notes_on_text_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_notes_on_text_index ON notes USING gin (text_index);
+
+
+--
 -- Name: index_pool_versions_on_pool_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2504,6 +2647,16 @@ CREATE TRIGGER trigger_forum_topics_on_update
 
 
 --
+-- Name: trigger_notes_on_update; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER trigger_notes_on_update
+    BEFORE INSERT OR UPDATE ON notes
+    FOR EACH ROW
+    EXECUTE PROCEDURE tsvector_update_trigger('text_index', 'pg_catalog.english', 'body');
+
+
+--
 -- Name: trigger_posts_on_tag_index_update; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -2580,3 +2733,7 @@ INSERT INTO schema_migrations (version) VALUES ('20100221005812');
 INSERT INTO schema_migrations (version) VALUES ('20100221012656');
 
 INSERT INTO schema_migrations (version) VALUES ('20100223001012');
+
+INSERT INTO schema_migrations (version) VALUES ('20100224171915');
+
+INSERT INTO schema_migrations (version) VALUES ('20100224172146');
