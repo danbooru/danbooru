@@ -1182,6 +1182,41 @@ ALTER SEQUENCE tag_implications_id_seq OWNED BY tag_implications.id;
 
 
 --
+-- Name: tag_subscriptions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE tag_subscriptions (
+    id integer NOT NULL,
+    owner_id integer NOT NULL,
+    name character varying(255) NOT NULL,
+    tag_query character varying(255) NOT NULL,
+    post_ids text NOT NULL,
+    is_visible_on_profile boolean DEFAULT true NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: tag_subscriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE tag_subscriptions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: tag_subscriptions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE tag_subscriptions_id_seq OWNED BY tag_subscriptions.id;
+
+
+--
 -- Name: tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1335,7 +1370,8 @@ CREATE TABLE users (
     name character varying(255) NOT NULL,
     password_hash character varying(255) NOT NULL,
     email character varying(255),
-    invited_by integer,
+    email_verification_key character varying(255),
+    inviter_id integer,
     is_banned boolean DEFAULT false NOT NULL,
     is_privileged boolean DEFAULT false NOT NULL,
     is_contributor boolean DEFAULT false NOT NULL,
@@ -1672,6 +1708,13 @@ ALTER TABLE tag_implications ALTER COLUMN id SET DEFAULT nextval('tag_implicatio
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE tag_subscriptions ALTER COLUMN id SET DEFAULT nextval('tag_subscriptions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE tags ALTER COLUMN id SET DEFAULT nextval('tags_id_seq'::regclass);
 
 
@@ -1971,6 +2014,14 @@ ALTER TABLE ONLY tag_aliases
 
 ALTER TABLE ONLY tag_implications
     ADD CONSTRAINT tag_implications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tag_subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY tag_subscriptions
+    ADD CONSTRAINT tag_subscriptions_pkey PRIMARY KEY (id);
 
 
 --
@@ -2534,6 +2585,20 @@ CREATE INDEX index_tag_implications_on_consequent_name ON tag_implications USING
 
 
 --
+-- Name: index_tag_subscriptions_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_tag_subscriptions_on_name ON tag_subscriptions USING btree (name);
+
+
+--
+-- Name: index_tag_subscriptions_on_owner_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_tag_subscriptions_on_owner_id ON tag_subscriptions USING btree (owner_id);
+
+
+--
 -- Name: index_tags_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2737,3 +2802,5 @@ INSERT INTO schema_migrations (version) VALUES ('20100223001012');
 INSERT INTO schema_migrations (version) VALUES ('20100224171915');
 
 INSERT INTO schema_migrations (version) VALUES ('20100224172146');
+
+INSERT INTO schema_migrations (version) VALUES ('20100307073438');

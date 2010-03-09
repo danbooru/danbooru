@@ -1,6 +1,8 @@
 require 'digest/sha1'
 
 class User < ActiveRecord::Base
+  class Error < Exception ; end
+  
   attr_accessor :password
   attr_accessible :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags
   validates_length_of :name, :within => 2..20, :on => :create
@@ -14,6 +16,7 @@ class User < ActiveRecord::Base
   after_save :update_cache
   before_create :normalize_level
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
+  belongs_to :inviter, :class_name => "User"
   scope :named, lambda {|name| where(["lower(name) = ?", name])}  
   
   module NameMethods
@@ -116,11 +119,30 @@ class User < ActiveRecord::Base
     end
   end
   
+  module EmailVerificationMethods
+    def is_verified?
+      email_verification_key.blank?
+    end
+    
+    def generate_email_verification_key
+      self.email_verification_key = Digest::SHA1.hexdigest("#{Time.now.to_f}--#{name}--#{rand(1_000_000)}--")
+    end
+    
+    def verify!(key)
+      if email_verification_key == key
+        self.update_attribute(:email_verification_key, nil)
+      else
+        raise User::Error.new("Verification key does not match")
+      end
+    end
+  end
+  
   include NameMethods
   include PasswordMethods
   extend AuthenticationMethods
   include FavoriteMethods
   include LevelMethods
+  include EmailVerificationMethods
 
   def can_update?(object, foreign_key = :user_id)
     is_moderator? || is_admin? || object.__send__(foreign_key) == id

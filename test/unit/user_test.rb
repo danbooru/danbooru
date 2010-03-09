@@ -6,6 +6,18 @@ class UserTest < ActiveSupport::TestCase
       MEMCACHE.flush_all
     end
     
+    should "verify" do
+      user = Factory.create(:user)
+      assert(user.is_verified?)
+      user = Factory.create(:user)
+      user.generate_email_verification_key
+      user.save
+      assert(!user.is_verified?)
+      assert_raise(User::Error) {user.verify!("bbb")}
+      assert_nothing_raised {user.verify!(user.email_verification_key)}
+      assert(user.is_verified?)
+    end
+    
     should "authenticate" do
       @user = Factory.create(:user)
       assert(User.authenticate(@user.name, "password"), "Authentication should have succeeded")

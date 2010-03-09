@@ -6,7 +6,8 @@ class CreateUsers < ActiveRecord::Migration
       t.column :name, :string, :null => false
       t.column :password_hash, :string, :null => false
       t.column :email, :string
-      t.column :invited_by, :integer
+      t.column :email_verification_key, :string
+      t.column :inviter_id, :integer
       t.column :is_banned, :boolean, :null => false, :default => false
       t.column :is_privileged, :boolean, :null => false, :default => false
       t.column :is_contributor, :boolean, :null => false, :default => false
