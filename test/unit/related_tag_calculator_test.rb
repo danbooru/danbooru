@@ -13,7 +13,7 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
       assert_equal({"bbb" => 3, "ccc" => 2, "ddd" => 1}, calculator.calculate_from_sample("aaa", 10))
     end
 
-    should "calculate related tags for a tag" do
+    should "calculate typed related tags for a tag" do
       posts = []
       posts << Factory.create(:post, :tag_string => "aaa bbb art:ccc copy:ddd")
       posts << Factory.create(:post, :tag_string => "aaa bbb art:ccc")
