@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+  <title><%= yield :page_title %></title>
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="top" title="<%= Danbooru.config.app_name %>" href="/">
+  <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
+  <%= stylesheet_link_tag "default" %>
+  <%= javascript_include_tag "application" %>
+  <%= Danbooru.config.custom_html_header_content %>
+  <%= yield :html_header_content %>
+</head>
+<body>
+  <div id="header">
+    <h2 id="site-title"><%= link_to(Danbooru.config.app_name, "/") %><%= tag_header(params[:tags]) %></h2>
+    <ul class="flat-list" id="nav">
+      <% if @current_user.is_member_or_higher? %>
+        <%= nav_link_to("My Account", user_path(@current_user)) %>
+      <% else %>
+        <%= nav_link_to("Login/Signup", new_session_path) %>
+      <% end %>
+      <%= nav_link_to("Posts", posts_path) %>
+      <%= nav_link_to("Comments", comments_path) %>
+      <%= nav_link_to("Notes", notes_path) %>
+      <%= nav_link_to("Artists", artists_path(:order => "date")) %>
+      <%= nav_link_to("Tags", tags_path(:order => "date")) %>
+      <%= nav_link_to("Pools", pools_path) %>
+      <%= nav_link_to("Wiki", wiki_page_path(:title => "help:home")) %>
+      <%= nav_link_to("Forum", forum_topics_path, :class => (@current_user.has_forum_been_updated? ? "forum-updated" : nil)) %>
+      <%= nav_link_to("&raquo;", site_map_help_path) %>
+    </ul>
+    <%= yield :secondary_nav_links %>
+  </div>
+
+  <% if flash[:notice] %>
+    <div id="notice"><%= h flash[:notice] %></div>
+  <% else %>
+    <div id="notice" style="display: none;"></div>
+  <% end %>
+  
+  <% if @current_user.has_mail? %>
+    <div class="has-mail" id="has-mail-notice">
+      <%= link_to "You have mail", dmails_path %>
+    </div>
+  <% end %>
+
+  <% if !@current_user.is_privileged? %>
+    <div id="upgrade-account" style="display: none;">
+      <%= link_to "Upgrade your account for only $20", users_help_path %>
+      <%= link_to_function "No thanks", "$('upgrade-account').hide(); Cookie.put('hide-upgrade-account', '1', 7)", :id => "hide-upgrade-account-link" %>
+    </div>
+  <% end %>
+  
+  <% if @current_user.is_banned? %>
+    <div id="ban-reason">
+      You have been banned. 
+      <% if @current_user.ban %>
+        Reason: <%= h @current_user.ban.reason %>. 
+        Expires: <%= @current_user.ban.expires_at.strftime('%Y-%m-%d') %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div id="content">
+    <%= yield :layout %>
+  </div>
+
+  <script type="text/javascript">
+    <%= yield :blacklist %>
+    Post.init_blacklisted();
+    Cookie.setup()
+  </script>
+
+  <%= yield :page_footer_content %>
+</body>
+</html>

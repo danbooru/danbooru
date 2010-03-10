@@ -1,0 +1,2 @@
+module DmailsHelper
+end

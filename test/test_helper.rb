@@ -8,9 +8,8 @@ require 'rails/test_help'
 
 Dir[File.expand_path(File.dirname(__FILE__) + "/factories/*.rb")].each {|file| require file}
 
-class ActiveSupport::TestCase
-protected
-  def upload_file(path, content_type, filename)
+module UploadMethods
+  def UploadTestMethods(path, content_type, filename)
   	tempfile = Tempfile.new(filename)
   	FileUtils.copy_file(path, tempfile.path)
   	(class << tempfile; self; end).class_eval do
@@ -26,3 +25,22 @@ protected
   	upload_file(path, "image/jpeg", File.basename(path))
   end
 end
+
+class ActiveSupport::TestCase
+  include UploadTestMethods
+end
+
+class ActionController::TestCase
+  include UploadTestMethods
+  
+  def assert_authentication_passes(action, http_method, role, params, session)
+    __send__(http_method, action, params, session.merge(:user_id => @users[role].id))
+    assert_response :success
+  end
+  
+  def assert_authentication_fails(action, http_method, role)
+    __send__(http_method, action, params, session.merge(:user_id => @users[role].id))
+    assert_redirected_to(new_sessions_path)
+  end
+end
+

@@ -7,6 +7,7 @@ end
 
 Factory.define(:banned_user, :parent => :user) do |f|
   f.is_banned true
+  f.ban {|x| x.association(:ban)}
 end
 
 Factory.define(:privileged_user, :parent => :user) do |f|

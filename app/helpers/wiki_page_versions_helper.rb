@@ -1,0 +1,2 @@
+module WikiPageVersionsHelper
+end

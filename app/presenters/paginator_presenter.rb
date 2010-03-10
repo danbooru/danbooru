@@ -1,0 +1,2 @@
+class PaginatorPresenter
+end

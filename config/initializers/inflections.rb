@@ -1,3 +1,3 @@
 ActiveSupport::Inflector.inflections do |inflect|
-  inflect.uncountable %w( feedback )
+  inflect.uncountable %w( user_feedback )
 end

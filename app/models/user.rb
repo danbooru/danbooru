@@ -117,6 +117,10 @@ class User < ActiveRecord::Base
         self.is_privileged = true
       end
     end
+    
+    def is_anonymous?
+      false
+    end
   end
   
   module EmailVerificationMethods
@@ -137,12 +141,19 @@ class User < ActiveRecord::Base
     end
   end
   
+  module BlacklistMethods
+    def blacklisted_tag_array
+      Tag.scan_query(blacklisted_tags)
+    end
+  end
+  
   include NameMethods
   include PasswordMethods
   extend AuthenticationMethods
   include FavoriteMethods
   include LevelMethods
   include EmailVerificationMethods
+  include BlacklistMethods
 
   def can_update?(object, foreign_key = :user_id)
     is_moderator? || is_admin? || object.__send__(foreign_key) == id
