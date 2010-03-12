@@ -4,16 +4,21 @@
   <title><%= yield(:page_title) || Danbooru.config.app_name %></title>
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
   <link rel="top" title="<%= Danbooru.config.app_name %>" href="/">
+  <%= csrf_meta_tag %>
+  <% unless @current_user.blacklisted_tags.blank? %>
+    <meta name="blacklisted-tags" content="<%= h @current_user.blacklisted_tags %>">
+  <% end %>
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
   <%= stylesheet_link_tag "default" %>
   <%= javascript_include_tag "http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" %>
+  <%= javascript_include_tag "rails" %>
   <%= Danbooru.config.custom_html_header_content %>
   <%= yield :html_header_content %>
 </head>
 <body>
   <nav>
     <h1><%= link_to(Danbooru.config.app_name, "/") %><%= yield :page_header %></h1>
-    <ul>
+    <menu>
       <% if @current_user.is_anonymous? %>
         <%= nav_link_to("Login", new_session_path) %>
       <% else %>
@@ -28,7 +33,7 @@
       <%= nav_link_to("Wiki", wiki_page_path(:id => "help:home")) %>
       <%= nav_link_to("Forum", forum_topics_path, :class => (@current_user.has_forum_been_updated? ? "forum-updated" : nil)) %>
       <%= nav_link_to("&raquo;".html_safe, site_map_path) %>
-    </ul>
+    </menu>
     <%= yield :secondary_nav_links %>
   </nav>
 
@@ -61,9 +66,9 @@
     </div>
   <% end %>
 
-  <section id="content">
+  <div id="content">
     <%= yield :layout %>
-  </section>
+  </div>
 
   <%= yield :page_footer_content %>
 </body>

@@ -19,10 +19,18 @@
 
 <aside>
   <h2>Help</h2>
-  <ul>
+  <menu>
     <li><%= link_to "I don't have an account", new_user_path %></li>
     <li><%= link_to "I forgot my password", reset_password_info_path %></li>
     <li><%= link_to "I forgot my login", login_reminder_info_path %></li>
     <li><%= link_to "I want to delete my account", delete_account_info_path %></li>
-  </ul>
+  </menu>
 </aside>
+
+<% content_for(:page_title) do %>
+login
+<% end %>
+
+<% content_for(:page_header) do %>
+  / login
+<% end %>

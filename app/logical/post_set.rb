@@ -102,4 +102,8 @@ class PostSet
   def to_json
     posts.to_json
   end
+  
+  def presenter
+    @presnter ||= PostSetPresenter.new(self)
+  end
 end

@@ -96,6 +96,10 @@ class AnonymousUser
     false
   end
   
+  def blacklisted_tags
+    ""
+  end
+  
   %w(banned privileged contributor janitor moderator admin).each do |name, value|
     normalized_name = name.downcase.gsub(/ /, "_")
 

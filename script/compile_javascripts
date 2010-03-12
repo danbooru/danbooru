@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+
+mkdir -p public/javascripts/compiled/posts
+
+# Create the base script that's used everywhere
+cat public/javascripts/src/rails.js > public/javascripts/compiled/base.js
+cat public/javascripts/src/cookie.js > public/javascripts/compiled/base.js
+cat public/javascripts/src/application.js >> public/javascripts/compiled/base.js
+
+# Create post/index.js
+cat public/javascripts/compiled/base.js > public/javascripts/compiled/posts/index.js
+cat public/javascripts/src/posts/index.js >> public/javascripts/compiled/posts/index.js

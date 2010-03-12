@@ -56,5 +56,5 @@ Danbooru::Application.routes.draw do |map|
   match "/user_maintenance/login_reminder" => "user_maintenance#login_reminder", :as => "login_reminder_info"
   match "/user_maintenance/reset_password" => "user_maintenance#reset_password", :as => "reset_password_info"
   
-  root :to => "post#index"
+  root :to => "posts#index"
 end

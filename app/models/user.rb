@@ -3,13 +3,13 @@ require 'digest/sha1'
 class User < ActiveRecord::Base
   class Error < Exception ; end
   
-  attr_accessor :password
-  attr_accessible :password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name
+  attr_accessor :password, :old_password
+  attr_accessible :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name
   validates_length_of :name, :within => 2..20, :on => :create
   validates_format_of :name, :with => /\A[^\s;,]+\Z/, :on => :create, :message => "cannot have whitespace, commas, or semicolons"
   validates_uniqueness_of :name, :case_sensitive => false, :on => :create
   validates_uniqueness_of :email, :case_sensitive => false, :on => :create, :if => lambda {|rec| !rec.email.blank?}
-  validates_length_of :password, :minimum => 5, :if => lambda {|rec| rec.new_record? || rec.password}
+  validates_length_of :password, :minimum => 5, :if => lambda {|rec| rec.new_record? || !rec.password.blank?}
   validates_inclusion_of :default_image_size, :in => %w(medium large original)
   validates_confirmation_of :password
   validates_presence_of :email, :if => lambda {|rec| rec.new_record? && Danbooru.config.enable_email_verification?}
@@ -176,6 +176,10 @@ class User < ActiveRecord::Base
   include EmailVerificationMethods
   include BlacklistMethods
   include ForumMethods
+  
+  def initialize_default_image_size
+    self.default_image_size = "Medium"
+  end
 
   def can_update?(object, foreign_key = :user_id)
     is_moderator? || is_admin? || object.__send__(foreign_key) == id
