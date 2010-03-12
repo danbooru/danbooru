@@ -120,12 +120,16 @@ class Tag < ActiveRecord::Base
   end
   
   module ParseMethods
+    def normalize(query)
+      query.to_s.downcase.strip
+    end
+    
     def scan_query(query)
-      query.to_s.downcase.scan(/\S+/).uniq
+      normalize(query).scan(/\S+/).uniq
     end
 
     def scan_tags(tags)
-      tags.to_s.downcase.gsub(/[,;*]/, "_").scan(/\S+/).uniq
+      normalize(tags).gsub(/[,;*]/, "_").scan(/\S+/).uniq
     end
 
     def parse_cast(object, type)
@@ -334,10 +338,25 @@ class Tag < ActiveRecord::Base
     end
   end
   
+  module SuggestionMethods
+    def find_suggestions(query)
+      query_tokens = query.split(/_/)
+      
+      if query_tokens.size == 2
+        search_for = query_tokens.reverse.join("_").to_escaped_for_sql_like
+      else
+        search_for = "%" + query.to_escaped_for_sql_like + "%"
+      end
+
+      Tag.where(["name LIKE ? ESCAPE E'\\\\' AND post_count > 0 AND name <> ?", search_for, query]).all(:order => "post_count DESC", :limit => 6, :select => "name").map(&:name).sort
+    end
+  end
+  
   extend ViewCountMethods
   include CategoryMethods
   extend StatisticsMethods
   include NameMethods
   extend UpdateMethods
   extend ParseMethods
+  extend SuggestionMethods
 end

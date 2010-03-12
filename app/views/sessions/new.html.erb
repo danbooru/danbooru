@@ -1,0 +1,28 @@
+<% form_tag(sessions_path) do %>
+  <fieldset>
+    <legend>Login</legend>
+    <p>
+      <%= label_tag "name", "Name" %>
+      <%= text_field_tag "name" %>
+    </p>
+
+    <p>
+      <%= label_tag "password", "Password" %>
+      <%= password_field_tag "password" %>
+    </p>
+
+    <p>
+      <%= submit_tag "Submit" %>
+    </p>
+  </fieldset>
+<% end %>  
+
+<aside>
+  <h2>Help</h2>
+  <ul>
+    <li><%= link_to "I don't have an account", new_user_path %></li>
+    <li><%= link_to "I forgot my password", reset_password_info_path %></li>
+    <li><%= link_to "I forgot my login", login_reminder_info_path %></li>
+    <li><%= link_to "I want to delete my account", delete_account_info_path %></li>
+  </ul>
+</aside>

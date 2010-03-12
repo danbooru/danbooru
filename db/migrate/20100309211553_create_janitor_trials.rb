@@ -7,7 +7,7 @@ class CreateJanitorTrials < ActiveRecord::Migration
       t.timestamps
     end
     
-    add_inex :janitor_trials, :user_id
+    add_index :janitor_trials, :user_id
   end
 
   def self.down

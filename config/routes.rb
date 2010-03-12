@@ -50,7 +50,11 @@ Danbooru::Application.routes.draw do |map|
   end
   resources :wiki_page_versions
 
-  match "/site_map" => "static#site_map"
+  match "/site_map" => "static#site_map", :as => "site_map"
+  match "/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
+  match "/user_maintenance/delete_account" => "user_maintenance#delete_account", :as => "delete_account_info"
+  match "/user_maintenance/login_reminder" => "user_maintenance#login_reminder", :as => "login_reminder_info"
+  match "/user_maintenance/reset_password" => "user_maintenance#reset_password", :as => "reset_password_info"
   
   root :to => "post#index"
 end

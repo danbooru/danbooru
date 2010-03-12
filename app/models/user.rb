@@ -4,16 +4,18 @@ class User < ActiveRecord::Base
   class Error < Exception ; end
   
   attr_accessor :password
-  attr_accessible :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags
+  attr_accessible :password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name
   validates_length_of :name, :within => 2..20, :on => :create
   validates_format_of :name, :with => /\A[^\s;,]+\Z/, :on => :create, :message => "cannot have whitespace, commas, or semicolons"
   validates_uniqueness_of :name, :case_sensitive => false, :on => :create
   validates_uniqueness_of :email, :case_sensitive => false, :on => :create, :if => lambda {|rec| !rec.email.blank?}
-  validates_length_of :password, :minimum => 5, :if => lambda {|rec| rec.password}
+  validates_length_of :password, :minimum => 5, :if => lambda {|rec| rec.new_record? || rec.password}
   validates_inclusion_of :default_image_size, :in => %w(medium large original)
   validates_confirmation_of :password
+  validates_presence_of :email, :if => lambda {|rec| rec.new_record? && Danbooru.config.enable_email_verification?}
   before_save :encrypt_password
   after_save :update_cache
+  before_create :promote_to_admin_if_first_user
   before_create :normalize_level
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
   belongs_to :inviter, :class_name => "User"
@@ -25,6 +27,10 @@ class User < ActiveRecord::Base
         Cache.get("un:#{user_id}") do
           select_value_sql("SELECT name FROM users WHERE id = ?", user_id) || Danbooru.config.default_guest_name
         end
+      end
+      
+      def find_by_name(name)
+        where(["lower(name) = ?", name.downcase]).first
       end
       
       def find_pretty_name(user_id)
@@ -102,6 +108,12 @@ class User < ActiveRecord::Base
   end
   
   module LevelMethods
+    def promote_to_admin_if_first_user
+      if User.count == 0
+        self.is_admin = true
+      end
+    end
+    
     def normalize_level
       if is_admin?
         self.is_moderator = true
@@ -147,6 +159,15 @@ class User < ActiveRecord::Base
     end
   end
   
+  module ForumMethods
+    def has_forum_been_updated?
+      return false unless is_privileged?
+      newest_topic = ForumPost.first(:order => "updated_at desc", :select => "updated_at")
+      return false if newest_topic.nil?
+      return newest_topic.updated_at > user.last_forum_read_at
+    end
+  end
+  
   include NameMethods
   include PasswordMethods
   extend AuthenticationMethods
@@ -154,6 +175,7 @@ class User < ActiveRecord::Base
   include LevelMethods
   include EmailVerificationMethods
   include BlacklistMethods
+  include ForumMethods
 
   def can_update?(object, foreign_key = :user_id)
     is_moderator? || is_admin? || object.__send__(foreign_key) == id

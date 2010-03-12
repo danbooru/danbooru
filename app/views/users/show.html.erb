@@ -1,0 +1,11 @@
+<h1><%= @user.name %></h1>
+
+<nav>
+  <ul>
+    <li><%= link_to "Settings", edit_user_path(@user) %></li>
+  </ul>
+</nav>
+
+<% content_for(:page_header) do %>
+  / <%= @user.name %>
+<% end %>

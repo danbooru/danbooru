@@ -1,4 +1,3 @@
-ENV["RAILS_ENV"] = "test"
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'shoulda'
 require 'factory_girl'
@@ -8,8 +7,8 @@ require 'rails/test_help'
 
 Dir[File.expand_path(File.dirname(__FILE__) + "/factories/*.rb")].each {|file| require file}
 
-module UploadMethods
-  def UploadTestMethods(path, content_type, filename)
+module UploadTestMethods
+  def upload_file(path, content_type, filename)
   	tempfile = Tempfile.new(filename)
   	FileUtils.copy_file(path, tempfile.path)
   	(class << tempfile; self; end).class_eval do

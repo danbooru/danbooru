@@ -2,6 +2,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   before_filter :set_current_user
   before_filter :initialize_cookies
+  layout "default"
 
 protected
   def access_denied
@@ -25,25 +26,15 @@ protected
   end
 
   def set_current_user
-    if @current_user == nil && session[:user_id]
+    if session[:user_id]
       @current_user = User.find_by_id(session[:user_id])
     end
-
-    if @current_user == nil && params[:user]
-      @current_user = User.authenticate(params[:user][:name], params[:user][:password])
-    end
     
-    if @current_user == nil && params[:api]
-      @current_user = User.authenticate(params[:api][:key], params[:api][:hash])
-    end
-
     if @current_user
       if @current_user.is_banned? && @current_user.ban && @current_user.ban.expires_at < Time.now
         @current_user.update_attribute(:is_banned, false)
         Ban.destroy_all("user_id = #{@current_user.id}")
       end
-
-      session[:user_id] = @current_user.id
     else
       @current_user = AnonymousUser.new
     end

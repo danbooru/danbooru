@@ -1,2 +1,8 @@
-// Place your application-specific JavaScript functions and classes here
-// This file is automatically included by javascript_include_tag :defaults
+// Post.init_blacklisted();
+// Cookie.setup();
+$(document).ready(function() {
+	$("#hide-upgrade-account-link").click(function() {
+		$("#upgrade-account").hide();
+		// Cookie.put('hide-upgrade-account', '1', 7);
+	});
+});

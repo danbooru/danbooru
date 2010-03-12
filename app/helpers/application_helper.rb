@@ -1,12 +1,12 @@
 module ApplicationHelper
-  def nav_link_to(text, options, html_options = nil)
-    if options[:controller] == params[:controller] || (%w(tag_alias tag_implication).include?(params[:controller]) && options[:controller] == "tag")
+  def nav_link_to(text, url, html_options = nil)
+    if url.include?(params[:controller]) || (%w(tag_alias tag_implication).include?(params[:controller]) && url =~ /\/tag/)
       klass = "current-page"
     else
       klass = nil
     end
     
-    %{<li class="#{klass}">} + fast_link_to(text, options, html_options) + "</li>"
+    (%{<li class="#{klass}">} + link_to(text, url, html_options) + "</li>").html_safe
   end
 
   def format_text(text, options = {})
@@ -22,7 +22,7 @@ module ApplicationHelper
 
   def tag_header(tags)
     unless tags.blank?
-      '/' + Tag.scan_query(tags).map {|t| link_to(h(t.tr("_", " ")), posts_path(:tags => t)}.join("+")
+      '/' + Tag.scan_query(tags).map {|t| link_to(h(t.tr("_", " ")), posts_path(:tags => t))}.join("+")
     end
   end
   

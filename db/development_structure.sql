@@ -763,6 +763,39 @@ ALTER SEQUENCE forum_topics_id_seq OWNED BY forum_topics.id;
 
 
 --
+-- Name: janitor_trials; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE janitor_trials (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    promoted_at timestamp without time zone,
+    original_level integer NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: janitor_trials_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE janitor_trials_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: janitor_trials_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE janitor_trials_id_seq OWNED BY janitor_trials.id;
+
+
+--
 -- Name: jobs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1631,6 +1664,13 @@ ALTER TABLE forum_topics ALTER COLUMN id SET DEFAULT nextval('forum_topics_id_se
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE janitor_trials ALTER COLUMN id SET DEFAULT nextval('janitor_trials_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE jobs ALTER COLUMN id SET DEFAULT nextval('jobs_id_seq'::regclass);
 
 
@@ -1926,6 +1966,14 @@ ALTER TABLE ONLY forum_posts
 
 ALTER TABLE ONLY forum_topics
     ADD CONSTRAINT forum_topics_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: janitor_trials_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY janitor_trials
+    ADD CONSTRAINT janitor_trials_pkey PRIMARY KEY (id);
 
 
 --
@@ -2396,6 +2444,13 @@ CREATE INDEX index_forum_topics_on_text_index ON forum_topics USING gin (text_in
 
 
 --
+-- Name: index_janitor_trials_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_janitor_trials_on_user_id ON janitor_trials USING btree (user_id);
+
+
+--
 -- Name: index_note_versions_on_note_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2804,3 +2859,5 @@ INSERT INTO schema_migrations (version) VALUES ('20100224171915');
 INSERT INTO schema_migrations (version) VALUES ('20100224172146');
 
 INSERT INTO schema_migrations (version) VALUES ('20100307073438');
+
+INSERT INTO schema_migrations (version) VALUES ('20100309211553');

@@ -165,21 +165,26 @@ module Danbooru
       }
     end
     
+    # If enabled, users must verify their email addresses.
+    def enable_email_verification?
+      true
+    end
+    
     # Any custom code you want to insert into the default layout without
     # having to modify the templates.
     def custom_html_header_content
-      <<-EOS
-      <script type="text/javascript">
-        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-      </script>
-      <script type="text/javascript">
-        try {
-          var pageTracker = _gat._getTracker("UA-86094-4");
-          pageTracker._trackPageview();
-        } catch(err) {}
-      </script>
-      EOS
+      %{
+        <script type="text/javascript">
+          var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+          document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+        </script>
+        <script type="text/javascript">
+          try {
+            var pageTracker = _gat._getTracker("UA-86094-4");
+            pageTracker._trackPageview();
+          } catch(err) {}
+        </script>
+      }.html_safe
     end
   end
 end

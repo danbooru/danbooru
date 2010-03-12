@@ -1,0 +1,96 @@
+<p><%= Danbooru.config.app_name %> is ad-sponsored and does not require an account to view. But in order to start uploading, editing, or creating content on this site, you will need to register. <em>Make sure you read and agree to the <%= link_to "terms of service", terms_of_service_path %> before registering. <strong>This site is open to web crawlers, therefore any name you choose will be public!</strong></em></p>
+
+<p>Registration for a basic account is free but comes with some limitations.</p>
+
+<div>
+  <div>
+    <h1>Basic</h1>
+    <ul>
+      <li>Free</li>
+      <li>Create and edit posts, favorites, forums, comments, wiki pages, pools, artists, and dmails</li>
+      <li>Search up to 2 tags at once</li>
+      <li>Some hidden posts</li>
+      <li>Ads visible</li>
+      <li>Uploads limited</li>
+    </ul>
+  </div>
+  
+  <div>
+    <h1>Privileged</h1>
+    <ul>
+      <li>One time $20 fee</li>
+      <li>Search up to 6 tags at once</li>
+      <li>No hidden posts</li>
+      <li>No ads</li>
+      <li>Uploads limited</li>
+      <li>Tag subscriptions</li>
+    </ul>
+  </div>
+  
+  <div>
+    <h1>Contributor</h1>
+    <ul>
+      <li>No upload limits</li>
+      <li>By invitation only</li>
+    </ul>
+  </div>
+</div>
+
+<% form_tag(users_path) do %>
+  <%= error_messages_for(@user) %>
+  
+  <fieldset>
+    <legend>Signup</legend>
+    
+    <p>
+      <%= label "user", "name" %>
+      <%= text_field "user", "name" %>
+    </p>
+    
+    <p>
+      <%= label "user", "password" %>
+      <%= password_field "user", "password" %>
+    </p>
+    
+    <p>
+      <%= label "user", "password_confirmation" %>
+      <%= password_field "user", "password_confirmation" %>
+    </p>
+    
+    <p>
+      <%= label "user", "email" %>
+      <%= text_field "user", "email" %>
+    </p>
+    
+    <%= submit_tag "Submit" %>
+  </fieldset>
+<% end %>
+
+<aside id="form-help">
+  <section>
+    Your name must be at least 2 characters and at most 20 characters long. It cannot contain spaces, commas, colons, or semi-colons.
+  </section>
+  
+  <section>
+    Your password must be at least 5 characters long.
+  </section>
+  
+  <section>
+    <% if Danbooru.config.enable_email_verification? %>
+      You must enter a valid email address. You will need to verify your email address after registering.
+    <% else %>
+      You can optionally enter an email address. Although optional, you will not be able to reset your password without an email address.
+    <% end %>
+  </section>
+</aside>
+
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function() {
+    $("#user_name").focus(function() {
+      $("#description").append("Your name must be between 2 and 20 characters, and cannot contain whitespace, commas, semicolons, or colons.");
+    });
+    $("#user_name").blur(function() {
+      $("#description").empty();
+    });
+  });
+</script>
