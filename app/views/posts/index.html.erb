@@ -18,10 +18,10 @@
       <h1>Mode</h1>
       <form action="/">
         <select name="mode">
-          <option value="view">View posts</option>
-          <option value="edit">Edit posts</option>
-          <option value="add-fav">Add to favorites</option>
-          <option value="remove-fav">Remove from favorites</option>
+          <option value="view">View</option>
+          <option value="edit">Edit</option>
+          <option value="add-fav">Favorite</option>
+          <option value="remove-fav">Unfavorite</option>
           <option value="rating-s">Rate safe</option>
           <option value="rating-q">Rate questionable</option>
           <option value="rating-e">Rate explicit</option>
@@ -32,9 +32,9 @@
           <option value="edit-tag-script">Edit tag script</option>
           <option value="apply-tag-script">Apply tag script</option>
           <% if @current_user.is_janitor? %>
-            <option value="approve">Approve post</option>
+            <option value="approve">Approve</option>
           <% end %>
-          <option value="flag">Flag post</option>
+          <option value="unapprove">Unapprove</option>
         </select>          
       </form>
     </section>
@@ -82,16 +82,4 @@
   / <%= @post_set.tags %>
 <% end %>
 
-<% content_for(:secondary_nav_links) do %>
-  <menu>
-    <li>Listing</li>
-    <li>Upload</li>
-    <li>Popular</li>
-    <li>Favorites</li>
-    <li>Subscriptions</li>
-    <li>Changes</li>
-    <li>Approvals</li>
-    <li>Moderate</li>
-    <li>Help</li>
-  </menu>
-<% end %>
+<%= render :partial => "posts/common_secondary_nav_links" %>

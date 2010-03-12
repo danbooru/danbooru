@@ -14,6 +14,7 @@ class CreateUsers < ActiveRecord::Migration
       t.column :is_janitor, :boolean, :null => false, :default => false
       t.column :is_moderator, :boolean, :null => false, :default => false
       t.column :is_admin, :boolean, :null => false, :default => false
+      t.column :base_upload_limit, :integer, :null => false, :default => 10
       
       # Cached data
       t.column :last_logged_in_at, :datetime

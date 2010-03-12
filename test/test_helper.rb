@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
+
 require 'shoulda'
 require 'factory_girl'
 require 'mocha'

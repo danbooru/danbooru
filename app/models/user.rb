@@ -109,6 +109,8 @@ class User < ActiveRecord::Base
   
   module LevelMethods
     def promote_to_admin_if_first_user
+      return if Rails.env.test?
+      
       if User.count == 0
         self.is_admin = true
       end
@@ -168,6 +170,54 @@ class User < ActiveRecord::Base
     end
   end
   
+  module LimitMethods
+    def can_upload?
+      if is_contributor?
+        true
+      elsif created_at > 1.week.ago
+        false
+      else
+        upload_limit > 0
+      end
+    end
+    
+    def can_comment?
+      if is_privileged?
+        true
+      elsif created_at > 1.week.ago
+        false
+      else
+        Comment.where("creator_id = ? and created_at > ?", id, 1.hour.ago).count <= Danbooru.config.member_comment_limit
+      end      
+    end
+    
+    def can_comment_vote?
+      CommentVote.where("user_id = ? and created_at > ?", id, 1.hour.ago).count < 10
+    end
+    
+    def can_remove_from_pools?
+      created_at <= 1.week.ago
+    end
+    
+    def upload_limit
+      deleted_count = Post.where("is_deleted = true and user_id = ?", id).count
+      unapproved_count = Post.where("is_pending = true and user_id = ?", id).count
+      approved_count = Post.where("is_flagged = false and is_deleted = false and is_pending = false and user_id = ?", id).count
+      
+      limit = base_upload_limit + (approved_count / 10) - (deleted_count / 4) - unapproved_count
+      
+      if limit > 20
+        limit = 20
+      end
+      
+      if limit < 0
+        limit = 0
+      end
+      
+      limit
+    end
+  end
+  
   include NameMethods
   include PasswordMethods
   extend AuthenticationMethods
@@ -176,6 +226,7 @@ class User < ActiveRecord::Base
   include EmailVerificationMethods
   include BlacklistMethods
   include ForumMethods
+  include LimitMethods
   
   def initialize_default_image_size
     self.default_image_size = "Medium"

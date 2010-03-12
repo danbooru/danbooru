@@ -41,6 +41,7 @@ Danbooru::Application.routes.draw do |map|
   resources :tag_implications
   resources :tag_subscriptions
   resources :unapprovals
+  resources :uploads
   resources :users
   resources :user_feedback
   resources :wiki_pages do

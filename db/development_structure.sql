@@ -770,7 +770,6 @@ CREATE TABLE janitor_trials (
     id integer NOT NULL,
     user_id integer NOT NULL,
     promoted_at timestamp without time zone,
-    original_level integer NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -1411,6 +1410,7 @@ CREATE TABLE users (
     is_janitor boolean DEFAULT false NOT NULL,
     is_moderator boolean DEFAULT false NOT NULL,
     is_admin boolean DEFAULT false NOT NULL,
+    base_upload_limit integer DEFAULT 10 NOT NULL,
     last_logged_in_at timestamp without time zone,
     last_forum_read_at timestamp without time zone,
     has_mail boolean DEFAULT false NOT NULL,

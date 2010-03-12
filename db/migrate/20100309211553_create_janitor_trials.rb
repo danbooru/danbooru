@@ -3,7 +3,6 @@ class CreateJanitorTrials < ActiveRecord::Migration
     create_table :janitor_trials do |t|
       t.column :user_id, :integer, :null => false
       t.column :promoted_at, :datetime
-      t.column :original_level, :integer, :null => false
       t.timestamps
     end
     

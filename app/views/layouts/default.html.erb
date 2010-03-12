@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-  <title><%= yield(:page_title) || Danbooru.config.app_name %></title>
+  <title><%= yield(:page_title) %></title>
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
   <link rel="top" title="<%= Danbooru.config.app_name %>" href="/">
   <%= csrf_meta_tag %>
@@ -17,7 +17,7 @@
 </head>
 <body>
   <nav>
-    <h1><%= link_to(Danbooru.config.app_name, "/") %><%= yield :page_header %></h1>
+    <h1><%= link_to(Danbooru.config.app_name, "/") %><%= yield :page_title %></h1>
     <menu>
       <% if @current_user.is_anonymous? %>
         <%= nav_link_to("Login", new_session_path) %>

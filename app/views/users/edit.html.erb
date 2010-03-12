@@ -1,39 +1,45 @@
 <% form_for @user do |f| %>
+  <p>Hover over the labels to see a brief explanation of the setting. Required fields are marked in red.</p>
+  
   <fieldset>
     <legend>Basic</legend>
     
     <p>
       <%= f.label :email %>
-      <%= f.text_field :email %>
+      <% if Danbooru.config.enable_email_verification? %>
+        <%= f.text_field :email %>
+      <% else %>
+        <%= f.text_field :email, :class => "required" %>
+      <% end %>
     </p>
     
     <p>
-      <%= f.label :receive_email_notifications, "Email notifications" %>
+      <%= f.label :receive_email_notifications, "Email notifications", :title => "Enable to receive email notification when you receive a DMail" %>
       <%= f.check_box :receive_email_notifications %>
     </p>
     
     <p>
-      <%= f.label :comment_threshold %>
+      <%= f.label :comment_threshold, nil, :title => "Comments below this score will be hidden by default" %>
       <%= f.text_field :comment_threshold, :size => 2 %>
     </p>
     
     <p>
-      <%= f.label :always_resize_images %>
+      <%= f.label :always_resize_images, nil, :title => "Enable to automatically resize images to fit your browser window" %>
       <%= f.check_box :always_resize_images %>
     </p>
     
     <p>
-      <%= f.label :default_image_size %>
+      <%= f.label :default_image_size, nil, :title => "Medium shows images resized to #{Danbooru.config.medium_image_width} pixels wide, large is #{Danbooru.config.large_image_width} pixels wide, and original is whatever the original image is" %>
       <%= f.select :default_image_size, %w(Medium Large Original) %>
     </p>
     
     <p>
-      <%= f.label :favorite_tags %>
+      <%= f.label :favorite_tags, nil, :title => "A list of whitespace delimited tags that show up in your profile" %>
       <%= f.text_area :favorite_tags, :rows => 5 %>
     </p>
     
     <p>
-      <%= f.label :blacklisted_tags %>
+      <%= f.label :blacklisted_tags, nil, :title => "A list of newline delimited tags that you never want to see" %>
       <%= f.text_area :blacklisted_tags, :rows => 5 %>
     </p>
   </fieldset>
@@ -43,17 +49,17 @@
     <p>For security purposes, changing the following settings requires you to re-enter your password. You can leave the new password field blank to keep your current one.</p>
 
     <p>
-      <%= f.label :name %>
+      <%= f.label :name, nil, :title => "Your login name" %>
       <%= f.text_field :name %>
     </p>
 
     <p>
-      <%= f.label :password, "New password" %>
+      <%= f.label :password, "New password", :title => "What you want your new password to be (leave blank if you don't want to change your password)" %>
       <%= f.text_field :password %>
     </p>
 
     <p>
-      <%= f.label :old_password %>
+      <%= f.label :old_password, nil, :title => "Your old password (you must enter your password if updating your name or password)" %>
       <%= f.text_field :old_password %>
     </p>
   </fieldset>
@@ -62,9 +68,5 @@
 <% end %>
 
 <% content_for(:page_title) do %>
-  /<%= @user.name %>/Settings
-<% end %>
-
-<% content_for(:page_header) do %>
-  / <%= @user.name %> / Settings
+  / Users / <%= @user.name %> / Settings
 <% end %>
