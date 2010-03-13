@@ -14,6 +14,11 @@
     </p>
     
     <p>
+      <%= f.label :time_zone %>
+      <%= f.time_zone_select :time_zone %>
+    </p>
+    
+    <p>
       <%= f.label :receive_email_notifications, "Email notifications", :title => "Enable to receive email notification when you receive a DMail" %>
       <%= f.check_box :receive_email_notifications %>
     </p>

@@ -23,7 +23,7 @@ class Post < ActiveRecord::Base
       FileUtils.rm_f(file_path)
       FileUtils.rm_f(medium_file_path)
       FileUtils.rm_f(large_file_path)
-      FileUtils.rm_f(thumb_file_path)
+      FileUtils.rm_f(preview_file_path)
     end
 
     def file_path_prefix
@@ -42,8 +42,8 @@ class Post < ActiveRecord::Base
       "#{Rails.root}/public/data/large/#{file_path_prefix}#{md5}.jpg"
     end
 
-    def thumb_file_path
-      "#{Rails.root}/public/data/thumb/#{file_path_prefix}#{md5}.jpg"
+    def preview_file_path
+      "#{Rails.root}/public/data/preview/#{file_path_prefix}#{md5}.jpg"
     end
 
     def file_url
@@ -58,8 +58,8 @@ class Post < ActiveRecord::Base
       "/data/large/#{file_path_prefix}#{md5}.jpg"
     end
 
-    def thumb_file_url
-      "/data/thumb/#{file_path_prefix}#{md5}.jpg"
+    def preview_file_url
+      "/data/preview/#{file_path_prefix}#{md5}.jpg"
     end
     
     def file_url_for(user)

@@ -99,11 +99,13 @@ class AnonymousUser
   def blacklisted_tags
     ""
   end
-  
-  %w(banned privileged contributor janitor moderator admin).each do |name, value|
-    normalized_name = name.downcase.gsub(/ /, "_")
 
-    define_method("is_#{normalized_name}?") do
+  def time_zone
+    "Eastern Time (US & Canada)"
+  end
+  
+  %w(member banned privileged contributor janitor moderator admin).each do |name|
+    define_method("is_#{name}?") do
       false
     end
   end

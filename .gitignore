@@ -6,3 +6,4 @@ lib/danbooru_image_resizer/*.log
 db/*.sqlite3
 log/*.log
 tmp/**/*
+public/data

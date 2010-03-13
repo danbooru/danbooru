@@ -2,7 +2,7 @@
   <p>Before uploading, please read the <%= link_to "how to upload guide", wiki_page_path("howto:upload") %>. It explains how to tag and what ratings are.</p>
 </div>
 
-<% form_for @upload do |f| %>
+<% form_for(@upload, :html => {:multipart => true}) do |f| %>
   <% if params[:url] %>
     <div id="image-preview">
       <%= image_tag(params[:url], :title => "Preview") %>

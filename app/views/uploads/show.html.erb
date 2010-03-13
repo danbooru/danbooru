@@ -1,0 +1,15 @@
+<h1>Upload #<%= @upload.id %></h1>
+
+<ul>
+  <li>Date: <%= @upload.created_at %></li>
+  <li>Source: <%= @upload.source %></li>
+  <li>Tags: <%= @upload.tag_string %></li>
+</ul>
+
+<% if @upload.is_completed? %>
+  <p>This upload has finished processing. <%= link_to "View the post", post_path(@upload.post_id) %>.</p>
+<% elsif @upload.is_pending? %>
+  <p>This upload is waiting to be processed. Please wait a few seconds.</p>
+<% else %>
+  <p>An error occurred: <%= @upload.status %></p>
+<% end %>

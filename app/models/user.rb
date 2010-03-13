@@ -135,6 +135,10 @@ class User < ActiveRecord::Base
     def is_anonymous?
       false
     end
+
+    def is_member?
+      true
+    end
   end
   
   module EmailVerificationMethods

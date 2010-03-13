@@ -28,6 +28,7 @@ class CreateUsers < ActiveRecord::Migration
       t.column :default_image_size, :string, :null => false, :default => "medium"
       t.column :favorite_tags, :text
       t.column :blacklisted_tags, :text
+      t.column :time_zone, :string, :null => false, :default => "Eastern Time (US & Canada)"
     end
     
     execute "CREATE UNIQUE INDEX index_users_on_name ON users ((lower(name)))"

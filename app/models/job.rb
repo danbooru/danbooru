@@ -1,5 +1,5 @@
 class Job < ActiveRecord::Base
-  CATEGORIES = %w(mass_tag_edit approve_tag_alias approve_tag_implication calculate_tag_subscriptions calculate_related_tags calculate_post_count calculate_uploaded_tags s3_backup)
+  CATEGORIES = %w(mass_tag_edit approve_tag_alias approve_tag_implication calculate_tag_subscriptions calculate_related_tags s3_backup upload_processing)
   STATUSES = %w(pending processing finished error)
   
   validates_inclusion_of :category, :in => CATEGORIES
@@ -34,6 +34,12 @@ class Job < ActiveRecord::Base
       update_attribute(:status, "pending")
     rescue Exception => x
       update_attributes(:status => "error", :status_message => "#{x.class}: #{x}")
+    end
+  end
+  
+  def execute_upload_processing
+    Upload.where("status = ?", "pending").each do |upload|
+      upload.process!
     end
   end
   
@@ -75,52 +81,32 @@ class Job < ActiveRecord::Base
     end
   end
   
-  def execute_calculate_post_count
-    Tag.recalculate_post_count(data["tag_name"])
-  end
-  
-  def execute_calculate_uploaded_tags
-    tags = []
-    user = User.find(data["id"])
-    CONFIG["tag_types"].values.uniq.each do |tag_type|
-      tags += user.calculate_uploaded_tags(tag_type)
-    end
-    
-    user.update_attribute(:uploaded_tags, tags.join("\n"))
-  end
-  
-  def execute_bandwidth_throttle
-    bw = File.read("/proc/net/dev").split(/\n/).grep(/eth1/).first.scan(/\S+/)[8].to_i
-    if $danbooru_bandwidth_previous
-      diff = bw - $danbooru_bandwidth_previous
-    else
-      diff = 0
-    end
-    $danbooru_bandwidth_previous = bw
-    Cache.put("db-bw", diff)
-  end
-  
   def execute_s3_backup
     last_id = data["last_id"].to_i
     
     begin
-      Post.find(:all, :conditions => ["id > ?", last_id], :limit => 200, :order => "id").each do |post|
-        AWS::S3::Base.establish_connection!(:access_key_id => CONFIG["amazon_s3_access_key_id"], :secret_access_key => CONFIG["amazon_s3_secret_access_key"])
+      Post.where("id > ?", last_id).each do |post|
+        AWS::S3::Base.establish_connection!(
+          :access_key_id => Danbooru.config.amazon_s3_access_key_id, 
+          :secret_access_key => Danbooru.config.amazon_s3_secret_access_key
+        )
         if File.exists?(post.file_path)
-          base64_md5 = Base64.encode64(Digest::MD5.digest(File.read(post.file_path)))
-          AWS::S3::S3Object.store(post.file_name, open(post.file_path, "rb"), CONFIG["amazon_s3_bucket_name"], "Content-MD5" => base64_md5)
+          AWS::S3::S3Object.store(
+            post.file_name, 
+            open(post.file_path, "rb"), 
+            Danbooru.config.amazon_s3_bucket_name, 
+            "Content-MD5" => Base64.encode64(post.md5)
+          )
         end
-
         if post.image? && File.exists?(post.preview_path)
-          AWS::S3::S3Object.store("preview/#{post.md5}.jpg", open(post.preview_path, "rb"), CONFIG["amazon_s3_bucket_name"])
+          AWS::S3::S3Object.store(
+            "preview/#{post.md5}.jpg", 
+            open(post.preview_path, "rb"), 
+            Danbooru.config.amazon_s3_bucket_name
+          )
         end
 
-        if File.exists?(post.sample_path)
-          AWS::S3::S3Object.store("sample/" + CONFIG["sample_filename_prefix"] + "#{post.md5}.jpg", open(post.sample_path, "rb"), CONFIG["amazon_s3_bucket_name"])
-        end
-      
         update_attributes(:data => {:last_id => post.id})
-        base64_md5 = nil
       end
 
     rescue Exception => x
@@ -156,19 +142,13 @@ class Job < ActiveRecord::Base
         else
           "tag:UNKNOWN"
         end
-    
-      when "calculate_post_count"
-        "tag:" + data["tag_name"]
-        
-      when "calculate_uploaded_tags"
-        "user:" + User.name(data["id"])
-        
+      
       when "bandwidth_throttle"
         ""
-        
+      
       when "s3_backup"
         "last_id:" + data["last_id"].to_s
-        
+      
       end
     rescue Exception
       "ERROR"
@@ -176,11 +156,11 @@ class Job < ActiveRecord::Base
   end
   
   def self.pending_count(task_type)
-    JobTask.count(:conditions => ["task_type = ? and status = 'pending'", task_type])
+    where("task_type = ? and status = 'pending'", task_type).count
   end
   
   def self.execute_once
-    find(:all, :conditions => ["status = ?", "pending"], :order => "id desc").each do |task|
+    where("status = ?", "pending").each do |task|
       task.execute!
       sleep 1
     end

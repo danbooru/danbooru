@@ -2,62 +2,106 @@ require "danbooru_image_resizer/danbooru_image_resizer"
 require "tmpdir"
 
 class Upload < ActiveRecord::Base
+  class Error < Exception ; end
+  
   attr_accessor :file, :image_width, :image_height, :file_ext, :md5, :file_size
   belongs_to :uploader, :class_name => "User"
   belongs_to :post
-  before_save :convert_cgi_file
+  before_create :initialize_status
+  before_create :convert_cgi_file
+  validate :uploader_is_not_limited
   
-  def process!
-    update_attribute(:status, "processing")
-    if is_downloadable?
-      download_from_source(temp_file_path)
+  module ValidationMethods
+    def uploader_is_not_limited
+      if !uploader.can_upload?
+        update_attribute(:status, "error: uploader has reached their daily limit")
+        raise
+      end
     end
-    self.file_ext = content_type_to_file_ext(content_type)
-    calculate_hash(file_path)
-    calculate_file_size(file_path)
-    calculate_dimensions(file_path) if has_dimensions?
-    generate_resizes(file_path)
-    move_file
-    post = convert_to_post
-    if post.save
-      update_attributes(:status => "finished", :post_id => post.id)
-    else
-      update_attribute(:status, "error: " + post.errors.full_messages.join(", "))
+    
+    def validate_file_exists
+      unless File.exists?(file_path)
+        update_attribute(:status, "error: file does not exist")
+        raise
+      end
+    end
+    
+    def validate_file_content_type
+      unless is_valid_content_type?
+        update_attribute(:status, "error: invalid content type (#{file_ext} not allowed)")
+        raise
+      end
+    end
+    
+    def validate_md5_confirmation
+      if !md5_confirmation.blank? && md5_confirmation != md5
+        update_attribute(:status, "error: md5 mismatch")
+        raise
+      end
+    end
+  end
+  
+  module ConversionMethods
+    def process!
+      update_attribute(:status, "processing")
+      if is_downloadable?
+        download_from_source(temp_file_path)
+      end
+      validate_file_exists
+      self.file_ext = content_type_to_file_ext(content_type)
+      validate_file_content_type
+      calculate_hash(file_path)
+      validate_md5_confirmation
+      calculate_file_size(file_path)
+      calculate_dimensions(file_path) if has_dimensions?
+      generate_resizes(file_path)
+      move_file
+      post = convert_to_post
+      if post.save
+        update_attributes(:status => "completed", :post_id => post.id)
+      else
+        update_attribute(:status, "error: " + post.errors.full_messages.join(", "))
+      end
+    rescue RuntimeError => x
+    end
+
+    def convert_to_post
+      returning Post.new do |p|
+        p.tag_string = tag_string
+        p.md5 = md5
+        p.file_ext = file_ext
+        p.image_width = image_width
+        p.image_height = image_height
+        p.uploader_id = uploader_id
+        p.uploader_ip_addr = uploader_ip_addr
+        p.updater_id = uploader_id
+        p.updater_ip_addr = uploader_ip_addr
+        p.rating = rating
+        p.source = source
+        p.file_size = file_size
+
+        unless uploader.is_contributor?
+          p.is_pending = true
+        end
+      end
+    end
+  end
+  
+  module FileMethods
+    def move_file
+      FileUtils.mv(file_path, md5_file_path)
+    end
+
+    def calculate_file_size(source_path)
+      self.file_size = File.size(source_path)
+    end
+
+    # Calculates the MD5 based on whatever is in temp_file_path
+    def calculate_hash(source_path)
+      self.md5 = Digest::MD5.file(source_path).hexdigest
     end
   end
 
-  def convert_to_post
-    returning Post.new do |p|
-      p.tag_string = tag_string
-      p.md5 = md5
-      p.file_ext = file_ext
-      p.image_width = image_width
-      p.image_height = image_height
-      p.uploader_id = uploader_id
-      p.uploader_ip_addr = uploader_ip_addr
-      p.updater_id = uploader_id
-      p.updater_ip_addr = uploader_ip_addr
-      p.rating = rating
-      p.source = source
-      p.file_size = file_size      
-    end
-  end
-  
-  def move_file
-    FileUtils.mv(file_path, md5_file_path)
-  end
-  
-  def calculate_file_size(source_path)
-    self.file_size = File.size(source_path)
-  end
-  
-  # Calculates the MD5 based on whatever is in temp_file_path
-  def calculate_hash(source_path)
-    self.md5 = Digest::MD5.file(source_path).hexdigest
-  end
-
-  class Error < Exception ; end
-  
   module ResizerMethods
     def generate_resizes(source_path)
       generate_resize_for(Danbooru.config.small_image_width, Danbooru.config.small_image_width, source_path)
@@ -101,6 +145,10 @@ class Upload < ActiveRecord::Base
   end
   
   module ContentTypeMethods
+    def is_valid_content_type?
+      file_ext =~ /jpg|gif|png|swf/
+    end
+    
     def content_type_to_file_ext(content_type)
       case content_type
       when "image/jpeg"
@@ -152,7 +200,7 @@ class Upload < ActiveRecord::Base
 
       case width
       when Danbooru.config.small_image_width
-        "#{Rails.root}/public/data/thumb/#{prefix}#{md5}.jpg"
+        "#{Rails.root}/public/data/preview/#{prefix}#{md5}.jpg"
 
       when Danbooru.config.medium_image_width
         "#{Rails.root}/public/data/medium/#{prefix}#{md5}.jpg"
@@ -202,10 +250,28 @@ class Upload < ActiveRecord::Base
     end
   end
   
+  module StatusMethods
+    def initialize_status
+      self.status = "pending"
+    end
+    
+    def is_pending?
+      status == "pending"
+    end
+    
+    def is_completed?
+      status == "completed"
+    end
+  end
+  
+  include ConversionMethods
+  include ValidationMethods
+  include FileMethods
   include ResizerMethods
   include DimensionMethods
   include ContentTypeMethods
   include DownloaderMethods
   include FilePathMethods
   include CgiFileMethods
+  include StatusMethods
 end

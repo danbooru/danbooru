@@ -10,10 +10,10 @@ protected
 
     respond_to do |fmt|
       fmt.html do 
-        if request.get? && Rails.environment != "test"
-          redirect_to new_sessions_path(:url => previous_url), :notice => "Access denied"
+        if request.get? && Rails.env.test?
+          redirect_to new_session_path(:url => previous_url), :notice => "Access denied"
         else
-          redirect_to new_sessions_path, :notice => "Access denied"
+          redirect_to new_session_path, :notice => "Access denied"
         end
       end
       fmt.xml do
@@ -38,9 +38,11 @@ protected
     else
       @current_user = AnonymousUser.new
     end
+    
+    Time.zone = @current_user.time_zone
   end
   
-  %w(banned privileged contributor janitor moderator admin).each do |level|
+  %w(member banned privileged contributor janitor moderator admin).each do |level|
     define_method("#{level}_only") do
       if @current_user.__send__("is_#{level}?")
         true

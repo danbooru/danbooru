@@ -1324,8 +1324,6 @@ ALTER SEQUENCE unapprovals_id_seq OWNED BY unapprovals.id;
 
 CREATE TABLE uploads (
     id integer NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
     source character varying(255),
     file_path character varying(255),
     content_type character varying(255),
@@ -1334,7 +1332,10 @@ CREATE TABLE uploads (
     uploader_ip_addr inet NOT NULL,
     tag_string text NOT NULL,
     status character varying(255) DEFAULT 'pending'::character varying NOT NULL,
-    post_id integer
+    post_id integer,
+    md5_confirmation character varying(255),
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -1419,7 +1420,8 @@ CREATE TABLE users (
     always_resize_images boolean DEFAULT false NOT NULL,
     default_image_size character varying(255) DEFAULT 'medium'::character varying NOT NULL,
     favorite_tags text,
-    blacklisted_tags text
+    blacklisted_tags text,
+    time_zone character varying(255) DEFAULT 'Eastern Time (US & Canada)'::character varying NOT NULL
 );
 
 
