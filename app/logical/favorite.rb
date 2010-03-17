@@ -12,7 +12,9 @@ class Favorite
   end
   
   def self.destroy_all_for_post(post)
-    ActiveRecord::Base.connection.execute("DELETE FROM #{table_name_for(user)} WHERE post_id = #{post.id}")
+    0.upto(9) do |i|
+      ActiveRecord::Base.connection.execute("DELETE FROM favorites_#{i} WHERE post_id = #{post.id}")
+    end
   end
   
   def self.destroy_all_for_user(user)

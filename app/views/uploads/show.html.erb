@@ -13,3 +13,7 @@
 <% else %>
   <p>An error occurred: <%= @upload.status %></p>
 <% end %>
+
+<p>You can <%= link_to "upload another file", new_upload_path %> or <%= link_to "view your current uploads", uploads_path %>.</p>
+
+<%= render :partial => "posts/common_secondary_nav_links" %>

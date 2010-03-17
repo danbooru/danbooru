@@ -186,5 +186,10 @@ module Danbooru
         </script>
       }.html_safe
     end
+    
+    # The number of posts displayed per page.
+    def posts_per_page
+      20
+    end
   end
 end

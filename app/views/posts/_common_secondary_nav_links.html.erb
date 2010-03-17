@@ -1,6 +1,6 @@
 <% content_for(:secondary_nav_links) do %>
   <menu>
-    <li>Listing</li>
+    <li><%= link_to "Listing", posts_path %></li>
     <li><%= link_to "Upload", new_upload_path %></li>
     <li>Popular</li>
     <li>Favorites</li>

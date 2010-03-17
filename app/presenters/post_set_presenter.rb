@@ -1,3 +1,5 @@
+require 'pp'
+
 class PostSetPresenter < Presenter
   attr_accessor :post_set
   
@@ -17,7 +19,80 @@ class PostSetPresenter < Presenter
     ""
   end
   
-  def pagination_html
+  def pagination_html(template)
+    if @post_set.use_sequential_paginator?
+      sequential_pagination_html(template)
+    else
+      numbered_pagination_html(template)
+    end
+  end
+  
+  def sequential_pagination_html(template)
+    html = "<menu>"
+    prev_url = template.request.env["HTTP_REFERER"]
+    next_url = template.posts_path(:tags => template.params[:tags], before_id => @post_set.posts[-1].id, :page => nil)
+    html << %{<li><a href="#{prev_url}">&laquo; Previous</a></li>}
+    if @post_set.posts.any?
+      html << %{<li><a href="#{next_url}">Next &raquo;</a></li>}
+    end
+    html << "</menu>"
+    html.html_safe
+  end
+  
+  def numbered_pagination_html(template)
+    total_pages = (@post_set.count.to_f / @post_set.limit.to_f).ceil
+    current_page = [1, @post_set.page].max
+    before_current_page = current_page - 1
+    after_current_page = current_page + 1
+    html = "<menu>"
+
+    current_page_min = [1, current_page - 2].max
+    current_page_max = [total_pages, current_page + 2].min
+    
+    if current_page == 1
+      # do nothing
+    elsif current_page_min == 1
+      1.upto(before_current_page) do |i|
+        html << numbered_pagination_item(template, i)
+      end
+    else
+      1.upto(3) do |i|
+        html << numbered_pagination_item(template, i)
+      end
+      
+      html << "<li>...</li>"
+      
+      current_page_min.upto(before_current_page) do |i|
+        html << numbered_pagination_item(template, i)
+      end
+    end
+    
+    html << %{<li class="current-page">#{current_page}</li>}
+    
+    if current_page == total_pages
+      # do nothing
+    elsif current_page_max == total_pages
+      after_current_page.upto(total_pages) do|i|
+        html << numbered_pagination_item(template, i)
+      end
+    else
+      after_current_page.upto(after_current_page + 2) do |i|
+        html << numbered_pagination_item(template, i)
+      end
+      
+      html << "<li>...</li>"
+      html << numbered_pagination_item(template, total_pages)
+    end
+    
+    html << "</menu>"
+    html.html_safe
+  end
+  
+  def numbered_pagination_item(template, page)
+    html = "<li>"
+    html << template.link_to(page, template.__send__(:posts_path, :tags => template.params[:tags], :page => page))
+    html << "</li>"
+    html.html_safe
   end
   
   def post_previews_html

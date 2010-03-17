@@ -71,14 +71,10 @@
 </section>
 
 <footer>
-  <%= @post_set.presenter.pagination_html %>
+  <%= @post_set.presenter.pagination_html(self) %>
 </footer>
 
 <% content_for(:page_title) do %>
-  /<%= @post_set.tags %>
-<% end %>
-
-<% content_for(:page_header) do %>
   / <%= @post_set.tags %>
 <% end %>
 

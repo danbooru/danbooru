@@ -2,6 +2,7 @@ class Post < ActiveRecord::Base
   attr_accessor :updater_id, :updater_ip_addr, :old_tag_string
   after_destroy :delete_files
   after_destroy :delete_favorites
+  after_destroy :update_tag_post_counts
   after_save :create_version  
   before_save :merge_old_tags
   before_save :normalize_tags
@@ -9,6 +10,7 @@ class Post < ActiveRecord::Base
   before_save :update_tag_post_counts
   before_save :set_tag_counts
   belongs_to :updater, :class_name => "User"
+  belongs_to :approver, :class_name => "User"
   has_one :unapproval, :dependent => :destroy
   has_one :upload, :dependent => :destroy
   has_one :moderation_detail, :class_name => "PostModerationDetail", :dependent => :destroy
@@ -16,6 +18,7 @@ class Post < ActiveRecord::Base
   has_many :votes, :class_name => "PostVote", :dependent => :destroy
   has_many :notes, :dependent => :destroy
   validates_presence_of :updater_id, :updater_ip_addr
+  validates_uniqueness_of :md5
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :updater_id, :updater_ip_addr, :last_noted_at
   
   module FileMethods
@@ -73,6 +76,10 @@ class Post < ActiveRecord::Base
       else
         file_url
       end
+    end
+    
+    def is_image?
+      file_ext =~ /jpg|gif|png/
     end
   end
   
@@ -168,6 +175,12 @@ class Post < ActiveRecord::Base
       increment_tags = tag_array - tag_array_was
       execute_sql("UPDATE tags SET post_count = post_count - 1 WHERE name IN (?)", decrement_tags) if decrement_tags.any?
       execute_sql("UPDATE tags SET post_count = post_count + 1 WHERE name IN (?)", increment_tags) if increment_tags.any?
+      decrement_tags.each do |tag|
+        expire_cache(tag)
+      end
+      increment_tags.each do |tag|
+        expire_cache(tag)
+      end
     end
     
     def set_tag_counts
@@ -501,15 +514,32 @@ class Post < ActiveRecord::Base
   
   module CountMethods
     def fast_count(tags)
-      Cache.get("pfc:#{Cache.sanitize(tags)}", 24.hours) do
-        Post.find_by_tags(tags).count
-      end
+      count = Cache.get("pfc:#{Cache.sanitize(tags)}")
+      return count unless count.nil?
+      count = Post.find_by_tags(tags).count
+      expiry = (count < 100) ? 0 : (count * 4).minutes
+      Cache.put("pfc:#{Cache.sanitize(tags)}", count, expiry)
+      count
     end
     
     def fast_delete_count(tags)
-      Cache.get("pfdc:#{Cache.sanitize(tags)}", 24.hours) do
-        Post.find_by_tags("#{tags} status:deleted").count
+      count = Cache.get("pfdc:#{Cache.sanitize(tags)}")
+      return count unless count.nil?
+      count = Post.find_by_tags("#{tags} status:deleted").count
+      expiry = (count < 100) ? 0 : (count * 4).minutes
+      Cache.put("pfc:#{Cache.sanitize(tags)}", count, expiry)
+      count
+    end
+  end
+  
+  module CacheMethods
+    def expire_cache(tag_name)
+      if Post.fast_count("") < 1000
+        Cache.delete("pfc:")
+        Cache.delete("pfdc:")
       end
+      Cache.delete("pfc:#{Cache.sanitize(tag_name)}")
+      Cache.delete("pfdc:#{Cache.sanitize(tag_name)}")
     end
   end
 
@@ -525,9 +555,14 @@ class Post < ActiveRecord::Base
   extend SearchMethods
   include VoteMethods
   extend CountMethods
+  include CacheMethods
   
   def reload(options = nil)
     super
     reset_tag_array_cache
+  end
+  
+  def presenter
+    @presenter ||= PostPresenter.new(self)
   end
 end

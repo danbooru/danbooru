@@ -1,7 +1,7 @@
 class PostSet
   class Error < Exception ; end
   
-  attr_accessor :tags, :page, :current_user, :before_id, :errors
+  attr_accessor :tags, :page, :current_user, :before_id, :errors, :count
   attr_accessor :wiki_page, :artist, :posts, :suggestions
   
   def initialize(tags, page, current_user, before_id = nil)
@@ -11,8 +11,16 @@ class PostSet
     @before_id = before_id
     @errors = []
     load_associations
-    load_paginator
+    load_posts
     validate
+  end
+  
+  def use_sequential_paginator?
+    !use_numbered_paginator?
+  end
+  
+  def use_numbered_paginator?
+    before_id.nil?
   end
   
   def has_errors?
@@ -20,7 +28,7 @@ class PostSet
   end
   
   def offset
-    x = (page - 1) * 20
+    x = (page - 1) * limit
     if x < 0
       x = 0
     end
@@ -28,7 +36,7 @@ class PostSet
   end
   
   def limit
-    20
+    Danbooru.config.posts_per_page
   end
   
   def is_single_tag?
@@ -42,28 +50,13 @@ class PostSet
     end
   end
   
-  def load_paginator
-    if before_id
-      load_sequential_paginator
-    else
-      load_paginated_paginator
-    end
-  end
-  
-  def load_paginated_paginator
+  def load_posts
+    @count = Post.fast_count(tags)
     @posts = Post.find_by_tags(tags, :before_id => before_id).all(:order => "posts.id desc", :limit => limit, :offset => offset)
   end
   
-  def load_sequential_paginator
-    count = Post.fast_count(tags)
-    @posts = WillPaginate::Collection.create(page, limit, count) do |pager|
-      pager.replace(Post.find_by_sql(tags).all(:order => "posts.id desc", :limit => pager.per_page, :offset => pager.offset))
-    end
-    load_suggestions(count)
-  end
-  
   def load_suggestions(count)
-    @suggestions = Tag.find_suggestions(tags) if count < 20 && is_single_tag?
+    @suggestions = Tag.find_suggestions(tags) if count < limit && is_single_tag?
   end
   
   def tag_array

@@ -9,6 +9,11 @@ class UploadsController < ApplicationController
     end
   end
   
+  def index
+    @uploads = Upload.where("uploader_id = ?", @current_user.id).includes(:uploader).order("uploads.id desc").limit(10)
+    respond_with(@uploads)
+  end
+  
   def show
     @upload = Upload.find(params[:id])
   end

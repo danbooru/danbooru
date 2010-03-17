@@ -1,19 +1,4 @@
 module Cache
-  def expire(options = {})
-    tags = options[:tags]
-    cache_version = Cache.get("$cache_version").to_i
-
-    Cache.put("$cache_version", cache_version + 1)
-
-    if tags
-      tags.scan(/\S+/).each do |x|
-        key = "tag:#{x}"
-        key_version = Cache.get(key).to_i
-        Cache.put(key, key_version + 1)
-      end
-    end
-  end
-    
   def incr(key, expiry = 0)
     val = Cache.get(key, expiry)
     Cache.put(key, val.to_i + 1)
@@ -98,7 +83,6 @@ module Cache
   
   module_function :get
   module_function :get_multi
-  module_function :expire
   module_function :incr
   module_function :put
   module_function :delete

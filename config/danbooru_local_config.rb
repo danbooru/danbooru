@@ -4,5 +4,9 @@ module Danbooru
     def app_name
       "f"
     end
+
+    def posts_per_page
+      1
+    end
   end
 end

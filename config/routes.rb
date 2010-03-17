@@ -20,6 +20,7 @@ Danbooru::Application.routes.draw do |map|
   resources :janitor_trials
   resources :jobs
   resources :notes
+  resources :note_versions
   resources :pools do
     member do
       put :revert

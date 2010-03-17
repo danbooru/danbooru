@@ -18,6 +18,12 @@ class Upload < ActiveRecord::Base
         raise
       end
     end
+
+    # Because uploads are processed serially, there's no race condition here.
+    def validate_md5_uniqueness
+      md5_post = Post.find_by_md5(md5)
+      merge_tags(md5_post) if md5_post
+    end
     
     def validate_file_exists
       unless File.exists?(file_path)
@@ -51,6 +57,7 @@ class Upload < ActiveRecord::Base
       self.file_ext = content_type_to_file_ext(content_type)
       validate_file_content_type
       calculate_hash(file_path)
+      validate_md5_uniqueness
       validate_md5_confirmation
       calculate_file_size(file_path)
       calculate_dimensions(file_path) if has_dimensions?
@@ -84,6 +91,15 @@ class Upload < ActiveRecord::Base
           p.is_pending = true
         end
       end
+    end
+    
+    def merge_tags(post)
+      post.tag_string += " #{tag_string}"
+      post.updater_id = uploader_id
+      post.updater_ip_addr = uploader_ip_addr
+      post.save
+      update_attribute(:status, "duplicate: #{post.id}")
+      raise
     end
   end
   
@@ -274,4 +290,8 @@ class Upload < ActiveRecord::Base
   include FilePathMethods
   include CgiFileMethods
   include StatusMethods
+  
+  def presenter
+    @presenter ||= UploadPresenter.new(self)
+  end
 end

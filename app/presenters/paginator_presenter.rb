@@ -1,2 +1,2 @@
-class PaginatorPresenter
+class PaginatorPresenter < Presenter
 end

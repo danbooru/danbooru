@@ -13,63 +13,43 @@
   <%= javascript_include_tag "http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" %>
   <%= javascript_include_tag "rails" %>
   <%= Danbooru.config.custom_html_header_content %>
-  <%= yield :html_header_content %>
+  <%= yield :html_header %>
 </head>
 <body>
-  <nav>
-    <h1><%= link_to(Danbooru.config.app_name, "/") %><%= yield :page_title %></h1>
-    <menu>
-      <% if @current_user.is_anonymous? %>
-        <%= nav_link_to("Login", new_session_path) %>
-      <% else %>
-        <%= nav_link_to("My Account", user_path(@current_user)) %>
-      <% end %>
-      <%= nav_link_to("Posts", posts_path) %>
-      <%= nav_link_to("Comments", comments_path) %>
-      <%= nav_link_to("Notes", notes_path) %>
-      <%= nav_link_to("Artists", artists_path(:order => "date")) %>
-      <%= nav_link_to("Tags", tags_path(:order => "date")) %>
-      <%= nav_link_to("Pools", pools_path) %>
-      <%= nav_link_to("Wiki", wiki_page_path(:id => "help:home")) %>
-      <%= nav_link_to("Forum", forum_topics_path, :class => (@current_user.has_forum_been_updated? ? "forum-updated" : nil)) %>
-      <%= nav_link_to("&raquo;".html_safe, site_map_path) %>
-    </menu>
-    <%= yield :secondary_nav_links %>
-  </nav>
-
+  <header>
+    <nav>
+      <menu>
+        <% if @current_user.is_anonymous? %>
+          <%= nav_link_to("Login", new_session_path) %>
+        <% else %>
+          <%= nav_link_to("My Account", user_path(@current_user)) %>
+        <% end %>
+        <%= nav_link_to("Posts", posts_path) %>
+        <%= nav_link_to("Comments", comments_path) %>
+        <%= nav_link_to("Notes", notes_path) %>
+        <%= nav_link_to("Artists", artists_path(:order => "date")) %>
+        <%= nav_link_to("Tags", tags_path(:order => "date")) %>
+        <%= nav_link_to("Pools", pools_path) %>
+        <%= nav_link_to("Wiki", wiki_page_path(:id => "help:home")) %>
+        <%= nav_link_to("Forum", forum_topics_path, :class => (@current_user.has_forum_been_updated? ? "forum-updated" : nil)) %>
+        <%= nav_link_to("&raquo;".html_safe, site_map_path) %>
+      </menu>
+      <%= yield :secondary_nav_links %>
+    </nav>    
+  </header>
+  
   <% if flash[:notice] %>
     <div id="notice"><%= flash[:notice] %></div>
   <% else %>
     <div id="notice" style="display: none;"></div>
   <% end %>
-  
-  <% if @current_user.has_mail? %>
-    <div class="has-mail" id="has-mail-notice">
-      <%= link_to "You have mail", dmails_path %>
-    </div>
-  <% end %>
-
-  <% if !@current_user.is_privileged? %>
-    <div id="upgrade-account" style="display: none;">
-      <%= link_to "Upgrade your account for only $20", wiki_page_path(:id => "help:users") %>
-      <%= link_to "No thanks", "#", :id => "hide-upgrade-account-link" %>
-    </div>
-  <% end %>
-  
-  <% if @current_user.is_banned? %>
-    <div id="ban-reason">
-      You have been banned. 
-      <% if @current_user.ban %>
-        Reason: <%= @current_user.ban.reason %>. 
-        Expires: <%= @current_user.ban.expires_at.strftime('%Y-%m-%d') %>
-      <% end %>
-    </div>
-  <% end %>
 
   <div id="content">
     <%= yield :layout %>
   </div>
-
-  <%= yield :page_footer_content %>
+  
+  <footer>
+    <%= yield :page_footer_content %>    
+  </footer>
 </body>
 </html>
