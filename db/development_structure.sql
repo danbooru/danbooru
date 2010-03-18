@@ -257,7 +257,6 @@ ALTER SEQUENCE artists_id_seq OWNED BY artists.id;
 CREATE TABLE bans (
     id integer NOT NULL,
     user_id integer,
-    ip_addr inet,
     reason text NOT NULL,
     banner_id integer NOT NULL,
     expires_at timestamp without time zone NOT NULL,
@@ -760,6 +759,39 @@ CREATE SEQUENCE forum_topics_id_seq
 --
 
 ALTER SEQUENCE forum_topics_id_seq OWNED BY forum_topics.id;
+
+
+--
+-- Name: ip_bans; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE ip_bans (
+    id integer NOT NULL,
+    creator_id integer NOT NULL,
+    ip_addr inet NOT NULL,
+    reason text NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: ip_bans_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE ip_bans_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: ip_bans_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE ip_bans_id_seq OWNED BY ip_bans.id;
 
 
 --
@@ -1666,6 +1698,13 @@ ALTER TABLE forum_topics ALTER COLUMN id SET DEFAULT nextval('forum_topics_id_se
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ip_bans ALTER COLUMN id SET DEFAULT nextval('ip_bans_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE janitor_trials ALTER COLUMN id SET DEFAULT nextval('janitor_trials_id_seq'::regclass);
 
 
@@ -1971,6 +2010,14 @@ ALTER TABLE ONLY forum_topics
 
 
 --
+-- Name: ip_bans_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY ip_bans
+    ADD CONSTRAINT ip_bans_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: janitor_trials_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2215,13 +2262,6 @@ CREATE INDEX index_bans_on_expires_at ON bans USING btree (expires_at);
 
 
 --
--- Name: index_bans_on_ip_addr; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_bans_on_ip_addr ON bans USING btree (ip_addr);
-
-
---
 -- Name: index_bans_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2443,6 +2483,13 @@ CREATE INDEX index_forum_topics_on_creator_id ON forum_topics USING btree (creat
 --
 
 CREATE INDEX index_forum_topics_on_text_index ON forum_topics USING gin (text_index);
+
+
+--
+-- Name: index_ip_bans_on_ip_addr; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_ip_bans_on_ip_addr ON ip_bans USING btree (ip_addr);
 
 
 --
@@ -2863,3 +2910,5 @@ INSERT INTO schema_migrations (version) VALUES ('20100224172146');
 INSERT INTO schema_migrations (version) VALUES ('20100307073438');
 
 INSERT INTO schema_migrations (version) VALUES ('20100309211553');
+
+INSERT INTO schema_migrations (version) VALUES ('20100318213503');

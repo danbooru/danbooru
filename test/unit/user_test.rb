@@ -6,6 +6,14 @@ class UserTest < ActiveSupport::TestCase
       MEMCACHE.flush_all
     end
     
+    should "not validate if the originating ip address is banned" do
+      Factory.create(:ip_ban)
+      user = Factory.build(:user)
+      user.save
+      assert(user.errors.any?)
+      assert_equal("IP address is banned", user.errors.full_messages.join)
+    end
+    
     should "limit post uploads" do
       user = Factory.create(:user)
       assert(!user.can_upload?)

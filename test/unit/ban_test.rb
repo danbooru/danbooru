@@ -153,18 +153,6 @@ class BanTest < ActiveSupport::TestCase
         ban = Factory.create(:ban, :user => user, :banner => admin, :duration => 1)
         assert(Ban.is_user_banned?(user))
       end
-    end
-    
-    context "by ip address" do
-      should "not return expired bans" do
-        admin = Factory.create(:admin_user)
-        
-        ban = Factory.create(:ban, :ip_addr => "1.2.3.4", :banner => admin, :duration => -1)
-        assert(!Ban.is_ip_banned?("1.2.3.4"))
-
-        ban = Factory.create(:ban, :ip_addr => "5.6.7.8", :banner => admin, :duration => 1)
-        assert(Ban.is_ip_banned?("5.6.7.8"))
-      end
-    end
+    end    
   end
 end

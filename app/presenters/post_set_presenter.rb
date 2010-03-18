@@ -72,7 +72,7 @@ class PostSetPresenter < Presenter
     if current_page == total_pages
       # do nothing
     elsif current_page_max == total_pages
-      after_current_page.upto(total_pages) do|i|
+      after_current_page.upto(total_pages) do |i|
         html << numbered_pagination_item(template, i)
       end
     else
@@ -80,8 +80,13 @@ class PostSetPresenter < Presenter
         html << numbered_pagination_item(template, i)
       end
       
-      html << "<li>...</li>"
-      html << numbered_pagination_item(template, total_pages)
+      if total_pages > 5
+        html << "<li>...</li>"
+      
+        (after_current_page + 3).upto(total_pages) do |i|
+          html << numbered_pagination_item(template, i)
+        end
+      end
     end
     
     html << "</menu>"

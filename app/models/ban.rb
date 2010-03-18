@@ -5,12 +5,8 @@ class Ban < ActiveRecord::Base
   attr_accessible :reason, :duration, :user_id
   validate :user_is_inferior
   
-  def self.is_user_banned?(user)
+  def self.is_banned?(user)
     exists?(["user_id = ? AND expires_at > ?", user.id, Time.now])
-  end
-  
-  def self.is_ip_banned?(ip_addr)
-    exists?(["ip_addr = ? AND expires_at > ?", ip_addr, Time.now])
   end
   
   def user_is_inferior

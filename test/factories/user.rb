@@ -5,6 +5,7 @@ Factory.define(:user) do |f|
   f.email {Faker::Internet.email}
   f.default_image_size "medium"
   f.base_upload_limit 10
+  f.ip_addr "127.0.0.1"
 end
 
 Factory.define(:banned_user, :parent => :user) do |f|
