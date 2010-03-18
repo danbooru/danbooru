@@ -9,7 +9,7 @@ class Comment < ActiveRecord::Base
   attr_accessor :do_not_bump_post
   
   scope :recent, :order => "comments.id desc", :limit => 6
-  scope :search_body, lambda {|query| where("body_index @@ plainto_tsquery(?)", query)}
+  scope :search_body, lambda {|query| where("body_index @@ plainto_tsquery(?)", query).order("comments.id DESC")}
   scope :hidden, lambda {|user| where("score < ?", user.comment_threshold)}
 
   def update_last_commented_at

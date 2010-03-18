@@ -2,7 +2,7 @@ require 'fileutils'
 
 Factory.define(:upload) do |f|
   f.rating "s"
-  f.uploader {|x| x.association(:user)}
+  f.uploader {|x| x.association(:user, :is_contributor => true)}
   f.uploader_ip_addr "127.0.0.1"
   f.tag_string "special"
   f.status "pending"

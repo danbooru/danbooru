@@ -147,11 +147,11 @@ class BanTest < ActiveSupport::TestCase
 
         user = Factory.create(:user)
         ban = Factory.create(:ban, :user => user, :banner => admin, :duration => -1)
-        assert(!Ban.is_user_banned?(user))
+        assert(!Ban.is_banned?(user))
 
         user = Factory.create(:user)
         ban = Factory.create(:ban, :user => user, :banner => admin, :duration => 1)
-        assert(Ban.is_user_banned?(user))
+        assert(Ban.is_banned?(user))
       end
     end    
   end

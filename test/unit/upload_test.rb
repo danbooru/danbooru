@@ -125,7 +125,7 @@ class UploadTest < ActiveSupport::TestCase
       assert_equal(110, post.image_height)
       assert_equal(8558, post.file_size)
       assert_equal(post.id, @upload.post_id)
-      assert_equal("finished", @upload.status)
+      assert_equal("completed", @upload.status)
     end
   end
   
@@ -151,6 +151,6 @@ class UploadTest < ActiveSupport::TestCase
     assert(File.exists?(post.file_path))
     assert_equal(28086, File.size(post.file_path))
     assert_equal(post.id, @upload.post_id)
-    assert_equal("finished", @upload.status)    
+    assert_equal("completed", @upload.status)    
   end
 end
