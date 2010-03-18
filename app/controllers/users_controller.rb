@@ -20,7 +20,7 @@ class UsersController < ApplicationController
   end
   
   def create
-    @user = User.new(params[:user])
+    @user = User.new(params[:user].merge(:ip_addr => request.remote_ip))
     flash[:notice] = "You have succesfully created a new account." if @user.save
     respond_with(@user)
   end

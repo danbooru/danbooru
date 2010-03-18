@@ -1,9 +1,9 @@
-require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
-
-require 'shoulda'
+ENV["RAILS_ENV"] = "test"
 require 'factory_girl'
+require 'shoulda'
 require 'mocha'
 require 'faker'
+require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'rails/test_help'
 
 Dir[File.expand_path(File.dirname(__FILE__) + "/factories/*.rb")].each {|file| require file}

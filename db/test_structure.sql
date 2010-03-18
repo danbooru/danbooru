@@ -257,7 +257,6 @@ ALTER SEQUENCE artists_id_seq OWNED BY artists.id;
 CREATE TABLE bans (
     id integer NOT NULL,
     user_id integer,
-    ip_addr inet,
     reason text NOT NULL,
     banner_id integer NOT NULL,
     expires_at timestamp without time zone NOT NULL,
@@ -760,6 +759,71 @@ CREATE SEQUENCE forum_topics_id_seq
 --
 
 ALTER SEQUENCE forum_topics_id_seq OWNED BY forum_topics.id;
+
+
+--
+-- Name: ip_bans; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE ip_bans (
+    id integer NOT NULL,
+    creator_id integer NOT NULL,
+    ip_addr inet NOT NULL,
+    reason text NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: ip_bans_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE ip_bans_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: ip_bans_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE ip_bans_id_seq OWNED BY ip_bans.id;
+
+
+--
+-- Name: janitor_trials; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE janitor_trials (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    promoted_at timestamp without time zone,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: janitor_trials_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE janitor_trials_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: janitor_trials_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE janitor_trials_id_seq OWNED BY janitor_trials.id;
 
 
 --
@@ -1292,8 +1356,6 @@ ALTER SEQUENCE unapprovals_id_seq OWNED BY unapprovals.id;
 
 CREATE TABLE uploads (
     id integer NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
     source character varying(255),
     file_path character varying(255),
     content_type character varying(255),
@@ -1302,7 +1364,10 @@ CREATE TABLE uploads (
     uploader_ip_addr inet NOT NULL,
     tag_string text NOT NULL,
     status character varying(255) DEFAULT 'pending'::character varying NOT NULL,
-    post_id integer
+    post_id integer,
+    md5_confirmation character varying(255),
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -1370,13 +1435,15 @@ CREATE TABLE users (
     name character varying(255) NOT NULL,
     password_hash character varying(255) NOT NULL,
     email character varying(255),
-    invited_by integer,
+    email_verification_key character varying(255),
+    inviter_id integer,
     is_banned boolean DEFAULT false NOT NULL,
     is_privileged boolean DEFAULT false NOT NULL,
     is_contributor boolean DEFAULT false NOT NULL,
     is_janitor boolean DEFAULT false NOT NULL,
     is_moderator boolean DEFAULT false NOT NULL,
     is_admin boolean DEFAULT false NOT NULL,
+    base_upload_limit integer DEFAULT 10 NOT NULL,
     last_logged_in_at timestamp without time zone,
     last_forum_read_at timestamp without time zone,
     has_mail boolean DEFAULT false NOT NULL,
@@ -1385,7 +1452,8 @@ CREATE TABLE users (
     always_resize_images boolean DEFAULT false NOT NULL,
     default_image_size character varying(255) DEFAULT 'medium'::character varying NOT NULL,
     favorite_tags text,
-    blacklisted_tags text
+    blacklisted_tags text,
+    time_zone character varying(255) DEFAULT 'Eastern Time (US & Canada)'::character varying NOT NULL
 );
 
 
@@ -1624,6 +1692,20 @@ ALTER TABLE forum_posts ALTER COLUMN id SET DEFAULT nextval('forum_posts_id_seq'
 --
 
 ALTER TABLE forum_topics ALTER COLUMN id SET DEFAULT nextval('forum_topics_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ip_bans ALTER COLUMN id SET DEFAULT nextval('ip_bans_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE janitor_trials ALTER COLUMN id SET DEFAULT nextval('janitor_trials_id_seq'::regclass);
 
 
 --
@@ -1928,6 +2010,22 @@ ALTER TABLE ONLY forum_topics
 
 
 --
+-- Name: ip_bans_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY ip_bans
+    ADD CONSTRAINT ip_bans_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: janitor_trials_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY janitor_trials
+    ADD CONSTRAINT janitor_trials_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2164,13 +2262,6 @@ CREATE INDEX index_bans_on_expires_at ON bans USING btree (expires_at);
 
 
 --
--- Name: index_bans_on_ip_addr; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_bans_on_ip_addr ON bans USING btree (ip_addr);
-
-
---
 -- Name: index_bans_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2392,6 +2483,20 @@ CREATE INDEX index_forum_topics_on_creator_id ON forum_topics USING btree (creat
 --
 
 CREATE INDEX index_forum_topics_on_text_index ON forum_topics USING gin (text_index);
+
+
+--
+-- Name: index_ip_bans_on_ip_addr; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_ip_bans_on_ip_addr ON ip_bans USING btree (ip_addr);
+
+
+--
+-- Name: index_janitor_trials_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_janitor_trials_on_user_id ON janitor_trials USING btree (user_id);
 
 
 --
@@ -2803,3 +2908,7 @@ INSERT INTO schema_migrations (version) VALUES ('20100224171915');
 INSERT INTO schema_migrations (version) VALUES ('20100224172146');
 
 INSERT INTO schema_migrations (version) VALUES ('20100307073438');
+
+INSERT INTO schema_migrations (version) VALUES ('20100309211553');
+
+INSERT INTO schema_migrations (version) VALUES ('20100318213503');
