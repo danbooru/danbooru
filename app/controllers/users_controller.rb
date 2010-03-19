@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   respond_to :html, :xml, :json
+  before_filter :member_only, :only => [:edit, :show, :update, :destroy, :create]
 
   def new
     @user = User.new
@@ -21,7 +22,10 @@ class UsersController < ApplicationController
   
   def create
     @user = User.new(params[:user].merge(:ip_addr => request.remote_ip))
-    flash[:notice] = "You have succesfully created a new account." if @user.save
+    if @user.save
+      flash[:notice] = "You have succesfully created a new account."
+      session[:user_id] = @user.id
+    end
     respond_with(@user)
   end
   

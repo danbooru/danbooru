@@ -42,60 +42,47 @@ class PostSetPresenter < Presenter
   def numbered_pagination_html(template)
     total_pages = (@post_set.count.to_f / @post_set.limit.to_f).ceil
     current_page = [1, @post_set.page].max
-    before_current_page = current_page - 1
-    after_current_page = current_page + 1
     html = "<menu>"
-
-    current_page_min = [1, current_page - 2].max
-    current_page_max = [total_pages, current_page + 2].min
-    
-    if current_page == 1
-      # do nothing
-    elsif current_page_min == 1
-      1.upto(before_current_page) do |i|
-        html << numbered_pagination_item(template, i)
+    window = 3
+    if total_pages <= (window * 2) + 5
+      1.upto(total_pages) do |page|
+        html << numbered_pagination_item(template, page, current_page)
+      end
+    elsif current_page <= window + 2
+      1.upto(current_page + window) do |page|
+        html << numbered_pagination_item(template, page, current_page)
+      end
+      html << numbered_pagination_item(template, "...", current_page)
+      html << numbered_pagination_item(template, total_pages, current_page)
+      
+    elsif current_page >= total_pages - (window + 1)
+      html << numbered_pagination_item(template, 1, current_page)
+      html << numbered_pagination_item(template, "...", current_page)
+      (current_page - window).upto(total_pages) do |page|
+        html << numbered_pagination_item(template, page, current_page)
       end
     else
-      1.upto(3) do |i|
-        html << numbered_pagination_item(template, i)
+      html << numbered_pagination_item(template, 1, current_page)
+      html << numbered_pagination_item(template, "...", current_page)
+      (current_page - window).upto(current_page + window) do |page|
+        html << numbered_pagination_item(template, page, current_page)
       end
-      
-      html << "<li>...</li>"
-      
-      current_page_min.upto(before_current_page) do |i|
-        html << numbered_pagination_item(template, i)
-      end
+      html << numbered_pagination_item(template, "...", current_page)
+      html << numbered_pagination_item(template, total_pages, current_page)
     end
-    
-    html << %{<li class="current-page">#{current_page}</li>}
-    
-    if current_page == total_pages
-      # do nothing
-    elsif current_page_max == total_pages
-      after_current_page.upto(total_pages) do |i|
-        html << numbered_pagination_item(template, i)
-      end
-    else
-      after_current_page.upto(after_current_page + 2) do |i|
-        html << numbered_pagination_item(template, i)
-      end
-      
-      if total_pages > 5
-        html << "<li>...</li>"
-      
-        (after_current_page + 3).upto(total_pages) do |i|
-          html << numbered_pagination_item(template, i)
-        end
-      end
-    end
-    
     html << "</menu>"
     html.html_safe
   end
   
-  def numbered_pagination_item(template, page)
+  def numbered_pagination_item(template, page, current_page)
     html = "<li>"
-    html << template.link_to(page, template.__send__(:posts_path, :tags => template.params[:tags], :page => page))
+    if page == "..."
+      html << "..."
+    elsif page == current_page
+      html << page.to_s
+    else
+      html << template.link_to(page, template.__send__(:posts_path, :tags => template.params[:tags], :page => page))
+    end
     html << "</li>"
     html.html_safe
   end

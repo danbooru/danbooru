@@ -181,6 +181,7 @@ class Post < ActiveRecord::Base
       increment_tags.each do |tag|
         expire_cache(tag)
       end
+      expire_cache("")
     end
     
     def set_tag_counts
@@ -515,20 +516,17 @@ class Post < ActiveRecord::Base
   module CountMethods
     def fast_count(tags)
       count = Cache.get("pfc:#{Cache.sanitize(tags)}")
-      return count unless count.nil?
-      count = Post.find_by_tags(tags).count
-      expiry = (count < 100) ? 0 : (count * 4).minutes
-      Cache.put("pfc:#{Cache.sanitize(tags)}", count, expiry)
+      if count.nil?
+        count = Post.find_by_tags("#{tags}").count
+        if count > Danbooru.config.posts_per_page * 10
+          Cache.put("pfc:#{Cache.sanitize(tags)}", count, (count * 4).minutes)
+        end
+      end
       count
     end
     
     def fast_delete_count(tags)
-      count = Cache.get("pfdc:#{Cache.sanitize(tags)}")
-      return count unless count.nil?
-      count = Post.find_by_tags("#{tags} status:deleted").count
-      expiry = (count < 100) ? 0 : (count * 4).minutes
-      Cache.put("pfc:#{Cache.sanitize(tags)}", count, expiry)
-      count
+      fast_count("#{tags} status:deleted")
     end
   end
   
