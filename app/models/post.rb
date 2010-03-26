@@ -78,6 +78,19 @@ class Post < ActiveRecord::Base
       end
     end
     
+    def file_path_for(user)
+      case user.default_image_size
+      when "medium"
+        medium_file_path
+        
+      when "large"
+        large_file_path
+        
+      else
+        file_path
+      end
+    end
+    
     def is_image?
       file_ext =~ /jpg|gif|png/
     end
@@ -90,6 +103,38 @@ class Post < ActiveRecord::Base
     
     def has_large?
       image_width > Danbooru.config.large_image_width
+    end
+    
+    def image_width_for(user)
+      case user.default_image_size
+      when "medium"
+        [Danbooru.config.medium_image_width, image_width].min
+        
+      when "large"
+        [Danbooru.config.large_image_width, image_width].min
+        
+      else
+        image_width
+      end
+    end
+    
+    def image_height_for(user)
+      case user.default_image_size
+      when "medium"
+        ratio = Danbooru.config.medium_image_width.to_f / image_width.to_f
+        
+      when "large"
+        ratio = Danbooru.config.large_image_width.to_f / image_width.to_f
+        
+      else
+        ratio = 1
+      end
+
+      if ratio < 1
+        image_height * ratio
+      else
+        image_height
+      end
     end
   end
   
