@@ -68,10 +68,18 @@ class Post < ActiveRecord::Base
     def file_url_for(user)
       case user.default_image_size
       when "medium"
-        medium_file_url
+        if image_width > Danbooru.config.medium_image_width
+          medium_file_url
+        else
+          file_url
+        end
         
       when "large"
-        large_file_url
+        if image_width > Danbooru.config.large_image_width
+          large_file_url
+        else
+          file_url
+        end
         
       else
         file_url
@@ -81,10 +89,18 @@ class Post < ActiveRecord::Base
     def file_path_for(user)
       case user.default_image_size
       when "medium"
-        medium_file_path
+        if image_width > Danbooru.config.medium_image_width
+          medium_file_path
+        else
+          file_path
+        end
         
       when "large"
-        large_file_path
+        if image_width > Danbooru.config.large_image_width
+          large_file_path
+        else
+          file_path
+        end
         
       else
         file_path
@@ -93,6 +109,10 @@ class Post < ActiveRecord::Base
     
     def is_image?
       file_ext =~ /jpg|gif|png/
+    end
+    
+    def is_flash?
+      file_ext =~ /swf/
     end
   end
   
@@ -105,13 +125,39 @@ class Post < ActiveRecord::Base
       image_width > Danbooru.config.large_image_width
     end
     
+    def medium_image_width
+      [Danbooru.config.medium_image_width, image_width].min
+    end
+    
+    def large_image_width
+      [Danbooru.config.large_image_width, image_width].min
+    end
+    
+    def medium_image_height
+      ratio = Danbooru.config.medium_image_width.to_f / image_width.to_f
+      if ratio < 1
+        image_height * ratio
+      else
+        image_height
+      end
+    end
+    
+    def large_image_height
+      ratio = Danbooru.config.large_image_width.to_f / image_width.to_f
+      if ratio < 1
+        image_height * ratio
+      else
+        image_height
+      end
+    end
+    
     def image_width_for(user)
       case user.default_image_size
       when "medium"
-        [Danbooru.config.medium_image_width, image_width].min
+        medium_image_width
         
       when "large"
-        [Danbooru.config.large_image_width, image_width].min
+        large_image_width
         
       else
         image_width
@@ -121,17 +167,11 @@ class Post < ActiveRecord::Base
     def image_height_for(user)
       case user.default_image_size
       when "medium"
-        ratio = Danbooru.config.medium_image_width.to_f / image_width.to_f
+        medium_image_height
         
       when "large"
-        ratio = Danbooru.config.large_image_width.to_f / image_width.to_f
+        large_image_height
         
-      else
-        ratio = 1
-      end
-
-      if ratio < 1
-        image_height * ratio
       else
         image_height
       end

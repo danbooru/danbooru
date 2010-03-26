@@ -14,41 +14,12 @@
   
   <section>
     <h1>Information</h1>
-    <ul>
-      <li>Id: <%= @post.id %></li>
-      <li>Uploaded <%= time_ago_in_words(@post.created_at) %> ago by <%= link_to_unless(@post.uploader.nil?, @post.uploader_name, user_path(@post.uploader)) %></li>
-      <% if @post.approver %>
-        <li>Approver: <%= @post.approver.name %></li>
-      <% end %>
-      <% if @post.is_image? %>
-        <li>
-          [M]
-          [L]
-          [O]
-        </li>
-      <% end %>
-      <li><%= link_to "Tag History", post_versions_path(:post_id => @post) %></li>
-      <li><%= link_to "Note History", note_versions_path(:post_id => @post) %></li>
-    </ul>
+    <%= render :partial => "information", :locals => {:post => @post} %>
   </section>
 
   <section>
     <h1>Options</h1>
-    <menu>
-      <% if !@post.is_deleted? && @post.is_image? && @post.image_width && @post.image_width > 700 %>
-        <li><%= link_to "Resize", "#" %></li>
-      <% end %>
-      <li><%= link_to "Favorite", "#" %></li>
-      <li><%= link_to "Unfavorite", "#" %></li>
-      <li><%= link_to "Add translation", "#" %></li>
-      <li><%= link_to "Unapprove", "#" %></li>
-      <% if @current_user.is_janitor? %>
-        <li><%= link_to "Approve", "#" %></li>
-        <li><%= link_to "Undelete", "#" %></li>
-        <li><%= link_to "Delete", "#" %></li>
-      <% end %>
-      <li><%= link_to "Add to Pool", "#" %></li>
-    </menu>
+    <%= render :partial => "options", :locals => {:post => @post} %>
   </section>  
 </aside>
 
@@ -57,7 +28,7 @@
   
   <section>
     <h2>Image</h2>
-    <%= @post.presenter.image_html %>
+    <%= @post.presenter.image_html(self, @current_user) %>
   </section>
   
   <section>
