@@ -104,6 +104,10 @@ class AnonymousUser
     "Eastern Time (US & Canada)"
   end
   
+  def default_image_size
+    "medium"
+  end
+  
   %w(member banned privileged contributor janitor moderator admin).each do |name|
     define_method("is_#{name}?") do
       false

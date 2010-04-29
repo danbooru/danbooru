@@ -1,25 +1,22 @@
-<aside>
+<aside class="sidebar">
   <section>
     <h1>Search</h1>
-    <% form_tag(posts_path, :method => "get") do %>
-      <%= text_field_tag("tags", params[:tags], :size => 20) %>
-      <%= submit_tag "Go" %>
-    <% end %>
+    <%= render :partial => "posts/partials/common/search" %>
   </section>
   
   <section>
     <h1>Tags</h1>
-    <%= @post.presenter.tag_list_html %>
+    <%= @post.presenter.tag_list_html(self, @current_user) %>
   </section>
   
   <section>
     <h1>Information</h1>
-    <%= render :partial => "information", :locals => {:post => @post} %>
+    <%= render :partial => "posts/partials/show/information", :locals => {:post => @post} %>
   </section>
 
   <section>
     <h1>Options</h1>
-    <%= render :partial => "options", :locals => {:post => @post} %>
+    <%= render :partial => "posts/partials/show/options", :locals => {:post => @post} %>
   </section>  
 </aside>
 
@@ -33,15 +30,17 @@
   
   <section>
     <h2>Notes</h2>
-    <%= @post.presenter.note_html %>
+    <%= render :partial => "notes/note", :collection => @post.notes.active %>
   </section>
   
   <section>
     <h2>Comments</h2>
+    <%= render :partial => "comments/partials/index/list", :locals => {:comments => @post.comments, :post => @post} %>
   </section>
   
   <section>
     <h2>Edit</h2>
+    <%= render :partial => "posts/partials/show/edit", :locals => {:post => @post} %>
   </section>
 </section>
 

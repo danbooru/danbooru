@@ -1,5 +1,5 @@
 class Post < ActiveRecord::Base
-  attr_accessor :updater_id, :updater_ip_addr, :old_tag_string
+  attr_accessor :updater_id, :updater_ip_addr, :old_tag_string, :should_create_pool
   after_destroy :delete_files
   after_destroy :delete_favorites
   after_destroy :update_tag_post_counts
@@ -17,6 +17,7 @@ class Post < ActiveRecord::Base
   has_many :versions, :class_name => "PostVersion", :dependent => :destroy  
   has_many :votes, :class_name => "PostVote", :dependent => :destroy
   has_many :notes, :dependent => :destroy
+  has_many :comments
   validates_presence_of :updater_id, :updater_ip_addr
   validates_uniqueness_of :md5
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :updater_id, :updater_ip_addr, :last_noted_at
@@ -136,7 +137,7 @@ class Post < ActiveRecord::Base
     def medium_image_height
       ratio = Danbooru.config.medium_image_width.to_f / image_width.to_f
       if ratio < 1
-        image_height * ratio
+        (image_height * ratio).to_i
       else
         image_height
       end
@@ -145,7 +146,7 @@ class Post < ActiveRecord::Base
     def large_image_height
       ratio = Danbooru.config.large_image_width.to_f / image_width.to_f
       if ratio < 1
-        image_height * ratio
+        (image_height * ratio).to_i
       else
         image_height
       end
@@ -515,10 +516,10 @@ class Post < ActiveRecord::Base
         relation = relation.order("posts.image_width * posts.image_height / 1000000.0, posts.id DESC")
 
       when "portrait"
-        relation = relation.order("1.0 * image_width / GREATEST(1, image_height), posts.id DESC")
+        relation = relation.order("1.0 * posts.image_width / GREATEST(1, posts.image_height), posts.id DESC")
 
       when "landscape"
-        relation = relation.order("1.0 * image_width / GREATEST(1, image_height) DESC, posts.id DESC")
+        relation = relation.order("1.0 * posts.image_width / GREATEST(1, posts.image_height) DESC, posts.id DESC")
 
       when "filesize", "filesize_desc"
         relation = relation.order("posts.file_size DESC")
@@ -536,6 +537,10 @@ class Post < ActiveRecord::Base
 
       if options[:offset]
         relation = relation.offset(options[:offset])
+      end
+      
+      if options[:select]
+        relation = relation.select(options[:select])
       end
       
       relation
@@ -649,3 +654,5 @@ class Post < ActiveRecord::Base
     @presenter ||= PostPresenter.new(self)
   end
 end
+
+Post.connection.extend(PostgresExtensions)

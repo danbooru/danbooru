@@ -1,0 +1,4 @@
+<% form_tag(posts_path, :method => "get") do %>
+  <%= text_field_tag("tags", params[:tags], :size => 15) %>
+  <%= submit_tag "Go" %>
+<% end %>

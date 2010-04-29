@@ -1,0 +1,15 @@
+<ul>
+  <% if !post.is_deleted? && post.is_image? && post.image_width && post.image_width > 700 %>
+    <li><%= link_to "Resize", "#" %></li>
+  <% end %>
+  <li><%= link_to "Favorite", "#" %></li>
+  <li><%= link_to "Unfavorite", "#" %></li>
+  <li><%= link_to "Translate", "#" %></li>
+  <li><%= link_to "Unapprove", "#" %></li>
+  <% if @current_user.is_janitor? %>
+    <li><%= link_to "Approve", "#" %></li>
+    <li><%= link_to "Undelete", "#" %></li>
+    <li><%= link_to "Delete", "#" %></li>
+  <% end %>
+  <li><%= link_to "Pool", "#" %></li>
+</ul>

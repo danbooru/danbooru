@@ -1,26 +1,34 @@
 class RelatedTagCalculator
   def find_tags(tag, limit)
-    ActiveRecord::Base.select_values_sql("SELECT tag_string FROM posts WHERE tag_index @@ to_tsquery('danbooru', ?) ORDER BY id DESC LIMIT ?", tag, limit)
+    Post.find_by_tags(tag, :limit => limit, :select => "posts.tag_string", :order => "posts.md5").map(&:tag_string)
   end
   
   def calculate_from_sample(name, limit, category_constraint = nil)
     counts = Hash.new {|h, k| h[k] = 0}
     
+    case category_constraint
+    when Tag.categories.artist
+      limit *= 5
+      
+    when Tag.categories.copyright
+      limit *= 4
+    
+    when Tag.categories.character
+      limit *= 3
+    end
+    
     find_tags(name, limit).each do |tags|
       tag_array = Tag.scan_tags(tags)
       if category_constraint
-        categories = Tag.categories_for(tag_array)
-        
         tag_array.each do |tag|
-          if categories[tag] == category_constraint && tag != name
+          category = Tag.category_for(tag)
+          if category == category_constraint
             counts[tag] += 1
           end
         end
       else
         tag_array.each do |tag|
-          if tag != name
-            counts[tag] += 1
-          end
+          counts[tag] += 1
         end
       end
     end
@@ -28,7 +36,11 @@ class RelatedTagCalculator
     counts
   end
   
+  def convert_hash_to_array(hash)
+    hash.to_a.sort_by {|x| -x[1]}.slice(0, 25)
+  end
+  
   def convert_hash_to_string(hash)
-    hash.to_a.sort_by {|x| -x[1]}.flatten.join(" ")
+    convert_hash_to_array(hash).flatten.join(" ")
   end
 end

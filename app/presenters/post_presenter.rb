@@ -2,27 +2,20 @@ class PostPresenter < Presenter
   def initialize(post)
     @post = post
   end
-  
-  def tag_list_html
-  end
-  
+
   def image_html(template, current_user)
-    return "" if @post.is_deleted? && !current_user.is_janitor?
+    return template.content_tag("p", "This image was deleted.") if @post.is_deleted? && !current_user.is_janitor?
+    return template.content_tag("p", "You need a privileged account to see this image.") if !Danbooru.config.can_see_post?(@post, current_user)
     
     if @post.is_flash?
-      template.render(:partial => "posts/flash", :locals => {:post => @post})
+      template.render(:partial => "posts/partials/show/flash", :locals => {:post => @post})
     elsif @post.is_image?
-      template.image_tag(
-        @post.file_url_for(current_user),
-        :alt => @post.tag_string,
-        :width => @post.image_width_for(current_user),
-        :height => @post.image_height_for(current_user),
-        "data-original-width" => @post.image_width,
-        "data-original-height" => @post.image_height
-      )
+      template.render(:partial => "posts/partials/show/image", :locals => {:post => @post})
     end
   end
   
-  def note_html
+  def tag_list_html(template, current_user)
+    @tag_set_presenter ||= TagSetPresenter.new(@post.tag_array)
+    @tag_set_presenter.tag_list_html(template, :show_extra_links => current_user.is_privileged?)
   end
 end

@@ -9,6 +9,10 @@ module ApplicationHelper
     content_tag("li", link_to(text, url, options), :class => klass)
   end
   
+  def format_text(text, options = {})
+    DText.parse(text)
+  end
+  
 protected
   def nav_link_match(controller, url)
     url =~ case controller

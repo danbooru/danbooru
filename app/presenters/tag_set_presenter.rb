@@ -5,36 +5,42 @@
 =end
 
 class TagSetPresenter < Presenter
-  def initialize(source)
-    @category_cache = {}
+  def initialize(tags)
+    @tags = tags
+    fetch_categories
   end
   
-  def to_list_html(template, options = {})
-    ul_class_attribute = options[:ul_class] ? %{class="#{options[:ul_class]}"} : ""
-    ul_id_attribute = options[:ul_id] ? %{id="#{options[:ul_id]}"} : ""
-
+  def tag_list_html(template, options = {})
     html = ""
-    html << "<ul #{ul_class_attribute} #{ul_id_attribute}>"
+    html << "<ul>"
     @tags.each do |tag|
       html << build_list_item(tag, template, options)
     end
     html << "</ul>"
-    html
+    html.html_safe
   end
 
 private
-  def fetch_categories(tags)
+  def fetch_categories
+    @category_cache ||= Tag.categories_for(@tags)
+  end
+  
+  def category_for(tag)
+    @category_cache[tag]
   end
   
   def build_list_item(tag, template, options)
     html = ""
-    html << "<li>"
+    html << %{<li data-tag-type="#{category_for(tag)}">}
     
     if options[:show_extra_links]
+      html << %{<a href="/wiki_pages/#{u(tag)}">?</a> }
+      html << %{<a href="#" class="search-inc-tag">+</a> }
+      html << %{<a href="#" class="search-exl-tag">-</a> }
     end
     
     humanized_tag = tag.tr("_", " ")
-    html << %{a href="/posts?tags=#{u(tag)}">#{h(humanized_tag)}</a>}
+    html << %{<a href="/posts?tags=#{u(tag)}">#{h(humanized_tag)}</a>}
     html << "</li>"
     html
   end

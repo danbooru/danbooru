@@ -1,0 +1,3 @@
+<% notes.each do |note| %>
+  <%= content_tag(:article, "data-width" => note.width, "data-height" => note.height, "data-x" => note.x, "data-y" => note.y, "data-body" => note.formatted_body) %>
+<% end %>

@@ -12,11 +12,13 @@
   <%= stylesheet_link_tag "default" %>
   <%= javascript_include_tag "http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" %>
   <%= javascript_include_tag "rails" %>
+  <%= javascript_include_tag "application" %>
   <%= Danbooru.config.custom_html_header_content %>
   <%= yield :html_header %>
 </head>
 <body>
   <header>
+    <h1><%= Danbooru.config.app_name %></h1>
     <nav>
       <menu>
         <% if @current_user.is_anonymous? %>

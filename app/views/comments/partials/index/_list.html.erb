@@ -1,0 +1,19 @@
+<div class="comment-section" data-post-id="<%= post.id %>">
+  <div class="comment-list">
+    <%= render :partial => "comments/partials/show/comment", :collection => comments %>
+  </div>
+
+  <div class="comment-response">
+    <p><%= submit_tag "Post comment", :class => "expand-comment-response" %></p>
+
+    <div class="comment-preview"></div>
+
+    <% form_tag(comments_path) do %>
+      <%= hidden_field "comment", "post_id", :value => post.id%>
+      <%= text_area "comment", "body", :size => "60x7" %><br>
+      <%= submit_tag "Post" %>
+      <%= submit_tag "Preview" %>
+    <% end %>
+  </div>  
+</div>
+

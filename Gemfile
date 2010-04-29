@@ -8,7 +8,7 @@ group :test do
   gem "faker"
 end
 
-gem "rails", "3.0.0.beta"
+gem "rails", "3.0.0.beta3"
 gem "pg"
 gem "memcache-client", :require => "memcache"
 gem "imagesize", :require => "image_size"

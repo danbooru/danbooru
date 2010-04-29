@@ -1,0 +1,259 @@
+.blacklisted {
+	display: none !important; 
+}
+
+body, div, h1, h2, h3, h4, h5, h6, p, ul, li, dd, dt {
+  font-family: verdana, sans-serif;
+	font-size: 100%;
+  margin: 0;
+  padding: 0;
+	border: 0;
+	vertical-align: baseline;
+}
+
+h1, h2, h3, h4 {
+  font-family: Tahoma;
+	line-height: 1em;
+}
+
+body {
+  font-size: 80%;
+  padding: 1em 2em;
+  margin: 0;
+}
+
+article, section {
+  display: block;
+}
+
+a:link {
+  color: #006FFA;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #006FFA;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #9093FF;
+  text-decoration: none;
+}
+
+a:active {
+  color: #006FFA;
+  text-decoration: none;
+}
+
+addr {
+  display: block;
+  margin-left: 2em;
+  font-weight: bold;
+}
+
+blockquote {
+  margin: 0 0 1em 0;
+  padding: 1em;
+  border: 1px solid #666;
+  background: #EEE;
+}
+
+code {
+  font-family: monospace;
+  font-size: 1.2em;
+}
+
+dd {
+  margin-bottom: 1em;
+}
+
+dt {
+  font-weight: bold;
+}
+
+h1 {
+  font-size: 2em;
+}
+
+h2 {
+  font-size: 1.8em;
+}
+
+h3 {
+  font-size: 1.6em;
+}
+
+h4 {
+  font-size: 1.4em;
+}
+
+h5 {
+  font-size: 1.2em;
+}
+
+h6 {
+  font-size: 1em;
+}
+
+header {
+	margin: 0 0 1em 0;
+	padding: 0;
+	display: block;
+}
+
+img {
+  border: none;
+  vertical-align: middle;
+}
+
+input[type=text], input[type=password], textarea, button {
+	border: 1px solid #AAA;
+	font-size: 1em;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+}
+
+input[type=submit] {
+	padding: 1px 4px;
+	border: 1px solid #AAA;
+	background-color: #EEE;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	font-size: 1em;
+	cursor: pointer;
+}
+
+input[type=submit]:hover {
+	background-color: #F6F6F6;
+}
+
+menu {
+	margin: 0;
+	padding: 0;
+}
+
+menu ul {
+	margin: 0;
+	padding: 0;
+}
+
+menu li {
+	margin: 0 1em 0 0;
+	padding: 0;
+	list-style-type: none;
+	display: inline;
+}
+
+section {
+	display: block;
+}
+
+span.link {
+  color: #006FFA;
+  cursor: pointer;
+}
+
+div#content > aside {
+	width: 25%;
+	float: left;
+}
+
+div#content > aside > section {
+	margin-bottom: 2em;
+}
+
+div#content > section {
+  width: 75%;
+	float: left;
+}
+
+div.clearfix {
+  clear: both;
+/*  border: 1px solid red;*/
+}
+
+
+/*** Context Menu ***/
+
+menu[type=context] {
+  width: 200px;
+  cursor: pointer;
+}
+
+menu[type=context] li {
+  list-style: none;
+  padding: 0px 4px;
+}
+
+menu[type=context] > li {
+  border: 1px solid #333;
+  -moz-border-radius: 3px;
+  background-color: #EEE;
+}
+
+menu[type=context] > li > img {
+  float: right;
+  padding-top: 2px;
+}
+
+menu[type=context] > ul {
+  width: 198px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #333;
+  background: #EEE;
+  -moz-border-radius: 3px;
+  margin-top: -1px;
+  display: none;
+  position: absolute;
+}
+
+menu[type=context] > ul li {
+  cursor: pointer;
+}
+
+
+/*** Header ***/
+
+body > header > h1 {
+  font-size: 3em;
+  font-family: Tahoma, Helvetica, sans-serif;
+}
+
+/*** Sidebar ***/
+
+aside.sidebar > section > h1 {
+  font-size: 1.5em;
+}
+
+aside.sidebar > section > ul > li {
+  list-style-type: none;
+}
+
+
+/*** Comments ***/
+div.comment-response {
+}
+
+div.comment-response > div {
+	margin-top: 1em;
+}
+
+div.comment-list {
+}
+
+div.comment-list > article {
+  margin-bottom: 1em;
+  display: block;
+}
+
+div.comment-list > article > header {
+  float: left;
+  width: 15em;
+}
+
+div.comment-list > article > div {
+  float: left;
+  width: 40em;
+}
