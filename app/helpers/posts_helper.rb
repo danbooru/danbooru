@@ -1,27 +1,16 @@
 module PostsHelper
-  def image_dimensions(post, current_user)
-    if post.is_image?
-      "(#{post.image_width_for(current_user)}x#{post.image_height_for(current_user)})"
+  def resize_image_links(post, user)
+    links = []
+    
+    links << %{<a href="#" data-src="#{post.file_url}" data-width="#{post.image_width}" data-height="#{post.image_height}">Original</a>} if post.has_medium? || post.has_large?
+    links << %{<a href="#" data-src="#{post.medium_file_url}" data-width="#{post.medium_image_width}" data-height="#{post.medium_image_height}">Medium</a>} if post.has_medium?
+    links << %{<a href="#" data-src="#{post.large_file_url}" data-width="#{post.large_image_width}" data-height="#{post.large_image_height}">Large</a>} if post.has_large?
+    
+    if links.any?
+      html = %{<li id="resize-link"><a href="#">Resize</a></li><ul id="resize-links">} + links.map {|x| %{<li>#{x}</li>}}.join("") + %{</ul>}
+      html.html_safe
     else
       ""
     end
-  end
-  
-  def image_dimension_menu(post, current_user)
-    html = ""
-    file_size = number_to_human_size(post.file_size)
-    original_dimensions = post.is_image? ? "(#{post.image_width}x#{post.image_height})" : nil
-    large_dimensions = post.has_large? ? "(#{post.large_image_width}x#{post.large_image_height})" : nil
-    medium_dimensions = post.has_medium? ? "(#{post.medium_image_width}x#{post.medium_image_height})" : nil
-    current_dimensions = "(#{post.image_width_for(current_user)}x#{post.image_height_for(current_user)})"
-    html << %{<menu type="context" data-user-default="<%= current_user.default_image_size %>">}
-    html << %{<li>#{file_size} #{current_dimensions}</li>}
-    html << %{<ul>}
-    html << %{<li id="original">#{file_size} #{original_dimensions}</li>}
-    html << %{<li id="medium">#{file_size} #{medium_dimensions}</li>} if medium_dimensions
-    html << %{<li id="large">#{file_size} #{large_dimensions}</li>} if large_dimensions
-    html << %{</ul>}
-    html << %{</menu>}
-    html.html_safe
   end
 end

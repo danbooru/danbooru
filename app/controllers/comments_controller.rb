@@ -2,6 +2,7 @@ class CommentsController < ApplicationController
   respond_to :html, :xml, :json
 
   def index
+    @posts = Post.paginate :order => "last_commented_at DESC", :per_page => 8
   end
   
   def update

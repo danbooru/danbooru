@@ -1,9 +1,8 @@
 class Post < ActiveRecord::Base
-  attr_accessor :updater_id, :updater_ip_addr, :old_tag_string, :should_create_pool
+  attr_accessor :old_tag_string, :old_parent_id
   after_destroy :delete_files
-  after_destroy :delete_favorites
-  after_destroy :update_tag_post_counts
   after_save :create_version  
+  after_save :update_parent_on_save
   before_save :merge_old_tags
   before_save :normalize_tags
   before_save :create_tags
@@ -11,6 +10,7 @@ class Post < ActiveRecord::Base
   before_save :set_tag_counts
   belongs_to :updater, :class_name => "User"
   belongs_to :approver, :class_name => "User"
+  belongs_to :parent, :class_name => "Post"
   has_one :unapproval, :dependent => :destroy
   has_one :upload, :dependent => :destroy
   has_one :moderation_detail, :class_name => "PostModerationDetail", :dependent => :destroy
@@ -18,9 +18,11 @@ class Post < ActiveRecord::Base
   has_many :votes, :class_name => "PostVote", :dependent => :destroy
   has_many :notes, :dependent => :destroy
   has_many :comments
-  validates_presence_of :updater_id, :updater_ip_addr
+  has_many :children, :class_name => "Post", :foreign_key => "parent_id", :order => "posts.id"
   validates_uniqueness_of :md5
-  attr_accessible :source, :rating, :tag_string, :old_tag_string, :updater_id, :updater_ip_addr, :last_noted_at
+  validates_presence_of :parent, :if => lambda {|rec| !rec.parent_id.nil?}
+  validate :validate_parent_does_not_have_a_parent
+  attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at
   
   module FileMethods
     def delete_files
@@ -179,13 +181,13 @@ class Post < ActiveRecord::Base
     end
   end
   
-  module ModerationMethods
-    def unapprove!(reason, current_user, current_ip_addr)
+  module ApprovalMethods
+    def unapprove!(reason)
       raise Unapproval::Error.new("You can't unapprove a post more than once") if is_flagged?
       
       unapproval = create_unapproval(
-        :unapprover_id => current_user.id,
-        :unapprover_ip_addr => current_ip_addr,
+        :unapprover_id => CurrentUser.user.id,
+        :unapprover_ip_addr => CurrentUser.ip_addr,
         :reason => reason
       )
       
@@ -193,15 +195,13 @@ class Post < ActiveRecord::Base
         raise Unapproval::Error.new(unapproval.errors.full_messages.join("; "))
       end
       
-      update_attribute(:is_flagged, true)
+      toggle!(:is_flagged)
     end
-    
-    def delete!
-      update_attribute(:is_deleted, true)
-    end
-    
+
     def approve!
-      update_attributes(:is_deleted => false, :is_pending => false)
+      update_attributes(
+        :is_pending => false
+      )
     end
   end
   
@@ -226,19 +226,17 @@ class Post < ActiveRecord::Base
         :source => source,
         :rating => rating,
         :tag_string => tag_string,
-        :updater_id => updater_id,
-        :updater_ip_addr => updater_ip_addr
+        :updater_id => CurrentUser.user.id,
+        :updater_ip_addr => CurrentUser.ip_addr
       )
     
       raise PostVersion::Error.new(version.errors.full_messages.join("; ")) if version.errors.any?
     end
     
-    def revert_to!(version, reverter_id, reverter_ip_addr)
+    def revert_to!(version)
       self.source = version.source
       self.rating = version.rating
       self.tag_string = version.tag_string
-      self.updater_id = reverter_id
-      self.updater_ip_addr = reverter_ip_addr
       save!
     end
   end
@@ -254,6 +252,14 @@ class Post < ActiveRecord::Base
     
     def create_tags
       set_tag_string(tag_array.map {|x| Tag.find_or_create_by_name(x).name}.join(" "))
+    end
+    
+    def increment_tag_post_counts
+      execute_sql("UPDATE tags SET post_count = post_count + 1 WHERE name IN (?)", tag_array) if tag_array.any?
+    end
+    
+    def decrement_tag_post_counts
+      execute_sql("UPDATE tags SET post_count = post_count - 1 WHERE name IN (?)", tag_array) if tag_array.any?
     end
     
     def update_tag_post_counts
@@ -333,19 +339,44 @@ class Post < ActiveRecord::Base
   
   module FavoriteMethods
     def delete_favorites
-      Favorite.destroy_all_for_post(self)
+      Favorite.destroy_for_post(self)
     end
     
     def add_favorite(user)
-      self.fav_string += " fav:#{user.name}"
+      if user.is_a?(ActiveRecord::Base)
+        user_id = user.id
+      else
+        user_id = user
+      end
+      
+      return false if fav_string =~ /fav:#{user_id}/
+      self.fav_string += " fav:#{user_id}"
       self.fav_string.strip!
-      Favorite.create(user, self)
+      
+      # in order to avoid rerunning the callbacks, just update through raw sql
+      execute_sql("UPDATE posts SET fav_string = ? WHERE id = ?", fav_string, id)
+      
+      Favorite.create(:user_id => user_id, :post_id => id)
     end
     
     def remove_favorite(user)
-      self.fav_string.gsub!(/(?:\A| )fav:#{user.name}(?:\Z| )/, " ")
+      if user.is_a?(ActiveRecord::Base)
+        user_id = user.id
+      else
+        user_id = user
+      end
+      
+      self.fav_string.gsub!(/(?:\A| )fav:#{user_id}(?:\Z| )/, " ")
       self.fav_string.strip!
-      Favorite.destroy(user, self)
+      
+      # in order to avoid rerunning the callbacks, just update through raw sql
+      execute_sql("UPDATE posts SET fav_string = ? WHERE id = ?", fav_string, id)
+
+      Favorite.destroy(:user_id => user_id, :post_id => id)
+    end
+    
+    def favorited_user_ids
+      fav_string.scan(/\d+/)
     end
   end
   
@@ -435,7 +466,11 @@ class Post < ActiveRecord::Base
         q = Tag.parse_query(q)
       end
       
-      relation = where()
+      if q[:status] == "deleted"
+        relation = RemovedPost.where()
+      else
+        relation = where()
+      end
 
       relation = add_range_relation(q[:post_id], "posts.id", relation)
       relation = add_range_relation(q[:mpixels], "posts.width * posts.height / 1000000.0", relation)
@@ -458,14 +493,10 @@ class Post < ActiveRecord::Base
         relation = relation.where(["posts.md5 IN (?)", q[:md5]])
       end
 
-      if q[:status] == "deleted"
-        relation = relation.where("posts.is_deleted = TRUE")
-      elsif q[:status] == "pending"
+      if q[:status] == "pending"
         relation = relation.where("posts.is_pending = TRUE")
       elsif q[:status] == "flagged"
         relation = relation.where("posts.is_flagged = TRUE")
-      else
-        relation = relation.where("posts.is_deleted = FALSE")
       end
 
       if q[:source].is_a?(String)
@@ -477,7 +508,7 @@ class Post < ActiveRecord::Base
       end
 
       relation = add_tag_string_search_relation(q[:tags], relation)
-
+      
       if q[:rating] == "q"
         relation = relation.where("posts.rating = 'q'")
       elsif q[:rating] == "s"
@@ -553,31 +584,31 @@ class Post < ActiveRecord::Base
     end
     
     def uploader_id
-      uploader.id
-    end
-    
-    def uploader_name
       uploader_string[9..-1]
     end
     
+    def uploader_name
+      User.id_to_name(uploader_id)
+    end
+    
     def uploader
-      User.find_by_name(uploader_name)
+      User.find(uploader_id)
     end
     
     def uploader=(user)
-      self.uploader_string = "uploader:#{user.name}"
+      self.uploader_string = "uploader:#{user.id}"
     end
   end
   
   module PoolMethods
     def add_pool(pool)
-      self.pool_string += " pool:#{pool.name}"
+      self.pool_string += " pool:#{pool.id}"
       self.pool_string.strip!
       pool.add_post!(self)
     end
     
     def remove_pool(pool)
-      self.pool_string.gsub!(/(?:\A| )pool:#{pool.name}(?:\Z| )/, " ")
+      self.pool_string.gsub!(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ")
       self.pool_string.strip!
       pool.remove_post!(self)
     end
@@ -631,9 +662,106 @@ class Post < ActiveRecord::Base
     end
   end
 
+  module ParentMethods
+    # A parent has many children. A child belongs to a parent. 
+    # A parent cannot have a parent.
+    #
+    # After deleting a child:
+    # - Move favorites to parent.
+    # - Does the parent have any active children?
+    #   - Yes: Done.
+    #   - No: Update parent's has_children flag to false.
+    #
+    # After deleting a parent:
+    # - Move favorites to the first child.
+    # - Reparent all active children to the first active child.
+    
+    module ClassMethods
+      def update_has_children_flag_for(post_id)
+        has_children = Post.exists?(["parent_id = ?", post_id])
+        execute_sql("UPDATE posts SET has_children = ? WHERE id = ?", has_children, post_id)
+      end
+    
+      def recalculate_has_children_for_all_posts
+        transaction do
+          execute_sql("UPDATE posts SET has_children = false WHERE has_children = true")
+          execute_sql("UPDATE posts SET has_children = true WHERE id IN (SELECT p.parent_id FROM posts p WHERE p.parent_id IS NOT NULL)")
+        end
+      end
+    end
+  
+    def self.included(m)
+      m.extend(ClassMethods)
+    end
+
+    def validate_parent_does_not_have_a_parent
+      return if parent.nil?
+      if !parent.parent.nil?
+        errors.add(:parent, "can not have a parent")
+      end
+    end
+    
+    def update_parent_on_destroy
+      Post.update_has_children_flag_for(parent_id)
+      Post.update_has_children_flag_for(parent_id_was) if parent_id_was && parent_id != parent_id_was
+    end
+    
+    def update_children_on_destroy
+      if children.size == 0
+        # do nothing
+      elsif children.size == 1
+        children.first.update_attribute(:parent_id, nil)
+      else
+        cached_children = children
+        cached_children[1..-1].each do |child|
+          child.update_attribute(:parent_id, cached_children[0].id)
+        end
+        cached_children[0].update_attribute(:parent_id, nil)
+      end
+    end
+
+    def update_parent_on_save
+      if parent_id == parent_id_was
+        # do nothing
+      elsif !parent_id_was.nil?
+        Post.update_has_children_flag_for(parent_id)
+        Post.update_has_children_flag_for(parent_id_was)
+      else
+        Post.update_has_children_flag_for(parent_id)
+      end
+    end
+    
+    def give_favorites_to_parent
+      return if parent.nil?
+
+      favorited_user_ids.each do |user_id|
+        parent.add_favorite(user_id)
+        remove_favorite(user_id)
+      end
+    end
+    
+    def delete_favorites
+      Favorite.destroy_for_post(self)
+    end
+  end
+  
+  module RemovalMethods
+    def remove!
+      Post.transaction do
+        execute_sql("INSERT INTO removed_posts (#{Post.column_names.join(', ')}) SELECT #{Post.column_names.join(', ')} FROM posts WHERE posts.id = #{id}")
+        give_favorites_to_parent
+        update_children_on_destroy
+        delete_favorites
+        decrement_tag_post_counts
+        execute_sql("DELETE FROM posts WHERE id = #{id}")
+        update_parent_on_destroy
+      end
+    end
+  end
+  
   include FileMethods
   include ImageMethods
-  include ModerationMethods
+  include ApprovalMethods
   include PresenterMethods
   include VersionMethods
   include TagMethods
@@ -644,6 +772,8 @@ class Post < ActiveRecord::Base
   include VoteMethods
   extend CountMethods
   include CacheMethods
+  include ParentMethods
+  include RemovalMethods
   
   def reload(options = nil)
     super

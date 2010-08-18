@@ -217,22 +217,22 @@ class Tag < ActiveRecord::Base
         if token =~ /\A(-uploader|uploader|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|status|tagcount|gentags|arttags|chartags|copytags):(.+)\Z/
           case $1
           when "-uploader"
-            q[:tags][:exclude] << token[1..-1]
+            q[:tags][:exclude] << "uploader:#{User.name_to_id(token[1..-1])}"
             
           when "uploader"
-            q[:tags][:related] << token
+            q[:tags][:related] << "uploader:#{User.name_to_id(token)}"
             
           when "-pool"
-            q[:tags][:exclude] << token[1..-1]
+            q[:tags][:exclude] << "pool:#{Pool.name_to_id(token[1..-1])}"
             
           when "pool"
-            q[:tags][:related] << token
+            q[:tags][:related] << "pool:#{Pool.name_to_id(token)}"
           
           when "-fav"
-            q[:tags][:exclude] << token[1..-1]
+            q[:tags][:exclude] << "fav:#{User.name_to_id(token[1..-1])}"
 
           when "fav"
-            q[:tags][:related] << token
+            q[:tags][:related] << "fav:#{User.name_to_id(token)}"
 
           when "sub"
             q[:subscriptions] << $2

@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
   before_filter :set_current_user
+  after_filter :reset_current_user
   before_filter :initialize_cookies
   layout "default"
 
@@ -27,24 +28,29 @@ protected
 
   def set_current_user
     if session[:user_id]
-      @current_user = User.find_by_id(session[:user_id])
+      CurrentUser.user = User.find_by_id(session[:user_id])
+      CurrentUser.ip_addr = request.remote_ip
     end
     
-    if @current_user
-      if @current_user.is_banned? && @current_user.ban && @current_user.ban.expires_at < Time.now
-        @current_user.update_attribute(:is_banned, false)
-        Ban.destroy_all("user_id = #{@current_user.id}")
+    if CurrentUser.user
+      if CurrentUser.user.is_banned? && CurrentUser.user.ban && CurrentUser.user.ban.expires_at < Time.now
+        CurrentUser.user.unban!
       end
     else
-      @current_user = AnonymousUser.new
+      CurrentUser.user = AnonymousUser.new
     end
     
-    Time.zone = @current_user.time_zone
+    Time.zone = CurrentUser.user.time_zone
+  end
+  
+  def reset_current_user
+    CurrentUser.user = nil
+    CurrentUser.ip_addr = nil
   end
   
   %w(member banned privileged contributor janitor moderator admin).each do |level|
     define_method("#{level}_only") do
-      if @current_user.__send__("is_#{level}?")
+      if CurrentUser.user.__send__("is_#{level}?")
         true
       else
         access_denied()
@@ -53,10 +59,10 @@ protected
   end
 
   def initialize_cookies
-    if @current_user.is_anonymous?
+    if CurrentUser.user.is_anonymous?
       cookies["blacklisted_tags"] = ""
     else
-      cookies["blacklisted_tags"] = @current_user.blacklisted_tags
+      cookies["blacklisted_tags"] = CurrentUser.user.blacklisted_tags
     end
   end
 end

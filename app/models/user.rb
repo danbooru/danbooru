@@ -20,6 +20,7 @@ class User < ActiveRecord::Base
   before_create :promote_to_admin_if_first_user
   before_create :normalize_level
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
+  has_one :ban
   belongs_to :inviter, :class_name => "User"
   scope :named, lambda {|name| where(["lower(name) = ?", name])}  
   
@@ -30,12 +31,23 @@ class User < ActiveRecord::Base
         return false
       end
     end
+    
+    def unban!
+      update_attribute(:is_banned, false)
+      ban.destroy
+    end
   end
   
   module NameMethods
     module ClassMethods
-      def find_name(user_id)
-        Cache.get("un:#{user_id}") do
+      def name_to_id(name)
+        Cache.get("uni:#{Cache.sanitize(name)}") do
+          select_value_sql("SELECT id FROM users WHERE name = ?", name.downcase)
+        end
+      end
+      
+      def id_to_name(user_id)
+        Cache.get("uin:#{user_id}") do
           select_value_sql("SELECT name FROM users WHERE id = ?", user_id) || Danbooru.config.default_guest_name
         end
       end
@@ -44,8 +56,8 @@ class User < ActiveRecord::Base
         where(["lower(name) = ?", name.downcase]).first
       end
       
-      def find_pretty_name(user_id)
-        find_name.tr("_", " ")
+      def id_to_pretty_name(user_id)
+        id_to_name.tr("_", " ")
       end
     end
     
@@ -58,7 +70,7 @@ class User < ActiveRecord::Base
     end
     
     def update_cache
-      Cache.put("un:#{id}", name)
+      Cache.put("uin:#{id}", name)
     end
   end
   

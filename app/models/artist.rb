@@ -3,7 +3,7 @@ class Artist < ActiveRecord::Base
   before_create :initialize_creator
   before_save :normalize_name
   after_save :create_version
-  after_save :commit_url_string
+  after_save :save_url_string
   validates_uniqueness_of :name
   validates_presence_of :updater_id, :updater_ip_addr
   belongs_to :updater, :class_name => "User"
@@ -36,7 +36,7 @@ class Artist < ActiveRecord::Base
       m.extend(ClassMethods)
     end
 
-    def commit_url_string
+    def save_url_string
       if @url_string
         artist_urls.clear
 
@@ -82,7 +82,7 @@ class Artist < ActiveRecord::Base
   
   module UpdaterMethods
     def updater_name
-      User.find_name(updater_id).tr("_", " ")
+      User.id_to_name(updater_id).tr("_", " ")
     end
   end
   
@@ -150,12 +150,35 @@ class Artist < ActiveRecord::Base
     end
   end
 
+  module FactoryMethods
+    def new_with_defaults(params)
+      returning(Artist.new) do |artist|
+        if params[:name]
+          artist.name = params[:name]
+          post = Post.find_by_tags("source:http* #{artist.name}").first
+          unless post.nil? || post.source.blank?
+            artist.url_string = post.source
+          end
+        end
+        
+        if params[:other_names]
+          artist.other_names = params[:other_names]
+        end
+        
+        if params[:urls]
+          artist.url_string = params[:urls]
+        end
+      end
+    end
+  end
+
   include UrlMethods
   include NameMethods
   include GroupMethods
   include UpdaterMethods
   extend SearchMethods  
   include VersionMethods
+  extend FactoryMethods
   
   def initialize_creator
     if creator.nil?

@@ -120,7 +120,7 @@ class Job < ActiveRecord::Base
       when "mass_tag_edit"
         start = data["start_tags"]
         result = data["result_tags"]
-        user = User.find_name(data["updater_id"])      
+        user = User.id_to_name(data["updater_id"])      
         "start:#{start} result:#{result} user:#{user}"
     
       when "approve_tag_alias"

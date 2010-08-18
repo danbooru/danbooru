@@ -13,7 +13,6 @@ class CreatePosts < ActiveRecord::Migration
       t.column :is_rating_locked, :boolean, :null => false, :default => false
       t.column :is_pending, :boolean, :null => false, :default => false
       t.column :is_flagged, :boolean, :null => false, :default => false
-      t.column :is_deleted, :boolean, :null => false, :default => false
 
       # Uploader
       t.column :uploader_string, :string, :null => false
@@ -47,6 +46,10 @@ class CreatePosts < ActiveRecord::Migration
       t.column :file_size, :integer, :null => false
       t.column :image_width, :integer, :null => false
       t.column :image_height, :integer, :null => false
+      
+      # Parent
+      t.column :parent_id, :integer
+      t.column :has_children, :boolean, :null => false, :default => false
     end
     
     add_index :posts, :md5, :unique => true
@@ -58,6 +61,7 @@ class CreatePosts < ActiveRecord::Migration
     add_index :posts, :image_height
     add_index :posts, :source
     add_index :posts, :view_count
+    add_index :posts, :parent_id
     
     execute "CREATE INDEX index_posts_on_mpixels ON posts (((image_width * image_height)::numeric / 1000000.0))"
 

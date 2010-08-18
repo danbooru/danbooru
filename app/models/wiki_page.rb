@@ -45,7 +45,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def creator_name
-    User.find_name(user_id).tr("_", " ")
+    User.id_to_name(user_id).tr("_", " ")
   end
 
   def pretty_title

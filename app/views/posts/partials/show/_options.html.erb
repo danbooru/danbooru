@@ -1,7 +1,5 @@
 <ul>
-  <% if !post.is_deleted? && post.is_image? && post.image_width && post.image_width > 700 %>
-    <li><%= link_to "Resize", "#" %></li>
-  <% end %>
+  <%= resize_image_links(post, @current_user) %>
   <li><%= link_to "Favorite", "#" %></li>
   <li><%= link_to "Unfavorite", "#" %></li>
   <li><%= link_to "Translate", "#" %></li>

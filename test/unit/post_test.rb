@@ -1,6 +1,142 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
 class PostTest < ActiveSupport::TestCase
+  setup do
+    user = Factory.create(:user)
+    CurrentUser.user = user
+    CurrentUser.ip_addr = "127.0.0.1"
+  end
+  
+  teardown do
+    CurrentUser.user = nil
+    CurrentUser.ip_addr = nil
+  end
+  
+  context "Removal:" do
+    context "Removing a post" do
+      should "duplicate the post in the archive table and remove it from the base table" do
+        post = Factory.create(:post)
+        
+        assert_difference("RemovedPost.count", 1) do
+          assert_difference("Post.count", -1) do
+            post.remove!
+          end
+        end
+        
+        removed_post = RemovedPost.last
+        assert_equal(post.tag_string, removed_post.tag_string)
+      end
+      
+      should "decrement the tag counts" do
+        post = Factory.create(:post, :tag_string => "aaa")
+        assert_equal(1, Tag.find_by_name("aaa").post_count)
+        post.remove!
+        assert_equal(0, Tag.find_by_name("aaa").post_count)
+      end
+    end
+  end
+  
+  context "Parenting:" do
+    context "Assignining a parent to a post" do
+      should "update the has_children flag on the parent" do
+        p1 = Factory.create(:post)
+        assert(!p1.has_children?, "Parent should not have any children")
+        c1 = Factory.create(:post, :parent_id => p1.id)
+        p1.reload
+        assert(p1.has_children?, "Parent not updated after child was added")
+      end
+      
+      should "update the has_children flag on the old parent" do
+        p1 = Factory.create(:post)
+        p2 = Factory.create(:post)
+        c1 = Factory.create(:post, :parent_id => p1.id)
+        c1.parent_id = p2.id
+        c1.save
+        p1.reload
+        p2.reload
+        assert(!p1.has_children?, "Old parent should not have a child")
+        assert(p2.has_children?, "New parent should have a child")
+      end
+
+      should "validate that the parent exists" do
+        post = Factory.build(:post, :parent_id => 1_000_000)
+        post.save
+        assert(post.errors[:parent].any?, "Parent should be invalid")
+      end
+      
+      should "fail if the parent has a parent" do
+        p1 = Factory.create(:post)
+        c1 = Factory.create(:post, :parent_id => p1.id)
+        c2 = Factory.build(:post, :parent_id => c1.id)
+        c2.save
+        assert(c2.errors[:parent].any?, "Parent should be invalid")
+      end
+    end
+        
+    context "Destroying a post with a parent" do
+      should "reassign favorites to the parent" do
+        p1 = Factory.create(:post)
+        c1 = Factory.create(:post, :parent_id => p1.id)
+        user = Factory.create(:user)
+        c1.add_favorite(user)
+        c1.remove!
+        p1.reload
+        assert(!Favorite.exists?(:post_id => c1.id, :user_id => user.id))
+        assert(Favorite.exists?(:post_id => p1.id, :user_id => user.id))
+      end
+
+      should "update the parent's has_children flag" do
+        p1 = Factory.create(:post)
+        c1 = Factory.create(:post, :parent_id => p1.id)
+        c1.remove!
+        p1.reload
+        assert(!p1.has_children?, "Parent should not have children")
+      end
+    end
+    
+    context "Destroying a post with" do
+      context "one child" do
+        should "remove the parent of that child" do
+          p1 = Factory.create(:post)
+          c1 = Factory.create(:post, :parent_id => p1.id)
+          p1.remove!
+          c1.reload
+          assert_nil(c1.parent)
+        end
+      end
+      
+      context "two or more children" do
+        should "reparent all children to the first child" do
+          p1 = Factory.create(:post)
+          c1 = Factory.create(:post, :parent_id => p1.id)
+          c2 = Factory.create(:post, :parent_id => p1.id)
+          c3 = Factory.create(:post, :parent_id => p1.id)
+          p1.remove!
+          c1.reload
+          c2.reload
+          c3.reload
+          assert_nil(c1.parent)
+          assert_equal(c1.id, c2.parent_id)
+          assert_equal(c1.id, c3.parent_id)
+        end
+      end
+    end
+    
+    context "Undestroying a post with a parent" do
+      should "not preserve the parent's has_children flag" do
+        p1 = Factory.create(:post)
+        c1 = Factory.create(:post, :parent_id => p1.id)
+        c1.remove!
+        c1 = RemovedPost.last
+        c1.unremove!
+        c1 = Post.last
+        p1.reload
+        assert_nil(p1.parent_id)
+        assert(!p1.has_children?, "Parent should not have children")
+      end
+    end
+  end
+
   context "During moderation a post" do
     setup do
       @post = Factory.create(:post)
@@ -8,29 +144,29 @@ class PostTest < ActiveSupport::TestCase
     end
   
     should "be unapproved once and only once" do
-      @post.unapprove!("bad", @user, "127.0.0.1")
+      @post.unapprove!("bad", @user.id, "127.0.0.1")
       assert(@post.is_flagged?, "Post should be flagged.")
       assert_not_nil(@post.unapproval, "Post should have an unapproval record.")
       assert_equal("bad", @post.unapproval.reason)
     
-      assert_raise(Unapproval::Error) {@post.unapprove!("bad", @user, "127.0.0.1")}
+      assert_raise(Unapproval::Error) {@post.unapprove!("bad", @user.id, "127.0.0.1")}
     end
   
     should "not unapprove if no reason is given" do
-      assert_raise(Unapproval::Error) {@post.unapprove!("", @user, "127.0.0.1")}
+      assert_raise(Unapproval::Error) {@post.unapprove!("", @user.id, "127.0.0.1")}
     end
   
-    should "be deleted" do
-      @post.delete!
+    should "be destroyed" do
+      @post.destroy(1, "127.0.0.1")
       assert(@post.is_deleted?, "Post should be deleted.")
     end
   
     should "be approved" do
-      @post.approve!
+      @post.approve!(1, "127.0.0.1")
       assert(!@post.is_pending?, "Post should not be pending.")
     
       @deleted_post = Factory.create(:post, :is_deleted => true)
-      @deleted_post.approve!
+      @deleted_post.approve!(1, "127.0.0.1")
       assert(!@post.is_deleted?, "Post should not be deleted.")
     end
   end

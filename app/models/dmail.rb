@@ -18,11 +18,11 @@ class Dmail < ActiveRecord::Base
   
   module AddressMethods
     def to_name
-      User.find_pretty_name(to_id)
+      User.id_to_pretty_name(to_id)
     end
 
     def from_name
-      User.find_pretty_name(from_id)
+      User.id_to_pretty_name(from_id)
     end
 
     def to_name=(name)

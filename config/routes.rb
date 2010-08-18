@@ -1,4 +1,4 @@
-Danbooru::Application.routes.draw do |map|
+Danbooru::Application.routes.draw do
   namespace :admin do
     resources :users
   end

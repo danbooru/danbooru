@@ -3,7 +3,7 @@ class WikiPageVersion < ActiveRecord::Base
   belongs_to :updater
   
   def updater_name
-    User.find_name(updater_id)
+    User.id_to_name(updater_id)
   end
 
   def pretty_title

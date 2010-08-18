@@ -3,6 +3,6 @@ class ArtistVersion < ActiveRecord::Base
   belongs_to :artist
   
   def updater_name
-    User.find_name(updater_id).tr("_", " ")
+    User.id_to_name(updater_id).tr("_", " ")
   end
 end

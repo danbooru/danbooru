@@ -6,8 +6,13 @@ class Pool < ActiveRecord::Base
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
   has_many :versions, :class_name => "PoolVersion", :dependent => :destroy
+  before_save :normalize_name
   after_save :create_version
   attr_accessible :name, :description, :post_ids, :is_public, :is_active
+  
+  def self.name_to_id(name)
+    select_value_sql("SELECT id FROM pools WHERE name = ?", name.downcase)
+  end
   
   def self.create_anonymous(creator, creator_ip_addr)
     Pool.new do |pool|
@@ -19,6 +24,10 @@ class Pool < ActiveRecord::Base
       pool.name = "anonymous:#{pool.id}"
       pool.save
     end
+  end
+  
+  def normalize_name
+    self.name = name.downcase
   end
   
   def revert_to!(version)

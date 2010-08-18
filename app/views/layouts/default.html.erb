@@ -10,7 +10,8 @@
   <% end %>
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
   <%= stylesheet_link_tag "default" %>
-  <%= javascript_include_tag "http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" %>
+  <%#= javascript_include_tag "http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" %>
+  <%= javascript_include_tag "jquery.min.js" %>
   <%= javascript_include_tag "rails" %>
   <%= javascript_include_tag "application" %>
   <%= Danbooru.config.custom_html_header_content %>

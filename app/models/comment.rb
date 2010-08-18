@@ -13,7 +13,7 @@ class Comment < ActiveRecord::Base
   scope :hidden, lambda {|user| where("score < ?", user.comment_threshold)}
 
   def creator_name
-    User.find_name(creator_id)
+    User.id_to_name(creator_id)
   end
 
   def validate_creator_is_not_limited

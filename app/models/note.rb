@@ -37,7 +37,7 @@ class Note < ActiveRecord::Base
   end
 
   def creator_name
-    User.find_name(creator_id)
+    User.id_to_name(creator_id)
   end
 
   def update_post
