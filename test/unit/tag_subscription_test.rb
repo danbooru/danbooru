@@ -1,6 +1,18 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
 class TagSubscriptionTest < ActiveSupport::TestCase
+  setup do
+    user = Factory.create(:user)
+    CurrentUser.user = user
+    CurrentUser.ip_addr = "127.0.0.1"
+    MEMCACHE.flush_all
+  end
+  
+  teardown do
+    CurrentUser.user = nil
+    CurrentUser.ip_addr = nil
+  end
+  
   context "A tag subscription" do
     should "find the union of all posts for each tag in its tag query" do
       posts = []

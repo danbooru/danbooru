@@ -183,7 +183,8 @@ class Post < ActiveRecord::Base
   
   module ApprovalMethods
     def unapprove!(reason)
-      raise Unapproval::Error.new("You can't unapprove a post more than once") if is_flagged?
+      raise Unapproval::Error.new("This post has already been flagged") if is_flagged?
+      raise Unapproval::Error.new("This post has already been unapproved once")  unless unapproval.nil?
       
       unapproval = create_unapproval(
         :unapprover_id => CurrentUser.user.id,
@@ -194,14 +195,15 @@ class Post < ActiveRecord::Base
       if unapproval.errors.any?
         raise Unapproval::Error.new(unapproval.errors.full_messages.join("; "))
       end
-      
-      toggle!(:is_flagged)
+
+      update_attribute(:is_flagged, true)
     end
 
     def approve!
-      update_attributes(
-        :is_pending => false
-      )
+      self.is_flagged = false
+      self.is_pending = false
+      self.approver_string = "approver:#{CurrentUser.user.name}"
+      save!
     end
   end
   
@@ -349,7 +351,7 @@ class Post < ActiveRecord::Base
         user_id = user
       end
       
-      return false if fav_string =~ /fav:#{user_id}/
+      return false if fav_string =~ /(?:\A| )fav:#{user_id}(?:\Z| )/
       self.fav_string += " fav:#{user_id}"
       self.fav_string.strip!
       
@@ -467,9 +469,9 @@ class Post < ActiveRecord::Base
       end
       
       if q[:status] == "deleted"
-        relation = RemovedPost.where()
+        relation = RemovedPost.where("TRUE")
       else
-        relation = where()
+        relation = where("TRUE")
       end
 
       relation = add_range_relation(q[:post_id], "posts.id", relation)
@@ -584,7 +586,7 @@ class Post < ActiveRecord::Base
     end
     
     def uploader_id
-      uploader_string[9..-1]
+      uploader_string[9..-1].to_i
     end
     
     def uploader_name
@@ -602,14 +604,17 @@ class Post < ActiveRecord::Base
   
   module PoolMethods
     def add_pool(pool)
+      return if pool_string =~ /(?:\A| )pool:#{pool.id}(?:\Z| )/
       self.pool_string += " pool:#{pool.id}"
       self.pool_string.strip!
+      execute_sql("UPDATE posts SET pool_string = ? WHERE id = ?", pool_string, id)
       pool.add_post!(self)
     end
     
     def remove_pool(pool)
       self.pool_string.gsub!(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ")
       self.pool_string.strip!
+      execute_sql("UPDATE posts SET pool_string = ? WHERE id = ?", pool_string, id)
       pool.remove_post!(self)
     end
   end
@@ -635,7 +640,8 @@ class Post < ActiveRecord::Base
   end
   
   module CountMethods
-    def fast_count(tags)
+    def fast_count(tags = "")
+      tags = tags.to_s
       count = Cache.get("pfc:#{Cache.sanitize(tags)}")
       if count.nil?
         count = Post.find_by_tags("#{tags}").count
@@ -645,20 +651,14 @@ class Post < ActiveRecord::Base
       end
       count
     end
-    
-    def fast_delete_count(tags)
-      fast_count("#{tags} status:deleted")
-    end
   end
   
   module CacheMethods
     def expire_cache(tag_name)
       if Post.fast_count("") < 1000
         Cache.delete("pfc:")
-        Cache.delete("pfdc:")
       end
       Cache.delete("pfc:#{Cache.sanitize(tag_name)}")
-      Cache.delete("pfdc:#{Cache.sanitize(tag_name)}")
     end
   end
 
@@ -755,6 +755,7 @@ class Post < ActiveRecord::Base
         decrement_tag_post_counts
         execute_sql("DELETE FROM posts WHERE id = #{id}")
         update_parent_on_destroy
+        tag_array.each {|x| expire_cache(x)}
       end
     end
   end

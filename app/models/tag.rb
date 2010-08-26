@@ -92,7 +92,7 @@ class Tag < ActiveRecord::Base
 
           tag
         else
-          returning Tag.new do |tag|
+          Tag.new.tap do |tag|
             tag.name = name
             tag.category = category
             tag.save
@@ -217,22 +217,22 @@ class Tag < ActiveRecord::Base
         if token =~ /\A(-uploader|uploader|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|status|tagcount|gentags|arttags|chartags|copytags):(.+)\Z/
           case $1
           when "-uploader"
-            q[:tags][:exclude] << "uploader:#{User.name_to_id(token[1..-1])}"
+            q[:tags][:exclude] << "uploader:#{User.name_to_id($2)}"
             
           when "uploader"
-            q[:tags][:related] << "uploader:#{User.name_to_id(token)}"
+            q[:tags][:related] << "uploader:#{User.name_to_id($2)}"
             
           when "-pool"
-            q[:tags][:exclude] << "pool:#{Pool.name_to_id(token[1..-1])}"
+            q[:tags][:exclude] << "pool:#{Pool.name_to_id($2)}"
             
           when "pool"
-            q[:tags][:related] << "pool:#{Pool.name_to_id(token)}"
+            q[:tags][:related] << "pool:#{Pool.name_to_id($2)}"
           
           when "-fav"
-            q[:tags][:exclude] << "fav:#{User.name_to_id(token[1..-1])}"
+            q[:tags][:exclude] << "fav:#{User.name_to_id($2)}"
 
           when "fav"
-            q[:tags][:related] << "fav:#{User.name_to_id(token)}"
+            q[:tags][:related] << "fav:#{User.name_to_id($2)}"
 
           when "sub"
             q[:subscriptions] << $2

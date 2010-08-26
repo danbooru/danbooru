@@ -49,6 +49,9 @@ class Upload < ActiveRecord::Base
   
   module ConversionMethods
     def process!
+      CurrentUser.user = uploader
+      CurrentUser.ip_addr = uploader_ip_addr
+
       update_attribute(:status, "processing")
       if is_downloadable?
         download_from_source(temp_file_path)
@@ -70,10 +73,13 @@ class Upload < ActiveRecord::Base
         update_attribute(:status, "error: " + post.errors.full_messages.join(", "))
       end
     rescue RuntimeError => x
+    ensure
+      CurrentUser.user = nil
+      CurrentUser.ip_addr = nil
     end
 
     def convert_to_post
-      returning Post.new do |p|
+      Post.new.tap do |p|
         p.tag_string = tag_string
         p.md5 = md5
         p.file_ext = file_ext
@@ -81,8 +87,6 @@ class Upload < ActiveRecord::Base
         p.image_height = image_height
         p.uploader_id = uploader_id
         p.uploader_ip_addr = uploader_ip_addr
-        p.updater_id = uploader_id
-        p.updater_ip_addr = uploader_ip_addr
         p.rating = rating
         p.source = source
         p.file_size = file_size

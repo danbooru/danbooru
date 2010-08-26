@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
 class DownloadTest < ActiveSupport::TestCase
   context "A post download" do

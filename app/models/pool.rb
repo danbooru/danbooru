@@ -36,6 +36,8 @@ class Pool < ActiveRecord::Base
   end
   
   def add_post!(post)
+    return if post_ids =~ /(?:\A| )#{post.id}(?:\Z| )/
+    
     self.post_ids += " #{post.id}"
     self.post_ids.strip!
     save

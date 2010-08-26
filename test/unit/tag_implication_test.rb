@@ -1,10 +1,18 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
 class TagImplicationTest < ActiveSupport::TestCase
   context "A tag implication" do
     setup do
-      MEMCACHE.flush_all
+      user = Factory.create(:user)
+      CurrentUser.user = user
+      CurrentUser.ip_addr = "127.0.0.1"
       @user = Factory.create(:user)
+      MEMCACHE.flush_all
+    end
+
+    teardown do
+      CurrentUser.user = nil
+      CurrentUser.ip_addr = nil
     end
     
     should "not validate when a circular relation is created" do

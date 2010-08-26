@@ -152,7 +152,7 @@ class Artist < ActiveRecord::Base
 
   module FactoryMethods
     def new_with_defaults(params)
-      returning(Artist.new) do |artist|
+      Artist.new.tap do |artist|
         if params[:name]
           artist.name = params[:name]
           post = Post.find_by_tags("source:http* #{artist.name}").first

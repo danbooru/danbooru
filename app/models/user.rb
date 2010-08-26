@@ -42,7 +42,7 @@ class User < ActiveRecord::Base
     module ClassMethods
       def name_to_id(name)
         Cache.get("uni:#{Cache.sanitize(name)}") do
-          select_value_sql("SELECT id FROM users WHERE name = ?", name.downcase)
+          select_value_sql("SELECT id FROM users WHERE lower(name) = ?", name.downcase)
         end
       end
       
@@ -111,7 +111,7 @@ class User < ActiveRecord::Base
   
   module FavoriteMethods
     def favorite_posts(options = {})
-      favorites_table = Favorite.table_name_for(self)
+      favorites_table = Favorite.table_name_for(id)
       before_id = options[:before]
       before_id_sql_fragment = "AND favorites.id < #{before_id.to_i}" if before_id
       limit = options[:limit] || 20
@@ -227,9 +227,9 @@ class User < ActiveRecord::Base
     end
     
     def upload_limit
-      deleted_count = Post.where("is_deleted = true and user_id = ?", id).count
+      deleted_count = RemovedPost.where("user_id = ?", id).count
       unapproved_count = Post.where("is_pending = true and user_id = ?", id).count
-      approved_count = Post.where("is_flagged = false and is_deleted = false and is_pending = false and user_id = ?", id).count
+      approved_count = Post.where("is_flagged = false and is_pending = false and user_id = ?", id).count
       
       limit = base_upload_limit + (approved_count / 10) - (deleted_count / 4) - unapproved_count
       

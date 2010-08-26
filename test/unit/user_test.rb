@@ -1,11 +1,19 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
 class UserTest < ActiveSupport::TestCase
+  setup do
+    user = Factory.create(:user)
+    CurrentUser.user = user
+    CurrentUser.ip_addr = "127.0.0.1"
+    MEMCACHE.flush_all
+  end
+  
+  teardown do
+    CurrentUser.user = nil
+    CurrentUser.ip_addr = nil
+  end
+
   context "A user" do
-    setup do
-      MEMCACHE.flush_all
-    end
-    
     should "not validate if the originating ip address is banned" do
       Factory.create(:ip_ban)
       user = Factory.build(:user)
@@ -22,7 +30,7 @@ class UserTest < ActiveSupport::TestCase
       user.update_attribute(:is_contributor, false)
       
       40.times do
-        Factory.create(:post, :uploader => user, :is_deleted => true)
+        Factory.create(:removed_post, :uploader => user)
       end
       
       assert(!user.can_upload?)
@@ -118,18 +126,18 @@ class UserTest < ActiveSupport::TestCase
       
     context "name" do
       should "be #{Danbooru.config.default_guest_name} given an invalid user id" do
-        assert_equal(Danbooru.config.default_guest_name, User.find_name(-1))
+        assert_equal(Danbooru.config.default_guest_name, User.id_to_name(-1))
       end
     
       should "be fetched given a user id" do
         @user = Factory.create(:user)
-        assert_equal(@user.name, User.find_name(@user.id))
+        assert_equal(@user.name, User.id_to_name(@user.id))
       end
     
       should "be updated" do
         @user = Factory.create(:user)
         @user.update_attribute(:name, "danzig")
-        assert_equal("danzig", User.find_name(@user.id))
+        assert_equal("danzig", User.id_to_name(@user.id))
       end
     end
       

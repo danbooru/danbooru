@@ -1,11 +1,19 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
 class WikiPageTest < ActiveSupport::TestCase
+  setup do
+    user = Factory.create(:user)
+    CurrentUser.user = user
+    CurrentUser.ip_addr = "127.0.0.1"
+    MEMCACHE.flush_all
+  end
+  
+  teardown do
+    CurrentUser.user = nil
+    CurrentUser.ip_addr = nil
+  end
+
   context "A wiki page" do
-    setup do
-      MEMCACHE.flush_all
-    end
-    
     should "normalize its title" do
       wp = Factory.create(:wiki_page, :title => "HOT POTATO")
       assert_equal("hot_potato", wp.title)

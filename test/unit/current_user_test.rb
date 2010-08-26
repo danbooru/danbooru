@@ -11,8 +11,9 @@ class ArtistTest < ActiveSupport::TestCase
       CurrentUser.user = user
       CurrentUser.ip_addr = "1.2.3.4"
       
-      assert_equal(user.id, CurrentUser.current_user)
-      assert_equal("1.2.3.4", CurrentUser.current_ip_addr)
+      assert_not_nil(CurrentUser.user)
+      assert_equal(user.id, CurrentUser.user.id)
+      assert_equal("1.2.3.4", CurrentUser.ip_addr)
     end
   end
 end

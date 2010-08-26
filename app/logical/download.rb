@@ -52,6 +52,7 @@ class Download
           "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
         }
         source = handle_pixiv(source, headers)
+        url = URI.parse(source)
         http.request_get(url.request_uri, headers) do |res|
           case res
           when Net::HTTPSuccess then

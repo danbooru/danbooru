@@ -91,7 +91,7 @@ class Note < ActiveRecord::Base
   end
   
   def self.build_relation(params)
-    relation = where()
+    relation = where("TRUE")
     
     if !params[:query].blank?
       query = params[:query].scan(/\S+/).join(" & ")        

@@ -13,7 +13,7 @@ class Cache
     start_time = Time.now
     sanitized_key_to_value_hash = MEMCACHE.get_multi(key_to_sanitized_key_hash.values)
     elapsed = Time.now - start_time
-    returning({}) do |result_hash|
+    {}.tap do |result_hash|
       key_to_sanitized_key_hash.each do |key, sanitized_key|
         if sanitized_key_to_value_hash.has_key?(sanitized_key)
           result_hash[key] = sanitized_key_to_value_hash[sanitized_key]

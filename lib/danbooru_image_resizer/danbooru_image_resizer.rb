@@ -6,7 +6,7 @@ module Danbooru
   end
 
   def reduce_to(size, max_size)
-    returning size.dup do |new_size|
+    size.dup.tap do |new_size|
       if new_size[:width] > max_size[:width]
         scale = max_size[:width].to_f / new_size[:width].to_f
         new_size[:width] = new_size[:width] * scale

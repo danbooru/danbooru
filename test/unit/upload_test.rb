@@ -1,6 +1,18 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
 class UploadTest < ActiveSupport::TestCase
+  setup do
+    user = Factory.create(:user)
+    CurrentUser.user = user
+    CurrentUser.ip_addr = "127.0.0.1"
+    MEMCACHE.flush_all
+  end
+  
+  teardown do
+    CurrentUser.user = nil
+    CurrentUser.ip_addr = nil
+  end
+  
   context "An upload" do    
     teardown do
       FileUtils.rm_f(Dir.glob("#{Rails.root}/tmp/test.*"))

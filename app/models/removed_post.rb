@@ -1,4 +1,6 @@
 class RemovedPost < ActiveRecord::Base
+  has_one :unapproval, :dependent => :destroy, :foreign_key => "post_id"
+  
   module RemovalMethods
     def unremove!
       Post.transaction do
@@ -6,6 +8,17 @@ class RemovedPost < ActiveRecord::Base
         execute_sql("DELETE FROM removed_posts WHERE id = #{id}")
       end
     end
+  end
+  
+  def fast_count(tags)
+    count = Cache.get("rpfc:#{Cache.sanitize(tags)}")
+    if count.nil?
+      count = RemovedPost.find_by_tags("#{tags}").count
+      if count > Danbooru.config.posts_per_page * 10
+        Cache.put("rpfc:#{Cache.sanitize(tags)}", count, (count * 4).minutes)
+      end
+    end
+    count
   end
   
   include Post::FileMethods

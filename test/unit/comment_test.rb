@@ -1,9 +1,17 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
 class CommentTest < ActiveSupport::TestCase
   context "A comment" do
     setup do
+      user = Factory.create(:user)
+      CurrentUser.user = user
+      CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
+    end
+    
+    teardown do
+      CurrentUser.user = nil
+      CurrentUser.ip_addr = nil
     end
     
     should "be created" do
@@ -37,12 +45,12 @@ class CommentTest < ActiveSupport::TestCase
       user = Factory.create(:user)
       post = Factory.create(:post)
       c1 = Factory.create(:comment, :post => post)
-      assert_nothing_raised {c1.vote!(user, true)}
-      assert_raise(CommentVote::Error) {c1.vote!(user, true)}
+      assert_nothing_raised {c1.vote!(true)}
+      assert_raise(CommentVote::Error) {c1.vote!(true)}
       assert_equal(1, CommentVote.count)
     
       c2 = Factory.create(:comment, :post => post)
-      assert_nothing_raised {c2.vote!(user, true)}
+      assert_nothing_raised {c2.vote!(true)}
       assert_equal(2, CommentVote.count)
     end
     

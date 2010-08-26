@@ -8,11 +8,11 @@ class IpBan < ActiveRecord::Base
   end
 
   def self.search(user_ids)
-    comments = count_by_ip_addr("comments", user_ids, "creator_id")
-    posts = count_by_ip_addr("post_versions", user_ids, "updater_id")
-    notes = count_by_ip_addr("note_versions", user_ids, "updater_id")
-    pools = count_by_ip_addr("pool_updates", user_ids, "updater_id")
-    wiki_pages = count_by_ip_addr("wiki_page_versions", user_ids, "updater_id")
+    comments = count_by_ip_addr("comments", user_ids, "creator_id", "ip_addr")
+    posts = count_by_ip_addr("post_versions", user_ids, "updater_id", "updater_ip_addr")
+    notes = count_by_ip_addr("note_versions", user_ids, "updater_id", "updater_ip_addr")
+    pools = count_by_ip_addr("pool_versions", user_ids, "updater_id", "updater_ip_addr")
+    wiki_pages = count_by_ip_addr("wiki_page_versions", user_ids, "updater_id", "updater_ip_addr")
     
     return {
       "comments" => comments,
@@ -23,7 +23,7 @@ class IpBan < ActiveRecord::Base
     }
   end
   
-  def self.count_by_ip_addr(table, user_ids, user_id_field = "user_id")
-    select_all_sql("SELECT ip_addr, count(*) FROM #{table} WHERE #{user_id_field} IN (?) GROUP BY ip_addr ORDER BY count(*) DESC", user_ids)
+  def self.count_by_ip_addr(table, user_ids, user_id_field = "user_id", ip_addr_field = "ip_addr")
+    select_all_sql("SELECT #{ip_addr_field}, count(*) FROM #{table} WHERE #{user_id_field} IN (?) GROUP BY #{ip_addr_field} ORDER BY count(*) DESC", user_ids)
   end
 end

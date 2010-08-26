@@ -1,6 +1,18 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
 class PostModerationDetailTest < ActiveSupport::TestCase
+  setup do
+    user = Factory.create(:user)
+    CurrentUser.user = user
+    CurrentUser.ip_addr = "127.0.0.1"
+    MEMCACHE.flush_all
+  end
+  
+  teardown do
+    CurrentUser.user = nil
+    CurrentUser.ip_addr = nil
+  end
+  
   context "A post moderation detail" do
     should "hide posts" do
       posts = []
@@ -30,8 +42,6 @@ class PostModerationDetailTest < ActiveSupport::TestCase
         PostModerationDetail.prune!
       end
       post.is_flagged = false
-      post.updater_id = user.id
-      post.updater_ip_addr = "127.0.0.1"
       post.save
       assert(post.errors.empty?)
       assert_difference("PostModerationDetail.count", -1) do

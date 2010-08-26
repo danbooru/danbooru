@@ -5,6 +5,7 @@ class PostTest < ActiveSupport::TestCase
     user = Factory.create(:user)
     CurrentUser.user = user
     CurrentUser.ip_addr = "127.0.0.1"
+    MEMCACHE.flush_all
   end
   
   teardown do
@@ -14,6 +15,15 @@ class PostTest < ActiveSupport::TestCase
   
   context "Removal:" do
     context "Removing a post" do
+      should "update the fast count" do
+        post = Factory.create(:post, :tag_string => "aaa")
+        assert_equal(1, Post.fast_count)
+        assert_equal(1, Post.fast_count("aaa"))
+        post.remove!
+        assert_equal(0, Post.fast_count)
+        assert_equal(0, Post.fast_count("aaa"))
+      end
+      
       should "duplicate the post in the archive table and remove it from the base table" do
         post = Factory.create(:post)
         
@@ -32,6 +42,17 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(1, Tag.find_by_name("aaa").post_count)
         post.remove!
         assert_equal(0, Tag.find_by_name("aaa").post_count)
+      end
+      
+      should "preserve the id" do
+        post = Factory.create(:post, :tag_string => "aaa")
+        post_id = post.id
+        post.remove!
+        removed_post = RemovedPost.last
+        assert_equal(post_id, removed_post.id)
+        removed_post.unremove!
+        post = Post.last
+        assert_equal(post_id, post.id)
       end
     end
   end
@@ -137,246 +158,284 @@ class PostTest < ActiveSupport::TestCase
     end
   end
 
-  context "During moderation a post" do
-    setup do
-      @post = Factory.create(:post)
-      @user = Factory.create(:user)
-    end
+  context "Moderation:" do
+    context "An approved post" do
+      should "be unapproved once and only once" do
+        post = Factory.create(:post)
+        post.unapprove!("bad")
+        assert(post.is_flagged?, "Post should be flagged.")
+        assert_not_nil(post.unapproval, "Post should have an unapproval record.")
+        assert_equal("bad", post.unapproval.reason)
+        assert_raise(Unapproval::Error) {post.unapprove!("bad")}
+      end
   
-    should "be unapproved once and only once" do
-      @post.unapprove!("bad", @user.id, "127.0.0.1")
-      assert(@post.is_flagged?, "Post should be flagged.")
-      assert_not_nil(@post.unapproval, "Post should have an unapproval record.")
-      assert_equal("bad", @post.unapproval.reason)
-    
-      assert_raise(Unapproval::Error) {@post.unapprove!("bad", @user.id, "127.0.0.1")}
-    end
-  
-    should "not unapprove if no reason is given" do
-      assert_raise(Unapproval::Error) {@post.unapprove!("", @user.id, "127.0.0.1")}
-    end
-  
-    should "be destroyed" do
-      @post.destroy(1, "127.0.0.1")
-      assert(@post.is_deleted?, "Post should be deleted.")
-    end
-  
-    should "be approved" do
-      @post.approve!(1, "127.0.0.1")
-      assert(!@post.is_pending?, "Post should not be pending.")
-    
-      @deleted_post = Factory.create(:post, :is_deleted => true)
-      @deleted_post.approve!(1, "127.0.0.1")
-      assert(!@post.is_deleted?, "Post should not be deleted.")
-    end
-  end
-
-  context "A post version" do
-    should "be created on any save" do
-      @user = Factory.create(:user)
-      @post = Factory.create(:post)
-      @reverter = Factory.create(:user)
-      assert_equal(1, @post.versions.size)
-    
-      @post.rating = "e"
-      @post.updater_id = @user.id
-      @post.updater_ip_addr = "125.0.0.0"
-      @post.save
-      assert_equal(2, @post.versions.size)
-      assert_equal(@user.id, @post.versions.last.updater_id)
-      assert_equal("125.0.0.0", @post.versions.last.updater_ip_addr)
-      
-      @post.revert_to!(PostVersion.first, @reverter.id, "127.0.0.1")
-      assert_equal("tag1 tag2", @post.tag_string)
-      assert_equal("q", @post.rating)
-    end
-  end
-
-  context "A post's tags" do
-    setup do
-      @post = Factory.create(:post)
-    end
-  
-    should "have an array representation" do
-      @post.set_tag_string("aaa bbb")
-      assert_equal(%w(aaa bbb), @post.tag_array)
-      assert_equal(%w(tag1 tag2), @post.tag_array_was)
-    end
-
-    should "reset the tag array cache when updated" do
-      post = Factory.create(:post, :tag_string => "aaa bbb ccc")
-      user = Factory.create(:user)
-      assert_equal(%w(aaa bbb ccc), post.tag_array)
-      post.tag_string = "ddd eee fff"
-      post.updater_id = user.id
-      post.updater_ip_addr = "127.0.0.1"
-      post.tag_string = "ddd eee fff"
-      post.save
-      assert_equal("ddd eee fff", post.tag_string)
-      assert_equal(%w(ddd eee fff), post.tag_array)
-    end
-
-    should "create the actual tag records" do
-      assert_difference("Tag.count", 3) do
-        post = Factory.create(:post, :tag_string => "aaa bbb ccc")
+      should "not unapprove if no reason is given" do
+        post = Factory.create(:post)
+        assert_raise(Unapproval::Error) {post.unapprove!("")}
       end
     end
-
-    should "update the post counts of relevant tag records" do
-      post1 = Factory.create(:post, :tag_string => "aaa bbb ccc")
-      post2 = Factory.create(:post, :tag_string => "bbb ccc ddd")
-      post3 = Factory.create(:post, :tag_string => "ccc ddd eee")
-      user = Factory.create(:user)
-      assert_equal(1, Tag.find_by_name("aaa").post_count)
-      assert_equal(2, Tag.find_by_name("bbb").post_count)
-      assert_equal(3, Tag.find_by_name("ccc").post_count)
-      post3.tag_string = "xxx"
-      post3.updater_id = user.id
-      post3.updater_ip_addr = "127.0.0.1"
-      post3.save
-      assert_equal(1, Tag.find_by_name("aaa").post_count)
-      assert_equal(2, Tag.find_by_name("bbb").post_count)
-      assert_equal(2, Tag.find_by_name("ccc").post_count)      
-      assert_equal(1, Tag.find_by_name("ddd").post_count)      
-      assert_equal(0, Tag.find_by_name("eee").post_count)
-      assert_equal(1, Tag.find_by_name("xxx").post_count)
-    end
-
-    should "be counted" do
-      @user = Factory.create(:user)
-      @artist_tag = Factory.create(:artist_tag)
-      @copyright_tag = Factory.create(:copyright_tag)
-      @general_tag = Factory.create(:tag)
-      @new_post = Factory.create(:post, :tag_string => "#{@artist_tag.name} #{@copyright_tag.name} #{@general_tag.name}")
-      assert_equal(1, @new_post.tag_count_artist)
-      assert_equal(1, @new_post.tag_count_copyright)
-      assert_equal(1, @new_post.tag_count_general)
-      assert_equal(0, @new_post.tag_count_character)
-      assert_equal(3, @new_post.tag_count)
-
-      @new_post.tag_string = "babs"
-      @new_post.updater_id = @user.id
-      @new_post.updater_ip_addr = "127.0.0.1"
-      @new_post.save
-      assert_equal(0, @new_post.tag_count_artist)
-      assert_equal(0, @new_post.tag_count_copyright)
-      assert_equal(1, @new_post.tag_count_general)
-      assert_equal(0, @new_post.tag_count_character)
-      assert_equal(1, @new_post.tag_count)
-    end
     
-    should "be merged with any changes that were made after loading the initial set of tags part 1" do
-      @user = Factory.create(:user)
-      @post = Factory.create(:post, :tag_string => "aaa bbb ccc")
-          
-      # user a adds <ddd>
-      @post_edited_by_user_a = Post.find(@post.id)
-      @post_edited_by_user_a.old_tag_string = "aaa bbb ccc"
-      @post_edited_by_user_a.tag_string = "aaa bbb ccc ddd"
-      @post_edited_by_user_a.updater_id = @user.id
-      @post_edited_by_user_a.updater_ip_addr = "127.0.0.1"
-      @post_edited_by_user_a.save
+    context "An unapproved post" do
+      should "preserve the approver's identity when approved" do
+        user = CurrentUser.user
+        post = Factory.create(:post, :is_pending => true)
+        post.approve!
+        assert_equal("approver:#{user.name}", post.approver_string)
+      end
       
-    
-      # user b removes <ccc> adds <eee>
-      @post_edited_by_user_b = Post.find(@post.id)
-      @post_edited_by_user_b.old_tag_string = "aaa bbb ccc"
-      @post_edited_by_user_b.tag_string = "aaa bbb eee"
-      @post_edited_by_user_b.updater_id = @user.id
-      @post_edited_by_user_b.updater_ip_addr = "127.0.0.1"
-      @post_edited_by_user_b.save
-    
-      # final should be <aaa>, <bbb>, <ddd>, <eee>
-      @final_post = Post.find(@post.id)      
-      assert_equal(%w(aaa bbb ddd eee), Tag.scan_tags(@final_post.tag_string).sort)
+      should "preserve the unapproval association even when removed" do
+        post = Factory.create(:post)
+        post.unapprove!("bad")
+        post.remove!
+        removed_post = RemovedPost.last
+        assert_not_nil(removed_post.unapproval)
+        assert_equal("bad", removed_post.unapproval.reason)
+      end
+      
+      context "that has been reapproved" do
+        should "no longer be flagged or pending" do
+          post = Factory.create(:post)
+          post.unapprove!("bad")
+          post.approve!
+          assert(post.errors.empty?, post.errors.full_messages.join(", "))
+          post.reload
+          assert_equal(false, post.is_flagged?)
+          assert_equal(false, post.is_pending?)
+        end
+        
+        should "cannot be unapproved again" do
+          post = Factory.create(:post)
+          post.unapprove!("bad")
+          post.approve!
+          assert_raise(Unapproval::Error) {post.unapprove!("bad")}
+        end
+      end
     end
+  end
 
-    should "be merged with any changes that were made after loading the initial set of tags part 2" do
-      # This is the same as part 1, only the order of operations is reversed.
-      # The results should be the same.
+  context "Versioning:" do
+    context "Saving a post" do
+      should "create a new version" do
+        post = Factory.create(:post)
+        assert_equal(1, post.versions.size)
     
-      @user = Factory.create(:user)
-      @post = Factory.create(:post, :tag_string => "aaa bbb ccc")
-          
-      # user a removes <ccc> adds <eee>
-      @post_edited_by_user_a = Post.find(@post.id)
-      @post_edited_by_user_a.old_tag_string = "aaa bbb ccc"
-      @post_edited_by_user_a.tag_string = "aaa bbb eee"
-      @post_edited_by_user_a.updater_id = @user.id
-      @post_edited_by_user_a.updater_ip_addr = "127.0.0.1"
-      @post_edited_by_user_a.save
+        post.rating = "e"
+        post.save
+        assert_equal(2, post.versions.size)
+        assert_equal(CurrentUser.user.id, post.versions.last.updater_id)
+        assert_equal(CurrentUser.ip_addr, post.versions.last.updater_ip_addr)
+      
+        post.revert_to!(PostVersion.first)
+        assert_equal("tag1 tag2", post.tag_string)
+        assert_equal("q", post.rating)
+      end
+    end
     
-      # user b adds <ddd>
-      @post_edited_by_user_b = Post.find(@post.id)
-      @post_edited_by_user_b.old_tag_string = "aaa bbb ccc"
-      @post_edited_by_user_b.tag_string = "aaa bbb ccc ddd"
-      @post_edited_by_user_b.updater_id = @user.id
-      @post_edited_by_user_b.updater_ip_addr = "127.0.0.1"
-      @post_edited_by_user_b.save
-    
-      # final should be <aaa>, <bbb>, <ddd>, <eee>
-      @final_post = Post.find(@post.id)      
-      assert_equal(%w(aaa bbb ddd eee), Tag.scan_tags(@final_post.tag_string).sort)
+    context "Reverting a post" do
+      should "identify the person who reverted the post" do
+        post = Factory.create(:post)
+        reverter = Factory.create(:user)
+        post.rating = "e"
+        post.save
+        post.rating = "q"
+        post.save
+        
+        CurrentUser.user = Factory.create(:user)
+        post.revert_to!(PostVersion.first)
+        post.reload
+        assert_equal(CurrentUser.user.id, post.versions.last.updater_id)
+      end
+    end
+  end
+
+  context "Tagging:" do
+    context "A post" do
+      should "have an array representation of its tags" do
+        post = Factory.create(:post)
+        post.set_tag_string("aaa bbb")
+        assert_equal(%w(aaa bbb), post.tag_array)
+        assert_equal(%w(tag1 tag2), post.tag_array_was)
+      end
+      
+      context "that has been updated" do
+        should "reset its tag array cache" do
+          post = Factory.create(:post, :tag_string => "aaa bbb ccc")
+          user = Factory.create(:user)
+          assert_equal(%w(aaa bbb ccc), post.tag_array)
+          post.tag_string = "ddd eee fff"
+          post.tag_string = "ddd eee fff"
+          post.save
+          assert_equal("ddd eee fff", post.tag_string)
+          assert_equal(%w(ddd eee fff), post.tag_array)
+        end
+
+        should "create the actual tag records" do
+          assert_difference("Tag.count", 3) do
+            post = Factory.create(:post, :tag_string => "aaa bbb ccc")
+          end
+        end
+        
+        should "update the post counts of relevant tag records" do
+          post1 = Factory.create(:post, :tag_string => "aaa bbb ccc")
+          post2 = Factory.create(:post, :tag_string => "bbb ccc ddd")
+          post3 = Factory.create(:post, :tag_string => "ccc ddd eee")
+          assert_equal(1, Tag.find_by_name("aaa").post_count)
+          assert_equal(2, Tag.find_by_name("bbb").post_count)
+          assert_equal(3, Tag.find_by_name("ccc").post_count)
+          post3.tag_string = "xxx"
+          post3.save
+          assert_equal(1, Tag.find_by_name("aaa").post_count)
+          assert_equal(2, Tag.find_by_name("bbb").post_count)
+          assert_equal(2, Tag.find_by_name("ccc").post_count)      
+          assert_equal(1, Tag.find_by_name("ddd").post_count)      
+          assert_equal(0, Tag.find_by_name("eee").post_count)
+          assert_equal(1, Tag.find_by_name("xxx").post_count)
+        end
+        
+        should "update its tag counts" do
+          artist_tag = Factory.create(:artist_tag)
+          copyright_tag = Factory.create(:copyright_tag)
+          general_tag = Factory.create(:tag)
+          new_post = Factory.create(:post, :tag_string => "#{artist_tag.name} #{copyright_tag.name} #{general_tag.name}")
+          assert_equal(1, new_post.tag_count_artist)
+          assert_equal(1, new_post.tag_count_copyright)
+          assert_equal(1, new_post.tag_count_general)
+          assert_equal(0, new_post.tag_count_character)
+          assert_equal(3, new_post.tag_count)
+
+          new_post.tag_string = "babs"
+          new_post.save
+          assert_equal(0, new_post.tag_count_artist)
+          assert_equal(0, new_post.tag_count_copyright)
+          assert_equal(1, new_post.tag_count_general)
+          assert_equal(0, new_post.tag_count_character)
+          assert_equal(1, new_post.tag_count)
+        end
+        
+        should "merge any changes that were made after loading the initial set of tags part 1" do
+          post = Factory.create(:post, :tag_string => "aaa bbb ccc")
+
+          # user a adds <ddd>
+          post_edited_by_user_a = Post.find(post.id)
+          post_edited_by_user_a.old_tag_string = "aaa bbb ccc"
+          post_edited_by_user_a.tag_string = "aaa bbb ccc ddd"
+          post_edited_by_user_a.save
+
+          # user b removes <ccc> adds <eee>
+          post_edited_by_user_b = Post.find(post.id)
+          post_edited_by_user_b.old_tag_string = "aaa bbb ccc"
+          post_edited_by_user_b.tag_string = "aaa bbb eee"
+          post_edited_by_user_b.save
+
+          # final should be <aaa>, <bbb>, <ddd>, <eee>
+          final_post = Post.find(post.id)      
+          assert_equal(%w(aaa bbb ddd eee), Tag.scan_tags(final_post.tag_string).sort)
+        end
+        
+        should "merge any changes that were made after loading the initial set of tags part 2" do
+          # This is the same as part 1, only the order of operations is reversed.
+          # The results should be the same.
+
+          post = Factory.create(:post, :tag_string => "aaa bbb ccc")
+
+          # user a removes <ccc> adds <eee>
+          post_edited_by_user_a = Post.find(post.id)
+          post_edited_by_user_a.old_tag_string = "aaa bbb ccc"
+          post_edited_by_user_a.tag_string = "aaa bbb eee"
+          post_edited_by_user_a.save
+
+          # user b adds <ddd>
+          post_edited_by_user_b = Post.find(post.id)
+          post_edited_by_user_b.old_tag_string = "aaa bbb ccc"
+          post_edited_by_user_b.tag_string = "aaa bbb ccc ddd"
+          post_edited_by_user_b.save
+
+          # final should be <aaa>, <bbb>, <ddd>, <eee>
+          final_post = Post.find(post.id)      
+          assert_equal(%w(aaa bbb ddd eee), Tag.scan_tags(final_post.tag_string).sort)
+        end
+      end
+
+      context "that has been tagged with a metatag" do
+        should "not include the metatag in its tag string" do
+          post = Factory.create(:post)
+          post.tag_string = "aaa pool:1234 pool:test rating:s fav:bob"
+          post.save
+          assert_equal("aaa", post.tag_string)
+        end
+      end
     end
   end
   
-  context "Adding a meta-tag" do
-    setup do
-      @post = Factory.create(:post)
-    end
+  context "Favorites:" do
+    context "Adding a post to a user's favorites" do
+      should "update the fav strings ont he post" do
+        user = Factory.create(:user)
+        post = Factory.create(:post)
+        post.add_favorite(user)
+        post.reload
+        assert_equal("fav:#{user.id}", post.fav_string)
+        assert(Favorite.exists?(:user_id => user.id, :post_id => post.id))
 
-    should "be ignored" do
-      @user = Factory.create(:user)
-    
-      @post.updater_id = @user.id
-      @post.updater_ip_addr = "127.0.0.1"
-      @post.tag_string = "aaa pool:1234 pool:test rating:s fav:bob"
-      @post.save
-      assert_equal("aaa", @post.tag_string)
-    end
-  end
+        post.add_favorite(user)
+        post.reload
+        assert_equal("fav:#{user.id}", post.fav_string)
+        assert(Favorite.exists?(:user_id => user.id, :post_id => post.id))
 
-  context "Favoriting a post" do
-    should "update the favorite string" do
-      @user = Factory.create(:user)
-      @post = Factory.create(:post)
-      @post.add_favorite(@user)
-      assert_equal("fav:#{@user.name}", @post.fav_string)
-    
-      @post.remove_favorite(@user)
-      assert_equal("", @post.fav_string)
+        post.remove_favorite(user)
+        post.reload
+        assert_equal("", post.fav_string)
+        assert(!Favorite.exists?(:user_id => user.id, :post_id => post.id))
+      
+        post.remove_favorite(user)
+        post.reload
+        assert_equal("", post.fav_string)
+        assert(!Favorite.exists?(:user_id => user.id, :post_id => post.id))
+      end
     end
   end
   
-  context "Pooling a post" do
-    should "work" do
-      post = Factory.create(:post)
-      pool = Factory.create(:pool)
-      post.add_pool(pool)
-      assert_equal("pool:#{pool.name}", post.pool_string)
-      post.remove_pool(pool)
-      assert_equal("", post.pool_string)
+  context "Pools:" do
+    context "Adding a post to a pool" do
+      should "update the post's pool string" do
+        post = Factory.create(:post)
+        pool = Factory.create(:pool)
+        post.add_pool(pool)
+        post.reload
+        assert_equal("pool:#{pool.id}", post.pool_string)
+        post.add_pool(pool)
+        post.reload
+        assert_equal("pool:#{pool.id}", post.pool_string)
+        post.remove_pool(pool)
+        post.reload
+        assert_equal("", post.pool_string)
+        post.remove_pool(pool)
+        post.reload
+        assert_equal("", post.pool_string)
+      end
     end
   end
   
-  context "A post's uploader" do
-    should "be defined" do
-      post = Factory.create(:post)
-      user1 = Factory.create(:user)
-      user2 = Factory.create(:user)
-      user3 = Factory.create(:user)
-      
-      post.uploader = user1
-      assert_equal("uploader:#{user1.name}", post.uploader_string)
-      
-      post.uploader_id = user2.id
-      assert_equal("uploader:#{user2.name}", post.uploader_string)
-      assert_equal(user2.id, post.uploader_id)
-      assert_equal(user2.name, post.uploader_name)
+  context "Uploading:" do
+    context "Uploading a post" do
+      should "capture who uploaded the post" do
+        post = Factory.create(:post)
+        user1 = Factory.create(:user)
+        user2 = Factory.create(:user)
+        user3 = Factory.create(:user)
+
+        post.uploader = user1
+        assert_equal("uploader:#{user1.id}", post.uploader_string)
+
+        post.uploader_id = user2.id
+        assert_equal("uploader:#{user2.id}", post.uploader_string)
+        assert_equal(user2.id, post.uploader_id)
+        assert_equal(user2.name, post.uploader_name)
+      end
     end
   end
 
-  context "A tag search" do
+  context "Searching:" do
     should "return posts for 1 tag" do
       post1 = Factory.create(:post, :tag_string => "aaa")
       post2 = Factory.create(:post, :tag_string => "aaa bbb")
@@ -445,7 +504,6 @@ class PostTest < ActiveSupport::TestCase
       post3 = Factory.create(:post)
       user = Factory.create(:user)
       post1.add_favorite(user)
-      post1.save
       relation = Post.find_by_tags("fav:#{user.name}")
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
@@ -457,7 +515,6 @@ class PostTest < ActiveSupport::TestCase
       post3 = Factory.create(:post)
       pool = Factory.create(:pool)
       post1.add_pool(pool)
-      post1.save
       relation = Post.find_by_tags("pool:#{pool.name}")
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
@@ -468,7 +525,6 @@ class PostTest < ActiveSupport::TestCase
       post1 = Factory.create(:post, :uploader => user)
       post2 = Factory.create(:post)
       post3 = Factory.create(:post)
-      assert_equal("uploader:#{user.name}", post1.uploader_string)
       relation = Post.find_by_tags("uploader:#{user.name}")
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
@@ -482,25 +538,7 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
     end
-  
-    should "filter out deleted posts by default" do
-      post1 = Factory.create(:post, :is_deleted => true)
-      post2 = Factory.create(:post, :is_deleted => true)
-      post3 = Factory.create(:post, :is_deleted => false)
-      relation = Post.find_by_tags("")
-      assert_equal(1, relation.count)
-      assert_equal(post3.id, relation.first.id)
-    end
-  
-    should "return posts for a particular status" do
-      post1 = Factory.create(:post, :is_deleted => true)
-      post2 = Factory.create(:post, :is_deleted => false)
-      post3 = Factory.create(:post, :is_deleted => false)
-      relation = Post.find_by_tags("status:deleted")
-      assert_equal(1, relation.count)
-      assert_equal(post1.id, relation.first.id)
-    end
-  
+    
     should "return posts for a source search" do
       post1 = Factory.create(:post, :source => "abcd")
       post2 = Factory.create(:post, :source => "abcdefg")
@@ -543,7 +581,7 @@ class PostTest < ActiveSupport::TestCase
     end
   end
 
-  context "Voting on a post" do
+  context "Voting:" do
     should "not allow duplicate votes" do
       user = Factory.create(:user)
       post = Factory.create(:post)
@@ -552,6 +590,27 @@ class PostTest < ActiveSupport::TestCase
       post.reload
       assert_equal(1, PostVote.count)
       assert_equal(1, post.score)
+    end
+  end
+
+  context "Counting:" do
+    context "Creating a post" do
+      should "increment the post count" do
+        assert_equal(0, Post.fast_count(""))
+        post = Factory.create(:post, :tag_string => "aaa bbb")
+        assert_equal(1, Post.fast_count(""))
+        assert_equal(1, Post.fast_count("aaa"))
+        assert_equal(1, Post.fast_count("bbb"))
+        assert_equal(0, Post.fast_count("ccc"))
+      
+        post.tag_string = "ccc"
+        post.save
+      
+        assert_equal(1, Post.fast_count(""))
+        assert_equal(0, Post.fast_count("aaa"))
+        assert_equal(0, Post.fast_count("bbb"))
+        assert_equal(1, Post.fast_count("ccc"))
+      end
     end
   end
 end
