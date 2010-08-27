@@ -17,14 +17,14 @@ class PostsController < ApplicationController
   
   def update
     @post = Post.find(params[:id])
-    @post.update_attributes(params[:post].merge(:updater_id => @current_user.id, :updater_ip_addr => request.remote_ip))
+    @post.update_attributes(params[:post])
     respond_with(@post)
   end
   
   def revert
     @post = Post.find(params[:id])
     @version = PostVersion.find(params[:version_id])
-    @post.revert_to!(@version, @current_user.id, request.remote_ip)
+    @post.revert_to!(@version)
     respond_width(@post)
   end
 

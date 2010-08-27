@@ -1,11 +1,10 @@
 class TagAlias < ActiveRecord::Base
-  attr_accessor :updater_id, :updater_ip_addr
+  attr_accessor :creator_ip_addr
   after_save :update_posts
   after_destroy :clear_cache
-  validates_presence_of :updater_id, :updater_ip_addr
+  validates_presence_of :creator_id, :creator_ip_addr
   validates_uniqueness_of :antecedent_name
   validate :absence_of_transitive_relation
-  belongs_to :updater, :class_name => "User"
   belongs_to :creator, :class_name => "User"
   
   def self.to_aliased(names)
@@ -41,11 +40,12 @@ class TagAlias < ActiveRecord::Base
     Post.find_by_tags(antecedent_name).find_each do |post|
       escaped_antecedent_name = Regexp.escape(antecedent_name)
       fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_antecedent_name}(?:\Z| )/, " #{consequent_name} ").strip
-      post.update_attributes(
-        :tag_string => fixed_tags,
-        :updater_id => updater_id,
-        :updater_ip_addr => updater_ip_addr
-      )
+      
+      CurrentUser.scoped(creator, creator_ip_addr) do
+        post.update_attributes(
+          :tag_string => fixed_tags
+        )
+      end
     end
   end
 end

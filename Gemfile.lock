@@ -31,6 +31,9 @@ GEM
     arel (1.0.0.rc1)
       activesupport (>= 3.0.0.beta)
     builder (2.1.2)
+    daemons (1.1.0)
+    delayed_job (2.0.3)
+      daemons
     erubis (2.6.6)
       abstract (>= 1.0.0)
     factory_girl (1.3.1)
@@ -76,6 +79,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  delayed_job
   factory_girl
   faker
   imagesize

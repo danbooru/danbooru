@@ -7,7 +7,7 @@ class Download
     @source = source
     @file_path = file_path
   end
-
+  
   # Downloads to @file_path
   def download!
     http_get_streaming(@source) do |response|
@@ -18,8 +18,8 @@ class Download
     end
     @source = fix_image_board_sources(@source)
   end
-
-# private
+  
+  # private
   def handle_pixiv(source, headers)
     if source =~ /pixiv\.net/
       headers["Referer"] = "http://www.pixiv.net"
@@ -33,7 +33,7 @@ class Download
   
     source
   end
-
+  
   def http_get_streaming(source, options = {})
     max_size = options[:max_size] || Danbooru.config.max_file_size
     max_size = nil if max_size == 0 # unlimited
@@ -77,7 +77,7 @@ class Download
       end # http.start
     end # while
   end # def
-
+  
   def fix_image_board_sources(source)
     if source =~ /\/src\/\d{12,}|urnc\.yi\.org|yui\.cynthia\.bne\.jp/
       "Image board"

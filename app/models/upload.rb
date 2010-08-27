@@ -49,33 +49,28 @@ class Upload < ActiveRecord::Base
   
   module ConversionMethods
     def process!
-      CurrentUser.user = uploader
-      CurrentUser.ip_addr = uploader_ip_addr
-
-      update_attribute(:status, "processing")
-      if is_downloadable?
-        download_from_source(temp_file_path)
+      CurrentUser.scoped(uploader, uploader_ip_addr) do
+        update_attribute(:status, "processing")
+        if is_downloadable?
+          download_from_source(temp_file_path)
+        end
+        validate_file_exists
+        self.file_ext = content_type_to_file_ext(content_type)
+        validate_file_content_type
+        calculate_hash(file_path)
+        validate_md5_uniqueness
+        validate_md5_confirmation
+        calculate_file_size(file_path)
+        calculate_dimensions(file_path) if has_dimensions?
+        generate_resizes(file_path)
+        move_file
+        post = convert_to_post
+        if post.save
+          update_attributes(:status => "completed", :post_id => post.id)
+        else
+          update_attribute(:status, "error: " + post.errors.full_messages.join(", "))
+        end
       end
-      validate_file_exists
-      self.file_ext = content_type_to_file_ext(content_type)
-      validate_file_content_type
-      calculate_hash(file_path)
-      validate_md5_uniqueness
-      validate_md5_confirmation
-      calculate_file_size(file_path)
-      calculate_dimensions(file_path) if has_dimensions?
-      generate_resizes(file_path)
-      move_file
-      post = convert_to_post
-      if post.save
-        update_attributes(:status => "completed", :post_id => post.id)
-      else
-        update_attribute(:status, "error: " + post.errors.full_messages.join(", "))
-      end
-    rescue RuntimeError => x
-    ensure
-      CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
     end
 
     def convert_to_post
@@ -85,8 +80,6 @@ class Upload < ActiveRecord::Base
         p.file_ext = file_ext
         p.image_width = image_width
         p.image_height = image_height
-        p.uploader_id = uploader_id
-        p.uploader_ip_addr = uploader_ip_addr
         p.rating = rating
         p.source = source
         p.file_size = file_size

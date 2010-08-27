@@ -22,7 +22,8 @@ class User < ActiveRecord::Base
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
   has_one :ban
   belongs_to :inviter, :class_name => "User"
-  scope :named, lambda {|name| where(["lower(name) = ?", name])}  
+  scope :named, lambda {|name| where(["lower(name) = ?", name])}
+  scope :admins, where("is_admin = TRUE")
   
   module BanMethods
     def validate_ip_addr_is_not_banned

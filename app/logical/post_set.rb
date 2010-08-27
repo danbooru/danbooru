@@ -1,13 +1,12 @@
 class PostSet
   class Error < Exception ; end
   
-  attr_accessor :tags, :page, :current_user, :before_id, :errors, :count
+  attr_accessor :tags, :page, :before_id, :errors, :count
   attr_accessor :wiki_page, :artist, :posts, :suggestions
   
-  def initialize(tags, page, current_user, before_id = nil)
+  def initialize(tags, page, before_id = nil)
     @tags = Tag.normalize(tags)
     @page = page.to_i
-    @current_user = current_user
     @before_id = before_id
     @errors = []
     load_associations
@@ -60,16 +59,14 @@ class PostSet
   end
   
   def tag_array
-    @tag_arary ||= Tag.scan_query(tags)
+    @tag_array ||= Tag.scan_query(tags)
   end
   
   def validate
-    begin
-      validate_page
-      validate_query_count
-    rescue Error => x
-      @errors << x.to_s
-    end
+    validate_page
+    validate_query_count
+  rescue Error => x
+    @errors << x.to_s
   end
   
   def validate_page
@@ -79,7 +76,7 @@ class PostSet
   end
   
   def validate_query_count
-    if !current_user.is_privileged? && tag_array.size > 2
+    if !CurrentUser.user.is_privileged? && tag_array.size > 2
       raise Error.new("You can only search up to two tags at once with a basic account")
     end
     

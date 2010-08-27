@@ -4,7 +4,7 @@ class CreateTagAliases < ActiveRecord::Migration
       t.column :antecedent_name, :string, :null => false
       t.column :consequent_name, :string, :null => false
       t.column :creator_id, :integer, :null => false
-      t.column :request_ids, :string
+      t.column :forum_topic_id, :integer
       t.timestamps
     end
     

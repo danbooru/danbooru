@@ -1,13 +1,12 @@
 class TagImplication < ActiveRecord::Base
-  attr_accessor :updater_id, :updater_ip_addr
+  attr_accessor :creator_ip_addr
   before_save :clear_cache
   before_save :update_descendant_names
   after_save :update_descendant_names_for_parent
   after_destroy :clear_cache
   after_save :update_posts
   belongs_to :creator, :class_name => "User"
-  belongs_to :updater, :class_name => "User"
-  validates_presence_of :updater_id, :updater_ip_addr, :creator_id
+  validates_presence_of :creator_id, :creator_ip_addr
   validates_uniqueness_of :antecedent_name, :scope => :consequent_name
   validate :absence_of_circular_relation
   
@@ -30,15 +29,16 @@ class TagImplication < ActiveRecord::Base
   end
   
   def descendants
-    all = []
-    children = [consequent_name]
+    @descendants ||= begin
+      [].tap do |all|
+        children = [consequent_name]
     
-    until children.empty?
-      all += children
-      children = self.class.where(["antecedent_name IN (?)", children]).all.map(&:consequent_name)
+        until children.empty?
+          all += children
+          children = self.class.where(["antecedent_name IN (?)", children]).all.map(&:consequent_name)
+        end
+      end
     end
-    
-    all
   end
   
   def descendant_names_array
@@ -51,16 +51,14 @@ class TagImplication < ActiveRecord::Base
     self.descendant_names = descendants.join(" ")
   end
   
-  def update_descendant_names!(updater_id, updater_ip_addr)
+  def update_descendant_names!
     update_descendant_names
-    self.updater_id = updater_id
-    self.updater_ip_addr = updater_ip_addr
     save!
   end
   
   def update_descendant_names_for_parent
     if parent
-      parent.update_descendant_names!(updater_id, updater_ip_addr)
+      parent.update_descendant_names!
     end
   end
 
@@ -72,17 +70,22 @@ class TagImplication < ActiveRecord::Base
     Post.find_by_tags(antecedent_name).find_each do |post|
       escaped_antecedent_name = Regexp.escape(antecedent_name)
       fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_antecedent_name}(?:\Z| )/, " #{antecedent_name} #{descendant_names} ").strip
-      post.update_attributes(
-        :tag_string => fixed_tags,
-        :updater_id => updater_id,
-        :updater_ip_addr => updater_ip_addr
-      )
+      CurrentUser.scoped(creator, creator_ip_addr) do
+        post.update_attributes(
+          :tag_string => fixed_tags
+        )
+      end
     end
   end
   
   def reload(options = {})
     super
     clear_parent_cache
+    clear_descendants_cache
+  end
+  
+  def clear_descendants_cache
+    @descendants = nil
   end
   
   def clear_parent_cache

@@ -5,7 +5,7 @@ class CreateTagImplications < ActiveRecord::Migration
       t.column :consequent_name, :string, :null => false
       t.column :descendant_names, :text, :null => false
       t.column :creator_id, :integer, :null => false
-      t.column :request_ids, :string
+      t.column :forum_topic_id, :integer
       t.timestamps
     end
     
