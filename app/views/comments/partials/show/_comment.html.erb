@@ -10,7 +10,7 @@
     <footer>
       <menu>
         <li><span class="link">Quote</span></li>
-        <% if @current_user.is_janitor? || @current_user.id == comment.creator_id %>
+        <% if CurrentUser.user.is_janitor? || CurrentUser.user.id == comment.creator_id %>
           <li><%= link_to "Delete", comment_path(comment.id), :confirm => "Do you really want to delete this comment?", :method => :delete %></li>
         <% end %>
         <li><%= link_to "Vote up", comment_vote_path(comment.id, :is_positive => true), :method => :post %></li>

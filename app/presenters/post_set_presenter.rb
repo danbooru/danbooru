@@ -15,12 +15,30 @@ class PostSetPresenter < Presenter
     ""
   end
   
-  def wiki_html
-    ""
+  def wiki_html(template)
+    if post_set.is_single_tag?
+      wiki_page = WikiPage.find_by_title(post_set.tags)
+      html = '<section>'
+      if wiki_page.nil?
+        html << '<p>'
+        html << 'There is no wiki for this tag.'
+        html << ' '
+        html << template.link_to("Create a new page", template.new_wiki_page_path(:title => post_set.tags))
+        html << '.'
+        html << '</p>'
+      else
+        html << '<h2>'
+        html << template.h(wiki_page.title)
+        html << '</h2>'
+        html << template.format_text(wiki_page.body)
+      end
+      html << '</section>'
+      html.html_safe
+    end
   end
   
   def pagination_html(template)
-    if @post_set.use_sequential_paginator?
+    if post_set.use_sequential_paginator?
       sequential_pagination_html(template)
     else
       numbered_pagination_html(template)
@@ -30,9 +48,9 @@ class PostSetPresenter < Presenter
   def sequential_pagination_html(template)
     html = "<menu>"
     prev_url = template.request.env["HTTP_REFERER"]
-    next_url = template.posts_path(:tags => template.params[:tags], before_id => @post_set.posts[-1].id, :page => nil)
+    next_url = template.posts_path(:tags => template.params[:tags], before_id => post_set.posts[-1].id, :page => nil)
     html << %{<li><a href="#{prev_url}">&laquo; Previous</a></li>}
-    if @post_set.posts.any?
+    if post_set.posts.any?
       html << %{<li><a href="#{next_url}">Next &raquo;</a></li>}
     end
     html << "</menu>"
@@ -40,8 +58,8 @@ class PostSetPresenter < Presenter
   end
   
   def numbered_pagination_html(template)
-    total_pages = (@post_set.count.to_f / @post_set.limit.to_f).ceil
-    current_page = [1, @post_set.page].max
+    total_pages = (post_set.count.to_f / post_set.limit.to_f).ceil
+    current_page = [1, post_set.page].max
     html = "<menu>"
     window = 3
     if total_pages <= (window * 2) + 5
@@ -94,7 +112,7 @@ class PostSetPresenter < Presenter
       flags = []
       flags << "pending" if post.is_pending?
       flags << "flagged" if post.is_flagged?
-      flags << "deleted" if post.is_deleted?
+      flags << "removed" if post.is_removed?
       
       html << %{<article id="post_#{post.id}" data-id="#{post.id}" data-tags="#{h(post.tag_string)}" data-uploader="#{h(post.uploader_name)}" data-rating="#{post.rating}" data-width="#{post.image_width}" data-height="#{post.image_height}" data-flags="#{flags.join(' ')}">}
       html << %{<a href="/posts/#{post.id}">}

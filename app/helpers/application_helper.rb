@@ -12,6 +12,16 @@ module ApplicationHelper
   def format_text(text, options = {})
     DText.parse(text)
   end
+
+  def error_messages_for(instance_name)
+    instance = instance_variable_get("@#{instance_name}")
+    
+    if instance.errors.any?
+      %{<div class="error-messages"><h1>There were errors</h1><p>#{instance.__send__(:errors).full_messages.join(", ")}</div>}.html_safe
+    else
+      ""
+    end
+  end
   
 protected
   def nav_link_match(controller, url)

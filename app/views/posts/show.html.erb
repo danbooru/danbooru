@@ -6,7 +6,7 @@
   
   <section>
     <h1>Tags</h1>
-    <%= @post.presenter.tag_list_html(self, @current_user) %>
+    <%= @post.presenter.tag_list_html(self) %>
   </section>
   
   <section>
@@ -25,7 +25,7 @@
   
   <section>
     <h2>Image</h2>
-    <%= @post.presenter.image_html(self, @current_user) %>
+    <%= @post.presenter.image_html(self) %>
   </section>
   
   <section>
@@ -54,4 +54,4 @@
   <meta name="pools" content="<%= @post.pool_string %>">
 <% end %>
 
-<%= render :partial => "posts/common_secondary_nav_links" %>
+<%= render :partial => "posts/partials/common/secondary_links" %>

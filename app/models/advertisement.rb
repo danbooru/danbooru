@@ -1,6 +1,16 @@
 class Advertisement < ActiveRecord::Base
   validates_inclusion_of :ad_type, :in => %w(horizontal vertical)
   has_many :hits, :class_name => "AdvertisementHit"
+  after_create :copy_to_servers
+  after_destroy :delete_from_servers
+
+  def copy_to_servers
+    RemoteServer.copy_to_all(image_path, image_path)
+  end
+  
+  def delete_from_servers
+    RemoteServer.delete_from_all(image_path)
+  end
 
   def hit!(ip_addr)
     hits.create(:ip_addr => ip_addr)
@@ -10,23 +20,21 @@ class Advertisement < ActiveRecord::Base
     hits.where(["created_at BETWEEN ? AND ?", start_date, end_date]).count
   end
   
-  def date_path
-    created_at.strftime("%Y%m%d")
+  def unique_identifier
+    @unique_identifier ||= ("%.0f" % (Time.now.to_f * 1_000))
   end
   
   def image_url
-    "/images/ads-#{date_path}/#{file_name}"
+    "/images/advertisements/#{file_name}"
   end
 
   def image_path
-    "#{Rails.root}/public/#{image_url}"
+    "#{Rails.root}/public/images/advertisements/#{file_name}"
   end
   
   def file=(f)
     if f.size > 0
-      self.created_at ||= Time.now
-      self.file_name = f.original_filename
-      FileUtils.mkdir_p(File.dirname(image_path))
+      self.file_name = unique_identifier + File.extname(f.original_filename)
 
       if f.local_path
         FileUtils.cp(f.local_path, image_path)
@@ -35,7 +43,6 @@ class Advertisement < ActiveRecord::Base
       end
 
       File.chmod(0644, image_path)
-    
       image_size = ImageSize.new(File.open(image_path, "rb"))
       self.width = image_size.get_width
       self.height = image_size.get_height
@@ -43,23 +50,23 @@ class Advertisement < ActiveRecord::Base
   end
   
   def preview_width
-    if width > 200 || height > 200
+    if width > 100 || height > 100
       if width < height
-        ratio = 200.0 / height
+        ratio = 100.0 / height
         return (width * ratio).to_i
       else
-        return 200
+        return 100
       end
     end      
   end
   
   def preview_height
-    if width > 200 || height > 200
+    if width > 100 || height > 100
       if height < width
-        ratio = 200.0 / width
+        ratio = 100.0 / width
         return (height * ratio)
       else
-        return 200
+        return 100
       end
     end      
   end

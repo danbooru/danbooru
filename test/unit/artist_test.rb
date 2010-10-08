@@ -3,7 +3,33 @@ require_relative '../test_helper'
 class ArtistTest < ActiveSupport::TestCase
   context "An artist" do
     setup do
+      user = Factory.create(:user)
+      CurrentUser.user = user
+      CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
+    end
+
+    teardown do
+      CurrentUser.user = nil
+      CurrentUser.ip_addr = nil
+    end
+    
+    should "create a new wiki page to store any note information" do
+      artist = nil
+      assert_difference("WikiPage.count") do
+        artist = Factory.create(:artist, :name => "aaa", :notes => "testing")
+      end
+      assert_equal("testing", artist.notes)
+      assert_equal("testing", artist.wiki_page.body)
+      assert_equal(artist.name, artist.wiki_page.title)
+    end
+    
+    should "update the wiki page when notes are assigned" do
+      artist = Factory.create(:artist, :name => "aaa", :notes => "testing")
+      artist.update_attribute(:notes, "kokoko")
+      artist.reload
+      assert_equal("kokoko", artist.notes)
+      assert_equal("kokoko", artist.wiki_page.body)
     end
     
     should "normalize its name" do
@@ -27,8 +53,6 @@ class ArtistTest < ActiveSupport::TestCase
     
     should "make sure old urls are deleted" do
       artist = Factory.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/test.jpg")
-      artist.updater_id = artist.creator_id
-      artist.updater_ip_addr = "127.0.0.1"
       artist.url_string = "http://not.rembrandt.com/test.jpg"
       artist.save
       artist.reload
@@ -79,11 +103,11 @@ class ArtistTest < ActiveSupport::TestCase
     
     should "have an associated wiki" do
       user = Factory.create(:user)
-      artist = Factory.create(:artist, :name => "max", :wiki_page_attributes => {:body => "this is max", :updater_id => user.id, :updater_ip_addr => "127.0.0.1"})
+      artist = Factory.create(:artist, :name => "max", :wiki_page_attributes => {:body => "this is max"})
       assert_not_nil(artist.wiki_page)
       assert_equal("this is max", artist.wiki_page.body)
     
-      artist.update_attributes(:wiki_page_attributes => {:id => artist.wiki_page.id, :body => "this is hoge mark ii", :creator_id => user.id, :updater_id => user.id, :updater_ip_addr => "127.0.0.1"})
+      artist.update_attributes(:wiki_page_attributes => {:id => artist.wiki_page.id, :body => "this is hoge mark ii", :creator_id => user.id})
       assert_equal("this is hoge mark ii", artist.wiki_page(true).body)
     end
     
@@ -96,15 +120,13 @@ class ArtistTest < ActiveSupport::TestCase
       end
       
       assert_difference("ArtistVersion.count") do
-        artist.updater_id = user.id
-        artist.updater_ip_addr = "127.0.0.1"
         artist.other_names = "xxx"
         artist.save
       end
       
       first_version = ArtistVersion.first
       assert_equal("yyy", first_version.other_names)
-      artist.revert_to!(first_version, reverter.id, "127.0.0.1")
+      artist.revert_to!(first_version)
       artist.reload
       assert_equal("yyy", artist.other_names)
     end

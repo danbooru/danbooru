@@ -1,0 +1,227 @@
+.blacklisted {
+  display: none !important; }
+
+body, div, h1, h2, h3, h4, h5, h6, p, ul, li, dd, dt {
+  font-family: verdana, sans-serif;
+  font-size: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: baseline; }
+
+h1, h2, h3, h4 {
+  font-family: Tahoma;
+  line-height: 1em; }
+
+body {
+  font-size: 80%;
+  padding: 1em 2em;
+  margin: 0; }
+
+article, section {
+  display: block; }
+
+a:link {
+  color: #006ffa;
+  text-decoration: none; }
+
+a:visited {
+  color: #006ffa;
+  text-decoration: none; }
+
+a:hover {
+  color: #9093ff;
+  text-decoration: none; }
+
+a:active {
+  color: #006ffa;
+  text-decoration: none; }
+
+addr {
+  display: block;
+  margin-left: 2em;
+  font-weight: bold; }
+
+blockquote {
+  margin: 0 0 1em 0;
+  padding: 1em;
+  border: 1px solid #666;
+  background: #EEE; }
+
+code {
+  font-family: monospace;
+  font-size: 1.2em; }
+
+dd {
+  margin-bottom: 1em; }
+
+dt {
+  font-weight: bold; }
+
+h1 {
+  font-size: 2em; }
+
+h2 {
+  font-size: 1.8em; }
+
+h3 {
+  font-size: 1.6em; }
+
+h4 {
+  font-size: 1.4em; }
+
+h5 {
+  font-size: 1.2em; }
+
+h6 {
+  font-size: 1em; }
+
+header {
+  margin: 0 0 1em 0;
+  padding: 0;
+  display: block; }
+
+img {
+  border: none;
+  vertical-align: middle; }
+
+input[type=text], input[type=password], textarea, button {
+  border: 1px solid #AAA;
+  font-size: 1em;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px; }
+
+input[type=submit] {
+  padding: 1px 4px;
+  border: 1px solid #AAA;
+  background-color: #EEE;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  font-size: 1em;
+  cursor: pointer; }
+
+input[type=submit]:hover {
+  background-color: #F6F6F6; }
+
+menu {
+  margin: 0;
+  padding: 0; }
+  menu ul {
+    margin: 0;
+    padding: 0; }
+  menu li {
+    margin: 0 1em 0 0;
+    padding: 0;
+    list-style-type: none;
+    display: inline; }
+
+section {
+  display: block; }
+
+span.link {
+  color: #006ffa;
+  cursor: pointer; }
+
+table tfoot {
+  margin-top: 2em; }
+
+div#content > aside {
+  width: 25%;
+  float: left; }
+
+div#content > aside > section {
+  margin-bottom: 2em; }
+
+div#content > section {
+  width: 75%;
+  float: left; }
+
+div.clearfix {
+  clear: both; }
+
+/*** Header ***/
+body > header > h1 {
+  font-size: 3em;
+  font-family: Tahoma, Helvetica, sans-serif; }
+
+/*** Sidebar ***/
+aside.sidebar > section > h1 {
+  font-size: 1.5em; }
+
+aside.sidebar > section > ul li {
+  list-style-type: none; }
+
+aside.sidebar > section > ul ul li {
+  margin-left: 1em; }
+
+/*** Comments ***/
+div.comment-response > div {
+  margin-top: 1em; }
+
+div.comment-list > article {
+  margin-bottom: 1em;
+  display: block; }
+
+div.comment-list > article > header {
+  float: left;
+  width: 15em; }
+
+div.comment-list > article > div {
+  float: left;
+  width: 40em; }
+
+/*** Sessions ***/
+div#sessions div#new section {
+  width: 30em;
+  float: left; }
+div#sessions div#new aside {
+  width: 20em;
+  float: left; }
+  div#sessions div#new aside li {
+    display: list-item;
+    margin-bottom: 0.5em;
+    list-style-type: square;
+    margin-left: 1em; }
+div#sessions div#new h2 {
+  margin-bottom: 5px; }
+
+/*** Artists ***/
+div#artists span.new-artist {
+  font-weight: bold;
+  color: #A00; }
+div#artists div#show {
+  max-width: 60em; }
+  div#artists div#show h1 {
+    font-size: 1.5em;
+    margin-bottom: 5px; }
+  div#artists div#show p.legend {
+    margin-bottom: 2em;
+    font-size: 0.8em;
+    font-style: italic; }
+
+/*** Users ***/
+div#users div#new {
+  max-width: 60em; }
+  div#users div#new h1 {
+    margin-bottom: 0.5em; }
+  div#users div#new p {
+    margin-bottom: 1em; }
+  div#users div#new li {
+    margin-left: 1em; }
+  div#users div#new div#account-comparison h1 {
+    font-size: 1.4em;
+    margin-bottom: 3px; }
+  div#users div#new div#account-comparison li {
+    font-size: 0.9em;
+    line-height: 1.5em; }
+  div#users div#new div#account-comparison section {
+    width: 18em;
+    float: left;
+    padding: 1em; }
+  div#users div#new footer.nav-links {
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+    display: block; }
+  div#users div#new div#p2 ul {
+    margin-bottom: 2em; }

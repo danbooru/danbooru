@@ -1,9 +1,15 @@
 Danbooru::Application.routes.draw do
   namespace :admin do
     resources :users
+    resources :posts do
+      collection do
+        get :mass_edit
+        put :mass_update
+      end
+    end
   end
-
   resources :advertisements
+  resources :advertisement_hits
   resources :artists do
     member do
       put :revert
@@ -38,7 +44,11 @@ Danbooru::Application.routes.draw do
   resources :reports
   resources :sessions
   resources :tags
-  resources :tag_aliases
+  resources :tag_aliases do
+    member do
+      delete :cache
+    end
+  end
   resources :tag_implications
   resources :tag_subscriptions
   resources :unapprovals
@@ -47,6 +57,7 @@ Danbooru::Application.routes.draw do
   resources :user_feedback
   resources :wiki_pages do
     member do
+      get :show, :id => /.+/
       put :revert
     end
   end

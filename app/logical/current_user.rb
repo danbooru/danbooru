@@ -5,7 +5,7 @@ class CurrentUser
     
     self.user = user
     self.ip_addr = ip_addr
-  
+    
     begin
       yield
     ensure
@@ -13,7 +13,7 @@ class CurrentUser
       self.ip_addr = old_ip_addr
     end
   end
-  
+
   def self.user=(user)
     Thread.current[:current_user] = user
   end

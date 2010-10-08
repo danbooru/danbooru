@@ -8,6 +8,7 @@ class Post < ActiveRecord::Base
   before_save :create_tags
   before_save :update_tag_post_counts
   before_save :set_tag_counts
+  before_validation_on_create :initialize_uploader
   belongs_to :updater, :class_name => "User"
   belongs_to :approver, :class_name => "User"
   belongs_to :parent, :class_name => "Post"
@@ -23,6 +24,7 @@ class Post < ActiveRecord::Base
   validates_presence_of :parent, :if => lambda {|rec| !rec.parent_id.nil?}
   validate :validate_parent_does_not_have_a_parent
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at
+  scope :visible, lambda {|user| Danbooru.config.can_user_see_post_conditions(user)}
   
   module FileMethods
     def delete_files
@@ -337,6 +339,10 @@ class Post < ActiveRecord::Base
     def filter_metatags(tags)
       tags.reject {|tag| tag =~ /\A(?:pool|rating|fav|approver|uploader):/}
     end
+    
+    def has_tag?(tag)
+      tag_string =~ /(?:^| )#{tag}(?:$| )/
+    end
   end
   
   module FavoriteMethods
@@ -581,6 +587,11 @@ class Post < ActiveRecord::Base
   end
   
   module UploaderMethods
+    def initialize_uploader
+      self.uploader = CurrentUser.user
+      self.uploader_ip_addr = CurrentUser.ip_addr
+    end
+    
     def uploader_id=(user_id)
       self.uploader = User.find(user_id)
     end
@@ -757,6 +768,10 @@ class Post < ActiveRecord::Base
         update_parent_on_destroy
         tag_array.each {|x| expire_cache(x)}
       end
+    end
+    
+    def is_removed?
+      false
     end
   end
   

@@ -1,13 +1,11 @@
 class WikiPage < ActiveRecord::Base
-  attr_accessor :updater_id, :updater_ip_addr
   before_save :normalize_title
   before_create :initialize_creator
   after_save :create_version
   belongs_to :creator, :class_name => "User"
-  belongs_to :updater, :class_name => "User"
   validates_uniqueness_of :title, :case_sensitive => false
-  validates_presence_of :body, :updater_id, :updater_ip_addr
-  attr_accessible :title, :body, :updater_id, :updater_ip_addr
+  validates_presence_of :body
+  attr_accessible :title, :body
   scope :titled, lambda {|title| where(["title = ?", title.downcase.tr(" ", "_")])}
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, :foreign_key => "name", :primary_key => "title"
@@ -27,12 +25,14 @@ class WikiPage < ActiveRecord::Base
     relation
   end
   
+  def self.find_title_and_id(title)
+    titled(title).select("title, id").first
+  end
+  
   def revert_to(version, reverter_id, reverter_ip_addr)
     self.title = version.title
     self.body = version.body
     self.is_locked = version.is_locked
-    self.updater_id = reverter_id
-    self.updater_ip_addr = reverter_ip_addr
   end
   
   def revert_to!(version, reverter_id, reverter_ip_addr)
@@ -55,8 +55,8 @@ class WikiPage < ActiveRecord::Base
   def create_version
     if title_changed? || body_changed? || is_locked_changed?
       versions.create(
-        :updater_id => updater_id,
-        :updater_ip_addr => updater_ip_addr,
+        :updater_id => CurrentUser.user.id,
+        :updater_ip_addr => CurrentUser.ip_addr,
         :title => title,
         :body => body,
         :is_locked => is_locked
@@ -65,8 +65,6 @@ class WikiPage < ActiveRecord::Base
   end
   
   def initialize_creator
-    if creator.nil?
-      self.creator_id = updater_id
-    end
+    self.creator_id = CurrentUser.user.id
   end
 end

@@ -20,6 +20,10 @@ class RemovedPost < ActiveRecord::Base
     end
     count
   end
+
+  def is_removed?
+    true
+  end
   
   include Post::FileMethods
   include Post::ImageMethods

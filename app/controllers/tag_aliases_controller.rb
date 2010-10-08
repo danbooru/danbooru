@@ -16,4 +16,7 @@ class TagAliasesController < ApplicationController
   
   def destroy
   end
+  
+  def destroy_cache
+  end
 end

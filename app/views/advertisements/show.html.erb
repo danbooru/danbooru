@@ -1,0 +1,7 @@
+<div><%= image_tag(@advertisement.image_url, :width => @advertisement.preview_width, :height => @advertisement.preview_height) %></div>
+
+<ul>
+  <li>Hits: <%= @advertisement.hits.between(@start_date, @end_date).count %></li>
+</ul>
+
+<%= render :partial => "secondary_nav_links" %>

@@ -1,3 +1,157 @@
+Cookie = {
+  put: function(name, value, days) {
+    if (days == null) {
+      days = 365;
+    }
+
+    var date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    var expires = "; expires=" + date.toGMTString();
+    document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/";
+  },
+
+  raw_get: function(name) {
+    var nameEq = name + "=";
+    var ca = document.cookie.split(";");
+
+    for (var i = 0; i < ca.length; ++i) {
+      var c = ca[i];
+
+      while (c.charAt(0) == " ") {
+        c = c.substring(1, c.length);
+      }
+
+      if (c.indexOf(nameEq) == 0) {
+        return c.substring(nameEq.length, c.length);
+      }
+    }
+
+    return "";
+  },
+  
+  get: function(name) {
+    return this.unescape(this.raw_get(name));
+  },
+  
+  remove: function(name) {
+    Cookie.put(name, "", -1);
+  },
+
+  unescape: function(val) {
+    return decodeURIComponent(val.replace(/\+/g, " "));
+  },
+
+  setup: function() {
+    if (location.href.match(/^\/(comment|pool|note|post)/) && this.get("tos") != "1") {
+      // Setting location.pathname in Safari doesn't work, so manually extract the domain.
+      var domain = location.href.match(/^(http:\/\/[^\/]+)/)[0];
+      location.href = domain + "/static/terms_of_service?url=" + location.href;
+      return;
+    }
+    
+		if (this.get("hide-upgrade-account") != "1") {
+      if ($("upgrade-account")) {
+   	    $("upgrade-account").show();
+      }
+		}
+  }
+}
+// Cookie.setup();
+
+$(document).ready(function() {
+	// $("#hide-upgrade-account-link").click(function() {
+	// 	$("#upgrade-account").hide();
+	// 	Cookie.put('hide-upgrade-account', '1', 7);
+	// });
+	
+	// Comment listing
+	$(".comment-section form").hide();
+	$(".comment-section input.expand-comment-response").click(function() {
+		var post_id = $(this).closest(".comment-section").attr("data-post-id");
+		$(".comment-section[data-post-id=" + post_id + "] form").show();
+		$(this).hide();
+	})
+
+  // Image resize sidebar
+  $("#resize-links").hide();
+
+  $("#resize-links a").click(function(e) {
+    var image = $("#image");
+    var target = $(e.target);
+    image.attr("src", target.attr("data-src"));
+    image.attr("width", target.attr("data-width"));
+    image.attr("height", target.attr("data-height"));
+    e.preventDefault();
+  }); 
+	
+	$("#resize-link a").click(function(e) {
+	  $("#resize-links").toggle();
+	  e.preventDefault();
+	});
+});
+
+
+var Danbooru = {};
+
+// ContextMenu
+
+Danbooru.ContextMenu = {};
+
+Danbooru.ContextMenu.add_icon = function() {
+  $("menu[type=context] > li").append('<img src="/images/arrow2_s.png">');        
+}
+
+Danbooru.ContextMenu.toggle_icon = function(li) {
+  if (li == null) {
+    $("menu[type=context] > li > img").attr("src", "/images/arrow2_s.png");
+  } else {
+    $(li).find("img").attr("src", function() {
+      if (this.src.match(/_n/)) {
+        return "/images/arrow2_s.png";              
+      } else {
+        return "/images/arrow2_n.png";
+      }
+    });
+  }
+}
+
+Danbooru.ContextMenu.setup = function() {
+  $("menu[type=context] li").hover(
+    function() {$(this).css({"background-color": "#F6F6F6"})},
+    function() {$(this).css({"background-color": "#EEE"})}
+  );
+  
+  this.add_icon();
+  
+  $("menu[type=context] > li").click(function(e) {
+    $(this).parent().find("ul").toggle();
+    e.stopPropagation();
+    Danbooru.ContextMenu.toggle_icon(this);
+  });
+  
+  $(document).click(function() {
+    $("menu[type=context] > ul").hide();
+    Danbooru.ContextMenu.toggle_icon();
+  });
+  
+  $("menu[type=context] > ul > li").click(function(element) {
+    $(this).closest("ul").toggle();
+    var text = $(this).text()
+    var menu = $(this).closest("menu");
+    menu.children("li").text(text);
+    if (menu.attr("data-update-field-id")) {
+      $("#" + menu.attr("data-update-field-id")).val(text);
+      Danbooru.ContextMenu.add_icon();
+    }
+    if (menu.attr("data-submit-on-change") == "true") {
+      menu.closest("form").submit();
+    }
+  });
+}
+
+$(document).ready(function() {
+  Danbooru.ContextMenu.setup();
+});
 PostModeMenu = {
   init: function() {
     this.original_background_color = $(document.body).css("background-color")

@@ -1,61 +1,3 @@
-Cookie = {
-  put: function(name, value, days) {
-    if (days == null) {
-      days = 365;
-    }
-
-    var date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-    var expires = "; expires=" + date.toGMTString();
-    document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/";
-  },
-
-  raw_get: function(name) {
-    var nameEq = name + "=";
-    var ca = document.cookie.split(";");
-
-    for (var i = 0; i < ca.length; ++i) {
-      var c = ca[i];
-
-      while (c.charAt(0) == " ") {
-        c = c.substring(1, c.length);
-      }
-
-      if (c.indexOf(nameEq) == 0) {
-        return c.substring(nameEq.length, c.length);
-      }
-    }
-
-    return "";
-  },
-  
-  get: function(name) {
-    return this.unescape(this.raw_get(name));
-  },
-  
-  remove: function(name) {
-    Cookie.put(name, "", -1);
-  },
-
-  unescape: function(val) {
-    return decodeURIComponent(val.replace(/\+/g, " "));
-  },
-
-  setup: function() {
-    if (location.href.match(/^\/(comment|pool|note|post)/) && this.get("tos") != "1") {
-      // Setting location.pathname in Safari doesn't work, so manually extract the domain.
-      var domain = location.href.match(/^(http:\/\/[^\/]+)/)[0];
-      location.href = domain + "/static/terms_of_service?url=" + location.href;
-      return;
-    }
-    
-		if (this.get("hide-upgrade-account") != "1") {
-      if ($("upgrade-account")) {
-   	    $("upgrade-account").show();
-      }
-		}
-  }
-}
 PostModeMenu = {
   init: function() {
     this.original_background_color = $(document.body).css("background-color")
@@ -67,7 +9,7 @@ PostModeMenu = {
       $("#mode-box select").val(Cookie.get("mode"));
     }
   
-    this.change();
+    // this.change();
   },
 
   change: function() {
@@ -159,7 +101,7 @@ PostModeMenu = {
       TagScript.run(post_id, tag_script);
     }
 
-    return false
+    return false;
   }
 }
 
@@ -175,13 +117,13 @@ TagScript = {
     split_pred.each(function(x) {
       if (x[0] == "-") {
         if (tags.include(x.substr(1, 100))) {
-          is_true = false
-          throw $break
+          is_true = false;
+          throw $break;
         }
       } else {
         if (!tags.include(x)) {
-          is_true = false
-          throw $break
+          is_true = false;
+          throw $break;
         }
       }
     })
@@ -193,34 +135,34 @@ TagScript = {
     if (command.match(/^\[if/)) {
       var match = command.match(/\[if\s+(.+?)\s*,\s*(.+?)\]/)
       if (TagScript.test(tags, match[1])) {
-        return TagScript.process(tags, match[2])
+        return TagScript.process(tags, match[2]);
       } else {
-        return tags
+        return tags;
       }
     } else if (command == "[reset]") {
-      return []
+      return [];
     } else if (command[0] == "-") {
       return tags.reject(function(x) {return x == command.substr(1, 100)})
     } else {
       tags.push(command)
-      return tags
+      return tags;
     }
   },
 
   run: function(post_id, tag_script) {
-    var commands = TagScript.parse(tag_script)
-    var post = Post.posts.get(post_id)
-    var old_tags = post.tags.join(" ")
+    var commands = TagScript.parse(tag_script);
+    var post = Post.posts.get(post_id);
+    var old_tags = post.tags.join(" ");
 
     commands.each(function(x) {
-      post.tags = TagScript.process(post.tags, x)
+      post.tags = TagScript.process(post.tags, x);
     })
 
-    Post.update(post_id, {"post[old_tags]": old_tags, "post[tags]": post.tags.join(" ")})
+    Post.update(post_id, {"post[old_tags]": old_tags, "post[tags]": post.tags.join(" ")});
   }
 }
 
 $(document).ready(function() {
-	$("#mode-box select").click(PostModeMenu.change)
+	$("#mode-box select").click(PostModeMenu.change);
 	PostModeMenu.init();
 });

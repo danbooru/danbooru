@@ -8,3 +8,4 @@ log/*.log
 tmp/**/*
 public/data
 vendor/cache/*.gem
+.sass-cache

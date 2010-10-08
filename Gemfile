@@ -1,4 +1,3 @@
-# Edit this Gemfile to bundle your application's dependencies.
 source 'http://gemcutter.org'
 
 group :test do
@@ -8,8 +7,13 @@ group :test do
   gem "faker"
 end
 
-gem "rails", "3.0.0.rc2"
+gem "rails", "3.0.0"
 gem "pg"
 gem "memcache-client", :require => "memcache"
 gem "imagesize", :require => "image_size"
 gem "delayed_job"
+gem "super_exception_notifier"
+gem "haml"
+gem "simple_form"
+
+gem "will_paginate", :git => "http://github.com/mislav/will_paginate.git", :branch => "rails3"

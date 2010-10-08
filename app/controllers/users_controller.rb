@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   respond_to :html, :xml, :json
-  before_filter :member_only, :only => [:edit, :show, :update, :destroy, :create]
+  before_filter :member_only, :only => [:edit, :show, :update, :destroy]
 
   def new
     @user = User.new
@@ -8,8 +8,8 @@ class UsersController < ApplicationController
   
   def edit
     @user = User.find(params[:id])
-    unless @current_user.is_admin?
-      @user = @current_user
+    unless CurrentUser.user.is_admin?
+      @user = CurrentUser.user
     end
   end
   
@@ -23,10 +23,13 @@ class UsersController < ApplicationController
   def create
     @user = User.new(params[:user].merge(:ip_addr => request.remote_ip))
     if @user.save
-      flash[:notice] = "You have succesfully created a new account."
+      flash[:notice] = "You have succesfully created a new account"
       session[:user_id] = @user.id
+      redirect_to user_path(@user)
+    else
+      flash[:notice] = "There were errors"
+      render :action => "new"
     end
-    respond_with(@user)
   end
   
   def update

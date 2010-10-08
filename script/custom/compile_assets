@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+script/custom/compile_javascripts
+script/custom/compile_stylesheets

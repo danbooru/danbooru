@@ -1,0 +1,6 @@
+<div id="search-form" style="margin-bottom: 1em;">
+  <% form_tag(artists_path, :method => :get) do %>
+    <%= text_field_tag "name", params[:name], :size => 40 %>
+    <%= submit_tag "Search" %>
+  <% end %>
+</div>

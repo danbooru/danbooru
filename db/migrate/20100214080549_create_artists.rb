@@ -4,6 +4,7 @@ class CreateArtists < ActiveRecord::Migration
       t.column :name, :string, :null => false
       t.column :creator_id, :integer, :null => false
       t.column :is_active, :boolean, :null => false, :default => true
+      t.column :is_banned, :boolean, :null => false, :default => false
       t.column :other_names, :text
       t.column :other_names_index, "tsvector"
       t.column :group_name, :string

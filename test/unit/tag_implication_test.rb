@@ -36,9 +36,7 @@ class TagImplicationTest < ActiveSupport::TestCase
       assert_equal(["bbb"], ti1.descendant_names_array)
       assert_equal(["bbb"], MEMCACHE.get("ti:aaa"))
       ti1.update_attributes(
-        :consequent_name => "ccc",
-        :updater_id => @user.id,
-        :updater_ip_addr => "127.0.0.1"
+        :consequent_name => "ccc"
       )
       assert_nil(MEMCACHE.get("ti:aaa"))
     end
@@ -71,9 +69,7 @@ class TagImplicationTest < ActiveSupport::TestCase
       ti1 = Factory.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       ti2 = Factory.create(:tag_implication, :antecedent_name => "ccc", :consequent_name => "ddd")
       ti2.update_attributes(
-        :antecedent_name => "bbb",
-        :updater_id => @user.id,
-        :updater_ip_addr => "127.0.0.1"
+        :antecedent_name => "bbb"
       )
       ti1.reload
       ti2.reload

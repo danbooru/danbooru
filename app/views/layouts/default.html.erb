@@ -1,19 +1,19 @@
 <!doctype html>
 <html>
 <head>
-  <title><%= yield(:page_title) %></title>
+  <title><%= @page_title %></title>
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
   <link rel="top" title="<%= Danbooru.config.app_name %>" href="/">
   <%= csrf_meta_tag %>
-  <% unless @current_user.blacklisted_tags.blank? %>
-    <meta name="blacklisted-tags" content="<%= h @current_user.blacklisted_tags %>">
+  <% unless CurrentUser.user.blacklisted_tags.blank? %>
+    <meta name="blacklisted-tags" content="<%= CurrentUser.user.blacklisted_tags %>">
+  <% end %>
+  <% if flash[:notice] =~ /error/ %>
+    <meta name="errors" content="true">
   <% end %>
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
-  <%= stylesheet_link_tag "default" %>
-  <%#= javascript_include_tag "http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" %>
-  <%= javascript_include_tag "jquery.min.js" %>
-  <%= javascript_include_tag "rails" %>
-  <%= javascript_include_tag "application" %>
+  <%= stylesheet_link_tag "compiled/default" %>
+  <%= javascript_include_tag "compiled/default" %>
   <%= Danbooru.config.custom_html_header_content %>
   <%= yield :html_header %>
 </head>
@@ -22,10 +22,10 @@
     <h1><%= Danbooru.config.app_name %></h1>
     <nav>
       <menu>
-        <% if @current_user.is_anonymous? %>
+        <% if CurrentUser.user.is_anonymous? %>
           <%= nav_link_to("Login", new_session_path) %>
         <% else %>
-          <%= nav_link_to("My Account", user_path(@current_user)) %>
+          <%= nav_link_to("My Account", user_path(CurrentUser.user)) %>
         <% end %>
         <%= nav_link_to("Posts", posts_path) %>
         <%= nav_link_to("Comments", comments_path) %>
@@ -34,11 +34,11 @@
         <%= nav_link_to("Tags", tags_path(:order => "date")) %>
         <%= nav_link_to("Pools", pools_path) %>
         <%= nav_link_to("Wiki", wiki_page_path(:id => "help:home")) %>
-        <%= nav_link_to("Forum", forum_topics_path, :class => (@current_user.has_forum_been_updated? ? "forum-updated" : nil)) %>
+        <%= nav_link_to("Forum", forum_topics_path, :class => (CurrentUser.user.has_forum_been_updated? ? "forum-updated" : nil)) %>
         <%= nav_link_to("&raquo;".html_safe, site_map_path) %>
       </menu>
-      <%= yield :secondary_nav_links %>
-    </nav>    
+      <%= yield :secondary_links %>
+    </nav>
   </header>
   
   <% if flash[:notice] %>

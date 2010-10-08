@@ -10,7 +10,7 @@ class UploadsController < ApplicationController
   end
   
   def index
-    @uploads = Upload.where("uploader_id = ?", @current_user.id).includes(:uploader).order("uploads.id desc").limit(10)
+    @uploads = Upload.where("uploader_id = ?", CurrentUser.user.id).includes(:uploader).order("uploads.id desc").limit(10)
     respond_with(@uploads)
   end
   
@@ -19,7 +19,15 @@ class UploadsController < ApplicationController
   end
 
   def create
-  	@upload = Upload.create(params[:upload].merge(:uploader_id => @current_user.id, :uploader_ip_addr => request.remote_ip))
+  	@upload = Upload.create(params[:upload])
     respond_with(@upload)
+  end
+  
+  def update
+    @upload = Upload.find(params[:id])
+    @upload.process!
+    render :update do |page|
+      page.reload
+    end
   end
 end

@@ -1,0 +1,28 @@
+<% form_for @advertisement, :html => {:multipart => true} do |f| %>
+  <table width="100%">
+    <tfoot>
+      <tr>
+        <td></td>
+        <td><%= submit_tag "Submit" %></td>
+      </tr>
+    </tfoot>
+    <tbody>
+      <tr>
+        <th width="15%"><%= f.label :file %></th>
+        <td width="85%"><%= f.file_field "file" %></td>
+      </tr>
+      <tr>
+        <th><%= f.label :referral_url %></th>
+        <td><%= f.text_field :referral_url %></td>
+      </tr>
+      <tr>
+        <th><%= f.label :ad_type %></th>
+        <td><%= f.select :ad_type, ["vertical", "horizontal"] %></td>
+      </tr>
+      <tr>
+        <th><%= f.label :status %></th>
+        <td><%= f.select :status, ["active", "inactive"] %></td>
+      </tr>
+    </tbody>
+  </table>
+<% end %>

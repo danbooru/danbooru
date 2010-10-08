@@ -11,6 +11,7 @@ class PostSet
     @errors = []
     load_associations
     load_posts
+    load_suggestions
     validate
   end
   
@@ -54,8 +55,12 @@ class PostSet
     @posts = Post.find_by_tags(tags, :before_id => before_id).all(:order => "posts.id desc", :limit => limit, :offset => offset)
   end
   
-  def load_suggestions(count)
-    @suggestions = Tag.find_suggestions(tags) if count < limit && is_single_tag?
+  def load_suggestions
+    if count < limit && is_single_tag?
+      @suggestions = Tag.find_suggestions(tags)
+    else
+      @suggestions = []
+    end
   end
   
   def tag_array

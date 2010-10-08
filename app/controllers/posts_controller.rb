@@ -4,10 +4,8 @@ class PostsController < ApplicationController
   respond_to :html, :xml, :json
   
   def index
-    @post_set = PostSet.new(params[:tags], params[:page], @current_user, params[:before_id])
-    respond_with(@post_set) do |fmt|
-      fmt.js
-    end
+    @post_set = PostSet.new(params[:tags], params[:page], params[:before_id])
+    respond_with(@post_set)
   end
   
   def show

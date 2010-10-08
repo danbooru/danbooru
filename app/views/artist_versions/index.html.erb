@@ -1,0 +1,46 @@
+<h4>History for <%= @artist.name %></h4>
+
+<div>
+  <table width="100%" class="highlightable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Other Names</th>
+        <th>Group</th>
+        <th>Updated</th>
+        <th>Updated by</th>
+        <th>Active</th>
+        <th>URLs</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @artist_versions.each do |artist_version| %>
+        <tr class="<%= cycle 'even', 'odd' %>">
+          <td><%= link_to h(artist_version.name), artist_versions_path(:artist_id => @artist.id) %></td>
+          <td><%= h artist_version.other_names %></td>
+          <td><%= h artist_version.group_name %></td>
+          <td><%= time_ago_in_words artist_version.created_at %> ago</td>
+          <td><%= link_to artist_version.updater_name, user_path(artist_version.user_id) %></td>
+          <td><%= artist_version.is_active? %></td>
+          <td><%= artist_version.urls.join(" ") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div id="paginator">
+  <%= will_paginate(@artist_versions) %>
+</div>
+
+<% content_for("footer") do %>
+  <li>|</li>
+  <li><%= link_to "Show", artist_path(@artist) %>
+  <li><%= link_to "Edit", edit_artist_path(@artist) %></li>
+  <li><%= link_to "Delete", artist_path(@artist, :method => :delete) %></li>
+  <li><%= link_to "History", artist_versions_path(:artist_id => @artist) %></li>
+  <li><%= link_to "Posts", posts_path(:tags => @artist.name) %></li>
+<% end %>
+
+<%= render :partial => "footer" %>
+

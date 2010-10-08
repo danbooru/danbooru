@@ -2,50 +2,60 @@ require 'cgi'
 
 class DText
   def self.parse_inline(str, options = {})
-    str = str.gsub(/&/, "&amp;")
-    str.gsub!(/</, "&lt;")
-    str.gsub!(/>/, "&gt;")
-    str.gsub!(/\[\[.+?\]\]/m) do |tag|
-      tag = tag[2..-3]
-      if tag =~ /^(.+?)\|(.+)$/
-        tag = $1
-        name = $2
-        '<a href="/wiki/show?title=' + CGI.escape(CGI.unescapeHTML(tag.tr(" ", "_").downcase)) + '">' + name + '</a>'
-      else
-        '<a href="/wiki/show?title=' + CGI.escape(CGI.unescapeHTML(tag.tr(" ", "_").downcase)) + '">' + tag + '</a>'
-      end
-    end
-    str.gsub!(/\{\{.+?\}\}/m) do |tag|
-      tag = tag[2..-3]
-      '<a href="/post/index?tags=' + CGI.escape(CGI.unescapeHTML(tag)) + '">' + tag + '</a>'
-    end
-    str.gsub!(/[Pp]ost #(\d+)/, '<a href="/post/show/\1">post #\1</a>')
-    str.gsub!(/[Ff]orum #(\d+)/, '<a href="/forum/show/\1">forum #\1</a>')
-    str.gsub!(/[Cc]omment #(\d+)/, '<a href="/comment/show/\1">comment #\1</a>')
-    str.gsub!(/[Pp]ool #(\d+)/, '<a href="/pool/show/\1">pool #\1</a>')
+    str = parse_aliased_wiki_links(str)
+    str = parse_wiki_links(str)
+    str = parse_post_links(str)
+    str = parse_id_links(str)
+    
     str.gsub!(/\n/m, "<br>")
-    str.gsub!(/\[b\](.+?)\[\/b\]/, '<strong>\1</strong>')
-    str.gsub!(/\[i\](.+?)\[\/i\]/, '<em>\1</em>')
+    str.gsub!(/\[b\](.+?)\[\/b\]/i, '<strong>\1</strong>')
+    str.gsub!(/\[i\](.+?)\[\/i\]/i, '<em>\1</em>')
     str.gsub!(/\[spoilers?\](.+?)\[\/spoilers?\]/m, '<span class="spoiler">\1</span>')
-    str.gsub!(/("[^"]+":(http:\/\/|\/)\S+|http:\/\/\S+)/m) do |link|
-      if link =~ /^"([^"]+)":(.+)$/
-        text = $1
-        link = $2
-      else
-        text = link
-      end
-      
-      if link =~ /([;,.!?\)\]<>])$/
-        link.chop!
-        ch = $1
-      else
-        ch = ""
-      end
-
-      link.gsub!(/"/, '&quot;')
-      '<a href="' + link + '">' + text + '</a>' + ch
+    str.gsub!(/\[url\](.+?)\[\/url\]/i) do
+      %{<a href="#{u($1)}">#{h($1)}</a>}
+    end
+    str.gsub!(/\[url=(.+?)\](.+?)\[\/url\]/m) do
+      %{<a href="#{u($1)}">#{h($2)}</a>}
     end
     str
+  end
+  
+  def self.parse_aliased_wiki_links(str)
+    str.gsub(/\[\[(.+?)\|(.+?)\]\]/m) do
+      text = $1
+      title = $2
+      wiki_page = WikiPage.find_title_and_id(title)
+      
+      if wiki_page
+        %{[url=/wiki_pages/#{wiki_page.id}]#{text}[/url]}
+      else
+        %{[url=/wiki_pages/new?title=#{title}]#{text}[/url]}
+      end
+    end
+  end
+  
+  def self.parse_wiki_links(str)
+    str.gsub(/\[\[(.+?)\]\]/) do
+      title = $1
+      wiki_page = WikiPage.find_title_and_id(title)
+      
+      if wiki_page
+        %{[url=/wiki_pages/#{wiki_page.id}]#{title}[/url]}
+      else
+        %{[url=/wiki_pages/new?title=#{title}]#{title}[/url]}
+      end
+    end
+  end
+  
+  def self.parse_post_links(str)
+    str.gsub(/\{\{(.+?)\}\}/, %{[url=/posts?tags=\1]\1[/url]})
+  end
+  
+  def self.parse_id_links(str)
+    str = str.gsub(/\bpost #(\d+)/i, %{[url=/posts/\1]post #\1[/url]})
+    str = str.gsub(/\bforum #(\d+)/i, %{[url=/forum_posts/\1]forum #\1[/url]})
+    str = str.gsub(/\bcomment #(\d+)/i, %{[url=/comments/\1]comment #\1[/url]})
+    str = str.gsub(/\bpool #(\d+)/i, %{[url=/pools/\1]pool #\1[/url]})
   end
   
   def self.parse_list(str, options = {})

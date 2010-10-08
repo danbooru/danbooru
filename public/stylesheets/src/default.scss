@@ -1,3 +1,6 @@
+$link_color: #006FFA;
+$link_hover_color: #9093FF;
+
 .blacklisted {
 	display: none !important; 
 }
@@ -27,22 +30,22 @@ article, section {
 }
 
 a:link {
-  color: #006FFA;
+  color: $link_color;
   text-decoration: none;
 }
 
 a:visited {
-  color: #006FFA;
+  color: $link_color;
   text-decoration: none;
 }
 
 a:hover {
-  color: #9093FF;
+  color: $link_hover_color;
   text-decoration: none;
 }
 
 a:active {
-  color: #006FFA;
+  color: $link_color;
   text-decoration: none;
 }
 
@@ -131,18 +134,18 @@ input[type=submit]:hover {
 menu {
 	margin: 0;
 	padding: 0;
-}
-
-menu ul {
-	margin: 0;
-	padding: 0;
-}
-
-menu li {
-	margin: 0 1em 0 0;
-	padding: 0;
-	list-style-type: none;
-	display: inline;
+	
+	ul {
+  	margin: 0;
+  	padding: 0;
+	}
+	
+	li {
+  	margin: 0 1em 0 0;
+  	padding: 0;
+  	list-style-type: none;
+  	display: inline;	  
+	}
 }
 
 section {
@@ -150,8 +153,12 @@ section {
 }
 
 span.link {
-  color: #006FFA;
+  color: $link_color;
   cursor: pointer;
+}
+
+table tfoot {
+  margin-top: 2em;
 }
 
 div#content > aside {
@@ -170,47 +177,6 @@ div#content > section {
 
 div.clearfix {
   clear: both;
-/*  border: 1px solid red;*/
-}
-
-
-/*** Context Menu ***/
-
-menu[type=context] {
-  width: 200px;
-  cursor: pointer;
-}
-
-menu[type=context] li {
-  list-style: none;
-  padding: 0px 4px;
-}
-
-menu[type=context] > li {
-  border: 1px solid #333;
-  -moz-border-radius: 3px;
-  background-color: #EEE;
-}
-
-menu[type=context] > li > img {
-  float: right;
-  padding-top: 2px;
-}
-
-menu[type=context] > ul {
-  width: 198px;
-  margin: 0;
-  padding: 0;
-  border: 1px solid #333;
-  background: #EEE;
-  -moz-border-radius: 3px;
-  margin-top: -1px;
-  display: none;
-  position: absolute;
-}
-
-menu[type=context] > ul li {
-  cursor: pointer;
 }
 
 
@@ -220,6 +186,7 @@ body > header > h1 {
   font-size: 3em;
   font-family: Tahoma, Helvetica, sans-serif;
 }
+
 
 /*** Sidebar ***/
 
@@ -244,9 +211,6 @@ div.comment-response > div {
 	margin-top: 1em;
 }
 
-div.comment-list {
-}
-
 div.comment-list > article {
   margin-bottom: 1em;
   display: block;
@@ -260,4 +224,104 @@ div.comment-list > article > header {
 div.comment-list > article > div {
   float: left;
   width: 40em;
+}
+
+
+/*** Sessions ***/
+div#sessions {
+  div#new {
+    section {
+      width: 30em;
+      float: left;
+    }
+
+    aside {
+      width: 20em;
+      float: left;
+    
+      li {
+        display: list-item;
+        margin-bottom: 0.5em;
+        list-style-type: square;
+        margin-left: 1em;
+      }
+    }
+  
+    h2 {
+      margin-bottom: 5px;
+    }
+  }
+}
+
+
+/*** Artists ***/
+div#artists {
+  span.new-artist {
+    font-weight: bold;
+    color: #A00;
+  }
+
+  div#show {
+    max-width: 60em;
+
+    h1 {
+      font-size: 1.5em;
+      margin-bottom: 5px;
+    }
+
+    p.legend {
+      margin-bottom: 2em;
+      font-size: 0.8em;
+      font-style: italic;    
+    }
+  }  
+}
+
+
+/*** Users ***/
+div#users {
+  div#new {
+    max-width: 60em;
+    
+    h1 {
+      margin-bottom: 0.5em;
+    }
+    
+    p {
+      margin-bottom: 1em;
+    }
+    
+    li {
+      margin-left: 1em;
+    }
+    
+    div#account-comparison {
+      h1 {
+        font-size: 1.4em;
+        margin-bottom: 3px;
+      }
+      
+      li {
+        font-size: 0.9em;
+        line-height: 1.5em;
+      }
+      
+      section {
+        width: 18em;
+        float: left;
+        padding: 1em;
+      }
+    }
+    
+    footer.nav-links {
+      font-size: 1.5em;
+      font-weight: bold;
+      text-align: center;
+      display: block;
+    }
+    
+    div#p2 ul {
+      margin-bottom: 2em;
+    }
+  }
 }

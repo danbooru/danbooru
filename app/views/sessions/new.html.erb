@@ -1,31 +1,42 @@
-<% form_tag(sessions_path) do %>
-  <fieldset>
-    <legend>Login</legend>
-    <p>
-      <%= label_tag "name", "Name" %>
-      <%= text_field_tag "name" %>
-    </p>
+<div id="session-new">
+  <section>
+    <h2>Login</h2>
+    <% form_tag(sessions_path) do %>
+      <table width="100%">
+        <tfoot>
+          <tr>
+            <td></td>
+            <td><%= submit_tag "Login" %></td>
+          </tr>
+        </tfoot>
+        <tbody>
+          <tr>
+            <th width="15%">
+              <%= label_tag :name %>
+            </th>
+            <td width="85%">
+              <%= text_field_tag :name %>
+            </td>
+          </tr>
+          <tr>
+            <th><%= label_tag :password %></th>
+            <td><%= password_field_tag :password %></td>
+          </tr>
+        </tbody>
+      </table>
+    <% end %>
+  </section>
 
-    <p>
-      <%= label_tag "password", "Password" %>
-      <%= password_field_tag "password" %>
-    </p>
-
-    <p>
-      <%= submit_tag "Submit" %>
-    </p>
-  </fieldset>
-<% end %>  
-
-<aside>
-  <h2>Help</h2>
-  <menu>
-    <li><%= link_to "I don't have an account", new_user_path %></li>
-    <li><%= link_to "I forgot my password", reset_password_info_path %></li>
-    <li><%= link_to "I forgot my login", login_reminder_info_path %></li>
-    <li><%= link_to "I want to delete my account", delete_account_info_path %></li>
-  </menu>
-</aside>
+  <aside>
+    <h2>Help</h2>
+    <ul>
+      <li><%= link_to "I don't have an account", new_user_path %></li>
+      <li><%= link_to "I forgot my password", reset_password_info_path %></li>
+      <li><%= link_to "I forgot my login", login_reminder_info_path %></li>
+      <li><%= link_to "I want to delete my account", delete_account_info_path %></li>
+    </ul>
+  </aside>
+</div>
 
 <% content_for(:page_title) do %>
  / login

@@ -1,19 +1,16 @@
 class Artist < ActiveRecord::Base
-  attr_accessor :updater_id, :updater_ip_addr
   before_create :initialize_creator
   before_save :normalize_name
   after_save :create_version
   after_save :save_url_string
   validates_uniqueness_of :name
-  validates_presence_of :updater_id, :updater_ip_addr
-  belongs_to :updater, :class_name => "User"
   belongs_to :creator, :class_name => "User"
   has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
-  has_many :artist_urls, :dependent => :destroy
+  has_many :urls, :dependent => :destroy, :class_name => "ArtistUrl"
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :tag_alias, :foreign_key => "antecedent_name", :primary_key => "name"
   accepts_nested_attributes_for :wiki_page
-  attr_accessible :name, :url_string, :other_names, :group_name, :wiki_page_attributes, :updater_id, :updater_ip_addr
+  attr_accessible :name, :url_string, :other_names, :group_name, :wiki_page_attributes, :notes
   
   module UrlMethods
     module ClassMethods
@@ -24,7 +21,7 @@ class Artist < ActiveRecord::Base
         while artists.empty? && url.size > 10
           u = url.sub(/\/+$/, "") + "/"
           u = u.to_escaped_for_sql_like.gsub(/\*/, '%') + '%'
-          artists += Artist.joins(:artist_urls).where(["artists.is_active = TRUE AND artist_urls.normalized_url LIKE ? ESCAPE E'\\\\'", u]).all(:order => "artists.name")
+          artists += Artist.joins(:urls).where(["artists.is_active = TRUE AND artist_urls.normalized_url LIKE ? ESCAPE E'\\\\'", u]).all(:order => "artists.name")
           url = File.dirname(url) + "/"
         end
 
@@ -38,10 +35,10 @@ class Artist < ActiveRecord::Base
 
     def save_url_string
       if @url_string
-        artist_urls.clear
+        urls.clear
 
         @url_string.scan(/\S+/).each do |url|
-          artist_urls.create(:url => url)
+          urls.create(:url => url)
         end
       end
     end
@@ -51,7 +48,7 @@ class Artist < ActiveRecord::Base
     end
     
     def url_string
-      @url_string || artist_urls.map {|x| x.url}.join("\n")
+      @url_string || urls.map {|x| x.url}.join("\n")
     end
   end
 
@@ -80,13 +77,15 @@ class Artist < ActiveRecord::Base
     end
   end
   
-  module UpdaterMethods
-    def updater_name
-      User.id_to_name(updater_id).tr("_", " ")
-    end
-  end
-  
   module SearchMethods
+    def find_by_name_or_id(params)
+      if params[:name]
+        find_by_name(params[:name])
+      else
+        find(params[:id])
+      end
+    end
+    
     def find_by_any_name(name)
       build_relation(:name => name).first
     end
@@ -120,6 +119,12 @@ class Artist < ActiveRecord::Base
         relation = relation.where(["id = ?", params[:id]])
       end
 
+      if params[:order] == "date"
+        relation = relation.order("updated_at DESC")
+      else
+        relation = relation.order("name")
+      end
+
       relation
     end
   end
@@ -129,8 +134,8 @@ class Artist < ActiveRecord::Base
       ArtistVersion.create(
         :artist_id => id,
         :name => name,
-        :updater_id => updater_id,
-        :updater_ip_addr => updater_ip_addr,
+        :updater_id => CurrentUser.user.id,
+        :updater_ip_addr => CurrentUser.ip_addr,
         :url_string => url_string,
         :is_active => is_active,
         :other_names => other_names,
@@ -138,14 +143,12 @@ class Artist < ActiveRecord::Base
       )
     end
     
-    def revert_to!(version, reverter_id, reverter_ip_addr)
+    def revert_to!(version)
       self.name = version.name
       self.url_string = version.url_string
       self.is_active = version.is_active
       self.other_names = version.other_names
       self.group_name = version.group_name
-      self.updater_id = reverter_id
-      self.updater_ip_addr = reverter_ip_addr
       save      
     end
   end
@@ -172,18 +175,47 @@ class Artist < ActiveRecord::Base
     end
   end
 
+  module NoteMethods
+    def notes
+      if wiki_page
+        wiki_page.body
+      else
+        nil
+      end
+    end
+    
+    def notes=(msg)
+      if wiki_page.nil?
+        self.wiki_page = WikiPage.new
+      end
+
+      wiki_page.title = name
+      wiki_page.body = msg
+      wiki_page.save
+    end
+  end
+  
+  module TagMethods
+    def has_tag_alias?
+      TagAlias.exists?(["antecedent_name = ?", name])
+    end
+
+    def tag_alias_name
+      TagAlias.find_by_antecedent_name(name).consequent_name
+    end
+  end
+  
   include UrlMethods
   include NameMethods
   include GroupMethods
-  include UpdaterMethods
   extend SearchMethods  
   include VersionMethods
   extend FactoryMethods
+  include NoteMethods
+  include TagMethods
   
   def initialize_creator
-    if creator.nil?
-      self.creator_id = updater_id
-    end
+    self.creator_id = CurrentUser.user.id
   end
 end
 

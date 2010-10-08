@@ -1,10 +1,1 @@
-<nav>
-  <ul>
-    <li><%= link_to "Settings", edit_user_path(@user) %></li>
-    <li><%= link_to "Log out", session_path(0), :method => :delete %></li>
-  </ul>
-</nav>
-
-<% content_for(:page_title) do %>
-  / Users / <%= @user.name %>
-<% end %>
+<%= render :partial => "secondary_nav_links" %>

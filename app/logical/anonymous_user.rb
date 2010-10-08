@@ -108,6 +108,10 @@ class AnonymousUser
     "medium"
   end
   
+  def blacklisted_tags
+    []
+  end
+  
   %w(member banned privileged contributor janitor moderator admin).each do |name|
     define_method("is_#{name}?") do
       false

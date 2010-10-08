@@ -1,7 +1,8 @@
 class TagAlias < ActiveRecord::Base
   attr_accessor :creator_ip_addr
   after_save :update_posts
-  after_destroy :clear_cache
+  after_commit :clear_cache
+  after_commit :clear_remote_cache
   validates_presence_of :creator_id, :creator_ip_addr
   validates_uniqueness_of :antecedent_name
   validate :absence_of_transitive_relation
@@ -30,6 +31,12 @@ class TagAlias < ActiveRecord::Base
 
   def clear_cache
     Cache.delete("ta:#{Cache.sanitize(antecedent_name)}")
+  end
+  
+  def clear_remote_cache
+    Danbooru.config.other_server_hosts.each do |server|
+      Net::HTTP.delete(URI.parse("http://#{server}/tag_aliases/#{id}/cache"))
+    end
   end
   
   def update_cache

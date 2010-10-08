@@ -14,7 +14,7 @@ class CommentsController < ApplicationController
   def create
     @comment = Comment.new(params[:comment])
     @comment.post_id = params[:comment][:post_id]
-    @comment.creator_id = @current_user.id
+    @comment.creator_id = CurrentUser.user.id
     @comment.ip_addr = request.remote_ip
     @comment.score = 0
     @comment.save

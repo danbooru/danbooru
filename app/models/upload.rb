@@ -7,7 +7,8 @@ class Upload < ActiveRecord::Base
   attr_accessor :file, :image_width, :image_height, :file_ext, :md5, :file_size
   belongs_to :uploader, :class_name => "User"
   belongs_to :post
-  before_create :initialize_status
+  before_validation_on_create :initialize_uploader
+  before_validation_on_create :initialize_status
   before_create :convert_cgi_file
   validate :uploader_is_not_limited
   
@@ -15,7 +16,6 @@ class Upload < ActiveRecord::Base
     def uploader_is_not_limited
       if !uploader.can_upload?
         update_attribute(:status, "error: uploader has reached their daily limit")
-        raise
       end
     end
 
@@ -28,21 +28,18 @@ class Upload < ActiveRecord::Base
     def validate_file_exists
       unless File.exists?(file_path)
         update_attribute(:status, "error: file does not exist")
-        raise
       end
     end
     
     def validate_file_content_type
       unless is_valid_content_type?
         update_attribute(:status, "error: invalid content type (#{file_ext} not allowed)")
-        raise
       end
     end
     
     def validate_md5_confirmation
       if !md5_confirmation.blank? && md5_confirmation != md5
         update_attribute(:status, "error: md5 mismatch")
-        raise
       end
     end
   end
@@ -71,6 +68,8 @@ class Upload < ActiveRecord::Base
           update_attribute(:status, "error: " + post.errors.full_messages.join(", "))
         end
       end
+    rescue Exception => x
+      update_attribute(:status, "error: #{x} - #{x.message}")
     end
 
     def convert_to_post
@@ -224,7 +223,7 @@ class Upload < ActiveRecord::Base
     end
     
     def temp_file_path
-      File.join(Dir::tmpdir, "#{Time.now.to_f}.#{$PROCESS_ID}")
+      File.join(Rails.root, "tmp", "#{Time.now.to_f}.#{$PROCESS_ID}")
     end
   end
   
@@ -249,11 +248,11 @@ class Upload < ActiveRecord::Base
     def convert_cgi_file
       return if file.blank? || file.size == 0
 
+      self.file_path = temp_file_path
+
       if file.local_path
-        self.file_path = file.local_path
+        FileUtils.cp(file.local_path, file_path)
       else
-        self.file_path = temp_file_path
-        
         File.open(file_path, 'wb') do |out| 
           out.write(file.read)
         end
@@ -277,6 +276,13 @@ class Upload < ActiveRecord::Base
     end
   end
   
+  module UploaderMethods
+    def initialize_uploader
+      self.uploader_id = CurrentUser.user.id
+      self.uploader_ip_addr = CurrentUser.ip_addr
+    end
+  end
+  
   include ConversionMethods
   include ValidationMethods
   include FileMethods
@@ -287,6 +293,7 @@ class Upload < ActiveRecord::Base
   include FilePathMethods
   include CgiFileMethods
   include StatusMethods
+  include UploaderMethods
   
   def presenter
     @presenter ||= UploadPresenter.new(self)

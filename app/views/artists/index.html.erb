@@ -1,0 +1,35 @@
+<div id="artist-index">
+  <%= render :partial => "search" %>
+
+  <table class="highlightable" width="100%">
+    <thead>
+      <tr>
+        <th width="5%"></th>
+        <th width="95%">Name</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @artists.each do |artist| %>
+        <% content_tag(:tr, :id => "artist-#{artist.id}") do %>
+          <td>
+            <%= link_to "P", posts_path(:tags => artist.name), :title => "Find posts for artist" %>
+            <%= link_to "E", edit_artist_path(artist), :title => "Edit artist" %> 
+            <%= link_to "D", artist_path(artist, :method => :delete, :confirm => "Do you really want to delete this artist?") %>
+          </td>
+          <td>
+            <%= link_to h(artist.name), artist_path(artist) %>
+            <% if !artist.group_name.blank? %>
+              [<%= link_to(artist.group_name, artist_path(artist)) %>]
+            <% end %>
+          </td>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+
+  <div id="paginator">
+    <%= will_paginate(@artists) %>
+  </div>
+
+  <%= render :partial => "secondary_nav_links" %>
+</div>

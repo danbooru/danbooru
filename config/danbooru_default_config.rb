@@ -127,11 +127,20 @@ module Danbooru
       Socket.gethostname
     end
     
-    # Names of other Danbooru servers which serve out of the same common database.
+    # Names of all Danbooru servers which serve out of the same common database.
     # Used in conjunction with load balancing to distribute files from one server to
     # the others. This should match whatever gethostname returns on the other servers.
-    def other_server_hosts
+    def all_server_hosts
       []
+    end
+    
+    # Names of other Danbooru servers.
+    def other_server_hosts
+      all_server_hosts.reject {|x| x == server_host}
+    end
+
+    def remote_server_login
+      "albert"
     end
     
     # Returns a hash mapping various tag categories to a numerical value.
@@ -190,6 +199,26 @@ module Danbooru
     # The number of posts displayed per page.
     def posts_per_page
       20
+    end
+
+    def is_post_restricted?(post)
+      post.has_tag?("loli") || post.has_tag?("shota")
+    end
+    
+    def is_user_restricted?(user)
+      !user.is_privileged? || user.name == "ppayne"
+    end
+    
+    def can_user_see_post?(user, post)
+      if is_user_restricted?(user) && is_post_restricted?(post)
+        false
+      else
+        true
+      end
+    end
+    
+    def select_posts_visible_to_user(user, posts)
+      posts.select {|x| !is_user_restricted?(user) || !is_post_restricted?(x)}
     end
   end
 end

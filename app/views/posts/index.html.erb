@@ -1,4 +1,4 @@
-<% unless @post_set.suggestions.blank? %>
+<% if @post_set.suggestions.any? %>
   <div class="notice">
     Maybe you meant: <%= @post_set.suggestions.map {|x| link_to(x, posts_path(:tags => x), :class => "tag-type-#{Tag.type_name(x)}" )}.to_sentence(:last_word_connector => ", or ", :two_words_connector => " or ") %>
   </div>
@@ -13,7 +13,7 @@
     <% end %>    
   </section>
   
-  <% if @current_user.is_privileged? %>
+  <% if CurrentUser.user.is_privileged? %>
     <section id="mode-box">
       <h1>Mode</h1>
       <form action="/">
@@ -31,7 +31,7 @@
           <option value="lock-note">Lock notes</option>
           <option value="edit-tag-script">Edit tag script</option>
           <option value="apply-tag-script">Apply tag script</option>
-          <% if @current_user.is_janitor? %>
+          <% if CurrentUser.user.is_janitor? %>
             <option value="approve">Approve</option>
           <% end %>
           <option value="unapprove">Unapprove</option>
@@ -60,7 +60,7 @@
     
     <section id="wiki-box">
       <h2>Wiki</h2>
-      <%= @post_set.presenter.wiki_html %>
+      <%= @post_set.presenter.wiki_html(self) %>
     </section>
   </div>
 </aside>
@@ -78,4 +78,4 @@
   / <%= @post_set.tags %>
 <% end %>
 
-<%= render :partial => "posts/common_secondary_nav_links" %>
+<%= render :partial => "posts/partials/common/secondary_links" %>

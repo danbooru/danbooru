@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   before_filter :set_current_user
   after_filter :reset_current_user
   before_filter :initialize_cookies
+  before_filter :set_title
   layout "default"
 
 protected
@@ -64,5 +65,9 @@ protected
     else
       cookies["blacklisted_tags"] = CurrentUser.user.blacklisted_tags
     end
+  end
+  
+  def set_title
+    @page_title = Danbooru.config.app_name + "/#{params[:controller]}"
   end
 end

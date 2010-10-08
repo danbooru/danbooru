@@ -1,5 +1,5 @@
 <div id="edit">
-  <% unless @current_user.is_contributor? %>
+  <% unless CurrentUser.user.is_contributor? %>
     <div style="margin-bottom: 1em;">
       <p>Before editing, read the <%= link_to "how to tag guide", wiki_page_path(:id => "howto:tag") %>.</p>
     </div>
@@ -23,7 +23,7 @@
       <% end %>
     </p>
     
-    <% if @current_user.is_privileged? %>
+    <% if CurrentUser.user.is_privileged? %>
       <p>
         <%= f.label :is_note_locked, "Lock notes" %>
         <%= f.check_box :is_note_locked %>
