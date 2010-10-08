@@ -110,7 +110,7 @@ img {
   vertical-align: middle;
 }
 
-input[type=text], input[type=password], textarea, button {
+input[type=text], input[type=password], input[type=url], textarea, button {
 	border: 1px solid #AAA;
 	font-size: 1em;
 	-moz-border-radius: 4px;
@@ -125,6 +125,10 @@ input[type=submit] {
 	-webkit-border-radius: 4px;
 	font-size: 1em;
 	cursor: pointer;
+}
+
+input:focus, textarea:focus {
+  background-color: #FFD;
 }
 
 input[type=submit]:hover {
@@ -200,6 +204,42 @@ aside.sidebar > section > ul li {
 
 aside.sidebar > section > ul ul li {
   margin-left: 1em;
+}
+
+
+/*** Simple Form ***/
+form.simple_form {
+  input[type=submit] {
+    margin-left: 10em;
+  }
+  
+  div.input {
+    margin-bottom: 0.5em;
+    
+    input, textarea {
+      width: 300px;
+    }
+    
+    textarea {
+      height: 100px;
+    }
+    
+    label {
+      vertical-align: top;
+      display: inline-block;
+      width: 10em;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    span.hint {
+      margin-left: 10em;
+      color: #666;
+      font-style: italic;
+      vertical-align: top;
+      display: block;
+    }
+  }
 }
 
 

@@ -1,41 +1,8 @@
-<%= form_for(@artist) do |f| %>
-  <%= error_messages_for "artist" %>
-  
-  <table class="form">
-    <tr>
-      <th width="15%"><%= f.label :name %>
-      <td width="85%"><%= f.text_field "name", :size => 30 %></td>
-    </tr>
-    <tr>
-      <th>
-        <%= f.label :other_names %>
-      </th>
-      <td>
-        <%= f.text_field "other_names", :size => 30 %>
-        <span class="info">Separate with commas</span>
-      </td>
-    </tr>
-    <tr>
-      <th><%= f.label :group_name %></th>
-      <td><%= f.text_field "group_name", :size => 30 %></td>
-    </tr>
-    <tr>
-      <th><%= f.label :url_string, "URLs" %></th>
-      <td><%= f.text_area "url_string", :size => "50x6", :class => "no-block" %></td>
-    </tr>
-    <tr>
-      <th><%= f.label :notes %></th>
-      <td>
-        <%= f.text_area "notes", :size => "50x10", :class => "no-block" %>
-        <span class="info"><%= link_to "Formatting help", wiki_page_path(:id => "help:dtext") %></span>
-      </td>
-    </tr>
-    <tr>
-      <td></td>
-      <td>
-        <%= submit_tag "Save" %>
-        <%= button_to_function "Cancel", "history.back()" %>
-      </td>
-    </tr>
-  </table>
+<%= simple_form_for(@artist) do |f| %>
+  <%= f.input :name %>
+  <%= f.input :other_names, :hint => "Separate with commas", :as => :text %>
+  <%= f.input :group_name %>
+  <%= f.input :url_string, :label => "URLs", :as => :text, :size => "10x5" %>
+  <%= f.input :notes, :as => :text %>
+  <%= f.button :submit %>
 <% end %>

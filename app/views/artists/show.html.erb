@@ -1,90 +1,84 @@
-<div id="artists-show">
-  <h1>Artist: <%= @artist.name.tr("_", " ") %></h1>
-  
-  <% unless @artist.notes.blank? %>
+<div id="artists">
+  <div id="show">
+    <h1>Artist: <%= @artist.name.tr("_", " ") %></h1>
+
+    <% unless @artist.notes.blank? %>
+      <div style="margin-bottom: 1em;">
+        <%= format_text(@artist.notes) %>
+      </div>
+    <% end %>
+
     <div style="margin-bottom: 1em;">
-      <%= format_text(@artist.notes) %>
-    </div>
-  <% end %>
-  
-  <div style="margin-bottom: 1em;">
-    <table width="100%">
-      <tbody>
-        <tr>
-          <th width="15%">Status</th>
-          <td width="85%">
-            <% if @artist.is_banned? %>
-              Banned
-            <% elsif @artist.is_active? %>
-              Active
-            <% else %>
-              Inactive
-            <% end %>
-          </td>
-        </tr>
-        <% if @artist.has_tag_alias? %>
+      <table width="100%">
+        <tbody>
           <tr>
-            <th>Tag Alias</th>
-            <td>
-              <%= @artist.tag_alias_name %>
-            </td>
-          </tr>
-        <% end %>
-        <% if !@artist.other_names.blank? %>
-          <tr>
-            <th>Other Names</th>
-            <td>
-              <%= link_to_artists(@artist.other_names.split(/,/)) %>
-            </td>
-          </tr>
-        <% end %>
-        <% if !@artist.group_name.blank? %>
-          <tr>
-            <th>Group</th>
-            <td>
-              <%= link_to_artist(@artist.group_name) %>
-            </td>
-          </tr>
-        <% end %>
-        <% if @artist.members.any? %>
-          <tr>
-            <th>Members</th>
-            <td>
-              <%= link_to_artists(@artist.members.map(&:name)) %>
-            </td>
-          </tr>
-        <% end %>
-        <% @artist.urls.each do |url| %>
-          <tr>
-            <th>URLs</th>
-            <td>
-              <%= link_to h(url.to_s), h(url.to_s) %>
-              <% if CurrentUser.user.is_moderator? %>
-                (<%= link_to("mass edit", mass_edit_admin_posts_path(:antecedent => "-#{@artist.name} source:#{ArtistUrl.normalize_for_search(url.to_s)}", :consequent => @artist.name)) %>)
+            <th width="15%">Status</th>
+            <td width="85%">
+              <% if @artist.is_banned? %>
+                Banned
+              <% elsif @artist.is_active? %>
+                Active
+              <% else %>
+                Inactive
               <% end %>
             </td>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-  
-  <p class="legend"><span class="new-artist">*</span> Indicates new artist</p>
-  
-  <div style="margin-bottom: 1em;">
-    <h4>Recent Posts</h4>
-    <div style="margin: 1em 0;">
-      <%#= @post_set.presenter.post_previews_html %>
+          <% if @artist.has_tag_alias? %>
+            <tr>
+              <th>Tag Alias</th>
+              <td>
+                <%= @artist.tag_alias_name %>
+              </td>
+            </tr>
+          <% end %>
+          <% if !@artist.other_names.blank? %>
+            <tr>
+              <th>Other Names</th>
+              <td>
+                <%= link_to_artists(@artist.other_names.split(/,/)) %>
+              </td>
+            </tr>
+          <% end %>
+          <% if !@artist.group_name.blank? %>
+            <tr>
+              <th>Group</th>
+              <td>
+                <%= link_to_artist(@artist.group_name) %>
+              </td>
+            </tr>
+          <% end %>
+          <% if @artist.members.any? %>
+            <tr>
+              <th>Members</th>
+              <td>
+                <%= link_to_artists(@artist.members.map(&:name)) %>
+              </td>
+            </tr>
+          <% end %>
+          <% @artist.urls.each do |url| %>
+            <tr>
+              <th>URLs</th>
+              <td>
+                <%= link_to h(url.to_s), h(url.to_s) %>
+                <% if CurrentUser.user.is_moderator? %>
+                  (<%= link_to("mass edit", mass_edit_admin_posts_path(:antecedent => "-#{@artist.name} source:#{ArtistUrl.normalize_for_search(url.to_s)}", :consequent => @artist.name)) %>)
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
     </div>
+
+    <p class="legend"><span class="new-artist">*</span> Indicates new artist</p>
+
+    <div style="margin-bottom: 1em;">
+      <h4>Recent Posts</h4>
+      <div style="margin: 1em 0;">
+        <%#= @post_set.presenter.post_previews_html %>
+      </div>
+    </div>
+
+    <%= render :partial => "secondary_links" %>
   </div>
-  
-  <% content_for("footer") do %>
-    <li>|</li>
-    <li><%= link_to "Posts", posts_path(:tags => @artist.name) %></li>
-    <li><%= link_to "Edit", edit_artist_path(@artist) %></li>
-    <li><%= link_to "Delete", artist_path(@artist, :method => :delete) %></li>
-    <li><%= link_to "History", artist_versions_path(:artist_id => @artist.id) %></li>
-  <% end %>
-  
-  <%= render :partial => "secondary_nav_links" %>
 </div>
