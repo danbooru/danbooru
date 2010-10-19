@@ -1,5 +1,4 @@
 <ul>
-  <li>ID: <%= post.id %></li>
   <li>Uploader: <%= link_to_unless(post.uploader.nil?, post.uploader_name, user_path(post.uploader)) %></li>
   <li>Uploaded: <%= time_ago_in_words(post.created_at).gsub(/about/, "") %> ago</li>
   <% if post.approver %>

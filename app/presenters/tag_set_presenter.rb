@@ -31,12 +31,12 @@ private
   
   def build_list_item(tag, template, options)
     html = ""
-    html << %{<li data-tag-type="#{category_for(tag)}">}
+    html << %{<li data-tag-type="#{category_for(tag)}" data-tag-name="#{u(tag)}">}
     
-    if options[:show_extra_links]
-      html << %{<a href="/wiki_pages/#{u(tag)}">?</a> }
+    if CurrentUser.user.is_privileged?
+      html << %{<a href="/wiki_pages?title=#{u(tag)}">?</a> }
       html << %{<a href="#" class="search-inc-tag">+</a> }
-      html << %{<a href="#" class="search-exl-tag">-</a> }
+      html << %{<a href="#" class="search-exl-tag">&ndash;</a> }
     end
     
     humanized_tag = tag.tr("_", " ")

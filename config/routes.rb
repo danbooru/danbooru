@@ -57,7 +57,6 @@ Danbooru::Application.routes.draw do
   resources :user_feedback
   resources :wiki_pages do
     member do
-      get :show, :id => /.+/
       put :revert
     end
   end

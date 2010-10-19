@@ -5,46 +5,54 @@
     </div>
   <% end %>
 
-  <% form_for(post) do |f| %>
+  <% form_for(post, :html => {:class => "simple_form"}) do |f| %>
     <%= f.hidden_field :old_tags, :value => post.tag_string %>
 
-    <p>
+    <div class="input">
       <% if post.is_rating_locked? %>
         This post is rating locked.
       <% else %>
-        <%= f.label :rating_explicit, "Explicit" %>
-        <%= f.radio_button :rating, :e %>
-        
-        <%= f.label :rating_questionable, "Questionable" %>
-        <%= f.radio_button :rating, :q %>
+        <%= f.label :blank, "Rating" %>
+      
+        <fieldset class="ratings">
+          <%= f.radio_button :rating, :e %>
+          <%= f.label :rating_e, "Explicit" %>
 
-        <%= f.label :rating_safe, "Safe" %>
-        <%= f.radio_button :rating, :s %>
+          <%= f.radio_button :rating, :q %>
+          <%= f.label :rating_q, "Questionable" %>
+
+          <%= f.radio_button :rating, :s %>
+          <%= f.label :rating_s, "Safe" %>
+        </fieldset>      
       <% end %>
-    </p>
+    </div>
     
     <% if CurrentUser.user.is_privileged? %>
-      <p>
-        <%= f.label :is_note_locked, "Lock notes" %>
-        <%= f.check_box :is_note_locked %>
-      </p>
-      
-      <p>
-        <%= f.label :is_rating_locked, "Lock rating" %>
-        <%= f.check_box :is_rating_locked %>
-      </p>
+      <div class="input">
+        <%= f.label :blank, "Lock" %>
+        
+        <fieldset class="locks">
+          <%= f.check_box :is_note_locked %>
+          <%= f.label :is_note_locked, "Notes" %>
+
+          <%= f.check_box :is_rating_locked %>
+          <%= f.label :is_rating_locked, "Rating" %>          
+        </fieldset>
+      </div>
     <% end %>
     
-    <p>
+    <div class="input">
       <%= f.label :source %>
       <%= f.text_field :source %>
-    </p>
+    </div>
     
-    <p>
+    <div class="input">
       <%= f.label :tag_string, "Tags" %>
       <%= f.text_area :tag_string , :size => "50x3" %>
-    </p>
+    </div>
     
-    <%= submit_tag "Submit" %>
+    <div class="input">
+      <%= submit_tag "Submit" %>      
+    </div>
   <% end %>
 </div>

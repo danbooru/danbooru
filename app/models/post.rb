@@ -8,7 +8,7 @@ class Post < ActiveRecord::Base
   before_save :create_tags
   before_save :update_tag_post_counts
   before_save :set_tag_counts
-  before_validation_on_create :initialize_uploader
+  before_validation :initialize_uploader, :on => :create
   belongs_to :updater, :class_name => "User"
   belongs_to :approver, :class_name => "User"
   belongs_to :parent, :class_name => "Post"
@@ -25,6 +25,7 @@ class Post < ActiveRecord::Base
   validate :validate_parent_does_not_have_a_parent
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at
   scope :visible, lambda {|user| Danbooru.config.can_user_see_post_conditions(user)}
+  scope :commented_before, lambda {|date| where("last_commented_at < ?", date).order("last_commented_at DESC")}
   
   module FileMethods
     def delete_files

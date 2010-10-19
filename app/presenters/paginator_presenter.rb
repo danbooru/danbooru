@@ -1,2 +1,0 @@
-class PaginatorPresenter < Presenter
-end

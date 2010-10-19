@@ -20,9 +20,16 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
       posts << Factory.create(:post, :tag_string => "aaa bbb ccc")
       posts << Factory.create(:post, :tag_string => "aaa bbb")
       
-      tag = Tag.find_by_name("aaa")
-      calculator = RelatedTagCalculator.new
-      assert_equal({"aaa" => 3, "bbb" => 3, "ccc" => 2, "ddd" => 1}, calculator.calculate_from_sample("aaa", 10))
+      assert_equal({"aaa" => 3, "bbb" => 3, "ccc" => 2, "ddd" => 1}, RelatedTagCalculator.calculate_from_sample("aaa", 10))
+    end
+    
+    should "calculate related tags for multiple tag" do
+      posts = []
+      posts << Factory.create(:post, :tag_string => "aaa bbb ccc")
+      posts << Factory.create(:post, :tag_string => "aaa bbb ccc ddd")
+      posts << Factory.create(:post, :tag_string => "aaa eee fff")
+      
+      assert_equal({"aaa"=>2, "bbb"=>2, "ddd"=>1, "ccc"=>2}, RelatedTagCalculator.calculate_from_sample("aaa bbb", 10))
     end
 
     should "calculate typed related tags for a tag" do
@@ -31,11 +38,8 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
       posts << Factory.create(:post, :tag_string => "aaa bbb art:ccc")
       posts << Factory.create(:post, :tag_string => "aaa bbb")
       
-      tag = Tag.find_by_name("aaa")
-      calculator = RelatedTagCalculator.new
-      assert_equal({"ccc" => 2}, calculator.calculate_from_sample("aaa", 10, Tag.categories.artist))
-      calculator = RelatedTagCalculator.new
-      assert_equal({"ddd" => 1}, calculator.calculate_from_sample("aaa", 10, Tag.categories.copyright))
+      assert_equal({"ccc" => 2}, RelatedTagCalculator.calculate_from_sample("aaa", 10, Tag.categories.artist))
+      assert_equal({"ddd" => 1}, RelatedTagCalculator.calculate_from_sample("aaa", 10, Tag.categories.copyright))
     end
     
     should "convert a hash into string format" do
@@ -45,9 +49,8 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
       posts << Factory.create(:post, :tag_string => "aaa bbb")
       
       tag = Tag.find_by_name("aaa")
-      calculator = RelatedTagCalculator.new
-      counts = calculator.calculate_from_sample("aaa", 10)
-      assert_equal("aaa 3 bbb 3 ccc 2 ddd 1", calculator.convert_hash_to_string(counts))
+      counts = RelatedTagCalculator.calculate_from_sample("aaa", 10)
+      assert_equal("aaa 3 bbb 3 ccc 2 ddd 1", RelatedTagCalculator.convert_hash_to_string(counts))
     end
   end
 end

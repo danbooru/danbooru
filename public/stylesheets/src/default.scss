@@ -49,12 +49,6 @@ a:active {
   text-decoration: none;
 }
 
-addr {
-  display: block;
-  margin-left: 2em;
-  font-weight: bold;
-}
-
 blockquote {
   margin: 0 0 1em 0;
   padding: 1em;
@@ -111,28 +105,28 @@ img {
 }
 
 input[type=text], input[type=password], input[type=url], textarea, button {
-	border: 1px solid #AAA;
+/*  border: 1px solid #AAA;*/
 	font-size: 1em;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
+/*  -moz-border-radius: 4px;*/
+/*  -webkit-border-radius: 4px;*/
 }
 
 input[type=submit] {
 	padding: 1px 4px;
-	border: 1px solid #AAA;
-	background-color: #EEE;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
+/*  border: 1px solid #AAA;*/
+/*  background-color: #EEE;*/
+/*  -moz-border-radius: 4px;*/
+/*  -webkit-border-radius: 4px;*/
 	font-size: 1em;
 	cursor: pointer;
 }
 
 input:focus, textarea:focus {
-  background-color: #FFD;
+/*  background-color: #FFD;*/
 }
 
 input[type=submit]:hover {
-	background-color: #F6F6F6;
+/*  background-color: #F6F6F6;*/
 }
 
 menu {
@@ -165,22 +159,72 @@ table tfoot {
   margin-top: 2em;
 }
 
-div#content > aside {
-	width: 25%;
-	float: left;
+div#notice {
+  margin: 1em;
+  padding: 1em;
+  border: 2px solid #666;
+  background: #EEE;
 }
 
-div#content > aside > section {
-	margin-bottom: 2em;
-}
+div#page {
+  aside#sidebar {
+  	width: 20%;
+  	float: left;
+  }
 
-div#content > section {
-  width: 75%;
-	float: left;
+  aside#sidebar > section {
+  	margin-bottom: 2em;
+  }
+
+  section#content {
+    width: 75%;
+  	float: left;
+  	margin-left: 2em;
+  }
 }
 
 div.clearfix {
   clear: both;
+}
+
+/*** Paginator ***/
+div.paginator {
+  display: block;
+  padding: 2em 0 1em 0;
+  font-size: 1em;
+  text-align: center;
+  font-weight: bold;
+  clear: both;
+  
+  a {
+    margin: 0 3px;
+    padding: 2px 6px;
+    font-weight: normal;
+    border: 1px solid #EAEAEA;
+  }
+
+  a.arrow {
+    border: none;
+  }
+
+  a.arrow:hover {
+    background: white;
+    color: #9093FF;
+  }
+
+  a.current {
+    border: 1px solid #AAA;
+  }
+
+  a:hover {
+    background: rgb(60, 60, 220);
+    color: white;
+  }
+
+  span {
+    margin: 0 3px;
+    padding: 2px 6px;
+  }
 }
 
 
@@ -192,31 +236,16 @@ body > header > h1 {
 }
 
 
-/*** Sidebar ***/
-
-aside.sidebar > section > h1 {
-  font-size: 1.5em;
-}
-
-aside.sidebar > section > ul li {
-  list-style-type: none;
-}
-
-aside.sidebar > section > ul ul li {
-  margin-left: 1em;
-}
-
-
 /*** Simple Form ***/
 form.simple_form {
   input[type=submit] {
-    margin-left: 10em;
+    margin-left: 10.3em;
   }
   
   div.input {
     margin-bottom: 0.5em;
     
-    input, textarea {
+    input[type=text], input[type=file], textarea {
       width: 300px;
     }
     
@@ -239,8 +268,100 @@ form.simple_form {
       vertical-align: top;
       display: block;
     }
+    
+    fieldset {
+      border: none;
+      display: inline;
+      margin: 0;
+      padding: 0;
+      
+      label {
+        font-weight: normal;
+        width: auto;
+        margin-right: 2em;
+      }
+    }
   }
 }
+
+
+/*** Posts ***/
+
+div.posts {
+  h1 {
+    font-size: 1.2em;
+  }
+  
+  h2 {
+    font-size: 1.1em;
+  }
+  
+  aside#sidebar > section > ul li {
+    list-style-type: none;
+  }
+
+  aside#sidebar > section > ul ul li {
+    margin-left: 1em;
+  }
+  
+  section#tag-and-wiki-box {
+    padding: 0;
+    
+    menu {
+      li {
+        display: inline-block;
+      }
+      
+      li.active a {
+        color: #000;
+      }
+    }
+    
+    h1 {
+      font-size: 1.2em;
+    }
+    
+    div#tag-box {
+      h2 {
+        display: none;
+      }
+      
+      li {
+        list-style-type: none;
+      }
+    }
+    
+    div#wiki-box {
+      h2 {
+        display: none;
+      }
+    }
+  }
+
+  section#content > h1 {
+    display: none;
+  }
+  
+  section#content {
+    section > h2 {
+      display: none;
+    }
+    
+    menu#post-sections {
+      margin-bottom: 1em;
+      
+      li {
+        font-size: 1.1em;
+        font-weight: bold;
+      }
+      
+      li.active a {
+        color: black;
+      }
+    }
+  }
+}
+
 
 
 /*** Comments ***/
@@ -361,6 +482,15 @@ div#users {
     }
     
     div#p2 ul {
+      margin-bottom: 2em;
+    }
+  }
+}
+
+/*** Uploads ***/
+div.uploads {
+  div.new {
+    div#upload-guide-notice {
       margin-bottom: 2em;
     }
   }

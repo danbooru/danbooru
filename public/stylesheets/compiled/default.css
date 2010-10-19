@@ -37,11 +37,6 @@ a:active {
   color: #006ffa;
   text-decoration: none; }
 
-addr {
-  display: block;
-  margin-left: 2em;
-  font-weight: bold; }
-
 blockquote {
   margin: 0 0 1em 0;
   padding: 1em;
@@ -86,25 +81,25 @@ img {
   vertical-align: middle; }
 
 input[type=text], input[type=password], input[type=url], textarea, button {
-  border: 1px solid #AAA;
+  /*  border: 1px solid #AAA;*/
   font-size: 1em;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px; }
+  /*  -moz-border-radius: 4px;*/
+  /*  -webkit-border-radius: 4px;*/ }
 
 input[type=submit] {
   padding: 1px 4px;
-  border: 1px solid #AAA;
-  background-color: #EEE;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
+  /*  border: 1px solid #AAA;*/
+  /*  background-color: #EEE;*/
+  /*  -moz-border-radius: 4px;*/
+  /*  -webkit-border-radius: 4px;*/
   font-size: 1em;
   cursor: pointer; }
 
 input:focus, textarea:focus {
-  background-color: #FFD; }
+  /*  background-color: #FFD;*/ }
 
 input[type=submit]:hover {
-  background-color: #F6F6F6; }
+  /*  background-color: #F6F6F6;*/ }
 
 menu {
   margin: 0;
@@ -128,41 +123,63 @@ span.link {
 table tfoot {
   margin-top: 2em; }
 
-div#content > aside {
-  width: 25%;
-  float: left; }
+div#notice {
+  margin: 1em;
+  padding: 1em;
+  border: 2px solid #666;
+  background: #EEE; }
 
-div#content > aside > section {
+div#page aside#sidebar {
+  width: 20%;
+  float: left; }
+div#page aside#sidebar > section {
   margin-bottom: 2em; }
-
-div#content > section {
+div#page section#content {
   width: 75%;
-  float: left; }
+  float: left;
+  margin-left: 2em; }
 
 div.clearfix {
   clear: both; }
+
+/*** Paginator ***/
+div.paginator {
+  display: block;
+  padding: 2em 0 1em 0;
+  font-size: 1em;
+  text-align: center;
+  font-weight: bold;
+  clear: both; }
+  div.paginator a {
+    margin: 0 3px;
+    padding: 2px 6px;
+    font-weight: normal;
+    border: 1px solid #EAEAEA; }
+  div.paginator a.arrow {
+    border: none; }
+  div.paginator a.arrow:hover {
+    background: white;
+    color: #9093FF; }
+  div.paginator a.current {
+    border: 1px solid #AAA; }
+  div.paginator a:hover {
+    background: #3c3cdc;
+    color: white; }
+  div.paginator span {
+    margin: 0 3px;
+    padding: 2px 6px; }
 
 /*** Header ***/
 body > header > h1 {
   font-size: 3em;
   font-family: Tahoma, Helvetica, sans-serif; }
 
-/*** Sidebar ***/
-aside.sidebar > section > h1 {
-  font-size: 1.5em; }
-
-aside.sidebar > section > ul li {
-  list-style-type: none; }
-
-aside.sidebar > section > ul ul li {
-  margin-left: 1em; }
-
 /*** Simple Form ***/
 form.simple_form input[type=submit] {
-  margin-left: 10em; }
+  margin-left: 10.3em; }
 form.simple_form div.input {
   margin-bottom: 0.5em; }
-  form.simple_form div.input input, form.simple_form div.input textarea {
+  form.simple_form div.input input[type=text], form.simple_form div.input input[type=file], form.simple_form div.input textarea {
     width: 300px; }
   form.simple_form div.input textarea {
     height: 100px; }
@@ -178,6 +195,50 @@ form.simple_form div.input {
     font-style: italic;
     vertical-align: top;
     display: block; }
+  form.simple_form div.input fieldset {
+    border: none;
+    display: inline;
+    margin: 0;
+    padding: 0; }
+    form.simple_form div.input fieldset label {
+      font-weight: normal;
+      width: auto;
+      margin-right: 2em; }
+
+/*** Posts ***/
+div.posts h1 {
+  font-size: 1.2em; }
+div.posts h2 {
+  font-size: 1.1em; }
+div.posts aside#sidebar > section > ul li {
+  list-style-type: none; }
+div.posts aside#sidebar > section > ul ul li {
+  margin-left: 1em; }
+div.posts section#tag-and-wiki-box {
+  padding: 0; }
+  div.posts section#tag-and-wiki-box menu li {
+    display: inline-block; }
+  div.posts section#tag-and-wiki-box menu li.active a {
+    color: #000; }
+  div.posts section#tag-and-wiki-box h1 {
+    font-size: 1.2em; }
+  div.posts section#tag-and-wiki-box div#tag-box h2 {
+    display: none; }
+  div.posts section#tag-and-wiki-box div#tag-box li {
+    list-style-type: none; }
+  div.posts section#tag-and-wiki-box div#wiki-box h2 {
+    display: none; }
+div.posts section#content > h1 {
+  display: none; }
+div.posts section#content section > h2 {
+  display: none; }
+div.posts section#content menu#post-sections {
+  margin-bottom: 1em; }
+  div.posts section#content menu#post-sections li {
+    font-size: 1.1em;
+    font-weight: bold; }
+  div.posts section#content menu#post-sections li.active a {
+    color: black; }
 
 /*** Comments ***/
 div.comment-response > div {
@@ -250,3 +311,7 @@ div#users div#new {
     display: block; }
   div#users div#new div#p2 ul {
     margin-bottom: 2em; }
+
+/*** Uploads ***/
+div.uploads div.new div#upload-guide-notice {
+  margin-bottom: 2em; }

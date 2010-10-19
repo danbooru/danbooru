@@ -1,56 +1,60 @@
-<div id="upload-guide-notice">
-  <p>Before uploading, please read the <%= link_to "how to upload guide", wiki_page_path("howto:upload") %>. It explains how to tag and what ratings are.</p>
-</div>
-
-<% form_for(@upload, :html => {:multipart => true}) do |f| %>
-  <% if params[:url] %>
-    <div id="image-preview">
-      <%= image_tag(params[:url], :title => "Preview") %>
-      <p id="scale"></p>
+<div class="uploads">
+  <div class="new">
+    <div id="upload-guide-notice">
+      <p>Before uploading, please read the <%= link_to "how to upload guide", wiki_pages_path(:title => "howto:upload") %>.</p>
     </div>
-    
-    <% if @post %>
-      <p>This post was probably already uploaded (<%= link_to "post ##{@post.id}", posts_path(@post), :target => "_blank" %>).</p>
+
+    <% form_for(@upload, :html => {:multipart => true, :class => "simple_form"}) do |f| %>
+      <% if params[:url] %>
+        <div id="image-preview">
+          <%= image_tag(params[:url], :title => "Preview") %>
+          <p id="scale"></p>
+        </div>
+
+        <% if @post %>
+          <p>This post was probably already uploaded (<%= link_to "post ##{@post.id}", posts_path(@post), :target => "_blank" %>).</p>
+        <% end %>
+      <% end %>
+
+      <div class="input">
+        <%= f.label :file %>
+        <%= f.file_field :file, :size => 50 %>
+      </div>
+
+      <div class="input">
+        <%= f.label :source, nil, :title => "You can enter a URL to have #{Danbooru.config.app_name} automatically download and process it" %>
+        <%= f.text_field :source, :size => 50, :value => params[:url] %>
+      </div>
+      
+      <div class="input">
+        <%= f.label :rating_q, "Rating" %>
+        
+        <fieldset class="ratings">
+          <%= f.radio_button :rating, :e %>
+          <%= f.label :rating_e, "Explicit", :title => "Hardcore porn, visible genitals, gore" %>
+
+          <%= f.radio_button :rating, :q %>
+          <%= f.label :rating_q, "Questionable", :title => "Nudity, anything erotic" %>
+
+          <%= f.radio_button :rating, :s %>          
+          <%= f.label :rating_s, "Safe", :title => "Everything else" %>
+        </fieldset>
+      </div>
+
+      <div class="input">
+        <%= f.label :tag_string, "Tags" %>
+        <%= f.text_area :tag_string, :size => "60x4" %>
+      </div>
+
+      <div class="input">
+        <%= submit_tag "Submit" %>
+      </div>
     <% end %>
-  <% end %>
-  
-  <fieldset>
-    <legend>Upload</legend>
-    
-    <p>
-      <%= f.label :file %>
-      <%= f.file_field :file, :size => 50 %>
-    </p>
-    
-    <p>
-      <%= f.label :source, nil, :title => "You can enter a URL to have #{Danbooru.config.app_name} automatically download and process it" %>
-      <%= f.text_field :source, :size => 50, :value => params[:url] %>
-    </p>
-    
-    <p>
-      <%= f.label :tag_string, "Tags" %>
-      <%= f.text_area :tag_string, :size => "60x4" %>
-    </p>
-    
-    <p>
-      <%= f.label :rating_e, "Explicit", :title => "Hardcore porn, visible genitals, gore" %>
-      <%= f.radio_button :rating, :e %>
-
-      <%= f.label :rating_q, "Questionable", :title => "Nudity, anything erotic" %>
-      <%= f.radio_button :rating, :q %>
-
-      <%= f.label :rating_s, "Safe", :title => "Everything else" %>
-      <%= f.radio_button :rating, :s %>
-    </p>
-    
-    <p>
-      <%= submit_tag "Submit" %>
-    </p>
-  </fieldset>
-<% end %>
+  </div>
+</div>
 
 <% content_for(:page_title) do %>
   / Upload
 <% end %>
 
-<%= render :partial => "posts/common_secondary_nav_links" %>
+<%= render :partial => "posts/partials/common/secondary_links" %>

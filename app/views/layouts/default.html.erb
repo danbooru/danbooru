@@ -13,6 +13,7 @@
   <% end %>
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
   <%= stylesheet_link_tag "compiled/default" %>
+  <%= stylesheet_link_tag "smoothness/jquery-ui-1.8.5.custom.css" %>
   <%= javascript_include_tag "compiled/default" %>
   <%= Danbooru.config.custom_html_header_content %>
   <%= yield :html_header %>
@@ -47,7 +48,7 @@
     <div id="notice" style="display: none;"></div>
   <% end %>
 
-  <div id="content">
+  <div id="page">
     <%= yield :layout %>
   </div>
   

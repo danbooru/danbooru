@@ -3,6 +3,7 @@
 mkdir -p public/javascripts/compiled/posts
 
 cat public/javascripts/src/lib/jquery.min.js > public/javascripts/compiled/default.js
+cat public/javascripts/src/lib/jquery-ui-1.8.5.custom.min.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/lib/rails.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/cookie.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/application.js >> public/javascripts/compiled/default.js

@@ -1,81 +1,90 @@
-<% if @post_set.suggestions.any? %>
-  <div class="notice">
-    Maybe you meant: <%= @post_set.suggestions.map {|x| link_to(x, posts_path(:tags => x), :class => "tag-type-#{Tag.type_name(x)}" )}.to_sentence(:last_word_connector => ", or ", :two_words_connector => " or ") %>
-  </div>
-<% end %>
+<div class="posts">
+  <div class="index">
+    <% if @post_set.suggestions.any? %>
+      <div class="notice">
+        Maybe you meant: <%= @post_set.suggestions.map {|x| link_to(x, posts_path(:tags => x), :class => "tag-type-#{Tag.type_name(x)}" )}.to_sentence(:last_word_connector => ", or ", :two_words_connector => " or ") %>
+      </div>
+    <% end %>
 
-<aside class="sidebar">
-  <section id="search-box">
-    <h1>Search</h1>
-    <% form_tag(posts_path, :method => "get") do %>
-      <%= text_field_tag("tags", params[:tags], :size => 20) %>
-      <%= submit_tag "Go" %>
-    <% end %>    
-  </section>
-  
-  <% if CurrentUser.user.is_privileged? %>
-    <section id="mode-box">
-      <h1>Mode</h1>
-      <form action="/">
-        <select name="mode">
-          <option value="view">View</option>
-          <option value="edit">Edit</option>
-          <option value="add-fav">Favorite</option>
-          <option value="remove-fav">Unfavorite</option>
-          <option value="rating-s">Rate safe</option>
-          <option value="rating-q">Rate questionable</option>
-          <option value="rating-e">Rate explicit</option>
-          <option value="vote-up">Vote up</option>
-          <option value="vote-down">Vote down</option>
-          <option value="lock-rating">Lock rating</option>
-          <option value="lock-note">Lock notes</option>
-          <option value="edit-tag-script">Edit tag script</option>
-          <option value="apply-tag-script">Apply tag script</option>
-          <% if CurrentUser.user.is_janitor? %>
-            <option value="approve">Approve</option>
+    <aside class="sidebar">
+      <section id="search-box">
+        <h1>Search</h1>
+        <% form_tag(posts_path, :method => "get") do %>
+          <%= text_field_tag("tags", params[:tags], :size => 20) %>
+          <%= submit_tag "Go" %>
+        <% end %>    
+      </section>
+
+      <% if CurrentUser.user.is_privileged? %>
+        <section id="mode-box">
+          <h1>Mode</h1>
+          <form action="/">
+            <select name="mode">
+              <option value="view">View</option>
+              <option value="edit">Edit</option>
+              <option value="add-fav">Favorite</option>
+              <option value="remove-fav">Unfavorite</option>
+              <option value="rating-s">Rate safe</option>
+              <option value="rating-q">Rate questionable</option>
+              <option value="rating-e">Rate explicit</option>
+              <option value="vote-up">Vote up</option>
+              <option value="vote-down">Vote down</option>
+              <option value="lock-rating">Lock rating</option>
+              <option value="lock-note">Lock notes</option>
+              <option value="edit-tag-script">Edit tag script</option>
+              <option value="apply-tag-script">Apply tag script</option>
+              <% if CurrentUser.user.is_janitor? %>
+                <option value="approve">Approve</option>
+              <% end %>
+              <option value="unapprove">Unapprove</option>
+            </select>          
+          </form>
+        </section>
+      <% end %>
+
+      <section id="blacklist-box">
+        <h1>Blacklisted</h1>
+        <%= link_to "Hidden", "#" %>
+        <ul>
+        </ul>
+      </section>
+
+      <section id="tag-and-wiki-box">
+        <menu>
+          <li><h1><a href="#tag-box">Tags</a></h1></li>
+          <% unless @post_set.tags.blank?  %>
+            <li><h1><a href="#wiki-box">Wiki</a></h1></li>
           <% end %>
-          <option value="unapprove">Unapprove</option>
-        </select>          
-      </form>
-    </section>
-  <% end %>
+        </menu>
 
-  <section id="blacklist-box">
-    <h1>Blacklisted</h1>
-    <%= link_to "Hidden", "#" %>
-    <ul>
-    </ul>
-  </section>
-  
-  <div id="tag-and-wiki-box">
-    <menu>
-      <li><h1>Tags</h1></li>
-      <li><h1>Wiki</h1></li>
-    </menu>
+        <div id="tag-box">
+          <h2>Tags</h2>
+          <%= @post_set.presenter.tag_list_html(self) %>
+        </div>
+
+        <div id="wiki-box">
+          <h2>Wiki</h2>
+          <%= @post_set.presenter.wiki_html(self) %>
+        </div>
+      </section>
+    </aside>
+
+    <section class="content">
+      <h1>Posts</h1>
+      <%= @post_set.presenter.post_previews_html %>
+
+      <div class="clearfix"></div>
     
-    <section id="tag-box">
-      <h2>Tags</h2>
-      <%= @post_set.presenter.tag_list_html %>
+      <div class="paginator">
+        <%= @post_set.presenter.pagination_html(self) %>
+      </div>
     </section>
     
-    <section id="wiki-box">
-      <h2>Wiki</h2>
-      <%= @post_set.presenter.wiki_html(self) %>
-    </section>
+    <% content_for(:page_title) do %>
+      / <%= @post_set.tags %>
+    <% end %>
+
+    <%= render :partial => "posts/partials/common/secondary_links" %>    
   </div>
-</aside>
+</div>
 
-<section>
-  <h1>Posts</h1>
-  <%= @post_set.presenter.post_previews_html %>
-</section>
-
-<footer>
-  <%= @post_set.presenter.pagination_html(self) %>
-</footer>
-
-<% content_for(:page_title) do %>
-  / <%= @post_set.tags %>
-<% end %>
-
-<%= render :partial => "posts/partials/common/secondary_links" %>

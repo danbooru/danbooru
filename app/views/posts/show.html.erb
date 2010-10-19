@@ -1,48 +1,58 @@
-<aside class="sidebar">
-  <section>
-    <h1>Search</h1>
-    <%= render :partial => "posts/partials/common/search" %>
-  </section>
-  
-  <section>
-    <h1>Tags</h1>
-    <%= @post.presenter.tag_list_html(self) %>
-  </section>
-  
-  <section>
-    <h1>Information</h1>
-    <%= render :partial => "posts/partials/show/information", :locals => {:post => @post} %>
-  </section>
+<div class="posts">
+  <div class="show">
+    <aside id="sidebar">
+      <section>
+        <h1>Search</h1>
+        <%= render :partial => "posts/partials/common/search" %>
+      </section>
 
-  <section>
-    <h1>Options</h1>
-    <%= render :partial => "posts/partials/show/options", :locals => {:post => @post} %>
-  </section>  
-</aside>
+      <section>
+        <h1>Tags</h1>
+        <%= @post.presenter.tag_list_html(self) %>
+      </section>
 
-<section>
-  <h1>Post</h1>
-  
-  <section>
-    <h2>Image</h2>
-    <%= @post.presenter.image_html(self) %>
-  </section>
-  
-  <section>
-    <h2>Notes</h2>
-    <%= render :partial => "notes/note", :collection => @post.notes.active %>
-  </section>
-  
-  <section>
-    <h2>Comments</h2>
-    <%= render :partial => "comments/partials/index/list", :locals => {:comments => @post.comments, :post => @post} %>
-  </section>
-  
-  <section>
-    <h2>Edit</h2>
-    <%= render :partial => "posts/partials/show/edit", :locals => {:post => @post} %>
-  </section>
-</section>
+      <section>
+        <h1>Information</h1>
+        <%= render :partial => "posts/partials/show/information", :locals => {:post => @post} %>
+      </section>
+
+      <section>
+        <h1>Options</h1>
+        <%= render :partial => "posts/partials/show/options", :locals => {:post => @post} %>
+      </section>  
+    </aside>
+
+    <section id="content">
+      <h1>Post</h1>
+
+      <section id="image">
+        <h2>Image</h2>
+        <%= @post.presenter.image_html(self) %>
+      </section>
+      
+      <menu id="post-sections">
+        <li><a href="#comments">Comments</a></li>
+        <li><a href="#notes">Notes</a></li>
+        <li><a href="#edit">Edit</a></li>
+      </menu>
+
+      <section id="comments">
+        <h2>Comments</h2>
+        <%= render :partial => "comments/partials/index/list", :locals => {:comments => @post.comments, :post => @post} %>
+      </section>
+
+      <section id="notes">
+        <h2>Notes</h2>
+        <%= render :partial => "notes/note", :collection => @post.notes.active %>
+      </section>
+
+      <section id="edit">
+        <h2>Edit</h2>
+        <%= render :partial => "posts/partials/show/edit", :locals => {:post => @post} %>
+      </section>
+    </section>    
+  </div>
+</div>
 
 <% content_for(:page_title) do %>
   / <%= @post.tag_string %>

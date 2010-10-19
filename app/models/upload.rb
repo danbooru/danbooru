@@ -7,8 +7,8 @@ class Upload < ActiveRecord::Base
   attr_accessor :file, :image_width, :image_height, :file_ext, :md5, :file_size
   belongs_to :uploader, :class_name => "User"
   belongs_to :post
-  before_validation_on_create :initialize_uploader
-  before_validation_on_create :initialize_status
+  before_validation :initialize_uploader, :on => :create
+  before_validation :initialize_status, :on => :create
   before_create :convert_cgi_file
   validate :uploader_is_not_limited
   
