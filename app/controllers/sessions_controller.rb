@@ -7,7 +7,7 @@ class SessionsController < ApplicationController
     if User.authenticate(params[:name], params[:password])
       @user = User.find_by_name(params[:name])
       session[:user_id] = @user.id
-      redirect_to(params[:url] || posts_path, :notice => "You are now logged in.")
+      redirect_to(params[:url] || session[:previous_uri] || posts_path, :notice => "You are now logged in.")
     else
       redirect_to(new_session_path, :notice => "Password was incorrect.")
     end

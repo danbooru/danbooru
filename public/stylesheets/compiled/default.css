@@ -205,6 +205,24 @@ form.simple_form div.input {
       width: auto;
       margin-right: 2em; }
 
+/*** DText Preview ***/
+div.dtext p {
+  margin-bottom: 1em; }
+
+/*** Comments ***/
+div.comments-for-post div.list-of-comments article {
+  margin-bottom: 2em; }
+  div.comments-for-post div.list-of-comments article div.author {
+    width: 20%;
+    float: left; }
+  div.comments-for-post div.list-of-comments article div.content {
+    margin-left: 2em;
+    width: 40em;
+    float: left; }
+div.comments-for-post div.comment-preview {
+  width: 40em;
+  margin-bottom: 2em; }
+
 /*** Posts ***/
 div.posts h1 {
   font-size: 1.2em; }

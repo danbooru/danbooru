@@ -174,10 +174,12 @@
   Danbooru.Post.initialize_tag_list = function() {
     $("#tag-box a.search-inc-tag").click(function(e) {
       $("#tags").val($("#tags").val() + " " + $(e.target).parent("li").attr("data-tag-name"));
+      return false;
     });
 
     $("#tag-box a.search-exl-tag").click(function(e) {
       $("#tags").val($("#tags").val() + " -" + $(e.target).parent("li").attr("data-tag-name"));
+      return false;
     });
   }
   
@@ -189,6 +191,7 @@
       var name = e.target.hash;
       $(name).show();
       e.stopPropagation();
+      return false;
     });
     
     $("#tag-and-wiki-box menu li:first-child").addClass("active");
@@ -205,6 +208,7 @@
       var name = e.target.hash;
       $(name).show();
       e.stopPropagation();
+      return false;
     });
     
     $("#post-sections li:first-child").addClass("active");

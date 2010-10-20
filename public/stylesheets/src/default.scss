@@ -285,6 +285,42 @@ form.simple_form {
 }
 
 
+/*** DText Preview ***/
+
+div.dtext {
+  p {
+    margin-bottom: 1em;
+  }
+}
+
+
+/*** Comments ***/
+
+div.comments-for-post {
+  div.list-of-comments {
+    article {
+      margin-bottom: 2em;
+      
+      div.author {
+        width: 20%;
+        float: left;
+      }
+      
+      div.content {
+        margin-left: 2em;
+        width: 40em;
+        float: left;
+      }
+    }
+  }
+  
+  div.comment-preview {
+    width: 40em;
+    margin-bottom: 2em;
+  }
+}
+
+
 /*** Posts ***/
 
 div.posts {
@@ -361,7 +397,6 @@ div.posts {
     }
   }
 }
-
 
 
 /*** Comments ***/

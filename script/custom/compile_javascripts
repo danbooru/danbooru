@@ -8,4 +8,5 @@ cat public/javascripts/src/lib/rails.js >> public/javascripts/compiled/default.j
 cat public/javascripts/src/app/cookie.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/application.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/posts.js >> public/javascripts/compiled/default.js
+cat public/javascripts/src/app/comments.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/uploads.js >> public/javascripts/compiled/default.js

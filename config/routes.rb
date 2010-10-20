@@ -62,6 +62,7 @@ Danbooru::Application.routes.draw do
   end
   resources :wiki_page_versions
 
+  match '/dtext/preview' => 'dtext#preview', :via => :post
   match "/site_map" => "static#site_map", :as => "site_map"
   match "/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
   match "/user_maintenance/delete_account" => "user_maintenance#delete_account", :as => "delete_account_info"
