@@ -6,7 +6,7 @@
       </div>
     <% end %>
 
-    <aside class="sidebar">
+    <aside id="sidebar">
       <section id="search-box">
         <h1>Search</h1>
         <% form_tag(posts_path, :method => "get") do %>
@@ -69,7 +69,7 @@
       </section>
     </aside>
 
-    <section class="content">
+    <section id="content">
       <h1>Posts</h1>
       <%= @post_set.presenter.post_previews_html %>
 

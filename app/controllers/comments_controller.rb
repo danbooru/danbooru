@@ -1,5 +1,6 @@
 class CommentsController < ApplicationController
   respond_to :html, :xml, :json
+  before_filter :member_only, :only => [:update, :create]
 
   def index
     @posts = Post.commented_before(params[:before_date] || Time.now).limit(8)
