@@ -44,11 +44,19 @@ class Post < ActiveRecord::Base
     end
     
     def medium_file_path
-      "#{Rails.root}/public/data/medium/#{file_path_prefix}#{md5}.jpg"
+      if has_medium?
+        "#{Rails.root}/public/data/medium/#{file_path_prefix}#{md5}.jpg"
+      else
+        file_path
+      end
     end
 
     def large_file_path
-      "#{Rails.root}/public/data/large/#{file_path_prefix}#{md5}.jpg"
+      if has_large?
+        "#{Rails.root}/public/data/large/#{file_path_prefix}#{md5}.jpg"
+      else
+        file_path
+      end
     end
 
     def preview_file_path

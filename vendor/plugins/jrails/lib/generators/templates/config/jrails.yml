@@ -1,0 +1,19 @@
+# if google: true, jrails will use 'jquery_version', 'jqueryui_version' feature.
+# for version information See Also http://code.google.com/apis/ajaxlibs/
+
+# default values in jrails/lib/jrails.rb
+#development:
+#  google: false
+#  compressed: true
+#  jquery_version: "1.4.2"
+#  jqueryui_version: "1.8.4"
+
+development:
+  google: false
+  compressed: false
+
+production:
+  google: true
+
+test:
+  google: false

@@ -1,2 +1,7 @@
-- @posts.each do |post|
-  = @post.id
+%div{:class => "comments"}
+  %div{:class => "index"}
+    - @posts.each do |post|
+      %div{:class => "preview"}
+        = image_tag(post.medium_file_url)
+      = render :partial => "comments/partials/index/list", :locals => {:post => post, :comments => post.comments}
+      %div{:class => "clearfix"}

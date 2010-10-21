@@ -42,6 +42,11 @@
     <% end %>
     
     <div class="input">
+      <%= f.label :parent_id, "Parent" %>
+      <%= f.text_field :parent_id, :size => 5 %>
+    </div>
+    
+    <div class="input">
       <%= f.label :source %>
       <%= f.text_field :source %>
     </div>

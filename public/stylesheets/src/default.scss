@@ -320,6 +320,20 @@ div.comments-for-post {
   }
 }
 
+div.comments {
+  div.index {
+    div.preview {
+      float: left;
+      width: 420px;
+    }
+    
+    div.list-of-comments {
+      float: left;
+      width: 55em;
+    }
+  }
+}
+
 
 /*** Posts ***/
 

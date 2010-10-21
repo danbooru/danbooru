@@ -223,6 +223,13 @@ div.comments-for-post div.comment-preview {
   width: 40em;
   margin-bottom: 2em; }
 
+div.comments div.index div.preview {
+  float: left;
+  width: 420px; }
+div.comments div.index div.list-of-comments {
+  float: left;
+  width: 55em; }
+
 /*** Posts ***/
 div.posts h1 {
   font-size: 1.2em; }

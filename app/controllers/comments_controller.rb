@@ -24,6 +24,8 @@ class CommentsController < ApplicationController
         flash[:notice] = "Comment posted"
         redirect_to posts_path(@comment.post)
       end
+      
+      format.js
     end
   end
 end
