@@ -223,6 +223,7 @@ CREATE TABLE artists (
     name character varying(255) NOT NULL,
     creator_id integer NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
+    is_banned boolean DEFAULT false NOT NULL,
     other_names text,
     other_names_index tsvector,
     group_name character varying(255),
@@ -865,41 +866,6 @@ ALTER SEQUENCE janitor_trials_id_seq OWNED BY janitor_trials.id;
 
 
 --
--- Name: jobs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobs (
-    id integer NOT NULL,
-    category character varying(255) NOT NULL,
-    status character varying(255) NOT NULL,
-    message text NOT NULL,
-    data_as_json text NOT NULL,
-    repeat_count integer NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: jobs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE jobs_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: jobs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE jobs_id_seq OWNED BY jobs.id;
-
-
---
 -- Name: note_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1283,7 +1249,7 @@ CREATE TABLE tag_aliases (
     antecedent_name character varying(255) NOT NULL,
     consequent_name character varying(255) NOT NULL,
     creator_id integer NOT NULL,
-    request_ids character varying(255),
+    forum_topic_id integer,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -1318,7 +1284,7 @@ CREATE TABLE tag_implications (
     consequent_name character varying(255) NOT NULL,
     descendant_names text NOT NULL,
     creator_id integer NOT NULL,
-    request_ids character varying(255),
+    forum_topic_id integer,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -1817,13 +1783,6 @@ ALTER TABLE janitor_trials ALTER COLUMN id SET DEFAULT nextval('janitor_trials_i
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE jobs ALTER COLUMN id SET DEFAULT nextval('jobs_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE note_versions ALTER COLUMN id SET DEFAULT nextval('note_versions_id_seq'::regclass);
 
 
@@ -2143,14 +2102,6 @@ ALTER TABLE ONLY ip_bans
 
 ALTER TABLE ONLY janitor_trials
     ADD CONSTRAINT janitor_trials_pkey PRIMARY KEY (id);
-
-
---
--- Name: jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY jobs
-    ADD CONSTRAINT jobs_pkey PRIMARY KEY (id);
 
 
 --
@@ -3204,8 +3155,6 @@ INSERT INTO schema_migrations (version) VALUES ('20100219230537');
 INSERT INTO schema_migrations (version) VALUES ('20100221003655');
 
 INSERT INTO schema_migrations (version) VALUES ('20100221005812');
-
-INSERT INTO schema_migrations (version) VALUES ('20100221012656');
 
 INSERT INTO schema_migrations (version) VALUES ('20100223001012');
 

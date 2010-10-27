@@ -83,7 +83,7 @@ class PixivProxy
 		mech = WWW::Mechanize.new
 		
 		mech.get("http://www.pixiv.net") do |page|
-			page.form_with(:action => "index.php") do |form|
+			page.form_with(:action => "login.php") do |form|
 				form.pixiv_id = "uroobnad"
 				form.pass = "uroobnad556"
 			end.click_button

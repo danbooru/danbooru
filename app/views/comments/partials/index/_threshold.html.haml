@@ -1,0 +1,3 @@
+<% if post.hidden_comment_count(@current_user) > 0 %>
+  <span class="info" id="threshold-comments-notice-for-<%= post.id %>"><%= link_to_remote "#{pluralize post.hidden_comment_count(@current_user), 'comment'} below threshold", :url => {:controller => "comment", :action => "index_all", :post_id => post.id} %>.</span>
+<% end %>

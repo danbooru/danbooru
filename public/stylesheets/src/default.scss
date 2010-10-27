@@ -324,12 +324,20 @@ div.comments {
   div.index {
     div.preview {
       float: left;
-      width: 420px;
+      width: 180px;
     }
     
-    div.list-of-comments {
-      float: left;
-      width: 55em;
+    div.post {
+      margin-bottom: 4em;
+
+      div.comments-for-post {
+        float: left;
+        width: 55em;
+
+        h1 {
+          font-size: 1.2em;
+        }
+      }
     }
   }
 }

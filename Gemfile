@@ -4,7 +4,7 @@ group :test do
   gem "shoulda"
   gem "factory_girl"
   gem "mocha"
-  gem "faker"
+  gem "ffaker", :git => "http://github.com/EmmanuelOga/ffaker.git"
 end
 
 gem "rails", "3.0.0"

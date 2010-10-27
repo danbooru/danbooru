@@ -225,10 +225,14 @@ div.comments-for-post div.comment-preview {
 
 div.comments div.index div.preview {
   float: left;
-  width: 420px; }
-div.comments div.index div.list-of-comments {
-  float: left;
-  width: 55em; }
+  width: 180px; }
+div.comments div.index div.post {
+  margin-bottom: 4em; }
+  div.comments div.index div.post div.comments-for-post {
+    float: left;
+    width: 55em; }
+    div.comments div.index div.post div.comments-for-post h1 {
+      font-size: 1.2em; }
 
 /*** Posts ***/
 div.posts h1 {

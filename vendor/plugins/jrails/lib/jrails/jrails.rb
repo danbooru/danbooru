@@ -1,4 +1,4 @@
-class JRails
+module JRails
   @@config = {
     :google           => false,
     :jquery_version   => "1.4.2",
