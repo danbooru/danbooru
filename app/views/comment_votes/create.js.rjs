@@ -1,0 +1,3 @@
+if @error
+  page.alert(@error.to_s)
+end
