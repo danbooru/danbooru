@@ -1,0 +1,1 @@
+page["#score-for-post-#{@post.id} span"].val(@post.score)
