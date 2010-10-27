@@ -10,6 +10,7 @@ class Upload < ActiveRecord::Base
   before_validation :initialize_uploader, :on => :create
   before_validation :initialize_status, :on => :create
   before_create :convert_cgi_file
+  after_destroy :delete_temp_file
   validate :uploader_is_not_limited
   
   module ValidationMethods
@@ -70,6 +71,8 @@ class Upload < ActiveRecord::Base
       end
     rescue Exception => x
       update_attribute(:status, "error: #{x} - #{x.message}")
+    ensure
+      delete_temp_file
     end
 
     def convert_to_post
@@ -100,6 +103,10 @@ class Upload < ActiveRecord::Base
   end
   
   module FileMethods
+    def delete_temp_file
+      FileUtils.rm_f(temp_file_path)
+    end
+    
     def move_file
       FileUtils.mv(file_path, md5_file_path)
     end
@@ -223,7 +230,7 @@ class Upload < ActiveRecord::Base
     end
     
     def temp_file_path
-      File.join(Rails.root, "tmp", "#{Time.now.to_f}.#{$PROCESS_ID}")
+      @temp_file_path ||= File.join(Rails.root, "tmp", "#{Time.now.to_f}.#{$PROCESS_ID}")
     end
   end
   

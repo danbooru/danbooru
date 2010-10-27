@@ -521,11 +521,15 @@ class PostTest < ActiveSupport::TestCase
     end
   
     should "return posts for the <uploader> metatag" do
-      user = Factory.create(:user)
-      post1 = Factory.create(:post, :uploader => user)
-      post2 = Factory.create(:post)
-      post3 = Factory.create(:post)
-      relation = Post.find_by_tags("uploader:#{user.name}")
+      second_user = Factory.create(:user)
+      post1 = Factory.create(:post)
+      
+      CurrentUser.scoped(second_user, "127.0.0.2") do
+        post2 = Factory.create(:post)
+        post3 = Factory.create(:post)
+      end
+      
+      relation = Post.find_by_tags("uploader:#{CurrentUser.user.name}")
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
     end

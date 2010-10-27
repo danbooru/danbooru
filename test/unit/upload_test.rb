@@ -11,6 +11,8 @@ class UploadTest < ActiveSupport::TestCase
   teardown do
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
+    
+    @upload.delete_temp_file if @upload
   end
   
   context "An upload" do    
@@ -164,5 +166,16 @@ class UploadTest < ActiveSupport::TestCase
     assert_equal(28086, File.size(post.file_path))
     assert_equal(post.id, @upload.post_id)
     assert_equal("completed", @upload.status)    
+  end
+  
+  should "delete the temporary file upon completion" do
+    @upload = Factory.create(:source_upload,
+      :rating => "s",
+      :uploader_ip_addr => "127.0.0.1",
+      :tag_string => "hoge foo"
+    )
+    
+    @upload.process!
+    assert(!File.exists?(@upload.temp_file_path))
   end
 end

@@ -28,8 +28,6 @@ class WikiPageTest < ActiveSupport::TestCase
     
     should "create versions" do
       wp = nil
-      user = Factory.create(:user)
-      reverter = Factory.create(:user)
       
       assert_difference("WikiPageVersion.count") do
         wp = Factory.create(:wiki_page, :title => "xxx")
@@ -37,15 +35,29 @@ class WikiPageTest < ActiveSupport::TestCase
 
       assert_difference("WikiPageVersion.count") do
         wp.title = "yyy"
-        wp.updater_id = user.id
-        wp.updater_ip_addr = "127.0.0.1"
         wp.save
       end
-      
+    end
+    
+    should "revert to a prior version" do
+      wp = Factory.create(:wiki_page, :title => "xxx")
+      wp.title = "yyy"
+      wp.save
       version = WikiPageVersion.first
-      wp.revert_to!(version, reverter.id, "127.0.0.1")
-      
+      wp.revert_to!(version)
+      wp.reload
       assert_equal("xxx", wp.title)
+    end
+    
+    should "differentiate between updater and creator" do
+      user = Factory.create(:user)
+      wp = Factory.create(:wiki_page, :title => "xxx")
+      CurrentUser.scoped(user, "127.0.0.1") do
+        wp.title = "yyy"
+        wp.save
+      end
+      version = WikiPageVersion.first
+      assert_not_equal(wp.creator_id, version.updater_id)      
     end
   end
 end

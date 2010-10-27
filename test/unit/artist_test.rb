@@ -48,7 +48,7 @@ class ArtistTest < ActiveSupport::TestCase
     should "parse urls" do
       artist = Factory.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/test.jpg http://aaa.com")
       artist.reload
-      assert_equal(["http://aaa.com", "http://rembrandt.com/test.jpg"], artist.artist_urls.map(&:to_s).sort)
+      assert_equal(["http://aaa.com", "http://rembrandt.com/test.jpg"], artist.urls.map(&:to_s).sort)
     end
     
     should "make sure old urls are deleted" do
@@ -56,7 +56,7 @@ class ArtistTest < ActiveSupport::TestCase
       artist.url_string = "http://not.rembrandt.com/test.jpg"
       artist.save
       artist.reload
-      assert_equal(["http://not.rembrandt.com/test.jpg"], artist.artist_urls.map(&:to_s).sort)
+      assert_equal(["http://not.rembrandt.com/test.jpg"], artist.urls.map(&:to_s).sort)
     end
 
     should "find matches by url" do

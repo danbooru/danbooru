@@ -15,6 +15,11 @@ class TagImplicationTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
     
+    should "populate the creator information" do
+      ti = Factory.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
+      assert_equal(CurrentUser.user.id, ti.creator_id)
+    end
+    
     should "not validate when a circular relation is created" do
       ti1 = Factory.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       ti2 = Factory.build(:tag_implication, :antecedent_name => "bbb", :consequent_name => "aaa")
@@ -38,7 +43,7 @@ class TagImplicationTest < ActiveSupport::TestCase
       ti1.update_attributes(
         :consequent_name => "ccc"
       )
-      assert_nil(MEMCACHE.get("ti:aaa"))
+      assert_equal(["ccc"], MEMCACHE.get("ti:aaa"))
     end
     
     should "clear the cache upon destruction" do
@@ -98,6 +103,18 @@ class TagImplicationTest < ActiveSupport::TestCase
       ti2 = Factory.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "yyy")
       p1.reload
       assert_equal("aaa yyy xxx bbb ccc", p1.tag_string)
+    end
+    
+    should "record the implication's creator in the tag history" do
+      user = Factory.create(:user)
+      p1 = nil
+      CurrentUser.scoped(user, "127.0.0.1") do
+        p1 = Factory.create(:post, :tag_string => "aaa bbb ccc")
+      end
+      ti1 = Factory.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "xxx")
+      p1.reload
+      assert_not_equal("uploader:#{ti1.creator_id}", p1.uploader_string)
+      assert_equal(ti1.creator_id, p1.versions.last.updater_id)
     end
   end
 end

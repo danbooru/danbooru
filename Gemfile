@@ -15,5 +15,7 @@ gem "delayed_job"
 gem "super_exception_notifier"
 gem "haml"
 gem "simple_form"
+gem "mechanize"
+gem "nokogiri"
 
 gem "will_paginate", :git => "http://github.com/mislav/will_paginate.git", :branch => "rails3"

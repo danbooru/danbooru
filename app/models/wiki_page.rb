@@ -29,14 +29,14 @@ class WikiPage < ActiveRecord::Base
     titled(title).select("title, id").first
   end
   
-  def revert_to(version, reverter_id, reverter_ip_addr)
+  def revert_to(version)
     self.title = version.title
     self.body = version.body
     self.is_locked = version.is_locked
   end
   
-  def revert_to!(version, reverter_id, reverter_ip_addr)
-    revert_to(version, reverter_id, reverter_ip_addr)
+  def revert_to!(version)
+    revert_to(version)
     save!
   end
 
