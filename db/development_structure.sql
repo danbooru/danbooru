@@ -1089,6 +1089,7 @@ CREATE TABLE post_votes (
     id integer NOT NULL,
     post_id integer NOT NULL,
     user_id integer NOT NULL,
+    score integer NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );

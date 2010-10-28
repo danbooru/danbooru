@@ -1,100 +1,102 @@
-<div id="users-new">
-  <h1>Registration</h1>
-  
-  <div id="p1">
-    <p><%= Danbooru.config.app_name %> is ad-sponsored and does not require an account to view. But in order to start uploading, editing, or creating content on this site, you will need to register. <em>Make sure you read and agree to the <%= link_to "terms of service", terms_of_service_path %> before registering. <strong>This site is open to web crawlers, therefore any name you choose will be public!</strong></em></p>
+<div class="users">
+  <div class="new">
+    <h1>Registration</h1>
 
-    <p>Registration for a basic account is free but comes with some limitations.</p>
+    <div id="p1">
+      <p><%= Danbooru.config.app_name %> is ad-sponsored and does not require an account to view. But in order to start uploading, editing, or creating content on this site, you will need to register. <em>Make sure you read and agree to the <%= link_to "terms of service", terms_of_service_path %> before registering. <strong>This site is open to web crawlers, therefore any name you choose will be public!</strong></em></p>
 
-    <div id="account-comparison">
-      <section>
-        <h1>Basic</h1>
-        <ul>
-          <li>Free</li>
-          <li>Uploads limited</li>
-          <li>Search up to 2 tags at once</li>
-          <li>Some hidden posts</li>
-          <li>Ads visible</li>
-          <li>Create and edit posts, favorites, forum posts, comments, wiki pages, pools, artists, and dmails</li>
-        </ul>
-      </section>
+      <p>Registration for a basic account is free but comes with some limitations.</p>
 
-      <section>
-        <h1>Privileged</h1>
-        <ul>
-          <li>One time $20 fee</li>
-          <li>Uploads limited</li>
-          <li>Search up to 6 tags at once</li>
-          <li>No hidden posts</li>
-          <li>No ads</li>
-          <li>Tag subscriptions</li>
-        </ul>
-      </section>
+      <div id="account-comparison">
+        <section>
+          <h1>Basic</h1>
+          <ul>
+            <li>Free</li>
+            <li>Uploads limited</li>
+            <li>Search up to 2 tags at once</li>
+            <li>Some hidden posts</li>
+            <li>Ads visible</li>
+            <li>Create and edit posts, favorites, forum posts, comments, wiki pages, pools, artists, and dmails</li>
+          </ul>
+        </section>
 
-      <section>
-        <h1>Contributor</h1>
-        <ul>
-          <li>Invitation only</li>
-          <li>No upload limits</li>
-        </ul>
-      </section>
+        <section>
+          <h1>Privileged</h1>
+          <ul>
+            <li>One time $20 fee</li>
+            <li>Uploads limited</li>
+            <li>Search up to 6 tags at once</li>
+            <li>No hidden posts</li>
+            <li>No ads</li>
+            <li>Tag subscriptions</li>
+          </ul>
+        </section>
 
-      <div class="clearfix"></div>
+        <section>
+          <h1>Contributor</h1>
+          <ul>
+            <li>Invitation only</li>
+            <li>No upload limits</li>
+          </ul>
+        </section>
+
+        <div class="clearfix"></div>
+      </div>
+
+      <footer class="nav-links">
+        <%= link_to "Continue &raquo;".html_safe, new_user_path(:anchor => "p2") %>
+      </footer>
     </div>
-    
-    <footer class="nav-links">
-      <%= link_to "Continue &raquo;".html_safe, new_user_path(:anchor => "p2") %>
-    </footer>
-  </div>
-  
-  <div id="p2">
-    <p>There are some restrictions on names:</p>
-    
-    <ul>
-      <li><strong>Name</strong>: Your name must be at least 2 characters and at most 20 characters long. It cannot contain spaces, commas, colons, or semi-colons. All characters must be US-ASCII.</li>
-      <li><strong>Password</strong>: Your password must be at least 5 characters long.</li>
-      <li>
-        <strong>Email</strong>:
-        <% if Danbooru.config.enable_email_verification? %>
-          You must enter a valid email address. You will need to verify your email address after registering.
-        <% else %>
-          You can optionally enter an email address. Although optional, you will not be able to reset your password without an email address.
-        <% end %>
-      </li>
-    </ul>
 
-    <% form_for(@user) do |f| %>
-      <%= error_messages_for("user") %>
+    <div id="p2">
+      <p>There are some restrictions on names:</p>
 
-      <table width="100%">
-        <tbody>
-          <tr>
-            <th width="15%"><%= f.label :name %></th>
-            <td width="85%"><%= f.text_field :name %></td>
-          </tr>
-          <tr>
-            <th><%= f.label :password %></th>
-            <td><%= f.password_field :password %></td>
-          </tr>
-          <tr>
-            <th><%= f.label :password_confirmation %></th>
-            <td><%= f.password_field :password_confirmation %></td>
-          </tr>
-          <tr>
-            <th><%= f.label :email %></th>
-            <td><%= f.text_field :email %></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td><%= submit_tag "Submit" %></td>
-          </tr>
-        </tbody>
-      </table>
-    <% end %>
-    
-    <footer class="nav-links">
-      <%= link_to "&laquo; Back".html_safe, new_user_path(:anchor => "p1") %>
-    </footer>
+      <ul>
+        <li><strong>Name</strong>: Your name must be at least 2 characters and at most 20 characters long. It cannot contain spaces, commas, colons, or semi-colons. All characters must be US-ASCII.</li>
+        <li><strong>Password</strong>: Your password must be at least 5 characters long.</li>
+        <li>
+          <strong>Email</strong>:
+          <% if Danbooru.config.enable_email_verification? %>
+            You must enter a valid email address. You will need to verify your email address after registering.
+          <% else %>
+            You can optionally enter an email address. Although optional, you will not be able to reset your password without an email address.
+          <% end %>
+        </li>
+      </ul>
+
+      <% form_for(@user) do |f| %>
+        <%= error_messages_for("user") %>
+
+        <table width="100%">
+          <tbody>
+            <tr>
+              <th width="15%"><%= f.label :name %></th>
+              <td width="85%"><%= f.text_field :name %></td>
+            </tr>
+            <tr>
+              <th><%= f.label :password %></th>
+              <td><%= f.password_field :password %></td>
+            </tr>
+            <tr>
+              <th><%= f.label :password_confirmation %></th>
+              <td><%= f.password_field :password_confirmation %></td>
+            </tr>
+            <tr>
+              <th><%= f.label :email %></th>
+              <td><%= f.text_field :email %></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td><%= submit_tag "Submit" %></td>
+            </tr>
+          </tbody>
+        </table>
+      <% end %>
+
+      <footer class="nav-links">
+        <%= link_to "&laquo; Back".html_safe, new_user_path(:anchor => "p1") %>
+      </footer>
+    </div>    
   </div>
 </div>
 

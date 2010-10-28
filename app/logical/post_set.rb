@@ -43,6 +43,10 @@ class PostSet
     tag_array.size == 1
   end
   
+  def date_tag
+    tag_array.grep(/date:/).first
+  end
+  
   def load_associations
     if is_single_tag?
       @wiki_page = WikiPage.find_by_title(tags)

@@ -38,7 +38,7 @@
 
       <section id="comments">
         <h2>Comments</h2>
-        <%= render :partial => "comments/partials/index/list", :locals => {:comments => @post.comments, :post => @post} %>
+        <%= render :partial => "comments/partials/index/list", :locals => {:comments => @post.comments, :post => @post, :show_header => false} %>
       </section>
 
       <section id="notes">

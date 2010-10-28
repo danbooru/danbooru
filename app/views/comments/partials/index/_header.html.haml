@@ -12,32 +12,18 @@
     %span{:class => "info"}
       %strong Score
       %span{:id => "score-for-post-#{post.id}"}
-        = post.score
-        
-
-<div class="header">
-  <div>
-    <span class="info"><strong>Date</strong> <%= compact_time(post.created_at) %></span>
-    <span class="info"><strong>User</strong> <%= fast_link_to h(post.author), :controller => "user", :action => "show", :id => post.user_id %></span>
-    <span class="info"><strong>Rating</strong> <%= post.pretty_rating %></span>
-    <span class="info">
-      <strong>Score</strong> <span id="post-score-<%= post.id %>"><%= post.score %></span> 
-      <% if @current_user.is_privileged_or_higher? %>
-        (vote <%= link_to_function "up", "Post.vote(1, #{post.id})" %>/<%= link_to_function "down", "Post.vote(-1, #{post.id})" %>)
-      <% end %>
-    </span>
-  </div>
-  <div class="tags">
-    <strong>Tags</strong>
-    <% post.cached_tags.split(/ /).each do |name| %>
-      <span class="tag-type-<%= Tag.type_name(name) %>">
-        <%= fast_link_to h(name.tr("_", " ")), :controller => "post", :action => "index", :tags => name %>
-      </span>
-    <% end %>
-  </div>
-  <div style="margin-top: 1em;">
-    <% if post.comments.count > 6 %>
-      <span class="info" id="hidden-comments-notice-for-<%= post.id %>"><%= link_to_remote "#{pluralize post.comments.size - 6, 'comment'} hidden", :url => {:controller => "comment", :action => "index_hidden", :post_id => post.id} %>.</span>
-    <% end %>
-
-    <%= render :partial => "threshold_notice", :locals => {:post => post} %>
+        %span= post.score
+        - if CurrentUser.user.is_privileged?
+          == (vote #{link_to("up", post_votes_path(:score => "up", :post_id => post.id), :remote => true, :method => :post)}/#{link_to("down", post_votes_path(:score => "down", :post_id => post.id), :remote => true, :method => :post)})
+  %div{:class => "row list-of-tags"}
+    %strong Tags
+    - post.tag_array.each do |tag_name|
+      %span{:class => "tag-type-#{Tag.category_for(tag_name)}"}
+        = link_to(tag_name.tr("_", " "), posts_path(:tags => tag_name))
+  %div{:class => "row notices"}
+    - if post.comments.count > 6
+      %span{:class => "info", :id => "hidden-comments-notice-for-#{post.id}"}
+        == #{link_to "#{pluralize(post.comments.size - 6, 'comment')} hidden", comments_path(:post_id => post.id), :remote => true}.
+    - if post.comments.hidden(CurrentUser.user).count > 0
+      %span{:class => "info", :id => "threshold-comments-notice-for-#{post.id}"}
+        == #{link_to "#{pluralize(post.comments.hidden(CurrentUser.user).count, 'comment')} below threshold", comments_path(:post_id => post.id, :include_hidden => true), :remote => true}.

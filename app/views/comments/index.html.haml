@@ -3,6 +3,6 @@
     - @posts.each do |post|
       %div{:class => "post"}
         %div{:class => "preview"}
-          = image_tag(post.preview_file_url)
-        = render :partial => "comments/partials/index/list", :locals => {:post => post, :comments => post.comments.recent.reverse}
+          = link_to image_tag(post.preview_file_url), post_path(post)
+        = render :partial => "comments/partials/index/list", :locals => {:post => post, :comments => post.comments.recent.reverse, :show_header => true}
         %div{:class => "clearfix"}

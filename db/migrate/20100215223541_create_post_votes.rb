@@ -3,6 +3,7 @@ class CreatePostVotes < ActiveRecord::Migration
     create_table :post_votes do |t|
       t.column :post_id, :integer, :null => false
       t.column :user_id, :integer, :null => false
+      t.column :score, :integer, :null => false
       t.timestamps
     end
   end

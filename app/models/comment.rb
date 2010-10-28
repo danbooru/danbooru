@@ -4,6 +4,7 @@ class Comment < ActiveRecord::Base
   belongs_to :post
   belongs_to :creator, :class_name => "User"
   has_many :votes, :class_name => "CommentVote", :dependent => :destroy
+  before_validation :initialize_creator, :on => :create
   after_save :update_last_commented_at
   attr_accessible :body
   attr_accessor :do_not_bump_post
@@ -11,6 +12,11 @@ class Comment < ActiveRecord::Base
   scope :recent, :order => "comments.id desc", :limit => 6
   scope :search_body, lambda {|query| where("body_index @@ plainto_tsquery(?)", query).order("comments.id DESC")}
   scope :hidden, lambda {|user| where("score < ?", user.comment_threshold)}
+
+  def initialize_creator
+    self.creator_id = CurrentUser.user.id
+    self.ip_addr = CurrentUser.ip_addr
+  end
 
   def creator_name
     User.id_to_name(creator_id)
@@ -26,20 +32,21 @@ class Comment < ActiveRecord::Base
     end
   end
   
-  def vote!(is_positive)
+  def vote!(score)
     if !CurrentUser.user.can_comment_vote?
       raise CommentVote::Error.new("You can only vote ten times an hour on comments")
       
-    elsif !is_positive && creator.is_janitor_or_higher?
+    elsif score == "down" && creator.is_janitor?
       raise CommentVote::Error.new("You cannot downvote janitor/moderator/admin comments")
       
     elsif votes.find_by_user_id(CurrentUser.user.id).nil?
-      if is_positive
-        update_attribute(:score, score + 1)
-      else
-        update_attribute(:score, score - 1)
+      if score == "up"
+        increment!(:score)
+      elsif score == "down"
+        decrement!(:score)
       end
-      votes.create(:user_id => CurrentUser.user.id)
+      
+      votes.create
       
     else
       raise CommentVote::Error.new("You have already voted for this comment")

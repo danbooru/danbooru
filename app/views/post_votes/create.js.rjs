@@ -1,1 +1,5 @@
-page["#score-for-post-#{@post.id} span"].val(@post.score)
+if @error
+  page.alert(@error.to_s)
+else
+  page["#score-for-post-#{@post.id} span"].text(@post.score)
+end

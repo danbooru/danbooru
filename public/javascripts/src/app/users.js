@@ -1,6 +1,6 @@
 $(document).ready(function() {
   $("footer.nav-links a").click(function(event) {
-    $("div#users-new > div").hide();
+    $("div.users div.new > div").hide();
     $(event.target.hash).show();
   });
   

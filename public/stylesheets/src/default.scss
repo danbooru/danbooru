@@ -444,6 +444,34 @@ div.comment-list > article > div {
   width: 40em;
 }
 
+div.comments {
+  div.index {
+    div.header {
+      span.info {
+        margin-right: 1.5em;
+      }
+
+      strong, time {
+        margin-right: 0.3em;
+      }
+      
+      time {
+        font-weight: bold;
+      }
+      
+      div.list-of-tags {
+        a {
+          margin-right: 0.5em;
+        }
+      }
+      
+      div.notices {
+        margin: 1em 0;
+      }
+    }
+  }
+}
+
 
 /*** Sessions ***/
 div#sessions {
@@ -497,8 +525,8 @@ div#artists {
 
 
 /*** Users ***/
-div#users {
-  div#new {
+div.users {
+  div.new {
     max-width: 60em;
     
     h1 {

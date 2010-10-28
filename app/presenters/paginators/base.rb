@@ -53,7 +53,7 @@ module Paginators
         elsif page == current_page
           html << page.to_s
         else
-          html << link(template, page)
+          html << paginated_link(template, page)
         end
         html << "</li>"
         html.html_safe

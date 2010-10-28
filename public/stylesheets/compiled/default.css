@@ -285,6 +285,17 @@ div.comment-list > article > div {
   float: left;
   width: 40em; }
 
+div.comments div.index div.header span.info {
+  margin-right: 1.5em; }
+div.comments div.index div.header strong, div.comments div.index div.header time {
+  margin-right: 0.3em; }
+div.comments div.index div.header time {
+  font-weight: bold; }
+div.comments div.index div.header div.list-of-tags a {
+  margin-right: 0.5em; }
+div.comments div.index div.header div.notices {
+  margin: 1em 0; }
+
 /*** Sessions ***/
 div#sessions div#new section {
   width: 30em;
@@ -315,30 +326,30 @@ div#artists div#show {
     font-style: italic; }
 
 /*** Users ***/
-div#users div#new {
+div.users div.new {
   max-width: 60em; }
-  div#users div#new h1 {
+  div.users div.new h1 {
     margin-bottom: 0.5em; }
-  div#users div#new p {
+  div.users div.new p {
     margin-bottom: 1em; }
-  div#users div#new li {
+  div.users div.new li {
     margin-left: 1em; }
-  div#users div#new div#account-comparison h1 {
+  div.users div.new div#account-comparison h1 {
     font-size: 1.4em;
     margin-bottom: 3px; }
-  div#users div#new div#account-comparison li {
+  div.users div.new div#account-comparison li {
     font-size: 0.9em;
     line-height: 1.5em; }
-  div#users div#new div#account-comparison section {
+  div.users div.new div#account-comparison section {
     width: 18em;
     float: left;
     padding: 1em; }
-  div#users div#new footer.nav-links {
+  div.users div.new footer.nav-links {
     font-size: 1.5em;
     font-weight: bold;
     text-align: center;
     display: block; }
-  div#users div#new div#p2 ul {
+  div.users div.new div#p2 ul {
     margin-bottom: 2em; }
 
 /*** Uploads ***/

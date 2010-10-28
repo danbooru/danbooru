@@ -176,7 +176,7 @@ module Danbooru
     
     # If enabled, users must verify their email addresses.
     def enable_email_verification?
-      true
+      false
     end
     
     # Any custom code you want to insert into the default layout without

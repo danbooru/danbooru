@@ -644,15 +644,15 @@ class Post < ActiveRecord::Base
       !votes.exists?(["user_id = ?", user.id])
     end
 
-    def vote!(user, is_positive)
-      if can_be_voted_by?(user)
-        if is_positive
+    def vote!(score)
+      if can_be_voted_by?(CurrentUser.user)
+        if score == "up"
           increment!(:score)
-        else
+        elsif score == "down"
           decrement!(:score)
         end
 
-        votes.create(:user_id => user.id)
+        votes.create(:score => score)
       else
         raise PostVote::Error.new("You have already voted for this comment")
       end

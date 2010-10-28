@@ -589,11 +589,13 @@ class PostTest < ActiveSupport::TestCase
     should "not allow duplicate votes" do
       user = Factory.create(:user)
       post = Factory.create(:post)
-      assert_nothing_raised {post.vote!(user, true)}
-      assert_raise(PostVote::Error) {post.vote!(user, true)}
-      post.reload
-      assert_equal(1, PostVote.count)
-      assert_equal(1, post.score)
+      CurrentUser.scoped(user, "127.0.0.1") do
+        assert_nothing_raised {post.vote!("up")}
+        assert_raise(PostVote::Error) {post.vote!("up")}
+        post.reload
+        assert_equal(1, PostVote.count)
+        assert_equal(1, post.score)
+      end
     end
   end
 

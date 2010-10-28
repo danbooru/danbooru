@@ -23,6 +23,16 @@ module ApplicationHelper
     end
   end
   
+  def compact_time(time)
+    if time > Time.now.beginning_of_day
+      time.strftime("%H:%M")
+    elsif time > Time.now.beginning_of_year
+      time.strftime("%b %e")
+    else
+      time.strftime("%b %e, %Y")
+    end
+  end
+  
 protected
   def nav_link_match(controller, url)
     url =~ case controller
