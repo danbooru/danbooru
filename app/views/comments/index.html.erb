@@ -1,0 +1,13 @@
+<div class="comments">
+  <div class="index">
+    <% @posts.each do |post| %>
+      <div class="post">
+        <div class="preview">
+          <%= link_to(image_tag(post.preview_file_url), post_path(post)) %>
+        </div>
+        <%= render :partial => "comments/partials/index/list", :locals => {:post => post, :comments => post.comments.recent.reverse, :show_header => true} %>
+        <div class="clearfix"></div>
+      </div>
+    <% end %>
+  </div>
+</div>

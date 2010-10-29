@@ -1,0 +1,46 @@
+<div class="header">
+  <div class="row">
+    <span class="info">
+      <time>Date</time>
+      <%= compact_time(post.created_at) %>
+    </span>
+    <span class="info">
+      <strong>User</strong>
+      <%= link_to(post.uploader_name, user_path(post.uploader_id)) %>
+    </span>
+    <span class="info">
+      <strong>Rating</strong>
+      <%= post.rating %>
+    </span>
+    <span class="info">
+      <strong>Score</strong>
+      <span id="score-for-post-<%= post.id %>"%>
+        <span><%= post.score %></span>
+        <% if CurrentUser.user.is_privileged? %>
+          (vote <%= link_to("up", post_votes_path(:score => "up", :post_id => post.id), :remote => true, :method => :post) %>/<%= link_to("down", post_votes_path(:score => "down", :post_id => post.id), :remote => true, :method => :post) %>)
+        <% end %>
+      </span>
+    </span>
+  </div>
+  <div class="row list-of-tags">
+    <strong>Tags</strong>
+    <% post.tag_array.each do |tag_name| %>
+      <span class="tag-type-<%= Tag.category_for(tag_name) %>">
+        <%= link_to(tag_name.tr("_", " "), posts_path(:tags => tag_name)) %>
+      </span>
+    <% end %>
+  </div>
+  <div class="row notices">
+    <% if post.comments.count > 6 %>
+      <span class="info" id="hidden-comments-notice-for-<%= post.id %>"%>
+        <%= link_to "#{pluralize(post.comments.size, 'comment')} hidden", comments_path(:post_id => post.id), :remote => true %>.
+      </span>
+    <% end %>
+    <% if post.comments.hidden(CurrentUser.user).count > 0 %>
+      <span class="info" id="threshold-comments-notice-for-<%= post.id %>"%>
+        <%= link_to "#{pluralize(post.comments.hidden(CurrentUser.user).count, 'comment')} below threshold", comments_path(:post_id => post.id, :include_hidden => true), :remote => true %>.
+      </span>
+    <% end %>
+  </div>
+</div>
+

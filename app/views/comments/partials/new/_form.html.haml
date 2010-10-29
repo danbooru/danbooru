@@ -1,7 +1,0 @@
-%div{:class => "comment-preview dtext"}
-= form_tag(comments_path, :remote => true) do
-  = hidden_field "comment", "post_id", :value => post.id
-  = text_area "comment", "body", :size => "60x7"
-  %br
-  = submit_tag "Post"
-  = submit_tag "Preview"

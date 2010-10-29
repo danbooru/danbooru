@@ -1,0 +1,16 @@
+<div class="comments-for-post" data-post-id="<%= post.id %>">
+  <% if show_header %>
+    <%= render :partial => "comments/partials/index/header", :locals => {:post => post} %>
+  <% end %>
+
+  <div class="list-of-comments">
+    <%= render :partial => "comments/partials/show/comment", :collection => comments %>
+  </div>
+  
+  <div class="clearfix"></div>
+  
+  <div class="new-comment">
+    <p><%= link_to "Post comment", new_comment_path, :class => "expand-comment-response" %></p>
+    <%= render :partial => "comments/partials/new/form", :locals => {:post => post} %>
+  </div>
+</div>

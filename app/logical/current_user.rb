@@ -29,4 +29,16 @@ class CurrentUser
   def self.ip_addr
     Thread.current[:current_ip_addr]
   end
+  
+  def self.id
+    user.id
+  end
+  
+  def self.method_missing(method, *params, &block)
+    if user.respond_to?(method)
+      user.__send__(method, *params, &block)
+    else
+      super
+    end
+  end
 end

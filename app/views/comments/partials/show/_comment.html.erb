@@ -1,0 +1,22 @@
+<article data-comment-id="<%= comment.id %>">
+  <div class="author">
+    <h1><%= link_to comment.creator_name, user_path(comment.creator_id) %></h1>
+    <time datetime="<%= comment.created_at %>">
+      <%= time_ago_in_words(comment.created_at) %> ago
+    </time>
+  </div>
+  <div class="content">
+    <div>
+      <%= format_text(comment.body) %>
+    </div>
+    <menu>
+      <li><span class="link">Reply</span></li>
+      <% if CurrentUser.user.is_janitor? || CurrentUser.user.id == comment.creator_id %>
+        <li><%= link_to "Delete", comment_path(comment.id), :confirm => "Do you really want to delete this comment?", :method => :delete %></li>
+      <% end %>
+      <li><%= link_to "Vote up", comment_votes_path(:comment_id => comment.id, :score => "up"), :method => :post, :remote => true %></li>
+      <li><%= link_to "Vote down", comment_votes_path(:comment_id => comment.id, :score => "down"), :method => :post, :remote => true %></li>
+    </menu>
+  </div>
+  <div class="clearfix"></div>
+</article>
