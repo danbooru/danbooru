@@ -1,7 +1,7 @@
 class Post < ActiveRecord::Base
   attr_accessor :old_tag_string, :old_parent_id
   after_destroy :delete_files
-  after_save :create_version  
+  after_save :update_history
   after_save :update_parent_on_save
   before_save :merge_old_tags
   before_save :normalize_tags
@@ -15,7 +15,7 @@ class Post < ActiveRecord::Base
   has_one :unapproval, :dependent => :destroy
   has_one :upload, :dependent => :destroy
   has_one :moderation_detail, :class_name => "PostModerationDetail", :dependent => :destroy
-  has_many :versions, :class_name => "PostVersion", :dependent => :destroy  
+  has_one :history, :class_name => "PostHistory"
   has_many :votes, :class_name => "PostVote", :dependent => :destroy
   has_many :notes, :dependent => :destroy
   has_many :comments
@@ -233,24 +233,21 @@ class Post < ActiveRecord::Base
     end
   end
   
-  module VersionMethods
-    def create_version
-      version = versions.create(
-        :source => source,
-        :rating => rating,
-        :tag_string => tag_string,
-        :updater_id => CurrentUser.user.id,
-        :updater_ip_addr => CurrentUser.ip_addr
-      )
-    
-      raise PostVersion::Error.new(version.errors.full_messages.join("; ")) if version.errors.any?
+  module HistoryMethods
+    def revisions
+      if history.nil?
+        update_history
+      end
+      
+      history.revisions
     end
     
-    def revert_to!(version)
-      self.source = version.source
-      self.rating = version.rating
-      self.tag_string = version.tag_string
-      save!
+    def update_history
+      if history.nil?
+        create_history
+      end
+
+      history << self
     end
   end
   
@@ -788,7 +785,7 @@ class Post < ActiveRecord::Base
   include ImageMethods
   include ApprovalMethods
   include PresenterMethods
-  include VersionMethods
+  include HistoryMethods
   include TagMethods
   include FavoriteMethods
   include UploaderMethods

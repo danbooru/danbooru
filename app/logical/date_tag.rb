@@ -34,7 +34,7 @@ class DateTag
   end
   
   def next_week
-    DateTag.new_from_range(1.week.since(start_date)), 1.week.since(end_date)
+    DateTag.new_from_range(1.week.since(start_date), 1.week.since(end_date))
   end
   
   def previous_month
@@ -42,7 +42,7 @@ class DateTag
   end
   
   def next_month
-    DateTag.new_from_range(1.month.since(start_date)), 1.month.since(end_date)
+    DateTag.new_from_range(1.month.since(start_date), 1.month.since(end_date))
   end
   
   def date

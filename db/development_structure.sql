@@ -1014,6 +1014,38 @@ ALTER SEQUENCE pools_id_seq OWNED BY pools.id;
 
 
 --
+-- Name: post_histories; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE post_histories (
+    id integer NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
+    post_id integer NOT NULL,
+    revisions text NOT NULL
+);
+
+
+--
+-- Name: post_histories_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE post_histories_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: post_histories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE post_histories_id_seq OWNED BY post_histories.id;
+
+
+--
 -- Name: post_moderation_details; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1043,42 +1075,6 @@ CREATE SEQUENCE post_moderation_details_id_seq
 --
 
 ALTER SEQUENCE post_moderation_details_id_seq OWNED BY post_moderation_details.id;
-
-
---
--- Name: post_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE post_versions (
-    id integer NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    post_id integer NOT NULL,
-    source character varying(255),
-    rating character(1) DEFAULT 'q'::bpchar NOT NULL,
-    tag_string text NOT NULL,
-    updater_id integer NOT NULL,
-    updater_ip_addr inet NOT NULL
-);
-
-
---
--- Name: post_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE post_versions_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: post_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE post_versions_id_seq OWNED BY post_versions.id;
 
 
 --
@@ -1812,14 +1808,14 @@ ALTER TABLE pools ALTER COLUMN id SET DEFAULT nextval('pools_id_seq'::regclass);
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE post_moderation_details ALTER COLUMN id SET DEFAULT nextval('post_moderation_details_id_seq'::regclass);
+ALTER TABLE post_histories ALTER COLUMN id SET DEFAULT nextval('post_histories_id_seq'::regclass);
 
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE post_versions ALTER COLUMN id SET DEFAULT nextval('post_versions_id_seq'::regclass);
+ALTER TABLE post_moderation_details ALTER COLUMN id SET DEFAULT nextval('post_moderation_details_id_seq'::regclass);
 
 
 --
@@ -2138,19 +2134,19 @@ ALTER TABLE ONLY pools
 
 
 --
+-- Name: post_histories_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY post_histories
+    ADD CONSTRAINT post_histories_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: post_moderation_details_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY post_moderation_details
     ADD CONSTRAINT post_moderation_details_pkey PRIMARY KEY (id);
-
-
---
--- Name: post_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY post_versions
-    ADD CONSTRAINT post_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -2713,6 +2709,13 @@ CREATE INDEX index_pools_on_name ON pools USING btree (name);
 
 
 --
+-- Name: index_post_histories_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_post_histories_on_post_id ON post_histories USING btree (post_id);
+
+
+--
 -- Name: index_post_moderation_details_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2724,20 +2727,6 @@ CREATE INDEX index_post_moderation_details_on_post_id ON post_moderation_details
 --
 
 CREATE INDEX index_post_moderation_details_on_user_id ON post_moderation_details USING btree (user_id);
-
-
---
--- Name: index_post_versions_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_post_versions_on_post_id ON post_versions USING btree (post_id);
-
-
---
--- Name: index_post_versions_on_updater_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_post_versions_on_updater_id ON post_versions USING btree (updater_id);
 
 
 --
