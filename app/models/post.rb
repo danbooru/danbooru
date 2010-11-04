@@ -1,4 +1,6 @@
 class Post < ActiveRecord::Base
+  class ApprovalError < Exception ; end
+  
   attr_accessor :old_tag_string, :old_parent_id
   after_destroy :delete_files
   after_save :update_history
@@ -211,9 +213,11 @@ class Post < ActiveRecord::Base
     end
 
     def approve!
+      raise ApprovalError.new("You have already approved this post previously") if approver_string == "approver:#{CurrentUser.name}"
+      
       self.is_flagged = false
       self.is_pending = false
-      self.approver_string = "approver:#{CurrentUser.user.name}"
+      self.approver_string = "approver:#{CurrentUser.name}"
       save!
     end
   end

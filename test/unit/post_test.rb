@@ -192,6 +192,19 @@ class PostTest < ActiveSupport::TestCase
         assert_equal("bad", removed_post.unapproval.reason)
       end
       
+      context "that was previously approved by person X" do
+        should "not allow person X to reapprove that post" do
+          user = Factory.create(:janitor_user, :name => "xxx")
+          post = Factory.create(:post, :approver_string => "approver:xxx")
+          post.unapprove!("bad")
+          CurrentUser.scoped(user, "127.0.0.1") do
+            assert_raises(Post::ApprovalError) do
+              post.approve!
+            end
+          end
+        end
+      end
+      
       context "that has been reapproved" do
         should "no longer be flagged or pending" do
           post = Factory.create(:post)
@@ -209,41 +222,6 @@ class PostTest < ActiveSupport::TestCase
           post.approve!
           assert_raise(Unapproval::Error) {post.unapprove!("bad")}
         end
-      end
-    end
-  end
-
-  context "Versioning:" do
-    context "Saving a post" do
-      should "create a new version" do
-        post = Factory.create(:post)
-        assert_equal(1, post.versions.size)
-    
-        post.rating = "e"
-        post.save
-        assert_equal(2, post.versions.size)
-        assert_equal(CurrentUser.user.id, post.versions.last.updater_id)
-        assert_equal(CurrentUser.ip_addr, post.versions.last.updater_ip_addr)
-      
-        post.revert_to!(PostVersion.first)
-        assert_equal("tag1 tag2", post.tag_string)
-        assert_equal("q", post.rating)
-      end
-    end
-    
-    context "Reverting a post" do
-      should "identify the person who reverted the post" do
-        post = Factory.create(:post)
-        reverter = Factory.create(:user)
-        post.rating = "e"
-        post.save
-        post.rating = "q"
-        post.save
-        
-        CurrentUser.user = Factory.create(:user)
-        post.revert_to!(PostVersion.first)
-        post.reload
-        assert_equal(CurrentUser.user.id, post.versions.last.updater_id)
       end
     end
   end

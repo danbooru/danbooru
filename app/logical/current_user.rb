@@ -34,6 +34,10 @@ class CurrentUser
     user.id
   end
   
+  def self.name
+    user.name
+  end
+  
   def self.method_missing(method, *params, &block)
     if user.respond_to?(method)
       user.__send__(method, *params, &block)
