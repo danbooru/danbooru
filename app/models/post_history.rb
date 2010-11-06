@@ -51,8 +51,12 @@ class PostHistory < ActiveRecord::Base
       hash["updated_at"]
     end
     
-    def updater_id
+    def user_id
       hash["user_id"]
+    end
+
+    def presenter
+      @presenter ||= PostHistoryRevisionPresenter.new(self)
     end
   end
 

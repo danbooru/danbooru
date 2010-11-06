@@ -10,6 +10,6 @@
       (<%= post.image_width %>x<%= post.image_height %>)
     <% end %>
   </li>
-  <li><%= link_to "Tag History", post_versions_path(:post_id => post) %></li>
-  <li><%= link_to "Note History", note_versions_path(:post_id => post) %></li>
+  <li><%= link_to "Tag History", post_histories_path(:search => {:post_id_eq => post.id}) %></li>
+  <li><%= link_to "Note History", note_versions_path(:search => {:post_id_eq => post.id}) %></li>
 </ul>

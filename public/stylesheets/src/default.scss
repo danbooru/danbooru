@@ -159,6 +159,18 @@ table tfoot {
   margin-top: 2em;
 }
 
+table.striped {
+  tbody {
+    tr:hover {
+      background-color: #FFE;
+    }
+  }
+  
+  tr.even {
+    background-color: #EEE;
+  }
+}
+
 div#notice {
   margin: 1em;
   padding: 1em;
@@ -415,6 +427,40 @@ div.posts {
       
       li.active a {
         color: black;
+      }
+    }
+  }
+}
+
+
+/*** Post Histories ***/
+div.post_histories {
+  div.index {
+    div.post {
+      margin-bottom: 2em;
+      
+      div.preview {
+        width: 20%;
+        float: left;
+      }
+      
+      div.history {
+        width: 70%;
+        float: left;
+        
+        table {
+          width: 100%;
+        }
+        
+        ins {
+          color: green;
+          text-decoration: none;
+        }
+        
+        del {
+          color: red;
+          text-decoration: line-through;
+        }
       }
     }
   }

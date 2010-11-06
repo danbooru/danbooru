@@ -6,8 +6,10 @@ $(document).ready(function() {
 	// 	Cookie.put('hide-upgrade-account', '1', 7);
 	// });
 
-  // Style button spans
-	
+  // Table striping
+  $("table.striped tbody tr:even").addClass("even");
+  $("table.striped tbody tr:odd").addClass("odd");
+
 	// Comment listing
 	$(".comment-section form").hide();
 	$(".comment-section input.expand-comment-response").click(function() {

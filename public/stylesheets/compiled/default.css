@@ -123,6 +123,11 @@ span.link {
 table tfoot {
   margin-top: 2em; }
 
+table.striped tbody tr:hover {
+  background-color: #FFE; }
+table.striped tr.even {
+  background-color: #EEE; }
+
 div#notice {
   margin: 1em;
   padding: 1em;
@@ -268,6 +273,24 @@ div.posts section#content menu#post-sections {
     font-weight: bold; }
   div.posts section#content menu#post-sections li.active a {
     color: black; }
+
+/*** Post Histories ***/
+div.post_histories div.index div.post {
+  margin-bottom: 2em; }
+  div.post_histories div.index div.post div.preview {
+    width: 20%;
+    float: left; }
+  div.post_histories div.index div.post div.history {
+    width: 70%;
+    float: left; }
+    div.post_histories div.index div.post div.history table {
+      width: 100%; }
+    div.post_histories div.index div.post div.history ins {
+      color: green;
+      text-decoration: none; }
+    div.post_histories div.index div.post div.history del {
+      color: red;
+      text-decoration: line-through; }
 
 /*** Comments ***/
 div.comment-response > div {

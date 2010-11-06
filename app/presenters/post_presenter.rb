@@ -10,6 +10,7 @@ class PostPresenter < Presenter
     html << %{<img src="#{post.preview_file_url}">}
     html << %{</a>}
     html << %{</article>}
+    html.html_safe
   end
   
   def initialize(post)

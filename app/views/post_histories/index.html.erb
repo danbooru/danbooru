@@ -9,25 +9,27 @@
         </div>
       
         <div class="history">
-          <table>
+          <table class="striped">
             <thead>
               <tr>
-                <th>Changes</th>
                 <th>Date</th>
                 <th>Updater</th>
+                <th>Changes</th>
               </tr>
             </thead>
             <tbody>
               <% history.each_revision do |revision| %>
                 <tr>
-                  <td><%= revision.presenter.changes %></td>
                   <td><%= revision.presenter.updated_at %></td>
                   <td><%= revision.presenter.updater_name %></td>
+                  <td><%= revision.presenter.changes %></td>
                 </tr>
               <% end %>
             </tbody>
           </table>
         </div>
+
+        <div class="clearfix"></div>
       </div>
     <% end %>
   </div>
