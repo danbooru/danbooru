@@ -61,6 +61,11 @@ GEM
     mechanize (1.0.0)
       nokogiri (>= 1.2.1)
     memcache-client (1.8.5)
+    meta_search (0.9.7.2)
+      actionpack (~> 3.0.0)
+      activerecord (~> 3.0.0)
+      activesupport (~> 3.0.0)
+      arel (~> 1.0.1)
     mime-types (1.16)
     mocha (0.9.9)
       rake
@@ -107,6 +112,7 @@ DEPENDENCIES
   imagesize
   mechanize
   memcache-client
+  meta_search
   mocha
   nokogiri
   pg

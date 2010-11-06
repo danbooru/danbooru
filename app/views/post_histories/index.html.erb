@@ -1,0 +1,35 @@
+<div class="post_histories">
+  <div class="index">
+    <h1>Post History</h1>
+    
+    <% @histories.each do |history| %>
+      <div class="post">
+        <div class="preview">
+          <%= history.post.presenter.preview_html %>
+        </div>
+      
+        <div class="history">
+          <table>
+            <thead>
+              <tr>
+                <th>Changes</th>
+                <th>Date</th>
+                <th>Updater</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% history.each_revision do |revision| %>
+                <tr>
+                  <td><%= revision.presenter.changes %></td>
+                  <td><%= revision.presenter.updated_at %></td>
+                  <td><%= revision.presenter.updater_name %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+

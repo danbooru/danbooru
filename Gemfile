@@ -17,5 +17,6 @@ gem "haml"
 gem "simple_form"
 gem "mechanize"
 gem "nokogiri"
+gem "meta_search"
 
 gem "will_paginate", :git => "http://github.com/mislav/will_paginate.git", :branch => "rails3"

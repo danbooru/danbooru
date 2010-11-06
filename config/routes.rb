@@ -39,7 +39,7 @@ Danbooru::Application.routes.draw do
     end
   end
   resources :post_moderation_details
-  resources :post_versions
+  resources :post_histories
   resources :post_votes
   resources :reports
   resources :sessions

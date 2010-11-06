@@ -1,6 +1,23 @@
 class PostPresenter < Presenter
+  def self.preview(post)
+    flags = []
+    flags << "pending" if post.is_pending?
+    flags << "flagged" if post.is_flagged?
+    flags << "removed" if post.is_removed?
+    
+    html =  %{<article id="post_#{post.id}" data-id="#{post.id}" data-tags="#{h(post.tag_string)}" data-uploader="#{h(post.uploader_name)}" data-rating="#{post.rating}" data-width="#{post.image_width}" data-height="#{post.image_height}" data-flags="#{flags.join(' ')}">}
+    html << %{<a href="/posts/#{post.id}">}
+    html << %{<img src="#{post.preview_file_url}">}
+    html << %{</a>}
+    html << %{</article>}
+  end
+  
   def initialize(post)
     @post = post
+  end
+  
+  def preview_html
+    PostPresenter.preview(@post)
   end
 
   def image_html(template)
