@@ -1,4 +1,6 @@
 class BansController < ApplicationController
+  before_filter :moderator_only, :except => [:show, :index]
+  
   def new
     @ban = Ban.new
   end
@@ -19,7 +21,7 @@ class BansController < ApplicationController
   def create
     @ban = Ban.new(params[:ban])
     if @ban.save
-      redirect_to ban_path(@ban)
+      redirect_to ban_path(@ban), :notice => "Ban created"
     else
       render :action => "new"
     end
@@ -28,9 +30,14 @@ class BansController < ApplicationController
   def update
     @ban = Ban.find(params[:id])
     if @ban.update_attributes(params[:ban])
-      redirect_to ban_path(@ban)
+      redirect_to ban_path(@ban), :notice => "Ban updated"
     else
       render :action => "edit"
     end
   end  
+  
+  def destroy
+    @ban = Ban.find(params[:id])
+    @ban.destroy
+  end
 end

@@ -2,6 +2,7 @@ require 'digest/sha1'
 
 class User < ActiveRecord::Base
   class Error < Exception ; end
+  class PrivilegeError < Exception ; end
   
   attr_accessor :password, :old_password, :ip_addr
   attr_accessible :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr
@@ -40,6 +41,8 @@ class User < ActiveRecord::Base
   end
   
   module NameMethods
+    extend ActiveSupport::Concern
+    
     module ClassMethods
       def name_to_id(name)
         Cache.get("uni:#{Cache.sanitize(name)}") do
@@ -62,10 +65,6 @@ class User < ActiveRecord::Base
       end
     end
     
-    def self.included(m)
-      m.extend(ClassMethods)
-    end
-
     def pretty_name
       name.tr("_", " ")
     end

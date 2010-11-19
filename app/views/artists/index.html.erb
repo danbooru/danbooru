@@ -1,6 +1,6 @@
 <div id="artists">
   <div id="index">
-    <%= render :partial => "search" %>
+    <%= render "search" %>
 
     <table class="highlightable" width="100%">
       <thead>
@@ -32,6 +32,6 @@
       <%= will_paginate(@artists) %>
     </div>    
 
-    <%= render :partial => "secondary_links" %>
+    <%= render "secondary_links" %>
   </div>
 </div>

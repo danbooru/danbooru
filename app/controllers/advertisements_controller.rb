@@ -33,8 +33,7 @@ class AdvertisementsController < ApplicationController
   def create
     @advertisement = Advertisement.new(params[:advertisement])
     if @advertisement.save
-      flash[:notice] = "Advertisement created"
-      redirect_to advertisement_path(@advertisement)
+      redirect_to advertisement_path(@advertisement), :notice => "Advertisement created"
     else
       flash[:notice] = "There were errors"
       render :action => "new"
@@ -44,8 +43,7 @@ class AdvertisementsController < ApplicationController
   def update
     @advertisement = Advertisement.find(params[:id])
     if @advertisement.update_attributes(params[:advertisement])
-      flash[:notice] = "Advertisement updated"
-      redirect_to advertisement_path(@advertisement)
+      redirect_to advertisement_path(@advertisement), :notice => "Advertisement updated"
     else
       flash[:notice] = "There were errors"
       render :action => "edit"
@@ -55,6 +53,6 @@ class AdvertisementsController < ApplicationController
   def destroy
     @advertisement = Advertisement.find(params[:id])
     @advertisement.destroy
-    redirect_to advertisements_path
+    redirect_to advertisements_path, :notice => "Advertisement destroyed"
   end
 end

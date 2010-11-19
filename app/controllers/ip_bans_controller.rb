@@ -1,0 +1,2 @@
+class IpBansController < ApplicationController
+end

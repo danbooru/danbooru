@@ -27,7 +27,7 @@ class ArtistsController < ApplicationController
     @artist = Artist.create(params[:artist])
 
     if @artist.errors.empty?
-      redirect_to artist_path(@artist)
+      redirect_to artist_path(@artist), :notice => "Artist created"
     else
       flash[:notice] = "There were errors"
       render :action => "new"
@@ -39,7 +39,7 @@ class ArtistsController < ApplicationController
     @artist.update_attributes(params[:artist])
     
     if @artist.errors.empty?
-      redirect_to artist_path(@artist)
+      redirect_to artist_path(@artist), :notice => "Artist updated"
     else
       flash[:notice] = "There were errors"
       render :action => "edit"
@@ -49,6 +49,6 @@ class ArtistsController < ApplicationController
   def revert
     @artist = Artist.find(params[:id])
     @artist.revert_to!(params[:version])
-    redirect_to artist_path(@artist)
+    redirect_to artist_path(@artist), :notice => "Artist updated"
   end
 end

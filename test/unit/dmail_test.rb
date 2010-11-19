@@ -47,7 +47,7 @@ class DmailTest < ActiveSupport::TestCase
     should "create a copy for each user" do
       dmail = Factory.build(:dmail)
       assert_difference("Dmail.count", 2) do
-        Dmail.create_new(dmail)
+        Dmail.create_split(dmail.attributes)
       end
     end
 

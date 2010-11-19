@@ -1,0 +1,12 @@
+<div id="preview">
+</div>
+
+<%= simple_form_for(dmail) do |f| %>
+  <%= hidden_field_tag "dmail[parent_id]", dmail.parent_id || dmail.id, :id => "dmail_parent_id" %>
+
+  <%= f.input :to_name, :label => "To" %>
+  <%= f.input :title %>
+  <%= f.input :body, :html_options => {:size => "50x25"} %>
+  <%= f.button :submit %>
+  <%= submit_tag "Preview"  %>
+<% end %>

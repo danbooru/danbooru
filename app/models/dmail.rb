@@ -3,6 +3,7 @@ class Dmail < ActiveRecord::Base
   validates_presence_of :from_id
   validates_format_of :title, :with => /\S/
   validates_format_of :body, :with => /\S/
+  before_validation :initialize_from_id, :on => :create
   belongs_to :owner, :class_name => "User"
   belongs_to :to, :class_name => "User"
   belongs_to :from, :class_name => "User"
@@ -30,29 +31,33 @@ class Dmail < ActiveRecord::Base
       return if user.nil?
       self.to_id = user.id
     end
-
-    def from_name=(name)
-      user = User.find_by_name(name)
-      return if user.nil?
-      self.from_id = user.id
+    
+    def initialize_from_id
+      self.from_id = CurrentUser.id
     end
   end
   
   module FactoryMethods
-    module ClassMethods
-      def create_new(dmail)
-        copy = dmail.clone
-        copy.owner_id = dmail.to_id
-        copy.save
-
-        copy = dmail.clone
-        copy.owner_id = dmail.from_id
-        copy.save
-      end
-    end
+    extend ActiveSupport::Concern
     
-    def self.included(m)
-      m.extend(ClassMethods)
+    module ClassMethods
+      def create_split(params)
+        Dmail.transaction do
+          copy = Dmail.new(params)
+          copy.owner_id = copy.to_id
+          copy.save
+
+          copy = Dmail.new(params)
+          copy.owner_id = CurrentUser.id
+          copy.save
+        end
+      end
+      
+      def new_blank
+        Dmail.new do |dmail|
+          dmail.from_id = CurrentUser.id
+        end
+      end
     end
     
     def build_response
@@ -64,7 +69,7 @@ class Dmail < ActiveRecord::Base
         dmail.from_id = to_id
         dmail.parent_id = id
       end
-    end    
+    end
   end
   
   include AddressMethods
@@ -90,5 +95,9 @@ class Dmail < ActiveRecord::Base
   
   def update_recipient
     to.update_attribute(:has_mail, true)
+  end
+  
+  def visible_to?(user)
+    user.is_moderator? || owner_id == user.id
   end
 end

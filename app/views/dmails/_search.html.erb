@@ -1,0 +1,10 @@
+<div>
+  <%= simple_form_for @search do |f| %>
+    <%= hidden_field_tag :folder, params[:folder] %>
+    <%= f.input :title_contains %>
+    <%= f.input :body_contains %>
+    <%= f.input :to_name_equals %>
+    <%= f.input :from_name_equals %>
+    <%= f.button :submit %>
+  <% end %>
+</div>

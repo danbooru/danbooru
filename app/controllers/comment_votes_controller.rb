@@ -5,7 +5,4 @@ class CommentVotesController < ApplicationController
   rescue CommentVote::Error => x
     @error = x
   end
-  
-  def destroy
-  end
 end
