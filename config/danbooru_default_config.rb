@@ -182,18 +182,7 @@ module Danbooru
     # Any custom code you want to insert into the default layout without
     # having to modify the templates.
     def custom_html_header_content
-      %{
-        <script type="text/javascript">
-          //var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-          //document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-        </script>
-        <script type="text/javascript">
-          try {
-            //var pageTracker = _gat._getTracker("UA-86094-4");
-            //pageTracker._trackPageview();
-          } catch(err) {}
-        </script>
-      }.html_safe
+      nil
     end
     
     # The number of posts displayed per page.
@@ -202,11 +191,11 @@ module Danbooru
     end
 
     def is_post_restricted?(post)
-      post.has_tag?("loli") || post.has_tag?("shota")
+      false
     end
     
     def is_user_restricted?(user)
-      !user.is_privileged? || user.name == "ppayne"
+      !user.is_privileged?
     end
     
     def can_user_see_post?(user, post)
@@ -218,7 +207,7 @@ module Danbooru
     end
     
     def select_posts_visible_to_user(user, posts)
-      posts.select {|x| !is_user_restricted?(user) || !is_post_restricted?(x)}
+      posts.select {|x| can_user_see_post?(x)}
     end
   end
 end

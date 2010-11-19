@@ -1,12 +1,7 @@
 Danbooru::Application.routes.draw do
   namespace :admin do
-    resources :users
-    resources :posts do
-      collection do
-        get :mass_edit
-        put :mass_update
-      end
-    end
+    match 'users/edit' => 'users#edit', :via => :get
+    match 'users' => 'users#update', :via => :put
   end
   resources :advertisements
   resources :advertisement_hits
