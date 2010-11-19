@@ -112,21 +112,14 @@ class User < ActiveRecord::Base
   module FavoriteMethods
     def favorite_posts(options = {})
       favorites_table = Favorite.table_name_for(id)
-      before_id = options[:before]
-      before_id_sql_fragment = "AND favorites.id < #{before_id.to_i}" if before_id
+      if options[:before_id]
+        before_id_sql_fragment = ["favorites.id < ?", options[:before_id]]
+      else
+        before_id_sql_fragment = "TRUE"
+      end
       limit = options[:limit] || 20
-      
-      sql = <<-EOS
-        SELECT posts.*, favorites.id AS favorite_id
-        FROM posts
-        JOIN #{favorites_table} AS favorites ON favorites.post_id = posts.id
-        WHERE
-          favorites.user_id = #{id}
-          #{before_id_sql_fragment}
-        ORDER BY favorite_id DESC
-        LIMIT #{limit.to_i}
-      EOS
-      Post.find_by_sql(sql)
+
+      Post.joins("JOIN #{favorites_table} AS favorites ON favorites.post_id = posts.id").where("favorites.user_id = ?", id).where(before_id_sql_fragment).order("favorite_id DESC").limit(limit).select("posts.*, favorites.id AS favorite_id")
     end
   end
   

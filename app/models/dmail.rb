@@ -9,7 +9,7 @@ class Dmail < ActiveRecord::Base
   belongs_to :from, :class_name => "User"
   after_create :update_recipient
   after_create :send_dmail
-  attr_accessible :title, :body, :is_deleted
+  attr_accessible :title, :body, :is_deleted, :to_id
   scope :for, lambda {|user| where(["owner_id = ?", user])}
   scope :inbox, where("to_id = owner_id")
   scope :sent, where("from_id = owner_id")
@@ -45,11 +45,11 @@ class Dmail < ActiveRecord::Base
         Dmail.transaction do
           copy = Dmail.new(params)
           copy.owner_id = copy.to_id
-          copy.save
+          copy.save!
 
           copy = Dmail.new(params)
           copy.owner_id = CurrentUser.id
-          copy.save
+          copy.save!
         end
       end
       

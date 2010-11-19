@@ -4,5 +4,5 @@ class ForumTopic < ActiveRecord::Base
   has_many :posts, :class_name => "ForumPost", :order => "forum_posts.id asc"
   validates_presence_of :title, :creator_id
   scope :search_title, lambda {|title| where(["text_index @@ plainto_tsquery(?)", title])}
-  accepts_nested_attributes_for :forum_posts
+  accepts_nested_attributes_for :posts
 end

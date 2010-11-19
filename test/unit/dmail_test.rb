@@ -4,9 +4,16 @@ class DmailTest < ActiveSupport::TestCase
   context "A dmail" do
     setup do
       MEMCACHE.flush_all
+      @user = Factory.create(:user)
+      CurrentUser.user = @user
+      CurrentUser.ip_addr = "127.0.0.1"
       ActionMailer::Base.delivery_method = :test
       ActionMailer::Base.perform_deliveries = true
       ActionMailer::Base.deliveries = []
+    end
+    
+    teardown do
+      CurrentUser.user = nil
     end
     
     context "search" do
@@ -28,11 +35,10 @@ class DmailTest < ActiveSupport::TestCase
     end
     
     should "should parse user names" do
-      user = Factory.create(:user)
       dmail = Factory.build(:dmail)
       dmail.to_id = nil
-      dmail.to_name = user.name
-      assert(dmail.to_id == user.id)
+      dmail.to_name = @user.name
+      assert(dmail.to_id == @user.id)
     end
     
     should "construct a response" do
@@ -45,9 +51,8 @@ class DmailTest < ActiveSupport::TestCase
     end
     
     should "create a copy for each user" do
-      dmail = Factory.build(:dmail)
       assert_difference("Dmail.count", 2) do
-        Dmail.create_split(dmail.attributes)
+        Dmail.create_split(:to_id => @user.id, :title => "foo", :body => "foo")
       end
     end
 

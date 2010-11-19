@@ -9,14 +9,12 @@ class IpBan < ActiveRecord::Base
 
   def self.search(user_ids)
     comments = count_by_ip_addr("comments", user_ids, "creator_id", "ip_addr")
-    posts = count_by_ip_addr("post_versions", user_ids, "updater_id", "updater_ip_addr")
     notes = count_by_ip_addr("note_versions", user_ids, "updater_id", "updater_ip_addr")
     pools = count_by_ip_addr("pool_versions", user_ids, "updater_id", "updater_ip_addr")
     wiki_pages = count_by_ip_addr("wiki_page_versions", user_ids, "updater_id", "updater_ip_addr")
     
     return {
       "comments" => comments,
-      "posts" => posts,
       "notes" => notes,
       "pools" => pools,
       "wiki_pages" => wiki_pages
