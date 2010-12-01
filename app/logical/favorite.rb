@@ -35,26 +35,26 @@ class Favorite
     end
   end
 
-private
-  def self.destroy_for_post_and_user(post_id, user_id)
-    execute_sql("DELETE FROM #{table_name_for(user_id)} WHERE post_id = #{post_id} AND user_id = #{user_id}")
-  end
-  
-  def self.destroy_for_post(post)
-    0.upto(9) do |i|
-      execute_sql("DELETE FROM favorites_#{i} WHERE post_id = #{post.id}")
+  private
+    def self.destroy_for_post_and_user(post_id, user_id)
+      execute_sql("DELETE FROM #{table_name_for(user_id)} WHERE post_id = #{post_id} AND user_id = #{user_id}")
     end
-  end
   
-  def self.destroy_for_user(user)
-    execute_sql("DELETE FROM #{table_name_for(user)} WHERE user_id = #{user.id}")
-  end
+    def self.destroy_for_post(post)
+      0.upto(9) do |i|
+        execute_sql("DELETE FROM favorites_#{i} WHERE post_id = #{post.id}")
+      end
+    end
   
-  def self.select_value_sql(sql, *params)
-    ActiveRecord::Base.select_value_sql(sql, *params)
-  end
+    def self.destroy_for_user(user)
+      execute_sql("DELETE FROM #{table_name_for(user)} WHERE user_id = #{user.id}")
+    end
   
-  def self.execute_sql(sql, *params)
-    ActiveRecord::Base.execute_sql(sql, *params)
-  end
+    def self.select_value_sql(sql, *params)
+      ActiveRecord::Base.select_value_sql(sql, *params)
+    end
+  
+    def self.execute_sql(sql, *params)
+      ActiveRecord::Base.execute_sql(sql, *params)
+    end
 end

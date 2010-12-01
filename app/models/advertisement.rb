@@ -32,6 +32,10 @@ class Advertisement < ActiveRecord::Base
     "#{Rails.root}/public/images/advertisements/#{file_name}"
   end
   
+  def file
+    nil
+  end
+  
   def file=(f)
     if f.size > 0
       self.file_name = unique_identifier + File.extname(f.original_filename)

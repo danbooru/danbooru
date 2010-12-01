@@ -17,7 +17,7 @@ class PostSetPresenter < Presenter
   end
   
   def wiki_html(template)
-    if post_set.is_single_tag?
+    if post_set.has_wiki?
       wiki_page = WikiPage.find_by_title(post_set.tags)
       html = '<section>'
       if wiki_page.nil?

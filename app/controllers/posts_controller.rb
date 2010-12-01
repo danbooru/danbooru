@@ -4,7 +4,7 @@ class PostsController < ApplicationController
   respond_to :html, :xml, :json
   
   def index
-    @post_set = PostSet.new(params[:tags], params[:page], params[:before_id])
+    @post_set = PostSets::Post.new(params[:tags], :page => params[:page], :before_id => params[:before_id])
     respond_with(@post_set)
   end
   

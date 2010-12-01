@@ -198,6 +198,10 @@ module Danbooru
       !user.is_privileged?
     end
     
+    def is_user_advertiser?(user)
+      user.is_admin?
+    end
+    
     def can_user_see_post?(user, post)
       if is_user_restricted?(user) && is_post_restricted?(post)
         false

@@ -20,9 +20,9 @@
           <td><%= h artist_version.other_names %></td>
           <td><%= h artist_version.group_name %></td>
           <td><%= time_ago_in_words artist_version.created_at %> ago</td>
-          <td><%= link_to artist_version.updater_name, user_path(artist_version.user_id) %></td>
+          <td><%= link_to artist_version.updater_name, user_path(artist_version.updater_id) %></td>
           <td><%= artist_version.is_active? %></td>
-          <td><%= artist_version.urls.join(" ") %></td>
+          <td><%= artist_version.url_string %></td>
         </tr>
       <% end %>
     </tbody>

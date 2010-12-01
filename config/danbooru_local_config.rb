@@ -31,5 +31,9 @@ module Danbooru
         </script>
       }.html_safe
     end
+    
+    def is_user_advertiser?(user)
+      user.is_admin? || user.name == "ppayne"
+    end
   end
 end

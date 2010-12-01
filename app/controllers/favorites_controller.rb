@@ -1,6 +1,10 @@
 class FavoritesController < ApplicationController
   def index
-    @posts = CurrentUser.favorite_posts(params)
+    if params[:tags]
+      redirect_to(posts_path(:tags => "fav:#{CurrentUser.name} #{params[:tags]}"))
+    else
+      @posts = PostSets::Favorite.new(CurrentUser.user)
+    end
   end
   
   def create

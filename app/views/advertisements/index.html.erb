@@ -1,28 +1,5 @@
 <h4>Advertisements</h4>
 
-<div style="margin-bottom: 1em;">
-  <% form_tag(advertisements_path, :method => :get) do %>
-    <table width="100%">
-      <tfoot>
-        <tr>
-          <th></th>
-          <td><%= submit_tag "Search" %></td>
-        </tr>
-      </tfoot>
-      <tbody>
-        <tr>
-          <th width="15%"><label>Start Date</label></th>
-          <td width="85%"><%= text_field_tag "start_date", @start_date %></td>
-        </tr>
-        <tr>
-          <th width="15%"><label>End Date</label></th>
-          <td width="85%"><%= text_field_tag "end_date", @end_date %></td>
-        </tr>
-      </tbody>        
-    </table>
-  <% end %>
-</div>
-
 <table width="100%" class="highlightable">
   <thead>
     <tr>

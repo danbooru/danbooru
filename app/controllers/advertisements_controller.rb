@@ -1,4 +1,6 @@
 class AdvertisementsController < ApplicationController
+  before_filter :advertiser_only
+  
   def new
     @advertisement = Advertisement.new(
       :ad_type => "vertical",
@@ -12,18 +14,8 @@ class AdvertisementsController < ApplicationController
   
   def index
     @advertisements = Advertisement.all
-
-    if params[:start_date]
-      @start_date = Date.parse(params[:start_date])
-    else
-      @start_date = 1.month.ago.to_date
-    end
-
-    if params[:end_date]
-      @end_date = Date.parse(params[:end_date])
-    else
-      @end_date = Date.today
-    end
+    @start_date = 1.month.ago.to_date
+    @end_date = Date.today
   end
   
   def show
@@ -55,4 +47,12 @@ class AdvertisementsController < ApplicationController
     @advertisement.destroy
     redirect_to advertisements_path, :notice => "Advertisement destroyed"
   end
+  
+  private
+    def advertiser_only
+      if !Danbooru.config.is_user_advertiser?(CurrentUser.user)
+        redirect_to "/static/access_denied"
+        return false
+      end
+    end
 end
