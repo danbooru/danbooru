@@ -19,8 +19,7 @@ class CommentsController < ApplicationController
     @comment.save
     respond_with(@comment) do |format|
       format.html do
-        flash[:notice] = "Comment posted"
-        redirect_to posts_path(@comment.post)
+        redirect_to post_path(@comment.post), :notice => "Comment posted"
       end
       
       format.js

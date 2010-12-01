@@ -11,7 +11,7 @@
       </thead>
       <tbody>
         <% @artists.each do |artist| %>
-          <% content_tag(:tr, :id => "artist-#{artist.id}") do %>
+          <%= content_tag(:tr, :id => "artist-#{artist.id}") do %>
             <td>
               <%= link_to "P", posts_path(:tags => artist.name), :title => "Find posts for artist" %>
               <%= link_to "E", edit_artist_path(artist), :title => "Edit artist" %> 

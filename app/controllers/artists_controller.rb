@@ -1,5 +1,5 @@
 class ArtistsController < ApplicationController
-  before_filter :member_only
+  before_filter :member_only, :except => [:index, :show]
   
   def new
     @artist = Artist.new_with_defaults(params)
@@ -48,7 +48,8 @@ class ArtistsController < ApplicationController
   
   def revert
     @artist = Artist.find(params[:id])
-    @artist.revert_to!(params[:version])
+    @version = ArtistVersion.find(params[:version_id])
+    @artist.revert_to!(@version)
     redirect_to artist_path(@artist), :notice => "Artist updated"
   end
 end

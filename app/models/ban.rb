@@ -38,6 +38,14 @@ class Ban < ActiveRecord::Base
     end
   end
   
+  def user_name
+    user ? user.name : nil
+  end
+  
+  def user_name=(username)
+    self.user_id = User.name_to_id(username)
+  end
+  
   def duration=(dur)
     self.expires_at = dur.to_i.days.from_now
     @duration = dur

@@ -20,6 +20,8 @@ class BansController < ApplicationController
   
   def create
     @ban = Ban.new(params[:ban])
+    @ban.banner_id = CurrentUser.id
+    
     if @ban.save
       redirect_to ban_path(@ban), :notice => "Ban created"
     else
@@ -39,5 +41,6 @@ class BansController < ApplicationController
   def destroy
     @ban = Ban.find(params[:id])
     @ban.destroy
+    redirect_to bans_path, :notice => "Ban destroyed"
   end
 end

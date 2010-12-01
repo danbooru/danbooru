@@ -12,7 +12,7 @@
       <tbody>
         <% @bans.each do |ban| %>
           <tr id="ban-<%= ban.id %>">
-            <td><%= ban.user_name %></td>
+            <td><%= ban.user.name %></td>
             <td><%= ban.expires_at %></td>
             <td><%= ban.reason %></td>
             <td>
