@@ -1,6 +1,6 @@
 <div class="login-header">
   <% if CurrentUser.is_anonymous? %>
-    <% form_tag(sessions_path) do %>
+    <% form_tag(session_path) do %>
       <span class="notice">You are not logged in.</span>
 
       <%= label_tag :name %>

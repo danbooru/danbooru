@@ -36,8 +36,7 @@ Danbooru::Application.routes.draw do
   resources :post_moderation_details
   resources :post_histories
   resources :post_votes
-  resources :reports
-  resources :sessions
+  resource :session
   resources :tags
   resources :tag_aliases do
     member do

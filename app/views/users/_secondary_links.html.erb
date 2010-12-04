@@ -9,7 +9,7 @@
     <% end %>
     <% unless CurrentUser.user.is_anonymous? %>
       <li>|</li>
-      <li><%= link_to "Logout", session_path(0), :method => :delete %></li>
+      <li><%= link_to "Logout", session_path, :method => :delete %></li>
     <% end %>
   </menu>
 <% end %>
