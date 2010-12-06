@@ -1,10 +1,16 @@
 class DmailsController < ApplicationController
   respond_to :html, :xml, :json
+  before_filter :member_only
   rescue_from User::PrivilegeError, :with => "static/access_denied"
 
   def new
-    @dmail = Dmail.new(params[:dmail])
-    respond_width(@dmail)
+    if params[:respond_to_id]
+      @dmail = Dmail.find(params[:respond_to_id]).build_response(:forward => params[:forward])
+    else
+      @dmail = Dmail.new(params[:dmail])
+    end
+    
+    respond_with(@dmail)
   end
   
   def index

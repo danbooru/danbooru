@@ -1,6 +1,6 @@
 module PostSets
   class Base
-    attr_accessor :page, :before_id, :count
+    attr_accessor :page, :before_id, :count, :posts
   
     def initialize(options = {})
       @page = options[:page].to_i

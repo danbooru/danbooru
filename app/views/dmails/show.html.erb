@@ -1,0 +1,12 @@
+<div class="dmails">
+  <div class="show">
+    <div class="dmail">
+      <h1><%= @dmail.title %></h1>
+      <%= format_text(@dmail.body) %>
+      <p>
+        <%= link_to "Respond", new_dmail_path(:respond_to_id => @dmail) %>
+        | <%= link_to "Forward", new_dmail_path(:respond_to_id => @dmail, :forward => true) %>
+      </p>      
+    </div>
+  </div>
+</div>

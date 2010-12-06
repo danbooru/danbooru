@@ -13,6 +13,10 @@ class Favorite
     # ignore
   end
   
+  def self.count(user_id)
+    select_value_sql("SELECT COUNT(*) FROM #{table_name_for(user_id)}").to_i
+  end
+  
   def self.destroy(conditions)
     if conditions[:user_id] && conditions[:post_id]
       destroy_for_post_and_user(conditions[:post_id], conditions[:user_id])

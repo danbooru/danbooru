@@ -6,9 +6,9 @@
   <tbody>
     <% @dmails.each do |dmail| %>
       <% if params[:folder] == "sent" %>
-        <%= render "sent", :locals => {:dmail => dmail} %>
+        <%= render :partial => "sent", :locals => {:dmail => dmail} %>
       <% else %>
-        <%= render "received", :locals => {:dmail => dmail} %>
+        <%= render :partial => "received", :locals => {:dmail => dmail} %>
       <% end %>
     <% end %>
   </tbody>

@@ -1,8 +1,6 @@
 Factory.define(:dmail) do |f|
-  f.owner {|x| x.association(:user)}
-  f.from_id {|x| x.owner_id}
   f.to {|x| x.association(:user)}
-  f.title {Faker::Lorem.words}
-  f.body {Faker::Lorem.sentences}
+  f.title {Faker::Lorem.words.join(" ")}
+  f.body {Faker::Lorem.sentences.join(" ")}
   f.is_read false
 end

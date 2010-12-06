@@ -61,7 +61,7 @@ class User < ActiveRecord::Base
       end
       
       def id_to_pretty_name(user_id)
-        id_to_name.tr("_", " ")
+        id_to_name(user_id).tr("_", " ")
       end
     end
     

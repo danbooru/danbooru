@@ -14,22 +14,22 @@ class ArtistsControllerTest < ActionController::TestCase
       CurrentUser.ip_addr = nil
     end
     
-    should "render the new page" do
+    should "get the new page" do
       get :new, {}, {:user_id => @user.id}
       assert_response :success
     end
     
-    should "render the edit page" do
+    should "get the edit page" do
       get :edit, {:id => @artist.id}, {:user_id => @user.id}
       assert_response :success
     end
     
-    should "render the show page" do
+    should "get the show page" do
       get :show, {:id => @artist.id}
       assert_response :success
     end
     
-    should "render the index page" do
+    should "get the index page" do
       get :index
       assert_response :success
     end

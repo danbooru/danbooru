@@ -4,7 +4,6 @@ class CreateDmails < ActiveRecord::Migration
       t.column :owner_id, :integer, :null => false
       t.column :from_id, :integer, :null => false
       t.column :to_id, :integer, :null => false
-      t.column :parent_id, :integer
       t.column :title, :string, :null => false
       t.column :body, :text, :null => false
       t.column :message_index, "tsvector", :null => false
@@ -14,7 +13,6 @@ class CreateDmails < ActiveRecord::Migration
     end
     
     add_index :dmails, :owner_id
-    add_index :dmails, :parent_id
     
     execute "CREATE INDEX index_dmails_on_message_index ON dmails USING GIN (message_index)"
     execute "CREATE TRIGGER trigger_dmails_on_update BEFORE INSERT OR UPDATE ON dmails FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('message_index', 'pg_catalog.english', 'title', 'body')"

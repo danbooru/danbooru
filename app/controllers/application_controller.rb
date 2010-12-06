@@ -5,6 +5,8 @@ class ApplicationController < ActionController::Base
   before_filter :initialize_cookies
   before_filter :set_title
   layout "default"
+  
+  rescue_from User::PrivilegeError, :with => :access_denied
 
 protected
   def access_denied
@@ -12,7 +14,7 @@ protected
 
     respond_to do |fmt|
       fmt.html do 
-        if request.get? && Rails.env.test?
+        if request.get?
           redirect_to new_session_path(:url => previous_url), :notice => "Access denied"
         else
           redirect_to new_session_path, :notice => "Access denied"

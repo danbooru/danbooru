@@ -7,22 +7,22 @@ class AdvertisementsControllerTest < ActionController::TestCase
       @advertiser = Factory.create(:admin_user)
     end
     
-    should "render the new page" do
+    should "get the new page" do
       get :new, {}, {:user_id => @advertiser.id}
       assert_response :success
     end
     
-    should "render the edit page" do
+    should "get the edit page" do
       get :edit, {:id => @ad.id}, {:user_id => @advertiser.id}
       assert_response :success
     end
     
-    should "render the index page" do
+    should "get the index page" do
       get :index, {}, {:user_id => @advertiser.id}
       assert_response :success
     end
     
-    should "render the show page" do
+    should "get the show page" do
       get :show, {:id => @ad.id}, {:user_id => @advertiser.id}
       assert_response :success
     end

@@ -45,7 +45,6 @@ class DmailTest < ActiveSupport::TestCase
       dmail = Factory.create(:dmail)
       response = dmail.build_response
       assert_equal("Re: #{dmail.title}", response.title)
-      assert_equal(dmail.id, response.parent_id)
       assert_equal(dmail.from_id, response.to_id)
       assert_equal(dmail.to_id, response.from_id)
     end

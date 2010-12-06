@@ -9,7 +9,7 @@ class Dmail < ActiveRecord::Base
   belongs_to :from, :class_name => "User"
   after_create :update_recipient
   after_create :send_dmail
-  attr_accessible :title, :body, :is_deleted, :to_id
+  attr_accessible :title, :body, :is_deleted, :to_id, :to
   scope :for, lambda {|user| where(["owner_id = ?", user])}
   scope :inbox, where("to_id = owner_id")
   scope :sent, where("from_id = owner_id")
@@ -42,6 +42,8 @@ class Dmail < ActiveRecord::Base
     
     module ClassMethods
       def create_split(params)
+        copy = nil
+        
         Dmail.transaction do
           copy = Dmail.new(params)
           copy.owner_id = copy.to_id
@@ -51,6 +53,8 @@ class Dmail < ActiveRecord::Base
           copy.owner_id = CurrentUser.id
           copy.save!
         end
+        
+        copy
       end
       
       def new_blank
@@ -60,14 +64,13 @@ class Dmail < ActiveRecord::Base
       end
     end
     
-    def build_response
+    def build_response(options = {})
       Dmail.new do |dmail|
         dmail.title = "Re: #{title}"
         dmail.owner_id = from_id
         dmail.body = quoted_body
-        dmail.to_id = from_id
+        dmail.to_id = from_id unless options[:forward]
         dmail.from_id = to_id
-        dmail.parent_id = id
       end
     end
   end

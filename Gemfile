@@ -5,6 +5,7 @@ group :test do
   gem "factory_girl"
   gem "mocha"
   gem "ffaker", :git => "http://github.com/EmmanuelOga/ffaker.git"
+  gem "simplecov", :require => false
 end
 
 gem "rails", "3.0.0"

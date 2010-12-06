@@ -13,12 +13,12 @@ class ArtistVersionsControllerTest < ActionController::TestCase
       CurrentUser.ip_addr = nil
     end
     
-    should "render the index page" do
+    should "get the index page" do
       get :index
       assert_response :success
     end
     
-    should "render the index page when searching for something" do
+    should "get the index page when searching for something" do
       get :index, {:search => {:name_equals => @artist.name}}
       assert_response :success
     end
