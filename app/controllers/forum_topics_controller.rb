@@ -43,11 +43,11 @@ class ForumTopicsController < ApplicationController
     @forum_topic.destroy
     respond_with(@forum_topic)
   end
-  
-  private
-    def check_privilege(forum_topic)
-      if !forum_topic.editable_by?(CurrentUser.user)
-        raise User::PrivilegeError
-      end
+
+private
+  def check_privilege(forum_topic)
+    if !forum_topic.editable_by?(CurrentUser.user)
+      raise User::PrivilegeError
     end
+  end
 end

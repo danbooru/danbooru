@@ -8,6 +8,10 @@ class ForumPost < ActiveRecord::Base
   validates_presence_of :body, :creator_id
   scope :body_matches, lambda {|body| where(["text_index @@ plainto_tsquery(?)", body])}
   search_methods :body_matches
+
+  def editable_by?(user)
+    creator_id == user.id || user.is_moderator?
+  end
   
   def update_topic_updated_at
     topic.update_attributes(:updater_id => CurrentUser.id)

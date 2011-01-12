@@ -1,37 +1,52 @@
 class ForumPostsController < ApplicationController
+  respond_to :html, :xml, :json
+  before_filter :member_only, :except => [:index, :show]
+  rescue_from User::PrivilegeError, :with => "static/access_denied"
+
   def new
     @forum_post = ForumPost.new(:topic_id => params[:topic_id])
+    respond_with(@forum_post)
   end
   
   def edit
     @forum_post = ForumPost.find(params[:id])
+    check_privilege(@forum_post)
+    respond_with(@forum_post)
+  end
+  
+  def index
+    @forum_posts = ForumPost.search(params[:search])
+    respond_with(@forum_posts)
   end
 
   def show
     @forum_post = ForumPost.find(params[:id])
+    respond_with(@forum_post)
   end
   
   def create
     @forum_post = ForumPost.new(params[:forum_post])
-    if @forum_post.save
-      redirect_to forum_post_path(@forum_post)
-    else
-      render :action => "new"
-    end
+    respond_with(@forum_post)
   end
   
   def update
     @forum_post = ForumPost.find(params[:id])
-    if @forum_post.update_attributes(params[:forum_post])
-      redirect_to forum_post_path(@forum_post)
-    else
-      render :action => "edit"
-    end
+    check_privilege(@forum_post)
+    @forum_post.update_attributes(params[:forum_post])
+    respond_with(@forum_post)
   end
   
   def destroy
     @forum_post = ForumPost.find(params[:id])
+    check_privilege(@forum_post)
     @forum_post.destroy
-    redirect_to forum_topic_path(@forum_post.topic_id)
+    respond_with(@forum_post)
+  end
+
+private
+  def check_privilege(forum_post)
+    if !forum_post.editable_by?(CurrentUser.user)
+      raise User::PrivilegeError
+    end
   end
 end

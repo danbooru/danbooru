@@ -7,6 +7,7 @@ class UploadsController < ApplicationController
     if params[:url]
       @post = Post.find_by_source(params[:url])
     end
+    respond_with(@upload)
   end
   
   def index
@@ -16,6 +17,7 @@ class UploadsController < ApplicationController
   
   def show
     @upload = Upload.find(params[:id])
+    respond_with(@upload)
   end
 
   def create
@@ -26,8 +28,6 @@ class UploadsController < ApplicationController
   def update
     @upload = Upload.find(params[:id])
     @upload.process!
-    render :update do |page|
-      page.reload
-    end
+    respond_with(@upload)
   end
 end
