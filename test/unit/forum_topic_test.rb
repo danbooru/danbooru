@@ -42,5 +42,19 @@ class ForumTopicTest < ActiveSupport::TestCase
         assert_equal(@second_user.id, @topic.updater_id)
       end
     end
+    
+    context "with multiple posts that has been deleted" do
+      setup do
+        5.times do
+          Factory.create(:forum_post, :topic_id => @topic.id)
+        end
+      end
+      
+      should "delete any associated posts" do
+        assert_difference("ForumPost.count", -5) do
+          @topic.destroy
+        end
+      end
+    end
   end
 end

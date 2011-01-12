@@ -74,7 +74,16 @@ class ForumTopicsControllerTest < ActionController::TestCase
     end
     
     context "destroy action" do
+      setup do
+        @post = Factory.create(:forum_post, :topic_id => @forum_topic.id)
+      end
       
+      should "destroy the topic and any associated posts" do
+        assert_difference(["ForumPost.count", "ForumTopic.count"], -1) do
+          post :destroy, {:id => @forum_topic.id}, {:user_id => @user.id}
+        end
+        assert_redirected_to(forum_topics_path)
+      end
     end
   end
 end
