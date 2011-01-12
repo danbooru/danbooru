@@ -1,0 +1,11 @@
+<h1>New Topic</h1>
+
+<%= simple_form_for(@forum_topic) do |f| %>
+  <%= f.input :title %>
+  
+  <%= f.simple_fields_for :original_post do |pf| %>
+    <%= pf.input :body %>
+  <% end %>
+  
+  <%= f.button :submit %>
+<% end %>

@@ -400,7 +400,6 @@ CREATE TABLE dmails (
     owner_id integer NOT NULL,
     from_id integer NOT NULL,
     to_id integer NOT NULL,
-    parent_id integer,
     title character varying(255) NOT NULL,
     body text NOT NULL,
     message_index tsvector NOT NULL,
@@ -738,6 +737,7 @@ CREATE TABLE forum_posts (
     id integer NOT NULL,
     topic_id integer NOT NULL,
     creator_id integer NOT NULL,
+    updater_id integer NOT NULL,
     body text NOT NULL,
     text_index tsvector NOT NULL,
     created_at timestamp without time zone,
@@ -771,6 +771,7 @@ ALTER SEQUENCE forum_posts_id_seq OWNED BY forum_posts.id;
 CREATE TABLE forum_topics (
     id integer NOT NULL,
     creator_id integer NOT NULL,
+    updater_id integer NOT NULL,
     title character varying(255) NOT NULL,
     response_count integer DEFAULT 0 NOT NULL,
     is_sticky boolean DEFAULT false NOT NULL,
@@ -2384,13 +2385,6 @@ CREATE INDEX index_dmails_on_message_index ON dmails USING gin (message_index);
 --
 
 CREATE INDEX index_dmails_on_owner_id ON dmails USING btree (owner_id);
-
-
---
--- Name: index_dmails_on_parent_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_dmails_on_parent_id ON dmails USING btree (parent_id);
 
 
 --

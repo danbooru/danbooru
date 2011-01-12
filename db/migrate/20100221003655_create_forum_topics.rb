@@ -2,6 +2,7 @@ class CreateForumTopics < ActiveRecord::Migration
   def self.up
     create_table :forum_topics do |t|
       t.column :creator_id, :integer, :null => false
+      t.column :updater_id, :integer, :null => false
       t.column :title, :string, :null => false
       t.column :response_count, :integer, :null => false, :default => 0
       t.column :is_sticky, :boolean, :null => false, :default => false
