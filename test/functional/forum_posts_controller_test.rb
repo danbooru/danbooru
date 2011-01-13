@@ -58,7 +58,7 @@ class ForumPostsControllerTest < ActionController::TestCase
     
     context "new action" do
       should "render" do
-        get :new, {}, {:user_id => @user.id}
+        get :new, {}, {:user_id => @user.id, :topic_id => @forum_topic.id}, {:user_id => @user.id}
         assert_response :success
       end
     end
@@ -66,7 +66,7 @@ class ForumPostsControllerTest < ActionController::TestCase
     context "create action" do
       should "create a new forum post" do
         assert_difference("ForumPost.count", 1) do
-          post :create, {:forum_post => {:body => "xaxaxa"}}, {:user_id => @user.id}
+          post :create, {:forum_post => {:body => "xaxaxa", :topic_id => @forum_topic.id}}, {:user_id => @user.id}
         end
 
         forum_post = ForumPost.last

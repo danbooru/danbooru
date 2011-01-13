@@ -1,0 +1,26 @@
+<%= render "search" %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Topic</th>
+      <th>Excerpt</th>
+      <th>Creator</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @forum_posts.each do |forum_post| %>
+      <tr>
+        <td><%= forum_post.topic.title %></td>
+        <td><%= truncate forum_post.body, :length => 50 %></td>
+        <td><%= forum_post.creator.name %></td>
+        <td><%= forum_post.created_at %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<div id="paginator">
+  <%= will_paginate @forum_posts %>
+</div>

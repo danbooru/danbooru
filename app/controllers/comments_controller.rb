@@ -3,7 +3,11 @@ class CommentsController < ApplicationController
   before_filter :member_only, :only => [:update, :create]
 
   def index
-    @posts = Post.commented_before(params[:before_date] || Time.now).limit(8)
+    if params[:group_by] == "post"
+      index_by_post
+    else
+      index_by_comment
+    end
   end
   
   def update
@@ -21,8 +25,22 @@ class CommentsController < ApplicationController
       format.html do
         redirect_to post_path(@comment.post), :notice => "Comment posted"
       end
-      
-      format.js
+    end
+  end
+  
+private
+  def index_by_post
+    @posts = Post.find_by_tags(params[:tags]).commented_before(params[:before_date] || Time.now).limit(8)
+    respond_with(@posts) do |format|
+      format.html {render :action => "index_by_post"}
+    end
+  end
+  
+  def index_by_comment
+    @search = Comment.search(params[:search])
+    @comments = @search.paginate(:page => params[:page])
+    respond_with(@comments) do |format|
+      format.html {render :action => "index_by_comment"}
     end
   end
 end

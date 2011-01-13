@@ -15,7 +15,8 @@ class ForumPostsController < ApplicationController
   end
   
   def index
-    @forum_posts = ForumPost.search(params[:search])
+    @search = ForumPost.search(params[:search])
+    @forum_posts = @search.paginate(:page => params[:page], :order => "id DESC")
     respond_with(@forum_posts)
   end
 
@@ -25,7 +26,7 @@ class ForumPostsController < ApplicationController
   end
   
   def create
-    @forum_post = ForumPost.new(params[:forum_post])
+    @forum_post = ForumPost.create(params[:forum_post])
     respond_with(@forum_post)
   end
   

@@ -1,0 +1,7 @@
+<h1>New Post</h1>
+
+<%= simple_form_for(@forum_post) do |f| %>
+  <%= f.input :topic_id, :as => :hidden %>
+  <%= f.input :body %>
+  <%= f.button :submit %>
+<% end %>

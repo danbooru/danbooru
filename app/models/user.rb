@@ -186,7 +186,8 @@ class User < ActiveRecord::Base
       return false unless is_privileged?
       newest_topic = ForumPost.first(:order => "updated_at desc", :select => "updated_at")
       return false if newest_topic.nil?
-      return newest_topic.updated_at > user.last_forum_read_at
+      return true if last_forum_read_at.nil?
+      return newest_topic.updated_at > last_forum_read_at
     end
   end
   

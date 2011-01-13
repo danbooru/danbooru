@@ -14,23 +14,37 @@ class CommentsControllerTest < ActionController::TestCase
       CurrentUser.ip_addr = nil
     end
 
-    should "get the index page" do
-      get :index
-      assert_response :success
-    end
-    
-    should "update a comment" do
-      post :update, {:id => @comment.id, :comment => {:body => "abc"}}, {:user_id => @comment.creator_id}
-      assert_redirected_to comment_path(@comment)
-    end
-    
-    should "create a comment" do
-      p = Factory.create(:post)
-      assert_difference("Comment.count", 1) do
-        post :create, {:comment => Factory.attributes_for(:comment, :post_id => p.id)}, {:user_id => @user.id}
+    context "index action" do
+      should "render by post" do
+        get :index, {:group_by => "post"}
+        assert_response :success
       end
-      comment = Comment.last
-      assert_redirected_to post_path(comment.post)
+      
+      should "render by comment" do
+        get :index, {:group_by => "comment"}
+        assert_response :success
+      end
+    end
+    
+    context "update action" do
+      should "update the comment" do
+        post :update, {:id => @comment.id, :comment => {:body => "abc"}}, {:user_id => @comment.creator_id}
+        assert_redirected_to comment_path(@comment)
+      end
+    end
+    
+    context "create action"do
+      setup do
+        @post = Factory.create(:post)
+      end
+
+      should "create a comment" do
+        assert_difference("Comment.count", 1) do
+          post :create, {:comment => Factory.attributes_for(:comment, :post_id => @post.id)}, {:user_id => @user.id}
+        end
+        comment = Comment.last
+        assert_redirected_to post_path(comment.post)
+      end
     end
   end
 end
