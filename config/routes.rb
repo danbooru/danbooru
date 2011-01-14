@@ -18,7 +18,12 @@ Danbooru::Application.routes.draw do
   resources :favorites
   resources :forum_posts
   resources :forum_topics
-  resources :janitor_trials
+  resources :janitor_trials do
+    member do
+      put :promote
+      put :demote
+    end
+  end
   resources :jobs
   resources :ip_bans
   resources :notes

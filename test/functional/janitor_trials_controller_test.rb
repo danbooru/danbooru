@@ -1,8 +1,73 @@
 require 'test_helper'
 
 class JanitorTrialsControllerTest < ActionController::TestCase
-  # Replace this with your real tests.
-  test "the truth" do
-    assert true
+  context "The janitor trials controller" do
+    setup do
+      @admin = Factory.create(:admin_user)
+      @user = Factory.create(:user)
+      CurrentUser.user = @admin
+      CurrentUser.ip_addr = "127.0.0.1"
+    end
+    
+    context "new action" do
+      should "render" do
+        get :new, {}, {:user_id => @admin.id}
+        assert_response :success
+      end
+    end
+
+    context "create action" do
+      should "create a new janitor trial" do
+        assert_difference("JanitorTrial.count", 1) do
+          post :create, {:janitor_trial => {:user_id => @user.id}}, {:user_id => @admin.id}
+        end
+      end
+    end
+    
+    context "promote action" do
+      setup do
+        @janitor_trial = Factory.create(:janitor_trial, :user_id => @user.id)
+      end
+      
+      should "promote the janitor trial" do
+        assert_difference("JanitorTrial.count", -1) do
+          post :promote, {:id => @janitor_trial.id}, {:user_id => @admin.id}
+        end
+        @user.reload
+        assert(@user.is_janitor?)
+      end
+    end
+    
+    context "demote action" do
+      setup do
+        @janitor_trial = Factory.create(:janitor_trial, :user_id => @user.id)
+      end
+      
+      should "demote the janitor trial" do
+        assert_difference("JanitorTrial.count", -1) do
+          post :demote, {:id => @janitor_trial.id}, {:user_id => @admin.id}
+        end
+        @user.reload
+        assert(!@user.is_janitor?)
+      end
+    end
+    
+    context "index action" do
+      setup do
+        Factory.create(:janitor_trial)
+      end
+      
+      should "render" do
+        get :index, {}, {:user_id => @admin.id}
+        assert_response :success
+      end
+      
+      context "with search parameters" do
+        should "render" do
+          get :index, {:search => {:user_name_equals => @user.name}}, {:user_id => @admin.id}
+          assert_response :success
+        end
+      end
+    end
   end
 end

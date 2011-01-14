@@ -1,5 +1,5 @@
 Factory.define(:user) do |f|
-  f.name {Faker::Name.first_name}
+  f.name {rand(1_000_000).to_s}
   f.password "password"
   f.password_hash {User.sha1("password")}
   f.email {Faker::Internet.email}

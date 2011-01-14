@@ -1,0 +1,7 @@
+<h1>New IP Ban</h1>
+
+<%= simple_form_for(@ip_ban) do |f| %>
+  <%= f.input :ip_addr %>
+  <%= f.input :reason %>
+  <%= f.button :submit %>
+<% end %>
