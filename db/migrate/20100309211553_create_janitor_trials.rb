@@ -1,6 +1,7 @@
 class CreateJanitorTrials < ActiveRecord::Migration
   def self.up
     create_table :janitor_trials do |t|
+      t.column :creator_id, :integer, :null => false
       t.column :user_id, :integer, :null => false
       t.timestamps
     end

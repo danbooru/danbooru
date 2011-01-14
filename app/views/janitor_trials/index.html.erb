@@ -1,0 +1,23 @@
+<h1>Janitor Trials</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Duration</th>
+      <td></td>
+    </tr>
+  </thead>
+  <tbody>
+    <% @janitor_trials.each do |janitor_trial| %>
+      <tr>
+        <td><%= janitor_trial.user.name %></td>
+        <td><%= janitor_trial.created_at %></td>
+        <td>
+          <%= link_to "Promote", promote_janitor_trial_path(janitor_trial), :remote => true, :method => :put %>
+          | <%= link_to "Demote", demote_janitor_trial_path(janitor_trial), :remote => true, :method => :put %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
