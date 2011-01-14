@@ -20,6 +20,7 @@ Danbooru::Application.routes.draw do
   resources :forum_topics
   resources :janitor_trials
   resources :jobs
+  resources :ip_bans
   resources :notes
   resources :note_versions
   resources :pools do

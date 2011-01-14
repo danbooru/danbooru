@@ -22,7 +22,7 @@ class IpBanTest < ActiveSupport::TestCase
   should "be able to count any updates from a user, groupiny by IP address" do
     CurrentUser.scoped(@user, "1.2.3.4") do
       comment = Factory.create(:comment, :body => "aaa")
-      counts = IpBan.search([comment.creator_id])
+      counts = IpBan.query([comment.creator_id])
       assert_equal([{"ip_addr" => "1.2.3.4", "count" => "1"}], counts["comments"])
     end
   end
