@@ -9,6 +9,10 @@ class JanitorTrialsControllerTest < ActionController::TestCase
       CurrentUser.ip_addr = "127.0.0.1"
     end
     
+    teardown do
+      CurrentUser.user = nil
+    end
+    
     context "new action" do
       should "render" do
         get :new, {}, {:user_id => @admin.id}

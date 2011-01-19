@@ -1,0 +1,13147 @@
+--- 
+Unit Tests: 
+  :original_result: 
+    /Users/ayi/Projects/personal/danbooru/vendor/plugins/jrails/lib/jrails.rb: 
+    - 1
+    - 
+    - 1
+    - 1
+    - 1
+    /Users/ayi/Projects/personal/danbooru/vendor/plugins/jrails/lib/jrails/jrails.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 3
+    - 5
+    - 1
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/vendor/plugins/jrails/lib/jrails/asset_tag_ext.rb: 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 1
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/vendor/plugins/jrails/lib/jrails/jquery_selector_assertions.rb: 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 4
+    - 4
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 5
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/admin/posts_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/admin/users_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/application_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 7
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/application_helper.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/admin/users_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/advertisements_helper.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/artist_versions_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/artists_helper.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/bans_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/comment_votes_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/comments_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/dmails_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/favorites_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/forum_posts_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/forum_topics_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/janitor_trials_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/notes_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/pool_versions_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/pools_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/post_moderation_details_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/post_versions_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/post_votes_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/posts_helper.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/sessions_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/tag_aliases_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/tag_implications_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/tag_subscriptions_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/tags_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/unapprovals_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/uploads_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/user_feedback_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/users_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/wiki_page_versions_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/wiki_pages_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/user.rb: 
+    - 1
+    - 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 9
+    - 9
+    - 1
+    - 1
+    - 9
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 8
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 21
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 21
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 16
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 8
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 8
+    - 4
+    - 4
+    - 4
+    - 4
+    - 4
+    - 0
+    - 0
+    - 4
+    - 0
+    - 4
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/advertisement_hits_controller.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/advertisements_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/artist_versions_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/artists_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/bans_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/comment_votes_controller.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/comments_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/dmails_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/dtext_controller.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/favorites_controller.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/forum_posts_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/forum_topics_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/ip_bans_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/janitor_trials_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/notes_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/pool_versions_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/pools_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/post_histories_controller.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/post_moderation_details_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/post_votes_controller.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/posts_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/sessions_controller.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/static_controller.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/tag_aliases_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/tag_implications_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/tag_subscriptions_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/tags_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/unapprovals_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/uploads_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/user_feedback_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/user_maintenance_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/users_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/wiki_page_versions_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/wiki_pages_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/anonymous_user.rb: 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 7
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/cache.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 21
+    - 21
+    - 
+    - 21
+    - 21
+    - 21
+    - 21
+    - 21
+    - 21
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/current_user.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 8
+    - 
+    - 
+    - 1
+    - 8
+    - 
+    - 
+    - 1
+    - 14
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 14
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/d_text.rb: 
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/date_tag.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/download.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/favorite.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/pixiv_proxy.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/post_sets/base.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/post_sets/favorite.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/post_sets/post.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/related_tag_calculator.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/remote_server.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/advertisement.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/advertisement_hit.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/artist.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/artist_url.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/artist_version.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/ban.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/comment.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    /Users/ayi/Projects/personal/danbooru/app/models/comment_vote.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/dmail.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 8
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 4
+    - 
+    - 4
+    - 4
+    - 4
+    - 4
+    - 
+    - 4
+    - 4
+    - 4
+    - 
+    - 
+    - 4
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 8
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 8
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/forum_post.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/forum_topic.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/ip_ban.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 8
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/janitor_trial.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 4
+    - 
+    - 4
+    - 
+    - 
+    - 1
+    - 4
+    - 
+    - 
+    - 1
+    - 2
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/backup_to_s3.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/calculate_post_count.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/calculate_related_tags.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/calculate_uploaded_tags.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/create_tag_alias.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/create_tag_implication.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/fix_pixiv_uploads.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/mass_tag_edit.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/process_tag_subscriptions.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/process_uploads.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/note.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/note_version.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/pool.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/pool_version.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/post.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    /Users/ayi/Projects/personal/danbooru/app/models/post_history.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/post_moderation_detail.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/post_vote.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/removed_post.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/report_mailer.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/tag.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 4
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/tag_alias.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/tag_implication.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/tag_subscription.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/unapproval.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/upload.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/lib/danbooru_image_resizer/danbooru_image_resizer.rb: 
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/user_feedback.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 2
+    - 
+    - 
+    - 1
+    - 2
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/user_mailer.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/wiki_page.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/wiki_page_version.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/note_presenter.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/paginators/base.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/presenter.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/paginators/post.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/paginators/post_version.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/post_history_revision_presenter.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/post_presenter.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/post_set_presenter.rb: 
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/tag_set_presenter.rb: 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/upload_presenter.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/wiki_page_presenter.rb: 
+    - 1
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+  :created_at: 2011-01-14 16:37:32.123885 -05:00
+Functional Tests: 
+  :original_result: 
+    /Users/ayi/Projects/personal/danbooru/vendor/plugins/jrails/lib/jrails.rb: 
+    - 1
+    - 
+    - 1
+    - 1
+    - 1
+    /Users/ayi/Projects/personal/danbooru/vendor/plugins/jrails/lib/jrails/jrails.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 3
+    - 5
+    - 1
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/vendor/plugins/jrails/lib/jrails/asset_tag_ext.rb: 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 1
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 5
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 5
+    - 
+    - 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/vendor/plugins/jrails/lib/jrails/jquery_selector_assertions.rb: 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 4
+    - 4
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 5
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/admin/posts_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/admin/users_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/application_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 7
+    - 2
+    - 2
+    - 
+    - 
+    - 7
+    - 7
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 7
+    - 
+    - 
+    - 1
+    - 7
+    - 7
+    - 
+    - 
+    - 1
+    - 7
+    - 4
+    - 4
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 7
+    - 0
+    - 
+    - 7
+    - 
+    - 
+    - 
+    - 1
+    - 7
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/application_helper.rb: 
+    - 1
+    - 1
+    - 50
+    - 5
+    - 
+    - 45
+    - 
+    - 
+    - 50
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 50
+    - 50
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/admin/users_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/advertisements_helper.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/artist_versions_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/artists_helper.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/bans_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/comment_votes_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/comments_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/dmails_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/favorites_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/forum_posts_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/forum_topics_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/janitor_trials_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/notes_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/pool_versions_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/pools_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/post_moderation_details_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/post_versions_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/post_votes_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/posts_helper.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/sessions_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/tag_aliases_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/tag_implications_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/tag_subscriptions_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/tags_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/unapprovals_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/uploads_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/user_feedback_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/users_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/wiki_page_versions_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/helpers/wiki_pages_helper.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/user.rb: 
+    - 1
+    - 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 20
+    - 20
+    - 1
+    - 1
+    - 20
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 19
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 19
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 19
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 38
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 19
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 19
+    - 0
+    - 0
+    - 0
+    - 0
+    - 19
+    - 0
+    - 0
+    - 19
+    - 0
+    - 19
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 12
+    - 
+    - 
+    - 1
+    - 4
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 5
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/advertisement_hits_controller.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/advertisements_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/artist_versions_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/artists_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/bans_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/comment_votes_controller.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/comments_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/dmails_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/dtext_controller.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/favorites_controller.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/forum_posts_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/forum_topics_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/ip_bans_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/janitor_trials_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/notes_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 2
+    - 2
+    - 2
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/pool_versions_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/pools_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/post_histories_controller.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/post_moderation_details_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/post_votes_controller.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/posts_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/sessions_controller.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/static_controller.rb: 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/tag_aliases_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/tag_implications_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/tag_subscriptions_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/tags_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/unapprovals_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/uploads_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/user_feedback_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/user_maintenance_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/users_controller.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/wiki_page_versions_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/controllers/wiki_pages_controller.rb: 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/anonymous_user.rb: 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 7
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/cache.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 72
+    - 36
+    - 36
+    - 
+    - 72
+    - 72
+    - 72
+    - 72
+    - 72
+    - 36
+    - 36
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 72
+    - 
+    - 
+    - 
+    - 1
+    - 18
+    - 18
+    - 18
+    - 18
+    - 18
+    - 18
+    - 0
+    - 0
+    - 
+    - 18
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 31
+    - 31
+    - 
+    - 31
+    - 31
+    - 31
+    - 31
+    - 31
+    - 31
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 36
+    - 36
+    - 36
+    - 36
+    - 36
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 84
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/current_user.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 23
+    - 
+    - 
+    - 1
+    - 16
+    - 
+    - 
+    - 1
+    - 89
+    - 
+    - 
+    - 1
+    - 13
+    - 
+    - 
+    - 1
+    - 24
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/d_text.rb: 
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/date_tag.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/download.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/favorite.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/pixiv_proxy.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/post_sets/base.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/post_sets/favorite.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/post_sets/post.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/related_tag_calculator.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/logical/remote_server.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/advertisement.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/advertisement_hit.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/artist.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/artist_url.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/artist_version.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/ban.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/comment.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    /Users/ayi/Projects/personal/danbooru/app/models/comment_vote.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/dmail.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/forum_post.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/forum_topic.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/ip_ban.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 19
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/janitor_trial.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/backup_to_s3.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/calculate_post_count.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/calculate_related_tags.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/calculate_uploaded_tags.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/create_tag_alias.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/create_tag_implication.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/fix_pixiv_uploads.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/mass_tag_edit.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/process_tag_subscriptions.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/jobs/process_uploads.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/note.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 2
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 7
+    - 
+    - 
+    - 1
+    - 10
+    - 
+    - 
+    - 1
+    - 10
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 10
+    - 
+    - 
+    - 1
+    - 10
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 8
+    - 8
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 8
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/note_version.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/pool.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/pool_version.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/post.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 7
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 6
+    - 6
+    - 
+    - 
+    - 6
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 24
+    - 
+    - 
+    - 1
+    - 12
+    - 
+    - 
+    - 1
+    - 18
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 6
+    - 6
+    - 6
+    - 6
+    - 6
+    - 0
+    - 
+    - 6
+    - 12
+    - 
+    - 6
+    - 
+    - 
+    - 1
+    - 6
+    - 6
+    - 6
+    - 6
+    - 6
+    - 
+    - 6
+    - 6
+    - 12
+    - 
+    - 12
+    - 
+    - 12
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 6
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 12
+    - 12
+    - 
+    - 
+    - 1
+    - 12
+    - 12
+    - 
+    - 
+    - 1
+    - 6
+    - 6
+    - 6
+    - 6
+    - 6
+    - 
+    - 
+    - 1
+    - 30
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 216
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 216
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 18
+    - 
+    - 18
+    - 0
+    - 
+    - 
+    - 18
+    - 0
+    - 0
+    - 
+    - 
+    - 18
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 18
+    - 0
+    - 
+    - 
+    - 18
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 18
+    - 18
+    - 
+    - 
+    - 18
+    - 0
+    - 
+    - 18
+    - 
+    - 
+    - 18
+    - 18
+    - 18
+    - 18
+    - 18
+    - 18
+    - 18
+    - 18
+    - 18
+    - 18
+    - 18
+    - 18
+    - 
+    - 18
+    - 0
+    - 
+    - 
+    - 18
+    - 0
+    - 
+    - 
+    - 18
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 18
+    - 0
+    - 
+    - 
+    - 18
+    - 0
+    - 
+    - 
+    - 18
+    - 
+    - 18
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 18
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 18
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 18
+    - 
+    - 
+    - 18
+    - 0
+    - 
+    - 
+    - 18
+    - 0
+    - 
+    - 
+    - 18
+    - 0
+    - 
+    - 
+    - 18
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 6
+    - 6
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 12
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 18
+    - 18
+    - 18
+    - 18
+    - 18
+    - 0
+    - 
+    - 
+    - 18
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 18
+    - 18
+    - 
+    - 18
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 6
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 6
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    /Users/ayi/Projects/personal/danbooru/app/models/post_history.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 6
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 6
+    - 
+    - 
+    - 1
+    - 6
+    - 
+    - 
+    - 1
+    - 18
+    - 0
+    - 
+    - 18
+    - 
+    - 
+    - 
+    - 1
+    - 6
+    - 6
+    - 6
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/post_moderation_detail.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/post_vote.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/removed_post.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/report_mailer.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/tag.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 4
+    - 24
+    - 
+    - 
+    - 
+    - 1
+    - 22
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 36
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 6
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 12
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 12
+    - 
+    - 
+    - 1
+    - 12
+    - 12
+    - 
+    - 12
+    - 0
+    - 0
+    - 
+    - 
+    - 12
+    - 
+    - 12
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 12
+    - 12
+    - 12
+    - 12
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 42
+    - 
+    - 
+    - 1
+    - 18
+    - 
+    - 
+    - 1
+    - 24
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 360
+    - 18
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 18
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 18
+    - 
+    - 18
+    - 
+    - 
+    - 1
+    - 18
+    - 18
+    - 18
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/tag_alias.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 60
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 60
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/tag_implication.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 0
+    - 6
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/tag_subscription.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/unapproval.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/upload.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/lib/danbooru_image_resizer/danbooru_image_resizer.rb: 
+    - 1
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/user_feedback.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/user_mailer.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/wiki_page.rb: 
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/models/wiki_page_version.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/note_presenter.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/paginators/base.rb: 
+    - 1
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/presenter.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/paginators/post.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/paginators/post_version.rb: 
+    - 1
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/post_history_revision_presenter.rb: 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/post_presenter.rb: 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/post_set_presenter.rb: 
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/tag_set_presenter.rb: 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/upload_presenter.rb: 
+    - 1
+    - 1
+    - 0
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    /Users/ayi/Projects/personal/danbooru/app/presenters/wiki_page_presenter.rb: 
+    - 1
+    - 
+    - 
+    - 1
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 0
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 0
+    - 0
+    - 
+    - 
+    - 0
+    - 0
+    - 0
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+  :created_at: 2011-01-14 17:58:08.537170 -05:00

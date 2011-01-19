@@ -26,7 +26,11 @@ Danbooru::Application.routes.draw do
   end
   resources :jobs
   resources :ip_bans
-  resources :notes
+  resources :notes do
+    member do
+      put :revert
+    end
+  end
   resources :note_versions
   resources :pools do
     member do
