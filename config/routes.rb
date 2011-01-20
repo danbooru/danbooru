@@ -33,6 +33,7 @@ Danbooru::Application.routes.draw do
   end
   resources :note_versions
   resources :pools do
+    resources :posts, :controller => "pools_posts", :only => [:create, :destroy]
     member do
       put :revert
     end

@@ -8,7 +8,7 @@ class Pool < ActiveRecord::Base
   has_many :versions, :class_name => "PoolVersion", :dependent => :destroy
   before_save :normalize_name
   after_save :create_version
-  attr_accessible :name, :description, :post_ids, :is_public, :is_active
+  attr_accessible :name, :description, :post_ids, :is_active
   
   def self.name_to_id(name)
     select_value_sql("SELECT id FROM pools WHERE name = ?", name.downcase)
