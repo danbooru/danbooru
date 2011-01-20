@@ -33,7 +33,7 @@ class NotesController < ApplicationController
   def revert
     @note = Note.find(params[:id])
     @version = NoteVersion.find(params[:version_id])
-    @note.revert_to(@version)
+    @note.revert_to!(@version)
     respond_with(@note)
   end
 end

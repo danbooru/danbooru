@@ -15,6 +15,7 @@ class CreateNoteVersions < ActiveRecord::Migration
     
     add_index :note_versions, :note_id
     add_index :note_versions, :updater_id
+    add_index :note_versions, :updater_ip_addr
   end
 
   def self.down

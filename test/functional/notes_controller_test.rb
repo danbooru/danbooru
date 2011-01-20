@@ -6,6 +6,7 @@ class NotesControllerTest < ActionController::TestCase
       @user = Factory.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
+      @post = Factory.create(:post)
     end
     
     teardown do
@@ -42,7 +43,7 @@ class NotesControllerTest < ActionController::TestCase
     context "create action" do
       should "create a note" do
         assert_difference("Note.count", 1) do
-          post :create, {:note => {:x => 100, :y => 100, :body => "abc"}}, {:user_id => @user.id}
+          post :create, {:note => {:x => 100, :y => 100, :width => 100, :height => 100, :body => "abc", :post_id => @post.id}}, {:user_id => @user.id}
         end
       end
     end
@@ -79,7 +80,7 @@ class NotesControllerTest < ActionController::TestCase
       end
       
       should "revert to a previous version" do
-        post :revert, {:id => @note.id, :version_id => @note.versions(true).first}
+        post :revert, {:id => @note.id, :version_id => @note.versions(true).first.id}
         @note.reload
         assert_equal("000", @note.body)
       end

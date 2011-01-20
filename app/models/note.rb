@@ -6,12 +6,12 @@ class Note < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   before_validation :initialize_updater
   before_validation :blank_body
+  validates_presence_of :post_id, :creator_id, :updater_id
   has_many :versions, :class_name => "NoteVersion", :order => "note_versions.id ASC"
   after_save :update_post
   after_save :create_version
   validate :post_must_not_be_note_locked
-  validates_presence_of :updater_id, :updater_ip_addr
-  attr_accessible :x, :y, :width, :height, :body, :updater_id, :updater_ip_addr, :is_active
+  attr_accessible :x, :y, :width, :height, :body, :updater_id, :updater_ip_addr, :is_active, :post_id
   scope :active, where("is_active = TRUE")
   scope :body_matches, lambda {|query| where("text_index @@ plainto_tsquery(?)", query)}
   search_method :body_matches
@@ -26,6 +26,7 @@ class Note < ActiveRecord::Base
   
   def initialize_updater
     self.updater_id = CurrentUser.id
+    self.updater_ip_addr = CurrentUser.ip_addr
   end
   
   def post_must_not_be_note_locked

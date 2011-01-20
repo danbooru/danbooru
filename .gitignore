@@ -10,3 +10,4 @@ public/data
 vendor/cache/*.gem
 .sass-cache
 .DS_Store
+coverage
