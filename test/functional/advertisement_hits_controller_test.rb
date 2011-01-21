@@ -9,7 +9,7 @@ class AdvertisementHitsControllerTest < ActionController::TestCase
 
     should "create a new hit" do
       assert_difference("AdvertisementHit.count", 1) do
-        post :create, {:id => @ad.id}
+        post :create, {:advertisement_id => @ad.id}
       end
       assert_redirected_to(@ad.referral_url)
     end

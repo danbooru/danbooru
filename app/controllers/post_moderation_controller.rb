@@ -1,5 +1,5 @@
-class PostModerationDetailsController < ApplicationController
-  def index
+class PostModerationController < ApplicationController
+  def show
   end
 
   def create

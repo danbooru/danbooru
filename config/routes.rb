@@ -3,21 +3,23 @@ Danbooru::Application.routes.draw do
     match 'users/edit' => 'users#edit', :via => :get
     match 'users' => 'users#update', :via => :put
   end
-  resources :advertisements
-  resources :advertisement_hits
+  resources :advertisements do
+    resources :hits, :controller => "advertisement_hits", :only => [:create]
+  end
   resources :artists do
     member do
       put :revert
     end
   end
-  resources :artist_versions
+  resources :artist_versions, :only => [:index]
   resources :bans
-  resources :comments
-  resources :comment_votes
+  resources :comments do
+    resources :votes, :controller => "comment_votes", :only => [:create, :destroy]
+  end
   resources :dmails
   resources :favorites
-  resources :forum_posts
   resources :forum_topics
+  resources :forum_posts
   resources :janitor_trials do
     member do
       put :promote
@@ -31,22 +33,22 @@ Danbooru::Application.routes.draw do
       put :revert
     end
   end
-  resources :note_versions
+  resources :note_versions, :only => [:index]
   resources :pools do
     resources :posts, :controller => "pools_posts", :only => [:create, :destroy]
     member do
       put :revert
     end
   end
-  resources :pool_versions
+  resources :pool_versions, :only => [:index]
   resources :posts do
+    resources :votes, :controller => "post_votes", :only => [:create, :destroy]
     member do
       put :revert
     end
   end
-  resources :post_moderation_details
-  resources :post_histories
-  resources :post_votes
+  resources :post_histories, :only => [:index]
+  resource :post_moderation, :controller => "post_moderation"
   resource :session
   resources :tags
   resources :tag_aliases do
@@ -65,7 +67,7 @@ Danbooru::Application.routes.draw do
       put :revert
     end
   end
-  resources :wiki_page_versions
+  resources :wiki_page_versions, :only => [:index]
 
   match '/dtext/preview' => 'dtext#preview', :via => :post
   match "/site_map" => "static#site_map", :as => "site_map"

@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), %w(.. test_helper))
 
-class PostModerationDetailControllerTest < ActionController::TestCase
-  context "A post moderation detail controller" do
+class PostModerationControllerTest < ActionController::TestCase
+  context "A post moderation controller" do
     should "" do
       ModQueuePost.destroy_all
 
