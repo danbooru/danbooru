@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), %w(.. test_helper))
+require "test_helper"
 
 class PostModerationControllerTest < ActionController::TestCase
   context "A post moderation controller" do
