@@ -1,84 +1,123 @@
 require_relative '../test_helper'
 
 class NoteTest < ActiveSupport::TestCase
-  setup do
-    user = Factory.create(:user)
-    CurrentUser.user = user
-    CurrentUser.ip_addr = "127.0.0.1"
-    MEMCACHE.flush_all
-  end
-  
-  teardown do
-    CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
-  end
-  
-  context "A note" do
+  context "In all cases" do
     setup do
+      @user = Factory.create(:user)
+      CurrentUser.user = @user
+      CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
     end
     
-    should "create versions" do
-      note = nil
-      assert_difference("NoteVersion.count") do
-        note = Factory.create(:note)
+    teardown do
+      CurrentUser.user = nil
+      CurrentUser.ip_addr = nil
+    end
+    
+    context "creating a note" do
+      setup do
+        @post = Factory.create(:post)
       end
-      version = NoteVersion.last
-      assert_equal(note.body, version.body)      
-      assert_difference("NoteVersion.count") do
-        note.update_attributes(:updater_id => note.creator_id, :updater_ip_addr => "127.0.0.1", :body => "fafafa")
+      
+      should "create a version" do
+        assert_difference("NoteVersion.count", 1) do
+          @note = Factory.create(:note, :post => @post)
+        end
+
+        assert_equal(1, @note.versions.count)
+        assert_equal(@note.body, @note.versions.first.body)
       end
-      version = NoteVersion.last
-      assert_equal("fafafa", version.body)
-    end
-    
-    should "allow undoing any change from a user" do
-      vandal = Factory.create(:user)
-      reverter = Factory.create(:user)
-      note = Factory.create(:note, :x => 100, :y => 100)
-      note.update_attributes(:x => 2000, :y => 2000, :updater_id => vandal.id, :updater_ip_addr => "127.0.0.1")
-      note.reload
-      assert_equal(2000, note.x)
-      assert_equal(2000, note.y)
-      Note.undo_changes_by_user(vandal.id, reverter.id, "127.0.0.1")
-      note.reload
-      assert_equal(100, note.x)
-      assert_equal(100, note.y)
-    end
-    
-    should "not validate if the post is note locked" do
-      post = Factory.create(:post, :is_note_locked => true)
-      note = Factory.build(:note, :post => post)
-      assert_difference("Note.count", 0) do
-        note.save
+      
+      should "update the post's last_noted_at field" do
+        assert_nil(@post.last_noted_at)
+        @note = Factory.create(:note, :post => @post)
+        @post.reload
+        assert_not_nil(@post.last_noted_at)
       end
-      assert(note.errors.any?)
+
+      context "for a note-locked post" do
+        setup do
+          @post.update_attribute(:is_note_locked, true)
+        end
+
+        should "fail" do
+          assert_difference("Note.count", 0) do
+            @note = Factory.build(:note, :post => @post)
+            @note.save
+          end
+          assert_equal(["Post is note locked"], @note.errors.full_messages)
+        end        
+      end
     end
     
-    should "update the post when saved" do
-      post = Factory.create(:post)
-      assert_nil(post.last_noted_at)
-      note = Factory.create(:note, :post => post)
-      post.reload
-      assert_not_nil(post.last_noted_at)
+    context "updating a note" do
+      setup do
+        @post = Factory.create(:post)
+        @note = Factory.create(:note, :post => @post)
+      end
+      
+      should "update the post's last_noted_at field" do
+        assert_nil(@post.last_noted_at)
+        @note.update_attributes(:x => 1000)
+        @post.reload
+        assert_equal(@post.last_noted_at, @note.updated_at)
+      end
+      
+      should "create a version" do
+        assert_difference("NoteVersion.count", 1) do
+          @note.update_attributes(:body => "fafafa")
+        end
+        assert_equal(2, @note.versions.count)
+        assert_equal("fafafa", @note.versions.last.body)
+      end
+      
+      context "for a note-locked post" do
+        setup do
+          @post.update_attribute(:is_note_locked, true)
+        end
+        
+        should "fail" do
+          @note.update_attributes(:x => 1000)
+          assert_equal(["Post is note locked"], @note.errors.full_messages)
+        end
+      end
     end
     
-    should "know when the post is note locked" do
-      post = Factory.create(:post, :is_note_locked => true)
-      note = Factory.build(:note, :post => post)
-      assert(note.is_locked?)
+    context "when notes have been vandalized by one user" do
+      setup do
+        @vandal = Factory.create(:user)
+        @note = Factory.create(:note, :x => 100, :y => 100)
+        CurrentUser.scoped(@vandal, "127.0.0.1") do
+          @note.update_attributes(:x => 2000, :y => 2000)
+        end
+      end
+      
+      context "the act of undoing all changes by that user" do
+        should "revert any affected notes" do
+          Note.undo_changes_by_user(@vandal.id)
+          @note.reload
+          assert_equal(100, @note.x)
+          assert_equal(100, @note.y)
+        end
+      end
     end
-    
-    should "return hits when searched" do
-      notes = []
-      notes << Factory.create(:note, :body => "aaa bbb ccc")
-      notes << Factory.create(:note, :body => "bbb ccc ddd", :is_active => false)
-      notes << Factory.create(:note, :body => "eee")
-      results = Note.build_relation(:query => "bbb").all
-      assert_equal(2, results.size)
-      results = Note.build_relation(:query => "bbb", :status => "Active").all
-      assert_equal(1, results.size)
-      assert_equal(notes[0].id, results[0].id)
+
+    context "searching for a note" do
+      setup do
+        @note = Factory.create(:note, :body => "aaa")
+      end
+      
+      context "where the body contains the string 'aaa'" do
+        should "return a hit" do
+          assert_equal(1, Note.body_matches("aaa").count)
+        end
+      end
+      
+      context "where the body contains the string 'bbb'" do
+        should "return no hits" do
+          assert_equal(0, Note.body_matches("bbb").count)
+        end
+      end
     end
   end
 end

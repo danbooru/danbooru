@@ -23,13 +23,10 @@ class PoolTest < ActiveSupport::TestCase
       user = Factory.create(:user)
       assert_equal(1, pool.versions(true).size)
       pool.post_ids = "1"
-      pool.updater_id = user.id
-      pool.updater_ip_addr = "128.0.0.1"
+      CurrentUser.ip_addr = "1.2.3.4"
       pool.save
       assert_equal(2, pool.versions(true).size)
       pool.post_ids = "1 2"
-      pool.updater_id = user.id
-      pool.updater_ip_addr = "128.0.0.1"
       pool.save
       assert_equal(2, pool.versions(true).size)
       pool.revert_to!(PoolVersion.first)

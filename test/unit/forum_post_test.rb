@@ -16,9 +16,10 @@ class ForumPostTest < ActiveSupport::TestCase
     
     should "update its parent when saved" do
       sleep 1
+      original_topic_updated_at = @topic.updated_at
       post = Factory.create(:forum_post, :topic_id => @topic.id)
       @topic.reload
-      assert(@topic.updated_at > 1.second.ago)
+      assert_not_equal(original_topic_updated_at, @topic.updated_at)
     end
     
     should "be searchable by body content" do

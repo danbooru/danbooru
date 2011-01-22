@@ -13,7 +13,7 @@ class Note < ActiveRecord::Base
   validate :post_must_not_be_note_locked
   attr_accessible :x, :y, :width, :height, :body, :updater_id, :updater_ip_addr, :is_active, :post_id
   scope :active, where("is_active = TRUE")
-  scope :body_matches, lambda {|query| where("text_index @@ plainto_tsquery(?)", query)}
+  scope :body_matches, lambda {|query| where("text_index @@ plainto_tsquery(?)", query.scan(/\S+/).join(" & "))}
   search_method :body_matches
   
   def presenter
@@ -96,22 +96,5 @@ class Note < ActiveRecord::Base
         end
       end
     end
-  end
-  
-  def self.build_relation(params)
-    relation = where("TRUE")
-    
-    if !params[:query].blank?
-      query = params[:query].scan(/\S+/).join(" & ")        
-      relation = relation.where(["text_index @@ plainto_tsquery(?)", query])
-    end
-    
-    if params[:status] == "Active"
-      relation = relation.where("is_active = TRUE")
-    elsif params[:status] == "Deleted"
-      relation = relation.where("is_active = FALSE")
-    end
-
-    relation
   end
 end
