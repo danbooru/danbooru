@@ -840,8 +840,8 @@ ALTER SEQUENCE ip_bans_id_seq OWNED BY ip_bans.id;
 
 CREATE TABLE janitor_trials (
     id integer NOT NULL,
+    creator_id integer NOT NULL,
     user_id integer NOT NULL,
-    promoted_at timestamp without time zone,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -987,7 +987,6 @@ CREATE TABLE pools (
     name character varying(255),
     creator_id integer NOT NULL,
     description text,
-    is_public boolean DEFAULT true NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
     post_ids text DEFAULT ''::text NOT NULL,
     created_at timestamp without time zone,
@@ -1012,6 +1011,38 @@ CREATE SEQUENCE pools_id_seq
 --
 
 ALTER SEQUENCE pools_id_seq OWNED BY pools.id;
+
+
+--
+-- Name: post_disapprovals; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE post_disapprovals (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    post_id integer NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: post_disapprovals_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE post_disapprovals_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: post_disapprovals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE post_disapprovals_id_seq OWNED BY post_disapprovals.id;
 
 
 --
@@ -1044,38 +1075,6 @@ CREATE SEQUENCE post_histories_id_seq
 --
 
 ALTER SEQUENCE post_histories_id_seq OWNED BY post_histories.id;
-
-
---
--- Name: post_moderation_details; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE post_moderation_details (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    post_id integer NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: post_moderation_details_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE post_moderation_details_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: post_moderation_details_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE post_moderation_details_id_seq OWNED BY post_moderation_details.id;
 
 
 --
@@ -1132,7 +1131,6 @@ CREATE TABLE posts (
     approver_string character varying(255) DEFAULT ''::character varying NOT NULL,
     fav_string text DEFAULT ''::text NOT NULL,
     pool_string text DEFAULT ''::text NOT NULL,
-    view_count integer DEFAULT 0 NOT NULL,
     last_noted_at timestamp without time zone,
     last_commented_at timestamp without time zone,
     tag_string text DEFAULT ''::text NOT NULL,
@@ -1809,14 +1807,14 @@ ALTER TABLE pools ALTER COLUMN id SET DEFAULT nextval('pools_id_seq'::regclass);
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE post_histories ALTER COLUMN id SET DEFAULT nextval('post_histories_id_seq'::regclass);
+ALTER TABLE post_disapprovals ALTER COLUMN id SET DEFAULT nextval('post_disapprovals_id_seq'::regclass);
 
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE post_moderation_details ALTER COLUMN id SET DEFAULT nextval('post_moderation_details_id_seq'::regclass);
+ALTER TABLE post_histories ALTER COLUMN id SET DEFAULT nextval('post_histories_id_seq'::regclass);
 
 
 --
@@ -2135,19 +2133,19 @@ ALTER TABLE ONLY pools
 
 
 --
+-- Name: post_disapprovals_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY post_disapprovals
+    ADD CONSTRAINT post_disapprovals_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: post_histories_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY post_histories
     ADD CONSTRAINT post_histories_pkey PRIMARY KEY (id);
-
-
---
--- Name: post_moderation_details_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY post_moderation_details
-    ADD CONSTRAINT post_moderation_details_pkey PRIMARY KEY (id);
 
 
 --
@@ -2661,6 +2659,13 @@ CREATE INDEX index_note_versions_on_updater_id ON note_versions USING btree (upd
 
 
 --
+-- Name: index_note_versions_on_updater_ip_addr; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_note_versions_on_updater_ip_addr ON note_versions USING btree (updater_ip_addr);
+
+
+--
 -- Name: index_notes_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2703,24 +2708,24 @@ CREATE INDEX index_pools_on_name ON pools USING btree (name);
 
 
 --
+-- Name: index_post_disapprovals_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_post_disapprovals_on_post_id ON post_disapprovals USING btree (post_id);
+
+
+--
+-- Name: index_post_disapprovals_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_post_disapprovals_on_user_id ON post_disapprovals USING btree (user_id);
+
+
+--
 -- Name: index_post_histories_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_post_histories_on_post_id ON post_histories USING btree (post_id);
-
-
---
--- Name: index_post_moderation_details_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_post_moderation_details_on_post_id ON post_moderation_details USING btree (post_id);
-
-
---
--- Name: index_post_moderation_details_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_post_moderation_details_on_user_id ON post_moderation_details USING btree (user_id);
 
 
 --
@@ -2798,13 +2803,6 @@ CREATE INDEX index_posts_on_source ON posts USING btree (source);
 --
 
 CREATE INDEX index_posts_on_tags_index ON posts USING gin (tag_index);
-
-
---
--- Name: index_posts_on_view_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_posts_on_view_count ON posts USING btree (view_count);
 
 
 --

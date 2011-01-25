@@ -28,7 +28,6 @@ class CreatePosts < ActiveRecord::Migration
       t.column :pool_string, :text, :null => false, :default => ""
 
       # Cached
-      t.column :view_count, :integer, :null => false, :default => 0
       t.column :last_noted_at, :datetime
       t.column :last_commented_at, :datetime
 
@@ -60,7 +59,6 @@ class CreatePosts < ActiveRecord::Migration
     add_index :posts, :image_width
     add_index :posts, :image_height
     add_index :posts, :source
-    add_index :posts, :view_count
     add_index :posts, :parent_id
     
     execute "CREATE INDEX index_posts_on_mpixels ON posts (((image_width * image_height)::numeric / 1000000.0))"

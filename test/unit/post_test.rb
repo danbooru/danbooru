@@ -175,12 +175,11 @@ class PostTest < ActiveSupport::TestCase
       end
     end
     
-    context "An unapproved post" do
+    context "An unapproved post" do      
       should "preserve the approver's identity when approved" do
-        user = CurrentUser.user
         post = Factory.create(:post, :is_pending => true)
         post.approve!
-        assert_equal("approver:#{user.name}", post.approver_string)
+        assert_equal("approver:#{CurrentUser.name}", post.approver_string)
       end
       
       should "preserve the unapproval association even when removed" do

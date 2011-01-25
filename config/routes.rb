@@ -47,8 +47,8 @@ Danbooru::Application.routes.draw do
       put :revert
     end
   end
+
   resources :post_histories, :only => [:index]
-  resource :post_moderation, :controller => "post_moderation"
   resource :session
   resources :tags
   resources :tag_aliases do
@@ -69,6 +69,9 @@ Danbooru::Application.routes.draw do
   end
   resources :wiki_page_versions, :only => [:index]
 
+  match '/post_moderation/moderate' => 'post_moderation#moderate'
+  match '/post_moderation/disapprove' => 'post_moderation#disapprove', :via => :put
+  match '/post_moderation/approve' => 'post_moderation#approve', :via => :put
   match '/dtext/preview' => 'dtext#preview', :via => :post
   match "/site_map" => "static#site_map", :as => "site_map"
   match "/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
