@@ -5,7 +5,4 @@ class PostVotesController < ApplicationController
   rescue PostVote::Error => x
     @error = x
   end
-  
-  def destroy
-  end
 end

@@ -48,7 +48,7 @@ Danbooru::Application.routes.draw do
     end
   end
 
-  resources :post_histories, :only => [:index]
+  resources :post_versions, :only => [:index]
   resource :session
   resources :tags
   resources :tag_aliases do

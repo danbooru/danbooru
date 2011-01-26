@@ -1,0 +1,25 @@
+<div class="post_versions">
+  <div class="index">
+    <h1>Post Versions</h1>
+
+    <table class="striped">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Updater</th>
+          <th>Changes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @post_versions.each do |post_version| %>
+          <tr>
+            <td><%= time_ago_in_words post_version.updated_at %></td>
+            <td><%= post_version.presenter.updater_name %></td>
+            <td><%= post_version.presenter.changes %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+

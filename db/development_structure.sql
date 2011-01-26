@@ -1046,23 +1046,29 @@ ALTER SEQUENCE post_disapprovals_id_seq OWNED BY post_disapprovals.id;
 
 
 --
--- Name: post_histories; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: post_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE post_histories (
+CREATE TABLE post_versions (
     id integer NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     post_id integer NOT NULL,
-    revisions text NOT NULL
+    add_tags text DEFAULT ''::text NOT NULL,
+    del_tags text DEFAULT ''::text NOT NULL,
+    rating character(1),
+    parent_id integer,
+    source text,
+    updater_id integer NOT NULL,
+    updater_ip_addr inet NOT NULL
 );
 
 
 --
--- Name: post_histories_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: post_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE post_histories_id_seq
+CREATE SEQUENCE post_versions_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MAXVALUE
@@ -1071,10 +1077,10 @@ CREATE SEQUENCE post_histories_id_seq
 
 
 --
--- Name: post_histories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: post_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE post_histories_id_seq OWNED BY post_histories.id;
+ALTER SEQUENCE post_versions_id_seq OWNED BY post_versions.id;
 
 
 --
@@ -1814,7 +1820,7 @@ ALTER TABLE post_disapprovals ALTER COLUMN id SET DEFAULT nextval('post_disappro
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE post_histories ALTER COLUMN id SET DEFAULT nextval('post_histories_id_seq'::regclass);
+ALTER TABLE post_versions ALTER COLUMN id SET DEFAULT nextval('post_versions_id_seq'::regclass);
 
 
 --
@@ -2141,11 +2147,11 @@ ALTER TABLE ONLY post_disapprovals
 
 
 --
--- Name: post_histories_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: post_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
-ALTER TABLE ONLY post_histories
-    ADD CONSTRAINT post_histories_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY post_versions
+    ADD CONSTRAINT post_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -2722,10 +2728,24 @@ CREATE INDEX index_post_disapprovals_on_user_id ON post_disapprovals USING btree
 
 
 --
--- Name: index_post_histories_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_post_versions_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_post_histories_on_post_id ON post_histories USING btree (post_id);
+CREATE INDEX index_post_versions_on_post_id ON post_versions USING btree (post_id);
+
+
+--
+-- Name: index_post_versions_on_updater_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_post_versions_on_updater_id ON post_versions USING btree (updater_id);
+
+
+--
+-- Name: index_post_versions_on_updater_ip_addr; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_post_versions_on_updater_ip_addr ON post_versions USING btree (updater_ip_addr);
 
 
 --

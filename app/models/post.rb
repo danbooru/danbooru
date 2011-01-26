@@ -3,7 +3,7 @@ class Post < ActiveRecord::Base
   
   attr_accessor :old_tag_string, :old_parent_id
   after_destroy :delete_files
-  after_save :update_history
+  after_save :create_version
   after_save :update_parent_on_save
   before_save :merge_old_tags
   before_save :normalize_tags
@@ -16,8 +16,7 @@ class Post < ActiveRecord::Base
   belongs_to :parent, :class_name => "Post"
   has_one :unapproval, :dependent => :destroy
   has_one :upload, :dependent => :destroy
-  has_one :moderation_detail, :class_name => "PostModerationDetail", :dependent => :destroy
-  has_one :history, :class_name => "PostHistory"
+  has_many :versions, :class_name => "PostVersion", :dependent => :destroy
   has_many :votes, :class_name => "PostVote", :dependent => :destroy
   has_many :notes, :dependent => :destroy
   has_many :comments
@@ -237,24 +236,6 @@ class Post < ActiveRecord::Base
       when "s"
         "Safe"
       end
-    end
-  end
-  
-  module HistoryMethods
-    def revisions
-      if history.nil?
-        update_history
-      end
-      
-      history.revisions
-    end
-    
-    def update_history
-      if history.nil?
-        create_history
-      end
-
-      history << self
     end
   end
   
@@ -788,11 +769,31 @@ class Post < ActiveRecord::Base
     end
   end
   
+  module VersionMethods
+    def create_version
+      if created_at == updated_at
+        versions.create(
+          :rating => rating,
+          :source => source,
+          :add_tags => tag_string,
+          :parent_id => parent_id
+        )
+      else
+        versions.create(
+          :rating => rating_changed? ? rating : nil,
+          :source => source_changed? ? source : nil,
+          :add_tags => (tag_array - tag_array_was).join(" "),
+          :del_tags => (tag_array_was - tag_array).join(" "),
+          :parent_id => parent_id_changed? ? parent_id : nil
+        )
+      end
+    end
+  end
+  
   include FileMethods
   include ImageMethods
   include ApprovalMethods
   include PresenterMethods
-  include HistoryMethods
   include TagMethods
   include FavoriteMethods
   include UploaderMethods
@@ -803,6 +804,7 @@ class Post < ActiveRecord::Base
   include CacheMethods
   include ParentMethods
   include RemovalMethods
+  include VersionMethods
   
   def reload(options = nil)
     super
