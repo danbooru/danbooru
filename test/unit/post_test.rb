@@ -596,4 +596,39 @@ class PostTest < ActiveSupport::TestCase
       end
     end
   end
+
+  context "Reverting: " do
+    context "a post that has been updated" do
+      setup do
+        @post = Factory.create(:post, :rating => "q", :tag_string => "aaa")
+        @post.update_attributes(:tag_string => "aaa bbb ccc ddd")
+        @post.update_attributes(:tag_string => "bbb xxx yyy", :source => "xyz")
+        @post.update_attributes(:tag_string => "bbb mmm yyy", :source => "abc")
+      end
+    
+      context "and then reverted to an early version" do
+        setup do
+          @post.revert_to(@post.versions[1])
+        end
+        
+        should "correctly revert all fields" do
+          assert_equal("aaa bbb ccc ddd", @post.tag_string)
+          assert_equal(nil, @post.source)
+          assert_equal("q", @post.rating)
+        end
+      end
+      
+      context "and then reverted to a later version" do
+        setup do
+          @post.revert_to(@post.versions[-2])
+        end
+        
+        should "correctly revert all fields" do
+          assert_equal("bbb xxx yyy", @post.tag_string)
+          assert_equal("xyz", @post.source)
+          assert_equal("q", @post.rating)
+        end
+      end
+    end
+  end
 end

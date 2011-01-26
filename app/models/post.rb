@@ -788,6 +788,33 @@ class Post < ActiveRecord::Base
         )
       end
     end
+    
+    def revert_to(target)
+      base_tags = []
+      base_rating = "q"
+      base_source = nil
+      base_parent_id = nil
+      
+      versions.each do |version|
+        if version.id <= target.id
+          base_tags += version.add_tag_array
+          base_tags -= version.del_tag_array
+          base_rating = version.rating if version.rating
+          base_source = version.source if version.source
+          base_parent_id = version.parent_id if version.parent_id
+        end
+      end
+      
+      self.tag_string = base_tags.sort.join(" ")
+      self.rating = base_rating
+      self.source = base_source
+      self.parent_id = base_parent_id
+    end
+    
+    def revert_to!(target)
+      revert_to(target)
+      save!
+    end
   end
   
   include FileMethods
