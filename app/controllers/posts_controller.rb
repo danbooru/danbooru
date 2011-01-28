@@ -23,7 +23,7 @@ class PostsController < ApplicationController
     @post = Post.find(params[:id])
     @version = PostVersion.find(params[:version_id])
     @post.revert_to!(@version)
-    respond_width(@post)
+    respond_with(@post)
   end
 
 private
