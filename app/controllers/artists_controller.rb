@@ -21,7 +21,7 @@ class ArtistsController < ApplicationController
     @artist = Artist.find(params[:id])
     
     if @artist
-      @posts = Danbooru.config.select_posts_visible_to_user(CurrentUser.user, Post.find_by_tags(@artist.name, :limit => 6))
+      @posts = Danbooru.config.select_posts_visible_to_user(CurrentUser.user, Post.tag_match(@artist.name).limit(6))
     end
 
     respond_with(@artist)

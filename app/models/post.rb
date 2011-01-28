@@ -30,6 +30,8 @@ class Post < ActiveRecord::Base
   scope :commented_before, lambda {|date| where("last_commented_at < ?", date).order("last_commented_at DESC")}
   scope :available_for_moderation, lambda {where(["id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :hidden_from_moderation, lambda {where(["id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
+  scope :before_id, lambda {|id| where(["posts.id < ?", options[:before_id]])}
+  scope :tag_match, lambda {|query| Post.tag_match_helper(query)}
   
   module FileMethods
     def delete_files
@@ -463,15 +465,15 @@ class Post < ActiveRecord::Base
       relation
     end
 
-    def find_by_tags(q, options = {})
+    def tag_match_helper(q)
       unless q.is_a?(Hash)
         q = Tag.parse_query(q)
       end
       
       if q[:status] == "deleted"
-        relation = RemovedPost.where("TRUE")
+        relation = RemovedPost.scoped
       else
-        relation = where("TRUE")
+        relation = Post.scoped
       end
 
       relation = add_range_relation(q[:post_id], "posts.id", relation)
@@ -486,10 +488,6 @@ class Post < ActiveRecord::Base
       relation = add_range_relation(q[:copyright_tag_count], "posts.tag_count_copyright", relation)
       relation = add_range_relation(q[:character_tag_count], "posts.tag_count_character", relation)
       relation = add_range_relation(q[:tag_count], "posts.tag_count", relation)      
-
-      if options[:before_id]
-        relation = relation.where(["posts.id < ?", options[:before_id]])
-      end
 
       if q[:md5].any?
         relation = relation.where(["posts.md5 IN (?)", q[:md5]])
@@ -564,18 +562,6 @@ class Post < ActiveRecord::Base
         relation = relation.order("posts.id DESC")
       end
 
-      if options[:limit]
-        relation = relation.limit(options[:limit])
-      end
-
-      if options[:offset]
-        relation = relation.offset(options[:offset])
-      end
-      
-      if options[:select]
-        relation = relation.select(options[:select])
-      end
-      
       relation
     end
   end
@@ -649,7 +635,7 @@ class Post < ActiveRecord::Base
       tags = tags.to_s
       count = Cache.get("pfc:#{Cache.sanitize(tags)}")
       if count.nil?
-        count = Post.find_by_tags("#{tags}").count
+        count = Post.tag_match("#{tags}").count
         if count > Danbooru.config.posts_per_page * 10
           Cache.put("pfc:#{Cache.sanitize(tags)}", count, (count * 4).minutes)
         end

@@ -109,7 +109,7 @@ class Tag < ActiveRecord::Base
   module UpdateMethods
     def mass_edit(start_tags, result_tags, updater_id, updater_ip_addr)
       updater = User.find(updater_id)
-      Post.find_by_tags(start_tags).each do |p|
+      Post.tag_match(start_tags).each do |p|
         start = TagAlias.to_aliased(scan_tags(start_tags))
         result = TagAlias.to_aliased(scan_tags(result_tags))
         tags = (p.tag_array - start + result).join(" ")

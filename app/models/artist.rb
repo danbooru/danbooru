@@ -159,7 +159,7 @@ class Artist < ActiveRecord::Base
       Artist.new.tap do |artist|
         if params[:name]
           artist.name = params[:name]
-          post = Post.find_by_tags("source:http* #{artist.name}").first
+          post = Post.tag_match("source:http* #{artist.name}").first
           unless post.nil? || post.source.blank?
             artist.url_string = post.source
           end

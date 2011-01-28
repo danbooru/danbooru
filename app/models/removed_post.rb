@@ -13,7 +13,7 @@ class RemovedPost < ActiveRecord::Base
   def fast_count(tags)
     count = Cache.get("rpfc:#{Cache.sanitize(tags)}")
     if count.nil?
-      count = RemovedPost.find_by_tags("#{tags}").count
+      count = RemovedPost.tag_match("#{tags}").count
       if count > Danbooru.config.posts_per_page * 10
         Cache.put("rpfc:#{Cache.sanitize(tags)}", count, (count * 4).minutes)
       end

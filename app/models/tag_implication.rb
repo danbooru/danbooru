@@ -110,7 +110,7 @@ class TagImplication < ActiveRecord::Base
   end
   
   def update_posts
-    Post.find_by_tags(antecedent_name).find_each do |post|
+    Post.tag_match(antecedent_name).find_each do |post|
       escaped_antecedent_name = Regexp.escape(antecedent_name)
       fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_antecedent_name}(?:\Z| )/, " #{antecedent_name} #{descendant_names} ").strip
       post.update_attributes(

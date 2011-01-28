@@ -30,7 +30,7 @@ class CommentsController < ApplicationController
   
 private
   def index_by_post
-    @posts = Post.find_by_tags(params[:tags]).commented_before(params[:before_date] || Time.now).limit(8)
+    @posts = Post.tag_match(params[:tags]).commented_before(params[:before_date] || Time.now).limit(8)
     respond_with(@posts) do |format|
       format.html {render :action => "index_by_post"}
     end

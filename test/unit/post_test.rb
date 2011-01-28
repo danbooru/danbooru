@@ -417,7 +417,7 @@ class PostTest < ActiveSupport::TestCase
       post1 = Factory.create(:post, :tag_string => "aaa")
       post2 = Factory.create(:post, :tag_string => "aaa bbb")
       post3 = Factory.create(:post, :tag_string => "bbb ccc")
-      relation = Post.find_by_tags("aaa")
+      relation = Post.tag_match("aaa")
       assert_equal(2, relation.count)
       assert_equal(post2.id, relation.all[0].id)
       assert_equal(post1.id, relation.all[1].id)
@@ -427,7 +427,7 @@ class PostTest < ActiveSupport::TestCase
       post1 = Factory.create(:post, :tag_string => "aaa")
       post2 = Factory.create(:post, :tag_string => "aaa bbb")
       post3 = Factory.create(:post, :tag_string => "bbb ccc")
-      relation = Post.find_by_tags("aaa bbb")
+      relation = Post.tag_match("aaa bbb")
       assert_equal(1, relation.count)
       assert_equal(post2.id, relation.first.id)
     end
@@ -436,7 +436,7 @@ class PostTest < ActiveSupport::TestCase
       post1 = Factory.create(:post, :tag_string => "aaa")
       post2 = Factory.create(:post, :tag_string => "aaa bbb")
       post3 = Factory.create(:post, :tag_string => "bbb ccc")
-      relation = Post.find_by_tags("aaa -bbb")
+      relation = Post.tag_match("aaa -bbb")
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
     end
@@ -445,7 +445,7 @@ class PostTest < ActiveSupport::TestCase
       post1 = Factory.create(:post, :tag_string => "aaa")
       post2 = Factory.create(:post, :tag_string => "aaab bbb")
       post3 = Factory.create(:post, :tag_string => "bbb ccc")
-      relation = Post.find_by_tags("a*")
+      relation = Post.tag_match("a*")
       assert_equal(2, relation.count)
       assert_equal(post2.id, relation.all[0].id)
       assert_equal(post1.id, relation.all[1].id)          
@@ -455,7 +455,7 @@ class PostTest < ActiveSupport::TestCase
       post1 = Factory.create(:post, :tag_string => "aaa")
       post2 = Factory.create(:post, :tag_string => "aaab bbb")
       post3 = Factory.create(:post, :tag_string => "bbb ccc")
-      relation = Post.find_by_tags("a* bbb")
+      relation = Post.tag_match("a* bbb")
       assert_equal(1, relation.count)
       assert_equal(post2.id, relation.first.id)
     end
@@ -464,13 +464,13 @@ class PostTest < ActiveSupport::TestCase
       post1 = Factory.create(:post)
       post2 = Factory.create(:post)
       post3 = Factory.create(:post)
-      relation = Post.find_by_tags("id:#{post2.id}")
+      relation = Post.tag_match("id:#{post2.id}")
       assert_equal(1, relation.count)
       assert_equal(post2.id, relation.first.id)
-      relation = Post.find_by_tags("id:>#{post2.id}")
+      relation = Post.tag_match("id:>#{post2.id}")
       assert_equal(1, relation.count)
       assert_equal(post3.id, relation.first.id)
-      relation = Post.find_by_tags("id:<#{post2.id}")
+      relation = Post.tag_match("id:<#{post2.id}")
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
     end
@@ -481,7 +481,7 @@ class PostTest < ActiveSupport::TestCase
       post3 = Factory.create(:post)
       user = Factory.create(:user)
       post1.add_favorite(user)
-      relation = Post.find_by_tags("fav:#{user.name}")
+      relation = Post.tag_match("fav:#{user.name}")
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
     end
@@ -492,7 +492,7 @@ class PostTest < ActiveSupport::TestCase
       post3 = Factory.create(:post)
       pool = Factory.create(:pool)
       post1.add_pool(pool)
-      relation = Post.find_by_tags("pool:#{pool.name}")
+      relation = Post.tag_match("pool:#{pool.name}")
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
     end
@@ -506,7 +506,7 @@ class PostTest < ActiveSupport::TestCase
         post3 = Factory.create(:post)
       end
       
-      relation = Post.find_by_tags("uploader:#{CurrentUser.user.name}")
+      relation = Post.tag_match("uploader:#{CurrentUser.user.name}")
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
     end
@@ -515,7 +515,7 @@ class PostTest < ActiveSupport::TestCase
       post1 = Factory.create(:post, :md5 => "abcd")
       post2 = Factory.create(:post)
       post3 = Factory.create(:post)
-      relation = Post.find_by_tags("md5:abcd")
+      relation = Post.tag_match("md5:abcd")
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
     end
@@ -524,7 +524,7 @@ class PostTest < ActiveSupport::TestCase
       post1 = Factory.create(:post, :source => "abcd")
       post2 = Factory.create(:post, :source => "abcdefg")
       post3 = Factory.create(:post, :source => "xyz")
-      relation = Post.find_by_tags("source:abcde")
+      relation = Post.tag_match("source:abcde")
       assert_equal(1, relation.count)
       assert_equal(post2.id, relation.first.id)
     end
@@ -535,7 +535,7 @@ class PostTest < ActiveSupport::TestCase
       post1 = Factory.create(:post, :rating => "s")
       post2 = Factory.create(:post, :rating => "q")
       post3 = Factory.create(:post, :rating => "e")
-      relation = Post.find_by_tags("rating:e")
+      relation = Post.tag_match("rating:e")
       assert_equal(1, relation.count)
       assert_equal(post3.id, relation.first.id)
     end
@@ -544,7 +544,7 @@ class PostTest < ActiveSupport::TestCase
       post1 = Factory.create(:post, :rating => "s")
       post2 = Factory.create(:post, :rating => "s")
       post3 = Factory.create(:post, :rating => "e")
-      relation = Post.find_by_tags("-rating:s")
+      relation = Post.tag_match("-rating:s")
       assert_equal(1, relation.count)
       assert_equal(post3.id, relation.first.id)
     end
@@ -553,11 +553,11 @@ class PostTest < ActiveSupport::TestCase
       post1 = Factory.create(:post, :rating => "s")
       post2 = Factory.create(:post, :rating => "s")
       post3 = Factory.create(:post, :rating => "e", :score => 5, :image_width => 1000)
-      relation = Post.find_by_tags("order:id")
+      relation = Post.tag_match("order:id")
       assert_equal(post1.id, relation.first.id)
-      relation = Post.find_by_tags("order:mpixels")
+      relation = Post.tag_match("order:mpixels")
       assert_equal(post3.id, relation.first.id)
-      relation = Post.find_by_tags("order:landscape")
+      relation = Post.tag_match("order:landscape")
       assert_equal(post3.id, relation.first.id)      
     end
   end

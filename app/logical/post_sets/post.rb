@@ -51,7 +51,7 @@ module PostSets
   
     def load_posts
       @count = Post.fast_count(tags)
-      @posts = Post.find_by_tags(tags, :before_id => before_id).all(:order => "posts.id desc", :limit => limit, :offset => offset)
+      @posts = Post.tag_match(tags).before_id(before_id).all(:order => "posts.id desc", :limit => limit, :offset => offset)
     end
   
     def load_suggestions
