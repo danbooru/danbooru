@@ -1,13 +1,18 @@
 class TagSubscription < ActiveRecord::Base
   belongs_to :owner, :class_name => "User"
-  before_create :initialize_post_ids
+  before_validation :initialize_owner, :on => :create
+  before_validation :initialize_post_ids, :on => :create
   before_save :normalize_name
   before_save :limit_tag_count
-  scope :visible, :conditions => "is_visible_on_profile = TRUE"
+  scope :visible, lambda {where("is_public = TRUE OR owner_id = ? OR ?", CurrentUser.id, CurrentUser.is_moderator?)}
   attr_accessible :name, :tag_query, :post_ids, :is_visible_on_profile
 
   def normalize_name
     self.name = name.gsub(/\W/, "_")
+  end
+  
+  def initialize_owner
+    self.owner_id = CurrentUser.id
   end
 
   def initialize_post_ids
@@ -39,6 +44,7 @@ class TagSubscription < ActiveRecord::Base
     end
 
     user = User.find_by_name(user_name)
+    
     if user
       relation = where(["owner_id = ?", user.id])
       
@@ -63,11 +69,11 @@ class TagSubscription < ActiveRecord::Base
   end
 
   def self.find_posts(user_id, name = nil, limit = Danbooru.config.tag_subscription_post_limit)
-    Post.where(["id in (?)", find_post_ids(user_id, name, limit)]).all(:order => "id DESC", :limit => limit)
+    Post.where(["id in (?)", find_post_ids(user_id, name, limit)]).order("id DESC").limit(limit)
   end
 
   def self.process_all
-    all.each do |tag_subscription|
+    find_each do |tag_subscription|
       if $job_task_daemon_active != false && tag_subscription.owner.is_privileged?
         begin
           tag_subscription.process

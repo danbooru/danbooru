@@ -22,6 +22,7 @@ class User < ActiveRecord::Base
   before_create :normalize_level
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
   has_one :ban
+  has_many :subscriptions, :class_name => "TagSubscription"
   belongs_to :inviter, :class_name => "User"
   scope :named, lambda {|name| where(["lower(name) = ?", name])}
   scope :admins, where("is_admin = TRUE")

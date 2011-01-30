@@ -38,10 +38,10 @@ class DmailsController < ApplicationController
     redirect_to dmails_path, :notice => "Message destroyed"
   end
   
-  private
-    def check_privilege(dmail)
-      if !dmail.visible_to?(CurrentUser.user)
-        raise User::PrivilegeError
-      end
+private
+  def check_privilege(dmail)
+    if !dmail.visible_to?(CurrentUser.user)
+      raise User::PrivilegeError
     end
+  end
 end

@@ -5,7 +5,7 @@ class CreateTagSubscriptions < ActiveRecord::Migration
       t.column :name, :string, :null => false
       t.column :tag_query, :string, :null => false
       t.column :post_ids, :text, :null => false
-      t.column :is_visible_on_profile, :boolean, :null => false, :default => true
+      t.column :is_public, :boolean, :null => false, :default => true
       t.timestamps
     end
     
