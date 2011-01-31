@@ -1321,7 +1321,7 @@ CREATE TABLE tag_subscriptions (
     name character varying(255) NOT NULL,
     tag_query character varying(255) NOT NULL,
     post_ids text NOT NULL,
-    is_visible_on_profile boolean DEFAULT true NOT NULL,
+    is_public boolean DEFAULT true NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );

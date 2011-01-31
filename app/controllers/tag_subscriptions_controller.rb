@@ -15,7 +15,7 @@ class TagSubscriptionsController < ApplicationController
   end
   
   def index
-    @search = TagSubscription.search(params[:search]).visible
+    @search = TagSubscription.visible.search(params[:search])
     @tag_subscriptions = @search.paginate(:page => params[:page])
     respond_with(@tag_subscriptions)
   end
