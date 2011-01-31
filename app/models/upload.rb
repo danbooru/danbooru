@@ -12,6 +12,7 @@ class Upload < ActiveRecord::Base
   before_create :convert_cgi_file
   after_destroy :delete_temp_file
   validate :uploader_is_not_limited
+  scope :uploaded_by, lambda {|user_id| where(["uploader_id = ?", user_id])}
   
   module ValidationMethods
     def uploader_is_not_limited
@@ -70,6 +71,7 @@ class Upload < ActiveRecord::Base
         end
       end
     rescue Exception => x
+      raise
       update_attribute(:status, "error: #{x} - #{x.message}")
     ensure
       delete_temp_file

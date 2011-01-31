@@ -13,6 +13,7 @@ Factory.define(:source_upload, :parent => :upload) do |f|
 end
 
 Factory.define(:jpg_upload, :parent => :upload) do |f|
+  f.content_type "image/jpeg"
   f.file_path do
     FileUtils.cp("#{Rails.root}/test/files/test.jpg", "#{Rails.root}/tmp")
     "#{Rails.root}/tmp/test.jpg"

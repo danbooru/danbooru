@@ -11,7 +11,8 @@ class UploadsController < ApplicationController
   end
   
   def index
-    @uploads = Upload.where("uploader_id = ?", CurrentUser.user.id).includes(:uploader).order("uploads.id desc").limit(10)
+    @search = Upload.search(params[:search])
+    @uploads = @search.paginate(:page => params[:page])
     respond_with(@uploads)
   end
   

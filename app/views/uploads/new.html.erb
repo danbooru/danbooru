@@ -4,7 +4,7 @@
       <p>Before uploading, please read the <%= link_to "how to upload guide", wiki_pages_path(:title => "howto:upload") %>.</p>
     </div>
 
-    <% form_for(@upload, :html => {:multipart => true, :class => "simple_form"}) do |f| %>
+    <%= form_for(@upload, :html => {:multipart => true, :class => "simple_form"}) do |f| %>
       <% if params[:url] %>
         <div id="image-preview">
           <%= image_tag(params[:url], :title => "Preview") %>
