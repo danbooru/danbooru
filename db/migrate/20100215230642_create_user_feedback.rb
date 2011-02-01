@@ -9,6 +9,7 @@ class CreateUserFeedback < ActiveRecord::Migration
     end
     
     add_index :user_feedback, :user_id
+    add_index :user_feedback, :creator_id
   end
 
   def self.down

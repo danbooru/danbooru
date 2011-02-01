@@ -6,6 +6,7 @@ lib/danbooru_image_resizer/*.log
 db/*.sqlite3
 log/*.log
 tmp/**/*
+tmp/upload_*
 public/data
 vendor/cache/*.gem
 .sass-cache

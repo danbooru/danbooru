@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
 
 protected
   def access_denied
-    previous_url = params[:url] || request.request_uri
+    previous_url = params[:url] || request.fullpath
 
     respond_to do |fmt|
       fmt.html do 

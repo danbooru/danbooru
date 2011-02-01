@@ -232,7 +232,7 @@ class Upload < ActiveRecord::Base
     end
     
     def temp_file_path
-      @temp_file_path ||= File.join(Rails.root, "tmp", "#{Time.now.to_f}.#{$PROCESS_ID}")
+      @temp_file_path ||= File.join(Rails.root, "tmp", "upload_#{Time.now.to_f}.#{$PROCESS_ID}")
     end
   end
   
