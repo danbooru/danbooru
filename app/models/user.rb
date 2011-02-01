@@ -26,6 +26,8 @@ class User < ActiveRecord::Base
   belongs_to :inviter, :class_name => "User"
   scope :named, lambda {|name| where(["lower(name) = ?", name])}
   scope :admins, where("is_admin = TRUE")
+  scope :with_email, lambda {|email| email.blank? ? where("FALSE") : where(["email = ?", email])}
+  scope :find_for_password_reset, lambda {|name, email| email.blank? ? where("FALSE") : where(["name = ? AND email = ?", name, email])}
   
   module BanMethods
     def validate_ip_addr_is_not_banned
@@ -93,6 +95,11 @@ class User < ActiveRecord::Base
       pass << rand(100).to_s
       execute_sql("UPDATE users SET password_hash = ? WHERE id = ?", self.class.sha1(pass), id)
       pass    
+    end
+    
+    def reset_password_and_deliver_notice
+      new_password = reset_password()
+      UserMaintenanceMailer.reset_password(self, new_password).deliver
     end
   end
   
