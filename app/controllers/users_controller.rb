@@ -1,40 +1,44 @@
 class UsersController < ApplicationController
   respond_to :html, :xml, :json
-  before_filter :member_only, :only => [:edit, :show, :update, :destroy]
+  before_filter :member_only, :only => [:edit, :update]
+  rescue_from User::PrivilegeError, :with => "static/access_denied"
 
   def new
     @user = User.new
+    respond_with(@user)
   end
   
   def edit
     @user = User.find(params[:id])
-    unless CurrentUser.user.is_admin?
-      @user = CurrentUser.user
-    end
+    check_privilege(@user)
+    respond_with(@user)
   end
   
   def index
+    @search = User.search(params[:search])
+    @users = @search.paginate(:page => params[:page])
+    respond_with(@users)
   end
   
   def show
     @user = User.find(params[:id])
+    respond_with(@user)
   end
   
   def create
-    @user = User.new(params[:user].merge(:ip_addr => request.remote_ip))
-    if @user.save
-      flash[:notice] = "You have succesfully created a new account"
-      session[:user_id] = @user.id
-      redirect_to user_path(@user)
-    else
-      flash[:notice] = "There were errors"
-      render :action => "new"
-    end
+    @user = User.create(params[:user])
+    respond_with(@user)
   end
   
   def update
+    @user = User.find(params[:id])
+    check_privilege(@user)
+    @user.update_attributes(params[:user])
+    respond_with(@user)
   end
-  
-  def destroy
+
+private
+  def check_privilege(user)
+    raise User::PrivilegeError unless (user.id == CurrentUser.id || CurrentUser.is_admin?)
   end
 end

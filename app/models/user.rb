@@ -4,7 +4,7 @@ class User < ActiveRecord::Base
   class Error < Exception ; end
   class PrivilegeError < Exception ; end
   
-  attr_accessor :password, :old_password, :ip_addr
+  attr_accessor :password, :old_password
   attr_accessible :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr
   validates_length_of :name, :within => 2..20, :on => :create
   validates_format_of :name, :with => /\A[^\s;,]+\Z/, :on => :create, :message => "cannot have whitespace, commas, or semicolons"
@@ -14,7 +14,6 @@ class User < ActiveRecord::Base
   validates_inclusion_of :default_image_size, :in => %w(medium large original)
   validates_confirmation_of :password
   validates_presence_of :email, :if => lambda {|rec| rec.new_record? && Danbooru.config.enable_email_verification?}
-  validates_presence_of :ip_addr, :on => :create
   validate :validate_ip_addr_is_not_banned, :on => :create
   before_save :encrypt_password
   after_save :update_cache
@@ -31,7 +30,7 @@ class User < ActiveRecord::Base
   
   module BanMethods
     def validate_ip_addr_is_not_banned
-      if IpBan.is_banned?(ip_addr)
+      if IpBan.is_banned?(CurrentUser.ip_addr)
         self.errors[:base] << "IP address is banned"
         return false
       end
