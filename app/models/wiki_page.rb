@@ -9,7 +9,7 @@ class WikiPage < ActiveRecord::Base
   scope :titled, lambda {|title| where(["title = ?", title.downcase.tr(" ", "_")])}
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, :foreign_key => "name", :primary_key => "title"
-  has_many :versions, :class_name => "WikiPageVersion", :dependent => :destroy
+  has_many :versions, :class_name => "WikiPageVersion", :dependent => :destroy, :order => "wiki_page_versions.id ASC"
   
   def self.build_relation(options = {})
     relation = where()

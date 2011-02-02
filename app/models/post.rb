@@ -16,7 +16,7 @@ class Post < ActiveRecord::Base
   belongs_to :parent, :class_name => "Post"
   has_one :unapproval, :dependent => :destroy
   has_one :upload, :dependent => :destroy
-  has_many :versions, :class_name => "PostVersion", :dependent => :destroy
+  has_many :versions, :class_name => "PostVersion", :dependent => :destroy, :order => "post_versions.id ASC"
   has_many :votes, :class_name => "PostVote", :dependent => :destroy
   has_many :notes, :dependent => :destroy
   has_many :comments

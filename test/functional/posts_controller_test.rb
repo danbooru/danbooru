@@ -6,7 +6,8 @@ class PostsControllerTest < ActionController::TestCase
       @user = Factory.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @post = Factory.create(:post, :uploader_id => @user.id, :tag_string => "aaa")
+      @post = Factory.create(:post, :uploader_id => @user.id, :tag_string => "aaaa")
+      MEMCACHE.flush_all
     end
     
     teardown do
@@ -22,7 +23,7 @@ class PostsControllerTest < ActionController::TestCase
       
       context "with a search" do
         should "render" do
-          get :index, {:tags => "aaa"}
+          get :index, {:tags => "aaaa"}
           assert_response :success
         end
       end
@@ -52,11 +53,11 @@ class PostsControllerTest < ActionController::TestCase
       
       should "work" do
         @version = @post.versions(true).first
-        assert_equal("aaa", @version.add_tags)
+        assert_equal("aaaa", @version.add_tags)
         post :revert, {:id => @post.id, :version_id => @version.id}, {:user_id => @user.id}
         assert_redirected_to post_path(@post)
         @post.reload
-        assert_equal("aaa", @post.tag_string)
+        assert_equal("aaaa", @post.tag_string)
       end
     end
   end

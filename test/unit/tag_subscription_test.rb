@@ -2,7 +2,7 @@ require_relative '../test_helper'
 
 class TagSubscriptionTest < ActiveSupport::TestCase
   setup do
-    user = Factory.create(:owner)
+    user = Factory.create(:user)
     CurrentUser.user = user
     CurrentUser.ip_addr = "127.0.0.1"
     MEMCACHE.flush_all
@@ -16,7 +16,7 @@ class TagSubscriptionTest < ActiveSupport::TestCase
   context "A tag subscription" do
     should "find the union of all posts for each tag in its tag query" do
       posts = []
-      user = Factory.create(:owner)
+      user = Factory.create(:user)
       posts << Factory.create(:post, :tag_string => "aaa")
       posts << Factory.create(:post, :tag_string => "bbb")
       posts << Factory.create(:post, :tag_string => "ccc")
@@ -29,7 +29,7 @@ class TagSubscriptionTest < ActiveSupport::TestCase
     
     should "cache its tag query results" do
       posts = []
-      user = Factory.create(:owner)
+      user = Factory.create(:user)
       posts << Factory.create(:post, :tag_string => "aaa")
       posts << Factory.create(:post, :tag_string => "bbb")
       posts << Factory.create(:post, :tag_string => "ccc")
@@ -38,7 +38,7 @@ class TagSubscriptionTest < ActiveSupport::TestCase
     end
     
     should "find posts based on its cached post ids" do
-      user = Factory.create(:owner)
+      user = Factory.create(:user)
       subs = []
       subs << Factory.create(:tag_subscription, :tag_query => "aaa", :owner => user, :name => "zzz")
       subs << Factory.create(:tag_subscription, :tag_query => "bbb", :owner => user, :name => "yyy")
@@ -59,8 +59,8 @@ class TagSubscriptionTest < ActiveSupport::TestCase
   context "A tag subscription manager" do
     should "process all active tag subscriptions" do
       users = []
-      users << Factory.create(:owner)
-      users << Factory.create(:owner)
+      users << Factory.create(:user)
+      users << Factory.create(:user)
       posts = []
       posts << Factory.create(:post, :tag_string => "aaa")
       posts << Factory.create(:post, :tag_string => "bbb")

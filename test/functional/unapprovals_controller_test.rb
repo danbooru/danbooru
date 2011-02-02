@@ -45,7 +45,9 @@ class UnapprovalsControllerTest < ActionController::TestCase
       
       should "create a new unapproval" do
         assert_difference("Unapproval.count", 1) do
-          post :create, {:post_id => @post.id, :reason => "xxx"}, {:user_id => @user.id}
+          post :create, {:unapproval => {:post_id => @post.id, :reason => "xxx"}}, {:user_id => @user.id}
+          assert_not_nil(assigns(:unapproval))
+          assert_equal([], assigns(:unapproval).errors.full_messages)
         end
       end
     end

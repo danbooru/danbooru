@@ -3,7 +3,7 @@ class Pool < ActiveRecord::Base
   validates_format_of :name, :with => /\A[^\s;,]+\Z/, :on => :create, :message => "cannot have whitespace, commas, or semicolons"
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
-  has_many :versions, :class_name => "PoolVersion", :dependent => :destroy
+  has_many :versions, :class_name => "PoolVersion", :dependent => :destroy, :order => "pool_versions.id ASC"
   before_validation :normalize_name
   before_validation :initialize_creator, :on => :create
   after_save :create_version
