@@ -1,7 +1,7 @@
 <ul>
   <%= resize_image_links(post, CurrentUser.user) %>
-  <li><%= link_to "Favorite", "#" %></li>
-  <li><%= link_to "Unfavorite", "#" %></li>
+  <li><%= link_to "Favorite", "#", :id => "add-to-favorites" %> <img src="/images/wait.gif" style="display: none;" id="add-to-favorites-wait"></li>
+  <li><%= link_to "Unfavorite", "#", :id => "remove-from-favorites" %> <img src="/images/wait.gif" style="display: none;" id="remove-from-favorites-wait"></li>
   <li><%= link_to "Translate", "#" %></li>
   <li><%= link_to "Unapprove", "#" %></li>
   <% if CurrentUser.user.is_janitor? %>

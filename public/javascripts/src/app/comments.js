@@ -27,7 +27,6 @@
           body: $(e.target).closest("form").find("textarea").val()
         },
         success: function(data, text_status, xhr) {
-          console.log($(this).closest("div.new-comment").find("div.comment-preview"));
           $(this).closest("div.new-comment").find("div.comment-preview").show().html(data);
         },
         type: "post"

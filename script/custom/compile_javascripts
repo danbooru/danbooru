@@ -12,3 +12,4 @@ cat public/javascripts/src/app/posts.js >> public/javascripts/compiled/default.j
 cat public/javascripts/src/app/comments.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/uploads.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/users.js >> public/javascripts/compiled/default.js
+cat public/javascripts/src/app/favorites.js >> public/javascripts/compiled/default.js

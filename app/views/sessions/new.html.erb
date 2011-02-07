@@ -1,7 +1,7 @@
 <div id="sessions">
   <div id="new">
     <section>
-      <h2>Login</h2>
+      <h2>Sign In</h2>
       <%= form_tag(session_path) do %>
         <table width="100%">
           <tfoot>
@@ -33,12 +33,12 @@
       <ul>
         <li><%= link_to "I don't have an account", new_user_path %></li>
         <li><%= link_to "I forgot my password", reset_password_path %></li>
-        <li><%= link_to "I forgot my login", login_reminder_path %></li>
+        <li><%= link_to "I forgot my user name", login_reminder_path %></li>
       </ul>
     </aside>    
   </div>
 </div>
 
 <% content_for(:page_title) do %>
- / login
+ /sign in
 <% end %>

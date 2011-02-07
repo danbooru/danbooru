@@ -30,7 +30,7 @@ class Post < ActiveRecord::Base
   scope :commented_before, lambda {|date| where("last_commented_at < ?", date).order("last_commented_at DESC")}
   scope :available_for_moderation, lambda {where(["id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :hidden_from_moderation, lambda {where(["id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
-  scope :before_id, lambda {|id| where(["posts.id < ?", id])}
+  scope :before_id, lambda {|id| id.present? ? where(["posts.id < ?", id]) : where("TRUE")}
   scope :tag_match, lambda {|query| Post.tag_match_helper(query)}
   
   module FileMethods

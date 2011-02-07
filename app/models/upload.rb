@@ -96,11 +96,8 @@ class Upload < ActiveRecord::Base
     
     def merge_tags(post)
       post.tag_string += " #{tag_string}"
-      post.updater_id = uploader_id
-      post.updater_ip_addr = uploader_ip_addr
       post.save
       update_attribute(:status, "duplicate: #{post.id}")
-      raise
     end
   end
   
@@ -259,8 +256,8 @@ class Upload < ActiveRecord::Base
 
       self.file_path = temp_file_path
 
-      if file.local_path
-        FileUtils.cp(file.local_path, file_path)
+      if file.tempfile
+        FileUtils.cp(file.tempfile.path, file_path)
       else
         File.open(file_path, 'wb') do |out| 
           out.write(file.read)
