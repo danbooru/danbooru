@@ -199,9 +199,14 @@ class Post < ActiveRecord::Base
   end
   
   module ApprovalMethods
+    def is_unapprovable?
+      is_pending == false && is_flagged == false && unapproval.nil?
+    end
+    
     def unapprove!(reason)
+      raise Unapproval::Error.new("This post is still pending approval") if is_pending?
       raise Unapproval::Error.new("This post has already been flagged") if is_flagged?
-      raise Unapproval::Error.new("This post has already been unapproved once")  unless unapproval.nil?
+      raise Unapproval::Error.new("This post has already been unapproved once") unless unapproval.nil?
       
       unapproval = create_unapproval(
         :unapprover_id => CurrentUser.user.id,

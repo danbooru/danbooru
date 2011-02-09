@@ -292,6 +292,10 @@ div.post_histories div.index div.post {
       color: red;
       text-decoration: line-through; }
 
+/*** Post Unapprovals ***/
+div#unapprove-dialog p {
+  margin-bottom: 1em; }
+
 /*** Comments ***/
 div.comment-response > div {
   margin-top: 1em; }

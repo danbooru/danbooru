@@ -52,6 +52,10 @@
       </section>
     </section>    
   </div>
+
+  <div id="unapprove-dialog" title="Unapprove Post">
+    <%= render :template => "unapprovals/new" %>
+  </div>
 </div>
 
 <% content_for(:page_title) do %>
@@ -63,6 +67,7 @@
   <meta name="favorites" content="<%= @post.fav_string %>">
   <meta name="pools" content="<%= @post.pool_string %>">
   <meta name="post-id" content="<%= @post.id %>">
+  <meta name="post-is-unapprovable" content="<%= @post.is_unapprovable? %>">
 <% end %>
 
 <%= render :partial => "posts/partials/common/secondary_links" %>

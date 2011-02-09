@@ -15,7 +15,7 @@ class UnapprovalsController < ApplicationController
   
   def create
     @unapproval = Unapproval.create(params[:unapproval])
-    respond_with(@unapproval)
+    respond_with(@unapproval, :location => post_path(@unapproval.post_id))
   end
   
   def destroy

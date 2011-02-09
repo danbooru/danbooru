@@ -4,14 +4,21 @@
   Danbooru.Favorite.initialize_all = function() {
     this.initialize_add_to_favorites();
     this.initialize_remove_from_favorites();
-    this.hide_or_remove_add_to_favorites_link();
+    this.hide_or_show_add_to_favorites_link();
   }
   
-  Danbooru.Favorite.hide_or_remove_add_to_favorites_link = function() {
+  Danbooru.Favorite.hide_or_show_add_to_favorites_link = function() {
     var favorites = $("meta[name=favorites]").attr("content");
-    var current_user = $("meta[name=current-user-id]").attr("content");
-    var regexp = new RegExp("\\bfav:" + current_user + "\\b");
-    if (favorites.match(regexp)) {
+    var current_user_id = $("meta[name=current-user-id]").attr("content");
+    
+    if (current_user_id == "") {
+      $("a#add-to-favorites").hide();
+      $("a#remove-from-favorites").hide();
+      return;
+    }
+    
+    var regexp = new RegExp("\\bfav:" + current_user_id + "\\b");
+    if ((favorites != undefined) && (favorites.match(regexp))) {
       $("a#add-to-favorites").hide();
     } else {
       $("a#remove-from-favorites").hide();      
