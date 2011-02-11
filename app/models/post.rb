@@ -1,5 +1,6 @@
 class Post < ActiveRecord::Base
   class ApprovalError < Exception ; end
+  class DisapprovalError < Exception ; end
   
   attr_accessor :old_tag_string, :old_parent_id
   after_destroy :delete_files
@@ -203,6 +204,10 @@ class Post < ActiveRecord::Base
       is_pending == false && is_flagged == false && unapproval.nil?
     end
     
+    def is_approvable?
+      (is_pending? || is_flagged?) && approver_string != "approver:#{CurrentUser.name}"
+    end
+    
     def unapprove!(reason)
       raise Unapproval::Error.new("This post is still pending approval") if is_pending?
       raise Unapproval::Error.new("This post has already been flagged") if is_flagged?
@@ -222,7 +227,7 @@ class Post < ActiveRecord::Base
     end
 
     def approve!
-      raise ApprovalError.new("You have already approved this post previously") if approver_string == "approver:#{CurrentUser.name}"
+      raise ApprovalError.new("You have previously approved this post and cannot approve it again") if approver_string == "approver:#{CurrentUser.name}"
       
       self.is_flagged = false
       self.is_pending = false

@@ -1,6 +1,6 @@
 class UnapprovalsController < ApplicationController
   before_filter :member_only
-  respond_to :html, :xml, :json
+  respond_to :html, :xml, :json, :js
   rescue_from User::PrivilegeError, :with => "static/access_denied"
 
   def new
@@ -15,7 +15,7 @@ class UnapprovalsController < ApplicationController
   
   def create
     @unapproval = Unapproval.create(params[:unapproval])
-    respond_with(@unapproval, :location => post_path(@unapproval.post_id))
+    respond_with(@unapproval)
   end
   
   def destroy

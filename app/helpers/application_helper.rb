@@ -33,6 +33,10 @@ module ApplicationHelper
     end
   end
   
+  def wait_image(html_id)
+    ('<img src="/images/wait.gif" style="display: none;" id="' + html_id + '">').html_safe
+  end
+  
 protected
   def nav_link_match(controller, url)
     url =~ case controller

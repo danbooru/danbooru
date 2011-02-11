@@ -817,6 +817,18 @@ $(document).ready(function() {
 
 
 var Danbooru = {};
+(function() {
+  Danbooru.Utility = {};
+  
+  Danbooru.Utility.j_alert = function(title, msg) {
+    $('<div title="' + title + '"></div>').html(msg).dialog();
+  }
+  
+  Danbooru.Utility.j_error = function(msg) {
+    this.j_alert("Error", msg);
+  }
+})();
+
 // PostModeMenu = {
 //   init: function() {
 //     this.original_background_color = $(document.body).css("background-color")
@@ -1190,6 +1202,13 @@ $(document).ready(function() {
   
   Danbooru.Unapproval.initialize_all = function() {
     this.initialize_unapprove();
+    this.hide_or_show_unapprove_link();
+  }
+  
+  Danbooru.Unapproval.hide_or_show_unapprove_link = function() {
+    if ($("meta[name=post-is-unapprovable]").attr("content") != "true") {
+      $("a#unapprove").hide();
+    }
   }
   
   Danbooru.Unapproval.initialize_unapprove = function() {
@@ -1200,6 +1219,7 @@ $(document).ready(function() {
       buttons: {
         "Submit": function() {
           $("#unapprove-dialog form").submit();
+          $(this).dialog("close");
         },
         "Cancel": function() {
           $(this).dialog("close");
@@ -1216,4 +1236,54 @@ $(document).ready(function() {
 
 $(document).ready(function() {
   Danbooru.Unapproval.initialize_all();
+});
+(function() {
+  Danbooru.PostModeration = {};
+  
+  Danbooru.PostModeration.initialize_all = function() {
+    this.initialize_approve_link();
+    this.initialize_disapprove_link();
+    this.hide_or_show_approve_and_disapprove_links();
+  }
+ 
+  Danbooru.PostModeration.hide_or_show_approve_and_disapprove_links = function() {
+    if ($("meta[name=post-is-approvable]").attr("content") != "true") {
+      $("a#approve").hide();
+      $("a#disapprove").hide();
+    }
+  }
+  
+  Danbooru.PostModeration.initialize_disapprove_link = function() {
+    $("a#disapprove").click(function() {
+      $.ajax({
+        url: "/post_moderation/disapprove.js",
+        type: "put",
+        data: {
+          post_id: $("meta[name=post-id]").attr("content")
+        },
+        beforeSend: function() {
+          $("img#disapprove-wait").show();
+        }
+      });
+    });
+  }
+  
+  Danbooru.PostModeration.initialize_approve_link = function() {
+    $("a#approve").click(function() {
+      $.ajax({
+        url: "/post_moderation/approve.js",
+        type: "put",
+        data: {
+          post_id: $("meta[name=post-id]").attr("content")
+        },
+        beforeSend: function() {
+          $("img#approve-wait").show();
+        }
+      });
+    });
+  }
+})();
+
+$(document).ready(function() {
+  Danbooru.PostModeration.initialize_all();
 });

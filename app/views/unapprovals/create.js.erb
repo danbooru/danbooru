@@ -1,0 +1,9 @@
+var errors = <%= @unapproval.errors.full_messages.to_json.html_safe %>;
+if (errors.length > 0) {
+  Danbooru.Utility.j_error(errors.join("; "));
+} else {
+  Danbooru.Utility.j_alert("Unapproval", "Unapproval successful");
+  $("a#approve").show();
+  $("a#disapprove").show();
+  $("a#unapprove").hide();
+}

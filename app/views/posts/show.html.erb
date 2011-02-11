@@ -68,6 +68,7 @@
   <meta name="pools" content="<%= @post.pool_string %>">
   <meta name="post-id" content="<%= @post.id %>">
   <meta name="post-is-unapprovable" content="<%= @post.is_unapprovable? %>">
+  <meta name="post-is-approvable" content="<%= @post.is_approvable? %>">
 <% end %>
 
 <%= render :partial => "posts/partials/common/secondary_links" %>

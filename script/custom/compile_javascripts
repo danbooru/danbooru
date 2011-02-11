@@ -8,9 +8,11 @@ cat public/javascripts/src/lib/jrails.min.js >> public/javascripts/compiled/defa
 cat public/javascripts/src/lib/rails.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/cookie.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/application.js >> public/javascripts/compiled/default.js
+cat public/javascripts/src/app/utility.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/posts.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/comments.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/uploads.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/users.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/favorites.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/unapprovals.js >> public/javascripts/compiled/default.js
+cat public/javascripts/src/app/post_moderation.js >> public/javascripts/compiled/default.js

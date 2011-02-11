@@ -1,16 +1,12 @@
 <ul>
   <%= resize_image_links(post, CurrentUser.user) %>
-  <li><%= link_to "Favorite", "#", :id => "add-to-favorites" %> <img src="/images/wait.gif" style="display: none;" id="add-to-favorites-wait"></li>
-  <li><%= link_to "Unfavorite", "#", :id => "remove-from-favorites" %> <img src="/images/wait.gif" style="display: none;" id="remove-from-favorites-wait"></li>
+  <li><%= link_to "Favorite", "#", :id => "add-to-favorites" %> <%= wait_image("add-to-favorites-wait") %></li>
+  <li><%= link_to "Unfavorite", "#", :id => "remove-from-favorites" %> <%= wait_image("remove-from-favorites-wait") %></li>
   <li><%= link_to "Translate", "#" %></li>
-  <% if !post.is_flagged? %>
-    <li><%= link_to "Unapprove", new_unapproval_path(:post_id => post.id), :id => "unapprove" %></li>
-  <% end %>
+  <li><%= link_to "Unapprove", new_unapproval_path(:post_id => post.id), :id => "unapprove" %></li>
   <% if CurrentUser.is_janitor? %>
-    <% if post.is_pending? || post.is_flagged? %>
-      <li><%= link_to "Approve", "#", :id => "approve" %> <img src="/images/wait.gif" style="display: none;" id="approve-wait"></li>
-      <li><%= link_to "Disapprove", "#", :id => "disapprove" %> <img src="/images/wait.gif" style="display: none;" id="disapprove-wait"></li>
-    <% end %>
+    <li><%= link_to "Approve", "#", :id => "approve" %> <%= wait_image("approve-wait") %></li>
+    <li><%= link_to "Disapprove", "#", :id => "disapprove" %> <%= wait_image("disapprove-wait") %></li>
   <% end %>
   <% if CurrentUser.is_moderator? %>
     <% if post.is_removed? %>
