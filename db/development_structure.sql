@@ -1132,6 +1132,7 @@ CREATE TABLE posts (
     is_rating_locked boolean DEFAULT false NOT NULL,
     is_pending boolean DEFAULT false NOT NULL,
     is_flagged boolean DEFAULT false NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL,
     uploader_string character varying(255) NOT NULL,
     uploader_ip_addr inet NOT NULL,
     approver_string character varying(255) DEFAULT ''::character varying NOT NULL,
@@ -1172,65 +1173,6 @@ CREATE SEQUENCE posts_id_seq
 --
 
 ALTER SEQUENCE posts_id_seq OWNED BY posts.id;
-
-
---
--- Name: removed_posts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE removed_posts (
-    id integer NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    score integer DEFAULT 0 NOT NULL,
-    source character varying(255),
-    md5 character varying(255) NOT NULL,
-    rating character(1) DEFAULT 'q'::bpchar NOT NULL,
-    is_note_locked boolean DEFAULT false NOT NULL,
-    is_rating_locked boolean DEFAULT false NOT NULL,
-    is_pending boolean DEFAULT false NOT NULL,
-    is_flagged boolean DEFAULT false NOT NULL,
-    uploader_string character varying(255) NOT NULL,
-    uploader_ip_addr inet NOT NULL,
-    approver_string character varying(255) DEFAULT ''::character varying NOT NULL,
-    fav_string text DEFAULT ''::text NOT NULL,
-    pool_string text DEFAULT ''::text NOT NULL,
-    view_count integer DEFAULT 0 NOT NULL,
-    last_noted_at timestamp without time zone,
-    last_commented_at timestamp without time zone,
-    tag_string text DEFAULT ''::text NOT NULL,
-    tag_index tsvector,
-    tag_count integer DEFAULT 0 NOT NULL,
-    tag_count_general integer DEFAULT 0 NOT NULL,
-    tag_count_artist integer DEFAULT 0 NOT NULL,
-    tag_count_character integer DEFAULT 0 NOT NULL,
-    tag_count_copyright integer DEFAULT 0 NOT NULL,
-    file_ext character varying(255) NOT NULL,
-    file_size integer NOT NULL,
-    image_width integer NOT NULL,
-    image_height integer NOT NULL,
-    parent_id integer,
-    has_children boolean DEFAULT false NOT NULL
-);
-
-
---
--- Name: removed_posts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE removed_posts_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: removed_posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE removed_posts_id_seq OWNED BY removed_posts.id;
 
 
 --
@@ -1354,7 +1296,6 @@ CREATE TABLE tags (
     id integer NOT NULL,
     name character varying(255) NOT NULL,
     post_count integer DEFAULT 0 NOT NULL,
-    view_count integer DEFAULT 0 NOT NULL,
     category integer DEFAULT 0 NOT NULL,
     related_tags text,
     related_tags_updated_at timestamp without time zone,
@@ -1841,13 +1782,6 @@ ALTER TABLE posts ALTER COLUMN id SET DEFAULT nextval('posts_id_seq'::regclass);
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE removed_posts ALTER COLUMN id SET DEFAULT nextval('removed_posts_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE tag_aliases ALTER COLUMN id SET DEFAULT nextval('tag_aliases_id_seq'::regclass);
 
 
@@ -2168,14 +2102,6 @@ ALTER TABLE ONLY post_votes
 
 ALTER TABLE ONLY posts
     ADD CONSTRAINT posts_pkey PRIMARY KEY (id);
-
-
---
--- Name: removed_posts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY removed_posts
-    ADD CONSTRAINT removed_posts_pkey PRIMARY KEY (id);
 
 
 --
@@ -2826,90 +2752,6 @@ CREATE INDEX index_posts_on_tags_index ON posts USING gin (tag_index);
 
 
 --
--- Name: index_removed_posts_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_removed_posts_on_created_at ON removed_posts USING btree (created_at);
-
-
---
--- Name: index_removed_posts_on_file_size; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_removed_posts_on_file_size ON removed_posts USING btree (file_size);
-
-
---
--- Name: index_removed_posts_on_image_height; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_removed_posts_on_image_height ON removed_posts USING btree (image_height);
-
-
---
--- Name: index_removed_posts_on_image_width; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_removed_posts_on_image_width ON removed_posts USING btree (image_width);
-
-
---
--- Name: index_removed_posts_on_last_commented_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_removed_posts_on_last_commented_at ON removed_posts USING btree (last_commented_at);
-
-
---
--- Name: index_removed_posts_on_last_noted_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_removed_posts_on_last_noted_at ON removed_posts USING btree (last_noted_at);
-
-
---
--- Name: index_removed_posts_on_md5; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_removed_posts_on_md5 ON removed_posts USING btree (md5);
-
-
---
--- Name: index_removed_posts_on_mpixels; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_removed_posts_on_mpixels ON posts USING btree (((((image_width * image_height))::numeric / 1000000.0)));
-
-
---
--- Name: index_removed_posts_on_parent_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_removed_posts_on_parent_id ON removed_posts USING btree (parent_id);
-
-
---
--- Name: index_removed_posts_on_source; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_removed_posts_on_source ON removed_posts USING btree (source);
-
-
---
--- Name: index_removed_posts_on_tags_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_removed_posts_on_tags_index ON posts USING gin (tag_index);
-
-
---
--- Name: index_removed_posts_on_view_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_removed_posts_on_view_count ON removed_posts USING btree (view_count);
-
-
---
 -- Name: index_tag_aliases_on_antecedent_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2963,6 +2805,13 @@ CREATE UNIQUE INDEX index_tags_on_name ON tags USING btree (name);
 --
 
 CREATE INDEX index_unapprovals_on_post_id ON unapprovals USING btree (post_id);
+
+
+--
+-- Name: index_user_feedback_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_user_feedback_on_creator_id ON user_feedback USING btree (creator_id);
 
 
 --
@@ -3085,16 +2934,6 @@ CREATE TRIGGER trigger_posts_on_tag_index_update
 
 
 --
--- Name: trigger_removed_posts_on_tag_index_update; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER trigger_removed_posts_on_tag_index_update
-    BEFORE INSERT OR UPDATE ON removed_posts
-    FOR EACH ROW
-    EXECUTE PROCEDURE tsvector_update_trigger('tag_index', 'public.danbooru', 'tag_string', 'fav_string', 'pool_string', 'uploader_string', 'approver_string');
-
-
---
 -- Name: trigger_wiki_pages_on_update; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3169,7 +3008,5 @@ INSERT INTO schema_migrations (version) VALUES ('20100307073438');
 INSERT INTO schema_migrations (version) VALUES ('20100309211553');
 
 INSERT INTO schema_migrations (version) VALUES ('20100318213503');
-
-INSERT INTO schema_migrations (version) VALUES ('20100818180317');
 
 INSERT INTO schema_migrations (version) VALUES ('20100826232512');

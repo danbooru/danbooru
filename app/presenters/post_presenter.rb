@@ -3,7 +3,7 @@ class PostPresenter < Presenter
     flags = []
     flags << "pending" if post.is_pending?
     flags << "flagged" if post.is_flagged?
-    flags << "removed" if post.is_removed?
+    flags << "deleted" if post.is_deleted?
     
     html =  %{<article id="post_#{post.id}" data-id="#{post.id}" data-tags="#{h(post.tag_string)}" data-uploader="#{h(post.uploader_name)}" data-rating="#{post.rating}" data-width="#{post.image_width}" data-height="#{post.image_height}" data-flags="#{flags.join(' ')}">}
     html << %{<a href="/posts/#{post.id}">}
@@ -22,7 +22,7 @@ class PostPresenter < Presenter
   end
 
   def image_html(template)
-    return template.content_tag("p", "This image was deleted.") if @post.is_removed? && !CurrentUser.user.is_janitor?
+    return template.content_tag("p", "This image was deleted.") if @post.is_deleted? && !CurrentUser.user.is_janitor?
     return template.content_tag("p", "You need a privileged account to see this image.") if !Danbooru.config.can_see_post?(@post, CurrentUser.user)
     
     if @post.is_flash?

@@ -13,46 +13,29 @@ class PostTest < ActiveSupport::TestCase
     CurrentUser.ip_addr = nil
   end
   
-  context "Removal:" do
-    context "Removing a post" do
+  context "Deletion:" do
+    context "Deleting a post" do
       should "update the fast count" do
         post = Factory.create(:post, :tag_string => "aaa")
         assert_equal(1, Post.fast_count)
         assert_equal(1, Post.fast_count("aaa"))
-        post.remove!
+        post.delete!
         assert_equal(0, Post.fast_count)
         assert_equal(0, Post.fast_count("aaa"))
       end
       
-      should "duplicate the post in the archive table and remove it from the base table" do
+      should "toggle the is_deleted flag" do
         post = Factory.create(:post)
-        
-        assert_difference("RemovedPost.count", 1) do
-          assert_difference("Post.count", -1) do
-            post.remove!
-          end
-        end
-        
-        removed_post = RemovedPost.last
-        assert_equal(post.tag_string, removed_post.tag_string)
+        assert_equal(false, post.is_deleted?)
+        post.delete!
+        assert_equal(true, post.is_deleted?)
       end
       
       should "decrement the tag counts" do
         post = Factory.create(:post, :tag_string => "aaa")
         assert_equal(1, Tag.find_by_name("aaa").post_count)
-        post.remove!
+        post.delete!
         assert_equal(0, Tag.find_by_name("aaa").post_count)
-      end
-      
-      should "preserve the id" do
-        post = Factory.create(:post, :tag_string => "aaa")
-        post_id = post.id
-        post.remove!
-        removed_post = RemovedPost.last
-        assert_equal(post_id, removed_post.id)
-        removed_post.unremove!
-        post = Post.last
-        assert_equal(post_id, post.id)
       end
     end
   end
@@ -100,7 +83,7 @@ class PostTest < ActiveSupport::TestCase
         c1 = Factory.create(:post, :parent_id => p1.id)
         user = Factory.create(:user)
         c1.add_favorite(user)
-        c1.remove!
+        c1.delete!
         p1.reload
         assert(!Favorite.exists?(:post_id => c1.id, :user_id => user.id))
         assert(Favorite.exists?(:post_id => p1.id, :user_id => user.id))
@@ -109,7 +92,7 @@ class PostTest < ActiveSupport::TestCase
       should "update the parent's has_children flag" do
         p1 = Factory.create(:post)
         c1 = Factory.create(:post, :parent_id => p1.id)
-        c1.remove!
+        c1.delete!
         p1.reload
         assert(!p1.has_children?, "Parent should not have children")
       end
@@ -120,7 +103,7 @@ class PostTest < ActiveSupport::TestCase
         should "remove the parent of that child" do
           p1 = Factory.create(:post)
           c1 = Factory.create(:post, :parent_id => p1.id)
-          p1.remove!
+          p1.delete!
           c1.reload
           assert_nil(c1.parent)
         end
@@ -132,7 +115,7 @@ class PostTest < ActiveSupport::TestCase
           c1 = Factory.create(:post, :parent_id => p1.id)
           c2 = Factory.create(:post, :parent_id => p1.id)
           c3 = Factory.create(:post, :parent_id => p1.id)
-          p1.remove!
+          p1.delete!
           c1.reload
           c2.reload
           c3.reload
@@ -147,10 +130,8 @@ class PostTest < ActiveSupport::TestCase
       should "not preserve the parent's has_children flag" do
         p1 = Factory.create(:post)
         c1 = Factory.create(:post, :parent_id => p1.id)
-        c1.remove!
-        c1 = RemovedPost.last
-        c1.unremove!
-        c1 = Post.last
+        c1.delete!
+        c1.undelete!
         p1.reload
         assert_nil(p1.parent_id)
         assert(!p1.has_children?, "Parent should not have children")
@@ -180,15 +161,6 @@ class PostTest < ActiveSupport::TestCase
         post = Factory.create(:post, :is_pending => true)
         post.approve!
         assert_equal("approver:#{CurrentUser.name}", post.approver_string)
-      end
-      
-      should "preserve the unapproval association even when removed" do
-        post = Factory.create(:post)
-        post.unapprove!("bad")
-        post.remove!
-        removed_post = RemovedPost.last
-        assert_not_nil(removed_post.unapproval)
-        assert_equal("bad", removed_post.unapproval.reason)
       end
       
       context "that was previously approved by person X" do

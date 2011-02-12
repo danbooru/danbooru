@@ -12,6 +12,30 @@ class PostModerationControllerTest < ActionController::TestCase
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
+
+    context "delete action" do
+      setup do
+        @post = Factory.create(:post)
+      end
+      
+      should "delete a post" do
+        post :delete, {:post_id => @post.id, :format => "js"}, {:user_id => @mod.id}
+        @post.reload
+        assert_equal(true, @post.is_deleted?)
+      end
+    end
+    
+    context "undelete action" do
+      setup do
+        @post = Factory.create(:post, :is_deleted => true)
+      end
+      
+      should "undelete a post" do
+        post :undelete, {:post_id => @post.id, :format => "js"}, {:user_id => @mod.id}
+        @post.reload
+        assert_equal(false, @post.is_deleted?)
+      end
+    end
     
     context "moderate action" do
       setup do

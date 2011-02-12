@@ -27,6 +27,7 @@ class Post < ActiveRecord::Base
   validate :validate_parent_does_not_have_a_parent
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at
   scope :pending, where(["is_pending = ?", true])
+  scope :undeleted, where(["is_deleted = ?", false])
   scope :visible, lambda {|user| Danbooru.config.can_user_see_post_conditions(user)}
   scope :commented_before, lambda {|date| where("last_commented_at < ?", date).order("last_commented_at DESC")}
   scope :available_for_moderation, lambda {where(["id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
@@ -237,6 +238,10 @@ class Post < ActiveRecord::Base
   end
   
   module PresenterMethods
+    def presenter
+      @presenter ||= PostPresenter.new(self)
+    end
+
     def pretty_rating
       case rating
       when "q"
@@ -480,11 +485,7 @@ class Post < ActiveRecord::Base
         q = Tag.parse_query(q)
       end
       
-      if q[:status] == "deleted"
-        relation = RemovedPost.scoped
-      else
-        relation = Post.scoped
-      end
+      relation = Post.scoped
 
       relation = add_range_relation(q[:post_id], "posts.id", relation)
       relation = add_range_relation(q[:mpixels], "posts.width * posts.height / 1000000.0", relation)
@@ -507,6 +508,8 @@ class Post < ActiveRecord::Base
         relation = relation.where("posts.is_pending = TRUE")
       elsif q[:status] == "flagged"
         relation = relation.where("posts.is_flagged = TRUE")
+      elsif q[:status] == "deleted"
+        relation = relation.where("posts.is_deleted = TRUE")
       end
 
       if q[:source].is_a?(String)
@@ -641,13 +644,31 @@ class Post < ActiveRecord::Base
   end
   
   module CountMethods
+    def get_count_from_cache(tags)
+      Cache.get(count_cache_key(tags))
+    end
+    
+    def set_count_in_cache(tags, count)
+      if count < 100
+        expiry = 0
+      else
+        expiry = (count * 4).minutes
+      end
+      
+      Cache.put(count_cache_key(tags), count, expiry)
+    end
+    
+    def count_cache_key(tags)
+      "pfc:#{Cache.sanitize(tags)}"
+    end
+    
     def fast_count(tags = "")
       tags = tags.to_s
-      count = Cache.get("pfc:#{Cache.sanitize(tags)}")
+      count = get_count_from_cache(tags)
       if count.nil?
-        count = Post.tag_match("#{tags}").count
+        count = Post.tag_match(tags).undeleted.count
         if count > Danbooru.config.posts_per_page * 10
-          Cache.put("pfc:#{Cache.sanitize(tags)}", count, (count * 4).minutes)
+          set_count_in_cache(tags, count)
         end
       end
       count
@@ -657,9 +678,9 @@ class Post < ActiveRecord::Base
   module CacheMethods
     def expire_cache(tag_name)
       if Post.fast_count("") < 1000
-        Cache.delete("pfc:")
+        Cache.delete(Post.count_cache_key(""))
       end
-      Cache.delete("pfc:#{Cache.sanitize(tag_name)}")
+      Cache.delete(Post.count_cache_key(tag_name))
     end
   end
 
@@ -679,14 +700,14 @@ class Post < ActiveRecord::Base
     
     module ClassMethods
       def update_has_children_flag_for(post_id)
-        has_children = Post.exists?(["parent_id = ?", post_id])
+        has_children = Post.exists?(["is_deleted = ? AND parent_id = ?", false, post_id])
         execute_sql("UPDATE posts SET has_children = ? WHERE id = ?", has_children, post_id)
       end
     
       def recalculate_has_children_for_all_posts
         transaction do
           execute_sql("UPDATE posts SET has_children = false WHERE has_children = true")
-          execute_sql("UPDATE posts SET has_children = true WHERE id IN (SELECT p.parent_id FROM posts p WHERE p.parent_id IS NOT NULL)")
+          execute_sql("UPDATE posts SET has_children = true WHERE id IN (SELECT p.parent_id FROM posts p WHERE p.parent_id IS NOT NULL AND is_deleted = FALSE)")
         end
       end
     end
@@ -746,22 +767,23 @@ class Post < ActiveRecord::Base
     end
   end
   
-  module RemovalMethods
-    def remove!
+  module DeletionMethods
+    def delete!
       Post.transaction do
-        execute_sql("INSERT INTO removed_posts (#{Post.column_names.join(', ')}) SELECT #{Post.column_names.join(', ')} FROM posts WHERE posts.id = #{id}")
         give_favorites_to_parent
         update_children_on_destroy
         delete_favorites
         decrement_tag_post_counts
-        execute_sql("DELETE FROM posts WHERE id = #{id}")
+        update_attribute(:is_deleted, true)
         update_parent_on_destroy
         tag_array.each {|x| expire_cache(x)}
       end
     end
     
-    def is_removed?
-      false
+    def undelete!
+      update_attribute(:is_deleted, false)
+      tag_array.each {|x| expire_cache(x)}
+      update_parent_on_save
     end
   end
   
@@ -826,16 +848,12 @@ class Post < ActiveRecord::Base
   extend CountMethods
   include CacheMethods
   include ParentMethods
-  include RemovalMethods
+  include DeletionMethods
   include VersionMethods
   
   def reload(options = nil)
     super
     reset_tag_array_cache
-  end
-  
-  def presenter
-    @presenter ||= PostPresenter.new(self)
   end
 end
 

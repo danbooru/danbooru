@@ -72,6 +72,8 @@ Danbooru::Application.routes.draw do
   match '/post_moderation/moderate' => 'post_moderation#moderate'
   match '/post_moderation/disapprove' => 'post_moderation#disapprove', :via => :put
   match '/post_moderation/approve' => 'post_moderation#approve', :via => :put
+  match '/post_moderation/delete' => 'post_moderation#delete', :via => :post
+  match '/post_moderation/undelete' => 'post_moderation#undelete', :via => :post
   match '/dtext/preview' => 'dtext#preview', :via => :post
   match "/site_map" => "static#site_map", :as => "site_map"
   match "/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"

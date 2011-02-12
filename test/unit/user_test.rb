@@ -30,7 +30,7 @@ class UserTest < ActiveSupport::TestCase
       user.update_attribute(:is_contributor, false)
       
       40.times do
-        Factory.create(:removed_post, :uploader => user)
+        Factory.create(:post, :uploader => user, :is_deleted => true)
       end
       
       assert(!user.can_upload?)

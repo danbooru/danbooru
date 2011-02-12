@@ -9,11 +9,8 @@
     <li><%= link_to "Disapprove", "#", :id => "disapprove" %> <%= wait_image("disapprove-wait") %></li>
   <% end %>
   <% if CurrentUser.is_moderator? %>
-    <% if post.is_removed? %>
-      <li><%= link_to "Undelete", "#" %></li>
-    <% else %>
-      <li><%= link_to "Delete", "#" %></li>
-    <% end %>
+    <li><%= link_to "Undelete", "#", :id => "undelete" %> <%= wait_image("undelete-wait") %></li>
+    <li><%= link_to "Delete", "#", :id => "delete" %> <%= wait_image("delete-wait") %></li>
   <% end %>
   <li><%= link_to "Pool", "#" %></li>
 </ul>

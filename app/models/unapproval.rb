@@ -9,7 +9,7 @@ class Unapproval < ActiveRecord::Base
   before_save :flag_post
   
   def validate_post_is_active
-    if post.is_pending? || post.is_flagged? || post.is_removed?
+    if post.is_pending? || post.is_flagged? || post.is_deleted?
       errors[:post] << "is inactive"
       false
     else

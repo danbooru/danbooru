@@ -14,6 +14,7 @@ module UploadTestMethods
   	FileUtils.copy_file(path, tempfile.path)
   	(class << tempfile; self; end).class_eval do
   		alias local_path path
+  		define_method(:tempfile) {self}
   		define_method(:original_filename) {filename}
   		define_method(:content_type) {content_type}
   	end

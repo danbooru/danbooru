@@ -5,6 +5,14 @@ class Cache
     ActiveRecord::Base.logger.debug('MemCache Incr %s' % [key])
   end
   
+  def self.decr(key, expiry = 0)
+    val = Cache.get(key, expiry)
+    if val.to_i > 0
+      Cache.put(key, val.to_i - 1)
+    end
+    ActiveRecord::Base.logger.debug('MemCache Decr %s' % [key])
+  end
+  
   def self.get_multi(keys, prefix, expiry = 0)
     key_to_sanitized_key_hash = keys.inject({}) do |hash, x|
       hash[x] = "#{prefix}:#{Cache.sanitize(x)}"

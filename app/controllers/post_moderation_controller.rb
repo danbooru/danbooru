@@ -33,6 +33,16 @@ class PostModerationController < ApplicationController
     end
   end
   
+  def delete
+    @post = Post.find(params[:post_id])
+    @post.delete!
+  end
+  
+  def undelete
+    @post = Post.find(params[:post_id])
+    @post.undelete!
+  end
+  
 private
   def disapproval_error(e)
     respond_to do |format|
