@@ -3,7 +3,7 @@ module PostSets
     attr_accessor :page, :before_id, :count, :posts
   
     def initialize(options = {})
-      @page = options[:page].to_i
+      @page = options[:page] ? options[:page].to_i : 1
       @before_id = options[:before_id]
       load_posts
     end
@@ -33,7 +33,15 @@ module PostSets
     end
   
     def presenter
-      @presnter ||= PostSetPresenter.new(self)
+      @presenter ||= PostSetPresenter.new(self)
+    end
+    
+    def offset
+      ((page < 1) ? 0 : (page - 1)) * count
+    end
+
+    def limit
+      Danbooru.config.posts_per_page
     end
   end
 end

@@ -1,0 +1,21 @@
+<div class="pools">
+  <div class="show">
+    <aside id="sidebar">
+      <h2>Pool: <%= @pool.name %></h2>
+      <p><%= format_text(@pool.description) %></p>
+    </aside>
+    
+    <section id="content">
+      <%= @post_set.presenter.post_previews_html %>
+
+      <div class="clearfix"></div>
+    
+      <div class="paginator">
+        <%= @post_set.presenter.pagination_html(self) %>
+      </div>
+    </section>
+  </div>
+</div>
+
+<%= render "secondary_links" %>
+

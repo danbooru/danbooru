@@ -7,10 +7,14 @@ class Pool < ActiveRecord::Base
   before_validation :normalize_name
   before_validation :initialize_creator, :on => :create
   after_save :create_version
-  attr_accessible :name, :description, :post_ids, :is_active
+  attr_accessible :name, :description, :post_ids, :is_active, :post_id_array
   
   def self.name_to_id(name)
-    select_value_sql("SELECT id FROM pools WHERE name = ?", name.downcase)
+    if name =~ /^\d+$/
+      name.to_i
+    else
+      select_value_sql("SELECT id FROM pools WHERE name = ?", name.downcase)
+    end
   end
   
   def self.create_anonymous(creator, creator_ip_addr)
@@ -59,6 +63,11 @@ class Pool < ActiveRecord::Base
   
   def post_id_array
     @post_id_array ||= post_ids.scan(/\d+/).map(&:to_i)
+  end
+  
+  def post_id_array=(array)
+    self.post_ids = array.join(" ")
+    clear_post_id_array
   end
   
   def clear_post_id_array

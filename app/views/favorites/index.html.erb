@@ -35,8 +35,10 @@
     </section>
     
     <% content_for(:page_title) do %>
-      / fav:<%= CurrentUser.name %>
+      /fav:<%= CurrentUser.name %>
     <% end %>
+
+    <%= render :partial => "posts/partials/common/secondary_links" %>    
   </div>
 </div>
 

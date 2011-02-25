@@ -271,6 +271,9 @@ form.simple_form {
       width: 10em;
       cursor: pointer;
       font-weight: bold;
+      margin-top: 3px;
+      margin-right: 10px;
+      text-align: right;
     }
     
     span.hint {
@@ -302,6 +305,18 @@ form.simple_form {
 div.dtext {
   p {
     margin-bottom: 1em;
+  }
+}
+
+
+/*** Pools ***/
+
+div.pools {
+  div.edit {
+    p {
+      margin-bottom: 1em;
+      width: 40em;
+    }
   }
 }
 
@@ -351,6 +366,20 @@ div.comments {
         }
       }
     }
+  }
+}
+
+
+/*** Favorites ***/
+div.favorites {
+  aside#sidebar {
+    h1 {
+      font-size: 1.2em;
+    }
+  }
+  
+  section#content > h1 {
+    display: none;
   }
 }
 

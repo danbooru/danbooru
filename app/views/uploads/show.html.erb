@@ -17,7 +17,7 @@
 <p>
   You can <%= link_to "upload another file", new_upload_path %> or <%= link_to "view your current uploads", uploads_path %>.
   <% if CurrentUser.user.is_moderator? %>
-    <%= link_to "Force update", upload_path(@upload), :remote => true, :method => :put %>.
+    <%= link_to "Force update", upload_path(@upload, :format => "js"), :remote => true, :method => :put %>.
   <% end %>
 </p>
 

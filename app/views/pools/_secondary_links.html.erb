@@ -1,0 +1,13 @@
+<% content_for(:secondary_links) do %>
+  <menu>
+    <li><%= link_to "Listing", pools_path %></li>
+    <li><%= link_to "New", new_pool_path %></li>
+    <% if @pool %>
+      <li>|</li>
+      <li><%= link_to "Show", pool_path(@pool) %></li>
+      <li><%= link_to "Search", posts_path(:tags => "pool:#{@pool.id}") %></li>
+      <li><%= link_to "Simple Edit", edit_pool_path(@pool) %></li>
+      <li><%= link_to "Advanced Edit", edit_pool_path(@pool, :advanced => true) %></li>
+    <% end %>
+  </menu>
+<% end %>

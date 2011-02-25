@@ -1,0 +1,11 @@
+<div class="pools">
+  <div class="edit">
+    <% if params[:advanced] %>
+      <%= render "advanced_edit" %>
+    <% else %>
+      <%= render :partial => "simple_edit", :locals => {:posts => @pool.posts} %>
+    <% end %>    
+  </div>
+</div>
+
+<%= render "secondary_links" %>

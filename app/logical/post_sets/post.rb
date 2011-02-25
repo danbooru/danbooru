@@ -30,10 +30,6 @@ module PostSets
       x
     end
   
-    def limit
-      Danbooru.config.posts_per_page
-    end
-  
     def is_single_tag?
       tag_array.size == 1
     end

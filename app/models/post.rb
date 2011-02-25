@@ -76,11 +76,19 @@ class Post < ActiveRecord::Base
     end
     
     def medium_file_url
-      "/data/medium/#{file_path_prefix}#{md5}.jpg"
+      if has_medium?
+        "/data/medium/#{file_path_prefix}#{md5}.jpg"
+      else
+        file_url
+      end
     end
 
     def large_file_url
-      "/data/large/#{file_path_prefix}#{md5}.jpg"
+      if has_large?
+        "/data/large/#{file_path_prefix}#{md5}.jpg"
+      else
+        medium_file_url
+      end
     end
 
     def preview_file_url

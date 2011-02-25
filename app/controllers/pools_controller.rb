@@ -1,5 +1,5 @@
 class PoolsController < ApplicationController
-  respond_to :html, :xml, :json
+  respond_to :html, :xml, :json, :js
   before_filter :member_only, :except => [:index, :show]
   before_filter :moderator_only, :only => [:destroy]
 
@@ -20,6 +20,7 @@ class PoolsController < ApplicationController
   
   def show
     @pool = Pool.find(params[:id])
+    @post_set = PostSets::Pool.new(@pool, :page => params[:page])
     respond_with(@pool)
   end
   

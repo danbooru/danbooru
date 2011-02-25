@@ -1,0 +1,6 @@
+<%= simple_form_for(@pool) do |f| %>
+  <h2>Edit Pool: <%= @pool.name %></h2>
+  <p>If you know the precise ordering of posts that you want, you can just enter them here instead of sorting each post manually. Enter a list of post ids separated by spaces.</p>
+  <%= f.input :post_ids, :label => "Posts" %>
+  <%= f.button :submit %>
+<% end %>

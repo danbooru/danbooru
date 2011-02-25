@@ -1,0 +1,36 @@
+<div id="pools">
+  <div id="index">
+    <%= render "search" %>
+
+    <table class="highlightable" width="100%">
+      <thead>
+        <tr>
+          <th width="5%"></th>
+          <th width="70%">Name</th>
+          <th width="25%">Creator</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @pools.each do |pool| %>
+          <%= content_tag(:tr, :id => "pool-#{pool.id}") do %>
+            <td>
+              
+            </td>
+            <td>
+              <%= link_to h(pool.name), pool_path(pool) %>
+            </td>
+            <td>
+              <%= link_to h(pool.creator.name), user_path(pool.creator) %>
+            </td>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+
+    <div id="paginator">
+      <%= will_paginate(@pools) %>
+    </div>    
+
+    <%= render "secondary_links" %>
+  </div>
+</div>

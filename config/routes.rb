@@ -35,13 +35,14 @@ Danbooru::Application.routes.draw do
   end
   resources :note_versions, :only => [:index]
   resources :pools do
-    resources :posts, :controller => "pools_posts", :only => [:create, :destroy]
+    resources :posts, :controller => "pools_posts", :only => [:create, :destroy, :show]
     member do
       put :revert
     end
   end
   resources :pool_versions, :only => [:index]
   resources :posts do
+    resources :pools, :controller => "pools_posts", :only => [:create]
     resources :votes, :controller => "post_votes", :only => [:create, :destroy]
     member do
       put :revert

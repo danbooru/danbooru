@@ -3,7 +3,7 @@
 mkdir -p public/javascripts/compiled/posts
 
 cat public/javascripts/src/lib/jquery.min.js > public/javascripts/compiled/default.js
-cat public/javascripts/src/lib/jquery-ui-1.8.5.custom.min.js >> public/javascripts/compiled/default.js
+cat public/javascripts/src/lib/jquery-ui-1.8.9.custom.min.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/lib/jrails.min.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/lib/rails.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/cookie.js >> public/javascripts/compiled/default.js
@@ -16,3 +16,4 @@ cat public/javascripts/src/app/users.js >> public/javascripts/compiled/default.j
 cat public/javascripts/src/app/favorites.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/unapprovals.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/post_moderation.js >> public/javascripts/compiled/default.js
+cat public/javascripts/src/app/pools.js >> public/javascripts/compiled/default.js

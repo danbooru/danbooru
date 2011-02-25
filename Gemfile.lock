@@ -92,6 +92,7 @@ GEM
       thor (~> 0.14.4)
     rake (0.8.7)
     shoulda (2.11.3)
+    silent-postgres (0.0.7)
     simple_form (1.3.0)
       rails (~> 3.0.0)
     simplecov (0.3.9)
@@ -122,6 +123,7 @@ DEPENDENCIES
   pg
   rails (= 3.0.3)
   shoulda
+  silent-postgres
   simple_form
   simplecov
   super_exception_notifier

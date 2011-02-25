@@ -193,7 +193,10 @@ form.simple_form div.input {
     display: inline-block;
     width: 10em;
     cursor: pointer;
-    font-weight: bold; }
+    font-weight: bold;
+    margin-top: 3px;
+    margin-right: 10px;
+    text-align: right; }
   form.simple_form div.input span.hint {
     margin-left: 10em;
     color: #666;
@@ -213,6 +216,11 @@ form.simple_form div.input {
 /*** DText Preview ***/
 div.dtext p {
   margin-bottom: 1em; }
+
+/*** Pools ***/
+div.pools div.edit p {
+  margin-bottom: 1em;
+  width: 40em; }
 
 /*** Comments ***/
 div.comments-for-post div.list-of-comments article {
@@ -238,6 +246,12 @@ div.comments div.index div.post {
     width: 55em; }
     div.comments div.index div.post div.comments-for-post h1 {
       font-size: 1.2em; }
+
+/*** Favorites ***/
+div.favorites aside#sidebar h1 {
+  font-size: 1.2em; }
+div.favorites section#content > h1 {
+  display: none; }
 
 /*** Posts ***/
 div.posts h1 {
