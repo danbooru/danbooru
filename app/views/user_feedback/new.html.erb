@@ -1,0 +1,29 @@
+<h4>Add Record for <%= h(@user.pretty_name) %></h4>
+
+<div id="preview" style="margin-bottom: 1em;">
+</div>
+
+<% form_tag(:action => "create") do %>
+  <%= hidden_field_tag "user_id", @user.id %>
+  <table width="100%">
+    <tbody>
+      <tr>
+        <th width="10%"><label>Positive</label></th>
+        <td width="90%"><%= check_box "user_record", "is_positive" %></td>
+      </tr>
+      <tr>
+        <th><label>Reason</label></th>
+        <td><%= text_area "user_record", "body", :size => "20x8" %></td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2">
+          <%= submit_tag "Submit" %> 
+          <%= submit_to_remote "preview", "Preview", :url => {:action => "preview"}, :update => "preview", :method => :get %>
+          <%= button_to_function "Cancel", "location.back()" %>
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+<% end %>

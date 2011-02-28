@@ -1,0 +1,40 @@
+<script language="javascript" type="text/javascript" src="/javascripts/flotr-0.2.0-alpha.js"></script>
+
+<% form_tag({:action => "tag_history"}, :method => :get) do %>
+  <table width="100%">
+    <tbody>
+      <tr>
+        <th width="10%">Tags</th>
+        <td width="90%"><%= text_field_tag "tag", params[:tag], :size => 50 %></td>
+      </tr>
+      <tr>
+        <th>Start Date</th>
+        <td><%= text_field_tag "start_date", @start_date %></td>
+      </tr>
+      <tr>
+        <th>End Date</th>
+        <td><%= text_field_tag "end_date", @end_date %></td>
+      </tr>
+      <tr>
+        <td colspan="2"><%= submit_tag "Search" %></td>
+      </tr>
+    </tbody>
+  </table>
+<% end %>
+
+<div id="container" style="width: 100%; height: 400px"></div>
+
+<% if @counts %>
+  <script type="text/javascript" charset="utf-8">
+    Flotr.draw(
+      $("container"), [<%= @counts.map {|x| "{data: #{x[1].to_json}, label: #{x[0].to_json}}"}.join(", ") %>],
+      {
+        lines: {show: true},
+        xaxis: {ticks: <%= @ticks.to_json %>},
+        yaxis: {noTicks: 10, tickDecimals: 0},
+        legend: {show: true},
+        shadowSize: 0
+      }
+    )
+  </script>
+<% end %>

@@ -1,0 +1,47 @@
+<div id="pool-history">
+  <h4>Pool History: <%= h(@pool.pretty_name) %></h4>  
+  <table width="100%" class="highlightable">
+    <thead>
+      <tr>
+        <th>Post Count</th>
+        <th>Changes</th>
+        <th>Updater</th>
+        <th>IP Address</th>
+        <th>Date</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @updates.each_with_index do |update, i| %>
+        <tr class="<%= cycle 'even', 'odd' %>">
+          <td><%= link_to update.post_count, :action => "show_historical", :id => update.id %></td>
+          <td><%= pool_update_diff(@updates, i) %></td>
+          <td><%= link_to update.updater_name, :controller => "user", :action => "show", :id => update.user_id %></td>
+          <td>
+            <% if @current_user.is_admin? %>
+              <%= h update.ip_addr %>
+            <% end %>
+          </td>
+          <td><%= update.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+          <td><%= link_to "Revert", :action => "revert", :id => update.id %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div id="paginator">
+  <%= will_paginate(@updates) %>
+</div>
+
+<% content_for("footer") do %>
+  <li>|</li>
+  <li><%= link_to "Show", :action => "show", :id => params[:id] %></li>
+  <li><%= link_to "Edit", :action => "update", :id => params[:id] %></li>
+  <li><%= link_to "Delete", :action => "destroy", :id => params[:id] %></li>
+  <li><%= link_to "Order", :action => "order", :id => params[:id] %></li>
+  <li><%= link_to "Import", :action => "import", :id => params[:id] %></li>
+  <li><%= link_to "History", :action => "history", :id => params[:id] %></li>
+<% end %>
+
+<%= render :partial => "footer" %>

@@ -640,8 +640,10 @@ class Post < ActiveRecord::Base
       if can_be_voted_by?(CurrentUser.user)
         if score == "up"
           increment!(:score)
+          increment!(:up_score)
         elsif score == "down"
           decrement!(:score)
+          decrement!(:down_score)
         end
 
         votes.create(:score => score)

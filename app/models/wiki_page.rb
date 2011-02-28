@@ -5,8 +5,10 @@ class WikiPage < ActiveRecord::Base
   belongs_to :creator, :class_name => "User"
   validates_uniqueness_of :title, :case_sensitive => false
   validates_presence_of :body
-  attr_accessible :title, :body
+  validate :validate_locker_is_janitor
+  attr_accessible :title, :body, :is_locked
   scope :titled, lambda {|title| where(["title = ?", title.downcase.tr(" ", "_")])}
+  scope :recent, order("updated_at DESC").limit(25)
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, :foreign_key => "name", :primary_key => "title"
   has_many :versions, :class_name => "WikiPageVersion", :dependent => :destroy, :order => "wiki_page_versions.id ASC"
@@ -27,6 +29,13 @@ class WikiPage < ActiveRecord::Base
   
   def self.find_title_and_id(title)
     titled(title).select("title, id").first
+  end
+  
+  def validate_locker_is_janitor
+    if is_locked_changed? && !CurrentUser.is_janitor?
+      errors.add(:is_locked, "can be modified by janitors only")
+      return false
+    end
   end
   
   def revert_to(version)

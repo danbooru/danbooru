@@ -1,0 +1,8 @@
+<div>
+  <%= simple_form_for(@search) do |f| %>
+    <%= f.input :name_matches, :required => false, :label => "Name" %>
+    <%= f.input :category_equals, :required => false, :label => "Category" %>
+    <%= f.input :meta_sort, :collection => [["Name", "name.asc"], ["Count", "post_count.desc"], ["Date", "created_at.desc"]], :label => "Sort", :required => false %>
+    <%= f.button :submit, "Search" %>
+  <% end %>
+</div>

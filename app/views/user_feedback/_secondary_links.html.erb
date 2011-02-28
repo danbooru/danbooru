@@ -1,0 +1,7 @@
+<% if @user %>
+  <% content_for("subnavbar") do %>
+    <li><%= link_to "Add", :action => "create", :user_id => @user.id %></li>
+    <li><%= link_to "List for user", :action => "index", :user_id => @user.id %></li>
+    <li><%= link_to "List for all", :action => "index", :user_id => nil %></li>
+  <% end %>
+<% end %>

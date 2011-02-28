@@ -1,0 +1,20 @@
+<% form_tag(:controller => "forum", :action => "create") do %>
+	<p>You can create a forum thread to suggest the creation of an implication.</p>	
+	<table>
+		<tr>
+			<th><label for="tag_implication_predicate">From</label></th>
+			<td><%= text_field "tag_implication", "predicate", :size => 40 %></td>
+		</tr>
+		<tr>
+			<th><label for="tag_implication_consequent">To</label></th>
+			<td><%= text_field "tag_implication", "consequent", :size => 40 %></td>
+		</tr>
+		<tr>
+			<th><label for="tag_implication_reason">Reason</label></th>
+			<td><%= text_area "tag_implication", "reason", :rows => 10, :cols => 60 %></td>
+		</tr>
+		<tr>
+			<td colspan="2"><%= submit_tag "Submit" %></td>
+		</tr>
+	</table>
+<% end %>

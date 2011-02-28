@@ -1,0 +1,10 @@
+<% form_tag({:action => "mass_edit"}, :onsubmit => "return confirm('Are you sure you wish to perform this tag edit?')") do %>
+  <%= text_field_tag "start", params[:source], :size => 60 %>
+  <%= text_field_tag "result", params[:name], :size => 60 %>
+  <%= button_to_function "Preview", "$('preview').innerHTML = 'Loading...'; new Ajax.Updater('preview', '#{url_for(:controller=>"tag",:action=>"edit_preview")}', {method: 'get', parameters: 'tags=' + $F('start')})" %><%= submit_tag "Save" %>
+<% end %>
+
+<%= render :partial => "footer" %>
+
+<div id="preview">
+</div>

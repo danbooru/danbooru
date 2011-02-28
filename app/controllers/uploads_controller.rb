@@ -1,6 +1,6 @@
 class UploadsController < ApplicationController
   before_filter :member_only
-  respond_to :html, :xml, :json
+  respond_to :html, :xml, :json, :js
   
   def new
     @upload = Upload.new(:rating => "q")

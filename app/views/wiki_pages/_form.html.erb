@@ -1,0 +1,5 @@
+<%= f.input :title %>
+<%= f.input :body %>
+<% if CurrentUser. %>
+<%= f.input :is_locked %>
+<%= f.button :submit, "Save" %><%= f.button :submit, "Cancel" %><%= f.button :submit "Preview" %>

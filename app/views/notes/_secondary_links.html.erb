@@ -1,0 +1,7 @@
+<% content_for("subnavbar") do %>
+  <li><%= link_to "List", :action => "index" %></li>
+  <li><%= link_to "Search", :action => "search" %></li>
+  <li><%= link_to "History", :action => "history" %></li>
+  <li><%= link_to "Requests", :controller => "post", :action => "index", :tags => "translation_request" %></li>
+  <li><%= link_to "Help", :controller => "help", :action => "notes" %></li>
+<% end %>

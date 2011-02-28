@@ -1,0 +1,10 @@
+<aside id="sidebar">
+  <section>
+    <h1>Search</h1>
+    <%= simple_form_for(@search) do |f| %>
+      <%= f.input :title_contains %>
+    <% end %>
+  </section>
+
+  <%= render "recent_changes" %>
+</aside>

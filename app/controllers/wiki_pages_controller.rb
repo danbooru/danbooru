@@ -16,6 +16,13 @@ class WikiPagesController < ApplicationController
   def index
     @search = WikiPage.search(params[:search])
     @wiki_pages = @search.paginate(:page => params[:page])
+    respond_with(@wiki_pages) do |format|
+      format.html do
+        if @wiki_pages.count == 1
+          redirect_to(wiki_page_path(@wiki_pages.first))
+        end
+      end
+    end
   end
   
   def show

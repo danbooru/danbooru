@@ -1,0 +1,26 @@
+<div id="c-wiki-pages">
+  <div id="a-index">
+    <%= render :partial => "sidebar" %>
+
+    <section id="content">
+      <table>
+        <tr>
+          <th>Title</th>
+          <th>Last edited</th>
+        </tr>
+        <% @wiki_pages.each do |wiki_page| %>
+          <tr>
+            <td class="tag-category-<%= wiki_page.category_name %>"><%= link_to wiki_page.pretty_title, wiki_page_path(wiki_page, :nordirect => 1) %></td>
+            <td><%= wiki_page.updated_at.strftime("%m/%d/%Y %I:%M") %> by <%= h wiki_page.creator.name %></td>
+          </tr>
+        <% end %>
+      </table>
+
+      <div id="paginator">
+        <%= will_paginate(@wiki_pages) %>
+      </div>
+    </section>
+  </div>
+</div>
+
+<%= render "secondary_links" %>

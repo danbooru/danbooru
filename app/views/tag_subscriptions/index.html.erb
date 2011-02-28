@@ -1,0 +1,14 @@
+<% form_tag(:action => "update") do %>
+  <h4>Edit Tag Subscriptions</h4>
+  <div style="margin-bottom: 1em;">
+    You can only create up to <%= CONFIG["max_tag_subscriptions"] %> groups and each group can have up to 20 tags.
+  </div>
+  
+  <table width="100%" class="highlightable">
+    <%= render :partial => "listing", :locals => {:tag_subscriptions => @tag_subscriptions} %>
+  </table>
+<% end %>
+
+<% content_for("subnavbar") do %>
+  <li><%= link_to "Help", :controller => "help", :action => "tag_subscriptions" %></li>
+<% end %>

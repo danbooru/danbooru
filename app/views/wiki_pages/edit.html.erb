@@ -1,0 +1,15 @@
+<div id="c-wiki-pages">
+  <div id="a-edit">
+    <%= render "sidebar" %>
+
+    <section id="content">
+      <h1 id="wiki-page-title"><%= @wiki_page.pretty_title %> (Editing)</h1>
+      <%= simple_form_for(@wiki_page) do |f| %>
+        <%= render :partial => "form", :locals => {:f => f} %>
+      <% end %>
+    </section>
+
+    <%= render "secondary_links" %>    
+  </div>
+</div>
+

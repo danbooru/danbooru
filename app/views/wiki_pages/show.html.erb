@@ -1,0 +1,57 @@
+<div id="c-wiki-pages">
+  <div id="a-show">
+    <%= render "sidebar" %>
+    
+    <section id="content">
+      <h1 id="wiki-page-title"><%= @wiki_page.pretty_title %></h1>
+      
+      <div id="wiki-page-body">
+        <%= format_text(@wiki_page.body) %>
+      </div>
+      
+      <div id="wiki-page-posts">
+        <%= @wiki_page.presenter.posts %>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="wiki" id="wiki-show">
+  <%= render :partial => "sidebar" %>
+
+  <h2 class="title"><%= @presenter.html_title %></h2>
+
+  <div id="body">
+    <div style="margin-bottom: 1em;">
+      <%= @presenter.html_body(self) %>
+    </div>
+
+    <div style="margin-bottom: 1em;">
+      <%= @presenter.html_posts(self) %>
+    </div>
+  </div>
+  
+  <% content_for("footer") do %>
+    <li>|</li>
+    <% if @wiki_page.nil? %>
+      <li><%= link_to "Posts (#{Post.fast_count(params[:title])})", :controller => "post", :action => "index", :tags => params[:title] %></li>
+      <li><%= link_to "Edit", :controller => "wiki", :action => "edit", :title => params[:title] %></li>
+    <% else %>
+      <li><%= link_to "Posts (#{Post.fast_count(params[:title])})", :controller => "post", :action => "index", :tags => @title %></li>
+      <li><%= link_to "History", :controller => "wiki", :action => "history", :title => @wiki_page.title %></li>
+      <% if not @wiki_page.is_locked? %>
+        <li><%= link_to "Edit", :controller => "wiki", :action => "edit", :title => @wiki_page.title, :version => @wiki_page.version %></li>
+      <% end %>
+      <% if @wiki_page.is_locked? %>
+        <li><%= link_to "Unlock", {:controller => "wiki", :action => "unlock", :title => @wiki_page.title}, :method => "post" %></li>
+      <% else %>
+        <li><%= link_to "Revert", {:controller => "wiki", :action => "revert", :title => @wiki_page.title, :version => @wiki_page.version}, :confirm => "Are you sure you want to revert to this page?", :method => :post %></li>
+        <li><%= link_to "Delete", {:controller => "wiki", :action => "destroy", :title => @wiki_page.title}, :confirm => "Are you sure you want to delete this page (and all versions)?", :method => :post %></li>
+        <li><%= link_to "Lock", {:controller => "wiki", :action => "lock", :title => @wiki_page.title}, :method => :post %></li>
+        <li><%= link_to "Rename", :action => "rename", :title => @wiki_page.title %></li>
+      <% end %>    
+    <% end %>
+  <% end %>
+  
+  <%= render :partial => "footer" %>
+</div>

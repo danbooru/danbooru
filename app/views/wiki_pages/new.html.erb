@@ -1,0 +1,16 @@
+<div id="c-wiki-pages">
+  <div id="a-new">
+    <%= render "sidebar" %>
+
+    <section id="content">
+      <div id="preview">
+      </div>
+
+      <%= simple_form_for(@wiki_page) do |f| %>
+        <%= render :partial => "form", :locals => {:f => f} %>
+      <% end %>
+    </section>
+  </div>
+</div>
+
+<%= render "secondary_links" %>

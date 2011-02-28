@@ -1,0 +1,38 @@
+<table width="100%" class="row-highlight">
+  <thead>
+    <tr>
+      <th></th>
+      <th width="5%">Post</th>
+      <th width="5%">Note</th>
+      <th width="50%">Body</th>
+      <th width="10%">IP Address</th>
+      <th width="10%">Edited By</th>
+      <th width="10%">Date</th>
+      <th width="10%">Options</th>
+    </tr>    
+  </thead>
+  <tbody>
+    <% @notes.each do |note| %>
+      <tr class="<%= cycle 'even', 'odd' %>">
+        <td style="background: <%= id_to_color(note.post_id) %>;"></td>
+        <td><%= link_to note.post_id, :controller => "post", :action => "show", :id => note.post_id %></td>
+        <td><%= link_to "#{note.note_id}.#{note.version}", :controller => "note", :action => "history", :id => note.note_id %></td>
+        <td><%= h(note.body) %> <% unless note.is_active? %>(deleted)<% end %></td>
+        <td>
+          <% if @current_user.is_admin? %>
+            <%= note.ip_addr %>
+          <% end %>
+        </td>
+        <td><%= link_to h(note.author), :controller => "user", :action => "show", :id => note.user_id %></td>
+        <td><%= note.updated_at.strftime("%Y-%m-%d %H:%M") %></td>
+        <td><%= link_to "Revert", {:controller => "note", :action => "revert", :id => note.note_id, :version => note.version}, :method => :post, :confirm => "Do you really wish to revert to this note?" %></td>
+      </tr>
+    <% end %>    
+  </tbody>
+</table>
+
+<div id="paginator">
+  <%= will_paginate(@notes) %>
+</div>
+
+<%= render :partial => "footer" %>

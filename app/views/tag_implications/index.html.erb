@@ -1,0 +1,95 @@
+<div style="margin-bottom: 1em;">
+  <% form_tag({:action => "index"}, :method => :get) do %>
+    <%= text_field_tag "query", params[:query] %> 
+    <%= submit_tag "Search Implications" %>  
+    <%= submit_tag "Search Aliases" %>
+  <% end %>  
+</div>
+
+<% form_tag(:action => "update") do %>
+  <table class="highlightable" width="100%">
+    <thead>
+      <tr>
+        <th width="1%"></th>
+        <th width="19%">Predicate</th>
+        <th width="20%">Consequent</th>
+        <th width="60%">Reason</th>
+      </tr>      
+    </thead>
+    <tfoot>
+      <tr>
+        <td colspan="4">
+          <% if @current_user.is_admin_or_higher? %>
+            <%= button_to_function "Select pending", "$$('.pending').each(function(x) {x.checked = true})" %> 
+            <%= submit_tag "Approve" %> 
+            <%= button_to_function "Delete", "$('reason-box').show(); $('reason').focus()" %>
+          <% end %>
+          
+          <% if @current_user.is_admin_or_higher? %>
+            <%= button_to_function "Add", "$('add-box').show().scrollTo(); $('tag_implication_predicate').focus()" %>
+          <% else %>
+            <%= button_to_function "Add", "window.location = '/forum/new?type=impl'" %>            
+          <% end %>
+
+          <% if @current_user.is_admin_or_higher? %>
+            <div id="reason-box" style="display: none; margin-top: 1em;">
+              <strong>Reason:</strong>
+              <%= text_field_tag "reason", "", :size => 40 %>
+              <%= submit_tag "Delete" %>
+            </div>
+          <% end %>
+        </td>
+      </tr>      
+    </tfoot>
+    <tbody>
+      <% @implications.each do |i| %>
+        <tr class="<%= cycle 'even', 'odd' %> <%= i.is_pending? ? 'pending-tag' : nil %>">
+          <td><input type="checkbox" value="1" name="implications[<%= i.id %>]" <%= i.is_pending? ? 'class="pending"' : nil %>></td>
+          <td><%= link_to h(i.predicate.name), :controller => "post", :action => "index", :tags => i.predicate.name %> (<%= i.predicate.post_count %>)</td>
+          <td><%= link_to h(i.consequent.name), :controller => "post", :action => "index", :tags => i.consequent.name %> (<%= i.consequent.post_count %>)</td>
+          <td><%= h i.reason %></td>
+        </tr>
+      <% end %>      
+    </tbody>
+  </table>
+<% end %>
+
+<% if @current_user.is_admin_or_higher? %>
+  <div id="add-box" <% unless params[:to_name] %>style="display: none;"<% end %>>
+    <% form_tag(:action => "create") do %>
+      <h4>Add Implication</h4>
+      <% unless @current_user.is_anonymous? %>
+        <%= hidden_field_tag "tag_implication[creator_id]", @current_user.id %>
+      <% end %>
+    
+      <table>
+        <tr>
+          <th><label for="tag_implication_predicate">Predicate</label></th>
+          <td><%= text_field "tag_implication", "predicate", :size => 40, :value => params[:from_name] %></td>
+        </tr>
+        <tr>
+          <th><label for="tag_implication_consequent">Consequent</label></th>
+          <td><%= text_field "tag_implication", "consequent", :size => 40, :value => params[:to_name] %></td>
+        </tr>
+        <tr>
+          <th><label for="tag_implication_reason">Reason</label></th>
+          <td><%= text_area "tag_implication", "reason", :size => "40x2", :value => params[:reason] %></td>
+        </tr>
+        <tr>
+          <td colspan="2"><%= submit_tag "Submit" %></td>
+        </tr>
+      </table>
+    <% end %>
+  </div>
+<% end %>
+
+<div id="paginator">
+  <%= will_paginate(@implications) %>
+</div>
+
+<% content_for("subnavbar") do %>
+  <li><%= link_to "List", :controller => "tag_implication", :action => "index" %></li>
+  <li><%= link_to "Add", :controller => "tag_implication", :action => "new" %></li>
+  <li><%= link_to "Help", :controller => "help", :action => "tag_implications" %></li>
+<% end %>
+

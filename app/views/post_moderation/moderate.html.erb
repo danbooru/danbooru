@@ -1,0 +1,56 @@
+<form method="get" action="/post/moderate">
+  <%= text_field_tag "query", params[:query], :size => 40 %>
+  <%= submit_tag "Search" %>
+</form>
+
+<script type="text/javascript" charset="utf-8">
+  Post.mod_queue = $A(<%= @posts.map(&:id).to_json %>)
+</script>
+
+<div style="margin-bottom: 2em;">
+  <h2>Moderation Queue</h2>
+  
+  <div style="margin: 1em 0;">
+    <h4>Deletion Guidelines</h4>
+    <p>As a general rule, you should not delete posts. Only approve of posts that you personally like. Posts that are not approved in three days will be automatically deleted. Posts with score -3 or lower are marked red. Posts with score 3 or higher are marked green. Posts tagged as duplicate are marked yellow. <% if params[:hidden] %>Click <%= fast_link_to "here", :action => "moderate", :query => params[:query], :hidden => nil %> to view all posts.<% else %>Click <%= fast_link_to "here", :action => "moderate", :query => params[:query], :hidden => true %> to view hidden posts.<% end %></p>
+    
+    <p>Mass update: <%= link_to_function "Approve all", "if (confirm('This will approve every pending post on this page. Continue?')) {Post.mass_moderate('Approve')}" %> | <%= link_to_function "Hide all", "if (confirm('This will hide every pending post on this page. Continue?')) {Post.mass_moderate('Hide')}" %></p>
+  </div>
+
+  <table width="100%">
+    <tbody>
+      <% @posts.each do |p| %>
+        <tr id="mod-row-<%= p.id %>" class="<% if p.cached_tags =~ /(^| )duplicate($| )/ %>dupe<% elsif p.score > 2 %>good<% elsif p.score < -2 %>bad<% else %><%= cycle 'even', 'odd' %><% end %>">
+          <td width="10%"><%= fast_link_to image_tag(p.preview_url, :class => (p.status == "flagged" ? "flagged" : nil), :width => p.preview_dimensions[0], :height => p.preview_dimensions[1]), {:controller => "post", :action => "show", :id => p.id}, :target => "_blank" %></td>
+          <td width="90%">
+            <ul>
+              <li>
+                <%= link_to_function "Approve", "Post.moderate(#{p.id}, 'Approve')" %> | 
+                <% if @current_user.is_janitor_or_higher? %>
+                  <%= link_to_function "Delete", "Post.moderate(#{p.id}, 'Delete')" %> | 
+                <% end %>
+                <%= link_to_function "Hide", "Post.moderate(#{p.id}, 'Hide')" %>
+              </li>
+              <li>Rating: <%= p.pretty_rating %></li>
+              <li>Hidden: <%= p.mod_hidden_count %></li>
+              <% if p.pools.any? %>
+                <li>Pools: <%= h p.pools.map {|x| x.pretty_name}.join(", ") %></li>
+              <% end %>
+              <% if p.parent_id %>
+                <li>Parent: <%= fast_link_to p.parent_id, :action => "moderate", :query => "parent:#{p.parent_id}" %></li>
+              <% end %>
+              <li>Tags: <%= h p.cached_tags %></li>
+              <li>Score: <span id="post-score-<%= p.id %>"><%= p.score %></span> (vote <%= link_to_function "down", "Post.vote(-1, #{p.id})" %>)</li>
+              <% if p.flag_detail && p.flag_detail.reason %>
+                <li>Flagged: <%= h p.flag_detail.reason %></li>
+              <% end %>
+              <li>Uploaded by <%= fast_link_to h(p.author), :controller => "user", :action => "show", :id => p.user_id %> <%= time_ago_in_words(p.created_at) %> ago (<%= fast_link_to "mod", :action => "moderate", :query => "user:#{p.author}" %>)</li>
+            </ul>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<%= render :partial => "footer" %>

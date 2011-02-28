@@ -1,0 +1,27 @@
+<%= render "search" %>
+
+<table width="100%" class="highlightable"> 
+  <thead>
+    <tr>
+      <th>Count</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @tags.each do |tag| %>
+      <tr>
+        <td><%= tag.post_count %></td>
+        <td class="tag-category-<%= tag.category_name %>">
+          <%= link_to("?", wiki_pages_path(:search => {:title_equals => tag.name})) %>
+          <%= link_to(tag.name, posts_path(:tags => tag.name)) %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<div id="paginator">
+  <%= will_paginate(@tags) %>
+</div>
+
+<%= render "secondary_links" %>

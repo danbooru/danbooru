@@ -3,6 +3,8 @@ class CreatePosts < ActiveRecord::Migration
     create_table :posts do |t|
       t.timestamps
       
+      t.column :up_score, :integer, :null => false, :default => 0
+      t.column :down_score, :integer, :null => false, :default => 0
       t.column :score, :integer, :null => false, :default => 0
       t.column :source, :string
       t.column :md5, :string, :null => false
