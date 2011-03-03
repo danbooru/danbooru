@@ -218,9 +218,26 @@ div.dtext p {
   margin-bottom: 1em; }
 
 /*** Pools ***/
-div.pools div.edit p {
+div#c-pools div#a-edit p {
   margin-bottom: 1em;
   width: 40em; }
+div#c-pools div#a-edit ul.ui-sortable {
+  list-style-type: none; }
+  div#c-pools div#a-edit ul.ui-sortable span {
+    margin: 0;
+    float: right;
+    cursor: pointer; }
+  div#c-pools div#a-edit ul.ui-sortable li {
+    padding: 0.5em; }
+  div#c-pools div#a-edit ul.ui-sortable li.ui-state-default {
+    margin-bottom: 20px;
+    width: 250px;
+    background: none; }
+  div#c-pools div#a-edit ul.ui-sortable li.ui-state-placeholder {
+    margin-bottom: 20px;
+    width: 250px;
+    height: 150px;
+    background: none; }
 
 /*** Comments ***/
 div.comments-for-post div.list-of-comments article {
@@ -254,38 +271,43 @@ div.favorites section#content > h1 {
   display: none; }
 
 /*** Posts ***/
-div.posts h1 {
+article.post-preview {
+  margin-right: 4em;
+  margin-bottom: 4em;
+  float: left; }
+
+div#c-posts h1 {
   font-size: 1.2em; }
-div.posts h2 {
+div#c-posts h2 {
   font-size: 1.1em; }
-div.posts aside#sidebar > section > ul li {
+div#c-posts aside#sidebar > section > ul li {
   list-style-type: none; }
-div.posts aside#sidebar > section > ul ul li {
+div#c-posts aside#sidebar > section > ul ul li {
   margin-left: 1em; }
-div.posts section#tag-and-wiki-box {
+div#c-posts section#tag-and-wiki-box {
   padding: 0; }
-  div.posts section#tag-and-wiki-box menu li {
+  div#c-posts section#tag-and-wiki-box menu li {
     display: inline-block; }
-  div.posts section#tag-and-wiki-box menu li.active a {
+  div#c-posts section#tag-and-wiki-box menu li.active a {
     color: #000; }
-  div.posts section#tag-and-wiki-box h1 {
+  div#c-posts section#tag-and-wiki-box h1 {
     font-size: 1.2em; }
-  div.posts section#tag-and-wiki-box div#tag-box h2 {
+  div#c-posts section#tag-and-wiki-box div#tag-box h2 {
     display: none; }
-  div.posts section#tag-and-wiki-box div#tag-box li {
+  div#c-posts section#tag-and-wiki-box div#tag-box li {
     list-style-type: none; }
-  div.posts section#tag-and-wiki-box div#wiki-box h2 {
+  div#c-posts section#tag-and-wiki-box div#wiki-box h2 {
     display: none; }
-div.posts section#content > h1 {
+div#c-posts section#content > h1 {
   display: none; }
-div.posts section#content section > h2 {
+div#c-posts section#content section > h2 {
   display: none; }
-div.posts section#content menu#post-sections {
+div#c-posts section#content menu#post-sections {
   margin-bottom: 1em; }
-  div.posts section#content menu#post-sections li {
+  div#c-posts section#content menu#post-sections li {
     font-size: 1.1em;
     font-weight: bold; }
-  div.posts section#content menu#post-sections li.active a {
+  div#c-posts section#content menu#post-sections li.active a {
     color: black; }
 
 /*** Post Histories ***/

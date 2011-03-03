@@ -4,8 +4,8 @@
 <ul id="sortable">
   <% posts.each do |post| %>
     <li class="ui-state-default" id="pool[post_id_array]_<%= post.id %>">
-      <%= link_to(image_tag(post.preview_file_url), post_path(post)) %>
-      <span class="delete">Delete</span>
+      <%= link_to(image_tag(post.preview_file_url), post_path(post)) %>        
+      <span class="ui-icon ui-icon-closethick delete" title="Remove post"></span>
     </li>
   <% end %>
 </ul>

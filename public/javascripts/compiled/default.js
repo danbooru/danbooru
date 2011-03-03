@@ -1430,7 +1430,9 @@ $(document).ready(function() {
   }
   
   Danbooru.Pool.initialize_simple_edit = function() {
-    $("ul#sortable").sortable();
+    $("ul#sortable").sortable({
+      placeholder: "ui-state-placeholder"
+    });
     $("ul#sortable").disableSelection();
     $("ul#sortable span.delete").click(function(e) {
       $(e.target).parent().remove();

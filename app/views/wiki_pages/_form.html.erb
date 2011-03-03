@@ -1,5 +1,8 @@
-<%= f.input :title %>
+<% if @wiki_page.new_record? || CurrentUser.is_moderator? %>
+  <%= f.input :title %>
+<% end %>
 <%= f.input :body %>
-<% if CurrentUser. %>
-<%= f.input :is_locked %>
+<% if CurrentUser.is_janitor? %>
+  <%= f.input :is_locked %>
+<% end %>
 <%= f.button :submit, "Save" %><%= f.button :submit, "Cancel" %><%= f.button :submit "Preview" %>

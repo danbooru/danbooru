@@ -311,11 +311,38 @@ div.dtext {
 
 /*** Pools ***/
 
-div.pools {
-  div.edit {
+div#c-pools {
+  div#a-edit {
     p {
       margin-bottom: 1em;
       width: 40em;
+    }
+    
+    ul.ui-sortable {
+      list-style-type: none;
+
+      span {
+        margin: 0;
+        float: right;
+        cursor: pointer;
+      }
+      
+      li {
+        padding: 0.5em;
+      }
+      
+      li.ui-state-default {
+        margin-bottom: 20px;
+        width: 250px;
+        background: none;
+      }
+      
+      li.ui-state-placeholder {
+        margin-bottom: 20px;
+        width: 250px;
+        height: 150px;
+        background: none;
+      }
     }
   }
 }
@@ -386,7 +413,13 @@ div.favorites {
 
 /*** Posts ***/
 
-div.posts {
+article.post-preview {
+  margin-right: 4em;
+  margin-bottom: 4em;
+  float: left;
+}
+
+div#c-posts {
   h1 {
     font-size: 1.2em;
   }

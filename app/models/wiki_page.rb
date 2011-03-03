@@ -76,4 +76,12 @@ class WikiPage < ActiveRecord::Base
   def initialize_creator
     self.creator_id = CurrentUser.user.id
   end
+  
+  def post_set
+    @post_set ||= PostSets::WikiPage.new(title)
+  end
+  
+  def presenter
+    @presenter ||= WikiPagePresenter.new(self)
+  end
 end
