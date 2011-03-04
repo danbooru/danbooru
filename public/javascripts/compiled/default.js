@@ -1423,9 +1423,25 @@ $(document).ready(function() {
   Danbooru.Pool.initialize_add_to_pool_link = function() {
     $("#add-to-pool-dialog").dialog({autoOpen: false});
     
+    $("#c-pools-posts #a-new input[type=text]").autocomplete({
+      source: function(req, resp) {
+        $.getJSON(
+          "/pools.json?search[name_contains]=" + req.term,
+          function(data) {
+            resp(data.map(function(x) {return x.pool.name;}));
+          }
+        );
+      },
+      minLength: 4,
+    });
+    
     $("a#pool").click(function() {
       $("#add-to-pool-dialog").dialog("open");
       return false;
+    });
+    
+    $("ul#recent-pools li").click(function() {
+      $("#pool_name").val($(this).html());
     });
   }
   

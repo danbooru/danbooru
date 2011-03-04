@@ -35,14 +35,12 @@ Danbooru::Application.routes.draw do
   end
   resources :note_versions, :only => [:index]
   resources :pools do
-    resources :posts, :controller => "pools_posts", :only => [:create, :destroy, :show]
     member do
       put :revert
     end
   end
   resources :pool_versions, :only => [:index]
   resources :posts do
-    resources :pools, :controller => "pools_posts", :only => [:create]
     resources :votes, :controller => "post_votes", :only => [:create, :destroy]
     member do
       put :revert
@@ -70,6 +68,8 @@ Danbooru::Application.routes.draw do
   end
   resources :wiki_page_versions, :only => [:index]
 
+  match '/pool_post' => 'pools_posts#create', :via => :post, :as => 'pool_post'
+  match '/pool_post' => 'pools_posts#destroy', :via => :delete, :as => 'pool_post'
   match '/post_moderation/moderate' => 'post_moderation#moderate'
   match '/post_moderation/disapprove' => 'post_moderation#disapprove', :via => :put
   match '/post_moderation/approve' => 'post_moderation#approve', :via => :put

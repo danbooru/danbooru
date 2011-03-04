@@ -309,6 +309,28 @@ div.dtext {
 }
 
 
+/*** Pools Posts ***/
+
+div#c-pools-posts {
+  div#a-new {
+    form {
+      margin-bottom: 1em;
+    }
+    
+    h1 {
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+    
+    li {
+      margin-left: 1em;
+      cursor: pointer;
+    }
+  }
+}
+
+
+
 /*** Pools ***/
 
 div#c-pools {

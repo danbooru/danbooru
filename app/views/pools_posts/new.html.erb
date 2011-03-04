@@ -1,4 +1,18 @@
-<%= form_for(post_pools_path(@post)) do %>
-  <p>Select a pool:</p>
-  <%= recent_pool_list %>
-<% end %>
+<div id="c-pools-posts">
+  <div id="a-new">
+    <%= form_tag(pool_post_path) do %>
+      <%= hidden_field_tag "post_id", @post.id %>
+      <%= text_field_tag "pool_name", "", :size => 20 %>
+      <%= submit_tag "Select" %>
+    <% end %>    
+
+    <div>
+      <h1>Recent Pools</h1>
+      <ul id="recent-pools">
+        <% recent_updated_pools.each do |pool| %>
+          <li><%= pool.name %></li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</div>

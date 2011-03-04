@@ -217,6 +217,16 @@ form.simple_form div.input {
 div.dtext p {
   margin-bottom: 1em; }
 
+/*** Pools Posts ***/
+div#c-pools-posts div#a-new form {
+  margin-bottom: 1em; }
+div#c-pools-posts div#a-new h1 {
+  font-size: 1.2em;
+  font-weight: bold; }
+div#c-pools-posts div#a-new li {
+  margin-left: 1em;
+  cursor: pointer; }
+
 /*** Pools ***/
 div#c-pools div#a-edit p {
   margin-bottom: 1em;
