@@ -1,6 +1,6 @@
 class CommentsController < ApplicationController
   respond_to :html, :xml, :json
-  before_filter :member_only, :only => [:update, :create]
+  before_filter :member_only, :only => [:update, :create, :edit]
 
   def index
     if params[:group_by] == "post"
@@ -13,7 +13,7 @@ class CommentsController < ApplicationController
   def update
     @comment = Comment.find(params[:id])
     @comment.update_attributes(params[:comment])
-    respond_with(@comment)
+    respond_with(@comment, :location => post_path(@comment.post_id))
   end
   
   def create
@@ -26,6 +26,11 @@ class CommentsController < ApplicationController
         redirect_to post_path(@comment.post), :notice => "Comment posted"
       end
     end
+  end
+  
+  def edit
+    @comment = Comment.find(params[:id])
+    respond_with(@comment)
   end
   
 private

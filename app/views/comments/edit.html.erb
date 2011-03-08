@@ -1,0 +1,11 @@
+<div id="c-comments">
+  <div id="a-edit">
+    <h1>Edit Comment</h1>    
+    
+    <%= simple_form_for(@comment) do |f| %>
+      <%= f.input :body %>
+      <%= f.button :submit %>
+    <% end %>
+  </div>
+</div>
+
