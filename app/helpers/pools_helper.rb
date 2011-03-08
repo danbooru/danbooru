@@ -1,6 +1,10 @@
 module PoolsHelper
-  def recent_updated_pools(&block)
+  def recent_updated_pools
     pool_ids = session[:recent_pool_ids].to_s.scan(/\d+/)
-    Pool.where(["id IN (?)", pool_ids]).each(&block) if pool_ids.any?
+    if pool_ids.any?
+      Pool.where(["id IN (?)", pool_ids])
+    else
+      []
+    end
   end
 end

@@ -1,9 +1,12 @@
 <article data-comment-id="<%= comment.id %>">
   <div class="author">
     <h1><%= link_to comment.creator_name, user_path(comment.creator_id) %></h1>
-    <time datetime="<%= comment.created_at %>">
-      <%= time_ago_in_words(comment.created_at) %> ago
-    </time>
+    <p>
+      <time datetime="<%= comment.created_at %>">
+        <%= time_ago_in_words(comment.created_at) %> ago
+      </time>
+    </p>
+    <p><span class="comment-score" id="score-for-comment-<%= comment.id %>"><%= pluralize comment.score, "point" %></span></p>
   </div>
   <div class="content">
     <div>

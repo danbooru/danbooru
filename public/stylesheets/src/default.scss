@@ -6,7 +6,7 @@ $link_hover_color: #9093FF;
 }
 
 body, div, h1, h2, h3, h4, h5, h6, p, ul, li, dd, dt {
-  font-family: verdana, sans-serif;
+  font-family: Verdana, Geneva, sans-serif;
 	font-size: 100%;
   margin: 0;
   padding: 0;
@@ -377,6 +377,10 @@ div.comments-for-post {
     article {
       margin-bottom: 2em;
       
+      span.comment-score {
+        color: #CCC;
+      }
+      
       div.author {
         width: 20%;
         float: left;
@@ -396,8 +400,32 @@ div.comments-for-post {
   }
 }
 
-div.comments {
-  div.index {
+div#c-comments {
+  div#a-index {
+    div.header {
+      span.info {
+        margin-right: 1.5em;
+      }
+
+      strong, time {
+        margin-right: 0.3em;
+      }
+      
+      time {
+        font-weight: bold;
+      }
+      
+      div.list-of-tags {
+        a {
+          margin-right: 0.5em;
+        }
+      }
+      
+      div.notices {
+        margin: 1em 0;
+      }
+    }
+    
     div.preview {
       float: left;
       width: 180px;
@@ -555,58 +583,6 @@ div.post_histories {
 div#unapprove-dialog {
   p {
     margin-bottom: 1em;
-  }
-}
-
-
-/*** Comments ***/
-div.comment-response {
-}
-
-div.comment-response > div {
-	margin-top: 1em;
-}
-
-div.comment-list > article {
-  margin-bottom: 1em;
-  display: block;
-}
-
-div.comment-list > article > header {
-  float: left;
-  width: 15em;
-}
-
-div.comment-list > article > div {
-  float: left;
-  width: 40em;
-}
-
-div.comments {
-  div.index {
-    div.header {
-      span.info {
-        margin-right: 1.5em;
-      }
-
-      strong, time {
-        margin-right: 0.3em;
-      }
-      
-      time {
-        font-weight: bold;
-      }
-      
-      div.list-of-tags {
-        a {
-          margin-right: 0.5em;
-        }
-      }
-      
-      div.notices {
-        margin: 1em 0;
-      }
-    }
   }
 }
 

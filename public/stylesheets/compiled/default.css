@@ -2,7 +2,7 @@
   display: none !important; }
 
 body, div, h1, h2, h3, h4, h5, h6, p, ul, li, dd, dt {
-  font-family: verdana, sans-serif;
+  font-family: Verdana, Geneva, sans-serif;
   font-size: 100%;
   margin: 0;
   padding: 0;
@@ -252,6 +252,8 @@ div#c-pools div#a-edit ul.ui-sortable {
 /*** Comments ***/
 div.comments-for-post div.list-of-comments article {
   margin-bottom: 2em; }
+  div.comments-for-post div.list-of-comments article span.comment-score {
+    color: #CCC; }
   div.comments-for-post div.list-of-comments article div.author {
     width: 20%;
     float: left; }
@@ -263,15 +265,25 @@ div.comments-for-post div.comment-preview {
   width: 40em;
   margin-bottom: 2em; }
 
-div.comments div.index div.preview {
+div#c-comments div#a-index div.header span.info {
+  margin-right: 1.5em; }
+div#c-comments div#a-index div.header strong, div#c-comments div#a-index div.header time {
+  margin-right: 0.3em; }
+div#c-comments div#a-index div.header time {
+  font-weight: bold; }
+div#c-comments div#a-index div.header div.list-of-tags a {
+  margin-right: 0.5em; }
+div#c-comments div#a-index div.header div.notices {
+  margin: 1em 0; }
+div#c-comments div#a-index div.preview {
   float: left;
   width: 180px; }
-div.comments div.index div.post {
+div#c-comments div#a-index div.post {
   margin-bottom: 4em; }
-  div.comments div.index div.post div.comments-for-post {
+  div#c-comments div#a-index div.post div.comments-for-post {
     float: left;
     width: 55em; }
-    div.comments div.index div.post div.comments-for-post h1 {
+    div#c-comments div#a-index div.post div.comments-for-post h1 {
       font-size: 1.2em; }
 
 /*** Favorites ***/
@@ -341,33 +353,6 @@ div.post_histories div.index div.post {
 /*** Post Unapprovals ***/
 div#unapprove-dialog p {
   margin-bottom: 1em; }
-
-/*** Comments ***/
-div.comment-response > div {
-  margin-top: 1em; }
-
-div.comment-list > article {
-  margin-bottom: 1em;
-  display: block; }
-
-div.comment-list > article > header {
-  float: left;
-  width: 15em; }
-
-div.comment-list > article > div {
-  float: left;
-  width: 40em; }
-
-div.comments div.index div.header span.info {
-  margin-right: 1.5em; }
-div.comments div.index div.header strong, div.comments div.index div.header time {
-  margin-right: 0.3em; }
-div.comments div.index div.header time {
-  font-weight: bold; }
-div.comments div.index div.header div.list-of-tags a {
-  margin-right: 0.5em; }
-div.comments div.index div.header div.notices {
-  margin: 1em 0; }
 
 /*** Sessions ***/
 div#sessions div#new section {

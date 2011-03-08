@@ -31,7 +31,7 @@
           <%= nav_link_to("My Account", user_path(CurrentUser.user)) %>
         <% end %>
         <%= nav_link_to("Posts", posts_path) %>
-        <%= nav_link_to("Comments", comments_path) %>
+        <%= nav_link_to("Comments", comments_path(:group_by => "post")) %>
         <%= nav_link_to("Notes", notes_path) %>
         <%= nav_link_to("Artists", artists_path(:order => "date")) %>
         <%= nav_link_to("Tags", tags_path(:order => "date")) %>

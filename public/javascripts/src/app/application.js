@@ -1,22 +1,22 @@
 $(document).ready(function() {
   Cookie.setup();
   
-	// $("#hide-upgrade-account-link").click(function() {
-	// 	$("#upgrade-account").hide();
-	// 	Cookie.put('hide-upgrade-account', '1', 7);
-	// });
+  // $("#hide-upgrade-account-link").click(function() {
+  //   $("#upgrade-account").hide();
+  //   Cookie.put('hide-upgrade-account', '1', 7);
+  // });
 
   // Table striping
   $("table.striped tbody tr:even").addClass("even");
   $("table.striped tbody tr:odd").addClass("odd");
 
-	// Comment listing
-	$(".comment-section form").hide();
-	$(".comment-section input.expand-comment-response").click(function() {
-		var post_id = $(this).closest(".comment-section").attr("data-post-id");
-		$(".comment-section[data-post-id=" + post_id + "] form").show();
-		$(this).hide();
-	});
+  // Comment listing
+  $(".comment-section form").hide();
+  $(".comment-section input.expand-comment-response").click(function() {
+    var post_id = $(this).closest(".comment-section").attr("data-post-id");
+    $(".comment-section[data-post-id=" + post_id + "] form").show();
+    $(this).hide();
+  });
 
   // Image resize sidebar
   $("#resize-links").hide();
@@ -29,11 +29,11 @@ $(document).ready(function() {
     image.attr("height", target.attr("data-height"));
     e.preventDefault();
   }); 
-	
-	$("#resize-link a").click(function(e) {
-	  $("#resize-links").toggle();
-	  e.preventDefault();
-	});
+  
+  $("#resize-link a").click(function(e) {
+    $("#resize-links").toggle();
+    e.preventDefault();
+  });
 });
 
 

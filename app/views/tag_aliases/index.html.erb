@@ -1,5 +1,5 @@
 <div style="margin-bottom: 1em;">
-  <% form_tag({:action => "index"}, :method => :get) do %>
+  <% form_tag(tag_aliases_path, :method => :get) do %>
     <%= text_field_tag "query", params[:query] %> 
     <%= submit_tag "Search Aliases" %>
     <%= submit_tag "Search Implications" %>  
@@ -12,7 +12,7 @@
       <thead>
         <tr>
           <th width="1%"></th>
-          <th width="19%">Alias</th>
+          <th width="19%">From</th>
           <th width="20%">To</th>
           <th width="60%">Reason</th>
         </tr>        
