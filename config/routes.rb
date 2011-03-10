@@ -68,6 +68,9 @@ Danbooru::Application.routes.draw do
   end
   resources :wiki_page_versions, :only => [:index]
 
+  match '/favorites/:id' => 'favorites#create', :via => :post, :as => "favorite"
+  match '/favorites/:id' => 'favorites#destroy', :via => :delete, :as => "favorite"
+  match '/favorites' => 'favorites#index', :via => :get, :as => "favorites"
   match '/pool_post' => 'pools_posts#create', :via => :post, :as => 'pool_post'
   match '/pool_post' => 'pools_posts#destroy', :via => :delete, :as => 'pool_post'
   match '/post_moderation/moderate' => 'post_moderation#moderate'

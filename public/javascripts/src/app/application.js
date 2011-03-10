@@ -15,6 +15,15 @@ $(document).ready(function() {
     $(".comment-section[data-post-id=" + post_id + "] form").show();
     $(this).hide();
   });
+  
+  // Ajax links
+  $("a[data-remote=true]").click(function(e) {
+    Danbooru.ajax_start(e.target);
+  })
+  
+  $("a[data-remote=true]").ajaxComplete(function(e) {
+    Danbooru.ajax_stop(e.target);
+  })
 
   // Image resize sidebar
   $("#resize-links").hide();

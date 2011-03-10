@@ -6,13 +6,12 @@
         <%= time_ago_in_words(comment.created_at) %> ago
       </time>
     </p>
-    <p><span class="comment-score" id="score-for-comment-<%= comment.id %>"><%= pluralize comment.score, "point" %></span></p>
   </div>
   <div class="content">
     <div>
       <%= format_text(comment.body) %>
     </div>
-    <menu>
+    <menu> 
       <li><span class="link">Reply</span></li>
       <% if CurrentUser.user.is_janitor? || CurrentUser.user.id == comment.creator_id %>
         <li><%= link_to "Delete", comment_path(comment.id), :confirm => "Do you really want to delete this comment?", :method => :delete %></li>

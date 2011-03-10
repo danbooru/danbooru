@@ -12,7 +12,7 @@
       <tr>
         <td><%= tag.post_count %></td>
         <td class="tag-category-<%= tag.category_name %>">
-          <%= link_to("?", wiki_pages_path(:search => {:title_equals => tag.name})) %>
+          <%= link_to("?", wiki_pages_path(:title => tag.name)) %>
           <%= link_to(tag.name, posts_path(:tags => tag.name)) %>
         </td>
       </tr>

@@ -2,5 +2,6 @@
 
 while true ; do
   script/custom/compile_javascripts ;
+  sass public/stylesheets/src/default.scss public/stylesheets/compiled/default.css ;
   sleep 1 ;
 done

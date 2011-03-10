@@ -5,7 +5,7 @@
     <% if @pool %>
       <li>|</li>
       <li><%= link_to "Show", pool_path(@pool) %></li>
-      <li><%= link_to "Search", posts_path(:tags => "pool:#{@pool.id}") %></li>
+      <li><%= link_to "Posts", posts_path(:tags => "pool:#{@pool.id}") %></li>
       <li><%= link_to "Simple Edit", edit_pool_path(@pool) %></li>
       <li><%= link_to "Advanced Edit", edit_pool_path(@pool, :advanced => true) %></li>
     <% end %>

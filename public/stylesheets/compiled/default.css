@@ -416,3 +416,26 @@ div.users div.new {
 /*** Uploads ***/
 div.uploads div.new div#upload-guide-notice {
   margin-bottom: 2em; }
+
+/*** notify ***/
+.notify-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; }
+  .notify-container .notify-notification {
+    position: relative; }
+    .notify-container .notify-notification .notify-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #333;
+      z-index: 1; }
+    .notify-container .notify-notification .notify-message {
+      position: relative;
+      z-index: 2;
+      padding: 20px;
+      text-align: center;
+      color: #FFF; }

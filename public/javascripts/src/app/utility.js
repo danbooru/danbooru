@@ -11,11 +11,11 @@
     this.j_alert("Error", msg);
   }
   
-  Danbooru.ajax_start = function(element) {
-    $(element).after(' <span class="wait">...</span>');
+  Danbooru.ajax_start = function(target) {
+    $(target).after(' <img src="/images/wait.gif" width="15" height="5" class="wait">');
   }
   
-  Danbooru.ajax_stop = function(element) {
-    $(element).next("span.wait").remove();
+  Danbooru.ajax_stop = function(target) {
+    $(target).next("img.wait").remove();
   }
 })();

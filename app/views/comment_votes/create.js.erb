@@ -1,5 +1,3 @@
 <% if @error %>
   alert("<%= escape_javascript(@error.to_s) %>");
-<% else %>
-  $("#score-for-comment-<%= @comment.id %>").html("<%= pluralize @comment.score, 'point' %>");
 <% end %>

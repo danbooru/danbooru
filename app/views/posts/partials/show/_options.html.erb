@@ -1,16 +1,16 @@
 <ul>
   <%= resize_image_links(post, CurrentUser.user) %>
-  <li><%= link_to "Favorite", "#", :id => "add-to-favorites" %> <%= wait_image("add-to-favorites-wait") %></li>
-  <li><%= link_to "Unfavorite", "#", :id => "remove-from-favorites" %> <%= wait_image("remove-from-favorites-wait") %></li>
+  <li><%= link_to "Favorite", favorite_path(post), :remote => true, :method => :post, :id => "add-to-favorites" %></li>
+  <li><%= link_to "Unfavorite", favorite_path(post), :remote => true, :method => :delete, :id => "remove-from-favorites" %></li>
   <li><%= link_to "Translate", "#" %></li>
   <li><%= link_to "Unapprove", new_unapproval_path(:post_id => post.id), :id => "unapprove" %></li>
   <% if CurrentUser.is_janitor? %>
-    <li><%= link_to "Approve", "#", :id => "approve" %> <%= wait_image("approve-wait") %></li>
-    <li><%= link_to "Disapprove", "#", :id => "disapprove" %> <%= wait_image("disapprove-wait") %></li>
+    <li><%= link_to "Approve", post_moderation_approve_path(:post_id => post.id), :remote => true, :method => :put, :id => "approve" %></li>
+    <li><%= link_to "Disapprove", post_moderation_disapprove_path(:post_id => post.id), :remote => true, :method => :put, :id => "disapprove" %></li>
   <% end %>
   <% if CurrentUser.is_moderator? %>
-    <li><%= link_to "Undelete", "#", :id => "undelete" %> <%= wait_image("undelete-wait") %></li>
-    <li><%= link_to "Delete", "#", :id => "delete" %> <%= wait_image("delete-wait") %></li>
+    <li><%= link_to "Undelete", post_moderation_undelete_path(:post_id => post.id), :remote => true, :method => :post, :id => "undelete" %></li>
+    <li><%= link_to "Delete", post_moderation_delete_path(:post_id => post.id), :remote => true, :method => :post, :id => "delete" %></li>
   <% end %>
   <li><%= link_to "Pool", "#", :id => "pool" %></li>
 </ul>
