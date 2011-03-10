@@ -2,21 +2,21 @@ $link_color: #006FFA;
 $link_hover_color: #9093FF;
 
 .blacklisted {
-	display: none !important; 
+  display: none !important; 
 }
 
 body, div, h1, h2, h3, h4, h5, h6, p, ul, li, dd, dt {
   font-family: Verdana, Geneva, sans-serif;
-	font-size: 100%;
+  font-size: 100%;
   margin: 0;
   padding: 0;
-	border: 0;
-	vertical-align: baseline;
+  border: 0;
+  vertical-align: baseline;
 }
 
 h1, h2, h3, h4 {
   font-family: Tahoma;
-	line-height: 1em;
+  line-height: 1em;
 }
 
 body {
@@ -94,9 +94,9 @@ h6 {
 }
 
 header {
-	margin: 0 0 1em 0;
-	padding: 0;
-	display: block;
+  margin: 0 0 1em 0;
+  padding: 0;
+  display: block;
 }
 
 img {
@@ -106,19 +106,19 @@ img {
 
 input[type=text], input[type=password], input[type=url], textarea, button {
 /*  border: 1px solid #AAA;*/
-	font-size: 1em;
+  font-size: 1em;
 /*  -moz-border-radius: 4px;*/
 /*  -webkit-border-radius: 4px;*/
 }
 
 input[type=submit] {
-	padding: 1px 4px;
+  padding: 1px 4px;
 /*  border: 1px solid #AAA;*/
 /*  background-color: #EEE;*/
 /*  -moz-border-radius: 4px;*/
 /*  -webkit-border-radius: 4px;*/
-	font-size: 1em;
-	cursor: pointer;
+  font-size: 1em;
+  cursor: pointer;
 }
 
 input:focus, textarea:focus {
@@ -130,29 +130,33 @@ input[type=submit]:hover {
 }
 
 menu {
-	margin: 0;
-	padding: 0;
-	
-	ul {
-  	margin: 0;
-  	padding: 0;
-	}
-	
-	li {
-  	margin: 0 1em 0 0;
-  	padding: 0;
-  	list-style-type: none;
-  	display: inline;	  
-	}
+  margin: 0;
+  padding: 0;
+  
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+  
+  li {
+    margin: 0 1em 0 0;
+    padding: 0;
+    list-style-type: none;
+    display: inline;    
+  }
 }
 
 section {
-	display: block;
+  display: block;
 }
 
 span.link {
   color: $link_color;
   cursor: pointer;
+}
+
+span.wait {
+  color: #CCC;
 }
 
 table tfoot {
@@ -180,18 +184,18 @@ div#notice {
 
 div#page {
   aside#sidebar {
-  	width: 20%;
-  	float: left;
+    width: 20%;
+    float: left;
   }
 
   aside#sidebar > section {
-  	margin-bottom: 1em;
+    margin-bottom: 1em;
   }
 
   section#content {
     width: 75%;
-  	float: left;
-  	margin-left: 2em;
+    float: left;
+    margin-left: 2em;
   }
 }
 
@@ -277,7 +281,7 @@ form.simple_form {
     }
     
     span.hint {
-      margin-left: 10em;
+      margin-left: 11em;
       color: #666;
       font-style: italic;
       vertical-align: top;

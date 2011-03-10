@@ -120,6 +120,9 @@ span.link {
   color: #006ffa;
   cursor: pointer; }
 
+span.wait {
+  color: #CCC; }
+
 table tfoot {
   margin-top: 2em; }
 
@@ -198,7 +201,7 @@ form.simple_form div.input {
     margin-right: 10px;
     text-align: right; }
   form.simple_form div.input span.hint {
-    margin-left: 10em;
+    margin-left: 11em;
     color: #666;
     font-style: italic;
     vertical-align: top;

@@ -1,5 +1,7 @@
-Cookie = {
-  put: function(name, value, days) {
+(function() {
+  Danbooru.Cookie = {};
+  
+  Danbooru.Cookie.put = function(name, value, days) {
     if (days == null) {
       days = 365;
     }
@@ -8,9 +10,9 @@ Cookie = {
     date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
     var expires = "; expires=" + date.toGMTString();
     document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/";
-  },
-
-  raw_get: function(name) {
+  }
+  
+  Danbooru.Cookie.raw_get = function(name) {
     var nameEq = name + "=";
     var ca = document.cookie.split(";");
 
@@ -27,21 +29,21 @@ Cookie = {
     }
 
     return "";
-  },
+  }
   
-  get: function(name) {
+  Danbooru.Cookie.get = function(name) {
     return this.unescape(this.raw_get(name));
-  },
+  }
   
-  remove: function(name) {
-    Cookie.put(name, "", -1);
-  },
+  Danbooru.Cookie.remove = function(name) {
+    this.put(name, "", -1);
+  }
 
-  unescape: function(val) {
+  Danbooru.Cookie.unescape = function(val) {
     return decodeURIComponent(val.replace(/\+/g, " "));
-  },
+  }
 
-  setup: function() {
+  Danbooru.Cookie.initialize = function() {
     if (location.href.match(/^\/(comment|pool|note|post)/) && this.get("tos") != "1") {
       // Setting location.pathname in Safari doesn't work, so manually extract the domain.
       var domain = location.href.match(/^(http:\/\/[^\/]+)/)[0];
@@ -55,4 +57,9 @@ Cookie = {
       }
 		}
   }
-}
+})();
+
+$(document).ready(function() {
+  Danbooru.Cookie.initialize();
+});
+

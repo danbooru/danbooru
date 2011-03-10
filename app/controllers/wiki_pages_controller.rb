@@ -2,6 +2,7 @@ class WikiPagesController < ApplicationController
   respond_to :html, :xml, :json
   before_filter :member_only, :except => [:index, :show]
   before_filter :moderator_only, :only => [:destroy]
+  before_filter :normalize_search_params, :only => [:index]
 
   def new
     @wiki_page = WikiPage.new
@@ -52,5 +53,13 @@ class WikiPagesController < ApplicationController
     @version = WikiPageVersion.find(params[:version_id])
     @wiki_page.revert_to!(@version)
     respond_with(@wiki_page)
+  end
+
+private
+  def normalize_search_params
+    if params[:title]
+      params[:search] ||= {}
+      params[:search][:title_equals] = params.delete(:title)
+    end
   end
 end

@@ -6,8 +6,8 @@ cat public/javascripts/src/lib/jquery-1.5.1.min.js > public/javascripts/compiled
 cat public/javascripts/src/lib/jquery-ui-1.8.9.custom.min.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/lib/jrails.min.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/lib/rails.js >> public/javascripts/compiled/default.js
-cat public/javascripts/src/app/cookie.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/application.js >> public/javascripts/compiled/default.js
+cat public/javascripts/src/app/cookie.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/utility.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/posts.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/comments.js >> public/javascripts/compiled/default.js

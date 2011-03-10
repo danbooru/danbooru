@@ -8,15 +8,13 @@
   }
   
   Danbooru.Favorite.hide_or_show_add_to_favorites_link = function() {
-    var favorites = $("meta[name=favorites]").attr("content");
-    var current_user_id = $("meta[name=current-user-id]").attr("content");
-    
+    var favorites = Danbooru.meta("favorites");
+    var current_user_id = Danbooru.meta("current-user-id");
     if (current_user_id == "") {
       $("a#add-to-favorites").hide();
       $("a#remove-from-favorites").hide();
       return;
     }
-    
     var regexp = new RegExp("\\bfav:" + current_user_id + "\\b");
     if ((favorites != undefined) && (favorites.match(regexp))) {
       $("a#add-to-favorites").hide();
@@ -27,46 +25,46 @@
   
   Danbooru.Favorite.initialize_add_to_favorites = function() {
     $("a#add-to-favorites").click(function(e) {
-      e.stopPropagation();
+      e.preventDefault();
       
       $.ajax({
+        type: "post",
         url: "/favorites",
         data: {
-          id: $("meta[name=post-id]").attr("content")
+          id: Danbooru.meta("post-id")
         },
         beforeSend: function() {
-          $("img#add-to-favorites-wait").show();
+          Danbooru.ajax_start(e.target);
         },
-        success: function(data, text_status, xhr) {
+        success: function() {
           $("a#add-to-favorites").hide();
           $("a#remove-from-favorites").show();
-          $("img#add-to-favorites-wait").hide();
         },
-        type: "post"
+        complete: function() {
+          Danbooru.ajax_stop(e.target);
+        }
       });
-      
-      return false;
     });
   }
   
   Danbooru.Favorite.initialize_remove_from_favorites = function() {
     $("a#remove-from-favorites").click(function(e) {
-      e.stopPropagation();
+      e.preventDefault();
       
       $.ajax({
-        url: "/favorites/" + $("meta[name=post-id]").attr("content"),
+        type: "delete",
+        url: "/favorites/" + Danbooru.meta("post-id"),
         beforeSend: function() {
-          $("img#remove-from-favorites-wait").show();
+          Danbooru.ajax_start(e.target);
         },
-        success: function(data, text_status, xhr) {
+        success: function() {
           $("a#add-to-favorites").show();
           $("a#remove-from-favorites").hide();
-          $("img#remove-from-favorites-wait").hide();
         },
-        type: "delete"
+        complete: function() {
+          Danbooru.ajax_stop(e.target);
+        }
       });
-      
-      return false;
     });
   }
 })();

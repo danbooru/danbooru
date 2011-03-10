@@ -3,7 +3,7 @@ class TagAliasesController < ApplicationController
   respond_to :html, :xml, :json
   
   def new
-    @tag_alias = TagAlias.new
+    @tag_alias = TagAlias.new(params[:tag_alias])
     respond_with(@tag_alias)
   end
   

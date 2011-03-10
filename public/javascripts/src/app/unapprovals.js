@@ -7,7 +7,7 @@
   }
   
   Danbooru.Unapproval.hide_or_show_unapprove_link = function() {
-    if ($("meta[name=post-is-unapprovable]").attr("content") != "true") {
+    if (Danbooru.meta("post-is-unapprovable") != "true") {
       $("a#unapprove").hide();
     }
   }
@@ -28,9 +28,9 @@
       }
     });
 
-    $("a#unapprove").click(function() {
+    $("a#unapprove").click(function(e) {
+      e.preventDefault();
       $("#unapprove-dialog").dialog("open");
-      return false;
     });
   }
 })();

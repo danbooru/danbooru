@@ -1,20 +1,13 @@
-<% form_tag(:controller => "forum", :action => "create") do %>
-	<p>You can create a forum thread to suggest the creation of an alias.</p>	
-	<table>
-		<tr>
-			<th><label for="tag_alias_name">From</label></th>
-			<td><%= text_field "tag_alias", "name", :size => 40 %></td>
-		</tr>
-		<tr>
-			<th><label for="tag_alias_alias">To</label></th>
-			<td><%= text_field "tag_alias", "alias", :size => 40 %></td>
-		</tr>
-		<tr>
-			<th><label for="tag_alias_reason">Reason</label></th>
-			<td><%= text_area "tag_alias", "reason", :rows => 10, :cols => 60 %></td>
-		</tr>
-		<tr>
-			<td colspan="2"><%= submit_tag "Submit" %></td>
-		</tr>
-	</table>
-<% end %>
+<div id="c-tag-aliases">
+  <div id="a-new">
+    <h1>New Tag Alias</h1>
+    <%= simple_form_for(@tag_alias) do |f| %>
+      <%= f.input :antecedent_name, :label => "From" %>
+      <%= f.input :consequent_name, :label => "To" %>
+      <%= f.input :forum_topic_id, :label => "Forum" %>
+      <%= f.button :submit %>
+    <% end %>    
+  </div>
+</div>
+
+<%= render "secondary_links" %>

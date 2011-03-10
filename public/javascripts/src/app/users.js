@@ -4,7 +4,7 @@ $(document).ready(function() {
     $(event.target.hash).show();
   });
   
-  if ($("meta[name=errors]").attr("content")) {
+  if (Danbooru.meta("errors")) {
     $("#p1").hide();
     $("#notice").hide();
   } else {

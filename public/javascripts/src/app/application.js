@@ -1,6 +1,4 @@
 $(document).ready(function() {
-  Cookie.setup();
-  
   // $("#hide-upgrade-account-link").click(function() {
   //   $("#upgrade-account").hide();
   //   Cookie.put('hide-upgrade-account', '1', 7);
@@ -13,7 +11,7 @@ $(document).ready(function() {
   // Comment listing
   $(".comment-section form").hide();
   $(".comment-section input.expand-comment-response").click(function() {
-    var post_id = $(this).closest(".comment-section").attr("data-post-id");
+    var post_id = $(this).closest(".comment-section").data("post-id");
     $(".comment-section[data-post-id=" + post_id + "] form").show();
     $(this).hide();
   });
@@ -24,9 +22,9 @@ $(document).ready(function() {
   $("#resize-links a").click(function(e) {
     var image = $("#image");
     var target = $(e.target);
-    image.attr("src", target.attr("data-src"));
-    image.attr("width", target.attr("data-width"));
-    image.attr("height", target.attr("data-height"));
+    image.attr("src", target.data("src"));
+    image.attr("width", target.data("width"));
+    image.attr("height", target.data("height"));
     e.preventDefault();
   }); 
   
@@ -35,6 +33,5 @@ $(document).ready(function() {
     e.preventDefault();
   });
 });
-
 
 var Danbooru = {};

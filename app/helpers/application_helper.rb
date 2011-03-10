@@ -34,7 +34,7 @@ module ApplicationHelper
   end
   
   def wait_image(html_id)
-    ('<img src="/images/wait.gif" style="display: none;" id="' + html_id + '">').html_safe
+    ('<img src="/images/wait.gif" style="display: none;" class="wait" id="' + html_id + '">').html_safe
   end
   
 protected

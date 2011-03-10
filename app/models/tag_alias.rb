@@ -29,6 +29,14 @@ class TagAlias < ActiveRecord::Base
     self.creator_id = CurrentUser.user.id
   end
   
+  def antecedent_tag
+    Tag.find_by_name(antecedent_name)
+  end
+  
+  def consequent_tag
+    Tag.find_by_name(consequent_name)
+  end
+  
   def absence_of_transitive_relation
     # We don't want a -> b && b -> c chains
     if self.class.exists?(["antecedent_name = ?", consequent_name]) || self.class.exists?(["consequent_name = ?", antecedent_name])

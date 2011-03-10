@@ -21,12 +21,13 @@
       minLength: 4,
     });
     
-    $("a#pool").click(function() {
+    $("a#pool").click(function(e) {
+      e.preventDefault();
       $("#add-to-pool-dialog").dialog("open");
-      return false;
     });
     
-    $("ul#recent-pools li").click(function() {
+    $("ul#recent-pools li").click(function(e) {
+      e.preventDefault();
       $("#pool_name").val($(this).html());
     });
   }
@@ -42,8 +43,8 @@
     
     $("div.pools div.edit form#ordering-form").submit(function(e) {
       $.ajax({
-        url: e.target.action,
         type: "put",
+        url: e.target.action,
         data: $("#sortable").sortable("serialize") + "&" +  $(e.target).serialize()
       });
       return false;

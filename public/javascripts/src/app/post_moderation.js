@@ -11,14 +11,14 @@
   }
  
   Danbooru.PostModeration.hide_or_show_approve_and_disapprove_links = function() {
-    if ($("meta[name=post-is-approvable]").attr("content") != "true") {
+    if (Danbooru.meta("post-is-approvable") != "true") {
       $("a#approve").hide();
       $("a#disapprove").hide();
     }
   }
   
   Danbooru.PostModeration.hide_or_show_delete_and_undelete_links = function() {
-    if ($("meta[name=post-is-deleted]").attr("content") == "true") {
+    if (Danbooru.meta("post-is-deleted") == "true") {
       $("a#delete").hide();
     } else {
       $("a#undelete").hide();
@@ -26,60 +26,76 @@
   }
   
   Danbooru.PostModeration.initialize_delete_link = function() {
-    $("a#delete").click(function() {
+    $("a#delete").click(function(e) {
+      e.preventDefault();
       $.ajax({
-        url: "/post_moderation/delete.js",
         type: "post",
+        url: "/post_moderation/delete.js",
         data: {
-          post_id: $("meta[name=post-id]").attr("content")
+          post_id: Danbooru.meta("post-id")
         },
         beforeSend: function() {
-          $("img#delete-wait").show();
+          Danbooru.ajax_start(e.target);
+        },
+        complete: function() {
+          Danbooru.ajax_stop(e.target);
         }
       });
     });
   }
   
   Danbooru.PostModeration.initialize_undelete_link = function() {
-    $("a#undelete").click(function() {
+    $("a#undelete").click(function(e) {
+      e.preventDefault();
       $.ajax({
-        url: "/post_moderation/undelete.js",
         type: "post",
+        url: "/post_moderation/undelete.js",
         data: {
-          post_id: $("meta[name=post-id]").attr("content")
+          post_id: Danbooru.meta("post-id")
         },
         beforeSend: function() {
-          $("img#undelete-wait").show();
+          Danbooru.ajax_start(e.target);
+        },
+        complete: function() {
+          Danbooru.ajax_stop(e.target);
         }
       });
     });
   }
   
   Danbooru.PostModeration.initialize_disapprove_link = function() {
-    $("a#disapprove").click(function() {
+    $("a#disapprove").click(function(e) {
+      e.preventDefault();
       $.ajax({
-        url: "/post_moderation/disapprove.js",
         type: "put",
+        url: "/post_moderation/disapprove.js",
         data: {
-          post_id: $("meta[name=post-id]").attr("content")
+          post_id: Danbooru.meta("post-id")
         },
         beforeSend: function() {
-          $("img#disapprove-wait").show();
+          Danbooru.ajax_start(e.target);
+        },
+        complete: function() {
+          Danbooru.ajax_stop(e.target);
         }
       });
     });
   }
   
   Danbooru.PostModeration.initialize_approve_link = function() {
-    $("a#approve").click(function() {
+    $("a#approve").click(function(e) {
+      e.preventDefault();
       $.ajax({
-        url: "/post_moderation/approve.js",
         type: "put",
+        url: "/post_moderation/approve.js",
         data: {
-          post_id: $("meta[name=post-id]").attr("content")
+          post_id: Danbooru.meta("post-id")
         },
         beforeSend: function() {
-          $("img#approve-wait").show();
+          Danbooru.ajax_start(e.target);
+        },
+        complete: function() {
+          Danbooru.ajax_stop(e.target);
         }
       });
     });

@@ -173,12 +173,12 @@
   
   Danbooru.Post.initialize_tag_list = function() {
     $("#tag-box a.search-inc-tag").click(function(e) {
-      $("#tags").val($("#tags").val() + " " + $(e.target).parent("li").attr("data-tag-name"));
+      $("#tags").val($("#tags").val() + " " + $(e.target).parent("li").data("tag-name"));
       return false;
     });
 
     $("#tag-box a.search-exl-tag").click(function(e) {
-      $("#tags").val($("#tags").val() + " -" + $(e.target).parent("li").attr("data-tag-name"));
+      $("#tags").val($("#tags").val() + " -" + $(e.target).parent("li").data("tag-name"));
       return false;
     });
   }
