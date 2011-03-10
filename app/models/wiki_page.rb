@@ -56,6 +56,10 @@ class WikiPage < ActiveRecord::Base
   def creator_name
     User.id_to_name(user_id).tr("_", " ")
   end
+  
+  def category_name
+    Tag.category_for(title)
+  end
 
   def pretty_title
     title.tr("_", " ")

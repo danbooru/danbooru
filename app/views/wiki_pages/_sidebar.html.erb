@@ -1,8 +1,8 @@
 <aside id="sidebar">
   <section>
     <h1>Search</h1>
-    <%= simple_form_for(@search) do |f| %>
-      <%= f.input :title_contains %>
+    <%= form_tag(wiki_pages_path, :method => :get) do %>
+      <%= text_field_tag "title", params[:title], :size => 20 %>
     <% end %>
   </section>
 

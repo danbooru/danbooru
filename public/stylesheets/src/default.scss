@@ -49,6 +49,10 @@ a:active {
   text-decoration: none;
 }
 
+abbr[title=required] {
+  display: none;
+}
+
 blockquote {
   margin: 0 0 1em 0;
   padding: 1em;
@@ -186,6 +190,14 @@ div#page {
   aside#sidebar {
     width: 20%;
     float: left;
+
+    h1 {
+      font-size: 1.2em;
+    }
+    
+    ul {
+      list-style-type: none;
+    }
   }
 
   aside#sidebar > section {
@@ -256,6 +268,24 @@ body > header > h1 {
 form.simple_form {
   input[type=submit] {
     margin-left: 10.3em;
+  }
+  
+  div.input.boolean {
+    padding-left: 10em;
+    
+    label {
+      margin: 0;
+      text-align: left;
+      display: inline;
+      width: none;
+    }
+  }
+  
+  div#multiple-buttons {
+    margin-left: 10em;
+    input {
+      margin: 0 0.5em 0 0;
+    }
   }
   
   div.input {
@@ -452,13 +482,7 @@ div#c-comments {
 
 
 /*** Favorites ***/
-div.favorites {
-  aside#sidebar {
-    h1 {
-      font-size: 1.2em;
-    }
-  }
-  
+div#c-favorites {
   section#content > h1 {
     display: none;
   }

@@ -4,6 +4,7 @@ module PostSets
     
     def initialize(tag_name)
       @tag_name = tag_name
+      super()
     end
     
     def load_posts
@@ -16,6 +17,10 @@ module PostSets
     
     def offset
       0
+    end
+    
+    def tags
+      [@tag_name]
     end
 
     def use_sequential_paginator?
