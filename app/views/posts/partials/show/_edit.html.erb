@@ -1,63 +1,61 @@
-<div id="edit">
-  <% unless CurrentUser.user.is_contributor? %>
-    <div style="margin-bottom: 1em;">
-      <p>Before editing, read the <%= link_to "how to tag guide", wiki_page_path(:id => "howto:tag") %>.</p>
-    </div>
-  <% end %>
+<% unless CurrentUser.user.is_contributor? %>
+  <div style="margin-bottom: 1em;">
+    <p>Before editing, read the <%= link_to "how to tag guide", wiki_page_path(:id => "howto:tag") %>.</p>
+  </div>
+<% end %>
 
-  <%= form_for(post, :html => {:class => "simple_form"}) do |f| %>
-    <%= f.hidden_field :old_tags, :value => post.tag_string %>
+<%= form_for(post, :html => {:class => "simple_form"}) do |f| %>
+  <%= f.hidden_field :old_tags, :value => post.tag_string %>
 
-    <div class="input">
-      <% if post.is_rating_locked? %>
-        This post is rating locked.
-      <% else %>
-        <%= f.label :blank, "Rating" %>
-      
-        <fieldset class="ratings">
-          <%= f.radio_button :rating, :e %>
-          <%= f.label :rating_e, "Explicit" %>
-
-          <%= f.radio_button :rating, :q %>
-          <%= f.label :rating_q, "Questionable" %>
-
-          <%= f.radio_button :rating, :s %>
-          <%= f.label :rating_s, "Safe" %>
-        </fieldset>      
-      <% end %>
-    </div>
+  <div class="input">
+    <% if post.is_rating_locked? %>
+      This post is rating locked.
+    <% else %>
+      <%= f.label :blank, "Rating" %>
     
-    <% if CurrentUser.user.is_privileged? %>
-      <div class="input">
-        <%= f.label :blank, "Lock" %>
-        
-        <fieldset class="locks">
-          <%= f.check_box :is_note_locked %>
-          <%= f.label :is_note_locked, "Notes" %>
+      <fieldset class="ratings">
+        <%= f.radio_button :rating, :e %>
+        <%= f.label :rating_e, "Explicit" %>
 
-          <%= f.check_box :is_rating_locked %>
-          <%= f.label :is_rating_locked, "Rating" %>          
-        </fieldset>
-      </div>
+        <%= f.radio_button :rating, :q %>
+        <%= f.label :rating_q, "Questionable" %>
+
+        <%= f.radio_button :rating, :s %>
+        <%= f.label :rating_s, "Safe" %>
+      </fieldset>      
     <% end %>
-    
+  </div>
+  
+  <% if CurrentUser.user.is_privileged? %>
     <div class="input">
-      <%= f.label :parent_id, "Parent" %>
-      <%= f.text_field :parent_id, :size => 5 %>
-    </div>
-    
-    <div class="input">
-      <%= f.label :source %>
-      <%= f.text_field :source %>
-    </div>
-    
-    <div class="input">
-      <%= f.label :tag_string, "Tags" %>
-      <%= f.text_area :tag_string , :size => "50x3" %>
-    </div>
-    
-    <div class="input">
-      <%= submit_tag "Submit" %>      
+      <%= f.label :blank, "Lock" %>
+      
+      <fieldset class="locks">
+        <%= f.check_box :is_note_locked %>
+        <%= f.label :is_note_locked, "Notes" %>
+
+        <%= f.check_box :is_rating_locked %>
+        <%= f.label :is_rating_locked, "Rating" %>          
+      </fieldset>
     </div>
   <% end %>
-</div>
+  
+  <div class="input">
+    <%= f.label :parent_id, "Parent" %>
+    <%= f.text_field :parent_id, :size => 5 %>
+  </div>
+  
+  <div class="input">
+    <%= f.label :source %>
+    <%= f.text_field :source %>
+  </div>
+  
+  <div class="input">
+    <%= f.label :tag_string, "Tags" %>
+    <%= f.text_area :tag_string , :size => "50x3" %>
+  </div>
+  
+  <div class="input">
+    <%= submit_tag "Submit" %>      
+  </div>
+<% end %>

@@ -5,6 +5,4 @@
 <% if CurrentUser.is_janitor? %>
   <%= f.input :is_locked %>
 <% end %>
-<div id="multiple-buttons">
-  <%= f.button :submit, "Save" %><%= f.button :submit, "Cancel" %><%= f.button :submit, "Preview" %>  
-</div>
+<%= f.button :submit, "Save" %><%= f.button :submit, "Cancel" %><%= f.button :submit, "Preview" %>  
