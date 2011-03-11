@@ -268,6 +268,12 @@ body > header > h1 {
 form.simple_form {
   margin: 1em 0;
   
+  div.input.boolean {
+    label {
+      display: inline;
+    }
+  }
+  
   div.input {
     margin-bottom: 1em;
     
@@ -644,6 +650,39 @@ div#artists {
       font-style: italic;    
     }
   }  
+}
+
+
+/*** Wiki Pages ***/
+div#c-wiki-pages {
+  div.wiki-page-body {
+    ul {
+      margin-left: 1em;
+    }
+    
+    p {
+      margin-bottom: 1em;
+    }
+  }
+  
+  div#a-edit, div#a-new {
+    textarea {
+      width: 500px;
+      height: 40em;
+    }
+    
+    div#preview {
+      border: 2px dashed #AAA;
+      padding: 1em;
+      margin: 1em;
+      width: 40em;
+      
+      h1:first-child {
+        color: #333;
+        margin-bottom: 0.5em;
+      }
+    }
+  }
 }
 
 

@@ -4,6 +4,10 @@
 
     <section id="content">
       <h1 id="wiki-page-title"><%= @wiki_page.pretty_title %> (Editing)</h1>
+
+      <div id="preview" class="wiki-page-body">
+      </div>
+
       <%= simple_form_for(@wiki_page) do |f| %>
         <%= render :partial => "form", :locals => {:f => f} %>
       <% end %>

@@ -1,0 +1,439 @@
+.blacklisted {
+  display: none !important; }
+
+body, div, h1, h2, h3, h4, h5, h6, p, ul, li, dd, dt {
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: baseline; }
+
+h1, h2, h3, h4 {
+  font-family: Tahoma;
+  line-height: 1em; }
+
+body {
+  font-size: 80%;
+  padding: 1em 2em;
+  margin: 0; }
+
+article, section {
+  display: block; }
+
+a:link {
+  color: #006ffa;
+  text-decoration: none; }
+
+a:visited {
+  color: #006ffa;
+  text-decoration: none; }
+
+a:hover {
+  color: #9093ff;
+  text-decoration: none; }
+
+a:active {
+  color: #006ffa;
+  text-decoration: none; }
+
+abbr[title=required] {
+  display: none; }
+
+blockquote {
+  margin: 0 0 1em 0;
+  padding: 1em;
+  border: 1px solid #666;
+  background: #EEE; }
+
+code {
+  font-family: monospace;
+  font-size: 1.2em; }
+
+dd {
+  margin-bottom: 1em; }
+
+dt {
+  font-weight: bold; }
+
+h1 {
+  font-size: 2em; }
+
+h2 {
+  font-size: 1.8em; }
+
+h3 {
+  font-size: 1.6em; }
+
+h4 {
+  font-size: 1.4em; }
+
+h5 {
+  font-size: 1.2em; }
+
+h6 {
+  font-size: 1em; }
+
+header {
+  margin: 0 0 1em 0;
+  padding: 0;
+  display: block; }
+
+img {
+  border: none;
+  vertical-align: middle; }
+
+input[type=text], input[type=password], input[type=url], textarea, button {
+  /*  border: 1px solid #AAA;*/
+  font-size: 1em;
+  /*  -moz-border-radius: 4px;*/
+  /*  -webkit-border-radius: 4px;*/ }
+
+input[type=submit] {
+  padding: 1px 4px;
+  /*  border: 1px solid #AAA;*/
+  /*  background-color: #EEE;*/
+  /*  -moz-border-radius: 4px;*/
+  /*  -webkit-border-radius: 4px;*/
+  font-size: 1em;
+  cursor: pointer; }
+
+input:focus, textarea:focus {
+  /*  background-color: #FFD;*/ }
+
+input[type=submit]:hover {
+  /*  background-color: #F6F6F6;*/ }
+
+menu {
+  margin: 0;
+  padding: 0; }
+  menu ul {
+    margin: 0;
+    padding: 0; }
+  menu li {
+    margin: 0 1em 0 0;
+    padding: 0;
+    list-style-type: none;
+    display: inline; }
+
+section {
+  display: block; }
+
+span.link {
+  color: #006ffa;
+  cursor: pointer; }
+
+span.wait {
+  color: #CCC; }
+
+table tfoot {
+  margin-top: 2em; }
+
+table.striped tbody tr:hover {
+  background-color: #FFE; }
+table.striped tr.even {
+  background-color: #EEE; }
+
+div#notice {
+  margin: 1em;
+  padding: 1em;
+  border: 2px solid #666;
+  background: #EEE; }
+
+div#page aside#sidebar {
+  width: 20%;
+  float: left; }
+  div#page aside#sidebar h1 {
+    font-size: 1.2em; }
+  div#page aside#sidebar ul {
+    list-style-type: none; }
+div#page aside#sidebar > section {
+  margin-bottom: 1em; }
+div#page section#content {
+  width: 75%;
+  float: left;
+  margin-left: 2em; }
+
+div.clearfix {
+  clear: both; }
+
+/*** Paginator ***/
+div.paginator {
+  display: block;
+  padding: 2em 0 1em 0;
+  font-size: 1em;
+  text-align: center;
+  font-weight: bold;
+  clear: both; }
+  div.paginator a {
+    margin: 0 3px;
+    padding: 2px 6px;
+    font-weight: normal;
+    border: 1px solid #EAEAEA; }
+  div.paginator a.arrow {
+    border: none; }
+  div.paginator a.arrow:hover {
+    background: white;
+    color: #9093FF; }
+  div.paginator a.current {
+    border: 1px solid #AAA; }
+  div.paginator a:hover {
+    background: #3c3cdc;
+    color: white; }
+  div.paginator span {
+    margin: 0 3px;
+    padding: 2px 6px; }
+
+/*** Header ***/
+body > header > h1 {
+  font-size: 3em;
+  font-family: Tahoma, Helvetica, sans-serif; }
+
+/*** Simple Form ***/
+form.simple_form {
+  margin: 1em 0; }
+  form.simple_form div.input.boolean label {
+    display: inline; }
+  form.simple_form div.input {
+    margin-bottom: 1em; }
+    form.simple_form div.input input[type=text], form.simple_form div.input input[type=file], form.simple_form div.input textarea {
+      width: 300px; }
+    form.simple_form div.input textarea {
+      height: 100px; }
+    form.simple_form div.input label {
+      display: block;
+      cursor: pointer;
+      font-weight: bold; }
+    form.simple_form div.input span.hint {
+      color: #666;
+      font-style: italic;
+      display: block; }
+    form.simple_form div.input fieldset {
+      border: none;
+      display: inline;
+      margin: 0;
+      padding: 0; }
+      form.simple_form div.input fieldset label {
+        font-weight: normal;
+        width: auto;
+        margin-right: 2em; }
+
+/*** DText Preview ***/
+div.dtext p {
+  margin-bottom: 1em; }
+
+/*** Pools Posts ***/
+div#c-pools-posts div#a-new form {
+  margin-bottom: 1em; }
+div#c-pools-posts div#a-new h1 {
+  font-size: 1.2em;
+  font-weight: bold; }
+div#c-pools-posts div#a-new li {
+  margin-left: 1em;
+  cursor: pointer; }
+
+/*** Pools ***/
+div#c-pools div#a-edit p {
+  margin-bottom: 1em;
+  width: 40em; }
+div#c-pools div#a-edit ul.ui-sortable {
+  list-style-type: none; }
+  div#c-pools div#a-edit ul.ui-sortable span {
+    margin: 0;
+    float: right;
+    cursor: pointer; }
+  div#c-pools div#a-edit ul.ui-sortable li {
+    padding: 0.5em; }
+  div#c-pools div#a-edit ul.ui-sortable li.ui-state-default {
+    margin-bottom: 20px;
+    width: 250px;
+    background: none; }
+  div#c-pools div#a-edit ul.ui-sortable li.ui-state-placeholder {
+    margin-bottom: 20px;
+    width: 250px;
+    height: 150px;
+    background: none; }
+
+/*** Comments ***/
+div.comments-for-post div.list-of-comments article {
+  margin-bottom: 2em; }
+  div.comments-for-post div.list-of-comments article span.comment-score {
+    color: #CCC; }
+  div.comments-for-post div.list-of-comments article div.author {
+    width: 20%;
+    float: left; }
+  div.comments-for-post div.list-of-comments article div.content {
+    margin-left: 2em;
+    width: 40em;
+    float: left; }
+div.comments-for-post div.comment-preview {
+  width: 40em;
+  margin-bottom: 2em; }
+
+div#c-comments div#a-index div.header span.info {
+  margin-right: 1.5em; }
+div#c-comments div#a-index div.header strong, div#c-comments div#a-index div.header time {
+  margin-right: 0.3em; }
+div#c-comments div#a-index div.header time {
+  font-weight: bold; }
+div#c-comments div#a-index div.header div.list-of-tags a {
+  margin-right: 0.5em; }
+div#c-comments div#a-index div.header div.notices {
+  margin: 1em 0; }
+div#c-comments div#a-index div.preview {
+  float: left;
+  width: 180px; }
+div#c-comments div#a-index div.post {
+  margin-bottom: 4em; }
+  div#c-comments div#a-index div.post div.comments-for-post {
+    float: left;
+    width: 55em; }
+    div#c-comments div#a-index div.post div.comments-for-post h1 {
+      font-size: 1.2em; }
+
+/*** Favorites ***/
+div#c-favorites section#content > h1 {
+  display: none; }
+
+/*** Posts ***/
+article.post-preview {
+  margin-right: 4em;
+  margin-bottom: 4em;
+  float: left; }
+
+div#c-posts h1 {
+  font-size: 1.2em; }
+div#c-posts h2 {
+  font-size: 1.1em; }
+div#c-posts aside#sidebar > section > ul li {
+  list-style-type: none; }
+div#c-posts aside#sidebar > section > ul ul li {
+  margin-left: 1em; }
+div#c-posts section#tag-and-wiki-box {
+  padding: 0; }
+  div#c-posts section#tag-and-wiki-box menu li {
+    display: inline-block; }
+  div#c-posts section#tag-and-wiki-box menu li.active a {
+    color: #000; }
+  div#c-posts section#tag-and-wiki-box h1 {
+    font-size: 1.2em; }
+  div#c-posts section#tag-and-wiki-box div#tag-box h2 {
+    display: none; }
+  div#c-posts section#tag-and-wiki-box div#tag-box li {
+    list-style-type: none; }
+  div#c-posts section#tag-and-wiki-box div#wiki-box h2 {
+    display: none; }
+div#c-posts section#content > h1 {
+  display: none; }
+div#c-posts section#content section > h2 {
+  display: none; }
+div#c-posts section#content menu#post-sections {
+  margin-bottom: 1em; }
+  div#c-posts section#content menu#post-sections li {
+    font-size: 1.1em;
+    font-weight: bold; }
+  div#c-posts section#content menu#post-sections li.active a {
+    color: black; }
+div#c-posts section#content section#edit fieldset label {
+  display: inline; }
+
+/*** Post Histories ***/
+div.post_histories div.index div.post {
+  margin-bottom: 2em; }
+  div.post_histories div.index div.post div.preview {
+    width: 20%;
+    float: left; }
+  div.post_histories div.index div.post div.history {
+    width: 70%;
+    float: left; }
+    div.post_histories div.index div.post div.history table {
+      width: 100%; }
+    div.post_histories div.index div.post div.history ins {
+      color: green;
+      text-decoration: none; }
+    div.post_histories div.index div.post div.history del {
+      color: red;
+      text-decoration: line-through; }
+
+/*** Post Unapprovals ***/
+div#unapprove-dialog p {
+  margin-bottom: 1em; }
+
+/*** Sessions ***/
+div#sessions div#new section {
+  width: 30em;
+  float: left; }
+div#sessions div#new aside {
+  width: 20em;
+  float: left; }
+  div#sessions div#new aside li {
+    display: list-item;
+    margin-bottom: 0.5em;
+    list-style-type: square;
+    margin-left: 1em; }
+div#sessions div#new h2 {
+  margin-bottom: 5px; }
+
+/*** Artists ***/
+div#artists span.new-artist {
+  font-weight: bold;
+  color: #A00; }
+div#artists div#show {
+  max-width: 60em; }
+  div#artists div#show h1 {
+    font-size: 1.5em;
+    margin-bottom: 5px; }
+  div#artists div#show p.legend {
+    margin-bottom: 2em;
+    font-size: 0.8em;
+    font-style: italic; }
+
+/*** Wiki Pages ***/
+div#c-wiki-pages div.wiki-page-body ul {
+  margin-left: 1em; }
+div#c-wiki-pages div.wiki-page-body p {
+  margin-bottom: 1em; }
+div#c-wiki-pages div#a-edit textarea, div#c-wiki-pages div#a-new textarea {
+  width: 500px;
+  height: 40em; }
+div#c-wiki-pages div#a-edit div#preview, div#c-wiki-pages div#a-new div#preview {
+  border: 2px dashed #AAA;
+  padding: 1em;
+  margin: 1em;
+  width: 40em; }
+  div#c-wiki-pages div#a-edit div#preview h1:first-child, div#c-wiki-pages div#a-new div#preview h1:first-child {
+    color: #333;
+    margin-bottom: 0.5em; }
+
+/*** Users ***/
+div.users div.new {
+  max-width: 60em; }
+  div.users div.new h1 {
+    margin-bottom: 0.5em; }
+  div.users div.new p {
+    margin-bottom: 1em; }
+  div.users div.new li {
+    margin-left: 1em; }
+  div.users div.new div#account-comparison h1 {
+    font-size: 1.4em;
+    margin-bottom: 3px; }
+  div.users div.new div#account-comparison li {
+    font-size: 0.9em;
+    line-height: 1.5em; }
+  div.users div.new div#account-comparison section {
+    width: 18em;
+    float: left;
+    padding: 1em; }
+  div.users div.new footer.nav-links {
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+    display: block; }
+  div.users div.new div#p2 ul {
+    margin-bottom: 2em; }
+
+/*** Uploads ***/
+div#c-uploads div#a-new div#upload-guide-notice {
+  margin-bottom: 2em; }
+div#c-uploads div#a-new fieldset.ratings label {
+  display: inline; }

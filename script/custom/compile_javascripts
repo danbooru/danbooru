@@ -17,3 +17,4 @@ cat public/javascripts/src/app/favorites.js >> public/javascripts/compiled/defau
 cat public/javascripts/src/app/unapprovals.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/post_moderation.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/pools.js >> public/javascripts/compiled/default.js
+cat public/javascripts/src/app/wiki_pages.js >> public/javascripts/compiled/default.js
