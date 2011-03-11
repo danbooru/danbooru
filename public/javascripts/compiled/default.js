@@ -1025,6 +1025,7 @@ $(document).ready(function() {
   Danbooru.Comment = {};
   
   Danbooru.Comment.initialize_all = function() {
+    $("#c-comments div.dtext-preview").hide();
     this.initialize_response_link();
     this.initialize_preview_button();
   }

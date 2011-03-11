@@ -221,6 +221,8 @@ form.simple_form {
 /*** DText Preview ***/
 div.dtext p {
   margin-bottom: 1em; }
+div.dtext ul {
+  margin-left: 1em; }
 
 /*** Pools Posts ***/
 div#c-pools-posts div#a-new form {
@@ -267,8 +269,13 @@ div.comments-for-post div.list-of-comments article {
     width: 40em;
     float: left; }
 div.comments-for-post div.comment-preview {
-  width: 40em;
   margin-bottom: 2em; }
+
+div.dtext-preview {
+  border: 2px dashed #AAA;
+  padding: 1em;
+  margin: 1em;
+  width: 40em; }
 
 div#c-comments div#a-index div.header span.info {
   margin-right: 1.5em; }
@@ -389,21 +396,12 @@ div#artists div#show {
     font-style: italic; }
 
 /*** Wiki Pages ***/
-div#c-wiki-pages div.wiki-page-body ul {
-  margin-left: 1em; }
-div#c-wiki-pages div.wiki-page-body p {
-  margin-bottom: 1em; }
 div#c-wiki-pages div#a-edit textarea, div#c-wiki-pages div#a-new textarea {
   width: 500px;
   height: 40em; }
-div#c-wiki-pages div#a-edit div#preview, div#c-wiki-pages div#a-new div#preview {
-  border: 2px dashed #AAA;
-  padding: 1em;
-  margin: 1em;
-  width: 40em; }
-  div#c-wiki-pages div#a-edit div#preview h1:first-child, div#c-wiki-pages div#a-new div#preview h1:first-child {
-    color: #333;
-    margin-bottom: 0.5em; }
+div#c-wiki-pages div#a-edit div#preview h1:first-child, div#c-wiki-pages div#a-new div#preview h1:first-child {
+  color: #333;
+  margin-bottom: 0.5em; }
 
 /*** Users ***/
 div.users div.new {

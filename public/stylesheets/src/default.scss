@@ -319,6 +319,10 @@ div.dtext {
   p {
     margin-bottom: 1em;
   }
+
+  ul {
+    margin-left: 1em;
+  }
 }
 
 
@@ -408,9 +412,15 @@ div.comments-for-post {
   }
   
   div.comment-preview {
-    width: 40em;
     margin-bottom: 2em;
   }
+}
+
+div.dtext-preview {
+  border: 2px dashed #AAA;
+  padding: 1em;
+  margin: 1em;
+  width: 40em;
 }
 
 div#c-comments {
@@ -655,16 +665,6 @@ div#artists {
 
 /*** Wiki Pages ***/
 div#c-wiki-pages {
-  div.wiki-page-body {
-    ul {
-      margin-left: 1em;
-    }
-    
-    p {
-      margin-bottom: 1em;
-    }
-  }
-  
   div#a-edit, div#a-new {
     textarea {
       width: 500px;
@@ -672,11 +672,6 @@ div#c-wiki-pages {
     }
     
     div#preview {
-      border: 2px dashed #AAA;
-      padding: 1em;
-      margin: 1em;
-      width: 40em;
-      
       h1:first-child {
         color: #333;
         margin-bottom: 0.5em;
