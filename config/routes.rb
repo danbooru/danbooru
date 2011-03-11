@@ -66,7 +66,7 @@ Danbooru::Application.routes.draw do
       put :revert
     end
   end
-  resources :wiki_page_versions, :only => [:index]
+  resources :wiki_page_versions, :only => [:index, :show]
 
   match '/favorites/:id' => 'favorites#create', :via => :post, :as => "favorite"
   match '/favorites/:id' => 'favorites#destroy', :via => :delete, :as => "favorite"

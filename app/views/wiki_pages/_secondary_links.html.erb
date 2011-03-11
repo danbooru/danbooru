@@ -14,5 +14,9 @@
         <% end %>
       <% end %>
     <% end %>
+    <% if @wiki_page_version %>
+      <li>|</li>
+      <li><%= link_to "Current", wiki_page_path(@wiki_page_version.wiki_page_id) %></li>
+    <% end %>
   </menu>
 <% end %>

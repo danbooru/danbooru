@@ -665,6 +665,14 @@ div#artists {
 
 /*** Wiki Pages ***/
 div#c-wiki-pages {
+  span.version {
+    color: #AAA;
+  }
+  
+  h1 {
+    margin-bottom: 0.5em;
+  }
+
   div#a-edit, div#a-new {
     textarea {
       width: 500px;
@@ -672,10 +680,6 @@ div#c-wiki-pages {
     }
     
     div#preview {
-      h1:first-child {
-        color: #333;
-        margin-bottom: 0.5em;
-      }
     }
   }
 }

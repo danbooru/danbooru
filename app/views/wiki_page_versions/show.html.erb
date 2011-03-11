@@ -1,0 +1,15 @@
+<div id="c-wiki-pages">
+  <div id="a-show">
+    <%= render "wiki_pages/sidebar" %>
+    
+    <section id="content">
+      <h1 id="wiki-page-title"><%= @wiki_page_version.pretty_title %> <span class="version">(<%= time_ago_in_words(@wiki_page_version.updated_at) %> ago)</span></h1>
+      
+      <div id="wiki-page-body" class="dtext">
+        <%= format_text(@wiki_page_version.body) %>
+      </div>
+    </section>
+  </div>
+</div>
+
+<%= render "wiki_pages/secondary_links" %>
