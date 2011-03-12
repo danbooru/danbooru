@@ -1,11 +1,9 @@
 <div id="c-forum-topics">
   <div id="a-new">
     <h1>New Forum Post</h1>
-
-    <%= simple_form_for(@forum_post) do |f| %>
-      <%= f.input :topic_id, :as => :hidden %>
-      <%= f.input :body %>
-      <%= f.button :submit, "Submit" %>
-    <% end %>
+    <%= render "form" %>
+    <%= error_messages_for "forum_post" %>
   </div>
 </div>
+
+<%= render "forum_topics/secondary_links" %>

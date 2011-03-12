@@ -1,0 +1,25 @@
+<div id="form-content">
+  <%= error_messages_for("forum_post") %>
+
+  <%= simple_form_for(@forum_post) do |f| %>
+    <% unless @forum_post.new_record? %>
+      <%= f.input :topic_id, :as => :hidden %>
+    <% end %>
+    <%= f.input :body %>
+
+    <%= f.button :submit, "Submit" %>
+    <%= f.button :submit, "Preview" %>
+  <% end %>
+</div>
+
+<div id="form-aside">
+  <div id="preview">
+    <div class="content dtext">
+      
+    </div>
+    <p><a href="#" name="toggle-preview">Hide</a></p>
+  </div>
+  <div id="dtext-help">
+    <%= render "dtext/help" %>
+  </div>
+</div>

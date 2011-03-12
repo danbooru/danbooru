@@ -134,14 +134,25 @@ table.striped tbody tr:hover {
 table.striped tr.even {
   background-color: #EEE; }
 
+div.error-messages {
+  margin: 1em 0;
+  padding: 1em; }
+  div.error-messages span.ui-icon {
+    float: left;
+    margin-right: 0.5em; }
+  div.error-messages h1 {
+    font-size: 1em;
+    color: #A00; }
+
 div#search {
   margin-bottom: 1em; }
 
 div#notice {
-  margin: 1em;
-  padding: 1em;
-  border: 2px solid #666;
-  background: #EEE; }
+  margin: 1em 0;
+  padding: 1em; }
+  div#notice span.ui-icon {
+    float: left;
+    margin-right: 0.5em; }
 
 div#page aside#sidebar {
   width: 20%;
@@ -222,6 +233,8 @@ form.simple_form {
         margin-right: 2em; }
 
 /*** DText Preview ***/
+div.dtext h1.preview-header {
+  margin-bottom: 0.25em; }
 div.dtext p {
   margin-bottom: 1em; }
 div.dtext ul {
@@ -455,6 +468,8 @@ div.list-of-forum-posts article {
     div.list-of-forum-posts article div.content menu {
       margin-top: 0.5em; }
 
+div#c-forum-topics div.single-forum-post {
+  width: 60em; }
 div#c-forum-topics div#a-show h1#forum-topic-title {
   font-size: 2em; }
 div#c-forum-topics span.info {
@@ -465,6 +480,10 @@ div#c-forum-topics textarea {
 div#c-forum-topics div#form-content {
   float: left;
   width: 500px; }
-div#c-forum-topics div#dtext-help {
+div#c-forum-topics div#form-aside {
   float: left;
   width: 400px; }
+  div#c-forum-topics div#form-aside div#preview > p {
+    margin-top: 0.5em;
+    padding-top: 0.5em;
+    border-top: 1px solid #AAA; }

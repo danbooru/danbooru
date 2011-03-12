@@ -6,6 +6,7 @@ class ForumPost < ActiveRecord::Base
   before_validation :initialize_updater
   after_save :update_topic_updated_at
   validates_presence_of :body, :creator_id
+  validate :validate_topic_is_unlocked
   scope :body_matches, lambda {|body| where(["text_index @@ plainto_tsquery(?)", body])}
   search_method :body_matches
   
@@ -17,6 +18,18 @@ class ForumPost < ActiveRecord::Base
       forum_post.build_response
     else
       new
+    end
+  end
+  
+  def validate_topic_is_unlocked
+    return if CurrentUser.is_moderator?
+    return if topic.nil?
+    
+    if topic.is_locked?
+      errors.add(:topic, "is locked") 
+      return false
+    else
+      return true
     end
   end
 

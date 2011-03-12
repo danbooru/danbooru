@@ -1,6 +1,4 @@
-<%= render "search" %>
-
-<table>
+<table width="100%" class="striped">
   <thead>
     <tr>
       <th>Topic</th>
@@ -12,10 +10,10 @@
   <tbody>
     <% @forum_posts.each do |forum_post| %>
       <tr>
-        <td><%= forum_post.topic.title %></td>
-        <td><%= truncate forum_post.body, :length => 50 %></td>
+        <td><%= link_to forum_post.topic.title, forum_topic_path(forum_post.topic) %></td>
+        <td><%= link_to truncate(forum_post.body, :length => 50), forum_post_path(forum_post) %></td>
         <td><%= forum_post.creator.name %></td>
-        <td><%= forum_post.created_at %></td>
+        <td><%= time_ago_in_words forum_post.created_at %> ago</td>
       </tr>
     <% end %>
   </tbody>
@@ -24,3 +22,5 @@
 <div id="paginator">
   <%= will_paginate @forum_posts %>
 </div>
+
+<%= render "forum_topics/secondary_links" %>

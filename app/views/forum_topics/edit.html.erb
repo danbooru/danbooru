@@ -1,19 +1,7 @@
 <div id="c-forum-topics">
   <div id="a-edit">
     <h1>Edit Forum Topic</h1>
-
-    <%= simple_form_for(@forum_topic) do |f| %>
-      <%= f.input :title %>
-  
-      <%= f.simple_fields_for :original_post do |pf| %>
-        <%= hidden_field_tag "forum_topic[original_post_attributes][topic_id]", @forum_topic.id %>
-        <%= pf.input :body %>
-      <% end %>
-  
-      <%= f.input :is_sticky %>
-      <%= f.input :is_locked %>
     
-      <%= f.button :submit, "Submit" %>
-    <% end %>
+    <%= render "form" %>
   </div>
 </div>

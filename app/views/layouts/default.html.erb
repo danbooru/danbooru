@@ -49,9 +49,9 @@
   </header>
   
   <% if flash[:notice] %>
-    <div id="notice"><%= flash[:notice] %></div>
+    <div class="ui-corner-all ui-state-highlight" id="notice"><span class="ui-icon ui-icon-info"></span> <%= flash[:notice] %></div>
   <% else %>
-    <div id="notice" style="display: none;"></div>
+    <div class="ui-corner-all ui-state-highlight" id="notice" style="display: none;"><span class="ui-icon ui-icon-info"></span> </div>
   <% end %>
 
   <div id="page">

@@ -3,7 +3,7 @@ $(document).ready(function() {
   //   $("#upgrade-account").hide();
   //   Cookie.put('hide-upgrade-account', '1', 7);
   // });
-
+  
   // Table striping
   $("table.striped tbody tr:even").addClass("even");
   $("table.striped tbody tr:odd").addClass("odd");

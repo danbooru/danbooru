@@ -7,6 +7,7 @@ class ForumTopic < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   before_validation :initialize_updater
   validates_presence_of :title, :creator_id
+  validates_associated :original_post
   scope :title_matches, lambda {|title| where(["text_index @@ plainto_tsquery(?)", title])}
   search_methods :title_matches
   accepts_nested_attributes_for :original_post

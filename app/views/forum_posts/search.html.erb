@@ -1,0 +1,12 @@
+<div id="c-forum-topics">
+  <div id="a-search">
+    <h1>Search Forum Posts</h1>
+    <%= simple_form_for @search do |f| %>
+      <%= f.input :topic_title_matches, :label => "Title" %>
+      <%= f.input :body_matches, :label => "Body" %>
+      <%= f.button :submit, "Search" %>
+    <% end %>
+  </div>
+</div>
+
+<%= render "forum_topics/secondary_links" %>

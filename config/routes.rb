@@ -19,7 +19,11 @@ Danbooru::Application.routes.draw do
   resources :dmails
   resources :favorites
   resources :forum_topics
-  resources :forum_posts
+  resources :forum_posts do
+    collection do
+      get :search
+    end
+  end
   resources :janitor_trials do
     member do
       put :promote

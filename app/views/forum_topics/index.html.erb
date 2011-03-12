@@ -1,8 +1,6 @@
 <h1>Forum</h1>
 
-<%= render "search" %>
-
-<table width="100%">
+<table width="100%" class="striped">
   <thead>
     <tr>
       <th>Title</th>
@@ -14,7 +12,7 @@
   <tbody>
     <% @forum_topics.each do |topic| %>
       <tr>
-        <td><%= topic.title %></td>
+        <td><% if topic.is_sticky? %><span class="sticky">Sticky:</span> <% end %><%= link_to topic.title, forum_topic_path(topic) %></td>
         <td><%= topic.creator.name %></td>
         <td><%= topic.updater.name %></td>
         <td><%= compact_time topic.updated_at %></td>

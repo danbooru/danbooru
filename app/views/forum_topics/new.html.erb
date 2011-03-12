@@ -2,21 +2,7 @@
   <div id="a-new">
     <h1>New Forum Topic</h1>
 
-    <div id="form-content">
-      <%= simple_form_for(@forum_topic) do |f| %>
-        <%= f.input :title %>
-
-        <%= f.simple_fields_for :original_post do |pf| %>
-          <%= pf.input :body %>
-        <% end %>
-
-        <%= f.button :submit, "Submit" %>
-      <% end %>
-    </div>
-
-    <div id="dtext-help">
-      <%= render "dtext/help" %>
-    </div>
+    <%= render "form" %>
   </div>
 </div>
 
