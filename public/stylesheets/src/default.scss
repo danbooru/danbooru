@@ -179,6 +179,10 @@ table.striped {
   }
 }
 
+div#search {
+  margin-bottom: 1em;
+}
+
 div#notice {
   margin: 1em;
   padding: 1em;
@@ -394,13 +398,13 @@ div.comments-for-post {
     article {
       margin-bottom: 2em;
       
-      span.comment-score {
-        color: #CCC;
-      }
-      
       div.author {
         width: 20%;
         float: left;
+        
+        h1 {
+          font-size: 1.5em;
+        }
       }
       
       div.content {
@@ -745,5 +749,60 @@ div#c-uploads {
         display: inline;
       }
     }
+  }
+}
+
+
+
+/*** Forum ***/
+div.list-of-forum-posts {
+  article {
+    margin-bottom: 3em;
+    
+    div.author {
+      width: 20%;
+      float: left;
+      
+      h1 {
+        font-size: 1.5em;
+      }
+    }
+    
+    div.content {
+      margin-left: 2em;
+      width: 40em;
+      float: left;
+      
+      menu {
+        margin-top: 0.5em;
+      }
+    }
+  }
+}
+
+div#c-forum-topics {
+  div#a-show {
+    h1#forum-topic-title {
+      font-size: 2em;
+    }
+  }
+  
+  span.info {
+    color: #AAA;
+  }
+  
+  textarea {
+    width: 400px;
+    height: 40em;
+  }
+  
+  div#form-content {
+    float: left;
+    width: 500px;
+  }
+  
+  div#dtext-help {
+    float: left;
+    width: 400px;
   }
 }

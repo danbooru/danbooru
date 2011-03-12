@@ -1,10 +1,10 @@
 class ForumPostsController < ApplicationController
-  respond_to :html, :xml, :json
+  respond_to :html, :xml, :json, :js
   before_filter :member_only, :except => [:index, :show]
   rescue_from User::PrivilegeError, :with => "static/access_denied"
 
   def new
-    @forum_post = ForumPost.new(:topic_id => params[:topic_id])
+    @forum_post = ForumPost.new_reply(params)
     respond_with(@forum_post)
   end
   
@@ -27,14 +27,14 @@ class ForumPostsController < ApplicationController
   
   def create
     @forum_post = ForumPost.create(params[:forum_post])
-    respond_with(@forum_post)
+    respond_with(@forum_post, :location => forum_topic_path(@forum_post.topic, :page => @forum_post.topic.last_page))
   end
   
   def update
     @forum_post = ForumPost.find(params[:id])
     check_privilege(@forum_post)
     @forum_post.update_attributes(params[:forum_post])
-    respond_with(@forum_post)
+    respond_with(@forum_post, :location => forum_topic_path(@forum_post.topic, :page => @forum_post.topic.last_page))
   end
   
   def destroy

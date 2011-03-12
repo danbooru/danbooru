@@ -134,6 +134,9 @@ table.striped tbody tr:hover {
 table.striped tr.even {
   background-color: #EEE; }
 
+div#search {
+  margin-bottom: 1em; }
+
 div#notice {
   margin: 1em;
   padding: 1em;
@@ -259,11 +262,11 @@ div#c-pools div#a-edit ul.ui-sortable {
 /*** Comments ***/
 div.comments-for-post div.list-of-comments article {
   margin-bottom: 2em; }
-  div.comments-for-post div.list-of-comments article span.comment-score {
-    color: #CCC; }
   div.comments-for-post div.list-of-comments article div.author {
     width: 20%;
     float: left; }
+    div.comments-for-post div.list-of-comments article div.author h1 {
+      font-size: 1.5em; }
   div.comments-for-post div.list-of-comments article div.content {
     margin-left: 2em;
     width: 40em;
@@ -436,3 +439,32 @@ div#c-uploads div#a-new div#upload-guide-notice {
   margin-bottom: 2em; }
 div#c-uploads div#a-new fieldset.ratings label {
   display: inline; }
+
+/*** Forum ***/
+div.list-of-forum-posts article {
+  margin-bottom: 3em; }
+  div.list-of-forum-posts article div.author {
+    width: 20%;
+    float: left; }
+    div.list-of-forum-posts article div.author h1 {
+      font-size: 1.5em; }
+  div.list-of-forum-posts article div.content {
+    margin-left: 2em;
+    width: 40em;
+    float: left; }
+    div.list-of-forum-posts article div.content menu {
+      margin-top: 0.5em; }
+
+div#c-forum-topics div#a-show h1#forum-topic-title {
+  font-size: 2em; }
+div#c-forum-topics span.info {
+  color: #AAA; }
+div#c-forum-topics textarea {
+  width: 400px;
+  height: 40em; }
+div#c-forum-topics div#form-content {
+  float: left;
+  width: 500px; }
+div#c-forum-topics div#dtext-help {
+  float: left;
+  width: 400px; }

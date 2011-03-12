@@ -2,11 +2,11 @@
 
 <%= render "search" %>
 
-<table>
+<table width="100%">
   <thead>
     <tr>
-      <th>Creator</th>
       <th>Title</th>
+      <th>Creator</th>
       <th>Updated by</th>
       <th>Updated at</th>
     </tr>
@@ -14,11 +14,13 @@
   <tbody>
     <% @forum_topics.each do |topic| %>
       <tr>
-        <td><%= topic.creator.name %></td>
         <td><%= topic.title %></td>
+        <td><%= topic.creator.name %></td>
         <td><%= topic.updater.name %></td>
         <td><%= compact_time topic.updated_at %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
+
+<%= render "secondary_links" %>

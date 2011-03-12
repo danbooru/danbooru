@@ -1,6 +1,10 @@
-<h1>Edit Post</h1>
+<div id="c-forum-topics">
+  <div id="a-edit">
+    <h1>Edit Forum Post</h1>
 
-<%= simple_form_for(@forum_post) do |f| %>
-  <%= f.input :body %>
-  <%= f.button :submit %>
-<% end %>
+    <%= simple_form_for(@forum_post) do |f| %>
+      <%= f.input :body %>
+      <%= f.button :submit, "Submit" %>
+    <% end %>
+  </div>
+</div>

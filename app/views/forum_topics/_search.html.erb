@@ -1,7 +1,6 @@
-<div>
-  <%= simple_form_for @search do |f| %>
-    <%= f.input :title_matches %>
-    <%= f.input :creator_name_equals %>
-    <%= f.button :submit %>
+<div id="search">
+  <%= form_tag(forum_posts_path, :method => :get) do %>
+    <%= text_field_tag "title_matches" %>
+    <%= submit_tag "Search" %>
   <% end %>
 </div>

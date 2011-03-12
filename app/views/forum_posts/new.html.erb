@@ -1,7 +1,11 @@
-<h1>New Post</h1>
+<div id="c-forum-topics">
+  <div id="a-new">
+    <h1>New Forum Post</h1>
 
-<%= simple_form_for(@forum_post) do |f| %>
-  <%= f.input :topic_id, :as => :hidden %>
-  <%= f.input :body %>
-  <%= f.button :submit %>
-<% end %>
+    <%= simple_form_for(@forum_post) do |f| %>
+      <%= f.input :topic_id, :as => :hidden %>
+      <%= f.input :body %>
+      <%= f.button :submit, "Submit" %>
+    <% end %>
+  </div>
+</div>

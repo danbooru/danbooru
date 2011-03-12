@@ -1,10 +1,12 @@
 class ForumTopicsController < ApplicationController
   respond_to :html, :xml, :json
   before_filter :member_only, :except => [:index, :show]
+  before_filter :normalize_search, :only => :index
   rescue_from User::PrivilegeError, :with => "static/access_denied"
 
   def new
     @forum_topic = ForumTopic.new
+    @forum_topic.original_post = ForumPost.new
     respond_with(@forum_topic)
   end
   
@@ -22,6 +24,7 @@ class ForumTopicsController < ApplicationController
   
   def show
     @forum_topic = ForumTopic.find(params[:id])
+    @forum_posts = ForumPost.search(:topic_id_eq => @forum_topic.id).paginate(:page => params[:page])
     respond_with(@forum_topic)
   end
   
@@ -33,6 +36,7 @@ class ForumTopicsController < ApplicationController
   def update
     @forum_topic = ForumTopic.find(params[:id])
     check_privilege(@forum_topic)
+    assign_special_attributes(@forum_topic)
     @forum_topic.update_attributes(params[:forum_topic])
     respond_with(@forum_topic)
   end
@@ -45,6 +49,25 @@ class ForumTopicsController < ApplicationController
   end
 
 private
+  def assign_special_attributes(forum_topic)
+    return unless CurrentUser.is_moderator?
+    
+    forum_topic.is_locked = params[:forum_topic][:is_locked]
+    forum_topic.is_sticky = params[:forum_topic][:is_sticky]
+  end
+  
+  def normalize_search
+    if params[:title_matches]
+      params[:search] ||= {}
+      params[:search][:title_matches] = params.delete(:title_matches)
+    end
+    
+    if params[:title]
+      params[:search] ||= {}
+      params[:search][:title_eq] = params.delete(:title)
+    end
+  end
+
   def check_privilege(forum_topic)
     if !forum_topic.editable_by?(CurrentUser.user)
       raise User::PrivilegeError

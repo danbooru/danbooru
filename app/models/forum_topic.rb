@@ -22,4 +22,12 @@ class ForumTopic < ActiveRecord::Base
   def initialize_updater
     self.updater_id = CurrentUser.id
   end
+  
+  def last_page
+    (posts.count / Danbooru.config.posts_per_page.to_f).ceil
+  end
+  
+  def presenter(forum_posts)
+    @presenter ||= ForumTopicPresenter.new(self, forum_posts)
+  end
 end
