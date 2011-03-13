@@ -13,7 +13,7 @@ module PostSets
     end
 
     def load_posts
-      @posts = pool.posts(:limit => limit, :offset => offset)
+      @posts = pool.posts(:limit => limit, :offset => offset).order("posts.id")
     end
     
     def sorted_posts

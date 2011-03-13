@@ -42,6 +42,10 @@ class PoolTest < ActiveSupport::TestCase
       p1.add_pool(pool)
       p2.add_pool(pool)
       p3.add_pool(pool)
+      pool.add_post!(p1)
+      pool.add_post!(p2)
+      pool.add_post!(p3)
+      pool.reload
       
       assert_equal("#{p1.id} #{p2.id} #{p3.id}", pool.post_ids)
       assert_equal([p1.id, p2.id, p3.id], pool.post_id_array)
@@ -61,6 +65,10 @@ class PoolTest < ActiveSupport::TestCase
       p1.add_pool(pool)
       p2.add_pool(pool)
       p3.add_pool(pool)
+      pool.add_post!(p1)
+      pool.add_post!(p2)
+      pool.add_post!(p3)
+      pool.reload
       neighbors = pool.neighbor_posts(p1)
       assert_nil(neighbors[:previous])
       assert_equal(p2.id, neighbors[:next])

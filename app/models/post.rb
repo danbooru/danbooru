@@ -22,6 +22,7 @@ class Post < ActiveRecord::Base
   has_many :notes, :dependent => :destroy
   has_many :comments
   has_many :children, :class_name => "Post", :foreign_key => "parent_id", :order => "posts.id"
+  has_many :disapprovals, :class_name => "PostDisapproval"
   validates_uniqueness_of :md5
   validates_presence_of :parent, :if => lambda {|rec| !rec.parent_id.nil?}
   validate :validate_parent_does_not_have_a_parent
@@ -615,19 +616,24 @@ class Post < ActiveRecord::Base
   end
   
   module PoolMethods
+    def pools
+      @pools ||= begin
+        pool_ids = pool_string.scan(/\d+/)
+        Pool.where(["id in (?)", pool_ids])
+      end
+    end
+    
     def add_pool(pool)
       return if pool_string =~ /(?:\A| )pool:#{pool.id}(?:\Z| )/
       self.pool_string += " pool:#{pool.id}"
       self.pool_string.strip!
       execute_sql("UPDATE posts SET pool_string = ? WHERE id = ?", pool_string, id)
-      pool.add_post!(self)
     end
     
     def remove_pool(pool)
       self.pool_string.gsub!(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ")
       self.pool_string.strip!
       execute_sql("UPDATE posts SET pool_string = ? WHERE id = ?", pool_string, id)
-      pool.remove_post!(self)
     end
   end
   

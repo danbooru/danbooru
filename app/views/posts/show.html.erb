@@ -5,6 +5,13 @@
         <h1>Search</h1>
         <%= render :partial => "posts/partials/common/search" %>
       </section>
+      
+      <% if @post.pools.any? %>
+        <section>
+          <h1>Pools</h1>
+          <%= render "posts/partials/show/pools", :locals => {:post => @post} %>
+        </section>
+      <% end %>
 
       <section>
         <h1>Tags</h1>
@@ -19,7 +26,7 @@
       <section>
         <h1>Options</h1>
         <%= render :partial => "posts/partials/show/options", :locals => {:post => @post} %>
-      </section>  
+      </section>
     </aside>
 
     <section id="content">

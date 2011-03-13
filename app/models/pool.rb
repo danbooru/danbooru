@@ -5,8 +5,10 @@ class Pool < ActiveRecord::Base
   belongs_to :updater, :class_name => "User"
   has_many :versions, :class_name => "PoolVersion", :dependent => :destroy, :order => "pool_versions.id ASC"
   before_validation :normalize_name
+  before_validation :normalize_post_ids
   before_validation :initialize_creator, :on => :create
   after_save :create_version
+  after_save :update_posts
   attr_accessible :name, :description, :post_ids, :is_active, :post_id_array
   
   def self.name_to_id(name)
@@ -35,22 +37,36 @@ class Pool < ActiveRecord::Base
     self.name = name.downcase
   end
   
+  def normalize_post_ids
+    self.post_ids = post_ids.gsub(/\s\s+/, " ")
+    self.post_ids = post_ids.gsub(/^\s+/, "")
+    self.post_ids = post_ids.gsub(/\s+$/, "")
+  end
+  
   def revert_to!(version)
     self.post_ids = version.post_ids
     save
   end
   
+  def update_posts
+    post_id_array.each do |post_id|
+      post = Post.find(post_id)
+      post.add_pool(self)
+    end
+  end
+  
   def add_post!(post)
     return if post_ids =~ /(?:\A| )#{post.id}(?:\Z| )/
-    
     self.post_ids += " #{post.id}"
     self.post_ids = post_ids.strip
+    clear_post_id_array
     save
   end
   
   def remove_post!(post)
     self.post_ids = post_ids.gsub(/(?:\A| )#{post.id}(?:\Z| )/, " ")
     self.post_ids = post_ids.strip
+    clear_post_id_array
     save
   end
   

@@ -1,22 +1,36 @@
-<form method="get" action="/post/moderate">
-  <%= text_field_tag "query", params[:query], :size => 40 %>
-  <%= submit_tag "Search" %>
-</form>
-
-<script type="text/javascript" charset="utf-8">
-  Post.mod_queue = $A(<%= @posts.map(&:id).to_json %>)
-</script>
+<div id="search">
+  <%= simple_form_for(@search) do |f| %>
+    <%= f.input "tags_match", :input_html => {:size => 40}, :label => false %>
+  <% end %>
+</div>
 
 <div style="margin-bottom: 2em;">
   <h2>Moderation Queue</h2>
   
-  <div style="margin: 1em 0;">
-    <h4>Deletion Guidelines</h4>
-    <p>As a general rule, you should not delete posts. Only approve of posts that you personally like. Posts that are not approved in three days will be automatically deleted. Posts with score -3 or lower are marked red. Posts with score 3 or higher are marked green. Posts tagged as duplicate are marked yellow. <% if params[:hidden] %>Click <%= fast_link_to "here", :action => "moderate", :query => params[:query], :hidden => nil %> to view all posts.<% else %>Click <%= fast_link_to "here", :action => "moderate", :query => params[:query], :hidden => true %> to view hidden posts.<% end %></p>
-    
-    <p>Mass update: <%= link_to_function "Approve all", "if (confirm('This will approve every pending post on this page. Continue?')) {Post.mass_moderate('Approve')}" %> | <%= link_to_function "Hide all", "if (confirm('This will hide every pending post on this page. Continue?')) {Post.mass_moderate('Hide')}" %></p>
-  </div>
-
+  <% @posts.each do |post| %>
+    <div>
+      <div>
+        <%= link_to(image_tag(post.medium_file_url), post_path(post)) %>
+      </div>
+      
+      <div>
+        <ul>
+          <li>Rating: <%= post.pretty_rating %></li>
+          <li>Score: <%= post.score %></li>
+          <li>Uploader: <%= link_to(post.uploader.name, user_path(post.uploader_id)) %> <%= time_ago_in_words(post.updated_at) %> ago</li>
+          <% if post.is_flagged? %>
+            <li>Flagged: <%= post.unapproval.reason %> by <%= post.unapproval.unapprover.name %></li>
+          <% end %>
+          <li>Hidden: <%= post.disapprovals.count %></li>
+          <li>Tags: <%= post.tag_string %></li>
+          <% if post.pools.any? %>
+            <li>Pools: </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+  
   <table width="100%">
     <tbody>
       <% @posts.each do |p| %>

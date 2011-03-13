@@ -198,7 +198,7 @@ class Tag < ActiveRecord::Base
         output[:exclude] << tag[1..-1]
         
       elsif tag =~ /\*/
-        matches = Tag.by_pattern(tag).all(:select => "name", :limit => 25, :order => "post_count DESC").map(&:name)
+        matches = Tag.name_matches(tag).all(:select => "name", :limit => 25, :order => "post_count DESC").map(&:name)
         matches = ["~no_matches~"] if matches.empty?
         output[:include] += matches
         

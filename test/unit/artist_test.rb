@@ -103,7 +103,7 @@ class ArtistTest < ActiveSupport::TestCase
     
     should "have an associated wiki" do
       user = Factory.create(:user)
-      artist = Factory.create(:artist, :name => "max", :wiki_page_attributes => {:body => "this is max"})
+      artist = Factory.create(:artist, :name => "max", :wiki_page_attributes => {:title => "xxx", :body => "this is max"})
       assert_not_nil(artist.wiki_page)
       assert_equal("this is max", artist.wiki_page.body)
     

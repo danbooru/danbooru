@@ -16,6 +16,9 @@ module PostSets
         @pool.add_post!(@post_2)
         @pool.add_post!(@post_1)
         @pool.add_post!(@post_3)
+        @post_2.add_pool(@pool)
+        @post_1.add_pool(@pool)
+        @post_3.add_pool(@pool)
         @set = PostSets::Pool.new(@pool, :page => 1)
       end
       

@@ -1,0 +1,5 @@
+<ul>
+  <% post.pools.each do |pool| %>
+    <li><span class="ui-icon ui-icon-circle-arrow-w"></span><span class="ui-icon ui-icon-circle-arrow-e"></span> <%= link_to pool_path(pool), pool.name %></li>
+  <% end %>
+</ul>
