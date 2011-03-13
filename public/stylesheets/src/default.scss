@@ -527,6 +527,14 @@ div#c-posts {
     font-size: 1.1em;
   }
   
+  aside#sidebar > section#pool-sidebar {
+    span.ui-icon {
+      float: left;
+      margin-right: 0.25em;
+      color: #666;
+    }
+  }
+  
   aside#sidebar > section > ul li {
     list-style-type: none;
   }

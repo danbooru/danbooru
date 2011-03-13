@@ -7,9 +7,9 @@
       </section>
       
       <% if @post.pools.any? %>
-        <section>
+        <section id="pool-sidebar">
           <h1>Pools</h1>
-          <%= render "posts/partials/show/pools", :locals => {:post => @post} %>
+          <%= render :partial => "posts/partials/show/pools", :locals => {:post => @post} %>
         </section>
       <% end %>
 

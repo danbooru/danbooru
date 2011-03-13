@@ -91,16 +91,18 @@ class Pool < ActiveRecord::Base
   end
   
   def neighbor_posts(post)
-    post_ids =~ /\A#{post.id} (\d+)|(\d+) #{post.id} (\d+)|(\d+) #{post.id}\Z/
+    @neighbor_posts ||= begin
+      post_ids =~ /\A#{post.id} (\d+)|(\d+) #{post.id} (\d+)|(\d+) #{post.id}\Z/
     
-    if $2 && $3
-      {:previous => $2.to_i, :next => $3.to_i}
-    elsif $1
-      {:next => $1.to_i}
-    elsif $4
-      {:previous => $4.to_i}
-    else
-      nil
+      if $2 && $3
+        {:previous => $2.to_i, :next => $3.to_i}
+      elsif $1
+        {:next => $1.to_i}
+      elsif $4
+        {:previous => $4.to_i}
+      else
+        {}
+      end
     end
   end
   
@@ -116,6 +118,7 @@ class Pool < ActiveRecord::Base
   
   def reload(options = {})
     super
+    @neighbor_posts = nil
     clear_post_id_array
   end
 end

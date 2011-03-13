@@ -333,6 +333,10 @@ div#c-posts h1 {
   font-size: 1.2em; }
 div#c-posts h2 {
   font-size: 1.1em; }
+div#c-posts aside#sidebar > section#pool-sidebar span.ui-icon {
+  float: left;
+  margin-right: 0.25em;
+  color: #666; }
 div#c-posts aside#sidebar > section > ul li {
   list-style-type: none; }
 div#c-posts aside#sidebar > section > ul ul li {

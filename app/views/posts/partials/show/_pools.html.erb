@@ -1,5 +1,17 @@
 <ul>
   <% post.pools.each do |pool| %>
-    <li><span class="ui-icon ui-icon-circle-arrow-w"></span><span class="ui-icon ui-icon-circle-arrow-e"></span> <%= link_to pool_path(pool), pool.name %></li>
+    <li>
+      <% if pool.neighbor_posts(post)[:previous] %>
+        <%= link_to "&laquo;".html_safe, post_path(pool.neighbor_posts(post)[:previous]) %>
+      <% else %>
+        &laquo;
+      <% end %>
+      <% if pool.neighbor_posts(post)[:next] %>
+        <%= link_to "&raquo;".html_safe, post_path(pool.neighbor_posts(post)[:next]) %>
+      <% else %>
+        &raquo;
+      <% end %>
+      <%= link_to pool.name, pool_path(pool) %>
+    </li>
   <% end %>
 </ul>
