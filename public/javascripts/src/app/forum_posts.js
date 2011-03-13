@@ -12,6 +12,7 @@
       $("#preview").toggle();
       $("#dtext-help").toggle();
     });
+    
     $("#c-forum-topics input[value=Preview]").click(function(e) {
       e.preventDefault();
       $.ajax({

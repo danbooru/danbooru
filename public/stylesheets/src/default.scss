@@ -154,6 +154,12 @@ section {
   display: block;
 }
 
+span.error {
+  display: block;
+  font-weight: bold;
+  color: red;
+}
+
 span.link {
   color: $link_color;
   cursor: pointer;
@@ -398,13 +404,13 @@ div#c-pools {
       
       li.ui-state-default {
         margin-bottom: 20px;
-        width: 250px;
+        width: 180px;
         background: none;
       }
       
       li.ui-state-placeholder {
         margin-bottom: 20px;
-        width: 250px;
+        width: 180px;
         height: 150px;
         background: none;
       }
@@ -689,28 +695,6 @@ div#artists {
 }
 
 
-/*** Wiki Pages ***/
-div#c-wiki-pages {
-  span.version {
-    color: #AAA;
-  }
-  
-  h1 {
-    margin-bottom: 0.5em;
-  }
-
-  div#a-edit, div#a-new {
-    textarea {
-      width: 500px;
-      height: 40em;
-    }
-    
-    div#preview {
-    }
-  }
-}
-
-
 /*** Users ***/
 div.users {
   div.new {
@@ -824,7 +808,8 @@ div#c-forum-topics {
   
   div#form-content {
     float: left;
-    width: 500px;
+    width: 450px;
+    padding-right: 1em;
   }
   
   div#form-aside {
@@ -835,6 +820,42 @@ div#c-forum-topics {
       margin-top: 0.5em;
       padding-top: 0.5em;
       border-top: 1px solid #AAA;
+    }
+  }
+}
+
+
+
+/*** Wiki Pages ***/
+div#c-wiki-pages {
+  span.version {
+    color: #AAA;
+  }
+  
+  div#form-content {
+    float: left;
+    width: 450px;
+    padding-right: 1em;
+  }
+  
+  div#form-aside {
+    float: left;
+    width: 400px;
+    
+    div#preview > p {
+      margin-top: 0.5em;
+      padding-top: 0.5em;
+      border-top: 1px solid #AAA;
+    }
+  }
+
+  div#a-edit, div#a-new {
+    textarea {
+      width: 400px;
+      height: 40em;
+    }
+    
+    div#preview {
     }
   }
 }

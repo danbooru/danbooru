@@ -1,8 +1,27 @@
-<% if @wiki_page.new_record? || CurrentUser.is_moderator? %>
-  <%= f.input :title %>
-<% end %>
-<%= f.input :body %>
-<% if CurrentUser.is_janitor? %>
-  <%= f.input :is_locked %>
-<% end %>
-<%= f.button :submit, "Save" %><%= f.button :submit, "Cancel" %><%= f.button :submit, "Preview" %>  
+<div id="form-content">
+  <%= error_messages_for("wiki_page") %>
+
+  <%= simple_form_for(@wiki_page) do |f| %>
+    <%= f.input :title %>
+    <%= f.input :body %>
+
+    <% if CurrentUser.is_janitor? %>
+      <%= f.input :is_locked %>
+    <% end %>
+
+    <%= f.button :submit, "Submit" %>
+    <%= f.button :submit, "Preview" %>
+  <% end %>
+</div>
+
+<div id="form-aside">
+  <div id="preview">
+    <div class="content dtext">
+      
+    </div>
+    <p><a href="#" name="toggle-preview">Hide</a></p>
+  </div>
+  <div id="dtext-help">
+    <%= render "dtext/help" %>
+  </div>
+</div>

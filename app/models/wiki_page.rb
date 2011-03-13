@@ -4,7 +4,7 @@ class WikiPage < ActiveRecord::Base
   after_save :create_version
   belongs_to :creator, :class_name => "User"
   validates_uniqueness_of :title, :case_sensitive => false
-  validates_presence_of :body
+  validates_presence_of :body, :title
   validate :validate_locker_is_janitor
   attr_accessible :title, :body, :is_locked
   scope :titled, lambda {|title| where(["title = ?", title.downcase.tr(" ", "_")])}

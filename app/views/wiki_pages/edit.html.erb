@@ -1,19 +1,11 @@
 <div id="c-wiki-pages">
   <div id="a-edit">
     <%= render "sidebar" %>
-
+    
     <section id="content">
-      <h1 id="wiki-page-title"><%= @wiki_page.pretty_title %> (Editing)</h1>
-
-      <div id="preview" class="dtext">
-      </div>
-
-      <%= simple_form_for(@wiki_page) do |f| %>
-        <%= render :partial => "form", :locals => {:f => f} %>
-      <% end %>
+      <%= render "form" %>
     </section>
-
-    <%= render "secondary_links" %>    
   </div>
 </div>
 
+<%= render "secondary_links" %>    
