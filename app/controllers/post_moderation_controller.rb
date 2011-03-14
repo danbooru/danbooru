@@ -4,7 +4,7 @@ class PostModerationController < ApplicationController
   rescue_from Post::DisapprovalError, :with => :disapproval_error
   
   def moderate
-    @search = Post.pending.available_for_moderation.search(params[:search]).order("id asc")
+    @search = Post.order("id asc").pending.available_for_moderation.search(:tag_match => params[:query])
     @posts = @search.paginate(:page => params[:page])
     respond_to do |format|
       format.html

@@ -13,6 +13,24 @@
       (<%= post.image_width %>x<%= post.image_height %>)
     <% end %>
   </li>
+  <li>
+    Status:
+    <% if post.is_pending? %>
+      <abbr title="Pending">P</abbr>
+    <% end %>
+    
+    <% if post.is_deleted? %>
+      <abbr title="Deleted">D</abbr>
+    <% end %>
+    
+    <% if post.is_flagged? %>
+      <abbr title="Unapproved">U</abbr>
+    <% end %>
+    
+    <% if !post.is_pending? && !post.is_deleted? %>
+      <abbr title="Active">A</abbr>
+    <% end %>
+  </li>
   <li><%= link_to "Tag History", post_versions_path(:search => {:post_id_eq => post.id}) %></li>
   <li><%= link_to "Note History", note_versions_path(:search => {:post_id_eq => post.id}) %></li>
 </ul>

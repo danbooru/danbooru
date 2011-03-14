@@ -35,6 +35,7 @@ class Post < ActiveRecord::Base
   scope :hidden_from_moderation, lambda {where(["id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :before_id, lambda {|id| id.present? ? where(["posts.id < ?", id]) : where("TRUE")}
   scope :tag_match, lambda {|query| Post.tag_match_helper(query)}
+  search_method :tag_match
   
   module FileMethods
     def delete_files

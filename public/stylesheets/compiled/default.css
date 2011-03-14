@@ -506,3 +506,13 @@ div#c-wiki-pages div#form-aside {
 div#c-wiki-pages div#a-edit textarea, div#c-wiki-pages div#a-new textarea {
   width: 400px;
   height: 40em; }
+
+/*** Post Moderation ***/
+div#c-post-moderation article {
+  margin-bottom: 4em; }
+div#c-post-moderation aside {
+  float: left;
+  width: 520px; }
+div#c-post-moderation section {
+  float: left;
+  width: 300px; }

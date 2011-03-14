@@ -867,3 +867,22 @@ div#c-wiki-pages {
     }
   }
 }
+
+
+
+/*** Post Moderation ***/
+div#c-post-moderation {
+  article {
+    margin-bottom: 4em;
+  }
+  
+  aside {
+    float: left;
+    width: 520px;
+  }
+  
+  section {
+    float: left;
+    width: 300px;
+  }
+}

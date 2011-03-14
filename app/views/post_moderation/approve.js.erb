@@ -1,4 +1,5 @@
-$("a#approve").hide();
-$("a#disapprove").hide();
-$("a#unapprove").show();
-$("img#approve-wait").hide();
+$("#c-posts a#approve").hide();
+$("#c-posts a#disapprove").hide();
+$("#c-posts a#unapprove").show();
+
+$("#c-post-moderation #post-<%= @post.id %>").hide();
