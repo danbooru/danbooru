@@ -28,6 +28,7 @@ class Post < ActiveRecord::Base
   validate :validate_parent_does_not_have_a_parent
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at
   scope :pending, where(["is_pending = ?", true])
+  scope :pending_or_flagged, where(["(is_pending = ? OR is_flagged = ?)", true, true])
   scope :undeleted, where(["is_deleted = ?", false])
   scope :visible, lambda {|user| Danbooru.config.can_user_see_post_conditions(user)}
   scope :commented_before, lambda {|date| where("last_commented_at < ?", date).order("last_commented_at DESC")}
