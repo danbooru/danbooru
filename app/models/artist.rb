@@ -12,6 +12,9 @@ class Artist < ActiveRecord::Base
   has_one :tag_alias, :foreign_key => "antecedent_name", :primary_key => "name"
   accepts_nested_attributes_for :wiki_page
   attr_accessible :name, :url_string, :other_names, :group_name, :wiki_page_attributes, :notes
+  scope :url_match, lambda {|string| where(["id in (?)", Artist.find_all_by_url(string).map(&:id)])}
+  scope :other_names_match, lambda {|string| where(["other_names_index @@ to_tsquery('danbooru', ?)", Artist.normalize_name(string)])}
+  search_method :url_match, :other_names_match
   
   module UrlMethods
     module ClassMethods
@@ -75,58 +78,6 @@ class Artist < ActiveRecord::Base
   module GroupMethods
     def member_names
       members.map(&:name).join(", ")
-    end
-  end
-  
-  module SearchMethods
-    def find_by_name_or_id(params)
-      if params[:name]
-        find_by_name(params[:name])
-      else
-        find(params[:id])
-      end
-    end
-    
-    def find_by_any_name(name)
-      build_relation(:name => name).first
-    end
-
-    def build_relation(params)
-      relation = Artist.where("is_active = TRUE")
-      
-      case params[:name]
-      when /^http/
-        relation = relation.where("id IN (?)", find_all_by_url(params[:name]).map(&:id))
-        
-      when /name:(.+)/
-        escaped_name = Artist.normalize_name($1).to_escaped_for_sql_like
-        relation = relation.where(["name LIKE ? ESCAPE E'\\\\'", escaped_name])
-        
-      when /other:(.+)/
-        escaped_name = Artist.normalize_name($1)
-        relation = relation.where(["other_names_index @@ to_tsquery('danbooru', ?)", escaped_name])
-        
-      when /group:(.+)/
-        escaped_name = Artist.normalize_name($1).to_escaped_for_sql_like
-        relation = relation.where(["group_name LIKE ? ESCAPE E'\\\\'", escaped_name])
-        
-      when /./
-        normalized_name = Artist.normalize_name($1)
-        escaped_name = normalized_name.to_escaped_for_sql_like
-        relation = relation.where(["name LIKE ? ESCAPE E'\\\\' OR other_names_index @@ to_tsquery('danbooru', ?) OR group_name LIKE ? ESCAPE E'\\\\'", escaped_name, normalized_name, escaped_name])
-      end
-
-      if params[:id]
-        relation = relation.where(["id = ?", params[:id]])
-      end
-
-      if params[:order] == "date"
-        relation = relation.order("updated_at DESC")
-      else
-        relation = relation.order("name")
-      end
-
-      relation
     end
   end
   
@@ -209,7 +160,6 @@ class Artist < ActiveRecord::Base
   include UrlMethods
   include NameMethods
   include GroupMethods
-  extend SearchMethods  
   include VersionMethods
   extend FactoryMethods
   include NoteMethods

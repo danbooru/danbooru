@@ -13,6 +13,10 @@ class TagsController < ApplicationController
     respond_with(@tags)
   end
   
+  def search
+    @search = Tag.search(params[:search])
+  end
+  
   def show
     @tag = Tag.find(params[:id])
     respond_with(@tag)

@@ -1,0 +1,17 @@
+<div id="c-artists">
+  <div id="a-search">
+    <h1>Search Artists</h1>
+    
+    <div id="search-form" style="margin-bottom: 1em;">
+      <%= simple_form_for(@search) do |f| %>
+        <%= f.input :name_contains, :label => "Name" %>
+        <%= f.input :other_names_match, :label => "Other Names" %>
+        <%= f.input :group_name_contains, :label => "Group Name" %>
+        <%= f.input :url_match, :label => "URL" %>
+        <%= f.button :submit, "Search" %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<%= render "secondary_links" %>

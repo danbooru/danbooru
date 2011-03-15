@@ -13,8 +13,13 @@ class ArtistsController < ApplicationController
   end
   
   def index
-    @artists = Artist.build_relation(params).paginate(:per_page => 25, :page => params[:page])
+    @search = Artist.search(params[:search])
+    @artists = @search.paginate(:page => params[:page])
     respond_with(@artists)
+  end
+  
+  def search
+    @search = Artist.search(params[:search])
   end
   
   def show

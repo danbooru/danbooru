@@ -1,7 +1,7 @@
 <div class="header">
   <div class="row">
     <span class="info">
-      <time>Date</time>
+      <strong>Date</strong>
       <%= compact_time(post.created_at) %>
     </span>
     <span class="info">
@@ -14,7 +14,7 @@
     </span>
     <span class="info">
       <strong>Score</strong>
-      <span id="score-for-post-<%= post.id %>"%>
+      <span id="score-for-post-<%= post.id %>">
         <span><%= post.score %></span>
         <% if CurrentUser.user.is_privileged? %>
           (vote <%= link_to("up", post_votes_path(:score => "up", :post_id => post.id), :remote => true, :method => :post) %>/<%= link_to("down", post_votes_path(:score => "down", :post_id => post.id), :remote => true, :method => :post) %>)

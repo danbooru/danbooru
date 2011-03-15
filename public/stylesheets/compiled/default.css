@@ -407,15 +407,15 @@ div#sessions div#new h2 {
   margin-bottom: 5px; }
 
 /*** Artists ***/
-div#artists span.new-artist {
+div#c-artists span.new-artist {
   font-weight: bold;
   color: #A00; }
-div#artists div#show {
+div#c-artists div#a-show {
   max-width: 60em; }
-  div#artists div#show h1 {
+  div#c-artists div#a-show h1 {
     font-size: 1.5em;
     margin-bottom: 5px; }
-  div#artists div#show p.legend {
+  div#c-artists div#a-show p.legend {
     margin-bottom: 2em;
     font-size: 0.8em;
     font-style: italic; }

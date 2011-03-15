@@ -10,11 +10,17 @@ Danbooru::Application.routes.draw do
     member do
       put :revert
     end
+    collection do
+      get :search
+    end
   end
   resources :artist_versions, :only => [:index]
   resources :bans
   resources :comments do
     resources :votes, :controller => "comment_votes", :only => [:create, :destroy]
+    collection do
+      get :search
+    end
   end
   resources :dmails
   resources :favorites
@@ -53,7 +59,11 @@ Danbooru::Application.routes.draw do
 
   resources :post_versions, :only => [:index]
   resource :session
-  resources :tags
+  resources :tags do
+    collection do
+      get :search
+    end
+  end
   resources :tag_aliases do
     member do
       delete :cache
