@@ -2,8 +2,8 @@ var errors = <%= @unapproval.errors.full_messages.to_json.html_safe %>;
 if (errors.length > 0) {
   Danbooru.j_error(errors.join("; "));
 } else {
-  Danbooru.j_alert("Unapproval", "Unapproval successful");
+  Danbooru.j_alert("Flag", "Post flagged");
   $("a#approve").show();
   $("a#disapprove").show();
-  $("a#unapprove").hide();
+  $("a#flag").hide();
 }

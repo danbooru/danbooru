@@ -1,0 +1,13 @@
+<div id="c-comments">
+  <div id="a-search">
+    <h1>Search Comments</h1>
+    <%= simple_form_for(@search) do |f| %>
+      <%= hidden_field_tag "group_by", "comment" %>
+      <%= f.input :body_matches, :label => "Body" %>
+      <%= f.input :creator_name_equals, :label => "User" %>
+      <%= f.input :post_tag_match, :label => "Tags" %>
+      
+      <%= f.button :submit, "Search" %>
+    <% end %>
+  </div>
+</div>

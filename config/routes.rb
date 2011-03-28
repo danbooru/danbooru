@@ -58,6 +58,8 @@ Danbooru::Application.routes.draw do
   end
 
   resources :post_versions, :only => [:index]
+  resources :post_flags, :only => [:new, :index, :create]
+  resources :post_appeals, :only => [:new, :index, :create]
   resource :session
   resources :tags do
     collection do
@@ -71,7 +73,6 @@ Danbooru::Application.routes.draw do
   end
   resources :tag_implications
   resources :tag_subscriptions
-  resources :unapprovals
   resources :uploads
   resources :users
   resources :user_feedback

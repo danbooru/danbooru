@@ -14,7 +14,8 @@ cat public/javascripts/src/app/comments.js >> public/javascripts/compiled/defaul
 cat public/javascripts/src/app/uploads.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/users.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/favorites.js >> public/javascripts/compiled/default.js
-cat public/javascripts/src/app/unapprovals.js >> public/javascripts/compiled/default.js
+cat public/javascripts/src/app/post_flags.js >> public/javascripts/compiled/default.js
+cat public/javascripts/src/app/post_appeals.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/post_moderation.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/pools.js >> public/javascripts/compiled/default.js
 cat public/javascripts/src/app/wiki_pages.js >> public/javascripts/compiled/default.js

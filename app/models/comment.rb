@@ -10,8 +10,12 @@ class Comment < ActiveRecord::Base
   attr_accessor :do_not_bump_post
   
   scope :recent, :order => "comments.id desc", :limit => 6
-  scope :search_body, lambda {|query| where("body_index @@ plainto_tsquery(?)", query).order("comments.id DESC")}
+  scope :body_matches, lambda {|query| where("body_index @@ plainto_tsquery(?)", query).order("comments.id DESC")}
   scope :hidden, lambda {|user| where("score < ?", user.comment_threshold)}
+  scope :post_tag_match, lambda {|query| joins(:post).where("posts.tag_index @@ to_tsquery('danbooru', ?)", query)}
+  
+  search_method :body_matches
+  search_method :post_tag_match
 
   def initialize_creator
     self.creator_id = CurrentUser.user.id

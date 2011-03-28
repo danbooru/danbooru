@@ -1,5 +1,5 @@
 class DtextController < ApplicationController
   def preview
-    render :inline => "<h1 class=\"preview-header\">Preview</h1><%= format_text(params[:body]) %>"
+    render :inline => "<h3 class=\"preview-header\">Preview</h3><%= format_text(params[:body]) %>"
   end
 end

@@ -1,0 +1,17 @@
+<p>If this post was automatically deleted, <strong>then it means at least ten janitors all thought it didn't belong on the site</strong>. If you still believe this image was wrongfully deleted, then you can appeal its deletion.</p>
+
+<p>Some valid reasons for appealing include:</p>
+
+<ul>
+  <li>Funny</li>
+  <li>Weird</li>
+  <li>Translated</li>
+  <li>Part of a pool</li>
+</ul>
+
+<p>All users are limited to 5 appeals a day. For more details, please read the <%= link_to "wiki", wiki_pages_path(:title => "help:deletion_appeals") %>.</p>
+
+<%= simple_form_for(@post_appeal, :remote => true, :format => :js) do |f| %>
+  <%= hidden_field_tag "post_appeal[post_id]", @post_appeal.post_id %>
+  <%= f.text_field :reason, :size => "40x5" %>
+<% end %>

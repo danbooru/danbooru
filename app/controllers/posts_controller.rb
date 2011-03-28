@@ -10,7 +10,8 @@ class PostsController < ApplicationController
   
   def show
     @post = Post.find(params[:id])
-    @unapproval = Unapproval.new(:post_id => @post)
+    @post_flag = PostFlag.new(:post_id => @post)
+    @post_appeal = PostAppeal.new(:post_id => @post)
     respond_with(@post)
   end
   

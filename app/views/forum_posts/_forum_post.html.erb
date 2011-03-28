@@ -1,10 +1,8 @@
 <article data-forum-post-id="<%= forum_post.id %>">
   <div class="author">
-    <h1><%= link_to forum_post.creator.name, user_path(forum_post.creator_id) %></h1>
+    <h4><%= link_to forum_post.creator.name, user_path(forum_post.creator_id) %></h4>
     <p>
-      <time datetime="<%= forum_post.created_at %>">
-        <%= time_ago_in_words(forum_post.created_at) %> ago
-      </time>
+      <%= time_ago_in_words(forum_post.created_at) %> ago
     </p>
   </div>
   <div class="content">

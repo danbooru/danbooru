@@ -1,6 +1,15 @@
 require 'cgi'
+require 'uri'
 
 class DText
+  def self.u(string)
+    CGI.escape(string)
+  end
+  
+  def self.h(string)
+    CGI.escapeHTML(string)
+  end
+  
   def self.parse_inline(str, options = {})
     str = parse_aliased_wiki_links(str)
     str = parse_wiki_links(str)

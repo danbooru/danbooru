@@ -1113,27 +1113,27 @@ $(document).ready(function() {
   Danbooru.Favorite.initialize_all();
 });
 (function() {
-  Danbooru.Unapproval = {};
+  Danbooru.PostFlag = {};
   
-  Danbooru.Unapproval.initialize_all = function() {
-    this.initialize_unapprove();
-    this.hide_or_show_unapprove_link();
+  Danbooru.PostFlag.initialize_all = function() {
+    this.initialize_flag();
+    this.hide_or_show_flag_link();
   }
   
-  Danbooru.Unapproval.hide_or_show_unapprove_link = function() {
-    if (Danbooru.meta("post-is-unapprovable") != "true") {
-      $("a#unapprove").hide();
+  Danbooru.PostFlag.hide_or_show_flag_link = function() {
+    if (Danbooru.meta("post-is-deleted") == "true") {
+      $("a#flag").hide();
     }
   }
   
-  Danbooru.Unapproval.initialize_unapprove = function() {
-    $("#unapprove-dialog").dialog({
+  Danbooru.PostFlag.initialize_flag = function() {
+    $("#flag-dialog").dialog({
       autoOpen: false, 
-      width: 400,
+      width: 700,
       modal: true,
       buttons: {
         "Submit": function() {
-          $("#unapprove-dialog form").submit();
+          $("#flag-dialog form").submit();
           $(this).dialog("close");
         },
         "Cancel": function() {
@@ -1142,15 +1142,55 @@ $(document).ready(function() {
       }
     });
 
-    $("a#unapprove").click(function(e) {
+    $("a#flag").click(function(e) {
       e.preventDefault();
-      $("#unapprove-dialog").dialog("open");
+      $("#flag-dialog").dialog("open");
     });
   }
 })();
 
 $(document).ready(function() {
-  Danbooru.Unapproval.initialize_all();
+  Danbooru.PostFlag.initialize_all();
+});
+(function() {
+  Danbooru.PostAppeal = {};
+  
+  Danbooru.PostAppeal.initialize_all = function() {
+    this.initialize_appeal();
+    this.hide_or_show_appeal_link();
+  }
+  
+  Danbooru.PostAppeal.hide_or_show_appeal_link = function() {
+    if (Danbooru.meta("post-is-deleted") != "true") {
+      $("a#appeal").hide();
+    }
+  }
+  
+  Danbooru.PostAppeal.initialize_appeal = function() {
+    $("#appeal-dialog").dialog({
+      autoOpen: false, 
+      width: 700,
+      modal: true,
+      buttons: {
+        "Submit": function() {
+          $("#appeal-dialog form").submit();
+          $(this).dialog("close");
+        },
+        "Cancel": function() {
+          $(this).dialog("close");
+        }
+      }
+    });
+
+    $("a#appeal").click(function(e) {
+      e.preventDefault();
+      $("#appeal-dialog").dialog("open");
+    });
+  }
+})();
+
+$(document).ready(function() {
+  Danbooru.PostAppeal.initialize_all();
 });
 (function() {
   Danbooru.PostModeration = {};

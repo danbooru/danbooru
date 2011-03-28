@@ -228,11 +228,15 @@ class User < ActiveRecord::Base
     end
     
     def upload_limit
-      deleted_count = RemovedPost.where("user_id = ?", id).count
-      unapproved_count = Post.where("is_pending = true and user_id = ?", id).count
+      deleted_count = Post.for_user(id).deleted.count
+      pending_count = Post.for_user(id).pending.count
       approved_count = Post.where("is_flagged = false and is_pending = false and user_id = ?", id).count
       
-      limit = base_upload_limit + (approved_count / 10) - (deleted_count / 4) - unapproved_count
+      if base_upload_limit
+        limit = base_upload_limit - pending_count
+      else
+        limit = 10 + (approved_count / 10) - (deleted_count / 4) - pending_count
+      end
       
       if limit > 20
         limit = 20

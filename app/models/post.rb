@@ -15,8 +15,9 @@ class Post < ActiveRecord::Base
   belongs_to :updater, :class_name => "User"
   belongs_to :approver, :class_name => "User"
   belongs_to :parent, :class_name => "Post"
-  has_one :unapproval, :dependent => :destroy
   has_one :upload, :dependent => :destroy
+  has_many :flags, :class_name => "PostFlag", :dependent => :destroy
+  has_many :appeals, :class_name => "PostAppeal", :dependent => :destroy
   has_many :versions, :class_name => "PostVersion", :dependent => :destroy, :order => "post_versions.id ASC"
   has_many :votes, :class_name => "PostVote", :dependent => :destroy
   has_many :notes, :dependent => :destroy
@@ -30,8 +31,10 @@ class Post < ActiveRecord::Base
   scope :pending, where(["is_pending = ?", true])
   scope :pending_or_flagged, where(["(is_pending = ? OR is_flagged = ?)", true, true])
   scope :undeleted, where(["is_deleted = ?", false])
+  scope :deleted, where(["is_deleted = ?", true])
   scope :visible, lambda {|user| Danbooru.config.can_user_see_post_conditions(user)}
   scope :commented_before, lambda {|date| where("last_commented_at < ?", date).order("last_commented_at DESC")}
+  scope :for_user, lambda {|user_id| where(["uploader_string = ?", "uploader:#{user_id}"])}
   scope :available_for_moderation, lambda {where(["id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :hidden_from_moderation, lambda {where(["id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :before_id, lambda {|id| id.present? ? where(["posts.id < ?", id]) : where("TRUE")}
@@ -212,30 +215,26 @@ class Post < ActiveRecord::Base
   end
   
   module ApprovalMethods
-    def is_unapprovable?
-      is_pending == false && is_flagged == false && unapproval.nil?
-    end
-    
     def is_approvable?
       (is_pending? || is_flagged?) && approver_string != "approver:#{CurrentUser.name}"
     end
     
-    def unapprove!(reason)
-      raise Unapproval::Error.new("This post is still pending approval") if is_pending?
-      raise Unapproval::Error.new("This post has already been flagged") if is_flagged?
-      raise Unapproval::Error.new("This post has already been unapproved once") unless unapproval.nil?
+    def flag!(reason)
+      flag = create_flag(:reason => reason)
       
-      unapproval = create_unapproval(
-        :unapprover_id => CurrentUser.user.id,
-        :unapprover_ip_addr => CurrentUser.ip_addr,
-        :reason => reason
-      )
-      
-      if unapproval.errors.any?
-        raise Unapproval::Error.new(unapproval.errors.full_messages.join("; "))
+      if flag.errors.any?
+        raise PostFlag::Error.new(flag.errors.full_messages.join("; "))
       end
 
       update_attribute(:is_flagged, true)
+    end
+    
+    def appeal!(reason)
+      appeal = create_appeal(:reason => reason)
+      
+      if appeal.errors.any?
+        raise PostAppeal::Error.new(appeal.errors.full_messages.join("; "))
+      end
     end
 
     def approve!

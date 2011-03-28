@@ -1,14 +1,10 @@
 <div id="c-forum-topics">
   <div id="a-show">
-    <h1 id="forum-topic-title">
-      <%= @forum_topic.title %>
-      <% if @forum_topic.is_locked? %>
-        <span class="info">(locked)</span>
-      <% end %>
-      <% if @forum_topic.is_sticky? %>
-        <span class="info">(sticky)</span>
-      <% end %>
-    </h1>
+    <% if @forum_topic.is_locked? %>
+      <div class="notice">
+        <p>This topic has been locked.</p>
+      </div>
+    <% end %>
 
     <%= render :partial => "forum_posts/listing", :locals => {:forum_posts => @forum_posts} %>
     <%= render "paginator" %>
@@ -16,3 +12,7 @@
 </div>
 
 <%= render "secondary_links" %>
+
+<%= content_for(:page_title) do %>
+forum/<%= @forum_topic.title %>
+<% end %>

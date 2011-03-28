@@ -1,20 +1,22 @@
 .blacklisted {
   display: none !important; }
 
-body, div, h1, h2, h3, h4, h5, h6, p, ul, li, dd, dt {
+body, div, h1, h2, h3, h4, h5, h6, p, ul, li, dd, dt, header, aside {
   font-family: Verdana, Geneva, sans-serif;
-  font-size: 100%;
+  line-height: 1.25em;
   margin: 0;
   padding: 0;
   border: 0;
   vertical-align: baseline; }
+
+body {
+  font-size: 87.5%; }
 
 h1, h2, h3, h4 {
   font-family: Tahoma;
   line-height: 1em; }
 
 body {
-  font-size: 80%;
   padding: 1em 2em;
   margin: 0; }
 
@@ -57,22 +59,22 @@ dt {
   font-weight: bold; }
 
 h1 {
-  font-size: 2em; }
+  font-size: 2.1818em; }
 
 h2 {
-  font-size: 1.8em; }
+  font-size: 1.9091em; }
 
 h3 {
-  font-size: 1.6em; }
+  font-size: 1.6364em; }
 
 h4 {
-  font-size: 1.4em; }
+  font-size: 1.4545em; }
 
 h5 {
-  font-size: 1.2em; }
+  font-size: 1.2727em; }
 
 h6 {
-  font-size: 1em; }
+  font-size: 1.090em; }
 
 header {
   margin: 0 0 1em 0;
@@ -115,6 +117,9 @@ menu {
     padding: 0;
     list-style-type: none;
     display: inline; }
+
+p {
+  margin-bottom: 1em; }
 
 section {
   display: block; }
@@ -208,17 +213,22 @@ body > header > h1 {
   font-size: 3em;
   font-family: Tahoma, Helvetica, sans-serif; }
 
+/*** Dialog Boxes ***/
+div.ui-dialog ul {
+  margin-left: 1em;
+  margin-bottom: 1em; }
+
 /*** Simple Form ***/
 form.simple_form {
-  margin: 1em 0; }
+  margin: 0 0 1em 0; }
   form.simple_form div.input.boolean label {
     display: inline; }
   form.simple_form div.input {
     margin-bottom: 1em; }
-    form.simple_form div.input input[type=text], form.simple_form div.input input[type=file], form.simple_form div.input textarea {
-      width: 300px; }
+    form.simple_form div.input input[type=text], form.simple_form div.input input[type=file] {
+      width: 20em; }
     form.simple_form div.input textarea {
-      height: 100px; }
+      width: 30em; }
     form.simple_form div.input label {
       display: block;
       cursor: pointer;
@@ -238,27 +248,21 @@ form.simple_form {
         margin-right: 2em; }
 
 /*** DText Preview ***/
-div.dtext h1.preview-header {
-  margin-bottom: 0.25em; }
-div.dtext p {
-  margin-bottom: 1em; }
-div.dtext ul {
-  margin-left: 1em; }
+div.dtext {
+  width: 30em; }
+  div.dtext ul {
+    margin-left: 1em; }
 
 /*** Pools Posts ***/
 div#c-pools-posts div#a-new form {
   margin-bottom: 1em; }
-div#c-pools-posts div#a-new h1 {
-  font-size: 1.2em;
-  font-weight: bold; }
 div#c-pools-posts div#a-new li {
   margin-left: 1em;
   cursor: pointer; }
 
 /*** Pools ***/
 div#c-pools div#a-edit p {
-  margin-bottom: 1em;
-  width: 40em; }
+  width: 30em; }
 div#c-pools div#a-edit ul.ui-sortable {
   list-style-type: none; }
   div#c-pools div#a-edit ul.ui-sortable span {
@@ -283,11 +287,9 @@ div.comments-for-post div.list-of-comments article {
   div.comments-for-post div.list-of-comments article div.author {
     width: 20%;
     float: left; }
-    div.comments-for-post div.list-of-comments article div.author h1 {
-      font-size: 1.5em; }
   div.comments-for-post div.list-of-comments article div.content {
     margin-left: 2em;
-    width: 40em;
+    width: 30em;
     float: left; }
 div.comments-for-post div.comment-preview {
   margin-bottom: 2em; }
@@ -296,7 +298,7 @@ div.dtext-preview {
   border: 2px dashed #AAA;
   padding: 1em;
   margin: 1em;
-  width: 40em; }
+  width: 30em; }
 
 div#c-comments div#a-index div.header span.info {
   margin-right: 1.5em; }
@@ -316,8 +318,6 @@ div#c-comments div#a-index div.post {
   div#c-comments div#a-index div.post div.comments-for-post {
     float: left;
     width: 55em; }
-    div#c-comments div#a-index div.post div.comments-for-post h1 {
-      font-size: 1.2em; }
 
 /*** Favorites ***/
 div#c-favorites section#content > h1 {
@@ -329,10 +329,6 @@ article.post-preview {
   margin-bottom: 4em;
   float: left; }
 
-div#c-posts h1 {
-  font-size: 1.2em; }
-div#c-posts h2 {
-  font-size: 1.1em; }
 div#c-posts aside#sidebar > section#pool-sidebar span.ui-icon {
   float: left;
   margin-right: 0.25em;
@@ -347,8 +343,6 @@ div#c-posts section#tag-and-wiki-box {
     display: inline-block; }
   div#c-posts section#tag-and-wiki-box menu li.active a {
     color: #000; }
-  div#c-posts section#tag-and-wiki-box h1 {
-    font-size: 1.2em; }
   div#c-posts section#tag-and-wiki-box div#tag-box h2 {
     display: none; }
   div#c-posts section#tag-and-wiki-box div#tag-box li {
@@ -412,26 +406,20 @@ div#c-artists span.new-artist {
   color: #A00; }
 div#c-artists div#a-show {
   max-width: 60em; }
-  div#c-artists div#a-show h1 {
-    font-size: 1.5em;
-    margin-bottom: 5px; }
   div#c-artists div#a-show p.legend {
     margin-bottom: 2em;
     font-size: 0.8em;
     font-style: italic; }
+div#c-artists div#a-edit textarea, div#c-artists div#a-new textarea {
+  height: 5em; }
 
 /*** Users ***/
 div.users div.new {
   max-width: 60em; }
-  div.users div.new h1 {
-    margin-bottom: 0.5em; }
   div.users div.new p {
     margin-bottom: 1em; }
   div.users div.new li {
     margin-left: 1em; }
-  div.users div.new div#account-comparison h1 {
-    font-size: 1.4em;
-    margin-bottom: 3px; }
   div.users div.new div#account-comparison li {
     font-size: 0.9em;
     line-height: 1.5em; }
@@ -440,7 +428,7 @@ div.users div.new {
     float: left;
     padding: 1em; }
   div.users div.new footer.nav-links {
-    font-size: 1.5em;
+    font-size: 1.4545em;
     font-weight: bold;
     text-align: center;
     display: block; }
@@ -459,11 +447,9 @@ div.list-of-forum-posts article {
   div.list-of-forum-posts article div.author {
     width: 20%;
     float: left; }
-    div.list-of-forum-posts article div.author h1 {
-      font-size: 1.5em; }
   div.list-of-forum-posts article div.content {
     margin-left: 2em;
-    width: 40em;
+    width: 30em;
     float: left; }
     div.list-of-forum-posts article div.content menu {
       margin-top: 0.5em; }
@@ -471,12 +457,9 @@ div.list-of-forum-posts article {
 div#c-forum-topics div.single-forum-post {
   width: 60em; }
 div#c-forum-topics div#a-show h1#forum-topic-title {
-  font-size: 2em; }
+  font-size: 2.1818em; }
 div#c-forum-topics span.info {
   color: #AAA; }
-div#c-forum-topics textarea {
-  width: 400px;
-  height: 40em; }
 div#c-forum-topics div#form-content {
   float: left;
   width: 450px;
@@ -494,18 +477,15 @@ div#c-wiki-pages span.version {
   color: #AAA; }
 div#c-wiki-pages div#form-content {
   float: left;
-  width: 450px;
+  width: 30em;
   padding-right: 1em; }
 div#c-wiki-pages div#form-aside {
   float: left;
-  width: 400px; }
+  width: 20em; }
   div#c-wiki-pages div#form-aside div#preview > p {
     margin-top: 0.5em;
     padding-top: 0.5em;
     border-top: 1px solid #AAA; }
-div#c-wiki-pages div#a-edit textarea, div#c-wiki-pages div#a-new textarea {
-  width: 400px;
-  height: 40em; }
 
 /*** Post Moderation ***/
 div#c-post-moderation article {

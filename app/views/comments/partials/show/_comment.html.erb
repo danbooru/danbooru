@@ -1,6 +1,6 @@
 <article data-comment-id="<%= comment.id %>">
   <div class="author">
-    <h1><%= link_to comment.creator_name, user_path(comment.creator_id) %></h1>
+    <h4><%= link_to comment.creator_name, user_path(comment.creator_id) %></h4>
     <p>
       <%= time_ago_in_words(comment.created_at) %> ago
     </p>

@@ -1,8 +1,12 @@
 <div id="c-comments">
   <div id="a-index">
-    <% @comments.each do |comment| %>
-      <%= render :partial => "comments/partials/index/list", :locals => {:post => comment.post, :comments => [comment], :show_header => false} %>
-    <% end %>
+    <div class="comments-for-post">
+      <div class="list-of-comments">
+        <% @comments.each do |comment| %>
+          <%= render :partial => "comments/partials/show/comment", :locals => {:post => comment.post, :comment => comment, :show_header => false} %>
+        <% end %>
+      </div>
+    </div>
   </div>
 </div>
 

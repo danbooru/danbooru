@@ -10,6 +10,10 @@ class CommentsController < ApplicationController
     end
   end
   
+  def search
+    @search = Comment.search(params[:search])
+  end
+  
   def update
     @comment = Comment.find(params[:id])
     @comment.update_attributes(params[:comment])

@@ -1,5 +1,0 @@
-<p>You can unapprove a post if you believe it breaks the rules or doesn't belong on this site. You must provide a reason.</p>
-<%= form_for(@unapproval, :remote => true, :format => :js) do |f| %>
-  <%= hidden_field_tag "unapproval[post_id]", @unapproval.post_id %>
-  <%= f.text_area :reason, :size => "40x5" %>
-<% end %>
