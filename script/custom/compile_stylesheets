@@ -1,4 +1,0 @@
-#!/usr/bin/env sh
-
-mkdir -p public/stylesheets/compiled
-sass public/stylesheets/src/default.scss public/stylesheets/compiled/default.css

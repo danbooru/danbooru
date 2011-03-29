@@ -20,6 +20,6 @@
 <p>Enter a reason:</p>
 
 <%= simple_form_for(@post_flag, :remote => true, :format => :js) do |f| %>
-  <%= hidden_field_tag "post_flag[post_id]", @post_flag.post_id %>
+  <%= f.input :post_id, :as => :hidden %>
   <%= f.text_field :reason %>
 <% end %>

@@ -4,12 +4,6 @@
   <% if post.approver %>
     <li>Approver: <%= link_to(post.approver.name, user_path(post.approver_id)) %></li>
   <% end %>
-  <% if post.is_flagged? %>
-    <li>Flagged: <%= post_flag_reason(post) %></li>
-  <% end %>
-  <% if (post.is_flagged? || post.is_deleted?) && post.appeals.any? %>
-    <li>Appealed: <%= post_appeal_reason(post) %></li>
-  <% end %>
   <li>
     Size: <%= number_to_human_size(post.file_size) %> 
     <% if post.is_image? %>
@@ -27,7 +21,7 @@
     <% end %>
     
     <% if post.is_flagged? %>
-      <abbr title="Unapproved">U</abbr>
+      <abbr title="Flagged">F</abbr>
     <% end %>
     
     <% if !post.is_pending? && !post.is_deleted? %>

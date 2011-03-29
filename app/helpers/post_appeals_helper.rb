@@ -1,9 +1,9 @@
 module PostAppealsHelper
-  def post_appeal_reason(post)
+  def post_appeal_reasons(post)
     post.appeals.map do |appeal|
       content_tag("span", :class => "flag-and-reason-count") do
-        appeal.reason + " (" + link_to(appeal.creator.name, :controller => "user", :action => "show", :id => appeal.creator_id) + ")"
+        (appeal.reason + " (" + link_to(appeal.creator.name, user_path(appeal.creator_id)) + ")").html_safe
       end
-    end.join("; ")
+    end.join("; ").html_safe
   end
 end

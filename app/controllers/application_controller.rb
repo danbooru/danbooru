@@ -42,7 +42,7 @@ protected
     else
       CurrentUser.user = AnonymousUser.new
     end
-    
+
     Time.zone = CurrentUser.user.time_zone
   end
   
@@ -57,6 +57,7 @@ protected
         true
       else
         access_denied()
+        false
       end
     end
   end

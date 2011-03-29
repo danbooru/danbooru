@@ -136,6 +136,10 @@ span.link {
 span.wait {
   color: #CCC; }
 
+span.ui-icon {
+  float: left;
+  margin-right: 0.25em; }
+
 table tfoot {
   margin-top: 2em; }
 
@@ -329,9 +333,13 @@ article.post-preview {
   margin-bottom: 4em;
   float: left; }
 
+div#c-posts div.notice {
+  font-size: 80%;
+  padding: 1em;
+  margin-bottom: 1em; }
+  div#c-posts div.notice ul {
+    margin-left: 1em; }
 div#c-posts aside#sidebar > section#pool-sidebar span.ui-icon {
-  float: left;
-  margin-right: 0.25em;
   color: #666; }
 div#c-posts aside#sidebar > section > ul li {
   list-style-type: none; }

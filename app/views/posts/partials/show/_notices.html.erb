@@ -1,0 +1,13 @@
+<% if post.is_flagged? %>
+  <div class="ui-corner-all ui-state-error notice">
+    <span class="ui-icon ui-icon-alert"></span>
+    This post has been flagged for deletion: <%= post_flag_reasons(post) %>
+  </div>
+<% end %>
+
+<% if post.is_deleted? && post.appeals.any? %>
+  <div class="ui-corner-all ui-state-highlight notice">
+    <span class="ui-icon ui-icon-info"></span>
+    This post has been appealed: <%= post_appeal_reasons(post) %>
+  </div>
+<% end %>

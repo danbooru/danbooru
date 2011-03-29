@@ -1,7 +1,7 @@
 <div id="sessions">
   <div id="new">
     <section>
-      <h2>Sign In</h2>
+      <h3>Sign In</h3>
       <%= form_tag(session_path) do %>
         <%= hidden_field_tag "url", params[:url] %>
         <table width="100%">
@@ -30,7 +30,7 @@
     </section>
 
     <aside>
-      <h2>Help</h2>
+      <h3>Help</h3>
       <ul>
         <li><%= link_to "I don't have an account", new_user_path %></li>
         <li><%= link_to "I forgot my password", reset_password_path %></li>

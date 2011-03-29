@@ -31,6 +31,8 @@
 
     <section id="content">
       <h1>Post</h1>
+      
+      <%= render :partial => "posts/partials/show/notices", :locals => {:post => @post} %>
 
       <section id="image">
         <h2>Image</h2>

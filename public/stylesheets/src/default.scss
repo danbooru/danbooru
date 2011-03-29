@@ -176,6 +176,11 @@ span.wait {
   color: #CCC;
 }
 
+span.ui-icon {
+  float: left;
+  margin-right: 0.25em;
+}
+
 table tfoot {
   margin-top: 2em;
 }
@@ -515,10 +520,18 @@ article.post-preview {
 }
 
 div#c-posts {
+  div.notice {
+    font-size: 80%;
+    padding: 1em;
+    margin-bottom: 1em;
+    
+    ul {
+      margin-left: 1em;
+    }
+  }
+  
   aside#sidebar > section#pool-sidebar {
     span.ui-icon {
-      float: left;
-      margin-right: 0.25em;
       color: #666;
     }
   }

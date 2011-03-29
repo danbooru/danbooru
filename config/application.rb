@@ -10,6 +10,26 @@ module Danbooru
     config.encoding = "utf-8"    
     config.active_record.schema_format = :sql
     config.filter_parameters << :password
+    config.action_view.javascript_expansions[:defaults] = [
+      "src/lib/jquery-1.5.1.min.js",
+      "src/lib/jquery-ui-1.8.9.custom.min.js",
+      "src/lib/rails.js",
+      "src/app/common.js",
+      "src/app/cookie.js",
+      "src/app/utility.js",
+      "src/app/posts.js",
+      "src/app/comments.js",
+      "src/app/uploads.js",
+      "src/app/users.js",
+      "src/app/favorites.js",
+      "src/app/post_flags.js",
+      "src/app/post_appeals.js",
+      "src/app/post_moderation.js",
+      "src/app/pools.js",
+      "src/app/wiki_pages.js",
+      "src/app/forum_posts.js"
+    ]
     # config.active_record.observers = :cacher, :garbage_collector, :forum_observer
   end
 end
+

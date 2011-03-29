@@ -1,7 +1,7 @@
 class PostModerationController < ApplicationController
-  before_filter :janitor_only
-  rescue_from Post::ApprovalError, :with => :approval_error
-  rescue_from Post::DisapprovalError, :with => :disapproval_error
+  # before_filter :janitor_only
+  # rescue_from Post::ApprovalError, :with => :approval_error
+  # rescue_from Post::DisapprovalError, :with => :disapproval_error
   
   def moderate
     @search = Post.order("id asc").pending_or_flagged.available_for_moderation.search(:tag_match => params[:query])
