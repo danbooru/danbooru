@@ -140,19 +140,37 @@ class PostTest < ActiveSupport::TestCase
   end
 
   context "Moderation:" do
+    context "A deleted post" do
+      setup do
+        @post = Factory.create(:post, :is_deleted => true)
+      end
+      
+      should "be appealed" do
+        assert_difference("PostAppeal.count", 1) do
+          @post.appeal!("xxx")
+        end
+        assert(@post.is_deleted?, "Post should still be deleted")
+        assert_equal(1, @post.appeals.count)
+      end
+    end
+    
     context "An approved post" do
-      should "be unapproved once and only once" do
+      should "be flagged" do
         post = Factory.create(:post)
-        post.unapprove!("bad")
+        assert_difference("PostFlag.count", 1) do
+          post.flag!("bad")
+        end
         assert(post.is_flagged?, "Post should be flagged.")
-        assert_not_nil(post.unapproval, "Post should have an unapproval record.")
-        assert_equal("bad", post.unapproval.reason)
-        assert_raise(Unapproval::Error) {post.unapprove!("bad")}
+        assert_equal(1, post.flags.count)
       end
   
-      should "not unapprove if no reason is given" do
+      should "not be flagged if no reason is given" do
         post = Factory.create(:post)
-        assert_raise(Unapproval::Error) {post.unapprove!("")}
+        assert_difference("PostFlag.count", 0) do
+          assert_raises(PostFlag::Error) do
+            post.flag!("")
+          end
+        end
       end
     end
     
@@ -167,7 +185,7 @@ class PostTest < ActiveSupport::TestCase
         should "not allow person X to reapprove that post" do
           user = Factory.create(:janitor_user, :name => "xxx")
           post = Factory.create(:post, :approver_string => "approver:xxx")
-          post.unapprove!("bad")
+          post.flag!("bad")
           CurrentUser.scoped(user, "127.0.0.1") do
             assert_raises(Post::ApprovalError) do
               post.approve!
@@ -179,19 +197,12 @@ class PostTest < ActiveSupport::TestCase
       context "that has been reapproved" do
         should "no longer be flagged or pending" do
           post = Factory.create(:post)
-          post.unapprove!("bad")
+          post.flag!("bad")
           post.approve!
           assert(post.errors.empty?, post.errors.full_messages.join(", "))
           post.reload
           assert_equal(false, post.is_flagged?)
           assert_equal(false, post.is_pending?)
-        end
-        
-        should "cannot be unapproved again" do
-          post = Factory.create(:post)
-          post.unapprove!("bad")
-          post.approve!
-          assert_raise(Unapproval::Error) {post.unapprove!("bad")}
         end
       end
     end

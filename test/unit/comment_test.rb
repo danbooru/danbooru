@@ -59,7 +59,7 @@ class CommentTest < ActiveSupport::TestCase
       c2 = Factory.create(:comment, :body => "aaa ddd")
       c3 = Factory.create(:comment, :body => "eee")
     
-      matches = Comment.search_body("aaa")
+      matches = Comment.body_matches("aaa")
       assert_equal(2, matches.count)
       assert_equal(c2.id, matches.all[0].id)
       assert_equal(c1.id, matches.all[1].id)

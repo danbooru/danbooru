@@ -93,7 +93,7 @@ class Pool < ActiveRecord::Base
   def neighbor_posts(post)
     @neighbor_posts ||= begin
       post_ids =~ /\A#{post.id} (\d+)|(\d+) #{post.id} (\d+)|(\d+) #{post.id}\Z/
-    
+      
       if $2 && $3
         {:previous => $2.to_i, :next => $3.to_i}
       elsif $1

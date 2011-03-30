@@ -85,12 +85,9 @@ class ArtistTest < ActiveSupport::TestCase
     
     should "search on other names should return matches" do
       artist = Factory.create(:artist, :name => "artist", :other_names => "aaa, ccc ddd")
-      assert_not_nil(Artist.find_by_any_name("name:artist"))
-      assert_nil(Artist.find_by_any_name("name:aaa"))
-      assert_nil(Artist.find_by_any_name("name:ccc_ddd"))
-      assert_nil(Artist.find_by_any_name("other:artist"))
-      assert_not_nil(Artist.find_by_any_name("other:aaa"))
-      assert_not_nil(Artist.find_by_any_name("other:ccc_ddd"))
+      assert_nil(Artist.other_names_match("artist").first)
+      assert_not_nil(Artist.other_names_match("aaa").first)
+      assert_not_nil(Artist.other_names_match("ccc_ddd").first)
     end
     
     should "search on group name and return matches" do
@@ -98,7 +95,7 @@ class ArtistTest < ActiveSupport::TestCase
       yuu = Factory.create(:artist, :name => "yuu", :group_name => "cat_or_fish")
       cat_or_fish.reload
       assert_equal("yuu", cat_or_fish.member_names)
-      assert_not_nil(Artist.find_by_any_name("group:cat_or_fish"))
+      assert_not_nil(Artist.search(:group_name_contains => "cat_or_fish").first)
     end
     
     should "have an associated wiki" do

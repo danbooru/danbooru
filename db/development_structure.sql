@@ -1089,6 +1089,7 @@ CREATE TABLE post_flags (
     creator_id integer NOT NULL,
     creator_ip_addr inet NOT NULL,
     reason text,
+    is_resolved boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );

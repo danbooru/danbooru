@@ -68,13 +68,18 @@ class PoolTest < ActiveSupport::TestCase
       pool.add_post!(p1)
       pool.add_post!(p2)
       pool.add_post!(p3)
+
       pool.reload
       neighbors = pool.neighbor_posts(p1)
       assert_nil(neighbors[:previous])
       assert_equal(p2.id, neighbors[:next])
+
+      pool.reload
       neighbors = pool.neighbor_posts(p2)
       assert_equal(p1.id, neighbors[:previous])
       assert_equal(p3.id, neighbors[:next])
+
+      pool.reload
       neighbors = pool.neighbor_posts(p3)
       assert_equal(p2.id, neighbors[:previous])
       assert_nil(neighbors[:next])

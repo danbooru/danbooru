@@ -220,7 +220,7 @@ class Post < ActiveRecord::Base
     end
     
     def flag!(reason)
-      flag = create_flag(:reason => reason)
+      flag = flags.create(:reason => reason)
       
       if flag.errors.any?
         raise PostFlag::Error.new(flag.errors.full_messages.join("; "))
@@ -230,7 +230,7 @@ class Post < ActiveRecord::Base
     end
     
     def appeal!(reason)
-      appeal = create_appeal(:reason => reason)
+      appeal = appeals.create(:reason => reason)
       
       if appeal.errors.any?
         raise PostAppeal::Error.new(appeal.errors.full_messages.join("; "))
