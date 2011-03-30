@@ -1,0 +1,22 @@
+<div id="c-post-flags">
+  <div id="a-index">
+    <table width="100%">
+      <thead>
+        <tr>
+          <th>Post</th>
+          <th>Creator</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @post_flags.each do |post_flag| %>
+          <tr>
+            <td><%= PostPresenter.preview(post_flag.post) %></td>
+            <td><%= link_to post_flag.creator.name, user_path(post_flag.creator) %></td>
+            <td><%= format_text post_flag.reason %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
