@@ -1,4 +1,6 @@
 .bundle
+config/database.yml
+config/danbooru_local_config.rb
 lib/danbooru_image_resizer/*.so
 lib/danbooru_image_resizer/*.o
 lib/danbooru_image_resizer/*.bundle
