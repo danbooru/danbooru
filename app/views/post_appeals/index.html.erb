@@ -1,0 +1,22 @@
+<div id="c-post-appeals">
+  <div id="a-index">
+    <table width="100%">
+      <thead>
+        <tr>
+          <th>Post</th>
+          <th>Creator</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @post_appeals.each do |post_appeal| %>
+          <tr>
+            <td><%= PostPresenter.preview(post_appeal.post) %></td>
+            <td><%= link_to post_appeal.creator.name, user_path(post_appeal.creator) %></td>
+            <td><%= format_text post_appeal.reason %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
