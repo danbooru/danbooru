@@ -1014,6 +1014,40 @@ ALTER SEQUENCE pools_id_seq OWNED BY pools.id;
 
 
 --
+-- Name: post_appeals; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE post_appeals (
+    id integer NOT NULL,
+    post_id integer NOT NULL,
+    creator_id integer NOT NULL,
+    creator_ip_addr integer NOT NULL,
+    reason text,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: post_appeals_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE post_appeals_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: post_appeals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE post_appeals_id_seq OWNED BY post_appeals.id;
+
+
+--
 -- Name: post_disapprovals; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1043,6 +1077,40 @@ CREATE SEQUENCE post_disapprovals_id_seq
 --
 
 ALTER SEQUENCE post_disapprovals_id_seq OWNED BY post_disapprovals.id;
+
+
+--
+-- Name: post_flags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE post_flags (
+    id integer NOT NULL,
+    post_id integer NOT NULL,
+    creator_id integer NOT NULL,
+    creator_ip_addr inet NOT NULL,
+    reason text,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: post_flags_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE post_flags_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: post_flags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE post_flags_id_seq OWNED BY post_flags.id;
 
 
 --
@@ -1754,7 +1822,21 @@ ALTER TABLE pools ALTER COLUMN id SET DEFAULT nextval('pools_id_seq'::regclass);
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE post_appeals ALTER COLUMN id SET DEFAULT nextval('post_appeals_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE post_disapprovals ALTER COLUMN id SET DEFAULT nextval('post_disapprovals_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE post_flags ALTER COLUMN id SET DEFAULT nextval('post_flags_id_seq'::regclass);
 
 
 --
@@ -2073,11 +2155,27 @@ ALTER TABLE ONLY pools
 
 
 --
+-- Name: post_appeals_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY post_appeals
+    ADD CONSTRAINT post_appeals_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: post_disapprovals_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY post_disapprovals
     ADD CONSTRAINT post_disapprovals_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: post_flags_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY post_flags
+    ADD CONSTRAINT post_flags_pkey PRIMARY KEY (id);
 
 
 --
@@ -2640,6 +2738,27 @@ CREATE INDEX index_pools_on_name ON pools USING btree (name);
 
 
 --
+-- Name: index_post_appeals_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_post_appeals_on_creator_id ON post_appeals USING btree (creator_id);
+
+
+--
+-- Name: index_post_appeals_on_creator_ip_addr; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_post_appeals_on_creator_ip_addr ON post_appeals USING btree (creator_ip_addr);
+
+
+--
+-- Name: index_post_appeals_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_post_appeals_on_post_id ON post_appeals USING btree (post_id);
+
+
+--
 -- Name: index_post_disapprovals_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2651,6 +2770,27 @@ CREATE INDEX index_post_disapprovals_on_post_id ON post_disapprovals USING btree
 --
 
 CREATE INDEX index_post_disapprovals_on_user_id ON post_disapprovals USING btree (user_id);
+
+
+--
+-- Name: index_post_flags_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_post_flags_on_creator_id ON post_flags USING btree (creator_id);
+
+
+--
+-- Name: index_post_flags_on_creator_ip_addr; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_post_flags_on_creator_ip_addr ON post_flags USING btree (creator_ip_addr);
+
+
+--
+-- Name: index_post_flags_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_post_flags_on_post_id ON post_flags USING btree (post_id);
 
 
 --
@@ -3010,3 +3150,7 @@ INSERT INTO schema_migrations (version) VALUES ('20100309211553');
 INSERT INTO schema_migrations (version) VALUES ('20100318213503');
 
 INSERT INTO schema_migrations (version) VALUES ('20100826232512');
+
+INSERT INTO schema_migrations (version) VALUES ('20110328215652');
+
+INSERT INTO schema_migrations (version) VALUES ('20110328215701');

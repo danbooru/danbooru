@@ -5,6 +5,7 @@ class CreatePostFlags < ActiveRecord::Migration
       t.column :creator_id, :integer, :null => false
       t.column :creator_ip_addr, :inet, :null => false
       t.column :reason, :text
+      t.column :is_resolved, :boolean, :null => false, :default => false
       t.timestamps
     end
     

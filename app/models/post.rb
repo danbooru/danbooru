@@ -216,7 +216,7 @@ class Post < ActiveRecord::Base
   
   module ApprovalMethods
     def is_approvable?
-      (is_pending? || is_flagged?) && approver_string != "approver:#{CurrentUser.name}"
+      (is_pending? || is_flagged? || is_deleted?) && approver_string != "approver:#{CurrentUser.name}"
     end
     
     def flag!(reason)
@@ -240,8 +240,10 @@ class Post < ActiveRecord::Base
     def approve!
       raise ApprovalError.new("You have previously approved this post and cannot approve it again") if approver_string == "approver:#{CurrentUser.name}"
       
+      flags.each {|x| x.resolve!}
       self.is_flagged = false
       self.is_pending = false
+      self.is_deleted = false
       self.approver_string = "approver:#{CurrentUser.name}"
       save!
     end

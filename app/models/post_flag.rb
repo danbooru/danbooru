@@ -7,15 +7,17 @@ class PostFlag < ActiveRecord::Base
   validate :validate_creator_is_not_limited
   validate :validate_post_is_active
   before_validation :initialize_creator, :on => :create
-  validates_uniqueness_of :creator_id, :scope => :post_id
+  validates_uniqueness_of :creator_id, :scope => :post_id, :message => "has already flagged this post"
   before_save :update_post
+  scope :resolved, where(["is_resolved = ?", true])
+  scope :unresolved, where(["is_resolved = ?", false])
   
   def update_post
     post.update_attribute(:is_flagged, true)
   end
   
   def validate_creator_is_not_limited
-    if PostAppeal.for_user(creator_id).recent.count >= 10
+    if flag_count_for_creator >= 10
       errors[:creator] << "can flag 10 posts a day"
       false
     else
@@ -35,5 +37,13 @@ class PostFlag < ActiveRecord::Base
   def initialize_creator
     self.creator_id = CurrentUser.id
     self.creator_ip_addr = CurrentUser.ip_addr
+  end
+  
+  def resolve!
+    update_attribute(:is_resolved, true)
+  end
+  
+  def flag_count_for_creator
+    PostAppeal.for_user(creator_id).recent.count
   end
 end
