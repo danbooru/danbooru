@@ -5,7 +5,7 @@
         <label for="user_name">User</label>
       </div>
       <div>
-        <% form_tag({:action => "index"}, :method => :get) do %>
+        <%= form_tag(post_versions_path, :method => :get) do %>
           <%= text_field_tag "user_name", params[:user_name], :id => "user_name", :size => 20 %> <%= submit_tag "Search" %>
         <% end %>
       </div>
@@ -15,7 +15,7 @@
         <label for="post_id">Post ID</label>
       </div>
       <div>
-        <% form_tag({:action => "index"}, :method => :get) do %>
+        <%= form_tag(post_versions_path, :method => :get) do %>
           <%= text_field_tag "post_id", params[:post_id], :id => "post_id", :size => 10 %> <%= submit_tag "Search" %>
         <% end %>
       </div>

@@ -3,6 +3,7 @@ class CreateCommentVotes < ActiveRecord::Migration
     create_table :comment_votes do |t|
       t.column :comment_id, :integer, :null => false
       t.column :user_id, :integer, :null => false
+      t.column :score, :integer, :null => false
       t.timestamps
     end
     

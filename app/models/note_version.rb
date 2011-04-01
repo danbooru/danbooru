@@ -1,5 +1,6 @@
 class NoteVersion < ActiveRecord::Base
   before_validation :initialize_updater
+  belongs_to :updater, :class_name => "User"
   
   def initialize_updater
     self.updater_id = CurrentUser.id

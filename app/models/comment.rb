@@ -37,23 +37,14 @@ class Comment < ActiveRecord::Base
   end
   
   def vote!(score)
-    if !CurrentUser.user.can_comment_vote?
-      raise CommentVote::Error.new("You can only vote ten times an hour on comments")
-      
-    elsif score == "down" && creator.is_janitor?
-      raise CommentVote::Error.new("You cannot downvote janitor/moderator/admin comments")
-      
-    elsif votes.find_by_user_id(CurrentUser.user.id).nil?
-      if score == "up"
-        increment!(:score)
-      elsif score == "down"
-        decrement!(:score)
-      end
-      
-      votes.create
-      
-    else
-      raise CommentVote::Error.new("You have already voted for this comment")
+    vote = votes.create(:score => score)
+    
+    if vote.errors.any?
+      raise CommentVote::Error.new(vote.errors.full_messages.join("; "))
+    elsif vote.is_positive?
+      increment!(:score)
+    elsif vote.is_negative?
+      decrement!(:score)
     end
   end
 end

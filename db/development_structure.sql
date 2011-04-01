@@ -293,6 +293,7 @@ CREATE TABLE comment_votes (
     id integer NOT NULL,
     comment_id integer NOT NULL,
     user_id integer NOT NULL,
+    score integer NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -1193,6 +1194,8 @@ CREATE TABLE posts (
     id integer NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
+    up_score integer DEFAULT 0 NOT NULL,
+    down_score integer DEFAULT 0 NOT NULL,
     score integer DEFAULT 0 NOT NULL,
     source character varying(255),
     md5 character varying(255) NOT NULL,
@@ -1390,40 +1393,6 @@ CREATE SEQUENCE tags_id_seq
 --
 
 ALTER SEQUENCE tags_id_seq OWNED BY tags.id;
-
-
---
--- Name: unapprovals; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE unapprovals (
-    id integer NOT NULL,
-    post_id integer NOT NULL,
-    reason text,
-    unapprover_id integer NOT NULL,
-    unapprover_ip_addr inet NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: unapprovals_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE unapprovals_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: unapprovals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE unapprovals_id_seq OWNED BY unapprovals.id;
 
 
 --
@@ -1893,13 +1862,6 @@ ALTER TABLE tags ALTER COLUMN id SET DEFAULT nextval('tags_id_seq'::regclass);
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE unapprovals ALTER COLUMN id SET DEFAULT nextval('unapprovals_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE uploads ALTER COLUMN id SET DEFAULT nextval('uploads_id_seq'::regclass);
 
 
@@ -2233,14 +2195,6 @@ ALTER TABLE ONLY tag_subscriptions
 
 ALTER TABLE ONLY tags
     ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
-
-
---
--- Name: unapprovals_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY unapprovals
-    ADD CONSTRAINT unapprovals_pkey PRIMARY KEY (id);
 
 
 --
@@ -2942,13 +2896,6 @@ CREATE UNIQUE INDEX index_tags_on_name ON tags USING btree (name);
 
 
 --
--- Name: index_unapprovals_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_unapprovals_on_post_id ON unapprovals USING btree (post_id);
-
-
---
 -- Name: index_user_feedback_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3097,8 +3044,6 @@ INSERT INTO schema_migrations (version) VALUES ('20100205162521');
 INSERT INTO schema_migrations (version) VALUES ('20100205163027');
 
 INSERT INTO schema_migrations (version) VALUES ('20100205224030');
-
-INSERT INTO schema_migrations (version) VALUES ('20100209201251');
 
 INSERT INTO schema_migrations (version) VALUES ('20100211025616');
 

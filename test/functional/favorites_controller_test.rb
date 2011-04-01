@@ -35,7 +35,7 @@ class FavoritesControllerTest < ActionController::TestCase
 
       should "create a favorite for the current user" do
         assert_difference("Favorite.count(#{@user.id})", 1) do
-          post :create, {:id => @post.id}, {:user_id => @user.id}
+          post :create, {:format => "js", :id => @post.id}, {:user_id => @user.id}
         end
       end
     end
@@ -51,7 +51,7 @@ class FavoritesControllerTest < ActionController::TestCase
       
       should "remove the favorite from the current user" do
         assert_difference("Favorite.count(#{@user.id})", -1) do
-          post :destroy, {:id => @post.id}, {:user_id => @user.id}
+          post :destroy, {:format => "js", :id => @post.id}, {:user_id => @user.id}
         end
       end
     end

@@ -70,7 +70,7 @@ class ForumPostsControllerTest < ActionController::TestCase
         end
 
         forum_post = ForumPost.last
-        assert_redirected_to(forum_post_path(forum_post))
+        assert_redirected_to(forum_topic_path(@forum_topic, :page => 1))
       end
     end
     

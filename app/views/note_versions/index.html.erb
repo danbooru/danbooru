@@ -1,4 +1,4 @@
-<table width="100%" class="row-highlight">
+<table width="100%">
   <thead>
     <tr>
       <th></th>
@@ -12,27 +12,27 @@
     </tr>    
   </thead>
   <tbody>
-    <% @notes.each do |note| %>
-      <tr class="<%= cycle 'even', 'odd' %>">
-        <td style="background: <%= id_to_color(note.post_id) %>;"></td>
-        <td><%= link_to note.post_id, :controller => "post", :action => "show", :id => note.post_id %></td>
-        <td><%= link_to "#{note.note_id}.#{note.version}", :controller => "note", :action => "history", :id => note.note_id %></td>
-        <td><%= h(note.body) %> <% unless note.is_active? %>(deleted)<% end %></td>
+    <% @note_versions.each do |note_version| %>
+      <tr>
+        <td></td>
+        <td><%= link_to note.post_id, post_path(note_version.post_id) %></td>
+        <td><%= link_to "#{note_version.note_id}", note_versions_path(:search => {:note_id_eq => note_version.note_id}) %></td>
+        <td><%= h(note_version.body) %> <% unless note_version.is_active? %>(deleted)<% end %></td>
         <td>
-          <% if @current_user.is_admin? %>
-            <%= note.ip_addr %>
+          <% if CurrentUser.is_janitor? %>
+            <%= note_version.ip_addr %>
           <% end %>
         </td>
-        <td><%= link_to h(note.author), :controller => "user", :action => "show", :id => note.user_id %></td>
-        <td><%= note.updated_at.strftime("%Y-%m-%d %H:%M") %></td>
-        <td><%= link_to "Revert", {:controller => "note", :action => "revert", :id => note.note_id, :version => note.version}, :method => :post, :confirm => "Do you really wish to revert to this note?" %></td>
+        <td><%= link_to note_version.updater.name, user_path(note_version.updater) %></td>
+        <td><%= note_version.updated_at.strftime("%Y-%m-%d %H:%M") %></td>
+        <td><%= link_to "Revert", revert_note_path(note_version.note_id, :version => note_version.id), :remote => true, :confirm => "Do you really want to revert to this version?" %></td>
       </tr>
     <% end %>    
   </tbody>
 </table>
 
 <div id="paginator">
-  <%= will_paginate(@notes) %>
+  <%= will_paginate(@note_versions) %>
 </div>
 
 <%= render :partial => "footer" %>

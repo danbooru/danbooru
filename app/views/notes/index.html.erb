@@ -3,13 +3,3 @@
     
   </div>
 </div>
-
-<div id="note-list">
-  <%= render :partial => "post/posts", :locals => {:posts => @posts} %>
-
-  <div id="paginator">
-    <%= will_paginate(@posts) %>
-  </div>
-
-  <%= render :partial => "footer" %>
-</div>

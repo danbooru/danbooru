@@ -9,4 +9,8 @@ class PoolVersion < ActiveRecord::Base
     self.updater_id = CurrentUser.id
     self.updater_ip_addr = CurrentUser.ip_addr
   end
+  
+  def post_id_array
+    @post_id_array ||= post_ids.scan(/\d+/).map(&:to_i)
+  end
 end

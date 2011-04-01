@@ -1,4 +1,3 @@
 Factory.define(:comment_vote) do |f|
-  f.comment {|x| x.association(:comment)}
-  f.user {|x| x.association(:user)}
+  f.score 1
 end
