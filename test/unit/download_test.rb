@@ -13,7 +13,7 @@ class DownloadTest < ActiveSupport::TestCase
     end
     
     should "stream a file from an HTTP source" do
-      @download.http_get_streaming(@download.source) do |resp|
+      @download.http_get_streaming do |resp|
         assert_equal("200", resp.code)
         assert(resp["Content-Length"].to_i > 0, "File should be larger than 0 bytes")
       end
@@ -21,7 +21,7 @@ class DownloadTest < ActiveSupport::TestCase
     
     should "throw an exception when the file is larger than the maximum" do
       assert_raise(Download::Error) do
-        @download.http_get_streaming(@download.source, :max_size => 1) do |resp|
+        @download.http_get_streaming(:max_size => 1) do |resp|
         end
       end
     end

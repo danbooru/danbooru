@@ -1,40 +1,69 @@
 class Download
   class Error < Exception ; end
   
-  attr_accessor :source, :content_type
+  attr_accessor :source, :content_type, :file_path
   
   def initialize(source, file_path)
     @source = source
     @file_path = file_path
   end
   
-  # Downloads to @file_path
   def download!
-    http_get_streaming(@source) do |response|
+    http_get_streaming do |response|
       self.content_type = response["Content-Type"]
-      File.open(@file_path, "wb") do |out|
+      File.open(file_path, "wb") do |out|
         response.read_body(out)
       end
     end
-    @source = fix_image_board_sources(@source)
+    after_download
   end
   
-  # private
-  def handle_pixiv(source, headers)
-    if source =~ /pixiv\.net/
-      headers["Referer"] = "http://www.pixiv.net"
+  def pixiv_rewrite(headers)
+    return unless source =~ /pixiv\.net/
 
-      # Don't download the small version
-      if source =~ %r!(/img/.+?/.+?)_m.+$!
-        match = $1
-        source.sub!(match + "_m", match)
+    headers["Referer"] = "http://www.pixiv.net"
+    
+    # Don't download the small version
+    if source =~ %r!(/img/.+?/.+?)_m.+$!
+      match = $1
+      source.sub!(match + "_m", match)
+    end
+    
+    # Download the big version if it exists
+    if source =~ %r!(\d+_p\d+)\.!
+      match = $1
+      repl = match.sub(/_p/, "_big_p")
+      big_source = source.sub(match, repl)
+      if pixiv_http_exists?(big_source)
+        self.source = big_source
       end
     end
-  
-    source
   end
   
-  def http_get_streaming(source, options = {})
+  def pixiv_http_exists?
+    # example: http://img01.pixiv.net/img/as-special/15649262_big_p2.jpg
+    exists = false
+    uri = URI.parse(source)
+    Net::HTTP.start(uri.host, uri.port) do |http|
+      headers = {"Referer" => "http://www.pixiv.net", "User-Agent" => "#{Danbooru.config.app_name}/#{Danbooru.config.version}"}
+      http.request_head(uri.request_uri, headers) do |res|
+        if res.is_a?(Net::HTTPSuccess)
+          exists = true
+        end
+      end
+    end
+    exists
+  end
+  
+  def before_download(headers)
+    pixiv_rewrite(headers)
+  end
+  
+  def after_download
+    fix_image_board_sources
+  end
+  
+  def http_get_streaming(options = {})
     max_size = options[:max_size] || Danbooru.config.max_file_size
     max_size = nil if max_size == 0 # unlimited
     limit = 4
@@ -51,7 +80,7 @@ class Download
         headers = {
           "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
         }
-        source = handle_pixiv(source, headers)
+        before_download(headers)
         url = URI.parse(source)
         http.request_get(url.request_uri, headers) do |res|
           case res
@@ -78,11 +107,9 @@ class Download
     end # while
   end # def
   
-  def fix_image_board_sources(source)
+  def fix_image_board_sources
     if source =~ /\/src\/\d{12,}|urnc\.yi\.org|yui\.cynthia\.bne\.jp/
-      "Image board"
-    else
-      source
+      self.source = "Image board"
     end
   end
 end
