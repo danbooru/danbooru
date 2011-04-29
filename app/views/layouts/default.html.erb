@@ -14,8 +14,7 @@
     <meta name="errors" content="true">
   <% end %>
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
-  <%= stylesheet_link_tag "compiled/default" %>
-  <%= stylesheet_link_tag "smoothness/jquery-ui-1.8.5.custom.css" %>
+  <%= stylesheet_link_tag "compiled/default", "smoothness/jquery-ui-1.8.5.custom.css", :cache => true %>
   <%= javascript_include_tag :defaults, :cache => true %>
   <%= Danbooru.config.custom_html_header_content %>
   <%= yield :html_header %>
