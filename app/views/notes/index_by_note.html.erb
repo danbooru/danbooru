@@ -1,0 +1,28 @@
+<div id="c-notes">
+  <div id="a-index">
+    <table>
+      <thead>
+        <tr>
+          <th>Post</th>
+          <th>Created by</th>
+          <th>Created at</th>
+          <th>Active?</th>
+          <th>Body</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @notes.each do |note| %>
+          <tr>
+            <td><%= link_to note.post_id, post_path(note.post_id) %></td>
+            <td><%= link_to note.creator.name, user_path(note.creator_id) %></td>
+            <td><%= time_ago_in_words(note.created_at) %> ago</td>
+            <td><%= note.is_active? %></td>
+            <td><%= format_text(note.body) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%= render "notes/secondary_links" %>

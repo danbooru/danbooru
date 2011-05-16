@@ -1,0 +1,11 @@
+<div id="c-pools">
+  <div id="a-search">
+    <%= simple_form_for @search, :method => :get do |f| %>
+      <%= f.input :name_contains, :label => "Name", :required => false %>
+      <%= f.input :description_contains, :label => "Description", :required => false %>
+      <%= f.button :submit, "Search" %>
+    <% end %>
+  </div>
+</div>
+
+<%= render "secondary_links" %>
