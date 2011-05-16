@@ -8,10 +8,6 @@ $link_hover_color: #9093FF;
 body, div, h1, h2, h3, h4, h5, h6, p, ul, li, dd, dt, header, aside {
   font-family: Verdana, Geneva, sans-serif;
   line-height: 1.25em;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  vertical-align: baseline;
 }
 
 body {
@@ -860,4 +856,68 @@ div#c-post-moderation {
     float: left;
     width: 300px;
   }
+}
+
+
+
+/*** Note Container ***/
+div#note-container {
+  position: absolute;
+  
+  div.note-body {
+    background: #FFE;
+    border: 1px solid black;
+    max-width: 300px;
+    min-width: 140px;
+    min-height: 10px;
+    position: absolute;
+    padding: 5px;
+    cursor: pointer;
+    overflow: auto;
+    
+    p.tn {
+      font-size: 0.8em;
+      color: gray;
+    }
+  }
+  
+  div.note-box {
+    position: absolute;
+    border: 1px solid black;
+    width: 150px;
+    height: 150px;
+    cursor: move;
+    background: #FFE;
+    
+    div.note-corner {
+      background: black;
+      width: 7px;
+      height: 7px;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      cursor: se-resize;
+    }
+  }
+  
+  div.unsaved {
+    background: #FFF;
+    border: 1px solid red;
+    
+    div.note-corner {
+      background: red;
+    }
+  }
+}
+
+div#jquery-test div.note {
+  background: #FFE;
+  border: 1px solid black;
+  max-width: 300px;
+  min-width: 140px;
+  min-height: 10px;
+  position: absolute;
+  padding: 5px;
+  cursor: pointer;
+  overflow: auto;
 }

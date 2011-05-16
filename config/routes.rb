@@ -39,12 +39,19 @@ Danbooru::Application.routes.draw do
   resources :jobs
   resources :ip_bans
   resources :notes do
+    collection do
+      get :search
+    end
+    
     member do
       put :revert
     end
   end
   resources :note_versions, :only => [:index]
   resources :pools do
+    collection do
+      get :search
+    end
     member do
       put :revert
     end
@@ -98,6 +105,7 @@ Danbooru::Application.routes.draw do
   match "/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
   match "/user_maintenance/login_reminder" => "user_maintenance#login_reminder", :as => "login_reminder"
   match "/user_maintenance/reset_password" => "user_maintenance#reset_password", :as => "reset_password"
+  match '/jquery_test' => 'static#jquery_test'
   
   root :to => "posts#index"
 end

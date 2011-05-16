@@ -40,7 +40,8 @@ class UserTest < ActiveSupport::TestCase
       user = Factory.create(:user)
       assert(user.can_comment_vote?)
       12.times do
-        Factory.create(:comment_vote, :user => user)
+        comment = Factory.create(:comment)
+        Factory.create(:comment_vote, :user => user, :comment_id => comment.id)
       end
       assert(!user.can_comment_vote?)
       CommentVote.update_all("created_at = '1990-01-01'")

@@ -1,7 +1,7 @@
-<div style="width: 40em; margin: 5em auto;">
+<div style="width: 40em; margin: 5em auto; overflow: scroll;">
   <div class="section">
     <h4>Terms of Service</h4>
-    <p>By accessing the "<%= CONFIG["app_name"] %>" website ("Site") you agree to the following terms of service. If you do not agree to these terms, then please do not access the Site.</p>  
+    <p>By accessing the "<%= Danbooru.config.app_name %>" website ("Site") you agree to the following terms of service. If you do not agree to these terms, then please do not access the Site.</p>  
 
     <ul>
       <li>The Site reserves the right to change these terms at any time.</li>
@@ -9,7 +9,7 @@
       <li>The Site is presented to you AS IS, without any warranty, express or implied. You will not hold the Site or its staff members liable for damages caused by the use of the site.</li>
       <li>The Site reserves the right to delete or modify your account, or any content you have posted to the site.</li>
       <li>You will make a best faith effort to upload only high quality anime-related images.</li>
-      <li>You have read the <%= link_to "tagging guidelines", :controller => "help", :action => "tags" %>.</li>
+      <li>You have read the <%= link_to "tagging guidelines", wiki_pages_path(:title => "help:tags") %>.</li>
     </ul>
     
     <div class="section">
@@ -36,7 +36,7 @@
   <div class="section">
     <h4>Copyright Infringement</h4>
 
-    <p>If you believe a post infringes upon your copyright, please send an email to the <%= mail_to CONFIG["admin_contact"], "webmaster", :encode => "hex" %> with the following pieces of information:</p>
+    <p>If you believe a post infringes upon your copyright, please send an email to the <%= mail_to Danbooru.config.contact_email, "webmaster", :encode => "hex" %> with the following pieces of information:</p>
     <ul>
       <li>The URL of the infringing post.</li>
       <li>Proof that you own the copyright.</li>

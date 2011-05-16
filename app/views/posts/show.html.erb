@@ -34,8 +34,9 @@
       
       <%= render :partial => "posts/partials/show/notices", :locals => {:post => @post} %>
 
-      <section id="image">
+      <section id="image-container">
         <h2>Image</h2>
+        <div id="note-container"></div>
         <%= @post.presenter.image_html(self) %>
       </section>
       

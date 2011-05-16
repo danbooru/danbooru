@@ -19,6 +19,10 @@ class PoolsController < ApplicationController
     respond_with(@pools)
   end
   
+  def search
+    @search = Pool.search(params[:search])
+  end
+  
   def show
     @pool = Pool.find(params[:id])
     @post_set = PostSets::Pool.new(@pool, :page => params[:page])

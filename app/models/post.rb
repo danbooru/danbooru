@@ -34,6 +34,7 @@ class Post < ActiveRecord::Base
   scope :deleted, where(["is_deleted = ?", true])
   scope :visible, lambda {|user| Danbooru.config.can_user_see_post_conditions(user)}
   scope :commented_before, lambda {|date| where("last_commented_at < ?", date).order("last_commented_at DESC")}
+  scope :noted_before, lambda {|date| where("last_noted_at < ?", date).order("last_noted_at DESC")}
   scope :for_user, lambda {|user_id| where(["uploader_string = ?", "uploader:#{user_id}"])}
   scope :available_for_moderation, lambda {where(["id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :hidden_from_moderation, lambda {where(["id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}

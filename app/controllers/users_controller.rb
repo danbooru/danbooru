@@ -27,6 +27,8 @@ class UsersController < ApplicationController
   
   def create
     @user = User.create(params[:user])
+    session[:user_id] = @user.id
+    set_current_user
     respond_with(@user)
   end
   

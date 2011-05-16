@@ -3,9 +3,11 @@ class NotesController < ApplicationController
   before_filter :member_only, :except => [:index, :show]
   
   def index
-    @search = Note.search(params[:search])
-    @notes = @search.paginate(:page => params[:page])
-    respond_with(@notes)
+    if params[:group_by] == "post"
+      index_by_post
+    else
+      index_by_note
+    end
   end
   
   def show
@@ -36,4 +38,21 @@ class NotesController < ApplicationController
     @note.revert_to!(@version)
     respond_with(@note)
   end
+
+private
+  def index_by_post
+    @posts = Post.tag_match(params[:tags]).noted_before(params[:before_date] || Time.now).limit(8)
+    respond_with(@posts) do |format|
+      format.html {render :action => "index_by_post"}
+    end
+  end
+
+  def index_by_note
+    @search = Note.search(params[:search])
+    @notes = @search.paginate(:page => params[:page])
+    respond_with(@notes) do |format|
+      format.html {render :action => "index_by_note"}
+    end
+  end
+  
 end

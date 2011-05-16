@@ -1,6 +1,7 @@
 <% content_for(:secondary_links) do %>
   <menu>
     <li><%= link_to "Listing", pools_path %></li>
+    <li><%= link_to "Search", search_pools_path %></li>
     <li><%= link_to "New", new_pool_path %></li>
     <% if @pool %>
       <li>|</li>
