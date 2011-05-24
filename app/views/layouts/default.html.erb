@@ -14,8 +14,8 @@
     <meta name="errors" content="true">
   <% end %>
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
-  <%= stylesheet_link_tag "compiled/default", "smoothness/jquery-ui-1.8.5.custom.css", :cache => true %>
-  <%= javascript_include_tag :defaults, :cache => true %>
+  <link rel="stylesheet" href="/assets/application.css" media="screen" type="text/css">
+  <script src="/assets/application.js" type="text/javascript" charset="utf-8" async defer></script>
   <%= Danbooru.config.custom_html_header_content %>
   <%= yield :html_header %>
 </head>

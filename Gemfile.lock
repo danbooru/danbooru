@@ -1,15 +1,14 @@
 GIT
+  remote: git://github.com/wantful/will_paginate.git
+  revision: e1676b5cec9e50e208fc2806b8c78ed1c8824275
+  specs:
+    will_paginate (2.3.15)
+
+GIT
   remote: http://github.com/EmmanuelOga/ffaker.git
   revision: baf4891a5351ad01775f3e4bb77c78ceed349360
   specs:
     ffaker (1.7.0)
-
-GIT
-  remote: http://github.com/mislav/will_paginate.git
-  revision: b1a5beeec9f56ecbe3594fcdca76d92b6767ce50
-  branch: rails3
-  specs:
-    will_paginate (3.0.pre3)
 
 GEM
   remote: http://gemcutter.org/
@@ -108,7 +107,7 @@ GEM
     sprockets (2.0.0.beta.8)
       hike (~> 1.0)
       rack (~> 1.0)
-      tilt (~> 1.1, != 1.3.0)
+      tilt (!= 1.3.0, ~> 1.1)
     super_exception_notifier (3.0.13)
       actionmailer
       rake

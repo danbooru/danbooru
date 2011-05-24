@@ -3,7 +3,7 @@ class Tag < ActiveRecord::Base
   after_save :update_category_cache
   has_one :wiki_page, :foreign_key => "name", :primary_key => "title"
   scope :name_matches, lambda {|name| where(["name LIKE ? ESCAPE E'\\\\'", name.to_escaped_for_sql_like])}
-  search_method :name_matches
+  search_methods :name_matches
 
   class CategoryMapping
     Danbooru.config.reverse_tag_category_mapping.each do |value, category|
