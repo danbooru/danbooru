@@ -1,4 +1,13 @@
 class WikiPagePresenter
+  attr_reader :wiki_page
+  
+  def initialize(wiki_page)
+    @wiki_page = wiki_page
+  end
+  
+  def excerpt
+    wiki_page.body.split(/\r\n|\r|\n/).first
+  end
   
   # Produce a formatted page that shows the difference between two versions of a page.
   def diff(other_version)

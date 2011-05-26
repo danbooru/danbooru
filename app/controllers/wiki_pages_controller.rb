@@ -5,7 +5,7 @@ class WikiPagesController < ApplicationController
   before_filter :normalize_search_params, :only => [:index]
 
   def new
-    @wiki_page = WikiPage.new
+    @wiki_page = WikiPage.new(params[:wiki_page])
     respond_with(@wiki_page)
   end
   

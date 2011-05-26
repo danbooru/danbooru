@@ -22,7 +22,7 @@
       <% end %>
 
       <section id="blacklist-box">
-        <h1>Blacklisted</h1>
+        <h1>Blacklist</h1>
         <%= link_to "Hidden", "#" %>
         <ul>
         </ul>
@@ -30,35 +30,18 @@
       
       <%= render :partial => "posts/partials/index/explore", :locals => {:post_set => @post_set} %>
 
-      <section id="tag-and-wiki-box">
-        <menu>
-          <li><h1><a href="#tag-box">Tags</a></h1></li>
-          <% unless @post_set.tags.blank?  %>
-            <li><h1><a href="#wiki-box">Wiki</a></h1></li>
-          <% end %>
-        </menu>
-
-        <div id="tag-box">
-          <h2>Tags</h2>
-          <%= @post_set.presenter.tag_list_html(self) %>
-        </div>
-
-        <div id="wiki-box">
-          <h2>Wiki</h2>
-          <%= @post_set.presenter.wiki_html(self) %>
-        </div>
+      <section id="tag-box">
+        <h1>Tags</h1>
+        <%= @post_set.presenter.tag_list_html(self) %>
       </section>
     </aside>
 
     <section id="content">
-      <h1>Posts</h1>
-      <%= @post_set.presenter.post_previews_html %>
-
-      <div class="clearfix"></div>
-    
-      <div class="paginator">
-        <%= @post_set.presenter.pagination_html(self) %>
-      </div>
+      <% if @post_set.has_wiki? && @post_set.page < 2 %>
+        <%= render :partial => "wiki_pages/excerpt", :locals => {:wiki_page => @post_set.wiki_page, :tag => @post_set.tag} %>
+      <% end %>
+      
+      <%= render :partial => "posts/partials/index/posts", :locals => {:post_set => @post_set} %>
     </section>
     
     <% content_for(:page_title) do %>

@@ -13,15 +13,16 @@
   <% if flash[:notice] =~ /error/ %>
     <meta name="errors" content="true">
   <% end %>
+  <meta name="max-image-width" content="500">
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
-  <link rel="stylesheet" href="/assets/application.css" media="screen" type="text/css">
-  <script src="/assets/application.js" type="text/javascript" charset="utf-8" async defer></script>
+  <%= stylesheet_link_tag "application", :media => "screen" %>
+  <%= javascript_include_tag "application" %>
   <%= Danbooru.config.custom_html_header_content %>
   <%= yield :html_header %>
 </head>
 <body>
   <header>
-    <h1><%= Danbooru.config.app_name %></h1>
+    <h1><%= link_to Danbooru.config.app_name, "/" %></h1>
     <nav>
       <menu>
         <% if CurrentUser.user.is_anonymous? %>

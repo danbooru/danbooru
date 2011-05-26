@@ -166,38 +166,22 @@
   Danbooru.Post = {};
   
   Danbooru.Post.initialize_all = function() {
-    this.initialize_tag_and_wiki_menu();
-    this.initialize_tag_list();
     this.initialize_post_sections();
+    this.initialize_wiki_page_excerpt();
   }
   
-  Danbooru.Post.initialize_tag_list = function() {
-    $("#tag-box a.search-inc-tag").click(function(e) {
-      $("#tags").val($("#tags").val() + " " + $(e.target).parent("li").data("tag-name"));
-      return false;
-    });
-
-    $("#tag-box a.search-exl-tag").click(function(e) {
-      $("#tags").val($("#tags").val() + " -" + $(e.target).parent("li").data("tag-name"));
-      return false;
-    });
-  }
-  
-  Danbooru.Post.initialize_tag_and_wiki_menu = function() {
-    $("#tag-and-wiki-box h1 a").click(function(e) {
-      $("#tag-box").hide();
-      $("#wiki-box").hide();
-      $("#tag-and-wiki-box menu li").toggleClass("active");
-      var name = e.target.hash;
-      $(name).show();
-      e.stopPropagation();
-      return false;
+  Danbooru.Post.initialize_wiki_page_excerpt = function() {
+    $("#close-wiki-page-excerpt").click(function() {
+      $("#wiki-page-excerpt").remove();
+      Danbooru.j_alert("Notice", "You can reenable the wiki excerpt by clearing your cookies.");
+      Danbooru.Cookie.put("hide-wiki-page-excerpt", "1");
     });
     
-    $("#tag-and-wiki-box menu li:first-child").addClass("active");
-    $("#wiki-box").hide();
+    if (Danbooru.Cookie.get("hide-wiki-page-excerpt") === "1") {
+      $("#wiki-page-excerpt").remove();
+    }
   }
-  
+
   Danbooru.Post.initialize_post_sections = function() {
     $("#post-sections li a").click(function(e) {
       $("#comments").hide();

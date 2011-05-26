@@ -8,7 +8,7 @@ class ForumPost < ActiveRecord::Base
   validates_presence_of :body, :creator_id
   validate :validate_topic_is_unlocked
   scope :body_matches, lambda {|body| where(["text_index @@ plainto_tsquery(?)", body])}
-  search_method :body_matches
+  search_methods :body_matches
   
   def self.new_reply(params)
     if params[:topic_id]

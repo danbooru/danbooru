@@ -2,28 +2,61 @@
 
 $link_color: #006FFA;
 $link_hover_color: #9093FF;
+$h1_size: 2em;
+$h2_size: 1.5em;
+$h3_size: 1.16667em;
+$h1_padding: 1.25em 0;
+$h2_padding: 1.45833em 0;
+$h3_padding: 1.51785em 0;
 
-.blacklisted {
-  display: none !important; 
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+ol, ul {
+  list-style: none;
+}
+blockquote, q {
+  quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
 }
 
-body, div, h1, h2, h3, h4, h5, h6, p, ul, li, dd, dt, header, aside {
-  font-family: Verdana, Geneva, sans-serif;
-  line-height: 1.25em;
-}
 
+/*** BEGIN CUSTOM STYLES ***/
 body {
-  font-size: 87.5%;
-}
-
-h1, h2, h3, h4 {
-  font-family: Tahoma;
-  line-height: 1em;
-}
-
-body {
+  font-family: Verdana, Helvetica, sans-serif;
   padding: 1em 2em;
   margin: 0;
+  line-height: 1.25em;
 }
 
 article, section {
@@ -74,28 +107,40 @@ dt {
   font-weight: bold;
 }
 
+h1, h2, h3 {
+  font-family: Tahoma;
+  font-weight: bold;
+  line-height: 1.25em;
+}
+
 h1 {
-  font-size: 2.1818em;
+  font-size: $h1_size; 
 }
 
-h2 {
-  font-size: 1.9091em;
+h2 { 
+  font-size: $h2_size; 
 }
 
-h3 {
-  font-size: 1.6364em;
+h3 { 
+  font-size: $h3_size; 
 }
 
-h4 {
-  font-size: 1.4545em;
-}
+div.prose {
+  h1, h2, h3 {
+    line-height: 1em;
+  }
+  
+  h1 {
+    padding: $h1_padding; 
+  }
 
-h5 {
-  font-size: 1.2727em;
-}
+  h2 { 
+    padding: $h2_padding; 
+  }
 
-h6 {
-  font-size: 1.090em;
+  h3 { 
+    padding: $h3_padding; 
+  }
 }
 
 header {
@@ -228,13 +273,17 @@ div#page {
   aside#sidebar {
     width: 20%;
     float: left;
-
+    
     h1 {
-      font-size: 1.2em;
+      font-size: $h3_size;
     }
     
     ul {
       list-style-type: none;
+    }
+    
+    input[type=text] {
+      width: 10em;
     }
   }
 
@@ -252,6 +301,7 @@ div#page {
 div.clearfix {
   clear: both;
 }
+
 
 /*** Paginator ***/
 div.paginator {
@@ -291,14 +341,6 @@ div.paginator {
     margin: 0 3px;
     padding: 2px 6px;
   }
-}
-
-
-/*** Header ***/
-
-body > header > h1 {
-  font-size: 3em;
-  font-family: Tahoma, Helvetica, sans-serif;
 }
 
 
@@ -542,65 +584,21 @@ div#c-posts {
     margin-left: 1em;
   }
   
-  section#tag-and-wiki-box {
-    padding: 0;
-    
-    menu {
-      li {
-        display: inline-block;
-      }
-      
-      li.active a {
-        color: #000;
-      }
-    }
-    
-    div#tag-box {
-      h2 {
-        display: none;
-      }
-      
-      li {
-        list-style-type: none;
-      }
-    }
-    
-    div#wiki-box {
-      h2 {
-        display: none;
-      }
-    }
-  }
-
-  section#content > h1 {
-    display: none;
+  h1 {
+    font-size: $h3_size;
   }
   
-  section#content {
-    section > h2 {
-      display: none;
-    }
-    
-    menu#post-sections {
-      margin-bottom: 1em;
-      
-      li {
-        font-size: 1.1em;
-        font-weight: bold;
-      }
-      
-      li.active a {
-        color: black;
-      }
-    }
-    
-    section#edit {
-      fieldset {
-        label {
-          display: inline;
-        }
-      }
-    }
+  div#wiki-page-excerpt {
+    position: relative;
+    width: 40em;
+    padding-right: 1em;
+  }
+  
+  span#close-wiki-page-excerpt {
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
   }
 }
 
@@ -783,9 +781,6 @@ div#c-forum-topics {
   }
   
   div#a-show {
-    h1#forum-topic-title {
-      font-size: 2.1818em;
-    }
   }
   
   span.info {
@@ -867,15 +862,13 @@ div#note-container {
   position: absolute;
   
   div.note-body {
-    background: #FFE;
-    border: 1px solid black;
-    max-width: 300px;
-    min-width: 140px;
-    min-height: 10px;
     position: absolute;
-    padding: 5px;
+    border: 1px solid black;
+    background: white;
+    min-width: 5em;
+    min-height: 1em;
     cursor: pointer;
-    overflow: auto;
+    padding: 4px;
     
     p.tn {
       font-size: 0.8em;
@@ -885,41 +878,49 @@ div#note-container {
   
   div.note-box {
     position: absolute;
-    border: 1px solid black;
-    width: 150px;
-    height: 150px;
+    border: 1px solid white;
+    min-width: 100px;
+    min-height: 100px;
     cursor: move;
     background: #FFE;
     
-    div.note-corner {
-      background: black;
-      width: 7px;
-      height: 7px;
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      cursor: se-resize;
+    div.note-box-inner-border {
+      border: 1px solid black;
+      background: white;
+    }
+    
+    div.note-box-inner-border.unsaved {
+      border: 1px solid red;
     }
   }
   
-  div.unsaved {
-    background: #FFF;
-    border: 1px solid red;
-    
-    div.note-corner {
-      background: red;
-    }
+  div.note-edit-dialog {
+    font-size: 70%;
   }
 }
 
-div#jquery-test div.note {
-  background: #FFE;
-  border: 1px solid black;
-  max-width: 300px;
-  min-width: 140px;
-  min-height: 10px;
-  position: absolute;
-  padding: 5px;
-  cursor: pointer;
-  overflow: auto;
+
+/*** Site Map ***/
+div#c-static {
+  div#a-site-map {
+    width: 80em;
+    
+    h1 {
+      display: none;
+    }
+    
+    section {
+      width: 20em;
+      float: left;
+      
+      h1 {
+        display: block;
+        font-size: $h3_size;
+      }
+      
+      ul {
+        margin-bottom: 1.5em;
+      }
+    }
+  }
 }

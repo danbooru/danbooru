@@ -2,7 +2,7 @@ module Danbooru
   class CustomConfiguration < Configuration
     # Define your custom overloads here
     def app_name
-      "."
+      "Lorem"
     end
 
     def posts_per_page

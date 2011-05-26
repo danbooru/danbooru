@@ -40,8 +40,8 @@ module PostSets
   
     def load_associations
       if is_single_tag?
-        @wiki_page = WikiPage.find_by_title(tags)
-        @artist = Artist.find_by_name(tags)
+        @wiki_page = ::WikiPage.titled(tags).first
+        @artist = ::Artist.find_by_name(tags)
       end
     end
   
@@ -60,6 +60,10 @@ module PostSets
   
     def tag_array
       @tag_array ||= Tag.scan_query(tags)
+    end
+    
+    def tag
+      tag_array.first
     end
   
     def validate
