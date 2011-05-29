@@ -107,6 +107,10 @@ dt {
   font-weight: bold;
 }
 
+em {
+  font-style: italic;
+}
+
 h1, h2, h3 {
   font-family: Tahoma;
   font-weight: bold;
@@ -366,7 +370,7 @@ form.simple_form {
   div.input {
     margin-bottom: 1em;
     
-    input[type=text], input[type=file] {
+    input[type=text], input[type=file], input[type=password], input[type=email] {
       width: 20em;
     }
     
@@ -396,6 +400,7 @@ form.simple_form {
         font-weight: normal;
         width: auto;
         margin-right: 2em;
+        display: inline;
       }
     }
   }
@@ -478,6 +483,11 @@ div.comments-for-post {
       div.author {
         width: 20%;
         float: left;
+        
+        h1 {
+          display: block;
+          font-size: $h2_size;
+        }
       }
       
       div.content {
@@ -591,14 +601,34 @@ div#c-posts {
   div#wiki-page-excerpt {
     position: relative;
     width: 40em;
-    padding-right: 1em;
+    
+    div#hide-or-show-wiki-page-excerpt {
+      font-size: 1em;
+      position: absolute;
+      top: 0;
+      right: 0;
+      
+      span {
+        cursor: pointer;
+        color: #AAA;
+      }
+      
+      span:hover {
+        color: #333;
+      }
+    }
   }
   
-  span#close-wiki-page-excerpt {
-    position: absolute;
-    top: 0;
-    right: 0;
-    cursor: pointer;
+  div#a-show {
+    menu#post-sections {
+      font-size: $h3_size;
+      font-weight: bold;
+      line-height: 1.25em;
+
+      li a {
+        color: $link_color;
+      }
+    }
   }
 }
 
@@ -665,8 +695,8 @@ div#sessions {
       }
     }
   
-    h2 {
-      margin-bottom: 5px;
+    h1 {
+      font-size: $h2_size;
     }
   }
 }
@@ -698,8 +728,8 @@ div#c-artists {
 
 
 /*** Users ***/
-div.users {
-  div.new {
+div#c-users {
+  div#a-new {
     max-width: 60em;
     
     p {
@@ -708,9 +738,14 @@ div.users {
     
     li {
       margin-left: 1em;
+      list-style-type: disc;
     }
     
     div#account-comparison {
+      h1 {
+        font-size: $h2_size;
+      }
+      
       li {
         font-size: 0.9em;
         line-height: 1.5em;
@@ -879,10 +914,12 @@ div#note-container {
   div.note-box {
     position: absolute;
     border: 1px solid white;
-    min-width: 100px;
-    min-height: 100px;
+    min-width: 20px;
+    min-height: 20px;
+    width: 100px;
+    height: 100px;
     cursor: move;
-    background: #FFE;
+    background: transparent;
     
     div.note-box-inner-border {
       border: 1px solid black;
@@ -893,10 +930,10 @@ div#note-container {
       border: 1px solid red;
     }
   }
-  
-  div.note-edit-dialog {
-    font-size: 70%;
-  }
+}
+
+div.note-edit-dialog {
+  font-size: 70%;
 }
 
 

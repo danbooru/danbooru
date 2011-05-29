@@ -4,16 +4,22 @@
  -->
 
 <div id="wiki-page-excerpt">
-  <span class="ui-icon ui-icon-closethick" id="close-wiki-page-excerpt"></span>
   <h1>Wiki</h1>
+  
+  <div id="hide-or-show-wiki-page-excerpt">
+    <span id="hide-wiki-page-excerpt">(hide)</span>
+    <span id="show-wiki-page-excerpt">(show)</span>
+  </div>
 
-  <% if wiki_page %>
-    <div id="wiki-page-excerpt" class="prose">
-      <%= format_text(wiki_page.presenter.excerpt) %>
+  <div id="wiki-page-excerpt-content">
+    <% if wiki_page %>
+      <div class="prose">
+        <%= format_text(wiki_page.presenter.excerpt) %>
 
-      <p>Read the <%= link_to "full article", wiki_page_path(wiki_page.id) %>.</p>
-    </div>
-  <% else %>
-    <p>There is currently no wiki page for the tag "<%= tag %>". You can <%= link_to "create one", new_wiki_page_path(:wiki_page => {:title => tag}) %>.</p>
-  <% end %>
+        <p>Read the <%= link_to "full article", wiki_page_path(wiki_page.id) %>.</p>
+      </div>
+    <% else %>
+      <p>There is currently no wiki page for the tag "<%= tag %>". You can <%= link_to "create one", new_wiki_page_path(:wiki_page => {:title => tag}) %>.</p>
+    <% end %>
+  </div>
 </div>

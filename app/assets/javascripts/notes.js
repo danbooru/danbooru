@@ -3,7 +3,7 @@ Danbooru.Note = {
     create: function(id) {
       var $inner_border = $('<div/>');
       $inner_border.addClass("note-box-inner-border");
-      $inner_border.css({opacity: 0.7});
+      $inner_border.css({opacity: 0.5});
 
       var $note_box = $('<div/>');
       $note_box.addClass("note-box");
@@ -61,6 +61,10 @@ Danbooru.Note = {
           }
         }
       );
+    },
+    
+    find: function(id) {
+      return $("#note-container div.note-box[data-id=" + id + "]");
     },
     
     resize_inner_border: function($note_box) {
@@ -124,7 +128,7 @@ Danbooru.Note = {
     },
     
     initialize: function($note_body) {
-      var $note_box = $("#note-container div.note-box[data-id=" + $note_body.data("id") + "]");
+      var $note_box = Danbooru.Note.Box.find($note_body.data("id"));
       $note_body.css({
         top: $note_box.position().top + $note_box.height() + 5,
         left: $note_box.position().left
@@ -149,18 +153,22 @@ Danbooru.Note = {
 
       Danbooru.Note.Body.hide_all();
       Danbooru.Note.clear_timeouts();
-      var $note_body = $("#note-container div.note-body[data-id=" + id + "]");
+      var $note_body = Danbooru.Note.Body.find(id);
       $note_body.show();
       Danbooru.Note.Body.initialize($note_body);
     },
     
+    find: function(id) {
+      return $("#note-container div.note-body[data-id=" + id + "]");
+    },
+    
     hide: function(id) {
-      var $note_body = $("#note-container div.note-body[data-id=" + id + "]");
+      var $note_body = Danbooru.Note.Body.find(id);
       Danbooru.Note.timeouts.push($.timeout(250).done(function() {$note_body.hide();}));
     },
     
     hide_all: function() {
-      $(".note-body").hide();
+      $("#note-container div.note-body").hide();
     },
     
     resize: function($note_body) {
@@ -250,17 +258,64 @@ Danbooru.Note = {
       Danbooru.Note.editing = true;
     },
     
+    parameterize_note: function($note_box, $note_body) {
+      var hash = {
+        note: {
+          x: $note_box.position().left,
+          y: $note_box.position().top,
+          width: $note_box.width(),
+          height: $note_box.height(),
+          body: $note_body.html(),
+          post_id: Danbooru.meta("post-id")
+        }
+      }
+      
+      if ($note_box.data("id").match(/x/)) {
+        hash.note.html_id = $note_box.data("id");
+      }
+      
+      return hash;
+    },
+    
+    error_handler: function(xhr, status, exception) {
+      Danbooru.j_error("There was an error saving the note");
+    },
+    
+    success_handler: function(data, status, xhr) {
+      if (data.html_id) {
+        var $note_body = Danbooru.Note.Body.find(data.html_id);
+        var $note_box = Danbooru.Note.Box.find(data.html_id);
+        $note_body.data("id", data.id).attr("data-id", data.id);
+        $note_box.data("id", data.id).attr("data-id", data.id);
+        $note_box.find(".note-box-inner-border").removeClass("unsaved");
+      }
+    },
+    
     save: function() {
       var $this = $(this);
       var $textarea = $this.find("textarea");
       var id = $this.data("id");
-      var $note_body = $("#note-container .note-body[data-id=" + id + "]");
-      var $note_box = $("#note-container .note-box[data-id=" + id + "]");
+      var $note_body = Danbooru.Note.Body.find(id);
+      var $note_box = Danbooru.Note.Box.find(id);
       var text = $textarea.val();
       Danbooru.Note.Body.set_text($note_body, text);
       $this.dialog("close");
-      $note_box.find(".note-box-inner-border").removeClass("unsaved");
-      console.log("save %d", id);
+      
+      if (id.match(/\d/)) {
+        $.ajax("/notes/" + id + ".json", {
+          type: "PUT",
+          data: Danbooru.Note.Edit.parameterize_note($note_box, $note_body),
+          error: Danbooru.Note.Edit.error_handler,
+          success: Danbooru.Note.Edit.success_handler
+        });
+      } else {
+        $.ajax("/notes.json", {
+          type: "POST",
+          data: Danbooru.Note.Edit.parameterize_note($note_box, $note_body),
+          error: Danbooru.Note.Edit.error_handler,
+          success: Danbooru.Note.Edit.success_handler
+        });
+      }
     },
     
     cancel: function() {
@@ -270,29 +325,37 @@ Danbooru.Note = {
     delete: function() {
       var $this = $(this);
       var id = $this.data("id");
-      console.log("delete %d", id);
-      $("#note-container .note-box[data-id=" + id + "]").remove();
-      $("#note-container .note-body[data-id=" + id + "]").remove();
+      Danbooru.Note.Box.find(id).remove();
+      Danbooru.Note.Body.find(id).remove();
       $(this).dialog("close");
+      
+      if (id.match(/\d/)) {
+        $.ajax("/notes/" + id + ".js", {
+          type: "DELETE"
+        });
+      }
     },
     
     history: function() {
       var $this = $(this);
       var id = $this.data("id");
-      console.log("history %d", id);
       $(this).dialog("close");
+      
+      if (id.match(/\d/)) {
+        window.href = "/note_versions?search[note_id]=" + id;
+      }
     }
   },
   
   TranslationMode: {
     start: function() {
       $("#note-container").click(Danbooru.Note.TranslationMode.create_note);
-      $("#translate-button").one("click", Danbooru.Note.TranslationMode.stop).html("Click on image");
+      $("#translate").one("click", Danbooru.Note.TranslationMode.stop).html("Click on image");
     },
     
     stop: function() {
       $("#note-container").unbind("click");
-      $("#translate-button").one("click", Danbooru.Note.TranslationMode.start).html("Translate");
+      $("#translate").one("click", Danbooru.Note.TranslationMode.start).html("Translate");
     },
     
     create_note: function(e) {
@@ -330,7 +393,7 @@ Danbooru.Note = {
   scale: function() {
     var $image = $("#image");
     if ($image.attr("ratio")) {
-      
+      // TODO: implement
     }
   },
   
@@ -355,7 +418,7 @@ Danbooru.Note = {
   new: function(x, y) {
     var $note_box = Danbooru.Note.Box.create(Danbooru.Note.id);
     var $note_body = Danbooru.Note.Body.create(Danbooru.Note.id);
-    $note_box.offset({
+    $note_box.css({
       top: y,
       left: x
     });
@@ -376,12 +439,12 @@ Danbooru.Note = {
   }
 }
 
-$(document).ready(function() {
-  if ($("#c-posts #a-show").size > 0) {
+$(function() {
+  if ($("#c-posts #a-show").size() > 0) {
     Danbooru.Note.Image.resize();
-    $("#translate-button").one("click", Danbooru.Note.TranslationMode.start);
+    $("#translate").one("click", Danbooru.Note.TranslationMode.start);
     $("#note-container").width($("#image").width()).height($("#image").height());
-    // $(document).bind("keydown", "ctrl+n", Danbooru.Note.TranslationMode.start);
+    $(document).bind("keydown", "ctrl+n", Danbooru.Note.TranslationMode.start);
 
     $("#toggle-resize").click(function() {
       var $image = $("#image");

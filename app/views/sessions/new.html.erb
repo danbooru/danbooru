@@ -1,36 +1,28 @@
 <div id="sessions">
   <div id="new">
     <section>
-      <h3>Sign In</h3>
-      <%= form_tag(session_path) do %>
+      <h1>Login</h1>
+      <%= form_tag(session_path, :class => "simple_form") do %>
         <%= hidden_field_tag "url", params[:url] %>
-        <table width="100%">
-          <tfoot>
-            <tr>
-              <td></td>
-              <td><%= submit_tag "Login" %></td>
-            </tr>
-          </tfoot>
-          <tbody>
-            <tr>
-              <th width="15%">
-                <%= label_tag :name %>
-              </th>
-              <td width="85%">
-                <%= text_field_tag :name %>
-              </td>
-            </tr>
-            <tr>
-              <th><%= label_tag :password %></th>
-              <td><%= password_field_tag :password %></td>
-            </tr>
-          </tbody>
-        </table>
+
+        <div class="input">
+          <label for="name">Name</label>
+          <%= text_field_tag :name %>
+        </div>
+        
+        <div class="input">
+          <label for="password">Password</label>
+          <%= password_field_tag :password %>
+        </div>
+        
+        <div class="input">
+          <%= submit_tag "Submit" %>
+        </div>
       <% end %>
     </section>
 
     <aside>
-      <h3>Help</h3>
+      <h1>Help</h1>
       <ul>
         <li><%= link_to "I don't have an account", new_user_path %></li>
         <li><%= link_to "I forgot my password", reset_password_path %></li>
@@ -41,5 +33,5 @@
 </div>
 
 <% content_for(:page_title) do %>
- /sign in
+ /login
 <% end %>

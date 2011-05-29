@@ -1,6 +1,6 @@
-<div class="users">
-  <div class="new">
-    <h3>Registration</h3>
+<div id="c-users">
+  <div id="a-new">
+    <h1>Registration</h1>
 
     <div id="p1">
       <p><%= Danbooru.config.app_name %> is ad-sponsored and does not require an account to view. But in order to start uploading, editing, or creating content on this site, you will need to register. <em>Make sure you read and agree to the <%= link_to "terms of service", terms_of_service_path %> before registering. <strong>This site is open to web crawlers, therefore any name you choose will be public!</strong></em></p>
@@ -64,33 +64,14 @@
         </li>
       </ul>
 
-      <% form_for(@user) do |f| %>
+      <%= simple_form_for(@user) do |f| %>
         <%= error_messages_for("user") %>
-
-        <table width="100%">
-          <tbody>
-            <tr>
-              <th width="15%"><%= f.label :name %></th>
-              <td width="85%"><%= f.text_field :name %></td>
-            </tr>
-            <tr>
-              <th><%= f.label :password %></th>
-              <td><%= f.password_field :password %></td>
-            </tr>
-            <tr>
-              <th><%= f.label :password_confirmation %></th>
-              <td><%= f.password_field :password_confirmation %></td>
-            </tr>
-            <tr>
-              <th><%= f.label :email %></th>
-              <td><%= f.text_field :email %></td>
-            </tr>
-            <tr>
-              <td></td>
-              <td><%= submit_tag "Submit" %></td>
-            </tr>
-          </tbody>
-        </table>
+        
+        <%= f.input :name %>
+        <%= f.input :password %>
+        <%= f.input :password_confirmation %>
+        <%= f.input :email %>
+        <%= f.button :submit %>
       <% end %>
 
       <footer class="nav-links">
@@ -100,3 +81,6 @@
   </div>
 </div>
 
+<% content_for(:page_title) do %>
+  /users/signup
+<% end %>

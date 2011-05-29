@@ -2,7 +2,7 @@
   <%= resize_image_links(post, CurrentUser.user) %>
   <li><%= link_to "Favorite", favorite_path(post), :remote => true, :method => :post, :id => "add-to-favorites" %></li>
   <li><%= link_to "Unfavorite", favorite_path(post), :remote => true, :method => :delete, :id => "remove-from-favorites" %></li>
-  <li><%= link_to "Translate", "#", :id => "translate" %></li>
+  <li><%= link_to "Translate", "#", :id => "translate", :title => "Shortcut is CTRL+N" %></li>
   <li><%= link_to "Flag", new_post_flag_path(:post_id => post.id), :id => "flag" %></li>
   <li><%= link_to "Appeal", new_post_appeal_path(:post_id => post.id), :id => "appeal" %></li>
   <% if CurrentUser.is_janitor? %>

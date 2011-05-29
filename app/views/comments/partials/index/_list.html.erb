@@ -4,7 +4,11 @@
   <% end %>
 
   <div class="list-of-comments">
-    <%= render :partial => "comments/partials/show/comment", :collection => comments %>
+    <% if comments.empty? %>
+      <p>There are no comments.</p>
+    <% else %>
+      <%= render :partial => "comments/partials/show/comment", :collection => comments %>
+    <% end %>
   </div>
   
   <div class="clearfix"></div>

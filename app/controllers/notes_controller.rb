@@ -1,6 +1,7 @@
 class NotesController < ApplicationController
-  respond_to :html, :xml, :json
+  respond_to :html, :xml, :json, :js
   before_filter :member_only, :except => [:index, :show]
+  before_filter :pass_html_id, :only => [:create]
   
   def index
     if params[:group_by] == "post"
@@ -17,7 +18,11 @@ class NotesController < ApplicationController
   
   def create
     @note = Note.create(params[:note])
-    respond_with(@note)
+    respond_with(@note) do |fmt|
+      fmt.json do
+        render :json => @note.to_json(:methods => :html_id)
+      end
+    end
   end
   
   def update
@@ -40,6 +45,12 @@ class NotesController < ApplicationController
   end
 
 private
+  def pass_html_id
+    if params[:note] && params[:note][:html_id]
+      response.headers["X-Html-Id"] = params[:note][:html_id]
+    end
+  end
+
   def index_by_post
     @posts = Post.tag_match(params[:tags]).noted_before(params[:before_date] || Time.now).limit(8)
     respond_with(@posts) do |format|

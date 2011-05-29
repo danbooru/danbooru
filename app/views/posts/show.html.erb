@@ -30,12 +30,9 @@
     </aside>
 
     <section id="content">
-      <h1>Post</h1>
-      
       <%= render :partial => "posts/partials/show/notices", :locals => {:post => @post} %>
 
       <section id="image-container">
-        <h2>Image</h2>
         <div id="note-container"></div>
         <%= @post.presenter.image_html(self) %>
       </section>
@@ -47,17 +44,14 @@
       </menu>
 
       <section id="comments">
-        <h2>Comments</h2>
         <%= render :partial => "comments/partials/index/list", :locals => {:comments => @post.comments, :post => @post, :show_header => false} %>
       </section>
 
       <section id="notes">
-        <h2>Notes</h2>
         <%= render :partial => "notes/note", :collection => @post.notes.active %>
       </section>
 
       <section id="edit">
-        <h2>Edit</h2>
         <%= render :partial => "posts/partials/show/edit", :locals => {:post => @post} %>
       </section>
     </section>    

@@ -1,2 +1,1 @@
-<%= render :partial => "posts/partials/show/notes", :locals => {:post => post, :notes => post.notes.active} %>
-<%= image_tag(post.file_url_for(CurrentUser.user), :alt => post.tag_string, :width => post.image_width_for(CurrentUser.user), :height => post.image_height_for(CurrentUser.user), :id => "image") %>
+<%= image_tag(post.file_url_for(CurrentUser.user), :alt => post.tag_string, :width => post.image_width_for(CurrentUser.user), :height => post.image_height_for(CurrentUser.user), :id => "image", "data-width" => post.image_width, "data-height" => post.image_height) %>
