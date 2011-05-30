@@ -7,13 +7,14 @@ Danbooru.Note = {
 
       var $note_box = $('<div/>');
       $note_box.addClass("note-box");
-      $note_box.data("id", id);
-      $note_box.attr("data-id", id);
+      $note_box.data("id", String(id));
+      $note_box.attr("data-id", String(id));
       $note_box.draggable({containment: "parent"});
       $note_box.resizable({
         containment: "parent", 
         handles: "se"
       });
+      $note_box.css({position: "absolute"});
       $note_box.append($inner_border);
       Danbooru.Note.Box.bind_events($note_box);
 
@@ -120,8 +121,8 @@ Danbooru.Note = {
     create: function(id) {
       var $note_body = $('<div></div>');
       $note_body.addClass("note-body");
-      $note_body.data("id", id);
-      $note_body.attr("data-id", id);
+      $note_body.data("id", String(id));
+      $note_body.attr("data-id", String(id));
       $note_body.hide();
       Danbooru.Note.Body.bind_events($note_body);
       return $note_body;
@@ -172,6 +173,8 @@ Danbooru.Note = {
     },
     
     resize: function($note_body) {
+      return;
+      
       var w = $note_body.width();
       var h = $note_body.height();
       var golden_ratio = 1.6180339887;
@@ -285,8 +288,8 @@ Danbooru.Note = {
       if (data.html_id) {
         var $note_body = Danbooru.Note.Body.find(data.html_id);
         var $note_box = Danbooru.Note.Box.find(data.html_id);
-        $note_body.data("id", data.id).attr("data-id", data.id);
-        $note_box.data("id", data.id).attr("data-id", data.id);
+        $note_body.data("id", String(data.id)).attr("data-id", data.id);
+        $note_box.data("id", String(data.id)).attr("data-id", data.id);
         $note_box.find(".note-box-inner-border").removeClass("unsaved");
       }
     },
@@ -436,6 +439,20 @@ Danbooru.Note = {
     });
     
     Danbooru.Note.timeouts = [];
+  },
+  
+  load_all: function() {
+    $.each($("section#notes article"), function(i, article) {
+      var $article = $(article);
+      Danbooru.Note.add(
+        $article.data("id"),
+        $article.data("x"),
+        $article.data("y"),
+        $article.data("width"),
+        $article.data("height"),
+        $article.html()
+      );
+    });
   }
 }
 
@@ -454,5 +471,7 @@ $(function() {
         Danbooru.Note.Image.resize();
       }
     });
+    
+    Danbooru.Note.load_all();
   }
 });

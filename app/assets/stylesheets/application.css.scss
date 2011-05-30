@@ -629,6 +629,10 @@ div#c-posts {
         color: $link_color;
       }
     }
+    
+    section#notes article {
+      margin-bottom: 1em;
+    }
   }
 }
 
@@ -904,6 +908,8 @@ div#note-container {
     min-height: 1em;
     cursor: pointer;
     padding: 4px;
+    z-index: 1000;
+    overflow: auto;
     
     p.tn {
       font-size: 0.8em;
