@@ -22,11 +22,20 @@
         <h1>Information</h1>
         <%= render :partial => "posts/partials/show/information", :locals => {:post => @post} %>
       </section>
-
+      
       <section>
         <h1>Options</h1>
         <%= render :partial => "posts/partials/show/options", :locals => {:post => @post} %>
       </section>
+
+      <section>
+        <h1>History</h1>
+        <ul>
+          <li><%= link_to "Tags", post_versions_path(:search => {:post_id_eq => @post.id}) %></li>
+          <li><%= link_to "Notes", note_versions_path(:search => {:post_id_eq => @post.id}) %></li>
+        </ul>
+      </section>
+
     </aside>
 
     <section id="content">
