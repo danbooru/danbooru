@@ -208,7 +208,7 @@ class Tag < ActiveRecord::Base
     end
 
     def parse_query(query, options = {})
-      q = Hash.new {|h, k| h[k] = []}
+      q = {}
       q[:tags] = {
         :related => [],
         :include => [],
@@ -237,6 +237,7 @@ class Tag < ActiveRecord::Base
             q[:tags][:related] << "fav:#{User.name_to_id($2)}"
 
           when "sub"
+            q[:subscriptions] ||= []
             q[:subscriptions] << $2
 
           when "md5"

@@ -5,6 +5,20 @@ class Favorite
     "favorites_#{user_id.to_i % 10}"
   end
   
+  def self.sql_order_clause(post_ids, posts_table_alias = "posts")
+    if post_ids.empty?
+      return "#{posts_table_alias}.id desc"
+    end
+
+    conditions = []
+    
+    post_ids.each_with_index do |post_id, n|
+      conditions << "when #{post_id} then #{n}"
+    end
+    
+    "case #{posts_table_alias}.id " + conditions.join(" ") + " end"
+  end
+  
   def self.create(attributes)
     user_id = attributes[:user_id]
     post_id = attributes[:post_id]
@@ -26,6 +40,19 @@ class Favorite
       destroy_for_post(conditions[:post_id])
     end
   end
+  
+  def self.find_post_ids(user_id, options)
+    limit = options[:limit] || 1 || Danbooru.config.posts_per_page
+    if options[:before_id]
+      select_values_sql("SELECT post_id FROM #{table_name_for(user_id)} WHERE id < ? ORDER BY id DESC LIMIT ?", options[:before_id], limit)
+    elsif options[:after_id]
+      select_values_sql("SELECT post_id FROM #{table_name_for(user_id)} WHERE id > ? ORDER BY id ASC LIMIT ?", options[:after_id], limit).reverse
+    elsif options[:offset]
+      select_values_sql("SELECT post_id FROM #{table_name_for(user_id)} ORDER BY id DESC LIMIT ? OFFSET ?",  limit, options[:offset])
+    else
+      select_values_sql("SELECT post_id FROM #{table_name_for(user_id)} ORDER BY id DESC LIMIT ?", limit)
+    end
+  end
 
   def self.exists?(conditions)
     if conditions[:user_id] && conditions[:post_id]
@@ -39,26 +66,30 @@ class Favorite
     end
   end
 
-  private
-    def self.destroy_for_post_and_user(post_id, user_id)
-      execute_sql("DELETE FROM #{table_name_for(user_id)} WHERE post_id = #{post_id} AND user_id = #{user_id}")
+  def self.destroy_for_post_and_user(post_id, user_id)
+    execute_sql("DELETE FROM #{table_name_for(user_id)} WHERE post_id = #{post_id} AND user_id = #{user_id}")
+  end
+
+  def self.destroy_for_post(post)
+    0.upto(9) do |i|
+      execute_sql("DELETE FROM favorites_#{i} WHERE post_id = #{post.id}")
     end
-  
-    def self.destroy_for_post(post)
-      0.upto(9) do |i|
-        execute_sql("DELETE FROM favorites_#{i} WHERE post_id = #{post.id}")
-      end
-    end
-  
-    def self.destroy_for_user(user)
-      execute_sql("DELETE FROM #{table_name_for(user)} WHERE user_id = #{user.id}")
-    end
-  
-    def self.select_value_sql(sql, *params)
-      ActiveRecord::Base.select_value_sql(sql, *params)
-    end
-  
-    def self.execute_sql(sql, *params)
-      ActiveRecord::Base.execute_sql(sql, *params)
-    end
+  end
+
+  def self.destroy_for_user(user)
+    execute_sql("DELETE FROM #{table_name_for(user)} WHERE user_id = #{user.id}")
+  end
+
+  def self.select_value_sql(sql, *params)
+    ActiveRecord::Base.select_value_sql(sql, *params)
+  end
+
+  def self.select_values_sql(sql, *params)
+    ActiveRecord::Base.select_values_sql(sql, *params)
+  end
+
+  def self.execute_sql(sql, *params)
+    ActiveRecord::Base.execute_sql(sql, *params)
+  end
 end
+

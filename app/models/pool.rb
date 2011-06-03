@@ -72,9 +72,9 @@ class Pool < ActiveRecord::Base
   
   def posts(options = {})
     offset = options[:offset] || 0
-    limit = options[:limit] || 20
+    limit = options[:limit] || Danbooru.config.posts_per_page
     ids = post_id_array[offset, limit]
-    Post.where(["id IN (?)", ids])
+    Post.where(["id IN (?)", ids]).order(Favorite.sql_order_clause(ids))
   end
   
   def post_id_array

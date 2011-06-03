@@ -6,6 +6,7 @@ class CreatePools < ActiveRecord::Migration
       t.column :description, :text
       t.column :is_active, :boolean, :null => false, :default => true
       t.column :post_ids, :text, :null => false, :default => ""
+      t.column :post_count, :integer, :null => false, :default => 0
       t.timestamps
     end
     

@@ -1,18 +1,29 @@
 module PostSets
-  class Favorite < Base
-    attr_accessor :user
-
-    def initialize(user)
-      @user = user
-      super()
+  module Favorite
+    def user
+      @user ||= User.find(params[:id])
     end
     
     def tags
-      "fav:#{user.name}"
+      @tags ||= ["fav:#{user.name}"]
+    end
+    
+    def has_wiki?
+      false
+    end
+    
+    def reload
+      super
+      @user = nil
+      @count = nil
+    end
+    
+    def count
+      @count ||= Favorite.count(user.id)
     end
 
-    def load_posts
-      @posts = user.favorite_posts(:before_id => before_id)
+    def posts
+      @posts ||= user.favorites(pagination_options)
     end
   end  
 end

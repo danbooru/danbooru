@@ -15,6 +15,7 @@ module Paginators
         [1, post_set.page].max
       end
       
+      # TODO: this is not compatible with paginating favorites
       def sequential_link(template)
         template.posts_path(:tags => template.params[:tags], before_id => post_set.posts[-1].id, :page => nil)
       end

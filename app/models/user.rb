@@ -117,16 +117,13 @@ class User < ActiveRecord::Base
   end
   
   module FavoriteMethods
-    def favorite_posts(options = {})
-      favorites_table = Favorite.table_name_for(id)
-      if options[:before_id]
-        before_id_sql_fragment = ["favorites.id < ?", options[:before_id]]
+    def favorites(options = {})
+      post_ids = Favorite.find_post_ids(id, options)
+      if post_ids.any?
+        Post.where("id in (?)", post_ids).order(Favorite.sql_order_clause(post_ids))
       else
-        before_id_sql_fragment = "TRUE"
+        Post.where("false")
       end
-      limit = options[:limit] || 20
-
-      Post.joins("JOIN #{favorites_table} AS favorites ON favorites.post_id = posts.id").where("favorites.user_id = ?", id).where(before_id_sql_fragment).order("favorite_id DESC").limit(limit).select("posts.*, favorites.id AS favorite_id")
     end
   end
   

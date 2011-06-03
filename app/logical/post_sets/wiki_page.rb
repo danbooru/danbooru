@@ -1,34 +1,29 @@
 module PostSets
-  class WikiPage < Base
-    attr_reader :tag_name
-    
-    def initialize(tag_name)
-      @tag_name = tag_name
-      super()
+  module WikiPage
+    def wiki_page
+      @wiki_page ||= begin
+        if params[:id]
+          ::WikiPage.find(params[:id])
+        elsif params[:tags]
+          ::WikiPage.titled(params[:tags]).first
+        end
+      end
     end
     
-    def load_posts
-      @posts = ::Post.tag_match(tag_name).all(:order => "posts.id desc", :limit => limit, :offset => offset)
-    end
-    
-    def limit
-      8
-    end
-    
-    def offset
-      0
+    def has_wiki?
+      true
     end
     
     def tags
-      [@tag_name]
+      @tags ||= Tag.normalize(wiki_page.title)
     end
-
-    def use_sequential_paginator?
-      false
+    
+    def posts
+      @posts ||= slice(::Post.tag_match(tag_string))
     end
-  
-    def use_numbered_paginator?
-      false
+    
+    def count
+      @count ||= ::Post.fast_count(tag_string)
     end
   end  
 end

@@ -1,6 +1,7 @@
 class Post < ActiveRecord::Base
   class ApprovalError < Exception ; end
   class DisapprovalError < Exception ; end
+  class SearchError < Exception ; end
   
   attr_accessor :old_tag_string, :old_parent_id
   after_destroy :delete_files
@@ -39,6 +40,7 @@ class Post < ActiveRecord::Base
   scope :available_for_moderation, lambda {where(["id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :hidden_from_moderation, lambda {where(["id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :before_id, lambda {|id| id.present? ? where(["posts.id < ?", id]) : where("TRUE")}
+  scope :after_id, lambda {|id| id.present? ? where("posts.id > ?", id) : where("true")}
   scope :tag_match, lambda {|query| Post.tag_match_helper(query)}
   search_methods :tag_match
   
@@ -374,36 +376,33 @@ class Post < ActiveRecord::Base
       Favorite.destroy_for_post(self)
     end
     
-    def add_favorite(user)
-      if user.is_a?(ActiveRecord::Base)
-        user_id = user.id
-      else
-        user_id = user
+    def favorited_by?(user_id)
+      fav_string =~ /(?:\A| )fav:#{user_id}(?:\Z| )/
+    end
+    
+    def add_favorite(user_id)
+      if user_id.is_a?(ActiveRecord::Base)
+        user_id = user_id.id
       end
       
-      return false if fav_string =~ /(?:\A| )fav:#{user_id}(?:\Z| )/
+      if favorited_by?(user_id)
+        return false
+      end
+      
       self.fav_string += " fav:#{user_id}"
       self.fav_string.strip!
-      
-      # in order to avoid rerunning the callbacks, just update through raw sql
-      execute_sql("UPDATE posts SET fav_string = ? WHERE id = ?", fav_string, id)
-      
+      update_attribute(:fav_string, fav_string)
       Favorite.create(:user_id => user_id, :post_id => id)
     end
     
-    def remove_favorite(user)
-      if user.is_a?(ActiveRecord::Base)
-        user_id = user.id
-      else
-        user_id = user
+    def remove_favorite(user_id)
+      if user_id.is_a?(ActiveRecord::Base)
+        user_id = user_id.id
       end
       
       self.fav_string.gsub!(/(?:\A| )fav:#{user_id}(?:\Z| )/, " ")
       self.fav_string.strip!
-      
-      # in order to avoid rerunning the callbacks, just update through raw sql
-      execute_sql("UPDATE posts SET fav_string = ? WHERE id = ?", fav_string, id)
-
+      update_attribute(:fav_string, fav_string)
       Favorite.destroy(:user_id => user_id, :post_id => id)
     end
     
@@ -413,9 +412,9 @@ class Post < ActiveRecord::Base
   end
   
   module SearchMethods
-    class SearchError < Exception ; end
-    
     def add_range_relation(arr, field, relation)
+      return relation if arr.nil?
+      
       case arr[0]
       when :eq
         relation.where(["#{field} = ?", arr[1]])
@@ -513,10 +512,10 @@ class Post < ActiveRecord::Base
       relation = add_range_relation(q[:character_tag_count], "posts.tag_count_character", relation)
       relation = add_range_relation(q[:tag_count], "posts.tag_count", relation)      
 
-      if q[:md5].any?
+      if q[:md5]
         relation = relation.where(["posts.md5 IN (?)", q[:md5]])
       end
-
+      
       if q[:status] == "pending"
         relation = relation.where("posts.is_pending = TRUE")
       elsif q[:status] == "flagged"
@@ -525,11 +524,11 @@ class Post < ActiveRecord::Base
         relation = relation.where("posts.is_deleted = TRUE")
       end
 
-      if q[:source].is_a?(String)
+      if q[:source]
         relation = relation.where(["posts.source LIKE ? ESCAPE E'\\\\'", q[:source]])
       end
 
-      if q[:subscriptions].any?
+      if q[:subscriptions]
         relation = add_tag_subscription_relation(q[:subscriptions], relation)
       end
 

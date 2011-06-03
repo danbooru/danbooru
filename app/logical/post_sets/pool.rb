@@ -1,33 +1,30 @@
+# This only works with the numbered paginator because of the way
+# the association is stored.
 module PostSets
-  class Pool < Base
-    attr_reader :pool
-    
-    def initialize(pool, options = {})
-      @pool = pool
-      @count = pool.post_id_array.size
-      super(options)
+  module Pool
+    def pool
+      @pool ||= Pool.find(params[:id])
     end
     
     def tags
-      "pool:#{pool.name}"
+      ["pool:#{pool.name}"]
+    end
+    
+    def has_wiki?
+      true
+    end
+    
+    def count
+      pool.post_count
     end
 
-    def load_posts
-      @posts = pool.posts(:limit => limit, :offset => offset).order("posts.id")
+    def posts
+      @posts ||= pool.posts(pagination_options)
     end
     
-    def sorted_posts
-      sort_posts(@posts)
-    end
-    
-  private
-    def sort_posts(posts)
-      posts_by_id = posts.inject({}) do |hash, post|
-        hash[post.id] = post
-        hash
-      end
-      
-      @pool.post_id_array.map {|x| posts_by_id[x]}
+    def reload
+      super
+      @pool = nil
     end
   end  
 end

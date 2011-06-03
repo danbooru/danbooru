@@ -5,5 +5,7 @@
 <div class="clearfix"></div>
 
 <div class="paginator">
-  <%= post_set.presenter.pagination_html(self) %>
+  <%= smart_paginator(post_set) do |page| %>
+    <%= link_to(page, posts_path(:page => page, :tags => params[:tags])) %>
+  <% end %>
 </div>
