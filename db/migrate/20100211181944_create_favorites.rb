@@ -1,20 +1,29 @@
 class CreateFavorites < ActiveRecord::Migration
+  TABLE_COUNT = 100
+  
   def self.up
-    (0..9).each do |number|
-      create_table "favorites_#{number}" do |t|
-        t.column :post_id, :integer
+    # this is a dummy table and should not be used
+    create_table "favorites" do |t|
+      t.column :user_id, :integer
+      t.column :post_id, :integer
+    end
+
+    0.upto(TABLE_COUNT - 1) do |i|
+      create_table "favorites_#{i}" do |t|
         t.column :user_id, :integer
+        t.column :post_id, :integer
       end
       
-      add_index "favorites_#{number}", :post_id
-      add_index "favorites_#{number}", :user_id
-      add_index "favorites_#{number}", [:post_id, :user_id], :unique => true
+      add_index "favorites_#{i}", :user_id
+      add_index "favorites_#{i}", :post_id
     end
   end
 
   def self.down
-    (0..9).each do |number|
-      drop_table "favorites_#{number}"
+    drop_table "favorites"
+    
+    0.upto(TABLE_COUNT - 1) do |i|
+      drop_table "favorites_#{i}"
     end
   end
 end

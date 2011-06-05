@@ -118,12 +118,7 @@ class User < ActiveRecord::Base
   
   module FavoriteMethods
     def favorites(options = {})
-      post_ids = Favorite.find_post_ids(id, options)
-      if post_ids.any?
-        Post.where("id in (?)", post_ids).order(Favorite.sql_order_clause(post_ids))
-      else
-        Post.where("false")
-      end
+      Favorite.model_for(id).where("user_id = ?", id)
     end
   end
   
@@ -212,7 +207,7 @@ class User < ActiveRecord::Base
       elsif created_at > 1.week.ago
         false
       else
-        Comment.where("creator_id = ? and created_at > ?", id, 1.hour.ago).count <= Danbooru.config.member_comment_limit
+        Comment.where("creator_id = ? and created_at > ?", id, 1.hour.ago).count < Danbooru.config.member_comment_limit
       end      
     end
     

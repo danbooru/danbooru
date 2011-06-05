@@ -1,19 +1,19 @@
 require_relative '../test_helper'
 
 class UserTest < ActiveSupport::TestCase
-  setup do
-    user = Factory.create(:user)
-    CurrentUser.user = user
-    CurrentUser.ip_addr = "127.0.0.1"
-    MEMCACHE.flush_all
-  end
-  
-  teardown do
-    CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
-  end
-
   context "A user" do
+    setup do
+      @user = Factory.create(:user)
+      CurrentUser.user = @user
+      CurrentUser.ip_addr = "127.0.0.1"
+      MEMCACHE.flush_all
+    end
+
+    teardown do
+      CurrentUser.user = nil
+      CurrentUser.ip_addr = nil
+    end
+
     should "not validate if the originating ip address is banned" do
       Factory.create(:ip_ban)
       user = Factory.build(:user)
@@ -23,59 +23,55 @@ class UserTest < ActiveSupport::TestCase
     end
     
     should "limit post uploads" do
-      user = Factory.create(:user)
-      assert(!user.can_upload?)
-      user.update_attribute(:is_contributor, true)
-      assert(user.can_upload?)
-      user.update_attribute(:is_contributor, false)
+      assert(!@user.can_upload?)
+      @user.update_attribute(:is_contributor, true)
+      assert(@user.can_upload?)
+      @user.update_attribute(:is_contributor, false)
       
       40.times do
-        Factory.create(:post, :uploader => user, :is_deleted => true)
+        Factory.create(:post, :uploader => @user, :is_deleted => true)
       end
       
-      assert(!user.can_upload?)
+      assert(!@user.can_upload?)
     end
     
     should "limit comment votes" do
-      user = Factory.create(:user)
-      assert(user.can_comment_vote?)
-      12.times do
+      assert(@user.can_comment_vote?)
+      10.times do
         comment = Factory.create(:comment)
-        Factory.create(:comment_vote, :user => user, :comment_id => comment.id)
+        Factory.create(:comment_vote, :comment_id => comment.id)
       end
-      assert(!user.can_comment_vote?)
+      
+      assert(!@user.can_comment_vote?)
       CommentVote.update_all("created_at = '1990-01-01'")
-      assert(user.can_comment_vote?)
+      assert(@user.can_comment_vote?)
     end
     
     should "limit comments" do
-      user = Factory.create(:user)
-      assert(!user.can_comment?)
-      user.update_attribute(:is_privileged, true)
-      assert(user.can_comment?)
-      user.update_attribute(:is_privileged, false)
-      user.update_attribute(:created_at, 1.year.ago)
-      assert(user.can_comment?)
-      (Danbooru.config.member_comment_limit + 1).times do
-        Factory.create(:comment, :creator => user)
+      assert(!@user.can_comment?)
+      @user.update_attribute(:is_privileged, true)
+      assert(@user.can_comment?)
+      @user.update_attribute(:is_privileged, false)
+      @user.update_attribute(:created_at, 1.year.ago)
+      assert(@user.can_comment?)
+      (Danbooru.config.member_comment_limit).times do
+        Factory.create(:comment)
       end
-      assert(!user.can_comment?)
+      assert(!@user.can_comment?)
     end
     
     should "verify" do
-      user = Factory.create(:user)
-      assert(user.is_verified?)
-      user = Factory.create(:user)
-      user.generate_email_verification_key
-      user.save
-      assert(!user.is_verified?)
-      assert_raise(User::Error) {user.verify!("bbb")}
-      assert_nothing_raised {user.verify!(user.email_verification_key)}
-      assert(user.is_verified?)
+      assert(@user.is_verified?)
+      @user = Factory.create(:user)
+      @user.generate_email_verification_key
+      @user.save
+      assert(!@user.is_verified?)
+      assert_raise(User::Error) {@user.verify!("bbb")}
+      assert_nothing_raised {@user.verify!(@user.email_verification_key)}
+      assert(@user.is_verified?)
     end
       
     should "authenticate" do
-      @user = Factory.create(:user)
       assert(User.authenticate(@user.name, "password"), "Authentication should have succeeded")
       assert(!User.authenticate(@user.name, "password2"), "Authentication should not have succeeded")
       assert(User.authenticate_hash(@user.name, @user.password_hash), "Authentication should have succeeded")
