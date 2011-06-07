@@ -356,20 +356,31 @@ class PostTest < ActiveSupport::TestCase
   end
   
   context "Pools:" do
+    context "Removing a post from a pool" do
+      should "update the post's pool string" do
+        post = Factory.create(:post)
+        pool = Factory.create(:pool)
+        post.add_pool!(pool)
+        post.remove_pool!(pool)
+        post.reload
+        assert_equal("", post.pool_string)
+        post.remove_pool!(pool)
+        post.reload
+        assert_equal("", post.pool_string)
+      end
+    end
+    
     context "Adding a post to a pool" do
       should "update the post's pool string" do
         post = Factory.create(:post)
         pool = Factory.create(:pool)
-        post.add_pool(pool)
+        post.add_pool!(pool)
         post.reload
         assert_equal("pool:#{pool.id}", post.pool_string)
-        post.add_pool(pool)
+        post.add_pool!(pool)
         post.reload
         assert_equal("pool:#{pool.id}", post.pool_string)
-        post.remove_pool(pool)
-        post.reload
-        assert_equal("", post.pool_string)
-        post.remove_pool(pool)
+        post.remove_pool!(pool)
         post.reload
         assert_equal("", post.pool_string)
       end
@@ -474,7 +485,7 @@ class PostTest < ActiveSupport::TestCase
       post2 = Factory.create(:post)
       post3 = Factory.create(:post)
       pool = Factory.create(:pool)
-      post1.add_pool(pool)
+      post1.add_pool!(pool)
       relation = Post.tag_match("pool:#{pool.name}")
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)

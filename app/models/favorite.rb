@@ -3,7 +3,7 @@ class Favorite < ActiveRecord::Base
   validates_uniqueness_of :post_id, :scope => :user_id
   
   def self.model_for(user_id)
-    mod = user_id % TABLE_COUNT
+    mod = user_id.to_i % TABLE_COUNT
     Object.const_get("Favorite#{mod}")
   end
   

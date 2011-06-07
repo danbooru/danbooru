@@ -632,17 +632,20 @@ class Post < ActiveRecord::Base
       end
     end
     
-    def add_pool(pool)
-      return if pool_string =~ /(?:\A| )pool:#{pool.id}(?:\Z| )/
-      self.pool_string += " pool:#{pool.id}"
-      self.pool_string.strip!
-      execute_sql("UPDATE posts SET pool_string = ? WHERE id = ?", pool_string, id)
+    def belongs_to_pool?(pool)
+      pool_string =~ /(?:\A| )pool:#{pool.id}(?:\Z| )/
     end
     
-    def remove_pool(pool)
-      self.pool_string.gsub!(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ")
-      self.pool_string.strip!
-      execute_sql("UPDATE posts SET pool_string = ? WHERE id = ?", pool_string, id)
+    def add_pool!(pool)
+      return if belongs_to_pool?(pool)
+      update_attribute(:pool_string, "#{pool_string} pool:#{pool.id}".strip)
+      pool.add_post!(self)
+    end
+    
+    def remove_pool!(pool)
+      return unless belongs_to_pool?(pool)
+      update_attribute(:pool_string, pool_string.gsub(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ").strip)
+      pool.remove_post!(self)
     end
   end
   

@@ -2,7 +2,7 @@ require_relative '../test_helper'
 
 class UploadTest < ActiveSupport::TestCase
   setup do
-    user = Factory.create(:user)
+    user = Factory.create(:contributor_user)
     CurrentUser.user = user
     CurrentUser.ip_addr = "127.0.0.1"
     MEMCACHE.flush_all

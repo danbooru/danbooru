@@ -6,9 +6,10 @@ class Pool < ActiveRecord::Base
   has_many :versions, :class_name => "PoolVersion", :dependent => :destroy, :order => "pool_versions.id ASC"
   before_validation :normalize_name
   before_validation :normalize_post_ids
+  before_validation :initialize_post_count
   before_validation :initialize_creator, :on => :create
   after_save :create_version
-  after_save :update_posts
+  after_save :balance_post_ids
   attr_accessible :name, :description, :post_ids, :is_active, :post_id_array
   
   def self.name_to_id(name)
@@ -29,56 +30,88 @@ class Pool < ActiveRecord::Base
     end
   end
   
+  def self.normalize_name(name)
+    name.downcase.gsub(/\s+/, "_")
+  end
+  
+  def self.normalize_post_ids(post_ids)
+    post_ids.gsub(/\s{2,}/, " ").strip
+  end
+  
   def initialize_creator
     self.creator_id = CurrentUser.id
   end
   
   def normalize_name
-    self.name = name.downcase
+    self.name = Pool.normalize_name(name)
   end
   
   def normalize_post_ids
-    self.post_ids = post_ids.gsub(/\s\s+/, " ")
-    self.post_ids = post_ids.gsub(/^\s+/, "")
-    self.post_ids = post_ids.gsub(/\s+$/, "")
+    self.post_ids = Pool.normalize_post_ids(post_ids)
   end
   
   def revert_to!(version)
     self.post_ids = version.post_ids
     save
   end
-  
-  def update_posts
-    post_id_array.each do |post_id|
-      post = Post.find(post_id)
-      post.add_pool(self)
-    end
+
+  def contains_post?(post_id)
+    post_ids =~ /(?:\A| )#{post_id}(?:\Z| )/
   end
   
   def add_post!(post)
-    return if post_ids =~ /(?:\A| )#{post.id}(?:\Z| )/
-    self.post_ids += " #{post.id}"
-    self.post_ids = post_ids.strip
+    return if contains_post?(post.id)
+    
+    increment!(:post_count)
+    update_attribute(:post_ids, "#{post_ids} #{post.id}".strip)
+    post.add_pool!(self)
     clear_post_id_array
-    save
   end
   
   def remove_post!(post)
-    self.post_ids = post_ids.gsub(/(?:\A| )#{post.id}(?:\Z| )/, " ")
-    self.post_ids = post_ids.strip
+    return unless contains_post?(post.id)
+    
+    decrement!(:post_count)
+    update_attribute(:post_ids, Pool.normalize_post_ids(post_ids.gsub(/(?:\A| )#{post.id}(?:\Z| )/, " ")))
+    post.remove_pool!(self)
     clear_post_id_array
-    save
   end
   
   def posts(options = {})
-    offset = options[:offset] || 0
-    limit = options[:limit] || Danbooru.config.posts_per_page
-    ids = post_id_array[offset, limit]
-    Post.where(["id IN (?)", ids]).order(Favorite.sql_order_clause(ids))
+    if options[:offset]
+      limit = options[:limit] || Danbooru.config.posts_per_page
+      slice = post_id_array.slice(options[:offset], limit)
+      if slice && slice.any?
+        Post.where("id in (?)", slice).order(arbitrary_sql_order_clause(slice, "posts"))
+      else
+        Post.where("false")
+      end
+    else
+      Post.where("id IN (?)", post_id_array).order(arbitrary_sql_order_clause(post_id_array, "posts"))
+    end
+  end
+  
+  def balance_post_ids
+    added = post_id_array - post_id_array_was
+    removed = post_id_array_was - post_id_array
+    
+    added.each do |post_id|
+      post = Post.find(post_id)
+      post.add_pool!(self)
+    end
+    
+    removed.each do |post_id|
+      post = Post.find(post_id)
+      post.remove_pool!(self)
+    end
   end
   
   def post_id_array
     @post_id_array ||= post_ids.scan(/\d+/).map(&:to_i)
+  end
+  
+  def post_id_array_was
+    @post_id_array_was ||= post_ids_was.scan(/\d+/).map(&:to_i)
   end
   
   def post_id_array=(array)
@@ -88,6 +121,11 @@ class Pool < ActiveRecord::Base
   
   def clear_post_id_array
     @post_id_array = nil
+    @post_id_array_was = nil
+  end
+  
+  def initialize_post_count
+    self.post_count = post_id_array.size
   end
   
   def neighbor_posts(post)
@@ -95,13 +133,13 @@ class Pool < ActiveRecord::Base
       post_ids =~ /\A#{post.id} (\d+)|(\d+) #{post.id} (\d+)|(\d+) #{post.id}\Z/
       
       if $2 && $3
-        {:previous => $2.to_i, :next => $3.to_i}
+        OpenStruct.new(:previous => $2.to_i, :next => $3.to_i)
       elsif $1
-        {:next => $1.to_i}
+        OpenStruct.new(:next => $1.to_i)
       elsif $4
-        {:previous => $4.to_i}
+        OpenStruct.new(:previous => $4.to_i)
       else
-        {}
+        OpenStruct.new
       end
     end
   end

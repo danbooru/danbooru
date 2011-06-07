@@ -14,10 +14,6 @@ class PoolTest < ActiveSupport::TestCase
   end
   
   context "A pool" do
-    setup do
-      MEMCACHE.flush_all
-    end
-    
     should "create versions for each distinct user" do
       pool = Factory.create(:pool)
       user = Factory.create(:user)
@@ -39,9 +35,6 @@ class PoolTest < ActiveSupport::TestCase
       p2 = Factory.create(:post)
       p3 = Factory.create(:post)
       p4 = Factory.create(:post)
-      p1.add_pool(pool)
-      p2.add_pool(pool)
-      p3.add_pool(pool)
       pool.add_post!(p1)
       pool.add_post!(p2)
       pool.add_post!(p3)
@@ -52,7 +45,7 @@ class PoolTest < ActiveSupport::TestCase
       posts = pool.posts.all
       assert_equal(3, posts.size)
       assert_equal([p1.id, p2.id, p3.id], posts.map(&:id))
-      posts = pool.posts(:limit => 1, :offset => 1).all
+      posts = pool.posts.limit(1).offset(1).all
       assert_equal(1, posts.size)
       assert_equal([p2.id], posts.map(&:id))
     end
@@ -62,27 +55,75 @@ class PoolTest < ActiveSupport::TestCase
       p1 = Factory.create(:post)
       p2 = Factory.create(:post)
       p3 = Factory.create(:post)
-      p1.add_pool(pool)
-      p2.add_pool(pool)
-      p3.add_pool(pool)
       pool.add_post!(p1)
       pool.add_post!(p2)
       pool.add_post!(p3)
 
       pool.reload
       neighbors = pool.neighbor_posts(p1)
-      assert_nil(neighbors[:previous])
-      assert_equal(p2.id, neighbors[:next])
+      assert_nil(neighbors.previous)
+      assert_equal(p2.id, neighbors.next)
 
       pool.reload
       neighbors = pool.neighbor_posts(p2)
-      assert_equal(p1.id, neighbors[:previous])
-      assert_equal(p3.id, neighbors[:next])
+      assert_equal(p1.id, neighbors.previous)
+      assert_equal(p3.id, neighbors.next)
 
       pool.reload
       neighbors = pool.neighbor_posts(p3)
-      assert_equal(p2.id, neighbors[:previous])
-      assert_nil(neighbors[:next])
+      assert_equal(p2.id, neighbors.previous)
+      assert_nil(neighbors.next)
+    end
+    
+    should "know what its post_ids were" do
+      p1 = Factory.create(:post)
+      p2 = Factory.create(:post)
+      pool = Factory.create(:pool, :post_ids => "#{p1.id}")
+      pool.post_id_array = [p1.id, p2.id]
+      assert_equal([p1.id], pool.post_id_array_was)
+    end
+    
+    should "update its posts if the post_ids is updated directly" do
+      p1 = Factory.create(:post)
+      p2 = Factory.create(:post)
+      pool = Factory.create(:pool, :post_ids => "#{p1.id}")
+      pool.post_id_array = [p1.id, p2.id]
+      pool.save
+      p1.reload
+      p2.reload
+      assert_equal("pool:#{pool.id}", p1.pool_string)
+      assert_equal("pool:#{pool.id}", p2.pool_string)
+    end
+    
+    should "set its post count even if post_ids is updated directly" do
+      p1 = Factory.create(:post)
+      p2 = Factory.create(:post)
+      pool = Factory.create(:pool, :post_ids => "#{p1.id}")
+      pool.post_id_array = [p1.id, p2.id]
+      pool.save
+      assert_equal(2, pool.post_count)
+    end
+    
+    should "increment the post count every time a post is added" do
+      p1 = Factory.create(:post)
+      pool = Factory.create(:pool)
+      pool.add_post!(p1)
+      assert_equal(1, pool.post_count)
+    end
+    
+    should "not double increment when the same post is readded" do
+      p1 = Factory.create(:post)
+      pool = Factory.create(:pool)
+      pool.add_post!(p1)
+      pool.add_post!(p1)
+      assert_equal(1, pool.post_count)
+    end
+    
+    should "not double decrement" do
+      p1 = Factory.create(:post)
+      pool = Factory.create(:pool)
+      pool.remove_post!(p1)
+      assert_equal(0, pool.post_count)
     end
   end
   

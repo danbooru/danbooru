@@ -38,8 +38,10 @@ class ForumPost < ActiveRecord::Base
   end
   
   def update_topic_updated_at
-    topic.update_attribute(:updater_id, CurrentUser.id)
-    topic.touch
+    if topic
+      topic.update_attribute(:updater_id, CurrentUser.id)
+      topic.touch
+    end
   end
   
   def initialize_creator
