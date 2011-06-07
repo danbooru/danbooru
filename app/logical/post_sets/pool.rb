@@ -3,7 +3,7 @@
 module PostSets
   module Pool
     def pool
-      @pool ||= Pool.find(params[:id])
+      @pool ||= ::Pool.find(params[:id])
     end
     
     def tags
@@ -19,7 +19,7 @@ module PostSets
     end
 
     def posts
-      @posts ||= pool.posts(pagination_options)
+      @posts ||= pool.posts(pagination_options).limit(limit).all
     end
     
     def reload

@@ -1,6 +1,6 @@
 class Favorite < ActiveRecord::Base
   TABLE_COUNT = 100
-  validates_uniqueness_of :post_id, :scope => :user_id
+  belongs_to :post
   
   def self.model_for(user_id)
     mod = user_id.to_i % TABLE_COUNT

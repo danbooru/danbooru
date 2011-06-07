@@ -117,8 +117,20 @@ class User < ActiveRecord::Base
   end
   
   module FavoriteMethods
-    def favorites(options = {})
-      Favorite.model_for(id).where("user_id = ?", id)
+    def favorites
+      Favorite.model_for(id).where("user_id = ?", id).order("id desc")
+    end
+    
+    def add_favorite!(post)
+      return if Favorite.model_for(id).exists?(:user_id => id, :post_id => post.id)
+      Favorite.model_for(id).create(:user_id => id, :post_id => post.id)
+      post.add_favorite!(self)
+    end
+    
+    def remove_favorite!(post)
+      return unless Favorite.model_for(id).exists?(:user_id => id, :post_id => post.id)
+      Favorite.model_for(id).destroy_all(:user_id => id, :post_id => post.id)
+      post.remove_favorite!(self)
     end
   end
   

@@ -1,12 +1,5 @@
 module PostSets
   module Numbered
-    attr_reader :page
-    
-    def initialize(params)
-      super
-      @page = options[:page] ? options[:page].to_i : 1
-    end
-
     def total_pages
       @total_pages ||= (count / limit.to_f).ceil.to_i
     end
@@ -17,7 +10,7 @@ module PostSets
     end
     
     def slice(relation)
-      relation.offset(offset).all
+      relation.offset(offset).limit(limit).all
     end
     
     def pagination_options
@@ -26,6 +19,10 @@ module PostSets
     
     def is_first_page?
       offset == 0
+    end
+    
+    def page
+      @page ||= params[:page] ? params[:page].to_i : 1
     end
     
     def offset

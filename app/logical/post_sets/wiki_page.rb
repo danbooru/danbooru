@@ -15,7 +15,7 @@ module PostSets
     end
     
     def tags
-      @tags ||= Tag.normalize(wiki_page.title)
+      @tags ||= ::Tag.normalize(wiki_page.title)
     end
     
     def posts

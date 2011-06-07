@@ -16,7 +16,6 @@ module PostSets
         @pool.add_post!(@post_2)
         @pool.add_post!(@post_1)
         @pool.add_post!(@post_3)
-        @set = PostSets::Pool.new(@pool, :page => 1)
       end
       
       teardown do
@@ -24,13 +23,42 @@ module PostSets
         CurrentUser.ip_addr = nil
       end
       
-      context "a pool with three posts" do
-        should "by default sort the posts by id" do
-          assert_equal([@post_1.id, @post_2.id, @post_3.id], @set.posts.map(&:id))
+      context "a post pool set for page 2" do
+        setup do
+          @set = PostSets::Base.new(:id => @pool.id, :page => 2)
+          @set.stubs(:limit).returns(1)
+          @set.extend(PostSets::Pool)
         end
-        
-        should "be capable of sorting by pool sequence" do
-          assert_equal([@post_2.id, @post_1.id, @post_3.id], @set.sorted_posts.map(&:id))
+
+        context "a numbered paginator" do
+          setup do
+            @set.extend(PostSets::Numbered)
+          end
+
+          should "return the second element" do
+            assert_equal(1, @set.posts.size)
+            assert_equal(@post_1.id, @set.posts.first.id)
+          end
+        end
+      end
+      
+      context "a post pool set with no page specified" do
+        setup do
+          @set = PostSets::Base.new(:id => @pool.id)
+          @set.stubs(:limit).returns(1)
+          @set.extend(PostSets::Pool)
+        end
+
+        context "a numbered paginator" do
+          setup do
+            @set.extend(PostSets::Numbered)
+          end
+
+          should "return the first element" do
+            assert_equal(3, @set.count)
+            assert_equal(1, @set.posts.size)
+            assert_equal(@post_2.id, @set.posts.first.id)
+          end
         end
       end
     end

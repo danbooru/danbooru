@@ -5,7 +5,7 @@ module PostSets
     attr_accessor :tags, :count, :wiki_page, :artist, :suggestions
     
     def tags
-      @tags ||= Tag.normalize(params[:tags])
+      @tags ||= ::Tag.normalize(params[:tags])
     end
     
     def count
@@ -13,7 +13,7 @@ module PostSets
     end
     
     def posts
-      @posts ||= slice(::Post.tag_match(tags).limit(limit))
+      @posts ||= slice(::Post.tag_match(tags))
     end
 
     def reload
@@ -42,7 +42,7 @@ module PostSets
     end
     
     def tag_array
-      @tag_array ||= Tag.scan_query(tags)
+      @tag_array ||= ::Tag.scan_query(tags)
     end
     
     def validate

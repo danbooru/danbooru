@@ -1,20 +1,20 @@
 module PostSets
   module Sequential
-    attr_reader :before_id, :after_id
+    def before_id
+      params[:before_id]
+    end
     
-    def initialize(params)
-      super
-      @before_id = params[:before_id]
-      @after_id = params[:after_id]
+    def after_id
+      params[:after_id]
     end
     
     def slice(relation)
       if before_id
-        relation.where("id < ?", before_id).all
+        relation.where("id < ?", before_id).limit(limit).all
       elsif after_id
-        relation.where("id > ?", after_id).order("id asc").all.reverse
+        relation.where("id > ?", after_id).order("id asc").limit(limit).all.reverse
       else
-        relation.all
+        relation.limit(limit).all
       end
     end
     

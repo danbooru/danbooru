@@ -78,8 +78,9 @@ class Pool < ActiveRecord::Base
   end
   
   def posts(options = {})
+    limit = options[:limit] || Danbooru.config.posts_per_page
+
     if options[:offset]
-      limit = options[:limit] || Danbooru.config.posts_per_page
       slice = post_id_array.slice(options[:offset], limit)
       if slice && slice.any?
         Post.where("id in (?)", slice).order(arbitrary_sql_order_clause(slice, "posts"))

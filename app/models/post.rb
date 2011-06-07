@@ -384,32 +384,20 @@ class Post < ActiveRecord::Base
       update_attribute(:fav_string, (fav_string + " fav:#{user_id}").strip)
     end
     
-    def add_favorite(user_id)
-      if user_id.is_a?(ActiveRecord::Base)
-        user_id = user_id.id
-      end
-      
-      if favorited_by?(user_id)
-        return false
-      end
-      
-      append_user_to_fav_string(user_id)
-      
-      Favorite.model_for(user_id).create(:user_id => user_id, :post_id => id)
+    def add_favorite!(user)
+      return if favorited_by?(user.id)
+      append_user_to_fav_string(user.id)
+      user.add_favorite!(self)
     end
     
     def delete_user_from_fav_string(user_id)
       update_attribute(:fav_string, fav_string.gsub(/(?:\A| )fav:#{user_id}(?:\Z| )/, " ").strip)
     end
     
-    def remove_favorite(user_id)
-      if user_id.is_a?(ActiveRecord::Base)
-        user_id = user_id.id
-      end
-      
-      delete_user_from_fav_string(user_id)
-
-      Favorite.model_for(user_id).destroy_all(:user_id => user_id, :post_id => id)
+    def remove_favorite!(user)
+      return unless favorited_by?(user.id)
+      delete_user_from_fav_string(user.id)
+      user.remove_favorite!(self)
     end
     
     def favorited_user_ids
@@ -785,8 +773,8 @@ class Post < ActiveRecord::Base
       return if parent.nil?
 
       favorited_user_ids.each do |user_id|
-        parent.add_favorite(user_id)
-        remove_favorite(user_id)
+        parent.add_favorite!(User.find(user_id))
+        remove_favorite!(User.find(user_id))
       end
     end
   end

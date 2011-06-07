@@ -82,7 +82,7 @@ class PostTest < ActiveSupport::TestCase
         p1 = Factory.create(:post)
         c1 = Factory.create(:post, :parent_id => p1.id)
         user = Factory.create(:user)
-        c1.add_favorite(user)
+        c1.add_favorite!(user)
         c1.delete!
         p1.reload
         assert(!Favorite.model_for(user.id).exists?(:post_id => c1.id, :user_id => user.id))
@@ -332,22 +332,22 @@ class PostTest < ActiveSupport::TestCase
       should "update the fav strings ont he post" do
         user = Factory.create(:user)
         post = Factory.create(:post)
-        post.add_favorite(user)
+        post.add_favorite!(user)
         post.reload
         assert_equal("fav:#{user.id}", post.fav_string)
         assert(Favorite.model_for(user.id).exists?(:user_id => user.id, :post_id => post.id))
 
-        post.add_favorite(user)
+        post.add_favorite!(user)
         post.reload
         assert_equal("fav:#{user.id}", post.fav_string)
         assert(Favorite.model_for(user.id).exists?(:user_id => user.id, :post_id => post.id))
 
-        post.remove_favorite(user)
+        post.remove_favorite!(user)
         post.reload
         assert_equal("", post.fav_string)
         assert(!Favorite.model_for(user.id).exists?(:user_id => user.id, :post_id => post.id))
       
-        post.remove_favorite(user)
+        post.remove_favorite!(user)
         post.reload
         assert_equal("", post.fav_string)
         assert(!Favorite.model_for(user.id).exists?(:user_id => user.id, :post_id => post.id))
@@ -474,7 +474,7 @@ class PostTest < ActiveSupport::TestCase
       post2 = Factory.create(:post)
       post3 = Factory.create(:post)
       user = Factory.create(:user)
-      post1.add_favorite(user)
+      post1.add_favorite!(user)
       relation = Post.tag_match("fav:#{user.name}")
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
