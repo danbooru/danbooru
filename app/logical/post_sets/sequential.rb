@@ -10,7 +10,7 @@ module PostSets
     
     def slice(relation)
       if before_id
-        relation.where("id < ?", before_id).limit(limit).all
+        relation.where("id < ?", before_id).order("id desc").limit(limit).all
       elsif after_id
         relation.where("id > ?", after_id).order("id asc").limit(limit).all.reverse
       else

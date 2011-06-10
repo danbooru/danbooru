@@ -627,13 +627,13 @@ class Post < ActiveRecord::Base
     def add_pool!(pool)
       return if belongs_to_pool?(pool)
       update_attribute(:pool_string, "#{pool_string} pool:#{pool.id}".strip)
-      pool.add_post!(self)
+      pool.add!(self)
     end
     
     def remove_pool!(pool)
       return unless belongs_to_pool?(pool)
       update_attribute(:pool_string, pool_string.gsub(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ").strip)
-      pool.remove_post!(self)
+      pool.remove!(self)
     end
   end
   

@@ -27,7 +27,7 @@ module PostSets
     end
     
     def relation
-      ::Favorite.model_for(user.id).where("user_id = ?", user.id).order("id desc")
+      ::Favorite.model_for(user.id).where("user_id = ?", user.id).includes(:post).order("id desc")
     end
   end  
 end

@@ -19,7 +19,7 @@ module PostSets
     end
 
     def posts
-      @posts ||= pool.posts(pagination_options).limit(limit).all
+      @posts ||= pool.posts(pagination_options.merge(:limit => limit)).all
     end
     
     def reload

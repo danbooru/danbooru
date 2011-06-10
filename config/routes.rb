@@ -55,6 +55,7 @@ Danbooru::Application.routes.draw do
     member do
       put :revert
     end
+    resource :order, :only => [:edit, :update]
   end
   resources :pool_versions, :only => [:index]
   resources :posts do

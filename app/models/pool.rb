@@ -6,18 +6,20 @@ class Pool < ActiveRecord::Base
   has_many :versions, :class_name => "PoolVersion", :dependent => :destroy, :order => "pool_versions.id ASC"
   before_validation :normalize_name
   before_validation :normalize_post_ids
-  before_validation :initialize_post_count
   before_validation :initialize_creator, :on => :create
   after_save :create_version
-  after_save :balance_post_ids
-  attr_accessible :name, :description, :post_ids, :is_active, :post_id_array
+  attr_accessible :name, :description, :post_ids, :is_active, :post_count
   
   def self.name_to_id(name)
     if name =~ /^\d+$/
       name.to_i
     else
-      select_value_sql("SELECT id FROM pools WHERE name = ?", name.downcase)
+      select_value_sql("SELECT id FROM pools WHERE name = ?", name.downcase).to_i
     end
+  end
+  
+  def self.id_to_name(id)
+    select_value_sql("SELECT name FROM pools WHERE id = ?", id)
   end
   
   def self.create_anonymous(creator, creator_ip_addr)
@@ -25,7 +27,7 @@ class Pool < ActiveRecord::Base
       pool.name = "TEMP:#{Time.now.to_f}.#{rand(1_000_000)}"
       pool.creator = creator
       pool.save
-      pool.name = "anonymous:#{pool.id}"
+      pool.name = "anon:#{pool.id}"
       pool.save
     end
   end
@@ -43,56 +45,58 @@ class Pool < ActiveRecord::Base
   end
   
   def normalize_name
-    self.name = Pool.normalize_name(name)
+    self.name = self.class.normalize_name(name)
   end
   
   def normalize_post_ids
-    self.post_ids = Pool.normalize_post_ids(post_ids)
+    self.post_ids = self.class.normalize_post_ids(post_ids)
   end
   
   def revert_to!(version)
     self.post_ids = version.post_ids
-    save
+    synchronize_posts!
   end
 
-  def contains_post?(post_id)
+  def contains?(post_id)
     post_ids =~ /(?:\A| )#{post_id}(?:\Z| )/
   end
   
-  def add_post!(post)
-    return if contains_post?(post.id)
+  def add!(post)
+    return if contains?(post.id)
     
-    increment!(:post_count)
-    update_attribute(:post_ids, "#{post_ids} #{post.id}".strip)
+    update_attributes(:post_ids => add_number_to_string(post.id, post_ids), :post_count => post_count + 1)
     post.add_pool!(self)
     clear_post_id_array
   end
   
-  def remove_post!(post)
-    return unless contains_post?(post.id)
+  def remove!(post)
+    return unless contains?(post.id)
     
-    decrement!(:post_count)
-    update_attribute(:post_ids, Pool.normalize_post_ids(post_ids.gsub(/(?:\A| )#{post.id}(?:\Z| )/, " ")))
+    update_attributes(:post_ids => remove_number_from_string(post.id, post_ids), :post_count => post_count - 1)
     post.remove_pool!(self)
     clear_post_id_array
   end
   
+  def add_number_to_string(number, string)
+    "#{string} #{number}"
+  end
+  
+  def remove_number_from_string(number, string)
+    string.gsub(/(?:\A| )#{number}(?:\Z| )/, " ")
+  end
+  
   def posts(options = {})
+    offset = options[:offset] || 0
     limit = options[:limit] || Danbooru.config.posts_per_page
-
-    if options[:offset]
-      slice = post_id_array.slice(options[:offset], limit)
-      if slice && slice.any?
-        Post.where("id in (?)", slice).order(arbitrary_sql_order_clause(slice, "posts"))
-      else
-        Post.where("false")
-      end
+    slice = post_id_array.slice(offset, limit)
+    if slice && slice.any?
+      Post.where("id in (?)", slice).order(arbitrary_sql_order_clause(slice, "posts"))
     else
-      Post.where("id IN (?)", post_id_array).order(arbitrary_sql_order_clause(post_id_array, "posts"))
+      Post.where("false")
     end
   end
   
-  def balance_post_ids
+  def synchronize_posts!
     added = post_id_array - post_id_array_was
     removed = post_id_array_was - post_id_array
     
@@ -105,6 +109,9 @@ class Pool < ActiveRecord::Base
       post = Post.find(post_id)
       post.remove_pool!(self)
     end
+    
+    self.post_count = post_id_array.size
+    save
   end
   
   def post_id_array
@@ -115,21 +122,12 @@ class Pool < ActiveRecord::Base
     @post_id_array_was ||= post_ids_was.scan(/\d+/).map(&:to_i)
   end
   
-  def post_id_array=(array)
-    self.post_ids = array.join(" ")
-    clear_post_id_array
-  end
-  
   def clear_post_id_array
     @post_id_array = nil
     @post_id_array_was = nil
   end
   
-  def initialize_post_count
-    self.post_count = post_id_array.size
-  end
-  
-  def neighbor_posts(post)
+  def neighbors(post)
     @neighbor_posts ||= begin
       post_ids =~ /\A#{post.id} (\d+)|(\d+) #{post.id} (\d+)|(\d+) #{post.id}\Z/
       
