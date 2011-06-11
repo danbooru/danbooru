@@ -19,6 +19,19 @@ module PostSets
         CurrentUser.ip_addr = nil
       end
       
+      context "a numbered set for page 2" do
+        setup do
+          @set = PostSets::Base.new(:page => 2)
+          @set.extend(PostSets::Sequential)
+          @set.extend(PostSets::Post)
+          @set.stubs(:limit).returns(1)
+        end
+        
+        should "return the second element" do
+          assert_equal(@post_2.id, @set.posts.first.id)
+        end
+      end
+      
       context "a sequential set for the 'a' tag query" do
         setup do
           @post_4 = Factory.create(:post, :tag_string => "a")
