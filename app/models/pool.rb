@@ -54,7 +54,7 @@ class Pool < ActiveRecord::Base
   
   def revert_to!(version)
     self.post_ids = version.post_ids
-    synchronize_posts!
+    synchronize!
   end
 
   def contains?(post_id)
@@ -96,7 +96,7 @@ class Pool < ActiveRecord::Base
     end
   end
   
-  def synchronize_posts!
+  def synchronize!
     added = post_id_array - post_id_array_was
     removed = post_id_array_was - post_id_array
     

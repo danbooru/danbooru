@@ -13,9 +13,9 @@ module PostSets
         @post_2 = Factory.create(:post)
         @post_3 = Factory.create(:post)
         @pool = Factory.create(:pool)
-        @pool.add_post!(@post_2)
-        @pool.add_post!(@post_1)
-        @pool.add_post!(@post_3)
+        @pool.add!(@post_2)
+        @pool.add!(@post_1)
+        @pool.add!(@post_3)
       end
       
       teardown do

@@ -1,11 +1,7 @@
 module PostSets
   module Post
-    class Error < Exception ; end
-  
-    attr_accessor :tags, :count, :wiki_page, :artist, :suggestions
-    
-    def tags
-      @tags ||= ::Tag.normalize(params[:tags])
+    def tag_string
+      @tag_string ||= params[:tags].to_s.downcase
     end
     
     def count
@@ -13,12 +9,12 @@ module PostSets
     end
     
     def posts
-      @posts ||= slice(::Post.tag_match(tags))
+      @posts ||= slice(::Post.tag_match(tag_string))
     end
 
     def reload
       super
-      @tags = nil
+      @tag_array = nil
       @tag_string = nil
       @count = nil
       @wiki_page = nil
@@ -40,23 +36,16 @@ module PostSets
     def is_single_tag?
       tag_array.size == 1
     end
-    
+        
     def tag_array
-      @tag_array ||= ::Tag.scan_query(tags)
+      @tag_array ||= ::Tag.scan_query(tag_string)
     end
     
     def validate
       super
-      validate_page
       validate_query_count
     end
     
-    def validate_page
-      if page > 1_000
-        raise Error.new("You cannot explicitly specify the page after page 1000")
-      end
-    end
-  
     def validate_query_count
       if !CurrentUser.is_privileged? && tag_array.size > 2
         raise Error.new("You can only search up to two tags at once with a basic account")

@@ -212,7 +212,7 @@ class PoolTest < ActiveSupport::TestCase
       setup do
         @pool.reload
         @pool.post_ids = "#{@p2.id}"
-        @pool.synchronize_posts!
+        @pool.synchronize!
       end
       
       should "update the pool" do
