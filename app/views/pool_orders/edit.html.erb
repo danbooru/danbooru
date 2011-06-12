@@ -1,0 +1,20 @@
+<div id="c-pool-orders">
+  <div id="a-edit">
+    <h1>Order Pool: <%= @pool.name %></h1>
+    <p>Drag and drop the list below to determine ordering.</p>
+
+    <ul id="sortable">
+      <% @pool.posts(:limit => 1_000).each do |post| %>
+        <li class="ui-state-default" id="pool[post_id_array]_<%= post.id %>">
+          <%= link_to(image_tag(post.preview_file_url), post_path(post)) %>        
+        </li>
+      <% end %>
+    </ul>
+
+    <%= simple_form_for(@pool, :format => :js, :html => {:id => "ordering-form"}) do |f| %>
+      <%= submit_tag "Save" %>
+    <% end %>
+  </div>
+</div>
+
+<%= render :partial => "pools/secondary_links" %>

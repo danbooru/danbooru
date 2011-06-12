@@ -1,10 +1,12 @@
 <div id="c-pools">
   <div id="a-edit">
-    <% if params[:advanced] %>
-      <%= render "advanced_edit" %>
-    <% else %>
-      <%= render :partial => "simple_edit", :locals => {:posts => @pool.posts} %>
-    <% end %>    
+    <%= simple_form_for(@pool) do |f| %>
+      <h1>Edit Pool: <%= @pool.name %></h1>
+      <%= f.input :name %>
+      <%= f.input :description %>
+      <%= f.input :post_ids, :label => "Posts" %>
+      <%= f.button :submit %>
+    <% end %>
   </div>
 </div>
 

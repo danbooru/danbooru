@@ -37,9 +37,6 @@
       placeholder: "ui-state-placeholder"
     });
     $("ul#sortable").disableSelection();
-    $("ul#sortable span.delete").click(function(e) {
-      $(e.target).parent().remove();
-    });
     
     $("div.pools div.edit form#ordering-form").submit(function(e) {
       $.ajax({

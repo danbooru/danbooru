@@ -1,3 +1,5 @@
+require 'ostruct'
+
 class Pool < ActiveRecord::Base
   validates_uniqueness_of :name
   validates_format_of :name, :with => /\A[^\s;,]+\Z/, :on => :create, :message => "cannot have whitespace, commas, or semicolons"

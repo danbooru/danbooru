@@ -1,13 +1,13 @@
 <ul>
   <% post.pools.each do |pool| %>
     <li>
-      <% if pool.neighbor_posts(post)[:previous] %>
-        <%= link_to "&laquo;".html_safe, post_path(pool.neighbor_posts(post)[:previous]) %>
+      <% if pool.neighbors(post).previous %>
+        <%= link_to "&laquo;".html_safe, post_path(pool.neighbors(post).previous) %>
       <% else %>
         &laquo;
       <% end %>
-      <% if pool.neighbor_posts(post)[:next] %>
-        <%= link_to "&raquo;".html_safe, post_path(pool.neighbor_posts(post)[:next]) %>
+      <% if pool.neighbors(post).next %>
+        <%= link_to "&raquo;".html_safe, post_path(pool.neighbors(post).next) %>
       <% else %>
         &raquo;
       <% end %>

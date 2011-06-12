@@ -4,7 +4,8 @@ class PostsController < ApplicationController
   respond_to :html, :xml, :json
   
   def index
-    @post_set = PostSets::Post.new(params[:tags], params)
+    @post_set = PostSets::Base.new(params)
+    extend_post_set(@post_set)
     respond_with(@post_set)
   end
   
@@ -29,6 +30,24 @@ class PostsController < ApplicationController
   end
 
 private
+  def extend_post_set(post_set)
+    @post_set.extend(PostSets::Post)
+    
+    if use_sequential_paginator?
+      @post_set.extend(PostSets::Sequential)
+    else
+      @post_set.extend(PostSets::Numbered)
+    end
+  end
+  
+  def use_sequential_paginator?
+    if params[:page].to_i > 1000
+      true
+    else
+      false
+    end
+  end
+
   def save_recent_tags
     if params[:tags] || (params[:post] && params[:post][:tags])
       tags = Tag.scan_tags(params[:tags] || params[:post][:tags])

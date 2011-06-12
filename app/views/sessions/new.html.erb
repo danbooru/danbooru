@@ -19,19 +19,18 @@
           <%= submit_tag "Submit" %>
         </div>
       <% end %>
-    </section>
-
-    <aside>
-      <h1>Help</h1>
-      <ul>
-        <li><%= link_to "I don't have an account", new_user_path %></li>
-        <li><%= link_to "I forgot my password", reset_password_path %></li>
-        <li><%= link_to "I forgot my user name", login_reminder_path %></li>
-      </ul>
-    </aside>    
+    </section>   
   </div>
 </div>
 
 <% content_for(:page_title) do %>
  /login
+<% end %>
+
+<% content_for(:secondary_links) do %>
+  <menu>
+    <li><%= link_to "Signup", new_user_path %></li>
+    <li><%= link_to "Reset Password", new_maintenance_user_password_reset_path %></li>
+    <li><%= link_to "Login Reminder", new_maintenance_user_login_reminder_path %></li>
+  </menu>
 <% end %>

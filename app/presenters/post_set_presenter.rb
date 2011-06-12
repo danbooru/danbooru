@@ -38,14 +38,6 @@ class PostSetPresenter < Presenter
     end
   end
   
-  def pagination_html(template)
-    if post_set.use_sequential_paginator?
-      Paginators::Post.new(post_set).sequential_pagination_html(template)
-    else
-      Paginators::Post.new(post_set).numbered_pagination_html(template)
-    end
-  end
-  
   def post_previews_html
     html = ""
     

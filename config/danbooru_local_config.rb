@@ -6,7 +6,7 @@ module Danbooru
     end
 
     def posts_per_page
-      20
+      1
     end
 
     def is_user_restricted?(user)

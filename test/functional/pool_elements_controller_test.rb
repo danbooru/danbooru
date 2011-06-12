@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class PoolsPostsControllerTest < ActionController::TestCase
+class PoolElementsControllerTest < ActionController::TestCase
   context "The pools posts controller" do
     setup do
       @user = Factory.create(:user)

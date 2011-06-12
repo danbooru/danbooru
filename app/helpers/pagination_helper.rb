@@ -1,8 +1,10 @@
 module PaginationHelper
   def smart_paginator(set, &block)
-    if set.page && set.page > 1000
+    if params[:page] && set.page > 1000
+      set.extend(PostSets::Sequential)
       sequential_paginator(set)
     else
+      set.extend(PostSets::Numbered)
       numbered_paginator(set, &block)
     end
   end
@@ -10,11 +12,11 @@ module PaginationHelper
   def sequential_paginator(set)
     html = "<menu>"
     
-    unless set.first_page?
+    unless set.is_first_page?
       html << '<li>' + link_to("&laquo; Previous", params.merge(:after_id => set.first_id)) + '</li>'
     end
     
-    unless set.last_page?
+    unless set.is_last_page?
       html << '<li>' + link_to("Next &raquo;", params.merge(:before_id => set.last_id)) + '</li>'
     end
     

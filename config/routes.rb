@@ -23,6 +23,7 @@ Danbooru::Application.routes.draw do
     end
   end
   resources :dmails
+  resource  :dtext_preview, :only => [:create]
   resources :favorites
   resources :forum_topics
   resources :forum_posts do
@@ -55,8 +56,9 @@ Danbooru::Application.routes.draw do
     member do
       put :revert
     end
-    resource :order, :only => [:edit, :update]
+    resource :order, :only => [:edit, :update], :controller => "PoolOrders"
   end
+  resource  :pool_element, :only => [:create, :destroy]
   resources :pool_versions, :only => [:index]
   resources :posts do
     resources :votes, :controller => "post_votes", :only => [:create, :destroy]
@@ -68,16 +70,14 @@ Danbooru::Application.routes.draw do
   resources :post_versions, :only => [:index]
   resources :post_flags, :only => [:new, :index, :create]
   resources :post_appeals, :only => [:new, :index, :create]
-  resource :session
+  resource  :session
   resources :tags do
     collection do
       get :search
     end
   end
   resources :tag_aliases do
-    member do
-      delete :cache
-    end
+    resource :cache, :only => [:destroy]
   end
   resources :tag_implications
   resources :tag_subscriptions
@@ -91,22 +91,23 @@ Danbooru::Application.routes.draw do
   end
   resources :wiki_page_versions, :only => [:index, :show]
 
-  match '/favorites/:id' => 'favorites#create', :via => :post, :as => "favorite"
-  match '/favorites/:id' => 'favorites#destroy', :via => :delete, :as => "favorite"
-  match '/favorites' => 'favorites#index', :via => :get, :as => "favorites"
-  match '/pool_post' => 'pools_posts#create', :via => :post, :as => 'pool_post'
-  match '/pool_post' => 'pools_posts#destroy', :via => :delete, :as => 'pool_post'
-  match '/post_moderation/moderate' => 'post_moderation#moderate'
-  match '/post_moderation/disapprove' => 'post_moderation#disapprove', :via => :put
-  match '/post_moderation/approve' => 'post_moderation#approve', :via => :put
-  match '/post_moderation/delete' => 'post_moderation#delete', :via => :post
-  match '/post_moderation/undelete' => 'post_moderation#undelete', :via => :post
-  match '/dtext/preview' => 'dtext#preview', :via => :post
+  namespace :maintenance do
+    namespace :user do
+      resource :password_reset, :only => [:new, :create, :edit, :update]
+      resource :login_reminder, :only => [:new, :create]
+    end
+  end
+  
+  namespace :moderation do
+    namespace :post do
+      resource :dashboard, :only => [:show]
+      resource :approval, :only => [:destroy, :create]
+      resource :deletion, :only => [:destroy, :create]
+    end
+  end
+
   match "/site_map" => "static#site_map", :as => "site_map"
   match "/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
-  match "/user_maintenance/login_reminder" => "user_maintenance#login_reminder", :as => "login_reminder"
-  match "/user_maintenance/reset_password" => "user_maintenance#reset_password", :as => "reset_password"
-  match '/jquery_test' => 'static#jquery_test'
   
   root :to => "posts#index"
 end

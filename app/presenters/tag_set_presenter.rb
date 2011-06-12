@@ -7,7 +7,6 @@
 class TagSetPresenter < Presenter
   def initialize(tags)
     @tags = tags
-    fetch_categories
   end
   
   def tag_list_html(template, options = {})
@@ -21,17 +20,13 @@ class TagSetPresenter < Presenter
   end
 
 private
-  def fetch_categories
-    @category_cache ||= Tag.categories_for(@tags)
-  end
-  
-  def category_for(tag)
-    @category_cache[tag]
+  def categories
+    @categories ||= Tag.categories_for(@tags)
   end
   
   def build_list_item(tag, template, options)
     html = ""
-    html << %{<li data-tag-type="#{category_for(tag)}" data-tag-name="#{u(tag)}">}
+    html << %{<li data-tag-type="#{categories[tag]}" data-tag-name="#{u(tag)}">}
     
     if CurrentUser.user.is_privileged?
       html << %{<a href="/wiki_pages?title=#{u(tag)}">?</a> }

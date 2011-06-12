@@ -18,6 +18,22 @@ module PostSets
       end
     end
     
+    def first_id
+      if posts.any?
+        posts.first.id
+      else
+        nil
+      end
+    end
+    
+    def last_id
+      if posts.any?
+        posts.last.id
+      else
+        nil
+      end
+    end
+    
     def pagination_options
       {:before_id => before_id, :after_id => after_id}
     end

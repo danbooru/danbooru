@@ -419,10 +419,12 @@ div.dtext {
 }
 
 
-/*** Pools Posts ***/
+/*** Pool Elements ***/
 
-div#c-pools-posts {
+div#c-pool-elements {
   div#a-new {
+    font-size: 0.8em;
+    
     form {
       margin-bottom: 1em;
     }
@@ -430,6 +432,10 @@ div#c-pools-posts {
     li {
       margin-left: 1em;
       cursor: pointer;
+    }
+    
+    h1 {
+      font-size: $h3_size;
     }
   }
 }
@@ -439,30 +445,41 @@ div#c-pools-posts {
 /*** Pools ***/
 
 div#c-pools {
+  h1 {
+    font-size: $h2_size;
+  }
+  
+  p {
+    width: 30em;
+  }
+  
+  textarea {
+    height: 10em;
+  }
+}
+
+
+/*** Pool Orders ***/
+
+div#c-pool-orders {
+  h1 {
+    font-size: $h2_size;
+  }
+  
   div#a-edit {
-    p {
-      width: 30em;
-    }
-    
     ul.ui-sortable {
       list-style-type: none;
 
-      span {
-        margin: 0;
-        float: right;
-        cursor: pointer;
-      }
-      
       li {
         padding: 0.5em;
       }
-      
+
       li.ui-state-default {
         margin-bottom: 20px;
         width: 180px;
         background: none;
       }
-      
+
       li.ui-state-placeholder {
         margin-bottom: 20px;
         width: 180px;
@@ -472,7 +489,6 @@ div#c-pools {
     }
   }
 }
-
 
 /*** Comments ***/
 
@@ -572,7 +588,7 @@ article.post-preview {
 
 div#c-posts {
   div.notice {
-    font-size: 80%;
+    font-size: 0.8em;
     padding: 1em;
     margin-bottom: 1em;
     
@@ -687,18 +703,6 @@ div#sessions {
       width: 30em;
       float: left;
     }
-
-    aside {
-      width: 20em;
-      float: left;
-    
-      li {
-        display: list-item;
-        margin-bottom: 0.5em;
-        list-style-type: square;
-        margin-left: 1em;
-      }
-    }
   
     h1 {
       font-size: $h2_size;
@@ -752,7 +756,7 @@ div#c-users {
       }
       
       li {
-        font-size: 0.9em;
+        font-size: 0.8em;
         line-height: 1.5em;
       }
       
@@ -940,7 +944,7 @@ div#note-container {
 }
 
 div.note-edit-dialog {
-  font-size: 70%;
+  font-size: 0.8em;
 }
 
 

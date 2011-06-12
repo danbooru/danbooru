@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
+  helper :pagination
   before_filter :set_current_user
   after_filter :reset_current_user
   before_filter :initialize_cookies

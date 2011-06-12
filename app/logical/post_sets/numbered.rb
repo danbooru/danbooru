@@ -36,6 +36,14 @@ module PostSets
       @page ||= params[:page] ? params[:page].to_i : 1
     end
     
+    def total_pages
+      (count / limit.to_f).ceil
+    end
+    
+    def current_page
+      page
+    end
+    
     def offset
       ((page < 1) ? 0 : (page - 1)) * limit
     end

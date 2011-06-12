@@ -41,6 +41,10 @@ module PostSets
       @tag_array ||= ::Tag.scan_query(tag_string)
     end
     
+    def tags
+      tag_array
+    end
+    
     def validate
       super
       validate_query_count

@@ -1,11 +1,11 @@
-class PoolsPostsController < ApplicationController
+class PoolElementsController < ApplicationController
   respond_to :html, :xml, :json, :js
   before_filter :member_only
   
   def create
     @pool = Pool.find_by_name(params[:pool_name]) || Pool.find(params[:pool_id])
     @post = Post.find(params[:post_id])
-    @pool.add_post!(@post)
+    @pool.add!(@post)
     append_pool_to_session(@pool)
     respond_with(@pool, :location => pool_path(@pool))
   end
@@ -13,7 +13,7 @@ class PoolsPostsController < ApplicationController
   def destroy
     @pool = Pool.find(params[:pool_id])
     @post = Post.find(params[:post_id])
-    @pool.remove_post!(@post)
+    @pool.remove!(@post)
     respond_with(@pool, :location => pool_path(@pool))
   end
   

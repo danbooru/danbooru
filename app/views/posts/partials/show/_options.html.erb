@@ -6,12 +6,12 @@
   <li><%= link_to "Flag", new_post_flag_path(:post_id => post.id), :id => "flag" %></li>
   <li><%= link_to "Appeal", new_post_appeal_path(:post_id => post.id), :id => "appeal" %></li>
   <% if CurrentUser.is_janitor? %>
-    <li><%= link_to "Approve", post_moderation_approve_path(:post_id => post.id), :remote => true, :method => :put, :id => "approve" %></li>
-    <li><%= link_to "Disapprove", post_moderation_disapprove_path(:post_id => post.id), :remote => true, :method => :put, :id => "disapprove" %></li>
+    <li><%= link_to "Approve", moderation_post_approval_path(:post_id => post.id), :remote => true, :method => :post, :id => "approve" %></li>
+    <li><%= link_to "Disapprove", moderation_post_approval_path(:post_id => post.id), :remote => true, :method => :destroy, :id => "disapprove" %></li>
   <% end %>
   <% if CurrentUser.is_moderator? %>
-    <li><%= link_to "Undelete", post_moderation_undelete_path(:post_id => post.id), :remote => true, :method => :post, :id => "undelete" %></li>
-    <li><%= link_to "Delete", post_moderation_delete_path(:post_id => post.id), :remote => true, :method => :post, :id => "delete" %></li>
+    <li><%= link_to "Undelete", moderation_post_deletion_path(:post_id => post.id), :remote => true, :method => :destroy, :id => "undelete" %></li>
+    <li><%= link_to "Delete", moderation_post_deletion_path(:post_id => post.id), :remote => true, :method => :post, :id => "delete" %></li>
   <% end %>
   <li><%= link_to "Pool", "#", :id => "pool" %></li>
 </ul>

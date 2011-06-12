@@ -1,9 +1,10 @@
 <div id="c-pools">
   <div id="a-show">
-    <aside id="sidebar">
-      <h2>Pool: <%= @pool.name %></h2>
-      <p><%= format_text(@pool.description) %></p>
-    </aside>
+    <h1>Pool: <%= @pool.name %></h1>
+    
+    <div id="description">
+      <%= format_text(@pool.description) %>
+    </div>
     
     <section id="content">
       <%= @post_set.presenter.post_previews_html %>
@@ -11,7 +12,9 @@
       <div class="clearfix"></div>
     
       <div class="paginator">
-        <%= @post_set.presenter.pagination_html(self) %>
+        <%= numbered_paginator(@post_set) do |page| %>
+          <%= link_to(page, pool_path(@pool, :page => page)) %>
+        <% end %>
       </div>
     </section>
   </div>

@@ -25,7 +25,9 @@ class PoolsController < ApplicationController
   
   def show
     @pool = Pool.find(params[:id])
-    @post_set = PostSets::Pool.new(@pool, :page => params[:page])
+    @post_set = PostSets::Base.new(:id => @pool, :page => params[:page])
+    @post_set.extend(PostSets::Numbered)
+    @post_set.extend(PostSets::Pool)
     respond_with(@pool)
   end
   

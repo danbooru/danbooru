@@ -57,6 +57,10 @@
       </section>
 
       <section id="notes">
+        <% if @post.notes.active.empty? %>
+          <p>There are no notes.</p>
+        <% end %>
+
         <%= render :partial => "notes/note", :collection => @post.notes.active %>
       </section>
 
@@ -75,7 +79,7 @@
   </div>
   
   <div id="add-to-pool-dialog" title="Add to Pool">
-    <%= render :template => "pools_posts/new" %>
+    <%= render :template => "pool_elements/new" %>
   </div>
 </div>
 
