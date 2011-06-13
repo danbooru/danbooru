@@ -54,7 +54,7 @@ table {
 /*** BEGIN CUSTOM STYLES ***/
 body {
   font-family: Verdana, Helvetica, sans-serif;
-  padding: 1em 2em;
+  padding: 0;
   margin: 0;
   line-height: 1.25em;
 }
@@ -193,10 +193,34 @@ menu {
   }
   
   li {
-    margin: 0 1em 0 0;
+    margin: 0;
     padding: 0;
     list-style-type: none;
     display: inline;    
+  }
+}
+
+header#top {
+  h1 {
+    margin: 5px 30px 0 30px;
+  }
+  
+  menu {
+    background: #F7F7FF;
+    padding: 5px 20px;
+    
+    li {
+      padding: 5px 10px;
+    }
+  }
+  
+  menu.main {
+    background: white;
+    
+    li.current {
+      background: #F7F7FF;
+      font-weight: bold;
+    }
   }
 }
 
@@ -523,7 +547,7 @@ div.comments-for-post {
 div.dtext-preview {
   border: 2px dashed #AAA;
   padding: 1em;
-  margin: 1em;
+  margin: 1em 0;
   width: 30em;
 }
 

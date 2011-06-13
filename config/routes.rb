@@ -91,6 +91,13 @@ Danbooru::Application.routes.draw do
   end
   resources :wiki_page_versions, :only => [:index, :show]
 
+  namespace :explore do
+    namespace :post do
+      resource :popular, :only => [:show]
+      resource :hot, :only => [:show]
+    end
+  end
+
   namespace :maintenance do
     namespace :user do
       resource :password_reset, :only => [:new, :create, :edit, :update]

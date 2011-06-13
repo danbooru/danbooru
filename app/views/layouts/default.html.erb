@@ -21,10 +21,10 @@
   <%= yield :html_header %>
 </head>
 <body>
-  <header>
+  <header id="top">
     <h1><%= link_to Danbooru.config.app_name, "/" %></h1>
     <nav>
-      <menu>
+      <menu class="main">
         <% if CurrentUser.user.is_anonymous? %>
           <%= nav_link_to("Login", new_session_path) %>
         <% else %>

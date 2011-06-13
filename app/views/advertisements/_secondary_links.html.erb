@@ -1,5 +1,5 @@
 <% content_for(:secondary_nav_links) do %>
-  <menu>
+  <menu id="secondary-links">
     <li><%= link_to "Listing", advertisements_path %></li>
     <li><%= link_to "New", new_advertisement_path %></li>
     <% if @advertisement && !@advertisement.new_record? %>

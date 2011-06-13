@@ -20,7 +20,7 @@
   Danbooru.Comment.initialize_preview_button = function() {
     $("div.new-comment input[type=submit][value=Preview]").click(function(e) {
       e.preventDefault();
-      $.ajax("/dtext/preview", {
+      $.ajax("/dtext_preview", {
         type: "post",
         data: {
           body: $(e.target).closest("form").find("textarea").val()

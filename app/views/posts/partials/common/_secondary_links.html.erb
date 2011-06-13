@@ -2,9 +2,12 @@
   <menu>
     <li><%= link_to "Listing", posts_path %></li>
     <li><%= link_to "Upload", new_upload_path %></li>
-    <li>Popular</li>
-    <li><%= link_to "Favorites", favorites_path %></li>
-    <li>Subscriptions</li>
+    <li><%= link_to "Popular", explore_post_popular_path %></li>
+    <li><%= link_to "Hot", explore_post_hot_path %></li>
+    <% unless CurrentUser.is_anonymous? %>
+      <li><%= link_to "Favorites", favorites_path %></li>
+      <li><%= link_to "Subscriptions", tag_subscriptions_path(:user_id => CurrentUser.id) %></li>
+    <% end %>
     <li><%= link_to "Changes", post_versions_path %></li>
     <li>Approvals</li>
     <li><%= link_to "Moderate", moderation_post_dashboard_path %></li>
