@@ -27,7 +27,9 @@
     </table>
 
     <div id="paginator">
-      <%= will_paginate(@artists) %>
+      <%= numbered_paginator(@artists) do |page| %>
+        <%= link_to(page, artists_path(:page => page, :search => params[:search])) %>
+      <% end %>
     </div>    
 
     <%= render "secondary_links" %>

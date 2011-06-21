@@ -11,11 +11,11 @@ module PaginationHelper
     html = "<menu>"
     
     unless records.is_first_page?
-      html << '<li>' + link_to("&laquo; Previous", params.merge(:page => "b#{records.first_id}")) + '</li>'
+      html << '<li>' + link_to("&laquo; Previous", params.merge(:page => "b#{records.before_id}")) + '</li>'
     end
     
     unless records.is_last_page?
-      html << '<li>' + link_to("Next &raquo;", params.merge(:page => "a#{records.last_id}")) + '</li>'
+      html << '<li>' + link_to("Next &raquo;", params.merge(:page => "a#{records.after_id}")) + '</li>'
     end
     
     html << "</menu>"

@@ -1,5 +1,5 @@
 module PostSets
-  class Post
+  class Post < Base
     attr_reader :tags, :page, :posts
     
     def initialize(params)
@@ -30,14 +30,6 @@ module PostSets
     
     def is_single_tag?
       tags.size == 1
-    end
-    
-    def tag
-      tag_string
-    end
-    
-    def presenter
-      @presenter ||= PostSetPresenter.new(self)
     end
   end
 end

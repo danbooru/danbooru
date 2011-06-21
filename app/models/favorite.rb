@@ -2,6 +2,8 @@ class Favorite < ActiveRecord::Base
   TABLE_COUNT = 100
   belongs_to :post
   
+  scope :for_user, lambda {|user_id| where("user_id = ?", user_id)}
+  
   def self.model_for(user_id)
     mod = user_id.to_i % TABLE_COUNT
     Object.const_get("Favorite#{mod}")

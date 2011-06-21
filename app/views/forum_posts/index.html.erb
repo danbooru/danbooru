@@ -20,7 +20,9 @@
 </table>
 
 <div id="paginator">
-  <%= will_paginate @forum_posts %>
+  <%= numbered_paginator(@forum_posts) do |page| %>
+    <%= link_to(page, forum_posts_path(:search => params[:search], :page => page)) %>
+  <% end %>
 </div>
 
 <%= render "forum_topics/secondary_links" %>

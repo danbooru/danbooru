@@ -30,7 +30,7 @@
       <div class="clearfix"></div>
     
       <div class="paginator">
-        <%= @post_set.presenter.pagination_html(self) %>
+        <%= sequential_paginator(@post_set.favorites) %>
       </div>
     </section>
     
