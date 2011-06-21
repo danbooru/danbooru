@@ -1,11 +1,18 @@
 module PostSets
   class Base
     def has_wiki?
-      false
+      is_single_tag?
     end
     
     def wiki_page
       nil
+    end
+    
+    def has_artist?
+      is_single_tag?
+    end
+    
+    def artist
     end
     
     def presenter
@@ -14,10 +21,6 @@ module PostSets
     
     def is_single_tag?
       false
-    end
-    
-    def tag
-      tag_string
     end
     
     def arbitrary_sql_order_clause(ids, table_name)

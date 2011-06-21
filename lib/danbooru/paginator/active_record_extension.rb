@@ -6,30 +6,36 @@ module Danbooru
       extend ActiveSupport::Concern
       
       module ClassMethods
-        def paginate(page)
-          if use_sequential_paginator?(page)
-            paginate_sequential(page)
+        def page(p)
+          if use_sequential_paginator?(p)
+            paginate_sequential(p)
           else
-            paginate_numbered(page)
+            paginate_numbered(p)
           end
         end
         
-        def use_sequential_paginator?(page)
-          page =~ /[ab]\d+/i
+        def use_sequential_paginator?(p)
+          p =~ /[ab]\d+/i
         end
 
-        def paginate_sequential(page)
-          if page =~ /b(\d+)/
+        def paginate_sequential(p)
+          if p =~ /b(\d+)/
             paginate_sequential_before($1)
-          elsif page =~ /a(\d+)/
+          elsif p =~ /a(\d+)/
             paginate_sequential_after($1)
           else
-            paginate_numbered(page)
+            paginate_numbered(p)
           end
         end
 
         def paginate_sequential_before(before_id)
-          limit(records_per_page).where("id < ?", before_id.to_i).reorder("id desc").tap do |obj|
+          c = limit(records_per_page)
+          
+          if before_id.to_i > 0
+            c = c.where("id < ?", before_id.to_i)
+          end
+          
+          c.reorder("id desc").tap do |obj|
             obj.extend(SequentialCollectionExtension)
             obj.sequential_paginator_mode = :before
           end
@@ -42,17 +48,17 @@ module Danbooru
           end
         end
         
-        def paginate_numbered(page)
-          page = [page.to_i, 1].max
-          limit(records_per_page).offset((page - 1) * records_per_page).tap do |obj|
+        def paginate_numbered(p)
+          p = [p.to_i, 1].max
+          limit(records_per_page).offset((p - 1) * records_per_page).tap do |obj|
             obj.extend(NumberedCollectionExtension)
             obj.total_pages = (obj.total_count / records_per_page.to_f).ceil
-            obj.current_page = page
+            obj.current_page = p
           end
         end
         
         def records_per_page
-          Danbooru.config.posts_per_page
+          Danbooru.config.posts_per_p
         end
 
         # taken from kaminari (https://github.com/amatsuda/kaminari)

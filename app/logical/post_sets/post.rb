@@ -1,15 +1,15 @@
 module PostSets
   class Post < Base
-    attr_reader :tags, :page, :posts
+    attr_reader :tag_array, :page, :posts
     
     def initialize(params)
-      @tags = Tag.scan_query(params[:tags])
+      @tag_array = Tag.scan_query(params[:tags])
       @page = [params[:page].to_i, 1].max
       @posts = ::Post.tag_match(tag_string).paginate(page)
     end
     
     def tag_string
-      @tag_string ||= tags.join(" ")
+      @tag_string ||= tag_array.join(" ")
     end
     
     def has_wiki?
@@ -29,7 +29,7 @@ module PostSets
     end
     
     def is_single_tag?
-      tags.size == 1
+      tag_array.size == 1
     end
   end
 end
