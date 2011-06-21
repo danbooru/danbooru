@@ -39,11 +39,23 @@ class Post < ActiveRecord::Base
   scope :for_user, lambda {|user_id| where(["uploader_string = ?", "uploader:#{user_id}"])}
   scope :available_for_moderation, lambda {where(["id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :hidden_from_moderation, lambda {where(["id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
-  scope :before_id, lambda {|id| id.present? ? where(["posts.id < ?", id]) : where("TRUE")}
-  scope :after_id, lambda {|id| id.present? ? where("posts.id > ?", id) : where("true")}
   scope :tag_match, lambda {|query| Post.tag_match_helper(query)}
   search_methods :tag_match
-  
+  scope :after_id, Proc.new {|num|
+    if num.present?
+      where("id > ?", num.to_i).reorder("id asc")
+    else
+      where("true")
+    end
+  }
+  scope :before_id, Proc.new {|num|
+    if num.present?
+      where("id < ?", num.to_i).reorder("id desc")
+    else
+      where("true")
+    end
+  }
+    
   module FileMethods
     def delete_files
       FileUtils.rm_f(file_path)

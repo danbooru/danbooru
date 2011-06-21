@@ -4,9 +4,8 @@ class PostsController < ApplicationController
   respond_to :html, :xml, :json
   
   def index
-    @post_set = PostSets::Base.new(params)
-    extend_post_set(@post_set)
-    respond_with(@post_set)
+    @posts = Post.search(params[:search]).paginate(params[:page])
+    respond_with(@posts)
   end
   
   def show

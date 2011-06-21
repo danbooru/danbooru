@@ -8,13 +8,6 @@ GIT
       activesupport (~> 3.1.0.alpha)
 
 GIT
-  remote: git://github.com/mmack/will_paginate.git
-  revision: 5816b4e8d4382b4b167621a9aea4b8fe72983c37
-  branch: rails3.1
-  specs:
-    will_paginate (3.1.0)
-
-GIT
   remote: http://github.com/EmmanuelOga/ffaker.git
   revision: 52feff4ecddbe8834b63beb122b153b65833e309
   specs:
@@ -143,4 +136,3 @@ DEPENDENCIES
   simple_form
   simplecov
   super_exception_notifier
-  will_paginate!

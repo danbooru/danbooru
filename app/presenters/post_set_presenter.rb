@@ -1,15 +1,11 @@
 require 'pp'
 
 class PostSetPresenter < Presenter
-  attr_accessor :post_set, :tag_set_presenter
+  attr_accessor :posts, :tag_set_presenter
   
-  def initialize(post_set)
-    @post_set = post_set
+  def initialize(posts)
+    @posts = posts
     @tag_set_presenter = TagSetPresenter.new(RelatedTagCalculator.calculate_from_sample_to_array(@post_set.tags).map {|x| x[0]})
-  end
-  
-  def posts
-    post_set.posts
   end
   
   def tag_list_html(template)

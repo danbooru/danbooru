@@ -1,81 +1,57 @@
-<div>
-  <div style="margin-bottom: 1em;">
-    <div class="history-search-row">
-      <div class="history-search-label">
-        <label for="user_name">User</label>
-      </div>
-      <div>
-        <%= form_tag(post_versions_path, :method => :get) do %>
-          <%= text_field_tag "user_name", params[:user_name], :id => "user_name", :size => 20 %> <%= submit_tag "Search" %>
-        <% end %>
-      </div>
+<div id="c-post-versions">
+  <div id="a-index">
+    <div id="search">
+      <%= simple_form_for(@search) do |f| %>
+        <%= f.input :updater_name_eq, "User" %>
+        <%= f.input :post_id_eq, :label => "Post" %>
+        <%= f.button :submit %>
+      <% end %>
     </div>
-    <div class="history-search-row">
-      <div class="history-search-label">
-        <label for="post_id">Post ID</label>
-      </div>
-      <div>
-        <%= form_tag(post_versions_path, :method => :get) do %>
-          <%= text_field_tag "post_id", params[:post_id], :id => "post_id", :size => 10 %> <%= submit_tag "Search" %>
-        <% end %>
-      </div>
-    </div>
-  </div>
-  <div style="clear: left;">
-    <table width="100%" class="highlightable" id="history">
-      <thead>
-        <tr>
-          <th width="1%"></th>
-          <th width="4%">Post</th>
-          <th width="15%">Date</th>
-          <th width="10%">User</th>
-          <th width="5%">Rating</th>
-          <th width="5%">Parent</th>
-          <th width="10%">IP Address</th>
-          <th width="50%">Tags</th>
-        </tr>
-      </thead>
-      <tfoot>
-        <tr>
-          <td colspan="8">
-            <%= button_to_function "Undo", "PostTagHistory.undo()", :id => "undo" %>
-            <%= button_to_function "Revert to", "PostTagHistory.revert()", :id => "revert" %>
-          </td>
-        </tr>
-      </tfoot>
-      <tbody>
-        <% @change_list.each do |change| %>
-          <tr class="<%= cycle 'even', 'odd' %>" id="r<%= change[:change].id %>" >
-            <td style="background: <%= id_to_color(change[:change].post_id) %>;"></td>
-            <td><%= link_to change[:change].post_id, :controller => "post", :action => "show", :id => change[:change].post_id %></td>
-            <td><%= change[:change].created_at.strftime("%Y-%m-%d %H:%M") %></td>
-            <td><%= link_to change[:change].author, :controller => "user", :action => "show", :id => change[:change].user_id %></td>
-            <td><%= change[:change].rating %></td>
-            <td><%= change[:parent_id] %></td>
-            <td>
-              <% if @current_user.is_admin? %>
-                <%= change[:ip_addr] %>
-              <% end %>
-            </td>
-            <td>
-              <span class="added-tags"><%= tag_list(change[:added_tags], :obsolete => change[:obsolete_added_tags], :prefix => "+") %></span>
-              <span class="removed-tags"><%= tag_list(change[:removed_tags], :obsolete=>change[:obsolete_removed_tags], :prefix=>"-") %></span>
-              <span class="unchanged-tags"><%= tag_list(change[:unchanged_tags], :prefix => "") %></span>
-            </td>
+    
+    <div class="listing">
+      <table>
+        <thead>
+          <tr>
+            <th width="5%">Post</th>
+            <th width="15%">Date</th>
+            <th width="10%">User</th>
+            <th width="5%">Rating</th>
+            <th width="5%">Parent</th>
+            <th width="10%">IP Address</th>
+            <th width="50%">Tags</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% @post_versions.each do |post_version| %>
+            <tr id="post-version-<%= post_version.id %>">
+              <td><%= link_to(post_version.post_id, post_path(post_version.post_id)) %></td>
+              <td><%= post_version.updated_at.strftime("%Y-%m-%d %H:%M") %></td>
+              <td><%= link_to(post_version.updater.name, user_path(post_version.updater_id)) %></td>
+              <td><%= post_version.rating %></td>
+              <td><%= post_version.parent_id %></td>
+              <td>
+                <% if CurrentUser.is_admin? %>
+                  <%= post_version.updater_ip_addr %>
+                <% end %>
+              </td>
+              <td>
+                <% post_version.add_tag_array.each do |tag| %>
+                  <ins><%= tag %></ins>
+                <% end %>
+                
+                <% post_version.del_tag_array.each do |tag| %>
+                  <del><%= tag %></del>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    
+    <div id="paginator">
+      <%= sequential_paginator(@post_versions) %>
+    </div>
   </div>
 </div>
 
-<script type="text/javascript">
-  <% @change_list.each do |change| %>
-    PostTagHistory.add_change(<%= change[:change].id %>, <%= change[:change].post_id %>, '<%= escape_javascript(change[:change].author) %>')
-  <% end %>
-  PostTagHistory.init()
-</script>
-
-<div id="paginator">
-  <%= tag_history_pagination_links(@changes) %>
-</div>
