@@ -1,25 +1,26 @@
 <!-- 
-- wiki_page
-- tag
+- post_set
  -->
 
-<div id="wiki-page-excerpt">
-  <h1>Wiki</h1>
-  
-  <div id="hide-or-show-wiki-page-excerpt">
-    <span id="hide-wiki-page-excerpt">(hide)</span>
-    <span id="show-wiki-page-excerpt">(show)</span>
-  </div>
+<% if post_set.has_wiki? %>
+  <div id="wiki-page-excerpt">
+    <h1>Wiki</h1>
 
-  <div id="wiki-page-excerpt-content">
-    <% if wiki_page %>
-      <div class="prose">
-        <%= format_text(wiki_page.presenter.excerpt) %>
+    <div id="hide-or-show-wiki-page-excerpt">
+      <span id="hide-wiki-page-excerpt">(hide)</span>
+      <span id="show-wiki-page-excerpt">(show)</span>
+    </div>
 
-        <p>Read the <%= link_to "full article", wiki_page_path(wiki_page.id) %>.</p>
-      </div>
-    <% else %>
-      <p>There is currently no wiki page for the tag "<%= tag %>". You can <%= link_to "create one", new_wiki_page_path(:wiki_page => {:title => tag}) %>.</p>
-    <% end %>
+    <div id="wiki-page-excerpt-content">
+      <% if post_set.wiki_page %>
+        <div class="prose">
+          <%= format_text(post_set.wiki_page.presenter.excerpt) %>
+
+          <p>Read the <%= link_to "full article", wiki_page_path(post_set.wiki_page.id) %>.</p>
+        </div>
+      <% else %>
+        <p>There is currently no wiki page for the tag "<%= post_set.tag_string %>". You can <%= link_to "create one", new_wiki_page_path(:wiki_page => {:title => post_set.tag_string}) %>.</p>
+      <% end %>
+    </div>
   </div>
-</div>
+<% end %>

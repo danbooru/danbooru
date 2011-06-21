@@ -29,10 +29,7 @@
     </aside>
 
     <section id="content">
-      <% if @post_set.has_wiki? && @post_set.page < 2 %>
-        <%= render :partial => "wiki_pages/excerpt", :locals => {:wiki_page => @post_set.wiki_page, :tag => @post_set.tag} %>
-      <% end %>
-      
+      <%= render :partial => "wiki_pages/excerpt", :locals => {:post_set => @post_set} %>
       <%= render :partial => "posts/partials/index/posts", :locals => {:post_set => @post_set} %>
     </section>
     
