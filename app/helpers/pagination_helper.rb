@@ -1,28 +1,28 @@
 module PaginationHelper
-  def smart_paginator(records, &block)
-    if records.is_sequential_paginator? || params[:page].to_i > 200
-      sequential_paginator(records)
-    else
-      numbered_paginator(records, &block)
-    end
-  end
-  
   def sequential_paginator(records)
     html = "<menu>"
     
-    unless records.is_first_page?
-      html << '<li>' + link_to("&laquo; Previous", params.merge(:page => "b#{records.before_id}")) + '</li>'
-    end
+    if records.any? 
+      if params[:page] =~ /[ab]/
+        html << '<li>' + link_to("< Previous", params.merge(:page => "a#{records[0].id}")) + '</li>'
+      end
     
-    unless records.is_last_page?
-      html << '<li>' + link_to("Next &raquo;", params.merge(:page => "a#{records.after_id}")) + '</li>'
+      html << '<li>' + link_to("Next >", params.merge(:page => "b#{records[-1].id}")) + '</li>'
     end
     
     html << "</menu>"
     html.html_safe
   end
   
+  def use_sequential_paginator?(records)
+    params[:page] =~ /[ab]/ || records.current_page > Danbooru.config.max_numbered_pages
+  end
+  
   def numbered_paginator(records, &block)
+    if use_sequential_paginator?(records)
+      return sequential_paginator(records)
+    end
+    
     html = "<menu>"
     window = 3
     if records.total_pages <= (window * 2) + 5
@@ -55,7 +55,7 @@ module PaginationHelper
   end
   
   def numbered_paginator_final_item(total_pages, current_page, &block)
-    if total_pages <= 200
+    if total_pages <= Danbooru.config.max_numbered_pages
       numbered_paginator_item(total_pages, current_page, &block)
     else
       ""
@@ -67,7 +67,7 @@ module PaginationHelper
     if page == "..."
       html << "..."
     elsif page == current_page
-      html << page.to_s
+      html << '<span>' + page.to_s + '</span>'
     else
       html << capture(page, &block)
     end

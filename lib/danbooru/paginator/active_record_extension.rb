@@ -6,29 +6,29 @@ module Danbooru
       extend ActiveSupport::Concern
       
       module ClassMethods
-        def page(p)
-          if use_sequential_paginator?(p)
-            paginate_sequential(p)
+        def paginate(page)
+          if use_sequential_paginator?(page)
+            paginate_sequential(page)
           else
-            paginate_numbered(p)
+            paginate_numbered(page)
           end
         end
         
-        def use_sequential_paginator?(p)
-          p =~ /[ab]\d+/i
+        def use_sequential_paginator?(page)
+          page =~ /[ab]\d+/i
         end
 
-        def paginate_sequential(p)
-          if p =~ /b(\d+)/
+        def paginate_sequential(page)
+          if page =~ /b(\d+)/
             paginate_sequential_before($1)
-          elsif p =~ /a(\d+)/
+          elsif page =~ /a(\d+)/
             paginate_sequential_after($1)
           else
-            paginate_numbered(p)
+            paginate_sequential_before
           end
         end
 
-        def paginate_sequential_before(before_id)
+        def paginate_sequential_before(before_id = nil)
           c = limit(records_per_page)
           
           if before_id.to_i > 0
@@ -48,17 +48,17 @@ module Danbooru
           end
         end
         
-        def paginate_numbered(p)
-          p = [p.to_i, 1].max
-          limit(records_per_page).offset((p - 1) * records_per_page).tap do |obj|
+        def paginate_numbered(page)
+          page = [page.to_i, 1].max
+          limit(records_per_page).offset((page - 1) * records_per_page).tap do |obj|
             obj.extend(NumberedCollectionExtension)
-            obj.total_pages = (obj.total_count / records_per_page.to_f).ceil
-            obj.current_page = p
+            obj.total_pages = (obj.total_count.to_f / records_per_page).ceil
+            obj.current_page = page
           end
         end
         
         def records_per_page
-          Danbooru.config.posts_per_p
+          Danbooru.config.posts_per_page
         end
 
         # taken from kaminari (https://github.com/amatsuda/kaminari)

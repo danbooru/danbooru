@@ -34,7 +34,7 @@
     </section>
     
     <% content_for(:page_title) do %>
-      /<%= @post_set.tags.join(" ") %>
+      /<%= @post_set.tag_string %>
     <% end %>
 
     <%= render :partial => "posts/partials/common/secondary_links" %>    

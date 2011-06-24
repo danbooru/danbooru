@@ -12,7 +12,7 @@ class UploadsController < ApplicationController
   
   def index
     @search = Upload.search(params[:search])
-    @uploads = @search.paginate(:page => params[:page])
+    @uploads = @search.order("id desc").paginate(params[:page])
     respond_with(@uploads)
   end
   

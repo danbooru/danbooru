@@ -14,8 +14,12 @@ class PostSetPresenter < Presenter
     tag_set_presenter.tag_list_html(template)
   end
   
-  def post_previews_html
+  def post_previews_html(template)
     html = ""
+    
+    if posts.empty?
+      return template.render(:partial => "post_sets/blank")
+    end
     
     posts.each do |post|
       html << PostPresenter.preview(post)

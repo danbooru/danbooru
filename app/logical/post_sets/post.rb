@@ -4,7 +4,7 @@ module PostSets
     
     def initialize(params)
       @tag_array = Tag.scan_query(params[:tags])
-      @page = [params[:page].to_i, 1].max
+      @page = params[:page]
       @posts = ::Post.tag_match(tag_string).paginate(page)
     end
     
@@ -13,7 +13,7 @@ module PostSets
     end
     
     def has_wiki?
-      if tags.any?
+      if tag_array.any?
         ::WikiPage.titled(tag_string).exists?
       else
         false
@@ -21,7 +21,7 @@ module PostSets
     end
     
     def wiki_page
-      if tags.any?
+      if tag_array.any?
         ::WikiPage.titled(tag_string).first
       else
         nil

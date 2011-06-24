@@ -48,13 +48,13 @@
     </nav>
   </header>
   
-  <%- if flash[:notice] -%>
-    <div class="ui-corner-all ui-state-highlight" id="notice"><span class="ui-icon ui-icon-info"></span> <%= flash[:notice] %></div>
-  <%- else -%>
-    <div class="ui-corner-all ui-state-highlight" id="notice" style="display: none;"><span class="ui-icon ui-icon-info"></span></div>
-  <%- end -%>
-  
   <div id="page">
+    <%- if flash[:notice] -%>
+      <div class="ui-corner-all ui-state-highlight" id="notice"><span class="ui-icon ui-icon-info"></span> <%= flash[:notice] %></div>
+    <%- else -%>
+      <div class="ui-corner-all ui-state-highlight" id="notice" style="display: none;"><span class="ui-icon ui-icon-info"></span></div>
+    <%- end -%>
+
     <%= yield :layout %>
   </div>
   

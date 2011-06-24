@@ -111,6 +111,11 @@ module Danbooru
     def tag_subscription_post_limit
       200
     end
+    
+    # After this many pages, the paginator will switch to sequential mode.
+    def max_numbered_pages
+      2
+    end
 
     # Max number of tag subscriptions per user
     def max_tag_subscriptions
