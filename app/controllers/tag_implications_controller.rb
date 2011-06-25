@@ -9,7 +9,7 @@ class TagImplicationsController < ApplicationController
   
   def index
     @search = TagImplication.search(params[:search])
-    @tag_implications = @search.paginate(:page => params[:page])
+    @tag_implications = @search.paginate(params[:page])
     respond_with(@tag_implicationes)
   end
   

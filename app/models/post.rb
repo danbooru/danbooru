@@ -40,6 +40,8 @@ class Post < ActiveRecord::Base
   scope :available_for_moderation, lambda {where(["id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :hidden_from_moderation, lambda {where(["id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :tag_match, lambda {|query| Post.tag_match_helper(query)}
+  scope :positive, where("score > 1")
+  scope :negative, where("score < -1")
   search_methods :tag_match
   scope :after_id, Proc.new {|num|
     if num.present?

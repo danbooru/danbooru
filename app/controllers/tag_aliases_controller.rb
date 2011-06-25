@@ -9,7 +9,7 @@ class TagAliasesController < ApplicationController
   
   def index
     @search = TagAlias.search(params[:search])
-    @tag_aliases = @search.paginate(:page => params[:page])
+    @tag_aliases = @search.paginate(params[:page])
     respond_with(@tag_aliases)
   end
   

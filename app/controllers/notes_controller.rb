@@ -52,7 +52,7 @@ private
   end
 
   def index_by_post
-    @posts = Post.tag_match(params[:tags]).noted_before(params[:before_date] || Time.now).limit(8)
+    @posts = Post.tag_match(params[:tags]).noted_before(params[:before_date] || Time.now).paginate(params[:page])
     respond_with(@posts) do |format|
       format.html {render :action => "index_by_post"}
     end
@@ -60,7 +60,7 @@ private
 
   def index_by_note
     @search = Note.search(params[:search])
-    @notes = @search.paginate(:page => params[:page])
+    @notes = @search.paginate(params[:page])
     respond_with(@notes) do |format|
       format.html {render :action => "index_by_note"}
     end

@@ -16,7 +16,7 @@ class UsersController < ApplicationController
   
   def index
     @search = User.search(params[:search])
-    @users = @search.paginate(:page => params[:page])
+    @users = @search.paginate(params[:page])
     respond_with(@users)
   end
   

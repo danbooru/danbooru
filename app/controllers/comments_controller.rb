@@ -39,7 +39,7 @@ class CommentsController < ApplicationController
   
 private
   def index_by_post
-    @posts = Post.tag_match(params[:tags]).commented_before(params[:before_date] || Time.now).limit(8)
+    @posts = Post.commented_before(Time.now).tag_match(params[:tags]).paginate(params[:page])
     respond_with(@posts) do |format|
       format.html {render :action => "index_by_post"}
     end
@@ -47,7 +47,7 @@ private
   
   def index_by_comment
     @search = Comment.search(params[:search])
-    @comments = @search.paginate(:page => params[:page])
+    @comments = @search.paginate(params[:page])
     respond_with(@comments) do |format|
       format.html {render :action => "index_by_comment"}
     end

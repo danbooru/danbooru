@@ -35,12 +35,11 @@ module ApplicationHelper
   
 protected
   def nav_link_match(controller, url)
+    puts "controller=#{controller} url=#{url}"
+    
     url =~ case controller
-    when "tag_aliases", "tag_implications"
-      /^\/tags/
-      
-    when "sessions", "user_maintenance"
-      /^\/users/
+    when "sessions", "users"
+      /^\/(session|users)/
       
     when "forum_posts"
       /^\/forum_topics/

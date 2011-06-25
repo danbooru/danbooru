@@ -36,7 +36,9 @@
 </div>
 
 <div id="paginator">
-  <%= will_paginate(@implications) %>
+  <%= numbered_paginator(@tag_implications) do |page| %>
+    <%= link_to(page, tag_impliactions_path(:page => page)) %>
+  <% end %>
 </div>
 
 <%= render "secondary_links" %>

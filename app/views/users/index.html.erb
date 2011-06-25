@@ -1,0 +1,64 @@
+<div id="c-users">
+  <div id="a-index">
+    <h1>Users</h1>
+    
+    <% simple_form_for(@search) do |f| %>
+      <%= f.input :name_contains, :label => "Name" %>
+      <%= f.input :is_banned_is_true, :label => "Banned" %>
+      <%= f.input :is_privileged_is_true, :label => "Privileged" %>
+      <%= f.input :is_contributor_is_true, :label => "Contributor" %>
+      <%= f.input :is_janitor_is_true, :label => "Janitor" %>
+      <%= f.input :is_moderator_is_true, :label => "Moderator" %>
+      <%= f.input :is_admin_is_true, :label => "Admin" %>
+      <%= f.sort_link "Name", :name %>
+      <%= f.sort_link "Date", :created_at_desc %>
+      <%= f.button :submit %>
+    <% end %>
+
+    <table width="100%" class="highlightable"> 
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Posts</th>
+          <th>Deleted</th>
+          <th>% Pos</th>
+          <th>% Neg</th>
+          <th>Notes</th>
+          <th>Level</th>
+          <th>Joined</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr>
+            <td>
+              <%= link_to user.pretty_name, user_path(user.id) %>
+              <% if user.inviter %>
+                &larr; <%= link_to user.inviter.name, user_path(user.inviter_id) %>
+              <% end %>
+            </td>
+            <td><%= link_to user.posts.count, posts_path(:tags => "uploader:#{user.name}") %></td>
+            <td><%= user.posts.deleted.count %></td>
+            <% if user.posts.count > 100 %>
+              <td><%= number_to_percentage(100 * user.posts.positive.count.to_f / user.posts.count, :precision => 0) %></td>
+              <td><%= number_to_percentage(100 * user.posts.negative.count.to_f / user.posts.count, :precision => 0) %></td>
+            <% else %>
+              <td></td>
+              <td></td>
+            <% end %>
+            <td><%= link_to user.note_versions.count, note_versions_path(:search => {:updater_id_eq => user.id}) %></td>
+            <td><%= user.pretty_level %></td>
+            <td><span title="<%= user.created_at %>"><%= time_ago_in_words user.created_at %> ago</span></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <div id="paginator">
+      <%= will_paginate(@users) %>
+    </div>
+
+    <%= render :partial => "footer" %>
+  </div>
+</div>
+

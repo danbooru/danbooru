@@ -18,8 +18,10 @@
   </tbody>
 </table>
 
-<div id="paginator">
-  <%= will_paginate(@tags) %>
+<div class="paginator">
+  <%= numbered_paginator(@tags) do |page| %>
+    <%= link_to(page, tags_path(:page => page)) %>
+  <% end %>
 </div>
 
 <%= render "secondary_links" %>

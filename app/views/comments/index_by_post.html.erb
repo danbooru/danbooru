@@ -1,5 +1,9 @@
 <div id="c-comments">
   <div id="a-index">
+    <% if @posts.empty? %>
+      <%= render "post_sets/blank" %>
+    <% end %>
+    
     <% @posts.each do |post| %>
       <div class="post">
         <div class="preview">
@@ -10,7 +14,7 @@
       </div>
     <% end %>
     
-    <div id="paginator">
+    <div class="paginator">
       <%= sequential_paginator(@posts) %>
     </div>
   </div>
