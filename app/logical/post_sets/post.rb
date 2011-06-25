@@ -13,11 +13,7 @@ module PostSets
     end
     
     def has_wiki?
-      if tag_array.any?
-        ::WikiPage.titled(tag_string).exists?
-      else
-        false
-      end
+      tag_array.any? && ::WikiPage.titled(tag_string).exists?
     end
     
     def wiki_page
@@ -28,8 +24,20 @@ module PostSets
       end
     end
     
+    def has_artist?
+      tag_array.any? && ::Artist.name_equals(tag_string).exists?
+    end
+    
+    def artist
+      ::Artist.name_equals(tag_string).first
+    end
+    
     def is_single_tag?
       tag_array.size == 1
+    end
+    
+    def presenter
+      @presenter ||= ::PostSetPresenters::Post.new(self)
     end
   end
 end

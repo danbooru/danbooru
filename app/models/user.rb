@@ -4,6 +4,15 @@ class User < ActiveRecord::Base
   class Error < Exception ; end
   class PrivilegeError < Exception ; end
   
+  module Levels
+    MEMBER = 0
+    PRIVILEGED = 100
+    CONTRIBUTOR = 200
+    JANITOR = 300
+    MODERATOR = 400
+    ADMIN = 500
+  end
+  
   attr_accessor :password, :old_password
   attr_accessible :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr
   validates_length_of :name, :within => 2..20, :on => :create
@@ -18,7 +27,6 @@ class User < ActiveRecord::Base
   before_save :encrypt_password
   after_save :update_cache
   before_create :promote_to_admin_if_first_user
-  before_create :normalize_level
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
   has_one :ban
   has_many :subscriptions, :class_name => "TagSubscription"
@@ -140,39 +148,62 @@ class User < ActiveRecord::Base
       return if Rails.env.test?
       
       if User.count == 0
-        self.is_admin = true
+        self.level = Levels::ADMIN
       end
     end
     
     def level_string
-      if is_admin?
-        "Admin"
-      elsif is_moderator?
+      case level
+      when Levels::MEMBER
+        "Member"
+        
+      when Levels::PRIVILEGED
+        "Privileged"
+        
+      when Levels::CONTRIBUTOR
+        "Contributor"
+        
+      when Levels::JANITOR
+        "Janitor"
+        
+      when Levels::MODERATOR
         "Moderator"
-    end
-    
-    def normalize_level
-      if is_admin?
-        self.is_moderator = true
-        self.is_janitor = true
-        self.is_contributor = true
-        self.is_privileged = true
-      elsif is_moderator?
-        self.is_janitor = true
-        self.is_privileged = true
-      elsif is_janitor?
-        self.is_privileged = true
-      elsif is_contributor?
-        self.is_privileged = true
+        
+      when Levels::ADMIN
+        "Admin"
       end
     end
-    
+
     def is_anonymous?
       false
     end
 
     def is_member?
       true
+    end
+    
+    def is_privileged?
+      level >= Levels::PRIVILEGED
+    end
+    
+    def is_contributor?
+      level >= Levels::CONTRIBUTOR
+    end
+    
+    def is_janitor?
+      level >= Levels::JANITOR
+    end
+    
+    def is_moderator?
+      level >= Levels::MODERATOR
+    end
+    
+    def is_mod?
+      level >= Levels::MODERATOR
+    end
+    
+    def is_admin?
+      level >= Levels::ADMIN
     end
   end
   

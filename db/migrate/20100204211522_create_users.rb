@@ -9,11 +9,7 @@ class CreateUsers < ActiveRecord::Migration
       t.column :email_verification_key, :string
       t.column :inviter_id, :integer
       t.column :is_banned, :boolean, :null => false, :default => false
-      t.column :is_privileged, :boolean, :null => false, :default => false
-      t.column :is_contributor, :boolean, :null => false, :default => false
-      t.column :is_janitor, :boolean, :null => false, :default => false
-      t.column :is_moderator, :boolean, :null => false, :default => false
-      t.column :is_admin, :boolean, :null => false, :default => false
+      t.column :level, :integer, :null => false, :default => 0
       t.column :base_upload_limit, :integer, :null => false, :default => 10
       
       # Cached data

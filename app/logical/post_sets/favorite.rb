@@ -1,20 +1,10 @@
 module PostSets
   class Favorite < Base
-    attr_reader :user, :page, :favorites, :posts
+    attr_reader :user, :page, :favorites
     
     def initialize(user_id, page)
       @user = ::User.find(user_id)
-      @page = [page.to_i, 1].max
-      @favorites = ::Favorite.model_for(user.id).for_user(user.id).page(page)
-      @posts = ::Post.where("id in (?)", post_ids).order(arbitrary_sql_order_clause(post_ids, "posts")).page("b0")
-    end
-    
-    def post_ids
-      @post_ids ||= favorites.map(&:post_id)
-    end
-    
-    def offset
-      (page - 1) * records_per_page
+      @favorites = ::Favorite.model_for(user.id).for_user(user.id).paginate(page)
     end
     
     def tag_array
@@ -23,6 +13,14 @@ module PostSets
     
     def tag_string
       tag_array.join(" ")
+    end
+    
+    def posts
+      favorites.map(&:post)
+    end
+    
+    def presenter
+      @presenter ||= ::PostSetPresenters::Favorite.new(self)
     end
   end
 end

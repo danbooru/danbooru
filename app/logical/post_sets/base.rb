@@ -1,7 +1,7 @@
 module PostSets
   class Base
     def has_wiki?
-      is_single_tag?
+      false
     end
     
     def wiki_page
@@ -9,18 +9,18 @@ module PostSets
     end
     
     def has_artist?
-      is_single_tag?
+      false
     end
     
     def artist
     end
     
-    def presenter
-      @presenter ||= PostSetPresenter.new(self)
-    end
-    
     def is_single_tag?
       false
+    end
+    
+    def presenter
+      raise NotImplementedError
     end
     
     def arbitrary_sql_order_clause(ids, table_name)

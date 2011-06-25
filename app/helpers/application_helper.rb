@@ -44,6 +44,9 @@ protected
     when "forum_posts"
       /^\/forum_topics/
       
+    when "uploads"
+      /^\/post/
+      
     else
       /^\/#{controller}/
     end
