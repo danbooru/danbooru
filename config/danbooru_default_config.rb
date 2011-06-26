@@ -87,11 +87,6 @@ module Danbooru
       2
     end
 
-    # Determine who can see a post.    
-    def can_see_post?(post, user)
-      true
-    end
-    
     # Determines who can see ads.
     def can_see_ads?(user)
       false

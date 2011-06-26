@@ -8,10 +8,10 @@ class FavoritesController < ApplicationController
   end
   
   def create
-    Post.find(params[:id]).add_favorite(CurrentUser.user)
+    Post.find(params[:post_id]).add_favorite!(CurrentUser.user)
   end
   
   def destroy
-    Post.find(params[:id]).remove_favorite(CurrentUser.user)
+    Post.find(params[:post_id]).remove_favorite!(CurrentUser.user)
   end
 end

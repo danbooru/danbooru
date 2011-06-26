@@ -24,11 +24,7 @@ class ArtistsController < ApplicationController
   
   def show
     @artist = Artist.find(params[:id])
-    
-    if @artist
-      @posts = Danbooru.config.select_posts_visible_to_user(CurrentUser.user, Post.tag_match(@artist.name).limit(6))
-    end
-
+    @post_set = PostSets::Artist.new(@artist)
     respond_with(@artist)
   end
   

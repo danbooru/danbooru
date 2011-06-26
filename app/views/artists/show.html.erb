@@ -1,14 +1,14 @@
 <div id="c-artists">
   <div id="a-show">
-    <h3>Artist: <%= @artist.name.tr("_", " ") %></h3>
+    <h1>Artist: <%= @artist.name.tr("_", " ") %></h1>
 
     <% unless @artist.notes.blank? %>
-      <div style="margin-bottom: 1em;">
+      <div class="prose">
         <%= format_text(@artist.notes) %>
       </div>
     <% end %>
 
-    <div style="margin-bottom: 1em;">
+    <div>
       <table width="100%">
         <tbody>
           <tr>
@@ -70,12 +70,10 @@
       </table>
     </div>
 
-    <p class="legend"><span class="new-artist">*</span> Indicates new artist</p>
-
-    <div style="margin-bottom: 1em;">
-      <h4>Recent Posts</h4>
+    <div>
+      <h1>Recent Posts</h1>
       <div style="margin: 1em 0;">
-        <%#= @post_set.presenter.post_previews_html %>
+        <%= @post_set.presenter.post_previews_html(self) %>
       </div>
     </div>
 

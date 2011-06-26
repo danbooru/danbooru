@@ -35,8 +35,6 @@ module ApplicationHelper
   
 protected
   def nav_link_match(controller, url)
-    puts "controller=#{controller} url=#{url}"
-    
     url =~ case controller
     when "sessions", "users"
       /^\/(session|users)/

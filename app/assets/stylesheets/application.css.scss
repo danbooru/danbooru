@@ -194,7 +194,7 @@ menu {
   
   li {
     margin: 0;
-    padding: 0;
+    padding: 0 1em 0 0;
     list-style-type: none;
     display: inline;    
   }
@@ -251,6 +251,10 @@ span.ui-icon {
   float: left;
   margin-top: 0.2em;
   margin-right: 0.25em;
+}
+
+strong {
+  font-weight: bold;
 }
 
 table tfoot {
