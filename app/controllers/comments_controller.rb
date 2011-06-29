@@ -21,10 +21,7 @@ class CommentsController < ApplicationController
   end
   
   def create
-    @comment = Comment.new(params[:comment])
-    @comment.post_id = params[:comment][:post_id]
-    @comment.score = 0
-    @comment.save
+    @comment = Comment.create(params[:comment])
     respond_with(@comment) do |format|
       format.html do
         redirect_to post_path(@comment.post), :notice => "Comment posted"

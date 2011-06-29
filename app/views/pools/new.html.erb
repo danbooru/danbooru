@@ -1,6 +1,12 @@
 <div id="c-pools">
   <div id="c-new">
-    <h1>New Pool</h1>
-    <%= render :partial => "form", :locals => {:pool => @pool} %>    
+    <%= simple_form_for(@pool) do |f| %>
+      <h1>New Pool</h1>
+      <%= f.input :name %>
+      <%= f.input :description %>
+      <%= f.button :submit %>
+    <% end %>
   </div>
 </div>
+
+<%= render "secondary_links" %>

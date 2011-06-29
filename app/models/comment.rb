@@ -6,7 +6,7 @@ class Comment < ActiveRecord::Base
   has_many :votes, :class_name => "CommentVote", :dependent => :destroy
   before_validation :initialize_creator, :on => :create
   after_save :update_last_commented_at
-  attr_accessible :body
+  attr_accessible :body, :post_id
   attr_accessor :do_not_bump_post
   
   scope :recent, :order => "comments.id desc", :limit => 6
