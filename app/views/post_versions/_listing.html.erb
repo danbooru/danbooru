@@ -1,0 +1,44 @@
+<div class="listing">
+  <table>
+    <thead>
+      <tr>
+        <th width="5%">Post</th>
+        <th width="15%">Date</th>
+        <th width="10%">User</th>
+        <th width="5%">Rating</th>
+        <th width="5%">Parent</th>
+        <th width="10%">IP Address</th>
+        <th width="50%">Tags</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% post_versions.each do |post_version| %>
+        <tr id="post-version-<%= post_version.id %>">
+          <td><%= link_to(post_version.post_id, post_path(post_version.post_id)) %></td>
+          <td><%= post_version.updated_at.strftime("%Y-%m-%d %H:%M") %></td>
+          <td><%= link_to(post_version.updater.name, user_path(post_version.updater_id)) %></td>
+          <td><%= post_version.rating %></td>
+          <td><%= post_version.parent_id %></td>
+          <td>
+            <% if CurrentUser.is_admin? %>
+              <%= post_version.updater_ip_addr %>
+            <% end %>
+          </td>
+          <td>
+            <% post_version.add_tag_array.each do |tag| %>
+              <ins><%= tag %></ins>
+            <% end %>
+            
+            <% post_version.del_tag_array.each do |tag| %>
+              <del><%= tag %></del>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="paginator">
+  <%= sequential_paginator(post_versions) %>
+</div>

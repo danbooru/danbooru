@@ -1,6 +1,6 @@
 class PoolVersionsController < ApplicationController
   def index
     @search = PoolVersion.search(params[:search])
-    @pool_versions = @search.paginate(:page => params[:page])
+    @pool_versions = @search.paginate(params[:page])
   end
 end

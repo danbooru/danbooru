@@ -44,7 +44,16 @@ protected
       
     when "uploads"
       /^\/post/
+    
+    when "post_versions"
+      /^\/post/
+    
+    when "pool_versions"
+      /^\/pool/
       
+    when "note_versions"
+      /^\/note/
+
     else
       /^\/#{controller}/
     end
