@@ -1,0 +1,11 @@
+<div id="c-notes">
+  <div id="a-search">
+    <%= simple_form_for @search do |f| %>
+      <%= f.input :body_matches, :label => "Body" %>
+      <%= f.input :post_tag_match, :label => "Tags" %>
+      <%= f.button :submit, "Search" %>
+    <% end %>
+  </div>
+</div>
+
+<%= render "secondary_links" %>

@@ -1,0 +1,11 @@
+<div id="c-notes">
+  <div id="a-index">
+    <%= @post_set.presenter.post_previews_html(self) %>
+    
+    <div class="paginator">
+      <%= numbered_paginator(@posts, false) %>
+    </div>
+  </div>
+</div>
+
+<%= render "secondary_links" %>

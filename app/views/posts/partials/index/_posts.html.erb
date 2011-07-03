@@ -5,7 +5,5 @@
 <div class="clearfix"></div>
 
 <div class="paginator">
-  <%= numbered_paginator(post_set.posts) do |page| %>
-    <%= link_to(page, posts_path(:page => page, :tags => post_set.tag_string)) %>
-  <% end %>
+  <%= numbered_paginator(post_set.posts) %>
 </div>

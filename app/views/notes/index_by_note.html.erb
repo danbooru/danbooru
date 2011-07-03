@@ -1,6 +1,6 @@
 <div id="c-notes">
   <div id="a-index">
-    <table width="100%">
+    <table width="100%" class="striped">
       <thead>
         <tr>
           <th>Post</th>
@@ -22,6 +22,10 @@
         <% end %>
       </tbody>
     </table>
+    
+    <div class="paginator">
+      <%= sequential_paginator(@notes) %>
+    </div>
   </div>
 </div>
 

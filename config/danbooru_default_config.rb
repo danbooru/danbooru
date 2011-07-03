@@ -111,7 +111,7 @@ module Danbooru
     def max_numbered_pages
       2
     end
-
+    
     # Max number of tag subscriptions per user
     def max_tag_subscriptions
       5

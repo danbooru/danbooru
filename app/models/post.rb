@@ -35,7 +35,7 @@ class Post < ActiveRecord::Base
   scope :deleted, where(["is_deleted = ?", true])
   scope :visible, lambda {|user| Danbooru.config.can_user_see_post_conditions(user)}
   scope :commented_before, lambda {|date| where("last_commented_at < ?", date).order("last_commented_at DESC")}
-  scope :noted_before, lambda {|date| where("last_noted_at < ?", date).order("last_noted_at DESC")}
+  scope :has_notes, where("last_noted_at is not null")
   scope :for_user, lambda {|user_id| where(["uploader_string = ?", "uploader:#{user_id}"])}
   scope :available_for_moderation, lambda {where(["id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :hidden_from_moderation, lambda {where(["id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
@@ -861,6 +861,12 @@ class Post < ActiveRecord::Base
     end
   end
   
+  module NoteMethods
+    def last_noted_at_as_integer
+      last_noted_at.to_i
+    end
+  end
+  
   include FileMethods
   include ImageMethods
   include ApprovalMethods
@@ -876,6 +882,7 @@ class Post < ActiveRecord::Base
   include ParentMethods
   include DeletionMethods
   include VersionMethods
+  include NoteMethods
   
   def reload(options = nil)
     super

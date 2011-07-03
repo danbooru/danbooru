@@ -194,7 +194,7 @@ menu {
   
   li {
     margin: 0;
-    padding: 0 1em 0 0;
+    padding: 0 0.25em;
     list-style-type: none;
     display: inline;    
   }
@@ -262,6 +262,10 @@ table tfoot {
 }
 
 table.striped {
+  p {
+    margin: 0;
+  }
+  
   tbody {
     tr:hover {
       background-color: #FFE;

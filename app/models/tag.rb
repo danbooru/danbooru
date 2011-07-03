@@ -293,6 +293,7 @@ class Tag < ActiveRecord::Base
 
           when "status"
             q[:status] = $2
+            
           end
           
         else

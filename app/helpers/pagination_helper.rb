@@ -18,8 +18,8 @@ module PaginationHelper
     params[:page] =~ /[ab]/ || records.current_page > Danbooru.config.max_numbered_pages
   end
   
-  def numbered_paginator(records, &block)
-    if use_sequential_paginator?(records)
+  def numbered_paginator(records, switch_to_sequential = true)
+    if use_sequential_paginator?(records) && switch_to_sequential
       return sequential_paginator(records)
     end
     
@@ -27,49 +27,49 @@ module PaginationHelper
     window = 3
     if records.total_pages <= (window * 2) + 5
       1.upto(records.total_pages) do |page|
-        html << numbered_paginator_item(page, records.current_page, &block)
+        html << numbered_paginator_item(page, records.current_page)
       end
     elsif records.current_page <= window + 2
       1.upto(records.current_page + window) do |page|
-        html << numbered_paginator_item(page, records.current_page, &block)
+        html << numbered_paginator_item(page, records.current_page)
       end
-      html << numbered_paginator_item("...", records.current_page, &block)
-      html << numbered_paginator_final_item(records.total_pages, records.current_page, &block)
+      html << numbered_paginator_item("...", records.current_page)
+      html << numbered_paginator_final_item(records.total_pages, records.current_page)
     elsif records.current_page >= records.total_pages - (window + 1)
-      html << numbered_paginator_item(1, records.current_page, &block)
-      html << numbered_paginator_item("...", records.current_page, &block)
+      html << numbered_paginator_item(1, records.current_page)
+      html << numbered_paginator_item("...", records.current_page)
       (records.current_page - window).upto(records.total_pages) do |page|
-        html << numbered_paginator_item(page, records.current_page, &block)
+        html << numbered_paginator_item(page, records.current_page)
       end
     else
-      html << numbered_paginator_item(1, records.current_page, &block)
-      html << numbered_paginator_item("...", records.current_page, &block)
+      html << numbered_paginator_item(1, records.current_page)
+      html << numbered_paginator_item("...", records.current_page)
       (records.current_page - window).upto(records.current_page + window) do |page|
-        html << numbered_paginator_item(page, records.current_page, &block)
+        html << numbered_paginator_item(page, records.current_page)
       end
-      html << numbered_paginator_item("...", records.current_page, &block)
-      html << numbered_paginator_final_item(records.total_pages, records.current_page, &block)
+      html << numbered_paginator_item("...", records.current_page)
+      html << numbered_paginator_final_item(records.total_pages, records.current_page)
     end
     html << "</menu>"
     html.html_safe
   end
   
-  def numbered_paginator_final_item(total_pages, current_page, &block)
+  def numbered_paginator_final_item(total_pages, current_page)
     if total_pages <= Danbooru.config.max_numbered_pages
-      numbered_paginator_item(total_pages, current_page, &block)
+      numbered_paginator_item(total_pages, current_page)
     else
       ""
     end
   end
   
-  def numbered_paginator_item(page, current_page, &block)
+  def numbered_paginator_item(page, current_page)
     html = "<li>"
     if page == "..."
       html << "..."
     elsif page == current_page
       html << '<span>' + page.to_s + '</span>'
     else
-      html << capture(page, &block)
+      html << link_to(page, params.merge(:page => page))
     end
     html << "</li>"
     html.html_safe
