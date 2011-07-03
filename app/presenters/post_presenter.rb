@@ -23,7 +23,7 @@ class PostPresenter < Presenter
 
   def image_html(template)
     return template.content_tag("p", "This image was deleted.") if @post.is_deleted? && !CurrentUser.user.is_janitor?
-    return template.content_tag("p", "You need a privileged account to see this image.") if !Danbooru.config.can_see_post?(@post, CurrentUser.user)
+    return template.content_tag("p", "You need a privileged account to see this image.") if !Danbooru.config.can_user_see_post?(CurrentUser.user, @post)
     
     if @post.is_flash?
       template.render(:partial => "posts/partials/show/flash", :locals => {:post => @post})

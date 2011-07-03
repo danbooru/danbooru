@@ -1,11 +1,18 @@
 module PostSets
   class Pool < Base
+    module ActiveRecordExtension
+      attr_accessor :total_pages, :current_page
+    end
+    
     attr_reader :pool, :page, :posts
     
-    def initailize(pool, page)
+    def initialize(pool, page)
       @pool = pool
       @page = page
       @posts = pool.posts(:offset => offset, :limit => limit)
+      @posts.extend(ActiveRecordExtension)
+      @posts.total_pages = total_pages
+      @posts.current_page = current_page
     end
     
     def offset
@@ -26,6 +33,14 @@ module PostSets
     
     def presenter
       @presenter ||= PostSetPresenters::Pool.new(self)
+    end
+    
+    def total_pages
+      (pool.post_count.to_f / limit).ceil
+    end
+    
+    def current_page
+      (offset.to_f / pool.post_count).floor
     end
   end
 end

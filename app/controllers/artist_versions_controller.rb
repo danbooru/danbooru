@@ -3,7 +3,7 @@ class ArtistVersionsController < ApplicationController
 
   def index
     @search = ArtistVersion.search(params[:search])
-    @artist_versions = @search.paginate :page => params[:page]
+    @artist_versions = @search.paginate(params[:page])
     respond_with(@artist_versions)
   end
 end

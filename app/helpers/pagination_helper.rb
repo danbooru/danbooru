@@ -63,6 +63,8 @@ module PaginationHelper
   end
   
   def numbered_paginator_item(page, current_page)
+    return "" if page.to_i > Danbooru.config.max_numbered_pages
+    
     html = "<li>"
     if page == "..."
       html << "..."

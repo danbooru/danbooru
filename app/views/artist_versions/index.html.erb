@@ -1,36 +1,40 @@
-<h4>Artist History</h4>
+<div id="c-artist-versions">
+  <div id="a-index">
+    <h1>Artist History</h1>
 
-<div>
-  <table width="100%" class="highlightable">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Other Names</th>
-        <th>Group</th>
-        <th>Updated</th>
-        <th>Updated by</th>
-        <th>Active</th>
-        <th>URLs</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @artist_versions.each do |artist_version| %>
-        <tr class="<%= cycle 'even', 'odd' %>">
-          <td><%= link_to h(artist_version.name), artist_versions_path(:artist_id => artist_version.artist_id) %></td>
-          <td><%= h artist_version.other_names %></td>
-          <td><%= h artist_version.group_name %></td>
-          <td><%= time_ago_in_words artist_version.created_at %> ago</td>
-          <td><%= link_to artist_version.updater_name, user_path(artist_version.updater_id) %></td>
-          <td><%= artist_version.is_active? %></td>
-          <td><%= artist_version.url_string %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+    <div>
+      <table width="100%" class="highlightable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Other Names</th>
+            <th>Group</th>
+            <th>Updated</th>
+            <th>Updated by</th>
+            <th>Active</th>
+            <th>URLs</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @artist_versions.each do |artist_version| %>
+            <tr class="<%= cycle 'even', 'odd' %>">
+              <td><%= link_to h(artist_version.name), artist_versions_path(:artist_id => artist_version.artist_id) %></td>
+              <td><%= h artist_version.other_names %></td>
+              <td><%= h artist_version.group_name %></td>
+              <td><%= time_ago_in_words artist_version.created_at %> ago</td>
+              <td><%= link_to artist_version.updater_name, user_path(artist_version.updater_id) %></td>
+              <td><%= artist_version.is_active? %></td>
+              <td><%= artist_version.url_string %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
 
-<div id="paginator">
-  <%= sequential_paginator(@artist_versions) %>
+    <div class="paginator">
+      <%= sequential_paginator(@artist_versions) %>
+    </div>
+  </div>
 </div>
 
 <%= render "artists/secondary_links" %>

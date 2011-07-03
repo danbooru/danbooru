@@ -3,22 +3,30 @@
     <table class="striped" width="100%">
       <thead>
         <tr>
-          <th width="5%"></th>
-          <th width="95%">Name</th>
+          <th width="45%">Primary Name</th>
+          <th width="45%">Secondary Names</th>
+          <th width="10%">Status</th>
         </tr>
       </thead>
       <tbody>
         <% @artists.each do |artist| %>
           <%= content_tag(:tr, :id => "artist-#{artist.id}") do %>
             <td>
-              <%= link_to "P", posts_path(:tags => artist.name), :title => "Find posts for artist" %>
-              <%= link_to "E", edit_artist_path(artist), :title => "Edit artist" %> 
-              <%= link_to "D", artist_path(artist, :method => :delete, :confirm => "Do you really want to delete this artist?") %>
-            </td>
-            <td>
               <%= link_to h(artist.name), artist_path(artist) %>
               <% if !artist.group_name.blank? %>
                 (group:<%= link_to(artist.group_name, artist_path(artist)) %>)
+              <% end %>
+            </td>
+            <td><%= artist.other_names %></td>
+            <td>
+              <% if artist.is_active? %>
+                Active
+              <% else %>
+                Deleted
+              <% end %>
+              
+              <% if artist.is_banned? %>
+                Banned
               <% end %>
             </td>
           <% end %>
@@ -26,10 +34,8 @@
       </tbody>
     </table>
 
-    <div id="paginator">
-      <%= numbered_paginator(@artists) do |page| %>
-        <%= link_to(page, artists_path(:page => page, :search => params[:search])) %>
-      <% end %>
+    <div class="paginator">
+      <%= numbered_paginator(@artists) %>
     </div>    
 
     <%= render "secondary_links" %>

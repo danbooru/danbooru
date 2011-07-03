@@ -12,9 +12,7 @@
       <div class="clearfix"></div>
     
       <div class="paginator">
-        <%= numbered_paginator(@post_set) do |page| %>
-          <%= link_to(page, pool_path(@pool, :page => page)) %>
-        <% end %>
+        <%= numbered_paginator(@post_set) %>
       </div>
     </section>
   </div>

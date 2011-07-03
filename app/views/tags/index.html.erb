@@ -19,9 +19,7 @@
 </table>
 
 <div class="paginator">
-  <%= numbered_paginator(@tags) do |page| %>
-    <%= link_to(page, tags_path(:page => page)) %>
-  <% end %>
+  <%= numbered_paginator(@tags) %>
 </div>
 
 <%= render "secondary_links" %>
