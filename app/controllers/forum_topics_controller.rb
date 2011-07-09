@@ -18,13 +18,13 @@ class ForumTopicsController < ApplicationController
   
   def index
     @search = ForumTopic.search(params[:search])
-    @forum_topics = @search.paginate(:page => params[:page], :order => "is_sticky DESC, updated_at DESC")
+    @forum_topics = @search.paginate(params[:page]).order("is_sticky DESC, updated_at DESC")
     respond_with(@forum_topics)
   end
   
   def show
     @forum_topic = ForumTopic.find(params[:id])
-    @forum_posts = ForumPost.search(:topic_id_eq => @forum_topic.id).paginate(:page => params[:page])
+    @forum_posts = ForumPost.search(:topic_id_eq => @forum_topic.id).paginate(params[:page])
     respond_with(@forum_topic)
   end
   

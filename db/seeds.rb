@@ -66,7 +66,7 @@ end
 if TagAlias.count == 0
   puts "Creating tag aliases"
   
-  11.upto(99) do |i|
+  100.upto(199) do |i|
     TagAlias.create(:antecedent_name => i.to_s, :consequent_name => (i * 100).to_s)
   end
 else
@@ -76,9 +76,20 @@ end
 if TagImplication.count == 0
   puts "Creating tag implictions"
 
-  10_000.upto(10_100) do |i|
+  100_000.upto(100_100) do |i|
     TagImplication.create(:antecedent_name => i.to_s, :consequent_name => (i * 100).to_s)
   end
 else
   puts "Skipping tag implications"
+end
+
+if Pool.count == 0
+  puts "Creating pools"
+  
+  1.upto(20) do |i|
+    pool = Pool.create(:name => i.to_s)
+    33.times do |j|
+      pool.add!(Post.order("random()").first)
+    end
+  end
 end

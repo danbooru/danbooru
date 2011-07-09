@@ -53,6 +53,9 @@ protected
       
     when "note_versions"
       /^\/note/
+      
+    when "artist_versions"
+      /^\/artist/
 
     else
       /^\/#{controller}/

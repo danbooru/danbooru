@@ -61,6 +61,7 @@ class Note < ActiveRecord::Base
     versions.create(
       :updater_id => updater_id,
       :updater_ip_addr => updater_ip_addr,
+      :post_id => post_id,
       :x => x,
       :y => y,
       :width => width,
@@ -73,6 +74,7 @@ class Note < ActiveRecord::Base
   def revert_to(version)
     self.x = version.x
     self.y = version.y
+    self.post_id = version.post_id
     self.body = version.body
     self.width = version.width
     self.height = version.height

@@ -16,7 +16,7 @@ module PostSets
     end
     
     def offset
-      ([page.to_i, 1].max - 1) * limit
+      (current_page - 1) * limit
     end
     
     def limit
@@ -40,7 +40,7 @@ module PostSets
     end
     
     def current_page
-      (offset.to_f / pool.post_count).floor
+      [page.to_i, 1].max
     end
   end
 end

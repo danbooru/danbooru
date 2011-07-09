@@ -4,7 +4,7 @@ class NoteVersionsController < ApplicationController
   
   def index
     @search = NoteVersion.search(params[:search])
-    @note_versions = @search.paginate(:page => params[:page])
+    @note_versions = @search.paginate(params[:page])
     respond_with(@note_versions)
   end
 end

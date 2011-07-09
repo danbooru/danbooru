@@ -1,38 +1,44 @@
-<table width="100%">
-  <thead>
-    <tr>
-      <th></th>
-      <th width="5%">Post</th>
-      <th width="5%">Note</th>
-      <th width="50%">Body</th>
-      <th width="10%">IP Address</th>
-      <th width="10%">Edited By</th>
-      <th width="10%">Date</th>
-      <th width="10%">Options</th>
-    </tr>    
-  </thead>
-  <tbody>
-    <% @note_versions.each do |note_version| %>
-      <tr>
-        <td></td>
-        <td><%= link_to note.post_id, post_path(note_version.post_id) %></td>
-        <td><%= link_to "#{note_version.note_id}", note_versions_path(:search => {:note_id_eq => note_version.note_id}) %></td>
-        <td><%= h(note_version.body) %> <% unless note_version.is_active? %>(deleted)<% end %></td>
-        <td>
-          <% if CurrentUser.is_janitor? %>
-            <%= note_version.ip_addr %>
-          <% end %>
-        </td>
-        <td><%= link_to note_version.updater.name, user_path(note_version.updater) %></td>
-        <td><%= note_version.updated_at.strftime("%Y-%m-%d %H:%M") %></td>
-        <td><%= link_to "Revert", revert_note_path(note_version.note_id, :version => note_version.id), :remote => true, :confirm => "Do you really want to revert to this version?" %></td>
-      </tr>
-    <% end %>    
-  </tbody>
-</table>
+<div id="c-note-versions">
+  <div id="a-index">
+    <table width="100%">
+      <thead>
+        <tr>
+          <th></th>
+          <th width="5%">Post</th>
+          <th width="5%">Note</th>
+          <th width="50%">Body</th>
+          <th width="10%">IP Address</th>
+          <th width="10%">Edited By</th>
+          <th width="10%">Date</th>
+          <th width="10%">Options</th>
+        </tr>    
+      </thead>
+      <tbody>
+        <% @note_versions.each do |note_version| %>
+          <tr>
+            <td></td>
+            <td><%= link_to note_version.post_id, post_path(note_version.post_id) %></td>
+            <td><%= link_to "#{note_version.note_id}", note_versions_path(:search => {:note_id_eq => note_version.note_id}) %></td>
+            <td><%= h(note_version.body) %> <% unless note_version.is_active? %>(deleted)<% end %></td>
+            <td>
+              <% if CurrentUser.is_janitor? %>
+                <%= note_version.updater_ip_addr %>
+              <% end %>
+            </td>
+            <td><%= link_to note_version.updater.name, user_path(note_version.updater) %></td>
+            <td><%= note_version.updated_at.strftime("%Y-%m-%d %H:%M") %></td>
+            <td><%= link_to "Revert", revert_note_path(note_version.note_id, :version => note_version.id), :remote => true, :confirm => "Do you really want to revert to this version?" %></td>
+          </tr>
+        <% end %>    
+      </tbody>
+    </table>
 
-<div id="paginator">
-  <%= sequential_paginator(@note_versions) %>
+    <div class="paginator">
+      <%= sequential_paginator(@note_versions) %>
+    </div>
+
+    <%= render :partial => "notes/secondary_links" %>
+    
+  </div>
 </div>
 
-<%= render :partial => "footer" %>

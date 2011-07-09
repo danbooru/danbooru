@@ -1,6 +1,6 @@
 module PostSetPresenters
   class Pool
-    attr_accessor :tag_set_presenter
+    attr_reader :tag_set_presenter, :pool_set
 
     def initialize(pool_set)
       @pool_set = pool_set
