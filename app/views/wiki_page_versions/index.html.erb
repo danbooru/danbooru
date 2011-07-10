@@ -3,6 +3,8 @@
     <%= render :partial => "wiki_pages/sidebar" %>
 
     <section id="content">
+      <h1>Wiki Pages</h1>
+      
       <table width="100%" class="striped">
         <thead>
           <tr>
@@ -29,6 +31,10 @@
           <% end %>       
         </tbody>
       </table>
+      
+      <div class="paginator">
+        <%= numbered_paginator(@wiki_page_versions) %>
+      </div>
     </section>
   </div>
 </div>

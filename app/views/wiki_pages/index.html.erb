@@ -3,23 +3,27 @@
     <%= render :partial => "sidebar" %>
 
     <section id="content">
+      <h1>Wiki Pages</h1>
+      
       <table class="striped" width="100%">
-        <tr>
-          <th>Title</th>
-          <th>Last edited</th>
-        </tr>
-        <% @wiki_pages.each do |wiki_page| %>
+        <thead>
           <tr>
-            <td class="tag-category-<%= wiki_page.category_name %>"><%= link_to wiki_page.pretty_title, wiki_page_path(wiki_page, :nordirect => 1) %></td>
-            <td><%= wiki_page.updated_at.strftime("%m/%d/%Y %I:%M") %> by <%= h wiki_page.creator.name %></td>
+            <th>Title</th>
+            <th>Last edited</th>
           </tr>
-        <% end %>
+        </thead>
+        <tbody>
+          <% @wiki_pages.each do |wiki_page| %>
+            <tr>
+              <td class="tag-category-<%= wiki_page.category_name %>"><%= link_to wiki_page.pretty_title, wiki_page_path(wiki_page, :nordirect => 1) %></td>
+              <td><%= wiki_page.updated_at.strftime("%m/%d/%Y %I:%M") %> by <%= h wiki_page.creator.name %></td>
+            </tr>
+          <% end %>          
+        </tbody>
       </table>
 
-      <div id="paginator">
-        <%= numbered_paginator(@wiki_pages) do |page| %>
-          <%= link_to(page, wiki_pages_path(:page => page, :search => params[:search])) %>
-        <% end %>
+      <div class="paginator">
+        <%= numbered_paginator(@wiki_pages) %>
       </div>
     </section>
   </div>
