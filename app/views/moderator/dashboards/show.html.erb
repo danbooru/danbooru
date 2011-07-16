@@ -1,0 +1,222 @@
+<div id="moderator-dashboard">
+  <h1>Moderator Dashboard</h1>
+  
+  <div id="ip-addr-search">
+    <% form_tag(moderator_ip_addrs_path, :method => :get) do %>
+      <label for="user_ids">Search IPs</label>
+      <%= text_field_tag "search[ip_addr_eq]", params[:ip_addrs] %>    
+      <%= submit_tag "Search" %>
+    <% end %>
+    
+    <% form_tag(moderator_ip_addrs_path, :method => :get) do %>
+      <label for="user_ids">Search User IDs</label>
+      <%= text_field_tag "search[user_id_eq]", params[:user_ids] %>    
+      <%= submit_tag "Search" %>
+    <% end %>
+  </div>
+  
+  <div id="activity-search">
+    <% form_tag(moderator_dashboard_path, :method => :get) do %>
+      <label for="min_date">Minimum Date</label>
+      <%= text_field_tag :min_date, @dashboard.min_date %><br>
+      
+      <label for="max_level">Max Level</label>
+      <%= user_level_select_tag(:max_level) %><br>
+      
+      <%= submit_tag "Search" %>
+    <% end %>
+  </div>
+  
+  <div id="comment-activity">
+    <table width="100%" class="striped">
+      <caption>Uploads</caption>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @dashboard.upload_activity.each do |activity| %>
+          <tr>
+            <td><%= admin_link_to_user(activity.user, :positive) %></td>
+            <td><%= link_to activity.count, {:controller => "post", :action => "index", :tags => "user:#{activity.user.name}"} %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    
+    <table width="100%" class="striped">
+      <caption>Note Updates</caption>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @dashboard.note_activity.each do |activity| %>
+          <tr>
+            <td><%= admin_link_to_user(activity.user, :positive) %></td>
+            <td><%= link_to activity.count, {:controller => "note", :action => "history", :user_id => activity.user.id} %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    
+    
+    <table width="100%" class="striped">
+      <caption>Tag Updates</caption>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @dashboard.tag_activity.each do |activity| %>
+          <tr>
+            <td><%= admin_link_to_user(activity.user, :positive) %></td>
+            <td><%= link_to activity.count, {:controller => "post_tag_history", :action => "index", :user_id => activity.user.id} %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    
+    
+    <table width="100%" class="striped">
+      <caption>Wiki Page Updates</caption>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @dashboard.wiki_page_activity.each do |activity| %>
+          <tr>
+            <td><%= admin_link_to_user(activity.user, :positive) %></td>
+            <td><%= link_to activity.count, {:controller => "wiki", :action => "recent_changes", :user_id => activity.user.id} %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    
+    
+    <table width="100%" class="striped">
+      <caption>Artist Updates</caption>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @dashboard.artist_activity.each do |activity| %>
+          <tr>
+            <td><%= admin_link_to_user(activity.user, :positive) %></td>
+            <td><%= link_to activity.count, {:controller => "artist", :action => "recent_changes", :user_id => activity.user.id} %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    
+    
+    <table width="100%" class="striped">
+      <caption>Comment Activity (Negative)</caption>
+      <thead>
+        <tr>
+          <th>Comment</th>
+          <th>User</th>
+          <th>Votes</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @dashboard.comment_activity.each do |activity| %>
+          <tr>
+            <td><%= link_to activity.comment.body, :controller => "post", :action => "show", :id => activity.comment.post_id %></td>
+            <td><%= admin_link_to_user(activity.comment.user, :negative) %></td>
+            <td><%= activity.count %></td>
+            <td><%= activity.comment.score %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  
+  <div id="post-activity">
+    <table width="100%" class="striped">
+      <caption>Appealed Posts</caption>
+      <thead>
+        <tr>
+          <th>Post</th>
+          <th>User</th>
+          <th>Flags</th>
+          <th>Appeals</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr>
+          <td colspan="5"><%= link_to "View all posts", :controller => "post_appeal", :action => "index" %></td>
+        </tr>
+      </tfoot>
+      <tbody>
+        <% @dashboard.appealed_posts.each do |appeal| %>
+          <tr>
+            <td><%= link_to image_tag(appeal.post.preview_url), :controller => "post", :action => "show", :id => appeal.post.id %></td>
+            <td><%= admin_link_to_user appeal.post.user, :negative %></td>
+            <td><%= post_flag_summary(appeal.post) %></td>
+            <td><%= post_appeal_summary(appeal.post) %></td>
+            <td><%= appeal.post.score %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <table width="100%" class="striped">
+      <caption>User Records</caption>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Message</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% UserRecord.recent(@dashboard.min_date).all(:order => "id desc").each do |record| %>
+          <tr class="user-record-score-<%= record.score %>">
+            <td><%= link_to(record.user.name, :controller => "user", :action => "show", :id => record.user_id) %></td>
+            <td><%= format_text(record.body) %></td>
+            <td><%= time_ago_in_words(record.created_at) %> ago</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    
+    
+    <table width="100%" class="striped">
+      <caption>Mod Actions</caption>
+      <thead>
+        <tr>
+          <th>Moderator</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr>
+          <td colspan="2"><%= link_to "View all actions", :controller => "mod_action", :action => "index" %></td>
+        </tr>
+      </tfoot>
+      <tbody>
+        <% ModAction.all(:order => "id desc", :limit => 10).each do |mod_action| %>
+          <tr>
+            <td><%= link_to mod_action.user.name, :controller => "user", :action => "show", :id => mod_action.user_id %></td>
+            <td><%= format_text(mod_action.description) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

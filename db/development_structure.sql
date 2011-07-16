@@ -3573,6 +3573,7 @@ CREATE TABLE janitor_trials (
     id integer NOT NULL,
     creator_id integer NOT NULL,
     user_id integer NOT NULL,
+    original_level integer NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -3604,6 +3605,7 @@ ALTER SEQUENCE janitor_trials_id_seq OWNED BY janitor_trials.id;
 CREATE TABLE note_versions (
     id integer NOT NULL,
     note_id integer NOT NULL,
+    post_id integer NOT NULL,
     updater_id integer NOT NULL,
     updater_ip_addr inet NOT NULL,
     x integer NOT NULL,
@@ -3936,9 +3938,9 @@ CREATE TABLE posts (
     is_pending boolean DEFAULT false NOT NULL,
     is_flagged boolean DEFAULT false NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,
-    uploader_string character varying(255) NOT NULL,
+    uploader_id integer NOT NULL,
     uploader_ip_addr inet NOT NULL,
-    approver_string character varying(255) DEFAULT ''::character varying NOT NULL,
+    approver_id integer,
     fav_string text DEFAULT ''::text NOT NULL,
     pool_string text DEFAULT ''::text NOT NULL,
     last_noted_at timestamp without time zone,
@@ -4214,11 +4216,7 @@ CREATE TABLE users (
     email_verification_key character varying(255),
     inviter_id integer,
     is_banned boolean DEFAULT false NOT NULL,
-    is_privileged boolean DEFAULT false NOT NULL,
-    is_contributor boolean DEFAULT false NOT NULL,
-    is_janitor boolean DEFAULT false NOT NULL,
-    is_moderator boolean DEFAULT false NOT NULL,
-    is_admin boolean DEFAULT false NOT NULL,
+    level integer DEFAULT 0 NOT NULL,
     base_upload_limit integer DEFAULT 10 NOT NULL,
     last_logged_in_at timestamp without time zone,
     last_forum_read_at timestamp without time zone,
@@ -7923,6 +7921,13 @@ CREATE INDEX index_note_versions_on_note_id ON note_versions USING btree (note_i
 
 
 --
+-- Name: index_note_versions_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_note_versions_on_post_id ON note_versions USING btree (post_id);
+
+
+--
 -- Name: index_note_versions_on_updater_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -8304,7 +8309,7 @@ CREATE TRIGGER trigger_notes_on_update
 CREATE TRIGGER trigger_posts_on_tag_index_update
     BEFORE INSERT OR UPDATE ON posts
     FOR EACH ROW
-    EXECUTE PROCEDURE tsvector_update_trigger('tag_index', 'public.danbooru', 'tag_string', 'fav_string', 'pool_string', 'uploader_string', 'approver_string');
+    EXECUTE PROCEDURE tsvector_update_trigger('tag_index', 'public.danbooru', 'tag_string', 'fav_string', 'pool_string');
 
 
 --

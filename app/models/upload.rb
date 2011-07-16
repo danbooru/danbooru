@@ -17,7 +17,7 @@ class Upload < ActiveRecord::Base
   module ValidationMethods
     def uploader_is_not_limited
       if !uploader.can_upload?
-        update_attribute(:status, "error: uploader has reached their daily limit")
+        update_column(:status, "error: uploader has reached their daily limit")
       end
     end
 
@@ -29,19 +29,19 @@ class Upload < ActiveRecord::Base
     
     def validate_file_exists
       unless File.exists?(file_path)
-        update_attribute(:status, "error: file does not exist")
+        update_column(:status, "error: file does not exist")
       end
     end
     
     def validate_file_content_type
       unless is_valid_content_type?
-        update_attribute(:status, "error: invalid content type (#{file_ext} not allowed)")
+        update_column(:status, "error: invalid content type (#{file_ext} not allowed)")
       end
     end
     
     def validate_md5_confirmation
       if !md5_confirmation.blank? && md5_confirmation != md5
-        update_attribute(:status, "error: md5 mismatch")
+        update_column(:status, "error: md5 mismatch")
       end
     end
   end
@@ -49,7 +49,7 @@ class Upload < ActiveRecord::Base
   module ConversionMethods
     def process!
       CurrentUser.scoped(uploader, uploader_ip_addr) do
-        update_attribute(:status, "processing")
+        update_column(:status, "processing")
         if is_downloadable?
           download_from_source(temp_file_path)
         end
@@ -67,12 +67,12 @@ class Upload < ActiveRecord::Base
         if post.save
           update_attributes(:status => "completed", :post_id => post.id)
         else
-          update_attribute(:status, "error: " + post.errors.full_messages.join(", "))
+          update_column(:status, "error: " + post.errors.full_messages.join(", "))
         end
       end
     rescue Exception => x
       raise
-      update_attribute(:status, "error: #{x} - #{x.message}")
+      update_column(:status, "error: #{x} - #{x.message}")
     ensure
       delete_temp_file
     end
@@ -87,6 +87,8 @@ class Upload < ActiveRecord::Base
         p.rating = rating
         p.source = source
         p.file_size = file_size
+        p.uploader_id = uploader_id
+        p.uploader_ip_addr = uploader_ip_addr
 
         unless uploader.is_contributor?
           p.is_pending = true
@@ -97,7 +99,7 @@ class Upload < ActiveRecord::Base
     def merge_tags(post)
       post.tag_string += " #{tag_string}"
       post.save
-      update_attribute(:status, "duplicate: #{post.id}")
+      update_column(:status, "duplicate: #{post.id}")
     end
   end
   

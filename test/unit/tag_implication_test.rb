@@ -113,7 +113,7 @@ class TagImplicationTest < ActiveSupport::TestCase
       end
       ti1 = Factory.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "xxx")
       p1.reload
-      assert_not_equal("uploader:#{ti1.creator_id}", p1.uploader_string)
+      assert_not_equal(ti1.creator_id, p1.uploader_id)
       assert_equal(ti1.creator_id, p1.versions.last.updater_id)
     end
   end

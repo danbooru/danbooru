@@ -15,6 +15,7 @@ class Post < ActiveRecord::Base
   before_validation :initialize_uploader, :on => :create
   belongs_to :updater, :class_name => "User"
   belongs_to :approver, :class_name => "User"
+  belongs_to :uploader, :class_name => "User"
   belongs_to :parent, :class_name => "Post"
   has_one :upload, :dependent => :destroy
   has_many :flags, :class_name => "PostFlag", :dependent => :destroy
@@ -36,7 +37,7 @@ class Post < ActiveRecord::Base
   scope :visible, lambda {|user| Danbooru.config.can_user_see_post_conditions(user)}
   scope :commented_before, lambda {|date| where("last_commented_at < ?", date).order("last_commented_at DESC")}
   scope :has_notes, where("last_noted_at is not null")
-  scope :for_user, lambda {|user_id| where(["uploader_string = ?", "uploader:#{user_id}"])}
+  scope :for_user, lambda {|user_id| where(["uploader_id = ?", user_id])}
   scope :available_for_moderation, lambda {where(["id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :hidden_from_moderation, lambda {where(["id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :tag_match, lambda {|query| Post.tag_match_helper(query)}
@@ -233,7 +234,7 @@ class Post < ActiveRecord::Base
   
   module ApprovalMethods
     def is_approvable?
-      (is_pending? || is_flagged? || is_deleted?) && approver_string != "approver:#{CurrentUser.name}"
+      (is_pending? || is_flagged? || is_deleted?) && approver_id != CurrentUser.id
     end
     
     def flag!(reason)
@@ -243,7 +244,7 @@ class Post < ActiveRecord::Base
         raise PostFlag::Error.new(flag.errors.full_messages.join("; "))
       end
 
-      update_attribute(:is_flagged, true)
+      update_column(:is_flagged, true)
     end
     
     def appeal!(reason)
@@ -255,13 +256,13 @@ class Post < ActiveRecord::Base
     end
 
     def approve!
-      raise ApprovalError.new("You have previously approved this post and cannot approve it again") if approver_string == "approver:#{CurrentUser.name}"
+      raise ApprovalError.new("You have previously approved this post and cannot approve it again") if approver_id == CurrentUser.id
       
       flags.each {|x| x.resolve!}
       self.is_flagged = false
       self.is_pending = false
       self.is_deleted = false
-      self.approver_string = "approver:#{CurrentUser.name}"
+      self.approver_id = CurrentUser.id
       save!
     end
   end
@@ -295,7 +296,7 @@ class Post < ActiveRecord::Base
     end
     
     def create_tags
-      set_tag_string(tag_array.map {|x| Tag.find_or_create_by_name(x).name}.join(" "))
+      set_tag_string(tag_array.map {|x| Tag.find_or_create_by_name(x).name}.uniq.join(" "))
     end
     
     def increment_tag_post_counts
@@ -373,11 +374,12 @@ class Post < ActiveRecord::Base
       normalized_tags = TagAlias.to_aliased(normalized_tags)
       normalized_tags = TagImplication.with_descendants(normalized_tags)
       normalized_tags = filter_metatags(normalized_tags)
+      normalized_tags = %w(tagme) if normalized_tags.empty?
       set_tag_string(normalized_tags.uniq.join(" "))
     end
     
     def filter_metatags(tags)
-      tags.reject {|tag| tag =~ /\A(?:pool|rating|fav|approver|uploader):/}
+      tags.reject {|tag| tag =~ /\A(?:pool|rating|fav):/}
     end
     
     def has_tag?(tag)
@@ -395,7 +397,7 @@ class Post < ActiveRecord::Base
     end
     
     def append_user_to_fav_string(user_id)
-      update_attribute(:fav_string, (fav_string + " fav:#{user_id}").strip)
+      update_column(:fav_string, (fav_string + " fav:#{user_id}").strip)
     end
     
     def add_favorite!(user)
@@ -405,7 +407,7 @@ class Post < ActiveRecord::Base
     end
     
     def delete_user_from_fav_string(user_id)
-      update_attribute(:fav_string, fav_string.gsub(/(?:\A| )fav:#{user_id}(?:\Z| )/, " ").strip)
+      update_column(:fav_string, fav_string.gsub(/(?:\A| )fav:#{user_id}(?:\Z| )/, " ").strip)
     end
     
     def remove_favorite!(user)
@@ -542,6 +544,22 @@ class Post < ActiveRecord::Base
 
       relation = add_tag_string_search_relation(q[:tags], relation)
       
+      if q[:uploader_id_neg]
+        relation = relation.where("posts.uploader_id not in (?)", q[:uploader_id_neg])
+      end
+      
+      if q[:uploader_id]
+        relation = relation.where("posts.uploader_id = ?", q[:uploader_id])
+      end
+      
+      if q[:approver_id_neg]
+        relation = relation.where("posts.approver_id not in (?)", q[:approver_id_neg])
+      end
+      
+      if q[:approver_id]
+        relation = relation.where("posts.approver_id = ?", q[:approver_id])
+      end
+      
       if q[:rating] == "q"
         relation = relation.where("posts.rating = 'q'")
       elsif q[:rating] == "s"
@@ -601,28 +619,14 @@ class Post < ActiveRecord::Base
   
   module UploaderMethods
     def initialize_uploader
-      self.uploader = CurrentUser.user
-      self.uploader_ip_addr = CurrentUser.ip_addr
-    end
-    
-    def uploader_id=(user_id)
-      self.uploader = User.find(user_id)
-    end
-    
-    def uploader_id
-      uploader_string[9..-1].to_i
+      if uploader_id.blank?
+        self.uploader_id = CurrentUser.id
+        self.uploader_ip_addr = CurrentUser.ip_addr
+      end
     end
     
     def uploader_name
       User.id_to_name(uploader_id)
-    end
-    
-    def uploader
-      User.find(uploader_id)
-    end
-    
-    def uploader=(user)
-      self.uploader_string = "uploader:#{user.id}"
     end
   end
   
@@ -640,13 +644,15 @@ class Post < ActiveRecord::Base
     
     def add_pool!(pool)
       return if belongs_to_pool?(pool)
-      update_attribute(:pool_string, "#{pool_string} pool:#{pool.id}".strip)
+      self.pool_string = "#{pool_string} pool:#{pool.id}".strip
+      update_column(:pool_string, pool_string)
       pool.add!(self)
     end
     
     def remove_pool!(pool)
       return unless belongs_to_pool?(pool)
-      update_attribute(:pool_string, pool_string.gsub(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ").strip)
+      self.pool_string = pool_string.gsub(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ").strip
+      update_column(:pool_string, pool_string)
       pool.remove!(self)
     end
   end
@@ -762,13 +768,11 @@ class Post < ActiveRecord::Base
       if children.size == 0
         # do nothing
       elsif children.size == 1
-        children.first.update_attribute(:parent_id, nil)
+        children.first.update_column(:parent_id, nil)
       else
         cached_children = children
-        cached_children[1..-1].each do |child|
-          child.update_attribute(:parent_id, cached_children[0].id)
-        end
-        cached_children[0].update_attribute(:parent_id, nil)
+        Post.update_all({:parent_id => cached_children[0].id}, :id => cached_children[1..-1].map(&:id))
+        cached_children[0].update_column(:parent_id, nil)
       end
     end
 
@@ -800,14 +804,14 @@ class Post < ActiveRecord::Base
         update_children_on_destroy
         delete_favorites
         decrement_tag_post_counts
-        update_attribute(:is_deleted, true)
+        update_column(:is_deleted, true)
         update_parent_on_destroy
         tag_array.each {|x| expire_cache(x)}
       end
     end
     
     def undelete!
-      update_attribute(:is_deleted, false)
+      update_column(:is_deleted, false)
       tag_array.each {|x| expire_cache(x)}
       update_parent_on_save
     end
@@ -822,7 +826,7 @@ class Post < ActiveRecord::Base
           :add_tags => tag_string,
           :parent_id => parent_id
         )
-      else
+      elsif rating_changed? || source_changed? || parent_id_changed? || tag_string_changed?
         versions.create(
           :rating => rating_changed? ? rating : nil,
           :source => source_changed? ? source : nil,

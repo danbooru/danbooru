@@ -6,7 +6,7 @@ module Jobs
       CONFIG["tag_types"].values.uniq.each do |tag_type|
         tags += user.calculate_uploaded_tags(tag_type)
       end
-      user.update_attribute(:uploaded_tags, tags.join("\n"))
+      user.update_column(:uploaded_tags, tags.join("\n"))
     end
   end
 end

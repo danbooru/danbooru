@@ -1,11 +1,13 @@
 module PostSets
+  class SearchError < Exception
+  end
+  
   class Post < Base
-    attr_reader :tag_array, :page, :posts
+    attr_reader :tag_array, :page
     
-    def initialize(params)
-      @tag_array = Tag.scan_query(params[:tags])
-      @page = params[:page]
-      @posts = ::Post.tag_match(tag_string).paginate(page)
+    def initialize(tags, page = 1)
+      @tag_array = Tag.scan_query(tags)
+      @page = page
     end
     
     def tag_string
@@ -24,6 +26,14 @@ module PostSets
       end
     end
     
+    def posts
+      if tag_array.size > 2 && !CurrentUser.is_privileged?
+        raise SearchError
+      end
+      
+      @posts ||= ::Post.tag_match(tag_string).paginate(page)
+    end
+    
     def has_artist?
       tag_array.any? && ::Artist.name_equals(tag_string).exists?
     end
@@ -34,6 +44,10 @@ module PostSets
     
     def is_single_tag?
       tag_array.size == 1
+    end
+    
+    def current_page
+      [page.to_i, 1].max
     end
     
     def presenter

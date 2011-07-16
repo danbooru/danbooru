@@ -1006,3 +1006,36 @@ div#c-static {
     }
   }
 }
+
+
+
+/*** moderator dashboard ***/
+div#moderator-dashboard {
+  div#comment-activity {
+    width: 45%;
+    float: left;
+  }
+
+  div#post-activity {
+    width: 45%;
+    float: left;
+    margin-left: 2em;
+  }
+
+  div#ip-addr-search {
+    margin-bottom: 2em;
+  }
+
+  div#activity-search {
+    margin-bottom: 2em;
+  }
+
+  table {
+    margin-bottom: 2em;
+  }
+
+  caption {
+    font-weight: bold;
+    font-size: 1.5em;
+  }
+}

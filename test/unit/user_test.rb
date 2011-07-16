@@ -24,9 +24,9 @@ class UserTest < ActiveSupport::TestCase
     
     should "limit post uploads" do
       assert(!@user.can_upload?)
-      @user.update_attribute(:is_contributor, true)
+      @user.update_column(:level, User::Levels::CONTRIBUTOR)
       assert(@user.can_upload?)
-      @user.update_attribute(:is_contributor, false)
+      @user.update_column(:level, User::Levels::MEMBER)
       
       40.times do
         Factory.create(:post, :uploader => @user, :is_deleted => true)
@@ -49,10 +49,10 @@ class UserTest < ActiveSupport::TestCase
     
     should "limit comments" do
       assert(!@user.can_comment?)
-      @user.update_attribute(:is_privileged, true)
+      @user.update_column(:level, User::Levels::PRIVILEGED)
       assert(@user.can_comment?)
-      @user.update_attribute(:is_privileged, false)
-      @user.update_attribute(:created_at, 1.year.ago)
+      @user.update_column(:level, User::Levels::MEMBER)
+      @user.update_column(:created_at, 1.year.ago)
       assert(@user.can_comment?)
       (Danbooru.config.member_comment_limit).times do
         Factory.create(:comment)
@@ -79,34 +79,34 @@ class UserTest < ActiveSupport::TestCase
     end
       
     should "normalize its level" do
-      user = Factory.create(:user, :is_admin => true)
+      user = Factory.create(:user, :level => User::Levels::ADMIN)
       assert(user.is_moderator?)
       assert(user.is_janitor?)
       assert(user.is_contributor?)
       assert(user.is_privileged?)
     
-      user = Factory.create(:user, :is_moderator => true)      
+      user = Factory.create(:user, :level => User::Levels::MODERATOR)
       assert(!user.is_admin?)
       assert(user.is_moderator?)
       assert(user.is_janitor?)
-      assert(!user.is_contributor?)
+      assert(user.is_contributor?)
       assert(user.is_privileged?)
     
-      user = Factory.create(:user, :is_janitor => true)      
+      user = Factory.create(:user, :level => User::Levels::JANITOR)
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
       assert(user.is_janitor?)
       assert(!user.is_contributor?)
       assert(user.is_privileged?)
     
-      user = Factory.create(:user, :is_contributor => true)      
+      user = Factory.create(:user, :level => User::Levels::CONTRIBUTOR)
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
       assert(!user.is_janitor?)
       assert(user.is_contributor?)
       assert(user.is_privileged?)
     
-      user = Factory.create(:user, :is_privileged => true)      
+      user = Factory.create(:user, :level => User::LEvels::PRIVILEGED)
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
       assert(!user.is_janitor?)
@@ -133,8 +133,8 @@ class UserTest < ActiveSupport::TestCase
     
       should "be updated" do
         @user = Factory.create(:user)
-        @user.update_attribute(:name, "danzig")
-        assert_equal("danzig", User.id_to_name(@user.id))
+        @user.update_column(:name, "danzig")
+        assert_equal(@user.name, User.id_to_name(@user.id))
       end
     end
       

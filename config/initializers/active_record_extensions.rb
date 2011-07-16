@@ -1,6 +1,24 @@
 module Danbooru
   module Extensions
     module ActiveRecord
+      extend ActiveSupport::Concern
+      
+      module ClassMethods
+        def without_timeout
+          connection.execute("SET STATEMENT_TIMEOUT = 0")
+          yield
+        ensure
+          connection.execute("SET STATEMENT_TIMEOUT = 10000")
+        end
+
+        def with_timeout(n)
+          connection.execute("SET STATEMENT_TIMEOUT = #{n}")
+          yield
+        ensure
+          connection.execute("SET STATEMENT_TIMEOUT = 10000")
+        end
+      end
+      
       %w(execute select_value select_values select_all).each do |method_name|
         define_method("#{method_name}_sql") do |sql, *params|
           connection.__send__(method_name, self.class.sanitize_sql_array([sql, *params]))

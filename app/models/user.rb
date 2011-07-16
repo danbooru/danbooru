@@ -28,6 +28,7 @@ class User < ActiveRecord::Base
   after_save :update_cache
   before_create :promote_to_admin_if_first_user
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
+  has_many :posts, :foreign_key => "uploader_id"
   has_one :ban
   has_many :subscriptions, :class_name => "TagSubscription"
   has_many :note_versions, :foreign_key => "updater_id"
@@ -46,7 +47,7 @@ class User < ActiveRecord::Base
     end
     
     def unban!
-      update_attribute(:is_banned, false)
+      update_column(:is_banned, false)
       ban.destroy
     end
   end
@@ -218,7 +219,7 @@ class User < ActiveRecord::Base
     
     def verify!(key)
       if email_verification_key == key
-        self.update_attribute(:email_verification_key, nil)
+        self.update_column(:email_verification_key, nil)
       else
         raise User::Error.new("Verification key does not match")
       end
@@ -293,12 +294,6 @@ class User < ActiveRecord::Base
     end
   end
   
-  module PostMethods
-    def posts
-      Post.where("uploader_string = ?", "uploader:#{id}")
-    end
-  end
-  
   include BanMethods
   include NameMethods
   include PasswordMethods
@@ -309,7 +304,6 @@ class User < ActiveRecord::Base
   include BlacklistMethods
   include ForumMethods
   include LimitMethods
-  include PostMethods
   
   def initialize_default_image_size
     self.default_image_size = "Medium"

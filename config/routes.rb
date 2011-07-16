@@ -1,7 +1,14 @@
 Danbooru::Application.routes.draw do
   namespace :admin do
-    match 'users/edit' => 'users#edit', :via => :get
-    match 'users' => 'users#update', :via => :put
+    resources :users, :only => [:get, :put, :destroy]
+  end
+  namespace :moderator do
+    resource :dashboard, :only => [:show]
+    resources :ip_addrs, :only => [:index] do
+      collection do
+        get :search
+      end
+    end
   end
   resources :advertisements do
     resources :hits, :controller => "advertisement_hits", :only => [:create]

@@ -25,40 +25,33 @@ module PostSets
       
       context "a post pool set for page 2" do
         setup do
-          @set = PostSets::Base.new(:id => @pool.id, :page => 2)
+          @set = PostSets::Pool.new(@pool, 2)
           @set.stubs(:limit).returns(1)
-          @set.extend(PostSets::Pool)
         end
 
-        context "a numbered paginator" do
-          setup do
-            @set.extend(PostSets::Numbered)
-          end
-
-          should "return the second element" do
-            assert_equal(1, @set.posts.size)
-            assert_equal(@post_1.id, @set.posts.first.id)
-          end
+        should "return the second element" do
+          assert_equal(1, @set.posts.size)
+          assert_equal(@post_1.id, @set.posts.first.id)
+        end
+        
+        should "know the total number of pages" do
+          assert_equal(3, @set.total_pages)
+        end
+        
+        should "know the current page" do
+          assert_equal(2, @set.current_page)
         end
       end
       
       context "a post pool set with no page specified" do
         setup do
-          @set = PostSets::Base.new(:id => @pool.id)
+          @set = PostSets::Pool.new(@pool)
           @set.stubs(:limit).returns(1)
-          @set.extend(PostSets::Pool)
         end
 
-        context "a numbered paginator" do
-          setup do
-            @set.extend(PostSets::Numbered)
-          end
-
-          should "return the first element" do
-            assert_equal(3, @set.count)
-            assert_equal(1, @set.posts.size)
-            assert_equal(@post_2.id, @set.posts.first.id)
-          end
+        should "return the first element" do
+          assert_equal(1, @set.posts.size)
+          assert_equal(@post_2.id, @set.posts.first.id)
         end
       end
     end

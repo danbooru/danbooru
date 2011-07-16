@@ -89,15 +89,15 @@ class Dmail < ActiveRecord::Base
   end
   
   def mark_as_read!
-    update_attribute(:is_read, true)
+    update_column(:is_read, true)
     
     unless Dmail.exists?(["to_id = ? AND is_read = false", to_id])
-      to.update_attribute(:has_mail, false)
+      to.update_column(:has_mail, false)
     end
   end
   
   def update_recipient
-    to.update_attribute(:has_mail, true)
+    to.update_column(:has_mail, true)
   end
   
   def visible_to?(user)

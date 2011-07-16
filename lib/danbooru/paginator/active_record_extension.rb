@@ -52,7 +52,7 @@ module Danbooru
           page = [page.to_i, 1].max
           
           if page > Danbooru.config.max_numbered_pages
-            raise "You cannot go beyond page #{Danbooru.config.max_numbered_pages}. Please narrow your search terms."
+            raise PaginationError.new("You cannot go beyond page #{Danbooru.config.max_numbered_pages}. Please narrow your search terms.")
           end
           
           limit(records_per_page).offset((page - 1) * records_per_page).tap do |obj|

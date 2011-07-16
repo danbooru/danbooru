@@ -1,4 +1,5 @@
 require_relative '../../test_helper'
+require "danbooru/paginator/pagination_error"
 
 module PostSets
   class PostTest < ActiveSupport::TestCase
@@ -19,12 +20,10 @@ module PostSets
         CurrentUser.ip_addr = nil
       end
       
-      context "a numbered set for page 2" do
+      context "a set for page 2" do
         setup do
-          @set = PostSets::Base.new(:page => 2)
-          @set.extend(PostSets::Sequential)
-          @set.extend(PostSets::Post)
-          @set.stubs(:limit).returns(1)
+          @set = PostSets::Post.new("", 2)
+          ::Post.stubs(:records_per_page).returns(1)
         end
         
         should "return the second element" do
@@ -32,18 +31,16 @@ module PostSets
         end
       end
       
-      context "a sequential set for the 'a' tag query" do
+      context "a set for the 'a' tag query" do
         setup do
           @post_4 = Factory.create(:post, :tag_string => "a")
           @post_5 = Factory.create(:post, :tag_string => "a")
         end
         
-        context "with no before_id parameter" do
+        context "with no page" do
           setup do
-            @set = PostSets::Base.new(:tags => "a")
-            @set.extend(PostSets::Sequential)
-            @set.extend(PostSets::Post)
-            @set.stubs(:limit).returns(1)
+            @set = PostSets::Post.new("a")
+            ::Post.stubs(:records_per_page).returns(1)
           end
           
           should "return the first element" do
@@ -51,12 +48,10 @@ module PostSets
           end
         end
         
-        context "with a before_id parameter for the first element" do
+        context "for before the first element" do
           setup do
-            @set = PostSets::Base.new(:tags => "a", :before_id => @post_5.id)
-            @set.extend(PostSets::Sequential)
-            @set.extend(PostSets::Post)
-            @set.stubs(:limit).returns(1)
+            @set = PostSets::Post.new("a", "b#{@post_5.id}")
+            ::Post.stubs(:records_per_page).returns(1)
           end
           
           should "return the second element" do
@@ -64,12 +59,10 @@ module PostSets
           end
         end
 
-        context "with an after_id parameter for the second element" do
+        context "for after the second element" do
           setup do
-            @set = PostSets::Base.new(:tags => "a", :after_id => @post_4.id)
-            @set.extend(PostSets::Sequential)
-            @set.extend(PostSets::Post)
-            @set.stubs(:limit).returns(1)
+            @set = PostSets::Post.new("a", "a#{@post_4.id}")
+            @set.stubs(:records_per_page).returns(1)
           end
           
           should "return the first element" do
@@ -78,11 +71,9 @@ module PostSets
         end
       end
       
-      context "a new numbered set for the 'a b' tag query" do
+      context "a set for the 'a b' tag query" do
         setup do
-          @set = PostSets::Base.new(:tags => "a b")
-          @set.extend(PostSets::Numbered)
-          @set.extend(PostSets::Post)
+          @set = PostSets::Post.new("a b")
         end
         
         should "know it isn't a single tag" do
@@ -90,31 +81,27 @@ module PostSets
         end
       end
       
-      context "a new numbered set going to the 1,001st page" do
+      context "a set going to the 1,001st page" do
         setup do
-          @set = PostSets::Base.new(:tags => "a", :page => 1_001)
-          @set.extend(PostSets::Numbered)
-          @set.extend(PostSets::Post)
+          @set = PostSets::Post.new("a", 1_001)
         end
         
-        should "not validate" do
-          assert_raises(PostSets::Error) do
-            @set.validate
+        should "fail" do
+          assert_raises(Danbooru::Paginator::PaginationError) do
+            @set.posts
           end
         end
       end
       
-      context "a new numbered set for the 'a b c' tag query" do
+      context "a set for the 'a b c' tag query" do
         setup do
-          @set = PostSets::Base.new(:tags => "a b c")
-          @set.extend(PostSets::Numbered)
-          @set.extend(PostSets::Post)
+          @set = PostSets::Post.new("a b c")
         end
         
         context "for a non-privileged user" do
-          should "not validate" do
-            assert_raises(PostSets::Error) do
-              @set.validate
+          should "fail" do
+            assert_raises(PostSets::SearchError) do
+              @set.posts
             end
           end
         end
@@ -124,25 +111,17 @@ module PostSets
             CurrentUser.user = Factory.create(:privileged_user)
           end
           
-          should "not validate" do
+          should "pass" do
             assert_nothing_raised do
-              @set.validate
+              @set.posts
             end
           end
         end
       end
       
-      context "a new numbered set for the 'a' tag query" do
+      context "a set for the 'a' tag query" do
         setup do
-          @set = PostSets::Base.new(:tags => "A")
-          @set.extend(PostSets::Numbered)
-          @set.extend(PostSets::Post)
-        end
-        
-        should "validate" do
-          assert_nothing_raised do
-            @set.validate
-          end
+          @set = PostSets::Post.new("a")
         end
         
         should "know it is a single tag" do
@@ -153,8 +132,8 @@ module PostSets
           assert_equal("a", @set.tag_string)
         end
         
-        should "find the count" do
-          assert_equal(1, @set.count)
+        should "know the count" do
+          assert_equal(1, @set.posts.total_count)
         end
         
         should "find the posts" do

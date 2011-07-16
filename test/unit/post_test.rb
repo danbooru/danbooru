@@ -178,13 +178,13 @@ class PostTest < ActiveSupport::TestCase
       should "preserve the approver's identity when approved" do
         post = Factory.create(:post, :is_pending => true)
         post.approve!
-        assert_equal("approver:#{CurrentUser.name}", post.approver_string)
+        assert_equal(post.approver_id, CurrentUser.id)
       end
       
       context "that was previously approved by person X" do
         should "not allow person X to reapprove that post" do
           user = Factory.create(:janitor_user, :name => "xxx")
-          post = Factory.create(:post, :approver_string => "approver:xxx")
+          post = Factory.create(:post, :approver_id => user.id)
           post.flag!("bad")
           CurrentUser.scoped(user, "127.0.0.1") do
             assert_raises(Post::ApprovalError) do
@@ -396,10 +396,10 @@ class PostTest < ActiveSupport::TestCase
         user3 = Factory.create(:user)
 
         post.uploader = user1
-        assert_equal("uploader:#{user1.id}", post.uploader_string)
+        assert_equal(user1.id, post.uploader_id)
 
         post.uploader_id = user2.id
-        assert_equal("uploader:#{user2.id}", post.uploader_string)
+        assert_equal(user2.id, post.uploader_id)
         assert_equal(user2.id, post.uploader_id)
         assert_equal(user2.name, post.uploader_name)
       end
@@ -493,13 +493,15 @@ class PostTest < ActiveSupport::TestCase
   
     should "return posts for the <uploader> metatag" do
       second_user = Factory.create(:user)
-      post1 = Factory.create(:post)
+      post1 = Factory.create(:post, :uploader => CurrentUser.user)
+      
+      assert_equal(CurrentUser.id, post1.uploader_id)
       
       CurrentUser.scoped(second_user, "127.0.0.2") do
         post2 = Factory.create(:post)
         post3 = Factory.create(:post)
       end
-      
+
       relation = Post.tag_match("uploader:#{CurrentUser.user.name}")
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)

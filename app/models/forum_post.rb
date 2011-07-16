@@ -39,7 +39,7 @@ class ForumPost < ActiveRecord::Base
   
   def update_topic_updated_at
     if topic
-      topic.update_attribute(:updater_id, CurrentUser.id)
+      topic.update_column(:updater_id, CurrentUser.id)
       topic.touch
     end
   end

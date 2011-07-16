@@ -13,7 +13,7 @@ class PostFlag < ActiveRecord::Base
   scope :unresolved, where(["is_resolved = ?", false])
   
   def update_post
-    post.update_attribute(:is_flagged, true)
+    post.update_column(:is_flagged, true)
   end
   
   def validate_creator_is_not_limited
@@ -40,7 +40,7 @@ class PostFlag < ActiveRecord::Base
   end
   
   def resolve!
-    update_attribute(:is_resolved, true)
+    update_column(:is_resolved, true)
   end
   
   def flag_count_for_creator

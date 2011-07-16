@@ -14,6 +14,7 @@ class Artist < ActiveRecord::Base
   attr_accessible :name, :url_string, :other_names, :group_name, :wiki_page_attributes, :notes
   scope :url_match, lambda {|string| where(["id in (?)", Artist.find_all_by_url(string).map(&:id)])}
   scope :other_names_match, lambda {|string| where(["other_names_index @@ to_tsquery('danbooru', ?)", Artist.normalize_name(string)])}
+  scope :name_equals, lambda {|string| where("name = ?", string)}
   search_methods :url_match, :other_names_match
   
   module UrlMethods

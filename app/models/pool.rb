@@ -91,7 +91,6 @@ class Pool < ActiveRecord::Base
     offset = options[:offset] || 0
     limit = options[:limit] || Danbooru.config.posts_per_page
     slice = post_id_array.slice(offset, limit)
-    puts slice.inspect
     if slice && slice.any?
       Post.where("id in (?)", slice).order(arbitrary_sql_order_clause(slice, "posts"))
     else
@@ -150,7 +149,7 @@ class Pool < ActiveRecord::Base
     last_version = versions.last
 
     if last_version && CurrentUser.ip_addr == last_version.updater_ip_addr && CurrentUser.id == last_version.updater_id
-      last_version.update_attribute(:post_ids, post_ids)
+      last_version.update_column(:post_ids, post_ids)
     else
       versions.create(:post_ids => post_ids)
     end

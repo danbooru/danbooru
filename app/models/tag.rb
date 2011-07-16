@@ -88,15 +88,15 @@ class Tag < ActiveRecord::Base
 
         if tag
           if category > 0 && !(options[:user] && !options[:user].is_privileged? && tag.post_count > 10)
-            tag.update_attribute(:category, category)
+            tag.update_column(:category, category)
           end
 
           tag
         else
-          Tag.new.tap do |tag|
-            tag.name = name
-            tag.category = category
-            tag.save
+          Tag.new.tap do |t|
+            t.name = name
+            t.category = category
+            t.save
           end
         end
       end
@@ -216,13 +216,21 @@ class Tag < ActiveRecord::Base
       }
 
       scan_query(query).each do |token|
-        if token =~ /\A(-uploader|uploader|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|status|tagcount|gentags|arttags|chartags|copytags):(.+)\Z/
+        if token =~ /\A(-uploader|uploader|-approver|approver|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|status|tagcount|gentags|arttags|chartags|copytags):(.+)\Z/
           case $1
           when "-uploader"
-            q[:tags][:exclude] << "uploader:#{User.name_to_id($2)}"
+            q[:uploader_id_neg] ||= []
+            q[:uploader_id_neg] << User.name_to_id($2)
             
           when "uploader"
-            q[:tags][:related] << "uploader:#{User.name_to_id($2)}"
+            q[:uploader_id] = User.name_to_id($2)
+            
+          when "-approver"
+            q[:approver_id_neg] ||= []
+            q[:approver_id_neg] << User.name.to_id($2)
+            
+          when "approver"
+            q[:approver_id] = User.name.to_id($2)
             
           when "-pool"
             q[:tags][:exclude] << "pool:#{Pool.name_to_id($2)}"

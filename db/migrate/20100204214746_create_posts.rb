@@ -18,11 +18,11 @@ class CreatePosts < ActiveRecord::Migration
       t.column :is_deleted, :boolean, :null => false, :default => false
 
       # Uploader
-      t.column :uploader_string, :string, :null => false
+      t.column :uploader_id, :integer, :null => false
       t.column :uploader_ip_addr, "inet", :null => false
       
       # Approver
-      t.column :approver_string, :string, :null => false, :default => ""
+      t.column :approver_id, :integer
 
       # Favorites
       t.column :fav_string, :text, :null => false, :default => ""
@@ -101,7 +101,7 @@ class CreatePosts < ActiveRecord::Migration
     execute "CREATE TEXT SEARCH CONFIGURATION public.danbooru (PARSER = public.testparser)"
     execute "ALTER TEXT SEARCH CONFIGURATION public.danbooru ADD MAPPING FOR WORD WITH SIMPLE"
     execute "SET default_text_search_config = 'public.danbooru'"
-    execute "CREATE TRIGGER trigger_posts_on_tag_index_update BEFORE INSERT OR UPDATE ON posts FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tag_index', 'public.danbooru', 'tag_string', 'fav_string', 'pool_string', 'uploader_string', 'approver_string')"
+    execute "CREATE TRIGGER trigger_posts_on_tag_index_update BEFORE INSERT OR UPDATE ON posts FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tag_index', 'public.danbooru', 'tag_string', 'fav_string', 'pool_string')"
   end
 
   def self.down

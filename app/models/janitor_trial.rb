@@ -5,9 +5,14 @@ class JanitorTrial < ActiveRecord::Base
   after_destroy :create_feedback
   validates_presence_of :user
   before_validation :initialize_creator
+  before_validation :initialize_original_level
   
   def initialize_creator
     self.creator_id = CurrentUser.id
+  end
+  
+  def initialize_original_level
+    self.original_level = user.level
   end
   
   def user_name=(name)
@@ -21,7 +26,7 @@ class JanitorTrial < ActiveRecord::Base
   end
   
   def promote_user
-    user.update_attribute(:is_janitor, true)
+    user.update_column(:level, User::Levels::JANITOR)
   end
   
   def create_feedback
@@ -36,7 +41,7 @@ class JanitorTrial < ActiveRecord::Base
   end
   
   def demote!
-    user.update_attribute(:is_janitor, false)
+    user.update_column(:level, original_level)
     destroy
   end
 end

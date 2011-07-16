@@ -67,7 +67,7 @@ class TagAliasTest < ActiveSupport::TestCase
       end
       ta1 = Factory.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "xxx")
       p1.reload
-      assert_not_equal("uploader:#{ta1.creator_id}", p1.uploader_string)
+      assert_not_equal(ta1.creator_id, p1.uploader_id)
       assert_equal(ta1.creator_id, p1.versions.last.updater_id)
     end
   end
