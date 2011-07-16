@@ -96,7 +96,7 @@ class UserTest < ActiveSupport::TestCase
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
       assert(user.is_janitor?)
-      assert(!user.is_contributor?)
+      assert(user.is_contributor?)
       assert(user.is_privileged?)
     
       user = Factory.create(:user, :level => User::Levels::CONTRIBUTOR)
@@ -106,7 +106,7 @@ class UserTest < ActiveSupport::TestCase
       assert(user.is_contributor?)
       assert(user.is_privileged?)
     
-      user = Factory.create(:user, :level => User::LEvels::PRIVILEGED)
+      user = Factory.create(:user, :level => User::Levels::PRIVILEGED)
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
       assert(!user.is_janitor?)
@@ -133,7 +133,7 @@ class UserTest < ActiveSupport::TestCase
     
       should "be updated" do
         @user = Factory.create(:user)
-        @user.update_column(:name, "danzig")
+        @user.update_attribute(:name, "danzig")
         assert_equal(@user.name, User.id_to_name(@user.id))
       end
     end
