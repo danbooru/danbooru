@@ -2423,6 +2423,38 @@ ALTER SEQUENCE user_feedback_id_seq OWNED BY user_feedback.id;
 
 
 --
+-- Name: user_password_reset_nonces; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE user_password_reset_nonces (
+    id integer NOT NULL,
+    key character varying(255) NOT NULL,
+    email character varying(255) NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: user_password_reset_nonces_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE user_password_reset_nonces_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_password_reset_nonces_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE user_password_reset_nonces_id_seq OWNED BY user_password_reset_nonces.id;
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2762,6 +2794,13 @@ ALTER TABLE user_feedback ALTER COLUMN id SET DEFAULT nextval('user_feedback_id_
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE user_password_reset_nonces ALTER COLUMN id SET DEFAULT nextval('user_password_reset_nonces_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
 
 
@@ -3025,6 +3064,14 @@ ALTER TABLE ONLY uploads
 
 ALTER TABLE ONLY user_feedback
     ADD CONSTRAINT user_feedback_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_password_reset_nonces_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY user_password_reset_nonces
+    ADD CONSTRAINT user_password_reset_nonces_pkey PRIMARY KEY (id);
 
 
 --
@@ -5123,3 +5170,5 @@ INSERT INTO schema_migrations (version) VALUES ('20110328215652');
 INSERT INTO schema_migrations (version) VALUES ('20110328215701');
 
 INSERT INTO schema_migrations (version) VALUES ('20110607194023');
+
+INSERT INTO schema_migrations (version) VALUES ('20110717010705');

@@ -15,7 +15,8 @@ class WikiPagesControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        Factory.create(:wiki_page, :title => "abc")
+        @wiki_page_abc = Factory.create(:wiki_page, :title => "abc")
+        @wiki_page_def = Factory.create(:wiki_page, :title => "def")
       end
       
       should "list all wiki_pages" do
@@ -25,7 +26,7 @@ class WikiPagesControllerTest < ActionController::TestCase
       
       should "list all wiki_pages (with search)" do
         get :index, {:search => {:title_matches => "abc"}}
-        assert_response :success
+        assert_redirected_to(wiki_page_path(@wiki_page_abc))
       end
     end
     

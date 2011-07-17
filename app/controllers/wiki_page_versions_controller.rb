@@ -3,7 +3,7 @@ class WikiPageVersionsController < ApplicationController
   
   def index
     @search = WikiPageVersion.search(params[:search])
-    @wiki_page_versions = @search.paginate(:page => params[:page])
+    @wiki_page_versions = @search.paginate(params[:page])
     respond_with(@wiki_page_versions)
   end
   

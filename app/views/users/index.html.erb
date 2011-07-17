@@ -4,12 +4,6 @@
     
     <% simple_form_for(@search) do |f| %>
       <%= f.input :name_contains, :label => "Name" %>
-      <%= f.input :is_banned_is_true, :label => "Banned" %>
-      <%= f.input :is_privileged_is_true, :label => "Privileged" %>
-      <%= f.input :is_contributor_is_true, :label => "Contributor" %>
-      <%= f.input :is_janitor_is_true, :label => "Janitor" %>
-      <%= f.input :is_moderator_is_true, :label => "Moderator" %>
-      <%= f.input :is_admin_is_true, :label => "Admin" %>
       <%= f.sort_link "Name", :name %>
       <%= f.sort_link "Date", :created_at_desc %>
       <%= f.button :submit %>
@@ -47,18 +41,18 @@
               <td></td>
             <% end %>
             <td><%= link_to user.note_versions.count, note_versions_path(:search => {:updater_id_eq => user.id}) %></td>
-            <td><%= user.pretty_level %></td>
+            <td><%= user.level_string %></td>
             <td><span title="<%= user.created_at %>"><%= time_ago_in_words user.created_at %> ago</span></td>
           </tr>
         <% end %>
       </tbody>
     </table>
 
-    <div id="paginator">
-      <%= will_paginate(@users) %>
+    <div class="paginator">
+      <%= numbered_paginator(@users) %>
     </div>
 
-    <%= render :partial => "footer" %>
+    <%= render "secondary_links" %>
   </div>
 </div>
 

@@ -10,7 +10,7 @@
       </div>
       
       <div id="wiki-page-posts">
-        <%= @wiki_page.post_set.presenter.post_previews_html %>
+        <%= @wiki_page.post_set.presenter.post_previews_html(self) %>
       </div>
     </section>
   </div>
