@@ -5,12 +5,12 @@ class User < ActiveRecord::Base
   class PrivilegeError < Exception ; end
   
   module Levels
-    MEMBER = 0
-    PRIVILEGED = 100
-    CONTRIBUTOR = 200
-    JANITOR = 300
-    MODERATOR = 400
-    ADMIN = 500
+    MEMBER = 20
+    PRIVILEGED = 30
+    CONTRIBUTOR = 33
+    JANITOR = 35
+    MODERATOR = 40
+    ADMIN = 50
   end
   
   attr_accessor :password, :old_password
@@ -128,18 +128,18 @@ class User < ActiveRecord::Base
   
   module FavoriteMethods
     def favorites
-      Favorite.model_for(id).where("user_id = ?", id).order("id desc")
+      Favorite.where("user_id = ?", id).order("id desc")
     end
     
     def add_favorite!(post)
-      return if Favorite.model_for(id).exists?(:user_id => id, :post_id => post.id)
-      Favorite.model_for(id).create(:user_id => id, :post_id => post.id)
+      return if Favorite.exists?(:user_id => id, :post_id => post.id)
+      Favorite.create(:user_id => id, :post_id => post.id)
       post.add_favorite!(self)
     end
     
     def remove_favorite!(post)
-      return unless Favorite.model_for(id).exists?(:user_id => id, :post_id => post.id)
-      Favorite.model_for(id).destroy_all(:user_id => id, :post_id => post.id)
+      return unless Favorite.exists?(:user_id => id, :post_id => post.id)
+      Favorite.destroy_all(:user_id => id, :post_id => post.id)
       post.remove_favorite!(self)
     end
   end

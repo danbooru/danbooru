@@ -85,8 +85,8 @@ class PostTest < ActiveSupport::TestCase
         c1.add_favorite!(user)
         c1.delete!
         p1.reload
-        assert(!Favorite.model_for(user.id).exists?(:post_id => c1.id, :user_id => user.id))
-        assert(Favorite.model_for(user.id).exists?(:post_id => p1.id, :user_id => user.id))
+        assert(!Favorite.exists?(:post_id => c1.id, :user_id => user.id))
+        assert(Favorite.exists?(:post_id => p1.id, :user_id => user.id))
       end
 
       should "update the parent's has_children flag" do
@@ -335,22 +335,22 @@ class PostTest < ActiveSupport::TestCase
         post.add_favorite!(user)
         post.reload
         assert_equal("fav:#{user.id}", post.fav_string)
-        assert(Favorite.model_for(user.id).exists?(:user_id => user.id, :post_id => post.id))
+        assert(Favorite.exists?(:user_id => user.id, :post_id => post.id))
 
         post.add_favorite!(user)
         post.reload
         assert_equal("fav:#{user.id}", post.fav_string)
-        assert(Favorite.model_for(user.id).exists?(:user_id => user.id, :post_id => post.id))
+        assert(Favorite.exists?(:user_id => user.id, :post_id => post.id))
 
         post.remove_favorite!(user)
         post.reload
         assert_equal("", post.fav_string)
-        assert(!Favorite.model_for(user.id).exists?(:user_id => user.id, :post_id => post.id))
+        assert(!Favorite.exists?(:user_id => user.id, :post_id => post.id))
       
         post.remove_favorite!(user)
         post.reload
         assert_equal("", post.fav_string)
-        assert(!Favorite.model_for(user.id).exists?(:user_id => user.id, :post_id => post.id))
+        assert(!Favorite.exists?(:user_id => user.id, :post_id => post.id))
       end
     end
   end

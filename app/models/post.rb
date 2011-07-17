@@ -389,7 +389,7 @@ class Post < ActiveRecord::Base
   
   module FavoriteMethods
     def delete_favorites
-      Favorite.delete_post(id)
+      Favorite.delete_all(:post_id => id)
     end
     
     def favorited_by?(user_id)

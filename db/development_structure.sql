@@ -9,7 +9,327 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET escape_string_warning = off;
 
+--
+-- Name: plpgsql; Type: PROCEDURAL LANGUAGE; Schema: -; Owner: -
+--
+
+CREATE PROCEDURAL LANGUAGE plpgsql;
+
+
 SET search_path = public, pg_catalog;
+
+--
+-- Name: favorites_insert_trigger(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION favorites_insert_trigger() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+      begin
+        if (NEW.user_id % 100 = 0) then
+          insert into favorites_0 values (NEW.*);
+                elsif (NEW.user_id % 100 = 1) then
+          insert into favorites_1 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 2) then
+          insert into favorites_2 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 3) then
+          insert into favorites_3 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 4) then
+          insert into favorites_4 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 5) then
+          insert into favorites_5 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 6) then
+          insert into favorites_6 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 7) then
+          insert into favorites_7 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 8) then
+          insert into favorites_8 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 9) then
+          insert into favorites_9 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 10) then
+          insert into favorites_10 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 11) then
+          insert into favorites_11 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 12) then
+          insert into favorites_12 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 13) then
+          insert into favorites_13 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 14) then
+          insert into favorites_14 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 15) then
+          insert into favorites_15 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 16) then
+          insert into favorites_16 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 17) then
+          insert into favorites_17 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 18) then
+          insert into favorites_18 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 19) then
+          insert into favorites_19 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 20) then
+          insert into favorites_20 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 21) then
+          insert into favorites_21 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 22) then
+          insert into favorites_22 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 23) then
+          insert into favorites_23 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 24) then
+          insert into favorites_24 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 25) then
+          insert into favorites_25 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 26) then
+          insert into favorites_26 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 27) then
+          insert into favorites_27 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 28) then
+          insert into favorites_28 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 29) then
+          insert into favorites_29 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 30) then
+          insert into favorites_30 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 31) then
+          insert into favorites_31 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 32) then
+          insert into favorites_32 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 33) then
+          insert into favorites_33 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 34) then
+          insert into favorites_34 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 35) then
+          insert into favorites_35 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 36) then
+          insert into favorites_36 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 37) then
+          insert into favorites_37 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 38) then
+          insert into favorites_38 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 39) then
+          insert into favorites_39 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 40) then
+          insert into favorites_40 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 41) then
+          insert into favorites_41 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 42) then
+          insert into favorites_42 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 43) then
+          insert into favorites_43 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 44) then
+          insert into favorites_44 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 45) then
+          insert into favorites_45 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 46) then
+          insert into favorites_46 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 47) then
+          insert into favorites_47 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 48) then
+          insert into favorites_48 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 49) then
+          insert into favorites_49 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 50) then
+          insert into favorites_50 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 51) then
+          insert into favorites_51 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 52) then
+          insert into favorites_52 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 53) then
+          insert into favorites_53 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 54) then
+          insert into favorites_54 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 55) then
+          insert into favorites_55 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 56) then
+          insert into favorites_56 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 57) then
+          insert into favorites_57 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 58) then
+          insert into favorites_58 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 59) then
+          insert into favorites_59 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 60) then
+          insert into favorites_60 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 61) then
+          insert into favorites_61 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 62) then
+          insert into favorites_62 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 63) then
+          insert into favorites_63 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 64) then
+          insert into favorites_64 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 65) then
+          insert into favorites_65 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 66) then
+          insert into favorites_66 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 67) then
+          insert into favorites_67 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 68) then
+          insert into favorites_68 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 69) then
+          insert into favorites_69 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 70) then
+          insert into favorites_70 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 71) then
+          insert into favorites_71 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 72) then
+          insert into favorites_72 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 73) then
+          insert into favorites_73 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 74) then
+          insert into favorites_74 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 75) then
+          insert into favorites_75 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 76) then
+          insert into favorites_76 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 77) then
+          insert into favorites_77 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 78) then
+          insert into favorites_78 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 79) then
+          insert into favorites_79 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 80) then
+          insert into favorites_80 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 81) then
+          insert into favorites_81 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 82) then
+          insert into favorites_82 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 83) then
+          insert into favorites_83 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 84) then
+          insert into favorites_84 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 85) then
+          insert into favorites_85 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 86) then
+          insert into favorites_86 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 87) then
+          insert into favorites_87 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 88) then
+          insert into favorites_88 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 89) then
+          insert into favorites_89 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 90) then
+          insert into favorites_90 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 91) then
+          insert into favorites_91 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 92) then
+          insert into favorites_92 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 93) then
+          insert into favorites_93 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 94) then
+          insert into favorites_94 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 95) then
+          insert into favorites_95 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 96) then
+          insert into favorites_96 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 97) then
+          insert into favorites_97 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 98) then
+          insert into favorites_98 values (NEW.*);
+
+        elsif (NEW.user_id % 100 = 99) then
+          insert into favorites_99 values (NEW.*);
+
+        end if;
+        return NULL;
+      end;
+      $$;
+
 
 --
 -- Name: testprs_end(internal); Type: FUNCTION; Schema: public; Owner: -
@@ -442,3006 +762,6 @@ CREATE TABLE favorites (
 
 
 --
--- Name: favorites_0; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_0 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_0_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_0_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_0_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_0_id_seq OWNED BY favorites_0.id;
-
-
---
--- Name: favorites_1; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_1 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_10; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_10 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_10_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_10_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_10_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_10_id_seq OWNED BY favorites_10.id;
-
-
---
--- Name: favorites_11; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_11 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_11_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_11_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_11_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_11_id_seq OWNED BY favorites_11.id;
-
-
---
--- Name: favorites_12; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_12 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_12_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_12_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_12_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_12_id_seq OWNED BY favorites_12.id;
-
-
---
--- Name: favorites_13; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_13 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_13_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_13_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_13_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_13_id_seq OWNED BY favorites_13.id;
-
-
---
--- Name: favorites_14; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_14 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_14_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_14_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_14_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_14_id_seq OWNED BY favorites_14.id;
-
-
---
--- Name: favorites_15; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_15 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_15_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_15_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_15_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_15_id_seq OWNED BY favorites_15.id;
-
-
---
--- Name: favorites_16; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_16 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_16_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_16_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_16_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_16_id_seq OWNED BY favorites_16.id;
-
-
---
--- Name: favorites_17; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_17 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_17_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_17_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_17_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_17_id_seq OWNED BY favorites_17.id;
-
-
---
--- Name: favorites_18; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_18 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_18_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_18_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_18_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_18_id_seq OWNED BY favorites_18.id;
-
-
---
--- Name: favorites_19; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_19 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_19_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_19_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_19_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_19_id_seq OWNED BY favorites_19.id;
-
-
---
--- Name: favorites_1_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_1_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_1_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_1_id_seq OWNED BY favorites_1.id;
-
-
---
--- Name: favorites_2; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_2 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_20; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_20 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_20_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_20_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_20_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_20_id_seq OWNED BY favorites_20.id;
-
-
---
--- Name: favorites_21; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_21 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_21_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_21_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_21_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_21_id_seq OWNED BY favorites_21.id;
-
-
---
--- Name: favorites_22; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_22 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_22_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_22_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_22_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_22_id_seq OWNED BY favorites_22.id;
-
-
---
--- Name: favorites_23; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_23 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_23_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_23_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_23_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_23_id_seq OWNED BY favorites_23.id;
-
-
---
--- Name: favorites_24; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_24 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_24_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_24_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_24_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_24_id_seq OWNED BY favorites_24.id;
-
-
---
--- Name: favorites_25; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_25 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_25_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_25_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_25_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_25_id_seq OWNED BY favorites_25.id;
-
-
---
--- Name: favorites_26; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_26 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_26_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_26_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_26_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_26_id_seq OWNED BY favorites_26.id;
-
-
---
--- Name: favorites_27; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_27 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_27_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_27_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_27_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_27_id_seq OWNED BY favorites_27.id;
-
-
---
--- Name: favorites_28; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_28 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_28_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_28_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_28_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_28_id_seq OWNED BY favorites_28.id;
-
-
---
--- Name: favorites_29; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_29 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_29_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_29_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_29_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_29_id_seq OWNED BY favorites_29.id;
-
-
---
--- Name: favorites_2_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_2_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_2_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_2_id_seq OWNED BY favorites_2.id;
-
-
---
--- Name: favorites_3; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_3 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_30; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_30 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_30_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_30_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_30_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_30_id_seq OWNED BY favorites_30.id;
-
-
---
--- Name: favorites_31; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_31 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_31_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_31_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_31_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_31_id_seq OWNED BY favorites_31.id;
-
-
---
--- Name: favorites_32; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_32 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_32_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_32_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_32_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_32_id_seq OWNED BY favorites_32.id;
-
-
---
--- Name: favorites_33; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_33 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_33_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_33_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_33_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_33_id_seq OWNED BY favorites_33.id;
-
-
---
--- Name: favorites_34; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_34 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_34_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_34_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_34_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_34_id_seq OWNED BY favorites_34.id;
-
-
---
--- Name: favorites_35; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_35 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_35_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_35_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_35_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_35_id_seq OWNED BY favorites_35.id;
-
-
---
--- Name: favorites_36; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_36 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_36_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_36_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_36_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_36_id_seq OWNED BY favorites_36.id;
-
-
---
--- Name: favorites_37; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_37 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_37_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_37_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_37_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_37_id_seq OWNED BY favorites_37.id;
-
-
---
--- Name: favorites_38; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_38 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_38_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_38_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_38_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_38_id_seq OWNED BY favorites_38.id;
-
-
---
--- Name: favorites_39; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_39 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_39_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_39_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_39_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_39_id_seq OWNED BY favorites_39.id;
-
-
---
--- Name: favorites_3_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_3_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_3_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_3_id_seq OWNED BY favorites_3.id;
-
-
---
--- Name: favorites_4; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_4 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_40; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_40 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_40_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_40_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_40_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_40_id_seq OWNED BY favorites_40.id;
-
-
---
--- Name: favorites_41; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_41 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_41_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_41_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_41_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_41_id_seq OWNED BY favorites_41.id;
-
-
---
--- Name: favorites_42; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_42 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_42_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_42_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_42_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_42_id_seq OWNED BY favorites_42.id;
-
-
---
--- Name: favorites_43; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_43 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_43_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_43_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_43_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_43_id_seq OWNED BY favorites_43.id;
-
-
---
--- Name: favorites_44; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_44 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_44_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_44_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_44_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_44_id_seq OWNED BY favorites_44.id;
-
-
---
--- Name: favorites_45; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_45 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_45_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_45_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_45_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_45_id_seq OWNED BY favorites_45.id;
-
-
---
--- Name: favorites_46; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_46 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_46_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_46_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_46_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_46_id_seq OWNED BY favorites_46.id;
-
-
---
--- Name: favorites_47; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_47 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_47_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_47_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_47_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_47_id_seq OWNED BY favorites_47.id;
-
-
---
--- Name: favorites_48; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_48 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_48_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_48_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_48_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_48_id_seq OWNED BY favorites_48.id;
-
-
---
--- Name: favorites_49; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_49 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_49_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_49_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_49_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_49_id_seq OWNED BY favorites_49.id;
-
-
---
--- Name: favorites_4_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_4_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_4_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_4_id_seq OWNED BY favorites_4.id;
-
-
---
--- Name: favorites_5; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_5 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_50; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_50 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_50_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_50_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_50_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_50_id_seq OWNED BY favorites_50.id;
-
-
---
--- Name: favorites_51; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_51 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_51_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_51_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_51_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_51_id_seq OWNED BY favorites_51.id;
-
-
---
--- Name: favorites_52; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_52 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_52_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_52_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_52_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_52_id_seq OWNED BY favorites_52.id;
-
-
---
--- Name: favorites_53; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_53 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_53_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_53_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_53_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_53_id_seq OWNED BY favorites_53.id;
-
-
---
--- Name: favorites_54; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_54 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_54_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_54_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_54_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_54_id_seq OWNED BY favorites_54.id;
-
-
---
--- Name: favorites_55; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_55 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_55_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_55_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_55_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_55_id_seq OWNED BY favorites_55.id;
-
-
---
--- Name: favorites_56; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_56 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_56_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_56_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_56_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_56_id_seq OWNED BY favorites_56.id;
-
-
---
--- Name: favorites_57; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_57 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_57_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_57_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_57_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_57_id_seq OWNED BY favorites_57.id;
-
-
---
--- Name: favorites_58; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_58 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_58_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_58_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_58_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_58_id_seq OWNED BY favorites_58.id;
-
-
---
--- Name: favorites_59; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_59 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_59_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_59_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_59_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_59_id_seq OWNED BY favorites_59.id;
-
-
---
--- Name: favorites_5_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_5_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_5_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_5_id_seq OWNED BY favorites_5.id;
-
-
---
--- Name: favorites_6; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_6 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_60; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_60 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_60_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_60_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_60_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_60_id_seq OWNED BY favorites_60.id;
-
-
---
--- Name: favorites_61; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_61 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_61_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_61_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_61_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_61_id_seq OWNED BY favorites_61.id;
-
-
---
--- Name: favorites_62; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_62 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_62_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_62_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_62_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_62_id_seq OWNED BY favorites_62.id;
-
-
---
--- Name: favorites_63; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_63 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_63_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_63_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_63_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_63_id_seq OWNED BY favorites_63.id;
-
-
---
--- Name: favorites_64; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_64 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_64_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_64_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_64_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_64_id_seq OWNED BY favorites_64.id;
-
-
---
--- Name: favorites_65; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_65 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_65_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_65_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_65_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_65_id_seq OWNED BY favorites_65.id;
-
-
---
--- Name: favorites_66; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_66 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_66_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_66_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_66_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_66_id_seq OWNED BY favorites_66.id;
-
-
---
--- Name: favorites_67; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_67 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_67_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_67_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_67_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_67_id_seq OWNED BY favorites_67.id;
-
-
---
--- Name: favorites_68; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_68 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_68_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_68_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_68_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_68_id_seq OWNED BY favorites_68.id;
-
-
---
--- Name: favorites_69; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_69 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_69_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_69_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_69_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_69_id_seq OWNED BY favorites_69.id;
-
-
---
--- Name: favorites_6_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_6_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_6_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_6_id_seq OWNED BY favorites_6.id;
-
-
---
--- Name: favorites_7; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_7 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_70; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_70 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_70_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_70_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_70_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_70_id_seq OWNED BY favorites_70.id;
-
-
---
--- Name: favorites_71; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_71 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_71_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_71_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_71_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_71_id_seq OWNED BY favorites_71.id;
-
-
---
--- Name: favorites_72; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_72 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_72_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_72_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_72_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_72_id_seq OWNED BY favorites_72.id;
-
-
---
--- Name: favorites_73; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_73 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_73_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_73_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_73_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_73_id_seq OWNED BY favorites_73.id;
-
-
---
--- Name: favorites_74; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_74 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_74_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_74_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_74_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_74_id_seq OWNED BY favorites_74.id;
-
-
---
--- Name: favorites_75; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_75 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_75_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_75_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_75_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_75_id_seq OWNED BY favorites_75.id;
-
-
---
--- Name: favorites_76; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_76 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_76_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_76_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_76_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_76_id_seq OWNED BY favorites_76.id;
-
-
---
--- Name: favorites_77; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_77 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_77_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_77_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_77_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_77_id_seq OWNED BY favorites_77.id;
-
-
---
--- Name: favorites_78; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_78 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_78_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_78_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_78_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_78_id_seq OWNED BY favorites_78.id;
-
-
---
--- Name: favorites_79; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_79 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_79_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_79_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_79_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_79_id_seq OWNED BY favorites_79.id;
-
-
---
--- Name: favorites_7_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_7_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_7_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_7_id_seq OWNED BY favorites_7.id;
-
-
---
--- Name: favorites_8; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_8 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_80; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_80 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_80_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_80_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_80_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_80_id_seq OWNED BY favorites_80.id;
-
-
---
--- Name: favorites_81; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_81 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_81_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_81_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_81_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_81_id_seq OWNED BY favorites_81.id;
-
-
---
--- Name: favorites_82; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_82 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_82_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_82_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_82_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_82_id_seq OWNED BY favorites_82.id;
-
-
---
--- Name: favorites_83; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_83 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_83_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_83_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_83_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_83_id_seq OWNED BY favorites_83.id;
-
-
---
--- Name: favorites_84; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_84 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_84_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_84_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_84_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_84_id_seq OWNED BY favorites_84.id;
-
-
---
--- Name: favorites_85; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_85 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_85_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_85_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_85_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_85_id_seq OWNED BY favorites_85.id;
-
-
---
--- Name: favorites_86; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_86 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_86_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_86_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_86_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_86_id_seq OWNED BY favorites_86.id;
-
-
---
--- Name: favorites_87; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_87 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_87_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_87_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_87_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_87_id_seq OWNED BY favorites_87.id;
-
-
---
--- Name: favorites_88; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_88 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_88_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_88_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_88_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_88_id_seq OWNED BY favorites_88.id;
-
-
---
--- Name: favorites_89; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_89 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_89_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_89_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_89_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_89_id_seq OWNED BY favorites_89.id;
-
-
---
--- Name: favorites_8_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_8_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_8_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_8_id_seq OWNED BY favorites_8.id;
-
-
---
--- Name: favorites_9; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_9 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_90; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_90 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_90_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_90_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_90_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_90_id_seq OWNED BY favorites_90.id;
-
-
---
--- Name: favorites_91; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_91 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_91_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_91_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_91_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_91_id_seq OWNED BY favorites_91.id;
-
-
---
--- Name: favorites_92; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_92 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_92_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_92_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_92_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_92_id_seq OWNED BY favorites_92.id;
-
-
---
--- Name: favorites_93; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_93 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_93_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_93_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_93_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_93_id_seq OWNED BY favorites_93.id;
-
-
---
--- Name: favorites_94; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_94 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_94_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_94_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_94_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_94_id_seq OWNED BY favorites_94.id;
-
-
---
--- Name: favorites_95; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_95 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_95_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_95_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_95_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_95_id_seq OWNED BY favorites_95.id;
-
-
---
--- Name: favorites_96; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_96 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_96_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_96_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_96_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_96_id_seq OWNED BY favorites_96.id;
-
-
---
--- Name: favorites_97; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_97 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_97_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_97_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_97_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_97_id_seq OWNED BY favorites_97.id;
-
-
---
--- Name: favorites_98; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_98 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_98_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_98_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_98_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_98_id_seq OWNED BY favorites_98.id;
-
-
---
--- Name: favorites_99; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE favorites_99 (
-    id integer NOT NULL,
-    user_id integer,
-    post_id integer
-);
-
-
---
--- Name: favorites_99_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_99_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_99_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_99_id_seq OWNED BY favorites_99.id;
-
-
---
--- Name: favorites_9_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE favorites_9_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: favorites_9_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE favorites_9_id_seq OWNED BY favorites_9.id;
-
-
---
 -- Name: favorites_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -3458,6 +778,906 @@ CREATE SEQUENCE favorites_id_seq
 --
 
 ALTER SEQUENCE favorites_id_seq OWNED BY favorites.id;
+
+
+--
+-- Name: favorites_0; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_0 (CONSTRAINT favorites_0_user_id_check CHECK (((user_id % 100) = 0))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_1; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_1 (CONSTRAINT favorites_1_user_id_check CHECK (((user_id % 100) = 1))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_10; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_10 (CONSTRAINT favorites_10_user_id_check CHECK (((user_id % 100) = 10))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_11; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_11 (CONSTRAINT favorites_11_user_id_check CHECK (((user_id % 100) = 11))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_12; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_12 (CONSTRAINT favorites_12_user_id_check CHECK (((user_id % 100) = 12))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_13; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_13 (CONSTRAINT favorites_13_user_id_check CHECK (((user_id % 100) = 13))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_14; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_14 (CONSTRAINT favorites_14_user_id_check CHECK (((user_id % 100) = 14))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_15; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_15 (CONSTRAINT favorites_15_user_id_check CHECK (((user_id % 100) = 15))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_16; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_16 (CONSTRAINT favorites_16_user_id_check CHECK (((user_id % 100) = 16))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_17; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_17 (CONSTRAINT favorites_17_user_id_check CHECK (((user_id % 100) = 17))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_18; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_18 (CONSTRAINT favorites_18_user_id_check CHECK (((user_id % 100) = 18))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_19; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_19 (CONSTRAINT favorites_19_user_id_check CHECK (((user_id % 100) = 19))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_2; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_2 (CONSTRAINT favorites_2_user_id_check CHECK (((user_id % 100) = 2))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_20; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_20 (CONSTRAINT favorites_20_user_id_check CHECK (((user_id % 100) = 20))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_21; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_21 (CONSTRAINT favorites_21_user_id_check CHECK (((user_id % 100) = 21))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_22; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_22 (CONSTRAINT favorites_22_user_id_check CHECK (((user_id % 100) = 22))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_23; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_23 (CONSTRAINT favorites_23_user_id_check CHECK (((user_id % 100) = 23))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_24; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_24 (CONSTRAINT favorites_24_user_id_check CHECK (((user_id % 100) = 24))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_25; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_25 (CONSTRAINT favorites_25_user_id_check CHECK (((user_id % 100) = 25))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_26; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_26 (CONSTRAINT favorites_26_user_id_check CHECK (((user_id % 100) = 26))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_27; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_27 (CONSTRAINT favorites_27_user_id_check CHECK (((user_id % 100) = 27))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_28; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_28 (CONSTRAINT favorites_28_user_id_check CHECK (((user_id % 100) = 28))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_29; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_29 (CONSTRAINT favorites_29_user_id_check CHECK (((user_id % 100) = 29))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_3; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_3 (CONSTRAINT favorites_3_user_id_check CHECK (((user_id % 100) = 3))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_30; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_30 (CONSTRAINT favorites_30_user_id_check CHECK (((user_id % 100) = 30))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_31; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_31 (CONSTRAINT favorites_31_user_id_check CHECK (((user_id % 100) = 31))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_32; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_32 (CONSTRAINT favorites_32_user_id_check CHECK (((user_id % 100) = 32))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_33; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_33 (CONSTRAINT favorites_33_user_id_check CHECK (((user_id % 100) = 33))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_34; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_34 (CONSTRAINT favorites_34_user_id_check CHECK (((user_id % 100) = 34))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_35; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_35 (CONSTRAINT favorites_35_user_id_check CHECK (((user_id % 100) = 35))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_36; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_36 (CONSTRAINT favorites_36_user_id_check CHECK (((user_id % 100) = 36))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_37; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_37 (CONSTRAINT favorites_37_user_id_check CHECK (((user_id % 100) = 37))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_38; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_38 (CONSTRAINT favorites_38_user_id_check CHECK (((user_id % 100) = 38))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_39; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_39 (CONSTRAINT favorites_39_user_id_check CHECK (((user_id % 100) = 39))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_4; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_4 (CONSTRAINT favorites_4_user_id_check CHECK (((user_id % 100) = 4))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_40; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_40 (CONSTRAINT favorites_40_user_id_check CHECK (((user_id % 100) = 40))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_41; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_41 (CONSTRAINT favorites_41_user_id_check CHECK (((user_id % 100) = 41))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_42; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_42 (CONSTRAINT favorites_42_user_id_check CHECK (((user_id % 100) = 42))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_43; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_43 (CONSTRAINT favorites_43_user_id_check CHECK (((user_id % 100) = 43))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_44; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_44 (CONSTRAINT favorites_44_user_id_check CHECK (((user_id % 100) = 44))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_45; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_45 (CONSTRAINT favorites_45_user_id_check CHECK (((user_id % 100) = 45))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_46; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_46 (CONSTRAINT favorites_46_user_id_check CHECK (((user_id % 100) = 46))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_47; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_47 (CONSTRAINT favorites_47_user_id_check CHECK (((user_id % 100) = 47))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_48; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_48 (CONSTRAINT favorites_48_user_id_check CHECK (((user_id % 100) = 48))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_49; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_49 (CONSTRAINT favorites_49_user_id_check CHECK (((user_id % 100) = 49))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_5; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_5 (CONSTRAINT favorites_5_user_id_check CHECK (((user_id % 100) = 5))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_50; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_50 (CONSTRAINT favorites_50_user_id_check CHECK (((user_id % 100) = 50))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_51; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_51 (CONSTRAINT favorites_51_user_id_check CHECK (((user_id % 100) = 51))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_52; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_52 (CONSTRAINT favorites_52_user_id_check CHECK (((user_id % 100) = 52))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_53; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_53 (CONSTRAINT favorites_53_user_id_check CHECK (((user_id % 100) = 53))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_54; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_54 (CONSTRAINT favorites_54_user_id_check CHECK (((user_id % 100) = 54))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_55; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_55 (CONSTRAINT favorites_55_user_id_check CHECK (((user_id % 100) = 55))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_56; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_56 (CONSTRAINT favorites_56_user_id_check CHECK (((user_id % 100) = 56))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_57; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_57 (CONSTRAINT favorites_57_user_id_check CHECK (((user_id % 100) = 57))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_58; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_58 (CONSTRAINT favorites_58_user_id_check CHECK (((user_id % 100) = 58))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_59; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_59 (CONSTRAINT favorites_59_user_id_check CHECK (((user_id % 100) = 59))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_6; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_6 (CONSTRAINT favorites_6_user_id_check CHECK (((user_id % 100) = 6))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_60; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_60 (CONSTRAINT favorites_60_user_id_check CHECK (((user_id % 100) = 60))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_61; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_61 (CONSTRAINT favorites_61_user_id_check CHECK (((user_id % 100) = 61))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_62; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_62 (CONSTRAINT favorites_62_user_id_check CHECK (((user_id % 100) = 62))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_63; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_63 (CONSTRAINT favorites_63_user_id_check CHECK (((user_id % 100) = 63))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_64; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_64 (CONSTRAINT favorites_64_user_id_check CHECK (((user_id % 100) = 64))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_65; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_65 (CONSTRAINT favorites_65_user_id_check CHECK (((user_id % 100) = 65))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_66; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_66 (CONSTRAINT favorites_66_user_id_check CHECK (((user_id % 100) = 66))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_67; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_67 (CONSTRAINT favorites_67_user_id_check CHECK (((user_id % 100) = 67))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_68; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_68 (CONSTRAINT favorites_68_user_id_check CHECK (((user_id % 100) = 68))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_69; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_69 (CONSTRAINT favorites_69_user_id_check CHECK (((user_id % 100) = 69))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_7; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_7 (CONSTRAINT favorites_7_user_id_check CHECK (((user_id % 100) = 7))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_70; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_70 (CONSTRAINT favorites_70_user_id_check CHECK (((user_id % 100) = 70))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_71; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_71 (CONSTRAINT favorites_71_user_id_check CHECK (((user_id % 100) = 71))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_72; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_72 (CONSTRAINT favorites_72_user_id_check CHECK (((user_id % 100) = 72))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_73; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_73 (CONSTRAINT favorites_73_user_id_check CHECK (((user_id % 100) = 73))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_74; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_74 (CONSTRAINT favorites_74_user_id_check CHECK (((user_id % 100) = 74))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_75; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_75 (CONSTRAINT favorites_75_user_id_check CHECK (((user_id % 100) = 75))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_76; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_76 (CONSTRAINT favorites_76_user_id_check CHECK (((user_id % 100) = 76))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_77; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_77 (CONSTRAINT favorites_77_user_id_check CHECK (((user_id % 100) = 77))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_78; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_78 (CONSTRAINT favorites_78_user_id_check CHECK (((user_id % 100) = 78))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_79; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_79 (CONSTRAINT favorites_79_user_id_check CHECK (((user_id % 100) = 79))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_8; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_8 (CONSTRAINT favorites_8_user_id_check CHECK (((user_id % 100) = 8))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_80; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_80 (CONSTRAINT favorites_80_user_id_check CHECK (((user_id % 100) = 80))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_81; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_81 (CONSTRAINT favorites_81_user_id_check CHECK (((user_id % 100) = 81))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_82; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_82 (CONSTRAINT favorites_82_user_id_check CHECK (((user_id % 100) = 82))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_83; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_83 (CONSTRAINT favorites_83_user_id_check CHECK (((user_id % 100) = 83))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_84; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_84 (CONSTRAINT favorites_84_user_id_check CHECK (((user_id % 100) = 84))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_85; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_85 (CONSTRAINT favorites_85_user_id_check CHECK (((user_id % 100) = 85))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_86; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_86 (CONSTRAINT favorites_86_user_id_check CHECK (((user_id % 100) = 86))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_87; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_87 (CONSTRAINT favorites_87_user_id_check CHECK (((user_id % 100) = 87))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_88; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_88 (CONSTRAINT favorites_88_user_id_check CHECK (((user_id % 100) = 88))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_89; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_89 (CONSTRAINT favorites_89_user_id_check CHECK (((user_id % 100) = 89))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_9; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_9 (CONSTRAINT favorites_9_user_id_check CHECK (((user_id % 100) = 9))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_90; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_90 (CONSTRAINT favorites_90_user_id_check CHECK (((user_id % 100) = 90))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_91; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_91 (CONSTRAINT favorites_91_user_id_check CHECK (((user_id % 100) = 91))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_92; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_92 (CONSTRAINT favorites_92_user_id_check CHECK (((user_id % 100) = 92))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_93; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_93 (CONSTRAINT favorites_93_user_id_check CHECK (((user_id % 100) = 93))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_94; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_94 (CONSTRAINT favorites_94_user_id_check CHECK (((user_id % 100) = 94))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_95; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_95 (CONSTRAINT favorites_95_user_id_check CHECK (((user_id % 100) = 95))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_96; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_96 (CONSTRAINT favorites_96_user_id_check CHECK (((user_id % 100) = 96))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_97; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_97 (CONSTRAINT favorites_97_user_id_check CHECK (((user_id % 100) = 97))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_98; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_98 (CONSTRAINT favorites_98_user_id_check CHECK (((user_id % 100) = 98))
+)
+INHERITS (favorites);
+
+
+--
+-- Name: favorites_99; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorites_99 (CONSTRAINT favorites_99_user_id_check CHECK (((user_id % 100) = 99))
+)
+INHERITS (favorites);
 
 
 --
@@ -4402,706 +2622,6 @@ ALTER TABLE favorites ALTER COLUMN id SET DEFAULT nextval('favorites_id_seq'::re
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE favorites_0 ALTER COLUMN id SET DEFAULT nextval('favorites_0_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_1 ALTER COLUMN id SET DEFAULT nextval('favorites_1_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_10 ALTER COLUMN id SET DEFAULT nextval('favorites_10_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_11 ALTER COLUMN id SET DEFAULT nextval('favorites_11_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_12 ALTER COLUMN id SET DEFAULT nextval('favorites_12_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_13 ALTER COLUMN id SET DEFAULT nextval('favorites_13_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_14 ALTER COLUMN id SET DEFAULT nextval('favorites_14_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_15 ALTER COLUMN id SET DEFAULT nextval('favorites_15_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_16 ALTER COLUMN id SET DEFAULT nextval('favorites_16_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_17 ALTER COLUMN id SET DEFAULT nextval('favorites_17_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_18 ALTER COLUMN id SET DEFAULT nextval('favorites_18_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_19 ALTER COLUMN id SET DEFAULT nextval('favorites_19_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_2 ALTER COLUMN id SET DEFAULT nextval('favorites_2_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_20 ALTER COLUMN id SET DEFAULT nextval('favorites_20_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_21 ALTER COLUMN id SET DEFAULT nextval('favorites_21_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_22 ALTER COLUMN id SET DEFAULT nextval('favorites_22_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_23 ALTER COLUMN id SET DEFAULT nextval('favorites_23_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_24 ALTER COLUMN id SET DEFAULT nextval('favorites_24_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_25 ALTER COLUMN id SET DEFAULT nextval('favorites_25_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_26 ALTER COLUMN id SET DEFAULT nextval('favorites_26_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_27 ALTER COLUMN id SET DEFAULT nextval('favorites_27_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_28 ALTER COLUMN id SET DEFAULT nextval('favorites_28_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_29 ALTER COLUMN id SET DEFAULT nextval('favorites_29_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_3 ALTER COLUMN id SET DEFAULT nextval('favorites_3_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_30 ALTER COLUMN id SET DEFAULT nextval('favorites_30_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_31 ALTER COLUMN id SET DEFAULT nextval('favorites_31_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_32 ALTER COLUMN id SET DEFAULT nextval('favorites_32_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_33 ALTER COLUMN id SET DEFAULT nextval('favorites_33_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_34 ALTER COLUMN id SET DEFAULT nextval('favorites_34_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_35 ALTER COLUMN id SET DEFAULT nextval('favorites_35_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_36 ALTER COLUMN id SET DEFAULT nextval('favorites_36_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_37 ALTER COLUMN id SET DEFAULT nextval('favorites_37_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_38 ALTER COLUMN id SET DEFAULT nextval('favorites_38_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_39 ALTER COLUMN id SET DEFAULT nextval('favorites_39_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_4 ALTER COLUMN id SET DEFAULT nextval('favorites_4_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_40 ALTER COLUMN id SET DEFAULT nextval('favorites_40_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_41 ALTER COLUMN id SET DEFAULT nextval('favorites_41_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_42 ALTER COLUMN id SET DEFAULT nextval('favorites_42_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_43 ALTER COLUMN id SET DEFAULT nextval('favorites_43_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_44 ALTER COLUMN id SET DEFAULT nextval('favorites_44_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_45 ALTER COLUMN id SET DEFAULT nextval('favorites_45_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_46 ALTER COLUMN id SET DEFAULT nextval('favorites_46_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_47 ALTER COLUMN id SET DEFAULT nextval('favorites_47_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_48 ALTER COLUMN id SET DEFAULT nextval('favorites_48_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_49 ALTER COLUMN id SET DEFAULT nextval('favorites_49_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_5 ALTER COLUMN id SET DEFAULT nextval('favorites_5_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_50 ALTER COLUMN id SET DEFAULT nextval('favorites_50_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_51 ALTER COLUMN id SET DEFAULT nextval('favorites_51_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_52 ALTER COLUMN id SET DEFAULT nextval('favorites_52_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_53 ALTER COLUMN id SET DEFAULT nextval('favorites_53_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_54 ALTER COLUMN id SET DEFAULT nextval('favorites_54_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_55 ALTER COLUMN id SET DEFAULT nextval('favorites_55_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_56 ALTER COLUMN id SET DEFAULT nextval('favorites_56_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_57 ALTER COLUMN id SET DEFAULT nextval('favorites_57_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_58 ALTER COLUMN id SET DEFAULT nextval('favorites_58_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_59 ALTER COLUMN id SET DEFAULT nextval('favorites_59_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_6 ALTER COLUMN id SET DEFAULT nextval('favorites_6_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_60 ALTER COLUMN id SET DEFAULT nextval('favorites_60_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_61 ALTER COLUMN id SET DEFAULT nextval('favorites_61_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_62 ALTER COLUMN id SET DEFAULT nextval('favorites_62_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_63 ALTER COLUMN id SET DEFAULT nextval('favorites_63_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_64 ALTER COLUMN id SET DEFAULT nextval('favorites_64_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_65 ALTER COLUMN id SET DEFAULT nextval('favorites_65_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_66 ALTER COLUMN id SET DEFAULT nextval('favorites_66_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_67 ALTER COLUMN id SET DEFAULT nextval('favorites_67_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_68 ALTER COLUMN id SET DEFAULT nextval('favorites_68_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_69 ALTER COLUMN id SET DEFAULT nextval('favorites_69_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_7 ALTER COLUMN id SET DEFAULT nextval('favorites_7_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_70 ALTER COLUMN id SET DEFAULT nextval('favorites_70_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_71 ALTER COLUMN id SET DEFAULT nextval('favorites_71_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_72 ALTER COLUMN id SET DEFAULT nextval('favorites_72_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_73 ALTER COLUMN id SET DEFAULT nextval('favorites_73_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_74 ALTER COLUMN id SET DEFAULT nextval('favorites_74_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_75 ALTER COLUMN id SET DEFAULT nextval('favorites_75_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_76 ALTER COLUMN id SET DEFAULT nextval('favorites_76_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_77 ALTER COLUMN id SET DEFAULT nextval('favorites_77_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_78 ALTER COLUMN id SET DEFAULT nextval('favorites_78_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_79 ALTER COLUMN id SET DEFAULT nextval('favorites_79_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_8 ALTER COLUMN id SET DEFAULT nextval('favorites_8_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_80 ALTER COLUMN id SET DEFAULT nextval('favorites_80_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_81 ALTER COLUMN id SET DEFAULT nextval('favorites_81_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_82 ALTER COLUMN id SET DEFAULT nextval('favorites_82_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_83 ALTER COLUMN id SET DEFAULT nextval('favorites_83_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_84 ALTER COLUMN id SET DEFAULT nextval('favorites_84_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_85 ALTER COLUMN id SET DEFAULT nextval('favorites_85_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_86 ALTER COLUMN id SET DEFAULT nextval('favorites_86_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_87 ALTER COLUMN id SET DEFAULT nextval('favorites_87_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_88 ALTER COLUMN id SET DEFAULT nextval('favorites_88_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_89 ALTER COLUMN id SET DEFAULT nextval('favorites_89_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_9 ALTER COLUMN id SET DEFAULT nextval('favorites_9_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_90 ALTER COLUMN id SET DEFAULT nextval('favorites_90_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_91 ALTER COLUMN id SET DEFAULT nextval('favorites_91_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_92 ALTER COLUMN id SET DEFAULT nextval('favorites_92_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_93 ALTER COLUMN id SET DEFAULT nextval('favorites_93_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_94 ALTER COLUMN id SET DEFAULT nextval('favorites_94_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_95 ALTER COLUMN id SET DEFAULT nextval('favorites_95_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_96 ALTER COLUMN id SET DEFAULT nextval('favorites_96_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_97 ALTER COLUMN id SET DEFAULT nextval('favorites_97_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_98 ALTER COLUMN id SET DEFAULT nextval('favorites_98_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE favorites_99 ALTER COLUMN id SET DEFAULT nextval('favorites_99_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE forum_posts ALTER COLUMN id SET DEFAULT nextval('forum_posts_id_seq'::regclass);
 
 
@@ -5337,806 +2857,6 @@ ALTER TABLE ONLY delayed_jobs
 
 ALTER TABLE ONLY dmails
     ADD CONSTRAINT dmails_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_0_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_0
-    ADD CONSTRAINT favorites_0_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_10_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_10
-    ADD CONSTRAINT favorites_10_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_11_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_11
-    ADD CONSTRAINT favorites_11_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_12_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_12
-    ADD CONSTRAINT favorites_12_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_13_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_13
-    ADD CONSTRAINT favorites_13_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_14_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_14
-    ADD CONSTRAINT favorites_14_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_15_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_15
-    ADD CONSTRAINT favorites_15_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_16_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_16
-    ADD CONSTRAINT favorites_16_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_17_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_17
-    ADD CONSTRAINT favorites_17_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_18_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_18
-    ADD CONSTRAINT favorites_18_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_19_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_19
-    ADD CONSTRAINT favorites_19_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_1_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_1
-    ADD CONSTRAINT favorites_1_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_20_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_20
-    ADD CONSTRAINT favorites_20_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_21_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_21
-    ADD CONSTRAINT favorites_21_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_22_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_22
-    ADD CONSTRAINT favorites_22_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_23_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_23
-    ADD CONSTRAINT favorites_23_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_24_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_24
-    ADD CONSTRAINT favorites_24_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_25_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_25
-    ADD CONSTRAINT favorites_25_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_26_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_26
-    ADD CONSTRAINT favorites_26_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_27_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_27
-    ADD CONSTRAINT favorites_27_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_28_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_28
-    ADD CONSTRAINT favorites_28_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_29_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_29
-    ADD CONSTRAINT favorites_29_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_2_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_2
-    ADD CONSTRAINT favorites_2_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_30_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_30
-    ADD CONSTRAINT favorites_30_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_31_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_31
-    ADD CONSTRAINT favorites_31_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_32_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_32
-    ADD CONSTRAINT favorites_32_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_33_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_33
-    ADD CONSTRAINT favorites_33_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_34_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_34
-    ADD CONSTRAINT favorites_34_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_35_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_35
-    ADD CONSTRAINT favorites_35_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_36_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_36
-    ADD CONSTRAINT favorites_36_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_37_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_37
-    ADD CONSTRAINT favorites_37_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_38_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_38
-    ADD CONSTRAINT favorites_38_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_39_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_39
-    ADD CONSTRAINT favorites_39_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_3_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_3
-    ADD CONSTRAINT favorites_3_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_40_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_40
-    ADD CONSTRAINT favorites_40_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_41_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_41
-    ADD CONSTRAINT favorites_41_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_42_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_42
-    ADD CONSTRAINT favorites_42_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_43_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_43
-    ADD CONSTRAINT favorites_43_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_44_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_44
-    ADD CONSTRAINT favorites_44_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_45_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_45
-    ADD CONSTRAINT favorites_45_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_46_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_46
-    ADD CONSTRAINT favorites_46_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_47_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_47
-    ADD CONSTRAINT favorites_47_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_48_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_48
-    ADD CONSTRAINT favorites_48_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_49_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_49
-    ADD CONSTRAINT favorites_49_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_4_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_4
-    ADD CONSTRAINT favorites_4_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_50_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_50
-    ADD CONSTRAINT favorites_50_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_51_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_51
-    ADD CONSTRAINT favorites_51_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_52_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_52
-    ADD CONSTRAINT favorites_52_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_53_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_53
-    ADD CONSTRAINT favorites_53_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_54_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_54
-    ADD CONSTRAINT favorites_54_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_55_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_55
-    ADD CONSTRAINT favorites_55_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_56_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_56
-    ADD CONSTRAINT favorites_56_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_57_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_57
-    ADD CONSTRAINT favorites_57_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_58_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_58
-    ADD CONSTRAINT favorites_58_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_59_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_59
-    ADD CONSTRAINT favorites_59_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_5_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_5
-    ADD CONSTRAINT favorites_5_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_60_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_60
-    ADD CONSTRAINT favorites_60_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_61_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_61
-    ADD CONSTRAINT favorites_61_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_62_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_62
-    ADD CONSTRAINT favorites_62_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_63_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_63
-    ADD CONSTRAINT favorites_63_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_64_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_64
-    ADD CONSTRAINT favorites_64_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_65_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_65
-    ADD CONSTRAINT favorites_65_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_66_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_66
-    ADD CONSTRAINT favorites_66_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_67_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_67
-    ADD CONSTRAINT favorites_67_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_68_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_68
-    ADD CONSTRAINT favorites_68_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_69_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_69
-    ADD CONSTRAINT favorites_69_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_6_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_6
-    ADD CONSTRAINT favorites_6_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_70_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_70
-    ADD CONSTRAINT favorites_70_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_71_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_71
-    ADD CONSTRAINT favorites_71_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_72_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_72
-    ADD CONSTRAINT favorites_72_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_73_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_73
-    ADD CONSTRAINT favorites_73_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_74_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_74
-    ADD CONSTRAINT favorites_74_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_75_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_75
-    ADD CONSTRAINT favorites_75_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_76_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_76
-    ADD CONSTRAINT favorites_76_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_77_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_77
-    ADD CONSTRAINT favorites_77_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_78_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_78
-    ADD CONSTRAINT favorites_78_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_79_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_79
-    ADD CONSTRAINT favorites_79_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_7_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_7
-    ADD CONSTRAINT favorites_7_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_80_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_80
-    ADD CONSTRAINT favorites_80_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_81_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_81
-    ADD CONSTRAINT favorites_81_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_82_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_82
-    ADD CONSTRAINT favorites_82_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_83_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_83
-    ADD CONSTRAINT favorites_83_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_84_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_84
-    ADD CONSTRAINT favorites_84_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_85_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_85
-    ADD CONSTRAINT favorites_85_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_86_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_86
-    ADD CONSTRAINT favorites_86_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_87_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_87
-    ADD CONSTRAINT favorites_87_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_88_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_88
-    ADD CONSTRAINT favorites_88_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_89_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_89
-    ADD CONSTRAINT favorites_89_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_8_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_8
-    ADD CONSTRAINT favorites_8_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_90_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_90
-    ADD CONSTRAINT favorites_90_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_91_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_91
-    ADD CONSTRAINT favorites_91_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_92_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_92
-    ADD CONSTRAINT favorites_92_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_93_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_93
-    ADD CONSTRAINT favorites_93_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_94_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_94
-    ADD CONSTRAINT favorites_94_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_95_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_95
-    ADD CONSTRAINT favorites_95_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_96_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_96
-    ADD CONSTRAINT favorites_96_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_97_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_97
-    ADD CONSTRAINT favorites_97_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_98_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_98
-    ADD CONSTRAINT favorites_98_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_99_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_99
-    ADD CONSTRAINT favorites_99_pkey PRIMARY KEY (id);
-
-
---
--- Name: favorites_9_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY favorites_9
-    ADD CONSTRAINT favorites_9_pkey PRIMARY KEY (id);
 
 
 --
@@ -8240,6 +4960,16 @@ CREATE UNIQUE INDEX index_wiki_pages_on_title ON wiki_pages USING btree (title);
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
+
+
+--
+-- Name: insert_favorites_trigger; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER insert_favorites_trigger
+    BEFORE INSERT ON favorites
+    FOR EACH ROW
+    EXECUTE PROCEDURE favorites_insert_trigger();
 
 
 --

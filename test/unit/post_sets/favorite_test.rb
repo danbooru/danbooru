@@ -24,8 +24,8 @@ module PostSets
       
       context "a favorite set for before the most recent post" do
         setup do
-          id = ::Favorite.model_for(@user.id).where(:user_id => @user.id, :post_id => @post_3.id).first.id
-          ::Favorite.model_for(@user.id).stubs(:records_per_page).returns(1)
+          id = ::Favorite.where(:user_id => @user.id, :post_id => @post_3.id).first.id
+          ::Favorite.stubs(:records_per_page).returns(1)
           @set = PostSets::Favorite.new(@user.id, "b#{id}")
         end
 
@@ -39,8 +39,8 @@ module PostSets
       
       context "a favorite set for after the second most recent post" do
         setup do
-          id = ::Favorite.model_for(@user.id).where(:user_id => @user.id, :post_id => @post_2.id).first.id
-          ::Favorite.model_for(@user.id).stubs(:records_per_page).returns(1)
+          id = ::Favorite.where(:user_id => @user.id, :post_id => @post_2.id).first.id
+          ::Favorite.stubs(:records_per_page).returns(1)
           @set = PostSets::Favorite.new(@user.id, "a#{id}")
         end
 
@@ -54,7 +54,7 @@ module PostSets
       
       context "a favorite set for page 2" do
         setup do
-          ::Favorite.model_for(@user.id).stubs(:records_per_page).returns(1)
+          ::Favorite.stubs(:records_per_page).returns(1)
           @set = PostSets::Favorite.new(@user.id, 2)
         end
 
@@ -68,7 +68,7 @@ module PostSets
       
       context "a favorite set with no page specified" do
         setup do
-          ::Favorite.model_for(@user.id).stubs(:records_per_page).returns(1)
+          ::Favorite.stubs(:records_per_page).returns(1)
           @set = PostSets::Favorite.new(@user.id)
         end
 

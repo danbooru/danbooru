@@ -8,13 +8,13 @@ Bundler.require(:default, Rails.env) if defined?(Bundler)
 
 module Danbooru
   class Application < Rails::Application
+    config.active_record.schema_format = :sql
     config.encoding = "utf-8"
     config.filter_parameters += [:password]
     config.assets.enabled = true
     config.autoload_paths += %W(#{config.root}/app/presenters #{config.root}/app/logical)
     config.plugins = [:all]
     config.time_zone = 'Eastern Time (US & Canada)'
-    config.active_record.schema_format = :sql
     # config.action_view.javascript_expansions[:defaults] = [
     #   "src/lib/jquery-1.6.0.min.js",
     #   "src/lib/jquery-ui-1.8.9.custom.min.js",
