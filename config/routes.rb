@@ -90,7 +90,7 @@ Danbooru::Application.routes.draw do
   resources :tag_subscriptions
   resources :uploads
   resources :users
-  resources :user_feedback
+  resources :user_feedbacks
   resources :wiki_pages do
     member do
       put :revert

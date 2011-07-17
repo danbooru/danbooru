@@ -1,7 +1,7 @@
 require 'test_helper'
 
-class UserFeedbackControllerTest < ActionController::TestCase
-  context "The user feedback controller" do
+class UserFeedbacksControllerTest < ActionController::TestCase
+  context "The user feedbacks controller" do
     setup do
       @user = Factory.create(:user)
       @critic = Factory.create(:privileged_user)
@@ -53,7 +53,7 @@ class UserFeedbackControllerTest < ActionController::TestCase
     context "create action" do
       should "create a new feedback" do
         assert_difference("UserFeedback.count", 1) do
-          post :create, {:user_feedback => {:is_positive => false, :user_name => @user.name, :body => "xxx"}}, {:user_id => @critic.id}
+          post :create, {:user_feedback => {:category => "positive", :user_name => @user.name, :body => "xxx"}}, {:user_id => @critic.id}
           assert_not_nil(assigns(:user_feedback))
           assert_equal([], assigns(:user_feedback).errors.full_messages)
         end

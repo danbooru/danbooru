@@ -2396,7 +2396,7 @@ CREATE TABLE user_feedback (
     id integer NOT NULL,
     user_id integer NOT NULL,
     creator_id integer NOT NULL,
-    is_positive boolean NOT NULL,
+    category character varying(255) NOT NULL,
     body text NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone

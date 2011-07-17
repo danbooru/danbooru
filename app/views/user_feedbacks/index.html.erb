@@ -1,0 +1,32 @@
+<div id="c-user-feedbacks">
+  <div id="a-index">
+    <h1>User Feedback</h1>
+    
+    <table width="100%">
+      <thead>
+        <tr>
+          <th width="15%">User</th>
+          <th width="15%">Creator</th>
+          <th width="15%">When</th>
+          <th width="55%">Message</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @user_feedbacks.each do |feedback| %>
+          <tr>
+            <td><%= link_to feedback.user_name, user_feedback_path(feedback.user_id) %></td>
+            <td><%= feedback.creator.name %></td>
+            <td><%= time_ago_in_words(feedback.created_at) %> ago</td>
+            <td><%= format_text(feedback.body) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <div class="paginator">
+      <%= numbered_paginator(@user_feedbacks) %>
+    </div>
+
+    <%= render "secondary_links" %>
+  </div>
+</div>

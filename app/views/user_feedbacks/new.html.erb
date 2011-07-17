@@ -1,0 +1,17 @@
+<div id="c-user-feedbacks">
+  <div id="a-new">
+    <h1>New User Feedback</h1>
+
+    <div id="preview">
+    </div>
+
+    <%= simple_form_for(@user_feedback) do |f| %>
+      <%= f.input :user_name %>
+      <%= f.input :category, :collection => ["positive", "neutral", "negative"] %>
+      <%= f.input :body %>
+      <%= f.button :submit %>
+      <%= f.button :submit, :value => "Preview" %>
+    <% end %>
+  </div>
+</div>
+
