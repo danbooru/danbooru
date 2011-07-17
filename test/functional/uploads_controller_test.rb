@@ -3,7 +3,7 @@ require 'test_helper'
 class UploadsControllerTest < ActionController::TestCase
   context "The uploads controller" do
     setup do
-      @user = Factory.create(:user)
+      @user = Factory.create(:contributor_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
