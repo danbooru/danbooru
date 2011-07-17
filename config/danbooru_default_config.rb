@@ -163,6 +163,15 @@ module Danbooru
       }
     end
     
+    def canonical_tag_category_mapping
+      @canonical_tag_category_mapping ||= {
+        "General" => 0,
+        "Artist" => 1,
+        "Copyright" => 2,
+        "Character" => 3
+      }
+    end
+    
     # Returns a hash maping numerical category values to their
     # string equivalent. Be sure to update the tag_category_mapping also.
     def reverse_tag_category_mapping
