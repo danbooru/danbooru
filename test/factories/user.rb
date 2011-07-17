@@ -13,21 +13,21 @@ Factory.define(:banned_user, :parent => :user) do |f|
 end
 
 Factory.define(:privileged_user, :parent => :user) do |f|
-  f.level 100
+  f.level 30
 end
 
 Factory.define(:contributor_user, :parent => :user) do |f|
-  f.level 200
+  f.level 33
 end
 
 Factory.define(:janitor_user, :parent => :user) do |f|
-  f.level 300
+  f.level 35
 end
 
 Factory.define(:moderator_user, :parent => :user) do |f|
-  f.level 400
+  f.level 40
 end
 
 Factory.define(:admin_user, :parent => :user) do |f|
-  f.level 500
+  f.level 50
 end
