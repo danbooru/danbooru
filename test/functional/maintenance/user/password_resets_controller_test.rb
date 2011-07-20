@@ -76,6 +76,32 @@ module Maintenance
               @user = Factory.create(:user)
               @nonce = Factory.create(:user_password_reset_nonce, :email => @user.email)
               ActionMailer::Base.deliveries.clear
+              get :edit, :email => @nonce.email, :key => @nonce.key
+            end
+            
+            should "succeed" do
+              assert_response :success
+            end
+          end
+        end
+        
+        context "update action" do
+          context "with invalid parameters" do
+            setup do
+              get :update
+            end
+            
+            should "fail" do
+              assert_redirected_to new_maintenance_user_password_reset_path
+            end
+          end
+          
+          context "with valid parameters" do
+            setup do
+              @user = Factory.create(:user)
+              @nonce = Factory.create(:user_password_reset_nonce, :email => @user.email)
+              ActionMailer::Base.deliveries.clear
+              @old_password = @user.password_hash
               post :update, :email => @nonce.email, :key => @nonce.key
             end
             
@@ -85,6 +111,11 @@ module Maintenance
             
             should "send an email" do
               assert_equal(1, ActionMailer::Base.deliveries.size)
+            end
+            
+            should "change the password" do
+              @user.reload
+              assert_not_equal(@old_password, @user.password_hash)
             end
             
             should "delete the nonce" do

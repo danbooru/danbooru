@@ -102,13 +102,13 @@ class User < ActiveRecord::Base
       end
 
       pass << rand(100).to_s
-      execute_sql("UPDATE users SET password_hash = ? WHERE id = ?", self.class.sha1(pass), id)
+      update_column(:password_hash, User.sha1(pass))
       pass    
     end
     
     def reset_password_and_deliver_notice
       new_password = reset_password()
-      UserMaintenanceMailer.reset_password(self, new_password).deliver
+      Maintenance::User::PasswordResetMailer.confirmation(self, new_password).deliver
     end
   end
   

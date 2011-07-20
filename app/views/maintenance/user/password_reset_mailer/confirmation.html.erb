@@ -1,0 +1,5 @@
+<h1>Password Reset Confirmation</h1>
+
+<p>The password for the user "<%= @user.name %>" for the website <%= Danbooru.config.app_name %> has been reset. It is now <code><%= @new_password %></code>.</p>
+
+<p>Please log in to the website and <%= link_to "change your password", edit_user_path(@user) %> as soon as possible.</p>

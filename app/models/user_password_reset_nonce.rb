@@ -6,7 +6,7 @@ class UserPasswordResetNonce < ActiveRecord::Base
   after_create :deliver_notice
 
   def deliver_notice
-    Maintenance::User::PasswordResetMailer.request(user).deliver
+    Maintenance::User::PasswordResetMailer.reset_request(user, self).deliver
   end
 
   def initialize_key
