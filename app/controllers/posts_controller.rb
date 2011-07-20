@@ -4,7 +4,7 @@ class PostsController < ApplicationController
   respond_to :html, :xml, :json
   
   def index
-    @post_set = PostSets::Post.new(params)
+    @post_set = PostSets::Post.new(tag_query, params[:page])
     @posts = @post_set.posts
     respond_with(@posts)
   end
@@ -30,9 +30,13 @@ class PostsController < ApplicationController
   end
 
 private
+  def tag_query
+    params[:tags] || (params[:post] && params[:post][:tags])
+  end
+
   def save_recent_tags
-    if params[:tags] || (params[:post] && params[:post][:tags])
-      tags = Tag.scan_tags(params[:tags] || params[:post][:tags])
+    if tag_query
+      tags = Tag.scan_tags(tag_query)
       tags = TagAlias.to_aliased(tags) + Tag.scan_tags(session[:recent_tags])
       session[:recent_tags] = tags.uniq.slice(0, 40).join(" ")
     end
