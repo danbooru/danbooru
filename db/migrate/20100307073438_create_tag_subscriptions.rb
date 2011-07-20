@@ -1,7 +1,7 @@
 class CreateTagSubscriptions < ActiveRecord::Migration
   def self.up
     create_table :tag_subscriptions do |t|
-      t.column :owner_id, :integer, :null => false
+      t.column :creator_id, :integer, :null => false
       t.column :name, :string, :null => false
       t.column :tag_query, :string, :null => false
       t.column :post_ids, :text, :null => false
@@ -9,7 +9,7 @@ class CreateTagSubscriptions < ActiveRecord::Migration
       t.timestamps
     end
     
-    add_index :tag_subscriptions, :owner_id
+    add_index :tag_subscriptions, :creator_id
     add_index :tag_subscriptions, :name
   end
 

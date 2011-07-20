@@ -2284,7 +2284,7 @@ ALTER SEQUENCE tag_implications_id_seq OWNED BY tag_implications.id;
 
 CREATE TABLE tag_subscriptions (
     id integer NOT NULL,
-    owner_id integer NOT NULL,
+    creator_id integer NOT NULL,
     name character varying(255) NOT NULL,
     tag_query character varying(255) NOT NULL,
     post_ids text NOT NULL,
@@ -4933,17 +4933,17 @@ CREATE INDEX index_tag_implications_on_consequent_name ON tag_implications USING
 
 
 --
+-- Name: index_tag_subscriptions_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_tag_subscriptions_on_creator_id ON tag_subscriptions USING btree (creator_id);
+
+
+--
 -- Name: index_tag_subscriptions_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_tag_subscriptions_on_name ON tag_subscriptions USING btree (name);
-
-
---
--- Name: index_tag_subscriptions_on_owner_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_tag_subscriptions_on_owner_id ON tag_subscriptions USING btree (owner_id);
 
 
 --

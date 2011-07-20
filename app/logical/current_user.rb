@@ -31,7 +31,11 @@ class CurrentUser
   end
   
   def self.id
-    user.id
+    if user.nil?
+      nil
+    else
+      user.id
+    end
   end
   
   def self.name

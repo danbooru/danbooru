@@ -1,14 +1,25 @@
-<% form_tag(:action => "update") do %>
-  <h4>Edit Tag Subscriptions</h4>
-  <div style="margin-bottom: 1em;">
-    You can only create up to <%= CONFIG["max_tag_subscriptions"] %> groups and each group can have up to 20 tags.
+<div id="c-tag-subscriptions">
+  <div id="a-index">
+    <h1>Tag Subscriptions</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Creator</th>
+          <th>Name</th>
+          <th>Tag Query</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @tag_subscriptions.each do |tag_subscription| %>
+          <tr>
+            <td><%= tag_subscription.creator.name %></td>
+            <td><%= link_to tag_subscription.name, tag_subscription_path(tag_subscription.id) %></td>
+            <td><%= link_to tag_subscription.tag_query, posts_path(:tags => "sub:#{@user.name}:#{tag_subscription.name}") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
   </div>
-  
-  <table width="100%" class="highlightable">
-    <%= render :partial => "listing", :locals => {:tag_subscriptions => @tag_subscriptions} %>
-  </table>
-<% end %>
+</div>
 
-<% content_for("subnavbar") do %>
-  <li><%= link_to "Help", :controller => "help", :action => "tag_subscriptions" %></li>
-<% end %>
+<%= render "secondary_links" %>

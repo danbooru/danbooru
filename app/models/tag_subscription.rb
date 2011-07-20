@@ -1,18 +1,18 @@
 class TagSubscription < ActiveRecord::Base
-  belongs_to :owner, :class_name => "User"
-  before_validation :initialize_owner, :on => :create
+  belongs_to :creator, :class_name => "User"
+  before_validation :initialize_creator, :on => :create
   before_validation :initialize_post_ids, :on => :create
   before_save :normalize_name
   before_save :limit_tag_count
-  scope :visible, lambda {where("is_public = TRUE OR owner_id = ? OR ?", CurrentUser.id, CurrentUser.is_moderator?)}
   attr_accessible :name, :tag_query, :post_ids, :is_visible_on_profile
+  validates_presence_of :name, :tag_query, :is_public, :creator_id
 
   def normalize_name
     self.name = name.gsub(/\W/, "_")
   end
   
-  def initialize_owner
-    self.owner_id = CurrentUser.id
+  def initialize_creator
+    self.creator_id = CurrentUser.id
   end
 
   def initialize_post_ids
@@ -33,6 +33,14 @@ class TagSubscription < ActiveRecord::Base
     end
     self.post_ids = post_ids.sort.reverse.slice(0, Danbooru.config.tag_subscription_post_limit).join(",")
   end
+  
+  def editable_by?(user)
+    user.is_moderator? || creator_id == user.id
+  end
+  
+  def self.visible_to(user)
+    where("(is_public = TRUE OR creator_id = ? OR ?)", user.id, user.is_moderator?)
+  end
 
   def self.find_tags(subscription_name)
     if subscription_name =~ /^(.+?):(.+)$/
@@ -46,7 +54,7 @@ class TagSubscription < ActiveRecord::Base
     user = User.find_by_name(user_name)
     
     if user
-      relation = where(["owner_id = ?", user.id])
+      relation = where(["creator_id = ?", user.id])
       
       if sub_group
         relation = relation.where(["name ILIKE ? ESCAPE E'\\\\'", sub_group.to_escaped_for_sql_like])
@@ -59,7 +67,7 @@ class TagSubscription < ActiveRecord::Base
   end
 
   def self.find_post_ids(user_id, name = nil, limit = Danbooru.config.tag_subscription_post_limit)
-    relation = where(["owner_id = ?", user_id])
+    relation = where(["creator_id = ?", user_id])
     
     if name
       relation = relation.where(["name ILIKE ? ESCAPE E'\\\\'", name.to_escaped_for_sql_like])
@@ -74,7 +82,7 @@ class TagSubscription < ActiveRecord::Base
 
   def self.process_all
     find_each do |tag_subscription|
-      if $job_task_daemon_active != false && tag_subscription.owner.is_privileged?
+      if $job_task_daemon_active != false && tag_subscription.creator.is_privileged?
         begin
           tag_subscription.process
           tag_subscription.save

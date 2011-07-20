@@ -15,26 +15,18 @@ class TagSubscriptionsControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        @tag_subscription = Factory.create(:tag_subscription, :name => "aaa", :owner => @user)
+        @tag_subscription = Factory.create(:tag_subscription, :name => "aaa")
       end
       
       should "list all visible tag subscriptions" do
         get :index
         assert_response :success
       end
-      
-      context "with search conditions" do
-        should "list all matching forum posts" do
-          get :index, {:search => {:name_equals => "aaa"}}
-          assert_response :success
-          assert_equal(1, assigns(:tag_subscriptions).size)
-        end
-      end
     end
     
     context "edit action" do
       setup do
-        @tag_subscription = Factory.create(:tag_subscription, :owner => @user)
+        @tag_subscription = Factory.create(:tag_subscription)
       end
       
       should "render" do

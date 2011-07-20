@@ -15,8 +15,9 @@ class TagSubscriptionsController < ApplicationController
   end
   
   def index
-    @search = TagSubscription.visible.search(params[:search])
-    @tag_subscriptions = @search.paginate(:page => params[:page])
+    @user = CurrentUser.user
+    @search = TagSubscription.visible_to(@user).search(params[:search])
+    @tag_subscriptions = @search.paginate(params[:page])
     respond_with(@tag_subscriptions)
   end
   
@@ -41,6 +42,6 @@ class TagSubscriptionsController < ApplicationController
   
 private
   def check_privilege(tag_subscription)
-    raise User::PrivilegeError unless (tag_subscription.owner_id == CurrentUser.id || CurrentUser.is_moderator?)
+    raise User::PrivilegeError unless tag_subscription.editable_by?(CurrentUser.user)
   end
 end
