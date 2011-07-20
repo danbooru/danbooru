@@ -1,5 +1,0 @@
-if @error
-  page.alert(@error.to_s)
-else
-  page["#score-for-post-#{@post.id} span"].text(@post.score)
-end
