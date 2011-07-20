@@ -84,7 +84,9 @@ Danbooru::Application.routes.draw do
     end
   end
   resources :tag_aliases do
-    resource :cache, :only => [:destroy]
+    member do
+      delete :cache
+    end
   end
   resources :tag_implications
   resources :tag_subscriptions

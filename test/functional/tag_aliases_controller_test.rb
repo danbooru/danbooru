@@ -16,7 +16,7 @@ class TagAliasesControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        @tag_alias = Factory.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :creator => @user)
+        @tag_alias = Factory.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
       end
       
       should "list all tag aliass" do
@@ -30,17 +30,6 @@ class TagAliasesControllerTest < ActionController::TestCase
       end
     end
     
-    context "edit action" do
-      setup do
-        @tag_alias = Factory.create(:tag_alias, :creator => @user)
-      end
-      
-      should "render" do
-        get :edit, {:id => @tag_alias.id}, {:user_id => @user.id}
-        assert_response :success
-      end
-    end
-    
     context "create action" do
       should "create a tag alias" do
         assert_difference("TagAlias.count", 1) do
@@ -48,22 +37,10 @@ class TagAliasesControllerTest < ActionController::TestCase
         end
       end
     end
-    
-    context "update action" do
-      setup do
-        @tag_alias = Factory.create(:tag_alias, :creator => @user)
-      end
-      
-      should "update a tag_alias" do
-        post :update, {:id => @tag_alias.id, :tag_alias => {:antecedent_name => "zzz"}}, {:user_id => @user.id}
-        @tag_alias.reload
-        assert_equal("zzz", @tag_alias.antecedent_name)
-      end
-    end
-    
+
     context "destroy action" do
       setup do
-        @tag_alias = Factory.create(:tag_alias, :creator => @user)
+        @tag_alias = Factory.create(:tag_alias)
       end
       
       should "destroy a tag_alias" do
@@ -75,7 +52,7 @@ class TagAliasesControllerTest < ActionController::TestCase
     
     context "destroy_cache action" do
       setup do
-        @tag_alias = Factory.create(:tag_alias, :antecedent_name => "aaa", :creator => @user)
+        @tag_alias = Factory.create(:tag_alias, :antecedent_name => "aaa")
       end
       
       should "reset the cache" do
