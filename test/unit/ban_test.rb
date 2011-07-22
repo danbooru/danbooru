@@ -152,7 +152,7 @@ class BanTest < ActiveSupport::TestCase
       ban = Factory.create(:ban, :user => user, :banner => admin)
       CurrentUser.user = nil
       assert(!user.feedback.empty?)
-      assert(!user.feedback.last.is_positive?)
+      assert_equal("negative", user.feedback.last.category)
     end
   end
 

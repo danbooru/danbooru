@@ -70,9 +70,13 @@ class DmailsControllerTest < ActionController::TestCase
     end
     
     context "create action" do
+      setup do
+        @user_2 = Factory.create(:user)
+      end
+      
       should "create two messages, one for the sender and one for the recipient" do
         assert_difference("Dmail.count", 2) do
-          dmail_attribs = Factory.attributes_for(:dmail).merge(:to_id => Factory.create(:user).id)
+          dmail_attribs = {:to_id => @user_2.id, :title => "abc", :body => "abc", :is_read => false}
           post :create, {:dmail => dmail_attribs}, {:user_id => @user.id}
           assert_redirected_to dmail_path(Dmail.last)
         end

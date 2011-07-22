@@ -21,8 +21,8 @@ class TagSubscriptionTest < ActiveSupport::TestCase
       posts << Factory.create(:post, :tag_string => "bbb")
       posts << Factory.create(:post, :tag_string => "ccc")
       posts << Factory.create(:post, :tag_string => "ddd")
-      sub_1 = Factory.create(:tag_subscription, :tag_query => "aaa bbb", :owner => user, :name => "zzz")
-      sub_2 = Factory.create(:tag_subscription, :tag_query => "ccc", :owner => user, :name => "yyy")
+      sub_1 = Factory.create(:tag_subscription, :tag_query => "aaa bbb", :creator => user, :name => "zzz")
+      sub_2 = Factory.create(:tag_subscription, :tag_query => "ccc", :creator => user, :name => "yyy")
       assert_equal([posts[1].id, posts[0].id], TagSubscription.find_posts(user.id, "zzz").map(&:id))
       assert_equal([posts[2].id, posts[1].id, posts[0].id], TagSubscription.find_posts(user.id).map(&:id))
     end
@@ -33,15 +33,15 @@ class TagSubscriptionTest < ActiveSupport::TestCase
       posts << Factory.create(:post, :tag_string => "aaa")
       posts << Factory.create(:post, :tag_string => "bbb")
       posts << Factory.create(:post, :tag_string => "ccc")
-      sub = Factory.create(:tag_subscription, :tag_query => "aaa bbb", :owner => user, :name => "zzz")
+      sub = Factory.create(:tag_subscription, :tag_query => "aaa bbb", :creator => user, :name => "zzz")
       assert_equal("#{posts[1].id},#{posts[0].id}", sub.post_ids)
     end
     
     should "find posts based on its cached post ids" do
       user = Factory.create(:user)
       subs = []
-      subs << Factory.create(:tag_subscription, :tag_query => "aaa", :owner => user, :name => "zzz")
-      subs << Factory.create(:tag_subscription, :tag_query => "bbb", :owner => user, :name => "yyy")
+      subs << Factory.create(:tag_subscription, :tag_query => "aaa", :creator => user, :name => "zzz")
+      subs << Factory.create(:tag_subscription, :tag_query => "bbb", :creator => user, :name => "yyy")
       assert_equal([], TagSubscription.find_posts(user.id))
       assert_equal([], TagSubscription.find_posts(user.id, "zzz"))
       assert_equal([], TagSubscription.find_posts(user.id, "yyy"))
@@ -66,8 +66,8 @@ class TagSubscriptionTest < ActiveSupport::TestCase
       posts << Factory.create(:post, :tag_string => "bbb")
       posts << Factory.create(:post, :tag_string => "ccc")
       subscriptions = []
-      subscriptions << Factory.create(:tag_subscription, :tag_query => "aaa", :owner => users[0])
-      subscriptions << Factory.create(:tag_subscription, :tag_query => "bbb", :owner => users[1])
+      subscriptions << Factory.create(:tag_subscription, :tag_query => "aaa", :creator => users[0])
+      subscriptions << Factory.create(:tag_subscription, :tag_query => "bbb", :creator => users[1])
       TagSubscription.process_all
       subscriptions.each {|x| x.reload}
       assert_equal("#{posts[0].id}", subscriptions[0].post_ids)

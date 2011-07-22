@@ -31,7 +31,7 @@ class JanitorTrial < ActiveRecord::Base
   
   def create_feedback
     user.feedback.create(
-      :is_positive => false,
+      :category => "negative",
       :body => "Demoted from janitor trial"
     )
   end
