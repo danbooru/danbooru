@@ -1,0 +1,19 @@
+<table>
+  <caption>Mod Actions</caption>
+  <thead>
+    <tr>
+      <th>Moderator</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @dashboard.mod_actions.each do |mod_action| %>
+      <tr>
+        <td><%= link_to mod_action.creator.name, user_path(mod_action.creator) %></td>
+        <td><%= format_text(mod_action.description) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<p><%= link_to "View all actions", mod_actions_path %></p>

@@ -1,0 +1,19 @@
+<table>
+  <caption>User Feedback</caption>
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Message</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @dashboard.user_feedbacks.each do |record| %>
+      <tr class="user-record-score-<%= record.category %>">
+        <td><%= link_to(record.user.name, user_path(record.user)) %></td>
+        <td><%= format_text(record.body) %></td>
+        <td><%= time_ago_in_words(record.created_at) %> ago</td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

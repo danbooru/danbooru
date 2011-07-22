@@ -2,7 +2,7 @@ module Moderator
   module Dashboard
     module Queries
       class PostAppeal
-        attr_reader :post, :reason
+        attr_reader :post, :count
 
         def self.all(min_date)
           sql = <<-EOS
@@ -11,7 +11,8 @@ module Moderator
             JOIN posts ON posts.id = post_appeals.post_id
             WHERE
               post_appeals.created_at > ? 
-              and posts.status <> ?
+              and posts.is_deleted = true
+              and posts.is_pending = false
             GROUP BY post_appeals.post_id
             ORDER BY count(*) DESC
             LIMIT 10
@@ -21,8 +22,8 @@ module Moderator
         end
 
         def initialize(hash)
-          @post = Post.find(hash["post_id"])
-          @reason = hash["reason"]
+          @post = ::Post.find(hash["post_id"])
+          @count = hash["count"]
         end
       end
     end

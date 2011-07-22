@@ -1,0 +1,21 @@
+<table>
+  <caption>Comment Activity</caption>
+  <thead>
+    <tr>
+      <th>Comment</th>
+      <th>User</th>
+      <th>Votes</th>
+      <th>Score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @dashboard.comments.each do |activity| %>
+      <tr>
+        <td><%= link_to activity.comment.body, post_path(activity.comment.post_id) %></td>
+        <td><%= mod_link_to_user(activity.comment.creator, :negative) %></td>
+        <td><%= activity.count %></td>
+        <td><%= activity.comment.score %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

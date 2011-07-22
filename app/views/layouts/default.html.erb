@@ -42,8 +42,9 @@
         <%= nav_link_to("Pools", pools_path) %>
         <%= nav_link_to("Wiki", wiki_pages_path(:title => "help:home")) %>
         <%= nav_link_to("Forum", forum_topics_path, :class => (CurrentUser.user.has_forum_been_updated? ? "forum-updated" : nil)) %>
-        <% if CurrentUser.is_moderator? %>
+        <% if CurrentUser.is_janitor? %>
           <%= nav_link_to("Dashboard", moderator_dashboard_path) %>
+          <%= nav_link_to("Queue", moderator_post_dashboard_path) %>
         <% end %>
         <%= nav_link_to("&raquo;".html_safe, site_map_path) %>
       </menu>

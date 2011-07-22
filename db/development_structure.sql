@@ -1819,6 +1819,38 @@ ALTER SEQUENCE janitor_trials_id_seq OWNED BY janitor_trials.id;
 
 
 --
+-- Name: mod_actions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE mod_actions (
+    id integer NOT NULL,
+    creator_id integer NOT NULL,
+    description text NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: mod_actions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE mod_actions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: mod_actions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE mod_actions_id_seq OWNED BY mod_actions.id;
+
+
+--
 -- Name: note_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2682,6 +2714,13 @@ ALTER TABLE janitor_trials ALTER COLUMN id SET DEFAULT nextval('janitor_trials_i
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE mod_actions ALTER COLUMN id SET DEFAULT nextval('mod_actions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE note_versions ALTER COLUMN id SET DEFAULT nextval('note_versions_id_seq'::regclass);
 
 
@@ -2936,6 +2975,14 @@ ALTER TABLE ONLY ip_bans
 
 ALTER TABLE ONLY janitor_trials
     ADD CONSTRAINT janitor_trials_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: mod_actions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY mod_actions
+    ADD CONSTRAINT mod_actions_pkey PRIMARY KEY (id);
 
 
 --
@@ -5172,3 +5219,5 @@ INSERT INTO schema_migrations (version) VALUES ('20110328215701');
 INSERT INTO schema_migrations (version) VALUES ('20110607194023');
 
 INSERT INTO schema_migrations (version) VALUES ('20110717010705');
+
+INSERT INTO schema_migrations (version) VALUES ('20110722211855');

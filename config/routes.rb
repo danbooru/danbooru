@@ -20,6 +20,12 @@ Danbooru::Application.routes.draw do
         end
       end
     end
+    resources :invitations, :only => [:new, :create, :index, :show]
+    resources :ip_addrs, :only => [:index, :search] do
+      collection do
+        get :search
+      end
+    end
   end
   resources :advertisements do
     resources :hits, :controller => "advertisement_hits", :only => [:create]
@@ -57,6 +63,7 @@ Danbooru::Application.routes.draw do
   end
   resources :jobs
   resources :ip_bans
+  resources :mod_actions
   resources :notes do
     collection do
       get :search

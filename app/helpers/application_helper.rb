@@ -33,6 +33,23 @@ module ApplicationHelper
     end
   end
   
+  def mod_link_to_user(user, positive_or_negative)
+    html = ""
+    html << link_to(user.name, user_path(user))
+    
+    if positive_or_negative == :positive
+      html << " [" + link_to("+", new_user_feedback_path(:user_record => {:category => "positive"})) + "]"
+
+      unless user.is_privileged?
+        html << " [" + link_to("invite", moderator_invitations_path(:invitation => {:name => user.name, :level => User::Levels::CONTRIBUTOR})) + "]"
+      end
+    else
+      html << " [" + link_to("&ndash;", new_user_feedback_path(:user_record => {:category => "negative", :user_id => user.id})) + "]"
+    end
+    
+    html
+  end
+  
 protected
   def nav_link_match(controller, url)
     url =~ case controller

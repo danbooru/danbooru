@@ -1,0 +1,9 @@
+<% form_tag(moderator_dashboard_path, :method => :get) do %>
+  <label for="min_date">Minimum Date</label>
+  <%= text_field_tag :min_date, @dashboard.min_date %><br>
+  
+  <label for="max_level">Max Level</label>
+  <%= user_level_select_tag(:max_level) %><br>
+  
+  <%= submit_tag "Search" %>
+<% end %>

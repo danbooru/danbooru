@@ -1,0 +1,25 @@
+<table>
+  <caption>Appeals</caption>
+  <thead>
+    <tr>
+      <th>Post</th>
+      <th>User</th>
+      <th>Flags</th>
+      <th>Appeals</th>
+      <th>Score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @dashboard.appeals.each do |appeal| %>
+      <tr>
+        <td><%= link_to image_tag(appeal.post.preview_file_url), post_path(appeal.post) %></td>
+        <td><%= mod_link_to_user appeal.post.uploader, :negative %></td>
+        <td><%= post_flag_reasons(appeal.post) %></td>
+        <td><%= post_appeal_reasons(appeal.post) %></td>
+        <td><%= appeal.post.score %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<p><%= link_to "View all appeals", post_appeals_path %></p>

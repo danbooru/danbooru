@@ -5,17 +5,17 @@ module Danbooru
       
       module ClassMethods
         def without_timeout
-          connection.execute("SET STATEMENT_TIMEOUT = 0")
+          connection.execute("SET STATEMENT_TIMEOUT = 0") unless Rails.env == "test"
           yield
         ensure
-          connection.execute("SET STATEMENT_TIMEOUT = 10000")
+          connection.execute("SET STATEMENT_TIMEOUT = 5000") unless Rails.env == "test"
         end
 
         def with_timeout(n)
-          connection.execute("SET STATEMENT_TIMEOUT = #{n}")
+          connection.execute("SET STATEMENT_TIMEOUT = #{n}") unless Rails.env == "test"
           yield
         ensure
-          connection.execute("SET STATEMENT_TIMEOUT = 10000")
+          connection.execute("SET STATEMENT_TIMEOUT = 5000") unless Rails.env == "test"
         end
       end
       

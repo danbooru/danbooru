@@ -1,0 +1,11 @@
+<% form_tag(moderator_ip_addrs_path, :method => :get) do %>
+  <label for="user_ids">Search IPs</label>
+  <%= text_field_tag "search[ip_addr_eq]", params[:ip_addrs] %>    
+  <%= submit_tag "Search" %>
+<% end %>
+
+<% form_tag(moderator_ip_addrs_path, :method => :get) do %>
+  <label for="user_ids">Search User IDs</label>
+  <%= text_field_tag "search[user_id_eq]", params[:user_ids] %>    
+  <%= submit_tag "Search" %>
+<% end %>

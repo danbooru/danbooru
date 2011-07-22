@@ -2,10 +2,27 @@ module Moderator
   module Dashboard
     module Queries
       class Upload
-        def self.all(min_date)
-          ActiveRecord::Base.without_timeout do
-            @upload_activity = ActiveRecord::Base.select_all_sql("select posts.uploader_string, count(*) from posts join users on posts.user_id = users.id where posts.created_at > ? and users.level <= ? group by posts.user_id order by count(*) desc limit 10", min_date, max_level).map {|x| UserActivity.new(x)}
-          end
+        attr_reader :user, :count
+        
+        def self.all(min_date, max_level)
+          sql = <<-EOS
+            select uploader_id, count(*) 
+            from posts 
+            join users on uploader_id = users.id 
+            where 
+              posts.created_at > ?  
+              and level <= ? 
+            group by posts.uploader_id 
+            order by count(*) desc 
+            limit 10
+          EOS
+          
+          ActiveRecord::Base.select_all_sql(sql, min_date, max_level).map {|x| new(x)}
+        end
+        
+        def initialize(hash)
+          @user = ::User.find(hash["uploader_id"])
+          @count = hash["count"]
         end
       end
     end

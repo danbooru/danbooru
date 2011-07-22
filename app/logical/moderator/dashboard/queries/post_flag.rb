@@ -12,7 +12,8 @@ module Moderator
             WHERE 
               post_flags.created_at > ? 
               AND post_flags.reason <> ? 
-              AND posts.status <> 'deleted' 
+              AND posts.is_deleted = false
+              and posts.is_pending = false
             GROUP BY post_flags.post_id 
             ORDER BY count(*) DESC 
             LIMIT 10

@@ -1,0 +1,17 @@
+<table>
+  <caption>Wiki Page Updates</caption>
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @dashboard.wiki_pages.each do |activity| %>
+      <tr>
+        <td><%= mod_link_to_user(activity.user, :positive) %></td>
+        <td><%= link_to activity.count, wiki_page_versions_path(:search => {:updater_id_eq => activity.user.id}) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
