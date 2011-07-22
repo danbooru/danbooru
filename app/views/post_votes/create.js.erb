@@ -1,0 +1,5 @@
+<% if @error %>
+  alert("<%= escape_javascript @error.to_s %>");
+<% else %>
+  $("#score-for-post-<%= @post.id %> span").text(<%= @post.score %>);
+<% end %>

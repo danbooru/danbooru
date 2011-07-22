@@ -917,9 +917,10 @@ div#c-wiki-pages {
 
 
 /*** Post Moderation ***/
-div#c-post-moderation {
+div#c-moderator-post-dashboards {
   article {
     margin-bottom: 4em;
+    overflow: hidden;
   }
   
   aside {

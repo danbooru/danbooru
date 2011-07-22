@@ -9,6 +9,17 @@ Danbooru::Application.routes.draw do
         get :search
       end
     end
+    namespace :post do
+      resource :dashboard, :only => [:show]
+      resource :approval, :only => [:create]
+      resource :disapproval, :only => [:create]
+      resources :posts, :only => [:delete, :undelete] do
+        member do
+          post :delete
+          post :undelete
+        end
+      end
+    end
   end
   resources :advertisements do
     resources :hits, :controller => "advertisement_hits", :only => [:create]
@@ -111,14 +122,6 @@ Danbooru::Application.routes.draw do
     namespace :user do
       resource :password_reset, :only => [:new, :create, :edit, :update]
       resource :login_reminder, :only => [:new, :create]
-    end
-  end
-  
-  namespace :moderation do
-    namespace :post do
-      resource :dashboard, :only => [:show]
-      resource :approval, :only => [:destroy, :create]
-      resource :deletion, :only => [:destroy, :create]
     end
   end
 

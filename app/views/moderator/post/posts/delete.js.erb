@@ -1,0 +1,1 @@
+$("#post-<%= @post.id %>").remove();
