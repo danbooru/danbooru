@@ -11,7 +11,7 @@ class BansController < ApplicationController
   
   def index
     @search = Ban.search(params[:search])
-    @bans = @search.paginate(:page => params[:page])
+    @bans = @search.paginate(params[:page])
   end
   
   def show

@@ -15,7 +15,7 @@ class DmailsController < ApplicationController
   
   def index
     @search = Dmail.search(params[:search])
-    @dmails = @search.paginate(:page => params[:page])
+    @dmails = @search.paginate(params[:page])
     @dmails.each {|x| check_privilege(x)}
     respond_with(@dmails)
   end

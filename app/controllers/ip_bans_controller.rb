@@ -12,7 +12,7 @@ class IpBansController < ApplicationController
   
   def index
     @search = IpBan.search(params[:search])
-    @ip_bans = @search.paginate(:page => params[:page])
+    @ip_bans = @search.paginate(params[:page])
   end
   
   def destroy

@@ -16,12 +16,15 @@ class NoteVersionsControllerTest < ActionController::TestCase
     context "index action" do
       setup do
         @note = Factory.create(:note)
-        CurrentUser.id = 20
-        @note.body = "1 2"
-        @note.create_version
-        CurrentUser.id = 30
-        @note.body = "1 2 3"
-        @note.create_version
+        @user_2 = Factory.create(:user)
+        
+        CurrentUser.scoped(@user_2, "1.2.3.4") do
+          @note.update_attributes(:body => "1 2")
+        end
+        
+        CurrentUser.scoped(@user, "1.2.3.4") do
+          @note.update_attributes(:body => "1 2 3")
+        end
       end
       
       should "list all versions" do
@@ -32,7 +35,7 @@ class NoteVersionsControllerTest < ActionController::TestCase
       end
       
       should "list all versions that match the search criteria" do
-        get :index, {:search => {:updater_id_equals => "20"}}
+        get :index, {:search => {:updater_id_equals => @user_2.id}}
         assert_response :success
         assert_not_nil(assigns(:note_versions))
         assert_equal(1, assigns(:note_versions).size)
