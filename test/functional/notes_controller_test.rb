@@ -66,9 +66,9 @@ class NotesControllerTest < ActionController::TestCase
       end
       
       should "destroy a note" do
-        assert_difference("Note.count", -1) do
-          post :destroy, {:id => @note.id}, {:user_id => @user.id}
-        end
+        post :destroy, {:id => @note.id}, {:user_id => @user.id}
+        @note.reload
+        assert_equal(false, @note.is_active?)
       end
     end
     

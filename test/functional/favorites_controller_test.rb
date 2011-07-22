@@ -14,6 +14,11 @@ class FavoritesControllerTest < ActionController::TestCase
     end
     
     context "index action" do
+      setup do
+        @post = Factory.create(:post)
+        @post.add_favorite!(@user)
+      end
+      
       context "with a specified tags parameter" do
         should "redirect to the posts controller" do
           get :index, {:tags => "abc"}, {:user_id => @user}
@@ -24,7 +29,7 @@ class FavoritesControllerTest < ActionController::TestCase
       should "display the current user's favorites" do
         get :index, {}, {:user_id => @user.id}
         assert_response :success
-        assert_not_nil(assigns(:post_set))
+        assert_not_nil(assigns(:favorite_set))
       end
     end
     
@@ -34,8 +39,8 @@ class FavoritesControllerTest < ActionController::TestCase
       end
 
       should "create a favorite for the current user" do
-        assert_difference("Favorite.count(#{@user.id})", 1) do
-          post :create, {:format => "js", :id => @post.id}, {:user_id => @user.id}
+        assert_difference("Favorite.count", 1) do
+          post :create, {:format => "js", :post_id => @post.id}, {:user_id => @user.id}
         end
       end
     end
@@ -43,14 +48,11 @@ class FavoritesControllerTest < ActionController::TestCase
     context "destroy action" do
       setup do
         @post = Factory.create(:post)
-        Favorite.create(
-          :user_id => @user.id,
-          :post_id => @post.id
-        )
+        @post.add_favorite!(@user)
       end
       
       should "remove the favorite from the current user" do
-        assert_difference("Favorite.count(#{@user.id})", -1) do
+        assert_difference("Favorite.count", -1) do
           post :destroy, {:format => "js", :id => @post.id}, {:user_id => @user.id}
         end
       end

@@ -12,6 +12,6 @@ class FavoritesController < ApplicationController
   end
   
   def destroy
-    Post.find(params[:post_id]).remove_favorite!(CurrentUser.user)
+    Post.find(params[:id]).remove_favorite!(CurrentUser.user)
   end
 end
