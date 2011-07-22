@@ -10,7 +10,7 @@ class PostFlagsController < ApplicationController
   
   def index
     @search = PostFlag.search(params[:search])
-    @post_flags = @search.paginate(:page => params[:page])
+    @post_flags = @search.paginate(params[:page])
   end
   
   def create

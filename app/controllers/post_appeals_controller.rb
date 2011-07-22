@@ -10,7 +10,7 @@ class PostAppealsController < ApplicationController
   
   def index
     @search = PostAppeal.search(params[:search])
-    @post_appeals = @search.paginate(:page => params[:page])
+    @post_appeals = @search.paginate(params[:page])
   end
   
   def create

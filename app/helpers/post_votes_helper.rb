@@ -9,6 +9,6 @@ module PostVotesHelper
     added = current.post_id_array - prev.post_id_array
     removed = prev.post_id_array - current.post_id_array
 
-    added.map {|x| '<ins>+<a href="/posts/' + x + '">' + x + '</a></ins>'}.join(" ") + removed.map {|x| '<del>&ndash;<a href="/posts/' + x + '">' + x + '</a></del>'}.join(" ")
+    added.map {|x| '<ins>+<a href="/posts/' + x.to_s + '">' + x.to_s + '</a></ins>'}.join(" ") + removed.map {|x| '<del>&ndash;<a href="/posts/' + x.to_s + '">' + x.to_s + '</a></del>'}.join(" ")
   end
 end

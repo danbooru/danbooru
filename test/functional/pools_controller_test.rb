@@ -75,18 +75,20 @@ class PoolsControllerTest < ActionController::TestCase
     
     context "revert action" do
       setup do
-        @pool = Factory.create(:pool, :post_ids => "1")
+        @post_2 = Factory.create(:post)
+        @pool = Factory.create(:pool, :post_ids => "#{@post.id}")
         CurrentUser.ip_addr = "1.2.3.4" # this is to get around the version collation
-        @pool.update_attributes(:post_ids => "1 2")
+        @pool.update_attributes(:post_ids => "#{@post.id} #{@post_2.id}")
         CurrentUser.ip_addr = "127.0.0.1"
       end
       
       should "revert to a previous version" do
+        assert_equal(2, PoolVersion.count)
         version = @pool.versions(true).first
-        assert_equal("1", version.post_ids)
+        assert_equal("#{@post.id}", version.post_ids)
         post :revert, {:id => @pool.id, :version_id => version.id}
         @pool.reload
-        assert_equal("1", @pool.post_ids)
+        assert_equal("#{@post.id}", @pool.post_ids)
       end
     end
   end

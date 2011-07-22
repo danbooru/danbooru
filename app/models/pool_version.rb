@@ -3,6 +3,7 @@ class PoolVersion < ActiveRecord::Base
   
   validates_presence_of :updater_id, :updater_ip_addr
   belongs_to :pool
+  belongs_to :updater, :class_name => "User"
   before_validation :initialize_updater
   
   def initialize_updater

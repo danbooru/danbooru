@@ -23,7 +23,7 @@ class PoolElementsControllerTest < ActionController::TestCase
       end
       
       should "add a post to a pool once and only once" do
-        @pool.add_post!(@post)
+        @pool.add!(@post)
         post :create, {:pool_id => @pool.id, :post_id => @post.id, :format => "json"}, {:user_id => @user.id}
         @pool.reload
         assert_equal([@post.id], @pool.post_id_array)
@@ -32,7 +32,7 @@ class PoolElementsControllerTest < ActionController::TestCase
     
     context "destroy action" do
       setup do
-        @pool.add_post!(@post)
+        @pool.add!(@post)
       end
       
       should "remove a post from a pool" do
@@ -42,7 +42,7 @@ class PoolElementsControllerTest < ActionController::TestCase
       end
       
       should "do nothing if the post is not a member of the pool" do
-        @pool.remove_post!(@post)
+        @pool.remove!(@post)
         post :destroy, {:pool_id => @pool.id, :post_id => @post.id, :format => "json"}, {:user_id => @user.id}
         @pool.reload
         assert_equal([], @pool.post_id_array)
