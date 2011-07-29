@@ -13,6 +13,24 @@ class UserTest < ActiveSupport::TestCase
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
+    
+    context "that has been invited by a mod" do
+      setup do
+        @mod = Factory.create(:moderator_user)
+      end
+      
+      should "work" do
+        @user.invite!(User::Levels::CONTRIBUTOR)
+        @user.reload
+        assert_equal(User::Levels::CONTRIBUTOR, @user.level)
+      end
+      
+      should "not allow invites up to janitor level or beyond" do
+        @user.invite!(User::Levels::JANITOR)
+        @user.reload
+        assert_equal(User::Levels::MEMBER, @user.level)
+      end
+    end
 
     should "not validate if the originating ip address is banned" do
       Factory.create(:ip_ban)

@@ -1,0 +1,13 @@
+<div id="c-moderator-invitations">
+  <div id="a-index">
+    <h1>Invitations</h1>
+    
+    <ul>
+      <% @users.each do |user| %>
+        <li><%= link_to user.name, user_path(user) %></li>
+      <% end %>
+    </ul>
+
+    <%= numbered_paginator(@users) %>
+  </div>
+</div>

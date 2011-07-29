@@ -52,6 +52,16 @@ class User < ActiveRecord::Base
     end
   end
   
+  module InvitationMethods
+    def invite!(level)
+      if level.to_i <= Levels::CONTRIBUTOR
+        self.level = level
+        self.inviter_id = CurrentUser.id
+        save
+      end
+    end
+  end
+  
   module NameMethods
     extend ActiveSupport::Concern
     
@@ -304,6 +314,7 @@ class User < ActiveRecord::Base
   include BlacklistMethods
   include ForumMethods
   include LimitMethods
+  include InvitationMethods
   
   def initialize_default_image_size
     self.default_image_size = "Medium"

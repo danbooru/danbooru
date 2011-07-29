@@ -9,6 +9,7 @@ Danbooru::Application.routes.draw do
         get :search
       end
     end
+    resources :invitations, :only => [:new, :create, :index]
     resource :tag
     namespace :post do
       resource :dashboard, :only => [:show]
