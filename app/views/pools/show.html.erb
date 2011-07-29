@@ -9,11 +9,7 @@
     <section id="content">
       <%= @post_set.presenter.post_previews_html(self) %>
 
-      <div class="clearfix"></div>
-    
-      <div class="paginator">
-        <%= numbered_paginator(@post_set) %>
-      </div>
+      <%= numbered_paginator(@post_set) %>
     </section>
   </div>
 </div>

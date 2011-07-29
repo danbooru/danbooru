@@ -23,6 +23,17 @@ class TagSubscriptionsControllerTest < ActionController::TestCase
         assert_response :success
       end
     end
+
+    context "posts action" do
+      setup do
+        @tag_subscription = Factory.create(:tag_subscription, :name => "aaa")
+      end
+      
+      should "list all visible tag subscriptions" do
+        get :posts, {:id => @tag_subscription.creator_id}
+        assert_response :success
+      end
+    end
     
     context "edit action" do
       setup do

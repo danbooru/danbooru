@@ -6,11 +6,10 @@
     <li><%= link_to "Hot", explore_post_hot_path %></li>
     <% unless CurrentUser.is_anonymous? %>
       <li><%= link_to "Favorites", favorites_path %></li>
-      <li><%= link_to "Subscriptions", tag_subscriptions_path(:user_id => CurrentUser.id) %></li>
+      <li><%= link_to "Subscriptions", posts_tag_subscription_path(CurrentUser.id) %></li>
     <% end %>
     <li><%= link_to "Changes", post_versions_path %></li>
-    <li>Approvals</li>
     <li><%= link_to "Moderate", moderator_post_dashboard_path %></li>
-    <li>Help</li>
+    <li><%= link_to "Help", wiki_pages_path(:title => "help:posts") %></li>
   </menu>
 <% end %>

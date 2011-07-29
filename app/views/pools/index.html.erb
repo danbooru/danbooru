@@ -25,9 +25,7 @@
       </tbody>
     </table>
 
-    <div class="paginator">
-      <%= sequential_paginator(@pools) %>
-    </div>    
+    <%= numbered_paginator(@pools) %>
 
     <%= render "secondary_links" %>
   </div>

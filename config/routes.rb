@@ -9,6 +9,7 @@ Danbooru::Application.routes.draw do
         get :search
       end
     end
+    resource :tag
     namespace :post do
       resource :dashboard, :only => [:show]
       resource :approval, :only => [:create]
@@ -107,7 +108,11 @@ Danbooru::Application.routes.draw do
     end
   end
   resources :tag_implications
-  resources :tag_subscriptions
+  resources :tag_subscriptions do
+    member do
+      get :posts
+    end
+  end
   resources :uploads
   resources :users
   resources :user_feedbacks

@@ -5,6 +5,14 @@ if User.count == 0
     :password => "password1",
     :password_confirmation => "password1"
   )
+  
+  0.upto(100) do |i|
+    User.create(
+      :name => i.to_s * 5,
+      :password => i.to_s * 5,
+      :password_confirmation => i.to_s * 5
+    )
+  end
 else
   puts "Skipping users"
   user = User.first
@@ -93,3 +101,27 @@ if Pool.count == 0
     end
   end
 end
+
+if Favorite.count == 0
+  puts "Creating favorites"
+
+  Post.order("random()").limit(50).each do |post|
+    user = User.order("random()").first
+    post.add_favorite!(user)
+    post.add_favorite!(CurrentUser.user)
+  end
+else 
+  puts "Skipping favorites"
+end
+
+if TagSubscription.count == 0
+  puts "Creating tag subscriptions"
+  TagSubscription.create(:name => "0", :tag_query => Tag.order("random()").first.name)
+  1.upto(50) do |i|
+    CurrentUser.user = User.order("random()").first
+    TagSubscription.create(:name => i.to_s, :tag_query => Tag.order("random()").first.name)
+  end
+else
+  puts "Skipping tag subscriptions"
+end
+

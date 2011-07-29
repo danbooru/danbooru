@@ -1,25 +1,27 @@
-<table width="100%" class="striped"> 
-  <thead>
-    <tr>
-      <th>Count</th>
-      <th>Name</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @tags.each do |tag| %>
-      <tr>
-        <td><%= tag.post_count %></td>
-        <td class="tag-category-<%= tag.category_name %>">
-          <%= link_to("?", wiki_pages_path(:title => tag.name)) %>
-          <%= link_to(tag.name, posts_path(:tags => tag.name)) %>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<div id="c-tags">
+  <div id="a-index">
+    <table width="100%" class="striped"> 
+      <thead>
+        <tr>
+          <th>Count</th>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @tags.each do |tag| %>
+          <tr>
+            <td><%= tag.post_count %></td>
+            <td class="tag-category-<%= tag.category_name %>">
+              <%= link_to("?", wiki_pages_path(:title => tag.name)) %>
+              <%= link_to(tag.name, posts_path(:tags => tag.name)) %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
 
-<div class="paginator">
-  <%= numbered_paginator(@tags) %>
+    <%= numbered_paginator(@tags) %>
+  </div>
 </div>
 
 <%= render "secondary_links" %>

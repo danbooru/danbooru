@@ -1,4 +1,6 @@
 class FavoritesController < ApplicationController
+  before_filter :member_only
+  
   def index
     if params[:tags]
       redirect_to(posts_path(:tags => "fav:#{CurrentUser.name} #{params[:tags]}"))

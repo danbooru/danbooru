@@ -15,7 +15,7 @@ class PostSetPresenter < Presenter
   end
   
   def post_previews_html(template)
-    html = ""
+    html = "<div class='post-previews'>"
     
     if posts.empty?
       return template.render(:partial => "post_sets/blank")
@@ -24,6 +24,8 @@ class PostSetPresenter < Presenter
     posts.each do |post|
       html << PostPresenter.preview(post)
     end
+    
+    html << '</div>'
     
     html.html_safe
   end

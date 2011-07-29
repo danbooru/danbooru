@@ -73,7 +73,13 @@ protected
       
     when "artist_versions"
       /^\/artist/
-
+      
+    when "moderator/post/dashboards"
+      /^\/post/
+      
+    when "moderator/dashboards"
+      /^\/moderator/
+      
     else
       /^\/#{controller}/
     end

@@ -40,6 +40,12 @@ class TagSubscriptionsController < ApplicationController
     respond_with(@tag_subscription)
   end
   
+  def posts
+    @user = User.find(params[:id])
+    @post_set = PostSets::Post.new("sub:#{@user.name} #{params[:tags]}", params[:page])
+    @posts = @post_set.posts
+  end
+  
 private
   def check_privilege(tag_subscription)
     raise User::PrivilegeError unless tag_subscription.editable_by?(CurrentUser.user)

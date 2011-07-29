@@ -1,0 +1,19 @@
+<div id="c-moderator-ip-addrs">
+  <div id="a-search">
+    <h1>IP Address Search</h1>
+    
+    <%= form_tag(moderator_ip_addrs_path) do %>
+      <div class="input">
+        <label>User</label>
+        <%= text_field :search, :user_name %>
+      </div>
+      
+      <div class="input">
+        <label>IP Addr</label>
+        <%= text_field :search, :ip_addr %>
+      </div>
+      
+      <%= submit_tag %>
+    <% end %>
+  </div>
+</div>

@@ -1,6 +1,6 @@
 module PaginationHelper
   def sequential_paginator(records)
-    html = "<menu>"
+    html = '<div class="paginator"><menu>'
     
     if records.any? 
       if params[:page] =~ /[ab]/
@@ -10,7 +10,7 @@ module PaginationHelper
       html << '<li>' + link_to("Next >", params.merge(:page => "b#{records[-1].id}")) + '</li>'
     end
     
-    html << "</menu>"
+    html << "</menu></div>"
     html.html_safe
   end
   
@@ -23,7 +23,7 @@ module PaginationHelper
       return sequential_paginator(records)
     end
     
-    html = "<menu>"
+    html = '<div class="paginator"><menu>'
     window = 3
     if records.total_pages <= (window * 2) + 5
       1.upto(records.total_pages) do |page|
@@ -50,7 +50,7 @@ module PaginationHelper
       html << numbered_paginator_item("...", records.current_page)
       html << numbered_paginator_final_item(records.total_pages, records.current_page)
     end
-    html << "</menu>"
+    html << "</menu></div>"
     html.html_safe
   end
   

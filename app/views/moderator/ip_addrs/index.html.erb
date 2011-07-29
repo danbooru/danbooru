@@ -1,0 +1,22 @@
+<div id="c-moderator-ip-addrs">
+  <div id="a-index">
+    <h1>IP Addresses</h1>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>Key</th>
+          <th>Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @search.execute.each do |k, count| %>
+          <tr>
+            <td><%= k %></td>
+            <td><%= count %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
