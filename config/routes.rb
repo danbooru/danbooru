@@ -10,7 +10,7 @@ Danbooru::Application.routes.draw do
       end
     end
     resources :invitations, :only => [:new, :create, :index]
-    resource :tag
+    resource :tag, :only => [:edit, :update]
     namespace :post do
       resource :dashboard, :only => [:show]
       resource :approval, :only => [:create]

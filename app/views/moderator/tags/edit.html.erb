@@ -1,0 +1,21 @@
+<div id="c-moderator-tags">
+  <div id="a-edit">
+    <h1>Edit Tags</h1>
+    
+    <%= form_tag(moderator_tag_path, :method => :put) do %>
+      <div class="input">
+        <label>Predicate</label>
+        <%= text_field :tag, :predicate %>
+      </div>
+      
+      <div class="input">
+        <label>Consequent</label>
+        <%= text_field :tag, :consequent %>
+      </div>
+      
+      <div class="input">
+        <%= submit_tag %>
+      </div>
+    <% end %>
+  </div>
+</div>

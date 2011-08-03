@@ -106,21 +106,7 @@ class Tag < ActiveRecord::Base
       m.extend(ClassMethods)
     end
   end
-  
-  module UpdateMethods
-    def mass_edit(start_tags, result_tags, updater_id, updater_ip_addr)
-      updater = User.find(updater_id)
-      Post.tag_match(start_tags).each do |p|
-        start = TagAlias.to_aliased(scan_tags(start_tags))
-        result = TagAlias.to_aliased(scan_tags(result_tags))
-        tags = (p.tag_array - start + result).join(" ")
-        CurrentUser.scoped(updater, updater_ip_addr) do
-          p.update_attributes(:tag_string => tags)
-        end
-      end    
-    end
-  end
-  
+
   module ParseMethods
     def normalize(query)
       query.to_s.downcase.strip
@@ -367,7 +353,6 @@ class Tag < ActiveRecord::Base
   include CategoryMethods
   extend StatisticsMethods
   include NameMethods
-  extend UpdateMethods
   extend ParseMethods
   extend SuggestionMethods
 end
