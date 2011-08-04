@@ -41,6 +41,7 @@ class Post < ActiveRecord::Base
   scope :available_for_moderation, lambda {where(["id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :hidden_from_moderation, lambda {where(["id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :tag_match, lambda {|query| Post.tag_match_helper(query)}
+  scope :exact_tag_match, lambda {|query| Post.exact_tag_match_helper(query)}
   scope :positive, where("score > 1")
   scope :negative, where("score < -1")
   search_methods :tag_match
@@ -500,6 +501,11 @@ class Post < ActiveRecord::Base
       end
       
       relation
+    end
+    
+    def exact_tag_match_helper(q)
+      arel = Post.scoped
+      add_tag_string_search_relation({:related => [q].flatten, :include => [], :exclude => []}, arel)
     end
 
     def tag_match_helper(q)

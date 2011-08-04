@@ -15,6 +15,7 @@ class TagImplicationsController < ApplicationController
   
   def create
     @tag_implication = TagImplication.create(params[:tag_implication])
+    @tag_implication.delay.process!
     respond_with(@tag_implication, :location => tag_implications_path(:search => {:id_eq => @tag_implication.id}))
   end
   

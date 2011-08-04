@@ -1,6 +1,6 @@
 <div style="width: 40em; margin: 5em auto; overflow: scroll;">
   <div class="section">
-    <h4>Terms of Service</h4>
+    <h1>Terms of Service</h1>
     <p>By accessing the "<%= Danbooru.config.app_name %>" website ("Site") you agree to the following terms of service. If you do not agree to these terms, then please do not access the Site.</p>  
 
     <ul>
@@ -13,13 +13,13 @@
     </ul>
     
     <div class="section">
-      <h6>Post/Comment Limiting</h6>
+      <h1>Post/Comment Limiting</h1>
       <p>You cannot upload a post or comment during the first week of signing up.</p>
       <p>After the initial period, you can post up to one comment an hour and a variable number of posts based on how many of your previous uploads were approved or deleted.</p>
     </div>
     
     <div class="section">
-      <h6>Prohibited Content</h6>
+      <h1>Prohibited Content</h1>
       <p>In addition, you may not use the Site to upload any of the following:</p>
       <ul>
         <li>Non-anime: Photographs of American porn actresses, for example, are prohibited. Photographs of cosplayers, figures, or prominent figures in the industry are acceptable.</li>
@@ -34,7 +34,7 @@
   </div>
 
   <div class="section">
-    <h4>Copyright Infringement</h4>
+    <h1>Copyright Infringement</h1>
 
     <p>If you believe a post infringes upon your copyright, please send an email to the <%= mail_to Danbooru.config.contact_email, "webmaster", :encode => "hex" %> with the following pieces of information:</p>
     <ul>
@@ -45,14 +45,14 @@
   </div>
 
   <div class="section">
-    <h4>Privacy Policy</h4>
+    <h1>Privacy Policy</h1>
 
     <p>The Site will not disclose the IP address, email address, password, or DMails of any user except to the staff.</p>
     <p>The Site is allowed to make public everything else, including but not limited to: uploaded posts, favorited posts, comments, forum posts, wiki edits, and note edits.</p>
   </div>
   
   <div>
-    <h4>Agreement</h4>
+    <h1>Agreement</h1>
     <p>By clicking on the "I Agree" link, you have read all the terms and have agreed to them.</p>
     <p><%= link_to("I Agree", params[:url] || "/", :onclick => "Cookie.put('tos', '1')") %> | <%= link_to("Cancel", "/") %></p>
   </div> 

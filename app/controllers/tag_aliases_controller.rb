@@ -15,6 +15,7 @@ class TagAliasesController < ApplicationController
   
   def create
     @tag_alias = TagAlias.create(params[:tag_alias])
+    @tag_alias.delay.process!
     respond_with(@tag_alias, :location => tag_aliases_path(:search => {:id_eq => @tag_alias.id}))
   end
   

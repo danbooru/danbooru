@@ -2250,7 +2250,9 @@ CREATE TABLE tag_aliases (
     antecedent_name character varying(255) NOT NULL,
     consequent_name character varying(255) NOT NULL,
     creator_id integer NOT NULL,
+    creator_ip_addr inet NOT NULL,
     forum_topic_id integer,
+    status character varying(255) DEFAULT 'pending'::character varying NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -2285,7 +2287,9 @@ CREATE TABLE tag_implications (
     consequent_name character varying(255) NOT NULL,
     descendant_names text NOT NULL,
     creator_id integer NOT NULL,
+    creator_ip_addr inet NOT NULL,
     forum_topic_id integer,
+    status character varying(255) DEFAULT 'pending'::character varying NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
