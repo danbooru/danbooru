@@ -310,11 +310,11 @@ class Tag < ActiveRecord::Base
   module RelationMethods
     def update_related
       counts = RelatedTagCalculator.calculate_from_sample(Danbooru.config.post_sample_size, name)
-      self.related_tags = RelatedTagCalculator.convert_hash_to_string(counts)
+      update_attributes(:related_tags => RelatedTagCalculator.convert_hash_to_string(counts), :related_tags_updated_at => Time.now)
     end
     
     def update_related_if_outdated
-      updated_related if should_update_related?
+      delay.update_related if should_update_related?
     end
     
     def related_cache_expiry

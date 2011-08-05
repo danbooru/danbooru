@@ -488,16 +488,20 @@ class Post < ActiveRecord::Base
     
     def add_tag_subscription_relation(subscriptions, relation)
       subscriptions.each do |subscription|
-        subscription =~ /^(.+?):(.+)$/
-        user_name = $1 || subscription
-        subscription_name = $2
-
-        user = User.find_by_name(user_name)
-
-        if user
+        if subscription =~ /^(.+?):(.+)$/
+          user_name = $1
+          subscription_name = $2
+          user = User.find_by_name(user_name)
+          return relation if user.nil?
           post_ids = TagSubscription.find_post_ids(user.id, subscription_name)
-          relation = relation.where(["posts.id IN (?)", post_ids])
+        else
+          user = User.find_by_name(subscription)
+          return relation if user.nil?
+          post_ids = TagSubscription.find_post_ids(user.id)
         end
+        
+        post_ids = [0] if post_ids.empty?
+        relation = relation.where(["posts.id IN (?)", post_ids])
       end
       
       relation

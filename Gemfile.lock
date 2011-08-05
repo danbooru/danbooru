@@ -16,6 +16,7 @@ GIT
 GEM
   remote: http://gemcutter.org/
   specs:
+    aaronh-chronic (0.3.9)
     actionmailer (3.1.0.rc1)
       actionpack (= 3.1.0.rc1)
       mail (~> 2.3.0)
@@ -124,6 +125,9 @@ GEM
     tzinfo (0.3.29)
     webrobots (0.0.10)
       nokogiri (>= 1.4.4)
+    whenever (0.6.8)
+      aaronh-chronic (>= 0.3.9)
+      activesupport (>= 2.3.4)
 
 PLATFORMS
   ruby
@@ -146,3 +150,4 @@ DEPENDENCIES
   simple_form
   simplecov
   super_exception_notifier
+  whenever
