@@ -1,5 +1,5 @@
 module PostSets
-  class Artist < Post
+  class Artist < PostSets::Post
     attr_reader :artist
     
     def initialize(artist)

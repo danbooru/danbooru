@@ -309,6 +309,7 @@ class Tag < ActiveRecord::Base
   
   module RelationMethods
     def update_related
+      return unless should_update_related?
       counts = RelatedTagCalculator.calculate_from_sample(Danbooru.config.post_sample_size, name)
       update_attributes(:related_tags => RelatedTagCalculator.convert_hash_to_string(counts), :related_tags_updated_at => Time.now)
     end
@@ -331,7 +332,8 @@ class Tag < ActiveRecord::Base
     end
     
     def related_tag_array
-      related_tags.split(/ /).in_groups_of(2)
+      update_related_if_outdated
+      related_tags.to_s.split(/ /).in_groups_of(2)
     end
   end
   
@@ -354,5 +356,6 @@ class Tag < ActiveRecord::Base
   extend StatisticsMethods
   include NameMethods
   extend ParseMethods
+  include RelationMethods
   extend SuggestionMethods
 end
