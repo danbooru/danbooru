@@ -8,7 +8,7 @@ group :test do
   gem "simplecov", :require => false
 end
 
-gem "rails", "3.1.0.rc1"
+gem "rails", "3.1.0.rc4"
 gem "pg"
 gem "memcache-client", :require => "memcache"
 gem "imagesize", :require => "image_size"
