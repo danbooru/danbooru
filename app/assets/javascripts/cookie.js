@@ -54,9 +54,9 @@
     if (this.get("hide-news-ticker") == "1") {
       $("#news-ticker").hide();
     } else {
-      $("#close-news-ticker-link").observe("click", function(e) {
+      $("#close-news-ticker-link").click(function(e) {
         $("#news-ticker").hide();
-        this.put("hide-news-ticker", "1", 1);
+        Danbooru.Cookie.put("hide-news-ticker", "1", 1);
         return false;
       });
     }
@@ -67,7 +67,7 @@
   }
 })();
 
-$(document).ready(function() {
+$(function() {
   Danbooru.Cookie.initialize();
 });
 

@@ -626,6 +626,10 @@ article.post-preview {
   float: left;
 }
 
+article.post-preview.blacklisted-active {
+  display: none;
+}
+
 div#c-posts {
   div.notice {
     font-size: 0.8em;
@@ -649,6 +653,23 @@ div#c-posts {
 
   aside#sidebar > section > ul ul li {
     margin-left: 1em;
+  }
+
+  aside#sidebar > section#blacklist-box ul {
+    margin-left: 1em;
+    
+    li {
+      list-style-type: disc;
+    }
+    
+    a {
+      color: $link_color;
+      cursor: pointer;
+    }
+    
+    span {
+      color: #AAA;
+    }
   }
   
   h1 {
@@ -1048,6 +1069,14 @@ div#moderator-dashboard {
 }
 
 
+/*** page footer ***/
+footer#page-footer {
+  clear: both;
+  margin: 1em;
+  text-align: center;
+  padding-top: 1em;
+  border-top: 2px solid #CCC;
+}
 
 /*** news ticker ***/
 
