@@ -87,9 +87,11 @@
     tags.push("rating:" + $post.data("rating"));
     tags.push("uploader:" + $post.data("uploader"));
     
-    if (Danbooru.is_subset(tags, blacklist.require)) {
-      if (blacklist.exclude.length == 0 || (!Danbooru.is_subset(tags, blacklist.exclude))) {
-        return true;
+    if (blacklist.require.length > 0 || blacklist.exclude.length > 0) {
+      if (blacklist.require.length === 0 || Danbooru.is_subset(tags, blacklist.require)) {
+        if (blacklist.exclude.length === 0 || (!Danbooru.is_subset(tags, blacklist.exclude))) {
+          return true;
+        }
       }
     }
     
