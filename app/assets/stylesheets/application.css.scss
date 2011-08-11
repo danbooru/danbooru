@@ -334,6 +334,7 @@ div#page {
     width: 75%;
     float: left;
     margin-left: 2em;
+    overflow: hidden;
   }
 }
 
@@ -712,6 +713,9 @@ div#c-posts {
       margin-bottom: 1em;
     }
   }
+}
+
+div#c-explore-posts {
 }
 
 

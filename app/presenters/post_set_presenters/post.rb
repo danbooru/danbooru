@@ -1,6 +1,7 @@
 module PostSetPresenters
-  class Post
+  class Post < Base
     attr_accessor :post_set, :tag_set_presenter
+    delegate :posts, :to => :post_set
 
     def initialize(post_set)
       @post_set = post_set
@@ -18,26 +19,8 @@ module PostSetPresenters
       RelatedTagCalculator.calculate_from_sample_to_array(post_set.tag_string).map(&:first)
     end
 
-    def posts
-      post_set.posts
-    end
-
     def tag_list_html(template)
       tag_set_presenter.tag_list_html(template)
-    end
-
-    def post_previews_html(template)
-      html = ""
-
-      if posts.empty?
-        return template.render(:partial => "post_sets/blank")
-      end
-
-      posts.each do |post|
-        html << PostPresenter.preview(post)
-      end
-
-      html.html_safe
     end
   end
 end

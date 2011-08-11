@@ -586,6 +586,10 @@ class Post < ActiveRecord::Base
         relation = relation.where("posts.rating <> 'e'")
       end
       
+      if q[:order] == "rank"
+        relation = relation.where("p.score > 0 and p.created_at >= ?", 0, 3.days.ago)
+      end
+      
       case q[:order]
       when "id", "id_asc"
         relation = relation.order("posts.id")
@@ -618,6 +622,9 @@ class Post < ActiveRecord::Base
 
       when "filesize_asc"
         relation = relation.order("posts.file_size")
+
+  	  when "rank"
+  	    sql << " ORDER BY log(3, p.score) + (extract(epoch from p.created_at) - extract(epoch from timestamp '2005-05-24')) / 45000 DESC"
 
       else
         relation = relation.order("posts.id DESC")

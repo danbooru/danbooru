@@ -125,9 +125,11 @@ Danbooru::Application.routes.draw do
   resources :wiki_page_versions, :only => [:index, :show]
 
   namespace :explore do
-    namespace :post do
-      resource :popular, :only => [:show]
-      resource :hot, :only => [:show]
+    resources :posts, :only => [:popular, :hot] do
+      collection do
+        get :popular
+        get :hot
+      end
     end
   end
 

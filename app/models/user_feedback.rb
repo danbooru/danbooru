@@ -9,6 +9,7 @@ class UserFeedback < ActiveRecord::Base
   scope :positive, where("category = ?", "positive")
   scope :neutral, where("category = ?", "neutral")
   scope :negative, where("category = ?", "negative")
+  scope :for_user, lambda {|user_id| where("user_id = ?", user_id)}
   
   def initialize_creator
     self.creator_id = CurrentUser.id

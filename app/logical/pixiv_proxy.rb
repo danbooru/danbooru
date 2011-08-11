@@ -4,7 +4,7 @@ class PixivProxy
   end
   
   def self.get(url)
-    if url =~ /\/(\d+)(_m)?\.(jpg|jpeg|png|gif)/i
+    if url =~ /\/(\d+)(_m|_p\d+)?\.(jpg|jpeg|png|gif)/i
       url = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
       get_single(url)
     elsif url =~ /member_illust\.php/ && url =~ /illust_id=/
