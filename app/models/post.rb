@@ -41,6 +41,7 @@ class Post < ActiveRecord::Base
   scope :available_for_moderation, lambda {where(["id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :hidden_from_moderation, lambda {where(["id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :tag_match, lambda {|query| Post.tag_match_helper(query)}
+  scope :exact_tag_match, lambda {|query| Post.exact_tag_match_helper(query)}
   scope :positive, where("score > 1")
   scope :negative, where("score < -1")
   search_methods :tag_match
@@ -487,19 +488,28 @@ class Post < ActiveRecord::Base
     
     def add_tag_subscription_relation(subscriptions, relation)
       subscriptions.each do |subscription|
-        subscription =~ /^(.+?):(.+)$/
-        user_name = $1 || subscription
-        subscription_name = $2
-
-        user = User.find_by_name(user_name)
-
-        if user
+        if subscription =~ /^(.+?):(.+)$/
+          user_name = $1
+          subscription_name = $2
+          user = User.find_by_name(user_name)
+          return relation if user.nil?
           post_ids = TagSubscription.find_post_ids(user.id, subscription_name)
-          relation = relation.where(["posts.id IN (?)", post_ids])
+        else
+          user = User.find_by_name(subscription)
+          return relation if user.nil?
+          post_ids = TagSubscription.find_post_ids(user.id)
         end
+        
+        post_ids = [0] if post_ids.empty?
+        relation = relation.where(["posts.id IN (?)", post_ids])
       end
       
       relation
+    end
+    
+    def exact_tag_match_helper(q)
+      arel = Post.scoped
+      add_tag_string_search_relation({:related => [q].flatten, :include => [], :exclude => []}, arel)
     end
 
     def tag_match_helper(q)
@@ -576,6 +586,10 @@ class Post < ActiveRecord::Base
         relation = relation.where("posts.rating <> 'e'")
       end
       
+      if q[:order] == "rank"
+        relation = relation.where("p.score > 0 and p.created_at >= ?", 0, 3.days.ago)
+      end
+      
       case q[:order]
       when "id", "id_asc"
         relation = relation.order("posts.id")
@@ -608,6 +622,9 @@ class Post < ActiveRecord::Base
 
       when "filesize_asc"
         relation = relation.order("posts.file_size")
+
+  	  when "rank"
+  	    sql << " ORDER BY log(3, p.score) + (extract(epoch from p.created_at) - extract(epoch from timestamp '2005-05-24')) / 45000 DESC"
 
       else
         relation = relation.order("posts.id DESC")

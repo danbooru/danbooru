@@ -12,7 +12,7 @@ module Danbooru
     
     # Contact email address of the admin.
     def contact_email
-      "webmaster#{server_host}"
+      "webmaster@#{server_host}"
     end
     
     # Stripped of any special characters.

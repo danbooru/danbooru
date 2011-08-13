@@ -1,9 +1,9 @@
 module PostSets
-  class Artist < Post
+  class Artist < PostSets::Post
     attr_reader :artist
     
     def initialize(artist)
-      super(:tags => artist.name)
+      super(artist.name)
       @artist = artist
     end
     

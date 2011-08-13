@@ -1,11 +1,7 @@
 class TagAlias < ActiveRecord::Base
-  attr_accessor :creator_ip_addr
-  after_save :update_posts
-  after_save :clear_cache
-  after_save :clear_remote_cache
+  before_save :clear_all_cache
   after_save :update_cache
-  after_destroy :clear_cache
-  after_destroy :clear_remote_cache
+  after_destroy :clear_all_cache
   before_validation :initialize_creator, :on => :create
   validates_presence_of :creator_id
   validates_uniqueness_of :antecedent_name
@@ -25,8 +21,17 @@ class TagAlias < ActiveRecord::Base
     alias_hash.values.flatten.uniq
   end
   
+  def process!
+    update_column(:status, "processing")
+    update_posts
+    update_column(:status, "active")
+  rescue Exception => e
+    update_column(:status, "error: #{e}")
+  end
+  
   def initialize_creator
     self.creator_id = CurrentUser.user.id
+    self.creator_ip_addr = CurrentUser.ip_addr
   end
   
   def antecedent_tag
@@ -44,6 +49,11 @@ class TagAlias < ActiveRecord::Base
       false
     end
   end
+  
+  def clear_all_cache
+    clear_cache
+    clear_remote_cache
+  end
 
   def clear_cache
     Cache.delete("ta:#{Cache.sanitize(antecedent_name)}")
@@ -60,13 +70,15 @@ class TagAlias < ActiveRecord::Base
   end
   
   def update_posts
-    Post.tag_match(antecedent_name).find_each do |post|
+    Post.exact_tag_match(antecedent_name).find_each do |post|
       escaped_antecedent_name = Regexp.escape(antecedent_name)
       fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_antecedent_name}(?:\Z| )/, " #{consequent_name} ").strip
       
-      post.update_attributes(
-        :tag_string => fixed_tags
-      )
+      CurrentUser.scoped(creator, creator_ip_addr) do
+        post.update_attributes(
+          :tag_string => fixed_tags
+        )
+      end
     end
   end
 end

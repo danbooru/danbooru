@@ -5,6 +5,7 @@ class PoolVersion < ActiveRecord::Base
   belongs_to :pool
   belongs_to :updater, :class_name => "User"
   before_validation :initialize_updater
+  scope :for_user, lambda {|user_id| where("updater_id = ?", user_id)}
   
   def initialize_updater
     self.updater_id = CurrentUser.id

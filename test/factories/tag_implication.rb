@@ -1,4 +1,10 @@
-Factory.define(:tag_implication) do |f|
-  f.antecedent_name "aaa"
-  f.consequent_name "bbb"
+FactoryGirl.define do
+  factory :tag_implication do
+    antecedent_name "aaa"
+    consequent_name "bbb"
+    
+    after_create do |tag_implication|
+      tag_implication.process!
+    end
+  end
 end

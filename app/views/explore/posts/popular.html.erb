@@ -1,0 +1,14 @@
+<div id="c-explore-posts">
+  <div id="a-index">
+    <h1>Explore: <%= @post_set.min_date %> &ndash; <%= @post_set.max_date %></h1>
+    
+    <%= render "date_explore", :post_set => @post_set %>
+    
+    <section id="content">
+      <%= @post_set.presenter.post_previews_html(self) %>
+    </section>
+  </div>
+</div>
+
+<%= render "posts/partials/common/secondary_links" %>
+

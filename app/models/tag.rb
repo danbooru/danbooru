@@ -106,21 +106,7 @@ class Tag < ActiveRecord::Base
       m.extend(ClassMethods)
     end
   end
-  
-  module UpdateMethods
-    def mass_edit(start_tags, result_tags, updater_id, updater_ip_addr)
-      updater = User.find(updater_id)
-      Post.tag_match(start_tags).each do |p|
-        start = TagAlias.to_aliased(scan_tags(start_tags))
-        result = TagAlias.to_aliased(scan_tags(result_tags))
-        tags = (p.tag_array - start + result).join(" ")
-        CurrentUser.scoped(updater, updater_ip_addr) do
-          p.update_attributes(:tag_string => tags)
-        end
-      end    
-    end
-  end
-  
+
   module ParseMethods
     def normalize(query)
       query.to_s.downcase.strip
@@ -323,12 +309,13 @@ class Tag < ActiveRecord::Base
   
   module RelationMethods
     def update_related
+      return unless should_update_related?
       counts = RelatedTagCalculator.calculate_from_sample(Danbooru.config.post_sample_size, name)
-      self.related_tags = RelatedTagCalculator.convert_hash_to_string(counts)
+      update_attributes(:related_tags => RelatedTagCalculator.convert_hash_to_string(counts), :related_tags_updated_at => Time.now)
     end
     
     def update_related_if_outdated
-      updated_related if should_update_related?
+      delay.update_related if should_update_related?
     end
     
     def related_cache_expiry
@@ -345,7 +332,8 @@ class Tag < ActiveRecord::Base
     end
     
     def related_tag_array
-      related_tags.split(/ /).in_groups_of(2)
+      update_related_if_outdated
+      related_tags.to_s.split(/ /).in_groups_of(2)
     end
   end
   
@@ -367,7 +355,7 @@ class Tag < ActiveRecord::Base
   include CategoryMethods
   extend StatisticsMethods
   include NameMethods
-  extend UpdateMethods
   extend ParseMethods
+  include RelationMethods
   extend SuggestionMethods
 end

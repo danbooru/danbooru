@@ -22,6 +22,8 @@
 </head>
 <body>
   <header id="top">
+    <%= render "news/listing" %>
+    
     <h1><%= link_to Danbooru.config.app_name, "/" %></h1>
     <nav>
       <menu class="main">
@@ -64,5 +66,7 @@
   <footer>
     <%= yield :page_footer_content %>    
   </footer>
+  
+  <%= render "static/footer" %>
 </body>
 </html>

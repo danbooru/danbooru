@@ -8,7 +8,11 @@ group :test do
   gem "simplecov", :require => false
 end
 
-gem "rails", "3.1.0.rc1"
+group :assets do
+  
+end
+
+gem "rails", "3.1.0.rc5"
 gem "pg"
 gem "memcache-client", :require => "memcache"
 gem "imagesize", :require => "image_size"
@@ -20,3 +24,4 @@ gem "mechanize"
 gem "nokogiri"
 gem "meta_search", :git => "git://github.com/ernie/meta_search.git"
 gem "silent-postgres"
+gem "whenever", :require => false

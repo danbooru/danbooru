@@ -1,43 +1,19 @@
 class TagImplication < ActiveRecord::Base
-  before_save :clear_cache
   before_save :update_descendant_names
   after_save :update_descendant_names_for_parent
-  after_save :update_cache
-  after_save :update_posts
-  after_destroy :clear_cache
-  after_destroy :clear_remote_cache
   belongs_to :creator, :class_name => "User"
   before_validation :initialize_creator, :on => :create
   validates_presence_of :creator_id
   validates_uniqueness_of :antecedent_name, :scope => :consequent_name
   validate :absence_of_circular_relation
-  
-  module CacheMethods
-    def clear_cache
-      Cache.delete("ti:#{Cache.sanitize(antecedent_name)}")
-      @descendants = nil
-    end
-
-    def clear_remote_cache
-      Danbooru.config.other_server_hosts.each do |server|
-        Net::HTTP.delete(URI.parse("http://#{server}/tag_implications/#{id}/cache"))
-      end
-    end
-
-    def update_cache
-      descendant_names_array
-      true
-    end
-  end
 
   module DescendantMethods
     extend ActiveSupport::Concern
     
     module ClassMethods
+      # assumes names are normalized
       def with_descendants(names)
-        names + Cache.get_multi(names.flatten, "ti") do |name|
-          ([name] + where(["antecedent_name = ?", name]).all.map {|x| x.descendant_names_array}).flatten
-        end.values.flatten.uniq
+        (names + where("antecedent_name in (?)", names).map(&:descendant_names_array)).flatten.uniq
       end
     end
     
@@ -55,9 +31,7 @@ class TagImplication < ActiveRecord::Base
     end
 
     def descendant_names_array
-      Cache.get("ti:#{Cache.sanitize(antecedent_name)}") do
-        descendant_names.split(/ /)
-      end
+      descendant_names.split(/ /)
     end
 
     def update_descendant_names
@@ -93,12 +67,20 @@ class TagImplication < ActiveRecord::Base
     end
   end
   
-  include CacheMethods
   include DescendantMethods
   include ParentMethods
   
   def initialize_creator
     self.creator_id = CurrentUser.user.id
+    self.creator_ip_addr = CurrentUser.ip_addr
+  end
+  
+  def process!
+    update_column(:status, "processing")
+    update_posts
+    update_column(:status, "active")
+  rescue Exception => e
+    update_column(:status, "error: #{e}")
   end
   
   def absence_of_circular_relation
@@ -110,12 +92,14 @@ class TagImplication < ActiveRecord::Base
   end
   
   def update_posts
-    Post.tag_match(antecedent_name).find_each do |post|
+    Post.exact_tag_match(antecedent_name).find_each do |post|
       escaped_antecedent_name = Regexp.escape(antecedent_name)
       fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_antecedent_name}(?:\Z| )/, " #{antecedent_name} #{descendant_names} ").strip
-      post.update_attributes(
-        :tag_string => fixed_tags
-      )
+      CurrentUser.scoped(creator, creator_ip_addr) do
+        post.update_attributes(
+          :tag_string => fixed_tags
+        )
+      end
     end
   end
   

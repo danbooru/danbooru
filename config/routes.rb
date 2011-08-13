@@ -10,7 +10,7 @@ Danbooru::Application.routes.draw do
       end
     end
     resources :invitations, :only => [:new, :create, :index]
-    resource :tag
+    resource :tag, :only => [:edit, :update]
     namespace :post do
       resource :dashboard, :only => [:show]
       resource :approval, :only => [:create]
@@ -125,9 +125,11 @@ Danbooru::Application.routes.draw do
   resources :wiki_page_versions, :only => [:index, :show]
 
   namespace :explore do
-    namespace :post do
-      resource :popular, :only => [:show]
-      resource :hot, :only => [:show]
+    resources :posts, :only => [:popular, :hot] do
+      collection do
+        get :popular
+        get :hot
+      end
     end
   end
 

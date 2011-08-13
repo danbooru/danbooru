@@ -1,7 +1,7 @@
 module PostSetPresenters
-  class Favorite
+  class Favorite < Base
     attr_accessor :favorite_set, :tag_set_presenter
-    delegate :favorites, :posts, :to => :favorite_set
+    delegate :favorites, :to => :favorite_set
 
     def initialize(favorite_set)
       @favorite_set = favorite_set
@@ -15,19 +15,9 @@ module PostSetPresenters
     def tag_list_html(template)
       tag_set_presenter.tag_list_html(template)
     end
-
-    def post_previews_html(template)
-      html = ""
-
-      if favorites.empty?
-        return template.render(:partial => "post_sets/blank")
-      end
-
-      favorites.each do |favorite|
-        html << PostPresenter.preview(favorite.post)
-      end
-
-      html.html_safe
+    
+    def posts
+      favorites.map(&:post)
     end
   end
 end

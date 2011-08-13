@@ -2,6 +2,7 @@ class PostVersion < ActiveRecord::Base
   belongs_to :post
   belongs_to :updater, :class_name => "User"
   before_validation :initialize_updater
+  scope :for_user, lambda {|user_id| where("updater_id = ?", user_id)}
   
   def self.create_from_post(post)
     if post.created_at == post.updated_at

@@ -51,15 +51,23 @@
       return;
     }
     
+    if (this.get("hide-news-ticker") == "1") {
+      $("#news-ticker").hide();
+    } else {
+      $("#close-news-ticker-link").click(function(e) {
+        $("#news-ticker").hide();
+        Danbooru.Cookie.put("hide-news-ticker", "1", 1);
+        return false;
+      });
+    }
+    
 		if (this.get("hide-upgrade-account") != "1") {
-      if ($("upgrade-account")) {
-   	    $("upgrade-account").show();
-      }
+ 	    $("#upgrade-account").show();
 		}
   }
 })();
 
-$(document).ready(function() {
+$(function() {
   Danbooru.Cookie.initialize();
 });
 

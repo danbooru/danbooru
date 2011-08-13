@@ -13,6 +13,7 @@ module PostSets
     end
     
     def artist
+      nil
     end
     
     def is_single_tag?

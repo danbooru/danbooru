@@ -525,7 +525,13 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(post2.id, relation.first.id)
     end
   
-    should "return posts for a tag subscription search"
+    should "return posts for a tag subscription search" do
+      post1 = Factory.create(:post, :tag_string => "aaa")
+      sub = Factory.create(:tag_subscription, :tag_query => "aaa", :name => "zzz")
+      TagSubscription.process_all
+      relation = Post.tag_match("sub:#{CurrentUser.name}")
+      assert_equal(1, relation.count)
+    end
   
     should "return posts for a particular rating" do
       post1 = Factory.create(:post, :rating => "s")
