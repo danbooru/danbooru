@@ -37,7 +37,7 @@ module PostSetPresenters
       elsif max_date - min_date == 6
         min_date.strftime("Week of %B %d, %Y")
       else
-        date.strftime("Month of %B %Y")
+        date.strftime("%B %Y")
       end
     end
   end
