@@ -48,6 +48,8 @@ class Upload < ActiveRecord::Base
   
   module ConversionMethods
     def process!
+      return if status =~ /processing|completed|error/
+      
       CurrentUser.scoped(uploader, uploader_ip_addr) do
         update_attribute(:status, "processing")
         if is_downloadable?
