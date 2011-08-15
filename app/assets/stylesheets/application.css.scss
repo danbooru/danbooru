@@ -1108,3 +1108,69 @@ div#news-ticker {
     float: right;
   }
 }
+
+
+/*** post mode menus ***/
+body#mode-view {
+  background-color: "#FFF";
+}
+
+body#mode-edit {
+  background-color: "#3A3";
+}
+
+body#mode-add-fav {
+  background-color: "#FFA";
+}
+
+body#mode-remove-fav {
+  background-color: "#FFA";
+}
+  
+body#mode-rating-q {
+  background-color: "#AAA";
+}
+
+body#mode-rating-s {
+  background-color: "#6F6";
+}
+
+body#mode-rating-e {
+  background-color: "#F66";
+}
+
+body#mode-vote-down {
+  background-color: "#FAA";
+}
+
+body#mode-vote-up {
+  background-color: "#AFA";
+}
+
+body#mode-lock-rating {
+  background-color: "#AA3";
+}
+
+body#mode-lock-note {
+  background-color: "#3AA";
+}
+
+body#mode-approve {
+  background-color: "#26A";
+}
+
+body#mode-unapprove {
+  background-color: "#F66";
+}
+
+body#mode-add-to-pool {
+  background-color: "#26A";
+}
+
+body#mode-apply-tag-script {
+  background-color: "#A3A";
+}
+
+body#mode-edit-tag-script {
+  background-color: "#FFF";
+}

@@ -3,6 +3,10 @@
     return $("meta[name=" + key + "]").attr("content");
   }
   
+  Danbooru.notice = function(msg) {
+    $('#notice').html(msg).show();
+  }
+  
   Danbooru.j_alert = function(title, msg) {
     $('<div title="' + title + '"></div>').html(msg).dialog();
   }

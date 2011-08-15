@@ -62,7 +62,7 @@ protected
     when "uploads"
       /^\/post/
     
-    when "post_versions"
+    when "post_versions", "explore/posts"
       /^\/post/
     
     when "pool_versions"

@@ -20,6 +20,36 @@
       $("a#remove-from-favorites").hide();      
     }
   }
+  
+  Danbooru.Favorite.create = function(post_id) {
+    Danbooru.Post.notice_update("inc");
+    
+    $.ajax({
+      type: "POST",
+      url: "/favorites",
+      data: {
+        post_id: post_id
+      },
+      complete: function() {
+        Danbooru.Post.notice_update("dec");
+      },
+      error: function(data, status, xhr) {
+        Danbooru.j_alert("Error: " + data.reason);
+      }
+    });
+  }
+  
+  Danbooru.Favorite.destroy = function(post_id) {
+    Danbooru.Post.notice_update("inc");
+    
+    $.ajax({
+      type: "DELETE",
+      url: "/favorites/" + post_id,
+      complete: function() {
+        Danbooru.Post.notice_update("dec");
+      }
+    });
+  }
 })();
 
 $(document).ready(function() {
