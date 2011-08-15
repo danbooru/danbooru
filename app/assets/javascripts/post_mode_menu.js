@@ -69,11 +69,9 @@
       Danbooru.Post.update(post_id, {"post[is_rating_locked]": "1"});
     } else if (s === 'lock-note') {
       Danbooru.Post.update(post_id, {"post[is_note_locked]": "1"});
-    } else if (s === 'add-to-pool') {
-      Pool.add_post(post_id, 0);
     } else if (s === "apply-tag-script") {
-      var tag_script = Cookie.get("tag-script");
-      TagScript.run(post_id, tag_script);
+      var tag_script = Danbooru.Cookie.get("tag-script");
+      Danbooru.TagScript.run(post_id, tag_script);
     }
     
     e.preventDefault();
