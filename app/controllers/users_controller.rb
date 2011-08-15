@@ -22,6 +22,7 @@ class UsersController < ApplicationController
   
   def show
     @user = User.find(params[:id])
+    @presenter = UserPresenter.new(@user)
     respond_with(@user)
   end
   

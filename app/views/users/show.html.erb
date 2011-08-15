@@ -1,3 +1,54 @@
-<h1>Namasté <%= CurrentUser.pretty_name %>!</h1>
+<div id="c-users">
+  <div id="a-show">
+    <h1>Show User: <%= CurrentUser.pretty_name %></h1>
+
+    <dl>
+      <dt>Join Date</dt>
+      <dd><%= @presenter.join_date %></dd>
+      
+      <dt>Inviter</dt>
+      <dd><%= @presenter.inviter(self) %></dd>
+      
+      <dt>Level</dt>
+      <dd><%= @presenter.level %></dd>
+      
+      <dt>Upload Limit</dt>
+      <dd><%= @presenter.upload_limit %></dd>
+      
+      <dt>Uploads</dt>
+      <dd><%= @presenter.uploads(self) %></dd>
+      
+      <dt>Deleted Uploads</dt>
+      <dd><%= @presenter.deleted_uploads(self) %></dd>
+      
+      <dt>Favorites</dt>
+      <dd><%= @presenter.favorites(self) %></dd>
+      
+      <dt>Subscriptions</dt>
+      <dd><%= @presenter.subscriptions(self) %></dd>
+      
+      <dt>Post Changes</dt>
+      <dd><%= @presenter.post_versions(self) %></dd>
+      
+      <dt>Note Changes</dt>
+      <dd><%= @presenter.note_versions(self) %></dd>
+      
+      <dt>Wiki Page Changes</dt>
+      <dd><%= @presenter.wiki_page_versions(self) %></dd>
+      
+      <dt>Pool Changes</dt>
+      <dd><%= @presenter.pool_versions(self) %></dd>
+      
+      <dt>Forum Posts</dt>
+      <dd><%= @presenter.forum_posts(self) %></dd>
+      
+      <dt>Approvals</dt>
+      <dd><%= @presenter.approvals(self) %></dd>
+      
+      <dt>Feedback</dt>
+      <dd><%= @presenter.feedbacks(self) %></dd>
+    </dl>
+  </div>
+</div>
 
 <%= render :partial => "secondary_links" %>
