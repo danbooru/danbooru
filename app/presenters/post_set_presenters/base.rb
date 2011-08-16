@@ -8,7 +8,7 @@ module PostSetPresenters
       html = ""
 
       if posts.empty?
-        return template.render(:partial => "post_sets/blank")
+        return template.render("post_sets/blank")
       end
 
       posts.each do |post|

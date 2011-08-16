@@ -26,9 +26,9 @@ class PostPresenter < Presenter
     return template.content_tag("p", "You need a privileged account to see this image.") if !Danbooru.config.can_user_see_post?(CurrentUser.user, @post)
     
     if @post.is_flash?
-      template.render(:partial => "posts/partials/show/flash", :locals => {:post => @post})
+      template.render("posts/partials/show/flash", :post => @post)
     elsif @post.is_image?
-      template.render(:partial => "posts/partials/show/image", :locals => {:post => @post})
+      template.render("posts/partials/show/image", :post => @post)
     end
   end
   

@@ -1,18 +1,19 @@
 <div id="c-dmails">
-  
+  <div id="a-index">
+    <h1>Messages</h1>
+
+    <%= render "search" %>
+
+    <table>
+      <tbody>
+        <% @dmails.each do |dmail| %>
+          <% if params[:folder] == "sent" %>
+            <%= render "sent", :dmail => dmail %>
+          <% else %>
+            <%= render "received", :dmail => dmail %>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 </div>
-<h1>Messages</h1>
-
-<%= render "search" %>
-
-<table>
-  <tbody>
-    <% @dmails.each do |dmail| %>
-      <% if params[:folder] == "sent" %>
-        <%= render :partial => "sent", :locals => {:dmail => dmail} %>
-      <% else %>
-        <%= render :partial => "received", :locals => {:dmail => dmail} %>
-      <% end %>
-    <% end %>
-  </tbody>
-</table>

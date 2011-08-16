@@ -1,11 +1,11 @@
 <div id="c-tag-subscriptions">
   <div id="a-posts">
     <aside id="sidebar">
-      <%= render :partial => "posts/partials/common/search", :locals => {:path => posts_tag_subscription_path, :tags => @post_set.tag_string} %>
+      <%= render "posts/partials/common/search", :path => posts_tag_subscription_path, :tags => @post_set.tag_string %>
 
-      <%= render :partial => "posts/partials/index/mode_menu" %>
+      <%= render "posts/partials/index/mode_menu" %>
 
-      <%= render :partial => "posts/partials/index/blacklist" %>
+      <%= render "posts/partials/index/blacklist" %>
     </aside>
       
     <section id="content">
@@ -20,7 +20,7 @@
       /fav:<%= CurrentUser.name %>
     <% end %>
 
-    <%= render :partial => "posts/partials/common/secondary_links" %>    
+    <%= render "posts/partials/common/secondary_links" %>    
   </div>
 </div>
 

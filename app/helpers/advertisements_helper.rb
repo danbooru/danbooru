@@ -22,7 +22,7 @@ module AdvertisementsHelper
   
   def render_rss_advertisement
     if Danbooru.config.can_user_see_ads?(CurrentUser.user)
-      render :partial => "static/jlist_rss_ads"
+      render "static/jlist_rss_ads"
     end
   end
 end

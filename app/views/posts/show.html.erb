@@ -1,12 +1,12 @@
 <div id="c-posts">
   <div id="a-show">
     <aside id="sidebar">
-      <%= render :partial => "posts/partials/common/search", :locals => {:path => posts_path, :tags => params[:tags]} %>
+      <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:tags] %>
       
       <% if @post.pools.any? %>
         <section id="pool-sidebar">
           <h1>Pools</h1>
-          <%= render :partial => "posts/partials/show/pools", :locals => {:post => @post} %>
+          <%= render "posts/partials/show/pools", :post => @post %>
         </section>
       <% end %>
 
@@ -17,12 +17,12 @@
 
       <section>
         <h1>Information</h1>
-        <%= render :partial => "posts/partials/show/information", :locals => {:post => @post} %>
+        <%= render "posts/partials/show/information", :post => @post %>
       </section>
       
       <section>
         <h1>Options</h1>
-        <%= render :partial => "posts/partials/show/options", :locals => {:post => @post} %>
+        <%= render "posts/partials/show/options", :post => @post %>
       </section>
 
       <section>
@@ -36,7 +36,7 @@
     </aside>
 
     <section id="content">
-      <%= render :partial => "posts/partials/show/notices", :locals => {:post => @post} %>
+      <%= render "posts/partials/show/notices", :post => @post %>
 
       <section id="image-container">
         <div id="note-container"></div>
@@ -50,7 +50,7 @@
       </menu>
 
       <section id="comments">
-        <%= render :partial => "comments/partials/index/list", :locals => {:comments => @post.comments, :post => @post, :show_header => false} %>
+        <%= render "comments/partials/index/list", :comments => @post.comments, :post => @post, :show_header => false %>
       </section>
 
       <section id="notes">
@@ -62,7 +62,7 @@
       </section>
 
       <section id="edit">
-        <%= render :partial => "posts/partials/show/edit", :locals => {:post => @post} %>
+        <%= render "posts/partials/show/edit", :post => @post %>
       </section>
     </section>    
   </div>
@@ -93,4 +93,4 @@
   <meta name="post-is-deleted" content="<%= @post.is_deleted? %>">
 <% end %>
 
-<%= render :partial => "posts/partials/common/secondary_links" %>
+<%= render "posts/partials/common/secondary_links" %>

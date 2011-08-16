@@ -1,6 +1,6 @@
 <div class="list-of-forum-posts">
   <% forum_posts.each do |forum_post| %>
-    <%= render :partial => "forum_posts/forum_post", :locals => {:forum_post => forum_post} %>
+    <%= render "forum_posts/forum_post", :forum_post => forum_post %>
   <% end %>
 </div>
 

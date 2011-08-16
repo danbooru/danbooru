@@ -50,17 +50,7 @@
       location.href = domain + "/static/terms_of_service?url=" + location.href;
       return;
     }
-    
-    if (this.get("hide-news-ticker") == "1") {
-      $("#news-ticker").hide();
-    } else {
-      $("#close-news-ticker-link").click(function(e) {
-        $("#news-ticker").hide();
-        Danbooru.Cookie.put("hide-news-ticker", "1", 1);
-        return false;
-      });
-    }
-    
+
 		if (this.get("hide-upgrade-account") != "1") {
  	    $("#upgrade-account").show();
 		}

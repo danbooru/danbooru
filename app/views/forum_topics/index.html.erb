@@ -1,24 +1,28 @@
-<h1>Forum</h1>
+<div id="c-forum-topics">
+  <div id="a-index">
+    <h1>Forum</h1>
 
-<table width="100%" class="striped">
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Creator</th>
-      <th>Updated by</th>
-      <th>Updated at</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @forum_topics.each do |topic| %>
-      <tr>
-        <td><% if topic.is_sticky? %><span class="sticky">Sticky:</span> <% end %><%= link_to topic.title, forum_topic_path(topic) %></td>
-        <td><%= topic.creator.name %></td>
-        <td><%= topic.updater.name %></td>
-        <td><%= compact_time topic.updated_at %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+    <table width="100%" class="striped">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Creator</th>
+          <th>Updated by</th>
+          <th>Updated at</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @forum_topics.each do |topic| %>
+          <tr>
+            <td><% if topic.is_sticky? %><span class="sticky">Sticky:</span> <% end %><%= link_to topic.title, forum_topic_path(topic) %></td>
+            <td><%= topic.creator.name %></td>
+            <td><%= topic.updater.name %></td>
+            <td><%= compact_time topic.updated_at %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
 
 <%= render "secondary_links" %>
