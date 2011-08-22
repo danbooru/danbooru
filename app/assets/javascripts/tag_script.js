@@ -35,7 +35,7 @@
     } else if (command === "[reset]") {
       return [];
     } else if (command[0] === "-") {
-      return tags.reject(function(x) {return x == command.substr(1, 100)})
+      return Danbooru.reject(tags, function(x) {return x === command.substr(1, 100)});
     } else {
       tags.push(command)
       return tags;
@@ -44,13 +44,13 @@
 
   Danbooru.TagScript.run = function(post_id, tag_script) {
     var commands = this.parse(tag_script);
-    var post = Post.posts.get(post_id);
-    var old_tags = post.tags.join(" ");
+    var post = $("#p_" + post_id);
+    var old_tags = post.data("tags");
 
     $.each(commands, function(i, x) {
-      post.tags = Danbooru.TagScript.process(post.tags, x);
+      post.data("tags", Danbooru.TagScript.process(post.data("tags"), x));
     })
 
-    Danbooru.Post.update(post_id, {"post[old_tags]": old_tags, "post[tags]": post.tags.join(" ")});
+    Danbooru.Post.update(post_id, {"post[old_tags]": old_tags, "post[tags]": post.data("tags")});
   }
 })();

@@ -12,6 +12,11 @@ class ArtistsController < ApplicationController
     respond_with(@artist)
   end
   
+  def banned
+    @artists = Artist.where("is_banned = ?", true).order("name")
+    respond_with(@artists)
+  end
+  
   def index
     @search = Artist.search(params[:search])
     @artists = @search.paginate(params[:page])

@@ -34,4 +34,14 @@
     
     return all;
   }
+  
+  Danbooru.reject = function(array, f) {
+    var filtered = [];
+    $.each(array, function(i, x) {
+      if (!f(x)) {
+        filtered.push(x);
+      }
+    });
+    return filtered;
+  }
 })();
