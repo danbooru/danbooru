@@ -44,7 +44,7 @@ void PNG::InfoCallback(png_struct *png, png_info *info_ptr)
 
 	png_read_update_info(png, info_ptr);
 
-	data->m_Resizer->SetSource(width, height, 4);
+	data->m_pOutputFilter->Init(width, height, 4);
 }
 
 void PNG::RowCallback(png_struct *png, png_byte *new_row, png_uint_32 row_num, int pass)
@@ -62,14 +62,12 @@ void PNG::RowCallback(png_struct *png, png_byte *new_row, png_uint_32 row_num, i
 
 	/* We've allocated data->m_RowsAllocated, but if we're doing multiple passes, only
 	 * rows 0 to row_num will actually have usable data. */
-	int DiscardRow;
-	int LastRow = min(data->m_Rows.GetEndRow(), (int) row_num+1);
-	if(!data->m_Resizer->Run(data->m_Rows.GetRows(), data->m_Rows.GetStartRow(), LastRow, DiscardRow))
-		Error(png, data->m_Resizer->GetError());
+	if(!data->m_pOutputFilter->WriteRow(p))
+		Error(png, data->m_pOutputFilter->GetError());
 
 	/* If we're interlaced, never discard rows. */
 	if(data->m_Passes == 1)
-		data->m_Rows.DiscardRows(DiscardRow);
+		data->m_Rows.DiscardRows(row_num+1);
 }
 
 void PNG::EndCallback(png_struct *png, png_info *info)
@@ -79,9 +77,9 @@ void PNG::EndCallback(png_struct *png, png_info *info)
 }
 
 
-bool PNG::Read(FILE *f, Resizer *resizer, char error[1024])
+bool PNG::Read(FILE *f, Filter *pOutput, char error[1024])
 {
-	m_Resizer = resizer;
+	m_pOutputFilter = pOutput;
 
 	png_error_info err;
 	err.err = error;
@@ -124,6 +122,9 @@ bool PNG::Read(FILE *f, Resizer *resizer, char error[1024])
 
 		png_process_data(png, info_ptr, buf, ret);
 	}
+
+        if(!m_pOutputFilter->Finish())
+		Error(png, m_pOutputFilter->GetError());
 
 	if(!m_Done)
 	{

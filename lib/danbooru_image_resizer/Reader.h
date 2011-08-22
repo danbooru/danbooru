@@ -3,12 +3,12 @@
 
 #include <stdio.h>
 
-class Resizer;
+class Filter;
 class Reader
 {
 public:
 	virtual ~Reader() { }
-	virtual bool Read(FILE *f, Resizer *rp, char errorbuf[1024]) = 0;
+	virtual bool Read(FILE *f, Filter *rp, char errorbuf[1024]) = 0;
 };
 
 #endif

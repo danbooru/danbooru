@@ -20,7 +20,7 @@ have_func("gdImageJpeg", "gd.h")
 have_func("jpeg_set_quality", ["stdlib.h", "stdio.h", "jpeglib-extern.h"])
 have_func("png_set_expand_gray_1_2_4_to_8", "png.h")
 
-with_cflags("-O2 -fno-exceptions -Wall") {true}
+with_cflags("-O2 -Wall") {true}
 #with_cflags("-O0 -g -fno-exceptions -Wall") {true}
 
 create_makefile("danbooru_image_resizer")

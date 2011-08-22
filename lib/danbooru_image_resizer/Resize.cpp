@@ -1,17 +1,101 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include "Resize.h"
-#include "JPEGReader.h"
+#include "Filter.h"
 #include <algorithm>
 using namespace std;
 
-Resizer::Resizer(JPEGCompressor *Compressor)
+namespace
 {
-	m_Compressor = Compressor;
+	inline float sincf(float x)
+	{
+		if(fabsf(x) < 1e-9)
+			return 1.0;
+		
+		return sinf(x) / x;
+	}
+
+	inline double fract(double f)
+	{
+		return f - floor(f);
+	}
+}
+
+static const int KERNEL_SIZE = 3;
+
+LanczosFilter::LanczosFilter()
+{
+	m_pFilters = NULL;
+}
+
+LanczosFilter::~LanczosFilter()
+{
+	delete[] m_pFilters;
+}
+
+void LanczosFilter::Init(float fFactor)
+{
+	/* If we're reducing the image, each output pixel samples each input pixel in the
+	 * range once, so we step one pixel.  If we're enlarging it by 2x, each output pixel
+	 * samples each input pixel twice, so we step half a pixel. */
+	m_fStep = 1;
+	if(fFactor > 1.0)
+		m_fStep = 1.0 / fFactor;
+
+	/* If we're sampling each pixel twice (m_fStep is .5), then we need twice as many taps
+	 * to sample KERNEL_SIZE pixels. */
+	m_iTaps = (int) ceil(KERNEL_SIZE / m_fStep) * 2;
+
+	delete[] m_pFilters;
+	m_pFilters = NULL; // in case of exception
+	m_pFilters = new float[m_iTaps * 256];
+
+	float *pOutput = m_pFilters;
+	for(int i=0; i < 256; ++i)
+	{
+		float fOffset = i / 256.0f;
+
+		float fSum = 0;
+		for(int i = 0; i < m_iTaps; ++i)
+		{
+			float fPos = -(m_iTaps/2-1) - fOffset + i;
+			fPos *= m_fStep;
+
+			float fValue = 0;
+			if(fabs(fPos) < KERNEL_SIZE)
+				fValue = sincf(M_PI*fPos) * sincf(M_PI / KERNEL_SIZE * fPos);
+
+			pOutput[i] = fValue;
+			fSum += fValue;
+		}
+
+		/* Scale the filter so it sums to 1. */
+		for(int i = 0; i<m_iTaps; ++i)
+			pOutput[i] /= fSum;
+
+		pOutput += m_iTaps;
+	}
+}
+
+const float *LanczosFilter::GetFilter(float fOffset) const
+{
+	int iOffset = int(fOffset * 256.0f);
+	iOffset %= 256;
+	return m_pFilters + iOffset*m_iTaps;
+}
+
+Resizer::Resizer(auto_ptr<Filter> pOutput):
+	m_pCompressor(pOutput)
+{
+	m_DestWidth = -1;
+	m_DestHeight = -1;
 	m_CurrentY = 0;
 	m_OutBuf = NULL;
+	m_szError = NULL;
+	m_iInputY = 0;
 }
 
 Resizer::~Resizer()
@@ -22,160 +106,178 @@ Resizer::~Resizer()
 
 const char *Resizer::GetError() const
 {
-	return m_Compressor->GetError();
+	if(m_szError != NULL)
+		return m_szError;
+	return m_pCompressor->GetError();
 }
 
-void Resizer::SetSource(int Width, int Height, int BPP)
+bool Resizer::Init(int iSourceWidth, int iSourceHeight, int iBPP)
 {
-	m_SourceWidth = Width;
-	m_SourceHeight = Height;
-	m_SourceBPP = BPP;
-}
+	assert(m_DestWidth != -1);
+	assert(m_DestHeight != -1);
+	assert(iBPP == 3);
+	m_SourceWidth = iSourceWidth;
+	m_SourceHeight = iSourceHeight;
+	m_SourceBPP = iBPP;
 
-bool Resizer::SetDest(int Width, int Height, int Quality)
-{
-	m_DestWidth = Width;
-	m_DestHeight = Height;
-	m_OutBuf = (uint8_t *) malloc(Width*3);
+	float fXFactor = float(m_SourceWidth) / m_DestWidth;
+	m_XFilter.Init(fXFactor);
 
-	return m_Compressor->Init(Width, Height, Quality);
-}
+	float fYFactor = float(m_SourceHeight) / m_DestHeight;
+	m_YFilter.Init(fYFactor);
 
-#define scale(x, l1, h1, l2, h2) (((x)-(l1))*((h2)-(l2))/((h1)-(l1))+(l2))
-
-static void Average(const uint8_t *const *src, float Colors[3], float SourceXStart, float SourceXEnd, float SourceYStart, float SourceYEnd, int SourceBPP)
-{
-	float Total = 0.0f;
-	for(float y = SourceYStart; y < SourceYEnd; ++y)
+	if(!m_Rows.Init(m_DestWidth, m_SourceHeight, m_SourceBPP, m_YFilter.m_iTaps))
 	{
-		float YCoverage = 1.0f;
-		if(int(y) == int(SourceYStart))
-			YCoverage -= y - int(y);
-		if(int(y) == int(SourceYEnd))
-			YCoverage -= 1.0f - (SourceYEnd - int(SourceYEnd));
-
-		const uint8_t *xsrc=src[(int) y]+(int)SourceXStart*SourceBPP;
-
-		/* The two conditionals can only be true on the first and last iteration of the loop,
-		 * so unfold those iterations and pull the conditionals out of the inner loop. */
-/*		while(x < SourceXEnd)
-		{
-			float XCoverage = 1.0f;
-			if(int(x) == int(SourceXStart))
-				XCoverage -= x - int(x);
-			if(int(x) == int(SourceXEnd))
-				XCoverage -= 1.0f - (SourceXEnd - int(SourceXEnd));
-
-			Colors[0] += xsrc[0] * XCoverage * YCoverage;
-			Colors[1] += xsrc[1] * XCoverage * YCoverage;
-			Colors[2] += xsrc[2] * XCoverage * YCoverage;
-			if(SourceBPP == 4)
-				Colors[3] += xsrc[3] * XCoverage * YCoverage;
-			xsrc += SourceBPP;
-
-			Total += XCoverage * YCoverage;
-			++x;
-		}
-*/
-		float x = int(SourceXStart);
-		if(x < SourceXEnd)
-		{
-			float XCoverage = 1.0f;
-			if(int(x) == int(SourceXStart))
-				XCoverage -= x - int(x);
-			if(int(x) == int(SourceXEnd))
-				XCoverage -= 1.0f - (SourceXEnd - int(SourceXEnd));
-
-			Colors[0] += xsrc[0] * XCoverage * YCoverage;
-			Colors[1] += xsrc[1] * XCoverage * YCoverage;
-			Colors[2] += xsrc[2] * XCoverage * YCoverage;
-			if(SourceBPP == 4)
-				Colors[3] += xsrc[3] * XCoverage * YCoverage;
-			xsrc += SourceBPP;
-
-			Total += XCoverage * YCoverage;
-			++x;
-		}
-
-		while(x < SourceXEnd-1)
-		{
-			Colors[0] += xsrc[0] * YCoverage;
-			Colors[1] += xsrc[1] * YCoverage;
-			Colors[2] += xsrc[2] * YCoverage;
-			if(SourceBPP == 4)
-				Colors[3] += xsrc[3] * YCoverage;
-			xsrc += SourceBPP;
-
-			Total += YCoverage;
-			++x;
-		}
-
-		if(x < SourceXEnd)
-		{
-			float XCoverage = 1.0f;
-			if(int(x) == int(SourceXStart))
-				XCoverage -= x - int(x);
-			if(int(x) == int(SourceXEnd))
-				XCoverage -= 1.0f - (SourceXEnd - int(SourceXEnd));
-
-			Colors[0] += xsrc[0] * XCoverage * YCoverage;
-			Colors[1] += xsrc[1] * XCoverage * YCoverage;
-			Colors[2] += xsrc[2] * XCoverage * YCoverage;
-			if(SourceBPP == 4)
-				Colors[3] += xsrc[3] * XCoverage * YCoverage;
-			xsrc += SourceBPP;
-
-			Total += XCoverage * YCoverage;
-		}
+		m_szError = "out of memory";
+		return false;
 	}
 
-	if(Total != 0.0f)
-		for(int i = 0; i < 4; ++i)
-			Colors[i] /= Total;
+	m_OutBuf = (uint8_t *) malloc(m_DestWidth * m_SourceBPP);
+	if(m_OutBuf == NULL)
+	{
+		m_szError = "out of memory";
+		return false;
+	}
+
+	return m_pCompressor->Init(m_DestWidth, m_DestHeight, m_SourceBPP);
 }
 
-bool Resizer::Run(const uint8_t *const *Source, int StartRow, int EndRow, int &DiscardRow)
+void Resizer::SetDest(int iDestWidth, int iDestHeight)
 {
-	while(m_CurrentY < m_DestHeight)
+	m_DestWidth = iDestWidth;
+	m_DestHeight = iDestHeight;
+}
+
+static uint8_t *PadRow(const uint8_t *pSourceRow, int iWidth, int iBPP, int iPadding)
+{
+	uint8_t *pRow = new uint8_t[(iWidth + iPadding*2) * iBPP];
+	uint8_t *pDest = pRow;
+	for(int x = 0; x < iPadding; ++x)
 	{
-		float SourceYStart = scale((float) m_CurrentY,   0.0f, (float) m_DestHeight, 0.0f, (float) m_SourceHeight);
-		float SourceYEnd = scale((float) m_CurrentY + 1, 0.0f, (float) m_DestHeight, 0.0f, (float) m_SourceHeight);
-		DiscardRow = int(SourceYStart)-1;
+		for(int i = 0; i < iBPP; ++i)
+			pDest[i] = pSourceRow[i];
+		pDest += iBPP;
+	}
 
-		if(EndRow != m_SourceHeight && int(SourceYEnd)+1 > EndRow-1)
+	memcpy(pDest, pSourceRow, iWidth*iBPP*sizeof(uint8_t));
+	pDest += iWidth*iBPP;
+
+	for(int x = 0; x < iPadding; ++x)
+	{
+		for(int i = 0; i < iBPP; ++i)
+			pDest[i] = pSourceRow[i];
+		pDest += iBPP;
+	}
+
+	return pRow;
+}
+
+bool Resizer::WriteRow(uint8_t *pNewRow)
+{
+	if(m_SourceWidth == m_DestWidth && m_SourceHeight == m_DestHeight)
+	{
+		++m_CurrentY;
+
+		/* We don't actually have any resizing to do, so short-circuit. */
+		if(!m_pCompressor->WriteRow((uint8_t *) pNewRow))
+			return false;
+
+		if(m_CurrentY != m_DestHeight)
 			return true;
-		assert(SourceYStart>=StartRow);
 
-		uint8_t *Output = m_OutBuf;
+		return m_pCompressor->Finish();
+	}
+
+	/* Make a copy of pNewRow with the first and last pixel duplicated, so we don't have to do
+	 * bounds checking in the inner loop below. */
+	uint8_t *pActualPaddedRow = PadRow(pNewRow, m_SourceWidth, m_SourceBPP, m_XFilter.m_iTaps/2);
+	const uint8_t *pPaddedRow = pActualPaddedRow + (m_XFilter.m_iTaps/2)*m_SourceBPP;
+
+	const float fXFactor = float(m_SourceWidth) / m_DestWidth;
+	const float fYFactor = float(m_SourceHeight) / m_DestHeight;
+
+	/* Run the horizontal filter on the incoming row, and drop the result into m_Rows. */
+	{
+		float *pRow = m_Rows.GetRow(m_iInputY);
+		++m_iInputY;
+
+		float *pOutput = pRow;
 		for(int x = 0; x < m_DestWidth; ++x)
 		{
-			float SourceXStart = scale((float) x,   0.0f, (float) m_DestWidth, 0.0f, (float) m_SourceWidth);
-			float SourceXEnd = scale((float) x + 1, 0.0f, (float) m_DestWidth, 0.0f, (float) m_SourceWidth);
+			const double fSourceX = (x + 0.5f) * fXFactor;
+			const double fOffset = fract(fSourceX + 0.5);
+			const float *pFilter = m_XFilter.GetFilter(fOffset);
+			const int iStartX = lrint(fSourceX - m_XFilter.m_iTaps/2 + 1e-6);
 
-			float Colors[4] = { 0.0 };
-			Average(Source, Colors, SourceXStart, SourceXEnd, SourceYStart, SourceYEnd, m_SourceBPP);
+			const uint8_t *pSource = pPaddedRow + iStartX*3;
 
-			if(m_SourceBPP == 4)
+			float fR = 0, fG = 0, fB = 0;
+			for(int i = 0; i < m_XFilter.m_iTaps; ++i)
 			{
-				for(int i = 0; i < 3; ++i)
-					Colors[i] *= Colors[3]/255.0f;
+				float fWeight = *pFilter++;
+
+				fR += pSource[0] * fWeight;
+				fG += pSource[1] * fWeight;
+				fB += pSource[2] * fWeight;
+				pSource += 3;
 			}
 
-			Output[0] = (uint8_t) min(255, int(Colors[0]));
-			Output[1] = (uint8_t) min(255, int(Colors[1]));
-			Output[2] = (uint8_t) min(255, int(Colors[2]));
+			pOutput[0] = fR;
+			pOutput[1] = fG;
+			pOutput[2] = fB;
 
-			Output += 3;
+			pOutput += m_SourceBPP;
+		}
+	}
+	delete[] pActualPaddedRow;
+
+	const float *const *pSourceRows = m_Rows.GetRows();
+	while(m_CurrentY < m_DestHeight)
+	{
+		const double fSourceY = (m_CurrentY + 0.5) * fYFactor;
+		const double fOffset = fract(fSourceY + 0.5);
+		const int iStartY = lrint(fSourceY - m_YFilter.m_iTaps/2 + 1e-6);
+
+		/* iStartY is the first row we'll need, and we never move backwards.  Discard rows
+		 * before it to save memory. */
+		m_Rows.DiscardRows(iStartY);
+
+		if(m_iInputY != m_SourceHeight && iStartY+m_YFilter.m_iTaps >= m_iInputY)
+			return true;
+
+		/* Process the next output row. */
+		uint8_t *pOutput = m_OutBuf;
+		for(int x = 0; x < m_DestWidth; ++x)
+		{
+			const float *pFilter = m_YFilter.GetFilter(fOffset);
+
+			float fR = 0, fG = 0, fB = 0;
+			for(int i = 0; i < m_YFilter.m_iTaps; ++i)
+			{
+				const float *pSource = pSourceRows[iStartY+i];
+				pSource += x * m_SourceBPP;
+
+				float fWeight = *pFilter++;
+				fR += pSource[0] * fWeight;
+				fG += pSource[1] * fWeight;
+				fB += pSource[2] * fWeight;
+			}
+
+			pOutput[0] = (uint8_t) max(0, min(255, (int) lrintf(fR)));
+			pOutput[1] = (uint8_t) max(0, min(255, (int) lrintf(fG)));
+			pOutput[2] = (uint8_t) max(0, min(255, (int) lrintf(fB)));
+
+			pOutput += 3;
 		}
 
-		if(!m_Compressor->WriteRow((JSAMPLE *) m_OutBuf))
+		if(!m_pCompressor->WriteRow((uint8_t *) m_OutBuf))
 			return false;
 		++m_CurrentY;
 	}
 
 	if(m_CurrentY == m_DestHeight)
 	{
-		if(!m_Compressor->Finish())
+		if(!m_pCompressor->Finish())
 			return false;
 	}
 

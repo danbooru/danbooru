@@ -1,32 +1,43 @@
 #ifndef RESIZE_H
 #define RESIZE_H
 
+#include "RowBuffer.h"
+#include "Filter.h"
+#include <memory>
+using namespace std;
 #include <stdint.h>
 
-class JPEGCompressor;
+struct LanczosFilter
+{
+	LanczosFilter();
+	~LanczosFilter();
+	void Init(float fFactor);
+	const float *GetFilter(float fOffset) const;
 
-class Resizer
+	float m_fStep;
+	int m_iTaps;
+	float *m_pFilters;
+};
+
+class Resizer: public Filter
 {
 public:
-	Resizer(JPEGCompressor *Compressor);
+	Resizer(auto_ptr<Filter> pCompressor);
 	~Resizer();
 
 	// BPP is 3 or 4, indicating RGB or RGBA.
-	void SetSource(int Width, int Height, int BPP);
-	bool SetDest(int Width, int Height, int Quality);
+	bool Init(int iSourceWidth, int iSourceHeight, int BPP);
+	void SetDest(int iDestWidth, int iDestHeight);
+	bool WriteRow(uint8_t *pNewRow);
+	bool Finish() { return true; }
 
-	/*
-	 * Resize part of an image.
-	 *
-	 * [FirstRow,LastRow) is a range indicating which elements in src[] are available.
-	 * On return, any rows in [0,DiscardRow) are no longer needed and can be deleted.
-	 */
-	bool Run(const uint8_t *const *src, int FirstRow, int LastRow, int &DiscardRow);
 	const char *GetError() const;
 
 private:
-	JPEGCompressor *m_Compressor;
+	auto_ptr<Filter> m_pCompressor;
 	uint8_t *m_OutBuf;
+	RowBuffer<float> m_Rows;
+	const char *m_szError;
 
 	int m_SourceWidth;
 	int m_SourceHeight;
@@ -35,7 +46,11 @@ private:
 	int m_DestWidth;
 	int m_DestHeight;
 
-	float m_CurrentY;
+	LanczosFilter m_XFilter;
+	LanczosFilter m_YFilter;
+
+	int m_iInputY;
+	int m_CurrentY;
 };
 
 #endif

@@ -3,6 +3,7 @@
 
 #include <png.h>
 #include "Reader.h"
+#include "Filter.h"
 #include "RowBuffer.h"
 
 struct png_error_info
@@ -18,11 +19,11 @@ public:
 		m_Done = false;
 	}
 
-	bool Read(FILE *f, Resizer *resizer, char error[1024]);
+	bool Read(FILE *f, Filter *pOutput, char error[1024]);
 
 private:
-	RowBuffer m_Rows;
-	Resizer *m_Resizer;
+	RowBuffer<uint8_t> m_Rows;
+	Filter *m_pOutputFilter;
 
 	bool m_Done;
 	int m_Passes;

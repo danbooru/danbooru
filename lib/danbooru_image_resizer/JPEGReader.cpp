@@ -1,6 +1,6 @@
 #include <string.h>
+#include <assert.h>
 #include "JPEGReader.h"
-#include "RowBuffer.h"
 #include "Resize.h"
 #include <algorithm>
 using namespace std;
@@ -32,9 +32,14 @@ const char *JPEGCompressor::GetError() const
 	return m_JErr.buffer;
 }
 
-
-bool JPEGCompressor::Init(int width, int height, int quality)
+void JPEGCompressor::SetQuality(int quality)
 {
+	m_iQuality = quality;
+}
+
+bool JPEGCompressor::Init(int width, int height, int bpp)
+{
+	assert(bpp == 3);
 	m_CInfo.err = jpeg_std_error(&m_JErr.pub);
 
 	m_JErr.pub.error_exit = jpeg_error_exit;
@@ -53,8 +58,18 @@ bool JPEGCompressor::Init(int width, int height, int quality)
 	m_CInfo.in_color_space = JCS_RGB; 	/* colorspace of input image */
 
 	jpeg_set_defaults(&m_CInfo);
-	jpeg_simple_progression(&m_CInfo);
-	jpeg_set_quality(&m_CInfo, quality, TRUE); // limit to baseline-JPEG values
+	jpeg_set_quality(&m_CInfo, m_iQuality, TRUE); // limit to baseline-JPEG values
+
+	/* For high-quality compression, disable color subsampling. */
+	if(m_iQuality >= 95)
+	{
+		m_CInfo.comp_info[0].h_samp_factor = 1;
+		m_CInfo.comp_info[0].v_samp_factor = 1;
+		m_CInfo.comp_info[1].h_samp_factor = 1;
+		m_CInfo.comp_info[1].v_samp_factor = 1;
+		m_CInfo.comp_info[2].h_samp_factor = 1;
+		m_CInfo.comp_info[2].v_samp_factor = 1;
+	}
 
 	jpeg_start_compress(&m_CInfo, TRUE);
 
@@ -89,13 +104,10 @@ bool JPEGCompressor::Finish()
 	return true;
 }
 
-bool JPEG::Read(FILE *f, Resizer *resizer, char error[1024])
+bool JPEG::Read(FILE *f, Filter *pOutput, char error[1024])
 {
 	// JMSG_LENGTH_MAX <= sizeof(error)
-	m_JErr.buffer = error;
-	RowBuffer Rows;
-
-	m_Resizer = resizer;
+	m_pOutputFilter = pOutput;
 
 	struct jpeg_decompress_struct CInfo;
 	CInfo.err = jpeg_std_error(&m_JErr.pub);
@@ -103,44 +115,55 @@ bool JPEG::Read(FILE *f, Resizer *resizer, char error[1024])
 	m_JErr.pub.emit_message = jpeg_warning;
 
 	bool Ret = false;
+	uint8_t *pBuf = NULL;
 	if(setjmp(m_JErr.setjmp_buffer))
+	{
+		memcpy(error, m_JErr.buffer, JMSG_LENGTH_MAX);
 		goto cleanup;
+	}
 
 	jpeg_create_decompress(&CInfo);
 
 	jpeg_stdio_src(&CInfo, f);
 	jpeg_read_header(&CInfo, TRUE);
 	CInfo.out_color_space = JCS_RGB;
+	if(CInfo.jpeg_color_space == JCS_CMYK || CInfo.jpeg_color_space == JCS_YCCK)
+	{
+		strcpy(error, "CMYK JPEGs are not supported; please convert to RGB");
+		goto cleanup;
+	}
 
 	jpeg_start_decompress(&CInfo);
 
-	if(!Rows.Init(CInfo.output_width, CInfo.output_height, 3))
+	if(!m_pOutputFilter->Init(CInfo.output_width, CInfo.output_height, 3))
+	{
+		strncpy(error, m_pOutputFilter->GetError(), sizeof(error));
+		error[sizeof(error)-1] = 0;
+		goto cleanup;
+	}
+
+	pBuf = (uint8_t *) malloc(CInfo.output_width * 3);
+	if(pBuf == NULL)
 	{
 		strcpy(error, "out of memory");
 		goto cleanup;
 	}
 
-	m_Resizer->SetSource(CInfo.output_width, CInfo.output_height, 3);
-
 	while(CInfo.output_scanline < CInfo.output_height)
 	{
-		uint8_t *p = Rows.GetRow(CInfo.output_scanline);
-		if(p == NULL)
+		jpeg_read_scanlines(&CInfo, &pBuf, 1);
+
+		if(!m_pOutputFilter->WriteRow(pBuf))
 		{
-			strcpy(error, "out of memory");
+			strcpy(error, m_pOutputFilter->GetError());
 			goto cleanup;
 		}
+	}
 
-		jpeg_read_scanlines(&CInfo, &p, 1);
-
-		int DiscardRow;
-		if(!m_Resizer->Run(Rows.GetRows(), Rows.GetStartRow(), min(Rows.GetEndRow(), (int) CInfo.output_scanline+1), DiscardRow))
-		{
-			strcpy(error, m_Resizer->GetError());
-			goto cleanup;
-		}
-
-		Rows.DiscardRows(DiscardRow);
+	if(!m_pOutputFilter->Finish())
+	{
+		strcpy(error, m_pOutputFilter->GetError());
+		goto cleanup;
 	}
 
 	jpeg_finish_decompress(&CInfo);
@@ -148,6 +171,8 @@ bool JPEG::Read(FILE *f, Resizer *resizer, char error[1024])
 	Ret = true;
 
 cleanup:
+	if(pBuf != NULL)
+		free(pBuf);
 	jpeg_destroy_decompress(&CInfo);
 
 	return Ret;
