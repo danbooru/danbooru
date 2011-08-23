@@ -1,5 +1,4 @@
 /*= require "smoothness/jquery-ui-1.8.5.custom.css" */
-@import 'bourbon';
 
 $link_color: #006FFA;
 $link_hover_color: #9093FF;
@@ -895,6 +894,10 @@ div#c-forum-topics {
   
   span.info {
     color: #AAA;
+  }
+  
+  tr.new-topic {
+    font-weight: bold;
   }
   
   div#form-content {

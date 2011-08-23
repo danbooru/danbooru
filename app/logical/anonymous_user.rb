@@ -112,6 +112,13 @@ class AnonymousUser
     []
   end
   
+  def last_forum_read_at
+    Time.now
+  end
+  
+  def update_column(*params)
+  end
+  
   %w(member banned privileged contributor janitor moderator admin).each do |name|
     define_method("is_#{name}?") do
       false

@@ -7,7 +7,8 @@
     <% end %>
 
     <%= render "forum_posts/listing", :forum_posts => @forum_posts %>
-    <%= render "paginator" %>
+    
+    <%= numbered_paginator(@forum_posts) %>
   </div>
 </div>
 
