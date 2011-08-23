@@ -18,7 +18,7 @@ module UploadTestMethods
   		define_method(:original_filename) {filename}
   		define_method(:content_type) {content_type}
   	end
-
+  	
   	tempfile
   end
 

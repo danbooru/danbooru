@@ -260,7 +260,7 @@ class Upload < ActiveRecord::Base
 
       self.file_path = temp_file_path
 
-      if file.tempfile
+      if file.respond_to?(:tempfile) && file.tempfile
         FileUtils.cp(file.tempfile.path, file_path)
       else
         File.open(file_path, 'wb') do |out| 
