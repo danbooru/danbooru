@@ -111,11 +111,11 @@ class UploadTest < ActiveSupport::TestCase
           @upload.calculate_dimensions(@upload.file_path)
           assert_nothing_raised {@upload.generate_resizes(@upload.file_path)}
           assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.small_image_width)))
-          assert_equal(6556, File.size(@upload.resized_file_path_for(Danbooru.config.small_image_width)))
+          assert_equal(7265, File.size(@upload.resized_file_path_for(Danbooru.config.small_image_width)))
           assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.medium_image_width)))
-          assert_equal(39411, File.size(@upload.resized_file_path_for(Danbooru.config.medium_image_width)))
+          assert_equal(43474, File.size(@upload.resized_file_path_for(Danbooru.config.medium_image_width)))
           assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.large_image_width)))
-          assert_equal(179324, File.size(@upload.resized_file_path_for(Danbooru.config.large_image_width)))
+          assert_equal(198583, File.size(@upload.resized_file_path_for(Danbooru.config.large_image_width)))
         end
       end
 

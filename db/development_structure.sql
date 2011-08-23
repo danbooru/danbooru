@@ -464,6 +464,37 @@ ALTER SEQUENCE advertisements_id_seq OWNED BY advertisements.id;
 
 
 --
+-- Name: amazon_backups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE amazon_backups (
+    id integer NOT NULL,
+    last_id integer,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: amazon_backups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE amazon_backups_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: amazon_backups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE amazon_backups_id_seq OWNED BY amazon_backups.id;
+
+
+--
 -- Name: artist_urls; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2252,7 +2283,7 @@ CREATE TABLE tag_aliases (
     creator_id integer NOT NULL,
     creator_ip_addr inet NOT NULL,
     forum_topic_id integer,
-    status character varying(255) DEFAULT 'pending'::character varying NOT NULL,
+    status text DEFAULT 'pending'::text NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -2289,7 +2320,7 @@ CREATE TABLE tag_implications (
     creator_id integer NOT NULL,
     creator_ip_addr inet NOT NULL,
     forum_topic_id integer,
-    status character varying(255) DEFAULT 'pending'::character varying NOT NULL,
+    status text DEFAULT 'pending'::text NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -2627,6 +2658,13 @@ ALTER TABLE advertisements ALTER COLUMN id SET DEFAULT nextval('advertisements_i
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE amazon_backups ALTER COLUMN id SET DEFAULT nextval('amazon_backups_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE artist_urls ALTER COLUMN id SET DEFAULT nextval('artist_urls_id_seq'::regclass);
 
 
@@ -2875,6 +2913,14 @@ ALTER TABLE ONLY advertisement_hits
 
 ALTER TABLE ONLY advertisements
     ADD CONSTRAINT advertisements_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: amazon_backups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY amazon_backups
+    ADD CONSTRAINT amazon_backups_pkey PRIMARY KEY (id);
 
 
 --
@@ -5225,3 +5271,5 @@ INSERT INTO schema_migrations (version) VALUES ('20110607194023');
 INSERT INTO schema_migrations (version) VALUES ('20110717010705');
 
 INSERT INTO schema_migrations (version) VALUES ('20110722211855');
+
+INSERT INTO schema_migrations (version) VALUES ('20110815233456');
