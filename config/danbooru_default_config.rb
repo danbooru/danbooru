@@ -72,6 +72,11 @@ module Danbooru
       300
     end
     
+    # If a solid state drive is availble, cache the thumbnails on the SSD to reduce disk seek times.
+    def ssd_path
+      nil
+    end
+    
     # List of memcached servers
     def memcached_servers
       %w(localhost:11211)

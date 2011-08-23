@@ -65,7 +65,8 @@ class Post < ActiveRecord::Base
       FileUtils.rm_f(file_path)
       FileUtils.rm_f(medium_file_path)
       FileUtils.rm_f(large_file_path)
-      FileUtils.rm_f(preview_file_path)
+      FileUtils.rm_f(ssd_preview_file_path) if Danbooru.config.ssd_path
+      FileUtils.rm_f(real_preview_file_path)
     end
 
     def file_path_prefix
@@ -91,9 +92,21 @@ class Post < ActiveRecord::Base
         file_path
       end
     end
+    
+    def real_preview_file_path
+      "#{Rails.root}/public/data/preview/#{file_path_prefix}#{md5}.jpg"
+    end
+    
+    def ssd_preview_file_path
+      "#{Danbooru.config.ssd_path}/public/data/preview/#{file_path_preview}#{md5}.jpg"
+    end
 
     def preview_file_path
-      "#{Rails.root}/public/data/preview/#{file_path_prefix}#{md5}.jpg"
+      if Danbooru.config.ssd_path
+        ssd_preview_file_path
+      else
+        real_preview_file_path
+      end
     end
 
     def file_url
@@ -117,7 +130,11 @@ class Post < ActiveRecord::Base
     end
 
     def preview_file_url
-      "/data/preview/#{file_path_prefix}#{md5}.jpg"
+      if Danbooru.config.ssd_path
+        "/ssd/data/preview/#{file_path_prefix}#{md5}.jpg"
+      else
+        "/data/preview/#{file_path_prefix}#{md5}.jpg"
+      end
     end
     
     def file_url_for(user)

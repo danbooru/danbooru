@@ -1,11 +1,11 @@
 set :output, "/var/log/whenever.log"
 
 every 1.hour do
-  TagSubscription.process_all
+  runner "TagSubscription.process_all"
 end
 
-if fetch(:whenever_environment) == "production"
+if environment == "production"
   every 1.hour do
-    AmazonBackup.execute
+    runner "AmazonBackup.execute"
   end
 end
