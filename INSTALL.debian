@@ -37,7 +37,10 @@ apt-get -y install python-software-properties
 add-apt-repository ppa:pitti/postgresql
 apt-get update
 apt-get install -y postgresql-9.1 libpq-dev
-POSTGRESQL_EXIT=$?
+
+if [ $? -ne 0 ]; then
+  exit 1
+fi
 
 # Install RVM
 echo "Installing RVM..."
@@ -53,7 +56,10 @@ gem install --no-ri --no-rdoc capistrano
 # Install Passenger
 gem install --no-ri --no-rdoc -v 3.0.8 passenger
 rvm exec passenger-install-nginx-module
-RVM_EXIT=$?
+
+if [ $? -ne 0 ]; then
+  exit 1
+fi
 
 # Setup nginx
 curl -s https://raw.github.com/ascarter/nginx-ubuntu-rvm/master/nginx > /etc/init.d/nginx
@@ -62,25 +68,16 @@ update-rc.d -f nginx defaults
 mkdir -p /opt/nginx/sites
 curl -s https://raw.github.com/r888888888/danbooru/master/script/install/nginx.conf > /opt/nginx/conf/nginx.conf
 curl -s https://raw.github.com/r888888888/danbooru/master/script/install/nginx.danbooru.conf > /opt/nginx/conf/sites/danbooru.conf
-
-if [ $RVM_EXIT -ne 0 ] ; then
-  echo "Passenger installation failed; not starting nginx"
-else
-  /etc/init.d/nginx start
-fi
+/etc/init.d/nginx start
 
 # Create user account
-# useradd -m danbooru
+useradd -m danbooru
 PG_HBA_FILE="/etc/postgresql/9.1/main/pg_hba.conf"
 echo "local    all         postgres,danbooru                              trust" > $PG_HBA_FILE
 echo "host     all         postgres,danbooru          127.0.0.1/32        trust" >> $PG_HBA_FILE
 
-if [ $POSTGRESQL_EXIT -ne 0 ]; then
-  echo "PostgreSQL installation failed; not starting server"
-else
-  /etc/init.d/postgresql-9.1 restart
-  sudo -u postgres createuser -s danbooru
-fi
+/etc/init.d/postgresql-9.1 restart
+sudo -u postgres createuser -s danbooru
 
 echo
 echo "I'm done!"
