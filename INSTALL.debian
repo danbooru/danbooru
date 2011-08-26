@@ -5,28 +5,28 @@ if [[ "$(whoami)" != "root" ]] ; then
   exit 1
 fi
 
-# echo "Danbooru Install"
-# echo "This script will install Ruby, Rails, PostgreSQL, and Nginx. By the end,"
-# echo "you should be able to connect to the server and create an account."
-# echo
-# echo "It will create a new user called danbooru which will run the Danbooru"
-# echo "processes. It will download the latest copy and install it in"
-# echo "/var/www/danbooru."
-# echo
-# echo -n "Enter the hostname for this server (ex: danbooru.donmai.us): "
-# read hostname
-# 
-# if [[ -z "$hostname" ]] ; then
-#   echo "Must enter a hostname"
-#   exit 1
-# fi
-# 
-# echo -n "Enter a name for the site (default: Danbooru): "
-# read sitename
-# 
-# if [[ -z "$sitename" ]] ; then
-#   sitename=Danbooru
-# fi
+echo "Danbooru Install"
+echo "This script will install Ruby, Rails, PostgreSQL, and Nginx. By the end,"
+echo "you should be able to connect to the server and create an account."
+echo
+echo "It will create a new user called danbooru which will run the Danbooru"
+echo "processes. It will download the latest copy and install it in"
+echo "/var/www/danbooru."
+echo
+echo -n "Enter the hostname for this server (ex: danbooru.donmai.us): "
+read hostname
+
+if [[ -z "$hostname" ]] ; then
+  echo "Must enter a hostname"
+  exit 1
+fi
+
+echo -n "Enter a name for the site (default: Danbooru): "
+read sitename
+
+if [[ -z "$sitename" ]] ; then
+  sitename=Danbooru
+fi
 
 # Install packages
 echo "Installing packages..."
@@ -61,6 +61,15 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+# Create user account
+useradd -m danbooru
+PG_HBA_FILE="/etc/postgresql/9.1/main/pg_hba.conf"
+echo "local    all         postgres,danbooru                              trust" > $PG_HBA_FILE
+echo "host     all         postgres,danbooru          127.0.0.1/32        trust" >> $PG_HBA_FILE
+
+/etc/init.d/postgresql restart
+sudo -u postgres createuser -s danbooru
+
 # Setup nginx
 curl -s https://raw.github.com/ascarter/nginx-ubuntu-rvm/master/nginx > /etc/init.d/nginx
 chmod +x,g-w /etc/init.d/nginx
@@ -70,15 +79,6 @@ curl -s https://raw.github.com/r888888888/danbooru/master/script/install/nginx.c
 curl -s https://raw.github.com/r888888888/danbooru/master/script/install/nginx.danbooru.conf > /opt/nginx/conf/sites/danbooru.conf
 sed -i -e 's/HOSTNAME/$hostname/g' /opt/nginx/conf/sites/danbooru.conf
 /etc/init.d/nginx start
-
-# Create user account
-useradd -m danbooru
-PG_HBA_FILE="/etc/postgresql/9.1/main/pg_hba.conf"
-echo "local    all         postgres,danbooru                              trust" > $PG_HBA_FILE
-echo "host     all         postgres,danbooru          127.0.0.1/32        trust" >> $PG_HBA_FILE
-
-/etc/init.d/postgresql-9.1 restart
-sudo -u postgres createuser -s danbooru
 
 echo
 echo "I'm done!"
