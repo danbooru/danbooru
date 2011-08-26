@@ -68,6 +68,7 @@ update-rc.d -f nginx defaults
 mkdir -p /opt/nginx/sites
 curl -s https://raw.github.com/r888888888/danbooru/master/script/install/nginx.conf > /opt/nginx/conf/nginx.conf
 curl -s https://raw.github.com/r888888888/danbooru/master/script/install/nginx.danbooru.conf > /opt/nginx/conf/sites/danbooru.conf
+sed -i -e 's/HOSTNAME/$hostname/g' /opt/nginx/conf/sites/danbooru.conf
 /etc/init.d/nginx start
 
 # Create user account
