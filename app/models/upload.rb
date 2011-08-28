@@ -66,6 +66,7 @@ class Upload < ActiveRecord::Base
         generate_resizes(file_path)
         move_file
         post = convert_to_post
+        post.distribute_files
         if post.save
           update_attributes(:status => "completed", :post_id => post.id)
         else

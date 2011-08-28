@@ -5,6 +5,7 @@ class Post < ActiveRecord::Base
   
   attr_accessor :old_tag_string, :old_parent_id
   after_destroy :delete_files
+  after_destroy :delete_remote_files
   after_save :create_version
   after_save :update_parent_on_save
   before_save :merge_old_tags
@@ -61,6 +62,22 @@ class Post < ActiveRecord::Base
   }
     
   module FileMethods
+    def distribute_files
+      RemoteFileManager.new(file_path).distribute
+      RemoteFileManager.new(real_preview_path).distribute
+      RemoteFileManager.new(ssd_preview_path).distribute if Danbooru.config.ssd_path
+      RemoteFileManager.new(medium_file_path).distribute if has_medium?
+      RemoteFileManager.new(large_file_path).distribute if has_large?
+    end
+    
+    def delete_remote_files
+      RemoteFileManager.new(file_path).delete
+      RemoteFileManager.new(real_preview_path).delete
+      RemoteFileManager.new(ssd_preview_path).delete if Danbooru.config.ssd_path
+      RemoteFileManager.new(medium_file_path).delete if has_medium?
+      RemoteFileManager.new(large_file_path).delete if has_large?
+    end
+    
     def delete_files
       FileUtils.rm_f(file_path)
       FileUtils.rm_f(medium_file_path)
