@@ -73,16 +73,28 @@ echo "host     all         postgres,danbooru          127.0.0.1/32        trust"
 /etc/init.d/postgresql restart
 sudo -u postgres createuser -s danbooru
 
+mkdir -p /var/log/www
+
 # Setup nginx
 curl -s https://raw.github.com/ascarter/nginx-ubuntu-rvm/master/nginx > /etc/init.d/nginx
 chmod +x,g-w /etc/init.d/nginx
 update-rc.d -f nginx defaults
-mkdir -p /opt/nginx/sites
-curl -s https://raw.github.com/r888888888/danbooru/master/script/install/nginx.conf > /opt/nginx/conf/nginx.conf
 mkdir -p /opt/nginx/conf/sites
+curl -s https://raw.github.com/r888888888/danbooru/master/script/install/nginx.conf > /opt/nginx/conf/nginx.conf
 curl -s https://raw.github.com/r888888888/danbooru/master/script/install/nginx.danbooru.conf > /opt/nginx/conf/sites/danbooru.conf
 sed -i -e 's/HOSTNAME/$hostname/g' /opt/nginx/conf/sites/danbooru.conf
 /etc/init.d/nginx start
+
+# Setup logrotate
+LOGROTATE_CONF_FILE="/etc/logrotate.conf"
+echo >> $LOGROTATE_CONF_FILE
+echo "/var/log/www/danbooru.access.log" >> $LOGROTATE_CONF_FILE
+echo "/var/log/www/danbooru.error.log">> $LOGROTATE_CONF_FILE
+echo "/var/www/danbooru/current/log/production.log {" >> $LOGROTATE_CONF_FILE
+echo "  daily" >> $LOGROTATE_CONF_FILE
+echo "  rotate 3" >> $LOGROTATE_CONF_FILE
+echo "  copytruncate" >> $LOGROTATE_CONF_FILE
+echo "}" >> $LOGROTATE_CONF_FILE
 
 # Setup danbooru account
 echo "*************************************************"
