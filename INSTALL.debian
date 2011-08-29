@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Run: bash < <(curl -s https://raw.github.com/r888888888/danbooru/master/INSTALL.debian)
+# Run: curl -s https://raw.github.com/r888888888/danbooru/master/INSTALL.debian > install.sh ; chmod +x install.sh ; ./install.sh
 
 if [[ "$(whoami)" != "root" ]] ; then
   echo "You must run this script as root"
@@ -35,7 +35,7 @@ fi
 
 # Install packages
 echo "Installing packages..."
-apt-get -y install build-essential automake openssl libssl-dev libyaml-dev libxml2-dev libxslt-dev autoconf ncurses-dev sudo gcc g++ libreadline-dev zlib1g-dev flex bison libgd2-noxpm libgd2-noxpm-dev bzip2 ragel memcached libmemcache-dev git curl libcurl4-openssl-dev
+apt-get -y install build-essential automake openssl libssl-dev libyaml-dev libxml2-dev libxslt-dev autoconf ncurses-dev sudo gcc g++ libreadline-dev zlib1g-dev flex bison libgd2-noxpm libgd2-noxpm-dev bzip2 ragel memcached libmemcache-dev git curl libcurl4-openssl-dev emacs-nox
 
 # Install PostgreSQL 9.1
 apt-get -y install python-software-properties
@@ -51,12 +51,14 @@ fi
 echo "Installing RVM..."
 bash < <(curl -s https://rvm.beginrescueend.com/install/rvm)
 echo "source /usr/local/rvm/scripts/rvm" >> /etc/bash.bashrc
+echo "source /usr/local/rvm/scripts/rvm" >> /etc/profile
 source /usr/local/rvm/scripts/rvm
 rvm install ruby-1.9.2-p290 --with-openssl-dir=/usr/local
 rvm 1.9.2 --default
 
 # Install gems
 gem install --no-ri --no-rdoc capistrano
+gem install --no-ri --no-rdoc capistrano-ext
 
 # Install Passenger
 gem install --no-ri --no-rdoc -v 3.0.8 passenger
@@ -68,6 +70,16 @@ fi
 
 # Create user account
 useradd -m danbooru
+chsh -s /bin/bash danbooru
+echo "source /usr/local/rvm/scripts/rvm" > /home/danbooru/.bashrc
+chmod g-wx,o-wx /home/danbooru/.bashrc
+chown danbooru:danbooru /home/danbooru/.bashrc
+echo "export rvm_path=/usr/local/rvm" > /etc/rvmrc
+addgroup wheel
+usermod -G root,wheel root
+usermod -G danbooru,wheel danbooru
+
+# Update PostgreSQL
 PG_HBA_FILE="/etc/postgresql/9.1/main/pg_hba.conf"
 echo "local    all         postgres,danbooru                              trust" > $PG_HBA_FILE
 echo "host     all         postgres,danbooru          127.0.0.1/32        trust" >> $PG_HBA_FILE
@@ -86,6 +98,8 @@ curl -s https://raw.github.com/r888888888/danbooru/master/script/install/nginx.c
 curl -s https://raw.github.com/r888888888/danbooru/master/script/install/nginx.danbooru.conf > /opt/nginx/conf/sites/danbooru.conf
 sed -i -e 's/HOSTNAME/$hostname/g' /opt/nginx/conf/sites/danbooru.conf
 /etc/init.d/nginx start
+
+echo "%wheel  ALL=(ALL)       ALL" >> /etc/sudoers
 
 # Setup logrotate
 LOGROTATE_CONF_FILE="/etc/logrotate.conf"
