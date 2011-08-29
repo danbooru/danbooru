@@ -29,14 +29,14 @@ namespace :local_config do
 
   desc "Initialize local config files"
   task :setup_local_files do
-    run "cp #{current_path}/script/install/danbooru_local_config.rb.templ #{deploy_to}/shared/config/danbooru_local_config.rb"
-    run "cp #{current_path}/script/install/database.yml.templ #{deploy_to}/shared/config/database.yml"
+    run "curl -s https://raw.github.com/r888888888/danbooru/master/script/install/danbooru_local_config.rb.templ > #{deploy_to}/shared/config/danbooru_local_config.rb"
+    run "curl -s https://raw.github.com/r888888888/danbooru/master/script/install/database.yml.templ > #{deploy_to}/shared/config/database.yml"
   end
 
   desc "Link the local config files"
   task :link_local_files do
-    run "ln -s #{deploy_to}/shared/config/danbooru_local_config.rb #{current_path}/config/danbooru_local_config.rb"
-    run "ln -s #{deploy_to}/shared/config/database.yml #{current_path}/config/database.yml"
+    run "ln -s #{deploy_to}/shared/config/danbooru_local_config.rb #{release_path}/config/danbooru_local_config.rb"
+    run "ln -s #{deploy_to}/shared/config/database.yml #{release_path}/config/database.yml"
   end
 end
 
