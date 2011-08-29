@@ -1,1 +1,1 @@
-server "testbooru.donmai.us", :web, :app, :primary => true
+server "testbooru.donmai.us", :web, :app, :db, :primary => true

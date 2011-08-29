@@ -59,6 +59,7 @@ rvm 1.9.2 --default
 # Install gems
 gem install --no-ri --no-rdoc capistrano
 gem install --no-ri --no-rdoc capistrano-ext
+gem install --no-ri --no-rdoc bundler
 
 # Install Passenger
 gem install --no-ri --no-rdoc -v 3.0.8 passenger
