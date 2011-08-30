@@ -11,6 +11,7 @@ end
 group :assets do
   gem "uglifier"
   gem "uglifier-rails"
+  gem "therubyracer"
 end
   
 gem "rails", "3.1.0.rc8"
