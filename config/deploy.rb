@@ -64,37 +64,37 @@ namespace :deploy do
   namespace :web do
     desc "Present a maintenance page to visitors."
     task :disable do
-      maintenance_html_path = "#{current_path}/public/maintenance.html.bak"
-      run "if [ -e #{maintenance_html_path} ] ; then mv #{maintenance_html_path} #{current_path}/public/maintenance.html ; fi"
+      maintenance_html_path = "#{release_path}/public/maintenance.html.bak"
+      run "if [ -e #{maintenance_html_path} ] ; then mv #{maintenance_html_path} #{release_path}/public/maintenance.html ; fi"
     end
     
     desc "Makes the application web-accessible again."
     task :enable do
-      maintenance_html_path = "#{current_path}/public/maintenance.html"
-      run "if [ -e #{maintenance_html_path} ] ; then mv #{maintenance_html_path} #{current_path}/public/maintenance.html.bak ; fi"
+      maintenance_html_path = "#{release_path}/public/maintenance.html"
+      run "if [ -e #{maintenance_html_path} ] ; then mv #{maintenance_html_path} #{release_path}/public/maintenance.html.bak ; fi"
     end
   end
   
   desc "Compile the image resizer"
   task :compile_image_resizer do
-    run "cd #{current_path}/lib/danbooru_image_resizer ; ruby extconf.rb ; make"
+    run "cd #{release_path}/lib/danbooru_image_resizer ; ruby extconf.rb ; make"
   end
 end
 
 namespace :delayed_job do
   desc "Start delayed_job process"
   task :start, :roles => :app do
-    run "cd #{current_path}; script/delayed_job start #{rails_env}"
+    run "cd #{release_path}; script/delayed_job start #{rails_env}"
   end
   
   desc "Stop delayed_job process"
   task :stop, :roles => :app do
-    run "cd #{current_path}; script/delayed_job stop #{rails_env}"
+    run "cd #{release_path}; script/delayed_job stop #{rails_env}"
   end
   
   desc "Restart delayed_job process"
   task :restart, :roles => :app do
-    run "cd #{current_path}; script/delayed_job restart #{rails_env}"
+    run "cd #{release_path}; script/delayed_job restart #{rails_env}"
   end
 end
 
