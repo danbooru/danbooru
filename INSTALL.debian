@@ -91,7 +91,7 @@ sudo -u postgres createuser -s danbooru
 mkdir -p /var/log/www
 
 # Setup nginx
-curl -s https://raw.github.com/ascarter/nginx-ubuntu-rvm/master/nginx > /etc/init.d/nginx
+curl -s https://raw.github.com/r888888888/danbooru/master/script/install/init_d.templ > /etc/init.d/nginx
 chmod +x,g-w /etc/init.d/nginx
 update-rc.d -f nginx defaults
 mkdir -p /opt/nginx/conf/sites
@@ -134,7 +134,7 @@ echo
 echo "**************************************************************"
 echo "* Danbooru has now been setup on this computer and should be *"
 echo "* accessible from the web. Go ahead and create an account.   *"
-echo "* The first account will automatically be made an admin.You  *"
+echo "* The first account will automatically be made an admin. You *"
 echo "* can edit the configuration files by editing                *"
 echo "* /var/www/danbooru/shared/config/local_config and           *"
 echo "* /var/www/danbooru/shared/config/database.yml               *"
