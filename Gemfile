@@ -9,10 +9,10 @@ group :test do
 end
 
 group :assets do
-  
+  gem "uglifier"
 end
 
-gem "rails", "3.1.0.rc5"
+gem "rails", "3.1.0.rc8"
 gem "pg"
 gem "memcache-client", :require => "memcache"
 gem "imagesize", :require => "image_size"

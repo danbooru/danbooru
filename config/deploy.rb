@@ -74,6 +74,11 @@ namespace :deploy do
       run "if [ -e #{maintenance_html_path} ] ; then mv #{maintenance_html_path} #{current_path}/public/maintenance.html.bak ; fi"
     end
   end
+  
+  desc "Compile the image resizer"
+  task :compile_image_resizer do
+    run "cd #{current_path}/lib/danbooru_image_resize ; ruby extconf.rb ; make"
+  end
 end
 
 namespace :delayed_job do
@@ -99,6 +104,7 @@ after "deploy:setup", "local_config:setup_local_files"
 after "deploy:setup", "data:setup_directories"
 after "deploy:update_code", "local_config:link_local_files"
 after "deploy:update_code", "data:link_directories"
+after "deploy:update_code", "deploy:compile_image_resizer"
 after "deploy:start", "delayed_job:start"
 after "deploy:stop", "delayed_job:stop"
 after "deploy:restart", "delayed_job:restart"
