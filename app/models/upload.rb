@@ -1,6 +1,5 @@
 require "danbooru_image_resizer/danbooru_image_resizer"
 require "tmpdir"
-require "process"
 
 class Upload < ActiveRecord::Base
   class Error < Exception ; end
