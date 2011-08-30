@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Downbooru</title>
+    <style type="text/css">
+      body {
+        margin: 0;
+        padding: 10em 2em;
+        font-family: 'Palatino Linotype', serif;
+      }
+
+      h1, p {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>The site is down for maintenance.</h1>
+    <p>Check <a href="http://search.twitter.com/search?q=&ands=danbooru&phrase=&ors=&nots=&tag=&lang=all&from=teruyo&to=&ref=&near=&within=15&units=mi&since=&until=&rpp=15">Twitter</a> for updates.</p>
+  </body>
+</html>
