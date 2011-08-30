@@ -77,7 +77,7 @@ namespace :deploy do
   
   desc "Compile the image resizer"
   task :compile_image_resizer do
-    run "cd #{current_path}/lib/danbooru_image_resize ; ruby extconf.rb ; make"
+    run "cd #{current_path}/lib/danbooru_image_resizer ; ruby extconf.rb ; make"
   end
 end
 
