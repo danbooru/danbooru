@@ -41,7 +41,7 @@ apt-get -y install build-essential automake openssl libssl-dev libyaml-dev libxm
 apt-get -y install python-software-properties
 add-apt-repository ppa:pitti/postgresql
 apt-get update
-apt-get install -y postgresql-9.1 libpq-dev
+apt-get install -y postgresql-9.1 postgresql-contrib-9.1 libpq-dev
 
 if [ $? -ne 0 ]; then
   exit 1
@@ -119,5 +119,23 @@ echo "* Enter a new password for the danbooru account *"
 echo "*************************************************"
 passwd danbooru
 
+sudo -u danbooru createdb danbooru2
+cd /home/danbooru
+sudo -u danbooru mkdir /home/danbooru/apps
+git clone git://github.com/r888888888/danbooru.git danbooru
+chown -R danbooru:danbooru danbooru
+cap deploy:setup
+cap deploy:update_code
+cap deploy:migrate
+chown danbooru:danbooru /var/www/danbooru/shared/log/development.log
+
 echo
-echo "I'm done!"
+echo
+echo "**************************************************************"
+echo "* Danbooru has now been setup on this computer and should be *"
+echo "* accessible from the web. Go ahead and create an account.   *"
+echo "* The first account will automatically be made an admin.You  *"
+echo "* can edit the configuration files by editing                *"
+echo "* /var/www/danbooru/shared/config/local_config and           *"
+echo "* /var/www/danbooru/shared/config/database.yml               *"
+echo "**************************************************************"

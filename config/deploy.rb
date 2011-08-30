@@ -40,6 +40,21 @@ namespace :local_config do
   end
 end
 
+namespace :data do
+  task :setup_directories do
+    run "mkdir -p #{deploy_to}/shared/data"
+    run "mkdir #{deploy_to}/shared/data/preview"
+    run "mkdir #{deploy_to}/shared/data/small"
+    run "mkdir #{deploy_to}/shared/data/large"
+    run "mkdir #{deploy_to}/shared/data/original"
+  end
+  
+  task :link_directories do
+    run "rm -f #{release_path}/public/data"
+    run "ln -s #{deploy_to}/shared/data #{release_path}/public/data"
+  end
+end
+
 desc "Change ownership of common directory to user"
 task :reset_ownership_of_common_directory do
   sudo "chown -R #{user}:#{user} /var/www/danbooru"
@@ -49,12 +64,12 @@ namespace :deploy do
   namespace :web do
     desc "Present a maintenance page to visitors."
     task :disable do
-      run "mv #{current_path}/public/maintenance2.html #{current_path}/public/maintenance.html"
+      run "mv #{current_path}/public/maintenance.html.bak #{current_path}/public/maintenance.html"
     end
     
     desc "Makes the application web-accessible again."
     task :enable do
-      run "mv #{current_path}/public/maintenance.html #{current_path}/public/maintenance2.html"
+      run "mv #{current_path}/public/maintenance.html #{current_path}/public/maintenance.html.bak"
     end
   end
 end
@@ -79,8 +94,11 @@ end
 after "deploy:setup", "reset_ownership_of_common_directory"
 after "deploy:setup", "local_config:setup_shared_directory"
 after "deploy:setup", "local_config:setup_local_files"
+after "deploy:setup", "data:setup_directories"
 after "deploy:update_code", "local_config:link_local_files"
+after "deploy:update_code", "data:link_directories"
 after "deploy:start", "delayed_job:start"
 after "deploy:stop", "delayed_job:stop"
 after "deploy:restart", "delayed_job:restart"
-
+before "deploy:update", "deploy:web:disable"
+after "deploy:restart", "deploy:web:enable"
