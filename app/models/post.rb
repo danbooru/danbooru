@@ -64,16 +64,16 @@ class Post < ActiveRecord::Base
   module FileMethods
     def distribute_files
       RemoteFileManager.new(file_path).distribute
-      RemoteFileManager.new(real_preview_path).distribute
-      RemoteFileManager.new(ssd_preview_path).distribute if Danbooru.config.ssd_path
+      RemoteFileManager.new(real_preview_file_path).distribute
+      RemoteFileManager.new(ssd_preview_file_path).distribute if Danbooru.config.ssd_path
       RemoteFileManager.new(medium_file_path).distribute if has_medium?
       RemoteFileManager.new(large_file_path).distribute if has_large?
     end
     
     def delete_remote_files
       RemoteFileManager.new(file_path).delete
-      RemoteFileManager.new(real_preview_path).delete
-      RemoteFileManager.new(ssd_preview_path).delete if Danbooru.config.ssd_path
+      RemoteFileManager.new(real_preview_file_path).delete
+      RemoteFileManager.new(ssd_preview_file_path).delete if Danbooru.config.ssd_path
       RemoteFileManager.new(medium_file_path).delete if has_medium?
       RemoteFileManager.new(large_file_path).delete if has_large?
     end
