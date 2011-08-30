@@ -64,15 +64,20 @@ namespace :deploy do
   namespace :web do
     desc "Present a maintenance page to visitors."
     task :disable do
-      maintenance_html_path = "#{release_path}/public/maintenance.html.bak"
-      run "if [ -e #{maintenance_html_path} ] ; then mv #{maintenance_html_path} #{release_path}/public/maintenance.html ; fi"
+      maintenance_html_path = "#{current_path}/public/maintenance.html.bak"
+      run "if [ -e #{maintenance_html_path} ] ; then mv #{maintenance_html_path} #{current_path}/public/maintenance.html ; fi"
     end
     
     desc "Makes the application web-accessible again."
     task :enable do
-      maintenance_html_path = "#{release_path}/public/maintenance.html"
-      run "if [ -e #{maintenance_html_path} ] ; then mv #{maintenance_html_path} #{release_path}/public/maintenance.html.bak ; fi"
+      maintenance_html_path = "#{current_path}/public/maintenance.html"
+      run "if [ -e #{maintenance_html_path} ] ; then mv #{maintenance_html_path} #{current_path}/public/maintenance.html.bak ; fi"
     end
+  end
+  
+  desc "Restart the application"
+  task :restart do
+    run "touch #{current_path}/tmp/restart.txt"
   end
   
   desc "Compile the image resizer"
@@ -84,17 +89,17 @@ end
 namespace :delayed_job do
   desc "Start delayed_job process"
   task :start, :roles => :app do
-    run "cd #{release_path}; script/delayed_job start #{rails_env}"
+    run "cd #{current_path}; script/delayed_job start #{rails_env}"
   end
   
   desc "Stop delayed_job process"
   task :stop, :roles => :app do
-    run "cd #{release_path}; script/delayed_job stop #{rails_env}"
+    run "cd #{current_path}; script/delayed_job stop #{rails_env}"
   end
   
   desc "Restart delayed_job process"
   task :restart, :roles => :app do
-    run "cd #{release_path}; script/delayed_job restart #{rails_env}"
+    run "cd #{current_path}; script/delayed_job restart #{rails_env}"
   end
 end
 
@@ -102,9 +107,9 @@ after "deploy:setup", "reset_ownership_of_common_directory"
 after "deploy:setup", "local_config:setup_shared_directory"
 after "deploy:setup", "local_config:setup_local_files"
 after "deploy:setup", "data:setup_directories"
-after "deploy:update_code", "local_config:link_local_files"
-after "deploy:update_code", "data:link_directories"
-after "deploy:update_code", "deploy:compile_image_resizer"
+after "deploy:symlink", "local_config:link_local_files"
+after "deploy:symlink", "data:link_directories"
+after "deploy:symlink", "deploy:compile_image_resizer"
 after "deploy:start", "delayed_job:start"
 after "deploy:stop", "delayed_job:stop"
 after "deploy:restart", "delayed_job:restart"

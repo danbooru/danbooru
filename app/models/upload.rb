@@ -1,5 +1,6 @@
 require "danbooru_image_resizer/danbooru_image_resizer"
 require "tmpdir"
+require "process"
 
 class Upload < ActiveRecord::Base
   class Error < Exception ; end
@@ -234,7 +235,7 @@ class Upload < ActiveRecord::Base
     end
     
     def temp_file_path
-      @temp_file_path ||= File.join(Rails.root, "tmp", "upload_#{Time.now.to_f}.#{$PROCESS_ID}")
+      @temp_file_path ||= File.join(Rails.root, "tmp", "upload_#{Time.now.to_f}.#{Process.pid}")
     end
   end
   
