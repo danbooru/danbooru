@@ -47,9 +47,7 @@
     var s = $("#mode-box select").val();
     var post_id = $(e.target).closest("article").data("id");
     
-    if (s === "view") {
-      return;
-    } else if (s === "add-fav") {
+    if (s === "add-fav") {
       Danbooru.Favorite.create(post_id);
     } else if (s === "remove-fav") {
       Danbooru.Favorite.destroy(post_id);
@@ -72,6 +70,8 @@
     } else if (s === "apply-tag-script") {
       var tag_script = Danbooru.Cookie.get("tag-script");
       Danbooru.TagScript.run(post_id, tag_script);
+    } else {
+      return;
     }
     
     e.preventDefault();

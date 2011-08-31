@@ -282,6 +282,10 @@ class Upload < ActiveRecord::Base
       status == "pending"
     end
     
+    def is_processing?
+      status == "processing"
+    end
+    
     def is_completed?
       status == "completed"
     end
