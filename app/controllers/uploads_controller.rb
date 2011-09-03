@@ -23,6 +23,7 @@ class UploadsController < ApplicationController
 
   def create
   	@upload = Upload.create(params[:upload])
+  	@upload.delay.process!
     respond_with(@upload)
   end
   

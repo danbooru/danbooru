@@ -1,25 +1,29 @@
-<p>If you believe a post does not belong on this site, you can flag for its deletion. As a reminder, the following are some common reasons for flagging a post:</p>
+<div id="c-post-flags">
+  <div id="a-index">
+    <p>If you believe a post does not belong on this site, you can flag for its deletion. As a reminder, the following are some common reasons for flagging a post:</p>
 
-<ul>
-  <li>Not anime-related</li>
-  <li>Furry: a character has body fur or an animal face</li>
-  <li>Watermark: text or logo inserted by someone besides the original artist</li>
-  <li>Poor compression: JPEG artifacts</li>
-  <li>Guro: mutilation, extreme bodily distension</li>
-  <li>Bad proportions: extremely large breasts or penises</li>
-  <li>Manga: Multiple pages of a manga, doujinshi, or comic that don't stand up to individual scrutiny</li>
-  <li>Fake translations: Made up translations are banned</li>
-</ul>
+    <ul>
+      <li>Not anime-related</li>
+      <li>Furry: a character has body fur or an animal face</li>
+      <li>Watermark: text or logo inserted by someone besides the original artist</li>
+      <li>Poor compression: JPEG artifacts</li>
+      <li>Guro: mutilation, extreme bodily distension</li>
+      <li>Bad proportions: extremely large breasts or penises</li>
+      <li>Manga: Multiple pages of a manga, doujinshi, or comic that don't stand up to individual scrutiny</li>
+      <li>Fake translations: Made up translations are banned</li>
+    </ul>
 
-<p>The following are <strong>NOT</strong> valid reasons for flagging a post:</p>
+    <p>The following are <strong>NOT</strong> valid reasons for flagging a post:</p>
 
-<ul>
-  <li>Duplicate: just parent to the original</li>
-</ul>
+    <ul>
+      <li>Duplicate: just parent to the original</li>
+    </ul>
 
-<p>Enter a reason:</p>
+    <p>Enter a reason:</p>
 
-<%= simple_form_for(@post_flag, :remote => true, :format => :js) do |f| %>
-  <%= f.input :post_id, :as => :hidden %>
-  <%= f.text_field :reason %>
-<% end %>
+    <%= simple_form_for(@post_flag, :remote => true, :format => :js) do |f| %>
+      <%= f.input :post_id, :as => :hidden %>
+      <%= f.text_field :reason %>
+    <% end %>
+  </div>
+</div>

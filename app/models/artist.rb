@@ -166,6 +166,10 @@ class Artist < ActiveRecord::Base
   include NoteMethods
   include TagMethods
   
+  def ban!
+    
+  end
+  
   def initialize_creator
     self.creator_id = CurrentUser.user.id
   end

@@ -23,13 +23,20 @@ module ApplicationHelper
     end
   end
   
+  def time_tag(content = nil, time)
+    zone = time.strftime("%z")
+    datetime = time.strftime("%Y-%m-%dT%H:%M" + zone[0, 3] + ":" + zone[3, 2])
+    
+    content_tag(:time, content || datetime, :datetime => datetime)
+  end
+  
   def compact_time(time)
     if time > Time.now.beginning_of_day
-      time.strftime("%H:%M")
+      time_tag(time.strftime("%H:%M"), time)
     elsif time > Time.now.beginning_of_year
-      time.strftime("%b %e")
+      time_tag(time.strftime("%b %e"), time)
     else
-      time.strftime("%b %e, %Y")
+      time_tag(time.strftime("%b %e, %Y"), time)
     end
   end
   
@@ -62,7 +69,7 @@ protected
     when "uploads"
       /^\/post/
     
-    when "post_versions"
+    when "post_versions", "explore/posts"
       /^\/post/
     
     when "pool_versions"

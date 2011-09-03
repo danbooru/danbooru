@@ -48,6 +48,8 @@ class Upload < ActiveRecord::Base
   
   module ConversionMethods
     def process!
+      return if status =~ /processing|completed|error/
+      
       CurrentUser.scoped(uploader, uploader_ip_addr) do
         update_attribute(:status, "processing")
         if is_downloadable?
@@ -64,6 +66,7 @@ class Upload < ActiveRecord::Base
         generate_resizes(file_path)
         move_file
         post = convert_to_post
+        post.distribute_files
         if post.save
           update_attributes(:status => "completed", :post_id => post.id)
         else
@@ -231,7 +234,7 @@ class Upload < ActiveRecord::Base
     end
     
     def temp_file_path
-      @temp_file_path ||= File.join(Rails.root, "tmp", "upload_#{Time.now.to_f}.#{$PROCESS_ID}")
+      @temp_file_path ||= File.join(Rails.root, "tmp", "upload_#{Time.now.to_f}.#{Process.pid}")
     end
   end
   
@@ -258,7 +261,7 @@ class Upload < ActiveRecord::Base
 
       self.file_path = temp_file_path
 
-      if file.tempfile
+      if file.respond_to?(:tempfile) && file.tempfile
         FileUtils.cp(file.tempfile.path, file_path)
       else
         File.open(file_path, 'wb') do |out| 
@@ -277,6 +280,10 @@ class Upload < ActiveRecord::Base
     
     def is_pending?
       status == "pending"
+    end
+    
+    def is_processing?
+      status == "processing"
     end
     
     def is_completed?

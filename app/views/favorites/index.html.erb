@@ -1,11 +1,11 @@
 <div id="c-favorites">
   <div id="a-index">
     <aside id="sidebar">
-      <%= render :partial => "posts/partials/common/search", :locals => {:path => favorites_path, :tags => @favorite_set.tag_string} %>
+      <%= render "posts/partials/common/search", :path => favorites_path, :tags => @favorite_set.tag_string %>
 
       <% if CurrentUser.is_privileged? %>
         <section id="mode-box">
-          <%= render :partial => "posts/partials/index/mode_menu" %>
+          <%= render "posts/partials/index/mode_menu" %>
         </section>
       <% end %>
 
@@ -29,7 +29,7 @@
       /fav:<%= CurrentUser.name %>
     <% end %>
 
-    <%= render :partial => "posts/partials/common/secondary_links" %>    
+    <%= render "posts/partials/common/secondary_links" %>    
   </div>
 </div>
 

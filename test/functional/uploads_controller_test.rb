@@ -64,7 +64,9 @@ class UploadsControllerTest < ActionController::TestCase
     context "create action" do
       should "create a new upload" do
         assert_difference("Upload.count", 1) do
-          post :create, {:upload => {:file => upload_jpeg("#{Rails.root}/test/files/test.jpg"), :tag_string => "aaa", :rating => "q", :source => "aaa"}}, {:user_id => @user.id}
+          file = Rack::Test::UploadedFile.new("#{Rails.root}/test/files/test.jpg", "image/jpeg")
+          file.stubs(:tempfile).returns(file)
+          post :create, {:upload => {:file => file, :tag_string => "aaa", :rating => "q", :source => "aaa"}}, {:user_id => @user.id}
         end
       end
     end

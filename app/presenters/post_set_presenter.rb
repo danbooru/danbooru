@@ -18,7 +18,7 @@ class PostSetPresenter < Presenter
     html = "<div class='post-previews'>"
     
     if posts.empty?
-      return template.render(:partial => "post_sets/blank")
+      return template.render("post_sets/blank")
     end
     
     posts.each do |post|

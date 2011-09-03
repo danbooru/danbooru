@@ -5,6 +5,10 @@ class UserPresenter
     @user = user
   end
   
+  def join_date
+    user.created_at.strftime("%Y-%m-%d")
+  end
+  
   def level
     user.level_string
   end
@@ -26,7 +30,7 @@ class UserPresenter
   def upload_limit
     deleted_count = Post.for_user(user.id).deleted.count
     pending_count = Post.for_user(user.id).pending.count
-    approved_count = Post.where("is_flagged = false and is_pending = false and user_id = ?", user.id).count
+    approved_count = Post.where("is_flagged = false and is_pending = false and uploader_id = ?", user.id).count
     
     if user.base_upload_limit
       limit = user.base_upload_limit - pending_count
@@ -89,7 +93,7 @@ class UserPresenter
     if user.inviter_id
       template.link_to(user.inviter.name, template.user_path(user.inviter_id))
     else
-      nil
+      "None"
     end
   end
   
@@ -102,6 +106,16 @@ class UserPresenter
     neutral = UserFeedback.for_user(user.id).neutral.count
     negative = UserFeedback.for_user(user.id).negative.count
     
-    template.link_to("positive:#{positive} neutral:#{neutral} negative:#{negative}", user_feedbacks_path(:search => {:user_id_rq => user.id}))
+    template.link_to("positive:#{positive} neutral:#{neutral} negative:#{negative}", template.user_feedbacks_path(:search => {:user_id_rq => user.id}))
+  end
+  
+  def subscriptions(template)
+    if user.subscriptions.any?
+      user.subscriptions.map do |subscription|
+        template.link_to(subscription.name, template.posts_path(:tags => "sub:#{user.name}:#{subscription.name}"))
+      end.join(", ").html_safe
+    else
+      "None"
+    end
   end
 end

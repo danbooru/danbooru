@@ -5,6 +5,7 @@ class Post < ActiveRecord::Base
   
   attr_accessor :old_tag_string, :old_parent_id
   after_destroy :delete_files
+  after_destroy :delete_remote_files
   after_save :create_version
   after_save :update_parent_on_save
   before_save :merge_old_tags
@@ -61,11 +62,28 @@ class Post < ActiveRecord::Base
   }
     
   module FileMethods
+    def distribute_files
+      RemoteFileManager.new(file_path).distribute
+      RemoteFileManager.new(real_preview_file_path).distribute
+      RemoteFileManager.new(ssd_preview_file_path).distribute if Danbooru.config.ssd_path
+      RemoteFileManager.new(medium_file_path).distribute if has_medium?
+      RemoteFileManager.new(large_file_path).distribute if has_large?
+    end
+    
+    def delete_remote_files
+      RemoteFileManager.new(file_path).delete
+      RemoteFileManager.new(real_preview_file_path).delete
+      RemoteFileManager.new(ssd_preview_file_path).delete if Danbooru.config.ssd_path
+      RemoteFileManager.new(medium_file_path).delete if has_medium?
+      RemoteFileManager.new(large_file_path).delete if has_large?
+    end
+    
     def delete_files
       FileUtils.rm_f(file_path)
       FileUtils.rm_f(medium_file_path)
       FileUtils.rm_f(large_file_path)
-      FileUtils.rm_f(preview_file_path)
+      FileUtils.rm_f(ssd_preview_file_path) if Danbooru.config.ssd_path
+      FileUtils.rm_f(real_preview_file_path)
     end
 
     def file_path_prefix
@@ -91,9 +109,21 @@ class Post < ActiveRecord::Base
         file_path
       end
     end
+    
+    def real_preview_file_path
+      "#{Rails.root}/public/data/preview/#{file_path_prefix}#{md5}.jpg"
+    end
+    
+    def ssd_preview_file_path
+      "#{Danbooru.config.ssd_path}/public/data/preview/#{file_path_preview}#{md5}.jpg"
+    end
 
     def preview_file_path
-      "#{Rails.root}/public/data/preview/#{file_path_prefix}#{md5}.jpg"
+      if Danbooru.config.ssd_path
+        ssd_preview_file_path
+      else
+        real_preview_file_path
+      end
     end
 
     def file_url
@@ -117,7 +147,11 @@ class Post < ActiveRecord::Base
     end
 
     def preview_file_url
-      "/data/preview/#{file_path_prefix}#{md5}.jpg"
+      if Danbooru.config.ssd_path
+        "/ssd/data/preview/#{file_path_prefix}#{md5}.jpg"
+      else
+        "/data/preview/#{file_path_prefix}#{md5}.jpg"
+      end
     end
     
     def file_url_for(user)

@@ -2,6 +2,7 @@ class ForumTopicsController < ApplicationController
   respond_to :html, :xml, :json
   before_filter :member_only, :except => [:index, :show]
   before_filter :normalize_search, :only => :index
+  before_filter :update_last_forum_read_at, :only => [:index, :show]
   rescue_from User::PrivilegeError, :with => "static/access_denied"
 
   def new
@@ -54,6 +55,12 @@ private
     
     forum_topic.is_locked = params[:forum_topic][:is_locked]
     forum_topic.is_sticky = params[:forum_topic][:is_sticky]
+  end
+  
+  def update_last_forum_read_at
+    return if CurrentUser.last_forum_read_at.present? && CurrentUser.last_forum_read_at > 1.day.ago
+    
+    CurrentUser.update_column(:last_forum_read_at, Time.now)
   end
   
   def normalize_search

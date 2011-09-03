@@ -1,3 +1,9 @@
-<%= image_tag(@advertisement.image_url) %>
-<%= render "form" %>
+<div id="c-advertisements">
+  <div id="a-edit">
+    <h1>Edit Advertisement</h1>
+    <%= image_tag(@advertisement.image_url) %>
+    <%= render "form" %>
+  </div>
+</div>
+
 <%= render "secondary_links" %>

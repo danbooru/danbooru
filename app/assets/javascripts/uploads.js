@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(function() {
   var img = $("#image-preview img");
   if (img) {
     var height = img.attr("height");
@@ -7,7 +7,7 @@ $(document).ready(function() {
       var ratio = 400.0 / height;
       img.attr("height", height * ratio);
       img.attr("width", width * ratio);
-      $("#scale").val("Scaled " + parseInt(100 * ratio) + "%");
+      $("#scale").html("Scaled " + parseInt(100 * ratio) + "%");
     }
   }
 });

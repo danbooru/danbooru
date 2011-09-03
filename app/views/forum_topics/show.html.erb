@@ -6,13 +6,14 @@
       </div>
     <% end %>
 
-    <%= render :partial => "forum_posts/listing", :locals => {:forum_posts => @forum_posts} %>
-    <%= render "paginator" %>
+    <%= render "forum_posts/listing", :forum_posts => @forum_posts %>
+    
+    <%= numbered_paginator(@forum_posts) %>
   </div>
 </div>
 
 <%= render "secondary_links" %>
 
 <%= content_for(:page_title) do %>
-forum/<%= @forum_topic.title %>
+  forum/<%= @forum_topic.title %>
 <% end %>

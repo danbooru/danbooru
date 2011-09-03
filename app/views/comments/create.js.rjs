@@ -1,1 +1,0 @@
-page.insert_html(:bottom, "div.comments-for-post[data-post-id=#{@comment.post_id}] div.list-of-comments", :partial => "comments/partials/show/comment", :locals => {:comment => @comment})

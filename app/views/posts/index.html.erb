@@ -1,28 +1,28 @@
 <div id="c-posts">
   <div id="a-index">
     <aside id="sidebar">
-      <%= render :partial => "posts/partials/common/search", :locals => {:path => posts_path, :tags => params[:tags]} %>
+      <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:tags] %>
 
-      <%= render :partial => "posts/partials/index/mode_menu" %>
+      <%= render "posts/partials/index/mode_menu" %>
 
       <section id="tag-box">
         <h1>Tags</h1>
         <%= @post_set.presenter.tag_list_html(self) %>
       </section>
 
-      <%= render :partial => "posts/partials/index/blacklist" %>
+      <%= render "posts/partials/index/blacklist" %>
     </aside>
 
     <section id="content">
-      <%= render :partial => "wiki_pages/excerpt", :locals => {:post_set => @post_set} %>
-      <%= render :partial => "posts/partials/index/posts", :locals => {:post_set => @post_set} %>
+      <%= render "wiki_pages/excerpt", :post_set => @post_set %>
+      <%= render "posts/partials/index/posts", :post_set => @post_set %>
     </section>
     
     <% content_for(:page_title) do %>
       /<%= @post_set.tag_string %>
     <% end %>
 
-    <%= render :partial => "posts/partials/common/secondary_links" %>    
+    <%= render "posts/partials/common/secondary_links" %>    
   </div>
 </div>
 

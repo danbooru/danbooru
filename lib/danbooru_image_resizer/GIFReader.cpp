@@ -1,12 +1,11 @@
+#include <stdlib.h>
 #include <string.h>
 #include <gd.h>
 #include "GIFReader.h"
-#include "RowBuffer.h"
 #include "Resize.h"
 
-bool GIF::Read(FILE *f, Resizer *resizer, char error[1024])
+bool GIF::Read(FILE *f, Filter *pOutput, char error[1024])
 {
-	RowBuffer Rows;
 	bool Ret = false;
 	gdImage *image = gdImageCreateFromGif(f);
 
@@ -16,21 +15,18 @@ bool GIF::Read(FILE *f, Resizer *resizer, char error[1024])
 		return false;
 	}
 
-	if(!Rows.Init(image->sx, image->sy, 3))
+	uint8_t *pBuf = NULL;
+	pBuf = (uint8_t *) malloc(image->sx * 3);
+	if(pBuf == NULL)
 	{
 		strcpy(error, "out of memory");
 		goto cleanup;
 	}
 
-	resizer->SetSource(image->sx, image->sy, 3);
+	pOutput->Init(image->sx, image->sy, 3);
 	for(int y = 0; y < image->sy; ++y)
 	{
-		uint8_t *p = Rows.GetRow(y);
-		if(p == NULL)
-		{
-			strcpy(error, "out of memory");
-			goto cleanup;
-		}
+		uint8_t *p = pBuf;
 
 		for(int x = 0; x < image->sx; ++x)
 		{
@@ -40,19 +36,25 @@ bool GIF::Read(FILE *f, Resizer *resizer, char error[1024])
 			(*p++) = gdTrueColorGetBlue(c);
 		}
 
-		int DiscardRow;
-		if(!resizer->Run(Rows.GetRows(), Rows.GetStartRow(), Rows.GetEndRow(), DiscardRow))
+		if(!pOutput->WriteRow(pBuf))
 		{
-			strcpy(error, resizer->GetError());
+			strcpy(error, pOutput->GetError());
 			goto cleanup;
 		}
+	}
 
-		Rows.DiscardRows(DiscardRow);
+	if(!pOutput->Finish())
+	{
+		strcpy(error, pOutput->GetError());
+		goto cleanup;
 	}
 
 	Ret = true;
 
 cleanup:
+	if(pBuf != NULL)
+		free(pBuf);
+
 	gdImageDestroy(image);
 	return Ret;
 }

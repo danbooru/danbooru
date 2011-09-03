@@ -4,11 +4,11 @@ SHELL = /bin/sh
 #### Start of system configuration section. ####
 
 srcdir = .
-topdir = /Users/ayi/.rvm/rubies/ruby-1.9.2-preview1/include/ruby-1.9.1
-hdrdir = /Users/ayi/.rvm/rubies/ruby-1.9.2-preview1/include/ruby-1.9.1
-arch_hdrdir = /Users/ayi/.rvm/rubies/ruby-1.9.2-preview1/include/ruby-1.9.1/$(arch)
+topdir = /Users/ayi/.rvm/rubies/ruby-1.9.2-p0/include/ruby-1.9.1
+hdrdir = /Users/ayi/.rvm/rubies/ruby-1.9.2-p0/include/ruby-1.9.1
+arch_hdrdir = /Users/ayi/.rvm/rubies/ruby-1.9.2-p0/include/ruby-1.9.1/$(arch)
 VPATH = $(srcdir):$(arch_hdrdir)/ruby:$(hdrdir)/ruby
-prefix = $(DESTDIR)/Users/ayi/.rvm/rubies/ruby-1.9.2-preview1
+prefix = $(DESTDIR)/Users/ayi/.rvm/rubies/ruby-1.9.2-p0
 rubylibprefix = $(libdir)/$(RUBY_BASE_NAME)
 exec_prefix = $(prefix)
 vendorhdrdir = $(rubyhdrdir)/vendor_ruby
@@ -45,7 +45,7 @@ vendorarchdir = $(vendorlibdir)/$(sitearch)
 
 CC = g++
 CXX = g++
-LIBRUBY = $(LIBRUBY_A)
+LIBRUBY = $(LIBRUBY_SO)
 LIBRUBY_A = lib$(RUBY_SO_NAME)-static.a
 LIBRUBYARG_SHARED = -l$(RUBY_SO_NAME)
 LIBRUBYARG_STATIC = -l$(RUBY_SO_NAME)-static
@@ -55,29 +55,29 @@ COUTFLAG = -o
 RUBY_EXTCONF_H = 
 cflags   =  $(optflags) $(debugflags) $(warnflags)
 optflags = -O3
-debugflags = -g
-warnflags = -Wall -Wno-unused-parameter -Wno-parentheses -Wno-missing-field-initializers -Wshorten-64-to-32 -Wpointer-arith -Wwrite-strings
-CFLAGS   = -fno-common -O2 -fno-exceptions -Wall 
+debugflags = -ggdb
+warnflags = -Wextra -Wno-unused-parameter -Wno-parentheses -Wpointer-arith -Wwrite-strings -Wno-missing-field-initializers -Wshorten-64-to-32 -Wno-long-long
+CFLAGS   = -fno-common -O2 -Wall 
 INCFLAGS = -I. -I$(arch_hdrdir) -I$(hdrdir)/ruby/backward -I$(hdrdir) -I$(srcdir)
 DEFS     = 
 CPPFLAGS = -DHAVE_GD_H -DHAVE_GDIMAGECREATEFROMGIF -DHAVE_GDIMAGEJPEG -DHAVE_JPEG_SET_QUALITY -DHAVE_PNG_SET_EXPAND_GRAY_1_2_4_TO_8 -I/opt/local/include -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE $(DEFS) $(cppflags)
 CXXFLAGS = $(CFLAGS) $(cxxflags)
 ldflags  = -L. 
-dldflags = 
-archflag = 
-DLDFLAGS = $(ldflags) $(dldflags) $(archflag)
-LDSHARED = $(CC) -dynamic -bundle -undefined suppress -flat_namespace
-LDSHAREDXX = $(CXX) -dynamic -bundle -undefined suppress -flat_namespace
+dldflags = -Wl,-undefined,dynamic_lookup -Wl,-multiply_defined,suppress -Wl,-flat_namespace
+ARCH_FLAG = 
+DLDFLAGS = $(ldflags) $(dldflags)
+LDSHARED = $(CC) -dynamic -bundle
+LDSHAREDXX = $(CXX) -dynamic -bundle
 AR = ar
 EXEEXT = 
 
 RUBY_BASE_NAME = ruby
 RUBY_INSTALL_NAME = ruby
-RUBY_SO_NAME = ruby
-arch = i386-darwin10.4.0
+RUBY_SO_NAME = ruby.1.9.1
+arch = x86_64-darwin10.4.0
 sitearch = $(arch)
 ruby_version = 1.9.1
-ruby = /Users/ayi/.rvm/rubies/ruby-1.9.2-preview1/bin/ruby
+ruby = /Users/ayi/.rvm/rubies/ruby-1.9.2-p0/bin/ruby
 RUBY = $(ruby)
 RM = rm -f
 RM_RF = $(RUBY) -run -e rm -- -rf
@@ -104,9 +104,9 @@ extout =
 extout_prefix = 
 target_prefix = 
 LOCAL_LIBS = 
-LIBS =  -lpng -ljpeg -lgd  -lpthread -ldl -lobjc 
-SRCS = danbooru_image_resizer.cpp GIFReader.cpp JPEGReader.cpp PNGReader.cpp Resize.cpp RowBuffer.cpp
-OBJS = danbooru_image_resizer.o GIFReader.o JPEGReader.o PNGReader.o Resize.o RowBuffer.o
+LIBS = $(LIBRUBYARG_SHARED) -lpng -ljpeg -lgd  -lpthread -ldl -lobjc 
+SRCS = ConvertToRGB.cpp danbooru_image_resizer.cpp GIFReader.cpp Histogram.cpp JPEGReader.cpp PNGReader.cpp Resize.cpp
+OBJS = ConvertToRGB.o danbooru_image_resizer.o GIFReader.o Histogram.o JPEGReader.o PNGReader.o Resize.o
 TARGET = danbooru_image_resizer
 DLLIB = $(TARGET).bundle
 EXTSTATIC = 
@@ -147,8 +147,9 @@ install: install-so install-rb
 
 install-so: $(RUBYARCHDIR)
 install-so: $(RUBYARCHDIR)/$(DLLIB)
-$(RUBYARCHDIR)/$(DLLIB): $(RUBYARCHDIR) $(DLLIB)
-	$(INSTALL_PROG) $(DLLIB) $(RUBYARCHDIR)
+$(RUBYARCHDIR)/$(DLLIB): $(DLLIB)
+	@-$(MAKEDIRS) $(@D)
+	$(INSTALL_PROG) $(DLLIB) $(@D)
 install-rb: pre-install-rb install-rb-default
 install-rb-default: pre-install-rb-default
 pre-install-rb: Makefile
