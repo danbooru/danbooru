@@ -45,3 +45,32 @@ class ActionController::TestCase
   end
 end
 
+class MockMemcache
+  def initialize
+    @memory = {}
+  end
+
+  def flush_all
+    @memory = {}
+  end
+
+  def set key, value, expiry = 0
+    @memory[key] = value
+  end
+
+  def get key
+    @memory[key]
+  end
+
+  def delete key, delay
+    @memory.delete key
+  end
+
+  def get_multi *keys
+    Hash[[keys.map{ |key| [key, @memory[key]] }]]
+  end
+end
+
+silence_warnings do
+  MEMCACHE = MockMemcache.new
+end
