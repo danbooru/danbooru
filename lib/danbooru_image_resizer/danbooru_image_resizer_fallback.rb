@@ -7,5 +7,8 @@ module Danbooru
     image.write destination_path
   end
 
-  module_function :resize_image
+  def is_fallback
+  end
+
+  module_function :resize_image, :is_fallback
 end

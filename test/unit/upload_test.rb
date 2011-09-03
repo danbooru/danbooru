@@ -110,12 +110,22 @@ class UploadTest < ActiveSupport::TestCase
           @upload.calculate_hash(@upload.file_path)
           @upload.calculate_dimensions(@upload.file_path)
           assert_nothing_raised {@upload.generate_resizes(@upload.file_path)}
-          assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.small_image_width)))
-          assert_equal(7265, File.size(@upload.resized_file_path_for(Danbooru.config.small_image_width)))
-          assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.medium_image_width)))
-          assert_equal(43474, File.size(@upload.resized_file_path_for(Danbooru.config.medium_image_width)))
-          assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.large_image_width)))
-          assert_equal(198583, File.size(@upload.resized_file_path_for(Danbooru.config.large_image_width)))
+          unless Danbooru.respond_to? :is_fallback
+            assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.small_image_width)))
+            assert_equal(7265, File.size(@upload.resized_file_path_for(Danbooru.config.small_image_width)))
+            assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.medium_image_width)))
+            assert_equal(43474, File.size(@upload.resized_file_path_for(Danbooru.config.medium_image_width)))
+            assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.large_image_width)))
+            assert_equal(198583, File.size(@upload.resized_file_path_for(Danbooru.config.large_image_width)))
+          else
+            # Different set of expected file sizes due to using a different compression algorithm
+            assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.small_image_width)))
+            assert_equal(7405, File.size(@upload.resized_file_path_for(Danbooru.config.small_image_width)))
+            assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.medium_image_width)))
+            assert_equal(43577, File.size(@upload.resized_file_path_for(Danbooru.config.medium_image_width)))
+            assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.large_image_width)))
+            assert_equal(198666, File.size(@upload.resized_file_path_for(Danbooru.config.large_image_width)))
+          end
         end
       end
 
