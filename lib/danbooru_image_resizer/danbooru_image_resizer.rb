@@ -1,4 +1,8 @@
-require 'danbooru_image_resizer/danbooru_image_resizer.so'
+begin
+  require 'danbooru_image_resizer/danbooru_image_resizer.so'
+rescue LoadError
+  require 'danbooru_image_resizer/danbooru_image_resizer_fallback'
+end
 
 module Danbooru
   def resize(file_ext, read_path, write_path, output_size, output_quality)
