@@ -27,3 +27,7 @@ gem "nokogiri"
 gem "meta_search", :git => "git://github.com/ernie/meta_search.git"
 gem "silent-postgres"
 gem "whenever", :require => false
+
+group :development do
+  gem 'pry'
+end
