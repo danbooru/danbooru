@@ -15,3 +15,4 @@ vendor/cache/*.gem
 .DS_Store
 coverage
 *~
+*.swp

@@ -111,4 +111,6 @@
 
 $(document).ready(function() {
   Danbooru.Post.initialize_all();
+  key('right', function(){ Danbooru.Paginator.next_page() });
+  key('left', function(){ Danbooru.Paginator.prev_page() });
 });
