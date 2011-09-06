@@ -1,9 +1,17 @@
 <div id="c-users">
   <div id="a-show">
-    <h1><%= CurrentUser.pretty_name %> <small>[<%= @presenter.level %>]</small></h1>
-    <div><small>Member since <strong><%= @presenter.join_date %></strong> with the help of <strong><%= @presenter.inviter(self) %></strong></small></div>
+    <h1>Show User: <%= CurrentUser.pretty_name %></h1>
 
     <dl>
+      <dt>Join Date</dt>
+      <dd><%= @presenter.join_date %></dd>
+      
+      <dt>Inviter</dt>
+      <dd><%= @presenter.inviter(self) %></dd>
+      
+      <dt>Level</dt>
+      <dd><%= @presenter.level %></dd>
+      
       <dt>Upload Limit</dt>
       <dd><%= @presenter.upload_limit %></dd>
 
