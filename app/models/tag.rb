@@ -213,10 +213,10 @@ class Tag < ActiveRecord::Base
             
           when "-approver"
             q[:approver_id_neg] ||= []
-            q[:approver_id_neg] << User.name.to_id($2)
+            q[:approver_id_neg] << User.name_to_id($2)
             
           when "approver"
-            q[:approver_id] = User.name.to_id($2)
+            q[:approver_id] = User.name_to_id($2)
             
           when "-pool"
             q[:tags][:exclude] << "pool:#{Pool.name_to_id($2)}"
