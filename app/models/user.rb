@@ -256,7 +256,8 @@ class User < ActiveRecord::Base
     def can_upload?
       if is_contributor?
         true
-      elsif created_at > 1.week.ago
+      elsif created_at > 1.second.ago
+        # TODO: change this to 1 week
         false
       else
         upload_limit > 0
