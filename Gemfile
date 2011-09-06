@@ -14,7 +14,7 @@ group :assets do
   gem "therubyracer"
 end
   
-gem "rails", "3.1.0.rc8"
+gem "rails", "3.1.0"
 gem "pg"
 gem "memcache-client", :require => "memcache"
 gem "imagesize", :require => "image_size"
