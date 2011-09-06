@@ -323,5 +323,10 @@ class User < ActiveRecord::Base
   def can_update?(object, foreign_key = :user_id)
     is_moderator? || is_admin? || object.__send__(foreign_key) == id
   end
+  
+  def serializable_hash(options = {})
+    options = {:except => [:password_hash, :email, :email_verification_key]}.merge(options ||= {})
+    super(options)
+  end
 end
 

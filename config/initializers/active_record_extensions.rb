@@ -44,6 +44,11 @@ module Danbooru
         
         "case #{table_name}.id " + conditions.join(" ") + " end"
       end
+      
+      def serializable_hash(options = {})
+        options = {:except => [:uploader_ip_addr, :updater_ip_addr, :creator_ip_addr, :ip_addr]}.merge(options ||= {})
+        super(options)
+      end
     end
   end
 end
