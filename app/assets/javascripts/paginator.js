@@ -11,7 +11,6 @@
     if($('.paginator li span').parent().prev().length != 0)
     {
       window.location = $('.paginator li span').parent().prev().find('a').attr('href');
-      console.log('logged')
     }
   }
 })();
