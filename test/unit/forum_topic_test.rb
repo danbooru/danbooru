@@ -1,4 +1,4 @@
-require_relative '../test_helper'
+require File.expand_path('../../test_helper',  __FILE__)
 
 class ForumTopicTest < ActiveSupport::TestCase
   context "A forum topic" do
