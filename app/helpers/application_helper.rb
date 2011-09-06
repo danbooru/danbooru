@@ -23,7 +23,7 @@ module ApplicationHelper
     end
   end
   
-  def time_tag(content = nil, time)
+  def time_tag(content, time)
     zone = time.strftime("%z")
     datetime = time.strftime("%Y-%m-%dT%H:%M" + zone[0, 3] + ":" + zone[3, 2])
     
