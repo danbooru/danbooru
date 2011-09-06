@@ -106,7 +106,7 @@ class UserPresenter
     neutral = UserFeedback.for_user(user.id).neutral.count
     negative = UserFeedback.for_user(user.id).negative.count
     
-    template.link_to("positive:#{positive} neutral:#{neutral} negative:#{negative}", template.user_feedbacks_path(:search => {:user_id_rq => user.id}))
+    template.link_to("positive:#{positive} neutral:#{neutral} negative:#{negative}", template.user_feedbacks_path(:search => {:user_id_eq => user.id}))
   end
   
   def subscriptions(template)
