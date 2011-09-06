@@ -72,7 +72,7 @@
         <% unless CurrentUser.nil? %>
           <li><%= link_to("Profile", user_path(CurrentUser.user)) %></li>
         <% end %>
-        <li><%= link_to("Feedback", user_feedback_index_path) %></li>
+        <li><%= link_to("Feedback", user_feedbacks_path) %></li>
         <li><%= link_to("Settings", edit_user_path(CurrentUser.user)) %></li>
         <li><%= link_to("Signup", new_user_path) %></li>
         <li><%= link_to("Terms of Service", terms_of_service_path) %></li>
