@@ -4,6 +4,10 @@ class UserPresenter
   def initialize(user)
     @user = user
   end
+
+  def name
+    user.pretty_name
+  end
   
   def join_date
     user.created_at.strftime("%Y-%m-%d")
