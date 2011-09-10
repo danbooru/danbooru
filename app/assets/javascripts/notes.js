@@ -196,6 +196,8 @@ Danbooru.Note = {
     },
     
     set_text: function($note_body, text) {
+      text = text.replace('<tn>', '<p class="tn">');
+      text = text.replace('</tn>', '</p>');
       $note_body.html(text);
       Danbooru.Note.Body.resize($note_body);
       Danbooru.Note.Body.bound_position($note_body);
@@ -235,7 +237,7 @@ Danbooru.Note = {
       });
       
       if ($note_body.html() !== "<em>Click to edit</em>") {
-        $textarea.val($note_body.html());
+        $textarea.val($note_body.data("original-body"));
       }
 
       $dialog = $('<div></div>');
@@ -301,6 +303,7 @@ Danbooru.Note = {
       var $note_body = Danbooru.Note.Body.find(id);
       var $note_box = Danbooru.Note.Box.find(id);
       var text = $textarea.val();
+      $note_body.data("original-body", text);
       Danbooru.Note.Body.set_text($note_body, text);
       $this.dialog("close");
       
@@ -413,6 +416,7 @@ Danbooru.Note = {
     
     $("div#note-container").append($note_box);
     $("div#note-container").append($note_body);
+    $note_body.data("original-body", text);
     Danbooru.Note.Box.scale($note_box);
     Danbooru.Note.Box.resize_inner_border($note_box);
     Danbooru.Note.Body.set_text($note_body, text);
