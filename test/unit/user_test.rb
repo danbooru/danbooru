@@ -156,6 +156,24 @@ class UserTest < ActiveSupport::TestCase
       end
     end
       
+    context "ip address" do
+      setup do
+        @user = Factory.create(:user)
+      end
+      
+      context "in the json representation" do
+        should "not appear" do
+          assert(@user.to_json !~ /addr/)
+        end
+      end
+      
+      context "in the xml representation" do
+        should "not appear" do
+          assert(@user.to_xml !~ /addr/)
+        end
+      end
+    end
+    
     context "password" do
       should "match the confirmation" do
         @user = Factory.create(:user)
@@ -186,6 +204,26 @@ class UserTest < ActiveSupport::TestCase
         @user = Factory.create(:user)
         new_pass = @user.reset_password
         assert(User.authenticate(@user.name, new_pass), "Authentication should have succeeded")
+      end
+      
+      context "in the json representation" do
+        setup do
+          @user = Factory.create(:user)
+        end
+        
+        should "not appear" do
+          assert(@user.to_json !~ /password/)
+        end
+      end
+      
+      context "in the xml representation" do
+        setup do
+          @user = Factory.create(:user)
+        end
+        
+        should "not appear" do
+          assert(@user.to_xml !~ /password/)
+        end
       end
     end
   end

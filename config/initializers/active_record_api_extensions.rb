@@ -17,7 +17,8 @@ module Danbooru
         options[:except] += hidden_attributes
         super(options, &block)
       end
-      
+    
+    protected
       def hidden_attributes
         [:uploader_ip_addr, :updater_ip_addr, :creator_ip_addr, :ip_addr]
       end
