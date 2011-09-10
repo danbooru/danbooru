@@ -305,6 +305,27 @@ class User < ActiveRecord::Base
     end
   end
   
+  module ApiMethods
+    def hidden_attributes
+      super + [:password_hash, :email, :email_verification_key]
+    end
+    
+    def serializable_hash(options = {})
+      options ||= {}
+      options[:except] ||= []
+      options[:except] += hidden_attributes
+      super(options)
+    end
+    
+    def to_xml(options = {}, &block)
+      # to_xml ignores the serializable_hash method
+      options ||= {}
+      options[:except] ||= []
+      options[:except] += hidden_attributes
+      super(options, &block)
+    end
+  end
+  
   include BanMethods
   include NameMethods
   include PasswordMethods
@@ -316,6 +337,7 @@ class User < ActiveRecord::Base
   include ForumMethods
   include LimitMethods
   include InvitationMethods
+  include ApiMethods
   
   def initialize_default_image_size
     self.default_image_size = "Medium"
@@ -323,11 +345,6 @@ class User < ActiveRecord::Base
 
   def can_update?(object, foreign_key = :user_id)
     is_moderator? || is_admin? || object.__send__(foreign_key) == id
-  end
-  
-  def serializable_hash(options = {})
-    options = {:except => [:password_hash, :email, :email_verification_key]}.merge(options ||= {})
-    super(options)
   end
 end
 
