@@ -1,6 +1,6 @@
 <div id="c-users">
   <div id="a-new">
-    <h1>Registration</h1>
+    <h1>Signup</h1>
 
     <div id="p1">
       <p><%= Danbooru.config.app_name %> is ad-sponsored and does not require an account to view. But in order to start uploading, editing, or creating content on this site, you will need to register. <em>Make sure you read and agree to the <%= link_to "terms of service", terms_of_service_path %> before registering. <strong>This site is open to web crawlers, therefore any name you choose will be public!</strong></em></p>
@@ -42,10 +42,6 @@
 
         <div class="clearfix"></div>
       </div>
-
-      <footer class="nav-links">
-        <%= link_to "Continue &raquo;".html_safe, new_user_path(:anchor => "p2") %>
-      </footer>
     </div>
 
     <div id="p2">
@@ -65,19 +61,15 @@
       </ul>
 
       <%= simple_form_for(@user) do |f| %>
-        <%= error_messages_for("user") %>
-        
         <%= f.input :name %>
         <%= f.input :password %>
         <%= f.input :password_confirmation %>
         <%= f.input :email, :required => false %>
         <%= f.button :submit %>
       <% end %>
-
-      <footer class="nav-links">
-        <%= link_to "&laquo; Back".html_safe, new_user_path(:anchor => "p1") %>
-      </footer>
-    </div>    
+    </div>
+    
+    <%= render "secondary_links" %>
   </div>
 </div>
 

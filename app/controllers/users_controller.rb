@@ -28,6 +28,7 @@ class UsersController < ApplicationController
   
   def create
     @user = User.create(params[:user])
+    flash[:notice] = "There were errors" if @user.errors.any?
     session[:user_id] = @user.id
     set_current_user
     respond_with(@user)

@@ -5,9 +5,9 @@ $(function() {
   });
   
   if (Danbooru.meta("errors")) {
-    $("#p1").hide();
-    $("#notice").hide();
+    // $("#p1").hide();
+    // $("#notice").hide();
   } else {
-    $("#p2").hide();
+    // $("#p2").hide();
   }
 });
