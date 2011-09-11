@@ -4,10 +4,10 @@
     
     <div id="search-form">
       <%= simple_form_for(@search) do |f| %>
-        <%= f.input :name_contains, :label => "Name" %>
-        <%= f.input :other_names_match, :label => "Other Names" %>
-        <%= f.input :group_name_contains, :label => "Group Name" %>
-        <%= f.input :url_match, :label => "URL" %>
+        <%= f.input :name_contains, :label => "Name", :required => false %>
+        <%= f.input :other_names_match, :label => "Other Names", :required => false %>
+        <%= f.input :group_name_contains, :label => "Group Name", :required => false %>
+        <%= f.input :url_match, :label => "URL", :required => false %>
         <%= f.button :submit, "Search" %>
       <% end %>
     </div>
