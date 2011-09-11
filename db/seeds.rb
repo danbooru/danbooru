@@ -45,7 +45,7 @@ end
 if Comment.count == 0
   puts "Creating comments"
   Post.all.each do |post|
-    20.times do
+    rand(30).times do
       Comment.create(:post_id => post.id, :body => rand(1_000_000).to_s)
     end
   end
@@ -56,8 +56,12 @@ end
 if Note.count == 0
   puts "Creating notes"
   Post.all.each do |post|
-    3.times do
-      Note.create(:post_id => post.id, :x => 0, :y => 0, :width => 100, :height => 100, :body => rand(1_000_000).to_s)
+    rand(10).times do
+      note = Note.create(:post_id => post.id, :x => 0, :y => 0, :width => 100, :height => 100, :body => rand(1_000_000).to_s)
+      
+      rand(30).times do |i|
+        note.update_attributes(:body => (i * i).to_s)
+      end
     end
   end
 else

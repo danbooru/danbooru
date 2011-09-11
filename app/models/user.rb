@@ -24,6 +24,7 @@ class User < ActiveRecord::Base
   validates_confirmation_of :password
   validates_presence_of :email, :if => lambda {|rec| rec.new_record? && Danbooru.config.enable_email_verification?}
   validate :validate_ip_addr_is_not_banned, :on => :create
+  before_validation :convert_blank_email_to_null
   before_save :encrypt_password
   after_save :update_cache
   before_create :promote_to_admin_if_first_user
@@ -218,7 +219,7 @@ class User < ActiveRecord::Base
     end
   end
   
-  module EmailVerificationMethods
+  module EmailMethods
     def is_verified?
       email_verification_key.blank?
     end
@@ -232,6 +233,12 @@ class User < ActiveRecord::Base
         self.update_column(:email_verification_key, nil)
       else
         raise User::Error.new("Verification key does not match")
+      end
+    end
+    
+    def convert_blank_email_to_null
+      if email.blank?
+        self.email = nil
       end
     end
   end
@@ -332,7 +339,7 @@ class User < ActiveRecord::Base
   extend AuthenticationMethods
   include FavoriteMethods
   include LevelMethods
-  include EmailVerificationMethods
+  include EmailMethods
   include BlacklistMethods
   include ForumMethods
   include LimitMethods
