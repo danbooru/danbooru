@@ -345,11 +345,11 @@ Danbooru.Note = {
     history: function() {
       var $this = $(this);
       var id = $this.data("id");
-      $(this).dialog("close");
-      
+      console.log("this=%o id=%o", $this, id);
       if (id.match(/\d/)) {
-        window.href = "/note_versions?search[note_id]=" + id;
+        window.location.href = "/note_versions?search[note_id_eq]=" + id;
       }
+      $(this).dialog("close");
     }
   },
   
