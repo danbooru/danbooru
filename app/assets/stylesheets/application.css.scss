@@ -151,6 +151,10 @@ div.prose {
   }
 }
 
+fieldset {
+  margin-bottom: 1em;
+}
+
 header {
   margin: 0 0 1em 0;
   padding: 0;
@@ -185,6 +189,12 @@ input:focus, textarea:focus {
 
 input[type=submit]:hover {
 /*  background-color: #F6F6F6;*/
+}
+
+legend {
+  font-size: $h2_size;
+  font-weight: bold;
+  margin-bottom: 0.5em;
 }
 
 menu {
