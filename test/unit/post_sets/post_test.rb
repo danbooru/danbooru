@@ -1,4 +1,4 @@
-require_relative '../../test_helper'
+require 'test_helper'
 require "danbooru/paginator/pagination_error"
 
 module PostSets

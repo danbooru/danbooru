@@ -1,4 +1,4 @@
-require_relative '../test_helper'
+require 'test_helper'
 
 class ForumTopicTest < ActiveSupport::TestCase
   context "A forum topic" do

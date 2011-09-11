@@ -1,6 +1,6 @@
 # encoding: UTF-8
 
-require_relative '../test_helper'
+require 'test_helper'
 
 class PixivProxyTest < ActiveSupport::TestCase
   context "The proxy" do

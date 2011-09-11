@@ -1,4 +1,4 @@
-require_relative '../test_helper'
+require 'test_helper'
 
 class BanTest < ActiveSupport::TestCase
   context "A ban" do
