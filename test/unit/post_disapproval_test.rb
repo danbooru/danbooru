@@ -1,4 +1,4 @@
-require_relative '../test_helper'
+require 'test_helper'
 
 class PostDisapprovalTest < ActiveSupport::TestCase
   context "In all cases" do

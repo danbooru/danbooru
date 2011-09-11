@@ -1,4 +1,4 @@
-require_relative '../test_helper'
+require 'test_helper'
 
 class TagImplicationTest < ActiveSupport::TestCase
   context "A tag implication" do

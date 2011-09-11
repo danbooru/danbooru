@@ -1,4 +1,4 @@
-require_relative '../test_helper'
+require 'test_helper'
 
 class UserFeedbackTest < ActiveSupport::TestCase
   context "A user's feedback" do
