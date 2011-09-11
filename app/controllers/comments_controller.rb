@@ -5,6 +5,8 @@ class CommentsController < ApplicationController
   def index
     if params[:group_by] == "post"
       index_by_post
+    elsif request.format == Mime::JS
+      index_for_post
     else
       index_by_comment
     end
@@ -35,6 +37,13 @@ class CommentsController < ApplicationController
   end
   
 private
+  def index_for_post
+    @post = Post.find(params[:post_id])
+    @comments = @post.comments
+    @comments = @comments.visible unless params[:include_hidden]
+    render :action => "index_for_post"
+  end
+
   def index_by_post
     @posts = Post.commented_before(Time.now).tag_match(params[:tags]).paginate(params[:page])
     respond_with(@posts) do |format|

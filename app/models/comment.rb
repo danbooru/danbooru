@@ -12,6 +12,7 @@ class Comment < ActiveRecord::Base
   scope :recent, :order => "comments.id desc", :limit => 6
   scope :body_matches, lambda {|query| where("body_index @@ plainto_tsquery(?)", query).order("comments.id DESC")}
   scope :hidden, lambda {|user| where("score < ?", user.comment_threshold)}
+  scope :visible, lambda {|user| where("score >= ?", user.comment_threshold)}
   scope :post_tag_match, lambda {|query| joins(:post).where("posts.tag_index @@ to_tsquery('danbooru', ?)", query)}
   scope :for_user, lambda {|user_id| where("creator_id = ?", user_id)}
   
