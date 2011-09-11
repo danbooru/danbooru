@@ -27,7 +27,11 @@
             </td>
             <td><%= link_to note_version.updater.name, user_path(note_version.updater) %></td>
             <td><%= note_version.updated_at.strftime("%Y-%m-%d %H:%M") %></td>
-            <td><%= link_to "Revert", revert_note_path(note_version.note_id, :version => note_version.id), :remote => true, :confirm => "Do you really want to revert to this version?" %></td>
+            <td>
+              <% if CurrentUser.is_member? %>
+                <%= link_to "Revert", revert_note_path(note_version.note_id, :version_id => note_version.id), :remote => true, :method => :put, :confirm => "Do you really want to revert to this version?" %>
+              <% end %>
+            </td>
           </tr>
         <% end %>    
       </tbody>
