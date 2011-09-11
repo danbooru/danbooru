@@ -2,8 +2,8 @@
   <div id="a-search">
     <h1>Search Forum Posts</h1>
     <%= simple_form_for @search do |f| %>
-      <%= f.input :topic_title_matches, :label => "Title" %>
-      <%= f.input :body_matches, :label => "Body" %>
+      <%= f.input :topic_title_matches, :label => "Title", :required => false %>
+      <%= f.input :body_matches, :label => "Body", :required => false %>
       <%= f.button :submit, "Search" %>
     <% end %>
   </div>
