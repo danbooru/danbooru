@@ -33,7 +33,7 @@
   <div class="row notices">
     <% if post.comments.count > 6 %>
       <span class="info" id="hidden-comments-notice-for-<%= post.id %>"%>
-        <%= link_to "#{pluralize(post.comments.size, 'comment')} hidden", comments_path(:post_id => post.id), :remote => true %>
+        <%= link_to "#{pluralize(post.comments.count - 6, 'more comment')}", comments_path(:post_id => post.id), :remote => true %>
       </span>
     <% end %>
     <% if post.comments.hidden(CurrentUser.user).count > 0 %>
