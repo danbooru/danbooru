@@ -33,12 +33,12 @@
   <div class="row notices">
     <% if post.comments.count > 6 %>
       <span class="info" id="hidden-comments-notice-for-<%= post.id %>"%>
-        <%= link_to "#{pluralize(post.comments.size, 'comment')} hidden", comments_path(:post_id => post.id), :remote => true %>.
+        <%= link_to "#{pluralize(post.comments.size, 'comment')} hidden", comments_path(:post_id => post.id), :remote => true %>
       </span>
     <% end %>
     <% if post.comments.hidden(CurrentUser.user).count > 0 %>
       <span class="info" id="threshold-comments-notice-for-<%= post.id %>"%>
-        <%= link_to "#{pluralize(post.comments.hidden(CurrentUser.user).count, 'comment')} below threshold", comments_path(:post_id => post.id, :include_hidden => true), :remote => true %>.
+        <%= link_to "#{pluralize(post.comments.hidden(CurrentUser.user).count, 'comment')} below threshold", comments_path(:post_id => post.id, :include_below_threshold => true), :remote => true %>
       </span>
     <% end %>
   </div>

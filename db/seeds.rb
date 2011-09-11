@@ -45,7 +45,9 @@ end
 if Comment.count == 0
   puts "Creating comments"
   Post.all.each do |post|
-    Comment.create(:post_id => post.id, :body => rand(1_000_000).to_s)
+    20.times do
+      Comment.create(:post_id => post.id, :body => rand(1_000_000).to_s)
+    end
   end
 else
   puts "Skipping comments"

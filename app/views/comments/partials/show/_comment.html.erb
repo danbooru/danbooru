@@ -1,4 +1,4 @@
-<article data-comment-id="<%= comment.id %>">
+<article class="comment" data-post-id="<%= comment.post_id %>" data-comment-id="<%= comment.id %>" data-score="<%= comment.score %>">
   <div class="author">
     <h1><%= link_to comment.creator_name, user_path(comment.creator_id) %></h1>
     <p>

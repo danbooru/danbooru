@@ -1,1 +1,11 @@
-$("div.comments-for-post[data-post-id=<%= @post.id %>] div.notices").hide();
+$("#hidden-comments-notice-for-<%= @post.id %>").hide();
+
+$("div.comments-for-post[data-post-id=<%= @post.id %>] div.list-of-comments").html("<%= j(render(:partial => 'comments/partials/show/comment', :collection => @comments))%>");
+
+<% if params[:include_below_threshold] %>
+  $("#threshold-comments-notice-for-<%= @post.id %>").hide();
+  Danbooru.Comment.highlight_threshold_comments(<%= @post.id %>);
+<% else %>
+  Danbooru.Comment.hide_threshold_comments(<%= @post.id %>);
+<% end %>
+

@@ -539,7 +539,7 @@ div#c-pool-orders {
 
 div.comments-for-post {
   div.list-of-comments {
-    article {
+    article.comment {
       margin-bottom: 2em;
       
       div.author {
@@ -557,6 +557,14 @@ div.comments-for-post {
         width: 30em;
         float: left;
       }
+    }
+    
+    article.comment.below-threshold {
+      opacity: 0.2;
+    }
+    
+    article.comment.below-threshold:hover {
+      opacity: 1.0;
     }
   }
   
