@@ -4,6 +4,7 @@
   <% if post.approver %>
     <li>Approver: <%= link_to(post.approver.name, user_path(post.approver_id)) %></li>
   <% end %>
+  <li>Rating: <%= post.pretty_rating %></li>
   <li>
     Size: <%= number_to_human_size(post.file_size) %> 
     <% if post.is_image? %>
