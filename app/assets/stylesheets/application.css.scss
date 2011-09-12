@@ -348,7 +348,7 @@ div#page {
     width: 75%;
     float: left;
     margin-left: 2em;
-    overflow: hidden;
+    overflow: visible;
   }
 }
 
@@ -359,7 +359,7 @@ div.clearfix {
 
 /*** Post previews ***/
 div.post-previews {
-  overflow: hidden;
+  overflow: visible;
 }
 
 

@@ -6,6 +6,34 @@
   Danbooru.Post.initialize_all = function() {
     this.initialize_post_sections();
     this.initialize_wiki_page_excerpt();
+    this.initialize_post_image_resize_links();
+  }
+  
+  Danbooru.Post.initialize_post_image_resize_links = function() {
+    $("#medium-file-link").click(function(e) {
+      var $link = $(e.target);
+      var $image = $("#image");
+      $image.attr("src", $link.attr("href"));
+      $image.width($image.data("medium-width"));
+      $image.height($image.data("medium-height"));
+      e.preventDefault();
+    });
+    $("#large-file-link").click(function(e) {
+      var $link = $(e.target);
+      var $image = $("#image");
+      $image.attr("src", $link.attr("href"));
+      $image.width($image.data("large-width"));
+      $image.height($image.data("large-height"));
+      e.preventDefault();
+    });
+    $("#original-file-link").click(function(e) {
+      var $link = $(e.target);
+      var $image = $("#image");
+      $image.attr("src", $link.attr("href"));
+      $image.width($image.data("original-width"));
+      $image.height($image.data("original-height"));
+      e.preventDefault();
+    });
   }
   
   Danbooru.Post.initialize_wiki_page_excerpt = function() {
