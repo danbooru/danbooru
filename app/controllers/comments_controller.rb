@@ -36,6 +36,13 @@ class CommentsController < ApplicationController
     respond_with(@comment)
   end
   
+  def show
+    @comment = Comment.find(params[:id])
+    respond_with(@comment) do |format|
+      format.json {render :json => @comment.to_json(:methods => [:creator_name])}
+    end
+  end
+  
 private
   def index_for_post
     @post = Post.find(params[:post_id])

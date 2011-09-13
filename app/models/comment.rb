@@ -48,6 +48,10 @@ class Comment < ActiveRecord::Base
       decrement!(:score)
     end
   end
+  
+  def creator_name
+    creator.name
+  end
 end
 
 Comment.connection.extend(PostgresExtensions)

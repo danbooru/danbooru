@@ -6,6 +6,31 @@
     this.initialize_response_link();
     this.initialize_preview_button();
     this.hide_threshold_comments();
+    this.initialize_reply_links();
+  }
+  
+  Danbooru.Comment.quote_message = function(data) {
+    var stripped_body = data["body"].replace(/\[quote\](?:.|\n|\r)+?\[\/quote\](?:\r\n|\r|\n)*/gm, "");
+    return "[quote]\n" + data["creator_name"] + " said:\n" + stripped_body + "\n[/quote]\n\n";
+  }
+  
+  Danbooru.Comment.quote = function(e) {
+    $.get(
+      "/comments/" + $(e.target).data('comment-id') + ".json",
+      function(data) {
+        var $link = $(e.target);
+        var $div = $link.closest("div.comments-for-post");
+        var $textarea = $div.find("textarea")
+        $textarea.val(Danbooru.Comment.quote_message(data));
+        $div.find("a.expand-comment-response").trigger("click");
+        $textarea.focus();
+      }
+    );
+    e.preventDefault();
+  }
+  
+  Danbooru.Comment.initialize_reply_links = function() {
+    $(".reply-link").click(Danbooru.Comment.quote);
   }
   
   Danbooru.Comment.initialize_response_link = function() {
