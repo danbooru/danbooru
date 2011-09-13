@@ -6,7 +6,4 @@ class PoolOrdersController < ApplicationController
     @pool = Pool.find(params[:pool_id])
     respond_with(@pool)
   end
-  
-  def update
-  end
 end

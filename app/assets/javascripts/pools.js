@@ -38,13 +38,13 @@
     });
     $("ul#sortable").disableSelection();
     
-    $("div.pools div.edit form#ordering-form").submit(function(e) {
+    $("div#c-pool-orders div#a-edit form#ordering-form").submit(function(e) {
       $.ajax({
         type: "put",
         url: e.target.action,
         data: $("#sortable").sortable("serialize") + "&" +  $(e.target).serialize()
       });
-      return false;
+      e.preventDefault();
     });
   }
 })();

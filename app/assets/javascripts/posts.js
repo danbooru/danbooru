@@ -11,25 +11,24 @@
   }
   
   Danbooru.Post.initialize_image_resize = function() {
-    var default_image_size = Danbooru.meta("default-image-size");
-    var original_width = parseInt($("#image").data("original-width"));
-    var medium_width = parseInt(Danbooru.meta("config-medium-width"));
-    var large_width = parseInt(Danbooru.meta("config-large-width"));
-    
-    console.log("original-width=%o medium-width=%o", original_width, medium_width);
-    
-    if ((default_image_size === "medium") && (original_width > medium_width)) {
-      $("#medium-file-link").trigger("click");
-    } else if ((default_image_size === "large") && (original_width > large_width)) {
-      $("#large-file-link").trigger("click");
-    } else {
-      $("#original-file-link").trigger("click");
+    if ($("#c-posts #a-show").size() > 0) {
+      var default_image_size = Danbooru.meta("default-image-size");
+      var original_width = parseInt($("#image").data("original-width"));
+      var medium_width = parseInt(Danbooru.meta("config-medium-width"));
+      var large_width = parseInt(Danbooru.meta("config-large-width"));
+
+      if ((default_image_size === "medium") && (original_width > medium_width)) {
+        $("#medium-file-link").trigger("click");
+      } else if ((default_image_size === "large") && (original_width > large_width)) {
+        $("#large-file-link").trigger("click");
+      } else {
+        $("#original-file-link").trigger("click");
+      }
     }
   }
   
   Danbooru.Post.build_resize_function = function(size) {
     return function(e) {
-      console.log("clicked " + size);
       Danbooru.Note.Box.descale_all();
       var $link = $(e.target);
       var $image = $("#image");

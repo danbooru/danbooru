@@ -31,25 +31,25 @@ class PoolsController < ApplicationController
   
   def create
     @pool = Pool.create(params[:pool])
-    respond_with(@pool)
+    respond_with(@pool, :notice => "Pool created")
   end
   
   def update
     @pool = Pool.find(params[:id])
     @pool.update_attributes(params[:pool])
-    respond_with(@pool)
+    respond_with(@pool, :notice => "Pool updated")
   end
   
   def destroy
     @pool = Pool.find(params[:id])
     @pool.destroy
-    respond_with(@pool)
+    respond_with(@pool, :notice => "Pool deleted")
   end
   
   def revert
     @pool = Pool.find(params[:id])
     @version = PoolVersion.find(params[:version_id])
     @pool.revert_to!(@version)
-    respond_with(@pool)
+    respond_with(@pool, :notice => "Pool reverted")
   end
 end
