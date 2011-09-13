@@ -2,9 +2,7 @@
   <%= error_messages_for("forum_post") %>
 
   <%= simple_form_for(@forum_post) do |f| %>
-    <% unless @forum_post.new_record? %>
-      <%= f.input :topic_id, :as => :hidden %>
-    <% end %>
+    <%= f.input :topic_id, :as => :hidden %>
     <%= f.input :body %>
 
     <%= f.button :submit, "Submit" %>
