@@ -78,42 +78,54 @@ Danbooru.Note = {
     
     scale: function($note_box) {
       var $image = $("#image");
-      var original_width = parseFloat($image.data("width"));
-      var original_height = parseFloat($image.data("height"));
+      var original_width = parseFloat($image.data("original-width"));
       var ratio = $image.width() / original_width;
       
       if (ratio < 1) {
-        var scaled_width = original_width * ratio;
-        var scaled_height = original_height * ratio;
-        var scaled_top = $note_box.offset().top * ratio;
-        var scaled_left = $note_box.offset().left * ratio;
+        var scaled_width = Math.round($note_box.width() * ratio);
+        var scaled_height = Math.round($note_box.height() * ratio);
+        var scaled_top = Math.round($note_box.position().top * ratio);
+        var scaled_left = Math.round($note_box.position().left * ratio);
         $note_box.css({
           top: scaled_top,
           left: scaled_left,
           width: scaled_width,
           height: scaled_height
         });
+        Danbooru.Note.Box.resize_inner_border($note_box);
       }
+    },
+    
+    scale_all: function() {
+      $(".note-box").each(function(i, v) {
+        Danbooru.Note.Box.scale($(v));
+      });
     },
     
     descale: function($note_box) {
       var $image = $("#image");
-      var original_width = parseFloat($image.data("width"));
-      var original_height = parseFloat($image.data("height"));
-      var ratio = $image.width() / original_width;
+      var original_width = parseFloat($image.data("original-width"));
+      var ratio = original_width / $image.width();
       
-      if (ratio < 1) {
-        var scaled_width = original_width * ratio;
-        var scaled_height = original_height * ratio;
-        var scaled_top = $note_box.offset().top * ratio;
-        var scaled_left = $note_box.offset().left * ratio;
+      if (ratio > 1) {
+        var scaled_width = Math.round($note_box.width() * ratio);
+        var scaled_height = Math.round($note_box.height() * ratio);
+        var scaled_top = Math.round($note_box.position().top * ratio);
+        var scaled_left = Math.round($note_box.position().left * ratio);
         $note_box.css({
           top: scaled_top,
           left: scaled_left,
           width: scaled_width,
           height: scaled_height
         });
+        Danbooru.Note.Box.resize_inner_border($note_box);
       }
+    },
+    
+    descale_all: function() {
+      $(".note-box").each(function(i, v) {
+        Danbooru.Note.Box.descale($(v));
+      });
     }
   },
   
@@ -214,10 +226,12 @@ Danbooru.Note = {
         Danbooru.Note.Body.hide($note_body_inner.data("id"));
       });
 
-      $note_body.click(function(e) {
-        var $note_body_inner = $(e.currentTarget);
-        Danbooru.Note.Edit.show($note_body_inner);
-      })
+      if (Danbooru.meta("current-user-name") !== "Anonymous") {
+        $note_body.click(function(e) {
+          var $note_body_inner = $(e.currentTarget);
+          Danbooru.Note.Edit.show($note_body_inner);
+        })
+      }
     }
   },
   
@@ -345,7 +359,6 @@ Danbooru.Note = {
     history: function() {
       var $this = $(this);
       var id = $this.data("id");
-      console.log("this=%o id=%o", $this, id);
       if (id.match(/\d/)) {
         window.location.href = "/note_versions?search[note_id_eq]=" + id;
       }
@@ -355,6 +368,7 @@ Danbooru.Note = {
   
   TranslationMode: {
     start: function() {
+      $("#original-file-link").click();
       $("#note-container").click(Danbooru.Note.TranslationMode.create_note);
       $("#translate").one("click", Danbooru.Note.TranslationMode.stop).html("Click on image");
     },
@@ -371,37 +385,11 @@ Danbooru.Note = {
     }
   },
   
-  Image: {
-    resize: function() {
-      var $image = $("#image");
-      var max_width = parseInt($("meta[name=max-image-width]").attr("content"));
-      var current_width = $image.width();
-      var current_height = $image.height();
-      if (current_width > max_width) {
-        var ratio = max_width / current_width;
-        $image.attr("ratio", ratio);
-        $image.width(current_width * ratio).height(current_height * ratio).attr("resized", "1");
-      }
-    },
-    
-    reset_size: function() {
-      var $image = $("#image");
-      $image.width($image.data("width")).height($image.data("height")).attr("resized", "0");
-    }
-  },
-  
   id: "x",
   dragging: false,
   editing: false,
   timeouts: [],
   pending: {},
-  
-  scale: function() {
-    var $image = $("#image");
-    if ($image.attr("ratio")) {
-      // TODO: implement
-    }
-  },
   
   add: function(id, x, y, w, h, text) {
     var $note_box = Danbooru.Note.Box.create(id);
@@ -462,20 +450,9 @@ Danbooru.Note = {
 
 $(function() {
   if ($("#c-posts #a-show").size() > 0) {
-    Danbooru.Note.Image.resize();
     $("#translate").one("click", Danbooru.Note.TranslationMode.start);
     $("#note-container").width($("#image").width()).height($("#image").height());
     $(document).bind("keydown", "ctrl+n", Danbooru.Note.TranslationMode.start);
-
-    $("#toggle-resize").click(function() {
-      var $image = $("#image");
-      if ($image.attr("resized") === "1") {
-        Danbooru.Note.Image.reset_size();
-      } else {
-        Danbooru.Note.Image.resize();
-      }
-    });
-    
     Danbooru.Note.load_all();
   }
 });

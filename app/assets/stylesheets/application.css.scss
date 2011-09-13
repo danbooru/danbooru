@@ -87,6 +87,10 @@ a:active {
   text-decoration: none;
 }
 
+a.active {
+  font-weight: bold;
+}
+
 abbr[title=required] {
   display: none;
 }

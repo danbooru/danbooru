@@ -7,33 +7,48 @@
     this.initialize_post_sections();
     this.initialize_wiki_page_excerpt();
     this.initialize_post_image_resize_links();
+    this.initialize_image_resize();
+  }
+  
+  Danbooru.Post.initialize_image_resize = function() {
+    var default_image_size = Danbooru.meta("default-image-size");
+    var original_width = parseInt($("#image").data("original-width"));
+    var medium_width = parseInt(Danbooru.meta("config-medium-width"));
+    var large_width = parseInt(Danbooru.meta("config-large-width"));
+    
+    console.log("original-width=%o medium-width=%o", original_width, medium_width);
+    
+    if ((default_image_size === "medium") && (original_width > medium_width)) {
+      $("#medium-file-link").trigger("click");
+    } else if ((default_image_size === "large") && (original_width > large_width)) {
+      $("#large-file-link").trigger("click");
+    } else {
+      $("#original-file-link").trigger("click");
+    }
+  }
+  
+  Danbooru.Post.build_resize_function = function(size) {
+    return function(e) {
+      console.log("clicked " + size);
+      Danbooru.Note.Box.descale_all();
+      var $link = $(e.target);
+      var $image = $("#image");
+      $("#medium-file-link").removeClass("active");
+      $("#large-file-link").removeClass("active");
+      $("#original-file-link").removeClass("active");
+      $link.addClass("active");
+      $image.attr("src", $link.attr("href"));
+      $image.width($image.data(size + "-width"));
+      $image.height($image.data(size + "-height"));
+      Danbooru.Note.Box.scale_all();
+      e.preventDefault();
+    }
   }
   
   Danbooru.Post.initialize_post_image_resize_links = function() {
-    $("#medium-file-link").click(function(e) {
-      var $link = $(e.target);
-      var $image = $("#image");
-      $image.attr("src", $link.attr("href"));
-      $image.width($image.data("medium-width"));
-      $image.height($image.data("medium-height"));
-      e.preventDefault();
-    });
-    $("#large-file-link").click(function(e) {
-      var $link = $(e.target);
-      var $image = $("#image");
-      $image.attr("src", $link.attr("href"));
-      $image.width($image.data("large-width"));
-      $image.height($image.data("large-height"));
-      e.preventDefault();
-    });
-    $("#original-file-link").click(function(e) {
-      var $link = $(e.target);
-      var $image = $("#image");
-      $image.attr("src", $link.attr("href"));
-      $image.width($image.data("original-width"));
-      $image.height($image.data("original-height"));
-      e.preventDefault();
-    });
+    $("#medium-file-link").click(Danbooru.Post.build_resize_function("medium"));
+    $("#large-file-link").click(Danbooru.Post.build_resize_function("large"));
+    $("#original-file-link").click(Danbooru.Post.build_resize_function("original"));
   }
   
   Danbooru.Post.initialize_wiki_page_excerpt = function() {
