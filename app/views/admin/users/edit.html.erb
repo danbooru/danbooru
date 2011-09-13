@@ -1,0 +1,14 @@
+<div id="c-admin-users">
+  <div id="a-edit">
+    <h1>Edit User: <%= @user.name %></h1>
+    
+    <%= form_tag(admin_user_path(@user), :class => "simple_form") do %>
+      <div class="input integer optional">
+        <label for="user_level" class="optional">Level</label>
+        <%= user_level_select(:user, :level) %>
+      </div>
+    
+      <%= submit_tag "Update" %>
+    <% end %>
+  </div>
+</div>

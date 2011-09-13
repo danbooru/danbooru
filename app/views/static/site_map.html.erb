@@ -80,7 +80,6 @@
       <% if CurrentUser.is_admin? %>
         <ul>
           <li><h1>Admin</h1></li>
-          <li><%= link_to("User", admin_users_path) %></li>   
           <li><%= link_to("Janitor Trials", janitor_trials_path) %></li>
           <li><%= link_to("IP Bans", ip_bans_path) %></li>
         </ul>

@@ -12,6 +12,7 @@
     <table width="100%" class="highlightable"> 
       <thead>
         <tr>
+          <th></th>
           <th>Name</th>
           <th>Posts</th>
           <th>Deleted</th>
@@ -25,6 +26,11 @@
       <tbody>
         <% @users.each do |user| %>
           <tr>
+            <td>
+              <% if CurrentUser.is_admin? %>
+                <%= link_to "Admin", edit_admin_user_path(user) %>
+              <% end %>
+            </td>
             <td>
               <%= link_to user.pretty_name, user_path(user.id) %>
               <% if user.inviter %>

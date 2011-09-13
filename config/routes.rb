@@ -1,6 +1,6 @@
 Danbooru::Application.routes.draw do
   namespace :admin do
-    resources :users, :only => [:index, :get, :put, :destroy]
+    resources :users, :only => [:edit, :update]
   end
   namespace :moderator do
     resource :dashboard, :only => [:show]
