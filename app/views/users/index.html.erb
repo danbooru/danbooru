@@ -9,7 +9,7 @@
       <%= f.button :submit %>
     <% end %>
 
-    <table width="100%" class="highlightable"> 
+    <table width="100%" class="striped"> 
       <thead>
         <tr>
           <th></th>
@@ -28,7 +28,7 @@
           <tr>
             <td>
               <% if CurrentUser.is_admin? %>
-                <%= link_to "Admin", edit_admin_user_path(user) %>
+                <%= link_to "Edit", edit_admin_user_path(user) %>
               <% end %>
             </td>
             <td>
