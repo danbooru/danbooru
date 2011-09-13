@@ -21,16 +21,17 @@
   }
   
   Danbooru.ForumPost.initialize_preview_link = function() {
-    $("#c-forum-topics #preview a[name=toggle-preview]").click(function() {
+    $("#c-forum-topics #preview a[name=toggle-preview]").click(function(e) {
       $("#preview").toggle();
       $("#dtext-help").toggle();
+      e.preventDefault();
     });
     
     $("#c-forum-topics input[value=Preview]").click(function(e) {
       e.preventDefault();
       $.ajax({
         type: "post",
-        url: "/dtext/preview",
+        url: "/dtext_preview",
         data: {
           body: $("#forum_post_body").val()
         },

@@ -8,16 +8,17 @@
   }
   
   Danbooru.WikiPage.initialize_preview_link = function() {
-    $("#c-wiki-pages #preview a[name=toggle-preview]").click(function() {
+    $("#c-wiki-pages #preview a[name=toggle-preview]").click(function(e) {
       $("#preview").toggle();
       $("#dtext-help").toggle();
+      e.preventDefault();
     });
     
     $("#c-wiki-pages input[value=Preview]").click(function(e) {
       e.preventDefault();
       $.ajax({
         type: "post",
-        url: "/dtext/preview",
+        url: "/dtext_preview",
         data: {
           body: $("#wiki_page_body").val()
         },
