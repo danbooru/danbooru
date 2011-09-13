@@ -8,7 +8,7 @@
   }
   
   Danbooru.j_alert = function(title, msg) {
-    $('<div title="' + title + '"></div>').html(msg).dialog();
+    $('<div title="' + title + '"></div>').html(msg).dialog({modal: true});
   }
   
   Danbooru.j_error = function(msg) {
@@ -16,7 +16,7 @@
   }
   
   Danbooru.ajax_start = function(target) {
-    $(target).after(' <img src="/images/wait.gif" width="15" height="5" class="wait">');
+    $(target).after('<img src="/images/wait.gif" width="15" height="5" class="wait">');
   }
   
   Danbooru.ajax_stop = function(target) {

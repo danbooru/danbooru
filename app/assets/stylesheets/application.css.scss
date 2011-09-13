@@ -170,6 +170,10 @@ img {
   vertical-align: middle;
 }
 
+img.wait {
+  margin-left: 5px;
+}
+
 input[type=text], input[type=password], input[type=url], textarea, button {
 /*  border: 1px solid #AAA;*/
   font-size: 1em;

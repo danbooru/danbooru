@@ -1,5 +1,5 @@
 <% if @error %>
-  alert("<%= escape_javascript @error.to_s %>");
+  Danbooru.j_error("<%= j @error.to_s %>");
 <% else %>
-  $("#score-for-post-<%= @post.id %> span").text(<%= @post.score %>);
+  $("#score-for-post-<%= @post.id %>").html(<%= @post.score %>);
 <% end %>
