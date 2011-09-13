@@ -1,1 +1,1 @@
-<%= content_tag(:article, raw(note.body), "data-width" => note.width, "data-height" => note.height, "data-x" => note.x, "data-y" => note.y, "data-id" => note.id) %>
+<%= content_tag(:article, raw(Sanitize.clean(note.body)), "data-width" => note.width, "data-height" => note.height, "data-x" => note.x, "data-y" => note.y, "data-id" => note.id) %>

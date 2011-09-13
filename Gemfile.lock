@@ -9,6 +9,13 @@ GIT
       polyamorous (~> 0.5.0)
 
 GIT
+  remote: git://github.com/rgrove/sanitize.git
+  revision: afdfa8f7f4129820c573f94f79b99aed715a385d
+  specs:
+    sanitize (2.0.3)
+      nokogiri (< 1.6, >= 1.4.4)
+
+GIT
   remote: http://github.com/EmmanuelOga/ffaker.git
   revision: f94bcf502fcdd4ba5f29155a3df1811af2663950
   specs:
@@ -179,6 +186,7 @@ DEPENDENCIES
   pg
   pry
   rails (= 3.1.0)
+  sanitize!
   shoulda
   silent-postgres
   simple_form

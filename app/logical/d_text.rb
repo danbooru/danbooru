@@ -11,11 +11,6 @@ class DText
   end
   
   def self.parse_inline(str, options = {})
-    str = parse_aliased_wiki_links(str)
-    str = parse_wiki_links(str)
-    str = parse_post_links(str)
-    str = parse_id_links(str)
-    
     str.gsub!(/\n/m, "<br>")
     str.gsub!(/\[b\](.+?)\[\/b\]/i, '<strong>\1</strong>')
     str.gsub!(/\[i\](.+?)\[\/i\]/i, '<em>\1</em>')
@@ -26,6 +21,10 @@ class DText
     str.gsub!(/\[url=(.+?)\](.+?)\[\/url\]/m) do
       %{<a href="#{u($1)}">#{h($2)}</a>}
     end
+    str = parse_aliased_wiki_links(str)
+    str = parse_wiki_links(str)
+    str = parse_post_links(str)
+    str = parse_id_links(str)
     str
   end
   
@@ -36,9 +35,9 @@ class DText
       wiki_page = WikiPage.find_title_and_id(title)
       
       if wiki_page
-        %{[url=/wiki_pages/#{wiki_page.id}]#{text}[/url]}
+        %{<a href="/wiki_pages/#{wiki_page.id}">#{text}</a>}
       else
-        %{[url=/wiki_pages/new?title=#{title}]#{text}[/url]}
+        %{<a href="/wiki_pages/new?title=#{title}">#{text}</url>}
       end
     end
   end
@@ -49,22 +48,22 @@ class DText
       wiki_page = WikiPage.find_title_and_id(title)
       
       if wiki_page
-        %{[url=/wiki_pages/#{wiki_page.id}]#{title}[/url]}
+        %{<a href="/wiki_pages/#{wiki_page.id}">#{title}</a>}
       else
-        %{[url=/wiki_pages/new?title=#{title}]#{title}[/url]}
+        %{<a href="/wiki_pages/new?wiki_page[title]=#{title}">#{title}</a>}
       end
     end
   end
   
   def self.parse_post_links(str)
-    str.gsub(/\{\{(.+?)\}\}/, %{[url=/posts?tags=\1]\1[/url]})
+    str.gsub(/\{\{(.+?)\}\}/, %{<a href="/posts?tags=\\1">\\1</a>})
   end
   
   def self.parse_id_links(str)
-    str = str.gsub(/\bpost #(\d+)/i, %{[url=/posts/\1]post #\1[/url]})
-    str = str.gsub(/\bforum #(\d+)/i, %{[url=/forum_posts/\1]forum #\1[/url]})
-    str = str.gsub(/\bcomment #(\d+)/i, %{[url=/comments/\1]comment #\1[/url]})
-    str = str.gsub(/\bpool #(\d+)/i, %{[url=/pools/\1]pool #\1[/url]})
+    str = str.gsub(/\bpost #(\d+)/i, %{<a href="/posts/\\1">post #\\1</a>})
+    str = str.gsub(/\bforum #(\d+)/i, %{<a href="/forum_posts/\\1">forum #\\1</a>})
+    str = str.gsub(/\bcomment #(\d+)/i, %{<a href="/comments/\\1">comment #\\1</a>})
+    str = str.gsub(/\bpool #(\d+)/i, %{<a href="/pools/\\1">pool #\\1</a>})
   end
   
   def self.parse_list(str, options = {})
@@ -151,7 +150,7 @@ class DText
       end
     end
 
-    html.join("").html_safe
+    Sanitize.clean(html.join(""), Sanitize::Config::BASIC).html_safe
   end
 end
 
