@@ -585,6 +585,19 @@ div.comments-for-post {
         margin-left: 2em;
         width: 30em;
         float: left;
+        
+        ul {
+          margin-left: 1em;
+          margin-bottom: 1em;
+          
+          ul {
+            margin-bottom: 0;
+          }
+        }
+        
+        li {
+          list-style-type: disc;
+        }
       }
     }
     
