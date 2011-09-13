@@ -2,8 +2,8 @@ require 'test_helper'
 
 class PostTest < ActiveSupport::TestCase
   setup do
-    user = Factory.create(:user)
-    CurrentUser.user = user
+    @user = Factory.create(:user)
+    CurrentUser.user = @user
     CurrentUser.ip_addr = "127.0.0.1"
     MEMCACHE.flush_all
   end
@@ -210,6 +210,81 @@ class PostTest < ActiveSupport::TestCase
 
   context "Tagging:" do
     context "A post" do
+      setup do
+        @post = Factory.create(:post)
+      end
+      
+      context "tagged with a metatag" do
+        context "for a pool" do
+          context "id" do
+            setup do
+              @pool = Factory.create(:pool)
+              @post.update_attributes(:tag_string => "aaa pool:#{@pool.id}")
+            end
+            
+            should "add the post to the pool" do
+              @post.reload
+              @pool.reload
+              assert_equal("#{@post.id}", @pool.post_ids)
+              assert_equal("pool:#{@pool.id}", @post.pool_string)
+            end
+          end
+          
+          context "name" do
+            context "that exists" do
+              setup do
+                @pool = Factory.create(:pool, :name => "abc")
+                @post.update_attributes(:tag_string => "aaa pool:abc")
+              end
+
+              should "add the post to the pool" do
+                @post.reload
+                @pool.reload
+                assert_equal("#{@post.id}", @pool.post_ids)
+                assert_equal("pool:#{@pool.id}", @post.pool_string)
+              end
+            end
+            
+            context "that doesn't exist" do
+              should "create a new pool and add the post to that pool" do
+                @post.update_attributes(:tag_string => "aaa pool:abc")
+                @pool = Pool.find_by_name("abc")
+                @post.reload
+                assert_not_nil(@pool)
+                assert_equal("#{@post.id}", @pool.post_ids)
+                assert_equal("pool:#{@pool.id}", @post.pool_string)
+              end
+            end
+          end
+        end
+        
+        context "for a rating" do
+          context "that is valid" do
+            should "update the rating" do
+              @post.update_attributes(:tag_string => "aaa rating:e")
+              @post.reload
+              assert_equal("e", @post.rating)
+            end
+          end
+          
+          context "that is invalid" do
+            should "not update the rating" do
+              @post.update_attributes(:tag_string => "aaa rating:z")
+              @post.reload
+              assert_equal("q", @post.rating)
+            end
+          end
+        end
+        
+        context "for a fav" do
+          should "add the current user to the post's favorite listing" do
+            @post.update_attributes(:tag_string => "aaa fav:self")
+            @post.reload
+            assert_equal("fav:#{@user.id}", @post.fav_string)
+          end
+        end
+      end
+      
       should "have an array representation of its tags" do
         post = Factory.create(:post)
         post.set_tag_string("aaa bbb")

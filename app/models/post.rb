@@ -414,7 +414,32 @@ class Post < ActiveRecord::Base
     end
     
     def filter_metatags(tags)
-      tags.reject {|tag| tag =~ /\A(?:pool|rating|fav):/}
+      metatags, tags = tags.partition {|x| x =~ /\A(?:pool|rating|fav):/}
+      apply_metatags(metatags)
+      return tags
+    end
+    
+    def apply_metatags(tags)
+      tags.each do |tag|
+        case tag
+        when /^pool:(\d+)$/
+          pool = Pool.find_by_id($1.to_i)
+          add_pool!(pool) if pool
+          
+        when /^pool:(.+)$/
+          pool = Pool.find_by_name($1)
+          if pool.nil?
+            pool = Pool.create(:name => $1, :description => "This pool was automatically generated")
+          end
+          add_pool!(pool)
+
+        when /^rating:([qse])/i
+          self.rating = $1.downcase
+          
+        when /^fav:(.+)$/
+          add_favorite!(CurrentUser.user)
+        end
+      end
     end
     
     def has_tag?(tag)
