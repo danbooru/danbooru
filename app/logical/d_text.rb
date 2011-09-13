@@ -11,15 +11,30 @@ class DText
   end
   
   def self.parse_inline(str, options = {})
+    str.gsub!(/&/, "&amp;")
+    str.gsub!(/</, "&lt;")
+    str.gsub!(/>/, "&gt;")
     str.gsub!(/\n/m, "<br>")
     str.gsub!(/\[b\](.+?)\[\/b\]/i, '<strong>\1</strong>')
     str.gsub!(/\[i\](.+?)\[\/i\]/i, '<em>\1</em>')
-    str.gsub!(/\[spoilers?\](.+?)\[\/spoilers?\]/m, '<span class="spoiler">\1</span>')
-    str.gsub!(/\[url\](.+?)\[\/url\]/i) do
-      %{<a href="#{u($1)}">#{h($1)}</a>}
+    str.gsub!(/(?<![=\]])(https?:\/\/\S+)/m) do |link|
+      if link =~ /([;,.!?\)\]])$/
+        stop = $1
+        link.chop!
+        text = link
+      else
+        stop = ""
+        text = link
+      end
+
+      link.gsub!(/"/, '&quot;')
+      '<a href="' + link + '">' + text + '</a>' + stop
     end
-    str.gsub!(/\[url=(.+?)\](.+?)\[\/url\]/m) do
-      %{<a href="#{u($1)}">#{h($2)}</a>}
+    str.gsub!(/\[url\](http.+?)\[\/url\]/i) do
+      %{<a href="#{$1}">#{$1}</a>}
+    end
+    str.gsub!(/\[url=(http.+?)\](.+?)\[\/url\]/m) do
+      %{<a href="#{$1}">#{$2}</a>}
     end
     str = parse_aliased_wiki_links(str)
     str = parse_wiki_links(str)
@@ -30,33 +45,36 @@ class DText
   
   def self.parse_aliased_wiki_links(str)
     str.gsub(/\[\[(.+?)\|(.+?)\]\]/m) do
-      text = $1
-      title = $2
+      text = CGI.unescapeHTML($1)
+      title = CGI.unescapeHTML($2)
       wiki_page = WikiPage.find_title_and_id(title)
       
       if wiki_page
-        %{<a href="/wiki_pages/#{wiki_page.id}">#{text}</a>}
+        %{<a href="/wiki_pages/#{wiki_page.id}">#{h(text)}</a>}
       else
-        %{<a href="/wiki_pages/new?title=#{title}">#{text}</url>}
+        %{<a href="/wiki_pages/new?title=#{u(title)}">#{h(text)}</url>}
       end
     end
   end
   
   def self.parse_wiki_links(str)
     str.gsub(/\[\[(.+?)\]\]/) do
-      title = $1
+      title = CGI.unescapeHTML($1)
       wiki_page = WikiPage.find_title_and_id(title)
       
       if wiki_page
-        %{<a href="/wiki_pages/#{wiki_page.id}">#{title}</a>}
+        %{<a href="/wiki_pages/#{wiki_page.id}">#{h(title)}</a>}
       else
-        %{<a href="/wiki_pages/new?wiki_page[title]=#{title}">#{title}</a>}
+        %{<a href="/wiki_pages/new?wiki_page[title]=#{u(title)}">#{h(title)}</a>}
       end
     end
   end
   
   def self.parse_post_links(str)
-    str.gsub(/\{\{(.+?)\}\}/, %{<a href="/posts?tags=\\1">\\1</a>})
+    str.gsub(/\{\{(.+?)\}\}/) do
+      tags = CGI.unescapeHTML($1)
+      %{<a href="/posts?tags=#{u(tags)}">#{h(tags)}</a>}
+    end
   end
   
   def self.parse_id_links(str)
@@ -110,11 +128,14 @@ class DText
     unless options[:inline]
       str.gsub!(/\s*\[quote\]\s*/m, "\n\n[quote]\n\n")
       str.gsub!(/\s*\[\/quote\]\s*/m, "\n\n[/quote]\n\n")
+      str.gsub!(/\s*\[spoilers?\](?!\])\s*/m, "\n\n[spoiler]\n\n")
+      str.gsub!(/\s*\[\/spoilers?\]\s*/m, "\n\n[/spoiler]\n\n")
     end
     
     str.gsub!(/(?:\r?\n){3,}/, "\n\n")
     str.strip!
     blocks = str.split(/(?:\r?\n){2}/)
+    stack = []
     
     html = blocks.map do |block|
       case block
@@ -135,22 +156,57 @@ class DText
         if options[:inline]
           ""
         else
-          '<blockquote>'
+          stack << "blockquote"
+          "<blockquote>"
         end
         
       when "[/quote]"
         if options[:inline]
           ""
-        else
+        elsif stack.last == "blockquote"
+          stack.pop
           '</blockquote>'
+        else
+          ""
+        end
+
+      when /\[spoilers?\](?!\])/
+        stack << "div"
+        '<div class="spoiler">'
+        
+      when /\[\/spoilers?\]/
+        if stack.last == "div"
+          stack.pop
+          '</div>'
         end
 
       else
         '<p>' + parse_inline(block) + "</p>"
       end
     end
+    
+    stack.reverse.each do |tag|
+      if tag == "blockquote"
+        html << "</blockquote>"
+      elsif tag == "div"
+        html << "</div>"
+      end
+    end
 
-    Sanitize.clean(html.join(""), Sanitize::Config::BASIC).html_safe
+    Sanitize.clean(
+      html.join(""),
+      :elements => %w(h1 h2 h3 h4 h5 h6 a span div blockquote br p ul li ol em strong),
+      :attributes => {
+        "a" => %w(href title),
+        "span" => %w(class),
+        "div" => %w(class)
+      },
+      :protocols => {
+        "a" => {
+          "href" => ["http", "https", :relative]
+        }
+      }
+    ).html_safe
   end
 end
 
