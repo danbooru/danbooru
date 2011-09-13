@@ -193,8 +193,12 @@ class DText
       end
     end
 
+    sanitize(html.join("")).html_safe
+  end
+  
+  def self.sanitize(text)
     Sanitize.clean(
-      html.join(""),
+      text,
       :elements => %w(h1 h2 h3 h4 h5 h6 a span div blockquote br p ul li ol em strong),
       :attributes => {
         "a" => %w(href title),
@@ -206,7 +210,7 @@ class DText
           "href" => ["http", "https", :relative]
         }
       }
-    ).html_safe
+    )
   end
 end
 

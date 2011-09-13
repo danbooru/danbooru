@@ -278,12 +278,16 @@ Danbooru.Note = {
     },
     
     parameterize_note: function($note_box, $note_body) {
+      var $image = $("#image");
+      var original_width = parseInt($image.data("original-width"));
+      var ratio = parseInt($image.width()) / original_width;
+      
       var hash = {
         note: {
-          x: $note_box.position().left,
-          y: $note_box.position().top,
-          width: $note_box.width(),
-          height: $note_box.height(),
+          x: $note_box.position().left / ratio,
+          y: $note_box.position().top / ratio,
+          width: $note_box.width() / ratio,
+          height: $note_box.height() / ratio,
           body: $note_body.html(),
           post_id: Danbooru.meta("post-id")
         }
