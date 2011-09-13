@@ -4,13 +4,14 @@
   <% if post.approver %>
     <li>Approver: <%= link_to(post.approver.name, user_path(post.approver_id)) %></li>
   <% end %>
-  <li>Rating: <%= post.pretty_rating %></li>
   <li>
     Size: <%= number_to_human_size(post.file_size) %> 
     <% if post.is_image? %>
       (<%= post.image_width %>x<%= post.image_height %>)
     <% end %>
   </li>
+  <li>Source: <%= post_source_tag(post) %></li>
+  <li>Rating: <%= post.pretty_rating %></li>
   <li>Score: <span id="score-for-post-<%= post.id %>"><%= post.score %></span> (vote <%= link_to "up", post_votes_path(:post_id => post.id, :score => "up"), :remote => true, :method => :post %>/<%= link_to "down", post_votes_path(:post_id => post.id, :score => "down"), :remote => true, :method => :post %>)</li>
   <li>
     Status:
