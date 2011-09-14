@@ -19,7 +19,7 @@ class User < ActiveRecord::Base
   validates_format_of :name, :with => /\A[^\s:]+\Z/, :on => :create, :message => "cannot have whitespace or colons"
   validates_uniqueness_of :name, :case_sensitive => false, :on => :create
   validates_uniqueness_of :email, :case_sensitive => false, :on => :create, :if => lambda {|rec| !rec.email.blank?}
-  validates_length_of :password, :minimum => 5, :if => lambda {|rec| rec.new_record? || !rec.password.blank?}
+  validates_length_of :password, :minimum => 5, :if => lambda {|rec| rec.new_record? || rec.password.present?}
   validates_inclusion_of :default_image_size, :in => %w(medium large original)
   validates_confirmation_of :password
   validates_presence_of :email, :if => lambda {|rec| rec.new_record? && Danbooru.config.enable_email_verification?}
@@ -100,7 +100,8 @@ class User < ActiveRecord::Base
   
   module PasswordMethods
     def encrypt_password
-      self.password_hash = self.class.sha1(password) if password
+      puts password.inspect
+      self.password_hash = self.class.sha1(password) if password.present?
     end
 
     def reset_password
