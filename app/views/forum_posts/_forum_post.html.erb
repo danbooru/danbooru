@@ -10,7 +10,7 @@
       <%= format_text(forum_post.body) %>
     </div>
     <menu> 
-      <li><%= link_to "Reply", new_forum_post_path(:post_id => forum_post.id) %></li>
+      <li><%= link_to "Quote", new_forum_post_path(:post_id => forum_post.id) %></li>
       <% if CurrentUser.user.is_janitor? || CurrentUser.user.id == forum_post.creator_id %>
         <li><%= link_to "Delete", forum_post_path(forum_post.id), :confirm => "Do you really want to delete this post?", :method => :delete, :remote => true %></li>
         <li><%= link_to "Edit", edit_forum_post_path(forum_post.id) %></li>
