@@ -52,6 +52,10 @@ class Comment < ActiveRecord::Base
   def creator_name
     creator.name
   end
+  
+  def editable_by?(user)
+    creator_id == user.id || user.is_moderator?
+  end
 end
 
 Comment.connection.extend(PostgresExtensions)

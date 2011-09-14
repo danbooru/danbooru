@@ -1,6 +1,7 @@
 class CommentsController < ApplicationController
   respond_to :html, :xml, :json
-  before_filter :member_only, :only => [:update, :create, :edit]
+  before_filter :member_only, :only => [:update, :create, :edit, :destroy]
+  rescue_from User::PrivilegeError, :with => "static/access_denied"
 
   def index
     if params[:group_by] == "post"
@@ -18,6 +19,7 @@ class CommentsController < ApplicationController
   
   def update
     @comment = Comment.find(params[:id])
+    check_privilege(@comment)
     @comment.update_attributes(params[:comment])
     respond_with(@comment, :location => post_path(@comment.post_id))
   end
@@ -33,6 +35,7 @@ class CommentsController < ApplicationController
   
   def edit
     @comment = Comment.find(params[:id])
+    check_privilege(@comment)
     respond_with(@comment)
   end
   
@@ -40,6 +43,15 @@ class CommentsController < ApplicationController
     @comment = Comment.find(params[:id])
     respond_with(@comment) do |format|
       format.json {render :json => @comment.to_json(:methods => [:creator_name])}
+    end
+  end
+  
+  def destroy
+    @comment = Comment.find(params[:id])
+    check_privilege(@comment)
+    @comment.destroy
+    respond_with(@comment) do |format|
+      format.js
     end
   end
   
@@ -63,6 +75,12 @@ private
     @comments = @search.paginate(params[:page])
     respond_with(@comments) do |format|
       format.html {render :action => "index_by_comment"}
+    end
+  end
+  
+  def check_privilege(comment)
+    if !comment.editable_by?(CurrentUser.user)
+      raise User::PrivilegeError
     end
   end
 end
