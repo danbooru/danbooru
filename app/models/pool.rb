@@ -46,6 +46,10 @@ class Pool < ActiveRecord::Base
     self.creator_id = CurrentUser.id
   end
   
+  def pretty_name
+    name.tr("_", " ")
+  end
+  
   def normalize_name
     self.name = self.class.normalize_name(name)
   end
