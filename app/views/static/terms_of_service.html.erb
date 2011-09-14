@@ -1,6 +1,7 @@
-<div style="width: 40em; margin: 5em auto; overflow: scroll;">
-  <div class="section">
-    <h1>Terms of Service</h1>
+<div id="terms-of-service">
+  <h1>Terms of Service</h1>
+  
+  <section>
     <p>By accessing the "<%= Danbooru.config.app_name %>" website ("Site") you agree to the following terms of service. If you do not agree to these terms, then please do not access the Site.</p>  
 
     <ul>
@@ -11,29 +12,29 @@
       <li>You will make a best faith effort to upload only high quality anime-related images.</li>
       <li>You have read the <%= link_to "tagging guidelines", wiki_pages_path(:title => "help:tags") %>.</li>
     </ul>
-    
-    <div class="section">
-      <h1>Post/Comment Limiting</h1>
-      <p>You cannot upload a post or comment during the first week of signing up.</p>
-      <p>After the initial period, you can post up to one comment an hour and a variable number of posts based on how many of your previous uploads were approved or deleted.</p>
-    </div>
-    
-    <div class="section">
-      <h1>Prohibited Content</h1>
-      <p>In addition, you may not use the Site to upload any of the following:</p>
-      <ul>
-        <li>Non-anime: Photographs of American porn actresses, for example, are prohibited. Photographs of cosplayers, figures, or prominent figures in the industry are acceptable.</li>
-        <li>Furry: Any image or movie where a person's skin is made of fur or scales.</li>
-        <li>Watermarked: Any image where a person who is not the original copyright owner has placed a watermark on the image.</li>
-        <li>Poorly compressed: Any image where compression artifacts are easily visible.</li>
-        <li>Grotesque: Any depiction of extreme mutilation, extreme bodily distension, feces, or bodies that are far outside the realm of normal human proportion (for example, breasts or penises that are larger than two heads in size).</li>
-        <li>Manga: Uploading entire manga or doujinshi chapters is discouraged. Individual pages can be uploaded if they meet the quality criterion.</li>
-        <li>Nude Filter: Images that have been edited by someone other than the original creator to remove clothing or censorship. These typically feature crude drawings of breasts or genitalia laid on top of the original image.</li>
-      </ul>
-    </div>
-  </div>
+  </section>
+  
+  <section>
+    <h1>Post/Comment Limiting</h1>
+    <p>You cannot upload a post or comment during the first week of signing up.</p>
+    <p>After the initial period, you can post up to one comment an hour and a variable number of posts based on how many of your previous uploads were approved or deleted.</p>
+  </section>
+  
+  <section>
+    <h1>Prohibited Content</h1>
+    <p>In addition, you may not use the Site to upload any of the following:</p>
+    <ul>
+      <li>Non-anime: Uploaded art should be related to anime or otherwise associated with otaku culture. Photographs of American porn actresses, for example, are prohibited. Photographs of cosplayers, figures, or prominent figures in the industry are acceptable.</li>
+      <li>Furry: Any image or movie where a person's skin is made of fur or scales is prohibited.</li>
+      <li>Watermarked: Any image where a person who is not the original copyright owner has placed a watermark on the image is prohibited.</li>
+      <li>Poorly compressed: Any image where compression artifacts are easily visible is prohibited.</li>
+      <li>Grotesque: Any depiction of extreme mutilation, extreme bodily distension, feces, or bodies that are far outside the realm of normal human proportion (for example, breasts or penises that are larger than two heads in size) are prohibited.</li>
+      <li>Manga: Uploading entire manga or doujinshi chapters is discouraged. Individual pages can be uploaded if they meet the quality criterion.</li>
+      <li>Nude Filter: Images that have been edited by someone other than the original creator to remove clothing or censorship are prohibited. These typically feature crude drawings of breasts or genitalia laid on top of the original image.</li>
+    </ul>
+  </section>
 
-  <div class="section">
+  <section>
     <h1>Copyright Infringement</h1>
 
     <p>If you believe a post infringes upon your copyright, please send an email to the <%= mail_to Danbooru.config.contact_email, "webmaster", :encode => "hex" %> with the following pieces of information:</p>
@@ -42,19 +43,19 @@
       <li>Proof that you own the copyright.</li>
       <li>An email address that will be provided to the person who uploaded the infringing post to facilitate communication.</li>
     </ul>
-  </div>
+  </section>
 
-  <div class="section">
+  <section>
     <h1>Privacy Policy</h1>
 
     <p>The Site will not disclose the IP address, email address, password, or DMails of any user except to the staff.</p>
     <p>The Site is allowed to make public everything else, including but not limited to: uploaded posts, favorited posts, comments, forum posts, wiki edits, and note edits.</p>
-  </div>
+  </section>
   
-  <div>
+  <section>
     <h1>Agreement</h1>
     <p>By clicking on the "I Agree" link, you have read all the terms and have agreed to them.</p>
-    <p><%= link_to("I Agree", params[:url] || "/", :onclick => "Cookie.put('tos', '1')") %> | <%= link_to("Cancel", "/") %></p>
-  </div> 
+    <p><%= link_to("I Agree", params[:url] || "/", :id => "tos-agree-link") %> | <%= link_to("Cancel", "http://www.google.com") %></p>
+  </section> 
 </div>
 
