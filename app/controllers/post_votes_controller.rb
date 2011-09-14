@@ -1,4 +1,6 @@
 class PostVotesController < ApplicationController
+  before_filter :member_only
+  
   def create
     @post = Post.find(params[:post_id])
     @post.vote!(params[:score])
