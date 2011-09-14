@@ -5,7 +5,6 @@
     $("div.dtext-preview").hide();
     this.initialize_response_link();
     this.initialize_preview_button();
-    this.hide_threshold_comments();
     this.initialize_reply_links();
   }
   
@@ -61,32 +60,12 @@
   Danbooru.Comment.highlight_threshold_comments = function(post_id) {
     var threshold = parseInt(Danbooru.meta("user-comment-threshold"));
     var articles = $("article.comment[data-post-id=" + post_id + "]");
-    console.log("articles=%o", articles);
     articles.each(function(i, v) {
       var $comment = $(v);
-      console.log("testing %o", $comment);
       if (parseInt($comment.data("score")) < threshold) {
         $comment.addClass("below-threshold");
       }
     })
-  }
-  
-  Danbooru.Comment.hide_threshold_comments = function(post_id) {
-    var threshold = parseInt(Danbooru.meta("user-comment-threshold"));
-    var articles = null;
-    
-    if (post_id) {
-      articles = $("article.comment[data-post-id=" + post_id + "]");
-    } else {
-      articles = $("article.comment");
-    }
-    
-    articles.each(function(i, v) {
-      var $comment = $(v);
-      if (parseInt($comment.data("score")) < threshold) {
-        $comment.hide();
-      }
-    });
   }
 })();
 
