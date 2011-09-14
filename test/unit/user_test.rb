@@ -206,6 +206,30 @@ class UserTest < ActiveSupport::TestCase
         assert(User.authenticate(@user.name, new_pass), "Authentication should have succeeded")
       end
       
+      should "not change the password if the password and old password are blank" do
+        @user = Factory.create(:user, :password => "67890")
+        @user.update_attributes(:password => "", :old_password => "")
+        assert_equal(User.sha1("67890"), @user.password_hash)
+      end
+      
+      should "not change the password if the old password is incorrect" do
+        @user = Factory.create(:user, :password => "67890")
+        @user.update_attributes(:password => "12345", :old_password => "abcdefg")
+        assert_equal(User.sha1("67890"), @user.password_hash)
+      end
+      
+      should "not change the password if the old password is blank" do
+        @user = Factory.create(:user, :password => "67890")
+        @user.update_attributes(:password => "12345", :old_password => "")
+        assert_equal(User.sha1("67890"), @user.password_hash)
+      end
+      
+      should "change the password if the old password is correct" do
+        @user = Factory.create(:user, :password => "67890")
+        @user.update_attributes(:password => "12345", :old_password => "67890")
+        assert_equal(User.sha1("12345"), @user.password_hash)
+      end
+      
       context "in the json representation" do
         setup do
           @user = Factory.create(:user)

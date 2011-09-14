@@ -38,15 +38,18 @@ class Comment < ActiveRecord::Base
   end
   
   def vote!(score)
-    vote = votes.create(:score => score)
+    numerical_score = score == "up" ? 1 : -1
+    vote = votes.create(:score => numerical_score)
     
-    if vote.errors.any?
-      raise CommentVote::Error.new(vote.errors.full_messages.join("; "))
-    elsif vote.is_positive?
-      increment!(:score)
-    elsif vote.is_negative?
-      decrement!(:score)
+    if vote.errors.empty?
+      if vote.is_positive?
+        increment!(:score)
+      elsif vote.is_negative?
+        decrement!(:score)
+      end
     end
+
+    return vote
   end
   
   def creator_name

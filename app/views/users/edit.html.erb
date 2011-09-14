@@ -19,8 +19,8 @@
     <p>For security purposes, changing the following settings requires you to re-enter your password. You can leave the new password field blank to keep your current one.</p>
 
     <%= f.input :name %>
-    <%= f.input :password, :title => "What you want your new password to be (leave blank if you don't want to change your password)", :label => "New password" %>
-    <%= f.input :old_password, :title => "Your old password (you must enter your password if updating your name or password)", :as => :password %>
+    <%= f.input :password, :title => "What you want your new password to be (leave blank if you don't want to change your password)", :label => "New password", :input_html => {:autocomplete => "off"} %>
+    <%= f.input :old_password, :title => "Your old password (you must enter your password if updating your name or password)", :as => :password, :input_html => {:autocomplete => "off"} %>
   </fieldset>
   
   <%= f.button :submit %>

@@ -26,7 +26,8 @@ class User < ActiveRecord::Base
   validate :validate_ip_addr_is_not_banned, :on => :create
   before_validation :convert_blank_email_to_null
   before_validation :normalize_blacklisted_tags
-  before_save :encrypt_password
+  before_create :encrypt_password_on_create
+  before_update :encrypt_password_on_update
   after_save :update_cache
   before_create :promote_to_admin_if_first_user
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
@@ -99,9 +100,21 @@ class User < ActiveRecord::Base
   end
   
   module PasswordMethods
-    def encrypt_password
-      puts password.inspect
-      self.password_hash = self.class.sha1(password) if password.present?
+    def encrypt_password_on_create
+      self.password_hash = User.sha1(password)
+    end
+    
+    def encrypt_password_on_update
+      return if password.blank?
+      return if old_password.blank?
+      
+      if User.sha1(old_password) == password_hash
+        self.password_hash = User.sha1(password)
+        return true
+      else
+        errors[:old_password] << "is incorrect"
+        return false
+      end
     end
 
     def reset_password
@@ -270,7 +283,6 @@ class User < ActiveRecord::Base
       if is_contributor?
         true
       elsif created_at > 1.second.ago
-        # TODO: change this to 1 week
         false
       else
         upload_limit > 0
@@ -298,7 +310,7 @@ class User < ActiveRecord::Base
     def upload_limit
       deleted_count = Post.for_user(id).deleted.count
       pending_count = Post.for_user(id).pending.count
-      approved_count = Post.where("is_flagged = false and is_pending = false and user_id = ?", id).count
+      approved_count = Post.where("is_flagged = false and is_pending = false and uploader_id = ?", id).count
       
       if base_upload_limit
         limit = base_upload_limit - pending_count

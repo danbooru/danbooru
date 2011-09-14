@@ -5,7 +5,7 @@ class CommentVote < ActiveRecord::Base
   belongs_to :user
   before_validation :initialize_user, :on => :create
   validates_presence_of :user_id, :comment_id, :score
-  validates_uniqueness_of :user_id, :scope => :comment_id
+  validates_uniqueness_of :user_id, :scope => :comment_id, :message => "has already voted for this comment"
   validate :validate_user_can_vote
   validate :validate_comment_can_be_down_voted
   validates_inclusion_of :score, :in => [-1, 1], :message => "must be 1 or -1"

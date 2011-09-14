@@ -22,8 +22,10 @@ class CommentVotesControllerTest < ActionController::TestCase
     
     should "fail silently on errors" do
       Factory.create(:comment_vote, :comment => @comment)
-      post :create, {:format => "js", :comment_id => @comment.id, :score => 1}, {:user_id => @user.id}
-      assert_response :error
+      assert_difference("CommentVote.count", 0) do
+        post :create, {:format => "js", :comment_id => @comment.id, :score => 1}, {:user_id => @user.id}
+        assert_response :success
+      end
     end
   end
 end

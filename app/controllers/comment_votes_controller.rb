@@ -1,15 +1,9 @@
 class CommentVotesController < ApplicationController
-  rescue_from CommentVote::Error, :with => :error
+  respond_to :js
   
   def create
     @comment = Comment.find(params[:comment_id])
-    @comment.vote!(params[:score])
-    render :nothing => true
-  end
-  
-private
-  def error(exception)
-    @exception = exception
-    render :action => "error", :status => 500
+    @comment_vote = @comment.vote!(params[:score])
+    respond_with(@comment_vote)
   end
 end
