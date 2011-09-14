@@ -1,0 +1,13 @@
+<div id="c-post-versions">
+  <div id="a-search">
+    <div id="search">
+      <%= simple_form_for(@search) do |f| %>
+        <%= f.input :updater_name_eq, :label => "User", :required => false %>
+        <%= f.input :post_id_eq, :label => "Post", :required => false %>
+        <%= f.button :submit, :value => "Search" %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<%= render "secondary_links" %>

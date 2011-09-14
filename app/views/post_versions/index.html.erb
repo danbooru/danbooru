@@ -1,13 +1,5 @@
 <div id="c-post-versions">
   <div id="a-index">
-    <div id="search">
-      <%= simple_form_for(@search) do |f| %>
-        <%= f.input :updater_name_eq, :label => "User" %>
-        <%= f.input :post_id_eq, :label => "Post" %>
-        <%= f.button :submit, :value => "Search" %>
-      <% end %>
-    </div>
-    
     <% if @post_versions.empty? %>
       <%= render "post_sets/blank" %>
     <% else %>
@@ -16,4 +8,4 @@
   </div>
 </div>
 
-<%= render "posts/partials/common/secondary_links" %>
+<%= render "secondary_links" %>

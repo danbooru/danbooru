@@ -94,8 +94,11 @@ Danbooru::Application.routes.draw do
       put :revert
     end
   end
-
-  resources :post_versions, :only => [:index]
+  resources :post_versions, :only => [:index, :search] do
+    collection do
+      get :search
+    end
+  end
   resources :post_flags, :only => [:new, :index, :create]
   resources :post_appeals, :only => [:new, :index, :create]
   resource  :session
