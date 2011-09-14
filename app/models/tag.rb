@@ -87,7 +87,7 @@ class Tag < ActiveRecord::Base
         tag = find_by_name(name)
 
         if tag
-          if category > 0 && !(options[:user] && !options[:user].is_privileged? && tag.post_count > 10)
+          if category > 0
             tag.update_column(:category, category)
           end
 

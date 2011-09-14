@@ -2,6 +2,10 @@
   <menu>
     <li><%= link_to "Listing", tags_path %></li>
     <li><%= link_to "Search", search_tags_path %></li>
-    <li><%= link_to "Help", wiki_pages_path(:search => {:title_equals => "help:tags"}) %></li>    
+    <li><%= link_to "Help", wiki_pages_path(:search => {:title_equals => "help:tags"}) %></li>
+    <% if @tag %>
+      <li>|</li>
+      <li><%= link_to "Edit", edit_tag_path(@tag) %></li>
+    <% end %>
   </menu>
 <% end %>
