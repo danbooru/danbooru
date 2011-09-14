@@ -750,7 +750,7 @@ class Post < ActiveRecord::Base
 
         votes.create(:score => score)
       else
-        raise PostVote::Error.new("You have already voted for this comment")
+        raise PostVote::Error.new("You have already voted for this post")
       end
     end
   end
