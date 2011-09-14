@@ -50,7 +50,7 @@ class Comment < ActiveRecord::Base
   end
   
   def creator_name
-    creator.name
+    creator.name.tr("_", " ")
   end
   
   def editable_by?(user)
