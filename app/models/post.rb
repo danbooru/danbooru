@@ -414,7 +414,7 @@ class Post < ActiveRecord::Base
     end
     
     def filter_metatags(tags)
-      metatags, tags = tags.partition {|x| x =~ /\A(?:pool|rating|fav):/}
+      metatags, tags = tags.partition {|x| x =~ /\A(?:pool|rating|fav|parent):/}
       apply_metatags(metatags)
       return tags
     end
@@ -422,6 +422,9 @@ class Post < ActiveRecord::Base
     def apply_metatags(tags)
       tags.each do |tag|
         case tag
+        when /^parent:(\d+)$/
+          self.parent_id = $1.to_i
+          
         when /^pool:(\d+)$/
           pool = Pool.find_by_id($1.to_i)
           add_pool!(pool) if pool

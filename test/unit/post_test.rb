@@ -215,6 +215,20 @@ class PostTest < ActiveSupport::TestCase
       end
       
       context "tagged with a metatag" do
+        context "for a parent" do
+          setup do
+            @parent = Factory.create(:post)
+          end
+          
+          should "update the parent relationships for both posts" do
+            @post.update_attributes(:tag_string => "aaa parent:#{@parent.id}")
+            @post.reload
+            @parent.reload
+            assert_equal(@parent.id, @post.parent_id)
+            assert(@parent.has_children?)
+          end
+        end
+        
         context "for a pool" do
           context "id" do
             setup do
