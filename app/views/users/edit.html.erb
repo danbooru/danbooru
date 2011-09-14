@@ -9,7 +9,7 @@
     <%= f.input :receive_email_notifications, :title => "Enable to receive email notification when you receive a DMail" %>
     <%= f.input :comment_threshold, :title => "Comments below this score will be hidden by default" %>
     <%= f.input :always_resize_images, :title => "Enable to automatically resize images to fit your browser window" %>
-    <%= f.input :default_image_size, :title => "Medium shows images resized to #{Danbooru.config.medium_image_width} pixels wide, large is #{Danbooru.config.large_image_width} pixels wide, and original is whatever the original image is", :collection => %w(medium large original) %>
+    <%= f.input :default_image_size, :title => "Medium shows images resized to #{Danbooru.config.medium_image_width} pixels wide, large is #{Danbooru.config.large_image_width} pixels wide, and original is whatever the original image is", :collection => %w(medium large original), :include_blank => false %>
     <%= f.input :favorite_tags, :title => "A list of whitespace delimited tags that show up in your profile", :input_html => {:size => "40x5"} %>
     <%= f.input :blacklisted_tags, :title => "A list of newline delimited tags that you never want to see", :input_html => {:size => "40x5"} %>
   </fieldset>
