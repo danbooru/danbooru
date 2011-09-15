@@ -26,7 +26,9 @@ class PostsController < ApplicationController
     @post = Post.find(params[:id])
     @version = PostVersion.find(params[:version_id])
     @post.revert_to!(@version)
-    respond_with(@post)
+    respond_with(@post) do |format|
+      format.js
+    end
   end
 
 private

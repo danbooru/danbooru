@@ -1,5 +1,5 @@
 <div class="listing">
-  <table>
+  <table class="striped">
     <thead>
       <tr>
         <th width="5%">Post</th>
@@ -8,7 +8,8 @@
         <th width="5%">Rating</th>
         <th width="5%">Parent</th>
         <th width="10%">IP Address</th>
-        <th width="50%">Tags</th>
+        <th width="45%">Tags</th>
+        <th width="5%"></th>
       </tr>
     </thead>
     <tbody>
@@ -32,6 +33,9 @@
             <% post_version.del_tag_array.each do |tag| %>
               <del><%= tag %></del>
             <% end %>
+          </td>
+          <td>
+            <%= link_to "Revert", revert_post_path(post_version.post_id, :version_id => post_version.id), :method => :put, :remote => true %>
           </td>
         </tr>
       <% end %>
