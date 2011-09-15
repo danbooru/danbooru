@@ -16,6 +16,9 @@ module Danbooru
     config.autoload_paths += %W(#{config.root}/app/presenters #{config.root}/app/logical #{config.root}/app/mailers)
     config.plugins = [:all]
     config.time_zone = 'Eastern Time (US & Canada)'
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.perform_deliveries = true
+    
     # config.action_view.javascript_expansions[:defaults] = [
     #   "src/lib/jquery-1.6.0.min.js",
     #   "src/lib/jquery-ui-1.8.9.custom.min.js",
