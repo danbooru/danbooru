@@ -40,10 +40,10 @@ class Download
     end
   end
   
-  def pixiv_http_exists?
+  def pixiv_http_exists?(url)
     # example: http://img01.pixiv.net/img/as-special/15649262_big_p2.jpg
     exists = false
-    uri = URI.parse(source)
+    uri = URI.parse(url)
     Net::HTTP.start(uri.host, uri.port) do |http|
       headers = {"Referer" => "http://www.pixiv.net", "User-Agent" => "#{Danbooru.config.app_name}/#{Danbooru.config.version}"}
       http.request_head(uri.request_uri, headers) do |res|
