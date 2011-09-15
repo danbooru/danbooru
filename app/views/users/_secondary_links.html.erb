@@ -1,7 +1,6 @@
 <% content_for(:secondary_links) do %>
   <menu>
     <li><%= link_to "Listing", users_path %></li>
-    <li><%= link_to "Signup", new_user_path %></li>
     <% if @user && !@user.new_record? %>
       <li>|</li>
       <li><%= link_to "Edit", edit_user_path(@user) %></li>
