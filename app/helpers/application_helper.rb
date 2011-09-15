@@ -54,7 +54,7 @@ module ApplicationHelper
       html << " [" + link_to("&ndash;", new_user_feedback_path(:user_record => {:category => "negative", :user_id => user.id})) + "]"
     end
     
-    html
+    html.html_safe
   end
   
 protected
