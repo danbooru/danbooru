@@ -137,6 +137,21 @@ h3 {
   font-size: $h3_size; 
 }
 
+.spoiler {
+  color: black;
+  background: black;
+  cursor: text;
+  display: block;
+}
+
+.spoiler a {
+  color: black;
+}
+
+.spoiler:hover {
+  color: white;
+}
+
 div.prose {
   h1, h2, h3 {
     line-height: 1em;

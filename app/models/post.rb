@@ -24,7 +24,7 @@ class Post < ActiveRecord::Base
   has_many :versions, :class_name => "PostVersion", :dependent => :destroy, :order => "post_versions.id ASC"
   has_many :votes, :class_name => "PostVote", :dependent => :destroy
   has_many :notes, :dependent => :destroy
-  has_many :comments
+  has_many :comments, :order => "comments.id"
   has_many :children, :class_name => "Post", :foreign_key => "parent_id", :order => "posts.id"
   has_many :disapprovals, :class_name => "PostDisapproval"
   validates_uniqueness_of :md5
