@@ -258,8 +258,7 @@ Danbooru.Note = {
       $dialog.append($textarea);
       $dialog.data("id", $note_body.data("id"));
       $dialog.dialog({
-        modal: true,
-        width: 300,
+        width: 350,
         dialogClass: "note-edit-dialog",
         title: "Edit note",
         buttons: {
@@ -274,7 +273,7 @@ Danbooru.Note = {
         $(".note-box").resizable("enable");
         $(".note-box").draggable("enable");
       });
-      Danbooru.Note.editing = true;
+      // Danbooru.Note.editing = true;
     },
     
     parameterize_note: function($note_box, $note_body) {
