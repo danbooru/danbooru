@@ -35,8 +35,11 @@ class PoolsController < ApplicationController
   end
   
   def update
+    # need to do this in order for synchronize! to work correctly
     @pool = Pool.find(params[:id])
-    @pool.update_attributes(params[:pool])
+    @pool.attributes = params[:pool]
+    @pool.synchronize!
+    @pool.save
     respond_with(@pool, :notice => "Pool updated")
   end
   
