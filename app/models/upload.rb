@@ -74,7 +74,6 @@ class Upload < ActiveRecord::Base
         end
       end
     rescue Exception => x
-      raise
       update_attribute(:status, "error: #{x} - #{x.message}")
     ensure
       delete_temp_file
