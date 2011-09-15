@@ -9,7 +9,9 @@
       <li><%= link_to "Subscriptions", posts_tag_subscription_path(CurrentUser.id) %></li>
     <% end %>
     <li><%= link_to "Changes", post_versions_path %></li>
-    <li><%= link_to "Moderate", moderator_post_dashboard_path %></li>
+    <% if CurrentUser.is_janitor? %>
+      <li><%= link_to "Moderate", moderator_post_dashboard_path %></li>
+    <% end %>
     <li><%= link_to "Help", wiki_pages_path(:title => "help:posts") %></li>
   </menu>
 <% end %>

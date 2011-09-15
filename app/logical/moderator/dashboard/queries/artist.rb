@@ -6,7 +6,7 @@ module Moderator
 
         def self.all(min_date, max_level)
           sql = <<-EOS
-            SELECT artist_versions.updater_id AS user_id, count(*)
+            SELECT artist_versions.updater_id AS updater_id, count(*)
             FROM artist_versions 
             JOIN users ON users.id = artist_versions.updater_id 
             WHERE 
