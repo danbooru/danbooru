@@ -87,6 +87,16 @@ class UploadTest < ActiveSupport::TestCase
           assert_equal(28086, File.size(@upload.file_path))
           assert_equal("jpg", @upload.file_ext)
         end
+        
+        should "process a transparent png" do
+          FileUtils.cp("#{Rails.root}/test/files/alpha.png", "#{Rails.root}/tmp")
+          @upload = Upload.new(:file => upload_file("#{Rails.root}/tmp/alpha.png", "image/png", "alpha.png"))
+          assert_nothing_raised {@upload.convert_cgi_file}
+          assert_equal("image/png", @upload.content_type)
+          assert(File.exists?(@upload.file_path))
+          assert_equal(1136, File.size(@upload.file_path))
+          assert_equal("png", @upload.file_ext)
+        end
       end
 
       context "hash calculator" do
