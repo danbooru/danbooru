@@ -23,8 +23,8 @@ module PostsHelper
   
   def post_source_tag(post)
     if post.source =~ /^http/
-      text = truncate(post.source.sub(/^https?:\/\//, ""))
-      link_to(truncate(text, :length => 15), post.source)
+      text = truncate(post.normalized_source.sub(/^https?:\/\//, ""))
+      link_to(truncate(text, :length => 15), post.normalized_source)
     else
       truncate(post.source, :length => 100)
     end

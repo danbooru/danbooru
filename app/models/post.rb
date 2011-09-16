@@ -319,6 +319,20 @@ class Post < ActiveRecord::Base
         "Safe"
       end
     end
+    
+    def normalized_source
+      if source =~ /pixiv\.net\/img\//
+        img_id = source[/(\d+)(_s|_m|(_big)?_p\d+)?\.[\w\?]+\s*$/, 1]
+
+        if $2 =~ /_p/
+          "http://www.pixiv.net/member_illust.php?mode=manga&illust_id=#{img_id}"
+        else
+          "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{img_id}"
+        end
+      else
+        source
+      end
+    end
   end
   
   module TagMethods
