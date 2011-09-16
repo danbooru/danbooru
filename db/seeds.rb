@@ -24,7 +24,11 @@ CurrentUser.ip_addr = "127.0.0.1"
 if Upload.count == 0
   puts "Creating uploads"
   1.upto(100) do |i|
-    url = "http://dummyimage.com/#{i * 10}x400/000/fff"
+    color1 = rand(4096).to_s(16)
+    color2 = rand(4096).to_s(16)
+    width = rand(2000) + 100
+    height = rand(2000) + 100
+    url = "http://dummyimage.com/#{width}x#{height}/#{color1}/#{color2}"
     tags = (i * i * i).to_s.scan(/./).uniq.join(" ")
   
     Upload.create(:source => url, :content_type => "image/gif", :rating => "q", :tag_string => tags)
