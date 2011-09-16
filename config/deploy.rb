@@ -79,11 +79,6 @@ namespace :deploy do
   task :restart do
     run "touch #{current_path}/tmp/restart.txt"
   end
-  
-  desc "Compile the image resizer"
-  task :compile_image_resizer do
-    run "cd #{release_path}/lib/danbooru_image_resizer ; ruby extconf.rb ; make"
-  end
 end
 
 namespace :delayed_job do
@@ -109,7 +104,6 @@ after "deploy:setup", "local_config:setup_local_files"
 after "deploy:setup", "data:setup_directories"
 after "deploy:symlink", "local_config:link_local_files"
 after "deploy:symlink", "data:link_directories"
-after "deploy:symlink", "deploy:compile_image_resizer"
 after "deploy:start", "delayed_job:start"
 after "deploy:stop", "delayed_job:stop"
 after "deploy:restart", "delayed_job:restart"

@@ -60,7 +60,7 @@ class NoteTest < ActiveSupport::TestCase
         assert_nil(@post.last_noted_at)
         @note.update_attributes(:x => 1000)
         @post.reload
-        assert_equal(@post.last_noted_at, @note.updated_at)
+        assert_equal(@post.last_noted_at.to_i, @note.updated_at.to_i)
       end
       
       should "create a version" do

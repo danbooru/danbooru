@@ -38,4 +38,17 @@ class DownloadTest < ActiveSupport::TestCase
       assert_match(/image\/gif/, @download.content_type)
     end
   end
+  
+  context "a post download for a pixiv manga page" do
+    setup do
+      @source = "http://img65.pixiv.net/img/kiyoringo/21755794_p2.png"
+      @tempfile = Tempfile.new("danbooru-test")
+      @download = Download.new(@source, @tempfile.path)
+    end
+    
+    should "download the big version" do
+      @download.download!
+      assert_equal("http://img65.pixiv.net/img/kiyoringo/21755794_big_p2.png", @download.source)
+    end
+  end
 end

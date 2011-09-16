@@ -28,11 +28,8 @@ gem "meta_search", :git => "git://github.com/ernie/meta_search.git"
 gem "silent-postgres"
 gem "whenever", :require => false
 gem "sanitize", :git => "git://github.com/rgrove/sanitize.git"
+gem 'rmagick'
 
 group :development do
   gem 'pry'
-end
-
-group :osx do
-  gem 'mini_magick'
 end

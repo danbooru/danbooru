@@ -126,12 +126,12 @@ class Upload < ActiveRecord::Base
 
   module ResizerMethods
     def generate_resizes(source_path)
-      generate_resize_for(Danbooru.config.small_image_width, Danbooru.config.small_image_width, source_path)
+      generate_resize_for(Danbooru.config.small_image_width, Danbooru.config.small_image_width, source_path, 80)
       generate_resize_for(Danbooru.config.medium_image_width, nil, source_path)
       generate_resize_for(Danbooru.config.large_image_width, nil, source_path)
     end
 
-    def generate_resize_for(width, height, source_path)
+    def generate_resize_for(width, height, source_path, quality = 90)
       return if width.nil?
       return unless image_width > width
       return unless height.nil? || image_height > height
@@ -140,15 +140,7 @@ class Upload < ActiveRecord::Base
         raise Error.new("file not found")
       end
 
-      size = Danbooru.reduce_to({:width => image_width, :height => image_height}, {:width => width, :height => height})
-
-      # If we're not reducing the resolution, only reencode if the source image larger than
-      # 200 kilobytes.
-      if size[:width] == image_width && size[:height] == image_height && File.size?(source_path) < 200.kilobytes
-        return
-      end
-
-      Danbooru.resize(file_ext, source_path, resized_file_path_for(width), size, 90)
+      Danbooru.resize(source_path, resized_file_path_for(width), width, height, quality)
     end
   end
 
