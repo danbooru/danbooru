@@ -691,9 +691,14 @@ div#c-favorites {
 /*** Posts ***/
 
 article.post-preview {
-  margin-right: 4em;
-  margin-bottom: 4em;
+  height: 150px;
+  width: 150px;
+  margin-right: 30px;
+  margin-bottom: 30px;
+  display: inline-block;
   float: left;
+  text-align: center;
+  vertical-align: middle;
 }
 
 article.post-preview.blacklisted-active {
