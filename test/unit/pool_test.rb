@@ -248,9 +248,13 @@ class PoolTest < ActiveSupport::TestCase
   end
 
   context "An anonymous pool" do
-    should "have a name starting with anon" do
+    setup do
       user = Factory.create(:user)
-      pool = Pool.create_anonymous(user, "127.0.0.1")
+      CurrentUser.user = user
+    end
+    
+    should "have a name starting with anon" do
+      pool = Pool.create_anonymous
       assert_match(/^anon:\d+$/, pool.name)
     end
   end

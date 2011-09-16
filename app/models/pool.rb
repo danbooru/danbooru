@@ -24,10 +24,9 @@ class Pool < ActiveRecord::Base
     select_value_sql("SELECT name FROM pools WHERE id = ?", id)
   end
   
-  def self.create_anonymous(creator, creator_ip_addr)
+  def self.create_anonymous
     Pool.new do |pool|
       pool.name = "TEMP:#{Time.now.to_f}.#{rand(1_000_000)}"
-      pool.creator = creator
       pool.save
       pool.name = "anon:#{pool.id}"
       pool.save

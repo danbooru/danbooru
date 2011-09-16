@@ -15,9 +15,6 @@ echo "It will create a new user called danbooru which will run the Danbooru"
 echo "processes. It will download the latest copy and install it in"
 echo "/var/www/danbooru."
 echo
-echo "It is mostly automated but you will receive some prompts when installing"
-echo "Passenger towards the end of the script."
-echo
 echo -n "Enter the hostname for this server (ex: danbooru.donmai.us): "
 read HOSTNAME
 
@@ -64,12 +61,8 @@ gem install --no-ri --no-rdoc bundler
 
 # Install Passenger
 gem install --no-ri --no-rdoc -v 3.0.9 passenger
-rvm exec passenger-install-nginx-module -a
-rm /opt/nginx/conf/*.default
-
-if [ $? -ne 0 ]; then
-  exit 1
-fi
+rvm exec passenger-install-nginx-module --auto --auto-download --prefix=/opt
+rm -f /opt/nginx/conf/*.default
 
 # Create user account
 useradd -m danbooru
