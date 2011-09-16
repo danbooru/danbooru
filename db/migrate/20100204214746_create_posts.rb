@@ -63,6 +63,8 @@ class CreatePosts < ActiveRecord::Migration
     add_index :posts, :image_height
     add_index :posts, :source
     add_index :posts, :parent_id
+    add_index :posts, :uploader_id
+    add_index :posts, :uploader_ip_addr
     
     execute "CREATE INDEX index_posts_on_mpixels ON posts (((image_width * image_height)::numeric / 1000000.0))"
 
