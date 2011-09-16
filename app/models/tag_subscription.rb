@@ -72,6 +72,10 @@ class TagSubscription < ActiveRecord::Base
     if name
       relation = relation.where(["name ILIKE ? ESCAPE E'\\\\'", name.to_escaped_for_sql_like])
     end
+    
+    relation.each do |tag_sub|
+      tag_sub.update_column(:last_accessed_at, Time.now)
+    end
 
     relation.map {|x| x.post_ids.split(/,/)}.flatten.uniq.map(&:to_i).sort.reverse.slice(0, limit)
   end
