@@ -61,7 +61,7 @@ gem install --no-ri --no-rdoc bundler
 
 # Install Passenger
 gem install --no-ri --no-rdoc -v 3.0.9 passenger
-rvm exec passenger-install-nginx-module --auto --auto-download --prefix=/opt
+bash -c '/usr/local/rvm/bin/rvm exec passenger-install-nginx-module --auto --auto-download --prefix=/opt'
 rm -f /opt/nginx/conf/*.default
 
 # Create user account
@@ -109,9 +109,11 @@ echo "  copytruncate" >> $LOGROTATE_CONF_FILE
 echo "}" >> $LOGROTATE_CONF_FILE
 
 # Setup danbooru account
+echo
 echo "*************************************************"
 echo "* Enter a new password for the danbooru account *"
 echo "*************************************************"
+echo
 passwd danbooru
 
 sudo -u danbooru createdb danbooru2
