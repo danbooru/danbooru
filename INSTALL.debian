@@ -121,10 +121,6 @@ cd /home/danbooru
 sudo -u danbooru mkdir /home/danbooru/apps
 git clone git://github.com/r888888888/danbooru.git danbooru
 chown -R danbooru:danbooru danbooru
-cap deploy:setup
-cap deploy:update_code
-cap deploy:migrate
-chown danbooru:danbooru /var/www/danbooru/shared/log/development.log
 
 echo
 echo

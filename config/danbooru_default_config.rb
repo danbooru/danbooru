@@ -1,3 +1,5 @@
+require 'socket'
+
 module Danbooru
   class Configuration
     # The version of this Danbooru.
@@ -8,6 +10,11 @@ module Danbooru
     # The name of this Danbooru.
     def app_name
       "Danbooru"
+    end
+    
+    # The hostname of the server.
+    def hostname
+      Socket.gethostname
     end
     
     # Contact email address of the admin.
