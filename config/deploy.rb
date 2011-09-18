@@ -90,7 +90,7 @@ namespace :delayed_job do
   desc "Stop delayed_job process"
   task :stop, :roles => :app do
     run "cd #{current_path}; RAILS_ENV=#{rails_env} script/delayed_job stop"
-    run "pkill -SIGKILL -f delayed_job"
+    run "pgrep -f delayed_job | xargs kill -SIGKILL"
   end
   
   desc "Restart delayed_job process"
