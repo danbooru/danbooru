@@ -15,7 +15,7 @@ class User < ActiveRecord::Base
   
   attr_accessor :password, :old_password
   attr_accessible :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr, :time_zone, :default_image_size
-  validates_length_of :name, :within => 2..20, :on => :create
+  validates_length_of :name, :within => 2..1000, :on => :create
   validates_format_of :name, :with => /\A[^\s:]+\Z/, :on => :create, :message => "cannot have whitespace or colons"
   validates_uniqueness_of :name, :case_sensitive => false, :on => :create
   validates_uniqueness_of :email, :case_sensitive => false, :on => :create, :if => lambda {|rec| !rec.email.blank?}
@@ -122,7 +122,7 @@ class User < ActiveRecord::Base
       vowels = "aeiou"
       pass = ""
 
-      4.times do
+      6.times do
         pass << consonants[rand(21), 1]
         pass << vowels[rand(5), 1]
       end

@@ -29,6 +29,7 @@ Danbooru.Note = {
           Danbooru.Note.dragging = true;
           Danbooru.Note.clear_timeouts();
           Danbooru.Note.Body.hide_all();
+          e.stopPropagation();
         }
       )
       
@@ -37,6 +38,7 @@ Danbooru.Note = {
         function(e) {
           var $note_box_inner = $(e.currentTarget);
           Danbooru.Note.Box.resize_inner_border($note_box_inner);
+          e.stopPropagation();
         }
       );
 
@@ -44,6 +46,7 @@ Danbooru.Note = {
         "dragstop resizestop",
         function(e) {
           Danbooru.Note.dragging = false;
+          e.stopPropagation();
         }
       );
 
@@ -60,6 +63,8 @@ Danbooru.Note = {
           } else if (e.type === "mouseout") {
             Danbooru.Note.Body.hide($note_box_inner.data("id"));
           }
+
+          e.stopPropagation();
         }
       );
     },
@@ -126,6 +131,10 @@ Danbooru.Note = {
       $(".note-box").each(function(i, v) {
         Danbooru.Note.Box.descale($(v));
       });
+    },
+    
+    toggle_all: function() {
+      $(".note-box").toggle();
     }
   },
   
@@ -219,18 +228,25 @@ Danbooru.Note = {
       $note_body.mouseover(function(e) {
         var $note_body_inner = $(e.currentTarget);
         Danbooru.Note.Body.show($note_body_inner.data("id"));
+        e.stopPropagation();
       });
 
       $note_body.mouseout(function(e) {
         var $note_body_inner = $(e.currentTarget);
         Danbooru.Note.Body.hide($note_body_inner.data("id"));
+        e.stopPropagation();
       });
 
       if (Danbooru.meta("current-user-name") !== "Anonymous") {
         $note_body.click(function(e) {
           var $note_body_inner = $(e.currentTarget);
           Danbooru.Note.Edit.show($note_body_inner);
+          e.stopPropagation();
         })
+      } else {
+        $note_body.click(function(e) {
+          e.stopPropagation();
+        });
       }
     }
   },
@@ -457,5 +473,6 @@ $(function() {
     $("#note-container").width($("#image").width()).height($("#image").height());
     $(document).bind("keydown", "ctrl+n", Danbooru.Note.TranslationMode.start);
     Danbooru.Note.load_all();
+    $("#note-container").click(Danbooru.Note.Box.toggle_all);
   }
 });

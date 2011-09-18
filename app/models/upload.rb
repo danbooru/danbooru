@@ -126,7 +126,7 @@ class Upload < ActiveRecord::Base
 
   module ResizerMethods
     def generate_resizes(source_path)
-      generate_resize_for(Danbooru.config.small_image_width, Danbooru.config.small_image_width, source_path, 80)
+      generate_resize_for(Danbooru.config.small_image_width, Danbooru.config.small_image_width, source_path, 85)
       generate_resize_for(Danbooru.config.medium_image_width, nil, source_path)
       generate_resize_for(Danbooru.config.large_image_width, nil, source_path)
     end

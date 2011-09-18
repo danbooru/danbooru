@@ -1048,6 +1048,7 @@ div#c-moderator-post-dashboards {
 /*** Note Container ***/
 div#note-container {
   position: absolute;
+  z-index: 500;
   
   div.note-body {
     position: absolute;
