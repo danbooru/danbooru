@@ -44,9 +44,15 @@
   }
 
   Danbooru.Cookie.initialize = function() {
-    if (location.href.match(/^\/(comment|pool|note|post)/) && this.get("tos") != "1") {
+    var loc = location.href;
+    
+    if (loc.match(/^http/)) {
+      loc = loc.replace(/^https?:\/\/[^\/]+/, "")
+    }
+    
+    if (loc.match(/^\/(comment|pool|note|post)/) && this.get("tos") != "1") {
       // Setting location.pathname in Safari doesn't work, so manually extract the domain.
-      var domain = location.href.match(/^(http:\/\/[^\/]+)/)[0];
+      var domain = location.href.match(/^(https?:\/\/[^\/]+)/)[0];
       location.href = domain + "/static/terms_of_service?url=" + location.href;
       return;
     }
