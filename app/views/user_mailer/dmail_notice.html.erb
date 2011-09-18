@@ -3,3 +3,5 @@
 <div>
   <%= h @dmail.body %>
 </div>
+
+<p><%= link_to "View message", dmail_path(@dmail, :host => Danbooru.config.hostname, :only_path => false) %></p>
