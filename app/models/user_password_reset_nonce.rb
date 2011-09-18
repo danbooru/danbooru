@@ -4,6 +4,10 @@ class UserPasswordResetNonce < ActiveRecord::Base
   before_validation :initialize_key, :on => :create
   after_create :deliver_notice
 
+  def self.prune!
+    destroy_all(["created_at < ?"], 1.week.ago)
+  end
+
   def deliver_notice
     Maintenance::User::PasswordResetMailer.reset_request(user, self).deliver
   end
