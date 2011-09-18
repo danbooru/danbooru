@@ -1,5 +1,4 @@
 class UserPasswordResetNonce < ActiveRecord::Base
-  validates_uniqueness_of :email
   validates_presence_of :email, :key
   validate :validate_existence_of_email
   before_validation :initialize_key, :on => :create
