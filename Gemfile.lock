@@ -66,6 +66,7 @@ GEM
     execjs (1.2.8)
       multi_json (~> 1.0)
     factory_girl (2.1.0)
+    ghazel-daemons (1.0.13.1)
     hike (1.2.1)
     i18n (0.6.0)
     imagesize (0.1.1)
@@ -173,6 +174,7 @@ DEPENDENCIES
   delayed_job
   factory_girl
   ffaker!
+  ghazel-daemons
   imagesize
   mechanize
   memcache-client
