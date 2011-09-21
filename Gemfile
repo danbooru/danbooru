@@ -20,7 +20,6 @@ gem "memcache-client", :require => "memcache"
 gem "imagesize", :require => "image_size"
 gem "delayed_job"
 gem "super_exception_notifier"
-gem "haml"
 gem "simple_form"
 gem "mechanize"
 gem "nokogiri"
@@ -28,7 +27,7 @@ gem "meta_search", :git => "git://github.com/ernie/meta_search.git"
 gem "silent-postgres"
 gem "whenever", :require => false
 gem "sanitize", :git => "git://github.com/rgrove/sanitize.git"
-gem 'rmagick'
+gem 'rmagick', :require => "RMagick"
 
 group :development do
   gem 'pry'
