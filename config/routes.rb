@@ -143,6 +143,11 @@ Danbooru::Application.routes.draw do
       resource :login_reminder, :only => [:new, :create]
     end
   end
+  
+  # aliases
+  resources :wpages, :controller => "wiki_pages"
+  resources :ftopics, :controller => "forum_topics"
+  resources :fposts, :controller => "forum_posts"
 
   match "/site_map" => "static#site_map", :as => "site_map"
   match "/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"

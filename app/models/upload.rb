@@ -13,6 +13,7 @@ class Upload < ActiveRecord::Base
   after_destroy :delete_temp_file
   validate :uploader_is_not_limited
   scope :uploaded_by, lambda {|user_id| where(["uploader_id = ?", user_id])}
+  scope :pending, where(:status => "pending")
   
   module ValidationMethods
     def uploader_is_not_limited
