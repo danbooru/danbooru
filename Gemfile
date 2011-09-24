@@ -12,6 +12,7 @@ group :assets do
   gem "uglifier"
   gem "uglifier-rails"
   gem "therubyracer"
+  gem "sass"
 end
 
 gem "ghazel-daemons", :require => "daemons"
