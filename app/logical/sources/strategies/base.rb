@@ -1,4 +1,4 @@
-module ArtSiteProxies
+module Sources
   module Strategies
     class Base
       attr_reader :url, :agent

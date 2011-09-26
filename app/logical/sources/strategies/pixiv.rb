@@ -1,4 +1,4 @@
-module ArtSiteProxies
+module Sources
   module Strategies
     class Pixiv < Base
       attr_reader :artist_name, :profile_url, :image_url, :tags
@@ -29,7 +29,7 @@ module ArtSiteProxies
         end
 
         if links.any?
-          profile_url = links[0]["href"]
+          profile_url = "http://www.pixiv.net/" + links[0]["href"]
           children = links[0].children
           artist = children[0]["alt"]
           return [artist, profile_url]
@@ -54,7 +54,7 @@ module ArtSiteProxies
 
         if links.any?
           links.map do |node|
-            [node.inner_text, node.attr("href")]
+            [node.inner_text, "http://www.pixiv.net/" + node.attr("href")]
           end
         else
           []

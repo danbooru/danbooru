@@ -1,5 +1,5 @@
-module ArtSiteProxies
-  class Proxy
+module Sources
+  class Site
     attr_reader :url, :strategy
     delegate :artist_name, :profile_url, :image_url, :tags, :to => :strategy
     

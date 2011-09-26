@@ -1,6 +1,6 @@
-module ArtSiteProxies
+module Sources
   module Strategies
-    class Default < Base
+    class Pixa < Base
       def artist_name
         "?"
       end
@@ -15,6 +15,10 @@ module ArtSiteProxies
       
       def tags
         []
+      end
+      
+    protected
+      def create_agent
       end
     end
   end
