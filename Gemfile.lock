@@ -54,6 +54,7 @@ GEM
     activesupport (3.1.0)
       multi_json (~> 1.0)
     arel (2.2.1)
+    awesome_print (0.4.0)
     bcrypt-ruby (3.0.1)
     builder (3.0.0)
     chronic (0.6.4)
@@ -172,6 +173,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  awesome_print
   delayed_job
   factory_girl
   ffaker!

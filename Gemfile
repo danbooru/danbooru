@@ -33,4 +33,5 @@ gem 'rmagick', :require => "RMagick"
 
 group :development do
   gem 'pry'
+  gem 'awesome_print'
 end

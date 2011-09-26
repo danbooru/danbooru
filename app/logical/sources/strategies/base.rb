@@ -1,7 +1,7 @@
 module Sources
   module Strategies
     class Base
-      attr_reader :url, :agent
+      attr_reader :url
       
       def self.url_match?(url)
         false
@@ -9,7 +9,6 @@ module Sources
       
       def initialize(url)
         @url = url
-        @agent = create_agent
       end
       
       def get
@@ -49,7 +48,7 @@ module Sources
       end
       
     protected
-      def create_agent
+      def agent
         raise NotImplementedError
       end
     end

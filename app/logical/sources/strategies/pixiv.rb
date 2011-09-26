@@ -81,18 +81,20 @@ module Sources
         end
       end
       
-      def create_agent
-        mech = Mechanize.new
+      def agent
+        @agent ||= begin
+          mech = Mechanize.new
 
-        mech.get("http://www.pixiv.net") do |page|
-          page.form_with(:action => "/login.php") do |form|
-            form['mode'] = "login"
-            form['login_pixiv_id'] = "uroobnad"
-            form['pass'] = "uroobnad556"
-          end.click_button
+          mech.get("http://www.pixiv.net") do |page|
+            page.form_with(:action => "/login.php") do |form|
+              form['mode'] = "login"
+              form['login_pixiv_id'] = "uroobnad"
+              form['pass'] = "uroobnad556"
+            end.click_button
+          end
+
+          mech
         end
-
-        mech
       end
     end
   end
