@@ -4,6 +4,12 @@ class SourcesController < ApplicationController
   
   def show
     @source = Sources::Site.new(params[:url])
-    respond_with(@source)
+    @source.get
+    
+    respond_with(@source) do |format|
+      format.json do
+        render :json => @source.to_json
+      end
+    end
   end
 end

@@ -1,6 +1,10 @@
 module Sources
   module Strategies
     class Default < Base
+      def site_name
+        "?"
+      end
+      
       def artist_name
         "?"
       end

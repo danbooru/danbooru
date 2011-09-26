@@ -1,6 +1,10 @@
 module Sources
   module Strategies
     class Tinami < Base
+      def site_name
+        "Tinami"
+      end
+      
       def artist_name
         "?"
       end

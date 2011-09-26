@@ -1,6 +1,10 @@
 module Sources
   module Strategies
     class NicoSeiga < Base
+      def site_name
+        "Nico Seiga"
+      end
+      
       def artist_name
         "?"
       end

@@ -3,13 +3,21 @@ module Sources
     class Pixiv < Base
       attr_reader :artist_name, :profile_url, :image_url, :tags
       
-      def initialize(url)
-        super
-        get
+      def self.url_match?(url)
+        url =~ /^https?:\/\/(?:\w+\.)?pixiv\.net/
       end
       
-      def is_pixiv?
-        url =~ /pixiv\.net/
+      def initialize(url)
+        super
+      end
+      
+      def site_name
+        "Pixiv"
+      end
+      
+      def unique_id
+        image_url =~ /\/img\/([^\/]+)/
+        $1
       end
       
       def get

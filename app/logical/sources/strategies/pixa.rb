@@ -1,6 +1,10 @@
 module Sources
   module Strategies
     class Pixa < Base
+      def site_name
+        "Pixa"
+      end
+      
       def artist_name
         "?"
       end

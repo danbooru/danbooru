@@ -6,18 +6,11 @@
       <p>Before uploading, please read the <%= link_to "how to upload guide", wiki_pages_path(:title => "howto:upload") %>.</p>
     </div>
 
+    <%= render "image" %>
+    <%= render "post" %>
+    <%= render "sources/info", :source => @source %>
+    
     <%= form_for(@upload, :html => {:multipart => true, :class => "simple_form"}) do |f| %>
-      <% if params[:url] %>
-        <div id="image-preview">
-          <%= image_tag(params[:url], :title => "Preview") %>
-          <p id="scale"></p>
-        </div>
-
-        <% if @post %>
-          <p>This post was probably already uploaded (<%= link_to "post ##{@post.id}", posts_path(@post), :target => "_blank" %>).</p>
-        <% end %>
-      <% end %>
-
       <div class="input">
         <%= f.label :file %>
         <%= f.file_field :file, :size => 50 %>

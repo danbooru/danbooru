@@ -1,0 +1,15 @@
+<!-- 
+- source
+ -->
+
+<% if source.try(:available?) %>
+  <div id="source-info">
+    <p>This looks like a <%= source.site_name %> upload. <%= link_to "Fetch data", source_path(:format => "json", :url => params[:url]), :id => "fetch-data" %>.</p>
+    
+    <ul>
+      <li><strong>Artist</strong>: <span id="source-artist"></span></li>
+      <li><strong>Tags</strong>: <span id="source-tags"></span></li>
+      <li><strong>Record</strong>: <span id="source-record"></span></li>
+    </ul>
+  </div>
+<% end %>

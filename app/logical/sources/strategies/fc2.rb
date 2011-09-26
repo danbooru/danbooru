@@ -1,6 +1,10 @@
 module Sources
   module Strategies
     class Fc2 < Base
+      def site_name
+        "FC2"
+      end
+      
       def artist_name
         "?"
       end

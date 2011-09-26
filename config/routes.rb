@@ -32,7 +32,7 @@ Danbooru::Application.routes.draw do
   resources :advertisements do
     resources :hits, :controller => "advertisement_hits", :only => [:create]
   end
-  resource :art_site_proxy, :only => [:show]
+  resource :source, :only => [:show]
   resources :artists do
     member do
       put :revert
