@@ -74,8 +74,8 @@ module Sources
           mech.get("http://www.tinami.com/login") do |page|
             page.form_with do |form|
               form["action_login"] = "true"
-              form['username'] = "r888888888@gmail.com"
-              form['password'] = "uroobnad556"
+              form['username'] = Danbooru.config.tinami_login
+              form['password'] = Danbooru.config.tinami_password
               form["rem"] = "1"
             end.click_button
           end

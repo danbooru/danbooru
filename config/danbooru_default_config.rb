@@ -234,5 +234,21 @@ module Danbooru
     def select_posts_visible_to_user(user, posts)
       posts.select {|x| can_user_see_post?(x)}
     end
+    
+    def pixiv_login
+      nil
+    end
+    
+    def pixiv_password
+      nil
+    end
+    
+    def tinami_login
+      nil
+    end
+    
+    def tinami_password
+      nil
+    end
   end
 end

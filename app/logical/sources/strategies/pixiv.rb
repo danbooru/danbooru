@@ -88,8 +88,8 @@ module Sources
           mech.get("http://www.pixiv.net") do |page|
             page.form_with(:action => "/login.php") do |form|
               form['mode'] = "login"
-              form['login_pixiv_id'] = "uroobnad"
-              form['pass'] = "uroobnad556"
+              form['login_pixiv_id'] = Danbooru.config.pixiv_login
+              form['pass'] = Danbooru.config.pixiv_password
             end.click_button
           end
 
