@@ -11,11 +11,6 @@
     $("#c-uploads #fetch-data").click(function(e) {
       Danbooru.ajax_start(e.target);
       $.get(e.target.href).success(function(data) {
-        var artist_name = data.artist_name;
-        var profile_url = data.profile_url;
-        var tags = data.tags;
-        var danbooru_id = data.danbooru_id;
-        var danbooru_name = data.danbooru_name;
         var tag_html = "";
         $.each(data.tags, function(i, v) {
           var name = v[0];
@@ -26,7 +21,7 @@
         $("#source-artist").html('<a href="' + data.profile_url + '">' + data.artist_name + '</a>');
         $("#source-tags").html(tag_html);
         
-        var new_artist_link = '<a href="/artists/new?name=' + data.unique_id + '&other_names=' + data.artist_name + '&urls=' + encodeURIComponent(profile_url) + '+' + encodeURIComponent($("#image").attr("src")) + '">new</a>';
+        var new_artist_link = '<a href="/artists/new?name=' + data.unique_id + '&other_names=' + data.artist_name + '&urls=' + encodeURIComponent(data.profile_url) + '+' + encodeURIComponent($("#image").attr("src")) + '">new</a>';
 
         if (data.danbooru_id) {
           $("#source-record").html('<a href="/artists/' + data.danbooru_id + '">' + data.danbooru_name + '</a> ' + new_artist_link);
