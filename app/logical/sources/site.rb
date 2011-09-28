@@ -22,6 +22,7 @@ module Sources
       return {
         :artist_name => artist_name,
         :profile_url => profile_url,
+        :image_url => image_url,
         :tags => tags,
         :danbooru_name => artist_record.first.try(:name),
         :danbooru_id => artist_record.first.try(:id),

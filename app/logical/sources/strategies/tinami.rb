@@ -21,6 +21,8 @@ module Sources
       end
       
       def normalized_url
+        # http://localhost:3000/uploads/new?url=http%3A%2F%2Fwww.tinami.com%2Fview%2F308872
+        # http://img.tinami.com/illust2/img/259/4e82154d61e74.jpg
         url
       end
       

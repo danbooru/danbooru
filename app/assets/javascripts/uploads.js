@@ -2,8 +2,16 @@
   Danbooru.Upload = {};
   
   Danbooru.Upload.initialize_all = function() {
+    this.initialize_tinami_urls();
     this.initialize_image();
     this.initialize_info();
+  }
+  
+  Danbooru.Upload.initialize_tinami_urls = function() {
+    // var source = $("#upload_source").val();
+    // if (source.match(/http:\/\/www\.tinami\.com\/view\/(\d+)/)) {
+    //   console.log("source=%s", source);
+    // }
   }
   
   Danbooru.Upload.initialize_info = function() {
@@ -13,15 +21,13 @@
       $.get(e.target.href).success(function(data) {
         var tag_html = "";
         $.each(data.tags, function(i, v) {
-          var name = v[0];
-          var url = v[1];
-          tag_html += ('<a href="' + url + '">' + name + '</a> ');
+          tag_html += ('<a href="' + v[1] + '">' + v[0] + '</a> ');
         });
         
         $("#source-artist").html('<a href="' + data.profile_url + '">' + data.artist_name + '</a>');
         $("#source-tags").html(tag_html);
         
-        var new_artist_link = '<a href="/artists/new?name=' + data.unique_id + '&other_names=' + data.artist_name + '&urls=' + encodeURIComponent(data.profile_url) + '+' + encodeURIComponent($("#image").attr("src")) + '">new</a>';
+        var new_artist_link = '<a href="/artists/new?name=' + data.unique_id + '&other_names=' + data.artist_name + '&urls=' + encodeURIComponent(data.profile_url) + '+' + encodeURIComponent(data.image_url) + '">new</a>';
 
         if (data.danbooru_id) {
           $("#source-record").html('<a href="/artists/' + data.danbooru_id + '">' + data.danbooru_name + '</a> ' + new_artist_link);

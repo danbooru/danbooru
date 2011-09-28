@@ -1,6 +1,6 @@
 <menu class="main">
   <% if CurrentUser.user.is_anonymous? %>
-    <%= nav_link_to("Login", new_session_path, :class => "login") %>
+    <%= nav_link_to("Sign in", new_session_path, :class => "login") %>
   <% else %>
     <%= nav_link_to("My Account", user_path(CurrentUser.user)) %>
   <% end %>
