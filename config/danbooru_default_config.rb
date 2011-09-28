@@ -250,5 +250,13 @@ module Danbooru
     def tinami_password
       nil
     end
+    
+    def nico_seiga_login
+      nil
+    end
+    
+    def nico_seiga_password
+      nil
+    end
   end
 end

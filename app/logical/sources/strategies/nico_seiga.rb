@@ -1,28 +1,80 @@
 module Sources
   module Strategies
     class NicoSeiga < Base
+      attr_reader :artist_name, :profile_url, :image_url, :tags
+
+      def self.url_match?(url)
+        url =~ /^https?:\/\/(?:\w+\.)?nico(?:seiga|video)\.jp/
+      end
+
       def site_name
         "Nico Seiga"
       end
       
-      def artist_name
-        "?"
+      def get
+        url = URI.parse(normalized_url).request_uri
+        agent.get(url) do |page|
+          @artist_name, @profile_url = get_profile_from_page(page)
+          @image_url = get_image_url_from_page(page)
+          @tags = get_tags_from_page(page)
+        end
       end
       
-      def profile_url
+      def normalized_url
         url
       end
       
-      def image_url
-        url
-      end
-      
-      def tags
-        []
+      def unique_id
+        profile_url =~ /\/illust\/(\d+)/
+        "nicoseiga" + $1
       end
       
     protected
-      def create_agent
+      def get_profile_from_page(page)
+        links = page.search("div.illust_user_name a")
+
+        if links.any?
+          profile_url = "http://seiga.nicovideo.jp" + links[0]["href"]
+          artist_name = links[0].text.gsub(/<\/?strong>/, "")
+        else
+          profile_url = nil
+          artist_name = nil
+        end
+        
+        return [artist_name, profile_url].compact
+      end
+      
+      def get_image_url_from_page(page)
+        links = page.search("a#illust_link")
+
+        if links.any?
+          "http://seiga.nicovideo.jp" + links[0]["href"]
+        else
+          nil
+        end
+      end
+      
+      def get_tags_from_page(page)
+        links = page.search("div#tag_block nobr a.tag")
+
+        links.map do |node|
+          [node.text, "http://seiga.nicovideo.jp" + node.attr("href")]
+        end
+      end
+    
+      def agent
+        @agent ||= begin
+          mech = Mechanize.new
+
+          mech.get("http://seiga.nicovideo.jp/login/redirect?next_url=") do |page|
+            page.form_with do |form|
+              form["mail"] = Danbooru.config.nico_seiga_login
+              form["password"] = Danbooru.config.nico_seiga_password
+            end.click_button
+          end
+
+          mech
+        end
       end
     end
   end
