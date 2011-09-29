@@ -99,7 +99,7 @@ namespace :delayed_job do
   end
   
   task :kill, :roles => :app do
-    procs = capture("pgrep -f delayed_job").scan(/\d+/)
+    procs = capture("pgrep -f delayed_job ; true").scan(/\d+/)
     if procs.any?
       run "for i in #{procs.join(' ')} ; do kill -SIGTERM $i ; done"
     end
