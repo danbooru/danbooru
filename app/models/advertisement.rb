@@ -5,11 +5,11 @@ class Advertisement < ActiveRecord::Base
   after_destroy :delete_from_servers
 
   def copy_to_servers
-    RemoteServer.copy_to_all(image_path, image_path)
+    RemoteFileManager.new(image_path).distribute
   end
   
   def delete_from_servers
-    RemoteServer.delete_from_all(image_path)
+    RemoteFileManager.new(image_path).delete
   end
 
   def hit!(ip_addr)
