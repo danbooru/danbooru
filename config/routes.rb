@@ -150,8 +150,9 @@ Danbooru::Application.routes.draw do
   resources :ftopics, :controller => "forum_topics"
   resources :fposts, :controller => "forum_posts"
 
-  match "/site_map" => "static#site_map", :as => "site_map"
-  match "/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
+  match "/static/bookmarklet" => "static#bookmarklet", :as => "bookmarklet"
+  match "/static/site_map" => "static#site_map", :as => "site_map"
+  match "/static/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
   
   root :to => "posts#index"
 end

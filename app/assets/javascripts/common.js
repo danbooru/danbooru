@@ -46,7 +46,7 @@ $(document).ready(function() {
   if (!location.href.match(/terms_of_service/) && Danbooru.Cookie.get("tos") !== "1") {
     // Setting location.pathname in Safari doesn't work, so manually extract the domain.
     var domain = location.href.match(/^(http:\/\/[^\/]+)/)[0];
-    location.href = domain + "/terms_of_service?url=" + location.href;
+    location.href = domain + "/static/terms_of_service?url=" + location.href;
   }
   
   $("#tos-agree-link").click(function() {
