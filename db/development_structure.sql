@@ -2357,7 +2357,8 @@ CREATE TABLE tag_subscriptions (
     post_ids text NOT NULL,
     is_public boolean DEFAULT true NOT NULL,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    last_accessed_at timestamp without time zone
 );
 
 
