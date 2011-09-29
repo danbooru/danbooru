@@ -7,10 +7,6 @@ module Sources
         url =~ /^https?:\/\/(?:\w+\.)?pixiv\.net/
       end
       
-      def initialize(url)
-        super
-      end
-      
       def site_name
         "Pixiv"
       end

@@ -258,5 +258,13 @@ module Danbooru
     def nico_seiga_password
       nil
     end
+    
+    def pixa_login
+      nil
+    end
+    
+    def pixa_password
+      nil
+    end
   end
 end
