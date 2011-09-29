@@ -4,7 +4,7 @@ module Sources
     delegate :get, :site_name, :artist_name, :artist_alias, :profile_url, :image_url, :tags, :artist_record, :unique_id, :to => :strategy
     
     def self.strategies
-      [Strategies::Fc2, Strategies::NicoSeiga, Strategies::Pixa, Strategies::Pixiv, Strategies::Tinami, Strategies::Default]
+      [Strategies::NicoSeiga, Strategies::Pixa, Strategies::Pixiv, Strategies::Tinami, Strategies::Default]
     end
     
     def initialize(url)
