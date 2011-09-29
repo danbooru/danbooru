@@ -94,7 +94,15 @@ namespace :delayed_job do
   
   desc "Restart delayed_job process"
   task :restart, :roles => :app do
-    run "cd #{current_path}; RAILS_ENV=#{rails_env} script/delayed_job restart"
+    find_and_execute_task("delayed_job:stop")
+    find_and_execute_task("delayed_job:start")
+  end
+  
+  task :kill, :roles => :app do
+    procs = capture("pgrep -f delayed_job").scan(/\d+/)
+    if procs.any?
+      run "for i in #{procs.join(' ')} ; do kill -SIGTERM $i ; done"
+    end
   end
 end
 
@@ -109,4 +117,4 @@ after "deploy:stop", "delayed_job:stop"
 after "deploy:restart", "delayed_job:restart"
 before "deploy:update", "deploy:web:disable"
 after "deploy:restart", "deploy:web:enable"
-
+after "delayed_job:stop", "delayed_job:kill"
