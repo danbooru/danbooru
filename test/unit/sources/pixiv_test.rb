@@ -10,8 +10,19 @@ module Sources
         @site.get
       end
       
-      should "get a single post" do
+      should "get the profile" do
         assert_equal("http://www.pixiv.net/member.php?id=4015", @site.profile_url)
+      end
+      
+      should "get the artist name" do
+        assert_equal("シビレ罠", @site.artist_name)
+      end
+      
+      should "get the image url" do
+        assert_equal("http://img01.pixiv.net/img/nisieda/9646484.jpg", @site.image_url)
+      end
+      
+      should "get the tags" do
         assert(@site.tags.size > 0)
         first_tag = @site.tags.first
         assert_equal(2, first_tag.size)
