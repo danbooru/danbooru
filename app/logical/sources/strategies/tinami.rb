@@ -1,8 +1,6 @@
 module Sources
   module Strategies
     class Tinami < Base
-      attr_reader :artist_name, :profile_url, :image_url, :tags
-
       def self.url_match?(url)
         url =~ /^https?:\/\/(?:\w+\.)?tinami\.com/
       end
@@ -11,24 +9,17 @@ module Sources
         "Tinami"
       end
       
+      def unique_id
+        profile_url =~ /\/profile\/(\d+)/
+        "tinami" + $1
+      end
+      
       def get
-        url = URI.parse(normalized_url).request_uri
-        agent.get(url) do |page|
+        agent.get(URI.parse(url).request_uri) do |page|
           @artist_name, @profile_url = get_profile_from_page(page)
           @image_url = get_image_url_from_page(page)
           @tags = get_tags_from_page(page)
         end
-      end
-      
-      def normalized_url
-        # http://localhost:3000/uploads/new?url=http%3A%2F%2Fwww.tinami.com%2Fview%2F308872
-        # http://img.tinami.com/illust2/img/259/4e82154d61e74.jpg
-        url
-      end
-      
-      def unique_id
-        profile_url =~ /\/profile\/(\d+)/
-        "tinami" + $1
       end
       
     protected

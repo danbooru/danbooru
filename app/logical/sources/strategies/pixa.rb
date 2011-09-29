@@ -1,8 +1,6 @@
 module Sources
   module Strategies
     class Pixa < Base
-      attr_reader :artist_name, :profile_url, :image_url, :tags
-
       def self.url_match?(url)
         url =~ /^https?:\/\/(?:\w+\.)?pixa\.cc/
       end
@@ -12,8 +10,8 @@ module Sources
       end
       
       def unique_id
-        image_url =~ /\/img\/([^\/]+)/
-        $1
+        profile_url =~ /\/show\/([^\/]+)/
+        "pixa" + $1
       end
       
       def get
@@ -25,6 +23,7 @@ module Sources
       end
       
     protected
+    
       def get_profile_from_page(page)
         links = page.search("p.profile_name a")
 

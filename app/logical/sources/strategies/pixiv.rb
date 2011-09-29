@@ -1,8 +1,6 @@
 module Sources
   module Strategies
     class Pixiv < Base
-      attr_reader :artist_name, :profile_url, :image_url, :tags
-      
       def self.url_match?(url)
         url =~ /^https?:\/\/(?:\w+\.)?pixiv\.net/
       end
@@ -17,8 +15,7 @@ module Sources
       end
       
       def get
-        url = URI.parse(normalized_url).request_uri
-        agent.get(url) do |page|
+        agent.get(URI.parse(normalized_url).request_uri) do |page|
           @artist_name, @profile_url = get_profile_from_page(page)
           @image_url = get_image_url_from_page(page)
           @tags = get_tags_from_page(page)
@@ -26,7 +23,7 @@ module Sources
       end
 
     protected
-      
+    
       def get_profile_from_page(page)
         links = page.search("div.front-subContent a").find_all do |node|
           node["href"] =~ /member\.php/

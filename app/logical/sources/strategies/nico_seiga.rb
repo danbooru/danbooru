@@ -1,8 +1,6 @@
 module Sources
   module Strategies
     class NicoSeiga < Base
-      attr_reader :artist_name, :profile_url, :image_url, :tags
-
       def self.url_match?(url)
         url =~ /^https?:\/\/(?:\w+\.)?nico(?:seiga|video)\.jp/
       end
@@ -11,25 +9,21 @@ module Sources
         "Nico Seiga"
       end
       
+      def unique_id
+        profile_url =~ /\/illust\/(\d+)/
+        "nicoseiga" + $1
+      end
+
       def get
-        url = URI.parse(normalized_url).request_uri
-        agent.get(url) do |page|
+        agent.get(URI.parse(url).request_uri) do |page|
           @artist_name, @profile_url = get_profile_from_page(page)
           @image_url = get_image_url_from_page(page)
           @tags = get_tags_from_page(page)
         end
       end
       
-      def normalized_url
-        url
-      end
-      
-      def unique_id
-        profile_url =~ /\/illust\/(\d+)/
-        "nicoseiga" + $1
-      end
-      
     protected
+    
       def get_profile_from_page(page)
         links = page.search("div.illust_user_name a")
 
