@@ -1,4 +1,18 @@
 <div id="terms-of-service">
+  <h1>Danbooru 2 Beta</h1>
+  
+  <p>Danbooru 2 is a rewrite of the original Danbooru source code. Most functionality remains the same. The goal is to create a cleaner architecture so that extending and expanding the site will be easier. The goal of the beta is to test the code and make sure all the pieces are working.</p>
+  <p>This test database is independent of the Danbooru database. That means your account has not been copied over. <strong>You will have to create a new account on Testbooru in order to start contributing.</strong> This is only to make testing easier; the eventual goal is to migrate the old Danbooru database to the new code. But that will come much later.</p>
+  <p>You are encouraged to upload, comment, note, and do everything in your power to break the site. If you notice any bugs or any inconsistencies with the old site, there's an issue tracker on <a href="https://github.com/r888888888/danbooru/issues/new">Github</a> that you can use. If you would rather not create a new Github account, you can post comments on <a href="http://danbooru.donmai.us/forum/show/65870">the forum</a>.</p>
+  <p>Some of the major change from the original Danbooru are:</p>
+  <ul>
+    <li><strong>An upload queue.</strong> Uploads are now added to a queue and processed sequentially.</li>
+    <li><strong>Small and large images.</strong> All images now get a small and large version.</li>
+  </ul>
+
+  <p><%= link_to("Continue", params[:url] || "/", :id => "tos-agree-link") %></p>  
+
+  <!--
   <h1>Terms of Service</h1>
   
   <section>
@@ -56,6 +70,9 @@
     <h1>Agreement</h1>
     <p>By clicking on the "I Agree" link, you have read all the terms and have agreed to them.</p>
     <p><%= link_to("I Agree", params[:url] || "/", :id => "tos-agree-link") %> | <%= link_to("Cancel", "http://www.google.com") %></p>
-  </section> 
+  </section>
+  -->
+  
+  
 </div>
 

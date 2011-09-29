@@ -1211,7 +1211,6 @@ div#news-ticker {
 
 div#terms-of-service {
   width: 40em;
-  margin: 5em auto;
   
   h1 {
     font-size: $h2_size;
@@ -1223,6 +1222,7 @@ div#terms-of-service {
   
   ul {
     margin-left: 1em;
+    margin-bottom: 1em;
   }
   
   li {
