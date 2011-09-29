@@ -1,7 +1,7 @@
 module Sources
   class Site
     attr_reader :url, :strategy
-    delegate :get, :site_name, :artist_name, :artist_alias, :profile_url, :image_url, :tags, :artist_record, :unique_id, :to => :strategy
+    delegate :get, :site_name, :artist_name, :profile_url, :image_url, :tags, :artist_record, :unique_id, :to => :strategy
     
     def self.strategies
       [Strategies::NicoSeiga, Strategies::Pixa, Strategies::Pixiv, Strategies::Tinami]
