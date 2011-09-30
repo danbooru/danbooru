@@ -238,7 +238,7 @@ class Upload < ActiveRecord::Base
 
     # Downloads the file to destination_path
     def download_from_source(destination_path)
-      download = Download.new(source, destination_path)
+      download = Downloads::File.new(source, destination_path)
       download.download!
       self.file_path = destination_path
       self.content_type = download.content_type || file_ext_to_content_type(source)
