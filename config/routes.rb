@@ -33,6 +33,7 @@ Danbooru::Application.routes.draw do
     resources :hits, :controller => "advertisement_hits", :only => [:create]
   end
   resource :source, :only => [:show]
+  resource :related_tag, :only => [:show]
   resources :artists do
     member do
       put :revert

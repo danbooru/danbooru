@@ -20,7 +20,15 @@ class RelatedTagQuery
     wiki_page.try(:tags) || []
   end
   
+  def to_json
+    {:query => query, :category => category, :tags => map_with_category_data(tags), :wiki_page_tags => map_with_category_data(wiki_page_tags)}.to_json
+  end
+  
 protected
+  
+  def map_with_category_data(list_of_tag_names)
+    Tag.categories_for(list_of_tag_names).to_a
+  end
   
   def pattern_matching_tags
     Tag.name_matches(query).order("post_count desc").limit(50).sort_by {|x| x.name}.map(&:name)

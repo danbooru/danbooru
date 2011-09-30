@@ -24,6 +24,10 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       should "work" do
         assert_equal(["aaa", "bbb", "ccc"], @query.tags)
       end
+      
+      should "render the json" do
+        assert_equal("{\"query\":\"aaa\",\"category\":\"\",\"tags\":[[\"aaa\",0],[\"bbb\",0],[\"ccc\",0]],\"wiki_page_tags\":[]}", @query.to_json)
+      end
     end
     
     context "for a tag that doesn't exist" do

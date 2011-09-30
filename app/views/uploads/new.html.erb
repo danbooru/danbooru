@@ -38,9 +38,18 @@
       </div>
 
       <div class="input">
-        <%= f.label :tag_string, "Tags" %>
-        <%= f.text_area :tag_string, :size => "60x4" %>
+        <div>
+          <%= f.label :tag_string, "Tags" %>
+          <%= f.text_area :tag_string, :size => "60x4" %>
+        </div>
+        
+        <%= button_tag "Related tags", :id => "related-tags-button" %>
+        <%= button_tag "Artists", :id => "related-artists-button" %>
+        <%= button_tag "Characters", :id => "related-characters-button" %>
+        <%= button_tag "Copyrights", :id => "related-copyrights-button" %>
       </div>
+      
+      <div id="related-tags"></div>
 
       <div class="input">
         <%= submit_tag "Submit" %>
