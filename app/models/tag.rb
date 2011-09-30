@@ -2,7 +2,8 @@ class Tag < ActiveRecord::Base
   attr_accessible :category
   after_save :update_category_cache
   has_one :wiki_page, :foreign_key => "name", :primary_key => "title"
-  scope :name_matches, lambda {|name| where(["name LIKE ? ESCAPE E'\\\\'", name.to_escaped_for_sql_like])}
+  scope :name_matches, lambda {|name| where("name LIKE ? ESCAPE E'\\\\'", name.to_escaped_for_sql_like)}
+  scope :named, lambda {|name| where("name = ?", TagAlias.to_aliased([name]).join(""))}
   search_methods :name_matches
 
   class CategoryMapping
@@ -310,8 +311,9 @@ class Tag < ActiveRecord::Base
   module RelationMethods
     def update_related
       return unless should_update_related?
-      counts = RelatedTagCalculator.calculate_from_sample(Danbooru.config.post_sample_size, name)
-      update_attributes(:related_tags => RelatedTagCalculator.convert_hash_to_string(counts), :related_tags_updated_at => Time.now)
+      self.related_tags = RelatedTagCalculator.calculate_from_sample_to_array(name).join(" ")
+      self.related_tags_updated_at = Time.now
+      save
     end
     
     def update_related_if_outdated

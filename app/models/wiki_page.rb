@@ -88,4 +88,14 @@ class WikiPage < ActiveRecord::Base
   def presenter
     @presenter ||= WikiPagePresenter.new(self)
   end
+  
+  def tags
+    body.scan(/\[\[(.+?)\]\]/).flatten.map do |match|
+      if match =~ /^(.+?)\|(.+)/
+        $1
+      else
+        match
+      end
+    end.map {|x| x.downcase.tr(" ", "_")}
+  end
 end
