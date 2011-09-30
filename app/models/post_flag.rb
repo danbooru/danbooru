@@ -9,8 +9,9 @@ class PostFlag < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   validates_uniqueness_of :creator_id, :scope => :post_id, :message => "has already flagged this post"
   before_save :update_post
-  scope :resolved, where(["is_resolved = ?", true])
-  scope :unresolved, where(["is_resolved = ?", false])
+  scope :resolved, where("is_resolved = ?", true)
+  scope :unresolved, where("is_resolved = ?", false)
+  scope :old, lambda {where("created_at <= ?", 3.days.ago)}
   
   def update_post
     post.update_column(:is_flagged, true)

@@ -299,6 +299,7 @@ class Post < ActiveRecord::Base
       self.is_deleted = false
       self.approver_id = CurrentUser.id
       save!
+      ModAction.create(:description => "approved post ##{id}")
     end
   end
   
@@ -900,6 +901,7 @@ class Post < ActiveRecord::Base
         update_column(:is_deleted, true)
         update_parent_on_destroy
         tag_array.each {|x| expire_cache(x)}
+        ModAction.create(:description => "deleted post ##{id}")
       end
     end
     
@@ -907,6 +909,7 @@ class Post < ActiveRecord::Base
       update_column(:is_deleted, false)
       tag_array.each {|x| expire_cache(x)}
       update_parent_on_save
+      ModAction.create(:description => "undeleted post ##{id}")
     end
   end
   
