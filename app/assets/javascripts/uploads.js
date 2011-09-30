@@ -2,16 +2,32 @@
   Danbooru.Upload = {};
   
   Danbooru.Upload.initialize_all = function() {
-    this.initialize_tinami_urls();
     this.initialize_image();
     this.initialize_info();
+    this.initialize_similar();
   }
-  
-  Danbooru.Upload.initialize_tinami_urls = function() {
-    // var source = $("#upload_source").val();
-    // if (source.match(/http:\/\/www\.tinami\.com\/view\/(\d+)/)) {
-    //   console.log("source=%s", source);
-    // }
+
+  Danbooru.Upload.initialize_similar = function() {
+    $("#similar-button").click(function(e) {
+      var old_source_name = $("#upload_source").attr("name");
+  		var old_file_name = $("#upload_file").attr("name")
+  		var old_target = $("#form").attr("target");
+  		var old_action = $("#form").attr("action");
+
+  		$("#upload_source").attr("name", "url");
+  		$("#upload_file").attr("name", "file");
+  		$("#form").attr("target", "_blank");
+  		$("#form").attr("action", "http://danbooru.iqdb.hanyuu.net/");
+
+  		$("form").trigger("submit");
+
+  		$("#upload_source").attr("name", old_source_name);
+  		$("#upload_file").attr("name", old_file_name);
+  		$("#form").attr("target", old_target);
+  		$("#form").attr("action", old_action);
+  		
+  		e.preventDefault();
+    });
   }
   
   Danbooru.Upload.initialize_info = function() {

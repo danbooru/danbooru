@@ -10,7 +10,7 @@
     <%= render "post" %>
     <%= render "sources/info", :source => @source %>
     
-    <%= form_for(@upload, :html => {:multipart => true, :class => "simple_form"}) do |f| %>
+    <%= form_for(@upload, :html => {:multipart => true, :class => "simple_form", :id => 'form'}) do |f| %>
       <div class="input">
         <%= f.label :file %>
         <%= f.file_field :file, :size => 50 %>
@@ -19,6 +19,7 @@
       <div class="input">
         <%= f.label :source, nil, :title => "You can enter a URL to have #{Danbooru.config.app_name} automatically download and process it" %>
         <%= f.text_field :source, :size => 50, :value => params[:url] %>
+        <%= button_tag "Similar", :id => "similar-button" %>
       </div>
       
       <div class="input">
