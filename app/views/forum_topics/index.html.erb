@@ -14,9 +14,23 @@
       <tbody>
         <% @forum_topics.each do |topic| %>
           <tr>
-            <td><% if topic.is_sticky? %><span class="sticky">Sticky:</span> <% end %><%= link_to topic.title, forum_topic_path(topic) %></td>
-            <td><%= topic.creator.name %></td>
-            <td><%= topic.updater.name %></td>
+            <td>
+              <% if topic.is_sticky? %>
+                <span class="sticky">Sticky:</span>
+              <% end %>
+              
+              <%= link_to topic.title, forum_topic_path(topic) %>
+
+              <% if topic.response_count > 30 %>
+                <%= link_to "last", forum_topic_path(topic, :page => (topic.response_count / 30.0).ceil), :class => "last-page" %>
+              <% end %>
+
+              <% if topic.is_locked? %>
+                <span class="locked-topic">(locked)</span>
+              <% end %>
+            </td>
+            <td><%= link_to topic.creator.name, user_path(topic.creator) %></td>
+            <td><%= link_to topic.updater.name, user_path(topic.updater) %></td>
             <td><%= compact_time topic.updated_at %></td>
           </tr>
         <% end %>
