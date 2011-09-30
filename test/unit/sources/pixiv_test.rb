@@ -6,7 +6,7 @@ module Sources
   class PixivTest < ActiveSupport::TestCase
     context "The source site for pixiv" do
       setup do
-        @site = Sources::Site.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=9646484")
+        @site = Sources::Site.new("http://www.pixiv.net/member_illust.php?mode=big&illust_id=9646484")
         @site.get
       end
       

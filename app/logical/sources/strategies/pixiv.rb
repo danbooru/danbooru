@@ -25,12 +25,12 @@ module Sources
     protected
     
       def get_profile_from_page(page)
-        links = page.search("div.front-subContent a").find_all do |node|
+        links = page.search("div.profile_area a.avatar_m").find_all do |node|
           node["href"] =~ /member\.php/
         end
 
         if links.any?
-          profile_url = "http://www.pixiv.net/" + links[0]["href"]
+          profile_url = "http://www.pixiv.net" + links[0]["href"]
           children = links[0].children
           artist = children[0]["alt"]
           return [artist, profile_url]
@@ -49,13 +49,13 @@ module Sources
       end
       
       def get_tags_from_page(page)
-        links = page.search("div.pedia li a").find_all do |node|
+        links = page.search("span#tags a").find_all do |node|
           node["href"] =~ /tags\.php/
         end
 
         if links.any?
           links.map do |node|
-            [node.inner_text, "http://www.pixiv.net/" + node.attr("href")]
+            [node.inner_text, "http://www.pixiv.net" + node.attr("href")]
           end
         else
           []
@@ -66,6 +66,8 @@ module Sources
         @normalized_url ||= begin
           if url =~ /\/(\d+)(_m|_p\d+)?\.(jpg|jpeg|png|gif)/i
             "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
+          elsif url =~ /mode=big/
+            url.sub(/mode=big/, "mode=medium")
           elsif url =~ /member_illust\.php/ && url =~ /illust_id=/
             url
           else
@@ -80,8 +82,7 @@ module Sources
 
           mech.get("http://www.pixiv.net") do |page|
             page.form_with(:action => "/login.php") do |form|
-              form['mode'] = "login"
-              form['login_pixiv_id'] = Danbooru.config.pixiv_login
+              form['pixiv_id'] = Danbooru.config.pixiv_login
               form['pass'] = Danbooru.config.pixiv_password
             end.click_button
           end

@@ -26,7 +26,11 @@ module Sources
       end
       
       def artist_record
-        Artist.other_names_match(artist_name)
+        if artist_name.present?
+          Artist.other_names_match(artist_name)
+        else
+          nil
+        end
       end
       
     protected

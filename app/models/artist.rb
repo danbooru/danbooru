@@ -60,7 +60,7 @@ class Artist < ActiveRecord::Base
   module NameMethods
     module ClassMethods
       def normalize_name(name)
-        name.downcase.strip.gsub(/ /, '_')
+        name.to_s.downcase.strip.gsub(/ /, '_')
       end
     end
     
