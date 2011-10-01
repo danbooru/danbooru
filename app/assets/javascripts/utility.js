@@ -35,6 +35,16 @@
     return all;
   }
   
+  Danbooru.without = function(array, element) {
+    var temp = [];
+    $.each(array, function(i, v) {
+      if (v !== element) {
+        temp.push(v);
+      }
+    });
+    return temp;
+  }
+  
   Danbooru.reject = function(array, f) {
     var filtered = [];
     $.each(array, function(i, x) {

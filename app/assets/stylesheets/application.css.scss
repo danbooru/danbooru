@@ -261,18 +261,20 @@ header#top {
   }
   
   menu {
+    margin-top: -2px;
     background: #F7F7FF;
-    padding: 5px 20px;
+    padding: 6px 20px;
     
-    li {
-      padding: 5px 10px;
+    li a {
+      padding: 6px 10px;
     }
   }
   
   menu.main {
+    margin-top: 0px;
     background: white;
     
-    li.current {
+    li.current a {
       background: #F7F7FF;
       font-weight: bold;
     }
