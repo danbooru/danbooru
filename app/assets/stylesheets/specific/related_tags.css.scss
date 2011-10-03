@@ -4,9 +4,15 @@ div#related-tags {
   overflow: auto;
   width: 100%;
   margin-bottom: 1em;
+  padding: 1em;
+  background: #EEE;
   
   div.artist {
     margin-bottom: 1em;
+  }
+  
+  div.artist:last-child {
+    margin-bottom: 0;
   }
   
   div.tag-column {
@@ -15,6 +21,8 @@ div#related-tags {
     float: left;
     
     ul {
+      margin: 0;
+      
       li {
         padding: 0.25em 0.5em;
         
