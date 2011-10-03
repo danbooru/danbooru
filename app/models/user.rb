@@ -282,7 +282,7 @@ class User < ActiveRecord::Base
     def can_upload?
       if is_contributor?
         true
-      elsif created_at > 1.second.ago
+      elsif false && created_at > 1.week.ago
         false
       else
         upload_limit > 0
@@ -292,7 +292,7 @@ class User < ActiveRecord::Base
     def can_comment?
       if is_privileged?
         true
-      elsif created_at > 1.week.ago
+      elsif false && created_at > 1.week.ago
         false
       else
         Comment.where("creator_id = ? and created_at > ?", id, 1.hour.ago).count < Danbooru.config.member_comment_limit

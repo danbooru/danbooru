@@ -28,7 +28,12 @@ class Comment < ActiveRecord::Base
   end
 
   def validate_creator_is_not_limited
-    creator.is_privileged? || Comment.where("creator_id = ? AND created_at >= ?", creator_id, 1.hour.ago).count < 5
+    if creator.can_comment?
+      true
+    else
+      errors.add(:creator, "can not post comments within 1 week of sign up, and can only post #{Danbooru.config.member_comment_limit} comments per hour after that")
+      false
+    end
   end
 
   def update_last_commented_at

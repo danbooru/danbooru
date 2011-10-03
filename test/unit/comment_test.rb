@@ -7,6 +7,7 @@ class CommentTest < ActiveSupport::TestCase
       CurrentUser.user = user
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
+      Danbooru.config.stubs(:member_comment_limit).returns(100)
     end
     
     teardown do
