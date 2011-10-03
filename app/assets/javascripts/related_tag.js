@@ -59,7 +59,7 @@
     
     $dest.append(Danbooru.RelatedTag.build_html(query, related_tags));
     if (wiki_page_tags.length > 0) {
-      $dest.append(Danbooru.RelatedTag.build_html("wiki:" + query), wiki_page_tags);
+      $dest.append(Danbooru.RelatedTag.build_html("wiki:" + query, wiki_page_tags));
     }
   }
   
@@ -85,8 +85,8 @@
       $link.addClass("tag-type-" + tag[1]);
       $link.attr("href", "/posts?tags=" + encodeURIComponent(tag[0]));
       $link.click(Danbooru.RelatedTag.toggle_tag);
-      if ($.inArray(tag, current)) {
-        $link.addClass("active");
+      if ($.inArray(tag[0], current) > -1) {
+        $link.addClass("selected");
       }
       $ul.append(
         $("<li/>").append($link)
@@ -102,7 +102,7 @@
     var tags = $field.val().match(/\S+/g) || [];
     var tag = $(e.target).html().replace(/ /g, "_");
 
-    if ($.inArray(tag, tags)) {
+    if ($.inArray(tag, tags) > -1) {
       $field.val(Danbooru.without(tags, tag).join(" ") + " ");
     } else {
       $field.val(tags.concat([tag]).join(" ") + " ");

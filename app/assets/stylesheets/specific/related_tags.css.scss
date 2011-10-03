@@ -1,0 +1,34 @@
+@import "../common/000_vars.css.scss";
+
+div#related-tags {
+  overflow: auto;
+  width: 100%;
+  margin-bottom: 1em;
+  
+  div.tag-column {
+    max-width: 15em;
+    margin-right: 2em;
+    float: left;
+    
+    ul {
+      li {
+        padding: 0.25em 0.5em;
+        
+        em {
+          padding: 0.25em 0.5em;
+          font-weight: bold;
+        }
+        
+        a {
+          padding: 0.25em 0.5em;
+          min-width: 3em;
+        }
+        
+        a.selected {
+          background-color: $link_color;
+          color: white;
+        }
+      }
+    }
+  }
+}

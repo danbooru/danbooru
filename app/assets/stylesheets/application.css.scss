@@ -1,37 +1,6 @@
 /*
  *= require "smoothness/jquery-ui-1.8.5.custom.css"
  *= require_self
+ *= require_tree "./common"
+ *= require_tree "./specific"
 */
-
-@import "common/000_vars.css.scss";
-@import "common/010_reset.css.scss";
-@import "common/020_base.css.scss";
-@import "common/030_links.css.scss";
-@import "common/dtext.css.scss";
-@import "common/inline.css.scss";
-@import "common/jquery_ui_custom.css.scss";
-@import "common/main_layout.css.scss";
-@import "common/news.css.scss";
-@import "common/notices.css.scss";
-@import "common/page_header.css.scss";
-@import "common/paginator.css.scss";
-@import "common/simple_form.css.scss";
-@import "common/spoiler.css.scss";
-@import "common/tables.css.scss";
-
-@import "specific/artists.css.scss";
-@import "specific/comments.css.scss";
-@import "specific/favorites.css.scss";
-@import "specific/forum.css.scss";
-@import "specific/moderator_dashboard.css.scss";
-@import "specific/notes.css.scss";
-@import "specific/pools.css.scss";
-@import "specific/post_mode_menu.css.scss";
-@import "specific/posts.css.scss";
-@import "specific/related_tags.css.scss";
-@import "specific/sessions.css.scss";
-@import "specific/site_map.css.scss";
-@import "specific/terms_of_service.css.scss";
-@import "specific/uploads.css.scss";
-@import "specific/users.css.scss";
-@import "specific/wiki_pages.css.scss";
