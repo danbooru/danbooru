@@ -97,7 +97,7 @@
     return $div;
   }
   
-  Danbooru.RelatedTag.toggle = function(e) {
+  Danbooru.RelatedTag.toggle_tag = function(e) {
     var $field = $("#upload_tag_string,#post_tag_string");
     var tags = $field.val().match(/\S+/g) || [];
     var tag = $(e.target).html().replace(/ /g, "_");

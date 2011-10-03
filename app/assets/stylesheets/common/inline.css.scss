@@ -1,0 +1,14 @@
+span.error {
+  display: block;
+  font-weight: bold;
+  color: red;
+}
+
+span.link {
+  color: $link_color;
+  cursor: pointer;
+}
+
+span.wait {
+  color: #CCC;
+}

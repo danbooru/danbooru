@@ -1,0 +1,45 @@
+div.prose {
+  h1, h2, h3 {
+    line-height: 1em;
+  }
+  
+  h1 {
+    padding: $h1_padding; 
+  }
+
+  h2 { 
+    padding: $h2_padding; 
+  }
+
+  h3 { 
+    padding: $h3_padding; 
+  }
+
+  ul {
+    margin-left: 1em;
+    margin-bottom: 1em;
+    
+    ul {
+      margin-bottom: 0;
+    }
+  }
+  
+  li {
+    list-style-type: disc;
+  }
+}
+
+div.dtext {
+  width: 30em;
+  
+  ul {
+    margin-left: 1em;
+  }
+}
+
+div.dtext-preview {
+  border: 2px dashed #AAA;
+  padding: 1em;
+  margin: 1em 0;
+  width: 30em;
+}

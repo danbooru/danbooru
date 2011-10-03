@@ -1,0 +1,47 @@
+div#search {
+  margin-bottom: 1em;
+}
+
+div#page {
+  margin: 0 30px;
+  
+  aside#sidebar {
+    width: 20%;
+    float: left;
+    
+    h1 {
+      font-size: $h3_size;
+    }
+    
+    ul {
+      list-style-type: none;
+    }
+    
+    input[type=text] {
+      width: 10em;
+    }
+  }
+
+  aside#sidebar > section {
+    margin-bottom: 1em;
+  }
+
+  section#content {
+    width: 75%;
+    float: left;
+    margin-left: 2em;
+    overflow: visible;
+  }
+}
+
+footer#page-footer {
+  clear: both;
+  margin: 1em;
+  text-align: center;
+  padding-top: 1em;
+  border-top: 1px solid #EEE;
+}
+
+div.clearfix {
+  clear: both;
+}

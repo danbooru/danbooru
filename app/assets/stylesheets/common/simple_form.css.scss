@@ -1,0 +1,48 @@
+form.simple_form {
+  margin: 0 0 1em 0;
+  
+  div.input.boolean {
+    label {
+      display: inline;
+    }
+  }
+  
+  div.input {
+    margin-bottom: 1em;
+    
+    input[type=text], input[type=file], input[type=password], input[type=email] {
+      width: 20em;
+    }
+    
+    textarea {
+      width: 30em;
+    }
+    
+    label {
+      display: block;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    span.hint {
+      color: #666;
+      font-style: italic;
+      display: block;
+    }
+    
+    fieldset {
+      border: none;
+      display: inline;
+      margin: 0;
+      padding: 0;
+      
+      label {
+        font-weight: normal;
+        width: auto;
+        margin-right: 2em;
+        display: inline;
+      }
+    }
+  }
+}
+

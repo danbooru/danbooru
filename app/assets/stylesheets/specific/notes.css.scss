@@ -1,0 +1,45 @@
+div#note-container {
+  position: absolute;
+  z-index: 500;
+  
+  div.note-body {
+    position: absolute;
+    border: 1px solid black;
+    background: white;
+    min-width: 5em;
+    min-height: 1em;
+    cursor: pointer;
+    padding: 4px;
+    z-index: 1000;
+    overflow: auto;
+    
+    p.tn {
+      font-size: 0.8em;
+      color: gray;
+    }
+  }
+  
+  div.note-box {
+    position: absolute;
+    border: 1px solid white;
+    min-width: 20px;
+    min-height: 20px;
+    width: 100px;
+    height: 100px;
+    cursor: move;
+    background: transparent;
+    
+    div.note-box-inner-border {
+      border: 1px solid black;
+      background: white;
+    }
+    
+    div.note-box-inner-border.unsaved {
+      border: 1px solid red;
+    }
+  }
+}
+
+div.note-edit-dialog {
+  font-size: 0.8em;
+}

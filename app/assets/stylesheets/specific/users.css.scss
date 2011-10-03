@@ -1,0 +1,42 @@
+div#c-users {
+  div#a-new {
+    max-width: 60em;
+    
+    p {
+      margin-bottom: 1em;
+    }
+    
+    li {
+      margin-left: 1em;
+      list-style-type: disc;
+    }
+    
+    div#account-comparison {
+      h1 {
+        font-size: $h2_size;
+      }
+      
+      li {
+        font-size: 0.8em;
+        line-height: 1.5em;
+      }
+      
+      section {
+        width: 18em;
+        float: left;
+        padding: 1em;
+      }
+    }
+    
+    footer.nav-links {
+      font-size: 1.4545em;
+      font-weight: bold;
+      text-align: center;
+      display: block;
+    }
+    
+    div#p2 ul {
+      margin-bottom: 2em;
+    }
+  }
+}

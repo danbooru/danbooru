@@ -1,0 +1,30 @@
+span.ui-icon {
+  float: left;
+  margin-top: 0.2em;
+  margin-right: 0.25em;
+}
+
+div.error-messages {
+  margin: 1em 0;
+  padding: 1em;
+
+  span.ui-icon {
+    float: left;
+    margin-right: 0.5em;
+  }
+  
+  h1 {
+    font-size: 1em;
+    color: #A00;
+  }
+}
+
+div#notice {
+  margin: 1em 0;
+  padding: 1em;
+  
+  span.ui-icon {
+    float: left;
+    margin-right: 0.5em;
+  }
+}

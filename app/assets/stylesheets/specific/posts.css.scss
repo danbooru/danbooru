@@ -1,0 +1,160 @@
+div.post-previews {
+  overflow: visible;
+}
+
+article.post-preview {
+  height: 150px;
+  width: 150px;
+  margin-right: 30px;
+  margin-bottom: 30px;
+  display: inline-block;
+  float: left;
+  text-align: center;
+  vertical-align: middle;
+}
+
+article.post-preview.blacklisted-active {
+  display: none;
+}
+
+div#c-posts {
+  div.notice {
+    font-size: 0.8em;
+    padding: 1em;
+    margin-bottom: 1em;
+    
+    ul {
+      margin-left: 1em;
+    }
+  }
+  
+  aside#sidebar > section#pool-sidebar {
+    span.ui-icon {
+      color: #666;
+    }
+  }
+  
+  aside#sidebar > section > ul li {
+    list-style-type: none;
+  }
+
+  aside#sidebar > section > ul ul li {
+    margin-left: 1em;
+  }
+
+  aside#sidebar > section#blacklist-box ul {
+    margin-left: 1em;
+    
+    li {
+      list-style-type: disc;
+    }
+    
+    a {
+      color: $link_color;
+      cursor: pointer;
+    }
+    
+    span {
+      color: #AAA;
+    }
+  }
+  
+  h1 {
+    font-size: $h3_size;
+  }
+  
+  div#wiki-page-excerpt {
+    position: relative;
+    width: 40em;
+    
+    div#hide-or-show-wiki-page-excerpt {
+      font-size: 1em;
+      position: absolute;
+      top: 0;
+      right: 0;
+      
+      span {
+        cursor: pointer;
+        color: #AAA;
+      }
+      
+      span:hover {
+        color: #333;
+      }
+    }
+  }
+  
+  div#a-show {
+    menu#post-sections {
+      font-size: $h3_size;
+      font-weight: bold;
+      line-height: 1.25em;
+
+      li a {
+        color: $link_color;
+      }
+    }
+    
+    section#notes article {
+      margin-bottom: 1em;
+    }
+  }
+}
+
+div#c-explore-posts {
+}
+
+div.post_histories {
+  div.index {
+    div.post {
+      margin-bottom: 2em;
+      
+      div.preview {
+        width: 20%;
+        float: left;
+      }
+      
+      div.history {
+        width: 70%;
+        float: left;
+        
+        table {
+          width: 100%;
+        }
+        
+        ins {
+          color: green;
+          text-decoration: none;
+        }
+        
+        del {
+          color: red;
+          text-decoration: line-through;
+        }
+      }
+    }
+  }
+}
+
+div#unapprove-dialog {
+  p {
+    margin-bottom: 1em;
+  }
+}
+
+div#c-moderator-post-dashboards {
+  article {
+    margin-bottom: 4em;
+    overflow: hidden;
+  }
+  
+  aside {
+    float: left;
+    width: 520px;
+  }
+  
+  section {
+    float: left;
+    width: 300px;
+  }
+}

@@ -1,0 +1,22 @@
+div#c-artists {
+  span.new-artist {
+    font-weight: bold;
+    color: #A00;
+  }
+
+  div#a-show {
+    max-width: 60em;
+
+    p.legend {
+      margin-bottom: 2em;
+      font-size: 0.8em;
+      font-style: italic;    
+    }
+  }
+  
+  div#a-edit, div#a-new {
+    textarea {
+      height: 5em;
+    }
+  }
+}

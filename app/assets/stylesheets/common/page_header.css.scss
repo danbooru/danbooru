@@ -1,0 +1,25 @@
+header#top {
+  h1 {
+    margin: 5px 30px 0 30px;
+  }
+  
+  menu {
+    margin-top: -2px;
+    background: #F7F7FF;
+    padding: 6px 20px;
+    
+    li a {
+      padding: 6px 10px;
+    }
+  }
+  
+  menu.main {
+    margin-top: 0px;
+    background: white;
+    
+    li.current a {
+      background: #F7F7FF;
+      font-weight: bold;
+    }
+  }
+}

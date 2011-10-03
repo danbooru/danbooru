@@ -1,0 +1,26 @@
+table.striped {
+  p {
+    margin: 0;
+  }
+  
+  td, th {
+    padding: 2px 4px;
+  }
+  
+  tbody {
+    tr:hover {
+      background-color: #FFE;
+    }
+  }
+  
+  thead {
+    th {
+      font-weight: bold;
+      text-align: left;
+    }
+  }
+  
+  tr.even {
+    background-color: #EEE;
+  }
+}

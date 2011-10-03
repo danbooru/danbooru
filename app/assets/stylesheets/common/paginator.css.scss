@@ -1,0 +1,38 @@
+div.paginator {
+  display: block;
+  padding: 2em 0 1em 0;
+  font-size: 1em;
+  text-align: center;
+  font-weight: bold;
+  clear: both;
+  
+  a {
+    margin: 0 3px;
+    padding: 2px 6px;
+    font-weight: normal;
+    border: 1px solid #EAEAEA;
+  }
+
+  a.arrow {
+    border: none;
+  }
+
+  a.arrow:hover {
+    background: white;
+    color: #9093FF;
+  }
+
+  a.current {
+    border: 1px solid #AAA;
+  }
+
+  a:hover {
+    background: rgb(60, 60, 220);
+    color: white;
+  }
+
+  span {
+    margin: 0 3px;
+    padding: 2px 6px;
+  }
+}

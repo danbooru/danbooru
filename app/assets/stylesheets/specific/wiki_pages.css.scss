@@ -1,0 +1,27 @@
+div#c-wiki-pages {
+  span.version {
+    color: #AAA;
+  }
+  
+  div#form-content {
+    float: left;
+    width: 30em;
+    padding-right: 1em;
+  }
+  
+  div#form-aside {
+    float: left;
+    width: 20em;
+    
+    div#preview > p {
+      margin-top: 0.5em;
+      padding-top: 0.5em;
+      border-top: 1px solid #AAA;
+    }
+  }
+  
+  div#a-edit, div#a-new {
+    div#preview {
+    }
+  }
+}

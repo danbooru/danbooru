@@ -1,0 +1,29 @@
+div#c-uploads {
+  div#a-new {
+    div#upload-guide-notice {
+      margin-bottom: 2em;
+    }
+
+    fieldset.ratings {
+      label {
+        display: inline;
+      }
+    }
+    
+    div#source-info {
+      margin: 1em 0;
+      padding: 1em;
+      border: 1px solid gray;
+      
+      p {
+        margin: 0;
+      }
+      
+      ul {
+        a {
+          margin-right: 1em;
+        }
+      }
+    }
+  }
+}

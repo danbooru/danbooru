@@ -1,0 +1,14 @@
+.spoiler {
+  color: black;
+  background: black;
+  cursor: text;
+  display: block;
+}
+
+.spoiler a {
+  color: black;
+}
+
+.spoiler:hover {
+  color: white;
+}

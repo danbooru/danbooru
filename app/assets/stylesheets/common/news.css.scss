@@ -1,0 +1,24 @@
+div#news-ticker {
+  padding: 5px;
+  background: #EEE;
+  border-bottom: 2px solid #666;
+  overflow: hidden;
+  font-size: 0.8em;
+  
+  ul {
+    float: left;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    list-style-type: none;
+    float: left;
+    margin: 0 2em 0 0;
+    padding: 0;
+  }
+
+  a#close-news-ticker-link {
+    float: right;
+  }
+}
