@@ -10,7 +10,7 @@
     this.common_bind("#related-artists-button", "artist");
     this.common_bind("#related-characters-button", "character");
     this.common_bind("#related-copyrights-button", "copyright");
-    $("find-artist-button").click(Danbooru.RelatedTag.find_artist);
+    $("#find-artist-button").click(Danbooru.RelatedTag.find_artist);
   }
   
   Danbooru.RelatedTag.common_bind = function(button_name, category) {
@@ -51,6 +51,10 @@
   }
   
   Danbooru.RelatedTag.build_all = function() {
+    if (Danbooru.RelatedTag.recent_search === null || Danbooru.RelatedTag.recent_search === undefined) {
+      return;
+    }
+    
     var query = Danbooru.RelatedTag.recent_search.query;
     var related_tags = Danbooru.RelatedTag.recent_search.tags;
     var wiki_page_tags = Danbooru.RelatedTag.recent_search.wiki_page_tags;
@@ -114,6 +118,7 @@
   }
   
   Danbooru.RelatedTag.find_artist = function(e) {
+    Danbooru.RelatedTag.recent_search = null;
     var url = $("#upload_source,#post_source");
     $.get("/artists.json", {"search[url_match]": url.val()}).success(Danbooru.RelatedTag.process_artist);
     e.preventDefault();
@@ -123,16 +128,30 @@
     var $dest = $("#related-tags");
     $dest.empty();
     
-    if (data.size() === 0) {
+    if (data.length === 0) {
       $dest.html("No artists found");
+      return;
+    } else if (data.length > 2) {
+      $dest.html("Too many matches found");
       return;
     }
     
     $.each(data, function(i, json) {
-      var id = json.id;
-      var name = json.name;
-      var other_names = json.other_names;
-      var urls
+      var $div = $("<div/>").addClass("artist");
+      var $ul = $("<ul/>");
+      $ul.append(
+        $("<li/>").append("Artist: ").append(
+          $("<a/>").attr("href", "/artists/" + json.id).html(json.name).click(Danbooru.RelatedTag.toggle_tag)
+        )
+      );
+      if (json.other_names.length > 0) {
+        $ul.append($("<li/>").html("Other names: " + json.other_names));
+      }
+      $.each(json.urls, function(i, v) {
+        $ul.append($("<li/>").html("URL: " + v.url));
+      });
+      $div.append($ul);
+      $dest.append($div);
     });
   }
 })();

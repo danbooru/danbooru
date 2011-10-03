@@ -20,7 +20,11 @@ class ArtistsController < ApplicationController
   def index
     @search = Artist.search(params[:search])
     @artists = @search.paginate(params[:page])
-    respond_with(@artists)
+    respond_with(@artists) do |format|
+      format.json do
+        render :json => @artists.to_json(:include => [:urls])
+      end
+    end
   end
   
   def search

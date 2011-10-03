@@ -138,13 +138,13 @@ class Artist < ActiveRecord::Base
     end
     
     def notes=(msg)
-      if wiki_page.nil?
-        self.wiki_page = WikiPage.new
+      if wiki_page
+        wiki_page.title = name
+        wiki_page.body = msg
+        wiki_page.save
+      else
+        self.wiki_page = WikiPage.new(:title => name, :body => msg)
       end
-
-      wiki_page.title = name
-      wiki_page.body = msg
-      wiki_page.save
     end
   end
   

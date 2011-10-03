@@ -20,6 +20,7 @@
         <%= f.label :source, nil, :title => "You can enter a URL to have #{Danbooru.config.app_name} automatically download and process it" %>
         <%= f.text_field :source, :size => 50, :value => params[:url] %>
         <%= button_tag "Similar", :id => "similar-button" %>
+        <%= button_tag "Artist", :id => "find-artist-button" %>
       </div>
       
       <div class="input">
