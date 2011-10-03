@@ -118,7 +118,7 @@ class Tag < ActiveRecord::Base
     end
 
     def scan_tags(tags)
-      normalize(tags).gsub(/[,;*]/, "_").scan(/\S+/).uniq
+      normalize(tags).gsub(/[%,]/, "").scan(/\S+/).uniq
     end
 
     def parse_cast(object, type)
