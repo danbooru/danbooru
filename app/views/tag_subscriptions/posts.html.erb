@@ -17,7 +17,7 @@
     </section>
     
     <% content_for(:page_title) do %>
-      /fav:<%= CurrentUser.name %>
+      /fav:<%= @user.name %>
     <% end %>
 
     <%= render "posts/partials/common/secondary_links" %>    
