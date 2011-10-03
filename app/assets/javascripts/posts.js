@@ -8,6 +8,14 @@
     this.initialize_wiki_page_excerpt();
     this.initialize_post_image_resize_links();
     this.initialize_image_resize();
+    this.initialize_titles();
+  }
+  
+  Danbooru.Post.initialize_titles = function() {
+    $("article.post-preview").each(function(i, v) {
+      var $v = $(v);
+      $v.attr("title", $v.data("tags") + " uploader:" + $v.data("uploader") + " rating:" + $v.data("rating"));
+    });
   }
   
   Danbooru.Post.initialize_image_resize = function() {
