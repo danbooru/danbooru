@@ -1,6 +1,20 @@
 @import "../common/000_vars.css.scss";
 
 div#c-users {
+  div#a-edit {
+    h1 {
+      margin-bottom: 0.5em;
+    }
+    
+    div.input span.hint {
+      visibility: hidden;
+    }
+    
+    div.input:hover span.hint {
+      visibility: visible;
+    }
+  }
+  
   div#a-new {
     max-width: 60em;
     

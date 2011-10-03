@@ -1,30 +1,32 @@
-<%= simple_form_for @user do |f| %>
-  <p>Hover over the labels to see a brief explanation of the setting. Required fields are marked in red.</p>
-  
-  <fieldset>
-    <legend>Basic</legend>
+<div id="c-users">
+  <div id="a-edit">
+    <h1>Edit Settings</h1>
     
-    <%= f.input :email, :required => Danbooru.config.enable_email_verification? %>
-    <%= f.input :time_zone %>
-    <%= f.input :receive_email_notifications, :title => "Enable to receive email notification when you receive a DMail" %>
-    <%= f.input :comment_threshold, :title => "Comments below this score will be hidden by default" %>
-    <%= f.input :always_resize_images, :title => "Enable to automatically resize images to fit your browser window" %>
-    <%= f.input :default_image_size, :title => "Medium shows images resized to #{Danbooru.config.medium_image_width} pixels wide, large is #{Danbooru.config.large_image_width} pixels wide, and original is whatever the original image is", :collection => %w(medium large original), :include_blank => false %>
-    <%= f.input :favorite_tags, :title => "A list of whitespace delimited tags that show up in your profile", :input_html => {:size => "40x5"} %>
-    <%= f.input :blacklisted_tags, :title => "A list of newline delimited tags that you never want to see", :input_html => {:size => "40x5"} %>
-  </fieldset>
-  
-  <fieldset>
-    <legend>Special</legend
-    <p>For security purposes, changing the following settings requires you to re-enter your password. You can leave the new password field blank to keep your current one.</p>
+    <%= simple_form_for @user do |f| %>
+      <fieldset>
+        <legend>Basic</legend>
 
-    <%= f.input :name %>
-    <%= f.input :password, :title => "What you want your new password to be (leave blank if you don't want to change your password)", :label => "New password", :input_html => {:autocomplete => "off"} %>
-    <%= f.input :old_password, :title => "Your old password (you must enter your password if updating your name or password)", :as => :password, :input_html => {:autocomplete => "off"} %>
-  </fieldset>
-  
-  <%= f.button :submit %>
-<% end %>
+        <%= f.input :email, :required => Danbooru.config.enable_email_verification?, :hint => "Your email address (used for messages and for password resets)" %>
+        <%= f.input :time_zone, :hint => "Your local time zone" %>
+        <%= f.input :receive_email_notifications, :hint => "Enable to receive email notification when you receive a DMail" %>
+        <%= f.input :comment_threshold, :hint => "Comments below this score will be hidden by default" %>
+        <%= f.input :always_resize_images, :hint => "Enable to automatically resize images to fit your browser window" %>
+        <%= f.input :default_image_size, :hint => "Medium shows images resized to #{Danbooru.config.medium_image_width} pixels wide, large is #{Danbooru.config.large_image_width} pixels wide, and original is whatever the original image is", :collection => %w(medium large original), :include_blank => false %>
+        <%= f.input :favorite_tags, :hint => "A list of whitespace delimited tags that show up in your profile", :input_html => {:size => "40x5"} %>
+        <%= f.input :blacklisted_tags, :hint => "A list of newline delimited tags that you never want to see", :input_html => {:size => "40x5"} %>
+      </fieldset>
+
+      <fieldset>
+        <legend>Password</legend>
+
+        <%= f.input :password, :hint => "What you want your new password to be (leave blank if you don't want to change your password)", :label => "New password", :input_html => {:autocomplete => "off"} %>
+        <%= f.input :old_password, :hint => "Your old password (you must enter your password if updating your name or password)", :as => :password, :input_html => {:autocomplete => "off"} %>
+      </fieldset>
+
+      <%= f.button :submit %>
+    <% end %>
+  </div>
+</div>
 
 <% content_for(:page_title) do %>
   /Users/<%= @user.name %>/Settings
