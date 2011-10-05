@@ -9,9 +9,9 @@ Danbooru.Note = {
       $note_box.addClass("note-box");
       $note_box.data("id", String(id));
       $note_box.attr("data-id", String(id));
-      $note_box.draggable({containment: "parent"});
+      $note_box.draggable({containment: $("#image")});
       $note_box.resizable({
-        containment: "parent", 
+        containment: $("#image"), 
         handles: "se"
       });
       $note_box.css({position: "absolute"});
@@ -388,12 +388,12 @@ Danbooru.Note = {
   TranslationMode: {
     start: function() {
       $("#original-file-link").click();
-      $("#note-container").click(Danbooru.Note.TranslationMode.create_note);
+      $("#image").one("click", Danbooru.Note.TranslationMode.create_note);
       $("#translate").one("click", Danbooru.Note.TranslationMode.stop).html("Click on image");
     },
     
     stop: function() {
-      $("#note-container").unbind("click");
+      // $("#image").unbind("click");
       $("#translate").one("click", Danbooru.Note.TranslationMode.start).html("Translate");
     },
     
@@ -401,6 +401,8 @@ Danbooru.Note = {
       var offset = $("#image").offset();
       Danbooru.Note.new(e.pageX - offset.left, e.pageY - offset.top);
       Danbooru.Note.TranslationMode.stop();
+      $(".note-box").show();
+      e.stopPropagation();
     }
   },
   
@@ -470,9 +472,9 @@ Danbooru.Note = {
 $(function() {
   if ($("#c-posts #a-show").size() > 0) {
     $("#translate").one("click", Danbooru.Note.TranslationMode.start);
-    $("#note-container").width($("#image").width()).height($("#image").height());
+    // $("#note-container").width($("#image").width()).height($("#image").height());
     $(document).bind("keydown", "ctrl+n", Danbooru.Note.TranslationMode.start);
     Danbooru.Note.load_all();
-    $("#note-container").click(Danbooru.Note.Box.toggle_all);
+    $("#image").click(Danbooru.Note.Box.toggle_all);
   }
 });
