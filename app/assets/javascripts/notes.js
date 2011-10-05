@@ -159,7 +159,8 @@ Danbooru.Note = {
     },
     
     bound_position: function($note_body) {
-      var doc_width = $(window).width();
+      var $image = $("#image");
+      var doc_width = $image.offset().left + $image.width();
       if ($note_body.offset().left + $note_body.width() > doc_width) {
         $note_body.css({
           // 30 is a magic number to factor in width of the scroll bar
