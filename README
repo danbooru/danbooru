@@ -1,10 +1,9 @@
 === Installation
 
 It is recommended that you install Danbooru on a Debian-based system
-since most of the required packages are available on APT. Although
-Danbooru has been successfully installed on Fedora, CentOS, FreeBSD,
-and OS X, the following instructions will assume you're installing on
-Debian. INSTALL.debian install script is straightforward and should be
+since most of the required packages are available on APT.  Danbooru
+has been successfully installed on Fedora, CentOS, FreeBSD, and OS X.
+The INSTALL.debian install script is straightforward and should be
 simple to adapt for other platforms.  If you want something similar to
 Danbooru that is easier to install, try Shimmie
 (http://trac.shishnet.org/shimmie2). Shimmie uses PHP and MySQL and
@@ -12,8 +11,7 @@ should be straightforward to install on most hosts.
 
 For best performance, you will need at least 256MB of RAM for
 PostgreSQL and Rails. The memory requirement will grow as your
-database gets bigger; the main Danbooru database takes up around 6GB
-of memory by itself.
+database gets bigger.
 
 Use your operating system's package management system whenever
 possible.  This will simplify the process of installing init scripts,
