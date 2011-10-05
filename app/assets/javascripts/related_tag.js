@@ -3,7 +3,7 @@
   
   Danbooru.RelatedTag.initialize_all = function() {
     this.initialize_buttons();
-    $("#related-tags").hide();
+    $("#related-tags-container").hide();
   }
   
   Danbooru.RelatedTag.initialize_buttons = function() {
@@ -47,6 +47,7 @@
   }
   
   Danbooru.RelatedTag.process_response = function(data) {
+    $("#related-tags-container").show();
     Danbooru.RelatedTag.recent_search = data;
     Danbooru.RelatedTag.build_all();
   }
@@ -129,6 +130,7 @@
   }
   
   Danbooru.RelatedTag.process_artist = function(data) {
+    $("#related-tags-container").show();
     var $dest = $("#related-tags");
     $dest.empty();
     

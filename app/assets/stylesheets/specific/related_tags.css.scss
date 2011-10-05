@@ -1,5 +1,13 @@
 @import "../common/000_vars.css.scss";
 
+div#related-tags-container {
+  padding-right: 2em;
+  
+  h1 {
+    font-size: $h3_size;
+  }
+}
+
 div#related-tags {
   overflow: auto;
   width: 100%;
@@ -24,15 +32,11 @@ div#related-tags {
       margin: 0;
       
       li {
-        padding: 0.25em 0.5em;
-        
         em {
-          padding: 0.25em 0.5em;
           font-weight: bold;
         }
         
         a {
-          padding: 0.25em 0.5em;
           min-width: 3em;
         }
         
