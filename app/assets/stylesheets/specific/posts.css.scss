@@ -97,8 +97,16 @@ div#c-posts {
       }
     }
     
-    section#notes article {
-      margin-bottom: 1em;
+    section#notes {
+      margin-top: 1em;
+      
+      article {
+        margin-bottom: 1em;
+      }
+    }
+    
+    section#edit {
+      margin-top: 1em;
     }
   }
 }
