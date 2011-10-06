@@ -25,23 +25,47 @@
   }
   
   Danbooru.RelatedTag.current_tag = function() {
+    // 1. abc def |  -> def
+    // 2. abc def|   -> def
+    // 3. abc de|f   -> def
+    // 4. abc |def   -> def
+    // 5. abc| def   -> abc
+    // 6. ab|c def   -> abc
+    // 7. |abc def   -> abc
+    // 8. | abc def  -> abc   -- not supported by this code but a pretty rare case
+    
     var $field = $("#upload_tag_string,#post_tag_string");
     var string = $field.val();
-    var text_length = string.length;
-    var a = $field[0].selectionStart;
-    var b = $field[0].selectionStart;
-    
-  	while ((a > 0) && string[a] != " ") {
-			a -= 1;
-		}
+    var n = string.length;
+    var a = $field.get(0).selectionStart;
+    var b = $field.get(0).selectionStart;
 
-		if (string[a] == " ") {
-			a += 1;
-		}
-
-		while ((b < text_length) && string[b] != " ") {
-			b += 1;
-		}
+    if ((a > 0) && (a < (n - 1)) && (string[a] !== " ") && (string[a - 1] === " ")) {
+      // 4 is the only case where we need to scan forward. in all other cases we
+      // can drag a backwards, and then drag b forwards.
+      
+      while ((b < n) && (string[b] !== " ")) {
+        b++;
+        console.log("1. a=%s b=%s", a, b);
+      }
+    } else {
+      while ((a > 0) && ((string[a] === " ") || (string[a] === undefined))) {
+        a--;
+        b--;
+        console.log("2. a=%s b=%s", a, b);
+      }
+      
+      while ((a > 0) && (string[a - 1] !== " ")) {
+        a--;
+        b--;
+        console.log("3. a=%s b=%s", a, b);
+      }
+      
+      while ((b < (n - 1)) && (string[b] !== " ")) {
+        b++;
+        console.log("4. a=%s b=%s", a, b);
+      }
+    }
 
 		return string.slice(a, b);
   }
