@@ -35,7 +35,7 @@
     // 8. | abc def  -> abc   -- not supported by this code but a pretty rare case
     
     var $field = $("#upload_tag_string,#post_tag_string");
-    var string = $field.val();
+    var string = $field.val().trim();
     var n = string.length;
     var a = $field.get(0).selectionStart;
     var b = $field.get(0).selectionStart;
@@ -46,27 +46,24 @@
       
       while ((b < n) && (string[b] !== " ")) {
         b++;
-        console.log("1. a=%s b=%s", a, b);
       }
     } else {
       while ((a > 0) && ((string[a] === " ") || (string[a] === undefined))) {
         a--;
         b--;
-        console.log("2. a=%s b=%s", a, b);
       }
       
       while ((a > 0) && (string[a - 1] !== " ")) {
         a--;
         b--;
-        console.log("3. a=%s b=%s", a, b);
       }
       
       while ((b < (n - 1)) && (string[b] !== " ")) {
         b++;
-        console.log("4. a=%s b=%s", a, b);
       }
     }
-
+    
+    b++;
 		return string.slice(a, b);
   }
   
