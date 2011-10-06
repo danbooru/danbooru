@@ -3,7 +3,7 @@
     <li><%= link_to "Listing", users_path %></li>
     <% if @user && !@user.new_record? %>
       <li>|</li>
-      <li><%= link_to "Edit", edit_user_path(@user) %></li>
+      <li><%= link_to "Settings", edit_user_path(@user) %></li>
       <li><%= link_to "Profile", user_path(@user) %></li>
     <% end %>
     <% unless CurrentUser.user.is_anonymous? %>
