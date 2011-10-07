@@ -24,6 +24,13 @@ private
     @categories ||= Tag.categories_for(@tags)
   end
   
+  def counts
+    @counts ||= Tag.counts_for(@tags).inject({}) do |hash, x|
+      hash[x["name"]] = x["post_count"]
+      hash
+    end
+  end
+  
   def build_list_item(tag, template, options)
     html = ""
     html << %{<li data-tag-type="#{categories[tag]}" data-tag-name="#{u(tag)}">}
@@ -35,7 +42,9 @@ private
     end
     
     humanized_tag = tag.tr("_", " ")
-    html << %{<a href="/posts?tags=#{u(tag)}">#{h(humanized_tag)}</a>}
+    html << %{<a href="/posts?tags=#{u(tag)}">#{h(humanized_tag)}</a> }
+    html << %{<span class="post-count">} + counts[tag].to_s + %{</span>}
+    
     html << "</li>"
     html
   end

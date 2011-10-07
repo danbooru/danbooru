@@ -75,6 +75,11 @@ namespace :deploy do
     end
   end
   
+  desc "Precompiles assets"
+  task :precompile_assets do
+    rake "assets:precompile"
+  end
+  
   desc "Restart the application"
   task :restart do
     run "touch #{current_path}/tmp/restart.txt"

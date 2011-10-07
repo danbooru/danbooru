@@ -21,7 +21,13 @@ class Tag < ActiveRecord::Base
       Danbooru.config.tag_category_mapping[string.downcase] || 0
     end
   end
-    
+  
+  module CountMethods
+    def counts_for(tag_names)
+      select_all_sql("SELECT name, post_count FROM tags WHERE name IN (?)", tag_names)
+    end
+  end
+  
   module ViewCountMethods
     def increment_view_count(name)
       Cache.incr("tvc:#{Cache.sanitize(name)}")
@@ -353,6 +359,7 @@ class Tag < ActiveRecord::Base
     end
   end
   
+  extend CountMethods
   extend ViewCountMethods
   include CategoryMethods
   extend StatisticsMethods

@@ -1,3 +1,5 @@
+@import "../common/000_vars.css.scss";
+
 div#c-artists {
   span.new-artist {
     font-weight: bold;
@@ -17,6 +19,15 @@ div#c-artists {
   div#a-edit, div#a-new {
     textarea {
       height: 5em;
+    }
+  }
+  
+  div.recent-posts { 
+    margin-top: 1em;
+    
+    h1 {
+      font-size: $h2_size;
+      margin: 0;
     }
   }
 }
