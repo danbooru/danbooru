@@ -15,7 +15,7 @@ module Sources
       end
       
       def get
-        agent.get(URI.parse(url).request_uri) do |page|
+        agent.get(URI.parse(normalized_url).request_uri) do |page|
           @artist_name, @profile_url = get_profile_from_page(page)
           @image_url = get_image_url_from_page(page)
           @tags = get_tags_from_page(page)
@@ -23,6 +23,13 @@ module Sources
       end
       
     protected
+      def normalized_url
+        if url =~ /show_original/
+          url.sub(/show_original/, "show")
+        else
+          url
+        end
+      end
     
       def get_profile_from_page(page)
         links = page.search("p.profile_name a")
