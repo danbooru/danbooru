@@ -77,7 +77,7 @@ namespace :deploy do
   
   desc "Precompiles assets"
   task :precompile_assets do
-    rake "assets:precompile"
+    run "bundle exec rake assets:precompile"
   end
   
   desc "Restart the application"
