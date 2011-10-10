@@ -203,7 +203,8 @@ class DText
       :attributes => {
         "a" => %w(href title),
         "span" => %w(class),
-        "div" => %w(class)
+        "div" => %w(class),
+        "p" => %w(class)
       },
       :protocols => {
         "a" => {
