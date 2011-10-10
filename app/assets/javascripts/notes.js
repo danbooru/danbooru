@@ -218,11 +218,16 @@ Danbooru.Note = {
     },
     
     set_text: function($note_body, text) {
-      text = text.replace('<tn>', '<p class="tn">');
-      text = text.replace('</tn>', '</p>');
-      $note_body.html(text);
+      Danbooru.Note.Body.display_text($note_body, text);
       Danbooru.Note.Body.resize($note_body);
       Danbooru.Note.Body.bound_position($note_body);
+    },
+    
+    display_text: function($note_body, text) {
+      text = text.replace(/<tn>/g, '<p class="tn">');
+      text = text.replace(/<\/tn>/g, '</p>');
+      text = text.replace(/\n/g, '<br>');
+      $note_body.html(text);
     },
     
     bind_events: function($note_body) {
@@ -304,7 +309,7 @@ Danbooru.Note = {
           y: $note_box.position().top / ratio,
           width: $note_box.width() / ratio,
           height: $note_box.height() / ratio,
-          body: $note_body.html(),
+          body: $note_body.data("original-body"),
           post_id: Danbooru.meta("post-id")
         }
       }
