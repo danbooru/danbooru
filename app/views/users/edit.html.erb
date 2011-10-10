@@ -1,11 +1,9 @@
 <div id="c-users">
   <div id="a-edit">
-    <h1>Edit Settings</h1>
+    <h1>Settings</h1>
     
     <%= simple_form_for @user do |f| %>
       <fieldset>
-        <legend>Basic</legend>
-
         <%= f.input :email, :required => Danbooru.config.enable_email_verification?, :hint => "Your email address (used for messages and for password resets)" %>
         <%= f.input :time_zone, :hint => "Your local time zone" %>
         <%= f.input :receive_email_notifications, :hint => "Enable to receive email notification when you receive a DMail" %>
@@ -17,8 +15,6 @@
       </fieldset>
 
       <fieldset>
-        <legend>Password</legend>
-
         <%= f.input :password, :hint => "What you want your new password to be (leave blank if you don't want to change your password)", :label => "New password", :input_html => {:autocomplete => "off"} %>
         <%= f.input :old_password, :hint => "Your old password (you must enter your password if updating your name or password)", :as => :password, :input_html => {:autocomplete => "off"} %>
       </fieldset>
@@ -29,7 +25,7 @@
 </div>
 
 <% content_for(:page_title) do %>
-  /Users/<%= @user.name %>/Settings
+  /settings
 <% end %>
 
 <%= render "secondary_links" %>

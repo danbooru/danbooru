@@ -8,6 +8,7 @@ class CreateAdvertisements < ActiveRecord::Migration
       t.column :width, :integer, :null => false
       t.column :height, :integer, :null => false
       t.column :file_name, :string, :null => false
+      t.column :is_work_safe, :boolean, :null => false, :default => false
       t.timestamps
     end
     

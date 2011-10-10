@@ -9,6 +9,7 @@ class CreateArtistVersions < ActiveRecord::Migration
       t.column :other_names, :text
       t.column :group_name, :string
       t.column :url_string, :text
+      t.column :is_banned, :boolean, :null => false, :default => false
       t.timestamps
     end
     

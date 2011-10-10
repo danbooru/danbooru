@@ -20,6 +20,18 @@ article.post-preview.blacklisted-active {
 }
 
 div#c-posts {
+  li.category-1 a {
+    color: #A00;
+  }
+  
+  li.category-3 a {
+    color: #A0A;
+  }
+  
+  li.category-4 a {
+    color: #0A0;
+  }
+  
   span.post-count {
     color: #CCC;
     margin-left: 0.2em;

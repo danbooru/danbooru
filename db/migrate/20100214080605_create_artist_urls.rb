@@ -9,6 +9,7 @@ class CreateArtistUrls < ActiveRecord::Migration
     
     add_index :artist_urls, :artist_id
     add_index :artist_urls, :normalized_url
+    add_index :artist_urls, :url
   end
 
   def self.down

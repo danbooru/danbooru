@@ -66,7 +66,7 @@ class Tag < ActiveRecord::Base
     end
     
     def update_category_cache
-      Cache.put("tc:#{Cache.sanitize(name)}", category)
+      Cache.put("tc:#{Cache.sanitize(name)}", category, 1.hour)
     end
   end
   
@@ -95,6 +95,7 @@ class Tag < ActiveRecord::Base
 
         if tag
           if category > 0
+            tag.update_category_cache
             tag.update_column(:category, category)
           end
 

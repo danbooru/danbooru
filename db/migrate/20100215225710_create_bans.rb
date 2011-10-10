@@ -10,6 +10,7 @@ class CreateBans < ActiveRecord::Migration
     
     add_index :bans, :user_id
     add_index :bans, :expires_at
+    add_index :bans, :banner_id
   end
 
   def self.down

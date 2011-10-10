@@ -33,7 +33,7 @@ private
   
   def build_list_item(tag, template, options)
     html = ""
-    html << %{<li data-tag-type="#{categories[tag]}" data-tag-name="#{u(tag)}">}
+    html << %{<li class="category-#{categories[tag]}">}
     
     if CurrentUser.user.is_privileged?
       html << %{<a href="/wiki_pages?title=#{u(tag)}">?</a> }
