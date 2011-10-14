@@ -10,7 +10,7 @@
     <li><strong>Small and large images.</strong> All images now get a small and large version.</li>
   </ul>
 
-  <p><%= link_to("Continue", params[:url] || "/", :id => "tos-agree-link") %></p>  
+  <p><%= link_to("Continue", request.env["HTTP_REFERER"] || "/", :id => "tos-agree-link") %></p>  
 
   <!--
   <h1>Terms of Service</h1>

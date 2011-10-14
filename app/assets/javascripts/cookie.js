@@ -50,10 +50,10 @@
       loc = loc.replace(/^https?:\/\/[^\/]+/, "")
     }
     
-    if (loc.match(/^\/(comment|pool|note|post)/) && this.get("tos") != "1") {
+    if (!loc.match(/\/static\/terms_of_service/) && this.get("tos") != "1") {
       // Setting location.pathname in Safari doesn't work, so manually extract the domain.
       var domain = location.href.match(/^(https?:\/\/[^\/]+)/)[0];
-      location.href = domain + "/terms_of_service?url=" + encodeURIComponent(location.href);
+      location.href = domain + "/static/terms_of_service";
       return;
     }
 
