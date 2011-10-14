@@ -95,8 +95,8 @@ class Tag < ActiveRecord::Base
 
         if tag
           if category > 0
-            tag.update_category_cache
             tag.update_column(:category, category)
+            tag.update_category_cache
           end
 
           tag
