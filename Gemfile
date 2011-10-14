@@ -18,7 +18,7 @@ end
 gem "rails", "3.1.0"
 gem "pg"
 gem "memcache-client", :require => "memcache"
-gem "imagesize", :require => "image_size"
+# gem "imagesize", :require => "image_size"
 gem "delayed_job"
 gem "super_exception_notifier"
 gem "simple_form"

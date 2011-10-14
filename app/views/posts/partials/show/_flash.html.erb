@@ -1,4 +1,4 @@
-<% content_tag(:object, :width => post.image_width, :height => post.image_height) do %>
+<%= content_tag(:object, :width => post.image_width, :height => post.image_height) do %>
   <%= tag :params, :name => "movie", :value => post.file_url %>
   <%= tag :embed, :src => post.file_url, :width => post.image_width, :height => post.image_height, :allowScriptAccess => "never" %>
 <% end %>

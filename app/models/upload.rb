@@ -123,13 +123,19 @@ class Upload < ActiveRecord::Base
     def calculate_hash(source_path)
       self.md5 = Digest::MD5.file(source_path).hexdigest
     end
+    
+    def is_image?
+      ["jpg", "gif", "png"].include?(file_ext)
+    end
   end
 
   module ResizerMethods
     def generate_resizes(source_path)
-      generate_resize_for(Danbooru.config.small_image_width, Danbooru.config.small_image_width, source_path, 85)
-      generate_resize_for(Danbooru.config.medium_image_width, nil, source_path)
-      generate_resize_for(Danbooru.config.large_image_width, nil, source_path)
+      if is_image?
+        generate_resize_for(Danbooru.config.small_image_width, Danbooru.config.small_image_width, source_path, 85)
+        generate_resize_for(Danbooru.config.medium_image_width, nil, source_path)
+        generate_resize_for(Danbooru.config.large_image_width, nil, source_path)
+      end
     end
 
     def generate_resize_for(width, height, source_path, quality = 90)

@@ -1,0 +1,1 @@
+require 'image_size'

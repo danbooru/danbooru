@@ -70,7 +70,6 @@ GEM
       activesupport
     hike (1.2.1)
     i18n (0.6.0)
-    imagesize (0.1.1)
     libv8 (3.3.10.2)
     mail (2.3.0)
       i18n (>= 0.4.0)
@@ -177,7 +176,6 @@ DEPENDENCIES
   delayed_job
   factory_girl
   ffaker!
-  imagesize
   mechanize
   memcache-client
   meta_search!
