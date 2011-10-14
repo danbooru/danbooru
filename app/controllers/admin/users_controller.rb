@@ -10,7 +10,7 @@ module Admin
       @user = User.find(params[:id])
       @user.level = params[:user][:level]
       @user.save
-      redirect_to admin_user_path(@user, :notice => "User updated")
+      redirect_to edit_admin_user_path(@user, :notice => "User updated")
     end
   end
 end
