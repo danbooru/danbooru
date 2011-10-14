@@ -9,7 +9,10 @@
     this.initialize_post_image_resize_links();
     this.initialize_image_resize();
     this.initialize_titles();
-    
+    this.initialize_links();
+  }
+  
+  Danbooru.Post.initialize_links = function() {
     $("#side-edit-link").click(function(e) {
       $("#post-edit-link").trigger("click");
       $("#post_tag_string").trigger("focus");

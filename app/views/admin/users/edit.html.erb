@@ -2,7 +2,7 @@
   <div id="a-edit">
     <h1>Edit User: <%= @user.name %></h1>
     
-    <%= form_tag(admin_user_path(@user), :class => "simple_form") do %>
+    <%= form_tag(admin_user_path(@user), :method => :put, :class => "simple_form") do %>
       <div class="input integer optional">
         <label for="user_level" class="optional">Level</label>
         <%= user_level_select(:user, :level) %>
