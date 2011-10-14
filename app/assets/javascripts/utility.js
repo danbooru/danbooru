@@ -8,11 +8,13 @@
   }
   
   Danbooru.j_alert = function(title, msg) {
-    $('<div title="' + title + '"></div>').html(msg).dialog({modal: true});
+    this.notice(msg);
+    // $('<div title="' + title + '"></div>').html(msg).dialog({modal: true});
   }
   
   Danbooru.j_error = function(msg) {
-    this.j_alert("Error", msg);
+    this.notice(msg);
+    // this.j_alert("Error", msg);
   }
   
   Danbooru.ajax_start = function(target) {

@@ -3,3 +3,11 @@
 
 en:
   hello: "Hello world"
+  activerecord:
+    attributes:
+      post_flag:
+        creator: "You"
+        creator_id: "You"
+      post_vote:
+        user: "You"
+        user_id: "You"
