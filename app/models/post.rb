@@ -425,6 +425,7 @@ class Post < ActiveRecord::Base
       normalized_tags = TagImplication.with_descendants(normalized_tags)
       normalized_tags = filter_metatags(normalized_tags)
       normalized_tags = %w(tagme) if normalized_tags.empty?
+      normalized_tags.sort!
       set_tag_string(normalized_tags.uniq.join(" "))
     end
     

@@ -33,6 +33,7 @@ class CreatePosts < ActiveRecord::Migration
       # Cached
       t.column :last_noted_at, :datetime
       t.column :last_commented_at, :datetime
+      t.column :fav_count, :integer, :null => false, :default => 0
 
       # Tags
       t.column :tag_string, :text, :null => false, :default => ""

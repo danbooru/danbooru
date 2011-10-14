@@ -4,7 +4,7 @@ class CreateTagAliases < ActiveRecord::Migration
       t.column :antecedent_name, :string, :null => false
       t.column :consequent_name, :string, :null => false
       t.column :creator_id, :integer, :null => false
-      t.column :creator_ip_addr, :inet, :null => false
+      t.column :creator_ip_addr, "inet", :null => false
       t.column :forum_topic_id, :integer
       t.column :status, :text, :null => false, :default => "pending"
       t.timestamps

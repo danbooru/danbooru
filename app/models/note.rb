@@ -13,7 +13,7 @@ class Note < ActiveRecord::Base
   validate :post_must_not_be_note_locked
   attr_accessible :x, :y, :width, :height, :body, :updater_id, :updater_ip_addr, :is_active, :post_id, :html_id
   scope :active, where("is_active = TRUE")
-  scope :body_matches, lambda {|query| where("text_index @@ plainto_tsquery(?)", query.scan(/\S+/).join(" & "))}
+  scope :body_matches, lambda {|query| where("body_index @@ plainto_tsquery(?)", query.scan(/\S+/).join(" & "))}
   scope :post_tag_match, lambda {|query| joins(:post).where("posts.tag_index @@ to_tsquery('danbooru', ?)", query)}
   search_methods :body_matches, :post_tag_match
   

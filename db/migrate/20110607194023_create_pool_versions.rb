@@ -9,6 +9,8 @@ class CreatePoolVersions < ActiveRecord::Migration
     end
     
     add_index :pool_versions, :pool_id
+    add_index :pool_versions, :updater_id
+    add_index :pool_versions, :updater_ip_addr
   end
 
   def down

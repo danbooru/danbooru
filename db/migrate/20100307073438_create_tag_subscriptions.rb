@@ -7,6 +7,7 @@ class CreateTagSubscriptions < ActiveRecord::Migration
       t.column :post_ids, :text, :null => false
       t.column :is_public, :boolean, :null => false, :default => true
       t.column :last_accessed_at, :datetime
+      t.column :is_opted_in, :boolean, :null => false, :default => false
       t.timestamps
     end
     
