@@ -34,6 +34,8 @@ div#c-pools {
 }
 
 div#c-pool-orders {
+  width: 75%;
+  
   h1 {
     font-size: $h2_size;
   }
@@ -43,19 +45,19 @@ div#c-pool-orders {
       list-style-type: none;
 
       li {
-        padding: 0.5em;
+        cursor: pointer;
+        margin-right: 20px;
+        margin-bottom: 20px;
+        width: 150px;
+        padding: 10px;
+        display: inline-block;
       }
 
       li.ui-state-default {
-        margin-bottom: 20px;
-        width: 180px;
         background: none;
       }
 
       li.ui-state-placeholder {
-        margin-bottom: 20px;
-        width: 180px;
-        height: 150px;
         background: none;
       }
     }

@@ -10,7 +10,7 @@ class Pool < ActiveRecord::Base
   before_validation :normalize_post_ids
   before_validation :initialize_creator, :on => :create
   after_save :create_version
-  attr_accessible :name, :description, :post_ids, :is_active, :post_count
+  attr_accessible :name, :description, :post_ids, :post_id_array, :is_active, :post_count
   
   def self.name_to_id(name)
     if name =~ /^\d+$/
@@ -121,6 +121,11 @@ class Pool < ActiveRecord::Base
   
   def post_id_array
     @post_id_array ||= post_ids.scan(/\d+/).map(&:to_i)
+  end
+  
+  def post_id_array=(array)
+    self.post_ids = array.join(" ")
+    clear_post_id_array
   end
   
   def post_id_array_was
