@@ -1,26 +1,38 @@
+@import "000_vars.css.scss";
+
 table.striped {
   p {
     margin: 0;
   }
   
   td, th {
-    padding: 2px 4px;
+    padding: 4px 6px;
   }
   
   tbody {
+    tr {
+      border-bottom: 1px solid $border_color;
+    }
+
     tr:hover {
-      background-color: #FFE;
+      background-color: $reverse_highlight_color;
     }
   }
   
   thead {
+    tr {
+      border-bottom: 2px solid #666;
+    }
+
     th {
       font-weight: bold;
       text-align: left;
+      color: #333;
+      padding: 8px 6px;
     }
   }
   
   tr.even {
-    background-color: #EEE;
+    background-color: #FAFAFA;
   }
 }
