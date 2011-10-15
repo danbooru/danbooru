@@ -1,13 +1,18 @@
-div#moderator-dashboard {
-  div#comment-activity {
-    width: 45%;
+div#c-moderator-dashboards {
+  width: 60em;
+  
+  div#col1 {
+    width: 30em;
     float: left;
   }
 
-  div#post-activity {
-    width: 45%;
+  div#col2 {
+    width: 30em;
     float: left;
-    margin-left: 2em;
+  }
+  
+  div.activity {
+    margin-bottom: 1em;
   }
 
   div#ip-addr-search {
@@ -19,11 +24,15 @@ div#moderator-dashboard {
   }
 
   table {
-    margin-bottom: 2em;
+    width: 26em;
   }
 
   caption {
     font-weight: bold;
-    font-size: 1.5em;
+    text-align: left;
+  }
+
+  th {
+    text-align: left;
   }
 }

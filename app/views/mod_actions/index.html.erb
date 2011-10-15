@@ -1,0 +1,25 @@
+<div id="c-mod-actions">
+  <div id="a-index">
+    <h1>Mod Actions</h1>
+    <table class="striped">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>User</th>
+          <th>Message</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @mod_actions.each do |mod_action| %>
+          <tr>
+            <td><%= mod_action.created_at %></td>
+            <td><%= link_to mod_action.creator.name, user_path(mod_action.creator) %></td>
+            <td><%= format_text(mod_actiond.description) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    
+    <%= sequential_paginator(@mod_actions) %>
+  </div>
+</div>
