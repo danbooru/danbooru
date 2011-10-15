@@ -131,34 +131,18 @@ div#c-posts {
 div#c-explore-posts {
 }
 
-div.post_histories {
-  div.index {
-    div.post {
-      margin-bottom: 2em;
-      
-      div.preview {
-        width: 20%;
-        float: left;
-      }
-      
-      div.history {
-        width: 70%;
-        float: left;
-        
-        table {
-          width: 100%;
-        }
-        
-        ins {
-          color: green;
-          text-decoration: none;
-        }
-        
-        del {
-          color: red;
-          text-decoration: line-through;
-        }
-      }
+div#c-post-versions {
+  div#a-index {
+    ins {
+      color: green;
+      text-decoration: none;
+      margin-right: 0.5em;
+    }
+    
+    del {
+      color: red;
+      text-decoration: line-through;
+      margin-right: 0.5em;
     }
   }
 }
