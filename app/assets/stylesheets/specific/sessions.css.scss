@@ -1,14 +1,11 @@
 @import "../common/000_vars.css.scss";
 
-div#sessions {
-  div#new {
-    section {
-      width: 30em;
-      float: left;
-    }
-  
-    h1 {
-      font-size: $h2_size;
+div#c-sessions {
+  div#a-new {
+    label#remember-label {
+      display: inline;
+      font-weight: normal;
+      font-style: italic;
     }
   }
 }

@@ -174,6 +174,20 @@ class UserTest < ActiveSupport::TestCase
       end
     end
     
+    context "cookie password hash" do
+      setup do
+        @user = Factory.create(:user, :password_hash => "1234")
+      end
+      
+      should "be correct" do
+        assert_equal("8ac3b1d04bdb95ba92f9e355897c880e0d88ac5a", @user.cookie_password_hash)
+      end
+      
+      should "validate" do
+        assert(User.authenticate_cookie_hash(@user.name, "8ac3b1d04bdb95ba92f9e355897c880e0d88ac5a"))
+      end
+    end
+    
     context "password" do
       should "match the confirmation" do
         @user = Factory.create(:user)

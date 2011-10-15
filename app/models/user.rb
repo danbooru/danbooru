@@ -139,16 +139,36 @@ class User < ActiveRecord::Base
   end
   
   module AuthenticationMethods
-    def authenticate(name, pass)
-      authenticate_hash(name, sha1(pass))
+    extend ActiveSupport::Concern
+    
+    module ClassMethods
+      def authenticate(name, pass)
+        authenticate_hash(name, sha1(pass))
+      end
+
+      def authenticate_hash(name, hash)
+        where(["lower(name) = ? AND password_hash = ?", name.downcase, hash]).first != nil
+      end
+    
+      def authenticate_cookie_hash(name, hash)
+        user = User.find_by_name(name)
+        return nil if user.nil?
+        return hash == user.cookie_password_hash
+      end
+
+      def sha1(pass)
+        Digest::SHA1.hexdigest("#{Danbooru.config.password_salt}--#{pass}--")
+      end
     end
 
-    def authenticate_hash(name, pass)
-      where(["lower(name) = ? AND password_hash = ?", name.downcase, pass]).first != nil
-    end
-
-    def sha1(pass)
-      Digest::SHA1.hexdigest("#{Danbooru.config.password_salt}--#{pass}--")
+    def cookie_password_hash
+      hash = password_hash
+      
+      (name.size + 8).times do
+        hash = User.sha1(hash)
+      end
+      
+      return hash
     end
   end
   
@@ -354,7 +374,7 @@ class User < ActiveRecord::Base
   include BanMethods
   include NameMethods
   include PasswordMethods
-  extend AuthenticationMethods
+  include AuthenticationMethods
   include FavoriteMethods
   include LevelMethods
   include EmailMethods

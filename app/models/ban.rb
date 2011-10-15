@@ -54,4 +54,8 @@ class Ban < ActiveRecord::Base
   def duration
     @duration
   end
+  
+  def expired?
+    expires_at < Time.now
+  end
 end

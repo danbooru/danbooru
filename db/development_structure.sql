@@ -2433,7 +2433,8 @@ CREATE TABLE uploads (
     post_id integer,
     md5_confirmation character varying(255),
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    backtrace text
 );
 
 

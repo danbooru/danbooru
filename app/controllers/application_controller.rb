@@ -31,20 +31,8 @@ protected
   end
 
   def set_current_user
-    if session[:user_id]
-      CurrentUser.user = User.find_by_id(session[:user_id])
-      CurrentUser.ip_addr = request.remote_ip
-    end
-    
-    if CurrentUser.user
-      if CurrentUser.user.is_banned? && CurrentUser.user.ban && CurrentUser.user.ban.expires_at < Time.now
-        CurrentUser.user.unban!
-      end
-    else
-      CurrentUser.user = AnonymousUser.new
-    end
-
-    Time.zone = CurrentUser.user.time_zone
+    session_loader = SessionLoader.new(session, cookies, request)
+    session_loader.load
   end
   
   def reset_current_user
