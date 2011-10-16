@@ -199,7 +199,7 @@ class DText
   def self.sanitize(text)
     Sanitize.clean(
       text,
-      :elements => %w(tn h1 h2 h3 h4 h5 h6 a span div blockquote br p ul li ol em strong small big b i font),
+      :elements => %w(tn h1 h2 h3 h4 h5 h6 a span div blockquote br p ul li ol em strong small b i),
       :attributes => {
         "a" => %w(href title style),
         "span" => %w(class style),
