@@ -5,7 +5,7 @@
   </div>
 <% end %>
 
-<% if post.is_deleted? && post.appeals.any? %>
+<% if post.appeals.any? %>
   <div class="ui-corner-all ui-state-highlight notice">
     <span class="ui-icon ui-icon-info"></span>
     This post has been appealed: <%= post_appeal_reasons(post) %>

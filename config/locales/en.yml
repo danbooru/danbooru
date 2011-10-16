@@ -11,3 +11,6 @@ en:
       post_vote:
         user: "You"
         user_id: "You"
+      post_appeal:
+        creator: "You"
+        creator_id: "You"

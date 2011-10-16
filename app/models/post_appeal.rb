@@ -7,7 +7,7 @@ class PostAppeal < ActiveRecord::Base
   validate :validate_post_is_inactive
   validate :validate_creator_is_not_limited
   before_validation :initialize_creator, :on => :create
-  validates_uniqueness_of :creator_id, :scope => :post_id, :message => "has already appealed this post"
+  validates_uniqueness_of :creator_id, :scope => :post_id, :message => "have already appealed this post"
   scope :for_user, lambda {|user_id| where(["creator_id = ?", user_id])}
   scope :recent, lambda {where(["created_at >= ?", 1.day.ago])}
   
