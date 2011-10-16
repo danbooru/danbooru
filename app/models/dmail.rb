@@ -9,7 +9,7 @@ class Dmail < ActiveRecord::Base
   belongs_to :from, :class_name => "User"
   after_create :update_recipient
   after_create :send_dmail
-  attr_accessible :title, :body, :is_deleted, :to_id, :to
+  attr_accessible :title, :body, :is_deleted, :to_id, :to, :to_name
   scope :for, lambda {|user| where(["owner_id = ?", user])}
   scope :inbox, where("to_id = owner_id")
   scope :sent, where("from_id = owner_id")

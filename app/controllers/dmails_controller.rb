@@ -20,6 +20,11 @@ class DmailsController < ApplicationController
     respond_with(@dmails)
   end
   
+  def search
+    @search = Dmail.search(params[:search])
+    respond_with(@dmails)
+  end
+  
   def show
     @dmail = Dmail.find(params[:id])
     check_privilege(@dmail)

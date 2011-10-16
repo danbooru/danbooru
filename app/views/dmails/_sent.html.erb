@@ -1,5 +1,6 @@
 <tr>
-  <td><%= link_to dmail.to_name, user_path(dmail.from) %></td>
+  <td><%= link_to dmail.to_name, user_path(dmail.to) %></td>
+  <td><%= link_to dmail.from_name, user_path(dmail.from) %></td>
   <td><%= link_to dmail.title, dmail_path(dmail) %></td>
   <td><%= compact_time(dmail.created_at) %></td>
 </tr>

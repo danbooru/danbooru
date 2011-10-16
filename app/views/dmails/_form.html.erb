@@ -5,6 +5,6 @@
   <%= f.input :to_name, :label => "To" %>
   <%= f.input :title %>
   <%= f.input :body, :html_options => {:size => "50x25"} %>
-  <%= f.button :submit %>
-  <%= submit_tag "Preview"  %>
+  <%= f.button :submit, "Send" %>
+  <%= submit_tag "Preview", :id => "preview-button"  %>
 <% end %>

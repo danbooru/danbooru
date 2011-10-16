@@ -1,7 +1,8 @@
 <div class="c-dmails">
   <div class="a-show">
     <div class="dmail">
-      <h1><%= @dmail.title %></h1>
+      <h1>Show Message</h1>
+      <h2><%= @dmail.title %></h2>
       <%= format_text(@dmail.body) %>
 
       <p>
@@ -11,3 +12,5 @@
     </div>
   </div>
 </div>
+
+<%= render "secondary_links" %>

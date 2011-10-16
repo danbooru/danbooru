@@ -52,7 +52,11 @@ Danbooru::Application.routes.draw do
       get :search
     end
   end
-  resources :dmails
+  resources :dmails do
+    collection do
+      get :search
+    end
+  end
   resource  :dtext_preview, :only => [:create]
   resources :favorites
   resources :forum_topics

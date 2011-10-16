@@ -2,9 +2,15 @@
   <div id="a-index">
     <h1>Messages</h1>
 
-    <%= render "search" %>
-
-    <table>
+    <table class="striped" width="100%">
+      <thead>
+        <tr>
+          <th>To</th>
+          <th>From</th>
+          <th>Subject</th>
+          <th>Date</th>
+        </tr>
+      </thead>
       <tbody>
         <% @dmails.each do |dmail| %>
           <% if params[:folder] == "sent" %>
@@ -17,3 +23,5 @@
     </table>
   </div>
 </div>
+
+<%= render "secondary_links" %>
