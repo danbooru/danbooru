@@ -893,6 +893,11 @@ class Post < ActiveRecord::Base
   end
   
   module DeletionMethods
+    def annihilate!
+      delete!
+      destroy
+    end
+    
     def delete!
       Post.transaction do
         give_favorites_to_parent

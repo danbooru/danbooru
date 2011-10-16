@@ -1,1 +1,4 @@
-$("#post-<%= @post.id %>").remove();
+$("#c-posts #delete").hide();
+$("#c-posts #undelete").show();
+$("#c-post-moderation #post-<%= @post.id %>").remove();
+Danbooru.notice("Post was deleted");

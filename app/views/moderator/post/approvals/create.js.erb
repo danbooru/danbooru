@@ -1,1 +1,6 @@
-$("#post-<%= @post.id %>").remove();
+$("#c-posts #approve").hide();
+$("#c-posts #disapprove").hide();
+$("#c-posts #flag").show();
+
+$("#c-post-moderation #post-<%= @post.id %>").hide();
+Danbooru.notice("Post was approved");

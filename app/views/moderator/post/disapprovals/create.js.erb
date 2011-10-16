@@ -1,1 +1,13 @@
-$("#post-<%= @post.id %>").remove();
+<% if @post_disapproval.errors.any? %>
+
+Danbooru.j_error("Error: " + "<%= j @post_disapproval.errors.full_messages.join("; ") %>");
+
+<% else %>
+
+$("#c-posts #approve").hide();
+$("#c-posts #disapprove").hide();
+
+$("#c-post-moderation #post-<%= @post.id %>").hide();
+Danbooru.notice("Post was disapproved");
+
+<% end %>

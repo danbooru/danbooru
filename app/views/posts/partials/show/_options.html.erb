@@ -16,5 +16,10 @@
     <li><%= link_to "Undelete", undelete_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "undelete" %></li>
     <li><%= link_to "Delete", delete_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "delete" %></li>
   <% end %>
+
+  <% if CurrentUser.is_admin? %>
+    <li><%= link_to "Annihilate", annihilate_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "annihilate", :confirm => "This will permanently delete this post (meaning the file will be deleted). Are you sure you want to annihilate this post?" %></li>
+  <% end %>
+
   <li><%= link_to "Pool", "#", :id => "pool" %></li>
 </ul>

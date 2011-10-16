@@ -17,6 +17,7 @@ Danbooru::Application.routes.draw do
       resource :disapproval, :only => [:create]
       resources :posts, :only => [:delete, :undelete] do
         member do
+          post :annihilate
           post :delete
           post :undelete
         end
