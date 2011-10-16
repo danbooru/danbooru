@@ -28,7 +28,7 @@ class PostFlagTest < ActiveSupport::TestCase
           @post_flag = PostFlag.create(:post => @post, :reason => "aaa")
         end
         
-        assert_equal(["Creator has already flagged this post"], @post_flag.errors.full_messages)
+        assert_equal(["You have already flagged this post"], @post_flag.errors.full_messages)
       end
       
       should "not be able to flag more than 10 posts in 24 hours" do
@@ -37,7 +37,7 @@ class PostFlagTest < ActiveSupport::TestCase
         assert_difference("PostFlag.count", 0) do
           @post_flag.save
         end
-        assert_equal(["Creator can flag 10 posts a day"], @post_flag.errors.full_messages)
+        assert_equal(["You can flag 10 posts a day"], @post_flag.errors.full_messages)
       end
       
       should "not be able to flag a deleted post" do

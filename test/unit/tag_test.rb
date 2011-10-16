@@ -106,7 +106,7 @@ class TagTest < ActiveSupport::TestCase
     
     should "strip out invalid characters when scanning" do
       assert_equal(%w(aaa bbb), Tag.scan_tags("aaa bbb"))
-      assert_equal(%w(-b_b_b_), Tag.scan_tags("-B,B;B* -b_b_b_"))
+      assert_equal(%w(-bb;b* -b_b_b_), Tag.scan_tags("-B,B;B* -b_b_b_"))
     end
     
     should "cast values" do

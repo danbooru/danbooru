@@ -14,6 +14,17 @@ class PostTest < ActiveSupport::TestCase
   end
   
   context "Deletion:" do
+    context "Annihilating a post" do
+      setup do
+        @post = Factory.create(:post)
+        @post.annihilate!
+      end
+      
+      should "destroy the record" do
+        assert_equal(0, Post.where("id = ?", @post.id).count)
+      end
+    end
+    
     context "Deleting a post" do
       should "update the fast count" do
         post = Factory.create(:post, :tag_string => "aaa")

@@ -439,6 +439,7 @@ CREATE TABLE advertisements (
     width integer NOT NULL,
     height integer NOT NULL,
     file_name character varying(255) NOT NULL,
+    is_work_safe boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -541,6 +542,7 @@ CREATE TABLE artist_versions (
     other_names text,
     group_name character varying(255),
     url_string text,
+    is_banned boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -1935,7 +1937,7 @@ CREATE TABLE notes (
     height integer NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
     body text NOT NULL,
-    text_index tsvector NOT NULL,
+    body_index tsvector NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -2228,6 +2230,7 @@ CREATE TABLE posts (
     pool_string text DEFAULT ''::text NOT NULL,
     last_noted_at timestamp without time zone,
     last_commented_at timestamp without time zone,
+    fav_count integer DEFAULT 0 NOT NULL,
     tag_string text DEFAULT ''::text NOT NULL,
     tag_index tsvector,
     tag_count integer DEFAULT 0 NOT NULL,
@@ -2356,9 +2359,10 @@ CREATE TABLE tag_subscriptions (
     tag_query character varying(255) NOT NULL,
     post_ids text NOT NULL,
     is_public boolean DEFAULT true NOT NULL,
+    last_accessed_at timestamp without time zone,
+    is_opted_in boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    last_accessed_at timestamp without time zone
+    updated_at timestamp without time zone
 );
 
 
@@ -2430,11 +2434,11 @@ CREATE TABLE uploads (
     uploader_ip_addr inet NOT NULL,
     tag_string text NOT NULL,
     status character varying(255) DEFAULT 'pending'::character varying NOT NULL,
+    backtrace text,
     post_id integer,
     md5_confirmation character varying(255),
     created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    backtrace text
+    updated_at timestamp without time zone
 );
 
 
@@ -3233,6 +3237,13 @@ CREATE INDEX index_artist_urls_on_normalized_url ON artist_urls USING btree (nor
 
 
 --
+-- Name: index_artist_urls_on_url; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_artist_urls_on_url ON artist_urls USING btree (url);
+
+
+--
 -- Name: index_artist_versions_on_artist_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3275,6 +3286,13 @@ CREATE INDEX index_artists_on_other_names_index ON artists USING gin (other_name
 
 
 --
+-- Name: index_bans_on_banner_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_bans_on_banner_id ON bans USING btree (banner_id);
+
+
+--
 -- Name: index_bans_on_expires_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3286,6 +3304,20 @@ CREATE INDEX index_bans_on_expires_at ON bans USING btree (expires_at);
 --
 
 CREATE INDEX index_bans_on_user_id ON bans USING btree (user_id);
+
+
+--
+-- Name: index_comment_votes_on_comment_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_comment_votes_on_comment_id ON comment_votes USING btree (comment_id);
+
+
+--
+-- Name: index_comment_votes_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_comment_votes_on_created_at ON comment_votes USING btree (created_at);
 
 
 --
@@ -4808,6 +4840,13 @@ CREATE INDEX index_note_versions_on_updater_ip_addr ON note_versions USING btree
 
 
 --
+-- Name: index_notes_on_body_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_notes_on_body_index ON notes USING gin (body_index);
+
+
+--
 -- Name: index_notes_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -4822,17 +4861,24 @@ CREATE INDEX index_notes_on_post_id ON notes USING btree (post_id);
 
 
 --
--- Name: index_notes_on_text_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_notes_on_text_index ON notes USING gin (text_index);
-
-
---
 -- Name: index_pool_versions_on_pool_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_pool_versions_on_pool_id ON pool_versions USING btree (pool_id);
+
+
+--
+-- Name: index_pool_versions_on_updater_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_pool_versions_on_updater_id ON pool_versions USING btree (updater_id);
+
+
+--
+-- Name: index_pool_versions_on_updater_ip_addr; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_pool_versions_on_updater_ip_addr ON pool_versions USING btree (updater_ip_addr);
 
 
 --
@@ -4927,6 +4973,20 @@ CREATE INDEX index_post_versions_on_updater_ip_addr ON post_versions USING btree
 
 
 --
+-- Name: index_post_votes_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_post_votes_on_post_id ON post_votes USING btree (post_id);
+
+
+--
+-- Name: index_post_votes_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_post_votes_on_user_id ON post_votes USING btree (user_id);
+
+
+--
 -- Name: index_posts_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -5004,6 +5064,20 @@ CREATE INDEX index_posts_on_tags_index ON posts USING gin (tag_index);
 
 
 --
+-- Name: index_posts_on_uploader_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_posts_on_uploader_id ON posts USING btree (uploader_id);
+
+
+--
+-- Name: index_posts_on_uploader_ip_addr; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_posts_on_uploader_ip_addr ON posts USING btree (uploader_ip_addr);
+
+
+--
 -- Name: index_tag_aliases_on_antecedent_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -5050,6 +5124,20 @@ CREATE INDEX index_tag_subscriptions_on_name ON tag_subscriptions USING btree (n
 --
 
 CREATE UNIQUE INDEX index_tags_on_name ON tags USING btree (name);
+
+
+--
+-- Name: index_uploads_on_uploader_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_uploads_on_uploader_id ON uploads USING btree (uploader_id);
+
+
+--
+-- Name: index_uploads_on_uploader_ip_addr; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_uploads_on_uploader_ip_addr ON uploads USING btree (uploader_ip_addr);
 
 
 --
@@ -5175,7 +5263,7 @@ CREATE TRIGGER trigger_forum_topics_on_update
 CREATE TRIGGER trigger_notes_on_update
     BEFORE INSERT OR UPDATE ON notes
     FOR EACH ROW
-    EXECUTE PROCEDURE tsvector_update_trigger('text_index', 'pg_catalog.english', 'body');
+    EXECUTE PROCEDURE tsvector_update_trigger('body_index', 'pg_catalog.english', 'body');
 
 
 --

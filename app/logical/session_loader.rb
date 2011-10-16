@@ -40,7 +40,6 @@ private
   end
   
   def cookie_password_hash_valid?
-    puts "cookie_password_hash=#{cookies[:cookie_password_hash]}"
     cookies[:cookie_password_hash] && User.authenticate_cookie_hash(cookies[:user_name], cookies[:cookie_password_hash])
   end
   

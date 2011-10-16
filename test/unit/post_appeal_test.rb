@@ -28,7 +28,7 @@ class PostAppealTest < ActiveSupport::TestCase
           @post_appeal = PostAppeal.create(:post => @post, :reason => "aaa")
         end
         
-        assert_equal(["Creator has already appealed this post"], @post_appeal.errors.full_messages)
+        assert_equal(["You have already appealed this post"], @post_appeal.errors.full_messages)
       end
       
       should "not be able to appeal more than 5 posts in 24 hours" do
@@ -37,7 +37,7 @@ class PostAppealTest < ActiveSupport::TestCase
         assert_difference("PostAppeal.count", 0) do
           @post_appeal.save
         end
-        assert_equal(["Creator can appeal 5 posts a day"], @post_appeal.errors.full_messages)
+        assert_equal(["You can appeal 5 posts a day"], @post_appeal.errors.full_messages)
       end
       
       should "not be able to appeal an active post" do

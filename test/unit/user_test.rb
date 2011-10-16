@@ -54,6 +54,7 @@ class UserTest < ActiveSupport::TestCase
     end
     
     should "limit comment votes" do
+      Danbooru.config.stubs(:member_comment_limit).returns(10)
       assert(@user.can_comment_vote?)
       10.times do
         comment = Factory.create(:comment)
@@ -176,7 +177,7 @@ class UserTest < ActiveSupport::TestCase
     
     context "cookie password hash" do
       setup do
-        @user = Factory.create(:user, :password_hash => "1234")
+        @user = Factory.create(:user, :name => "albert", :password_hash => "1234")
       end
       
       should "be correct" do

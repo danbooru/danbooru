@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-rake db:drop db:create
+bundle exec rake db:drop db:create
 createlang plpgsql danbooru2
-rake db:migrate
-rake db:seed
+bundle exec rake db:migrate
+bundle exec rake db:seed

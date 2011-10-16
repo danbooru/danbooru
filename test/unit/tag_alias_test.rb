@@ -45,7 +45,7 @@ class TagAliasTest < ActiveSupport::TestCase
       ta = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "ccc")
       post1.reload
       post2.reload
-      assert_equal("ccc bbb", post1.tag_string)
+      assert_equal("bbb ccc", post1.tag_string)
       assert_equal("ccc ddd", post2.tag_string)
     end
     

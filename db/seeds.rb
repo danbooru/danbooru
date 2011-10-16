@@ -50,7 +50,7 @@ if Comment.count == 0
   puts "Creating comments"
   Post.all.each do |post|
     rand(30).times do
-      Comment.create(:post_id => post.id, :body => rand(1_000_000).to_s)
+      Comment.create(:post_id => post.id, :body => Time.now.to_f.to_s)
     end
   end
 else
@@ -61,7 +61,7 @@ if Note.count == 0
   puts "Creating notes"
   Post.all.each do |post|
     rand(10).times do
-      note = Note.create(:post_id => post.id, :x => 0, :y => 0, :width => 100, :height => 100, :body => rand(1_000_000).to_s)
+      note = Note.create(:post_id => post.id, :x => 0, :y => 0, :width => 100, :height => 100, :body => Time.now.to_f.to_s)
       
       rand(30).times do |i|
         note.update_attributes(:body => (i * i).to_s)
@@ -106,7 +106,7 @@ if Pool.count == 0
   
   1.upto(20) do |i|
     pool = Pool.create(:name => i.to_s)
-    33.times do |j|
+    rand(33).times do |j|
       pool.add!(Post.order("random()").first)
     end
   end
@@ -122,6 +122,18 @@ if Favorite.count == 0
   end
 else 
   puts "Skipping favorites"
+end
+
+if ForumTopic.count == 0
+  puts "Creating forum posts"
+  
+  100.times do |i|
+    topic = ForumTopic.create(:title => Time.now.to_f.to_s)
+    
+    rand(100).times do |j|
+      post = ForumPost.create(:topic_id => topic.id, :body => Time.now.to_f.to_s)
+    end
+  end
 end
 
 if TagSubscription.count == 0

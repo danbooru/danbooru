@@ -140,7 +140,7 @@ class UploadTest < ActiveSupport::TestCase
         end
 
         post = Post.last
-        assert_equal("hoge foo", post.tag_string)
+        assert_equal("foo hoge", post.tag_string)
         assert_equal("s", post.rating)
         assert_equal(@upload.uploader_id, post.uploader_id)
         assert_equal("127.0.0.1", post.uploader_ip_addr)
@@ -167,7 +167,7 @@ class UploadTest < ActiveSupport::TestCase
         assert_nothing_raised {@upload.process!}
       end
       post = Post.last
-      assert_equal("hoge foo", post.tag_string)
+      assert_equal("foo hoge", post.tag_string)
       assert_equal("s", post.rating)
       assert_equal(@upload.uploader_id, post.uploader_id)
       assert_equal("127.0.0.1", post.uploader_ip_addr)

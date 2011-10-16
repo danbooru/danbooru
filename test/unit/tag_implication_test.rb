@@ -80,7 +80,7 @@ class TagImplicationTest < ActiveSupport::TestCase
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "xxx")
       ti2 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "yyy")
       p1.reload
-      assert_equal("aaa yyy xxx bbb ccc", p1.tag_string)
+      assert_equal("aaa bbb ccc xxx yyy", p1.tag_string)
     end
     
     should "record the implication's creator in the tag history" do
