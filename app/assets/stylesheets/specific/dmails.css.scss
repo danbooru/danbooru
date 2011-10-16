@@ -1,0 +1,14 @@
+@import "../common/000_vars.css.scss";
+
+div#c-dmails {
+  div#preview {
+    margin: 1em 0;
+    border: 1px solid #CCC;
+    padding: 1em;
+    width: 40em;
+    
+    h1 {
+      font-size: $h2_size;
+    }
+  }
+}
