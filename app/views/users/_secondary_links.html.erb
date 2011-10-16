@@ -1,13 +1,14 @@
 <% content_for(:secondary_links) do %>
   <menu>
     <li><%= link_to "Listing", users_path %></li>
-    <% unless CurrentUser.is_anonymous? %>
-      <% if @user %>
+    <% if @user && !CurrentUser.is_anonymous? %>
+      <li>|</li>
+      <% if @user.id == CurrentUser.id %>
+        <li><%= link_to "Settings", edit_user_path(CurrentUser.user) %></li>
+        <li><%= link_to "Profile", user_path(CurrentUser.user) %></li>
+      <% else %>
         <li><%= link_to "Send message", new_dmail_path(:dmail => {:to_id => @user.id}) %></li>
       <% end %>
-      <li>|</li>
-      <li><%= link_to "My settings", edit_user_path(CurrentUser.user) %></li>
-      <li><%= link_to "My profile", user_path(CurrentUser.user) %></li>
       <li>|</li>
       <li><%= link_to "Sign out", session_path, :method => :delete %></li>
     <% end %>
