@@ -5,19 +5,20 @@
     <table class="striped" width="100%">
       <thead>
         <tr>
-          <th>To</th>
-          <th>From</th>
-          <th>Subject</th>
           <th>Date</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Subject</th>
         </tr>
       </thead>
       <tbody>
         <% @dmails.each do |dmail| %>
-          <% if params[:folder] == "sent" %>
-            <%= render "sent", :dmail => dmail %>
-          <% else %>
-            <%= render "received", :dmail => dmail %>
-          <% end %>
+          <tr>
+            <td><%= compact_time(dmail.created_at) %></td>
+            <td><%= link_to dmail.from_name, user_path(dmail.from) %></td>
+            <td><%= link_to dmail.to_name, user_path(dmail.to) %></td>
+            <td><%= link_to dmail.title, dmail_path(dmail) %></td>
+          </tr>
         <% end %>
       </tbody>
     </table>
