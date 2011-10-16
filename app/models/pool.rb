@@ -10,6 +10,7 @@ class Pool < ActiveRecord::Base
   before_validation :normalize_post_ids
   before_validation :initialize_creator, :on => :create
   after_save :create_version
+  before_destroy :create_mod_action_for_destroy
   attr_accessible :name, :description, :post_ids, :post_id_array, :is_active, :post_count
   
   def self.name_to_id(name)
@@ -64,6 +65,14 @@ class Pool < ActiveRecord::Base
 
   def contains?(post_id)
     post_ids =~ /(?:\A| )#{post_id}(?:\Z| )/
+  end
+  
+  def deletable_by?(user)
+    user.is_janitor?
+  end
+  
+  def create_mod_action_for_destroy
+    ModAction.create(:description => "deleted pool ##{id} name=#{name} post_ids=#{post_ids}")
   end
   
   def add!(post)

@@ -2,6 +2,7 @@ class PoolsController < ApplicationController
   respond_to :html, :xml, :json, :js
   before_filter :member_only, :except => [:index, :show]
   before_filter :moderator_only, :only => [:destroy]
+  rescue_from User::PrivilegeError, :with => "static/access_denied"
 
   def new
     @pool = Pool.new
@@ -45,6 +46,9 @@ class PoolsController < ApplicationController
   
   def destroy
     @pool = Pool.find(params[:id])
+    if !@pool.deletable_by?(CurrentUser.user)
+      raise User::PrivilegeError
+    end
     @pool.destroy
     respond_with(@pool, :notice => "Pool deleted")
   end

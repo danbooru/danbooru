@@ -8,6 +8,9 @@
       <li><%= link_to "Show", pool_path(@pool) %></li>
       <li><%= link_to "Posts", posts_path(:tags => "pool:#{@pool.id}") %></li>
       <li><%= link_to "Edit", edit_pool_path(@pool) %></li>
+      <% if @pool.deletable_by?(CurrentUser.user) %>
+        <li><%= link_to "Delete", pool_path(@pool), :method => :delete, :confirm => "Are you sure you want to delete this pool?", :remote => true %></li>
+      <% end %>
       <li><%= link_to "Order", edit_pool_order_path(@pool) %></li>
     <% end %>
   </menu>
