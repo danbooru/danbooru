@@ -30,7 +30,7 @@ class ForumTopicsController < ApplicationController
   end
   
   def create
-    @forum_topic = ForumTopic.create(params[:forum_topic])
+    @forum_topic = ForumTopic.create(params[:forum_topic], :as => CurrentUser.role)
     respond_with(@forum_topic)
   end
   
@@ -38,7 +38,7 @@ class ForumTopicsController < ApplicationController
     @forum_topic = ForumTopic.find(params[:id])
     check_privilege(@forum_topic)
     assign_special_attributes(@forum_topic)
-    @forum_topic.update_attributes(params[:forum_topic])
+    @forum_topic.update_attributes(params[:forum_topic], :as => CurrentUser.role)
     respond_with(@forum_topic)
   end
   

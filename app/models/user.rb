@@ -199,6 +199,28 @@ class User < ActiveRecord::Base
       end
     end
     
+    def role
+      case level
+      when Levels::MEMBER
+        :member
+        
+      when Levels::PRIVILEGED
+        :privileged
+        
+      when Levels::CONTRIBUTOR
+        :contributor
+        
+      when Levels::JANITOR
+        :janitor
+        
+      when Levels::MODERATOR
+        :moderator
+        
+      when Levels::ADMIN
+        :admin
+      end
+    end
+    
     def level_string
       case level
       when Levels::MEMBER

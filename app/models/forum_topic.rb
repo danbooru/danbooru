@@ -1,5 +1,6 @@
 class ForumTopic < ActiveRecord::Base
   attr_accessible :title, :original_post_attributes
+  attr_accessible :is_sticky, :is_locked, :as => :janitor
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
   has_many :posts, :class_name => "ForumPost", :order => "forum_posts.id asc", :foreign_key => "topic_id", :dependent => :destroy

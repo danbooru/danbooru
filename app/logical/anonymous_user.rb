@@ -119,6 +119,10 @@ class AnonymousUser
   def update_column(*params)
   end
   
+  def role
+    :anonymous
+  end
+  
   %w(member banned privileged contributor janitor moderator admin).each do |name|
     define_method("is_#{name}?") do
       false
