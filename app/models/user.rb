@@ -313,7 +313,7 @@ class User < ActiveRecord::Base
   module ForumMethods
     def has_forum_been_updated?
       return false unless is_privileged?
-      newest_topic = ForumPost.first(:order => "updated_at desc", :select => "updated_at")
+      newest_topic = ForumPost.order("updated_at desc").first
       return false if newest_topic.nil?
       return true if last_forum_read_at.nil?
       return newest_topic.updated_at > last_forum_read_at
