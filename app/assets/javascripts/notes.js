@@ -163,8 +163,7 @@ Danbooru.Note = {
       var doc_width = $image.offset().left + $image.width();
       if ($note_body.offset().left + $note_body.width() > doc_width) {
         $note_body.css({
-          // 30 is a magic number to factor in width of the scroll bar
-          left: $note_body.position().left - 30 - ($note_body.offset().left + $note_body.width() - doc_width)
+          left: $note_body.position().left - 10 - ($note_body.offset().left + $note_body.width() - doc_width)
         });
       }
     },
@@ -195,8 +194,6 @@ Danbooru.Note = {
     },
     
     resize: function($note_body) {
-      return;
-      
       var w = $note_body.width();
       var h = $note_body.height();
       var golden_ratio = 1.6180339887;
