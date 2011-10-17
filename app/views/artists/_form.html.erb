@@ -3,6 +3,8 @@
   <%= f.input :other_names, :hint => "Separate with commas", :as => :text %>
   <%= f.input :group_name %>
   <%= f.input :url_string, :label => "URLs", :as => :text, :size => "10x5" %>
+  <%= f.input :is_active %>
+  <%= f.input :is_banned %>
   <%= f.input :notes, :as => :text %>
   <%= f.button :submit %>
 <% end %>

@@ -14,6 +14,24 @@ class ArtistTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
     
+    context "that has been banned" do
+      setup do
+        @post = Factory.create(:post, :tag_string => "aaa")
+        @artist = Factory.create(:artist, :name => "aaa")
+        @artist.reload
+        @artist.update_attributes(:is_banned => true)
+        @post.reload
+      end
+      
+      should "delete the post" do
+        assert(@post.is_deleted?)
+      end
+      
+      should "create a new tag implication" do
+        assert_equal(1, TagImplication.where(:antecedent_name => "aaa", :consequent_name => "banned_artist").count)
+      end
+    end
+    
     should "create a new wiki page to store any note information" do
       artist = nil
       assert_difference("WikiPage.count") do

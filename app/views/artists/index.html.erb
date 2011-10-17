@@ -20,17 +20,7 @@
               <% end %>
             </td>
             <td><%= artist.other_names %></td>
-            <td>
-              <% if artist.is_active? %>
-                Active
-              <% else %>
-                Deleted
-              <% end %>
-              
-              <% if artist.is_banned? %>
-                Banned
-              <% end %>
-            </td>
+            <td><%= artist.status %></td>
           <% end %>
         <% end %>
       </tbody>

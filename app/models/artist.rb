@@ -3,6 +3,7 @@ class Artist < ActiveRecord::Base
   before_save :normalize_name
   after_save :create_version
   after_save :save_url_string
+  after_save :commit_ban
   validates_uniqueness_of :name
   belongs_to :creator, :class_name => "User"
   has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
@@ -11,7 +12,7 @@ class Artist < ActiveRecord::Base
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :tag_alias, :foreign_key => "antecedent_name", :primary_key => "name"
   accepts_nested_attributes_for :wiki_page
-  attr_accessible :name, :url_string, :other_names, :group_name, :wiki_page_attributes, :notes
+  attr_accessible :name, :url_string, :other_names, :group_name, :wiki_page_attributes, :notes, :is_banned, :is_active
   scope :url_match, lambda {|string| where(["id in (?)", Artist.find_all_by_url(string).map(&:id)])}
   scope :other_names_match, lambda {|string| where(["other_names_index @@ to_tsquery('danbooru', ?)", Artist.normalize_name(string)])}
   scope :name_equals, lambda {|string| where("name = ?", string)}
@@ -158,6 +159,34 @@ class Artist < ActiveRecord::Base
     end
   end
   
+  module BanMethods
+    def commit_ban
+      if is_banned? && is_banned_changed?
+        ban!
+      end
+      
+      true
+    end
+    
+    def ban!
+      Post.transaction do
+        Post.tag_match(name).each do |post|
+          begin
+            post.flag!("Artist requested removal")
+          rescue PostFlag::Error
+            # swallow
+          end
+          post.delete!
+        end
+        
+        tag_implication = TagImplication.create(:antecedent_name => name, :consequent_name => "banned_artist")
+        tag_implication.delay.process!
+        update_column(:is_active, false)
+        update_column(:is_banned, true)
+      end
+    end
+  end
+  
   include UrlMethods
   include NameMethods
   include GroupMethods
@@ -165,13 +194,19 @@ class Artist < ActiveRecord::Base
   extend FactoryMethods
   include NoteMethods
   include TagMethods
+  include BanMethods
   
-  def ban!
-    
+  def status
+    if is_banned?
+      "Banned"
+    elsif is_active?
+      "Active"
+    else
+      "Deleted"
+    end
   end
   
   def initialize_creator
     self.creator_id = CurrentUser.user.id
   end
 end
-

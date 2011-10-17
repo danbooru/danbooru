@@ -13,15 +13,7 @@
         <tbody>
           <tr>
             <th width="15%">Status</th>
-            <td width="85%">
-              <% if @artist.is_banned? %>
-                Banned
-              <% elsif @artist.is_active? %>
-                Active
-              <% else %>
-                Inactive
-              <% end %>
-            </td>
+            <td width="85%"><%= @artist.status %></td>
           </tr>
           <% if @artist.has_tag_alias? %>
             <tr>
