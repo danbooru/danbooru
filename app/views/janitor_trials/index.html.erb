@@ -2,7 +2,7 @@
   <div id="a-index">
     <h1>Janitor Trials</h1>
 
-    <table>
+    <table class="striped">
       <thead>
         <tr>
           <th>User</th>
@@ -14,7 +14,7 @@
         <% @janitor_trials.each do |janitor_trial| %>
           <tr>
             <td><%= janitor_trial.user.name %></td>
-            <td><%= janitor_trial.created_at %></td>
+            <td><%= time_ago_in_words janitor_trial.created_at %></td>
             <td>
               <%= link_to "Promote", promote_janitor_trial_path(janitor_trial), :remote => true, :method => :put %>
               | <%= link_to "Demote", demote_janitor_trial_path(janitor_trial), :remote => true, :method => :put %>
@@ -25,3 +25,5 @@
     </table>
   </div>
 </div>
+
+<%= render "secondary_links" %>

@@ -15,6 +15,10 @@ class JanitorTrial < ActiveRecord::Base
     self.original_level = user.level
   end
   
+  def user_name
+    user.try(:name)
+  end
+  
   def user_name=(name)
     self.user_id = User.name_to_id(name)
   end

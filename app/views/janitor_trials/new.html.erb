@@ -3,8 +3,10 @@
     <h1>New Janitor Trial</h1>
 
     <%= simple_form_for(@janitor_trial) do |f| %>
-      <%= f.input :user_id %>
-      <%= f.button :submit %>
+      <%= f.input :user_name %>
+      <%= f.button :submit, "Submit" %>
     <% end %>
   </div>
 </div>
+
+<%= render "secondary_links" %>
