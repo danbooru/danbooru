@@ -2,7 +2,7 @@
   <div id="a-index">
     <h1>IP Bans</h1>
 
-    <table>
+    <table class="striped">
       <thead>
         <tr>
           <th>IP Address</th>
@@ -22,6 +22,9 @@
         <% end %>
       </tbody>
     </table>
+    
+    <%= numbered_paginator(@ip_bans) %>
   </div>
 </div>
 
+<%= render "secondary_links" %>

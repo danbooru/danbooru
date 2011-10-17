@@ -18,6 +18,5 @@ class IpBansController < ApplicationController
   def destroy
     @ip_ban = IpBan.find(params[:id])
     @ip_ban.destroy
-    redirect_to ip_bans_path
   end
 end

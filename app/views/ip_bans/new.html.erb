@@ -5,7 +5,9 @@
     <%= simple_form_for(@ip_ban) do |f| %>
       <%= f.input :ip_addr %>
       <%= f.input :reason %>
-      <%= f.button :submit %>
+      <%= f.button :submit, "Submit" %>
     <% end %>
   </div>
 </div>
+
+<%= render "secondary_links" %>
