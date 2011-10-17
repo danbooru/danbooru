@@ -2,18 +2,20 @@
   <div id="a-index">
     <h1>User Feedback</h1>
     
-    <table width="100%">
+    <table class="striped" width="100%">
       <thead>
         <tr>
+          <th width="10%">Category</th>
           <th width="15%">User</th>
           <th width="15%">Creator</th>
           <th width="15%">When</th>
-          <th width="55%">Message</th>
+          <th width="45%">Message</th>
         </tr>
       </thead>
       <tbody>
         <% @user_feedbacks.each do |feedback| %>
           <tr>
+            <td><%= feedback.category %></td>
             <td><%= link_to feedback.user_name, user_feedback_path(feedback.user_id) %></td>
             <td><%= feedback.creator.name %></td>
             <td><%= time_ago_in_words(feedback.created_at) %> ago</td>

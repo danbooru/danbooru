@@ -7,10 +7,10 @@
 
     <%= simple_form_for(@user_feedback) do |f| %>
       <%= f.input :user_name %>
-      <%= f.input :category, :collection => ["positive", "neutral", "negative"] %>
-      <%= f.input :body %>
-      <%= f.button :submit %>
-      <%= f.button :submit, :value => "Preview" %>
+      <%= f.input :category, :collection => ["positive", "neutral", "negative"], :include_blank => false %>
+      <%= f.input :body, :input_html => {:size => "50x5"} %>
+      <%= f.button :submit, "Submit" %>
+      <%= f.button :submit, "Preview" %>
     <% end %>
   </div>
 </div>

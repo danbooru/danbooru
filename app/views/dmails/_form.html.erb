@@ -4,7 +4,7 @@
 <%= simple_form_for(dmail) do |f| %>
   <%= f.input :to_name, :label => "To" %>
   <%= f.input :title %>
-  <%= f.input :body, :html_options => {:size => "50x25"} %>
+  <%= f.input :body, :input_html => {:size => "50x25"} %>
   <%= f.button :submit, "Send" %>
   <%= submit_tag "Preview", :id => "preview-button"  %>
 <% end %>

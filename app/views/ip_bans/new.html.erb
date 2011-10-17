@@ -4,7 +4,7 @@
 
     <%= simple_form_for(@ip_ban) do |f| %>
       <%= f.input :ip_addr %>
-      <%= f.input :reason %>
+      <%= f.input :reason, :input_html => {:size => "50x5"} %>
       <%= f.button :submit, "Submit" %>
     <% end %>
   </div>
