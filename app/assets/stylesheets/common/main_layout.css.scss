@@ -5,10 +5,12 @@ div#search {
 }
 
 div#page {
+  overflow: hidden;
+  width: 85em;
   margin: 0 30px;
   
   aside#sidebar {
-    width: 20%;
+    width: 15em;
     float: left;
     
     h1 {
@@ -29,9 +31,9 @@ div#page {
   }
 
   section#content {
-    width: 75%;
+    width: 65em;
     float: left;
-    margin-left: 2em;
+    padding-left: 2em;
     overflow: visible;
   }
 }

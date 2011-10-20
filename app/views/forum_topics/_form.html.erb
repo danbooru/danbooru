@@ -8,7 +8,8 @@
       <% unless @forum_topic.new_record? %>
         <%= hidden_field_tag "forum_topic[original_post_attributes][topic_id]", @forum_topic.id %>
       <% end %>
-      <%= pf.input :body, :input_html => {:id => "forum_post_body"} %>
+      
+      <%= render "dtext/form", :name => "Body", :input_id => "forum_post_body", :input_name => "forum_topic[original_post_attributes][body]", :value => @forum_topic.original_post.body, :preview_id => "dtext-preview" %>
     <% end %>
   
     <% if CurrentUser.is_moderator? %>
@@ -17,18 +18,6 @@
     <% end %>
   
     <%= f.button :submit, "Submit" %>
-    <%= f.button :submit, "Preview" %>
+    <%= f.button :submit, "Preview", "data-input-id" => "forum_post_body", "data-preview-id" => "dtext-preview" %>
   <% end %>
-</div>
-
-<div id="form-aside">
-  <div id="preview">
-    <div class="content dtext">
-      
-    </div>
-    <p><a href="#" name="toggle-preview">Hide</a></p>
-  </div>
-  <div id="dtext-help">
-    <%= render "dtext/help" %>
-  </div>
 </div>

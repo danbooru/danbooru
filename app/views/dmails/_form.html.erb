@@ -1,10 +1,9 @@
-<div id="preview">
-</div>
-
 <%= simple_form_for(dmail) do |f| %>
   <%= f.input :to_name, :label => "To" %>
   <%= f.input :title %>
-  <%= f.input :body, :input_html => {:size => "50x25"} %>
+
+  <%= render "dtext/form", :name => "Body", :input_id => "dmail_body", :input_name => "dmail[body]", :value => dmail.body, :preview_id => "dtext-preview" %>
+
   <%= f.button :submit, "Send" %>
-  <%= submit_tag "Preview", :id => "preview-button"  %>
+  <%= f.button :submit, "Preview", "data-input-id" => "dmail_body", "data-preview-id" => "dtext-preview" %>
 <% end %>

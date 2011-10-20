@@ -1,11 +1,9 @@
 <div class="comment-preview dtext dtext-preview">
 </div>
 
-<%= form_tag(comments_path) do %>
+<%= form_tag(comments_path, :class => "simple_form") do %>
   <%= hidden_field "comment", "post_id", :value => post.id %>
-  <%= text_area "comment", "body", :size => "60x7" %>
-  <br>
+  <%= render "dtext/form", :name => "Response", :input_id => "comment_response_for_#{post.id}", :input_name => "comment[body]", :value => "", :preview_id => "dtext-preview-for-#{post.id}" %>
   <%= submit_tag "Post" %>
-  <%= submit_tag "Preview" %>
-  <%= link_to "Formatting", wiki_pages_path(:title => "help:dtext") %>
-<% end %>
+  <%= submit_tag "Preview", "data-input-id" => "comment_response_for_#{post.id}", "data-preview-id" => "dtext-preview-for-#{post.id}" %>
+<% end %>  

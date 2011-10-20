@@ -34,24 +34,7 @@ div#c-forum-topics {
   tr.new-topic {
     font-weight: bold;
   }
-  
-  div#form-content {
-    float: left;
-    width: 450px;
-    padding-right: 1em;
-  }
-  
-  div#form-aside {
-    float: left;
-    width: 400px;
-    
-    div#preview > p {
-      margin-top: 0.5em;
-      padding-top: 0.5em;
-      border-top: 1px solid #AAA;
-    }
-  }
-  
+
   a.last-page {
     color: #666;
   }
