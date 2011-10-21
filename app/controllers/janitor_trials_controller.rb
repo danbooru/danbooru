@@ -37,4 +37,8 @@ class JanitorTrialsController < ApplicationController
       format.js
     end
   end
+  
+  def test
+    @tester = JanitorTrialTester.new(params[:janitor_trial][:user_name])
+  end
 end

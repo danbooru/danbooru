@@ -5,7 +5,10 @@
     <%= simple_form_for(@janitor_trial) do |f| %>
       <%= f.input :user_name %>
       <%= f.button :submit, "Submit" %>
+      <%= f.button :submit, "Test" %>
     <% end %>
+    
+    <p id="test-results"></p>
   </div>
 </div>
 

@@ -66,6 +66,9 @@ Danbooru::Application.routes.draw do
     end
   end
   resources :janitor_trials do
+    collection do
+      get :test
+    end
     member do
       put :promote
       put :demote
