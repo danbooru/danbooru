@@ -4,6 +4,7 @@
   Danbooru.PostModeMenu.initialize = function() {
     this.initialize_selector();
     this.initialize_preview_link();
+    this.initialize_edit_form();
   }
   
   Danbooru.PostModeMenu.initialize_selector = function() {
@@ -21,7 +22,29 @@
     $(".post-preview a").click(Danbooru.PostModeMenu.click);
   }
   
+  Danbooru.PostModeMenu.initialize_edit_form = function() {
+    $("#quick-edit-div").hide();
+    
+    $("#quick-edit-form").submit(function(e) {
+      $.ajax({
+        type: "put",
+        url: $("#quick-edit-form").attr("action"),
+        data: {
+          post: {
+            tag_string: $("#post_tag_string").val()
+          }
+        },
+        success: function(data) {
+          Danbooru.Post.update_data(data);
+        }
+      });
+      
+      e.preventDefault();
+    });
+  }
+  
   Danbooru.PostModeMenu.change = function() {
+    $("#quick-edit-div").hide();
     var s = $("#mode-box select").val();
     var $body = $(document.body);
     $body.removeClass();
@@ -43,6 +66,13 @@
     }
   }
   
+  Danbooru.PostModeMenu.open_edit = function(post_id) {
+    var $post = $("#post_" + post_id);
+    $("#quick-edit-div").show();
+    $("#quick-edit-form").attr("action", "/posts/" + post_id + ".json");
+    $("#post_tag_string").val($post.data("tags"));
+  }
+  
   Danbooru.PostModeMenu.click = function(e) {
     var s = $("#mode-box select").val();
     var post_id = $(e.target).closest("article").data("id");
@@ -52,7 +82,7 @@
     } else if (s === "remove-fav") {
       Danbooru.Favorite.destroy(post_id);
     } else if (s === "edit") {
-     // TODO
+      Danbooru.PostModeMenu.open_edit(post_id);
     } else if (s === 'vote-down') {
       Danbooru.Post.vote("down", post_id);
     } else if (s === 'vote-up') {

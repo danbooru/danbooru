@@ -14,6 +14,7 @@
     </aside>
 
     <section id="content">
+      <%= render "posts/partials/index/edit" %>
       <%= render "wiki_pages/excerpt", :post_set => @post_set %>
       <%= render "posts/partials/index/posts", :post_set => @post_set %>
     </section>

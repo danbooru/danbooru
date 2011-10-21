@@ -19,7 +19,11 @@ class PostsController < ApplicationController
   def update
     @post = Post.find(params[:id])
     @post.update_attributes(params[:post])
-    respond_with(@post)
+    respond_with(@post) do |format|
+      format.json do
+        render :json => @post.to_json
+      end
+    end
   end
   
   def revert

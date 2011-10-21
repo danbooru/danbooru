@@ -1,0 +1,8 @@
+<div id="quick-edit-div">
+  <h1>Edit</h1>
+
+  <%= form_tag("/posts", :class => "simple_form", :method => :put, :id => "quick-edit-form") do %>
+    <%= text_area_tag "post[tag_string]", "" %>
+    <%= submit_tag "Submit" %>
+  <% end %>
+</div>

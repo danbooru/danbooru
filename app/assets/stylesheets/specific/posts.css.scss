@@ -135,6 +135,14 @@ div#c-posts {
       margin-top: 1em;
     }
   }
+  
+  div#quick-edit-div {
+    textarea {
+      width: 30em;
+      height: 4em;
+      display: block;
+    }
+  }
 }
 
 div#c-explore-posts {

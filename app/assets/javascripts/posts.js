@@ -22,9 +22,13 @@
   
   Danbooru.Post.initialize_titles = function() {
     $("article.post-preview").each(function(i, v) {
-      var $v = $(v);
-      $v.attr("title", $v.data("tags") + " uploader:" + $v.data("uploader") + " rating:" + $v.data("rating"));
+      Danbooru.Post.initialize_title_for(v);
     });
+  }
+  
+  Danbooru.Post.initialize_title_for = function(post) {
+    var $post = $(post);
+    $post.attr("title", $post.data("tags") + " uploader:" + $post.data("uploader") + " rating:" + $post.data("rating"));
   }
   
   Danbooru.Post.initialize_image_resize = function() {
@@ -124,7 +128,9 @@
   
   Danbooru.Post.update_data = function(data) {
     var $post = $("#post_" + data.id);
-    $post.data("tags", data.tags);
+    $post.data("tags", data.tag_string);
+    $post.data("rating", data.rating);
+    Danbooru.Post.initialize_title_for($post);
   }
   
   Danbooru.Post.vote = function(score, id) {
