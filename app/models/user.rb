@@ -15,7 +15,8 @@ class User < ActiveRecord::Base
   
   attr_accessor :password, :old_password
   attr_accessible :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr, :time_zone, :default_image_size
-  validates_length_of :name, :within => 2..1000, :on => :create
+  attr_accessible :level, :as => :admin
+  validates_length_of :name, :within => 2..100, :on => :create
   validates_format_of :name, :with => /\A[^\s:]+\Z/, :on => :create, :message => "cannot have whitespace or colons"
   validates_uniqueness_of :name, :case_sensitive => false, :on => :create
   validates_uniqueness_of :email, :case_sensitive => false, :on => :create, :if => lambda {|rec| !rec.email.blank?}
@@ -191,6 +192,21 @@ class User < ActiveRecord::Base
   end
   
   module LevelMethods
+    extend ActiveSupport::Concern
+    
+    module ClassMethods
+      def level_hash
+        return {
+          "Member" => Levels::MEMBER,
+          "Privileged" => Levels::PRIVILEGED,
+          "Contributor" => Levels::CONTRIBUTOR,
+          "Janitor" => Levels::JANITOR,
+          "Moderator" => Levels::MODERATOR,
+          "Admin" => Levels::ADMIN
+        }
+      end
+    end
+    
     def promote_to_admin_if_first_user
       return if Rails.env.test?
       

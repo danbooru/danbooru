@@ -16,7 +16,7 @@ div#c-users {
   }
   
   div#a-new {
-    max-width: 60em;
+    max-width: 50em;
     
     p {
       margin-bottom: 1em;
@@ -28,8 +28,11 @@ div#c-users {
     }
     
     div#account-comparison {
+      padding: 0 1em;
+      margin: 1em 0;
+      
       h1 {
-        font-size: $h2_size;
+        font-size: $h3_size;
       }
       
       li {
@@ -38,9 +41,9 @@ div#c-users {
       }
       
       section {
-        width: 18em;
+        width: 15em;
         float: left;
-        padding: 1em;
+        padding-right: 1em;
       }
     }
     

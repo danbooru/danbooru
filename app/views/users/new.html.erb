@@ -69,6 +69,7 @@
         <%= f.input :password %>
         <%= f.input :password_confirmation %>
         <%= f.input :email, :required => false %>
+        <%= f.input :level, :collection => User.level_hash.to_a, :include_blank => false %>
         <%= f.button :submit %>
       <% end %>
     </div>
