@@ -6,11 +6,11 @@
     </div>
 
     <%= simple_form_for(@user_feedback) do |f| %>
-      <%= f.input :user_name %>
+      <%= f.input :user_name, :label => "User" %>
       <%= f.input :category, :collection => ["positive", "neutral", "negative"], :include_blank => false %>
-      <%= f.input :body, :input_html => {:size => "50x5"} %>
+      <%= dtext_field "user_feedback", "body" %>
       <%= f.button :submit, "Submit" %>
-      <%= f.button :submit, "Preview" %>
+      <%= dtext_preview_button "user_feedback", "body" %>
     <% end %>
   </div>
 </div>

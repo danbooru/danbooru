@@ -3,9 +3,9 @@
     <h1>Edit Comment</h1>    
     
     <%= simple_form_for(@comment) do |f| %>
-      <%= render "dtext/form", :name => "Body", :input_id => "comment_body", :input_name => "comment[body]", :value => @comment.body, :preview_id => "dtext-preview" %>
+      <%= dtext_field "comment", "body" %>
       <%= f.button :submit, "Submit" %>
-      <%= f.button :submit, "Preview", "data-input-id" => "comment_body", "data-preview-id" => "dtext-preview" %>
+      <%= dtext_preview_button "comment", "body" %>
     <% end %>
   </div>
 </div>

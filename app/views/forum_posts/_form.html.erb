@@ -1,23 +1,9 @@
-<div id="form-content">
-  <%= error_messages_for("forum_post") %>
+<%= error_messages_for("forum_post") %>
 
-  <%= simple_form_for(@forum_post) do |f| %>
-    <%= f.input :topic_id, :as => :hidden %>
-    <%= f.input :body %>
+<%= simple_form_for(@forum_post) do |f| %>
+  <%= f.input :topic_id, :as => :hidden %>
+  <%= dtext_field "forum_post", "body" %>
 
-    <%= f.button :submit, "Submit" %>
-    <%= f.button :submit, "Preview" %>
-  <% end %>
-</div>
-
-<div id="form-aside">
-  <div id="preview">
-    <div class="content dtext">
-      
-    </div>
-    <p><a href="#" name="toggle-preview">Hide</a></p>
-  </div>
-  <div id="dtext-help">
-    <%= render "dtext/help" %>
-  </div>
-</div>
+  <%= f.button :submit, "Submit" %>
+  <%= dtext_preview_button "forum_post", "body" %>
+<% end %>

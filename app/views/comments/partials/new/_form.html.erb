@@ -3,7 +3,7 @@
 
 <%= form_tag(comments_path, :class => "simple_form") do %>
   <%= hidden_field "comment", "post_id", :value => post.id %>
-  <%= render "dtext/form", :name => "Response", :input_id => "comment_response_for_#{post.id}", :input_name => "comment[body]", :value => "", :preview_id => "dtext-preview-for-#{post.id}" %>
+  <%= dtext_field "comment", "body", :input_id => "comment_response_for_#{post.id}", :preview_id => "dtext-preview-for-#{post.id}" %>
   <%= submit_tag "Post" %>
-  <%= submit_tag "Preview", "data-input-id" => "comment_response_for_#{post.id}", "data-preview-id" => "dtext-preview-for-#{post.id}" %>
+  <%= dtext_preview_button "comment", "body", :input_id => "comment_response_for_#{post.id}", :preview_id => "dtext-preview-for-#{post.id}" %>
 <% end %>  

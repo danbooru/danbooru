@@ -57,6 +57,22 @@ module ApplicationHelper
     html.html_safe
   end
   
+  def dtext_field(object, name, options = {})
+    options[:name] ||= "Body"
+    options[:input_id] ||= "#{object}_#{name}"
+    options[:input_name] ||= "#{object}[#{name}]"
+    options[:value] ||= instance_variable_get("@#{object}").try(name)
+    options[:preview_id] ||= "dtext-preview"
+    
+    render "dtext/form", options
+  end
+  
+  def dtext_preview_button(object, name, options = {})
+    options[:input_id] ||= "#{object}_#{name}"
+    options[:preview_id] ||= "dtext-preview"
+    submit_tag("Preview", "data-input-id" => options[:input_id], "data-preview-id" => options[:preview_id])
+  end
+  
 protected
   def nav_link_match(controller, url)
     url =~ case controller

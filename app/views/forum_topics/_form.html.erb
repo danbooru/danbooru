@@ -9,7 +9,7 @@
         <%= hidden_field_tag "forum_topic[original_post_attributes][topic_id]", @forum_topic.id %>
       <% end %>
       
-      <%= render "dtext/form", :name => "Body", :input_id => "forum_post_body", :input_name => "forum_topic[original_post_attributes][body]", :value => @forum_topic.original_post.body, :preview_id => "dtext-preview" %>
+      <%= dtext_field "forum_post", "body", :input_name => "forum_topic[original_post_attributes][body]", :value => @forum_topic.original_post.body %>
     <% end %>
   
     <% if CurrentUser.is_moderator? %>
@@ -18,6 +18,6 @@
     <% end %>
   
     <%= f.button :submit, "Submit" %>
-    <%= f.button :submit, "Preview", "data-input-id" => "forum_post_body", "data-preview-id" => "dtext-preview" %>
+    <%= dtext_preview_button "forum_post", "body" %>
   <% end %>
 </div>

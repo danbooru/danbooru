@@ -5,8 +5,7 @@
   <%= f.input :url_string, :label => "URLs", :as => :text, :input_html => {:size => "50x5"} %>
   <%= f.input :is_active %>
   <%= f.input :is_banned %>
-  
-  <%= render "dtext/form", :name => "Notes", :input_id => "artist_notes", :input_name => "artist[notes]", :value => @artist.notes, :preview_id => "dtext-preview" %>
+  <%= dtext_field "artist", "notes" %>
   <%= f.button :submit, "Submit" %>
-  <%= f.button :submit, "Preview", "data-input-id" => "artist_notes", "data-preview-id" => "dtext-preview" %>
+  <%= dtext_preview_button "artist", "notes" %>
 <% end %>
