@@ -34,11 +34,12 @@ private
   def build_list_item(tag, template, options)
     html = ""
     html << %{<li class="category-#{categories[tag]}">}
+    current_query = template.params[:tags] || ""
     
     if CurrentUser.user.is_privileged?
       html << %{<a href="/wiki_pages?title=#{u(tag)}">?</a> }
-      html << %{<a href="#" class="search-inc-tag">+</a> }
-      html << %{<a href="#" class="search-exl-tag">&ndash;</a> }
+      html << %{<a href="/posts?tags=#{u(current_query)}+#{u(tag)}" class="search-inc-tag">+</a> }
+      html << %{<a href="/posts?tags=#{u(current_query)}+-#{u(tag)}" class="search-exl-tag">&ndash;</a> }
     end
     
     humanized_tag = tag.tr("_", " ")

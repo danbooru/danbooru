@@ -1,5 +1,7 @@
 <ul>
-  <%= resize_image_links(post, CurrentUser.user) %>
+  <% if post.is_image? %>
+    <%= resize_image_links(post, CurrentUser.user) %>
+  <% end %>
   <li><%= link_to "Edit", post_path(post), :id => "side-edit-link" %></li>
   <% if CurrentUser.is_member? %>
     <li><%= link_to "Favorite", favorites_path(:post_id => post.id), :remote => true, :method => :post, :id => "add-to-favorites" %></li>
