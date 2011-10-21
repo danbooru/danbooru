@@ -13,6 +13,15 @@ article.post-preview {
   float: left;
   text-align: center;
   vertical-align: middle;
+  
+  span.text-post-preview {
+    border: 1px solid #666;
+    height: 150px;
+    width: 150px;
+    text-align: center;
+    vertical-align: middle;
+    display: block;
+  }
 }
 
 article.post-preview.blacklisted-active {

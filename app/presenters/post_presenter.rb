@@ -7,7 +7,15 @@ class PostPresenter < Presenter
     
     html =  %{<article class="post-preview" id="post_#{post.id}" data-id="#{post.id}" data-tags="#{h(post.tag_string)}" data-uploader="#{h(post.uploader_name)}" data-rating="#{post.rating}" data-width="#{post.image_width}" data-height="#{post.image_height}" data-flags="#{flags.join(' ')}">}
     html << %{<a href="/posts/#{post.id}">}
-    html << %{<img src="#{post.preview_file_url}">}
+    
+    if post.is_image?
+      html << %{<img src="#{post.preview_file_url}">}
+    elsif post.is_flash?
+      html << '<span class="text-post-preview">Flash</span>'
+    else
+      html << '<span class="text-post-preview">Download</span>'
+    end
+    
     html << %{</a>}
     html << %{</article>}
     html.html_safe
