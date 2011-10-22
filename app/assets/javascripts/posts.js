@@ -29,6 +29,23 @@
   Danbooru.Post.initialize_title_for = function(post) {
     var $post = $(post);
     $post.attr("title", $post.data("tags") + " uploader:" + $post.data("uploader") + " rating:" + $post.data("rating"));
+    
+    var status = $post.data("flags");
+    if (status.match(/pending/)) {
+      $post.addClass("post-status-pending");
+    }
+    
+    if (status.match(/flagged/)) {
+      $post.addClass("post-status-flagged");
+    }
+    
+    if ($post.data("parent-id")) {
+      $post.addClass("post-status-has-parent");
+    }
+
+    if ($post.data("has-children")) {
+      $post.addClass("post-status-has-children");
+    }
   }
   
   Danbooru.Post.initialize_image_resize = function() {

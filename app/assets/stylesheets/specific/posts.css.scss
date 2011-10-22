@@ -28,6 +28,26 @@ article.post-preview.blacklisted-active {
   display: none;
 }
 
+article.post-preview {
+  border: 3px solid white;
+}
+
+article.post-preview.post-status-has-parent {
+  border: 3px solid #CC0;
+}
+
+article.post-preview.post-status-has-children {
+  border: 3px solid #0F0;
+}
+
+article.post-preview.post-status-pending {
+  border: 3px solid #00F;
+}
+
+article.post-preview.post-status-flagged {
+  border: 3px solid #F00;
+}
+
 div#c-posts {
   li.category-1 a {
     color: #A00;
