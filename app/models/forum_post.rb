@@ -1,6 +1,6 @@
 class ForumPost < ActiveRecord::Base
   attr_accessible :body, :topic_id
-  attr_accessible :body, :topic_id, :as => [:admin, :moderator, :janitor]
+  attr_accessible :body, :topic_id, :is_locked, :is_sticky, :as => [:admin, :moderator, :janitor]
   belongs_to :creator, :class_name => "User"
   belongs_to :topic, :class_name => "ForumTopic"
   before_validation :initialize_creator, :on => :create
@@ -8,6 +8,7 @@ class ForumPost < ActiveRecord::Base
   after_save :update_topic_updated_at
   validates_presence_of :body, :creator_id
   validate :validate_topic_is_unlocked
+  before_destroy :validate_topic_is_unlocked
   scope :body_matches, lambda {|body| where(["forum_posts.text_index @@ plainto_tsquery(?)", body])}
   scope :for_user, lambda {|user_id| where("forum_posts.creator_id = ?", user_id)}
   search_methods :body_matches

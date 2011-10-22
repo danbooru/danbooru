@@ -14,6 +14,25 @@ class ForumPostTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
     
+    context "belonging to a locked topic" do
+      setup do
+        @post = Factory.create(:forum_post, :topic_id => @topic.id, :body => "zzz")
+        @topic.update_attribute(:is_locked, true)
+        @post.reload
+      end
+      
+      should "not be updateable" do
+        @post.update_attributes(:body => "xxx")
+        @post.reload
+        assert_equal("zzz", @post.body)
+      end
+      
+      should "not be deletable" do
+        @post.destroy
+        assert_equal(1, ForumPost.count)
+      end
+    end
+    
     should "update its parent when saved" do
       sleep 1
       original_topic_updated_at = @topic.updated_at
