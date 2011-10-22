@@ -4,19 +4,13 @@
   }
   
   Danbooru.notice = function(msg) {
-    $('#notice').html(msg).show();
+    $('#notice').html(msg).addClass("ui-state-highlight").removeClass("ui-state-error").show();
   }
   
-  Danbooru.j_alert = function(title, msg) {
-    this.notice(msg);
-    // $('<div title="' + title + '"></div>').html(msg).dialog({modal: true});
+  Danbooru.error = function(msg) {
+    $('#notice').html(msg).removeClass("ui-state-highlight").addClass("ui-state-error").show();
   }
-  
-  Danbooru.j_error = function(msg) {
-    this.notice(msg);
-    // this.j_alert("Error", msg);
-  }
-  
+
   Danbooru.ajax_start = function(target) {
     $(target).after('<img src="/images/wait.gif" width="15" height="5" class="wait">');
   }

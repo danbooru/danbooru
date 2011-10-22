@@ -30,8 +30,8 @@ class Post < ActiveRecord::Base
   validates_uniqueness_of :md5
   validates_presence_of :parent, :if => lambda {|rec| !rec.parent_id.nil?}
   validate :validate_parent_does_not_have_a_parent
-  attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at
-  attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at, :is_rating_locked, :is_note_locked, :as => [:admin, :moderator, :janitor]
+  attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at, :parent_id
+  attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at, :parent_id, :is_rating_locked, :is_note_locked, :as => [:admin, :moderator, :janitor]
   scope :pending, where(["is_pending = ?", true])
   scope :pending_or_flagged, where(["(is_pending = ? OR is_flagged = ?)", true, true])
   scope :undeleted, where(["is_deleted = ?", false])
@@ -292,7 +292,10 @@ class Post < ActiveRecord::Base
     end
 
     def approve!
-      raise ApprovalError.new("You have previously approved this post and cannot approve it again") if approver_id == CurrentUser.id
+      if approver_id == CurrentUser.id
+        errors.add(:approver, "have already approved this post")
+        raise ApprovalError.new("You have previously approved this post and cannot approve it again") 
+      end
       
       flags.each {|x| x.resolve!}
       self.is_flagged = false
@@ -301,6 +304,10 @@ class Post < ActiveRecord::Base
       self.approver_id = CurrentUser.id
       save!
       ModAction.create(:description => "approved post ##{id}")
+    end
+    
+    def disapproved_by?(user)
+      PostDisapproval.where(:user_id => user.id, :post_id => id).exists?
     end
   end
   

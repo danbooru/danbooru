@@ -1,6 +1,16 @@
+<% if @post.errors.any? %>
+
+Danbooru.error("Error: " + <%= @post.errors.full_messages.join("; ").to_json.html_safe %>);
+
+<% else %>
+
 $("#c-posts #approve").hide();
 $("#c-posts #disapprove").hide();
 $("#c-posts #flag").show();
 
+$("#pending-approval-notice").hide();
+
 $("#c-post-moderation #post-<%= @post.id %>").hide();
 Danbooru.notice("Post was approved");
+
+<% end %>

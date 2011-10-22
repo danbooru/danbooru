@@ -6,6 +6,7 @@ module Moderator
       def create
         @post = ::Post.find(params[:post_id])
         @post.approve!
+      rescue ::Post::ApprovalError
       end
     end
   end
