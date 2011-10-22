@@ -15,11 +15,11 @@ class PoolTest < ActiveSupport::TestCase
   
   context "A name" do
     setup do
-      @pool = Factory.create(:pool)
+      @pool = Factory.create(:pool, :name => "xxx")
     end
     
     should "be mapped to a pool id" do
-      assert_equal(@pool.id, Pool.name_to_id(@pool.name))
+      assert_equal(@pool.id, Pool.name_to_id("xxx"))
     end
   end
   

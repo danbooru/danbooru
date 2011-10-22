@@ -584,9 +584,9 @@ class PostTest < ActiveSupport::TestCase
       post1 = Factory.create(:post)
       post2 = Factory.create(:post)
       post3 = Factory.create(:post)
-      pool = Factory.create(:pool)
+      pool = Factory.create(:pool, :name => "xxx")
       post1.add_pool!(pool)
-      relation = Post.tag_match("pool:#{pool.name}")
+      relation = Post.tag_match("pool:xxx")
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
     end

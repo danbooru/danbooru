@@ -31,7 +31,8 @@ class Post < ActiveRecord::Base
   validates_presence_of :parent, :if => lambda {|rec| !rec.parent_id.nil?}
   validate :validate_parent_does_not_have_a_parent
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at, :parent_id
-  attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at, :parent_id, :is_rating_locked, :is_note_locked, :as => [:admin, :moderator, :janitor]
+  attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at, :parent_id, :as => [:member]
+  attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at, :parent_id, :is_rating_locked, :is_note_locked, :as => [:admin, :moderator]
   scope :pending, where(["is_pending = ?", true])
   scope :pending_or_flagged, where(["(is_pending = ? OR is_flagged = ?)", true, true])
   scope :undeleted, where(["is_deleted = ?", false])

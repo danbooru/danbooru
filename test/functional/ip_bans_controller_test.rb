@@ -48,7 +48,7 @@ class IpBansControllerTest < ActionController::TestCase
       
       should "destroy an ip ban" do
         assert_difference("IpBan.count", -1) do
-          post :destroy, {:id => @ip_ban.id}, {:user_id => @admin.id}
+          post :destroy, {:id => @ip_ban.id, :format => "js"}, {:user_id => @admin.id}
         end
       end
     end

@@ -15,6 +15,7 @@ class User < ActiveRecord::Base
   
   attr_accessor :password, :old_password
   attr_accessible :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr, :time_zone, :default_image_size
+  attr_accessible :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr, :time_zone, :default_image_size, :as => [:moderator, :member]
   attr_accessible :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr, :time_zone, :default_image_size, :level, :as => :admin
   validates_length_of :name, :within => 2..100, :on => :create
   validates_format_of :name, :with => /\A[^\s:]+\Z/, :on => :create, :message => "cannot have whitespace or colons"
@@ -217,19 +218,10 @@ class User < ActiveRecord::Base
     
     def role
       case level
-      when Levels::MEMBER
+      when Levels::MEMBER, Levels::PRIVILEGED, Levels::CONTRIBUTOR
         :member
         
-      when Levels::PRIVILEGED
-        :privileged
-        
-      when Levels::CONTRIBUTOR
-        :contributor
-        
-      when Levels::JANITOR
-        :janitor
-        
-      when Levels::MODERATOR
+      when Levels::MODERATOR, Levels::JANITOR
         :moderator
         
       when Levels::ADMIN

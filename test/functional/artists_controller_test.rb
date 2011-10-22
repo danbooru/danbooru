@@ -44,9 +44,9 @@ class ArtistsControllerTest < ActionController::TestCase
     
     should "update an artist" do
       post :update, {:id => @artist.id, :artist => {:name => "xxx"}}, {:user_id => @user.id}
-      artist = Artist.last
-      assert_equal("xxx", artist.name)
-      assert_redirected_to(artist_path(artist))
+      @artist.reload
+      assert_equal("xxx", @artist.name)
+      assert_redirected_to(artist_path(@artist))
     end
     
     should "revert an artist" do
