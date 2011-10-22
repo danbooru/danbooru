@@ -1,5 +1,6 @@
 class ForumPost < ActiveRecord::Base
   attr_accessible :body, :topic_id
+  attr_accessible :body, :topic_id, :as => [:admin, :moderator, :janitor]
   belongs_to :creator, :class_name => "User"
   belongs_to :topic, :class_name => "ForumTopic"
   before_validation :initialize_creator, :on => :create
