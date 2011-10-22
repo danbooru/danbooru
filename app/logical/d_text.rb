@@ -17,25 +17,29 @@ class DText
     str.gsub!(/\n/m, "<br>")
     str.gsub!(/\[b\](.+?)\[\/b\]/i, '<strong>\1</strong>')
     str.gsub!(/\[i\](.+?)\[\/i\]/i, '<em>\1</em>')
-    str.gsub!(/(?<![=\]])(https?:\/\/\S+)/m) do |link|
-      if link =~ /([;,.!?\)\]])$/
-        stop = $1
-        link.chop!
-        text = link
+    str.gsub!(/("[^"]+":(https?:\/\/|\/)\S+|https?:\/\/\S+)/m) do |url|
+      if url =~ /^"([^"]+)":(.+)$/
+        text = $1
+        url = $2
       else
-        stop = ""
-        text = link
+        text = url
+      end
+      
+      if url =~ /([;,.!?\)\]<>])$/
+        url.chop!
+        ch = $1
+      else
+        ch = ""
       end
 
-      link.gsub!(/"/, '&quot;')
-      '<a href="' + link + '">' + text + '</a>' + stop
+      '<a href="' + url + '">' + text + '</a>' + ch
     end
-    str.gsub!(/\[url\](http.+?)\[\/url\]/i) do
-      %{<a href="#{$1}">#{$1}</a>}
-    end
-    str.gsub!(/\[url=(http.+?)\](.+?)\[\/url\]/m) do
-      %{<a href="#{$1}">#{$2}</a>}
-    end
+    # str.gsub!(/\[url\](http.+?)\[\/url\]/i) do
+    #   %{<a href="#{$1}">#{$1}</a>}
+    # end
+    # str.gsub!(/\[url=(http.+?)\](.+?)\[\/url\]/m) do
+    #   %{<a href="#{$1}">#{$2}</a>}
+    # end
     str = parse_aliased_wiki_links(str)
     str = parse_wiki_links(str)
     str = parse_post_links(str)
@@ -44,34 +48,23 @@ class DText
   end
   
   def self.parse_aliased_wiki_links(str)
-    str.gsub(/\[\[(.+?)\|(.+?)\]\]/m) do
-      text = CGI.unescapeHTML($1)
+    str.gsub(/\[\[([^\|\]]+)\|([^\]]+)\]\]/m) do
+      text = CGI.unescapeHTML($1).tr("_", " ")
       title = CGI.unescapeHTML($2)
-      wiki_page = WikiPage.find_title_and_id(title)
-      
-      if wiki_page
-        %{<a href="/wiki_pages/#{wiki_page.id}">#{h(text)}</a>}
-      else
-        %{<a href="/wiki_pages/new?title=#{u(title)}">#{h(text)}</url>}
-      end
+      %{<a href="/wiki_pages/show_or_new?title=#{u(title)}">#{h(text)}</a>}
     end
   end
   
   def self.parse_wiki_links(str)
-    str.gsub(/\[\[(.+?)\]\]/) do
+    str.gsub(/\[\[([^\]]+)\]\]/) do
       title = CGI.unescapeHTML($1)
-      wiki_page = WikiPage.find_title_and_id(title)
-      
-      if wiki_page
-        %{<a href="/wiki_pages/#{wiki_page.id}">#{h(title)}</a>}
-      else
-        %{<a href="/wiki_pages/new?wiki_page[title]=#{u(title)}">#{h(title)}</a>}
-      end
+      text = title.tr("_", " ")
+      %{<a href="/wiki_pages/show_or_new?title=#{u(title)}">#{h(text)}</a>}
     end
   end
   
   def self.parse_post_links(str)
-    str.gsub(/\{\{(.+?)\}\}/) do
+    str.gsub(/\{\{([^\}]+)\}\}/) do
       tags = CGI.unescapeHTML($1)
       %{<a href="/posts?tags=#{u(tags)}">#{h(tags)}</a>}
     end

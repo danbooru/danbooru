@@ -12,8 +12,8 @@ class DTextTest < ActiveSupport::TestCase
   end
   
   def test_wiki_links
-    assert_equal("<p>a <a href=\"/wiki_pages/new?wiki_page%5Btitle%5D=b\">b</a> c</p>", p("a [[b]] c"))
-    assert_equal("<p>a <a href=\"/wiki_pages/new?wiki_page%5Btitle%5D=spoiler\">spoiler</a> c</p>", p("a [[spoiler]] c"))
+    assert_equal("<p>a <a href=\"/wiki_pages/show_or_new?title=b\">b</a> c</p>", p("a [[b]] c"))
+    assert_equal("<p>a <a href=\"/wiki_pages/show_or_new?title=spoiler\">spoiler</a> c</p>", p("a [[spoiler]] c"))
   end
   
   def test_spoilers
@@ -46,16 +46,22 @@ class DTextTest < ActiveSupport::TestCase
     assert_equal('<p>a (<a href="http://test.com">http://test.com</a>) b</p>', p('a (http://test.com) b'))
   end
   
-  def test_links
-    assert_equal('<p><a href="http://test.com">test</a></p>', p('[url=http://test.com]test[/url]'))
-    assert_equal('<p>"1" <a href="http://two.com">2</a></p>', p('"1" [url=http://two.com]2[/url]'))
-    assert_equal('<p>"1" <a href="http://three.com">2 &amp; 3</a></p>', p('"1" [url=http://three.com]2 & 3[/url]'))
+  # def test_links
+  #   assert_equal('<p><a href="http://test.com">test</a></p>', p('[url=http://test.com]test[/url]'))
+  #   assert_equal('<p>"1" <a href="http://two.com">2</a></p>', p('"1" [url=http://two.com]2[/url]'))
+  #   assert_equal('<p>"1" <a href="http://three.com">2 &amp; 3</a></p>', p('"1" [url=http://three.com]2 & 3[/url]'))
+  # end
+
+  def test_old_syle_links
+    assert_equal('<p><a href="http://test.com">test</a></p>', p('"test":http://test.com'))
+    assert_equal('<p>"1" <a href="http://two.com">2</a></p>', p('"1" "2":http://two.com'))
+    assert_equal('<p>"1" <a href="http://three.com">2 &amp; 3</a></p>', p('"1" "2 & 3":http://three.com'))
   end
   
-  def test_aliased_urls
-    assert_equal('<p>a <a href="http://test.com">bob</a>. b</p>', p('a [url=http://test.com]bob[/url]. b'))
-    assert_equal('<p><em><a href="http://test.com">bob</a></em></p>', p('[i][url=http://test.com]bob[/url][/i]'))
-  end
+  # def test_aliased_urls
+  #   assert_equal('<p>a <a href="http://test.com">bob</a>. b</p>', p('a [url=http://test.com]bob[/url]. b'))
+  #   assert_equal('<p><em><a href="http://test.com">bob</a></em></p>', p('[i][url=http://test.com]bob[/url][/i]'))
+  # end
   
   def test_lists
     assert_equal('<ul><li>a</li></ul>', p('* a'))
@@ -77,5 +83,10 @@ class DTextTest < ActiveSupport::TestCase
   
   def test_extra_newlines
     assert_equal('<p>a</p><p>b</p>', p("a\n\n\n\n\n\n\nb\n\n\n\n"))
+  end
+  
+  def test_complex_links
+    assert_equal('<p><a href="/wiki_pages/show_or_new?title=2+3">1</a> | <a href="/wiki_pages/show_or_new?title=5+6">4</a></p>', p("[[1|2 3]] | [[4|5 6]]"))
+    assert_equal("<p>Tags <strong>(<a href=\"/wiki_pages/show_or_new?title=Tagging+Guidelines\">howto:tag</a> | <a href=\"/wiki_pages/show_or_new?title=Tag+Checklist\">howto:tag checklist</a> | <a href=\"/wiki_pages/show_or_new?title=Tag+Groups\">Tag Groups</a>)</strong></p>", p("Tags [b]([[howto:tag|Tagging Guidelines]] | [[howto:tag_checklist|Tag Checklist]] | [[Tag Groups]])[/b]"))
   end
 end

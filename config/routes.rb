@@ -136,6 +136,9 @@ Danbooru::Application.routes.draw do
     member do
       put :revert
     end
+    collection do
+      get :show_or_new
+    end
   end
   resources :wiki_page_versions, :only => [:index, :show]
 

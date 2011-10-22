@@ -16,6 +16,10 @@ div.prose {
   h3 { 
     padding: $h3_padding; 
   }
+  
+  h4, h5, h6 {
+    padding: 0;
+  }
 
   ul {
     margin-left: 1em;

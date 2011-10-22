@@ -54,6 +54,15 @@ class WikiPagesController < ApplicationController
     @wiki_page.revert_to!(@version)
     respond_with(@wiki_page)
   end
+  
+  def show_or_new
+    @wiki_page = WikiPage.find_by_name(params[:title])
+    if @wiki_page
+      redirect_to wiki_page_path(@wiki_page)
+    else
+      redirect_to new_wiki_page_path(:wiki_page => {:title => params[:title]})
+    end
+  end
 
 private
   def normalize_search_params
