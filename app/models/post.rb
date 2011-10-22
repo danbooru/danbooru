@@ -31,6 +31,7 @@ class Post < ActiveRecord::Base
   validates_presence_of :parent, :if => lambda {|rec| !rec.parent_id.nil?}
   validate :validate_parent_does_not_have_a_parent
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at
+  attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at, :is_rating_locked, :is_note_locked, :as => [:admin, :moderator, :janitor]
   scope :pending, where(["is_pending = ?", true])
   scope :pending_or_flagged, where(["(is_pending = ? OR is_flagged = ?)", true, true])
   scope :undeleted, where(["is_deleted = ?", false])
@@ -973,6 +974,27 @@ class Post < ActiveRecord::Base
     end
   end
   
+  module ApiMethods
+    def hidden_attributes
+      super + [:tag_index]
+    end
+    
+    def serializable_hash(options = {})
+      options ||= {}
+      options[:except] ||= []
+      options[:except] += hidden_attributes
+      super(options)
+    end
+    
+    def to_xml(options = {}, &block)
+      # to_xml ignores the serializable_hash method
+      options ||= {}
+      options[:except] ||= []
+      options[:except] += hidden_attributes
+      super(options, &block)
+    end
+  end
+  
   include FileMethods
   include ImageMethods
   include ApprovalMethods
@@ -989,6 +1011,7 @@ class Post < ActiveRecord::Base
   include DeletionMethods
   include VersionMethods
   include NoteMethods
+  include ApiMethods
   
   def reload(options = nil)
     super

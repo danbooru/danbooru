@@ -24,6 +24,10 @@
   
   Danbooru.PostModeMenu.initialize_edit_form = function() {
     $("#quick-edit-div").hide();
+    $("#quick-edit-form input[value=Cancel]").click(function(e) {
+      $("#quick-edit-div").hide();
+      e.preventDefault();
+    });
     
     $("#quick-edit-form").submit(function(e) {
       $.ajax({
@@ -56,13 +60,13 @@
       script = prompt("Enter a tag script", script);
     
       if (script) {
-        Cookie.put("tag-script", script);
+        Danbooru.Cookie.put("tag-script", script);
         $("#mode-box select").val("apply-tag-script");
       } else {
         $("#mode-box select").val("view");
       }
 
-      this.change();
+      Danbooru.PostModeMenu.change();
     }
   }
   

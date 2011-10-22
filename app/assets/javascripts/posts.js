@@ -168,7 +168,7 @@
         Danbooru.Post.update_data(data);
       },
       error: function(data, status, xhr) {
-        Danbooru.j_alert("Error: " + data.reason);
+        Danbooru.notice("Error: " + data.reason);
       }
     });
   }

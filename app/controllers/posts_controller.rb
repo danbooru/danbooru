@@ -18,7 +18,7 @@ class PostsController < ApplicationController
   
   def update
     @post = Post.find(params[:id])
-    @post.update_attributes(params[:post])
+    @post.update_attributes(params[:post], :as => CurrentUser.role)
     respond_with(@post) do |format|
       format.json do
         render :json => @post.to_json

@@ -11,11 +11,11 @@
 
     $.each(split_pred, function(i, x) {
       if (x[0] === "-") {
-        if (tags.include(x.substr(1, 100))) {
+        if ($.inArray(x.substr(1, 100), tags)) {
           is_true = false;
         }
       } else {
-        if (!tags.include(x)) {
+        if (!$.inArray(x, tags)) {
           is_true = false;
         }
       }
@@ -27,8 +27,8 @@
   Danbooru.TagScript.process = function(tags, command) {
     if (command.match(/^\[if/)) {
       var match = command.match(/\[if\s+(.+?)\s*,\s*(.+?)\]/)
-      if (this.test(tags, match[1])) {
-        return this.process(tags, match[2]);
+      if (Danbooru.TagScript.test(tags, match[1])) {
+        return Danbooru.TagScript.process(tags, match[2]);
       } else {
         return tags;
       }
@@ -37,20 +37,21 @@
     } else if (command[0] === "-") {
       return Danbooru.reject(tags, function(x) {return x === command.substr(1, 100)});
     } else {
-      tags.push(command)
+      tags.push(command);
       return tags;
     }
   }
 
   Danbooru.TagScript.run = function(post_id, tag_script) {
-    var commands = this.parse(tag_script);
-    var post = $("#p_" + post_id);
-    var old_tags = post.data("tags");
-
+    var commands = Danbooru.TagScript.parse(tag_script);
+    var $post = $("#post_" + post_id);
+    var old_tags = $post.data("tags");
+    
     $.each(commands, function(i, x) {
-      post.data("tags", Danbooru.TagScript.process(post.data("tags"), x));
-    })
+      var array = $post.data("tags").match(/\S+/g);
+      $post.data("tags", Danbooru.TagScript.process(array, x).join(" "));
+    });
 
-    Danbooru.Post.update(post_id, {"post[old_tags]": old_tags, "post[tags]": post.data("tags")});
+    Danbooru.Post.update(post_id, {"post[old_tag_string]": old_tags, "post[tag_string]": $post.data("tags")});
   }
 })();
