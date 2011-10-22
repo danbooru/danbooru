@@ -31,6 +31,7 @@
     $post.attr("title", $post.data("tags") + " uploader:" + $post.data("uploader") + " rating:" + $post.data("rating"));
     
     var status = $post.data("flags");
+    
     if (status.match(/pending/)) {
       $post.addClass("post-status-pending");
     }

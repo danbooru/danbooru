@@ -28,23 +28,23 @@ article.post-preview.blacklisted-active {
   display: none;
 }
 
-article.post-preview {
-  border: 3px solid white;
+article.post-preview img {
+  border: 3px solid transparent;
 }
 
-article.post-preview.post-status-has-parent {
+article.post-preview.post-status-has-parent img {
   border: 3px solid #CC0;
 }
 
-article.post-preview.post-status-has-children {
+article.post-preview.post-status-has-children img {
   border: 3px solid #0F0;
 }
 
-article.post-preview.post-status-pending {
+article.post-preview.post-status-pending img {
   border: 3px solid #00F;
 }
 
-article.post-preview.post-status-flagged {
+article.post-preview.post-status-flagged img {
   border: 3px solid #F00;
 }
 

@@ -1,5 +1,9 @@
 class PostPresenter < Presenter
   def self.preview(post)
+    if post.is_deleted? && !CurrentUser.is_privileged?
+      return ""
+    end
+    
     flags = []
     flags << "pending" if post.is_pending?
     flags << "flagged" if post.is_flagged?

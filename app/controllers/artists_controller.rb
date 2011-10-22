@@ -1,6 +1,6 @@
 class ArtistsController < ApplicationController
   respond_to :html, :xml, :json
-  before_filter :member_only, :except => [:index, :show]
+  before_filter :member_only, :except => [:index, :show, :banned]
   
   def new
     @artist = Artist.new_with_defaults(params)
@@ -38,13 +38,13 @@ class ArtistsController < ApplicationController
   end
   
   def create
-    @artist = Artist.create(params[:artist])
+    @artist = Artist.create(params[:artist], :as => CurrentUser.role)
     respond_with(@artist)
   end
   
   def update
     @artist = Artist.find(params[:id])
-    @artist.update_attributes(params[:artist])
+    @artist.update_attributes(params[:artist], :as => CurrentUser.role)
     respond_with(@artist)
   end
   
@@ -53,5 +53,14 @@ class ArtistsController < ApplicationController
     @version = ArtistVersion.find(params[:version_id])
     @artist.revert_to!(@version)
     respond_with(@artist)
+  end
+  
+  def show_or_new
+    @artist = Artist.find_by_name(params[:name])
+    if @artist
+      redirect_to artist_path(@artist)
+    else
+      redirect_to new_artist_path(:name => params[:name])
+    end
   end
 end

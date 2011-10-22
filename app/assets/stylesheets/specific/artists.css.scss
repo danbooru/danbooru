@@ -5,9 +5,13 @@ div#c-artists {
     font-weight: bold;
     color: #A00;
   }
+  
+  div#a-banned {
+    max-width: 50em;
+  }
 
   div#a-show {
-    max-width: 60em;
+    max-width: 50em;
 
     p.legend {
       margin-bottom: 2em;

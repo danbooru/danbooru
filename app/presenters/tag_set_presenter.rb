@@ -37,7 +37,11 @@ private
     current_query = template.params[:tags] || ""
     
     if CurrentUser.user.is_privileged?
-      html << %{<a href="/wiki_pages?title=#{u(tag)}">?</a> }
+      if categories[tag] == 1
+        html << %{<a href="/artists/show_or_new?name=#{u(tag)}">?</a> }
+      else
+        html << %{<a href="/wiki_pages?title=#{u(tag)}">?</a> }
+      end
       html << %{<a href="/posts?tags=#{u(current_query)}+#{u(tag)}" class="search-inc-tag">+</a> }
       html << %{<a href="/posts?tags=#{u(current_query)}+-#{u(tag)}" class="search-exl-tag">&ndash;</a> }
     end
