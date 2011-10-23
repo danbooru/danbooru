@@ -31,3 +31,7 @@
     <%= render "secondary_links" %>
   </div>
 </div>
+
+<% content_for(:page_title) do %>
+  Artists - <%= Danbooru.config.app_name %>
+<% end %>

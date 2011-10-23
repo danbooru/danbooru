@@ -53,7 +53,7 @@
               <td>
                 <%= link_to h(url.to_s), h(url.to_s) %>
                 <% if CurrentUser.user.is_moderator? %>
-                  (<%#= link_to("mass edit", mass_edit_admin_posts_path(:antecedent => "-#{@artist.name} source:#{ArtistUrl.normalize_for_search(url.to_s)}", :consequent => @artist.name)) %>)
+                  (<%= link_to("mass edit", edit_moderator_tag_path(:antecedent => "-#{@artist.name} source:#{ArtistUrl.normalize_for_search(url.to_s)}", :consequent => @artist.name)) %>)
                 <% end %>
               </td>
             </tr>
@@ -72,3 +72,7 @@
     <%= render "secondary_links" %>
   </div>
 </div>
+
+<% content_for(:page_title) do %>
+  Artist - <%= @artist.name %> - <%= Danbooru.config.app_name %>
+<% end %>

@@ -20,7 +20,11 @@
     </section>
     
     <% content_for(:page_title) do %>
-      /<%= @post_set.tag_string %>
+      <% if @post_set.tag_string.present? %>
+        <%= @post_set.tag_string %> - <%= Danbooru.config.app_name %>
+      <% else %>
+        <%= Danbooru.config.app_name %>
+      <% end %>
     <% end %>
 
     <%= render "posts/partials/common/secondary_links" %>    

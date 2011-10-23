@@ -18,3 +18,7 @@
     <%= render "sessions/secondary_links" %>
   </div>
 </div>
+
+<% content_for(:page_title) do %>
+  Login Reminder - <%= Danbooru.config.app_name %>
+<% end %>

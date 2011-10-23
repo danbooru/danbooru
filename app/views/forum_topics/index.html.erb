@@ -46,3 +46,7 @@
 <%= content_for(:html_header) do %>
   <meta name="last-forum-read-at" content="<%= CurrentUser.last_forum_read_at.to_date %>">
 <% end %>
+
+<% content_for(:page_title) do %>
+  Forum - <%= Danbooru.config.app_name %>
+<% end %>

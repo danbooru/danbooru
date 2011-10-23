@@ -81,7 +81,7 @@
 </div>
 
 <% content_for(:page_title) do %>
-  /p/<%= @post.tag_string %>
+  <%= @post.tag_string %> - <%= Danbooru.config.app_name %>
 <% end %>
 
 <% content_for(:html_header) do %>

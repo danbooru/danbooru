@@ -24,3 +24,7 @@
 </p>
 
 <%= render "posts/partials/common/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Upload - <%= Danbooru.config.app_name %>
+<% end %>

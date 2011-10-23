@@ -1,6 +1,6 @@
 <div id="c-moderator-ip-addrs">
   <div id="a-search">
-    <h1>IP Address Search</h1>
+    <h1>Search IP Addresses</h1>
     
     <%= form_tag(moderator_ip_addrs_path) do %>
       <div class="input">
@@ -17,3 +17,7 @@
     <% end %>
   </div>
 </div>
+
+<% content_for(:page_title) do %>
+  Search IP Addresses - <%= Danbooru.config.app_name %>
+<% end %>

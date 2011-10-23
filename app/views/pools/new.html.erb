@@ -10,3 +10,7 @@
 </div>
 
 <%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  New Pool - <%= Danbooru.config.app_name %>
+<% end %>

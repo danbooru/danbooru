@@ -6,3 +6,7 @@
 </div>
 
 <%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Edit Artist - <%= Danbooru.config.app_name %>
+<% end %>

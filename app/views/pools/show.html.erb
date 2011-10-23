@@ -16,3 +16,6 @@
 
 <%= render "secondary_links" %>
 
+<% content_for(:page_title) do %>
+  Pool - <%= @pool.name %> - <%= Danbooru.config.app_name %>
+<% end %>

@@ -10,3 +10,7 @@
 </div>
 
 <%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Tag - <%= @tag.name %> - <%= Danbooru.config.app_name %>
+<% end %>

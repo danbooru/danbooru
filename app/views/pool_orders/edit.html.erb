@@ -18,3 +18,7 @@
 </div>
 
 <%= render "pools/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Order Pool - <%= Danbooru.config.app_name %>
+<% end %>

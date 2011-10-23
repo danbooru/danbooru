@@ -16,11 +16,11 @@
       <%= numbered_paginator(@posts) %>
     </section>
     
-    <% content_for(:page_title) do %>
-      /sub:<%= @user.name %>
-    <% end %>
-
     <%= render "posts/partials/common/secondary_links" %>    
   </div>
 </div>
+
+<% content_for(:page_title) do %>
+  Tag Subscriptions - <%= @user.name %> - <%= Danbooru.config.app_name %>
+<% end %>
 

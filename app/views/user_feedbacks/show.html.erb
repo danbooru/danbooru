@@ -12,3 +12,7 @@
 </div>
 
 <%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Feedback - <%= @user_feedback.user_name %> - <%= Danbooru.config.app_name %>
+<% end %>

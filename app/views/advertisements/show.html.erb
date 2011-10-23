@@ -1,6 +1,6 @@
 <div id="c-advertisements">
   <div id="a-show">
-    <h1>Show Advertisement</h1>
+    <h1>Advertisement</h1>
 
     <%= image_tag(@advertisement.image_url, :width => @advertisement.preview_width, :height => @advertisement.preview_height) %>
 
@@ -10,5 +10,8 @@
   </div>
 </div>
 
-
 <%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Advertisement - <%= Danbooru.config.app_name %>
+<% end %>

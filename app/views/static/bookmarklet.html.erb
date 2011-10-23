@@ -7,3 +7,7 @@
     <p>Bookmark this link. Next time you are directly viewing an image (that is, the JPG/PNG/GIF file is in the URL bar) you can open this bookmarklet and you will be taken to the upload page. Depending on the site you are uploading from you may also see some options for fetching metadata.</p>
   </div>
 </div>
+
+<% content_for(:page_title) do %>
+  Bookmarklet - <%= Danbooru.config.app_name %>
+<% end %>

@@ -16,3 +16,7 @@
     <%= render "sessions/secondary_links" %>
   </div>
 </div>
+
+<% content_for(:page_title) do %>
+  Reset Password - <%= Danbooru.config.app_name %>
+<% end %>

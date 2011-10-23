@@ -5,12 +5,12 @@
     <%= form_tag(moderator_tag_path, :method => :put) do %>
       <div class="input">
         <label>Predicate</label>
-        <%= text_field :tag, :predicate %>
+        <%= text_field :tag, :antecedent, :value => params[:antecedent] %>
       </div>
       
       <div class="input">
         <label>Consequent</label>
-        <%= text_field :tag, :consequent %>
+        <%= text_field :tag, :consequent, :value => params[:consequent] %>
       </div>
       
       <div class="input">
@@ -19,3 +19,7 @@
     <% end %>
   </div>
 </div>
+
+<% content_for(:page_title) do %>
+  Edit Tag - <%= Danbooru.config.app_name %>
+<% end %>

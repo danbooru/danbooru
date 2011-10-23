@@ -10,3 +10,7 @@
 </div>
 
 <%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Ban - <%= @ban.user.name %> - <%= Danbooru.config.app_name %>
+<% end %>

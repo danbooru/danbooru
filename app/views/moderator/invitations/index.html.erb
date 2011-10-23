@@ -11,3 +11,7 @@
     <%= numbered_paginator(@users) %>
   </div>
 </div>
+
+<% content_for(:page_title) do %>
+  Invitations - <%= Danbooru.config.app_name %>
+<% end %>

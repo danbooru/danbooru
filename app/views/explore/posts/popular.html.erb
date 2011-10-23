@@ -12,3 +12,6 @@
 
 <%= render "posts/partials/common/secondary_links" %>
 
+<% content_for(:page_title) do %>
+  Popular - <%= Danbooru.config.app_name %>
+<% end %>

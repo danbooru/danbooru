@@ -14,3 +14,7 @@
 </div>
 
 <%= render "comments/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Search Comments - <%= Danbooru.config.app_name %>
+<% end %>

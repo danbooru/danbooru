@@ -7,7 +7,7 @@ module Moderator
     end
     
     def update
-      tag_batch_change = TagBatchChange.new(params[:tag][:predicate], params[:tag][:consequent])
+      tag_batch_change = TagBatchChange.new(params[:tag][:antecedent], params[:tag][:consequent])
       tag_batch_change.execute
       redirect_to edit_moderator_tag_path, :notice => "Posts updated"
     end

@@ -39,3 +39,7 @@
 </div>
 
 <%= render "posts/partials/common/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Mod Dashboard - <%= Danbooru.config.app_name %>
+<% end %>

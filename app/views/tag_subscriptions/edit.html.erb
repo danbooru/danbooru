@@ -4,3 +4,7 @@
     <%= render "form" %>
   </div>
 </div>
+
+<% content_for(:page_title) do %>
+  Edit Tag Subscription - <%= Danbooru.config.app_name %>
+<% end %>
