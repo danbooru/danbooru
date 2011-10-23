@@ -61,7 +61,7 @@ gem install --no-ri --no-rdoc bundler
 
 # Install Passenger
 gem install --no-ri --no-rdoc -v 3.0.9 passenger
-bash -c '/usr/local/rvm/bin/rvm exec passenger-install-nginx-module --auto --auto-download --prefix=/opt'
+bash -c '/usr/local/rvm/bin/rvm exec passenger-install-nginx-module --auto --auto-download --prefix=/opt/nginx'
 rm -f /opt/nginx/conf/*.default
 
 # Create user account
@@ -135,7 +135,7 @@ echo "*                                                            *"
 echo "* You will probably want to create your own branch and       *"
 echo "* modify the config/deploy/staging.rb and production.rb      *"
 echo "* files to point to the correct servers. Then run:           *"
-echo "* cap deploy                                                 *"
+echo "* cap deploy:setup && cap deploy                             *"
 echo "*                                                            *"
 echo "* The first account will automatically be made an admin. You *"
 echo "* can edit the configuration files by editing                *"
