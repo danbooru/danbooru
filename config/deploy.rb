@@ -44,7 +44,7 @@ namespace :data do
   task :setup_directories do
     run "mkdir -p #{deploy_to}/shared/data"
     run "mkdir #{deploy_to}/shared/data/preview"
-    run "mkdir #{deploy_to}/shared/data/small"
+    run "mkdir #{deploy_to}/shared/data/medium"
     run "mkdir #{deploy_to}/shared/data/large"
     run "mkdir #{deploy_to}/shared/data/original"
   end
