@@ -11,7 +11,7 @@ class TagAlias < ActiveRecord::Base
   def self.to_aliased(names)
     alias_hash = Cache.get_multi(names.flatten, "ta") do |name|
       ta = TagAlias.find_by_antecedent_name(name)
-      if ta
+      if ta && ta.is_active?
         ta.consequent_name
       else
         name
@@ -27,6 +27,14 @@ class TagAlias < ActiveRecord::Base
     update_column(:status, "active")
   rescue Exception => e
     update_column(:status, "error: #{e}")
+  end
+  
+  def is_pending?
+    status == "pending"
+  end
+  
+  def is_active?
+    status == "active"
   end
   
   def initialize_creator

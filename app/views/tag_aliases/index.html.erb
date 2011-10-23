@@ -11,10 +11,11 @@
     <table width="100%" class="striped">
       <thead>
         <tr>
-          <th width="20%">From</th>
-          <th width="20%">To</th>
-          <th width="20%">Reference</th>
-          <th width="40%"></th>
+          <th width="30%">From</th>
+          <th width="30%">To</th>
+          <th width="10%">Reference</th>
+          <th width="10%">Status</th>
+          <th width="20%"></th>
         </tr>        
       </thead>
       <tbody>
@@ -27,9 +28,16 @@
                 <%= link_to tag_alias.forum_topic_id, forum_topic_path(tag_alias.forum_topic_id) %>
               <% end %>
             </td>
+            <td id="tag-alias-status-for-<%= tag_alias.id %>">
+              <%= tag_alias.status %>
+            </td>
             <td>
               <% if CurrentUser.is_admin? %>
                 <%= link_to "Delete", tag_alias_path(tag_alias), :remote => true, :method => :delete, :confirm => "Are you sure you want to delete this alias?" %>
+                
+                <% if tag_alias.is_pending? %>
+                  | <%= link_to "Approve", approve_tag_alias_path(tag_alias), :remote => true, :method => :post %>
+                <% end %>
               <% end %>
             </td>
           </tr>

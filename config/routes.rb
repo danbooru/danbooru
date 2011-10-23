@@ -121,9 +121,14 @@ Danbooru::Application.routes.draw do
   resources :tag_aliases do
     member do
       delete :cache
+      post :approve
     end
   end
-  resources :tag_implications
+  resources :tag_implications do
+    member do
+      post :approve
+    end
+  end
   resources :tag_subscriptions do
     member do
       get :posts
