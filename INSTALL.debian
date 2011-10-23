@@ -119,14 +119,24 @@ passwd danbooru
 sudo -u danbooru createdb danbooru2
 cd /home/danbooru
 sudo -u danbooru mkdir /home/danbooru/apps
+cd /home/danbooru/apps
 git clone git://github.com/r888888888/danbooru.git danbooru
 chown -R danbooru:danbooru danbooru
 
 echo
 echo
 echo "**************************************************************"
-echo "* Danbooru has now been setup on this computer and should be *"
-echo "* accessible from the web. Go ahead and create an account.   *"
+echo "* Danbooru is now ready for deployment.                      *"
+echo "*                                                            *"
+echo "* A local copy has been checked out into /home/danbooru/apps *"
+echo "* but you may want to clone your own copy from               *"
+echo "* http://github.com/r888888888/danbooru.git                  *"
+echo "*                                                            *"
+echo "* You will probably want to create your own branch and       *"
+echo "* modify the config/deploy/staging.rb and production.rb      *"
+echo "* files to point to the correct servers. Then run:           *"
+echo "* cap deploy                                                 *"
+echo "*                                                            *"
 echo "* The first account will automatically be made an admin. You *"
 echo "* can edit the configuration files by editing                *"
 echo "* /var/www/danbooru/shared/config/local_config and           *"
