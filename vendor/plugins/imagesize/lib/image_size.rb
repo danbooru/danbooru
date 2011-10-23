@@ -272,6 +272,8 @@ class ImageSize
     y_max = Integer("0b#{str[(last += bit_length),bit_length]}")
     width = (x_max - x_min)/20
     height = (y_max - y_min)/20
+    width *= -1 if width < 0
+    height *= -1 if height < 0
     [width, height]
   end
 end
