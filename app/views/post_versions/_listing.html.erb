@@ -16,7 +16,7 @@
       <% post_versions.each do |post_version| %>
         <tr id="post-version-<%= post_version.id %>">
           <td><%= link_to(post_version.post_id, post_path(post_version.post_id)) %></td>
-          <td><%= post_version.updated_at.strftime("%Y-%m-%d %H:%M") %></td>
+          <td><%= compact_time(post_version.updated_at) %></td>
           <td><%= link_to(post_version.updater.name, user_path(post_version.updater_id)) %></td>
           <td><%= post_version.rating %></td>
           <td><%= post_version.parent_id %></td>
@@ -25,15 +25,7 @@
               <%= post_version.updater_ip_addr %>
             <% end %>
           </td>
-          <td>
-            <% post_version.add_tag_array.each do |tag| %>
-              <ins><%= tag %></ins>
-            <% end %>
-            
-            <% post_version.del_tag_array.each do |tag| %>
-              <del><%= tag %></del>
-            <% end %>
-          </td>
+          <td><%= post_version_diff(post_version) %></td>
           <td>
             <%= link_to "Revert", revert_post_path(post_version.post_id, :version_id => post_version.id), :method => :put, :remote => true %>
           </td>

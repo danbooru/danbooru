@@ -14,6 +14,31 @@ class PostVersionTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
     
+    context "that has multiple versions: " do
+      setup do
+        @post = Factory.create(:post, :tag_string => "1")
+        @post.update_attributes(:tag_string => "1 2")
+        @post.update_attributes(:tag_string => "2 3")
+      end
+      
+      context "a version record" do
+        setup do
+          @version = PostVersion.last
+        end
+        
+        should "know its previous version" do
+          assert_not_nil(@version.previous)
+          assert_equal("1 2", @version.previous.tags)
+        end
+        
+        should "know the seuqence of all versions for the post" do
+          assert_equal(2, @version.sequence_for_post.size)
+          assert_equal(%w(3), @version.sequence_for_post[0][:added_tags])
+          assert_equal(%w(2), @version.sequence_for_post[1][:added_tags])
+        end
+      end
+    end
+    
     context "that has been created" do
       setup do
         @parent = Factory.create(:post)
@@ -23,8 +48,7 @@ class PostVersionTest < ActiveSupport::TestCase
       should "also create a version" do
         assert_equal(1, @post.versions.size)
         @version = @post.versions.last
-        assert_equal("aaa bbb ccc", @version.add_tags)
-        assert_equal("", @version.del_tags)
+        assert_equal("aaa bbb ccc", @version.tags)
         assert_equal(@post.rating, @version.rating)
         assert_equal(@post.parent_id, @version.parent_id)
         assert_equal(@post.source, @version.source)
@@ -41,8 +65,7 @@ class PostVersionTest < ActiveSupport::TestCase
       should "also create a version" do
         assert_equal(2, @post.versions.size)
         @version = @post.versions.last
-        assert_equal("xxx", @version.add_tags)
-        assert_equal("aaa", @version.del_tags)
+        assert_equal("bbb ccc xxx", @version.tags)
         assert_nil(@version.rating)
         assert_equal("", @version.source)
         assert_nil(@version.parent_id)

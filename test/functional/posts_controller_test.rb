@@ -53,7 +53,7 @@ class PostsControllerTest < ActionController::TestCase
       
       should "work" do
         @version = @post.versions(true).first
-        assert_equal("aaaa", @version.add_tags)
+        assert_equal("aaaa", @version.tags)
         post :revert, {:id => @post.id, :version_id => @version.id}, {:user_id => @user.id}
         assert_redirected_to post_path(@post)
         @post.reload

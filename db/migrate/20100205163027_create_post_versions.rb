@@ -4,8 +4,7 @@ class CreatePostVersions < ActiveRecord::Migration
       t.timestamps
       
       t.column :post_id, :integer, :null => false
-      t.column :add_tags, :text, :null => false, :default => ""
-      t.column :del_tags, :text, :null => false, :default => ""
+      t.column :tags, :text, :null => false, :default => ""
       t.column :rating, :char
       t.column :parent_id, :integer
       t.column :source, :text

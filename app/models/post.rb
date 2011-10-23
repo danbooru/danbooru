@@ -934,40 +934,24 @@ class Post < ActiveRecord::Base
         versions.create(
           :rating => rating,
           :source => source,
-          :add_tags => tag_string,
+          :tags => tag_string,
           :parent_id => parent_id
         )
       elsif rating_changed? || source_changed? || parent_id_changed? || tag_string_changed?
         versions.create(
-          :rating => rating_changed? ? rating : nil,
-          :source => source_changed? ? source : nil,
-          :add_tags => (tag_array - tag_array_was).join(" "),
-          :del_tags => (tag_array_was - tag_array).join(" "),
-          :parent_id => parent_id_changed? ? parent_id : nil
+          :rating => rating,
+          :source => source,
+          :tags => tag_string,
+          :parent_id => parent_id
         )
       end
     end
     
     def revert_to(target)
-      base_tags = []
-      base_rating = "q"
-      base_source = nil
-      base_parent_id = nil
-      
-      versions.each do |version|
-        if version.id <= target.id
-          base_tags += version.add_tag_array
-          base_tags -= version.del_tag_array
-          base_rating = version.rating if version.rating
-          base_source = version.source if version.source
-          base_parent_id = version.parent_id if version.parent_id
-        end
-      end
-      
-      self.tag_string = base_tags.sort.join(" ")
-      self.rating = base_rating
-      self.source = base_source
-      self.parent_id = base_parent_id
+      self.tag_string = target.tags
+      self.rating = target.rating
+      self.source = target.source
+      self.parent_id = target.parent_id
     end
     
     def revert_to!(target)

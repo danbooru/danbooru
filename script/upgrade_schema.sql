@@ -250,15 +250,11 @@ alter table post_versions rename column created_at to updated_at;
 alter table post_versions rename column user_id to updater_id;
 alter table post_versions rename column ip_addr to updater_ip_addr;
 alter table post_versions add column source text;
-alter table post_versions add column add_tags text not null default '';
-alter table post_versions add column del_tags text not null default '';
 alter index idx_post_tag_histories__post rename to index_post_versions_on_post_id;
 alter index index_post_tag_histories_on_user_id rename to index_post_versions_on_updater_id;
 create index index_post_versions_on_updater_ip_addr on post_versions (updater_ip_addr);
 alter table post_versions drop column id;
 alter table post_versions add column id serial primary key;
--- update post_versions.add_tags
--- update post_versions.del_tags
 
 alter table post_votes drop constraint post_votes_post_id_fkey;
 alter table post_votes drop constraint post_votes_user_id_fkey;
@@ -412,5 +408,4 @@ alter table wiki_pages drop constraint fk_wiki_pages__user;
 drop table dmails_orig;
 drop table favorites_orig;
 drop table pools_posts;
-alter table post_versions drop column tags;
 alter table users drop column show_samples;

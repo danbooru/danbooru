@@ -27,7 +27,7 @@ module ApplicationHelper
     zone = time.strftime("%z")
     datetime = time.strftime("%Y-%m-%dT%H:%M" + zone[0, 3] + ":" + zone[3, 2])
     
-    content_tag(:time, content || datetime, :datetime => datetime)
+    content_tag(:time, content || datetime, :datetime => datetime, :title => time.to_formatted_s)
   end
   
   def compact_time(time)
