@@ -48,3 +48,16 @@ footer#page-footer {
 div.clearfix {
   clear: both;
 }
+
+div#more-links {
+  z-index: 5000;
+  position: absolute;
+  background: white;
+  border: 1px solid #999;
+  width: 8em;
+  line-height: 1.3em;
+  padding: 0.2em 0.6em;
+  -moz-box-shadow: 2px 2px 2px #ccc;
+  -webkit-box-shadow: 2px 2px 2px #ccc;
+  box-shadow: 2px 2px 2px #ccc;
+}

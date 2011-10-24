@@ -66,7 +66,7 @@ class PostVersionTest < ActiveSupport::TestCase
         assert_equal(2, @post.versions.size)
         @version = @post.versions.last
         assert_equal("bbb ccc xxx", @version.tags)
-        assert_nil(@version.rating)
+        assert_equal("q", @version.rating)
         assert_equal("", @version.source)
         assert_nil(@version.parent_id)
       end

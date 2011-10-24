@@ -16,6 +16,18 @@ $(document).ready(function() {
     $(this).hide();
   });
   
+  // More link
+  $("#site-map-link").click(function(e) {
+    $("#more-links").toggle();
+    e.preventDefault();
+    e.stopPropagation();
+  });
+  $("#more-links").hide().offset({top: $("#site-map-link").offset().top + $("#site-map-link").height() + 10, left: $("#site-map-link").offset().left});  
+  
+  $(document).click(function(e) {
+    $("#more-links").hide();
+  });
+  
   // Ajax links
   $("a[data-remote=true]").click(function(e) {
     Danbooru.ajax_start(e.target);

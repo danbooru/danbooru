@@ -60,19 +60,37 @@ class TagImplicationTest < ActiveSupport::TestCase
       assert_equal("ddd", ti2.descendant_names)
     end
     
-    should "update the decendants for its parent on save" do
+    should "update the decendants for its parent on create" do
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
+      ti1.reload
+      assert_equal("active", ti1.status)
+      assert_equal("bbb", ti1.descendant_names)
+
       ti2 = FactoryGirl.create(:tag_implication, :antecedent_name => "bbb", :consequent_name => "ccc")
+      ti1.reload
+      ti2.reload
+      assert_equal("active", ti1.status)
+      assert_equal("active", ti2.status)
+      assert_equal("bbb ccc", ti1.descendant_names)
+      assert_equal("ccc", ti2.descendant_names)
+
       ti3 = FactoryGirl.create(:tag_implication, :antecedent_name => "ccc", :consequent_name => "ddd")
+      ti1.reload
+      ti2.reload
+      ti3.reload
+      assert_equal("bbb ccc ddd", ti1.descendant_names)
+      assert_equal("ccc ddd", ti2.descendant_names)
+
       ti4 = FactoryGirl.create(:tag_implication, :antecedent_name => "ccc", :consequent_name => "eee")
       ti1.reload
       ti2.reload
       ti3.reload
       ti4.reload
-      assert_equal("bbb ccc eee ddd", ti1.descendant_names)
-      assert_equal("ccc eee ddd", ti2.descendant_names)
+      assert_equal("bbb ccc ddd eee", ti1.descendant_names)
+      assert_equal("ccc ddd eee", ti2.descendant_names)
       assert_equal("ddd", ti3.descendant_names)
       assert_equal("eee", ti4.descendant_names)
+
     end
     
     should "update any affected post upon save" do

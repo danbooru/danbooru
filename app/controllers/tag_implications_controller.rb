@@ -1,6 +1,5 @@
 class TagImplicationsController < ApplicationController
-  before_filter :admin_only, :only => [:approve, :destroy]
-  before_filter :member_only, :only => [:create]
+  before_filter :admin_only, :only => [:new, :create, :approve, :destroy]
   respond_to :html, :xml, :json, :js
   
   def new

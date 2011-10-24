@@ -24,9 +24,9 @@ class TagImplication < ActiveRecord::Base
 
           until children.empty?
             all.concat(children)
-            children = self.class.where(["antecedent_name IN (?) and status = ?", children, "active"]).all.map(&:consequent_name)
+            children = self.class.where(["antecedent_name IN (?)", children]).all.map(&:consequent_name)
           end
-        end
+        end.sort
       end
     end
 
@@ -40,7 +40,7 @@ class TagImplication < ActiveRecord::Base
 
     def update_descendant_names!
       update_descendant_names
-      save!
+      update_column(:descendant_names, descendant_names)
     end
 
     def update_descendant_names_for_parent
@@ -77,6 +77,7 @@ class TagImplication < ActiveRecord::Base
   
   def process!
     update_column(:status, "processing")
+    update_descendant_names_for_parent
     update_posts
     update_column(:status, "active")
   rescue Exception => e

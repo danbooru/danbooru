@@ -29,17 +29,6 @@ class NotesControllerTest < ActionController::TestCase
       end
     end
     
-    context "show action" do
-      setup do
-        @note = Factory.create(:note)
-      end
-      
-      should "render" do
-        get :show, {:id => @note.id}
-        assert_response :success
-      end
-    end
-    
     context "create action" do
       should "create a note" do
         assert_difference("Note.count", 1) do

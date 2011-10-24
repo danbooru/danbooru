@@ -82,29 +82,23 @@ protected
     when "forum_posts"
       /^\/forum_topics/
       
-    when "uploads"
-      /^\/post/
-    
-    when "post_versions", "explore/posts"
-      /^\/post/
-    
-    when "pool_versions"
-      /^\/pool/
+    when "comments"
+      /^\/comments/
       
-    when "note_versions"
-      /^\/note/
+    when "notes", "note_versions"
+      /^\/notes/
       
-    when "artist_versions"
-      /^\/artist/
-      
-    when "moderator/post/dashboards"
+    when "posts", "uploads", "post_versions", "explore/posts", "moderator/post/dashboards", "favorites", "tag_subscriptions"
       /^\/post/
       
-    when "moderator/dashboards"
-      /^\/moderator/
+    when "wiki_pages", "wiki_page_versions"
+      /^\/wiki_pages/
+      
+    when "forum_topics", "forum_posts"
+      /^\/forum_topics/
       
     else
-      /^\/#{controller}/
+      /^\/static/
     end
   end
 end
