@@ -17,8 +17,10 @@ class DTextTest < ActiveSupport::TestCase
   end
   
   def test_spoilers
-    assert_equal("<p>this is</p><div class=\"spoiler\"><p>an inline spoiler</p></div><p>.</p>", p("this is [spoiler]an inline spoiler[/spoiler]."))
-    assert_equal("<p>this is</p><div class=\"spoiler\"><p>a block spoiler</p></div><p>.</p>", p("this is\n\n[spoiler]\na block spoiler\n[/spoiler]."))
+    assert_equal("", p("this is [spoiler]an inline spoiler[/spoiler]."))
+    assert_equal("", p("this is\n\n[spoiler]\na block spoiler\n[/spoiler]."))
+    assert_equal("", p("[spoiler]this is a spoiler with no closing tag\nnew text"))
+    assert_equal("", p("[spoiler]this is [spoiler]a nested[/spoiler] spoiler[/spoiler]"))
   end
   
   def test_paragraphs

@@ -17,7 +17,18 @@ class DText
     str.gsub!(/\n/m, "<br>")
     str.gsub!(/\[b\](.+?)\[\/b\]/i, '<strong>\1</strong>')
     str.gsub!(/\[i\](.+?)\[\/i\]/i, '<em>\1</em>')
-    str.gsub!(/("[^"]+":(https?:\/\/|\/)\S+|https?:\/\/\S+)/m) do |url|
+    str.gsub!(/\[spoilers?\](.+?)(?:\[\/?spoilers?\]|$)/, '<span class="spoiler">\1</span>')
+
+    str = parse_links(str)
+    str = parse_aliased_wiki_links(str)
+    str = parse_wiki_links(str)
+    str = parse_post_links(str)
+    str = parse_id_links(str)
+    str
+  end
+  
+  def self.parse_links(str)
+    str.gsub(/("[^"]+":(https?:\/\/|\/)\S+|https?:\/\/\S+)/m) do |url|
       if url =~ /^"([^"]+)":(.+)$/
         text = $1
         url = $2
@@ -34,17 +45,6 @@ class DText
 
       '<a href="' + url + '">' + text + '</a>' + ch
     end
-    # str.gsub!(/\[url\](http.+?)\[\/url\]/i) do
-    #   %{<a href="#{$1}">#{$1}</a>}
-    # end
-    # str.gsub!(/\[url=(http.+?)\](.+?)\[\/url\]/m) do
-    #   %{<a href="#{$1}">#{$2}</a>}
-    # end
-    str = parse_aliased_wiki_links(str)
-    str = parse_wiki_links(str)
-    str = parse_post_links(str)
-    str = parse_id_links(str)
-    str
   end
   
   def self.parse_aliased_wiki_links(str)
@@ -121,8 +121,6 @@ class DText
     unless options[:inline]
       str.gsub!(/\s*\[quote\]\s*/m, "\n\n[quote]\n\n")
       str.gsub!(/\s*\[\/quote\]\s*/m, "\n\n[/quote]\n\n")
-      str.gsub!(/\s*\[spoilers?\](?!\])\s*/m, "\n\n[spoiler]\n\n")
-      str.gsub!(/\s*\[\/spoilers?\]\s*/m, "\n\n[/spoiler]\n\n")
     end
     
     str.gsub!(/(?:\r?\n){3,}/, "\n\n")
@@ -161,16 +159,6 @@ class DText
           '</blockquote>'
         else
           ""
-        end
-
-      when /\[spoilers?\](?!\])/
-        stack << "div"
-        '<div class="spoiler">'
-        
-      when /\[\/spoilers?\]/
-        if stack.last == "div"
-          stack.pop
-          '</div>'
         end
 
       else
