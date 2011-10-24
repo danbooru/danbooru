@@ -17,10 +17,11 @@ class DTextTest < ActiveSupport::TestCase
   end
   
   def test_spoilers
-    assert_equal("", p("this is [spoiler]an inline spoiler[/spoiler]."))
-    assert_equal("", p("this is\n\n[spoiler]\na block spoiler\n[/spoiler]."))
-    assert_equal("", p("[spoiler]this is a spoiler with no closing tag\nnew text"))
-    assert_equal("", p("[spoiler]this is [spoiler]a nested[/spoiler] spoiler[/spoiler]"))
+    assert_equal("<p>this is <span class=\"spoiler\">an inline spoiler</span>.</p>", p("this is [spoiler]an inline spoiler[/spoiler]."))
+    assert_equal("<p>this is</p><p><span class=\"spoiler\"><br>a block spoiler</span><br>[/spoiler].</p>", p("this is\n\n[spoiler]\na block spoiler\n[/spoiler]."))
+    assert_equal("<p><span class=\"spoiler\">this is a spoiler with no closing tag</span></p><p>new text</p>", p("[spoiler]this is a spoiler with no closing tag\n\nnew text"))
+    assert_equal("<p><span class=\"spoiler\">this is a spoiler with no closing tag</span><br>new text</p>", p("[spoiler]this is a spoiler with no closing tag\nnew text"))
+    assert_equal("<p><span class=\"spoiler\">this is </span>a nested[/spoiler] spoiler[/spoiler]</p>", p("[spoiler]this is [spoiler]a nested[/spoiler] spoiler[/spoiler]"))
   end
   
   def test_paragraphs
@@ -76,11 +77,6 @@ class DTextTest < ActiveSupport::TestCase
     assert_equal('<p><a href="/posts?tags=tag">tag</a></p>', p("{{tag}}"))
     assert_equal('<p><a href="/posts?tags=tag1+tag2">tag1 tag2</a></p>', p("{{tag1 tag2}}"))
     assert_equal('<p><a href="/posts?tags=%3C3">&lt;3</a></p>', p("{{<3}}"))
-  end
-  
-  def test_missing_spoiler_tags
-    assert_equal('<div class="spoiler"><p>testing</p></div>', p('[spoiler]testing'))
-    assert_equal('<div class="spoiler"><div class="spoiler"><p>testing</p></div></div>', p('[spoiler][spoiler]testing[/spoiler]'))
   end
   
   def test_extra_newlines

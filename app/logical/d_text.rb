@@ -14,10 +14,10 @@ class DText
     str.gsub!(/&/, "&amp;")
     str.gsub!(/</, "&lt;")
     str.gsub!(/>/, "&gt;")
+    str.gsub!(/(?<!\[)\[spoilers?\](.+?)(?:\[\/?spoilers?\]|$)/m, '<span class="spoiler">\1</span>')
     str.gsub!(/\n/m, "<br>")
     str.gsub!(/\[b\](.+?)\[\/b\]/i, '<strong>\1</strong>')
     str.gsub!(/\[i\](.+?)\[\/i\]/i, '<em>\1</em>')
-    str.gsub!(/\[spoilers?\](.+?)(?:\[\/?spoilers?\]|$)/, '<span class="spoiler">\1</span>')
 
     str = parse_links(str)
     str = parse_aliased_wiki_links(str)

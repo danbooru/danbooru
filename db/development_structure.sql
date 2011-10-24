@@ -13,7 +13,7 @@ SET escape_string_warning = off;
 -- Name: plpgsql; Type: PROCEDURAL LANGUAGE; Schema: -; Owner: -
 --
 
-CREATE PROCEDURAL LANGUAGE plpgsql;
+CREATE OR REPLACE PROCEDURAL LANGUAGE plpgsql;
 
 
 SET search_path = public, pg_catalog;
@@ -414,8 +414,8 @@ CREATE TABLE advertisement_hits (
 CREATE SEQUENCE advertisement_hits_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -452,8 +452,8 @@ CREATE TABLE advertisements (
 CREATE SEQUENCE advertisements_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -483,8 +483,8 @@ CREATE TABLE amazon_backups (
 CREATE SEQUENCE amazon_backups_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -516,8 +516,8 @@ CREATE TABLE artist_urls (
 CREATE SEQUENCE artist_urls_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -555,8 +555,8 @@ CREATE TABLE artist_versions (
 CREATE SEQUENCE artist_versions_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -592,8 +592,8 @@ CREATE TABLE artists (
 CREATE SEQUENCE artists_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -626,8 +626,8 @@ CREATE TABLE bans (
 CREATE SEQUENCE bans_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -659,8 +659,8 @@ CREATE TABLE comment_votes (
 CREATE SEQUENCE comment_votes_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -695,8 +695,8 @@ CREATE TABLE comments (
 CREATE SEQUENCE comments_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -733,8 +733,8 @@ CREATE TABLE delayed_jobs (
 CREATE SEQUENCE delayed_jobs_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -771,8 +771,8 @@ CREATE TABLE dmails (
 CREATE SEQUENCE dmails_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -801,8 +801,8 @@ CREATE TABLE favorites (
 CREATE SEQUENCE favorites_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -817,7 +817,8 @@ ALTER SEQUENCE favorites_id_seq OWNED BY favorites.id;
 -- Name: favorites_0; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_0 (CONSTRAINT favorites_0_user_id_check CHECK (((user_id % 100) = 0))
+CREATE TABLE favorites_0 (
+    CONSTRAINT favorites_0_user_id_check CHECK (((user_id % 100) = 0))
 )
 INHERITS (favorites);
 
@@ -826,7 +827,8 @@ INHERITS (favorites);
 -- Name: favorites_1; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_1 (CONSTRAINT favorites_1_user_id_check CHECK (((user_id % 100) = 1))
+CREATE TABLE favorites_1 (
+    CONSTRAINT favorites_1_user_id_check CHECK (((user_id % 100) = 1))
 )
 INHERITS (favorites);
 
@@ -835,7 +837,8 @@ INHERITS (favorites);
 -- Name: favorites_10; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_10 (CONSTRAINT favorites_10_user_id_check CHECK (((user_id % 100) = 10))
+CREATE TABLE favorites_10 (
+    CONSTRAINT favorites_10_user_id_check CHECK (((user_id % 100) = 10))
 )
 INHERITS (favorites);
 
@@ -844,7 +847,8 @@ INHERITS (favorites);
 -- Name: favorites_11; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_11 (CONSTRAINT favorites_11_user_id_check CHECK (((user_id % 100) = 11))
+CREATE TABLE favorites_11 (
+    CONSTRAINT favorites_11_user_id_check CHECK (((user_id % 100) = 11))
 )
 INHERITS (favorites);
 
@@ -853,7 +857,8 @@ INHERITS (favorites);
 -- Name: favorites_12; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_12 (CONSTRAINT favorites_12_user_id_check CHECK (((user_id % 100) = 12))
+CREATE TABLE favorites_12 (
+    CONSTRAINT favorites_12_user_id_check CHECK (((user_id % 100) = 12))
 )
 INHERITS (favorites);
 
@@ -862,7 +867,8 @@ INHERITS (favorites);
 -- Name: favorites_13; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_13 (CONSTRAINT favorites_13_user_id_check CHECK (((user_id % 100) = 13))
+CREATE TABLE favorites_13 (
+    CONSTRAINT favorites_13_user_id_check CHECK (((user_id % 100) = 13))
 )
 INHERITS (favorites);
 
@@ -871,7 +877,8 @@ INHERITS (favorites);
 -- Name: favorites_14; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_14 (CONSTRAINT favorites_14_user_id_check CHECK (((user_id % 100) = 14))
+CREATE TABLE favorites_14 (
+    CONSTRAINT favorites_14_user_id_check CHECK (((user_id % 100) = 14))
 )
 INHERITS (favorites);
 
@@ -880,7 +887,8 @@ INHERITS (favorites);
 -- Name: favorites_15; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_15 (CONSTRAINT favorites_15_user_id_check CHECK (((user_id % 100) = 15))
+CREATE TABLE favorites_15 (
+    CONSTRAINT favorites_15_user_id_check CHECK (((user_id % 100) = 15))
 )
 INHERITS (favorites);
 
@@ -889,7 +897,8 @@ INHERITS (favorites);
 -- Name: favorites_16; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_16 (CONSTRAINT favorites_16_user_id_check CHECK (((user_id % 100) = 16))
+CREATE TABLE favorites_16 (
+    CONSTRAINT favorites_16_user_id_check CHECK (((user_id % 100) = 16))
 )
 INHERITS (favorites);
 
@@ -898,7 +907,8 @@ INHERITS (favorites);
 -- Name: favorites_17; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_17 (CONSTRAINT favorites_17_user_id_check CHECK (((user_id % 100) = 17))
+CREATE TABLE favorites_17 (
+    CONSTRAINT favorites_17_user_id_check CHECK (((user_id % 100) = 17))
 )
 INHERITS (favorites);
 
@@ -907,7 +917,8 @@ INHERITS (favorites);
 -- Name: favorites_18; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_18 (CONSTRAINT favorites_18_user_id_check CHECK (((user_id % 100) = 18))
+CREATE TABLE favorites_18 (
+    CONSTRAINT favorites_18_user_id_check CHECK (((user_id % 100) = 18))
 )
 INHERITS (favorites);
 
@@ -916,7 +927,8 @@ INHERITS (favorites);
 -- Name: favorites_19; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_19 (CONSTRAINT favorites_19_user_id_check CHECK (((user_id % 100) = 19))
+CREATE TABLE favorites_19 (
+    CONSTRAINT favorites_19_user_id_check CHECK (((user_id % 100) = 19))
 )
 INHERITS (favorites);
 
@@ -925,7 +937,8 @@ INHERITS (favorites);
 -- Name: favorites_2; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_2 (CONSTRAINT favorites_2_user_id_check CHECK (((user_id % 100) = 2))
+CREATE TABLE favorites_2 (
+    CONSTRAINT favorites_2_user_id_check CHECK (((user_id % 100) = 2))
 )
 INHERITS (favorites);
 
@@ -934,7 +947,8 @@ INHERITS (favorites);
 -- Name: favorites_20; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_20 (CONSTRAINT favorites_20_user_id_check CHECK (((user_id % 100) = 20))
+CREATE TABLE favorites_20 (
+    CONSTRAINT favorites_20_user_id_check CHECK (((user_id % 100) = 20))
 )
 INHERITS (favorites);
 
@@ -943,7 +957,8 @@ INHERITS (favorites);
 -- Name: favorites_21; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_21 (CONSTRAINT favorites_21_user_id_check CHECK (((user_id % 100) = 21))
+CREATE TABLE favorites_21 (
+    CONSTRAINT favorites_21_user_id_check CHECK (((user_id % 100) = 21))
 )
 INHERITS (favorites);
 
@@ -952,7 +967,8 @@ INHERITS (favorites);
 -- Name: favorites_22; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_22 (CONSTRAINT favorites_22_user_id_check CHECK (((user_id % 100) = 22))
+CREATE TABLE favorites_22 (
+    CONSTRAINT favorites_22_user_id_check CHECK (((user_id % 100) = 22))
 )
 INHERITS (favorites);
 
@@ -961,7 +977,8 @@ INHERITS (favorites);
 -- Name: favorites_23; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_23 (CONSTRAINT favorites_23_user_id_check CHECK (((user_id % 100) = 23))
+CREATE TABLE favorites_23 (
+    CONSTRAINT favorites_23_user_id_check CHECK (((user_id % 100) = 23))
 )
 INHERITS (favorites);
 
@@ -970,7 +987,8 @@ INHERITS (favorites);
 -- Name: favorites_24; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_24 (CONSTRAINT favorites_24_user_id_check CHECK (((user_id % 100) = 24))
+CREATE TABLE favorites_24 (
+    CONSTRAINT favorites_24_user_id_check CHECK (((user_id % 100) = 24))
 )
 INHERITS (favorites);
 
@@ -979,7 +997,8 @@ INHERITS (favorites);
 -- Name: favorites_25; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_25 (CONSTRAINT favorites_25_user_id_check CHECK (((user_id % 100) = 25))
+CREATE TABLE favorites_25 (
+    CONSTRAINT favorites_25_user_id_check CHECK (((user_id % 100) = 25))
 )
 INHERITS (favorites);
 
@@ -988,7 +1007,8 @@ INHERITS (favorites);
 -- Name: favorites_26; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_26 (CONSTRAINT favorites_26_user_id_check CHECK (((user_id % 100) = 26))
+CREATE TABLE favorites_26 (
+    CONSTRAINT favorites_26_user_id_check CHECK (((user_id % 100) = 26))
 )
 INHERITS (favorites);
 
@@ -997,7 +1017,8 @@ INHERITS (favorites);
 -- Name: favorites_27; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_27 (CONSTRAINT favorites_27_user_id_check CHECK (((user_id % 100) = 27))
+CREATE TABLE favorites_27 (
+    CONSTRAINT favorites_27_user_id_check CHECK (((user_id % 100) = 27))
 )
 INHERITS (favorites);
 
@@ -1006,7 +1027,8 @@ INHERITS (favorites);
 -- Name: favorites_28; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_28 (CONSTRAINT favorites_28_user_id_check CHECK (((user_id % 100) = 28))
+CREATE TABLE favorites_28 (
+    CONSTRAINT favorites_28_user_id_check CHECK (((user_id % 100) = 28))
 )
 INHERITS (favorites);
 
@@ -1015,7 +1037,8 @@ INHERITS (favorites);
 -- Name: favorites_29; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_29 (CONSTRAINT favorites_29_user_id_check CHECK (((user_id % 100) = 29))
+CREATE TABLE favorites_29 (
+    CONSTRAINT favorites_29_user_id_check CHECK (((user_id % 100) = 29))
 )
 INHERITS (favorites);
 
@@ -1024,7 +1047,8 @@ INHERITS (favorites);
 -- Name: favorites_3; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_3 (CONSTRAINT favorites_3_user_id_check CHECK (((user_id % 100) = 3))
+CREATE TABLE favorites_3 (
+    CONSTRAINT favorites_3_user_id_check CHECK (((user_id % 100) = 3))
 )
 INHERITS (favorites);
 
@@ -1033,7 +1057,8 @@ INHERITS (favorites);
 -- Name: favorites_30; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_30 (CONSTRAINT favorites_30_user_id_check CHECK (((user_id % 100) = 30))
+CREATE TABLE favorites_30 (
+    CONSTRAINT favorites_30_user_id_check CHECK (((user_id % 100) = 30))
 )
 INHERITS (favorites);
 
@@ -1042,7 +1067,8 @@ INHERITS (favorites);
 -- Name: favorites_31; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_31 (CONSTRAINT favorites_31_user_id_check CHECK (((user_id % 100) = 31))
+CREATE TABLE favorites_31 (
+    CONSTRAINT favorites_31_user_id_check CHECK (((user_id % 100) = 31))
 )
 INHERITS (favorites);
 
@@ -1051,7 +1077,8 @@ INHERITS (favorites);
 -- Name: favorites_32; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_32 (CONSTRAINT favorites_32_user_id_check CHECK (((user_id % 100) = 32))
+CREATE TABLE favorites_32 (
+    CONSTRAINT favorites_32_user_id_check CHECK (((user_id % 100) = 32))
 )
 INHERITS (favorites);
 
@@ -1060,7 +1087,8 @@ INHERITS (favorites);
 -- Name: favorites_33; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_33 (CONSTRAINT favorites_33_user_id_check CHECK (((user_id % 100) = 33))
+CREATE TABLE favorites_33 (
+    CONSTRAINT favorites_33_user_id_check CHECK (((user_id % 100) = 33))
 )
 INHERITS (favorites);
 
@@ -1069,7 +1097,8 @@ INHERITS (favorites);
 -- Name: favorites_34; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_34 (CONSTRAINT favorites_34_user_id_check CHECK (((user_id % 100) = 34))
+CREATE TABLE favorites_34 (
+    CONSTRAINT favorites_34_user_id_check CHECK (((user_id % 100) = 34))
 )
 INHERITS (favorites);
 
@@ -1078,7 +1107,8 @@ INHERITS (favorites);
 -- Name: favorites_35; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_35 (CONSTRAINT favorites_35_user_id_check CHECK (((user_id % 100) = 35))
+CREATE TABLE favorites_35 (
+    CONSTRAINT favorites_35_user_id_check CHECK (((user_id % 100) = 35))
 )
 INHERITS (favorites);
 
@@ -1087,7 +1117,8 @@ INHERITS (favorites);
 -- Name: favorites_36; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_36 (CONSTRAINT favorites_36_user_id_check CHECK (((user_id % 100) = 36))
+CREATE TABLE favorites_36 (
+    CONSTRAINT favorites_36_user_id_check CHECK (((user_id % 100) = 36))
 )
 INHERITS (favorites);
 
@@ -1096,7 +1127,8 @@ INHERITS (favorites);
 -- Name: favorites_37; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_37 (CONSTRAINT favorites_37_user_id_check CHECK (((user_id % 100) = 37))
+CREATE TABLE favorites_37 (
+    CONSTRAINT favorites_37_user_id_check CHECK (((user_id % 100) = 37))
 )
 INHERITS (favorites);
 
@@ -1105,7 +1137,8 @@ INHERITS (favorites);
 -- Name: favorites_38; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_38 (CONSTRAINT favorites_38_user_id_check CHECK (((user_id % 100) = 38))
+CREATE TABLE favorites_38 (
+    CONSTRAINT favorites_38_user_id_check CHECK (((user_id % 100) = 38))
 )
 INHERITS (favorites);
 
@@ -1114,7 +1147,8 @@ INHERITS (favorites);
 -- Name: favorites_39; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_39 (CONSTRAINT favorites_39_user_id_check CHECK (((user_id % 100) = 39))
+CREATE TABLE favorites_39 (
+    CONSTRAINT favorites_39_user_id_check CHECK (((user_id % 100) = 39))
 )
 INHERITS (favorites);
 
@@ -1123,7 +1157,8 @@ INHERITS (favorites);
 -- Name: favorites_4; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_4 (CONSTRAINT favorites_4_user_id_check CHECK (((user_id % 100) = 4))
+CREATE TABLE favorites_4 (
+    CONSTRAINT favorites_4_user_id_check CHECK (((user_id % 100) = 4))
 )
 INHERITS (favorites);
 
@@ -1132,7 +1167,8 @@ INHERITS (favorites);
 -- Name: favorites_40; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_40 (CONSTRAINT favorites_40_user_id_check CHECK (((user_id % 100) = 40))
+CREATE TABLE favorites_40 (
+    CONSTRAINT favorites_40_user_id_check CHECK (((user_id % 100) = 40))
 )
 INHERITS (favorites);
 
@@ -1141,7 +1177,8 @@ INHERITS (favorites);
 -- Name: favorites_41; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_41 (CONSTRAINT favorites_41_user_id_check CHECK (((user_id % 100) = 41))
+CREATE TABLE favorites_41 (
+    CONSTRAINT favorites_41_user_id_check CHECK (((user_id % 100) = 41))
 )
 INHERITS (favorites);
 
@@ -1150,7 +1187,8 @@ INHERITS (favorites);
 -- Name: favorites_42; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_42 (CONSTRAINT favorites_42_user_id_check CHECK (((user_id % 100) = 42))
+CREATE TABLE favorites_42 (
+    CONSTRAINT favorites_42_user_id_check CHECK (((user_id % 100) = 42))
 )
 INHERITS (favorites);
 
@@ -1159,7 +1197,8 @@ INHERITS (favorites);
 -- Name: favorites_43; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_43 (CONSTRAINT favorites_43_user_id_check CHECK (((user_id % 100) = 43))
+CREATE TABLE favorites_43 (
+    CONSTRAINT favorites_43_user_id_check CHECK (((user_id % 100) = 43))
 )
 INHERITS (favorites);
 
@@ -1168,7 +1207,8 @@ INHERITS (favorites);
 -- Name: favorites_44; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_44 (CONSTRAINT favorites_44_user_id_check CHECK (((user_id % 100) = 44))
+CREATE TABLE favorites_44 (
+    CONSTRAINT favorites_44_user_id_check CHECK (((user_id % 100) = 44))
 )
 INHERITS (favorites);
 
@@ -1177,7 +1217,8 @@ INHERITS (favorites);
 -- Name: favorites_45; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_45 (CONSTRAINT favorites_45_user_id_check CHECK (((user_id % 100) = 45))
+CREATE TABLE favorites_45 (
+    CONSTRAINT favorites_45_user_id_check CHECK (((user_id % 100) = 45))
 )
 INHERITS (favorites);
 
@@ -1186,7 +1227,8 @@ INHERITS (favorites);
 -- Name: favorites_46; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_46 (CONSTRAINT favorites_46_user_id_check CHECK (((user_id % 100) = 46))
+CREATE TABLE favorites_46 (
+    CONSTRAINT favorites_46_user_id_check CHECK (((user_id % 100) = 46))
 )
 INHERITS (favorites);
 
@@ -1195,7 +1237,8 @@ INHERITS (favorites);
 -- Name: favorites_47; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_47 (CONSTRAINT favorites_47_user_id_check CHECK (((user_id % 100) = 47))
+CREATE TABLE favorites_47 (
+    CONSTRAINT favorites_47_user_id_check CHECK (((user_id % 100) = 47))
 )
 INHERITS (favorites);
 
@@ -1204,7 +1247,8 @@ INHERITS (favorites);
 -- Name: favorites_48; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_48 (CONSTRAINT favorites_48_user_id_check CHECK (((user_id % 100) = 48))
+CREATE TABLE favorites_48 (
+    CONSTRAINT favorites_48_user_id_check CHECK (((user_id % 100) = 48))
 )
 INHERITS (favorites);
 
@@ -1213,7 +1257,8 @@ INHERITS (favorites);
 -- Name: favorites_49; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_49 (CONSTRAINT favorites_49_user_id_check CHECK (((user_id % 100) = 49))
+CREATE TABLE favorites_49 (
+    CONSTRAINT favorites_49_user_id_check CHECK (((user_id % 100) = 49))
 )
 INHERITS (favorites);
 
@@ -1222,7 +1267,8 @@ INHERITS (favorites);
 -- Name: favorites_5; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_5 (CONSTRAINT favorites_5_user_id_check CHECK (((user_id % 100) = 5))
+CREATE TABLE favorites_5 (
+    CONSTRAINT favorites_5_user_id_check CHECK (((user_id % 100) = 5))
 )
 INHERITS (favorites);
 
@@ -1231,7 +1277,8 @@ INHERITS (favorites);
 -- Name: favorites_50; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_50 (CONSTRAINT favorites_50_user_id_check CHECK (((user_id % 100) = 50))
+CREATE TABLE favorites_50 (
+    CONSTRAINT favorites_50_user_id_check CHECK (((user_id % 100) = 50))
 )
 INHERITS (favorites);
 
@@ -1240,7 +1287,8 @@ INHERITS (favorites);
 -- Name: favorites_51; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_51 (CONSTRAINT favorites_51_user_id_check CHECK (((user_id % 100) = 51))
+CREATE TABLE favorites_51 (
+    CONSTRAINT favorites_51_user_id_check CHECK (((user_id % 100) = 51))
 )
 INHERITS (favorites);
 
@@ -1249,7 +1297,8 @@ INHERITS (favorites);
 -- Name: favorites_52; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_52 (CONSTRAINT favorites_52_user_id_check CHECK (((user_id % 100) = 52))
+CREATE TABLE favorites_52 (
+    CONSTRAINT favorites_52_user_id_check CHECK (((user_id % 100) = 52))
 )
 INHERITS (favorites);
 
@@ -1258,7 +1307,8 @@ INHERITS (favorites);
 -- Name: favorites_53; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_53 (CONSTRAINT favorites_53_user_id_check CHECK (((user_id % 100) = 53))
+CREATE TABLE favorites_53 (
+    CONSTRAINT favorites_53_user_id_check CHECK (((user_id % 100) = 53))
 )
 INHERITS (favorites);
 
@@ -1267,7 +1317,8 @@ INHERITS (favorites);
 -- Name: favorites_54; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_54 (CONSTRAINT favorites_54_user_id_check CHECK (((user_id % 100) = 54))
+CREATE TABLE favorites_54 (
+    CONSTRAINT favorites_54_user_id_check CHECK (((user_id % 100) = 54))
 )
 INHERITS (favorites);
 
@@ -1276,7 +1327,8 @@ INHERITS (favorites);
 -- Name: favorites_55; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_55 (CONSTRAINT favorites_55_user_id_check CHECK (((user_id % 100) = 55))
+CREATE TABLE favorites_55 (
+    CONSTRAINT favorites_55_user_id_check CHECK (((user_id % 100) = 55))
 )
 INHERITS (favorites);
 
@@ -1285,7 +1337,8 @@ INHERITS (favorites);
 -- Name: favorites_56; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_56 (CONSTRAINT favorites_56_user_id_check CHECK (((user_id % 100) = 56))
+CREATE TABLE favorites_56 (
+    CONSTRAINT favorites_56_user_id_check CHECK (((user_id % 100) = 56))
 )
 INHERITS (favorites);
 
@@ -1294,7 +1347,8 @@ INHERITS (favorites);
 -- Name: favorites_57; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_57 (CONSTRAINT favorites_57_user_id_check CHECK (((user_id % 100) = 57))
+CREATE TABLE favorites_57 (
+    CONSTRAINT favorites_57_user_id_check CHECK (((user_id % 100) = 57))
 )
 INHERITS (favorites);
 
@@ -1303,7 +1357,8 @@ INHERITS (favorites);
 -- Name: favorites_58; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_58 (CONSTRAINT favorites_58_user_id_check CHECK (((user_id % 100) = 58))
+CREATE TABLE favorites_58 (
+    CONSTRAINT favorites_58_user_id_check CHECK (((user_id % 100) = 58))
 )
 INHERITS (favorites);
 
@@ -1312,7 +1367,8 @@ INHERITS (favorites);
 -- Name: favorites_59; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_59 (CONSTRAINT favorites_59_user_id_check CHECK (((user_id % 100) = 59))
+CREATE TABLE favorites_59 (
+    CONSTRAINT favorites_59_user_id_check CHECK (((user_id % 100) = 59))
 )
 INHERITS (favorites);
 
@@ -1321,7 +1377,8 @@ INHERITS (favorites);
 -- Name: favorites_6; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_6 (CONSTRAINT favorites_6_user_id_check CHECK (((user_id % 100) = 6))
+CREATE TABLE favorites_6 (
+    CONSTRAINT favorites_6_user_id_check CHECK (((user_id % 100) = 6))
 )
 INHERITS (favorites);
 
@@ -1330,7 +1387,8 @@ INHERITS (favorites);
 -- Name: favorites_60; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_60 (CONSTRAINT favorites_60_user_id_check CHECK (((user_id % 100) = 60))
+CREATE TABLE favorites_60 (
+    CONSTRAINT favorites_60_user_id_check CHECK (((user_id % 100) = 60))
 )
 INHERITS (favorites);
 
@@ -1339,7 +1397,8 @@ INHERITS (favorites);
 -- Name: favorites_61; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_61 (CONSTRAINT favorites_61_user_id_check CHECK (((user_id % 100) = 61))
+CREATE TABLE favorites_61 (
+    CONSTRAINT favorites_61_user_id_check CHECK (((user_id % 100) = 61))
 )
 INHERITS (favorites);
 
@@ -1348,7 +1407,8 @@ INHERITS (favorites);
 -- Name: favorites_62; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_62 (CONSTRAINT favorites_62_user_id_check CHECK (((user_id % 100) = 62))
+CREATE TABLE favorites_62 (
+    CONSTRAINT favorites_62_user_id_check CHECK (((user_id % 100) = 62))
 )
 INHERITS (favorites);
 
@@ -1357,7 +1417,8 @@ INHERITS (favorites);
 -- Name: favorites_63; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_63 (CONSTRAINT favorites_63_user_id_check CHECK (((user_id % 100) = 63))
+CREATE TABLE favorites_63 (
+    CONSTRAINT favorites_63_user_id_check CHECK (((user_id % 100) = 63))
 )
 INHERITS (favorites);
 
@@ -1366,7 +1427,8 @@ INHERITS (favorites);
 -- Name: favorites_64; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_64 (CONSTRAINT favorites_64_user_id_check CHECK (((user_id % 100) = 64))
+CREATE TABLE favorites_64 (
+    CONSTRAINT favorites_64_user_id_check CHECK (((user_id % 100) = 64))
 )
 INHERITS (favorites);
 
@@ -1375,7 +1437,8 @@ INHERITS (favorites);
 -- Name: favorites_65; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_65 (CONSTRAINT favorites_65_user_id_check CHECK (((user_id % 100) = 65))
+CREATE TABLE favorites_65 (
+    CONSTRAINT favorites_65_user_id_check CHECK (((user_id % 100) = 65))
 )
 INHERITS (favorites);
 
@@ -1384,7 +1447,8 @@ INHERITS (favorites);
 -- Name: favorites_66; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_66 (CONSTRAINT favorites_66_user_id_check CHECK (((user_id % 100) = 66))
+CREATE TABLE favorites_66 (
+    CONSTRAINT favorites_66_user_id_check CHECK (((user_id % 100) = 66))
 )
 INHERITS (favorites);
 
@@ -1393,7 +1457,8 @@ INHERITS (favorites);
 -- Name: favorites_67; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_67 (CONSTRAINT favorites_67_user_id_check CHECK (((user_id % 100) = 67))
+CREATE TABLE favorites_67 (
+    CONSTRAINT favorites_67_user_id_check CHECK (((user_id % 100) = 67))
 )
 INHERITS (favorites);
 
@@ -1402,7 +1467,8 @@ INHERITS (favorites);
 -- Name: favorites_68; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_68 (CONSTRAINT favorites_68_user_id_check CHECK (((user_id % 100) = 68))
+CREATE TABLE favorites_68 (
+    CONSTRAINT favorites_68_user_id_check CHECK (((user_id % 100) = 68))
 )
 INHERITS (favorites);
 
@@ -1411,7 +1477,8 @@ INHERITS (favorites);
 -- Name: favorites_69; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_69 (CONSTRAINT favorites_69_user_id_check CHECK (((user_id % 100) = 69))
+CREATE TABLE favorites_69 (
+    CONSTRAINT favorites_69_user_id_check CHECK (((user_id % 100) = 69))
 )
 INHERITS (favorites);
 
@@ -1420,7 +1487,8 @@ INHERITS (favorites);
 -- Name: favorites_7; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_7 (CONSTRAINT favorites_7_user_id_check CHECK (((user_id % 100) = 7))
+CREATE TABLE favorites_7 (
+    CONSTRAINT favorites_7_user_id_check CHECK (((user_id % 100) = 7))
 )
 INHERITS (favorites);
 
@@ -1429,7 +1497,8 @@ INHERITS (favorites);
 -- Name: favorites_70; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_70 (CONSTRAINT favorites_70_user_id_check CHECK (((user_id % 100) = 70))
+CREATE TABLE favorites_70 (
+    CONSTRAINT favorites_70_user_id_check CHECK (((user_id % 100) = 70))
 )
 INHERITS (favorites);
 
@@ -1438,7 +1507,8 @@ INHERITS (favorites);
 -- Name: favorites_71; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_71 (CONSTRAINT favorites_71_user_id_check CHECK (((user_id % 100) = 71))
+CREATE TABLE favorites_71 (
+    CONSTRAINT favorites_71_user_id_check CHECK (((user_id % 100) = 71))
 )
 INHERITS (favorites);
 
@@ -1447,7 +1517,8 @@ INHERITS (favorites);
 -- Name: favorites_72; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_72 (CONSTRAINT favorites_72_user_id_check CHECK (((user_id % 100) = 72))
+CREATE TABLE favorites_72 (
+    CONSTRAINT favorites_72_user_id_check CHECK (((user_id % 100) = 72))
 )
 INHERITS (favorites);
 
@@ -1456,7 +1527,8 @@ INHERITS (favorites);
 -- Name: favorites_73; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_73 (CONSTRAINT favorites_73_user_id_check CHECK (((user_id % 100) = 73))
+CREATE TABLE favorites_73 (
+    CONSTRAINT favorites_73_user_id_check CHECK (((user_id % 100) = 73))
 )
 INHERITS (favorites);
 
@@ -1465,7 +1537,8 @@ INHERITS (favorites);
 -- Name: favorites_74; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_74 (CONSTRAINT favorites_74_user_id_check CHECK (((user_id % 100) = 74))
+CREATE TABLE favorites_74 (
+    CONSTRAINT favorites_74_user_id_check CHECK (((user_id % 100) = 74))
 )
 INHERITS (favorites);
 
@@ -1474,7 +1547,8 @@ INHERITS (favorites);
 -- Name: favorites_75; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_75 (CONSTRAINT favorites_75_user_id_check CHECK (((user_id % 100) = 75))
+CREATE TABLE favorites_75 (
+    CONSTRAINT favorites_75_user_id_check CHECK (((user_id % 100) = 75))
 )
 INHERITS (favorites);
 
@@ -1483,7 +1557,8 @@ INHERITS (favorites);
 -- Name: favorites_76; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_76 (CONSTRAINT favorites_76_user_id_check CHECK (((user_id % 100) = 76))
+CREATE TABLE favorites_76 (
+    CONSTRAINT favorites_76_user_id_check CHECK (((user_id % 100) = 76))
 )
 INHERITS (favorites);
 
@@ -1492,7 +1567,8 @@ INHERITS (favorites);
 -- Name: favorites_77; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_77 (CONSTRAINT favorites_77_user_id_check CHECK (((user_id % 100) = 77))
+CREATE TABLE favorites_77 (
+    CONSTRAINT favorites_77_user_id_check CHECK (((user_id % 100) = 77))
 )
 INHERITS (favorites);
 
@@ -1501,7 +1577,8 @@ INHERITS (favorites);
 -- Name: favorites_78; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_78 (CONSTRAINT favorites_78_user_id_check CHECK (((user_id % 100) = 78))
+CREATE TABLE favorites_78 (
+    CONSTRAINT favorites_78_user_id_check CHECK (((user_id % 100) = 78))
 )
 INHERITS (favorites);
 
@@ -1510,7 +1587,8 @@ INHERITS (favorites);
 -- Name: favorites_79; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_79 (CONSTRAINT favorites_79_user_id_check CHECK (((user_id % 100) = 79))
+CREATE TABLE favorites_79 (
+    CONSTRAINT favorites_79_user_id_check CHECK (((user_id % 100) = 79))
 )
 INHERITS (favorites);
 
@@ -1519,7 +1597,8 @@ INHERITS (favorites);
 -- Name: favorites_8; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_8 (CONSTRAINT favorites_8_user_id_check CHECK (((user_id % 100) = 8))
+CREATE TABLE favorites_8 (
+    CONSTRAINT favorites_8_user_id_check CHECK (((user_id % 100) = 8))
 )
 INHERITS (favorites);
 
@@ -1528,7 +1607,8 @@ INHERITS (favorites);
 -- Name: favorites_80; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_80 (CONSTRAINT favorites_80_user_id_check CHECK (((user_id % 100) = 80))
+CREATE TABLE favorites_80 (
+    CONSTRAINT favorites_80_user_id_check CHECK (((user_id % 100) = 80))
 )
 INHERITS (favorites);
 
@@ -1537,7 +1617,8 @@ INHERITS (favorites);
 -- Name: favorites_81; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_81 (CONSTRAINT favorites_81_user_id_check CHECK (((user_id % 100) = 81))
+CREATE TABLE favorites_81 (
+    CONSTRAINT favorites_81_user_id_check CHECK (((user_id % 100) = 81))
 )
 INHERITS (favorites);
 
@@ -1546,7 +1627,8 @@ INHERITS (favorites);
 -- Name: favorites_82; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_82 (CONSTRAINT favorites_82_user_id_check CHECK (((user_id % 100) = 82))
+CREATE TABLE favorites_82 (
+    CONSTRAINT favorites_82_user_id_check CHECK (((user_id % 100) = 82))
 )
 INHERITS (favorites);
 
@@ -1555,7 +1637,8 @@ INHERITS (favorites);
 -- Name: favorites_83; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_83 (CONSTRAINT favorites_83_user_id_check CHECK (((user_id % 100) = 83))
+CREATE TABLE favorites_83 (
+    CONSTRAINT favorites_83_user_id_check CHECK (((user_id % 100) = 83))
 )
 INHERITS (favorites);
 
@@ -1564,7 +1647,8 @@ INHERITS (favorites);
 -- Name: favorites_84; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_84 (CONSTRAINT favorites_84_user_id_check CHECK (((user_id % 100) = 84))
+CREATE TABLE favorites_84 (
+    CONSTRAINT favorites_84_user_id_check CHECK (((user_id % 100) = 84))
 )
 INHERITS (favorites);
 
@@ -1573,7 +1657,8 @@ INHERITS (favorites);
 -- Name: favorites_85; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_85 (CONSTRAINT favorites_85_user_id_check CHECK (((user_id % 100) = 85))
+CREATE TABLE favorites_85 (
+    CONSTRAINT favorites_85_user_id_check CHECK (((user_id % 100) = 85))
 )
 INHERITS (favorites);
 
@@ -1582,7 +1667,8 @@ INHERITS (favorites);
 -- Name: favorites_86; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_86 (CONSTRAINT favorites_86_user_id_check CHECK (((user_id % 100) = 86))
+CREATE TABLE favorites_86 (
+    CONSTRAINT favorites_86_user_id_check CHECK (((user_id % 100) = 86))
 )
 INHERITS (favorites);
 
@@ -1591,7 +1677,8 @@ INHERITS (favorites);
 -- Name: favorites_87; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_87 (CONSTRAINT favorites_87_user_id_check CHECK (((user_id % 100) = 87))
+CREATE TABLE favorites_87 (
+    CONSTRAINT favorites_87_user_id_check CHECK (((user_id % 100) = 87))
 )
 INHERITS (favorites);
 
@@ -1600,7 +1687,8 @@ INHERITS (favorites);
 -- Name: favorites_88; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_88 (CONSTRAINT favorites_88_user_id_check CHECK (((user_id % 100) = 88))
+CREATE TABLE favorites_88 (
+    CONSTRAINT favorites_88_user_id_check CHECK (((user_id % 100) = 88))
 )
 INHERITS (favorites);
 
@@ -1609,7 +1697,8 @@ INHERITS (favorites);
 -- Name: favorites_89; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_89 (CONSTRAINT favorites_89_user_id_check CHECK (((user_id % 100) = 89))
+CREATE TABLE favorites_89 (
+    CONSTRAINT favorites_89_user_id_check CHECK (((user_id % 100) = 89))
 )
 INHERITS (favorites);
 
@@ -1618,7 +1707,8 @@ INHERITS (favorites);
 -- Name: favorites_9; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_9 (CONSTRAINT favorites_9_user_id_check CHECK (((user_id % 100) = 9))
+CREATE TABLE favorites_9 (
+    CONSTRAINT favorites_9_user_id_check CHECK (((user_id % 100) = 9))
 )
 INHERITS (favorites);
 
@@ -1627,7 +1717,8 @@ INHERITS (favorites);
 -- Name: favorites_90; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_90 (CONSTRAINT favorites_90_user_id_check CHECK (((user_id % 100) = 90))
+CREATE TABLE favorites_90 (
+    CONSTRAINT favorites_90_user_id_check CHECK (((user_id % 100) = 90))
 )
 INHERITS (favorites);
 
@@ -1636,7 +1727,8 @@ INHERITS (favorites);
 -- Name: favorites_91; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_91 (CONSTRAINT favorites_91_user_id_check CHECK (((user_id % 100) = 91))
+CREATE TABLE favorites_91 (
+    CONSTRAINT favorites_91_user_id_check CHECK (((user_id % 100) = 91))
 )
 INHERITS (favorites);
 
@@ -1645,7 +1737,8 @@ INHERITS (favorites);
 -- Name: favorites_92; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_92 (CONSTRAINT favorites_92_user_id_check CHECK (((user_id % 100) = 92))
+CREATE TABLE favorites_92 (
+    CONSTRAINT favorites_92_user_id_check CHECK (((user_id % 100) = 92))
 )
 INHERITS (favorites);
 
@@ -1654,7 +1747,8 @@ INHERITS (favorites);
 -- Name: favorites_93; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_93 (CONSTRAINT favorites_93_user_id_check CHECK (((user_id % 100) = 93))
+CREATE TABLE favorites_93 (
+    CONSTRAINT favorites_93_user_id_check CHECK (((user_id % 100) = 93))
 )
 INHERITS (favorites);
 
@@ -1663,7 +1757,8 @@ INHERITS (favorites);
 -- Name: favorites_94; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_94 (CONSTRAINT favorites_94_user_id_check CHECK (((user_id % 100) = 94))
+CREATE TABLE favorites_94 (
+    CONSTRAINT favorites_94_user_id_check CHECK (((user_id % 100) = 94))
 )
 INHERITS (favorites);
 
@@ -1672,7 +1767,8 @@ INHERITS (favorites);
 -- Name: favorites_95; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_95 (CONSTRAINT favorites_95_user_id_check CHECK (((user_id % 100) = 95))
+CREATE TABLE favorites_95 (
+    CONSTRAINT favorites_95_user_id_check CHECK (((user_id % 100) = 95))
 )
 INHERITS (favorites);
 
@@ -1681,7 +1777,8 @@ INHERITS (favorites);
 -- Name: favorites_96; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_96 (CONSTRAINT favorites_96_user_id_check CHECK (((user_id % 100) = 96))
+CREATE TABLE favorites_96 (
+    CONSTRAINT favorites_96_user_id_check CHECK (((user_id % 100) = 96))
 )
 INHERITS (favorites);
 
@@ -1690,7 +1787,8 @@ INHERITS (favorites);
 -- Name: favorites_97; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_97 (CONSTRAINT favorites_97_user_id_check CHECK (((user_id % 100) = 97))
+CREATE TABLE favorites_97 (
+    CONSTRAINT favorites_97_user_id_check CHECK (((user_id % 100) = 97))
 )
 INHERITS (favorites);
 
@@ -1699,7 +1797,8 @@ INHERITS (favorites);
 -- Name: favorites_98; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_98 (CONSTRAINT favorites_98_user_id_check CHECK (((user_id % 100) = 98))
+CREATE TABLE favorites_98 (
+    CONSTRAINT favorites_98_user_id_check CHECK (((user_id % 100) = 98))
 )
 INHERITS (favorites);
 
@@ -1708,7 +1807,8 @@ INHERITS (favorites);
 -- Name: favorites_99; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE favorites_99 (CONSTRAINT favorites_99_user_id_check CHECK (((user_id % 100) = 99))
+CREATE TABLE favorites_99 (
+    CONSTRAINT favorites_99_user_id_check CHECK (((user_id % 100) = 99))
 )
 INHERITS (favorites);
 
@@ -1736,8 +1836,8 @@ CREATE TABLE forum_posts (
 CREATE SEQUENCE forum_posts_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -1773,8 +1873,8 @@ CREATE TABLE forum_topics (
 CREATE SEQUENCE forum_topics_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -1806,8 +1906,8 @@ CREATE TABLE ip_bans (
 CREATE SEQUENCE ip_bans_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -1839,8 +1939,8 @@ CREATE TABLE janitor_trials (
 CREATE SEQUENCE janitor_trials_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -1871,8 +1971,8 @@ CREATE TABLE mod_actions (
 CREATE SEQUENCE mod_actions_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -1911,8 +2011,8 @@ CREATE TABLE note_versions (
 CREATE SEQUENCE note_versions_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -1950,8 +2050,8 @@ CREATE TABLE notes (
 CREATE SEQUENCE notes_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -1984,8 +2084,8 @@ CREATE TABLE pool_versions (
 CREATE SEQUENCE pool_versions_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -2020,8 +2120,8 @@ CREATE TABLE pools (
 CREATE SEQUENCE pools_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -2054,8 +2154,8 @@ CREATE TABLE post_appeals (
 CREATE SEQUENCE post_appeals_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -2086,8 +2186,8 @@ CREATE TABLE post_disapprovals (
 CREATE SEQUENCE post_disapprovals_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -2121,8 +2221,8 @@ CREATE TABLE post_flags (
 CREATE SEQUENCE post_flags_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -2158,8 +2258,8 @@ CREATE TABLE post_versions (
 CREATE SEQUENCE post_versions_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -2191,8 +2291,8 @@ CREATE TABLE post_votes (
 CREATE SEQUENCE post_votes_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -2253,8 +2353,8 @@ CREATE TABLE posts (
 CREATE SEQUENCE posts_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -2298,8 +2398,8 @@ CREATE TABLE tag_aliases (
 CREATE SEQUENCE tag_aliases_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -2335,8 +2435,8 @@ CREATE TABLE tag_implications (
 CREATE SEQUENCE tag_implications_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -2372,8 +2472,8 @@ CREATE TABLE tag_subscriptions (
 CREATE SEQUENCE tag_subscriptions_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -2407,8 +2507,8 @@ CREATE TABLE tags (
 CREATE SEQUENCE tags_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -2448,8 +2548,8 @@ CREATE TABLE uploads (
 CREATE SEQUENCE uploads_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -2482,8 +2582,8 @@ CREATE TABLE user_feedback (
 CREATE SEQUENCE user_feedback_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -2514,8 +2614,8 @@ CREATE TABLE user_password_reset_nonces (
 CREATE SEQUENCE user_password_reset_nonces_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -2562,8 +2662,8 @@ CREATE TABLE users (
 CREATE SEQUENCE users_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -2598,8 +2698,8 @@ CREATE TABLE wiki_page_versions (
 CREATE SEQUENCE wiki_page_versions_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -2633,8 +2733,8 @@ CREATE TABLE wiki_pages (
 CREATE SEQUENCE wiki_pages_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
@@ -5199,90 +5299,63 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 -- Name: insert_favorites_trigger; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER insert_favorites_trigger
-    BEFORE INSERT ON favorites
-    FOR EACH ROW
-    EXECUTE PROCEDURE favorites_insert_trigger();
+CREATE TRIGGER insert_favorites_trigger BEFORE INSERT ON favorites FOR EACH ROW EXECUTE PROCEDURE favorites_insert_trigger();
 
 
 --
 -- Name: trigger_artists_on_update; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER trigger_artists_on_update
-    BEFORE INSERT OR UPDATE ON artists
-    FOR EACH ROW
-    EXECUTE PROCEDURE tsvector_update_trigger('other_names_index', 'public.danbooru', 'other_names');
+CREATE TRIGGER trigger_artists_on_update BEFORE INSERT OR UPDATE ON artists FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('other_names_index', 'public.danbooru', 'other_names');
 
 
 --
 -- Name: trigger_comments_on_update; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER trigger_comments_on_update
-    BEFORE INSERT OR UPDATE ON comments
-    FOR EACH ROW
-    EXECUTE PROCEDURE tsvector_update_trigger('body_index', 'pg_catalog.english', 'body');
+CREATE TRIGGER trigger_comments_on_update BEFORE INSERT OR UPDATE ON comments FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('body_index', 'pg_catalog.english', 'body');
 
 
 --
 -- Name: trigger_dmails_on_update; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER trigger_dmails_on_update
-    BEFORE INSERT OR UPDATE ON dmails
-    FOR EACH ROW
-    EXECUTE PROCEDURE tsvector_update_trigger('message_index', 'pg_catalog.english', 'title', 'body');
+CREATE TRIGGER trigger_dmails_on_update BEFORE INSERT OR UPDATE ON dmails FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('message_index', 'pg_catalog.english', 'title', 'body');
 
 
 --
 -- Name: trigger_forum_posts_on_update; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER trigger_forum_posts_on_update
-    BEFORE INSERT OR UPDATE ON forum_posts
-    FOR EACH ROW
-    EXECUTE PROCEDURE tsvector_update_trigger('text_index', 'pg_catalog.english', 'body');
+CREATE TRIGGER trigger_forum_posts_on_update BEFORE INSERT OR UPDATE ON forum_posts FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('text_index', 'pg_catalog.english', 'body');
 
 
 --
 -- Name: trigger_forum_topics_on_update; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER trigger_forum_topics_on_update
-    BEFORE INSERT OR UPDATE ON forum_topics
-    FOR EACH ROW
-    EXECUTE PROCEDURE tsvector_update_trigger('text_index', 'pg_catalog.english', 'title');
+CREATE TRIGGER trigger_forum_topics_on_update BEFORE INSERT OR UPDATE ON forum_topics FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('text_index', 'pg_catalog.english', 'title');
 
 
 --
 -- Name: trigger_notes_on_update; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER trigger_notes_on_update
-    BEFORE INSERT OR UPDATE ON notes
-    FOR EACH ROW
-    EXECUTE PROCEDURE tsvector_update_trigger('body_index', 'pg_catalog.english', 'body');
+CREATE TRIGGER trigger_notes_on_update BEFORE INSERT OR UPDATE ON notes FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('body_index', 'pg_catalog.english', 'body');
 
 
 --
 -- Name: trigger_posts_on_tag_index_update; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER trigger_posts_on_tag_index_update
-    BEFORE INSERT OR UPDATE ON posts
-    FOR EACH ROW
-    EXECUTE PROCEDURE tsvector_update_trigger('tag_index', 'public.danbooru', 'tag_string', 'fav_string', 'pool_string');
+CREATE TRIGGER trigger_posts_on_tag_index_update BEFORE INSERT OR UPDATE ON posts FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tag_index', 'public.danbooru', 'tag_string', 'fav_string', 'pool_string');
 
 
 --
 -- Name: trigger_wiki_pages_on_update; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER trigger_wiki_pages_on_update
-    BEFORE INSERT OR UPDATE ON wiki_pages
-    FOR EACH ROW
-    EXECUTE PROCEDURE tsvector_update_trigger('body_index', 'public.danbooru', 'body', 'title');
+CREATE TRIGGER trigger_wiki_pages_on_update BEFORE INSERT OR UPDATE ON wiki_pages FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('body_index', 'public.danbooru', 'body', 'title');
 
 
 --
