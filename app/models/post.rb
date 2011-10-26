@@ -559,11 +559,7 @@ class Post < ActiveRecord::Base
       if tags[:exclude].any?
         raise SearchError.new("You cannot search for more than #{Danbooru.config.tag_query_limit} tags at a time") if tags[:exclude].size > Danbooru.config.tag_query_limit
 
-        if tags[:related].any? || tags[:include].any?
-          tag_query_sql << "!(" + escape_string_for_tsquery(tags[:exclude]).join(" | ") + ")"
-        else
-          raise SearchError.new("You cannot search for only excluded tags")
-        end
+        tag_query_sql << "!(" + escape_string_for_tsquery(tags[:exclude]).join(" | ") + ")"
       end
 
       if tag_query_sql.any?
