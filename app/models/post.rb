@@ -41,7 +41,7 @@ class Post < ActiveRecord::Base
   scope :commented_before, lambda {|date| where("last_commented_at < ?", date).order("last_commented_at DESC")}
   scope :has_notes, where("last_noted_at is not null")
   scope :for_user, lambda {|user_id| where(["uploader_id = ?", user_id])}
-  scope :available_for_moderation, lambda {|hidden| hidden.present? ? where(["id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id]) : where(["id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
+  scope :available_for_moderation, lambda {|hidden| hidden.present? ? where(["id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id]) : where(["id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :hidden_from_moderation, lambda {where(["id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :tag_match, lambda {|query| Post.tag_match_helper(query)}
   scope :exact_tag_match, lambda {|query| Post.exact_tag_match_helper(query)}

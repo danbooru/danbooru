@@ -15,7 +15,7 @@
         <p>
           As a general rule, you should only approve of posts that you personally like. Posts that are not approved in three days will be automatically deleted. Posts with score -3 or lower are marked red. Posts with score 3 or higher are marked green.
           <% if params[:hidden] %>
-            <%= link_to "View all posts", moderator_post_queue_path(:query => params[:query], :hidden => nil) %>.
+            <%= link_to "View pending posts", moderator_post_queue_path(:query => params[:query], :hidden => nil) %>.
           <% else %>
             <%= link_to "View hidden posts", moderator_post_queue_path(:query => params[:query], :hidden => true) %>.
           <% end %>
