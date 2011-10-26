@@ -56,7 +56,7 @@ class WikiPagesController < ApplicationController
   end
   
   def show_or_new
-    @wiki_page = WikiPage.find_by_name(params[:title])
+    @wiki_page = WikiPage.find_by_title(params[:title])
     if @wiki_page
       redirect_to wiki_page_path(@wiki_page)
     else
