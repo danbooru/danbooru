@@ -2,8 +2,9 @@ class Ban < ActiveRecord::Base
   after_create :update_feedback
   belongs_to :user
   belongs_to :banner, :class_name => "User"
-  attr_accessible :reason, :duration, :user_id
+  attr_accessible :reason, :duration, :user_id, :user_name
   validate :user_is_inferior
+  validates_presence_of :user_id, :reason, :duration
   
   def self.is_banned?(user)
     exists?(["user_id = ? AND expires_at > ?", user.id, Time.now])

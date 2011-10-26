@@ -78,12 +78,12 @@
   }
   
   Danbooru.Blacklist.posts = function() {
-    return $("article.post-preview");
+    return $(".post-preview");
   }
   
   Danbooru.Blacklist.post_match = function(post, blacklist) {
     var $post = $(post);
-    var tags = $post.data("tags").match(/\S+/g) || [];
+    var tags = String($post.data("tags")).match(/\S+/g) || [];
     tags.push("rating:" + $post.data("rating"));
     tags.push("uploader:" + $post.data("uploader"));
     

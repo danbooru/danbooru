@@ -31,8 +31,10 @@ module ApplicationHelper
   end
   
   def compact_time(time)
-    if time > Time.now.beginning_of_day
-      time_tag(time.strftime("%H:%M"), time)
+    if time > Time.now.end_of_day
+      time_tag(time.strftime("%b %e, %Y"), time)
+    elsif time > Time.now.beginning_of_day 
+      time_tag(time.strftime("%l:%M %P"), time)
     elsif time > Time.now.beginning_of_year
       time_tag(time.strftime("%b %e"), time)
     else

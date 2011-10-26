@@ -10,5 +10,6 @@
     <% if CurrentUser.is_janitor? %>
       <%= nav_link_to("Dashboard", moderator_dashboard_path) %>
     <% end %>
+    <%= nav_link_to("More &raquo;".html_safe, site_map_path) %>
   </ul>
 </div>

@@ -48,7 +48,7 @@
     var old_tags = $post.data("tags");
     
     $.each(commands, function(i, x) {
-      var array = $post.data("tags").match(/\S+/g);
+      var array = String($post.data("tags")).match(/\S+/g);
       $post.data("tags", Danbooru.TagScript.process(array, x).join(" "));
     });
 
