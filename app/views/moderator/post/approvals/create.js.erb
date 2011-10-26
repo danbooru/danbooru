@@ -10,7 +10,7 @@ $("#c-posts #flag").show();
 
 $("#pending-approval-notice").hide();
 
-$("#c-post-moderation #post-<%= @post.id %>").hide();
+$("#c-moderator-post-queues #post-<%= @post.id %>").hide();
 Danbooru.notice("Post was approved");
 
 <% end %>

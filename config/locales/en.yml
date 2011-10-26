@@ -17,3 +17,6 @@ en:
       post_appeal:
         creator: "You"
         creator_id: "You"
+      post_disapproval:
+        post: "You"
+        post_id: "You"

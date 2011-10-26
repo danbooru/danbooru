@@ -32,18 +32,25 @@
 
           <section>
             <ul>
-              <li><%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :remote => true, :method => :post %> | <%= link_to "Disapprove", moderator_post_disapproval_path(:post_id => post.id), :remote => true, :method => :post %></li>
-              <li>Rating: <%= post.rating %></li>
-              <li>Score: <%= post.score %></li>
-              <li>Uploader: <%= link_to(post.uploader.name, user_path(post.uploader_id)) %> <%= time_ago_in_words(post.created_at) %> ago</li>
+              <li><h2><%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :remote => true, :method => :post, :class => "approve-link" %> | <%= link_to "Hide", moderator_post_disapproval_path(:post_id => post.id), :remote => true, :method => :post, :class => 'disapprove-link' %></h2></li>
+              <li><strong>Rating</strong>: <%= post.pretty_rating %></li>
+              <li><strong>Score</strong>: <%= post.score %></li>
+              <li>
+                <strong>Size:</strong>
+                <%= number_to_human_size(post.file_size) %> 
+                <% if post.is_image? %>
+                  (<%= post.image_width %>x<%= post.image_height %>)
+                <% end %>
+              </li>
+              <li><strong>Uploader</strong>: <%= link_to(post.uploader.name, user_path(post.uploader_id)) %> <%= time_ago_in_words(post.created_at) %> ago</li>
               <% if post.is_flagged? %>
-                <li>Flagged: <%= post_flag_reason(post) %></li>
+                <li><strong>Flagged</strong>: <%= post_flag_reason(post) %></li>
               <% end %>
               <% if (post.is_flagged? || post.is_deleted?) && post.appeals.any? %>
-                <li>Appeals: <%= post_appeal_reason(post) %></li>
+                <li><strong>Appeals</strong>: <%= post_appeal_reason(post) %></li>
               <% end %>
-              <li>Disapprovals: <%= post.disapprovals.count %></li>
-              <li>Tags: <%= post.tag_string %></li>
+              <li><strong>Hidden</strong>: <%= post.disapprovals.count %></li>
+              <li><strong>Tags</strong>: <%= post.tag_string %></li>
             </ul>
           </section>
         </article>
