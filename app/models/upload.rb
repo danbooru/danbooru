@@ -133,16 +133,12 @@ class Upload < ActiveRecord::Base
     def generate_resizes(source_path)
       if is_image?
         generate_resize_for(Danbooru.config.small_image_width, Danbooru.config.small_image_width, source_path, 85)
-        generate_resize_for(Danbooru.config.medium_image_width, nil, source_path)
-        generate_resize_for(Danbooru.config.large_image_width, nil, source_path)
+        generate_resize_for(Danbooru.config.medium_image_width, nil, source_path) if image_width > Danbooru.config.medium_image_width
+        generate_resize_for(Danbooru.config.large_image_width, nil, source_path) if image_width > Danbooru.config.large_image_width
       end
     end
 
     def generate_resize_for(width, height, source_path, quality = 90)
-      return if width.nil?
-      return unless image_width > width
-      return unless height.nil? || image_height > height
-
       unless File.exists?(source_path)
         raise Error.new("file not found")
       end

@@ -1,6 +1,6 @@
 module Moderator
   module Post
-    class DashboardsController < ApplicationController
+    class QueuesController < ApplicationController
       respond_to :html, :json
       before_filter :janitor_only
       

@@ -36,9 +36,9 @@
   
   <div id="page">
     <%- if flash[:notice] -%>
-      <div class="ui-corner-all ui-state-highlight" id="notice"><span class="ui-icon ui-icon-info"></span> <%= flash[:notice] %></div>
+      <div class="ui-corner-all ui-state-highlight" id="notice"><%= flash[:notice] %></div>
     <%- else -%>
-      <div class="ui-corner-all ui-state-highlight" id="notice" style="display: none;"><span class="ui-icon ui-icon-info"></span></div>
+      <div class="ui-corner-all ui-state-highlight" id="notice" style="display: none;"></div>
     <%- end -%>
 
     <%= yield :layout %>

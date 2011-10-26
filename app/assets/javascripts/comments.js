@@ -4,6 +4,7 @@
   Danbooru.Comment.initialize_all = function() {
     this.initialize_response_link();
     this.initialize_reply_links();
+    this.initialize_expand_links();
   }
   
   Danbooru.Comment.quote_message = function(data) {
@@ -28,6 +29,15 @@
   
   Danbooru.Comment.initialize_reply_links = function() {
     $(".reply-link").click(Danbooru.Comment.quote);
+  }
+  
+  Danbooru.Comment.initialize_expand_links = function() {
+    $(".comment-section form").hide();
+    $(".comment-section input.expand-comment-response").click(function() {
+      var post_id = $(this).closest(".comment-section").data("post-id");
+      $(".comment-section[data-post-id=" + post_id + "] form").show();
+      $(this).hide();
+    });
   }
   
   Danbooru.Comment.initialize_response_link = function() {

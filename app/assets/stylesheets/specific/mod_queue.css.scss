@@ -1,0 +1,26 @@
+@import "../common/000_vars.css.scss";
+
+div#c-moderator-post-queues {
+  article {
+    margin-bottom: 4em;
+    overflow: hidden;
+  }
+  
+  aside {
+    float: left;
+    width: 520px;
+  }
+  
+  section {
+    float: left;
+    width: 300px;
+  }
+  
+  div#moderation-guideline {
+    width: 60em;
+    
+    h1 {
+      font-size: $h2_size;
+    }
+  }
+}

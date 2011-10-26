@@ -10,12 +10,31 @@
     this.initialize_image_resize();
     this.initialize_titles();
     this.initialize_links();
+    this.initialize_resize_links();
   }
   
   Danbooru.Post.initialize_links = function() {
     $("#side-edit-link").click(function(e) {
       $("#post-edit-link").trigger("click");
       $("#post_tag_string").trigger("focus");
+      e.preventDefault();
+    });
+  }
+  
+  Danbooru.Post.initialize_resize_links = function() {
+    $("#resize-links").hide();
+
+    $("#resize-links a").click(function(e) {
+      var image = $("#image");
+      var target = $(e.target);
+      image.attr("src", target.data("src"));
+      image.attr("width", target.data("width"));
+      image.attr("height", target.data("height"));
+      e.preventDefault();
+    }); 
+
+    $("#resize-link a").click(function(e) {
+      $("#resize-links").toggle();
       e.preventDefault();
     });
   }

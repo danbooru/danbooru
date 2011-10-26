@@ -10,6 +10,10 @@
       $("#close-news-ticker-link").click(function(e) {
         $("#news-ticker").hide();
         Danbooru.Cookie.put("news-ticker", key);
+        
+        // need to reset the more link
+        $("#more-links").hide().offset({top: $("#site-map-link").offset().top + $("#site-map-link").height() + 10, left: $("#site-map-link").offset().left});  
+        
         return false;
       });
     }

@@ -12,7 +12,7 @@ Danbooru::Application.routes.draw do
     resources :invitations, :only => [:new, :create, :index]
     resource :tag, :only => [:edit, :update]
     namespace :post do
-      resource :dashboard, :only => [:show]
+      resource :queue, :only => [:show]
       resource :approval, :only => [:create]
       resource :disapproval, :only => [:create]
       resources :posts, :only => [:delete, :undelete] do

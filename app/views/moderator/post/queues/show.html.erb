@@ -1,7 +1,7 @@
-<div id="c-moderator-post-dashboards">
+<div id="c-moderator-post-queues">
   <div id="a-show">
     <div id="search">
-      <%= form_tag(moderator_post_dashboard_path, :method => :get) do %>
+      <%= form_tag(moderator_post_queue_path, :method => :get) do %>
         <%= text_field_tag "query", params[:query], :size => 40 %>
         <%= submit_tag "Search" %>
       <% end %>
@@ -9,6 +9,20 @@
 
     <div>
       <h1>Moderation Queue</h1>
+      
+      <div id="moderation-guideline">
+        <h1>Deletion Guidelines</h1>
+        <p>
+          As a general rule, you should only approve of posts that you personally like. Posts that are not approved in three days will be automatically deleted. Posts with score -3 or lower are marked red. Posts with score 3 or higher are marked green.
+          <% if params[:hidden] %>
+            <%= link_to "View all posts", moderator_post_queue_path(:query => params[:query], :hidden => nil) %>.
+          <% else %>
+            <%= link_to "View hidden posts", moderator_post_queue_path(:query => params[:query], :hidden => true) %>.
+          <% end %>
+        </p>
+
+        <p><%= button_tag "Approve all", :id => "approve-all-button" %><%= button_tag "Hide all", :id => "hide-all-button" %></p>
+      </div>
 
       <% @posts.each do |post| %>
         <article id="post-<%= post.id %>">
@@ -41,5 +55,5 @@
 <%= render "posts/partials/common/secondary_links" %>
 
 <% content_for(:page_title) do %>
-  Mod Dashboard - <%= Danbooru.config.app_name %>
+  Mod Queue - <%= Danbooru.config.app_name %>
 <% end %>
