@@ -2,7 +2,7 @@ class ForumTopicsController < ApplicationController
   respond_to :html, :xml, :json
   before_filter :member_only, :except => [:index, :show]
   before_filter :normalize_search, :only => :index
-  before_filter :update_last_forum_read_at, :only => [:index, :show]
+  after_filter :update_last_forum_read_at, :only => [:show]
   rescue_from User::PrivilegeError, :with => "static/access_denied"
 
   def new
@@ -37,7 +37,6 @@ class ForumTopicsController < ApplicationController
   def update
     @forum_topic = ForumTopic.find(params[:id])
     check_privilege(@forum_topic)
-    assign_special_attributes(@forum_topic)
     @forum_topic.update_attributes(params[:forum_topic], :as => CurrentUser.role)
     respond_with(@forum_topic)
   end
@@ -50,17 +49,12 @@ class ForumTopicsController < ApplicationController
   end
 
 private
-  def assign_special_attributes(forum_topic)
-    return unless CurrentUser.is_moderator?
-    
-    forum_topic.is_locked = params[:forum_topic][:is_locked]
-    forum_topic.is_sticky = params[:forum_topic][:is_sticky]
-  end
-  
   def update_last_forum_read_at
-    return if CurrentUser.last_forum_read_at.present? && CurrentUser.last_forum_read_at > 1.day.ago
+    return if CurrentUser.is_anonymous?
     
-    CurrentUser.update_column(:last_forum_read_at, Time.now)
+    if CurrentUser.last_forum_read_at.nil? || CurrentUser.last_forum_read_at < @forum_topic.updated_at
+      CurrentUser.update_column(:last_forum_read_at, @forum_topic.updated_at)
+    end
   end
   
   def normalize_search

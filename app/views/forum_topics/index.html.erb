@@ -13,7 +13,7 @@
       </thead>
       <tbody>
         <% @forum_topics.each do |topic| %>
-          <tr>
+          <tr class="forum-topic-row <% if topic.updated_at > (CurrentUser.last_forum_read_at || Time.now) %>new-topic<% end %>">
             <td>
               <% if topic.is_sticky? %>
                 <span class="sticky">Sticky:</span>
@@ -42,10 +42,6 @@
 </div>
 
 <%= render "secondary_links" %>
-
-<%= content_for(:html_header) do %>
-  <meta name="last-forum-read-at" content="<%= CurrentUser.last_forum_read_at.to_date %>">
-<% end %>
 
 <% content_for(:page_title) do %>
   Forum - <%= Danbooru.config.app_name %>
