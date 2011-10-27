@@ -25,7 +25,7 @@ class ForumTopicsController < ApplicationController
   
   def show
     @forum_topic = ForumTopic.find(params[:id])
-    @forum_posts = ForumPost.search(:topic_id_eq => @forum_topic.id).paginate(params[:page])
+    @forum_posts = ForumPost.search(:topic_id_eq => @forum_topic.id).order("forum_posts.id").paginate(params[:page])
     respond_with(@forum_topic)
   end
   
