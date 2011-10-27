@@ -109,7 +109,7 @@ class UploadTest < ActiveSupport::TestCase
 
       context "resizer" do
         teardown do
-          FileUtils.rm_f(Dir.glob("#{Rails.root}/public/data/thumb/test.*.jpg"))
+          FileUtils.rm_f(Dir.glob("#{Rails.root}/public/data/preview/test.*.jpg"))
           FileUtils.rm_f(Dir.glob("#{Rails.root}/public/data/medium/test.*.jpg"))
           FileUtils.rm_f(Dir.glob("#{Rails.root}/public/data/large/test.*.jpg"))
           FileUtils.rm_f(Dir.glob("#{Rails.root}/public/data/original/test.*.jpg"))
@@ -121,11 +121,11 @@ class UploadTest < ActiveSupport::TestCase
           @upload.calculate_dimensions(@upload.file_path)
           assert_nothing_raised {@upload.generate_resizes(@upload.file_path)}
           assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.small_image_width)))
-          assert_equal(5613, File.size(@upload.resized_file_path_for(Danbooru.config.small_image_width)))
+          assert_equal(5677, File.size(@upload.resized_file_path_for(Danbooru.config.small_image_width)))
           assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.medium_image_width)))
-          assert_equal(42990, File.size(@upload.resized_file_path_for(Danbooru.config.medium_image_width)))
+          assert_equal(43470, File.size(@upload.resized_file_path_for(Danbooru.config.medium_image_width)))
           assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.large_image_width)))
-          assert_equal(197046, File.size(@upload.resized_file_path_for(Danbooru.config.large_image_width)))
+          assert_equal(198695, File.size(@upload.resized_file_path_for(Danbooru.config.large_image_width)))
         end
       end
 

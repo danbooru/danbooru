@@ -5,9 +5,14 @@ class Ban < ActiveRecord::Base
   attr_accessible :reason, :duration, :user_id, :user_name
   validate :user_is_inferior
   validates_presence_of :user_id, :reason, :duration
+  before_validation :initialize_banner_id, :on => :create
   
   def self.is_banned?(user)
     exists?(["user_id = ? AND expires_at > ?", user.id, Time.now])
+  end
+  
+  def initialize_banner_id
+    self.banner_id = CurrentUser.id
   end
   
   def user_is_inferior

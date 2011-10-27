@@ -19,13 +19,12 @@ class BansController < ApplicationController
   end
   
   def create
-    @ban = Ban.new(params[:ban])
-    @ban.banner_id = CurrentUser.id
+    @ban = Ban.create(params[:ban])
     
-    if @ban.save
-      redirect_to ban_path(@ban), :notice => "Ban created"
-    else
+    if @ban.errors.any?
       render :action => "new"
+    else
+      redirect_to ban_path(@ban), :notice => "Ban created"
     end
   end
   
@@ -34,6 +33,7 @@ class BansController < ApplicationController
     if @ban.update_attributes(params[:ban])
       redirect_to ban_path(@ban), :notice => "Ban updated"
     else
+      puts @ban.errors.full_messages
       render :action => "edit"
     end
   end  
