@@ -1,14 +1,9 @@
 .bundle
 config/database.yml
 config/danbooru_local_config.rb
-lib/danbooru_image_resizer/*.so
-lib/danbooru_image_resizer/*.o
-lib/danbooru_image_resizer/*.bundle
-lib/danbooru_image_resizer/*.log
 db/*.sqlite3
 log/*.log
-tmp/**/*
-tmp/upload_*
+tmp/*
 public/data
 vendor/cache/*.gem
 .sass-cache
@@ -16,3 +11,5 @@ vendor/cache/*.gem
 coverage
 *~
 *.swp
+tmp/*.jpg
+tmp/*.png

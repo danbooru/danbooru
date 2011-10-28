@@ -27,7 +27,13 @@
       <% @posts.each do |post| %>
         <article id="post-<%= post.id %>">
           <aside>
-            <%= link_to(image_tag(post.medium_file_url), post_path(post)) %>
+            <% if post.is_image? %>
+              <%= link_to(image_tag(post.medium_file_url), post_path(post)) %>
+            <% elsif post.is_flash? %>
+              <div class="text-post-medium">Flash</div>
+            <% else %>
+              <div class="text-post-medium">Download</div>
+            <% end %>
           </aside>
 
           <section>

@@ -30,11 +30,24 @@ Danbooru::Application.routes.draw do
       end
     end
   end
+  namespace :explore do
+    resources :posts, :only => [:popular, :hot] do
+      collection do
+        get :popular
+        get :hot
+      end
+    end
+  end
+  namespace :maintenance do
+    namespace :user do
+      resource :password_reset, :only => [:new, :create, :edit, :update]
+      resource :login_reminder, :only => [:new, :create]
+    end
+  end
+
   resources :advertisements do
     resources :hits, :controller => "advertisement_hits", :only => [:create]
   end
-  resource :source, :only => [:show]
-  resource :related_tag, :only => [:show]
   resources :artists do
     member do
       put :revert
@@ -60,12 +73,13 @@ Danbooru::Application.routes.draw do
   end
   resource  :dtext_preview, :only => [:create]
   resources :favorites
-  resources :forum_topics
   resources :forum_posts do
     collection do
       get :search
     end
   end
+  resources :forum_topics
+  resources :ip_bans
   resources :janitor_trials do
     collection do
       get :test
@@ -76,13 +90,12 @@ Danbooru::Application.routes.draw do
     end
   end
   resources :jobs
-  resources :ip_bans
+  resource :landing
   resources :mod_actions
   resources :notes do
     collection do
       get :search
     end
-    
     member do
       put :revert
     end
@@ -105,14 +118,16 @@ Danbooru::Application.routes.draw do
       put :revert
     end
   end
+  resources :post_appeals, :only => [:new, :index, :create]
+  resources :post_flags, :only => [:new, :index, :create]
   resources :post_versions, :only => [:index, :search] do
     collection do
       get :search
     end
   end
-  resources :post_flags, :only => [:new, :index, :create]
-  resources :post_appeals, :only => [:new, :index, :create]
-  resource  :session
+  resource :related_tag, :only => [:show]
+  resource :session
+  resource :source, :only => [:show]
   resources :tags do
     collection do
       get :search
@@ -147,22 +162,6 @@ Danbooru::Application.routes.draw do
   end
   resources :wiki_page_versions, :only => [:index, :show]
 
-  namespace :explore do
-    resources :posts, :only => [:popular, :hot] do
-      collection do
-        get :popular
-        get :hot
-      end
-    end
-  end
-
-  namespace :maintenance do
-    namespace :user do
-      resource :password_reset, :only => [:new, :create, :edit, :update]
-      resource :login_reminder, :only => [:new, :create]
-    end
-  end
-  
   # aliases
   resources :wpages, :controller => "wiki_pages"
   resources :ftopics, :controller => "forum_topics"
@@ -172,5 +171,5 @@ Danbooru::Application.routes.draw do
   match "/static/site_map" => "static#site_map", :as => "site_map"
   match "/static/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
   
-  root :to => "posts#index"
+  root :to => "landings#show"
 end

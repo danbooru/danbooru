@@ -1,0 +1,22 @@
+<div id="c-landings">
+  <div id="a-show">
+    <h1><%= link_to Danbooru.config.app_name, posts_path %></h1>
+    <p class="slogan">Find good art fast</p>
+    
+    <div class="column">
+      <% @explorer.col1.each do |post| %>
+        <%= render "image", :post => post %>
+      <% end %>
+    </div>
+
+    <div class="column">
+      <% @explorer.col2.each do |post| %>
+        <%= render "image", :post => post %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  <%= Danbooru.config.app_name %>
+<% end %>

@@ -32,6 +32,13 @@ class PostPresenter < Presenter
   def preview_html
     PostPresenter.preview(@post)
   end
+  
+  def medium_image_html(template, options = {})
+    return "" if @post.is_deleted? && !CurrentUser.user.is_janitor?
+    return "" if !Danbooru.config.can_user_see_post?(CurrentUser.user, @post)
+    
+    template.render("posts/partials/show/medium_image", :post => @post)
+  end
 
   def image_html(template)
     return template.content_tag("p", "This image was deleted.") if @post.is_deleted? && !CurrentUser.user.is_janitor?

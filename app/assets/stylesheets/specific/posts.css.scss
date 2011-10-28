@@ -26,6 +26,14 @@ article.post-preview {
   }
 }
 
+div.text-post-medium {
+  height: 150px;
+  width: 480px;
+  text-align: center;
+  line-height: 480px;
+  border: 1px solid #CCC;
+}
+
 article.post-preview.blacklisted-active {
   display: none;
 }

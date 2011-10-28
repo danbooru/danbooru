@@ -8,17 +8,20 @@ $(document).ready(function() {
   $("table.striped tbody tr:even").addClass("even");
   $("table.striped tbody tr:odd").addClass("odd");
 
-  // More link
-  $("#site-map-link").click(function(e) {
-    $("#more-links").toggle();
-    e.preventDefault();
-    e.stopPropagation();
-  });
-  $("#more-links").hide().offset({top: $("#site-map-link").offset().top + $("#site-map-link").height() + 10, left: $("#site-map-link").offset().left});  
-  
-  $(document).click(function(e) {
-    $("#more-links").hide();
-  });
+  if ($("#site-map-link").length > 0) {
+    // More link
+    $("#site-map-link").click(function(e) {
+      $("#more-links").toggle();
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    $("#more-links").hide().offset({top: $("#site-map-link").offset().top + $("#site-map-link").height() + 10, left: $("#site-map-link").offset().left});  
+
+    $(document).click(function(e) {
+      $("#more-links").hide();
+    });
+  }
   
   // Ajax links
   $("a[data-remote=true]").click(function(e) {

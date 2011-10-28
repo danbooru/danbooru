@@ -473,6 +473,29 @@ class Post < ActiveRecord::Base
     def has_tag?(tag)
       tag_string =~ /(?:^| )#{tag}(?:$| )/
     end
+    
+    def essential_tag_string
+      tag_categories = Tag.categories_for(tag_array)
+      tag_array.each do |tag|
+        if tag_categories[tag] == Danbooru.config.tag_category_mapping["copyright"]
+          return "copyright: " + tag
+        end
+      end
+
+      tag_array.each do |tag|
+        if tag_categories[tag] == Danbooru.config.tag_category_mapping["character"]
+          return "character: " + tag
+        end
+      end
+
+      tag_array.each do |tag|
+        if tag_categories[tag] == Danbooru.config.tag_category_mapping["artist"]
+          return "artist: " + tag
+        end
+      end
+
+      return tag_array.first
+    end
   end
   
   module FavoriteMethods

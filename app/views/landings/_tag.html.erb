@@ -1,0 +1,8 @@
+<!-- 
+- tag
+ -->
+<div>
+  <% @explorer.search(tag, 300).each do |post| %>
+    <%= post.presenter.medium_image_html(self, :max_height => 300) %>
+  <% end %>
+</div>
