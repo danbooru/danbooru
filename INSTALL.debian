@@ -33,7 +33,7 @@ fi
 # Install packages
 echo "Installing packages..."
 apt-get update
-apt-get -y install build-essential automake openssl libssl-dev libyaml-dev libxml2-dev libxslt-dev autoconf ncurses-dev sudo gcc g++ libreadline-dev zlib1g-dev flex bison bzip2 ragel memcached libmemcache-dev git-core curl libcurl4-openssl-dev emacs imagemagick libmagickcore-dev libmagickwand-dev sendmail psmisc
+apt-get -y install build-essential automake openssl libssl-dev libyaml-dev libxml2-dev libxslt-dev autoconf ncurses-dev sudo gcc g++ libreadline-dev zlib1g-dev flex bison bzip2 ragel memcached libmemcache-dev git-core curl libcurl4-openssl-dev emacs imagemagick libmagickcore-dev libmagickwand-dev sendmail psmisc ffmpegthumbnailer
 
 # Install PostgreSQL 9.1
 apt-get -y install python-software-properties

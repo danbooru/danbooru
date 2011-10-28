@@ -14,13 +14,15 @@ article.post-preview {
   text-align: center;
   vertical-align: middle;
   
-  span.text-post-preview {
-    border: 1px solid #666;
+  div.text-post-preview {
+    font-size: $h2_size;
+    font-weight: bold;
     height: 150px;
     width: 150px;
-    text-align: center;
-    vertical-align: middle;
     display: block;
+    text-align: center;
+    line-height: 150px;
+    border: 1px solid #CCC;
   }
 }
 

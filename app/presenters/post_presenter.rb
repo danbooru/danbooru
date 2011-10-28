@@ -15,9 +15,9 @@ class PostPresenter < Presenter
     if post.is_image?
       html << %{<img src="#{post.preview_file_url}">}
     elsif post.is_flash?
-      html << '<span class="text-post-preview">Flash</span>'
+      html << '<div class="text-post-preview">Flash</div>'
     else
-      html << '<span class="text-post-preview">Download</span>'
+      html << '<div class="text-post-preview">Download</div>'
     end
     
     html << %{</a>}
