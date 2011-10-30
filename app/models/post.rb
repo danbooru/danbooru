@@ -234,6 +234,10 @@ class Post < ActiveRecord::Base
     end
     
     def medium_image_height
+      if is_flash?
+        return 150
+      end
+      
       ratio = Danbooru.config.medium_image_width.to_f / image_width.to_f
       if ratio < 1
         (image_height * ratio).to_i
