@@ -135,7 +135,11 @@ class Post < ActiveRecord::Base
     
     def medium_file_url
       if has_medium?
-        "/data/medium/#{file_path_prefix}#{md5}.jpg"
+        if is_flash?
+          "/images/480x150-flash.png"
+        else
+          "/data/medium/#{file_path_prefix}#{md5}.jpg"
+        end
       else
         file_url
       end
@@ -150,6 +154,10 @@ class Post < ActiveRecord::Base
     end
 
     def preview_file_url
+      if is_flash?
+        return "/images/150x150-flash.png"
+      end
+      
       if Danbooru.config.ssd_path
         "/ssd/data/preview/#{file_path_prefix}#{md5}.jpg"
       else
