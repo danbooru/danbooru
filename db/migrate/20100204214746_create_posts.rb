@@ -13,6 +13,7 @@ class CreatePosts < ActiveRecord::Migration
       # Statuses
       t.column :is_note_locked, :boolean, :null => false, :default => false
       t.column :is_rating_locked, :boolean, :null => false, :default => false
+      t.column :is_status_locked, :boolean, :null => false, :default => false
       t.column :is_pending, :boolean, :null => false, :default => false
       t.column :is_flagged, :boolean, :null => false, :default => false
       t.column :is_deleted, :boolean, :null => false, :default => false

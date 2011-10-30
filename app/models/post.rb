@@ -32,7 +32,8 @@ class Post < ActiveRecord::Base
   validate :validate_parent_does_not_have_a_parent
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at, :parent_id
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at, :parent_id, :as => [:member]
-  attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at, :parent_id, :is_rating_locked, :is_note_locked, :as => [:admin, :moderator]
+  attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at, :parent_id, :is_rating_locked, :is_note_locked, :as => [:moderator]
+  attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at, :parent_id, :is_rating_locked, :is_note_locked, :is_status_locked, :as => [:admin]
   scope :pending, where(["is_pending = ?", true])
   scope :pending_or_flagged, where(["(is_pending = ? OR is_flagged = ?)", true, true])
   scope :undeleted, where(["is_deleted = ?", false])
@@ -271,10 +272,14 @@ class Post < ActiveRecord::Base
   
   module ApprovalMethods
     def is_approvable?
-      (is_pending? || is_flagged? || is_deleted?) && approver_id != CurrentUser.id
+      !is_status_locked? && (is_pending? || is_flagged? || is_deleted?) && approver_id != CurrentUser.id
     end
     
     def flag!(reason)
+      if is_status_locked?
+        raise PostFlag::Error.new("Post is locked and cannot be flagged")
+      end
+      
       flag = flags.create(:reason => reason)
       
       if flag.errors.any?
@@ -285,6 +290,10 @@ class Post < ActiveRecord::Base
     end
     
     def appeal!(reason)
+      if is_status_locked?
+        raise PostAppeal::Error.new("Post is locked and cannot be appealed")
+      end
+      
       appeal = appeals.create(:reason => reason)
       
       if appeal.errors.any?
@@ -293,6 +302,16 @@ class Post < ActiveRecord::Base
     end
 
     def approve!
+      if is_status_locked?
+        errors.add(:is_status_locked, "; post cannot be approved")
+        raise ApprovalError.new("Post is locked and cannot be approved")
+      end
+      
+      if uploader_id == CurrentUser.id
+        errors.add(:base, "You cannot approve a post you uploaded")
+        raise ApprovalError.new("You cannot approve a post you uploaded")
+      end
+      
       if approver_id == CurrentUser.id
         errors.add(:approver, "have already approved this post")
         raise ApprovalError.new("You have previously approved this post and cannot approve it again") 
@@ -922,11 +941,21 @@ class Post < ActiveRecord::Base
   
   module DeletionMethods
     def annihilate!
+      if is_status_locked?
+        self.errors.add(:is_status_locked, "; cannot delete post")
+        return false
+      end
+      
       delete!
       destroy
     end
     
     def delete!
+      if is_status_locked?
+        self.errors.add(:is_status_locked, "; cannot delete post")
+        return false
+      end
+      
       Post.transaction do
         give_favorites_to_parent
         update_children_on_destroy
@@ -940,6 +969,11 @@ class Post < ActiveRecord::Base
     end
     
     def undelete!
+      if is_status_locked?
+        self.errors.add(:is_status_locked, "; cannot undelete post")
+        return false
+      end
+      
       update_column(:is_deleted, false)
       tag_array.each {|x| expire_cache(x)}
       update_parent_on_save

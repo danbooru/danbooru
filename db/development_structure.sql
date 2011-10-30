@@ -2319,6 +2319,7 @@ CREATE TABLE posts (
     rating character(1) DEFAULT 'q'::bpchar NOT NULL,
     is_note_locked boolean DEFAULT false NOT NULL,
     is_rating_locked boolean DEFAULT false NOT NULL,
+    is_status_locked boolean DEFAULT false NOT NULL,
     is_pending boolean DEFAULT false NOT NULL,
     is_flagged boolean DEFAULT false NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,

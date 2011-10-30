@@ -26,7 +26,7 @@
     <% end %>
   </div>
   
-  <% if CurrentUser.user.is_privileged? %>
+  <% if CurrentUser.is_privileged? %>
     <div class="input">
       <%= f.label :blank, "Lock" %>
       
@@ -35,7 +35,12 @@
         <%= f.label :is_note_locked, "Notes" %>
 
         <%= f.check_box :is_rating_locked %>
-        <%= f.label :is_rating_locked, "Rating" %>          
+        <%= f.label :is_rating_locked, "Rating" %>
+        
+        <% if CurrentUser.is_admin? %>
+          <%= f.check_box :is_status_locked %>
+          <%= f.label :is_status_locked, "Status" %>
+        <% end %>
       </fieldset>
     </div>
   <% end %>

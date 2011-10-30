@@ -17,15 +17,40 @@ class PostTest < ActiveSupport::TestCase
     context "Annihilating a post" do
       setup do
         @post = Factory.create(:post)
-        @post.annihilate!
+      end
+      
+      context "that is status locked" do
+        setup do
+          @post.update_attributes({:is_status_locked => true}, :as => :admin)
+        end
+        
+        should "not destroy the record" do
+          @post.annihilate!
+          assert_equal(1, Post.where("id = ?", @post.id).count)
+        end
       end
       
       should "destroy the record" do
+        @post.annihilate!
+        assert_equal([], @post.errors.full_messages)
         assert_equal(0, Post.where("id = ?", @post.id).count)
       end
     end
     
     context "Deleting a post" do
+      context "that is status locked" do
+        setup do
+          @post = Factory.create(:post)
+          @post.update_attributes({:is_status_locked => true}, :as => :admin)
+        end
+        
+        should "fail" do
+          @post.delete!
+          assert_equal(["Is status locked ; cannot delete post"], @post.errors.full_messages)
+          assert_equal(1, Post.where("id = ?", @post.id).count)
+        end
+      end
+      
       should "update the fast count" do
         post = Factory.create(:post, :tag_string => "aaa")
         assert_equal(1, Post.fast_count)
@@ -156,6 +181,24 @@ class PostTest < ActiveSupport::TestCase
         @post = Factory.create(:post, :is_deleted => true)
       end
       
+      context "that is status locked" do
+        setup do
+          @post.update_attributes({:is_status_locked => true}, :as => :admin)
+        end
+        
+        should "not allow undeletion" do
+          @post.undelete!
+          assert_equal(["Is status locked ; cannot undelete post"], @post.errors.full_messages)
+          assert_equal(true, @post.is_deleted?)
+        end
+      end
+      
+      should "be undeleted" do
+        @post.undelete!
+        @post.reload
+        assert_equal(false, @post.is_deleted?)
+      end
+      
       should "be appealed" do
         assert_difference("PostAppeal.count", 1) do
           @post.appeal!("xxx")
@@ -192,14 +235,43 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(post.approver_id, CurrentUser.id)
       end
       
+      context "that was uploaded by person X" do
+        setup do
+          @post = Factory.create(:post)
+          @post.flag!("reason")
+        end
+        
+        should "not allow person X to approve that post" do
+          assert_raises(Post::ApprovalError) do
+            CurrentUser.scoped(@post.uploader, "127.0.0.1") do
+              @post.approve!
+            end
+          end
+
+          assert_equal(["You cannot approve a post you uploaded"], @post.errors.full_messages)
+        end
+      end
+      
       context "that was previously approved by person X" do
+        setup do
+          @user = Factory.create(:janitor_user, :name => "xxx")
+          @user2 = Factory.create(:janitor_user, :name => "yyy")
+          @post = Factory.create(:post, :approver_id => @user.id)
+          @post.flag!("bad")
+        end
+        
         should "not allow person X to reapprove that post" do
-          user = Factory.create(:janitor_user, :name => "xxx")
-          post = Factory.create(:post, :approver_id => user.id)
-          post.flag!("bad")
-          CurrentUser.scoped(user, "127.0.0.1") do
+          CurrentUser.scoped(@user, "127.0.0.1") do
             assert_raises(Post::ApprovalError) do
-              post.approve!
+              @post.approve!
+            end
+          end
+        end
+        
+        should "allow person Y to approve the post" do
+          CurrentUser.scoped(@user2, "127.0.0.1") do
+            assert_nothing_raised do
+              @post.approve!
             end
           end
         end
@@ -214,6 +286,31 @@ class PostTest < ActiveSupport::TestCase
           post.reload
           assert_equal(false, post.is_flagged?)
           assert_equal(false, post.is_pending?)
+        end
+      end
+    end
+
+    context "A status locked post" do
+      setup do
+        @post = Factory.create(:post)
+        @post.update_attributes({:is_status_locked => true}, :as => :admin)
+      end
+      
+      should "not allow new flags" do
+        assert_raises(PostFlag::Error) do
+          @post.flag!("wrong")
+        end
+      end
+      
+      should "not allow new appeals" do
+        assert_raises(PostAppeal::Error) do
+          @post.appeal!("wrong")
+        end
+      end
+      
+      should "not allow approval" do
+        assert_raises(Post::ApprovalError) do
+          @post.approve!
         end
       end
     end
@@ -670,7 +767,7 @@ class PostTest < ActiveSupport::TestCase
       post = Factory.create(:post)
       CurrentUser.scoped(user, "127.0.0.1") do
         assert_nothing_raised {post.vote!("up")}
-        assert_raise(PostVote::Error) {post.vote!("up")}
+        assert_raises(PostVote::Error) {post.vote!("up")}
         post.reload
         assert_equal(1, PostVote.count)
         assert_equal(1, post.score)
