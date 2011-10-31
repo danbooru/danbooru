@@ -19,6 +19,8 @@ alter table artists drop column other_names_array;
 alter table artists drop constraint artists_updater_id_fkey;
 alter index artists_name_uniq rename to index_artists_on_name;
 alter table artists add column other_names_index tsvector;
+alter table artists drop column updater_ip_addr;
+alter table artists rename column updater_id to creator_id;
 CREATE INDEX index_artists_on_other_names_index ON artists USING GIN (other_names_index);
 CREATE TRIGGER trigger_artists_on_update BEFORE INSERT OR UPDATE ON artists FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('other_names_index', 'public.danbooru', 'other_names');
 
@@ -2904,8 +2906,7 @@ alter table forum_posts drop column is_sticky;
 alter table forum_posts drop column is_locked;
 alter table forum_posts drop column title;
 alter table forum_posts drop column response_count;
-alter table forum_posts drop column last_updated_by;
-alter table forum_posts add column updater_id integer;
+alter table forum_posts rename column last_updated_by to updater_id;
 create index index_forum_posts_on_topic_id on forum_posts (topic_id);
 
 drop table job_tasks;
@@ -2965,7 +2966,7 @@ alter table pools rename column user_id to creator_id;
 alter table pools drop column is_public;
 alter table pools add column post_ids text not null default '';
 alter index pools_user_id_idx rename to index_pools_on_creator_id;
-update pools set post_ids = string_agg((select _.post_id from pools_posts _ where _.pool_id = pools.id order by _.sequence), ' ');
+update pools set post_ids = (select string_agg(x.post_id, ' ') from (select _.post_id::text from pools_posts _ where _.pool_id = pools.id order by _.sequence) x);
 
 alter table post_tag_histories rename to post_versions;
 alter table post_versions drop constraint fk_post_tag_histories__post;
@@ -3022,8 +3023,10 @@ alter index index_posts_on_width rename to index_posts_on_image_width;
 alter index index_posts_on_tags_index rename to index_posts_on_tag_index;
 alter index posts_mpixels rename to index_posts_on_mpixels;
 create index index_posts_on_uploader_ip_addr on posts (uploader_ip_addr);
-update posts set fav_string = string_agg((select 'fav:' || _.user_id from favorites _ where _.post_id = posts.id), ' ');
-update posts set pool_string = string_agg((select 'pool:' || _.pool_id from pools_posts _ where _.post_id = posts.id), ' ');
+update posts set fav_string = (select string_agg('fav:' || _.user_id, ' ') from favorites _ where _.post_id = posts.id);
+update posts set pool_string = (select string_agg('pool:' || _.pool_id, ' ') from pools_posts _ where _.post_id = posts.id);
+drop function trg_posts_tags__delete();
+drop function trg_posts_tags__insert();
 
 drop table server_keys;
 drop table table_data;
@@ -3042,6 +3045,8 @@ update tag_aliases set status = 'pending' where is_pending = true;
 alter table tag_aliases drop column is_pending;
 update tag_aliases set consequent_name = (select _.name from tags _ where _.id = tag_aliases.alias_id);
 alter table tag_aliases drop column alias_id;
+alter table tag_aliases add column created_at timestamp without time zone default now();
+alter table tag_aliases add column updated_at timestamp without time zone default now();
 
 alter table tag_implications drop constraint fk_tag_implications__child;
 alter table tag_implications drop constraint fk_tag_implications__parent;
@@ -3058,6 +3063,9 @@ update tag_implications set antecedent_name = (select _.name from tags _ where _
 update tag_implications set consequent_name = (select _.name from tags _ where _.id = tag_implications.consequent_id);
 alter table tag_implications drop column consequent_id;
 alter table tag_implications drop column predicate_id;
+alter table tag_implications add column forum_topic_id integer;
+alter table tag_implications add column created_at timestamp without time zone default now();
+alter table tag_implications add column updated_at timestamp without time zone default now();
 
 alter table tag_subscriptions drop constraint tag_subscriptions_user_id_fkey;
 alter table tag_subscriptions rename column user_id to creator_id;
@@ -3067,6 +3075,7 @@ alter table tag_subscriptions add column created_at timestamp without time zone;
 alter table tag_subscriptions add column updated_at timestamp without time zone;
 alter table tag_subscriptions add column last_accessed_at timestamp without time zone;
 alter index index_tag_subscriptions_on_user_id rename to index_tag_subscriptions_on_creator_id;
+alter table tag_subscriptions add column is_opted_in boolean not null default false;
 
 alter table tags rename column tag_type to category;
 alter table tags drop column is_ambiguous;
@@ -3083,7 +3092,7 @@ alter table janitor_trials add column id serial primary key;
 alter table janitor_trials drop column promotion_date;
 alter table janitor_trials drop column test_promotion_date;
 alter table janitor_trials drop constraint test_janitors_user_id_fkey;
-alter table janitor_trials rename column user_id to creator_id;
+alter table janitor_trials add column creator_id integer not null default 1;
 alter index index_test_janitors_on_user_id rename to index_janitor_trials_on_creator_id;
 
 alter table user_records rename to user_feedback;
@@ -3099,8 +3108,6 @@ create index index_user_feedback_on_user_id on user_feedback (user_id);
 alter table user_feedback drop column id;
 alter table user_feedback add column id serial primary key;
 
--- process user_blacklisted_tags
-
 alter table users add column updated_at timestamp without time zone;
 alter table users add column email_verification_key varchar(255);
 alter table users rename column invited_by to inviter_id;
@@ -3111,10 +3118,36 @@ alter table users add column default_image_size varchar(255) not null default 'm
 alter table users add column favorite_tags text;
 alter table users add column blacklisted_tags text;
 alter table users add column time_zone varchar(255) not null default 'Eastern Time (US & Canada)';
+alter table users drop column invite_count;
+alter table users rename column upload_limit to base_upload_limit;
+alter table users drop column uploaded_tags;
 alter index idx_users__name rename to index_users_on_name;
 create index index_users_on_email on users (email) where email is not null;
 create index index_users_on_inviter_id on users (inviter_id) where inviter_id is not null;
--- update users.blacklisted_tags
+update users set blacklisted_tags = (select string_agg(_.tags, E'\n') from user_blacklisted_tags _ where _.user_id = users.id);
+drop table user_blacklisted_tags;
+
+CREATE TABLE user_password_reset_nonces (
+    id integer NOT NULL,
+    key character varying(255) NOT NULL,
+    email character varying(255) NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+ALTER TABLE public.user_password_reset_nonces OWNER TO ayi;
+CREATE SEQUENCE user_password_reset_nonces_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+ALTER TABLE public.user_password_reset_nonces_id_seq OWNER TO ayi;
+ALTER SEQUENCE user_password_reset_nonces_id_seq OWNED BY user_password_reset_nonces.id;
+ALTER TABLE user_password_reset_nonces ALTER COLUMN id SET DEFAULT nextval('user_password_reset_nonces_id_seq'::regclass);
+ALTER TABLE ONLY user_password_reset_nonces
+    ADD CONSTRAINT user_password_reset_nonces_pkey PRIMARY KEY (id);
+
+alter table user_feedback add column updated_at timestamp without time zone default now();
 
 alter table wiki_page_versions drop constraint fk_wiki_page_versions__user;
 alter table wiki_page_versions drop constraint fk_wiki_page_versions__wiki_page;
@@ -3126,7 +3159,34 @@ alter index idx_wiki_page_versions__wiki_page rename to index_wiki_page_versions
 alter index index_wiki_page_versions_on_user_id rename to index_wiki_page_versions_on_updater_id;
 
 alter table wiki_pages drop constraint fk_wiki_pages__user;
+drop trigger trg_wiki_page_search_update on wiki_pages;
+alter table wiki_pages drop column version;
+alter table wiki_pages rename column text_search_index to body_index;
+alter index idx_wiki_pages__title rename to index_wiki_pages_on_title;
+alter index idx_wiki_pages__updated_at rename to index_wiki_pages_on_updated_at;
+alter index wiki_pages_search_idx rename to index_wiki_pages_on_body_index;
+CREATE TRIGGER trigger_wiki_pages_on_update BEFORE INSERT OR UPDATE ON wiki_pages FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('body_index', 'public.danbooru', 'body', 'title');
+
+CREATE TABLE amazon_backups (
+    id integer NOT NULL,
+    last_id integer,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+CREATE SEQUENCE amazon_backups_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+ALTER SEQUENCE amazon_backups_id_seq OWNED BY amazon_backups.id;
+ALTER TABLE amazon_backups ALTER COLUMN id SET DEFAULT nextval('amazon_backups_id_seq'::regclass);
+ALTER TABLE ONLY amazon_backups
+    ADD CONSTRAINT amazon_backups_pkey PRIMARY KEY (id);
+
 
 -- post processing
 drop table pools_posts;
+drop function pools_posts_delete_trg();
+drop function pools_posts_insert_trg();
 alter table users drop column show_samples;

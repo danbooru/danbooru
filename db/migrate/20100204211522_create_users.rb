@@ -16,6 +16,7 @@ class CreateUsers < ActiveRecord::Migration
       t.column :last_logged_in_at, :datetime
       t.column :last_forum_read_at, :datetime
       t.column :has_mail, :boolean, :null => false, :default => false
+      t.column :recent_tags, :text
       
       # Profile settings
       t.column :receive_email_notifications, :boolean, :null => false, :default => false
