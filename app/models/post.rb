@@ -710,6 +710,10 @@ class Post < ActiveRecord::Base
         relation = relation.where("posts.approver_id = ?", q[:approver_id])
       end
       
+      if q[:parent_id]
+        relation = relation.where("(posts.id = ? or posts.parent_id = ?)", q[:parent_id], q[:parent_id])
+      end
+      
       if q[:rating] == "q"
         relation = relation.where("posts.rating = 'q'")
       elsif q[:rating] == "s"

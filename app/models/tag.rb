@@ -213,7 +213,7 @@ class Tag < ActiveRecord::Base
       }
 
       scan_query(query).each do |token|
-        if token =~ /\A(-uploader|uploader|-approver|approver|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|status|tagcount|gentags|arttags|chartags|copytags):(.+)\Z/
+        if token =~ /\A(-uploader|uploader|-approver|approver|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|status|tagcount|gentags|arttags|chartags|copytags|parent):(.+)\Z/
           case $1
           when "-uploader"
             q[:uploader_id_neg] ||= []
@@ -292,6 +292,9 @@ class Tag < ActiveRecord::Base
 
           when "copytags"
             q[:copyright_tag_count] = parse_helper($2)
+            
+          when "parent"
+            q[:parent_id] = $2.to_i
             
           when "order"
             q[:order] = $2
