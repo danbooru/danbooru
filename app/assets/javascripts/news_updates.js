@@ -1,14 +1,14 @@
 (function() {
-  Danbooru.News = {};
+  Danbooru.NewsUpdate = {};
   
-  Danbooru.News.initialize = function() {
-    var key = $("#news-ticker").data("updated-at");
+  Danbooru.NewsUpdate.initialize = function() {
+    var key = $("#news-updates").data("updated-at");
     
     if (Danbooru.Cookie.get("news-ticker") === key) {
-      $("#news-ticker").hide();
+      $("#news-updates").hide();
     } else {
       $("#close-news-ticker-link").click(function(e) {
-        $("#news-ticker").hide();
+        $("#news-updates").hide();
         Danbooru.Cookie.put("news-ticker", key);
         
         // need to reset the more link
@@ -20,6 +20,6 @@
   }
   
   $(function() {
-    Danbooru.News.initialize();
+    Danbooru.NewsUpdate.initialize();
   });
 })();

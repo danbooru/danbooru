@@ -26,7 +26,7 @@ class CreateUsers < ActiveRecord::Migration
       t.column :receive_email_notifications, :boolean, :null => false, :default => false
       t.column :comment_threshold, :integer, :null => false, :default => -1
       t.column :always_resize_images, :boolean, :null => false, :default => false
-      t.column :default_image_size, :string, :null => false, :default => "medium"
+      t.column :default_image_size, :string, :null => false, :default => "large"
       t.column :favorite_tags, :text
       t.column :blacklisted_tags, :text
       t.column :time_zone, :string, :null => false, :default => "Eastern Time (US & Canada)"

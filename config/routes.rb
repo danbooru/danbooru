@@ -92,6 +92,7 @@ Danbooru::Application.routes.draw do
   resources :jobs
   resource :landing
   resources :mod_actions
+  resources :news_updates
   resources :notes do
     collection do
       get :search

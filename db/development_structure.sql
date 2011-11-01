@@ -1984,6 +1984,39 @@ ALTER SEQUENCE mod_actions_id_seq OWNED BY mod_actions.id;
 
 
 --
+-- Name: news_updates; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE news_updates (
+    id integer NOT NULL,
+    message text NOT NULL,
+    creator_id integer NOT NULL,
+    updater_id integer NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: news_updates_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE news_updates_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: news_updates_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE news_updates_id_seq OWNED BY news_updates.id;
+
+
+--
 -- Name: note_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2874,6 +2907,13 @@ ALTER TABLE mod_actions ALTER COLUMN id SET DEFAULT nextval('mod_actions_id_seq'
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE news_updates ALTER COLUMN id SET DEFAULT nextval('news_updates_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE note_versions ALTER COLUMN id SET DEFAULT nextval('note_versions_id_seq'::regclass);
 
 
@@ -3144,6 +3184,14 @@ ALTER TABLE ONLY janitor_trials
 
 ALTER TABLE ONLY mod_actions
     ADD CONSTRAINT mod_actions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: news_updates_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY news_updates
+    ADD CONSTRAINT news_updates_pkey PRIMARY KEY (id);
 
 
 --
@@ -4917,6 +4965,13 @@ CREATE INDEX index_janitor_trials_on_user_id ON janitor_trials USING btree (user
 
 
 --
+-- Name: index_news_updates_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_news_updates_on_created_at ON news_updates USING btree (created_at);
+
+
+--
 -- Name: index_note_versions_on_note_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -5441,3 +5496,5 @@ INSERT INTO schema_migrations (version) VALUES ('20110717010705');
 INSERT INTO schema_migrations (version) VALUES ('20110722211855');
 
 INSERT INTO schema_migrations (version) VALUES ('20110815233456');
+
+INSERT INTO schema_migrations (version) VALUES ('20111101212358');

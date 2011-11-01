@@ -1,0 +1,32 @@
+<div id="c-news-updates">
+  <div id="a-index">
+    <h1>News Updates</h1>
+    
+    <table class="striped" width="100%">
+      <thead>
+        <tr>
+          <th>Creator</th>
+          <th>Message</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @news_updates.each do |news_update| %>
+          <tr id="news-update-<%= news_update.id %>">
+            <td><%= news_update.creator.name %></td>
+            <td><%= news_update.message %></td>
+            <td><%= link_to "Edit", edit_news_update_path(news_update) %> | <%= link_to "Delete", news_update_path(news_update), :method => :delete %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    
+    <%= numbered_paginator(@news_updates) %>
+  </div>
+</div>
+
+<%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  News Updates - <%= Danbooru.config.app_name %>
+<% end %>

@@ -1,0 +1,16 @@
+<div id="c-news-updates">
+  <div id="a-new">
+    <h1>Edit Update</h1>
+    
+    <%= simple_form_for(@news_update) do |f| %>
+      <%= f.input :message, :hint => "Use HTML for formatting", :input_html => {:size => "30x5"} %>
+      <%= f.button :submit, "Submit" %>
+    <% end %>
+  </div>
+</div>
+
+<%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Edit Update - <%= Danbooru.config.app_name %>
+<% end %>
