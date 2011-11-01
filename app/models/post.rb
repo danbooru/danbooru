@@ -478,6 +478,9 @@ class Post < ActiveRecord::Base
     def apply_metatags(tags)
       tags.each do |tag|
         case tag
+        when /^parent:none$/, /^parent:0$/
+          self.parent_id = nil
+          
         when /^parent:(\d+)$/
           self.parent_id = $1.to_i
           
