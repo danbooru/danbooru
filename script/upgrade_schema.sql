@@ -3121,13 +3121,21 @@ alter table users add column default_image_size varchar(255) not null default 'm
 alter table users add column favorite_tags text;
 alter table users add column blacklisted_tags text;
 alter table users add column time_zone varchar(255) not null default 'Eastern Time (US & Canada)';
+alter table users add column post_update_count integer not null default 0;
+alter table users add column note_update_count integer not null default 0;
+alter table users add column favorite_count integer not null default 0;
+alter table users add column post_upload_count integer not null default 0;
 alter table users drop column invite_count;
 alter table users rename column upload_limit to base_upload_limit;
 alter table users drop column uploaded_tags;
 alter index idx_users__name rename to index_users_on_name;
 create index index_users_on_email on users (email) where email is not null;
 create index index_users_on_inviter_id on users (inviter_id) where inviter_id is not null;
+update users set post_upload_count = (select count(*) from posts where uploader_id = users.id);
 update users set blacklisted_tags = (select string_agg(_.tags, E'\n') from user_blacklisted_tags _ where _.user_id = users.id);
+update users set post_update_count = (select count(*) from post_versions where updater_id = users.id);
+update users set note_update_count = (select count(*) from note_versions where updater_id = users.id);
+update users set favorite_count = (select count(*) from favorites where user_id = users.id);
 drop table user_blacklisted_tags;
 
 CREATE TABLE user_password_reset_nonces (

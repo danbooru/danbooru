@@ -56,6 +56,12 @@ class NoteTest < ActiveSupport::TestCase
         @note = Factory.create(:note, :post => @post)
       end
       
+      should "increment the updater's note_update_count" do
+        assert_difference("CurrentUser.note_update_count", 1) do
+          @note.update_attributes(:body => "zzz")
+        end
+      end
+      
       should "update the post's last_noted_at field" do
         assert_nil(@post.last_noted_at)
         @note.update_attributes(:x => 1000)

@@ -58,7 +58,7 @@ class UserPresenter
   end
   
   def uploads(template)
-    template.link_to(Post.for_user(user.id).count, template.posts_path(:tags => "uploader:#{user.name}"))
+    template.link_to(user.post_upload_count, template.posts_path(:tags => "uploader:#{user.name}"))
   end
   
   def deleted_uploads(template)
@@ -66,7 +66,7 @@ class UserPresenter
   end
   
   def favorites(template)
-    template.link_to(Favorite.for_user(user.id).count, template.favorites_path(:user_id => user.id))
+    template.link_to(user.favorite_count, template.favorites_path(:user_id => user.id))
   end
   
   def comments(template)
@@ -74,11 +74,11 @@ class UserPresenter
   end
   
   def post_versions(template)
-    template.link_to(PostVersion.for_user(user.id).count, template.post_versions_path(:search => {:updater_id_eq => user.id}))
+    template.link_to(user.post_update_count, template.post_versions_path(:search => {:updater_id_eq => user.id}))
   end
   
   def note_versions(template)
-    template.link_to(NoteVersion.for_user(user.id).count, template.note_versions_path(:search => {:updater_id_eq => user.id}))
+    template.link_to(user.note_update_count, template.note_versions_path(:search => {:updater_id_eq => user.id}))
   end
   
   def wiki_page_versions(template)

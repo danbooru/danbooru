@@ -128,6 +128,14 @@ class UploadTest < ActiveSupport::TestCase
           assert_equal(198695, File.size(@upload.resized_file_path_for(Danbooru.config.large_image_width)))
         end
       end
+      
+      should "increment the uploaders post_upload_count" do
+        @upload = Factory.create(:source_upload)
+        assert_difference("CurrentUser.post_upload_count", 1) do
+          @upload.process!
+          CurrentUser.reload
+        end
+      end
 
       should "process completely for a downloaded image" do
         @upload = Factory.create(:source_upload,

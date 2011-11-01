@@ -17,6 +17,10 @@ class CreateUsers < ActiveRecord::Migration
       t.column :last_forum_read_at, :datetime
       t.column :has_mail, :boolean, :null => false, :default => false
       t.column :recent_tags, :text
+      t.column :post_upload_count, :integer, :null => false, :default => 0
+      t.column :post_update_count, :integer, :null => false, :default => 0
+      t.column :note_update_count, :integer, :null => false, :default => 0
+      t.column :favorite_count, :integer, :null => false, :default => 0
       
       # Profile settings
       t.column :receive_email_notifications, :boolean, :null => false, :default => false

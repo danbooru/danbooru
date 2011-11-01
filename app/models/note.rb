@@ -58,6 +58,8 @@ class Note < ActiveRecord::Base
   end
   
   def create_version
+    CurrentUser.increment!(:note_update_count)
+    
     versions.create(
       :updater_id => updater_id,
       :updater_ip_addr => updater_ip_addr,

@@ -119,6 +119,12 @@ class AnonymousUser
   def update_column(*params)
   end
   
+  def increment!(field)
+  end
+  
+  def decrement!(field)
+  end
+  
   def role
     :anonymous
   end

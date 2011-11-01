@@ -69,6 +69,7 @@ class Upload < ActiveRecord::Base
         post = convert_to_post
         post.distribute_files
         if post.save
+          CurrentUser.increment!(:post_upload_count)
           update_attributes(:status => "completed", :post_id => post.id)
         else
           update_attribute(:status, "error: " + post.errors.full_messages.join(", "))

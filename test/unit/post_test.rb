@@ -415,6 +415,15 @@ class PostTest < ActiveSupport::TestCase
       end
       
       context "that has been updated" do
+        should "increment the updater's post_update_count" do
+          post = Factory.create(:post, :tag_string => "aaa bbb ccc")
+          
+          assert_difference("CurrentUser.post_update_count", 1) do
+            post.update_attributes(:tag_string => "zzz")
+            CurrentUser.reload
+          end
+        end
+        
         should "reset its tag array cache" do
           post = Factory.create(:post, :tag_string => "aaa bbb ccc")
           user = Factory.create(:user)
@@ -525,29 +534,76 @@ class PostTest < ActiveSupport::TestCase
   end
   
   context "Favorites:" do
-    context "Adding a post to a user's favorites" do
-      should "update the fav strings ont he post" do
-        user = Factory.create(:user)
-        post = Factory.create(:post)
-        post.add_favorite!(user)
-        post.reload
-        assert_equal("fav:#{user.id}", post.fav_string)
-        assert(Favorite.exists?(:user_id => user.id, :post_id => post.id))
-
-        post.add_favorite!(user)
-        post.reload
-        assert_equal("fav:#{user.id}", post.fav_string)
-        assert(Favorite.exists?(:user_id => user.id, :post_id => post.id))
-
-        post.remove_favorite!(user)
-        post.reload
-        assert_equal("", post.fav_string)
-        assert(!Favorite.exists?(:user_id => user.id, :post_id => post.id))
+    context "Removing a post from a user's favorites" do
+      setup do
+        @user = Factory.create(:user)
+        CurrentUser.user = @user
+        CurrentUser.ip_addr = "127.0.0.1"
+        @post = Factory.create(:post)
+        @post.add_favorite!(@user)
+      end
       
-        post.remove_favorite!(user)
-        post.reload
-        assert_equal("", post.fav_string)
-        assert(!Favorite.exists?(:user_id => user.id, :post_id => post.id))
+      teardown do
+        CurrentUser.user = nil
+        CurrentUser.ip_addr = nil
+      end
+      
+      should "decrement the user's favorite_count" do
+        assert_difference("CurrentUser.favorite_count", -1) do
+          @post.remove_favorite!(@user)
+          CurrentUser.reload
+        end
+      end
+      
+      should "not decrement the user's favorite_count if the user did not favorite the post" do
+        @post2 = Factory.create(:post)
+        assert_difference("CurrentUser.favorite_count", 0) do
+          @post2.remove_favorite!(@user)
+          CurrentUser.reload
+        end
+      end
+    end
+    
+    context "Adding a post to a user's favorites" do
+      setup do
+        @user = Factory.create(:user)
+        CurrentUser.user = @user
+        CurrentUser.ip_addr = "127.0.0.1"
+        @post = Factory.create(:post)
+      end
+      
+      teardown do
+        CurrentUser.user = nil
+        CurrentUser.ip_addr = nil
+      end
+      
+      should "increment the user's favorite_count" do
+        assert_difference("CurrentUser.favorite_count", 1) do
+          @post.add_favorite!(@user)
+          CurrentUser.reload
+        end
+      end
+      
+      should "update the fav strings ont he post" do
+        @post.add_favorite!(@user)
+        @post.reload
+        assert_equal("fav:#{@user.id}", @post.fav_string)
+        assert(Favorite.exists?(:user_id => @user.id, :post_id => @post.id))
+
+        @post.add_favorite!(@user)
+        @post.reload
+        assert_equal("fav:#{@user.id}", @post.fav_string)
+        assert(Favorite.exists?(:user_id => @user.id, :post_id => @post.id))
+
+        @post.remove_favorite!(@user)
+        @post.reload
+        assert_equal("", @post.fav_string)
+        assert(!Favorite.exists?(:user_id => @user.id, :post_id => @post.id))
+      
+        @post.remove_favorite!(@user)
+        @post.reload
+        assert_equal("", @post.fav_string)
+        assert(!Favorite.exists?(:user_id => @user.id, :post_id => @post.id))
       end
     end
   end

@@ -995,6 +995,8 @@ class Post < ActiveRecord::Base
   
   module VersionMethods
     def create_version
+      CurrentUser.increment!(:post_update_count)
+      
       if created_at == updated_at
         versions.create(
           :rating => rating,
