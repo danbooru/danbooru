@@ -19,6 +19,12 @@ div.comments-for-post {
         margin-left: 2em;
         width: 30em;
         float: left;
+        
+        menu {
+          li {
+            margin-right: 0.5em;
+          }
+        }
       }
     }
     
