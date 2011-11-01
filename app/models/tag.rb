@@ -191,6 +191,9 @@ class Tag < ActiveRecord::Base
       if tag[0] == "-" && tag.size > 1
         output[:exclude] << tag[1..-1]
         
+      elsif tag[0] == "~" && tag.size > 1
+        output[:include] << tag[1..-1]
+        
       elsif tag =~ /\*/
         matches = Tag.name_matches(tag).all(:select => "name", :limit => 25, :order => "post_count DESC").map(&:name)
         matches = ["~no_matches~"] if matches.empty?
