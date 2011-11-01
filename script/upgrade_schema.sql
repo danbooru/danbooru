@@ -109,6 +109,9 @@ insert into dmails (owner_id, from_id, to_id, title, body, is_read, is_deleted, 
 insert into dmails (owner_id, from_id, to_id, title, body, is_read, is_deleted, created_at, updated_at) select dmails_orig.to_id, dmails_orig.from_id, dmails_orig.to_id, dmails_orig.title, dmails_orig.body, dmails_orig.has_seen, false, dmails_orig.created_at, dmails_orig.created_at from dmails_orig;
 drop table dmails_orig;
 
+alter table tag_subscriptions drop column id;
+alter table tag_subscriptions add column id serial primary key;
+
 alter table favorites rename to favorites_orig;
 alter table favorites_orig drop constraint fk_favorites__post;
 alter table favorites_orig drop constraint fk_favorites__user;
@@ -3183,6 +3186,77 @@ ALTER SEQUENCE amazon_backups_id_seq OWNED BY amazon_backups.id;
 ALTER TABLE amazon_backups ALTER COLUMN id SET DEFAULT nextval('amazon_backups_id_seq'::regclass);
 ALTER TABLE ONLY amazon_backups
     ADD CONSTRAINT amazon_backups_pkey PRIMARY KEY (id);
+
+
+CREATE TABLE uploads (
+    id integer NOT NULL,
+    source character varying(255),
+    file_path character varying(255),
+    content_type character varying(255),
+    rating character(1) NOT NULL,
+    uploader_id integer NOT NULL,
+    uploader_ip_addr inet NOT NULL,
+    tag_string text NOT NULL,
+    status character varying(255) DEFAULT 'pending'::character varying NOT NULL,
+    backtrace text,
+    post_id integer,
+    md5_confirmation character varying(255),
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+CREATE SEQUENCE uploads_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+ALTER SEQUENCE uploads_id_seq OWNED BY uploads.id;
+ALTER TABLE uploads ALTER COLUMN id SET DEFAULT nextval('uploads_id_seq'::regclass);
+ALTER TABLE ONLY uploads
+    ADD CONSTRAINT uploads_pkey PRIMARY KEY (id);
+CREATE INDEX index_uploads_on_uploader_id ON uploads USING btree (uploader_id);
+CREATE INDEX index_uploads_on_uploader_ip_addr ON uploads USING btree (uploader_ip_addr);
+
+delete from schema_migrations;
+COPY schema_migrations (version) FROM stdin;
+20100204211522
+20100204214746
+20100205162521
+20100205163027
+20100205224030
+20100211025616
+20100211181944
+20100211191709
+20100211191716
+20100213181847
+20100213183712
+20100214080549
+20100214080557
+20100214080605
+20100215182234
+20100215213756
+20100215223541
+20100215224629
+20100215224635
+20100215225710
+20100215230642
+20100219230537
+20100221003655
+20100221005812
+20100223001012
+20100224171915
+20100224172146
+20100307073438
+20100309211553
+20100318213503
+20100826232512
+20110328215652
+20110328215701
+20110607194023
+20110717010705
+20110722211855
+20110815233456
+\.
 
 
 -- post processing
