@@ -9,16 +9,12 @@ group :test do
 end
 
 group :assets do
-  gem "uglifier"
-  gem "uglifier-rails"
-  gem "therubyracer"
   gem "sass"
 end
 
-gem "rails", "3.1.0"
+gem "rails", "3.1.1"
 gem "pg"
 gem "memcache-client", :require => "memcache"
-# gem "imagesize", :require => "image_size"
 gem "delayed_job"
 gem "super_exception_notifier"
 gem "simple_form"
@@ -28,7 +24,7 @@ gem "meta_search", :git => "git://github.com/ernie/meta_search.git"
 gem "silent-postgres"
 gem "whenever", :require => false
 gem "sanitize", :git => "git://github.com/rgrove/sanitize.git"
-gem 'rmagick', :require => "RMagick"
+gem 'mini_magick'
 
 group :development do
   gem 'pry'

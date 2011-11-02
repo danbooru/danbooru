@@ -2,8 +2,10 @@
   Danbooru.RelatedTag = {};
   
   Danbooru.RelatedTag.initialize_all = function() {
-    this.initialize_buttons();
-    $("#related-tags-container").hide();
+    if ($("#c-posts").length || $("#c-uploads").length) {
+      this.initialize_buttons();
+      $("#related-tags-container").hide();
+    }
   }
   
   Danbooru.RelatedTag.initialize_buttons = function() {

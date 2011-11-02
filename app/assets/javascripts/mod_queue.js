@@ -2,7 +2,7 @@
   Danbooru.ModQueue = {};
   
   Danbooru.ModQueue.initialize_approve_all_button = function() {
-    $("#c-moderator-post-queues #approve-all-button").click(function(e) {
+    $("#approve-all-button").click(function(e) {
       if (!confirm("Are you sure you want to approve every post on this page?")) {
         return;
       }
@@ -13,7 +13,7 @@
   }
   
   Danbooru.ModQueue.initialize_hide_all_button = function() {
-    $("#c-moderator-post-queues #hide-all-button").click(function(e) {
+    $("#hide-all-button").click(function(e) {
       if (!confirm("Are you sure you want to hide every post on this page?")) {
         return;
       }
@@ -25,6 +25,8 @@
 })();
 
 $(function() {
-  Danbooru.ModQueue.initialize_approve_all_button();
-  Danbooru.ModQueue.initialize_hide_all_button();
+  if ($("#c-moderator-post-queues").length) {
+    Danbooru.ModQueue.initialize_approve_all_button();
+    Danbooru.ModQueue.initialize_hide_all_button();
+  }
 });

@@ -18,8 +18,8 @@
       });
     }
   }
-  
-  $(function() {
-    Danbooru.NewsUpdate.initialize();
-  });
 })();
+
+$(function() {
+  Danbooru.NewsUpdate.initialize();
+});

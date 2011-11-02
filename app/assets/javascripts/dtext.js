@@ -3,7 +3,6 @@
   
   Danbooru.Dtext.initialize_links = function() {
     $(".simple_form .dtext-preview").hide();
-
     $(".simple_form input[value=Preview]").click(Danbooru.Dtext.click_button);
   }
   

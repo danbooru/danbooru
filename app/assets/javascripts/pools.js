@@ -2,8 +2,13 @@
   Danbooru.Pool = {};
   
   Danbooru.Pool.initialize_all = function() {
-    this.initialize_add_to_pool_link();
-    this.initialize_simple_edit();
+    if ($("#c-posts").length && $("#a-show").length) {
+      this.initialize_add_to_pool_link();
+    }
+    
+    if ($("#c-pool-orders").length) {
+      this.initialize_simple_edit();
+    }
   }
   
   Danbooru.Pool.initialize_add_to_pool_link = function() {
@@ -21,24 +26,24 @@
       minLength: 4,
     });
     
-    $("a#pool").click(function(e) {
+    $("#pool").click(function(e) {
       e.preventDefault();
       $("#add-to-pool-dialog").dialog("open");
     });
     
-    $("ul#recent-pools li").click(function(e) {
+    $("#recent-pools li").click(function(e) {
       e.preventDefault();
       $("#pool_name").val($(this).html());
     });
   }
   
   Danbooru.Pool.initialize_simple_edit = function() {
-    $("ul#sortable").sortable({
+    $("#sortable").sortable({
       placeholder: "ui-state-placeholder"
     });
-    $("ul#sortable").disableSelection();
+    $("#sortable").disableSelection();
     
-    $("div#c-pool-orders div#a-edit form#ordering-form").submit(function(e) {
+    $("#ordering-form").submit(function(e) {
       $.ajax({
         type: "put",
         url: e.target.action,

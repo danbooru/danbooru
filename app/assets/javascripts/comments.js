@@ -2,9 +2,11 @@
   Danbooru.Comment = {};
   
   Danbooru.Comment.initialize_all = function() {
-    this.initialize_response_link();
-    this.initialize_reply_links();
-    this.initialize_expand_links();
+    if ($("#c-posts").length || $("#c-comments").length) {
+      this.initialize_response_link();
+      this.initialize_reply_links();
+      this.initialize_expand_links();
+    }
   }
   
   Danbooru.Comment.quote_message = function(data) {

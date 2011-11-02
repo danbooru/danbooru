@@ -3,8 +3,11 @@
   
   Danbooru.Upload.initialize_all = function() {
     this.initialize_image();
-    this.initialize_info();
-    this.initialize_similar();
+    
+    if ($("#c-uploads").length) {
+      this.initialize_info();
+      this.initialize_similar();
+    }
   }
 
   Danbooru.Upload.initialize_similar = function() {
@@ -31,8 +34,8 @@
   }
   
   Danbooru.Upload.initialize_info = function() {
-    $("#c-uploads #source-info ul").hide();
-    $("#c-uploads #fetch-data").click(function(e) {
+    $("#source-info ul").hide();
+    $("#fetch-data").click(function(e) {
       Danbooru.ajax_start(e.target);
       $.get(e.target.href).success(function(data) {
         var tag_html = "";
@@ -61,7 +64,7 @@
   }
   
   Danbooru.Upload.initialize_image = function() {
-    var $image = $("#c-uploads #image");
+    var $image = $("#image");
     if ($image.size() > 0) {
       var height = $image.height();
       var width = $image.width();

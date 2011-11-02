@@ -2,9 +2,11 @@
   Danbooru.PostModeMenu = {};
   
   Danbooru.PostModeMenu.initialize = function() {
-    this.initialize_selector();
-    this.initialize_preview_link();
-    this.initialize_edit_form();
+    if ($("#c-posts").length || $("#c-favorites").length || $("#c-pools").length) {
+      this.initialize_selector();
+      this.initialize_preview_link();
+      this.initialize_edit_form();
+    }
   }
   
   Danbooru.PostModeMenu.initialize_selector = function() {

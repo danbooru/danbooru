@@ -2,22 +2,24 @@
   Danbooru.JanitorTrials = {};
 
   Danbooru.JanitorTrials.initialize_all = function() {
-    $("#c-janitor-trials input[value=Test]").click(function(e) {
-      $.ajax({
-        type: "get",
-        url: "/janitor_trials/test.json",
-        data: {
-          janitor_trial: {
-            user_name: $("#janitor_trial_user_name").val()
+    if ($("#c-janitor-trials").length) {
+      $("input[value=Test]").click(function(e) {
+        $.ajax({
+          type: "get",
+          url: "/janitor_trials/test.json",
+          data: {
+            janitor_trial: {
+              user_name: $("#janitor_trial_user_name").val()
+            }
+          },
+          success: function(data) {
+            $("#test-results").html(data);
           }
-        },
-        success: function(data) {
-          $("#test-results").html(data);
-        }
-      });
-      
-      e.preventDefault();
-    });
+        });
+
+        e.preventDefault();
+      }); 
+    }
   }
 })();
 

@@ -103,16 +103,19 @@
     $post.addClass("blacklisted").addClass("blacklisted-active");
   }
   
-  Danbooru.Blacklist.initialize = function() {
-    Danbooru.Blacklist.parse_entries();
-    if (Danbooru.Blacklist.apply() > 0) {
-      Danbooru.Blacklist.update_sidebar();
-    } else {
-      $("#blacklist-box").hide();
+  Danbooru.Blacklist.initialize_all = function() {
+    if ($("#c-posts").length || $("#c-favorites").length || $("#c-pools").length) {
+      Danbooru.Blacklist.parse_entries();
+      
+      if (Danbooru.Blacklist.apply() > 0) {
+        Danbooru.Blacklist.update_sidebar();
+      } else {
+        $("#blacklist-box").hide();
+      }
     }
   }
 })();
 
 $(document).ready(function() {
-  Danbooru.Blacklist.initialize();
+  Danbooru.Blacklist.initialize_all();
 });

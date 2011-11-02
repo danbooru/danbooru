@@ -4,13 +4,19 @@
   Danbooru.Post.pending_update_count = 0;
   
   Danbooru.Post.initialize_all = function() {
-    this.initialize_post_sections();
-    this.initialize_wiki_page_excerpt();
-    this.initialize_post_image_resize_links();
-    this.initialize_image_resize();
     this.initialize_titles();
-    this.initialize_links();
-    this.initialize_resize_links();
+
+    if ($("#c-posts").length && $("#a-index").length) {
+      this.initialize_wiki_page_excerpt();
+    }
+
+    if ($("#c-posts").length && $("#a-show").length) {
+      this.initialize_resize_links();
+      this.initialize_links();
+      this.initialize_image_resize();
+      this.initialize_post_sections();
+      this.initialize_post_image_resize_links();
+    }
   }
   
   Danbooru.Post.initialize_links = function() {
@@ -32,7 +38,7 @@
       image.attr("height", target.data("height"));
       e.preventDefault();
     }); 
-
+    
     $("#resize-link a").click(function(e) {
       $("#resize-links").toggle();
       e.preventDefault();
@@ -40,7 +46,7 @@
   }
   
   Danbooru.Post.initialize_titles = function() {
-    $("article.post-preview").each(function(i, v) {
+    $(".post-preview").each(function(i, v) {
       Danbooru.Post.initialize_title_for(v);
     });
   }
@@ -69,19 +75,17 @@
   }
   
   Danbooru.Post.initialize_image_resize = function() {
-    if ($("#c-posts #a-show").size() > 0) {
-      var default_image_size = Danbooru.meta("default-image-size");
-      var original_width = parseInt($("#image").data("original-width"));
-      var medium_width = parseInt(Danbooru.meta("config-medium-width"));
-      var large_width = parseInt(Danbooru.meta("config-large-width"));
+    var default_image_size = Danbooru.meta("default-image-size");
+    var original_width = parseInt($("#image").data("original-width"));
+    var medium_width = parseInt(Danbooru.meta("config-medium-width"));
+    var large_width = parseInt(Danbooru.meta("config-large-width"));
 
-      if ((default_image_size === "medium") && (original_width > medium_width)) {
-        $("#medium-file-link").trigger("click");
-      } else if ((default_image_size === "large") && (original_width > large_width)) {
-        $("#large-file-link").trigger("click");
-      } else {
-        $("#original-file-link").trigger("click");
-      }
+    if ((default_image_size === "medium") && (original_width > medium_width)) {
+      $("#medium-file-link").trigger("click");
+    } else if ((default_image_size === "large") && (original_width > large_width)) {
+      $("#large-file-link").trigger("click");
+    } else {
+      $("#original-file-link").trigger("click");
     }
   }
   

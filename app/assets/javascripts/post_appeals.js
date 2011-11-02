@@ -2,13 +2,15 @@
   Danbooru.PostAppeal = {};
   
   Danbooru.PostAppeal.initialize_all = function() {
-    this.initialize_appeal();
-    this.hide_or_show_appeal_link();
+    if ($("#c-posts") && $("#a-show")) {
+      this.initialize_appeal();
+      this.hide_or_show_appeal_link();
+    }
   }
   
   Danbooru.PostAppeal.hide_or_show_appeal_link = function() {
     if (Danbooru.meta("post-is-flagged") !== "true") {
-      $("#c-posts #appeal").hide();
+      $("#appeal").hide();
     }
   }
   
@@ -28,7 +30,7 @@
       }
     });
 
-    $("a#appeal").click(function(e) {
+    $("#appeal").click(function(e) {
       e.preventDefault();
       $("#appeal-dialog").dialog("open");
     });
