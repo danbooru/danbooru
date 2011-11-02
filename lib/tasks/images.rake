@@ -1,3 +1,5 @@
+require 'danbooru_image_resizer/danbooru_image_resizer'
+
 namespace :images do
   desc "Generate medium-sized images of posts"
   task :generate_medium => :environment do
