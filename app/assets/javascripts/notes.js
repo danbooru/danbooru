@@ -392,7 +392,7 @@ Danbooru.Note = {
     start: function() {
       $("#original-file-link").click();
       $("#image").one("click", Danbooru.Note.TranslationMode.create_note);
-      Danbooru.notice("Click on the image to create a note (shortcut is n)");
+      Danbooru.notice('Click on the image to create a note (shortcut is <span class="key">n</span>)');
     },
     
     stop: function() {
@@ -474,7 +474,7 @@ Danbooru.Note = {
 $(function() {
   if ($("#c-posts #a-show").size() > 0) {
     $("#translate").one("click", Danbooru.Note.TranslationMode.start);
-    $(document).bind("keydown", "n", Danbooru.Note.TranslationMode.start);
+    key("n", Danbooru.Note.TranslationMode.start);
     Danbooru.Note.load_all();
     $("#image").click(Danbooru.Note.Box.toggle_all);
   }

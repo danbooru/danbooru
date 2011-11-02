@@ -22,3 +22,16 @@ span.count {
 
 span.edit-options {
 }
+
+span.key {
+  background: #333;
+  border: 1px solid #333;
+  padding: 1px 3px;
+  color: white;
+  display: inline-block;
+  width: 1em;
+  text-align: center;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+}
