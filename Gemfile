@@ -10,6 +10,8 @@ end
 
 group :assets do
   gem "sass"
+  gem "uglifier"
+  gem "therubyracer"
 end
 
 gem "rails", "3.1.1"
