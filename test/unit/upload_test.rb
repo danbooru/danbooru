@@ -125,7 +125,7 @@ class UploadTest < ActiveSupport::TestCase
           assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.medium_image_width)))
           assert_equal(43470, File.size(@upload.resized_file_path_for(Danbooru.config.medium_image_width)))
           assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.large_image_width)))
-          assert_equal(198695, File.size(@upload.resized_file_path_for(Danbooru.config.large_image_width)))
+          assert_equal(129472, File.size(@upload.resized_file_path_for(Danbooru.config.large_image_width)))
         end
       end
       
