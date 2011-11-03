@@ -13,9 +13,9 @@
     if ($("#c-posts").length && $("#a-show").length) {
       this.initialize_resize_links();
       this.initialize_links();
-      this.initialize_image_resize();
       this.initialize_post_sections();
       this.initialize_post_image_resize_links();
+      this.initialize_image_resize();
     }
   }
   
