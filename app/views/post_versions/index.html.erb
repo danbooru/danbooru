@@ -1,5 +1,7 @@
 <div id="c-post-versions">
   <div id="a-index">
+    <h1>Changes</h1>
+    
     <% if @post_versions.empty? %>
       <%= render "post_sets/blank" %>
     <% else %>
@@ -11,5 +13,5 @@
 <%= render "secondary_links" %>
 
 <% content_for(:page_title) do %>
-  Post Versions - <%= Danbooru.config.app_name %>
+  Post Changes - <%= Danbooru.config.app_name %>
 <% end %>

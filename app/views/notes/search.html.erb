@@ -1,5 +1,7 @@
 <div id="c-notes">
   <div id="a-search">
+    <h1>Search Notes</h1>
+    
     <%= simple_form_for @search do |f| %>
       <%= f.input :body_matches, :label => "Body", :required => false %>
       <%= f.input :post_tag_match, :label => "Tags", :required => false %>

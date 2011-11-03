@@ -1,5 +1,7 @@
 <div id="c-post-versions">
   <div id="a-search">
+    <h1>Search Changes</h1>
+    
     <div id="search">
       <%= simple_form_for(@search) do |f| %>
         <%= f.input :updater_name_eq, :label => "User", :required => false %>
@@ -13,5 +15,5 @@
 <%= render "secondary_links" %>
 
 <% content_for(:page_title) do %>
-  Search Post Versions - <%= Danbooru.config.app_name %>
+  Search Post Changes - <%= Danbooru.config.app_name %>
 <% end %>

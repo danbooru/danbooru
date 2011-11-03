@@ -50,10 +50,10 @@
               </li>
               <li><strong>Uploader</strong>: <%= link_to(post.uploader.name, user_path(post.uploader_id)) %> <%= time_ago_in_words(post.created_at) %> ago</li>
               <% if post.is_flagged? %>
-                <li><strong>Flagged</strong>: <%= post_flag_reason(post) %></li>
+                <li><strong>Flagged</strong>: <%= post_flag_reasons(post) %></li>
               <% end %>
               <% if (post.is_flagged? || post.is_deleted?) && post.appeals.any? %>
-                <li><strong>Appeals</strong>: <%= post_appeal_reason(post) %></li>
+                <li><strong>Appeals</strong>: <%= post_appeal_reasons(post) %></li>
               <% end %>
               <li><strong>Hidden</strong>: <%= post.disapprovals.count %></li>
               <li><strong>Tags</strong>: <%= post.tag_string %></li>

@@ -1,5 +1,7 @@
+@import "../common/000_vars.css.scss";
+
 div#c-favorites {
   section#content > h1 {
-    display: none;
+    font-size: $h3_size;
   }
 }
