@@ -35,18 +35,19 @@
   
   Danbooru.Comment.initialize_expand_links = function() {
     $(".comment-section form").hide();
-    $(".comment-section input.expand-comment-response").click(function() {
+    $(".comment-section input.expand-comment-response").click(function(e) {
       var post_id = $(this).closest(".comment-section").data("post-id");
-      $(".comment-section[data-post-id=" + post_id + "] form").show();
       $(this).hide();
+      $(".comment-section[data-post-id=" + post_id + "] form").slideDown("fast");
+      e.preventDefault();
     });
   }
   
   Danbooru.Comment.initialize_response_link = function() {
     $("a.expand-comment-response").click(function(e) {
-      e.preventDefault();
-      $(e.target).closest("div.new-comment").find("form").show();
       $(e.target).hide();
+      $(e.target).closest("div.new-comment").find("form").slideDown("fast");
+      e.preventDefault();
     });
     
     $("div.new-comment form").hide();

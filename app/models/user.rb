@@ -37,6 +37,7 @@ class User < ActiveRecord::Base
   has_one :ban
   has_many :subscriptions, :class_name => "TagSubscription", :foreign_key => "creator_id"
   has_many :note_versions, :foreign_key => "updater_id"
+  has_many :dmails, :foreign_key => "owner_id", :order => "dmails.id desc"
   belongs_to :inviter, :class_name => "User"
   scope :named, lambda {|name| where(["lower(name) = ?", name])}
   scope :admins, where("is_admin = TRUE")

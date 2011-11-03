@@ -136,7 +136,7 @@ class Post < ActiveRecord::Base
     def medium_file_url
       if has_medium?
         if is_flash?
-          "/images/480x150-flash.png"
+          "/images/480x200-flash.png"
         else
           "/data/medium/#{file_path_prefix}#{md5}.jpg"
         end
@@ -235,7 +235,7 @@ class Post < ActiveRecord::Base
     
     def medium_image_height
       if is_flash?
-        return 204
+        return 200
       end
       
       ratio = Danbooru.config.medium_image_width.to_f / image_width.to_f

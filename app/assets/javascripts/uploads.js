@@ -2,9 +2,8 @@
   Danbooru.Upload = {};
   
   Danbooru.Upload.initialize_all = function() {
-    this.initialize_image();
-    
     if ($("#c-uploads").length) {
+      this.initialize_image();
       this.initialize_info();
       this.initialize_similar();
     }

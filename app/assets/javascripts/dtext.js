@@ -16,7 +16,7 @@
       success: function(data) {
         $button.val("Edit");
         $input.hide();
-        $preview.html(data).show();
+        $preview.html(data).fadeIn("fast");
       }
     });
   }
@@ -24,7 +24,7 @@
   Danbooru.Dtext.call_edit = function(e, $button, $input, $preview) {
     $button.val("Preview");
     $preview.hide();
-    $input.show();
+    $input.slideDown("fast");
   }
   
   Danbooru.Dtext.click_button = function(e) {
