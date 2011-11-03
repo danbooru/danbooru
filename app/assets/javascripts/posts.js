@@ -141,16 +141,10 @@
     $("#post-sections li a").click(function(e) {
       if (e.target.hash === "#comments") {
         $("#comments").fadeIn("fast");
-        $("#notes").hide();
-        $("#edit").hide();
-      } else if (e.target.hash === "#notes") {
-        $("#notes").fadeIn("fast");
-        $("#comments").hide();
         $("#edit").hide();
       } else {
         $("#edit").fadeIn("fast");
         $("#comments").hide();
-        $("#notes").hide();
       }
       
       $("#post-sections li").removeClass("active");
