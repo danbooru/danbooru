@@ -5,7 +5,7 @@
   
   Danbooru.Post.initialize_all = function() {
     this.initialize_titles();
-
+    
     if ($("#c-posts").length && $("#a-index").length) {
       this.initialize_wiki_page_excerpt();
     }
@@ -120,30 +120,42 @@
       $("#show-wiki-page-excerpt").hide();
     }
     
-    $("#hide-wiki-page-excerpt").click(function() {
+    $("#hide-wiki-page-excerpt").click(function(e) {
       $("#hide-wiki-page-excerpt").hide();
       $("#wiki-page-excerpt-content").hide();
       $("#show-wiki-page-excerpt").show();
       Danbooru.Cookie.put("hide-wiki-page-excerpt", "1");
+      e.preventDefault();
     });
     
-    $("#show-wiki-page-excerpt").click(function() {
+    $("#show-wiki-page-excerpt").click(function(e) {
       $("#hide-wiki-page-excerpt").show();
       $("#wiki-page-excerpt-content").show();
       $("#show-wiki-page-excerpt").hide();
       Danbooru.Cookie.put("hide-wiki-page-excerpt", "0");
+      e.preventDefault();
     });
   }
   
   Danbooru.Post.initialize_post_sections = function() {
     $("#post-sections li a").click(function(e) {
-      $("#comments").hide();
-      $("#notes").hide();
-      $("#edit").hide();
+      if (e.target.hash === "#comments") {
+        $("#comments").fadeIn("fast");
+        $("#notes").hide();
+        $("#edit").hide();
+      } else if (e.target.hash === "#notes") {
+        $("#notes").fadeIn("fast");
+        $("#comments").hide();
+        $("#edit").hide();
+      } else {
+        $("#edit").fadeIn("fast");
+        $("#comments").hide();
+        $("#notes").hide();
+      }
+      
       $("#post-sections li").removeClass("active");
       $(e.target).parent("li").addClass("active");
       var name = e.target.hash;
-      $(name).show();
       e.preventDefault();
     });
     

@@ -36,7 +36,7 @@
         Danbooru.Post.notice_update("dec");
       },
       error: function(data, status, xhr) {
-        Danbooru.j_alert("Error: " + data.reason);
+        Danbooru.notice("Error: " + data.reason);
       }
     });
   }

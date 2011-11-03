@@ -144,12 +144,21 @@ div#c-posts {
   
   div#a-show {
     menu#post-sections {
-      font-size: $h3_size;
+      font-size: $h2_size;
       font-weight: bold;
       line-height: 1.25em;
 
-      li a {
-        color: $link_color;
+      li {
+        padding: 0;
+        margin: 0 0.5em 0 0;
+        
+        a {
+          color: $link_dark_color;
+        }
+        
+        &.active a {
+          color: $link_color;
+        }
       }
     }
     

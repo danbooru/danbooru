@@ -319,7 +319,7 @@ Danbooru.Note = {
     },
     
     error_handler: function(xhr, status, exception) {
-      Danbooru.j_error("There was an error saving the note");
+      Danbooru.error("There was an error saving the note");
     },
     
     success_handler: function(data, status, xhr) {

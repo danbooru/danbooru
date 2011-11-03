@@ -4,11 +4,11 @@
   }
   
   Danbooru.notice = function(msg) {
-    $('#notice').html(msg).addClass("ui-state-highlight").removeClass("ui-state-error").show();
+    $('#notice').html(msg).addClass("ui-state-highlight").removeClass("ui-state-error").slideDown("fast");
   }
   
   Danbooru.error = function(msg) {
-    $('#notice').html(msg).removeClass("ui-state-highlight").addClass("ui-state-error").show();
+    $('#notice').html(msg).removeClass("ui-state-highlight").addClass("ui-state-error").slideDown("fast");
   }
 
   Danbooru.ajax_start = function(target) {

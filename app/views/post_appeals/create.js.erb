@@ -1,6 +1,6 @@
 var errors = "<%= j @post_appeal.errors.full_messages.join("; ") %>";
 if (errors.length > 0) {
-  Danbooru.j_error(errors);
+  Danbooru.error(errors);
 } else {
-  Danbooru.j_alert("Appeal", "Post appealed");
+  Danbooru.notice("Post appealed");
 }
