@@ -5,35 +5,22 @@ div#main {
 }
 
 header {
-  margin: 0;
+  margin: 10px;
   padding: 0;
+  overflow: visible;
   
-  menu {
-    width: 100%;
-    margin: 0;
-    padding: 0;
+  div#search-item {
+    float: right;
     
-    li {
-      margin: 0;
-      padding: 0;
-      display: inline-block;
-      vertical-align: middle;
+    input {
+      font-size: 2em;
     }
-
-    li#search-item {
-      width: 50%;
-      
-      input {
-        font-size: 2em;
-      }
-    }
-    
-    li#sign-in-item {
-      width: 49%;
-      text-align: right;
-      font-size: 1.5em;
-      font-weight: bold;
-    }
+  }
+  
+  div#sign-in-item {
+    float: left;
+    font-size: 1.5em;
+    font-weight: bold;
   }
 }
 
