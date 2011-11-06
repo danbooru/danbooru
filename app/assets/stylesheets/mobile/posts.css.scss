@@ -28,6 +28,7 @@ header {
 footer {
   div.paginator {
     overflow: visible;
+    font-size: 3em;
     
     li {
       a {
@@ -41,18 +42,6 @@ footer {
     
     li:last-child {
       float: right;
-    }
-  }
-  
-  div.back {
-    overflow: visible;
-    padding: 5em 5em 10em 0;
-    
-    a {
-      display: block;
-      float: right;
-      font-size: 3em;
-      font-weight: bold;
     }
   }
 }
