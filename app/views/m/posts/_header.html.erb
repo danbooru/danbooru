@@ -5,9 +5,6 @@
         <%= search_field_tag :tags, params[:tags] %>
       <% end %>
     </li>
-    <li id="site-item">
-      <h1><%= Danbooru.config.app_name %></h1>
-    </li>
     <li id="sign-in-item">
       <% if true || CurrentUser.is_anonymous? %>
         <%= link_to "Sign in", new_m_session_path %>

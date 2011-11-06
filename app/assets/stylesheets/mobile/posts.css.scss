@@ -5,7 +5,7 @@ div#main {
 }
 
 header {
-  margin: 0 0 10px 0;
+  margin: 10px 0 10px 0;
   padding: 0 10px;
   
   menu {
@@ -15,26 +15,21 @@ header {
     li {
       margin: 0;
       padding: 0;
-      width: 33%;
       display: inline-block;
       vertical-align: middle;
     }
-    
+
     li#search-item {
-      input {
-        font-size: 2em;
-      }
-    }
-    
-    li#site-item {
-      text-align: center;
+      width: 45%;
       
-      h1 {
-        font-size: 3em;
+      input {
+        font-size: 1.5em;
+        width: 100%;
       }
     }
     
     li#sign-in-item {
+      width: 45%;
       text-align: right;
       
       a {
