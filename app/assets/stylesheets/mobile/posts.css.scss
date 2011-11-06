@@ -19,8 +19,9 @@ header {
   
   div#sign-in-item {
     float: left;
-    font-size: 1.5em;
+    font-size: 2em;
     font-weight: bold;
+    margin-top: 0.3em;
   }
 }
 
@@ -40,6 +41,18 @@ footer {
     
     li:last-child {
       float: right;
+    }
+  }
+  
+  div.back {
+    overflow: visible;
+    padding: 5em 0 10em 0;
+    
+    a {
+      display: block;
+      float: right;
+      font-size: 3em;
+      font-weight: bold;
     }
   }
 }

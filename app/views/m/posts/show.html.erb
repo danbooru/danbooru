@@ -4,6 +4,12 @@
   <%= image_tag(@post.large_file_url, :width => @post.large_image_width, :height => @post.large_image_height, :id => "image") %>
   
   <%= render "tags", :post => @post %>
+  
+  <footer>
+    <div class="back"> 
+      <%= link_to "< Back", :back %>
+    </div>
+  </footer>
 </div>
 
 <% content_for(:page_title) do %>
