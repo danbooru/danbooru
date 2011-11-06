@@ -17,7 +17,6 @@ header {
     padding: 0;
     
     li {
-      font-size: 1.5em;
       margin: 0;
       padding: 0;
       width: 33%;
@@ -25,11 +24,17 @@ header {
       vertical-align: middle;
     }
     
+    li#search-item {
+      input {
+        font-size: 2em;
+      }
+    }
+    
     li#site-item {
       text-align: center;
       
       h1 {
-        font-size: 2em;
+        font-size: 3em;
       }
     }
     
@@ -37,6 +42,7 @@ header {
       text-align: right;
       
       a {
+        font-size: 1.5em;
         font-weight: bold;
       }
     }
@@ -109,7 +115,7 @@ div#tag-list {
   
   li {
     display: inline-block;
-    margin: 1.5em 0.5em;
+    margin: 2em 0.5em;
 
     a {
       background: #eee;
