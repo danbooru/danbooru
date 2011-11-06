@@ -5,10 +5,11 @@ div#main {
 }
 
 header {
-  margin: 10px 0 10px 0;
-  padding: 0 10px;
+  margin: 0;
+  padding: 0;
   
   menu {
+    width: 100%;
     margin: 0;
     padding: 0;
     
@@ -20,22 +21,18 @@ header {
     }
 
     li#search-item {
-      width: 45%;
+      width: 50%;
       
       input {
-        font-size: 1.5em;
-        width: 100%;
+        font-size: 2em;
       }
     }
     
     li#sign-in-item {
-      width: 45%;
+      width: 49%;
       text-align: right;
-      
-      a {
-        font-size: 1.5em;
-        font-weight: bold;
-      }
+      font-size: 1.5em;
+      font-weight: bold;
     }
   }
 }

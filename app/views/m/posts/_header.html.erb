@@ -6,6 +6,7 @@
       <% end %>
     </li>
     <li id="sign-in-item">
+      <%= Danbooru.config.app_name %> - 
       <% if true || CurrentUser.is_anonymous? %>
         <%= link_to "Sign in", new_m_session_path %>
       <% end %>
