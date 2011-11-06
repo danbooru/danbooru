@@ -1,5 +1,5 @@
 class PostPresenter < Presenter
-  def self.preview(post)
+  def self.preview(post, options = {})
     if post.is_deleted? && !CurrentUser.is_privileged?
       return ""
     end
@@ -9,8 +9,10 @@ class PostPresenter < Presenter
     flags << "flagged" if post.is_flagged?
     flags << "deleted" if post.is_deleted?
     
+    path = options[:path_prefix] || "/posts"
+    
     html =  %{<article class="post-preview" id="post_#{post.id}" data-id="#{post.id}" data-tags="#{h(post.tag_string)}" data-uploader="#{h(post.uploader_name)}" data-rating="#{post.rating}" data-width="#{post.image_width}" data-height="#{post.image_height}" data-flags="#{flags.join(' ')}" data-parent-id="#{post.parent_id}" data-has-children="#{post.has_children?}">}
-    html << %{<a href="/posts/#{post.id}">}
+    html << %{<a href="#{path}/#{post.id}">}
     
     if post.is_image?
       html << %{<img src="#{post.preview_file_url}">}
@@ -51,8 +53,8 @@ class PostPresenter < Presenter
     end
   end
   
-  def tag_list_html(template)
+  def tag_list_html(template, options = {})
     @tag_set_presenter ||= TagSetPresenter.new(@post.tag_array)
-    @tag_set_presenter.tag_list_html(template, :show_extra_links => CurrentUser.user.is_privileged?)
+    @tag_set_presenter.tag_list_html(template, options.merge(:show_extra_links => CurrentUser.user.is_privileged?))
   end
 end

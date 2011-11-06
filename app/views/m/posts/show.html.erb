@@ -1,0 +1,11 @@
+<div id="c-m-posts">
+  <%= render "header" %>
+  
+  <%= image_tag(@post.large_file_url, :width => @post.large_image_width, :height => @post.large_image_height, :id => "image") %>
+  
+  <%= render "tags", :post => @post %>
+</div>
+
+<% content_for(:page_title) do %>
+  <%= @post.tag_string %> - <%= Danbooru.config.app_name %>
+<% end %>

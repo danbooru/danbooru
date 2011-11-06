@@ -1,0 +1,12 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<title><%= yield :page_title %></title> 
+  <%= csrf_meta_tag %>
+  <%= stylesheet_link_tag "mobile", :media => "screen" %>
+  <%= javascript_include_tag "mobile" %>
+</head> 
+<body>
+<%= yield :layout %>
+</body>
+</html>

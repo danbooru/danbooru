@@ -36,20 +36,26 @@ private
     html << %{<li class="category-#{categories[tag]}">}
     current_query = template.params[:tags] || ""
     
-    if categories[tag] == 1
-      html << %{<a class="wiki-link" href="/artists/show_or_new?name=#{u(tag)}">?</a> }
-    else
-      html << %{<a class="wiki-link" href="/wiki_pages?title=#{u(tag)}">?</a> }
-    end
+    unless options[:name_only]
+      if categories[tag] == 1
+        html << %{<a class="wiki-link" href="/artists/show_or_new?name=#{u(tag)}">?</a> }
+      else
+        html << %{<a class="wiki-link" href="/wiki_pages?title=#{u(tag)}">?</a> }
+      end
 
-    if CurrentUser.user.is_privileged?
-      html << %{<a href="/posts?tags=#{u(current_query)}+#{u(tag)}" class="search-inc-tag">+</a> }
-      html << %{<a href="/posts?tags=#{u(current_query)}+-#{u(tag)}" class="search-exl-tag">&ndash;</a> }
+      if CurrentUser.user.is_privileged?
+        html << %{<a href="/posts?tags=#{u(current_query)}+#{u(tag)}" class="search-inc-tag">+</a> }
+        html << %{<a href="/posts?tags=#{u(current_query)}+-#{u(tag)}" class="search-exl-tag">&ndash;</a> }
+      end
     end
     
     humanized_tag = tag.tr("_", " ")
-    html << %{<a href="/posts?tags=#{u(tag)}">#{h(humanized_tag)}</a> }
-    html << %{<span class="post-count">} + counts[tag].to_s + %{</span>}
+    path = options[:path_prefix] || "/posts"
+    html << %{<a href="#{path}?tags=#{u(tag)}">#{h(humanized_tag)}</a> }
+    
+    unless options[:name_only]
+      html << %{<span class="post-count">} + counts[tag].to_s + %{</span>}
+    end
     
     html << "</li>"
     html

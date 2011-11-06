@@ -13,25 +13,6 @@ article.post-preview {
   float: left;
   text-align: center;
   vertical-align: middle;
-  
-  div.text-post-preview {
-    font-size: $h2_size;
-    font-weight: bold;
-    height: 150px;
-    width: 150px;
-    display: block;
-    text-align: center;
-    line-height: 150px;
-    border: 1px solid #CCC;
-  }
-}
-
-div.text-post-medium {
-  height: 150px;
-  width: 480px;
-  text-align: center;
-  line-height: 480px;
-  border: 1px solid #CCC;
 }
 
 article.post-preview.blacklisted-active {

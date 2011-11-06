@@ -1,0 +1,138 @@
+@import "../common/000_vars.css.scss";
+
+header {
+  margin: 0 0 10px 0;
+  padding: 0 10px;
+  
+  input {
+    font-size: 1.5em;
+  }
+  
+  menu {
+    margin: 0;
+    padding: 0;
+    
+    li {
+      margin: 0;
+      padding: 0;
+      width: 33%;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    
+    li#search-item {
+      input {
+        font-size: 1.5em;
+      }
+    }
+    
+    li#site-item {
+      color: $link_color;
+      font-size: 1.5em;
+      text-align: center;
+    }
+    
+    li#sign-in-item {
+      text-align: right;
+      
+      a {
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+footer {
+  div.paginator {
+    overflow: visible;
+    
+    li {
+      a {
+        border: none;
+      }
+    }
+    
+    li:first-child {
+      float: left;
+    }
+    
+    li:last-child {
+      float: right;
+    }
+  }
+}
+
+div.post-previews {
+  overflow: visible;
+}
+
+article.post-preview {
+  height: 188px;
+  width: 188px;
+  display: inline-block;
+  float: left;
+  text-align: center;
+  vertical-align: middle;
+}
+
+article.post-preview.blacklisted-active {
+  display: none;
+}
+
+article.post-preview img {
+  border: 3px solid transparent;
+}
+
+article.post-preview.post-status-has-parent img {
+  border: 3px solid #CC0;
+}
+
+article.post-preview.post-status-has-children img {
+  border: 3px solid #0F0;
+}
+
+article.post-preview.post-status-pending img {
+  border: 3px solid #00F;
+}
+
+article.post-preview.post-status-flagged img {
+  border: 3px solid #F00;
+}
+
+img#image {
+  margin: 10px;
+}
+
+div#tag-list {
+  padding: 10px;
+  
+  li {
+    display: inline-block;
+
+    a {
+      background: #eee;
+      font-size: 1.5em;
+      font-weight: bold;
+      margin: 0 0.5em;
+      padding: 0.2em 0.5em;
+      border: 1px solid #666;
+      -moz-border-radius: 3px;
+      -webkit-border-radius: 3px;
+      border-radius: 3px;
+    }
+  }
+}
+
+div#c-posts {
+  li.category-1 a {
+    color: #A00;
+  }
+  
+  li.category-3 a {
+    color: #A0A;
+  }
+  
+  li.category-4 a {
+    color: #0A0;
+  }
+}
