@@ -3,6 +3,7 @@ Factory.define(:tag) do |f|
   f.post_count 0
   f.category {Tag.categories.general}
   f.related_tags ""
+  f.related_tags_updated_at {Time.now}
 end
 
 Factory.define(:artist_tag, :parent => :tag) do |f|

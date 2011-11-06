@@ -10,7 +10,7 @@ module Moderator
             FROM post_versions 
             JOIN users ON users.id = post_versions.updater_id 
             WHERE 
-              post_versions.created_at > ? 
+              post_versions.updated_at > ? 
               AND users.level <= ? 
             GROUP BY post_versions.updater_id 
             ORDER BY count(*) DESC 

@@ -8,7 +8,7 @@ class CreateUploads < ActiveRecord::Migration
       t.column :uploader_id, :integer, :null => false
       t.column :uploader_ip_addr, "inet", :null => false
       t.column :tag_string, :text, :null => false
-      t.column :status, :string, :null => false, :default => "pending"
+      t.column :status, :text, :null => false, :default => "pending"
       t.column :backtrace, :text
       t.column :post_id, :integer
       t.column :md5_confirmation, :string

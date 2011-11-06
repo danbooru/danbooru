@@ -14,7 +14,7 @@ class PostFlagsController < ApplicationController
   end
   
   def create
-    @post_flag = PostFlag.create(params[:post_flag])
+    @post_flag = PostFlag.create(params[:post_flag].merge(:is_resolved => false))
     respond_with(@post_flag)
   end
 

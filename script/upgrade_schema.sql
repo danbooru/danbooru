@@ -105,6 +105,7 @@ ALTER TABLE dmails ALTER COLUMN id SET DEFAULT nextval('dmails_id_seq'::regclass
 ALTER TABLE ONLY dmails ADD CONSTRAINT dmails_pkey PRIMARY KEY (id);
 CREATE INDEX index_dmails_on_message_index ON dmails USING gin (message_index);
 CREATE INDEX index_dmails_on_owner_id ON dmails USING btree (owner_id);
+CREATE TRIGGER trigger_dmails_on_update BEFORE INSERT OR UPDATE ON dmails FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('message_index', 'pg_catalog.english', 'title', 'body');
 insert into dmails (owner_id, from_id, to_id, title, body, is_read, is_deleted, created_at, updated_at) select dmails_orig.from_id, dmails_orig.from_id, dmails_orig.to_id, dmails_orig.title, dmails_orig.body, dmails_orig.has_seen, false, dmails_orig.created_at, dmails_orig.created_at from dmails_orig;
 insert into dmails (owner_id, from_id, to_id, title, body, is_read, is_deleted, created_at, updated_at) select dmails_orig.to_id, dmails_orig.from_id, dmails_orig.to_id, dmails_orig.title, dmails_orig.body, dmails_orig.has_seen, false, dmails_orig.created_at, dmails_orig.created_at from dmails_orig;
 drop table dmails_orig;
@@ -2969,7 +2970,7 @@ alter table pools rename column user_id to creator_id;
 alter table pools drop column is_public;
 alter table pools add column post_ids text not null default '';
 alter index pools_user_id_idx rename to index_pools_on_creator_id;
-update pools set post_ids = (select string_agg(x.post_id, ' ') from (select _.post_id::text from pools_posts _ where _.pool_id = pools.id order by _.sequence) x);
+update pools set post_ids = (select coalesce(string_agg(x.post_id, ' ')) from (select _.post_id::text from pools_posts _ where _.pool_id = pools.id order by _.sequence) x);
 
 alter table post_tag_histories rename to post_versions;
 alter table post_versions drop constraint fk_post_tag_histories__post;
@@ -3012,8 +3013,13 @@ alter table posts rename column general_tag_count to tag_count_general;
 alter table posts rename column artist_tag_count to tag_count_artist;
 alter table posts rename column character_tag_count to tag_count_character;
 alter table posts rename column copyright_tag_count to tag_count_copyright;
+alter table posts add column tag_count integer not null default 0;
+update posts set tag_count = tag_count_general + tag_count_artist + tag_count_character + tag_count_copyright;
+alter table posts add column updated_at timestamp without time zone;
+update posts set updated_at = created_at;
 alter table posts add column fav_string text not null default '';
 alter table posts add column pool_string text not null default '';
+alter table posts alter column source drop not null;
 CREATE TRIGGER trigger_posts_on_tag_index_update BEFORE INSERT OR UPDATE ON posts FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tag_index', 'public.danbooru', 'tag_string', 'fav_string', 'pool_string');
 alter index idx_posts__md5 rename to index_posts_on_md5;
 alter index idx_posts__created_at rename to index_posts_on_created_at;
@@ -3026,10 +3032,18 @@ alter index index_posts_on_width rename to index_posts_on_image_width;
 alter index index_posts_on_tags_index rename to index_posts_on_tag_index;
 alter index posts_mpixels rename to index_posts_on_mpixels;
 create index index_posts_on_uploader_ip_addr on posts (uploader_ip_addr);
-update posts set fav_string = (select string_agg('fav:' || _.user_id, ' ') from favorites _ where _.post_id = posts.id);
-update posts set pool_string = (select string_agg('pool:' || _.pool_id, ' ') from pools_posts _ where _.post_id = posts.id);
+update posts set fav_string = (select coalesce(string_agg('fav:' || _.user_id, ' '), '') from favorites _ where _.post_id = posts.id);
+update posts set pool_string = (select coalesce(string_agg('pool:' || _.pool_id, ' '), '') from pools_posts _ where _.post_id = posts.id);
 drop function trg_posts_tags__delete();
 drop function trg_posts_tags__insert();
+
+alter table post_appeals rename column user_id to creator_id;
+alter index index_post_appeals_on_user_id rename to index_post_appeals_on_creator_id;
+alter table post_appeals rename column ip_addr to creator_ip_addr;
+alter index index_post_appeals_on_ip_addr to index_post_appeals_on_creator_ip_addr;
+
+create index index_post_flags_on_creator_id on post_flags (creator_id);
+create index index_post_flags_on_creator_ip_addr on post_flags (creator_ip_addr);
 
 drop table server_keys;
 drop table table_data;
@@ -3088,6 +3102,8 @@ alter table tags add column created_at timestamp without time zone;
 alter table tags add column updated_at timestamp without time zone;
 alter index idx_tags__name rename to index_tags_on_name;
 alter index idx_tags__post_count rename to index_tags_on_post_count;
+alter table tags alter column related_tags drop not null;
+alter table tags alter column related_tags_updated_at drop not null;
 
 alter table test_janitors rename to janitor_trials;
 alter table janitor_trials drop column id;
@@ -3126,6 +3142,8 @@ alter table users add column note_update_count integer not null default 0;
 alter table users add column favorite_count integer not null default 0;
 alter table users add column post_upload_count integer not null default 0;
 alter table users drop column invite_count;
+alter table users alter column last_logged_in_at drop not null;
+alter table users alter column last_forum_at drop not null;
 alter table users rename column upload_limit to base_upload_limit;
 alter table users drop column uploaded_tags;
 alter index idx_users__name rename to index_users_on_name;
@@ -3172,7 +3190,9 @@ alter index index_wiki_page_versions_on_user_id rename to index_wiki_page_versio
 alter table wiki_pages drop constraint fk_wiki_pages__user;
 drop trigger trg_wiki_page_search_update on wiki_pages;
 alter table wiki_pages drop column version;
+alter table wiki_pages drop column ip_addr;
 alter table wiki_pages rename column text_search_index to body_index;
+alter table wiki_pages rename column user_id to creator_id;
 alter index idx_wiki_pages__title rename to index_wiki_pages_on_title;
 alter index idx_wiki_pages__updated_at rename to index_wiki_pages_on_updated_at;
 alter index wiki_pages_search_idx rename to index_wiki_pages_on_body_index;
@@ -3205,7 +3225,7 @@ CREATE TABLE uploads (
     uploader_id integer NOT NULL,
     uploader_ip_addr inet NOT NULL,
     tag_string text NOT NULL,
-    status character varying(255) DEFAULT 'pending'::character varying NOT NULL,
+    status text DEFAULT 'pending' NOT NULL,
     backtrace text,
     post_id integer,
     md5_confirmation character varying(255),
@@ -3224,6 +3244,27 @@ ALTER TABLE ONLY uploads
     ADD CONSTRAINT uploads_pkey PRIMARY KEY (id);
 CREATE INDEX index_uploads_on_uploader_id ON uploads USING btree (uploader_id);
 CREATE INDEX index_uploads_on_uploader_ip_addr ON uploads USING btree (uploader_ip_addr);
+
+CREATE TABLE news_updates (
+    id integer NOT NULL,
+    message text NOT NULL,
+    creator_id integer NOT NULL,
+    updater_id integer NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+CREATE SEQUENCE news_updates_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+ALTER SEQUENCE news_updates_id_seq OWNED BY news_updates.id;
+ALTER TABLE news_updates ALTER COLUMN id SET DEFAULT nextval('news_updates_id_seq'::regclass);
+ALTER TABLE ONLY news_updates
+    ADD CONSTRAINT news_updates_pkey PRIMARY KEY (id);
+CREATE INDEX index_news_updates_on_created_at ON news_updates USING btree (created_at);
+
 
 delete from schema_migrations;
 COPY schema_migrations (version) FROM stdin;
@@ -3264,8 +3305,8 @@ COPY schema_migrations (version) FROM stdin;
 20110717010705
 20110722211855
 20110815233456
+20111101212358
 \.
-
 
 -- post processing
 drop table pools_posts;

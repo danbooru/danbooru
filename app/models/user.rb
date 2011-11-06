@@ -26,7 +26,6 @@ class User < ActiveRecord::Base
   validates_confirmation_of :password
   validates_presence_of :email, :if => lambda {|rec| rec.new_record? && Danbooru.config.enable_email_verification?}
   validate :validate_ip_addr_is_not_banned, :on => :create
-  before_validation :convert_blank_email_to_null
   before_validation :normalize_blacklisted_tags
   before_create :encrypt_password_on_create
   before_update :encrypt_password_on_update
@@ -301,12 +300,6 @@ class User < ActiveRecord::Base
         self.update_column(:email_verification_key, nil)
       else
         raise User::Error.new("Verification key does not match")
-      end
-    end
-    
-    def convert_blank_email_to_null
-      if email.blank?
-        self.email = nil
       end
     end
   end

@@ -4,6 +4,13 @@ class ArtistUrlTest < ActiveSupport::TestCase
   context "An artist url" do
     setup do
       MEMCACHE.flush_all
+      CurrentUser.user = Factory.create(:user)
+      CurrentUser.ip_addr = "127.0.0.1"
+    end
+    
+    teardown do
+      CurrentUser.user = nil
+      CurrentUser.ip_addr = nil
     end
 
     should "always add a trailing slash when normalized" do

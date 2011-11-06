@@ -343,7 +343,7 @@ class Tag < ActiveRecord::Base
     end
     
     def should_update_related?
-      related_tags.blank? || related_tags_updated_at < related_cache_expiry.hours.ago
+      related_tags.blank? || related_tags_updated_at.blank? || related_tags_updated_at < related_cache_expiry.hours.ago
     end
     
     def related_tag_array

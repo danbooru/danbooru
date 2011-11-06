@@ -6,6 +6,7 @@ Factory.define(:user) do |f|
   f.default_image_size "medium"
   f.base_upload_limit 10
   f.level 20
+  f.last_logged_in_at {Time.now}
 end
 
 Factory.define(:banned_user, :parent => :user) do |f|

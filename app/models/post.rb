@@ -292,7 +292,7 @@ class Post < ActiveRecord::Base
         raise PostFlag::Error.new("Post is locked and cannot be flagged")
       end
       
-      flag = flags.create(:reason => reason)
+      flag = flags.create(:reason => reason, :is_resolved => false)
       
       if flag.errors.any?
         raise PostFlag::Error.new(flag.errors.full_messages.join("; "))
