@@ -44,6 +44,12 @@ footer {
   }
 }
 
+div#posts {
+  overflow: visible;
+  clear: both;
+  padding-top: 10px;
+}
+
 div.post-previews {
   overflow: visible;
 }
