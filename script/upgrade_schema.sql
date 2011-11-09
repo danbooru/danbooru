@@ -86,7 +86,7 @@ CREATE TABLE dmails (
     owner_id integer NOT NULL,
     from_id integer NOT NULL,
     to_id integer NOT NULL,
-    title character varying(255) NOT NULL,
+    title text NOT NULL,
     body text NOT NULL,
     message_index tsvector NOT NULL,
     is_read boolean DEFAULT false NOT NULL,
@@ -113,9 +113,12 @@ drop table dmails_orig;
 alter table tag_subscriptions drop column id;
 alter table tag_subscriptions add column id serial primary key;
 
+alter table favorites drop constraint fk_favorites__post;
+alter table favorites drop constraint fk_favorites__user;
+alter table favorites drop constraint favorites_pkey;
+drop index idx_favorites__post;
+drop index idx_favorites__user;
 alter table favorites rename to favorites_orig;
-alter table favorites_orig drop constraint fk_favorites__post;
-alter table favorites_orig drop constraint fk_favorites__user;
 
 CREATE FUNCTION favorites_insert_trigger() RETURNS trigger
     LANGUAGE plpgsql
@@ -1340,8 +1343,6 @@ CREATE TABLE favorites_99 (CONSTRAINT favorites_99_user_id_check CHECK (((user_i
 INHERITS (favorites);
 
 ALTER TABLE favorites ALTER COLUMN id SET DEFAULT nextval('favorites_id_seq'::regclass);
-
-alter table favorites_orig drop constraint favorites_pkey;
 
 ALTER TABLE ONLY favorites
     ADD CONSTRAINT favorites_pkey PRIMARY KEY (id);
@@ -2889,6 +2890,7 @@ CREATE TRIGGER trigger_forum_topics_on_update
     BEFORE INSERT OR UPDATE ON forum_topics
     FOR EACH ROW
     EXECUTE PROCEDURE tsvector_update_trigger('text_index', 'pg_catalog.english', 'title');
+update forum_posts set creator_id = 1 where creator_id is null;
 insert into forum_topics (creator_id, updater_id, title, response_count, is_sticky, is_locked, text_index, created_at, updated_at, original_post_id) select forum_posts.creator_id, forum_posts.creator_id, forum_posts.title, forum_posts.response_count, forum_posts.is_sticky, forum_posts.is_locked, forum_posts.text_search_index, forum_posts.created_at, forum_posts.updated_at, forum_posts.id from forum_posts where parent_id is null;
 
 alter table forum_posts drop constraint forum_posts_creator_id_fkey;
@@ -2970,7 +2972,7 @@ alter table pools rename column user_id to creator_id;
 alter table pools drop column is_public;
 alter table pools add column post_ids text not null default '';
 alter index pools_user_id_idx rename to index_pools_on_creator_id;
-update pools set post_ids = (select coalesce(string_agg(x.post_id, ' ')) from (select _.post_id::text from pools_posts _ where _.pool_id = pools.id order by _.sequence) x);
+update pools set post_ids = (select coalesce(string_agg(x.post_id, ' '), '') from (select _.post_id::text from pools_posts _ where _.pool_id = pools.id order by _.sequence) x);
 
 alter table post_tag_histories rename to post_versions;
 alter table post_versions drop constraint fk_post_tag_histories__post;

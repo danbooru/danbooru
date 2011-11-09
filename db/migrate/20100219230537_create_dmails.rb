@@ -4,7 +4,7 @@ class CreateDmails < ActiveRecord::Migration
       t.column :owner_id, :integer, :null => false
       t.column :from_id, :integer, :null => false
       t.column :to_id, :integer, :null => false
-      t.column :title, :string, :null => false
+      t.column :title, :text, :null => false
       t.column :body, :text, :null => false
       t.column :message_index, "tsvector", :null => false
       t.column :is_read, :boolean, :null => false, :default => false
