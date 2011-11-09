@@ -1,13 +1,16 @@
 <header>
   <div id="sign-in-item">
-    <%= Danbooru.config.app_name %>
-    <% if true || CurrentUser.is_anonymous? %>
-      - <%= link_to "Sign in", new_m_session_path %>
+    <%= link_to Danbooru.config.app_name, posts_path %>
+    
+    <% if CurrentUser.is_anonymous? %>
+      &ndash; <%= link_to "Sign in", new_m_session_path(:url => request.fullpath) %>
+    <% else %>
+      &ndash; <%= link_to "Sign out", m_session_path, :remote => true, :method => :delete %>
     <% end %>
   </div>
   <div id="search-item">
     <%= form_tag(m_posts_path, :method => :get) do %>
-      <%= search_field_tag :tags, params[:tags] %>
+      <%= search_field_tag :tags, params[:tags], :placeholder => "Search" %>
     <% end %>
   </div>
 </header>

@@ -1,34 +1,43 @@
 @import "../common/000_vars.css.scss";
 
+$default_font_size: 30pt;
+
 div#main {
   max-width: 960px;
 }
 
 header {
-  margin: 10px;
-  padding: 0;
-  overflow: visible;
+  background: #eee;
+  height: 50px;
+  padding: 0 10px;
+  overflow: hidden;
   
+  div {
+    height: 50px;
+    vertical-align: middle;
+  }
+
   div#search-item {
     float: right;
     
     input {
-      font-size: 2em;
+      margin-top: 10%;
+      font-size: $default_font_size;
     }
   }
   
   div#sign-in-item {
     float: left;
-    font-size: 3em;
+    font-size: $default_font_size;
     font-weight: bold;
-    margin-top: 0.3em;
+    margin-top: 15px;
   }
 }
 
 footer {
   div.paginator {
     overflow: visible;
-    font-size: 3em;
+    font-size: $default_font_size;
     
     li {
       a {
@@ -102,13 +111,13 @@ div#tag-list {
 
     a {
       background: #eee;
-      font-size: 3em;
+      font-size: $default_font_size;
       font-weight: bold;
       padding: 0.2em 0.5em;
       border: 1px solid #666;
-      -moz-border-radius: 3px;
-      -webkit-border-radius: 3px;
-      border-radius: 3px;
+      -moz-border-radius: 0.5em;
+      -webkit-border-radius: 0.5em;
+      border-radius: 0.5em;
     }
   }
 }

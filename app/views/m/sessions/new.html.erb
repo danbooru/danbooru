@@ -1,0 +1,33 @@
+<div id="c-m-sessions">
+  <div id="a-new">
+    <section>
+      <h1>Sign in</h1>
+      <%= form_tag(session_path, :class => "simple_form") do %>
+        <%= hidden_field_tag "url", params[:url] %>
+
+        <div class="input">
+          <label for="name">Name</label>
+          <%= text_field_tag :name %>
+        </div>
+        
+        <div class="input">
+          <label for="password">Password</label>
+          <%= password_field_tag :password %>
+        </div>
+
+        <div class="input">
+          <label for="remember" id="remember-label">Remember</label>
+          <%= check_box_tag :remember %>
+        </div>
+        
+        <div class="input">
+          <%= submit_tag "Submit" %>
+        </div>
+      <% end %>
+    </section>   
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+ Sign in - <%= Danbooru.config.app_name %>
+<% end %>
