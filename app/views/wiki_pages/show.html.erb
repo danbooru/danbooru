@@ -18,6 +18,7 @@
 
 <% content_for(:page_title) do %>
   Wiki - <%= @wiki_page.pretty_title %> - <%= Danbooru.config.app_name %>
+  <meta name="description" content="<%= @wiki_page.presenter.blurb %>"></meta>
 <% end %>
 
 <%= render "secondary_links" %>
