@@ -1,3 +1,8 @@
+alter table posts add column fav_string text not null default '';
+alter table posts add column pool_string text not null default '';
+update posts set fav_string = (select coalesce(string_agg('fav:' || _.user_id, ' '), '') from favorites _ where _.post_id = posts.id);
+update posts set pool_string = (select coalesce(string_agg('pool:' || _.pool_id, ' '), '') from pools_posts _ where _.post_id = posts.id);
+
 create index index_advertisements_on_ad_type on advertisements (ad_type);
 
 alter table artist_urls drop constraint artist_urls_artist_id_fkey;
@@ -3019,8 +3024,6 @@ alter table posts add column tag_count integer not null default 0;
 update posts set tag_count = tag_count_general + tag_count_artist + tag_count_character + tag_count_copyright;
 alter table posts add column updated_at timestamp without time zone;
 update posts set updated_at = created_at;
-alter table posts add column fav_string text not null default '';
-alter table posts add column pool_string text not null default '';
 alter table posts alter column source drop not null;
 CREATE TRIGGER trigger_posts_on_tag_index_update BEFORE INSERT OR UPDATE ON posts FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tag_index', 'public.danbooru', 'tag_string', 'fav_string', 'pool_string');
 alter index idx_posts__md5 rename to index_posts_on_md5;
@@ -3034,8 +3037,6 @@ alter index index_posts_on_width rename to index_posts_on_image_width;
 alter index index_posts_on_tags_index rename to index_posts_on_tag_index;
 alter index posts_mpixels rename to index_posts_on_mpixels;
 create index index_posts_on_uploader_ip_addr on posts (uploader_ip_addr);
-update posts set fav_string = (select coalesce(string_agg('fav:' || _.user_id, ' '), '') from favorites _ where _.post_id = posts.id);
-update posts set pool_string = (select coalesce(string_agg('pool:' || _.pool_id, ' '), '') from pools_posts _ where _.post_id = posts.id);
 drop function trg_posts_tags__delete();
 drop function trg_posts_tags__insert();
 
