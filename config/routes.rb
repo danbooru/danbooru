@@ -174,58 +174,58 @@ Danbooru::Application.routes.draw do
   resources :fposts, :controller => "forum_posts"
 
   # legacy aliases
-  match "/artist" => "artists#index"
-  match "/artist/index" => "artists#index"
-  match "/artist/show/:id" => "artists#show"
-  match "/artist/history/:id" => "artist_versions#index"
+  match "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}"}
+  match "/artist/index" => redirect {|params, req| "/artists?page=#{req.params[:page]}"}
+  match "/artist/show/:id" => redirect("/artists/%{id}")
+  match "/artist/history/:id" => redirect("/artist_versions?search[artist_id]=%{id}")
   
-  match "/comment" => "comments#index"
-  match "/comment/index" => "comments#index"
-  match "/comment/show/:id" => "comments#show"
+  match "/comment" => redirect {|params, req| "/comments?page=#{req.params[:page]}"}
+  match "/comment/index" => redirect {|params, req| "/comments?page=#{req.params[:page]}"}
+  match "/comment/show/:id" => redirect("/comments/%{id}")
   
-  match "/favorite" => "favorites#index"
-  match "/favorite/index" => "favorites#index"
+  match "/favorite" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
+  match "/favorite/index" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
   
-  match "/forum" => "forum_topics#index"
-  match "/forum/index" => "forum_topics#index"
-  match "/forum/show/:id" => "forum_posts#show"
+  match "/forum" => redirect {|params, req| "/forum_topics?page=#{req.params[:page]}"}
+  match "/forum/index" => redirect {|params, req| "/forum_topics?page=#{req.params[:page]}"}
+  match "/forum/show/:id" => redirect("/forum_posts/%{id}")
 
-  match "/note" => "notes#index"
-  match "/note/index" => "notes#index"
-  match "/note/history" => "note_versions#index"
+  match "/note" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
+  match "/note/index" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
+  match "/note/history" => redirect("/note_versions")
   
-  match "/pool" => "pools#index"
-  match "/pool/index" => "pools#index"
-  match "/pool/show/:id" => "pools#show"
-  match "/pool/history/:id" => "pool_versions#index"
-  match "/pool/recent_changes" => "pool_versions#index"
+  match "/pool" => redirect {|params, req| "/pools?page=#{req.params[:page]}"}
+  match "/pool/index" => redirect {|params, req| "/pools?page=#{req.params[:page]}"}
+  match "/pool/show/:id" => redirect("/pools/%{id}")
+  match "/pool/history/:id" => redirect("/pool_versions?search[pool_id]=%{id}")
+  match "/pool/recent_changes" => redirect("/pool_versions")
   
-  match "/post/index" => "posts#index"
-  match "/post" => "posts#index"
-  match "/post/upload" => "uploads#new"
-  match "/post/moderate" => "moderator/post/queues#show"
-  match "/post/atom" => "posts#index.atom"
-  match "/post/atom.feed" => "posts#index.atom"
-  match "/post/popular_by_day" => "explore/posts#popular"
-  match "/post/popular_by_week" => "explore/posts#popular"
-  match "/post/popular_by_month" => "explore/posts#popular"
-  match "/post/show/:id/:tag_title" => "posts#show"
-  match "/post/show/:id" => "posts#show"
+  match "/post/index" => redirect {|params, req| "/posts?tags=#{params[:tags]}&page=#{req.params[:page]}"}
+  match "/post" => redirect {|params, req| "/posts?tags=#{req.params[:tags]}&page=#{req.params[:page]}"}
+  match "/post/upload" => redirect("/uploads/new")
+  match "/post/moderate" => redirect("/moderator/post/queues")
+  match "/post/atom" => redirect("/posts.atom")
+  match "/post/atom.feed" => redirect("/posts.atom")
+  match "/post/popular_by_day" => redirect("/explore/posts/popular")
+  match "/post/popular_by_week" => redirect("/explore/posts/popular")
+  match "/post/popular_by_month" => redirect("/explore/posts/popular")
+  match "/post/show/:id/:tag_title" => redirect("/posts/%{id}")
+  match "/post/show/:id" => redirect("/posts/%{id}")
   
-  match "/post_tag_history" => "post_versions#index"
-  match "/post_tag_history/index" => "post_versions#index"
+  match "/post_tag_history" => redirect {|params, req| "/post_versions?page=#{req.params[:page]}"}
+  match "/post_tag_history/index" => redirect {|params, req| "/post_versions?page=#{req.params[:page]}"}
   
-  match "/tag" => "tags#index"
-  match "/tag/index" => "tags#index"
+  match "/tag" => redirect {|params, req| "/tags?page=#{req.params[:page]}"}
+  match "/tag/index" => redirect {|params, req| "/tags?page=#{req.params[:page]}"}
   
-  match "/user" => "users#index"
-  match "/user/index" => "users#index"
+  match "/user" => redirect {|params, req| "/users?page=#{req.params[:page]}"}
+  match "/user/index" => redirect {|params, req| "/users?page=#{req.params[:page]}"}
   
-  match "/wiki" => "wiki_pages#index"
-  match "/wiki/index" => "wiki_pages#index"
-  match "/wiki/show/:title" => "wiki_pages#index"
-  match "/wiki/recent_changes" => "wiki_page_versions#index"
-  match "/wiki/history/:title" => "wiki_page_versions#index"
+  match "/wiki" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
+  match "/wiki/index" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
+  match "/wiki/show/:title" => redirect("/wiki_pages?title=%{title}")
+  match "/wiki/recent_changes" => redirect("/wiki_page_versions")
+  match "/wiki/history/:title" => redirect("/wiki_page_versions?title=%{title}")
 
   match "/static/keyboard_shortcuts" => "static#keyboard_shortcuts", :as => "keyboard_shortcuts"
   match "/static/bookmarklet" => "static#bookmarklet", :as => "bookmarklet"
