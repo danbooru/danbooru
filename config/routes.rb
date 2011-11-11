@@ -173,10 +173,64 @@ Danbooru::Application.routes.draw do
   resources :ftopics, :controller => "forum_topics"
   resources :fposts, :controller => "forum_posts"
 
+  # legacy aliases
+  match "/artist" => "artists#index"
+  match "/artist/index" => "artists#index"
+  match "/artist/show/:id" => "artists#show"
+  match "/artist/history/:id" => "artist_versions#index"
+  
+  match "/comment" => "comments#index"
+  match "/comment/index" => "comments#index"
+  match "/comment/show/:id" => "comments#show"
+  
+  match "/favorite" => "favorites#index"
+  match "/favorite/index" => "favorites#index"
+  
+  match "/forum" => "forum_topics#index"
+  match "/forum/index" => "forum_topics#index"
+  match "/forum/show/:id" => "forum_posts#show"
+
+  match "/note" => "notes#index"
+  match "/note/index" => "notes#index"
+  match "/note/history" => "note_versions#index"
+  
+  match "/pool" => "pools#index"
+  match "/pool/index" => "pools#index"
+  match "/pool/show/:id" => "pools#show"
+  match "/pool/history/:id" => "pool_versions#index"
+  match "/pool/recent_changes" => "pool_versions#index"
+  
+  match "/post/index" => "posts#index"
+  match "/post" => "posts#index"
+  match "/post/upload" => "uploads#new"
+  match "/post/moderate" => "moderator/post/queues#show"
+  match "/post/atom" => "posts#index.atom"
+  match "/post/atom.feed" => "posts#index.atom"
+  match "/post/popular_by_day" => "explore/posts#popular"
+  match "/post/popular_by_week" => "explore/posts#popular"
+  match "/post/popular_by_month" => "explore/posts#popular"
+  match "/post/show/:id/:tag_title" => "posts#show"
+  match "/post/show/:id" => "posts#show"
+  
+  match "/post_tag_history" => "post_versions#index"
+  match "/post_tag_history/index" => "post_versions#index"
+  
+  match "/tag" => "tags#index"
+  match "/tag/index" => "tags#index"
+  
+  match "/user" => "users#index"
+  match "/user/index" => "users#index"
+  
+  match "/wiki" => "wiki_pages#index"
+  match "/wiki/index" => "wiki_pages#index"
+  match "/wiki/show/:title" => "wiki_pages#index"
+  match "/wiki/recent_changes" => "wiki_page_versions#index"
+  match "/wiki/history/:title" => "wiki_page_versions#index"
+
   match "/static/keyboard_shortcuts" => "static#keyboard_shortcuts", :as => "keyboard_shortcuts"
   match "/static/bookmarklet" => "static#bookmarklet", :as => "bookmarklet"
   match "/static/site_map" => "static#site_map", :as => "site_map"
   match "/static/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
   
-  root :to => "landings#show"
+  root :to => "posts#index"
 end

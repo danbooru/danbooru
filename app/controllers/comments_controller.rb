@@ -4,12 +4,12 @@ class CommentsController < ApplicationController
   rescue_from User::PrivilegeError, :with => "static/access_denied"
 
   def index
-    if params[:group_by] == "post"
-      index_by_post
+    if params[:group_by] == "comment"
+      index_by_comment
     elsif request.format == Mime::JS
       index_for_post
     else
-      index_by_comment
+      index_by_post
     end
   end
   

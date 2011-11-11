@@ -8,10 +8,10 @@ class NotesController < ApplicationController
   end
   
   def index
-    if params[:group_by] == "post"
-      index_by_post
-    else
+    if params[:group_by] == "note"
       index_by_note
+    else
+      index_by_post
     end
   end
   
