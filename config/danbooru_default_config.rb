@@ -232,7 +232,7 @@ module Danbooru
     end
     
     def select_posts_visible_to_user(user, posts)
-      posts.select {|x| can_user_see_post?(x)}
+      posts.select {|x| can_user_see_post?(user, x)}
     end
     
     def pixiv_login

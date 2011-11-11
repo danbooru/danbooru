@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<title><%= Danbooru.config.app_name %></title>
+	<link href="http://<%= Danbooru.config.hostname %>/post/atom" rel="self"/>
+  <link href="http://<%= Danbooru.config.hostname %>/post/index" rel="alternate"/>
+  <id>http://<%= Danbooru.config.hostname %>/posts.atom?tags=<%= params[:tags] %></id>
+  <% if @posts.any? %>
+    <updated><%= @posts[0].created_at.gmtime.xmlschema %></updated>
+  <% end %>
+  <author><name><%= Danbooru.config.app_name %></name></author>
+
+  <% Danbooru.config.select_posts_visible_to_user(CurrentUser.user, @posts).each do |post| %>
+    <entry>
+      <title><%= post.tag_string %></title>
+      <link href="http://<%= Danbooru.config.hostname %>/posts/<%= post.id %>" rel="alternate"/>
+      <% if post.source =~ /^http/ %>
+        <link href="<%= post.source %>" rel="related"/>
+      <% end %>
+      <id>http://<%= Danbooru.config.hostname %>/posts/<%= post.id %></id>
+      <updated><%= post.created_at.gmtime.xmlschema %></updated>
+      <summary><%= post.tag_string %></summary>
+      <content type="xhtml">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+          <a href="http://<%= Danbooru.config.hostname %>/posts/<%= post.id %>">
+            <img src="http://<%= Danbooru.config.hostname %><%= post.preview_file_url %>"/>
+          </a>
+        </div>
+      </content>
+      <author>
+        <name><%= post.uploader_name %></name>
+      </author>
+    </entry>
+  <% end %>
+</feed>

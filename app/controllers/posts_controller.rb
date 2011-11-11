@@ -6,7 +6,9 @@ class PostsController < ApplicationController
   def index
     @post_set = PostSets::Post.new(tag_query, params[:page])
     @posts = @post_set.posts
-    respond_with(@posts)
+    respond_with(@posts) do |format|
+      format.atom
+    end
   end
   
   def show
