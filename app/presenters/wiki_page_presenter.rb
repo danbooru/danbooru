@@ -10,7 +10,7 @@ class WikiPagePresenter
   end
   
   def blurb
-    excerpt.gsub(/<.+?>/, "")
+    excerpt.try(:gsub, /<.+?>/, "")
   end
   
   # Produce a formatted page that shows the difference between two versions of a page.
