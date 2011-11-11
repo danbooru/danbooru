@@ -9,6 +9,10 @@ class WikiPagePresenter
     wiki_page.body.split(/\r\n|\r|\n/).first
   end
   
+  def blurb
+    excerpt.gsub(/<.+?>/, "")
+  end
+  
   # Produce a formatted page that shows the difference between two versions of a page.
   def diff(other_version)
     pattern = Regexp.new('(?:<.+?>)|(?:[0-9_A-Za-z\x80-\xff]+[\x09\x20]?)|(?:[ \t]+)|(?:\r?\n)|(?:.+?)')

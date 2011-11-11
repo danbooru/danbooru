@@ -31,3 +31,9 @@
   </div>
 </div>
 
+<%= content_for(:html_header) do %>
+  <%= auto_discovery_link_tag :atom, :controller => "posts", :action => "index", :format => "atom", :tags => params[:tags] %>
+  <% if @post_set.wiki_page %>
+    <meta name="description" content="<%= @post_set.wiki_page.presenter.blurb %>"></meta>
+  <% end %>
+<% end %>
