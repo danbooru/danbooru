@@ -65,10 +65,10 @@
 
     <div id="p3">
       <%= simple_form_for(@user) do |f| %>
-        <%= f.input :name %>
+        <%= f.input :name, :as => :string %>
         <%= f.input :password %>
         <%= f.input :password_confirmation %>
-        <%= f.input :email, :required => false %>
+        <%= f.input :email, :required => false, :as => :email %>
         <%= f.input :level, :collection => User.level_hash.to_a, :include_blank => false %>
         <%= f.button :submit %>
       <% end %>

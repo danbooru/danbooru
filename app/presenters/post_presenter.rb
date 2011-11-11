@@ -15,7 +15,7 @@ class PostPresenter < Presenter
     html << %{<a href="#{path}/#{post.id}">}
     
     if post.is_image?
-      html << %{<img src="#{post.preview_file_url}">}
+      html << %{<img src="#{post.preview_file_url}" alt="#{h(post.tag_string)}">}
     elsif post.is_flash?
       html << '<div class="text-post-preview">Flash</div>'
     else

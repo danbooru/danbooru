@@ -4,7 +4,7 @@
     
     <%= simple_form_for @user do |f| %>
       <fieldset>
-        <%= f.input :email, :required => Danbooru.config.enable_email_verification?, :hint => "Your email address (used for messages and for password resets)" %>
+        <%= f.input :email, :required => Danbooru.config.enable_email_verification?, :hint => "Your email address (used for messages and for password resets)", :as => :email %>
         <%= f.input :time_zone, :hint => "Your local time zone" %>
         <%= f.input :receive_email_notifications, :hint => "Enable to receive email notification when you receive a DMail" %>
         <%= f.input :comment_threshold, :hint => "Comments below this score will be hidden by default" %>
