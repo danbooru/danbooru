@@ -203,7 +203,7 @@ Danbooru::Application.routes.draw do
   match "/post/index" => redirect {|params, req| "/posts?tags=#{params[:tags]}&page=#{req.params[:page]}"}
   match "/post" => redirect {|params, req| "/posts?tags=#{req.params[:tags]}&page=#{req.params[:page]}"}
   match "/post/upload" => redirect("/uploads/new")
-  match "/post/moderate" => redirect("/moderator/post/queues")
+  match "/post/moderate" => redirect("/moderator/post/queue")
   match "/post/atom" => redirect("/posts.atom")
   match "/post/atom.feed" => redirect("/posts.atom")
   match "/post/popular_by_day" => redirect("/explore/posts/popular")

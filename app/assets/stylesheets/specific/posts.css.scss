@@ -105,12 +105,23 @@ div#c-posts {
   div#wiki-page-excerpt {
     position: relative;
     width: 40em;
+    background: #EEE;
+    padding: 0.5em;
+    margin-bottom: 1em;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    border-radius: 0.5em;
+    border: 1px solid #CCC;
+    
+    p:last-child {
+      margin-bottom: 0;
+    }
     
     div#hide-or-show-wiki-page-excerpt {
       font-size: 1em;
       position: absolute;
-      top: 0;
-      right: 0;
+      top: 9px;
+      right: 9px;
       
       span {
         cursor: pointer;
