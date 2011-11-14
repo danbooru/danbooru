@@ -6,12 +6,13 @@ div#c-users {
       margin-bottom: 0.5em;
     }
     
-    div.input span.hint {
-      visibility: hidden;
+    div.input {
+      margin-bottom: 2em;
     }
     
-    div.input:hover span.hint {
-      visibility: visible;
+    div.input span.hint {
+      display: block;
+      max-width: 30em;
     }
   }
   

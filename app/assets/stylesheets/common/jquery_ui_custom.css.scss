@@ -6,6 +6,11 @@ div.ui-dialog {
 }
 
 .ui-state-highlight {
-  border: 2px solid #999;
-  background: #eee;
+  border: 1px solid #FCEEC1;
+  background: #FDF5D9;
+}
+
+.ui-state-error {
+  border: 1px solid #FBC7C6;
+  background: #FDDFDE;
 }

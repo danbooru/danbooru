@@ -1,4 +1,4 @@
-<% if (post.is_flagged? || post.is_deleted?) && post.flags.any? %>
+<% if true || (post.is_flagged? || post.is_deleted?) && post.flags.any? %>
   <div class="ui-corner-all ui-state-highlight notice">
     This post has been flagged for deletion: <%= post_flag_reasons(post) %>
   </div>
