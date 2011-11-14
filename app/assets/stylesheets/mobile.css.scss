@@ -1,7 +1,7 @@
 /*
+ *= require "smoothness/jquery-ui-1.8.5.custom.css"
  *= require_self
- *= require "./common/010_reset"
- *= require "./common/020_base"
- *= require "./common/030_links"
+ *= require_tree "./common"
+ *= require_tree "./specific"
  *= require_tree "./mobile"
 */

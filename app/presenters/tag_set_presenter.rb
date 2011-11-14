@@ -51,7 +51,7 @@ private
     
     humanized_tag = tag.tr("_", " ")
     path = options[:path_prefix] || "/posts"
-    html << %{<a href="#{path}?tags=#{u(tag)}">#{h(humanized_tag)}</a> }
+    html << %{<a class="search-tag" href="#{path}?tags=#{u(tag)}">#{h(humanized_tag)}</a> }
     
     unless options[:name_only]
       html << %{<span class="post-count">} + counts[tag].to_s + %{</span>}

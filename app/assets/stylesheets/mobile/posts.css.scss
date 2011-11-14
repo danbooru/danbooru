@@ -1,135 +1,33 @@
 @import "../common/000_vars.css.scss";
 
-$default_font_size: 30pt;
-
-div#main {
-  max-width: 960px;
-}
-
-header {
-  background: #eee;
-  height: 50px;
-  padding: 0 10px;
-  overflow: hidden;
-  
-  div {
-    height: 50px;
-    vertical-align: middle;
-  }
-
-  div#search-item {
-    float: right;
-    
-    input {
-      margin-top: 10%;
-      font-size: $default_font_size;
-    }
+div#c-posts {
+  section#mode-box {
+    display: none;
   }
   
-  div#sign-in-item {
-    float: left;
-    font-size: $default_font_size;
-    font-weight: bold;
-    margin-top: 15px;
-  }
-}
-
-footer {
-  div.paginator {
-    overflow: visible;
-    font-size: $default_font_size;
-    
-    li {
-      a {
-        border: none;
+  section#tag-box {
+    ul {
+      font-size: $h2_size;
+      font-weight: bold;
+      
+      li {
+        margin: 0.5em 0;
       }
     }
     
-    li:first-child {
-      float: left;
+    a.search-tag {
     }
     
-    li:last-child {
-      float: right;
+    a.search-inc-tag {
+      display: none;
     }
-  }
-}
-
-div#posts {
-  overflow: visible;
-  clear: both;
-  padding-top: 10px;
-}
-
-div.post-previews {
-  overflow: visible;
-}
-
-article.post-preview {
-  height: 188px;
-  width: 188px;
-  float: left;
-  text-align: center;
-  vertical-align: middle;
-  @include inline-block;
-}
-
-article.post-preview.blacklisted-active {
-  display: none;
-}
-
-article.post-preview img {
-  border: 3px solid transparent;
-}
-
-article.post-preview.post-status-has-parent img {
-  border: 3px solid #CC0;
-}
-
-article.post-preview.post-status-has-children img {
-  border: 3px solid #0F0;
-}
-
-article.post-preview.post-status-pending img {
-  border: 3px solid #00F;
-}
-
-article.post-preview.post-status-flagged img {
-  border: 3px solid #F00;
-}
-
-img#image {
-  margin: 10px;
-}
-
-div#tag-list {
-  padding: 10px;
-  
-  li {
-    margin: 2.5em 0.5em;
-    @include inline-block;
-
-    a {
-      background: #eee;
-      font-size: $default_font_size;
-      font-weight: bold;
-      padding: 0.2em 0.5em;
-      border: 1px solid #666;
-      @include border-radius(0.5em);
+    
+    a.search-exl-tag {
+      display: none;
     }
-  }
-}
-
-div#c-posts {
-  li.category-1 a {
-    color: #A00;
-  }
-  
-  li.category-3 a {
-    color: #A0A;
-  }
-  
-  li.category-4 a {
-    color: #0A0;
+    
+    span.post-count {
+      display: none;
+    }
   }
 }
