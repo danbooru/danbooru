@@ -134,20 +134,16 @@ div#c-posts {
   
   div#a-show {
     menu#post-sections {
-      font-size: $h2_size;
-      font-weight: bold;
-      line-height: 1.25em;
-
+      margin-top: 1em;
+      font-size: $h3_size;
+      
       li {
-        padding: 0;
-        margin: 0 0.5em 0 0;
+        padding: 0.25em 0.5em;
         
-        a {
-          color: $link_dark_color;
-        }
-        
-        &.active a {
-          color: $link_color;
+        &.active {
+          background-color: $menu_color;
+          font-weight: bold;
+          @include border-radius(4px);
         }
       }
     }

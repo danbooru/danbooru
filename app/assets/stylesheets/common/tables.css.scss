@@ -11,11 +11,11 @@ table.striped {
   
   tbody {
     tr {
-      border-bottom: 1px solid $border_color;
-    }
-
-    tr:hover {
-      background-color: $reverse_highlight_color;
+      border-bottom: 1px solid #CCC;
+      
+      &:hover {
+        background-color: $highlight_color;
+      }
     }
   }
   
@@ -35,4 +35,3 @@ table.striped {
     background-color: #FAFAFA;
   }
 }
-  

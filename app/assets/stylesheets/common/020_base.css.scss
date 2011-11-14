@@ -43,7 +43,7 @@ em {
 h1, h2, h3, h4, h5, h6 {
   font-family: Tahoma, Verdana, Helvetica, sans-serif;
   font-weight: bold;
-  line-height: 1.25em;
+  line-height: 1.5em;
 }
 
 h1 {
@@ -76,22 +76,6 @@ img {
 
 img.wait {
   margin-left: 5px;
-}
-
-input[type=text], input[type=password], input[type=url], textarea, button {
-  font-size: 1em;
-}
-
-input[type=submit] {
-  padding: 1px 4px;
-  font-size: 1em;
-  cursor: pointer;
-}
-
-input:focus, textarea:focus {
-}
-
-input[type=submit]:hover {
 }
 
 legend {

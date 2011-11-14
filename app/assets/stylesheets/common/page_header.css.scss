@@ -1,3 +1,5 @@
+@import "000_vars.css.scss";
+
 header#top {
   h1 {
     font-size: 2.5em;
@@ -6,7 +8,7 @@ header#top {
   
   menu {
     margin-top: -2px;
-    background: #F7F7FF;
+    background: $menu_color;
     padding: 6px 20px;
     
     li {
@@ -24,8 +26,9 @@ header#top {
     background: white;
     
     li.current a {
-      background: #F7F7FF;
+      background: $menu_color;
       font-weight: bold;
+      @include border-radius(4px 4px 0 0);
     }
   }
 }
