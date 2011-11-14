@@ -10,3 +10,44 @@ $h3_size: 1.16667em;
 $h1_padding: 1.25em 0;
 $h2_padding: 1.45833em 0;
 $h3_padding: 1.51785em 0;
+
+@mixin round-border($radius) {
+  -moz-border-radius: $radius;
+  -webkit-border-radius:; $radius;
+  -ms-border-radius:; $radius;
+  -o-border-radius:; $radius;
+  border-radius: $radius;
+}
+
+@mixin box-shadow($x, $y, $blur, $color) {
+  -moz-box-shadow: $x $y $blur $color;
+  -webkit-box-shadow: $x $y $blur $color;
+  -ms-box-shadow: $x $y $blur $color;
+  -o-box-shadow: $x $y $blur $color;
+  box-shadow: $x $y $blur $color;
+}
+
+@mixin text-shadow($x, $y, $blur, $color) {
+  -moz-text-shadow: $x $y $blur $color;
+  -webkit-text-shadow: $x $y $blur $color;
+  -ms-text-shadow: $x $y $blur $color;
+  -o-text-shadow: $x $y $blur $color;
+  text-shadow: $x $y $blur $color;
+}
+
+@mixin transparency($value) {
+  opacity: $value;
+  -ms-filter: unqoute("progid:DXImageTransform.Microsoft.Alpha(Opacity=#{$value * 100})");
+  filter: unquote("alpha(opacity=#{$value * 100})");
+  zoom: 1;
+}
+
+@mixin inline-block {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+}

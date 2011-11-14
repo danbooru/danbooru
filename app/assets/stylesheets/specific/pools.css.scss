@@ -50,7 +50,7 @@ div#c-pool-orders {
         margin-bottom: 20px;
         width: 150px;
         padding: 10px;
-        display: inline-block;
+        @include inline-block;
       }
 
       li.ui-state-default {

@@ -3,7 +3,13 @@ Danbooru.Note = {
     create: function(id) {
       var $inner_border = $('<div/>');
       $inner_border.addClass("note-box-inner-border");
-      $inner_border.css({opacity: 0.5});
+      
+      $inner_border.css({
+        opacity: 0.5,
+        "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)",
+        "filter": "alpha(opacity=50)",
+        zoom: 1
+      });
 
       var $note_box = $('<div/>');
       $note_box.addClass("note-box");

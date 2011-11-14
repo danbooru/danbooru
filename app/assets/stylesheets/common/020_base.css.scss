@@ -79,28 +79,19 @@ img.wait {
 }
 
 input[type=text], input[type=password], input[type=url], textarea, button {
-/*  border: 1px solid #AAA;*/
   font-size: 1em;
-/*  -moz-border-radius: 4px;*/
-/*  -webkit-border-radius: 4px;*/
 }
 
 input[type=submit] {
   padding: 1px 4px;
-/*  border: 1px solid #AAA;*/
-/*  background-color: #EEE;*/
-/*  -moz-border-radius: 4px;*/
-/*  -webkit-border-radius: 4px;*/
   font-size: 1em;
   cursor: pointer;
 }
 
 input:focus, textarea:focus {
-/*  background-color: #FFD;*/
 }
 
 input[type=submit]:hover {
-/*  background-color: #F6F6F6;*/
 }
 
 legend {

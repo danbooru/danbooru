@@ -9,10 +9,10 @@ article.post-preview {
   width: 150px;
   margin-right: 30px;
   margin-bottom: 30px;
-  display: inline-block;
   float: left;
   text-align: center;
   vertical-align: middle;
+  @include inline-block;
 }
 
 article.post-preview.blacklisted-active {
@@ -108,10 +108,8 @@ div#c-posts {
     background: #EEE;
     padding: 0.5em;
     margin-bottom: 1em;
-    -moz-border-radius: 0.5em;
-    -webkit-border-radius: 0.5em;
-    border-radius: 0.5em;
     border: 1px solid #CCC;
+    @include border-radius(0.5em);
     
     p:last-child {
       margin-bottom: 0;

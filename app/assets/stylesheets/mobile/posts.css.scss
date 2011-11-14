@@ -68,10 +68,10 @@ div.post-previews {
 article.post-preview {
   height: 188px;
   width: 188px;
-  display: inline-block;
   float: left;
   text-align: center;
   vertical-align: middle;
+  @include inline-block;
 }
 
 article.post-preview.blacklisted-active {
@@ -106,8 +106,8 @@ div#tag-list {
   padding: 10px;
   
   li {
-    display: inline-block;
     margin: 2.5em 0.5em;
+    @include inline-block;
 
     a {
       background: #eee;
@@ -115,9 +115,7 @@ div#tag-list {
       font-weight: bold;
       padding: 0.2em 0.5em;
       border: 1px solid #666;
-      -moz-border-radius: 0.5em;
-      -webkit-border-radius: 0.5em;
-      border-radius: 0.5em;
+      @include border-radius(0.5em);
     }
   }
 }
