@@ -16,7 +16,7 @@ $(document).ready(function() {
       e.stopPropagation();
     });
 
-    $("#more-links").hide().offset({top: $("#site-map-link").offset().top + $("#site-map-link").height() + 10, left: $("#site-map-link").offset().left});  
+    $("#more-links").hide().offset({top: $("#site-map-link").offset().top, left: $("#site-map-link").offset().left + 10});  
 
     $(document).click(function(e) {
       $("#more-links").hide();

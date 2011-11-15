@@ -27,12 +27,12 @@ $baseline: 1em;
   box-shadow: $x $y $blur $color;
 }
 
-@mixin text-shadow($x, $y, $blur, $color) {
-  -moz-text-shadow: $x $y $blur $color;
-  -webkit-text-shadow: $x $y $blur $color;
-  -ms-text-shadow: $x $y $blur $color;
-  -o-text-shadow: $x $y $blur $color;
-  text-shadow: $x $y $blur $color;
+@mixin text-shadow($val) {
+  -moz-text-shadow: $val;
+  -webkit-text-shadow: $val;
+  -ms-text-shadow: $val;
+  -o-text-shadow: $val;
+  text-shadow: $val;
 }
 
 @mixin transparency($value) {

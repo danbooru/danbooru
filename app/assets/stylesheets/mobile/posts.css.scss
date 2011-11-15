@@ -7,27 +7,26 @@ div#c-posts {
   
   section#tag-box {
     ul {
-      font-size: $h1_size;
       font-weight: bold;
       
       li {
         margin: 0.5em 0;
       }
     }
-    
-    a.search-tag {
-    }
-    
-    a.search-inc-tag {
-      display: none;
-    }
-    
-    a.search-exl-tag {
-      display: none;
-    }
-    
-    span.post-count {
-      display: none;
-    }
+  }
+
+  a.search-tag {
+  }
+  
+  a.search-inc-tag {
+    display: none;
+  }
+  
+  a.search-exl-tag {
+    display: none;
+  }
+  
+  span.post-count {
+    display: none;
   }
 }
