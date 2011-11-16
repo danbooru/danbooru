@@ -10,21 +10,22 @@ $h1_padding: 1.25em 0;
 $h2_padding: 1.45833em 0;
 $h3_padding: 1.51785em 0;
 $baseline: 1em;
+$basefont: 100%;
 
-@mixin border-radius($radius) {
-  -moz-border-radius: $radius;
-  -webkit-border-radius: $radius;
-  -ms-border-radius: $radius;
-  -o-border-radius: $radius;
-  border-radius: $radius;
+@mixin border-radius($val) {
+  -moz-border-radius: $val;
+  -webkit-border-radius: $val;
+  -ms-border-radius: $val;
+  -o-border-radius: $val;
+  border-radius: $val;
 }
 
-@mixin box-shadow($x, $y, $blur, $color) {
-  -moz-box-shadow: $x $y $blur $color;
-  -webkit-box-shadow: $x $y $blur $color;
-  -ms-box-shadow: $x $y $blur $color;
-  -o-box-shadow: $x $y $blur $color;
-  box-shadow: $x $y $blur $color;
+@mixin box-shadow($val) {
+  -moz-box-shadow: $val;
+  -webkit-box-shadow: $val;
+  -ms-box-shadow: $val;
+  -o-box-shadow: $val;
+  box-shadow: $val;
 }
 
 @mixin text-shadow($val) {
@@ -69,4 +70,29 @@ $baseline: 1em;
   text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
   border-color: $secondaryColor $secondaryColor darken($secondaryColor, 15%);
   border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) opacify(rgba(0,0,0,0.1), 0.15);
+}
+
+@mixin transition($transition) {
+  -webkit-transition: $transition;
+     -moz-transition: $transition;
+      -ms-transition: $transition;
+       -o-transition: $transition;
+          transition: $transition;
+}
+
+@mixin vertical-three-colors-gradient($startColor: #00b3ee, $midColor: #7a43b6, $colorStop: 50%, $endColor: #c3325f) {
+  background-color: $endColor;
+  background-repeat: no-repeat;
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from($startColor), color-stop($colorStop, $midColor), to($endColor));
+  background-image: -webkit-linear-gradient($startColor, $midColor $colorStop, $endColor);
+  background-image: -moz-linear-gradient($startColor, $midColor $colorStop, $endColor);
+  background-image: -ms-linear-gradient($startColor, $midColor $colorStop, $endColor);
+  background-image: -o-linear-gradient($startColor, $midColor $colorStop, $endColor);
+  background-image: linear-gradient($startColor, $midColor $colorStop, $endColor);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{$startColor}', endColorstr='#{$endColor}', GradientType=0); // IE9 and down, gets no color-stop at all the proper fallback
+}
+
+// Reset filters for IE
+@mixin reset-filter() {
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
