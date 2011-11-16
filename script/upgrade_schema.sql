@@ -3043,7 +3043,7 @@ drop function trg_posts_tags__insert();
 alter table post_appeals rename column user_id to creator_id;
 alter index index_post_appeals_on_user_id rename to index_post_appeals_on_creator_id;
 alter table post_appeals rename column ip_addr to creator_ip_addr;
-alter index index_post_appeals_on_ip_addr to index_post_appeals_on_creator_ip_addr;
+alter index index_post_appeals_on_ip_addr rename to index_post_appeals_on_creator_ip_addr;
 
 create index index_post_flags_on_creator_id on post_flags (creator_id);
 create index index_post_flags_on_creator_ip_addr on post_flags (creator_ip_addr);
@@ -3146,7 +3146,7 @@ alter table users add column favorite_count integer not null default 0;
 alter table users add column post_upload_count integer not null default 0;
 alter table users drop column invite_count;
 alter table users alter column last_logged_in_at drop not null;
-alter table users alter column last_forum_at drop not null;
+alter table users alter column last_forum_read_at drop not null;
 alter table users rename column upload_limit to base_upload_limit;
 alter table users drop column uploaded_tags;
 alter index idx_users__name rename to index_users_on_name;

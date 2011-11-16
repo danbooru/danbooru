@@ -176,7 +176,7 @@ class User < ActiveRecord::Base
   
   module FavoriteMethods
     def favorites
-      Favorite.where("user_id = ?", id).order("id desc")
+      Favorite.where("user_id % 100 = #{id % 100} and user_id = #{id}").order("id desc")
     end
     
     def add_favorite!(post)
