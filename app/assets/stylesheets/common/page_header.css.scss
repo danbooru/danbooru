@@ -28,7 +28,6 @@ header#top {
     li.current a {
       background: $menu_color;
       font-weight: bold;
-      @include border-radius(4px 4px 0 0);
     }
   }
 }

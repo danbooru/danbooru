@@ -122,24 +122,15 @@ select:focus {
   outline: 1px dotted #666; // Select elements don't get box-shadow styles, so instead we do outline
 }
 
-// button styles
-button, input[type="submit"] {
-  // Sets the close button to the middle of message
-  .close {
-    font-family: Arial, sans-serif;
-    line-height: 18px;
-  }
-}
-
 // Base .btn styles
-button, input[type="submit"] {
+button, input[type="submit"], a.btn {
   // Button Base
   cursor: pointer;
   display: inline-block;
   @include vertical-three-colors-gradient(#fff, #fff, 25%, darken(#fff, 10%));
   padding: 3px 10px 3px;
   text-shadow: 0 1px 1px rgba(255,255,255,.75);
-  color: #222;
+  color: black;
   font-size: $basefont;
   line-height: normal;
   border: 1px solid #ccc;

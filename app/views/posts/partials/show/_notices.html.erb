@@ -1,4 +1,4 @@
-<% if true || (post.is_flagged? || post.is_deleted?) && post.flags.any? %>
+<% if (post.is_flagged? || post.is_deleted?) && post.flags.any? %>
   <div class="ui-corner-all ui-state-highlight notice">
     This post has been flagged for deletion: <%= post_flag_reasons(post) %>
   </div>
@@ -9,10 +9,10 @@
     This post is pending approval (<%= link_to "learn more", wiki_pages_path(:title => "help:post_moderation") %>)
     
     <% if CurrentUser.is_janitor? && !post.disapproved_by?(CurrentUser.user) %>
-      <span class="quick-mod">
-        <%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :method => :post, :remote => true %>
-        | <%= link_to "Disapprove", moderator_post_disapproval_path(:post_id => post.id), :method => :post, :remote => true %>
-      </span>
+      <div class="quick-mod">
+        <%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :method => :post, :remote => true, :class => "btn" %>
+        <%= link_to "Disapprove", moderator_post_disapproval_path(:post_id => post.id), :method => :post, :remote => true, :class => "btn" %>
+      </div>
     <% end %>
   </div>
 <% end %>
