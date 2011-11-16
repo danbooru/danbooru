@@ -16,7 +16,11 @@ $(document).ready(function() {
       e.stopPropagation();
     });
 
-    $("#more-links").hide().offset({top: $("#site-map-link").offset().top, left: $("#site-map-link").offset().left + 10});  
+    $("#more-links").position({
+      of: $("#site-map-link"),
+      my: "left top",
+      at: "left top"
+    }).hide();
 
     $(document).click(function(e) {
       $("#more-links").hide();
