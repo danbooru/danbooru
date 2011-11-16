@@ -57,6 +57,6 @@ div#more-links {
   width: 8em;
   line-height: 1.3em;
   padding: 0.2em 0.6em;
-  @include box-shadow(2px, 2px, 2px, #ccc);
+  @include box-shadow(2px 2px 2px #ccc);
 }
  
