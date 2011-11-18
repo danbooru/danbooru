@@ -1,7 +1,11 @@
 alter table posts add column fav_string text not null default '';
 alter table posts add column pool_string text not null default '';
-update posts set fav_string = (select coalesce(string_agg('fav:' || _.user_id, ' '), '') from favorites _ where _.post_id = posts.id);
-update posts set pool_string = (select coalesce(string_agg('pool:' || _.pool_id, ' '), '') from pools_posts _ where _.post_id = posts.id);
+
+-- TODO: REVERT
+update posts set fav_string = (select coalesce(string_agg('fav:' || _.user_id, ' '), '') from favorites _ where _.post_id = posts.id) where posts.id < 1000;
+  
+-- TODO: REVERT
+update posts set pool_string = (select coalesce(string_agg('pool:' || _.pool_id, ' '), '') from pools_posts _ where _.post_id = posts.id) where posts.id < 1000;
 
 create index index_advertisements_on_ad_type on advertisements (ad_type);
 

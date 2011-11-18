@@ -27,7 +27,7 @@ class UsersController < ApplicationController
   end
   
   def create
-    @user = User.create(params[:user], :as => :admin)
+    @user = User.create(params[:user], :as => CurrentUser.role)
     if @user.errors.empty?
       session[:user_id] = @user.id
     end
@@ -38,7 +38,7 @@ class UsersController < ApplicationController
   def update
     @user = User.find(params[:id])
     check_privilege(@user)
-    @user.update_attributes(params[:user], :as => :admin)
+    @user.update_attributes(params[:user], :as => CurrentUser.role)
     respond_with(@user)
   end
 
