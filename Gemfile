@@ -14,7 +14,7 @@ group :assets do
   gem "therubyracer"
 end
 
-gem "rails", "3.1.1"
+gem "rails", "3.1.3"
 gem "pg"
 gem "memcache-client", :require => "memcache"
 gem "delayed_job"

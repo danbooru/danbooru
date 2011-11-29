@@ -31,6 +31,7 @@ alter table artists add column other_names_index tsvector;
 alter table artists drop column updater_ip_addr;
 alter table artists rename column updater_id to creator_id;
 CREATE INDEX index_artists_on_other_names_index ON artists USING GIN (other_names_index);
+update artists set other_names_index = to_tsvector('public.danbooru', other_names);
 CREATE TRIGGER trigger_artists_on_update BEFORE INSERT OR UPDATE ON artists FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('other_names_index', 'public.danbooru', 'other_names');
 
 alter table banned_ips rename to ip_bans;
@@ -113,6 +114,7 @@ ALTER SEQUENCE dmails_id_seq OWNED BY dmails.id;
 ALTER TABLE dmails ALTER COLUMN id SET DEFAULT nextval('dmails_id_seq'::regclass);
 ALTER TABLE ONLY dmails ADD CONSTRAINT dmails_pkey PRIMARY KEY (id);
 CREATE INDEX index_dmails_on_message_index ON dmails USING gin (message_index);
+update dmails set message_index = to_tsvector('pg_catalog.english', title || ' ' || body);
 CREATE INDEX index_dmails_on_owner_id ON dmails USING btree (owner_id);
 CREATE TRIGGER trigger_dmails_on_update BEFORE INSERT OR UPDATE ON dmails FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('message_index', 'pg_catalog.english', 'title', 'body');
 insert into dmails (owner_id, from_id, to_id, title, body, is_read, is_deleted, created_at, updated_at) select dmails_orig.from_id, dmails_orig.from_id, dmails_orig.to_id, dmails_orig.title, dmails_orig.body, dmails_orig.has_seen, false, dmails_orig.created_at, dmails_orig.created_at from dmails_orig;
@@ -2895,6 +2897,7 @@ ALTER TABLE ONLY forum_topics
 CREATE INDEX index_forum_topics_on_creator_id ON forum_topics USING btree (creator_id);
 CREATE INDEX index_forum_topics_on_original_post_id ON forum_topics USING btree (original_post_id);
 CREATE INDEX index_forum_topics_on_text_index ON forum_topics USING gin (text_index);
+update forum_topics set text_index = to_tsvector('pg_catalog.english', title);
 CREATE TRIGGER trigger_forum_topics_on_update
     BEFORE INSERT OR UPDATE ON forum_topics
     FOR EACH ROW
@@ -3015,6 +3018,7 @@ alter table posts add column is_deleted boolean not null default false;
 update posts set is_pending = true where status = 'pending';
 update posts set is_flagged = true where status = 'flagged';
 update posts set is_deleted = true where status = 'deleted';
+update posts set up_score = score;
 alter table posts drop column status;
 alter table posts drop column sample_width;
 alter table posts drop column sample_height;
@@ -3071,6 +3075,7 @@ update tag_aliases set consequent_name = (select _.name from tags _ where _.id =
 alter table tag_aliases drop column alias_id;
 alter table tag_aliases add column created_at timestamp without time zone default now();
 alter table tag_aliases add column updated_at timestamp without time zone default now();
+update tag_aliases set creator_id = 1 where creator_id is null;
 
 alter table tag_implications drop constraint fk_tag_implications__child;
 alter table tag_implications drop constraint fk_tag_implications__parent;
@@ -3090,6 +3095,7 @@ alter table tag_implications drop column predicate_id;
 alter table tag_implications add column forum_topic_id integer;
 alter table tag_implications add column created_at timestamp without time zone default now();
 alter table tag_implications add column updated_at timestamp without time zone default now();
+update tag_implications set creator_id = 1 where creator_id is null;
 
 alter table tag_subscriptions drop constraint tag_subscriptions_user_id_fkey;
 alter table tag_subscriptions rename column user_id to creator_id;
@@ -3161,7 +3167,7 @@ update users set blacklisted_tags = (select string_agg(_.tags, E'\n') from user_
 update users set post_update_count = (select count(*) from post_versions where updater_id = users.id);
 update users set note_update_count = (select count(*) from note_versions where updater_id = users.id);
 update users set favorite_count = (select count(*) from favorites where user_id = users.id);
-drop table user_blacklisted_tags;
+-- drop table user_blacklisted_tags;
 
 CREATE TABLE user_password_reset_nonces (
     id integer NOT NULL,
