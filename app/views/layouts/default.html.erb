@@ -17,7 +17,6 @@
   <meta name="default-image-size" content="<%= CurrentUser.user.default_image_size %>">
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
   <%= stylesheet_link_tag "application", :media => "screen" %>
-  <%#= stylesheet_link_tag "mobile", :media => "only screen and (max-device-width:480px)" %>
   <%= javascript_include_tag "application" %>
   <%= Danbooru.config.custom_html_header_content %>
   <%= yield :html_header %>
@@ -36,6 +35,14 @@
   </header>
   
   <div id="page">
+    <% if CurrentUser.is_anonymous? && session[:started_at] && session[:started_at] < 1.minute.ago && cookies[:hide_sign_up_notice].blank? %>
+      <%= render "users/sign_up_notice" %>
+    <% end %>
+    
+    <% if !CurrentUser.is_anonymous? && !CurrentUser.is_privileged? && cookies[:hide_upgrade_account_notice].blank? && params[:action] != "upgrade_information" %>
+      <%= render "users/upgrade_notice" %>
+    <% end %>
+    
     <%- if flash[:notice] -%>
       <div class="ui-corner-all ui-state-highlight" id="notice"><%= flash[:notice] %></div>
     <%- else -%>

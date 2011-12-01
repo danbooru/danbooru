@@ -151,7 +151,15 @@ Danbooru::Application.routes.draw do
     end
   end
   resources :uploads
-  resources :users
+  resources :users do
+    collection do
+      get :upgrade_information
+    end
+    
+    member do
+      post :upgrade
+    end
+  end
   resources :user_feedbacks
   resources :wiki_pages do
     member do

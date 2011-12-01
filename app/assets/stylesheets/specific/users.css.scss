@@ -20,34 +20,17 @@ div#c-users {
     max-width: 50em;
     
     p {
+      font-size: 1.2em;
       margin-bottom: 1em;
+      line-height: 1.4em;
     }
     
-    li {
-      margin-left: 1em;
-      list-style-type: disc;
+    input[type=submit] {
+      padding: 5px 20px;
+      font-size: 20pt;
+      font-weight: bold;
     }
-    
-    div#account-comparison {
-      padding: 0 1em;
-      margin: 1em 0;
-      
-      h1 {
-        font-size: $h3_size;
-      }
-      
-      li {
-        font-size: 0.8em;
-        line-height: 1.5em;
-      }
-      
-      section {
-        width: 15em;
-        float: left;
-        padding-right: 1em;
-      }
-    }
-    
+
     footer.nav-links {
       font-size: 1.4545em;
       font-weight: bold;
@@ -57,6 +40,57 @@ div#c-users {
     
     div#p2 ul {
       margin-bottom: 2em;
+    }
+  }
+  
+  div#a-upgrade-information {
+    max-width: 55em;
+    font-size: 1.2em;
+    
+    form {
+      input {
+        font-size: 20pt;
+      }
+      
+      input[type=submit] {
+        padding: 5px 20px;
+        font-weight: bold;
+      }
+    }
+    
+    div#feature-comparison {
+      overflow: hidden;
+      margin-bottom: 1em;
+      
+      div.column {
+        width: 15em;
+        float: left;
+        border: 1px solid #666;
+        @include border-radius(4px);
+        padding: 0.25em 0.5em;
+        margin: 0.5em;
+        
+        h1 {
+          font-size: $h3_size;
+        }
+        
+        li {
+          margin-left: 1.5em;
+          list-style-type: disc;
+        }
+        
+        &#basic-account {
+          background: rgb(240, 255, 240);
+        }
+        
+        &#privileged-account {
+          background: rgb(255, 255, 240);
+        }
+
+        &#contributor-account {
+          background: rgb(240, 240, 240);
+        }
+      }
     }
   }
 }

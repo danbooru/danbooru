@@ -1,0 +1,50 @@
+<div id="c-users">
+  <div id="a-upgrade-information">
+    <h1>Upgrade Account</h1>
+    
+    <p class="copy">Annoyed by ads? Want more searching power? Upgrade your account for only $10 and become a power user of the best database of anime artwork on the internet.</p>
+    
+    <div id="feature-comparison">
+      <div class="column" id="basic-account">
+        <h1>Basic</h1>
+        <ul>
+          <li>Free</li>
+          <li>Ad supported</li>
+          <li>Search 2 tags at a time</li>
+        </ul>
+      </div>
+      
+      <div class="column" id="privileged-account">
+        <h1>Privileged</h1>
+        <ul>
+          <li>One time $10 fee</li>
+          <li>No ads</li>
+          <li>Search 8 tags at a time</li>
+          <li>Subscribe to tags</li>
+          <li>Warm fuzzy feeling</li>
+        </ul>
+      </div>
+      
+      <div class="column" id="contributor-account">
+        <h1>Contributor</h1>
+        <ul>
+          <li>Invite only</li>
+          <li>Unlimited uploads</li>
+        </ul>
+      </div>
+    </div>
+    
+    <p>Just provide your email address and details for upgrading your account will be sent to you. If you have any further questions or concerns, feel free to contact me at <%= mail_to Danbooru.config.contact_email, nil, :encode => :javascript %>.</p>
+
+    <%= form_tag(upgrade_user_path(CurrentUser.user)) do %>
+      <%= email_field_tag :email, CurrentUser.email %>
+      <%= submit_tag "Upgrade" %>
+    <% end %>
+  </div>
+</div>
+
+<%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Upgrade - <%= Danbooru.config.app_name %>
+<% end %>

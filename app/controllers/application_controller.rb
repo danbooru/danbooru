@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
   after_filter :reset_current_user
   before_filter :initialize_cookies
   before_filter :set_title
+  before_filter :set_started_at_session
   layout "default"
   
   rescue_from User::PrivilegeError, :with => :access_denied
@@ -38,6 +39,12 @@ protected
   def reset_current_user
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
+  end
+  
+  def set_started_at_session
+    if session[:started_at].blank?
+      session[:started_at] = Time.now
+    end
   end
   
   %w(member banned privileged contributor janitor moderator admin).each do |level|

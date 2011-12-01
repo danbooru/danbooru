@@ -1,79 +1,22 @@
 <div id="c-users">
   <div id="a-new">
-    <h1>Sign up</h1>
+    <h1>Sign Up</h1>
 
-    <% if @user.errors.empty? %>
-      <div id="p1">
-        <p><%= Danbooru.config.app_name %> is ad-sponsored and does not require an account to view. But in order to start uploading, editing, or creating content on this site, you will need to register. <em>Make sure you read and agree to the <%= link_to "terms of service", terms_of_service_path %> before registering. <strong>This site is open to web crawlers, therefore any name you choose will be public!</strong></em></p>
-
-        <p>Registration for a basic account is free but comes with some limitations.</p>
-
-        <div id="account-comparison">
-          <section>
-            <h1>Basic</h1>
-            <ul>
-              <li>Free</li>
-              <li>Uploads limited</li>
-              <li>Search up to 2 tags at once</li>
-              <li>Some hidden posts</li>
-              <li>Ads visible</li>
-              <li>Create and edit posts, favorites, forum posts, comments, wiki pages, pools, artists, and dmails</li>
-            </ul>
-          </section>
-
-          <section>
-            <h1>Privileged</h1>
-            <ul>
-              <li>One time $20 fee</li>
-              <li>Uploads limited</li>
-              <li>Search up to 6 tags at once</li>
-              <li>No hidden posts</li>
-              <li>No ads</li>
-              <li>Tag subscriptions</li>
-            </ul>
-          </section>
-
-          <section>
-            <h1>Contributor</h1>
-            <ul>
-              <li>Invitation only</li>
-              <li>No upload limits</li>
-            </ul>
-          </section>
-
-          <div class="clearfix"></div>
-        </div>
-      </div>
-
-      <div id="p2">
-        <p>There are some restrictions on names:</p>
-
-        <ul>
-          <li><strong>Name</strong>: Your name must be at least 2 characters and at most 20 characters long. It cannot contain spaces or colons. All characters must be US-ASCII.</li>
-          <li><strong>Password</strong>: Your password must be at least 5 characters long.</li>
-          <li>
-            <strong>Email</strong>:
-            <% if Danbooru.config.enable_email_verification? %>
-              You must enter a valid email address. You will need to verify your email address after registering.
-            <% else %>
-              You can optionally enter an email address. Although optional, you will not be able to reset your password without an email address.
-            <% end %>
-          </li>
-        </ul>
-      </div>
-    <% end %>
+    <p>A basic account is <strong>free</strong> and lets you keep favorites, upload artwork, and write comments. If you want <%= link_to "more features", wiki_pages_path(:title => "help:accounts") %> you can upgrade your account later.</p>
 
     <div id="p3">
       <%= simple_form_for(@user) do |f| %>
         <%= f.input :name, :as => :string %>
+        <%= f.input :email, :required => false, :as => :email %>
         <%= f.input :password %>
         <%= f.input :password_confirmation %>
-        <%= f.input :email, :required => false, :as => :email %>
-        <%= f.button :submit %>
+        <%= f.button :submit, "Sign up" %>
       <% end %>
     </div>
   </div>
 </div>
+
+<%= render "secondary_links" %>
 
 <% content_for(:page_title) do %>
   Sign up - <%= Danbooru.config.app_name %>

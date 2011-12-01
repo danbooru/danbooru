@@ -1,15 +1,10 @@
-$(document).ready(function() {
-  // $("#hide-upgrade-account-link").click(function() {
-  //   $("#upgrade-account").hide();
-  //   Cookie.put('hide-upgrade-account', '1', 7);
-  // });
-  
+$(function() {
   // Table striping
-  $("table.striped tbody tr:even").addClass("even");
-  $("table.striped tbody tr:odd").addClass("odd");
+  $(".striped tbody tr:even").addClass("even");
+  $(".striped tbody tr:odd").addClass("odd");
 
+  // More link
   if ($("#site-map-link").length > 0) {
-    // More link
     $("#site-map-link").click(function(e) {
       $("#more-links").toggle();
       e.preventDefault();
@@ -27,6 +22,19 @@ $(document).ready(function() {
     });
   }
   
+  // Account notices
+  $("#hide-sign-up-notice").click(function(e) {
+    $("#sign-up-notice").hide();
+    Danbooru.Cookie.put("hide_sign_up_notice", "1", 7);
+    e.preventDefault();
+  });
+  
+  $("#hide-upgrade-account-notice").click(function(e) {
+    $("#upgrade-account-notice").hide();
+    Danbooru.Cookie.put('hide_upgrade_account_notice', '1', 7);
+    e.preventDefault();
+  });
+  
   // Ajax links
   $("a[data-remote=true]").click(function(e) {
     Danbooru.ajax_start(e.target);
@@ -38,7 +46,6 @@ $(document).ready(function() {
 
   // TOS link
   if (!location.href.match(/terms_of_service/) && Danbooru.Cookie.get("tos") !== "1") {
-    // Setting location.pathname in Safari doesn't work, so manually extract the domain.
     var domain = location.href.match(/^(http:\/\/[^\/]+)/)[0];
     location.href = domain + "/static/terms_of_service?url=" + location.href;
   }

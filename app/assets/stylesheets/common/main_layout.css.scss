@@ -8,6 +8,22 @@ div#page {
   overflow: visible;
   margin: 0 30px;
   
+  div#upgrade-account-notice, div#sign-up-notice {
+    margin: 1em 0;
+    padding: 1em;
+    text-align: center;
+    position: relative;
+    
+    h1 {
+      font-size: $h2_size;
+      font-weight: bold;
+    }
+    
+    p {
+      margin: 0;
+    }
+  }
+  
   aside#sidebar {
     width: 20%;
     float: left;
