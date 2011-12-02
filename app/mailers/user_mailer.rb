@@ -5,4 +5,12 @@ class UserMailer < ActionMailer::Base
     @dmail = dmail
     mail(:to => dmail.to.email, :subject => "#{Danbooru.config.app_name} - Message received from #{dmail.from.name}")    
   end
+  
+  def upgrade(user, email)
+    mail(:to => email, :subject => "#{Danbooru.config.app_name} account upgrade")
+  end
+  
+  def upgrade_fail(email)
+    mail(:to => email, :subject => "#{Danbooru.config.app_name} account upgrade")
+  end
 end

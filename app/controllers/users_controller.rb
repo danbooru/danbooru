@@ -41,6 +41,16 @@ class UsersController < ApplicationController
     @user.update_attributes(params[:user], :as => CurrentUser.role)
     respond_with(@user)
   end
+  
+  def upgrade
+    @user = User.find(params[:id])
+    
+    if params[:email] =~ /paypal/
+      UserMailer.upgrade_fail(params[:email]).deliver
+    else
+      UserMailer.upgrade(@user, params[:email]).deliver
+    end
+  end
 
 private
   def check_privilege(user)

@@ -17,7 +17,7 @@ div#c-users {
   }
   
   div#a-new {
-    max-width: 50em;
+    max-width: 40em;
     
     p {
       font-size: 1.2em;
@@ -44,7 +44,7 @@ div#c-users {
   }
   
   div#a-upgrade-information {
-    max-width: 55em;
+    max-width: 40em;
     font-size: 1.2em;
     
     form {
@@ -63,7 +63,7 @@ div#c-users {
       margin-bottom: 1em;
       
       div.column {
-        width: 15em;
+        width: 11em;
         float: left;
         border: 1px solid #666;
         @include border-radius(4px);

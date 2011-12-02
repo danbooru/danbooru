@@ -22,6 +22,10 @@ module Danbooru
       "webmaster@#{server_host}"
     end
     
+    def upgrade_account_email
+      contact_email
+    end
+    
     # Stripped of any special characters.
     def safe_app_name
       app_name.gsub(/[^a-zA-Z0-9_-]/, "_")
