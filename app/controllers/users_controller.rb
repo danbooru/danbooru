@@ -50,6 +50,8 @@ class UsersController < ApplicationController
     else
       UserMailer.upgrade(@user, params[:email]).deliver
     end
+    
+    redirect_to user_path(@user), :notice => "Email was sent"
   end
 
 private

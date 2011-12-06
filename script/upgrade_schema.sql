@@ -61,6 +61,7 @@ alter table comments rename column user_id to creator_id;
 alter index index_comments_on_user_id rename to index_comments_on_creator_id;
 drop trigger trg_comment_search_update on comments;
 CREATE TRIGGER trigger_comments_on_update BEFORE INSERT OR UPDATE ON comments FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('body_index', 'pg_catalog.english', 'body');
+update comments set creator_id = 1 where creator_id is null;
 
 CREATE TABLE delayed_jobs (
     id integer NOT NULL,
@@ -3047,6 +3048,7 @@ alter index posts_mpixels rename to index_posts_on_mpixels;
 create index index_posts_on_uploader_ip_addr on posts (uploader_ip_addr);
 drop function trg_posts_tags__delete();
 drop function trg_posts_tags__insert();
+update posts set uploader_id = 1 where uploader_id is null;
 
 alter table post_appeals rename column user_id to creator_id;
 alter index index_post_appeals_on_user_id rename to index_post_appeals_on_creator_id;
@@ -3167,7 +3169,7 @@ update users set blacklisted_tags = (select string_agg(_.tags, E'\n') from user_
 update users set post_update_count = (select count(*) from post_versions where updater_id = users.id);
 update users set note_update_count = (select count(*) from note_versions where updater_id = users.id);
 update users set favorite_count = (select count(*) from favorites where user_id = users.id);
--- drop table user_blacklisted_tags;
+drop table user_blacklisted_tags;
 
 CREATE TABLE user_password_reset_nonces (
     id integer NOT NULL,

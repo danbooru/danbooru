@@ -11,6 +11,7 @@ $(function() {
       e.stopPropagation();
     });
 
+    $("#more-links").show();
     $("#more-links").position({
       of: $("#site-map-link"),
       my: "left top",

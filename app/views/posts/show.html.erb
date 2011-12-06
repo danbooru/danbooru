@@ -52,11 +52,11 @@
         <%= render "comments/partials/index/list", :comments => @post.comments, :post => @post, :show_header => false %>
       </section>
 
-      <section id="notes">
+      <section id="notes" style="display: none;">
         <%= render :partial => "notes/note", :collection => @post.notes.active %>
       </section>
 
-      <section id="edit">
+      <section id="edit" style="display: none;">
         <%= render "posts/partials/show/edit", :post => @post %>
       </section>
     </section>    

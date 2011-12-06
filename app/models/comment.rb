@@ -57,10 +57,6 @@ class Comment < ActiveRecord::Base
     return vote
   end
   
-  def creator_name
-    creator.name.tr("_", " ")
-  end
-  
   def editable_by?(user)
     creator_id == user.id || user.is_moderator?
   end
