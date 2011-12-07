@@ -39,24 +39,24 @@ article.post-preview.post-status-flagged img {
   border: 3px solid #F00;
 }
 
+.category-1 a {
+  color: #A00;
+}
+
+.category-3 a {
+  color: #A0A;
+}
+
+.category-4 a {
+  color: #0A0;
+}
+
+.post-count {
+  color: #CCC;
+  margin-left: 0.2em;
+}
+
 div#c-posts {
-  .category-1 a {
-    color: #A00;
-  }
-  
-  .category-3 a {
-    color: #A0A;
-  }
-  
-  .category-4 a {
-    color: #0A0;
-  }
-  
-  span.post-count {
-    color: #CCC;
-    margin-left: 0.2em;
-  }
-  
   div.notice {
     font-size: 0.8em;
     padding: 1em;
