@@ -92,7 +92,7 @@ update-rc.d -f nginx defaults
 mkdir -p /opt/nginx/conf/sites
 curl -s https://raw.github.com/r888888888/danbooru/master/script/install/nginx.conf > /opt/nginx/conf/nginx.conf
 curl -s https://raw.github.com/r888888888/danbooru/master/script/install/nginx.danbooru.conf > /opt/nginx/conf/sites/danbooru.conf
-sed -i -e 's/\$hostname/$HOSTNAME/g' /opt/nginx/conf/sites/danbooru.conf
+sed -i -e 's/__hostname__/$HOSTNAME/g' /opt/nginx/conf/sites/danbooru.conf
 /etc/init.d/nginx start
 
 echo "%wheel  ALL=(ALL)       ALL" >> /etc/sudoers
@@ -137,8 +137,8 @@ echo "* modify the config/deploy/staging.rb and production.rb      *"
 echo "* files to point to the correct servers. Then run:           *"
 echo "* cap deploy:setup && cap deploy                             *"
 echo "*                                                            *"
-echo "* The first account will automatically be made an admin. You *"
-echo "* can edit the configuration files by editing                *"
+echo "* The first account will automatically be made an admin.     *"
+echo "* You can edit the configuration files by editing            *"
 echo "* /var/www/danbooru/shared/config/local_config and           *"
 echo "* /var/www/danbooru/shared/config/database.yml               *"
 echo "**************************************************************"
