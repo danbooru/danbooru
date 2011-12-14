@@ -138,6 +138,10 @@ module Danbooru
       5.megabytes
     end
     
+    def member_comment_time_threshold
+      1.week.ago
+    end
+    
     # The name of the server the app is hosted on.
     def server_host
       Socket.gethostname

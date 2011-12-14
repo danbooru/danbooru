@@ -7,6 +7,6 @@ Factory.define(:note) do |f|
   f.height 0
   f.is_active true
   f.body {Faker::Lorem.sentences.join}
-  f.updater_id {|x| x.creator_id}
+  f.updater_id {|x| x.association(:user)}
   f.updater_ip_addr "127.0.0.1"
 end
