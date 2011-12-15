@@ -12,8 +12,8 @@ class PostAppeal < ActiveRecord::Base
   scope :recent, lambda {where(["created_at >= ?", 1.day.ago])}
   
   def validate_creator_is_not_limited
-    if appeal_count_for_creator >= 5
-      errors[:creator] << "can appeal 5 posts a day"
+    if appeal_count_for_creator >= 1
+      errors[:creator] << "can appeal one post a day"
       false
     else
       true

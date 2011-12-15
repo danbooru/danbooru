@@ -4,7 +4,13 @@ module PostFlagsHelper
     html << '<ul>'
     
     post.flags.each do |flag|
-      html << '<li>' + flag.reason + ' - ' + link_to(flag.creator.name, user_path(flag.creator)) + ' ' + time_ago_in_words(flag.created_at) + ' ago</li>'
+      html << '<li>' + flag.reason
+      
+      if CurrentUser.is_janitor?
+        html << ' - ' + link_to(flag.creator.name, user_path(flag.creator))
+      end
+
+      html << ' ' + time_ago_in_words(flag.created_at) + ' ago</li>'
     end
     
     html << '</ul>'
