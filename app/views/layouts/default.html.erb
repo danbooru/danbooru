@@ -17,6 +17,7 @@
   <meta name="default-image-size" content="<%= CurrentUser.user.default_image_size %>">
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
   <%= stylesheet_link_tag "application", :media => "screen" %>
+  <%= stylesheet_link_tag "mobile", :media => "only screen and (max-width: 480px), only screen and (max-device-width: 480px)" %>
   <%= javascript_include_tag "application" %>
   <%= Danbooru.config.custom_html_header_content %>
   <%= yield :html_header %>
