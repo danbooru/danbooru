@@ -51,13 +51,17 @@ input,
 textarea,
 select {
   display: inline-block;
-  width: 210px;
   height: $baseline;
   padding: 4px;
   font-size: $basefont;
   line-height: $baseline;
   border: 1px solid #ccc;
   @include border-radius(3px);
+}
+
+input,
+textarea {
+  width: 210px;
 }
 
 select {
