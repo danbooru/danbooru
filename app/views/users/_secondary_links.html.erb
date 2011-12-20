@@ -16,6 +16,9 @@
       <% if !CurrentUser.is_privileged? %>
         <li><%= link_to "Upgrade", upgrade_information_users_path %></li>
       <% end %>
+      <% if CurrentUser.is_admin? %>
+        <li><%= link_to "Promote", edit_admin_user_path(@user) %></li>
+      <% end %>
       <li>|</li>
       <li><%= link_to "Sign out", session_path, :method => :delete %></li>
     <% end %>
