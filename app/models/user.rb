@@ -25,10 +25,12 @@ class User < ActiveRecord::Base
   validates_confirmation_of :password
   validates_presence_of :email, :if => lambda {|rec| rec.new_record? && Danbooru.config.enable_email_verification?}
   validate :validate_ip_addr_is_not_banned, :on => :create
+  validate :validate_feedback_on_name_change, :on => :update
   before_validation :normalize_blacklisted_tags
   before_create :encrypt_password_on_create
   before_update :encrypt_password_on_update
   after_save :update_cache
+  after_update :update_remote_cache
   before_create :promote_to_admin_if_first_user
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
   has_many :posts, :foreign_key => "uploader_id"
@@ -71,7 +73,7 @@ class User < ActiveRecord::Base
     
     module ClassMethods
       def name_to_id(name)
-        Cache.get("uni:#{Cache.sanitize(name)}") do
+        Cache.get("uni:#{Cache.sanitize(name)}", 1.hour) do
           select_value_sql("SELECT id FROM users WHERE lower(name) = ?", name.downcase)
         end
       end
@@ -97,6 +99,21 @@ class User < ActiveRecord::Base
     
     def update_cache
       Cache.put("uin:#{id}", name)
+    end
+    
+    def update_remote_cache
+      if name_changed?
+        Danbooru.config.other_server_hosts.each do |server|
+          Net::HTTP.delete(URI.parse("http://#{server}/users/#{id}/cache"))
+        end
+      end
+    end
+    
+    def validate_feedback_on_name_change
+      if feedback.negative.count > 0 && name_changed?
+        self.errors[:base] << "You can not change your name if you have any negative feedback"
+        return false
+      end
     end
   end
   

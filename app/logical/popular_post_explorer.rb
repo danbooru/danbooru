@@ -9,8 +9,7 @@ class PopularPostExplorer
 private
 
   def load_posts
-    # Post.tag_match("order:rank").where("image_width >= ?", Danbooru.config.medium_image_width).limit(5).offset(offset)
-    @posts = Post.where("image_width >= ?", Danbooru.config.medium_image_width).limit(50)
+    Post.tag_match("order:rank").where("image_width >= ?", Danbooru.config.medium_image_width).limit(5).offset(offset)
   end
   
   def sort_posts

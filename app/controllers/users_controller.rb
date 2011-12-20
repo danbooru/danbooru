@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   respond_to :html, :xml, :json
-  before_filter :member_only, :only => [:edit, :update]
+  before_filter :member_only, :only => [:edit, :update, :upgrade]
   rescue_from User::PrivilegeError, :with => "static/access_denied"
 
   def new
@@ -52,6 +52,12 @@ class UsersController < ApplicationController
     end
     
     redirect_to user_path(@user), :notice => "Email was sent"
+  end
+  
+  def cache
+    @user = User.find(params[:id])
+    @user.update_cache
+    render :nothing => true
   end
 
 private

@@ -158,6 +158,7 @@ Danbooru::Application.routes.draw do
     end
     
     member do
+      delete :cache
       post :upgrade
     end
   end
@@ -171,7 +172,7 @@ Danbooru::Application.routes.draw do
     end
   end
   resources :wiki_page_versions, :only => [:index, :show]
-
+  
   # aliases
   resources :wpages, :controller => "wiki_pages"
   resources :ftopics, :controller => "forum_topics"
