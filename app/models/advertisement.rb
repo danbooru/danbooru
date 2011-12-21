@@ -50,6 +50,12 @@ class Advertisement < ActiveRecord::Base
       image_size = ImageSize.new(File.open(image_path, "rb"))
       self.width = image_size.get_width
       self.height = image_size.get_height
+      
+      if width > height
+        self.ad_type = "horizontal"
+      else
+        self.ad_type = "vertical"
+      end
     end
   end
   

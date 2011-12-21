@@ -55,7 +55,7 @@ private
           tag_implication = TagImplication.where("antecedent_name = ? and consequent_name = ?", token[1], token[2]).first
           raise "Implication for #{token[1]} not found" if tag_implication.nil?
           tag_implication.destroy
-      
+        
         else
           raise "Unknown token: #{token[0]}"
         end
