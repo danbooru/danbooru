@@ -1,10 +1,10 @@
 <div id="c-moderator-tags">
   <div id="a-edit">
-    <h1>Edit Tags</h1>
+    <h1>Mass Edit</h1>
     
-    <%= form_tag(moderator_tag_path, :method => :put) do %>
+    <%= form_tag(moderator_tag_path, :method => :put, :class => "simple_form") do %>
       <div class="input">
-        <label>Predicate</label>
+        <label>Antecedent</label>
         <%= text_field :tag, :antecedent, :value => params[:antecedent] %>
       </div>
       
@@ -14,12 +14,12 @@
       </div>
       
       <div class="input">
-        <%= submit_tag %>
+        <%= submit_tag "Submit" %>
       </div>
     <% end %>
   </div>
 </div>
 
 <% content_for(:page_title) do %>
-  Edit Tag - <%= Danbooru.config.app_name %>
+  Mass Edit - <%= Danbooru.config.app_name %>
 <% end %>
