@@ -205,7 +205,9 @@ Danbooru::Application.routes.draw do
   match "/pool/history/:id" => redirect("/pool_versions?search[pool_id]=%{id}")
   match "/pool/recent_changes" => redirect("/pool_versions")
   
-  match "/post/index" => redirect {|params, req| "/posts?tags=#{params[:tags]}&page=#{req.params[:page]}"}
+  match "/post/index.xml", :controller => "legacy", :action => "posts", :format => "xml"
+  match "/post/index.json", :controller => "legacy", :action => "posts", :format => "json"
+  match "/post/index" => redirect {|params, req| "/posts?tags=#{req.params[:tags]}&page=#{req.params[:page]}"}
   match "/post" => redirect {|params, req| "/posts?tags=#{req.params[:tags]}&page=#{req.params[:page]}"}
   match "/post/upload" => redirect("/uploads/new")
   match "/post/moderate" => redirect("/moderator/post/queue")

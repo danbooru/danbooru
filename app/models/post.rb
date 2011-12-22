@@ -1058,6 +1058,42 @@ class Post < ActiveRecord::Base
       options[:except] += hidden_attributes
       super(options, &block)
     end
+    
+    def to_legacy_json
+      return {
+        "has_comments" => last_commented_at.present?,
+        "parent_id" => parent_id,
+        "status" => status,
+        "has_children" => has_children?,
+        "created_at" => created_at.to_formatted_s(:db),
+        "md5" => md5,
+        "has_notes" => last_noted_at.present?,
+        "rating" => rating,
+        "author" => uploader.name,
+        "creator_id" => uploader_id,
+        "width" => image_width,
+        "source" => source,
+        "preview_url" => preview_file_url,
+        "score" => score,
+        "tags" => tag_string,
+        "height" => image_height,
+        "file_size" => file_size,
+        "id" => id,
+        "file_url" => file_url
+      }.to_json
+    end
+    
+    def status
+      if is_pending?
+        "pending"
+      elsif is_deleted?
+        "deleted"
+      elsif is_flagged?
+        "flagged"
+      else
+        "active"
+      end
+    end
   end
   
   include FileMethods
