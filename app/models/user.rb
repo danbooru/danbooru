@@ -73,13 +73,13 @@ class User < ActiveRecord::Base
     
     module ClassMethods
       def name_to_id(name)
-        Cache.get("uni:#{Cache.sanitize(name)}", 1.hour) do
+        Cache.get("uni:#{Cache.sanitize(name)}", 4.hours) do
           select_value_sql("SELECT id FROM users WHERE lower(name) = ?", name.downcase)
         end
       end
       
       def id_to_name(user_id)
-        Cache.get("uin:#{user_id}", 1.hour) do
+        Cache.get("uin:#{user_id}", 4.hours) do
           select_value_sql("SELECT name FROM users WHERE id = ?", user_id) || Danbooru.config.default_guest_name
         end
       end
