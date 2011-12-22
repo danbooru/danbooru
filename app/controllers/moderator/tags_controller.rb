@@ -7,9 +7,8 @@ module Moderator
     end
     
     def update
-      tag_batch_change = TagBatchChange.new(params[:tag][:antecedent], params[:tag][:consequent])
-      tag_batch_change.execute
-      redirect_to edit_moderator_tag_path, :notice => "Posts updated"
+      Delayed::Job.enqueue(TagBatchChange.new(params[:tag][:antecedent], params[:tag][:consequent], CurrentUser.user, CurrentUser.ip_addr))
+      redirect_to edit_moderator_tag_path, :notice => "Post changes queued"
     end
     
     def error

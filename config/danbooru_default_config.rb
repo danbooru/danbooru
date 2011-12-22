@@ -243,6 +243,10 @@ module Danbooru
       posts.select {|x| can_user_see_post?(user, x)}
     end
     
+    def max_appeals_per_day
+      1
+    end
+    
     def pixiv_login
       nil
     end

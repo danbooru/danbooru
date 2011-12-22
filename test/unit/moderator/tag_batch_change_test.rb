@@ -16,16 +16,16 @@ module Moderator
       end
 
       should "execute" do
-        tag_batch_change = TagBatchChange.new("aaa", "bbb")
-        tag_batch_change.execute
+        tag_batch_change = TagBatchChange.new("aaa", "bbb", @user, "127.0.0.1")
+        tag_batch_change.perform
         @post.reload
         assert_equal("bbb", @post.tag_string)
       end
       
       should "raise an error if there is no predicate" do
-        tag_batch_change = TagBatchChange.new("", "bbb")
+        tag_batch_change = TagBatchChange.new("", "bbb", @user, "127.0.0.1")
         assert_raises(TagBatchChange::Error) do
-          tag_batch_change.execute
+          tag_batch_change.perform
         end
       end
     end

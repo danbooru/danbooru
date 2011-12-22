@@ -7,6 +7,7 @@ class PostAppealTest < ActiveSupport::TestCase
       CurrentUser.user = @alice
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
+      Danbooru.config.stubs(:max_appeals_per_day).returns(5)
     end
 
     teardown do
@@ -37,7 +38,7 @@ class PostAppealTest < ActiveSupport::TestCase
         assert_difference("PostAppeal.count", 0) do
           @post_appeal.save
         end
-        assert_equal(["You can appeal 5 posts a day"], @post_appeal.errors.full_messages)
+        assert_equal(["You can appeal at most 5 post a day"], @post_appeal.errors.full_messages)
       end
       
       should "not be able to appeal an active post" do
