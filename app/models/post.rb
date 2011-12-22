@@ -1069,7 +1069,7 @@ class Post < ActiveRecord::Base
         "md5" => md5,
         "has_notes" => last_noted_at.present?,
         "rating" => rating,
-        "author" => uploader.name,
+        "author" => uploader_name,
         "creator_id" => uploader_id,
         "width" => image_width,
         "source" => source,

@@ -79,7 +79,7 @@ class User < ActiveRecord::Base
       end
       
       def id_to_name(user_id)
-        Cache.get("uin:#{user_id}") do
+        Cache.get("uin:#{user_id}", 1.hour) do
           select_value_sql("SELECT name FROM users WHERE id = ?", user_id) || Danbooru.config.default_guest_name
         end
       end
@@ -107,6 +107,8 @@ class User < ActiveRecord::Base
           Net::HTTP.delete(URI.parse("http://#{server}/users/#{id}/cache"))
         end
       end
+    rescue Exception
+      # swallow, since it'll be expired eventually anyway
     end
     
     def validate_feedback_on_name_change
