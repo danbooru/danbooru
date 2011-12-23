@@ -6,6 +6,10 @@
   Danbooru.Post.initialize_all = function() {
     this.initialize_titles();
     
+    if ($("#c-posts").length) {
+      this.initialize_shortcuts();
+    }
+    
     if ($("#c-posts").length && $("#a-index").length) {
       this.initialize_wiki_page_excerpt();
     }
@@ -16,6 +20,21 @@
       this.initialize_post_sections();
       this.initialize_post_image_resize_links();
       this.initialize_image_resize();
+    }
+  }
+  
+  Danbooru.Post.initialize_shortcuts = function() {
+    key('/', function(e) {
+      $("#tags").trigger("focus"); 
+      e.preventDefault();
+    });
+    
+    if ($("#a-show").length) {
+      key('e', function(e) {
+        $("#post-edit-link").trigger("click");
+        $("#post_tag_string").trigger("focus");
+        e.preventDefault();
+      });
     }
   }
   

@@ -5,8 +5,9 @@ div#c-static {
     overflow: visible;
     
     section {
-      width: 33%;
+      width: 20%;
       float: left;
+      margin-bottom: 1em;
       
       h1 {
         font-size: $h3_size;
