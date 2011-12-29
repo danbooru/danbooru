@@ -26,7 +26,7 @@
     <% end %>
   </div>
   
-  <% if CurrentUser.is_privileged? %>
+  <% if CurrentUser.is_janitor? %>
     <div class="input">
       <%= f.label :blank, "Lock" %>
       
