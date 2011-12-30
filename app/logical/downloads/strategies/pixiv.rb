@@ -4,6 +4,7 @@ module Downloads
       def rewrite(url, headers)
         if url =~ /https?:\/\/(?:\w+\.)?pixiv\.net/
           url, headers = rewrite_headers(url, headers)
+          url, headers = rewrite_html_pages(url, headers)
           url, headers = rewrite_small_images(url, headers)
           url, headers = rewrite_small_manga_pages(url, headers)
         end
@@ -15,6 +16,18 @@ module Downloads
       def rewrite_headers(url, headers)
         headers["Referer"] = "http://www.pixiv.net"
         return [url, headers]
+      end
+      
+      def rewrite_html_pages(url, headers)
+        # example: http://www.pixiv.net/member_illust.php?mode=big&illust_id=23828655
+
+        if url =~ %r!illust_id=\d+!
+          source = ::Sources::Strategies::Pixiv.new(url)
+          source.get
+          return [source.image_url, headers]
+        else
+          return [url, headers]
+        end
       end
       
       def rewrite_small_images(url, headers)

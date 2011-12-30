@@ -30,6 +30,10 @@ module Downloads
     def after_download
       fix_image_board_sources
     end
+    
+    def url
+      URI.parse(source)
+    end
   
     def http_get_streaming(options = {})
       max_size = options[:max_size] || Danbooru.config.max_file_size
@@ -37,19 +41,17 @@ module Downloads
       limit = 4
 
       while true
-        url = URI.parse(source)
-
         unless url.is_a?(URI::HTTP)
           raise Error.new("URL must be HTTP")
         end
 
+        headers = {
+          "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
+        }
+        @source, headers = before_download(source, headers)
+        
         Net::HTTP.start(url.host, url.port) do |http|
           http.read_timeout = 10
-          headers = {
-            "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
-          }
-          @source, headers = before_download(@source, headers)
-          url = URI.parse(source)
           http.request_get(url.request_uri, headers) do |res|
             case res
             when Net::HTTPSuccess then

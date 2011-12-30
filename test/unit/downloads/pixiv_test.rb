@@ -15,6 +15,20 @@ module Downloads
       end
     end
     
+    context "a download for a html page" do
+      setup do
+        @source = "http://www.pixiv.net/member_illust.php?mode=big&illust_id=23828655"
+        @source = "http://www.pixiv.net/member_illust.php?mode=big&illust_id=4348318"
+        @tempfile = Tempfile.new("danbooru-test")
+        @download = Downloads::File.new(@source, @tempfile.path)
+        @download.download!
+      end
+      
+      should "work" do
+        assert_equal(185778, ::File.size(@tempfile.path))
+      end
+    end
+    
     context "a download for a small image" do
       setup do
         @source = "http://img02.pixiv.net/img/wanwandoh/4348318_m.jpg"
