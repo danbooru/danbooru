@@ -171,13 +171,13 @@ div#c-explore-posts {
 
 div#c-post-versions {
   div#a-index {
-    ins {
+    ins, ins a {
       color: green;
       text-decoration: none;
       margin-right: 0.5em;
     }
     
-    del {
+    del, del a {
       color: red;
       text-decoration: line-through;
       margin-right: 0.5em;
