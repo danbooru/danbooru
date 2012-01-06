@@ -16,7 +16,9 @@
     
     <% if CurrentUser.is_janitor? && !post.disapproved_by?(CurrentUser.user) %>
       <div class="quick-mod">
-        <%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :method => :post, :remote => true, :class => "btn" %>
+        <% unless post.is_status_locked? %>
+          <%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :method => :post, :remote => true, :class => "btn" %>
+        <% end %>
         <%= link_to "Disapprove", moderator_post_disapproval_path(:post_id => post.id), :method => :post, :remote => true, :class => "btn" %>
       </div>
     <% end %>
