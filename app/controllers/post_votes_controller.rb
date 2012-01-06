@@ -1,5 +1,5 @@
 class PostVotesController < ApplicationController
-  before_filter :member_only
+  before_filter :privileged_only
   
   def create
     @post = Post.find(params[:post_id])

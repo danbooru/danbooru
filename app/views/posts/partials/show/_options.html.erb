@@ -8,15 +8,17 @@
     <li><%= link_to "Unfavorite", favorite_path(post), :remote => true, :method => :delete, :id => "remove-from-favorites" %></li>
   <% end %>
   <li><%= link_to "Translate", "#", :id => "translate", :title => "Shortcut is CTRL+N" %></li>
-  <li><%= link_to "Flag", new_post_flag_path(:post_id => post.id), :id => "flag" %></li>
-  <li><%= link_to "Appeal", new_post_appeal_path(:post_id => post.id), :id => "appeal" %></li>
-  <% if CurrentUser.is_janitor? && !post.is_status_locked? %>
-    <li><%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :remote => true, :method => :post, :id => "approve" %></li>
-    <li><%= link_to "Disapprove", moderator_post_disapproval_path(:post_id => post.id), :remote => true, :method => :post, :id => "disapprove" %></li>
-  <% end %>
-  <% if CurrentUser.is_moderator? && !post.is_status_locked? %>
-    <li><%= link_to "Undelete", undelete_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "undelete" %></li>
-    <li><%= link_to "Delete", delete_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "delete" %></li>
+  <% unless post.is_status_locked? %>
+    <li><%= link_to "Flag", new_post_flag_path(:post_id => post.id), :id => "flag" %></li>
+    <li><%= link_to "Appeal", new_post_appeal_path(:post_id => post.id), :id => "appeal" %></li>
+    <% if CurrentUser.is_janitor? %>
+      <li><%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :remote => true, :method => :post, :id => "approve" %></li>
+      <li><%= link_to "Disapprove", moderator_post_disapproval_path(:post_id => post.id), :remote => true, :method => :post, :id => "disapprove" %></li>
+    <% end %>
+    <% if CurrentUser.is_moderator? %>
+      <li><%= link_to "Undelete", undelete_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "undelete" %></li>
+      <li><%= link_to "Delete", delete_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "delete" %></li>
+    <% end %>
   <% end %>
 
   <% if CurrentUser.is_admin? %>
