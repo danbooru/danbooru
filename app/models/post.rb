@@ -532,10 +532,6 @@ class Post < ActiveRecord::Base
   end
   
   module FavoriteMethods
-    def delete_favorites
-      Favorite.delete_all(:post_id => id)
-    end
-    
     def favorited_by?(user_id)
       fav_string =~ /(?:\A| )fav:#{user_id}(?:\Z| )/
     end
@@ -896,10 +892,11 @@ class Post < ActiveRecord::Base
     
     module ClassMethods
       def update_has_children_flag_for(post_id)
+        return if post_id.nil?
         has_children = Post.exists?(["is_deleted = ? AND parent_id = ?", false, post_id])
         execute_sql("UPDATE posts SET has_children = ? WHERE id = ?", has_children, post_id)
       end
-    
+      
       def recalculate_has_children_for_all_posts
         transaction do
           execute_sql("UPDATE posts SET has_children = false WHERE has_children = true")
@@ -920,7 +917,8 @@ class Post < ActiveRecord::Base
     end
     
     def update_parent_on_destroy
-      Post.update_has_children_flag_for(parent_id)
+      Post.update_has_children_flag_for(id)
+      Post.update_has_children_flag_for(parent_id) if parent_id
       Post.update_has_children_flag_for(parent_id_was) if parent_id_was && parent_id != parent_id_was
     end
     
@@ -931,8 +929,8 @@ class Post < ActiveRecord::Base
         children.first.update_column(:parent_id, nil)
       else
         cached_children = children
-        Post.update_all({:parent_id => cached_children[0].id}, :id => cached_children[1..-1].map(&:id))
         cached_children[0].update_column(:parent_id, nil)
+        Post.update_all({:parent_id => cached_children[0].id}, :id => cached_children[1..-1].map(&:id))
       end
     end
 
@@ -975,12 +973,12 @@ class Post < ActiveRecord::Base
       end
       
       Post.transaction do
+        update_column(:is_deleted, true)
         give_favorites_to_parent
         update_children_on_destroy
-        delete_favorites
-        decrement_tag_post_counts
-        update_column(:is_deleted, true)
         update_parent_on_destroy
+        decrement_tag_post_counts
+        update_column(:parent_id, nil)
         tag_array.each {|x| expire_cache(x)}
         ModAction.create(:description => "deleted post ##{id}")
       end

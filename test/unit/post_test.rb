@@ -113,29 +113,44 @@ class PostTest < ActiveSupport::TestCase
       end
     end
         
-    context "Destroying a post with a parent" do
-      should "reassign favorites to the parent" do
-        p1 = Factory.create(:post)
-        c1 = Factory.create(:post, :parent_id => p1.id)
-        user = Factory.create(:user)
-        c1.add_favorite!(user)
-        c1.delete!
-        p1.reload
-        assert(!Favorite.exists?(:post_id => c1.id, :user_id => user.id))
-        assert(Favorite.exists?(:post_id => p1.id, :user_id => user.id))
-      end
-
-      should "update the parent's has_children flag" do
-        p1 = Factory.create(:post)
-        c1 = Factory.create(:post, :parent_id => p1.id)
-        c1.delete!
-        p1.reload
-        assert(!p1.has_children?, "Parent should not have children")
-      end
-    end
-    
     context "Destroying a post with" do
+      context "a parent" do
+        should "reset the has_children flag of the parent" do
+          p1 = Factory.create(:post)
+          c1 = Factory.create(:post, :parent_id => p1.id)
+          c1.delete!
+          p1.reload
+          assert_equal(false, p1.has_children?)
+        end
+        
+        should "reassign favorites to the parent" do
+          p1 = Factory.create(:post)
+          c1 = Factory.create(:post, :parent_id => p1.id)
+          user = Factory.create(:user)
+          c1.add_favorite!(user)
+          c1.delete!
+          p1.reload
+          assert(!Favorite.exists?(:post_id => c1.id, :user_id => user.id))
+          assert(Favorite.exists?(:post_id => p1.id, :user_id => user.id))
+        end
+
+        should "update the parent's has_children flag" do
+          p1 = Factory.create(:post)
+          c1 = Factory.create(:post, :parent_id => p1.id)
+          c1.delete!
+          p1.reload
+          assert(!p1.has_children?, "Parent should not have children")
+        end
+      end
+      
       context "one child" do
+        should "remove the has_children flag" do
+          p1 = Factory.create(:post)
+          c1 = Factory.create(:post, :parent_id => p1.id)
+          p1.delete!
+          assert_equal(false, p1.has_children?)
+        end
+        
         should "remove the parent of that child" do
           p1 = Factory.create(:post)
           c1 = Factory.create(:post, :parent_id => p1.id)
