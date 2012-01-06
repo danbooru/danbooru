@@ -63,7 +63,8 @@ module Danbooru
         end
         
         def records_per_page
-          Danbooru.config.posts_per_page
+          # ugly hack but no easy way to pass this info down
+          Thread.current["records_per_page"] || Danbooru.config.posts_per_page
         end
 
         # taken from kaminari (https://github.com/amatsuda/kaminari)
