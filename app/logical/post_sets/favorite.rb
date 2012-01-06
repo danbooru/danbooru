@@ -12,7 +12,7 @@ module PostSets
     end
     
     def tag_string
-      tag_array.join(" ")
+      tag_array.uniq.join(" ")
     end
     
     def posts

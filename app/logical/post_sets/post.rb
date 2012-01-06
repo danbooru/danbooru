@@ -11,7 +11,7 @@ module PostSets
     end
     
     def tag_string
-      @tag_string ||= tag_array.join(" ")
+      @tag_string ||= tag_array.uniq.join(" ")
     end
     
     def has_wiki?
