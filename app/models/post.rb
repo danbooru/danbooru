@@ -135,7 +135,7 @@ class Post < ActiveRecord::Base
     def medium_file_url
       if has_medium?
         if is_flash?
-          "/images/480x200-flash.png"
+          "/data/preview/480x200-flash.png"
         else
           "/data/medium/#{file_path_prefix}#{md5}.jpg"
         end
@@ -154,7 +154,7 @@ class Post < ActiveRecord::Base
 
     def preview_file_url
       if is_flash?
-        return "/images/150x150-flash.png"
+        return "/data/preview/150x150-flash.png"
       end
       
       if Danbooru.config.ssd_path
@@ -677,6 +677,10 @@ class Post < ActiveRecord::Base
         relation = relation.where("posts.is_flagged = TRUE")
       elsif q[:status] == "deleted"
         relation = relation.where("posts.is_deleted = TRUE")
+      elsif q[:status] == "all" || q[:status] == "any"
+        # do nothing
+      else
+        relation = relation.where("posts.is_deleted <> TRUE")
       end
 
       if q[:source]
