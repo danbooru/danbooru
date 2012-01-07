@@ -17,7 +17,7 @@ module PostSetPresenters
     end
     
     def posts
-      favorites.map(&:post)
+      @posts ||= favorite_set.posts
     end
   end
 end
