@@ -17,6 +17,7 @@ class Dmail < ActiveRecord::Base
   scope :deleted, where(["is_deleted = ?", true])
   scope :search_message, lambda {|query| where(["message_index @@ plainto_tsquery(?)", query])}
   scope :unread, where("is_read = false and is_deleted = false")
+  scope :visible, lambda {where("(to_id = ? or from_id = ?)", CurrentUser.id, CurrentUser.id)}
   
   module AddressMethods
     def to_name
