@@ -709,19 +709,19 @@ class Post < ActiveRecord::Base
         relation = relation.where("(posts.id = ? or posts.parent_id = ?)", q[:parent_id], q[:parent_id])
       end
       
-      if q[:rating] == "q"
+      if q[:rating] =~ /^q/
         relation = relation.where("posts.rating = 'q'")
-      elsif q[:rating] == "s"
+      elsif q[:rating] =~ /^s/
         relation = relation.where("posts.rating = 's'")
-      elsif q[:rating] == "e"
+      elsif q[:rating] =~ /^e/
         relation = relation.where("posts.rating = 'e'")
       end
 
-      if q[:rating_negated] == "q"
+      if q[:rating_negated] =~ /^q/
         relation = relation.where("posts.rating <> 'q'")
-      elsif q[:rating_negated] == "s"
+      elsif q[:rating_negated] =~ /^s/
         relation = relation.where("posts.rating <> 's'")
-      elsif q[:rating_negated] == "e"
+      elsif q[:rating_negated] =~ /^e/
         relation = relation.where("posts.rating <> 'e'")
       end
       
