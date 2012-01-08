@@ -11,7 +11,7 @@
         <% @tags.each do |tag| %>
           <tr>
             <td><%= tag.post_count %></td>
-            <td class="tag-category-<%= tag.category_name %>">
+            <td class="category-<%= tag.category %>">
               <%= link_to("?", wiki_pages_path(:title => tag.name)) %>
               <%= link_to(tag.name, posts_path(:tags => tag.name)) %>
             </td>
