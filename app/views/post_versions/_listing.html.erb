@@ -17,7 +17,11 @@
         <tr id="post-version-<%= post_version.id %>">
           <td><%= link_to(post_version.post_id, post_path(post_version.post_id)) %></td>
           <td><%= compact_time(post_version.updated_at) %></td>
-          <td><%= link_to(post_version.updater.name, user_path(post_version.updater_id)) %></td>
+          <td>
+            <% if post_version.updater %>
+              <%= link_to(post_version.updater.name, user_path(post_version.updater_id)) %>
+            <% end %>
+          </td>
           <td><%= post_version.rating %></td>
           <td><%= post_version.parent_id %></td>
           <td>
