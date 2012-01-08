@@ -50,7 +50,7 @@ module ApplicationHelper
       html << " [" + link_to("+", new_user_feedback_path(:user_record => {:category => "positive"})) + "]"
 
       unless user.is_privileged?
-        html << " [" + link_to("invite", moderator_invitations_path(:invitation => {:name => user.name, :level => User::Levels::CONTRIBUTOR})) + "]"
+        html << " [" + link_to("invite", new_moderator_invitations_path(:invitation => {:name => user.name, :level => User::Levels::CONTRIBUTOR})) + "]"
       end
     else
       html << " [" + link_to("&ndash;", new_user_feedback_path(:user_record => {:category => "negative", :user_id => user.id})) + "]"
