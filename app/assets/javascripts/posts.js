@@ -232,9 +232,11 @@
       },
       success: function(data, status, xhr) {
         Danbooru.Post.update_data(data);
+        
       },
       error: function(data, status, xhr) {
         Danbooru.notice("Error: " + data.reason);
+        $("#post_" + data.id).effect("shake", {"distance": 20}, "fast");
       }
     });
   }

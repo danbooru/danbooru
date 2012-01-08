@@ -42,6 +42,8 @@
         },
         success: function(data) {
           Danbooru.Post.update_data(data);
+          $("#post_" + data.id).effect("shake", {distance: 5, times: 1}, 100);
+          Danbooru.notice("Post #" + data.id + " updated");
         }
       });
       
