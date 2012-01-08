@@ -25,7 +25,7 @@
   </div>
 <% end %>
 
-<% if post.appeals.any? %>
+<% if (post.is_flagged? || post.is_deleted?) && post.appeals.any? %>
   <div class="ui-corner-all ui-state-highlight notice">
     This post has been appealed: <%= post_appeal_reasons(post) %>
   </div>
