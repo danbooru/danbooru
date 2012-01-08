@@ -7,6 +7,8 @@ class TagAlias < ActiveRecord::Base
   validates_uniqueness_of :antecedent_name
   validate :absence_of_transitive_relation
   belongs_to :creator, :class_name => "User"
+  scope :name_matches, lambda {|name| where("(antecedent_name = ? or consequent_name = ?)", name, name)}
+  search_method :name_matches
   
   def self.to_aliased(names)
     alias_hash = Cache.get_multi(names.flatten, "ta") do |name|

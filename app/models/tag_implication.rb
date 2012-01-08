@@ -6,6 +6,8 @@ class TagImplication < ActiveRecord::Base
   validates_presence_of :creator_id
   validates_uniqueness_of :antecedent_name, :scope => :consequent_name
   validate :absence_of_circular_relation
+  scope :name_matches, lambda {|name| where("(antecedent_name = ? or consequent_name = ?)", name, name)}
+  search_method :name_matches
 
   module DescendantMethods
     extend ActiveSupport::Concern

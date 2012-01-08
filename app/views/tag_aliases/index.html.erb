@@ -1,7 +1,7 @@
 <div id="c-tag-aliases">
   <div id="a-index">
     <div class="search">
-      <%= form_tag(tag_aliases_path, :method => :get) do %>
+      <%= form_tag(general_search_tag_aliases_path, :method => :get) do %>
         <%= text_field_tag "query", params[:query] %> 
         <%= submit_tag "Search Aliases" %>
         <%= submit_tag "Search Implications" %>  

@@ -8,6 +8,14 @@ class TagAliasesController < ApplicationController
     respond_with(@tag_alias)
   end
   
+  def general_search
+    if params[:commit] == "Search Aliases"
+      redirect_to tag_aliases_path(:search => {:name_matches => params[:query]})
+    else
+      redirect_to tag_implications_path(:search => {:name_matches => params[:query]})
+    end
+  end
+  
   def index
     @search = TagAlias.search(params[:search])
     @tag_aliases = @search.order("(case status when 'pending' then 0 when 'queued' then 1 else 2 end), antecedent_name, consequent_name").paginate(params[:page])

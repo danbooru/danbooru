@@ -140,6 +140,9 @@ Danbooru::Application.routes.draw do
       delete :cache
       post :approve
     end
+    collection do
+      get :general_search
+    end
   end
   resources :tag_implications do
     member do
