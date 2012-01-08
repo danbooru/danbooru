@@ -334,7 +334,7 @@ class Tag < ActiveRecord::Base
     end
     
     def related_cache_expiry
-      base = Math.sqrt(post_count)
+      base = Math.sqrt([post_count, 0].max)
       if base > 24
         24
       else
