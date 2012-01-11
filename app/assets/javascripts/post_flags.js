@@ -3,7 +3,7 @@
   
   Danbooru.PostFlag.initialize_all = function() {
     if ($("#c-posts") && $("#a-show")) {
-      this.initialize_flag();
+     this.initialize_flag();
       this.hide_or_show_flag_link();
     }
   }
@@ -28,6 +28,10 @@
           $(this).dialog("close");
         }
       }
+    });
+
+    $('#flag-dialog form').submit(function() {
+      $('#flag-dialog').dialog('close');
     });
 
     $("#flag").click(function(e) {
