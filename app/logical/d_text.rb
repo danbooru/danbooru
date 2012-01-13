@@ -49,8 +49,8 @@ class DText
   
   def self.parse_aliased_wiki_links(str)
     str.gsub(/\[\[([^\|\]]+)\|([^\]]+)\]\]/m) do
-      text = CGI.unescapeHTML($1).tr("_", " ")
-      title = CGI.unescapeHTML($2)
+      text = CGI.unescapeHTML($2).tr("_", " ")
+      title = CGI.unescapeHTML($1)
       %{<a href="/wiki_pages/show_or_new?title=#{u(title)}">#{h(text)}</a>}
     end
   end
