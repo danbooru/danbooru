@@ -132,26 +132,21 @@
   }
   
   Danbooru.Post.initialize_wiki_page_excerpt = function() {
-    if (Danbooru.Cookie.get("hide-wiki-page-excerpt") === "1") {
-      $("#hide-wiki-page-excerpt").hide();
-      $("#wiki-page-excerpt-content").hide();
-    } else {
-      $("#show-wiki-page-excerpt").hide();
-    }
+    $("#wiki-page-excerpt").hide();
     
-    $("#hide-wiki-page-excerpt").click(function(e) {
-      $("#hide-wiki-page-excerpt").hide();
-      $("#wiki-page-excerpt-content").hide();
-      $("#show-wiki-page-excerpt").show();
-      Danbooru.Cookie.put("hide-wiki-page-excerpt", "1");
+    $("#show-posts-link").click(function(e) {
+      $("#show-posts-link").parent("li").addClass("active");
+      $("#show-wiki-excerpt-link").parent("li").removeClass("active");
+      $("#posts").show();
+      $("#wiki-page-excerpt").hide();
       e.preventDefault();
     });
     
-    $("#show-wiki-page-excerpt").click(function(e) {
-      $("#hide-wiki-page-excerpt").show();
-      $("#wiki-page-excerpt-content").show();
-      $("#show-wiki-page-excerpt").hide();
-      Danbooru.Cookie.put("hide-wiki-page-excerpt", "0");
+    $("#show-wiki-excerpt-link").click(function(e) {
+      $("#show-posts-link").parent("li").removeClass("active");
+      $("#show-wiki-excerpt-link").parent("li").addClass("active");
+      $("#posts").hide();
+      $("#wiki-page-excerpt").show();
       e.preventDefault();
     });
   }

@@ -1,5 +1,5 @@
-<h1>Posts</h1>
+<div id="posts">
+  <%= post_set.presenter.post_previews_html(self) %>
 
-<%= post_set.presenter.post_previews_html(self) %>
-
-<%= numbered_paginator(post_set.posts) %>
+  <%= numbered_paginator(post_set.posts) %>  
+</div>

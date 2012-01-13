@@ -102,32 +102,19 @@ div#c-posts {
     font-size: $h3_size;
   }
   
-  div#wiki-page-excerpt {
-    position: relative;
-    width: 40em;
-    background: #EEE;
-    padding: 0.5em 1em;
-    margin-bottom: 1em;
-    border: 1px solid #CCC;
-    @include border-radius(0.5em);
-    
-    p:last-child {
-      margin-bottom: 0;
-    }
-    
-    div#hide-or-show-wiki-page-excerpt {
-      font-size: 1em;
-      position: absolute;
-      top: 9px;
-      right: 9px;
+  div#a-index {
+    menu#post-sections {
+      margin-bottom: 0.5em;
+      font-size: $h3_size;
       
-      span {
-        cursor: pointer;
-        color: #AAA;
-      }
-      
-      span:hover {
-        color: #333;
+      li {
+        padding: 0.25em 0.5em;
+        
+        &.active {
+          background-color: $menu_color;
+          font-weight: bold;
+          @include border-radius(4px);
+        }
       }
     }
   }

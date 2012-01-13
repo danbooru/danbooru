@@ -1,4 +1,4 @@
-//= require jquery-1.6.2.min.js
+//= require jquery-1.7.1.min.js
 //= require jquery-ui-1.8.12.custom.min.js
 //= require keymaster.min.js
 //= require jquery.hotkeys.js
