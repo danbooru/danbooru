@@ -27,6 +27,7 @@ class DmailsController < ApplicationController
   def show
     @dmail = Dmail.find(params[:id])
     check_privilege(@dmail)
+    @dmail.mark_as_read!
     respond_with(@dmail)
   end
 

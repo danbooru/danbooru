@@ -1,6 +1,6 @@
 <%= simple_form_for(dmail) do |f| %>
   <%= f.input :to_name, :label => "To" %>
-  <%= f.input :title %>
+  <%= f.input :title, :as => :string %>
   <%= dtext_field "dmail", "body" %>
   <%= f.button :submit, "Send" %>
   <%= dtext_preview_button "dmail", "body" %>

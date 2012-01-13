@@ -5,6 +5,10 @@ div#c-dmails {
     max-width: 50em;
   }
   
+  tr.read-false {
+    font-weight: bold;
+  }
+  
   div#preview {
     margin: 1em 0;
     border: 1px solid #CCC;

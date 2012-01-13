@@ -49,7 +49,9 @@ class Dmail < ActiveRecord::Base
         Dmail.transaction do
           copy = Dmail.new(params)
           copy.owner_id = copy.to_id
-          copy.save!
+          unless copy.to_id == CurrentUser.id
+            copy.save!
+          end
 
           copy = Dmail.new(params)
           copy.owner_id = CurrentUser.id
