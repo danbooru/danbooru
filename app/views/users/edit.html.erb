@@ -5,7 +5,7 @@
     <%= simple_form_for @user do |f| %>
       <fieldset>
         <% if @user.feedback.negative.count == 0 %>
-          <%= f.input :name %>
+          <%= f.input :name, :as => :string %>
         <% end %>
 
         <%= f.input :email, :required => Danbooru.config.enable_email_verification?, :hint => "Used for messages and for password resets", :as => :email %>
