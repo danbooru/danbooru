@@ -18,7 +18,7 @@ class Upload < ActiveRecord::Base
   module ValidationMethods
     def uploader_is_not_limited
       if !uploader.can_upload?
-        update_attribute(:status, "error: uploader has reached their daily limit")
+        raise "uploader has reached their daily limit"
       end
     end
 
@@ -30,19 +30,19 @@ class Upload < ActiveRecord::Base
     
     def validate_file_exists
       unless File.exists?(file_path)
-        update_attribute(:status, "error: file does not exist")
+        raise "file does not exist"
       end
     end
     
     def validate_file_content_type
       unless is_valid_content_type?
-        update_attribute(:status, "error: invalid content type (#{file_ext} not allowed)")
+        raise "invalid content type (#{file_ext} not allowed)"
       end
     end
     
     def validate_md5_confirmation
       if !md5_confirmation.blank? && md5_confirmation != md5
-        update_attribute(:status, "error: md5 mismatch")
+        raise "md5 mismatch"
       end
     end
   end
