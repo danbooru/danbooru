@@ -1,7 +1,4 @@
 module PostSets
-  class SearchError < Exception
-  end
-  
   class Post < Base
     attr_reader :tag_array, :page
     
@@ -28,7 +25,7 @@ module PostSets
     
     def posts
       if tag_array.size > 2 && !CurrentUser.is_privileged?
-        raise SearchError
+        raise SearchError.new("Upgrade your account to search more than two tags at once")
       end
       
       @posts ||= ::Post.tag_match(tag_string).paginate(page)

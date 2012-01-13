@@ -2,6 +2,7 @@ class PostsController < ApplicationController
   before_filter :member_only, :except => [:show, :index]
   after_filter :save_recent_tags, :only => [:update]
   respond_to :html, :xml, :json
+  rescue_from PostSets::SearchError, :with => :search_error
   
   def index
     @post_set = PostSets::Post.new(tag_query, params[:page])
@@ -38,6 +39,11 @@ class PostsController < ApplicationController
   end
 
 private
+  def search_error(exception)
+    @exception = exception
+    render :action => "error"
+  end
+  
   def tag_query
     params[:tags] || (params[:post] && params[:post][:tags])
   end
