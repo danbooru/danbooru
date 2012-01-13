@@ -600,6 +600,7 @@ class Post < ActiveRecord::Base
       tag_query_sql = []
 
       if tags[:include].any?
+        raise SearchError.new("You cannot search for more than #{Danbooru.config.tag_query_limit} tags at a time") if tags[:include].size > Danbooru.config.tag_query_limit
         tag_query_sql << "(" + escape_string_for_tsquery(tags[:include]).join(" | ") + ")"
       end
   

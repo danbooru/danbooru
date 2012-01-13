@@ -7,8 +7,6 @@ div.paginator {
   clear: both;
   
   li {
-    font-weight: bold;
-    
     a {
       margin: 0 0.25em;
       padding: 0.25em 0.75em;
@@ -35,7 +33,8 @@ div.paginator {
 
     span {
       margin: 0 0.25em;
-      padding: 0.25em 0.75em
+      padding: 0.25em 0.75em;
+      font-weight: bold;
     }
   }
 }
