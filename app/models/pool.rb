@@ -39,7 +39,7 @@ class Pool < ActiveRecord::Base
   end
   
   def self.normalize_post_ids(post_ids)
-    post_ids.gsub(/\s{2,}/, " ").strip
+    post_ids.scan(/\d+/).join(" ")
   end
   
   def self.find_by_name(name)
