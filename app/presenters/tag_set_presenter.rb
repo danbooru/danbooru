@@ -12,7 +12,7 @@ class TagSetPresenter < Presenter
   def tag_list_html(template, options = {})
     html = ""
     html << "<ul>"
-    @tags.each do |tag|
+    @tags.flatten.each do |tag|
       html << build_list_item(tag, template, options)
     end
     html << "</ul>"
