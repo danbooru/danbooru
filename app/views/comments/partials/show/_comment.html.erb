@@ -17,7 +17,7 @@
       <% end %>
       <li><%= link_to "Vote up", comment_votes_path(:comment_id => comment.id, :score => "up"), :method => :post, :remote => true %></li>
       <li><%= link_to "Vote down", comment_votes_path(:comment_id => comment.id, :score => "down"), :method => :post, :remote => true %></li>
-      
+    
       <% if @comment %>
         <li><%= link_to "View post", post_path(post) %></li>
       <% end %>
