@@ -14,12 +14,12 @@
   Danbooru.Pool.initialize_add_to_pool_link = function() {
     $("#add-to-pool-dialog").dialog({autoOpen: false});
     
-    $("#c-pools-posts #a-new input[type=text]").autocomplete({
+    $("#c-pool-elements #a-new input[type=text]").autocomplete({
       source: function(req, resp) {
         $.getJSON(
           "/pools.json?search[name_contains]=" + req.term,
           function(data) {
-            resp(data.map(function(x) {return x.pool.name;}));
+            resp(data.map(function(x) {return x.name;}));
           }
         );
       },

@@ -176,7 +176,6 @@ Danbooru.Note = {
         $note_body.css({width: $note_body.width() + 5});
       }
       
-      console.log("left=%d width=%d", $image.offset().left, $image.width());
       if ($note_body.offset().left + $note_body.width() > doc_width) {
         $note_body.css({
           left: $note_body.position().left - 10 - ($note_body.offset().left + $note_body.width() - doc_width)
