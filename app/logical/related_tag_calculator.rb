@@ -1,6 +1,6 @@
 class RelatedTagCalculator
   def self.find_tags(tag, limit)
-    Post.tag_match(tag).limit(limit).select("posts.tag_string").order("posts.md5").map(&:tag_string)
+    Post.tag_match(tag).limit(limit).select("posts.tag_string").reorder("posts.md5").map(&:tag_string)
   end
   
   def self.calculate_from_sample_to_array(tags, category_constraint = nil)

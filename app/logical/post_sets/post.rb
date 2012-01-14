@@ -43,6 +43,10 @@ module PostSets
       tag_array.size == 1
     end
     
+    def is_empty_tag?
+      tag_array.size == 0
+    end
+    
     def current_page
       [page.to_i, 1].max
     end

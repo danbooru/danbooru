@@ -3049,7 +3049,7 @@ create index index_posts_on_uploader_ip_addr on posts (uploader_ip_addr);
 drop function trg_posts_tags__delete();
 drop function trg_posts_tags__insert();
 update posts set uploader_id = 1 where uploader_id is null;
-
+create index index_posts_on_created_at_date on posts (date(created_at));
 alter table post_appeals rename column user_id to creator_id;
 alter index index_post_appeals_on_user_id rename to index_post_appeals_on_creator_id;
 alter table post_appeals rename column ip_addr to creator_ip_addr;
