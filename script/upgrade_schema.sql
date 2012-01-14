@@ -3119,6 +3119,7 @@ alter index idx_tags__name rename to index_tags_on_name;
 alter index idx_tags__post_count rename to index_tags_on_post_count;
 alter table tags alter column related_tags drop not null;
 alter table tags alter column related_tags_updated_at drop not null;
+ALTER TABLE tags ALTER COLUMN related_tags SET DEFAULT null;
 
 alter table test_janitors rename to janitor_trials;
 alter table janitor_trials drop column id;
