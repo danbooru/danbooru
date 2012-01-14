@@ -43,6 +43,7 @@ class User < ActiveRecord::Base
   scope :admins, where("is_admin = TRUE")
   scope :with_email, lambda {|email| email.blank? ? where("FALSE") : where(["email = ?", email])}
   scope :find_for_password_reset, lambda {|name, email| email.blank? ? where("FALSE") : where(["name = ? AND email = ?", name, email])}
+  search_method :named
   
   module BanMethods
     def validate_ip_addr_is_not_banned

@@ -5,8 +5,8 @@
       <%= hidden_field_tag :folder, params[:folder] %>
       <%= f.input :title_contains, :required => false, :label => "Title" %>
       <%= f.input :body_contains, :required => false, :label => "Body" %>
-      <%= f.input :to_name_equals, :required => false, :label => "To" %>
-      <%= f.input :from_name_equals, :required => false, :label => "From" %>
+      <%= f.input :to_name_matches, :required => false, :label => "To" %>
+      <%= f.input :from_name_matches, :required => false, :label => "From" %>
       <%= f.button :submit, "Search" %>
     <% end %>    
   </div>

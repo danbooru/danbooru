@@ -18,6 +18,9 @@ class Dmail < ActiveRecord::Base
   scope :search_message, lambda {|query| where(["message_index @@ plainto_tsquery(?)", query])}
   scope :unread, where("is_read = false and is_deleted = false")
   scope :visible, lambda {where("(to_id = ? or from_id = ?)", CurrentUser.id, CurrentUser.id)}
+  scope :to_name_matches, lambda {|name| where("to_id = (select _.id from users _ where lower(_.name) = ?)", name.downcase)}  
+  scope :from_name_matches, lambda {|name| where("from_id = (select _.id from users _ where lower(_.name) = ?)", name.downcase)}
+  search_method :to_name_matches, :from_name_matches
   
   module AddressMethods
     def to_name
