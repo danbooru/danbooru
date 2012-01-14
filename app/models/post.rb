@@ -469,7 +469,7 @@ class Post < ActiveRecord::Base
     end
     
     def filter_metatags(tags)
-      metatags, tags = tags.partition {|x| x =~ /\A(?:pool|rating|fav|parent):/}
+      metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|rating|fav|parent):/}
       apply_metatags(metatags)
       return tags
     end
@@ -482,7 +482,15 @@ class Post < ActiveRecord::Base
           
         when /^parent:(\d+)$/
           self.parent_id = $1.to_i
+        
+        when /^-pool:(\d+)$/
+          pool = Pool.find_by_id($1.to_i)
+          remove_pool!(pool) if pool
           
+        when /^-pool:(.+)$/
+          pool = Pool.find_by_name($1)
+          remove_pool!(pool) if pool
+        
         when /^pool:(\d+)$/
           pool = Pool.find_by_id($1.to_i)
           add_pool!(pool) if pool
