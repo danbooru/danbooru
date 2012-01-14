@@ -9,7 +9,9 @@ module PostSetPresenters
     end
     
     def related_tags
-      if post_set.is_single_tag?
+      if post_set.is_pattern_search?
+        pattern_tags
+      elsif post_set.is_single_tag?
         related_tags_for_single
       elsif post_set.is_empty_tag?
         popular_tags
@@ -29,6 +31,10 @@ module PostSetPresenters
       end
       
       results
+    end
+    
+    def pattern_tags
+      Tag.name_matches(post_set.tag_string).all(:select => "name", :limit => Danbooru.config.tag_query_limit, :order => "post_count DESC").map(&:name)
     end
     
     def related_tags_for_group

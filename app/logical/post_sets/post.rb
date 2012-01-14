@@ -47,6 +47,10 @@ module PostSets
       tag_array.size == 0
     end
     
+    def is_pattern_search?
+      tag_string =~ /\*/
+    end
+    
     def current_page
       [page.to_i, 1].max
     end
