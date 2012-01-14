@@ -24,6 +24,7 @@ class User < ActiveRecord::Base
   validates_inclusion_of :default_image_size, :in => %w(medium large original)
   validates_confirmation_of :password
   validates_presence_of :email, :if => lambda {|rec| rec.new_record? && Danbooru.config.enable_email_verification?}
+  validates_presence_of :comment_threshold
   validate :validate_ip_addr_is_not_banned, :on => :create
   validate :validate_feedback_on_name_change, :on => :update
   before_validation :normalize_blacklisted_tags
