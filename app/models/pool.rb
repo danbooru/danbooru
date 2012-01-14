@@ -42,6 +42,16 @@ class Pool < ActiveRecord::Base
     post_ids.gsub(/\s{2,}/, " ").strip
   end
   
+  def self.find_by_name(name)
+    if name =~ /^\d+$/
+      where("id = ?", name.to_i).first
+    elsif name
+      where("name = ?", normalize_name(name)).first
+    else
+      nil
+    end
+  end
+  
   def initialize_creator
     self.creator_id = CurrentUser.id
   end

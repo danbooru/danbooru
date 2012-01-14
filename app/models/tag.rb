@@ -79,7 +79,7 @@ class Tag < ActiveRecord::Base
   module NameMethods
     module ClassMethods
       def normalize_name(name)
-        name.downcase.tr(" ", "_").gsub(/\A[-~]+/, "")
+        name.downcase.tr(" ", "_").gsub(/\A[-~]+/, "").gsub(/\*/, "")
       end
 
       def find_or_create_by_name(name, options = {})
