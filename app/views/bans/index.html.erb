@@ -18,8 +18,10 @@
             <td><%= ban.expires_at %></td>
             <td><%= ban.reason %></td>
             <td>
-              <%= link_to "Edit", edit_ban_path(ban) %>
-              | <%= link_to "Delete", ban_path(ban), :method => :delete, :remote => true %>
+              <% if CurrentUser.is_moderator? %>
+                <%= link_to "Edit", edit_ban_path(ban) %>
+                | <%= link_to "Delete", ban_path(ban), :method => :delete, :remote => true %>
+              <% end %>
             </td>
           </tr>
         <% end %>
