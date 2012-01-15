@@ -1,6 +1,12 @@
 <div id="c-dmails">
   <div id="a-index">
-    <h1>Messages</h1>
+    <% if params[:folder] == "sent" %>
+      <h1>Sent Messages</h1>
+    <% elsif params[:folder] == "received" %>
+      <h1>Received Messages</h1>
+    <% else %>
+      <h1>Messages</h1>
+    <% end %>
 
     <table class="striped" width="100%">
       <thead>
