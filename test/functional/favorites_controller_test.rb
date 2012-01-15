@@ -21,7 +21,7 @@ class FavoritesControllerTest < ActionController::TestCase
       
       context "with a specified tags parameter" do
         should "redirect to the posts controller" do
-          get :index, {:tags => "abc"}, {:user_id => @user}
+          get :index, {:tags => "fav:#{@user.name} abc"}, {:user_id => @user}
           assert_redirected_to(posts_path(:tags => "fav:#{@user.name} abc"))
         end
       end

@@ -14,7 +14,7 @@ module Moderator
       end
       
       should "render the new page" do
-        get :new, {}, {:user_id => @mod.id}
+        get :new, {:invitation => {:name => @user_1.name}}, {:user_id => @mod.id}
         assert_response :success
       end
       

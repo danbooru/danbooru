@@ -13,6 +13,8 @@ module Moderator
         search_by_user_name(params[:user_name_eq].split(/,/))
       elsif params[:ip_addr_eq]
         search_by_ip_addr(params[:ip_addr_eq].split(/,/))
+      else
+        []
       end
     end
     

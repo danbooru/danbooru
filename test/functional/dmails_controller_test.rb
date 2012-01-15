@@ -44,15 +44,17 @@ class DmailsControllerTest < ActionController::TestCase
       should "show dmails owned by the current user" do
         get :index, {:owner_id_equals => @dmail.owner_id, :folder => "sent"}, {:user_id => @dmail.owner_id}
         assert_response :success
+        assert_equal(1, assigns[:dmails].size)
 
         get :index, {:owner_id_equals => @dmail.owner_id, :folder => "received"}, {:user_id => @dmail.owner_id}
         assert_response :success
+        assert_equal(1, assigns[:dmails].size)
       end
       
       should "not show dmails not owned by the current user" do
-        assert_raises(User::PrivilegeError) do
-          get :index, {:owner_id_equals => @dmail.owner_id}, {:user_id => @unrelated_user.id}
-        end
+        get :index, {:owner_id_equals => @dmail.owner_id}, {:user_id => @unrelated_user.id}
+        assert_response :success
+        assert_equal(0, assigns[:dmails].size)
       end
     end
     
@@ -63,7 +65,7 @@ class DmailsControllerTest < ActionController::TestCase
       end
       
       should "not show dmails not owned by the current user" do
-        assert_raises(User::PrivilegeError) do
+        assert_raise(User::PrivilegeError) do
           get :show, {:id => @dmail.id}, {:user_id => @unrelated_user.id}
         end
       end

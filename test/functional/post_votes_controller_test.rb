@@ -3,7 +3,7 @@ require 'test_helper'
 class PostVotesControllerTest < ActionController::TestCase
   context "The post vote controller" do
     setup do
-      @user = Factory.create(:user)
+      @user = Factory.create(:privileged_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
       @post = Factory.create(:post)
@@ -17,6 +17,7 @@ class PostVotesControllerTest < ActionController::TestCase
     context "create action" do
       should "increment a post's score if the score is positive" do
         post :create, {:post_id => @post.id, :score => "up", :format => "js"}, {:user_id => @user.id}
+        assert_response :success
         @post.reload
         assert_equal(1, @post.score)
       end

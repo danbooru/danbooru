@@ -12,17 +12,17 @@ module Moderator
       end
 
       should "find by ip addr" do
-        get :index, {:search => {:ip_addr => "127.0.0.1"}}, {:user_id => @user.id}
+        get :index, {:search => {:ip_addr_eq => "127.0.0.1"}}, {:user_id => @user.id}
         assert_response :success
       end
       
       should "find by user id" do
-        get :index, {:search => {:user_id => @user.id.to_s}}, {:user_id => @user.id}
+        get :index, {:search => {:user_id_eq => @user.id.to_s}}, {:user_id => @user.id}
         assert_response :success
       end
 
       should "find by user name" do
-        get :index, {:search => {:user_name => @user.name}}, {:user_id => @user.id}
+        get :index, {:search => {:user_name_eq => @user.name}}, {:user_id => @user.id}
         assert_response :success
       end
       
