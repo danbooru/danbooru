@@ -84,7 +84,7 @@ class DTextTest < ActiveSupport::TestCase
   end
   
   def test_complex_links
-    assert_equal('<p><a href="/wiki_pages/show_or_new?title=2+3">1</a> | <a href="/wiki_pages/show_or_new?title=5+6">4</a></p>', p("[[1|2 3]] | [[4|5 6]]"))
-    assert_equal("<p>Tags <strong>(<a href=\"/wiki_pages/show_or_new?title=Tagging+Guidelines\">howto:tag</a> | <a href=\"/wiki_pages/show_or_new?title=Tag+Checklist\">howto:tag checklist</a> | <a href=\"/wiki_pages/show_or_new?title=Tag+Groups\">Tag Groups</a>)</strong></p>", p("Tags [b]([[howto:tag|Tagging Guidelines]] | [[howto:tag_checklist|Tag Checklist]] | [[Tag Groups]])[/b]"))
+    assert_equal("<p><a href=\"/wiki_pages/show_or_new?title=1\">2 3</a> | <a href=\"/wiki_pages/show_or_new?title=4\">5 6</a></p>", p("[[1|2 3]] | [[4|5 6]]"))
+    assert_equal("<p>Tags <strong>(<a href=\"/wiki_pages/show_or_new?title=howto%3Atag\">Tagging Guidelines</a> | <a href=\"/wiki_pages/show_or_new?title=howto%3Atag_checklist\">Tag Checklist</a> | <a href=\"/wiki_pages/show_or_new?title=Tag+Groups\">Tag Groups</a>)</strong></p>", p("Tags [b]([[howto:tag|Tagging Guidelines]] | [[howto:tag_checklist|Tag Checklist]] | [[Tag Groups]])[/b]"))
   end
 end
