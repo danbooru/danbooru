@@ -35,15 +35,6 @@ $(function() {
     Danbooru.Cookie.put('hide_upgrade_account_notice', '1', 7);
     e.preventDefault();
   });
-  
-  // Ajax links
-  $("a[data-remote=true]").click(function(e) {
-    Danbooru.ajax_start(e.target);
-  })
-  
-  $("a[data-remote=true]").ajaxComplete(function(e) {
-    Danbooru.ajax_stop(e.target);
-  })
 
   // TOS link
   if (!location.href.match(/terms_of_service/) && Danbooru.Cookie.get("tos") !== "1") {

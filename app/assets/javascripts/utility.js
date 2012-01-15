@@ -10,14 +10,6 @@
   Danbooru.error = function(msg) {
     $('#notice').html(msg).removeClass("ui-state-highlight").addClass("ui-state-error").fadeIn("fast");
   }
-
-  Danbooru.ajax_start = function(target) {
-    $(target).after('<img src="/images/wait.gif" width="15" height="5" class="wait">');
-  }
-  
-  Danbooru.ajax_stop = function(target) {
-    $(target).next("img.wait").remove();
-  }
   
   Danbooru.is_subset = function(array, subarray) {
     var all = true;

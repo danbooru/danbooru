@@ -35,7 +35,6 @@
   Danbooru.Upload.initialize_info = function() {
     $("#source-info ul").hide();
     $("#fetch-data").click(function(e) {
-      Danbooru.ajax_start(e.target);
       $.get(e.target.href).success(function(data) {
         var tag_html = "";
         $.each(data.tags, function(i, v) {
@@ -55,8 +54,6 @@
         
         $("#source-info p").hide();
         $("#source-info ul").show();
-      }).complete(function(data) {
-        Danbooru.ajax_stop(e.target);
       });
       e.preventDefault();
     });
