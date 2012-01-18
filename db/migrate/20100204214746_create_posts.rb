@@ -67,7 +67,8 @@ class CreatePosts < ActiveRecord::Migration
     add_index :posts, :parent_id
     add_index :posts, :uploader_id
     add_index :posts, :uploader_ip_addr
-    
+
+    execute "create index index_posts_on_source_pattern on posts (source text_pattern_ops)"
     execute "create index index_posts_on_created_at_date on posts (date(created_at))"
     execute "CREATE INDEX index_posts_on_mpixels ON posts (((image_width * image_height)::numeric / 1000000.0))"
 

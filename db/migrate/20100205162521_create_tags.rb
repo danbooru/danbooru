@@ -10,6 +10,7 @@ class CreateTags < ActiveRecord::Migration
     end
     
     add_index :tags, :name, :unique => true
+    execute "create index index_tags_on_name_pattern on tags (name text_pattern_ops)"
   end
 
   def self.down
