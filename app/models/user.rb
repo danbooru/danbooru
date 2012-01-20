@@ -18,8 +18,8 @@ class User < ActiveRecord::Base
   attr_accessible :level, :as => :admin
   validates_length_of :name, :within => 2..100, :on => :create
   validates_format_of :name, :with => /\A[^\s:]+\Z/, :on => :create, :message => "cannot have whitespace or colons"
-  validates_uniqueness_of :name, :case_sensitive => false, :on => :create
-  validates_uniqueness_of :email, :case_sensitive => false, :on => :create, :if => lambda {|rec| !rec.email.blank?}
+  validates_uniqueness_of :name, :case_sensitive => false
+  validates_uniqueness_of :email, :case_sensitive => false, :if => lambda {|rec| rec.email.present?}
   validates_length_of :password, :minimum => 5, :if => lambda {|rec| rec.new_record? || rec.password.present?}
   validates_inclusion_of :default_image_size, :in => %w(medium large original)
   validates_confirmation_of :password
