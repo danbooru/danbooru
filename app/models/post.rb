@@ -661,8 +661,9 @@ class Post < ActiveRecord::Base
         q = Tag.parse_query(q)
       end
       
+      constraint = false
       relation = Post.scoped
-
+      
       relation = add_range_relation(q[:post_id], "posts.id", relation)
       relation = add_range_relation(q[:mpixels], "posts.width * posts.height / 1000000.0", relation)
       relation = add_range_relation(q[:width], "posts.image_width", relation)
@@ -686,10 +687,6 @@ class Post < ActiveRecord::Base
         relation = relation.where("posts.is_flagged = TRUE")
       elsif q[:status] == "deleted"
         relation = relation.where("posts.is_deleted = TRUE")
-      elsif q[:status] == "all" || q[:status] == "any"
-        # do nothing
-      else
-        relation = relation.where("posts.is_deleted <> TRUE")
       end
 
       if q[:source]

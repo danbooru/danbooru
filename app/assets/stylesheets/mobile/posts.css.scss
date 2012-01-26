@@ -1,15 +1,12 @@
-a.search-inc-tag {
-  display: none;
-}
+@import "../common/000_vars.css.scss";
 
-a.search-exl-tag {
-  display: none;
-}
-
-.post-count {
-  display: none;
-}
-
-section#mode-box {
-  display: none;
+article.post-preview {
+  height: 150px;
+  width: 150px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  float: left;
+  text-align: center;
+  vertical-align: middle;
+  @include inline-block;
 }

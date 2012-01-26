@@ -176,6 +176,10 @@ Danbooru::Application.routes.draw do
   end
   resources :wiki_page_versions, :only => [:index, :show]
   
+  namespace :mobile do
+    resources :posts
+  end
+  
   # aliases
   resources :wpages, :controller => "wiki_pages"
   resources :ftopics, :controller => "forum_topics"

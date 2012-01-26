@@ -1,0 +1,33 @@
+@import "../common/000_vars.css.scss";
+
+header#top {
+  h1 {
+    font-size: 2.5em;
+    margin: 5px 5px 0 5px;
+  }
+  
+  menu {
+    margin-top: -2px;
+    background: $menu_color;
+    padding: 3px 10px;
+    
+    li {
+      margin: 0;
+      padding: 0;
+    }
+    
+    li a {
+      padding: 6px 10px;
+    }
+  }
+  
+  menu.main {
+    margin-top: 0px;
+    background: white;
+    
+    li.current a {
+      background: $menu_color;
+      font-weight: bold;
+    }
+  }
+}

@@ -1,0 +1,14 @@
+<div id="c-posts">
+  <div id="a-index">
+    <%= render "posts/partials/index/posts", :post_set => @post_set %>
+    <%= render "posts/partials/common/secondary_links" %>    
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  <% if @post_set.tag_string.present? %>
+    <%= @post_set.tag_string %> - <%= Danbooru.config.app_name %>
+  <% else %>
+    <%= Danbooru.config.app_name %>
+  <% end %>
+<% end %>
