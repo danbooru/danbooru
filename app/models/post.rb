@@ -687,6 +687,10 @@ class Post < ActiveRecord::Base
         relation = relation.where("posts.is_flagged = TRUE")
       elsif q[:status] == "deleted"
         relation = relation.where("posts.is_deleted = TRUE")
+      elsif q[:status] == "all" || q[:status] == "any"
+        # do nothing
+      else
+        relation = relation.where("posts.is_deleted <> TRUE")
       end
 
       if q[:source]
