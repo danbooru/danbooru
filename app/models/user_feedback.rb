@@ -1,5 +1,5 @@
 class UserFeedback < ActiveRecord::Base
-  set_table_name "user_feedback"
+  self.table_name = "user_feedback"
   belongs_to :user
   belongs_to :creator, :class_name => "User"
   before_validation :initialize_creator, :on => :create

@@ -14,13 +14,14 @@ group :assets do
   gem "therubyracer"
 end
 
-gem "rails", "3.1.3"
+gem "rails", "3.2.0"
 gem "pg"
 gem "memcache-client", :require => "memcache"
 gem "delayed_job"
+gem "delayed_job_active_record"
 gem "super_exception_notifier"
 gem "simple_form"
-gem "mechanize"
+gem "mechanize", git: 'git://github.com/caribio/mechanize.git'
 gem "nokogiri"
 gem "meta_search", :git => "git://github.com/ernie/meta_search.git"
 gem "silent-postgres"

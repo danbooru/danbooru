@@ -78,7 +78,7 @@ class DmailsControllerTest < ActionController::TestCase
       
       should "create two messages, one for the sender and one for the recipient" do
         assert_difference("Dmail.count", 2) do
-          dmail_attribs = {:to_id => @user_2.id, :title => "abc", :body => "abc", :is_read => false}
+          dmail_attribs = {:to_id => @user_2.id, :title => "abc", :body => "abc"}
           post :create, {:dmail => dmail_attribs}, {:user_id => @user.id}
           assert_redirected_to dmail_path(Dmail.last)
         end
