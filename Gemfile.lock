@@ -68,6 +68,7 @@ GEM
     builder (3.0.0)
     chronic (0.6.6)
     coderay (1.0.5)
+    daemons (1.1.6)
     delayed_job (3.0.1)
       activesupport (~> 3.0)
     delayed_job_active_record (0.3.1)
@@ -176,6 +177,7 @@ PLATFORMS
 
 DEPENDENCIES
   awesome_print
+  daemons
   delayed_job
   delayed_job_active_record
   factory_girl

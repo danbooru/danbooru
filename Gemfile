@@ -28,6 +28,7 @@ gem "silent-postgres"
 gem "whenever", :require => false
 gem "sanitize", :git => "git://github.com/rgrove/sanitize.git"
 gem 'rmagick', :require => "RMagick"
+gem 'daemons'
 
 group :development do
   gem 'pry'
