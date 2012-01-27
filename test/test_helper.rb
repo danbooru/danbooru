@@ -71,6 +71,4 @@ class MockMemcache
   end
 end
 
-silence_warnings do
-  MEMCACHE = MockMemcache.new
-end
+MEMCACHE = MockMemcache.new
