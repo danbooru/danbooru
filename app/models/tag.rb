@@ -211,7 +211,7 @@ class Tag < ActiveRecord::Base
         :include => [],
         :exclude => []
       }
-
+      
       scan_query(query).each do |token|
         if token =~ /\A(-uploader|uploader|-approver|approver|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|status|tagcount|gentags|arttags|chartags|copytags|parent):(.+)\Z/
           case $1
@@ -308,7 +308,7 @@ class Tag < ActiveRecord::Base
           parse_tag(token, q[:tags])
         end
       end
-
+      
       normalize_tags_in_query(q)
 
       return q

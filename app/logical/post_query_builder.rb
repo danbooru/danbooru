@@ -1,8 +1,8 @@
 class PostQueryBuilder
-  attr_accessor :q, :has_constraints
+  attr_accessor :query_string, :has_constraints
   
-  def initialize(q)
-    @q = q
+  def initialize(query_string)
+    @query_string = query_string
     @has_constraint = false
   end
   
@@ -54,20 +54,20 @@ class PostQueryBuilder
     tag_query_sql = []
 
     if tags[:include].any?
-      raise SearchError.new("You cannot search for more than #{Danbooru.config.tag_query_limit} tags at a time") if tags[:include].size > Danbooru.config.tag_query_limit
+      raise ::Post::SearchError.new("You cannot search for more than #{Danbooru.config.tag_query_limit} tags at a time") if tags[:include].size > Danbooru.config.tag_query_limit
       tag_query_sql << "(" + escape_string_for_tsquery(tags[:include]).join(" | ") + ")"
       has_constraints!
     end
 
     if tags[:related].any?
-      raise SearchError.new("You cannot search for more than #{Danbooru.config.tag_query_limit} tags at a time") if tags[:related].size > Danbooru.config.tag_query_limit
+      raise ::Post::SearchError.new("You cannot search for more than #{Danbooru.config.tag_query_limit} tags at a time") if tags[:related].size > Danbooru.config.tag_query_limit
       tag_query_sql << "(" + escape_string_for_tsquery(tags[:related]).join(" & ") + ")"
       has_constraints!
     end
 
     if tags[:exclude].any?
-      raise SearchError.new("You cannot search for more than #{Danbooru.config.tag_query_limit} tags at a time") if tags[:exclude].size > Danbooru.config.tag_query_limit
-      raise SearchError.new("You cannot search for only excluded tags") unless has_constraints?
+      raise ::Post::SearchError.new("You cannot search for more than #{Danbooru.config.tag_query_limit} tags at a time") if tags[:exclude].size > Danbooru.config.tag_query_limit
+      raise ::Post::SearchError.new("You cannot search for only excluded tags") unless has_constraints?
 
       tag_query_sql << "!(" + escape_string_for_tsquery(tags[:exclude]).join(" | ") + ")"
     end
@@ -101,8 +101,8 @@ class PostQueryBuilder
   end
   
   def build
-    unless q.is_a?(Hash)
-      q = Tag.parse_query(q)
+    unless query_string.is_a?(Hash)
+      q = Tag.parse_query(query_string)
     end
     
     relation = Post.scoped

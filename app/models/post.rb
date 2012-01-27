@@ -43,7 +43,7 @@ class Post < ActiveRecord::Base
   scope :for_user, lambda {|user_id| where(["uploader_id = ?", user_id])}
   scope :available_for_moderation, lambda {|hidden| hidden.present? ? where(["id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id]) : where(["id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
   scope :hidden_from_moderation, lambda {where(["id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id])}
-  scope :tag_match, lambda {|query| Post.tag_match_helper(query)}
+  scope :tag_match, lambda {|query| PostQueryBuilder.new(query).build}
   scope :positive, where("score > 1")
   scope :negative, where("score < -1")
   search_methods :tag_match
@@ -568,13 +568,6 @@ class Post < ActiveRecord::Base
     end
   end
   
-  module SearchMethods
-    def tag_match_helper(q)
-      builder = PostQueryBuilder.new(q)
-      builder.build
-    end
-  end
-  
   module UploaderMethods
     def initialize_uploader
       if uploader_id.blank?
@@ -904,7 +897,6 @@ class Post < ActiveRecord::Base
   include FavoriteMethods
   include UploaderMethods
   include PoolMethods
-  extend SearchMethods
   include VoteMethods
   extend CountMethods
   include CacheMethods

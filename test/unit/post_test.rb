@@ -830,6 +830,20 @@ class PostTest < ActiveSupport::TestCase
       relation = Post.tag_match("order:landscape")
       assert_equal(post3.id, relation.first.id)      
     end
+    
+    should "fail for exclusive tag searches with no other tag" do
+      post1 = Factory.create(:post, :rating => "s", :tag_string => "aaa")
+      assert_raise(::Post::SearchError) do
+        relation = Post.tag_match("-aaa")
+      end
+    end
+    
+    should "succeed for exclusive tag searches combined with a metatag" do
+      post1 = Factory.create(:post, :rating => "s", :tag_string => "aaa")
+      assert_nothing_raised do
+        relation = Post.tag_match("-aaa id:>0")
+      end
+    end
   end
 
   context "Voting:" do

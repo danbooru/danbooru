@@ -31,6 +31,8 @@ class TagAliasTest < ActiveSupport::TestCase
       tag1 = Factory.create(:tag, :name => "aaa")
       tag2 = Factory.create(:tag, :name => "bbb")
       ta = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+      assert_nil(MEMCACHE.get("ta:aaa"))
+      ta.update_cache
       assert_equal("bbb", MEMCACHE.get("ta:aaa"))
       ta.destroy
       assert_nil(MEMCACHE.get("ta:aaa"))
