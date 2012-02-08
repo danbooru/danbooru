@@ -29,6 +29,12 @@ class ArtistsControllerTest < ActionController::TestCase
       assert_response :success
     end
     
+    should "get the show page for a negated tag" do
+      @artist.update_attribute(:name, "-aaa")
+      get :show, {:id => @artist.id}
+      assert_response :success
+    end
+    
     should "get the index page" do
       get :index
       assert_response :success

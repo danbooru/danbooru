@@ -9,6 +9,8 @@ module PostSets
     
     def posts
       ::Post.tag_match(@artist.name)
+    rescue ::Post::SearchError
+      ::Post.where("false")
     end
 
     def presenter

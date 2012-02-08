@@ -659,6 +659,8 @@ class Post < ActiveRecord::Base
         end
       end
       count
+    rescue SearchError
+      0
     end
   end
   

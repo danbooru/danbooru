@@ -178,6 +178,8 @@ Danbooru::Application.routes.draw do
   
   namespace :mobile do
     resources :posts
+    resource :session
+    resources :favorites
   end
   
   # aliases

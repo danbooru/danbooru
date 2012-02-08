@@ -29,6 +29,8 @@ module PostSets
       end
       
       @posts ||= ::Post.tag_match(tag_string).paginate(page)
+    rescue ::Post::SearchError
+      @posts = ::Post.where("false")
     end
     
     def has_artist?

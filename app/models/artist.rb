@@ -171,13 +171,17 @@ class Artist < ActiveRecord::Base
     
     def ban!
       Post.transaction do
-        Post.tag_match(name).each do |post|
-          begin
-            post.flag!("Artist requested removal")
-          rescue PostFlag::Error
-            # swallow
+        begin
+          Post.tag_match(name).each do |post|
+            begin
+              post.flag!("Artist requested removal")
+            rescue PostFlag::Error
+              # swallow
+            end
+            post.delete!
           end
-          post.delete!
+        rescue Post::SearchError
+          # swallow
         end
         
         # potential race condition but unlikely

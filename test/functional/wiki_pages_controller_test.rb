@@ -39,6 +39,12 @@ class WikiPagesControllerTest < ActionController::TestCase
         get :show, {:id => @wiki_page.id}
         assert_response :success
       end
+      
+      should "render for a negated tag" do
+        @wiki_page.update_attribute(:title, "-aaa")
+        get :show, {:id => @wiki_page.id}
+        assert_response :success
+      end
     end
     
     context "create action" do

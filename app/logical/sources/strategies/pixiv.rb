@@ -42,7 +42,7 @@ module Sources
       def get_image_url_from_page(page)
         meta = page.search("meta[property=\"og:image\"]").first
         if meta
-          meta.attr("content").sub(/_m\./, ".")
+          meta.attr("content").sub(/_[ms]\./, ".")
         else
           nil
         end
