@@ -6,7 +6,7 @@ namespace :images do
     Post.where("image_width > ?", Danbooru.config.small_image_width).find_each do |post|
       if post.is_image?
         puts "resizing preview #{post.id}"
-        Danbooru.resize(post.file_path, post.preview_file_path, Danbooru.config.small_image_width, Danbooru.config.small_image_width, 80)
+        Danbooru.resize(post.file_path, post.preview_file_path, Danbooru.config.small_image_width, Danbooru.config.small_image_width, 90)
       end
     end
   end
