@@ -3,8 +3,14 @@ module Danbooru
     image = Magick::Image.read(read_path).first
     
     if width == Danbooru.config.small_image_width
-      image.change_geometry("#{width}x#{height}>") do |small_width, small_height, img|
-        img.thumbnail!(small_width, small_height)
+      image.change_geometry("#{width}x#{height}^") do |small_width, small_height, img|
+        if width > height
+          gravity = Magick::WestGravity
+        else
+          gravity = Magick::NorthGravity
+        end
+        
+        img.reseize_to_fill!(small_width, small_height, gravity)
         width = small_width
         height = small_height
       end
