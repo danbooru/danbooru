@@ -5,10 +5,10 @@ div.post-previews {
 }
 
 article.post-preview {
-  height: 154px;
-  width: 154px;
-  margin-right: 20px;
-  margin-bottom: 20px;
+  height: 150px;
+  width: 150px;
+  margin-right: 15px;
+  margin-bottom: 15px;
   float: left;
   overflow: hidden;
   @include inline-block;
@@ -26,19 +26,19 @@ article.post-preview img {
   border: 2px solid transparent;
 }
 
-article.post-preview.post-status-has-parent img {
+article.post-preview.post-status-has-parent {
   border: 2px solid #CC0;
 }
 
-article.post-preview.post-status-has-children img {
+article.post-preview.post-status-has-children {
   border: 2px solid #0F0;
 }
 
-article.post-preview.post-status-pending img {
+article.post-preview.post-status-pending {
   border: 2px solid #00F;
 }
 
-article.post-preview.post-status-flagged img {
+article.post-preview.post-status-flagged {
   border: 2px solid #F00;
 }
 
