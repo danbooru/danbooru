@@ -14,7 +14,7 @@ class PostPresenter < Presenter
     html =  %{<article class="post-preview" id="post_#{post.id}" data-id="#{post.id}" data-tags="#{h(post.tag_string)}" data-uploader="#{h(post.uploader_name)}" data-rating="#{post.rating}" data-width="#{post.image_width}" data-height="#{post.image_height}" data-flags="#{flags.join(' ')}" data-parent-id="#{post.parent_id}" data-has-children="#{post.has_children?}">}
     html << %{<a href="#{path}/#{post.id}">}
     
-    if post.image_width > post.image_height * 1.3 && post.image_width > Danbooru.config.small_image_width && !post.is_flash?
+    if post.image_width.to_i > post.image_height.to_i * 1.3 && post.image_width.to_i > Danbooru.config.small_image_width && !post.is_flash?
       klass = "wide"
     else
       klass = "tall"
