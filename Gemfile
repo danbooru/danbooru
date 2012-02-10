@@ -9,9 +9,8 @@ group :test do
 end
 
 group :assets do
-  gem "sass"
-  gem "uglifier"
-  gem "therubyracer"
+  gem "sass-rails", "~> 3.2.3"
+  gem "uglifier", ">= 1.0.3"
 end
 
 gem "rails", "3.2.1"
