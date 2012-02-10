@@ -1,25 +1,17 @@
 module Danbooru
   def resize(read_path, write_path, width, height, resize_quality = 90)
     image = Magick::Image.read(read_path).first
+    geometry = "#{width}x>"
+
+    if width == Danbooru.config.small_image_width && image.rows < image.columns
+      # wider than it is tall
+      geometry = ">x#{height}"
+    end
     
-    if width == Danbooru.config.small_image_width
-      image.change_geometry("#{width}x#{height}^") do |small_width, small_height, img|
-        if width > height
-          gravity = Magick::WestGravity
-        else
-          gravity = Magick::NorthGravity
-        end
-        
-        img.reseize_to_fill!(small_width, small_height, gravity)
-        width = small_width
-        height = small_height
-      end
-    else
-      image.change_geometry("#{width}x>") do |new_width, new_height, img|
-        img.resize!(new_width, new_height)
-        width = new_width
-        height = new_height
-      end
+    image.change_geometry(geometry) do |new_width, new_height, img|
+      img.resize!(new_width, new_height)
+      width = new_width
+      height = new_height
     end
     
     image = flatten(image, width, height)
