@@ -5,8 +5,8 @@ div.post-previews {
 }
 
 article.post-preview {
-  height: 150px;
-  width: 150px;
+  height: 154px;
+  width: 154px;
   margin-right: 20px;
   margin-bottom: 20px;
   float: left;
@@ -23,23 +23,23 @@ article.post-preview.blacklisted-active {
 }
 
 article.post-preview img {
-  border: 3px solid transparent;
+  border: 2px solid transparent;
 }
 
 article.post-preview.post-status-has-parent img {
-  border: 3px solid #CC0;
+  border: 2px solid #CC0;
 }
 
 article.post-preview.post-status-has-children img {
-  border: 3px solid #0F0;
+  border: 2px solid #0F0;
 }
 
 article.post-preview.post-status-pending img {
-  border: 3px solid #00F;
+  border: 2px solid #00F;
 }
 
 article.post-preview.post-status-flagged img {
-  border: 3px solid #F00;
+  border: 2px solid #F00;
 }
 
 .category-1 a {
