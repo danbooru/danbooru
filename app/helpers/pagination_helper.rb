@@ -15,7 +15,7 @@ module PaginationHelper
   end
   
   def use_sequential_paginator?(records)
-    params[:page] =~ /[ab]/ || records.current_page > Danbooru.config.max_numbered_pages
+    params[:page] =~ /[ab]/ || records.current_page >= Danbooru.config.max_numbered_pages
   end
   
   def numbered_paginator(records, switch_to_sequential = true)
