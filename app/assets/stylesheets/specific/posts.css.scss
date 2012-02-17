@@ -114,9 +114,7 @@ div#c-posts {
         padding: 0.25em 0.5em;
         
         &.active {
-          background-color: $menu_color;
           font-weight: bold;
-          @include border-radius(4px);
         }
       }
     }

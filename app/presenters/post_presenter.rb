@@ -13,19 +13,20 @@ class PostPresenter < Presenter
     
     html =  %{<article class="post-preview" id="post_#{post.id}" data-id="#{post.id}" data-tags="#{h(post.tag_string)}" data-uploader="#{h(post.uploader_name)}" data-rating="#{post.rating}" data-width="#{post.image_width}" data-height="#{post.image_height}" data-flags="#{flags.join(' ')}" data-parent-id="#{post.parent_id}" data-has-children="#{post.has_children?}">}
     html << %{<a href="#{path}/#{post.id}">}
-    
-    if post.is_image? && post.image_width > post.image_height && post.image_width.to_i > Danbooru.config.small_image_width
-      ratio = Danbooru.config.small_image_width.to_f / post.image_height.to_f
-      offset = ((ratio * post.image_width) - Danbooru.config.small_image_width).to_i / 2
-      margin = "-#{offset}px"
-    else
-      margin = 0
-    end
-    
-    html << %{<img style="margin-left: #{margin};" src="#{post.preview_file_url}" alt="#{h(post.tag_string)}">}
+    html << %{<img style="margin-left: #{margin(post)};" src="#{post.preview_file_url}" alt="#{h(post.tag_string)}">}
     html << %{</a>}
     html << %{</article>}
     html.html_safe
+  end
+  
+  def self.margin(post)
+    if post.is_image? && post.image_width > post.image_height && post.image_width.to_i > Danbooru.config.small_image_width
+      ratio = Danbooru.config.small_image_width.to_f / post.image_height.to_f
+      offset = ((ratio * post.image_width) - Danbooru.config.small_image_width).to_i / 2
+      return "-#{offset}px"
+    else
+      return 0
+    end
   end
   
   def initialize(post)
