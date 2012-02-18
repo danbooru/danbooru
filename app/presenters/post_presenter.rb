@@ -23,7 +23,7 @@ class PostPresenter < Presenter
     if post.is_image? && post.image_height > post.image_width && post.image_height < 2 * post.image_width && post.image_height
       ratio = Danbooru.config.small_image_width.to_f / post.image_width.to_f
       offset = ((ratio * post.image_height) - Danbooru.config.small_image_width).to_i / 2
-      return "#{offset}px"
+      return "-#{offset}px"
     else
       0
     end
