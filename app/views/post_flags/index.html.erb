@@ -1,10 +1,10 @@
 <div id="c-post-flags">
   <div id="a-index">
     <h1>Flags</h1>
-    <table width="100%">
+    <table width="100%" class="striped">
       <thead>
         <tr>
-          <th>Post</th>
+          <th width="1%"></th>
           <th>Creator</th>
           <th>Reason</th>
         </tr>
@@ -19,6 +19,8 @@
         <% end %>
       </tbody>
     </table>
+    
+    <%= numbered_paginator(@post_flags) %>
   </div>
 </div>
 
