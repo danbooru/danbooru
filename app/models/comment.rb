@@ -15,8 +15,9 @@ class Comment < ActiveRecord::Base
   scope :visible, lambda {|user| where("score >= ?", user.comment_threshold)}
   scope :post_tag_match, lambda {|query| joins(:post).where("posts.tag_index @@ to_tsquery('danbooru', ?)", query)}
   scope :for_user, lambda {|user_id| where("creator_id = ?", user_id)}
+  scope :for_user_name, lambda {|user_name| where("creator_id = (select _.id from users _ where lower(_.name) = lower(?))", user_name)}
   
-  search_methods :body_matches, :post_tag_match
+  search_methods :body_matches, :post_tag_match, :for_user_name
 
   def initialize_creator
     self.creator_id = CurrentUser.user.id
