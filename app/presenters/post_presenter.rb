@@ -30,7 +30,7 @@ class PostPresenter < Presenter
   end
   
   def self.margin_left(post)
-    if post.is_image? && post.image_width > post.image_height && post.image_width.to_i > Danbooru.config.small_image_width
+    if post.is_image? && post.image_width > post.image_height && post.image_width > Danbooru.config.small_image_width
       ratio = Danbooru.config.small_image_width.to_f / post.image_height.to_f
       offset = ((ratio * post.image_width) - Danbooru.config.small_image_width).to_i / 2
       return "-#{offset}px"

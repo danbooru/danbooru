@@ -1,9 +1,10 @@
 module Moderator
   class IpAddrSearch
-    attr_reader :params
+    attr_reader :params, :errors
     
     def initialize(params)
       @params = params
+      @errors = []
     end
     
     def execute
@@ -22,7 +23,7 @@ module Moderator
     def select_all_sql(sql, *params)
       ActiveRecord::Base.select_all_sql(sql, *params)
     end
-  
+    
     def search_by_ip_addr(ip_addrs)
       sums = Hash.new {|h, k| h[k] = 0}
     
