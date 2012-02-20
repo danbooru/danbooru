@@ -1,0 +1,14 @@
+<div id="c-users">
+  <div id="a-search">
+    <%= simple_form_for(@search) do |f| %>
+      <%= f.input :name_matches, :required => false, :label => "Name" %>
+      <%= f.button :submit, "Search" %>
+    <% end %>
+  </div>
+</div>
+
+<%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Search Users - <%= Danbooru.config.app_name %>
+<% end %>

@@ -20,6 +20,10 @@ class UsersController < ApplicationController
     respond_with(@users)
   end
   
+  def search
+    @search = User.search(params[:search])
+  end
+  
   def show
     @user = User.find(params[:id])
     @presenter = UserPresenter.new(@user)

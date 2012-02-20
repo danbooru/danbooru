@@ -158,6 +158,7 @@ Danbooru::Application.routes.draw do
   resources :users do
     collection do
       get :upgrade_information
+      get :search
     end
     
     member do
