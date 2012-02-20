@@ -4,7 +4,7 @@
     
     <div id="search">
       <%= simple_form_for(@search) do |f| %>
-        <%= f.input :updater_name_eq, :label => "User", :required => false %>
+        <%= f.input :updater_name_matches, :label => "User", :required => false %>
         <%= f.input :post_id_eq, :label => "Post", :required => false %>
         <%= f.button :submit, :value => "Search" %>
       <% end %>
