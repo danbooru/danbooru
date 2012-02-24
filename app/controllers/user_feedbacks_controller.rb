@@ -21,7 +21,7 @@ class UserFeedbacksController < ApplicationController
   
   def index
     @search = UserFeedback.search(params[:search])
-    @user_feedbacks = @search.paginate(params[:page])
+    @user_feedbacks = @search.paginate(params[:page]).order("id desc")
     respond_with(@user_feedbacks)
   end
   
