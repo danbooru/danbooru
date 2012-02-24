@@ -1,11 +1,11 @@
 class JanitorTrial < ActiveRecord::Base
   belongs_to :user
+  before_create :initialize_original_level
   after_create :send_dmail
   after_create :promote_user
   after_destroy :create_feedback
   validates_presence_of :user
   before_validation :initialize_creator
-  before_validation :initialize_original_level
   
   def initialize_creator
     self.creator_id = CurrentUser.id
