@@ -58,6 +58,7 @@ class Dmail < ActiveRecord::Base
 
           copy = Dmail.new(params)
           copy.owner_id = CurrentUser.id
+          copy.is_read = true
           copy.save
         end
         
