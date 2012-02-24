@@ -63,6 +63,7 @@ class User < ActiveRecord::Base
   module InvitationMethods
     def invite!(level)
       if level.to_i <= Levels::CONTRIBUTOR
+        ModAction.create(:description => "invited user ##{id} (#{name})")
         self.level = level
         self.inviter_id = CurrentUser.id
         save

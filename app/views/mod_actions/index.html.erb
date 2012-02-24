@@ -1,7 +1,7 @@
 <div id="c-mod-actions">
   <div id="a-index">
     <h1>Mod Actions</h1>
-    <table class="striped">
+    <table class="striped" width="100%">
       <thead>
         <tr>
           <th>Date</th>
@@ -12,7 +12,7 @@
       <tbody>
         <% @mod_actions.each do |mod_action| %>
           <tr>
-            <td><%= mod_action.created_at %></td>
+            <td><%= compact_time mod_action.created_at %></td>
             <td><%= link_to mod_action.creator.name, user_path(mod_action.creator) %></td>
             <td><%= format_text(mod_action.description) %></td>
           </tr>

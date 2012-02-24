@@ -75,6 +75,7 @@ class DText
     str = str.gsub(/\bforum #(\d+)/i, %{<a href="/forum_posts/\\1">forum #\\1</a>})
     str = str.gsub(/\bcomment #(\d+)/i, %{<a href="/comments/\\1">comment #\\1</a>})
     str = str.gsub(/\bpool #(\d+)/i, %{<a href="/pools/\\1">pool #\\1</a>})
+    str = str.gsub(/\buser #(\d+)/i, %{<a href="/users/\\1">user #\\1</a>})
   end
   
   def self.parse_list(str, options = {})
