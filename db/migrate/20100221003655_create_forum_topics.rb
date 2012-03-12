@@ -7,6 +7,7 @@ class CreateForumTopics < ActiveRecord::Migration
       t.column :response_count, :integer, :null => false, :default => 0
       t.column :is_sticky, :boolean, :null => false, :default => false
       t.column :is_locked, :boolean, :null => false, :default => false
+      t.column :is_deleted, :boolean, :null => false, :default => false
       t.column :text_index, "tsvector", :null => false
       t.timestamps
     end

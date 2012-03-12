@@ -2883,7 +2883,8 @@ CREATE TABLE forum_topics (
     text_index tsvector NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    original_post_id integer not null
+    original_post_id integer not null,
+    is_deleted boolean DEFAULT false NOT NULL
 );
 CREATE SEQUENCE forum_topics_id_seq
     START WITH 1
@@ -2904,7 +2905,7 @@ CREATE TRIGGER trigger_forum_topics_on_update
     FOR EACH ROW
     EXECUTE PROCEDURE tsvector_update_trigger('text_index', 'pg_catalog.english', 'title');
 update forum_posts set creator_id = 1 where creator_id is null;
-insert into forum_topics (creator_id, updater_id, title, response_count, is_sticky, is_locked, text_index, created_at, updated_at, original_post_id) select forum_posts.creator_id, forum_posts.creator_id, forum_posts.title, forum_posts.response_count, forum_posts.is_sticky, forum_posts.is_locked, forum_posts.text_search_index, forum_posts.created_at, forum_posts.updated_at, forum_posts.id from forum_posts where parent_id is null;
+insert into forum_topics (creator_id, updater_id, title, response_count, is_sticky, is_locked, text_index, created_at, updated_at, original_post_id, is_deleted) select forum_posts.creator_id, forum_posts.creator_id, forum_posts.title, forum_posts.response_count, forum_posts.is_sticky, forum_posts.is_locked, forum_posts.text_search_index, forum_posts.created_at, forum_posts.updated_at, forum_posts.id, forum_posts.is_deleted from forum_posts where parent_id is null;
 
 alter table forum_posts drop constraint forum_posts_creator_id_fkey;
 alter table forum_posts drop constraint forum_posts_last_updated_by_fkey;

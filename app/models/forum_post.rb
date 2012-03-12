@@ -1,16 +1,18 @@
 class ForumPost < ActiveRecord::Base
   attr_accessible :body, :topic_id, :as => [:member, :privileged, :contributor, :janitor, :admin, :moderator, :default]
-  attr_accessible :is_locked, :is_sticky, :as => [:admin, :moderator]
+  attr_accessible :is_locked, :is_sticky, :is_deleted, :as => [:admin, :moderator]
   belongs_to :creator, :class_name => "User"
   belongs_to :topic, :class_name => "ForumTopic"
   before_validation :initialize_creator, :on => :create
   before_validation :initialize_updater
+  before_validation :initialize_is_deleted, :on => :create
   after_save :update_topic_updated_at
   validates_presence_of :body, :creator_id
   validate :validate_topic_is_unlocked
   before_destroy :validate_topic_is_unlocked
   scope :body_matches, lambda {|body| where(["forum_posts.text_index @@ plainto_tsquery(?)", body])}
   scope :for_user, lambda {|user_id| where("forum_posts.creator_id = ?", user_id)}
+  scope :active, where("is_deleted = false")
   search_methods :body_matches
   
   def self.new_reply(params)
@@ -53,6 +55,10 @@ class ForumPost < ActiveRecord::Base
   
   def initialize_updater
     self.updater_id = CurrentUser.id
+  end
+  
+  def initialize_is_deleted
+    self.is_deleted = false if is_deleted.nil?
   end
   
   def build_response

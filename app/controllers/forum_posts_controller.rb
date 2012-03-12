@@ -15,7 +15,7 @@ class ForumPostsController < ApplicationController
   end
   
   def index
-    @search = ForumPost.search(params[:search])
+    @search = ForumPost.active.search(params[:search])
     @forum_posts = @search.paginate(params[:page]).order("forum_posts.id desc")
     respond_with(@forum_posts)
   end
@@ -44,7 +44,14 @@ class ForumPostsController < ApplicationController
   def destroy
     @forum_post = ForumPost.find(params[:id])
     check_privilege(@forum_post)
-    @forum_post.destroy
+    @forum_post.update_attribute(:is_deleted, true)
+    respond_with(@forum_post)
+  end
+  
+  def undelete
+    @forum_post = ForumPost.find(params[:id])
+    check_privilege(@forum_post)
+    @forum_post.update_attribute(:is_deleted, false)
     respond_with(@forum_post)
   end
 

@@ -1,6 +1,11 @@
 <div id="c-forum-topics">
   <div id="a-show">
-    <h1>Topic: <%= @forum_topic.title %></h1>
+    <h1>
+      Topic: <%= @forum_topic.title %>
+      <% if @forum_topic.is_deleted? %>
+        (deleted)
+      <% end %>
+    </h1>
     
     <% if @forum_topic.is_locked? %>
       <div class="notice">

@@ -75,11 +75,18 @@ Danbooru::Application.routes.draw do
   resource  :dtext_preview, :only => [:create]
   resources :favorites
   resources :forum_posts do
+    member do
+      post :undelete
+    end
     collection do
       get :search
     end
   end
-  resources :forum_topics
+  resources :forum_topics do
+    member do
+      post :undelete
+    end
+  end
   resources :ip_bans
   resources :janitor_trials do
     collection do

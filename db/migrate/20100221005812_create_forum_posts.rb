@@ -6,6 +6,7 @@ class CreateForumPosts < ActiveRecord::Migration
       t.column :updater_id, :integer, :null => false
       t.column :body, :text, :null => false
       t.column :text_index, "tsvector", :null => false
+      t.column :is_deleted, :boolean, :null => false, :default => false
       t.timestamps
     end
 

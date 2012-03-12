@@ -8,10 +8,12 @@ class Pool < ActiveRecord::Base
   has_many :versions, :class_name => "PoolVersion", :dependent => :destroy, :order => "pool_versions.id ASC"
   before_validation :normalize_name
   before_validation :normalize_post_ids
+  before_validation :initialize_is_active, :on => :create
   before_validation :initialize_creator, :on => :create
   after_save :create_version
   before_destroy :create_mod_action_for_destroy
   attr_accessible :name, :description, :post_ids, :post_id_array, :is_active, :post_count
+  scope :active, where("is_active = true")
   
   def self.name_to_id(name)
     if name =~ /^\d+$/
@@ -50,6 +52,10 @@ class Pool < ActiveRecord::Base
     else
       nil
     end
+  end
+  
+  def initialize_is_active
+    self.is_active = true if is_active.nil?
   end
   
   def initialize_creator
