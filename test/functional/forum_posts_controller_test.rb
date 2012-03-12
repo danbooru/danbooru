@@ -76,10 +76,23 @@ class ForumPostsControllerTest < ActionController::TestCase
     
     context "destroy action" do
       should "destroy the posts" do
-        assert_difference("ForumPost.count", -1) do
-          post :destroy, {:id => @forum_post.id}, {:user_id => @user.id}
-        end
-        assert_redirected_to(forum_posts_path)
+        post :destroy, {:id => @forum_post.id}, {:user_id => @user.id}
+        assert_redirected_to(forum_post_path(@forum_post))
+        @forum_post.reload
+        assert_equal(true, @forum_post.is_deleted?)
+      end
+    end
+    
+    context "undelete action" do
+      setup do
+        @forum_post.update_attribute(:is_deleted, true)
+      end
+      
+      should "restore the post" do
+        post :undelete, {:id => @forum_post.id}, {:user_id => @user.id}
+        assert_redirected_to(forum_post_path(@forum_post))
+        @forum_post.reload
+        assert_equal(false, @forum_post.is_deleted?)
       end
     end
   end
