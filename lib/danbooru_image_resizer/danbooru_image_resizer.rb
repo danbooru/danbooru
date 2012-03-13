@@ -3,9 +3,9 @@ module Danbooru
     image = Magick::Image.read(read_path).first
     geometry = "#{width}x>"
 
-    if width == Danbooru.config.small_image_width && image.rows < image.columns
+    if width == Danbooru.config.small_image_width
       # wider than it is tall
-      geometry = ">x#{height}"
+      geometry = "#{Danbooru.config.small_image_width}x#{Danbooru.config.small_image_width}>"
     end
     
     image.change_geometry(geometry) do |new_width, new_height, img|

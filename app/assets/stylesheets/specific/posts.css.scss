@@ -12,10 +12,6 @@ article.post-preview {
   float: left;
   overflow: hidden;
   @include inline-block;
-  
-  img.wide {
-    margin-left: -25%;
-  }
 }
 
 article.post-preview.blacklisted-active {
