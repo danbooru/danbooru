@@ -9,7 +9,7 @@ group :test do
 end
 
 group :assets do
-  gem "sass-rails", "~> 3.2.3"
+  gem "sass-rails"
   gem "uglifier", ">= 1.0.3"
   gem "therubyracer"
 end
@@ -24,7 +24,6 @@ gem "simple_form"
 gem "mechanize", git: 'git://github.com/caribio/mechanize.git'
 gem "nokogiri"
 gem "meta_search", :git => "git://github.com/ernie/meta_search.git"
-gem "silent-postgres"
 gem "whenever", :require => false
 gem "sanitize", :git => "git://github.com/rgrove/sanitize.git"
 gem 'rmagick', :require => "RMagick"

@@ -21,7 +21,7 @@ class User < ActiveRecord::Base
   validates_uniqueness_of :name, :case_sensitive => false
   validates_uniqueness_of :email, :case_sensitive => false, :if => lambda {|rec| rec.email.present?}
   validates_length_of :password, :minimum => 5, :if => lambda {|rec| rec.new_record? || rec.password.present?}
-  validates_inclusion_of :default_image_size, :in => %w(medium large original)
+  validates_inclusion_of :default_image_size, :in => %w(large original)
   validates_confirmation_of :password
   validates_presence_of :email, :if => lambda {|rec| rec.new_record? && Danbooru.config.enable_email_verification?}
   validates_presence_of :comment_threshold
@@ -432,7 +432,7 @@ class User < ActiveRecord::Base
   include ApiMethods
   
   def initialize_default_image_size
-    self.default_image_size = "Medium"
+    self.default_image_size = "large"
   end
 
   def can_update?(object, foreign_key = :user_id)

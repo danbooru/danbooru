@@ -68,7 +68,6 @@ class Post < ActiveRecord::Base
       RemoteFileManager.new(file_path).distribute
       RemoteFileManager.new(real_preview_file_path).distribute
       RemoteFileManager.new(ssd_preview_file_path).distribute if Danbooru.config.ssd_path
-      RemoteFileManager.new(medium_file_path).distribute if has_medium?
       RemoteFileManager.new(large_file_path).distribute if has_large?
     end
     
@@ -76,13 +75,11 @@ class Post < ActiveRecord::Base
       RemoteFileManager.new(file_path).delete
       RemoteFileManager.new(real_preview_file_path).delete
       RemoteFileManager.new(ssd_preview_file_path).delete if Danbooru.config.ssd_path
-      RemoteFileManager.new(medium_file_path).delete if has_medium?
       RemoteFileManager.new(large_file_path).delete if has_large?
     end
     
     def delete_files
       FileUtils.rm_f(file_path)
-      FileUtils.rm_f(medium_file_path)
       FileUtils.rm_f(large_file_path)
       FileUtils.rm_f(ssd_preview_file_path) if Danbooru.config.ssd_path
       FileUtils.rm_f(real_preview_file_path)
@@ -96,14 +93,6 @@ class Post < ActiveRecord::Base
       "#{Rails.root}/public/data/original/#{file_path_prefix}#{md5}.#{file_ext}"
     end
     
-    def medium_file_path
-      if has_medium?
-        "#{Rails.root}/public/data/medium/#{file_path_prefix}#{md5}.jpg"
-      else
-        file_path
-      end
-    end
-
     def large_file_path
       if has_large?
         "#{Rails.root}/public/data/large/#{file_path_prefix}#{md5}.jpg"
@@ -132,23 +121,11 @@ class Post < ActiveRecord::Base
       "/data/original/#{file_path_prefix}#{md5}.#{file_ext}"
     end
     
-    def medium_file_url
-      if has_medium?
-        if is_flash?
-          "/data/preview/480x200-flash.png"
-        else
-          "/data/medium/#{file_path_prefix}#{md5}.jpg"
-        end
-      else
-        file_url
-      end
-    end
-
     def large_file_url
       if has_large?
         "/data/large/#{file_path_prefix}#{md5}.jpg"
       else
-        medium_file_url
+        file_url
       end
     end
 
@@ -166,13 +143,6 @@ class Post < ActiveRecord::Base
     
     def file_url_for(user)
       case user.default_image_size
-      when "medium"
-        if image_width > Danbooru.config.medium_image_width
-          medium_file_url
-        else
-          file_url
-        end
-        
       when "large"
         if image_width > Danbooru.config.large_image_width
           large_file_url
@@ -187,13 +157,6 @@ class Post < ActiveRecord::Base
     
     def file_path_for(user)
       case user.default_image_size
-      when "medium"
-        if image_width > Danbooru.config.medium_image_width
-          medium_file_path
-        else
-          file_path
-        end
-        
       when "large"
         if image_width > Danbooru.config.large_image_width
           large_file_path
@@ -216,33 +179,12 @@ class Post < ActiveRecord::Base
   end
   
   module ImageMethods
-    def has_medium?
-      image_width > Danbooru.config.medium_image_width
-    end
-    
     def has_large?
       image_width > Danbooru.config.large_image_width
     end
     
-    def medium_image_width
-      [Danbooru.config.medium_image_width, image_width].min
-    end
-    
     def large_image_width
       [Danbooru.config.large_image_width, image_width].min
-    end
-    
-    def medium_image_height
-      if is_flash?
-        return 200
-      end
-      
-      ratio = Danbooru.config.medium_image_width.to_f / image_width.to_f
-      if ratio < 1
-        (image_height * ratio).to_i
-      else
-        image_height
-      end
     end
     
     def large_image_height
@@ -256,9 +198,6 @@ class Post < ActiveRecord::Base
     
     def image_width_for(user)
       case user.default_image_size
-      when "medium"
-        medium_image_width
-        
       when "large"
         large_image_width
         
@@ -269,9 +208,6 @@ class Post < ActiveRecord::Base
     
     def image_height_for(user)
       case user.default_image_size
-      when "medium"
-        medium_image_height
-        
       when "large"
         large_image_height
         

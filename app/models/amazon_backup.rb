@@ -28,10 +28,6 @@ class AmazonBackup < ActiveRecord::Base
         AWS::S3::S3Object.store("preview/#{post.md5}.jpg", open(post.preview_file_path, "rb"), Danbooru.config.amazon_s3_bucket_name)
       end
 
-      if File.exists?(post.medium_file_path)
-        AWS::S3::S3Object.store("medium/#{post.md5}.jpg", open(post.medium_file_path, "rb"), Danbooru.config.amazon_s3_bucket_name)
-      end
-
       if File.exists?(post.large_file_path)
         AWS::S3::S3Object.store("large/#{post.md5}.jpg", open(post.large_file_path, "rb"), Danbooru.config.amazon_s3_bucket_name)
       end

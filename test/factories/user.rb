@@ -3,7 +3,7 @@ Factory.define(:user) do |f|
   f.password "password"
   f.password_hash {User.sha1("password")}
   f.email {Faker::Internet.email}
-  f.default_image_size "medium"
+  f.default_image_size "large"
   f.base_upload_limit 10
   f.level 20
   f.last_logged_in_at {Time.now}

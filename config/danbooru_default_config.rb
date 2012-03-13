@@ -68,11 +68,6 @@ module Danbooru
       150
     end
     
-    # Medium resize image width. Set to nil to disable.
-    def medium_image_width
-      480
-    end
-    
     # Large resize image width. Set to nil to disable.
     def large_image_width
       960

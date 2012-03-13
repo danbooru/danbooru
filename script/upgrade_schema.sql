@@ -3150,7 +3150,7 @@ alter table users rename column invited_by to inviter_id;
 alter table users rename column last_forum_topic_read_at to last_forum_read_at;
 alter table users rename column receive_dmails to receive_email_notifications;
 alter table users add column is_banned boolean not null default false;
-alter table users add column default_image_size varchar(255) not null default 'medium';
+alter table users add column default_image_size varchar(255) not null default 'large';
 alter table users add column favorite_tags text;
 alter table users add column blacklisted_tags text;
 alter table users add column time_zone varchar(255) not null default 'Eastern Time (US & Canada)';

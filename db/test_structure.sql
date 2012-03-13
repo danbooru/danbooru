@@ -1450,7 +1450,7 @@ CREATE TABLE users (
     receive_email_notifications boolean DEFAULT false NOT NULL,
     comment_threshold integer DEFAULT (-1) NOT NULL,
     always_resize_images boolean DEFAULT false NOT NULL,
-    default_image_size character varying(255) DEFAULT 'medium'::character varying NOT NULL,
+    default_image_size character varying(255) DEFAULT 'large'::character varying NOT NULL,
     favorite_tags text,
     blacklisted_tags text,
     time_zone character varying(255) DEFAULT 'Eastern Time (US & Canada)'::character varying NOT NULL

@@ -134,7 +134,6 @@ class Upload < ActiveRecord::Base
     def generate_resizes(source_path)
       if is_image?
         generate_resize_for(Danbooru.config.small_image_width, Danbooru.config.small_image_width, source_path, 85)
-        generate_resize_for(Danbooru.config.medium_image_width, nil, source_path) if image_width > Danbooru.config.medium_image_width
         generate_resize_for(Danbooru.config.large_image_width, nil, source_path) if image_width > Danbooru.config.large_image_width
       end
     end
@@ -219,9 +218,6 @@ class Upload < ActiveRecord::Base
       case width
       when Danbooru.config.small_image_width
         "#{Rails.root}/public/data/preview/#{prefix}#{md5}.jpg"
-
-      when Danbooru.config.medium_image_width
-        "#{Rails.root}/public/data/medium/#{prefix}#{md5}.jpg"
 
       when Danbooru.config.large_image_width
         "#{Rails.root}/public/data/large/#{prefix}#{md5}.jpg"

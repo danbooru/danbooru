@@ -96,12 +96,9 @@
   Danbooru.Post.initialize_image_resize = function() {
     var default_image_size = Danbooru.meta("default-image-size");
     var original_width = parseInt($("#image").data("original-width"));
-    var medium_width = parseInt(Danbooru.meta("config-medium-width"));
     var large_width = parseInt(Danbooru.meta("config-large-width"));
 
-    if ((default_image_size === "medium") && (original_width > medium_width)) {
-      $("#medium-file-link").trigger("click");
-    } else if ((default_image_size === "large") && (original_width > large_width)) {
+    if ((default_image_size === "large") && (original_width > large_width)) {
       $("#large-file-link").trigger("click");
     } else {
       $("#original-file-link").trigger("click");
@@ -113,7 +110,6 @@
       Danbooru.Note.Box.descale_all();
       var $link = $(e.target);
       var $image = $("#image");
-      $("#medium-file-link").removeClass("active");
       $("#large-file-link").removeClass("active");
       $("#original-file-link").removeClass("active");
       $link.addClass("active");
@@ -126,7 +122,6 @@
   }
   
   Danbooru.Post.initialize_post_image_resize_links = function() {
-    $("#medium-file-link").click(Danbooru.Post.build_resize_function("medium"));
     $("#large-file-link").click(Danbooru.Post.build_resize_function("large"));
     $("#original-file-link").click(Danbooru.Post.build_resize_function("original"));
   }

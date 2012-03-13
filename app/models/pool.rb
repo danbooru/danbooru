@@ -12,7 +12,8 @@ class Pool < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   after_save :create_version
   before_destroy :create_mod_action_for_destroy
-  attr_accessible :name, :description, :post_ids, :post_id_array, :is_active, :post_count
+  attr_accessible :name, :description, :post_ids, :post_id_array, :post_count, :as => [:member, :privileged, :contributor, :janitor, :moderator, :admin, :default]
+  attr_accessible :is_active, :as => [:janitor, :moderator, :admin]
   scope :active, where("is_active = true")
   
   def self.name_to_id(name)

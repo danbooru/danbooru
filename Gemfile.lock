@@ -145,7 +145,6 @@ GEM
       shoulda-matchers (~> 1.0.0)
     shoulda-context (1.0.0)
     shoulda-matchers (1.0.0)
-    silent-postgres (0.1.1)
     simple_form (2.0.1)
       actionpack (~> 3.0)
       activemodel (~> 3.0)
@@ -200,9 +199,8 @@ DEPENDENCIES
   rails (= 3.2.2)
   rmagick
   sanitize!
-  sass-rails (~> 3.2.3)
+  sass-rails
   shoulda
-  silent-postgres
   simple_form
   simplecov
   super_exception_notifier

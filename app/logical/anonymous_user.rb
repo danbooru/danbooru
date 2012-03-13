@@ -105,7 +105,7 @@ class AnonymousUser
   end
   
   def default_image_size
-    "medium"
+    "large"
   end
   
   def blacklisted_tags
