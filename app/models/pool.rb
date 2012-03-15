@@ -12,9 +12,9 @@ class Pool < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   after_save :create_version
   before_destroy :create_mod_action_for_destroy
-  attr_accessible :name, :description, :post_ids, :post_id_array, :post_count, :as => [:member, :privileged, :contributor, :janitor, :moderator, :admin, :default]
-  attr_accessible :is_active, :as => [:janitor, :moderator, :admin]
-  scope :active, where("is_active = true")
+  attr_accessible :name, :description, :post_ids, :post_id_array, :post_count, :is_active, :as => [:member, :privileged, :contributor, :janitor, :moderator, :admin, :default]
+  attr_accessible :is_deleted, :as => [:janitor, :moderator, :admin]
+  scope :active, where("is_active = true and is_deleted = false")
   
   def self.name_to_id(name)
     if name =~ /^\d+$/
@@ -56,6 +56,7 @@ class Pool < ActiveRecord::Base
   end
   
   def initialize_is_active
+    self.is_deleted = false if is_deleted.nil?
     self.is_active = true if is_active.nil?
   end
   

@@ -46,6 +46,8 @@
       <menu id="post-sections">
         <li><a href="#comments">Comments</a></li>
         <li><a href="#edit" id="post-edit-link">Edit</a></li>
+        <li><a href="#favorite-tab">Favorite</a></li>
+        <li><a href="#share">Share</a></li>
       </menu>
 
       <section id="comments">
@@ -58,6 +60,14 @@
 
       <section id="edit" style="display: none;">
         <%= render "posts/partials/show/edit", :post => @post %>
+      </section>
+      
+      <section id="favorite-tab" style="display: none;">
+        <p>Favoriting...</p>
+      </section>
+      
+      <section id="share-tab" style="display: none;">
+        <h1>Share</h1>
       </section>
     </section>    
   </div>

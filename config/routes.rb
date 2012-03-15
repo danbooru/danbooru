@@ -116,6 +116,7 @@ Danbooru::Application.routes.draw do
     end
     member do
       put :revert
+      post :undelete
     end
     resource :order, :only => [:edit, :update], :controller => "PoolOrders"
   end

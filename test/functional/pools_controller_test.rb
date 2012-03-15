@@ -67,9 +67,23 @@ class PoolsControllerTest < ActionController::TestCase
       end
       
       should "destroy a pool" do
-        assert_difference("Pool.count", -1) do
-          post :destroy, {:id => @pool.id}, {:user_id => @mod.id}
-        end
+        post :destroy, {:id => @pool.id}, {:user_id => @mod.id}
+        @pool.reload
+        assert_equal(true, @pool.is_deleted?)
+      end
+    end
+    
+    context "undelete action" do
+      setup do
+        @pool = Factory.create(:pool)
+        @pool.is_deleted = true
+        @pool.save
+      end
+      
+      should "restore a pool" do
+        post :undelete, {:id => @pool.id}, {:user_id => @mod.id}
+        @pool.reload
+        assert_equal(false, @pool.is_deleted?)
       end
     end
     
