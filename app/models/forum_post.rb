@@ -39,7 +39,7 @@ class ForumPost < ActiveRecord::Base
   end
 
   def editable_by?(user)
-    creator_id == user.id || user.is_moderator?
+    creator_id == user.id || user.is_janitor?
   end
   
   def update_topic_updated_at

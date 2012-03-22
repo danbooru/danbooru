@@ -1,12 +1,12 @@
 <div id="more-links" style="display: none;">
   <ul>
-    <%= nav_link_to("Artists", artists_path(:order => "date")) %>
-    <%= nav_link_to("Tags", tags_path(:order => "date")) %>
+    <%= nav_link_to("Artists", search_artists_path(:order => "date")) %>
+    <%= nav_link_to("Tags", search_tags_path(:order => "date")) %>
     <% if CurrentUser.is_moderator? %>
       <%= nav_link_to("Aliases", tag_aliases_path) %>
       <%= nav_link_to("Implications", tag_implications_path) %>
     <% end %>
-    <%= nav_link_to("Pools", pools_path) %>
+    <%= nav_link_to("Pools", search_pools_path) %>
     <% if CurrentUser.is_janitor? %>
       <%= nav_link_to("Dashboard", moderator_dashboard_path) %>
     <% end %>
