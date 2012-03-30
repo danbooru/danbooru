@@ -2,26 +2,43 @@
   <% if post.is_image? %>
     <%= resize_image_links(post, CurrentUser.user) %>
   <% end %>
+  
   <% if CurrentUser.is_member? %>
-    <li><%= link_to "Edit", post_path(post), :id => "side-edit-link" %></li>
     <li><%= link_to "Favorite", favorites_path(:post_id => post.id), :remote => true, :method => :post, :id => "add-to-favorites" %></li>
     <li><%= link_to "Unfavorite", favorite_path(post), :remote => true, :method => :delete, :id => "remove-from-favorites" %></li>
     <li><%= link_to "Pool", "#", :id => "pool" %></li>
     <li><%= link_to "Translate", "#", :id => "translate", :title => "Shortcut is CTRL+N" %></li>
+    <li><%= link_to "Find similar", "http://danbooru.iqdb.org/db-search.php?url=#{post.preview_url}" %></li>
+    
     <% unless post.is_status_locked? %>
-      <li><%= link_to "Flag", new_post_flag_path(:post_id => post.id), :id => "flag" %></li>
-      <li><%= link_to "Appeal", new_post_appeal_path(:post_id => post.id), :id => "appeal" %></li>
+      <% if !post.is_deleted? %>
+        <li><%= link_to "Flag", new_post_flag_path(:post_id => post.id), :id => "flag" %></li>
+      <% end %>
+      
+      <% if post.is_flagged? || post.is_deleted? %>
+        <li><%= link_to "Appeal", new_post_appeal_path(:post_id => post.id), :id => "appeal" %></li>
+      <% end %>
+      
       <% if CurrentUser.is_janitor? %>
-        <li><%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :remote => true, :method => :post, :id => "approve" %></li>
-        <li><%= link_to "Disapprove", moderator_post_disapproval_path(:post_id => post.id), :remote => true, :method => :post, :id => "disapprove" %></li>
+        <% if post.is_flagged? || post.is_pending? %>
+          <li><%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :remote => true, :method => :post, :id => "approve" %></li>
+        <% else %>
+          <li><%= link_to "Hide from queue", moderator_post_disapproval_path(:post_id => post.id), :remote => true, :method => :post, :id => "disapprove" %></li>
+        <% end %>
       <% end %>
+
       <% if CurrentUser.is_moderator? %>
-        <li><%= link_to "Undelete", undelete_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "undelete" %></li>
-        <li><%= link_to "Delete", delete_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "delete" %></li>
+        <% if post.is_deleted? %>
+          <li><%= link_to "Undelete", undelete_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "undelete" %></li>
+        <% else %>
+          <li><%= link_to "Delete", delete_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "delete" %></li>
+        <% end %>
       <% end %>
+
     <% end %>
   <% end %>
+  
   <% if CurrentUser.is_admin? %>
     <li><%= link_to "Annihilate", annihilate_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "annihilate", :confirm => "This will permanently delete this post (meaning the file will be deleted). Are you sure you want to annihilate this post?" %></li>
   <% end %>
-</ul>
+</ulS
