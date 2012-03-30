@@ -1,14 +1,10 @@
 <ul>
-  <% if post.is_image? %>
-    <%= resize_image_links(post, CurrentUser.user) %>
-  <% end %>
-  
   <% if CurrentUser.is_member? %>
     <li><%= link_to "Favorite", favorites_path(:post_id => post.id), :remote => true, :method => :post, :id => "add-to-favorites" %></li>
     <li><%= link_to "Unfavorite", favorite_path(post), :remote => true, :method => :delete, :id => "remove-from-favorites" %></li>
     <li><%= link_to "Pool", "#", :id => "pool" %></li>
     <li><%= link_to "Translate", "#", :id => "translate", :title => "Shortcut is CTRL+N" %></li>
-    <li><%= link_to "Find similar", "http://danbooru.iqdb.org/db-search.php?url=#{post.preview_url}" %></li>
+    <li><%= link_to "Find similar", "http://danbooru.iqdb.org/db-search.php?url=#{post.preview_file_url}" %></li>
     
     <% unless post.is_status_locked? %>
       <% if !post.is_deleted? %>
@@ -41,4 +37,4 @@
   <% if CurrentUser.is_admin? %>
     <li><%= link_to "Annihilate", annihilate_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "annihilate", :confirm => "This will permanently delete this post (meaning the file will be deleted). Are you sure you want to annihilate this post?" %></li>
   <% end %>
-</ulS
+</ul>

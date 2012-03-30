@@ -15,11 +15,9 @@
     }
 
     if ($("#c-posts").length && $("#a-show").length) {
-      this.initialize_resize_links();
       this.initialize_links();
       this.initialize_post_sections();
       this.initialize_post_image_resize_links();
-      this.initialize_image_resize();
     }
   }
   
@@ -42,24 +40,6 @@
     $("#side-edit-link").click(function(e) {
       $("#post-edit-link").trigger("click");
       $("#post_tag_string").trigger("focus");
-      e.preventDefault();
-    });
-  }
-  
-  Danbooru.Post.initialize_resize_links = function() {
-    $("#resize-links").hide();
-
-    $("#resize-links a").click(function(e) {
-      var image = $("#image");
-      var target = $(e.target);
-      image.attr("src", target.data("src"));
-      image.attr("width", target.data("width"));
-      image.attr("height", target.data("height"));
-      e.preventDefault();
-    }); 
-    
-    $("#resize-link a").click(function(e) {
-      $("#resize-links").toggle();
       e.preventDefault();
     });
   }
@@ -92,38 +72,19 @@
       $post.addClass("post-status-has-children");
     }
   }
-  
-  Danbooru.Post.initialize_image_resize = function() {
-    var default_image_size = Danbooru.meta("default-image-size");
-    var original_width = parseInt($("#image").data("original-width"));
-    var large_width = parseInt(Danbooru.meta("config-large-width"));
 
-    if ((default_image_size === "large") && (original_width > large_width)) {
-      $("#large-file-link").trigger("click");
-    } else {
-      $("#original-file-link").trigger("click");
-    }
-  }
-  
-  Danbooru.Post.build_resize_function = function(size) {
-    return function(e) {
+  Danbooru.Post.initialize_post_image_resize_links = function() {
+    $("#image-resize-link").click(function(e) {
       Danbooru.Note.Box.descale_all();
       var $link = $(e.target);
       var $image = $("#image");
-      $("#large-file-link").removeClass("active");
-      $("#original-file-link").removeClass("active");
-      $link.addClass("active");
       $image.attr("src", $link.attr("href"));
-      $image.width($image.data(size + "-width"));
-      $image.height($image.data(size + "-height"));
+      $image.width($image.data("original-width"));
+      $image.height($image.data("original-height"));
       Danbooru.Note.Box.scale_all();
+      $("#image-resize-notice").hide();
       e.preventDefault();
-    }
-  }
-  
-  Danbooru.Post.initialize_post_image_resize_links = function() {
-    $("#large-file-link").click(Danbooru.Post.build_resize_function("large"));
-    $("#original-file-link").click(Danbooru.Post.build_resize_function("original"));
+    });
   }
   
   Danbooru.Post.initialize_wiki_page_excerpt = function() {
@@ -149,11 +110,17 @@
   Danbooru.Post.initialize_post_sections = function() {
     $("#post-sections li a").click(function(e) {
       if (e.target.hash === "#comments") {
-        $("#comments").fadeIn("fast");
+        $("#comments").show();
         $("#edit").hide();
-      } else {
-        $("#edit").fadeIn("fast");
+        $("#share").hide();
+      } else if (e.target.hash === "#edit") {
+        $("#edit").show();
         $("#comments").hide();
+        $("#share").hide();
+      } else {
+        $("#edit").hide();
+        $("#comments").hide();
+        $("#share").show();
       }
       
       $("#post-sections li").removeClass("active");

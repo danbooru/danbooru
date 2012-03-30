@@ -19,7 +19,7 @@
   		$("#upload_source").attr("name", "url");
   		$("#upload_file").attr("name", "file");
   		$("#form").attr("target", "_blank");
-  		$("#form").attr("action", "http://danbooru.iqdb.hanyuu.net/");
+  		$("#form").attr("action", "http://danbooru.iqdb.org/");
 
   		$("form").trigger("submit");
 

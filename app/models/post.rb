@@ -215,6 +215,10 @@ class Post < ActiveRecord::Base
         image_height
       end
     end
+    
+    def resize_percentage
+      100 * large_image_width.to_f / image_width.to_f
+    end
   end
   
   module ApprovalMethods

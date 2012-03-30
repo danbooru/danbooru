@@ -6,7 +6,9 @@
 
 <% if (post.is_flagged? || post.is_deleted?) && post.flags.any? %>
   <div class="ui-corner-all ui-state-highlight notice">
-    This post has been flagged for deletion: <%= post_flag_reasons(post) %>
+    <p>This post has been flagged for deletion: </p>
+    
+    <%= post_flag_reasons(post) %>
   </div>
 <% end %>
 
@@ -19,7 +21,7 @@
         <% unless post.is_status_locked? %>
           <%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :method => :post, :remote => true, :class => "btn" %>
         <% end %>
-        <%= link_to "Disapprove", moderator_post_disapproval_path(:post_id => post.id), :method => :post, :remote => true, :class => "btn" %>
+        <%= link_to "Hide from queue", moderator_post_disapproval_path(:post_id => post.id), :method => :post, :remote => true, :class => "btn" %>
       </div>
     <% end %>
   </div>
@@ -27,7 +29,8 @@
 
 <% if (post.is_flagged? || post.is_deleted?) && post.appeals.any? %>
   <div class="ui-corner-all ui-state-highlight notice">
-    This post has been appealed: <%= post_appeal_reasons(post) %>
+    <p>This post has been appealed:</p> 
+    <%= post_appeal_reasons(post) %>
   </div>
 <% end %>
 
