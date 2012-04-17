@@ -130,6 +130,10 @@ div#c-posts {
           @include border-radius(4px);
         }
       }
+      
+      div.share a {
+        margin: 0;
+      }
     }
     
     section {
