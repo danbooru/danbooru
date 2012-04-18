@@ -70,7 +70,7 @@ module Danbooru
     
     # Large resize image width. Set to nil to disable.
     def large_image_width
-      960
+      900
     end
     
     # When calculating statistics based on the posts table, gather this many posts to sample from.
