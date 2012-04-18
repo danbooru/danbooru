@@ -7,11 +7,15 @@ div.post-previews {
 article.post-preview {
   height: 154px;
   width: 154px;
-  margin-right: 11px;
-  margin-bottom: 11px;
+  margin: 0 10px 10px 0;
   float: left;
   overflow: hidden;
+  text-align: center;
   @include inline-block;
+  
+  img {
+    margin: auto;
+  }
 }
 
 article.post-preview.blacklisted-active {
