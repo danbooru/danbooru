@@ -122,7 +122,7 @@ div#c-posts {
   
   div#a-show {
     menu#post-sections {
-      margin-top: 1em;
+      margin: 0;
       font-size: $h3_size;
       
       li {
@@ -154,9 +154,6 @@ div#c-posts {
       display: block;
     }
   }
-}
-
-div#c-explore-posts {
 }
 
 div#c-post-versions {
