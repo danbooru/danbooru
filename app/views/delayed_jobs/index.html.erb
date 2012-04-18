@@ -1,0 +1,28 @@
+<h1>Delayed Jobs</h1>
+
+<table class="striped" width="100%">
+  <thead>
+    <tr>
+      <th>Handler</th>
+      <th>Attempts</th>
+      <th>Priority</th>
+      <th>Last error</th>
+      <th>Run at</th>
+      <th>Failed at</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @delayed_jobs.each do |job| %>
+      <tr>
+        <td><%= job.handler %></td>
+        <td><%= job.attempts %></td>
+        <td><%= job.priority %></td>
+        <td><%= job.last_error %></td>
+        <td><%= job.run_at %></td>
+        <td><%= job.failed_at %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= numbered_paginator(@delayed_jobs) %>

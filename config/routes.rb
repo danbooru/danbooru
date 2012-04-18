@@ -67,6 +67,7 @@ Danbooru::Application.routes.draw do
       get :search
     end
   end
+  resources :delayed_jobs, :only => [:index]
   resources :dmails do
     collection do
       get :search
