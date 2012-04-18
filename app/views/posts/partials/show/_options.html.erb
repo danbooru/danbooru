@@ -7,7 +7,7 @@
     <li><%= link_to "Find similar", "http://danbooru.iqdb.org/db-search.php?url=#{post.preview_file_url}" %></li>
     
     <% unless post.is_status_locked? %>
-      <% if !post.is_deleted? %>
+      <% if !post.is_deleted? && !post.is_pending? %>
         <li><%= link_to "Flag", new_post_flag_path(:post_id => post.id), :id => "flag" %></li>
       <% end %>
       
@@ -35,6 +35,6 @@
   <% end %>
   
   <% if CurrentUser.is_admin? %>
-    <li><%= link_to "Annihilate", annihilate_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "annihilate", :confirm => "This will permanently delete this post (meaning the file will be deleted). Are you sure you want to annihilate this post?" %></li>
+    <li><%= link_to "Permanent delete", annihilate_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "annihilate", :confirm => "This will permanently delete this post (meaning the file will be deleted). Are you sure you want to delete this post?" %></li>
   <% end %>
 </ul>
