@@ -125,9 +125,9 @@ drop table dmails_orig;
 alter table tag_subscriptions drop column id;
 alter table tag_subscriptions add column id serial primary key;
 
--- alter table favorites drop constraint fk_favorites__post;
--- alter table favorites drop constraint fk_favorites__user;
--- alter table favorites drop constraint favorites_pkey;
+alter table favorites drop constraint fk_favorites__post;
+alter table favorites drop constraint fk_favorites__user;
+alter table favorites drop constraint favorites_pkey;
 drop index idx_favorites__post;
 drop index idx_favorites__user;
 alter table favorites rename to favorites_orig;
