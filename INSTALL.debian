@@ -47,12 +47,12 @@ fi
 
 # Install RVM
 echo "Installing RVM..."
-bash < <(curl -s https://rvm.beginrescueend.com/install/rvm)
+curl -L get.rvm.io | bash -s stable
 echo "source /usr/local/rvm/scripts/rvm" >> /etc/bash.bashrc
 echo "source /usr/local/rvm/scripts/rvm" >> /etc/profile
 source /usr/local/rvm/scripts/rvm
-rvm install ruby-1.9.2-p290 --with-openssl-dir=/usr/local
-rvm 1.9.2 --default
+rvm install ruby-1.9.3-p125 --with-openssl-dir=/usr/local
+rvm 1.9.3-p125 --default
 
 # Install gems
 gem install --no-ri --no-rdoc capistrano
@@ -60,7 +60,7 @@ gem install --no-ri --no-rdoc capistrano-ext
 gem install --no-ri --no-rdoc bundler
 
 # Install Passenger
-gem install --no-ri --no-rdoc -v 3.0.9 passenger
+gem install --no-ri --no-rdoc -v 3.0.12 passenger
 bash -c '/usr/local/rvm/bin/rvm exec passenger-install-nginx-module --auto --auto-download --prefix=/opt/nginx'
 rm -f /opt/nginx/conf/*.default
 
