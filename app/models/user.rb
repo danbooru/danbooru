@@ -438,5 +438,13 @@ class User < ActiveRecord::Base
   def can_update?(object, foreign_key = :user_id)
     is_moderator? || is_admin? || object.__send__(foreign_key) == id
   end
+  
+  def dmail_count
+    if has_mail?
+      "(#{dmails.unread.count})"
+    else
+      ""
+    end
+  end
 end
 
