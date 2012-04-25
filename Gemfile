@@ -21,7 +21,7 @@ gem "delayed_job"
 gem "delayed_job_active_record"
 gem "super_exception_notifier"
 gem "simple_form"
-gem "mechanize", git: 'git://github.com/caribio/mechanize.git'
+gem "mechanize", :git => 'git://github.com/caribio/mechanize.git'
 gem "nokogiri"
 gem "meta_search", :git => "git://github.com/ernie/meta_search.git"
 gem "whenever", :require => false
