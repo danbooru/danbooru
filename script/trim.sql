@@ -1,11 +1,4 @@
 set statement_timeout = 0;
-delete from posts where id < 1000000;
-delete from comments where post_id < 1000000;
-delete from favorites where post_id < 1000000;
-delete from flagged_post_details where post_id < 1000000;
-delete from note_versions where post_id < 1000000;
-delete from notes where post_id < 1000000;
-delete from pools_posts where post_id < 1000000;
-delete from post_appeals where post_id < 1000000;
-delete from post_tag_histories where post_id < 1000000;
-delete from post_votes where post_id < 1000000;
+delete from posts where id < 1140000;
+delete from post_appeals where post_id < 1140000;
+vacuum analyze;

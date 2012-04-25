@@ -28,6 +28,7 @@ gem "whenever", :require => false
 gem "sanitize", :git => "git://github.com/rgrove/sanitize.git"
 gem 'rmagick', :require => "RMagick"
 gem 'daemons'
+gem 'newrelic_rpm'
 
 group :development do
   gem 'pry'
