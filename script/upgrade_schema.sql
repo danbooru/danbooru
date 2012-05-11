@@ -3179,14 +3179,14 @@ CREATE TABLE user_password_reset_nonces (
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
-ALTER TABLE public.user_password_reset_nonces OWNER TO ayi;
+ALTER TABLE public.user_password_reset_nonces OWNER TO danbooru;
 CREATE SEQUENCE user_password_reset_nonces_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-ALTER TABLE public.user_password_reset_nonces_id_seq OWNER TO ayi;
+ALTER TABLE public.user_password_reset_nonces_id_seq OWNER TO danbooru;
 ALTER SEQUENCE user_password_reset_nonces_id_seq OWNED BY user_password_reset_nonces.id;
 ALTER TABLE user_password_reset_nonces ALTER COLUMN id SET DEFAULT nextval('user_password_reset_nonces_id_seq'::regclass);
 ALTER TABLE ONLY user_password_reset_nonces

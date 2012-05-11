@@ -440,7 +440,7 @@ class Post < ActiveRecord::Base
           if pool.nil?
             pool = Pool.create(:name => $1, :description => "This pool was automatically generated")
           end
-          add_pool!(pool)
+          add_pool!(pool) if pool
 
         when /^rating:([qse])/i
           self.rating = $1.downcase

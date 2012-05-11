@@ -28,7 +28,7 @@ class TagImplication < ActiveRecord::Base
             all.concat(children)
             children = self.class.where(["antecedent_name IN (?)", children]).all.map(&:consequent_name)
           end
-        end.sort
+        end.sort.uniq
       end
     end
 
