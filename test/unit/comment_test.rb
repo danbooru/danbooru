@@ -64,14 +64,15 @@ class CommentTest < ActiveSupport::TestCase
         user = Factory.create(:user)
         post = Factory.create(:post)
         c1 = Factory.create(:comment, :post => post)
-        comment_vote = c1.vote!(true)
+        comment_vote = c1.vote!("up")
         assert_equal([], comment_vote.errors.full_messages)
-        comment_vote = c1.vote!(true)
+        comment_vote = c1.vote!("up")
         assert_equal(["User has already voted for this comment"], comment_vote.errors.full_messages)
         assert_equal(1, CommentVote.count)
+        assert_equal(1, CommentVote.last.score)
 
         c2 = Factory.create(:comment, :post => post)
-        comment_vote = c2.vote!(true)
+        comment_vote = c2.vote!("up")
         assert_equal([], comment_vote.errors.full_messages)
         assert_equal(2, CommentVote.count)
       end
