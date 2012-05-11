@@ -74,7 +74,7 @@ class Advertisement < ActiveRecord::Base
     if width > 100 || height > 100
       if height < width
         ratio = 100.0 / width
-        return (height * ratio)
+        return (height * ratio).to_i
       else
         return 100
       end

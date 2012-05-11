@@ -2,15 +2,27 @@ require 'test_helper'
 
 class AdvertisementTest < ActiveSupport::TestCase
   context "An advertisement" do
+    setup do
+      @ad = Factory.create(:advertisement, :file => upload_jpeg("#{Rails.root}/test/files/test.jpg"))
+    end
+    
+    teardown do
+      FileUtils.rm_f(Dir.glob("#{Rails.root}/public/images/advertisements/*.jpg"))
+    end
+    
     should "create new hit records" do
-      ad = Factory.create(:advertisement)
       assert_difference("AdvertisementHit.count") do
-        ad.hit!("0.0.0.0")
+        @ad.hit!("0.0.0.0")
       end
       assert_equal("0.0.0.0", AdvertisementHit.first.ip_addr)
       assert_equal(1, AdvertisementHit.first.advertisement_id)
-      assert_equal(1, ad.hit_sum(1.day.ago, 1.day.from_now))
-      assert_equal(0, ad.hit_sum(2.days.ago, 1.day.ago))
+      assert_equal(1, @ad.hit_sum(1.day.ago, 1.day.from_now))
+      assert_equal(0, @ad.hit_sum(2.days.ago, 1.day.ago))
+    end
+    
+    should "know its preview height and preview width" do
+      assert_equal(100, @ad.preview_width)
+      assert_equal(67, @ad.preview_height)
     end
   end
 end
