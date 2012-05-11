@@ -4,7 +4,7 @@ require 'test_helper'
 
 module Sources
   class PixaTest < ActiveSupport::TestCase
-    context "The source site for nico seiga" do
+    context "The source site for pixa" do
       setup do
         @site = Sources::Site.new("http://www.pixa.cc/illustrations/show/75575")
         @site.get

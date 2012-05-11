@@ -6,7 +6,7 @@ class Note < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   before_validation :initialize_updater
   before_validation :blank_body
-  validates_presence_of :post_id, :creator_id, :updater_id
+  validates_presence_of :post_id, :creator_id, :updater_id, :x, :y, :width, :height
   has_many :versions, :class_name => "NoteVersion", :order => "note_versions.id ASC"
   after_save :update_post
   after_save :create_version
