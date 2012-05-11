@@ -20,6 +20,8 @@ class Artist < ActiveRecord::Base
   search_methods :url_match, :other_names_match
   
   module UrlMethods
+    extend ActiveSupport::Concern
+    
     module ClassMethods
       def find_all_by_url(url)
         url = ArtistUrl.normalize(url)
@@ -34,10 +36,6 @@ class Artist < ActiveRecord::Base
 
         artists.uniq_by {|x| x.name}.slice(0, 20)
       end
-    end
-    
-    def self.included(m)
-      m.extend(ClassMethods)
     end
 
     def save_url_string
@@ -60,14 +58,12 @@ class Artist < ActiveRecord::Base
   end
 
   module NameMethods
+    extend ActiveSupport::Concern
+    
     module ClassMethods
       def normalize_name(name)
         name.to_s.downcase.strip.gsub(/ /, '_')
       end
-    end
-    
-    def self.included(m)
-      m.extend(ClassMethods)
     end
 
     def normalize_name
