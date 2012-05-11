@@ -26,6 +26,19 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
       end
     end
     
+    context "given a list with an invalid command" do
+      setup do
+        @list = "zzzz abc -> def\n"
+        @importer = AliasAndImplicationImporter.new(@list, nil)
+      end
+      
+      should "throw an exception" do
+        assert_raises(RuntimeError) do
+          @importer.process!
+        end
+      end
+    end
+    
     context "given a list with a logic error" do
       setup do
         @list = "remove alias zzz -> yyy\n"
