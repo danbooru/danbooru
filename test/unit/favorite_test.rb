@@ -15,6 +15,17 @@ class FavoriteTest < ActiveSupport::TestCase
   end
 
   context "A favorite" do
+    should "delete from all tables" do
+      user1 = Factory.create(:user)
+      p1 = Factory.create(:post)
+    
+      user1.add_favorite!(p1)
+      assert_equal(1, Favorite.count)
+      
+      Favorite.destroy_all(:user_id => user1.id, :post_id => p1.id)
+      assert_equal(0, Favorite.count)
+    end
+    
     should "know which table it belongs to" do
       user1 = Factory.create(:user)
       user2 = Factory.create(:user)      
