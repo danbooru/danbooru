@@ -6,12 +6,13 @@ div.comments-for-post {
       margin-bottom: 2em;
       
       div.author {
-        width: 20%;
+        width: 12em;
         float: left;
+        overflow: hidden;
         
         h1 {
           display: block;
-          font-size: $h2_size;
+          font-size: $h3_size;
         }
       }
       

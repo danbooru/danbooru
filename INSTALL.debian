@@ -45,7 +45,7 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# Install RVM
+# Install rbenv
 echo "Installing RVM..."
 curl -L get.rvm.io | bash -s stable
 echo "source /usr/local/rvm/scripts/rvm" >> /etc/bash.bashrc
