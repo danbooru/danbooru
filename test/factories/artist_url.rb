@@ -1,4 +1,6 @@
-Factory.define(:artist_url) do |f|
-  f.artist {|x| x.association(:artist)}
-  f.url {Faker::Internet.domain_name}
+FactoryGirl.define do
+  factory(:artist_url) do
+    artist
+    url {Faker::Internet.domain_name}
+  end
 end

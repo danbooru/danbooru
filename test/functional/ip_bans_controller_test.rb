@@ -3,7 +3,7 @@ require 'test_helper'
 class IpBansControllerTest < ActionController::TestCase
   context "The ip bans controller" do
     setup do
-      @admin = Factory.create(:admin_user)
+      @admin = FactoryGirl.create(:admin_user)
       CurrentUser.user = @admin
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -25,7 +25,7 @@ class IpBansControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        Factory.create(:ip_ban)
+        FactoryGirl.create(:ip_ban)
       end
       
       should "render" do
@@ -43,7 +43,7 @@ class IpBansControllerTest < ActionController::TestCase
     
     context "destroy action" do
       setup do
-        @ip_ban = Factory.create(:ip_ban)
+        @ip_ban = FactoryGirl.create(:ip_ban)
       end
       
       should "destroy an ip ban" do

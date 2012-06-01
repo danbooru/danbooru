@@ -3,13 +3,13 @@ require 'test_helper'
 class ForumPostsControllerTest < ActionController::TestCase
   context "The forum posts controller" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @other_user = Factory.create(:user)
-      @mod = Factory.create(:moderator_user)
-      @forum_topic = Factory.create(:forum_topic, :title => "my forum topic", :creator => @user)
-      @forum_post = Factory.create(:forum_post, :topic_id => @forum_topic.id, :body => "xxx")
+      @other_user = FactoryGirl.create(:user)
+      @mod = FactoryGirl.create(:moderator_user)
+      @forum_topic = FactoryGirl.create(:forum_topic, :title => "my forum topic", :creator => @user)
+      @forum_post = FactoryGirl.create(:forum_post, :topic_id => @forum_topic.id, :body => "xxx")
     end
     
     teardown do

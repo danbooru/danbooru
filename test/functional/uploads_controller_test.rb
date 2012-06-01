@@ -3,7 +3,7 @@ require 'test_helper'
 class UploadsControllerTest < ActionController::TestCase
   context "The uploads controller" do
     setup do
-      @user = Factory.create(:contributor_user)
+      @user = FactoryGirl.create(:contributor_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -21,7 +21,7 @@ class UploadsControllerTest < ActionController::TestCase
       
       context "for a post that has already been uploaded" do
         setup do
-          @post = Factory.create(:post, :source => "aaa")
+          @post = FactoryGirl.create(:post, :source => "aaa")
         end
         
         should "initialize the post" do
@@ -34,7 +34,7 @@ class UploadsControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        @upload = Factory.create(:source_upload)
+        @upload = FactoryGirl.create(:source_upload)
       end
       
       should "render" do
@@ -52,7 +52,7 @@ class UploadsControllerTest < ActionController::TestCase
     
     context "show action" do
       setup do
-        @upload = Factory.create(:jpg_upload)
+        @upload = FactoryGirl.create(:jpg_upload)
       end
       
       should "render" do
@@ -73,7 +73,7 @@ class UploadsControllerTest < ActionController::TestCase
     
     context "update action" do
       setup do
-        @upload = Factory.create(:jpg_upload)
+        @upload = FactoryGirl.create(:jpg_upload)
       end
       
       should "process an unapproval" do

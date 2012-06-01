@@ -3,7 +3,7 @@ require 'test_helper'
 class AdvertisementTest < ActiveSupport::TestCase
   context "An advertisement" do
     setup do
-      @ad = Factory.create(:advertisement, :file => upload_jpeg("#{Rails.root}/test/files/test.jpg"))
+      @ad = FactoryGirl.create(:advertisement, :file => upload_jpeg("#{Rails.root}/test/files/test.jpg"))
     end
     
     teardown do

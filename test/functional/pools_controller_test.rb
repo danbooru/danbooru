@@ -3,11 +3,11 @@ require 'test_helper'
 class PoolsControllerTest < ActionController::TestCase
   context "The pools controller" do
     setup do
-      @user = Factory.create(:user)
-      @mod = Factory.create(:moderator_user)
+      @user = FactoryGirl.create(:user)
+      @mod = FactoryGirl.create(:moderator_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @post = Factory.create(:post)
+      @post = FactoryGirl.create(:post)
     end
     
     teardown do
@@ -16,7 +16,7 @@ class PoolsControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        Factory.create(:pool, :name => "abc")
+        FactoryGirl.create(:pool, :name => "abc")
       end
       
       should "list all pools" do
@@ -32,7 +32,7 @@ class PoolsControllerTest < ActionController::TestCase
     
     context "show action" do
       setup do
-        @pool = Factory.create(:pool)
+        @pool = FactoryGirl.create(:pool)
       end
       
       should "render" do
@@ -51,7 +51,7 @@ class PoolsControllerTest < ActionController::TestCase
     
     context "update action" do
       setup do
-        @pool = Factory.create(:pool)
+        @pool = FactoryGirl.create(:pool)
       end
       
       should "update a pool" do
@@ -63,7 +63,7 @@ class PoolsControllerTest < ActionController::TestCase
     
     context "destroy action" do
       setup do
-        @pool = Factory.create(:pool)
+        @pool = FactoryGirl.create(:pool)
       end
       
       should "destroy a pool" do
@@ -75,7 +75,7 @@ class PoolsControllerTest < ActionController::TestCase
     
     context "undelete action" do
       setup do
-        @pool = Factory.create(:pool)
+        @pool = FactoryGirl.create(:pool)
         @pool.is_deleted = true
         @pool.save
       end
@@ -89,8 +89,8 @@ class PoolsControllerTest < ActionController::TestCase
     
     context "revert action" do
       setup do
-        @post_2 = Factory.create(:post)
-        @pool = Factory.create(:pool, :post_ids => "#{@post.id}")
+        @post_2 = FactoryGirl.create(:post)
+        @pool = FactoryGirl.create(:pool, :post_ids => "#{@post.id}")
         CurrentUser.ip_addr = "1.2.3.4" # this is to get around the version collation
         @pool.update_attributes(:post_ids => "#{@post.id} #{@post_2.id}")
         CurrentUser.ip_addr = "127.0.0.1"

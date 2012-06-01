@@ -3,7 +3,7 @@ require 'test_helper'
 class PostFlagsControllerTest < ActionController::TestCase
   context "The post flags controller" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -22,8 +22,8 @@ class PostFlagsControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        @post = Factory.create(:post)
-        @post_flag = Factory.create(:post_flag, :post => @post)
+        @post = FactoryGirl.create(:post)
+        @post_flag = FactoryGirl.create(:post_flag, :post => @post)
       end
       
       should "render" do
@@ -41,7 +41,7 @@ class PostFlagsControllerTest < ActionController::TestCase
     
     context "create action" do
       setup do 
-        @post = Factory.create(:post)
+        @post = FactoryGirl.create(:post)
       end
       
       should "create a new flag" do

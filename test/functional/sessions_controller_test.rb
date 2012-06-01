@@ -3,7 +3,7 @@ require 'test_helper'
 class SessionsControllerTest < ActionController::TestCase
   context "the sessions controller" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
     end
     
     context "new action" do

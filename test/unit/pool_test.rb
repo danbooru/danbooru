@@ -2,7 +2,7 @@ require 'test_helper'
 
 class PoolTest < ActiveSupport::TestCase
   setup do
-    user = Factory.create(:user)
+    user = FactoryGirl.create(:user)
     CurrentUser.user = user
     CurrentUser.ip_addr = "127.0.0.1"
     MEMCACHE.flush_all
@@ -15,7 +15,7 @@ class PoolTest < ActiveSupport::TestCase
   
   context "A name" do
     setup do
-      @pool = Factory.create(:pool, :name => "xxx")
+      @pool = FactoryGirl.create(:pool, :name => "xxx")
     end
     
     should "be mapped to a pool id" do
@@ -25,7 +25,7 @@ class PoolTest < ActiveSupport::TestCase
   
   context "An id number" do
     setup do
-      @pool = Factory.create(:pool)
+      @pool = FactoryGirl.create(:pool)
     end
     
     should "be mapped to a pool id" do
@@ -39,10 +39,10 @@ class PoolTest < ActiveSupport::TestCase
   
   context "Reverting a pool" do
     setup do
-      @pool = Factory.create(:pool)
-      @p1 = Factory.create(:post)
-      @p2 = Factory.create(:post)
-      @p3 = Factory.create(:post)
+      @pool = FactoryGirl.create(:pool)
+      @p1 = FactoryGirl.create(:post)
+      @p2 = FactoryGirl.create(:post)
+      @p3 = FactoryGirl.create(:post)
       CurrentUser.ip_addr = "1.2.3.4"
       @pool.add!(@p1)
       CurrentUser.ip_addr = "1.2.3.5"
@@ -81,9 +81,9 @@ class PoolTest < ActiveSupport::TestCase
   
   context "Updating a pool" do
     setup do
-      @pool = Factory.create(:pool)
-      @p1 = Factory.create(:post)
-      @p2 = Factory.create(:post)
+      @pool = FactoryGirl.create(:pool)
+      @p1 = FactoryGirl.create(:post)
+      @p2 = FactoryGirl.create(:post)
     end
     
     context "by adding a new post" do
@@ -194,10 +194,10 @@ class PoolTest < ActiveSupport::TestCase
   
   context "An existing pool" do
     setup do
-      @pool = Factory.create(:pool)
-      @p1 = Factory.create(:post)
-      @p2 = Factory.create(:post)
-      @p3 = Factory.create(:post)
+      @pool = FactoryGirl.create(:pool)
+      @p1 = FactoryGirl.create(:post)
+      @p2 = FactoryGirl.create(:post)
+      @p3 = FactoryGirl.create(:post)
       @pool.add!(@p1)
       @pool.add!(@p2)
       @pool.add!(@p3)
@@ -249,7 +249,7 @@ class PoolTest < ActiveSupport::TestCase
 
   context "An anonymous pool" do
     setup do
-      user = Factory.create(:user)
+      user = FactoryGirl.create(:user)
       CurrentUser.user = user
     end
     

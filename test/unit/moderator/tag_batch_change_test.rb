@@ -4,10 +4,10 @@ module Moderator
   class TagBatchChangeTest < ActiveSupport::TestCase
     context "a tag batch change" do
       setup do
-        @user = Factory.create(:moderator_user)
+        @user = FactoryGirl.create(:moderator_user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
-        @post = Factory.create(:post, :tag_string => "aaa")
+        @post = FactoryGirl.create(:post, :tag_string => "aaa")
       end
   
       teardown do

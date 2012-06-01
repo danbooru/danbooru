@@ -3,10 +3,10 @@ require 'test_helper'
 class NewsUpdatesControllerTest < ActionController::TestCase
   context "the news updates controller" do
     setup do
-      @admin = Factory.create(:admin_user)
+      @admin = FactoryGirl.create(:admin_user)
       CurrentUser.user = @admin
       CurrentUser.ip_addr = "127.0.0.1"
-      @news_update = Factory.create(:news_update)
+      @news_update = FactoryGirl.create(:news_update)
     end
     
     teardown do

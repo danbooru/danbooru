@@ -1,3 +1,5 @@
-Factory.define(:comment_vote) do |f|
-  f.score 1
+FactoryGirl.define do
+  factory(:comment_vote) do
+    score 1
+  end
 end

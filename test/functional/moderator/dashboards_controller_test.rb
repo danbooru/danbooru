@@ -4,7 +4,7 @@ module Moderator
   class DashboardsControllerTest < ActionController::TestCase
     context "The moderator dashboards controller" do
       setup do
-        @admin = Factory.create(:admin_user)
+        @admin = FactoryGirl.create(:admin_user)
         CurrentUser.user = @admin
         CurrentUser.ip_addr = "127.0.0.1"
         Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
@@ -13,7 +13,7 @@ module Moderator
       context "show action" do
         context "for mod actions" do
           setup do
-            @mod_action = Factory.create(:mod_action)
+            @mod_action = FactoryGirl.create(:mod_action)
           end
           
           should "render" do
@@ -25,7 +25,7 @@ module Moderator
         
         context "for user feedbacks" do
           setup do
-            @feedback = Factory.create(:user_feedback)
+            @feedback = FactoryGirl.create(:user_feedback)
           end
           
           should "render" do
@@ -37,7 +37,7 @@ module Moderator
         
         context "for wiki pages" do
           setup do
-            @wiki_page = Factory.create(:wiki_page)
+            @wiki_page = FactoryGirl.create(:wiki_page)
           end
           
           should "render" do
@@ -49,7 +49,7 @@ module Moderator
         
         context "for tags and uploads" do
           setup do
-            @post = Factory.create(:post)
+            @post = FactoryGirl.create(:post)
           end
           
           should "render" do
@@ -61,8 +61,8 @@ module Moderator
         
         context "for notes"do
           setup do
-            @post = Factory.create(:post)
-            @note = Factory.create(:note, :post_id => @post.id)
+            @post = FactoryGirl.create(:post)
+            @note = FactoryGirl.create(:note, :post_id => @post.id)
           end
           
           should "render" do
@@ -74,10 +74,10 @@ module Moderator
       
         context "for comments" do
           setup do
-            @users = (0..5).map {Factory.create(:user)}
+            @users = (0..5).map {FactoryGirl.create(:user)}
 
             CurrentUser.scoped(@users[0], "1.2.3.4") do
-              @comment = Factory.create(:comment)
+              @comment = FactoryGirl.create(:comment)
             end
             
             @users.each do |user|
@@ -95,7 +95,7 @@ module Moderator
         
         context "for artists" do
           setup do
-            @artist = Factory.create(:artist)
+            @artist = FactoryGirl.create(:artist)
           end
           
           should "render" do
@@ -107,7 +107,7 @@ module Moderator
         
         context "for flags" do
           setup do
-            @post = Factory.create(:post)
+            @post = FactoryGirl.create(:post)
             @post.flag!("blah")
           end
 
@@ -119,7 +119,7 @@ module Moderator
         
         context "for appeals" do
           setup do
-            @post = Factory.create(:post, :is_deleted => true)
+            @post = FactoryGirl.create(:post, :is_deleted => true)
             @post.appeal!("blah")
           end
 

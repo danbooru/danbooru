@@ -3,7 +3,7 @@ require 'test_helper'
 class PostDisapprovalTest < ActiveSupport::TestCase
   context "In all cases" do
     setup do
-      @alice = Factory.create(:moderator_user)
+      @alice = FactoryGirl.create(:moderator_user)
       CurrentUser.user = @alice
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
@@ -16,8 +16,8 @@ class PostDisapprovalTest < ActiveSupport::TestCase
     
     context "A post disapproval" do
       setup do
-        @post_1 = Factory.create(:post, :is_pending => true)
-        @post_2 = Factory.create(:post, :is_pending => true)
+        @post_1 = FactoryGirl.create(:post, :is_pending => true)
+        @post_2 = FactoryGirl.create(:post, :is_pending => true)
       end
       
       context "made by alice" do
@@ -38,7 +38,7 @@ class PostDisapprovalTest < ActiveSupport::TestCase
 
         context "when the current user is brittony" do
           setup do
-            @brittony = Factory.create(:moderator_user)
+            @brittony = FactoryGirl.create(:moderator_user)
             CurrentUser.user = @brittony
           end
           
@@ -51,8 +51,8 @@ class PostDisapprovalTest < ActiveSupport::TestCase
 
       context "for a post that has been approved" do
         setup do
-          @post = Factory.create(:post)
-          @user = Factory.create(:user)
+          @post = FactoryGirl.create(:post)
+          @user = FactoryGirl.create(:user)
           @disapproval = PostDisapproval.create(:user => @user, :post => @post)
         end
         

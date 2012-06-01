@@ -3,10 +3,10 @@ require 'test_helper'
 class ForumTopicTest < ActiveSupport::TestCase
   context "A forum topic" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @topic = Factory.create(:forum_topic, :title => "xxx")
+      @topic = FactoryGirl.create(:forum_topic, :title => "xxx")
     end
     
     teardown do
@@ -17,7 +17,7 @@ class ForumTopicTest < ActiveSupport::TestCase
     context "constructed with nested attributes for its original post" do
       should "create a matching forum post" do
         assert_difference(["ForumTopic.count", "ForumPost.count"], 1) do
-          @topic = Factory.create(:forum_topic, :title => "abc", :original_post_attributes => {:body => "abc"})
+          @topic = FactoryGirl.create(:forum_topic, :title => "abc", :original_post_attributes => {:body => "abc"})
        end 
       end
     end
@@ -33,7 +33,7 @@ class ForumTopicTest < ActiveSupport::TestCase
     
     context "updated by a second user" do
       setup do
-        @second_user = Factory.create(:user)
+        @second_user = FactoryGirl.create(:user)
         CurrentUser.user = @second_user
       end
       
@@ -46,7 +46,7 @@ class ForumTopicTest < ActiveSupport::TestCase
     context "with multiple posts that has been deleted" do
       setup do
         5.times do
-          Factory.create(:forum_post, :topic_id => @topic.id)
+          FactoryGirl.create(:forum_post, :topic_id => @topic.id)
         end
       end
       

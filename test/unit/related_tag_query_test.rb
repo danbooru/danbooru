@@ -2,7 +2,7 @@ require 'test_helper'
 
 class RelatedTagQueryTest < ActiveSupport::TestCase
   setup do
-    user = Factory.create(:user)
+    user = FactoryGirl.create(:user)
     CurrentUser.user = user
     CurrentUser.ip_addr = "127.0.0.1"
     MEMCACHE.flush_all
@@ -11,8 +11,8 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
   
   context "a related tag query without a category constraint" do
     setup do
-      @post_1 = Factory.create(:post, :tag_string => "aaa bbb")
-      @post_2 = Factory.create(:post, :tag_string => "aaa bbb ccc")
+      @post_1 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
+      @post_2 = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
     end
 
     context "for a tag that already exists" do
@@ -52,7 +52,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
     
     context "for a tag with a wiki page" do
       setup do
-        @wiki_page = Factory.create(:wiki_page, :title => "aaa", :body => "[[bbb]] [[ccc]]")
+        @wiki_page = FactoryGirl.create(:wiki_page, :title => "aaa", :body => "[[bbb]] [[ccc]]")
         @query = RelatedTagQuery.new("aaa", "")
       end
       
@@ -64,9 +64,9 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
   
   context "a related tag query with a category constraint" do
     setup do
-      @post_1 = Factory.create(:post, :tag_string => "aaa bbb")
-      @post_2 = Factory.create(:post, :tag_string => "aaa art:ccc")
-      @post_3 = Factory.create(:post, :tag_string => "aaa copy:ddd")
+      @post_1 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
+      @post_2 = FactoryGirl.create(:post, :tag_string => "aaa art:ccc")
+      @post_3 = FactoryGirl.create(:post, :tag_string => "aaa copy:ddd")
       @query = RelatedTagQuery.new("aaa", "artist")
     end
     

@@ -3,7 +3,7 @@ require 'test_helper'
 class WikiPageVersionsControllerTest < ActionController::TestCase
   context "The wiki page versions controller" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -15,7 +15,7 @@ class WikiPageVersionsControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        @wiki_page = Factory.create(:wiki_page)
+        @wiki_page = FactoryGirl.create(:wiki_page)
         @wiki_page.update_attributes(:body => "1 2")
         @wiki_page.update_attributes(:body => "2 3")
       end

@@ -3,10 +3,10 @@ require 'test_helper'
 class NotesControllerTest < ActionController::TestCase
   context "The notes controller" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @post = Factory.create(:post)
+      @post = FactoryGirl.create(:post)
     end
     
     teardown do
@@ -15,7 +15,7 @@ class NotesControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        Factory.create(:note)
+        FactoryGirl.create(:note)
       end
       
       should "list all notes" do
@@ -39,7 +39,7 @@ class NotesControllerTest < ActionController::TestCase
     
     context "update action" do
       setup do
-        @note = Factory.create(:note)
+        @note = FactoryGirl.create(:note)
       end
       
       should "update a note" do
@@ -51,7 +51,7 @@ class NotesControllerTest < ActionController::TestCase
     
     context "destroy action" do
       setup do
-        @note = Factory.create(:note)
+        @note = FactoryGirl.create(:note)
       end
       
       should "destroy a note" do
@@ -63,7 +63,7 @@ class NotesControllerTest < ActionController::TestCase
     
     context "revert action" do
       setup do
-        @note = Factory.create(:note, :body => "000")
+        @note = FactoryGirl.create(:note, :body => "000")
         @note.update_attributes(:body => "111")
         @note.update_attributes(:body => "222")
       end

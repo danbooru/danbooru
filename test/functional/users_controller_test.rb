@@ -3,7 +3,7 @@ require 'test_helper'
 class UsersControllerTest < ActionController::TestCase
   context "The users controller" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -14,7 +14,7 @@ class UsersControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        Factory.create(:user, :name => "abc")
+        FactoryGirl.create(:user, :name => "abc")
       end
       
       should "list all users" do
@@ -30,7 +30,7 @@ class UsersControllerTest < ActionController::TestCase
     
     context "show action" do
       setup do
-        @user = Factory.create(:user)
+        @user = FactoryGirl.create(:user)
       end
       
       should "render" do
@@ -51,7 +51,7 @@ class UsersControllerTest < ActionController::TestCase
     
     context "edit action" do
       setup do
-        @user = Factory.create(:user)
+        @user = FactoryGirl.create(:user)
       end
       
       should "render" do
@@ -62,7 +62,7 @@ class UsersControllerTest < ActionController::TestCase
     
     context "update action" do
       setup do
-        @user = Factory.create(:user)
+        @user = FactoryGirl.create(:user)
       end
       
       should "update a user" do

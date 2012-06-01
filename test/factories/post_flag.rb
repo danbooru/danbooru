@@ -1,4 +1,6 @@
-Factory.define(:post_flag) do |f|
-  f.reason "xxx"
-  f.is_resolved false
+FactoryGirl.define do
+  factory(:post_flag) do
+    reason "xxx"
+    is_resolved false
+  end
 end

@@ -3,8 +3,8 @@ require 'test_helper'
 class AdvertisementHitsControllerTest < ActionController::TestCase
   context "An advertisement hits controller" do
     setup do
-      @ad = Factory.create(:advertisement)
-      @advertiser = Factory.create(:admin_user)
+      @ad = FactoryGirl.create(:advertisement)
+      @advertiser = FactoryGirl.create(:admin_user)
     end
 
     should "create a new hit" do

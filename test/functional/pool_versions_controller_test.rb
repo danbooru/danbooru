@@ -3,7 +3,7 @@ require 'test_helper'
 class PoolVersionsControllerTest < ActionController::TestCase
   context "The pool versions controller" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -15,9 +15,9 @@ class PoolVersionsControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        @pool = Factory.create(:pool)
-        @user_2 = Factory.create(:user)
-        @user_3 = Factory.create(:user)
+        @pool = FactoryGirl.create(:pool)
+        @user_2 = FactoryGirl.create(:user)
+        @user_3 = FactoryGirl.create(:user)
         
         CurrentUser.scoped(@user_2, "1.2.3.4") do
           @pool.update_attributes(:post_ids => "1 2")

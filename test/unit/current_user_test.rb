@@ -8,7 +8,7 @@ class ArtistTest < ActiveSupport::TestCase
   
   context "The current user" do
     should "be set only within the scope of the block" do
-      user = Factory.create(:user)
+      user = FactoryGirl.create(:user)
       
       assert_nil(CurrentUser.user)
       assert_nil(CurrentUser.ip_addr)
@@ -24,8 +24,8 @@ class ArtistTest < ActiveSupport::TestCase
   
   context "A scoped current user" do
     should "reset the current user after the block has exited" do
-      user1 = Factory.create(:user)
-      user2 = Factory.create(:user)      
+      user1 = FactoryGirl.create(:user)
+      user2 = FactoryGirl.create(:user)      
       CurrentUser.user = user1
       CurrentUser.scoped(user2, nil) do
         assert_equal(user2.id, CurrentUser.user.id)
@@ -34,8 +34,8 @@ class ArtistTest < ActiveSupport::TestCase
     end
     
     should "reset the current user even if an exception is thrown" do
-      user1 = Factory.create(:user)
-      user2 = Factory.create(:user)      
+      user1 = FactoryGirl.create(:user)
+      user2 = FactoryGirl.create(:user)      
       CurrentUser.user = user1
       assert_raises(RuntimeError) do
         CurrentUser.scoped(user2, nil) do

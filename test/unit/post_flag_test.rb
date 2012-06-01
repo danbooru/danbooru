@@ -3,7 +3,7 @@ require 'test_helper'
 class PostFlagTest < ActiveSupport::TestCase
   context "In all cases" do
     setup do
-      @alice = Factory.create(:user)
+      @alice = FactoryGirl.create(:user)
       CurrentUser.user = @alice
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
@@ -16,7 +16,7 @@ class PostFlagTest < ActiveSupport::TestCase
     
     context "a user" do
       setup do
-        @post = Factory.create(:post, :tag_string => "aaa")
+        @post = FactoryGirl.create(:post, :tag_string => "aaa")
       end
       
       should "not be able to flag a post more than twice" do

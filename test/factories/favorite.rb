@@ -1,2 +1,3 @@
-Factory.define(:favorite) do |f|
+FactoryGirl.define do
+  factory(:favorite)
 end

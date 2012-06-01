@@ -3,7 +3,7 @@ require 'test_helper'
 class PostAppealTest < ActiveSupport::TestCase
   context "In all cases" do
     setup do
-      @alice = Factory.create(:user)
+      @alice = FactoryGirl.create(:user)
       CurrentUser.user = @alice
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
@@ -17,7 +17,7 @@ class PostAppealTest < ActiveSupport::TestCase
     
     context "a user" do
       setup do
-        @post = Factory.create(:post, :tag_string => "aaa", :is_deleted => true)
+        @post = FactoryGirl.create(:post, :tag_string => "aaa", :is_deleted => true)
       end
       
       should "not be able to appeal a post more than twice" do

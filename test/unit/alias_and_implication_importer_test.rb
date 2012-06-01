@@ -3,7 +3,7 @@ require 'test_helper'
 class AliasAndImplicationImporterTest < ActiveSupport::TestCase
   context "The alias and implication importer" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -20,7 +20,7 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
       end
       
       should "process it" do
-        assert_difference("Delayed::Job.count", 2) do
+        assert_difference("Delayed::Job.count", 3) do
           @importer.process!
         end
       end

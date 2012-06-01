@@ -3,7 +3,7 @@ require 'test_helper'
 class TagsControllerTest < ActionController::TestCase
   context "The tags controller" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -15,7 +15,7 @@ class TagsControllerTest < ActionController::TestCase
     
     context "edit action" do
       setup do
-        @tag = Factory.create(:tag, :name => "aaa")
+        @tag = FactoryGirl.create(:tag, :name => "aaa")
       end
       
       should "render" do
@@ -26,7 +26,7 @@ class TagsControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        @tag = Factory.create(:tag, :name => "aaa")
+        @tag = FactoryGirl.create(:tag, :name => "aaa")
       end
       
       should "render" do
@@ -44,7 +44,7 @@ class TagsControllerTest < ActionController::TestCase
     
     context "show action" do
       setup do 
-        @tag = Factory.create(:tag)
+        @tag = FactoryGirl.create(:tag)
       end
       
       should "render" do
@@ -55,7 +55,7 @@ class TagsControllerTest < ActionController::TestCase
     
     context "update action" do
       setup do
-        @tag = Factory.create(:tag)
+        @tag = FactoryGirl.create(:tag)
       end
       
       should "update the tag" do

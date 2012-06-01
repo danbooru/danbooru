@@ -1,19 +1,21 @@
-Factory.define(:tag) do |f|
-  f.name {Faker::Name.first_name.downcase}
-  f.post_count 0
-  f.category {Tag.categories.general}
-  f.related_tags ""
-  f.related_tags_updated_at {Time.now}
-end
+FactoryGirl.define do
+  factory(:tag) do
+    name {Faker::Name.first_name.downcase}
+    post_count 0
+    category {Tag.categories.general}
+    related_tags ""
+    related_tags_updated_at {Time.now}
+    
+    factory(:artist_tag) do
+      category {Tag.categories.artist}
+    end
 
-Factory.define(:artist_tag, :parent => :tag) do |f|
-  f.category {Tag.categories.artist}
-end
+    factory(:copyright_tag) do
+      category {Tag.categories.copyright}
+    end
 
-Factory.define(:copyright_tag, :parent => :tag) do |f|
-  f.category {Tag.categories.copyright}
-end
-
-Factory.define(:character_tag, :parent => :tag) do |f|
-  f.category {Tag.categories.character}
+    factory(:character_tag) do
+      category {Tag.categories.character}
+    end
+  end
 end

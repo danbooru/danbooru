@@ -3,10 +3,10 @@ require "test_helper"
 class PostsControllerTest < ActionController::TestCase
   context "The posts controller" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @post = Factory.create(:post, :uploader_id => @user.id, :tag_string => "aaaa")
+      @post = FactoryGirl.create(:post, :uploader_id => @user.id, :tag_string => "aaaa")
       MEMCACHE.flush_all
     end
     

@@ -3,11 +3,11 @@ require 'test_helper'
 class DmailsControllerTest < ActionController::TestCase
   context "The dmails controller" do
     setup do
-      @user = Factory.create(:user)
-      @unrelated_user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
+      @unrelated_user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @dmail = Factory.create(:dmail, :owner => @user)
+      @dmail = FactoryGirl.create(:dmail, :owner => @user)
     end
     
     teardown do
@@ -73,7 +73,7 @@ class DmailsControllerTest < ActionController::TestCase
     
     context "create action" do
       setup do
-        @user_2 = Factory.create(:user)
+        @user_2 = FactoryGirl.create(:user)
       end
       
       should "create two messages, one for the sender and one for the recipient" do

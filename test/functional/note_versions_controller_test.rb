@@ -3,7 +3,7 @@ require 'test_helper'
 class NoteVersionsControllerTest < ActionController::TestCase
   context "The note versions controller" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -15,8 +15,8 @@ class NoteVersionsControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        @note = Factory.create(:note)
-        @user_2 = Factory.create(:user)
+        @note = FactoryGirl.create(:note)
+        @user_2 = FactoryGirl.create(:user)
         
         CurrentUser.scoped(@user_2, "1.2.3.4") do
           @note.update_attributes(:body => "1 2")

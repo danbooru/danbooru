@@ -4,11 +4,11 @@ module Moderator
   class IpAddrSearchTest < ActiveSupport::TestCase
     context "an ip addr search" do
       setup do
-        @user = Factory.create(:user)
+        @user = FactoryGirl.create(:user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
         Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
-        Factory.create(:comment)
+        FactoryGirl.create(:comment)
         MEMCACHE.flush_all
       end
   

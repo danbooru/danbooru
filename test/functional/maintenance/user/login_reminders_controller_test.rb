@@ -5,8 +5,8 @@ module Maintenance
     class LoginRemindersControllerTest < ActionController::TestCase
       context "A login reminder controller" do
         setup do
-          @user = Factory.create(:user)
-          @blank_email_user = Factory.create(:user, :email => "")
+          @user = FactoryGirl.create(:user)
+          @blank_email_user = FactoryGirl.create(:user, :email => "")
           CurrentUser.user = nil
           CurrentUser.ip_addr = "127.0.0.1"
           ActionMailer::Base.delivery_method = :test

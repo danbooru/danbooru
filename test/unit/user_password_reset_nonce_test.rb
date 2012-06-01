@@ -4,8 +4,8 @@ class UserPasswordResetNonceTest < ActiveSupport::TestCase
   context "Creating a new nonce" do
     context "with a valid email" do
       setup do
-        @user = Factory.create(:user, :email => "aaa@b.net")
-        @nonce = Factory.create(:user_password_reset_nonce, :email => @user.email)
+        @user = FactoryGirl.create(:user, :email => "aaa@b.net")
+        @nonce = FactoryGirl.create(:user_password_reset_nonce, :email => @user.email)
       end
       
       should "validate" do
@@ -24,7 +24,7 @@ class UserPasswordResetNonceTest < ActiveSupport::TestCase
     
     context "with a blank email" do
       setup do
-        @user = Factory.create(:user, :email => "")
+        @user = FactoryGirl.create(:user, :email => "")
         @nonce = UserPasswordResetNonce.new(:email => "")
       end
       

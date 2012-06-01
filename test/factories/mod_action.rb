@@ -1,4 +1,6 @@
-Factory.define(:mod_action) do |f|
-  f.creator {|x| x.association(:user)}
-  f.description "1234"
+FactoryGirl.define do
+  factory(:mod_action) do
+    creator :factory => :user
+    description "1234"
+  end
 end

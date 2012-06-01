@@ -146,7 +146,7 @@ module Danbooru
     # Used in conjunction with load balancing to distribute files from one server to
     # the others. This should match whatever gethostname returns on the other servers.
     def all_server_hosts
-      []
+      [server_host]
     end
     
     # Names of other Danbooru servers.

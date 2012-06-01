@@ -3,10 +3,10 @@ require 'test_helper'
 class TagImplicationTest < ActiveSupport::TestCase
   context "A tag implication" do
     setup do
-      user = Factory.create(:user)
+      user = FactoryGirl.create(:user)
       CurrentUser.user = user
       CurrentUser.ip_addr = "127.0.0.1"
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       MEMCACHE.flush_all
     end
 
@@ -22,7 +22,7 @@ class TagImplicationTest < ActiveSupport::TestCase
     
     should "not validate when a circular relation is created" do
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
-      ti2 = Factory.build(:tag_implication, :antecedent_name => "bbb", :consequent_name => "aaa")
+      ti2 = FactoryGirl.build(:tag_implication, :antecedent_name => "bbb", :consequent_name => "aaa")
       ti2.save
       assert(ti2.errors.any?, "Tag implication should not have validated.")
       assert_equal("Tag implication can not create a circular relation with another tag implication", ti2.errors.full_messages.join(""))
@@ -30,7 +30,7 @@ class TagImplicationTest < ActiveSupport::TestCase
     
     should "not allow for duplicates" do
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
-      ti2 = Factory.build(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
+      ti2 = FactoryGirl.build(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       ti2.save
       assert(ti2.errors.any?, "Tag implication should not have validated.")
       assert_equal("Antecedent name has already been taken", ti2.errors.full_messages.join(""))
@@ -94,7 +94,7 @@ class TagImplicationTest < ActiveSupport::TestCase
     end
     
     should "update any affected post upon save" do
-      p1 = Factory.create(:post, :tag_string => "aaa bbb ccc")
+      p1 = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "xxx")
       ti2 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "yyy")
       p1.reload
@@ -102,10 +102,10 @@ class TagImplicationTest < ActiveSupport::TestCase
     end
     
     should "record the implication's creator in the tag history" do
-      user = Factory.create(:user)
+      user = FactoryGirl.create(:user)
       p1 = nil
       CurrentUser.scoped(user, "127.0.0.1") do
-        p1 = Factory.create(:post, :tag_string => "aaa bbb ccc")
+        p1 = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
       end
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "xxx")
       p1.reload

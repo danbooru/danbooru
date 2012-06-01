@@ -3,12 +3,12 @@ require 'test_helper'
 class PoolElementsControllerTest < ActionController::TestCase
   context "The pools posts controller" do
     setup do
-      @user = Factory.create(:user)
-      @mod = Factory.create(:moderator_user)
+      @user = FactoryGirl.create(:user)
+      @mod = FactoryGirl.create(:moderator_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @post = Factory.create(:post)
-      @pool = Factory.create(:pool, :name => "abc")
+      @post = FactoryGirl.create(:post)
+      @pool = FactoryGirl.create(:pool, :name => "abc")
     end
     
     teardown do

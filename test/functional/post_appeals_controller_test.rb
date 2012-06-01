@@ -3,7 +3,7 @@ require 'test_helper'
 class PostAppealsControllerTest < ActionController::TestCase
   context "The post appeals controller" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -22,8 +22,8 @@ class PostAppealsControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        @post = Factory.create(:post, :is_deleted => true)
-        @post_appeal = Factory.create(:post_appeal, :post => @post)
+        @post = FactoryGirl.create(:post, :is_deleted => true)
+        @post_appeal = FactoryGirl.create(:post_appeal, :post => @post)
       end
       
       should "render" do
@@ -41,7 +41,7 @@ class PostAppealsControllerTest < ActionController::TestCase
     
     context "create action" do
       setup do 
-        @post = Factory.create(:post, :is_deleted => true)
+        @post = FactoryGirl.create(:post, :is_deleted => true)
       end
       
       should "create a new appeal" do

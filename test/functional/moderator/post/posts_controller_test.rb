@@ -5,14 +5,14 @@ module Moderator
     class PostsControllerTest < ActionController::TestCase
       context "The moderator post disapprovals controller" do
         setup do
-          @admin = Factory.create(:admin_user)
+          @admin = FactoryGirl.create(:admin_user)
           CurrentUser.user = @admin
           CurrentUser.ip_addr = "127.0.0.1"
         end
         
         context "delete action" do
           setup do
-            @post = Factory.create(:post)
+            @post = FactoryGirl.create(:post)
           end
           
           should "render" do
@@ -25,7 +25,7 @@ module Moderator
 
         context "undelete action" do
           setup do
-            @post = Factory.create(:post, :is_deleted => true)
+            @post = FactoryGirl.create(:post, :is_deleted => true)
           end
           
           should "render" do

@@ -3,10 +3,10 @@ require 'test_helper'
 class PostVotesControllerTest < ActionController::TestCase
   context "The post vote controller" do
     setup do
-      @user = Factory.create(:privileged_user)
+      @user = FactoryGirl.create(:privileged_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @post = Factory.create(:post)
+      @post = FactoryGirl.create(:post)
     end
     
     teardown do

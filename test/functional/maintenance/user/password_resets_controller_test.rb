@@ -5,7 +5,7 @@ module Maintenance
     class PasswordResetsControllerTest < ActionController::TestCase
       context "A password resets controller" do
         setup do
-          @user = Factory.create(:user, :email => "abc@com.net")
+          @user = FactoryGirl.create(:user, :email => "abc@com.net")
           CurrentUser.user = nil
           CurrentUser.ip_addr = "127.0.0.1"
           ActionMailer::Base.delivery_method = :test
@@ -73,8 +73,8 @@ module Maintenance
           
           context "with valid parameters" do
             setup do
-              @user = Factory.create(:user)
-              @nonce = Factory.create(:user_password_reset_nonce, :email => @user.email)
+              @user = FactoryGirl.create(:user)
+              @nonce = FactoryGirl.create(:user_password_reset_nonce, :email => @user.email)
               ActionMailer::Base.deliveries.clear
               get :edit, :email => @nonce.email, :key => @nonce.key
             end
@@ -98,8 +98,8 @@ module Maintenance
           
           context "with valid parameters" do
             setup do
-              @user = Factory.create(:user)
-              @nonce = Factory.create(:user_password_reset_nonce, :email => @user.email)
+              @user = FactoryGirl.create(:user)
+              @nonce = FactoryGirl.create(:user_password_reset_nonce, :email => @user.email)
               ActionMailer::Base.deliveries.clear
               @old_password = @user.password_hash
               post :update, :email => @nonce.email, :key => @nonce.key

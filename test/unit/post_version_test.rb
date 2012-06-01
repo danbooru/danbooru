@@ -3,7 +3,7 @@ require 'test_helper'
 class PostVersionTest < ActiveSupport::TestCase
   context "A post" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
@@ -16,7 +16,7 @@ class PostVersionTest < ActiveSupport::TestCase
     
     context "that has multiple versions: " do
       setup do
-        @post = Factory.create(:post, :tag_string => "1")
+        @post = FactoryGirl.create(:post, :tag_string => "1")
         @post.update_attributes(:tag_string => "1 2")
         @post.update_attributes(:tag_string => "2 3")
       end
@@ -41,8 +41,8 @@ class PostVersionTest < ActiveSupport::TestCase
     
     context "that has been created" do
       setup do
-        @parent = Factory.create(:post)
-        @post = Factory.create(:post, :tag_string => "aaa bbb ccc", :rating => "e", :parent => @parent, :source => "xyz")
+        @parent = FactoryGirl.create(:post)
+        @post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc", :rating => "e", :parent => @parent, :source => "xyz")
       end
       
       should "also create a version" do
@@ -57,8 +57,8 @@ class PostVersionTest < ActiveSupport::TestCase
     
     context "that has been updated" do
       setup do
-        @parent = Factory.create(:post)
-        @post = Factory.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
+        @parent = FactoryGirl.create(:post)
+        @post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
         @post.update_attributes(:tag_string => "bbb ccc xxx", :source => "")
       end
       

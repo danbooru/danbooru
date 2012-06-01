@@ -4,14 +4,14 @@ module PostSets
   class FavoriteTest < ActiveSupport::TestCase
     context "In all cases" do
       setup do
-        @user = Factory.create(:user)
+        @user = FactoryGirl.create(:user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
         MEMCACHE.flush_all
 
-        @post_1 = Factory.create(:post)
-        @post_2 = Factory.create(:post)
-        @post_3 = Factory.create(:post)
+        @post_1 = FactoryGirl.create(:post)
+        @post_2 = FactoryGirl.create(:post)
+        @post_3 = FactoryGirl.create(:post)
         @post_2.add_favorite!(@user)
         @post_1.add_favorite!(@user)
         @post_3.add_favorite!(@user)

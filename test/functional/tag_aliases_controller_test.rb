@@ -3,7 +3,7 @@ require 'test_helper'
 class TagAliasesControllerTest < ActionController::TestCase
   context "The tag aliases controller" do
     setup do
-      @user = Factory.create(:admin_user)
+      @user = FactoryGirl.create(:admin_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
@@ -17,7 +17,7 @@ class TagAliasesControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        @tag_alias = Factory.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+        @tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
       end
       
       should "list all tag aliass" do
@@ -41,7 +41,7 @@ class TagAliasesControllerTest < ActionController::TestCase
 
     context "destroy action" do
       setup do
-        @tag_alias = Factory.create(:tag_alias)
+        @tag_alias = FactoryGirl.create(:tag_alias)
       end
       
       should "destroy a tag_alias" do
@@ -53,7 +53,7 @@ class TagAliasesControllerTest < ActionController::TestCase
     
     context "destroy_cache action" do
       setup do
-        @tag_alias = Factory.create(:tag_alias, :antecedent_name => "aaa")
+        @tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa")
       end
       
       should "reset the cache" do

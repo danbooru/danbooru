@@ -3,7 +3,7 @@ require 'test_helper'
 class UploadTest < ActiveSupport::TestCase
   context "In all cases" do
     setup do
-      user = Factory.create(:contributor_user)
+      user = FactoryGirl.create(:contributor_user)
       CurrentUser.user = user
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
@@ -23,21 +23,21 @@ class UploadTest < ActiveSupport::TestCase
 
       context "image size calculator" do
         should "discover the dimensions for a JPG" do
-          @upload = Factory.create(:jpg_upload)
+          @upload = FactoryGirl.create(:jpg_upload)
           assert_nothing_raised {@upload.calculate_dimensions(@upload.file_path)}
           assert_equal(500, @upload.image_width)
           assert_equal(335, @upload.image_height)
         end
 
         should "discover the dimensions for a PNG" do
-          @upload = Factory.create(:png_upload)
+          @upload = FactoryGirl.create(:png_upload)
           assert_nothing_raised {@upload.calculate_dimensions(@upload.file_path)}
           assert_equal(768, @upload.image_width)
           assert_equal(1024, @upload.image_height)
         end
 
         should "discover the dimensions for a GIF" do
-          @upload = Factory.create(:gif_upload)
+          @upload = FactoryGirl.create(:gif_upload)
           assert_nothing_raised {@upload.calculate_dimensions(@upload.file_path)}
           assert_equal(400, @upload.image_width)
           assert_equal(400, @upload.image_height)
@@ -46,7 +46,7 @@ class UploadTest < ActiveSupport::TestCase
 
       context "content type calculator" do
         should "know how to parse jpeg, png, gif, and swf file extensions" do
-          @upload = Factory.create(:jpg_upload)
+          @upload = FactoryGirl.create(:jpg_upload)
           assert_equal("image/jpeg", @upload.file_ext_to_content_type("test.jpeg"))
           assert_equal("image/gif", @upload.file_ext_to_content_type("test.gif"))
           assert_equal("image/png", @upload.file_ext_to_content_type("test.png"))
@@ -55,7 +55,7 @@ class UploadTest < ActiveSupport::TestCase
         end
 
         should "know how to parse jpeg, png, gif, and swf content types" do
-          @upload = Factory.create(:jpg_upload)
+          @upload = FactoryGirl.create(:jpg_upload)
           assert_equal("jpg", @upload.content_type_to_file_ext("image/jpeg"))
           assert_equal("gif", @upload.content_type_to_file_ext("image/gif"))
           assert_equal("png", @upload.content_type_to_file_ext("image/png"))
@@ -66,7 +66,7 @@ class UploadTest < ActiveSupport::TestCase
 
       context "downloader" do
         should "initialize the final path and content type after downloading a file" do
-          @upload = Factory.create(:source_upload)
+          @upload = FactoryGirl.create(:source_upload)
           path = "#{Rails.root}/tmp/test.download.jpg"
           assert_nothing_raised {@upload.download_from_source(path)}
           assert(File.exists?(path))
@@ -101,7 +101,7 @@ class UploadTest < ActiveSupport::TestCase
 
       context "hash calculator" do
         should "caculate the hash" do
-          @upload = Factory.create(:jpg_upload)
+          @upload = FactoryGirl.create(:jpg_upload)
           @upload.calculate_hash(@upload.file_path)
           assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", @upload.md5)
         end
@@ -115,7 +115,7 @@ class UploadTest < ActiveSupport::TestCase
         end
 
         should "generate several resized versions of the image" do
-          @upload = Factory.create(:large_jpg_upload)
+          @upload = FactoryGirl.create(:large_jpg_upload)
           @upload.calculate_hash(@upload.file_path)
           @upload.calculate_dimensions(@upload.file_path)
           assert_nothing_raised {@upload.generate_resizes(@upload.file_path)}
@@ -127,7 +127,7 @@ class UploadTest < ActiveSupport::TestCase
       end
       
       should "increment the uploaders post_upload_count" do
-        @upload = Factory.create(:source_upload)
+        @upload = FactoryGirl.create(:source_upload)
         assert_difference("CurrentUser.post_upload_count", 1) do
           @upload.process!
           CurrentUser.reload
@@ -135,7 +135,7 @@ class UploadTest < ActiveSupport::TestCase
       end
 
       should "process completely for a downloaded image" do
-        @upload = Factory.create(:source_upload,
+        @upload = FactoryGirl.create(:source_upload,
           :rating => "s",
           :uploader_ip_addr => "127.0.0.1",
           :tag_string => "hoge foo"
@@ -160,7 +160,7 @@ class UploadTest < ActiveSupport::TestCase
     end
 
     should "process completely for an uploaded image" do
-      @upload = Factory.create(:jpg_upload,
+      @upload = FactoryGirl.create(:jpg_upload,
         :rating => "s",
         :uploader_ip_addr => "127.0.0.1",
         :tag_string => "hoge foo"
@@ -185,7 +185,7 @@ class UploadTest < ActiveSupport::TestCase
     end
 
     should "delete the temporary file upon completion" do
-      @upload = Factory.create(:source_upload,
+      @upload = FactoryGirl.create(:source_upload,
         :rating => "s",
         :uploader_ip_addr => "127.0.0.1",
         :tag_string => "hoge foo"

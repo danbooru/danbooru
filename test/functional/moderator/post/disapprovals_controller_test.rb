@@ -5,11 +5,11 @@ module Moderator
     class DisapprovalsControllerTest < ActionController::TestCase
       context "The moderator post disapprovals controller" do
         setup do
-          @admin = Factory.create(:admin_user)
+          @admin = FactoryGirl.create(:admin_user)
           CurrentUser.user = @admin
           CurrentUser.ip_addr = "127.0.0.1"
           
-          @post = Factory.create(:post, :is_pending => true)
+          @post = FactoryGirl.create(:post, :is_pending => true)
         end
         
         context "create action" do

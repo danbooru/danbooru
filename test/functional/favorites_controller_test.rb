@@ -3,7 +3,7 @@ require 'test_helper'
 class FavoritesControllerTest < ActionController::TestCase
   context "The favorites controller" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -15,7 +15,7 @@ class FavoritesControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        @post = Factory.create(:post)
+        @post = FactoryGirl.create(:post)
         @post.add_favorite!(@user)
       end
       
@@ -35,7 +35,7 @@ class FavoritesControllerTest < ActionController::TestCase
     
     context "create action" do
       setup do
-        @post = Factory.create(:post)
+        @post = FactoryGirl.create(:post)
       end
 
       should "create a favorite for the current user" do
@@ -47,7 +47,7 @@ class FavoritesControllerTest < ActionController::TestCase
     
     context "destroy action" do
       setup do
-        @post = Factory.create(:post)
+        @post = FactoryGirl.create(:post)
         @post.add_favorite!(@user)
       end
       

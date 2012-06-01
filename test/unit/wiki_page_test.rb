@@ -13,10 +13,10 @@ class WikiPageTest < ActiveSupport::TestCase
   context "A wiki page" do
     context "updated by a janitor" do
       setup do
-        @user = Factory.create(:janitor_user)
+        @user = FactoryGirl.create(:janitor_user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
-        @wiki_page = Factory.create(:wiki_page)
+        @wiki_page = FactoryGirl.create(:wiki_page)
       end
         
       should "allow the is_locked attribute to be updated" do
@@ -28,10 +28,10 @@ class WikiPageTest < ActiveSupport::TestCase
     
     context "updated by a regular user" do
       setup do
-        @user = Factory.create(:user)
+        @user = FactoryGirl.create(:user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
-        @wiki_page = Factory.create(:wiki_page, :title => "HOT POTATO")
+        @wiki_page = FactoryGirl.create(:wiki_page, :title => "HOT POTATO")
       end
       
       should "not allow the is_locked attribute to be updated" do
@@ -53,7 +53,7 @@ class WikiPageTest < ActiveSupport::TestCase
 
       should "create versions" do
         assert_difference("WikiPageVersion.count") do
-          @wiki_page = Factory.create(:wiki_page, :title => "xxx")
+          @wiki_page = FactoryGirl.create(:wiki_page, :title => "xxx")
         end
 
         assert_difference("WikiPageVersion.count") do
@@ -72,7 +72,7 @@ class WikiPageTest < ActiveSupport::TestCase
       end
 
       should "differentiate between updater and creator" do
-        another_user = Factory.create(:user)
+        another_user = FactoryGirl.create(:user)
         CurrentUser.scoped(another_user, "127.0.0.1") do
           @wiki_page.title = "yyy"
           @wiki_page.save

@@ -1,3 +1,5 @@
-Factory.define(:post_appeal) do |f|
-  f.reason "xxx"
+FactoryGirl.define do
+  factory(:post_appeal) do
+    reason "xxx"
+  end
 end

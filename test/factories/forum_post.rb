@@ -1,3 +1,5 @@
-Factory.define(:forum_post) do |f|
-  f.body {Faker::Lorem.sentences}
+FactoryGirl.define do
+  factory(:forum_post) do
+    body {Faker::Lorem.sentences.join(" ")}
+  end
 end

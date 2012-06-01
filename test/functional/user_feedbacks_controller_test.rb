@@ -3,8 +3,8 @@ require 'test_helper'
 class UserFeedbacksControllerTest < ActionController::TestCase
   context "The user feedbacks controller" do
     setup do
-      @user = Factory.create(:user)
-      @critic = Factory.create(:privileged_user)
+      @user = FactoryGirl.create(:user)
+      @critic = FactoryGirl.create(:privileged_user)
       CurrentUser.user = @critic
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -23,7 +23,7 @@ class UserFeedbacksControllerTest < ActionController::TestCase
     
     context "edit action" do
       setup do
-        @user_feedback = Factory.create(:user_feedback)
+        @user_feedback = FactoryGirl.create(:user_feedback)
       end
       
       should "render" do
@@ -34,7 +34,7 @@ class UserFeedbacksControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        @user_feedback = Factory.create(:user_feedback)
+        @user_feedback = FactoryGirl.create(:user_feedback)
       end
       
       should "render" do
@@ -62,7 +62,7 @@ class UserFeedbacksControllerTest < ActionController::TestCase
     
     context "destroy action" do
       setup do
-        @user_feedback = Factory.create(:user_feedback)
+        @user_feedback = FactoryGirl.create(:user_feedback)
       end
       
       should "delete a feedback" do

@@ -3,7 +3,7 @@ require 'test_helper'
 class CommentTest < ActiveSupport::TestCase
   context "A comment" do
     setup do
-      user = Factory.create(:user)
+      user = FactoryGirl.create(:user)
       CurrentUser.user = user
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
@@ -21,7 +21,7 @@ class CommentTest < ActiveSupport::TestCase
       end
       
       should "fail creation" do
-        comment = Factory.build(:comment)
+        comment = FactoryGirl.build(:comment)
         comment.save
         assert_equal(["Creator can not post comments within 1 week of sign up, and can only post 5 comments per hour after that"], comment.errors.full_messages)
       end
@@ -34,36 +34,36 @@ class CommentTest < ActiveSupport::TestCase
       end
 
       should "be created" do
-        comment = Factory.build(:comment)
+        comment = FactoryGirl.build(:comment)
         comment.save
         assert(comment.errors.empty?, comment.errors.full_messages.join(", "))
       end
 
       should "not bump the parent post" do
-        post = Factory.create(:post)
-        comment = Factory.create(:comment, :do_not_bump_post => "1", :post => post)
+        post = FactoryGirl.create(:post)
+        comment = FactoryGirl.create(:comment, :do_not_bump_post => "1", :post => post)
         post.reload
         assert_nil(post.last_commented_at)
 
-        comment = Factory.create(:comment, :post => post)
+        comment = FactoryGirl.create(:comment, :post => post)
         post.reload
         assert_not_nil(post.last_commented_at)
       end
 
       should "not update the post after exceeding the threshold" do
         Danbooru.config.stubs(:comment_threshold).returns(1)
-        p = Factory.create(:post)
-        c1 = Factory.create(:comment, :post => p)
+        p = FactoryGirl.create(:post)
+        c1 = FactoryGirl.create(:comment, :post => p)
         sleep 1
-        c2 = Factory.create(:comment, :post => p)
+        c2 = FactoryGirl.create(:comment, :post => p)
         p.reload
         assert_equal(c1.created_at.to_s, p.last_commented_at.to_s)
       end
 
       should "not allow duplicate votes" do
-        user = Factory.create(:user)
-        post = Factory.create(:post)
-        c1 = Factory.create(:comment, :post => post)
+        user = FactoryGirl.create(:user)
+        post = FactoryGirl.create(:post)
+        c1 = FactoryGirl.create(:comment, :post => post)
         comment_vote = c1.vote!("up")
         assert_equal([], comment_vote.errors.full_messages)
         comment_vote = c1.vote!("up")
@@ -71,16 +71,16 @@ class CommentTest < ActiveSupport::TestCase
         assert_equal(1, CommentVote.count)
         assert_equal(1, CommentVote.last.score)
 
-        c2 = Factory.create(:comment, :post => post)
+        c2 = FactoryGirl.create(:comment, :post => post)
         comment_vote = c2.vote!("up")
         assert_equal([], comment_vote.errors.full_messages)
         assert_equal(2, CommentVote.count)
       end
 
       should "be searchable" do
-        c1 = Factory.create(:comment, :body => "aaa bbb ccc")
-        c2 = Factory.create(:comment, :body => "aaa ddd")
-        c3 = Factory.create(:comment, :body => "eee")
+        c1 = FactoryGirl.create(:comment, :body => "aaa bbb ccc")
+        c2 = FactoryGirl.create(:comment, :body => "aaa ddd")
+        c3 = FactoryGirl.create(:comment, :body => "eee")
 
         matches = Comment.body_matches("aaa")
         assert_equal(2, matches.count)

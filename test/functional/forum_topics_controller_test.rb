@@ -3,12 +3,12 @@ require 'test_helper'
 class ForumTopicsControllerTest < ActionController::TestCase
   context "The forum topics controller" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @other_user = Factory.create(:user)
-      @mod = Factory.create(:moderator_user)
-      @forum_topic = Factory.create(:forum_topic, :title => "my forum topic", :creator => @user)
+      @other_user = FactoryGirl.create(:user)
+      @mod = FactoryGirl.create(:moderator_user)
+      @forum_topic = FactoryGirl.create(:forum_topic, :title => "my forum topic", :creator => @user)
     end
     
     teardown do
@@ -75,7 +75,7 @@ class ForumTopicsControllerTest < ActionController::TestCase
     
     context "destroy action" do
       setup do
-        @post = Factory.create(:forum_post, :topic_id => @forum_topic.id)
+        @post = FactoryGirl.create(:forum_post, :topic_id => @forum_topic.id)
       end
       
       should "destroy the topic and any associated posts" do

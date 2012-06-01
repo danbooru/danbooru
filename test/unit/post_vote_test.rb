@@ -2,12 +2,12 @@ require 'test_helper'
 
 class PostVoteTest < ActiveSupport::TestCase
   setup do
-    user = Factory.create(:user)
+    user = FactoryGirl.create(:user)
     CurrentUser.user = user
     CurrentUser.ip_addr = "127.0.0.1"
     MEMCACHE.flush_all
     
-    @post = Factory.create(:post)
+    @post = FactoryGirl.create(:post)
   end
   
   context "Voting for a post" do

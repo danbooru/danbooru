@@ -13,16 +13,16 @@ class UserFeedbackTest < ActiveSupport::TestCase
     end
     
     should "should not validate if the creator is not privileged" do
-      user = Factory.create(:user)
-      privileged = Factory.create(:privileged_user)
-      member = Factory.create(:user)
+      user = FactoryGirl.create(:user)
+      privileged = FactoryGirl.create(:privileged_user)
+      member = FactoryGirl.create(:user)
       
       CurrentUser.user = privileged
-      feedback = Factory.create(:user_feedback, :user => user)
+      feedback = FactoryGirl.create(:user_feedback, :user => user)
       assert(feedback.errors.empty?)
       
       CurrentUser.user = member
-      feedback = Factory.build(:user_feedback, :user => user)
+      feedback = FactoryGirl.build(:user_feedback, :user => user)
       feedback.save
       assert(feedback.errors.any?)
     end

@@ -3,7 +3,7 @@ require 'test_helper'
 class TagImplicationsControllerTest < ActionController::TestCase
   context "The tag implicationes controller" do
     setup do
-      @user = Factory.create(:admin_user)
+      @user = FactoryGirl.create(:admin_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
@@ -17,7 +17,7 @@ class TagImplicationsControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        @tag_implication = Factory.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb", :creator => @user)
+        @tag_implication = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb", :creator => @user)
       end
       
       should "list all tag implications" do
@@ -41,7 +41,7 @@ class TagImplicationsControllerTest < ActionController::TestCase
     
     context "destroy action" do
       setup do
-        @tag_implication = Factory.create(:tag_implication, :creator => @user)
+        @tag_implication = FactoryGirl.create(:tag_implication, :creator => @user)
       end
       
       should "destroy a tag_implication" do

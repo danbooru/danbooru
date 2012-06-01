@@ -3,7 +3,7 @@ FactoryGirl.define do
     antecedent_name "aaa"
     consequent_name "bbb"
     
-    after_create do |tag_alias|
+    after(:create) do |tag_alias|
       tag_alias.process!
     end
   end

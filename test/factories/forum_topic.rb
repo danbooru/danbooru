@@ -1,5 +1,7 @@
-Factory.define(:forum_topic) do |f|
-  f.title {Faker::Lorem.words}
-  f.is_sticky false
-  f.is_locked false
+FactoryGirl.define do
+  factory(:forum_topic) do
+    title {Faker::Lorem.words.join(" ")}
+    is_sticky false
+    is_locked false
+  end
 end

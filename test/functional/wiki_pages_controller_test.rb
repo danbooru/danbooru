@@ -3,8 +3,8 @@ require 'test_helper'
 class WikiPagesControllerTest < ActionController::TestCase
   context "The wiki pages controller" do
     setup do
-      @user = Factory.create(:user)
-      @mod = Factory.create(:moderator_user)
+      @user = FactoryGirl.create(:user)
+      @mod = FactoryGirl.create(:moderator_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -15,8 +15,8 @@ class WikiPagesControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        @wiki_page_abc = Factory.create(:wiki_page, :title => "abc")
-        @wiki_page_def = Factory.create(:wiki_page, :title => "def")
+        @wiki_page_abc = FactoryGirl.create(:wiki_page, :title => "abc")
+        @wiki_page_def = FactoryGirl.create(:wiki_page, :title => "def")
       end
       
       should "list all wiki_pages" do
@@ -32,7 +32,7 @@ class WikiPagesControllerTest < ActionController::TestCase
     
     context "show action" do
       setup do
-        @wiki_page = Factory.create(:wiki_page)
+        @wiki_page = FactoryGirl.create(:wiki_page)
       end
       
       should "render" do
@@ -57,7 +57,7 @@ class WikiPagesControllerTest < ActionController::TestCase
     
     context "update action" do
       setup do
-        @wiki_page = Factory.create(:wiki_page)
+        @wiki_page = FactoryGirl.create(:wiki_page)
       end
       
       should "update a wiki_page" do
@@ -69,7 +69,7 @@ class WikiPagesControllerTest < ActionController::TestCase
     
     context "destroy action" do
       setup do
-        @wiki_page = Factory.create(:wiki_page)
+        @wiki_page = FactoryGirl.create(:wiki_page)
       end
       
       should "destroy a wiki_page" do
@@ -81,7 +81,7 @@ class WikiPagesControllerTest < ActionController::TestCase
     
     context "revert action" do
       setup do
-        @wiki_page = Factory.create(:wiki_page, :body => "1")
+        @wiki_page = FactoryGirl.create(:wiki_page, :body => "1")
         @wiki_page.update_attributes(:body => "1 2")
         @wiki_page.update_attributes(:body => "1 2 3")
       end

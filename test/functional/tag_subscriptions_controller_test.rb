@@ -3,7 +3,7 @@ require 'test_helper'
 class TagSubscriptionsControllerTest < ActionController::TestCase
   context "The tag subscriptions controller" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -15,7 +15,7 @@ class TagSubscriptionsControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        @tag_subscription = Factory.create(:tag_subscription, :name => "aaa")
+        @tag_subscription = FactoryGirl.create(:tag_subscription, :name => "aaa")
       end
       
       should "list all visible tag subscriptions" do
@@ -26,7 +26,7 @@ class TagSubscriptionsControllerTest < ActionController::TestCase
 
     context "posts action" do
       setup do
-        @tag_subscription = Factory.create(:tag_subscription, :name => "aaa")
+        @tag_subscription = FactoryGirl.create(:tag_subscription, :name => "aaa")
       end
       
       should "list all visible tag subscriptions" do
@@ -37,7 +37,7 @@ class TagSubscriptionsControllerTest < ActionController::TestCase
     
     context "edit action" do
       setup do
-        @tag_subscription = Factory.create(:tag_subscription)
+        @tag_subscription = FactoryGirl.create(:tag_subscription)
       end
       
       should "render" do
@@ -63,7 +63,7 @@ class TagSubscriptionsControllerTest < ActionController::TestCase
     
     context "destroy action" do
       setup do
-        @tag_subscription = Factory.create(:tag_subscription)
+        @tag_subscription = FactoryGirl.create(:tag_subscription)
       end
       
       should "destroy the posts" do

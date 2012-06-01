@@ -1,35 +1,38 @@
-Factory.define(:user) do |f|
-  f.name {rand(1_000_000).to_s}
-  f.password "password"
-  f.password_hash {User.sha1("password")}
-  f.email {Faker::Internet.email}
-  f.default_image_size "large"
-  f.base_upload_limit 10
-  f.level 20
-  f.last_logged_in_at {Time.now}
+FactoryGirl.define do
+  factory(:user) do
+    name {rand(1_000_000).to_s}
+    password "password"
+    password_hash {User.sha1("password")}
+    email {Faker::Internet.email}
+    default_image_size "large"
+    base_upload_limit 10
+    level 20
+    last_logged_in_at {Time.now}
+    
+    factory(:banned_user) do
+      is_banned true
+      ban {|x| x.association(:ban)}
+    end
+
+    factory(:privileged_user) do
+      level 30
+    end
+
+    factory(:contributor_user) do
+      level 33
+    end
+
+    factory(:janitor_user) do
+      level 35
+    end
+
+    factory(:moderator_user) do
+      level 40
+    end
+
+    factory(:admin_user) do
+      level 50
+    end
+  end
 end
 
-Factory.define(:banned_user, :parent => :user) do |f|
-  f.is_banned true
-  f.ban {|x| x.association(:ban)}
-end
-
-Factory.define(:privileged_user, :parent => :user) do |f|
-  f.level 30
-end
-
-Factory.define(:contributor_user, :parent => :user) do |f|
-  f.level 33
-end
-
-Factory.define(:janitor_user, :parent => :user) do |f|
-  f.level 35
-end
-
-Factory.define(:moderator_user, :parent => :user) do |f|
-  f.level 40
-end
-
-Factory.define(:admin_user, :parent => :user) do |f|
-  f.level 50
-end

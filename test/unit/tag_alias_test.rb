@@ -3,10 +3,11 @@ require 'test_helper'
 class TagAliasTest < ActiveSupport::TestCase
   context "A tag alias" do
     setup do
-      user = Factory.create(:user)
+      user = FactoryGirl.create(:user)
       CurrentUser.user = user
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
+      Delayed::Worker.delay_jobs = false
     end
 
     teardown do
@@ -20,16 +21,16 @@ class TagAliasTest < ActiveSupport::TestCase
     end
         
     should "convert a tag to its normalized version" do
-      tag1 = Factory.create(:tag, :name => "aaa")
-      tag2 = Factory.create(:tag, :name => "bbb")
+      tag1 = FactoryGirl.create(:tag, :name => "aaa")
+      tag2 = FactoryGirl.create(:tag, :name => "bbb")
       ta = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
       normalized_tags = TagAlias.to_aliased(["aaa", "ccc"])
       assert_equal(["bbb", "ccc"], normalized_tags.sort)
     end
     
     should "update the cache" do
-      tag1 = Factory.create(:tag, :name => "aaa")
-      tag2 = Factory.create(:tag, :name => "bbb")
+      tag1 = FactoryGirl.create(:tag, :name => "aaa")
+      tag2 = FactoryGirl.create(:tag, :name => "bbb")
       ta = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
       assert_nil(MEMCACHE.get("ta:aaa"))
       ta.update_cache
@@ -40,8 +41,8 @@ class TagAliasTest < ActiveSupport::TestCase
     
     should "update any affected posts when saved" do
       assert_equal(0, TagAlias.count)
-      post1 = Factory.create(:post, :tag_string => "aaa bbb")
-      post2 = Factory.create(:post, :tag_string => "ccc ddd")
+      post1 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
+      post2 = FactoryGirl.create(:post, :tag_string => "ccc ddd")
       assert_equal("aaa bbb", post1.tag_string)
       assert_equal("ccc ddd", post2.tag_string)
       ta = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "ccc")
@@ -54,7 +55,7 @@ class TagAliasTest < ActiveSupport::TestCase
     should "not validate for transitive relations" do
       ta1 = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
       assert_difference("TagAlias.count", 0) do
-        ta3 = Factory.build(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ddd")
+        ta3 = FactoryGirl.build(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ddd")
         ta3.save
         assert(ta3.errors.any?, "Tag alias should be invalid")
         assert_equal("Tag alias can not create a transitive relation with another tag alias", ta3.errors.full_messages.join)
@@ -62,10 +63,10 @@ class TagAliasTest < ActiveSupport::TestCase
     end
     
     should "record the alias's creator in the tag history" do
-      uploader = Factory.create(:user)
+      uploader = FactoryGirl.create(:user)
       post = nil
       CurrentUser.scoped(uploader, "127.0.0.1") do
-        post = Factory.create(:post, :tag_string => "aaa bbb ccc")
+        post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
       end
       tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "xxx")
       post.reload

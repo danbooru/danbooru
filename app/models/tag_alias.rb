@@ -1,5 +1,5 @@
 class TagAlias < ActiveRecord::Base
-  before_save :clear_all_cache
+  after_save :clear_all_cache
   after_save :update_cache
   after_destroy :clear_all_cache
   before_validation :initialize_creator, :on => :create
@@ -62,17 +62,14 @@ class TagAlias < ActiveRecord::Base
   end
   
   def clear_all_cache
-    clear_cache
-    clear_remote_cache
+    Danbooru.config.all_server_hosts.each do |host|
+      delay.clear_cache(host)
+    end
   end
 
-  def clear_cache
-    Cache.delete("ta:#{Cache.sanitize(antecedent_name)}")
-  end
-  
-  def clear_remote_cache
-    Danbooru.config.other_server_hosts.each do |server|
-      Net::HTTP.delete(URI.parse("http://#{server}/tag_aliases/#{id}/cache"))
+  def clear_cache(host = Socket.gethostname)
+    if host == Socket.gethostname
+      Cache.delete("ta:#{Cache.sanitize(antecedent_name)}")
     end
   end
   

@@ -3,10 +3,10 @@ require 'test_helper'
 class ArtistsControllerTest < ActionController::TestCase
   context "An artists controller" do
     setup do
-      CurrentUser.user = Factory.create(:user)
+      CurrentUser.user = FactoryGirl.create(:user)
       CurrentUser.ip_addr = "127.0.0.1"
-      @artist = Factory.create(:artist)
-      @user = Factory.create(:user)
+      @artist = FactoryGirl.create(:artist)
+      @user = FactoryGirl.create(:user)
     end
     
     teardown do
@@ -42,7 +42,7 @@ class ArtistsControllerTest < ActionController::TestCase
     
     should "create an artist" do
       assert_difference("Artist.count", 1) do
-        post :create, {:artist => Factory.attributes_for(:artist)}, {:user_id => @user.id}
+        post :create, {:artist => FactoryGirl.attributes_for(:artist)}, {:user_id => @user.id}
       end
       artist = Artist.last
       assert_redirected_to(artist_path(artist))

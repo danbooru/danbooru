@@ -3,7 +3,7 @@ require 'test_helper'
 class UserTest < ActiveSupport::TestCase
   context "A user" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
@@ -16,7 +16,7 @@ class UserTest < ActiveSupport::TestCase
     
     context "that has been invited by a mod" do
       setup do
-        @mod = Factory.create(:moderator_user)
+        @mod = FactoryGirl.create(:moderator_user)
       end
       
       should "work" do
@@ -34,10 +34,10 @@ class UserTest < ActiveSupport::TestCase
     
     context "who has negeative feedback and is trying to change their name" do
       setup do
-        @mod = Factory.create(:moderator_user)
+        @mod = FactoryGirl.create(:moderator_user)
         
         CurrentUser.scoped(@mod, "127.0.0.1") do
-          Factory.create(:user_feedback, :user => @user, :category => "negative")
+          FactoryGirl.create(:user_feedback, :user => @user, :category => "negative")
         end
       end
       
@@ -49,8 +49,8 @@ class UserTest < ActiveSupport::TestCase
     end
 
     should "not validate if the originating ip address is banned" do
-      Factory.create(:ip_ban)
-      user = Factory.build(:user)
+      FactoryGirl.create(:ip_ban)
+      user = FactoryGirl.build(:user)
       user.save
       assert(user.errors.any?)
       assert_equal("IP address is banned", user.errors.full_messages.join)
@@ -63,7 +63,7 @@ class UserTest < ActiveSupport::TestCase
       @user.update_column(:level, User::Levels::MEMBER)
       
       40.times do
-        Factory.create(:post, :uploader => @user, :is_deleted => true)
+        FactoryGirl.create(:post, :uploader => @user, :is_deleted => true)
       end
       
       assert(!@user.can_upload?)
@@ -74,8 +74,8 @@ class UserTest < ActiveSupport::TestCase
       Danbooru.config.stubs(:member_comment_limit).returns(10)
       assert(@user.can_comment_vote?)
       10.times do
-        comment = Factory.create(:comment)
-        Factory.create(:comment_vote, :comment_id => comment.id)
+        comment = FactoryGirl.create(:comment)
+        FactoryGirl.create(:comment_vote, :comment_id => comment.id)
       end
       
       assert(!@user.can_comment_vote?)
@@ -91,14 +91,14 @@ class UserTest < ActiveSupport::TestCase
       @user.update_column(:created_at, 1.year.ago)
       assert(@user.can_comment?)
       (Danbooru.config.member_comment_limit).times do
-        Factory.create(:comment)
+        FactoryGirl.create(:comment)
       end
       assert(!@user.can_comment?)
     end
     
     should "verify" do
       assert(@user.is_verified?)
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       @user.generate_email_verification_key
       @user.save
       assert(!@user.is_verified?)
@@ -115,41 +115,41 @@ class UserTest < ActiveSupport::TestCase
     end
       
     should "normalize its level" do
-      user = Factory.create(:user, :level => User::Levels::ADMIN)
+      user = FactoryGirl.create(:user, :level => User::Levels::ADMIN)
       assert(user.is_moderator?)
       assert(user.is_janitor?)
       assert(user.is_contributor?)
       assert(user.is_privileged?)
     
-      user = Factory.create(:user, :level => User::Levels::MODERATOR)
+      user = FactoryGirl.create(:user, :level => User::Levels::MODERATOR)
       assert(!user.is_admin?)
       assert(user.is_moderator?)
       assert(user.is_janitor?)
       assert(user.is_contributor?)
       assert(user.is_privileged?)
     
-      user = Factory.create(:user, :level => User::Levels::JANITOR)
+      user = FactoryGirl.create(:user, :level => User::Levels::JANITOR)
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
       assert(user.is_janitor?)
       assert(user.is_contributor?)
       assert(user.is_privileged?)
     
-      user = Factory.create(:user, :level => User::Levels::CONTRIBUTOR)
+      user = FactoryGirl.create(:user, :level => User::Levels::CONTRIBUTOR)
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
       assert(!user.is_janitor?)
       assert(user.is_contributor?)
       assert(user.is_privileged?)
     
-      user = Factory.create(:user, :level => User::Levels::PRIVILEGED)
+      user = FactoryGirl.create(:user, :level => User::Levels::PRIVILEGED)
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
       assert(!user.is_janitor?)
       assert(!user.is_contributor?)
       assert(user.is_privileged?)
     
-      user = Factory.create(:user)      
+      user = FactoryGirl.create(:user)      
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
       assert(!user.is_janitor?)
@@ -163,12 +163,12 @@ class UserTest < ActiveSupport::TestCase
       end
     
       should "be fetched given a user id" do
-        @user = Factory.create(:user)
+        @user = FactoryGirl.create(:user)
         assert_equal(@user.name, User.id_to_name(@user.id))
       end
     
       should "be updated" do
-        @user = Factory.create(:user)
+        @user = FactoryGirl.create(:user)
         @user.update_attribute(:name, "danzig")
         assert_equal(@user.name, User.id_to_name(@user.id))
       end
@@ -176,7 +176,7 @@ class UserTest < ActiveSupport::TestCase
       
     context "ip address" do
       setup do
-        @user = Factory.create(:user)
+        @user = FactoryGirl.create(:user)
       end
       
       context "in the json representation" do
@@ -194,7 +194,7 @@ class UserTest < ActiveSupport::TestCase
     
     context "cookie password hash" do
       setup do
-        @user = Factory.create(:user, :name => "albert", :password_hash => "1234")
+        @user = FactoryGirl.create(:user, :name => "albert", :password_hash => "1234")
       end
       
       should "be correct" do
@@ -208,7 +208,7 @@ class UserTest < ActiveSupport::TestCase
     
     context "password" do
       should "match the confirmation" do
-        @user = Factory.create(:user)
+        @user = FactoryGirl.create(:user)
         @user.password = "zugzug5"
         @user.password_confirmation = "zugzug5"
         @user.save
@@ -217,7 +217,7 @@ class UserTest < ActiveSupport::TestCase
       end
       
       should "match the confirmation" do
-        @user = Factory.create(:user)
+        @user = FactoryGirl.create(:user)
         @user.password = "zugzug6"
         @user.password_confirmation = "zugzug5"
         @user.save
@@ -225,7 +225,7 @@ class UserTest < ActiveSupport::TestCase
       end
       
       should "not be too short" do
-        @user = Factory.create(:user)
+        @user = FactoryGirl.create(:user)
         @user.password = "x5"
         @user.password_confirmation = "x5"
         @user.save
@@ -233,38 +233,38 @@ class UserTest < ActiveSupport::TestCase
       end
       
       should "should be reset" do
-        @user = Factory.create(:user)
+        @user = FactoryGirl.create(:user)
         new_pass = @user.reset_password
         assert(User.authenticate(@user.name, new_pass), "Authentication should have succeeded")
       end
       
       should "not change the password if the password and old password are blank" do
-        @user = Factory.create(:user, :password => "67890")
+        @user = FactoryGirl.create(:user, :password => "67890")
         @user.update_attributes(:password => "", :old_password => "")
         assert_equal(User.sha1("67890"), @user.password_hash)
       end
       
       should "not change the password if the old password is incorrect" do
-        @user = Factory.create(:user, :password => "67890")
+        @user = FactoryGirl.create(:user, :password => "67890")
         @user.update_attributes(:password => "12345", :old_password => "abcdefg")
         assert_equal(User.sha1("67890"), @user.password_hash)
       end
       
       should "not change the password if the old password is blank" do
-        @user = Factory.create(:user, :password => "67890")
+        @user = FactoryGirl.create(:user, :password => "67890")
         @user.update_attributes(:password => "12345", :old_password => "")
         assert_equal(User.sha1("67890"), @user.password_hash)
       end
       
       should "change the password if the old password is correct" do
-        @user = Factory.create(:user, :password => "67890")
+        @user = FactoryGirl.create(:user, :password => "67890")
         @user.update_attributes(:password => "12345", :old_password => "67890")
         assert_equal(User.sha1("12345"), @user.password_hash)
       end
       
       context "in the json representation" do
         setup do
-          @user = Factory.create(:user)
+          @user = FactoryGirl.create(:user)
         end
         
         should "not appear" do
@@ -274,7 +274,7 @@ class UserTest < ActiveSupport::TestCase
       
       context "in the xml representation" do
         setup do
-          @user = Factory.create(:user)
+          @user = FactoryGirl.create(:user)
         end
         
         should "not appear" do

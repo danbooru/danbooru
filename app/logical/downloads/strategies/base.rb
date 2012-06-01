@@ -2,7 +2,7 @@ module Downloads
   module Strategies
     class Base
       def self.strategies
-        [Pixiv, Tinami, Pixa]
+        [Pixiv]
       end
       
       def rewrite(url, headers)

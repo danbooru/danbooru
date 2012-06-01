@@ -3,7 +3,7 @@ require 'test_helper'
 class PostVersionsControllerTest < ActionController::TestCase
   context "The post versions controller" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -15,7 +15,7 @@ class PostVersionsControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        @post = Factory.create(:post)
+        @post = FactoryGirl.create(:post)
         @post.update_attributes(:tag_string => "1 2", :source => "xxx")
         @post.update_attributes(:tag_string => "2 3", :rating => "e")
       end

@@ -3,8 +3,8 @@ require 'test_helper'
 class JanitorTrialsControllerTest < ActionController::TestCase
   context "The janitor trials controller" do
     setup do
-      @admin = Factory.create(:admin_user)
-      @user = Factory.create(:user)
+      @admin = FactoryGirl.create(:admin_user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @admin
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -30,7 +30,7 @@ class JanitorTrialsControllerTest < ActionController::TestCase
     
     context "promote action" do
       setup do
-        @janitor_trial = Factory.create(:janitor_trial, :user_id => @user.id)
+        @janitor_trial = FactoryGirl.create(:janitor_trial, :user_id => @user.id)
       end
       
       should "promote the janitor trial" do
@@ -44,7 +44,7 @@ class JanitorTrialsControllerTest < ActionController::TestCase
     
     context "demote action" do
       setup do
-        @janitor_trial = Factory.create(:janitor_trial, :user_id => @user.id)
+        @janitor_trial = FactoryGirl.create(:janitor_trial, :user_id => @user.id)
       end
       
       should "demote the janitor trial" do
@@ -58,7 +58,7 @@ class JanitorTrialsControllerTest < ActionController::TestCase
     
     context "index action" do
       setup do
-        Factory.create(:janitor_trial)
+        FactoryGirl.create(:janitor_trial)
       end
       
       should "render" do

@@ -2,7 +2,7 @@ require 'test_helper'
 
 class FavoriteTest < ActiveSupport::TestCase
   setup do
-    user = Factory.create(:user)
+    user = FactoryGirl.create(:user)
     CurrentUser.user = user
     CurrentUser.ip_addr = "127.0.0.1"
     MEMCACHE.flush_all
@@ -16,8 +16,8 @@ class FavoriteTest < ActiveSupport::TestCase
 
   context "A favorite" do
     should "delete from all tables" do
-      user1 = Factory.create(:user)
-      p1 = Factory.create(:post)
+      user1 = FactoryGirl.create(:user)
+      p1 = FactoryGirl.create(:post)
     
       user1.add_favorite!(p1)
       assert_equal(1, Favorite.count)
@@ -27,10 +27,10 @@ class FavoriteTest < ActiveSupport::TestCase
     end
     
     should "know which table it belongs to" do
-      user1 = Factory.create(:user)
-      user2 = Factory.create(:user)      
-      p1 = Factory.create(:post)
-      p2 = Factory.create(:post)
+      user1 = FactoryGirl.create(:user)
+      user2 = FactoryGirl.create(:user)      
+      p1 = FactoryGirl.create(:post)
+      p2 = FactoryGirl.create(:post)
     
       user1.add_favorite!(p1)
       user1.add_favorite!(p2)
@@ -47,9 +47,9 @@ class FavoriteTest < ActiveSupport::TestCase
     end
     
     should "not allow duplicates" do
-      user1 = Factory.create(:user)
-      p1 = Factory.create(:post)
-      p2 = Factory.create(:post)
+      user1 = FactoryGirl.create(:user)
+      p1 = FactoryGirl.create(:post)
+      p2 = FactoryGirl.create(:post)
       user1.add_favorite!(p1)
       user1.add_favorite!(p1)
       

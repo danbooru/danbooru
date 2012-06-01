@@ -3,7 +3,7 @@ require 'test_helper'
 class NoteTest < ActiveSupport::TestCase
   context "In all cases" do
     setup do
-      @user = Factory.create(:user)
+      @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
@@ -16,12 +16,12 @@ class NoteTest < ActiveSupport::TestCase
     
     context "creating a note" do
       setup do
-        @post = Factory.create(:post)
+        @post = FactoryGirl.create(:post)
       end
       
       should "create a version" do
         assert_difference("NoteVersion.count", 1) do
-          @note = Factory.create(:note, :post => @post)
+          @note = FactoryGirl.create(:note, :post => @post)
         end
 
         assert_equal(1, @note.versions.count)
@@ -30,7 +30,7 @@ class NoteTest < ActiveSupport::TestCase
       
       should "update the post's last_noted_at field" do
         assert_nil(@post.last_noted_at)
-        @note = Factory.create(:note, :post => @post)
+        @note = FactoryGirl.create(:note, :post => @post)
         @post.reload
         assert_not_nil(@post.last_noted_at)
       end
@@ -42,7 +42,7 @@ class NoteTest < ActiveSupport::TestCase
 
         should "fail" do
           assert_difference("Note.count", 0) do
-            @note = Factory.build(:note, :post => @post)
+            @note = FactoryGirl.build(:note, :post => @post)
             @note.save
           end
           assert_equal(["Post is note locked"], @note.errors.full_messages)
@@ -52,8 +52,8 @@ class NoteTest < ActiveSupport::TestCase
     
     context "updating a note" do
       setup do
-        @post = Factory.create(:post)
-        @note = Factory.create(:note, :post => @post)
+        @post = FactoryGirl.create(:post)
+        @note = FactoryGirl.create(:note, :post => @post)
       end
       
       should "increment the updater's note_update_count" do
@@ -91,8 +91,8 @@ class NoteTest < ActiveSupport::TestCase
     
     context "when notes have been vandalized by one user" do
       setup do
-        @vandal = Factory.create(:user)
-        @note = Factory.create(:note, :x => 100, :y => 100)
+        @vandal = FactoryGirl.create(:user)
+        @note = FactoryGirl.create(:note, :x => 100, :y => 100)
         CurrentUser.scoped(@vandal, "127.0.0.1") do
           @note.update_attributes(:x => 2000, :y => 2000)
         end
@@ -110,7 +110,7 @@ class NoteTest < ActiveSupport::TestCase
 
     context "searching for a note" do
       setup do
-        @note = Factory.create(:note, :body => "aaa")
+        @note = FactoryGirl.create(:note, :body => "aaa")
       end
       
       context "where the body contains the string 'aaa'" do

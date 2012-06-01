@@ -1,5 +1,7 @@
-Factory.define(:dmail) do |f|
-  f.to {|x| x.association(:user)}
-  f.title {Faker::Lorem.words.join(" ")}
-  f.body {Faker::Lorem.sentences.join(" ")}
+FactoryGirl.define do
+  factory(:dmail) do
+    to :factory => :user
+    title {Faker::Lorem.words.join(" ")}
+    body {Faker::Lorem.sentences.join(" ")}
+  end
 end
