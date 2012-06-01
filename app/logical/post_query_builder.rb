@@ -138,8 +138,12 @@ class PostQueryBuilder
     end
 
     if q[:source]
-      relation = relation.where("posts.source LIKE ? ESCAPE E'\\\\'", q[:source])
-      has_constraints!
+      if q[:source] == "none"
+        relation = relation.where("(posts.source = '' OR posts.source IS NULL)")
+      else
+        relation = relation.where("posts.source LIKE ? ESCAPE E'\\\\'", q[:source])
+        has_constraints!
+      end
     end
 
     if q[:subscriptions]
