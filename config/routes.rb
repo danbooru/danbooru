@@ -251,6 +251,7 @@ Danbooru::Application.routes.draw do
   match "/static/bookmarklet" => "static#bookmarklet", :as => "bookmarklet"
   match "/static/site_map" => "static#site_map", :as => "site_map"
   match "/static/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
+  match "/static/mrtg" => "static#mrtg", :as => "mrtg"
   
   root :to => "posts#index"
 end
