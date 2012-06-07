@@ -19,7 +19,8 @@ class SessionLoader
     else
       CurrentUser.user = AnonymousUser.new
     end
-
+    
+    update_last_logged_in_at
     set_time_zone
   end
 
@@ -41,6 +42,12 @@ private
   
   def cookie_password_hash_valid?
     cookies[:cookie_password_hash] && User.authenticate_cookie_hash(cookies[:user_name], cookies[:cookie_password_hash])
+  end
+  
+  def update_last_logged_in_at
+    return if CurrentUser.is_anonymous?
+    return if CurrentUser.last_logged_in_at && CurrentUser.last_logged_in_at > 1.week.ago
+    CurrentUser.user.update_attribute(:last_logged_in_at, Time.now)
   end
   
   def set_time_zone

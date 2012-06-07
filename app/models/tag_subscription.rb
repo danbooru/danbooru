@@ -34,6 +34,10 @@ class TagSubscription < ActiveRecord::Base
     self.post_ids = post_ids.sort.reverse.slice(0, Danbooru.config.tag_subscription_post_limit).join(",")
   end
   
+  def is_active?
+    creator.last_logged_in_at && creator.last_logged_in_at > 1.year.ago
+  end
+  
   def editable_by?(user)
     user.is_moderator? || creator_id == user.id
   end
@@ -86,7 +90,7 @@ class TagSubscription < ActiveRecord::Base
 
   def self.process_all
     find_each do |tag_subscription|
-      if $job_task_daemon_active != false && tag_subscription.creator.is_privileged?
+      if $job_task_daemon_active != false && tag_subscription.creator.is_privileged? && tag_subscription.is_active?
         begin
           tag_subscription.process
           tag_subscription.save
