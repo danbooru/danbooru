@@ -301,7 +301,7 @@ class Post < ActiveRecord::Base
     end
     
     def normalized_source
-      if source =~ /pixiv\.net\/img\//
+      if source =~ /pixiv\.net\/img/
         img_id = source[/(\d+)(_s|_m|(_big)?_p\d+)?\.[\w\?]+\s*$/, 1]
 
         if $2 =~ /_p/
