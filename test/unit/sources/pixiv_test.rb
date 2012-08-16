@@ -19,7 +19,7 @@ module Sources
       end
       
       should "get the image url" do
-        assert_equal("http://img01.pixiv.net/img/nisieda/9646484.jpg", @site.image_url)
+        assert_equal("http://i1.pixiv.net/img01/img/nisieda/9646484.jpg", @site.image_url)
       end
       
       should "get the tags" do
