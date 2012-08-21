@@ -73,6 +73,10 @@ module Danbooru
       900
     end
     
+    def large_image_prefix
+      "sample-"
+    end
+    
     # When calculating statistics based on the posts table, gather this many posts to sample from.
     def post_sample_size
       300

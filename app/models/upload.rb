@@ -209,7 +209,7 @@ class Upload < ActiveRecord::Base
   module FilePathMethods
     def md5_file_path
       prefix = Rails.env == "test" ? "test." : ""
-      "#{Rails.root}/public/data/original/#{prefix}#{md5}.#{file_ext}"
+      "#{Rails.root}/public/data/#{prefix}#{md5}.#{file_ext}"
     end
     
     def resized_file_path_for(width)
@@ -220,7 +220,7 @@ class Upload < ActiveRecord::Base
         "#{Rails.root}/public/data/preview/#{prefix}#{md5}.jpg"
 
       when Danbooru.config.large_image_width
-        "#{Rails.root}/public/data/large/#{prefix}#{md5}.jpg"
+        "#{Rails.root}/public/data/sample/#{prefix}#{md5}.jpg"
       end
     end
     

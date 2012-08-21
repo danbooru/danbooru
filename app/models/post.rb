@@ -90,12 +90,12 @@ class Post < ActiveRecord::Base
     end
     
     def file_path
-      "#{Rails.root}/public/data/original/#{file_path_prefix}#{md5}.#{file_ext}"
+      "#{Rails.root}/public/data/#{file_path_prefix}#{md5}.#{file_ext}"
     end
     
     def large_file_path
       if has_large?
-        "#{Rails.root}/public/data/large/#{file_path_prefix}#{md5}.jpg"
+        "#{Rails.root}/public/data/sample/#{file_path_prefix}#{Danbooru.config.large_image_prefix}#{md5}.jpg"
       else
         file_path
       end
@@ -118,12 +118,12 @@ class Post < ActiveRecord::Base
     end
 
     def file_url
-      "/data/original/#{file_path_prefix}#{md5}.#{file_ext}"
+      "/data/#{file_path_prefix}#{md5}.#{file_ext}"
     end
     
     def large_file_url
       if has_large?
-        "/data/large/#{file_path_prefix}#{md5}.jpg"
+        "/data/sample/#{file_path_prefix}#{Danbooru.config.large_image_prefix}#{md5}.jpg"
       else
         file_url
       end
