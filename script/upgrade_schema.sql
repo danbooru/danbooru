@@ -2,10 +2,10 @@ alter table posts add column fav_string text not null default '';
 alter table posts add column pool_string text not null default '';
 
 -- TODO: REVERT
-update posts set fav_string = (select coalesce(string_agg('fav:' || _.user_id, ' '), '') from favorites _ where _.post_id = posts.id) where posts.id < 1000;
+update posts set fav_string = (select coalesce(array_to_string(array_agg('fav:' || _.user_id), ' '), '') from favorites _ where _.post_id = posts.id) where posts.id < 1000;
   
 -- TODO: REVERT
-update posts set pool_string = (select coalesce(string_agg('pool:' || _.pool_id, ' '), '') from pools_posts _ where _.post_id = posts.id) where posts.id < 1000;
+update posts set pool_string = (select coalesce(array_to_string(array_agg('pool:' || _.pool_id), ' '), '') from pools_posts _ where _.post_id = posts.id) where posts.id < 1000;
 
 create index index_advertisements_on_ad_type on advertisements (ad_type);
 
@@ -2986,7 +2986,7 @@ alter table pools rename column user_id to creator_id;
 alter table pools drop column is_public;
 alter table pools add column post_ids text not null default '';
 alter index pools_user_id_idx rename to index_pools_on_creator_id;
-update pools set post_ids = (select coalesce(string_agg(x.post_id, ' '), '') from (select _.post_id::text from pools_posts _ where _.pool_id = pools.id order by _.sequence) x);
+update pools set post_ids = (select coalesce(array_to_string(array_agg(x.post_id), ' '), '') from (select _.post_id::text from pools_posts _ where _.pool_id = pools.id order by _.sequence) x);
 
 alter table post_tag_histories rename to post_versions;
 alter table post_versions drop constraint fk_post_tag_histories__post;
@@ -3166,7 +3166,7 @@ alter index idx_users__name rename to index_users_on_name;
 create index index_users_on_email on users (email) where email is not null;
 create index index_users_on_inviter_id on users (inviter_id) where inviter_id is not null;
 update users set post_upload_count = (select count(*) from posts where uploader_id = users.id);
-update users set blacklisted_tags = (select string_agg(_.tags, E'\n') from user_blacklisted_tags _ where _.user_id = users.id);
+update users set blacklisted_tags = (select array_to_string(array_agg(_.tags), E'\n') from user_blacklisted_tags _ where _.user_id = users.id);
 update users set post_update_count = (select count(*) from post_versions where updater_id = users.id);
 update users set note_update_count = (select count(*) from note_versions where updater_id = users.id);
 update users set favorite_count = (select count(*) from favorites where user_id = users.id);

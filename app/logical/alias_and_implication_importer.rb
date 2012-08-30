@@ -41,7 +41,7 @@ private
         when :create_alias
           tag_alias = TagAlias.create(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2])
           tag_alias.delay.process!
-      
+        
         when :create_implication
           tag_implication = TagImplication.create(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2])
           tag_implication.delay.process!
