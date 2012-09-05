@@ -23,6 +23,8 @@ if [[ -z "$HOSTNAME" ]] ; then
   exit 1
 fi
 
+RUBY_VERSION=1.9.3-p194
+
 echo -n "Enter a name for the site (default: Danbooru): "
 read SITENAME
 
@@ -33,47 +35,48 @@ fi
 # Install packages
 echo "Installing packages..."
 apt-get update
-apt-get -y install build-essential automake openssl libssl-dev libyaml-dev libxml2-dev libxslt-dev autoconf ncurses-dev sudo gcc g++ libreadline-dev zlib1g-dev flex bison bzip2 ragel memcached libmemcache-dev git-core curl libcurl4-openssl-dev emacs imagemagick libmagickcore-dev libmagickwand-dev sendmail psmisc ffmpegthumbnailer
-
-# Install PostgreSQL 9.1
-apt-get -y install python-software-properties
-add-apt-repository ppa:pitti/postgresql
-apt-get update
-apt-get install -y postgresql-9.1 postgresql-contrib-9.1 libpq-dev
+apt-get -y install build-essential automake openssl libssl-dev libyaml-dev libxml2-dev libxslt-dev autoconf ncurses-dev sudo gcc g++ libreadline-dev zlib1g-dev flex bison bzip2 ragel memcached libmemcache-dev git curl libcurl4-openssl-dev emacs imagemagick libmagickcore-dev libmagickwand-dev sendmail psmisc postgresql postgresql-contrib libpq-dev
 
 if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# Install rbenv
-echo "Installing RVM..."
-curl -L get.rvm.io | bash -s stable
-echo "source /usr/local/rvm/scripts/rvm" >> /etc/bash.bashrc
-echo "source /usr/local/rvm/scripts/rvm" >> /etc/profile
-source /usr/local/rvm/scripts/rvm
-rvm install ruby-1.9.3-p125 --with-openssl-dir=/usr/local
-rvm 1.9.3-p125 --default
-
-# Install gems
-gem install --no-ri --no-rdoc capistrano
-gem install --no-ri --no-rdoc capistrano-ext
-gem install --no-ri --no-rdoc bundler
-
-# Install Passenger
-gem install --no-ri --no-rdoc -v 3.0.12 passenger
-bash -c '/usr/local/rvm/bin/rvm exec passenger-install-nginx-module --auto --auto-download --prefix=/opt/nginx'
-rm -f /opt/nginx/conf/*.default
-
 # Create user account
 useradd -m danbooru
 chsh -s /bin/bash danbooru
-echo "source /usr/local/rvm/scripts/rvm" > /home/danbooru/.bashrc
-chmod g-wx,o-wx /home/danbooru/.bashrc
-chown danbooru:danbooru /home/danbooru/.bashrc
-echo "export rvm_path=/usr/local/rvm" > /etc/rvmrc
 addgroup wheel
 usermod -G root,wheel root
 usermod -G danbooru,wheel danbooru
+
+# Setup danbooru account
+echo
+echo "*************************************************"
+echo "* Enter a new password for the danbooru account *"
+echo "*************************************************"
+echo
+passwd danbooru
+
+# Install rbenv
+echo "Installing rbenv..."
+cd /
+sudo -u danbooru git clone git://github.com/sstephenson/rbenv.git /home/danbooru/.rbenv
+sudo -u danbooru touch /home/danbooru/.bash_profile
+echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> /home/danbooru/.bash_profile
+echo 'eval "$(rbenv init -)"' >> /home/danbooru/.bash_profile
+sudo -u danbooru mkdir -p /home/danbooru/.rbenv/plugins
+sudo -u danbooru git clone git://github.com/sstephenson/ruby-build.git /home/danbooru/.rbenv/plugins/ruby-build
+sudo -u danbooru bash -l -c "rbenv install $RUBY_VERSION"
+sudo -u danbooru bash -l -c "rbenv global $RUBY_VERSION"
+
+# Install gems
+sudo -u danbooru bash -l -c 'gem install --no-ri --no-rdoc capistrano'
+sudo -u danbooru bash -l -c 'gem install --no-ri --no-rdoc capistrano-ext'
+sudo -u danbooru bash -l -c 'gem install --no-ri --no-rdoc bundler'
+
+# Install Passenger
+sudo -u danbooru bash -l -c 'gem install --no-ri --no-rdoc -v 3.0.14 passenger'
+/home/danbooru/.rbenv/versions/$RUBY_VERSION/bin/passenger-install-nginx-module --auto --auto-download --prefix=/opt/nginx
+rm -f /opt/nginx/conf/*.default
 
 # Update PostgreSQL
 PG_HBA_FILE="/etc/postgresql/9.1/main/pg_hba.conf"
@@ -83,6 +86,7 @@ echo "host     all         postgres,danbooru          127.0.0.1/32        trust"
 /etc/init.d/postgresql restart
 sudo -u postgres createuser -s danbooru
 
+mkdir -p /var/www
 mkdir -p /var/log/www
 
 # Setup nginx
@@ -107,14 +111,6 @@ echo "  daily" >> $LOGROTATE_CONF_FILE
 echo "  rotate 3" >> $LOGROTATE_CONF_FILE
 echo "  copytruncate" >> $LOGROTATE_CONF_FILE
 echo "}" >> $LOGROTATE_CONF_FILE
-
-# Setup danbooru account
-echo
-echo "*************************************************"
-echo "* Enter a new password for the danbooru account *"
-echo "*************************************************"
-echo
-passwd danbooru
 
 sudo -u danbooru createdb danbooru2
 cd /home/danbooru
