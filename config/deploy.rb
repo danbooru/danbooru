@@ -1,13 +1,13 @@
-$:.unshift(File.expand_path("./lib", ENV["rvm_path"]))
-set :rvm_ruby_string, "ruby-1.9.3-p125"
-set :rvm_bin_path, "/usr/local/rvm/bin"
-require 'rvm/capistrano'
-
 set :stages, %w(production staging)
 set :default_stage, "staging"
 require 'capistrano/ext/multistage'
 
 require 'bundler/capistrano'
+set :bundle_flags, "--deployment --quiet --binstubs --shebang ruby-local-exec"
+
+set :default_environment, {
+  "PATH" => '$HOME/.rbenv/shims:$HOME/.rbenv/bin:$PATH'
+}
 
 set :whenever_command, "bundle exec whenever"
 set :whenever_environment, defer {stage}
