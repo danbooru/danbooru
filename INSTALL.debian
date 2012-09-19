@@ -74,7 +74,7 @@ sudo -u danbooru bash -l -c 'gem install --no-ri --no-rdoc capistrano-ext'
 sudo -u danbooru bash -l -c 'gem install --no-ri --no-rdoc bundler'
 
 # Install Passenger
-sudo -u danbooru bash -l -c 'gem install --no-ri --no-rdoc -v 3.0.14 passenger'
+sudo -u danbooru bash -l -c 'gem install --no-ri --no-rdoc -v 3.0.17 passenger'
 /home/danbooru/.rbenv/versions/$RUBY_VERSION/bin/passenger-install-nginx-module --auto --auto-download --prefix=/opt/nginx
 rm -f /opt/nginx/conf/*.default
 

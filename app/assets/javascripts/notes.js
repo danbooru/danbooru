@@ -489,7 +489,7 @@ Danbooru.Note = {
 $(function() {
   if ($("#c-posts").length && $("#a-show").length) {
     $("#translate").one("click", Danbooru.Note.TranslationMode.start);
-    key("n", Danbooru.Note.TranslationMode.start);
+    $(document).bind("keypress", "n", Danbooru.Note.TranslationMode.start);
     Danbooru.Note.load_all();
     $("#image").click(Danbooru.Note.Box.toggle_all);
   }

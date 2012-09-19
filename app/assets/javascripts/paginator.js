@@ -15,7 +15,7 @@
 })();
 
 $(function() {
-  key('right', function(){ Danbooru.Paginator.next_page() });
-  key('left', function(){ Danbooru.Paginator.prev_page() });
+  $(document).bind("keypress", 'right', function(){ Danbooru.Paginator.next_page() });
+  $(document).bind("keypress", 'left', function(){ Danbooru.Paginator.prev_page() });
 });
 
