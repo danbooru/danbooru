@@ -48,8 +48,8 @@ class Upload < ActiveRecord::Base
   end
   
   module ConversionMethods
-    def process!
-      return if status =~ /processing|completed|error/
+    def process! force=false
+      return if !force && status =~ /processing|completed|error/
       
       CurrentUser.scoped(uploader, uploader_ip_addr) do
         update_attribute(:status, "processing")
