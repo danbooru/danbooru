@@ -1,11 +1,8 @@
 alter table posts add column fav_string text not null default '';
 alter table posts add column pool_string text not null default '';
 
--- TODO: REVERT
-update posts set fav_string = (select coalesce(array_to_string(array_agg('fav:' || _.user_id), ' '), '') from favorites _ where _.post_id = posts.id) where posts.id < 1000;
-  
--- TODO: REVERT
-update posts set pool_string = (select coalesce(array_to_string(array_agg('pool:' || _.pool_id), ' '), '') from pools_posts _ where _.post_id = posts.id) where posts.id < 1000;
+update posts set fav_string = (select coalesce(array_to_string(array_agg('fav:' || _.user_id), ' '), '') from favorites _ where _.post_id = posts.id);
+update posts set pool_string = (select coalesce(array_to_string(array_agg('pool:' || _.pool_id), ' '), '') from pools_posts _ where _.post_id = posts.id);
 
 create index index_advertisements_on_ad_type on advertisements (ad_type);
 
@@ -3323,6 +3320,13 @@ COPY schema_migrations (version) FROM stdin;
 20110815233456
 20111101212358
 \.
+
+-- reindex
+update posts set id = id;
+update artists set id = id;
+update dmails set id = id;
+update forum_topics set id = id;
+update forum_posts set id = id;
 
 -- post processing
 drop table pools_posts;
