@@ -14,6 +14,10 @@ div.list-of-forum-posts {
       
       menu {
         margin-top: 0.5em;
+        
+        li {
+          margin-right: 1em;
+        }
       }
     }
   }
@@ -31,8 +35,10 @@ div#c-forum-topics {
     color: #AAA;
   }
   
-  tr.new-topic {
-    font-weight: bold;
+  span.new {
+    font-size: 80%;
+    color: red;
+    margin-right: 0.5em;
   }
 
   a.last-page {

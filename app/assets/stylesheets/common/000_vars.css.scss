@@ -2,7 +2,7 @@ $menu_color: #F7F7FF;
 $link_color: hsl(213, 100%, 50%);
 $link_hover_color: lighten($link_color, 25%);
 $link_dark_color: darken($link_color, 25%);
-$highlight_color: lighten(complement($link_color), 35%);
+$highlight_color: lighten($link_color, 45%);
 $h1_size: 2em;
 $h2_size: 1.5em;
 $h3_size: 1.16667em;

@@ -13,10 +13,14 @@
       </thead>
       <tbody>
         <% @forum_topics.each do |topic| %>
-          <tr class="forum-topic-row <% if topic.updated_at > (CurrentUser.last_forum_read_at || Time.now) %>new-topic<% end %>">
+          <tr class="forum-topic-row">
             <td>
               <% if topic.is_sticky? %>
                 <span class="sticky">Sticky:</span>
+              <% end %>
+              
+              <% if topic.updated_at > (CurrentUser.last_forum_read_at || Time.now) %>
+                <span class="new">NEW</span>
               <% end %>
               
               <%= link_to topic.title, forum_topic_path(topic) %>
