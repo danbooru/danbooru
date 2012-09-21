@@ -42,4 +42,46 @@ class PostPresenter < Presenter
     @tag_set_presenter ||= TagSetPresenter.new(@post.tag_array)
     @tag_set_presenter.tag_list_html(template, options.merge(:show_extra_links => CurrentUser.user.is_privileged?))
   end
+  
+  def pool_html(template)
+    html = ["<ul>"]
+    
+    if template.params[:pool_id]
+      pool = Pool.where(:id => template.params[:pool_id]).first
+      return if pool.nil?
+      html = pool_link_html(html, template, pool)
+      
+      @post.pools.active.where("id <> ?", template.params[:pool_id]).each do |other_pool|
+        html = pool_link_html(html, template, other_pool)
+      end
+    else
+      @post.pools.active.each do |pool|
+        html = pool_link_html(html, template, pool)
+      end
+    end
+    
+    html << "</ul>"
+    html.join("\n").html_safe
+  end
+  
+  def pool_link_html(html, template, pool)
+    html << "<li>"
+    
+    if pool.neighbors(@post).previous
+      html << template.link_to("&laquo;".html_safe, template.post_path(pool.neighbors(@post).previous, :pool_id => pool.id))
+    else
+      html << "&laquo;"
+    end
+    
+    if pool.neighbors(@post).next
+      html << template.link_to("&raquo;".html_safe, template.post_path(pool.neighbors(@post).next, :pool_id => pool.id))
+    else
+      html << "&raquo;"
+    end
+    
+    html << " "
+    html << template.link_to(pool.name, template.pool_path(pool))
+    html << "</li>"
+    html
+  end
 end

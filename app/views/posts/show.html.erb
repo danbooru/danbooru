@@ -6,7 +6,7 @@
       <% if @post.pools.any? %>
         <section id="pool-sidebar">
           <h1>Pools</h1>
-          <%= render "posts/partials/show/pools", :post => @post %>
+          <%= @post.presenter.pool_html(self) %>
         </section>
       <% end %>
 
