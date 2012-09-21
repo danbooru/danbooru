@@ -41,43 +41,41 @@ div#c-users {
     max-width: 40em;
     font-size: 1.2em;
     
-    form {
-      input {
-        font-size: 20pt;
-      }
-    }
-    
     div#feature-comparison {
       overflow: hidden;
       margin-bottom: 1em;
       
-      div.column {
-        width: 11em;
-        float: left;
-        border: 1px solid #666;
-        @include border-radius(4px);
-        padding: 0.25em 0.5em;
-        margin: 0.5em;
+      table {
+        width: 100%;
         
-        h1 {
-          font-size: $h3_size;
+        colgroup#basic {
+          background-color: #ddd;
         }
         
-        li {
-          margin-left: 1.5em;
-          list-style-type: disc;
+        colgroup#gold  {
+          background-color: #ffe;
         }
         
-        &#basic-account {
-          background: rgb(240, 255, 240);
+        colgroup#platinum {
+          background-color: #eee;
         }
         
-        &#privileged-account {
-          background: rgb(255, 255, 240);
+        td, th {
+          text-align: center;
+          vertical-align: top;
+          padding: 0.5em 0;
         }
-
-        &#contributor-account {
-          background: rgb(240, 240, 240);
+        
+        tbody {
+          tr {
+            border-bottom: 2px solid black;
+          }
+        }
+        
+        p.cost-footnote {
+          font-size: 80%;
+          color: gray;
+          margin: 0;
         }
       }
     }

@@ -1,39 +1,57 @@
 <div id="c-users">
   <div id="a-upgrade-information">
-    <h1>Upgrade Account</h1>
+    <h1>Upgrade Your Account</h1>
     
-    <p class="copy">Annoyed by ads? Want more searching power? Upgrade your account for only $10 and become a power user of the best database of anime artwork on the internet.</p>
+    <p class="copy">Annoyed by ads? Want more searching power? Upgrade your account and become a power user of the best database of anime artwork on the internet.</p>
     
     <div id="feature-comparison">
-      <div class="column" id="basic-account">
-        <h1>Basic</h1>
-        <ul>
-          <li>Free</li>
-          <li>Ad supported</li>
-          <li>Search 2 tags at a time</li>
-        </ul>
-      </div>
-      
-      <div class="column" id="privileged-account">
-        <h1>Privileged</h1>
-        <ul>
-          <li>One time $10 fee</li>
-          <li>No ads</li>
-          <li>Search 8 tags at a time</li>
-          <li>Subscribe to tags</li>
-          <li>Warm fuzzy feeling</li>
-        </ul>
-      </div>
-      
-      <div class="column" id="contributor-account">
-        <h1>Contributor</h1>
-        <ul>
-          <li>Invite only</li>
-          <li>Unlimited uploads</li>
-        </ul>
-      </div>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Basic</th>
+            <th>Gold</th>
+            <th>Platinum</th>
+          </tr>
+        </thead>
+        <tbody>
+          <colgroup></colgroup>
+          <colgroup id="basic"></colgroup>
+          <colgroup id="gold"></colgroup>
+          <colgroup id="platinum"></colgroup>
+          <tr>
+            <td>Cost</td>
+            <td>Free</td>
+            <td>$20<p class="cost-footnote">One time fee</p></td>
+            <td>$40<p class="cost-footnote">One time fee</p></td>
+          </tr>
+          <tr>
+            <td>Ads</td>
+            <td>Yes</td>
+            <td>None</td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td>Tag Limit</td>
+            <td>2</td>
+            <td>6</td>
+            <td>12</td>
+          </tr>
+          <tr>
+            <td>Favorite Limit</td>
+            <td>1,000</td>
+            <td>5,000</td>
+            <td>Unlimited</td>
+          </tr>
+          <tr>
+            <td>Bookmark Tags</td>
+            <td>No</td>
+            <td>Yes</td>
+            <td>Yes</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    
     <p>Just provide your email address and details for upgrading your account will be sent to you. If you have any further questions or concerns, feel free to contact me at <%= mail_to Danbooru.config.contact_email, nil, :encode => :javascript %>.</p>
 
     <%= form_tag(upgrade_user_path(CurrentUser.user)) do %>
