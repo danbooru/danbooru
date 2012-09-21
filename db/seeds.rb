@@ -1,3 +1,5 @@
+CurrentUser.ip_addr = "127.0.0.1"
+
 if User.count == 0
   puts "Creating users"
   user = User.create(
@@ -15,11 +17,10 @@ if User.count == 0
   end
 else
   puts "Skipping users"
-  user = User.first
+  user = User.find_by_name("albert")
 end
 
 CurrentUser.user = user
-CurrentUser.ip_addr = "127.0.0.1"
 
 if Upload.count == 0
   puts "Creating uploads"
@@ -28,7 +29,7 @@ if Upload.count == 0
     color2 = rand(4096).to_s(16)
     width = rand(2000) + 100
     height = rand(2000) + 100
-    url = "http://dummyimage.com/#{width}x#{height}/#{color1}/#{color2}"
+    url = "http://ipsumimage.appspot.com/#{width}x#{height}"
     tags = (i * i * i).to_s.scan(/./).uniq.join(" ")
   
     Upload.create(:source => url, :content_type => "image/gif", :rating => "q", :tag_string => tags)

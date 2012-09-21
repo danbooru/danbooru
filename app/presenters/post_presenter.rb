@@ -43,6 +43,17 @@ class PostPresenter < Presenter
     @tag_set_presenter.tag_list_html(template, options.merge(:show_extra_links => CurrentUser.user.is_privileged?))
   end
   
+  def post_footer_for_pool_html(template)
+    if template.params[:pool_id]
+      pool = Pool.where(:id => template.params[:pool_id]).first
+      return if pool.nil?
+      return if pool.neighbors(@post).next.nil?
+      template.link_to("Next in #{pool.name}", template.post_path(pool.neighbors(@post).next))
+    else
+      nil
+    end
+  end
+  
   def pool_html(template)
     html = ["<ul>"]
     
