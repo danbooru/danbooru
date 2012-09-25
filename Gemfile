@@ -33,5 +33,6 @@ gem 'newrelic_rpm'
 group :development do
   gem 'pry'
   gem 'pry-nav'
+  gem 'pry-doc'
   gem 'awesome_print'
 end
