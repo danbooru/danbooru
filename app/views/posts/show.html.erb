@@ -11,8 +11,7 @@
       <% end %>
 
       <section>
-        <h1>Tags</h1>
-        <%= @post.presenter.tag_list_html(self) %>
+        <%= @post.presenter.split_tag_list_html(self) %>
       </section>
 
       <section>

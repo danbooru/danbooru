@@ -5,7 +5,7 @@
 <% end %>
 
 <%= form_for(post, :html => {:class => "simple_form"}) do |f| %>
-  <%= f.hidden_field :old_tags, :value => post.tag_string %>
+  <%= f.hidden_field :old_tag_string, :value => post.tag_string %>
 
   <div class="input">
     <% if post.is_rating_locked? %>

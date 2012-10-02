@@ -11,15 +11,76 @@ class TagSetPresenter < Presenter
   
   def tag_list_html(template, options = {})
     html = ""
-    html << "<ul>"
-    Array(@tags).each do |tag|
-      html << build_list_item(tag, template, options)
+    if @tags.present?
+      html << "<ul>"
+      @tags.each do |tag|
+        html << build_list_item(tag, template, options)
+      end
+      html << "</ul>"
     end
-    html << "</ul>"
+
+    html.html_safe
+  end
+  
+  def split_tag_list_html(template, options = {})
+    html = ""
+    
+    if copyright_tags.any?
+      html << '<h1>Copyrights</h1>'
+      html << "<ul>"
+      copyright_tags.keys.each do |tag|
+        html << build_list_item(tag, template, options)
+      end
+      html << "</ul>"
+    end
+    
+    if character_tags.any?
+      html << '<h1>Characters</h1>'
+      html << "<ul>"
+      character_tags.keys.each do |tag|
+        html << build_list_item(tag, template, options)
+      end
+      html << "</ul>"
+    end
+    
+    if artist_tags.any?
+      html << '<h1>Artist</h1>'
+      html << "<ul>"
+      artist_tags.keys.each do |tag|
+        html << build_list_item(tag, template, options)
+      end
+      html << "</ul>"
+    end
+    
+    if general_tags.any?
+      html << '<h1>Tags</h1>'
+      html << "<ul>"
+      general_tags.keys.each do |tag|
+        html << build_list_item(tag, template, options)
+      end
+      html << "</ul>"
+    end
+
     html.html_safe
   end
 
 private
+  def general_tags
+    @general_tags ||= categories.select {|k, v| v == Tag.categories.general}
+  end
+  
+  def copyright_tags
+    @copyright_tags ||= categories.select {|k, v| v == Tag.categories.copyright}
+  end
+  
+  def character_tags
+    @character_tags ||= categories.select {|k, v| v == Tag.categories.character}
+  end
+  
+  def artist_tags
+    @artist_tags ||= categories.select {|k, v| v == Tag.categories.artist}
+  end
+
   def categories
     @categories ||= Tag.categories_for(@tags)
   end
@@ -37,7 +98,7 @@ private
     current_query = template.params[:tags] || ""
     
     unless options[:name_only]
-      if categories[tag] == 1
+      if categories[tag] == Tag.categories.artist
         html << %{<a class="wiki-link" href="/artists/show_or_new?name=#{u(tag)}">?</a> }
       else
         html << %{<a class="wiki-link" href="/wiki_pages?title=#{u(tag)}">?</a> }

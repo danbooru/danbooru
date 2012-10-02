@@ -43,6 +43,11 @@ class PostPresenter < Presenter
     @tag_set_presenter.tag_list_html(template, options.merge(:show_extra_links => CurrentUser.user.is_privileged?))
   end
   
+  def split_tag_list_html(template, options = {})
+    @tag_set_presenter ||= TagSetPresenter.new(@post.tag_array)
+    @tag_set_presenter.split_tag_list_html(template, options.merge(:show_extra_links => CurrentUser.user.is_privileged?))
+  end
+  
   def post_footer_for_pool_html(template)
     if template.params[:pool_id]
       pool = Pool.where(:id => template.params[:pool_id]).first
@@ -91,7 +96,7 @@ class PostPresenter < Presenter
     end
     
     html << " "
-    html << template.link_to(pool.name, template.pool_path(pool))
+    html << template.link_to(pool.pretty_name, template.pool_path(pool))
     html << "</li>"
     html
   end
