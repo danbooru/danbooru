@@ -8,6 +8,7 @@
     <% if @artist && !@artist.new_record? %>
       <li>|</li>
       <li><%= link_to "Edit", edit_artist_path(@artist) %></li>
+      <li><%= link_to "History", artist_versions_path(:search => {:artist_id_eq => @artist.id}) %></li>
       <li><%= link_to "Show", artist_path(@artist) %></li>
     <% end %>
   </menu>

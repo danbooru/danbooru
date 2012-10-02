@@ -48,12 +48,15 @@ div#c-users {
       table {
         width: 100%;
         
+        colgroup {
+          width: 10em;
+        }
+                
         colgroup#basic {
-          background-color: #ddd;
         }
         
         colgroup#gold  {
-          background-color: #ffe;
+          background-color: #FFF380;
         }
         
         colgroup#platinum {
