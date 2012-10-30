@@ -44,7 +44,7 @@ class PostPresenter < Presenter
     end
     
     if @post.artist_tags.any?
-      string << "by"
+      string << "drawn by"
       string << @post.artist_tags.to_sentence
     end
     
