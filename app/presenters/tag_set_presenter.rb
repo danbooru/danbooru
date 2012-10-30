@@ -92,6 +92,10 @@ private
     end
   end
   
+  def is_index?
+    template.params[:action] == "index"
+  end
+  
   def build_list_item(tag, template, options)
     html = ""
     html << %{<li class="category-#{categories[tag]}">}
@@ -104,7 +108,7 @@ private
         html << %{<a class="wiki-link" href="/wiki_pages?title=#{u(tag)}">?</a> }
       end
 
-      if CurrentUser.user.is_privileged?
+      if CurrentUser.user.is_privileged? && is_index?
         html << %{<a href="/posts?tags=#{u(current_query)}+#{u(tag)}" class="search-inc-tag">+</a> }
         
         if current_query.present?
