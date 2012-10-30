@@ -27,6 +27,30 @@ class PostPresenter < Presenter
     PostPresenter.preview(@post)
   end
   
+  def humanized_tag_string
+    @post.tag_string.split(/ /).join(", ").tr("_", " ")
+  end
+  
+  def humanized_essential_tag_string
+    string = []
+    
+    if @post.character_tags.any?
+      string << @post.character_tags.slice(0, 5).to_sentence
+    end
+    
+    if @post.copyright_tags.any?
+      string << "from"
+      string << @post.copyright_tags.slice(0, 5).to_sentence
+    end
+    
+    if @post.artist_tags.any?
+      string << "by"
+      string << @post.artist_tags.to_sentence
+    end
+    
+    string.join(" ").tr("_", " ")
+  end
+  
   def image_html(template)
     return template.content_tag("p", "This image was deleted.") if @post.is_deleted? && !CurrentUser.user.is_janitor?
     return template.content_tag("p", "You need a privileged account to see this image.") if !Danbooru.config.can_user_see_post?(CurrentUser.user, @post)

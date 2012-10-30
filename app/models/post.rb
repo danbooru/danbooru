@@ -455,8 +455,32 @@ class Post < ActiveRecord::Base
       tag_string =~ /(?:^| )#{tag}(?:$| )/
     end
     
+    def tag_categories
+      @tag_categories ||= Tag.categories_for(tag_array)
+    end
+    
+    def copyright_tags
+      typed_tags("copyright")
+    end
+    
+    def character_tags
+      typed_tags("character")
+    end
+    
+    def artist_tags
+      typed_tags("artist")
+    end
+    
+    def typed_tags(name)
+      @typed_tags ||= {}
+      @typed_tags[name] ||= begin
+        tag_array.select do |tag|
+          tag_categories[tag] == Danbooru.config.tag_category_mapping[name]
+        end
+      end
+    end
+    
     def essential_tag_string
-      tag_categories = Tag.categories_for(tag_array)
       tag_array.each do |tag|
         if tag_categories[tag] == Danbooru.config.tag_category_mapping["copyright"]
           return tag
@@ -852,6 +876,9 @@ class Post < ActiveRecord::Base
   def reload(options = nil)
     super
     reset_tag_array_cache
+    @tag_categories = nil
+    @typed_tags = nil
+    self
   end
 end
 
