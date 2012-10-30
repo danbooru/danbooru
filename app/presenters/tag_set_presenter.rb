@@ -92,7 +92,7 @@ private
     end
   end
   
-  def is_index?
+  def is_index?(template)
     template.params[:action] == "index"
   end
   
@@ -108,7 +108,7 @@ private
         html << %{<a class="wiki-link" href="/wiki_pages?title=#{u(tag)}">?</a> }
       end
 
-      if CurrentUser.user.is_privileged? && is_index?
+      if CurrentUser.user.is_privileged? && is_index?(template)
         html << %{<a href="/posts?tags=#{u(current_query)}+#{u(tag)}" class="search-inc-tag">+</a> }
         
         if current_query.present?
