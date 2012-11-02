@@ -92,9 +92,9 @@ private
     end
   end
   
-  # def is_index?(template)
-  #   template.params[:action] == "index"
-  # end
+  def is_index?(template)
+    template.params[:action] == "index"
+  end
   
   def build_list_item(tag, template, options)
     html = ""
@@ -108,13 +108,13 @@ private
         html << %{<a class="wiki-link" href="/wiki_pages?title=#{u(tag)}">?</a> }
       end
 
-      # if CurrentUser.user.is_privileged? && is_index?(template)
-      #   html << %{<a href="/posts?tags=#{u(current_query)}+#{u(tag)}" class="search-inc-tag">+</a> }
-      #   
-      #   if current_query.present?
-      #     html << %{<a href="/posts?tags=#{u(current_query)}+-#{u(tag)}" class="search-exl-tag">&ndash;</a> }
-      #   end
-      # end
+      if CurrentUser.user.is_privileged? && is_index?(template)
+        html << %{<a href="/posts?tags=#{u(current_query)}+#{u(tag)}" class="search-inc-tag">+</a> }
+        
+        if current_query.present?
+          html << %{<a href="/posts?tags=#{u(current_query)}+-#{u(tag)}" class="search-exl-tag">&ndash;</a> }
+        end
+      end
     end
     
     humanized_tag = tag.tr("_", " ")
