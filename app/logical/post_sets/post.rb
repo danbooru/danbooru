@@ -11,6 +11,10 @@ module PostSets
       @tag_string ||= tag_array.uniq.join(" ")
     end
     
+    def humanized_tag_string
+      tag_array.slice(0, 25).join(" ").tr("_", " ")
+    end
+    
     def has_wiki?
       tag_array.any? && ::WikiPage.titled(tag_string).exists?
     end

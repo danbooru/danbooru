@@ -29,7 +29,7 @@
     
     <% content_for(:page_title) do %>
       <% if @post_set.tag_string.present? %>
-        <%= @post_set.tag_string %> - <%= Danbooru.config.app_name %>
+        <%= @post_set.humanized_tag_string %> - <%= Danbooru.config.app_name %>
       <% else %>
         <%= Danbooru.config.app_name %>
       <% end %>

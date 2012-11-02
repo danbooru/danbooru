@@ -37,6 +37,10 @@ module PostSets
       tag_array.join("")
     end
     
+    def humanized_tag_string
+      "pool:#{pool.pretty_name}"
+    end
+    
     def presenter
       @presenter ||= PostSetPresenters::Pool.new(self)
     end

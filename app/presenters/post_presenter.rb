@@ -28,7 +28,7 @@ class PostPresenter < Presenter
   end
   
   def humanized_tag_string
-    @post.tag_string.split(/ /).join(", ").tr("_", " ")
+    @post.tag_string.split(/ /).slice(0, 25).join(", ").tr("_", " ")
   end
   
   def humanized_essential_tag_string

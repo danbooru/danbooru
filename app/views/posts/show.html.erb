@@ -80,7 +80,7 @@
 </div>
 
 <% content_for(:page_title) do %>
-  <%= @post.tag_string %> - <%= Danbooru.config.app_name %>
+  <%= @post.presenter.humanized_tag_string %> - <%= Danbooru.config.app_name %>
 <% end %>
 
 <% content_for(:html_header) do %>

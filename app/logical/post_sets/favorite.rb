@@ -15,6 +15,10 @@ module PostSets
       tag_array.uniq.join(" ")
     end
     
+    def humanized_tag_string
+      "fav:#{user.pretty_name}"
+    end
+    
     def posts
       favorites.order("favorites.id desc").includes(:post).map(&:post)
     end
