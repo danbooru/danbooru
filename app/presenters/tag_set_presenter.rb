@@ -108,12 +108,9 @@ private
         html << %{<a class="wiki-link" href="/wiki_pages?title=#{u(tag)}">?</a> }
       end
 
-      if CurrentUser.user.is_privileged? && is_index?(template)
+      if CurrentUser.user.is_privileged? && is_index?(template) && current_query.present?
         html << %{<a href="/posts?tags=#{u(current_query)}+#{u(tag)}" class="search-inc-tag">+</a> }
-        
-        if current_query.present?
-          html << %{<a href="/posts?tags=#{u(current_query)}+-#{u(tag)}" class="search-exl-tag">&ndash;</a> }
-        end
+        html << %{<a href="/posts?tags=#{u(current_query)}+-#{u(tag)}" class="search-exl-tag">&ndash;</a> }
       end
     end
     
