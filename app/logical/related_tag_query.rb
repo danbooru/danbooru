@@ -35,7 +35,7 @@ protected
   end
   
   def related_tags
-    tag = Tag.named(query).first
+    tag = Tag.named(query.strip).first
     
     if tag
       tag.related_tag_array.map(&:first)
