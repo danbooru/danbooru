@@ -1,9 +1,9 @@
 <ul>
   <% if CurrentUser.is_member? %>
-    <li><%= link_to "Add to favorites", favorites_path(:post_id => post.id), :remote => true, :method => :post, :id => "add-to-favorites" %></li>
-    <li><%= link_to "Remove from favorites", favorite_path(post), :remote => true, :method => :delete, :id => "remove-from-favorites" %></li>
-    <li><%= link_to "Add to pool", "#", :id => "pool" %></li>
-    <li><%= link_to "Translate", "#", :id => "translate", :title => "Shortcut is CTRL+N" %></li>
+    <li><%= link_to "Favorite", favorites_path(:post_id => post.id), :remote => true, :method => :post, :id => "add-to-favorites" %></li>
+    <li><%= link_to "Unfavorite", favorite_path(post), :remote => true, :method => :delete, :id => "remove-from-favorites" %></li>
+    <li><%= link_to "Pool", "#", :id => "pool" %></li>
+    <li><%= link_to "Note", "#", :id => "translate", :title => "Shortcut is CTRL+N" %></li>
     <li><%= link_to "Find similar", "http://danbooru.iqdb.org/db-search.php?url=http://#{Danbooru.config.hostname}#{post.preview_file_url}" %></li>
     
     <% unless post.is_status_locked? %>
@@ -35,6 +35,6 @@
   <% end %>
   
   <% if CurrentUser.is_admin? %>
-    <li><%= link_to "Permanent delete", annihilate_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "annihilate", :confirm => "This will permanently delete this post (meaning the file will be deleted). Are you sure you want to delete this post?" %></li>
+    <li><%= link_to "Expunge", annihilate_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "annihilate", :confirm => "This will permanently delete this post (meaning the file will be deleted). Are you sure you want to delete this post?" %></li>
   <% end %>
 </ul>
