@@ -15,7 +15,7 @@ group :assets do
 end
 
 gem "rails", "3.2.3"
-gem "pg"
+gem "pg", "0.12.2"
 gem "memcache-client", :require => "memcache"
 gem "delayed_job"
 gem "delayed_job_active_record"
