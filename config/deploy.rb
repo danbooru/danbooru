@@ -16,8 +16,8 @@ require 'whenever/capistrano'
 set :application, "danbooru"
 set :repository,  "git://github.com/r888888888/danbooru.git"
 set :scm, :git
-set :user, "danbooru"
-set :deploy_to, "/var/www/#{application}"
+set :user, "albert"
+set :deploy_to, "/var/www/danbooru2"
 
 default_run_options[:pty] = true
 
