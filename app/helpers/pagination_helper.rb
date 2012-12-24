@@ -27,7 +27,7 @@ module PaginationHelper
     window = 3
     
     if records.current_page >= 2
-      html << link_to("<<", params.merge(:page => records.current_page - 1))
+      html << "<li><span>" + link_to("<<", params.merge(:page => records.current_page - 1)) + "</span></li>"
     end
     
     if records.total_pages <= (window * 2) + 5
@@ -57,7 +57,7 @@ module PaginationHelper
     end
     
     if records.current_page < records.total_pages
-      html << link_to(">>", params.merge(:page => records.current_page + 1))
+      html << "<li><span>" + link_to(">>", params.merge(:page => records.current_page + 1)) + "</span></li>"
     end
     
     html << "</menu></div>"
