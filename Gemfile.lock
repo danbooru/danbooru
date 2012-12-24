@@ -102,7 +102,7 @@ GEM
     newrelic_rpm (3.4.1)
     nokogiri (1.5.5)
     ntlm-http (0.1.1)
-    pg (0.14.0)
+    pg (0.12.2)
     polyamorous (0.5.0)
       activerecord (~> 3.0)
     polyglot (0.3.3)
@@ -197,7 +197,7 @@ DEPENDENCIES
   mocha
   newrelic_rpm
   nokogiri
-  pg
+  pg (= 0.12.2)
   pry
   rails (= 3.2.3)
   rmagick
