@@ -49,7 +49,9 @@ module Sources
       end
       
       def get_tags_from_page(page)
-        links = page.search("span#tags a").find_all do |node|
+        # puts page.root.to_xhtml
+        
+        links = page.search("ul.tags a").find_all do |node|
           node["href"] =~ /tags\.php/
         end
 

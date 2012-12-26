@@ -29,7 +29,7 @@ module Sources
         assert(first_tag[0] =~ /./)
         assert(first_tag[1] =~ /tags\.php\?tag=/)
       end
-
+      
       should "convert a page into a json representation" do
         assert_nothing_raised do
           @site.to_json
