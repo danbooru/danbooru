@@ -70,7 +70,7 @@ module Danbooru
     
     # Large resize image width. Set to nil to disable.
     def large_image_width
-      900
+      850
     end
     
     def large_image_prefix
