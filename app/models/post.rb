@@ -106,7 +106,7 @@ class Post < ActiveRecord::Base
     end
     
     def ssd_preview_file_path
-      "#{Danbooru.config.ssd_path}/public/data/preview/#{file_path_preview}#{md5}.jpg"
+      "#{Danbooru.config.ssd_path}/public/data/preview/#{file_path_prefix}#{md5}.jpg"
     end
 
     def preview_file_path
