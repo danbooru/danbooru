@@ -73,6 +73,12 @@ module Danbooru
           c = c.reorder(nil)
           c = c.count
           c.respond_to?(:count) ? c.count : c
+        rescue ActiveRecord::StatementInvalid => e
+          if e.to_s =~ /statement timeout/
+            1_000_000
+          else
+            raise
+          end
         end
       end
     end
