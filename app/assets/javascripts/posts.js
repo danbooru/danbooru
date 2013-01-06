@@ -18,6 +18,7 @@
       this.initialize_links();
       this.initialize_post_sections();
       this.initialize_post_image_resize_links();
+      this.place_jlist_ads();
     }
   }
   
@@ -196,6 +197,29 @@
         $("#post_" + data.id).effect("shake", {"distance": 20}, "fast");
       }
     });
+  }
+  
+  Danbooru.Post.place_jlist_ads = function() {
+    var jlist = $("#jlist-rss-ads-for-show");
+    if (jlist.length) {
+      var image = $("#image");
+
+      if (image.length) {
+        var x = image.offset().left + image.width() + 50;
+        var y = image.offset().top;
+        if (x < 950) {
+          x = 950
+        }
+        jlist.css({
+          position: "absolute",
+          width: "108px",
+          left: x + "px",
+          top: y + "px"
+        });
+      } else {
+        jlist.hide();
+      }
+    }
   }
 })();
 

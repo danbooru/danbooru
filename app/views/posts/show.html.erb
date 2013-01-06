@@ -3,6 +3,8 @@
     <aside id="sidebar">
       <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:tags] %>
       
+      <%= render_advertisement("vertical") %>
+      
       <% if @post.pools.any? %>
         <section id="pool-sidebar">
           <h1>Pools</h1>
@@ -36,7 +38,9 @@
 
     <section id="content">
       <%= render "posts/partials/show/notices", :post => @post %>
-
+      
+      <%= render_advertisement("horizontal") %>
+      
       <section id="image-container">
         <div id="note-container"></div>
         <%= @post.presenter.image_html(self) %>
@@ -63,7 +67,9 @@
       <section id="share" style="display: none;">
         <%= render "posts/partials/show/share", :post => @post %>
       </section>
-    </section>    
+      
+      <%= render_rss_advertisement("long", @post.rating == "e") %>
+    </section>
   </div>
 
   <div id="flag-dialog" title="Flag post">

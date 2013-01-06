@@ -3,6 +3,8 @@
     <aside id="sidebar">
       <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:tags] %>
 
+      <%= render_advertisement("vertical") %>
+
       <%= render "posts/partials/index/mode_menu" %>
 
       <section id="tag-box">
@@ -35,7 +37,9 @@
       <% end %>
     <% end %>
 
-    <%= render "posts/partials/common/secondary_links" %>    
+    <%= render "posts/partials/common/secondary_links" %>
+    
+    <%= render_rss_advertisement("short", @post_set.posts.any? {|x| x.rating == "e"}) %>   
   </div>
 </div>
 
