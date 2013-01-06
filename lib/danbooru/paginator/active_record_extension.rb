@@ -6,7 +6,9 @@ module Danbooru
       extend ActiveSupport::Concern
       
       module ClassMethods
-        def paginate(page)
+        def paginate(page, options = {})
+          @paginator_options = options
+          
           if use_sequential_paginator?(page)
             paginate_sequential(page)
           else
@@ -69,6 +71,8 @@ module Danbooru
 
         # taken from kaminari (https://github.com/amatsuda/kaminari)
         def total_count
+          return @paginator_options[:count] if @paginator_options[:count]
+          
           c = except(:offset, :limit, :order)
           c = c.reorder(nil)
           c = c.count
