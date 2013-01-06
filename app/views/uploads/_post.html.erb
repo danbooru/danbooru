@@ -2,5 +2,5 @@
 - post
  -->
 <% if post %>
-  <p>This post was probably already uploaded (<%= link_to "post ##{post.id}", posts_path(post), :target => "_blank" %>).</p>
+  <p>This post was probably already uploaded (<%= link_to "post ##{post.id}", post_path(post), :target => "_blank" %>).</p>
 <% end %>
