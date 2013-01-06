@@ -7,7 +7,7 @@
     </div>
 
     <%= render "image" %>
-    <%= render "post" %>
+    <%= render "post", :post => @post %>
     <%= render "sources/info", :source => @source %>
     
     <%= form_for(@upload, :html => {:multipart => true, :class => "simple_form", :id => 'form'}) do |f| %>
@@ -17,7 +17,7 @@
       </div>
 
       <div class="input">
-        <%= f.label :source, @post.try(:source), :title => "You can enter a URL to have #{Danbooru.config.app_name} automatically download and process it" %>
+        <%= f.label :source, nil, :title => "You can enter a URL to have #{Danbooru.config.app_name} automatically download and process it" %>
         <%= f.text_field :source, :size => 50, :value => params[:url] %>
         <%= button_tag "Similar", :id => "similar-button" %>
         <%= button_tag "Artist", :id => "find-artist-button" %>
