@@ -29,6 +29,8 @@ gem "sanitize", :git => "git://github.com/rgrove/sanitize.git"
 gem 'rmagick', :require => "RMagick"
 gem 'daemons'
 gem 'newrelic_rpm'
+gem 'net-ssh'
+gem 'net-sftp'
 
 group :development do
   gem 'pry'

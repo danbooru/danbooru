@@ -99,6 +99,9 @@ GEM
     multi_json (1.3.6)
     net-http-digest_auth (1.2.1)
     net-http-persistent (2.7)
+    net-sftp (2.0.5)
+      net-ssh (>= 2.0.9)
+    net-ssh (2.6.2)
     newrelic_rpm (3.4.1)
     nokogiri (1.5.5)
     ntlm-http (0.1.1)
@@ -195,6 +198,8 @@ DEPENDENCIES
   memcache-client
   meta_search!
   mocha
+  net-sftp
+  net-ssh
   newrelic_rpm
   nokogiri
   pg (= 0.12.2)
