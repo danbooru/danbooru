@@ -1,6 +1,6 @@
 module AdvertisementsHelper
   def render_advertisement(ad_type)
-		if Danbooru.config.can_user_see_ads?(CurrentUser.user)
+		if Danbooru.config.can_see_ads?(CurrentUser.user)
 	    @advertisement = Advertisement.find(:first, :conditions => ["ad_type = ? AND status = 'active'", ad_type], :order => "random()")
 	    content_tag(
 	      "div", 
@@ -21,7 +21,7 @@ module AdvertisementsHelper
   end
   
   def render_rss_advertisement(short_or_long, safe)
-    if Danbooru.config.can_user_see_ads?(CurrentUser.user)
+    if Danbooru.config.can_see_ads?(CurrentUser.user)
       if safe
         render "advertisements/jlist_rss_ads_explicit_#{short_or_long}"
       else
