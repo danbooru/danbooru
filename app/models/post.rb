@@ -621,18 +621,21 @@ class Post < ActiveRecord::Base
       count = get_count_from_cache(tags)
       if count.nil?
         if tags.blank?
-          set_count_in_cache("", 1_000_000, rand(24) * 1.hour)
+          count = 1_000_000
         else
-          count = Post.tag_match(tags).undeleted.count
-          if count > Danbooru.config.posts_per_page * 10
-            set_count_in_cache(tags, count)
+          begin
+            count = Post.tag_match(tags).undeleted.count
+          rescue ActiveRecord::StatementInvalid
+            count = 1_000_000
           end
         end
+
+        if count > Danbooru.config.posts_per_page * 10
+          set_count_in_cache(tags, count)
+        end
       end
+
       count
-    rescue ActiveRecord::StatementInvalid
-      set_count_in_cache(tags, 1_000_000, rand(24) * 1.hour)
-      1_000_000
     rescue SearchError
       0
     end
