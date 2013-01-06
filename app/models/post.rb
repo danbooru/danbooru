@@ -624,6 +624,8 @@ class Post < ActiveRecord::Base
         end
       end
       count
+    rescue ActiveRecord::StatementInvalid
+      1_000_000
     rescue SearchError
       0
     end
