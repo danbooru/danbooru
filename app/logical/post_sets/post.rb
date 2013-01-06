@@ -27,6 +27,10 @@ module PostSets
       end
     end
     
+    def has_explicit?
+      posts.any? {|x| x.rating == "e"}
+    end
+    
     def posts
       if tag_array.size > 2 && !CurrentUser.is_privileged?
         raise SearchError.new("Upgrade your account to search more than two tags at once")
