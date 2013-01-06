@@ -33,7 +33,7 @@ class Advertisement < ActiveRecord::Base
   end
 
   def image_path
-    "#{Danbooru.config.advertisement_path}/ads-#{date-prefix}/#{file_name}"
+    "#{Danbooru.config.advertisement_path}/ads-#{date_prefix}/#{file_name}"
   end
   
   def file
