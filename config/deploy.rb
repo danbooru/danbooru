@@ -50,6 +50,12 @@ namespace :data do
   task :link_directories do
     run "rm -f #{release_path}/public/data"
     run "ln -s #{deploy_to}/shared/data #{release_path}/public/data"
+    
+    run "rm -f #{release_path}/public/ssd"
+    run "ln -s /mnt/ssd#{release_path}/public #{release_path}/public/ssd"
+    
+    run "rm -f #{release_path}/public/images/advertisements"
+    run "ln -s #{deploy_to}/shared/advertisements #{release_path}/public/images/advertisements"
   end
 end
 

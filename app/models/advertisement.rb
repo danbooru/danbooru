@@ -25,11 +25,15 @@ class Advertisement < ActiveRecord::Base
   end
   
   def image_url
-    "/images/advertisements/#{file_name}"
+    "/images/advertisements/ads-#{date_prefix}/#{file_name}"
+  end
+  
+  def date_prefix
+    created_at.strftime("%Y%m%d")
   end
 
   def image_path
-    "#{Rails.root}/public/images/advertisements/#{file_name}"
+    "#{Danbooru.config.advertisement_path}/ads-#{date-prefix}/#{file_name}"
   end
   
   def file

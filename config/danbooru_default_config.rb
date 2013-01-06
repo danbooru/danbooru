@@ -87,6 +87,11 @@ module Danbooru
       nil
     end
     
+    # Where the ad banners are stored in the file system
+    def advertisement_path
+      nil
+    end
+    
     # List of memcached servers
     def memcached_servers
       %w(localhost:11211)
