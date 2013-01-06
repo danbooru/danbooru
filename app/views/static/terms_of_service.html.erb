@@ -1,22 +1,7 @@
 <div id="terms-of-service">
-  <h1>Danbooru 2 Beta</h1>
-  
-  <p>Danbooru 2 is a rewrite of the original Danbooru source code. Most functionality remains the same. The goal is to create a cleaner architecture so that extending and expanding the site will be easier. The goal of the beta is to test the code and make sure all the pieces are working.</p>
-  <p>This test database is based on a copied snapshot of the Danbooru database. Unless you signed up recently, your account should exist on this test site.</p>
-  <p>You are encouraged to upload, comment, note, and do everything in your power to break the site. If you notice any bugs or any inconsistencies with the old site, there's an issue tracker on <a href="https://github.com/r888888888/danbooru/issues/new">Github</a> that you can use. If you would rather not create a new Github account, you can post comments on <a href="http://danbooru.donmai.us/forum/show/65870">the forum</a>.</p>
-  <p>Some of the major change from the original Danbooru are:</p>
-  <ul>
-    <li><strong>An upload queue.</strong> Uploads are now added to a queue and processed sequentially.</li>
-    <li><strong>Small and large images.</strong> All images now get a small and large version.</li>
-  </ul>
-
-  <p><%= link_to("Continue", request.env["HTTP_REFERER"] || "/", :id => "tos-agree-link", :class => "btn") %></p>  
-
-  <!--
-  <h1>Terms of Service</h1>
-  
-  <section>
-    <p>By accessing the "<%= Danbooru.config.app_name %>" website ("Site") you agree to the following terms of service. If you do not agree to these terms, then please do not access the Site.</p>  
+  <div class="section">
+    <h4>Terms of Service</h4>
+    <p>By accessing the "<%= Danboru.config.app_name %>" website ("Site") you agree to the following terms of service. If you do not agree to these terms, then please do not access the Site.</p>  
 
     <ul>
       <li>The Site reserves the right to change these terms at any time.</li>
@@ -24,32 +9,34 @@
       <li>The Site is presented to you AS IS, without any warranty, express or implied. You will not hold the Site or its staff members liable for damages caused by the use of the site.</li>
       <li>The Site reserves the right to delete or modify your account, or any content you have posted to the site.</li>
       <li>You will make a best faith effort to upload only high quality anime-related images.</li>
-      <li>You have read the <%= link_to "tagging guidelines", wiki_pages_path(:title => "help:tags") %>.</li>
+      <li>You have read the <%= link_to "tagging guidelines", :controller => "help", :action => "tags" %>.</li>
     </ul>
-  </section>
-  
-  <section>
-    <h1>Post/Comment Limiting</h1>
-    <p>You cannot upload a post or comment during the first week of signing up.</p>
-    <p>After the initial period, you can post up to one comment an hour and a variable number of posts based on how many of your previous uploads were approved or deleted.</p>
-  </section>
-  
-  <section>
-    <h1>Prohibited Content</h1>
-    <p>In addition, you may not use the Site to upload any of the following:</p>
-    <ul>
-      <li>Non-anime: Uploaded art should be related to anime or otherwise associated with otaku culture. Photographs of American porn actresses, for example, are prohibited. Photographs of cosplayers, figures, or prominent figures in the industry are acceptable.</li>
-      <li>Furry: Any image or movie where a person's skin is made of fur or scales is prohibited.</li>
-      <li>Watermarked: Any image where a person who is not the original copyright owner has placed a watermark on the image is prohibited.</li>
-      <li>Poorly compressed: Any image where compression artifacts are easily visible is prohibited.</li>
-      <li>Grotesque: Any depiction of extreme mutilation, extreme bodily distension, feces, or bodies that are far outside the realm of normal human proportion (for example, breasts or penises that are larger than two heads in size) are prohibited.</li>
-      <li>Manga: Uploading entire manga or doujinshi chapters is discouraged. Individual pages can be uploaded if they meet the quality criterion.</li>
-      <li>Nude Filter: Images that have been edited by someone other than the original creator to remove clothing or censorship are prohibited. These typically feature crude drawings of breasts or genitalia laid on top of the original image.</li>
-    </ul>
-  </section>
+    
+    <div class="section">
+      <h6>Post/Comment Limiting</h6>
+      <p>You cannot upload a post or comment during the first week of signing up.</p>
+      <p>After the initial period, you can post up to one comment an hour and a variable number of posts based on how many of your previous uploads were approved or deleted.</p>
+    </div>
+    
+    <div class="section">
+      <h6>Prohibited Content</h6>
+      <p>In addition, you may not use the Site to upload any of the following:</p>
+      <ul>
+        <li>Non-anime: Photographs of American porn actresses, for example, are prohibited. Photographs of cosplayers, figures, or prominent figures in the industry are acceptable.</li>
+        <li>Furry: Any image or movie where a person's skin is made of fur or scales.</li>
+        <li>Watermarked: Any image where a person who is not the original copyright owner has placed a watermark on the image.</li>
+        <li>Poorly compressed: Any image where compression artifacts are easily visible.</li>
+        <li>Grotesque: Any depiction of extreme mutilation, extreme bodily distension, feces, or bodies that are far outside the realm of normal human proportion (for example, breasts that are larger than three heads in size or penises that are larger than two heads in size).</li>
+        <li>Manga: Uploading entire manga or doujinshi chapters is discouraged. Individual pages can be uploaded if they meet the quality criterion.</li>
+        <li>Nude Filter: Images that have been edited by someone other than the original creator to remove clothing or censorship. These typically feature crude drawings of breasts or genitalia laid on top of the original image.</li>
+        <li>Fake translations: Images that have false translations are not allowed in any case.</li>
+        <li>Hard translations: Images that have been edited to replace the original language are discouraged.</li>
+      </ul>
+    </div>
+  </div>
 
-  <section>
-    <h1>Copyright Infringement</h1>
+  <div class="section">
+    <h4>Copyright Infringement</h4>
 
     <p>If you believe a post infringes upon your copyright, please send an email to the <%= mail_to Danbooru.config.contact_email, "webmaster", :encode => "hex" %> with the following pieces of information:</p>
     <ul>
@@ -57,24 +44,19 @@
       <li>Proof that you own the copyright.</li>
       <li>An email address that will be provided to the person who uploaded the infringing post to facilitate communication.</li>
     </ul>
-  </section>
+  </div>
 
-  <section>
-    <h1>Privacy Policy</h1>
+  <div class="section">
+    <h4>Privacy Policy</h4>
 
     <p>The Site will not disclose the IP address, email address, password, or DMails of any user except to the staff.</p>
     <p>The Site is allowed to make public everything else, including but not limited to: uploaded posts, favorited posts, comments, forum posts, wiki edits, and note edits.</p>
-  </section>
+  </div>
   
-  <section>
-    <h1>Agreement</h1>
+  <div>
+    <h4>Agreement</h4>
     <p>By clicking on the "I Agree" link, you have read all the terms and have agreed to them.</p>
-    <p><%= link_to("I Agree", params[:url] || "/", :id => "tos-agree-link") %> | <%= link_to("Cancel", "http://www.google.com") %></p>
-  </section>
-  -->
-  
+    <p><%= link_to("I Agree", params[:url] || "/", :onclick => "Cookie.put('tos', '1')") %> | <%= link_to("Cancel", "/") %></p>
+  </div> 
 </div>
 
-<% content_for(:page_title) do %>
-  Terms of Service - <%= Danbooru.config.app_name %>
-<% end %>
