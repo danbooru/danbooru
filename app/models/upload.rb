@@ -50,6 +50,7 @@ class Upload < ActiveRecord::Base
   module ConversionMethods
     def process! force=false
       return if !force && status =~ /processing|completed|error/
+      return if Socket.gethostname != server
       
       CurrentUser.scoped(uploader, uploader_ip_addr) do
         update_attribute(:status, "processing")
