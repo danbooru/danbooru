@@ -11,7 +11,7 @@ module AdvertisementsHelper
 	          :width => @advertisement.width, 
 	          :height => @advertisement.height
 	        ), 
-	        advertisement_hit_path(:advertisement_id => @advertisement.id),
+	        advertisement_hits_path(:advertisement_id => @advertisement.id),
 	        :style => "margin-bottom: 1em;"
 	      )
 	    )
