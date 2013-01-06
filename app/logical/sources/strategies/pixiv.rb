@@ -51,8 +51,8 @@ module Sources
       def get_tags_from_page(page)
         # puts page.root.to_xhtml
         
-        links = page.search("ul.tags a").find_all do |node|
-          node["href"] =~ /tags\.php/
+        links = page.search("ul.tags a.text").find_all do |node|
+          node["href"] =~ /search\.php/
         end
 
         if links.any?
