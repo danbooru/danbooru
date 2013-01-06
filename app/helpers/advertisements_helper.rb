@@ -4,7 +4,7 @@ module AdvertisementsHelper
 	    @advertisement = Advertisement.find(:first, :conditions => ["ad_type = ? AND status = 'active'", ad_type], :order => "random()")
 	    content_tag(
 	      "div", 
-	      link_to_remote(
+	      link_to(
 	        image_tag(
 	          @advertisement.image_url, 
 	          :alt => "Advertisement", 
