@@ -106,6 +106,14 @@ div#c-posts {
   }
   
   div#a-index {
+    div#posts {
+      margin-right: 150px;
+    }
+    
+    div#jlist-rss-ads-for-show {
+      float: right;
+    }
+    
     menu#post-sections {
       margin-bottom: 0.5em;
       font-size: $h3_size;
