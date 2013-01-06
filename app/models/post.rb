@@ -600,11 +600,13 @@ class Post < ActiveRecord::Base
       Cache.get(count_cache_key(tags))
     end
     
-    def set_count_in_cache(tags, count)
-      if count < 100
-        expiry = 0
-      else
-        expiry = (count * 4).minutes
+    def set_count_in_cache(tags, count, expiry = nil)
+      if expiry.nil?
+        if count < 100
+          expiry = 0
+        else
+          expiry = (count * 4).minutes
+        end
       end
       
       Cache.put(count_cache_key(tags), count, expiry)
@@ -615,17 +617,21 @@ class Post < ActiveRecord::Base
     end
     
     def fast_count(tags = "")
-      tags = tags.to_s
+      tags = tags.to_s.strip
       count = get_count_from_cache(tags)
       if count.nil?
-        count = Post.tag_match(tags).undeleted.count
-        if count > Danbooru.config.posts_per_page * 10
-          set_count_in_cache(tags, count)
+        if tags.blank?
+          set_count_in_cache("", 1_000_000, rand(24) * 1.hour)
+        else
+          count = Post.tag_match(tags).undeleted.count
+          if count > Danbooru.config.posts_per_page * 10
+            set_count_in_cache(tags, count)
+          end
         end
       end
       count
     rescue ActiveRecord::StatementInvalid
-      set_count_in_cache(tags, rand(24) * 1.hour)
+      set_count_in_cache(tags, 1_000_000, rand(24) * 1.hour)
       1_000_000
     rescue SearchError
       0
