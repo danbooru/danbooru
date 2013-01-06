@@ -51,6 +51,11 @@ class Upload < ActiveRecord::Base
     def process! force=false
       return if !force && status =~ /processing|completed|error/
       
+      if server != Socket.gethostname
+        delay.process!
+        return
+      end
+      
       CurrentUser.scoped(uploader, uploader_ip_addr) do
         update_attribute(:status, "processing")
         if is_downloadable?
