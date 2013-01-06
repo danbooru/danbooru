@@ -625,6 +625,7 @@ class Post < ActiveRecord::Base
       end
       count
     rescue ActiveRecord::StatementInvalid
+      set_count_in_cache(tags, rand(24) * 1.hour)
       1_000_000
     rescue SearchError
       0
