@@ -12,6 +12,8 @@ module AdvertisementsHelper
 	          :height => @advertisement.height
 	        ), 
 	        advertisement_hits_path(:advertisement_id => @advertisement.id),
+	        :remote => true,
+	        :method => :post,
 	        :style => "margin-bottom: 1em;"
 	      )
 	    )
