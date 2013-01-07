@@ -21,7 +21,6 @@ class Dmail < ActiveRecord::Base
   scope :to_name_matches, lambda {|name| where("to_id = (select _.id from users _ where lower(_.name) = ?)", name.downcase)}  
   scope :from_name_matches, lambda {|name| where("from_id = (select _.id from users _ where lower(_.name) = ?)", name.downcase)}
   search_method :to_name_matches, :from_name_matches
-  default_scope limit(1)
   
   module AddressMethods
     def to_name

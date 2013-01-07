@@ -10,7 +10,6 @@ class PostAppeal < ActiveRecord::Base
   validates_uniqueness_of :creator_id, :scope => :post_id, :message => "have already appealed this post"
   scope :for_user, lambda {|user_id| where(["creator_id = ?", user_id])}
   scope :recent, lambda {where(["created_at >= ?", 1.day.ago])}
-  default_scope limit(1)
   
   def validate_creator_is_not_limited
     if appeal_count_for_creator >= Danbooru.config.max_appeals_per_day

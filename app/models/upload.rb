@@ -14,7 +14,6 @@ class Upload < ActiveRecord::Base
   validate :uploader_is_not_limited
   scope :uploaded_by, lambda {|user_id| where(["uploader_id = ?", user_id])}
   scope :pending, where(:status => "pending")
-  default_scope limit(1)
     
   module ValidationMethods
     def uploader_is_not_limited

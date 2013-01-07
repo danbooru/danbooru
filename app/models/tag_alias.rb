@@ -9,7 +9,6 @@ class TagAlias < ActiveRecord::Base
   belongs_to :creator, :class_name => "User"
   scope :name_matches, lambda {|name| where("(antecedent_name = ? or consequent_name = ?)", name.downcase, name.downcase)}
   search_method :name_matches
-  default_scope limit(1)
     
   def self.to_aliased(names)
     alias_hash = Cache.get_multi(names.flatten, "ta") do |name|

@@ -18,7 +18,6 @@ class Artist < ActiveRecord::Base
   scope :other_names_match, lambda {|string| where(["other_names_index @@ to_tsquery('danbooru', ?)", Artist.normalize_name(string)])}
   scope :name_equals, lambda {|string| where("name = ?", string)}
   search_methods :url_match, :other_names_match
-  default_scope limit(1)
   
   module UrlMethods
     extend ActiveSupport::Concern

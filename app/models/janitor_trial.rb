@@ -6,7 +6,6 @@ class JanitorTrial < ActiveRecord::Base
   after_destroy :create_feedback
   validates_presence_of :user
   before_validation :initialize_creator
-  default_scope limit(1)
     
   def initialize_creator
     self.creator_id = CurrentUser.id

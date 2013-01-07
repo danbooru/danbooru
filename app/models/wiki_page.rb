@@ -12,7 +12,6 @@ class WikiPage < ActiveRecord::Base
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, :foreign_key => "name", :primary_key => "title"
   has_many :versions, :class_name => "WikiPageVersion", :dependent => :destroy, :order => "wiki_page_versions.id ASC"
-  default_scope limit(1)
     
   def self.build_relation(options = {})
     relation = where()

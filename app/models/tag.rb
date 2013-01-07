@@ -5,7 +5,6 @@ class Tag < ActiveRecord::Base
   scope :name_matches, lambda {|name| where("name LIKE ? ESCAPE E'\\\\'", name.downcase.to_escaped_for_sql_like)}
   scope :named, lambda {|name| where("name = ?", TagAlias.to_aliased([name]).join(""))}
   search_methods :name_matches
-  default_scope limit(1)
   
   class CategoryMapping
     Danbooru.config.reverse_tag_category_mapping.each do |value, category|

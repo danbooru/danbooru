@@ -16,7 +16,6 @@ class Note < ActiveRecord::Base
   scope :body_matches, lambda {|query| where("body_index @@ plainto_tsquery(?)", query.scan(/\S+/).join(" & "))}
   scope :post_tag_match, lambda {|query| joins(:post).where("posts.tag_index @@ to_tsquery('danbooru', ?)", query)}
   search_methods :body_matches, :post_tag_match
-  default_scope limit(1)
   
   def presenter
     @presenter ||= NotePresenter.new(self)

@@ -6,7 +6,6 @@ class Ban < ActiveRecord::Base
   validate :user_is_inferior
   validates_presence_of :user_id, :reason, :duration
   before_validation :initialize_banner_id, :on => :create
-  default_scope limit(1)
     
   def self.is_banned?(user)
     exists?(["user_id = ? AND expires_at > ?", user.id, Time.now])

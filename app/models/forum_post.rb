@@ -14,7 +14,6 @@ class ForumPost < ActiveRecord::Base
   scope :for_user, lambda {|user_id| where("forum_posts.creator_id = ?", user_id)}
   scope :active, where("is_deleted = false")
   search_methods :body_matches
-  default_scope limit(1)
   
   def self.new_reply(params)
     if params[:topic_id]

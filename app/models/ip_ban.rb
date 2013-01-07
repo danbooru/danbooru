@@ -3,7 +3,6 @@ class IpBan < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   validates_presence_of :reason, :creator
   validates_uniqueness_of :ip_addr
-  default_scope limit(1)
   
   def self.is_banned?(ip_addr)
     exists?(["ip_addr = ?", ip_addr])

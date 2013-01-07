@@ -6,7 +6,6 @@ class TagSubscription < ActiveRecord::Base
   before_save :limit_tag_count
   attr_accessible :name, :tag_query, :post_ids, :is_visible_on_profile
   validates_presence_of :name, :tag_query, :is_public, :creator_id
-  default_scope limit(1)
   
   def normalize_name
     self.name = name.gsub(/\W/, "_")

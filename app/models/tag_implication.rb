@@ -8,7 +8,6 @@ class TagImplication < ActiveRecord::Base
   validate :absence_of_circular_relation
   scope :name_matches, lambda {|name| where("(antecedent_name = ? or consequent_name = ?)", name.downcase, name.downcase)}
   search_method :name_matches
-  default_scope limit(1)
   
   module DescendantMethods
     extend ActiveSupport::Concern
