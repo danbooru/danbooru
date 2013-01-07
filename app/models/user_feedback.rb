@@ -10,7 +10,8 @@ class UserFeedback < ActiveRecord::Base
   scope :neutral, where("category = ?", "neutral")
   scope :negative, where("category = ?", "negative")
   scope :for_user, lambda {|user_id| where("user_id = ?", user_id)}
-  
+  default_scope limit(1)
+    
   def initialize_creator
     self.creator_id = CurrentUser.id
   end

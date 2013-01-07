@@ -8,7 +8,8 @@ class Comment < ActiveRecord::Base
   after_save :update_last_commented_at
   attr_accessible :body, :post_id
   attr_accessor :do_not_bump_post
-  
+  default_scope limit(1)
+    
   scope :recent, :order => "comments.id desc", :limit => 6
   scope :body_matches, lambda {|query| where("body_index @@ plainto_tsquery(?)", query).order("comments.id DESC")}
   scope :hidden, lambda {|user| where("score < ?", user.comment_threshold)}

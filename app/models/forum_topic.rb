@@ -14,7 +14,8 @@ class ForumTopic < ActiveRecord::Base
   scope :active, where("is_deleted = false")
   search_methods :title_matches
   accepts_nested_attributes_for :original_post
-    
+  default_scope limit(1)
+  
   def editable_by?(user)
     creator_id == user.id || user.is_moderator?
   end

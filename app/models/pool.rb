@@ -15,7 +15,8 @@ class Pool < ActiveRecord::Base
   attr_accessible :name, :description, :post_ids, :post_id_array, :post_count, :is_active, :as => [:member, :privileged, :contributor, :janitor, :moderator, :admin, :default]
   attr_accessible :is_deleted, :as => [:janitor, :moderator, :admin]
   scope :active, where("is_active = true and is_deleted = false")
-  
+  default_scope limit(1)
+    
   def self.name_to_id(name)
     if name =~ /^\d+$/
       name.to_i

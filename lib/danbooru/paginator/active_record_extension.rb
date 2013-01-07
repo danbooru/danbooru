@@ -5,10 +5,6 @@ module Danbooru
     module ActiveRecordExtension
       extend ActiveSupport::Concern
       
-      included do
-        default_scope limit(1)
-      end
-      
       module ClassMethods
         def paginate(page, options = {})
           @paginator_options = options

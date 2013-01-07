@@ -12,7 +12,8 @@ class PostFlag < ActiveRecord::Base
   scope :resolved, where("is_resolved = ?", true)
   scope :unresolved, where("is_resolved = ?", false)
   scope :old, lambda {where("created_at <= ?", 3.days.ago)}
-  
+  default_scope limit(1)
+    
   def update_post
     post.update_column(:is_flagged, true)
   end
