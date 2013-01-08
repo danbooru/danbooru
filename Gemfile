@@ -23,14 +23,13 @@ gem "super_exception_notifier"
 gem "simple_form"
 gem "mechanize", :git => 'git://github.com/caribio/mechanize.git'
 gem "nokogiri"
-gem "meta_search", :git => "git://github.com/ernie/meta_search.git"
 gem "whenever", :require => false
 gem "sanitize", :git => "git://github.com/rgrove/sanitize.git"
 gem 'rmagick', :require => "RMagick"
 gem 'daemons'
-gem 'newrelic_rpm'
 gem 'net-ssh'
 gem 'net-sftp'
+gem 'newrelic_rpm'
 
 group :development do
   gem 'pry'

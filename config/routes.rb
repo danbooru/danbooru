@@ -195,7 +195,7 @@ Danbooru::Application.routes.draw do
   match "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}"}
   match "/artist/index" => redirect {|params, req| "/artists?page=#{req.params[:page]}"}
   match "/artist/show/:id" => redirect("/artists/%{id}")
-  match "/artist/history/:id" => redirect("/artist_versions?search[artist_id_eq]=%{id}")
+  match "/artist/history/:id" => redirect("/artist_versions?search[artist_id]=%{id}")
   
   match "/comment" => redirect {|params, req| "/comments?page=#{req.params[:page]}"}
   match "/comment/index" => redirect {|params, req| "/comments?page=#{req.params[:page]}"}
@@ -215,7 +215,7 @@ Danbooru::Application.routes.draw do
   match "/pool" => redirect {|params, req| "/pools?page=#{req.params[:page]}"}
   match "/pool/index" => redirect {|params, req| "/pools?page=#{req.params[:page]}"}
   match "/pool/show/:id" => redirect("/pools/%{id}")
-  match "/pool/history/:id" => redirect("/pool_versions?search[pool_id_eq]=%{id}")
+  match "/pool/history/:id" => redirect("/pool_versions?search[pool_id]=%{id}")
   match "/pool/recent_changes" => redirect("/pool_versions")
   
   match "/post/index.xml", :controller => "legacy", :action => "posts", :format => "xml"

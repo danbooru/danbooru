@@ -12,7 +12,6 @@ class ForumTopic < ActiveRecord::Base
   validates_associated :original_post
   scope :title_matches, lambda {|title| where(["text_index @@ plainto_tsquery(?)", title])}
   scope :active, where("is_deleted = false")
-  search_methods :title_matches
   accepts_nested_attributes_for :original_post
   
   def editable_by?(user)

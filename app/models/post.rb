@@ -47,7 +47,6 @@ class Post < ActiveRecord::Base
   scope :positive, where("score > 1")
   scope :negative, where("score < -1")
   scope :updater_name_matches, lambda {|name| where("updater_id = (select _.id from users _ where lower(_.name) = ?)", name.downcase)}
-  search_methods :tag_match, :updater_name_matches
   scope :after_id, Proc.new {|num|
     if num.present?
       where("id > ?", num.to_i).reorder("id asc")

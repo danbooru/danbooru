@@ -2474,7 +2474,8 @@ CREATE TABLE uploads (
     post_id integer,
     md5_confirmation character varying(255),
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    server text
 );
 
 
@@ -6170,3 +6171,5 @@ INSERT INTO schema_migrations (version) VALUES ('20110722211855');
 INSERT INTO schema_migrations (version) VALUES ('20110815233456');
 
 INSERT INTO schema_migrations (version) VALUES ('20111101212358');
+
+INSERT INTO schema_migrations (version) VALUES ('20130106210658');

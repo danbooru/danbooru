@@ -18,8 +18,7 @@ class ArtistsController < ApplicationController
   end
   
   def index
-    @search = Artist.search(params[:search])
-    @artists = @search.paginate(params[:page])
+    @artists = Artist.search(params[:search]).paginate(params[:page])
     respond_with(@artists) do |format|
       format.xml do
         render :xml => @artists.to_xml(:include => [:urls])
@@ -31,7 +30,6 @@ class ArtistsController < ApplicationController
   end
   
   def search
-    @search = Artist.search(params[:search])
   end
   
   def show

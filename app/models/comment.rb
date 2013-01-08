@@ -10,15 +10,57 @@ class Comment < ActiveRecord::Base
   attr_accessor :do_not_bump_post
     
   scope :recent, :order => "comments.id desc", :limit => 6
-  scope :body_matches, lambda {|query| where("body_index @@ plainto_tsquery(?)", query).order("comments.id DESC")}
-  scope :hidden, lambda {|user| where("score < ?", user.comment_threshold)}
-  scope :visible, lambda {|user| where("score >= ?", user.comment_threshold)}
-  scope :post_tag_match, lambda {|query| joins(:post).where("posts.tag_index @@ to_tsquery('danbooru', ?)", query)}
-  scope :for_user, lambda {|user_id| where("creator_id = ?", user_id)}
-  scope :for_user_name, lambda {|user_name| where("creator_id = (select _.id from users _ where lower(_.name) = lower(?))", user_name)}
   
-  search_methods :body_matches, :post_tag_match, :for_user_name
-
+  module SearchMethods
+    extend ActiveSupport::Concern
+    
+    module ClassMethods
+      def body_matches(query)
+        where("body_index @@ plainto_tsquery(?)", query).order("comments.id DESC")
+      end
+      
+      def hidden(user)
+        where("score < ?", user.comment_threshold)
+      end
+      
+      def visible(user)
+        where("score >= ?", user.comment_threshold)
+      end
+      
+      def post_tags_match(query)
+        joins(:post).where("posts.tag_index @@ to_tsquery('danbooru', ?)", query)
+      end
+      
+      def for_creator(user_id)
+        where("creator_id = ?", user_id)
+      end
+      
+      def for_creator_name(user_name)
+        where("creator_id = (select _.id from users _ where lower(_.name) = lower(?))", user_name)
+      end
+      
+      def search(params)
+        q = scoped
+        
+        if params[:body_matches]
+          q = q.body_matches(params[:body_matches])
+        end
+        
+        if params[:post_tags_match]
+          q = q.post_tags_match(params[:post_tags_match])
+        end
+        
+        if params[:creator_name]
+          q = q.for_user_name(params[:creator_name])
+        end
+        
+        q
+      end
+    end
+  end
+  
+  include SearchMethods
+  
   def initialize_creator
     self.creator_id = CurrentUser.user.id
     self.ip_addr = CurrentUser.ip_addr

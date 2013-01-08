@@ -71,8 +71,7 @@ private
   end
   
   def index_by_comment
-    @search = Comment.search(params[:search])
-    @comments = @search.paginate(params[:page])
+    @comments = Comment.search(params[:search]).paginate(params[:page])
     respond_with(@comments) do |format|
       format.html {render :action => "index_by_comment"}
     end

@@ -11,6 +11,20 @@ class Ban < ActiveRecord::Base
     exists?(["user_id = ? AND expires_at > ?", user.id, Time.now])
   end
   
+  def self.search(params)
+    q = scoped
+    
+    if params[:banner_name]
+      q = q.where("banner_id = (select _.id from users _ where lower(_.name) = ?)", params[:banner_name].downcase)
+    end
+    
+    if params[:user_name]
+      q = q.where("user_id = (select _.id from users _ where lower(_.name) = ?)", params[:user_name].downcase)
+    end
+    
+    q
+  end
+  
   def initialize_banner_id
     self.banner_id = CurrentUser.id
   end

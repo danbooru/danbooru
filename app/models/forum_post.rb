@@ -13,7 +13,6 @@ class ForumPost < ActiveRecord::Base
   scope :body_matches, lambda {|body| where(["forum_posts.text_index @@ plainto_tsquery(?)", body])}
   scope :for_user, lambda {|user_id| where("forum_posts.creator_id = ?", user_id)}
   scope :active, where("is_deleted = false")
-  search_methods :body_matches
   
   def self.new_reply(params)
     if params[:topic_id]
