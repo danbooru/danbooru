@@ -3,12 +3,9 @@
     <h1>Search Artists</h1>
     
     <div id="search-form">
-      <%= simple_form_for(@search) do |f| %>
-        <%= f.input :name_contains, :label => "Name", :required => false %>
-        <%= f.input :other_names_match, :label => "Other Names", :required => false %>
-        <%= f.input :group_name_contains, :label => "Group Name", :required => false %>
-        <%= f.input :url_match, :label => "URL", :required => false %>
-        <%= f.button :submit, "Search" %>
+      <%= form_tag(artists_path, :method => :get, :class => "simple_form") do %>
+        <%= search_field "name" %>
+        <%= submit_tag "Search" %>
       <% end %>
     </div>
   </div>

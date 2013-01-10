@@ -127,7 +127,7 @@ class ArtistTest < ActiveSupport::TestCase
       yuu = FactoryGirl.create(:artist, :name => "yuu", :group_name => "cat_or_fish")
       cat_or_fish.reload
       assert_equal("yuu", cat_or_fish.member_names)
-      assert_not_nil(Artist.search(:group_name_contains => "cat_or_fish").first)
+      assert_not_nil(Artist.search(:name => "group:cat_or_fish").first)
     end
     
     should "have an associated wiki" do

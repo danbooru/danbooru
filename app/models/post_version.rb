@@ -2,8 +2,37 @@ class PostVersion < ActiveRecord::Base
   belongs_to :post
   belongs_to :updater, :class_name => "User"
   before_validation :initialize_updater
-  scope :for_user, lambda {|user_id| where("updater_id = ?", user_id)}
-  scope :updater_name_matches, lambda {|name| where("updater_id = (select _.id from users _ where lower(_.name) = ?)", name.downcase)}
+  
+  module SearchMethods
+    def for_user(user_id)
+      where("updater_id = ?", user_id)
+    end
+    
+    def updater_name(name)
+      where("updater_id = (select _.id from users _ where lower(_.name) = ?)", name.downcase)
+    end
+    
+    def search(params)
+      q = scoped
+      return q if params.blank?
+      
+      if params[:updater_name]
+        q = q.updater_name(params[:updater_name])
+      end
+      
+      if params[:updater_id]
+        q = q.where("updater_id = ?", params[:updater_id].to_i)
+      end
+      
+      if params[:post_id]
+        q = q.where("post_id = ?", params[:post_id].to_i)
+      end
+      
+      q
+    end
+  end
+  
+  extend SearchMethods
   
   def self.create_from_post(post)
     if post.created_at == post.updated_at

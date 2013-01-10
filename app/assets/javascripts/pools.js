@@ -17,7 +17,7 @@
     $("#c-pool-elements #a-new input[type=text]").autocomplete({
       source: function(req, resp) {
         $.getJSON(
-          "/pools.json?search[name_contains]=" + req.term,
+          "/pools.json?search[name_matches]=" + req.term,
           function(data) {
             resp(data.map(function(x) {return x.name;}));
           }

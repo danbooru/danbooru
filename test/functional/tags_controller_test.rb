@@ -36,7 +36,7 @@ class TagsControllerTest < ActionController::TestCase
       
       context "with search parameters" do
         should "render" do
-          get :index, {:search => {:name_equals => "aaa"}}
+          get :index, {:search => {:name_matches => "aaa"}}
           assert_response :success
         end
       end

@@ -7,6 +7,17 @@ class IpBan < ActiveRecord::Base
   def self.is_banned?(ip_addr)
     exists?(["ip_addr = ?", ip_addr])
   end
+  
+  def self.search(params)
+    q = scoped
+    return q if params.blank?
+    
+    if params[:ip_addr]
+      q = q.where("ip_addr = ?", params[:ip_addr])
+    end
+    
+    q
+  end
 
   def self.query(user_ids)
     comments = count_by_ip_addr("comments", user_ids, "creator_id", "ip_addr")

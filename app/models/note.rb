@@ -12,9 +12,45 @@ class Note < ActiveRecord::Base
   after_save :create_version
   validate :post_must_not_be_note_locked
   attr_accessible :x, :y, :width, :height, :body, :updater_id, :updater_ip_addr, :is_active, :post_id, :html_id
-  scope :active, where("is_active = TRUE")
-  scope :body_matches, lambda {|query| where("body_index @@ plainto_tsquery(?)", query.scan(/\S+/).join(" & "))}
-  scope :post_tag_match, lambda {|query| joins(:post).where("posts.tag_index @@ to_tsquery('danbooru', ?)", query)}
+  
+  module SearchMethods
+    def active
+      where("is_active = TRUE")
+    end
+    
+    def body_matches(query)
+      where("body_index @@ plainto_tsquery(?)", query.scan(/\S+/).join(" & "))
+    end
+    
+    def post_tags_match(query)
+      joins(:post).where("posts.tag_index @@ to_tsquery('danbooru', ?)", query)
+    end
+    
+    def creator_name(name)
+      where("creator_id = (select _.id from users _ where lower(_.name) = ?)", name)
+    end
+    
+    def search(params)
+      q = scoped
+      return q if params.blank?
+      
+      if params[:body_matches]
+        q = q.body_matches(params[:body_matches])
+      end
+      
+      if params[:post_tags_match]
+        q = q.post_tags_match(params[:post_tags_match])
+      end
+      
+      if params[:creator_name]
+        q = q.creator_name(params[:creator_name])
+      end
+      
+      q
+    end
+  end
+  
+  extend SearchMethods
   
   def presenter
     @presenter ||= NotePresenter.new(self)

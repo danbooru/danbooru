@@ -75,6 +75,11 @@ module ApplicationHelper
     submit_tag("Preview", "data-input-id" => options[:input_id], "data-preview-id" => options[:preview_id])
   end
   
+  def search_field(method, options = {})
+    name = options[:label] || method.titleize
+    raw '<div class="input"><label for="search_' + method + '">' + name + '</label><input type="text" name="search_' + method + '" id="search_'  + method + '"></div>'
+  end
+  
 protected
   def nav_link_match(controller, url)
     url =~ case controller

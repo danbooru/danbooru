@@ -25,7 +25,7 @@ class WikiPagesControllerTest < ActionController::TestCase
       end
       
       should "list all wiki_pages (with search)" do
-        get :index, {:search => {:title_matches => "abc"}}
+        get :index, {:search => {:title => "abc"}}
         assert_redirected_to(wiki_page_path(@wiki_page_abc))
       end
     end

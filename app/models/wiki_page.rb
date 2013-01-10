@@ -7,25 +7,36 @@ class WikiPage < ActiveRecord::Base
   validates_presence_of :title
   validate :validate_locker_is_janitor
   attr_accessible :title, :body, :is_locked
-  scope :titled, lambda {|title| where(["title = ?", title.downcase.tr(" ", "_")])}
-  scope :recent, order("updated_at DESC").limit(25)
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, :foreign_key => "name", :primary_key => "title"
   has_many :versions, :class_name => "WikiPageVersion", :dependent => :destroy, :order => "wiki_page_versions.id ASC"
-    
-  def self.build_relation(options = {})
-    relation = where()
-    
-    if options[:title]
-      relation = relation.where(["title LIKE ? ESCAPE E'\\\\'", options[:title].downcase.tr(" ", "_").to_escaped_for_sql_like])
+  
+  module SearchMethods
+    def titled(title)
+      where("title = ?", title.downcase.tr(" ", "_"))
     end
     
-    if options[:creator_id]
-      relation = relation.where(["creator_id = ?", options[:creator_id]])
+    def recent
+      order("updated_at DESC").limit(25)
     end
-    
-    relation
+
+    def search(params = {})
+      q = scoped
+      return q if params.blank?
+
+      if params[:title]
+        q = q.where("title LIKE ? ESCAPE E'\\\\'", params[:title].downcase.tr(" ", "_").to_escaped_for_sql_like)
+      end
+
+      if params[:creator_id]
+        q = q.where("creator_id = ?", params[:creator_id])
+      end
+
+      q
+    end
   end
+  
+  extend SearchMethods
   
   def self.find_title_and_id(title)
     titled(title).select("title, id").first

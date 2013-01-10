@@ -14,8 +14,6 @@ class Artist < ActiveRecord::Base
   accepts_nested_attributes_for :wiki_page
   attr_accessible :body, :name, :url_string, :other_names, :group_name, :wiki_page_attributes, :notes, :is_active, :as => [:member, :privileged, :contributor, :janitor, :moderator, :default, :admin]
   attr_accessible :is_banned, :as => :admin
-  scope :active, where("is_active = true")
-  scope :banned, where("is_banned = true")
   
   module UrlMethods
     extend ActiveSupport::Concern
@@ -191,67 +189,72 @@ class Artist < ActiveRecord::Base
   end
   
   module SearchMethods
-    extend ActiveSupport::Concern
+    def active
+      where("is_active = true")
+    end
+      
+    def banned
+      where("is_banned = true")
+    end
+
+    def url_matches(string)
+      matches = find_all_by_url(string).map(&:id)
+
+      if matches.any?
+        where("id in (?)", matches)
+      else
+        where("false")
+      end
+    end
     
-    module ClassMethods
-      def url_matches(string)
-        matches = find_all_by_url(string).map(&:id)
+    def other_names_match(string)
+      where("other_names_index @@ to_tsquery('danbooru', ?)", Artist.normalize_name(string))
+    end
+    
+    def group_name_matches(name)
+      stripped_name = normalize_name(name).to_escaped_for_sql_like
+      where("group_name LIKE ? ESCAPE E'\\\\'", stripped_name)
+    end
+    
+    def name_matches(name)
+      stripped_name = normalize_name(name).to_escaped_for_sql_like
+      where("name LIKE ? ESCAPE E'\\\\'", stripped_name)
+    end
+    
+    def any_name_matches(name)
+      stripped_name = normalize_name(name).to_escaped_for_sql_like
+      where("(name LIKE ? ESCAPE E'\\\\' OR other_names_index @@ to_tsquery('danbooru', ?))", stripped_name, normalize_name(name))
+    end
+    
+    def search(params)
+      q = active
+      return q if params.blank?
 
-        if matches.any?
-          where("id in (?)", matches)
-        else
-          where("false")
-        end
-      end
-      
-      def other_names_match(string)
-        where("other_names_index @@ to_tsquery('danbooru', ?)", Artist.normalize_name(string))
-      end
-      
-      def group_name_matches(name)
-        stripped_name = normalize_name(name).to_escaped_for_sql_like
-        where("group_name LIKE ? ESCAPE E'\\\\'", stripped_name)
-      end
-      
-      def name_matches(name)
-        stripped_name = normalize_name(name).to_escaped_for_sql_like
-        where("name LIKE ? ESCAPE E'\\\\'", stripped_name)
-      end
-      
-      def any_name_matches(name)
-        stripped_name = normalize_name(name).to_escaped_for_sql_like
-        where("(name LIKE ? ESCAPE E'\\\\' OR other_names_index @@ to_tsquery('danbooru', ?))", stripped_name, normalize_name(name))
-      end
-      
-      def search(params)
-        q = active
+      case params[:name]
+      when /^http/
+        q = q.url_matches(params[:name])
 
-        case params[:name]
-        when /^http/
-          q = q.url_matches(params[:name])
-
-        when /name:(.+)/
-          q = q.name_matches($1)
-          
-        when /other:(.+)/
-          q = q.other_names_match($1)
-
-        when /group:(.+)/
-          q = q.group_name_matches($1)
-
-        when /status:banned/
-          q = q.banned
-
-        when /./
-          q = q.any_name_matches(params[:name])
-        end
-
-        if params[:id]
-          q = q.where("id = ?", params[:id])
-        end
+      when /name:(.+)/
+        q = q.name_matches($1)
         
-        q
+      when /other:(.+)/
+        q = q.other_names_match($1)
+
+      when /group:(.+)/
+        q = q.group_name_matches($1)
+
+      when /status:banned/
+        q = q.banned
+
+      when /./
+        q = q.any_name_matches(params[:name])
       end
+
+      if params[:id]
+        q = q.where("id = ?", params[:id])
+      end
+      
+      q
     end
   end
   
@@ -263,7 +266,7 @@ class Artist < ActiveRecord::Base
   include NoteMethods
   include TagMethods
   include BanMethods
-  include SearchMethods
+  extend SearchMethods
   
   def status
     if is_banned?

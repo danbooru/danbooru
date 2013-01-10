@@ -251,6 +251,13 @@ module Danbooru
       1
     end
     
+    # Counting every post is typically expensive because it involves a sequential scan on
+    # potentially millions of rows. If this method returns a value, then blank searches
+    # will return that number for the fast_count call instead.
+    def blank_tag_search_fast_count
+      nil
+    end
+    
     def pixiv_login
       nil
     end

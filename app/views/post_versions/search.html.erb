@@ -3,10 +3,10 @@
     <h1>Search Changes</h1>
     
     <div id="search">
-      <%= simple_form_for(@search) do |f| %>
-        <%= f.input :updater_name_matches, :label => "User", :required => false %>
-        <%= f.input :post_id_eq, :label => "Post", :required => false %>
-        <%= f.button :submit, :value => "Search" %>
+      <%= form_tag(post_versions_path, :method => :get, :class => "simple_form") do %>
+        <%= search_field "updater_name", :label => "User" %>
+        <%= search_field "post_id", :label => "Post" %>
+        <%= submit_tag "Search" %>
       <% end %>
     </div>
   </div>

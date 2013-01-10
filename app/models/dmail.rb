@@ -10,16 +10,6 @@ class Dmail < ActiveRecord::Base
   after_create :update_recipient
   after_create :send_dmail
   attr_accessible :title, :body, :is_deleted, :to_id, :to, :to_name
-  scope :for, lambda {|user| where(["owner_id = ?", user])}
-  scope :inbox, where("to_id = owner_id")
-  scope :sent, where("from_id = owner_id")
-  scope :active, where(["is_deleted = ?", false])
-  scope :deleted, where(["is_deleted = ?", true])
-  scope :search_message, lambda {|query| where(["message_index @@ plainto_tsquery(?)", query])}
-  scope :unread, where("is_read = false and is_deleted = false")
-  scope :visible, lambda {where("owner_id = ?", CurrentUser.id)}
-  scope :to_name_matches, lambda {|name| where("to_id = (select _.id from users _ where lower(_.name) = ?)", name.downcase)}  
-  scope :from_name_matches, lambda {|name| where("from_id = (select _.id from users _ where lower(_.name) = ?)", name.downcase)}
   
   module AddressMethods
     def to_name
@@ -82,8 +72,82 @@ class Dmail < ActiveRecord::Base
     end
   end
   
+  module SearchMethods
+    def for(user)
+      where("owner_id = ?", user)
+    end
+    
+    def inbox
+      where("to_id = owner_id")
+    end
+    
+    def sent
+      where("from_id = owner_id")
+    end
+    
+    def active
+      where("is_deleted = ?", false)
+    end
+    
+    def deleted
+      where("is_deleted = ?", true)
+    end
+    
+    def search_message(query)
+      where("message_index @@ plainto_tsquery(?)", query)
+    end
+    
+    def unread
+      where("is_read = false and is_deleted = false")
+    end
+    
+    def visible
+      where("owner_id = ?", CurrentUser.id)
+    end
+    
+    def to_name_matches(name)
+      where("to_id = (select _.id from users _ where lower(_.name) = ?)", name.downcase)
+    end
+    
+    def from_name_matches(name)
+      where("from_id = (select _.id from users _ where lower(_.name) = ?)", name.downcase)
+    end
+    
+    def search(params)
+      q = scoped
+      return q if params.blank?
+      
+      if params[:message_matches]
+        q = q.search_message(params[:message_matches])
+      end
+      
+      if params[:owner_id]
+        q = q.for(params[:owner_id].to_i)
+      end
+      
+      if params[:to_name]
+        q = q.to_name_matches(params[:to_name])
+      end
+      
+      if params[:to_id]
+        q = q.where("to_id = ?", params[:to_id].to_i)
+      end
+      
+      if params[:from_name]
+        q = q.from_name_matches(params[:from_name])
+      end
+      
+      if params[:from_id]
+        q = q.where("from_id = ?", params[:from_id].to_i)
+      end
+      
+      q
+    end
+  end
+  
   include AddressMethods
   include FactoryMethods
+  extend SearchMethods
   
   def quoted_body
     "[quote]#{body}[/quote]"

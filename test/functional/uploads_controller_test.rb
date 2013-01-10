@@ -44,7 +44,7 @@ class UploadsControllerTest < ActionController::TestCase
       
       context "with search parameters" do
         should "render" do
-          get :index, {:search => {:source_equals => @upload.source}}, {:user_id => @user.id}
+          get :index, {:search => {:source => @upload.source}}, {:user_id => @user.id}
           assert_response :success
         end
       end

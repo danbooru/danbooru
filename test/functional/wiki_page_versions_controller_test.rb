@@ -27,7 +27,7 @@ class WikiPageVersionsControllerTest < ActionController::TestCase
       end
       
       should "list all versions that match the search criteria" do
-        get :index, {:search => {:wiki_page_id_equals => @wiki_page.id}}
+        get :index, {:search => {:wiki_page_id => @wiki_page.id}}
         assert_response :success
         assert_not_nil(assigns(:wiki_page_versions))
       end

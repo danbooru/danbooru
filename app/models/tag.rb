@@ -2,8 +2,6 @@ class Tag < ActiveRecord::Base
   attr_accessible :category
   after_save :update_category_cache
   has_one :wiki_page, :foreign_key => "name", :primary_key => "title"
-  scope :name_matches, lambda {|name| where("name LIKE ? ESCAPE E'\\\\'", name.downcase.to_escaped_for_sql_like)}
-  scope :named, lambda {|name| where("name = ?", TagAlias.to_aliased([name]).join(""))}
   
   class CategoryMapping
     Danbooru.config.reverse_tag_category_mapping.each do |value, category|
@@ -365,6 +363,42 @@ class Tag < ActiveRecord::Base
     end
   end
   
+  module SearchMethods
+    def name_matches(name)
+      where("name LIKE ? ESCAPE E'\\\\'", name.downcase.to_escaped_for_sql_like)
+    end
+    
+    def named(name)
+      where("name = ?", TagAlias.to_aliased([name]).join(""))
+    end
+    
+    def search(params)
+      q = scoped
+      return q if params.blank?
+      
+      if params[:name_matches]
+        q = q.name_matches(params[:name_matches])
+      end
+      
+      if params[:category]
+        q = q.where("category = ?", params[:category])
+      end
+      
+      case params[:sort]
+      when "count"
+        q = q.order("post_count")
+        
+      when "date"
+        q = q.order("created_at")
+
+      else
+        q = q.order("name")
+      end
+      
+      q
+    end
+  end
+  
   extend CountMethods
   extend ViewCountMethods
   include CategoryMethods
@@ -373,4 +407,5 @@ class Tag < ActiveRecord::Base
   extend ParseMethods
   include RelationMethods
   extend SuggestionMethods
+  extend SearchMethods
 end

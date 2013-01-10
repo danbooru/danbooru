@@ -26,7 +26,7 @@ class TagImplicationsControllerTest < ActionController::TestCase
       end
       
       should "list all tag_implications (with search)" do
-        get :index, {:search => {:antecedent_name_matches => "aaa"}}
+        get :index, {:search => {:antecedent_name => "aaa"}}
         assert_response :success
       end
     end

@@ -1,13 +1,13 @@
 <div id="c-dmails">
   <div id="a-search">
     <h1>Search Messages</h1>
-    <%= simple_form_for @search do |f| %>
+    <%= form_tag(dmails_path, :method => :get, :class => "simple_form") do %>
       <%= hidden_field_tag :folder, params[:folder] %>
-      <%= f.input :title_contains, :required => false, :label => "Title" %>
-      <%= f.input :body_contains, :required => false, :label => "Body" %>
-      <%= f.input :to_name_matches, :required => false, :label => "To" %>
-      <%= f.input :from_name_matches, :required => false, :label => "From" %>
-      <%= f.button :submit, "Search" %>
+      
+      <%= search_field :message_matches, :label => "Message" %>
+      <%= search_field :to_name, :label => "To" %>
+      <%= search_field :from_name, :label => "From" %>
+      <%= submit_tag "Search" %>
     <% end %>    
   </div>
 </div>

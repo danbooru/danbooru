@@ -46,7 +46,7 @@ module PostSets
     end
     
     def artist
-      ::Artist.name_equals(tag_string).first
+      ::Artist.name_matches(tag_string).first
     end
     
     def is_single_tag?

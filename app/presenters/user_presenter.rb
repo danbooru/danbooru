@@ -70,27 +70,27 @@ class UserPresenter
   end
   
   def comments(template)
-    template.link_to(Comment.for_user(user.id).count, template.comments_path(:search => {:creator_id_eq => user.id}))
+    template.link_to(Comment.for_user(user.id).count, template.comments_path(:search => {:creator_id => user.id}))
   end
   
   def post_versions(template)
-    template.link_to(user.post_update_count, template.post_versions_path(:search => {:updater_id_eq => user.id}))
+    template.link_to(user.post_update_count, template.post_versions_path(:search => {:updater_id => user.id}))
   end
   
   def note_versions(template)
-    template.link_to(user.note_update_count, template.note_versions_path(:search => {:updater_id_eq => user.id}))
+    template.link_to(user.note_update_count, template.note_versions_path(:search => {:updater_id => user.id}))
   end
   
   def wiki_page_versions(template)
-    template.link_to(WikiPageVersion.for_user(user.id).count, template.wiki_page_versions_path(:search => {:updater_id_eq => user.id}))
+    template.link_to(WikiPageVersion.for_user(user.id).count, template.wiki_page_versions_path(:search => {:updater_id => user.id}))
   end
   
   def forum_posts(template)
-    template.link_to(ForumPost.for_user(user.id).count, template.forum_posts_path(:search => {:creator_id_eq => user.id}))
+    template.link_to(ForumPost.for_user(user.id).count, template.forum_posts_path(:search => {:creator_id => user.id}))
   end
   
   def pool_versions(template)
-    template.link_to(PoolVersion.for_user(user.id).count, template.pool_versions_path(:search => {:updater_id_eq => user.id}))
+    template.link_to(PoolVersion.for_user(user.id).count, template.pool_versions_path(:search => {:updater_id => user.id}))
   end
   
   def inviter(template)
@@ -110,7 +110,7 @@ class UserPresenter
     neutral = UserFeedback.for_user(user.id).neutral.count
     negative = UserFeedback.for_user(user.id).negative.count
     
-    template.link_to("positive:#{positive} neutral:#{neutral} negative:#{negative}", template.user_feedbacks_path(:search => {:user_id_eq => user.id}))
+    template.link_to("positive:#{positive} neutral:#{neutral} negative:#{negative}", template.user_feedbacks_path(:search => {:user_id => user.id}))
   end
   
   def subscriptions(template)

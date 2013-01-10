@@ -44,7 +44,7 @@ class UserFeedbacksControllerTest < ActionController::TestCase
       
       context "with search parameters" do
         should "render" do
-          get :index, {:search => {:user_id_equals => @user.id}}, {:user_id => @critic.id}
+          get :index, {:search => {:user_id => @user.id}}, {:user_id => @critic.id}
           assert_response :success
         end
       end

@@ -7,6 +7,7 @@ FactoryGirl.define do
     uploader_ip_addr "127.0.0.1"
     tag_string "special"
     status "pending"
+    server Socket.gethostname
     
     factory(:source_upload) do
       source "http://www.google.com/intl/en_ALL/images/logo.gif"

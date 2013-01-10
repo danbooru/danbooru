@@ -15,7 +15,7 @@ class TagImplicationsController < ApplicationController
   
   def create
     @tag_implication = TagImplication.create(params[:tag_implication])
-    respond_with(@tag_implication, :location => tag_implications_path(:search => {:id_eq => @tag_implication.id}))
+    respond_with(@tag_implication, :location => tag_implications_path(:search => {:id => @tag_implication.id}))
   end
   
   def destroy

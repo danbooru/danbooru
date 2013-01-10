@@ -1,9 +1,10 @@
 <div id="c-pools">
   <div id="a-search">
-    <%= simple_form_for @search, :method => :get do |f| %>
-      <%= f.input :name_contains, :label => "Name", :required => false %>
-      <%= f.input :description_contains, :label => "Description", :required => false %>
-      <%= f.button :submit, "Search" %>
+    <%= form_tag pools_path, :method => :get, :class => "simple_form" do %>
+      <%= search_field "name_matches", :label => "Name" %>
+      <%= search_field "description_matches", :label => "Description" %>
+      <%= search_field "creator_name", :label => "Creator" %>
+      <%= submit_tag "Search" %>
     <% end %>
   </div>
 </div>

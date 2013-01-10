@@ -1,9 +1,18 @@
 <div id="c-tags">
   <div id="a-search">
-    <%= simple_form_for(@search) do |f| %>
-      <%= f.input :name_matches, :required => false, :label => "Name" %>
-      <%= f.input :category_equals, :required => false, :label => "Category", :collection => Danbooru.config.canonical_tag_category_mapping.to_a %>
-      <%= f.input :meta_sort, :collection => [["Name", "name.asc"], ["Count", "post_count.desc"], ["Date", "created_at.desc"]], :label => "Sort", :required => false %>
+    <%= form_tag(tags_path, :method => :get, :class => "simple_form") do %>
+      <%= search_field "name_matches", :label => "Name" %>
+      
+      <div class="input">
+        <label for="search_category">Category</label>
+        <%= select "search", "category", Tag.canonical_tag_category_mapping.to_a %>
+      </div>
+      
+      <div class="input">
+        <label for="search_sort">Sort</label>
+        <%= select "search", "sort", %w(name count date) %>
+      </div>
+      
       <%= f.button :submit, "Search" %>
     <% end %>
   </div>

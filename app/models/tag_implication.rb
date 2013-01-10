@@ -6,7 +6,6 @@ class TagImplication < ActiveRecord::Base
   validates_presence_of :creator_id
   validates_uniqueness_of :antecedent_name, :scope => :consequent_name
   validate :absence_of_circular_relation
-  scope :name_matches, lambda {|name| where("(antecedent_name = ? or consequent_name = ?)", name.downcase, name.downcase)}
   
   module DescendantMethods
     extend ActiveSupport::Concern
@@ -68,8 +67,34 @@ class TagImplication < ActiveRecord::Base
     end
   end
   
+  module SearchMethods
+    def name_matches(name)
+      where("(antecedent_name = ? or consequent_name = ?)", name.downcase, name.downcase)
+    end
+    
+    def search(params)
+      q = scoped
+      return q if params.blank?
+
+      if params[:id]
+        q = q.where("id = ?", params[:id].to_i)
+      end
+      
+      if params[:name_matches]
+        q = q.name_matches(params[:name_matches])
+      end
+      
+      if params[:antecedent_name]
+        q = q.where("antecedent_name = ?", params[:antecedent_name])
+      end
+
+      q
+    end
+  end
+  
   include DescendantMethods
   include ParentMethods
+  extend SearchMethods
   
   def initialize_creator
     self.creator_id = CurrentUser.user.id

@@ -14,7 +14,33 @@ class Pool < ActiveRecord::Base
   before_destroy :create_mod_action_for_destroy
   attr_accessible :name, :description, :post_ids, :post_id_array, :post_count, :is_active, :as => [:member, :privileged, :contributor, :janitor, :moderator, :admin, :default]
   attr_accessible :is_deleted, :as => [:janitor, :moderator, :admin]
-  scope :active, where("is_active = true and is_deleted = false")
+
+  module SearchMethods
+    def active
+      where("is_active = true and is_deleted = false")
+    end
+    
+    def search(params)
+      q = scoped
+      return q if params.blank?
+      
+      if params[:name_matches]
+        q = q.where("name like ? escape E'\\\\'", params[:name_matches])
+      end
+      
+      if params[:description_matches]
+        q = q.where("description like ? escape E'\\\\'", params[:description_matches])
+      end
+      
+      if params[:creator_name]
+        q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name])
+      end
+      
+      q
+    end
+  end
+  
+  extend SearchMethods
     
   def self.name_to_id(name)
     if name =~ /^\d+$/

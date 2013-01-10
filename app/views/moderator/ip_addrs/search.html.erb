@@ -2,18 +2,10 @@
   <div id="a-search">
     <h1>Search IP Addresses</h1>
     
-    <%= form_tag(moderator_ip_addrs_path) do %>
-      <div class="input">
-        <label>User</label>
-        <%= text_field :search, :user_name %>
-      </div>
-      
-      <div class="input">
-        <label>IP Addr</label>
-        <%= text_field :search, :ip_addr %>
-      </div>
-      
-      <%= submit_tag %>
+    <%= form_tag(moderator_ip_addrs_path, :class => "simple_form") do %>
+      <%= search_field "user_name", :label => "User" %>
+      <%= search_field "ip_addr", :label => "IP Addr" %>
+      <%= submit_tag "Search" %>
     <% end %>
   </div>
 </div>

@@ -8,12 +8,12 @@ module Moderator
     end
     
     def execute
-      if params[:user_id_eq]
-        search_by_user_id(params[:user_id_eq].split(/,/))
-      elsif params[:user_name_eq]
-        search_by_user_name(params[:user_name_eq].split(/,/))
-      elsif params[:ip_addr_eq]
-        search_by_ip_addr(params[:ip_addr_eq].split(/,/))
+      if params[:user_id]
+        search_by_user_id(params[:user_id].split(/,/))
+      elsif params[:user_name]
+        search_by_user_name(params[:user_name].split(/,/))
+      elsif params[:ip_addr]
+        search_by_ip_addr(params[:ip_addr].split(/,/))
       else
         []
       end

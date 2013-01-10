@@ -35,7 +35,7 @@ class IpBansControllerTest < ActionController::TestCase
       
       context "with search parameters" do
         should "render" do
-          get :index, {:search => {:ip_addr_equals => "1.2.3.4"}}, {:user_id => @admin.id}
+          get :index, {:search => {:ip_addr => "1.2.3.4"}}, {:user_id => @admin.id}
           assert_response :success
         end
       end

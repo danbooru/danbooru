@@ -42,6 +42,11 @@ class TagSubscription < ActiveRecord::Base
     user.is_moderator? || creator_id == user.id
   end
   
+  def self.search(params)
+    q = scoped
+    return q if params.blank?
+  end
+  
   def self.visible_to(user)
     where("(is_public = TRUE OR creator_id = ? OR ?)", user.id, user.is_moderator?)
   end

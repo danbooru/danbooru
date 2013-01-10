@@ -4,6 +4,7 @@ class ArtistVersion < ActiveRecord::Base
   
   def self.search(params)
     q = scoped
+    return q if params.blank?
     
     if params[:artist_id]
       q = q.where("artist_id = ?", params[:artist_id].to_i)

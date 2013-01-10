@@ -10,9 +10,34 @@ class ForumTopic < ActiveRecord::Base
   before_validation :initialize_is_deleted, :on => :create
   validates_presence_of :title, :creator_id
   validates_associated :original_post
-  scope :title_matches, lambda {|title| where(["text_index @@ plainto_tsquery(?)", title])}
-  scope :active, where("is_deleted = false")
   accepts_nested_attributes_for :original_post
+  
+  module SearchMethods
+    def title_matches(title)
+      where("text_index @@ plainto_tsquery(?)", title)
+    end
+    
+    def active
+      where("is_deleted = false")
+    end
+    
+    def search(params)
+      q = scoped
+      return q if params.blank?
+      
+      if params[:title_matches]
+        q = q.title_matches(params[:title_matches])
+      end
+      
+      if params[:title]
+        q = q.where("title = ?", params[:title])
+      end
+      
+      q
+    end
+  end
+  
+  extend SearchMethods
   
   def editable_by?(user)
     creator_id == user.id || user.is_moderator?

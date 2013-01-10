@@ -12,8 +12,6 @@ class Upload < ActiveRecord::Base
   before_create :convert_cgi_file
   after_destroy :delete_temp_file
   validate :uploader_is_not_limited
-  scope :uploaded_by, lambda {|user_id| where(["uploader_id = ?", user_id])}
-  scope :pending, where(:status => "pending")
     
   module ValidationMethods
     def uploader_is_not_limited
@@ -149,7 +147,8 @@ class Upload < ActiveRecord::Base
       end
 
       Danbooru.resize(source_path, resized_file_path_for(width), width, height, quality)
-      if width == Danbooru.config.small_image_width
+
+      if width == Danbooru.config.small_image_width && Danbooru.config.ssd_path
         Danbooru.resize(source_path, ssd_file_path, width, height, quality)
       end
     end
@@ -302,6 +301,31 @@ class Upload < ActiveRecord::Base
     end
   end
   
+  module SearchMethods
+    def uploaded_by(user_id)
+      where("uploader_id = ?", user_id)
+    end
+    
+    def pending
+      where(:status => "pending")
+    end
+    
+    def search(params)
+      q = scoped
+      return q if params.blank?
+      
+      if params[:uploader_id]
+        q = q.uploaded_by(params[:uploader_id].to_i)
+      end
+      
+      if params[:source]
+        q = q.where("source = ?", params[:source])
+      end
+      
+      q
+    end
+  end
+  
   include ConversionMethods
   include ValidationMethods
   include FileMethods
@@ -313,6 +337,7 @@ class Upload < ActiveRecord::Base
   include CgiFileMethods
   include StatusMethods
   include UploaderMethods
+  extend SearchMethods
   
   def presenter
     @presenter ||= UploadPresenter.new(self)

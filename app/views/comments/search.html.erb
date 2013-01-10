@@ -2,13 +2,13 @@
   <div id="a-search">
     <h1>Search Comments</h1>
     
-    <%= simple_form_for(@search) do |f| %>
+    <%= form_tag(comments_path, :method => :get) do |f| %>
       <%= hidden_field_tag "group_by", "comment" %>
-      <%= f.input :body_matches, :label => "Body", :required => false %>
-      <%= f.input :for_user_name, :label => "User", :required => false %>
-      <%= f.input :post_tag_match, :label => "Tags", :required => false %>
       
-      <%= f.button :submit, "Search" %>
+      <%= search_field :body_matches, :label => "Body" %>
+      <%= search_field :creator_name, :label => "User" %>
+      <%= search_field :post_tags_match, :label => "Tags" %>
+      <%= submit_tag "Search" %>
     <% end %>
   </div>
 </div>

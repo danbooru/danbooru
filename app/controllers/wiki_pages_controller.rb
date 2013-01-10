@@ -68,7 +68,7 @@ private
   def normalize_search_params
     if params[:title]
       params[:search] ||= {}
-      params[:search][:title_equals] = params.delete(:title)
+      params[:search][:title] = params.delete(:title)
     end
   end
 end

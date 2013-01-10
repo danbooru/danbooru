@@ -29,8 +29,8 @@
       <section>
         <h1>History</h1>
         <ul>
-          <li><%= link_to "Tags", post_versions_path(:search => {:post_id_eq => @post.id}) %></li>
-          <li><%= link_to "Notes", note_versions_path(:search => {:post_id_eq => @post.id}) %></li>
+          <li><%= link_to "Tags", post_versions_path(:search => {:post_id => @post.id}) %></li>
+          <li><%= link_to "Notes", note_versions_path(:search => {:post_id => @post.id}) %></li>
         </ul>
       </section>
 

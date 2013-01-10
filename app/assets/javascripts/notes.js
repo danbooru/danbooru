@@ -397,7 +397,7 @@ Danbooru.Note = {
       var $this = $(this);
       var id = $this.data("id");
       if (id.match(/\d/)) {
-        window.location.href = "/note_versions?search[note_id_eq]=" + id;
+        window.location.href = "/note_versions?search[note_id]=" + id;
       }
       $(this).dialog("close");
     }

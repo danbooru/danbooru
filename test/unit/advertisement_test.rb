@@ -3,6 +3,7 @@ require 'test_helper'
 class AdvertisementTest < ActiveSupport::TestCase
   context "An advertisement" do
     setup do
+      Danbooru.config.stubs(:advertisement_path).returns("/tmp")
       @ad = FactoryGirl.create(:advertisement, :file => upload_jpeg("#{Rails.root}/test/files/test.jpg"))
     end
     

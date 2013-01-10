@@ -29,7 +29,7 @@ class Advertisement < ActiveRecord::Base
   end
   
   def date_prefix
-    created_at.strftime("%Y%m%d")
+    created_at.try(:strftime, "%Y%m%d")
   end
 
   def image_path
@@ -43,6 +43,7 @@ class Advertisement < ActiveRecord::Base
   def file=(f)
     if f.size > 0
       self.file_name = unique_identifier + File.extname(f.original_filename)
+      FileUtils.mkdir_p(File.dirname(image_path))
 
       if f.local_path
         FileUtils.cp(f.local_path, image_path)

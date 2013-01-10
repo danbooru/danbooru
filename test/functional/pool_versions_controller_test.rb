@@ -36,7 +36,7 @@ class PoolVersionsControllerTest < ActionController::TestCase
       end
       
       should "list all versions that match the search criteria" do
-        get :index, {:search => {:updater_id_equals => @user_2.id}}
+        get :index, {:search => {:updater_id => @user_2.id}}
         assert_response :success
         assert_not_nil(assigns(:pool_versions))
         assert_equal(1, assigns(:pool_versions).size)

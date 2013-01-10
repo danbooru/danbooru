@@ -2,11 +2,9 @@
   <div id="a-index">
     <h1>Users</h1>
     
-    <% simple_form_for(@search) do |f| %>
-      <%= f.input :name_contains, :label => "Name" %>
-      <%= f.sort_link "Name", :name %>
-      <%= f.sort_link "Date", :created_at_desc %>
-      <%= f.button :submit %>
+    <% form_tag(users_path, :method => :get, :class => "simple_form") do %>
+      <%= search_field "name_matches", :label => "Name" %>
+      <%= submit_tag "Search" %>
     <% end %>
 
     <table width="100%" class="striped"> 
@@ -46,7 +44,7 @@
               <td></td>
               <td></td>
             <% end %>
-            <td><%= link_to user.note_versions.count, note_versions_path(:search => {:updater_id_eq => user.id}) %></td>
+            <td><%= link_to user.note_versions.count, note_versions_path(:search => {:updater_id => user.id}) %></td>
             <td><%= user.level_string %></td>
             <td><span title="<%= user.created_at %>"><%= time_ago_in_words user.created_at %> ago</span></td>
           </tr>

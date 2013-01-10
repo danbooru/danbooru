@@ -13,6 +13,7 @@ class Ban < ActiveRecord::Base
   
   def self.search(params)
     q = scoped
+    return q if params.blank?
     
     if params[:banner_name]
       q = q.where("banner_id = (select _.id from users _ where lower(_.name) = ?)", params[:banner_name].downcase)

@@ -68,7 +68,7 @@ class JanitorTrialsControllerTest < ActionController::TestCase
       
       context "with search parameters" do
         should "render" do
-          get :index, {:search => {:user_name_equals => @user.name}}, {:user_id => @admin.id}
+          get :index, {:search => {:user_name => @user.name}}, {:user_id => @admin.id}
           assert_response :success
         end
       end

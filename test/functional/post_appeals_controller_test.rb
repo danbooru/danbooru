@@ -33,7 +33,7 @@ class PostAppealsControllerTest < ActionController::TestCase
       
       context "with search parameters" do
         should "render" do
-          get :index, {:search => {:post_id_equals => @post_appeal.post_id}}, {:user_id => @user.id}
+          get :index, {:search => {:post_id => @post_appeal.post_id}}, {:user_id => @user.id}
           assert_response :success
         end
       end

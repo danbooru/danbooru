@@ -1,8 +1,14 @@
 <div id="c-users">
   <div id="a-search">
-    <%= simple_form_for(@search) do |f| %>
-      <%= f.input :name_matches, :required => false, :label => "Name" %>
-      <%= f.button :submit, "Search" %>
+    <%= form_tag(users_path, :method => :get, :class => "simple_form") do %>
+      <%= search_field "name_matches", :label => "Name" %>
+      
+      <div class="input">
+        <label for="search_level">Min Level</label>
+        <%= select("search", "min_level", User.level_hash.to_a) %>
+      </div>
+      
+      <%= submit_tag "Search" %>
     <% end %>
   </div>
 </div>

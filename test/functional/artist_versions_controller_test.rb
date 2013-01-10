@@ -19,7 +19,7 @@ class ArtistVersionsControllerTest < ActionController::TestCase
     end
     
     should "get the index page when searching for something" do
-      get :index, {:search => {:name_equals => @artist.name}}
+      get :index, {:search => {:name => @artist.name}}
       assert_response :success
     end
   end

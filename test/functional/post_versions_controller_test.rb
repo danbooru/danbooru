@@ -27,7 +27,7 @@ class PostVersionsControllerTest < ActionController::TestCase
       end
       
       should "list all versions that match the search criteria" do
-        get :index, {:search => {:post_id_equals => @post.id}}
+        get :index, {:search => {:post_id => @post.id}}
         assert_response :success
         assert_not_nil(assigns(:post_versions))
       end

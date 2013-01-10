@@ -40,10 +40,6 @@ class User < ActiveRecord::Base
   has_many :note_versions, :foreign_key => "updater_id"
   has_many :dmails, :foreign_key => "owner_id", :order => "dmails.id desc"
   belongs_to :inviter, :class_name => "User"
-  scope :named, lambda {|name| where(["lower(name) = ?", name])}
-  scope :admins, where("is_admin = TRUE")
-  scope :with_email, lambda {|email| email.blank? ? where("FALSE") : where(["email = ?", email])}
-  scope :find_for_password_reset, lambda {|name, email| email.blank? ? where("FALSE") : where(["name = ? AND email = ?", name, email])}
     
   module BanMethods
     def validate_ip_addr_is_not_banned
@@ -417,6 +413,51 @@ class User < ActiveRecord::Base
     end
   end
   
+  module SearchMethods
+    def named(name)
+      where("lower(name) = ?", name)
+    end
+    
+    def name_matches(name)
+      where("lower(name) like ? escape E'\\\\'", name.to_escaped_for_sql_like)
+    end
+    
+    def admins
+      where("is_admin = TRUE")
+    end
+    
+    def with_email(email)
+      if email.blank? 
+        where("FALSE")
+      else 
+        where("email = ?", email)
+      end
+    end
+    
+    def find_for_password_reset(name, email)
+      if email.blank? 
+        where("FALSE")
+      else
+        where(["name = ? AND email = ?", name, email])
+      end
+    end
+    
+    def search(params)
+      q = scoped
+      return q if params.blank?
+      
+      if params[:name_matches]
+        q = q.name_matches(params[:name_matches])
+      end
+      
+      if params[:min_level]
+        q = q.where("level >= ?", params[:min_level].to_i)
+      end
+      
+      q
+    end
+  end
+  
   include BanMethods
   include NameMethods
   include PasswordMethods
@@ -429,6 +470,7 @@ class User < ActiveRecord::Base
   include LimitMethods
   include InvitationMethods
   include ApiMethods
+  extend SearchMethods
   
   def initialize_default_image_size
     self.default_image_size = "large"
