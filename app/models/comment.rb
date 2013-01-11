@@ -35,7 +35,7 @@ class Comment < ActiveRecord::Base
     end
     
     def for_creator_name(user_name)
-      where("creator_id = (select _.id from users _ where lower(_.name) = lower(?))", user_name)
+      where("creator_id = (select _.id from users _ where lower(_.name) = lower(?))", user_name.downcase)
     end
     
     def search(params)

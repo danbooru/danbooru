@@ -19,6 +19,10 @@ class WikiPage < ActiveRecord::Base
     def recent
       order("updated_at DESC").limit(25)
     end
+    
+    def body_matches(query)
+      where("body_index @@ plainto_tsquery(?)", query.scan(/\S+/).join(" & "))
+    end
 
     def search(params = {})
       q = scoped
@@ -30,6 +34,14 @@ class WikiPage < ActiveRecord::Base
 
       if params[:creator_id]
         q = q.where("creator_id = ?", params[:creator_id])
+      end
+      
+      if params[:body_matches]
+        q = q.body_matches(params[:body_matches])
+      end
+      
+      if params[:creator_name]
+        q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].downcase)
       end
 
       q

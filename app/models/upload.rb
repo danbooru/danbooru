@@ -318,6 +318,10 @@ class Upload < ActiveRecord::Base
         q = q.uploaded_by(params[:uploader_id].to_i)
       end
       
+      if params[:uploader_name]
+        q = q.where("uploader_id = (select _.id from users _ where lower(_.name) = ?)", params[:uploader_name].downcase)
+      end
+      
       if params[:source]
         q = q.where("source = ?", params[:source])
       end

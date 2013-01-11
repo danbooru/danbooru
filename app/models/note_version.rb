@@ -15,6 +15,10 @@ class NoteVersion < ActiveRecord::Base
       q = q.where("post_id = ?", params[:post_id].to_i)
     end
     
+    if params[:note_id]
+      q = q.where("note_id = ?", params[:note_id].to_i)
+    end
+    
     q
   end
   

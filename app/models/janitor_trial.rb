@@ -15,6 +15,10 @@ class JanitorTrial < ActiveRecord::Base
       q = q.where("user_id = (select _.id from users _ where lower(_.name) = ?)", params[:user_name].downcase)
     end
     
+    if params[:user_id]
+      q = q.where("user_id = ?", params[:user_id].to_i)
+    end
+    
     q
   end
     

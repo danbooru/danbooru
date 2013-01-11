@@ -27,7 +27,7 @@ class Note < ActiveRecord::Base
     end
     
     def creator_name(name)
-      where("creator_id = (select _.id from users _ where lower(_.name) = ?)", name)
+      where("creator_id = (select _.id from users _ where lower(_.name) = ?)", name.downcase)
     end
     
     def search(params)
@@ -44,6 +44,10 @@ class Note < ActiveRecord::Base
       
       if params[:creator_name]
         q = q.creator_name(params[:creator_name])
+      end
+      
+      if params[:creator_id]
+        q = q.where("creator_id = ?", params[:creator_id].to_i)
       end
       
       q

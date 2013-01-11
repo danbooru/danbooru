@@ -33,7 +33,11 @@ class Pool < ActiveRecord::Base
       end
       
       if params[:creator_name]
-        q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name])
+        q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].downcase)
+      end
+      
+      if params[:creator_id]
+        q = q.where("creator_id = ?", params[:creator_id].to_i)
       end
       
       q
