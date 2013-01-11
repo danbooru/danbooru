@@ -11,7 +11,7 @@ class CommentVote < ActiveRecord::Base
   validates_inclusion_of :score, :in => [-1, 1], :message => "must be 1 or -1"
   
   def self.prune!
-    destroy_all(["created_at < ?", 14.days.ago])
+    destroy_all("created_at < ?", 14.days.ago)
   end
   
   def validate_user_can_vote

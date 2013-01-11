@@ -19,8 +19,16 @@ class Ban < ActiveRecord::Base
       q = q.where("banner_id = (select _.id from users _ where lower(_.name) = ?)", params[:banner_name].downcase)
     end
     
+    if params[:banner_id]
+      q = q.where("banner_id = ?", params[:banner_id].to_i)
+    end
+    
     if params[:user_name]
       q = q.where("user_id = (select _.id from users _ where lower(_.name) = ?)", params[:user_name].downcase)
+    end
+    
+    if params[:user_id]
+      q = q.where("user_id = ?", params[:user_id].to_i)
     end
     
     q
