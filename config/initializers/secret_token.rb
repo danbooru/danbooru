@@ -8,6 +8,6 @@
 if File.exists?(File.expand_path("~/.danbooru/secret_token"))
   Danbooru::Application.config.secret_token = File.read(File.expand_path("~/.danbooru/secret_token"))
 else
-  Danbooru::Application.config.secret_token = 'bd49b99b97bed9bf337d83224d315abaf5e5f48fbd20183570b6c4d81220035536e5a6683461da02f60a8f507ea74aa92fa083c577963e0f16a557ce808c2f30'
+  Danbooru::Application.config.secret_token = SecureRandom.hex(64)
 end
 
