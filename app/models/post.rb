@@ -568,7 +568,13 @@ class Post < ActiveRecord::Base
   
   module CountMethods
     def get_count_from_cache(tags)
-      Cache.get(count_cache_key(tags))
+      count = Cache.get(count_cache_key(tags))
+      
+      if count.nil?
+        count = select_value("SELECT post_count FROM tags WHERE name = ?", tags.to_s)
+      end
+      
+      count
     end
     
     def set_count_in_cache(tags, count, expiry = nil)
