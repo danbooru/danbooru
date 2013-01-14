@@ -7,7 +7,7 @@ module Danbooru
       
       module ClassMethods
         def paginate(page, options = {})
-          @paginator_options = options
+          @paginator_options = options || {}
           
           if use_sequential_paginator?(page)
             paginate_sequential(page)

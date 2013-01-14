@@ -5,7 +5,7 @@ module PostSets
     def initialize(tags, page = 1, per_page = nil)
       @tag_array = Tag.scan_query(tags)
       @page = page
-      @per_page = (per_page || ::Post.records_per_page).to_i
+      @per_page = (per_page || Danbooru.config.posts_per_page).to_i
       @per_page = 200 if @per_page > 200
     end
     
