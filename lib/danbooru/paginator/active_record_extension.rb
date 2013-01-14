@@ -66,7 +66,7 @@ module Danbooru
         
         def records_per_page
           # ugly hack but no easy way to pass this info down
-          Thread.current["records_per_page"] || Danbooru.config.posts_per_page
+          (@paginator_options[:limit] || Thread.current["records_per_page"] || Danbooru.config.posts_per_page).to_i
         end
 
         # taken from kaminari (https://github.com/amatsuda/kaminari)

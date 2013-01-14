@@ -1,6 +1,6 @@
 class LegacyController < ApplicationController
   def posts
-    @post_set = PostSets::Post.new(tag_query, params[:page])
+    @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit])
     @posts = @post_set.posts
   end
 

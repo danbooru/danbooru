@@ -1,10 +1,12 @@
 module PostSets
   class Post < Base
-    attr_reader :tag_array, :page
+    attr_reader :tag_array, :page, :per_page
     
-    def initialize(tags, page = 1)
+    def initialize(tags, page = 1, per_page = nil)
       @tag_array = Tag.scan_query(tags)
       @page = page
+      @per_page = (per_page || Post.records_per_page).to_i
+      @per_page = 200 if @per_page > 200
     end
     
     def tag_string
@@ -36,7 +38,7 @@ module PostSets
         raise SearchError.new("Upgrade your account to search more than two tags at once")
       end
       
-      @posts ||= ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string))
+      @posts ||= ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => :per_page)
     rescue ::Post::SearchError
       @posts = ::Post.where("false")
     end
