@@ -571,7 +571,7 @@ class Post < ActiveRecord::Base
       count = Cache.get(count_cache_key(tags))
       
       if count.nil?
-        count = select_value("SELECT post_count FROM tags WHERE name = ?", tags.to_s)
+        count = select_value_sql("SELECT post_count FROM tags WHERE name = ?", tags.to_s)
       end
       
       count

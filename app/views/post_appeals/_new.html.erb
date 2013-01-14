@@ -4,9 +4,9 @@
 
     <p>All users are limited to one appeal a day. For more details, please read the <%= link_to "wiki", wiki_pages_path(:title => "help:deletion_appeals") %>.</p>
 
-    <%= simple_form_for(@post_appeal, :remote => true, :format => :js) do |f| %>
+    <%= form_tag(post_appeals_path(:format => :js), :remote => true) do %>
       <%= hidden_field_tag "post_appeal[post_id]", @post_appeal.post_id %>
-      <%= f.text_field :reason, :size => "40x5" %>
+      <%= text_area :post_appeal, :reason, :size => "40x5" %>
     <% end %>
   </div>
 </div>
