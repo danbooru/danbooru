@@ -45,7 +45,7 @@
 </div>
 
 <%= content_for(:html_header) do %>
-  <%= auto_discovery_link_tag :atom, :controller => "posts", :action => "index", :format => "atom", :tags => params[:tags] %>
+  <link href="<%= posts_path(:format => 'atom', :tags => params[:tags]) %>" rel="alternate" title="ATOM" type="application/atom+xml" />
   <% if @post_set.wiki_page %>
     <meta name="description" content="<%= @post_set.wiki_page.presenter.blurb %>"></meta>
   <% end %>

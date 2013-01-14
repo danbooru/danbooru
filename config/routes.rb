@@ -65,6 +65,7 @@ Danbooru::Application.routes.draw do
     resources :votes, :controller => "comment_votes", :only => [:create, :destroy]
     collection do
       get :search
+      get :index_all
     end
   end
   resources :delayed_jobs, :only => [:index]
@@ -253,6 +254,7 @@ Danbooru::Application.routes.draw do
   match "/static/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
   match "/static/mrtg" => "static#mrtg", :as => "mrtg"
   match "/static/contact" => "static#contact", :as => "contact"
+  match "/static/benchmark" => "static#benchmark"
   
   root :to => "posts#index"
 end

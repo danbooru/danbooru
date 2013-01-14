@@ -9,6 +9,38 @@ module ApplicationHelper
     content_tag("li", link_to(text, url, options), :class => klass)
   end
   
+  def fast_link_to(text, link_params, options = {})
+    if options
+      attributes = options.map do |k, v| 
+        %{#{k}="#{h(v)}"}
+      end.join(" ")
+    else
+      attributes = ""
+    end
+    
+    if link_params.is_a?(Hash)
+      action = link_params.delete(:action)
+      controller = link_params.delete(:controller) || controller_name
+      id = link_params.delete(:id)
+      
+      link_params = link_params.map {|k, v| "#{k}=#{u(v)}"}.join("&")
+      
+      if link_params.present?
+        link_params = "?#{link_params}"
+      end
+      
+      if id
+        url = "/#{controller}/#{action}/#{id}#{link_params}"
+      else
+        url = "/#{controller}/#{action}#{link_params}"
+      end
+    else
+      url = link_params
+    end
+    
+    raw %{<a href="#{h(url)}" #{attributes}>#{text}</a>}
+  end
+  
   def format_text(text, options = {})
     DText.parse(text)
   end
