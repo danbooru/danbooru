@@ -244,7 +244,7 @@ Danbooru::Application.routes.draw do
   
   match "/wiki" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
   match "/wiki/index" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
-  match "/wiki/show/:title" => redirect("/wiki_pages?title=%{title}")
+  match "/wiki/show" => redirect {|params, req| "/wiki_pages?title=#{req.params[:title]}"}
   match "/wiki/recent_changes" => redirect("/wiki_page_versions")
   match "/wiki/history/:title" => redirect("/wiki_page_versions?title=%{title}")
 

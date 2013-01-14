@@ -454,6 +454,10 @@ class User < ActiveRecord::Base
         q = q.where("level >= ?", params[:min_level].to_i)
       end
       
+      if params[:id]
+        q = q.where("id = ?", params[:id].to_i)
+      end
+      
       q
     end
   end
