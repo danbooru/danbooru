@@ -5,7 +5,7 @@ class PostsController < ApplicationController
   rescue_from PostSets::SearchError, :with => :search_error
   
   def index
-    @post_set = PostSets::Post.new(tag_query, params[:page])
+    @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit])
     @posts = @post_set.posts
     respond_with(@posts) do |format|
       format.atom

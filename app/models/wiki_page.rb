@@ -105,7 +105,7 @@ class WikiPage < ActiveRecord::Base
   end
   
   def post_set
-    @post_set ||= PostSets::WikiPage.new(title)
+    @post_set ||= PostSets::WikiPage.new(title, 1, 4)
   end
   
   def presenter
