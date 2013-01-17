@@ -23,7 +23,7 @@ if [[ -z "$HOSTNAME" ]] ; then
   exit 1
 fi
 
-RUBY_VERSION=1.9.3-p194
+RUBY_VERSION=1.9.3-p327
 
 echo -n "Enter a name for the site (default: Danbooru): "
 read SITENAME
