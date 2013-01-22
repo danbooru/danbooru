@@ -1,7 +1,7 @@
 <div id="c-tag-subscriptions">
   <div id="a-index">
     <h1>Tag Subscriptions</h1>
-    <table>
+    <table class="striped" width="100%">
       <thead>
         <tr>
           <th>Creator</th>
@@ -12,13 +12,15 @@
       <tbody>
         <% @tag_subscriptions.each do |tag_subscription| %>
           <tr>
-            <td><%= tag_subscription.creator.name %></td>
-            <td><%= link_to tag_subscription.name, tag_subscription_path(tag_subscription.id) %></td>
-            <td><%= link_to tag_subscription.tag_query, posts_path(:tags => "sub:#{@user.name}:#{tag_subscription.name}") %></td>
+            <td><%= link_to tag_subscription.creator.name, user_path(tag_subscription.creator_id) %></td>
+            <td><%= link_to tag_subscription.name, edit_tag_subscription_path(tag_subscription) %></td>
+            <td><%= link_to tag_subscription.tag_query, posts_path(:tags => "sub:#{tag_subscription.creator.name}:#{tag_subscription.name}") %></td>
           </tr>
         <% end %>
       </tbody>
     </table>
+    
+    <%= sequential_paginator(@tag_subscriptions) %>
   </div>
 </div>
 

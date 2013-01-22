@@ -1,4 +1,5 @@
 CurrentUser.ip_addr = "127.0.0.1"
+Delayed::Worker.delay_jobs = false
 
 if User.count == 0
   puts "Creating users"
@@ -32,7 +33,7 @@ if Upload.count == 0
     url = "http://ipsumimage.appspot.com/#{width}x#{height}"
     tags = (i * i * i).to_s.scan(/./).uniq.join(" ")
   
-    Upload.create(:source => url, :content_type => "image/gif", :rating => "q", :tag_string => tags)
+    Upload.create(:source => url, :content_type => "image/gif", :rating => "q", :tag_string => tags, :server => Socket.gethostname)
   end
 else
   puts "Skipping uploads"
