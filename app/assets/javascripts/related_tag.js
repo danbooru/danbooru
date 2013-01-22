@@ -161,7 +161,6 @@
       $dest.html("No artists found");
       return;
     } else if (data.length > 2) {
-      console.log(data);
       $dest.html("Too many matching artists found");
       return;
     }
