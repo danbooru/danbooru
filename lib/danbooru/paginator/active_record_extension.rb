@@ -67,7 +67,7 @@ module Danbooru
         end
         
         def records_per_page
-          (@paginator_options[:limit] || Danbooru.config.posts_per_page).to_i
+          (@paginator_options.try(:[], :limit) || Danbooru.config.posts_per_page).to_i
         end
 
         # taken from kaminari (https://github.com/amatsuda/kaminari)
