@@ -18,7 +18,7 @@
             <td><%= feedback.category %></td>
             <td><%= link_to feedback.user_name, user_feedback_path(feedback.user_id) %></td>
             <td><%= feedback.creator.name %></td>
-            <td><%= time_ago_in_words(feedback.created_at) %> ago</td>
+            <td><%= time_ago_in_words_tagged(feedback.created_at) %> ago</td>
             <td><%= format_text(feedback.body) %></td>
           </tr>
         <% end %>

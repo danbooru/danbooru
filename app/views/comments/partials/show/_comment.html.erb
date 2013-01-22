@@ -2,7 +2,7 @@
   <div class="author">
     <h1><%= link_to comment.creator_name, user_path(comment.creator_id) %></h1>
     <p>
-      <%= time_ago_in_words(comment.created_at) %> ago
+      <%= time_ago_in_words_tagged(comment.created_at) %> ago
     </p>
   </div>
   <div class="content">

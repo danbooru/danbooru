@@ -46,7 +46,7 @@
             <% end %>
             <td><%= link_to user.note_versions.count, note_versions_path(:search => {:updater_id => user.id}) %></td>
             <td><%= user.level_string %></td>
-            <td><span title="<%= user.created_at %>"><%= time_ago_in_words user.created_at %> ago</span></td>
+            <td><span title="<%= user.created_at %>"><%= time_ago_in_words_tagged user.created_at %> ago</span></td>
           </tr>
         <% end %>
       </tbody>

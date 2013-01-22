@@ -26,7 +26,7 @@
                 <%= pool_version.updater_ip_addr %>
               <% end %>
             </td>
-            <td><%= time_ago_in_words pool_version.updated_at %></td>
+            <td><%= time_ago_in_words_tagged pool_version.updated_at %></td>
             <td><%= link_to "Revert", revert_pool_path(pool_version.pool_id, :version => pool_version.id) %></td>
           </tr>
         <% end %>

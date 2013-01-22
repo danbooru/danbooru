@@ -62,6 +62,10 @@ module ApplicationHelper
     content_tag(:time, content || datetime, :datetime => datetime, :title => time.to_formatted_s)
   end
   
+  def time_ago_in_words_tagged(time)
+    time_tag(time_ago_in_words(time) + " ago", time)
+  end
+  
   def compact_time(time)
     if time > Time.now.end_of_day
       time_tag(time.strftime("%b %e, %Y"), time)

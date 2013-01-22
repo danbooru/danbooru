@@ -14,7 +14,7 @@
         <% @janitor_trials.each do |janitor_trial| %>
           <tr>
             <td><%= link_to janitor_trial.user.name, user_path(janitor_trial.user) %></td>
-            <td><%= time_ago_in_words janitor_trial.created_at %></td>
+            <td><%= time_ago_in_words_tagged janitor_trial.created_at %></td>
             <td>
               <%= link_to "Promote", promote_janitor_trial_path(janitor_trial), :remote => true, :method => :put %>
               | <%= link_to "Demote", demote_janitor_trial_path(janitor_trial), :remote => true, :method => :put %>
