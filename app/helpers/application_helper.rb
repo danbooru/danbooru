@@ -63,7 +63,7 @@ module ApplicationHelper
   end
   
   def time_ago_in_words_tagged(time)
-    raw time_tag(time_ago_in_words(time) + " ago", time)
+    time_tag(raw(time_ago_in_words(time)) + " ago", time)
   end
   
   def compact_time(time)
