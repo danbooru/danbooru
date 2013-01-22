@@ -171,12 +171,14 @@ div#c-post-versions {
       color: green;
       text-decoration: none;
       margin-right: 0.5em;
+      word-wrap: break-word
     }
     
     del, del a {
       color: red;
       text-decoration: line-through;
       margin-right: 0.5em;
+      word-wrap: break-word
     }
   }
 }

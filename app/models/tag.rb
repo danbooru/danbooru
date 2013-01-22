@@ -3,6 +3,19 @@ class Tag < ActiveRecord::Base
   after_save :update_category_cache
   has_one :wiki_page, :foreign_key => "name", :primary_key => "title"
   
+  module ApiMethods
+    def to_legacy_json
+      return {
+        "name" => name,
+        "id" => id,
+        "created_at" => created_at.strftime("%Y-%m-%d %H:%M"),
+        "count" => post_count,
+        "type" => category,
+        "ambiguous" => false
+      }.to_json
+    end
+  end
+  
   class CategoryMapping
     Danbooru.config.reverse_tag_category_mapping.each do |value, category|
       define_method(category.downcase) do
@@ -399,6 +412,7 @@ class Tag < ActiveRecord::Base
     end
   end
   
+  include ApiMethods
   extend CountMethods
   extend ViewCountMethods
   include CategoryMethods

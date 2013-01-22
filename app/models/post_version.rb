@@ -97,4 +97,7 @@ class PostVersion < ActiveRecord::Base
     PostVersion.where("post_id = ? and id < ?", post_id, id).order("id desc").first
   end
   
+  def truncated_source
+    source.gsub(/^http:\/\//, "").sub(/\/.+/, "")
+  end
 end

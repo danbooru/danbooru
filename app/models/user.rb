@@ -411,6 +411,15 @@ class User < ActiveRecord::Base
       options[:except] += hidden_attributes
       super(options, &block)
     end
+
+    def to_legacy_json
+      return {
+        "name" => name,
+        "id" => id,
+        "level" => level,
+        "created_at" => created_at.strftime("%Y-%m-%d %H:%M")
+      }.to_json
+    end
   end
   
   module SearchMethods
@@ -445,6 +454,10 @@ class User < ActiveRecord::Base
     def search(params)
       q = scoped
       return q if params.blank?
+      
+      if params[:name]
+        q = q.name_matches(params[:name])
+      end
       
       if params[:name_matches]
         q = q.name_matches(params[:name_matches])

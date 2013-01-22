@@ -236,9 +236,13 @@ Danbooru::Application.routes.draw do
   match "/post_tag_history" => redirect {|params, req| "/post_versions?page=#{req.params[:page]}"}
   match "/post_tag_history/index" => redirect {|params, req| "/post_versions?page=#{req.params[:page]}"}
   
+  match "/tag/index.xml", :controller => "legacy", :action => "tags", :format => "xml"
+  match "/tag/index.json", :controller => "legacy", :action => "tags", :format => "json"
   match "/tag" => redirect {|params, req| "/tags?page=#{req.params[:page]}"}
   match "/tag/index" => redirect {|params, req| "/tags?page=#{req.params[:page]}"}
   
+  match "/user/index.xml", :controller => "legacy", :action => "users", :format => "xml"
+  match "/user/index.json", :controller => "legacy", :action => "users", :format => "json"
   match "/user" => redirect {|params, req| "/users?page=#{req.params[:page]}"}
   match "/user/index" => redirect {|params, req| "/users?page=#{req.params[:page]}"}
   
