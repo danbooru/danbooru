@@ -148,7 +148,7 @@
     $("#related-tags").show();
     Danbooru.RelatedTag.recent_search = null;
     var url = $("#upload_source,#post_source");
-    $.get("/artists.json", {"artist[search]": "name:" + url.val()}).success(Danbooru.RelatedTag.process_artist);
+    $.get("/artists.json", {"search[name]": url.val()}).success(Danbooru.RelatedTag.process_artist);
     e.preventDefault();
   }
   
