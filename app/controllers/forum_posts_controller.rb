@@ -4,6 +4,7 @@ class ForumPostsController < ApplicationController
   rescue_from User::PrivilegeError, :with => "static/access_denied"
 
   def new
+    @forum_topic = ForumTopic.find(params[:topic_id]) if params[:topic_id]
     @forum_post = ForumPost.new_reply(params)
     respond_with(@forum_post)
   end
