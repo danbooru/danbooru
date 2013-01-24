@@ -601,9 +601,12 @@ class Post < ActiveRecord::Base
           count = Danbooru.config.blank_tag_search_fast_count
         else
           begin
+            ActiveRecord::Base.connection.execute("SET statement_timeout = 500")
             count = Post.tag_match(tags).undeleted.count
           rescue ActiveRecord::StatementInvalid
             count = Danbooru.config.blank_tag_search_fast_count || 1_000_000
+          ensure
+            ActiveRecord::Base.connection.execute("SET statement_timeout = 3000")
           end
         end
 
