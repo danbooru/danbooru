@@ -233,7 +233,7 @@ class PostQueryBuilder
 	    relation = relation.order("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 45000 DESC")
 
     else
-      relation = relation.where("false")
+      relation = relation.order("posts.id DESC")
     end
 
     relation
