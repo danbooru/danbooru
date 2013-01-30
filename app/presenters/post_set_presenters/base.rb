@@ -6,7 +6,7 @@ module PostSetPresenters
     
     def post_previews_html(template)
       html = ""
-      is_empty = Post.with_timeout(500, false) do
+      is_empty = ::Post.with_timeout(500, false) do
         posts.empty?
       end
 
