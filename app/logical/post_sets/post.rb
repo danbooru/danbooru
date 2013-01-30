@@ -38,7 +38,7 @@ module PostSets
         raise SearchError.new("Upgrade your account to search more than two tags at once")
       end
       
-      @posts ||= ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+      @posts ||= ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page).all
     rescue ::Post::SearchError
       @posts = ::Post.where("false")
     end
