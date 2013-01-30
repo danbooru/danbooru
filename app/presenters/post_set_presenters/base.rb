@@ -10,7 +10,7 @@ module PostSetPresenters
         posts.empty?
       end
 
-      if is_empty?
+      if is_empty
         return template.render("post_sets/blank")
       end
 
