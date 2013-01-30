@@ -14,7 +14,7 @@ module Danbooru
         def with_timeout(n, default_value)
           connection.execute("SET STATEMENT_TIMEOUT = #{n}") unless Rails.env == "test"
           yield
-        rescue ActiveRecord::StatementInvalid
+        rescue ::ActiveRecord::StatementInvalid
           return default_value
         ensure
           connection.execute("SET STATEMENT_TIMEOUT = 3000") unless Rails.env == "test"
