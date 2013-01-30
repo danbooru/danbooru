@@ -6,8 +6,11 @@ module PostSetPresenters
     
     def post_previews_html(template)
       html = ""
+      is_empty = Post.with_timeout(500, false) do
+        posts.empty?
+      end
 
-      if posts.empty?
+      if is_empty?
         return template.render("post_sets/blank")
       end
 
