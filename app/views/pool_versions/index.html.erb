@@ -18,7 +18,7 @@
         <% @pool_versions.each do |pool_version| %>
           <tr>
             <td><%= pool_version.pool.name %></td>
-            <td><%= link_to pool_version.post_id_array.size, pool_versions_path(pool_version) %></td>
+            <td><%= link_to pool_version.post_id_array.size, pool_version_path(pool_version) %></td>
             <td><%= pool_version_diff(pool_version) %></td>
             <td><%= link_to pool_version.updater.name, user_path(pool_version.updater) %></td>
             <td>

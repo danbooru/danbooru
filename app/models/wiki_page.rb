@@ -43,6 +43,10 @@ class WikiPage < ActiveRecord::Base
       if params[:creator_name]
         q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].downcase)
       end
+      
+      if params[:sort] == "time"
+        q = q.order("updated_at desc")
+      end
 
       q
     end
