@@ -53,7 +53,7 @@
       </menu>
 
       <section id="comments">
-        <%= render "comments/partials/index/list", :comments => @post.comments.includes(:creator), :post => @post, :show_header => false %>
+        <%= render "comments/partials/index/list", :comments => @post.comments, :post => @post, :show_header => false %>
       </section>
 
       <section id="notes" style="display: none;">

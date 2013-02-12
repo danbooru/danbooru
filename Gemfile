@@ -29,7 +29,7 @@ gem 'rmagick', :require => "RMagick"
 gem 'daemons'
 gem 'net-ssh'
 gem 'net-sftp'
-gem 'newrelic_rpm'
+# gem 'newrelic_rpm'
 
 group :development do
   gem 'pry'

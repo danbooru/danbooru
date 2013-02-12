@@ -94,7 +94,6 @@ GEM
     net-sftp (2.0.5)
       net-ssh (>= 2.0.9)
     net-ssh (2.6.3)
-    newrelic_rpm (3.5.5.38)
     nokogiri (1.5.6)
     ntlm-http (0.1.1)
     pg (0.12.2)
@@ -193,7 +192,6 @@ DEPENDENCIES
   mocha
   net-sftp
   net-ssh
-  newrelic_rpm
   nokogiri
   pg (= 0.12.2)
   pry
