@@ -205,6 +205,7 @@ Danbooru::Application.routes.draw do
   
   match "/favorite" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
   match "/favorite/index" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
+  match "/favorite/list_users.json", :controller => "legacy", :action => "unavailable"
   
   match "/forum" => redirect {|params, req| "/forum_topics?page=#{req.params[:page]}"}
   match "/forum/index" => redirect {|params, req| "/forum_topics?page=#{req.params[:page]}"}

@@ -19,6 +19,10 @@ class LegacyController < ApplicationController
   def tags
     @tags = Tag.search(params).limit(100)
   end
+  
+  def unavailable
+    render :text => "this resource is no longer available", :status => 410
+  end
 
 private
   def tag_query
