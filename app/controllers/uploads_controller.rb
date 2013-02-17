@@ -23,6 +23,9 @@ class UploadsController < ApplicationController
   end
 
   def create
+    render :nothing => true
+    return
+    
   	@upload = Upload.create(params[:upload].merge(:server => Socket.gethostname))
   	@upload.delay.process!
     respond_with(@upload)
