@@ -40,6 +40,12 @@ class Pool < ActiveRecord::Base
         q = q.where("creator_id = ?", params[:creator_id].to_i)
       end
       
+      if params[:sort] == "updated_at"
+        q = q.order("updated_at desc")
+      else
+        q = q.order("name")
+      end
+      
       q
     end
   end

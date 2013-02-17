@@ -4,6 +4,12 @@
       <%= search_field "name_matches", :label => "Name" %>
       <%= search_field "description_matches", :label => "Description" %>
       <%= search_field "creator_name", :label => "Creator" %>
+      
+      <div class="input">
+        <label>Order</label>
+        <%= select "search", "sort", [["Name", "name"], ["Last updated", "updated_at"]] %>
+      </div>
+      
       <%= submit_tag "Search" %>
     <% end %>
   </div>
