@@ -11,7 +11,7 @@ class PostPresenter < Presenter
     
     path = options[:path_prefix] || "/posts"
     
-    html =  %{<article class="post-preview" id="post_#{post.id}" data-id="#{post.id}" data-tags="#{h(post.tag_string)}" data-uploader="#{h(post.uploader_name)}" data-rating="#{post.rating}" data-width="#{post.image_width}" data-height="#{post.image_height}" data-flags="#{flags.join(' ')}" data-parent-id="#{post.parent_id}" data-has-children="#{post.has_children?}">}
+    html =  %{<article class="post-preview" id="post_#{post.id}" data-id="#{post.id}" data-tags="#{h(post.tag_string)}" data-uploader="#{h(post.uploader_name)}" data-rating="#{post.rating}" data-width="#{post.image_width}" data-height="#{post.image_height}" data-flags="#{flags.join(' ')}" data-parent-id="#{post.parent_id}" data-has-children="#{post.has_children?}" data-score="#{post.score}">}
     html << %{<a href="#{path}/#{post.id}">}
     html << %{<img src="#{post.preview_file_url}" alt="#{h(post.tag_string)}">}
     html << %{</a>}
