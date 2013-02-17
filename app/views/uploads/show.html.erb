@@ -14,6 +14,11 @@
   <p>This upload is being processed. Please wait a few seconds.</p>
 <% else %>
   <p>An error occurred: <%= @upload.status %></p>
+  <ul>
+    <% @upload.backtrace.split(/\n/).each do |line| %>
+      <li><%= line %></li>
+    <% end %>
+  </ul>
 <% end %>
 
 <p>
@@ -31,6 +36,6 @@
 
 <% if @upload.is_pending? || @upload.is_processing? %>
   <% content_for(:html_header) do %>
-    <meta http-equiv="refresh" content="1">
+    <meta http-equiv="refresh" content="2">
   <% end %>
 <% end %>
