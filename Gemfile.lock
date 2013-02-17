@@ -94,6 +94,7 @@ GEM
     net-sftp (2.1.1)
       net-ssh (>= 2.6.5)
     net-ssh (2.6.5)
+    newrelic_rpm (3.5.5.38)
     nokogiri (1.5.6)
     ntlm-http (0.1.1)
     pg (0.12.2)
@@ -129,6 +130,7 @@ GEM
       json (~> 1.4)
     ref (1.0.2)
     rmagick (2.13.2)
+    ruby-prof (0.12.2)
     sass (3.2.5)
     sass-rails (3.2.6)
       railties (~> 3.2.0)
@@ -192,11 +194,13 @@ DEPENDENCIES
   mocha
   net-sftp
   net-ssh
+  newrelic_rpm
   nokogiri
   pg (= 0.12.2)
   pry
   rails (= 3.2.12)
   rmagick
+  ruby-prof
   sanitize!
   sass-rails
   shoulda

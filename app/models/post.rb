@@ -618,7 +618,7 @@ class Post < ActiveRecord::Base
   
   module CacheMethods
     def expire_cache(tag_name)
-      if Post.fast_count("") < 1000
+      if Post.fast_count("").to_i < 1000
         Cache.delete(Post.count_cache_key(""))
       end
       Cache.delete(Post.count_cache_key(tag_name))
