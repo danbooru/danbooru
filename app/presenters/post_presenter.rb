@@ -4,6 +4,10 @@ class PostPresenter < Presenter
       return ""
     end
     
+    unless Danbooru.config.can_user_see_post?(CurrentUser.user, post)
+      return ""
+    end
+    
     flags = []
     flags << "pending" if post.is_pending?
     flags << "flagged" if post.is_flagged?

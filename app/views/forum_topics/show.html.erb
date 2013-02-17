@@ -17,7 +17,7 @@
     
     <p><%= link_to "Reply &raquo;".html_safe, new_forum_post_path(:topic_id => @forum_topic.id) %></p>
     
-    <div style="display: none;" id="topic-response">
+    <div id="topic-response">
       <%= render "forum_posts/form", :forum_post => ForumPost.new(:topic_id => @forum_topic.id) %>
     </div>
     
