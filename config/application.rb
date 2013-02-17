@@ -1,7 +1,6 @@
 require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
-require 'english'
 
 if defined?(Bundler)
   # If you precompile assets before deploying to production, use this line
@@ -23,7 +22,7 @@ module Danbooru
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {:enable_starttls_auto => false}
     config.action_mailer.perform_deliveries = true
-    config.log_tags = ["PID:#{$PROCESS_ID}"]
+    config.log_tags = ["PID:#{Process.pid}"]
   end
 end
 
