@@ -10,7 +10,7 @@
       <p>Read the <%= link_to "full article", wiki_page_path(post_set.wiki_page.id) %>.</p>
     </div>
   <% else %>
-    <% if post_set.tag_string.any? %>
+    <% if post_set.tag_string.present? %>
       <p>There is currently no wiki page for the tag "<%= post_set.tag_string %>". You can <%= link_to "create one", new_wiki_page_path(:wiki_page => {:title => post_set.tag_string}) %>.</p>
     <% end %>
   <% end %>
