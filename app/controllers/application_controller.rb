@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  include Memorylogic
   protect_from_forgery
   helper :pagination
   before_filter :set_current_user

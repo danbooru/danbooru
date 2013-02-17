@@ -22,6 +22,7 @@ module Danbooru
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {:enable_starttls_auto => false}
     config.action_mailer.perform_deliveries = true
+    config.log_tags = ["PID:#{$PROCESS_ID}"]
   end
 end
 
