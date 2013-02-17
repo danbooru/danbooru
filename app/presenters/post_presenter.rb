@@ -56,7 +56,7 @@ class PostPresenter < Presenter
   end
   
   def image_html(template)
-    return template.content_tag("p", "This image was deleted.") if @post.is_deleted? && !CurrentUser.user.is_janitor?
+    return template.content_tag("p", "This image was deleted.") if @post.is_deleted? && !CurrentUser.user.is_privileged?
     return template.content_tag("p", "You need a privileged account to see this image.") if !Danbooru.config.can_user_see_post?(CurrentUser.user, @post)
     
     if @post.is_flash?
