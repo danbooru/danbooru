@@ -23,11 +23,14 @@ class Upload < ActiveRecord::Base
     # Because uploads are processed serially, there's no race condition here.
     def validate_md5_uniqueness
       md5_post = Post.find_by_md5(md5)
-      merge_tags(md5_post) if md5_post
+      if md5_post
+        merge_tags(md5_post) 
+        update_attribute(:status, "duplicate: #{post.id}")
+      end
     end
     
     def validate_file_exists
-      unless File.exists?(file_path)
+      unless file_path && File.exists?(file_path)
         raise "file does not exist"
       end
     end
@@ -106,7 +109,6 @@ class Upload < ActiveRecord::Base
     def merge_tags(post)
       post.tag_string += " #{tag_string}"
       post.save
-      update_attribute(:status, "duplicate: #{post.id}")
     end
   end
   
@@ -292,6 +294,14 @@ class Upload < ActiveRecord::Base
     
     def is_completed?
       status == "completed"
+    end
+    
+    def is_duplicate?
+      status =~ /duplicate/
+    end
+    
+    def duplicate_post_id
+      @duplicate_post_id ||= status[/duplicate: (\d+)/, 1]
     end
   end
   

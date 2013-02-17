@@ -12,6 +12,8 @@
   <p>This upload is waiting to be processed. Please wait a few seconds.</p>
 <% elsif @upload.is_processing? %>
   <p>This upload is being processed. Please wait a few seconds.</p>
+<% elsif @upload.is_duplicate? %>
+  <p>This upload is a duplicate: post #<%= link_to @upload.duplicate_post_id, post_path(@upload.duplicate_post_id) %></p>
 <% else %>
   <p>An error occurred: <%= @upload.status %></p>
   <ul>
