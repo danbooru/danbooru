@@ -9,7 +9,7 @@
   <meta name="current-user-id" content="<%= CurrentUser.id %>">
   <meta name="user-comment-threshold" content="<%= CurrentUser.comment_threshold %>">
   <% unless CurrentUser.user.blacklisted_tags.blank? %>
-    <meta name="blacklisted-tags" content="<%= CurrentUser.user.blacklisted_tags.gsub(/\n|\r/, ",") %>">
+    <meta name="blacklisted-tags" content="<%= CurrentUser.user.blacklisted_tags.gsub(/\r\n|\r|\n/, ",") %>">
   <% end %>
   <% if flash[:notice] =~ /error/ %>
     <meta name="errors" content="true">
