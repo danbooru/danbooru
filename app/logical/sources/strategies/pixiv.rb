@@ -25,18 +25,17 @@ module Sources
     protected
     
       def get_profile_from_page(page)
-        links = page.search("div.profile_area a.avatar_m").find_all do |node|
-          node["href"] =~ /member\.php/
+        profile_url = page.search("a.user-link").first
+        if profile_url
+          profile_url = profile_link["href"]
+        end
+        
+        artist_name = page.search("h1.user").first
+        if artist_name
+          artist_name = artist_name.inner_text
         end
 
-        if links.any?
-          profile_url = "http://www.pixiv.net" + links[0]["href"]
-          children = links[0].children
-          artist = children[0]["alt"]
-          return [artist, profile_url]
-        else
-          return []
-        end
+        return [artist_name, profile_url]
       end
       
       def get_image_url_from_page(page)
