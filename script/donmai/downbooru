@@ -1,0 +1,3 @@
+#!/bin/bash
+
+mv public/maintenance2.html public/maintenance.html

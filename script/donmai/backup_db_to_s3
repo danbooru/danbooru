@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'aws/s3'
+
+MAX_BACKUPS = 30
+
+home = File.expand_path("~")
+
+if !File.exists?("#{home}/.s3/access_key")
+  STDERR.puts "Access key not found"
+  exit 1
+end
+
+if !File.exists?("#{home}/.s3/secret_access_key")
+  STDERR.puts "Secret access key not found"
+  exit 1
+end
+
+access_key = open("#{home}/.s3/access_key").read.strip
+secret_access_key = open("#{home}/.s3/secret_access_key").read.strip
+
+AWS::S3::Base.establish_connection!(:access_key_id => access_key, :secret_access_key => secret_access_key)
+
+current_backups = AWS::S3::Bucket.find("danbooru-backup").objects.map {|x| x.key}.select {|x| x =~ /^db-/}.sort.reverse
+
+if current_backups.size > MAX_BACKUPS
+  current_backups[MAX_BACKUPS..-1].each do |old_backup|
+    AWS::S3::S3Object.delete(old_backup, "danbooru-backup")
+    puts "Deleted old backup #{old_backup}"
+  end
+end
+
+backup = Dir["/var/www/danbooru2/shared/backup/db-*.dump"].sort.last
+data = File.open(backup, "rb")
+filename = data.mtime.strftime("db-%Y-%m-%d-%H-%M")
+AWS::S3::S3Object.store(filename, data, "danbooru-backup", :access => :private)
+puts "Uploaded #{backup} as #{filename}"
