@@ -9,43 +9,63 @@ module Moderator
       end
       
       def artists
-        Queries::Artist.all(min_date, max_level)
+        ActiveRecord::Base.without_timeout do
+          Queries::Artist.all(min_date, max_level)
+        end
       end
       
       def comments
-        Queries::Comment.all(min_date, max_level)
+        ActiveRecord::Base.without_timeout do
+          Queries::Comment.all(min_date, max_level)
+        end
       end
 
       def mod_actions
-        Queries::ModAction.all
+        ActiveRecord::Base.without_timeout do
+          Queries::ModAction.all
+        end
       end
 
       def notes
-        Queries::Note.all(min_date, max_level)
+        ActiveRecord::Base.without_timeout do
+          Queries::Note.all(min_date, max_level)
+        end
       end
 
       def appeals
-        Queries::PostAppeal.all(min_date)
+        ActiveRecord::Base.without_timeout do
+          Queries::PostAppeal.all(min_date)
+        end
       end
 
       def flags
-        Queries::PostFlag.all(min_date)
+        ActiveRecord::Base.without_timeout do
+          Queries::PostFlag.all(min_date)
+        end
       end
 
       def tags
-        Queries::Tag.all(min_date, max_level)
+        ActiveRecord::Base.without_timeout do
+          Queries::Tag.all(min_date, max_level)
+        end
       end
 
       def posts
-        Queries::Upload.all(min_date, max_level)
+        ActiveRecord::Base.without_timeout do
+          Queries::Upload.all(min_date, max_level)
+        end
       end
       
       def user_feedbacks
-        Queries::UserFeedback.all
+        ActiveRecord::Base.without_timeout do
+          Queries::UserFeedback.all
+        end
       end
 
       def wiki_pages
-        Queries::WikiPage.all(min_date, max_level)
+        ActiveRecord::Base.without_timeout do
+          Queries::WikiPage.all(min_date, max_level)
+        end
       end
     end
   end
