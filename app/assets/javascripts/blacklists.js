@@ -4,8 +4,7 @@
   Danbooru.Blacklist.blacklists = [];
   
   Danbooru.Blacklist.parse_entries = function() {
-    var raw = $('<textarea/>').html(Danbooru.meta("blacklisted-tags") || "[]").val();
-    var entries = ($.parseJSON(raw)).replace(/(rating:[qes])\w+/, "$1").split(/,/);
+    var entries = j(Danbooru.meta("blacklisted-tags") || "[]").replace(/(rating:[qes])\w+/, "$1").split(/,/);
     $.each(entries, function(i, tags) {
       var blacklist = {
         "tags": tags, 
