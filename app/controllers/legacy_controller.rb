@@ -1,7 +1,15 @@
 class LegacyController < ApplicationController
+  before_filter :member_only, :only => [:create_post]
+
   def posts
     @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit])
     @posts = @post_set.posts
+  end
+  
+  def create_post
+    @upload = Upload.create(params[:post].merge(:server => Socket.gethostname))
+    @upload.delay.process!
+    render :nothing => true
   end
   
   def users

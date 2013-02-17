@@ -1,5 +1,6 @@
 class JanitorTrialsController < ApplicationController
   respond_to :html, :xml, :json
+  before_filter :moderator_only, :only => [:create, :promote, :demote]
   
   def new
     @janitor_trial = JanitorTrial.new
