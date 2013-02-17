@@ -219,7 +219,7 @@ class User < ActiveRecord::Base
         return {
           "Member" => Levels::MEMBER,
           "Privileged" => Levels::PRIVILEGED,
-          "Builder" => Levels::BUIDLER,
+          "Builder" => Levels::BUILDER,
           "Contributor" => Levels::CONTRIBUTOR,
           "Janitor" => Levels::JANITOR,
           "Moderator" => Levels::MODERATOR,

@@ -5,7 +5,7 @@
       
       <div class="input">
         <label for="search_category">Category</label>
-        <%= select "search", "category", Tag.canonical_tag_category_mapping.to_a %>
+        <%= select "search", "category", Danbooru.config.canonical_tag_category_mapping.to_a %>
       </div>
       
       <div class="input">

@@ -224,12 +224,13 @@ Danbooru::Application.routes.draw do
   match "/post/index.xml", :controller => "legacy", :action => "posts", :format => "xml"
   match "/post/index.json", :controller => "legacy", :action => "posts", :format => "json"
   match "/post/create.xml", :controller => "legacy", :action => "create_post"
-  match "/post/index" => redirect {|params, req| "/posts?tags=#{req.params[:tags].to_s.gsub(/ /, '%20')}&page=#{req.params[:page]}"}
-  match "/post" => redirect {|params, req| "/posts?tags=#{req.params[:tags].to_s.gsub(/ /, '%20')}&page=#{req.params[:page]}"}
+  match "/post/piclens", :controller => "legacy", :action => "unavailable"
+  match "/post/index" => redirect {|params, req| "/posts?tags=#{u(req.params[:tags])}&page=#{req.params[:page]}"}
+  match "/post" => redirect {|params, req| "/posts?tags=#{u(req.params[:tags])}&page=#{req.params[:page]}"}
   match "/post/upload" => redirect("/uploads/new")
   match "/post/moderate" => redirect("/moderator/post/queue")
-  match "/post/atom" => redirect {|params, req| "/posts.atom?tags=#{req.params[:tags].to_s.gsub(/ /, '%20')}"}
-  match "/post/atom.feed" => redirect {|params, req| "/posts.atom?tags=#{req.params[:tags].to_s.gsub(/ /, '%20')}"}
+  match "/post/atom" => redirect {|params, req| "/posts.atom?tags=#{u(req.params[:tags])}"}
+  match "/post/atom.feed" => redirect {|params, req| "/posts.atom?tags=#{u(req.params[:tags])}"}
   match "/post/popular_by_day" => redirect("/explore/posts/popular")
   match "/post/popular_by_week" => redirect("/explore/posts/popular")
   match "/post/popular_by_month" => redirect("/explore/posts/popular")
@@ -255,7 +256,7 @@ Danbooru::Application.routes.draw do
   
   match "/wiki" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
   match "/wiki/index" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
-  match "/wiki/show" => redirect {|params, req| "/wiki_pages?title=#{req.params[:title]}"}
+  match "/wiki/show" => redirect {|params, req| "/wiki_pages?title=#{u(req.params[:title])}"}
   match "/wiki/recent_changes" => redirect("/wiki_page_versions")
   match "/wiki/history/:title" => redirect("/wiki_page_versions?title=%{title}")
 
