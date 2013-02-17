@@ -24,19 +24,19 @@ class Pool < ActiveRecord::Base
       q = scoped
       return q if params.blank?
       
-      if params[:name_matches]
-        q = q.where("name like ? escape E'\\\\'", params[:name_matches])
+      if params[:name_matches].present?
+        q = q.where("name like ? escape E'\\\\'", params[:name_matches].to_escaped_for_sql_like)
       end
       
-      if params[:description_matches]
-        q = q.where("description like ? escape E'\\\\'", params[:description_matches])
+      if params[:description_matches].present?
+        q = q.where("description like ? escape E'\\\\'", params[:description_matches].to_escaped_for_sql_like)
       end
       
-      if params[:creator_name]
+      if params[:creator_name].present?
         q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].downcase)
       end
       
-      if params[:creator_id]
+      if params[:creator_id].present?
         q = q.where("creator_id = ?", params[:creator_id].to_i)
       end
       
