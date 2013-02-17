@@ -223,13 +223,13 @@ class Tag < ActiveRecord::Base
       }
       
       scan_query(query).each do |token|
-        if token =~ /\A(-uploader|uploader|-approver|approver|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|status|tagcount|gentags|arttags|chartags|copytags|parent):(.+)\Z/
+        if token =~ /\A(-user|user|-approver|approver|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|status|tagcount|gentags|arttags|chartags|copytags|parent):(.+)\Z/
           case $1
-          when "-uploader"
+          when "-user"
             q[:uploader_id_neg] ||= []
             q[:uploader_id_neg] << User.name_to_id($2)
             
-          when "uploader"
+          when "user"
             q[:uploader_id] = User.name_to_id($2)
             
           when "-approver"
