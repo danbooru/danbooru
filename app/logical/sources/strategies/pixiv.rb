@@ -27,7 +27,7 @@ module Sources
       def get_profile_from_page(page)
         profile_url = page.search("a.user-link").first
         if profile_url
-          profile_url = profile_link["href"]
+          profile_url = profile_url["href"]
         end
         
         artist_name = page.search("h1.user").first
