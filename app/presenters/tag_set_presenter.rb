@@ -105,7 +105,7 @@ private
       if categories[tag] == Tag.categories.artist
         html << %{<a class="wiki-link" href="/artists/show_or_new?name=#{u(tag)}">?</a> }
       else
-        html << %{<a class="wiki-link" href="/wiki_pages?title=#{u(tag)}">?</a> }
+        html << %{<a class="wiki-link" href="/wiki_pages/show_or_new?title=#{u(tag)}">?</a> }
       end
 
       if CurrentUser.user.is_privileged? && is_index?(template) && current_query.present?
