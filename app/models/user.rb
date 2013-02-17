@@ -1,4 +1,5 @@
 require 'digest/sha1'
+require 'scrypt'
 
 class User < ActiveRecord::Base
   class Error < Exception ; end
@@ -120,15 +121,15 @@ class User < ActiveRecord::Base
   
   module PasswordMethods
     def encrypt_password_on_create
-      self.password_hash = User.sha1(password)
+      self.password_hash = SCrypt::Password.create(salt_password(password))
     end
     
     def encrypt_password_on_update
       return if password.blank?
       return if old_password.blank?
       
-      if User.sha1(old_password) == password_hash
-        self.password_hash = User.sha1(password)
+      if SCrypt::Password.new(password_hash) == salt_password(old_password)
+        self.password_hash = SCrypt::Password.create(salt_password(password))
         return true
       else
         errors[:old_password] << "is incorrect"
@@ -147,7 +148,8 @@ class User < ActiveRecord::Base
       end
 
       pass << rand(100).to_s
-      update_column(:password_hash, User.sha1(pass))
+      update_column(:password_hash,
+                    SCrypt::Password.create(salt_password(pass)))
       pass    
     end
     
@@ -162,13 +164,20 @@ class User < ActiveRecord::Base
     
     module ClassMethods
       def authenticate(name, pass)
-        authenticate_hash(name, sha1(pass))
+        authenticate_pass(name, pass)
       end
 
-      def authenticate_hash(name, hash)
-        where(["lower(name) = ? AND password_hash = ?", name.downcase, hash]).first != nil
+      def authenticate_pass(name, pass)
+        user = where(["lower(name) = ?", name.downcase]).first
+        if not user.nil?
+          return (SCrypt::Password.new(user.password_hash) ==
+                  salt_password(pass))
+        else
+          # No such user!
+          return false
+        end
       end
-    
+
       def authenticate_cookie_hash(name, hash)
         user = User.find_by_name(name)
         return nil if user.nil?
@@ -178,6 +187,14 @@ class User < ActiveRecord::Base
       def sha1(pass)
         Digest::SHA1.hexdigest("#{Danbooru.config.password_salt}--#{pass}--")
       end
+
+      def salt_password(pass)
+        "#{Danbooru.config.password_salt}--#{pass}--"
+      end
+    end
+
+    def salt_password(pass)
+      "#{Danbooru.config.password_salt}--#{pass}--"
     end
 
     def cookie_password_hash
