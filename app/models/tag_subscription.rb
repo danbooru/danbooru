@@ -60,6 +60,10 @@ class TagSubscription < ActiveRecord::Base
   def self.visible_to(user)
     where("(is_public = TRUE OR creator_id = ? OR ?)", user.id, user.is_moderator?)
   end
+  
+  def self.owned_by(user)
+    where("creator_id = ?", user.id)
+  end
 
   def self.find_tags(subscription_name)
     if subscription_name =~ /^(.+?):(.+)$/
