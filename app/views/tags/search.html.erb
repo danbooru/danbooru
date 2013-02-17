@@ -5,7 +5,7 @@
       
       <div class="input">
         <label for="search_category">Category</label>
-        <%= select "search", "category", Danbooru.config.canonical_tag_category_mapping.to_a %>
+        <%= select "search", "category", [""] + Danbooru.config.canonical_tag_category_mapping.to_a %>
       </div>
       
       <div class="input">
@@ -13,7 +13,7 @@
         <%= select "search", "sort", %w(name count date) %>
       </div>
       
-      <%= f.button :submit, "Search" %>
+      <%= submit_tag "Search" %>
     <% end %>
   </div>
 </div>

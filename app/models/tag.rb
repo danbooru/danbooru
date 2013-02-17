@@ -393,7 +393,7 @@ class Tag < ActiveRecord::Base
         q = q.name_matches(params[:name_matches])
       end
       
-      if params[:category]
+      if params[:category].present?
         q = q.where("category = ?", params[:category])
       end
       

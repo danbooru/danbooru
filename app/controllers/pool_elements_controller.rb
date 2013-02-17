@@ -3,18 +3,24 @@ class PoolElementsController < ApplicationController
   before_filter :member_only
   
   def create
-    @pool = Pool.find_by_name(params[:pool_name]) || Pool.find_by_id(params[:pool_id]) || Pool.create(:name => params[:pool_name], :description => "This pool was automatically generated")
+    @pool = Pool.find_by_name(params[:pool_name]) || Pool.find_by_id(params[:pool_id])
+    
+    if @pool.nil?
+      
+      return
+    end
+    
     @post = Post.find(params[:post_id])
     @pool.add!(@post)
     append_pool_to_session(@pool)
-    respond_with(@pool, :location => pool_path(@pool))
+    respond_with(@pool, :location => post_path(@post))
   end
   
   def destroy
     @pool = Pool.find(params[:pool_id])
     @post = Post.find(params[:post_id])
     @pool.remove!(@post)
-    respond_with(@pool, :location => pool_path(@pool))
+    respond_with(@pool, :location => post_path(@post))
   end
   
 private
