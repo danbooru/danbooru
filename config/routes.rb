@@ -221,12 +221,12 @@ Danbooru::Application.routes.draw do
   
   match "/post/index.xml", :controller => "legacy", :action => "posts", :format => "xml"
   match "/post/index.json", :controller => "legacy", :action => "posts", :format => "json"
-  match "/post/index" => redirect {|params, req| "/posts?tags=#{req.params[:tags]}&page=#{req.params[:page]}"}
-  match "/post" => redirect {|params, req| "/posts?tags=#{req.params[:tags]}&page=#{req.params[:page]}"}
+  match "/post/index" => redirect {|params, req| "/posts?tags=#{req.params[:tags].to_s.gsub(/ /, '%20')}&page=#{req.params[:page]}"}
+  match "/post" => redirect {|params, req| "/posts?tags=#{req.params[:tags].to_s.gsub(/ /, '%20')}&page=#{req.params[:page]}"}
   match "/post/upload" => redirect("/uploads/new")
   match "/post/moderate" => redirect("/moderator/post/queue")
-  match "/post/atom" => redirect("/posts.atom")
-  match "/post/atom.feed" => redirect("/posts.atom")
+  match "/post/atom" => redirect {|params, req| "/posts.atom?tags=#{req.params[:tags].to_s.gsub(/ /, '%20')}"}
+  match "/post/atom.feed" => redirect {|params, req| "/posts.atom?tags=#{req.params[:tags].to_s.gsub(/ /, '%20')}"}
   match "/post/popular_by_day" => redirect("/explore/posts/popular")
   match "/post/popular_by_week" => redirect("/explore/posts/popular")
   match "/post/popular_by_month" => redirect("/explore/posts/popular")
