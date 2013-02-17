@@ -221,7 +221,7 @@ class Upload < ActiveRecord::Base
     
     def ssd_file_path
       prefix = Rails.env == "test" ? "test." : ""
-      "#{Rails.root}/public/ssd/data/preview/#{prefix}#{md5}.#{file_ext}"
+      "#{Danbooru.config.ssd_path}/public/data/preview/#{prefix}#{md5}.jpg"
     end
     
     def resized_file_path_for(width)
