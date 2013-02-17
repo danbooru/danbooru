@@ -6,7 +6,7 @@
       <h1>New Forum Post</h1>
     <% end %>
     
-    <%= render "form" %>
+    <%= render "form", :forum_post => @forum_post %>
     <%= error_messages_for "forum_post" %>
   </div>
 </div>

@@ -15,7 +15,7 @@
       <%= format_text(forum_post.body) %>
     </div>
     <menu> 
-      <li><%= link_to "Quote", new_forum_post_path(:post_id => forum_post.id) %></li>
+      <li><%= link_to "Quote", new_forum_post_path(:post_id => forum_post.id), :method => :get, :remote => true %></li>
       <% if CurrentUser.user.is_janitor? || CurrentUser.user.id == forum_post.creator_id %>
         <% if forum_post.is_deleted %>
           <li><%= link_to "Undelete", undelete_forum_post_path(forum_post.id), :method => :post, :remote => true %></li>

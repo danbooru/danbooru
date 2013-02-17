@@ -1,0 +1,6 @@
+$("#forum_post_body").val("<%= escape_javascript @forum_post.body %>");
+$("#new-topic-response").show();
+
+$('html, body').animate({
+    scrollTop: $("#forum_post_body").offset().top - 100
+}, 500);
