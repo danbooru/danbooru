@@ -25,7 +25,7 @@ class Upload < ActiveRecord::Base
       md5_post = Post.find_by_md5(md5)
       if md5_post
         merge_tags(md5_post) 
-        update_attribute(:status, "duplicate: #{post.id}")
+        raise "duplicate: #{post.id}"
       end
     end
     
