@@ -21,6 +21,7 @@ module Danbooru
     end
     
     image.destroy!
+    FileUtils.chmod(0664, write_path)
   end
   
   def flatten(image, width, height)
