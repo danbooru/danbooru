@@ -115,9 +115,11 @@ class UserPresenter
   
   def subscriptions(template)
     if user.subscriptions.any?
-      user.subscriptions.map do |subscription|
+      str = user.subscriptions.map do |subscription|
         template.link_to(subscription.name, template.posts_path(:tags => "sub:#{user.name}:#{subscription.name}"))
-      end.join(", ").html_safe
+      end.join(", ")
+      s += " [" + template.link_to("edit", template.tag_subscriptions_path) + "]"
+      str.html_safe
     else
       "None"
     end
