@@ -271,6 +271,7 @@ class Upload < ActiveRecord::Base
           out.write(file.read)
         end
       end
+      FileUtils.chmod(0664, file_path)
       self.content_type = file.content_type || file_ext_to_content_type(file.original_filename)
       self.file_ext = content_type_to_file_ext(content_type)
     end
