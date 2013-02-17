@@ -30,8 +30,6 @@ gem 'daemons'
 gem 'net-ssh'
 gem 'net-sftp'
 
-gem 'memorylogic'
-
 group :development do
   gem 'newrelic_rpm'
   gem 'ruby-prof'

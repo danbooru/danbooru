@@ -1,5 +1,4 @@
 class ApplicationController < ActionController::Base
-  include Memorylogic
   protect_from_forgery
   helper :pagination
   before_filter :set_current_user
@@ -7,11 +6,18 @@ class ApplicationController < ActionController::Base
   before_filter :initialize_cookies
   before_filter :set_title
   before_filter :set_started_at_session
+  after_filter :log_memory_usage
   layout "default"
   
   rescue_from User::PrivilegeError, :with => :access_denied
 
 protected
+  def log_memory_usage
+    Rails.logger.info "\e[1;31mMemory usage:\e[0m #{Memorylogic.memory_usage}"
+    Rails.logger.info" \e[1;31mParams:\e[0m #{params.inspect}"
+    Rails.logger.info "\e[1;31mUser: \e[0m#{CurrentUser.id}"
+  end
+
   def access_denied
     previous_url = params[:url] || request.fullpath
 
