@@ -44,7 +44,7 @@ class UserPresenter
       string = "base:10 + approved:(#{approved_count} / 10) - deleted:(#{deleted_count}) / 4 - pending:#{pending_count}"
     end
     
-    if limit > 20
+    if limit >= 20
       limit = 20
       string += " = capped:20"
     elsif limit < 0

@@ -16,7 +16,7 @@ class PoolsController < ApplicationController
   
   def index
     @search = Pool.active.search(params[:search])
-    @pools = @search.paginate(params[:page])
+    @pools = @search.paginate(params[:page]).order("name")
     respond_with(@pools)
   end
   
