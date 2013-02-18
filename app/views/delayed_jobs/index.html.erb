@@ -3,6 +3,7 @@
 <table class="striped" width="100%">
   <thead>
     <tr>
+      <th>ID</th>
       <% if CurrentUser.is_admin? %>
         <th>Handler</th>
       <% end %>
@@ -16,8 +17,9 @@
   <tbody>
     <% @delayed_jobs.each do |job| %>
       <tr>
+        <td><%= job.id %></td>
         <% if CurrentUser.is_admin? %>
-          <td><%= job.handler %></td>
+          <td><%= job.handler[:method_name] %></td>
         <% end %>
         <td><%= job.attempts %></td>
         <td><%= job.priority %></td>
