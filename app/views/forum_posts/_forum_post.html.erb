@@ -24,6 +24,7 @@
             <li><%= link_to "Delete", forum_post_path(forum_post.id), :confirm => "Do you really want to delete this post?", :method => :delete, :remote => true %></li>
           <% end %>
           <li><%= link_to "Edit", edit_forum_post_path(forum_post.id) %></li>
+          <li><%= link_to "Permalink", forum_post_path(forum_post) %></li>
         <% end %>
       </menu>
     </div>

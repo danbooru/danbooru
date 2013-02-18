@@ -1,4 +1,4 @@
-$("#forum_post_body").val(<%= raw @forum_post.body.to_json %>);
+$("#forum_post_body").val($("#forum_post_body").val() + <%= raw @forum_post.body.to_json %>);
 $("#topic-response").show();
 
 $('html, body').animate({
