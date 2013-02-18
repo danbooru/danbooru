@@ -13,9 +13,7 @@ class ApplicationController < ActionController::Base
 
 protected
   def log_memory_usage
-    Rails.logger.info "\e[1;31mMemory usage:\e[0m #{Memorylogic.memory_usage}"
-    Rails.logger.info" \e[1;31mParams:\e[0m #{params.inspect}"
-    Rails.logger.info "\e[1;31mUser: \e[0m#{CurrentUser.id}"
+    Rails.logger.info "\e[1;31mMemory usage:\e[0m #{Memorylogic.memory_usage}\t\e[1;31mParams:\e[0m #{params.inspect}\t\e[1;31mUser: \e[0m#{CurrentUser.id}"
   end
 
   def access_denied
