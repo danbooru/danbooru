@@ -141,7 +141,7 @@ class Post < ActiveRecord::Base
     end
     
     def is_image?
-      file_ext =~ /jpg|gif|png/
+      file_ext =~ /jpg|jpeg|gif|png/
     end
     
     def is_flash?
