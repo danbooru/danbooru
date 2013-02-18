@@ -1,5 +1,5 @@
 $("#forum_post_body").val(<%= raw @forum_post.body.to_json %>);
-$("#new-topic-response").show();
+$("#topic-response").show();
 
 $('html, body').animate({
     scrollTop: $("#forum_post_body").offset().top - 100

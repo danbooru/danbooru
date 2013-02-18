@@ -9,6 +9,8 @@ div.comments-for-post {
         width: 12em;
         float: left;
         overflow: hidden;
+        margin-right: 2em;
+        word-wrap: break-word; 
         
         h1 {
           display: block;
@@ -17,8 +19,7 @@ div.comments-for-post {
       }
       
       div.content {
-        margin-left: 2em;
-        width: 35em;
+        width: 40em;
         float: left;
         
         menu {

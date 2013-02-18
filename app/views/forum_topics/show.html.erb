@@ -15,9 +15,9 @@
 
     <%= render "forum_posts/listing", :forum_posts => @forum_posts %>
     
-    <p><%= link_to "Reply &raquo;".html_safe, new_forum_post_path(:topic_id => @forum_topic.id) %></p>
+    <p><%= link_to "Reply &raquo;".html_safe, new_forum_post_path(:topic_id => @forum_topic.id), :id => "new-response-link" %></p>
     
-    <div id="topic-response">
+    <div style="display: none;" id="topic-response">
       <%= render "forum_posts/form", :forum_post => ForumPost.new(:topic_id => @forum_topic.id) %>
     </div>
     
@@ -29,4 +29,21 @@
 
 <%= content_for(:page_title) do %>
   Forum - <%= @forum_topic.title %> - <%= Danbooru.config.app_name %>
+<% end %>
+
+<%= content_for(:html_header) do %>
+  <script>
+    $(function() {
+      $("#new-response-link").click(function(e) {
+        $("#forum_post_body").val("");
+        $("#topic-response").show();
+
+        $('html, body').animate({
+            scrollTop: $("#forum_post_body").offset().top - 100
+        }, 500);
+        
+        e.preventDefault();
+      })
+    });
+  </script>
 <% end %>

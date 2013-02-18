@@ -3,13 +3,14 @@ div.list-of-forum-posts {
     margin-bottom: 3em;
     
     div.author {
-      width: 20%;
+      width: 12em;
       float: left;
+      margin-right: 2em;
+      word-wrap: break-word;
     }
     
     div.content {
-      margin-left: 2em;
-      width: 30em;
+      width: 40em;
       float: left;
       
       menu {
