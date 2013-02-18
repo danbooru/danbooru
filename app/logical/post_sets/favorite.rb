@@ -4,7 +4,7 @@ module PostSets
     
     def initialize(user_id, page = 1)
       @user = ::User.find(user_id)
-      @favorites = ::Favorite.for_user(user.id).paginate(page)
+      @favorites = ::Favorite.for_user(user.id).paginate(page).order("favorites.id desc")
     end
     
     def tag_array
@@ -20,7 +20,7 @@ module PostSets
     end
     
     def posts
-      favorites.order("favorites.id desc").includes(:post).map(&:post)
+      favorites.includes(:post).map(&:post)
     end
     
     def presenter
