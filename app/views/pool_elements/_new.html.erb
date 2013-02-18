@@ -1,9 +1,22 @@
 <div id="c-pool-elements">
   <div id="a-new">
-    <%= form_tag(pool_element_path) do %>
+    <%= form_tag(pool_element_path, :class => "simple_form") do %>
       <%= hidden_field_tag "post_id", @post.id %>
-      <%= text_field_tag "pool_name", "", :size => 20 %>
-      <%= submit_tag "Select" %>
+
+      <div class="input">
+        <label>Pool</label>
+        <%= select_tag "pool_id", options_for_select([["", ""]] + Pool.options) %>
+      </div>
+      
+      <div class="input">
+        <label>Pool Name</label>
+        <%= text_field_tag "pool_name", "", :size => 20 %>
+        <span class="hint">Type the first two characters of a pool name</span>
+      </div>
+      
+      <div class="input">
+        <%= submit_tag "Select" %>
+      </div>
     <% end %>
 
     <% if recent_updated_pools.any? %>

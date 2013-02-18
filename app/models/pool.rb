@@ -25,6 +25,7 @@ class Pool < ActiveRecord::Base
       return q if params.blank?
       
       if params[:name_matches].present?
+        params[:name_matches] += "*" unless params[:name_matches] =~ /\*/
         q = q.where("name like ? escape E'\\\\'", params[:name_matches].to_escaped_for_sql_like)
       end
       
@@ -62,6 +63,10 @@ class Pool < ActiveRecord::Base
   
   def self.id_to_name(id)
     select_value_sql("SELECT name FROM pools WHERE id = ?", id)
+  end
+  
+  def self.options
+    select_all_sql("SELECT id, name FROM pools WHERE is_active = true AND is_deleted = false ORDER BY name LIMIT 100").map {|x| [x["name"], x["id"]]}
   end
   
   def self.create_anonymous

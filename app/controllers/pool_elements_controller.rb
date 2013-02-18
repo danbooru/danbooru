@@ -5,14 +5,12 @@ class PoolElementsController < ApplicationController
   def create
     @pool = Pool.find_by_name(params[:pool_name]) || Pool.find_by_id(params[:pool_id])
     
-    if @pool.nil?
-      
-      return
+    if @pool.present?
+      @post = Post.find(params[:post_id])
+      @pool.add!(@post)
+      append_pool_to_session(@pool)
     end
     
-    @post = Post.find(params[:post_id])
-    @pool.add!(@post)
-    append_pool_to_session(@pool)
     respond_with(@pool, :location => post_path(@post))
   end
   

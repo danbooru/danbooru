@@ -23,7 +23,7 @@
           }
         );
       },
-      minLength: 4,
+      minLength: 2,
     });
     
     $("#pool").click(function(e) {
