@@ -1,0 +1,8 @@
+<section id="related-box">
+  <h1>Related Searches</h1>
+  <ul id="related-list">
+    <% if @post_set.has_deleted? %>
+      <li><%= link_to "Deleted", posts_path(:tags => "#{params[:tags]} status:deleted") %></li>
+    <% end %>
+  </ul>
+</section>

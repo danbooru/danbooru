@@ -29,6 +29,10 @@ module PostSets
       end
     end
     
+    def has_deleted?
+      tag_string !~ /status/ && ::Post.tag_match("#{tag_string} status:deleted").exists?
+    end
+    
     def has_explicit?
       posts.any? {|x| x.rating == "e"}
     end
