@@ -14,7 +14,6 @@ class TagsController < ApplicationController
   end
   
   def search
-    # @search = Tag.search(params[:search])
   end
   
   def show

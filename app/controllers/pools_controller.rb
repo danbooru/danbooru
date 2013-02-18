@@ -21,7 +21,6 @@ class PoolsController < ApplicationController
   end
   
   def search
-    # @search = Pool.search(params[:search])
   end
   
   def show
