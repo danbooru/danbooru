@@ -58,11 +58,11 @@ class UserPresenter
   end
   
   def uploads(template)
-    template.link_to(user.post_upload_count, template.posts_path(:tags => "uploader:#{user.name}"))
+    template.link_to(user.post_upload_count, template.posts_path(:tags => "user:#{user.name}"))
   end
   
   def deleted_uploads(template)
-    template.link_to(Post.for_user(user.id).deleted.count, template.posts_path(:tags => "status:deleted uploader:#{user.name}"))
+    template.link_to(Post.for_user(user.id).deleted.count, template.posts_path(:tags => "status:deleted user:#{user.name}"))
   end
   
   def favorites(template)

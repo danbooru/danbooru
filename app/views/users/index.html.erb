@@ -35,7 +35,7 @@
                 &larr; <%= link_to user.inviter.name, user_path(user.inviter_id) %>
               <% end %>
             </td>
-            <td><%= link_to user.posts.count, posts_path(:tags => "uploader:#{user.name}") %></td>
+            <td><%= link_to user.posts.count, posts_path(:tags => "user:#{user.name}") %></td>
             <td><%= user.posts.deleted.count %></td>
             <% if user.posts.count > 100 %>
               <td><%= number_to_percentage(100 * user.posts.positive.count.to_f / user.posts.count, :precision => 0) %></td>

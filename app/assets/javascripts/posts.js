@@ -54,7 +54,7 @@
   
   Danbooru.Post.initialize_title_for = function(post) {
     var $post = $(post);
-    $post.attr("title", $post.data("tags") + " uploader:" + $post.data("uploader") + " rating:" + $post.data("rating") + " score:" + $post.data("score"));
+    $post.attr("title", $post.data("tags") + " user:" + $post.data("uploader") + " rating:" + $post.data("rating") + " score:" + $post.data("score"));
     
     var status = $post.data("flags");
     

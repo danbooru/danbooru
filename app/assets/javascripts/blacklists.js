@@ -85,7 +85,7 @@
     var $post = $(post);
     var tags = String($post.data("tags")).match(/\S+/g) || [];
     tags.push("rating:" + $post.data("rating"));
-    tags.push("uploader:" + $post.data("uploader"));
+    tags.push("user:" + $post.data("user"));
     
     if (blacklist.require.length > 0 || blacklist.exclude.length > 0) {
       if (blacklist.require.length === 0 || Danbooru.is_subset(tags, blacklist.require)) {
