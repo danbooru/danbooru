@@ -85,6 +85,7 @@
       $image.height($image.data("original-height"));
       Danbooru.Note.Box.scale_all();
       $("#image-resize-notice").hide();
+      Danbooru.Post.place_jlist_ads();
       e.preventDefault();
     });
   }

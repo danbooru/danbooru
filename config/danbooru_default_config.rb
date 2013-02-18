@@ -109,7 +109,7 @@ module Danbooru
 
     # Determines who can see ads.
     def can_see_ads?(user)
-      false
+      !user.is_privileged?
     end
     
     # This is required for Rails 2.0.
