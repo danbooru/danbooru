@@ -9,6 +9,7 @@
     <%= render "image" %>
     <%= render "post", :post => @post %>
     <%= render "sources/info", :source => @source %>
+    
     <%= form_for(@upload, :html => {:multipart => true, :class => "simple_form", :id => 'form'}) do |f| %>
       <div class="input">
         <%= f.label :file %>
