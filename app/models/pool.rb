@@ -17,7 +17,7 @@ class Pool < ActiveRecord::Base
 
   module SearchMethods
     def active
-      where("is_active = true and is_deleted = false")
+      where("is_deleted = false")
     end
     
     def search(params)

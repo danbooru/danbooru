@@ -521,7 +521,7 @@ class Post < ActiveRecord::Base
     def pools
       @pools ||= begin
         pool_ids = pool_string.scan(/\d+/)
-        Pool.where(["is_active = true and id in (?)", pool_ids])
+        Pool.where(["is_deleted = false and id in (?)", pool_ids])
       end
     end
     
