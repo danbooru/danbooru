@@ -55,6 +55,62 @@ article.post-preview.post-status-flagged img {
   margin-left: 0.2em;
 }
 
+body.mode-edit {
+  background: #3A3;
+}
+
+body.mode-add-fav {
+  background: #FFA;
+}
+
+body.mode-remove-fav {
+  background: #FFA;
+}
+
+body.mode-rating-q {
+  background: #AAA;
+}
+
+body.mode-rating-s {
+  background: #6F6;
+}
+
+body.mode-rating-e {
+  background: #F66;
+}
+
+body.mode-vote-down {
+  background: #FAA;
+}
+
+body.mode-vote-up {
+  background: #AFA;
+}
+
+body.mode-lock-rating {
+  background: #AA3;
+}
+
+body.mode-lock-note {
+  background: #3AA;
+}
+
+body.mode-approve {
+  background: #26A;
+}
+
+body.mode-add-to-pool {
+  background: #26A;
+}
+
+body.mode-apply-tag-script {
+  background: #A3A;
+}
+
+body.mode-edit-tag-script {
+  background: white;
+}
+
 div#c-posts {
   div.notice {
     font-size: 0.8em;

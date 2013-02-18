@@ -6,6 +6,7 @@
       this.initialize_selector();
       this.initialize_preview_link();
       this.initialize_edit_form();
+      Danbooru.PostModeMenu.change();
     }
   }
   
