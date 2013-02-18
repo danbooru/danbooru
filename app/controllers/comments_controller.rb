@@ -14,7 +14,7 @@ class CommentsController < ApplicationController
   end
   
   def search
-    @search = Comment.search(params[:search])
+    # @search = Comment.search(params[:search])
   end
   
   def update

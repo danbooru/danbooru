@@ -22,7 +22,7 @@ class ForumPostsController < ApplicationController
   end
   
   def search
-    @search = ForumPost.search(params[:search])
+    # @search = ForumPost.search(params[:search])
   end
 
   def show

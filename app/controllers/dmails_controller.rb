@@ -20,8 +20,7 @@ class DmailsController < ApplicationController
   end
   
   def search
-    @search = Dmail.search(params[:search])
-    respond_with(@dmails)
+    # @search = Dmail.search(params[:search])
   end
   
   def show

@@ -4,7 +4,7 @@ class NotesController < ApplicationController
   before_filter :pass_html_id, :only => [:create]
   
   def search
-    @search = Note.search(params[:search])
+    # @search = Note.search(params[:search])
   end
   
   def index

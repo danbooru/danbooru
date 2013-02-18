@@ -21,7 +21,7 @@ class UsersController < ApplicationController
   end
   
   def search
-    @search = User.search(params[:search])
+    # @search = User.search(params[:search])
   end
   
   def show

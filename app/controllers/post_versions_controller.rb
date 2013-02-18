@@ -8,6 +8,6 @@ class PostVersionsController < ApplicationController
   end
   
   def search
-    @search = PostVersion.search(params[:search])
+    # @search = PostVersion.search(params[:search])
   end
 end
