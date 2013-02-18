@@ -30,7 +30,7 @@ module PostSets
     end
     
     def has_deleted?
-      tag_string !~ /status/ && ::Post.tag_match("#{tag_string} status:deleted").exists?
+      CurrentUser.is_privileged? && tag_string !~ /status/ && ::Post.tag_match("#{tag_string} status:deleted").exists?
     end
     
     def has_explicit?
