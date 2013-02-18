@@ -2,7 +2,7 @@ $(function() {
   // Table striping
   $(".striped tbody tr:even").addClass("even");
   $(".striped tbody tr:odd").addClass("odd");
-
+  
   // More link
   if ($("#site-map-link").length > 0) {
     $("#site-map-link").click(function(e) {
