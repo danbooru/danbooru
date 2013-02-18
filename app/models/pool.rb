@@ -26,7 +26,7 @@ class Pool < ActiveRecord::Base
       
       if params[:name_matches].present?
         params[:name_matches] += "*" unless params[:name_matches] =~ /\*/
-        q = q.where("name like ? escape E'\\\\'", params[:name_matches].to_escaped_for_sql_like)
+        q = q.where("name ilike ? escape E'\\\\'", params[:name_matches].to_escaped_for_sql_like)
       end
       
       if params[:description_matches].present?
