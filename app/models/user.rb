@@ -465,11 +465,11 @@ class User < ActiveRecord::Base
       return q if params.blank?
       
       if params[:name]
-        q = q.name_matches(params[:name])
+        q = q.name_matches(params[:name].downcase)
       end
       
       if params[:name_matches]
-        q = q.name_matches(params[:name_matches])
+        q = q.name_matches(params[:name_matches].downcase)
       end
       
       if params[:min_level]
