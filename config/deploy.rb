@@ -79,6 +79,19 @@ namespace :deploy do
     end
   end
   
+  namespace :nginx do
+    desc "Stop nginx"
+    task :stop do
+      sudo "/etc/init.d/nginx stop"
+      sleep 15
+    end
+    
+    desc "Start nginx"
+    task :start do
+      sudo "/etc/init.d/nginx start"
+    end
+  end
+  
   desc "Precompiles assets"
   task :precompile_assets do
     run "cd #{current_path}; bundle exec rake assets:precompile"
@@ -126,7 +139,9 @@ after "deploy:create_symlink", "data:link_directories"
 # after "deploy:stop", "delayed_job:stop"
 # after "deploy:restart", "delayed_job:restart"
 before "deploy:update", "deploy:web:disable"
+# after "deploy:update", "deploy:nginx:stop"
 after "deploy:update", "deploy:restart"
 after "deploy:restart", "deploy:precompile_assets"
 after "deploy:restart", "deploy:web:enable"
+# after "deploy:update", "deploy:nginx:start"
 # after "delayed_job:stop", "delayed_job:kill"

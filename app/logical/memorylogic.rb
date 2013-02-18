@@ -5,8 +5,8 @@ module Memorylogic
 
   def self.memory_usage
     ps = Sys::ProcTable.ps(Process.pid)
-    if ps.respond_to?(:rss)
-      number_to_human_size(ps.rss.to_i * 1.kilobyte)
+    if ps.respond_to?(:pctmem)
+      ps.pctmem
     else
       0
     end
