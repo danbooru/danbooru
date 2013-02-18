@@ -1,30 +1,32 @@
-<article data-forum-post-id="<%= forum_post.id %>">
-  <div class="author">
-    <h4>
-      <%= link_to forum_post.creator.name, user_path(forum_post.creator_id) %>
-      <% if forum_post.is_deleted? %>
-        (deleted)
-      <% end %>
-    </h4>
-    <p>
-      <%= time_ago_in_words_tagged(forum_post.created_at) %>
-    </p>
-  </div>
-  <div class="content">
-    <div>
-      <%= format_text(forum_post.body) %>
-    </div>
-    <menu> 
-      <li><%= link_to "Quote", new_forum_post_path(:post_id => forum_post.id), :method => :get, :remote => true %></li>
-      <% if CurrentUser.user.is_janitor? || CurrentUser.user.id == forum_post.creator_id %>
-        <% if forum_post.is_deleted %>
-          <li><%= link_to "Undelete", undelete_forum_post_path(forum_post.id), :method => :post, :remote => true %></li>
-        <% else %>
-          <li><%= link_to "Delete", forum_post_path(forum_post.id), :confirm => "Do you really want to delete this post?", :method => :delete, :remote => true %></li>
+<% if CurrentUser.is_janitor? || !forum_post.is_deleted? %>
+  <article data-forum-post-id="<%= forum_post.id %>">
+    <div class="author">
+      <h4>
+        <%= link_to forum_post.creator.name, user_path(forum_post.creator_id) %>
+        <% if forum_post.is_deleted? %>
+          (deleted)
         <% end %>
-        <li><%= link_to "Edit", edit_forum_post_path(forum_post.id) %></li>
-      <% end %>
-    </menu>
-  </div>
-  <div class="clearfix"></div>
-</article>
+      </h4>
+      <p>
+        <%= time_ago_in_words_tagged(forum_post.created_at) %>
+      </p>
+    </div>
+    <div class="content">
+      <div>
+        <%= format_text(forum_post.body) %>
+      </div>
+      <menu> 
+        <li><%= link_to "Quote", new_forum_post_path(:post_id => forum_post.id), :method => :get, :remote => true %></li>
+        <% if CurrentUser.user.is_janitor? %>
+          <% if forum_post.is_deleted %>
+            <li><%= link_to "Undelete", undelete_forum_post_path(forum_post.id), :method => :post, :remote => true %></li>
+          <% else %>
+            <li><%= link_to "Delete", forum_post_path(forum_post.id), :confirm => "Do you really want to delete this post?", :method => :delete, :remote => true %></li>
+          <% end %>
+          <li><%= link_to "Edit", edit_forum_post_path(forum_post.id) %></li>
+        <% end %>
+      </menu>
+    </div>
+    <div class="clearfix"></div>
+  </article>
+<% end %>

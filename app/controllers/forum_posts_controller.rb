@@ -43,7 +43,7 @@ class ForumPostsController < ApplicationController
   
   def destroy
     @forum_post = ForumPost.find(params[:id])
-    check_privilege(@forum_post)
+    raise User::PrivilegeError unless CurrentUser.is_janitor?
     @forum_post.update_attribute(:is_deleted, true)
     respond_with(@forum_post)
   end
