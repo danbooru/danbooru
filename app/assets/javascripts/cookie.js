@@ -54,6 +54,7 @@
       // Setting location.pathname in Safari doesn't work, so manually extract the domain.
       var domain = location.href.match(/^(https?:\/\/[^\/]+)/)[0];
       location.href = domain + "/static/terms_of_service";
+      this.put("toc", "1", 365)
       return;
     }
 
