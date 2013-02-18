@@ -7,14 +7,23 @@
           <th>Creator</th>
           <th>Name</th>
           <th>Tag Query</th>
+          <% if CurrentUser.is_admin? %>
+            <th>Count</th>
+          <% end %>
+          <th></th>
         </tr>
       </thead>
       <tbody>
         <% @tag_subscriptions.each do |tag_subscription| %>
           <tr>
             <td><%= link_to tag_subscription.creator.name, user_path(tag_subscription.creator_id) %></td>
-            <td><%= link_to tag_subscription.name, edit_tag_subscription_path(tag_subscription) %></td>
-            <td><%= link_to tag_subscription.tag_query, posts_path(:tags => "sub:#{tag_subscription.creator.name}:#{tag_subscription.name}") %></td>
+            <td><%= tag_subscription.name %></td>
+            <td><%= tag_subscription.tag_query %></td>
+            <td><%= tag_subscription.post_id_array.size %></td>
+            <td>
+              <%= link_to "edit", edit_tag_subscription_path(tag_subscription) %>
+              | <%= link_to "posts", posts_path(:tags => "sub:#{tag_subscription.creator.name}:#{tag_subscription.name}") %>
+            </td>
           </tr>
         <% end %>
       </tbody>

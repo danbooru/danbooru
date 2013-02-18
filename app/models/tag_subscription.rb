@@ -4,7 +4,7 @@ class TagSubscription < ActiveRecord::Base
   before_validation :initialize_post_ids, :on => :create
   before_save :normalize_name
   before_save :limit_tag_count
-  attr_accessible :name, :tag_query, :post_ids, :is_visible_on_profile
+  attr_accessible :name, :tag_query, :post_ids, :is_public, :is_visible_on_profile
   validates_presence_of :name, :tag_query, :is_public, :creator_id
   
   def normalize_name
@@ -40,6 +40,10 @@ class TagSubscription < ActiveRecord::Base
   
   def editable_by?(user)
     user.is_moderator? || creator_id == user.id
+  end
+  
+  def post_id_array
+    post_ids.split(/,/)
   end
   
   def self.search(params)

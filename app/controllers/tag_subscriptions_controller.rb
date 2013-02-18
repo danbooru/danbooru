@@ -23,7 +23,7 @@ class TagSubscriptionsController < ApplicationController
   
   def create
     @tag_subscription = TagSubscription.create(params[:tag_subscription])
-    respond_with(@tag_subscription)
+    respond_with(@tag_subscription, :location => tag_subscriptions_path)
   end
   
   def update
