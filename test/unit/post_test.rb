@@ -759,7 +759,7 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(post1.id, relation.first.id)
     end
   
-    should "return posts for the <uploader> metatag" do
+    should "return posts for the <user> metatag" do
       second_user = FactoryGirl.create(:user)
       post1 = FactoryGirl.create(:post, :uploader => CurrentUser.user)
       
@@ -770,7 +770,7 @@ class PostTest < ActiveSupport::TestCase
         post3 = FactoryGirl.create(:post)
       end
 
-      relation = Post.tag_match("uploader:#{CurrentUser.user.name}")
+      relation = Post.tag_match("user:#{CurrentUser.user.name}")
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
     end

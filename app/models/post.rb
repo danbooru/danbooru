@@ -596,10 +596,6 @@ class Post < ActiveRecord::Base
     def fast_count(tags = "")
       tags = tags.to_s.strip
       
-      if tags.blank?
-        return Danbooru.config.blank_tag_search_fast_count || 1_000_000
-      end
-      
       count = get_count_from_cache(tags)
       if count.nil?
         if tags.blank? && Danbooru.config.blank_tag_search_fast_count
@@ -615,7 +611,7 @@ class Post < ActiveRecord::Base
         end
       end
 
-      count
+      count.to_i
     rescue SearchError
       0
     end
