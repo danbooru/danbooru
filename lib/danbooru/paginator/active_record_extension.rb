@@ -9,8 +9,6 @@ module Danbooru
         def paginate(page, options = {})
           @paginator_options = options
           
-          # connection.execute("SET statement_timeout=500")
-          
           if use_sequential_paginator?(page)
             paginate_sequential(page)
           else
