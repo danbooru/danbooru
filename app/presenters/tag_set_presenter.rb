@@ -7,6 +7,7 @@
 class TagSetPresenter < Presenter
   def initialize(tags)
     @tags = tags
+    puts @tags.inspect
   end
   
   def tag_list_html(template, options = {})

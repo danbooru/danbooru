@@ -191,8 +191,8 @@ module Danbooru
       @canonical_tag_category_mapping ||= {
         "General" => 0,
         "Artist" => 1,
-        "Copyright" => 2,
-        "Character" => 3
+        "Copyright" => 3,
+        "Character" => 4
       }
     end
     
