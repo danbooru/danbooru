@@ -29,7 +29,7 @@ class Tag < ActiveRecord::Base
     end
     
     def value_for(string)
-      Danbooru.config.tag_category_mapping[string.downcase] || 0
+      Danbooru.config.tag_category_mapping[string.to_s.downcase] || 0
     end
   end
   
@@ -95,26 +95,30 @@ class Tag < ActiveRecord::Base
 
       def find_or_create_by_name(name, options = {})
         name = normalize_name(name)
-        category = categories.general
+        category = nil
 
         if name =~ /\A(#{categories.regexp}):(.+)\Z/
-          category = categories.value_for($1)
+          category = $1
           name = $2
         end
 
         tag = find_by_name(name)
 
         if tag
-          if category != tag.category
-            tag.update_column(:category, category)
-            tag.update_category_cache
+          if category
+            category_id = categories.value_for(category)
+            
+            if category_id != tag.category
+              tag.update_column(:category, category_id)
+              tag.update_category_cache
+            end
           end
 
           tag
         else
           Tag.new.tap do |t|
             t.name = name
-            t.category = category
+            t.category = categories.value_for(category)
             t.save
           end
         end
