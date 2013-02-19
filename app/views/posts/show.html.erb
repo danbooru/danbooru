@@ -5,7 +5,7 @@
       
       <%= render_advertisement("vertical") %>
       
-      <% if @post.pools.any? %>
+      <% if @post.pools.active.any? %>
         <section id="pool-sidebar">
           <h1>Pools</h1>
           <%= @post.presenter.pool_html(self) %>
