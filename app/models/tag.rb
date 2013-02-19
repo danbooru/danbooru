@@ -1,4 +1,5 @@
 class Tag < ActiveRecord::Base
+  METATAGS = "-user|user|-approver|approver|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|status|tagcount|gentags|arttags|chartags|copytags|parent"
   attr_accessible :category
   after_save :update_category_cache
   has_one :wiki_page, :foreign_key => "name", :primary_key => "title"
@@ -223,7 +224,7 @@ class Tag < ActiveRecord::Base
       }
       
       scan_query(query).each do |token|
-        if token =~ /\A(-user|user|-approver|approver|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|status|tagcount|gentags|arttags|chartags|copytags|parent):(.+)\Z/
+        if token =~ /\A(#{METATAGS}):(.+)\Z/
           case $1
           when "-user"
             q[:uploader_id_neg] ||= []

@@ -570,7 +570,7 @@ class Post < ActiveRecord::Base
     def get_count_from_cache(tags)
       count = Cache.get(count_cache_key(tags))
       
-      if count.nil?
+      if count.nil? && tags.to_s !~ /^(?:#{Tag::METATAGS}):/
         count = select_value_sql("SELECT post_count FROM tags WHERE name = ?", tags.to_s)
       end
       
