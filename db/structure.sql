@@ -2463,7 +2463,7 @@ ALTER SEQUENCE tags_id_seq OWNED BY tags.id;
 
 CREATE TABLE uploads (
     id integer NOT NULL,
-    source character varying(255),
+    source text,
     file_path character varying(255),
     content_type character varying(255),
     rating character(1) NOT NULL,
@@ -6176,3 +6176,5 @@ INSERT INTO schema_migrations (version) VALUES ('20111101212358');
 INSERT INTO schema_migrations (version) VALUES ('20130106210658');
 
 INSERT INTO schema_migrations (version) VALUES ('20130114154400');
+
+INSERT INTO schema_migrations (version) VALUES ('20130219171111');
