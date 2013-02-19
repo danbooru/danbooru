@@ -11,7 +11,7 @@ class Comment < ActiveRecord::Base
     
   module SearchMethods
     def recent
-      order("comments.id desc").limit(6)
+      reorder("comments.id desc").limit(6)
     end
     
     def body_matches(query)
@@ -51,7 +51,7 @@ class Comment < ActiveRecord::Base
       end
       
       if params[:creator_name].present?
-        q = q.for_user_name(params[:creator_name])
+        q = q.for_creator_name(params[:creator_name])
       end
       
       if params[:creator_id].present?
