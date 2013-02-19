@@ -3,24 +3,30 @@
   
   Danbooru.Blacklist.blacklists = [];
   
+  Danbooru.Blacklist.parse_entry = function(string) {
+    var blacklist = {
+      "tags": string, 
+      "require": [], 
+      "exclude": [], 
+      "disabled": false, 
+      "hits": 0
+    };
+    var matches = string.match(/\S+/g) || [];
+    $.each(matches, function(i, tag) {
+      if (tag.charAt(0) === '-') {
+        blacklist.exclude.push(tag.slice(1));
+      } else {
+        blacklist.require.push(tag);
+      }
+    });
+    return blacklist;
+  }
+  
   Danbooru.Blacklist.parse_entries = function() {
     var entries = (Danbooru.meta("blacklisted-tags") || "[]").replace(/(rating:[qes])\w+/, "$1").split(/,/);
+    
     $.each(entries, function(i, tags) {
-      var blacklist = {
-        "tags": tags, 
-        "require": [], 
-        "exclude": [], 
-        "disabled": false, 
-        "hits": 0
-      };
-      var matches = tags.match(/\S+/g) || [];
-      $.each(matches, function(i, tag) {
-        if (tag.charAt(0) === '-') {
-          blacklist.exclude.push(tag.slice(1));
-        } else {
-          blacklist.require.push(tag);
-        }
-      })
+      var blacklist = Danbooru.Blacklist.parse_entry(tags);
       Danbooru.Blacklist.blacklists.push(blacklist);
     });
   }
@@ -29,7 +35,12 @@
     $(".blacklisted").each(function(i, element) {
       var $element = $(element);
       if ($element.hasClass("blacklisted-active")) {
-        $element.removeClass("blacklisted-active");
+        var tag = $(e.target).html();
+        var blacklist = Danbooru.Blacklist.parse_entry(tag);
+        
+        if (Danbooru.Blacklist.post_match($element, blacklist)) {
+          $element.removeClass("blacklisted-active");
+        }
       } else {
         $element.addClass("blacklisted-active");
       }
@@ -104,14 +115,12 @@
   }
   
   Danbooru.Blacklist.initialize_all = function() {
-    if ($("#c-posts").length || $("#c-favorites").length || $("#c-pools").length) {
-      Danbooru.Blacklist.parse_entries();
-      
-      if (Danbooru.Blacklist.apply() > 0) {
-        Danbooru.Blacklist.update_sidebar();
-      } else {
-        $("#blacklist-box").hide();
-      }
+    Danbooru.Blacklist.parse_entries();
+    
+    if (Danbooru.Blacklist.apply() > 0) {
+      Danbooru.Blacklist.update_sidebar();
+    } else {
+      $("#blacklist-box").hide();
     }
   }
 })();

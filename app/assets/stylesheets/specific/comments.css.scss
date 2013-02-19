@@ -88,5 +88,9 @@ div#c-comments {
         width: 55em;
       }
     }
+    
+    div.post.blacklisted {
+      display: none;
+    }
   }
 }

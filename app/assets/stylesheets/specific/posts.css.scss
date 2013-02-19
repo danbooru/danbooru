@@ -140,23 +140,6 @@ div#c-posts {
     margin-left: 1em;
   }
 
-  aside#sidebar > section#blacklist-box ul {
-    margin-left: 1em;
-    
-    li {
-      list-style-type: disc;
-    }
-    
-    a {
-      color: $link_color;
-      cursor: pointer;
-    }
-    
-    span {
-      color: #AAA;
-    }
-  }
-  
   h1 {
     font-size: $h3_size;
   }

@@ -45,6 +45,23 @@ div#page {
     margin-bottom: 1em;
   }
 
+  aside#sidebar > section#blacklist-box ul {
+    margin-left: 1em;
+    
+    li {
+      list-style-type: disc;
+    }
+    
+    a {
+      color: $link_color;
+      cursor: pointer;
+    }
+    
+    span {
+      color: #AAA;
+    }
+  }
+  
   section#content {
     width: 70%;
     float: left;
