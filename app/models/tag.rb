@@ -400,6 +400,10 @@ class Tag < ActiveRecord::Base
         q = q.where("category = ?", params[:category])
       end
       
+      if params[:hide_empty] == "yes"
+        q = q.where("post_count > 0")
+      end
+      
       case params[:sort].present?
       when "count"
         q = q.order("post_count desc")
