@@ -4,11 +4,6 @@
       <%= hidden_field_tag "post_id", @post.id %>
 
       <div class="input">
-        <label>Pool</label>
-        <%= select_tag "pool_id", options_for_select([["", ""]] + Pool.options) %>
-      </div>
-      
-      <div class="input">
         <label>Pool Name</label>
         <%= text_field_tag "pool_name", "", :size => 20 %>
         <span class="hint">Type the first two characters of a pool name</span>

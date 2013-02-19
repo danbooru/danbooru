@@ -402,10 +402,10 @@ class Tag < ActiveRecord::Base
       
       case params[:sort].present?
       when "count"
-        q = q.order("post_count")
+        q = q.order("post_count desc")
         
       when "date"
-        q = q.order("created_at")
+        q = q.order("created_at desc")
 
       else
         q = q.order("name")

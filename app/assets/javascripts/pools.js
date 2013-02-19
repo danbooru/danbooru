@@ -19,7 +19,7 @@
         $.getJSON(
           "/pools.json?search[name_matches]=" + req.term,
           function(data) {
-            resp(data.map(function(x) {return x.name;}));
+            resp(data.map(function(x) {return x.name.replace(/_/g, " ");}));
           }
         );
       },
