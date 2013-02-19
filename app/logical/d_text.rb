@@ -14,7 +14,6 @@ class DText
     str.gsub!(/&/, "&amp;")
     str.gsub!(/</, "&lt;")
     str.gsub!(/>/, "&gt;")
-    str.gsub!(/(?<!\[)\[spoilers?\](.+?)(?:\[\/?spoilers?\]|$)/m, '<span class="spoiler">\1</span>')
     str.gsub!(/\n/m, "<br>")
     str.gsub!(/\[b\](.+?)\[\/b\]/i, '<strong>\1</strong>')
     str.gsub!(/\[i\](.+?)\[\/i\]/i, '<em>\1</em>')
@@ -122,6 +121,8 @@ class DText
     unless options[:inline]
       str.gsub!(/\s*\[quote\]\s*/m, "\n\n[quote]\n\n")
       str.gsub!(/\s*\[\/quote\]\s*/m, "\n\n[/quote]\n\n")
+      str.gsub!(/\s*\[spoilers?\](?!\])\s*/m, "\n\n[spoiler]\n\n")
+      str.gsub!(/\s*\[\/spoilers?\]\s*/m, "\n\n[/spoiler]\n\n")
     end
     
     str.gsub!(/(?:\r?\n){3,}/, "\n\n")
@@ -160,6 +161,16 @@ class DText
           '</blockquote>'
         else
           ""
+        end
+
+      when /\[spoilers?\](?!\])/
+        stack << "div"
+        '<div class="spoiler">'
+        
+      when /\[\/spoilers?\]/
+        if stack.last == "div"
+          stack.pop
+          '</div>'
         end
 
       else
