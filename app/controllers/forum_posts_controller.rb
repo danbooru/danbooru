@@ -26,7 +26,11 @@ class ForumPostsController < ApplicationController
 
   def show
     @forum_post = ForumPost.find(params[:id])
-    respond_with(@forum_post)
+    if request.format == "text/html" && @forum_post.id == @forum_post.topic.original_post.id
+      redirect_to(forum_topic_path(@forum_post.topic))
+    else
+      respond_with(@forum_post)
+    end
   end
   
   def create
