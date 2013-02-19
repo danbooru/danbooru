@@ -99,6 +99,7 @@ class Upload < ActiveRecord::Base
         p.file_size = file_size
         p.uploader_id = uploader_id
         p.uploader_ip_addr = uploader_ip_addr
+        p.parent_id = parent_id
 
         unless uploader.is_contributor?
           p.is_pending = true

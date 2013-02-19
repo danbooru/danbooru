@@ -39,6 +39,11 @@
       </div>
 
       <div class="input">
+        <%= f.label :parent_id, "Parent ID" %>
+        <%= f.text_field :parent_id %>
+      </div>
+      
+      <div class="input">
         <div>
           <%= f.label :tag_string, "Tags" %>
           <%= f.text_area :tag_string, :size => "60x4" %>
