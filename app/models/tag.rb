@@ -105,7 +105,7 @@ class Tag < ActiveRecord::Base
         tag = find_by_name(name)
 
         if tag
-          if category > 0
+          if category != tag.category
             tag.update_column(:category, category)
             tag.update_category_cache
           end
