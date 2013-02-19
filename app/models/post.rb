@@ -102,7 +102,7 @@ class Post < ActiveRecord::Base
 
     def preview_file_url
       if is_flash?
-        return "/data/preview/150x150-flash.png"
+        return "/images/download-preview.png"
       end
       
       if Danbooru.config.ssd_path

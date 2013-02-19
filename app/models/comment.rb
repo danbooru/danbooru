@@ -8,7 +8,7 @@ class Comment < ActiveRecord::Base
   after_save :update_last_commented_at
   attr_accessible :body, :post_id
   attr_accessor :do_not_bump_post
-    
+  
   module SearchMethods
     def recent
       reorder("comments.id desc").limit(6)
