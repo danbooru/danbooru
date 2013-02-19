@@ -6,7 +6,7 @@ class ForumPost < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   before_validation :initialize_updater
   before_validation :initialize_is_deleted, :on => :create
-  after_save :update_topic_updated_at
+  after_create :update_topic_updated_at
   validates_presence_of :body, :creator_id
   validate :validate_topic_is_unlocked
   before_destroy :validate_topic_is_unlocked
