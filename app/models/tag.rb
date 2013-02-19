@@ -347,13 +347,15 @@ class Tag < ActiveRecord::Base
       base = Math.sqrt([post_count, 0].max)
       if base > 24
         24
+      elsif base < 1
+        1
       else
         base
       end
     end
     
     def should_update_related?
-      related_tags.blank? || related_tags_updated_at.blank? || related_tags_updated_at < related_cache_expiry.hours.ago
+      Delayed::Job.count < 200 && related_tags.blank? || related_tags_updated_at.blank? || related_tags_updated_at < related_cache_expiry.hours.ago
     end
     
     def related_tag_array

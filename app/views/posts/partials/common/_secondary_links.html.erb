@@ -6,7 +6,7 @@
     <li><%= link_to "Hot", posts_path(:tags => "order:rank") %></li>
     <% unless CurrentUser.is_anonymous? %>
       <li><%= link_to "Favorites", favorites_path %></li>
-      <li><%= link_to "Subscriptions", posts_tag_subscription_path(CurrentUser.id) %></li>
+      <li><%= link_to "Subscriptions", posts_path(:tags => "sub:#{CurrentUser.name}") %></li>
     <% end %>
     <li class="nonessential"><%= link_to "Changes", post_versions_path %></li>
     <% if CurrentUser.is_janitor? %>
