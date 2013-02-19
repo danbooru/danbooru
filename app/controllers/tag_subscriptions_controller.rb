@@ -30,7 +30,7 @@ class TagSubscriptionsController < ApplicationController
     @tag_subscription = TagSubscription.find(params[:id])
     check_privilege(@tag_subscription)
     @tag_subscription.update_attributes(params[:tag_subscription])
-    respond_with(@tag_subscription)
+    respond_with(@tag_subscription, :location => tag_subscriptions_path)
   end
   
   def destroy

@@ -11,6 +11,8 @@ module PostSetPresenters
     def related_tags
       if post_set.is_pattern_search?
         pattern_tags
+      elsif post_set.is_tag_subscription?
+        post_set.tag_subscription_tags
       elsif post_set.is_single_tag?
         related_tags_for_single
       elsif post_set.is_empty_tag?
@@ -48,7 +50,7 @@ module PostSetPresenters
         return tag.related_tag_array.map(&:first)
       end
     end
-
+    
     def tag_list_html(template)
       tag_set_presenter.tag_list_html(template)
     end

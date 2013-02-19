@@ -20,7 +20,7 @@ module PostSets
     def has_wiki?
       tag_array.any? && ::WikiPage.titled(tag_string).exists?
     end
-    
+
     def wiki_page
       if tag_array.any?
         ::WikiPage.titled(tag_string).first
@@ -73,6 +73,18 @@ module PostSets
     
     def current_page
       [page.to_i, 1].max
+    end
+    
+    def is_tag_subscription?
+      tag_subscription.present?
+    end
+    
+    def tag_subscription
+      @tag_subscription ||= tag_array.select {|x| x =~ /^sub:/}.map {|x| x.sub(/^sub:/, "")}.first
+    end
+    
+    def tag_subscription_tags
+      @tag_subscription_tags ||= TagSubscription.find_tags(tag_subscription)
     end
     
     def presenter
