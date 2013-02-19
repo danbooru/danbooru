@@ -10,6 +10,13 @@ class PostsController < ApplicationController
     respond_with(@posts) do |format|
       format.atom
     end
+  rescue ::ActiveRecord::StatementInvalid => e
+    if e.to_s =~ /statement timeout/
+      @error_message = "The database timed out running your query. Try a simpler query that returns fewer results."
+      render :action => "error"
+    else
+      raise
+    end
   end
   
   def show
