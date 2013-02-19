@@ -23,9 +23,12 @@
           <% else %>
             <li><%= link_to "Delete", forum_post_path(forum_post.id), :confirm => "Do you really want to delete this post?", :method => :delete, :remote => true %></li>
           <% end %>
-          <li><%= link_to "Edit", edit_forum_post_path(forum_post.id) %></li>
-          <li><%= link_to "Permalink", forum_post_path(forum_post) %></li>
         <% end %>
+        <% if forum_post.editable_by?(CurrentUser.user) %>
+          <li><%= link_to "Edit", edit_forum_post_path(forum_post.id) %></li>
+        <% end %>
+        <li><%= link_to "Parent", forum_topic_path(forum_post.topic) %></li>
+        <li><%= link_to "Permalink", forum_post_path(forum_post) %></li>
       </menu>
     </div>
     <div class="clearfix"></div>
