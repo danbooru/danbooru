@@ -3,9 +3,10 @@ class ModAction < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   
   def self.search(params = {})
-    q = scoped()
+    q = scoped
+    return q if params.blank?
     
-    if params[:creator_id]
+    if params[:creator_id].present?
       q = q.where("creator_id = ?", params[:creator_id].to_i)
     end
     
