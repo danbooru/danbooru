@@ -63,7 +63,7 @@ private
   end
 
   def index_by_post
-    @posts = Post.commented_before(Time.now).tag_match(params[:tags]).order("posts.id desc").paginate(params[:page], :limit => 5)
+    @posts = Post.commented_before(Time.now).tag_match(params[:tags]).paginate(params[:page], :limit => 5)
     respond_with(@posts) do |format|
       format.html {render :action => "index_by_post"}
     end
