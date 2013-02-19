@@ -55,11 +55,11 @@ class UserFeedback < ActiveRecord::Base
   end
   
   def user_name
-    if user
-      user.name
-    else
-      nil
-    end
+    User.id_to_name(user_id)
+  end
+  
+  def creator_name
+    User.id_to_name(creator_id)
   end
   
   def user_name=(name)

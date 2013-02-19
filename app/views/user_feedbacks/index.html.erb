@@ -14,10 +14,10 @@
       </thead>
       <tbody>
         <% @user_feedbacks.each do |feedback| %>
-          <tr>
+          <tr class="feedback-category-<%= feedback.category %>">
             <td><%= feedback.category %></td>
-            <td><%= link_to feedback.user_name, user_feedback_path(feedback.user_id) %></td>
-            <td><%= feedback.creator.name %></td>
+            <td><%= link_to feedback.user_name, user_path(feedback.user_id) %></td>
+            <td><%= link_to feedback.creator_name, user_path(feedback.creator_id) %></td>
             <td><%= time_ago_in_words_tagged(feedback.created_at) %> ago</td>
             <td><%= format_text(feedback.body) %></td>
           </tr>
