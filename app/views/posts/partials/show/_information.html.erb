@@ -5,7 +5,7 @@
     <li>Approver: <%= link_to(post.approver.name, user_path(post.approver_id)) %></li>
   <% end %>
   <li>
-    Size: <%= number_to_human_size(post.file_size) %> 
+    Size: <%= link_to number_to_human_size(post.file_size), post.file_url %> 
     <% if post.is_image? %>
       (<%= post.image_width %>x<%= post.image_height %>)
     <% end %>
