@@ -3,6 +3,14 @@
     <div class="dmail">
       <h1>Show Message</h1>
       <h2><%= @dmail.title %></h2>
+      
+      <ul style="margin-bottom: 1em;">
+        <li><strong>Sender</strong>: <%= @dmail.from_name %></li>
+        <li><strong>Recipient</strong>: <%= @dmail.to_name %></li>
+        <li><strong>Date</strong>: <%= compact_time(@dmail.created_at) %></li>
+      </ul>
+      
+      <h3>Body</h3>
       <%= format_text(@dmail.body) %>
 
       <p>
