@@ -9,5 +9,15 @@
   <%= nav_link_to("Notes", notes_path(:group_by => "post")) %>
   <%= nav_link_to("Wiki", wiki_pages_path(:title => "help:home")) %>
   <%= nav_link_to("Forum", forum_topics_path, :class => (CurrentUser.user.has_forum_been_updated? ? "forum-updated" : nil)) %>
+  <%= nav_link_to("Artists", artists_path(:order => "date")) %>
+  <%= nav_link_to("Tags", tags_path(:order => "date")) %>
+  <% if CurrentUser.is_moderator? %>
+    <%= nav_link_to("Aliases", tag_aliases_path) %>
+    <%= nav_link_to("Implications", tag_implications_path) %>
+  <% end %>
+  <%= nav_link_to("Pools", pools_path) %>
+  <% if CurrentUser.is_janitor? %>
+    <%= nav_link_to("Dashboard", moderator_dashboard_path) %>
+  <% end %>
   <%= nav_link_to("More &raquo;".html_safe, site_map_path, :id => "site-map-link") %>
 </menu>
