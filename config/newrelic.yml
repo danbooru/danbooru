@@ -216,8 +216,8 @@ test:
 # incurring any user-visible performance degradation.
 production:
   <<: *default_settings
-  monitor_mode: false
-  developer_mode: true
+  monitor_mode: true
+  developer_mode: false
 
 # Many applications have a staging environment which behaves
 # identically to production.  Support for that environment is provided
