@@ -3,7 +3,9 @@ module Maintenance
     class LoginReminderMailer < ActionMailer::Base
       def notice(user)
         @user = user
-        mail(:to => user.email, :subject => "#{Danbooru.config.app_name} login reminder", :from => Danbooru.config.contact_email)
+        if user.email.present?
+          mail(:to => user.email, :subject => "#{Danbooru.config.app_name} login reminder", :from => Danbooru.config.contact_email)
+        end
       end
     end
   end

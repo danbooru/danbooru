@@ -37,6 +37,9 @@ class PostsController < ApplicationController
       format.js
     end
   end
+  
+  def error
+  end
 
 private
   def search_error(exception)

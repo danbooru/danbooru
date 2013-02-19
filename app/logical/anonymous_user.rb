@@ -112,6 +112,10 @@ class AnonymousUser
     []
   end
   
+  def email
+    ""
+  end
+  
   def last_forum_read_at
     Time.now
   end
