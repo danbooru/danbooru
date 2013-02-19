@@ -464,19 +464,19 @@ class User < ActiveRecord::Base
       q = scoped
       return q if params.blank?
       
-      if params[:name]
+      if params[:name].present?
         q = q.name_matches(params[:name].downcase)
       end
       
-      if params[:name_matches]
+      if params[:name_matches].present?
         q = q.name_matches(params[:name_matches].downcase)
       end
       
-      if params[:min_level]
+      if params[:min_level].present?
         q = q.where("level >= ?", params[:min_level].to_i)
       end
       
-      if params[:id]
+      if params[:id].present?
         q = q.where("id = ?", params[:id].to_i)
       end
       

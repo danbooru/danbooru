@@ -325,15 +325,15 @@ class Upload < ActiveRecord::Base
       q = scoped
       return q if params.blank?
       
-      if params[:uploader_id]
+      if params[:uploader_id].present?
         q = q.uploaded_by(params[:uploader_id].to_i)
       end
       
-      if params[:uploader_name]
+      if params[:uploader_name].present?
         q = q.where("uploader_id = (select _.id from users _ where lower(_.name) = ?)", params[:uploader_name].downcase)
       end
       
-      if params[:source]
+      if params[:source].present?
         q = q.where("source = ?", params[:source])
       end
       

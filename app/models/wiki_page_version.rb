@@ -11,11 +11,11 @@ class WikiPageVersion < ActiveRecord::Base
       q = scoped
       return q if params.blank?
       
-      if params[:updater_id]
+      if params[:updater_id].present?
         q = q.for_user(params[:updater_id].to_i)
       end
       
-      if params[:wiki_page_id]
+      if params[:wiki_page_id].present?
         q = q.where("wiki_page_id = ?", params[:wiki_page_id].to_i)
       end
       

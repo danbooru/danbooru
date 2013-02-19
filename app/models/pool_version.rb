@@ -15,15 +15,15 @@ class PoolVersion < ActiveRecord::Base
       q = scoped
       return q if params.blank?
       
-      if params[:updater_id]
+      if params[:updater_id].present?
         q = q.for_user(params[:updater_id].to_i)
       end
       
-      if params[:updater_name]
+      if params[:updater_name].present?
         q = q.where("updater_id = (select _.id from users _ where lower(_.name) = ?)", params[:updater_name].downcase)
       end
       
-      if params[:pool_id]
+      if params[:pool_id].present?
         q = q.where("pool_id = ?", params[:pool_id].to_i)
       end
       

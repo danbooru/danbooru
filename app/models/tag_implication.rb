@@ -76,15 +76,15 @@ class TagImplication < ActiveRecord::Base
       q = scoped
       return q if params.blank?
 
-      if params[:id]
+      if params[:id].present?
         q = q.where("id = ?", params[:id].to_i)
       end
       
-      if params[:name_matches]
+      if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
       end
       
-      if params[:antecedent_name]
+      if params[:antecedent_name].present?
         q = q.where("antecedent_name = ?", params[:antecedent_name])
       end
 

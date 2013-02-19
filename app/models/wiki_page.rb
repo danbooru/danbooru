@@ -28,19 +28,19 @@ class WikiPage < ActiveRecord::Base
       q = scoped
       return q if params.blank?
 
-      if params[:title]
+      if params[:title].present?
         q = q.where("title LIKE ? ESCAPE E'\\\\'", params[:title].downcase.tr(" ", "_").to_escaped_for_sql_like)
       end
 
-      if params[:creator_id]
+      if params[:creator_id].present?
         q = q.where("creator_id = ?", params[:creator_id])
       end
       
-      if params[:body_matches]
+      if params[:body_matches].present?
         q = q.body_matches(params[:body_matches])
       end
       
-      if params[:creator_name]
+      if params[:creator_name].present?
         q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].downcase)
       end
       

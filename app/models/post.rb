@@ -925,15 +925,15 @@ class Post < ActiveRecord::Base
       q = scoped
       return q if params.blank?
       
-      if params[:before_id]
+      if params[:before_id].present?
         q = q.before_id(params[:before_id].to_i)
       end
       
-      if params[:after_id]
+      if params[:after_id].present?
         q = q.after_id(params[:after_id].to_i)
       end
       
-      if params[:tag_match]
+      if params[:tag_match].present?
         q = q.tag_match(params[:tag_match])
       end
       

@@ -16,15 +16,15 @@ class PostVersion < ActiveRecord::Base
       q = scoped
       return q if params.blank?
       
-      if params[:updater_name]
+      if params[:updater_name].present?
         q = q.updater_name(params[:updater_name])
       end
       
-      if params[:updater_id]
+      if params[:updater_id].present?
         q = q.where("updater_id = ?", params[:updater_id].to_i)
       end
       
-      if params[:post_id]
+      if params[:post_id].present?
         q = q.where("post_id = ?", params[:post_id].to_i)
       end
       

@@ -22,15 +22,15 @@ class PostAppeal < ActiveRecord::Base
       q = scoped
       return q if params.blank?
       
-      if params[:creator_id]
+      if params[:creator_id].present?
         q = q.for_user(params[:creator_id].to_i)
       end
       
-      if params[:creator_name]
+      if params[:creator_name].present?
         q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].downcase)
       end
       
-      if params[:post_id]
+      if params[:post_id].present?
         q = q.where("post_id = ?", params[:post_id].to_i)
       end
       

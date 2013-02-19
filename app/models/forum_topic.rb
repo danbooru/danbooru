@@ -25,11 +25,11 @@ class ForumTopic < ActiveRecord::Base
       q = scoped
       return q if params.blank?
       
-      if params[:title_matches]
+      if params[:title_matches].present?
         q = q.title_matches(params[:title_matches])
       end
       
-      if params[:title]
+      if params[:title].present?
         q = q.where("title = ?", params[:title])
       end
       

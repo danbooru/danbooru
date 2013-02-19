@@ -1,7 +1,7 @@
 <div id="c-forum-topics">
   <div id="a-search">
     <h1>Search Forum</h1>
-    <%= form_tag(forum_topics_path, :method => :get, :class => "simple_form") do %>
+    <%= form_tag(forum_posts_path, :method => :get, :class => "simple_form") do %>
       <%= search_field "topic_title_matches", :label => "Title" %>
       <%= search_field "body_matches", :label => "Body" %>
       <%= search_field "creator_name", :label => "Author" %>

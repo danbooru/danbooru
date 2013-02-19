@@ -28,19 +28,19 @@ class UserFeedback < ActiveRecord::Base
       q = scoped
       return q if params.blank?
       
-      if params[:user_id]
+      if params[:user_id].present?
         q = q.for_user(params[:user_id].to_i)
       end
       
-      if params[:user_name]
+      if params[:user_name].present?
         q = q.where("user_id = (select _.id from users _ where lower(_.name) = ?)", params[:user_name].downcase)
       end
       
-      if params[:creator_id]
+      if params[:creator_id].present?
          q = q.where("creator_id = ?", params[:creator_id].to_i)
       end
 
-      if params[:creator_name]
+      if params[:creator_name].present?
         q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].downcase)
       end
       

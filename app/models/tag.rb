@@ -391,7 +391,7 @@ class Tag < ActiveRecord::Base
       q = scoped
       return q if params.blank?
       
-      if params[:name_matches]
+      if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
       end
       
@@ -399,7 +399,7 @@ class Tag < ActiveRecord::Base
         q = q.where("category = ?", params[:category])
       end
       
-      case params[:sort]
+      case params[:sort].present?
       when "count"
         q = q.order("post_count")
         

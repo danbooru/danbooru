@@ -117,27 +117,27 @@ class Dmail < ActiveRecord::Base
       q = scoped
       return q if params.blank?
       
-      if params[:message_matches]
+      if params[:message_matches].present?
         q = q.search_message(params[:message_matches])
       end
       
-      if params[:owner_id]
+      if params[:owner_id].present?
         q = q.for(params[:owner_id].to_i)
       end
       
-      if params[:to_name]
+      if params[:to_name].present?
         q = q.to_name_matches(params[:to_name])
       end
       
-      if params[:to_id]
+      if params[:to_id].present?
         q = q.where("to_id = ?", params[:to_id].to_i)
       end
       
-      if params[:from_name]
+      if params[:from_name].present?
         q = q.from_name_matches(params[:from_name])
       end
       
-      if params[:from_id]
+      if params[:from_id].present?
         q = q.where("from_id = ?", params[:from_id].to_i)
       end
       

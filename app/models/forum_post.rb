@@ -25,30 +25,30 @@ class ForumPost < ActiveRecord::Base
     end
     
     def active
-      where("is_deleted = false")
+      where("forum_posts.is_deleted = false")
     end
     
     def search(params)
       q = scoped
       return q if params.blank?
       
-      if params[:creator_id]
+      if params[:creator_id].present?
         q = q.where("creator_id = ?", params[:creator_id].to_i)
       end
       
-      if params[:topic_id]
+      if params[:topic_id].present?
         q = q.where("topic_id = ?", params[:topic_id].to_i)
       end
       
-      if params[:topic_title_matches]
+      if params[:topic_title_matches].present?
         q = q.joins(:topic).where("forum_topics.text_index @@ plainto_tsquery(?)", params[:topic_title_matches])
       end
       
-      if params[:body_matches]
+      if params[:body_matches].present?
         q = q.body_matches(params[:body_matches])
       end
       
-      if params[:creator_name]
+      if params[:creator_name].present?
         q = q.creator_name(params[:creator_name])
       end
       
