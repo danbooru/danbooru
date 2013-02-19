@@ -138,6 +138,14 @@ class TagImplication < ActiveRecord::Base
     status == "active"
   end
   
+  def antecedent_tag
+    Tag.find_by_name(antecedent_name)
+  end
+  
+  def consequent_tag
+    Tag.find_by_name(consequent_name)
+  end
+  
   def reload(options = {})
     super
     clear_parent_cache
