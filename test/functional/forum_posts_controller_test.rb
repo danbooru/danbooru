@@ -76,7 +76,8 @@ class ForumPostsControllerTest < ActionController::TestCase
     
     context "destroy action" do
       should "destroy the posts" do
-        post :destroy, {:id => @forum_post.id}, {:user_id => @user.id}
+        CurrentUser.user = @mod
+        post :destroy, {:id => @forum_post.id}, {:user_id => @mod.id}
         assert_redirected_to(forum_post_path(@forum_post))
         @forum_post.reload
         assert_equal(true, @forum_post.is_deleted?)
