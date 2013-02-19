@@ -65,7 +65,7 @@ module Sources
       
       def normalized_url
         @normalized_url ||= begin
-          if url =~ /\/(\d+)(_m|_p\d+)?\.(jpg|jpeg|png|gif)/i
+          if url =~ /\/(\d+)(?:_big)?(?:_m|_p\d+)?\.(?:jpg|jpeg|png|gif)/i
             "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
           elsif url =~ /mode=big/
             url.sub(/mode=big/, "mode=medium")
