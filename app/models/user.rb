@@ -5,6 +5,7 @@ class User < ActiveRecord::Base
   class PrivilegeError < Exception ; end
   
   module Levels
+    BLOCKED = 10
     MEMBER = 20
     PRIVILEGED = 30
     BUILDER = 32
@@ -251,6 +252,9 @@ class User < ActiveRecord::Base
     
     def level_string
       case level
+      when Levels::BLOCKED
+        "Banned"
+        
       when Levels::MEMBER
         "Member"
         

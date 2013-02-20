@@ -12,6 +12,11 @@
       <dt>Level</dt>
       <dd><%= @presenter.level %></dd>
       
+      <% if @user.is_banned? %>
+        <dt>Ban reason</dt>
+        <dd><%= @presenter.ban_reason %></dd>
+      <% end %>
+      
       <dt>Upload Limit</dt>
       <dd><%= @presenter.upload_limit %></dd>
 
