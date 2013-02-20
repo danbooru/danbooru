@@ -602,7 +602,7 @@ class Post < ActiveRecord::Base
         count = get_count_from_cache(tags)
       
         if count.nil?
-          fast_count_search(tags)
+          count = fast_count_search(tags)
         end
       end
 
@@ -623,6 +623,8 @@ class Post < ActiveRecord::Base
       if count > Danbooru.config.posts_per_page * 10
         set_count_in_cache(tags, count)
       end
+      
+      count
     end
   end
   

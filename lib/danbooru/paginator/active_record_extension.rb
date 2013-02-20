@@ -70,7 +70,6 @@ module Danbooru
 
         # taken from kaminari (https://github.com/amatsuda/kaminari)
         def total_count
-          raise if @paginator_options[:count] == 0
           return @paginator_options[:count] if @paginator_options[:count]
           
           c = except(:offset, :limit, :order)
