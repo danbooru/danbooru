@@ -30,10 +30,10 @@ gem 'daemons'
 gem 'net-ssh'
 gem 'net-sftp'
 gem 'newrelic_rpm'
+gem 'term-ansicolor'
 
 group :development do
   gem 'ruby-prof'
   gem 'pry'
   gem 'awesome_print'
-  gem 'term-ansicolor'
 end
