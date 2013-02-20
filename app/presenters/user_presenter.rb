@@ -70,7 +70,7 @@ class UserPresenter
   end
   
   def comments(template)
-    template.link_to(Comment.for_user(user.id).count, template.comments_path(:search => {:creator_id => user.id}))
+    template.link_to(Comment.for_creator(user.id).count, template.comments_path(:search => {:creator_id => user.id}))
   end
   
   def post_versions(template)
