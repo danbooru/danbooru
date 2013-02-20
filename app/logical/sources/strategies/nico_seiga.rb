@@ -60,7 +60,7 @@ module Sources
         @agent ||= begin
           mech = Mechanize.new
 
-          mech.get("http://seiga.nicovideo.jp/login/redirect?next_url=") do |page|
+          mech.get("https://secure.nicovideo.jp/secure/login_form") do |page|
             page.form_with do |form|
               form["mail"] = Danbooru.config.nico_seiga_login
               form["password"] = Danbooru.config.nico_seiga_password

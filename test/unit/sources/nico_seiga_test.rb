@@ -6,6 +6,7 @@ module Sources
   class NicoSeigaTest < ActiveSupport::TestCase
     context "The source site for nico seiga" do
       setup do
+        # Sources::Strategies::NicoSeiga.new("http://lohas.nicoseiga.jp/priv/2853566?e=1361296671&h=794b3686b02edfd64c22ed2f99a4c55650371854")
         @site = Sources::Site.new("http://seiga.nicovideo.jp/seiga/im1464351?track=ranking")
         @site.get
       end

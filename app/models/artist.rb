@@ -230,7 +230,7 @@ class Artist < ActiveRecord::Base
       q = active
       return q if params.blank?
 
-      case params[:name].present?
+      case params[:name]
       when /^http/
         q = q.url_matches(params[:name])
 
