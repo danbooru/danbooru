@@ -8,6 +8,7 @@ class User < ActiveRecord::Base
     BLOCKED = 10
     MEMBER = 20
     PRIVILEGED = 30
+    PLATINUM = 31
     BUILDER = 32
     CONTRIBUTOR = 33
     JANITOR = 35
@@ -262,7 +263,10 @@ class User < ActiveRecord::Base
         "Builder"
         
       when Levels::PRIVILEGED
-        "Privileged"
+        "Gold"
+        
+      when Levels::PLATINUM
+        "Platinum"
         
       when Levels::CONTRIBUTOR
         "Contributor"
@@ -292,6 +296,10 @@ class User < ActiveRecord::Base
     
     def is_privileged?
       level >= Levels::PRIVILEGED
+    end
+    
+    def is_platinum?
+      level >= Levels::PLATINUM
     end
     
     def is_contributor?
@@ -402,6 +410,26 @@ class User < ActiveRecord::Base
       end
       
       limit
+    end
+    
+    def tag_query_limit
+      if is_privileged?
+        Danbooru.config.tag_query_limit
+      elsif is_platinum?
+        Danbooru.config.tag_query_limit * 2
+      else
+        2
+      end
+    end
+    
+    def favorite_limit
+      if is_privileged?
+        5_000
+      elsif is_platinum?
+        nil
+      else
+        1_000
+      end
     end
   end
   

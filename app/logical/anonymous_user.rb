@@ -133,7 +133,19 @@ class AnonymousUser
     :anonymous
   end
   
-  %w(member banned privileged contributor janitor moderator admin).each do |name|
+  def tag_query_limit
+    2
+  end
+  
+  def favorite_limit
+    0
+  end
+  
+  def favorite_count
+    0
+  end
+  
+  %w(member banned privileged platinum contributor janitor moderator admin).each do |name|
     define_method("is_#{name}?") do
       false
     end

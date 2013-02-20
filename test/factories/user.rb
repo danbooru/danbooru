@@ -8,6 +8,7 @@ FactoryGirl.define do
     base_upload_limit 10
     level 20
     last_logged_in_at {Time.now}
+    favorite_count 0
     
     factory(:banned_user) do
       is_banned true
