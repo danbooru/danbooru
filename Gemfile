@@ -30,7 +30,7 @@ gem 'daemons'
 gem 'net-ssh'
 gem 'net-sftp'
 gem 'newrelic_rpm'
-gem 'term-ansicolor'
+gem 'term-ansicolor', :require => "term/ansicolor"
 
 group :development do
   gem 'ruby-prof'
