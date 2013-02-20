@@ -53,7 +53,7 @@ class TagSetPresenter < Presenter
     end
     
     if general_tags.any?
-      html << '<h2>Tags</h2>'
+      html << '<h1>Tags</h1>'
       html << "<ul>"
       general_tags.keys.each do |tag|
         html << build_list_item(tag, template, options)
