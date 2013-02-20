@@ -7,7 +7,7 @@
     <% end %>
     
     <% @posts.each do |post| %>
-      <div class="post post-preview" data-tags="<%= post.tag_string %>" data-uploader="<%= post.uploader_name %>" data-rating="<%= post.rating %>" data-flags="<%= post.status %>" data-score="<%= post.score %>">
+      <div class="post post-preview" data-tags="<%= post.tag_string %>" data-uploader="<%= post.uploader_name %>" data-rating="<%= post.rating %>" data-flags="<%= post.status %>" data-score="<%= post.score %>" data-parent-id="<%= post.parent_id %>" data-has-children="<%= post.has_children? %>">
         <div class="preview">
           <%= link_to(image_tag(post.preview_file_url), post_path(post)) %>
         </div>

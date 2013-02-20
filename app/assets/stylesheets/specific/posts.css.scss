@@ -14,27 +14,27 @@ article.post-preview {
   }
 }
 
-article.post-preview.blacklisted-active {
+.post-preview.blacklisted-active {
   display: none;
 }
 
-article.post-preview {
+.post-preview {
   border: 2px solid transparent;
 }
 
-article.post-preview.post-status-has-parent img {
+.post-preview.post-status-has-parent img {
   border: 2px solid #CC0;
 }
 
-article.post-preview.post-status-has-children img {
+.post-preview.post-status-has-children img {
   border: 2px solid #0F0;
 }
 
-article.post-preview.post-status-pending img {
+.post-preview.post-status-pending img {
   border: 2px solid #00F;
 }
 
-article.post-preview.post-status-flagged img {
+.post-preview.post-status-flagged img {
   border: 2px solid #F00;
 }
 
