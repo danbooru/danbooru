@@ -6,8 +6,8 @@ class Pool < ActiveRecord::Base
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
   has_many :versions, :class_name => "PoolVersion", :dependent => :destroy, :order => "pool_versions.id ASC"
-  before_validation :normalize_name
   before_validation :normalize_post_ids
+  before_validation :normalize_name
   before_validation :initialize_is_active, :on => :create
   before_validation :initialize_creator, :on => :create
   after_save :create_version
@@ -58,7 +58,7 @@ class Pool < ActiveRecord::Base
     if name =~ /^\d+$/
       name.to_i
     else
-      select_value_sql("SELECT id FROM pools WHERE name = ?", name.downcase).to_i
+      select_value_sql("SELECT id FROM pools WHERE lower(name) = ?", name.downcase.tr(" ", "_")).to_i
     end
   end
   
@@ -80,7 +80,7 @@ class Pool < ActiveRecord::Base
   end
   
   def self.normalize_name(name)
-    name.downcase.gsub(/\s+/, "_")
+    name.gsub(/\s+/, "_")
   end
   
   def self.normalize_post_ids(post_ids)
@@ -91,7 +91,7 @@ class Pool < ActiveRecord::Base
     if name =~ /^\d+$/
       where("id = ?", name.to_i).first
     elsif name
-      where("name = ?", normalize_name(name)).first
+      where("lower(name) = ?", normalize_name(name).downcase).first
     else
       nil
     end
@@ -106,12 +106,12 @@ class Pool < ActiveRecord::Base
     self.creator_id = CurrentUser.id
   end
   
-  def pretty_name
-    name.tr("_", " ")
+  def normalize_name
+    self.name = Pool.normalize_name(name)
   end
   
-  def normalize_name
-    self.name = self.class.normalize_name(name)
+  def pretty_name
+    name.tr("_", " ")
   end
   
   def normalize_post_ids
