@@ -12,7 +12,7 @@ class Artist < ActiveRecord::Base
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :tag_alias, :foreign_key => "antecedent_name", :primary_key => "name"
   accepts_nested_attributes_for :wiki_page
-  attr_accessible :body, :name, :url_string, :other_names, :group_name, :wiki_page_attributes, :notes, :is_active, :as => [:member, :privileged, :platinum, :contributor, :janitor, :moderator, :default, :admin]
+  attr_accessible :body, :name, :url_string, :other_names, :other_names_comma, :group_name, :wiki_page_attributes, :notes, :is_active, :as => [:member, :privileged, :platinum, :contributor, :janitor, :moderator, :default, :admin]
   attr_accessible :is_banned, :as => :admin
   
   module UrlMethods
@@ -64,9 +64,18 @@ class Artist < ActiveRecord::Base
 
     def normalize_name
       self.name = Artist.normalize_name(name)
-      if other_names
-        self.other_names = other_names.split(/,/).map {|x| Artist.normalize_name(x)}.join(" ")
-      end
+    end
+    
+    def other_names_array
+      other_names.split(/ /)
+    end
+    
+    def other_names_comma
+      other_names_array.join(", ")
+    end
+    
+    def other_names_comma=(string)
+      self.other_names = string.split(/,/).map {|x| Artist.normalize_name(x)}.join(" ")
     end
   end
   

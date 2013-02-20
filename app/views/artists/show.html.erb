@@ -9,57 +9,29 @@
     <% end %>
 
     <div>
-      <table width="100%">
-        <tbody>
-          <tr>
-            <th width="15%">Status</th>
-            <td width="85%"><%= @artist.status %></td>
-          </tr>
-          <% if @artist.has_tag_alias? %>
-            <tr>
-              <th>Tag Alias</th>
-              <td>
-                <%= @artist.tag_alias_name %>
-              </td>
-            </tr>
-          <% end %>
-          <% if !@artist.other_names.blank? %>
-            <tr>
-              <th>Other Names</th>
-              <td>
-                <%= link_to_artists(@artist.other_names.split(/,/)) %>
-              </td>
-            </tr>
-          <% end %>
-          <% if !@artist.group_name.blank? %>
-            <tr>
-              <th>Group</th>
-              <td>
-                <%= link_to_artist(@artist.group_name) %>
-              </td>
-            </tr>
-          <% end %>
-          <% if @artist.members.any? %>
-            <tr>
-              <th>Members</th>
-              <td>
-                <%= link_to_artists(@artist.members.map(&:name)) %>
-              </td>
-            </tr>
-          <% end %>
-          <% @artist.urls.each do |url| %>
-            <tr>
-              <th>URLs</th>
-              <td>
-                <%= link_to h(url.to_s), h(url.to_s) %>
-                <% if CurrentUser.user.is_moderator? %>
-                  (<%= link_to("mass edit", edit_moderator_tag_path(:antecedent => "-#{@artist.name} source:#{ArtistUrl.normalize_for_search(url.to_s)}", :consequent => @artist.name)) %>)
-                <% end %>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
+      <ul>
+        <li><strong>Status</strong> <%= @artist.status %></li>
+        <% if @artist.has_tag_alias? %>
+          <li><strong>Tag Alias</strong> <%= @artist.tag_alias_name %></li>
+        <% end %>
+        <% if @artist.other_names.present? %>
+          <li><strong>Other Names</strong> <%= link_to_artists(@artist.other_names.split(/ /)) %></li>
+        <% end %>
+        <% if @artist.group_name.present? %>
+          <li><strong>Group</strong> <%= link_to_artist(@artist.group_name) %></li>
+        <% end %>
+        <% if @artist.members.any? %>
+          <li><strong>Members</strong> <%= link_to_artists(@artist.members.map(&:name)) %></li>
+        <% end %>
+        <% @artist.urls.each do |url| %>
+          <li>
+            URL: <%= link_to h(url.to_s), h(url.to_s) %>
+            <% if CurrentUser.user.is_moderator? %>
+              (<%= link_to("mass edit", edit_moderator_tag_path(:antecedent => "-#{@artist.name} source:#{ArtistUrl.normalize_for_search(url.to_s)}", :consequent => @artist.name)) %>)
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
     </div>
 
     <div class="recent-posts">

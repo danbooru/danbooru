@@ -1,6 +1,6 @@
 <%= simple_form_for(@artist) do |f| %>
   <%= f.input :name %>
-  <%= f.input :other_names, :hint => "Separate with commas", :as => :text %>
+  <%= f.input :other_names_comma, :hint => "Separate with commas", :as => :text, :label => "Other names" %>
   <%= f.input :group_name %>
   <%= f.input :url_string, :label => "URLs", :as => :text, :input_html => {:size => "50x5"} %>
   <%= f.input :is_active %>
