@@ -6,7 +6,10 @@ class UploadsController < ApplicationController
     @upload = Upload.new(:rating => "q")
     if params[:url]
       @post = Post.find_by_source(params[:url])
-      @source = Sources::Site.new(params[:url])
+      begin
+        @source = Sources::Site.new(params[:url])
+      rescue Exception
+      end
     end
     respond_with(@upload)
   end

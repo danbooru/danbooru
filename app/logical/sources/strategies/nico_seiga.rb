@@ -15,7 +15,7 @@ module Sources
       end
 
       def get
-        agent.get(URI.parse(url).request_uri) do |page|
+        agent.get(url) do |page|
           @artist_name, @profile_url = get_profile_from_page(page)
           @image_url = get_image_url_from_page(page)
           @tags = get_tags_from_page(page)
