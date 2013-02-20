@@ -9,7 +9,6 @@ class LegacyController < ApplicationController
   def create_post
     @upload = Upload.create(params[:post].merge(:server => Socket.gethostname))
     @upload.delay.process!
-    render :nothing => true
   end
   
   def users

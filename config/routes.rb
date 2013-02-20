@@ -223,7 +223,7 @@ Danbooru::Application.routes.draw do
   
   match "/post/index.xml", :controller => "legacy", :action => "posts", :format => "xml"
   match "/post/index.json", :controller => "legacy", :action => "posts", :format => "json"
-  match "/post/create.xml", :controller => "legacy", :action => "create_post"
+  match "/post/create.xml", :controller => "legacy", :action => "create_post", :format => "xml"
   match "/post/piclens", :controller => "legacy", :action => "unavailable"
   match "/post/index" => redirect {|params, req| "/posts?tags=#{CGI::escape(req.params[:tags].to_s)}&page=#{req.params[:page]}"}
   match "/post" => redirect {|params, req| "/posts?tags=#{CGI::escape(req.params[:tags].to_s)}&page=#{req.params[:page]}"}
