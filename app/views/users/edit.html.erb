@@ -12,6 +12,7 @@
         <%= f.input :time_zone %>
         <%= f.input :receive_email_notifications %>
         <%= f.input :comment_threshold, :hint => "Comments below this score will be hidden by default" %>
+        <%= f.input :always_resize_images %>
         <%= f.input :default_image_size, :hint => "Large is #{Danbooru.config.large_image_width} pixels wide, and original is whatever the original image is", :collection => %w(large original), :include_blank => false %>
         <%= f.input :favorite_tags, :hint => "A list of whitespace delimited tags that show up in your profile", :input_html => {:size => "40x5"} %>
         <%= f.input :blacklisted_tags, :hint => "A list of newline delimited tags that you never want to see", :input_html => {:size => "40x5"} %>

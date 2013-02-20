@@ -20,6 +20,10 @@
       this.initialize_post_image_resize_links();
       this.initialize_post_image_resize_to_window_link();
       this.place_jlist_ads();
+      
+      if (Danbooru.meta("always-resize-images") === "true") {
+        $("#image-resize-to-window-link").click();
+      }
     }
   }
   
