@@ -235,6 +235,8 @@ class User < ActiveRecord::Base
       
       if User.count == 0
         self.level = Levels::ADMIN
+      else
+        self.level = Levels::MEMBER
       end
     end
     

@@ -7,7 +7,15 @@ class LegacyController < ApplicationController
   end
   
   def create_post
-    @upload = Upload.create(params[:post].merge(:server => Socket.gethostname))
+    @upload = Upload.new
+    @upload.server = Socket.gethostname
+    @upload.file = params[:post][:file]
+    @upload.source = params[:post][:source]
+    @upload.tags = params[:post][:tag_string]
+    @upload.parent_id = params[:post][:parent_id]
+    @upload.rating = params[:post][:rating]
+    @upload.md5_confirmation = params[:md5] if params[:md5].present?
+    @upload.save
     @upload.delay.process!
   end
   
