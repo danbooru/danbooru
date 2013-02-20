@@ -159,6 +159,7 @@ GEM
     super_exception_notifier (3.0.13)
       actionmailer
       rake
+    term-ansicolor (1.0.7)
     therubyracer (0.11.3)
       libv8 (~> 3.11.8.12)
       ref
@@ -207,6 +208,7 @@ DEPENDENCIES
   simple_form
   simplecov
   super_exception_notifier
+  term-ansicolor
   therubyracer
   uglifier (>= 1.0.3)
   whenever

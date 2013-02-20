@@ -34,6 +34,7 @@ module PaginationHelper
       1.upto(records.total_pages) do |page|
         html << numbered_paginator_item(page, records.current_page)
       end
+      
     elsif records.current_page <= window + 2
       1.upto(records.current_page + window) do |page|
         html << numbered_paginator_item(page, records.current_page)

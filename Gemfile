@@ -35,4 +35,5 @@ group :development do
   gem 'ruby-prof'
   gem 'pry'
   gem 'awesome_print'
+  gem 'term-ansicolor'
 end
