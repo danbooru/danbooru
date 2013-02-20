@@ -122,6 +122,10 @@ div#c-posts {
     }
   }
   
+  aside#sidebar #tag-list h2 {
+    font-size: $h4_size;
+  }
+  
   aside#sidebar > section#pool-sidebar {
     span.ui-icon {
       color: #666;

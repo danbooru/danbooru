@@ -26,7 +26,7 @@ class TagSetPresenter < Presenter
     html = ""
     
     if copyright_tags.any?
-      html << '<h1>Copyrights</h1>'
+      html << '<h2>Copyrights</h2>'
       html << "<ul>"
       copyright_tags.keys.each do |tag|
         html << build_list_item(tag, template, options)
@@ -35,7 +35,7 @@ class TagSetPresenter < Presenter
     end
     
     if character_tags.any?
-      html << '<h1>Characters</h1>'
+      html << '<h2>Characters</h2>'
       html << "<ul>"
       character_tags.keys.each do |tag|
         html << build_list_item(tag, template, options)
@@ -44,7 +44,7 @@ class TagSetPresenter < Presenter
     end
     
     if artist_tags.any?
-      html << '<h1>Artist</h1>'
+      html << '<h2>Artist</h2>'
       html << "<ul>"
       artist_tags.keys.each do |tag|
         html << build_list_item(tag, template, options)
@@ -53,7 +53,7 @@ class TagSetPresenter < Presenter
     end
     
     if general_tags.any?
-      html << '<h1>Tags</h1>'
+      html << '<h2>Tags</h2>'
       html << "<ul>"
       general_tags.keys.each do |tag|
         html << build_list_item(tag, template, options)
