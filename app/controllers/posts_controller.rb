@@ -3,6 +3,7 @@ class PostsController < ApplicationController
   after_filter :save_recent_tags, :only => [:update]
   respond_to :html, :xml, :json
   rescue_from PostSets::SearchError, :with => :search_error
+  rescue_from Post::SearchError, :with => :search_error
   
   def index
     @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit])
