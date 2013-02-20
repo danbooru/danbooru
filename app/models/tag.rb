@@ -406,7 +406,7 @@ class Tag < ActiveRecord::Base
         q = q.where("category = ?", params[:category])
       end
       
-      if params[:hide_empty] == "yes"
+      if params[:hide_empty] != "no"
         q = q.where("post_count > 0")
       end
       
