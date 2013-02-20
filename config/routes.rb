@@ -202,6 +202,7 @@ Danbooru::Application.routes.draw do
   match "/comment" => redirect {|params, req| "/comments?page=#{req.params[:page]}"}
   match "/comment/index" => redirect {|params, req| "/comments?page=#{req.params[:page]}"}
   match "/comment/show/:id" => redirect("/comments/%{id}")
+  match "/comment/new" => redirect("/comments")
   
   match "/favorite" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
   match "/favorite/index" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
@@ -210,6 +211,8 @@ Danbooru::Application.routes.draw do
   match "/forum" => redirect {|params, req| "/forum_topics?page=#{req.params[:page]}"}
   match "/forum/index" => redirect {|params, req| "/forum_topics?page=#{req.params[:page]}"}
   match "/forum/show/:id" => redirect("/forum_posts/%{id}")
+  match "/forum/search" => redirect("/forum_posts/search")
+  match "/forum/edit/:id" => redirect("/forum_posts/%{id}/edit")
 
   match "/note" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
   match "/note/index" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
