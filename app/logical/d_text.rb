@@ -48,16 +48,16 @@ class DText
   
   def self.parse_aliased_wiki_links(str)
     str.gsub(/\[\[([^\|\]]+)\|([^\]]+)\]\]/m) do
-      text = CGI.unescapeHTML($2).tr("_", " ")
-      title = CGI.unescapeHTML($1)
+      text = CGI.unescapeHTML($2)
+      title = CGI.unescapeHTML($1).tr(" ", "_").downcase
       %{<a href="/wiki_pages/show_or_new?title=#{u(title)}">#{h(text)}</a>}
     end
   end
   
   def self.parse_wiki_links(str)
     str.gsub(/\[\[([^\]]+)\]\]/) do
-      title = CGI.unescapeHTML($1)
-      text = title.tr("_", " ")
+      text = CGI.unescapeHTML($1)
+      title = text.tr(" ", "_").downcase
       %{<a href="/wiki_pages/show_or_new?title=#{u(title)}">#{h(text)}</a>}
     end
   end
