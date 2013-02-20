@@ -595,10 +595,15 @@ class Post < ActiveRecord::Base
     
     def fast_count(tags = "")
       tags = tags.to_s.strip
-      count = get_count_from_cache(tags)
+
+      if tags.blank? && Danbooru.config.blank_tag_search_fast_count
+        count = Danbooru.config.blank_tag_search_fast_count
+      else
+        count = get_count_from_cache(tags)
       
-      if count.nil?
-        fast_count_search(tags)
+        if count.nil?
+          fast_count_search(tags)
+        end
       end
 
       count.to_i
@@ -607,12 +612,8 @@ class Post < ActiveRecord::Base
     end
     
     def fast_count_search(tags)
-      if tags.blank? && Danbooru.config.blank_tag_search_fast_count
-        count = Danbooru.config.blank_tag_search_fast_count
-      else
-        count = Post.with_timeout(500, Danbooru.config.blank_tag_search_fast_count || 1_000_000) do
-          Post.tag_match(tags).undeleted.count
-        end
+      count = Post.with_timeout(500, Danbooru.config.blank_tag_search_fast_count || 1_000_000) do
+        Post.tag_match(tags).undeleted.count
       end
       
       if count == 0
