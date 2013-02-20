@@ -66,7 +66,7 @@ class PostQueryBuilder
     end
 
     if tags[:exclude].any?
-      raise ::Post::SearchError.new("You cannot search for more than #{CurrentUser.user.tag_query_limit} tags at a time") if tags[:exclude].size > CurrentUse.userr.tag_query_limit
+      raise ::Post::SearchError.new("You cannot search for more than #{CurrentUser.user.tag_query_limit} tags at a time") if tags[:exclude].size > CurrentUser.user.tag_query_limit
       raise ::Post::SearchError.new("You cannot search for only excluded tags") unless has_constraints?
 
       tag_query_sql << "!(" + escape_string_for_tsquery(tags[:exclude]).join(" | ") + ")"
