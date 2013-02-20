@@ -8,7 +8,7 @@ module PostSets
     end
     
     def posts
-      ::Post.tag_match(@artist.name)
+      ::Post.tag_match(@artist.name).limit(10)
     rescue ::Post::SearchError
       ::Post.where("false")
     end
