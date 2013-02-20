@@ -79,6 +79,18 @@ namespace :deploy do
     end
   end
   
+  namespace :nginx do
+    desc "Shut down Nginx"
+    task :stop do
+      sudo "for i in `pgrep -f nginx` ; do kill -SIGTERM $i ; done"
+    end
+    
+    desc "Start Nginx"
+    task :stop do
+      sudo "/etc/init.d/nginx start"
+    end
+  end
+  
   desc "Precompiles assets"
   task :precompile_assets do
     run "cd #{current_path}; bundle exec rake assets:precompile"
