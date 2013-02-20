@@ -16,7 +16,7 @@
           <% @wiki_pages.each do |wiki_page| %>
             <tr>
               <td class="tag-category-<%= wiki_page.category_name %>"><%= link_to wiki_page.pretty_title, wiki_page_path(wiki_page, :noredirect => 1) %></td>
-              <td><%= wiki_page.updated_at.strftime("%m/%d/%Y %I:%M") %> by <%= h link_to wiki_page.creator.name, user_path(wiki_page.creator) %></td>
+              <td><%= wiki_page.updated_at.strftime("%Y-%m-%d %I:%M") %> by <%= h link_to wiki_page.creator.name, user_path(wiki_page.creator) %></td>
             </tr>
           <% end %>          
         </tbody>

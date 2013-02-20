@@ -23,7 +23,7 @@
                 <% end %>
               </td>
               <td>
-                <%= link_to wiki_page_version.updated_at.strftime("%m/%d/%Y %I:%M"), wiki_page_version_path(wiki_page_version) %>
+                <%= link_to wiki_page_version.updated_at.strftime("%Y-%m-%d %I:%M"), wiki_page_version_path(wiki_page_version) %>
                 <% if wiki_page_version.updater %>
                   by
                   <%= link_to wiki_page_version.updater_name, user_path(wiki_page_version.updater) %>

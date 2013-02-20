@@ -1,8 +1,8 @@
 <% cache("news-updates", :expires_in => 1.hour) do %>
-  <div id="news-updates" data-updated-at="<%= NewsUpdate.recent.first.try(:created_at).try(:strftime, "%m/%d/%Y") %>">
+  <div id="news-updates" data-updated-at="<%= NewsUpdate.recent.first.try(:created_at).try(:strftime, "%Y-%m-%d") %>">
     <ul>
       <% NewsUpdate.recent.each do |news_update| %>
-        <li><%= news_update.created_at.strftime("%m/%d") %>: <%= news_update.message.html_safe %></li>
+        <li><%= news_update.created_at.strftime("%b %d") %>: <%= news_update.message.html_safe %></li>
       <% end %>
     </ul>
 

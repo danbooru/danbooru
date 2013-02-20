@@ -67,15 +67,7 @@ module ApplicationHelper
   end
   
   def compact_time(time)
-    if time > Time.now.end_of_day
-      time_tag(time.strftime("%b %e, %Y"), time)
-    elsif time > Time.now.beginning_of_day 
-      time_tag(time.strftime("%l:%M %P"), time)
-    elsif time > Time.now.beginning_of_year
-      time_tag(time.strftime("%b %e"), time)
-    else
-      time_tag(time.strftime("%b %e, %Y"), time)
-    end
+    time_tag(time.strftime("%Y-%m-%d %H:%M"), time)
   end
   
   def mod_link_to_user(user, positive_or_negative)
