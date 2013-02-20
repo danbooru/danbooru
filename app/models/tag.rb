@@ -339,7 +339,7 @@ class Tag < ActiveRecord::Base
   module RelationMethods
     def update_related
       return unless should_update_related?
-      CurrentUser.scoped(User.find(1)) do
+      CurrentUser.scoped(User.find(1), "127.0.0.1") do
         self.related_tags = RelatedTagCalculator.calculate_from_sample_to_array(name).join(" ")
       end
       self.related_tags_updated_at = Time.now
