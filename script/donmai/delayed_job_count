@@ -1,0 +1,3 @@
+#!/bin/bash
+
+psql -hdbserver -c 'select count(*) from delayed_jobs' -Pt -A danbooru2 > /tmp/delayed_job_count
