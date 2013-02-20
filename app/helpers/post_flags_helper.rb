@@ -10,7 +10,7 @@ module PostFlagsHelper
         html << ' - ' + link_to(flag.creator.name, user_path(flag.creator))
       end
 
-      html << ' ' + time_ago_in_words_tagged(flag.created_at) + ' ago</li>'
+      html << ' ' + time_ago_in_words_tagged(flag.created_at) + '</li>'
     end
     
     html << '</ul>'

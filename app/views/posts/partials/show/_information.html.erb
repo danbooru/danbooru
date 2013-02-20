@@ -1,6 +1,6 @@
 <ul>
   <li>Uploader: <%= link_to_unless(post.uploader.nil?, post.uploader_name, user_path(post.uploader)) %></li>
-  <li>Date: <time datetime="<%= post.created_at.iso8601 %>" title="<%= post.created_at.to_date %>"><%= raw time_ago_in_words_tagged(post.created_at).gsub(/about/, "") %> ago</time></li>
+  <li>Date: <time datetime="<%= post.created_at.iso8601 %>" title="<%= post.created_at.to_date %>"><%= raw time_ago_in_words_tagged(post.created_at).gsub(/about/, "") %></time></li>
   <% if post.approver %>
     <li>Approver: <%= link_to(post.approver.name, user_path(post.approver_id)) %></li>
   <% end %>

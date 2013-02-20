@@ -21,7 +21,7 @@
               <td><%= link_to h(artist_version.name), artist_versions_path(:artist_id => artist_version.artist_id) %></td>
               <td><%= h artist_version.other_names %></td>
               <td><%= h artist_version.group_name %></td>
-              <td><%= time_ago_in_words_tagged artist_version.created_at %> ago</td>
+              <td><%= time_ago_in_words_tagged artist_version.created_at %></td>
               <td><%= link_to artist_version.updater_name, user_path(artist_version.updater_id) %></td>
               <td><%= artist_version.is_active? %></td>
               <td><%= artist_version.url_string %></td>

@@ -1,12 +1,20 @@
-<% if post.is_deleted? %>
-  <div class="ui-corner-all ui-state-error notice">
-    This post has been deleted
+<% if post.is_flagged? && !post.is_deleted? && post.flags.any? %>
+  <div class="ui-corner-all ui-state-highlight notice">
+    <p>This post was flagged for deletion: </p>
+    
+    <%= post_flag_reasons(post) %>
   </div>
 <% end %>
 
-<% if (post.is_flagged? || post.is_deleted?) && post.flags.any? %>
+<% if post.is_deleted? && post.flags.empty? %>
+  <div class="ui-corner-all ui-state-error notice">
+    This post was deleted
+  </div>
+<% end %>
+
+<% if post.is_deleted? && post.flags.any? %>
   <div class="ui-corner-all ui-state-highlight notice">
-    <p>This post has been flagged for deletion: </p>
+    <p>This post was deleted for the following reasons: </p>
     
     <%= post_flag_reasons(post) %>
   </div>
@@ -19,7 +27,7 @@
     <% if CurrentUser.is_janitor? && !post.disapproved_by?(CurrentUser.user) %>
       <div class="quick-mod">
         <% unless post.is_status_locked? %>
-          <%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :method => :post, :remote => true, :class => "btn" %>
+          <%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :method => :post, :remote => true, :class => "btn" %> |
         <% end %>
         <%= link_to "Hide from queue", moderator_post_disapproval_path(:post_id => post.id), :method => :post, :remote => true, :class => "btn" %>
       </div>
@@ -29,7 +37,7 @@
 
 <% if (post.is_flagged? || post.is_deleted?) && post.appeals.any? %>
   <div class="ui-corner-all ui-state-highlight notice">
-    <p>This post has been appealed:</p> 
+    <p>This post was appealed:</p> 
     <%= post_appeal_reasons(post) %>
   </div>
 <% end %>

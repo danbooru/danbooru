@@ -42,7 +42,7 @@
                   (<%= post.image_width %>x<%= post.image_height %>)
                 <% end %>
               </li>
-              <li><strong>Uploader</strong>: <%= link_to(post.uploader.name, user_path(post.uploader_id)) %> <%= time_ago_in_words_tagged(post.created_at) %> ago</li>
+              <li><strong>Uploader</strong>: <%= link_to(post.uploader.name, user_path(post.uploader_id)) %> <%= time_ago_in_words_tagged(post.created_at) %></li>
               <% if post.is_flagged? %>
                 <li><strong>Flagged</strong>: <%= post_flag_reasons(post) %></li>
               <% end %>
