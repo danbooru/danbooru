@@ -66,7 +66,7 @@ class UserPresenter
   end
   
   def favorites(template)
-    template.link_to(user.favorite_count, template.favorites_path(:user_id => user.id))
+    template.link_to(user.favorite_count, template.posts_path(:tags => "fav:#{user.name}"))
   end
   
   def comments(template)
