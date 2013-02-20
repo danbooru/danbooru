@@ -111,8 +111,8 @@ class ArtistTest < ActiveSupport::TestCase
     end
     
     should "normalize its other names" do
-      artist = FactoryGirl.create(:artist, :name => "a1", :other_names => "aaa, bbb, ccc ddd")
-      assert_equal("aaa bbb ccc_ddd", artist.other_names)
+      artist = FactoryGirl.create(:artist, :name => "a1", :other_names_comma => "aaa, bbb, ccc ddd")
+      assert_equal("aaa, bbb, ccc_ddd", artist.other_names_comma)
     end
     
     should "search on its name should return results" do
@@ -121,7 +121,7 @@ class ArtistTest < ActiveSupport::TestCase
     end
     
     should "search on other names should return matches" do
-      artist = FactoryGirl.create(:artist, :name => "artist", :other_names => "aaa, ccc ddd")
+      artist = FactoryGirl.create(:artist, :name => "artist", :other_names_comma => "aaa, ccc ddd")
       assert_nil(Artist.other_names_match("artist").first)
       assert_not_nil(Artist.other_names_match("aaa").first)
       assert_not_nil(Artist.other_names_match("ccc_ddd").first)

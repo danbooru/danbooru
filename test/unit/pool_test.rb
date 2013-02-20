@@ -183,7 +183,7 @@ class PoolTest < ActiveSupport::TestCase
     
     should "normalize its name" do
       @pool.update_attributes(:name => "A B")
-      assert_equal("a_b", @pool.name)
+      assert_equal("A_B", @pool.name)
     end
     
     should "normalize its post ids" do

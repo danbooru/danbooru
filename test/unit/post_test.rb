@@ -38,6 +38,10 @@ class PostTest < ActiveSupport::TestCase
     end
     
     context "Deleting a post" do
+      setup do
+        Danbooru.config.stubs(:blank_tag_search_fast_count).returns(nil)
+      end
+      
       context "that is status locked" do
         setup do
           @post = FactoryGirl.create(:post)
@@ -862,6 +866,10 @@ class PostTest < ActiveSupport::TestCase
 
   context "Counting:" do
     context "Creating a post" do
+      setup do
+        Danbooru.config.stubs(:blank_tag_search_fast_count).returns(nil)
+      end
+      
       should "increment the post count" do
         assert_equal(0, Post.fast_count(""))
         post = FactoryGirl.create(:post, :tag_string => "aaa bbb")
