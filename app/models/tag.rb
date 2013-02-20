@@ -210,7 +210,7 @@ class Tag < ActiveRecord::Base
         output[:include] << tag[1..-1]
         
       elsif tag =~ /\*/
-        matches = Tag.name_matches(tag).all(:select => "name", :limit => CurrentUser.tag_query_limit, :order => "post_count DESC").map(&:name)
+        matches = Tag.name_matches(tag).all(:select => "name", :limit => CurrentUser.user.tag_query_limit, :order => "post_count DESC").map(&:name)
         matches = ["~no_matches~"] if matches.empty?
         output[:include] += matches
         
