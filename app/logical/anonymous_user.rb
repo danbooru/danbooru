@@ -60,6 +60,10 @@ class AnonymousUser
     []
   end
   
+  def favorite_tags
+    nil
+  end
+  
   def upload_limit
     0
   end

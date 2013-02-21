@@ -88,10 +88,17 @@
     var $dest = $("#related-tags");
     $dest.empty();
     
+    if (Danbooru.RelatedTag.favorite_tags().length) {
+      $dest.append(Danbooru.RelatedTag.build_html("favorite", Danbooru.RelatedTag.favorite_tags()));
+    }
     $dest.append(Danbooru.RelatedTag.build_html(query, related_tags));
-    if (wiki_page_tags.length > 0) {
+    if (wiki_page_tags.length) {
       $dest.append(Danbooru.RelatedTag.build_html("wiki:" + query, wiki_page_tags));
     }
+  }
+  
+  Danbooru.RelatedTag.favorite_tags = function() {
+    return Danbooru.meta("favorite-tags").match(/\S+/g);
   }
   
   Danbooru.RelatedTag.build_html = function(query, related_tags) {
