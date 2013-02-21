@@ -8,9 +8,9 @@
 <div class="input text optional">
   <label class="text optional" for="<%= input_id %>"><%= name %></label>
 
-  <div class="dtext-previewable">  
+  <div class="dtext-previewable">
     <textarea id="<%= input_id %>" class="text optional" rows="20" name="<%= input_name %>" cols="30"><%= value %></textarea>
-    <div id="<%= preview_id %>" class="dtext-preview"></div>
+    <div id="<%= preview_id %>" class="dtext-preview prose"></div>
   </div>
    <span class="hint">All text is formatted using <%= link_to "DText", wiki_pages_path(:title => "help:dtext") %></span>
 </div>
