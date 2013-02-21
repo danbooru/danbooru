@@ -137,7 +137,7 @@ class PostQueryBuilder
     end
 
     if q[:source]
-      if q[:source] == "none"
+      if q[:source] == "none%"
         relation = relation.where("(posts.source = '' OR posts.source IS NULL)")
       else
         relation = relation.where("posts.source LIKE ? ESCAPE E'\\\\'", q[:source])
