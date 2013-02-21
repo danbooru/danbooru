@@ -11,7 +11,7 @@
     </div>
     <menu>
       <% if @comment || @comments %>
-        <li><%= link_to "View post", post_path(post) %></li>
+        <li><%= link_to "View post", post_path(comment.post_id) %></li>
       <% else %>
         <li><%= link_to "Reply", new_comment_path(:post_id => comment.post_id), :class => "reply-link", "data-comment-id" => comment.id %></li>
         <% if comment.editable_by?(CurrentUser.user) %>
