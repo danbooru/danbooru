@@ -6,7 +6,7 @@ class WikiPagePresenter
   end
   
   def excerpt
-    wiki_page.body.split(/\r\n|\r|\n/).first
+    wiki_page.body
   end
   
   def blurb
