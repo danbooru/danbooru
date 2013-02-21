@@ -5739,6 +5739,13 @@ CREATE INDEX index_post_versions_on_post_id ON post_versions USING btree (post_i
 
 
 --
+-- Name: index_post_versions_on_updated_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_post_versions_on_updated_at ON post_versions USING btree (updated_at);
+
+
+--
 -- Name: index_post_versions_on_updater_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -5939,6 +5946,13 @@ CREATE INDEX index_uploads_on_uploader_id ON uploads USING btree (uploader_id);
 --
 
 CREATE INDEX index_uploads_on_uploader_ip_addr ON uploads USING btree (uploader_ip_addr);
+
+
+--
+-- Name: index_user_feedback_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_user_feedback_on_created_at ON user_feedback USING btree (created_at);
 
 
 --
@@ -6181,3 +6195,7 @@ INSERT INTO schema_migrations (version) VALUES ('20130114154400');
 INSERT INTO schema_migrations (version) VALUES ('20130219171111');
 
 INSERT INTO schema_migrations (version) VALUES ('20130219184743');
+
+INSERT INTO schema_migrations (version) VALUES ('20130221032344');
+
+INSERT INTO schema_migrations (version) VALUES ('20130221035518');

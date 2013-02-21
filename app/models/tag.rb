@@ -221,6 +221,9 @@ class Tag < ActiveRecord::Base
 
     def parse_query(query, options = {})
       q = {}
+      
+      q[:tag_count] = 0
+      
       q[:tags] = {
         :related => [],
         :include => [],
@@ -228,6 +231,8 @@ class Tag < ActiveRecord::Base
       }
       
       scan_query(query).each do |token|
+        q[:tag_count] += 1
+
         if token =~ /\A(#{METATAGS}):(.+)\Z/
           case $1
           when "-user"

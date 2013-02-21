@@ -835,9 +835,9 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(post3.id, relation.first.id)      
     end
     
-    should "fail for exclusive tag searches with no other tag" do
+    should "succeed for exclusive tag searches with no other tag" do
       post1 = FactoryGirl.create(:post, :rating => "s", :tag_string => "aaa")
-      assert_raise(::Post::SearchError) do
+      assert_nothing_raised do
         relation = Post.tag_match("-aaa")
       end
     end
