@@ -82,11 +82,14 @@ namespace :deploy do
   namespace :nginx do
     desc "Shut down Nginx"
     task :stop do
-      sudo "for i in `pgrep -f nginx` ; do kill -SIGTERM $i ; done"
+      pids = capture("pgrep -f nginx").scan(/\d+/)
+      pids.each do |pid|
+        sudo "kill -SIGTERM #{pid}"
+      end
     end
     
     desc "Start Nginx"
-    task :stop do
+    task :start do
       sudo "/etc/init.d/nginx start"
     end
   end
