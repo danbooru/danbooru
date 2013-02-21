@@ -49,24 +49,28 @@ class PostQueryBuilder
       "''" + escaped_token + "''"
     end
   end
+  
+  def tag_query_limit
+    Danbooru.config.tag_query_limit
+  end
 
   def add_tag_string_search_relation(tags, relation)
     tag_query_sql = []
 
     if tags[:include].any?
-      raise ::Post::SearchError.new("You cannot search for more than #{CurrentUser.user.tag_query_limit} tags at a time") if tags[:include].size > CurrentUser.user.tag_query_limit
+      raise ::Post::SearchError.new("You cannot search for more than #{tag_query_limit} tags at a time") if tags[:include].size > tag_query_limit
       tag_query_sql << "(" + escape_string_for_tsquery(tags[:include]).join(" | ") + ")"
       has_constraints!
     end
 
     if tags[:related].any?
-      raise ::Post::SearchError.new("You cannot search for more than #{CurrentUser.user.tag_query_limit} tags at a time") if tags[:related].size > CurrentUser.user.tag_query_limit
+      raise ::Post::SearchError.new("You cannot search for more than #{tag_query_limit} tags at a time") if tags[:related].size > tag_query_limit
       tag_query_sql << "(" + escape_string_for_tsquery(tags[:related]).join(" & ") + ")"
       has_constraints!
     end
 
     if tags[:exclude].any?
-      raise ::Post::SearchError.new("You cannot search for more than #{CurrentUser.user.tag_query_limit} tags at a time") if tags[:exclude].size > CurrentUser.user.tag_query_limit
+      raise ::Post::SearchError.new("You cannot search for more than #{tag_query_limit} tags at a time") if tags[:exclude].size > tag_query_limit
       raise ::Post::SearchError.new("You cannot search for only excluded tags") unless has_constraints?
 
       tag_query_sql << "!(" + escape_string_for_tsquery(tags[:exclude]).join(" | ") + ")"

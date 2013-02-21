@@ -416,9 +416,9 @@ class User < ActiveRecord::Base
     
     def tag_query_limit
       if is_privileged?
-        Danbooru.config.tag_query_limit
+        Danbooru.config.base_tag_query_limit
       elsif is_platinum?
-        Danbooru.config.tag_query_limit * 2
+        Danbooru.config.base_tag_query_limit * 2
       else
         2
       end

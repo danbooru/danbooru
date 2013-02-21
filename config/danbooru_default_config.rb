@@ -118,8 +118,16 @@ module Danbooru
     end
     
     # Users cannot search for more than X regular tags at a time.
-    def tag_query_limit
+    def base_tag_query_limit
       6
+    end
+    
+    def tag_query_limit
+      if CurrentUser.user.present?
+        CurrentUser.user.tag_query_limit
+      else
+        base_tag_query_limit * 2
+      end
     end
     
     # Max number of posts to cache
