@@ -7,7 +7,7 @@
 <% end %>
 
 <% if post.is_deleted? && post.flags.empty? %>
-  <div class="ui-corner-all ui-state-error notice">
+  <div class="ui-corner-all ui-state-highlight notice">
     This post was deleted
   </div>
 <% end %>
