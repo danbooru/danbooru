@@ -22,6 +22,12 @@ class ArtistUrlTest < ActiveSupport::TestCase
       assert_equal("http://monet.com/", url.url)
       assert_equal("http://monet.com/", url.normalized_url)
     end
+    
+    should "normalise https" do
+      url = FactoryGirl.create(:artist_url, :url => "https://google.com")
+      assert_equal("https://google.com", url.url)
+      assert_equal("http://google.com/", url.normalized_url)
+    end
 
     should "normalize fc2 urls" do
       url = FactoryGirl.create(:artist_url, :url => "http://blog55.fc2.com/monet")
