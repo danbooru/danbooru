@@ -491,7 +491,7 @@ Danbooru.Note = {
 }
 
 $(function() {
-  if ($("#c-posts").length && $("#a-show").length) {
+  if ($("#c-posts").length && $("#a-show").length && $("#image").length) {
     $("#translate").one("click", Danbooru.Note.TranslationMode.start);
     $(document).bind("keypress", "n", Danbooru.Note.TranslationMode.start);
     Danbooru.Note.load_all();
