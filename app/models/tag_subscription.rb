@@ -118,7 +118,7 @@ class TagSubscription < ActiveRecord::Base
           tag_subscription.process
           tag_subscription.save
         rescue Exception => x
-          raise if Rails.environment != "production"
+          raise if Rails.env != "production"
         end
       end
     end
