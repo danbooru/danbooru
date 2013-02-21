@@ -81,7 +81,7 @@ module ApplicationHelper
         html << " [" + link_to("invite", new_moderator_invitation_path(:invitation => {:name => user.name, :level => User::Levels::CONTRIBUTOR})) + "]"
       end
     else
-      html << " [" + link_to("&ndash;", new_user_feedback_path(:user_feedback => {:category => "negative", :user_id => user.id})) + "]"
+      html << " [" + link_to("&ndash;".html_safe, new_user_feedback_path(:user_feedback => {:category => "negative", :user_id => user.id})) + "]"
     end
     
     html.html_safe
