@@ -1,6 +1,21 @@
 @import "../common/000_vars.css.scss";
 
 div#c-users {
+  div#a-show {
+    dl {
+      dt { 
+        width: 12em;
+        float: left;
+        clear: left;
+        margin-right: .75em;
+      }
+      
+      dt:after { 
+        content: ':';
+      }
+    }
+  }
+  
   div#a-edit {
     h1 {
       margin-bottom: 0.5em;
