@@ -9,7 +9,7 @@ class PostAppealsController < ApplicationController
   end
   
   def index
-    @search = PostAppeal.search(params[:search]).order("id desc")
+    @search = PostAppeal.order("id desc").search(params[:search])
     @post_appeals = @search.paginate(params[:page])
   end
   

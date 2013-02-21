@@ -220,7 +220,8 @@ class User < ActiveRecord::Base
       def level_hash
         return {
           "Member" => Levels::MEMBER,
-          "Privileged" => Levels::PRIVILEGED,
+          "Gold" => Levels::PRIVILEGED,
+          "Platinum" => Levels::PLATINUM,
           "Builder" => Levels::BUILDER,
           "Contributor" => Levels::CONTRIBUTOR,
           "Janitor" => Levels::JANITOR,
@@ -427,13 +428,13 @@ class User < ActiveRecord::Base
     def favorite_limit
       return nil
       
-      if is_privileged?
-        20_000
-      elsif is_platinum?
-        nil
-      else
-        4_000
-      end
+      # if is_privileged?
+      #   20_000
+      # elsif is_platinum?
+      #   nil
+      # else
+      #   4_000
+      # end
     end
   end
   

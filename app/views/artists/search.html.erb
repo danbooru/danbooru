@@ -9,6 +9,11 @@
           <%= text_field "search", "name" %>
           <p class="hint">You can search on any name or URL</p>
         </div>
+        
+        <div class="input">
+          <label>Sort</label>
+          <%= select "search", "sort", ["Date", "Name"] %>
+        </div>
         <%= submit_tag "Search" %>
       <% end %>
     </div>

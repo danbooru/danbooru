@@ -258,6 +258,12 @@ class Artist < ActiveRecord::Base
       when /./
         q = q.any_name_matches(params[:name])
       end
+      
+      if params[:sort] == "Name"
+        q = q.reorder("name")
+      else
+        q = q.reorder("id desc")
+      end
 
       if params[:id].present?
         q = q.where("id = ?", params[:id])

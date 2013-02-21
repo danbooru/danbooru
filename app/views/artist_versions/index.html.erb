@@ -18,7 +18,7 @@
         <tbody>
           <% @artist_versions.each do |artist_version| %>
             <tr class="<%= cycle 'even', 'odd' %>">
-              <td><%= link_to h(artist_version.name), artist_versions_path(:artist_id => artist_version.artist_id) %></td>
+              <td><%= link_to h(artist_version.name), artist_versions_path(:search => {:artist_id => artist_version.artist_id}) %></td>
               <td><%= h artist_version.other_names %></td>
               <td><%= h artist_version.group_name %></td>
               <td><%= time_ago_in_words_tagged artist_version.created_at %></td>
@@ -31,7 +31,7 @@
       </table>
     </div>
 
-    <%= sequential_paginator(@artist_versions) %>
+    <%= numbered_paginator(@artist_versions, :count => (params[:search].present? ? nil : 1_000_000)) %>
   </div>
 </div>
 

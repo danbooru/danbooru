@@ -15,7 +15,7 @@ class DmailsController < ApplicationController
   
   def index
     @search = Dmail.visible.search(params[:search])
-    @dmails = @search.paginate(params[:page]).order("dmails.created_at desc")
+    @dmails = @search.order("dmails.created_at desc").paginate(params[:page])
     respond_with(@dmails)
   end
   

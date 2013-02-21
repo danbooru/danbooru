@@ -16,7 +16,7 @@ class TagSubscriptionsController < ApplicationController
   
   def index
     @user = CurrentUser.user
-    @search = TagSubscription.owned_by(@user).search(params[:search])
+    @search = TagSubscription.owned_by(@user).order("name").search(params[:search])
     @tag_subscriptions = @search.paginate(params[:page])
     respond_with(@tag_subscriptions)
   end

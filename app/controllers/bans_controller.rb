@@ -10,7 +10,7 @@ class BansController < ApplicationController
   end
   
   def index
-    @search = Ban.search(params[:search])
+    @search = Ban.search(params[:search]).order("id desc")
     @bans = @search.paginate(params[:page])
   end
   

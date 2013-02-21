@@ -14,6 +14,12 @@ class ArtistVersion < ActiveRecord::Base
       q = q.where("artist_id = ?", params[:artist_id].to_i)
     end
     
+    if params[:sort] == "Name"
+      q = q.reorder("name")
+    else
+      q = q.reorder("id desc")
+    end
+      
     q
   end
   
