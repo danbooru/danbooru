@@ -380,6 +380,10 @@ Danbooru.Note = {
     },
     
     delete: function() {
+      if (!confirm("Do you really want to delete this note?")) {
+        return
+      }
+      
       var $this = $(this);
       var id = $this.data("id");
       Danbooru.Note.Box.find(id).remove();

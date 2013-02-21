@@ -36,7 +36,7 @@ class NotesController < ApplicationController
   
   def destroy
     @note = Note.find(params[:id])
-    @note.update_column(:is_active, false)
+    @note.update_attribute(:is_active, false)
     respond_with(@note)
   end
   
