@@ -835,6 +835,14 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(post3.id, relation.first.id)      
     end
     
+    should "fail for more than 6 tags" do
+      post1 = FactoryGirl.create(:post, :rating => "s")
+
+      assert_raise(::Post::SearchError) do
+        Post.tag_match("a b c rating:s width:10 height:10 user:bob")
+      end
+    end
+    
     should "succeed for exclusive tag searches with no other tag" do
       post1 = FactoryGirl.create(:post, :rating => "s", :tag_string => "aaa")
       assert_nothing_raised do
