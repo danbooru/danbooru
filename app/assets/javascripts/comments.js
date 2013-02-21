@@ -7,6 +7,10 @@
       this.initialize_reply_links();
       this.initialize_expand_links();
     }
+    
+    if ($("#c-posts").length && $("#a-show").length) {
+      Danbooru.Comment.highlight_threshold_comments(Danbooru.meta("post-id"));
+    }
   }
   
   Danbooru.Comment.quote_message = function(data) {
@@ -60,6 +64,17 @@
       var $comment = $(v);
       if (parseInt($comment.data("score")) < threshold) {
         $comment.addClass("below-threshold");
+      }
+    })
+  }
+  
+  Danbooru.Comment.hide_threshold_comments = function(post_id) {
+    var threshold = parseInt(Danbooru.meta("user-comment-threshold"));
+    var articles = $("article.comment[data-post-id=" + post_id + "]");
+    articles.each(function(i, v) {
+      var $comment = $(v);
+      if (parseInt($comment.data("score")) < threshold) {
+        $comment.hide();
       }
     })
   }
