@@ -7,6 +7,7 @@
           <th width="1%"></th>
           <th>Creator</th>
           <th>Reason</th>
+          <th>Resolved</th>
         </tr>
       </thead>
       <tbody>
@@ -15,6 +16,7 @@
             <td><%= PostPresenter.preview(post_flag.post) %></td>
             <td><%= link_to post_flag.creator.name, user_path(post_flag.creator) %></td>
             <td><%= format_text post_flag.reason %></td>
+            <td><%= post_flag.is_resolved? %></td>
           </tr>
         <% end %>
       </tbody>
