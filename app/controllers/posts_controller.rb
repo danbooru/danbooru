@@ -32,6 +32,15 @@ class PostsController < ApplicationController
     @post = Post.find(params[:id])
     @post.update_attributes(params[:post], :as => CurrentUser.role)
     respond_with(@post) do |format|
+      format.html do
+        if @post.errors.any?
+          @error_message = @post.errors.full_messages.join("; ")
+          render :action => "error"
+        else
+          redirect_to post_path(@post)
+        end
+      end
+      
       format.json do
         render :json => @post.to_json
       end
