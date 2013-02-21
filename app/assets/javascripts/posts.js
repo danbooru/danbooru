@@ -112,7 +112,6 @@
           $img.data("scale_factor", ratio);
           $img.css("width", $img.width() * ratio);
           $img.css("height", $img.height() * ratio);
-          console.log("ratio=%f", ratio);
         }
       } else {
         $img.data("scale_factor", 1);
