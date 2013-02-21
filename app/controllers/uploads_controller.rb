@@ -22,7 +22,13 @@ class UploadsController < ApplicationController
   
   def show
     @upload = Upload.find(params[:id])
-    respond_with(@upload)
+    respond_with(@upload) do |format|
+      format.html do
+        if @upload.is_completed? && @upload.post_id
+          redirect_to(post_path(@upload.post_id))
+        end
+      end
+    end
   end
 
   def create
