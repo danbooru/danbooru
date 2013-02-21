@@ -14,7 +14,11 @@
         <% @post_flags.each do |post_flag| %>
           <tr>
             <td><%= PostPresenter.preview(post_flag.post) %></td>
-            <td><%= link_to post_flag.creator.name, user_path(post_flag.creator) %></td>
+            <td>
+              <% if CurrentUser.user.is_janitor? %>
+                <%= link_to post_flag.creator.name, user_path(post_flag.creator) %>
+              <% end %>
+            </td>
             <td><%= format_text post_flag.reason %></td>
             <td><%= post_flag.is_resolved? %></td>
           </tr>
