@@ -4,7 +4,11 @@
     
     <div id="search-form">
       <%= form_tag(artists_path, :method => :get, :class => "simple_form") do %>
-        <%= search_field "name" %>
+        <div class="input">
+          <label>Name</label>
+          <%= text_field "search", "name" %>
+          <p class="hint">You can search on any name or URL</p>
+        </div>
         <%= submit_tag "Search" %>
       <% end %>
     </div>
