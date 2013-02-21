@@ -6,8 +6,9 @@ div#note-container {
     position: absolute;
     border: 1px solid black;
     background: white;
-    min-width: 5em;
+    min-width: 10px;
     min-height: 1em;
+    line-height: normal;
     cursor: pointer;
     padding: 4px;
     z-index: 1500;

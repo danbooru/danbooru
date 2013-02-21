@@ -241,6 +241,7 @@ class Tag < ActiveRecord::Base
             
           when "user"
             q[:uploader_id] = User.name_to_id($2)
+            q[:uploader_id] = -1 if q[:uploader_id].nil?
             
           when "-approver"
             q[:approver_id_neg] ||= []
@@ -248,6 +249,7 @@ class Tag < ActiveRecord::Base
             
           when "approver"
             q[:approver_id] = User.name_to_id($2)
+            q[:approver_id] = -1 if q[:approver_id].nil?
             
           when "-pool"
             q[:tags][:exclude] << "pool:#{Pool.name_to_id($2)}"
