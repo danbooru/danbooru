@@ -34,7 +34,7 @@ class UserPresenter
   end
   
   def posts_for_subscription(subscription)
-    Post.where("id in (?)", subscription.post_id_array.slice(0, 6).map(&:to_i))
+    Post.where("id in (?)", subscription.post_id_array.slice(0, 6).map(&:to_i)).order("id desc")
   end
   
   def upload_limit
@@ -72,7 +72,7 @@ class UserPresenter
   end
   
   def favorites
-    @favorites ||= user.favorites.limit(6).includes(:post).map(&:post)
+    @favorites ||= user.favorites.limit(6).includes(:post).reorder("favorites.id desc").map(&:post)
   end
   
   def has_favorites?
