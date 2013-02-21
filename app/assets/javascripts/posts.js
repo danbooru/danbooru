@@ -28,13 +28,13 @@
   }
   
   Danbooru.Post.initialize_shortcuts = function() {
-    $(document).bind("keypress", '/', function(e) {
+    $(document).bind("keydown./", function(e) {
       $("#tags").trigger("focus"); 
       e.preventDefault();
     });
     
     if ($("#a-show").length) {
-      $(document).bind("keypress", 'e', function(e) {
+      $(document).bind("keydown.e", function(e) {
         $("#post-edit-link").trigger("click");
         $("#post_tag_string").trigger("focus");
         e.preventDefault();
