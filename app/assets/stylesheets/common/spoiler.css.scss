@@ -3,6 +3,14 @@
   background: black;
 }
 
+.spoiler a {
+  color: black;
+}
+
 .spoiler:hover {
+  color: white;
+}
+
+.spoiler:hover a{
   color: white;
 }
