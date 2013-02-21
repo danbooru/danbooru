@@ -126,6 +126,24 @@ protected
     when "posts", "uploads", "post_versions", "explore/posts", "moderator/post/dashboards", "favorites", "tag_subscriptions"
       /^\/post/
       
+    when "artists", "artist_versions"
+      /^\/artist/
+      
+    when "tags"
+      /^\/tags/
+      
+    when "pools"
+      /^\/pools/
+      
+    when "moderator/dashboards"
+      /^\/moderator/
+      
+    when "tag_aliases"
+      /^\/tag_aliases/
+      
+    when "tag_implications"
+      /^\/tag_implications/
+      
     when "wiki_pages", "wiki_page_versions"
       /^\/wiki_pages/
       
