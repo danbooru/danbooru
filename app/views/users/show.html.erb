@@ -2,60 +2,106 @@
   <div id="a-show">
     <h1><%= @presenter.name %></h1>
 
-    <dl>
-      <dt>Join Date</dt>
-      <dd><%= @presenter.join_date %></dd>
+    <div class="grid">
+      <div class="col">
+        <div class="box">
+          <h2><%= link_to "Uploads", posts_path(:tags => "user:#{@user.name}") %></h2>
+          <% if @presenter.has_uploads? %>
+            <div>
+              <% @presenter.uploads.each do |post| %>
+                <%= PostPresenter.preview(post) %>
+              <% end %>
+            </div>
+          <% else %>
+            <p>None</p>
+          <% end %>
+        </div>
+
+        <div class="box">
+          <h2><%= link_to "Favorites", posts_path(:tags => "fav:#{@user.name}") %></h2>
+          <% if @presenter.has_favorites? %>
+            <div>
+              <% @presenter.favorites.each do |post| %>
+                <%= PostPresenter.preview(post) %>
+              <% end %>
+            </div>
+          <% else %>
+            <p>None</p>
+          <% end %>
+        </div>
+        
+        <div class="box">
+          <h2>Subscriptions</h2>
+          <% @presenter.subscriptions.each do |subscription| %>
+            <div class="box">
+              <h3><%= link_to subscription.name, posts_path(:tags => "sub:#{@user.name}:#{subscription.name}") %></h3>
+              
+              <div>
+                <% @presenter.posts_for_subscription(subscription).each do |post| %>
+                  <%= PostPresenter.preview(post) %>
+                <% end %>
+              </div>
+            </div>
+            
+          <% end %>
+        </div>
+      </div>
       
-      <dt>Inviter</dt>
-      <dd><%= @presenter.inviter(self) %></dd>
-      
-      <dt>Level</dt>
-      <dd><%= @presenter.level %></dd>
-      
-      <% if @user.is_banned? %>
-        <dt>Ban reason</dt>
-        <dd><%= @presenter.ban_reason %></dd>
-      <% end %>
-      
-      <dt>Upload Limit</dt>
-      <dd><%= @presenter.upload_limit %></dd>
+      <div class="col">
+        <h2>Statistics</h2>
+        <dl>
+          <dt>Join Date</dt>
+          <dd><%= @presenter.join_date %></dd>
 
-      <dt>Uploads</dt>
-      <dd><%= @presenter.uploads(self) %></dd>
+          <dt>Inviter</dt>
+          <dd><%= @presenter.inviter(self) %></dd>
 
-      <dt>Deleted Uploads</dt>
-      <dd><%= @presenter.deleted_uploads(self) %></dd>
+          <dt>Level</dt>
+          <dd><%= @presenter.level %></dd>
 
-      <dt>Favorites</dt>
-      <dd><%= @presenter.favorites(self) %></dd>
+          <% if @user.is_banned? %>
+            <dt>Ban reason</dt>
+            <dd><%= @presenter.ban_reason %></dd>
+          <% end %>
 
-      <dt>Subscriptions</dt>
-      <dd><%= @presenter.subscriptions(self) %></dd>
+          <dt>Upload Limit</dt>
+          <dd><%= @presenter.upload_limit %></dd>
 
-      <dt>Post Changes</dt>
-      <dd><%= @presenter.post_versions(self) %></dd>
+          <dt>Uploads</dt>
+          <dd><%= @presenter.upload_count(self) %></dd>
 
-      <dt>Note Changes</dt>
-      <dd><%= @presenter.note_versions(self) %></dd>
+          <dt>Deleted Uploads</dt>
+          <dd><%= @presenter.deleted_upload_count(self) %></dd>
 
-      <dt>Wiki Page Changes</dt>
-      <dd><%= @presenter.wiki_page_versions(self) %></dd>
+          <dt>Favorites</dt>
+          <dd><%= @presenter.favorite_count(self) %></dd>
 
-      <dt>Pool Changes</dt>
-      <dd><%= @presenter.pool_versions(self) %></dd>
+          <dt>Post Changes</dt>
+          <dd><%= @presenter.post_version_count(self) %></dd>
 
-      <dt>Forum Posts</dt>
-      <dd><%= @presenter.forum_posts(self) %></dd>
+          <dt>Note Changes</dt>
+          <dd><%= @presenter.note_version_count(self) %></dd>
 
-      <dt>Approvals</dt>
-      <dd><%= @presenter.approvals(self) %></dd>
-      
-      <dt>Comments</dt>
-      <dd><%= @presenter.comments(self) %></dd>
+          <dt>Wiki Page Changes</dt>
+          <dd><%= @presenter.wiki_page_version_count(self) %></dd>
 
-      <dt>Feedback</dt>
-      <dd><%= @presenter.feedbacks(self) %></dd>
-    </dl>
+          <dt>Pool Changes</dt>
+          <dd><%= @presenter.pool_version_count(self) %></dd>
+
+          <dt>Forum Posts</dt>
+          <dd><%= @presenter.forum_post_count(self) %></dd>
+
+          <dt>Approvals</dt>
+          <dd><%= @presenter.approval_count(self) %></dd>
+
+          <dt>Comments</dt>
+          <dd><%= @presenter.comment_count(self) %></dd>
+
+          <dt>Feedback</dt>
+          <dd><%= @presenter.feedbacks(self) %></dd>
+        </dl>
+      </div>
+    </div>
   </div>
 </div>
 

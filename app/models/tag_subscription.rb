@@ -6,6 +6,7 @@ class TagSubscription < ActiveRecord::Base
   before_save :limit_tag_count
   attr_accessible :name, :tag_query, :post_ids, :is_public, :is_visible_on_profile
   validates_presence_of :name, :tag_query, :is_public, :creator_id
+  validate :creator_can_create_subscriptions
   
   def normalize_name
     self.name = name.gsub(/\W/, "_")
@@ -17,6 +18,15 @@ class TagSubscription < ActiveRecord::Base
 
   def initialize_post_ids
     process
+  end
+  
+  def creator_can_create_subscriptions
+    if TagSubscription.owned_by(creator).count >= Danbooru.config.max_tag_subscriptions
+      self.errors.add(:creator, "can subscribe up to #{Danbooru.config.max_tag_subscriptions} tags")
+      return false
+    else
+      return true
+    end
   end
 
   def tag_query_array
@@ -94,10 +104,10 @@ class TagSubscription < ActiveRecord::Base
   end
 
   def self.find_post_ids(user_id, name = nil, limit = Danbooru.config.tag_subscription_post_limit)
-    relation = where(["creator_id = ?", user_id])
+    relation = where("creator_id = ?", user_id)
     
     if name
-      relation = relation.where(["name ILIKE ? ESCAPE E'\\\\'", name.to_escaped_for_sql_like])
+      relation = relation.where("name ILIKE ? ESCAPE E'\\\\'", name.to_escaped_for_sql_like)
     end
     
     relation.each do |tag_sub|

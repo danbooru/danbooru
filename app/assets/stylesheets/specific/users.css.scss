@@ -2,6 +2,28 @@
 
 div#c-users {
   div#a-show {
+    div.grid {
+      div.col {
+        float: left;
+        width: 50%;
+      }
+      
+      div.box {
+        clear: both;
+        margin-bottom: 2em;
+      }
+      
+      /* clearfix hacks */
+      div.box:before, div.box:after {
+        content: "";
+        display: table;
+      }
+      
+      div.box:after {
+        clear: both;
+      }
+    }
+    
     dl {
       dt { 
         width: 12em;

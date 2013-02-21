@@ -5648,6 +5648,13 @@ CREATE INDEX index_pool_versions_on_pool_id ON pool_versions USING btree (pool_i
 
 
 --
+-- Name: index_pool_versions_on_updated_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_pool_versions_on_updated_at ON pool_versions USING btree (updated_at);
+
+
+--
 -- Name: index_pool_versions_on_updater_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -6199,3 +6206,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130219184743');
 INSERT INTO schema_migrations (version) VALUES ('20130221032344');
 
 INSERT INTO schema_migrations (version) VALUES ('20130221035518');
+
+INSERT INTO schema_migrations (version) VALUES ('20130221214811');

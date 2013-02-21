@@ -25,10 +25,16 @@ class UserPresenter
     end
   end
   
-  def tag_subscriptions(template)
-    user.subscriptions.map do |subscription|
-      template.link_to(subscription.name, template.tag_subscription_path(subscription))
-    end.join("; ")
+  def tag_subscriptions
+    if CurrentUser.user.id == user.id
+      user.subscriptions
+    else
+      user.subscriptions.select {|x| x.is_public?}
+    end
+  end
+  
+  def posts_for_subscription(subscription)
+    Post.where("id in (?)", subscription.post_id_array.slice(0, 6).map(&:to_i))
   end
   
   def upload_limit
@@ -57,39 +63,55 @@ class UserPresenter
     return string
   end
   
-  def uploads(template)
+  def uploads
+    @uploads ||= Post.where("uploader_id = ?", user.id).order("id desc").limit(6)
+  end
+  
+  def has_uploads?
+    user.post_upload_count > 0
+  end
+  
+  def favorites
+    @favorites ||= user.favorites.limit(6).includes(:post).map(&:post)
+  end
+  
+  def has_favorites?
+    user.favorite_count > 0
+  end
+  
+  def upload_count(template)
     template.link_to(user.post_upload_count, template.posts_path(:tags => "user:#{user.name}"))
   end
   
-  def deleted_uploads(template)
+  def deleted_upload_count(template)
     template.link_to(Post.for_user(user.id).deleted.count, template.posts_path(:tags => "status:deleted user:#{user.name}"))
   end
   
-  def favorites(template)
+  def favorite_count(template)
     template.link_to(user.favorite_count, template.posts_path(:tags => "fav:#{user.name}"))
   end
   
-  def comments(template)
+  def comment_count(template)
     template.link_to(Comment.for_creator(user.id).count, template.comments_path(:search => {:creator_id => user.id}))
   end
   
-  def post_versions(template)
+  def post_version_count(template)
     template.link_to(user.post_update_count, template.post_versions_path(:search => {:updater_id => user.id}))
   end
   
-  def note_versions(template)
+  def note_version_count(template)
     template.link_to(user.note_update_count, template.note_versions_path(:search => {:updater_id => user.id}))
   end
   
-  def wiki_page_versions(template)
+  def wiki_page_version_count(template)
     template.link_to(WikiPageVersion.for_user(user.id).count, template.wiki_page_versions_path(:search => {:updater_id => user.id}))
   end
   
-  def forum_posts(template)
+  def forum_post_count(template)
     template.link_to(ForumPost.for_user(user.id).count, template.forum_posts_path(:search => {:creator_id => user.id}))
   end
   
-  def pool_versions(template)
+  def pool_version_count(template)
     template.link_to(PoolVersion.for_user(user.id).count, template.pool_versions_path(:search => {:updater_id => user.id}))
   end
   
@@ -101,7 +123,7 @@ class UserPresenter
     end
   end
   
-  def approvals(template)
+  def approval_count(template)
     template.link_to(Post.where("approver_id = ?", user.id).count, template.posts_path(:tags => "approver:#{user.name}"))
   end
   
@@ -113,15 +135,17 @@ class UserPresenter
     template.link_to("positive:#{positive} neutral:#{neutral} negative:#{negative}", template.user_feedbacks_path(:search => {:user_id => user.id}))
   end
   
-  def subscriptions(template)
-    if user.subscriptions.any?
-      str = user.subscriptions.map do |subscription|
-        template.link_to(subscription.name, template.posts_path(:tags => "sub:#{user.name}:#{subscription.name}"))
-      end.join(", ")
-      str += " [" + template.link_to("edit", template.tag_subscriptions_path) + "]"
-      str.html_safe
-    else
-      "None"
-    end
+  def subscriptions
+    user.subscriptions
+    # 
+    # if user.subscriptions.any?
+    #   str = user.subscriptions.map do |subscription|
+    #     template.link_to(subscription.name, template.posts_path(:tags => "sub:#{user.name}:#{subscription.name}"))
+    #   end.join(", ")
+    #   str += " [" + template.link_to("edit", template.tag_subscriptions_path) + "]"
+    #   str.html_safe
+    # else
+    #   "None"
+    # end
   end
 end
