@@ -11,7 +11,7 @@ class LegacyController < ApplicationController
     @upload.server = Socket.gethostname
     @upload.file = params[:post][:file]
     @upload.source = params[:post][:source]
-    @upload.tags = params[:post][:tag_string]
+    @upload.tag_string = params[:post][:tags]
     @upload.parent_id = params[:post][:parent_id]
     @upload.rating = params[:post][:rating]
     @upload.md5_confirmation = params[:md5] if params[:md5].present?
