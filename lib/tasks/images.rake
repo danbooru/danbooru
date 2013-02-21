@@ -19,6 +19,15 @@ namespace :images do
     post.distribute_files
   end
   
+  desc "Finds advertisement images that don't exist"
+  task :find_missing_ads => :environment do
+    Advertisement.where("status = 'active'").each do |ad|
+      if !File.exists?(ad.image_path)
+        puts ad.image_path
+      end
+    end
+  end
+  
   desc "Generate thumbnail-sized images of posts"
   task :generate_preview => :environment do
     Post.where("image_width > ?", Danbooru.config.small_image_width).find_each do |post|
