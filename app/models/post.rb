@@ -570,7 +570,7 @@ class Post < ActiveRecord::Base
     def get_count_from_cache(tags)
       count = Cache.get(count_cache_key(tags))
       
-      if count.nil? && tags.to_s !~ /^(?:#{Tag::METATAGS}):/
+      if count.nil? && tags.to_s !~ /(?:#{Tag::METATAGS}):/
         count = select_value_sql("SELECT post_count FROM tags WHERE name = ?", tags.to_s)
       end
       
@@ -613,11 +613,11 @@ class Post < ActiveRecord::Base
     
     def fast_count_search(tags)
       count = Post.with_timeout(500, Danbooru.config.blank_tag_search_fast_count || 1_000_000) do
-        Post.tag_match(tags).undeleted.count
+        Post.tag_match(tags).count
       end
       
       if count == 0
-        count = Post.tag_match(tags).undeleted.count
+        count = Post.tag_match(tags).count
       end
       
       if count > Danbooru.config.posts_per_page * 10
