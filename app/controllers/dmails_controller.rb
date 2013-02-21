@@ -41,6 +41,12 @@ class DmailsController < ApplicationController
     redirect_to dmails_path, :notice => "Message destroyed"
   end
   
+  def mark_all_as_read
+    Dmail.visible.unread.each do |x|
+      x.update_column(:is_read, true)
+    end
+  end
+  
 private
   def check_privilege(dmail)
     if !dmail.visible_to?(CurrentUser.user)

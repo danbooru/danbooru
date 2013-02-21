@@ -4,5 +4,6 @@
     <li><%= link_to "Sent", dmails_path(:search => {:owner_id => CurrentUser.id, :from_id => CurrentUser.id}, :folder => "sent") %></li>
     <li><%= link_to "New", new_dmail_path %></li>
     <li><%= link_to "Search", search_dmails_path %></li>
+    <li><%= link_to "Mark all as read", {:controller => "dmails", :action => "mark_all_as_read"}, :method => :post, :remote => true %></li>
   </menu>
 <% end %>

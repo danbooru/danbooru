@@ -72,6 +72,7 @@ Danbooru::Application.routes.draw do
   resources :dmails do
     collection do
       get :search
+      post :mark_all_as_read
     end
   end
   resource  :dtext_preview, :only => [:create]
