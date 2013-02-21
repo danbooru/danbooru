@@ -105,7 +105,12 @@ module ApplicationHelper
   
   def search_field(method, options = {})
     name = options[:label] || method.titleize
-    raw '<div class="input"><label for="search_' + method + '">' + name + '</label><input type="text" name="search[' + method + ']" id="search_'  + method + '"></div>'
+    string = '<div class="input"><label for="search_' + method + '">' + name + '</label><input type="text" name="search[' + method + ']" id="search_'  + method + '">'
+    if options[:hint]
+      string += '<p class="hint">' + options[:hint] + '</p>'
+    end
+    string += '</div>'
+    string.html_safe
   end
   
 protected

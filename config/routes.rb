@@ -183,6 +183,7 @@ Danbooru::Application.routes.draw do
       put :revert
     end
     collection do
+      get :search
       get :show_or_new
     end
   end

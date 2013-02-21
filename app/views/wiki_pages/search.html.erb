@@ -1,0 +1,22 @@
+<div id="c-wiki-pages">
+  <div id="a-search">
+    <%= form_tag(wiki_pages_path, :method => :get, :class => "simple_form") do %>
+      <%= search_field "title", :hint => "Use * for wildcard searches" %>
+      <%= search_field "creator_name" %>
+      <%= search_field "body_matches", :label => "Body" %>
+      
+      <div class="input">
+        <label for="search_sort">Sort</label>
+        <%= select "search", "sort", ["Name", "Date"] %>
+      </div>
+      
+      <%= submit_tag "Search" %>
+    <% end %>
+  </div>
+</div>
+
+<%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Search Wiki - <%= Danbooru.config.app_name %>
+<% end %>
