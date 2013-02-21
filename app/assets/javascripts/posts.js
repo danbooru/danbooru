@@ -244,8 +244,8 @@
       if (image.length) {
         var x = image.offset().left + image.width() + 50;
         var y = image.offset().top;
-        if (x < 950) {
-          x = 950
+        if (x < 1050) {
+          x = 1050
         }
         jlist.css({
           position: "absolute",
