@@ -13,7 +13,7 @@ class LegacyController < ApplicationController
     @upload.source = params[:post][:source]
     @upload.tag_string = params[:post][:tags]
     @upload.parent_id = params[:post][:parent_id]
-    @upload.rating = params[:post][:rating]
+    @upload.rating = params[:post][:rating][0]
     @upload.md5_confirmation = params[:md5] if params[:md5].present?
     @upload.save
     @upload.delay.process!
