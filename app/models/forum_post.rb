@@ -87,8 +87,9 @@ class ForumPost < ActiveRecord::Base
   
   def update_topic_updated_at
     if topic
-      topic.update_column(:updater_id, CurrentUser.id)
-      topic.touch
+      topic.updater_id = CurrentUser.id
+      topic.response_count = topic.response_count + 1
+      topic.save
     end
   end
   
