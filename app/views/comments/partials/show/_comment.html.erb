@@ -10,9 +10,7 @@
       <%= format_text(comment.body) %>
     </div>
     <menu>
-      <% if @comment || @comments %>
-        <li><%= link_to "View post", post_path(comment.post_id) %></li>
-      <% else %>
+      <% if @post || @posts %>
         <li><%= link_to "Reply", new_comment_path(:post_id => comment.post_id), :class => "reply-link", "data-comment-id" => comment.id %></li>
         <% if comment.editable_by?(CurrentUser.user) %>
           <li><%= link_to "Delete", comment_path(comment.id), :confirm => "Do you really want to delete this comment?", :method => :delete, :remote => true %></li>

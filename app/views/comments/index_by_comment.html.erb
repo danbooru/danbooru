@@ -5,7 +5,13 @@
     <div class="comments-for-post">
       <div class="list-of-comments">
         <% @comments.each do |comment| %>
-          <%= render "comments/partials/show/comment", :post => comment.post, :comment => comment, :show_header => false %>
+          <div class="post post-preview" data-tags="<%= comment.post.tag_string %>" data-uploader="<%= comment.post.uploader_name %>" data-rating="<%= comment.post.rating %>" data-flags="<%= comment.post.status %>" data-score="<%= comment.post.score %>" data-parent-id="<%= comment.post.parent_id %>" data-has-children="<%= comment.post.has_children? %>">
+            <div class="preview">
+              <%= link_to(image_tag(comment.post.preview_file_url), post_path(comment.post)) %>
+            </div>
+            <%= render :partial => "comments/partials/show/comment", :collection => [comment] %>
+            <div class="clearfix"></div>
+          </div>
         <% end %>
       </div>
     </div>
