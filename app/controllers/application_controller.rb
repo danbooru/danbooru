@@ -14,12 +14,12 @@ class ApplicationController < ActionController::Base
 protected
   def rescue_exception(exception)
     @exception = exception
-    render :action => "static/error", :status => 500
+    render :template => "static/error", :status => 500
   end
   
   def render_pagination_limit
-    @error_message = "You can view up to 1,000 pages. Please narrow your search terms."
-    render :action => "static/error", :status => 410
+    @error_message = "You can only view up to #{Danbooru.config.max_numbered_pages} pages. Please narrow your search terms."
+    render :template => "static/error", :status => 410
   end
   
   def access_denied

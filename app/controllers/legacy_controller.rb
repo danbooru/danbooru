@@ -1,6 +1,6 @@
 class LegacyController < ApplicationController
   before_filter :member_only, :only => [:create_post]
-  rescue_from PostSets::SearchError, :with => :error
+  rescue_from PostSets::SearchError, :with => :rescue_exception
 
   def posts
     @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit])
@@ -30,9 +30,6 @@ class LegacyController < ApplicationController
   
   def unavailable
     render :text => "this resource is no longer available", :status => 410
-  end
-  
-  def error
   end
 
 private
