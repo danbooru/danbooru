@@ -38,7 +38,7 @@ class Cache
   def self.get(key, expiry = 0)
     begin
       start_time = Time.now
-      value = MEMCACHE.get key
+      value = MEMCACHE.get key.slice(0, 200)
       elapsed = Time.now - start_time
       ActiveRecord::Base.logger.debug('MemCache Get (%0.6f)  %s' % [elapsed, key])
       if value.nil? and block_given? then

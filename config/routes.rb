@@ -198,13 +198,16 @@ Danbooru::Application.routes.draw do
   match "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}"}
   match "/artist/index" => redirect {|params, req| "/artists?page=#{req.params[:page]}"}
   match "/artist/show/:id" => redirect("/artists/%{id}")
-  match "/artist/show" => redirect {|params, req| "/artists?name=#{req.params[:name]}"}
+  match "/artist/show" => redirect {|params, req| "/artists?name=#{CGI::escape(req.params[:name])}"}
   match "/artist/history/:id" => redirect("/artist_versions?search[artist_id]=%{id}")
+  match "/artist/update/:id" => redirect("/artists/%{id}")
+  match "/artist/recent_changes" => redirect("/artist_versions")
   
   match "/comment" => redirect {|params, req| "/comments?page=#{req.params[:page]}"}
   match "/comment/index" => redirect {|params, req| "/comments?page=#{req.params[:page]}"}
   match "/comment/show/:id" => redirect("/comments/%{id}")
   match "/comment/new" => redirect("/comments")
+  match "/comment/search" => redirect("/comments/search")
   
   match "/favorite" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
   match "/favorite/index" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
@@ -214,6 +217,7 @@ Danbooru::Application.routes.draw do
   match "/forum/index" => redirect {|params, req| "/forum_topics?page=#{req.params[:page]}"}
   match "/forum/show/:id" => redirect("/forum_posts/%{id}")
   match "/forum/search" => redirect("/forum_posts/search")
+  match "/forum/new" => redirect("/forum_posts/new")
   match "/forum/edit/:id" => redirect("/forum_posts/%{id}/edit")
 
   match "/note" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
@@ -243,6 +247,7 @@ Danbooru::Application.routes.draw do
   match "/post/show/:id" => redirect("/posts/%{id}")
   match "/post/view/:id/:tag_title" => redirect("/posts/%{id}")
   match "/post/view/:id" => redirect("/posts/%{id}")
+  match "/post/flag/:id" => redirect("/posts/%{id}")
   
   match "/post_tag_history" => redirect {|params, req| "/post_versions?page=#{req.params[:page]}"}
   match "/post_tag_history/index" => redirect {|params, req| "/post_versions?page=#{req.params[:page]}"}
@@ -261,6 +266,8 @@ Danbooru::Application.routes.draw do
   
   match "/wiki" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
   match "/wiki/index" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
+  match "/wiki/revert" => redirect("/wiki_pages")
+  match "/wiki/rename" => redirect("/wiki_pages")
   match "/wiki/show" => redirect {|params, req| "/wiki_pages?title=#{CGI::escape(req.params[:title].to_s)}"}
   match "/wiki/recent_changes" => redirect("/wiki_page_versions")
   match "/wiki/history/:title" => redirect("/wiki_page_versions?title=%{title}")

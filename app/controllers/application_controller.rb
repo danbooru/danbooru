@@ -9,9 +9,19 @@ class ApplicationController < ActionController::Base
   layout "default"
   
   rescue_from User::PrivilegeError, :with => :access_denied
+  rescue_from Danbooru::Paginator::PaginationError, :with => :render_pagination_limit
 
 protected
-
+  def rescue_exception(exception)
+    @exception = exception
+    render :action => "static/error", :status => 500
+  end
+  
+  def render_pagination_limit
+    @error_message = "You can view up to 1,000 pages. Please narrow your search terms."
+    render :action => "static/error", :status => 410
+  end
+  
   def access_denied
     previous_url = params[:url] || request.fullpath
 

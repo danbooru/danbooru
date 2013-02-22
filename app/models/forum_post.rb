@@ -110,7 +110,7 @@ class ForumPost < ActiveRecord::Base
   end
   
   def quoted_response
-    stripped_body = body.gsub(/\[quote\](?:.|\n|\r)+\[\/quote\][\n\r]*/m, "")
+    stripped_body = body.gsub(/\[quote\](?:.|\n|\r)+?\[\/quote\][\n\r]*/m, "")
     "[quote]\n#{creator_name} said:\n\n#{stripped_body}\n[/quote]\n\n"
   end
   

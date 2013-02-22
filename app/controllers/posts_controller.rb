@@ -2,9 +2,8 @@ class PostsController < ApplicationController
   before_filter :member_only, :except => [:show, :index]
   after_filter :save_recent_tags, :only => [:update]
   respond_to :html, :xml, :json
-  rescue_from PostSets::SearchError, :with => :search_error
-  rescue_from Post::SearchError, :with => :search_error
-  rescue_from Danbooru::Paginator::PaginationError, :with => :search_error
+  rescue_from PostSets::SearchError, :with => :rescue_exception
+  rescue_from Post::SearchError, :with => :rescue_exception
   
   def index
     @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit])
@@ -55,16 +54,8 @@ class PostsController < ApplicationController
       format.js
     end
   end
-  
-  def error
-  end
 
 private
-  def search_error(exception)
-    @exception = exception
-    render :action => "error"
-  end
-  
   def tag_query
     params[:tags] || (params[:post] && params[:post][:tags])
   end

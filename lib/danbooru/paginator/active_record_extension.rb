@@ -59,7 +59,11 @@ module Danbooru
           
           limit(records_per_page).offset((page - 1) * records_per_page).tap do |obj|
             obj.extend(NumberedCollectionExtension)
-            obj.total_pages = (obj.total_count.to_f / records_per_page).ceil
+            if records_per_page > 0
+              obj.total_pages = (obj.total_count.to_f / records_per_page).ceil
+            else
+              obj.total_pages = 1
+            end
             obj.current_page = page
           end
         end
