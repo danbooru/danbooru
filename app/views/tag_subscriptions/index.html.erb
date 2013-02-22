@@ -4,7 +4,6 @@
     <table class="striped" width="100%">
       <thead>
         <tr>
-          <th>Creator</th>
           <th>Name</th>
           <th>Tag Query</th>
           <% if CurrentUser.is_admin? %>
@@ -16,8 +15,7 @@
       <tbody>
         <% @tag_subscriptions.each do |tag_subscription| %>
           <tr>
-            <td><%= link_to tag_subscription.creator.name, user_path(tag_subscription.creator_id) %></td>
-            <td><%= tag_subscription.name %></td>
+            <td><%= tag_subscription.pretty_name %></td>
             <td><%= tag_subscription.tag_query %></td>
             <td><%= tag_subscription.post_id_array.size %></td>
             <td>

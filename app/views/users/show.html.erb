@@ -34,7 +34,7 @@
           <h2>Subscriptions</h2>
           <% @presenter.subscriptions.each do |subscription| %>
             <div class="box">
-              <h3><%= link_to subscription.name, posts_path(:tags => "sub:#{@user.name}:#{subscription.name}") %></h3>
+              <h3><%= link_to subscription.pretty_name, posts_path(:tags => "sub:#{@user.name}:#{subscription.name}") %></h3>
               
               <div>
                 <% @presenter.posts_for_subscription(subscription).each do |post| %>

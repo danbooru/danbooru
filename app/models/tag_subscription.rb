@@ -12,6 +12,10 @@ class TagSubscription < ActiveRecord::Base
     self.name = name.gsub(/\W/, "_")
   end
   
+  def pretty_name
+    name.tr("_", " ")
+  end
+  
   def initialize_creator
     self.creator_id = CurrentUser.id
   end
