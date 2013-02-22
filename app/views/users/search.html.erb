@@ -7,6 +7,11 @@
         <label for="search_level">Level</label>
         <%= select("search", "level", [""] + User.level_hash.to_a) %>
       </div>
+
+      <div class="input">
+        <label for="search_min_level">Min Level</label>
+        <%= select("search", "min_level", [""] + User.level_hash.to_a) %>
+      </div>
       
       <%= submit_tag "Search" %>
     <% end %>
