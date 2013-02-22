@@ -25,7 +25,7 @@
         var $link = $(e.target);
         var $div = $link.closest("div.comments-for-post");
         var $textarea = $div.find("textarea")
-        $textarea.val(Danbooru.Comment.quote_message(data));
+        $textarea.val($textarea.val() + "\n\n" + Danbooru.Comment.quote_message(data));
         $div.find("a.expand-comment-response").trigger("click");
         $textarea.focus();
       }
