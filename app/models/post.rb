@@ -739,6 +739,7 @@ class Post < ActiveRecord::Base
       
       Post.transaction do
         update_column(:is_deleted, true)
+        update_column(:is_pending, false)
         give_favorites_to_parent
         update_children_on_destroy
         update_parent_on_destroy

@@ -48,7 +48,7 @@ class UserPresenter
     
     deleted_count = Post.for_user(user.id).deleted.count
     pending_count = Post.for_user(user.id).pending.count
-    approved_count = Post.where("is_flagged = false and is_pending = false and is_deleted = false and uploader_id = ?", user.id).count
+    approved_count = Post.where("is_pending = false and is_deleted = false and uploader_id = ?", user.id).count
     
     if user.base_upload_limit
       limit = user.base_upload_limit - pending_count
