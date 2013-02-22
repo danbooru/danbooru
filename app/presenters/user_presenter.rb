@@ -100,7 +100,7 @@ class UserPresenter
   end
   
   def comment_count(template)
-    template.link_to(Comment.for_creator(user.id).count, template.comments_path(:search => {:creator_id => user.id}))
+    template.link_to(Comment.for_creator(user.id).count, template.comments_path(:search => {:creator_id => user.id}, :group_by => "comment"))
   end
   
   def post_version_count(template)
