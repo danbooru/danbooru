@@ -22,16 +22,12 @@
         <% else %>
           <li><%= link_to "Hide from queue", moderator_post_disapproval_path(:post_id => post.id), :remote => true, :method => :post, :id => "disapprove" %></li>
         <% end %>
-      <% end %>
-
-      <% if CurrentUser.is_moderator? %>
         <% if post.is_deleted? %>
           <li><%= link_to "Undelete", undelete_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "undelete" %></li>
         <% else %>
           <li><%= link_to "Delete", delete_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "delete" %></li>
         <% end %>
       <% end %>
-
     <% end %>
   <% end %>
   
