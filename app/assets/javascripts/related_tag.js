@@ -100,7 +100,9 @@
   Danbooru.RelatedTag.favorite_tags = function() {
     var string = Danbooru.meta("favorite-tags");
     if (string) {
-      return Danbooru.meta("favorite-tags").match(/\S+/g);
+      return $.map(string.match(/\S+/g), function(x, i) {
+        return [[x, 0]];
+      });
     } else {
       return [];
     }
