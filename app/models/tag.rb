@@ -417,7 +417,19 @@ class Tag < ActiveRecord::Base
         q = q.where("post_count > 0")
       end
       
-      case params[:sort].present?
+      if params[:limit].present?
+        q = q.limit(params[:limit].to_i)
+      end
+      
+      case params[:order]
+      when "date"
+        q = q.order("created_at desc")
+        
+      else
+        q = q.order("name")
+      end
+      
+      case params[:sort]
       when "count"
         q = q.order("post_count desc")
         
