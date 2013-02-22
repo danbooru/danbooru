@@ -116,7 +116,7 @@ module ApplicationHelper
 protected
   def nav_link_match(controller, url)
     url =~ case controller
-    when "sessions", "users", "maintenance/user/login_reminders", "maintenance/user/password_resets", "admin/users"
+    when "sessions", "users", "maintenance/user/login_reminders", "maintenance/user/password_resets", "admin/users", "tag_subscriptions"
       /^\/(session|users)/
       
     when "forum_posts"
@@ -128,7 +128,7 @@ protected
     when "notes", "note_versions"
       /^\/notes/
       
-    when "posts", "uploads", "post_versions", "explore/posts", "moderator/post/dashboards", "favorites", "tag_subscriptions"
+    when "posts", "uploads", "post_versions", "explore/posts", "moderator/post/dashboards", "favorites"
       /^\/post/
       
     when "artists", "artist_versions"

@@ -9,6 +9,9 @@
       <li>|</li>
       <% if @user.id == CurrentUser.id %>
         <li><%= link_to "Settings", edit_user_path(CurrentUser.user) %></li>
+        <% if @user.is_privileged? %>
+          <li><%= link_to "Edit subscriptions", tag_subscriptions_path %></li>
+        <% end %>
         <li><%= link_to "Profile", user_path(CurrentUser.user) %></li>
         <li><%= link_to "Messages #{CurrentUser.dmail_count}", dmails_path(:search => {:owner_id => CurrentUser.id, :to_id => CurrentUser.id}) %></li>
       <% else %>

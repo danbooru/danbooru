@@ -42,6 +42,10 @@ class UserPresenter
   end
   
   def upload_limit
+    if user.is_contributor?
+      return "none"
+    end
+    
     deleted_count = Post.for_user(user.id).deleted.count
     pending_count = Post.for_user(user.id).pending.count
     approved_count = Post.where("is_flagged = false and is_pending = false and is_deleted = false and uploader_id = ?", user.id).count
