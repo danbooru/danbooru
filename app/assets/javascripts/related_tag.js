@@ -98,7 +98,12 @@
   }
   
   Danbooru.RelatedTag.favorite_tags = function() {
-    return Danbooru.meta("favorite-tags").match(/\S+/g);
+    var string = Danbooru.meta("favorite-tags");
+    if (string) {
+      return Danbooru.meta("favorite-tags").match(/\S+/g);
+    } else {
+      return [];
+    }
   }
   
   Danbooru.RelatedTag.build_html = function(query, related_tags) {
