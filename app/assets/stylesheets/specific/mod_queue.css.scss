@@ -6,6 +6,18 @@ div#c-moderator-post-queues {
     overflow: hidden;
   }
   
+  article.post-has-dup {
+    background: rgb(255, 255, 100);
+  }
+
+  article.post-neg-score {
+    background: rgb(255, 230, 230);
+  }
+  
+  article.post-pos-score {
+    background: rgb(230, 255, 230);
+  }
+  
   aside {
     float: left;
     width: 220px;

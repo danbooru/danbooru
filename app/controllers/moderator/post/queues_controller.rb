@@ -5,8 +5,9 @@ module Moderator
       before_filter :janitor_only
       
       def show
-        @search = ::Post.order("id asc").pending_or_flagged.available_for_moderation(params[:hidden]).search(:tag_match => "#{params[:query]} status:any")
-        @posts = @search.paginate(params[:page])
+        ::Post.without_timeout do
+          @posts = ::Post.order("id asc").pending_or_flagged.available_for_moderation(params[:hidden]).search(:tag_match => "#{params[:query]} status:any").paginate(params[:page])
+        end
         respond_with(@posts)
       end
     end

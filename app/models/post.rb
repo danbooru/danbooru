@@ -426,6 +426,10 @@ class Post < ActiveRecord::Base
       tag_string =~ /(?:^| )#{tag}(?:$| )/
     end
     
+    def has_dup_tag?
+      has_tag?("duplicate") ? true : false
+    end
+    
     def tag_categories
       @tag_categories ||= Tag.categories_for(tag_array)
     end
