@@ -1,0 +1,54 @@
+<div>
+  <h2>Statistics</h2>
+  <dl>
+    <dt>Join Date</dt>
+    <dd><%= presenter.join_date %></dd>
+
+    <dt>Inviter</dt>
+    <dd><%= presenter.inviter(self) %></dd>
+
+    <dt>Level</dt>
+    <dd><%= presenter.level %></dd>
+
+    <% if user.is_banned? %>
+      <dt>Ban reason</dt>
+      <dd><%= presenter.ban_reason %></dd>
+    <% end %>
+
+    <dt>Upload Limit</dt>
+    <dd><%= presenter.upload_limit %></dd>
+
+    <dt>Uploads</dt>
+    <dd><%= presenter.upload_count(self) %></dd>
+
+    <dt>Deleted Uploads</dt>
+    <dd><%= presenter.deleted_upload_count(self) %></dd>
+
+    <dt>Favorites</dt>
+    <dd><%= presenter.favorite_count(self) %></dd>
+
+    <dt>Post Changes</dt>
+    <dd><%= presenter.post_version_count(self) %></dd>
+
+    <dt>Note Changes</dt>
+    <dd><%= presenter.note_version_count(self) %></dd>
+
+    <dt>Wiki Page Changes</dt>
+    <dd><%= presenter.wiki_page_version_count(self) %></dd>
+
+    <dt>Pool Changes</dt>
+    <dd><%= presenter.pool_version_count(self) %></dd>
+
+    <dt>Forum Posts</dt>
+    <dd><%= presenter.forum_post_count(self) %></dd>
+
+    <dt>Approvals</dt>
+    <dd><%= presenter.approval_count(self) %></dd>
+
+    <dt>Comments</dt>
+    <dd><%= presenter.comment_count(self) %></dd>
+
+    <dt>Feedback</dt>
+    <dd><%= presenter.feedbacks(self) %></dd>
+  </dl>
+</div>
