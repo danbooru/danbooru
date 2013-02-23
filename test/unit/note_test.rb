@@ -14,6 +14,24 @@ class NoteTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
     
+    context "for a post that already has a note" do
+      setup do
+        @post = FactoryGirl.create(:post)
+        @note = FactoryGirl.create(:note, :post => @post)
+      end
+      
+      context "when the note is deleted the post" do
+        setup do
+          @note.toggle!(:is_active)
+        end
+        
+        should "null out its last_noted_at_field" do
+          @post.reload
+          assert_nil(@post.last_noted_at)
+        end
+      end
+    end
+    
     context "creating a note" do
       setup do
         @post = FactoryGirl.create(:post)
