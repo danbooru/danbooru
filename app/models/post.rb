@@ -871,7 +871,7 @@ class Post < ActiveRecord::Base
     end
     
     def pending_or_flagged
-      where("(is_pending = ? or is_flagged = ?)", true, true)
+      where("(is_pending = ? or (is_flagged = ? and id in (select _.post_id from post_flags _ where _.created_at >= ?)))", true, true, 1.week.ago)
     end
     
     def undeleted
