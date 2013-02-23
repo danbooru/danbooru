@@ -4,7 +4,7 @@
   </div>
 <% end %>
 
-<%= form_for(post, :html => {:class => "simple_form"}) do |f| %>
+<%= form_for(post, :html => {:class => "simple_form", :id => "form"}) do |f| %>
   <%= f.hidden_field :old_tag_string, :value => post.tag_string %>
 
   <div class="input">

@@ -19,12 +19,33 @@
       this.initialize_post_sections();
       this.initialize_post_image_resize_links();
       this.initialize_post_image_resize_to_window_link();
+      this.initialize_similar();
       this.place_jlist_ads();
       
       if (Danbooru.meta("always-resize-images") === "true") {
         $("#image-resize-to-window-link").click();
       }
     }
+  }
+  
+  Danbooru.Post.initialize_similar = function() {
+    $("#similar-button").click(function(e) {
+      var old_source_name = $("#post_source").attr("name");
+  		var old_target = $("#form").attr("target");
+  		var old_action = $("#form").attr("action");
+
+  		$("#post_source").attr("name", "url");
+  		$("#form").attr("target", "_blank");
+  		$("#form").attr("action", "http://danbooru.iqdb.org/");
+
+      $("#form").trigger("submit");
+
+  		$("#post_source").attr("name", old_source_name);
+  		$("#form").attr("target", old_target);
+  		$("#form").attr("action", old_action);
+  		
+  		e.preventDefault();
+    });
   }
   
   Danbooru.Post.initialize_shortcuts = function() {

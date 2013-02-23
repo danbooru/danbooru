@@ -21,7 +21,7 @@
   		$("#form").attr("target", "_blank");
   		$("#form").attr("action", "http://danbooru.iqdb.org/");
 
-  		$("form").trigger("submit");
+      $("#form").trigger("submit");
 
   		$("#upload_source").attr("name", old_source_name);
   		$("#upload_file").attr("name", old_file_name);
