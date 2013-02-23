@@ -201,6 +201,7 @@ Danbooru::Application.routes.draw do
 
   # legacy aliases
   match "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}"}
+  match "/artist/index.xml", :controller => "legacy", :action => "artists"
   match "/artist/index" => redirect {|params, req| "/artists?page=#{req.params[:page]}"}
   match "/artist/show/:id" => redirect("/artists/%{id}")
   match "/artist/show" => redirect {|params, req| "/artists?name=#{CGI::escape(req.params[:name])}"}

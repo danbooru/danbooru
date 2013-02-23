@@ -21,11 +21,15 @@ class LegacyController < ApplicationController
   end
   
   def users
-    @users = User.search(params).limit(100)
+    @users = User.limit(100).search(params).paginate(params[:page])
   end
   
   def tags
-    @tags = Tag.search(params).limit(100)
+    @tags = Tag.limit(100).search(params).paginate(params[:page])
+  end
+  
+  def artists
+    @artists = Artist.limit(100).search(params[:search]).paginate(params[:page])
   end
   
   def unavailable
