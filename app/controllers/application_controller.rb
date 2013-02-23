@@ -3,7 +3,6 @@ class ApplicationController < ActionController::Base
   helper :pagination
   before_filter :set_current_user
   after_filter :reset_current_user
-  before_filter :initialize_cookies
   before_filter :set_title
   before_filter :set_started_at_session
   layout "default"
@@ -66,14 +65,6 @@ protected
         access_denied()
         false
       end
-    end
-  end
-
-  def initialize_cookies
-    if CurrentUser.user.is_anonymous?
-      cookies["blacklisted_tags"] = ""
-    else
-      cookies["blacklisted_tags"] = CurrentUser.user.blacklisted_tags
     end
   end
   
