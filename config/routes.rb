@@ -52,6 +52,7 @@ Danbooru::Application.routes.draw do
   resources :artists do
     member do
       put :revert
+      put :ban
     end
     collection do
       get :show_or_new

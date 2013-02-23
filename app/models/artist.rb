@@ -3,7 +3,6 @@ class Artist < ActiveRecord::Base
   before_save :normalize_name
   after_save :create_version
   after_save :save_url_string
-  after_save :commit_ban
   validates_uniqueness_of :name
   belongs_to :creator, :class_name => "User"
   has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
@@ -162,14 +161,6 @@ class Artist < ActiveRecord::Base
   end
   
   module BanMethods
-    def commit_ban
-      if is_banned? && is_banned_changed?
-        ban!
-      end
-      
-      true
-    end
-    
     def ban!
       Post.transaction do
         begin

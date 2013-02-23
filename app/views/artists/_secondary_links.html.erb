@@ -11,6 +11,9 @@
       <li><%= link_to "Show", artist_path(@artist) %></li>
       <li><%= link_to "Edit", edit_artist_path(@artist) %></li>
       <li><%= link_to "History", artist_versions_path(:search => {:artist_id => @artist.id}) %></li>
+      <% if CurrentUser.is_admin? %>
+        <%= link_to "Ban", ban_artist_path(@artist), :method => :put %>
+      <% end %>
     <% end %>
   </menu>
 <% end %>

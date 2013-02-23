@@ -1,6 +1,7 @@
 class ArtistsController < ApplicationController
   respond_to :html, :xml, :json
   before_filter :member_only, :except => [:index, :show, :banned]
+  before_filter :admin_only, :only => [:ban]
   
   def new
     @artist = Artist.new_with_defaults(params)
@@ -15,6 +16,12 @@ class ArtistsController < ApplicationController
   def banned
     @artists = Artist.where("is_banned = ?", true).order("name")
     respond_with(@artists)
+  end
+  
+  def ban
+    @artist = Artist.find(params[:id])
+    @artist.ban!
+    redirect_to(artist_path(@artist), :notice => "Artist was banned")
   end
   
   def index
