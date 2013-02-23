@@ -14,6 +14,23 @@ class ForumPostTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
     
+    context "that belongs to a topic with several pages of posts" do
+      setup do
+        Danbooru.config.stubs(:posts_per_page).returns(3)
+        @posts = []
+        10.times do
+          @posts << FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
+        end
+      end
+      
+      should "know which page it's on" do
+        assert_equal(2, @posts[3].forum_topic_page)
+        assert_equal(2, @posts[4].forum_topic_page)
+        assert_equal(2, @posts[5].forum_topic_page)
+        assert_equal(3, @posts[6].forum_topic_page)
+      end
+    end
+    
     context "belonging to a locked topic" do
       setup do
         @post = FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => "zzz")
