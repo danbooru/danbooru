@@ -284,6 +284,18 @@ class Artist < ActiveRecord::Base
     end
   end
   
+  def legacy_api_hash
+    return {
+      :id => id, 
+      :name => name, 
+      :other_names => other_names,
+      :group_name => group_name,
+      :urls => artist_urls.map {|x| x.url},
+      :is_active => is_active?,
+      :updater_id => 0
+    }
+  end
+  
   def initialize_creator
     self.creator_id = CurrentUser.user.id
   end
