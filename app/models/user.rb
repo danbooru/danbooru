@@ -396,7 +396,7 @@ class User < ActiveRecord::Base
     def upload_limit
       deleted_count = Post.for_user(id).deleted.count
       pending_count = Post.for_user(id).pending.count
-      approved_count = Post.where("is_pending = false and is_deleted = false and uploader_id = ?", id).count
+      approved_count = Post.where("is_flagged = false and is_pending = false and is_deleted = false and uploader_id = ?", id).count
       
       if base_upload_limit
         limit = base_upload_limit - pending_count
