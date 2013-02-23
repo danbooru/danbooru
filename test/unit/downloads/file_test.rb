@@ -39,5 +39,24 @@ module Downloads
         assert_match(/image\/gif/, @download.content_type)
       end
     end
+
+    context "A post download with an HTTPS source" do
+      setup do
+        @source = "https://www.google.com/intl/en_ALL/images/logo.gif"
+        @tempfile = Tempfile.new("danbooru-test")
+        @download = Downloads::File.new(@source, @tempfile.path)
+      end
+
+      teardown do
+        @tempfile.close
+      end
+
+      should "stream a file from an HTTPS source" do
+        @download.http_get_streaming do |resp|
+          assert_equal("200", resp.code)
+          assert(resp["Content-Length"].to_i > 0, "File should be larger than 0 bytes")
+        end
+      end
+    end
   end
 end
