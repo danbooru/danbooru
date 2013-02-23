@@ -247,7 +247,7 @@ class Upload < ActiveRecord::Base
   module DownloaderMethods
     # Determines whether the source is downloadable
     def is_downloadable?
-      source =~ /^http:\/\// && file_path.blank?
+      source =~ /^https?:\/\// && file_path.blank?
     end
 
     # Downloads the file to destination_path
