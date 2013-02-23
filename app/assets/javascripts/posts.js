@@ -1,15 +1,15 @@
 (function() {
   Danbooru.Post = {};
-  
+
   Danbooru.Post.pending_update_count = 0;
-  
+
   Danbooru.Post.initialize_all = function() {
     this.initialize_titles();
-    
+
     if ($("#c-posts").length) {
       this.initialize_shortcuts();
     }
-    
+
     if ($("#c-posts").length && $("#a-index").length) {
       this.initialize_wiki_page_excerpt();
     }
@@ -20,19 +20,19 @@
       this.initialize_post_image_resize_links();
       this.initialize_post_image_resize_to_window_link();
       this.place_jlist_ads();
-      
+
       if (Danbooru.meta("always-resize-images") === "true") {
         $("#image-resize-to-window-link").click();
       }
     }
   }
-  
+
   Danbooru.Post.initialize_shortcuts = function() {
     $(document).bind("keydown./", function(e) {
-      $("#tags").trigger("focus"); 
+      $("#tags").trigger("focus");
       e.preventDefault();
     });
-    
+
     if ($("#a-show").length) {
       $(document).bind("keydown.e", function(e) {
         $("#post-edit-link").trigger("click");
@@ -41,7 +41,7 @@
       });
     }
   }
-  
+
   Danbooru.Post.initialize_links = function() {
     $("#side-edit-link").click(function(e) {
       $("#post-edit-link").trigger("click");
@@ -49,28 +49,28 @@
       e.preventDefault();
     });
   }
-  
+
   Danbooru.Post.initialize_titles = function() {
     $(".post-preview").each(function(i, v) {
       Danbooru.Post.initialize_title_for(v);
     });
   }
-  
+
   Danbooru.Post.initialize_title_for = function(post) {
     var $post = $(post);
     var $img = $post.find("img");
     $img.attr("title", $post.data("tags") + " user:" + $post.data("uploader") + " rating:" + $post.data("rating") + " score:" + $post.data("score"));
-    
+
     var status = $post.data("flags");
-    
+
     if (status.match(/pending/)) {
       $post.addClass("post-status-pending");
     }
-    
+
     if (status.match(/flagged/)) {
       $post.addClass("post-status-flagged");
     }
-    
+
     if ($post.data("parent-id")) {
       $post.addClass("post-status-has-parent");
     }
@@ -82,7 +82,6 @@
 
   Danbooru.Post.initialize_post_image_resize_links = function() {
     $("#image-resize-link").click(function(e) {
-      Danbooru.Note.Box.descale_all();
       var $link = $(e.target);
       var $image = $("#image");
       $image.attr("src", $link.attr("href"));
@@ -94,12 +93,10 @@
       e.preventDefault();
     });
   }
-  
+
   Danbooru.Post.initialize_post_image_resize_to_window_link = function() {
     $("#image-resize-to-window-link").click(function(e) {
       var $img = $("#image");
-
-      Danbooru.Note.Box.descale_all();
 
       if (($img.data("scale_factor") === 1) || ($img.data("scale_factor") === undefined)) {
         $img.data("original_width", $img.width());
@@ -124,10 +121,10 @@
       e.preventDefault();
     });
   }
-  
+
   Danbooru.Post.initialize_wiki_page_excerpt = function() {
     $("#wiki-page-excerpt").hide();
-    
+
     $("#show-posts-link").click(function(e) {
       $("#show-posts-link").parent("li").addClass("active");
       $("#show-wiki-excerpt-link").parent("li").removeClass("active");
@@ -135,7 +132,7 @@
       $("#wiki-page-excerpt").hide();
       e.preventDefault();
     });
-    
+
     $("#show-wiki-excerpt-link").click(function(e) {
       $("#show-posts-link").parent("li").removeClass("active");
       $("#show-wiki-excerpt-link").parent("li").addClass("active");
@@ -144,7 +141,7 @@
       e.preventDefault();
     });
   }
-  
+
   Danbooru.Post.initialize_post_sections = function() {
     $("#post-sections li a").click(function(e) {
       if (e.target.hash === "#comments") {
@@ -160,25 +157,25 @@
         $("#comments").hide();
         $("#share").show();
       }
-      
+
       $("#post-sections li").removeClass("active");
       $(e.target).parent("li").addClass("active");
       var name = e.target.hash;
       e.preventDefault();
     });
-    
+
     $("#post-sections li:first-child").addClass("active");
     $("#notes").hide();
     $("#edit").hide();
   }
-  
+
   Danbooru.Post.notice_update = function(x) {
     if (x === "inc") {
       Danbooru.Post.pending_update_count += 1;
       Danbooru.notice("Updating posts (" + Danbooru.Post.pending_update_count + " pending)...");
     } else {
       Danbooru.Post.pending_update_count -= 1;
-      
+
       if (Danbooru.Post.pending_update_count < 1) {
         Danbooru.notice("Posts updated");
       } else {
@@ -186,17 +183,17 @@
       }
     }
   }
-  
+
   Danbooru.Post.update_data = function(data) {
     var $post = $("#post_" + data.id);
     $post.data("tags", data.tag_string);
     $post.data("rating", data.rating);
     Danbooru.Post.initialize_title_for($post);
   }
-  
+
   Danbooru.Post.vote = function(score, id) {
     Danbooru.Post.notice_update("inc");
-    
+
     $.ajax({
       type: "POST",
       url: "/posts/" + id + "/votes",
@@ -214,7 +211,7 @@
       }
     });
   }
-  
+
   Danbooru.Post.update = function(post_id, params) {
     Danbooru.Post.notice_update("inc");
 
@@ -227,7 +224,7 @@
       },
       success: function(data, status, xhr) {
         Danbooru.Post.update_data(data);
-        
+
       },
       error: function(data, status, xhr) {
         Danbooru.notice("Error: " + data.reason);
@@ -235,7 +232,7 @@
       }
     });
   }
-  
+
   Danbooru.Post.place_jlist_ads = function() {
     var jlist = $("#jlist-rss-ads-for-show");
     if (jlist.length) {
