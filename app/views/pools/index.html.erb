@@ -4,8 +4,9 @@
       <thead>
         <tr>
           <th width="5%"></th>
-          <th width="70%">Name</th>
+          <th width="60%">Name</th>
           <th width="25%">Creator</th>
+          <th width="10%">Count</th>
         </tr>
       </thead>
       <tbody>
@@ -19,6 +20,9 @@
             </td>
             <td>
               <%= link_to h(pool.creator.name), user_path(pool.creator) %>
+            </td>
+            <td>
+              <%= pool.post_count %>
             </td>
           <% end %>
         <% end %>
