@@ -82,7 +82,6 @@
 
   Danbooru.Post.initialize_post_image_resize_links = function() {
     $("#image-resize-link").click(function(e) {
-      Danbooru.Note.Box.descale_all();
       var $link = $(e.target);
       var $image = $("#image");
       $image.attr("src", $link.attr("href"));
@@ -98,8 +97,6 @@
   Danbooru.Post.initialize_post_image_resize_to_window_link = function() {
     $("#image-resize-to-window-link").click(function(e) {
       var $img = $("#image");
-
-      Danbooru.Note.Box.descale_all();
 
       if (($img.data("scale_factor") === 1) || ($img.data("scale_factor") === undefined)) {
         $img.data("original_width", $img.width());

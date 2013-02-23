@@ -88,54 +88,20 @@ Danbooru.Note = {
     },
 
     scale: function($note_box) {
-      var $image = $("#image");
-      var original_width = parseFloat($image.data("original-width"));
-      var ratio = $image.width() / original_width;
-
-      if (ratio < 1) {
-        var scaled_width = Math.round($note_box.width() * ratio);
-        var scaled_height = Math.round($note_box.height() * ratio);
-        var scaled_top = Math.round($note_box.position().top * ratio);
-        var scaled_left = Math.round($note_box.position().left * ratio);
-        $note_box.css({
-          top: scaled_top,
-          left: scaled_left,
-          width: scaled_width,
-          height: scaled_height
-        });
-        Danbooru.Note.Box.resize_inner_border($note_box);
-      }
+      var ratio = $image.width() / parseFloat($("#image").data("original-width"));
+      var $note = $("#notes > article[data-id=" + $note_box.data("id") + "]");
+      $note_box.css({
+        top: parseFloat($note.data("y")) * ratio,
+        left: parseFloat($note.data("x")) * ratio,
+        width: parseFloat($note.data("width")) * ratio,
+        height: parseFloat($note.data("height")) * ratio
+      });
+      Danbooru.Note.Box.resize_inner_border($note_box);
     },
 
     scale_all: function() {
       $(".note-box").each(function(i, v) {
         Danbooru.Note.Box.scale($(v));
-      });
-    },
-
-    descale: function($note_box) {
-      var $image = $("#image");
-      var original_width = parseFloat($image.data("original-width"));
-      var ratio = original_width / $image.width();
-
-      if (ratio > 1) {
-        var scaled_width = Math.round($note_box.width() * ratio);
-        var scaled_height = Math.round($note_box.height() * ratio);
-        var scaled_top = Math.round($note_box.position().top * ratio);
-        var scaled_left = Math.round($note_box.position().left * ratio);
-        $note_box.css({
-          top: scaled_top,
-          left: scaled_left,
-          width: scaled_width,
-          height: scaled_height
-        });
-        Danbooru.Note.Box.resize_inner_border($note_box);
-      }
-    },
-
-    descale_all: function() {
-      $(".note-box").each(function(i, v) {
-        Danbooru.Note.Box.descale($(v));
       });
     },
 
