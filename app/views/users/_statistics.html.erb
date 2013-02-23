@@ -1,54 +1,100 @@
 <div>
   <h2>Statistics</h2>
-  <dl>
-    <dt>Join Date</dt>
-    <dd><%= presenter.join_date %></dd>
+  <table width="100%" class="user-statistics">
+    <tbody>
+      <tr>
+        <th>Join Date</th>
+        <td><%= presenter.join_date %></td>
+      </tr>
 
-    <dt>Inviter</dt>
-    <dd><%= presenter.inviter(self) %></dd>
+      <tr>
+        <th>Inviter</th>
+        <td><%= presenter.inviter(self) %></td>
+      </tr>
 
-    <dt>Level</dt>
-    <dd><%= presenter.level %></dd>
+      <tr>
+        <th>Level</th>
+        <td><%= presenter.level %></td>
+      </tr>
 
-    <% if user.is_banned? %>
-      <dt>Ban reason</dt>
-      <dd><%= presenter.ban_reason %></dd>
-    <% end %>
+      <% if user.is_banned? %>
+        <tr>
+          <th>Ban reason</th>
+          <td><%= presenter.ban_reason %></td>
+        </tr>
+      <% end %>
 
-    <dt>Upload Limit</dt>
-    <dd><%= presenter.upload_limit %></dd>
+      <tr>
+        <th>Upload Limit</th>
+        <td><%= presenter.upload_limit %></td>
+      </tr>
 
-    <dt>Uploads</dt>
-    <dd><%= presenter.upload_count(self) %></dd>
+      <tr>
+        <th>Uploads</th>
+        <td><%= presenter.upload_count(self) %></td>
+      </tr>
+      
+      <tr>
+        <th>Deleted Uploads</th>
+        <td><%= presenter.deleted_upload_count(self) %></td>
+      </tr>
 
-    <dt>Deleted Uploads</dt>
-    <dd><%= presenter.deleted_upload_count(self) %></dd>
+      <tr>
+        <th>Favorites</th>
+        <td><%= presenter.favorite_count(self) %></td>
+      </tr>
 
-    <dt>Favorites</dt>
-    <dd><%= presenter.favorite_count(self) %></dd>
+      <tr>
+        <th>Post Changes</th>
+        <td><%= presenter.post_version_count(self) %></td>
+      </tr>
 
-    <dt>Post Changes</dt>
-    <dd><%= presenter.post_version_count(self) %></dd>
+      <tr>
+        <th>Note Changes</th>
+        <td><%= presenter.note_version_count(self) %></td>
+      </tr>
 
-    <dt>Note Changes</dt>
-    <dd><%= presenter.note_version_count(self) %></dd>
+      <tr>
+        <th>Wiki Page Changes</th>
+        <td><%= presenter.wiki_page_version_count(self) %></td>
+      </tr>
 
-    <dt>Wiki Page Changes</dt>
-    <dd><%= presenter.wiki_page_version_count(self) %></dd>
+      <tr>
+        <th>Pool Changes</th>
+        <td><%= presenter.pool_version_count(self) %></td>
+      </tr>
 
-    <dt>Pool Changes</dt>
-    <dd><%= presenter.pool_version_count(self) %></dd>
+      <tr>
+        <th>Forum Posts</th>
+        <td><%= presenter.forum_post_count(self) %></td>
+      </tr>
 
-    <dt>Forum Posts</dt>
-    <dd><%= presenter.forum_post_count(self) %></dd>
+      <tr>
+        <th>Approvals</th>
+        <td><%= presenter.approval_count(self) %></td>
+      </tr>
 
-    <dt>Approvals</dt>
-    <dd><%= presenter.approval_count(self) %></dd>
+      <tr>
+        <th>Comments</th>
+        <td><%= presenter.comment_count(self) %></td>
+      </tr>
 
-    <dt>Comments</dt>
-    <dd><%= presenter.comment_count(self) %></dd>
-
-    <dt>Feedback</dt>
-    <dd><%= presenter.feedbacks(self) %></dd>
-  </dl>
+      <tr>
+        <th>Feedback</th>
+        <td><%= presenter.feedbacks(self) %></td>    </tbody>
+      </tr>
+      
+      <tr>
+        <th>Subscriptions</th>
+        <td>
+          <% presenter.subscriptions.each do |subscription| %>
+            <p>
+              <strong><%= link_to subscription.pretty_name, posts_path(:tags => "sub:#{user.name}:#{subscription.name}") %></strong>
+              &ndash;
+              <%= presenter.tag_links_for_subscription(self, subscription) %>
+            </p>
+          <% end %>
+        </td>
+      </tr>
+  </table>
 </div>
