@@ -866,7 +866,7 @@ class Post < ActiveRecord::Base
     end
     
     def pending_or_flagged
-      where("(is_pending = ? OR is_flagged = ?)", true, true)
+      where("(is_pending = true OR (is_flagged = true and is_deleted = false))")
     end
     
     def undeleted
