@@ -9,7 +9,7 @@ module PostVersionsHelper
       html << '<del>' + link_to(tag, posts_path(:tags => tag)) + '</del>'
     end
     diff[:unchanged_tags].each do |tag|
-      html << '<span>' + link_to(tag, posts_path(:tags => tag)) + '</span>' unless tag =~ /^(?:rating|source):/
+      html << '<span>' + link_to(tag, posts_path(:tags => tag)) + '</span>'
     end
     return html.join(" ").html_safe
   end
