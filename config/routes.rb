@@ -140,7 +140,11 @@ Danbooru::Application.routes.draw do
     end
   end
   resource :related_tag, :only => [:show]
-  resource :session
+  resource :session do
+    collection do
+      get :sign_out
+    end
+  end
   resource :source, :only => [:show]
   resources :tags do
     collection do

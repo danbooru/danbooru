@@ -24,7 +24,7 @@
         <li><%= link_to "Promote", edit_admin_user_path(@user) %></li>
       <% end %>
       <li>|</li>
-      <li><%= link_to "Sign out", session_path, :method => :delete %></li>
+      <li><%= link_to "Sign out", sign_out_session_path %></li>
     <% end %>
   </menu>
 <% end %>
