@@ -1,5 +1,10 @@
 <%= simple_form_for(@artist) do |f| %>
-  <%= f.input :name %>
+  <div class="input">
+    <label for="artist_name">Name</label>
+    <%= text_field "artist", "name" %>
+    [<%= link_to "check", "#", :id => "check-name-link" %>]
+    <span id="check-name-result"></span>
+  </div>
   <%= f.input :other_names_comma, :hint => "Separate with commas", :as => :text, :label => "Other names" %>
   <%= f.input :group_name %>
   <%= f.input :url_string, :label => "URLs", :as => :text, :input_html => {:size => "50x5"} %>

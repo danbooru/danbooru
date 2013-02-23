@@ -25,7 +25,7 @@ class ArtistsController < ApplicationController
   end
   
   def index
-    @artists = Artist.search(params[:search]).order("id desc").paginate(params[:page])
+    @artists = Artist.search(params[:search] || params).order("id desc").paginate(params[:page])
     respond_with(@artists) do |format|
       format.xml do
         render :xml => @artists.to_xml(:include => [:urls])
