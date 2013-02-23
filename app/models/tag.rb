@@ -231,7 +231,7 @@ class Tag < ActiveRecord::Base
       }
       
       scan_query(query).each do |token|
-        q[:tag_count] += 1
+        q[:tag_count] += 1 unless token == "status:deleted"
 
         if token =~ /\A(#{METATAGS}):(.+)\Z/
           case $1
