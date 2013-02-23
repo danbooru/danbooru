@@ -41,8 +41,8 @@ module Downloads
       limit = 4
 
       while true
-        unless url.is_a?(URI::HTTP)
-          raise Error.new("URL must be HTTP")
+        unless url.is_a?(URI::HTTP) || url.is_a?(URI::HTTPS)
+          raise Error.new("URL must be HTTP or HTTPS")
         end
 
         headers = {
@@ -50,7 +50,7 @@ module Downloads
         }
         @source, headers = before_download(source, headers)
         
-        Net::HTTP.start(url.host, url.port) do |http|
+        Net::HTTP.start(url.host, url.port, :use_ssl => url.is_a?(URI::HTTPS)) do |http|
           http.read_timeout = 10
           http.request_get(url.request_uri, headers) do |res|
             case res
