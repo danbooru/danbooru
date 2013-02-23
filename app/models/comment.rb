@@ -6,6 +6,7 @@ class Comment < ActiveRecord::Base
   has_many :votes, :class_name => "CommentVote", :dependent => :destroy
   before_validation :initialize_creator, :on => :create
   after_save :update_last_commented_at
+  after_destroy :update_last_commented_at
   attr_accessible :body, :post_id, :do_not_bump_post
   attr_accessor :do_not_bump_post
   
@@ -83,8 +84,10 @@ class Comment < ActiveRecord::Base
   end
 
   def update_last_commented_at
-    if Comment.where(["post_id = ?", post_id]).count <= Danbooru.config.comment_threshold && !do_not_bump_post
+    if Comment.where("post_id = ?", post_id).count <= Danbooru.config.comment_threshold && !do_not_bump_post
       execute_sql("UPDATE posts SET last_commented_at = ? WHERE id = ?", created_at, post_id)
+    elsif Comment.where("post_id = ?", post_id).empty?
+      execute_sql("UPDATE posts SET last_commented_at = null WHERE id = ?", created_at, post_id)
     end
   end
   
