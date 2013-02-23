@@ -7,7 +7,7 @@ class IpBan < ActiveRecord::Base
   validates_uniqueness_of :ip_addr, :if => lambda {|rec| rec.ip_addr =~ IP_ADDR_REGEX}
   
   def self.is_banned?(ip_addr)
-    exists?("ip_addr = ?", ip_addr)
+    exists?(["ip_addr = ?", ip_addr])
   end
   
   def self.search(params)
