@@ -17,7 +17,7 @@ class ForumPostsController < ApplicationController
   
   def index
     @search = ForumPost.active.search(params[:search])
-    @forum_posts = @search.order("forum_posts.id DESC").paginate(params[:page])
+    @forum_posts = @search.order("forum_posts.id DESC").paginate(params[:page], :search_count => params[:search])
     respond_with(@forum_posts)
   end
   

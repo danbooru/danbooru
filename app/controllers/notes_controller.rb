@@ -63,8 +63,7 @@ private
   end
 
   def index_by_note
-    @search = Note.search(params[:search])
-    @notes = @search.order("id desc").paginate(params[:page])
+    @notes = Note.search(params[:search]).order("id desc").paginate(params[:page], :search_count => params[:search])
     respond_with(@notes) do |format|
       format.html {render :action => "index_by_note"}
     end

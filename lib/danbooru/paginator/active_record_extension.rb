@@ -69,12 +69,33 @@ module Danbooru
         end
         
         def records_per_page
-          (@paginator_options.try(:[], :limit) || Danbooru.config.posts_per_page).to_i
+          option_for(:limit).to_i
+        end
+        
+        # When paginating large tables, we want to avoid doing an expensive count query
+        # when the result won't even be used. So when calling paginate you can pass in
+        # an optional :search_count key which points to the search params. If these params
+        # exist, then assume we're doing a search and don't override the default count
+        # behavior. Otherwise, just return some large number so the paginator skips the
+        # count.
+        def option_for(key)
+          case key
+          when :limit
+            @paginator_options.try(:[], :limit) || Danbooru.config.posts_per_page
+            
+          when :count
+            if @paginator_options.has_key?(:search_count) && @paginator_options[:search_count].blank?
+              1_000_000
+            else
+              nil
+            end
+            
+          end
         end
 
         # taken from kaminari (https://github.com/amatsuda/kaminari)
         def total_count
-          return @paginator_options[:count] if @paginator_options[:count]
+          return option_for(:count) if option_for(:count)
           
           c = except(:offset, :limit, :order)
           c = c.reorder(nil)

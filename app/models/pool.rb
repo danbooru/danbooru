@@ -22,7 +22,7 @@ class Pool < ActiveRecord::Base
     
     def search(params)
       q = scoped
-      return q if params.blank?
+      params = {} if params.blank?
       
       if params[:name_matches].present?
         params[:name_matches] = params[:name_matches].tr(" ", "_")
@@ -42,10 +42,10 @@ class Pool < ActiveRecord::Base
         q = q.where("creator_id = ?", params[:creator_id].to_i)
       end
       
-      if params[:sort] == "updated_at"
-        q = q.order("updated_at desc")
-      else
+      if params[:sort] == "name"
         q = q.order("name")
+      else
+        q = q.order("updated_at desc")
       end
       
       q

@@ -5,7 +5,7 @@ class NoteVersion < ActiveRecord::Base
 
   def self.search(params)
     q = scoped
-    return q if params.blank?
+    params = {} if params.blank?
     
     if params[:updater_id]
       q = q.where("updater_id = ?", params[:updater_id].to_i)

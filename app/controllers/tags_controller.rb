@@ -8,7 +8,7 @@ class TagsController < ApplicationController
   end
   
   def index
-    @tags = Tag.search(params[:search]).paginate(params[:page])
+    @tags = Tag.search(params[:search]).paginate(params[:page], :search_count => params[:search])
     respond_with(@tags)
   end
   

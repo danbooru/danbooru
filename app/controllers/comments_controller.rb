@@ -67,14 +67,14 @@ private
   end
 
   def index_by_post
-    @posts = Post.commented_before(Time.now).tag_match(params[:tags]).paginate(params[:page], :limit => 5)
+    @posts = Post.commented_before(Time.now).tag_match(params[:tags]).paginate(params[:page], :limit => 5, :search_count => params[:search])
     respond_with(@posts) do |format|
       format.html {render :action => "index_by_post"}
     end
   end
   
   def index_by_comment
-    @comments = Comment.search(params[:search]).order("comments.id DESC").paginate(params[:page])
+    @comments = Comment.search(params[:search]).order("comments.id DESC").paginate(params[:page], :search_count => params[:search])
     respond_with(@comments) do |format|
       format.html {render :action => "index_by_comment"}
     end

@@ -2,8 +2,7 @@ class WikiPageVersionsController < ApplicationController
   respond_to :json, :html, :xml
   
   def index
-    @search = WikiPageVersion.search(params[:search])
-    @wiki_page_versions = @search.order("id desc").paginate(params[:page])
+    @wiki_page_versions = WikiPageVersion.search(params[:search]).order("id desc").paginate(params[:page], :search_count => params[:search])
     respond_with(@wiki_page_versions)
   end
   

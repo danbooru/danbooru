@@ -14,7 +14,7 @@ class PostVersion < ActiveRecord::Base
     
     def search(params)
       q = scoped
-      return q if params.blank?
+      params = {} if params.blank?
       
       if params[:updater_name].present?
         q = q.updater_name(params[:updater_name])
