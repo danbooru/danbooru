@@ -31,11 +31,9 @@
     {
       if (a[0] < b[0]) {
         a.shift();
-      }
-      else if (a[0] > b[0]) {
+      } else if (a[0] > b[0]) {
         b.shift();
-      }
-      else {
+      } else {
         result.push(a.shift());
         b.shift();
       }
