@@ -33,7 +33,7 @@ class ArtistTest < ActiveSupport::TestCase
       setup do
         @post = FactoryGirl.create(:post, :tag_string => "aaa")
         @artist = FactoryGirl.create(:artist, :name => "aaa")
-        @artist.update_attributes({:is_banned => true}, :as => :admin)
+        @artist.ban!
         @post.reload
       end
       
