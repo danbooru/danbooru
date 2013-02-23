@@ -3,6 +3,14 @@
     <%= render "comments/partials/index/header", :post => post %>
   <% end %>
 
+  <div class="row notices">
+    <% if post.comments.hidden(CurrentUser.user).count > 0 || post.comments.count > 6 %>
+      <span class="info" id="threshold-comments-notice-for-<%= post.id %>"%>
+        <%= link_to "Show all comments", comments_path(:post_id => post.id, :include_below_threshold => true), :remote => true %>
+      </span>
+    <% end %>
+  </div>
+
   <div class="list-of-comments">
     <% if comments.empty? %>
       <p>There are no comments.</p>
