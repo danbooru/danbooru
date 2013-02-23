@@ -403,7 +403,7 @@ class Tag < ActiveRecord::Base
     
     def search(params)
       q = scoped
-      return q if params.blank?
+      params = {} if params.blank?
       
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
@@ -413,7 +413,7 @@ class Tag < ActiveRecord::Base
         q = q.where("category = ?", params[:category])
       end
       
-      if params[:hide_empty] != "no"
+      if params[:hide_empty].blank? || params[:hide_empty] != "no"
         q = q.where("post_count > 0")
       end
       
@@ -422,22 +422,22 @@ class Tag < ActiveRecord::Base
       end
       
       case params[:order]
-      when "date"
-        q = q.order("created_at desc")
+      when "name"
+        q = q.order("name")
         
       else
-        q = q.order("name")
+        q = q.order("created_at desc")
       end
       
       case params[:sort]
       when "count"
         q = q.order("post_count desc")
         
-      when "date"
-        q = q.order("created_at desc")
+      when "name"
+        q = q.order("name")
 
       else
-        q = q.order("name")
+        q = q.order("created_at desc")
       end
       
       q

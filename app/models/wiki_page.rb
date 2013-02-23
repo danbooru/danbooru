@@ -26,7 +26,7 @@ class WikiPage < ActiveRecord::Base
 
     def search(params = {})
       q = scoped
-      return q if params.blank?
+      params = {} if params.blank?
 
       if params[:title].present?
         q = q.where("title LIKE ? ESCAPE E'\\\\'", params[:title].downcase.tr(" ", "_").to_escaped_for_sql_like)

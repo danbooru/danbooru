@@ -228,7 +228,7 @@ class Artist < ActiveRecord::Base
     
     def search(params)
       q = active
-      return q if params.blank?
+      params = {} if params.blank?
 
       case params[:name]
       when /^http/
