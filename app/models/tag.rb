@@ -9,7 +9,7 @@ class Tag < ActiveRecord::Base
       return {
         "name" => name,
         "id" => id,
-        "created_at" => created_at.strftime("%Y-%m-%d %H:%M"),
+        "created_at" => created_at.try(:strftime, "%Y-%m-%d %H:%M"),
         "count" => post_count,
         "type" => category,
         "ambiguous" => false
