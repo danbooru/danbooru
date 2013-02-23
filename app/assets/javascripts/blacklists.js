@@ -100,7 +100,7 @@
 
     if (blacklist.require.length > 0 || blacklist.exclude.length > 0) {
       if (blacklist.require.length === 0 || Danbooru.is_subset(tags, blacklist.require)) {
-        if (blacklist.exclude.length === 0 || (!Danbooru.is_subset(tags, blacklist.exclude))) {
+        if (blacklist.exclude.length === 0 || (!Danbooru.intersect(tags, blacklist.exclude).length)) {
           return true;
         }
       }

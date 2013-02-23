@@ -23,6 +23,26 @@
     return all;
   }
 
+  Danbooru.intersect = function(a, b) {
+    a = a.slice(0).sort();
+    b = b.slice(0).sort();
+    var result = [];
+    while (a.length > 0 && b.length > 0)
+    {
+      if (a[0] < b[0]) {
+        a.shift();
+      }
+      else if (a[0] > b[0]) {
+        b.shift();
+      }
+      else {
+        result.push(a.shift());
+        b.shift();
+      }
+    }
+    return result;
+  }
+
   Danbooru.without = function(array, element) {
     var temp = [];
     $.each(array, function(i, v) {
