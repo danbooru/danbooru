@@ -46,7 +46,7 @@ class PostFlag < ActiveRecord::Base
   extend SearchMethods
     
   def update_post
-    post.update_column(:is_flagged, true)
+    post.update_column(:is_flagged, true) unless post.is_flagged?
   end
   
   def validate_creator_is_not_limited

@@ -208,7 +208,7 @@ class Post < ActiveRecord::Base
         raise PostFlag::Error.new(flag.errors.full_messages.join("; "))
       end
 
-      update_column(:is_flagged, true)
+      update_column(:is_flagged, true) unless is_flagged?
     end
     
     def appeal!(reason)
@@ -740,6 +740,7 @@ class Post < ActiveRecord::Base
       Post.transaction do
         update_column(:is_deleted, true)
         update_column(:is_pending, false)
+        update_column(:is_flagged, false)
         give_favorites_to_parent
         update_children_on_destroy
         update_parent_on_destroy
@@ -865,8 +866,12 @@ class Post < ActiveRecord::Base
       where("is_pending = ?", true)
     end
     
+    def flagged
+      where("is_flagged = ?", true)
+    end
+    
     def pending_or_flagged
-      where("(is_pending = true OR (is_flagged = true and is_deleted = false))")
+      where("(is_pending = ? or is_flagged = ?)", true, true)
     end
     
     def undeleted
@@ -895,9 +900,9 @@ class Post < ActiveRecord::Base
     
     def available_for_moderation(hidden)
       if hidden.present?
-        where("id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id)
+        where("posts.id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id)
       else
-        where("id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id)
+        where("posts.id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id)
       end
     end
     
