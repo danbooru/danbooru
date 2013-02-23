@@ -14,7 +14,7 @@ class PostsController < ApplicationController
   rescue ::ActiveRecord::StatementInvalid => e
     if e.to_s =~ /statement timeout/
       @error_message = "The database timed out running your query. Try a simpler query that returns fewer results."
-      render :action => "error"
+      render :template => "static/error", :status => 500
     else
       raise
     end
@@ -34,7 +34,7 @@ class PostsController < ApplicationController
       format.html do
         if @post.errors.any?
           @error_message = @post.errors.full_messages.join("; ")
-          render :action => "error"
+          render :template => "static/error", :status => 500
         else
           redirect_to post_path(@post)
         end

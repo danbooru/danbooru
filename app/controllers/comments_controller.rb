@@ -16,6 +16,10 @@ class CommentsController < ApplicationController
   def search
   end
   
+  def new
+    redirect_to comments_path
+  end
+  
   def update
     @comment = Comment.find(params[:id])
     check_privilege(@comment)

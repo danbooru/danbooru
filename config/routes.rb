@@ -201,7 +201,9 @@ Danbooru::Application.routes.draw do
   match "/artist/show" => redirect {|params, req| "/artists?name=#{CGI::escape(req.params[:name])}"}
   match "/artist/history/:id" => redirect("/artist_versions?search[artist_id]=%{id}")
   match "/artist/update/:id" => redirect("/artists/%{id}")
+  match "/artist/destroy/:id" => redirect("/artists/%{id}")
   match "/artist/recent_changes" => redirect("/artist_versions")
+  match "/artist/create" => redirect("/artists")
   
   match "/comment" => redirect {|params, req| "/comments?page=#{req.params[:page]}"}
   match "/comment/index" => redirect {|params, req| "/comments?page=#{req.params[:page]}"}
