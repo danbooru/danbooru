@@ -61,7 +61,7 @@ class PostVersion < ActiveRecord::Base
   end
 
   def sequence_for_post
-    versions = PostVersion.where(:post_id => post_id).order("id desc").all
+    versions = PostVersion.where(:post_id => post_id).order("updated_at desc").all
     diffs = []
     versions.each_index do |i|
       if i < versions.size - 1
@@ -94,7 +94,7 @@ class PostVersion < ActiveRecord::Base
   end
   
   def previous
-    PostVersion.where("post_id = ? and id < ?", post_id, id).order("id desc").first
+    PostVersion.where("post_id = ? and id < ?", post_id, id).order("updated_at desc").first
   end
   
   def truncated_source
