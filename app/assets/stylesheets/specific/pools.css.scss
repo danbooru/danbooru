@@ -31,6 +31,10 @@ div#c-pools {
   textarea {
     height: 10em;
   }
+  
+  span.inactive {
+    color: #AAA;
+  }
 }
 
 div#c-pool-orders {

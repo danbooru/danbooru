@@ -1,6 +1,12 @@
 <div id="c-pools">
   <div id="a-show">
-    <h1>Pool: <%= @pool.pretty_name %></h1>
+    <h1>
+      Pool: 
+      <%= @pool.pretty_name %>
+      <% if @pool.is_deleted? %>
+        <span class="inactive">(deleted)</span>
+      <% end %>
+    </h1>
     
     <div id="description">
       <%= format_text(@pool.description) %>
