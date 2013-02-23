@@ -5,7 +5,6 @@
     <table class="striped" width="100%">
       <thead>
         <tr>
-          <th width="10%">Category</th>
           <th width="15%">User</th>
           <th width="15%">Creator</th>
           <th width="15%">When</th>
@@ -15,7 +14,6 @@
       <tbody>
         <% @user_feedbacks.each do |feedback| %>
           <tr class="feedback-category-<%= feedback.category %>">
-            <td><%= feedback.category %></td>
             <td><%= link_to feedback.user_name, user_path(feedback.user_id) %></td>
             <td><%= link_to feedback.creator_name, user_path(feedback.creator_id) %></td>
             <td><%= compact_time(feedback.created_at) %></td>
