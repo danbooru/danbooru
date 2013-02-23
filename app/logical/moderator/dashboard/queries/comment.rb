@@ -15,7 +15,7 @@ module Moderator
               AND comments.score < 0 
               AND users.level <= ? 
             GROUP BY comment_votes.comment_id 
-            HAVING count(*) >= 3 
+            HAVING count(*) >= 3
             ORDER BY count(*) DESC 
             LIMIT 10
           EOS

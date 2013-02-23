@@ -1,13 +1,12 @@
 div#c-moderator-dashboards {
-  width: 60em;
-  
   div#col1 {
-    width: 30em;
+    width: 45%;
     float: left;
+    padding-right: 5%;
   }
 
   div#col2 {
-    width: 30em;
+    width: 45%;
     float: left;
   }
   
@@ -32,7 +31,7 @@ div#c-moderator-dashboards {
   }
 
   table {
-    width: 26em;
+    width: 100%;
   }
 
   caption {
