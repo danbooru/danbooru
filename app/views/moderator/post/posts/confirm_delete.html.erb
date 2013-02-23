@@ -1,0 +1,15 @@
+<h1>Delete Post</h1>
+
+<div>
+  <%= PostPresenter.preview(@post) %>
+</div>
+
+<%= form_tag(delete_moderator_post_post_path, :style => "clear: both;", :class => "simple_form") do %>
+  <div class="input">
+    <label for="reason">Reason</label>
+    <%= text_area_tag "reason" %>
+  </div>
+  
+  <%= submit_tag "Delete" %>
+  <%= submit_tag "Cancel" %>
+<% end %>

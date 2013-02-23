@@ -16,8 +16,9 @@ Danbooru::Application.routes.draw do
       resource :queue, :only => [:show]
       resource :approval, :only => [:create]
       resource :disapproval, :only => [:create]
-      resources :posts, :only => [:delete, :undelete] do
+      resources :posts, :only => [:delete, :undelete, :annihilate, :confirm_delete] do
         member do
+          get :confirm_delete
           post :annihilate
           post :delete
           post :undelete
