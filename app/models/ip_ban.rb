@@ -1,18 +1,20 @@
 class IpBan < ActiveRecord::Base
+  IP_ADDR_REGEX = /\A(?:[0-9]{1,3}\.){3}[0-9]{1,3}\Z/
   belongs_to :creator, :class_name => "User"
   before_validation :initialize_creator, :on => :create
-  validates_presence_of :reason, :creator
-  validates_uniqueness_of :ip_addr
+  validates_presence_of :reason, :creator, :ip_addr
+  validates_format_of :ip_addr, :with => IP_ADDR_REGEX
+  validates_uniqueness_of :ip_addr, :if => lambda {|rec| rec.ip_addr =~ IP_ADDR_REGEX}
   
   def self.is_banned?(ip_addr)
-    exists?(["ip_addr = ?", ip_addr])
+    exists?("ip_addr = ?", ip_addr)
   end
   
   def self.search(params)
     q = scoped
     return q if params.blank?
     
-    if params[:ip_addr]
+    if params[:ip_addr].present?
       q = q.where("ip_addr = ?", params[:ip_addr])
     end
     

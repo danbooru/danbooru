@@ -2,8 +2,10 @@
   <div id="a-new">
     <h1>New IP Ban</h1>
 
+    <%= error_messages_for "ip_ban" %>
+    
     <%= simple_form_for(@ip_ban) do |f| %>
-      <%= f.input :ip_addr %>
+      <%= f.input :ip_addr, :label => "IP Address" %>
       <%= f.input :reason, :input_html => {:size => "50x5"} %>
       <%= f.button :submit, "Submit" %>
     <% end %>
