@@ -609,7 +609,7 @@ class Post < ActiveRecord::Base
       else
         count = get_count_from_cache(tags)
       
-        if count.nil? || count == 0
+        if count.to_i == 0
           count = fast_count_search(tags)
         end
       end
