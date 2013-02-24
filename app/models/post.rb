@@ -574,7 +574,7 @@ class Post < ActiveRecord::Base
     def get_count_from_cache(tags)
       count = Cache.get(count_cache_key(tags))
       
-      if count.nil? && tags.to_s !~ /(?:#{Tag::METATAGS}):/
+      if count.nil?
         count = select_value_sql("SELECT post_count FROM tags WHERE name = ?", tags.to_s)
       end
       
@@ -584,7 +584,7 @@ class Post < ActiveRecord::Base
     def set_count_in_cache(tags, count, expiry = nil)
       if expiry.nil?
         if count < 100
-          expiry = 0
+          expiry = 1.minute
         else
           expiry = (count * 4).minutes
         end
@@ -602,10 +602,12 @@ class Post < ActiveRecord::Base
 
       if tags.blank? && Danbooru.config.blank_tag_search_fast_count
         count = Danbooru.config.blank_tag_search_fast_count
+      elsif tags =~ /(?:#{Tag::METATAGS}):/
+        fast_count_search(tags)
       else
         count = get_count_from_cache(tags)
       
-        if count.nil?
+        if count.nil? || count == 0
           count = fast_count_search(tags)
         end
       end
@@ -619,15 +621,9 @@ class Post < ActiveRecord::Base
       count = Post.with_timeout(500, Danbooru.config.blank_tag_search_fast_count || 1_000_000) do
         Post.tag_match(tags).count
       end
-      
-      if count == 0
-        count = Post.tag_match(tags).count
-      end
-      
-      if count > Danbooru.config.posts_per_page * 10
+      if count > 0
         set_count_in_cache(tags, count)
       end
-      
       count
     end
   end
