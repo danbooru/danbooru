@@ -2,7 +2,7 @@ class RelatedTagQuery
   attr_reader :query, :category
   
   def initialize(query, category)
-    @query = query
+    @query = query.strip
     @category = category
   end
 
@@ -17,7 +17,11 @@ class RelatedTagQuery
   end
   
   def wiki_page_tags
-    wiki_page.try(:tags) || []
+    results = wiki_page.try(:tags) || []
+    results.reject! do |name|
+      name =~ /^(?:list_of_|tag_group|pool_group|howto:|about:|help:|template:)/
+    end
+    results
   end
   
   def to_json
