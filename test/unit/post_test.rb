@@ -877,6 +877,25 @@ class PostTest < ActiveSupport::TestCase
       setup do
         Danbooru.config.stubs(:blank_tag_search_fast_count).returns(nil)
       end
+
+      context "with a primed cache" do
+        setup do
+          Cache.put("pfc:aaa", 0)
+          Cache.put("pfc:alias", 0)
+          Cache.put("pfc:width:50", 0)
+          Danbooru.config.stubs(:blank_tag_search_fast_count).returns(1_000_000)
+          FactoryGirl.create(:tag_alias, :antecedent_name => "alias", :consequent_name => "aaa")
+          FactoryGirl.create(:post, :tag_string => "aaa")
+        end
+        
+        should "be counted correctly in fast_count" do
+          assert_equal(1, Post.count)
+          assert_equal(Danbooru.config.blank_tag_search_fast_count, Post.fast_count(""))
+          assert_equal(1, Post.fast_count("aaa"))
+          assert_equal(1, Post.fast_count("alias"))
+          assert_equal(0, Post.fast_count("bbb"))
+        end
+      end
       
       should "increment the post count" do
         assert_equal(0, Post.fast_count(""))
