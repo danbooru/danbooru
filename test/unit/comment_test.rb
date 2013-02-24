@@ -32,6 +32,19 @@ class CommentTest < ActiveSupport::TestCase
         Danbooru.config.stubs(:member_comment_limit).returns(100)
         Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
       end
+      
+      context "that is then deleted" do
+        setup do
+          @post = FactoryGirl.create(:post)
+          @comment = FactoryGirl.create(:comment, :post_id => @post.id)
+          @comment.destroy
+          @post.reload
+        end
+        
+        should "nullify the last_commented_at field" do
+          assert_nil(@post.last_commented_at)
+        end
+      end
 
       should "be created" do
         comment = FactoryGirl.build(:comment)
