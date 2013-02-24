@@ -66,6 +66,7 @@ GEM
     delayed_job_active_record (0.4.1)
       activerecord (>= 2.1.0, < 4)
       delayed_job (~> 3.0)
+    diff-lcs (1.2.1)
     domain_name (0.5.7)
       unf (~> 0.0.3)
     erubis (2.7.0)
@@ -188,6 +189,7 @@ DEPENDENCIES
   daemons
   delayed_job
   delayed_job_active_record
+  diff-lcs
   factory_girl
   ffaker!
   mechanize!

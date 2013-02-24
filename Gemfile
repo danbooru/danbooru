@@ -31,6 +31,7 @@ gem 'net-ssh'
 gem 'net-sftp'
 gem 'newrelic_rpm'
 gem 'term-ansicolor', :require => "term/ansicolor"
+gem 'diff-lcs', :require => "diff/lcs/array"
 
 group :development do
   gem 'ruby-prof'

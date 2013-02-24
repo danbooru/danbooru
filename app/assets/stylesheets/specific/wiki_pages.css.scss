@@ -7,4 +7,18 @@ div#c-wiki-pages {
     float: left;
     width: 30em;
   }
+  
+  del {
+    background: #FCC;
+    text-decoration: none;
+  }
+
+  ins {
+    background: #CFC;
+    text-decoration: none;
+  }
+  
+  table {
+    margin-bottom: 1em;
+  }
 }

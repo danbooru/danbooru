@@ -193,7 +193,11 @@ Danbooru::Application.routes.draw do
       get :show_or_new
     end
   end
-  resources :wiki_page_versions, :only => [:index, :show]
+  resources :wiki_page_versions, :only => [:index, :show, :diff] do
+    collection do
+      get :diff
+    end
+  end
   
   # aliases
   resources :wpages, :controller => "wiki_pages"

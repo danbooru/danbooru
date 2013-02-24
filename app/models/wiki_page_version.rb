@@ -24,7 +24,7 @@ class WikiPageVersion < ActiveRecord::Base
   end
   
   extend SearchMethods
-    
+  
   def updater_name
     User.id_to_name(updater_id)
   end

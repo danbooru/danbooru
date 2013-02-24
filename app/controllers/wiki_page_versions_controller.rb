@@ -10,4 +10,9 @@ class WikiPageVersionsController < ApplicationController
     @wiki_page_version = WikiPageVersion.find(params[:id])
     respond_with(@wiki_page_version)
   end
+  
+  def diff
+    @thispage = WikiPageVersion.find(params[:thispage])
+    @otherpage = WikiPageVersion.find(params[:otherpage])
+  end
 end
