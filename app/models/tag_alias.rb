@@ -95,6 +95,8 @@ class TagAlias < ActiveRecord::Base
   def clear_cache(host = Socket.gethostname)
     if host == Socket.gethostname
       Cache.delete("ta:#{Cache.sanitize(antecedent_name)}")
+    else
+      delay.clear_cache(host)
     end
   end
   
