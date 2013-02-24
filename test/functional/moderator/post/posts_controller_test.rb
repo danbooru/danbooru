@@ -16,8 +16,7 @@ module Moderator
           end
           
           should "render" do
-            post :delete, {:id => @post.id, :format => "js"}, {:user_id => @admin.id}
-            assert_response :success
+            post :delete, {:id => @post.id, :reason => "xxx", :format => "js", :commit => "Delete"}, {:user_id => @admin.id}
             @post.reload
             assert(@post.is_deleted?)
           end
