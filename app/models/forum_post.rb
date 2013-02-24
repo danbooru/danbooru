@@ -115,7 +115,7 @@ class ForumPost < ActiveRecord::Base
   end
   
   def forum_topic_page
-    ((ForumPost.where("topic_id = ? and created_at < ?", topic_id, created_at).count + 1) / Danbooru.config.posts_per_page.to_f).ceil
+    ((ForumPost.where("topic_id = ? and created_at <= ?", topic_id, created_at).count) / Danbooru.config.posts_per_page.to_f).ceil
   end
   
   def build_response
