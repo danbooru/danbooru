@@ -49,14 +49,6 @@
     if (loc.match(/^http/)) {
       loc = loc.replace(/^https?:\/\/[^\/]+/, "")
     }
-    
-    if (!loc.match(/\/static\/terms_of_service/) && this.get("tos") != "1") {
-      // Setting location.pathname in Safari doesn't work, so manually extract the domain.
-      var domain = location.href.match(/^(https?:\/\/[^\/]+)/)[0];
-      location.href = domain + "/static/terms_of_service";
-      this.put("toc", "1", 365)
-      return;
-    }
 
 		if (this.get("hide-upgrade-account") != "1") {
  	    $("#upgrade-account").show();

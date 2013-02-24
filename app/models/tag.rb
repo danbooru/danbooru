@@ -37,6 +37,10 @@ class Tag < ActiveRecord::Base
     def counts_for(tag_names)
       select_all_sql("SELECT name, post_count FROM tags WHERE name IN (?)", tag_names)
     end
+    
+    def fix_post_count
+      update_column(:post_count, Post.tag_match("#{name} status:any").count)
+    end
   end
   
   module ViewCountMethods

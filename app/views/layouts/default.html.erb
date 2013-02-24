@@ -43,6 +43,10 @@
       <%= render "users/upgrade_notice" %>
     <% end %>
     
+    <% if !CurrentUser.is_privileged? && CurrentUser.user.created_at > 2.weeks.ago %>
+      <%= render "users/tos" %>
+    <% end %>
+    
     <%- if flash[:notice] -%>
       <div class="ui-corner-all ui-state-highlight" id="notice"><%= flash[:notice] %></div>
     <%- else -%>
