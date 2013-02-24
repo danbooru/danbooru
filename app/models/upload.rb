@@ -16,7 +16,7 @@ class Upload < ActiveRecord::Base
   module ValidationMethods
     def uploader_is_not_limited
       if !uploader.can_upload?
-        raise Error.new("uploader has reached their daily limit")
+        raise Error.new(uploader.upload_limited_reason)
       end
     end
 
