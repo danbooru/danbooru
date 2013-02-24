@@ -12,7 +12,7 @@
       <%= dtext_field "forum_post", "body", :input_name => "forum_topic[original_post_attributes][body]", :value => @forum_topic.original_post.body %>
     <% end %>
   
-    <% if CurrentUser.is_moderator? %>
+    <% if CurrentUser.is_janitor? %>
       <%= f.input :is_sticky %>
       <%= f.input :is_locked %>
     <% end %>
