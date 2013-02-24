@@ -87,7 +87,7 @@ class Comment < ActiveRecord::Base
     if Comment.where("post_id = ?", post_id).count <= Danbooru.config.comment_threshold && !do_not_bump_post
       execute_sql("UPDATE posts SET last_commented_at = ? WHERE id = ?", created_at, post_id)
     elsif Comment.where("post_id = ?", post_id).empty?
-      execute_sql("UPDATE posts SET last_commented_at = null WHERE id = ?", created_at, post_id)
+      execute_sql("UPDATE posts SET last_commented_at = null WHERE id = ?", post_id)
     end
   end
   
