@@ -3,6 +3,7 @@ module Moderator
     class PostsController < ApplicationController
       before_filter :janitor_only, :only => [:delete, :undelete]
       before_filter :admin_only, :only => [:annihilate]
+      rescue_from ::PostFlag::Error, :with => :rescue_exception
 
       def confirm_delete
         @post = ::Post.find(params[:id])
