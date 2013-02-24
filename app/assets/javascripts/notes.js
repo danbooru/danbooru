@@ -451,7 +451,7 @@ Danbooru.Note = {
         $article.data("y"),
         $article.data("width"),
         $article.data("height"),
-        $article.html()
+        $article.text()
       );
     });
   }

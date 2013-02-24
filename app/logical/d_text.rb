@@ -190,6 +190,8 @@ class DText
   end
   
   def self.sanitize(text)
+    text.gsub!(/<( |\Z)/, "&lt;\\1")
+    
     Sanitize.clean(
       text,
       :elements => %w(tn h1 h2 h3 h4 h5 h6 a span div blockquote br p ul li ol em strong small big b i font),
