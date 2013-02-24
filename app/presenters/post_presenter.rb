@@ -112,13 +112,13 @@ class PostPresenter < Presenter
     html << "<li>"
     
     if pool.neighbors(@post).previous
-      html << template.link_to("&laquo;prev".html_safe, template.post_path(pool.neighbors(@post).previous, :pool_id => pool.id))
+      html << template.link_to("&laquo;prev".html_safe, template.post_path(pool.neighbors(@post).previous, :pool_id => pool.id), :rel => "prev")
     else
       html << "&laquo;prev"
     end
     
     if pool.neighbors(@post).next
-      html << template.link_to("next&raquo;".html_safe, template.post_path(pool.neighbors(@post).next, :pool_id => pool.id))
+      html << template.link_to("next&raquo;".html_safe, template.post_path(pool.neighbors(@post).next, :pool_id => pool.id), :rel => "next")
     else
       html << "next&raquo;"
     end
