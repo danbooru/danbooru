@@ -1,5 +1,6 @@
-<%= image_tag(post.file_url_for(CurrentUser.user), :width => post.image_width_for(CurrentUser.user), :height => post.image_height_for(CurrentUser.user), :id => "image", "data-original-width" => post.image_width, "data-original-height" => post.image_height, "data-large-width" => post.large_image_width, "data-large-height" => post.large_image_height) %>
-
 <% if post.has_large? && CurrentUser.default_image_size == "large" %>
   <p id="image-resize-notice">Resized to <%= number_to_percentage post.resize_percentage, :precision => 0 %> of original (<%= link_to "view original", post.file_url, :id => "image-resize-link" %>)</p>
 <% end %>
+
+<%= image_tag(post.file_url_for(CurrentUser.user), :width => post.image_width_for(CurrentUser.user), :height => post.image_height_for(CurrentUser.user), :id => "image", "data-original-width" => post.image_width, "data-original-height" => post.image_height, "data-large-width" => post.large_image_width, "data-large-height" => post.large_image_height) %>
+
