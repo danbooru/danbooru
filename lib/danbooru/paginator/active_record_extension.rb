@@ -86,6 +86,8 @@ module Danbooru
           when :count
             if @paginator_options.has_key?(:search_count) && @paginator_options[:search_count].blank?
               1_000_000
+            elsif @paginator_options[:count]
+              @paginator_options[:count]
             else
               nil
             end
