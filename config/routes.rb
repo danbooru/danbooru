@@ -91,6 +91,9 @@ Danbooru::Application.routes.draw do
     member do
       post :undelete
     end
+    collection do
+      post :mark_all_as_read
+    end
   end
   resources :ip_bans
   resources :janitor_trials do

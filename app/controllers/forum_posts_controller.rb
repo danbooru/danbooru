@@ -58,7 +58,7 @@ class ForumPostsController < ApplicationController
     @forum_post.update_attribute(:is_deleted, false)
     respond_with(@forum_post)
   end
-
+  
 private
   def check_privilege(forum_post)
     if !forum_post.editable_by?(CurrentUser.user)

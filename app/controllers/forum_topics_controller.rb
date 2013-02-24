@@ -55,6 +55,11 @@ class ForumTopicsController < ApplicationController
     respond_with(@forum_topic)
   end
 
+  def mark_all_as_read
+    CurrentUser.user.update_attribute(:last_forum_read_at, Time.now)
+    redirect_to forum_topics_path, :notice => "All topics marked as read"
+  end
+
 private
   def update_last_forum_read_at
     return if CurrentUser.is_anonymous?
