@@ -207,6 +207,12 @@ class PostQueryBuilder
 
     when "score_asc"
       relation = relation.order("posts.score, posts.id DESC")
+      
+    when "favcount"
+      relation = relation.order("posts.fav_count DESC, posts.id DESC")
+      
+    when "favcount_asc"
+      relation = relation.order("posts.fav_count, posts.id DESC")
 
     when "mpixels", "mpixels_desc"
       # Use "w*h/1000000", even though "w*h" would give the same result, so this can use

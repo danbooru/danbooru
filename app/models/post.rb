@@ -490,6 +490,7 @@ class Post < ActiveRecord::Base
     def add_favorite!(user)
       return if favorited_by?(user.id)
       append_user_to_fav_string(user.id)
+      increment!(:fav_count)
       user.add_favorite!(self)
     end
     
@@ -499,6 +500,7 @@ class Post < ActiveRecord::Base
     
     def remove_favorite!(user)
       return unless favorited_by?(user.id)
+      decrement!(:fav_count)
       delete_user_from_fav_string(user.id)
       user.remove_favorite!(self)
     end
