@@ -23,7 +23,7 @@
   }
 
   Danbooru.Blacklist.parse_entries = function() {
-    var entries = (Danbooru.meta("blacklisted-tags") || "[]").replace(/(rating:[qes])\w+/, "$1").split(/,/);
+    var entries = (Danbooru.meta("blacklisted-tags") || "").replace(/(rating:[qes])\w+/, "$1").split(/,/);
 
     $.each(entries, function(i, tags) {
       var blacklist = Danbooru.Blacklist.parse_entry(tags);
