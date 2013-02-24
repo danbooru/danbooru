@@ -55,6 +55,9 @@
   Danbooru.PostModeMenu.change = function(e) {
     $("#quick-edit-div").slideUp("fast");
     var s = $("#mode-box select").val();
+    if (s === undefined) {
+      return;
+    }
     var $body = $(document.body);
     $body.removeClass();
     $body.addClass("mode-" + s);
