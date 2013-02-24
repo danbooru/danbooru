@@ -908,6 +908,10 @@ class Post < ActiveRecord::Base
       where("id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id)
     end
     
+    def raw_tag_match(tag)
+      where("posts.tag_index @@ to_tsquery('danbooru', E?)", tag)
+    end
+    
     def tag_match(query)
       PostQueryBuilder.new(query).build
     end

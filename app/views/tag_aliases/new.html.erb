@@ -2,7 +2,8 @@
   <div id="a-new">
     <h1>New Tag Alias</h1>
     <%= simple_form_for(@tag_alias) do |f| %>
-      <%= f.input :antecedent_name, :label => "From" %>
+      <%= f.input :status, :value => "pending", :as => :hidden %>
+      <%= f.input :antecedent_name, :as => :string, :label => "From" %>
       <%= f.input :consequent_name, :label => "To" %>
       <%= f.input :forum_topic_id, :label => "Forum" %>
       <%= f.button :submit %>
