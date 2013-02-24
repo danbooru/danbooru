@@ -605,7 +605,7 @@ class Post < ActiveRecord::Base
       if tags.blank? && Danbooru.config.blank_tag_search_fast_count
         count = Danbooru.config.blank_tag_search_fast_count
       elsif tags =~ /(?:#{Tag::METATAGS}):/
-        fast_count_search(tags)
+        count = fast_count_search(tags)
       else
         count = get_count_from_cache(tags)
       
