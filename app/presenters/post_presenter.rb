@@ -93,7 +93,7 @@ class PostPresenter < Presenter
     if template.params[:pool_id].present?
       pool = Pool.where(:id => template.params[:pool_id]).first
       return if pool.nil?
-      html = pool_link_html(html, template, pool)
+      html = pool_link_html(html, template, pool, :include_rel => true)
       
       @post.pools.active.where("id <> ?", template.params[:pool_id]).each do |other_pool|
         html = pool_link_html(html, template, other_pool)
@@ -108,19 +108,27 @@ class PostPresenter < Presenter
     html.join("\n").html_safe
   end
   
-  def pool_link_html(html, template, pool)
+  def pool_link_html(html, template, pool, options = {})
     pool_html = ["<li>"]
     match_found = false
     
+    if options[:include_rel]
+      prev_rel = "prev"
+      next_rel = "next"
+    else
+      prev_rel = nil
+      next_rel = nil
+    end
+    
     if pool.neighbors(@post).previous
-      pool_html << template.link_to("&laquo;prev".html_safe, template.post_path(pool.neighbors(@post).previous, :pool_id => pool.id), :rel => "prev")
+      pool_html << template.link_to("&laquo;prev".html_safe, template.post_path(pool.neighbors(@post).previous, :pool_id => pool.id), :rel => prev_rel)
       match_found = true
     else
       pool_html << "&laquo;prev"
     end
     
     if pool.neighbors(@post).next
-      pool_html << template.link_to("next&raquo;".html_safe, template.post_path(pool.neighbors(@post).next, :pool_id => pool.id), :rel => "next")
+      pool_html << template.link_to("next&raquo;".html_safe, template.post_path(pool.neighbors(@post).next, :pool_id => pool.id), :rel => next_rel)
       match_found = true
     else
       pool_html << "next&raquo;"
