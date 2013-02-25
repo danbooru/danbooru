@@ -27,7 +27,11 @@
           <% end %>
         <% end %>
         <% if forum_post.editable_by?(CurrentUser.user) %>
-          <li><%= link_to "Edit", edit_forum_post_path(forum_post.id) %></li>
+          <% if forum_post.is_original_post? %>
+            <li><%= link_to "Edit", edit_forum_topic_path(forum_post.topic) %></li>
+          <% else %>
+            <li><%= link_to "Edit", edit_forum_post_path(forum_post.id) %></li>
+          <% end %>
         <% end %>
         <li><%= link_to "Parent", forum_topic_path(forum_post.topic, :page => forum_post.forum_topic_page) %></li>
         <li><%= link_to "Permalink", forum_post_path(forum_post) %></li>

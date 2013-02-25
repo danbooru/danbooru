@@ -118,6 +118,10 @@ class ForumPost < ActiveRecord::Base
     ((ForumPost.where("topic_id = ? and created_at <= ?", topic_id, created_at).count) / Danbooru.config.posts_per_page.to_f).ceil
   end
   
+  def is_original_post?
+    ForumPost.exists?(["id = ? and id = (select _.id from forum_posts _ where _.topic_id = ? order by _.id asc limit 1)", id, topic_id])
+  end
+  
   def build_response
     dup.tap do |x|
       x.body = x.quoted_response
