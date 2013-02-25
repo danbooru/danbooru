@@ -5,13 +5,6 @@
       
       <%= render_advertisement("vertical") %>
       
-      <% if @post.pools.active.any? %>
-        <section id="pool-sidebar">
-          <h1>Pools</h1>
-          <%= @post.presenter.pool_html(self) %>
-        </section>
-      <% end %>
-
       <section id="tag-list">
         <%= @post.presenter.split_tag_list_html(self) %>
       </section>
@@ -45,7 +38,11 @@
         <div id="note-container"></div>
         <%= @post.presenter.image_html(self) %>
       </section>
-      
+
+      <% if @post.pools.active.any? %>
+        <%= render "posts/partials/show/pools", :post => @post %>
+      <% end %>
+
       <menu id="post-sections">
         <li><a href="#comments">Comments</a></li>
         <li><a href="#edit" id="post-edit-link">Edit</a></li>

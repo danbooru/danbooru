@@ -176,16 +176,16 @@ div#c-posts {
   }
   
   div#a-show {
+    .active {
+      font-weight: bold;
+    }
+
     menu#post-sections {
       margin: 0;
       font-size: $h3_size;
       
       li {
         padding: 0 1em 0 0;
-        
-        &.active {
-          font-weight: bold;
-        }
       }
       
       div.share a {
@@ -203,6 +203,19 @@ div#c-posts {
     
     span.quick-mod {
       float: right;
+    }
+    
+    .pool-name {
+      margin: 0 1em;
+    }
+    
+    #pool-nav {
+      margin: 1em 0;
+      
+      li {
+        text-align: center;
+        height: 1.5em;
+      }
     }
   }
   

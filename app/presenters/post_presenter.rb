@@ -115,27 +115,31 @@ class PostPresenter < Presenter
     if options[:include_rel]
       prev_rel = "prev"
       next_rel = "next"
+      klass = "active"
     else
       prev_rel = nil
       next_rel = nil
+      klass = ""
     end
     
     if pool.neighbors(@post).previous
-      pool_html << template.link_to("&laquo;prev".html_safe, template.post_path(pool.neighbors(@post).previous, :pool_id => pool.id), :rel => prev_rel)
+      pool_html << template.link_to("&laquo;prev".html_safe, template.post_path(pool.neighbors(@post).previous, :pool_id => pool.id), :rel => prev_rel, :class => klass)
       match_found = true
     else
       pool_html << "&laquo;prev"
     end
     
+    pool_html << ' <span class="pool-name ' + klass + '">'
+    pool_html << template.link_to("Pool: #{pool.pretty_name}", template.pool_path(pool))
+    pool_html << '</span> '
+
     if pool.neighbors(@post).next
-      pool_html << template.link_to("next&raquo;".html_safe, template.post_path(pool.neighbors(@post).next, :pool_id => pool.id), :rel => next_rel)
+      pool_html << template.link_to("next&raquo;".html_safe, template.post_path(pool.neighbors(@post).next, :pool_id => pool.id), :rel => next_rel, :class => klass)
       match_found = true
     else
       pool_html << "next&raquo;"
     end
     
-    pool_html << " "
-    pool_html << template.link_to(pool.pretty_name, template.pool_path(pool))
     pool_html << "</li>"
     
     if match_found

@@ -2,6 +2,7 @@
   Danbooru.Post = {};
 
   Danbooru.Post.pending_update_count = 0;
+  Danbooru.Post.scroll_top = 0;
 
   Danbooru.Post.initialize_all = function() {
     this.initialize_titles();
@@ -21,6 +22,7 @@
       this.initialize_post_image_resize_to_window_link();
       this.initialize_similar();
       this.place_jlist_ads();
+      this.center_pool_nav();
 
       if (Danbooru.meta("always-resize-images") === "true") {
         $("#image-resize-to-window-link").click();
@@ -60,6 +62,28 @@
         $("#post_tag_string").trigger("focus");
         e.preventDefault();
       });
+
+      $(document).bind("keydown.left", function(e) {
+        location.href = $("#pool-nav a.active[rel=prev]").attr("href");
+        e.preventDefault();
+      });
+
+      $(document).bind("keydown.right", function(e) {
+        location.href = $("#pool-nav a.active[rel=next]").attr("href");
+        e.preventDefault();
+      });
+      
+      $(document).bind("keydown.space", function() {
+        Danbooru.Post.scroll_top = Danbooru.Post.scroll_top + 800;
+        
+        if (Danbooru.Post.scroll_top > $("#image").height() + $("#image").offset().top + 100) {
+          location.href = $("#pool-nav a.active[rel=next]").attr("href");
+        }
+        
+        $('html, body').animate({
+            scrollTop: Danbooru.Post.scroll_top
+        }, 500);
+      })
     }
   }
 
@@ -111,6 +135,7 @@
       Danbooru.Note.Box.scale_all();
       $("#image-resize-notice").hide();
       Danbooru.Post.place_jlist_ads();
+      Danbooru.Post.center_pool_nav();
       e.preventDefault();
     });
   }
@@ -139,6 +164,7 @@
 
       Danbooru.Note.Box.scale_all();
       Danbooru.Post.place_jlist_ads()
+      Danbooru.Post.center_pool_nav();
       e.preventDefault();
     });
   }
@@ -275,6 +301,17 @@
         jlist.hide();
       }
     }
+  }
+  
+  Danbooru.Post.center_pool_nav = function() {
+    var width = $("#image").width();
+    if (width > 1000) {
+      width = 1000;
+    }
+    if (width < 400) {
+      $("#pool-nav li").css("textAlign", "left");
+    }
+    $("#pool-nav").width(width);
   }
 })();
 

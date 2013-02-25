@@ -2,7 +2,6 @@
   Danbooru.Paginator = {};
   
   Danbooru.Paginator.next_page = function() {
-    console.log("next");
     if ($('.paginator li span').parent().next().length) {
       window.location = $('.paginator li span').parent().next().find('a').attr('href');
     }
@@ -16,7 +15,9 @@
 })();
 
 $(function() {
-  $(document).bind("keydown.right", Danbooru.Paginator.next_page);
-  $(document).bind("keydown.left", Danbooru.Paginator.prev_page);
+  if ($(".paginator").length) {
+    $(document).bind("keydown.right", Danbooru.Paginator.next_page);
+    $(document).bind("keydown.left", Danbooru.Paginator.prev_page);
+  }
 });
 
