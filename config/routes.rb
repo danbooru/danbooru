@@ -134,6 +134,7 @@ Danbooru::Application.routes.draw do
     resources :votes, :controller => "post_votes", :only => [:create, :destroy]
     member do
       put :revert
+      get :show_seq
     end
   end
   resources :post_appeals, :only => [:new, :index, :create]

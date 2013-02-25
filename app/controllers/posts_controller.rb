@@ -27,6 +27,15 @@ class PostsController < ApplicationController
     respond_with(@post)
   end
   
+  def show_seq
+    context = PostSearchContext.new(params)
+    if context.post_id
+      redirect_to(post_path(context.post_id, :tags => params[:tags]))
+    else
+      redirect_to(post_path(params[:id], :tags => params[:tags]))
+    end
+  end
+  
   def update
     @post = Post.find(params[:id])
     @post.update_attributes(params[:post], :as => CurrentUser.role)

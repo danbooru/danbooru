@@ -122,6 +122,13 @@ div#c-posts {
     }
   }
   
+  div.nav-notice {
+    padding: 1em;
+    margin-bottom: 1em;
+    background: #EEE;
+    border: 1px solid #AAA;
+  }
+  
   aside#sidebar #tag-list h2 {
     font-size: $h4_size;
   }
@@ -205,11 +212,11 @@ div#c-posts {
       float: right;
     }
     
-    .pool-name {
+    .pool-name, .tag-name {
       margin: 0 1em;
     }
     
-    #pool-nav {
+    #pool-nav, #tag-seq-nav {
       margin: 1em 0;
       
       li {

@@ -39,10 +39,14 @@
         <%= @post.presenter.image_html(self) %>
       </section>
 
+      <% if params[:tags] %>
+        <%= render "posts/partials/show/tag_seq", :post => @post %>
+      <% end %>
+
       <% if @post.pools.active.any? %>
         <%= render "posts/partials/show/pools", :post => @post %>
       <% end %>
-
+      
       <menu id="post-sections">
         <li><a href="#comments">Comments</a></li>
         <li><a href="#edit" id="post-edit-link">Edit</a></li>

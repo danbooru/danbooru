@@ -50,18 +50,26 @@
   }
   
   Danbooru.Post.nav_pool_prev = function() {
-    location.href = $("#pool-nav a.active[rel=prev]").attr("href");
+    if ($("#tag-seq-nav").length) {
+      location.href = $("#tag-seq-nav a[rel=prev]").attr("href");
+    } else {
+      location.href = $("#pool-nav a.active[rel=prev]").attr("href");
+    }
   }
   
   Danbooru.Post.nav_pool_next = function() {
-    location.href = $("#pool-nav a.active[rel=next]").attr("href");
+    if ($("#tag-seq-nav").length) {
+      location.href = $("#tag-seq-nav a[rel=next]").attr("href");
+    } else {
+      location.href = $("#pool-nav a.active[rel=next]").attr("href");
+    }
   }
   
   Danbooru.Post.nav_pool_scroll = function() {
     var scroll_top = $(window).scrollTop() + $(window).height();
     
     if (scroll_top > $("#image").height() + $("#image").offset().top + 100) {
-      location.href = $("#pool-nav a.active[rel=next]").attr("href");
+      Danbooru.Post.nav_pool_next();
       return;
     }
     
@@ -321,10 +329,10 @@
     if (width > 1000) {
       width = 1000;
     }
-    if (width < 400) {
-      $("#pool-nav li").css("textAlign", "left");
+    if (width > 700) {
+      width = 700
     }
-    $("#pool-nav").width(width);
+    $("#pool-nav,#tag-seq-nav").width(width);
   }
 })();
 
