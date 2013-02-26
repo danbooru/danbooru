@@ -333,7 +333,7 @@
         jlist.css({
           position: "absolute",
           width: "108px",
-          left: x + "px",
+          right: "10px",
           top: y + "px"
         });
       } else {
