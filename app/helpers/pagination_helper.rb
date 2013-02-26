@@ -29,7 +29,7 @@ module PaginationHelper
     if records.current_page >= 2
       html << "<li>" + link_to("<<", params.merge(:page => records.current_page - 1)) + "</li>"
     end
-    
+
     if records.total_pages <= (window * 2) + 5
       1.upto(records.total_pages) do |page|
         html << numbered_paginator_item(page, records.current_page)
@@ -50,14 +50,21 @@ module PaginationHelper
     else
       html << numbered_paginator_item(1, records.current_page)
       html << numbered_paginator_item("...", records.current_page)
-      (records.current_page - window).upto(records.current_page + window) do |page|
+      if records.size > 0
+        right_window = records.current_page + window
+      else
+        right_window = records.current_page
+      end
+      (records.current_page - window).upto(right_window) do |page|
         html << numbered_paginator_item(page, records.current_page)
       end
-      html << numbered_paginator_item("...", records.current_page)
-      html << numbered_paginator_final_item(records.total_pages, records.current_page)
+      if records.size > 0
+        html << numbered_paginator_item("...", records.current_page)
+        html << numbered_paginator_final_item(records.total_pages, records.current_page)
+      end
     end
     
-    if records.current_page < records.total_pages
+    if records.current_page < records.total_pages && records.size > 0
       html << "<li>" + link_to(">>", params.merge(:page => records.current_page + 1)) + "</li>"
     end
     
