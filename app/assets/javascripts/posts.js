@@ -327,15 +327,21 @@
       if (image.length) {
         var x = image.offset().left + image.width() + 50;
         var y = image.offset().top;
-        if (x < 1050) {
-          x = 1050
+        if (x > $(window).width()) {
+          jlist.css({
+            position: "absolute",
+            width: "108px",
+            left: x + "px",
+            top: y + "px"
+          });
+        } else {
+          jlist.css({
+            position: "absolute",
+            width: "108px",
+            right: "10px",
+            top: y + "px"
+          });
         }
-        jlist.css({
-          position: "absolute",
-          width: "108px",
-          right: "10px",
-          top: y + "px"
-        });
       } else {
         jlist.hide();
       }
