@@ -8,6 +8,7 @@
 
     if ($("#c-posts").length) {
       this.initialize_shortcuts();
+      this.initialize_nav_help_link();
     }
 
     if ($("#c-posts").length && $("#a-index").length) {
@@ -21,7 +22,6 @@
       this.initialize_post_image_resize_to_window_link();
       this.initialize_similar();
       this.place_jlist_ads();
-      this.center_pool_nav();
 
       if (Danbooru.meta("always-resize-images") === "true") {
         $("#image-resize-to-window-link").click();
@@ -50,18 +50,26 @@
   }
   
   Danbooru.Post.nav_pool_prev = function() {
-    if ($("#tag-seq-nav").length) {
-      location.href = $("#tag-seq-nav a[rel=prev]").attr("href");
+    if ($("#search-seq-nav").length) {
+      var href = $("#search-seq-nav a[rel=prev]").attr("href");
+      if (href) {
+        location.href = href;
+      }
     } else {
-      location.href = $("#pool-nav a.active[rel=prev]").attr("href");
+      var href = $("#pool-nav a.active[rel=prev]").attr("href");
+      if (href) {
+        location.href = href;
+      }
     }
   }
   
   Danbooru.Post.nav_pool_next = function() {
-    if ($("#tag-seq-nav").length) {
-      location.href = $("#tag-seq-nav a[rel=next]").attr("href");
+    if ($("#search-seq-nav").length) {
+      var href = $("#search-seq-nav a[rel=next]").attr("href");
+      location.href = href;
     } else {
-      location.href = $("#pool-nav a.active[rel=next]").attr("href");
+      var href = $("#pool-nav a.active[rel=next]").attr("href")
+      location.href = href;
     }
   }
   
@@ -115,6 +123,18 @@
       e.preventDefault();
     });
   }
+  
+  Danbooru.Post.initialize_nav_help_link = function() {
+    $("#close-nav-help-link").click(function(e) {
+      Danbooru.Cookie.put("close-nav-help", "1");
+      $("#nav-help").hide();
+      e.preventDefault();
+    });
+    
+    if (Danbooru.Cookie.get("close-nav-help") === "1") {
+      $("#nav-help").hide();
+    }
+  }
 
   Danbooru.Post.initialize_titles = function() {
     $(".post-preview").each(function(i, v) {
@@ -156,7 +176,6 @@
       Danbooru.Note.Box.scale_all();
       $("#image-resize-notice").hide();
       Danbooru.Post.place_jlist_ads();
-      Danbooru.Post.center_pool_nav();
       e.preventDefault();
     });
   }
@@ -185,7 +204,6 @@
 
       Danbooru.Note.Box.scale_all();
       Danbooru.Post.place_jlist_ads()
-      Danbooru.Post.center_pool_nav();
       e.preventDefault();
     });
   }
@@ -322,17 +340,6 @@
         jlist.hide();
       }
     }
-  }
-  
-  Danbooru.Post.center_pool_nav = function() {
-    var width = $("#image").width();
-    if (width > 1000) {
-      width = 1000;
-    }
-    if (width > 700) {
-      width = 700
-    }
-    $("#pool-nav,#tag-seq-nav").width(width);
   }
 })();
 

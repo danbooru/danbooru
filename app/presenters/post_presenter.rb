@@ -104,8 +104,14 @@ class PostPresenter < Presenter
         html = pool_link_html(html, template, other_pool)
       end
     else
+      first = true
       @post.pools.active.each do |pool|
-        html = pool_link_html(html, template, pool)
+        if first
+          html = pool_link_html(html, template, pool, :include_rel => true)
+          first = false
+        else
+          html = pool_link_html(html, template, pool)
+        end
       end
     end
     

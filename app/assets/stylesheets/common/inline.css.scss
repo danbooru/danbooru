@@ -26,9 +26,9 @@ span.edit-options {
 span.key {
   background: #333;
   border: 1px solid #333;
-  padding: 1px 3px;
+  padding: 1px 6px;
   color: white;
-  width: 1em;
+/*  width: 1em;*/
   text-align: center;
   @include inline-block;
   @include border-radius(3px);

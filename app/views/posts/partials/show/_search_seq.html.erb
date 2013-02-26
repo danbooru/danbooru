@@ -1,8 +1,8 @@
-<div id="tag-seq-nav" class="ui-corner-all nav-notice">
+<div id="search-seq-nav" class="ui-corner-all nav-notice">
   <ul>
-    <li>
+    <li class="active">
       <%= link_to "&laquo;prev".html_safe, show_seq_post_path(post, :tags => params[:tags], :seq => "prev"), :rel => "prev" %>
-      <span class="tag-name">Search: <%= params[:tags] %></span>
+      <span class="search-name">Search: <%= params[:tags] %></span>
       <%= link_to "next&raquo;".html_safe, show_seq_post_path(post, :tags => params[:tags], :seq => "next"), :rel => "next" %>
     </li>
   </ul>

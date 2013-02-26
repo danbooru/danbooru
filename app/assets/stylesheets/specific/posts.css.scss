@@ -120,6 +120,11 @@ div#c-posts {
     ul {
       margin-left: 1em;
     }
+
+    p {
+      margin: 0;
+      text-align: center;
+    }
   }
   
   div.nav-notice {
@@ -127,6 +132,11 @@ div#c-posts {
     margin-bottom: 1em;
     background: #EEE;
     border: 1px solid #AAA;
+    
+    p {
+      margin: 0;
+      text-align: center;
+    }
   }
   
   aside#sidebar #tag-list h2 {
@@ -212,11 +222,11 @@ div#c-posts {
       float: right;
     }
     
-    .pool-name, .tag-name {
+    .pool-name, .search-name {
       margin: 0 1em;
     }
     
-    #pool-nav, #tag-seq-nav {
+    #pool-nav, #search-seq-nav, #nav-help {
       margin: 1em 0;
       
       li {

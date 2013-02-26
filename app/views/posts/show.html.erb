@@ -39,8 +39,12 @@
         <%= @post.presenter.image_html(self) %>
       </section>
 
+      <% if params[:tags] || @post.pools.active.any? %>
+        <%= render "posts/partials/show/nav_help" %>
+      <% end %>
+
       <% if params[:tags] %>
-        <%= render "posts/partials/show/tag_seq", :post => @post %>
+        <%= render "posts/partials/show/search_seq", :post => @post %>
       <% end %>
 
       <% if @post.pools.active.any? %>
