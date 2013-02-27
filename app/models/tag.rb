@@ -1,7 +1,7 @@
 class Tag < ActiveRecord::Base
   METATAGS = "-user|user|-approver|approver|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|status|tagcount|gentags|arttags|chartags|copytags|parent"
   attr_accessible :category
-  after_save :update_category_cache
+  after_save :update_category_cache_for_all
   has_one :wiki_page, :foreign_key => "name", :primary_key => "title"
   
   module ApiMethods
@@ -80,8 +80,18 @@ class Tag < ActiveRecord::Base
       Danbooru.config.reverse_tag_category_mapping[category]
     end
     
-    def update_category_cache
-      Cache.put("tc:#{Cache.sanitize(name)}", category, 1.hour)
+    def update_category_cache_for_all
+      Danbooru.config.all_server_hosts.each do |host|
+        delay.update_category_cache(host)
+      end
+    end
+    
+    def update_category_cache(host)
+      if host == Socket.gethostname
+        Cache.put("tc:#{Cache.sanitize(name)}", category, 1.hour)
+      else
+        delay.update_category_cache(host)
+      end
     end
   end
   
@@ -114,7 +124,7 @@ class Tag < ActiveRecord::Base
             
             if category_id != tag.category
               tag.update_column(:category, category_id)
-              tag.update_category_cache
+              tag.update_category_cache_for_all
             end
           end
 
