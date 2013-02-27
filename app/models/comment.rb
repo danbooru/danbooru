@@ -84,8 +84,6 @@ class Comment < ActiveRecord::Base
   end
 
   def update_last_commented_at
-    puts Comment.where("post_id = ?", post_id).count
-    puts !do_not_bump_post?
     if Comment.where("post_id = ?", post_id).count == 0
       Post.update_all("last_commented_at = NULL", ["id = ?", post_id])
     elsif Comment.where("post_id = ?", post_id).count <= Danbooru.config.comment_threshold && !do_not_bump_post?

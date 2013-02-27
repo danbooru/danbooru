@@ -8,6 +8,7 @@ class Post < ActiveRecord::Base
   after_destroy :delete_remote_files
   after_save :create_version
   after_save :update_parent_on_save
+  after_save :apply_metatags, :on => :create
   before_save :merge_old_tags
   before_save :normalize_tags
   before_save :create_tags
@@ -380,13 +381,15 @@ class Post < ActiveRecord::Base
     end
     
     def filter_metatags(tags)
-      metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|rating|fav|parent):/}
-      apply_metatags(metatags)
+      @metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|rating|fav|parent):/}
+      apply_metatags
       return tags
     end
     
-    def apply_metatags(tags)
-      tags.each do |tag|
+    def apply_metatags
+      return unless @metatags.is_a?(Array)
+      
+      @metatags.each do |tag|
         case tag
         when /^parent:none$/, /^parent:0$/
           self.parent_id = nil

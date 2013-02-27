@@ -33,7 +33,6 @@ class BansController < ApplicationController
     if @ban.update_attributes(params[:ban])
       redirect_to ban_path(@ban), :notice => "Ban updated"
     else
-      puts @ban.errors.full_messages
       render :action => "edit"
     end
   end  
