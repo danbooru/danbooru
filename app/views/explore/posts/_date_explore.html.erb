@@ -1,18 +1,18 @@
 <aside id="sidebar">
   <ul>
     <li>
-      <%= link_to "&laquo;".html_safe, popular_explore_posts_path(:date => post_set.presenter.prev_day, :scale => "day") %> 
-      <%= link_to "&raquo;".html_safe, popular_explore_posts_path(:date => post_set.presenter.next_day, :scale => "day") %> 
+      <%= link_to "&laquo;prev".html_safe, popular_explore_posts_path(:date => post_set.presenter.prev_day, :scale => "day") %> 
+      <%= link_to "next&raquo;".html_safe, popular_explore_posts_path(:date => post_set.presenter.next_day, :scale => "day") %> 
       <%= link_to "Day", popular_explore_posts_path(:date => post_set.presenter.date, :scale => "day") %>
     </li>
     <li>
-      <%= link_to "&laquo;".html_safe, popular_explore_posts_path(:date => post_set.presenter.prev_week, :scale => "week") %> 
-      <%= link_to "&raquo;".html_safe, popular_explore_posts_path(:date => post_set.presenter.next_week, :scale => "week") %> 
+      <%= link_to "&laquo;prev".html_safe, popular_explore_posts_path(:date => post_set.presenter.prev_week, :scale => "week") %> 
+      <%= link_to "next&raquo;".html_safe, popular_explore_posts_path(:date => post_set.presenter.next_week, :scale => "week") %> 
       <%= link_to "Week", popular_explore_posts_path(:date => post_set.presenter.date, :scale => "week") %>
     </li>
     <li>
-      <%= link_to "&laquo;".html_safe, popular_explore_posts_path(:date => post_set.presenter.prev_month, :scale => "month") %> 
-      <%= link_to "&raquo;".html_safe, popular_explore_posts_path(:date => post_set.presenter.next_month, :scale => "month") %> 
+      <%= link_to "&laquo;prev".html_safe, popular_explore_posts_path(:date => post_set.presenter.prev_month, :scale => "month") %> 
+      <%= link_to "next&raquo;".html_safe, popular_explore_posts_path(:date => post_set.presenter.next_month, :scale => "month") %> 
       <%= link_to "Month", popular_explore_posts_path(:date => post_set.presenter.date, :scale => "month") %>
     </li>
   </ul>
