@@ -5,7 +5,7 @@ class TagSubscription < ActiveRecord::Base
   before_save :normalize_name
   before_save :limit_tag_count
   attr_accessible :name, :tag_query, :post_ids, :is_public, :is_visible_on_profile
-  validates_presence_of :name, :tag_query, :is_public, :creator_id
+  validates_presence_of :name, :tag_query, :creator_id
   validate :creator_can_create_subscriptions, :on => :create
   
   def normalize_name
