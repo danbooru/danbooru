@@ -49,6 +49,10 @@ module PostSets
       (pool.post_count.to_f / limit).ceil
     end
     
+    def size
+      posts.size
+    end
+    
     def current_page
       [page.to_i, 1].max
     end
