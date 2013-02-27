@@ -225,7 +225,8 @@ class Artist < ActiveRecord::Base
     
     def any_name_matches(name)
       stripped_name = normalize_name(name).to_escaped_for_sql_like
-      where("(name LIKE ? ESCAPE E'\\\\' OR other_names_index @@ to_tsquery('danbooru', ?))", stripped_name, normalize_name(name))
+      name_for_tsquery = normalize_name(name).gsub(/\(/, "\\(").gsub(/\)/, "\\)")
+      where("(name LIKE ? ESCAPE E'\\\\' OR other_names_index @@ to_tsquery('danbooru', ?))", stripped_name, name_for_tsquery)
     end
     
     def search(params)
