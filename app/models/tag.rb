@@ -199,6 +199,9 @@ class Tag < ActiveRecord::Base
 
       when /\A>(.+)/
         return [:gt, parse_cast($1, type)]
+        
+      when /,/
+        return [:in, range.split(/,/)]
 
       else
         return [:eq, parse_cast(range, type)]

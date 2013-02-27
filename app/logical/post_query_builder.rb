@@ -34,6 +34,9 @@ class PostQueryBuilder
 
     when :lte
       relation.where(["#{field} <= ?", arr[1]])
+      
+    when :in
+      relation.where(["#{field} in (?)", arr[1]])
 
     when :between
       relation.where(["#{field} BETWEEN ? AND ?", arr[1], arr[2]])

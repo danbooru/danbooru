@@ -817,6 +817,7 @@ class Post < ActiveRecord::Base
     def to_xml(options = {}, &block)
       # to_xml ignores the serializable_hash method
       options ||= {}
+      options[:methods] = [:uploader_name]
       options[:except] ||= []
       options[:except] += hidden_attributes
       super(options, &block)

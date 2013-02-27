@@ -114,6 +114,10 @@ class Pool < ActiveRecord::Base
     name.tr("_", " ")
   end
   
+  def creator_name
+    User.id_to_name(creator_id)
+  end
+  
   def normalize_post_ids
     self.post_ids = self.class.normalize_post_ids(post_ids)
   end
@@ -236,5 +240,28 @@ class Pool < ActiveRecord::Base
     super
     @neighbor_posts = nil
     clear_post_id_array
+  end
+  
+  def to_xml(options = {}, &block)
+    # to_xml ignores the serializable_hash method
+    options ||= {}
+    options[:methods] = [:creator_name]
+    super(options, &block)
+  end
+  
+  def serializable_hash(options = {})
+    return {
+      "created_at" => created_at,
+      "creator_id" => creator_id,
+      "creator_name" => creator_name,
+      "description" => description,
+      "id" => id,
+      "is_active" => is_active?,
+      "is_deleted" => is_deleted?,
+      "name" => name,
+      "post_count" => post_count,
+      "post_ids" => post_ids,
+      "updated_at" => updated_at
+    }
   end
 end
