@@ -567,7 +567,7 @@ class PostTest < ActiveSupport::TestCase
   context "Favorites:" do
     context "Removing a post from a user's favorites" do
       setup do
-        @user = FactoryGirl.create(:user)
+        @user = FactoryGirl.create(:contributor_user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
         @post = FactoryGirl.create(:post)
@@ -586,6 +586,21 @@ class PostTest < ActiveSupport::TestCase
         end
       end
       
+      should "decrement the post's score for privileged users" do
+        @post.remove_favorite!(@user)
+        @post.reload
+        assert_equal(0, @post.score)
+      end
+
+      should "not decrement the post's score for basic users" do
+        @member = FactoryGirl.create(:user)
+        CurrentUser.scoped(@member, "127.0.0.1") do
+          @post.remove_favorite!(@user)
+        end
+        @post.reload
+        assert_equal(1, @post.score)
+      end
+      
       should "not decrement the user's favorite_count if the user did not favorite the post" do
         @post2 = FactoryGirl.create(:post)
         assert_difference("CurrentUser.favorite_count", 0) do
@@ -597,7 +612,7 @@ class PostTest < ActiveSupport::TestCase
     
     context "Adding a post to a user's favorites" do
       setup do
-        @user = FactoryGirl.create(:user)
+        @user = FactoryGirl.create(:contributor_user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
         @post = FactoryGirl.create(:post)
@@ -613,6 +628,21 @@ class PostTest < ActiveSupport::TestCase
           @post.add_favorite!(@user)
           CurrentUser.reload
         end
+      end
+      
+      should "increment the post's score for privileged users" do
+        @post.add_favorite!(@user)
+        @post.reload
+        assert_equal(1, @post.score)
+      end
+      
+      should "not increment the post's score for basic users" do
+        @member = FactoryGirl.create(:user)
+        CurrentUser.scoped(@member, "127.0.0.1") do
+          @post.add_favorite!(@user)
+        end
+        @post.reload
+        assert_equal(0, @post.score)
       end
       
       should "update the fav strings ont he post" do
@@ -963,3 +993,4 @@ class PostTest < ActiveSupport::TestCase
     end
   end
 end
+
