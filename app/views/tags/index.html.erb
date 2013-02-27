@@ -5,6 +5,7 @@
         <tr>
           <th>Count</th>
           <th>Name</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -15,6 +16,7 @@
               <%= link_to("?", wiki_pages_path(:title => tag.name)) %>
               <%= link_to(tag.name, posts_path(:tags => tag.name)) %>
             </td>
+            <td><%= link_to "edit", edit_tag_path(tag) %></td>
           </tr>
         <% end %>
       </tbody>
