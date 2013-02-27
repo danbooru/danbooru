@@ -31,7 +31,11 @@ class CommentsController < ApplicationController
     @comment = Comment.create(params[:comment])
     respond_with(@comment) do |format|
       format.html do
-        redirect_to post_path(@comment.post), :notice => "Comment posted"
+        if @comment.errors.any?
+          redirect_to post_path(@comment.post), :notice => @comment.errors.full_messages.join("; ")
+        else
+          redirect_to post_path(@comment.post), :notice => "Comment posted"
+        end
       end
     end
   end
