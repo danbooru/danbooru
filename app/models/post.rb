@@ -755,7 +755,9 @@ class Post < ActiveRecord::Base
         return false
       end
       
-      update_column(:is_deleted, false)
+      self.is_deleted = false
+      self.approver_id = CurrentUser.id
+      save
       tag_array.each {|x| expire_cache(x)}
       update_parent_on_save
       ModAction.create(:description => "undeleted post ##{id}")

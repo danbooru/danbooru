@@ -182,6 +182,18 @@ class PostTest < ActiveSupport::TestCase
     end
     
     context "Undestroying a post with a parent" do
+      should "create a new approver" do
+        new_user = FactoryGirl.create(:moderator_user)
+        p1 = FactoryGirl.create(:post)
+        c1 = FactoryGirl.create(:post, :parent_id => p1.id)
+        c1.delete!
+        CurrentUser.scoped(new_user, "127.0.0.1") do
+          c1.undelete!
+        end
+        p1.reload
+        assert_equal(new_user.id, c1.approver_id)
+      end
+      
       should "not preserve the parent's has_children flag" do
         p1 = FactoryGirl.create(:post)
         c1 = FactoryGirl.create(:post, :parent_id => p1.id)
