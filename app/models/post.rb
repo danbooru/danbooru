@@ -155,6 +155,10 @@ class Post < ActiveRecord::Base
       image_width > Danbooru.config.large_image_width
     end
     
+    def has_large
+      has_large?
+    end
+    
     def large_image_width
       [Danbooru.config.large_image_width, image_width].min
     end
@@ -297,7 +301,7 @@ class Post < ActiveRecord::Base
     end
     
     def create_tags
-      set_tag_string(tag_array.map {|x| Tag.find_or_create_by_name(x).name}.uniq.join(" "))
+      set_tag_string(tag_array.map {|x| Tag.find_or_create_by_name(x).name}.uniq.sort.join(" "))
     end
     
     def increment_tag_post_counts
@@ -356,7 +360,7 @@ class Post < ActiveRecord::Base
         current_tags = tag_array_was()
         new_tags = tag_array()
         old_tags = Tag.scan_tags(old_tag_string)        
-        set_tag_string(((current_tags + new_tags) - old_tags + (current_tags & new_tags)).uniq.join(" "))
+        set_tag_string(((current_tags + new_tags) - old_tags + (current_tags & new_tags)).uniq.sort.join(" "))
       end
     end
     
@@ -377,7 +381,7 @@ class Post < ActiveRecord::Base
       normalized_tags = filter_metatags(normalized_tags)
       normalized_tags = %w(tagme) if normalized_tags.empty?
       normalized_tags.sort!
-      set_tag_string(normalized_tags.uniq.join(" "))
+      set_tag_string(normalized_tags.uniq.sort.join(" "))
     end
     
     def filter_metatags(tags)
@@ -828,10 +832,17 @@ class Post < ActiveRecord::Base
     def to_xml(options = {}, &block)
       # to_xml ignores the serializable_hash method
       options ||= {}
-      options[:methods] = [:uploader_name]
+      options[:methods] = [:uploader_name, :has_large]
       options[:except] ||= []
       options[:except] += hidden_attributes
       super(options, &block)
+    end
+    
+    def serializable_hash(options = {})
+      hash = super(options)
+      hash["uploader_name"] = uploader_name
+      hash["has_large"] = has_large
+      hash
     end
     
     def to_legacy_json
