@@ -5,7 +5,9 @@ module Moderator
       
       def create
         @post = ::Post.find(params[:post_id])
-        @post.approve!
+        if @post.is_deleted? || @post.is_flagged? || @post.is_pending?
+          @post.approve!
+        end
       rescue ::Post::ApprovalError
       end
     end
