@@ -43,6 +43,7 @@ class User < ActiveRecord::Base
   has_many :note_versions, :foreign_key => "updater_id"
   has_many :dmails, :foreign_key => "owner_id", :order => "dmails.id desc"
   belongs_to :inviter, :class_name => "User"
+  after_update :create_mod_action
     
   module BanMethods
     def validate_ip_addr_is_not_banned
@@ -61,7 +62,6 @@ class User < ActiveRecord::Base
   module InvitationMethods
     def invite!(level)
       if level.to_i <= Levels::CONTRIBUTOR
-        ModAction.create(:description => "invited user ##{id} (#{name})")
         self.level = level
         self.inviter_id = CurrentUser.id
         save
@@ -254,8 +254,8 @@ class User < ActiveRecord::Base
       end
     end
     
-    def level_string
-      case level
+    def level_string(value = nil)
+      case (value || level)
       when Levels::BLOCKED
         "Banned"
         
@@ -323,6 +323,12 @@ class User < ActiveRecord::Base
     
     def is_admin?
       level >= Levels::ADMIN
+    end
+    
+    def create_mod_action
+      if level_changed?
+        ModAction.create(:description => "level changed #{level_string(level_was)} -> #{level_string} by #{CurrentUser.name}")
+      end
     end
   end
   

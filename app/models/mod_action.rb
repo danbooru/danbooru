@@ -10,6 +10,10 @@ class ModAction < ActiveRecord::Base
       q = q.where("creator_id = ?", params[:creator_id].to_i)
     end
     
+    if params[:all].blank?
+      q = q.where("description not like ")
+    end
+    
     q
   end
   

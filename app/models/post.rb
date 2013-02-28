@@ -246,7 +246,7 @@ class Post < ActiveRecord::Base
       self.is_deleted = false
       self.approver_id = CurrentUser.id
       save!
-      ModAction.create(:description => "approved post ##{id}")
+      # ModAction.create(:description => "approved post ##{id}")
     end
     
     def disapproved_by?(user)

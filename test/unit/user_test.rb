@@ -30,6 +30,13 @@ class UserTest < ActiveSupport::TestCase
         @user.reload
         assert_equal(User::Levels::MEMBER, @user.level)
       end
+      
+      should "create a mod action" do
+        assert_difference("ModAction.count") do
+          @user.invite!(User::Levels::CONTRIBUTOR)
+        end
+        assert_equal("level changed Member -> Contributor by #{CurrentUser.name}", ModAction.first.description)
+      end
     end
     
     context "who has negeative feedback and is trying to change their name" do
