@@ -66,6 +66,8 @@ class PostPresenter < Presenter
     
     if @post.is_flash?
       template.render("posts/partials/show/flash", :post => @post)
+    elsif !@post.is_image?
+      template.render("posts/partials/show/download", :post => @post)
     elsif @post.is_image?
       template.render("posts/partials/show/image", :post => @post)
     end
