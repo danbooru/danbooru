@@ -4,10 +4,10 @@ module PaginationHelper
     
     if records.any? 
       if params[:page] =~ /[ab]/
-        html << '<li>' + link_to("< Previous", params.merge(:page => "a#{records[0].id}")) + '</li>'
+        html << '<li>' + link_to("< Previous", params.merge(:page => "a#{records[0].id}"), :rel => "prev") + '</li>'
       end
     
-      html << '<li>' + link_to("Next >", params.merge(:page => "b#{records[-1].id}")) + '</li>'
+      html << '<li>' + link_to("Next >", params.merge(:page => "b#{records[-1].id}"), :rel => "next") + '</li>'
     end
     
     html << "</menu></div>"
@@ -27,7 +27,7 @@ module PaginationHelper
     window = 3
     
     if records.current_page >= 2
-      html << "<li>" + link_to("<<", params.merge(:page => records.current_page - 1)) + "</li>"
+      html << "<li>" + link_to("<<", params.merge(:page => records.current_page - 1), :rel => "prev") + "</li>"
     end
 
     if records.total_pages <= (window * 2) + 5
@@ -65,7 +65,7 @@ module PaginationHelper
     end
     
     if records.current_page < records.total_pages && records.size > 0
-      html << "<li>" + link_to(">>", params.merge(:page => records.current_page + 1)) + "</li>"
+      html << "<li>" + link_to(">>", params.merge(:page => records.current_page + 1), :rel => "next") + "</li>"
     end
     
     html << "</menu></div>"
