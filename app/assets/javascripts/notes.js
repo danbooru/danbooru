@@ -375,17 +375,25 @@ Danbooru.Note = {
   },
 
   TranslationMode: {
+    active: false,
+    
     start: function() {
+      if (Danbooru.Note.TranslationMode.active) {
+        return;
+      }
+      
+      Danbooru.Note.TranslationMode.active = true;
       $("#original-file-link").click();
       $("#image").one("click", Danbooru.Note.TranslationMode.create_note);
       Danbooru.notice('Click on the image to create a note (shortcut is <span class="key">n</span>)');
     },
 
     stop: function() {
-      // $("#image").unbind("click");
+      Danbooru.Note.TranslationMode.active = false;
     },
 
     create_note: function(e) {
+      Danbooru.Note.TranslationMode.active = false;
       var offset = $("#image").offset();
       Danbooru.Note.new(e.pageX - offset.left, e.pageY - offset.top);
       Danbooru.Note.TranslationMode.stop();
