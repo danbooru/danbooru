@@ -98,7 +98,7 @@
     tags.push("rating:" + $post.data("rating"));
     tags.push("user:" + $post.data("user"));
 
-    return Danbooru.is_subset(tags, blacklist.require) && !Danbooru.intersect(tags, blacklist.exclude).length;
+    return (blacklist.require.length > 0 || blacklist.exclude.length > 0) && Danbooru.is_subset(tags, blacklist.require) && !Danbooru.intersect(tags, blacklist.exclude).length;
   }
 
   Danbooru.Blacklist.post_hide = function(post) {

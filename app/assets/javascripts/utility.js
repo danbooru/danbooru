@@ -13,7 +13,7 @@
 
   Danbooru.is_subset = function(array, subarray) {
     var all = true;
-
+    
     $.each(subarray, function(i, val) {
       if ($.inArray(val, array) === -1) {
         all = false;
