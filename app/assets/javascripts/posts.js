@@ -308,13 +308,30 @@
       complete: function() {
         Danbooru.Post.notice_update("dec");
       },
-      success: function(data, status, xhr) {
+      success: function(data) {
         Danbooru.Post.update_data(data);
-
       },
-      error: function(data, status, xhr) {
+      error: function(data) {
         Danbooru.notice("Error: " + data.reason);
         $("#post_" + data.id).effect("shake", {"distance": 20}, "fast");
+      }
+    });
+  }
+  
+  Danbooru.Post.approve = function(post_id) {
+    $.ajax({
+      type: "POST",
+      url: "/moderator/post/approval.json",
+      data: {"post_id": post_id},
+      dataType: "json",
+      success: function(data) {
+        if (!data.success) {
+          Danbooru.error("Error: " + data.reason);
+        } else {
+          var $post = $("#post_" + post_id);
+          $post.data("flags", $post.data("flags").replace(/pending/, ""));
+          $post.removeClass("post-status-pending");
+        }
       }
     });
   }

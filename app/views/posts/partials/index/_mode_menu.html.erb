@@ -14,6 +14,9 @@
         <option value="vote-down">Vote down</option>
         <option value="lock-rating">Lock rating</option>
         <option value="lock-note">Lock notes</option>
+        <% if CurrentUser.is_janitor? %>
+          <option value="approve">Approve</option>
+        <% end %>
         <option value="edit-tag-script">Edit tag script</option>
         <option value="apply-tag-script">Apply tag script</option>
       </select>          

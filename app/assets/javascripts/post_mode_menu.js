@@ -109,6 +109,8 @@
       Danbooru.Post.update(post_id, {"post[is_rating_locked]": "1"});
     } else if (s === 'lock-note') {
       Danbooru.Post.update(post_id, {"post[is_note_locked]": "1"});
+    } else if (s === 'approve') {
+      Danbooru.Post.approve(post_id);
     } else if (s === "apply-tag-script") {
       var tag_script = Danbooru.Cookie.get("tag-script");
       Danbooru.TagScript.run(post_id, tag_script);
