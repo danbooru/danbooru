@@ -730,11 +730,12 @@ class Post < ActiveRecord::Base
         return false
       end
       
-      delete!
+      ModAction.create(:description => "permanently deleted post ##{id}")
+      delete!(:without_mod_action => true)
       destroy
     end
     
-    def delete!
+    def delete!(options = {})
       if is_status_locked?
         self.errors.add(:is_status_locked, "; cannot delete post")
         return false
@@ -750,7 +751,10 @@ class Post < ActiveRecord::Base
         decrement_tag_post_counts
         update_column(:parent_id, nil)
         tag_array.each {|x| expire_cache(x)}
-        ModAction.create(:description => "deleted post ##{id}")
+        
+        unless options[:without_mod_action]
+          ModAction.create(:description => "deleted post ##{id}")
+        end
       end
     end
     
