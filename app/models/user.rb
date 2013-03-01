@@ -530,7 +530,7 @@ class User < ActiveRecord::Base
       end
 
       if params[:level].present?
-        q = q.where("level = ?", params[:min_level].to_i)
+        q = q.where("level = ?", params[:level].to_i)
       end
       
       if params[:id].present?
