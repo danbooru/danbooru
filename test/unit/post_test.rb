@@ -369,6 +369,20 @@ class PostTest < ActiveSupport::TestCase
         end
         
         context "for a pool" do
+          context "on creation" do
+            setup do
+              @pool = FactoryGirl.create(:pool)
+              @post = FactoryGirl.create(:post, :tag_string => "aaa pool:#{@pool.id}")
+            end
+            
+            should "add the post to the pool" do
+              @post.reload
+              @pool.reload
+              assert_equal("#{@post.id}", @pool.post_ids)
+              assert_equal("pool:#{@pool.id}", @post.pool_string)
+            end
+          end
+          
           context "id" do
             setup do
               @pool = FactoryGirl.create(:pool)
