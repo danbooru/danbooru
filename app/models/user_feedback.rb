@@ -6,6 +6,7 @@ class UserFeedback < ActiveRecord::Base
   attr_accessible :body, :user_id, :category, :user_name
   validates_presence_of :user, :creator, :body, :category
   validate :creator_is_privileged
+  after_create :create_dmail
 
   module SearchMethods
     def positive
@@ -64,6 +65,11 @@ class UserFeedback < ActiveRecord::Base
   
   def user_name=(name)
     self.user_id = User.name_to_id(name)
+  end
+  
+  def create_dmail
+    body = %{#{creator_name} created a "#{category} record":/user_feedbacks?search[user_id]=#{user_id} for your account.}
+    Dmail.create_split(:to_id => user_id, :title => "Your user record has been updated", :body => body)
   end
   
   def creator_is_privileged

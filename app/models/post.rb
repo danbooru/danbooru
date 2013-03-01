@@ -835,7 +835,10 @@ class Post < ActiveRecord::Base
       options ||= {}
       options[:except] ||= []
       options[:except] += hidden_attributes
-      super(options)
+      hash = super(options)
+      hash["uploader_name"] = uploader_name
+      hash["has_large"] = has_large
+      hash
     end
     
     def to_xml(options = {}, &block)
@@ -845,13 +848,6 @@ class Post < ActiveRecord::Base
       options[:except] ||= []
       options[:except] += hidden_attributes
       super(options, &block)
-    end
-    
-    def serializable_hash(options = {})
-      hash = super(options)
-      hash["uploader_name"] = uploader_name
-      hash["has_large"] = has_large
-      hash
     end
     
     def to_legacy_json
