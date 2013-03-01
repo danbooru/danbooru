@@ -28,7 +28,7 @@ class Comment < ActiveRecord::Base
     end
     
     def post_tags_match(query)
-      joins(:post).where("posts.tag_index @@ to_tsquery('danbooru', ?)", query)
+      joins(:post).where("posts.tag_index @@ to_tsquery('danbooru', E?)", query)
     end
     
     def for_creator(user_id)

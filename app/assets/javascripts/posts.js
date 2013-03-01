@@ -105,7 +105,7 @@
       });
 
       $(document).bind("keydown.right", function(e) {
-        Danbooru.Post.nav_pool_prev();
+        Danbooru.Post.nav_pool_next();
         e.preventDefault();
       });
       
