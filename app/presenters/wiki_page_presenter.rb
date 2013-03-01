@@ -13,6 +13,14 @@ class WikiPagePresenter
     excerpt.try(:gsub, /<.+?>/, "")
   end
   
+  def consequent_tag_aliases
+    @consequent_tag_aliases ||= TagAlias.where("consequent_name = ?", wiki_page.title)
+  end
+  
+  def antecedent_tag_alias
+    @antecedent_tag_alias ||= TagAlias.find_by_antecedent_name(wiki_page.title)
+  end
+  
   # Produce a formatted page that shows the difference between two versions of a page.
   def diff(other_version)
     pattern = Regexp.new('(?:<.+?>)|(?:[0-9_A-Za-z\x80-\xff]+[\x09\x20]?)|(?:[ \t]+)|(?:\r?\n)|(?:.+?)')
