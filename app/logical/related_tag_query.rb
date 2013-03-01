@@ -35,7 +35,7 @@ protected
   end
   
   def pattern_matching_tags
-    Tag.name_matches(query).order("post_count desc").limit(50).sort_by {|x| x.name}.map(&:name)
+    Tag.name_matches(query).where("post_count > 0").order("post_count desc").limit(50).sort_by {|x| x.name}.map(&:name)
   end
   
   def related_tags
