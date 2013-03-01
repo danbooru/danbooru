@@ -8,7 +8,7 @@ class Post < ActiveRecord::Base
   after_destroy :delete_remote_files
   after_save :create_version
   after_save :update_parent_on_save
-  after_save :apply_metatags, :on => :create
+  after_save :apply_post_metatags, :on => :create
   before_save :merge_old_tags
   before_save :normalize_tags
   before_save :create_tags
@@ -385,22 +385,17 @@ class Post < ActiveRecord::Base
     end
     
     def filter_metatags(tags)
-      @metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|rating|fav|parent):/}
-      apply_metatags
+      @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent):/}
+      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|fav):/}
+      apply_pre_metatags
       return tags
     end
     
-    def apply_metatags
-      return unless @metatags.is_a?(Array)
+    def apply_post_metatags
+      return unless @post_metatags
       
-      @metatags.each do |tag|
+      @post_metatags.each do |tag|
         case tag
-        when /^parent:none$/, /^parent:0$/
-          self.parent_id = nil
-          
-        when /^parent:(\d+)$/
-          self.parent_id = $1.to_i
-        
         when /^-pool:(\d+)$/
           pool = Pool.find_by_id($1.to_i)
           remove_pool!(pool) if pool
@@ -419,12 +414,26 @@ class Post < ActiveRecord::Base
             pool = Pool.create(:name => $1, :description => "This pool was automatically generated")
           end
           add_pool!(pool) if pool
-
-        when /^rating:([qse])/i
-          self.rating = $1.downcase
           
         when /^fav:(.+)$/
           add_favorite!(CurrentUser.user)
+        end
+      end
+    end
+    
+    def apply_pre_metatags
+      return unless @pre_metatags
+      
+      @pre_metatags.each do |tag|
+        case tag
+        when /^parent:none$/, /^parent:0$/
+          self.parent_id = nil
+          
+        when /^parent:(\d+)$/
+          self.parent_id = $1.to_i
+
+        when /^rating:([qse])/i
+          self.rating = $1.downcase
         end
       end
     end
