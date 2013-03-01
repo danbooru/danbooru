@@ -9,7 +9,7 @@ class TagSubscription < ActiveRecord::Base
   validate :creator_can_create_subscriptions, :on => :create
   
   def normalize_name
-    self.name = name.gsub(/\W/, "_")
+    self.name = name.gsub(/\s+/, "_")
   end
   
   def pretty_name
