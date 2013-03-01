@@ -69,7 +69,7 @@ class TagImplication < ActiveRecord::Base
   
   module SearchMethods
     def name_matches(name)
-      where("(antecedent_name = ? or consequent_name = ?)", name.downcase, name.downcase)
+      where("(antecedent_name like ? escape E'\\\\' or consequent_name like ? escape E'\\\\')", name.downcase.to_escaped_for_sql_like, name.downcase.to_escaped_for_sql_like)
     end
     
     def search(params)
