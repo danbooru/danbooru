@@ -15,5 +15,19 @@ module PostSetPresenters
     def tag_list_html(template)
       tag_set_presenter.tag_list_html(template)
     end
+    
+    def post_previews_html(template)
+      html = ""
+
+      if posts.empty?
+        return template.render("post_sets/blank")
+      end
+
+      posts.each do |post|
+        html << PostPresenter.preview(post, :pool_id => post_set.pool.id)
+      end
+
+      html.html_safe
+    end
   end
 end
