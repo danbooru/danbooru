@@ -81,7 +81,11 @@ module Danbooru
         def option_for(key)
           case key
           when :limit
-            @paginator_options.try(:[], :limit) || Danbooru.config.posts_per_page
+            limit = @paginator_options.try(:[], :limit) || Danbooru.config.posts_per_page
+            if limit.to_i > 1_000
+              limit = 1000
+            end
+            limit
             
           when :count
             if @paginator_options.has_key?(:search_count) && @paginator_options[:search_count].blank?

@@ -25,7 +25,7 @@ class LegacyController < ApplicationController
   end
   
   def tags
-    @tags = Tag.limit(100).search(params).paginate(params[:page])
+    @tags = Tag.limit(100).search(params).paginate(params[:page], :limit => params[:limit])
   end
   
   def artists

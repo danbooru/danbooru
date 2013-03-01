@@ -95,7 +95,7 @@
     if ($("#a-show").length) {
       $(document).bind("keydown.e", function(e) {
         $("#post-edit-link").trigger("click");
-        $("#post_tag_string").trigger("focus");
+        $("#post_tag_string").focus();
         e.preventDefault();
       });
 
@@ -238,6 +238,8 @@
         $("#edit").show();
         $("#comments").hide();
         $("#share").hide();
+        $("#post_tag_string").focus();
+        $("")
       } else {
         $("#edit").hide();
         $("#comments").hide();
