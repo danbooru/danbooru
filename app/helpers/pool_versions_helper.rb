@@ -1,6 +1,6 @@
 module PoolVersionsHelper
   def pool_version_diff(current)
-    prev = PoolVersion.where(["pool_id = ? and id < ?", current.pool_id, current.id]).order("id desc").first
+    prev = PoolVersion.where(["pool_id = ? and id < ?", current.pool_id, current.id]).order("updated_at desc").first
 
     if prev.nil?
       return current.post_id_array.map {|x| '<ins><a href="/posts/' + x.to_s + '">' + x.to_s + '</a></ins>'}.join(" ").html_safe
