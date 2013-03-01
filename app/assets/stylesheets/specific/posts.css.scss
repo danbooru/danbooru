@@ -132,6 +132,7 @@ div#c-posts {
     margin-bottom: 1em;
     background: #EEE;
     border: 1px solid #AAA;
+    position: relative;
     
     p {
       margin: 0;
@@ -233,6 +234,13 @@ div#c-posts {
         text-align: center;
         height: 1.5em;
       }
+    }
+    
+    span.close-button {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      cursor: pointer;
     }
   }
   

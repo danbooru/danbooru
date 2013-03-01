@@ -68,7 +68,7 @@ class UserFeedback < ActiveRecord::Base
   end
   
   def create_dmail
-    body = %{#{creator_name} created a "#{category} record":/user_feedbacks?search[user_id]=#{user_id} for your account.}
+    body = %{#{creator_name} created a "#{category} record":/user_feedbacks?search[user_id]=#{user_id} for your account. #{body}}
     Dmail.create_split(:to_id => user_id, :title => "Your user record has been updated", :body => body)
   end
   
