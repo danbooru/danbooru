@@ -69,7 +69,9 @@
       location.href = href;
     } else {
       var href = $("#pool-nav a.active[rel=next]").attr("href")
-      location.href = href;
+      if (href) {
+        location.href = href;
+      }
     }
   }
   
