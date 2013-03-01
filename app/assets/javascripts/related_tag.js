@@ -145,7 +145,7 @@
   Danbooru.RelatedTag.toggle_tag = function(e) {
     var $field = $("#upload_tag_string,#post_tag_string");
     var tags = $field.val().match(/\S+/g) || [];
-    var tag = $(e.target).html().replace(/ /g, "_");
+    var tag = $(e.target).html().replace(/ /g, "_").replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&amp;/g, "&");
 
     if ($.inArray(tag, tags) > -1) {
       $field.val(Danbooru.without(tags, tag).join(" ") + " ");
