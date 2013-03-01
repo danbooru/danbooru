@@ -231,8 +231,23 @@ div#c-posts {
       margin: 1em 0;
       
       li {
+        position: relative;
         text-align: center;
         height: 1.5em;
+        
+        .prev {
+          position: absolute;
+          left: 1em;
+        }
+        
+        .next {
+          position: absolute;
+          right: 1em;
+        }
+        
+        &:hover {
+          background: rgb(250, 250, 250);
+        }
       }
     }
     

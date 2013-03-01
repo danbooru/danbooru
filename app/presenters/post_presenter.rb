@@ -138,10 +138,10 @@ class PostPresenter < Presenter
     end
     
     if pool.neighbors(@post).previous
-      pool_html << template.link_to("&laquo;prev".html_safe, template.post_path(pool.neighbors(@post).previous, :pool_id => pool.id), :rel => prev_rel, :class => klass)
+      pool_html << template.link_to("&laquo;prev".html_safe, template.post_path(pool.neighbors(@post).previous, :pool_id => pool.id), :rel => prev_rel, :class => "#{klass} prev")
       match_found = true
     else
-      pool_html << "&laquo;prev"
+      pool_html << '<span class="prev">&laquo;prev</span>'
     end
     
     pool_html << ' <span class="pool-name ' + klass + '">'
@@ -149,10 +149,10 @@ class PostPresenter < Presenter
     pool_html << '</span> '
 
     if pool.neighbors(@post).next
-      pool_html << template.link_to("next&raquo;".html_safe, template.post_path(pool.neighbors(@post).next, :pool_id => pool.id), :rel => next_rel, :class => klass)
+      pool_html << template.link_to("next&raquo;".html_safe, template.post_path(pool.neighbors(@post).next, :pool_id => pool.id), :rel => next_rel, :class => "#{klass} next")
       match_found = true
     else
-      pool_html << "next&raquo;"
+      pool_html << '<span class="next">next&raquo;</span>'
     end
     
     pool_html << "</li>"
