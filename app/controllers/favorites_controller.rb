@@ -11,7 +11,8 @@ class FavoritesController < ApplicationController
   
   def create
     if CurrentUser.favorite_limit.nil? || CurrentUser.favorite_count < CurrentUser.favorite_limit
-      Post.find(params[:post_id]).add_favorite!(CurrentUser.user)
+      @post = Post.find(params[:post_id])
+      @post.add_favorite!(CurrentUser.user)
     else
       @error_msg = "You can only keep up to #{CurrentUser.favorite_limit} favorites. Upgrade your account to save more."
     end

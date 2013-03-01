@@ -3,4 +3,5 @@
 <% else %>
   $("a#add-to-favorites").hide();
   $("a#remove-from-favorites").show();
+  $("#score-for-post-<%= @post.id %>").html(<%= @post.score %>);
 <% end %>
