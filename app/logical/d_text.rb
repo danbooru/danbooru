@@ -27,7 +27,7 @@ class DText
   end
   
   def self.parse_links(str)
-    str.gsub(/("[^"]+":(https?:\/\/|\/)\S+|https?:\/\/\S+)/m) do |url|
+    str.gsub(/("[^"]+":(https?:\/\/|\/)[^\s\r\n<>]+|https?:\/\/[^\s\r\n<>]+)+/) do |url|
       if url =~ /^"([^"]+)":(.+)$/
         text = $1
         url = $2
