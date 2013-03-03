@@ -1,3 +1,6 @@
+<!doctype html>
+<html>
+<body>
 <p><%= h @dmail.from.name %> said:</p>
 
 <div>
@@ -5,3 +8,5 @@
 </div>
 
 <p><%= link_to "View message", dmail_path(@dmail, :host => Danbooru.config.hostname, :only_path => false) %></p>
+</body>
+</html>
