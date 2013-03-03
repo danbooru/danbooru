@@ -62,6 +62,13 @@ class DmailTest < ActiveSupport::TestCase
         FactoryGirl.create(:dmail, :to => user, :owner => @user)
       end
     end
+
+    should "create only one message for a split response" do
+      user = FactoryGirl.create(:user, :receive_email_notifications => true)
+      assert_difference("ActionMailer::Base.deliveries.size", 1) do
+        Dmail.create_split(:to_id => user.id, :title => "foo", :body => "foo")
+      end
+    end
     
     should "be marked as read after the user reads it" do
       dmail = FactoryGirl.create(:dmail, :owner => @user)
