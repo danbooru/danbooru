@@ -16,6 +16,7 @@
         <%= format_text(forum_post.body) %>
       </div>
       <menu>
+        <li>ID: <%= forum_post.id %></li>
         <% if @forum_topic %>
           <li><%= link_to "Quote", new_forum_post_path(:post_id => forum_post.id), :method => :get, :remote => true %></li>
         <% end %>
