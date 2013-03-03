@@ -48,8 +48,12 @@ module PostSets
           timeout = 300
         end
         
-        temp = ::Post.with_timeout(timeout, Danbooru.config.blank_tag_search_fast_count || 1_000_000) do
+        temp = ::Post.with_timeout(timeout, nil) do
           ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+        end
+        
+        if temp.nil?
+          temp = ::Post.where("FALSE").paginate(page)
         end
         
         temp.all
