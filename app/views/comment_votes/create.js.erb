@@ -1,5 +1,9 @@
 <% if @comment_vote.errors.any? %>
   Danbooru.error("<%= j @comment_vote.errors.full_messages.join('; ') %>");
-<% elsif @comment_vote.is_negative? %>
-  $(".comment[data-comment-id=<%= @comment.id %>]").remove();
+<% else %>
+  <% if @comment_vote.is_negative? %>
+    $(".comment[data-comment-id=<%= @comment.id %>]").remove();
+  <% end %>
+  $("#comment-vote-up-link-for-<%= @comment.id %>").remove();
+  $("#comment-vote-down-link-for-<%= @comment.id %>").remove();
 <% end %>
