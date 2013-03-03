@@ -443,7 +443,7 @@ class Tag < ActiveRecord::Base
         q = q.reorder("name")
         
       else
-        q = q.reorder("created_at desc")
+        q = q.reorder("id desc")
       end
       
       case params[:sort]
@@ -454,7 +454,7 @@ class Tag < ActiveRecord::Base
         q = q.reorder("name")
 
       else
-        q = q.reorder("created_at desc")
+        q = q.reorder("id desc")
       end
       
       q
