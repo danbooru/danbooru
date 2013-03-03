@@ -21,7 +21,7 @@
               <tr>
                 <td><%= radio_button_tag "thispage", wiki_page_version.id %></td>
                 <td><%= radio_button_tag "otherpage", wiki_page_version.id %></td>
-                <td><%= wiki_page_version.title %></td>
+                <td><%= link_to wiki_page_version.title, wiki_page_path(wiki_page_version.wiki_page_id) %></td>
                 <td>
                   <% if CurrentUser.is_admin? %>
                     <%= wiki_page_version.updater_ip_addr %>
