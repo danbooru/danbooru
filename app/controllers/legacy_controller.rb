@@ -17,7 +17,7 @@ class LegacyController < ApplicationController
     @upload.rating = params[:post][:rating][0].downcase
     @upload.md5_confirmation = params[:md5] if params[:md5].present?
     @upload.save
-    @upload.delay.process!
+    @upload.process!
   end
   
   def users

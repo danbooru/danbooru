@@ -81,17 +81,15 @@ class Tag < ActiveRecord::Base
     end
     
     def update_category_cache_for_all
-      Danbooru.config.all_server_hosts.each do |host|
-        delay.update_category_cache(host)
+      if category_changed?
+        Danbooru.config.all_server_hosts.each do |host|
+          delay(:queue => host).update_category_cache
+        end
       end
     end
     
-    def update_category_cache(host)
-      if host == Socket.gethostname
-        Cache.put("tc:#{Cache.sanitize(name)}", category, 1.hour)
-      else
-        delay.update_category_cache(host)
-      end
+    def update_category_cache
+      Cache.put("tc:#{Cache.sanitize(name)}", category, 1.hour)
     end
   end
   
@@ -371,7 +369,13 @@ class Tag < ActiveRecord::Base
     end
     
     def update_related_if_outdated
-      delay.update_related if should_update_related?
+      if should_update_related?
+        if post_count < 100
+          update_related
+        else
+          delay.update_related 
+        end
+      end
     end
     
     def related_cache_expiry
@@ -386,7 +390,7 @@ class Tag < ActiveRecord::Base
     end
     
     def should_update_related?
-      Delayed::Job.count < 200 && related_tags.blank? || related_tags_updated_at.blank? || related_tags_updated_at < related_cache_expiry.hours.ago
+      Delayed::Job.count < 200 && (related_tags.blank? || related_tags_updated_at.blank? || related_tags_updated_at < related_cache_expiry.hours.ago)
     end
     
     def related_tag_array

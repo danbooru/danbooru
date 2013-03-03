@@ -12,7 +12,7 @@ class Upload < ActiveRecord::Base
   before_create :convert_cgi_file
   after_destroy :delete_temp_file
   validate :uploader_is_not_limited
-  validate :file_or_source_is_present
+  validate :file_or_source_is_present, :on => :create
     
   module ValidationMethods
     def uploader_is_not_limited
@@ -64,11 +64,6 @@ class Upload < ActiveRecord::Base
   module ConversionMethods
     def process! force=false
       return if !force && status =~ /processing|completed|error/
-      
-      if server != Socket.gethostname
-        delay.process!
-        return
-      end
       
       CurrentUser.scoped(uploader, uploader_ip_addr) do
         update_attribute(:status, "processing")

@@ -168,7 +168,7 @@ module Danbooru
     
     # Names of other Danbooru servers.
     def other_server_hosts
-      all_server_hosts.reject {|x| x == server_host}
+      @other_server_hosts ||= all_server_hosts.reject {|x| x == server_host}
     end
 
     def remote_server_login
