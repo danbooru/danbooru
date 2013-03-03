@@ -6,9 +6,6 @@
   Danbooru.notice = function(msg) {
     $('#notice').html(msg).addClass("ui-state-highlight").removeClass("ui-state-error").fadeIn("fast");
     var scroll_top = $("#notice");
-    $('html, body').animate({
-        scrollTop: scroll_top
-    }, 250);
   }
 
   Danbooru.error = function(msg) {
