@@ -47,7 +47,7 @@ module PostSets
       end
       
       @posts ||= begin
-        ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+        temp = ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
         temp.all
         temp
       end
