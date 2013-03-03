@@ -15,7 +15,7 @@
   
   Danbooru.Upload.initialize_enter_on_tags = function() {
     $("#upload_tag_string,#post_tag_string").bind("keydown.return", function(e) {
-      $("#form").submit();
+      $("#form").trigger("submit");
       e.preventDefault();
     });
   }

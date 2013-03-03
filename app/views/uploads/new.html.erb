@@ -21,8 +21,8 @@
       <div class="input">
         <%= f.label :source, nil, :title => "You can enter a URL to have #{Danbooru.config.app_name} automatically download and process it" %>
         <%= f.text_field :source, :size => 50, :value => params[:url] %>
-        <%= button_tag "Similar", :id => "similar-button" %>
-        <%= button_tag "Artist", :id => "find-artist-button" %>
+        <%= button_tag "Similar", :id => "similar-button", :type => "button" %>
+        <%= button_tag "Artist", :id => "find-artist-button", :type => "button" %>
       </div>
       
       <div class="input">
@@ -51,10 +51,10 @@
           <%= f.text_area :tag_string, :size => "60x4" %>
         </div>
         
-        <%= button_tag "Related tags", :id => "related-tags-button" %>
-        <%= button_tag "Artists", :id => "related-artists-button" %>
-        <%= button_tag "Characters", :id => "related-characters-button" %>
-        <%= button_tag "Copyrights", :id => "related-copyrights-button" %>
+        <%= button_tag "Related tags", :id => "related-tags-button", :type => "button" %>
+        <%= button_tag "Artists", :id => "related-artists-button", :type => "button" %>
+        <%= button_tag "Characters", :id => "related-characters-button", :type => "button" %>
+        <%= button_tag "Copyrights", :id => "related-copyrights-button", :type => "button" %>
       </div>
       
       <div class="input">
