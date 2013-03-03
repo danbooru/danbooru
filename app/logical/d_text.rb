@@ -190,7 +190,7 @@ class DText
   end
   
   def self.sanitize(text)
-    text.gsub!(/<( |\Z)/, "&lt;\\1")
+    text.gsub!(/<( |-|\Z)/, "&lt;\\1")
     
     Sanitize.clean(
       text,
