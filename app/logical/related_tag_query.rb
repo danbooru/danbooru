@@ -11,8 +11,10 @@ class RelatedTagQuery
       pattern_matching_tags
     elsif category.present?
       related_tags_by_category
-    else
+    elsif query.present?
       related_tags
+    else
+      []
     end
   end
   
