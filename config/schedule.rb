@@ -1,6 +1,6 @@
 set :output, "/var/log/whenever.log"
 
-every 1.hour do
+every 4.hours do
   runner "TagSubscription.process_all"
 end
 
