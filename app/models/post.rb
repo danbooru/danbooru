@@ -152,7 +152,7 @@ class Post < ActiveRecord::Base
   
   module ImageMethods
     def has_large?
-      image_width > Danbooru.config.large_image_width
+      image_width.present? && image_width > Danbooru.config.large_image_width
     end
     
     def has_large

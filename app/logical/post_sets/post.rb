@@ -43,7 +43,15 @@ module PostSets
       end
       
       @posts ||= begin
-        temp = ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+        timeout = 3000
+        if tag_string =~ /source:.*\*.*\*$/
+          timeout = 300
+        end
+        
+        temp = ::Post.with_timeout(timeout, Danbooru.config.blank_tag_search_fast_count || 1_000_000) do
+          ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+        end
+        
         temp.all
         temp
       end
