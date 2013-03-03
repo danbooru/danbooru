@@ -10,6 +10,8 @@
     <%= render "post", :post => @post %>
     <%= render "sources/info", :source => @source %>
     
+    <%= error_messages_for "upload" %>
+    
     <%= form_for(@upload, :html => {:multipart => true, :class => "simple_form", :id => 'form'}) do |f| %>
       <div class="input">
         <%= f.label :file %>
