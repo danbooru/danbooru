@@ -110,7 +110,7 @@ class PostPresenter < Presenter
     else
       first = true
       @post.pools.active.each do |pool|
-        if first
+        if first && template.params[:tags].blank?
           html = pool_link_html(html, template, pool, :include_rel => true)
           first = false
         else
