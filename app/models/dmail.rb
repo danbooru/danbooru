@@ -63,7 +63,11 @@ class Dmail < ActiveRecord::Base
     
     def build_response(options = {})
       Dmail.new do |dmail|
-        dmail.title = "Re: #{title}"
+        if title =~ /Re:/
+          dmail.title = title
+        else
+          dmail.title = "Re: #{title}"
+        end
         dmail.owner_id = from_id
         dmail.body = quoted_body
         dmail.to_id = from_id unless options[:forward]
