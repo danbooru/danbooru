@@ -78,7 +78,7 @@
   Danbooru.Post.nav_pool_scroll = function() {
     var scroll_top = $(window).scrollTop() + $(window).height();
     
-    if (scroll_top > $("#image").height() + $("#image").offset().top + 100) {
+    if (scroll_top > $("#image").height() + $("#image").offset().top + $(window).height()) {
       Danbooru.Post.nav_pool_next();
       return;
     }
