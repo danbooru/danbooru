@@ -181,7 +181,7 @@ class Artist < ActiveRecord::Base
         # potential race condition but unlikely
         unless TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").exists?
           tag_implication = TagImplication.create(:antecedent_name => name, :consequent_name => "banned_artist")
-          tag_implication.delay.process!
+          tag_implication.delay(:queue => "default").process!
         end
         
         update_column(:is_active, false)

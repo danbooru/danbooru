@@ -40,11 +40,11 @@ private
         case token[0]
         when :create_alias
           tag_alias = TagAlias.create(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2])
-          tag_alias.delay.process!
+          tag_alias.delay(:queue => "default").process!
         
         when :create_implication
           tag_implication = TagImplication.create(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2])
-          tag_implication.delay.process!
+          tag_implication.delay(:queue => "default").process!
       
         when :remove_alias
           tag_alias = TagAlias.where("antecedent_name = ?", token[1]).first

@@ -373,7 +373,7 @@ class Tag < ActiveRecord::Base
         if post_count < 100
           update_related
         else
-          delay.update_related 
+          delay(:queue => "default").update_related 
         end
       end
     end
