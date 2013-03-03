@@ -94,7 +94,7 @@ class PostVersion < ActiveRecord::Base
   end
   
   def previous
-    PostVersion.where("post_id = ? and id < ?", post_id, id).order("updated_at desc").first
+    PostVersion.where("post_id = ? and updated_at < ?", post_id, updated_at).order("updated_at desc").first
   end
   
   def truncated_source
