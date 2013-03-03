@@ -41,21 +41,13 @@ module PostSets
       if tag_array.size > 2 && !CurrentUser.is_privileged?
         raise SearchError.new("Upgrade your account to search more than two tags at once")
       end
+
+      if tag_array.any? {|x| x =~ /^source:.*\*.*pixiv/}
+        raise SearchError.new("Your search took too long to execute and was canceled")
+      end
       
       @posts ||= begin
-        timeout = 3000
-        if tag_string =~ /source:.*\*.*pixiv$/
-          timeout = 300
-        end
-        
-        temp = ::Post.with_timeout(timeout, nil) do
-          ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
-        end
-        
-        if temp.nil?
-          temp = ::Post.where("FALSE").paginate(page)
-        end
-        
+        ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
         temp.all
         temp
       end
