@@ -169,6 +169,10 @@
       $post.addClass("post-status-flagged");
     }
 
+    if (status.match(/deleted/)) {
+      $post.addClass("post-status-deleted");
+    }
+
     if ($post.data("parent-id")) {
       $post.addClass("post-status-has-parent");
     }

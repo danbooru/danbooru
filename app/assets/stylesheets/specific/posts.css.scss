@@ -26,6 +26,10 @@ article.post-preview {
   border: 2px solid #CC0;
 }
 
+.post-preview.post-status-deleted img {
+  border: 2px solid #000;
+}
+
 .post-preview.post-status-has-children img {
   border: 2px solid #0F0;
 }
