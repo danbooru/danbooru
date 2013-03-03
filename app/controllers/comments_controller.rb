@@ -2,7 +2,8 @@ class CommentsController < ApplicationController
   respond_to :html, :xml, :json
   before_filter :member_only, :only => [:update, :create, :edit, :destroy]
   rescue_from User::PrivilegeError, :with => "static/access_denied"
-
+  rescue_from ActiveRecord::StatementInvalid, :with => :search_error
+  
   def index
     if params[:group_by] == "comment"
       index_by_comment
@@ -88,6 +89,18 @@ private
   def check_privilege(comment)
     if !comment.editable_by?(CurrentUser.user)
       raise User::PrivilegeError
+    end
+  end
+
+protected
+  
+  def search_error(e)
+    if e.message =~ /syntax error in tsquery/
+      @error_message = "Meta-tags are not supported in comment searches by tag"
+      render :template => "static/error", :status => 500
+    else
+      @exception = e
+      render :template => "static/error", :status => 500
     end
   end
 end

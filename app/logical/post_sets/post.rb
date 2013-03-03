@@ -42,12 +42,21 @@ module PostSets
         raise SearchError.new("Upgrade your account to search more than two tags at once")
       end
 
+      timeout = 3000
+      
       if tag_array.any? {|x| x =~ /^source:.*\*.*pixiv/}
-        raise SearchError.new("Your search took too long to execute and was canceled")
+        timeout = 300
       end
       
       @posts ||= begin
-        temp = ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+        temp = ::Post.with_timeout(500, nil) do
+          ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+        end
+        
+        if temp.nil?
+          raise SearchError.new("Your search took too long to execute and was canceled")
+        end
+
         temp.all
         temp
       end
