@@ -44,7 +44,7 @@ module PostSets
       
       @posts ||= begin
         timeout = 3000
-        if tag_string =~ /source:.*\*.*\*$/
+        if tag_string =~ /source:.*\*.*pixiv$/
           timeout = 300
         end
         
