@@ -2,18 +2,20 @@
   Danbooru.meta = function(key) {
     return $("meta[name=" + key + "]").attr("content");
   }
+  
+  Danbooru.scroll_to = function(element) {
+    $('html, body').animate({
+        scrollTop: element.offset().top - 10
+    }, 250);
+  }
 
   Danbooru.notice = function(msg) {
     $('#notice').html(msg).addClass("ui-state-highlight").removeClass("ui-state-error").fadeIn("fast");
-    var scroll_top = $("#notice");
   }
 
   Danbooru.error = function(msg) {
     $('#notice').html(msg).removeClass("ui-state-highlight").addClass("ui-state-error").fadeIn("fast");
-    var scroll_top = $("#notice");
-    $('html, body').animate({
-        scrollTop: scroll_top
-    }, 250);
+    Danbooru.scroll_to($("#notice"));
   }
 
   Danbooru.is_subset = function(array, subarray) {

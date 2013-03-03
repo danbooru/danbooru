@@ -50,7 +50,9 @@
   Danbooru.Comment.initialize_response_link = function() {
     $("a.expand-comment-response").click(function(e) {
       $(e.target).hide();
-      $(e.target).closest("div.new-comment").find("form").slideDown("fast");
+      var $form = $(e.target).closest("div.new-comment").find("form");
+      $form.slideDown("fast");
+      Danbooru.scroll_to($form);
       e.preventDefault();
     });
     
