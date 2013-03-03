@@ -270,18 +270,20 @@ div#c-posts {
 
 div#c-post-versions {
   div#a-index {
+    a {
+      word-wrap: break-word
+    }
+    
     ins, ins a {
       color: green;
       text-decoration: none;
       margin-right: 0.5em;
-      word-wrap: break-word
     }
     
     del, del a {
       color: red;
       text-decoration: line-through;
       margin-right: 0.5em;
-      word-wrap: break-word
     }
   }
 }
