@@ -35,7 +35,7 @@ class UserTest < ActiveSupport::TestCase
         assert_difference("ModAction.count") do
           @user.invite!(User::Levels::CONTRIBUTOR)
         end
-        assert_equal("level changed Member -> Contributor by #{CurrentUser.name}", ModAction.first.description)
+        assert_equal("#{@user.id} level changed Member -> Contributor by #{CurrentUser.name}", ModAction.first.description)
       end
     end
     

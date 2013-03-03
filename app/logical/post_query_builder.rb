@@ -200,7 +200,7 @@ class PostQueryBuilder
     
     case q[:order]
     when "id", "id_asc"
-      relation = relation.order("posts.id")
+      relation = relation.order("posts.id ASC")
 
     when "id_desc"
       relation = relation.order("posts.id DESC")
@@ -209,13 +209,13 @@ class PostQueryBuilder
       relation = relation.order("posts.score DESC, posts.id DESC")
 
     when "score_asc"
-      relation = relation.order("posts.score, posts.id DESC")
+      relation = relation.order("posts.score ASC, posts.id DESC")
       
     when "favcount"
       relation = relation.order("posts.fav_count DESC, posts.id DESC")
       
     when "favcount_asc"
-      relation = relation.order("posts.fav_count, posts.id DESC")
+      relation = relation.order("posts.fav_count ASC, posts.id DESC")
 
     when "mpixels", "mpixels_desc"
       # Use "w*h/1000000", even though "w*h" would give the same result, so this can use
@@ -223,10 +223,10 @@ class PostQueryBuilder
       relation = relation.order("posts.image_width * posts.image_height / 1000000.0 DESC, posts.id DESC")
 
     when "mpixels_asc"
-      relation = relation.order("posts.image_width * posts.image_height / 1000000.0, posts.id DESC")
+      relation = relation.order("posts.image_width * posts.image_height / 1000000.0 ASC, posts.id DESC")
 
     when "portrait"
-      relation = relation.order("1.0 * posts.image_width / GREATEST(1, posts.image_height), posts.id DESC")
+      relation = relation.order("1.0 * posts.image_width / GREATEST(1, posts.image_height) ASC, posts.id DESC")
 
     when "landscape"
       relation = relation.order("1.0 * posts.image_width / GREATEST(1, posts.image_height) DESC, posts.id DESC")
@@ -235,7 +235,7 @@ class PostQueryBuilder
       relation = relation.order("posts.file_size DESC")
 
     when "filesize_asc"
-      relation = relation.order("posts.file_size")
+      relation = relation.order("posts.file_size ASC")
 
 	  when "rank"
 	    relation = relation.order("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 45000 DESC")
