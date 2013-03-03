@@ -39,7 +39,7 @@ class User < ActiveRecord::Base
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
   has_many :posts, :foreign_key => "uploader_id"
   has_one :ban
-  has_many :subscriptions, :class_name => "TagSubscription", :foreign_key => "creator_id"
+  has_many :subscriptions, :class_name => "TagSubscription", :foreign_key => "creator_id", :order => "name"
   has_many :note_versions, :foreign_key => "updater_id"
   has_many :dmails, :foreign_key => "owner_id", :order => "dmails.id desc"
   belongs_to :inviter, :class_name => "User"

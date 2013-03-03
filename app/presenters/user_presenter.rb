@@ -25,14 +25,6 @@ class UserPresenter
     end
   end
   
-  def tag_subscriptions
-    if CurrentUser.user.id == user.id
-      user.subscriptions
-    else
-      user.subscriptions.select {|x| x.is_public?}
-    end
-  end
-  
   def posts_for_subscription(subscription)
     Post.where("id in (?)", subscription.post_id_array.slice(0, 6).map(&:to_i)).order("id desc")
   end
@@ -144,16 +136,10 @@ class UserPresenter
   end
   
   def subscriptions
-    user.subscriptions
-    # 
-    # if user.subscriptions.any?
-    #   str = user.subscriptions.map do |subscription|
-    #     template.link_to(subscription.name, template.posts_path(:tags => "sub:#{user.name}:#{subscription.name}"))
-    #   end.join(", ")
-    #   str += " [" + template.link_to("edit", template.tag_subscriptions_path) + "]"
-    #   str.html_safe
-    # else
-    #   "None"
-    # end
+    if CurrentUser.user.id == user.id
+      user.subscriptions
+    else
+      user.subscriptions.select {|x| x.is_public?}
+    end
   end
 end
