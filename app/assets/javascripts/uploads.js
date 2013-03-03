@@ -2,11 +2,19 @@
   Danbooru.Upload = {};
   
   Danbooru.Upload.initialize_all = function() {
+    if ($("#c-uploads,#c-posts").length) {
+      this.initialize_enter_on_tags();
+    }
+    
     if ($("#c-uploads").length) {
       this.initialize_image();
       this.initialize_info();
       this.initialize_similar();
     }
+  }
+  
+  Danbooru.Upload.initialize_enter_on_tags = function() {
+    $("#upload_tag_string,#post_tag_string").bind("keydown.return", function() {$("#form").submit();});
   }
 
   Danbooru.Upload.initialize_similar = function() {
