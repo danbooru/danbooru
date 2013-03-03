@@ -13,7 +13,14 @@ class ApplicationController < ActionController::Base
 protected
   def rescue_exception(exception)
     @exception = exception
-    render :template => "static/error", :status => 500
+    
+    if exception.is_a?(::ActiveRecord::StatementInvalid) && exception.to_s =~ /statement timeout/
+      @exception = nil
+      @error_message = "The database timed out running your query."
+      render :template => "static/error", :status => 500
+    else
+      render :template => "static/error", :status => 500
+    end
   end
   
   def render_pagination_limit

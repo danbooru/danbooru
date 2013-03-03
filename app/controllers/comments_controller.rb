@@ -99,8 +99,7 @@ protected
       @error_message = "Meta-tags are not supported in comment searches by tag"
       render :template => "static/error", :status => 500
     else
-      @exception = e
-      render :template => "static/error", :status => 500
+      rescue_exception(e)
     end
   end
 end
