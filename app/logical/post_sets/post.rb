@@ -45,7 +45,7 @@ module PostSets
       timeout = 3000
       
       if tag_array.any? {|x| x =~ /^source:.*\*.*pixiv/}
-        timeout = 300
+        timeout = 1000
       end
       
       @posts ||= begin

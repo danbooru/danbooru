@@ -369,28 +369,24 @@ class Tag < ActiveRecord::Base
     end
     
     def update_related_if_outdated
-      if should_update_related?
-        if post_count < 100
-          update_related
-        else
-          delay(:queue => "default").update_related 
-        end
+      if should_update_related? && Delayed::Job.count < 200
+        delay(:queue => "default").update_related 
       end
     end
     
     def related_cache_expiry
       base = Math.sqrt([post_count, 0].max)
-      if base > 24
+      if base > 24 * 7
+        24 * 7
+      elsif base < 24
         24
-      elsif base < 1
-        1
       else
         base
       end
     end
     
     def should_update_related?
-      Delayed::Job.count < 200 && (related_tags.blank? || related_tags_updated_at.blank? || related_tags_updated_at < related_cache_expiry.hours.ago)
+      related_tags.blank? || related_tags_updated_at.blank? || related_tags_updated_at < related_cache_expiry.hours.ago
     end
     
     def related_tag_array
