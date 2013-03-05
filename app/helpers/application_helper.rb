@@ -49,7 +49,7 @@ module ApplicationHelper
     instance = instance_variable_get("@#{instance_name}")
     
     if instance && instance.errors.any?
-      %{<div class="error-messages ui-state-error ui-corner-all"><span class="ui-icon ui-icon-alert"></span> <strong>Error</strong>: #{instance.__send__(:errors).full_messages.join(", ")}</div>}.html_safe
+      %{<div class="error-messages ui-state-error ui-corner-all"><strong>Error</strong>: #{instance.__send__(:errors).full_messages.join(", ")}</div>}.html_safe
     else
       ""
     end
