@@ -142,7 +142,7 @@ module Danbooru
     
     # Maximum size of an upload.
     def max_file_size
-      10.megabytes
+      25.megabytes
     end
     
     def member_comment_time_threshold
