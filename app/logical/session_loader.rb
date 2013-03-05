@@ -32,7 +32,7 @@ private
   end
   
   def load_cookie_user
-    CurrentUser.user = User.find_by_name(cookies[:user_name])
+    CurrentUser.user = User.find_by_name(cookies.signed[:user_name])
     CurrentUser.ip_addr = request.remote_ip
   end
   
@@ -41,7 +41,7 @@ private
   end
   
   def cookie_password_hash_valid?
-    cookies[:cookie_password_hash] && User.authenticate_cookie_hash(cookies[:user_name], cookies[:cookie_password_hash])
+    cookies[:password_hash] && User.authenticate_cookie_hash(cookies.signed[:user_name], cookies.signed[:password_hash])
   end
   
   def update_last_logged_in_at

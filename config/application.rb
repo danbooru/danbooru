@@ -1,5 +1,4 @@
 require File.expand_path('../boot', __FILE__)
-
 require 'rails/all'
 
 if defined?(Bundler)
@@ -11,6 +10,7 @@ end
 
 module Danbooru
   class Application < Rails::Application
+    
     config.active_record.schema_format = :sql
     config.encoding = "utf-8"
     config.filter_parameters += [:password]
@@ -25,4 +25,3 @@ module Danbooru
     config.log_tags = [lambda {|req| "PID:#{Process.pid}"}]
   end
 end
-

@@ -2596,7 +2596,8 @@ CREATE TABLE users (
     default_image_size character varying(255) DEFAULT 'large'::character varying NOT NULL,
     favorite_tags text,
     blacklisted_tags text,
-    time_zone character varying(255) DEFAULT 'Eastern Time (US & Canada)'::character varying NOT NULL
+    time_zone character varying(255) DEFAULT 'Eastern Time (US & Canada)'::character varying NOT NULL,
+    bcrypt_password_hash text
 );
 
 
@@ -6208,3 +6209,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130221032344');
 INSERT INTO schema_migrations (version) VALUES ('20130221035518');
 
 INSERT INTO schema_migrations (version) VALUES ('20130221214811');
+
+INSERT INTO schema_migrations (version) VALUES ('20130305005138');

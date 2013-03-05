@@ -121,19 +121,24 @@ class User < ActiveRecord::Base
   end
   
   module PasswordMethods
+    def bcrypt_password
+      BCrypt::Password.new(bcrypt_password_hash)
+    end
+
     def encrypt_password_on_create
-      self.password_hash = User.sha1(password)
+      self.password_hash = ""
+      self.bcrypt_password_hash = User.bcrypt(password)
     end
     
     def encrypt_password_on_update
       return if password.blank?
       return if old_password.blank?
       
-      if User.sha1(old_password) == password_hash
-        self.password_hash = User.sha1(password)
+      if bcrypt_password == User.sha1(old_password)
+        self.bcrypt_password_hash = User.bcrypt(password)
         return true
       else
-        errors[:old_password] << "is incorrect"
+        errors[:old_password] = "is incorrect"
         return false
       end
     end
@@ -149,7 +154,7 @@ class User < ActiveRecord::Base
       end
 
       pass << rand(100).to_s
-      update_column(:password_hash, User.sha1(pass))
+      update_column(:bcrypt_password_hash, User.bcrypt(pass))
       pass    
     end
     
@@ -168,28 +173,30 @@ class User < ActiveRecord::Base
       end
 
       def authenticate_hash(name, hash)
-        where(["lower(name) = ? AND password_hash = ?", name.downcase, hash]).first != nil
+        user = find_by_name(name)
+        if user && user.bcrypt_password == hash
+          user
+        else
+          nil
+        end
       end
-    
+
       def authenticate_cookie_hash(name, hash)
-        user = User.find_by_name(name)
-        return nil if user.nil?
-        return hash == user.cookie_password_hash
+        user = find_by_name(name)
+        if user && user.bcrypt_password_hash == hash
+          user
+        else
+          nil
+        end
+      end
+      
+      def bcrypt(pass)
+        BCrypt::Password.create(sha1(pass))
       end
 
       def sha1(pass)
         Digest::SHA1.hexdigest("#{Danbooru.config.password_salt}--#{pass}--")
       end
-    end
-
-    def cookie_password_hash
-      hash = password_hash
-      
-      (name.size + 8).times do
-        hash = User.sha1(hash)
-      end
-      
-      return hash
     end
   end
   
@@ -456,7 +463,7 @@ class User < ActiveRecord::Base
   
   module ApiMethods
     def hidden_attributes
-      super + [:password_hash, :email, :email_verification_key]
+      super + [:password_hash, :bcrypt_password_hash, :email, :email_verification_key]
     end
     
     def serializable_hash(options = {})

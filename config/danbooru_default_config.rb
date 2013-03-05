@@ -112,11 +112,6 @@ module Danbooru
       !user.is_privileged?
     end
     
-    # This is required for Rails 2.0.
-    def session_secret_key
-      "This should be at least 30 characters long"
-    end
-    
     # Users cannot search for more than X regular tags at a time.
     def base_tag_query_limit
       6

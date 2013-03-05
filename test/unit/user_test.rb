@@ -35,7 +35,7 @@ class UserTest < ActiveSupport::TestCase
         assert_difference("ModAction.count") do
           @user.invite!(User::Levels::CONTRIBUTOR)
         end
-        assert_equal("#{@user.id} level changed Member -> Contributor by #{CurrentUser.name}", ModAction.first.description)
+        assert_equal("#{@user.name} level changed Member -> Contributor by #{CurrentUser.name}", ModAction.last.description)
       end
     end
     
@@ -199,21 +199,16 @@ class UserTest < ActiveSupport::TestCase
       end
     end
     
-    context "cookie password hash" do
-      setup do
-        @user = FactoryGirl.create(:user, :name => "albert", :password_hash => "1234")
-      end
-      
-      should "be correct" do
-        assert_equal("8ac3b1d04bdb95ba92f9e355897c880e0d88ac5a", @user.cookie_password_hash)
-      end
-      
-      should "validate" do
-        assert(User.authenticate_cookie_hash(@user.name, "8ac3b1d04bdb95ba92f9e355897c880e0d88ac5a"))
-      end
-    end
-    
     context "password" do
+      should "match the cookie hash" do
+        @user = FactoryGirl.create(:user)
+        @user.password = "zugzug5"
+        @user.password_confirmation = "zugzug5"
+        @user.save
+        @user.reload
+        assert(User.authenticate_cookie_hash(@user.name, @user.bcrypt_password_hash))
+      end
+      
       should "match the confirmation" do
         @user = FactoryGirl.create(:user)
         @user.password = "zugzug5"
@@ -248,25 +243,25 @@ class UserTest < ActiveSupport::TestCase
       should "not change the password if the password and old password are blank" do
         @user = FactoryGirl.create(:user, :password => "67890")
         @user.update_attributes(:password => "", :old_password => "")
-        assert_equal(User.sha1("67890"), @user.password_hash)
+        assert(@user.bcrypt_password == User.sha1("67890"))
       end
       
       should "not change the password if the old password is incorrect" do
         @user = FactoryGirl.create(:user, :password => "67890")
         @user.update_attributes(:password => "12345", :old_password => "abcdefg")
-        assert_equal(User.sha1("67890"), @user.password_hash)
+        assert(@user.bcrypt_password == User.sha1("67890"))
       end
       
       should "not change the password if the old password is blank" do
         @user = FactoryGirl.create(:user, :password => "67890")
         @user.update_attributes(:password => "12345", :old_password => "")
-        assert_equal(User.sha1("67890"), @user.password_hash)
+        assert(@user.bcrypt_password == User.sha1("67890"))
       end
       
       should "change the password if the old password is correct" do
         @user = FactoryGirl.create(:user, :password => "67890")
         @user.update_attributes(:password => "12345", :old_password => "67890")
-        assert_equal(User.sha1("12345"), @user.password_hash)
+        assert(@user.bcrypt_password == User.sha1("12345"))
       end
       
       context "in the json representation" do

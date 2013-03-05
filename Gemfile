@@ -32,7 +32,7 @@ gem 'net-sftp'
 gem 'newrelic_rpm'
 gem 'term-ansicolor', :require => "term/ansicolor"
 gem 'diff-lcs', :require => "diff/lcs/array"
-gem 'bcrypt-ruby'
+gem 'bcrypt-ruby', :require => "bcrypt"
 
 group :development do
   gem 'ruby-prof'

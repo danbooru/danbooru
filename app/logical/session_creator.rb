@@ -15,8 +15,8 @@ class SessionCreator
       user.update_column(:last_logged_in_at, Time.now)
       
       if remember.present?
-        cookies[:user_name] = {:expires => 1.year.from_now, :value => user.name}
-        cookies[:cookie_password_hash] = {:expires => 1.year.from_now, :value => user.cookie_password_hash}
+        cookies.permanent.signed[:user_name] = user.name
+        cookies.permanent.signed[:password_hash] = user.bcrypt_password_hash
       end
       
       session[:user_id] = user.id

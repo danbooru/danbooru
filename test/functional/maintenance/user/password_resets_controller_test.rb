@@ -101,7 +101,7 @@ module Maintenance
               @user = FactoryGirl.create(:user)
               @nonce = FactoryGirl.create(:user_password_reset_nonce, :email => @user.email)
               ActionMailer::Base.deliveries.clear
-              @old_password = @user.password_hash
+              @old_password = @user.bcrypt_password_hash
               post :update, :email => @nonce.email, :key => @nonce.key
             end
             
@@ -115,7 +115,7 @@ module Maintenance
             
             should "change the password" do
               @user.reload
-              assert_not_equal(@old_password, @user.password_hash)
+              assert_not_equal(@old_password, @user.bcrypt_password_hash)
             end
             
             should "delete the nonce" do
