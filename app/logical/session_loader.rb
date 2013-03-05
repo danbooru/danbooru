@@ -41,7 +41,7 @@ private
   end
   
   def cookie_password_hash_valid?
-    cookies[:password_hash] && User.authenticate_cookie_hash(cookies.signed[:user_name], cookies[:password_hash])
+    cookies[:password_hash] && cookies.signed[:user_name] && User.authenticate_cookie_hash(cookies.signed[:user_name], cookies[:password_hash])
   end
   
   def update_last_logged_in_at

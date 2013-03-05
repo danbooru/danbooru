@@ -443,10 +443,10 @@ class User < ActiveRecord::Base
     end
     
     def tag_query_limit
-      if is_privileged?
-        Danbooru.config.base_tag_query_limit
-      elsif is_platinum?
+      if is_platinum?
         Danbooru.config.base_tag_query_limit * 2
+      elsif is_privileged?
+        Danbooru.config.base_tag_query_limit
       else
         2
       end
