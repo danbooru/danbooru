@@ -467,8 +467,10 @@ Danbooru.Note = {
 
 $(function() {
   if ($("#c-posts").length && $("#a-show").length && $("#image").length) {
-    $("#translate").one("click", Danbooru.Note.TranslationMode.start);
-    $(document).bind("keydown.n", Danbooru.Note.TranslationMode.start);
+    if ($("#note-locked-notice").length == 0) {
+      $("#translate").one("click", Danbooru.Note.TranslationMode.start);
+      $(document).bind("keydown.n", Danbooru.Note.TranslationMode.start);
+    }
     Danbooru.Note.load_all();
     $("#image").click(Danbooru.Note.Box.toggle_all);
   }

@@ -4,7 +4,11 @@
     <li><%= link_to "Favorite", favorites_path(:post_id => post.id), :remote => true, :method => :post, :id => "add-to-favorites" %></li>
     <li><%= link_to "Unfavorite", favorite_path(post), :remote => true, :method => :delete, :id => "remove-from-favorites" %></li>
     <li><%= link_to "Add to pool", "#", :id => "pool" %></li>
-    <li><%= link_to "Add note", "#", :id => "translate", :title => "Shortcut is CTRL+N" %></li>
+    <% if post.is_note_locked? %>
+      <li><span id="note-locked-notice">Note locked</span></li>
+    <% else %>
+      <li><%= link_to "Add note", "#", :id => "translate", :title => "Shortcut is CTRL+N" %></li>
+    <% end %>
     <li><%= link_to "Find similar", "http://danbooru.iqdb.org/db-search.php?url=http://#{Danbooru.config.hostname}#{post.preview_file_url}" %></li>
     
     <% unless post.is_status_locked? %>
