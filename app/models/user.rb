@@ -124,6 +124,10 @@ class User < ActiveRecord::Base
     def bcrypt_password
       BCrypt::Password.new(bcrypt_password_hash)
     end
+    
+    def bcrypt_cookie_password_hash
+      bcrypt_password_hash.slice(20, 100)
+    end
 
     def encrypt_password_on_create
       self.password_hash = ""
@@ -183,7 +187,7 @@ class User < ActiveRecord::Base
 
       def authenticate_cookie_hash(name, hash)
         user = find_by_name(name)
-        if user && user.bcrypt_password_hash == hash
+        if user && user.bcrypt_cookie_password_hash == hash
           user
         else
           nil

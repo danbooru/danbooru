@@ -16,7 +16,7 @@ class SessionCreator
       
       if remember.present?
         cookies.permanent.signed[:user_name] = user.name
-        cookies.permanent.signed[:password_hash] = user.bcrypt_password_hash
+        cookies.permanent[:password_hash] = user.bcrypt_cookie_password_hash
       end
       
       session[:user_id] = user.id

@@ -117,8 +117,8 @@ class UserTest < ActiveSupport::TestCase
     should "authenticate" do
       assert(User.authenticate(@user.name, "password"), "Authentication should have succeeded")
       assert(!User.authenticate(@user.name, "password2"), "Authentication should not have succeeded")
-      assert(User.authenticate_hash(@user.name, @user.password_hash), "Authentication should have succeeded")
-      assert(!User.authenticate_hash(@user.name, "xxxx"), "Authentication should not have succeeded")
+      assert(User.authenticate_hash(@user.name, User.sha1("password")), "Authentication should have succeeded")
+      assert(!User.authenticate_hash(@user.name, User.sha1("xxx")), "Authentication should not have succeeded")
     end
       
     should "normalize its level" do
@@ -206,7 +206,7 @@ class UserTest < ActiveSupport::TestCase
         @user.password_confirmation = "zugzug5"
         @user.save
         @user.reload
-        assert(User.authenticate_cookie_hash(@user.name, @user.bcrypt_password_hash))
+        assert(User.authenticate_cookie_hash(@user.name, @user.bcrypt_cookie_password_hash))
       end
       
       should "match the confirmation" do
