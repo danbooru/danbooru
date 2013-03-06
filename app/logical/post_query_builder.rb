@@ -1,6 +1,11 @@
 class PostQueryBuilder
   attr_accessor :query_string, :has_constraints
   
+  def self.escape_string_for_tsquery(token)
+    escaped_token = token.gsub(/\\|'/, '\0\0\0\0').gsub("?", "\\\\77").gsub("%", "\\\\37")
+    "''" + escaped_token + "''"
+  end
+  
   def initialize(query_string)
     @query_string = query_string
     @has_constraint = false
@@ -48,8 +53,7 @@ class PostQueryBuilder
 
   def escape_string_for_tsquery(array)
     array.map do |token|
-      escaped_token = token.gsub(/\\|'/, '\0\0\0\0').gsub("?", "\\\\77").gsub("%", "\\\\37")
-      "''" + escaped_token + "''"
+      PostQueryBuilder.escape_string_for_tsquery(token)
     end
   end
 

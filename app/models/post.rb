@@ -938,8 +938,8 @@ class Post < ActiveRecord::Base
     end
     
     def raw_tag_match(tag)
-      tag = tag.gsub("(", '\\\\\\\\(')
-      where("posts.tag_index @@ to_tsquery('danbooru', E?)", tag)
+      tag = PostQueryBuilder.escape_string_for_tsquery(tag)
+      where("posts.tag_index @@ to_tsquery('danbooru', E'" + tag + "')")
     end
     
     def tag_match(query)
