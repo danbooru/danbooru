@@ -353,6 +353,28 @@ class PostTest < ActiveSupport::TestCase
         @post = FactoryGirl.create(:post)
       end
       
+      context "with an artist tag that is then changed to copyright" do
+        setup do
+          Delayed::Worker.delay_jobs = false
+          @post = Post.find(@post.id)
+          @post.update_attribute(:tag_string, "art:abc")
+          @post = Post.find(@post.id)
+          @post.update_attribute(:tag_string, "copy:abc")
+        end
+        
+        teardown do
+          Delayed::Worker.delay_jobs = true
+        end
+        
+        should "update the category of the tag" do
+          assert_equal(Tag.categories.copyright, Tag.find_by_name("abc").category)
+        end
+        
+        should "update the category cache of the tag" do
+          assert_equal(Tag.categories.copyright, Cache.get("tc:abc"))
+        end
+      end
+      
       context "tagged with a metatag" do
         context "for a parent" do
           setup do

@@ -86,7 +86,9 @@ class Tag < ActiveRecord::Base
     
     def update_category_cache_for_all
       if category_changed?
-        Danbooru.config.all_server_hosts.each do |host|
+        update_category_cache
+        
+        Danbooru.config.other_server_hosts.each do |host|
           delay(:queue => host).update_category_cache
         end
       end
