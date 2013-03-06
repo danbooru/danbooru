@@ -97,6 +97,9 @@
     var tags = String($post.data("tags")).match(/\S+/g) || [];
     tags.push("rating:" + $post.data("rating"));
     tags.push("user:" + $post.data("user"));
+    $.each(String($post.data("flags")).match(/\S+/g) || [], function(i, v) {
+      tags.push("status:" + v);
+    });
 
     return (blacklist.require.length > 0 || blacklist.exclude.length > 0) && Danbooru.is_subset(tags, blacklist.require) && !Danbooru.intersect(tags, blacklist.exclude).length;
   }
