@@ -938,6 +938,7 @@ class Post < ActiveRecord::Base
     end
     
     def raw_tag_match(tag)
+      tag = tag.gsub("(", '\\\\\\\\(')
       where("posts.tag_index @@ to_tsquery('danbooru', E?)", tag)
     end
     

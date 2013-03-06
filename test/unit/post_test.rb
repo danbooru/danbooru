@@ -108,13 +108,13 @@ class PostTest < ActiveSupport::TestCase
         assert(post.errors[:parent].any?, "Parent should be invalid")
       end
       
-      should "fail if the parent has a parent" do
-        p1 = FactoryGirl.create(:post)
-        c1 = FactoryGirl.create(:post, :parent_id => p1.id)
-        c2 = FactoryGirl.build(:post, :parent_id => c1.id)
-        c2.save
-        assert(c2.errors[:parent].any?, "Parent should be invalid")
-      end
+      # should "fail if the parent has a parent" do
+      #   p1 = FactoryGirl.create(:post)
+      #   c1 = FactoryGirl.create(:post, :parent_id => p1.id)
+      #   c2 = FactoryGirl.build(:post, :parent_id => c1.id)
+      #   c2.save
+      #   assert(c2.errors[:parent].any?, "Parent should be invalid")
+      # end
     end
         
     context "Destroying a post with" do
