@@ -10,6 +10,7 @@ class TagAliasCorrectionsController < ApplicationController
 
     if params[:commit] == "Fix"
       @correction.fix!
+      flash[:notice] = "The fix has been queued and will be processed"
     end
     
     redirect_to tag_alias_correction_path(:id => params[:tag_alias_id])

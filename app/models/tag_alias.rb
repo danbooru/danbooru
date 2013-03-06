@@ -97,11 +97,11 @@ class TagAlias < ActiveRecord::Base
   
   def clear_all_cache
     Danbooru.config.all_server_hosts.each do |host|
-      delay(:queue => host).clear_cache(host)
+      delay(:queue => host).clear_cache
     end
   end
 
-  def clear_cache(host = Socket.gethostname)
+  def clear_cache
     Cache.delete("ta:#{Cache.sanitize(antecedent_name)}")
     Cache.delete("ta:#{Cache.sanitize(consequent_name)}")
   end
