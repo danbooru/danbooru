@@ -790,9 +790,8 @@ class Post < ActiveRecord::Base
   
   module VersionMethods
     def create_version
-      CurrentUser.increment!(:post_update_count)
-      
       if created_at == updated_at
+        CurrentUser.increment!(:post_update_count)
         versions.create(
           :rating => rating,
           :source => source,
@@ -800,6 +799,7 @@ class Post < ActiveRecord::Base
           :parent_id => parent_id
         )
       elsif rating_changed? || source_changed? || parent_id_changed? || tag_string_changed?
+        CurrentUser.increment!(:post_update_count)
         versions.create(
           :rating => rating,
           :source => source,
