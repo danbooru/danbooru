@@ -1,5 +1,5 @@
 class Tag < ActiveRecord::Base
-  METATAGS = "-user|user|-approver|approver|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|status|tagcount|gentags|arttags|chartags|copytags|parent"
+  METATAGS = "-user|user|-approver|approver|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|status|tagcount|gentags|arttags|chartags|copytags|parent|pixiv"
   attr_accessible :category
   after_save :update_category_cache_for_all
   has_one :wiki_page, :foreign_key => "name", :primary_key => "title"
@@ -310,8 +310,8 @@ class Tag < ActiveRecord::Base
       	    q[:filesize] = parse_helper($2, :filesize)
 
           when "source"
-            q[:source] = $2.to_escaped_for_sql_like + "%"
-
+            q[:source] = ($2.to_escaped_for_sql_like + "%").gsub(/%+/, '%')
+            
           when "date"
             q[:date] = parse_helper($2, :date)
 
@@ -339,6 +339,9 @@ class Tag < ActiveRecord::Base
           when "status"
             q[:status] = $2
             
+          when "pixiv"
+            q[:pixiv] = parse_helper($2)
+
           end
           
         else
