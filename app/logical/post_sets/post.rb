@@ -42,26 +42,15 @@ module PostSets
         raise SearchError.new("Upgrade your account to search more than two tags at once")
       end
 
-      timeout = 3000
-      
-      if tag_array.any? {|x| x =~ /^source:.*\*.*pixiv/}
-        timeout = 1000
+      if tag_array.any? {|x| x =~ /^source:.*\*.*pixiv/} && !CurrentUser.user.is_builder?
+        raise SearchError.new("Your search took too long to execute and was canceled")
       end
       
       @posts ||= begin
-        temp = ::Post.with_timeout(timeout, nil) do
-          ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
-        end
-        
-        if temp.nil?
-          raise SearchError.new("Your search took too long to execute and was canceled")
-        end
-
+        ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
         temp.all
         temp
       end
-    rescue ::Post::SearchError
-      @posts = ::Post.where("false")
     end
     
     def has_artist?
