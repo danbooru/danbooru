@@ -38,8 +38,10 @@ class PostsController < ApplicationController
         if @post.errors.any?
           @error_message = @post.errors.full_messages.join("; ")
           render :template => "static/error", :status => 500
-        else
+        elsif params[:tags].present?
           redirect_to post_path(@post, :tags => params[:tags])
+        else
+          redirect_to post_path(@post)
         end
       end
       
