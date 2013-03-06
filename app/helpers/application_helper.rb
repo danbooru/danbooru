@@ -143,7 +143,7 @@ protected
     when "moderator/dashboards"
       /^\/moderator/
       
-    when "tag_aliases"
+    when "tag_aliases", "tag_alias_corrections"
       /^\/tag_aliases/
       
     when "tag_implications"

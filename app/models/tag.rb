@@ -34,12 +34,14 @@ class Tag < ActiveRecord::Base
   end
   
   module CountMethods
-    def counts_for(tag_names)
-      select_all_sql("SELECT name, post_count FROM tags WHERE name IN (?)", tag_names)
+    module ClassMethods
+      def counts_for(tag_names)
+        select_all_sql("SELECT name, post_count FROM tags WHERE name IN (?)", tag_names)
+      end
     end
     
     def fix_post_count
-      update_column(:post_count, Post.tag_match("#{name} status:any").count)
+      update_column(:post_count, Post.raw_tag_match(name).count)
     end
   end
   
@@ -462,7 +464,7 @@ class Tag < ActiveRecord::Base
   end
   
   include ApiMethods
-  extend CountMethods
+  include CountMethods
   extend ViewCountMethods
   include CategoryMethods
   extend StatisticsMethods

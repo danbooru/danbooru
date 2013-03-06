@@ -157,6 +157,7 @@ Danbooru::Application.routes.draw do
     end
   end
   resources :tag_aliases do
+    resource :correction, :only => [:new, :create, :show], :controller => "TagAliasCorrections"
     member do
       delete :cache
       post :approve
@@ -165,6 +166,7 @@ Danbooru::Application.routes.draw do
       get :general_search
     end
   end
+  resource :tag_alias_correction, :only => [:new, :create, :show]
   resources :tag_implications do
     member do
       post :approve

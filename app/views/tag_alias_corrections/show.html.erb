@@ -1,0 +1,25 @@
+<h1>Tag Alias Correction: <%= @correction.antecedent_name %> -&gt; <%= @correction.consequent_name %></h1>
+
+<p>Because tag aliases are cached in memory, they may go out of sync. This action will clear out the cache and fix and lingering posts.</p>
+
+<% @correction.each_server do |correction| %>
+  <div style="margin-bottom: 1em;">
+    <h2>Server: <%= Socket.gethostname %></h2>
+    <ul>
+      <li><strong><%= @correction.antecedent_name %></strong> aliased to <strong><%= @correction.statistics_hash["antecedent_cache"] %></strong> in cache</li>
+      <li><strong><%= @correction.consequent_name %></strong> aliased to <strong><%= @correction.statistics_hash["consequent_cache"] %></strong> in cache</li>
+      <li><strong><%= @correction.antecedent_name %></strong> count is <%= @correction.statistics_hash["antecedent_count"] %></li>
+      <li><strong><%= @correction.consequent_name %></strong> count is <%= @correction.statistics_hash["consequent_count"] %></li>
+    </ul>
+  </div>
+<% end %>
+
+<p>You can try to fix this alias. This will clear the cache and re-save all posts associated with <strong><%= @correction.antecedent_name %></strong>.</p>
+
+<%= form_tag(tag_alias_correction_path) do %>
+  <%= hidden_field "tag_alias_id", params[:tag_alias_id] %>
+  <%= submit_tag "Fix" %>
+  <%= submit_tag "Cancel" %>
+<% end %>
+
+<%= render "tag_aliases/secondary_links" %>

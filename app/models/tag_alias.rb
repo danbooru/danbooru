@@ -94,22 +94,17 @@ class TagAlias < ActiveRecord::Base
 
   def clear_cache(host = Socket.gethostname)
     Cache.delete("ta:#{Cache.sanitize(antecedent_name)}")
+    Cache.delete("ta:#{Cache.sanitize(consequent_name)}")
   end
   
   def update_cache
     Cache.put("ta:#{Cache.sanitize(antecedent_name)}", consequent_name)
+    Cache.delete("ta:#{Cache.sanitize(consequent_name)}")
   end
   
   def update_posts
-    Post.tag_match("#{antecedent_name} status:any").find_each do |post|
-      escaped_antecedent_name = Regexp.escape(antecedent_name)
-      fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_antecedent_name}(?:\Z| )/, " #{consequent_name} ").strip
-      
-      CurrentUser.scoped(creator, creator_ip_addr) do
-        post.update_attributes(
-          :tag_string => fixed_tags
-        )
-      end
+    Post.raw_tag_match(antecedent_name).each do |post|
+      post.save
     end
   end
 end
