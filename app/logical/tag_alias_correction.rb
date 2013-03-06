@@ -52,7 +52,7 @@ class TagAliasCorrection
   def fix!
     clear_cache
     tag_alias.update_cache
-    tag_alias.delay.update_posts
+    tag_alias.delay(:queue => "default").update_posts
     tag_alias.antecedent_tag.fix_post_count if tag_alias.antecedent_tag
     tag_alias.consequent_tag.fix_post_count if tag_alias.consequent_tag
   end
