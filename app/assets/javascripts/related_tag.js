@@ -180,6 +180,9 @@
     }
     
     $.each(data, function(i, json) {
+      if (!json.other_names) {
+        json.other_names = "";
+      }
       var $div = $("<div/>").addClass("artist");
       var $ul = $("<ul/>");
       $ul.append(
