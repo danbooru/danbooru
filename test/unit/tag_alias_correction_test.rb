@@ -13,6 +13,7 @@ class TagAliasTest < ActiveSupport::TestCase
     end
 
     teardown do
+      MEMCACHE.flush_all
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
@@ -28,7 +29,7 @@ class TagAliasTest < ActiveSupport::TestCase
         assert_equal("zzz", @correction.statistics_hash["antecedent_cache"])
         assert_nil(@correction.statistics_hash["consequent_cache"])
         assert_equal(-3, @correction.statistics_hash["antecedent_count"])
-        assert_nil(@correction.statistics_hash["consequent_count"])
+        assert_equal(1, @correction.statistics_hash["consequent_count"])
       end
       
       should "render to json" do

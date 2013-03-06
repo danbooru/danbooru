@@ -1,6 +1,7 @@
 class TagAlias < ActiveRecord::Base
   after_save :clear_all_cache
   after_save :update_cache
+  after_save :ensure_category_consistency
   after_destroy :clear_all_cache
   before_validation :initialize_creator, :on => :create
   validates_presence_of :creator_id
@@ -86,6 +87,14 @@ class TagAlias < ActiveRecord::Base
     end
   end
   
+  def ensure_category_consistency
+    if antecedent_tag && consequent_tag && antecedent_tag.category != consequent_tag.category
+      consequent_tag.update_attribute(:category, antecedent_tag.category)
+    end
+    
+    true
+  end
+  
   def clear_all_cache
     Danbooru.config.all_server_hosts.each do |host|
       delay(:queue => host).clear_cache(host)
@@ -103,8 +112,14 @@ class TagAlias < ActiveRecord::Base
   end
   
   def update_posts
-    Post.raw_tag_match(antecedent_name).each do |post|
-      post.save
+    Post.raw_tag_match(antecedent_name).find_each do |post|
+      escaped_antecedent_name = Regexp.escape(antecedent_name)
+      fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_antecedent_name}(?:\Z| )/, " #{consequent_name} ").strip
+      CurrentUser.scoped(creator, creator_ip_addr) do
+        post.update_attributes(
+          :tag_string => fixed_tags
+        )
+      end
     end
   end
 end

@@ -73,5 +73,13 @@ class TagAliasTest < ActiveSupport::TestCase
       assert_not_equal(tag_alias.creator_id, post.uploader_id)
       assert_equal(tag_alias.creator_id, post.versions.last.updater_id)
     end
+    
+    should "push the antecedent's category to the consequent" do
+      tag1 = FactoryGirl.create(:tag, :name => "aaa", :category => 1)
+      tag2 = FactoryGirl.create(:tag, :name => "bbb")
+      ta = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+      tag2.reload
+      assert_equal(1, tag2.category)
+    end
   end
 end

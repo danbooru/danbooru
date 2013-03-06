@@ -34,6 +34,8 @@ class Tag < ActiveRecord::Base
   end
   
   module CountMethods
+    extend ActiveSupport::Concern
+    
     module ClassMethods
       def counts_for(tag_names)
         select_all_sql("SELECT name, post_count FROM tags WHERE name IN (?)", tag_names)
@@ -102,45 +104,39 @@ class Tag < ActiveRecord::Base
   end
   
   module NameMethods
-    module ClassMethods
-      def normalize_name(name)
-        name.downcase.tr(" ", "_").gsub(/\A[-~]+/, "").gsub(/\*/, "")
-      end
-
-      def find_or_create_by_name(name, options = {})
-        name = normalize_name(name)
-        category = nil
-
-        if name =~ /\A(#{categories.regexp}):(.+)\Z/
-          category = $1
-          name = $2
-        end
-
-        tag = find_by_name(name)
-
-        if tag
-          if category
-            category_id = categories.value_for(category)
-            
-            if category_id != tag.category
-              tag.update_column(:category, category_id)
-              tag.update_category_cache_for_all
-            end
-          end
-
-          tag
-        else
-          Tag.new.tap do |t|
-            t.name = name
-            t.category = categories.value_for(category)
-            t.save
-          end
-        end
-      end
+    def normalize_name(name)
+      name.downcase.tr(" ", "_").gsub(/\A[-~]+/, "").gsub(/\*/, "")
     end
-    
-    def self.included(m)
-      m.extend(ClassMethods)
+
+    def find_or_create_by_name(name, options = {})
+      name = normalize_name(name)
+      category = nil
+
+      if name =~ /\A(#{categories.regexp}):(.+)\Z/
+        category = $1
+        name = $2
+      end
+
+      tag = find_by_name(name)
+
+      if tag
+        if category
+          category_id = categories.value_for(category)
+          
+          if category_id != tag.category
+            tag.update_column(:category, category_id)
+            tag.update_category_cache_for_all
+          end
+        end
+
+        tag
+      else
+        Tag.new.tap do |t|
+          t.name = name
+          t.category = categories.value_for(category)
+          t.save
+        end
+      end
     end
   end
 
@@ -468,7 +464,7 @@ class Tag < ActiveRecord::Base
   extend ViewCountMethods
   include CategoryMethods
   extend StatisticsMethods
-  include NameMethods
+  extend NameMethods
   extend ParseMethods
   include RelationMethods
   extend SuggestionMethods

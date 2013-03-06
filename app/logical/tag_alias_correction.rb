@@ -51,9 +51,8 @@ class TagAliasCorrection
   
   def fix!
     clear_cache
-    Post.raw_tag_match(tag_alias.antecedent_name).each do |post|
-      post.save
-    end
+    tag_alias.update_cache
+    tag_alias.update_posts
     tag_alias.antecedent_tag.fix_post_count if tag_alias.antecedent_tag
     tag_alias.consequent_tag.fix_post_count if tag_alias.consequent_tag
   end
