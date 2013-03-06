@@ -124,8 +124,9 @@ class PostQueryBuilder
     relation = add_range_relation(q[:artist_tag_count], "posts.tag_count_artist", relation)
     relation = add_range_relation(q[:copyright_tag_count], "posts.tag_count_copyright", relation)
     relation = add_range_relation(q[:character_tag_count], "posts.tag_count_character", relation)
-    relation = add_range_relation(q[:tag_count], "posts.tag_count", relation)      
-
+    relation = add_range_relation(q[:tag_count], "posts.tag_count", relation)
+    relation = add_range_relation(q[:pixiv], "substring(posts.source, 'pixiv.net/img.*/([0-9]+)[^/]*$')::integer", relation)
+    
     if q[:md5]
       relation = relation.where(["posts.md5 IN (?)", q[:md5]])
       has_constraints!
@@ -146,6 +147,13 @@ class PostQueryBuilder
     if q[:source]
       if q[:source] == "none%"
         relation = relation.where("(posts.source = '' OR posts.source IS NULL)")
+      elsif q[:source] =~ /^(pixiv\/|%\.?pixiv(\.net(\/img)?)?(%\/|(?=%$)))(.+)$/
+        if $5 == "%"
+            relation = relation.where("substring(posts.source, 'pixiv.net/img.*/([^/]*/[^/]*)$') IS NOT NULL")
+        else
+            relation = relation.where("substring(posts.source, 'pixiv.net/img.*/([^/]*/[^/]*)$') LIKE ? ESCAPE E'\\\\'", $5)
+        end
+        has_constraints!
       else
         relation = relation.where("posts.source LIKE ? ESCAPE E'\\\\'", q[:source])
         has_constraints!
@@ -241,8 +249,8 @@ class PostQueryBuilder
     when "filesize_asc"
       relation = relation.order("posts.file_size ASC")
 
-	  when "rank"
-	    relation = relation.order("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 45000 DESC")
+    when "rank"
+      relation = relation.order("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 45000 DESC")
 
     else
       relation = relation.order("posts.id DESC")
