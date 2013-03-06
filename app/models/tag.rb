@@ -84,8 +84,8 @@ class Tag < ActiveRecord::Base
       Danbooru.config.reverse_tag_category_mapping[category]
     end
     
-    def update_category_cache_for_all
-      if category_changed?
+    def update_category_cache_for_all(force = false)
+      if category_changed? || force
         update_category_cache
         
         Danbooru.config.other_server_hosts.each do |host|
@@ -127,7 +127,7 @@ class Tag < ActiveRecord::Base
           
           if category_id != tag.category
             tag.update_column(:category, category_id)
-            tag.update_category_cache_for_all
+            tag.update_category_cache_for_all(true)
           end
         end
 
