@@ -86,7 +86,7 @@ class User < ActiveRecord::Base
       end
       
       def find_by_name(name)
-        where(["lower(name) = ?", name.downcase]).first
+        where("lower(name) = ?", name.downcase.tr(" ", "_")).first
       end
       
       def id_to_pretty_name(user_id)
