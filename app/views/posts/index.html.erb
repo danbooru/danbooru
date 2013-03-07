@@ -28,8 +28,6 @@
       <%= render "posts/partials/index/edit" %>
       <%= render "wiki_pages/excerpt", :post_set => @post_set %>
       <%= render "posts/partials/index/posts", :post_set => @post_set %>
-      
-      <%= render "posts/partials/index/nav_help" %>
 
       <%= render_rss_advertisement("short", @post_set.has_explicit?) %>   
     </section>
