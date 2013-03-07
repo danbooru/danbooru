@@ -255,7 +255,7 @@
         $("#comments").hide();
         $("#share").hide();
         $("#post_tag_string").focus();
-        $("")
+        $("#related-tags-button").trigger("click");
       } else {
         $("#edit").hide();
         $("#comments").hide();
