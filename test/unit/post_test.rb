@@ -856,6 +856,12 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
     end
+    
+    should "return posts for the <pixiv> metatag" do
+      post = FactoryGirl.create(:post, :source => "http://i1.pixiv.net/img123/img/artist-name/789.png")
+      assert_equal(1, Post.tag_match("pixiv:789").count)
+      assert_equal(0, Post.tag_match("pixiv:790").count)
+    end
   
     should "return posts for a list of md5 hashes" do
       post1 = FactoryGirl.create(:post, :md5 => "abcd")
@@ -873,6 +879,14 @@ class PostTest < ActiveSupport::TestCase
       relation = Post.tag_match("source:abcde")
       assert_equal(1, relation.count)
       assert_equal(post2.id, relation.first.id)
+    end
+    
+    should "return posts for a pixiv source search" do
+      post = FactoryGirl.create(:post, :source => "http://i1.pixiv.net/img123/img/artist-name/789.png")
+      assert_equal(1, Post.tag_match("source:pixiv/artist-name/*").count)
+      assert_equal(0, Post.tag_match("source:pixiv/artist-fake/*").count)
+      assert_equal(1, Post.tag_match("source:*.pixiv.net/img*/artist-name/*").count)
+      assert_equal(0, Post.tag_match("source:*.pixiv.net/img*/artist-fake/*").count)
     end
   
     should "return posts for a tag subscription search" do

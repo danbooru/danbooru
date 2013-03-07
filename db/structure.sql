@@ -5852,6 +5852,20 @@ CREATE INDEX index_posts_on_parent_id ON posts USING btree (parent_id);
 
 
 --
+-- Name: index_posts_on_pixiv_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_posts_on_pixiv_id ON posts USING btree ((("substring"((source)::text, 'pixiv.net/img.*/([0-9]+)[^/]*$'::text))::integer));
+
+
+--
+-- Name: index_posts_on_pixiv_suffix; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_posts_on_pixiv_suffix ON posts USING btree ("substring"((source)::text, 'pixiv.net/img.*/([^/]*/[^/]*)$'::text) text_pattern_ops);
+
+
+--
 -- Name: index_posts_on_source; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -6209,5 +6223,7 @@ INSERT INTO schema_migrations (version) VALUES ('20130221032344');
 INSERT INTO schema_migrations (version) VALUES ('20130221035518');
 
 INSERT INTO schema_migrations (version) VALUES ('20130221214811');
+
+INSERT INTO schema_migrations (version) VALUES ('20130302214500');
 
 INSERT INTO schema_migrations (version) VALUES ('20130305005138');

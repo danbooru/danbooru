@@ -149,9 +149,9 @@ class PostQueryBuilder
         relation = relation.where("(posts.source = '' OR posts.source IS NULL)")
       elsif q[:source] =~ /^(pixiv\/|%\.?pixiv(\.net(\/img)?)?(%\/|(?=%$)))(.+)$/
         if $5 == "%"
-            relation = relation.where("substring(posts.source, 'pixiv.net/img.*/([^/]*/[^/]*)$') IS NOT NULL")
+          relation = relation.where("substring(posts.source, 'pixiv.net/img.*/([^/]*/[^/]*)$') IS NOT NULL")
         else
-            relation = relation.where("substring(posts.source, 'pixiv.net/img.*/([^/]*/[^/]*)$') LIKE ? ESCAPE E'\\\\'", $5)
+          relation = relation.where("substring(posts.source, 'pixiv.net/img.*/([^/]*/[^/]*)$') LIKE ? ESCAPE E'\\\\'", $5)
         end
         has_constraints!
       else
