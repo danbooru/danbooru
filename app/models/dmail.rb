@@ -3,6 +3,7 @@ class Dmail < ActiveRecord::Base
   validates_presence_of :from_id
   validates_format_of :title, :with => /\S/
   validates_format_of :body, :with => /\S/
+  validate :validate_sender_is_not_banned
   before_validation :initialize_from_id, :on => :create
   belongs_to :owner, :class_name => "User"
   belongs_to :to, :class_name => "User"
@@ -152,6 +153,15 @@ class Dmail < ActiveRecord::Base
   include AddressMethods
   include FactoryMethods
   extend SearchMethods
+  
+  def validate_sender_is_not_banned
+    if from.is_banned?
+      errors[:base] = "Sender is banned and cannot send messages"
+      return false
+    else
+      return true
+    end
+  end
   
   def quoted_body
     "[quote]#{body}[/quote]"

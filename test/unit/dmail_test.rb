@@ -16,6 +16,19 @@ class DmailTest < ActiveSupport::TestCase
       CurrentUser.user = nil
     end
     
+    context "from a banned user" do
+      setup do
+        @user.update_attribute(:is_banned, true)
+      end
+      
+      should "not validate" do
+        dmail = FactoryGirl.build(:dmail, :title => "xxx", :owner => @user)
+        dmail.save
+        assert_equal(1, dmail.errors.size)
+        assert_equal(["Sender is banned and cannot send messages"], dmail.errors.full_messages)
+      end
+    end
+    
     context "search" do
       should "return results based on title contents" do
         dmail = FactoryGirl.create(:dmail, :title => "xxx", :owner => @user)
