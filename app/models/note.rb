@@ -19,11 +19,11 @@ class Note < ActiveRecord::Base
     end
     
     def body_matches(query)
-      where("body_index @@ plainto_tsquery(?)", query.scan(/\S+/).join(" & "))
+      where("body_index @@ plainto_tsquery(E?)", query.to_escaped_for_tsquery_split)
     end
     
     def post_tags_match(query)
-      joins(:post).where("posts.tag_index @@ to_tsquery('danbooru', ?)", query)
+      joins(:post).where("posts.tag_index @@ to_tsquery('danbooru', E?)", query.to_escaped_for_tsquery_split)
     end
     
     def creator_name(name)

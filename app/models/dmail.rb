@@ -99,7 +99,7 @@ class Dmail < ActiveRecord::Base
     end
     
     def search_message(query)
-      where("message_index @@ plainto_tsquery(?)", query)
+      where("message_index @@ plainto_tsquery(?)", query.to_escaped_for_tsquery_split)
     end
     
     def unread

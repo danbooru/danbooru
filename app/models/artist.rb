@@ -210,7 +210,7 @@ class Artist < ActiveRecord::Base
     end
     
     def other_names_match(string)
-      where("other_names_index @@ to_tsquery('danbooru', ?)", Artist.normalize_name(string))
+      where("other_names_index @@ to_tsquery('danbooru', E?)", Artist.normalize_name(string).to_escaped_for_tsquery)
     end
     
     def group_name_matches(name)
@@ -225,8 +225,8 @@ class Artist < ActiveRecord::Base
     
     def any_name_matches(name)
       stripped_name = normalize_name(name).to_escaped_for_sql_like
-      name_for_tsquery = normalize_name(name).gsub(/\(/, "\\(").gsub(/\)/, "\\)")
-      where("(name LIKE ? ESCAPE E'\\\\' OR other_names_index @@ to_tsquery('danbooru', ?))", stripped_name, name_for_tsquery)
+      name_for_tsquery = normalize_name(name).to_escaped_for_tsquery
+      where("(name LIKE ? ESCAPE E'\\\\' OR other_names_index @@ to_tsquery('danbooru', E?))", stripped_name, name_for_tsquery)
     end
     
     def search(params)

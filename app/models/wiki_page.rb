@@ -21,7 +21,7 @@ class WikiPage < ActiveRecord::Base
     end
     
     def body_matches(query)
-      where("body_index @@ plainto_tsquery(?)", query.scan(/\S+/).join(" & "))
+      where("body_index @@ plainto_tsquery(?)", query.to_escaped_for_tsquery_split)
     end
 
     def search(params = {})

@@ -13,7 +13,7 @@ class ForumPost < ActiveRecord::Base
   
   module SearchMethods
     def body_matches(body)
-      where("forum_posts.text_index @@ plainto_tsquery(?)", body)
+      where("forum_posts.text_index @@ plainto_tsquery(E?)", body.to_escaped_for_tsquery)
     end
     
     def for_user(user_id)
@@ -41,7 +41,7 @@ class ForumPost < ActiveRecord::Base
       end
       
       if params[:topic_title_matches].present?
-        q = q.joins(:topic).where("forum_topics.text_index @@ plainto_tsquery(?)", params[:topic_title_matches])
+        q = q.joins(:topic).where("forum_topics.text_index @@ plainto_tsquery(E?)", params[:topic_title_matches].to_escaped_for_tsquery_split)
       end
       
       if params[:body_matches].present?

@@ -14,7 +14,7 @@ class ForumTopic < ActiveRecord::Base
   
   module SearchMethods
     def title_matches(title)
-      where("text_index @@ plainto_tsquery(?)", title)
+      where("text_index @@ plainto_tsquery(E?)", title.to_escaped_for_tsquery_split)
     end
     
     def active

@@ -1,11 +1,6 @@
 class PostQueryBuilder
   attr_accessor :query_string, :has_constraints
   
-  def self.escape_string_for_tsquery(token)
-    escaped_token = token.gsub(/\\|'/, '\0\0\0\0').gsub("?", "\\\\77").gsub("%", "\\\\37")
-    "''" + escaped_token + "''"
-  end
-  
   def initialize(query_string)
     @query_string = query_string
     @has_constraint = false
@@ -53,7 +48,7 @@ class PostQueryBuilder
 
   def escape_string_for_tsquery(array)
     array.map do |token|
-      PostQueryBuilder.escape_string_for_tsquery(token)
+      token.to_escaped_for_tsquery
     end
   end
 
@@ -75,7 +70,7 @@ class PostQueryBuilder
     end
 
     if tag_query_sql.any?
-      relation = relation.where("posts.tag_index @@ to_tsquery('danbooru', E'" + tag_query_sql.join(" & ") + "')")
+      relation = relation.where("posts.tag_index @@ to_tsquery('danbooru', E?)", tag_query_sql.join(" & "))
     end
     
     relation

@@ -16,7 +16,7 @@ class Comment < ActiveRecord::Base
     end
     
     def body_matches(query)
-      where("body_index @@ plainto_tsquery(?)", query).order("comments.id DESC")
+      where("body_index @@ plainto_tsquery(?)", query.to_escaped_for_tsquery_split).order("comments.id DESC")
     end
     
     def hidden(user)
@@ -28,7 +28,7 @@ class Comment < ActiveRecord::Base
     end
     
     def post_tags_match(query)
-      joins(:post).where("posts.tag_index @@ to_tsquery('danbooru', E?)", query)
+      joins(:post).where("posts.tag_index @@ to_tsquery('danbooru', ?)", query.to_escaped_for_tsquery_split)
     end
     
     def for_creator(user_id)
