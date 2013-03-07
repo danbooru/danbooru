@@ -30,6 +30,10 @@
     </aside>
 
     <section id="content">
+      <% if @post.presenter.has_nav_links?(self) %>
+        <%= render "posts/partials/show/nav_links", :post => @post, :position => "top" %>
+      <% end %>
+      
       <%= render "posts/partials/show/notices", :post => @post %>
       
       <%= render_advertisement("horizontal") %>
@@ -39,16 +43,8 @@
         <%= @post.presenter.image_html(self) %>
       </section>
 
-      <% if params[:tags] || @post.pools.active.any? %>
-        <%= render "posts/partials/show/nav_help" %>
-      <% end %>
-
-      <% if params[:tags] %>
-        <%= render "posts/partials/show/search_seq", :post => @post %>
-      <% end %>
-
-      <% if @post.pools.active.any? %>
-        <%= render "posts/partials/show/pools", :post => @post %>
+      <% if @post.presenter.has_nav_links?(self) %>
+        <%= render "posts/partials/show/nav_links", :post => @post, :position => "bottom" %>
       <% end %>
       
       <menu id="post-sections">

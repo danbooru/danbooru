@@ -149,6 +149,18 @@ class AnonymousUser
     0
   end
   
+  def enable_post_navigation
+    true
+  end
+  
+  def new_post_navigation_layout
+    true
+  end
+  
+  def enable_privacy_mode
+    false
+  end
+  
   %w(member banned privileged builder platinum contributor janitor moderator admin).each do |name|
     define_method("is_#{name}?") do
       false

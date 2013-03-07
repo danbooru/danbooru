@@ -2597,7 +2597,10 @@ CREATE TABLE users (
     favorite_tags text,
     blacklisted_tags text,
     time_zone character varying(255) DEFAULT 'Eastern Time (US & Canada)'::character varying NOT NULL,
-    bcrypt_password_hash text
+    bcrypt_password_hash text,
+    enable_post_navigation boolean DEFAULT true NOT NULL,
+    new_post_navigation_layout boolean DEFAULT true NOT NULL,
+    enable_privacy_mode boolean DEFAULT false NOT NULL
 );
 
 
@@ -6227,3 +6230,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130221214811');
 INSERT INTO schema_migrations (version) VALUES ('20130302214500');
 
 INSERT INTO schema_migrations (version) VALUES ('20130305005138');
+
+INSERT INTO schema_migrations (version) VALUES ('20130307225324');

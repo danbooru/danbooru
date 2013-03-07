@@ -1,4 +1,4 @@
-<div id="search-seq-nav" class="ui-corner-all nav-notice">
+<div id="search-seq-nav">
   <ul>
     <li class="active">
       <%= link_to "&laquo;prev".html_safe, show_seq_post_path(post, :tags => params[:tags], :seq => "prev"), :rel => "prev", :class => "prev" %>
@@ -6,6 +6,4 @@
       <%= link_to "next&raquo;".html_safe, show_seq_post_path(post, :tags => params[:tags], :seq => "next"), :rel => "next", :class => "next" %>
     </li>
   </ul>
-  
-  <span class="close-button ui-icon ui-icon-closethick" id="close-search-seq-nav"></span>
 </div>

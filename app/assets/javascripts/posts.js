@@ -127,25 +127,6 @@
   }
   
   Danbooru.Post.initialize_nav_help_link = function() {
-    $("#close-nav-help-link").click(function(e) {
-      Danbooru.Cookie.put("close-nav-help", "1");
-      $("#nav-help").hide();
-      e.preventDefault();
-    });
-    
-    if (Danbooru.Cookie.get("close-nav-help") === "1") {
-      $("#nav-help").hide();
-    }
-
-    $("#close-search-seq-nav").click(function(e) {
-      Danbooru.Cookie.put("close-search-seq", "1");
-      $("#search-seq-nav").hide();
-      e.preventDefault();
-    });
-    
-    if (Danbooru.Cookie.get("close-search-seq") === "1") {
-      $("#search-seq-nav").hide();
-    }
   }
 
   Danbooru.Post.initialize_titles = function() {

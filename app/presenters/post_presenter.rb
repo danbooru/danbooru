@@ -85,6 +85,10 @@ class PostPresenter < Presenter
     @tag_set_presenter.split_tag_list_html(template, options.merge(:show_extra_links => CurrentUser.user.is_privileged?))
   end
   
+  def has_nav_links?(template)
+    template.params[:tags].present? || @post.pools.active.any?
+  end
+  
   def post_footer_for_pool_html(template)
     if template.params[:pool_id]
       pool = Pool.where(:id => template.params[:pool_id]).first

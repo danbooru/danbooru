@@ -231,9 +231,18 @@ div#c-posts {
       margin: 0 1em;
     }
     
-    #pool-nav, #search-seq-nav, #nav-help {
+    #nav-links {
       margin: 1em 0;
+      padding: 1em 0.5em;
       
+      #keyboard-shortcuts-link {
+        margin-top: 1em;
+        font-size: 80%;
+        font-style: italic;
+      }
+    }
+    
+    #pool-nav, #search-seq-nav, #nav-help {
       li {
         position: relative;
         text-align: center;
