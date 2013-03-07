@@ -254,11 +254,23 @@ class User < ActiveRecord::Base
     
     def role
       case level
-      when Levels::MEMBER, Levels::PRIVILEGED, Levels::BUILDER, Levels::CONTRIBUTOR
+      when Levels::MEMBER
         :member
         
-      when Levels::MODERATOR, Levels::JANITOR
+      when Levels::PRIVILEGED
+        :privileged
+        
+      when Levels::BUILDER
+        :builder
+      
+      when Levels::CONTRIBUTOR
+        :contributor
+        
+      when Levels::MODERATOR
         :moderator
+
+      when Levels::JANITOR
+        :janitor
         
       when Levels::ADMIN
         :admin

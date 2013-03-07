@@ -11,7 +11,7 @@ class Artist < ActiveRecord::Base
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :tag_alias, :foreign_key => "antecedent_name", :primary_key => "name"
   accepts_nested_attributes_for :wiki_page
-  attr_accessible :body, :name, :url_string, :other_names, :other_names_comma, :group_name, :wiki_page_attributes, :notes, :is_active, :as => [:member, :privileged, :platinum, :contributor, :janitor, :moderator, :default, :admin]
+  attr_accessible :body, :name, :url_string, :other_names, :other_names_comma, :group_name, :wiki_page_attributes, :notes, :is_active, :as => [:member, :privileged, :builder, :platinum, :contributor, :janitor, :moderator, :default, :admin]
   attr_accessible :is_banned, :as => :admin
   
   module UrlMethods
