@@ -16,6 +16,6 @@
   </head>
   <body>
     <h1>The site is down for maintenance.</h1>
-    <p>Check <a href="http://search.twitter.com/search?q=&amp;ands=danbooru&amp;phrase=&amp;ors=&amp;nots=&amp;tag=&amp;lang=all&amp;from=teruyo&amp;to=&amp;ref=&amp;near=&amp;within=15&amp;units=mi&amp;since=&amp;until=&amp;rpp=15">Twitter</a> for updates.</p>
+    <p>Check <a href="https://twitter.com/search?q=%23danbooru%20from%3Ateruyo&src=typd">Twitter</a> for updates.</p>
   </body>
 </html>
