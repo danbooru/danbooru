@@ -316,7 +316,7 @@ class Tag < ActiveRecord::Base
             q[:date] = parse_helper($2, :date)
 
           when "tagcount"
-            q[:tag_count] = parse_helper($2)
+            q[:post_tag_count] = parse_helper($2)
             
           when "gentags"
             q[:general_tag_count] = parse_helper($2)
