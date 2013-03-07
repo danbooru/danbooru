@@ -8,12 +8,18 @@ every 1.day do
   runner "PostPruner.new.prune!"
 end
 
-every 1.day do
+every 1.day, :at => "1:00 am" do
   runner "Upload.delete_all(['created_at < ?', 1.day.ago])"
 end
 
-every 1.day do
+every 1.day, :at => "2:00 am" do
   runner "ModAction.delete_all(['created_at < ?', 3.days.ago])"
+end
+
+every 1.day, :at => "3:00 am" do
+  command "cd /var/www/danbooru2/current ; script/donmai/backup_db"
+  command "cd /var/www/danbooru2/current ; script/donmai/backup_db_to_s3"
+  command "cd /var/www/danbooru2/current ; script/donmai/prune_backup_dbs"
 end
 
 if environment == "production"
