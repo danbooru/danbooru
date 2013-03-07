@@ -426,7 +426,7 @@ class Tag < ActiveRecord::Base
       params = {} if params.blank?
       
       if params[:name_matches].present?
-        q = q.name_matches(params[:name_matches])
+        q = q.name_matches(params[:name_matches].strip)
       end
       
       if params[:category].present?
