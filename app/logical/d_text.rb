@@ -198,8 +198,8 @@ class DText
       :attributes => {
         "a" => %w(href title style),
         "span" => %w(class style),
-        "div" => %w(class style),
-        "p" => %w(class style),
+        "div" => %w(class style align),
+        "p" => %w(class style align),
         "font" => %w(color size style)
       },
       :protocols => {
