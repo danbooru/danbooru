@@ -88,6 +88,9 @@
     var $dest = $("#related-tags");
     $dest.empty();
     
+    if (Danbooru.Cookie.get("recent_tags")) {
+      $dest.append(Danbooru.RelatedTag.build_html("recent", Danbooru.RelatedTag.recent_tags()));
+    }
     if (Danbooru.RelatedTag.favorite_tags().length) {
       $dest.append(Danbooru.RelatedTag.build_html("favorite", Danbooru.RelatedTag.favorite_tags()));
     }
@@ -100,6 +103,17 @@
   Danbooru.RelatedTag.favorite_tags = function() {
     var string = Danbooru.meta("favorite-tags");
     if (string) {
+      return $.map(string.match(/\S+/g), function(x, i) {
+        return [[x, 0]];
+      });
+    } else {
+      return [];
+    }
+  }
+  
+  Danbooru.RelatedTag.recent_tags = function() {
+    var string = Danbooru.Cookie.get("recent_tags");
+    if (string && string.length) {
       return $.map(string.match(/\S+/g), function(x, i) {
         return [[x, 0]];
       });

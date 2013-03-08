@@ -66,10 +66,10 @@ private
   end
 
   def save_recent_tags
-    if tag_query
-      tags = Tag.scan_tags(tag_query)
-      tags = TagAlias.to_aliased(tags) + Tag.scan_tags(session[:recent_tags])
-      session[:recent_tags] = tags.uniq.slice(0, 40).join(" ")
+    if @post
+      tags = Tag.scan_tags(@post.tag_string)
+      tags = TagAlias.to_aliased(tags) + Tag.scan_tags(cookies[:recent_tags])
+      cookies[:recent_tags] = tags.uniq.slice(0, 40).join(" ")
     end
   end
 end
