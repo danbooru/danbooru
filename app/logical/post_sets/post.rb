@@ -18,7 +18,7 @@ module PostSets
     end
     
     def has_wiki?
-      tag_array.any? && ::WikiPage.titled(tag_string).exists?
+      tag_array.size == 1 && ::WikiPage.titled(tag_string).exists?
     end
 
     def wiki_page

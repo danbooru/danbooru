@@ -20,7 +20,7 @@
       <menu id="post-sections">
         <li class="active"><a href="#posts" id="show-posts-link">Posts</a></li>
         
-        <% if params[:tags].present? %>
+        <% if @post_set.has_wiki? %>
           <li><a href="#wiki-except" id="show-wiki-excerpt-link">Wiki</a></li>
         <% end %>
       </menu>
