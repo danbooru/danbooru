@@ -293,9 +293,8 @@ module Danbooru
       nil
     end
     
-    # If you wish to proxy emails through Amazon SES
     def amazon_ses
-      # {:smtp_server_name => "smtp server name", :user_name => "amazon user name", :ses_smtp_user_name => "smtp user name", :ses_smtp_password => "smtp password"}
+      # {:smtp_server_name => "smtp server", :user_name => "user name", :ses_smtp_user_name => "smtp user name", :ses_smtp_password => "smtp password"}
       nil
     end
   end
