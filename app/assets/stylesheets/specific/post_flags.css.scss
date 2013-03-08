@@ -2,4 +2,12 @@ div#c-post-flags {
   li {
     list-style-type: disc;
   }
+  
+  tr.resolved-true {
+    background: #DDD !important;
+  }
+
+  tr.resolved-false {
+    background: #FFF !important;
+  }
 }

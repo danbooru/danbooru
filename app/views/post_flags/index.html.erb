@@ -5,22 +5,22 @@
       <thead>
         <tr>
           <th width="1%"></th>
-          <th>Creator</th>
+          <% if CurrentUser.user.is_janitor? %>
+            <th>Creator</th>
+          <% end %>
           <th>Reason</th>
-          <th>Resolved</th>
         </tr>
       </thead>
       <tbody>
         <% @post_flags.each do |post_flag| %>
-          <tr>
+          <tr class="resolved-<%= post_flag.is_resolved? %>">
             <td><%= PostPresenter.preview(post_flag.post) %></td>
-            <td>
-              <% if CurrentUser.user.is_janitor? %>
+            <% if CurrentUser.user.is_janitor? %>
+              <td>
                 <%= link_to post_flag.creator.name, user_path(post_flag.creator) %>
-              <% end %>
-            </td>
+              </td>
+            <% end %>
             <td><%= format_text post_flag.reason %></td>
-            <td><%= post_flag.is_resolved? %></td>
           </tr>
         <% end %>
       </tbody>
