@@ -79,14 +79,10 @@
   Danbooru.Post.nav_pool_scroll = function() {
     var scroll_top = $(window).scrollTop() + $(window).height();
     
-    if (scroll_top > $("#image").height() + $("#image").offset().top + $(window).height()) {
+    if (scroll_top > $("#image").height() + $("#image").offset().top + ($("#image").height() / 2)) {
       Danbooru.Post.nav_pool_next();
       return;
     }
-    
-    $('html, body').animate({
-        scrollTop: scroll_top
-    }, 250);
   }
 
   Danbooru.Post.initialize_shortcuts = function() {
@@ -114,7 +110,6 @@
       
       $(document).bind("keydown.space", function(e) {
         Danbooru.Post.nav_pool_scroll();
-        e.preventDefault();
       })
     }
   }
