@@ -757,6 +757,34 @@ class PostTest < ActiveSupport::TestCase
   end
 
   context "Searching:" do
+    should "return posts for the ' tag" do
+      post1 = FactoryGirl.create(:post, :tag_string => "'")
+      post2 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
+      count = Post.tag_match("'").count
+      assert_equal(1, count)
+    end
+    
+    should "return posts for the \\ tag" do
+      post1 = FactoryGirl.create(:post, :tag_string => "\\")
+      post2 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
+      count = Post.tag_match("\\").count
+      assert_equal(1, count)
+    end
+    
+    should "return posts for the ( tag" do
+      post1 = FactoryGirl.create(:post, :tag_string => "(")
+      post2 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
+      count = Post.tag_match("(").count
+      assert_equal(1, count)
+    end
+    
+    should "return posts for the ? tag" do
+      post1 = FactoryGirl.create(:post, :tag_string => "?")
+      post2 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
+      count = Post.tag_match("?").count
+      assert_equal(1, count)
+    end
+    
     should "return posts for 1 tag" do
       post1 = FactoryGirl.create(:post, :tag_string => "aaa")
       post2 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
