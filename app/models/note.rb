@@ -37,6 +37,10 @@ class Note < ActiveRecord::Base
       if params[:body_matches].present?
         q = q.body_matches(params[:body_matches])
       end
+
+      if params[:post_id].present?
+        q = q.body_matches(params[:post_id])
+      end
       
       if params[:post_tags_match].present?
         q = q.post_tags_match(params[:post_tags_match])
