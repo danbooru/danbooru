@@ -2,14 +2,14 @@
   Danbooru.PostFlag = {};
   
   Danbooru.PostFlag.initialize_all = function() {
-    if ($("#c-posts") && $("#a-show")) {
-     this.initialize_flag();
+    if ($("#c-posts").length && $("#a-show").length) {
+      this.initialize_flag();
       this.hide_or_show_flag_link();
     }
   }
   
   Danbooru.PostFlag.hide_or_show_flag_link = function() {
-    if (Danbooru.meta("post-is-deleted") == "true") {
+    if (Danbooru.meta("post-is-deleted") === "true") {
       $("#flag").hide();
     }
   }
@@ -41,6 +41,6 @@
   }
 })();
 
-$(document).ready(function() {
+$(function() {
   Danbooru.PostFlag.initialize_all();
 });

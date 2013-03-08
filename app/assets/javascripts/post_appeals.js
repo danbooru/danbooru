@@ -2,7 +2,7 @@
   Danbooru.PostAppeal = {};
   
   Danbooru.PostAppeal.initialize_all = function() {
-    if ($("#c-posts") && $("#a-show")) {
+    if ($("#c-posts").length && $("#a-show").length) {
       this.initialize_appeal();
       this.hide_or_show_appeal_link();
     }
