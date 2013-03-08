@@ -7,7 +7,5 @@
     <% if post.pools.active.any? %>
       <%= render "posts/partials/show/pools", :post => post %>
     <% end %>
-    
-    <p id="keyboard-shortcuts-link"><%= link_to "Keyboard shortcuts available", keyboard_shortcuts_path %></p>
   </div>
 <% end %>
