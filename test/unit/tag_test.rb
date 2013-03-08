@@ -101,12 +101,12 @@ class TagTest < ActiveSupport::TestCase
   context "A tag parser" do
     should "scan a query" do
       assert_equal(%w(aaa bbb), Tag.scan_query("aaa bbb"))
-      assert_equal(%w(~aaa -bbb*), Tag.scan_query("~AAa -BBB* -bbb*"))
+      assert_equal(%w(~AAa -BBB* -bbb*), Tag.scan_query("~AAa -BBB* -bbb*"))
     end
     
     should "strip out invalid characters when scanning" do
       assert_equal(%w(aaa bbb), Tag.scan_tags("aaa bbb"))
-      assert_equal(%w(-bb;b* -b_b_b_), Tag.scan_tags("-B,B;B* -b_b_b_"))
+      assert_equal(%w(-BB;B* -b_b_b_), Tag.scan_tags("-B,B;B* -b_b_b_"))
     end
     
     should "cast values" do

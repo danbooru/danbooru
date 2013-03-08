@@ -909,6 +909,13 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(post2.id, relation.first.id)
     end
     
+    should "return posts for a case sensitive source search" do
+      post1 = FactoryGirl.create(:post, :source => "ABCD")
+      post2 = FactoryGirl.create(:post, :source => "1234")
+      relation = Post.tag_match("source:ABCD")
+      assert_equal(1, relation.count)
+    end
+    
     should "return posts for a pixiv source search" do
       post = FactoryGirl.create(:post, :source => "http://i1.pixiv.net/img123/img/artist-name/789.png")
       assert_equal(1, Post.tag_match("source:pixiv/artist-name/*").count)

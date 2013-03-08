@@ -144,7 +144,7 @@ class Tag < ActiveRecord::Base
 
   module ParseMethods
     def normalize(query)
-      query.to_s.downcase.strip
+      query.to_s.strip
     end
     
     def scan_query(query)
@@ -219,18 +219,18 @@ class Tag < ActiveRecord::Base
     
     def parse_tag(tag, output)
       if tag[0] == "-" && tag.size > 1
-        output[:exclude] << tag[1..-1]
+        output[:exclude] << tag[1..-1].downcase
         
       elsif tag[0] == "~" && tag.size > 1
-        output[:include] << tag[1..-1]
+        output[:include] << tag[1..-1].downcase
         
       elsif tag =~ /\*/
-        matches = Tag.name_matches(tag).all(:select => "name", :limit => Danbooru.config.tag_query_limit, :order => "post_count DESC").map(&:name)
+        matches = Tag.name_matches(tag.downcase).all(:select => "name", :limit => Danbooru.config.tag_query_limit, :order => "post_count DESC").map(&:name)
         matches = ["~no_matches~"] if matches.empty?
         output[:include] += matches
         
       else
-        output[:related] << tag
+        output[:related] << tag.downcase
       end
     end
 
@@ -283,7 +283,7 @@ class Tag < ActiveRecord::Base
             q[:subscriptions] << $2
 
           when "md5"
-            q[:md5] = $2.split(/,/)
+            q[:md5] = $2.downcase.split(/,/)
 
           when "-rating"
             q[:rating_negated] = $2
@@ -334,10 +334,10 @@ class Tag < ActiveRecord::Base
             q[:parent_id] = $2.to_i
             
           when "order"
-            q[:order] = $2
+            q[:order] = $2.downcase
 
           when "status"
-            q[:status] = $2
+            q[:status] = $2.downcase
             
           when "pixiv"
             q[:pixiv] = parse_helper($2)

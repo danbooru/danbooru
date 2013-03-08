@@ -111,7 +111,7 @@ class TagSubscription < ActiveRecord::Base
     relation = where("creator_id = ?", user_id)
     
     if name
-      relation = relation.where("name ILIKE ? ESCAPE E'\\\\'", name.to_escaped_for_sql_like)
+      relation = relation.where("lower(name) LIKE ? ESCAPE E'\\\\'", name.downcase.to_escaped_for_sql_like)
     end
     
     relation.each do |tag_sub|

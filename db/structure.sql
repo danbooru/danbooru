@@ -5680,6 +5680,13 @@ CREATE INDEX index_pools_on_creator_id ON pools USING btree (creator_id);
 
 
 --
+-- Name: index_pools_on_lower_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_pools_on_lower_name ON pools USING btree (lower((name)::text));
+
+
+--
 -- Name: index_pools_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -6232,3 +6239,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130302214500');
 INSERT INTO schema_migrations (version) VALUES ('20130305005138');
 
 INSERT INTO schema_migrations (version) VALUES ('20130307225324');
+
+INSERT INTO schema_migrations (version) VALUES ('20130308204213');
