@@ -560,6 +560,23 @@ class User < ActiveRecord::Base
         q = q.where("id = ?", params[:id].to_i)
       end
       
+      case params[:order]
+      when "name"
+        q = q.order("name")
+        
+      when "post_upload_count"
+        q = q.order("post_upload_count desc")
+        
+      when "note_count"
+        q = q.order("note_update_count desc")
+        
+      when "post_update_count" 
+        q = q.order("post_update_count desc")
+        
+      else
+        q = q.order("created_at desc")
+      end
+      
       q
     end
   end
