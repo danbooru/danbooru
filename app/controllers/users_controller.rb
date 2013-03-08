@@ -61,6 +61,12 @@ class UsersController < ApplicationController
     @user.update_cache
     render :nothing => true
   end
+  
+  def restore_uploaded_tags
+    @user = User.find(params[:id])
+    importer = UploadedTagsImporter.new(@user)
+    importer.import!
+  end
 
 private
   def check_privilege(user)
