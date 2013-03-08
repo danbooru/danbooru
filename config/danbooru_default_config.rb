@@ -292,5 +292,11 @@ module Danbooru
     def pixa_password
       nil
     end
+    
+    # If you wish to proxy emails through Amazon SES
+    def amazon_ses
+      # {:smtp_server_name => "smtp server name", :user_name => "amazon user name", :ses_smtp_user_name => "smtp user name", :ses_smtp_password => "smtp password"}
+      nil
+    end
   end
 end
