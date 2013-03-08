@@ -7,8 +7,9 @@
     this.initialize_titles();
 
     if ($("#c-posts").length) {
-      this.initialize_shortcuts();
-      this.initialize_nav_help_link();
+      if (Danbooru.meta("enable-js-navigation") === "true") {
+        this.initialize_shortcuts();
+      }
     }
 
     if ($("#c-posts").length && $("#a-index").length) {
@@ -124,9 +125,6 @@
       $("#post_tag_string").trigger("focus");
       e.preventDefault();
     });
-  }
-  
-  Danbooru.Post.initialize_nav_help_link = function() {
   }
 
   Danbooru.Post.initialize_titles = function() {

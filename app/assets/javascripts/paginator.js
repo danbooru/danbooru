@@ -17,7 +17,7 @@
 })();
 
 $(function() {
-  if ($(".paginator").length) {
+  if ($(".paginator").length && (Danbooru.meta("enable-js-navigation") === "true")) {
     $(document).bind("keydown.right", Danbooru.Paginator.next_page);
     $(document).bind("keydown.left", Danbooru.Paginator.prev_page);
   }

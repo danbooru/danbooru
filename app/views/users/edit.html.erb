@@ -10,7 +10,7 @@
         <%= f.input :comment_threshold, :hint => "Comments below this score will be hidden by default" %>
         <%= f.input :always_resize_images, :as => :select, :include_blank => false %>
         <%= f.input :default_image_size, :hint => "Large is #{Danbooru.config.large_image_width} pixels wide, and original is whatever the original image is", :collection => %w(large original), :include_blank => false %>
-        <%= f.input :enable_post_navigation, :as => :select, :include_blank => false, :hint => "When searching, do you want to navigate from post to post?" %>
+        <%= f.input :enable_post_navigation, :as => :select, :include_blank => false, :label => "Enable keyboard shortcuts" %>
         <%= f.input :new_post_navigation_layout, :as => :select, :label => "Pool links", :include_blank => false, :collection => [["Bottom", "true"], ["Top", "false"]], :hint => "When browsing pools, where do you want the navigation links to be placed?" %>
         <%= f.input :favorite_tags, :hint => "A list of whitespace delimited tags that show up in your profile", :input_html => {:size => "40x5"} %>
         <%= f.input :blacklisted_tags, :hint => "A list of newline delimited tags that you never want to see", :input_html => {:size => "40x5"} %>

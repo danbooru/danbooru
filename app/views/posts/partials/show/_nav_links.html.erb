@@ -1,6 +1,6 @@
 <% if (position == "bottom" && CurrentUser.user.new_post_navigation_layout) || (position == "top" && !CurrentUser.user.new_post_navigation_layout) %>
   <div id="nav-links" class="ui-corner-all nav-notice">
-    <% if params[:tags].present? && CurrentUser.user.enable_post_navigation && params[:tags] !~ /order:/ %>
+    <% if params[:tags].present? && params[:tags] !~ /order:/ %>
       <%= render "posts/partials/show/search_seq", :post => post %>
     <% end %>
 
