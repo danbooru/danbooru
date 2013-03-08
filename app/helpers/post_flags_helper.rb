@@ -4,13 +4,20 @@ module PostFlagsHelper
     html << '<ul>'
     
     post.flags.each do |flag|
-      html << '<li>' + flag.reason
+      html << '<li>'
+      html << flag.reason
       
       if CurrentUser.is_janitor?
         html << ' - ' + link_to(flag.creator.name, user_path(flag.creator))
       end
 
-      html << ' - ' + time_ago_in_words_tagged(flag.created_at) + '</li>'
+      html << ' - ' + time_ago_in_words_tagged(flag.created_at)
+      
+      if flag.is_resolved?
+        html << ' <span class="resolved">RESOLVED</span>'
+      end
+      
+      html << '</li>'
     end
     
     html << '</ul>'
