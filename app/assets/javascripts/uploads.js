@@ -10,6 +10,7 @@
       this.initialize_image();
       this.initialize_info();
       this.initialize_similar();
+      $("#related-tags-button").trigger("click");
     }
   }
   
@@ -25,7 +26,6 @@
     $("#similar-button").click(function(e) {
       var old_source_name = $("#upload_source").attr("name");
   		var old_file_name = $("#upload_file").attr("name")
-  		var old_target = $("#form").attr("target");
   		var old_action = $("#form").attr("action");
 
   		$("#upload_source").attr("name", "url");
@@ -37,7 +37,7 @@
 
   		$("#upload_source").attr("name", old_source_name);
   		$("#upload_file").attr("name", old_file_name);
-  		$("#form").attr("target", old_target);
+  		$("#form").attr("target", "");
   		$("#form").attr("action", old_action);
   		
   		e.preventDefault();

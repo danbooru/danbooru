@@ -13,7 +13,7 @@
       This post is rating locked.
     <% else %>
       <%= f.label :blank, "Rating" %>
-    
+  
       <fieldset class="ratings">
         <%= f.radio_button :rating, :e %>
         <%= f.label :rating_e, "Explicit" %>
@@ -26,18 +26,18 @@
       </fieldset>      
     <% end %>
   </div>
-  
+
   <% if CurrentUser.is_builder? %>
     <div class="input">
       <%= f.label :blank, "Lock" %>
-      
+    
       <fieldset class="locks">
         <%= f.check_box :is_note_locked %>
         <%= f.label :is_note_locked, "Notes" %>
 
         <%= f.check_box :is_rating_locked %>
         <%= f.label :is_rating_locked, "Rating" %>
-        
+      
         <% if CurrentUser.is_admin? %>
           <%= f.check_box :is_status_locked %>
           <%= f.label :is_status_locked, "Status" %>
@@ -45,25 +45,25 @@
       </fieldset>
     </div>
   <% end %>
-  
+
   <div class="input">
     <%= f.label :parent_id, "Parent" %>
     <%= f.text_field :parent_id, :size => 5 %>
   </div>
-  
+
   <div class="input">
     <%= f.label :source %>
     <%= f.text_field :source %>
     <%= button_tag "Similar", :id => "similar-button", :type => "button" %>
     <%= button_tag "Artist", :id => "find-artist-button", :type => "button" %>
   </div>
-  
+
   <div class="input">
     <div>
       <%= f.label :tag_string, "Tags" %>
       <%= f.text_area :tag_string , :size => "50x3" %>
     </div>
-    
+  
     <%= button_tag "Related tags", :id => "related-tags-button", :type => "button" %>
     <%= button_tag "Artists", :id => "related-artists-button", :type => "button" %>
     <%= button_tag "Characters", :id => "related-characters-button", :type => "button" %>
@@ -73,11 +73,11 @@
   <div class="input">
     <%= submit_tag "Submit" %>      
   </div>
-  
+
   <div id="related-tags-container">
     <h1>Related Tags</h1>
     <div id="related-tags">
     </div>
   </div>
-  
+
 <% end %>

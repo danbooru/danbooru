@@ -32,7 +32,7 @@ class Post < ActiveRecord::Base
   validates_presence_of :parent, :if => lambda {|rec| !rec.parent_id.nil?}
   # validate :validate_parent_does_not_have_a_parent
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at, :parent_id, :as => [:member, :builder, :privileged, :platinum, :contributor, :janitor, :moderator, :admin, :default]
-  attr_accessible :is_rating_locked, :is_note_locked, :as => [:builder, :janitor, :moderator, :admin]
+  attr_accessible :is_rating_locked, :is_note_locked, :as => [:builder, :contributor, :janitor, :moderator, :admin]
   attr_accessible :is_status_locked, :as => [:admin]
     
   module FileMethods

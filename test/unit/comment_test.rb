@@ -80,7 +80,7 @@ class CommentTest < ActiveSupport::TestCase
         comment_vote = c1.vote!("up")
         assert_equal([], comment_vote.errors.full_messages)
         comment_vote = c1.vote!("up")
-        assert_equal(["User has already voted for this comment"], comment_vote.errors.full_messages)
+        assert_equal(["You have already voted for this comment"], comment_vote.errors.full_messages)
         assert_equal(1, CommentVote.count)
         assert_equal(1, CommentVote.last.score)
 

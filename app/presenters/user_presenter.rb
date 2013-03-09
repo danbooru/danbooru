@@ -50,12 +50,9 @@ class UserPresenter
       string = "base:10 + approved:(#{approved_count} / 10) - deleted:(#{deleted_count}) / 4 - pending:#{pending_count}"
     end
     
-    if limit >= 20
-      limit = 20
-      string += " = capped:20"
-    elsif limit < 0
+    if limit < 0
       limit = 0
-      string += " = capped:0"
+      string += " = 0"
     else
       string += " = #{limit}"
     end

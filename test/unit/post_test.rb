@@ -373,6 +373,12 @@ class PostTest < ActiveSupport::TestCase
         should "update the category cache of the tag" do
           assert_equal(Tag.categories.copyright, Cache.get("tc:abc"))
         end
+        
+        should "update the tag counts of the posts" do
+          assert_equal(0, @post.tag_count_artist)
+          assert_equal(1, @post.tag_count_copyright)
+          assert_equal(0, @post.tag_count_general)
+        end
       end
       
       context "tagged with a metatag" do

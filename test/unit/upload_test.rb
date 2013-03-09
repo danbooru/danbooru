@@ -22,6 +22,31 @@ class UploadTest < ActiveSupport::TestCase
       teardown do
         FileUtils.rm_f(Dir.glob("#{Rails.root}/tmp/test.*"))
       end
+      
+      context "that has insanely absurd res dimensions" do
+        setup do
+          @upload = FactoryGirl.build(:jpg_upload, :tag_string => "")
+          @upload.image_width = 10_000
+          @upload.image_height = 10
+          @upload.add_dimension_tags!
+        end
+        
+        should "have the insanely_absurdres tag" do
+          assert_match(/insanely_absurdres/, @upload.tag_string)
+        end
+      end
+      
+      context "that has a large flie size" do
+        setup do
+          @upload = FactoryGirl.build(:jpg_upload, :tag_string => "")
+          @upload.file_size = 11.megabytes
+          @upload.add_file_size_tags!(@upload.file_path)
+        end
+        
+        should "have the huge_filesize tag" do
+          assert_match(/huge_filesize/, @upload.tag_string)
+        end
+      end
 
       context "image size calculator" do
         should "discover the dimensions for a JPG" do
@@ -81,17 +106,17 @@ class UploadTest < ActiveSupport::TestCase
 
       context "determining if a file is downloadable" do
         should "classify HTTP sources as downloadable" do
-          @upload = FactoryGirl.create(:source_upload, source: "http://www.example.com/1.jpg")
+          @upload = FactoryGirl.create(:source_upload, :source => "http://www.example.com/1.jpg")
           assert_not_nil(@upload.is_downloadable?)
         end
 
         should "classify HTTPS sources as downloadable" do
-          @upload = FactoryGirl.create(:source_upload, source: "https://www.example.com/1.jpg")
+          @upload = FactoryGirl.create(:source_upload, :source => "https://www.example.com/1.jpg")
           assert_not_nil(@upload.is_downloadable?)
         end
 
         should "classify non-HTTP/HTTPS sources as not downloadable" do
-          @upload = FactoryGirl.create(:source_upload, source: "ftp://www.example.com/1.jpg")
+          @upload = FactoryGirl.create(:source_upload, :source => "ftp://www.example.com/1.jpg")
           assert_nil(@upload.is_downloadable?)
         end
       end
