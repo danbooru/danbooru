@@ -50,7 +50,7 @@
     });
   }
   
-  Danbooru.Post.nav_pool_prev = function() {
+  Danbooru.Post.nav_prev = function() {
     if ($("#search-seq-nav").length) {
       var href = $("#search-seq-nav a[rel=prev]").attr("href");
       if (href) {
@@ -64,7 +64,7 @@
     }
   }
   
-  Danbooru.Post.nav_pool_next = function() {
+  Danbooru.Post.nav_next = function() {
     if ($("#search-seq-nav").length) {
       var href = $("#search-seq-nav a[rel=next]").attr("href");
       location.href = href;
@@ -76,17 +76,21 @@
     }
   }
   
-  Danbooru.Post.nav_pool_scroll = function() {
-    var scroll_top = $(window).scrollTop() + $(window).height();
-    
-    if (scroll_top > $("#image").height() + $("#image").offset().top + ($("#image").height() / 2)) {
-      Danbooru.Post.nav_pool_next();
-      return;
+  Danbooru.Post.nav_scroll_down = function() {
+    var scroll_top = $(window).scrollTop() + ($(window).height() * 0.85);
+    Danbooru.scroll_to(scroll_top);
+  }
+
+  Danbooru.Post.nav_scroll_up = function() {
+    var scroll_top = $(window).scrollTop() - ($(window).height() * 0.85);
+    if (scroll_top < 0) {
+      scroll_top = 0;
     }
+    Danbooru.scroll_to(scroll_top);
   }
 
   Danbooru.Post.initialize_shortcuts = function() {
-    $(document).bind("keydown./", function(e) {
+    $(document).bind("keydown.q", function(e) {
       $("#tags").trigger("focus");
       e.preventDefault();
     });
@@ -98,18 +102,22 @@
         e.preventDefault();
       });
 
-      $(document).bind("keydown.left", function(e) {
-        Danbooru.Post.nav_pool_prev();
+      $(document).bind("keydown.a", function(e) {
+        Danbooru.Post.nav_prev();
         e.preventDefault();
       });
 
-      $(document).bind("keydown.right", function(e) {
-        Danbooru.Post.nav_pool_next();
+      $(document).bind("keydown.d", function(e) {
+        Danbooru.Post.nav_next();
         e.preventDefault();
       });
       
-      $(document).bind("keydown.space", function(e) {
-        Danbooru.Post.nav_pool_scroll();
+      $(document).bind("keydown.s", function(e) {
+        Danbooru.Post.nav_scroll_down();
+      })
+
+      $(document).bind("keydown.w", function(e) {
+        Danbooru.Post.nav_scroll_up();
       })
     }
   }

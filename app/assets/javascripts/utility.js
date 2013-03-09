@@ -4,9 +4,15 @@
   }
   
   Danbooru.scroll_to = function(element) {
+    var top = null;
+    if (typeof(element) === "number") {
+      top = element;
+    } else {
+      top = element.offset().top - 10;
+    }
     $('html, body').animate({
-        scrollTop: element.offset().top - 10
-    }, 250);
+        scrollTop: top
+    }, 0);
   }
 
   Danbooru.notice = function(msg) {
