@@ -33,6 +33,7 @@ gem 'newrelic_rpm'
 gem 'term-ansicolor', :require => "term/ansicolor"
 gem 'diff-lcs', :require => "diff/lcs/array"
 gem 'bcrypt-ruby', :require => "bcrypt"
+gem 'aws-s3', :require => "aws/s3"
 
 group :development do
   gem 'ruby-prof'
