@@ -77,7 +77,11 @@ class Upload < ActiveRecord::Base
         validate_md5_uniqueness
         validate_md5_confirmation
         calculate_file_size(file_path)
-        calculate_dimensions(file_path) if has_dimensions?
+        add_file_size_tags!(file_path)
+        if has_dimensions?
+          calculate_dimensions(file_path) 
+          add_dimension_tags!
+        end
         generate_resizes(file_path)
         move_file
         post = convert_to_post
@@ -172,7 +176,17 @@ class Upload < ActiveRecord::Base
       self.image_width = image_size.get_width
       self.image_height = image_size.get_height
     end
-
+    
+    def add_dimension_tags!
+      if image_width >= 10_000 || image_height >= 10_000
+        self.tag_string = "#{tag_string} insanely_absurdres".strip
+      elsif image_width >= 3200 || image_height >= 2400
+        self.tag_string = "#{tag_string} absurdres".strip
+      elsif image_width >= 1600 && image_height >= 1200
+        self.tag_string = "#{tag_string} highres".strip
+      end
+    end
+    
     # Does this file have image dimensions?
     def has_dimensions?
       %w(jpg gif png swf).include?(file_ext)
@@ -362,6 +376,12 @@ class Upload < ActiveRecord::Base
   include StatusMethods
   include UploaderMethods
   extend SearchMethods
+  
+  def add_file_size_tags!(file_path)
+    if file_size >= 10.megabytes
+      self.tag_string = "#{tag_string} huge_filesize".strip
+    end
+  end
   
   def presenter
     @presenter ||= UploadPresenter.new(self)
