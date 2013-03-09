@@ -33,7 +33,6 @@
   Danbooru.Post.initialize_similar = function() {
     $("#similar-button").click(function(e) {
       var old_source_name = $("#post_source").attr("name");
-  		var old_target = $("#form").attr("target");
   		var old_action = $("#form").attr("action");
 
   		$("#post_source").attr("name", "url");
@@ -43,7 +42,7 @@
       $("#form").trigger("submit");
 
   		$("#post_source").attr("name", old_source_name);
-  		$("#form").attr("target", old_target);
+  		$("#form").attr("target", "");
   		$("#form").attr("action", old_action);
   		
   		e.preventDefault();
