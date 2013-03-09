@@ -87,7 +87,7 @@ class Tag < ActiveRecord::Base
     def update_category_cache_for_all(force = false)
       if category_changed? || force
         update_category_cache
-        update_category_post_counts if category_changed?
+        delay(:queue => "default").update_category_post_counts if category_changed?
         
         Danbooru.config.other_server_hosts.each do |host|
           delay(:queue => host).update_category_cache
@@ -98,7 +98,9 @@ class Tag < ActiveRecord::Base
     def update_category_post_counts
       old_field = "tag_count_#{Danbooru.config.reverse_tag_category_mapping[category_was]}".downcase
       new_field = "tag_count_#{category_name}".downcase
-      Post.raw_tag_match(name).update_all("#{old_field} = #{old_field} - 1, #{new_field} = #{new_field} + 1")
+      Post.without_timeout do
+        Post.raw_tag_match(name).update_all("#{old_field} = #{old_field} - 1, #{new_field} = #{new_field} + 1")
+      end
     end
     
     def update_category_cache
