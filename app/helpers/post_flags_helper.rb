@@ -5,7 +5,7 @@ module PostFlagsHelper
     
     post.flags.each do |flag|
       html << '<li>'
-      html << flag.reason
+      html << DText.parse_inline(flag.reason).html_safe
       
       if CurrentUser.is_janitor?
         html << ' - ' + link_to(flag.creator.name, user_path(flag.creator))
