@@ -443,10 +443,6 @@ class User < ActiveRecord::Base
         limit = 10 + (approved_count / 10) - (deleted_count / 4) - pending_count
       end
       
-      if limit > 20
-        limit = 20
-      end
-      
       if limit < 0
         limit = 0
       end

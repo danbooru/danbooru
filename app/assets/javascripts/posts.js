@@ -110,15 +110,15 @@
         Danbooru.Post.nav_next();
         e.preventDefault();
       });
-      
-      $(document).bind("keydown.s", function(e) {
-        Danbooru.Post.nav_scroll_down();
-      })
-
-      $(document).bind("keydown.w", function(e) {
-        Danbooru.Post.nav_scroll_up();
-      })
     }
+
+    $(document).bind("keydown.s", function(e) {
+      Danbooru.Post.nav_scroll_down();
+    })
+
+    $(document).bind("keydown.w", function(e) {
+      Danbooru.Post.nav_scroll_up();
+    })
   }
 
   Danbooru.Post.initialize_links = function() {
