@@ -2,7 +2,7 @@
   <div id="a-diff">
     <h1>Wiki Page: <%= @thispage.title %></h1>
 
-    <p>Showing differences between <%= compact_time @thispage.created_at %> (<%= link_to @thispage.updater.name, user_path(@thispage.updater) %>) and <%= compact_time @otherpage.created_at %> (<%= link_to @otherpage.updater.name, user_path(@otherpage.updater) %>)</p>
+    <p>Showing differences between <%= compact_time @thispage.created_at %> (<%= link_to @thispage.updater_name, user_path(@thispage.updater) %>) and <%= compact_time @otherpage.created_at %> (<%= link_to @otherpage.updater_name, user_path(@otherpage.updater) %>)</p>
 
     <div>
       <%= wiki_page_diff(@thispage, @otherpage) %>
