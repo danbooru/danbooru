@@ -236,9 +236,7 @@
         $("#comments").hide();
         $("#share").hide();
         $("#post_tag_string").focus();
-        if (Danbooru.meta("favorite-tags")) {
-          $("#related-tags-button").trigger("click");
-        }
+        $("#related-tags-button").trigger("click");
       } else {
         $("#edit").hide();
         $("#comments").hide();
