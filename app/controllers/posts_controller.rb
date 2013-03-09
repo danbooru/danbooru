@@ -16,6 +16,12 @@ class PostsController < ApplicationController
   
   def show
     @post = Post.find(params[:id])
+    
+    if !Danbooru.config.can_user_see_post?(CurrentUser.user, @post)
+      redirect_to(:back, :notice => "Post #{@post.id} is not available")
+      return
+    end
+    
     @post_flag = PostFlag.new(:post_id => @post.id)
     @post_appeal = PostAppeal.new(:post_id => @post.id)
     respond_with(@post)
@@ -32,7 +38,11 @@ class PostsController < ApplicationController
   
   def update
     @post = Post.find(params[:id])
-    @post.update_attributes(params[:post], :as => CurrentUser.role)
+
+    if Danbooru.config.can_user_see_post?(CurrentUser.user, @post)
+      @post.update_attributes(params[:post], :as => CurrentUser.role)
+    end
+    
     respond_with(@post) do |format|
       format.html do
         if @post.errors.any?
