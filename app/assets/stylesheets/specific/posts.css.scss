@@ -312,6 +312,28 @@ div#c-explore-posts {
       margin-left: 0;
     }
   }
+  
+  #blacklist-box {
+    margin-bottom: 1em;
+  }
+  
+  #blacklist-list {
+    display: inline;
+  }
+  
+  #blacklist-list li {
+    display: inline;
+    margin-right: 1em;
+    
+    a {
+      color: $link_color;
+      cursor: pointer;
+    }
+    
+    span {
+      color: #AAA;
+    }
+  }
 }
 
 div#unapprove-dialog {
