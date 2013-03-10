@@ -837,17 +837,24 @@ class Post < ActiveRecord::Base
       options ||= {}
       options[:except] ||= []
       options[:except] += hidden_attributes
+      # options[:methods] += [:uploader_name, :has_large]
       hash = super(options)
-      hash["uploader_name"] = uploader_name
-      hash["has_large"] = has_large
       hash
+    end
+
+    def to_json(options = {})
+      options ||= {}
+      options[:methods] ||= []
+      options[:methods] += [:uploader_name, :has_large]
+      super(options)
     end
     
     def to_xml(options = {}, &block)
       # to_xml ignores the serializable_hash method
       options ||= {}
-      options[:except] ||= []
-      options[:except] += hidden_attributes
+      options[:procs] ||= []
+      options[:procs] << lambda {|options, record| options[:builder].tag!("uploader-name", record.uploader_name)}
+      options[:procs] << lambda {|options, record| options[:builder].tag!("has-large", record.has_large?, :type => "boolean")}
       super(options, &block)
     end
     
