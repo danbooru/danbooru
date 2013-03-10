@@ -5,6 +5,14 @@ module Sources
         url =~ /^https?:\/\/(?:\w+\.)?pixiv\.net/
       end
       
+      def referer_url(template)
+        if template.params[:ref] =~ /pixiv\.net\/member_illust/ && template.params[:ref] !~ /mode=manga/
+          template.params[:ref]
+        else
+          template.params[:url]
+        end
+      end
+      
       def site_name
         "Pixiv"
       end

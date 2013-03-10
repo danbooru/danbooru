@@ -33,6 +33,10 @@ module Sources
         end
       end
       
+      def referer_url(template)
+        template.params[:ref] || template.params[:url]
+      end
+      
     protected
       def agent
         raise NotImplementedError
