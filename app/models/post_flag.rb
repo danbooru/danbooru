@@ -50,8 +50,8 @@ class PostFlag < ActiveRecord::Base
   end
   
   def validate_creator_is_not_limited
-    if flag_count_for_creator >= 10
-      errors[:creator] << "can flag 10 posts a day"
+    if flag_count_for_creator >= 5
+      errors[:creator] << "can flag 5 posts a day"
       false
     else
       true
@@ -77,6 +77,6 @@ class PostFlag < ActiveRecord::Base
   end
   
   def flag_count_for_creator
-    PostAppeal.for_user(creator_id).recent.count
+    PostFlag.where(:creator_id => creator_id).recent.count
   end
 end
