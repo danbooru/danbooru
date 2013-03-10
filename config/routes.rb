@@ -243,6 +243,8 @@ Danbooru::Application.routes.draw do
   match "/forum/new" => redirect("/forum_posts/new")
   match "/forum/edit/:id" => redirect("/forum_posts/%{id}/edit")
 
+  match "/help/:title" => redirect {|params, req| ("/wiki_pages?title=#{CGI::escape('help:' + req.params[:title])}")}
+
   match "/note" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
   match "/note/index" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
   match "/note/history" => redirect("/note_versions")
