@@ -75,7 +75,7 @@ class User < ActiveRecord::Base
     module ClassMethods
       def name_to_id(name)
         Cache.get("uni:#{Cache.sanitize(name)}", 4.hours) do
-          select_value_sql("SELECT id FROM users WHERE lower(name) = ?", name.downcase)
+          select_value_sql("SELECT id FROM users WHERE lower(name) = ?", name.mb_chars.downcase)
         end
       end
       
@@ -86,7 +86,7 @@ class User < ActiveRecord::Base
       end
       
       def find_by_name(name)
-        where("lower(name) = ?", name.downcase.tr(" ", "_")).first
+        where("lower(name) = ?", name.mb_chars.downcase.tr(" ", "_")).first
       end
       
       def id_to_pretty_name(user_id)
@@ -537,11 +537,11 @@ class User < ActiveRecord::Base
       return q if params.blank?
       
       if params[:name].present?
-        q = q.name_matches(params[:name].downcase)
+        q = q.name_matches(params[:name].mb_chars.downcase)
       end
       
       if params[:name_matches].present?
-        q = q.name_matches(params[:name_matches].downcase)
+        q = q.name_matches(params[:name_matches].mb_chars.downcase)
       end
       
       if params[:min_level].present?
