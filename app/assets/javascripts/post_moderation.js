@@ -9,14 +9,14 @@
   }
  
   Danbooru.PostModeration.hide_or_show_approve_and_disapprove_links = function() {
-    if (Danbooru.meta("post-is-approvable") != "true") {
+    if (Danbooru.meta("post-is-approvable") !== "true") {
       $("#approve").hide();
       $("#disapprove").hide();
     }
   }
   
   Danbooru.PostModeration.hide_or_show_delete_and_undelete_links = function() {
-    if (Danbooru.meta("post-is-deleted") == "true") {
+    if (Danbooru.meta("post-is-deleted") === "true") {
       $("#delete").hide();
     } else {
       $("#undelete").hide();

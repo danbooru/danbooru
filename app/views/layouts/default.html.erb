@@ -19,7 +19,7 @@
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
   <%= stylesheet_link_tag "application", :media => "screen" %>
   <%= javascript_include_tag "application" %>
-  <%= Danbooru.config.custom_html_header_content %>
+  <%= raw Danbooru.config.custom_html_header_content %>
   <%= yield :html_header %>
 </head>
 <body>

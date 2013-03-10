@@ -98,8 +98,10 @@ class Tag < ActiveRecord::Base
     def update_category_post_counts
       old_field = "tag_count_#{Danbooru.config.reverse_tag_category_mapping[category_was]}".downcase
       new_field = "tag_count_#{category_name}".downcase
-      Post.without_timeout do
-        Post.raw_tag_match(name).update_all("#{old_field} = #{old_field} - 1, #{new_field} = #{new_field} + 1")
+      if old_field != new_field
+        Post.without_timeout do
+          Post.raw_tag_match(name).update_all("#{old_field} = #{old_field} - 1, #{new_field} = #{new_field} + 1")
+        end
       end
     end
     
