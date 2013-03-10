@@ -2,7 +2,7 @@
   <div id="a-index">
     <h1>Popular: <%= @post_set.presenter.range_text %></h1>
     
-    <%= render "date_explore", :post_set => @post_set %>
+    <%= @post_set.presenter.nav_links(self) %>
     
     <%= render "blacklists" %>
 
