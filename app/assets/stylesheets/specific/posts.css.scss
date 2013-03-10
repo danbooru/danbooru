@@ -299,6 +299,21 @@ div#c-post-versions {
   }
 }
 
+div#c-explore-posts {
+  a.desc {
+    font-weight: bold;
+    margin: 0 0.5em;
+  }
+  
+  .period {
+    margin: 0 0.5em;
+    
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+}
+
 div#unapprove-dialog {
   p {
     margin-bottom: 1em;

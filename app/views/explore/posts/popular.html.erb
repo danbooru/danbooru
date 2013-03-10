@@ -1,12 +1,10 @@
 <div id="c-explore-posts">
   <div id="a-index">
-    <h1>Explore: <%= @post_set.presenter.range_text %></h1>
+    <h1>Popular: <%= @post_set.presenter.range_text %></h1>
     
     <%= render "date_explore", :post_set => @post_set %>
     
-    <section id="content">
-      <%= @post_set.presenter.post_previews_html(self) %>
-    </section>
+    <%= @post_set.presenter.post_previews_html(self) %>
   </div>
 </div>
 
