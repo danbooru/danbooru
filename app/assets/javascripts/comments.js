@@ -25,9 +25,13 @@
         var $link = $(e.target);
         var $div = $link.closest("div.comments-for-post");
         var $textarea = $div.find("textarea")
-        $textarea.val($textarea.val() + "\n\n" + Danbooru.Comment.quote_message(data));
+        var msg = Danbooru.Comment.quote_message(data);
+        if ($textarea.val().length > 0) {
+          msg = $textarea.val() + "\n\n" + msg;
+        }
+        $textarea.val(msg);
         $div.find("a.expand-comment-response").trigger("click");
-        $textarea.focus();
+        $textarea.selectEnd();
       }
     );
     e.preventDefault();
@@ -51,7 +55,7 @@
     $("a.expand-comment-response").click(function(e) {
       $(e.target).hide();
       var $form = $(e.target).closest("div.new-comment").find("form");
-      $form.slideDown("fast");
+      $form.show();
       Danbooru.scroll_to($form);
       e.preventDefault();
     });

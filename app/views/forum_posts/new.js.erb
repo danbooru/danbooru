@@ -1,6 +1,10 @@
-$("#forum_post_body").val($("#forum_post_body").val() + "\n\n" + <%= raw @forum_post.body.to_json %>);
+var msg = <%= raw @forum_post.body.to_json %>;
+if ($("#forum_post_body").val().length > 0) {
+  msg = $("#forum_post_body").val() + "\n\n" + msg;
+}
+$("#forum_post_body").val(msg);
 $("#topic-response").show();
-
 $('html, body').animate({
     scrollTop: $("#forum_post_body").offset().top - 100
 }, 500);
+$("#forum_post_body").selectEnd();
