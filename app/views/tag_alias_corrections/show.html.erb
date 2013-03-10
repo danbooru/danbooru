@@ -16,8 +16,7 @@
 
 <p>You can try to fix this alias. This will clear the cache and re-save all posts associated with <strong><%= @correction.antecedent_name %></strong>.</p>
 
-<%= form_tag(tag_alias_correction_path) do %>
-  <%= hidden_field "tag_alias_id", params[:tag_alias_id] %>
+<%= form_tag(tag_alias_correction_path(:tag_alias_id => @correction.tag_alias_id)) do %>
   <%= submit_tag "Fix" %>
   <%= submit_tag "Cancel" %>
 <% end %>

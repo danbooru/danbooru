@@ -1,5 +1,5 @@
 class TagAliasesController < ApplicationController
-  before_filter :admin_only, :only => [:approve, :destroy, :create]
+  before_filter :admin_only, :only => [:approve, :destroy, :new, :create]
   respond_to :html, :xml, :json, :js
   
   def new

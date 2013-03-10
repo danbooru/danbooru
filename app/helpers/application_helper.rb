@@ -143,10 +143,10 @@ protected
     when "moderator/dashboards"
       /^\/moderator/
       
-    when "tag_aliases", "tag_alias_corrections"
+    when "tag_aliases", "tag_alias_corrections", "tag_alias_requests"
       /^\/tag_aliases/
       
-    when "tag_implications"
+    when "tag_implications", "tag_implication_requests"
       /^\/tag_implications/
       
     when "wiki_pages", "wiki_page_versions"

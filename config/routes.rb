@@ -167,11 +167,13 @@ Danbooru::Application.routes.draw do
     end
   end
   resource :tag_alias_correction, :only => [:new, :create, :show]
+  resource :tag_alias_request, :only => [:new, :create]
   resources :tag_implications do
     member do
       post :approve
     end
   end
+  resource :tag_implication_request, :only => [:new, :create]
   resources :tag_subscriptions do
     member do
       get :posts

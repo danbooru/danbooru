@@ -3,7 +3,7 @@ class TagImplication < ActiveRecord::Base
   after_save :update_descendant_names_for_parent
   belongs_to :creator, :class_name => "User"
   before_validation :initialize_creator, :on => :create
-  validates_presence_of :creator_id
+  validates_presence_of :creator_id, :antecedent_name, :consequent_name
   validates_uniqueness_of :antecedent_name, :scope => :consequent_name
   validate :absence_of_circular_relation
   

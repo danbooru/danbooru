@@ -4,10 +4,11 @@ class TagAlias < ActiveRecord::Base
   after_save :ensure_category_consistency
   after_destroy :clear_all_cache
   before_validation :initialize_creator, :on => :create
-  validates_presence_of :creator_id
+  validates_presence_of :creator_id, :antecedent_name, :consequent_name
   validates_uniqueness_of :antecedent_name
   validate :absence_of_transitive_relation
   belongs_to :creator, :class_name => "User"
+  belongs_to :forum_topic
   
   module SearchMethods
     def name_matches(name)

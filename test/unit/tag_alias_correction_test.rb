@@ -1,7 +1,7 @@
 require 'test_helper'
 
-class TagAliasTest < ActiveSupport::TestCase
-  context "A tag alias" do
+class TagAliasCorrectionTest < ActiveSupport::TestCase
+  context "A tag alias correction" do
     setup do
       @mod = FactoryGirl.create(:moderator_user)
       CurrentUser.user = @mod

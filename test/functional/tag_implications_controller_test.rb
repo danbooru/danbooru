@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class TagImplicationsControllerTest < ActionController::TestCase
-  context "The tag implicationes controller" do
+  context "The tag implications controller" do
     setup do
       @user = FactoryGirl.create(:admin_user)
       CurrentUser.user = @user

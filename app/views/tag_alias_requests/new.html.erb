@@ -1,0 +1,30 @@
+<div id="c-tag-aliases">
+  <div id="a-request-new">
+    <h1>Tag Alias Request</h1>
+
+    <p>You can request a new tag alias be created. This will create a corresponding forum topic for community review.</p>
+    
+    <%= form_tag(tag_alias_request_path, :class => "simple_form") do %>
+      <div class="input">
+        <label>Antecedent</label>
+        <%= text_field "tag_alias_request", "antecedent_name" %>
+      </div>
+
+      <div class="input">
+        <label>Consequent</label>
+        <%= text_field "tag_alias_request", "consequent_name" %>
+      </div>
+
+      <div class="input">
+        <label>Reason</label>
+        <%= text_area "tag_alias_request", "reason" %>
+      </div>
+
+      <div class="input">
+        <%= submit_tag "Submit" %>
+      </div>
+    <% end %>
+    
+    <%= render "tag_aliases/secondary_links" %>
+  </div>
+</div>

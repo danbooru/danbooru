@@ -1,10 +1,6 @@
 class TagAliasCorrectionsController < ApplicationController
   before_filter :moderator_only
   
-  def new
-    @correction = TagAliasCorrection.new(params[:tag_alias_id])
-  end
-  
   def create
     @correction = TagAliasCorrection.new(params[:tag_alias_id])
 
@@ -13,7 +9,7 @@ class TagAliasCorrectionsController < ApplicationController
       flash[:notice] = "The fix has been queued and will be processed"
     end
     
-    redirect_to tag_alias_correction_path(:id => params[:tag_alias_id])
+    redirect_to tag_alias_correction_path(:tag_alias_id => params[:tag_alias_id])
   end
   
   def show
