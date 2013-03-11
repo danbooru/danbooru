@@ -81,7 +81,7 @@
         var ratio = 400.0 / height;
         $image.height(height * ratio);
         $image.width(width * ratio);
-        $("#scale").html("Scaled " + parseInt(100 * ratio) + "%");
+        $("#scale").html("Scaled " + parseInt(100 * ratio) + "% (original: " + width + "x" + height + ")");
       }
     }
   }
