@@ -364,6 +364,27 @@ class Upload < ActiveRecord::Base
     end
   end
   
+  module ApiMethods
+    def serializable_hash(options = {})
+      options ||= {}
+      options[:except] ||= []
+      options[:except] += hidden_attributes
+      unless options[:builder]
+        options[:methods] ||= []
+        options[:methods] += [:uploader_name]
+      end
+      hash = super(options)
+      hash
+    end
+    
+    def to_xml(options = {}, &block)
+      options ||= {}
+      options[:procs] ||= []
+      options[:procs] << lambda {|options, record| options[:builder].tag!("uploader-name", record.uploader_name)}
+      super(options, &block)
+    end
+  end
+  
   include ConversionMethods
   include ValidationMethods
   include FileMethods
@@ -376,11 +397,16 @@ class Upload < ActiveRecord::Base
   include StatusMethods
   include UploaderMethods
   extend SearchMethods
+  include ApiMethods
   
   def add_file_size_tags!(file_path)
     if file_size >= 10.megabytes
       self.tag_string = "#{tag_string} huge_filesize".strip
     end
+  end
+  
+  def uploader_name
+    User.id_to_name(uploader_id)
   end
   
   def presenter

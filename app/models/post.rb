@@ -537,7 +537,7 @@ class Post < ActiveRecord::Base
     end
     
     def uploader_name
-      User.id_to_name(uploader_id)
+      User.id_to_name(uploader_id).tr("_", " ")
     end
   end
   
@@ -837,20 +837,15 @@ class Post < ActiveRecord::Base
       options ||= {}
       options[:except] ||= []
       options[:except] += hidden_attributes
-      # options[:methods] += [:uploader_name, :has_large]
+      unless options[:builder]
+        options[:methods] ||= []
+        options[:methods] += [:uploader_name, :has_large]
+      end
       hash = super(options)
       hash
     end
-
-    def to_json(options = {})
-      options ||= {}
-      options[:methods] ||= []
-      options[:methods] += [:uploader_name, :has_large]
-      super(options)
-    end
     
     def to_xml(options = {}, &block)
-      # to_xml ignores the serializable_hash method
       options ||= {}
       options[:procs] ||= []
       options[:procs] << lambda {|options, record| options[:builder].tag!("uploader-name", record.uploader_name)}

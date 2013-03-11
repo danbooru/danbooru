@@ -58,7 +58,29 @@ class Note < ActiveRecord::Base
     end
   end
   
+  module ApiMethods
+    def serializable_hash(options = {})
+      options ||= {}
+      options[:except] ||= []
+      options[:except] += hidden_attributes
+      unless options[:builder]
+        options[:methods] ||= []
+        options[:methods] += [:creator_name]
+      end
+      hash = super(options)
+      hash
+    end
+    
+    def to_xml(options = {}, &block)
+      options ||= {}
+      options[:procs] ||= []
+      options[:procs] << lambda {|options, record| options[:builder].tag!("creator-name", record.creator_name)}
+      super(options, &block)
+    end
+  end
+  
   extend SearchMethods
+  include ApiMethods
   
   def presenter
     @presenter ||= NotePresenter.new(self)
@@ -89,7 +111,7 @@ class Note < ActiveRecord::Base
   end
 
   def creator_name
-    User.id_to_name(creator_id)
+    User.id_to_name(creator_id).tr("_", " ")
   end
 
   def update_post
