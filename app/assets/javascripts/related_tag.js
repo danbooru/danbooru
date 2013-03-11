@@ -14,6 +14,9 @@
     this.common_bind("#related-characters-button", "character");
     this.common_bind("#related-copyrights-button", "copyright");
     $("#find-artist-button").click(Danbooru.RelatedTag.find_artist);
+    if ($("#upload_source").val().match(/pixiv\.net/)){
+      $("#find-artist-button").trigger("click");
+    }
   }
   
   Danbooru.RelatedTag.common_bind = function(button_name, category) {
