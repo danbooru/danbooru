@@ -1,5 +1,6 @@
 class UploadsController < ApplicationController
   before_filter :member_only
+  after_filter :save_recent_tags, :only => [:create]
   respond_to :html, :xml, :json, :js
   rescue_from Upload::Error, :with => :rescue_exception
   
@@ -42,5 +43,14 @@ class UploadsController < ApplicationController
     @upload = Upload.find(params[:id])
     @upload.process!
     respond_with(@upload)
+  end
+
+protected
+  def save_recent_tags
+    if @upload
+      tags = Tag.scan_tags(@upload.tag_string)
+      tags = TagAlias.to_aliased(tags) + Tag.scan_tags(cookies[:recent_tags])
+      cookies[:recent_tags] = tags.uniq.slice(0, 40).join(" ")
+    end
   end
 end
