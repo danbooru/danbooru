@@ -22,6 +22,10 @@ every 1.day, :at => "3:00 am" do
   command "cd /var/www/danbooru2/current ; script/donmai/prune_backup_dbs"
 end
 
+every 1.day, :at => "4:00 am" do
+  command "psql --set-statement-timeout=0 -hdbserver -c \"vacuum analyze verbose;\" danbooru2"
+end
+
 if environment == "production"
   every 1.hour do
     runner "AmazonBackup.execute"
