@@ -14,14 +14,18 @@
     this.common_bind("#related-artists-button", "artist");
     this.common_bind("#related-characters-button", "character");
     this.common_bind("#related-copyrights-button", "copyright");
-    $("#find-artist-button").click(Danbooru.RelatedTag.find_artist);
-    if ($("#upload_source").val().match(/pixiv\.net/)){
-      $("#find-artist-button").trigger("click");
+    if ($("#c-uploads").length) {
+      if ($("#upload_source").val().match(/pixiv\.net/)){
+        $("#find-artist-button").trigger("click");
+      }
     }
+    $("#find-artist-button").click(Danbooru.RelatedTag.find_artist);
   }
   
   Danbooru.RelatedTag.common_bind = function(button_name, category) {
     $(button_name).click(function(e) {
+      $("#related-tags").html("<em>Loading...</em>");
+      $("#related-tags-container").show();
       $.get("/related_tag.json", {
         "query": Danbooru.RelatedTag.current_tag(),
         "category": category
@@ -74,7 +78,6 @@
   }
   
   Danbooru.RelatedTag.process_response = function(data) {
-    $("#related-tags-container").show();
     Danbooru.RelatedTag.recent_search = data;
     Danbooru.RelatedTag.build_all();
   }
@@ -177,7 +180,7 @@
   }
   
   Danbooru.RelatedTag.find_artist = function(e) {
-    $("#related-tags").show();
+    $("#artist-tags").html("<em>Loading...</em>");
     Danbooru.RelatedTag.recent_search = null;
     var url = $("#upload_source,#post_source");
     $.get("/artists.json", {"search[name]": url.val()}).success(Danbooru.RelatedTag.process_artist);
