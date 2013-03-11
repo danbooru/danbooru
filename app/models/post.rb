@@ -317,13 +317,9 @@ class Post < ActiveRecord::Base
       increment_tags = tag_array - tag_array_was
       execute_sql("UPDATE tags SET post_count = post_count - 1 WHERE name IN (?)", decrement_tags) if decrement_tags.any?
       execute_sql("UPDATE tags SET post_count = post_count + 1 WHERE name IN (?)", increment_tags) if increment_tags.any?
-      decrement_tags.each do |tag|
-        expire_cache(tag)
-      end
-      increment_tags.each do |tag|
-        expire_cache(tag)
-      end
-      expire_cache("")
+      Post.expire_cache_for_all(decrement_tags)
+      Post.expire_cache_for_all(increment_tags)
+      Post.expire_cache_for_all([""])
     end
     
     def set_tag_counts
@@ -651,11 +647,20 @@ class Post < ActiveRecord::Base
   end
   
   module CacheMethods
-    def expire_cache(tag_name)
+    def expire_cache_for_all(tag_names)
+      Danbooru.config.all_server_hosts.each do |host|
+        delay(:queue => host).expire_cache(tag_names)
+      end
+    end
+    
+    def expire_cache(tag_names)
+      tag_names.each do |tag_name|
+        Cache.delete(Post.count_cache_key(tag_name))
+      end
+      
       if Post.fast_count("").to_i < 1000
         Cache.delete(Post.count_cache_key(""))
       end
-      Cache.delete(Post.count_cache_key(tag_name))
     end
   end
 
@@ -765,7 +770,7 @@ class Post < ActiveRecord::Base
         update_parent_on_destroy
         decrement_tag_post_counts
         update_column(:parent_id, nil)
-        tag_array.each {|x| expire_cache(x)}
+        Post.expire_cache_for_all(tag_array)
         
         unless options[:without_mod_action]
           ModAction.create(:description => "deleted post ##{id}")
@@ -782,7 +787,7 @@ class Post < ActiveRecord::Base
       self.is_deleted = false
       self.approver_id = CurrentUser.id
       save
-      tag_array.each {|x| expire_cache(x)}
+      Post.expire_cache_for_all(tag_array)
       update_parent_on_save
       ModAction.create(:description => "undeleted post ##{id}")
     end
@@ -1005,7 +1010,7 @@ class Post < ActiveRecord::Base
   include PoolMethods
   include VoteMethods
   extend CountMethods
-  include CacheMethods
+  extend CacheMethods
   include ParentMethods
   include DeletionMethods
   include VersionMethods
