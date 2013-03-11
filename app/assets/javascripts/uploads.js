@@ -59,7 +59,7 @@
         var new_artist_link = '<a href="/artists/new?name=' + data.unique_id + '&other_names=' + data.artist_name + '&urls=' + encodeURIComponent(data.profile_url) + '+' + encodeURIComponent(data.image_url) + '">new</a>';
 
         if (data.danbooru_id) {
-          $("#source-record").html('<a href="/artists/' + data.danbooru_id + '">' + data.danbooru_name + '</a> ' + new_artist_link);
+          $("#source-record").html('<a href="/artists/' + data.danbooru_id + '">' + data.danbooru_name + '</a>');
         } else {
           $("#source-record").html(new_artist_link);
         }
@@ -69,6 +69,7 @@
       });
       e.preventDefault();
     });
+    $("#fetch-data").trigger("click");
   }
   
   Danbooru.Upload.initialize_image = function() {
