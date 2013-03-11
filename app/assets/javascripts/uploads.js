@@ -10,9 +10,7 @@
       this.initialize_image();
       this.initialize_info();
       this.initialize_similar();
-      if (!$("#upload_source").val().match(/pixiv\.net/)) {
-        $("#related-tags-button").trigger("click");
-      }
+      $("#related-tags-button").trigger("click");
     }
   }
   

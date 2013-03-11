@@ -1,6 +1,6 @@
 @import "../common/000_vars.css.scss";
 
-div#related-tags-container {
+div#related-tags-container, div#artist-tags-container {
   padding-right: 2em;
   
   h1 {
@@ -8,7 +8,7 @@ div#related-tags-container {
   }
 }
 
-div#related-tags {
+div#artist-tags {
   overflow: auto;
   width: 100%;
   margin-bottom: 1em;
@@ -22,6 +22,14 @@ div#related-tags {
   div.artist:last-child {
     margin-bottom: 0;
   }
+}
+
+div#related-tags {
+  overflow: auto;
+  width: 100%;
+  margin-bottom: 1em;
+  padding: 1em;
+  background: #EEE;
   
   div.tag-column {
     max-width: 15em;

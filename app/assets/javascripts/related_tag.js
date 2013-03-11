@@ -5,6 +5,7 @@
     if ($("#c-posts").length || $("#c-uploads").length) {
       this.initialize_buttons();
       $("#related-tags-container").hide();
+      $("#artist-tags-container").hide();
     }
   }
   
@@ -184,8 +185,8 @@
   }
   
   Danbooru.RelatedTag.process_artist = function(data) {
-    $("#related-tags-container").show();
-    var $dest = $("#related-tags");
+    $("#artist-tags-container").show();
+    var $dest = $("#artist-tags");
     $dest.empty();
     
     if (data.length === 0) {
