@@ -9,7 +9,6 @@ class PostsController < ApplicationController
   def index
     @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit])
     @posts = @post_set.posts
-    response.headers["X-Total-Pages"] = @posts.total_pages.to_s
     respond_with(@posts) do |format|
       format.atom
     end
