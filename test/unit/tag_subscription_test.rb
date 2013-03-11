@@ -23,7 +23,7 @@ class TagSubscriptionTest < ActiveSupport::TestCase
       should "fail" do
         sub = FactoryGirl.build(:tag_subscription, :tag_query => "aaa bbb", :creator => @user, :name => "zzz")
         sub.save
-        assert_equal(["Creator can subscribe up to 0 tags"], sub.errors.full_messages)
+        assert_equal(["You can create up to 0 tag subscriptions"], sub.errors.full_messages)
       end
     end
     
