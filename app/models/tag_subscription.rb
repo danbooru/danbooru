@@ -6,6 +6,7 @@ class TagSubscription < ActiveRecord::Base
   before_save :limit_tag_count
   attr_accessible :name, :tag_query, :post_ids, :is_public, :is_visible_on_profile
   validates_presence_of :name, :tag_query, :creator_id
+  validates_format_of :tag_query, :with => /^(?:\S+\s*){1,20}$/, :message => "can have up to 20 tags"
   validate :creator_can_create_subscriptions, :on => :create
   
   def normalize_name
@@ -26,7 +27,7 @@ class TagSubscription < ActiveRecord::Base
   
   def creator_can_create_subscriptions
     if TagSubscription.owned_by(creator).count >= Danbooru.config.max_tag_subscriptions
-      self.errors.add(:creator, "can subscribe up to #{Danbooru.config.max_tag_subscriptions} tags")
+      self.errors.add(:creator, "can create up to #{Danbooru.config.max_tag_subscriptions} tag subscriptions")
       return false
     else
       return true
@@ -38,7 +39,7 @@ class TagSubscription < ActiveRecord::Base
   end
 
   def limit_tag_count
-    self.tag_query = tag_query_array.slice(0, 20).join(" ")
+    # self.tag_query = tag_query_array.slice(0, 20).join(" ")
   end
 
   def process

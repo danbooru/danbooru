@@ -23,14 +23,30 @@ class TagSubscriptionsController < ApplicationController
   
   def create
     @tag_subscription = TagSubscription.create(params[:tag_subscription])
-    respond_with(@tag_subscription, :location => tag_subscriptions_path)
+    respond_with(@tag_subscription) do |format|
+      format.html do
+        if @tag_subscription.errors.any?
+          render :action => "new"
+        else
+          redirect_to tag_subscriptions_path
+        end
+      end
+    end
   end
   
   def update
     @tag_subscription = TagSubscription.find(params[:id])
     check_privilege(@tag_subscription)
     @tag_subscription.update_attributes(params[:tag_subscription])
-    respond_with(@tag_subscription, :location => tag_subscriptions_path)
+    respond_with(@tag_subscription) do |format|
+      format.html do
+        if @tag_subscription.errors.any?
+          render :action => "edit"
+        else
+          redirect_to tag_subscriptions_path
+        end
+      end
+    end
   end
   
   def destroy
