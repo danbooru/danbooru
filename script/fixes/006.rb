@@ -2,6 +2,8 @@
 
 require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'config', 'environment'))
 
+ActiveRecord::Base.connection.execute("set statement_timeout = 0")
+
 Post.where("created_at > '2013-02-01'").find_each do |post|
   puts "Fixing #{post.id}"
   post.reload
@@ -11,4 +13,9 @@ Post.where("created_at > '2013-02-01'").find_each do |post|
   post.update_column(:tag_count_artist, post.tag_count_artist)
   post.update_column(:tag_count_copyright, post.tag_count_copyright)
   post.update_column(:tag_count_character, post.tag_count_character)
+end
+
+PoolVersion.where("post_ids like '% 0 %'").find_each do |pool_version|
+  cleaned_post_ids = pool_version.post_ids.scan(/(\d+) \d+/).join(" ")
+  pool_version.update_column(:post_ids, cleaned_post_ids)
 end
