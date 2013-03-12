@@ -5,7 +5,7 @@ div#note-container {
   div.note-body {
     position: absolute;
     border: 1px solid black;
-    background: white;
+    background: #FFE;
     min-width: 10px;
     min-height: 1em;
     line-height: normal;
@@ -48,7 +48,7 @@ div#note-container {
     
     div.note-box-inner-border {
       border: 1px solid black;
-      background: white;
+      background: #FFE;
     }
     
     div.note-box-inner-border.unsaved {

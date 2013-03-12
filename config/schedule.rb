@@ -4,6 +4,10 @@ every 4.hours do
   runner "TagSubscription.process_all"
 end
 
+every 1.hour do
+  runner "UploadErrorChecker.new.check!"
+end
+
 every 1.day do
   runner "PostPruner.new.prune!"
 end
