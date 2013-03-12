@@ -179,11 +179,13 @@ class Upload < ActiveRecord::Base
     
     def add_dimension_tags!
       if image_width >= 10_000 || image_height >= 10_000
-        self.tag_string = "#{tag_string} insanely_absurdres".strip
+        self.tag_string = "#{tag_string} incredibly_absurdres".strip
       elsif image_width >= 3200 || image_height >= 2400
         self.tag_string = "#{tag_string} absurdres".strip
-      elsif image_width >= 1600 && image_height >= 1200
+      elsif image_width >= 1600 || image_height >= 1200
         self.tag_string = "#{tag_string} highres".strip
+      elsif image_width <= 500 && image_height <= 500
+        self.tag_string = "#{tag_string} lowres".strip
       end
     end
     
