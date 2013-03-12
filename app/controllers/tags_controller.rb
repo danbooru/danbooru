@@ -23,6 +23,7 @@ class TagsController < ApplicationController
   def update
     @tag = Tag.find(params[:id])
     @tag.update_attributes(params[:tag])
+    @tag.update_category_cache_for_all
     respond_with(@tag)
   end  
 end

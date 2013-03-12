@@ -1,7 +1,6 @@
 class Tag < ActiveRecord::Base
   METATAGS = "-user|user|-approver|approver|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|status|tagcount|gentags|arttags|chartags|copytags|parent|pixiv"
   attr_accessible :category
-  after_save :update_category_cache_for_all
   has_one :wiki_page, :foreign_key => "name", :primary_key => "title"
   
   module ApiMethods
@@ -84,24 +83,23 @@ class Tag < ActiveRecord::Base
       Danbooru.config.reverse_tag_category_mapping[category]
     end
     
-    def update_category_cache_for_all(force = false)
-      if category_changed? || force
-        update_category_cache
-        delay(:queue => "default").update_category_post_counts if category_changed?
-        
-        Danbooru.config.other_server_hosts.each do |host|
-          delay(:queue => host).update_category_cache
-        end
+    def update_category_cache_for_all
+      Danbooru.config.all_server_hosts.each do |host|
+        delay(:queue => host).update_category_cache
       end
+      
+      delay(:queue => "default").update_category_post_counts
     end
     
     def update_category_post_counts
-      old_field = "tag_count_#{Danbooru.config.reverse_tag_category_mapping[category_was]}".downcase
-      new_field = "tag_count_#{category_name}".downcase
-      if old_field != new_field
-        Post.without_timeout do
-          Post.raw_tag_match(name).update_all("#{old_field} = #{old_field} - 1, #{new_field} = #{new_field} + 1")
-        end
+      Post.raw_tag_match(name).find_each do |post|
+        post.reload
+        post.set_tag_counts
+        post.update_column(:tag_count, post.tag_count)
+        post.update_column(:tag_count_general, post.tag_count_general)
+        post.update_column(:tag_count_artist, post.tag_count_artist)
+        post.update_column(:tag_count_copyright, post.tag_count_copyright)
+        post.update_column(:tag_count_character, post.tag_count_character)
       end
     end
     
@@ -138,7 +136,7 @@ class Tag < ActiveRecord::Base
           
           if category_id != tag.category
             tag.update_column(:category, category_id)
-            tag.update_category_cache_for_all(true)
+            tag.update_category_cache_for_all
           end
         end
 
