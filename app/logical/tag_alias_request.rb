@@ -4,8 +4,8 @@ class TagAliasRequest
   attr_reader :antecedent_name, :consequent_name, :reason, :tag_alias, :forum_topic
   
   def initialize(antecedent_name, consequent_name, reason)
-    @antecedent_name = antecedent_name
-    @consequent_name = consequent_name
+    @antecedent_name = antecedent_name.tr(" ", "_")
+    @consequent_name = consequent_name.tr(" ", "_")
     @reason = reason
   end
   
@@ -27,7 +27,7 @@ class TagAliasRequest
     @forum_topic = ForumTopic.create(
       :title => "Tag alias: #{antecedent_name} -> #{consequent_name}",
       :original_post_attributes => {
-        :body => reason + "\n\n\"Link to alias\":/tag_aliases?search[id]=#{tag_alias.id}"
+        :body => reason + "\n\ncreate alias #{antecedent_name} -> #{consequent_name}\n\n\"Link to alias\":/tag_aliases?search[id]=#{tag_alias.id}\n\nLink to wiki: [[#{antecedent_name}]] -> [[#{consequent_name}]]"
       }
     )
     if @forum_topic.errors.any?

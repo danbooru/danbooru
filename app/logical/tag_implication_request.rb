@@ -4,8 +4,8 @@ class TagImplicationRequest
   attr_reader :antecedent_name, :consequent_name, :reason, :tag_implication, :forum_topic
   
   def initialize(antecedent_name, consequent_name, reason)
-    @antecedent_name = antecedent_name
-    @consequent_name = consequent_name
+    @antecedent_name = antecedent_name.tr(" ", "_")
+    @consequent_name = consequent_name.tr(" ", "_")
     @reason = reason
   end
   
@@ -27,7 +27,7 @@ class TagImplicationRequest
     @forum_topic = ForumTopic.create(
       :title => "Tag implication: #{antecedent_name} -> #{consequent_name}",
       :original_post_attributes => {
-        :body => reason + "\n\n\"Link to implication\":/tag_implications?search[id]=#{tag_implication.id}"
+        :body => reason + "\n\ncreate implication #{antecedent_name} -> #{consequent_name}\n\n\"Link to implication\":/tag_implications?search[id]=#{tag_implication.id}\n\nLink to wiki: [[#{antecedent_name}]] -> [[#{consequent_name}]]"
       }
     )
     if @forum_topic.errors.any?

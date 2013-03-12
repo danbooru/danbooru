@@ -52,8 +52,8 @@ class TagAlias < ActiveRecord::Base
   
   def process!
     update_column(:status, "processing")
-    update_posts
     clear_all_cache
+    update_posts
     update_column(:status, "active")
   rescue Exception => e
     update_column(:status, "error: #{e}")
