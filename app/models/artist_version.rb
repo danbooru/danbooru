@@ -23,6 +23,10 @@ class ArtistVersion < ActiveRecord::Base
     q
   end
   
+  def url_array
+    url_string.scan(/\S+/)
+  end
+  
   def updater_name
     User.id_to_name(updater_id).tr("_", " ")
   end

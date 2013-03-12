@@ -28,7 +28,13 @@
               <td><%= time_ago_in_words_tagged artist_version.created_at %></td>
               <td><%= link_to artist_version.updater_name, user_path(artist_version.updater_id) %></td>
               <td><%= artist_version.is_active? %></td>
-              <td><%= artist_version.url_string %></td>
+              <td>
+                <ul>
+                  <% artist_version.url_array.each do |url| %>
+                    <li><%= url %></li>
+                  <% end %>
+                </ul>
+              </td>
             </tr>
           <% end %>
         </tbody>
