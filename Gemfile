@@ -19,7 +19,6 @@ gem "pg", "0.12.2"
 gem "memcache-client", :require => "memcache"
 gem "delayed_job"
 gem "delayed_job_active_record"
-gem "super_exception_notifier"
 gem "simple_form"
 gem "mechanize", :git => 'git://github.com/caribio/mechanize.git'
 gem "nokogiri"
@@ -34,9 +33,9 @@ gem 'term-ansicolor', :require => "term/ansicolor"
 gem 'diff-lcs', :require => "diff/lcs/array"
 gem 'bcrypt-ruby', :require => "bcrypt"
 gem 'aws-s3', :require => "aws/s3"
+gem 'awesome_print'
 
 group :development do
   gem 'ruby-prof'
   gem 'pry'
-  gem 'awesome_print'
 end

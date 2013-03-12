@@ -23,7 +23,7 @@ class UploadTest < ActiveSupport::TestCase
         FileUtils.rm_f(Dir.glob("#{Rails.root}/tmp/test.*"))
       end
       
-      context "that has insanely absurd res dimensions" do
+      context "that has incredibly absurd res dimensions" do
         setup do
           @upload = FactoryGirl.build(:jpg_upload, :tag_string => "")
           @upload.image_width = 10_000
@@ -31,8 +31,8 @@ class UploadTest < ActiveSupport::TestCase
           @upload.add_dimension_tags!
         end
         
-        should "have the insanely_absurdres tag" do
-          assert_match(/insanely_absurdres/, @upload.tag_string)
+        should "have the incredibly_absurdres tag" do
+          assert_match(/incredibly_absurdres/, @upload.tag_string)
         end
       end
       
@@ -189,7 +189,7 @@ class UploadTest < ActiveSupport::TestCase
         end
 
         post = Post.last
-        assert_equal("foo hoge", post.tag_string)
+        assert_equal("foo hoge lowres", post.tag_string)
         assert_equal("s", post.rating)
         assert_equal(@upload.uploader_id, post.uploader_id)
         assert_equal("127.0.0.1", post.uploader_ip_addr)
@@ -216,7 +216,7 @@ class UploadTest < ActiveSupport::TestCase
         assert_nothing_raised {@upload.process!}
       end
       post = Post.last
-      assert_equal("foo hoge", post.tag_string)
+      assert_equal("foo hoge lowres", post.tag_string)
       assert_equal("s", post.rating)
       assert_equal(@upload.uploader_id, post.uploader_id)
       assert_equal("127.0.0.1", post.uploader_ip_addr)

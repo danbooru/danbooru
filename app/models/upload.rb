@@ -178,6 +178,8 @@ class Upload < ActiveRecord::Base
     end
     
     def add_dimension_tags!
+      return if !Danbooru.config.enable_dimension_autotagging
+      
       if image_width >= 10_000 || image_height >= 10_000
         self.tag_string = "#{tag_string} incredibly_absurdres".strip
       elsif image_width >= 3200 || image_height >= 2400

@@ -162,9 +162,6 @@ GEM
       multi_json (~> 1.0)
       rack (~> 1.0)
       tilt (~> 1.1, != 1.3.0)
-    super_exception_notifier (3.0.13)
-      actionmailer
-      rake
     term-ansicolor (1.0.7)
     therubyracer (0.11.3)
       libv8 (~> 3.11.8.12)
@@ -217,7 +214,6 @@ DEPENDENCIES
   shoulda
   simple_form
   simplecov
-  super_exception_notifier
   term-ansicolor
   therubyracer
   uglifier (>= 1.0.3)

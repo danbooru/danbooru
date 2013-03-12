@@ -297,5 +297,9 @@ module Danbooru
       # {:smtp_server_name => "smtp server", :user_name => "user name", :ses_smtp_user_name => "smtp user name", :ses_smtp_password => "smtp password"}
       nil
     end
+    
+    def enable_dimension_autotagging
+      true
+    end
   end
 end
