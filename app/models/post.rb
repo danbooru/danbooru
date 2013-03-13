@@ -740,6 +740,8 @@ class Post < ActiveRecord::Base
         parent.add_favorite!(User.find(user_id))
         remove_favorite!(User.find(user_id))
       end
+
+      update_column(:score, 0)
     end
   end
   

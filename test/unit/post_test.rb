@@ -137,6 +137,7 @@ class PostTest < ActiveSupport::TestCase
           p1.reload
           assert(!Favorite.exists?(:post_id => c1.id, :user_id => user.id))
           assert(Favorite.exists?(:post_id => p1.id, :user_id => user.id))
+          assert_equal(0, c1.score)
         end
 
         should "update the parent's has_children flag" do
