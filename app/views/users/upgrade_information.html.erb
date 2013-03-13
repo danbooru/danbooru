@@ -50,7 +50,7 @@
             <td>Yes</td>
           </tr>
           <tr>
-            <td>See Deleted Posts</td>
+            <td>See Banned Posts</td>
             <td>No</td>
             <td>Yes</td>
             <td>Yes</td>
@@ -64,7 +64,7 @@
         </tbody>
       </table>
     </div>
-    <p>Just provide your email address and details for upgrading your account will be sent to you. If you have any further questions or concerns, feel free to contact me at <%= mail_to Danbooru.config.contact_email, nil, :encode => :javascript %>.</p>
+    <p>Just provide your email address and details for upgrading your account will be sent to you. <strong>Upgrading from Gold to Platinum will only cost $20.</strong> If you have any further questions or concerns, feel free to contact me at <%= mail_to Danbooru.config.contact_email, nil, :encode => :javascript %>.</p>
 
     <%= form_tag(upgrade_user_path(CurrentUser.user)) do %>
       <%= email_field_tag :email, CurrentUser.email %>

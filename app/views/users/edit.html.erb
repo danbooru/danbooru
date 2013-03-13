@@ -4,6 +4,10 @@
     
     <%= simple_form_for @user do |f| %>
       <fieldset>
+        <div class="input">
+          <label>Name</label>
+          <p>Name changes are not supported. <%= link_to "Read why", name_change_path %>.</p>
+        </div>
         <%= f.input :email, :required => Danbooru.config.enable_email_verification?, :hint => "Used for messages and for password resets", :as => :email %>
         <%= f.input :time_zone, :include_blank => false %>
         <%= f.input :receive_email_notifications, :as => :select, :include_blank => false %>

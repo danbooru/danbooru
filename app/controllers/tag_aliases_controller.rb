@@ -28,6 +28,8 @@ class TagAliasesController < ApplicationController
   
   def destroy
     @tag_alias = TagAlias.find(params[:id])
+    @tag_alias.update_column(:status, "deleted")
+    @tag_alias.clear_all_cache
     @tag_alias.destroy
     respond_with(@tag_alias, :location => tag_aliases_path)
   end
@@ -37,11 +39,5 @@ class TagAliasesController < ApplicationController
     @tag_alias.update_column(:status, "queued")
     @tag_alias.delay(:queue => "default").process!
     respond_with(@tag_alias, :location => tag_alias_path(@tag_alias))
-  end
-  
-  def cache
-    @tag_alias = TagAlias.find(params[:id])
-    @tag_alias.clear_cache
-    render :nothing => true
   end
 end

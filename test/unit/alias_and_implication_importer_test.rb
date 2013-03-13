@@ -20,7 +20,7 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
       end
       
       should "process it" do
-        assert_difference("Delayed::Job.count", 3) do
+        assert_difference("Delayed::Job.count", 4) do
           @importer.process!
         end
       end

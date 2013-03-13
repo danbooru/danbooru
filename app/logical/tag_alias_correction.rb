@@ -51,7 +51,6 @@ class TagAliasCorrection
   
   def fix!
     clear_cache
-    tag_alias.update_cache
     tag_alias.delay(:queue => "default").update_posts
   end
 end

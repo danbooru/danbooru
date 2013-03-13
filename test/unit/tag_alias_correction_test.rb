@@ -45,6 +45,7 @@ class TagAliasCorrectionTest < ActiveSupport::TestCase
       context "that is fixed" do
         setup do
           @correction.fix!
+          TagAlias.to_aliased(["aaa"])
         end
         
         should "now have the correct cache" do

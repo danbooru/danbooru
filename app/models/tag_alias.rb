@@ -1,6 +1,5 @@
 class TagAlias < ActiveRecord::Base
   after_save :clear_all_cache
-  after_save :update_cache
   after_save :ensure_category_consistency
   after_destroy :clear_all_cache
   before_validation :initialize_creator, :on => :create
@@ -35,7 +34,25 @@ class TagAlias < ActiveRecord::Base
     end
   end
   
+  module CacheMethods
+    extend ActiveSupport::Concern
+    
+    module ClassMethods
+      def clear_cache_for(name)
+        Cache.delete("ta:#{Cache.sanitize(name)}")
+      end
+    end
+    
+    def clear_all_cache
+      Danbooru.config.all_server_hosts.each do |host|
+        TagAlias.delay(:queue => host).clear_cache_for(antecedent_name)
+        TagAlias.delay(:queue => host).clear_cache_for(consequent_name)
+      end
+    end
+  end
+  
   extend SearchMethods
+  include CacheMethods
   
   def self.to_aliased(names)
     alias_hash = Cache.get_multi(names.flatten, "ta") do |name|
@@ -94,22 +111,6 @@ class TagAlias < ActiveRecord::Base
     end
     
     true
-  end
-  
-  def clear_all_cache
-    Danbooru.config.all_server_hosts.each do |host|
-      delay(:queue => host).clear_cache
-    end
-  end
-
-  def clear_cache
-    Cache.delete("ta:#{Cache.sanitize(antecedent_name)}")
-    Cache.delete("ta:#{Cache.sanitize(consequent_name)}")
-  end
-  
-  def update_cache
-    Cache.put("ta:#{Cache.sanitize(antecedent_name)}", consequent_name)
-    Cache.delete("ta:#{Cache.sanitize(consequent_name)}")
   end
   
   def update_posts

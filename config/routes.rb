@@ -159,7 +159,6 @@ Danbooru::Application.routes.draw do
   resources :tag_aliases do
     resource :correction, :only => [:new, :create, :show], :controller => "TagAliasCorrections"
     member do
-      delete :cache
       post :approve
     end
     collection do
@@ -304,6 +303,7 @@ Danbooru::Application.routes.draw do
   match "/static/mrtg" => "static#mrtg", :as => "mrtg"
   match "/static/contact" => "static#contact", :as => "contact"
   match "/static/benchmark" => "static#benchmark"
+  match "/static/name_change" => "static#name_change", :as => "name_change"
   
   root :to => "posts#index"
 end
