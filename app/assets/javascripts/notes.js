@@ -190,6 +190,13 @@ Danbooru.Note = {
         h = h * 1.025;
       }
 
+      if ($note_body.html().length < 20) {
+        while (h > 20) {
+          h = h / 1.025;
+          w = w * 1.025;
+        }
+      }
+
       $note_body.css({
         width: w,
         height: "auto"
@@ -438,6 +445,7 @@ Danbooru.Note = {
     $note_body.html("<em>Click to edit</em>");
     $("#note-container").append($note_box);
     $("#note-container").append($note_body);
+    Danbooru.Note.Body.resize($note_body);
     Danbooru.Note.Box.resize_inner_border($note_box);
     Danbooru.Note.id += "x";
   },
