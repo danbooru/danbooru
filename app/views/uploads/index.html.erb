@@ -16,7 +16,7 @@
             <td><%= link_to upload.id, upload_path(upload) %></td>
             <td><%= link_to upload.uploader.name, user_path(upload.uploader) %></td>
             <td><%= upload.presenter.status(self) %></td>
-            <td><%= time_ago_in_words_tagged upload.created_at %></td>
+            <td><%= compact_time upload.created_at %></td>
             <td><%= upload.tag_string %></td>
           </tr>
         <% end %>

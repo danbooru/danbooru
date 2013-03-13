@@ -25,7 +25,7 @@
               <td><%= link_to "artist", artist_path(artist_version.artist) %></td>
               <td><%= artist_version.other_names %></td>
               <td><%= artist_version.group_name %></td>
-              <td><%= time_ago_in_words_tagged artist_version.created_at %></td>
+              <td><%= compact_time artist_version.created_at %></td>
               <td><%= link_to artist_version.updater_name, user_path(artist_version.updater_id) %></td>
               <td><%= artist_version.is_active? %></td>
               <td>
