@@ -23,7 +23,7 @@ class NotesController < ApplicationController
     @note = Note.create(params[:note])
     respond_with(@note) do |fmt|
       fmt.json do
-        render :json => @note.to_json(:methods => :html_id)
+        render :json => @note.to_json(:methods => [:html_id])
       end
     end
   end
