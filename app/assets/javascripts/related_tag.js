@@ -30,6 +30,7 @@
         "query": Danbooru.RelatedTag.current_tag(),
         "category": category
       }).success(Danbooru.RelatedTag.process_response);
+      $("#artist-tags-container").hide();
       e.preventDefault();
     });
   }

@@ -22,7 +22,7 @@ end
 
 every 1.day, :at => "2:00 am" do
   command "cd /var/www/danbooru2/current ; script/donmai/backup_db"
-  command "cd /var/www/danbooru2/current ; script/donmai/backup_db_to_s3"
+  command "cd /var/www/danbooru2/current ; bundle exec ruby script/donmai/backup_db_to_s3"
   command "cd /var/www/danbooru2/current ; script/donmai/prune_backup_dbs"
 end
 
