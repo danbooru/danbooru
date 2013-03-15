@@ -1,5 +1,5 @@
 class PostsController < ApplicationController
-  before_filter :member_only, :except => [:show, :index]
+  before_filter :member_only, :except => [:show, :show_seq, :index]
   after_filter :save_recent_tags, :only => [:update]
   respond_to :html, :xml, :json
   rescue_from PostSets::SearchError, :with => :rescue_exception
