@@ -12,6 +12,7 @@
       <th>Last error</th>
       <th>Run at</th>
       <th>Failed at</th>
+      <th>Queue</th>
     </tr>
   </thead>
   <tbody>
@@ -26,6 +27,7 @@
         <td><%= job.last_error %></td>
         <td><%= job.run_at %></td>
         <td><%= job.failed_at %></td>
+        <td><%= job.queue %></td>
       </tr>
     <% end %>
   </tbody>
