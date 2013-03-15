@@ -27,6 +27,7 @@ class Artist < ActiveRecord::Base
           u = u.to_escaped_for_sql_like.gsub(/\*/, '%') + '%'
           artists += Artist.joins(:urls).where(["artists.is_active = TRUE AND artist_urls.normalized_url LIKE ? ESCAPE E'\\\\'", u]).all(:order => "artists.name")
           url = File.dirname(url) + "/"
+          break if url =~ /\.(?:net|com|org)\/$/
         end
 
         artists.uniq_by {|x| x.name}.slice(0, 20)
