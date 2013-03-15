@@ -19,7 +19,7 @@ every 1.day, :at => "1:00 am" do
 end
 
 every 1.day, :at => "2:00 am" do
-  command "psql --set statement_timeout=0 -hdbserver -c \"vacuum analyze verbose;\" danbooru2"
+  command "psql --set statement_timeout=0 -hdbserver -c \"vacuum analyze;\" danbooru2"
 end
 
 if environment == "production"
