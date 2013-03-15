@@ -5,6 +5,7 @@ class PostsController < ApplicationController
   rescue_from PostSets::SearchError, :with => :rescue_exception
   rescue_from Post::SearchError, :with => :rescue_exception
   rescue_from ActiveRecord::StatementInvalid, :with => :rescue_exception
+  rescue_from ActiveRecord::RecordNotFound, :with => :rescue_exception
   
   def index
     @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit])

@@ -1,5 +1,6 @@
 class CommentVotesController < ApplicationController
   respond_to :js
+  before_filter :member_only
   
   def create
     @comment = Comment.find(params[:comment_id])

@@ -3,6 +3,7 @@ class WikiPagesController < ApplicationController
   before_filter :member_only, :except => [:index, :show, :show_or_new]
   before_filter :moderator_only, :only => [:destroy]
   before_filter :normalize_search_params, :only => [:index]
+  rescue_from ActiveRecord::StatementInvalid, :with => :rescue_exception
 
   def new
     @wiki_page = WikiPage.new(params[:wiki_page])
@@ -26,7 +27,11 @@ class WikiPagesController < ApplicationController
   end
   
   def show
-    @wiki_page = WikiPage.find(params[:id])
+    if params[:id] =~ /[a-zA-Z]/
+      @wiki_page = WikiPage.find_by_title(params[:id])
+    else
+      @wiki_page = WikiPage.find(params[:id])
+    end
     respond_with(@wiki_page)
   end
   
