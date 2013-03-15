@@ -38,6 +38,7 @@ namespace :local_config do
   task :link_local_files do
     run "ln -s #{deploy_to}/shared/config/danbooru_local_config.rb #{release_path}/config/danbooru_local_config.rb"
     run "ln -s #{deploy_to}/shared/config/database.yml #{release_path}/config/database.yml"
+    run "ln -s #{deploy_to}/shared/config/newrelic.yml #{release_path}/config/newrelic.yml"
   end
 end
 
