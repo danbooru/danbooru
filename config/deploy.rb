@@ -6,8 +6,7 @@ require 'bundler/capistrano'
 set :bundle_flags, "--deployment --quiet --binstubs --shebang ruby-local-exec"
 
 set :default_environment, {
-  "PATH" => '$HOME/.rbenv/shims:$HOME/.rbenv/bin:$PATH',
-  "NRCONFIG" => "/var/www/danbooru2/shared/config/newrelic.yml"
+  "PATH" => '$HOME/.rbenv/shims:$HOME/.rbenv/bin:$PATH'
 }
 
 set :whenever_command, "bundle exec whenever"

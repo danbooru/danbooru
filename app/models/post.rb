@@ -319,7 +319,7 @@ class Post < ActiveRecord::Base
       execute_sql("UPDATE tags SET post_count = post_count + 1 WHERE name IN (?)", increment_tags) if increment_tags.any?
       Post.expire_cache_for_all(decrement_tags)
       Post.expire_cache_for_all(increment_tags)
-      Post.expire_cache_for_all([""])
+      Post.expire_cache_for_all([""]) if new_record? || id <= 100_000
     end
     
     def set_tag_counts
