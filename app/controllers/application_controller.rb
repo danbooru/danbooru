@@ -20,8 +20,8 @@ protected
       render :template => "static/error", :status => 500
     elsif exception.is_a?(::ActiveRecord::RecordNotFound)
       @exception = nil
-      @error_message = "That record was not found", :status => 404
-      render :template => "static/error", :status => 500
+      @error_message = "That record was not found"
+      render :template => "static/error", :status => 404
     else
       render :template => "static/error", :status => 500
     end
