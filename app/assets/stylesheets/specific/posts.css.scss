@@ -176,8 +176,8 @@ div#c-posts {
   
   div#a-index {
     div#posts {
-      max-width: 900px;
-      float: left;
+      margin-left: 15em;
+      margin-right: 6.5em;
     }
     
     div#jlist-rss-ads-for-show {
@@ -262,6 +262,12 @@ div#c-posts {
       }
     }
     
+    #content {
+      width:70%;
+      float:left;
+      padding-left:1em;
+    }
+    
     span.close-button {
       position: absolute;
       top: 5px;
@@ -296,6 +302,7 @@ div#c-post-versions {
       text-decoration: line-through;
       margin-right: 0.5em;
     }
+      
   }
 }
 
