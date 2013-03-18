@@ -27,7 +27,7 @@ class TagAliasRequest
     @forum_topic = ForumTopic.create(
       :title => "Tag alias: #{antecedent_name} -> #{consequent_name}",
       :original_post_attributes => {
-        :body => reason + "\n\ncreate alias #{antecedent_name} -> #{consequent_name}\n\n\"Link to alias\":/tag_aliases?search[id]=#{tag_alias.id}\n\nLink to wiki: [[#{antecedent_name}]] -> [[#{consequent_name}]]"
+        :body => "create alias [[#{antecedent_name}]] -> [[#{consequent_name}]]\n\n\"Link to alias\":/tag_aliases?search[id]=#{tag_alias.id}\n\n#{reason}"
       }
     )
     if @forum_topic.errors.any?
