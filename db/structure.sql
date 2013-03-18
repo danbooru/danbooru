@@ -684,7 +684,9 @@ CREATE TABLE comments (
     body_index tsvector NOT NULL,
     score integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    updater_id integer,
+    updater_ip_addr inet
 );
 
 
@@ -6241,3 +6243,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130305005138');
 INSERT INTO schema_migrations (version) VALUES ('20130307225324');
 
 INSERT INTO schema_migrations (version) VALUES ('20130308204213');
+
+INSERT INTO schema_migrations (version) VALUES ('20130318002652');

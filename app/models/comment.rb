@@ -5,6 +5,7 @@ class Comment < ActiveRecord::Base
   belongs_to :creator, :class_name => "User"
   has_many :votes, :class_name => "CommentVote", :dependent => :destroy
   before_validation :initialize_creator, :on => :create
+  before_validation :initialize_updater
   after_save :update_last_commented_at
   after_destroy :update_last_commented_at
   attr_accessible :body, :post_id, :do_not_bump_post
@@ -70,8 +71,17 @@ class Comment < ActiveRecord::Base
     self.ip_addr = CurrentUser.ip_addr
   end
 
+  def initialize_updater
+    self.updater_id = CurrentUser.user.id
+    self.updater_ip_addr = CurrentUser.ip_addr
+  end
+
   def creator_name
     User.id_to_name(creator_id)
+  end
+  
+  def updater_name
+    User.id_to_name(updater_id)
   end
 
   def validate_creator_is_not_limited
@@ -111,7 +121,7 @@ class Comment < ActiveRecord::Base
   end
   
   def editable_by?(user)
-    creator_id == user.id || user.is_moderator?
+    creator_id == user.id || user.is_janitor?
   end
 end
 
