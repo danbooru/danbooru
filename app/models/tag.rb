@@ -454,19 +454,22 @@ class Tag < ActiveRecord::Base
       when "name"
         q = q.reorder("name")
         
-      else
+      when "date"
         q = q.reorder("id desc")
+        
+      else
+        q = q.reorder("post_count desc")
       end
       
       case params[:sort]
-      when "count"
-        q = q.reorder("post_count desc")
+      when "date"
+        q = q.reorder("id desc")
         
       when "name"
         q = q.reorder("name")
 
       else
-        q = q.reorder("id desc")
+        q = q.reorder("post_count desc")
       end
       
       q
