@@ -762,6 +762,7 @@ class Post < ActiveRecord::Base
       end
       
       ModAction.create(:description => "permanently deleted post ##{id}")
+      decrement_tag_post_counts
       delete!(:without_mod_action => true)
       destroy
     end
@@ -779,7 +780,7 @@ class Post < ActiveRecord::Base
         give_favorites_to_parent
         update_children_on_destroy
         update_parent_on_destroy
-        decrement_tag_post_counts
+        # decrement_tag_post_counts
         update_column(:parent_id, nil)
         Post.expire_cache_for_all(tag_array)
         

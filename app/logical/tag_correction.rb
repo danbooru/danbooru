@@ -44,6 +44,6 @@ class TagCorrection
   
   def fix!
     tag.delay(:queue => "default").fix_post_count
-    Post.expire_cache_for_all(tag.name)
+    Post.expire_cache_for_all([tag.name])
   end
 end
