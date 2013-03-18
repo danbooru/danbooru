@@ -86,7 +86,7 @@ class PostPresenter < Presenter
   end
   
   def has_nav_links?(template)
-    (template.params[:tags].present? && template.params[:tags] !~ /order:/) || @post.pools.active.any?
+    (CurrentUser.user.enable_sequential_post_navigation && template.params[:tags].present? && template.params[:tags] !~ /order:/) || @post.pools.active.any?
   end
   
   def post_footer_for_pool_html(template)

@@ -161,6 +161,10 @@ class AnonymousUser
     false
   end
   
+  def enable_sequential_post_navigation
+    true
+  end
+  
   %w(member banned privileged builder platinum contributor janitor moderator admin).each do |name|
     define_method("is_#{name}?") do
       false

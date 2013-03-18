@@ -2602,7 +2602,8 @@ CREATE TABLE users (
     bcrypt_password_hash text,
     enable_post_navigation boolean DEFAULT true NOT NULL,
     new_post_navigation_layout boolean DEFAULT true NOT NULL,
-    enable_privacy_mode boolean DEFAULT false NOT NULL
+    enable_privacy_mode boolean DEFAULT false NOT NULL,
+    enable_sequential_post_navigation boolean DEFAULT true NOT NULL
 );
 
 
@@ -6254,3 +6255,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130308204213');
 INSERT INTO schema_migrations (version) VALUES ('20130318002652');
 
 INSERT INTO schema_migrations (version) VALUES ('20130318012517');
+
+INSERT INTO schema_migrations (version) VALUES ('20130318030619');
