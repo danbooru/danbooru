@@ -11,6 +11,14 @@ header#top {
     background: $menu_color;
     padding: 6px 20px;
     
+    form {
+      display: inline-block;
+      
+      input {
+        width: 8em;
+      }
+    }
+    
     li {
       margin: 0;
       padding: 0;
