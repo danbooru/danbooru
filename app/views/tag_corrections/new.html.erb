@@ -1,0 +1,8 @@
+<h1>Fix Tag</h1>
+
+<p>You can fix the post count for this tag. It will update it from <%= @tag.post_count %> to <%= @tag.real_post_count %>.</p>
+
+<%= form_tag(tag_correction_path(:tag_id => @tag.id)) do %>
+  <%= submit_tag "Fix" %>
+  <%= submit_tag "Cancel" %>
+<% end %>

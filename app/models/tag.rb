@@ -41,8 +41,12 @@ class Tag < ActiveRecord::Base
       end
     end
     
+    def real_post_count
+      Post.raw_tag_match(name).count
+    end
+    
     def fix_post_count
-      update_column(:post_count, Post.raw_tag_match(name).count)
+      update_column(:post_count, real_post_count)
     end
   end
   

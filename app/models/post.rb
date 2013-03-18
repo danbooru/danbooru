@@ -587,6 +587,15 @@ class Post < ActiveRecord::Base
   end
   
   module CountMethods
+    def fix_post_counts
+      post.set_tag_counts
+      post.update_column(:tag_count, post.tag_count)
+      post.update_column(:tag_count_general, post.tag_count_general)
+      post.update_column(:tag_count_artist, post.tag_count_artist)
+      post.update_column(:tag_count_copyright, post.tag_count_copyright)
+      post.update_column(:tag_count_character, post.tag_count_character)
+    end
+    
     def get_count_from_cache(tags)
       count = Cache.get(count_cache_key(tags))
       
