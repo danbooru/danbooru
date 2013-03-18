@@ -16,7 +16,7 @@ class WikiPagesController < ApplicationController
   end
   
   def index
-    @wiki_pages = WikiPage.search(params[:search]).order("id desc").paginate(params[:page], :search_count => params[:search])
+    @wiki_pages = WikiPage.search(params[:search]).order("updated_at desc").paginate(params[:page], :search_count => params[:search])
     respond_with(@wiki_pages) do |format|
       format.html do
         if @wiki_pages.count == 1
