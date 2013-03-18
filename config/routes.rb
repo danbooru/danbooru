@@ -128,7 +128,11 @@ Danbooru::Application.routes.draw do
     end
     resource :order, :only => [:edit, :update], :controller => "PoolOrders"
   end
-  resource  :pool_element, :only => [:create, :destroy]
+  resource  :pool_element, :only => [:create, :destroy] do
+    collection do
+      get :all_select
+    end
+  end
   resources :pool_versions, :only => [:index]
   resources :posts do
     resources :votes, :controller => "post_votes", :only => [:create, :destroy]

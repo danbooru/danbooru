@@ -106,19 +106,19 @@ class PostPresenter < Presenter
     if template.params[:pool_id].present?
       pool = Pool.where(:id => template.params[:pool_id]).first
       return if pool.nil?
-      html = pool_link_html(html, template, pool, :include_rel => true)
+      html += pool_link_html(template, pool, :include_rel => true)
       
       @post.pools.active.where("id <> ?", template.params[:pool_id]).each do |other_pool|
-        html = pool_link_html(html, template, other_pool)
+        html += pool_link_html(template, other_pool)
       end
     else
       first = true
       @post.pools.active.each do |pool|
         if first && template.params[:tags].blank?
-          html = pool_link_html(html, template, pool, :include_rel => true)
+          html += pool_link_html(template, pool, :include_rel => true)
           first = false
         else
-          html = pool_link_html(html, template, pool)
+          html += pool_link_html(template, pool)
         end
       end
     end
@@ -127,7 +127,7 @@ class PostPresenter < Presenter
     html.join("\n").html_safe
   end
   
-  def pool_link_html(html, template, pool, options = {})
+  def pool_link_html(template, pool, options = {})
     pool_html = ["<li>"]
     match_found = false
     
@@ -160,11 +160,6 @@ class PostPresenter < Presenter
     end
     
     pool_html << "</li>"
-    
-    if match_found
-      html += pool_html
-    end
-
-    html
+    pool_html
   end
 end
