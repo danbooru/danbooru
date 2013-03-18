@@ -384,7 +384,9 @@ Danbooru.Note = {
   TranslationMode: {
     active: false,
     
-    start: function() {
+    start: function(e) {
+      e.preventDefault();
+
       if (Danbooru.Note.TranslationMode.active) {
         return;
       }
@@ -406,6 +408,7 @@ Danbooru.Note = {
       Danbooru.Note.TranslationMode.stop();
       $(".note-box").show();
       e.stopPropagation();
+      e.preventDefault();
     }
   },
 
