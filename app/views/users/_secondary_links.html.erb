@@ -5,7 +5,7 @@
     <% if CurrentUser.is_anonymous? %>
       <li><%= link_to "Sign up", new_user_path %></li>
     <% end %>
-    <% if @user && !CurrentUser.is_anonymous? %>
+    <% if @user && !@user.new_record? && !CurrentUser.is_anonymous? %>
       <li>|</li>
       <% if @user.id == CurrentUser.id %>
         <li><%= link_to "Settings", edit_user_path(CurrentUser.user) %></li>

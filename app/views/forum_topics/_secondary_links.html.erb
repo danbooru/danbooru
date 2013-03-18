@@ -5,7 +5,7 @@
     <li><%= link_to "Search", search_forum_posts_path %></li>
     <li><%= link_to "Mark all as read", mark_all_as_read_forum_topics_path, :method => :post %></li>
     <li><%= link_to "Help", wiki_pages_path(:title => "help:forum") %></li>
-    <% if @forum_topic %>
+    <% if @forum_topic && !@forum_topic.new_record? %>
       <li>|</li>
       <li><%= link_to "Reply", new_forum_post_path(:topic_id => @forum_topic.id) %></li>
       <% if !@forum_topic.new_record? && @forum_topic.editable_by?(CurrentUser.user) %>
