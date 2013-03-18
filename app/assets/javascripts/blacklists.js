@@ -47,7 +47,22 @@
     });
   }
 
+  Danbooru.Blacklist.toggle_all = function(e) {
+    $(".blacklisted").each(function(i, element) {
+      var $element = $(element);
+      if ($element.hasClass("blacklisted-active")) {
+        $element.removeClass("blacklisted-active");
+      } else {
+        $element.addClass("blacklisted-active");
+      }
+    });
+  }
+  
   Danbooru.Blacklist.update_sidebar = function() {
+    if (this.blacklists.length > 0) {
+      this.blacklists.unshift({"tags": "~all~", "hits": -1});
+    }
+    
     $.each(this.blacklists, function(i, blacklist) {
       if (blacklist.hits === 0) {
         return;
@@ -56,12 +71,21 @@
       var item = $("<li/>");
       var link = $("<a/>");
       var count = $("<span/>");
-      link.html(blacklist.tags);
-      link.click(Danbooru.Blacklist.toggle);
-      count.html(blacklist.hits);
-      item.append(link);
-      item.append(" ");
-      item.append(count);
+      
+      if (blacklist.tags === "~all~") {
+        link.html("All");
+        link.click(Danbooru.Blacklist.toggle_all);
+        item.append(link);
+        item.append(" ");
+      } else {
+        link.html(blacklist.tags);
+        link.click(Danbooru.Blacklist.toggle);
+        count.html(blacklist.hits);
+        item.append(link);
+        item.append(" ");
+        item.append(count);
+      }
+      
       $("#blacklist-list").append(item);
     });
 
