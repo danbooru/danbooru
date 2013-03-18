@@ -39,7 +39,7 @@ class Note < ActiveRecord::Base
       end
 
       if params[:post_id].present?
-        q = q.body_matches(params[:post_id])
+        q = q.where("post_id = ?", params[:post_id].to_i)
       end
       
       if params[:post_tags_match].present?

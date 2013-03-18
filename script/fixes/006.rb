@@ -15,7 +15,7 @@ Post.where("created_at > '2013-02-01'").find_each do |post|
   post.update_column(:tag_count_character, post.tag_count_character)
 end
 
-PoolVersion.where("post_ids like '% 0 %'").find_each do |pool_version|
+PoolVersion.where("post_ids like '% 1 %'").find_each do |pool_version|
   cleaned_post_ids = pool_version.post_ids.scan(/(\d+) \d+/).join(" ")
   pool_version.update_column(:post_ids, cleaned_post_ids)
 end
