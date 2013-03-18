@@ -461,15 +461,13 @@ class User < ActiveRecord::Base
     end
     
     def favorite_limit
-      return nil
-      
-      # if is_privileged?
-      #   20_000
-      # elsif is_platinum?
-      #   nil
-      # else
-      #   4_000
-      # end
+      if is_privileged?
+        20_000
+      elsif is_platinum?
+        nil
+      else
+        4_000
+      end
     end
   end
   

@@ -782,7 +782,6 @@ class Post < ActiveRecord::Base
         update_parent_on_destroy
         # decrement_tag_post_counts
         update_column(:parent_id, nil)
-        Post.expire_cache_for_all(tag_array)
         
         unless options[:without_mod_action]
           ModAction.create(:description => "deleted post ##{id}")

@@ -61,8 +61,8 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(1, Post.fast_count)
         assert_equal(1, Post.fast_count("aaa"))
         post.delete!
-        assert_equal(0, Post.fast_count)
-        assert_equal(0, Post.fast_count("aaa"))
+        assert_equal(1, Post.fast_count)
+        assert_equal(1, Post.fast_count("aaa"))
       end
       
       should "toggle the is_deleted flag" do
@@ -72,11 +72,11 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(true, post.is_deleted?)
       end
       
-      should "decrement the tag counts" do
+      should "not decrement the tag counts" do
         post = FactoryGirl.create(:post, :tag_string => "aaa")
         assert_equal(1, Tag.find_by_name("aaa").post_count)
         post.delete!
-        assert_equal(0, Tag.find_by_name("aaa").post_count)
+        assert_equal(1, Tag.find_by_name("aaa").post_count)
       end
     end
   end
