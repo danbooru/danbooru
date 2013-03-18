@@ -105,15 +105,15 @@ class Comment < ActiveRecord::Base
     do_not_bump_post == "1"
   end
   
-  def vote!(score)
-    numerical_score = score == "up" ? 1 : -1
+  def vote!(val)
+    numerical_score = val == "up" ? 1 : -1
     vote = votes.create(:score => numerical_score)
     
     if vote.errors.empty?
       if vote.is_positive?
-        increment!(:score)
+        update_column(:score, score + 1)
       elsif vote.is_negative?
-        decrement!(:score)
+        update_column(:score, score - 1)
       end
     end
 

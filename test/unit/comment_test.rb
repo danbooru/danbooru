@@ -73,6 +73,17 @@ class CommentTest < ActiveSupport::TestCase
         assert_equal(c1.created_at.to_s, p.last_commented_at.to_s)
       end
 
+      should "not record the user id of the voter" do
+        user = FactoryGirl.create(:user)
+        post = FactoryGirl.create(:post)
+        c1 = FactoryGirl.create(:comment, :post => post)
+        CurrentUser.scoped(user, "127.0.0.1") do
+          c1.vote!("up")
+          c1.reload
+          assert_not_equal(user.id, c1.updater_id)
+        end
+      end
+
       should "not allow duplicate votes" do
         user = FactoryGirl.create(:user)
         post = FactoryGirl.create(:post)
