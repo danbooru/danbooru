@@ -41,7 +41,7 @@
       </table>
     </div>
 
-    <%= numbered_paginator(@artist_versions, :count => (params[:search].present? ? nil : 1_000_000)) %>
+    <%= numbered_paginator(@artist_versions, :search_count => params[:search]) %>
   </div>
 </div>
 
