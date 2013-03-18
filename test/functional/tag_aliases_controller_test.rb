@@ -50,16 +50,5 @@ class TagAliasesControllerTest < ActionController::TestCase
         end
       end
     end
-    
-    context "destroy_cache action" do
-      setup do
-        @tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa")
-      end
-      
-      should "reset the cache" do
-        post :cache, {:id => @tag_alias.id}, {:user_id => @user.id}
-        assert_nil(Cache.get("ta:aaa"))
-      end
-    end
   end
 end

@@ -92,20 +92,20 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "find matches by url" do
-      a1 = FactoryGirl.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/test.jpg")
-      a2 = FactoryGirl.create(:artist, :name => "subway", :url_string => "http://subway.com/test.jpg")
-      a3 = FactoryGirl.create(:artist, :name => "minko", :url_string => "https://minko.com/test.jpg")
+      a1 = FactoryGirl.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/x/test.jpg")
+      a2 = FactoryGirl.create(:artist, :name => "subway", :url_string => "http://subway.com/x/test.jpg")
+      a3 = FactoryGirl.create(:artist, :name => "minko", :url_string => "https://minko.com/x/test.jpg")
 
-      assert_equal(["rembrandt"], Artist.find_all_by_url("http://rembrandt.com/test.jpg").map(&:name))
-      assert_equal(["rembrandt"], Artist.find_all_by_url("http://rembrandt.com/another.jpg").map(&:name))    
+      assert_equal(["rembrandt"], Artist.find_all_by_url("http://rembrandt.com/x/test.jpg").map(&:name))
+      assert_equal(["rembrandt"], Artist.find_all_by_url("http://rembrandt.com/x/another.jpg").map(&:name))    
       assert_equal([], Artist.find_all_by_url("http://nonexistent.com/test.jpg").map(&:name))
-      assert_equal(["minko"], Artist.find_all_by_url("https://minko.com/test.jpg").map(&:name))
-      assert_equal(["minko"], Artist.find_all_by_url("http://minko.com/test.jpg").map(&:name))
+      assert_equal(["minko"], Artist.find_all_by_url("https://minko.com/x/test.jpg").map(&:name))
+      assert_equal(["minko"], Artist.find_all_by_url("http://minko.com/x/test.jpg").map(&:name))
     end
     
     should "not allow duplicates" do
-      FactoryGirl.create(:artist, :name => "warhol", :url_string => "http://warhol.com/a/image.jpg\nhttp://warhol.com/b/image.jpg")
-      assert_equal(["warhol"], Artist.find_all_by_url("http://warhol.com/test.jpg").map(&:name))
+      FactoryGirl.create(:artist, :name => "warhol", :url_string => "http://warhol.com/x/a/image.jpg\nhttp://warhol.com/x/b/image.jpg")
+      assert_equal(["warhol"], Artist.find_all_by_url("http://warhol.com/x/test.jpg").map(&:name))
     end
     
     should "hide deleted artists" do

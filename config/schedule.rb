@@ -18,7 +18,7 @@ every 1.day, :at => "1:00 am" do
   command "cd /var/www/danbooru2/current ; script/donmai/prune_backup_dbs"
 end
 
-every 1.day, :at => "2:00 am" do
+every 8.hours do
   command "psql --set statement_timeout=0 -hdbserver -c \"vacuum analyze;\" danbooru2"
 end
 

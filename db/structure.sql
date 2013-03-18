@@ -2250,8 +2250,6 @@ CREATE TABLE posts (
     id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    up_score integer DEFAULT 0 NOT NULL,
-    down_score integer DEFAULT 0 NOT NULL,
     score integer DEFAULT 0 NOT NULL,
     source character varying(255),
     md5 character varying(255) NOT NULL,
@@ -6257,3 +6255,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130318002652');
 INSERT INTO schema_migrations (version) VALUES ('20130318012517');
 
 INSERT INTO schema_migrations (version) VALUES ('20130318030619');
+
+INSERT INTO schema_migrations (version) VALUES ('20130318031705');
