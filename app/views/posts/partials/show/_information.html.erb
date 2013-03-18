@@ -1,7 +1,7 @@
 <ul>
   <li>ID: <%= post.id %></li>
   <li>Uploader: <%= link_to_unless(post.uploader.nil?, post.uploader_name, user_path(post.uploader)) %></li>
-  <li>Date: <%= raw time_ago_in_words_tagged(post.created_at).gsub(/about/, "") %></li>
+  <li>Date: <%= link_to time_ago_in_words_tagged(post.created_at), posts_path(:tags => "date:#{post.created_at.to_date}") %></li>
   <% if post.approver %>
     <li>Approver: <%= link_to(post.approver.name, user_path(post.approver_id)) %></li>
   <% end %>
