@@ -1,3 +1,4 @@
 $("a#add-to-favorites").show();
 $("a#remove-from-favorites").hide();
 $("#score-for-post-<%= @post.id %>").html(<%= @post.score %>);
+$("#favcount-for-post-<%= @post.id %>").html(<%= @post.fav_count %>);
