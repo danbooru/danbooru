@@ -8,19 +8,19 @@ module PostSetPresenters
     end
 
     def prev_day
-      date - 1
+      date - 1.day
     end
     
     def next_day
-      date + 1
+      date + 1.day
     end
     
     def prev_week
-      date - 7
+      date - 7.days
     end
     
     def next_week
-      date + 7
+      date + 7.days
     end
     
     def prev_month
@@ -111,7 +111,7 @@ module PostSetPresenters
     def range_text
       if min_date == max_date
         date.strftime("%B %d, %Y")
-      elsif max_date - min_date == 6
+      elsif max_date - min_date < 10.days
         min_date.strftime("Week of %B %d, %Y")
       else
         date.strftime("%B %Y")
