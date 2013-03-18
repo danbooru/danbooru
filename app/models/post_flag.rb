@@ -54,7 +54,9 @@ class PostFlag < ActiveRecord::Base
   end
   
   def validate_creator_is_not_limited
-    if flag_count_for_creator >= 10
+    if CurrentUser.is_janitor?
+      false
+    elsif flag_count_for_creator >= 10
       errors[:creator] << "can flag 10 posts a day"
       false
     else
