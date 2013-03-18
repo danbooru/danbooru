@@ -1,0 +1,39 @@
+Danbooru offers a REST-like API to make scripting easy. All you need is a way to GET, POST, PUT and DELETE to URLs. Responses are given in either XML or JSON format.
+
+h1. Basics
+
+HTTP defines four basic request methods: GET, POST, PUT and DELETE. You'll be using these methods to interact with the Danbooru API. Most API calls that change the state of the database (like creating, updating, or deleting something) require an HTTP POST, PUT or DELETE call. API calls that only retrieve data can typically be done with an HTTP GET call.
+
+A URL is considered a resource and the HTTP methods are actions you perform on the resource. For example, GET "/posts/1.json":/posts/1.json returns a JSON representation of a post. GET "/posts/1.xml":/posts/1.xml returns an XML representation. POST /posts/1.json would update the resource, for example changing its tags.
+
+Some resources require parameters. For example, you can search for tags named abc by calling GET "/tags.json?search[name_matches]=abc":/tags.json?search[name_matches]=abc will give you a JSON listing of all tags with name abc.
+
+For POST, PUT and DELETE requests you will be passing these parameters along in the body instead of the query parameters.
+
+h1. Responses
+
+All API calls that change state will return a single element response (for XML calls). They are formatted like this:
+
+[quote]
+<?xml version="1.0" encoding="UTF-8"?>
+<response success="false" reason="duplicate"/>
+[/quote]
+
+For JSON responses, they'll look like this:
+
+[quote]
+{success: false, reason: "duplicate"}
+[/quote]
+
+While you can usually determine success or failure based on the response object, you can also figure out what happened based on the HTTP status code. In addition to the standard ones, Danbooru uses some custom status codes in the 4xx and 5xx range.
+
+* [b]200 OK[/b]: Request was successful
+* [b]403 Forbidden[/b]: Access denied
+* [b]404 Not Found[/b]: Not found
+* [b]420 Invalid Record[/b]: Record could not be saved
+* [b]421 User Throttled[/b]: User is throttled, try again later
+* [b]422 Locked[/b]: The resource is locked and cannot be modified
+* [b]423 Already Exists[/b]: Resource already exists
+* [b]424 Invalid Parameters[/b]: The given parameters were invalid
+* [b]500 Internal Server Error[/b]:  Some unknown error occurred on the server
+* [b]503 Service Unavailable[/b]: Server cannot currently handle the request, try again later

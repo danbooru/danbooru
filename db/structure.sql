@@ -2393,7 +2393,7 @@ CREATE TABLE tag_subscriptions (
     id integer NOT NULL,
     creator_id integer NOT NULL,
     name character varying(255) NOT NULL,
-    tag_query character varying(255) NOT NULL,
+    tag_query text NOT NULL,
     post_ids text NOT NULL,
     is_public boolean DEFAULT true NOT NULL,
     last_accessed_at timestamp without time zone,
@@ -6257,3 +6257,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130318012517');
 INSERT INTO schema_migrations (version) VALUES ('20130318030619');
 
 INSERT INTO schema_migrations (version) VALUES ('20130318031705');
+
+INSERT INTO schema_migrations (version) VALUES ('20130318231740');
