@@ -27,6 +27,7 @@ div#page {
   aside#sidebar {
     width: 15em;
     float: left;
+    position: absolute;
     
     h1 {
       font-size: $h3_size;
