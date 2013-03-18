@@ -69,6 +69,18 @@ class ForumPostTest < ActiveSupport::TestCase
       assert_equal(@user.id, post.creator_id)
     end
     
+    context "that is deleted" do
+      setup do
+        @post = FactoryGirl.create(:forum_post, :topic_id => @topic.id)
+        @post.update_attribute(:is_deleted, true)
+        @topic.reload
+      end
+      
+      should "also delete the topic" do
+        assert(@topic.is_deleted)
+      end
+    end
+    
     context "updated by a second user" do
       setup do
         @post = FactoryGirl.create(:forum_post, :topic_id => @topic.id)

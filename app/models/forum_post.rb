@@ -10,6 +10,7 @@ class ForumPost < ActiveRecord::Base
   validates_presence_of :body, :creator_id
   validate :validate_topic_is_unlocked
   before_destroy :validate_topic_is_unlocked
+  after_save :delete_topic_if_original_post
   
   module SearchMethods
     def body_matches(body)
@@ -120,6 +121,14 @@ class ForumPost < ActiveRecord::Base
   
   def is_original_post?
     ForumPost.exists?(["id = ? and id = (select _.id from forum_posts _ where _.topic_id = ? order by _.id asc limit 1)", id, topic_id])
+  end
+  
+  def delete_topic_if_original_post
+    if is_deleted? && is_original_post?
+      topic.update_attribute(:is_deleted, true)
+    end
+    
+    true
   end
   
   def build_response

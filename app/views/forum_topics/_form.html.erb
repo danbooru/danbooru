@@ -5,7 +5,7 @@
     <%= f.input :title %>
 
     <%= f.simple_fields_for :original_post do |pf| %>
-      <% unless @forum_topic.new_record? %>
+      <% if !@forum_topic.new_record? %>
         <%= hidden_field_tag "forum_topic[original_post_attributes][topic_id]", @forum_topic.id %>
       <% end %>
       
