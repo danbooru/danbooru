@@ -14,7 +14,7 @@
   <li>Source: <%= post_source_tag(post) %></li>
   <li>Rating: <%= post.pretty_rating %></li>
   <li>Score: <span id="score-for-post-<%= post.id %>"><%= post.score %></span> <% if CurrentUser.is_privileged? %>(vote <%= link_to "up", post_votes_path(:post_id => post.id, :score => "up"), :remote => true, :method => :post %>/<%= link_to "down", post_votes_path(:post_id => post.id, :score => "down"), :remote => true, :method => :post %>)<% end %></li>
-  <li>Fav count: <%= post.fav_count %></li>
+  <li>Favorites: <%= post.fav_count %></li>
   <li>
     Status:
     <% if post.is_pending? %>

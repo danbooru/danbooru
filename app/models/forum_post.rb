@@ -109,6 +109,10 @@ class ForumPost < ActiveRecord::Base
   def creator_name
     User.id_to_name(creator_id)
   end
+
+  def updater_name
+    User.id_to_name(updater_id)
+  end
   
   def quoted_response
     stripped_body = body.gsub(/\[quote\](?:.|\n|\r)+?\[\/quote\][\n\r]*/m, "")
