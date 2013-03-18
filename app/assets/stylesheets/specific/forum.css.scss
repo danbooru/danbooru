@@ -29,9 +29,12 @@ div.list-of-forum-posts {
   }
 }
 
+div.list-of-forum-posts+p { 
+  margin-left: 14em; 
+}
+
 div#c-forum-topics {
   div.single-forum-post {
-    width: 60em;
   }
   
   div#a-show {
@@ -54,4 +57,8 @@ div#c-forum-topics {
   span.locked-topic {
     color: #666;
   }
+  
+  #topic-response { 
+    margin-left:14em; 
+  } 
 }
