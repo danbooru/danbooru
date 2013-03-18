@@ -7,7 +7,9 @@
     <% if @tag %>
       <li>|</li>
       <li><%= link_to "Edit", edit_tag_path(@tag) %></li>
-      <li><%= link_to "Fix", new_tag_correction_path(:tag_id => @tag.id) %></li>
+      <% if @tag.post_count < 1_000 %>
+        <li><%= link_to "Fix", new_tag_correction_path(:tag_id => @tag.id) %></li>
+      <% end %>
     <% end %>
   </menu>
 <% end %>

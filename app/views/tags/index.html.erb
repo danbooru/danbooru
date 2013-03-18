@@ -18,7 +18,9 @@
             </td>
             <td>
               <%= link_to "edit", edit_tag_path(tag) %>
-              | <%= link_to "fix", new_tag_correction_path(:tag_id => tag.id) %>
+              <% if tag.post_count < 1_000 %>
+                | <%= link_to "fix", new_tag_correction_path(:tag_id => tag.id) %>
+              <% end %>
             </td>
           </tr>
         <% end %>
