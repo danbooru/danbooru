@@ -40,7 +40,7 @@ class ForumTopic < ActiveRecord::Base
   extend SearchMethods
   
   def editable_by?(user)
-    creator_id == user.id || user.is_moderator?
+    creator_id == user.id || user.is_janitor?
   end
 
   def initialize_is_deleted
