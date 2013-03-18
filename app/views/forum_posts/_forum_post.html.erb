@@ -15,7 +15,7 @@
       <div class="prose">
         <%= format_text(forum_post.body) %>
       </div>
-      <% if forum_post.updated_at != forum_post.created_at %>
+      <% if forum_post.updater_id != forum_post.creator_id %>
         <p class="info">Updated by <%= link_to forum_post.updater_name, user_path(forum_post.updater_id) %> <%= time_ago_in_words_tagged(forum_post.updated_at) %></p>
       <% end %>
       <menu>
