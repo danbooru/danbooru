@@ -476,7 +476,7 @@ Danbooru.Note = {
 $(function() {
   if ($("#c-posts").length && $("#a-show").length && $("#image").length) {
     if ($("#note-locked-notice").length == 0) {
-      $("#translate").one("click", Danbooru.Note.TranslationMode.start);
+      $("#translate").bind("click", Danbooru.Note.TranslationMode.start);
       $(document).bind("keydown.n", Danbooru.Note.TranslationMode.start);
     }
     Danbooru.Note.load_all();
