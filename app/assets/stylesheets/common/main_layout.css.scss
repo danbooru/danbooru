@@ -27,6 +27,7 @@ div#page {
   aside#sidebar {
     width: 15em;
     float: left;
+    position: absolute;
     
     h1 {
       font-size: $h3_size;
@@ -41,11 +42,6 @@ div#page {
     }
   }
   
-  aside#sidebar:after {
-    content: "";
-    clear: both;
-  }
-
   aside#sidebar > section {
     margin-bottom: 1em;
   }
@@ -73,7 +69,6 @@ div#page {
 }
 
 footer#page-footer {
-  clear: both;
   margin: 1em;
   text-align: center;
   padding-top: 1em;
