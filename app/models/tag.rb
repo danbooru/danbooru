@@ -174,7 +174,7 @@ class Tag < ActiveRecord::Base
 
       when :date
         begin
-          object.to_date
+          Time.zone.parse(object)
         rescue Exception
           nil
         end

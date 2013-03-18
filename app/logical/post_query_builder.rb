@@ -21,7 +21,11 @@ class PostQueryBuilder
     
     case arr[0]
     when :eq
-      relation.where(["#{field} = ?", arr[1]])
+      if arr[1].is_a?(Time)
+        relation.where("#{field} between ? and ?", arr[1].beginning_of_day, arr[1].end_of_day)
+      else
+        relation.where(["#{field} = ?", arr[1]])
+      end
 
     when :gt
       relation.where(["#{field} > ?", arr[1]])

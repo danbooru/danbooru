@@ -3,12 +3,12 @@ module PostSets
     attr_reader :date, :scale
     
     def initialize(date, scale)
-      @date = date.blank? ? Date.today : date.to_date
+      @date = date.blank? ? Time.zone.now : Time.zone.parse(date)
       @scale = scale
     end
     
     def posts
-      ::Post.where("created_at between ? and ?", min_date, max_date + 1).order("score desc").limit(limit)
+      ::Post.where("created_at between ? and ?", min_date.beginning_of_day, max_date.end_of_day).order("score desc").limit(limit)
     end
     
     def limit
