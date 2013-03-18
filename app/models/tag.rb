@@ -42,7 +42,7 @@ class Tag < ActiveRecord::Base
     end
     
     def real_post_count
-      Post.raw_tag_match(name).count
+      @real_post_count ||= Post.raw_tag_match(name).count
     end
     
     def fix_post_count
