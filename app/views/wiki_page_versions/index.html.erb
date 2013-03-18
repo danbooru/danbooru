@@ -19,8 +19,16 @@
           <tbody>
             <% @wiki_page_versions.each do |wiki_page_version| %>
               <tr>
-                <td><%= radio_button_tag "thispage", wiki_page_version.id %></td>
-                <td><%= radio_button_tag "otherpage", wiki_page_version.id %></td>
+                <td>
+                  <% if params[:search] && params[:search][:wiki_page_id] %>
+                    <%= radio_button_tag "thispage", wiki_page_version.id %>
+                  <% end %>
+                </td>
+                <td>
+                  <% if params[:search] && params[:search][:wiki_page_id] %>
+                    <%= radio_button_tag "otherpage", wiki_page_version.id %>
+                  <% end %>
+                </td>
                 <td><%= link_to wiki_page_version.title, wiki_page_path(wiki_page_version.wiki_page_id) %></td>
                 <td>
                   <% if CurrentUser.is_admin? %>
@@ -39,7 +47,9 @@
           </tbody>
         </table>
         
-        <%= submit_tag "Diff" %>
+        <% if params[:search] && params[:search][:wiki_page_id] %>
+          <%= submit_tag "Diff" %>
+        <% end %>
       <% end %>
       
       <%= numbered_paginator(@wiki_page_versions) %>
