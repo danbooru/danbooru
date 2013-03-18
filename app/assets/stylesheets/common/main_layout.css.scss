@@ -27,7 +27,6 @@ div#page {
   aside#sidebar {
     width: 15em;
     float: left;
-    position: absolute;
     
     h1 {
       font-size: $h3_size;
@@ -40,6 +39,11 @@ div#page {
     input[type=text] {
       width: 10em;
     }
+  }
+  
+  aside#sidebar:after {
+    content: "";
+    clear: both;
   }
 
   aside#sidebar > section {
