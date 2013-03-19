@@ -41,7 +41,7 @@ Download and install  image_size with the following.
 
 == Licence
 
-This code is free to use under the terms of the Ruby's licence. 
+This code is free to use under the terms of the Ruby's licence.
 
 == Contact
 
