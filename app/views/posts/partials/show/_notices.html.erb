@@ -1,7 +1,7 @@
 <% if post.is_flagged? && !post.is_deleted? && post.flags.any? %>
   <div class="ui-corner-all ui-state-highlight notice">
     <p>This post was flagged for deletion: </p>
-    
+
     <%= post_flag_reasons(post) %>
   </div>
 <% end %>
@@ -15,7 +15,7 @@
 <% if post.is_deleted? && post.flags.any? %>
   <div class="ui-corner-all ui-state-highlight notice">
     <p>This post was deleted for the following reasons: </p>
-    
+
     <%= post_flag_reasons(post) %>
   </div>
 <% end %>
@@ -23,7 +23,7 @@
 <% if post.is_pending? %>
   <div class="ui-corner-all ui-state-highlight notice" id="pending-approval-notice">
     This post is pending approval (<%= link_to "learn more", wiki_pages_path(:title => "help:post_moderation") %>)
-    
+
     <% if CurrentUser.is_janitor? && !post.disapproved_by?(CurrentUser.user) %>
       <div class="quick-mod">
         <% unless post.is_status_locked? %>
@@ -37,7 +37,7 @@
 
 <% if (post.is_flagged? || post.is_deleted?) && post.appeals.any? %>
   <div class="ui-corner-all ui-state-highlight notice">
-    <p>This post was appealed:</p> 
+    <p>This post was appealed:</p>
     <%= post_appeal_reasons(post) %>
   </div>
 <% end %>

@@ -2,9 +2,9 @@
   <div id="a-index">
     <div class="search">
       <%= form_tag(general_search_tag_aliases_path, :method => :get) do %>
-        <%= text_field_tag "query", params[:query] %> 
+        <%= text_field_tag "query", params[:query] %>
         <%= submit_tag "Search Aliases" %>
-        <%= submit_tag "Search Implications" %>  
+        <%= submit_tag "Search Implications" %>
       <% end %>
     </div>
 
@@ -16,7 +16,7 @@
           <th width="10%">Reference</th>
           <th width="10%">Status</th>
           <th width="20%"></th>
-        </tr>        
+        </tr>
       </thead>
       <tbody>
         <% @tag_aliases.each do |tag_alias| %>
@@ -34,18 +34,18 @@
             <td>
               <% if CurrentUser.is_admin? %>
                 <%= link_to "Delete", tag_alias_path(tag_alias), :remote => true, :method => :delete, :confirm => "Are you sure you want to delete this alias?" %>
-                
+
                 <% if tag_alias.is_pending? %>
                   | <%= link_to "Approve", approve_tag_alias_path(tag_alias), :remote => true, :method => :post %>
                 <% end %>
-                
+
                 <% if CurrentUser.is_moderator? %>
                   | <%= link_to "Fix", tag_alias_correction_path(:tag_alias_id => tag_alias.id) %>
                 <% end %>
               <% end %>
             </td>
           </tr>
-        <% end %>        
+        <% end %>
       </tbody>
     </table>
 

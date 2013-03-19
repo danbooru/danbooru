@@ -3,7 +3,7 @@
 
   <%= simple_form_for(@wiki_page) do |f| %>
     <%= f.input :title, :as => :string %>
-    
+
     <%= dtext_field "wiki_page", "body" %>
 
     <% if CurrentUser.is_janitor? %>

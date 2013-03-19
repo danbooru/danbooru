@@ -8,15 +8,15 @@
       <% if !@forum_topic.new_record? %>
         <%= hidden_field_tag "forum_topic[original_post_attributes][topic_id]", @forum_topic.id %>
       <% end %>
-      
+
       <%= dtext_field "forum_post", "body", :input_name => "forum_topic[original_post_attributes][body]", :value => @forum_topic.original_post.body %>
     <% end %>
-  
+
     <% if CurrentUser.is_janitor? %>
       <%= f.input :is_sticky %>
       <%= f.input :is_locked %>
     <% end %>
-  
+
     <%= f.button :submit, "Submit" %>
     <%= dtext_preview_button "forum_post", "body" %>
   <% end %>

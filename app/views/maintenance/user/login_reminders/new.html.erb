@@ -5,16 +5,16 @@
     <p>If you supplied an email address when signing up, <%= Danbooru.config.app_name %> can email you your login information. Password details will not be provided and will not be changed.</p>
 
     <p>If you didn't supply a valid email address, you are out of luck.</p>
-    
+
     <%= form_tag(maintenance_user_login_reminder_path, :class => "simple_form") do %>
       <div class="input email required">
         <label for="user_email" class="required">Email</label>
         <%= email_field(:user, :email) %>
       </div>
-      
+
       <%= submit_tag "Submit" %>
     <% end %>
-    
+
     <%= render "sessions/secondary_links" %>
   </div>
 </div>

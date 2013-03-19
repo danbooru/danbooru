@@ -20,7 +20,7 @@
     </ul>
 
     <p>Enter a reason:</p>
-    
+
     <%= form_tag(post_flags_path(:format => :js), :remote => true) do %>
       <%= hidden_field :post_flag, :post_id %>
       <%= text_area :post_flag, :reason, :size => "40x5" %>

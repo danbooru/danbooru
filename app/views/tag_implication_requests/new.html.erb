@@ -3,7 +3,7 @@
     <h1>Tag Implication Request</h1>
 
     <p>You can request a new tag implication be created. This will create a corresponding forum topic for community review.</p>
-    
+
     <%= form_tag(tag_implication_request_path, :class => "simple_form") do %>
       <div class="input">
         <label>Antecedent</label>
@@ -24,7 +24,7 @@
         <%= submit_tag "Submit" %>
       </div>
     <% end %>
-    
+
     <%= render "tag_implications/secondary_links" %>
   </div>
 </div>

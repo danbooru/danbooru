@@ -3,7 +3,7 @@
     <li><%= link_to "Listing", tag_subscriptions_path %></li>
     <li><%= link_to "New", new_tag_subscription_path %></li>
     <li><%= link_to "Help", wiki_pages_path(:title => "help:tag_subscriptions") %></li>
-    
+
     <% if @tag_subscription && !@tag_subscription.new_record? && @tag_subscription.editable_by?(CurrentUser.user) %>
       <li>|</li>
       <li><%= link_to "Show", tag_subscription_path(@tag_subscription) %></li>

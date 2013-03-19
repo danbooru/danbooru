@@ -1,17 +1,17 @@
 <div id="c-pools">
   <div id="a-show">
     <h1>
-      Pool: 
+      Pool:
       <%= @pool.pretty_name %>
       <% if @pool.is_deleted? %>
         <span class="inactive">(deleted)</span>
       <% end %>
     </h1>
-    
+
     <div id="description">
       <%= format_text(@pool.description) %>
     </div>
-    
+
     <section id="content">
       <%= @post_set.presenter.post_previews_html(self) %>
 

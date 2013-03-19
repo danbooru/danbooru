@@ -8,7 +8,7 @@
   <div class="content">
     <div class="body prose">
       <%= format_text(comment.body) %>
-      
+
       <% if comment.updater_id.present? && (comment.updater_id != comment.creator_id || comment.created_at != comment.updated_at) %>
         <p class="info">Updated by <%= link_to comment.updater_name, user_path(comment.updater_id) %> <%= time_ago_in_words_tagged(comment.updated_at) %></p>
       <% end %>

@@ -2,9 +2,9 @@
   <div id="a-show">
     <aside id="sidebar">
       <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:tags] %>
-      
+
       <%= render_advertisement("vertical") %>
-      
+
       <section id="tag-list">
         <%= @post.presenter.split_tag_list_html(self) %>
       </section>
@@ -13,7 +13,7 @@
         <h1>Information</h1>
         <%= render "posts/partials/show/information", :post => @post %>
       </section>
-      
+
       <section>
         <h1>Options</h1>
         <%= render "posts/partials/show/options", :post => @post %>
@@ -33,11 +33,11 @@
       <% if @post.presenter.has_nav_links?(self) %>
         <%= render "posts/partials/show/nav_links", :post => @post, :position => "top" %>
       <% end %>
-      
+
       <%= render "posts/partials/show/notices", :post => @post %>
-      
+
       <%= render_advertisement("horizontal") %>
-      
+
       <section id="image-container">
         <div id="note-container"></div>
         <%= @post.presenter.image_html(self) %>
@@ -46,7 +46,7 @@
       <% if @post.presenter.has_nav_links?(self) %>
         <%= render "posts/partials/show/nav_links", :post => @post, :position => "bottom" %>
       <% end %>
-      
+
       <menu id="post-sections">
         <li><a href="#comments">Comments</a></li>
         <% if Danbooru.config.can_user_see_post?(CurrentUser.user, @post) %>
@@ -68,11 +68,11 @@
           <%= render "posts/partials/show/edit", :post => @post %>
         </section>
       <% end %>
-      
+
       <section id="share" style="display: none;">
         <%= render "posts/partials/show/share", :post => @post %>
       </section>
-      
+
       <%= render_rss_advertisement("long", @post.rating == "e") %>
     </section>
   </div>
@@ -84,7 +84,7 @@
   <div id="appeal-dialog" title="Appeal post" style="display: none;">
     <%= render "post_appeals/new" %>
   </div>
-  
+
   <div id="add-to-pool-dialog" title="Add to pool" style="display: none;">
     <%= render "pool_elements/new" %>
   </div>

@@ -13,7 +13,7 @@
         <% @pools.each do |pool| %>
           <%= content_tag(:tr, :id => "pool-#{pool.id}") do %>
             <td>
-              
+
             </td>
             <td>
               <%= link_to h(pool.pretty_name), pool_path(pool) %>

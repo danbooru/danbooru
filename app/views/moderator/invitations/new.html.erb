@@ -1,18 +1,18 @@
 <div id="c-moderator-invitations">
   <div id="a-new">
     <h1>New Invitation</h1>
-    
+
     <%= form_tag(moderator_invitations_path, :class => "simple_form") do %>
       <div class="input">
         <label>User</label>
         <%= text_field :invitation, :user_name, :value => params[:invitation][:name] %>
       </div>
-      
+
       <div class="input">
         <label>Level</label>
         <%= level_select %>
       </div>
-      
+
       <%= submit_tag %>
     <% end %>
   </div>

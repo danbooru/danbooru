@@ -2,7 +2,7 @@
   <div id="a-search">
     <%= form_tag(users_path, :method => :get, :class => "simple_form") do %>
       <%= search_field "name_matches", :label => "Name" %>
-      
+
       <div class="input">
         <label for="search_level">Level</label>
         <%= select("search", "level", [""] + User.level_hash.to_a) %>
@@ -12,12 +12,12 @@
         <label for="search_min_level">Min Level</label>
         <%= select("search", "min_level", [""] + User.level_hash.to_a) %>
       </div>
-      
+
       <div class="input">
         <label for="search_order">Order</label>
         <%= select("search", "order", [["Join date", "date"], ["Name", "name"], ["Upload count", "post_upload_count"], ["Note count", "note_count"], ["Post update count", "post_update_count"]]) %>
       </div>
-      
+
       <%= submit_tag "Search" %>
     <% end %>
   </div>

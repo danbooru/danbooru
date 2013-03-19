@@ -18,11 +18,11 @@
               <% if topic.is_sticky? %>
                 <span class="sticky">Sticky:</span>
               <% end %>
-              
+
               <% if topic.updated_at > (CurrentUser.last_forum_read_at || Time.now) %>
                 <span class="new">NEW</span>
               <% end %>
-              
+
               <%= link_to topic.title, forum_topic_path(topic) %>
 
               <% if topic.response_count > Danbooru.config.posts_per_page %>
@@ -40,7 +40,7 @@
         <% end %>
       </tbody>
     </table>
-    
+
     <%= numbered_paginator(@forum_topics) %>
   </div>
 </div>

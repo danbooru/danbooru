@@ -1,7 +1,7 @@
 <div id="c-uploads">
   <div id="a-new">
     <h1>Upload</h1>
-    
+
     <div id="upload-guide-notice">
       <p>Before uploading, please read the <%= link_to "how to upload guide", wiki_pages_path(:title => "howto:upload") %>.</p>
     </div>
@@ -9,9 +9,9 @@
     <%= render "image" %>
     <%= render "post", :post => @post %>
     <%= render "sources/info", :source => @source %>
-    
+
     <%= error_messages_for "upload" %>
-    
+
     <%= form_for(@upload, :html => {:multipart => true, :class => "simple_form", :id => 'form'}) do |f| %>
       <div class="input">
         <%= f.label :file %>
@@ -24,10 +24,10 @@
         <%= button_tag "Similar", :id => "similar-button", :type => "button" %>
         <%= button_tag "Artist", :id => "find-artist-button", :type => "button" %>
       </div>
-      
+
       <div class="input">
         <%= f.label :rating_q, "Rating" %>
-        
+
         <fieldset class="ratings">
           <%= f.radio_button :rating, :e %>
           <%= f.label :rating_e, "Explicit", :title => "Hardcore porn, visible genitals, gore" %>
@@ -35,7 +35,7 @@
           <%= f.radio_button :rating, :q %>
           <%= f.label :rating_q, "Questionable", :title => "Nudity, anything erotic" %>
 
-          <%= f.radio_button :rating, :s %>          
+          <%= f.radio_button :rating, :s %>
           <%= f.label :rating_s, "Safe", :title => "Everything else" %>
         </fieldset>
       </div>
@@ -44,19 +44,19 @@
         <%= f.label :parent_id, "Parent ID" %>
         <%= f.text_field :parent_id %>
       </div>
-      
+
       <div class="input">
         <div>
           <%= f.label :tag_string, "Tags" %>
           <%= f.text_area :tag_string, :size => "60x4" %>
         </div>
-        
+
         <%= button_tag "Related tags", :id => "related-tags-button", :type => "button" %>
         <%= button_tag "Artists", :id => "related-artists-button", :type => "button" %>
         <%= button_tag "Characters", :id => "related-characters-button", :type => "button" %>
         <%= button_tag "Copyrights", :id => "related-copyrights-button", :type => "button" %>
       </div>
-      
+
       <div class="input">
         <%= submit_tag "Submit", :class => "large" %>
       </div>

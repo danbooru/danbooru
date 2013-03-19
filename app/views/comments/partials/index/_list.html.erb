@@ -18,9 +18,9 @@
       <%= render :partial => "comments/partials/show/comment", :collection => comments %>
     <% end %>
   </div>
-  
+
   <div class="clearfix"></div>
-  
+
   <div class="new-comment">
     <p><%= link_to "Post comment", new_comment_path, :class => "expand-comment-response" %></p>
     <%= render "comments/partials/new/form", :post => post %>

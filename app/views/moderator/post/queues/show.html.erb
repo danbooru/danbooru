@@ -9,7 +9,7 @@
 
     <div>
       <h1>Moderation Queue</h1>
-      
+
       <div id="moderation-guideline">
         <h1>Deletion Guidelines</h1>
         <p>
@@ -37,7 +37,7 @@
               <li><strong>Score</strong>: <%= post.score %></li>
               <li>
                 <strong>Size:</strong>
-                <%= number_to_human_size(post.file_size) %> 
+                <%= number_to_human_size(post.file_size) %>
                 <% if post.is_image? %>
                   (<%= post.image_width %>x<%= post.image_height %>)
                 <% end %>
@@ -56,7 +56,7 @@
         </article>
       <% end %>
     </div>
-    
+
     <%= numbered_paginator(@posts) %>
   </div>
 </div>

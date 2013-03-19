@@ -1,18 +1,18 @@
 <div id="c-wiki-pages">
   <div id="a-new">
     <%= render "sidebar" %>
-    
+
     <section id="content">
       <h1>New Wiki Page</h1>
       <%= render "form" %>
-      
+
       <div id="wiki-page-posts">
         <h2>Posts</h2>
         <%= @wiki_page.post_set.presenter.post_previews_html(self) %>
       </div>
-      
+
       <div class="clearfix"></div>
-      
+
     </section>
   </div>
 </div>

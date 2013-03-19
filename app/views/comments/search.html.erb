@@ -1,10 +1,10 @@
 <div id="c-comments">
   <div id="a-search">
     <h1>Search Comments</h1>
-    
+
     <%= form_tag(comments_path, :method => :get, :class => "simple_form") do %>
       <%= hidden_field_tag "group_by", "comment" %>
-      
+
       <%= search_field "body_matches", :label => "Body" %>
       <%= search_field "creator_name", :label => "User" %>
       <%= search_field "post_tags_match", :label => "Tags", :hint => "Meta-tags not supported" %>

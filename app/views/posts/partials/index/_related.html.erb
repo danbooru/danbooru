@@ -4,7 +4,7 @@
     <% if @post_set.has_deleted? %>
       <li><%= link_to "Deleted posts", posts_path(:tags => "#{params[:tags]} status:deleted") %></li>
     <% end %>
-    
+
     <% if @post_set.is_tag_subscription? %>
       <li><%= link_to "Edit subscriptions", tag_subscriptions_path %></li>
     <% end %>

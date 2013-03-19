@@ -1,7 +1,7 @@
 <div id="c-maintenance-user-password-resets">
   <div id="a-edit">
     <h1>Reset Password</h1>
-    
+
     <% if @nonce %>
       <%= form_tag(maintenance_user_password_reset_path, :method => :put) do %>
         <%= hidden_field_tag :email, params[:email] %>
@@ -12,7 +12,7 @@
     <% else %>
       <p>Invalid key</p>
     <% end %>
-    
+
     <%= render "sessions/secondary_links" %>
   </div>
 </div>

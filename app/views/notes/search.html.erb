@@ -1,7 +1,7 @@
 <div id="c-notes">
   <div id="a-search">
     <h1>Search Notes</h1>
-    
+
     <%= form_tag(notes_path, :method => :get, :class => "simple_form") do %>
       <%= hidden_field_tag "group_by", "note" %>
       <%= search_field "body_matches", :label => "Body" %>

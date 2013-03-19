@@ -2,8 +2,8 @@
   <div id="a-index">
     <div class="search">
       <%= form_tag(general_search_tag_aliases_path, :method => :get) do %>
-        <%= text_field_tag "query", params[:query] %> 
-        <%= submit_tag "Search Implications" %>  
+        <%= text_field_tag "query", params[:query] %>
+        <%= submit_tag "Search Implications" %>
         <%= submit_tag "Search Aliases" %>
       <% end %>
     </div>
@@ -16,7 +16,7 @@
           <th width="10%">Reference</th>
           <th width="10%">Status</th>
           <th width="15%"></th>
-        </tr>        
+        </tr>
       </thead>
       <tbody>
         <% @tag_implications.each do |tag_implication| %>
@@ -38,7 +38,7 @@
               <% end %>
             </td>
           </tr>
-        <% end %>        
+        <% end %>
       </tbody>
     </table>
 

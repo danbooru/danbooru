@@ -1,18 +1,18 @@
 <div id="c-moderator-tags">
   <div id="a-edit">
     <h1>Mass Edit</h1>
-    
+
     <%= form_tag(moderator_tag_path, :method => :put, :class => "simple_form") do %>
       <div class="input">
         <label>Antecedent</label>
         <%= text_field :tag, :antecedent, :value => params[:antecedent] %>
       </div>
-      
+
       <div class="input">
         <label>Consequent</label>
         <%= text_field :tag, :consequent, :value => params[:consequent] %>
       </div>
-      
+
       <div class="input">
         <%= submit_tag "Submit" %>
       </div>

@@ -7,7 +7,7 @@
     <% if @wiki_page %>
       <li>|</li>
       <li><%= link_to "Posts (#{Post.fast_count(@wiki_page.title)})", posts_path(:tags => @wiki_page.title) %></li>
-      <% unless @wiki_page.new_record? %> 
+      <% unless @wiki_page.new_record? %>
         <li><%= link_to "History", wiki_page_versions_path(:search => {:wiki_page_id => @wiki_page.id}) %></li>
         <% if CurrentUser.is_member? %>
           <li><%= link_to "Edit", edit_wiki_page_path(@wiki_page) %></li>

@@ -1,7 +1,7 @@
 <div id="c-artists">
   <div id="a-search">
     <h1>Search Artists</h1>
-    
+
     <div id="search-form">
       <%= form_tag(artists_path, :method => :get, :class => "simple_form") do %>
         <div class="input">
@@ -9,7 +9,7 @@
           <%= text_field "search", "name" %>
           <p class="hint">You can search on any name or URL</p>
         </div>
-        
+
         <div class="input">
           <label>Sort</label>
           <%= select "search", "sort", ["Date", "Name"] %>

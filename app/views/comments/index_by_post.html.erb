@@ -1,11 +1,11 @@
 <div id="c-comments">
   <div id="a-index">
     <h1>Comments</h1>
-    
+
     <% if @posts.empty? %>
       <%= render "post_sets/blank" %>
     <% end %>
-    
+
     <% @posts.select {|x| Danbooru.config.can_user_see_post?(CurrentUser.user, x)}.each do |post| %>
       <div class="post post-preview" data-tags="<%= post.tag_string %>" data-uploader="<%= post.uploader_name %>" data-rating="<%= post.rating %>" data-flags="<%= post.status %>" data-score="<%= post.score %>" data-parent-id="<%= post.parent_id %>" data-has-children="<%= post.has_children? %>" data-id="<%= post.id %>" data-width="<%= post.image_width %>" data-height="<%= post.image_height %>">
         <div class="preview">
@@ -15,7 +15,7 @@
         <div class="clearfix"></div>
       </div>
     <% end %>
-    
+
     <%= numbered_paginator(@posts) %>
   </div>
 </div>

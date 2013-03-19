@@ -6,7 +6,7 @@
     <li>Approver: <%= link_to(post.approver.name, user_path(post.approver_id)) %></li>
   <% end %>
   <li>
-    Size: <%= link_to_if Danbooru.config.can_user_see_post?(CurrentUser.user, post), number_to_human_size(post.file_size), post.file_url %> 
+    Size: <%= link_to_if Danbooru.config.can_user_see_post?(CurrentUser.user, post), number_to_human_size(post.file_size), post.file_url %>
     <% if post.is_image? %>
       (<%= post.image_width %>x<%= post.image_height %>)
     <% end %>
@@ -20,15 +20,15 @@
     <% if post.is_pending? %>
       Pending
     <% end %>
-    
+
     <% if post.is_deleted? %>
       Deleted
     <% end %>
-    
+
     <% if post.is_flagged? %>
       Flagged
     <% end %>
-    
+
     <% if !post.is_pending? && !post.is_deleted? %>
       Active
     <% end %>
