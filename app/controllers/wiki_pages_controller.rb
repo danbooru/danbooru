@@ -1,7 +1,7 @@
 class WikiPagesController < ApplicationController
   respond_to :html, :xml, :json, :js
   before_filter :member_only, :except => [:index, :show, :show_or_new]
-  before_filter :moderator_only, :only => [:destroy]
+  before_filter :janitor_only, :only => [:destroy]
   before_filter :normalize_search_params, :only => [:index]
   rescue_from ActiveRecord::StatementInvalid, :with => :rescue_exception
 
@@ -30,7 +30,7 @@ class WikiPagesController < ApplicationController
     if params[:id] =~ /[a-zA-Z]/
       @wiki_page = WikiPage.find_by_title(params[:id])
     else
-      @wiki_page = WikiPage.find(params[:id])
+      @wiki_page = WikiPage.find_by_id(params[:id])
     end
     respond_with(@wiki_page)
   end
