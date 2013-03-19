@@ -14,12 +14,13 @@
     this.common_bind("#related-artists-button", "artist");
     this.common_bind("#related-characters-button", "character");
     this.common_bind("#related-copyrights-button", "copyright");
+    $("#find-artist-button").click(Danbooru.RelatedTag.find_artist);
     if ($("#c-uploads").length) {
-      if ($("#upload_source").val().match(/pixiv\.net/)){
+      if ($("#upload_source").val().match(/pixiv\.net/)) {
+        Danbooru.RelatedTag.auto_artist_find = true;
         $("#find-artist-button").trigger("click");
       }
     }
-    $("#find-artist-button").click(Danbooru.RelatedTag.find_artist);
   }
   
   Danbooru.RelatedTag.common_bind = function(button_name, category) {
@@ -207,9 +208,10 @@
       }
       var $div = $("<div/>").addClass("artist");
       var $ul = $("<ul/>");
+      var $link = null;
       $ul.append(
         $("<li/>").append("Artist: ").append(
-          $("<a/>").attr("href", "/artists/" + json.id).html(json.name).click(Danbooru.RelatedTag.toggle_tag)
+          $link = $("<a/>").attr("href", "/artists/" + json.id).html(json.name).click(Danbooru.RelatedTag.toggle_tag)
         )
       );
       if (json.other_names.length > 0) {
@@ -220,6 +222,7 @@
       });
       $div.append($ul);
       $dest.append($div);
+      $link.trigger("click");
     });
   }
 })();

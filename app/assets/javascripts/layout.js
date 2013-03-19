@@ -1,6 +1,11 @@
 $(function() {
   var $sidebar = $("#sidebar");
   var $content = $("#content");
+  
+  if (!$sidebar.length || !$content.length) {
+    return;
+  }
+  
   var sidebar_offset = $sidebar.offset().top + $sidebar.height();
   var content_offset = $content.offset().top + $content.height();
   var offset = null;

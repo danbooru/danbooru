@@ -10,7 +10,9 @@
       this.initialize_image();
       this.initialize_info();
       this.initialize_similar();
-      $("#related-tags-button").trigger("click");
+      if (!Danbooru.RelatedTag.auto_artist_find) {
+        $("#related-tags-button").trigger("click");
+      }
     }
   }
   
