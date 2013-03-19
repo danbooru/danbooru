@@ -11,7 +11,9 @@
       </ul>
       
       <h3>Body</h3>
-      <%= format_text(@dmail.body) %>
+      <div class="prose">
+        <%= format_text(@dmail.body) %>
+      </div>
 
       <p>
         <%= link_to "Respond", new_dmail_path(:respond_to_id => @dmail) %>
