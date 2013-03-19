@@ -2,7 +2,7 @@
 
 div#related-tags-container, div#artist-tags-container {
   padding-right: 2em;
-  
+
   h1 {
     font-size: $h3_size;
   }
@@ -14,11 +14,11 @@ div#artist-tags {
   margin-bottom: 1em;
   padding: 1em;
   background: #EEE;
-  
+
   div.artist {
     margin-bottom: 1em;
   }
-  
+
   div.artist:last-child {
     margin-bottom: 0;
   }
@@ -30,24 +30,24 @@ div#related-tags {
   margin-bottom: 1em;
   padding: 1em;
   background: #EEE;
-  
+
   div.tag-column {
     max-width: 15em;
     margin-right: 2em;
     float: left;
-    
+
     ul {
       margin: 0;
-      
+
       li {
         em {
           font-weight: bold;
         }
-        
+
         a {
           min-width: 3em;
         }
-        
+
         a.selected {
           background-color: $link_color;
           color: white;

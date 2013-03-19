@@ -5,7 +5,7 @@ div#c-artists {
     font-weight: bold;
     color: #A00;
   }
-  
+
   div#a-banned {
   }
 
@@ -13,25 +13,25 @@ div#c-artists {
     p.legend {
       margin-bottom: 2em;
       font-size: 0.8em;
-      font-style: italic;    
+      font-style: italic;
     }
   }
-  
+
   div#a-edit, div#a-new {
     textarea {
       height: 5em;
     }
   }
-  
-  div.recent-posts { 
+
+  div.recent-posts {
     margin-top: 1em;
-    
+
     h1 {
       font-size: $h2_size;
       margin: 0;
     }
   }
-  
+
   .hint {
     display: block;
   }

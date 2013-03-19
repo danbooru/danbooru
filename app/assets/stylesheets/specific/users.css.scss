@@ -6,61 +6,61 @@ div#c-users {
       h2, h3 {
         color: #333;
       }
-      
+
       margin-bottom: 2em;
     }
-    
+
     /* clearfix hacks */
     div.box:before, div.box:after {
       content: "";
       display: table;
     }
-    
+
     div.box:after {
       clear: both;
     }
-    
+
     table.user-statistics {
       tr {
         height: 1.75em;
       }
-      
+
       th {
         width: 15%;
         text-align: right;
         padding-right: 1em;
         vertical-align: top;
       }
-      
+
       td {
         width: 85%;
         vertical-align: top;
       }
-      
+
       p {
         margin-bottom: 0.5em;
       }
     }
   }
-  
+
   div#a-edit {
     h1 {
       margin-bottom: 0.5em;
     }
-    
+
     div.input {
       margin-bottom: 2em;
     }
-    
+
     div.input span.hint {
       display: block;
       max-width: 30em;
     }
   }
-  
+
   div#a-new {
     max-width: 60em;
-    
+
     p {
       font-size: 1.2em;
       margin-bottom: 1em;
@@ -73,50 +73,50 @@ div#c-users {
       text-align: center;
       display: block;
     }
-    
+
     div#p2 ul {
       margin-bottom: 2em;
     }
   }
-  
+
   div#a-upgrade-information {
     max-width: 40em;
     font-size: 1.2em;
-    
+
     div#feature-comparison {
       overflow: hidden;
       margin-bottom: 1em;
-      
+
       table {
         width: 100%;
-        
+
         colgroup {
           width: 10em;
         }
-                
+
         colgroup#basic {
         }
-        
+
         colgroup#gold  {
           background-color: #FFF380;
         }
-        
+
         colgroup#platinum {
           background-color: #eee;
         }
-        
+
         td, th {
           text-align: center;
           vertical-align: top;
           padding: 0.5em 0;
         }
-        
+
         tbody {
           tr {
             border-bottom: 2px solid black;
           }
         }
-        
+
         p.cost-footnote {
           font-size: 80%;
           color: gray;

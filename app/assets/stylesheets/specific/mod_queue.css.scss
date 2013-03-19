@@ -5,7 +5,7 @@ div#c-moderator-post-queues {
     margin-bottom: 4em;
     overflow: hidden;
   }
-  
+
   article.post-has-dup {
     background: rgb(255, 255, 100);
   }
@@ -13,26 +13,26 @@ div#c-moderator-post-queues {
   article.post-neg-score {
     background: rgb(255, 230, 230);
   }
-  
+
   article.post-pos-score {
     background: rgb(230, 255, 230);
   }
-  
+
   aside {
     float: left;
     width: 220px;
     text-align: right;
     padding-right: 20px;
   }
-  
+
   section {
     float: left;
     width: 600px;
   }
-  
+
   div#moderation-guideline {
     width: 900px;
-    
+
     h1 {
       font-size: $h2_size;
     }

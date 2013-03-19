@@ -4,25 +4,25 @@ table.striped {
   p {
     margin: 0;
   }
-  
+
   td, th {
     padding: 4px 6px;
   }
-  
+
   tbody {
     tr {
       border-bottom: 1px solid #CCC;
-      
+
       &:hover {
         background-color: $highlight_color;
       }
     }
   }
-  
+
   .number {
     text-align: right;
   }
-  
+
   thead {
     tr {
       border-bottom: 2px solid #666;
@@ -34,7 +34,7 @@ table.striped {
       color: #333;
     }
   }
-  
+
   tr.even {
     background-color: #FAFAFA;
   }

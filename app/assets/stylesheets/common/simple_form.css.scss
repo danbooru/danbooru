@@ -1,6 +1,6 @@
 form.simple_form {
   margin: 0 0 1em 0;
-  
+
   div.input.boolean {
     label {
       display: inline;
@@ -8,32 +8,32 @@ form.simple_form {
       vertical-align: middle;
     }
   }
-  
+
   div.input {
     margin-bottom: 1em;
-    
+
     input[type=text], input[type=file], input[type=password], input[type=email] {
       width: 20em;
     }
-    
+
     textarea {
       width: 100%;
       font-size: 1.2em;
     }
-    
+
     label {
       display: block;
       cursor: pointer;
       font-weight: bold;
       line-height: 1.5em;
     }
-    
+
     fieldset {
       border: none;
       display: inline;
       margin: 0;
       padding: 0;
-      
+
       label {
         font-weight: normal;
         width: auto;

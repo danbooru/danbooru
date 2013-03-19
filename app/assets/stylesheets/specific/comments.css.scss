@@ -4,7 +4,7 @@ div.comments-for-post {
   div.notices {
     margin: 1em 0;
   }
-  
+
   p.info {
     color: #AAA;
     font-style: italic;
@@ -14,24 +14,24 @@ div.comments-for-post {
   div.list-of-comments {
     article.comment {
       margin-bottom: 2em;
-      
+
       div.author {
         width: 12em;
         float: left;
         overflow: hidden;
         margin-right: 2em;
-        word-wrap: break-word; 
-        
+        word-wrap: break-word;
+
         h1 {
           display: block;
           font-size: $h3_size;
         }
       }
-      
+
       div.content {
         width: 40em;
         float: left;
-        
+
         menu {
           li {
             margin-right: 1em;
@@ -39,14 +39,14 @@ div.comments-for-post {
         }
       }
     }
-    
+
     article.comment.below-threshold {
       -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=30);
       filter: alpha(opacity=30);
       zoom: 1;
       opacity: 0.3;
     }
-    
+
     article.comment.below-threshold:hover {
       -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
       filter: alpha(opacity=100);
@@ -54,7 +54,7 @@ div.comments-for-post {
       opacity: 1.0;
     }
   }
-  
+
   div.comment-preview {
     margin-bottom: 2em;
   }
@@ -70,18 +70,18 @@ div#c-comments {
       strong, time {
         margin-right: 0.3em;
       }
-      
+
       div.list-of-tags {
         a {
           margin-right: 0.5em;
         }
       }
-      
+
       div.notices {
         margin: 1em 0;
       }
     }
-    
+
     div.preview {
       float: left;
       width: 154px;
@@ -90,7 +90,7 @@ div#c-comments {
       overflow: hidden;
       text-align: center;
     }
-    
+
     div.post {
       margin-bottom: 4em;
 
@@ -99,7 +99,7 @@ div#c-comments {
         width: 55em;
       }
     }
-    
+
     div.post.blacklisted {
       display: none;
     }

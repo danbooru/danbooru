@@ -3,16 +3,16 @@
 div#c-pool-elements {
   div#a-new {
     font-size: 0.8em;
-    
+
     form {
       margin-bottom: 1em;
     }
-    
+
     li {
       margin-left: 1em;
       cursor: pointer;
     }
-    
+
     h1 {
       font-size: $h3_size;
     }
@@ -23,15 +23,15 @@ div#c-pools {
   h1 {
     font-size: $h2_size;
   }
-  
+
   p {
     width: 30em;
   }
-  
+
   textarea {
     height: 10em;
   }
-  
+
   span.inactive {
     color: #AAA;
   }
@@ -41,7 +41,7 @@ div#c-pool-orders {
   h1 {
     font-size: $h2_size;
   }
-  
+
   div#a-edit {
     ul.ui-sortable {
       list-style-type: none;

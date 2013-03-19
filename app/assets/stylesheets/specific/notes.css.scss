@@ -1,7 +1,7 @@
 div#note-container {
   position: absolute;
   z-index: 500;
-  
+
   div.note-body {
     position: absolute;
     border: 1px solid black;
@@ -13,29 +13,29 @@ div#note-container {
     padding: 4px;
     z-index: 1500;
     overflow: auto;
-    
+
     h1, h2, h3, h4, h5, h6, a, span, div, blockquote, br, p, ul, li, ol, em, strong, small, big, b, i, font, u, s, code, center {
       line-height: normal;
-    } 
-    
+    }
+
     p.tn {
       font-size: 0.8em;
       color: gray;
     }
-    
+
     b, strong {
       font-weight: bold;
     }
-    
+
     i, em {
       font-style: italic;
     }
-    
+
     small {
       font-size: 0.8em;
     }
   }
-  
+
   div.note-box {
     position: absolute;
     border: 1px solid white;
@@ -45,12 +45,12 @@ div#note-container {
     height: 100px;
     cursor: move;
     background: transparent;
-    
+
     div.note-box-inner-border {
       border: 1px solid black;
       background: #FFE;
     }
-    
+
     div.note-box-inner-border.unsaved {
       border: 1px solid red;
     }

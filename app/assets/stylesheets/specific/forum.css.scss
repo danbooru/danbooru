@@ -7,20 +7,20 @@ div.list-of-forum-posts {
 
   article {
     margin-bottom: 3em;
-    
+
     div.author {
       width: 12em;
       float: left;
       margin-right: 2em;
       word-wrap: break-word;
     }
-    
+
     div.content {
       margin-left: 14em;
-      
+
       menu {
         margin-top: 0.5em;
-        
+
         li {
           margin-right: 1em;
         }
@@ -29,21 +29,21 @@ div.list-of-forum-posts {
   }
 }
 
-div.list-of-forum-posts+p { 
-  margin-left: 14em; 
+div.list-of-forum-posts+p {
+  margin-left: 14em;
 }
 
 div#c-forum-topics {
   div.single-forum-post {
   }
-  
+
   div#a-show {
   }
-  
+
   span.info {
     color: #AAA;
   }
-  
+
   span.new {
     font-size: 80%;
     color: red;
@@ -53,7 +53,7 @@ div#c-forum-topics {
   a.last-page {
     color: #666;
   }
-  
+
   span.locked-topic {
     color: #666;
   }

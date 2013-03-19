@@ -6,19 +6,19 @@ div.prose {
   h1, h2, h3 {
     line-height: 1em;
   }
-  
+
   h1 {
-    padding: $h1_padding; 
+    padding: $h1_padding;
   }
 
-  h2 { 
-    padding: $h2_padding; 
+  h2 {
+    padding: $h2_padding;
   }
 
-  h3 { 
-    padding: $h3_padding; 
+  h3 {
+    padding: $h3_padding;
   }
-  
+
   h4, h5, h6 {
     padding: 0;
   }
@@ -26,12 +26,12 @@ div.prose {
   ul {
     margin-left: 1em;
     margin-bottom: 1em;
-    
+
     ul {
       margin-bottom: 0;
     }
   }
-  
+
   li {
     list-style-type: disc;
   }

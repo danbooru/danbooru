@@ -48,16 +48,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: $h1_size; 
+  font-size: $h1_size;
 }
 
-h2 { 
-  font-size: $h2_size; 
+h2 {
+  font-size: $h2_size;
 }
 
 h3, h4, h5, h6 {
   font-weight: bold;
-  font-size: $h3_size; 
+  font-size: $h3_size;
 }
 
 fieldset {
@@ -88,17 +88,17 @@ legend {
 menu {
   margin: 0;
   padding: 0;
-  
+
   ul {
     margin: 0;
     padding: 0;
   }
-  
+
   li {
     margin: 0;
     padding: 0 0.2em;
     list-style-type: none;
-    display: inline;    
+    display: inline;
   }
 }
 
