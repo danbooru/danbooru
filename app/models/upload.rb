@@ -3,7 +3,7 @@ require "tmpdir"
 
 class Upload < ActiveRecord::Base
   class Error < Exception ; end
-  
+
   attr_accessor :file, :image_width, :image_height, :file_ext, :md5, :file_size
   belongs_to :uploader, :class_name => "User"
   belongs_to :post
@@ -13,7 +13,7 @@ class Upload < ActiveRecord::Base
   after_destroy :delete_temp_file
   validate :uploader_is_not_limited
   validate :file_or_source_is_present, :on => :create
-    
+
   module ValidationMethods
     def uploader_is_not_limited
       if !uploader.can_upload?
@@ -37,34 +37,34 @@ class Upload < ActiveRecord::Base
     def validate_md5_uniqueness
       md5_post = Post.find_by_md5(md5)
       if md5_post
-        merge_tags(md5_post) 
+        merge_tags(md5_post)
         raise "duplicate: #{md5_post.id}"
       end
     end
-    
+
     def validate_file_exists
       unless file_path && File.exists?(file_path)
         raise "file does not exist"
       end
     end
-    
+
     def validate_file_content_type
       unless is_valid_content_type?
         raise "invalid content type (#{file_ext} not allowed)"
       end
     end
-    
+
     def validate_md5_confirmation
       if !md5_confirmation.blank? && md5_confirmation != md5
         raise "md5 mismatch"
       end
     end
   end
-  
+
   module ConversionMethods
     def process! force=false
       return if !force && status =~ /processing|completed|error/
-      
+
       CurrentUser.scoped(uploader, uploader_ip_addr) do
         update_attribute(:status, "processing")
         if is_downloadable?
@@ -79,7 +79,7 @@ class Upload < ActiveRecord::Base
         calculate_file_size(file_path)
         add_file_size_tags!(file_path)
         if has_dimensions?
-          calculate_dimensions(file_path) 
+          calculate_dimensions(file_path)
           add_dimension_tags!
         end
         generate_resizes(file_path)
@@ -118,18 +118,18 @@ class Upload < ActiveRecord::Base
         end
       end
     end
-    
+
     def merge_tags(post)
       post.tag_string += " #{tag_string}"
       post.save
     end
   end
-  
+
   module FileMethods
     def delete_temp_file
       FileUtils.rm_f(temp_file_path)
     end
-    
+
     def move_file
       FileUtils.mv(file_path, md5_file_path)
     end
@@ -142,7 +142,7 @@ class Upload < ActiveRecord::Base
     def calculate_hash(source_path)
       self.md5 = Digest::MD5.file(source_path).hexdigest
     end
-    
+
     def is_image?
       ["jpg", "gif", "png"].include?(file_ext)
     end
@@ -176,10 +176,10 @@ class Upload < ActiveRecord::Base
       self.image_width = image_size.get_width
       self.image_height = image_size.get_height
     end
-    
+
     def add_dimension_tags!
       return if !Danbooru.config.enable_dimension_autotagging
-      
+
       if image_width >= 10_000 || image_height >= 10_000
         self.tag_string = "#{tag_string} incredibly_absurdres".strip
       elsif image_width >= 3200 || image_height >= 2400
@@ -190,37 +190,37 @@ class Upload < ActiveRecord::Base
         self.tag_string = "#{tag_string} lowres".strip
       end
     end
-    
+
     # Does this file have image dimensions?
     def has_dimensions?
       %w(jpg gif png swf).include?(file_ext)
     end
   end
-  
+
   module ContentTypeMethods
     def is_valid_content_type?
       file_ext =~ /jpg|gif|png|swf/
     end
-    
+
     def content_type_to_file_ext(content_type)
       case content_type
       when "image/jpeg"
         "jpg"
-        
+
       when "image/gif"
         "gif"
-        
+
       when "image/png"
         "png"
-        
+
       when "application/x-shockwave-flash"
         "swf"
-        
+
       else
         "bin"
       end
     end
-    
+
     # Converts a content type string to a file extension
     def file_ext_to_content_type(file_ext)
       case file_ext
@@ -247,12 +247,12 @@ class Upload < ActiveRecord::Base
       prefix = Rails.env == "test" ? "test." : ""
       "#{Rails.root}/public/data/#{prefix}#{md5}.#{file_ext}"
     end
-    
+
     def ssd_file_path
       prefix = Rails.env == "test" ? "test." : ""
       "#{Danbooru.config.ssd_path}/public/data/preview/#{prefix}#{md5}.jpg"
     end
-    
+
     def resized_file_path_for(width)
       prefix = Rails.env == "test" ? "test." : ""
 
@@ -264,12 +264,12 @@ class Upload < ActiveRecord::Base
         "#{Rails.root}/public/data/sample/#{Danbooru.config.large_image_prefix}#{prefix}#{md5}.jpg"
       end
     end
-    
+
     def temp_file_path
       @temp_file_path ||= File.join(Rails.root, "tmp", "upload_#{Time.now.to_f}.#{Process.pid}")
     end
   end
-  
+
   module DownloaderMethods
     # Determines whether the source is downloadable
     def is_downloadable?
@@ -296,7 +296,7 @@ class Upload < ActiveRecord::Base
       if file.respond_to?(:tempfile) && file.tempfile
         FileUtils.cp(file.tempfile.path, file_path)
       else
-        File.open(file_path, 'wb') do |out| 
+        File.open(file_path, 'wb') do |out|
           out.write(file.read)
         end
       end
@@ -305,69 +305,69 @@ class Upload < ActiveRecord::Base
       self.file_ext = content_type_to_file_ext(content_type)
     end
   end
-  
+
   module StatusMethods
     def initialize_status
       self.status = "pending"
     end
-    
+
     def is_pending?
       status == "pending"
     end
-    
+
     def is_processing?
       status == "processing"
     end
-    
+
     def is_completed?
       status == "completed"
     end
-    
+
     def is_duplicate?
       status =~ /duplicate/
     end
-    
+
     def duplicate_post_id
       @duplicate_post_id ||= status[/duplicate: (\d+)/, 1]
     end
   end
-  
+
   module UploaderMethods
     def initialize_uploader
       self.uploader_id = CurrentUser.user.id
       self.uploader_ip_addr = CurrentUser.ip_addr
     end
   end
-  
+
   module SearchMethods
     def uploaded_by(user_id)
       where("uploader_id = ?", user_id)
     end
-    
+
     def pending
       where(:status => "pending")
     end
-    
+
     def search(params)
       q = scoped
       return q if params.blank?
-      
+
       if params[:uploader_id].present?
         q = q.uploaded_by(params[:uploader_id].to_i)
       end
-      
+
       if params[:uploader_name].present?
         q = q.where("uploader_id = (select _.id from users _ where lower(_.name) = ?)", params[:uploader_name].downcase)
       end
-      
+
       if params[:source].present?
         q = q.where("source = ?", params[:source])
       end
-      
+
       q
     end
   end
-  
+
   module ApiMethods
     def serializable_hash(options = {})
       options ||= {}
@@ -380,7 +380,7 @@ class Upload < ActiveRecord::Base
       hash = super(options)
       hash
     end
-    
+
     def to_xml(options = {}, &block)
       options ||= {}
       options[:procs] ||= []
@@ -388,7 +388,7 @@ class Upload < ActiveRecord::Base
       super(options, &block)
     end
   end
-  
+
   include ConversionMethods
   include ValidationMethods
   include FileMethods
@@ -402,17 +402,17 @@ class Upload < ActiveRecord::Base
   include UploaderMethods
   extend SearchMethods
   include ApiMethods
-  
+
   def add_file_size_tags!(file_path)
     if file_size >= 10.megabytes
       self.tag_string = "#{tag_string} huge_filesize".strip
     end
   end
-  
+
   def uploader_name
     User.id_to_name(uploader_id)
   end
-  
+
   def presenter
     @presenter ||= UploadPresenter.new(self)
   end

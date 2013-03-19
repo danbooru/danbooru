@@ -47,14 +47,14 @@ namespace :data do
     run "mkdir #{deploy_to}/shared/data/preview"
     run "mkdir #{deploy_to}/shared/data/sample"
   end
-  
+
   task :link_directories do
     run "rm -f #{release_path}/public/data"
     run "ln -s #{deploy_to}/shared/data #{release_path}/public/data"
-    
+
     run "rm -f #{release_path}/public/ssd"
     run "ln -s /mnt/ssd#{deploy_to}/current/public #{release_path}/public/ssd"
-    
+
     run "rm -f #{release_path}/public/images/advertisements"
     run "ln -s #{deploy_to}/shared/advertisements #{release_path}/public/images/advertisements"
   end
@@ -72,31 +72,31 @@ namespace :deploy do
       maintenance_html_path = "#{current_path}/public/maintenance.html.bak"
       run "if [ -e #{maintenance_html_path} ] ; then mv #{maintenance_html_path} #{current_path}/public/maintenance.html ; fi"
     end
-    
+
     desc "Makes the application web-accessible again."
     task :enable do
       maintenance_html_path = "#{current_path}/public/maintenance.html"
       run "if [ -e #{maintenance_html_path} ] ; then mv #{maintenance_html_path} #{current_path}/public/maintenance.html.bak ; fi"
     end
   end
-  
+
   namespace :nginx do
     desc "Shut down Nginx"
     task :stop do
       sudo "/etc/init.d/nginx stop"
     end
-    
+
     desc "Start Nginx"
     task :start do
       sudo "/etc/init.d/nginx start"
     end
   end
-  
+
   desc "Precompiles assets"
   task :precompile_assets do
     run "cd #{current_path}; bundle exec rake assets:precompile"
   end
-  
+
   desc "Restart the application"
   task :restart do
     run "touch #{current_path}/tmp/restart.txt"
@@ -108,21 +108,21 @@ namespace :delayed_job do
   task :start, :roles => :app do
     run "cd #{current_path}; RAILS_ENV=#{rails_env} bundle exec ruby script/delayed_job --queues=default,`hostname` start"
   end
-  
+
   desc "Stop delayed_job process"
   task :stop, :roles => :app do
     run "cd #{current_path}; RAILS_ENV=#{rails_env} bundle exec ruby script/delayed_job stop"
   end
-  
+
   desc "Restart delayed_job process"
   task :restart, :roles => :app do
     find_and_execute_task("delayed_job:stop")
     find_and_execute_task("delayed_job:start")
   end
-  
+
   task :kill, :roles => :app do
     procs = capture("ps -A -o pid,command").split(/\r\n|\r|\n/).grep(/delayed_job/).map(&:to_i)
-    
+
     if procs.any?
       run "for i in #{procs.join(' ')} ; do kill -SIGTERM $i ; done"
     end

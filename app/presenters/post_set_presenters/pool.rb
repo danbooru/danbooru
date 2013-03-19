@@ -11,11 +11,11 @@ module PostSetPresenters
         ).map {|x| x[0]}
       )
     end
-    
+
     def tag_list_html(template)
       tag_set_presenter.tag_list_html(template)
     end
-    
+
     def post_previews_html(template)
       html = ""
 

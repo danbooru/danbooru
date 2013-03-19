@@ -10,45 +10,45 @@ class ForumTopicsController < ApplicationController
     @forum_topic.original_post = ForumPost.new
     respond_with(@forum_topic)
   end
-  
+
   def edit
     @forum_topic = ForumTopic.find(params[:id])
     check_privilege(@forum_topic)
     respond_with(@forum_topic)
   end
-  
+
   def index
     @search = ForumTopic.active.search(params[:search])
     @forum_topics = @search.order("is_sticky DESC, updated_at DESC").paginate(params[:page], :search_count => params[:search])
     respond_with(@forum_topics)
   end
-  
+
   def show
     @forum_topic = ForumTopic.find(params[:id])
     @forum_posts = ForumPost.search(:topic_id => @forum_topic.id).order("forum_posts.id").paginate(params[:page])
     @forum_posts.all
     respond_with(@forum_topic)
   end
-  
+
   def create
     @forum_topic = ForumTopic.create(params[:forum_topic], :as => CurrentUser.role)
     respond_with(@forum_topic)
   end
-  
+
   def update
     @forum_topic = ForumTopic.find(params[:id])
     check_privilege(@forum_topic)
     @forum_topic.update_attributes(params[:forum_topic], :as => CurrentUser.role)
     respond_with(@forum_topic)
   end
-  
+
   def destroy
     @forum_topic = ForumTopic.find(params[:id])
     check_privilege(@forum_topic)
     @forum_topic.update_attribute(:is_deleted, true)
     respond_with(@forum_topic)
   end
-  
+
   def undelete
     @forum_topic = ForumTopic.find(params[:id])
     check_privilege(@forum_topic)
@@ -64,18 +64,18 @@ class ForumTopicsController < ApplicationController
 private
   def update_last_forum_read_at
     return if CurrentUser.is_anonymous?
-    
+
     if CurrentUser.last_forum_read_at.nil? || CurrentUser.last_forum_read_at < @forum_topic.updated_at
       CurrentUser.update_column(:last_forum_read_at, @forum_topic.updated_at)
     end
   end
-  
+
   def normalize_search
     if params[:title_matches]
       params[:search] ||= {}
       params[:search][:title_matches] = params.delete(:title_matches)
     end
-    
+
     if params[:title]
       params[:search] ||= {}
       params[:search][:title] = params.delete(:title)

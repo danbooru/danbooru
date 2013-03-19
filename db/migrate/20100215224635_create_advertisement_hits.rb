@@ -5,7 +5,7 @@ class CreateAdvertisementHits < ActiveRecord::Migration
       t.column :ip_addr, "inet", :null => false
       t.timestamps
     end
-    
+
     add_index :advertisement_hits, :advertisement_id
     add_index :advertisement_hits, :created_at
   end

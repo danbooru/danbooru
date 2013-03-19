@@ -10,7 +10,7 @@ class CommentsControllerTest < ActionController::TestCase
       @comment = FactoryGirl.create(:comment, :post => @post)
       @user = FactoryGirl.create(:moderator_user)
     end
-    
+
     teardown do
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
@@ -21,20 +21,20 @@ class CommentsControllerTest < ActionController::TestCase
         get :index, {:group_by => "post"}
         assert_response :success
       end
-      
+
       should "render by comment" do
         get :index, {:group_by => "comment"}
         assert_response :success
       end
     end
-    
+
     context "update action" do
       should "update the comment" do
         post :update, {:id => @comment.id, :comment => {:body => "abc"}}, {:user_id => @comment.creator_id}
         assert_redirected_to post_path(@comment.post)
       end
     end
-    
+
     context "create action"do
       should "create a comment" do
         assert_difference("Comment.count", 1) do

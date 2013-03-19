@@ -8,7 +8,7 @@ class CreatePostFlags < ActiveRecord::Migration
       t.column :is_resolved, :boolean, :null => false, :default => false
       t.timestamps
     end
-    
+
     add_index :post_flags, :post_id
     add_index :post_flags, :creator_id
     add_index :post_flags, :creator_ip_addr

@@ -8,29 +8,29 @@ class PostVersionTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
     end
-    
+
     teardown do
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
-    
+
     context "that has multiple versions: " do
       setup do
         @post = FactoryGirl.create(:post, :tag_string => "1")
         @post.update_attributes(:tag_string => "1 2")
         @post.update_attributes(:tag_string => "2 3")
       end
-      
+
       context "a version record" do
         setup do
           @version = PostVersion.last
         end
-        
+
         should "know its previous version" do
           assert_not_nil(@version.previous)
           assert_equal("1 2", @version.previous.tags)
         end
-        
+
         should "know the seuqence of all versions for the post" do
           assert_equal(2, @version.sequence_for_post.size)
           assert_equal(%w(3), @version.sequence_for_post[0][:added_tags])
@@ -38,13 +38,13 @@ class PostVersionTest < ActiveSupport::TestCase
         end
       end
     end
-    
+
     context "that has been created" do
       setup do
         @parent = FactoryGirl.create(:post)
         @post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc", :rating => "e", :parent => @parent, :source => "xyz")
       end
-      
+
       should "also create a version" do
         assert_equal(1, @post.versions.size)
         @version = @post.versions.last
@@ -54,14 +54,14 @@ class PostVersionTest < ActiveSupport::TestCase
         assert_equal(@post.source, @version.source)
       end
     end
-    
+
     context "that has been updated" do
       setup do
         @parent = FactoryGirl.create(:post)
         @post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
         @post.update_attributes(:tag_string => "bbb ccc xxx", :source => "")
       end
-      
+
       should "also create a version" do
         assert_equal(2, @post.versions.size)
         @version = @post.versions.last

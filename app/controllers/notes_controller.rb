@@ -2,10 +2,10 @@ class NotesController < ApplicationController
   respond_to :html, :xml, :json, :js
   before_filter :member_only, :except => [:index, :show]
   before_filter :pass_html_id, :only => [:create]
-  
+
   def search
   end
-  
+
   def index
     if params[:group_by] == "note"
       index_by_note
@@ -13,12 +13,12 @@ class NotesController < ApplicationController
       index_by_post
     end
   end
-  
+
   def show
     @note = Note.find(params[:id])
     respond_with(@note)
   end
-  
+
   def create
     @note = Note.create(params[:note])
     respond_with(@note) do |fmt|
@@ -27,19 +27,19 @@ class NotesController < ApplicationController
       end
     end
   end
-  
+
   def update
     @note = Note.find(params[:id])
     @note.update_attributes(params[:note])
     respond_with(@note)
   end
-  
+
   def destroy
     @note = Note.find(params[:id])
     @note.update_attribute(:is_active, false)
     respond_with(@note)
   end
-  
+
   def revert
     @note = Note.find(params[:id])
     @version = NoteVersion.find(params[:version_id])

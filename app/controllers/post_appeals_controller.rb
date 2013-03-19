@@ -7,12 +7,12 @@ class PostAppealsController < ApplicationController
     @post_appeal = PostAppeal.new
     respond_with(@post_appeal)
   end
-  
+
   def index
     @search = PostAppeal.order("id desc").search(params[:search])
     @post_appeals = @search.paginate(params[:page])
   end
-  
+
   def create
     @post_appeal = PostAppeal.create(params[:post_appeal])
     respond_with(@post_appeal)

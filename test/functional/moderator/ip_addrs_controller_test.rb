@@ -15,7 +15,7 @@ module Moderator
         get :index, {:search => {:ip_addr => "127.0.0.1"}}, {:user_id => @user.id}
         assert_response :success
       end
-      
+
       should "find by user id" do
         get :index, {:search => {:user_id => @user.id.to_s}}, {:user_id => @user.id}
         assert_response :success
@@ -25,7 +25,7 @@ module Moderator
         get :index, {:search => {:user_name => @user.name}}, {:user_id => @user.id}
         assert_response :success
       end
-      
+
       should "render the search page" do
         get :search, {}, {:user_id => @user.id}
         assert_response :success

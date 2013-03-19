@@ -15,13 +15,13 @@ class TagAliasRequestTest < ActiveSupport::TestCase
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
-    
+
     should "raise an exception if invalid" do
       assert_raises(TagAliasRequest::ValidationError) do
         TagAliasRequest.new("", "", "reason").create
       end
     end
-    
+
     should "create a tag alias" do
       assert_difference("TagAlias.count", 1) do
         TagAliasRequest.new("aaa", "bbb", "reason").create

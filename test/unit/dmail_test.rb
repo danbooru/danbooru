@@ -11,16 +11,16 @@ class DmailTest < ActiveSupport::TestCase
       ActionMailer::Base.perform_deliveries = true
       ActionMailer::Base.deliveries = []
     end
-    
+
     teardown do
       CurrentUser.user = nil
     end
-    
+
     context "from a banned user" do
       setup do
         @user.update_attribute(:is_banned, true)
       end
-      
+
       should "not validate" do
         dmail = FactoryGirl.build(:dmail, :title => "xxx", :owner => @user)
         dmail.save
@@ -28,7 +28,7 @@ class DmailTest < ActiveSupport::TestCase
         assert_equal(["Sender is banned and cannot send messages"], dmail.errors.full_messages)
       end
     end
-    
+
     context "search" do
       should "return results based on title contents" do
         dmail = FactoryGirl.create(:dmail, :title => "xxx", :owner => @user)
@@ -37,7 +37,7 @@ class DmailTest < ActiveSupport::TestCase
         matches = Dmail.search_message("aaa")
         assert(matches.empty?)
       end
-      
+
       should "return results based on body contents" do
         dmail = FactoryGirl.create(:dmail, :body => "xxx", :owner => @user)
         matches = Dmail.search_message("xxx")
@@ -46,14 +46,14 @@ class DmailTest < ActiveSupport::TestCase
         assert(matches.empty?)
       end
     end
-    
+
     should "should parse user names" do
       dmail = FactoryGirl.build(:dmail, :owner => @user)
       dmail.to_id = nil
       dmail.to_name = @user.name
       assert(dmail.to_id == @user.id)
     end
-    
+
     should "construct a response" do
       dmail = FactoryGirl.create(:dmail, :owner => @user)
       response = dmail.build_response
@@ -61,7 +61,7 @@ class DmailTest < ActiveSupport::TestCase
       assert_equal(dmail.from_id, response.to_id)
       assert_equal(dmail.to_id, response.from_id)
     end
-    
+
     should "create a copy for each user" do
       @new_user = FactoryGirl.create(:user)
       assert_difference("Dmail.count", 2) do
@@ -82,14 +82,14 @@ class DmailTest < ActiveSupport::TestCase
         Dmail.create_split(:to_id => user.id, :title => "foo", :body => "foo")
       end
     end
-    
+
     should "be marked as read after the user reads it" do
       dmail = FactoryGirl.create(:dmail, :owner => @user)
       assert(!dmail.is_read?)
       dmail.mark_as_read!
       assert(dmail.is_read?)
     end
-    
+
     should "notify the recipient he has mail" do
       dmail = FactoryGirl.create(:dmail, :owner => @user)
       assert(dmail.to(true).has_mail?)

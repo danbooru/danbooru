@@ -3,7 +3,7 @@ class UploadsController < ApplicationController
   after_filter :save_recent_tags, :only => [:create]
   respond_to :html, :xml, :json, :js
   rescue_from Upload::Error, :with => :rescue_exception
-  
+
   def new
     @upload = Upload.new(:rating => "q")
     if params[:url]
@@ -15,13 +15,13 @@ class UploadsController < ApplicationController
     end
     respond_with(@upload)
   end
-  
+
   def index
     @search = Upload.search(params[:search])
     @uploads = @search.order("id desc").paginate(params[:page])
     respond_with(@uploads)
   end
-  
+
   def show
     @upload = Upload.find(params[:id])
     respond_with(@upload) do |format|
@@ -38,7 +38,7 @@ class UploadsController < ApplicationController
   	@upload.process! if @upload.errors.empty?
     respond_with(@upload)
   end
-  
+
   def update
     @upload = Upload.find(params[:id])
     @upload.process!

@@ -9,7 +9,7 @@ FactoryGirl.define do
     status "pending"
     server Socket.gethostname
     source "xxx"
-    
+
     factory(:source_upload) do
       source "http://www.google.com/intl/en_ALL/images/logo.gif"
     end

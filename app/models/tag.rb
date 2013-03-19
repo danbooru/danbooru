@@ -2,7 +2,7 @@ class Tag < ActiveRecord::Base
   METATAGS = "-user|user|-approver|approver|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|status|tagcount|gentags|arttags|chartags|copytags|parent|pixiv"
   attr_accessible :category
   has_one :wiki_page, :foreign_key => "name", :primary_key => "title"
-  
+
   module ApiMethods
     def to_legacy_json
       return {
@@ -15,70 +15,70 @@ class Tag < ActiveRecord::Base
       }.to_json
     end
   end
-  
+
   class CategoryMapping
     Danbooru.config.reverse_tag_category_mapping.each do |value, category|
       define_method(category.downcase) do
         value
       end
     end
-    
+
     def regexp
       @regexp ||= Regexp.compile(Danbooru.config.tag_category_mapping.keys.sort_by {|x| -x.size}.join("|"))
     end
-    
+
     def value_for(string)
       Danbooru.config.tag_category_mapping[string.to_s.downcase] || 0
     end
   end
-  
+
   module CountMethods
     extend ActiveSupport::Concern
-    
+
     module ClassMethods
       def counts_for(tag_names)
         select_all_sql("SELECT name, post_count FROM tags WHERE name IN (?)", tag_names)
       end
     end
-    
+
     def real_post_count
       @real_post_count ||= Post.raw_tag_match(name).count
     end
-    
+
     def fix_post_count
       update_column(:post_count, real_post_count)
     end
   end
-  
+
   module ViewCountMethods
     def increment_view_count(name)
       Cache.incr("tvc:#{Cache.sanitize(name)}")
     end
   end
-  
+
   module CategoryMethods
     module ClassMethods
       def categories
         @category_mapping ||= CategoryMapping.new
       end
-      
+
       def select_category_for(tag_name)
         select_value_sql("SELECT category FROM tags WHERE name = ?", tag_name).to_i
       end
-      
+
       def category_for(tag_name)
         Cache.get("tc:#{Cache.sanitize(tag_name)}") do
           select_category_for(tag_name)
         end
       end
-      
+
       def categories_for(tag_names)
         Cache.get_multi(tag_names, "tc") do |name|
           select_category_for(name)
         end
       end
     end
-    
+
     def self.included(m)
       m.extend(ClassMethods)
     end
@@ -86,16 +86,16 @@ class Tag < ActiveRecord::Base
     def category_name
       Danbooru.config.reverse_tag_category_mapping[category]
     end
-    
+
     def update_category_cache_for_all
       update_category_cache
       Danbooru.config.other_server_hosts.each do |host|
         delay(:queue => host).update_category_cache
       end
-      
+
       delay(:queue => "default").update_category_post_counts
     end
-    
+
     def update_category_post_counts
       Post.raw_tag_match(name).find_each do |post|
         post.reload
@@ -107,18 +107,18 @@ class Tag < ActiveRecord::Base
         post.update_column(:tag_count_character, post.tag_count_character)
       end
     end
-    
+
     def update_category_cache
       Cache.put("tc:#{Cache.sanitize(name)}", category, 1.hour)
     end
   end
-  
+
   module StatisticsMethods
     def trending
       raise NotImplementedError
     end
   end
-  
+
   module NameMethods
     def normalize_name(name)
       name.downcase.tr(" ", "_").gsub(/\A[-~]+/, "").gsub(/\*/, "")
@@ -138,7 +138,7 @@ class Tag < ActiveRecord::Base
       if tag
         if category
           category_id = categories.value_for(category)
-          
+
           if category_id != tag.category
             tag.update_column(:category, category_id)
             tag.update_category_cache_for_all
@@ -160,7 +160,7 @@ class Tag < ActiveRecord::Base
     def normalize(query)
       query.to_s.strip
     end
-    
+
     def scan_query(query)
       normalize(query).scan(/\S+/).uniq
     end
@@ -221,7 +221,7 @@ class Tag < ActiveRecord::Base
 
       when /\A>(.+)/
         return [:gt, parse_cast($1, type)]
-        
+
       when /,/
         return [:in, range.split(/,/)]
 
@@ -230,19 +230,19 @@ class Tag < ActiveRecord::Base
 
       end
     end
-    
+
     def parse_tag(tag, output)
       if tag[0] == "-" && tag.size > 1
         output[:exclude] << tag[1..-1].downcase
-        
+
       elsif tag[0] == "~" && tag.size > 1
         output[:include] << tag[1..-1].downcase
-        
+
       elsif tag =~ /\*/
         matches = Tag.name_matches(tag.downcase).all(:select => "name", :limit => Danbooru.config.tag_query_limit, :order => "post_count DESC").map(&:name)
         matches = ["~no_matches~"] if matches.empty?
         output[:include] += matches
-        
+
       else
         output[:related] << tag.downcase
       end
@@ -250,15 +250,15 @@ class Tag < ActiveRecord::Base
 
     def parse_query(query, options = {})
       q = {}
-      
+
       q[:tag_count] = 0
-      
+
       q[:tags] = {
         :related => [],
         :include => [],
         :exclude => []
       }
-      
+
       scan_query(query).each do |token|
         q[:tag_count] += 1 unless token == "status:deleted"
 
@@ -267,25 +267,25 @@ class Tag < ActiveRecord::Base
           when "-user"
             q[:uploader_id_neg] ||= []
             q[:uploader_id_neg] << User.name_to_id($2)
-            
+
           when "user"
             q[:uploader_id] = User.name_to_id($2)
             q[:uploader_id] = -1 if q[:uploader_id].nil?
-            
+
           when "-approver"
             q[:approver_id_neg] ||= []
             q[:approver_id_neg] << User.name_to_id($2)
-            
+
           when "approver"
             q[:approver_id] = User.name_to_id($2)
             q[:approver_id] = -1 if q[:approver_id].nil?
-            
+
           when "-pool"
             q[:tags][:exclude] << "pool:#{Pool.name_to_id($2)}"
-            
+
           when "pool"
             q[:tags][:related] << "pool:#{Pool.name_to_id($2)}"
-          
+
           when "-fav"
             q[:tags][:exclude] << "fav:#{User.name_to_id($2)}"
 
@@ -304,16 +304,16 @@ class Tag < ActiveRecord::Base
 
           when "rating"
             q[:rating] = $2
-            
+
           when "id"
             q[:post_id] = parse_helper($2)
-            
+
           when "width"
             q[:width] = parse_helper($2)
-            
+
           when "height"
             q[:height] = parse_helper($2)
-            
+
           when "mpixels"
             q[:mpixels] = parse_helper($2, :float)
 
@@ -325,13 +325,13 @@ class Tag < ActiveRecord::Base
 
           when "source"
             q[:source] = ($2.to_escaped_for_sql_like + "%").gsub(/%+/, '%')
-            
+
           when "date"
             q[:date] = parse_helper($2, :date)
 
           when "tagcount"
             q[:post_tag_count] = parse_helper($2)
-            
+
           when "gentags"
             q[:general_tag_count] = parse_helper($2)
 
@@ -343,26 +343,26 @@ class Tag < ActiveRecord::Base
 
           when "copytags"
             q[:copyright_tag_count] = parse_helper($2)
-            
+
           when "parent"
             q[:parent_id] = $2.to_i
-            
+
           when "order"
             q[:order] = $2.downcase
 
           when "status"
             q[:status] = $2.downcase
-            
+
           when "pixiv"
             q[:pixiv] = parse_helper($2)
 
           end
-          
+
         else
           parse_tag(token, q[:tags])
         end
       end
-      
+
       normalize_tags_in_query(q)
 
       return q
@@ -374,7 +374,7 @@ class Tag < ActiveRecord::Base
       query_hash[:tags][:related] = TagAlias.to_aliased(query_hash[:tags][:related])
     end
   end
-  
+
   module RelationMethods
     def update_related
       return unless should_update_related?
@@ -384,13 +384,13 @@ class Tag < ActiveRecord::Base
       self.related_tags_updated_at = Time.now
       save
     end
-    
+
     def update_related_if_outdated
       if should_update_related? && Delayed::Job.count < 200
-        delay(:queue => "default").update_related 
+        delay(:queue => "default").update_related
       end
     end
-    
+
     def related_cache_expiry
       base = Math.sqrt([post_count, 0].max)
       if base > 24 * 7
@@ -401,21 +401,21 @@ class Tag < ActiveRecord::Base
         base
       end
     end
-    
+
     def should_update_related?
       related_tags.blank? || related_tags_updated_at.blank? || related_tags_updated_at < related_cache_expiry.hours.ago
     end
-    
+
     def related_tag_array
       update_related_if_outdated
       related_tags.to_s.split(/ /).in_groups_of(2)
     end
   end
-  
+
   module SuggestionMethods
     def find_suggestions(query)
       query_tokens = query.split(/_/)
-      
+
       if query_tokens.size == 2
         search_for = query_tokens.reverse.join("_").to_escaped_for_sql_like
       else
@@ -425,42 +425,42 @@ class Tag < ActiveRecord::Base
       Tag.where(["name LIKE ? ESCAPE E'\\\\' AND post_count > 0 AND name <> ?", search_for, query]).all(:order => "post_count DESC", :limit => 6, :select => "name").map(&:name).sort
     end
   end
-  
+
   module SearchMethods
     def name_matches(name)
       where("name LIKE ? ESCAPE E'\\\\'", name.downcase.to_escaped_for_sql_like)
     end
-    
+
     def named(name)
       where("name = ?", TagAlias.to_aliased([name]).join(""))
     end
-    
+
     def search(params)
       q = scoped
       params = {} if params.blank?
-      
+
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches].strip)
       end
-      
+
       if params[:category].present?
         q = q.where("category = ?", params[:category])
       end
-      
+
       if params[:hide_empty].blank? || params[:hide_empty] != "no"
         q = q.where("post_count > 0")
       end
-      
+
       if params[:limit].present?
         q = q.limit(params[:limit].to_i)
       end
-      
+
       if params[:order] == "name"
         q = q.reorder("name")
-        
+
       elsif params[:order] == "date"
         q = q.reorder("id desc")
-        
+
       elsif params[:sort] == "date"
         q = q.reorder("id desc")
 
@@ -470,11 +470,11 @@ class Tag < ActiveRecord::Base
       else
         q = q.reorder("post_count desc")
       end
-      
+
       q
     end
   end
-  
+
   include ApiMethods
   include CountMethods
   extend ViewCountMethods

@@ -11,7 +11,7 @@ class CreateAdvertisements < ActiveRecord::Migration
       t.column :is_work_safe, :boolean, :null => false, :default => false
       t.timestamps
     end
-    
+
     add_index :advertisements, :ad_type
   end
 

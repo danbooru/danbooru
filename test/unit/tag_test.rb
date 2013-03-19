@@ -8,17 +8,17 @@ class TagTest < ActiveSupport::TestCase
     MEMCACHE.flush_all
     Delayed::Worker.delay_jobs = false
   end
-  
+
   teardown do
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
   end
-  
+
   context "A tag category fetcher" do
     setup do
       MEMCACHE.flush_all
     end
-    
+
     should "fetch for a single tag" do
       FactoryGirl.create(:artist_tag, :name => "test")
       assert_equal(Tag.categories.artist, Tag.category_for("test"))
@@ -28,7 +28,7 @@ class TagTest < ActiveSupport::TestCase
       FactoryGirl.create(:artist_tag, :name => "!@$%")
       assert_equal(Tag.categories.artist, Tag.category_for("!@$%"))
     end
-    
+
     should "fetch for multiple tags" do
       FactoryGirl.create(:artist_tag, :name => "aaa")
       FactoryGirl.create(:copyright_tag, :name => "bbb")
@@ -38,26 +38,26 @@ class TagTest < ActiveSupport::TestCase
       assert_equal(0, categories["ccc"])
     end
   end
-  
+
   context "A tag category mapping" do
     setup do
       MEMCACHE.flush_all
     end
-    
+
     should "exist" do
       assert_nothing_raised {Tag.categories}
     end
-    
+
     should "have convenience methods for the four main categories" do
       assert_equal(0, Tag.categories.general)
       assert_equal(1, Tag.categories.artist)
       assert_equal(3, Tag.categories.copyright)
       assert_equal(4, Tag.categories.character)
     end
-    
+
     should "have a regular expression for matching category names and shortcuts" do
       regexp = Tag.categories.regexp
-      
+
       assert_match(regexp, "artist")
       assert_match(regexp, "art")
       assert_match(regexp, "copyright")
@@ -69,16 +69,16 @@ class TagTest < ActiveSupport::TestCase
       assert_no_match(regexp, "c")
       assert_no_match(regexp, "woodle")
     end
-    
+
     should "map a category name to its value" do
       assert_equal(0, Tag.categories.value_for("general"))
       assert_equal(0, Tag.categories.value_for("gen"))
       assert_equal(1, Tag.categories.value_for("artist"))
       assert_equal(1, Tag.categories.value_for("art"))
-      assert_equal(0, Tag.categories.value_for("unknown"))      
+      assert_equal(0, Tag.categories.value_for("unknown"))
     end
   end
-  
+
   context "A tag" do
     setup do
       MEMCACHE.flush_all
@@ -88,29 +88,29 @@ class TagTest < ActiveSupport::TestCase
       @tag = FactoryGirl.create(:artist_tag)
       assert_equal("Artist", @tag.category_name)
     end
-    
+
     should "reset its category after updating" do
       tag = FactoryGirl.create(:artist_tag)
       tag.update_category_cache_for_all
       assert_equal(Tag.categories.artist, MEMCACHE.get("tc:#{tag.name}"))
-      
+
       tag.update_attribute(:category, Tag.categories.copyright)
       tag.update_category_cache_for_all
       assert_equal(Tag.categories.copyright, MEMCACHE.get("tc:#{tag.name}"))
     end
   end
-  
+
   context "A tag parser" do
     should "scan a query" do
       assert_equal(%w(aaa bbb), Tag.scan_query("aaa bbb"))
       assert_equal(%w(~AAa -BBB* -bbb*), Tag.scan_query("~AAa -BBB* -bbb*"))
     end
-    
+
     should "strip out invalid characters when scanning" do
       assert_equal(%w(aaa bbb), Tag.scan_tags("aaa bbb"))
       assert_equal(%w(-BB;B* -b_b_b_), Tag.scan_tags("-B,B;B* -b_b_b_"))
     end
-    
+
     should "cast values" do
       assert_equal(2048, Tag.parse_cast("2kb", :filesize))
       assert_equal(2097152, Tag.parse_cast("2m", :filesize))
@@ -118,7 +118,7 @@ class TagTest < ActiveSupport::TestCase
       assert_nothing_raised {Tag.parse_cast("1234", :integer)}
       assert_nothing_raised {Tag.parse_cast("1234.56", :float)}
     end
-    
+
     should "parse a query" do
       tag1 = FactoryGirl.create(:tag, :name => "abc")
       tag2 = FactoryGirl.create(:tag, :name => "acb")
@@ -134,7 +134,7 @@ class TagTest < ActiveSupport::TestCase
       assert_equal(["acb"], Tag.parse_query("a*b")[:tags][:include])
     end
   end
-  
+
   context "A tag" do
     should "be found when one exists" do
       tag = FactoryGirl.create(:tag)
@@ -142,7 +142,7 @@ class TagTest < ActiveSupport::TestCase
         Tag.find_or_create_by_name(tag.name)
       end
     end
-    
+
     should "change the type for an existing tag" do
       tag = FactoryGirl.create(:tag)
       assert_difference("Tag.count", 0) do
@@ -152,7 +152,7 @@ class TagTest < ActiveSupport::TestCase
         assert_equal(Tag.categories.artist, tag.category)
       end
     end
-    
+
     should "be created when one doesn't exist" do
       assert_difference("Tag.count", 1) do
         tag = Tag.find_or_create_by_name("hoge")
@@ -160,7 +160,7 @@ class TagTest < ActiveSupport::TestCase
         assert_equal(Tag.categories.general, tag.category)
       end
     end
-    
+
     should "be created with the type when one doesn't exist" do
       assert_difference("Tag.count", 1) do
         tag = Tag.find_or_create_by_name("artist:hoge")

@@ -7,16 +7,16 @@ module Moderator
         def self.all(min_date, max_level)
           sql = <<-EOS
             SELECT artist_versions.updater_id AS updater_id, count(*)
-            FROM artist_versions 
-            JOIN users ON users.id = artist_versions.updater_id 
-            WHERE 
-              artist_versions.created_at > ? 
-              AND users.level <= ? 
-            GROUP BY artist_versions.updater_id 
-            ORDER BY count(*) DESC 
+            FROM artist_versions
+            JOIN users ON users.id = artist_versions.updater_id
+            WHERE
+              artist_versions.created_at > ?
+              AND users.level <= ?
+            GROUP BY artist_versions.updater_id
+            ORDER BY count(*) DESC
             LIMIT 10
           EOS
-          
+
           ActiveRecord::Base.select_all_sql(sql, min_date, max_level).map {|x| new(x)}
         end
 

@@ -9,28 +9,28 @@ class TagAliasesControllerTest < ActionController::TestCase
       MEMCACHE.flush_all
       Delayed::Worker.delay_jobs = false
     end
-    
+
     teardown do
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
-    
+
     context "index action" do
       setup do
         @tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
       end
-      
+
       should "list all tag aliass" do
         get :index
         assert_response :success
       end
-      
+
       should "list all tag_aliass (with search)" do
         get :index, {:search => {:antecedent_name => "aaa"}}
         assert_response :success
       end
     end
-    
+
     context "create action" do
       should "create a tag alias" do
         assert_difference("TagAlias.count", 1) do
@@ -43,7 +43,7 @@ class TagAliasesControllerTest < ActionController::TestCase
       setup do
         @tag_alias = FactoryGirl.create(:tag_alias)
       end
-      
+
       should "destroy a tag_alias" do
         assert_difference("TagAlias.count", -1) do
           post :destroy, {:id => @tag_alias.id}, {:user_id => @user.id}

@@ -5,7 +5,7 @@ class CreatePostDisapprovals < ActiveRecord::Migration
       t.column :post_id, :integer, :null => false
       t.timestamps
     end
-    
+
     add_index :post_disapprovals, :user_id
     add_index :post_disapprovals, :post_id
   end

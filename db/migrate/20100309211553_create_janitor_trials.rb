@@ -6,7 +6,7 @@ class CreateJanitorTrials < ActiveRecord::Migration
       t.column :original_level, :integer, :null => false
       t.timestamps
     end
-    
+
     add_index :janitor_trials, :user_id
   end
 

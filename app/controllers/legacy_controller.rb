@@ -6,7 +6,7 @@ class LegacyController < ApplicationController
     @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit])
     @posts = @post_set.posts
   end
-  
+
   def create_post
     @upload = Upload.new
     @upload.server = Socket.gethostname
@@ -19,19 +19,19 @@ class LegacyController < ApplicationController
     @upload.save
     @upload.process!
   end
-  
+
   def users
     @users = User.limit(100).search(params).paginate(params[:page])
   end
-  
+
   def tags
     @tags = Tag.limit(100).search(params).paginate(params[:page], :limit => params[:limit])
   end
-  
+
   def artists
     @artists = Artist.limit(100).search(params[:search]).paginate(params[:page])
   end
-  
+
   def unavailable
     render :text => "this resource is no longer available", :status => 410
   end

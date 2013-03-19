@@ -2,7 +2,7 @@ class CreatePosts < ActiveRecord::Migration
   def self.up
     create_table :posts do |t|
       t.timestamps
-      
+
       t.column :up_score, :integer, :null => false, :default => 0
       t.column :down_score, :integer, :null => false, :default => 0
       t.column :score, :integer, :null => false, :default => 0
@@ -21,7 +21,7 @@ class CreatePosts < ActiveRecord::Migration
       # Uploader
       t.column :uploader_id, :integer, :null => false
       t.column :uploader_ip_addr, "inet", :null => false
-      
+
       # Approver
       t.column :approver_id, :integer
 
@@ -50,12 +50,12 @@ class CreatePosts < ActiveRecord::Migration
       t.column :file_size, :integer, :null => false
       t.column :image_width, :integer, :null => false
       t.column :image_height, :integer, :null => false
-      
+
       # Parent
       t.column :parent_id, :integer
       t.column :has_children, :boolean, :null => false, :default => false
     end
-    
+
     add_index :posts, :md5, :unique => true
     add_index :posts, :created_at
     add_index :posts, :last_commented_at
@@ -102,7 +102,7 @@ class CreatePosts < ActiveRecord::Migration
         HEADLINE = pg_catalog.prsd_headline,
         LEXTYPES = testprs_lextype
     )"
-    
+
     execute "CREATE INDEX index_posts_on_tags_index ON posts USING gin (tag_index)"
     execute "CREATE TEXT SEARCH CONFIGURATION public.danbooru (PARSER = public.testparser)"
     execute "ALTER TEXT SEARCH CONFIGURATION public.danbooru ADD MAPPING FOR WORD WITH SIMPLE"

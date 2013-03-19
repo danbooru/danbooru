@@ -8,7 +8,7 @@ module Moderator
       def confirm_delete
         @post = ::Post.find(params[:id])
       end
-      
+
       def delete
         @post = ::Post.find(params[:id])
         if params[:commit] == "Delete"
@@ -17,12 +17,12 @@ module Moderator
         end
         redirect_to(post_path(@post))
       end
-      
+
       def undelete
         @post = ::Post.find(params[:id])
         @post.undelete!
       end
-      
+
       def annihilate
         @post = ::Post.find(params[:id])
         @post.annihilate!

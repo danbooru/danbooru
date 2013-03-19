@@ -13,10 +13,10 @@ class Artist < ActiveRecord::Base
   accepts_nested_attributes_for :wiki_page
   attr_accessible :body, :name, :url_string, :other_names, :other_names_comma, :group_name, :wiki_page_attributes, :notes, :is_active, :as => [:member, :privileged, :builder, :platinum, :contributor, :janitor, :moderator, :default, :admin]
   attr_accessible :is_banned, :as => :admin
-  
+
   module UrlMethods
     extend ActiveSupport::Concern
-    
+
     module ClassMethods
       def find_all_by_url(url)
         url = ArtistUrl.normalize(url)
@@ -43,11 +43,11 @@ class Artist < ActiveRecord::Base
         end
       end
     end
-    
+
     def url_string=(string)
       @url_string = string
     end
-    
+
     def url_string
       @url_string || urls.map {|x| x.url}.join("\n")
     end
@@ -55,7 +55,7 @@ class Artist < ActiveRecord::Base
 
   module NameMethods
     extend ActiveSupport::Concern
-    
+
     module ClassMethods
       def normalize_name(name)
         name.to_s.downcase.strip.gsub(/ /, '_')
@@ -65,26 +65,26 @@ class Artist < ActiveRecord::Base
     def normalize_name
       self.name = Artist.normalize_name(name)
     end
-    
+
     def other_names_array
       other_names.try(:split, / /)
     end
-    
+
     def other_names_comma
       other_names_array.try(:join, ", ")
     end
-    
+
     def other_names_comma=(string)
       self.other_names = string.split(/,/).map {|x| Artist.normalize_name(x)}.join(" ")
     end
   end
-  
+
   module GroupMethods
     def member_names
       members.map(&:name).join(", ")
     end
   end
-  
+
   module VersionMethods
     def create_version
       ArtistVersion.create(
@@ -98,14 +98,14 @@ class Artist < ActiveRecord::Base
         :group_name => group_name
       )
     end
-    
+
     def revert_to!(version)
       self.name = version.name
       self.url_string = version.url_string
       self.is_active = version.is_active
       self.other_names = version.other_names
       self.group_name = version.group_name
-      save      
+      save
     end
   end
 
@@ -119,11 +119,11 @@ class Artist < ActiveRecord::Base
             artist.url_string = post.source
           end
         end
-        
+
         if params[:other_names]
           artist.other_names = params[:other_names]
         end
-        
+
         if params[:urls]
           artist.url_string = params[:urls]
         end
@@ -139,7 +139,7 @@ class Artist < ActiveRecord::Base
         nil
       end
     end
-    
+
     def notes=(msg)
       if wiki_page
         wiki_page.title = name
@@ -152,7 +152,7 @@ class Artist < ActiveRecord::Base
       end
     end
   end
-  
+
   module TagMethods
     def has_tag_alias?
       TagAlias.exists?(["antecedent_name = ?", name])
@@ -162,7 +162,7 @@ class Artist < ActiveRecord::Base
       TagAlias.find_by_antecedent_name(name).consequent_name
     end
   end
-  
+
   module BanMethods
     def ban!
       Post.transaction do
@@ -178,24 +178,24 @@ class Artist < ActiveRecord::Base
         rescue Post::SearchError
           # swallow
         end
-        
+
         # potential race condition but unlikely
         unless TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").exists?
           tag_implication = TagImplication.create(:antecedent_name => name, :consequent_name => "banned_artist")
           tag_implication.delay(:queue => "default").process!
         end
-        
+
         update_column(:is_active, false)
         update_column(:is_banned, true)
       end
     end
   end
-  
+
   module SearchMethods
     def active
       where("is_active = true")
     end
-      
+
     def banned
       where("is_banned = true")
     end
@@ -209,27 +209,27 @@ class Artist < ActiveRecord::Base
         where("false")
       end
     end
-    
+
     def other_names_match(string)
       where("other_names_index @@ to_tsquery('danbooru', E?)", Artist.normalize_name(string).to_escaped_for_tsquery)
     end
-    
+
     def group_name_matches(name)
       stripped_name = normalize_name(name).to_escaped_for_sql_like
       where("group_name LIKE ? ESCAPE E'\\\\'", stripped_name)
     end
-    
+
     def name_matches(name)
       stripped_name = normalize_name(name).to_escaped_for_sql_like
       where("name LIKE ? ESCAPE E'\\\\'", stripped_name)
     end
-    
+
     def any_name_matches(name)
       stripped_name = normalize_name(name).to_escaped_for_sql_like
       name_for_tsquery = normalize_name(name).to_escaped_for_tsquery
       where("(name LIKE ? ESCAPE E'\\\\' OR other_names_index @@ to_tsquery('danbooru', E?))", stripped_name, name_for_tsquery)
     end
-    
+
     def search(params)
       q = active
       params = {} if params.blank?
@@ -240,7 +240,7 @@ class Artist < ActiveRecord::Base
 
       when /name:(.+)/
         q = q.name_matches($1)
-        
+
       when /other:(.+)/
         q = q.other_names_match($1)
 
@@ -253,7 +253,7 @@ class Artist < ActiveRecord::Base
       when /./
         q = q.any_name_matches(params[:name])
       end
-      
+
       if params[:sort] == "Name"
         q = q.reorder("name")
       else
@@ -263,11 +263,11 @@ class Artist < ActiveRecord::Base
       if params[:id].present?
         q = q.where("id = ?", params[:id])
       end
-      
+
       q
     end
   end
-  
+
   include UrlMethods
   include NameMethods
   include GroupMethods
@@ -277,7 +277,7 @@ class Artist < ActiveRecord::Base
   include TagMethods
   include BanMethods
   extend SearchMethods
-  
+
   def status
     if is_banned?
       "Banned"
@@ -287,11 +287,11 @@ class Artist < ActiveRecord::Base
       "Deleted"
     end
   end
-  
+
   def legacy_api_hash
     return {
-      :id => id, 
-      :name => name, 
+      :id => id,
+      :name => name,
       :other_names => other_names,
       :group_name => group_name,
       :urls => artist_urls.map {|x| x.url},
@@ -299,7 +299,7 @@ class Artist < ActiveRecord::Base
       :updater_id => 0
     }
   end
-  
+
   def initialize_creator
     self.creator_id = CurrentUser.user.id
   end

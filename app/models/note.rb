@@ -12,28 +12,28 @@ class Note < ActiveRecord::Base
   after_save :create_version
   validate :post_must_not_be_note_locked
   attr_accessible :x, :y, :width, :height, :body, :updater_id, :updater_ip_addr, :is_active, :post_id, :html_id
-  
+
   module SearchMethods
     def active
       where("is_active = TRUE")
     end
-    
+
     def body_matches(query)
       where("body_index @@ plainto_tsquery(E?)", query.to_escaped_for_tsquery_split)
     end
-    
+
     def post_tags_match(query)
       joins(:post).where("posts.tag_index @@ to_tsquery('danbooru', E?)", query.to_escaped_for_tsquery_split)
     end
-    
+
     def creator_name(name)
       where("creator_id = (select _.id from users _ where lower(_.name) = ?)", name.downcase)
     end
-    
+
     def search(params)
       q = scoped
       return q if params.blank?
-      
+
       if params[:body_matches].present?
         q = q.body_matches(params[:body_matches])
       end
@@ -41,23 +41,23 @@ class Note < ActiveRecord::Base
       if params[:post_id].present?
         q = q.where("post_id = ?", params[:post_id].to_i)
       end
-      
+
       if params[:post_tags_match].present?
         q = q.post_tags_match(params[:post_tags_match])
       end
-      
+
       if params[:creator_name].present?
         q = q.creator_name(params[:creator_name])
       end
-      
+
       if params[:creator_id].present?
         q = q.where("creator_id = ?", params[:creator_id].to_i)
       end
-      
+
       q
     end
   end
-  
+
   module ApiMethods
     def serializable_hash(options = {})
       options ||= {}
@@ -70,7 +70,7 @@ class Note < ActiveRecord::Base
       hash = super(options)
       hash
     end
-    
+
     def to_xml(options = {}, &block)
       options ||= {}
       options[:procs] ||= []
@@ -78,34 +78,34 @@ class Note < ActiveRecord::Base
       super(options, &block)
     end
   end
-  
+
   extend SearchMethods
   include ApiMethods
-  
+
   def presenter
     @presenter ||= NotePresenter.new(self)
   end
-  
+
   def initialize_creator
     self.creator_id = CurrentUser.id
   end
-  
+
   def initialize_updater
     self.updater_id = CurrentUser.id
     self.updater_ip_addr = CurrentUser.ip_addr
   end
-  
+
   def post_must_not_be_note_locked
     if is_locked?
       errors.add :post, "is note locked"
       return false
     end
   end
-  
+
   def is_locked?
     Post.exists?(["id = ? AND is_note_locked = ?", post_id, true])
   end
-  
+
   def blank_body
     self.body = "(empty)" if body.blank?
   end
@@ -121,10 +121,10 @@ class Note < ActiveRecord::Base
       execute_sql("UPDATE posts SET last_noted_at = NULL WHERE id = ?", post_id)
     end
   end
-  
+
   def create_version
     CurrentUser.increment!(:note_update_count)
-    
+
     versions.create(
       :updater_id => updater_id,
       :updater_ip_addr => updater_ip_addr,
@@ -137,7 +137,7 @@ class Note < ActiveRecord::Base
       :body => body
     )
   end
-  
+
   def revert_to(version)
     self.x = version.x
     self.y = version.y
@@ -149,7 +149,7 @@ class Note < ActiveRecord::Base
     self.updater_id = CurrentUser.id
     self.updater_ip_addr = CurrentUser.ip_addr
   end
-  
+
   def revert_to!(version)
     revert_to(version)
     save!

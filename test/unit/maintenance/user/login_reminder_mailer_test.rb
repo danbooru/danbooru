@@ -7,7 +7,7 @@ module Maintenance
         setup do
           @user = FactoryGirl.create(:user)
         end
-        
+
         should "send the notie" do
           LoginReminderMailer.notice(@user).deliver
           assert !ActionMailer::Base.deliveries.empty?

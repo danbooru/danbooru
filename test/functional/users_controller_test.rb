@@ -7,38 +7,38 @@ class UsersControllerTest < ActionController::TestCase
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
-    
+
     teardown do
       CurrentUser.user = nil
     end
-    
+
     context "index action" do
       setup do
         FactoryGirl.create(:user, :name => "abc")
       end
-      
+
       should "list all users" do
         get :index
         assert_response :success
       end
-      
+
       should "list all users (with search)" do
         get :index, {:search => {:name_matches => "abc"}}
         assert_response :success
       end
     end
-    
+
     context "show action" do
       setup do
         @user = FactoryGirl.create(:user)
       end
-      
+
       should "render" do
         get :show, {:id => @user.id}
         assert_response :success
       end
     end
-    
+
     context "create action" do
       should "create a user" do
         assert_difference("User.count", 1) do
@@ -48,23 +48,23 @@ class UsersControllerTest < ActionController::TestCase
         end
       end
     end
-    
+
     context "edit action" do
       setup do
         @user = FactoryGirl.create(:user)
       end
-      
+
       should "render" do
         get :edit, {:id => @user.id}, {:user_id => @user.id}
         assert_response :success
       end
     end
-    
+
     context "update action" do
       setup do
         @user = FactoryGirl.create(:user)
       end
-      
+
       should "update a user" do
         post :update, {:id => @user.id, :user => {:name => "xyz"}}, {:user_id => @user.id}
         @user.reload

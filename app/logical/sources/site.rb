@@ -2,14 +2,14 @@ module Sources
   class Site
     attr_reader :url, :strategy
     delegate :get, :referer_url, :site_name, :artist_name, :profile_url, :image_url, :tags, :artist_record, :unique_id, :to => :strategy
-    
+
     def self.strategies
       [Strategies::NicoSeiga, Strategies::Pixiv]
     end
-    
+
     def initialize(url)
       @url = url
-      
+
       Site.strategies.each do |strategy|
         if strategy.url_match?(url)
           @strategy = strategy.new(url)
@@ -18,7 +18,7 @@ module Sources
         end
       end
     end
-    
+
     def to_json
       return {
         :artist_name => artist_name,
@@ -30,7 +30,7 @@ module Sources
         :unique_id => unique_id
       }.to_json
     end
-    
+
     def available?
       strategy.present?
     end

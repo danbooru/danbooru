@@ -8,7 +8,7 @@ if User.count == 0
     :password => "password1",
     :password_confirmation => "password1"
   )
-  
+
   0.upto(100) do |i|
     User.create(
       :name => i.to_s * 5,
@@ -32,7 +32,7 @@ if Upload.count == 0
     height = rand(2000) + 100
     url = "http://ipsumimage.appspot.com/#{width}x#{height}"
     tags = (i * i * i).to_s.scan(/./).uniq.join(" ")
-  
+
     Upload.create(:source => url, :content_type => "image/gif", :rating => "q", :tag_string => tags, :server => Socket.gethostname)
   end
 else
@@ -64,7 +64,7 @@ if Note.count == 0
   Post.all.each do |post|
     rand(10).times do
       note = Note.create(:post_id => post.id, :x => 0, :y => 0, :width => 100, :height => 100, :body => Time.now.to_f.to_s)
-      
+
       rand(30).times do |i|
         note.update_attributes(:body => (i * i).to_s)
       end
@@ -85,7 +85,7 @@ end
 
 if TagAlias.count == 0
   puts "Creating tag aliases"
-  
+
   100.upto(199) do |i|
     TagAlias.create(:antecedent_name => i.to_s, :consequent_name => (i * 100).to_s)
   end
@@ -105,7 +105,7 @@ end
 
 if Pool.count == 0
   puts "Creating pools"
-  
+
   1.upto(20) do |i|
     pool = Pool.create(:name => i.to_s)
     rand(33).times do |j|
@@ -122,16 +122,16 @@ if Favorite.count == 0
     post.add_favorite!(user)
     post.add_favorite!(CurrentUser.user)
   end
-else 
+else
   puts "Skipping favorites"
 end
 
 if ForumTopic.count == 0
   puts "Creating forum posts"
-  
+
   100.times do |i|
     topic = ForumTopic.create(:title => Time.now.to_f.to_s)
-    
+
     rand(100).times do |j|
       post = ForumPost.create(:topic_id => topic.id, :body => Time.now.to_f.to_s)
     end

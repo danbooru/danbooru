@@ -6,7 +6,7 @@ class CreateIpBans < ActiveRecord::Migration
       t.column :reason, :text, :null => false
       t.timestamps
     end
-    
+
     add_index :ip_bans, :ip_addr, :unique => true
   end
 

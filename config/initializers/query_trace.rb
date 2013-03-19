@@ -72,7 +72,7 @@ end
 QueryTrace.attach_to :active_record
 
 trap('QUIT') do
-  # Sending 2 backspace characters removes the ^\ that is 
+  # Sending 2 backspace characters removes the ^\ that is
   # printed to the console.
   rm_noise = "\b\b"
 

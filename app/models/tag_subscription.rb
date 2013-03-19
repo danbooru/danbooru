@@ -8,15 +8,15 @@ class TagSubscription < ActiveRecord::Base
   validates_presence_of :name, :tag_query, :creator_id
   validates_format_of :tag_query, :with => /^(?:\S+\s*){1,20}$/m, :message => "can have up to 20 tags"
   validate :creator_can_create_subscriptions, :on => :create
-  
+
   def normalize_name
     self.name = name.gsub(/\s+/, "_")
   end
-  
+
   def pretty_name
     name.tr("_", " ")
   end
-  
+
   def initialize_creator
     self.creator_id = CurrentUser.id
   end
@@ -24,7 +24,7 @@ class TagSubscription < ActiveRecord::Base
   def initialize_post_ids
     process
   end
-  
+
   def creator_can_create_subscriptions
     if TagSubscription.owned_by(creator).count >= Danbooru.config.max_tag_subscriptions
       self.errors.add(:creator, "can create up to #{Danbooru.config.max_tag_subscriptions} tag subscriptions")
@@ -49,38 +49,38 @@ class TagSubscription < ActiveRecord::Base
     end
     self.post_ids = post_ids.sort.reverse.slice(0, Danbooru.config.tag_subscription_post_limit).join(",")
   end
-  
+
   def is_active?
     creator.last_logged_in_at && creator.last_logged_in_at > 1.year.ago
   end
-  
+
   def editable_by?(user)
     user.is_moderator? || creator_id == user.id
   end
-  
+
   def post_id_array
     post_ids.split(/,/)
   end
-  
+
   def self.search(params)
     q = scoped
     return q if params.blank?
-    
+
     if params[:creator_id]
       q = q.where("creator_id = ?", params[:creator_id].to_i)
     end
-    
+
     if params[:creator_name]
       q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].downcase)
     end
-    
+
     q
   end
-  
+
   def self.visible_to(user)
     where("(is_public = TRUE OR creator_id = ? OR ?)", user.id, user.is_moderator?)
   end
-  
+
   def self.owned_by(user)
     where("creator_id = ?", user.id)
   end
@@ -95,10 +95,10 @@ class TagSubscription < ActiveRecord::Base
     end
 
     user = User.find_by_name(user_name)
-    
+
     if user
       relation = where(["creator_id = ?", user.id])
-      
+
       if sub_group
         relation = relation.where(["name ILIKE ? ESCAPE E'\\\\'", sub_group.to_escaped_for_sql_like])
       end
@@ -106,16 +106,16 @@ class TagSubscription < ActiveRecord::Base
       relation.map {|x| x.tag_query.split(/ /)}.flatten
     else
       []
-    end        
+    end
   end
 
   def self.find_post_ids(user_id, name = nil, limit = Danbooru.config.tag_subscription_post_limit)
     relation = where("creator_id = ?", user_id)
-    
+
     if name
       relation = relation.where("lower(name) LIKE ? ESCAPE E'\\\\'", name.downcase.to_escaped_for_sql_like)
     end
-    
+
     relation.each do |tag_sub|
       tag_sub.update_column(:last_accessed_at, Time.now)
     end

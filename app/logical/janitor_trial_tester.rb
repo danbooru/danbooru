@@ -1,10 +1,10 @@
 class JanitorTrialTester
   attr_reader :user
-  
+
   def initialize(user_name)
     @user = User.find_by_name(user_name)
   end
-  
+
   def test
     if user.nil?
       "User not found"

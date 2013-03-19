@@ -2,7 +2,7 @@ class CreatePostVersions < ActiveRecord::Migration
   def self.up
     create_table :post_versions do |t|
       t.timestamps
-      
+
       t.column :post_id, :integer, :null => false
       t.column :tags, :text, :null => false, :default => ""
       t.column :rating, :char
@@ -11,7 +11,7 @@ class CreatePostVersions < ActiveRecord::Migration
       t.column :updater_id, :integer, :null => false
       t.column :updater_ip_addr, "inet", :null => false
     end
-    
+
     add_index :post_versions, :post_id
     add_index :post_versions, :updater_id
     add_index :post_versions, :updater_ip_addr

@@ -9,12 +9,12 @@ module Downloads
         @download = Downloads::File.new(@source, @tempfile.path)
         @download.download!
       end
-    
+
       should "instead download the big version" do
         assert_equal("http://img65.pixiv.net/img/kiyoringo/21755794_big_p2.png", @download.source)
       end
     end
-    
+
     context "a download for a html page" do
       setup do
         @source = "http://www.pixiv.net/member_illust.php?mode=big&illust_id=23828655"
@@ -23,12 +23,12 @@ module Downloads
         @download = Downloads::File.new(@source, @tempfile.path)
         @download.download!
       end
-      
+
       should "work" do
         assert_equal(185778, ::File.size(@tempfile.path))
       end
     end
-    
+
     context "a download for a small image" do
       setup do
         @source = "http://img02.pixiv.net/img/wanwandoh/4348318_m.jpg"
@@ -36,11 +36,11 @@ module Downloads
         @download = Downloads::File.new(@source, @tempfile.path)
         @download.download!
       end
-      
+
       should "instead download the original version" do
         assert_equal("http://img02.pixiv.net/img/wanwandoh/4348318.jpg", @download.source)
       end
-      
+
       should "work" do
         assert_equal(185778, ::File.size(@tempfile.path))
       end

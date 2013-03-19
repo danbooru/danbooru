@@ -7,7 +7,7 @@ class Advertisement < ActiveRecord::Base
   def copy_to_servers
     RemoteFileManager.new(image_path).distribute
   end
-  
+
   def delete_from_servers
     RemoteFileManager.new(image_path).delete
   end
@@ -19,15 +19,15 @@ class Advertisement < ActiveRecord::Base
   def hit_sum(start_date, end_date)
     hits.where(["created_at BETWEEN ? AND ?", start_date, end_date]).count
   end
-  
+
   def unique_identifier
     @unique_identifier ||= ("%.0f" % (Time.now.to_f * 1_000))
   end
-  
+
   def image_url
     "/images/advertisements/ads-#{date_prefix}/#{file_name}"
   end
-  
+
   def date_prefix
     created_at.try(:strftime, "%Y%m%d")
   end
@@ -35,11 +35,11 @@ class Advertisement < ActiveRecord::Base
   def image_path
     "#{Danbooru.config.advertisement_path}/ads-#{date_prefix}/#{file_name}"
   end
-  
+
   def file
     nil
   end
-  
+
   def file=(f)
     if f.size > 0
       self.file_name = unique_identifier + File.extname(f.original_filename)
@@ -55,7 +55,7 @@ class Advertisement < ActiveRecord::Base
       image_size = ImageSize.new(File.open(image_path, "rb"))
       self.width = image_size.get_width
       self.height = image_size.get_height
-      
+
       if width > height
         self.ad_type = "horizontal"
       else
@@ -63,7 +63,7 @@ class Advertisement < ActiveRecord::Base
       end
     end
   end
-  
+
   def preview_width
     if width > 100 || height > 100
       if width < height
@@ -72,9 +72,9 @@ class Advertisement < ActiveRecord::Base
       else
         return 100
       end
-    end      
+    end
   end
-  
+
   def preview_height
     if width > 100 || height > 100
       if height < width
@@ -83,6 +83,6 @@ class Advertisement < ActiveRecord::Base
       else
         return 100
       end
-    end      
+    end
   end
 end

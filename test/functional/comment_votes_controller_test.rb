@@ -8,19 +8,19 @@ class CommentVotesControllerTest < ActionController::TestCase
       Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
       @comment = FactoryGirl.create(:comment)
     end
-    
+
     teardown do
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
-    
+
     should "create a vote" do
       assert_difference("CommentVote.count", 1) do
         post :create, {:format => "js", :comment_id => @comment.id, :score => 1}, {:user_id => @user.id}
         assert_response :success
       end
     end
-    
+
     should "fail silently on errors" do
       FactoryGirl.create(:comment_vote, :comment => @comment)
       assert_difference("CommentVote.count", 0) do

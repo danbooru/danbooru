@@ -16,18 +16,18 @@ module Maintenance
           CurrentUser.user = nil
           CurrentUser.ip_addr = nil
         end
-        
+
         should "render the new page" do
           get :new
           assert_response :success
         end
-        
+
         context "create action" do
           context "given invalid parameters" do
             setup do
               post :create, {:nonce => {:email => ""}}
             end
-            
+
             should "not create a new nonce" do
               assert_equal(0, UserPasswordResetNonce.count)
             end
@@ -40,7 +40,7 @@ module Maintenance
               assert_equal(0, ActionMailer::Base.deliveries.size)
             end
           end
-          
+
           context "given valid parameters" do
             setup do
               post :create, {:nonce => {:email => @user.email}}
@@ -49,7 +49,7 @@ module Maintenance
             should "create a new nonce" do
               assert_equal(1, UserPasswordResetNonce.where(:email => @user.email).count)
             end
-            
+
             should "redirect to the new page" do
               assert_redirected_to new_maintenance_user_password_reset_path
             end
@@ -70,7 +70,7 @@ module Maintenance
               assert_response :success
             end
           end
-          
+
           context "with valid parameters" do
             setup do
               @user = FactoryGirl.create(:user)
@@ -78,24 +78,24 @@ module Maintenance
               ActionMailer::Base.deliveries.clear
               get :edit, :email => @nonce.email, :key => @nonce.key
             end
-            
+
             should "succeed" do
               assert_response :success
             end
           end
         end
-        
+
         context "update action" do
           context "with invalid parameters" do
             setup do
               get :update
             end
-            
+
             should "fail" do
               assert_redirected_to new_maintenance_user_password_reset_path
             end
           end
-          
+
           context "with valid parameters" do
             setup do
               @user = FactoryGirl.create(:user)
@@ -104,20 +104,20 @@ module Maintenance
               @old_password = @user.bcrypt_password_hash
               post :update, :email => @nonce.email, :key => @nonce.key
             end
-            
+
             should "succeed" do
               assert_redirected_to new_maintenance_user_password_reset_path
             end
-            
+
             should "send an email" do
               assert_equal(1, ActionMailer::Base.deliveries.size)
             end
-            
+
             should "change the password" do
               @user.reload
               assert_not_equal(@old_password, @user.bcrypt_password_hash)
             end
-            
+
             should "delete the nonce" do
               assert_equal(0, UserPasswordResetNonce.count)
             end

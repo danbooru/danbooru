@@ -1,28 +1,28 @@
 class JanitorTrialsController < ApplicationController
   respond_to :html, :xml, :json
   before_filter :moderator_only, :only => [:create, :promote, :demote]
-  
+
   def new
     @janitor_trial = JanitorTrial.new
     respond_with(@janitor_trial)
   end
-  
+
   def edit
     @janitor_trial = JanitorTrial.find(params[:id])
     respond_with(@janitor_trial)
   end
-  
+
   def index
     @search = JanitorTrial.search(params[:search])
     @janitor_trials = @search.order("id desc").paginate(params[:page])
     respond_with(@janitor_trials)
   end
-  
+
   def create
     @janitor_trial = JanitorTrial.create(params[:janitor_trial])
     respond_with(@janitor_trial, :location => janitor_trials_path)
   end
-  
+
   def promote
     @janitor_trial = JanitorTrial.find(params[:id])
     @janitor_trial.promote!
@@ -30,7 +30,7 @@ class JanitorTrialsController < ApplicationController
       format.js
     end
   end
-  
+
   def demote
     @janitor_trial = JanitorTrial.find(params[:id])
     @janitor_trial.demote!
@@ -38,7 +38,7 @@ class JanitorTrialsController < ApplicationController
       format.js
     end
   end
-  
+
   def test
     @tester = JanitorTrialTester.new(params[:janitor_trial][:user_name])
   end

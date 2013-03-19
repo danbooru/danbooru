@@ -1,5 +1,5 @@
 # require 'test_helper'
-# 
+#
 # module Downloads
 #   class TinamiTest < ActiveSupport::TestCase
 #     context "a download for a pixa image" do
@@ -8,7 +8,7 @@
 #         @tempfile = Tempfile.new("danbooru-test")
 #         @download = Downloads::File.new(@source, @tempfile.path)
 #       end
-#     
+#
 #       should "work" do
 #         @download.download!
 #         assert_equal(201248, ::File.size(@tempfile.path))

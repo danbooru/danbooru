@@ -7,44 +7,44 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
-    
+
     teardown do
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
-    
+
     context "given a valid list" do
       setup do
         @list = "create alias abc -> def\ncreate implication aaa -> bbb\n"
         @importer = AliasAndImplicationImporter.new(@list, nil)
       end
-      
+
       should "process it" do
         assert_difference("Delayed::Job.count", 4) do
           @importer.process!
         end
       end
     end
-    
+
     context "given a list with an invalid command" do
       setup do
         @list = "zzzz abc -> def\n"
         @importer = AliasAndImplicationImporter.new(@list, nil)
       end
-      
+
       should "throw an exception" do
         assert_raises(RuntimeError) do
           @importer.process!
         end
       end
     end
-    
+
     context "given a list with a logic error" do
       setup do
         @list = "remove alias zzz -> yyy\n"
         @importer = AliasAndImplicationImporter.new(@list, nil)
       end
-      
+
       should "throw an exception" do
         assert_raises(RuntimeError) do
           @importer.process!

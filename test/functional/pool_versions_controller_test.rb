@@ -7,34 +7,34 @@ class PoolVersionsControllerTest < ActionController::TestCase
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
-    
+
     teardown do
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
-    
+
     context "index action" do
       setup do
         @pool = FactoryGirl.create(:pool)
         @user_2 = FactoryGirl.create(:user)
         @user_3 = FactoryGirl.create(:user)
-        
+
         CurrentUser.scoped(@user_2, "1.2.3.4") do
           @pool.update_attributes(:post_ids => "1 2")
         end
-        
+
         CurrentUser.scoped(@user_3, "5.6.7.8") do
           @pool.update_attributes(:post_ids => "1 2 3 4")
         end
       end
-      
+
       should "list all versions" do
         get :index
         assert_response :success
         assert_not_nil(assigns(:pool_versions))
         assert_equal(3, assigns(:pool_versions).size)
       end
-      
+
       should "list all versions that match the search criteria" do
         get :index, {:search => {:updater_id => @user_2.id}}
         assert_response :success

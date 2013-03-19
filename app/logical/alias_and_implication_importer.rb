@@ -1,18 +1,18 @@
 class AliasAndImplicationImporter
   attr_accessor :text, :commands, :forum_id
-  
+
   def initialize(text, forum_id)
     @forum_id = forum_id
     @text = text
   end
-  
+
   def process!
     tokens = tokenize(text)
     parse(tokens)
   end
-  
+
 private
-  
+
   def tokenize(text)
     text.gsub!(/^\s+/, "")
     text.gsub!(/\s+$/, "")
@@ -33,7 +33,7 @@ private
       end
     end
   end
-  
+
   def parse(tokens)
     ActiveRecord::Base.transaction do
       tokens.map do |token|
@@ -41,21 +41,21 @@ private
         when :create_alias
           tag_alias = TagAlias.create(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2])
           tag_alias.delay(:queue => "default").process!
-        
+
         when :create_implication
           tag_implication = TagImplication.create(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2])
           tag_implication.delay(:queue => "default").process!
-      
+
         when :remove_alias
           tag_alias = TagAlias.where("antecedent_name = ?", token[1]).first
           raise "Alias for #{token[1]} not found" if tag_alias.nil?
           tag_alias.destroy
-      
+
         when :remove_implication
           tag_implication = TagImplication.where("antecedent_name = ? and consequent_name = ?", token[1], token[2]).first
           raise "Implication for #{token[1]} not found" if tag_implication.nil?
           tag_implication.destroy
-        
+
         else
           raise "Unknown token: #{token[0]}"
         end

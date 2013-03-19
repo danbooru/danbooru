@@ -14,12 +14,12 @@ class TagAliasTest < ActiveSupport::TestCase
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
-        
+
     should "populate the creator information" do
       ta = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
       assert_equal(CurrentUser.user.id, ta.creator_id)
     end
-        
+
     should "convert a tag to its normalized version" do
       tag1 = FactoryGirl.create(:tag, :name => "aaa")
       tag2 = FactoryGirl.create(:tag, :name => "bbb")
@@ -27,7 +27,7 @@ class TagAliasTest < ActiveSupport::TestCase
       normalized_tags = TagAlias.to_aliased(["aaa", "ccc"])
       assert_equal(["bbb", "ccc"], normalized_tags.sort)
     end
-    
+
     should "update the cache" do
       tag1 = FactoryGirl.create(:tag, :name => "aaa")
       tag2 = FactoryGirl.create(:tag, :name => "bbb")
@@ -38,7 +38,7 @@ class TagAliasTest < ActiveSupport::TestCase
       ta.destroy
       assert_nil(Cache.get("ta:aaa"))
     end
-    
+
     should "update any affected posts when saved" do
       assert_equal(0, TagAlias.count)
       post1 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
@@ -51,7 +51,7 @@ class TagAliasTest < ActiveSupport::TestCase
       assert_equal("bbb ccc", post1.tag_string)
       assert_equal("ccc ddd", post2.tag_string)
     end
-    
+
     should "not validate for transitive relations" do
       ta1 = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
       assert_difference("TagAlias.count", 0) do
@@ -61,7 +61,7 @@ class TagAliasTest < ActiveSupport::TestCase
         assert_equal("Tag alias can not create a transitive relation with another tag alias", ta3.errors.full_messages.join)
       end
     end
-    
+
     should "record the alias's creator in the tag history" do
       uploader = FactoryGirl.create(:user)
       post = nil
@@ -73,7 +73,7 @@ class TagAliasTest < ActiveSupport::TestCase
       assert_not_equal(tag_alias.creator_id, post.uploader_id)
       assert_equal(tag_alias.creator_id, post.versions.last.updater_id)
     end
-    
+
     should "push the antecedent's category to the consequent" do
       tag1 = FactoryGirl.create(:tag, :name => "aaa", :category => 1)
       tag2 = FactoryGirl.create(:tag, :name => "bbb")

@@ -11,15 +11,15 @@ class AnonymousUser
   def comment_threshold
     0
   end
-  
+
   def created_at
     Time.now
   end
-  
+
   def updated_at
     Time.now
   end
-  
+
   def name
     "Anonymous"
   end
@@ -31,11 +31,11 @@ class AnonymousUser
   def is_anonymous?
     true
   end
-  
+
   def has_mail?
     false
   end
-  
+
   def has_forum_been_updated?
     false
   end
@@ -47,11 +47,11 @@ class AnonymousUser
   def ban
     false
   end
-  
+
   def always_resize_images?
     false
   end
-  
+
   def show_samples?
     true
   end
@@ -59,15 +59,15 @@ class AnonymousUser
   def tag_subscriptions
     []
   end
-  
+
   def favorite_tags
     nil
   end
-  
+
   def upload_limit
     0
   end
-  
+
   def base_upload_limit
     0
   end
@@ -75,15 +75,15 @@ class AnonymousUser
   def uploaded_tags
     ""
   end
-  
+
   def uploaded_tags_with_types
     []
   end
-  
+
   def recent_tags
     ""
   end
-  
+
   def recent_tags_with_types
     []
   end
@@ -91,15 +91,15 @@ class AnonymousUser
   def can_upload?
     false
   end
-  
+
   def can_comment?
     false
   end
-  
+
   def can_remove_from_pools?
     false
   end
-  
+
   def blacklisted_tags
     ""
   end
@@ -107,64 +107,64 @@ class AnonymousUser
   def time_zone
     "Eastern Time (US & Canada)"
   end
-  
+
   def default_image_size
     "large"
   end
-  
+
   def blacklisted_tags
     []
   end
-  
+
   def email
     ""
   end
-  
+
   def last_forum_read_at
     Time.now
   end
-  
+
   def update_column(*params)
   end
-  
+
   def increment!(field)
   end
-  
+
   def decrement!(field)
   end
-  
+
   def role
     :anonymous
   end
-  
+
   def tag_query_limit
     2
   end
-  
+
   def favorite_limit
     0
   end
-  
+
   def favorite_count
     0
   end
-  
+
   def enable_post_navigation
     true
   end
-  
+
   def new_post_navigation_layout
     true
   end
-  
+
   def enable_privacy_mode
     false
   end
-  
+
   def enable_sequential_post_navigation
     true
   end
-  
+
   %w(member banned privileged builder platinum contributor janitor moderator admin).each do |name|
     define_method("is_#{name}?") do
       false

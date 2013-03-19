@@ -14,12 +14,12 @@ class IpBansController < ApplicationController
       redirect_to ip_bans_path
     end
   end
-  
+
   def index
     @search = IpBan.search(params[:search])
     @ip_bans = @search.order("id desc").paginate(params[:page])
   end
-  
+
   def destroy
     @ip_ban = IpBan.find(params[:id])
     @ip_ban.destroy

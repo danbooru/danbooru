@@ -10,14 +10,14 @@ module Moderator
             FROM post_appeals
             JOIN posts ON posts.id = post_appeals.post_id
             WHERE
-              post_appeals.created_at > ? 
+              post_appeals.created_at > ?
               and posts.is_deleted = true
               and posts.is_pending = false
             GROUP BY post_appeals.post_id
             ORDER BY count(*) DESC
             LIMIT 10
           EOS
-          
+
           ActiveRecord::Base.select_all_sql(sql, min_date).map {|x| new(x)}
         end
 

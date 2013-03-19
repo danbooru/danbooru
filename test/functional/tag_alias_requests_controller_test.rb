@@ -9,19 +9,19 @@ class TagAliasRequestsControllerTest < ActionController::TestCase
       MEMCACHE.flush_all
       Delayed::Worker.delay_jobs = false
     end
-    
+
     teardown do
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
-    
+
     context "new action" do
       should "render" do
         get :new, {}, {:user => @user.id}
         assert_response :success
       end
     end
-    
+
     context "create action" do
       should "render" do
         assert_difference("ForumTopic.count", 1) do

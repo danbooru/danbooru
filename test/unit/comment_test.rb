@@ -8,31 +8,31 @@ class CommentTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
     end
-    
+
     teardown do
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
-    
+
     context "created by a limited user" do
       setup do
         Danbooru.config.stubs(:member_comment_limit).returns(5)
         Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.ago)
       end
-      
+
       should "fail creation" do
         comment = FactoryGirl.build(:comment)
         comment.save
         assert_equal(["Creator can not post comments within 1 week of sign up, and can only post 5 comments per hour after that"], comment.errors.full_messages)
       end
     end
-    
+
     context "created by an unlimited user" do
       setup do
         Danbooru.config.stubs(:member_comment_limit).returns(100)
         Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
       end
-      
+
       context "that is then deleted" do
         setup do
           @post = FactoryGirl.create(:post)
@@ -40,7 +40,7 @@ class CommentTest < ActiveSupport::TestCase
           @comment.destroy
           @post.reload
         end
-        
+
         should "nullify the last_commented_at field" do
           assert_nil(@post.last_commented_at)
         end

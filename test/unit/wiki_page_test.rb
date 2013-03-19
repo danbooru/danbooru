@@ -4,7 +4,7 @@ class WikiPageTest < ActiveSupport::TestCase
   setup do
     MEMCACHE.flush_all
   end
-  
+
   teardown do
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
@@ -18,14 +18,14 @@ class WikiPageTest < ActiveSupport::TestCase
         CurrentUser.ip_addr = "127.0.0.1"
         @wiki_page = FactoryGirl.create(:wiki_page)
       end
-        
+
       should "allow the is_locked attribute to be updated" do
         @wiki_page.update_attributes(:is_locked => true)
         @wiki_page.reload
         assert_equal(true, @wiki_page.is_locked?)
       end
     end
-    
+
     context "updated by a regular user" do
       setup do
         @user = FactoryGirl.create(:user)
@@ -33,14 +33,14 @@ class WikiPageTest < ActiveSupport::TestCase
         CurrentUser.ip_addr = "127.0.0.1"
         @wiki_page = FactoryGirl.create(:wiki_page, :title => "HOT POTATO")
       end
-      
+
       should "not allow the is_locked attribute to be updated" do
         @wiki_page.update_attributes(:is_locked => true)
         assert_equal(["Is locked can be modified by janitors only"], @wiki_page.errors.full_messages)
         @wiki_page.reload
         assert_equal(false, @wiki_page.is_locked?)
       end
-      
+
       should "normalize its title" do
         assert_equal("hot_potato", @wiki_page.title)
       end
@@ -78,7 +78,7 @@ class WikiPageTest < ActiveSupport::TestCase
           @wiki_page.save
         end
         version = WikiPageVersion.first
-        assert_not_equal(@wiki_page.creator_id, version.updater_id)      
+        assert_not_equal(@wiki_page.creator_id, version.updater_id)
       end
     end
   end

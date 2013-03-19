@@ -5,7 +5,7 @@ FactoryGirl.define do
     category {Tag.categories.general}
     related_tags ""
     related_tags_updated_at {Time.now}
-    
+
     factory(:artist_tag) do
       category {Tag.categories.artist}
     end

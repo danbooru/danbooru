@@ -8,10 +8,10 @@ module Moderator
           @admin = FactoryGirl.create(:admin_user)
           CurrentUser.user = @admin
           CurrentUser.ip_addr = "127.0.0.1"
-          
+
           @post = FactoryGirl.create(:post, :is_pending => true)
         end
-        
+
         context "show action" do
           should "render" do
             get :show, {}, {:user_id => @admin.id}

@@ -1,10 +1,10 @@
 class TagAliasRequestsController < ApplicationController
   before_filter :member_only
   rescue_from TagAliasRequest::ValidationError, :with => :rescue_exception
-  
+
   def new
   end
-  
+
   def create
     @tag_alias_request = TagAliasRequest.new(
       params[:tag_alias_request][:antecedent_name],

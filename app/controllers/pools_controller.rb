@@ -8,31 +8,31 @@ class PoolsController < ApplicationController
     @pool = Pool.new
     respond_with(@pool)
   end
-  
+
   def edit
     @pool = Pool.find(params[:id])
     respond_with(@pool)
   end
-  
+
   def index
     @pools = Pool.active.search(params[:search]).order("updated_at desc").paginate(params[:page], :search_count => params[:search])
     respond_with(@pools)
   end
-  
+
   def search
   end
-  
+
   def show
     @pool = Pool.find(params[:id])
     @post_set = PostSets::Pool.new(@pool, params[:page])
     respond_with(@pool)
   end
-  
+
   def create
     @pool = Pool.create(params[:pool])
     respond_with(@pool, :notice => "Pool created")
   end
-  
+
   def update
     # need to do this in order for synchronize! to work correctly
     @pool = Pool.find(params[:id])
@@ -41,7 +41,7 @@ class PoolsController < ApplicationController
     @pool.save
     respond_with(@pool, :notice => "Pool updated")
   end
-  
+
   def destroy
     @pool = Pool.find(params[:id])
     if !@pool.deletable_by?(CurrentUser.user)
@@ -50,7 +50,7 @@ class PoolsController < ApplicationController
     @pool.update_attribute(:is_deleted, true)
     respond_with(@pool, :notice => "Pool deleted")
   end
-  
+
   def undelete
     @pool = Pool.find(params[:id])
     if !@pool.deletable_by?(CurrentUser.user)
@@ -59,7 +59,7 @@ class PoolsController < ApplicationController
     @pool.update_attribute(:is_deleted, false)
     respond_with(@pool, :notice => "Pool undeleted")
   end
-  
+
   def revert
     @pool = Pool.find(params[:id])
     @version = PoolVersion.find(params[:version_id])

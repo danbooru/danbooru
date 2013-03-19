@@ -12,7 +12,7 @@ class CreateArtistVersions < ActiveRecord::Migration
       t.column :is_banned, :boolean, :null => false, :default => false
       t.timestamps
     end
-    
+
     add_index :artist_versions, :artist_id
     add_index :artist_versions, :name
     add_index :artist_versions, :updater_id

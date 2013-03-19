@@ -6,11 +6,11 @@ class CreateArtistUrls < ActiveRecord::Migration
       t.column :normalized_url, :text, :null => false
       t.timestamps
     end
-    
+
     add_index :artist_urls, :artist_id
     add_index :artist_urls, :normalized_url
     add_index :artist_urls, :url
-    
+
     execute "create index index_artist_urls_on_url_pattern on artist_urls (url text_pattern_ops)"
     execute "create index index_artist_urls_on_normalized_url_pattern on artist_urls (normalized_url text_pattern_ops)"
   end

@@ -7,12 +7,12 @@ class PostFlagsController < ApplicationController
     @post_flag = PostFlag.new
     respond_with(@post_flag)
   end
-  
+
   def index
     @search = PostFlag.order("id desc").search(params[:search])
     @post_flags = @search.paginate(params[:page])
   end
-  
+
   def create
     @post_flag = PostFlag.create(params[:post_flag].merge(:is_resolved => false))
     respond_with(@post_flag)

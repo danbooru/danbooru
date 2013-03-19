@@ -9,7 +9,7 @@ class CreateTagAliases < ActiveRecord::Migration
       t.column :status, :text, :null => false, :default => "pending"
       t.timestamps
     end
-    
+
     add_index :tag_aliases, :antecedent_name
     add_index :tag_aliases, :consequent_name
   end

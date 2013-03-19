@@ -9,7 +9,7 @@ class CreateComments < ActiveRecord::Migration
       t.column :score, :integer, :null => false, :default => 0
       t.timestamps
     end
-    
+
     add_index :comments, :post_id
     execute "CREATE INDEX index_comments_on_body_index ON comments USING GIN (body_index)"
     execute "CREATE TRIGGER trigger_comments_on_update BEFORE INSERT OR UPDATE ON comments FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('body_index', 'pg_catalog.english', 'body')"

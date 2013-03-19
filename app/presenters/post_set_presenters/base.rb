@@ -3,7 +3,7 @@ module PostSetPresenters
     def posts
       raise NotImplementedError
     end
-    
+
     def post_previews_html(template)
       html = ""
 

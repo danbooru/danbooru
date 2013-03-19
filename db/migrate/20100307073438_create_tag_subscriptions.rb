@@ -10,7 +10,7 @@ class CreateTagSubscriptions < ActiveRecord::Migration
       t.column :is_opted_in, :boolean, :null => false, :default => false
       t.timestamps
     end
-    
+
     add_index :tag_subscriptions, :creator_id
     add_index :tag_subscriptions, :name
   end

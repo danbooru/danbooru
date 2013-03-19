@@ -8,5 +8,5 @@ class AdvertisementHitsController < ApplicationController
 protected
   def set_title
     @page_title = Danbooru.config.app_name + "/advertisements"
-  end    
+  end
 end

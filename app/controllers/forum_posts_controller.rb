@@ -8,19 +8,19 @@ class ForumPostsController < ApplicationController
     @forum_post = ForumPost.new_reply(params)
     respond_with(@forum_post)
   end
-  
+
   def edit
     @forum_post = ForumPost.find(params[:id])
     check_privilege(@forum_post)
     respond_with(@forum_post)
   end
-  
+
   def index
     @search = ForumPost.active.search(params[:search])
     @forum_posts = @search.order("forum_posts.id DESC").paginate(params[:page], :search_count => params[:search])
     respond_with(@forum_posts)
   end
-  
+
   def search
   end
 
@@ -32,33 +32,33 @@ class ForumPostsController < ApplicationController
       respond_with(@forum_post)
     end
   end
-  
+
   def create
     @forum_post = ForumPost.create(params[:forum_post])
     respond_with(@forum_post, :location => forum_topic_path(@forum_post.topic, :page => @forum_post.topic.last_page))
   end
-  
+
   def update
     @forum_post = ForumPost.find(params[:id])
     check_privilege(@forum_post)
     @forum_post.update_attributes(params[:forum_post])
     respond_with(@forum_post, :location => forum_topic_path(@forum_post.topic, :page => @forum_post.forum_topic_page))
   end
-  
+
   def destroy
     @forum_post = ForumPost.find(params[:id])
     raise User::PrivilegeError unless @forum_post.editable_by?(CurrentUser.user)
     @forum_post.update_attribute(:is_deleted, true)
     respond_with(@forum_post)
   end
-  
+
   def undelete
     @forum_post = ForumPost.find(params[:id])
     check_privilege(@forum_post)
     @forum_post.update_attribute(:is_deleted, false)
     respond_with(@forum_post)
   end
-  
+
 private
   def check_privilege(forum_post)
     if !forum_post.editable_by?(CurrentUser.user)

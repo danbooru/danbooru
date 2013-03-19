@@ -1,30 +1,30 @@
 class PoolElementsController < ApplicationController
   respond_to :html, :xml, :json, :js
   before_filter :member_only
-  
+
   def create
     @pool = Pool.find_by_name(params[:pool_name]) || Pool.find_by_id(params[:pool_id])
-    
+
     if @pool.present?
       @post = Post.find(params[:post_id])
       @pool.add!(@post)
       append_pool_to_session(@pool)
     end
-    
+
     respond_with(@pool, :location => post_path(@post))
   end
-  
+
   def destroy
     @pool = Pool.find(params[:pool_id])
     @post = Post.find(params[:post_id])
     @pool.remove!(@post)
     respond_with(@pool, :location => post_path(@post))
   end
-  
+
   def all_select
     @pools = Pool.active.order("name").select("id, name").all
   end
-  
+
 private
   def append_pool_to_session(pool)
     recent_pool_ids = session[:recent_pool_ids].to_s.scan(/\d+/)

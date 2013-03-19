@@ -8,54 +8,54 @@ class PostTest < ActiveSupport::TestCase
     MEMCACHE.flush_all
     Delayed::Worker.delay_jobs = false
   end
-  
+
   teardown do
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
   end
-  
+
   context "Deletion:" do
     context "Annihilating a post" do
       setup do
         @post = FactoryGirl.create(:post)
       end
-      
+
       context "that is status locked" do
         setup do
           @post.update_attributes({:is_status_locked => true}, :as => :admin)
         end
-        
+
         should "not destroy the record" do
           @post.annihilate!
           assert_equal(1, Post.where("id = ?", @post.id).count)
         end
       end
-      
+
       should "destroy the record" do
         @post.annihilate!
         assert_equal([], @post.errors.full_messages)
         assert_equal(0, Post.where("id = ?", @post.id).count)
       end
     end
-    
+
     context "Deleting a post" do
       setup do
         Danbooru.config.stubs(:blank_tag_search_fast_count).returns(nil)
       end
-      
+
       context "that is status locked" do
         setup do
           @post = FactoryGirl.create(:post)
           @post.update_attributes({:is_status_locked => true}, :as => :admin)
         end
-        
+
         should "fail" do
           @post.delete!
           assert_equal(["Is status locked ; cannot delete post"], @post.errors.full_messages)
           assert_equal(1, Post.where("id = ?", @post.id).count)
         end
       end
-      
+
       should "update the fast count" do
         post = FactoryGirl.create(:post, :tag_string => "aaa")
         assert_equal(1, Post.fast_count)
@@ -64,14 +64,14 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(1, Post.fast_count)
         assert_equal(1, Post.fast_count("aaa"))
       end
-      
+
       should "toggle the is_deleted flag" do
         post = FactoryGirl.create(:post)
         assert_equal(false, post.is_deleted?)
         post.delete!
         assert_equal(true, post.is_deleted?)
       end
-      
+
       should "not decrement the tag counts" do
         post = FactoryGirl.create(:post, :tag_string => "aaa")
         assert_equal(1, Tag.find_by_name("aaa").post_count)
@@ -80,7 +80,7 @@ class PostTest < ActiveSupport::TestCase
       end
     end
   end
-  
+
   context "Parenting:" do
     context "Assignining a parent to a post" do
       should "update the has_children flag on the parent" do
@@ -90,7 +90,7 @@ class PostTest < ActiveSupport::TestCase
         p1.reload
         assert(p1.has_children?, "Parent not updated after child was added")
       end
-      
+
       should "update the has_children flag on the old parent" do
         p1 = FactoryGirl.create(:post)
         p2 = FactoryGirl.create(:post)
@@ -108,7 +108,7 @@ class PostTest < ActiveSupport::TestCase
         post.save
         assert(post.errors[:parent].any?, "Parent should be invalid")
       end
-      
+
       # should "fail if the parent has a parent" do
       #   p1 = FactoryGirl.create(:post)
       #   c1 = FactoryGirl.create(:post, :parent_id => p1.id)
@@ -117,7 +117,7 @@ class PostTest < ActiveSupport::TestCase
       #   assert(c2.errors[:parent].any?, "Parent should be invalid")
       # end
     end
-        
+
     context "Destroying a post with" do
       context "a parent" do
         should "reset the has_children flag of the parent" do
@@ -127,7 +127,7 @@ class PostTest < ActiveSupport::TestCase
           p1.reload
           assert_equal(false, p1.has_children?)
         end
-        
+
         should "reassign favorites to the parent" do
           p1 = FactoryGirl.create(:post)
           c1 = FactoryGirl.create(:post, :parent_id => p1.id)
@@ -148,7 +148,7 @@ class PostTest < ActiveSupport::TestCase
           assert(!p1.has_children?, "Parent should not have children")
         end
       end
-      
+
       context "one child" do
         should "remove the has_children flag" do
           p1 = FactoryGirl.create(:post)
@@ -156,7 +156,7 @@ class PostTest < ActiveSupport::TestCase
           p1.delete!
           assert_equal(false, p1.has_children?)
         end
-        
+
         should "remove the parent of that child" do
           p1 = FactoryGirl.create(:post)
           c1 = FactoryGirl.create(:post, :parent_id => p1.id)
@@ -165,7 +165,7 @@ class PostTest < ActiveSupport::TestCase
           assert_nil(c1.parent)
         end
       end
-      
+
       context "two or more children" do
         should "reparent all children to the first child" do
           p1 = FactoryGirl.create(:post)
@@ -182,7 +182,7 @@ class PostTest < ActiveSupport::TestCase
         end
       end
     end
-    
+
     context "Undestroying a post with a parent" do
       should "create a new approver" do
         new_user = FactoryGirl.create(:moderator_user)
@@ -195,7 +195,7 @@ class PostTest < ActiveSupport::TestCase
         p1.reload
         assert_equal(new_user.id, c1.approver_id)
       end
-      
+
       should "not preserve the parent's has_children flag" do
         p1 = FactoryGirl.create(:post)
         c1 = FactoryGirl.create(:post, :parent_id => p1.id)
@@ -213,25 +213,25 @@ class PostTest < ActiveSupport::TestCase
       setup do
         @post = FactoryGirl.create(:post, :is_deleted => true)
       end
-      
+
       context "that is status locked" do
         setup do
           @post.update_attributes({:is_status_locked => true}, :as => :admin)
         end
-        
+
         should "not allow undeletion" do
           @post.undelete!
           assert_equal(["Is status locked ; cannot undelete post"], @post.errors.full_messages)
           assert_equal(true, @post.is_deleted?)
         end
       end
-      
+
       should "be undeleted" do
         @post.undelete!
         @post.reload
         assert_equal(false, @post.is_deleted?)
       end
-      
+
       should "be appealed" do
         assert_difference("PostAppeal.count", 1) do
           @post.appeal!("xxx")
@@ -240,7 +240,7 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(1, @post.appeals.count)
       end
     end
-    
+
     context "An approved post" do
       should "be flagged" do
         post = FactoryGirl.create(:post)
@@ -250,7 +250,7 @@ class PostTest < ActiveSupport::TestCase
         assert(post.is_flagged?, "Post should be flagged.")
         assert_equal(1, post.flags.count)
       end
-  
+
       should "not be flagged if no reason is given" do
         post = FactoryGirl.create(:post)
         assert_difference("PostFlag.count", 0) do
@@ -260,20 +260,20 @@ class PostTest < ActiveSupport::TestCase
         end
       end
     end
-    
-    context "An unapproved post" do      
+
+    context "An unapproved post" do
       should "preserve the approver's identity when approved" do
         post = FactoryGirl.create(:post, :is_pending => true)
         post.approve!
         assert_equal(post.approver_id, CurrentUser.id)
       end
-      
+
       context "that was uploaded by person X" do
         setup do
           @post = FactoryGirl.create(:post)
           @post.flag!("reason")
         end
-        
+
         should "not allow person X to approve that post" do
           assert_raises(Post::ApprovalError) do
             CurrentUser.scoped(@post.uploader, "127.0.0.1") do
@@ -284,7 +284,7 @@ class PostTest < ActiveSupport::TestCase
           assert_equal(["You cannot approve a post you uploaded"], @post.errors.full_messages)
         end
       end
-      
+
       context "that was previously approved by person X" do
         setup do
           @user = FactoryGirl.create(:janitor_user, :name => "xxx")
@@ -292,7 +292,7 @@ class PostTest < ActiveSupport::TestCase
           @post = FactoryGirl.create(:post, :approver_id => @user.id)
           @post.flag!("bad")
         end
-        
+
         should "not allow person X to reapprove that post" do
           CurrentUser.scoped(@user, "127.0.0.1") do
             assert_raises(Post::ApprovalError) do
@@ -300,7 +300,7 @@ class PostTest < ActiveSupport::TestCase
             end
           end
         end
-        
+
         should "allow person Y to approve the post" do
           CurrentUser.scoped(@user2, "127.0.0.1") do
             assert_nothing_raised do
@@ -309,7 +309,7 @@ class PostTest < ActiveSupport::TestCase
           end
         end
       end
-      
+
       context "that has been reapproved" do
         should "no longer be flagged or pending" do
           post = FactoryGirl.create(:post)
@@ -328,19 +328,19 @@ class PostTest < ActiveSupport::TestCase
         @post = FactoryGirl.create(:post)
         @post.update_attributes({:is_status_locked => true}, :as => :admin)
       end
-      
+
       should "not allow new flags" do
         assert_raises(PostFlag::Error) do
           @post.flag!("wrong")
         end
       end
-      
+
       should "not allow new appeals" do
         assert_raises(PostAppeal::Error) do
           @post.appeal!("wrong")
         end
       end
-      
+
       should "not allow approval" do
         assert_raises(Post::ApprovalError) do
           @post.approve!
@@ -354,7 +354,7 @@ class PostTest < ActiveSupport::TestCase
       setup do
         @post = FactoryGirl.create(:post)
       end
-      
+
       context "with an artist tag that is then changed to copyright" do
         setup do
           Delayed::Worker.delay_jobs = false
@@ -364,32 +364,32 @@ class PostTest < ActiveSupport::TestCase
           @post.update_attribute(:tag_string, "copy:abc")
           @post.reload
         end
-        
+
         teardown do
           Delayed::Worker.delay_jobs = true
         end
-        
+
         should "update the category of the tag" do
           assert_equal(Tag.categories.copyright, Tag.find_by_name("abc").category)
         end
-        
+
         should "update the category cache of the tag" do
           assert_equal(Tag.categories.copyright, Cache.get("tc:abc"))
         end
-        
+
         should "update the tag counts of the posts" do
           assert_equal(0, @post.tag_count_artist)
           assert_equal(1, @post.tag_count_copyright)
           assert_equal(0, @post.tag_count_general)
         end
       end
-      
+
       context "tagged with a metatag" do
         context "for a parent" do
           setup do
             @parent = FactoryGirl.create(:post)
           end
-          
+
           should "update the parent relationships for both posts" do
             @post.update_attributes(:tag_string => "aaa parent:#{@parent.id}")
             @post.reload
@@ -398,14 +398,14 @@ class PostTest < ActiveSupport::TestCase
             assert(@parent.has_children?)
           end
         end
-        
+
         context "for a pool" do
           context "on creation" do
             setup do
               @pool = FactoryGirl.create(:pool)
               @post = FactoryGirl.create(:post, :tag_string => "aaa pool:#{@pool.id}")
             end
-            
+
             should "add the post to the pool" do
               @post.reload
               @pool.reload
@@ -413,13 +413,13 @@ class PostTest < ActiveSupport::TestCase
               assert_equal("pool:#{@pool.id}", @post.pool_string)
             end
           end
-          
+
           context "id" do
             setup do
               @pool = FactoryGirl.create(:pool)
               @post.update_attributes(:tag_string => "aaa pool:#{@pool.id}")
             end
-            
+
             should "add the post to the pool" do
               @post.reload
               @pool.reload
@@ -427,7 +427,7 @@ class PostTest < ActiveSupport::TestCase
               assert_equal("pool:#{@pool.id}", @post.pool_string)
             end
           end
-          
+
           context "name" do
             context "that exists" do
               setup do
@@ -442,7 +442,7 @@ class PostTest < ActiveSupport::TestCase
                 assert_equal("pool:#{@pool.id}", @post.pool_string)
               end
             end
-            
+
             context "that doesn't exist" do
               should "create a new pool and add the post to that pool" do
                 @post.update_attributes(:tag_string => "aaa pool:abc")
@@ -455,7 +455,7 @@ class PostTest < ActiveSupport::TestCase
             end
           end
         end
-        
+
         context "for a rating" do
           context "that is valid" do
             should "update the rating" do
@@ -464,7 +464,7 @@ class PostTest < ActiveSupport::TestCase
               assert_equal("e", @post.rating)
             end
           end
-          
+
           context "that is invalid" do
             should "not update the rating" do
               @post.update_attributes(:tag_string => "aaa rating:z")
@@ -473,7 +473,7 @@ class PostTest < ActiveSupport::TestCase
             end
           end
         end
-        
+
         context "for a fav" do
           should "add the current user to the post's favorite listing" do
             @post.update_attributes(:tag_string => "aaa fav:self")
@@ -482,24 +482,24 @@ class PostTest < ActiveSupport::TestCase
           end
         end
       end
-      
+
       should "have an array representation of its tags" do
         post = FactoryGirl.create(:post)
         post.set_tag_string("aaa bbb")
         assert_equal(%w(aaa bbb), post.tag_array)
         assert_equal(%w(tag1 tag2), post.tag_array_was)
       end
-      
+
       context "that has been updated" do
         should "increment the updater's post_update_count" do
           post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
-          
+
           assert_difference("CurrentUser.post_update_count", 1) do
             post.update_attributes(:tag_string => "zzz")
             CurrentUser.reload
           end
         end
-        
+
         should "reset its tag array cache" do
           post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
           user = FactoryGirl.create(:user)
@@ -516,7 +516,7 @@ class PostTest < ActiveSupport::TestCase
             post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
           end
         end
-        
+
         should "update the post counts of relevant tag records" do
           post1 = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
           post2 = FactoryGirl.create(:post, :tag_string => "bbb ccc ddd")
@@ -528,12 +528,12 @@ class PostTest < ActiveSupport::TestCase
           post3.save
           assert_equal(1, Tag.find_by_name("aaa").post_count)
           assert_equal(2, Tag.find_by_name("bbb").post_count)
-          assert_equal(2, Tag.find_by_name("ccc").post_count)      
-          assert_equal(1, Tag.find_by_name("ddd").post_count)      
+          assert_equal(2, Tag.find_by_name("ccc").post_count)
+          assert_equal(1, Tag.find_by_name("ddd").post_count)
           assert_equal(0, Tag.find_by_name("eee").post_count)
           assert_equal(1, Tag.find_by_name("xxx").post_count)
         end
-        
+
         should "update its tag counts" do
           artist_tag = FactoryGirl.create(:artist_tag)
           copyright_tag = FactoryGirl.create(:copyright_tag)
@@ -553,7 +553,7 @@ class PostTest < ActiveSupport::TestCase
           assert_equal(0, new_post.tag_count_character)
           assert_equal(1, new_post.tag_count)
         end
-        
+
         should "merge any changes that were made after loading the initial set of tags part 1" do
           post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
 
@@ -570,10 +570,10 @@ class PostTest < ActiveSupport::TestCase
           post_edited_by_user_b.save
 
           # final should be <aaa>, <bbb>, <ddd>, <eee>
-          final_post = Post.find(post.id)      
+          final_post = Post.find(post.id)
           assert_equal(%w(aaa bbb ddd eee), Tag.scan_tags(final_post.tag_string).sort)
         end
-        
+
         should "merge any changes that were made after loading the initial set of tags part 2" do
           # This is the same as part 1, only the order of operations is reversed.
           # The results should be the same.
@@ -593,7 +593,7 @@ class PostTest < ActiveSupport::TestCase
           post_edited_by_user_b.save
 
           # final should be <aaa>, <bbb>, <ddd>, <eee>
-          final_post = Post.find(post.id)      
+          final_post = Post.find(post.id)
           assert_equal(%w(aaa bbb ddd eee), Tag.scan_tags(final_post.tag_string).sort)
         end
       end
@@ -608,7 +608,7 @@ class PostTest < ActiveSupport::TestCase
       end
     end
   end
-  
+
   context "Favorites:" do
     context "Removing a post from a user's favorites" do
       setup do
@@ -618,19 +618,19 @@ class PostTest < ActiveSupport::TestCase
         @post = FactoryGirl.create(:post)
         @post.add_favorite!(@user)
       end
-      
+
       teardown do
         CurrentUser.user = nil
         CurrentUser.ip_addr = nil
       end
-      
+
       should "decrement the user's favorite_count" do
         assert_difference("CurrentUser.favorite_count", -1) do
           @post.remove_favorite!(@user)
           CurrentUser.reload
         end
       end
-      
+
       should "decrement the post's score for privileged users" do
         @post.remove_favorite!(@user)
         @post.reload
@@ -645,7 +645,7 @@ class PostTest < ActiveSupport::TestCase
         @post.reload
         assert_equal(1, @post.score)
       end
-      
+
       should "not decrement the user's favorite_count if the user did not favorite the post" do
         @post2 = FactoryGirl.create(:post)
         assert_difference("CurrentUser.favorite_count", 0) do
@@ -654,7 +654,7 @@ class PostTest < ActiveSupport::TestCase
         end
       end
     end
-    
+
     context "Adding a post to a user's favorites" do
       setup do
         @user = FactoryGirl.create(:contributor_user)
@@ -662,25 +662,25 @@ class PostTest < ActiveSupport::TestCase
         CurrentUser.ip_addr = "127.0.0.1"
         @post = FactoryGirl.create(:post)
       end
-      
+
       teardown do
         CurrentUser.user = nil
         CurrentUser.ip_addr = nil
       end
-      
+
       should "increment the user's favorite_count" do
         assert_difference("CurrentUser.favorite_count", 1) do
           @post.add_favorite!(@user)
           CurrentUser.reload
         end
       end
-      
+
       should "increment the post's score for privileged users" do
         @post.add_favorite!(@user)
         @post.reload
         assert_equal(1, @post.score)
       end
-      
+
       should "not increment the post's score for basic users" do
         @member = FactoryGirl.create(:user)
         CurrentUser.scoped(@member, "127.0.0.1") do
@@ -689,7 +689,7 @@ class PostTest < ActiveSupport::TestCase
         @post.reload
         assert_equal(0, @post.score)
       end
-      
+
       should "update the fav strings ont he post" do
         @post.add_favorite!(@user)
         @post.reload
@@ -705,7 +705,7 @@ class PostTest < ActiveSupport::TestCase
         @post.reload
         assert_equal("", @post.fav_string)
         assert(!Favorite.exists?(:user_id => @user.id, :post_id => @post.id))
-      
+
         @post.remove_favorite!(@user)
         @post.reload
         assert_equal("", @post.fav_string)
@@ -713,7 +713,7 @@ class PostTest < ActiveSupport::TestCase
       end
     end
   end
-  
+
   context "Pools:" do
     context "Removing a post from a pool" do
       should "update the post's pool string" do
@@ -728,7 +728,7 @@ class PostTest < ActiveSupport::TestCase
         assert_equal("", post.pool_string)
       end
     end
-    
+
     context "Adding a post to a pool" do
       should "update the post's pool string" do
         post = FactoryGirl.create(:post)
@@ -745,7 +745,7 @@ class PostTest < ActiveSupport::TestCase
       end
     end
   end
-  
+
   context "Uploading:" do
     context "Uploading a post" do
       should "capture who uploaded the post" do
@@ -772,28 +772,28 @@ class PostTest < ActiveSupport::TestCase
       count = Post.tag_match("'").count
       assert_equal(1, count)
     end
-    
+
     should "return posts for the \\ tag" do
       post1 = FactoryGirl.create(:post, :tag_string => "\\")
       post2 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
       count = Post.tag_match("\\").count
       assert_equal(1, count)
     end
-    
+
     should "return posts for the ( tag" do
       post1 = FactoryGirl.create(:post, :tag_string => "(")
       post2 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
       count = Post.tag_match("(").count
       assert_equal(1, count)
     end
-    
+
     should "return posts for the ? tag" do
       post1 = FactoryGirl.create(:post, :tag_string => "?")
       post2 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
       count = Post.tag_match("?").count
       assert_equal(1, count)
     end
-    
+
     should "return posts for 1 tag" do
       post1 = FactoryGirl.create(:post, :tag_string => "aaa")
       post2 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
@@ -812,7 +812,7 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(1, relation.count)
       assert_equal(post2.id, relation.first.id)
     end
-  
+
     should "return posts for 1 tag with exclusion" do
       post1 = FactoryGirl.create(:post, :tag_string => "aaa")
       post2 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
@@ -821,7 +821,7 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
     end
-  
+
     should "return posts for 1 tag with a pattern" do
       post1 = FactoryGirl.create(:post, :tag_string => "aaa")
       post2 = FactoryGirl.create(:post, :tag_string => "aaab bbb")
@@ -829,9 +829,9 @@ class PostTest < ActiveSupport::TestCase
       relation = Post.tag_match("a*")
       assert_equal(2, relation.count)
       assert_equal(post2.id, relation.all[0].id)
-      assert_equal(post1.id, relation.all[1].id)          
+      assert_equal(post1.id, relation.all[1].id)
     end
-  
+
     should "return posts for 2 tags, one with a pattern" do
       post1 = FactoryGirl.create(:post, :tag_string => "aaa")
       post2 = FactoryGirl.create(:post, :tag_string => "aaab bbb")
@@ -840,7 +840,7 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(1, relation.count)
       assert_equal(post2.id, relation.first.id)
     end
-  
+
     should "return posts for the <id> metatag" do
       post1 = FactoryGirl.create(:post)
       post2 = FactoryGirl.create(:post)
@@ -855,7 +855,7 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
     end
-  
+
     should "return posts for the <fav> metatag" do
       post1 = FactoryGirl.create(:post)
       post2 = FactoryGirl.create(:post)
@@ -866,7 +866,7 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
     end
-  
+
     should "return posts for the <pool> metatag" do
       post1 = FactoryGirl.create(:post)
       post2 = FactoryGirl.create(:post)
@@ -877,13 +877,13 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
     end
-  
+
     should "return posts for the <user> metatag" do
       second_user = FactoryGirl.create(:user)
       post1 = FactoryGirl.create(:post, :uploader => CurrentUser.user)
-      
+
       assert_equal(CurrentUser.id, post1.uploader_id)
-      
+
       CurrentUser.scoped(second_user, "127.0.0.2") do
         post2 = FactoryGirl.create(:post)
         post3 = FactoryGirl.create(:post)
@@ -893,13 +893,13 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
     end
-    
+
     should "return posts for the <pixiv> metatag" do
       post = FactoryGirl.create(:post, :source => "http://i1.pixiv.net/img123/img/artist-name/789.png")
       assert_equal(1, Post.tag_match("pixiv:789").count)
       assert_equal(0, Post.tag_match("pixiv:790").count)
     end
-  
+
     should "return posts for a list of md5 hashes" do
       post1 = FactoryGirl.create(:post, :md5 => "abcd")
       post2 = FactoryGirl.create(:post)
@@ -908,7 +908,7 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(1, relation.count)
       assert_equal(post1.id, relation.first.id)
     end
-    
+
     should "return posts for a source search" do
       post1 = FactoryGirl.create(:post, :source => "abcd")
       post2 = FactoryGirl.create(:post, :source => "abcdefg")
@@ -917,14 +917,14 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(1, relation.count)
       assert_equal(post2.id, relation.first.id)
     end
-    
+
     should "return posts for a case sensitive source search" do
       post1 = FactoryGirl.create(:post, :source => "ABCD")
       post2 = FactoryGirl.create(:post, :source => "1234")
       relation = Post.tag_match("source:ABCD")
       assert_equal(1, relation.count)
     end
-    
+
     should "return posts for a pixiv source search" do
       post = FactoryGirl.create(:post, :source => "http://i1.pixiv.net/img123/img/artist-name/789.png")
       assert_equal(1, Post.tag_match("source:pixiv/artist-name/*").count)
@@ -932,7 +932,7 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(1, Post.tag_match("source:*.pixiv.net/img*/artist-name/*").count)
       assert_equal(0, Post.tag_match("source:*.pixiv.net/img*/artist-fake/*").count)
     end
-  
+
     should "return posts for a tag subscription search" do
       post1 = FactoryGirl.create(:post, :tag_string => "aaa")
       sub = FactoryGirl.create(:tag_subscription, :tag_query => "aaa", :name => "zzz")
@@ -940,7 +940,7 @@ class PostTest < ActiveSupport::TestCase
       relation = Post.tag_match("sub:#{CurrentUser.name}")
       assert_equal(1, relation.count)
     end
-  
+
     should "return posts for a particular rating" do
       post1 = FactoryGirl.create(:post, :rating => "s")
       post2 = FactoryGirl.create(:post, :rating => "q")
@@ -949,7 +949,7 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(1, relation.count)
       assert_equal(post3.id, relation.first.id)
     end
-  
+
     should "return posts for a particular negated rating" do
       post1 = FactoryGirl.create(:post, :rating => "s")
       post2 = FactoryGirl.create(:post, :rating => "s")
@@ -958,7 +958,7 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(1, relation.count)
       assert_equal(post3.id, relation.first.id)
     end
-  
+
     should "return posts ordered by a particular attribute" do
       post1 = FactoryGirl.create(:post, :rating => "s")
       post2 = FactoryGirl.create(:post, :rating => "s")
@@ -968,9 +968,9 @@ class PostTest < ActiveSupport::TestCase
       relation = Post.tag_match("order:mpixels")
       assert_equal(post3.id, relation.first.id)
       relation = Post.tag_match("order:landscape")
-      assert_equal(post3.id, relation.first.id)      
+      assert_equal(post3.id, relation.first.id)
     end
-    
+
     should "fail for more than 6 tags" do
       post1 = FactoryGirl.create(:post, :rating => "s")
 
@@ -978,14 +978,14 @@ class PostTest < ActiveSupport::TestCase
         Post.tag_match("a b c rating:s width:10 height:10 user:bob")
       end
     end
-    
+
     should "succeed for exclusive tag searches with no other tag" do
       post1 = FactoryGirl.create(:post, :rating => "s", :tag_string => "aaa")
       assert_nothing_raised do
         relation = Post.tag_match("-aaa")
       end
     end
-    
+
     should "succeed for exclusive tag searches combined with a metatag" do
       post1 = FactoryGirl.create(:post, :rating => "s", :tag_string => "aaa")
       assert_nothing_raised do
@@ -1023,7 +1023,7 @@ class PostTest < ActiveSupport::TestCase
           FactoryGirl.create(:tag_alias, :antecedent_name => "alias", :consequent_name => "aaa")
           FactoryGirl.create(:post, :tag_string => "aaa")
         end
-        
+
         should "be counted correctly in fast_count" do
           assert_equal(1, Post.count)
           assert_equal(Danbooru.config.blank_tag_search_fast_count, Post.fast_count(""))
@@ -1032,7 +1032,7 @@ class PostTest < ActiveSupport::TestCase
           assert_equal(0, Post.fast_count("bbb"))
         end
       end
-      
+
       should "increment the post count" do
         assert_equal(0, Post.fast_count(""))
         post = FactoryGirl.create(:post, :tag_string => "aaa bbb")
@@ -1040,10 +1040,10 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(1, Post.fast_count("aaa"))
         assert_equal(1, Post.fast_count("bbb"))
         assert_equal(0, Post.fast_count("ccc"))
-      
+
         post.tag_string = "ccc"
         post.save
-      
+
         assert_equal(1, Post.fast_count(""))
         assert_equal(0, Post.fast_count("aaa"))
         assert_equal(0, Post.fast_count("bbb"))
@@ -1060,24 +1060,24 @@ class PostTest < ActiveSupport::TestCase
         @post.update_attributes(:tag_string => "bbb xxx yyy", :source => "xyz")
         @post.update_attributes(:tag_string => "bbb mmm yyy", :source => "abc")
       end
-    
+
       context "and then reverted to an early version" do
         setup do
           @post.revert_to(@post.versions[1])
         end
-        
+
         should "correctly revert all fields" do
           assert_equal("aaa bbb ccc ddd", @post.tag_string)
           assert_equal(nil, @post.source)
           assert_equal("q", @post.rating)
         end
       end
-      
+
       context "and then reverted to a later version" do
         setup do
           @post.revert_to(@post.versions[-2])
         end
-        
+
         should "correctly revert all fields" do
           assert_equal("bbb xxx yyy", @post.tag_string)
           assert_equal("xyz", @post.source)

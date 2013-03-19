@@ -13,7 +13,7 @@ class CreateNoteVersions < ActiveRecord::Migration
       t.column :body, :text, :null => false
       t.timestamps
     end
-    
+
     add_index :note_versions, :note_id
     add_index :note_versions, :post_id
     add_index :note_versions, :updater_id

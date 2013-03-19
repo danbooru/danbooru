@@ -10,7 +10,7 @@ class CreateTagImplications < ActiveRecord::Migration
       t.column :status, :text, :null => false, :default => "pending"
       t.timestamps
     end
-    
+
     add_index :tag_implications, :antecedent_name
     add_index :tag_implications, :consequent_name
   end

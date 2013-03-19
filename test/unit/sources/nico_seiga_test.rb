@@ -10,19 +10,19 @@ module Sources
         @site = Sources::Site.new("http://seiga.nicovideo.jp/seiga/im1464351?track=ranking")
         @site.get
       end
-      
+
       should "get the profile" do
         assert_equal("http://seiga.nicovideo.jp/user/illust/20446930?target=seiga", @site.profile_url)
       end
-      
+
       should "get the artist name" do
         assert_equal("rariemonn", @site.artist_name)
       end
-      
+
       should "get the image url" do
         assert_equal("http://seiga.nicovideo.jp/image/source?id=1464351", @site.image_url)
       end
-      
+
       should "get the tags" do
         assert(@site.tags.size > 0)
         first_tag = @site.tags.first

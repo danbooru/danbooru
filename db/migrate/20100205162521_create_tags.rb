@@ -8,7 +8,7 @@ class CreateTags < ActiveRecord::Migration
       t.column :related_tags_updated_at, :datetime
       t.timestamps
     end
-    
+
     add_index :tags, :name, :unique => true
     execute "create index index_tags_on_name_pattern on tags (name text_pattern_ops)"
   end

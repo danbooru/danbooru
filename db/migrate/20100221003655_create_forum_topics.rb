@@ -11,7 +11,7 @@ class CreateForumTopics < ActiveRecord::Migration
       t.column :text_index, "tsvector", :null => false
       t.timestamps
     end
-    
+
     add_index :forum_topics, :creator_id
 
     execute "CREATE INDEX index_forum_topics_on_text_index ON forum_topics USING GIN (text_index)"

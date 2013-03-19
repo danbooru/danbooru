@@ -9,7 +9,7 @@ class CreateWikiPageVersions < ActiveRecord::Migration
       t.column :is_locked, :boolean, :null => false
       t.timestamps
     end
-    
+
     add_index :wiki_page_versions, :wiki_page_id
   end
 

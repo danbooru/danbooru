@@ -8,7 +8,7 @@ class IpBanTest < ActiveSupport::TestCase
     MEMCACHE.flush_all
     Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
   end
-  
+
   teardown do
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
@@ -19,7 +19,7 @@ class IpBanTest < ActiveSupport::TestCase
     counts = IpBan.count_by_ip_addr("comments", [comment.creator_id], "creator_id", "ip_addr")
     assert_equal([{"ip_addr" => "127.0.0.1", "count" => "1"}], counts)
   end
-  
+
   should "be able to count any updates from a user, groupiny by IP address" do
     CurrentUser.scoped(@user, "1.2.3.4") do
       comment = FactoryGirl.create(:comment, :body => "aaa")

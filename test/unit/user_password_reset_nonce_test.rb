@@ -7,11 +7,11 @@ class UserPasswordResetNonceTest < ActiveSupport::TestCase
         @user = FactoryGirl.create(:user, :email => "aaa@b.net")
         @nonce = FactoryGirl.create(:user_password_reset_nonce, :email => @user.email)
       end
-      
+
       should "validate" do
         assert_equal([], @nonce.errors.full_messages)
       end
-      
+
       should "populate the key with a random string" do
         assert_equal(32, @nonce.key.size)
       end
@@ -21,24 +21,24 @@ class UserPasswordResetNonceTest < ActiveSupport::TestCase
         @nonce.reset_user!
       end
     end
-    
+
     context "with a blank email" do
       setup do
         @user = FactoryGirl.create(:user, :email => "")
         @nonce = UserPasswordResetNonce.new(:email => "")
       end
-      
+
       should "not validate" do
         @nonce.save
         assert_equal(["Email can't be blank", "Email is invalid"], @nonce.errors.full_messages.sort)
       end
     end
-    
+
     context "with an invalid email" do
       setup do
         @nonce = UserPasswordResetNonce.new(:email => "z@z.net")
       end
-      
+
       should "not validate" do
         @nonce.save
         assert_equal(["Email is invalid"], @nonce.errors.full_messages)

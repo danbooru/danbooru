@@ -18,11 +18,11 @@ class UploadTest < ActiveSupport::TestCase
       @upload.delete_temp_file if @upload
     end
 
-    context "An upload" do    
+    context "An upload" do
       teardown do
         FileUtils.rm_f(Dir.glob("#{Rails.root}/tmp/test.*"))
       end
-      
+
       context "that has incredibly absurd res dimensions" do
         setup do
           @upload = FactoryGirl.build(:jpg_upload, :tag_string => "")
@@ -30,19 +30,19 @@ class UploadTest < ActiveSupport::TestCase
           @upload.image_height = 10
           @upload.add_dimension_tags!
         end
-        
+
         should "have the incredibly_absurdres tag" do
           assert_match(/incredibly_absurdres/, @upload.tag_string)
         end
       end
-      
+
       context "that has a large flie size" do
         setup do
           @upload = FactoryGirl.build(:jpg_upload, :tag_string => "")
           @upload.file_size = 11.megabytes
           @upload.add_file_size_tags!(@upload.file_path)
         end
-        
+
         should "have the huge_filesize tag" do
           assert_match(/huge_filesize/, @upload.tag_string)
         end
@@ -131,7 +131,7 @@ class UploadTest < ActiveSupport::TestCase
           assert_equal(28086, File.size(@upload.file_path))
           assert_equal("jpg", @upload.file_ext)
         end
-        
+
         should "process a transparent png" do
           FileUtils.cp("#{Rails.root}/test/files/alpha.png", "#{Rails.root}/tmp")
           @upload = Upload.new(:file => upload_file("#{Rails.root}/tmp/alpha.png", "image/png", "alpha.png"))
@@ -169,7 +169,7 @@ class UploadTest < ActiveSupport::TestCase
           assert_equal(108224, File.size(@upload.resized_file_path_for(Danbooru.config.large_image_width)))
         end
       end
-      
+
       should "increment the uploaders post_upload_count" do
         @upload = FactoryGirl.create(:source_upload)
         assert_difference("CurrentUser.post_upload_count", 1) do
@@ -225,7 +225,7 @@ class UploadTest < ActiveSupport::TestCase
       assert(File.exists?(post.file_path))
       assert_equal(28086, File.size(post.file_path))
       assert_equal(post.id, @upload.post_id)
-      assert_equal("completed", @upload.status)    
+      assert_equal("completed", @upload.status)
     end
 
     should "delete the temporary file upon completion" do

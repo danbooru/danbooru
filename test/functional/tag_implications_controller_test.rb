@@ -9,22 +9,22 @@ class TagImplicationsControllerTest < ActionController::TestCase
       MEMCACHE.flush_all
       Delayed::Worker.delay_jobs = false
     end
-    
+
     teardown do
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
-    
+
     context "index action" do
       setup do
         @tag_implication = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb", :creator => @user)
       end
-      
+
       should "list all tag implications" do
         get :index
         assert_response :success
       end
-      
+
       should "list all tag_implications (with search)" do
         get :index, {:search => {:antecedent_name => "aaa"}}
         assert_response :success
@@ -38,12 +38,12 @@ class TagImplicationsControllerTest < ActionController::TestCase
         end
       end
     end
-    
+
     context "destroy action" do
       setup do
         @tag_implication = FactoryGirl.create(:tag_implication, :creator => @user)
       end
-      
+
       should "destroy a tag_implication" do
         assert_difference("TagImplication.count", -1) do
           post :destroy, {:id => @tag_implication.id}, {:user_id => @user.id}

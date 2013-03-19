@@ -12,7 +12,7 @@ class CreateNotes < ActiveRecord::Migration
       t.column :body_index, "tsvector", :null => false
       t.timestamps
     end
-    
+
     add_index :notes, :creator_id
     add_index :notes, :post_id
     execute "CREATE INDEX index_notes_on_body_index ON notes USING GIN (body_index)"

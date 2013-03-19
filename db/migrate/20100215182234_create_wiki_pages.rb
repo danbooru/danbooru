@@ -8,7 +8,7 @@ class CreateWikiPages < ActiveRecord::Migration
       t.column :is_locked, :boolean, :null => false, :default => false
       t.timestamps
     end
-    
+
     add_index :wiki_pages, :title, :unique => true
     execute "CREATE INDEX index_wiki_pages_on_body_index_index ON wiki_pages USING GIN (body_index)"
     execute "CREATE TRIGGER trigger_wiki_pages_on_update BEFORE INSERT OR UPDATE ON wiki_pages FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('body_index', 'public.danbooru', 'body', 'title')"

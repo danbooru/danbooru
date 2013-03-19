@@ -188,7 +188,7 @@ Danbooru::Application.routes.draw do
       get :upgrade_information
       get :search
     end
-    
+
     member do
       delete :cache
       post :upgrade
@@ -210,7 +210,7 @@ Danbooru::Application.routes.draw do
       get :diff
     end
   end
-  
+
   # aliases
   resources :wpages, :controller => "wiki_pages"
   resources :ftopics, :controller => "forum_topics"
@@ -228,17 +228,17 @@ Danbooru::Application.routes.draw do
   match "/artist/destroy/:id" => redirect("/artists/%{id}")
   match "/artist/recent_changes" => redirect("/artist_versions")
   match "/artist/create" => redirect("/artists")
-  
+
   match "/comment" => redirect {|params, req| "/comments?page=#{req.params[:page]}"}
   match "/comment/index" => redirect {|params, req| "/comments?page=#{req.params[:page]}"}
   match "/comment/show/:id" => redirect("/comments/%{id}")
   match "/comment/new" => redirect("/comments")
   match "/comment/search" => redirect("/comments/search")
-  
+
   match "/favorite" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
   match "/favorite/index" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
   match "/favorite/list_users.json", :controller => "legacy", :action => "unavailable"
-  
+
   match "/forum" => redirect {|params, req| "/forum_topics?page=#{req.params[:page]}"}
   match "/forum/index" => redirect {|params, req| "/forum_topics?page=#{req.params[:page]}"}
   match "/forum/show/:id" => redirect("/forum_posts/%{id}")
@@ -251,13 +251,13 @@ Danbooru::Application.routes.draw do
   match "/note" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
   match "/note/index" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
   match "/note/history" => redirect("/note_versions")
-  
+
   match "/pool" => redirect {|params, req| "/pools?page=#{req.params[:page]}"}
   match "/pool/index" => redirect {|params, req| "/pools?page=#{req.params[:page]}"}
   match "/pool/show/:id" => redirect("/pools/%{id}")
   match "/pool/history/:id" => redirect("/pool_versions?search[pool_id]=%{id}")
   match "/pool/recent_changes" => redirect("/pool_versions")
-  
+
   match "/post/index.xml", :controller => "legacy", :action => "posts", :format => "xml"
   match "/post/index.json", :controller => "legacy", :action => "posts", :format => "json"
   match "/post/create.xml", :controller => "legacy", :action => "create_post", :format => "xml"
@@ -276,22 +276,22 @@ Danbooru::Application.routes.draw do
   match "/post/view/:id/:tag_title" => redirect("/posts/%{id}")
   match "/post/view/:id" => redirect("/posts/%{id}")
   match "/post/flag/:id" => redirect("/posts/%{id}")
-  
+
   match "/post_tag_history" => redirect {|params, req| "/post_versions?page=#{req.params[:page]}"}
   match "/post_tag_history/index" => redirect {|params, req| "/post_versions?page=#{req.params[:page]}"}
-  
+
   match "/tag/index.xml", :controller => "legacy", :action => "tags", :format => "xml"
   match "/tag/index.json", :controller => "legacy", :action => "tags", :format => "json"
   match "/tag" => redirect {|params, req| "/tags?page=#{req.params[:page]}"}
   match "/tag/index" => redirect {|params, req| "/tags?page=#{req.params[:page]}"}
-  
+
   match "/user/index.xml", :controller => "legacy", :action => "users", :format => "xml"
   match "/user/index.json", :controller => "legacy", :action => "users", :format => "json"
   match "/user" => redirect {|params, req| "/users?page=#{req.params[:page]}"}
   match "/user/index" => redirect {|params, req| "/users?page=#{req.params[:page]}"}
   match "/user/show/:id" => redirect("/users/%{id}")
   match "/user/login" => redirect("/sessions/new")
-  
+
   match "/wiki" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
   match "/wiki/index" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
   match "/wiki/revert" => redirect("/wiki_pages")
@@ -308,6 +308,6 @@ Danbooru::Application.routes.draw do
   match "/static/contact" => "static#contact", :as => "contact"
   match "/static/benchmark" => "static#benchmark"
   match "/static/name_change" => "static#name_change", :as => "name_change"
-  
+
   root :to => "posts#index"
 end

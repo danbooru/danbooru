@@ -1,16 +1,16 @@
 class PostPruner
   attr_reader :admin
-  
+
   def initialize
     @admin = User.where(:level => User::Levels::ADMIN).first
   end
-  
+
   def prune!
     prune_pending!
     prune_flagged!
     prune_mod_actions!
   end
-  
+
 protected
 
   def prune_pending!
@@ -25,7 +25,7 @@ protected
       end
     end
   end
-  
+
   def prune_flagged!
     CurrentUser.scoped(admin, "127.0.0.1") do
       Post.where("is_deleted = ? and is_flagged = ?", false, true).each do |post|
@@ -40,7 +40,7 @@ protected
       end
     end
   end
-  
+
   def prune_mod_actions!
     ModAction.destroy_all(["creator_id = ? and description like ?", admin.id, "deleted post %"])
   end

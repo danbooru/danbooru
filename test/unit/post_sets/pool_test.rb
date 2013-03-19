@@ -17,12 +17,12 @@ module PostSets
         @pool.add!(@post_1)
         @pool.add!(@post_3)
       end
-      
+
       teardown do
         CurrentUser.user = nil
         CurrentUser.ip_addr = nil
       end
-      
+
       context "a post pool set for page 2" do
         setup do
           @set = PostSets::Pool.new(@pool, 2)
@@ -33,16 +33,16 @@ module PostSets
           assert_equal(1, @set.posts.size)
           assert_equal(@post_1.id, @set.posts.first.id)
         end
-        
+
         should "know the total number of pages" do
           assert_equal(3, @set.total_pages)
         end
-        
+
         should "know the current page" do
           assert_equal(2, @set.current_page)
         end
       end
-      
+
       context "a post pool set with no page specified" do
         setup do
           @set = PostSets::Pool.new(@pool)

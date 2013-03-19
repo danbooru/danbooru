@@ -8,35 +8,35 @@ class NoteTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
     end
-    
+
     teardown do
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
-    
+
     context "for a post that already has a note" do
       setup do
         @post = FactoryGirl.create(:post)
         @note = FactoryGirl.create(:note, :post => @post)
       end
-      
+
       context "when the note is deleted the post" do
         setup do
           @note.toggle!(:is_active)
         end
-        
+
         should "null out its last_noted_at_field" do
           @post.reload
           assert_nil(@post.last_noted_at)
         end
       end
     end
-    
+
     context "creating a note" do
       setup do
         @post = FactoryGirl.create(:post)
       end
-      
+
       should "create a version" do
         assert_difference("NoteVersion.count", 1) do
           @note = FactoryGirl.create(:note, :post => @post)
@@ -45,7 +45,7 @@ class NoteTest < ActiveSupport::TestCase
         assert_equal(1, @note.versions.count)
         assert_equal(@note.body, @note.versions.first.body)
       end
-      
+
       should "update the post's last_noted_at field" do
         assert_nil(@post.last_noted_at)
         @note = FactoryGirl.create(:note, :post => @post)
@@ -64,29 +64,29 @@ class NoteTest < ActiveSupport::TestCase
             @note.save
           end
           assert_equal(["Post is note locked"], @note.errors.full_messages)
-        end        
+        end
       end
     end
-    
+
     context "updating a note" do
       setup do
         @post = FactoryGirl.create(:post)
         @note = FactoryGirl.create(:note, :post => @post)
       end
-      
+
       should "increment the updater's note_update_count" do
         assert_difference("CurrentUser.note_update_count", 1) do
           @note.update_attributes(:body => "zzz")
         end
       end
-      
+
       should "update the post's last_noted_at field" do
         assert_nil(@post.last_noted_at)
         @note.update_attributes(:x => 1000)
         @post.reload
         assert_equal(@post.last_noted_at.to_i, @note.updated_at.to_i)
       end
-      
+
       should "create a version" do
         assert_difference("NoteVersion.count", 1) do
           @note.update_attributes(:body => "fafafa")
@@ -94,19 +94,19 @@ class NoteTest < ActiveSupport::TestCase
         assert_equal(2, @note.versions.count)
         assert_equal("fafafa", @note.versions.last.body)
       end
-      
+
       context "for a note-locked post" do
         setup do
           @post.update_attribute(:is_note_locked, true)
         end
-        
+
         should "fail" do
           @note.update_attributes(:x => 1000)
           assert_equal(["Post is note locked"], @note.errors.full_messages)
         end
       end
     end
-    
+
     context "when notes have been vandalized by one user" do
       setup do
         @vandal = FactoryGirl.create(:user)
@@ -115,7 +115,7 @@ class NoteTest < ActiveSupport::TestCase
           @note.update_attributes(:x => 2000, :y => 2000)
         end
       end
-      
+
       context "the act of undoing all changes by that user" do
         should "revert any affected notes" do
           Note.undo_changes_by_user(@vandal.id)
@@ -130,13 +130,13 @@ class NoteTest < ActiveSupport::TestCase
       setup do
         @note = FactoryGirl.create(:note, :body => "aaa")
       end
-      
+
       context "where the body contains the string 'aaa'" do
         should "return a hit" do
           assert_equal(1, Note.body_matches("aaa").count)
         end
       end
-      
+
       context "where the body contains the string 'bbb'" do
         should "return no hits" do
           assert_equal(0, Note.body_matches("bbb").count)

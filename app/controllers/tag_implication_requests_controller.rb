@@ -1,10 +1,10 @@
 class TagImplicationRequestsController < ApplicationController
   before_filter :member_only
   rescue_from TagImplicationRequest::ValidationError, :with => :rescue_exception
-  
+
   def new
   end
-  
+
   def create
     @tag_implication_request = TagImplicationRequest.new(
       params[:tag_implication_request][:antecedent_name],

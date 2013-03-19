@@ -14,12 +14,12 @@ class TagImplicationTest < ActiveSupport::TestCase
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
-    
+
     should "populate the creator information" do
       ti = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       assert_equal(CurrentUser.user.id, ti.creator_id)
     end
-    
+
     should "not validate when a circular relation is created" do
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       ti2 = FactoryGirl.build(:tag_implication, :antecedent_name => "bbb", :consequent_name => "aaa")
@@ -27,7 +27,7 @@ class TagImplicationTest < ActiveSupport::TestCase
       assert(ti2.errors.any?, "Tag implication should not have validated.")
       assert_equal("Tag implication can not create a circular relation with another tag implication", ti2.errors.full_messages.join(""))
     end
-    
+
     should "not allow for duplicates" do
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       ti2 = FactoryGirl.build(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
@@ -35,11 +35,11 @@ class TagImplicationTest < ActiveSupport::TestCase
       assert(ti2.errors.any?, "Tag implication should not have validated.")
       assert_equal("Antecedent name has already been taken", ti2.errors.full_messages.join(""))
     end
-  
+
     should "calculate all its descendants" do
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "bbb", :consequent_name => "ccc")
       assert_equal("ccc", ti1.descendant_names)
-      assert_equal(["ccc"], ti1.descendant_names_array)      
+      assert_equal(["ccc"], ti1.descendant_names_array)
       ti2 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       assert_equal("bbb ccc", ti2.descendant_names)
       assert_equal(["bbb", "ccc"], ti2.descendant_names_array)
@@ -47,7 +47,7 @@ class TagImplicationTest < ActiveSupport::TestCase
       assert_equal("ccc", ti1.descendant_names)
       assert_equal(["ccc"], ti1.descendant_names_array)
     end
-    
+
     should "update its descendants on save" do
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       ti2 = FactoryGirl.create(:tag_implication, :antecedent_name => "ccc", :consequent_name => "ddd")
@@ -59,7 +59,7 @@ class TagImplicationTest < ActiveSupport::TestCase
       assert_equal("bbb ddd", ti1.descendant_names)
       assert_equal("ddd", ti2.descendant_names)
     end
-    
+
     should "update the decendants for its parent on create" do
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       ti1.reload
@@ -92,7 +92,7 @@ class TagImplicationTest < ActiveSupport::TestCase
       assert_equal("eee", ti4.descendant_names)
 
     end
-    
+
     should "update any affected post upon save" do
       p1 = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "xxx")
@@ -100,7 +100,7 @@ class TagImplicationTest < ActiveSupport::TestCase
       p1.reload
       assert_equal("aaa bbb ccc xxx yyy", p1.tag_string)
     end
-    
+
     should "record the implication's creator in the tag history" do
       user = FactoryGirl.create(:user)
       p1 = nil

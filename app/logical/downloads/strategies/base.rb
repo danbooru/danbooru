@@ -4,7 +4,7 @@ module Downloads
       def self.strategies
         [Pixiv]
       end
-      
+
       def rewrite(url, headers)
         return [url, headers]
       end

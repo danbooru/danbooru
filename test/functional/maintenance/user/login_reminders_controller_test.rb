@@ -17,7 +17,7 @@ module Maintenance
           CurrentUser.user = nil
           CurrentUser.ip_addr = nil
         end
-        
+
         should "render the new page" do
           get :new
           assert_response :success

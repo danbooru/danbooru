@@ -1,11 +1,11 @@
 module Admin
   class UsersController < ApplicationController
     before_filter :moderator_only
-    
+
     def edit
       @user = User.find(params[:id])
     end
-    
+
     def update
       @user = User.find(params[:id])
       @user.level = params[:user][:level]

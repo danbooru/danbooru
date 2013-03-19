@@ -7,7 +7,7 @@ class CreateUserFeedback < ActiveRecord::Migration
       t.column :body, :text, :null => false
       t.timestamps
     end
-    
+
     add_index :user_feedback, :user_id
     add_index :user_feedback, :creator_id
   end

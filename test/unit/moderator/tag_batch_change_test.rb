@@ -9,7 +9,7 @@ module Moderator
         CurrentUser.ip_addr = "127.0.0.1"
         @post = FactoryGirl.create(:post, :tag_string => "aaa")
       end
-  
+
       teardown do
         CurrentUser.user = nil
         CurrentUser.ip_addr = nil
@@ -21,7 +21,7 @@ module Moderator
         @post.reload
         assert_equal("bbb", @post.tag_string)
       end
-      
+
       should "raise an error if there is no predicate" do
         tag_batch_change = TagBatchChange.new("", "bbb", @user, "127.0.0.1")
         assert_raises(TagBatchChange::Error) do

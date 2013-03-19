@@ -7,7 +7,7 @@ class CreatePostAppeals < ActiveRecord::Migration
       t.column :reason, :text
       t.timestamps
     end
-    
+
     add_index :post_appeals, :post_id
     add_index :post_appeals, :creator_id
     add_index :post_appeals, :creator_ip_addr

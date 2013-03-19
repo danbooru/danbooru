@@ -10,7 +10,7 @@ class CreatePools < ActiveRecord::Migration
       t.column :is_deleted, :boolean, :null => false, :default => false
       t.timestamps
     end
-    
+
     add_index :pools, :name
     add_index :pools, :creator_id
   end

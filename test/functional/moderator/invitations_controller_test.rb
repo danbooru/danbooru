@@ -8,23 +8,23 @@ module Moderator
         CurrentUser.user = @mod
         CurrentUser.ip_addr = "127.0.0.1"
         MEMCACHE.flush_all
-        
+
         @user_1 = FactoryGirl.create(:user)
         @user_2 = FactoryGirl.create(:user, :inviter_id => @mod.id)
       end
-      
+
       should "render the new page" do
         get :new, {:invitation => {:name => @user_1.name}}, {:user_id => @mod.id}
         assert_response :success
       end
-      
+
       should "create a new invite" do
         post :create, {:invitation => {:user_id => @user_1.id, :level => User::Levels::CONTRIBUTOR}}, {:user_id => @mod.id}
         assert_redirected_to(moderator_invitations_path)
         @user_1.reload
         assert_equal(User::Levels::CONTRIBUTOR, @user_1.level)
       end
-      
+
       should "list invites" do
         get :index
         assert_response :success

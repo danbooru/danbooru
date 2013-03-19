@@ -1,33 +1,33 @@
 class BansController < ApplicationController
   before_filter :moderator_only, :except => [:show, :index]
-  
+
   def new
     @ban = Ban.new
   end
-  
+
   def edit
     @ban = Ban.find(params[:id])
   end
-  
+
   def index
     @search = Ban.search(params[:search]).order("id desc")
     @bans = @search.paginate(params[:page])
   end
-  
+
   def show
     @ban = Ban.find(params[:id])
   end
-  
+
   def create
     @ban = Ban.create(params[:ban])
-    
+
     if @ban.errors.any?
       render :action => "new"
     else
       redirect_to ban_path(@ban), :notice => "Ban created"
     end
   end
-  
+
   def update
     @ban = Ban.find(params[:id])
     if @ban.update_attributes(params[:ban])
@@ -35,8 +35,8 @@ class BansController < ApplicationController
     else
       render :action => "edit"
     end
-  end  
-  
+  end
+
   def destroy
     @ban = Ban.find(params[:id])
     @ban.destroy

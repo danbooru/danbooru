@@ -7,7 +7,7 @@ class CreatePoolVersions < ActiveRecord::Migration
       t.column :updater_ip_addr, "inet", :null => false
       t.timestamps
     end
-    
+
     add_index :pool_versions, :pool_id
     add_index :pool_versions, :updater_id
     add_index :pool_versions, :updater_ip_addr

@@ -8,20 +8,20 @@ class BanTest < ActiveSupport::TestCase
         CurrentUser.user = @banner
         CurrentUser.ip_addr = "127.0.0.1"
       end
-      
+
       teardown do
         @banner = nil
         CurrentUser.user = nil
         CurrentUser.ip_addr = nil
       end
-      
+
       should "not be valid against another admin" do
         user = FactoryGirl.create(:admin_user)
         ban = FactoryGirl.build(:ban, :user => user, :banner => @banner)
         ban.save
         assert(ban.errors.any?)
       end
-      
+
       should "be valid against anyone who is not an admin" do
         user = FactoryGirl.create(:moderator_user)
         ban = FactoryGirl.create(:ban, :user => user, :banner => @banner)
@@ -44,20 +44,20 @@ class BanTest < ActiveSupport::TestCase
         assert(ban.errors.empty?)
       end
     end
-    
+
     context "created by a moderator" do
       setup do
         @banner = FactoryGirl.create(:moderator_user)
         CurrentUser.user = @banner
         CurrentUser.ip_addr = "127.0.0.1"
       end
-      
+
       teardown do
         @banner = nil
         CurrentUser.user = nil
         CurrentUser.ip_addr = nil
       end
-      
+
       should "not be valid against an admin or moderator" do
         user = FactoryGirl.create(:admin_user)
         ban = FactoryGirl.build(:ban, :user => user, :banner => @banner)
@@ -69,7 +69,7 @@ class BanTest < ActiveSupport::TestCase
         ban.save
         assert(ban.errors.any?)
       end
-      
+
       should "be valid against anyone who is not an admin or a moderator" do
         user = FactoryGirl.create(:janitor_user)
         ban = FactoryGirl.create(:ban, :user => user, :banner => @banner)
@@ -88,20 +88,20 @@ class BanTest < ActiveSupport::TestCase
         assert(ban.errors.empty?)
       end
     end
-    
+
     context "created by a janitor" do
       setup do
-        @banner = FactoryGirl.create(:janitor_user)        
+        @banner = FactoryGirl.create(:janitor_user)
         CurrentUser.user = @banner
         CurrentUser.ip_addr = "127.0.0.1"
       end
-      
+
       teardown do
         @banner = nil
         CurrentUser.user = nil
         CurrentUser.ip_addr = nil
       end
-      
+
       should "always be invalid" do
         user = FactoryGirl.create(:admin_user)
         ban = FactoryGirl.build(:ban, :user => user, :banner => @banner)
@@ -143,7 +143,7 @@ class BanTest < ActiveSupport::TestCase
       CurrentUser.user = nil
       assert_not_nil(ban.expires_at)
     end
-    
+
     should "update the user's feedback" do
       user = FactoryGirl.create(:user)
       admin = FactoryGirl.create(:admin_user)
@@ -164,31 +164,31 @@ class BanTest < ActiveSupport::TestCase
         CurrentUser.ip_addr = "127.0.0.1"
         @user = FactoryGirl.create(:user)
       end
-      
+
       teardown do
         CurrentUser.user = nil
         CurrentUser.ip_addr = nil
       end
-      
+
       context "when only expired bans exist" do
         setup do
           @ban = FactoryGirl.create(:ban, :user => @user, :banner => @admin, :duration => -1)
         end
-        
+
         should "not return expired bans" do
           assert(!Ban.is_banned?(@user))
         end
       end
-      
+
       context "when active bans still exist" do
         setup do
           @ban = FactoryGirl.create(:ban, :user => @user, :banner => @admin, :duration => 1)
         end
-        
+
         should "return active bans" do
           assert(Ban.is_banned?(@user))
         end
       end
-    end    
+    end
   end
 end

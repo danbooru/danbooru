@@ -15,13 +15,13 @@ class TagImplicationRequestTest < ActiveSupport::TestCase
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
-    
+
     should "raise an exception if invalid" do
       assert_raises(TagImplicationRequest::ValidationError) do
         TagImplicationRequest.new("", "", "reason").create
       end
     end
-    
+
     should "create a tag implication" do
       assert_difference("TagImplication.count", 1) do
         TagImplicationRequest.new("aaa", "bbb", "reason").create

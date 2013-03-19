@@ -1,6 +1,6 @@
 class PostVote < ActiveRecord::Base
   class Error < Exception ; end
-  
+
   belongs_to :post
   before_validation :initialize_user, :on => :create
   validates_presence_of :post_id, :user_id, :score
@@ -13,7 +13,7 @@ class PostVote < ActiveRecord::Base
       write_attribute(:score, -1)
     end
   end
-  
+
   def initialize_user
     self.user_id = CurrentUser.user.id
   end

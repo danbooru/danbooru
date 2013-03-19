@@ -8,16 +8,16 @@ module Downloads
           url, headers = rewrite_small_images(url, headers)
           url, headers = rewrite_small_manga_pages(url, headers)
         end
-        
+
         return [url, headers]
       end
-    
+
     protected
       def rewrite_headers(url, headers)
         headers["Referer"] = "http://www.pixiv.net"
         return [url, headers]
       end
-      
+
       def rewrite_html_pages(url, headers)
         # example: http://www.pixiv.net/member_illust.php?mode=big&illust_id=23828655
 
@@ -29,16 +29,16 @@ module Downloads
           return [url, headers]
         end
       end
-      
+
       def rewrite_small_images(url, headers)
         if url =~ %r!(/img/.+?/.+?)_m.+$!
           match = $1
           url.sub!(match + "_m", match)
         end
-        
+
         return [url, headers]
       end
-      
+
       def rewrite_small_manga_pages(url, headers)
         if url =~ %r!(\d+_p\d+)\.!
           match = $1
@@ -48,7 +48,7 @@ module Downloads
             url = big_url
           end
         end
-        
+
         return [url, headers]
       end
 

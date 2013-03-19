@@ -4,7 +4,7 @@ module Maintenance
       def new
         @nonce = UserPasswordResetNonce.new
       end
-      
+
       def create
         @nonce = UserPasswordResetNonce.create(params[:nonce])
         if @nonce.errors.any?
@@ -13,14 +13,14 @@ module Maintenance
           redirect_to new_maintenance_user_password_reset_path, :notice => "Email request sent"
         end
       end
-      
+
       def edit
         @nonce = UserPasswordResetNonce.where(:email => params[:email], :key => params[:key]).first
       end
-      
+
       def update
         @nonce = UserPasswordResetNonce.where(:email => params[:email], :key => params[:key]).first
-        
+
         if @nonce
           @nonce.reset_user!
           @nonce.destroy

@@ -3,9 +3,9 @@ require './test/test_helper.rb'
 class TestImageSize < Test::Unit::TestCase
 
 	def setup
-		@files = ['4_1_2.gif', '2-4-7.png', 'tokyo_tower.jpg', 'bmp.bmp', 
-		          'ppm.ppm', 'pgm.pgm', 'pbm.pbm', 
-		          'cursor.xbm', 'tiff.tiff', 'test.xpm', 
+		@files = ['4_1_2.gif', '2-4-7.png', 'tokyo_tower.jpg', 'bmp.bmp',
+		          'ppm.ppm', 'pgm.pgm', 'pbm.pbm',
+		          'cursor.xbm', 'tiff.tiff', 'test.xpm',
 		          'tower_e.gif.psd', 'detect.swf']
 		@results = [
 		  ['GIF' ,668,481],

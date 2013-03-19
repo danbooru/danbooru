@@ -8,7 +8,7 @@ module Downloads
         # @tempfile = Tempfile.new("danbooru-test")
         # @download = Downloads::File.new(@source, @tempfile.path)
       end
-    
+
       should "work" do
         # @download.download!
         # assert_equal(201248, ::File.size(@tempfile.path))

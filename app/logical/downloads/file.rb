@@ -1,14 +1,14 @@
 module Downloads
   class File
     class Error < Exception ; end
-  
+
     attr_accessor :source, :content_type, :file_path
-  
+
     def initialize(source, file_path)
       @source = source
       @file_path = file_path
     end
-  
+
     def download!
       http_get_streaming do |response|
         self.content_type = response["Content-Type"]
@@ -18,23 +18,23 @@ module Downloads
       end
       after_download
     end
-  
+
     def before_download(url, headers)
       Strategies::Base.strategies.each do |strategy|
         url, headers = strategy.new.rewrite(url, headers)
       end
-      
+
       return [url, headers]
     end
-  
+
     def after_download
       fix_image_board_sources
     end
-    
+
     def url
       URI.parse(source)
     end
-  
+
     def http_get_streaming(options = {})
       max_size = options[:max_size] || Danbooru.config.max_file_size
       max_size = nil if max_size == 0 # unlimited
@@ -49,7 +49,7 @@ module Downloads
           "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
         }
         @source, headers = before_download(source, headers)
-        
+
         Net::HTTP.start(url.host, url.port, :use_ssl => url.is_a?(URI::HTTPS)) do |http|
           http.read_timeout = 10
           http.request_get(url.request_uri, headers) do |res|
@@ -76,7 +76,7 @@ module Downloads
         end # http.start
       end # while
     end # def
-  
+
     def fix_image_board_sources
       if source =~ /\/src\/\d{12,}|urnc\.yi\.org|yui\.cynthia\.bne\.jp/
         @source = "Image board"

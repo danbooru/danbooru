@@ -6,7 +6,7 @@ class CreateNewsUpdates < ActiveRecord::Migration
       t.column :updater_id, :integer, :null => false
       t.timestamps
     end
-    
+
     add_index :news_updates, :created_at
   end
 end

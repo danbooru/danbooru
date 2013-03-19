@@ -14,7 +14,7 @@ class CreateUploads < ActiveRecord::Migration
       t.column :md5_confirmation, :string
       t.timestamps
     end
-    
+
     add_index :uploads, :uploader_id
     add_index :uploads, :uploader_ip_addr
   end

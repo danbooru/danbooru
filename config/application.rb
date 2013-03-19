@@ -10,7 +10,7 @@ end
 
 module Danbooru
   class Application < Rails::Application
-    
+
     config.active_record.schema_format = :sql
     config.encoding = "utf-8"
     config.filter_parameters += [:password]

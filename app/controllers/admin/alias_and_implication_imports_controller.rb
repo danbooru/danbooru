@@ -1,10 +1,10 @@
 module Admin
   class AliasAndImplicationImportsController < ApplicationController
     before_filter :admin_only
-    
+
     def new
     end
-    
+
     def create
       @importer = AliasAndImplicationImporter.new(params[:batch][:text], params[:batch][:forum_id])
       @importer.process!

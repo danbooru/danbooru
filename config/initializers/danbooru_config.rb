@@ -5,6 +5,6 @@ module Danbooru
   def config
     @configuration ||= CustomConfiguration.new
   end
-  
+
   module_function :config
 end

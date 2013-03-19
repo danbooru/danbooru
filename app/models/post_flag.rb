@@ -1,6 +1,6 @@
 class PostFlag < ActiveRecord::Base
   class Error < Exception ; end
-  
+
   belongs_to :creator, :class_name => "User"
   belongs_to :post
   validates_presence_of :reason, :creator_id, :creator_ip_addr
@@ -14,45 +14,45 @@ class PostFlag < ActiveRecord::Base
     def resolved
       where("is_resolved = ?", true)
     end
-    
+
     def unresolved
       where("is_resolved = ?", false)
     end
-    
+
     def recent
       where("created_at >= ?", 1.day.ago)
     end
-    
+
     def old
       where("created_at <= ?", 3.days.ago)
     end
-    
+
     def search(params)
       q = scoped
       return q if params.blank?
-      
+
       if params[:creator_id].present?
         q = q.where("creator_id = ?", params[:creator_id].to_i)
       end
-      
+
       if params[:creator_name].present?
         q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].downcase)
       end
-      
+
       if params[:post_id].present?
         q = q.where("post_id = ?", params[:post_id].to_i)
       end
-      
+
       q
     end
   end
-  
+
   extend SearchMethods
-    
+
   def update_post
     post.update_column(:is_flagged, true) unless post.is_flagged?
   end
-  
+
   def validate_creator_is_not_limited
     if CurrentUser.is_janitor?
       false
@@ -63,7 +63,7 @@ class PostFlag < ActiveRecord::Base
       true
     end
   end
-  
+
   def validate_post_is_active
     if post.is_deleted?
       errors[:post] << "is deleted"
@@ -72,16 +72,16 @@ class PostFlag < ActiveRecord::Base
       true
     end
   end
-  
+
   def initialize_creator
     self.creator_id = CurrentUser.id
     self.creator_ip_addr = CurrentUser.ip_addr
   end
-  
+
   def resolve!
     update_column(:is_resolved, true)
   end
-  
+
   def flag_count_for_creator
     PostFlag.where(:creator_id => creator_id).recent.count
   end

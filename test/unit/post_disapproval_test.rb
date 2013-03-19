@@ -13,13 +13,13 @@ class PostDisapprovalTest < ActiveSupport::TestCase
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
-    
+
     context "A post disapproval" do
       setup do
         @post_1 = FactoryGirl.create(:post, :is_pending => true)
         @post_2 = FactoryGirl.create(:post, :is_pending => true)
       end
-      
+
       context "made by alice" do
         setup do
           @disapproval = PostDisapproval.create(:user => @alice, :post => @post_1)
@@ -29,7 +29,7 @@ class PostDisapprovalTest < ActiveSupport::TestCase
           setup do
             CurrentUser.user = @alice
           end
-          
+
           should "remove the associated post from alice's moderation queue" do
             assert(!Post.available_for_moderation(false).map(&:id).include?(@post_1.id))
             assert(Post.available_for_moderation(false).map(&:id).include?(@post_2.id))
@@ -41,7 +41,7 @@ class PostDisapprovalTest < ActiveSupport::TestCase
             @brittony = FactoryGirl.create(:moderator_user)
             CurrentUser.user = @brittony
           end
-          
+
           should "not remove the associated post from brittony's moderation queue" do
             assert(Post.available_for_moderation(false).map(&:id).include?(@post_1.id))
             assert(Post.available_for_moderation(false).map(&:id).include?(@post_2.id))
@@ -55,7 +55,7 @@ class PostDisapprovalTest < ActiveSupport::TestCase
           @user = FactoryGirl.create(:user)
           @disapproval = PostDisapproval.create(:user => @user, :post => @post)
         end
-        
+
         should "be pruned" do
           assert_difference("PostDisapproval.count", -1) do
             PostDisapproval.prune!

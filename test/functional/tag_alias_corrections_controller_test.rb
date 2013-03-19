@@ -10,19 +10,19 @@ class TagAliasCorrectionsControllerTest < ActionController::TestCase
       Delayed::Worker.delay_jobs = false
       @tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
     end
-    
+
     teardown do
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
-    
+
     context "show action" do
       should "render" do
         get :show, {:tag_alias_id => @tag_alias.id}, {:user => @admin.id}
         assert_response :success
       end
     end
-    
+
     context "create action" do
       should "render" do
         post :create, {:tag_alias_id => @tag_alias.id, :commit => "Fix"}, {:user => @admin.id}

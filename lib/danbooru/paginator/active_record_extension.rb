@@ -4,18 +4,18 @@ module Danbooru
   module Paginator
     module ActiveRecordExtension
       extend ActiveSupport::Concern
-      
+
       module ClassMethods
         def paginate(page, options = {})
           @paginator_options = options
-          
+
           if use_sequential_paginator?(page)
             paginate_sequential(page)
           else
             paginate_numbered(page)
           end
         end
-        
+
         def use_sequential_paginator?(page)
           page =~ /[ab]\d+/i
         end
@@ -32,11 +32,11 @@ module Danbooru
 
         def paginate_sequential_before(before_id = nil)
           c = limit(records_per_page)
-          
+
           if before_id.to_i > 0
             c = c.where("id < ?", before_id.to_i)
           end
-          
+
           c.reorder("id desc").tap do |obj|
             obj.extend(SequentialCollectionExtension)
             obj.sequential_paginator_mode = :before
@@ -49,14 +49,14 @@ module Danbooru
             obj.sequential_paginator_mode = :after
           end
         end
-        
+
         def paginate_numbered(page)
           page = [page.to_i, 1].max
-          
+
           if page > Danbooru.config.max_numbered_pages
             raise ::Danbooru::Paginator::PaginationError.new("You cannot go beyond page #{Danbooru.config.max_numbered_pages}. Please narrow your search terms.")
           end
-          
+
           limit(records_per_page).offset((page - 1) * records_per_page).tap do |obj|
             obj.extend(NumberedCollectionExtension)
             if records_per_page > 0
@@ -67,11 +67,11 @@ module Danbooru
             obj.current_page = page
           end
         end
-        
+
         def records_per_page
           option_for(:limit).to_i
         end
-        
+
         # When paginating large tables, we want to avoid doing an expensive count query
         # when the result won't even be used. So when calling paginate you can pass in
         # an optional :search_count key which points to the search params. If these params
@@ -86,7 +86,7 @@ module Danbooru
               limit = 1000
             end
             limit
-            
+
           when :count
             if @paginator_options.has_key?(:search_count) && @paginator_options[:search_count].blank?
               1_000_000
@@ -95,14 +95,14 @@ module Danbooru
             else
               nil
             end
-            
+
           end
         end
 
         # taken from kaminari (https://github.com/amatsuda/kaminari)
         def total_count
           return option_for(:count) if option_for(:count)
-          
+
           c = except(:offset, :limit, :order)
           c = c.reorder(nil)
           c = c.count

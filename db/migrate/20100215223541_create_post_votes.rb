@@ -6,7 +6,7 @@ class CreatePostVotes < ActiveRecord::Migration
       t.column :score, :integer, :null => false
       t.timestamps
     end
-    
+
     add_index :post_votes, :post_id
     add_index :post_votes, :user_id
   end

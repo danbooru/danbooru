@@ -7,26 +7,26 @@ class TagSubscriptionTest < ActiveSupport::TestCase
     CurrentUser.ip_addr = "127.0.0.1"
     MEMCACHE.flush_all
   end
-  
+
   teardown do
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
   end
-  
+
   context "A tag subscription" do
     context "for a user with too many subscriptions" do
       setup do
         Danbooru.config.stubs(:max_tag_subscriptions).returns(0)
         @user = FactoryGirl.create(:user)
       end
-      
+
       should "fail" do
         sub = FactoryGirl.build(:tag_subscription, :tag_query => "aaa bbb", :creator => @user, :name => "zzz")
         sub.save
         assert_equal(["You can create up to 0 tag subscriptions"], sub.errors.full_messages)
       end
     end
-    
+
     should "find the union of all posts for each tag in its tag query" do
       posts = []
       user = FactoryGirl.create(:user)
@@ -41,7 +41,7 @@ class TagSubscriptionTest < ActiveSupport::TestCase
         assert_equal([posts[2].id, posts[1].id, posts[0].id], TagSubscription.find_posts(user.id).map(&:id))
       end
     end
-    
+
     should "cache its tag query results" do
       posts = []
       user = FactoryGirl.create(:user)
@@ -53,7 +53,7 @@ class TagSubscriptionTest < ActiveSupport::TestCase
         assert_equal("#{posts[1].id},#{posts[0].id}", sub.post_ids)
       end
     end
-    
+
     should "find posts based on its cached post ids" do
       user = FactoryGirl.create(:user)
       CurrentUser.scoped(user, "127.0.0.1") do

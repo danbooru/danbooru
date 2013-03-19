@@ -6,7 +6,7 @@ class CreateCommentVotes < ActiveRecord::Migration
       t.column :score, :integer, :null => false
       t.timestamps
     end
-    
+
     add_index :comment_votes, :comment_id
     add_index :comment_votes, :user_id
     add_index :comment_votes, :created_at

@@ -6,7 +6,7 @@ module Maintenance
         @nonce = nonce
         mail(:to => @user.email, :subject => "#{Danbooru.config.app_name} password reset request", :from => Danbooru.config.contact_email)
       end
-      
+
       def confirmation(user, new_password)
         @user = user
         @new_password = new_password

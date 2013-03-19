@@ -5,17 +5,17 @@ class AmazonBackup < ActiveRecord::Base
   def self.last_id
     first.last_id
   end
-  
+
   def self.update_id(new_id)
     first.update_column(:last_id, new_id)
   end
-  
+
   def self.execute
     last_id = AmazonBackup.last_id
-    
+
     Post.where("id > ?", last_id).limit(200).order("id").each do |post|
       AWS::S3::Base.establish_connection!(
-        :access_key_id => Danbooru.config.amazon_s3_access_key_id, 
+        :access_key_id => Danbooru.config.amazon_s3_access_key_id,
         :secret_access_key => Danbooru.config.amazon_s3_secret_access_key
       )
 
@@ -31,7 +31,7 @@ class AmazonBackup < ActiveRecord::Base
       if File.exists?(post.large_file_path)
         AWS::S3::S3Object.store("large/#{post.md5}.jpg", open(post.large_file_path, "rb"), Danbooru.config.amazon_s3_bucket_name)
       end
-      
+
       AmazonBackup.update_id(last_id)
     end
   rescue Exception => x
