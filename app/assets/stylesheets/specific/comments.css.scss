@@ -1,6 +1,7 @@
 @import "../common/000_vars.css.scss";
 
 div.comments-for-post {
+  float: left;
   div.notices {
     margin: 1em 0;
   }
