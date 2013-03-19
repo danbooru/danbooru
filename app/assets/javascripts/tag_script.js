@@ -4,7 +4,7 @@
   Danbooru.TagScript.parse = function(script) {
     return script.match(/\[.+?\]|\S+/g);
   }
-  
+
   Danbooru.TagScript.test = function(tags, predicate) {
     var split_pred = predicate.match(/\S+/g);
     var is_true = true;
@@ -46,7 +46,7 @@
     var commands = Danbooru.TagScript.parse(tag_script);
     var $post = $("#post_" + post_id);
     var old_tags = $post.data("tags");
-    
+
     $.each(commands, function(i, x) {
       var array = String($post.data("tags")).match(/\S+/g);
       $post.data("tags", Danbooru.TagScript.process(array, x).join(" "));

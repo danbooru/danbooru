@@ -383,14 +383,14 @@ Danbooru.Note = {
 
   TranslationMode: {
     active: false,
-    
+
     start: function(e) {
       e.preventDefault();
 
       if (Danbooru.Note.TranslationMode.active) {
         return;
       }
-      
+
       Danbooru.Note.TranslationMode.active = true;
       $("#original-file-link").click();
       $("#image").one("click", Danbooru.Note.TranslationMode.create_note);

@@ -9,7 +9,7 @@
       }
     }
   }
-  
+
   Danbooru.PostPopular.nav_next = function() {
     if ($("#popular-nav-links").length) {
       var href = $("#popular-nav-links a[rel=next]").attr("href");

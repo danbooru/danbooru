@@ -29,7 +29,7 @@
       }
     }
   }
-  
+
   Danbooru.Post.initialize_similar = function() {
     $("#similar-button").click(function(e) {
       var old_source_name = $("#post_source").attr("name");
@@ -44,11 +44,11 @@
   		$("#post_source").attr("name", old_source_name);
   		$("#form").attr("target", "");
   		$("#form").attr("action", old_action);
-  		
+
   		e.preventDefault();
     });
   }
-  
+
   Danbooru.Post.nav_prev = function() {
     if ($("#search-seq-nav").length) {
       var href = $("#search-seq-nav a[rel=prev]").attr("href");
@@ -62,7 +62,7 @@
       }
     }
   }
-  
+
   Danbooru.Post.nav_next = function() {
     if ($("#search-seq-nav").length) {
       var href = $("#search-seq-nav a[rel=next]").attr("href");
@@ -74,7 +74,7 @@
       }
     }
   }
-  
+
   Danbooru.Post.nav_scroll_down = function() {
     var scroll_top = $(window).scrollTop() + ($(window).height() * 0.85);
     Danbooru.scroll_to(scroll_top);
@@ -316,7 +316,7 @@
       }
     });
   }
-  
+
   Danbooru.Post.approve = function(post_id) {
     $.ajax({
       type: "POST",

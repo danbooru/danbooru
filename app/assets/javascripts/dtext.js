@@ -1,11 +1,11 @@
 (function() {
   Danbooru.Dtext = {};
-  
+
   Danbooru.Dtext.initialize_links = function() {
     $(".simple_form .dtext-preview").hide();
     $(".simple_form input[value=Preview]").click(Danbooru.Dtext.click_button);
   }
-  
+
   Danbooru.Dtext.call_preview = function(e, $button, $input, $preview) {
     $.ajax({
       type: "post",
@@ -20,18 +20,18 @@
       }
     });
   }
-  
+
   Danbooru.Dtext.call_edit = function(e, $button, $input, $preview) {
     $button.val("Preview");
     $preview.hide();
     $input.slideDown("fast");
   }
-  
+
   Danbooru.Dtext.click_button = function(e) {
     var $button = $(e.target);
     var $input = $("#" + $button.data("input-id"));
     var $preview = $("#" + $button.data("preview-id"));
-    
+
     if ($button.val().match(/preview/i)) {
       Danbooru.Dtext.call_preview(e, $button, $input, $preview);
     } else {

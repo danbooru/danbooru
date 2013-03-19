@@ -1,6 +1,6 @@
 (function() {
   Danbooru.Paginator = {};
-  
+
   Danbooru.Paginator.next_page = function() {
     var href = $(".paginator a[rel=next]").attr("href");
     if (href) {

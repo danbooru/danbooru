@@ -1,11 +1,11 @@
 (function() {
   Danbooru.Upload = {};
-  
+
   Danbooru.Upload.initialize_all = function() {
     if ($("#c-uploads,#c-posts").length) {
       this.initialize_enter_on_tags();
     }
-    
+
     if ($("#c-uploads").length) {
       this.initialize_image();
       this.initialize_info();
@@ -15,7 +15,7 @@
       }
     }
   }
-  
+
   Danbooru.Upload.initialize_enter_on_tags = function() {
     $("#upload_tag_string,#post_tag_string").bind("keydown.return", function(e) {
       $("#form").trigger("submit");
@@ -41,11 +41,11 @@
   		$("#upload_file").attr("name", old_file_name);
   		$("#form").attr("target", "");
   		$("#form").attr("action", old_action);
-  		
+
   		e.preventDefault();
     });
   }
-  
+
   Danbooru.Upload.initialize_info = function() {
     $("#source-info ul").hide();
     $("#fetch-data").click(function(e) {
@@ -54,10 +54,10 @@
         $.each(data.tags, function(i, v) {
           tag_html += ('<a href="' + v[1] + '">' + v[0] + '</a> ');
         });
-        
+
         $("#source-artist").html('<a href="' + data.profile_url + '">' + data.artist_name + '</a>');
         $("#source-tags").html(tag_html);
-        
+
         var new_artist_link = '<a href="/artists/new?name=' + data.unique_id + '&other_names=' + data.artist_name + '&urls=' + encodeURIComponent(data.profile_url) + '+' + encodeURIComponent(data.image_url) + '">new</a>';
 
         if (data.danbooru_id) {
@@ -65,7 +65,7 @@
         } else {
           $("#source-record").html(new_artist_link);
         }
-        
+
         $("#source-info p").hide();
         $("#source-info ul").show();
       });
@@ -73,7 +73,7 @@
     });
     $("#fetch-data").trigger("click");
   }
-  
+
   Danbooru.Upload.initialize_image = function() {
     var $image = $("#image");
     if ($image.size() > 0) {

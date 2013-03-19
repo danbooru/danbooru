@@ -2,7 +2,7 @@
   Danbooru.meta = function(key) {
     return $("meta[name=" + key + "]").attr("content");
   }
-  
+
   Danbooru.scroll_to = function(element) {
     var top = null;
     if (typeof(element) === "number") {
@@ -26,7 +26,7 @@
 
   Danbooru.is_subset = function(array, subarray) {
     var all = true;
-    
+
     $.each(subarray, function(i, val) {
       if ($.inArray(val, array) === -1) {
         all = false;
@@ -73,7 +73,7 @@
     });
     return filtered;
   }
-  
+
   $.fn.selectRange = function(start, end) {
     return this.each(function() {
       if (this.setSelectionRange) {
@@ -88,7 +88,7 @@
       }
     });
   };
-  
+
   $.fn.selectEnd = function(){
     this.selectRange(this.val().length, this.val().length);
     return this;
