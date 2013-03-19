@@ -4,4 +4,13 @@ div#c-favorites {
   section#content > h1 {
     font-size: $h3_size;
   }
+  
+  div#posts {
+    margin-left: 0;
+    margin-right: 6.5em;
+  }
+  
+  #content {
+    margin-left: 15em;
+  }
 }
