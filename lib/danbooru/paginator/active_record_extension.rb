@@ -83,7 +83,7 @@ module Danbooru
           when :limit
             limit = @paginator_options.try(:[], :limit) || Danbooru.config.posts_per_page
             if limit.to_i > 1_000
-              limit = 1000
+              limit = 1_000
             end
             limit
 

@@ -6,7 +6,7 @@ HTTP defines four basic request methods: GET, POST, PUT and DELETE. You'll be us
 
 A URL is considered a resource and the HTTP methods are actions you perform on the resource. For example, GET "/posts/1.json":/posts/1.json returns a JSON representation of a post. GET "/posts/1.xml":/posts/1.xml returns an XML representation. POST /posts/1.json would update the resource, for example changing its tags.
 
-Some resources require parameters. For example, you can search for tags named abc by calling GET "/tags.json?search[name_matches]=abc":/tags.json?search[name_matches]=abc will give you a JSON listing of all tags with name abc.
+Some resources require parameters. For example, you can search for tags named abc by calling GET "/tags.json?search[name_matches]=abc":/tags.json?search[name_matches]=abc. This will give you a JSON listing of all tags with name abc.
 
 For POST, PUT and DELETE requests you will be passing these parameters along in the body instead of the query parameters.
 
@@ -37,3 +37,466 @@ While you can usually determine success or failure based on the response object,
 * [b]424 Invalid Parameters[/b]: The given parameters were invalid
 * [b]500 Internal Server Error[/b]:  Some unknown error occurred on the server
 * [b]503 Service Unavailable[/b]: Server cannot currently handle the request, try again later
+
+h1. Authentication
+
+All API calls must be authenticated. You can pass in two parameters: login and api_key. For legacy users, password_hash using the old salted SHA1 hashed password is also supported. Your API key is equivalent to your bcrypted password hash, which is stored in your cookies as password_hash. You can discover your API key by visiting your user profile. Your API key is intended to be a secret so you should not publicly distribute it.
+
+Basic members can make 3,000 requests an hour. Gold members can make 10,000 requests an hour. Platinum members can make 20,000 requests an hour.
+
+h1. Posts
+
+h2. Listing
+
+The base URL is GET /posts.json.
+
+h3. Parameters
+
+* [b]limit[/b] How many posts you want to retrieve. There is a hard limit of 100 posts per request.
+* [b]page[/b] The page number.
+* [b]tags[/b] The tags to search for. Any tag combination that works on the web site will work here. This includes all the meta-tags.
+
+h3. Responses
+
+TODO
+
+h2. Show
+
+The base URL is GET /posts/$id.json where $id is the post id.
+
+h3. Responses
+
+TODO
+
+h2. Create
+
+You cannot directly create posts. You must create an upload, which is then converted into a post.
+
+h2. Update
+
+The base URL is PUT /posts/$id.json where $id is the post id.
+
+h3. Parameters
+
+* [b]post[tag_string][/b] A space delimited list of tags.
+* [b]post[rating][/b] The rating for the post. Can be: safe, questionable, or explicit.
+* [b]post[source][/b] If this is a URL, Danbooru will download the file.
+* [b]post[parent_id][/b] The ID of the parent post.
+
+h3. Responses
+
+TODO
+
+h2. Delete
+
+You cannot delete posts. You can only flag them for deletion (see PostFlag resource).
+
+h2. Revert
+
+The base URL is PUT /posts/$id/revert.json where $id is the post id.
+
+h3. Parameters
+
+* [b]version_id[/b] REQUIRED The post version id to revert to.
+
+h3. Responses
+
+TODO
+
+h1. Post Votes
+
+h2. Create
+
+The base URL is POST /posts/$post_id/votes.json where $post_id is the post id.
+
+h3. Parameters
+
+* [b]score[/b] REQUIRED Can be: up, down.
+
+h3. Responses
+
+TODO
+
+h1. Post Flags
+
+h2. Listing
+
+The base URL is GET /post_flags.json.
+
+h3. Parameters
+
+* [b]search[creator_id][/b] The user id of the flag's creator.
+* [b]search[creator_name][/b] The name of the flag's creator.
+* [b]search[post_id][/b] The post id if the flag.
+
+h3. Responses
+
+TODO
+
+h2. Create
+
+The base URL is POST /post_flags.json.
+
+h3. Parameters
+
+* [b]post_flag[post_id][/b] REQUIRED The id of the flagged post.
+* [b]post_flag[reason][/b] REQUIRED The reason of the flagging.
+
+h3. Responses
+
+TODO
+
+h1. Post Appeals
+
+h2. Listing
+
+The base URL is GET /post_appeals.json.
+
+h3. Parameters
+
+* [b]search[creator_id][/b] The user id of the appeal's creator.
+* [b]search[creator_name][/b] The name of the appeal's creator.
+* [b]search[post_id][/b] The post id if the appeal.
+
+h3. Responses
+
+TODO
+
+h2. Create
+
+The base URL is POST /post_appeals.json.
+
+h3. Parameters
+
+* [b]post_appeal[post_id][/b] REQUIRED The id of the appealed post.
+* [b]post_appeal[reason][/b] REQUIRED The reason of the appeal.
+
+h3. Responses
+
+TODO
+
+h1. Uploads
+
+h2. Listing
+
+The base URL is GET /uploads.json.
+
+h3. Parameters
+
+* [b]search[uploader_id][/b] The id of the uploader.
+* [b]search[uploader_name][/b] The name of the uploader.
+* [b]search[source][/b] The source of the upload (exact string match).
+
+h3. Responses
+
+TODO
+
+h2. Show
+
+The base URL is GET /uploads/$id.json where $id is the upload id.
+
+h3. Responses
+
+TODO
+
+h2. Create
+
+The base URL is POST /uploads.json.
+
+h3. Parameters
+
+* [b]upload[file][/b] The file data encoded as a multipart form.
+* [b]upload[source][/b] The source URL.
+* [b]upload[rating][/b] REQUIRED Can be: safe, questionable, explicit.
+* [b]upload[parent_id][/b] The parent post id.
+* [b]upload[tag_string][/b] REQUIRED The tags.
+
+Either the file or the source must be provided.
+
+h3. Responses
+
+TODO
+
+h1. Comments
+
+h2. Listing
+
+The base URL is GET /comments.json.
+
+h3. Parameters
+
+* [b]group_by[/b] Must be: comment
+* [b]search[body_matches][/b] Body contains the given terms.
+* [b]search[post_tags_match][/b] The comment's post's tags match the given terms. Meta-tags not supported.
+* [b]search[creator_name][/b] The name of the creator (exact match)
+* [b]search[creator_id][/b] The user id of the creator
+
+h3. Responses
+
+TODO
+
+h2. Create
+
+The base URL is POST /comments.json
+
+h3. Parameters
+
+* [b]comment[post_id][/b] REQUIRED
+* [b]comment[body][/b] REQUIRED
+* [b]comment[do_not_bump_post][/b] Set to 1 if you do not want the post to be bumped to the top of the comment listing
+
+h3. Responses
+
+TODO
+
+h2. Update
+
+The base URL is PUT /comments/$id.json where $id is the comment id.
+
+h3. Parameters
+
+* [b]comment[body][/b] REQUIRED
+* [b]comment[do_not_bump_post][/b] Set to 1 if you do not want the post to be bumped to the top of the comment listing
+
+h3. Responses
+
+TODO
+
+h2. Show
+
+The base URL is GET /comments/$id.json where $id is the comment id.
+
+h3. Responses
+
+TODO
+
+h2. Delete
+
+The base URL is DELETE /comments/$id.json where $id is the comment id.
+
+h3. Responses
+
+TODO
+
+h1. Dmails
+
+h2. Listing
+
+The base URL is GET /dmails.json. You can only view dmails you own.
+
+h3. Parameters
+
+* [b]search[message_matches][/b] The message body contains the given terms.
+* [b]search[to_name][/b] The recipient's name.
+* [b]search[to_id][/b] The recipient's user id.
+* [b]search[from_name][/b] The sender's name.
+* [b]search[from_id][/b] The sender's user id.
+
+h3. Responses
+
+TODO
+
+h2. Show
+
+The base URL is GET /dmails/$id.json where $id is the dmail id. You can only view dmails you own.
+
+h3. Responses
+
+TODO
+
+h2. Create
+
+The base URL is POST /dmails.json.
+
+h3. Parameters
+
+* [b]dmail[to_name][/b] The recipient's name.
+* [b]dmail[title][/b] The title of the message.
+* [b]dmail[body][/b] The body of the message.
+
+h3. Responses
+
+TODO
+
+h2. Delete
+
+The base URL is DELETE /dmails/$id.json where $id is the dmail id. You can only delete dmails you own.
+
+h3. Responses
+
+TODO
+
+h1. Artists
+
+h2. Listing
+
+The base URL is GET /artists.json.
+
+h3. Parameters
+
+* [b]search[name][/b] This field has multiple uses depending on what the query starts with:
+** [i]http[/i] Search for artist with this URL.
+** [i]name:[/i] Search for artists with the given name as their base name..
+** [i]other:[/i] Search for artists with the given name in their other names.
+** [i]group:[/i] Search for artists belonging to the group with the given name.
+** [i]status:banned[/i] Search for artists that are banned.
+** [i]else[/i] Search for the given name in the base name and the other names.
+* [b]search[id][/b] The artist id.
+* [b]search[sort][/b] Can be: name, date.
+
+h3. Responses
+
+TODO
+
+h2. Show
+
+The base URL is GET /artists/$id.json where $id is the artist id.
+
+h3. Responses
+
+TODO
+
+h2. Create
+
+The base URL is POST /artists.json.
+
+h3. Parameters
+
+* [b]artist[name][/b]
+* [b]artist[other_names_comma][/b] List of alternative names for this artist, comma delimited.
+* [b]artist[group_name][/b] The name of the group this artist belongs to.
+* [b]artist[url_string][/b] List of URLs associated with this artist, whitespace or newline delimited.
+* [b]artist[is_active][/b] Can be: 1, 0.
+
+h3. Responses
+
+TODO
+
+h2. Update
+
+The base URL is PUT /artists/$id.json where $id is the artist id.
+
+h3. Parameters
+
+* [b]artist[name][/b]
+* [b]artist[other_names_comma][/b] List of alternative names for this artist, comma delimited.
+* [b]artist[group_name][/b] The name of the group this artist belongs to.
+* [b]artist[url_string][/b] List of URLs associated with this artist, whitespace or newline delimited.
+* [b]artist[is_active][/b] Can be: 1, 0.
+
+h3. Responses
+
+TODO
+
+h2. Banned
+
+The base URL is GET /artists/banned.json. This is a shortcut for an artist listing search with name=status:banned.
+
+h3. Responses
+
+See the listing response.
+
+h2. Revert
+
+The base URL is PUT /artists/$id/revert.json where $id is the artist id.
+
+h3. Parameters
+
+* [b]version_id[/b] The artist version id to revert to.
+
+h3. Responses
+
+TODO
+
+h1. Notes
+
+h2. Listing
+
+The base URL is GET /notes.json.
+
+h3. Parameters
+
+* [b]search[body_matches][/b] The note's body matches the given terms.
+* [b]search[post_id][/b]
+* [b]search[post_tags_match][/b] The note's post's tags match the given terms. Meta-tags are not supported.
+* [b]search[creator_name][/b] The creator's name. Exact match.
+* [b]search[creator_id][/b] The creator's user id.
+
+h3. Responses
+
+TODO
+
+h2. Show
+
+The base URL is GET /notes/$id.json where $id is the note id.
+
+h3. Responses
+
+TODO
+
+h2. Create
+
+h3. Parameters
+
+* [b]note[post_id][/b] REQUIRED
+* [b]note[x][/b] REQUIRED The x coordinates of the note in pixels, with respect to the top-left corner of the image.
+* [b]note[y][/b] REQUIRED The y coordinates of the note in pixels, with respect to the top-left corner of the image.
+* [b]note[width][/b] REQUIRED The width of the note in pixels.
+* [b]note[height][/b] REQUIRED The height of the note in pixels.
+* [b]note[body][/b] REQUIRED The body of the note.
+
+h3. Responses
+
+TODO
+
+h2. Update
+
+The base URL is PUT /notes/$id.json where $id is the note id.
+
+h3. Parameters
+
+* [b]note[x][/b] REQUIRED The x coordinates of the note in pixels, with respect to the top-left corner of the image.
+* [b]note[y][/b] REQUIRED The y coordinates of the note in pixels, with respect to the top-left corner of the image.
+* [b]note[width][/b] REQUIRED The width of the note in pixels.
+* [b]note[height][/b] REQUIRED The height of the note in pixels.
+* [b]note[body][/b] REQUIRED The body of the note.
+
+h2. Delete
+
+The base URL is DELETE /notes/$id.json where $id is the note id.
+
+h3. Responses
+
+TODO
+
+h2. Revert
+
+The base URL is PUT /notes/$id/revert.json where $id is the note id.
+
+h3. Parameters
+
+* [b]version_id[/b] The note version id to revert to.
+
+h1. Users
+
+
+
+h1. Post Versions
+
+h1. Note Versions
+
+h1. Pools
+
+h1. Pool Versions
+
+h1. Tag Aliases
+
+h1. Tag Implications
+
+h1. Wiki Pages
+
+h1. Related Tags
+
+h1. Forum Topics
+
+h1. Forum Posts
