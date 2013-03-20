@@ -24,7 +24,7 @@ div#artist-tags {
   }
 }
 
-div#related-tags {
+div.related-tags {
   overflow: auto;
   width: 100%;
   margin-bottom: 1em;
@@ -54,5 +54,10 @@ div#related-tags {
         }
       }
     }
+  }
+  
+  div.tag-column.artist {
+    float: none;
+    max-width: 100%;
   }
 }

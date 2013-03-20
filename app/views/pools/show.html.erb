@@ -12,7 +12,7 @@
       <%= format_text(@pool.description) %>
     </div>
 
-    <section id="content">
+    <section>
       <%= @post_set.presenter.post_previews_html(self) %>
 
       <%= numbered_paginator(@post_set) %>

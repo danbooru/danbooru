@@ -22,6 +22,15 @@
       }
     }
   }
+  
+  Danbooru.RelatedTag.tags_include = function(name) {
+    var current = $("#upload_tag_string,#post_tag_string").val().match(/\S+/g) || [];
+    if ($.inArray(name, current) > -1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   Danbooru.RelatedTag.common_bind = function(button_name, category) {
     $(button_name).click(function(e) {
@@ -178,6 +187,9 @@
 
     $field[0].selectionStart = $field.val().length;
     Danbooru.RelatedTag.build_all();
+    if (Danbooru.RelatedTag.recent_artist && $("#artist-tags-container").css("display") === "block") {
+      Danbooru.RelatedTag.process_artist(Danbooru.RelatedTag.recent_artist);
+    }
     e.preventDefault();
   }
 
@@ -190,6 +202,7 @@
   }
 
   Danbooru.RelatedTag.process_artist = function(data) {
+    Danbooru.RelatedTag.recent_artist = data;
     $("#artist-tags-container").show();
     var $dest = $("#artist-tags");
     $dest.empty();
@@ -206,12 +219,16 @@
       if (!json.other_names) {
         json.other_names = "";
       }
-      var $div = $("<div/>").addClass("artist");
+      var $div = $("<div/>").addClass("tag-column").addClass("artist");
       var $ul = $("<ul/>");
-      var $link = null;
+      var $link = $("<a/>").attr("href", "/artists/" + json.id).html(json.name).click(Danbooru.RelatedTag.toggle_tag);
+      if (Danbooru.RelatedTag.tags_include(json.name)) {
+        $link.addClass("selected");
+      }
+      
       $ul.append(
         $("<li/>").append("Artist: ").append(
-          $link = $("<a/>").attr("href", "/artists/" + json.id).html(json.name).click(Danbooru.RelatedTag.toggle_tag)
+          $link
         )
       );
       if (json.other_names.length > 0) {
@@ -222,7 +239,6 @@
       });
       $div.append($ul);
       $dest.append($div);
-      $link.trigger("click");
     });
   }
 })();
