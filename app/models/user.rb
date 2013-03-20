@@ -464,9 +464,9 @@ class User < ActiveRecord::Base
       if is_platinum?
         nil
       elsif is_privileged?
-        20_000
+        40_000
       else
-        4_000
+        20_000
       end
     end
   end
