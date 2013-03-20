@@ -5,12 +5,22 @@ class ApplicationController < ActionController::Base
   after_filter :reset_current_user
   before_filter :set_title
   before_filter :set_started_at_session
+  before_filter :api_check
   layout "default"
 
   rescue_from User::PrivilegeError, :with => :access_denied
   rescue_from Danbooru::Paginator::PaginationError, :with => :render_pagination_limit
 
 protected
+  def api_check
+    if CurrentUser.is_anonymous? && request.format.to_s =~ /json|xml/
+      render :text => "401 Not Authorized\n", :layout => false, :status => 401
+      return false
+    end
+    
+    return true
+  end
+
   def rescue_exception(exception)
     @exception = exception
 
@@ -53,7 +63,7 @@ protected
   end
 
   def set_current_user
-    session_loader = SessionLoader.new(session, cookies, request)
+    session_loader = SessionLoader.new(session, cookies, request, params)
     session_loader.load
   end
 
