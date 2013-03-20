@@ -121,6 +121,8 @@ class DText
     unless options[:inline]
       str.gsub!(/\s*\[quote\]\s*/m, "\n\n[quote]\n\n")
       str.gsub!(/\s*\[\/quote\]\s*/m, "\n\n[/quote]\n\n")
+      str.gsub!(/\s*\[code\]\s*/m, "\n\n[code]\n\n")
+      str.gsub!(/\s*\[\/code\]\s*/m, "\n\n[/code]\n\n")
       str.gsub!(/\s*\[spoilers?\](?!\])\s*/m, "\n\n[spoiler]\n\n")
       str.gsub!(/\s*\[\/spoilers?\]\s*/m, "\n\n[/spoiler]\n\n")
     end
@@ -162,6 +164,12 @@ class DText
         else
           ""
         end
+        
+      when /\[code\](?!\])/
+        '<pre>'
+
+      when /\[\/code\](?!\])/
+        '</pre>'
 
       when /\[spoilers?\](?!\])/
         stack << "div"
