@@ -15,12 +15,6 @@
     this.common_bind("#related-characters-button", "character");
     this.common_bind("#related-copyrights-button", "copyright");
     $("#find-artist-button").click(Danbooru.RelatedTag.find_artist);
-    if ($("#c-uploads").length) {
-      if ($("#upload_source").val().match(/pixiv\.net/)) {
-        Danbooru.RelatedTag.auto_artist_find = true;
-        $("#find-artist-button").trigger("click");
-      }
-    }
   }
   
   Danbooru.RelatedTag.tags_include = function(name) {

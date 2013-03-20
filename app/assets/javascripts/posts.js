@@ -237,6 +237,7 @@
         $("#share").hide();
         $("#post_tag_string").focus();
         $("#related-tags-button").trigger("click");
+        $("#find-artist-button").trigger("click");
       } else {
         $("#edit").hide();
         $("#comments").hide();
