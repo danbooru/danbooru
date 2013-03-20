@@ -6,8 +6,9 @@ class TagCorrectionsController < ApplicationController
   end
 
   def create
+    @correction = TagCorrection.new(params[:tag_id])
+
     if params[:commit] == "Fix"
-      @correction = TagCorrection.new(params[:tag_id])
       @correction.fix!
     end
 
