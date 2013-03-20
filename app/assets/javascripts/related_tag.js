@@ -207,11 +207,8 @@
     var $dest = $("#artist-tags");
     $dest.empty();
 
-    if (data.length === 0) {
+    if (data.length != 1) {
       $dest.html("No artists found");
-      return;
-    } else if (data.length > 2) {
-      $dest.html("Too many matching artists found");
       return;
     }
 
