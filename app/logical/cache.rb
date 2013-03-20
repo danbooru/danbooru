@@ -1,15 +1,11 @@
 class Cache
-  def self.incr(key, expiry = 0)
-    val = Cache.get(key, expiry)
-    Cache.put(key, val.to_i + 1)
+  def self.incr(key)
+    MEMCACHE.incr(key)
     ActiveRecord::Base.logger.debug('MemCache Incr %s' % [key])
   end
 
-  def self.decr(key, expiry = 0)
-    val = Cache.get(key, expiry)
-    if val.to_i > 0
-      Cache.put(key, val.to_i - 1)
-    end
+  def self.decr(key)
+    MEMCACHE.decr(key)
     ActiveRecord::Base.logger.debug('MemCache Decr %s' % [key])
   end
 

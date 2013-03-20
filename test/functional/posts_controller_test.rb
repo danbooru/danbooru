@@ -16,16 +16,32 @@ class PostsControllerTest < ActionController::TestCase
     end
     
     context "for api calls" do
+      context "passing the api limit" do
+        setup do
+          User.any_instance.stubs(:api_hourly_limit).returns(5)
+        end
+        
+        should "work" do
+          CurrentUser.user.api_hourly_limit.times do
+            get :index, {:format => "json", :login => @user.name, :api_key => @user.bcrypt_cookie_password_hash}
+            assert_response :success
+          end
+
+          get :index, {:format => "json", :login => @user.name, :api_key => @user.bcrypt_cookie_password_hash}
+          assert_response 421
+        end
+      end
+      
       context "using http basic auth" do
         should "succeed for password matches" do
-          @basic_auth_string = "Basic #{ActiveSupport::Base64.encode64("#{@user.name}:#{@user.bcrypt_cookie_password_hash}")}"
+          @basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:#{@user.bcrypt_cookie_password_hash}")}"
           @request.env['HTTP_AUTHORIZATION'] = @basic_auth_string
           get :index, {:format => "json"}
           assert_response :success
         end
         
         should "fail for password mismatches" do
-          @basic_auth_string = "Basic #{ActiveSupport::Base64.encode64("#{@user.name}:badpassword")}"
+          @basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:badpassword")}"
           @request.env['HTTP_AUTHORIZATION'] = @basic_auth_string
           get :index, {:format => "json"}
           assert_response 401

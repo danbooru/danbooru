@@ -53,6 +53,23 @@ class MockMemcache
   def flush_all
     @memory = {}
   end
+  
+  def fetch key, expiry = 0, raw = false
+    if @memory.has_key?(key)
+      @memory[key]
+    else
+      @memory[key] = yield
+    end
+    @memory[key]
+  end
+
+  def incr key
+    @memory[key] += 1
+  end
+
+  def decr key
+    @memory[key] -= 1
+  end
 
   def set key, value, expiry = 0
     @memory[key] = value
@@ -62,7 +79,7 @@ class MockMemcache
     @memory[key]
   end
 
-  def delete key, delay
+  def delete key, delay = 0
     @memory.delete key
   end
 

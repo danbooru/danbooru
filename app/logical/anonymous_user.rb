@@ -164,6 +164,10 @@ class AnonymousUser
   def enable_sequential_post_navigation
     true
   end
+  
+  def api_hourly_limit
+    500
+  end
 
   %w(member banned privileged builder platinum contributor janitor moderator admin).each do |name|
     define_method("is_#{name}?") do

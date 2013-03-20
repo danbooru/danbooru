@@ -13,9 +13,16 @@ class ApplicationController < ActionController::Base
 
 protected
   def api_check
-    if CurrentUser.is_anonymous? && request.format.to_s =~ /json|xml/
-      render :text => "401 Not Authorized\n", :layout => false, :status => 401
-      return false
+    if request.format.to_s =~ /json|xml/
+      if CurrentUser.is_anonymous?
+        render :text => "401 Not Authorized\n", :layout => false, :status => 401
+        return false
+      end
+
+      if ApiLimiter.throttled?(request.remote_ip)
+        render :text => "421 User Throttled\n", :layout => false, :status => 421
+        return false
+      end
     end
     
     return true

@@ -469,6 +469,16 @@ class User < ActiveRecord::Base
         20_000
       end
     end
+    
+    def api_hourly_limit
+      if is_platinum?
+        20_000
+      elsif is_privileged?
+        10_000
+      else
+        3_000
+      end
+    end
   end
 
   module ApiMethods
