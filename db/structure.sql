@@ -2672,7 +2672,8 @@ CREATE TABLE wiki_pages (
     body_index tsvector NOT NULL,
     is_locked boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    updater_id integer
 );
 
 
@@ -6259,3 +6260,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130318030619');
 INSERT INTO schema_migrations (version) VALUES ('20130318031705');
 
 INSERT INTO schema_migrations (version) VALUES ('20130318231740');
+
+INSERT INTO schema_migrations (version) VALUES ('20130320070700');

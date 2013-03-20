@@ -1,6 +1,7 @@
 class WikiPage < ActiveRecord::Base
   before_save :normalize_title
-  before_create :initialize_creator
+  before_validation :initialize_creator, :on => :create
+  before_validation :initialize_updater
   after_save :create_version
   belongs_to :creator, :class_name => "User"
   validates_uniqueness_of :title, :case_sensitive => false
@@ -125,9 +126,17 @@ class WikiPage < ActiveRecord::Base
       )
     end
   end
+  
+  def updater_name
+    User.id_to_name(updater_id)
+  end
 
   def initialize_creator
     self.creator_id = CurrentUser.user.id
+  end
+  
+  def initialize_updater
+    self.updater_id = CurrentUser.user.id
   end
 
   def post_set
