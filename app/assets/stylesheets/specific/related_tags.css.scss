@@ -25,11 +25,11 @@ div#artist-tags {
 }
 
 div.related-tags {
-  overflow: auto;
   width: 100%;
   margin-bottom: 1em;
   padding: 1em;
   background: #EEE;
+  overflow: auto;
 
   div.tag-column {
     max-width: 15em;
