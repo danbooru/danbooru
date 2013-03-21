@@ -440,7 +440,7 @@ class User < ActiveRecord::Base
       if base_upload_limit
         limit = [base_upload_limit - (deleted_count / 2), 4].max - pending_count
       else
-        limit = [10 + [approved_count / 2, 20].min - (deleted_count / 2), 4].max - pending_count
+        limit = [10 + [approved_count / 2, 30].min - (deleted_count / 2), 4].max - pending_count
       end
 
       if limit < 0

@@ -45,7 +45,7 @@ class UserPresenter
     if base_upload_limit
       string = "max(base_upload_limit:#{base_upload_limit} - (deleted_count:#{deleted_count} / 2), 4) - pending_count:#{pending_count}"
     else
-      string = "max(10 + min(approved_count:#{approved_count} / 2, 20) - (deleted_count:#{deleted_count} / 2), 4) - pending_count:#{pending_count}"
+      string = "max(10 + min(approved_count:#{approved_count} / 2, 30) - (deleted_count:#{deleted_count} / 2), 4) - pending_count:#{pending_count}"
     end
     
     "#{string} = #{user.upload_limit} (deletions and approvals within past month)"
