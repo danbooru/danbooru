@@ -47,6 +47,8 @@ class WikiPage < ActiveRecord::Base
 
       if params[:sort] == "time" || params[:sort] == "Date"
         q = q.order("updated_at desc")
+      elsif params[:sort] == "title"
+        q = q.order("title")
       end
 
       q

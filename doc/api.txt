@@ -404,7 +404,7 @@ The base URL is PUT /artists/$id/revert.json where $id is the artist id.
 
 h3. Parameters
 
-* [b]version_id[/b] The artist version id to revert to.
+* [b]version_id[/b] REQUIRED The artist version id to revert to.
 
 h3. Responses
 
@@ -457,11 +457,11 @@ The base URL is PUT /notes/$id.json where $id is the note id.
 
 h3. Parameters
 
-* [b]note[x][/b] REQUIRED The x coordinates of the note in pixels, with respect to the top-left corner of the image.
-* [b]note[y][/b] REQUIRED The y coordinates of the note in pixels, with respect to the top-left corner of the image.
-* [b]note[width][/b] REQUIRED The width of the note in pixels.
-* [b]note[height][/b] REQUIRED The height of the note in pixels.
-* [b]note[body][/b] REQUIRED The body of the note.
+* [b]note[x][/b] The x coordinates of the note in pixels, with respect to the top-left corner of the image.
+* [b]note[y][/b] The y coordinates of the note in pixels, with respect to the top-left corner of the image.
+* [b]note[width][/b] The width of the note in pixels.
+* [b]note[height][/b] The height of the note in pixels.
+* [b]note[body][/b] The body of the note.
 
 h2. Delete
 
@@ -477,28 +477,298 @@ The base URL is PUT /notes/$id/revert.json where $id is the note id.
 
 h3. Parameters
 
-* [b]version_id[/b] The note version id to revert to.
+* [b]version_id[/b] REQUIRED The note version id to revert to.
 
 h1. Users
 
+h2. Levels
 
+Users have a number attribute called level representing their role. The current levels are:
+
+* Member: 20
+* Gold: 30
+* Platinum: 31
+* Builder: 32
+* Contributor: 33
+* Janitor: 35
+* Moderator: 40
+* Admin: 50
+
+h2. Listing
+
+The base URL is GET /users.json.
+
+h3. Parameters
+
+* [b]search[name][/b] Supports patterns.
+* [b]search[min_level][/b] Minimum level (see section on levels).
+* [b]search[level][/b] Current level (see section on levels).
+* [b]search[id][/b] The user id.
+* [b]search[sort][/b] Can be: name, post_upload_count, note_count, post_update_count, date.
+
+h2. Show
+
+The base URL is GET /users/$id.json where $id is the user id.
+
+h3. Responses
+
+TODO
 
 h1. Post Versions
 
+h2. Listing
+
+The base URL is GET /post_versions.json.
+
+h3. Parameters
+
+* [b]search[updater_name][/b]
+* [b]search[updater_id][/b]
+* [b]search[post_id][/b]
+
+h3. Responses
+
+TODO
+
 h1. Note Versions
+
+h2. Listing
+
+The base URL is GET /note_versions.json.
+
+h3. Parameters
+
+* [b]search[updater_id][/b]
+* [b]search[post_id][/b]
+* [b]search[note_id][/b]
+
+h3. Responses
+
+TODO
 
 h1. Pools
 
+h2. Listing
+
+The base URL is GET /pools.json.
+
+h3. Parameters
+
+* [b]search[name_matches][/b]
+* [b]search[description_matches][/b]
+* [b]search[creator_name][/b]
+* [b]search[creator_id][/b]
+* [b]search[sort][/b] Can be: name, date
+
+h2. Show
+
+The base URL is GET /pools/$id.json where $id is the pool id.
+
+h2. Create
+
+The base URL is POST /pools.json.
+
+h3. Parameters
+
+* [b]pool[name][/b] REQUIRED
+* [b]pool[description][/b] REQUIRED
+
+h2. Update
+
+The base URL is PUT /pools/$id.json where $id is the pool id.
+
+h3. Parameters
+
+* [b]pool[name][/b]
+* [b]pool[description][/b]
+* [b]pool[post_ids][/b] List of space delimited post ids.
+* [b]pool[is_active][/b] Can be: 1, 0
+
+h2. Delete
+
+The base URL is DELETE /pools/$id.json where $id is the pool id.
+
+h2. Undelete
+
+The base URL is POST /pools/$id/undelete.json where $id is the pool id.
+
+h2. Revert
+
+The base URL is PUT /pools/$id/revert.json where $id is the pool id.
+
+h3. Parameters
+
+* [b]version_id[/b] REQUIRED
+
 h1. Pool Versions
+
+h2. Listing
+
+The base URL is GET /pool_versions.json.
+
+h3. Parameters
+
+* [b]search[updater_id][/b]
+* [b]search[updater_name][/b]
+* [b]search[pool_id][/b]
 
 h1. Tag Aliases
 
+h2. Listing
+
+The base URL is GET /tag_aliases.json.
+
+h3. Parameters
+
+* [b]search[name_matches][/b] Match antecedent or consequent name.
+* [b]search[antecedent_name][/b] Match antecedent name (exact match).
+* [b]search[id][/b] The tag alias id.
+
 h1. Tag Implications
+
+h2. Listing
+
+The base URL is GET /tag_implications.json.
+
+h3. Parameters
+
+* [b]search[name_matches][/b] Match antecedent or consequent name.
+* [b]search[antecedent_name][/b] Match antecedent name (exact match).
+* [b]search[id][/b] The tag alias id.
 
 h1. Wiki Pages
 
+h2. Listing
+
+The base URL is GET /wiki_pages.json.
+
+h3. Parameters
+
+* [b]search[title][/b]
+* [b]search[creator_id][/b]
+* [b]search[body_matches][/b]
+* [b]search[creator_name][/b]
+* [b]search[sort][/b] Can be: date, title.
+
+h2. Show
+
+The base URL is GET /wiki_pages/$id.json where $id is the wiki page id.
+
+h2. Create
+
+The base URL is POST /wiki_pages.json.
+
+h3. Parameters
+
+* [b]wiki_page[title][/b] REQUIRED
+* [b]wiki_page[body][/b] REQUIRED
+
+h2. Update
+
+The base URL is PUT /wiki_pages/$id.json where $id is the wiki page id.
+
+h3. Parameters
+
+* [b]wiki_page[title][/b]
+* [b]wiki_page[body][/b]
+
+h2. Revert
+
+The base URL is PUT /wiki_pages/$id/revert.json where $id is the wiki page id.
+
+h3. Parameters
+
+* [b]version_id[/b] REQUIRED
+
 h1. Related Tags
+
+h2. Show
+
+The base URL is GET /related_tag.json.
+
+h3. Parameters
+
+* [b]query[/b] REQUIRED The tag to find the related tags for.
+* [b]category[/b] If specified, show only tags of a specific category. Can be:
+** [i]General[/i] 0
+** [i]Artist[/i] 1
+** [i]Copyright[/i] 3
+** [i]Character[/i] 4
 
 h1. Forum Topics
 
+h2. Listing
+
+The base URL is GET /forum_topics.json.
+
+h3. Parameters
+
+* [b]search[title_matches][/b] Search body for the given terms.
+* [b]search[title][/b] Exact title match.
+
+h2. Show
+
+The base URL is GET /forum_topics/$id.json where $id is the forum topic id.
+
+h2. Create
+
+The base URL is POST /forum_topics.json.
+
+h3. Parameters
+
+* [b]forum_topic[title][/b]
+* [b]forum_topic[original_post_attributes][body][/b] Message of the initial post.
+
+h2. Update
+
+The base URL is PUT /forum_topics/$id.json where $id is the forum topic id.
+
+h3. Parameters
+
+* [b]forum_topic[title][/b]
+
+h2. Delete
+
+The base URL is DELETE /forum_topics/$id.json where $id is the forum topic id.
+
+h2. Undelete
+
+The base URL is POST /forum_topics/$id/undelete.json where $id is the forum topic id.
+
 h1. Forum Posts
+
+h2. Listing
+
+The base URL is GET /forum_posts.json.
+
+h3. Parameters
+
+* [b]search[creator_id][/b]
+* [b]search[creator_name][/b]
+* [b]search[topic_id][/b]
+* [b]search[topic_title_matches][/b]
+* [b]search[body_matches][/b]
+
+h2. Create
+
+The base URL is POST /forum_posts.json.
+
+h3. Parameters
+
+* [b]forum_post[body][/b]
+
+h2. Update
+
+The base URL is PUT /forum_posts/$id.json where $id is the forum post id.
+
+h3. Parameters
+
+* [b]forum_post[body][/b]
+
+h2. Delete
+
+The base URL is DELETE /forum_posts/$id.json where $id is the forum post id.
+
+h2. Undelete
+
+The base URL is POST /forum_posts/$id/undelete.json where $id is the forum post id.
