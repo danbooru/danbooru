@@ -235,8 +235,12 @@ div#c-posts {
     }
 
     #nav-links {
-      margin: 1em 7em 1em 0;
+      margin: 1em 0;
       padding: 1em 0.5em;
+    }
+    
+    #content {
+      margin-right: 7em;
     }
 
     #pool-nav, #search-seq-nav, #nav-help {
