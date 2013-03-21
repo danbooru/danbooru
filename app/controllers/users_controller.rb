@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   respond_to :html, :xml, :json
   before_filter :member_only, :only => [:edit, :update, :upgrade]
-  rescue_from User::PrivilegeError, :with => "static/access_denied"
+  rescue_from User::PrivilegeError, :with => :access_denied
 
   def new
     @user = User.new
