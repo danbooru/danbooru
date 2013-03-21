@@ -6,7 +6,7 @@ has been successfully installed on Fedora, CentOS, FreeBSD, and OS X.
 The INSTALL.debian install script is straightforward and should be
 simple to adapt for other platforms.  If you want something similar to
 Danbooru that is easier to install, try Shimmie
-(http://trac.shishnet.org/shimmie2). Shimmie uses PHP and MySQL and
+(http://code.shishnet.org/shimmie2/). Shimmie uses PHP and MySQL and
 should be straightforward to install on most hosts.
 
 For best performance, you will need at least 256MB of RAM for
