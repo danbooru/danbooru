@@ -438,9 +438,9 @@ class User < ActiveRecord::Base
       approved_count = Post.where("is_flagged = false and is_pending = false and is_deleted = false and uploader_id = ? and created_at >= ?", id, 1.month.ago).count
 
       if base_upload_limit
-        limit = base_upload_limit - (deleted_count / 5) - pending_count
+        limit = [base_upload_limit - (deleted_count / 2), 4].max - pending_count
       else
-        limit = 10 + (approved_count / 10) - (deleted_count / 5) - pending_count
+        limit = [10 + [approved_count / 2, 20].min - (deleted_count / 2), 4].max - pending_count
       end
 
       if limit < 0
