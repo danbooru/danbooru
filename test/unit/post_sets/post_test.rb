@@ -100,7 +100,7 @@ module PostSets
 
         context "for a non-privileged user" do
           should "fail" do
-            assert_raises(PostSets::SearchError) do
+            assert_raises(::Post::SearchError) do
               @set.posts
             end
           end

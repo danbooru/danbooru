@@ -479,6 +479,16 @@ class User < ActiveRecord::Base
         3_000
       end
     end
+    
+    def statement_timeout
+      if is_platinum?
+        9_000
+      elsif is_privileged?
+        6_000
+      else
+        3_000
+      end
+    end
   end
 
   module ApiMethods

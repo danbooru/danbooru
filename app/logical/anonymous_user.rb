@@ -168,6 +168,10 @@ class AnonymousUser
   def api_hourly_limit
     500
   end
+  
+  def statement_timeout
+    3_000
+  end
 
   %w(member banned privileged builder platinum contributor janitor moderator admin).each do |name|
     define_method("is_#{name}?") do

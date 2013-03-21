@@ -25,9 +25,15 @@ class SessionLoader
 
     update_last_logged_in_at
     set_time_zone
+    set_statement_timeout
   end
 
 private
+  
+  def set_statement_timeout
+    timeout = CurrentUser.user.statement_timeout
+    ActiveRecord::Base.connection.execute("set statement_timeout = #{timeout}")
+  end
 
   def load_session_for_api
     if request.authorization

@@ -40,9 +40,13 @@ While you can usually determine success or failure based on the response object,
 
 h1. Authentication
 
-All API calls must be authenticated. You can pass in two parameters: login and api_key. For legacy users, password_hash using the old salted SHA1 hashed password is also supported. Your API key is equivalent to your bcrypted password hash, which is stored in your cookies as password_hash. You can discover your API key by visiting your user profile. Your API key is intended to be a secret so you should not publicly distribute it.
+You must be logged in to use the API.
+
+If you can't maintain a session via a cookie, you can pass in two parameters to authenticate: login and api_key. For legacy users, password_hash using the old salted SHA1 hashed password is also supported. Your API key is equivalent to your bcrypted password hash, which is stored in your cookies as password_hash. You can discover your API key by visiting your user profile. Your API key is intended to be a secret so you should not publicly distribute it.
 
 You can also authenticate via HTTP Basic Authentication using your user name and API key.
+
+If you are writing a user script for a browser, you do not need to embed an API key. You can rely on the user's session.
 
 Basic members can make 3,000 requests an hour. Gold members can make 10,000 requests an hour. Platinum members can make 20,000 requests an hour.
 
