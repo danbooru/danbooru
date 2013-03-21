@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
 
 protected
   def api_check
-    if request.format.to_s =~ /json|xml/
+    if request.format.to_s =~ /\/json|\/xml/
       if CurrentUser.is_anonymous?
         render :text => "401 Not Authorized\n", :layout => false, :status => 401
         return false
