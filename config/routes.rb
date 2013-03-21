@@ -285,6 +285,8 @@ Danbooru::Application.routes.draw do
   match "/tag" => redirect {|params, req| "/tags?page=#{req.params[:page]}"}
   match "/tag/index" => redirect {|params, req| "/tags?page=#{req.params[:page]}"}
 
+  match "/tag_implication" => redirect {|params, req| "/tag_implications?search[name_matches]=#{CGI::escape(req.params[:query])}"}
+
   match "/user/index.xml", :controller => "legacy", :action => "users", :format => "xml"
   match "/user/index.json", :controller => "legacy", :action => "users", :format => "json"
   match "/user" => redirect {|params, req| "/users?page=#{req.params[:page]}"}
