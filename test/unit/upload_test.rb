@@ -22,6 +22,19 @@ class UploadTest < ActiveSupport::TestCase
       teardown do
         FileUtils.rm_f(Dir.glob("#{Rails.root}/tmp/test.*"))
       end
+      
+      context "from a user that is limited" do
+        setup do
+          CurrentUser.user = FactoryGirl.create(:user, :created_at => 1.year.ago)
+          User.any_instance.stubs(:upload_limit).returns(0)
+        end
+        
+        should "fail creation" do
+          @upload = FactoryGirl.build(:jpg_upload, :tag_string => "")
+          @upload.save
+          assert_equal(["You can only upload 0 posts a day"], @upload.errors.full_messages)
+        end
+      end
 
       context "that has incredibly absurd res dimensions" do
         setup do

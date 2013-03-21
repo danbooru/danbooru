@@ -406,9 +406,9 @@ class User < ActiveRecord::Base
 
     def upload_limited_reason
       if created_at > 1.week.ago
-        "You cannot upload during your first week of registration"
+        "cannot upload during your first week of registration"
       elsif upload_limit <= 0
-        "You can only upload #{upload_limit} posts a day"
+        "can only upload #{upload_limit} posts a day"
       else
         nil
       end
