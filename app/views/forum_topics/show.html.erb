@@ -15,11 +15,13 @@
 
     <%= render "forum_posts/listing", :forum_posts => @forum_posts %>
 
-    <p><%= link_to "Reply &raquo;".html_safe, new_forum_post_path(:topic_id => @forum_topic.id), :id => "new-response-link" %></p>
+    <% if CurrentUser.is_member? %>
+      <p><%= link_to "Reply &raquo;".html_safe, new_forum_post_path(:topic_id => @forum_topic.id), :id => "new-response-link" %></p>
 
-    <div style="display: none;" id="topic-response">
-      <%= render "forum_posts/form", :forum_post => ForumPost.new(:topic_id => @forum_topic.id) %>
-    </div>
+      <div style="display: none;" id="topic-response">
+        <%= render "forum_posts/form", :forum_post => ForumPost.new(:topic_id => @forum_topic.id) %>
+      </div>
+    <% end %>
 
     <%= numbered_paginator(@forum_posts) %>
   </div>

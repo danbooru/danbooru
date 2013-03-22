@@ -51,7 +51,7 @@
 
       <menu id="post-sections">
         <li><a href="#comments">Comments</a></li>
-        <% if Danbooru.config.can_user_see_post?(CurrentUser.user, @post) %>
+        <% if CurrentUser.is_member? && Danbooru.config.can_user_see_post?(CurrentUser.user, @post) %>
           <li><a href="#edit" id="post-edit-link">Edit</a></li>
         <% end %>
         <li><a href="#share">Share</a></li>
@@ -65,7 +65,7 @@
         <%= render :partial => "notes/note", :collection => @post.notes.active %>
       </section>
 
-      <% if Danbooru.config.can_user_see_post?(CurrentUser.user, @post) %>
+      <% if CurrentUser.is_member? && Danbooru.config.can_user_see_post?(CurrentUser.user, @post) %>
         <section id="edit" style="display: none;">
           <%= render "posts/partials/show/edit", :post => @post %>
         </section>

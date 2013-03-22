@@ -4,7 +4,7 @@
     <li><%= link_to "Listing", pools_path %></li>
     <li><%= link_to "Search", search_pools_path %></li>
     <li><%= link_to "New", new_pool_path %></li>
-    <% if @pool && !@pool.new_record? %>
+    <% if CurrentUser.is_member? && @pool && !@pool.new_record? %>
       <li>|</li>
       <li><%= link_to "Show", pool_path(@pool) %></li>
       <li><%= link_to "Posts", posts_path(:tags => "pool:#{@pool.id}") %></li>
