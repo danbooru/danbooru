@@ -14,6 +14,7 @@
             <th>Updated by</th>
             <th>Active</th>
             <th>URLs</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -34,6 +35,9 @@
                     <li><%= url %></li>
                   <% end %>
                 </ul>
+              </td>
+              <td>
+                <%= link_to "Revert", revert_artist_path(artist_version.artist_id, :version_id => artist_version.id), :method => :put, :confirm => "Are you sure you want to revert this artist?" %>
               </td>
             </tr>
           <% end %>
