@@ -22,7 +22,7 @@
           <tr>
             <td></td>
             <td><%= link_to note_version.post_id, post_path(note_version.post_id) %></td>
-            <td><%= link_to "#{note_version.note_id}.#{note_version.id}", note_versions_path(:search => {:note_id => note_version.note_id}) %></td>
+            <td><%= link_to "#{note_version.note_id}.#{note_version.version}", note_versions_path(:search => {:note_id => note_version.note_id}) %></td>
             <td><%= h(note_version.body) %> <% unless note_version.is_active? %>(deleted)<% end %></td>
             <% if CurrentUser.is_janitor? %>
               <td>

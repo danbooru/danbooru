@@ -132,7 +132,7 @@ class AnonymousUser
 
   def decrement!(field)
   end
-
+  
   def role
     :anonymous
   end

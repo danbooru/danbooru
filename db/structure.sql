@@ -1938,7 +1938,8 @@ CREATE TABLE note_versions (
     is_active boolean DEFAULT true NOT NULL,
     body text NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    version integer DEFAULT 0 NOT NULL
 );
 
 
@@ -1977,7 +1978,8 @@ CREATE TABLE notes (
     body text NOT NULL,
     body_index tsvector NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    version integer DEFAULT 0 NOT NULL
 );
 
 
@@ -6270,3 +6272,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130321144736');
 INSERT INTO schema_migrations (version) VALUES ('20130322162059');
 
 INSERT INTO schema_migrations (version) VALUES ('20130322173202');
+
+INSERT INTO schema_migrations (version) VALUES ('20130322173859');

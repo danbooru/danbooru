@@ -123,7 +123,8 @@ class Note < ActiveRecord::Base
   end
 
   def create_version
-    CurrentUser.increment!(:note_update_count)
+    CurrentUser.user.increment!(:note_update_count)
+    update_column(:version, version.to_i + 1)
 
     versions.create(
       :updater_id => updater_id,
@@ -134,7 +135,8 @@ class Note < ActiveRecord::Base
       :width => width,
       :height => height,
       :is_active => is_active,
-      :body => body
+      :body => body,
+      :version => version
     )
   end
 
