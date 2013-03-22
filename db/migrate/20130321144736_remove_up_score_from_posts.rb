@@ -6,5 +6,8 @@ class RemoveUpScoreFromPosts < ActiveRecord::Migration
   end
 
   def down
+    execute "set statement_timeout = 0"
+    add_column :posts, :up_score, :integer
+    add_column :posts, :up_score, :integer
   end
 end

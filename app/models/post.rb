@@ -777,6 +777,7 @@ class Post < ActiveRecord::Base
         update_column(:is_deleted, true)
         update_column(:is_pending, false)
         update_column(:is_flagged, false)
+        update_column(:is_banned, true) if options[:ban]
         give_favorites_to_parent
         update_children_on_destroy
         update_parent_on_destroy

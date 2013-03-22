@@ -173,7 +173,7 @@ class Artist < ActiveRecord::Base
             rescue PostFlag::Error
               # swallow
             end
-            post.delete!
+            post.delete!(:ban => true)
           end
         rescue Post::SearchError
           # swallow

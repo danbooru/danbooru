@@ -1,6 +1,10 @@
 class PostPresenter < Presenter
   def self.preview(post, options = {})
-    if post.is_deleted? && !CurrentUser.is_privileged?
+    if post.is_deleted? && options[:tags] !~ /status:(?:all|any|deleted)/
+      return ""
+    end
+    
+    if post.is_banned? && !CurrentUser.is_privileged?
       return ""
     end
 
@@ -12,6 +16,7 @@ class PostPresenter < Presenter
     flags << "pending" if post.is_pending?
     flags << "flagged" if post.is_flagged?
     flags << "deleted" if post.is_deleted?
+    flags << "banned" if post.is_banned?
 
     path = options[:path_prefix] || "/posts"
 
@@ -63,7 +68,7 @@ class PostPresenter < Presenter
   end
 
   def image_html(template)
-    return template.content_tag("p", "This image was deleted.") if @post.is_deleted? && !CurrentUser.user.is_privileged?
+    return template.content_tag("p", "The artist requested removal of this image") if @post.is_banned? && !CurrentUser.user.is_privileged?
     return template.content_tag("p", "You need a privileged account to see this image.") if !Danbooru.config.can_user_see_post?(CurrentUser.user, @post)
 
     if @post.is_flash?

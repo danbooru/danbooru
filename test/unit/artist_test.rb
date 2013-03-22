@@ -37,6 +37,10 @@ class ArtistTest < ActiveSupport::TestCase
         @post.reload
       end
 
+      should "ban the post" do
+        assert(@post.is_banned?)
+      end
+
       should "delete the post" do
         assert(@post.is_deleted?)
       end

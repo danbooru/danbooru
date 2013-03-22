@@ -2280,7 +2280,8 @@ CREATE TABLE posts (
     image_width integer NOT NULL,
     image_height integer NOT NULL,
     parent_id integer,
-    has_children boolean DEFAULT false NOT NULL
+    has_children boolean DEFAULT false NOT NULL,
+    is_banned boolean DEFAULT false NOT NULL
 );
 
 
@@ -6264,3 +6265,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130318231740');
 INSERT INTO schema_migrations (version) VALUES ('20130320070700');
 
 INSERT INTO schema_migrations (version) VALUES ('20130321144736');
+
+INSERT INTO schema_migrations (version) VALUES ('20130322162059');
