@@ -32,6 +32,7 @@ class WikiPagesController < ApplicationController
     else
       @wiki_page = WikiPage.find_by_id(params[:id])
     end
+    
     respond_with(@wiki_page)
   end
 
