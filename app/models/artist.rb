@@ -144,7 +144,7 @@ class Artist < ActiveRecord::Base
       if wiki_page
         wiki_page.title = name
         wiki_page.body = msg
-        wiki_page.save
+        wiki_page.save if wiki_page.body_changed?
       else
         if msg.present?
           self.wiki_page = WikiPage.new(:title => name, :body => msg)
