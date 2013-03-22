@@ -81,7 +81,7 @@ module Danbooru
         def option_for(key)
           case key
           when :limit
-            limit = @paginator_options.try(:[], :limit) || Danbooru.config.posts_per_page
+            limit = @paginator_options.try(:[], :limit) || CurrentUser.user.per_page
             if limit.to_i > 1_000
               limit = 1_000
             end

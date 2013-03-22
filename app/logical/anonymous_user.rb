@@ -172,6 +172,10 @@ class AnonymousUser
   def statement_timeout
     3_000
   end
+  
+  def per_page
+    Danbooru.config.posts_per_page
+  end
 
   %w(member banned privileged builder platinum contributor janitor moderator admin).each do |name|
     define_method("is_#{name}?") do

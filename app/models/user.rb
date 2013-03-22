@@ -17,7 +17,7 @@ class User < ActiveRecord::Base
   end
 
   attr_accessor :password, :old_password
-  attr_accessible :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr, :time_zone, :default_image_size, :enable_sequential_post_navigation, :as => [:moderator, :janitor, :contributor, :privileged, :member, :anonymous, :default, :builder, :admin]
+  attr_accessible :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr, :time_zone, :default_image_size, :enable_sequential_post_navigation, :per_page, :as => [:moderator, :janitor, :contributor, :privileged, :member, :anonymous, :default, :builder, :admin]
   attr_accessible :level, :as => :admin
   validates_length_of :name, :within => 2..100, :on => :create
   validates_format_of :name, :with => /\A[^\s:]+\Z/, :on => :create, :message => "cannot have whitespace or colons"
@@ -25,11 +25,13 @@ class User < ActiveRecord::Base
   validates_uniqueness_of :email, :case_sensitive => false, :if => lambda {|rec| rec.email.present?}
   validates_length_of :password, :minimum => 5, :if => lambda {|rec| rec.new_record? || rec.password.present?}
   validates_inclusion_of :default_image_size, :in => %w(large original)
+  validates_inclusion_of :per_page, :in => [20, 50, 100]
   validates_confirmation_of :password
   validates_presence_of :email, :if => lambda {|rec| rec.new_record? && Danbooru.config.enable_email_verification?}
   validates_presence_of :comment_threshold
   validate :validate_ip_addr_is_not_banned, :on => :create
   before_validation :normalize_blacklisted_tags
+  before_validation :set_per_page
   before_create :encrypt_password_on_create
   before_update :encrypt_password_on_update
   after_save :update_cache
@@ -344,6 +346,10 @@ class User < ActiveRecord::Base
       if level_changed?
         ModAction.create(:description => "#{name} level changed #{level_string(level_was)} -> #{level_string} by #{CurrentUser.name}")
       end
+    end
+    
+    def set_per_page
+      self.per_page = Danbooru.config.posts_per_page unless is_privileged?
     end
   end
 

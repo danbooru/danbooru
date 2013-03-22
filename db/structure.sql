@@ -2602,7 +2602,8 @@ CREATE TABLE users (
     enable_post_navigation boolean DEFAULT true NOT NULL,
     new_post_navigation_layout boolean DEFAULT true NOT NULL,
     enable_privacy_mode boolean DEFAULT false NOT NULL,
-    enable_sequential_post_navigation boolean DEFAULT true NOT NULL
+    enable_sequential_post_navigation boolean DEFAULT true NOT NULL,
+    per_page integer DEFAULT 20 NOT NULL
 );
 
 
@@ -6267,3 +6268,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130320070700');
 INSERT INTO schema_migrations (version) VALUES ('20130321144736');
 
 INSERT INTO schema_migrations (version) VALUES ('20130322162059');
+
+INSERT INTO schema_migrations (version) VALUES ('20130322173202');
