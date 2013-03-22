@@ -7,6 +7,7 @@ module Downloads
     def initialize(source, file_path)
       @source = source
       @file_path = file_path
+      @tries = 0
     end
 
     def download!
@@ -75,6 +76,14 @@ module Downloads
           end # http.request_get
         end # http.start
       end # while
+
+    rescue Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EIO, Errno::EHOSTUNREACH, Errno::ECONNREFUSED, IOError
+      @tries += 1
+      if @tries < 3
+        retry
+      else
+        raise
+      end
     end # def
 
     def fix_image_board_sources
