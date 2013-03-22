@@ -24,7 +24,7 @@
           <span class="hint">A list of whitespace delimited tags that show up in your profile. <%= link_to "Restore from old database", restore_uploaded_tags_user_path(@user), :method => :post, :remote => true %></span>
         </div>
 
-        <%= f.input :blacklisted_tags, :hint => "A list of newline delimited tags that you never want to see", :input_html => {:size => "40x5"} %>
+        <%= f.input :blacklisted_tags, :hint => "Put any tag combinations you never want to see here. Each combination should go on a separate line.", :input_html => {:size => "40x5"} %>
       </fieldset>
 
       <fieldset>
