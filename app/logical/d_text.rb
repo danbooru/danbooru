@@ -132,6 +132,7 @@ class DText
     str.strip!
     blocks = str.split(/(?:\r?\n){2}/)
     stack = []
+    flags = {}
 
     html = blocks.map do |block|
       case block
@@ -167,9 +168,11 @@ class DText
         end
         
       when /\[code\](?!\])/
+        flags[:code] = true
         '<pre>'
 
       when /\[\/code\](?!\])/
+        flags[:code] = false
         '</pre>'
 
       when /\[spoilers?\](?!\])/
@@ -183,7 +186,11 @@ class DText
         end
 
       else
-        '<p>' + parse_inline(block) + "</p>"
+        if flags[:code]
+          block
+        else
+          '<p>' + parse_inline(block) + '</p>'
+        end
       end
     end
 
@@ -192,6 +199,8 @@ class DText
         html << "</blockquote>"
       elsif tag == "div"
         html << "</div>"
+      elsif tag == "pre"
+        html << "</pre>"
       end
     end
 

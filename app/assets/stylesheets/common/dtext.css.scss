@@ -35,6 +35,13 @@ div.prose {
   li {
     list-style-type: disc;
   }
+  
+  pre {
+    font-family: monospace;
+    margin: 1em 0;
+    padding: 1em 2em;
+    background: #eee;
+  }
 }
 
 div.dtext-preview {
