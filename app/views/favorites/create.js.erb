@@ -5,4 +5,5 @@
   $("a#remove-from-favorites").show();
   $("#score-for-post-<%= @post.id %>").html(<%= @post.score %>);
   $("#favcount-for-post-<%= @post.id %>").html(<%= @post.fav_count %>);
+  Danbooru.notice("You have favorited this post");
 <% end %>
