@@ -45,14 +45,14 @@ class ForumTopicsController < ApplicationController
   def destroy
     @forum_topic = ForumTopic.find(params[:id])
     check_privilege(@forum_topic)
-    @forum_topic.update_attribute(:is_deleted, true)
+    @forum_topic.update_column(:is_deleted, true)
     respond_with(@forum_topic)
   end
 
   def undelete
     @forum_topic = ForumTopic.find(params[:id])
     check_privilege(@forum_topic)
-    @forum_topic.update_attribute(:is_deleted, false)
+    @forum_topic.update_column(:is_deleted, false)
     respond_with(@forum_topic)
   end
 
