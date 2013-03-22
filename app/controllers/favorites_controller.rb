@@ -5,7 +5,7 @@ class FavoritesController < ApplicationController
     if params[:tags]
       redirect_to(posts_path(:tags => params[:tags]))
     else
-      @favorite_set = PostSets::Favorite.new(CurrentUser.user, params[:page])
+      @favorite_set = PostSets::Favorite.new(CurrentUser.user, params[:page], params)
     end
   end
 

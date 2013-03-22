@@ -2,9 +2,9 @@ module PostSets
   class Favorite < Base
     attr_reader :user, :page, :favorites
 
-    def initialize(user_id, page = 1)
+    def initialize(user_id, page = 1, params = {})
       @user = ::User.find(user_id)
-      @favorites = ::Favorite.for_user(user.id).paginate(page).order("favorites.id desc")
+      @favorites = ::Favorite.for_user(user.id).paginate(page, :limit => params[:limit]).order("favorites.id desc")
     end
 
     def tag_array
