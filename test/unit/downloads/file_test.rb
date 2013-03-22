@@ -13,6 +13,19 @@ module Downloads
         @tempfile.close
       end
 
+      context "that fails" do
+        setup do
+          Net::HTTP.stubs(:start).raises(Errno::ETIMEDOUT)
+        end
+        
+        should "retry three times" do
+          assert_raises(Errno::ETIMEDOUT) do
+            @download.http_get_streaming {}
+          end
+          assert_equal(3, @download.tries)
+        end
+      end
+
       should "stream a file from an HTTP source" do
         @download.http_get_streaming do |resp|
           assert_equal("200", resp.code)

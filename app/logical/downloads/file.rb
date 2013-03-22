@@ -2,6 +2,7 @@ module Downloads
   class File
     class Error < Exception ; end
 
+    attr_reader :tries
     attr_accessor :source, :content_type, :file_path
 
     def initialize(source, file_path)
@@ -77,7 +78,6 @@ module Downloads
             end # http.request_get
           end # http.start
         rescue Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EIO, Errno::EHOSTUNREACH, Errno::ECONNREFUSED, IOError => x
-          puts x.inspect
           @tries += 1
           if @tries < 3
             retry
