@@ -35,7 +35,7 @@ class UploadsController < ApplicationController
 
   def create
   	@upload = Upload.create(params[:upload].merge(:server => Socket.gethostname))
-  	@upload.process! if @upload.errors.empty?
+    @upload.process! if @upload.errors.empty?
     respond_with(@upload)
   end
 

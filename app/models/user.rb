@@ -29,7 +29,6 @@ class User < ActiveRecord::Base
   validates_presence_of :email, :if => lambda {|rec| rec.new_record? && Danbooru.config.enable_email_verification?}
   validates_presence_of :comment_threshold
   validate :validate_ip_addr_is_not_banned, :on => :create
-  validate :validate_feedback_on_name_change, :on => :update
   before_validation :normalize_blacklisted_tags
   before_create :encrypt_password_on_create
   before_update :encrypt_password_on_update
@@ -110,13 +109,6 @@ class User < ActiveRecord::Base
       end
     rescue Exception
       # swallow, since it'll be expired eventually anyway
-    end
-
-    def validate_feedback_on_name_change
-      if feedback.negative.count > 0 && name_changed?
-        self.errors[:base] << "You can not change your name if you have any negative feedback"
-        return false
-      end
     end
   end
 
@@ -407,10 +399,8 @@ class User < ActiveRecord::Base
     def upload_limited_reason
       if created_at > 1.week.ago
         "cannot upload during your first week of registration"
-      elsif upload_limit <= 0
-        "can only upload #{upload_limit} posts a day"
       else
-        nil
+        "can not upload until your pending posts have been approved"
       end
     end
 
