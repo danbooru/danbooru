@@ -217,7 +217,7 @@ Danbooru::Application.routes.draw do
   resources :fposts, :controller => "forum_posts"
 
   # legacy aliases
-  match "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}"}
+  match "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}&search[name]=#{CGI::escape(req.params[:name])}"}
   match "/artist/index.xml", :controller => "legacy", :action => "artists", :format => "xml"
   match "/artist/index.json", :controller => "legacy", :action => "artists", :format => "json"
   match "/artist/index" => redirect {|params, req| "/artists?page=#{req.params[:page]}"}
