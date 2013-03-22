@@ -237,6 +237,7 @@ Danbooru.Note = {
         })
       } else {
         $note_body.click(function(e) {
+          Danbooru.notice("You must be logged in to edit notes");
           e.stopPropagation();
         });
       }
