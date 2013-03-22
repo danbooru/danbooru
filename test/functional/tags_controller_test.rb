@@ -3,7 +3,7 @@ require 'test_helper'
 class TagsControllerTest < ActionController::TestCase
   context "The tags controller" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryGirl.create(:builder_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end

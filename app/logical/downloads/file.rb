@@ -51,39 +51,41 @@ module Downloads
         }
         @source, headers = before_download(source, headers)
 
-        Net::HTTP.start(url.host, url.port, :use_ssl => url.is_a?(URI::HTTPS)) do |http|
-          http.read_timeout = 10
-          http.request_get(url.request_uri, headers) do |res|
-            case res
-            when Net::HTTPSuccess then
-              if max_size
-                len = res["Content-Length"]
-                raise Error.new("File is too large (#{len} bytes)") if len && len.to_i > max_size
-              end
-              yield(res)
-              return
+        begin
+          Net::HTTP.start(url.host, url.port, :use_ssl => url.is_a?(URI::HTTPS)) do |http|
+            http.read_timeout = 10
+            http.request_get(url.request_uri, headers) do |res|
+              case res
+              when Net::HTTPSuccess then
+                if max_size
+                  len = res["Content-Length"]
+                  raise Error.new("File is too large (#{len} bytes)") if len && len.to_i > max_size
+                end
+                yield(res)
+                return
 
-            when Net::HTTPRedirection then
-              if limit == 0 then
-                raise Error.new("Too many redirects")
-              end
-              source = res["location"]
-              limit -= 1
+              when Net::HTTPRedirection then
+                if limit == 0 then
+                  raise Error.new("Too many redirects")
+                end
+                source = res["location"]
+                limit -= 1
 
-            else
-              raise Error.new("HTTP error code: #{res.code} #{res.message}")
-            end
-          end # http.request_get
-        end # http.start
+              else
+                raise Error.new("HTTP error code: #{res.code} #{res.message}")
+              end
+            end # http.request_get
+          end # http.start
+        rescue Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EIO, Errno::EHOSTUNREACH, Errno::ECONNREFUSED, IOError => x
+          puts x.inspect
+          @tries += 1
+          if @tries < 3
+            retry
+          else
+            raise
+          end
+        end
       end # while
-
-    rescue Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EIO, Errno::EHOSTUNREACH, Errno::ECONNREFUSED, IOError
-      @tries += 1
-      if @tries < 3
-        retry
-      else
-        raise
-      end
     end # def
 
     def fix_image_board_sources

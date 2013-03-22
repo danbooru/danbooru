@@ -2283,7 +2283,9 @@ CREATE TABLE posts (
     image_height integer NOT NULL,
     parent_id integer,
     has_children boolean DEFAULT false NOT NULL,
-    is_banned boolean DEFAULT false NOT NULL
+    is_banned boolean DEFAULT false NOT NULL,
+    up_score integer,
+    down_score integer
 );
 
 

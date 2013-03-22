@@ -349,7 +349,9 @@ class User < ActiveRecord::Base
     end
     
     def set_per_page
-      self.per_page = Danbooru.config.posts_per_page unless is_privileged?
+      if per_page.nil? || !is_privileged?
+        self.per_page = Danbooru.config.posts_per_page
+      end
     end
   end
 

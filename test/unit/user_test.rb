@@ -39,22 +39,6 @@ class UserTest < ActiveSupport::TestCase
       end
     end
 
-    context "who has negeative feedback and is trying to change their name" do
-      setup do
-        @mod = FactoryGirl.create(:moderator_user)
-
-        CurrentUser.scoped(@mod, "127.0.0.1") do
-          FactoryGirl.create(:user_feedback, :user => @user, :category => "negative")
-        end
-      end
-
-      should "not validate" do
-        @user.reload
-        @user.update_attributes(:name => "fanfarlo")
-        assert_equal(["You can not change your name if you have any negative feedback"], @user.errors.full_messages)
-      end
-    end
-
     should "not validate if the originating ip address is banned" do
       FactoryGirl.create(:ip_ban)
       user = FactoryGirl.build(:user)

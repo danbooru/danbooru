@@ -38,12 +38,12 @@ class UserPresenter
       return "none"
     end
     
-    deleted_count = Post.for_user(id).deleted.where("created_at >= ?", 1.month.ago).count
-    pending_count = Post.for_user(id).pending.where("created_at >= ?", 3.days.ago).count
-    approved_count = Post.where("is_flagged = false and is_pending = false and is_deleted = false and uploader_id = ? and created_at >= ?", id, 1.month.ago).count
+    deleted_count = Post.for_user(user.id).deleted.where("created_at >= ?", 1.month.ago).count
+    pending_count = Post.for_user(user.id).pending.where("created_at >= ?", 3.days.ago).count
+    approved_count = Post.where("is_flagged = false and is_pending = false and is_deleted = false and uploader_id = ? and created_at >= ?", user.id, 1.month.ago).count
 
-    if base_upload_limit
-      string = "max(base_upload_limit:#{base_upload_limit} - (deleted_count:#{deleted_count} / 2), 4) - pending_count:#{pending_count}"
+    if user.base_upload_limit
+      string = "max(base_upload_limit:#{user.base_upload_limit} - (deleted_count:#{deleted_count} / 2), 4) - pending_count:#{pending_count}"
     else
       string = "max(10 + min(approved_count:#{approved_count} / 2, 30) - (deleted_count:#{deleted_count} / 2), 4) - pending_count:#{pending_count}"
     end
