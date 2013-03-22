@@ -1,5 +1,5 @@
 class ForumPost < ActiveRecord::Base
-  attr_accessible :body, :topic_id, :as => [:member, :builder, :privileged, :platinum, :contributor, :admin, :moderator, :default]
+  attr_accessible :body, :topic_id, :as => [:member, :builder, :janitor, :privileged, :platinum, :contributor, :admin, :moderator, :default]
   attr_accessible :is_locked, :is_sticky, :is_deleted, :as => [:admin, :moderator, :janitor]
   belongs_to :creator, :class_name => "User"
   belongs_to :topic, :class_name => "ForumTopic"
