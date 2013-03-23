@@ -43,12 +43,12 @@ class UserPresenter
     approved_count = Post.where("is_flagged = false and is_pending = false and is_deleted = false and uploader_id = ? and created_at >= ?", user.id, 1.year.ago).count
 
     if user.base_upload_limit.to_i != 0
-      string = "max(base_upload_limit:#{user.base_upload_limit} - (deleted_count:#{deleted_count} / 2), 4) - pending_count:#{pending_count}"
+      string = "max(base_upload_limit:#{user.base_upload_limit} - (deleted_count:#{deleted_count} / 4), 4) - pending_count:#{pending_count}"
     else
-      string = "max(10 + min(approved_count:#{approved_count} / 2, 90) - (min(deleted_count:#{deleted_count} / 10), 90), 4) - pending_count:#{pending_count}"
+      string = "max(10 + (approved_count:#{approved_count} / 2) - (deleted_count:#{deleted_count} / 4), 4) - pending_count:#{pending_count}"
     end
     
-    "#{string} = #{user.upload_limit} (deletions and approvals within past month)"
+    "#{string} = #{user.upload_limit} (deletions + approved within past 3 months)"
   end
 
   def uploads

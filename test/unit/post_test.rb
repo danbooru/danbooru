@@ -764,20 +764,6 @@ class PostTest < ActiveSupport::TestCase
       end
     end
   end
-  
-  context "Paginating:" do
-    setup do
-      CurrentUser.user.stubs(:per_page).returns(3)
-      4.times do
-        FactoryGirl.create(:post)
-      end
-    end
-    
-    should "delegate the default limit to the user" do
-      posts = Post.tag_match("").paginate(1).all
-      assert_equal(3, posts.size)
-    end
-  end
 
   context "Searching:" do
     should "return posts for the ' tag" do
