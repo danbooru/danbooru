@@ -56,7 +56,7 @@ class ForumTopic < ActiveRecord::Base
   end
 
   def last_page
-    (posts.count / Danbooru.config.posts_per_page.to_f).ceil
+    (posts.count / CurrentUser.user.per_page.to_f).ceil
   end
 
   def presenter(forum_posts)
