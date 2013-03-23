@@ -10,5 +10,9 @@ class AddIsBannedToPosts < ActiveRecord::Migration
     PostFlag.where("reason ilike '%requested%' and reason <> 'Artist requested removal'").each do |flag|
       flag.post.update_column(:is_banned, true)
     end
+
+    PostFlag.where("reason ilike '%banned artist%'").each do |flag|
+      flag.post.update_column(:is_banned, true)
+    end
   end
 end

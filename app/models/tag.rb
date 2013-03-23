@@ -1,5 +1,5 @@
 class Tag < ActiveRecord::Base
-  METATAGS = "-user|user|-approver|approver|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|status|tagcount|gentags|arttags|chartags|copytags|parent|pixiv"
+  METATAGS = "-user|user|-approver|approver|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|pixiv"
   attr_accessible :category
   has_one :wiki_page, :foreign_key => "name", :primary_key => "title"
 
@@ -349,6 +349,9 @@ class Tag < ActiveRecord::Base
 
           when "order"
             q[:order] = $2.downcase
+
+          when "-status"
+            q[:status_neg] = $2.downcase
 
           when "status"
             q[:status] = $2.downcase
