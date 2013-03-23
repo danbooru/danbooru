@@ -179,28 +179,42 @@ Danbooru.Note = {
       var w = $note_body.width();
       var h = $note_body.height();
       var golden_ratio = 1.6180339887;
+      var last = 0;
+      var x = 0;
+      
+      if ((w / h) < golden_ratio) {
+        var lo = 140;
+        var hi = 400;
+        do {
+          last = w;
+          x = (lo + hi) / 2;
+          $note_body.css("min-width", x);
+          w = $note_body.width();
+          h = $note_body.height();
 
-      while (w / h < golden_ratio) {
-        w = w * 1.025;
-        h = h / 1.025;
-      }
-
-      while (w / h > golden_ratio) {
-        w = w / 1.025;
-        h = h * 1.025;
-      }
-
-      if ($note_body.html().length < 20) {
-        while (h > 20) {
-          h = h / 1.025;
-          w = w * 1.025;
+          if ((w / h) < golden_ratio) {
+            lo = x;
+          } else {
+            hi = x;
+          }
+        } while ((lo < hi) && (w > last));
+      } else if ($note_body[0].scrollWidth <= $note_body.width()) {
+        var lo = 20;
+        var hi = w;
+  
+        do {
+          x = (lo + hi) / 2;
+          $note_body.css("min-width", x);
+          if ($note_body.height() > h) {
+            lo = x
+          } else {
+            hi = x;
+          }
+        } while ((hi - lo) > 4)
+        if ($note_body.height() > h) {
+          $note_body.css("minWidth", hi);
         }
       }
-
-      $note_body.css({
-        width: w,
-        height: "auto"
-      });
     },
 
     set_text: function($note_body, text) {
