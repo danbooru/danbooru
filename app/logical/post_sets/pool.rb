@@ -16,7 +16,7 @@ module PostSets
     end
 
     def limit
-      Danbooru.config.posts_per_page
+      CurrentUser.user.per_page
     end
 
     def tag_array

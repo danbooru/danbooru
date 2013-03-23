@@ -12,7 +12,7 @@ module PostSets
     end
 
     def limit
-      25
+       CurrentUser.user.per_page
     end
 
     def min_date

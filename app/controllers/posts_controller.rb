@@ -8,7 +8,7 @@ class PostsController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, :with => :rescue_exception
 
   def index
-    @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit])
+    @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit] || CurrentUser.user.per_page)
     @posts = @post_set.posts
     respond_with(@posts) do |format|
       format.atom
