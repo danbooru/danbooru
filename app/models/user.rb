@@ -433,14 +433,14 @@ class User < ActiveRecord::Base
     end
 
     def upload_limit
-      deleted_count = Post.for_user(id).deleted.where("created_at >= ?", 1.month.ago).count
+      deleted_count = Post.for_user(id).deleted.where("created_at >= ?", 3.months.ago).count
       pending_count = Post.for_user(id).pending.where("created_at >= ?", 3.days.ago).count
-      approved_count = Post.where("is_flagged = false and is_pending = false and is_deleted = false and uploader_id = ? and created_at >= ?", id, 1.month.ago).count
+      approved_count = Post.where("is_flagged = false and is_pending = false and is_deleted = false and uploader_id = ? and created_at >= ?", id, 1.year.ago).count
 
       if base_upload_limit
         limit = [base_upload_limit - (deleted_count / 2), 4].max - pending_count
       else
-        limit = [10 + [approved_count / 2, 30].min - (deleted_count / 2), 4].max - pending_count
+        limit = [10 + [approved_count / 2, 90].min - (deleted_count / 2), 4].max - pending_count
       end
 
       if limit < 0
