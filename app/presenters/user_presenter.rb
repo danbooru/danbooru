@@ -42,7 +42,7 @@ class UserPresenter
     pending_count = Post.for_user(user.id).pending.where("created_at >= ?", 3.days.ago).count
     approved_count = Post.where("is_flagged = false and is_pending = false and is_deleted = false and uploader_id = ? and created_at >= ?", user.id, 1.year.ago).count
 
-    if user.base_upload_limit
+    if user.base_upload_limit.to_i != 0
       string = "max(base_upload_limit:#{user.base_upload_limit} - (deleted_count:#{deleted_count} / 2), 4) - pending_count:#{pending_count}"
     else
       string = "max(10 + min(approved_count:#{approved_count} / 2, 90) - (deleted_count:#{deleted_count} / 2), 4) - pending_count:#{pending_count}"
