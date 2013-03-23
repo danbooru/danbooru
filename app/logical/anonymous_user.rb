@@ -176,6 +176,10 @@ class AnonymousUser
   def per_page
     Danbooru.config.posts_per_page
   end
+  
+  def hide_deleted_posts?
+    false
+  end
 
   %w(member banned privileged builder platinum contributor janitor moderator admin).each do |name|
     define_method("is_#{name}?") do
