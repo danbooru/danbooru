@@ -22,8 +22,16 @@ class UserFeedbackTest < ActiveSupport::TestCase
         FactoryGirl.create(:user_feedback, :user => user)
       end
     end
+    
+    should "not validate if the creator is the user" do
+      privileged_user = FactoryGirl.create(:privileged_user)
+      CurrentUser.user = privileged_user
+      feedback = FactoryGirl.build(:user_feedback, :user => privileged_user)
+      feedback.save
+      assert_equal(["You cannot submit feedback for yourself"], feedback.errors.full_messages)
+    end
 
-    should "should not validate if the creator is not privileged" do
+    should "not validate if the creator is not privileged" do
       user = FactoryGirl.create(:user)
       privileged = FactoryGirl.create(:privileged_user)
       member = FactoryGirl.create(:user)
@@ -35,7 +43,7 @@ class UserFeedbackTest < ActiveSupport::TestCase
       CurrentUser.user = member
       feedback = FactoryGirl.build(:user_feedback, :user => user)
       feedback.save
-      assert(feedback.errors.any?)
+      assert_equal(["You must be privileged"], feedback.errors.full_messages)
     end
   end
 end

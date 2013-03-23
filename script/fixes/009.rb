@@ -15,3 +15,5 @@ Note.find_each do |note|
   end
   note.update_column(:version, i)
 end
+
+UserFeedback.delete_all("creator_id = user_id")
