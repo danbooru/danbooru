@@ -9,7 +9,9 @@
         <%= format_text(@wiki_page_version.body) %>
       </div>
       
-      <p><%= link_to "Revert to this version", revert_wiki_page_path(@wiki_page_version.wiki_page_id, :version_id => @wiki_page_version.id), :method => :put %></p>
+      <% if CurrentUser.is_member? %>
+        <p><%= link_to "Revert to this version", revert_wiki_page_path(@wiki_page_version.wiki_page_id, :version_id => @wiki_page_version.id), :method => :put %></p>
+      <% end %>
     </section>
   </div>
 </div>
