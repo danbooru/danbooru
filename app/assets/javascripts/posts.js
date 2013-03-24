@@ -173,6 +173,7 @@
       Danbooru.Note.Box.scale_all();
       $("#image-resize-notice").hide();
       Danbooru.Post.place_jlist_ads();
+      $image.data("scale_factor", 1);
       e.preventDefault();
     });
   }
