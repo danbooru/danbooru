@@ -17,7 +17,7 @@ module DelayedJobsHelper
       '<strong>implication</strong>: ' + job.payload_object.antecedent_name + " -&gt; " + job.payload_object.consequent_name
 
     when "Class#clear_cache_for"
-      "<strong>expire tag alias cache</strong>: " + job.payload_object.flatten.join(" ")
+      "<strong>expire tag alias cache</strong>: " + job.payload_object.args.flatten.join(" ")
 
     when "Tag#update_category_cache"
       "<strong>update tag category cache</strong>: " + job.payload_object.name
