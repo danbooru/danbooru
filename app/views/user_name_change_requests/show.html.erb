@@ -33,7 +33,11 @@
     </ul>
   </section>
   
-  <% if CurrentUser.user.is_admin? %>
+  <% if @change_request.rejected? %>
+    <section>
+      <h2>Request was rejected</h2>
+    </section>
+  <% elsif CurrentUser.user.is_admin? %>
     <section>
       <h2>Options</h2>
       <%= form_tag(approve_user_name_change_request_path(@change_request)) do %>
@@ -52,5 +56,11 @@
       <% end %>
     </section>
   <% end %>
+  
+  <section>
+    <%= form_tag(user_name_change_request_path(@change_request), :method => :delete) do %>
+      <%= submit_tag "Delete" %>
+    <% end %>
+  </section>
 </div>
 

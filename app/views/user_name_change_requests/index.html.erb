@@ -1,0 +1,24 @@
+<div id="c-user-name-change-requests">
+  <h1>Name Change Requests</h1>
+  
+  <table class="striped" width="100%">
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Desired</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @change_requests.each do |change_request| %>
+        <tr>
+          <td><%= link_to change_request.original_name, user_path(change_request.user_id) %></td>
+          <td><%= change_request.desired_name %></td>
+          <td><%= link_to "view", user_name_change_request_path(change_request) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  
+  <%= numbered_paginator(@change_requests) %>
+</div>

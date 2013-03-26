@@ -1,6 +1,6 @@
 class UserNameChangeRequestsController < ApplicationController
-  before_filter :member_only, :only => [:new, :create, :show]
-  before_filter :admin_only, :only => [:index, :approve, :reject]
+  before_filter :privileged_only, :only => [:new, :create, :show]
+  before_filter :admin_only, :only => [:index, :approve, :reject, :destroy]
 
   def new
   end
@@ -13,7 +13,12 @@ class UserNameChangeRequestsController < ApplicationController
       :change_reason => params[:reason],
       :desired_name => params[:desired_name]
     )
-    redirect_to user_name_change_request_path(@change_request), :notice => "Your request has been submitted and is pending admin review"
+    
+    if @change_request.errors.any?
+      render :action => "new"
+    else
+      redirect_to user_name_change_request_path(@change_request), :notice => "Your request has been submitted and is pending admin review"
+    end
   end
   
   def show
@@ -28,6 +33,12 @@ class UserNameChangeRequestsController < ApplicationController
     @change_request = UserNameChangeRequest.find(params[:id])
     @change_request.approve!
     redirect_to user_name_change_request_path(@change_request), :notice => "Name change request approved"
+  end
+  
+  def destroy
+    @change_request = UserNameChangeRequest.find(params[:id])
+    @change_request.destroy
+    redirect_to user_name_change_requests_path
   end
   
   def reject

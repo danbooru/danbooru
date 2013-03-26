@@ -464,9 +464,9 @@ class User < ActiveRecord::Base
       if is_platinum?
         nil
       elsif is_privileged?
-        40_000
-      else
         20_000
+      else
+        10_000
       end
     end
     
@@ -573,7 +573,7 @@ class User < ActiveRecord::Base
       if params[:id].present?
         q = q.where("id = ?", params[:id].to_i)
       end
-
+      
       case params[:order]
       when "name"
         q = q.order("name")

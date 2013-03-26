@@ -20,7 +20,7 @@ class UserNameChangeRequestTest < ActiveSupport::TestCase
       end
       
       should "create a dmail" do
-        assert_difference("Dmail.count", 2) do
+        assert_difference("Dmail.count", 4) do
           @change_request.approve!
         end
       end
@@ -34,6 +34,18 @@ class UserNameChangeRequestTest < ActiveSupport::TestCase
       should "clear the user name cache" do
         @change_request.approve!
         assert_equal("abc", Cache.get("uin:#{@requester.id}"))
+      end
+      
+      should "create feedback" do
+        assert_difference("UserFeedback.count", 1) do
+          @change_request.approve!
+        end
+      end
+      
+      should "create mod action" do
+        assert_difference("ModAction.count", 1) do
+          @change_request.approve!
+        end
       end
     end
     

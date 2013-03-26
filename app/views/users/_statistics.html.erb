@@ -97,6 +97,13 @@
         </td>
       </tr>
       
+      <% if CurrentUser.user.is_janitor? && presenter.previous_names.present? %>
+        <tr>
+          <th>Previous Names</th>
+          <td><%= presenter.previous_names %></td>
+        </tr>
+      <% end %>
+      
       <% if CurrentUser.user.id == user.id %>
         <tr>
           <th>API Key</th>

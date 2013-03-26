@@ -5,9 +5,15 @@
     <%= simple_form_for @user do |f| %>
       <fieldset>
         <legend>Basic Settings</legend>
+        
         <div class="input">
           <label>Name</label>
-          <p>Name changes are not supported. <%= link_to "Read why", name_change_path %>.</p>
+          
+          <% if CurrentUser.user.is_privileged? %>
+            <p><%= link_to "Request a name change", new_user_name_change_request_path %></p>
+          <% else %>
+            <p>You must <%= link_to "upgrade your account", upgrade_information_users_path %> to request a name change</p>
+          <% end %>
         </div>
         <%= f.input :email, :required => Danbooru.config.enable_email_verification?, :hint => "Used for messages and for password resets", :as => :email %>
         <%= f.input :time_zone, :include_blank => false %>
