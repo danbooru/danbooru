@@ -55,10 +55,12 @@ private
   
   def authenticate_api_key(name, api_key)
     CurrentUser.user = User.authenticate_cookie_hash(name, api_key)
+    CurrentUser.ip_addr = request.remote_ip
   end
   
   def authenticate_legacy_api_key(name, password_hash)
     CurrentUser.user = User.authenticate_hash(name, password_hash)
+    CurrentUser.ip_addr = request.remote_ip
   end
 
   def load_session_user
