@@ -112,8 +112,8 @@ div#c-users {
         }
 
         tbody {
-          tr {
-            border-bottom: 2px solid black;
+          tr:hover {
+            background-color: #FEF;
           }
         }
 
