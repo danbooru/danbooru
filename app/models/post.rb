@@ -667,7 +667,7 @@ class Post < ActiveRecord::Base
         Cache.delete(Post.count_cache_key(tag_name))
       end
 
-      if Post.fast_count("").to_i < 1000
+      if CurrentUser.user.id < 1_000
         Cache.delete(Post.count_cache_key(""))
       end
     end

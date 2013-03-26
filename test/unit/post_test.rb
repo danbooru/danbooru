@@ -357,6 +357,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "with an artist tag that is then changed to copyright" do
         setup do
+          CurrentUser.user = FactoryGirl.create(:builder_user)
           Delayed::Worker.delay_jobs = false
           @post = Post.find(@post.id)
           @post.update_attribute(:tag_string, "art:abc")
