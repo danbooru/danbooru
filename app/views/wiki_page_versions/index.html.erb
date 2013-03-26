@@ -13,7 +13,9 @@
               <th width="2%"></th>
               <th width="55%">Title</th>
               <th width="5%"></th>
-              <th width="10%">IP Address</th>
+              <% if CurrentUser.is_admin? %>
+                <th width="10%">IP Address</th>
+              <% end %>
               <th width="26%">Last edited</th>
             </tr>
           </thead>
@@ -32,11 +34,11 @@
                 </td>
                 <td><%= link_to wiki_page_version.title, wiki_page_version_path(wiki_page_version) %></td>
                 <td><%= link_to "wiki", wiki_page_path(wiki_page_version.wiki_page_id) %></td>
-                <td>
-                  <% if CurrentUser.is_admin? %>
+                <% if CurrentUser.is_admin? %>
+                  <td>
                     <%= wiki_page_version.updater_ip_addr %>
-                  <% end %>
-                </td>
+                  </td>
+                <% end %>
                 <td>
                   <%= compact_time(wiki_page_version.updated_at) %>
                   <% if wiki_page_version.updater %>
