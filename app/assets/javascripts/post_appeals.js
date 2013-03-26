@@ -9,7 +9,7 @@
   }
 
   Danbooru.PostAppeal.hide_or_show_appeal_link = function() {
-    if (Danbooru.meta("post-is-flagged") !== "true") {
+    if ((Danbooru.meta("post-is-flagged") === "false") && (Danbooru.meta("post-is-deleted") === "false")) {
       $("#appeal").hide();
     }
   }
