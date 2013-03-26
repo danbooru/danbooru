@@ -217,12 +217,12 @@ Danbooru::Application.routes.draw do
   resources :fposts, :controller => "forum_posts"
 
   # legacy aliases
-  match "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}&search[name]=#{CGI::escape(req.params[:name])}"}
+  match "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}&search[name]=#{CGI::escape(req.params[:name].to_s)}"}
   match "/artist/index.xml", :controller => "legacy", :action => "artists", :format => "xml"
   match "/artist/index.json", :controller => "legacy", :action => "artists", :format => "json"
   match "/artist/index" => redirect {|params, req| "/artists?page=#{req.params[:page]}"}
   match "/artist/show/:id" => redirect("/artists/%{id}")
-  match "/artist/show" => redirect {|params, req| "/artists?name=#{CGI::escape(req.params[:name])}"}
+  match "/artist/show" => redirect {|params, req| "/artists?name=#{CGI::escape(req.params[:name].to_s)}"}
   match "/artist/history/:id" => redirect("/artist_versions?search[artist_id]=%{id}")
   match "/artist/update/:id" => redirect("/artists/%{id}")
   match "/artist/destroy/:id" => redirect("/artists/%{id}")
@@ -282,10 +282,10 @@ Danbooru::Application.routes.draw do
 
   match "/tag/index.xml", :controller => "legacy", :action => "tags", :format => "xml"
   match "/tag/index.json", :controller => "legacy", :action => "tags", :format => "json"
-  match "/tag" => redirect {|params, req| "/tags?page=#{req.params[:page]}&search[name_matches]=#{CGI::escape(req.params[:name])}&search[order]=#{req.params[:order]}"}
-  match "/tag/index" => redirect {|params, req| "/tags?page=#{req.params[:page]}&search[name_matches]=#{CGI::escape(req.params[:name])}&search[order]=#{req.params[:order]}"}
+  match "/tag" => redirect {|params, req| "/tags?page=#{req.params[:page]}&search[name_matches]=#{CGI::escape(req.params[:name].to_s)}&search[order]=#{req.params[:order]}"}
+  match "/tag/index" => redirect {|params, req| "/tags?page=#{req.params[:page]}&search[name_matches]=#{CGI::escape(req.params[:name].to_s)}&search[order]=#{req.params[:order]}"}
 
-  match "/tag_implication" => redirect {|params, req| "/tag_implications?search[name_matches]=#{CGI::escape(req.params[:query])}"}
+  match "/tag_implication" => redirect {|params, req| "/tag_implications?search[name_matches]=#{CGI::escape(req.params[:query].to_s)}"}
 
   match "/user/index.xml", :controller => "legacy", :action => "users", :format => "xml"
   match "/user/index.json", :controller => "legacy", :action => "users", :format => "json"
