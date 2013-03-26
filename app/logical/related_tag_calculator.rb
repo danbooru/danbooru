@@ -10,17 +10,6 @@ class RelatedTagCalculator
   def self.calculate_from_sample(tags, limit, category_constraint = nil)
     counts = Hash.new {|h, k| h[k] = 0}
 
-    case category_constraint
-    when Tag.categories.artist
-      limit *= 4
-
-    when Tag.categories.copyright
-      limit *= 3
-
-    when Tag.categories.character
-      limit *= 2
-    end
-
     find_tags(tags, limit).each do |tags|
       tag_array = Tag.scan_tags(tags)
       if category_constraint
