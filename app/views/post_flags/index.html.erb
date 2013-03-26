@@ -14,7 +14,7 @@
       <tbody>
         <% @post_flags.each do |post_flag| %>
           <tr class="resolved-<%= post_flag.is_resolved? %>">
-            <td><%= PostPresenter.preview(post_flag.post) %></td>
+            <td><%= PostPresenter.preview(post_flag.post, :tags => "status:any") %></td>
             <% if CurrentUser.user.is_janitor? %>
               <td>
                 <%= link_to post_flag.creator.name, user_path(post_flag.creator) %>
