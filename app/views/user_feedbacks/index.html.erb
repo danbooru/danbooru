@@ -9,6 +9,7 @@
           <th width="15%">Creator</th>
           <th width="15%">When</th>
           <th width="45%">Message</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -18,6 +19,11 @@
             <td><%= link_to feedback.creator_name, user_path(feedback.creator_id) %></td>
             <td><%= compact_time(feedback.created_at) %></td>
             <td><%= format_text(feedback.body) %></td>
+            <td>
+              <% if CurrentUser.user.is_moderator? %>
+                <%= link_to "delete", user_feedback_path(feedback), :method => :delete %>
+              <% end %>
+            </td>
           </tr>
         <% end %>
       </tbody>
