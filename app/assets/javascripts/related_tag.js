@@ -110,6 +110,18 @@
     if (wiki_page_tags.length) {
       $dest.append(Danbooru.RelatedTag.build_html("wiki:" + query, wiki_page_tags));
     }
+    if (Danbooru.RelatedTag.recent_artists) {
+      var tags = [];
+      if (Danbooru.RelatedTag.recent_artists.length !== 1) {
+        tags.push([" none", 0]);
+      } else {
+        tags.push([Danbooru.RelatedTag.recent_artists[0].name, 1]);
+        $.each(Danbooru.RelatedTag.recent_artists[0].urls, function(i, url) {
+          tags.push([" " + url.url, 0]);
+        });
+      }
+     $dest.append(Danbooru.RelatedTag.build_html("artist", tags, true));
+    }
   }
 
   Danbooru.RelatedTag.favorite_tags = function() {
@@ -134,13 +146,17 @@
     }
   }
 
-  Danbooru.RelatedTag.build_html = function(query, related_tags) {
+  Danbooru.RelatedTag.build_html = function(query, related_tags, is_wide_column) {
     if (query === null || query === "") {
       return "";
     }
 
     var current = $("#upload_tag_string,#post_tag_string").val().match(/\S+/g) || [];
-    var $div = $("<div/>").addClass("tag-column");
+    var $div = $("<div/>");
+    $div.addClass("tag-column")
+    if (is_wide_column) {
+      $div.addClass("wide-column");
+    }
     var $ul = $("<ul/>");
     $ul.append(
       $("<li/>").append(
@@ -151,17 +167,21 @@
     );
 
     $.each(related_tags, function(i, tag) {
-      var $link = $("<a/>");
-      $link.html(tag[0].replace(/_/g, " "));
-      $link.addClass("tag-type-" + tag[1]);
-      $link.attr("href", "/posts?tags=" + encodeURIComponent(tag[0]));
-      $link.click(Danbooru.RelatedTag.toggle_tag);
-      if ($.inArray(tag[0], current) > -1) {
-        $link.addClass("selected");
+      if (tag[0][0] !== " ") {
+        var $link = $("<a/>");
+        $link.html(tag[0].replace(/_/g, " "));
+        $link.addClass("tag-type-" + tag[1]);
+        $link.attr("href", "/posts?tags=" + encodeURIComponent(tag[0]));
+        $link.click(Danbooru.RelatedTag.toggle_tag);
+        if ($.inArray(tag[0], current) > -1) {
+          $link.addClass("selected");
+        }
+        $ul.append(
+          $("<li/>").append($link)
+        );
+      } else {
+        $ul.append($("<li/>").html(tag[0]));
       }
-      $ul.append(
-        $("<li/>").append($link)
-      );
     });
 
     $div.append($ul);
@@ -189,48 +209,14 @@
 
   Danbooru.RelatedTag.find_artist = function(e) {
     $("#artist-tags").html("<em>Loading...</em>");
-    Danbooru.RelatedTag.recent_search = null;
     var url = $("#upload_source,#post_source");
-    $.get("/artists.json", {"search[name]": url.val()}).success(Danbooru.RelatedTag.process_artist);
+    $.get("/artists.json", {"limit": 2, "search[name]": url.val()}).success(Danbooru.RelatedTag.process_artist);
     e.preventDefault();
   }
 
   Danbooru.RelatedTag.process_artist = function(data) {
-    Danbooru.RelatedTag.recent_artist = data;
-    $("#artist-tags-container").show();
-    var $dest = $("#artist-tags");
-    $dest.empty();
-
-    if (data.length != 1) {
-      $dest.html("No artists found");
-      return;
-    }
-
-    $.each(data, function(i, json) {
-      if (!json.other_names) {
-        json.other_names = "";
-      }
-      var $div = $("<div/>").addClass("tag-column").addClass("artist");
-      var $ul = $("<ul/>");
-      var $link = $("<a/>").attr("href", "/artists/" + json.id).html(json.name).click(Danbooru.RelatedTag.toggle_tag);
-      if (Danbooru.RelatedTag.tags_include(json.name)) {
-        $link.addClass("selected");
-      }
-      
-      $ul.append(
-        $("<li/>").append("Artist: ").append(
-          $link
-        )
-      );
-      if (json.other_names.length > 0) {
-        $ul.append($("<li/>").html("Other names: " + json.other_names));
-      }
-      $.each(json.urls, function(i, v) {
-        $ul.append($("<li/>").html("URL: " + v.url));
-      });
-      $div.append($ul);
-      $dest.append($div);
-    });
+    Danbooru.RelatedTag.recent_artists = data;
+    Danbooru.RelatedTag.build_all();
   }
 })();
 

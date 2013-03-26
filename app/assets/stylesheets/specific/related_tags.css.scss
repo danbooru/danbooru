@@ -1,26 +1,10 @@
 @import "../common/000_vars.css.scss";
 
-div#related-tags-container, div#artist-tags-container {
+div#related-tags-container {
   padding-right: 2em;
 
   h1 {
     font-size: $h3_size;
-  }
-}
-
-div#artist-tags {
-  overflow: auto;
-  width: 100%;
-  margin-bottom: 1em;
-  padding: 1em;
-  background: #EEE;
-
-  div.artist {
-    margin-bottom: 1em;
-  }
-
-  div.artist:last-child {
-    margin-bottom: 0;
   }
 }
 
@@ -56,8 +40,7 @@ div.related-tags {
     }
   }
   
-  div.tag-column.artist {
-    float: none;
-    max-width: 100%;
+  div.wide-column {
+    max-width: 45em;
   }
 }
