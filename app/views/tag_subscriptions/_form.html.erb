@@ -1,6 +1,6 @@
 <%= simple_form_for(@tag_subscription) do |f| %>
   <%= f.input :name %>
-  <%= f.input :tag_query %>
+  <%= f.input :tag_query, :as => :string %>
   <div class="input">
     <label for="tag_subscription_is_public">
       <%= check_box "tag_subscription", "is_public" %>
