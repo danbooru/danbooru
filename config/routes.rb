@@ -196,6 +196,12 @@ Danbooru::Application.routes.draw do
     end
   end
   resources :user_feedbacks
+  resources :user_name_change_requests do
+    member do
+      post :approve
+      post :reject
+    end
+  end
   resources :wiki_pages do
     member do
       put :revert

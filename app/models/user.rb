@@ -531,7 +531,7 @@ class User < ActiveRecord::Base
     end
 
     def admins
-      where("is_admin = TRUE")
+      where("level = ?", Levels::ADMIN)
     end
 
     def with_email(email)

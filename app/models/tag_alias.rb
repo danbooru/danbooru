@@ -3,6 +3,7 @@ class TagAlias < ActiveRecord::Base
   after_save :clear_all_cache
   after_destroy :clear_all_cache
   before_validation :initialize_creator, :on => :create
+  before_validation :normalize_names
   validates_presence_of :creator_id, :antecedent_name, :consequent_name
   validates_uniqueness_of :antecedent_name
   validate :absence_of_transitive_relation
@@ -87,6 +88,11 @@ class TagAlias < ActiveRecord::Base
 
   def is_active?
     status == "active"
+  end
+  
+  def normalize_names
+    self.antecedent_name = antecedent_name.mb_chars.downcase.tr(" ", "_").strip
+    self.consequent_name = consequent_name.downcase.tr(" ", "_").strip
   end
 
   def initialize_creator

@@ -3,6 +3,7 @@ class TagImplication < ActiveRecord::Base
   after_save :update_descendant_names_for_parent
   belongs_to :creator, :class_name => "User"
   before_validation :initialize_creator, :on => :create
+  before_validation :normalize_names
   validates_presence_of :creator_id, :antecedent_name, :consequent_name
   validates_uniqueness_of :antecedent_name, :scope => :consequent_name
   validate :absence_of_circular_relation
@@ -128,6 +129,11 @@ class TagImplication < ActiveRecord::Base
         )
       end
     end
+  end
+  
+  def normalize_names
+    self.antecedent_name = antecedent_name.downcase.tr(" ", "_").strip
+    self.consequent_name = consequent_name.downcase.tr(" ", "_").strip
   end
 
   def is_pending?
