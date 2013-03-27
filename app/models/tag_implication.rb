@@ -132,8 +132,8 @@ class TagImplication < ActiveRecord::Base
   end
   
   def normalize_names
-    self.antecedent_name = antecedent_name.downcase.tr(" ", "_").strip
-    self.consequent_name = consequent_name.downcase.tr(" ", "_").strip
+    self.antecedent_name = antecedent_name.downcase.tr(" ", "_")
+    self.consequent_name = consequent_name.downcase.tr(" ", "_")
   end
 
   def is_pending?
