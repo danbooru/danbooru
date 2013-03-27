@@ -426,7 +426,9 @@ class Post < ActiveRecord::Base
           self.parent_id = nil
 
         when /^parent:(\d+)$/
-          self.parent_id = $1.to_i
+          if Post.exists?(["id = ? and is_deleted = false", $1.to_i])
+            self.parent_id = $1.to_i
+          end
 
         when /^rating:([qse])/i
           self.rating = $1.downcase

@@ -390,6 +390,18 @@ class PostTest < ActiveSupport::TestCase
           setup do
             @parent = FactoryGirl.create(:post)
           end
+          
+          context "that has been deleted" do
+            setup do
+              @parent.update_column(:is_deleted, true)
+            end
+            
+            should "not update the parent relationships" do
+              @post.update_attributes(:tag_string => "aaa parent:#{@parent.id}")
+              @post.reload
+              assert_nil(@post.parent_id)
+            end
+          end
 
           should "update the parent relationships for both posts" do
             @post.update_attributes(:tag_string => "aaa parent:#{@parent.id}")
