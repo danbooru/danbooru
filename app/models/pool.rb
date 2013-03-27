@@ -141,6 +141,7 @@ class Pool < ActiveRecord::Base
 
   def add!(post)
     return if contains?(post.id)
+    return if is_deleted?
 
     update_attributes(:post_ids => add_number_to_string(post.id, post_ids), :post_count => post_count + 1)
     post.add_pool!(self)
@@ -149,6 +150,7 @@ class Pool < ActiveRecord::Base
 
   def remove!(post)
     return unless contains?(post.id)
+    return if is_deleted?
 
     update_attributes(:post_ids => remove_number_from_string(post.id, post_ids), :post_count => post_count - 1)
     post.remove_pool!(self)

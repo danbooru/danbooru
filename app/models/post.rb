@@ -553,6 +553,7 @@ class Post < ActiveRecord::Base
 
     def add_pool!(pool)
       return if belongs_to_pool?(pool)
+      return if pool.is_deleted?
       self.pool_string = "#{pool_string} pool:#{pool.id}".strip
       update_column(:pool_string, pool_string) unless new_record?
       pool.add!(self)
@@ -560,6 +561,7 @@ class Post < ActiveRecord::Base
 
     def remove_pool!(pool)
       return unless belongs_to_pool?(pool)
+      return if pool.is_deleted?
       self.pool_string = pool_string.gsub(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ").strip
       update_column(:pool_string, pool_string) unless new_record?
       pool.remove!(self)
