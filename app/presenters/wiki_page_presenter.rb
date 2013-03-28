@@ -25,8 +25,8 @@ class WikiPagePresenter
     @consequent_tag_implications ||= TagImplication.where("status = 'active' and consequent_name = ?", wiki_page.title).all
   end
 
-  def antecedent_tag_implication
-    @antecedent_tag_implication ||= TagImplication.where("status = 'active' and antecedent_name = ?", wiki_page.title).first
+  def antecedent_tag_implications
+    @antecedent_tag_implications ||= TagImplication.where("status = 'active' and antecedent_name = ?", wiki_page.title).all
   end
 
   # Produce a formatted page that shows the difference between two versions of a page.
