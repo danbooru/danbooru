@@ -23,7 +23,7 @@
           <p class="hint">The following tags are aliased to this tag: <%= raw @wiki_page.presenter.consequent_tag_aliases.map {|x| link_to(x.antecedent_name, posts_path(:tags => x.antecedent_name))}.join(", ") %>.</p>
         <% end %>
 
-        <% if @wiki_page.presenter.antecedent_tag_implications %>
+        <% if @wiki_page.presenter.antecedent_tag_implications.any? %>
           <p class="hint">This tag has been implicated to <%= raw @wiki_page.presenter.antecedent_tag_implications.map {|x| link_to(x.consequent_name, posts_path(:tags => x.consequent_name))}.join(", ") %>.</p>
         <% end %>
 

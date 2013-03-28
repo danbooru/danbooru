@@ -13,6 +13,22 @@
 
       <%= render "form" %>
 
+      <% if @wiki_page.presenter.antecedent_tag_alias %>
+        <p class="hint">This tag has been aliased to <%= link_to @wiki_page.presenter.antecedent_tag_alias.consequent_name, posts_path(:tags => @wiki_page.presenter.antecedent_tag_alias.consequent_name) %>.</p>
+      <% end %>
+
+      <% if @wiki_page.presenter.consequent_tag_aliases.any? %>
+        <p class="hint">The following tags are aliased to this tag: <%= raw @wiki_page.presenter.consequent_tag_aliases.map {|x| link_to(x.antecedent_name, posts_path(:tags => x.antecedent_name))}.join(", ") %>.</p>
+      <% end %>
+
+      <% if @wiki_page.presenter.antecedent_tag_implications.any? %>
+        <p class="hint">This tag has been implicated to <%= raw @wiki_page.presenter.antecedent_tag_implications.map {|x| link_to(x.consequent_name, posts_path(:tags => x.consequent_name))}.join(", ") %>.</p>
+      <% end %>
+
+      <% if @wiki_page.presenter.consequent_tag_implications.any? %>
+        <p class="hint">The following tags are implicated to this tag: <%= raw @wiki_page.presenter.consequent_tag_implications.map {|x| link_to(x.antecedent_name, posts_path(:tags => x.antecedent_name))}.join(", ") %>.</p>
+      <% end %>
+
       <div id="wiki-page-posts">
         <h2>Posts</h2>
         <%= @wiki_page.post_set.presenter.post_previews_html(self) %>
