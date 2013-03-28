@@ -21,6 +21,14 @@ class WikiPagePresenter
     @antecedent_tag_alias ||= TagAlias.where("status = 'active' and antecedent_name = ?", wiki_page.title).first
   end
 
+  def consequent_tag_implications
+    @consequent_tag_implications ||= TagImplication.where("status = 'active' and consequent_name = ?", wiki_page.title).all
+  end
+
+  def antecedent_tag_implication
+    @antecedent_tag_implication ||= TagImplication.where("status = 'active' and antecedent_name = ?", wiki_page.title).first
+  end
+
   # Produce a formatted page that shows the difference between two versions of a page.
   def diff(other_version)
     pattern = Regexp.new('(?:<.+?>)|(?:[0-9_A-Za-z\x80-\xff]+[\x09\x20]?)|(?:[ \t]+)|(?:\r?\n)|(?:.+?)')
