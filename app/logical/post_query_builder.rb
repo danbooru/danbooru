@@ -150,14 +150,17 @@ class PostQueryBuilder
       relation = relation.where("posts.is_deleted = FALSE")
     end
 
+    # The SourcePattern SQL function replaces Pixiv sources with "pixiv/[suffix]", where
+    # [suffix] is everything past the second-to-last slash in the URL.  It leaves non-Pixiv
+    # URLs unchanged.  This is to ease database load for Pixiv source searches.
     if q[:source]
       if q[:source] == "none%"
         relation = relation.where("(posts.source = '' OR posts.source IS NULL)")
-      elsif q[:source] =~ /pixiv/
-        raise ::Post::SearchError.new("pixiv source searches temporarily disabled")
+      elsif q[:source] =~ /^%\.?pixiv(\.net(\/img)?)?(%\/|(?=%$))(.+)$/
+        relation = relation.where("SourcePattern(posts.source) LIKE ? ESCAPE E'\\\\'", "pixiv/" + $5)
         has_constraints!
       else
-        relation = relation.where("posts.source LIKE ? ESCAPE E'\\\\'", q[:source])
+        relation = relation.where("SourcePattern(posts.source) LIKE SourcePattern(?) ESCAPE E'\\\\'", q[:source])
         has_constraints!
       end
     end
