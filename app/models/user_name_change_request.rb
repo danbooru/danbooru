@@ -22,6 +22,10 @@ class UserNameChangeRequest < ActiveRecord::Base
     status == "rejected"
   end
   
+  def approved?
+    status == "approved"
+  end
+  
   def normalize_name
     self.desired_name = desired_name.strip.gsub(/ /, "_")
   end

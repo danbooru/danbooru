@@ -37,6 +37,12 @@
     <section>
       <h2>Request was rejected</h2>
     </section>
+  
+  <% elsif @change_request.approved? %>
+    <section>
+      <h2>Request was approved by <%= @change_request.approver.name %></h2>
+    </section>
+  
   <% elsif CurrentUser.user.is_admin? %>
     <section>
       <h2>Options</h2>
