@@ -17,7 +17,7 @@
 <% else %>
   <p>An error occurred: <%= @upload.status %></p>
   <ul>
-    <% @upload.backtrace.split(/\n/).each do |line| %>
+    <% @upload.backtrace.to_s.split(/\n/).each do |line| %>
       <li><%= line %></li>
     <% end %>
   </ul>
