@@ -235,6 +235,18 @@ class PostQueryBuilder
     when "favcount_asc"
       relation = relation.order("posts.fav_count ASC, posts.id DESC")
 
+    when "comment"
+      relation = relation.order("posts.last_commented_at DESC, posts.id DESC").where("posts.last_commented_at is not null")
+
+    when "comment_asc"
+      relation = relation.order("posts.last_commented_at ASC, posts.id DESC").where("posts.last_commented_at is not null")
+
+    when "note"
+      relation = relation.order("posts.last_noted_at DESC, posts.id DESC").where("posts.last_noted_at is not null")
+
+    when "note_asc"
+      relation = relation.order("posts.last_noted_at ASC, posts.id DESC").where("posts.last_noted_at is not null")
+
     when "mpixels", "mpixels_desc"
       # Use "w*h/1000000", even though "w*h" would give the same result, so this can use
       # the posts_mpixels index.
