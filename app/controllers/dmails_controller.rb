@@ -16,7 +16,11 @@ class DmailsController < ApplicationController
   def index
     @search = Dmail.visible.search(params[:search])
     @dmails = @search.order("dmails.created_at desc").paginate(params[:page])
-    respond_with(@dmails)
+    respond_with(@dmails) do |format|
+      format.xml do
+        render :xml => @dmails.to_xml(:root => "dmails")
+      end
+    end
   end
 
   def search

@@ -3,7 +3,11 @@ class WikiPageVersionsController < ApplicationController
 
   def index
     @wiki_page_versions = WikiPageVersion.search(params[:search]).order("id desc").paginate(params[:page], :search_count => params[:search])
-    respond_with(@wiki_page_versions)
+    respond_with(@wiki_page_versions) do |format|
+      format.xml do
+        render :xml => @wiki_page_versions.to_xml(:root => "wiki-page-versions")
+      end
+    end
   end
 
   def show

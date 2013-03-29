@@ -3,6 +3,10 @@ class ArtistVersionsController < ApplicationController
 
   def index
     @artist_versions = ArtistVersion.search(params[:search]).order("id desc").paginate(params[:page], :search_count => params[:search])
-    respond_with(@artist_versions)
+    respond_with(@artist_versions) do |format|
+      format.xml do
+        render :xml => @artist_versions.to_xml(:root => "artist-versions")
+      end
+    end
   end
 end

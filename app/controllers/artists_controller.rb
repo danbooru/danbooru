@@ -28,7 +28,7 @@ class ArtistsController < ApplicationController
     @artists = Artist.search(params[:search] || params).order("id desc").paginate(params[:page])
     respond_with(@artists) do |format|
       format.xml do
-        render :xml => @artists.to_xml(:include => [:urls])
+        render :xml => @artists.to_xml(:include => [:urls], :root => "artists")
       end
       format.json do
         render :json => @artists.to_json(:include => [:urls])

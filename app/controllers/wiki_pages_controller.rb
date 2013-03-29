@@ -23,6 +23,9 @@ class WikiPagesController < ApplicationController
           redirect_to(wiki_page_path(@wiki_pages.first))
         end
       end
+      format.xml do
+        render :xml => @wiki_pages.to_xml(:root => "wiki-pages")
+      end
     end
   end
 

@@ -18,7 +18,11 @@ class ForumPostsController < ApplicationController
   def index
     @search = ForumPost.active.search(params[:search])
     @forum_posts = @search.order("forum_posts.id DESC").paginate(params[:page], :search_count => params[:search])
-    respond_with(@forum_posts)
+    respond_with(@forum_posts) do |format|
+      format.xml do
+        render :xml => @forum_posts.to_xml(:root => "forum-posts")
+      end
+    end
   end
 
   def search

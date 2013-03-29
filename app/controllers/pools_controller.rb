@@ -16,7 +16,11 @@ class PoolsController < ApplicationController
 
   def index
     @pools = Pool.active.search(params[:search]).order("updated_at desc").paginate(params[:page], :search_count => params[:search])
-    respond_with(@pools)
+    respond_with(@pools) do |format|
+      format.xml do
+        render :xml => @pools.to_xml(:root => "pools")
+      end
+    end
   end
 
   def search
