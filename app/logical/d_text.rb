@@ -17,6 +17,8 @@ class DText
     str.gsub!(/\n/m, "<br>")
     str.gsub!(/\[b\](.+?)\[\/b\]/i, '<strong>\1</strong>')
     str.gsub!(/\[i\](.+?)\[\/i\]/i, '<em>\1</em>')
+    str.gsub!(/\[s\](.+?)\[\/s\]/i, '<s>\1</s>')
+    str.gsub!(/\[u\](.+?)\[\/u\]/i, '<u>\1</u>')
 
     str = parse_links(str)
     str = parse_aliased_wiki_links(str)
