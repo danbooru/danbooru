@@ -3,7 +3,7 @@
   <% if presenter.has_uploads? %>
     <div>
       <% presenter.uploads.each do |post| %>
-        <%= PostPresenter.preview(post) %>
+        <%= PostPresenter.preview(post, :tags => "user:#{user.name}") %>
       <% end %>
     </div>
   <% else %>
@@ -16,7 +16,7 @@
   <% if presenter.has_favorites? %>
     <div>
       <% presenter.favorites.each do |post| %>
-        <%= PostPresenter.preview(post) %>
+        <%= PostPresenter.preview(post, :tags => "fav:#{user.name}") %>
       <% end %>
     </div>
   <% else %>
@@ -32,7 +32,7 @@
 
     <div class="box">
       <% presenter.posts_for_subscription(subscription).each do |post| %>
-        <%= PostPresenter.preview(post) %>
+        <%= PostPresenter.preview(post, :tags => "sub:#{user.name}:#{subscription.name}") %>
       <% end %>
     </div>
   </div>
