@@ -52,9 +52,11 @@ class Advertisement < ActiveRecord::Base
       end
 
       File.chmod(0644, image_path)
-      image_size = ImageSize.new(File.open(image_path, "rb"))
-      self.width = image_size.get_width
-      self.height = image_size.get_height
+      File.open(image_path, "rb") do |file|
+        image_size = ImageSize.new(file.read)
+        self.width = image_size.get_width
+        self.height = image_size.get_height
+      end
 
       if width > height
         self.ad_type = "horizontal"
