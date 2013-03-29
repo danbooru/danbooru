@@ -70,15 +70,4 @@ protected
 end
 
 QueryTrace.attach_to :active_record
-
-trap('QUIT') do
-  # Sending 2 backspace characters removes the ^\ that is
-  # printed to the console.
-  rm_noise = "\b\b"
-
-  QueryTrace.toggle!
-  puts "#{rm_noise}=> QueryTrace #{QueryTrace.status}"
-end
-
 QueryTrace.enable! if ENV['QUERY_TRACE']
-puts "=> QueryTrace #{QueryTrace.status}; CTRL-\\ to toggle"
