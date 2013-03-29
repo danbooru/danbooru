@@ -36,7 +36,7 @@ class PostFlag < ActiveRecord::Base
       end
 
       if params[:creator_name].present?
-        q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].downcase)
+        q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].mb_chars.downcase)
       end
 
       if params[:post_id].present?

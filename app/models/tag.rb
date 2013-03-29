@@ -121,7 +121,7 @@ class Tag < ActiveRecord::Base
 
   module NameMethods
     def normalize_name(name)
-      name.downcase.tr(" ", "_").gsub(/\A[-~]+/, "").gsub(/\*/, "")
+      name.mb_chars.downcase.tr(" ", "_").gsub(/\A[-~]+/, "").gsub(/\*/, "").to_s
     end
 
     def find_or_create_by_name(name, options = {})
@@ -233,10 +233,10 @@ class Tag < ActiveRecord::Base
 
     def parse_tag(tag, output)
       if tag[0] == "-" && tag.size > 1
-        output[:exclude] << tag[1..-1].downcase
+        output[:exclude] << tag[1..-1].mb_chars.downcase
 
       elsif tag[0] == "~" && tag.size > 1
-        output[:include] << tag[1..-1].downcase
+        output[:include] << tag[1..-1].mb_chars.downcase
 
       elsif tag =~ /\*/
         matches = Tag.name_matches(tag.downcase).all(:select => "name", :limit => Danbooru.config.tag_query_limit, :order => "post_count DESC").map(&:name)
@@ -244,7 +244,7 @@ class Tag < ActiveRecord::Base
         output[:include] += matches
 
       else
-        output[:related] << tag.downcase
+        output[:related] << tag.mb_chars.downcase
       end
     end
 
@@ -431,7 +431,7 @@ class Tag < ActiveRecord::Base
 
   module SearchMethods
     def name_matches(name)
-      where("name LIKE ? ESCAPE E'\\\\'", name.downcase.to_escaped_for_sql_like)
+      where("name LIKE ? ESCAPE E'\\\\'", name.mb_chars.downcase.to_escaped_for_sql_like)
     end
 
     def named(name)

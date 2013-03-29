@@ -20,7 +20,7 @@ class PoolVersion < ActiveRecord::Base
       end
 
       if params[:updater_name].present?
-        q = q.where("updater_id = (select _.id from users _ where lower(_.name) = ?)", params[:updater_name].downcase)
+        q = q.where("updater_id = (select _.id from users _ where lower(_.name) = ?)", params[:updater_name].mb_chars.downcase)
       end
 
       if params[:pool_id].present?

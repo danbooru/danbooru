@@ -14,7 +14,7 @@ class WikiPage < ActiveRecord::Base
 
   module SearchMethods
     def titled(title)
-      where("title = ?", title.downcase.tr(" ", "_"))
+      where("title = ?", title.mb_chars.downcase.tr(" ", "_"))
     end
 
     def recent
@@ -30,7 +30,7 @@ class WikiPage < ActiveRecord::Base
       params = {} if params.blank?
 
       if params[:title].present?
-        q = q.where("title LIKE ? ESCAPE E'\\\\'", params[:title].downcase.tr(" ", "_").to_escaped_for_sql_like)
+        q = q.where("title LIKE ? ESCAPE E'\\\\'", params[:title].mb_chars.downcase.tr(" ", "_").to_escaped_for_sql_like)
       end
 
       if params[:creator_id].present?
@@ -102,7 +102,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def normalize_title
-    self.title = title.downcase.tr(" ", "_")
+    self.title = title.mb_chars.downcase.tr(" ", "_")
   end
 
   def creator_name
@@ -156,6 +156,6 @@ class WikiPage < ActiveRecord::Base
       else
         match
       end
-    end.map {|x| x.downcase.tr(" ", "_")}
+    end.map {|x| x.mb_chars.downcase.tr(" ", "_")}
   end
 end

@@ -58,7 +58,7 @@ class Pool < ActiveRecord::Base
     if name =~ /^\d+$/
       name.to_i
     else
-      select_value_sql("SELECT id FROM pools WHERE lower(name) = ?", name.downcase.tr(" ", "_")).to_i
+      select_value_sql("SELECT id FROM pools WHERE lower(name) = ?", name.mb_chars.downcase.tr(" ", "_")).to_i
     end
   end
 
@@ -91,7 +91,7 @@ class Pool < ActiveRecord::Base
     if name =~ /^\d+$/
       where("id = ?", name.to_i).first
     elsif name
-      where("lower(name) = ?", normalize_name(name).downcase).first
+      where("lower(name) = ?", normalize_name(name).mb_chars.downcase).first
     else
       nil
     end

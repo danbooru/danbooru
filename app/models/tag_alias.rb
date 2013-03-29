@@ -12,7 +12,7 @@ class TagAlias < ActiveRecord::Base
 
   module SearchMethods
     def name_matches(name)
-      where("(antecedent_name like ? escape E'\\\\' or consequent_name like ? escape E'\\\\')", name.downcase.to_escaped_for_sql_like, name.downcase.to_escaped_for_sql_like)
+      where("(antecedent_name like ? escape E'\\\\' or consequent_name like ? escape E'\\\\')", name.mb_chars.downcase.to_escaped_for_sql_like, name.downcase.to_escaped_for_sql_like)
     end
     
     def active

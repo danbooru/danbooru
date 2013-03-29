@@ -12,7 +12,7 @@ class JanitorTrial < ActiveRecord::Base
     return q if params.blank?
 
     if params[:user_name]
-      q = q.where("user_id = (select _.id from users _ where lower(_.name) = ?)", params[:user_name].downcase)
+      q = q.where("user_id = (select _.id from users _ where lower(_.name) = ?)", params[:user_name].mb_chars.downcase)
     end
 
     if params[:user_id]

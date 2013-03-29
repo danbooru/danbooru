@@ -111,11 +111,11 @@ class Dmail < ActiveRecord::Base
     end
 
     def to_name_matches(name)
-      where("to_id = (select _.id from users _ where lower(_.name) = ?)", name.downcase)
+      where("to_id = (select _.id from users _ where lower(_.name) = ?)", name.mb_chars.downcase)
     end
 
     def from_name_matches(name)
-      where("from_id = (select _.id from users _ where lower(_.name) = ?)", name.downcase)
+      where("from_id = (select _.id from users _ where lower(_.name) = ?)", name.mb_chars.downcase)
     end
 
     def search(params)

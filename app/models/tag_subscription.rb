@@ -71,7 +71,7 @@ class TagSubscription < ActiveRecord::Base
     end
 
     if params[:creator_name]
-      q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].downcase)
+      q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].mb_chars.downcase)
     end
 
     q
@@ -113,7 +113,7 @@ class TagSubscription < ActiveRecord::Base
     relation = where("creator_id = ?", user_id)
 
     if name
-      relation = relation.where("lower(name) LIKE ? ESCAPE E'\\\\'", name.downcase.to_escaped_for_sql_like)
+      relation = relation.where("lower(name) LIKE ? ESCAPE E'\\\\'", name.mb_chars.downcase.to_escaped_for_sql_like)
     end
 
     relation.each do |tag_sub|

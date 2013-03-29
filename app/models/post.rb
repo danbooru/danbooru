@@ -973,7 +973,7 @@ class Post < ActiveRecord::Base
     end
 
     def updater_name_matches(name)
-      where("updater_id = (select _.id from users _ where lower(_.name) = ?)", name.downcase)
+      where("updater_id = (select _.id from users _ where lower(_.name) = ?)", name.mb_chars.downcase)
     end
 
     def after_id(num)

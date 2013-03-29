@@ -359,7 +359,7 @@ class Upload < ActiveRecord::Base
       end
 
       if params[:uploader_name].present?
-        q = q.where("uploader_id = (select _.id from users _ where lower(_.name) = ?)", params[:uploader_name].downcase)
+        q = q.where("uploader_id = (select _.id from users _ where lower(_.name) = ?)", params[:uploader_name].mb_chars.downcase)
       end
 
       if params[:source].present?
