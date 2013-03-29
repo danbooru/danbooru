@@ -172,9 +172,11 @@ class Upload < ActiveRecord::Base
   module DimensionMethods
     # Figures out the dimensions of the image.
     def calculate_dimensions(file_path)
-      image_size = ImageSize.new(File.open(file_path, "rb"))
-      self.image_width = image_size.get_width
-      self.image_height = image_size.get_height
+      File.open(file_path, "rb") do |file|
+        image_size = ImageSize.new(file.read)
+        self.image_width = image_size.get_width
+        self.image_height = image_size.get_height
+      end
     end
 
     def add_dimension_tags!
