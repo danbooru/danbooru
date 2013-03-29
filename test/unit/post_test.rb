@@ -907,12 +907,6 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(post1.id, relation.first.id)
     end
 
-    should "return posts for the <pixiv> metatag" do
-      post = FactoryGirl.create(:post, :source => "http://i1.pixiv.net/img123/img/artist-name/789.png")
-      assert_equal(1, Post.tag_match("pixiv:789").count)
-      assert_equal(0, Post.tag_match("pixiv:790").count)
-    end
-
     should "return posts for a list of md5 hashes" do
       post1 = FactoryGirl.create(:post, :md5 => "abcd")
       post2 = FactoryGirl.create(:post)
@@ -939,11 +933,42 @@ class PostTest < ActiveSupport::TestCase
     end
 
     should "return posts for a pixiv source search" do
-      post = FactoryGirl.create(:post, :source => "http://i1.pixiv.net/img123/img/artist-name/789.png")
+      url = "http://i1.pixiv.net/img123/img/artist-name/789.png"
+      post = FactoryGirl.create(:post, :source => url)
       assert_equal(1, Post.tag_match("source:pixiv/artist-name/*").count)
       assert_equal(0, Post.tag_match("source:pixiv/artist-fake/*").count)
       assert_equal(1, Post.tag_match("source:*.pixiv.net/img*/artist-name/*").count)
       assert_equal(0, Post.tag_match("source:*.pixiv.net/img*/artist-fake/*").count)
+    end
+
+    should "return posts for a pixiv id search (type 1)" do
+      url = "http://i1.pixiv.net/img-inf/img/2013/03/14/03/02/36/34228050_s.jpg"
+      post = FactoryGirl.create(:post, :source => url)
+      assert_equal(1, Post.tag_match("pixiv_id:34228050").count)
+    end
+
+    should "return posts for a pixiv id search (type 2)" do
+      url = "http://i1.pixiv.net/img123/img/artist-name/789.png"
+      post = FactoryGirl.create(:post, :source => url)
+      assert_equal(1, Post.tag_match("pixiv_id:789").count)
+    end
+    
+    should "return posts for a pixiv id search (type 3)" do
+      url = "http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=19113635&page=0"
+      post = FactoryGirl.create(:post, :source => url)
+      assert_equal(1, Post.tag_match("pixiv_id:19113635").count)
+    end
+    
+    should "return posts for a pixiv id search (type 4)" do
+      url = "http://i2.pixiv.net/img70/img/disappearedstump/34551381_p3.jpg?1364424318"
+      post = FactoryGirl.create(:post, :source => url)
+      assert_equal(1, Post.tag_match("pixiv_id:34551381").count)
+    end
+    
+    should "return posts for a pixiv novel id search" do
+      url = "http://www.pixiv.net/novel/show.php?id=2156088"
+      post = FactoryGirl.create(:post, :source => url)
+      assert_equal(1, Post.tag_match("pixiv_novel_id:2156088").count)
     end
 
     should "return posts for a tag subscription search" do

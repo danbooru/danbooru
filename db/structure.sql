@@ -332,6 +332,19 @@ CREATE FUNCTION favorites_insert_trigger() RETURNS trigger
 
 
 --
+-- Name: sourcepattern(text); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION sourcepattern(src text) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE STRICT
+    AS $_$
+               BEGIN
+                 RETURN regexp_replace(src, '^[^/]*(//)?[^/]*.pixiv.net/img.*(/[^/]*/[^/]*)$', E'pixiv\\2');
+               END;
+             $_$;
+
+
+--
 -- Name: testprs_end(internal); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -5930,13 +5943,6 @@ CREATE INDEX index_posts_on_pixiv_id ON posts USING btree ((("substring"((source
 
 
 --
--- Name: index_posts_on_pixiv_suffix; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_posts_on_pixiv_suffix ON posts USING btree ("substring"((source)::text, 'pixiv.net/img.*/([^/]*/[^/]*)$'::text) text_pattern_ops);
-
-
---
 -- Name: index_posts_on_source; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -5947,7 +5953,7 @@ CREATE INDEX index_posts_on_source ON posts USING btree (source);
 -- Name: index_posts_on_source_pattern; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_posts_on_source_pattern ON posts USING btree (source text_pattern_ops);
+CREATE INDEX index_posts_on_source_pattern ON posts USING btree (sourcepattern((source)::text) text_pattern_ops);
 
 
 --
@@ -6347,3 +6353,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130322173859');
 INSERT INTO schema_migrations (version) VALUES ('20130323160259');
 
 INSERT INTO schema_migrations (version) VALUES ('20130326035904');
+
+INSERT INTO schema_migrations (version) VALUES ('20130328092739');

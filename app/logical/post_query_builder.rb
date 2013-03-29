@@ -124,6 +124,7 @@ class PostQueryBuilder
     relation = add_range_relation(q[:copyright_tag_count], "posts.tag_count_copyright", relation)
     relation = add_range_relation(q[:character_tag_count], "posts.tag_count_character", relation)
     relation = add_range_relation(q[:post_tag_count], "posts.tag_count", relation)
+    # relation = add_range_relation(q[:pixiv_id], "substring(posts.source, 'pixiv.net/img.*/([0-9]+)[^/]*$')::integer", relation) 
 
     if q[:md5]
       relation = relation.where(["posts.md5 IN (?)", q[:md5]])
@@ -156,8 +157,8 @@ class PostQueryBuilder
     if q[:source]
       if q[:source] == "none%"
         relation = relation.where("(posts.source = '' OR posts.source IS NULL)")
-      elsif q[:source] =~ /^%\.?pixiv(\.net(\/img)?)?(%\/|(?=%$))(.+)$/
-        relation = relation.where("SourcePattern(posts.source) LIKE ? ESCAPE E'\\\\'", "pixiv/" + $5)
+      elsif q[:source] =~ /^%\.?pixiv(?:\.net(?:\/img)?)?(?:%\/|(?=%$))(.+)$/
+        relation = relation.where("SourcePattern(posts.source) LIKE ? ESCAPE E'\\\\'", "pixiv/" + $1)
         has_constraints!
       else
         relation = relation.where("SourcePattern(posts.source) LIKE SourcePattern(?) ESCAPE E'\\\\'", q[:source])

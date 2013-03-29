@@ -24,11 +24,11 @@ class ArtistVersion < ActiveRecord::Base
   end
 
   def url_array
-    url_string.scan(/\S+/)
+    url_string.to_s.scan(/\S+/)
   end
 
   def other_names_array
-    other_names.scan(/\S+/)
+    other_names.to_s.scan(/\S+/)
   end
 
   def urls_diff(version)
