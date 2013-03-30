@@ -220,6 +220,22 @@ class PostQueryBuilder
       relation = relation.where("posts.rating <> 'e'")
     end
 
+    if q[:locked] == "rating"
+      relation = relation.where("posts.is_rating_locked = TRUE")
+    elsif q[:locked] == "note" || q[:locked] == "notes"
+      relation = relation.where("posts.is_note_locked = TRUE")
+    elsif q[:locked] == "status"
+      relation = relation.where("posts.is_status_locked = TRUE")
+    end
+
+    if q[:locked_negated] == "rating"
+      relation = relation.where("posts.is_rating_locked = FALSE")
+    elsif q[:locked_negated] == "note" || q[:locked_negated] == "notes"
+      relation = relation.where("posts.is_note_locked = FALSE")
+    elsif q[:locked_negated] == "status"
+      relation = relation.where("posts.is_status_locked = FALSE")
+    end
+
     relation = add_tag_string_search_relation(q[:tags], relation)
 
     if q[:order] == "rank"
