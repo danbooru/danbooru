@@ -95,7 +95,7 @@
     $("#related-tags").show();
 
     var query = Danbooru.RelatedTag.recent_search.query;
-    var related_tags = Danbooru.RelatedTag.recent_search.tags.sort();
+    var related_tags = Danbooru.RelatedTag.recent_search.tags;
     var wiki_page_tags = Danbooru.RelatedTag.recent_search.wiki_page_tags;
     var $dest = $("#related-tags");
     $dest.empty();
