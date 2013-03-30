@@ -1,0 +1,4 @@
+<%= form_tag(comments_path, :method => :get) do %>
+  <%= hidden_field_tag "group_by", "comment" %>
+  <%= text_field "search", "body_matches", :placeholder => "Search comments" %>
+<% end %>
