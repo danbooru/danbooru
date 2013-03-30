@@ -1,9 +1,9 @@
 <ul>
   <li>ID: <%= post.id %></li>
-  <li>Uploader: <%= link_to_unless(post.uploader.nil?, post.uploader_name, user_path(post.uploader)) %></li>
+  <li>Uploader: <%= link_to_unless(post.uploader.nil?, post.uploader_name, user_path(post.uploader), { :class => post.uploader.level_class }) %></li>
   <li>Date: <%= link_to time_ago_in_words_tagged(post.created_at), posts_path(:tags => "date:#{post.created_at.to_date}") %></li>
   <% if post.approver %>
-    <li>Approver: <%= link_to(post.approver.name, user_path(post.approver_id)) %></li>
+    <li>Approver: <%= link_to(post.approver.name, user_path(post.approver_id), { :class => post.approver.level_class }) %></li>
   <% end %>
   <li>
     Size: <%= link_to_if Danbooru.config.can_user_see_post?(CurrentUser.user, post), number_to_human_size(post.file_size), post.file_url %>

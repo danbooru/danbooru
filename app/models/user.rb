@@ -355,6 +355,10 @@ class User < ActiveRecord::Base
       
       return true
     end
+
+    def level_class
+      "user-#{level_string.downcase}"
+    end
   end
 
   module EmailMethods

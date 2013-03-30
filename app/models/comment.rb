@@ -3,6 +3,7 @@ class Comment < ActiveRecord::Base
   validates_format_of :body, :with => /\S/, :message => 'has no content'
   belongs_to :post
   belongs_to :creator, :class_name => "User"
+  belongs_to :updater, :class_name => "User"
   has_many :votes, :class_name => "CommentVote", :dependent => :destroy
   before_validation :initialize_creator, :on => :create
   before_validation :initialize_updater
