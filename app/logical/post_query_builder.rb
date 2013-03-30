@@ -189,6 +189,16 @@ class PostQueryBuilder
       has_constraints!
     end
 
+    if q[:commenter_id]
+      relation = relation.where(:id => Comment.where("creator_id = ?", q[:commenter_id]).select("post_id").uniq)
+      has_constraints!
+    end
+
+    if q[:noter_id]
+      relation = relation.where(:id => Note.where("creator_id = ?", q[:noter_id]).select("post_id").uniq)
+      has_constraints!
+    end
+
     if q[:parent_id]
       relation = relation.where("(posts.id = ? or posts.parent_id = ?)", q[:parent_id], q[:parent_id])
       has_constraints!
