@@ -156,6 +156,6 @@ class WikiPage < ActiveRecord::Base
       else
         match
       end
-    end.map {|x| x.mb_chars.downcase.tr(" ", "_")}
+    end.map {|x| x.mb_chars.downcase.tr(" ", "_").to_s}
   end
 end
