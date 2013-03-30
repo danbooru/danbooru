@@ -1,5 +1,5 @@
 class Tag < ActiveRecord::Base
-  METATAGS = "-user|user|-approver|approver|commenter|noter|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|pixiv"
+  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|-pool|pool|-fav|fav|sub|md5|-rating|rating|width|height|mpixels|score|filesize|source|id|date|order|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|pixiv"
   attr_accessible :category
   has_one :wiki_page, :foreign_key => "name", :primary_key => "title"
 
@@ -280,7 +280,7 @@ class Tag < ActiveRecord::Base
             q[:approver_id] = User.name_to_id($2)
             q[:approver_id] = -1 if q[:approver_id].nil?
 
-          when "commenter"
+          when "commenter", "comm"
             q[:commenter_id] = User.name_to_id($2)
             q[:commenter_id] = -1 if q[:commenter_id].nil?
 

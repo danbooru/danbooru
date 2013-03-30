@@ -245,10 +245,10 @@ class PostQueryBuilder
     when "favcount_asc"
       relation = relation.order("posts.fav_count ASC, posts.id DESC")
 
-    when "comment"
+    when "comment", "comm"
       relation = relation.order("posts.last_commented_at DESC, posts.id DESC").where("posts.last_commented_at is not null")
 
-    when "comment_asc"
+    when "comment_asc", "comm_asc"
       relation = relation.order("posts.last_commented_at ASC, posts.id DESC").where("posts.last_commented_at is not null")
 
     when "note"
