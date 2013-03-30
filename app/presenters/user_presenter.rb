@@ -105,7 +105,7 @@ class UserPresenter
 
   def inviter(template)
     if user.inviter_id
-      template.link_to(user.inviter.name, template.user_path(user.inviter_id))
+      template.link_to(user.inviter.name, template.user_path(user.inviter_id), { :class => user.inviter.level_class })
     else
       "None"
     end

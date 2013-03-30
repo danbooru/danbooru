@@ -15,8 +15,8 @@
       <tbody>
         <% @user_feedbacks.each do |feedback| %>
           <tr class="feedback-category-<%= feedback.category %>">
-            <td><%= link_to feedback.user_name, user_path(feedback.user_id) %></td>
-            <td><%= link_to feedback.creator_name, user_path(feedback.creator_id) %></td>
+            <td><%= link_to feedback.user_name, user_path(feedback.user_id), { :class => feedback.user.level_class } %></td>
+            <td><%= link_to feedback.creator_name, user_path(feedback.creator_id), { :class => feedback.creator.level_class } %></td>
             <td><%= compact_time(feedback.created_at) %></td>
             <td><%= format_text(feedback.body) %></td>
             <td>

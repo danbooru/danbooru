@@ -16,7 +16,7 @@
         <% @notes.each do |note| %>
           <tr>
             <td><%= link_to note.post_id, post_path(note.post_id) %></td>
-            <td><%= link_to note.creator.name, user_path(note.creator_id) %></td>
+            <td><%= link_to note.creator.name, user_path(note.creator_id), { :class => note.creator.level_class } %></td>
             <td><%= compact_time(note.created_at) %></td>
             <td><%= note.is_active? %></td>
             <td><%= format_text(note.body) %></td>
