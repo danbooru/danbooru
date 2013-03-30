@@ -1,5 +1,5 @@
 class ArtistVersion < ActiveRecord::Base
-  belongs_to :updater
+  belongs_to :updater, :class_name => "User"
   belongs_to :artist
 
   def self.search(params)
