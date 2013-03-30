@@ -1,11 +1,8 @@
 class ChangeSourcePatternIndexOnPosts < ActiveRecord::Migration
   def up
     execute "set statement_timeout = 0"
-    begin
-      execute "DROP INDEX index_posts_on_pixiv_suffix"
-      execute "DROP INDEX index_posts_on_source_pattern"
-    rescue Exception
-    end
+    execute "DROP INDEX index_posts_on_pixiv_suffix"
+    execute "DROP INDEX index_posts_on_source_pattern"
     execute "CREATE FUNCTION SourcePattern(src text) RETURNS text AS $$
                BEGIN
                  RETURN regexp_replace(src, '^[^/]*(//)?[^/]*\.pixiv\.net/img.*(/[^/]*/[^/]*)$', E'pixiv\\\\2');
