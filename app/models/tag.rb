@@ -139,7 +139,7 @@ class Tag < ActiveRecord::Base
         if category
           category_id = categories.value_for(category)
 
-          if category_id != tag.category && (CurrentUser.is_builder? || tag.post_count <= 100)
+          if category_id != tag.category && (CurrentUser.is_builder? || tag.post_count <= 50)
             tag.update_column(:category, category_id)
             tag.update_category_cache_for_all
           end
