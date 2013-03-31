@@ -1,10 +1,10 @@
 (function() {
   Danbooru.Blacklist = {};
 
-  Danbooru.Blacklist.blacklists = [];
+  Danbooru.Blacklist.entries = [];
 
   Danbooru.Blacklist.parse_entry = function(string) {
-    var blacklist = {
+    var entry = {
       "tags": string,
       "require": [],
       "exclude": [],
@@ -14,57 +14,52 @@
     var matches = string.match(/\S+/g) || [];
     $.each(matches, function(i, tag) {
       if (tag.charAt(0) === '-') {
-        blacklist.exclude.push(tag.slice(1));
+        entry.exclude.push(tag.slice(1));
       } else {
-        blacklist.require.push(tag);
+        entry.require.push(tag);
       }
     });
-    return blacklist;
+    return entry;
   }
 
   Danbooru.Blacklist.parse_entries = function() {
     var entries = (Danbooru.meta("blacklisted-tags") || "nozomiisthebestlovelive").replace(/(rating:[qes])\w+/ig, "$1").toLowerCase().split(/,/);
 
     $.each(entries, function(i, tags) {
-      var blacklist = Danbooru.Blacklist.parse_entry(tags);
-      Danbooru.Blacklist.blacklists.push(blacklist);
+      var entry = Danbooru.Blacklist.parse_entry(tags);
+      Danbooru.Blacklist.entries.push(entry);
     });
   }
 
-  Danbooru.Blacklist.toggle = function(e) {
-    $(".blacklisted").each(function(i, element) {
-      var $element = $(element);
-      if ($element.hasClass("blacklisted-active")) {
-        var tag = $(e.target).html();
-        var blacklist = Danbooru.Blacklist.parse_entry(tag);
+  Danbooru.Blacklist.show_entry = function(e) {
+    $(".blacklisted").addClass("blacklisted-active");
+    
+    Danbooru.Blacklist.posts().each(function(i, post) {
+      var $post = $(post);
+      var tag = $(e.target).html();
+      var entry = Danbooru.Blacklist.parse_entry(tag);
 
-        if (Danbooru.Blacklist.post_match($element, blacklist)) {
-          $element.removeClass("blacklisted-active");
-        }
-      } else {
-        $element.addClass("blacklisted-active");
+      if (Danbooru.Blacklist.post_match($post, entry)) {
+        $post.removeClass("blacklisted-active");
       }
     });
   }
 
   Danbooru.Blacklist.toggle_all = function(e) {
-    $(".blacklisted").each(function(i, element) {
-      var $element = $(element);
-      if ($element.hasClass("blacklisted-active")) {
-        $element.removeClass("blacklisted-active");
-      } else {
-        $element.addClass("blacklisted-active");
-      }
-    });
+    if ($(".blacklisted-active").length) {
+      $(".blacklisted").removeClass("blacklisted-active");
+    } else {
+      $(".blacklisted").addClass("blacklisted-active");
+    }
   }
 
   Danbooru.Blacklist.update_sidebar = function() {
-    if (this.blacklists.length > 0) {
-      this.blacklists.unshift({"tags": "~all~", "hits": -1});
+    if (this.entries.length > 0) {
+      this.entries.unshift({"tags": "~all~", "hits": -1});
     }
 
-    $.each(this.blacklists, function(i, blacklist) {
-      if (blacklist.hits === 0) {
+    $.each(this.entries, function(i, entry) {
+      if (entry.hits === 0) {
         return;
       }
 
@@ -72,15 +67,15 @@
       var link = $("<a/>");
       var count = $("<span/>");
 
-      if (blacklist.tags === "~all~") {
+      if (entry.tags === "~all~") {
         link.html("All");
         link.click(Danbooru.Blacklist.toggle_all);
         item.append(link);
         item.append(" ");
       } else {
-        link.html(blacklist.tags);
-        link.click(Danbooru.Blacklist.toggle);
-        count.html(blacklist.hits);
+        link.html(entry.tags);
+        link.click(Danbooru.Blacklist.show_entry);
+        count.html(entry.hits);
         item.append(link);
         item.append(" ");
         item.append(count);
@@ -93,17 +88,17 @@
   }
 
   Danbooru.Blacklist.apply = function() {
-    $.each(this.blacklists, function(i, blacklist) {
-      blacklist.hits = 0;
+    $.each(this.entries, function(i, entry) {
+      entry.hits = 0;
     });
 
     var count = 0
 
     $.each(this.posts(), function(i, post) {
-      $.each(Danbooru.Blacklist.blacklists, function(i, blacklist) {
-        if (Danbooru.Blacklist.post_match(post, blacklist)) {
+      $.each(Danbooru.Blacklist.entries, function(i, entry) {
+        if (Danbooru.Blacklist.post_match(post, entry)) {
           Danbooru.Blacklist.post_hide(post);
-          blacklist.hits += 1;
+          entry.hits += 1;
           count += 1;
         }
       });
@@ -116,7 +111,7 @@
     return $(".post-preview");
   }
 
-  Danbooru.Blacklist.post_match = function(post, blacklist) {
+  Danbooru.Blacklist.post_match = function(post, entry) {
     var $post = $(post);
     var tags = String($post.data("tags")).match(/\S+/g) || [];
     tags.push("rating:" + $post.data("rating"));
@@ -125,7 +120,7 @@
       tags.push("status:" + v);
     });
 
-    return (blacklist.require.length > 0 || blacklist.exclude.length > 0) && Danbooru.is_subset(tags, blacklist.require) && !Danbooru.intersect(tags, blacklist.exclude).length;
+    return (entry.require.length > 0 || entry.exclude.length > 0) && Danbooru.is_subset(tags, entry.require) && !Danbooru.intersect(tags, entry.exclude).length;
   }
 
   Danbooru.Blacklist.post_hide = function(post) {
