@@ -125,7 +125,7 @@ private
         post_count = counts[tag].to_s
       end
 
-      is_underused_tag = counts[tag].to_i <= 10 && categories[tag] == Tag.categories.general
+      is_underused_tag = counts[tag].to_i <= 1 && categories[tag] == Tag.categories.general
       html << %{<span class="post-count#{is_underused_tag ? " low-post-count" : ""}">#{post_count}</span>}
     end
 
