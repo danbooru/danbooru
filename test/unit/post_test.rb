@@ -965,11 +965,11 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(1, Post.tag_match("pixiv_id:34551381").count)
     end
     
-    should "return posts for a pixiv novel id search" do
-      url = "http://www.pixiv.net/novel/show.php?id=2156088"
-      post = FactoryGirl.create(:post, :source => url)
-      assert_equal(1, Post.tag_match("pixiv_novel_id:2156088").count)
-    end
+    # should "return posts for a pixiv novel id search" do
+    #   url = "http://www.pixiv.net/novel/show.php?id=2156088"
+    #   post = FactoryGirl.create(:post, :source => url)
+    #   assert_equal(1, Post.tag_match("pixiv_novel_id:2156088").count)
+    # end
 
     should "return posts for a tag subscription search" do
       post1 = FactoryGirl.create(:post, :tag_string => "aaa")

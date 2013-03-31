@@ -15,6 +15,7 @@ class Post < ActiveRecord::Base
   before_save :update_tag_post_counts
   before_save :set_tag_counts
   before_validation :initialize_uploader, :on => :create
+  before_validation :parse_pixiv_id
   belongs_to :updater, :class_name => "User"
   belongs_to :approver, :class_name => "User"
   belongs_to :uploader, :class_name => "User"
@@ -1011,7 +1012,21 @@ class Post < ActiveRecord::Base
       q
     end
   end
-
+  
+  module PixivMethods
+    def parse_pixiv_id
+      if source =~ %r!http://i\d\.pixiv\.net/img-inf/img/\d+/\d+/\d+/\d+/\d+/\d+/(\d+)_s.jpg!
+        self.pixiv_id = $1
+      elsif source =~ %r!http://i\d\.pixiv\.net/img\d+/img/[^\/]+/(\d+)!
+        self.pixiv_id = $1
+      elsif source =~ /pixiv\.net/ && source =~ /illust_id=(\d+)/
+        self.pixiv_id = $1
+      else
+        self.pixiv_id = nil
+      end
+    end
+  end
+  
   include FileMethods
   include ImageMethods
   include ApprovalMethods
@@ -1029,6 +1044,7 @@ class Post < ActiveRecord::Base
   include NoteMethods
   include ApiMethods
   extend SearchMethods
+  include PixivMethods
 
   def reload(options = nil)
     super

@@ -124,7 +124,7 @@ class PostQueryBuilder
     relation = add_range_relation(q[:copyright_tag_count], "posts.tag_count_copyright", relation)
     relation = add_range_relation(q[:character_tag_count], "posts.tag_count_character", relation)
     relation = add_range_relation(q[:post_tag_count], "posts.tag_count", relation)
-    # relation = add_range_relation(q[:pixiv_id], "substring(posts.source, 'pixiv.net/img.*/([0-9]+)[^/]*$')::integer", relation) 
+    relation = add_range_relation(q[:pixiv_id], "posts.pixiv_id", relation) 
 
     if q[:md5]
       relation = relation.where(["posts.md5 IN (?)", q[:md5]])

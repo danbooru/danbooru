@@ -2330,7 +2330,8 @@ CREATE TABLE posts (
     has_children boolean DEFAULT false NOT NULL,
     is_banned boolean DEFAULT false NOT NULL,
     up_score integer,
-    down_score integer
+    down_score integer,
+    pixiv_id integer
 );
 
 
@@ -5993,7 +5994,7 @@ CREATE INDEX index_posts_on_parent_id ON posts USING btree (parent_id);
 -- Name: index_posts_on_pixiv_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_posts_on_pixiv_id ON posts USING btree ((("substring"((source)::text, 'pixiv.net/img.*/([0-9]+)[^/]*$'::text))::integer));
+CREATE INDEX index_posts_on_pixiv_id ON posts USING btree (pixiv_id) WHERE (pixiv_id IS NOT NULL);
 
 
 --
@@ -6411,3 +6412,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130326035904');
 INSERT INTO schema_migrations (version) VALUES ('20130328092739');
 
 INSERT INTO schema_migrations (version) VALUES ('20130331180246');
+
+INSERT INTO schema_migrations (version) VALUES ('20130331182719');
