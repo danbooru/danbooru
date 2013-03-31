@@ -1,17 +1,20 @@
 class ApiCacheGenerator
   def generate_tag_cache
-    File.open("#{RAILS_ROOT}/public/cache/tags-legacy.xml", "w") do |f|
-      f.puts('<?xml version="1.0" encoding="UTF-8"?>')
-      f.puts('<tags type="array">')
+    File.open("#{Rails.root}/public/cache/tags.json", "w") do |f|
+      f.print("[")
       Tag.find_each do |tag|
-        name = CGI.escape_html(tag.name)
-        id = tag.id.to_s
-        created_at = tag.created_at.try(:strftime, '%Y-%m-%d %H:%M')
-        post_count = tag.post_count.to_s
-        category = tag.category
-        f.puts('<tag name="' + name + '" id="' + id + '" ambiguous="false" created_at="' + created_at + '" count="' + post_count + '" type="' + category + '"></tag>')
+        hash = {
+          "name" => tag.name,
+          "id" => tag.id,
+          "created_at" => tag.created_at,
+          "post_count" => tag.post_count,
+          "category" => tag.category
+        }
+        f.print(hash.to_json)
+        f.print(", ")
       end
-      f.puts('</tags>')
+      f.seek(-2, IO::SEEK_END)
+      f.print("]\n")
     end
   end
 end
