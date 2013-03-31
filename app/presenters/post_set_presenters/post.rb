@@ -49,8 +49,7 @@ module PostSetPresenters
       if tag
         tag.related_tag_array.map(&:first)
       else
-        tag = Tag.find_or_create_by_name(post_set.tag_string)
-        tag.related_tag_array.map(&:first)
+        []
       end
     end
 
