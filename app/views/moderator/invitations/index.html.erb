@@ -4,7 +4,7 @@
 
     <ul>
       <% @users.each do |user| %>
-        <li><%= link_to user.name, user_path(user) %></li>
+        <li><%= link_to user.name, user_path(user), { :class => user.level_class } %></li>
       <% end %>
     </ul>
 

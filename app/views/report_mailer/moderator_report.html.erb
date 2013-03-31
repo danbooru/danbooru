@@ -19,7 +19,7 @@
   <tbody>
     <% User.find(:all, :conditions => ["level >= ?", CONFIG["user_levels"]["Test Janitor"]], :order => "level, name").each do |user| %>
       <tr>
-        <td><%= link_to user.name, user_path(user, :host => Danbooru.config.hostname, :only_path => false) %></td>
+        <td><%= link_to user.name, user_path(user, :host => Danbooru.config.hostname, :only_path => false), { :class => user.level_class } %></td>
         <td><%= user.pretty_level %></td>
         <td style="text-align: right;"><%= Post.count(:conditions => ["created_at >= ? AND approver_id = ?", 1.days.ago, user.id]) %>/<%= Post.count(:conditions => ["created_at >= ? AND (approver_id IS NOT NULL OR status = 'pending')", 1.days.ago]) %></td>
         <td style="text-align: right;"><%= Post.count(:conditions => ["created_at >= ? AND approver_id = ?", 7.days.ago, user.id]) %>/<%= Post.count(:conditions => ["created_at >= ? AND (approver_id IS NOT NULL OR status = 'pending')", 7.days.ago]) %></td>

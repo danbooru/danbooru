@@ -17,7 +17,7 @@
             <td><%= PostPresenter.preview(post_flag.post, :tags => "status:any") %></td>
             <% if CurrentUser.user.is_janitor? %>
               <td>
-                <%= link_to post_flag.creator.name, user_path(post_flag.creator) %>
+                <%= link_to post_flag.creator.name, user_path(post_flag.creator), { :class => post_flag.creator.level_class } %>
               </td>
             <% end %>
             <td><%= format_text post_flag.reason %></td>

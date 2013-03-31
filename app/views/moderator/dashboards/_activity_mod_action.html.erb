@@ -9,7 +9,7 @@
   <tbody>
     <% @dashboard.mod_actions.each do |mod_action| %>
       <tr>
-        <td><%= link_to mod_action.creator.name, user_path(mod_action.creator) %></td>
+        <td><%= link_to mod_action.creator.name, user_path(mod_action.creator), { :class => mod_action.creator.level_class } %></td>
         <td><%= format_text(mod_action.description) %></td>
       </tr>
     <% end %>

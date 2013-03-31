@@ -72,7 +72,7 @@ module ApplicationHelper
 
   def mod_link_to_user(user, positive_or_negative)
     html = ""
-    html << link_to(user.name, user_path(user))
+    html << link_to(user.name, user_path(user), { :class => user.level_class })
 
     if positive_or_negative == :positive
       html << " [" + link_to("+", new_user_feedback_path(:user_feedback => {:category => "positive", :user_id => user.id})) + "]"
