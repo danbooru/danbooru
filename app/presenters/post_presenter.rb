@@ -69,7 +69,7 @@ class PostPresenter < Presenter
 
   def image_html(template)
     return template.content_tag("p", "The artist requested removal of this image") if @post.is_banned? && !CurrentUser.user.is_privileged?
-    return template.content_tag("p", "You need a privileged account to see this image.") if !Danbooru.config.can_user_see_post?(CurrentUser.user, @post)
+    return template.content_tag("p", template.link_to("You need a privileged account to see this image.", template.upgrade_information_users_path)) if !Danbooru.config.can_user_see_post?(CurrentUser.user, @post)
 
     if @post.is_flash?
       template.render("posts/partials/show/flash", :post => @post)

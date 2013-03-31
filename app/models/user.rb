@@ -299,6 +299,9 @@ class User < ActiveRecord::Base
 
       when Levels::ADMIN
         "Admin"
+        
+      else
+        ""
       end
     end
 
