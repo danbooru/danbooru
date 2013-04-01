@@ -11,7 +11,7 @@ module Danbooru
           connection.execute("SET STATEMENT_TIMEOUT = #{CurrentUser.user.statement_timeout}") unless Rails.env == "test"
         end
 
-        def with_timeout(n, default_value)
+        def with_timeout(n, default_value = nil)
           connection.execute("SET STATEMENT_TIMEOUT = #{n}") unless Rails.env == "test"
           yield
         rescue ::ActiveRecord::StatementInvalid

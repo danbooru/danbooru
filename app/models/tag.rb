@@ -100,11 +100,13 @@ class Tag < ActiveRecord::Base
       Post.raw_tag_match(name).find_each do |post|
         post.reload
         post.set_tag_counts
-        post.update_column(:tag_count, post.tag_count)
-        post.update_column(:tag_count_general, post.tag_count_general)
-        post.update_column(:tag_count_artist, post.tag_count_artist)
-        post.update_column(:tag_count_copyright, post.tag_count_copyright)
-        post.update_column(:tag_count_character, post.tag_count_character)
+        Post.with_timeout(10_000, nil) do
+          post.update_column(:tag_count, post.tag_count)
+          post.update_column(:tag_count_general, post.tag_count_general)
+          post.update_column(:tag_count_artist, post.tag_count_artist)
+          post.update_column(:tag_count_copyright, post.tag_count_copyright)
+          post.update_column(:tag_count_character, post.tag_count_character)
+        end
       end
     end
 
