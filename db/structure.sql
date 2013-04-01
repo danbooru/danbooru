@@ -5928,13 +5928,6 @@ CREATE INDEX index_posts_on_created_at ON posts USING btree (created_at);
 
 
 --
--- Name: index_posts_on_created_at_date; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_posts_on_created_at_date ON posts USING btree (date(created_at));
-
-
---
 -- Name: index_posts_on_file_size; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -6414,3 +6407,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130328092739');
 INSERT INTO schema_migrations (version) VALUES ('20130331180246');
 
 INSERT INTO schema_migrations (version) VALUES ('20130331182719');
+
+INSERT INTO schema_migrations (version) VALUES ('20130401013601');

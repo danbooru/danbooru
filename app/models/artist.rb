@@ -231,7 +231,7 @@ class Artist < ActiveRecord::Base
     end
 
     def search(params)
-      q = active
+      q = scoped
       params = {} if params.blank?
 
       case params[:name]
