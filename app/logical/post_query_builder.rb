@@ -118,7 +118,7 @@ class PostQueryBuilder
     relation = add_range_relation(q[:height], "posts.image_height", relation)
     relation = add_range_relation(q[:score], "posts.score", relation)
     relation = add_range_relation(q[:filesize], "posts.file_size", relation)
-    relation = add_range_relation(q[:date], "date(posts.created_at)", relation)
+    relation = add_range_relation(q[:date], "posts.created_at", relation)
     relation = add_range_relation(q[:general_tag_count], "posts.tag_count_general", relation)
     relation = add_range_relation(q[:artist_tag_count], "posts.tag_count_artist", relation)
     relation = add_range_relation(q[:copyright_tag_count], "posts.tag_count_copyright", relation)
