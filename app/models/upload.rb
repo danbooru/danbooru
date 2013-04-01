@@ -206,7 +206,7 @@ class Upload < ActiveRecord::Base
 
     def content_type_to_file_ext(content_type)
       case content_type
-      when "image/jpeg"
+      when "image/jpeg", "image/jpg"
         "jpg"
 
       when "image/gif"
