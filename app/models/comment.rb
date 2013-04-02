@@ -86,10 +86,13 @@ class Comment < ActiveRecord::Base
   end
 
   def validate_creator_is_not_limited
-    if creator.can_comment?
+    if creator.is_comment_limited?
+      errors.add(:base, "You can only post #{Danbooru.config.member_comment_limit} comments per hour")
+      false
+    elsif creator.can_comment?
       true
     else
-      errors.add(:creator, "can not post comments within 1 week of sign up, and can only post #{Danbooru.config.member_comment_limit} comments per hour after that")
+      errors.add(:base, "You can not post comments within 1 week of sign up")
       false
     end
   end
