@@ -424,10 +424,16 @@ class User < ActiveRecord::Base
     def can_comment?
       if is_privileged?
         true
-      elsif created_at > Danbooru.config.member_comment_time_threshold
+      else
+        created_at <= Danbooru.config.member_comment_time_threshold
+      end
+    end
+
+    def is_comment_limited?
+      if is_privileged?
         false
       else
-        Comment.where("creator_id = ? and created_at > ?", id, 1.hour.ago).count < Danbooru.config.member_comment_limit
+        Comment.where("creator_id = ? and created_at > ?", id, 1.hour.ago).count >= Danbooru.config.member_comment_limit
       end
     end
 

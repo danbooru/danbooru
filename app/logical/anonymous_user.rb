@@ -96,6 +96,10 @@ class AnonymousUser
     false
   end
 
+  def is_comment_limited?
+    true
+  end
+
   def can_remove_from_pools?
     false
   end
