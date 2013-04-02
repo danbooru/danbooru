@@ -43,7 +43,7 @@ class UserNameChangeRequest < ActiveRecord::Base
   end
   
   def approve!
-    update_attribute(:status, "approved")
+    update_attributes(:status => "approved", :approver_id => CurrentUser.user.id)
     user.update_attribute(:name, desired_name)
     body = "Your name change request has been approved. Be sure to log in with your new user name."
     Dmail.create_split(:title => "Name change request approved", :body => body, :to_id => user_id)
