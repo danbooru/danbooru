@@ -7,3 +7,7 @@
 
   <p>For this reason user name changes are not supported.</p>
 </div>
+
+<% content_for(:page_title) do %>
+  Name Change - <%= Danbooru.config.app_name %>
+<% end %>
