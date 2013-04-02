@@ -86,7 +86,7 @@ class Comment < ActiveRecord::Base
   end
 
   def validate_creator_is_not_limited
-    if creator.is_comment_limited?
+    if creator.is_comment_limited? && !do_not_bump_post?
       errors.add(:base, "You can only post #{Danbooru.config.member_comment_limit} comments per hour")
       false
     elsif creator.can_comment?
