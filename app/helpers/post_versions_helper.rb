@@ -5,8 +5,14 @@ module PostVersionsHelper
     diff[:added_tags].each do |tag|
       html << '<ins>+' + link_to(tag, posts_path(:tags => tag)) + '</ins>'
     end
+    diff[:obsolete_added_tags].each do |tag|
+      html << '+<ins class="obsolete">' + link_to(tag, posts_path(:tags => tag)) + '</ins>'
+    end
     diff[:removed_tags].each do |tag|
       html << '<del>-' + link_to(tag, posts_path(:tags => tag)) + '</del>'
+    end
+    diff[:obsolete_removed_tags].each do |tag|
+      html << '-<del class="obsolete">' + link_to(tag, posts_path(:tags => tag)) + '</del>'
     end
     diff[:unchanged_tags].each do |tag|
       html << '<span>' + link_to(tag, posts_path(:tags => tag)) + '</span>'

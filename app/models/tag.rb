@@ -1,5 +1,5 @@
 class Tag < ActiveRecord::Base
-  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|-pool|pool|-fav|fav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|score|filesize|source|id|date|order|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|pixiv_id"
+  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|-pool|pool|-fav|fav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|score|filesize|source|id|date|order|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|pixiv_id|pixiv"
   attr_accessible :category
   has_one :wiki_page, :foreign_key => "name", :primary_key => "title"
 
@@ -268,27 +268,29 @@ class Tag < ActiveRecord::Base
           case $1
           when "-user"
             q[:uploader_id_neg] ||= []
-            q[:uploader_id_neg] << User.name_to_id($2)
+            user_id = User.name_to_id($2)
+            q[:uploader_id_neg] << user_id unless user_id.blank?
 
           when "user"
             q[:uploader_id] = User.name_to_id($2)
-            q[:uploader_id] = -1 if q[:uploader_id].nil?
+            q[:uploader_id] = -1 if q[:uploader_id].blank?
 
           when "-approver"
             q[:approver_id_neg] ||= []
-            q[:approver_id_neg] << User.name_to_id($2)
+            user_id = User.name_to_id($2)
+            q[:approver_id_neg] << user_id unless user_id.blank?
 
           when "approver"
             q[:approver_id] = User.name_to_id($2)
-            q[:approver_id] = -1 if q[:approver_id].nil?
+            q[:approver_id] = -1 if q[:approver_id].blank?
 
           when "commenter", "comm"
             q[:commenter_id] = User.name_to_id($2)
-            q[:commenter_id] = -1 if q[:commenter_id].nil?
+            q[:commenter_id] = -1 if q[:commenter_id].blank?
 
           when "noter"
             q[:noter_id] = User.name_to_id($2)
-            q[:noter_id] = -1 if q[:noter_id].nil?
+            q[:noter_id] = -1 if q[:noter_id].blank?
 
           when "-pool"
             q[:tags][:exclude] << "pool:#{Pool.name_to_id($2)}"
@@ -372,7 +374,7 @@ class Tag < ActiveRecord::Base
           when "status"
             q[:status] = $2.downcase
 
-          when "pixiv_id"
+          when "pixiv_id", "pixiv"
             q[:pixiv_id] = parse_helper($2)
 
           end
