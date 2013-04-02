@@ -128,14 +128,16 @@ class TagSubscription < ActiveRecord::Base
   end
 
   def self.process_all
-    find_each do |tag_subscription|
-      if $job_task_daemon_active != false && tag_subscription.creator.is_privileged? && tag_subscription.is_active?
-        begin
-          tag_subscription.process
-          tag_subscription.save
-          sleep 0
-        rescue Exception => x
-          raise if Rails.env != "production"
+    CurrentUser.scoped(User.admins.first, "127.0.0.1") do
+      find_each do |tag_subscription|
+        if $job_task_daemon_active != false && tag_subscription.creator.is_privileged? && tag_subscription.is_active?
+          begin
+            tag_subscription.process
+            tag_subscription.save
+            sleep 0
+          rescue Exception => x
+            raise if Rails.env != "production"
+          end
         end
       end
     end
