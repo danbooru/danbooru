@@ -49,6 +49,10 @@ class Comment < ActiveRecord::Base
         q = q.body_matches(params[:body_matches])
       end
 
+      if params[:post_id].present?
+        q = q.where("post_id = ?", params[:post_id].to_i)
+      end
+
       if params[:post_tags_match].present?
         q = q.post_tags_match(params[:post_tags_match])
       end
