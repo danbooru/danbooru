@@ -13,3 +13,8 @@ Post.where("source like ?", "http://www.pixiv.net%").find_each do |post|
   post.parse_pixiv_id
   post.update_column(:pixiv_id, post.pixiv_id) if post.pixiv_id.present?
 end
+
+Post.where("source like ?", "http://img%.pixiv.net/img/%").find_each do |post|
+  post.parse_pixiv_id
+  post.update_column(:pixiv_id, post.pixiv_id) if post.pixiv_id.present?
+end
