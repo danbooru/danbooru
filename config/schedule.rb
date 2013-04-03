@@ -1,9 +1,5 @@
 set :output, "/var/log/whenever.log"
 
-every 4.hours do
-  runner "TagSubscription.process_all"
-end
-
 every 1.hour do
   runner "UploadErrorChecker.new.check!"
 end

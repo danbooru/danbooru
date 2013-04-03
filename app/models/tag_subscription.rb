@@ -51,7 +51,7 @@ class TagSubscription < ActiveRecord::Base
   end
 
   def is_active?
-    creator.last_logged_in_at && creator.last_logged_in_at > 1.year.ago
+    creator.last_logged_in_at && creator.last_logged_in_at > 3.months.ago
   end
 
   def editable_by?(user)
