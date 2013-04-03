@@ -23,7 +23,7 @@ class CommentTest < ActiveSupport::TestCase
       should "fail creation" do
         comment = FactoryGirl.build(:comment)
         comment.save
-        assert_equal(["Creator can not post comments within 1 week of sign up, and can only post 5 comments per hour after that"], comment.errors.full_messages)
+        assert_equal(["You can not post comments within 1 week of sign up"], comment.errors.full_messages)
       end
     end
 

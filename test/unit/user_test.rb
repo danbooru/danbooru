@@ -81,10 +81,11 @@ class UserTest < ActiveSupport::TestCase
       @user.update_column(:level, User::Levels::MEMBER)
       @user.update_column(:created_at, 1.year.ago)
       assert(@user.can_comment?)
+      assert(!@user.is_comment_limited?)
       (Danbooru.config.member_comment_limit).times do
         FactoryGirl.create(:comment)
       end
-      assert(!@user.can_comment?)
+      assert(@user.is_comment_limited?)
     end
 
     should "verify" do

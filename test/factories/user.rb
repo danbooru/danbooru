@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory(:user) do
-    name {rand(1_000_000).to_s}
+    name {(rand(1_000_000) + 10).to_s}
     password "password"
     password_hash {User.sha1("password")}
     email {Faker::Internet.email}

@@ -7,8 +7,8 @@ class Comment < ActiveRecord::Base
   has_many :votes, :class_name => "CommentVote", :dependent => :destroy
   before_validation :initialize_creator, :on => :create
   before_validation :initialize_updater
-  after_save :update_last_commented_at
-  after_destroy :update_last_commented_at
+  after_save :update_last_commented_at_on_save
+  after_destroy :update_last_commented_at_on_destroy
   attr_accessible :body, :post_id, :do_not_bump_post
   attr_accessor :do_not_bump_post
 
@@ -101,12 +101,18 @@ class Comment < ActiveRecord::Base
     end
   end
 
-  def update_last_commented_at
-    if Comment.where("post_id = ?", post_id).count == 0
+  def update_last_commented_at_on_destroy
+    if Comment.where("post_id = ? and id <> ?", post_id, id).count == 0
       Post.update_all("last_commented_at = NULL", ["id = ?", post_id])
-    elsif Comment.where("post_id = ?", post_id).count <= Danbooru.config.comment_threshold && !do_not_bump_post?
+    end
+    true
+  end
+
+  def update_last_commented_at_on_save
+    if Comment.where("post_id = ?", post_id).count <= Danbooru.config.comment_threshold && !do_not_bump_post?
       Post.update_all(["last_commented_at = ?", created_at], ["id = ?", post_id])
     end
+    true
   end
 
   def do_not_bump_post?
