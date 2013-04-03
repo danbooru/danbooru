@@ -67,7 +67,7 @@ class Artist < ActiveRecord::Base
     end
 
     def other_names_array
-      other_names.try(:split, / /)
+      other_names.try(:split, /\s/)
     end
 
     def other_names_comma
