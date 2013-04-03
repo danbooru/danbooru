@@ -236,7 +236,10 @@
         $("#edit").show();
         $("#comments").hide();
         $("#share").hide();
-        $("#post_tag_string").focus();
+        var tag_string_textarea = $("#post_tag_string");
+        var tag_string = tag_string_textarea.val();
+        tag_string_textarea.focus();
+        tag_string_textarea.val("").val(tag_string);
         $("#related-tags-button").trigger("click");
         $("#find-artist-button").trigger("click");
       } else {
