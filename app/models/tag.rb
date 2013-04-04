@@ -404,6 +404,7 @@ class Tag < ActiveRecord::Base
       end
       self.related_tags_updated_at = Time.now
       save
+    rescue ActiveRecord::StatementInvalid
     end
 
     def update_related_if_outdated
