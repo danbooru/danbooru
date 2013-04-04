@@ -935,10 +935,10 @@ class PostTest < ActiveSupport::TestCase
     should "return posts for a pixiv source search" do
       url = "http://i1.pixiv.net/img123/img/artist-name/789.png"
       post = FactoryGirl.create(:post, :source => url)
-      assert_equal(1, Post.tag_match("source:pixiv/artist-name/*").count)
-      assert_equal(0, Post.tag_match("source:pixiv/artist-fake/*").count)
       assert_equal(1, Post.tag_match("source:*.pixiv.net/img*/artist-name/*").count)
       assert_equal(0, Post.tag_match("source:*.pixiv.net/img*/artist-fake/*").count)
+      assert_equal(1, Post.tag_match("source:pixiv/artist-name/*").count)
+      assert_equal(0, Post.tag_match("source:pixiv/artist-fake/*").count)
     end
 
     should "return posts for a pixiv id search (type 1)" do

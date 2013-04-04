@@ -157,6 +157,8 @@ class PostQueryBuilder
     if q[:source]
       if q[:source] == "none%"
         relation = relation.where("(posts.source = '' OR posts.source IS NULL)")
+      elsif q[:source] == "http%"
+        relation = relation.where("(posts.source like ?)", "http%")
       elsif q[:source] =~ /^%\.?pixiv(?:\.net(?:\/img)?)?(?:%\/|(?=%$))(.+)$/
         relation = relation.where("SourcePattern(posts.source) LIKE ? ESCAPE E'\\\\'", "pixiv/" + $1)
         has_constraints!
