@@ -4,8 +4,8 @@ class TagImplicationRequest
   attr_reader :antecedent_name, :consequent_name, :reason, :tag_implication, :forum_topic
 
   def initialize(antecedent_name, consequent_name, reason)
-    @antecedent_name = antecedent_name.tr(" ", "_")
-    @consequent_name = consequent_name.tr(" ", "_")
+    @antecedent_name = antecedent_name.strip.tr(" ", "_")
+    @consequent_name = consequent_name.strip.tr(" ", "_")
     @reason = reason
   end
 
