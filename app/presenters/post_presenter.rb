@@ -99,7 +99,7 @@ class PostPresenter < Presenter
       pool = Pool.where(:id => template.params[:pool_id]).first
       return if pool.nil?
       return if pool.neighbors(@post).next.nil?
-      template.link_to("Next in #{pool.name}", template.post_path(pool.neighbors(@post).next))
+      template.link_to("Next in #{pool.pretty_name}", template.post_path(pool.neighbors(@post).next))
     else
       nil
     end
