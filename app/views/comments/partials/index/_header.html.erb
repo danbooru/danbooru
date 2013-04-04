@@ -6,7 +6,7 @@
     </span>
     <span class="info">
       <strong>User</strong>
-      <%= link_to(post.uploader_name, user_path(post.uploader_id)) %>
+      <%= link_to(post.uploader_name, user_path(post.uploader_id), { :class => post.uploader.level_class }) %>
     </span>
     <span class="info">
       <strong>Rating</strong>
