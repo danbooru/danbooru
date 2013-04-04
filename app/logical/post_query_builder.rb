@@ -161,7 +161,7 @@ class PostQueryBuilder
         relation = relation.where("SourcePattern(posts.source) LIKE ? ESCAPE E'\\\\'", "pixiv/" + $1)
         has_constraints!
       else
-        relation = relation.where("posts.source LIKE ? ESCAPE E'\\\\'", q[:source])
+        relation = relation.where("SourcePattern(posts.source) LIKE SourcePattern(?) ESCAPE E'\\\\'", q[:source])
         has_constraints!
       end
     end
