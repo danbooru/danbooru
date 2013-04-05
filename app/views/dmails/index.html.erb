@@ -21,8 +21,8 @@
         <% @dmails.each do |dmail| %>
           <tr class="read-<%= dmail.is_read? %>">
             <td><%= compact_time(dmail.created_at) %></td>
-            <td><%= link_to dmail.from_name, user_path(dmail.from), { :class => dmail.from.level_class } %></td>
-            <td><%= link_to dmail.to_name, user_path(dmail.to), { :class => dmail.to.level_class } %></td>
+            <td><%= link_to_user dmail.from %></td>
+            <td><%= link_to_user dmail.to %></td>
             <td><%= link_to dmail.title, dmail_path(dmail) %></td>
           </tr>
         <% end %>

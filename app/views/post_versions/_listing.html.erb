@@ -21,7 +21,7 @@
           <td><%= compact_time(post_version.updated_at) %></td>
           <td>
             <% if post_version.updater %>
-              <%= link_to(post_version.updater.name, user_path(post_version.updater_id), { :class => post_version.updater.level_class } ) %>
+              <%= link_to_user(post_version.updater) %>
             <% end %>
           </td>
           <td><%= post_version.rating %></td>

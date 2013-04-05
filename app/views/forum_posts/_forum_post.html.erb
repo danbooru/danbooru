@@ -2,7 +2,7 @@
   <article data-forum-post-id="<%= forum_post.id %>">
     <div class="author">
       <h4>
-        <%= link_to forum_post.creator.name, user_path(forum_post.creator_id), { :class => forum_post.creator.level_class } %>
+        <%= link_to_user forum_post.creator %>
         <% if forum_post.is_deleted? %>
           (deleted)
         <% end %>
@@ -16,7 +16,7 @@
         <%= format_text(forum_post.body) %>
       </div>
       <% if forum_post.updater_id != forum_post.creator_id %>
-        <p class="info">Updated by <%= link_to forum_post.updater_name, user_path(forum_post.updater_id), { :class => forum_post.updater.level_class } %> <%= time_ago_in_words_tagged(forum_post.updated_at) %></p>
+        <p class="info">Updated by <%= link_to_user forum_post.updater %> <%= time_ago_in_words_tagged(forum_post.updated_at) %></p>
       <% end %>
       <menu>
         <li>ID: <%= forum_post.id %></li>

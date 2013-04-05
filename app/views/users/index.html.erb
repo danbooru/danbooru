@@ -30,9 +30,9 @@
               <% end %>
             </td>
             <td>
-              <%= link_to user.pretty_name, user_path(user.id), { :class => user.level_class } %>
+              <%= link_to_user user %>
               <% if user.inviter %>
-                &larr; <%= link_to user.inviter.name, user_path(user.inviter_id), { :class => user.inviter.level_class } %>
+                &larr; <%= link_to_user user.inviter %>
               <% end %>
             </td>
             <td><%= link_to user.posts.count, posts_path(:tags => "user:#{user.name}") %></td>

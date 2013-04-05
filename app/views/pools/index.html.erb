@@ -19,7 +19,7 @@
               <%= link_to h(pool.pretty_name), pool_path(pool) %>
             </td>
             <td>
-              <%= link_to h(pool.creator.name), user_path(pool.creator), { :class => pool.creator.level_class } %>
+              <%= link_to_user pool.creator %>
             </td>
             <td>
               <%= pool.post_count %>

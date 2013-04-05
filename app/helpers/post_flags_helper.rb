@@ -8,7 +8,7 @@ module PostFlagsHelper
       html << DText.parse_inline(flag.reason).html_safe
 
       if CurrentUser.is_janitor?
-        html << ' - ' + link_to(flag.creator.name, user_path(flag.creator), { :class => flag.creator.level_class })
+        html << ' - ' + link_to_user(flag.creator)
       end
 
       html << ' - ' + time_ago_in_words_tagged(flag.created_at)

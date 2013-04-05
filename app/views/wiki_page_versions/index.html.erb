@@ -43,7 +43,7 @@
                   <%= compact_time(wiki_page_version.updated_at) %>
                   <% if wiki_page_version.updater %>
                     by
-                    <%= link_to wiki_page_version.updater_name, user_path(wiki_page_version.updater), { :class => wiki_page_version.updater.level_class } %>
+                    <%= link_to_user wiki_page_version.updater %>
                   <% end %>
                 </td>
               </tr>

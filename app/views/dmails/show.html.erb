@@ -5,8 +5,8 @@
       <h2><%= @dmail.title %></h2>
 
       <ul style="margin-bottom: 1em;">
-        <li><strong>Sender</strong>: <%= link_to @dmail.from_name, user_path(@dmail.from_id), { :class => @dmail.from.level_class } %></li>
-        <li><strong>Recipient</strong>: <%= link_to @dmail.to_name, user_path(@dmail.to_id), { :class => @dmail.to.level_class } %></li>
+        <li><strong>Sender</strong>: <%= link_to_user @dmail.from %></li>
+        <li><strong>Recipient</strong>: <%= link_to_user @dmail.to %></li>
         <li><strong>Date</strong>: <%= compact_time(@dmail.created_at) %></li>
       </ul>
 

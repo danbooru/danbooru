@@ -10,7 +10,7 @@
   <tbody>
     <% @dashboard.user_feedbacks.each do |record| %>
       <tr class="feedback-category-<%= record.category %>">
-        <td><%= link_to(record.user.name, user_path(record.user), { :class => record.user.level_class }) %></td>
+        <td><%= link_to_user(record.user) %></td>
         <td><%= format_text(record.body) %></td>
         <td><%= time_ago_in_words_tagged(record.created_at) %></td>
       </tr>

@@ -33,8 +33,8 @@
                 <span class="locked-topic">(locked)</span>
               <% end %>
             </td>
-            <td><%= link_to topic.creator.name, user_path(topic.creator), { :class => topic.creator.level_class } %></td>
-            <td><%= link_to topic.updater.name, user_path(topic.updater), { :class => topic.updater.level_class } %></td>
+            <td><%= link_to_user topic.creator %></td>
+            <td><%= link_to_user topic.updater %></td>
             <td><%= compact_time topic.updated_at %></td>
           </tr>
         <% end %>

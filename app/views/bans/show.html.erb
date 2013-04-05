@@ -2,7 +2,7 @@
   <div class="show">
     <h1>Show Ban</h1>
     <ul>
-      <li><strong>User</strong>: <%= link_to(@ban.user.name, user_path(@ban.user_id), { :class => @ban.user.level_class }) %></li>
+      <li><strong>User</strong>: <%= link_to_user(@ban.user) %></li>
       <li><strong>Expires</strong>: <%= compact_time @ban.expires_at %></li>
       <li><strong>Reason</strong>: <%= @ban.reason %></li>
     </ul>

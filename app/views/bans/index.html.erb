@@ -14,7 +14,7 @@
       <tbody>
         <% @bans.each do |ban| %>
           <tr id="ban-<%= ban.id %>">
-            <td><%= link_to(ban.user.name, user_path(ban.user_id), { :class => ban.user.level_class }) %></td>
+            <td><%= link_to_user(ban.user) %></td>
             <td><%= ban.expires_at %></td>
             <td><%= ban.reason %></td>
             <td>

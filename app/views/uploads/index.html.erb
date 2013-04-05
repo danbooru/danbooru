@@ -14,7 +14,7 @@
         <% @uploads.each do |upload| %>
           <tr>
             <td><%= link_to upload.id, upload_path(upload) %></td>
-            <td><%= link_to upload.uploader.name, user_path(upload.uploader), { :class => upload.uploader.level_class } %></td>
+            <td><%= link_to_user upload.uploader %></td>
             <td><%= upload.presenter.status(self) %></td>
             <td><%= compact_time upload.created_at %></td>
             <td><%= upload.tag_string %></td>

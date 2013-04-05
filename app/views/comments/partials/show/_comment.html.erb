@@ -1,6 +1,6 @@
 <article class="comment" data-post-id="<%= comment.post_id %>" data-comment-id="<%= comment.id %>" data-score="<%= comment.score %>">
   <div class="author">
-    <h1><%= link_to comment.creator_name, user_path(comment.creator_id), { :class => comment.creator.level_class } %></h1>
+    <h1><%= link_to_user comment.creator %></h1>
     <p>
       <%= time_ago_in_words_tagged(comment.created_at) %>
     </p>
@@ -10,7 +10,7 @@
       <%= format_text(comment.body) %>
 
       <% if comment.updater_id.present? && (comment.updater_id != comment.creator_id || comment.created_at != comment.updated_at) %>
-        <p class="info">Updated by <%= link_to comment.updater_name, user_path(comment.updater_id), { :class => comment.updater.level_class } %> <%= time_ago_in_words_tagged(comment.updated_at) %></p>
+        <p class="info">Updated by <%= link_to_user comment.updater %> <%= time_ago_in_words_tagged(comment.updated_at) %></p>
       <% end %>
     </div>
     
