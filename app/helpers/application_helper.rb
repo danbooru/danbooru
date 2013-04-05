@@ -71,11 +71,11 @@ module ApplicationHelper
   end
 
   def link_to_user(user)
-    link_to(user.name, user_path(user), :class => user.level_class)
+    link_to(user.pretty_name, user_path(user), :class => user.level_class)
   end
 
   def link_to_user_unless(condition, user)
-    link_to_unless(condition, user.name, user_path(user), :class => user.level_class)
+    link_to_unless(condition, user.pretty_name, user_path(user), :class => user.level_class)
   end
 
   def mod_link_to_user(user, positive_or_negative)
