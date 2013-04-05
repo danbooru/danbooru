@@ -9,9 +9,13 @@
           <th>Post Count</th>
           <th>Changes</th>
           <th>Updater</th>
-          <th>IP Address</th>
+          <% if CurrentUser.is_janitor? %>
+            <th>IP Address</th>
+          <% end %>
           <th>Date</th>
-          <th></th>
+          <% if CurrentUser.is_member? %>
+            <th></th>
+          <% end %>
         </tr>
       </thead>
       <tbody>
@@ -21,13 +25,17 @@
             <td><%= link_to pool_version.post_id_array.size, pool_versions_path(:search => {:pool_id => pool_version.pool_id}) %></td>
             <td><%= pool_version_diff(pool_version) %></td>
             <td><%= link_to_user pool_version.updater%></td>
-            <td>
-              <% if CurrentUser.is_janitor? %>
+            <% if CurrentUser.is_janitor? %>
+              <td>
                 <%= pool_version.updater_ip_addr %>
-              <% end %>
-            </td>
+              </td>
+            <% end %>
             <td><%= compact_time pool_version.updated_at %></td>
-            <td><%= link_to "Revert", revert_pool_path(pool_version.pool_id, :version => pool_version.id) %></td>
+            <% if CurrentUser.is_member? %>
+              <td>
+                <%= link_to "Revert", revert_pool_path(pool_version.pool_id, :version => pool_version.id) %>
+              </td>
+            <% end %>
           </tr>
         <% end %>
       </tbody>

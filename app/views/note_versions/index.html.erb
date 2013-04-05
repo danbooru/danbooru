@@ -8,13 +8,15 @@
           <th></th>
           <th width="5%">Post</th>
           <th width="5%">Note</th>
-          <th width="50%">Body</th>
+          <th>Body</th>
           <% if CurrentUser.is_janitor? %>
             <th width="10%">IP Address</th>
           <% end %>
           <th width="10%">Edited By</th>
           <th width="10%">Date</th>
-          <th width="10%">Options</th>
+          <% if CurrentUser.is_member? %>
+            <th width="5%"></th>
+          <% end %>
         </tr>
       </thead>
       <tbody>
@@ -31,11 +33,11 @@
             <% end %>
             <td><%= link_to_user note_version.updater %></td>
             <td><%= compact_time note_version.updated_at %></td>
-            <td>
-              <% if CurrentUser.is_member? %>
+            <% if CurrentUser.is_member? %>
+              <td>
                 <%= link_to "Revert", revert_note_path(note_version.note_id, :version_id => note_version.id), :remote => true, :method => :put, :confirm => "Do you really want to revert to this version?" %>
-              <% end %>
-            </td>
+              </td>
+            <% end %>
           </tr>
         <% end %>
       </tbody>
