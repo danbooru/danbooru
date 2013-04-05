@@ -14,6 +14,10 @@ article.post-preview {
   }
 }
 
+a.blacklisted-active {
+  font-weight: bold;
+}
+
 .post-preview.blacklisted-active {
   display: none;
 }
