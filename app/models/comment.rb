@@ -102,8 +102,11 @@ class Comment < ActiveRecord::Base
   end
 
   def update_last_commented_at_on_destroy
-    if Comment.where("post_id = ? and id <> ?", post_id, id).count == 0
+    other_comments = Comment.where("post_id = ? and id <> ?", post_id, id).order("id DESC")
+    if other_comments.count == 0
       Post.update_all("last_commented_at = NULL", ["id = ?", post_id])
+    else
+      Post.update_all(["last_commented_at = ?", other_comments.first.created_at], ["id = ?", post_id])
     end
     true
   end
