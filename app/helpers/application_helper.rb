@@ -70,9 +70,17 @@ module ApplicationHelper
     time_tag(time.strftime("%Y-%m-%d %H:%M"), time)
   end
 
+  def link_to_user(user)
+    link_to(user.name, user_path(user), :class => user.level_class)
+  end
+
+  def link_to_user_unless(condition, user)
+    link_to_unless(condition, user.name, user_path(user), :class => user.level_class)
+  end
+
   def mod_link_to_user(user, positive_or_negative)
     html = ""
-    html << link_to(user.name, user_path(user), { :class => user.level_class })
+    html << link_to_user(user)
 
     if positive_or_negative == :positive
       html << " [" + link_to("+", new_user_feedback_path(:user_feedback => {:category => "positive", :user_id => user.id})) + "]"
