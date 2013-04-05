@@ -44,7 +44,7 @@ class PostsControllerTest < ActionController::TestCase
           @basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:badpassword")}"
           @request.env['HTTP_AUTHORIZATION'] = @basic_auth_string
           get :index, {:format => "json"}
-          assert_response 401
+          assert_response 403
         end
       end
       
@@ -56,7 +56,7 @@ class PostsControllerTest < ActionController::TestCase
         
         should "fail for password mismatches" do
           get :index, {:format => "json", :login => @user.name, :api_key => "bad"}
-          assert_response 401
+          assert_response 403
         end
       end
       
@@ -68,7 +68,7 @@ class PostsControllerTest < ActionController::TestCase
         
         should "fail for password mismatches" do
           get :index, {:format => "json", :login => @user.name, :password_hash => "bad"}
-          assert_response 401
+          assert_response 403
         end
       end
     end
