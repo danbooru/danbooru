@@ -1,5 +1,5 @@
 class Comment < ActiveRecord::Base
-  validate :validate_creator_is_not_limited
+  validate :validate_creator_is_not_limited, :on => :create
   validates_format_of :body, :with => /\S/, :message => 'has no content'
   belongs_to :post
   belongs_to :creator, :class_name => "User"
