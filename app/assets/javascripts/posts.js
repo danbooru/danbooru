@@ -110,6 +110,11 @@
         Danbooru.Post.nav_next();
         e.preventDefault();
       });
+
+      $(document).bind("keydown.f", function(e) {
+        $("#add-to-favorites").filter(":visible").trigger("click");
+        e.preventDefault();
+      });
     }
 
     $(document).bind("keydown.s", function(e) {
