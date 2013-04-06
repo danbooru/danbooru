@@ -117,6 +117,7 @@ class PostQueryBuilder
     relation = add_range_relation(q[:width], "posts.image_width", relation)
     relation = add_range_relation(q[:height], "posts.image_height", relation)
     relation = add_range_relation(q[:score], "posts.score", relation)
+    relation = add_range_relation(q[:fav_count], "posts.fav_count", relation)
     relation = add_range_relation(q[:filesize], "posts.file_size", relation)
     relation = add_range_relation(q[:date], "posts.created_at", relation)
     relation = add_range_relation(q[:general_tag_count], "posts.tag_count_general", relation)

@@ -1,5 +1,5 @@
 class Tag < ActiveRecord::Base
-  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|-pool|pool|-fav|fav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|score|filesize|source|id|date|order|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|pixiv_id|pixiv"
+  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|-pool|pool|-fav|fav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|score|favcount|filesize|source|id|date|order|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|pixiv_id|pixiv"
   attr_accessible :category
   has_one :wiki_page, :foreign_key => "name", :primary_key => "title"
 
@@ -337,6 +337,9 @@ class Tag < ActiveRecord::Base
 
           when "score"
             q[:score] = parse_helper($2)
+
+          when "favcount"
+            q[:fav_count] = parse_helper($2)
 
           when "filesize"
       	    q[:filesize] = parse_helper($2, :filesize)
