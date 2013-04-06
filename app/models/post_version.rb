@@ -73,10 +73,15 @@ class PostVersion < ActiveRecord::Base
 
   def diff(version)
     latest_tags = post.tag_array
+    latest_tags << "rating:#{post.rating}" if post.rating.present?
+    latest_tags << "parent:#{post.parent_id}" if post.parent_id.present?
+    latest_tags << "source:#{post.source}" if post.source.present?
+
     new_tags = tag_array
     new_tags << "rating:#{rating}" if rating.present?
     new_tags << "parent:#{parent_id}" if parent_id.present?
     new_tags << "source:#{source}" if source.present?
+
     old_tags = version.present? ? version.tag_array : []
     if version.present?
       old_tags << "rating:#{version.rating}" if version.rating.present?
