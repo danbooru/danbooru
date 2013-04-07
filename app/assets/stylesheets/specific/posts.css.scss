@@ -234,10 +234,6 @@ div#c-posts {
       float: right;
     }
 
-    .pool-name, .search-name {
-      margin: 0 1em;
-    }
-
     #nav-links {
       margin: 1em 0;
       padding: 1em 0.5em;
@@ -251,16 +247,18 @@ div#c-posts {
       li {
         position: relative;
         text-align: center;
-        height: 1.5em;
+        padding: 0px 4.5em;
 
         .prev {
           position: absolute;
           left: 1em;
+          top: 0px;
         }
 
         .next {
           position: absolute;
           right: 1em;
+          top: 0px;
         }
 
         &:hover {
