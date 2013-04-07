@@ -27,7 +27,7 @@ class CommentVote < ActiveRecord::Base
 
   def validate_user_can_vote
     if !user.can_comment_vote?
-      errors.add :base, "You cannot vote on comments"
+      errors.add :base, "You cannot vote on more than 10 comments per hour"
       false
     else
       true
