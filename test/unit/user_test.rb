@@ -196,6 +196,7 @@ class UserTest < ActiveSupport::TestCase
 
       should "match the confirmation" do
         @user = FactoryGirl.create(:user)
+        @user.old_password = "password"
         @user.password = "zugzug5"
         @user.password_confirmation = "zugzug5"
         @user.save
