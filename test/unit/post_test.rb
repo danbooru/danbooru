@@ -15,7 +15,7 @@ class PostTest < ActiveSupport::TestCase
   end
 
   context "Deletion:" do
-    context "Annihilating a post" do
+    context "Expunging a post" do
       setup do
         @post = FactoryGirl.create(:post)
       end
@@ -26,13 +26,13 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "not destroy the record" do
-          @post.annihilate!
+          @post.expunge!
           assert_equal(1, Post.where("id = ?", @post.id).count)
         end
       end
 
       should "destroy the record" do
-        @post.annihilate!
+        @post.expunge!
         assert_equal([], @post.errors.full_messages)
         assert_equal(0, Post.where("id = ?", @post.id).count)
       end
@@ -108,22 +108,14 @@ class PostTest < ActiveSupport::TestCase
         post.save
         assert(post.errors[:parent].any?, "Parent should be invalid")
       end
-
-      # should "fail if the parent has a parent" do
-      #   p1 = FactoryGirl.create(:post)
-      #   c1 = FactoryGirl.create(:post, :parent_id => p1.id)
-      #   c2 = FactoryGirl.build(:post, :parent_id => c1.id)
-      #   c2.save
-      #   assert(c2.errors[:parent].any?, "Parent should be invalid")
-      # end
     end
 
-    context "Destroying a post with" do
+    context "Expunging a post with" do
       context "a parent" do
         should "reset the has_children flag of the parent" do
           p1 = FactoryGirl.create(:post)
           c1 = FactoryGirl.create(:post, :parent_id => p1.id)
-          c1.delete!
+          c1.expunge!
           p1.reload
           assert_equal(false, p1.has_children?)
         end
@@ -133,7 +125,7 @@ class PostTest < ActiveSupport::TestCase
           c1 = FactoryGirl.create(:post, :parent_id => p1.id)
           user = FactoryGirl.create(:user)
           c1.add_favorite!(user)
-          c1.delete!
+          c1.expunge!
           p1.reload
           assert(!Favorite.exists?(:post_id => c1.id, :user_id => user.id))
           assert(Favorite.exists?(:post_id => p1.id, :user_id => user.id))
@@ -143,24 +135,17 @@ class PostTest < ActiveSupport::TestCase
         should "update the parent's has_children flag" do
           p1 = FactoryGirl.create(:post)
           c1 = FactoryGirl.create(:post, :parent_id => p1.id)
-          c1.delete!
+          c1.expunge!
           p1.reload
           assert(!p1.has_children?, "Parent should not have children")
         end
       end
 
       context "one child" do
-        should "remove the has_children flag" do
-          p1 = FactoryGirl.create(:post)
-          c1 = FactoryGirl.create(:post, :parent_id => p1.id)
-          p1.delete!
-          assert_equal(false, p1.has_children?)
-        end
-
         should "remove the parent of that child" do
           p1 = FactoryGirl.create(:post)
           c1 = FactoryGirl.create(:post, :parent_id => p1.id)
-          p1.delete!
+          p1.expunge!
           c1.reload
           assert_nil(c1.parent)
         end
@@ -172,19 +157,85 @@ class PostTest < ActiveSupport::TestCase
           c1 = FactoryGirl.create(:post, :parent_id => p1.id)
           c2 = FactoryGirl.create(:post, :parent_id => p1.id)
           c3 = FactoryGirl.create(:post, :parent_id => p1.id)
-          p1.delete!
+          p1.expunge!
           c1.reload
           c2.reload
           c3.reload
-          assert_nil(c1.parent)
+          assert_nil(c1.parent_id)
           assert_equal(c1.id, c2.parent_id)
           assert_equal(c1.id, c3.parent_id)
         end
       end
     end
+    
+    context "Deleting a post with" do
+      context "a parent" do
+        should "not reset the has_children flag of the parent" do
+          p1 = FactoryGirl.create(:post)
+          c1 = FactoryGirl.create(:post, :parent_id => p1.id)
+          c1.delete!
+          p1.reload
+          assert_equal(true, p1.has_children?)
+        end
 
-    context "Undestroying a post with a parent" do
-      should "create a new approver" do
+        should "not reassign favorites to the parent" do
+          p1 = FactoryGirl.create(:post)
+          c1 = FactoryGirl.create(:post, :parent_id => p1.id)
+          user = FactoryGirl.create(:user)
+          c1.add_favorite!(user)
+          c1.delete!
+          p1.reload
+          assert(Favorite.exists?(:post_id => c1.id, :user_id => user.id))
+          assert(!Favorite.exists?(:post_id => p1.id, :user_id => user.id))
+          assert_equal(0, c1.score)
+        end
+
+        should "not update the parent's has_children flag" do
+          p1 = FactoryGirl.create(:post)
+          c1 = FactoryGirl.create(:post, :parent_id => p1.id)
+          c1.delete!
+          p1.reload
+          assert(p1.has_children?, "Parent should have children")
+        end
+      end
+
+      context "one child" do
+        should "not remove the has_children flag" do
+          p1 = FactoryGirl.create(:post)
+          c1 = FactoryGirl.create(:post, :parent_id => p1.id)
+          p1.delete!
+          p1.reload
+          assert_equal(true, p1.has_children?)
+        end
+
+        should "not remove the parent of that child" do
+          p1 = FactoryGirl.create(:post)
+          c1 = FactoryGirl.create(:post, :parent_id => p1.id)
+          p1.delete!
+          c1.reload
+          assert_not_nil(c1.parent)
+        end
+      end
+
+      context "two or more children" do
+        should "not reparent all children to the first child" do
+          p1 = FactoryGirl.create(:post)
+          c1 = FactoryGirl.create(:post, :parent_id => p1.id)
+          c2 = FactoryGirl.create(:post, :parent_id => p1.id)
+          c3 = FactoryGirl.create(:post, :parent_id => p1.id)
+          p1.delete!
+          c1.reload
+          c2.reload
+          c3.reload
+          assert_equal(p1.id, c1.parent_id)
+          assert_equal(p1.id, c2.parent_id)
+          assert_equal(p1.id, c3.parent_id)
+        end
+      end
+    end
+
+    context "Undeleting a post with a parent" do
+      should "update with a new approver" do
         new_user = FactoryGirl.create(:moderator_user)
         p1 = FactoryGirl.create(:post)
         c1 = FactoryGirl.create(:post, :parent_id => p1.id)
@@ -196,14 +247,14 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(new_user.id, c1.approver_id)
       end
 
-      should "not preserve the parent's has_children flag" do
+      should "preserve the parent's has_children flag" do
         p1 = FactoryGirl.create(:post)
         c1 = FactoryGirl.create(:post, :parent_id => p1.id)
         c1.delete!
         c1.undelete!
         p1.reload
-        assert_nil(p1.parent_id)
-        assert(!p1.has_children?, "Parent should not have children")
+        assert_not_nil(c1.parent_id)
+        assert(p1.has_children?, "Parent should have children")
       end
     end
   end

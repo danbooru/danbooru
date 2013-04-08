@@ -203,7 +203,7 @@ class UserTest < ActiveSupport::TestCase
         assert(User.authenticate(@user.name, "zugzug5"), "Authentication should have succeeded")
       end
 
-      should "match the confirmation" do
+      should "fail if the confirmation does not match" do
         @user = FactoryGirl.create(:user)
         @user.password = "zugzug6"
         @user.password_confirmation = "zugzug5"
