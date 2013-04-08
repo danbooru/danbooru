@@ -156,7 +156,7 @@ Danbooru::Application.routes.draw do
   end
   resource :source, :only => [:show]
   resources :tags do
-    resource :correction, :only => [:new, :create], :controller => "TagCorrections"
+    resource :correction, :only => [:new, :create, :show], :controller => "TagCorrections"
     collection do
       get :search
     end

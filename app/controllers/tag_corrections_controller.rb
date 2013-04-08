@@ -4,6 +4,10 @@ class TagCorrectionsController < ApplicationController
   def new
     @correction = TagCorrection.new(params[:tag_id])
   end
+  
+  def show
+    @correction = TagCorrection.new(params[:tag_id])
+  end
 
   def create
     @correction = TagCorrection.new(params[:tag_id])
