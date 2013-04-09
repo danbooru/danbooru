@@ -12,7 +12,7 @@
     }
     $('html, body').animate({
         scrollTop: top
-    }, 0);
+    }, 300);
   }
 
   Danbooru.notice = function(msg) {
