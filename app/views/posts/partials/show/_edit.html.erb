@@ -61,7 +61,7 @@
   <div class="input">
     <div>
       <%= f.label :tag_string, "Tags" %>
-      <%= f.text_area :tag_string , :size => "50x3", :value => post.tag_string + " " %>
+      <%= f.text_area :tag_string , :size => "50x3", :value => post.presenter.categorized_tag_string + " " %>
     </div>
 
     <%= button_tag "Related tags", :id => "related-tags-button", :type => "button" %>

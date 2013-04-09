@@ -459,6 +459,10 @@ class Post < ActiveRecord::Base
       typed_tags("artist")
     end
 
+    def general_tags
+      typed_tags("general")
+    end
+
     def typed_tags(name)
       @typed_tags ||= {}
       @typed_tags[name] ||= begin
