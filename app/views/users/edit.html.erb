@@ -19,7 +19,7 @@
         <%= f.input :time_zone, :include_blank => false %>
         <%= f.input :receive_email_notifications, :as => :select, :include_blank => false %>
         <%= f.input :comment_threshold, :hint => "Comments below this score will be hidden by default" %>
-        <%= f.input :default_image_size, :hint => "Show original image or show resampled #{Danbooru.config.large_image_width} pixel version", :label => "Image size", :collection => %w(large original), :include_blank => false %>
+        <%= f.input :default_image_size, :hint => "Show original image or show resampled #{Danbooru.config.large_image_width} pixel version", :label => "Default image width", :collection => [["850px", "large"], ["original", "original"]], :include_blank => false %>
         
         <% if CurrentUser.user.is_privileged? %>
           <%= f.input :per_page, :label => "Posts per page", :as => :select, :collection => (1..100), :include_blank => false %>
