@@ -44,7 +44,7 @@
       <%= render "users/upgrade_notice" %>
     <% end %>
 
-    <% if !CurrentUser.is_privileged? && CurrentUser.user.created_at > 2.weeks.ago %>
+    <% if cookies["accepted_tos"].blank? && !CurrentUser.is_privileged? %>
       <%= render "users/tos" %>
     <% end %>
 

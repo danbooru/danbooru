@@ -311,6 +311,7 @@ Danbooru::Application.routes.draw do
   match "/static/bookmarklet" => "static#bookmarklet", :as => "bookmarklet"
   match "/static/site_map" => "static#site_map", :as => "site_map"
   match "/static/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
+  match "/static/accept_terms_of_service" => "static#accept_terms_of_service", :as => "accept_terms_of_service"
   match "/static/mrtg" => "static#mrtg", :as => "mrtg"
   match "/static/contact" => "static#contact", :as => "contact"
   match "/static/benchmark" => "static#benchmark"

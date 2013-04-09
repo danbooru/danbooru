@@ -50,6 +50,11 @@
     <p>Danbooru will not disclose the IP address, email address, password, or DMails of any user except to the staff.</p>
     <p>Danbooru is allowed to make public everything else, including but not limited to: uploaded posts, favorited posts, comments, forum posts, wiki edits, and note edits.</p>
   </div>
+  
+  <%= form_tag(accept_terms_of_service_path) do %>
+    <%= hidden_field_tag :url, params[:url] %>
+    <%= submit_tag "I have read and agree to these rules" %>
+  <% end %>
 </div>
 
 <% content_for(:page_title) do %>
