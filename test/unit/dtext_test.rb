@@ -41,6 +41,10 @@ class DTextTest < ActiveSupport::TestCase
     assert_equal("<blockquote>\n<p>a</p>\n<blockquote><p>b</p></blockquote>\n<p>c</p>\n</blockquote>", p("[quote]\na\n[quote]\nb\n[/quote]\nc\n[/quote]"))
   end
 
+  def test_code
+    assert_equal("<pre>for (i=0; i&lt;5; ++i) {\n  printf(1);\n}\n\nexit(1);\n\n</pre>", p("[code]for (i=0; i<5; ++i) {\n  printf(1);\n}\n\nexit(1);"))
+  end
+
   def test_urls
     assert_equal('<p>a <a href="http://test.com">http://test.com</a> b</p>', p('a http://test.com b'))
     assert_equal('<p><a href="http://test.com">http://test.com</a><br>b</p>', p("http://test.com\nb"))
@@ -49,23 +53,12 @@ class DTextTest < ActiveSupport::TestCase
     assert_equal('<p>a <a href="http://test.com">http://test.com</a>. b</p>', p('a http://test.com. b'))
     assert_equal('<p>a (<a href="http://test.com">http://test.com</a>) b</p>', p('a (http://test.com) b'))
   end
-
-  # def test_links
-  #   assert_equal('<p><a href="http://test.com">test</a></p>', p('[url=http://test.com]test[/url]'))
-  #   assert_equal('<p>"1" <a href="http://two.com">2</a></p>', p('"1" [url=http://two.com]2[/url]'))
-  #   assert_equal('<p>"1" <a href="http://three.com">2 &amp; 3</a></p>', p('"1" [url=http://three.com]2 & 3[/url]'))
-  # end
-
+  
   def test_old_syle_links
     assert_equal('<p><a href="http://test.com">test</a></p>', p('"test":http://test.com'))
     assert_equal('<p>"1" <a href="http://two.com">2</a></p>', p('"1" "2":http://two.com'))
     assert_equal('<p>"1" <a href="http://three.com">2 &amp; 3</a></p>', p('"1" "2 & 3":http://three.com'))
   end
-
-  # def test_aliased_urls
-  #   assert_equal('<p>a <a href="http://test.com">bob</a>. b</p>', p('a [url=http://test.com]bob[/url]. b'))
-  #   assert_equal('<p><em><a href="http://test.com">bob</a></em></p>', p('[i][url=http://test.com]bob[/url][/i]'))
-  # end
 
   def test_lists
     assert_equal('<ul><li>a</li></ul>', p('* a'))

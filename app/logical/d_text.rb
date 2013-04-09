@@ -179,7 +179,7 @@ class DText
 
       else
         if flags[:code]
-          block
+          CGI.escape_html(block) + "\n\n"
         else
           '<p>' + parse_inline(block) + '</p>'
         end
