@@ -66,12 +66,6 @@ class UsersController < ApplicationController
     render :nothing => true
   end
 
-  def restore_uploaded_tags
-    @user = User.find(params[:id])
-    importer = UploadedTagsImporter.new(@user)
-    importer.import!
-  end
-
 private
   def check_privilege(user)
     raise User::PrivilegeError unless (user.id == CurrentUser.id || CurrentUser.is_admin?)

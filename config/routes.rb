@@ -192,7 +192,6 @@ Danbooru::Application.routes.draw do
     member do
       delete :cache
       post :upgrade
-      post :restore_uploaded_tags
     end
   end
   resources :user_feedbacks
