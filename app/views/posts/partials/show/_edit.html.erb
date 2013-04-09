@@ -1,4 +1,4 @@
-<% unless CurrentUser.user.is_contributor? %>
+<% unless CurrentUser.user.is_builder? %>
   <div style="margin-bottom: 1em;">
     <p>Before editing, read the <%= link_to "how to tag guide", wiki_page_path(:id => "howto:tag") %>.</p>
   </div>
@@ -61,7 +61,7 @@
   <div class="input">
     <div>
       <%= f.label :tag_string, "Tags" %>
-      <%= f.text_area :tag_string , :size => "50x3", :value => post.tag_string + " " %>
+      <%= f.text_area :tag_string , :size => "50x3", :value => post.presenter.categorized_tag_string + " " %>
     </div>
 
     <%= button_tag "Related tags", :id => "related-tags-button", :type => "button" %>
