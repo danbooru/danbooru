@@ -1,4 +1,4 @@
-<% unless CurrentUser.user.is_contributor? %>
+<% unless CurrentUser.user.is_builder? %>
   <div style="margin-bottom: 1em;">
     <p>Before editing, read the <%= link_to "how to tag guide", wiki_page_path(:id => "howto:tag") %>.</p>
   </div>
