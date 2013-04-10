@@ -55,8 +55,8 @@ class PostPresenter < Presenter
     end
 
     if @post.copyright_tags.any?
-      string << "from"
-      string << @post.copyright_tags.slice(0, 5).to_sentence
+      copytags = @post.copyright_tags.slice(0, 5).to_sentence
+      string << (@post.character_tags.any? ? "(#{copytags})" : copytags)
     end
 
     if @post.artist_tags.any?
@@ -64,7 +64,7 @@ class PostPresenter < Presenter
       string << @post.artist_tags.to_sentence
     end
 
-    string.join(" ").tr("_", " ")
+    string.empty? ? "##{@post.id}" : string.join(" ").tr("_", " ")
   end
 
   def categorized_tag_string
