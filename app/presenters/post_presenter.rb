@@ -108,7 +108,7 @@ class PostPresenter < Presenter
       string << @post.general_tags
     end
 
-    string.slice(0, 25).join(", ").tr("_", " ")
+    string.flatten.slice(0, 25).join(", ").tr("_", " ")
   end
 
   def image_html(template)
