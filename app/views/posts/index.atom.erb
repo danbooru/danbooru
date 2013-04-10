@@ -12,7 +12,7 @@
 
   <% Danbooru.config.select_posts_visible_to_user(CurrentUser.user, @posts).each do |post| %>
     <entry>
-      <title><%= post.tag_string %></title>
+      <title><%= post.presenter.humanized_essential_tag_string %></title>
       <link href="http://<%= Danbooru.config.hostname %>/posts/<%= post.id %>" rel="alternate"/>
       <% if post.source =~ /^http/ %>
         <link href="<%= post.source %>" rel="related"/>
