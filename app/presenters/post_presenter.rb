@@ -89,6 +89,28 @@ class PostPresenter < Presenter
     string.join("\n")
   end
 
+  def humanized_categorized_tag_string
+    string = []
+
+    if @post.copyright_tags.any?
+      string << @post.copyright_tags
+    end
+
+    if @post.character_tags.any?
+      string << @post.character_tags
+    end
+
+    if @post.artist_tags.any?
+      string << @post.artist_tags
+    end
+
+    if @post.general_tags.any?
+      string << @post.general_tags
+    end
+
+    string.slice(0, 25).join(", ").tr("_", " ")
+  end
+
   def image_html(template)
     return template.content_tag("p", "The artist requested removal of this image") if @post.is_banned? && !CurrentUser.user.is_privileged?
     return template.content_tag("p", template.link_to("You need a privileged account to see this image.", template.upgrade_information_users_path)) if !Danbooru.config.can_user_see_post?(CurrentUser.user, @post)
