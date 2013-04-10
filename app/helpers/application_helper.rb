@@ -145,7 +145,7 @@ protected
     when "tags"
       /^\/tags/
 
-    when "pools"
+    when "pools", "pool_versions"
       /^\/pools/
 
     when "moderator/dashboards"
