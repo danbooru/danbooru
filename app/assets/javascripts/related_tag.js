@@ -55,25 +55,25 @@
     var a = $field.get(0).selectionStart;
     var b = $field.get(0).selectionStart;
 
-    if ((a > 0) && (a < (n - 1)) && (string[a] !== " ") && (string[a - 1] === " ")) {
+    if ((a > 0) && (a < (n - 1)) && (!/\s/.test(string[a])) && (/\s/.test(string[a - 1]))) {
       // 4 is the only case where we need to scan forward. in all other cases we
       // can drag a backwards, and then drag b forwards.
 
-      while ((b < n) && (string[b] !== " ")) {
+      while ((b < n) && (!/\s/.test(string[b]))) {
         b++;
       }
     } else {
-      while ((a > 0) && ((string[a] === " ") || (string[a] === undefined))) {
+      while ((a > 0) && ((/\s/.test(string[a])) || (string[a] === undefined))) {
         a--;
         b--;
       }
 
-      while ((a > 0) && (string[a - 1] !== " ")) {
+      while ((a > 0) && (!/\s/.test(string[a - 1]))) {
         a--;
         b--;
       }
 
-      while ((b < (n - 1)) && (string[b] !== " ")) {
+      while ((b < (n - 1)) && (!/\s/.test(string[b]))) {
         b++;
       }
     }
