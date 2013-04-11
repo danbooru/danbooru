@@ -15,16 +15,16 @@
       <% if !@forum_topic.new_record? && @forum_topic.editable_by?(CurrentUser.user) %>
         <li><%= link_to "Edit", edit_forum_topic_path(@forum_topic) %></li>
         <% if CurrentUser.is_janitor? %>
-          <li><%= link_to "Delete", forum_topic_path(@forum_topic), :remote => true, :method => :delete, :confirm => "Do you want to delete this forum topic?" %></li>
+          <li><%= link_to "Delete", forum_topic_path(@forum_topic), :remote => true, :method => :delete, :confirm => "Are you sure you want to delete this forum topic?" %></li>
           <% if @forum_topic.is_locked? %>
             <li><%= link_to "Unlock", forum_topic_path(@forum_topic, :forum_topic => {:is_locked => false}), :method => :put %></li>
           <% else %>
-            <li><%= link_to "Lock", forum_topic_path(@forum_topic, :forum_topic => {:is_locked => true}), :method => :put %></li>
+            <li><%= link_to "Lock", forum_topic_path(@forum_topic, :forum_topic => {:is_locked => true}), :method => :put, :confirm => "Are you sure you want to lock this forum topic?" %></li>
           <% end %>
           <% if @forum_topic.is_sticky? %>
             <li><%= link_to "Unsticky", forum_topic_path(@forum_topic, :forum_topic => {:is_sticky => false}), :method => :put %></li>
           <% else %>
-            <li><%= link_to "Sticky", forum_topic_path(@forum_topic, :forum_topic => {:is_sticky => true}), :method => :put %></li>
+            <li><%= link_to "Sticky", forum_topic_path(@forum_topic, :forum_topic => {:is_sticky => true}), :method => :put, :confirm => "Are you sure you want to sticky this forum topic?" %></li>
           <% end %>
         <% end %>
       <% end %>

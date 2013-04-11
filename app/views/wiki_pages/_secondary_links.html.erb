@@ -19,7 +19,7 @@
           <li><%= link_to "Edit", edit_wiki_page_path(@wiki_page) %></li>
         <% end %>
         <% if CurrentUser.is_janitor? %>
-          <li><%= link_to "Delete", wiki_page_path(@wiki_page), :remote => true, :method => :delete, :confirm => "Do you want to delete this wiki page?" %></li>
+          <li><%= link_to "Delete", wiki_page_path(@wiki_page), :remote => true, :method => :delete, :confirm => "Are you sure you want to delete this wiki page?" %></li>
         <% end %>
       <% end %>
     <% end %>
