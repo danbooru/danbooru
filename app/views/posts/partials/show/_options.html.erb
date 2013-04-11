@@ -10,7 +10,9 @@
   <% end %>
   <li><%= link_to "Find similar", "http://danbooru.iqdb.org/db-search.php?url=http://#{Danbooru.config.hostname}#{post.preview_file_url}" %></li>
 
-  <% unless post.is_status_locked? %>
+  <% if post.is_status_locked? %>
+    <li><span id="status-locked-notice">Status locked</span></li>
+  <% else %>
     <% if !post.is_deleted? && !post.is_pending? %>
       <li><%= link_to "Flag", new_post_flag_path(:post_id => post.id), :id => "flag" %></li>
     <% end %>
@@ -31,10 +33,10 @@
       <% else %>
         <li><%= link_to "Hide from queue", moderator_post_disapproval_path(:post_id => post.id), :remote => true, :method => :post, :id => "disapprove" %></li>
       <% end %>
-    <% end %>
-  <% end %>
 
-  <% if CurrentUser.is_admin? %>
-    <li><%= link_to "Expunge", expunge_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "expunge", :confirm => "This will permanently delete this post (meaning the file will be deleted). Are you sure you want to delete this post?" %></li>
+      <% if CurrentUser.is_admin? %>
+        <li><%= link_to "Expunge", expunge_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "expunge", :confirm => "This will permanently delete this post (meaning the file will be deleted). Are you sure you want to delete this post?" %></li>
+      <% end %>
+    <% end %>
   <% end %>
 </ul>
