@@ -33,7 +33,7 @@
 
     </aside>
 
-    <section id="content">
+    <section id="content" class="<%= Danbooru.config.can_see_ads?(CurrentUser.user) ? "with-ads" : "without-ads" %>">
       <% if @post.presenter.has_nav_links?(self) %>
         <%= render "posts/partials/show/nav_links", :post => @post, :position => "top" %>
       <% end %>
