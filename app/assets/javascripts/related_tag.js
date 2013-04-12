@@ -194,10 +194,11 @@
     var tag = $(e.target).html().replace(/ /g, "_").replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&amp;/g, "&");
 
     if ($.inArray(tag, tags) > -1) {
-      $field.val(Danbooru.without(tags, tag).join(" ") + " ");
+      $field.val($field.val().replace(new RegExp("\\b" + tag + "\\b", "gi"), " "));
     } else {
-      $field.val(tags.concat([tag]).join(" ") + " ");
+      $field.val($field.val() + " " + tag);
     }
+    $field.val($field.val().trim().replace(/ +/g, " "));
 
     $field[0].selectionStart = $field.val().length;
     Danbooru.RelatedTag.build_all();
