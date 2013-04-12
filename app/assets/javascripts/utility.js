@@ -74,6 +74,10 @@
     return filtered;
   }
 
+  Danbooru.regexp_escape = function(string) {
+    return string.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
+  }
+
   $.fn.selectRange = function(start, end) {
     return this.each(function() {
       if (this.setSelectionRange) {

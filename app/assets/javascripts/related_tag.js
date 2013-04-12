@@ -194,7 +194,8 @@
     var tag = $(e.target).html().replace(/ /g, "_").replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&amp;/g, "&");
 
     if ($.inArray(tag, tags) > -1) {
-      $field.val($field.val().replace(new RegExp("\\b" + tag + "\\b", "gi"), " "));
+      var escaped_tag = Danbooru.regexp_escape(tag);
+      $field.val($field.val().replace(new RegExp("(^|\\s)" + escaped_tag + "($|\\s)", "gi"), "$1$2"));
     } else {
       $field.val($field.val() + " " + tag);
     }
