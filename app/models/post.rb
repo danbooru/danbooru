@@ -493,6 +493,22 @@ class Post < ActiveRecord::Base
 
       return tag_array.first
     end
+
+    def tag_string_copyright
+      copyright_tags.join(" ")
+    end
+
+    def tag_string_character
+      character_tags.join(" ")
+    end
+
+    def tag_string_artist
+      artist_tags.join(" ")
+    end
+
+    def tag_string_general
+      general_tags.join(" ")
+    end
   end
 
   module FavoriteMethods
@@ -856,7 +872,7 @@ class Post < ActiveRecord::Base
       options[:except] += hidden_attributes
       unless options[:builder]
         options[:methods] ||= []
-        options[:methods] += [:uploader_name, :has_large]
+        options[:methods] += [:uploader_name, :has_large, :tag_string_artist, :tag_string_character, :tag_string_copyright, :tag_string_general]
       end
       hash = super(options)
       hash
@@ -867,6 +883,10 @@ class Post < ActiveRecord::Base
       options[:procs] ||= []
       options[:procs] << lambda {|options, record| options[:builder].tag!("uploader-name", record.uploader_name)}
       options[:procs] << lambda {|options, record| options[:builder].tag!("has-large", record.has_large?, :type => "boolean")}
+      options[:procs] << lambda {|options, record| options[:builder].tag!("tag-string-artist", record.tag_string_artist)}
+      options[:procs] << lambda {|options, record| options[:builder].tag!("tag-string-character", record.tag_string_character)}
+      options[:procs] << lambda {|options, record| options[:builder].tag!("tag-string-copyright", record.tag_string_copyright)}
+      options[:procs] << lambda {|options, record| options[:builder].tag!("tag-string-general", record.tag_string_general)}
       super(options, &block)
     end
 
