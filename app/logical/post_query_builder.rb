@@ -207,7 +207,7 @@ class PostQueryBuilder
     elsif q[:parent_neg] == "none" || q[:parent] == "any"
       relation = relation.where("posts.parent_id IS NOT NULL")
     elsif q[:parent]
-      relation = relation.where("(posts.id = ? or posts.parent_id = ?)", q[:parent], q[:parent])
+      relation = relation.where("(posts.id = ? or posts.parent_id = ?)", q[:parent].to_i, q[:parent].to_i)
       has_constraints!
     end
 
