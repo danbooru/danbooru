@@ -3,6 +3,7 @@ class ApiCacheGenerator
     File.open("#{Rails.root}/public/cache/tags.json", "w") do |f|
       f.print("[")
       Tag.find_each do |tag|
+        next unless tag.post_count > 0
         hash = {
           "name" => tag.name,
           "id" => tag.id,
