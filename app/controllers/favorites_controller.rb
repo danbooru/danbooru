@@ -4,6 +4,8 @@ class FavoritesController < ApplicationController
   def index
     if params[:tags]
       redirect_to(posts_path(:tags => params[:tags]))
+    elsif request.format == Mime::JS
+      list_favorited_users
     else
       @favorite_set = PostSets::Favorite.new(CurrentUser.user, params[:page], params)
     end
@@ -21,5 +23,10 @@ class FavoritesController < ApplicationController
   def destroy
     @post = Post.find(params[:id])
     @post.remove_favorite!(CurrentUser.user)
+  end
+
+  def list_favorited_users
+    @post = Post.find(params[:post_id])
+    render :action => "list_favorited_users"
   end
 end

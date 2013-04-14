@@ -1,0 +1,1 @@
+<br><%= post.favorited_users.reverse_each.map{|user| link_to_user(user)}.join(", ").html_safe %>

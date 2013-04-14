@@ -543,6 +543,10 @@ class Post < ActiveRecord::Base
     def favorited_user_ids
       fav_string.scan(/\d+/)
     end
+
+    def favorited_users
+      favorited_user_ids.map {|id| User.find_by_id(id)}
+    end
   end
 
   module UploaderMethods
