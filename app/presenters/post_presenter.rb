@@ -86,7 +86,7 @@ class PostPresenter < Presenter
       string << @post.general_tags.join(" ")
     end
 
-    string.join("\n")
+    string.join(" \n")
   end
 
   def humanized_categorized_tag_string
