@@ -199,7 +199,7 @@
     } else {
       $field.val($field.val() + " " + tag);
     }
-    $field.val($field.val().trim().replace(/ +/g, " "));
+    $field.val($field.val().trim().replace(/ +/g, " ") + " ");
 
     $field[0].selectionStart = $field.val().length;
     Danbooru.RelatedTag.build_all();
