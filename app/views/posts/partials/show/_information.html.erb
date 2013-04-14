@@ -1,6 +1,6 @@
 <ul>
   <li>ID: <%= post.id %></li>
-  <li>Uploader: <%= link_to_user_unless(post.uploader.nil?, post.uploader) + " " + link_to("&raquo;".html_safe, posts_path(:tags => "user:#{post.uploader.name}")) %></li>
+  <li>Uploader: <%= link_to_user_unless(post.uploader.nil?, post.uploader) + "&nbsp;".html_safe + link_to("&raquo;".html_safe, posts_path(:tags => "user:#{post.uploader.name}")) %></li>
   <li>Date: <%= link_to time_ago_in_words_tagged(post.created_at), posts_path(:tags => "date:#{post.created_at.to_date}") %></li>
   <% if post.approver %>
     <li>Approver: <%= link_to_user(post.approver) %></li>
