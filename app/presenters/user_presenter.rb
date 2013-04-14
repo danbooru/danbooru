@@ -95,6 +95,10 @@ class UserPresenter
     template.link_to(WikiPageVersion.for_user(user.id).count, template.wiki_page_versions_path(:search => {:updater_id => user.id}))
   end
 
+  def artist_version_count(template)
+    template.link_to(ArtistVersion.for_user(user.id).count, template.artist_versions_path(:search => {:updater_id => user.id}))
+  end
+
   def forum_post_count(template)
     template.link_to(ForumPost.for_user(user.id).count, template.forum_posts_path(:search => {:creator_id => user.id}))
   end
