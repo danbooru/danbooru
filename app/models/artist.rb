@@ -254,7 +254,7 @@ class Artist < ActiveRecord::Base
         q = q.any_name_matches(params[:name])
       end
 
-      if params[:sort] == "Name"
+      if params[:sort] == "name"
         q = q.reorder("name")
       else
         q = q.reorder("id desc")

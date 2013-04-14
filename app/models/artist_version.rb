@@ -2,26 +2,38 @@ class ArtistVersion < ActiveRecord::Base
   belongs_to :updater, :class_name => "User"
   belongs_to :artist
 
-  def self.search(params)
-    q = scoped
-    return q if params.blank?
-
-    if params[:name]
-      q = q.where("name like ? escape E'\\\\'", params[:name].to_escaped_for_sql_like)
+  module SearchMethods
+    def for_user(user_id)
+      where("updater_id = ?", user_id)
     end
 
-    if params[:artist_id]
-      q = q.where("artist_id = ?", params[:artist_id].to_i)
-    end
+    def search(params)
+      q = scoped
+      return q if params.blank?
 
-    if params[:sort] == "Name"
-      q = q.reorder("name")
-    else
-      q = q.reorder("id desc")
-    end
+      if params[:name].present?
+        q = q.where("name like ? escape E'\\\\'", params[:name].to_escaped_for_sql_like)
+      end
 
-    q
+      if params[:updater_id].present?
+        q = q.for_user(params[:updater_id].to_i)
+      end
+
+      if params[:artist_id].present?
+        q = q.where("artist_id = ?", params[:artist_id].to_i)
+      end
+
+      if params[:sort] == "name"
+        q = q.reorder("name")
+      else
+        q = q.reorder("id desc")
+      end
+
+      q
+    end
   end
+
+  extend SearchMethods
 
   def url_array
     url_string.to_s.scan(/\S+/)
