@@ -506,7 +506,7 @@ class User < ActiveRecord::Base
 
   module ApiMethods
     def hidden_attributes
-      super + [:password_hash, :bcrypt_password_hash, :email, :email_verification_key, :time_zone, :created_at, :updated_at, :receive_email_notifications, :last_logged_in_at, :last_forum_read_at, :has_mail, :default_image_size, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :base_upload_limit, :recent_tags, :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout]
+      super + [:password_hash, :bcrypt_password_hash, :email, :email_verification_key, :time_zone, :created_at, :updated_at, :receive_email_notifications, :last_logged_in_at, :last_forum_read_at, :has_mail, :default_image_size, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :base_upload_limit, :recent_tags, :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :enable_sequential_post_navigation, :hide_deleted_posts, :per_page]
     end
 
     def serializable_hash(options = {})
