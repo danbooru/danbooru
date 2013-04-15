@@ -104,7 +104,7 @@
       $dest.append(Danbooru.RelatedTag.build_html("recent", Danbooru.RelatedTag.recent_tags()));
     }
     if (Danbooru.RelatedTag.favorite_tags().length) {
-      $dest.append(Danbooru.RelatedTag.build_html("favorite", Danbooru.RelatedTag.favorite_tags()));
+      $dest.append(Danbooru.RelatedTag.build_html("frequent", Danbooru.RelatedTag.favorite_tags()));
     }
     $dest.append(Danbooru.RelatedTag.build_html(query, related_tags));
     if (wiki_page_tags.length) {
