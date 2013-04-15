@@ -1,5 +1,5 @@
 class Tag < ActiveRecord::Base
-  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|-pool|pool|-fav|fav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|score|favcount|filesize|source|id|date|order|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|-parent|pixiv_id|pixiv"
+  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|-pool|pool|-fav|fav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|score|favcount|filesize|source|id|date|age|order|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|-parent|pixiv_id|pixiv"
   attr_accessible :category
   has_one :wiki_page, :foreign_key => "name", :primary_key => "title"
 
@@ -186,6 +186,33 @@ class Tag < ActiveRecord::Base
           nil
         end
 
+      when :age
+        object =~ /(\d+)(s(econds?)?|mi(nutes?)?|h(ours?)?|d(ays?)?|w(eeks?)?|mo(nths?)?|y(ears?)?)/i
+
+        size = $1.to_i
+        unit = $2
+
+        conversion_factor = case unit
+        when /^s/i
+          1.second
+        when /^mi/i
+          1.minute
+        when /^h/i
+          1.hour
+        when /^d/i
+          1.day
+        when /^w/i
+          1.week
+        when /^mo/i
+          1.month
+        when /^y/i
+          1.year
+        else
+          1.second
+        end
+
+        (size * conversion_factor).to_i
+
       when :filesize
         object =~ /\A(\d+(?:\.\d*)?|\d*\.\d+)([kKmM]?)[bB]?\Z/
 
@@ -349,6 +376,9 @@ class Tag < ActiveRecord::Base
 
           when "date"
             q[:date] = parse_helper($2, :date)
+
+          when "age"
+            q[:age] = parse_helper($2, :age)
 
           when "tagcount"
             q[:post_tag_count] = parse_helper($2)
