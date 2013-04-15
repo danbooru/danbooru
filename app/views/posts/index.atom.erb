@@ -2,8 +2,8 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom">
 	<title><%= Danbooru.config.app_name %></title>
-	<link href="http://<%= Danbooru.config.hostname %>/post/atom" rel="self"/>
-  <link href="http://<%= Danbooru.config.hostname %>/post/index" rel="alternate"/>
+	<link href="http://<%= Danbooru.config.hostname %>/posts.atom" rel="self"/>
+  <link href="http://<%= Danbooru.config.hostname %>/posts" rel="alternate"/>
   <id>http://<%= Danbooru.config.hostname %>/posts.atom?tags=<%= params[:tags] %></id>
   <% if @posts.any? %>
     <updated><%= @posts[0].created_at.gmtime.xmlschema %></updated>
@@ -25,6 +25,7 @@
           <a href="http://<%= Danbooru.config.hostname %>/posts/<%= post.id %>">
             <img src="http://<%= Danbooru.config.hostname %><%= post.preview_file_url %>"/>
           </a>
+          <p><%= post.tag_string %></p>
         </div>
       </content>
       <author>
