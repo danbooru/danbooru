@@ -17,7 +17,7 @@ module Downloads
 
     context "a download for a html page" do
       setup do
-        @source = "http://www.pixiv.net/member_illust.php?mode=big&illust_id=23828655"
+        # @source = "http://www.pixiv.net/member_illust.php?mode=big&illust_id=23828655"
         @source = "http://www.pixiv.net/member_illust.php?mode=big&illust_id=4348318"
         @tempfile = Tempfile.new("danbooru-test")
         @download = Downloads::File.new(@source, @tempfile.path)

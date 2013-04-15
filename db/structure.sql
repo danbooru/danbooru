@@ -2297,6 +2297,8 @@ CREATE TABLE posts (
     id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
+    up_score integer DEFAULT 0 NOT NULL,
+    down_score integer DEFAULT 0 NOT NULL,
     score integer DEFAULT 0 NOT NULL,
     source character varying(255),
     md5 character varying(255) NOT NULL,
@@ -2329,8 +2331,6 @@ CREATE TABLE posts (
     parent_id integer,
     has_children boolean DEFAULT false NOT NULL,
     is_banned boolean DEFAULT false NOT NULL,
-    up_score integer,
-    down_score integer,
     pixiv_id integer
 );
 
@@ -6180,13 +6180,6 @@ CREATE INDEX index_wiki_pages_on_title_pattern ON wiki_pages USING btree (title 
 
 
 --
--- Name: index_wiki_pages_on_updated_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_wiki_pages_on_updated_at ON wiki_pages USING btree (updated_at);
-
-
---
 -- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -6391,13 +6384,9 @@ INSERT INTO schema_migrations (version) VALUES ('20130318012517');
 
 INSERT INTO schema_migrations (version) VALUES ('20130318030619');
 
-INSERT INTO schema_migrations (version) VALUES ('20130318031705');
-
 INSERT INTO schema_migrations (version) VALUES ('20130318231740');
 
 INSERT INTO schema_migrations (version) VALUES ('20130320070700');
-
-INSERT INTO schema_migrations (version) VALUES ('20130321144736');
 
 INSERT INTO schema_migrations (version) VALUES ('20130322162059');
 
