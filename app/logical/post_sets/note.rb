@@ -11,7 +11,7 @@ module PostSets
     end
     
     def limit
-      params[:limit] || CurrentUser.user.per_page
+     [(params[:limit] || CurrentUser.user.per_page).to_i, 1_000].min
     end
   end
 end
