@@ -234,6 +234,10 @@ div#c-posts {
       float: right;
     }
 
+    .pool-name, .search-name {
+      word-wrap: break-word;
+    }
+
     #nav-links {
       margin: 1em 0;
       padding: 1em 0.5em;
