@@ -57,6 +57,11 @@ namespace :data do
 
     run "rm -f #{release_path}/public/images/advertisements"
     run "ln -s #{deploy_to}/shared/advertisements #{release_path}/public/images/advertisements"
+
+    run "mkdir -p #{release_path}/public/cache"
+    run "mkdir -p #{deploy_to}/shared/system/cache"
+    run "touch #{deploy_to}/shared/system/cache/tags.json"
+    run "ln -s #{deploy_to}/shared/system/cache/tags.json #{release_path}/public/cache/tags.json"
   end
 end
 
