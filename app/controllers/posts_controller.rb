@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
   before_filter :member_only, :except => [:show, :show_seq, :index]
-  before_fitler :janitor_only, :only => [:ban, :unban]
+  before_filter :janitor_only, :only => [:ban, :unban]
   after_filter :save_recent_tags, :only => [:update]
   respond_to :html, :xml, :json
   rescue_from PostSets::SearchError, :with => :rescue_exception
