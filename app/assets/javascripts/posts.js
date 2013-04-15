@@ -18,6 +18,7 @@
 
     if ($("#c-posts").length && $("#a-show").length) {
       this.initialize_links();
+      this.initialize_favlist();
       this.initialize_post_sections();
       this.initialize_post_image_resize_links();
       this.initialize_post_image_resize_to_window_link();
@@ -130,6 +131,25 @@
     $("#side-edit-link").click(function(e) {
       $("#post-edit-link").trigger("click");
       $("#post_tag_string").trigger("focus");
+      e.preventDefault();
+    });
+  }
+
+  Danbooru.Post.initialize_favlist = function() {
+    $("#favlist").hide();
+    $("#hide-favlist-link").hide();
+
+    $("#show-favlist-link").click(function(e) {
+      $("#favlist").show();
+      $(this).hide();
+      $("#hide-favlist-link").show();
+      e.preventDefault();
+    });
+
+    $("#hide-favlist-link").click(function(e) {
+      $("#favlist").hide();
+      $(this).hide();
+      $("#show-favlist-link").show();
       e.preventDefault();
     });
   }

@@ -14,7 +14,12 @@
   <li>Source: <%= post_source_tag(post) %></li>
   <li>Rating: <%= post.pretty_rating %></li>
   <li>Score: <span id="score-for-post-<%= post.id %>"><%= post.score %></span> <% if CurrentUser.is_privileged? %>(vote <%= link_to "up", post_votes_path(:post_id => post.id, :score => "up"), :remote => true, :method => :post %>/<%= link_to "down", post_votes_path(:post_id => post.id, :score => "down"), :remote => true, :method => :post %>)<% end %></li>
-  <li>Favorites: <span id="favcount-for-post-<%= post.id %>"><%= post.fav_count %></span> <% if CurrentUser.is_privileged? && post.fav_count > 0 %><span id="favlist-for-post-<%= post.id %>"><%= link_to "&raquo;".html_safe, favorites_path(:post_id => post.id), :remote => true %></span><% end %></li>
+  <li>Favorites: <span id="favcount-for-post-<%= post.id %>"><%= post.fav_count %></span>
+  <% if CurrentUser.is_privileged? && post.fav_count > 0 %>
+    <%= link_to "&raquo;".html_safe, favorites_path(:post_id => post.id), :remote => true, :id => "show-favlist-link" %>
+    <%= link_to "&laquo;".html_safe, "#", :id => "hide-favlist-link" %>
+    <div id="favlist" style="margin-left:1.5em; word-wrap:break-word"></div>
+  <% end %></li>
   <li>
     Status:
     <% if post.is_pending? %>
