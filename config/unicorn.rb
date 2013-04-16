@@ -13,7 +13,11 @@ timeout 180
 listen "127.0.0.1:9000"
 
 # Spawn unicorn master worker for user apps (group: apps)
-user 'albert', 'albert'
+if Socket.gethostname =~ /li246/
+  user 'danbooru', 'danbooru'
+else
+  user 'albert', 'albert'
+end
 
 # Fill path to your app
 working_directory app_path
