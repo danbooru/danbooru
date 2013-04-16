@@ -92,6 +92,7 @@ GEM
     i18n (0.6.4)
     journey (1.0.4)
     json (1.7.7)
+    kgio (2.8.0)
     libv8 (3.11.8.17)
     mail (2.4.4)
       i18n (>= 0.4.0)
@@ -144,6 +145,7 @@ GEM
       rake (>= 0.8.7)
       rdoc (~> 3.4)
       thor (>= 0.14.6, < 2.0)
+    raindrops (0.10.0)
     rake (10.0.4)
     rdoc (3.12.2)
       json (~> 1.4)
@@ -191,6 +193,10 @@ GEM
     unf (0.1.1)
       unf_ext
     unf_ext (0.0.6)
+    unicorn (4.6.2)
+      kgio (~> 2.6)
+      rack
+      raindrops (~> 0.7)
     webrobots (0.1.1)
     whenever (0.8.2)
       activesupport (>= 2.3.4)
@@ -231,4 +237,5 @@ DEPENDENCIES
   term-ansicolor
   therubyracer
   uglifier (>= 1.0.3)
+  unicorn
   whenever
