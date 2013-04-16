@@ -35,7 +35,12 @@ gem 'bcrypt-ruby', :require => "bcrypt"
 gem 'aws-s3', :require => "aws/s3"
 gem 'awesome_print'
 
+group :production do
+  gem 'capistrano-unicorn', :require => false
+end
+
 group :development do
   gem 'ruby-prof'
   gem 'pry'
 end
+
