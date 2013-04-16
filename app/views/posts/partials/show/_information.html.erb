@@ -18,7 +18,7 @@
   <% if CurrentUser.is_privileged? && post.fav_count > 0 %>
     <%= link_to "&raquo;".html_safe, favorites_path(:post_id => post.id), :remote => true, :id => "show-favlist-link" %>
     <%= link_to "&laquo;".html_safe, "#", :id => "hide-favlist-link" %>
-    <div id="favlist" style="margin-left:1.5em; word-wrap:break-word"></div>
+    <div id="favlist"></div>
   <% end %></li>
   <li>
     Status:
