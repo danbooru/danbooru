@@ -2,22 +2,14 @@
 app_path = "/var/www/danbooru2/current"
 
 # Set unicorn options
-if Socket.gethostname =~ /sonohara|hijiribe/
-  worker_processes 12
-else
-  worker_processes 1
-end
+worker_processes 12
 
 preload_app false
 timeout 180
 listen "127.0.0.1:9000"
 
 # Spawn unicorn master worker for user apps (group: apps)
-if Socket.gethostname =~ /li246/
-  user 'danbooru', 'danbooru'
-else
-  user 'albert', 'albert'
-end
+user 'albert', 'albert'
 
 # Fill path to your app
 working_directory app_path
