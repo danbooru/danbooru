@@ -92,15 +92,14 @@ class Tag < ActiveRecord::Base
       Danbooru.config.other_server_hosts.each do |host|
         delay(:queue => host).update_category_cache
       end
-
       delay(:queue => "default").update_category_post_counts
     end
 
     def update_category_post_counts
-      Post.raw_tag_match(name).find_each do |post|
-        post.reload
-        post.set_tag_counts
-        Post.with_timeout(10_000, nil) do
+      Post.with_timeout(30_000, nil) do
+        Post.raw_tag_match(name).find_each do |post|
+          post.reload
+          post.set_tag_counts
           post.update_column(:tag_count, post.tag_count)
           post.update_column(:tag_count_general, post.tag_count_general)
           post.update_column(:tag_count_artist, post.tag_count_artist)

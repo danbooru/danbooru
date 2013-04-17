@@ -1,6 +1,5 @@
 class PostsController < ApplicationController
   before_filter :member_only, :except => [:show, :show_seq, :index]
-  before_filter :janitor_only, :only => [:ban, :unban]
   after_filter :save_recent_tags, :only => [:update]
   respond_to :html, :xml, :json
   rescue_from PostSets::SearchError, :with => :rescue_exception
@@ -68,19 +67,6 @@ class PostsController < ApplicationController
       format.js
     end
   end
-
-  def ban
-    @post = Post.find(params[:id])
-    @post.update_attribute(:is_banned, true)
-    redirect_to(post_path(@post), :notice => "Post was banned")
-  end
-
-  def unban
-    @post = Post.find(params[:id])
-    @post.update_attribute(:is_Banned, false)
-    redirect_to(post_path(@post), :notice => "Post was unbanned")
-  end
-
 
 private
   def tag_query

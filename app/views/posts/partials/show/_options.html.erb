@@ -35,9 +35,9 @@
       <% end %>
 
       <% if post.is_banned? %>
-        <li><%= link_to "Unban", unban_post_path(post), :method => :post %></li>
+        <li><%= link_to "Unban", unban_moderator_post_post_path(post), :method => :post %></li>
       <% else %>
-        <li><%= link_to "Ban", ban_post_path(post), :method => :post %></li>
+        <li><%= link_to "Ban", confirm_ban_moderator_post_post_path(post) %></li>
       <% end %>
 
       <% if CurrentUser.is_admin? %>

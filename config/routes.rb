@@ -22,6 +22,9 @@ Danbooru::Application.routes.draw do
           post :expunge
           post :delete
           post :undelete
+          get :confirm_ban
+          post :ban
+          post :unban
         end
       end
     end
@@ -139,8 +142,6 @@ Danbooru::Application.routes.draw do
     member do
       put :revert
       get :show_seq
-      post :ban
-      post :unban
     end
   end
   resources :post_appeals, :only => [:new, :index, :create]
