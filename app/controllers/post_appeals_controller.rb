@@ -23,6 +23,11 @@ class PostAppealsController < ApplicationController
     respond_with(@post_appeal)
   end
 
+  def show
+    @post_appeal = PostAppeal.find(params[:id])
+    respond_with(@post_appeal)
+  end
+
 private
   def check_privilege(post_appeal)
     raise User::PrivilegeError unless (post_appeal.creator_id == CurrentUser.id || CurrentUser.is_moderator?)

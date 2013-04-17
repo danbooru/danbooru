@@ -144,8 +144,8 @@ Danbooru::Application.routes.draw do
       get :show_seq
     end
   end
-  resources :post_appeals, :only => [:new, :index, :create]
-  resources :post_flags, :only => [:new, :index, :create]
+  resources :post_appeals
+  resources :post_flags
   resources :post_versions, :only => [:index, :search] do
     collection do
       get :search
