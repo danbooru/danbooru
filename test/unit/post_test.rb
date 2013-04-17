@@ -56,6 +56,15 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      context "with the banned_artist tag" do
+        should "also ban the post" do
+          post = FactoryGirl.create(:post, :tag_string => "banned_artist")
+          post.delete!
+          post.reload
+          assert(post.is_banned?)
+        end
+      end
+
       should "update the fast count" do
         post = FactoryGirl.create(:post, :tag_string => "aaa")
         assert_equal(1, Post.fast_count)

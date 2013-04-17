@@ -817,7 +817,7 @@ class Post < ActiveRecord::Base
         update_column(:is_deleted, true)
         update_column(:is_pending, false)
         update_column(:is_flagged, false)
-        update_column(:is_banned, true) if options[:ban]
+        update_column(:is_banned, true) if options[:ban] || has_tag?("banned_artist")
 
         unless options[:without_mod_action]
           ModAction.create(:description => "deleted post ##{id}")
