@@ -460,7 +460,7 @@ class Post < ActiveRecord::Base
     end
 
     def artist_tags_excluding_hidden
-      artist_tags - %(banned_artist)
+      artist_tags - %w(banned_artist)
     end
 
     def general_tags
