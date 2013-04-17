@@ -797,6 +797,16 @@ class Post < ActiveRecord::Base
       destroy
     end
 
+    def ban!
+      update_column(:is_banned, true)
+      ModAction.create(:description => "banned post ##{id}")
+    end
+
+    def unban!
+      update_column(:is_banned, false)
+      ModAction.create(:description => "unbanned post ##{id}")
+    end
+
     def delete!(options = {})
       if is_status_locked?
         self.errors.add(:is_status_locked, "; cannot delete post")

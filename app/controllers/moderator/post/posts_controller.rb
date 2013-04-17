@@ -35,14 +35,14 @@ module Moderator
       def ban
         @post = ::Post.find(params[:id])
         if params[:commit] == "Ban"
-          @post.update_column(:is_banned, true)
+          @post.ban!
         end
         redirect_to(post_path(@post), :notice => "Post was banned")
       end
 
       def unban
         @post = ::Post.find(params[:id])
-        @post.update_attribute(:is_banned, false)
+        @post.unban!
         redirect_to(post_path(@post), :notice => "Post was unbanned")
       end
     end
