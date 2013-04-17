@@ -247,6 +247,13 @@ div#c-posts {
       margin-right: 7em;
     }
 
+    #favlist {
+      margin-left: 1.5em;
+      word-wrap: break-word;
+      max-height: 200px;
+      overflow: auto;
+    }
+
     #pool-nav, #search-seq-nav, #nav-help {
       li {
         position: relative;

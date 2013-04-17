@@ -190,7 +190,7 @@ class Tag < ActiveRecord::Base
         end
 
       when :age
-        object =~ /(\d+)(s(econds?)?|mi(nutes?)?|h(ours?)?|d(ays?)?|w(eeks?)?|mo(nths?)?|y(ears?)?)/i
+        object =~ /(\d+)(s(econds?)?|mi(nutes?)?|h(ours?)?|d(ays?)?|w(eeks?)?|mo(nths?)?|y(ears?)?)?/i
 
         size = $1.to_i
         unit = $2
