@@ -73,9 +73,13 @@ class Tag < ActiveRecord::Base
       end
 
       def categories_for(tag_names)
-        Cache.get_multi(tag_names, "tc") do |name|
-          select_category_for(name)
+        Array(tag_names).inject({}) do |hash, tag_name|
+          hash[tag_name] = category_for(tag_name)
+          hash
         end
+        # Cache.get_multi(tag_names, "tc") do |name|
+        #   select_category_for(name)
+        # end
       end
     end
 
