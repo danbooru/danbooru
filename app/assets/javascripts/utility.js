@@ -3,16 +3,22 @@
     return $("meta[name=" + key + "]").attr("content");
   }
 
+  Danbooru.scrolling = false;
+
   Danbooru.scroll_to = function(element) {
+    if (Danbooru.scrolling) {
+      return;
+    } else {
+      Danbooru.scrolling = true;
+    }
+
     var top = null;
     if (typeof(element) === "number") {
       top = element;
     } else {
       top = element.offset().top - 10;
     }
-    $('html, body').animate({
-        scrollTop: top
-    }, 300);
+    $('html, body').animate({scrollTop: top}, 200, "linear", function() {Danbooru.scrolling = false;});
   }
 
   Danbooru.notice = function(msg) {
