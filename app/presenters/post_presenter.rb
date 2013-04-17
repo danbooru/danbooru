@@ -59,9 +59,9 @@ class PostPresenter < Presenter
       string << (@post.character_tags.any? ? "(#{copytags})" : copytags)
     end
 
-    if @post.artist_tags.any?
+    if @post.artist_tags_excluding_hidden.any?
       string << "drawn by"
-      string << @post.artist_tags.to_sentence
+      string << @post.artist_tags_excluding_hidden.to_sentence
     end
 
     string.empty? ? "##{@post.id}" : string.join(" ").tr("_", " ")

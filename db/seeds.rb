@@ -1,17 +1,51 @@
+require 'set'
+
 CurrentUser.ip_addr = "127.0.0.1"
 Delayed::Worker.delay_jobs = false
+$used_names = Set.new([""])
+
+def rand_string(n)
+  string = ""
+
+  n = rand(n) + 1
+
+  while $used_names.include?(string)
+    consonants = "bcdfghjklmnpqrstvwxz".scan(/./)
+    vowels = "aeiouy".scan(/./)
+    string = ""
+    n.times do
+      string << consonants[rand(consonants.size)]
+      string << vowels[rand(vowels.size)]
+    end
+  end
+
+  $used_names.add(string)
+  string
+end
+
+def rand_sentence(n)
+  (0..n).map {rand_string(6)}.join(" ") + "."
+end
+
+def rand_paragraph(n)
+  (0..n).map {rand_sentence(6)}.join(" ")
+end
+
+def rand_document(n)
+  (0..n).map {rand_pargraph(6)}.join("\n\n")
+end
 
 if User.count == 0
   puts "Creating users"
   user = User.create(
-    :name => "albert",
+    :name => "admin",
     :password => "password1",
     :password_confirmation => "password1"
   )
 
-  0.upto(100) do |i|
+  0.upto(10) do |i|
     User.create(
-      :name => i.to_s * 5,
+      :name => rand_string(8),
       :password => i.to_s * 5,
       :password_confirmation => i.to_s * 5
     )
@@ -31,7 +65,7 @@ if Upload.count == 0
     width = rand(2000) + 100
     height = rand(2000) + 100
     url = "http://ipsumimage.appspot.com/#{width}x#{height}"
-    tags = (i * i * i).to_s.scan(/./).uniq.join(" ")
+    tags = rand_sentence(6).scan(/[a-z]+/).join(" ")
 
     Upload.create(:source => url, :content_type => "image/gif", :rating => "q", :tag_string => tags, :server => Socket.gethostname)
   end
@@ -52,7 +86,7 @@ if Comment.count == 0
   puts "Creating comments"
   Post.all.each do |post|
     rand(30).times do
-      Comment.create(:post_id => post.id, :body => Time.now.to_f.to_s)
+      Comment.create(:post_id => post.id, :body => rand_paragraph(6))
     end
   end
 else
@@ -66,7 +100,7 @@ if Note.count == 0
       note = Note.create(:post_id => post.id, :x => 0, :y => 0, :width => 100, :height => 100, :body => Time.now.to_f.to_s)
 
       rand(30).times do |i|
-        note.update_attributes(:body => (i * i).to_s)
+        note.update_attributes(:body => rand_sentence(6))
       end
     end
   end
@@ -77,7 +111,7 @@ end
 if Artist.count == 0
   puts "Creating artists"
   0.upto(100) do |i|
-    Artist.create(:name => i.to_s)
+    Artist.create(:name => rand_string(6))
   end
 else
   puts "Skipping artists"
@@ -87,7 +121,7 @@ if TagAlias.count == 0
   puts "Creating tag aliases"
 
   100.upto(199) do |i|
-    TagAlias.create(:antecedent_name => i.to_s, :consequent_name => (i * 100).to_s)
+    TagAlias.create(:antecedent_name => rand_string(6), :consequent_name => rand_string(6))
   end
 else
   puts "Skipping tag aliases"
@@ -97,7 +131,7 @@ if TagImplication.count == 0
   puts "Creating tag implictions"
 
   100_000.upto(100_100) do |i|
-    TagImplication.create(:antecedent_name => i.to_s, :consequent_name => (i * 100).to_s)
+    TagImplication.create(:antecedent_name => rand_string(6), :consequent_name => rand_string(6))
   end
 else
   puts "Skipping tag implications"
@@ -130,10 +164,10 @@ if ForumTopic.count == 0
   puts "Creating forum posts"
 
   100.times do |i|
-    topic = ForumTopic.create(:title => Time.now.to_f.to_s)
+    topic = ForumTopic.create(:title => rand_sentence(6))
 
     rand(100).times do |j|
-      post = ForumPost.create(:topic_id => topic.id, :body => Time.now.to_f.to_s)
+      post = ForumPost.create(:topic_id => topic.id, :body => rand_document(6))
     end
   end
 end

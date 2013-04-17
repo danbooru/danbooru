@@ -73,9 +73,13 @@ class Tag < ActiveRecord::Base
       end
 
       def categories_for(tag_names)
-        Cache.get_multi(tag_names, "tc") do |name|
-          select_category_for(name)
+        Array(tag_names).inject({}) do |hash, tag_name|
+          hash[tag_name] = category_for(tag_name)
+          hash
         end
+        # Cache.get_multi(tag_names, "tc") do |name|
+        #   select_category_for(name)
+        # end
       end
     end
 
@@ -92,15 +96,14 @@ class Tag < ActiveRecord::Base
       Danbooru.config.other_server_hosts.each do |host|
         delay(:queue => host).update_category_cache
       end
-
       delay(:queue => "default").update_category_post_counts
     end
 
     def update_category_post_counts
-      Post.raw_tag_match(name).find_each do |post|
-        post.reload
-        post.set_tag_counts
-        Post.with_timeout(10_000, nil) do
+      Post.with_timeout(30_000, nil) do
+        Post.raw_tag_match(name).find_each do |post|
+          post.reload
+          post.set_tag_counts
           post.update_column(:tag_count, post.tag_count)
           post.update_column(:tag_count_general, post.tag_count_general)
           post.update_column(:tag_count_artist, post.tag_count_artist)
@@ -187,7 +190,7 @@ class Tag < ActiveRecord::Base
         end
 
       when :age
-        object =~ /(\d+)(s(econds?)?|mi(nutes?)?|h(ours?)?|d(ays?)?|w(eeks?)?|mo(nths?)?|y(ears?)?)/i
+        object =~ /(\d+)(s(econds?)?|mi(nutes?)?|h(ours?)?|d(ays?)?|w(eeks?)?|mo(nths?)?|y(ears?)?)?/i
 
         size = $1.to_i
         unit = $2

@@ -44,6 +44,7 @@ class UsersController < ApplicationController
   def update
     @user = User.find(params[:id])
     check_privilege(@user)
+    sanitize_params!
     @user.update_attributes(params[:user], :as => CurrentUser.role)
     respond_with(@user)
   end
@@ -67,6 +68,14 @@ class UsersController < ApplicationController
   end
 
 private
+  def sanitize_params!
+    return if CurrentUser.is_admin?
+    
+    if params[:user] && params[:user][:level].to_i >= User::Levels::MODERATOR
+      params[:user][:level] = User::Levels::JANITOR
+    end
+  end
+
   def check_privilege(user)
     raise User::PrivilegeError unless (user.id == CurrentUser.id || CurrentUser.is_admin?)
   end

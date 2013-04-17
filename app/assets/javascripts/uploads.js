@@ -83,6 +83,19 @@
         $image.height(height * ratio);
         $image.width(width * ratio);
         $("#scale").html("Scaled " + parseInt(100 * ratio) + "% (original: " + width + "x" + height + ")");
+        $image.resizable({
+          maxHeight: height,
+          maxWidth: width,
+          aspectRatio: width/height,
+          handles: "e, s, se",
+          resize: function( event, ui ){
+            var origin_width = ui.element.resizable("option","maxWidth");
+            var origin_height = ui.element.resizable("option","maxHeight");
+            var height = ui.size.height;
+            var ratio = height/origin_height;
+            $("#scale").html("Scaled " + parseInt(100 * ratio) + "% (original: " + origin_width + "x" + origin_height + ")");
+          }
+        });
       }
     }
   }

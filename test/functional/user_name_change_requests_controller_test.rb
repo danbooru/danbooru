@@ -27,6 +27,17 @@ class UserNameChangeRequestsControllerTest < ActionController::TestCase
         get :show, {:id => @change_request.id}, {:user_id => @user.id}
         assert_response :success
       end
+
+      context "when the current user is not an admin and does not own the request" do
+        setup do
+          CurrentUser.user = FactoryGirl.create(:user)
+        end
+
+        should "fail" do
+          get :show, {:id => @change_request.id}
+          assert_redirected_to(new_session_path(:url => user_name_change_request_path(@change_request)))
+        end
+      end
     end
     
     context "for actions restricted to admins" do

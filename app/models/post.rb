@@ -459,6 +459,10 @@ class Post < ActiveRecord::Base
       typed_tags("artist")
     end
 
+    def artist_tags_excluding_hidden
+      artist_tags - %w(banned_artist)
+    end
+
     def general_tags
       typed_tags("general")
     end
@@ -793,6 +797,16 @@ class Post < ActiveRecord::Base
       destroy
     end
 
+    def ban!
+      update_column(:is_banned, true)
+      ModAction.create(:description => "banned post ##{id}")
+    end
+
+    def unban!
+      update_column(:is_banned, false)
+      ModAction.create(:description => "unbanned post ##{id}")
+    end
+
     def delete!(options = {})
       if is_status_locked?
         self.errors.add(:is_status_locked, "; cannot delete post")
@@ -803,7 +817,7 @@ class Post < ActiveRecord::Base
         update_column(:is_deleted, true)
         update_column(:is_pending, false)
         update_column(:is_flagged, false)
-        update_column(:is_banned, true) if options[:ban]
+        update_column(:is_banned, true) if options[:ban] || has_tag?("banned_artist")
 
         unless options[:without_mod_action]
           ModAction.create(:description => "deleted post ##{id}")

@@ -92,10 +92,10 @@ Danbooru.Note = {
       var ratio = $image.width() / parseFloat($("#image").data("original-width"));
       var $note = $("#notes > article[data-id=" + $note_box.data("id") + "]");
       $note_box.css({
-        top: parseFloat($note.data("y")) * ratio,
-        left: parseFloat($note.data("x")) * ratio,
-        width: parseFloat($note.data("width")) * ratio,
-        height: parseFloat($note.data("height")) * ratio
+        top: Math.ceil(parseFloat($note.data("y")) * ratio),
+        left: Math.ceil(parseFloat($note.data("x")) * ratio),
+        width: Math.ceil(parseFloat($note.data("width")) * ratio),
+        height: Math.ceil(parseFloat($note.data("height")) * ratio)
       });
       Danbooru.Note.Box.resize_inner_border($note_box);
     },

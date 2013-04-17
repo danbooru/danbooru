@@ -8,6 +8,7 @@ class DailyMaintenance
     Delayed::Job.delete_all(['created_at < ?', 1.day.ago])
     PostVote.delete_all(['created_at < ?', 1.month.ago])
     TagSubscription.process_all
+    ApiCacheGenerator.new.generate_tag_cache
     prune_ad_hits
   end
   
