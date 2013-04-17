@@ -1,6 +1,7 @@
 module Admin
   class UsersController < ApplicationController
     before_filter :moderator_only
+    rescue_from User::PrivilegeError, :with => :access_denied
 
     def edit
       @user = User.find(params[:id])
@@ -8,10 +9,23 @@ module Admin
 
     def update
       @user = User.find(params[:id])
+      sanitize_params!
       @user.level = params[:user][:level]
       @user.inviter_id = CurrentUser.id unless @user.inviter_id.present?
       @user.save
       redirect_to edit_admin_user_path(@user, :notice => "User updated"), :notice => "User updated"
+    end
+
+  protected
+    def sanitize_params!
+      # admins can do anything
+      return if CurrentUser.is_admin?
+
+      # can't promote/demote moderators
+      raise User::PrivilegeError if @user.is_moderator?
+
+      # can't promote to admin      
+      raise User::PrivilegeError if params[:user] && params[:user][:level].to_i >= User::Levels::ADMIN
     end
   end
 end
