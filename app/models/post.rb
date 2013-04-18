@@ -304,18 +304,18 @@ class Post < ActiveRecord::Base
     end
 
     def increment_tag_post_counts
-      execute_sql("UPDATE tags SET post_count = post_count + 1 WHERE name IN (?)", tag_array) if tag_array.any?
+      Post.execute_sql("UPDATE tags SET post_count = post_count + 1 WHERE name IN (?)", tag_array) if tag_array.any?
     end
 
     def decrement_tag_post_counts
-      execute_sql("UPDATE tags SET post_count = post_count - 1 WHERE name IN (?)", tag_array) if tag_array.any?
+      Post.execute_sql("UPDATE tags SET post_count = post_count - 1 WHERE name IN (?)", tag_array) if tag_array.any?
     end
 
     def update_tag_post_counts
       decrement_tags = tag_array_was - tag_array
       increment_tags = tag_array - tag_array_was
-      execute_sql("UPDATE tags SET post_count = post_count - 1 WHERE name IN (?)", decrement_tags) if decrement_tags.any?
-      execute_sql("UPDATE tags SET post_count = post_count + 1 WHERE name IN (?)", increment_tags) if increment_tags.any?
+      Post.execute_sql("UPDATE tags SET post_count = post_count - 1 WHERE name IN (?)", decrement_tags) if decrement_tags.any?
+      Post.execute_sql("UPDATE tags SET post_count = post_count + 1 WHERE name IN (?)", increment_tags) if increment_tags.any?
       Post.expire_cache_for_all(decrement_tags) if decrement_tags.any?
       Post.expire_cache_for_all(increment_tags) if increment_tags.any?
       Post.expire_cache_for_all([""]) if new_record? || id <= 100_000
@@ -612,7 +612,6 @@ class Post < ActiveRecord::Base
 
         votes.create(:score => score)
       else
-        puts "raising"
         raise PostVote::Error.new("You have already voted for this post")
       end
     end

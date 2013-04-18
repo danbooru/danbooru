@@ -60,16 +60,11 @@ class TagAlias < ActiveRecord::Base
   include CacheMethods
 
   def self.to_aliased(names)
-    alias_hash = Cache.get_multi(names.flatten, "ta") do |name|
-      ta = TagAlias.find_by_antecedent_name(name)
-      if ta && ta.is_active?
-        ta.consequent_name
-      else
-        name
+    Array(names).flatten.map do |name|
+      Cache.get("ta:#{Cache.sanitize(name)}") do
+        ActiveRecord::Base.select_value_sql("select consequent_name from tag_aliases where status = 'active' and antecedent_name = ?", name) || name
       end
-    end
-
-    alias_hash.values.flatten.uniq
+    end.uniq
   end
 
   def process!
