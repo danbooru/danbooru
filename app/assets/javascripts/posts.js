@@ -281,17 +281,19 @@
     $("#edit").hide();
   }
 
-  Danbooru.Post.notice_update = function(x) {
+  Danbooru.Post.notice_update = function(x, hide_msg) {
     if (x === "inc") {
       Danbooru.Post.pending_update_count += 1;
       Danbooru.notice("Updating posts (" + Danbooru.Post.pending_update_count + " pending)...");
     } else {
       Danbooru.Post.pending_update_count -= 1;
 
-      if (Danbooru.Post.pending_update_count < 1) {
-        Danbooru.notice("Posts updated");
-      } else {
-        Danbooru.notice("Updating posts (" + Post.pending_update_count + " pending)...");
+      if (!!hide_msg) {
+        if (Danbooru.Post.pending_update_count < 1) {
+          Danbooru.notice("Posts updated");
+        } else {
+          Danbooru.notice("Updating posts (" + Post.pending_update_count + " pending)...");
+        }
       }
     }
   }
@@ -304,23 +306,10 @@
   }
 
   Danbooru.Post.vote = function(score, id) {
-    Danbooru.Post.notice_update("inc");
+    Danbooru.notice("Voting...");
 
-    $.ajax({
-      type: "POST",
-      url: "/posts/" + id + "/votes",
-      data: {
-        score: score
-      },
-      complete: function() {
-        Danbooru.Post.notice_update("dec");
-      },
-      success: function(data, status, xhr) {
-        $("post-score-" + data.post_id).html(data.score);
-      },
-      error: function(data, status, xhr) {
-        Danbooru.notice("Error: " + data.reason);
-      }
+    $.post("/posts/" + id + "/votes.js", {
+       score: score
     });
   }
 

@@ -18,7 +18,7 @@
     } else {
       top = element.offset().top - 10;
     }
-    $('html, body').animate({scrollTop: top}, 200, "linear", function() {Danbooru.scrolling = false;});
+    $('html, body').animate({scrollTop: top}, 300, "linear", function() {Danbooru.scrolling = false;});
   }
 
   Danbooru.notice = function(msg) {

@@ -1,5 +1,6 @@
 <% if @error %>
-  Danbooru.error("<%= j @error.to_s %>");
+  Danbooru.notice("<%= j @error.to_s %>");
 <% else %>
+  Danbooru.notice("Vote saved");
   $("#score-for-post-<%= @post.id %>").html(<%= @post.score %>);
 <% end %>

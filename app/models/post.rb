@@ -527,8 +527,8 @@ class Post < ActiveRecord::Base
     def add_favorite!(user)
       return if favorited_by?(user.id)
       append_user_to_fav_string(user.id)
-      increment!(:fav_count)
-      increment!(:score) if CurrentUser.is_privileged?
+      Post.connection.execute_sql("update posts set fav_count = fav_count + 1 where id = #{id}")
+      Post.connection.execute_sql("update posts set score = score + 1 where id = #{id}") if CurrentUser.is_privileged?
       user.add_favorite!(self)
     end
 
@@ -538,8 +538,8 @@ class Post < ActiveRecord::Base
 
     def remove_favorite!(user)
       return unless favorited_by?(user.id)
-      decrement!(:fav_count)
-      decrement!(:score) if CurrentUser.is_privileged?
+      Post.connection.execute_sql("update posts set fav_count = fav_count - 1 where id = #{id}")
+      Post.connection.execute_sql("update posts set score = score - 1 where id = #{id}") if CurrentUser.is_privileged?
       delete_user_from_fav_string(user.id)
       user.remove_favorite!(self)
     end
@@ -597,7 +597,7 @@ class Post < ActiveRecord::Base
 
   module VoteMethods
     def can_be_voted_by?(user)
-      !votes.exists?(["user_id = ?", user.id])
+      !PostVote.exists?(:user_id => user.id, :post_id => id)
     end
 
     def vote!(score)
@@ -612,6 +612,7 @@ class Post < ActiveRecord::Base
 
         votes.create(:score => score)
       else
+        puts "raising"
         raise PostVote::Error.new("You have already voted for this post")
       end
     end

@@ -2691,7 +2691,8 @@ CREATE TABLE users (
     enable_privacy_mode boolean DEFAULT false NOT NULL,
     enable_sequential_post_navigation boolean DEFAULT true NOT NULL,
     per_page integer DEFAULT 20 NOT NULL,
-    hide_deleted_posts boolean DEFAULT false NOT NULL
+    hide_deleted_posts boolean DEFAULT false NOT NULL,
+    style_usernames boolean DEFAULT false NOT NULL
 );
 
 
@@ -6407,3 +6408,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130331182719');
 INSERT INTO schema_migrations (version) VALUES ('20130401013601');
 
 INSERT INTO schema_migrations (version) VALUES ('20130409191950');
+
+INSERT INTO schema_migrations (version) VALUES ('20130417221643');
