@@ -185,6 +185,10 @@ class AnonymousUser
     false
   end
 
+  def style_usernames?
+    false
+  end
+
   %w(member banned privileged builder platinum contributor janitor moderator admin).each do |name|
     define_method("is_#{name}?") do
       false

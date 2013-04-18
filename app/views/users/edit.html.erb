@@ -25,6 +25,8 @@
           <%= f.input :per_page, :label => "Posts per page", :as => :select, :collection => (1..100), :include_blank => false %>
         <% end %>
         
+        <%= f.input :style_usernames, :as => :select, :label => "Colored usernames", :hint => "Color each user's name depending on their rank", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
+        
         <%= f.input :blacklisted_tags, :hint => "Put any tag combinations you never want to see here. Each combination should go on a separate line.", :input_html => {:size => "40x5"} %>
         <div class="input text optional field_with_hint">
           <label class="text optional" for="user_favorite_tags">Frequent tags</label>
