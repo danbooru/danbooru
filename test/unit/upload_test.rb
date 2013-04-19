@@ -187,6 +187,7 @@ class UploadTest < ActiveSupport::TestCase
         @upload = FactoryGirl.create(:source_upload)
         assert_difference("CurrentUser.post_upload_count", 1) do
           @upload.process!
+          puts @upload.errors.full_messages
           CurrentUser.reload
         end
       end

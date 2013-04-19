@@ -713,7 +713,7 @@ class PostTest < ActiveSupport::TestCase
       should "not decrement the post's score for basic users" do
         @member = FactoryGirl.create(:user)
         CurrentUser.scoped(@member, "127.0.0.1") do
-          @post.remove_favorite!(@user)
+          @post.remove_favorite!(@member)
         end
         @post.reload
         assert_equal(1, @post.score)
@@ -757,7 +757,7 @@ class PostTest < ActiveSupport::TestCase
       should "not increment the post's score for basic users" do
         @member = FactoryGirl.create(:user)
         CurrentUser.scoped(@member, "127.0.0.1") do
-          @post.add_favorite!(@user)
+          @post.add_favorite!(@member)
         end
         @post.reload
         assert_equal(0, @post.score)

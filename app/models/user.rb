@@ -204,17 +204,11 @@ class User < ActiveRecord::Base
     end
 
     def add_favorite!(post)
-      return if Favorite.for_user(id).exists?(:user_id => id, :post_id => post.id)
-      Favorite.create(:user_id => id, :post_id => post.id)
-      increment!(:favorite_count)
-      post.add_favorite!(self)
+      Favorite.add(post, self)
     end
 
     def remove_favorite!(post)
-      return unless Favorite.for_user(id).exists?(:user_id => id, :post_id => post.id)
-      Favorite.destroy_all(:user_id => id, :post_id => post.id)
-      decrement!(:favorite_count)
-      post.remove_favorite!(self)
+      Favorite.remove(post, self)
     end
   end
 
