@@ -21,12 +21,12 @@ class TagAliasesControllerTest < ActionController::TestCase
       end
 
       should "list all tag aliass" do
-        get :index
+        get :index, {}, {:user_id => @user.id}
         assert_response :success
       end
 
       should "list all tag_aliass (with search)" do
-        get :index, {:search => {:antecedent_name => "aaa"}}
+        get :index, {:search => {:antecedent_name => "aaa"}}, {:user_id => @user.id}
         assert_response :success
       end
     end

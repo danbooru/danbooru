@@ -18,14 +18,14 @@ class TagAliasCorrectionsControllerTest < ActionController::TestCase
 
     context "show action" do
       should "render" do
-        get :show, {:tag_alias_id => @tag_alias.id}, {:user => @admin.id}
+        get :show, {:tag_alias_id => @tag_alias.id}, {:user_id => @admin.id}
         assert_response :success
       end
     end
 
     context "create action" do
       should "render" do
-        post :create, {:tag_alias_id => @tag_alias.id, :commit => "Fix"}, {:user => @admin.id}
+        post :create, {:tag_alias_id => @tag_alias.id, :commit => "Fix"}, {:user_id => @admin.id}
         assert_redirected_to(tag_alias_correction_path(:tag_alias_id => @tag_alias.id))
       end
     end

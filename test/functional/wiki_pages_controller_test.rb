@@ -89,7 +89,7 @@ class WikiPagesControllerTest < ActionController::TestCase
       should "revert to a previous version" do
         version = @wiki_page.versions(true).first
         assert_equal("1", version.body)
-        post :revert, {:id => @wiki_page.id, :version_id => version.id}
+        post :revert, {:id => @wiki_page.id, :version_id => version.id}, {:user_id => @user.id}
         @wiki_page.reload
         assert_equal("1", @wiki_page.body)
       end

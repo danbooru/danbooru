@@ -69,7 +69,7 @@ class NotesControllerTest < ActionController::TestCase
       end
 
       should "revert to a previous version" do
-        post :revert, {:id => @note.id, :version_id => @note.versions(true).first.id}
+        post :revert, {:id => @note.id, :version_id => @note.versions(true).first.id}, {:user_id => @user.id}
         @note.reload
         assert_equal("000", @note.body)
       end

@@ -26,7 +26,7 @@ module Moderator
       end
 
       should "list invites" do
-        get :index
+        get :index, {}, {:user_id => @mod.id}
         assert_response :success
       end
     end

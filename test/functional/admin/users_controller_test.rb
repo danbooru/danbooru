@@ -12,7 +12,7 @@ class Admin::UsersControllerTest < ActionController::TestCase
 
     context "#edit" do
       should "render" do
-        get :edit, {:id => @user.id}
+        get :edit, {:id => @user.id}, {:user_id => @mod.id}
         assert_response :success
       end
     end
@@ -20,7 +20,7 @@ class Admin::UsersControllerTest < ActionController::TestCase
     context "#update" do
       context "on a basic user" do
         should "succeed" do
-          put :update, {:id => @user.id, :user => {:level => "30"}}
+          put :update, {:id => @user.id, :user => {:level => "30"}}, {:user_id => @mod.id}
           assert_redirected_to(edit_admin_user_path(@user))
           @user.reload
           assert_equal(30, @user.level)
@@ -29,7 +29,7 @@ class Admin::UsersControllerTest < ActionController::TestCase
 
         context "promoted to an admin" do
           should "fail" do
-            put :update, {:id => @user.id, :user => {:level => "50"}}
+            put :update, {:id => @user.id, :user => {:level => "50"}}, {:user_id => @mod.id}
             assert_redirected_to(new_session_path)
             @user.reload
             assert_equal(20, @user.level)

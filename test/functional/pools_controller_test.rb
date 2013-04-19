@@ -100,7 +100,7 @@ class PoolsControllerTest < ActionController::TestCase
         assert_equal(2, PoolVersion.count)
         version = @pool.versions(true).first
         assert_equal("#{@post.id}", version.post_ids)
-        post :revert, {:id => @pool.id, :version_id => version.id}
+        post :revert, {:id => @pool.id, :version_id => version.id}, {:user_id => @mod.id}
         @pool.reload
         assert_equal("#{@post.id}", @pool.post_ids)
       end
