@@ -4,7 +4,8 @@ class WikiPagesController < ApplicationController
   before_filter :janitor_only, :only => [:destroy]
   before_filter :normalize_search_params, :only => [:index]
   rescue_from ActiveRecord::StatementInvalid, :with => :rescue_exception
-
+  rescue_from ActiveRecord::RecordNotFound, :with => :rescue_exception
+  
   def new
     @wiki_page = WikiPage.new(params[:wiki_page])
     respond_with(@wiki_page)
