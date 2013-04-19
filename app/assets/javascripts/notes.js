@@ -441,7 +441,8 @@ Danbooru.Note = {
       left: x,
       top: y,
       width: w,
-      height: h
+      height: h,
+      display: 'none'
     });
 
     $("#note-container").append($note_box);
@@ -488,6 +489,12 @@ Danbooru.Note = {
         $article.html()
       );
     });
+    
+    $('#note-container').css('display','none');
+    $('.note-box').each(function(i, v) {
+      $(v).css('display','block')
+    });
+    $('#note-container').css('display','block');
   }
 }
 
