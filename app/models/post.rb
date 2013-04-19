@@ -262,6 +262,15 @@ class Post < ActiveRecord::Base
       @presenter ||= PostPresenter.new(self)
     end
 
+    def status_flags
+      flags = []
+      flags << "pending" if is_pending?
+      flags << "flagged" if is_flagged?
+      flags << "deleted" if is_deleted?
+      flags << "banned" if is_banned?
+      flags.join(" ")
+    end
+
     def pretty_rating
       case rating
       when "q"

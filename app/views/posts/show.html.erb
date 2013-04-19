@@ -14,6 +14,8 @@
         <%= render "posts/partials/show/information", :post => @post %>
       </section>
 
+      <%= render "posts/partials/index/blacklist" %>
+
       <% if CurrentUser.is_member? %>
         <section>
           <h1>Options</h1>
