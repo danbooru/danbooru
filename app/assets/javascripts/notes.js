@@ -449,7 +449,6 @@ Danbooru.Note = {
     $("#note-container").append($note_body);
     $note_body.data("original-body", text);
     Danbooru.Note.Box.scale($note_box);
-    Danbooru.Note.Box.resize_inner_border($note_box);
     Danbooru.Note.Body.set_text($note_body, text);
   },
 
