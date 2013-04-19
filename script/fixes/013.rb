@@ -13,3 +13,7 @@ Comment.find_each do |comment|
     comment.destroy
   end
 end
+
+User.where("name like ? or name like ?", "\\_%", "%\\_").each do |user|
+  puts "#{user.id}\t#{user.name}\t#{user.level}\t#{user.email}\t#{user.last_logged_in_at}"
+end ; true

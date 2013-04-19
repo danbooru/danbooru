@@ -92,12 +92,12 @@ class User < ActiveRecord::Base
       end
 
       def id_to_pretty_name(user_id)
-        id_to_name(user_id).tr("_", " ")
+        id_to_name(user_id).gsub(/([^_])_+(?=[^_])/, "\\1 \\2")
       end
     end
 
     def pretty_name
-      name.tr("_", " ")
+      name.gsub(/([^_])_+(?=[^_])/, "\\1 \\2")
     end
 
     def update_cache
