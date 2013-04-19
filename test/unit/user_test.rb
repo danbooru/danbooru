@@ -154,6 +154,24 @@ class UserTest < ActiveSupport::TestCase
         assert_equal(Danbooru.config.default_guest_name, User.id_to_name(-1))
       end
 
+      should "not contain a colon" do
+        user = FactoryGirl.build(:user, :name => "a:b")
+        user.save
+        assert_equal(["Name cannot have whitespace or colons"], user.errors.full_messages)
+      end
+
+      should "not begin with an underscore" do
+        user = FactoryGirl.build(:user, :name => "_x")
+        user.save
+        assert_equal(["Name cannot begin or end with an underscore"], user.errors.full_messages)
+      end
+
+      should "not end with an underscore" do
+        user = FactoryGirl.build(:user, :name => "x_")
+        user.save
+        assert_equal(["Name cannot begin or end with an underscore"], user.errors.full_messages)
+      end
+
       should "be fetched given a user id" do
         @user = FactoryGirl.create(:user)
         assert_equal(@user.name, User.id_to_name(@user.id))

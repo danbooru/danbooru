@@ -21,6 +21,7 @@ class User < ActiveRecord::Base
   attr_accessible :level, :as => :admin
   validates_length_of :name, :within => 2..100, :on => :create
   validates_format_of :name, :with => /\A[^\s:]+\Z/, :on => :create, :message => "cannot have whitespace or colons"
+  validates_format_of :name, :with => /\A[^_].*[^_]\Z/, :on => :create, :message => "cannot begin or end with an underscore"
   validates_uniqueness_of :name, :case_sensitive => false
   validates_uniqueness_of :email, :case_sensitive => false, :if => lambda {|rec| rec.email.present?}
   validates_length_of :password, :minimum => 5, :if => lambda {|rec| rec.new_record? || rec.password.present?}
