@@ -1,6 +1,6 @@
 class PostPresenter < Presenter
   def self.preview(post, options = {})
-    if post.is_deleted? && options[:tags] !~ /status:(?:all|any|deleted)/
+    if post.is_deleted? && options[:tags] !~ /status:(?:all|any|deleted|banned)/
       return ""
     end
     
