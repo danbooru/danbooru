@@ -12,7 +12,7 @@
 
         <div class="input">
           <label>Sort</label>
-          <%= select "search", "sort", ["Date", "Name"] %>
+          <%= select "search", "sort", [["Date", "date"], ["Name", "name"]] %>
         </div>
         <%= submit_tag "Search" %>
       <% end %>
