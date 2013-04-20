@@ -8,3 +8,5 @@ $("div.comments-for-post[data-post-id=<%= @post.id %>] div.list-of-comments").ht
 <% else %>
   Danbooru.Comment.hide_threshold_comments(<%= @post.id %>);
 <% end %>
+
+Danbooru.Comment.initialize_reply_links();
