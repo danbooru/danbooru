@@ -199,7 +199,7 @@
 
     if ($.inArray(tag, tags) > -1) {
       var escaped_tag = Danbooru.regexp_escape(tag);
-      $field.val($field.val().replace(new RegExp("(^|\\s)" + escaped_tag + "($|\\s)", "gi"), "$1$2"));
+      $field.val($field.val().replace(new RegExp("(\A|\\s)" + escaped_tag + "(\Z|\\s)", "gi"), "$1$2"));
     } else {
       $field.val($field.val() + " " + tag);
     }
