@@ -263,8 +263,28 @@ class Artist < ActiveRecord::Base
         q = q.reorder("id desc")
       end
 
+      if params[:is_active] == "true"
+        q = q.active
+      elsif params[:is_active] == "false"
+        q = q.where("is_active = false")
+      end
+
+      if params[:is_banned] == "true"
+        q = q.banned
+      elsif params[:is_banned] == "false"
+        q = q.where("is_banned = false")
+      end
+
       if params[:id].present?
         q = q.where("id = ?", params[:id])
+      end
+
+      if params[:creator_name].present?
+        q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].tr(" ", "_").mb_chars.downcase)
+      end
+
+      if params[:creator_id].present?
+        q = q.where("creator_id = ?", params[:creator_id].to_i)
       end
 
       q

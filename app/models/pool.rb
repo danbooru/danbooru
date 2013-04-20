@@ -42,6 +42,12 @@ class Pool < ActiveRecord::Base
         q = q.where("creator_id = ?", params[:creator_id].to_i)
       end
 
+      if params[:is_active] == "true"
+        q = q.where("is_active = true")
+      elsif params[:is_active] == "false"
+        q = q.where("is_active = false")
+      end
+
       if params[:sort] == "name"
         q = q.order("name")
       else
