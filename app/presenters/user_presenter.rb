@@ -83,12 +83,20 @@ class UserPresenter
     template.link_to(Comment.for_creator(user.id).count, template.comments_path(:search => {:creator_id => user.id}, :group_by => "comment"))
   end
 
+  def commented_posts_count(template)
+    template.link_to(Post.fast_count("commenter:#{user.name}"), template.posts_path(:tags => "commenter:#{user.name}"))
+  end
+
   def post_version_count(template)
     template.link_to(user.post_update_count, template.post_versions_path(:search => {:updater_id => user.id}))
   end
 
   def note_version_count(template)
     template.link_to(user.note_update_count, template.note_versions_path(:search => {:updater_id => user.id}))
+  end
+
+  def noted_posts_count(template)
+    template.link_to(Post.fast_count("noter:#{user.name}"), template.posts_path(:tags => "noter:#{user.name}"))
   end
 
   def wiki_page_version_count(template)
