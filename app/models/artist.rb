@@ -94,6 +94,7 @@ class Artist < ActiveRecord::Base
         :updater_ip_addr => CurrentUser.ip_addr,
         :url_string => url_string,
         :is_active => is_active,
+        :is_banned => is_banned,
         :other_names => other_names,
         :group_name => group_name
       )
