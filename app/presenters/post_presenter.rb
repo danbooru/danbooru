@@ -146,7 +146,7 @@ class PostPresenter < Presenter
   def pool_html(template)
     html = ["<ul>"]
 
-    if template.params[:pool_id].present?
+    if template.params[:pool_id].present? && @post.belongs_to_pool_with_id?(template.params[:pool_id])
       pool = Pool.where(:id => template.params[:pool_id]).first
       return if pool.nil?
       html += pool_link_html(template, pool, :include_rel => true)

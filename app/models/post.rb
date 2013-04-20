@@ -579,6 +579,10 @@ class Post < ActiveRecord::Base
       pool_string =~ /(?:\A| )pool:#{pool.id}(?:\Z| )/
     end
 
+    def belongs_to_pool_with_id?(pool_id)
+      pool_string =~ /(?:\A| )pool:#{pool_id}(?:\Z| )/
+    end
+
     def add_pool!(pool)
       return if belongs_to_pool?(pool)
       return if pool.is_deleted?
