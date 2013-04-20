@@ -28,6 +28,10 @@ class PostVersion < ActiveRecord::Base
         q = q.where("post_id = ?", params[:post_id].to_i)
       end
 
+      if params[:start_id].present?
+        q = q.where("id <= ?", params[:start_id].to_i)
+      end
+
       q
     end
   end
