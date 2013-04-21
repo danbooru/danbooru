@@ -16,6 +16,11 @@ class WikiPageVersionsController < ApplicationController
   end
 
   def diff
+    if params[:thispage].blank? || params[:otherpage].blank?
+      redirect_to :back, :notice => "You must select two versions to diff"
+      return
+    end
+
     @thispage = WikiPageVersion.find(params[:thispage])
     @otherpage = WikiPageVersion.find(params[:otherpage])
   end
