@@ -380,17 +380,18 @@ class Post < ActiveRecord::Base
 
     def normalize_tags
       normalized_tags = Tag.scan_tags(tag_string)
+      normalized_tags = filter_metatags(normalized_tags)
+      normalized_tags = normalized_tags.map{|tag| tag.downcase}
       normalized_tags = TagAlias.to_aliased(normalized_tags)
       normalized_tags = TagImplication.with_descendants(normalized_tags)
-      normalized_tags = filter_metatags(normalized_tags)
       normalized_tags = %w(tagme) if normalized_tags.empty?
       normalized_tags.sort!
       set_tag_string(normalized_tags.uniq.sort.join(" "))
     end
 
     def filter_metatags(tags)
-      @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent):/}
-      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|fav):/}
+      @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent):/i}
+      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|fav):/i}
       apply_pre_metatags
       return tags
     end
@@ -400,26 +401,26 @@ class Post < ActiveRecord::Base
 
       @post_metatags.each do |tag|
         case tag
-        when /^-pool:(\d+)$/
+        when /^-pool:(\d+)$/i
           pool = Pool.find_by_id($1.to_i)
           remove_pool!(pool) if pool
 
-        when /^-pool:(.+)$/
+        when /^-pool:(.+)$/i
           pool = Pool.find_by_name($1)
           remove_pool!(pool) if pool
 
-        when /^pool:(\d+)$/
+        when /^pool:(\d+)$/i
           pool = Pool.find_by_id($1.to_i)
           add_pool!(pool) if pool
 
-        when /^pool:(.+)$/
+        when /^pool:(.+)$/i
           pool = Pool.find_by_name($1)
           if pool.nil?
             pool = Pool.create(:name => $1, :description => "This pool was automatically generated")
           end
           add_pool!(pool) if pool
 
-        when /^fav:(.+)$/
+        when /^fav:(.+)$/i
           add_favorite!(CurrentUser.user)
         end
       end
@@ -430,10 +431,10 @@ class Post < ActiveRecord::Base
 
       @pre_metatags.each do |tag|
         case tag
-        when /^parent:none$/, /^parent:0$/
+        when /^parent:none$/i, /^parent:0$/i
           self.parent_id = nil
 
-        when /^parent:(\d+)$/
+        when /^parent:(\d+)$/i
           if Post.exists?(["id = ? and is_deleted = false", $1.to_i])
             self.parent_id = $1.to_i
           end
