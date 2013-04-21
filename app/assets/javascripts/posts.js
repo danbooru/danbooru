@@ -281,19 +281,17 @@
     $("#edit").hide();
   }
 
-  Danbooru.Post.notice_update = function(x, hide_msg) {
+  Danbooru.Post.notice_update = function(x) {
     if (x === "inc") {
       Danbooru.Post.pending_update_count += 1;
       Danbooru.notice("Updating posts (" + Danbooru.Post.pending_update_count + " pending)...");
     } else {
       Danbooru.Post.pending_update_count -= 1;
 
-      if (!!hide_msg) {
-        if (Danbooru.Post.pending_update_count < 1) {
-          Danbooru.notice("Posts updated");
-        } else {
-          Danbooru.notice("Updating posts (" + Post.pending_update_count + " pending)...");
-        }
+      if (Danbooru.Post.pending_update_count < 1) {
+        Danbooru.notice("Posts updated");
+      } else {
+        Danbooru.notice("Updating posts (" + Post.pending_update_count + " pending)...");
       }
     }
   }
