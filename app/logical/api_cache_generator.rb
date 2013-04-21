@@ -20,5 +20,7 @@ class ApiCacheGenerator
       f.seek(-2, IO::SEEK_END)
       f.print("]\n")
     end
+
+    RemoteFileManager.new("/var/www/danbooru2/shared/system/cache/tags.json").distribute
   end
 end
