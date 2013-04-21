@@ -14,6 +14,18 @@ Post.find_each do |post|
   post.update_column(:fav_count, Favorite.where("post_id = #{post.id}").count)
 end
 
-Post.select("id, score, up_score, down_score, fav_count").find_each do |post|
-  post.update_column(:score, post.up_score + post.down_score)
-end ; true
+# Post.select("id, score, up_score, down_score, fav_count").find_each do |post|
+#   post.update_column(:score, post.up_score + post.down_score)
+# end ; true
+
+Ban.find_each do |ban|
+  ban.user.update_attribute(:is_banned, true)
+end
+
+ArtistVersion.update_all "is_banned = false"
+
+Artist.find_each do |artist|
+  if artist.is_banned?
+    artist.versions.last.update_column(:is_banned, true)
+  end
+end
