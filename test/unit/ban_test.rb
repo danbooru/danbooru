@@ -15,6 +15,14 @@ class BanTest < ActiveSupport::TestCase
         CurrentUser.ip_addr = nil
       end
 
+      should "set the is_banned flag on the user" do
+        user = FactoryGirl.create(:user)
+        ban = FactoryGirl.build(:ban, :user => user, :banner => @banner)
+        ban.save
+        user.reload
+        assert(user.is_banned?)
+      end
+
       should "not be valid against another admin" do
         user = FactoryGirl.create(:admin_user)
         ban = FactoryGirl.build(:ban, :user => user, :banner => @banner)

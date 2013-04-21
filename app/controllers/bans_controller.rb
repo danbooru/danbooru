@@ -2,7 +2,7 @@ class BansController < ApplicationController
   before_filter :moderator_only, :except => [:show, :index]
 
   def new
-    @ban = Ban.new
+    @ban = Ban.new(params[:ban])
   end
 
   def edit

@@ -1,5 +1,7 @@
 class Ban < ActiveRecord::Base
   after_create :update_feedback
+  after_create :update_user_on_create
+  after_destroy :update_user_on_destroy
   belongs_to :user
   belongs_to :banner, :class_name => "User"
   attr_accessible :reason, :duration, :user_id, :user_name
@@ -65,6 +67,14 @@ class Ban < ActiveRecord::Base
       feedback.creator_id = banner_id
       feedback.save
     end
+  end
+
+  def update_user_on_create
+    user.update_attribute(:is_banned, true)
+  end
+
+  def update_user_on_destroy
+    user.update_attribute(:is_banned, false)
   end
 
   def user_name

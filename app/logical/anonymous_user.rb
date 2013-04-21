@@ -32,6 +32,10 @@ class AnonymousUser
     true
   end
 
+  def is_banned?
+    false
+  end
+
   def has_mail?
     false
   end

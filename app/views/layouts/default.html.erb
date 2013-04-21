@@ -44,6 +44,10 @@
       <%= render "users/upgrade_notice" %>
     <% end %>
 
+    <% if CurrentUser.user.is_banned? %>
+      <%= render "users/ban_notice" %>
+    <% end %>
+
     <% if cookies["accepted_tos"].blank? && !CurrentUser.is_privileged? %>
       <%= render "users/tos" %>
     <% end %>

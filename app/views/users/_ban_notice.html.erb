@@ -1,0 +1,5 @@
+<div class="ui-corner-all ui-state-error" id="ban-notice">
+  <h1>Your account has been temporarily banned</h1>
+  <p>Reason: <%= CurrentUser.user.ban.reason %></p>
+  <p>Your ban will expire in <%= time_ago_in_words(CurrentUser.user.ban.expires_at) %></p>
+</div>

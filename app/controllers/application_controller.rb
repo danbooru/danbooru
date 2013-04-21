@@ -88,7 +88,7 @@ protected
 
   %w(member banned builder privileged platinum contributor janitor moderator admin).each do |level|
     define_method("#{level}_only") do
-      if CurrentUser.user.__send__("is_#{level}?")
+      if !CurrentUser.user.is_banned? && CurrentUser.user.__send__("is_#{level}?")
         true
       else
         access_denied()

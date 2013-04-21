@@ -47,8 +47,8 @@ if User.count == 0
   0.upto(10) do |i|
     User.create(
       :name => rand_string(8, true),
-      :password => i.to_s * 5,
-      :password_confirmation => i.to_s * 5
+      :password => "password1",
+      :password_confirmation => "password1"
     )
   end
   $used_names = Set.new([""])
