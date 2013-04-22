@@ -171,7 +171,7 @@ class PostPresenter < Presenter
   end
 
   def pool_link_html(template, pool, options = {})
-    pool_html = ["<li>"]
+    pool_html = ['<li id="nav-link-for-pool-#{pool.id}">']
     match_found = false
 
     if options[:include_rel]
