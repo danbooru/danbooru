@@ -302,8 +302,8 @@ class Tag < ActiveRecord::Base
             q[:uploader_id_neg] << user_id unless user_id.blank?
 
           when "user"
-            q[:uploader_id] = User.name_to_id($2)
-            q[:uploader_id] = -1 if q[:uploader_id].blank?
+            user_id = User.name_to_id($2)
+            q[:uploader_id] = user_id unless user_id.blank?
 
           when "-approver"
             q[:approver_id_neg] ||= []
@@ -311,16 +311,18 @@ class Tag < ActiveRecord::Base
             q[:approver_id_neg] << user_id unless user_id.blank?
 
           when "approver"
-            q[:approver_id] = User.name_to_id($2)
-            q[:approver_id] = -1 if q[:approver_id].blank?
+            user_id = User.name_to_id($2)
+            q[:approver_id] = user_id unless user_id.blank?
 
           when "commenter", "comm"
-            q[:commenter_id] = User.name_to_id($2)
-            q[:commenter_id] = -1 if q[:commenter_id].blank?
+            q[:commenter_ids] ||= []
+            user_id = User.name_to_id($2)
+            q[:commenter_ids] << user_id unless user_id.blank?
 
           when "noter"
-            q[:noter_id] = User.name_to_id($2)
-            q[:noter_id] = -1 if q[:noter_id].blank?
+            q[:noter_ids] ||= []
+            user_id = User.name_to_id($2)
+            q[:noter_ids] << user_id unless user_id.blank?
 
           when "-pool"
             q[:tags][:exclude] << "pool:#{Pool.name_to_id($2)}"

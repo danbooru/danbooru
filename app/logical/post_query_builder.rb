@@ -193,13 +193,17 @@ class PostQueryBuilder
       has_constraints!
     end
 
-    if q[:commenter_id]
-      relation = relation.where(:id => Comment.where("creator_id = ?", q[:commenter_id]).select("post_id").uniq)
+    if q[:commenter_ids]
+      q[:commenter_ids].each do |commenter_id|
+        relation = relation.where(:id => Comment.where("creator_id = ?", commenter_id).select("post_id").uniq)
+      end
       has_constraints!
     end
 
-    if q[:noter_id]
-      relation = relation.where(:id => Note.where("creator_id = ?", q[:noter_id]).select("post_id").uniq)
+    if q[:noter_ids]
+      q[:noter_ids].each do |noter_id|
+        relation = relation.where(:id => Note.where("creator_id = ?", noter_id).select("post_id").uniq)
+      end
       has_constraints!
     end
 
