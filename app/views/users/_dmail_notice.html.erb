@@ -1,0 +1,3 @@
+<div class="ui-corner-all ui-state-highlight" id="dmail-notice">
+  <h1>You have <%= link_to "unread mail", dmails_path(:search => {:owner_id => CurrentUser.id, :to_id => CurrentUser.id}, :folder => "received") %>.</h1>
+</div>

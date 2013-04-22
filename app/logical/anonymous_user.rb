@@ -193,6 +193,10 @@ class AnonymousUser
     false
   end
 
+  def dmail_count
+    ""
+  end
+
   %w(member banned privileged builder platinum contributor janitor moderator admin).each do |name|
     define_method("is_#{name}?") do
       false

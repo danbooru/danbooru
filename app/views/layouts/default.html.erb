@@ -48,6 +48,10 @@
       <%= render "users/ban_notice" %>
     <% end %>
 
+    <% if CurrentUser.dmail_count.present? %>
+      <%= render "users/dmail_notice" %>
+    <% end %>
+
     <% if cookies["accepted_tos"].blank? && !CurrentUser.is_privileged? %>
       <%= render "users/tos" %>
     <% end %>
