@@ -2,7 +2,7 @@
 app_path = "/var/www/danbooru2/current"
 
 # Set unicorn options
-worker_processes 8
+worker_processes 10
 
 preload_app false
 timeout 180
