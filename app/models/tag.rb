@@ -195,26 +195,24 @@ class Tag < ActiveRecord::Base
         size = $1.to_i
         unit = $2
 
-        conversion_factor = case unit
+        case unit
         when /^s/i
-          1.second
+          size.seconds.ago
         when /^mi/i
-          1.minute
+          size.minutes.ago
         when /^h/i
-          1.hour
+          size.hours.ago
         when /^d/i
-          1.day
+          size.days.ago
         when /^w/i
-          1.week
+          size.weeks.ago
         when /^mo/i
-          1.month
+          size.months.ago
         when /^y/i
-          1.year
+          size.years.ago
         else
-          1.second
+          size.seconds.ago
         end
-
-        (size * conversion_factor).to_i
 
       when :filesize
         object =~ /\A(\d+(?:\.\d*)?|\d*\.\d+)([kKmM]?)[bB]?\Z/
