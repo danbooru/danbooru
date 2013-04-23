@@ -11,7 +11,7 @@ module Admin
       @user = User.find(params[:id])
       sanitize_params!
       @user.level = params[:user][:level]
-      @user.inviter_id = CurrentUser.id unless @user.inviter_id.present?
+      @user.inviter_id = CurrentUser.id
       @user.save
       redirect_to edit_admin_user_path(@user), :notice => "User updated"
     end
