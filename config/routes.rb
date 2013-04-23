@@ -160,9 +160,6 @@ Danbooru::Application.routes.draw do
   resource :source, :only => [:show]
   resources :tags do
     resource :correction, :only => [:new, :create, :show], :controller => "TagCorrections"
-    collection do
-      get :search
-    end
   end
   resources :tag_aliases do
     resource :correction, :only => [:create, :new, :show], :controller => "TagAliasCorrections"
