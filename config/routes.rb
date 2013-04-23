@@ -122,9 +122,6 @@ Danbooru::Application.routes.draw do
   end
   resources :note_versions, :only => [:index]
   resources :pools do
-    collection do
-      get :search
-    end
     member do
       put :revert
       post :undelete

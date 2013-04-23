@@ -2,7 +2,6 @@
   <menu>
     <li><%= render "pools/quick_search" %></li>
     <li><%= link_to "Listing", pools_path %></li>
-    <li><%= link_to "Search", search_pools_path %></li>
     <li><%= link_to "New", new_pool_path %></li>
     <% if CurrentUser.is_member? && @pool && !@pool.new_record? %>
       <li>|</li>
