@@ -238,18 +238,23 @@ class Tag < ActiveRecord::Base
       # (-?(\d+(\.\d*)?|\d*\.\d+))
       case range
       when /\A(.+?)\.\.(.+)/
+        return [:between, parse_cast($2, type), parse_cast($1, type)] if type == :age
         return [:between, parse_cast($1, type), parse_cast($2, type)]
 
       when /\A<=(.+)/, /\A\.\.(.+)/
+        return [:gte, parse_cast($1, type)] if type == :age
         return [:lte, parse_cast($1, type)]
 
       when /\A<(.+)/
+        return [:gt, parse_cast($1, type)] if type == :age
         return [:lt, parse_cast($1, type)]
 
       when /\A>=(.+)/, /\A(.+)\.\.\Z/
+        return [:lte, parse_cast($1, type)] if type == :age
         return [:gte, parse_cast($1, type)]
 
       when /\A>(.+)/
+        return [:lt, parse_cast($1, type)] if type == :age
         return [:gt, parse_cast($1, type)]
 
       when /,/
