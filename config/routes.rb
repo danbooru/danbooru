@@ -60,7 +60,6 @@ Danbooru::Application.routes.draw do
     end
     collection do
       get :show_or_new
-      get :search
       get :banned
     end
   end
