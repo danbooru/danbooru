@@ -191,6 +191,12 @@ class Upload < ActiveRecord::Base
       elsif image_width <= 500 && image_height <= 500
         self.tag_string = "#{tag_string} lowres".strip
       end
+
+      if image_width >= 1024 && image_width.to_f / image_height >= 3
+        self.tag_string = "#{tag_string} wide_image".strip
+      elsif image_height >= 1024 && image_height.to_f / image_width >= 3
+        self.tag_string = "#{tag_string} tall_image".strip
+      end
     end
 
     # Does this file have image dimensions?
