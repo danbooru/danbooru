@@ -235,12 +235,14 @@ class Pool < ActiveRecord::Base
   end
 
   def create_version
-    last_version = versions.last
+    if post_ids_changed? || name_changed? || description_changed? || is_active_changed? || is_deleted_changed?
+      last_version = versions.last
 
-    if last_version && CurrentUser.ip_addr == last_version.updater_ip_addr && CurrentUser.id == last_version.updater_id
-      last_version.update_column(:post_ids, post_ids)
-    else
-      versions.create(:post_ids => post_ids)
+      if last_version && CurrentUser.ip_addr == last_version.updater_ip_addr && CurrentUser.id == last_version.updater_id
+        last_version.update_column(:post_ids, post_ids)
+      else
+        versions.create(:post_ids => post_ids)
+      end
     end
   end
 
