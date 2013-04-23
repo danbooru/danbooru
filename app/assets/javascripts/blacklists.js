@@ -101,7 +101,7 @@
     if (previews.length) {
       return previews;
     } else {
-      return $("#image");
+      return $("#image-container");
     }
   }
 
