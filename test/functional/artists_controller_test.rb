@@ -42,7 +42,9 @@ class ArtistsControllerTest < ActionController::TestCase
 
     should "create an artist" do
       assert_difference("Artist.count", 1) do
-        post :create, {:artist => FactoryGirl.attributes_for(:artist)}, {:user_id => @user.id}
+        attributes = FactoryGirl.attributes_for(:artist)
+        attributes.delete(:is_active)
+        post :create, {:artist => attributes}, {:user_id => @user.id}
       end
       artist = Artist.last
       assert_redirected_to(artist_path(artist))

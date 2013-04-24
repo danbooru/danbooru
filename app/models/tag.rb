@@ -266,6 +266,25 @@ class Tag < ActiveRecord::Base
       end
     end
 
+    def reverse_parse_helper(array)
+      case array[0]
+      when :lte
+        [:gte, *array[1..-1]]
+
+      when :lt
+        [:gt, *array[1..-1]]
+
+      when :gte
+        [:lte, *array[1..-1]]
+
+      when :gt
+        [:lt, *array[1..-1]]
+
+      else
+        array
+      end
+    end
+
     def parse_tag(tag, output)
       if tag[0] == "-" && tag.size > 1
         output[:exclude] << tag[1..-1].mb_chars.downcase
@@ -386,7 +405,7 @@ class Tag < ActiveRecord::Base
             q[:date] = parse_helper($2, :date)
 
           when "age"
-            q[:age] = parse_helper($2, :age)
+            q[:age] = reverse_parse_helper(parse_helper($2, :age))
 
           when "tagcount"
             q[:post_tag_count] = parse_helper($2)
