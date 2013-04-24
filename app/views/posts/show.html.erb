@@ -5,6 +5,8 @@
 
       <%= render_advertisement("vertical") %>
 
+      <%= render "posts/partials/index/blacklist" %>
+
       <section id="tag-list">
         <%= @post.presenter.split_tag_list_html(self) %>
       </section>
@@ -13,8 +15,6 @@
         <h1>Information</h1>
         <%= render "posts/partials/show/information", :post => @post %>
       </section>
-
-      <%= render "posts/partials/index/blacklist" %>
 
       <% if CurrentUser.is_member? %>
         <section>
