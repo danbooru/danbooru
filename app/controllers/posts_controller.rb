@@ -22,6 +22,8 @@ class PostsController < ApplicationController
     @post = Post.find(params[:id])
     @post_flag = PostFlag.new(:post_id => @post.id)
     @post_appeal = PostAppeal.new(:post_id => @post.id)
+    @parent_post_set = PostSets::Post.new("parent:#{@post.id}")
+    @child_post_set = PostSets::Post.new("parent:#{@post.parent_id}")
     respond_with(@post)
   end
 

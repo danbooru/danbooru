@@ -133,6 +133,31 @@
       $("#post_tag_string").trigger("focus");
       e.preventDefault();
     });
+
+    $("#parent-relationship-preview").hide();
+    $("#child-relationship-preview").hide();
+
+    $("#parent-relationship-preview-link").click(function(e) {
+      $("#parent-relationship-preview").toggle();
+      if ($("#parent-relationship-preview").is(":visible")) {
+        $(this).html("&laquo; hide");
+      }
+      else {
+        $(this).html("show &raquo;");
+      }
+      e.preventDefault();
+    });
+
+    $("#child-relationship-preview-link").click(function(e) {
+      $("#child-relationship-preview").toggle();
+      if ($("#child-relationship-preview").is(":visible")) {
+        $(this).html("&laquo; hide");
+      }
+      else {
+        $(this).html("show &raquo;");
+      }
+      e.preventDefault();
+    });
   }
 
   Danbooru.Post.initialize_favlist = function() {
