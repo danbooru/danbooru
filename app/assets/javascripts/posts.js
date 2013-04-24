@@ -18,6 +18,7 @@
 
     if ($("#c-posts").length && $("#a-show").length) {
       this.initialize_links();
+      this.initialize_post_relationship_previews();
       this.initialize_favlist();
       this.initialize_post_sections();
       this.initialize_post_image_resize_links();
@@ -133,7 +134,9 @@
       $("#post_tag_string").trigger("focus");
       e.preventDefault();
     });
+  }
 
+  Danbooru.Post.initialize_post_relationship_previews = function() {
     $("#parent-relationship-preview").hide();
     $("#child-relationship-preview").hide();
 
