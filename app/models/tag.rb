@@ -263,6 +263,9 @@ class Tag < ActiveRecord::Base
 
     def reverse_parse_helper(array)
       case array[0]
+      when :between
+        [:between, *array[1..-1].reverse]
+
       when :lte
         [:gte, *array[1..-1]]
 
