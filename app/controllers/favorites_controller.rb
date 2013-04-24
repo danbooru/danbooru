@@ -6,6 +6,8 @@ class FavoritesController < ApplicationController
       redirect_to(posts_path(:tags => params[:tags]))
     elsif request.format == Mime::JS
       list_favorited_users
+    elsif params[:user_id]
+      @favorite_set = PostSets::Favorite.new(User.find(params[:user_id]), params[:page], params)
     else
       @favorite_set = PostSets::Favorite.new(CurrentUser.user, params[:page], params)
     end
