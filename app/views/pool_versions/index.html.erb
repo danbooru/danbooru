@@ -21,7 +21,7 @@
       <tbody>
         <% @pool_versions.each do |pool_version| %>
           <tr>
-            <td><%= link_to pool_version.pool.pretty_name, pool_path(pool_version.pool_id) %></td>
+            <td><%= link_to pool_version.pretty_name, pool_path(pool_version.pool_id) %></td>
             <td><%= link_to pool_version.post_id_array.size, pool_versions_path(:search => {:pool_id => pool_version.pool_id}) %></td>
             <td><%= pool_version_diff(pool_version) %></td>
             <td><%= link_to_user pool_version.updater%></td>

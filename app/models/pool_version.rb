@@ -37,6 +37,10 @@ class PoolVersion < ActiveRecord::Base
     User.id_to_name(updater_id)
   end
 
+  def pretty_name
+    name.tr("_", " ")
+  end
+
   def initialize_updater
     self.updater_id = CurrentUser.id
     self.updater_ip_addr = CurrentUser.ip_addr

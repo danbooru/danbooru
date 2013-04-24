@@ -130,6 +130,7 @@ class Pool < ActiveRecord::Base
 
   def revert_to!(version)
     self.post_ids = version.post_ids
+    self.name = version.name
     synchronize!
   end
 
@@ -240,8 +241,9 @@ class Pool < ActiveRecord::Base
 
       if last_version && CurrentUser.ip_addr == last_version.updater_ip_addr && CurrentUser.id == last_version.updater_id
         last_version.update_column(:post_ids, post_ids)
+        last_version.update_column(:name, name)
       else
-        versions.create(:post_ids => post_ids)
+        versions.create(:post_ids => post_ids, :name => name)
       end
     end
   end
