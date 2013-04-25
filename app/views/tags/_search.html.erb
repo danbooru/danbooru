@@ -33,7 +33,7 @@
         <th><label for="search_hide_empty">Hide Empty</label></th>
         <td>
           <div class="input">
-            <%= check_box "search", "hide_empty", {:checked => true}, "yes", "no" %>
+            <%= select "search", "hide_empty", ["yes", "no"] %>
           </div>
         </td>
       </tr>
