@@ -90,7 +90,7 @@
     var $post = $("#post_" + post_id);
     $("#quick-edit-div").slideDown("fast");
     $("#quick-edit-form").attr("action", "/posts/" + post_id + ".json");
-    $("#post_tag_string").val($post.data("tags") + " ").focus();
+    $("#post_tag_string").val($post.data("tags") + " ").focus().selectEnd().height($("#post_tag_string")[0].scrollHeight);
   }
 
   Danbooru.PostModeMenu.click = function(e) {
