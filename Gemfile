@@ -37,7 +37,7 @@ gem 'aws-s3', :require => "aws/s3"
 gem 'awesome_print'
 
 group :production do
-  gem 'unicorn'
+  gem 'unicorn', :platforms => :ruby
   gem 'capistrano-unicorn', :require => false
 end
 
