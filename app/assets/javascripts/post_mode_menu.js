@@ -6,6 +6,7 @@
       this.initialize_selector();
       this.initialize_preview_link();
       this.initialize_edit_form();
+      this.initialize_edit_tag_script_field();
       Danbooru.PostModeMenu.change();
     }
   }
@@ -52,6 +53,22 @@
     });
   }
 
+  Danbooru.PostModeMenu.initialize_edit_tag_script_field = function() {
+    $("#edit-tag-script").on("keydown.return blur", function(e) {
+      var script = $(this).val();
+
+      if (script) {
+        Danbooru.Cookie.put("tag-script", script);
+
+        $("#mode-box select").val("apply-tag-script");
+      } else {
+        $("#mode-box select").val("view");
+      }
+
+      Danbooru.PostModeMenu.change(e);
+    });
+  }
+
   Danbooru.PostModeMenu.change = function(e) {
     $("#quick-edit-div").slideUp("fast");
     var s = $("#mode-box select").val();
@@ -65,16 +82,14 @@
 
     if (s === "edit-tag-script") {
       var script = Danbooru.Cookie.get("tag-script");
-      script = prompt("Enter a tag script", script);
 
-      if (script) {
-        Danbooru.Cookie.put("tag-script", script);
-        $("#mode-box select").val("apply-tag-script");
-      } else {
-        $("#mode-box select").val("view");
-      }
+      $("#edit-tag-script").removeAttr("disabled").val(script).show().focus();
+    } else if (s === "apply-tag-script") {
+      var script = Danbooru.Cookie.get("tag-script");
 
-      Danbooru.PostModeMenu.change(e);
+      $("#edit-tag-script").show().val(script).attr("disabled", "disabled");
+    } else {
+      $("#edit-tag-script").hide();
     }
   }
 
