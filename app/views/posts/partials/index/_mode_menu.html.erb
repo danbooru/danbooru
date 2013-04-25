@@ -19,10 +19,9 @@
         <% if CurrentUser.is_janitor? %>
           <option value="approve">Approve</option>
         <% end %>
-        <option value="edit-tag-script">Edit tag script</option>
-        <option value="apply-tag-script">Apply tag script</option>
+        <option value="tag-script">Tag script</option>
       </select>
     </form>
   </section>
-  <input id="edit-tag-script" disabled></input>
+  <input id="tag-script-field"></input>
 <% end %>

@@ -6,7 +6,7 @@
       this.initialize_selector();
       this.initialize_preview_link();
       this.initialize_edit_form();
-      this.initialize_edit_tag_script_field();
+      this.initialize_tag_script_field();
       Danbooru.PostModeMenu.change();
     }
   }
@@ -53,19 +53,16 @@
     });
   }
 
-  Danbooru.PostModeMenu.initialize_edit_tag_script_field = function() {
-    $("#edit-tag-script").on("keydown.return blur", function(e) {
+  Danbooru.PostModeMenu.initialize_tag_script_field = function() {
+    $("#tag-script-field").blur(function(e) {
       var script = $(this).val();
 
       if (script) {
         Danbooru.Cookie.put("tag-script", script);
-
-        $("#mode-box select").val("apply-tag-script");
       } else {
         $("#mode-box select").val("view");
+        Danbooru.PostModeMenu.change(e);
       }
-
-      Danbooru.PostModeMenu.change(e);
     });
   }
 
@@ -80,16 +77,12 @@
     $body.addClass("mode-" + s);
     Danbooru.Cookie.put("mode", s, 1);
 
-    if (s === "edit-tag-script") {
+    if (s === "tag-script") {
       var script = Danbooru.Cookie.get("tag-script");
 
-      $("#edit-tag-script").removeAttr("disabled").val(script).show().focus();
-    } else if (s === "apply-tag-script") {
-      var script = Danbooru.Cookie.get("tag-script");
-
-      $("#edit-tag-script").show().val(script).attr("disabled", "disabled");
+      $("#tag-script-field").val(script).show().focus().selectEnd();
     } else {
-      $("#edit-tag-script").hide();
+      $("#tag-script-field").hide();
     }
   }
 
@@ -126,7 +119,7 @@
       Danbooru.Post.update(post_id, {"post[is_note_locked]": "1"});
     } else if (s === 'approve') {
       Danbooru.Post.approve(post_id);
-    } else if (s === "apply-tag-script") {
+    } else if (s === "tag-script") {
       var tag_script = Danbooru.Cookie.get("tag-script");
       Danbooru.TagScript.run(post_id, tag_script);
     } else {
