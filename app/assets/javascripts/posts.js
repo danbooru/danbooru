@@ -192,28 +192,6 @@
     var $post = $(post);
     var $img = $post.find("img");
     $img.attr("title", $post.attr("data-tags") + " user:" + $post.attr("data-uploader") + " rating:" + $post.data("rating") + " score:" + $post.data("score"));
-
-    var status = $post.data("flags");
-
-    if (status.match(/pending/)) {
-      $post.addClass("post-status-pending");
-    }
-
-    if (status.match(/flagged/)) {
-      $post.addClass("post-status-flagged");
-    }
-
-    if (status.match(/deleted/)) {
-      $post.addClass("post-status-deleted");
-    }
-
-    if ($post.data("parent-id")) {
-      $post.addClass("post-status-has-parent");
-    }
-
-    if ($post.data("has-children")) {
-      $post.addClass("post-status-has-children");
-    }
   }
 
   Danbooru.Post.initialize_post_image_resize_links = function() {
