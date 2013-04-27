@@ -126,7 +126,7 @@ private
       end
 
       is_underused_tag = counts[tag].to_i <= 1 && categories[tag] == Tag.categories.general
-      html << %{<span class="post-count#{is_underused_tag ? " low-post-count" : ""}">#{post_count}</span>}
+      html << %{<span class="post-count#{is_underused_tag ? " low-post-count" : ""}"#{is_underused_tag ? " title='This tag has low post count. Check if it is a typo or consider tagging more post with it.'" : ""}>#{post_count}</span>}
     end
 
     html << "</li>"
