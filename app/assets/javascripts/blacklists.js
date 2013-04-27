@@ -97,12 +97,7 @@
   }
 
   Danbooru.Blacklist.posts = function() {
-    var previews = $(".post-preview");
-    if (previews.length) {
-      return previews;
-    } else {
-      return $("#image-container");
-    }
+    return $(".post-preview, #image-container")
   }
 
   Danbooru.Blacklist.post_match = function(post, entry) {
