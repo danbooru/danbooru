@@ -1,9 +1,10 @@
 class TagsController < ApplicationController
-  before_filter :builder_only, :only => [:edit, :update]
+  before_filter :member_only, :only => [:edit, :update]
   respond_to :html, :xml, :json
 
   def edit
     @tag = Tag.find(params[:id])
+    check_privilege(@tag)
     respond_with(@tag)
   end
 
@@ -26,8 +27,14 @@ class TagsController < ApplicationController
 
   def update
     @tag = Tag.find(params[:id])
+    check_privilege(@tag)
     @tag.update_attributes(params[:tag])
     @tag.update_category_cache_for_all
     respond_with(@tag)
+  end
+
+private
+  def check_privilege(tag)
+    raise User::PrivilegeError unless (CurrentUser.is_builder? || tag.post_count <= 50)
   end
 end

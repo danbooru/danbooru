@@ -18,11 +18,11 @@
               <%= link_to(tag.name, posts_path(:tags => tag.name)) %>
             </td>
             <td>
-              <% if CurrentUser.is_builder? %>
+              <% if CurrentUser.is_builder? || tag.post_count <= 50 %>
                 <%= link_to "edit", edit_tag_path(tag) %>
-                <% if tag.post_count < 1_000 %>
-                  | <%= link_to "fix", new_tag_correction_path(:tag_id => tag.id) %>
-                <% end %>
+              <% end %>
+              <% if CurrentUser.is_builder? && tag.post_count < 1_000 %>
+                | <%= link_to "fix", new_tag_correction_path(:tag_id => tag.id) %>
               <% end %>
             </td>
           </tr>
