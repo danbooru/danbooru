@@ -12,7 +12,7 @@ module PostSetPresenters
       end
 
       posts.each do |post|
-        html << PostPresenter.preview(post, :tags => template.params[:tags])
+        html << PostPresenter.preview(post, :tags => @post_set.tag_string)
       end
 
       html.html_safe

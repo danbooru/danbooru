@@ -207,6 +207,10 @@ class PostQueryBuilder
       has_constraints!
     end
 
+    if q[:post_id_negated]
+      relation = relation.where("posts.id <> ?", q[:post_id_negated])
+    end
+
     if q[:parent] == "none"
       relation = relation.where("posts.parent_id IS NULL")
     elsif q[:parent_neg] == "none" || q[:parent] == "any"
