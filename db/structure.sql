@@ -2058,7 +2058,8 @@ CREATE TABLE pool_versions (
     updater_id integer NOT NULL,
     updater_ip_addr inet NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    name character varying(255)
 );
 
 
@@ -6410,3 +6411,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130401013601');
 INSERT INTO schema_migrations (version) VALUES ('20130409191950');
 
 INSERT INTO schema_migrations (version) VALUES ('20130417221643');
+
+INSERT INTO schema_migrations (version) VALUES ('20130424121410');

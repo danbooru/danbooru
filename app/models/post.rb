@@ -526,12 +526,25 @@ class Post < ActiveRecord::Base
   end
 
   module FavoriteMethods
+    def clean_fav_string?
+      rand(100) < [Math.log(fav_string.size, 2), 5].min
+    end
+
+    def clean_fav_string!
+      array = fav_string.scan(/\S+/).uniq
+      self.fav_string = array.join(" ")
+      self.fav_count = array.size
+      update_column(:fav_string, fav_string)
+      update_column(:fav_count, fav_count)
+    end
+
     def favorited_by?(user_id)
       fav_string =~ /(?:\A| )fav:#{user_id}(?:\Z| )/
     end
 
     def append_user_to_fav_string(user_id)
       update_column(:fav_string, (fav_string + " fav:#{user_id}").strip)
+      clean_fav_string! if clean_fav_string?
     end
 
     def add_favorite!(user)
