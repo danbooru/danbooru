@@ -127,7 +127,7 @@ private
 
       is_underused_tag = counts[tag].to_i <= 1 && categories[tag] == Tag.categories.general
       klass = "post-count#{is_underused_tag ? " low-post-count" : ""}"
-      title = "This tag has a low post count. Check if it is a typo or consider tagging more posts with it."
+      title = "New general tag detected. Check the spelling or populate it now."
 
       html << %{<span class="#{klass}"#{is_underused_tag ? " title='#{title}'" : ""}>#{post_count}</span>}
     end
