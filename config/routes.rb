@@ -190,7 +190,11 @@ Danbooru::Application.routes.draw do
       post :upgrade
     end
   end
-  resources :user_feedbacks
+  resources :user_feedbacks do
+    collection do
+      get :search
+    end
+  end
   resources :user_name_change_requests do
     member do
       post :approve
