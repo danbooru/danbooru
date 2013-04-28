@@ -5,6 +5,7 @@
       <select name="mode">
         <option value="view">View</option>
         <option value="edit">Edit</option>
+        <option value="tag-script">Tag script</option>
         <option value="add-fav">Favorite</option>
         <option value="remove-fav">Unfavorite</option>
         <option value="rating-s">Rate safe</option>
@@ -19,7 +20,6 @@
         <% if CurrentUser.is_janitor? %>
           <option value="approve">Approve</option>
         <% end %>
-        <option value="tag-script">Tag script</option>
       </select>
     </form>
   </section>
