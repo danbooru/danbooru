@@ -48,14 +48,14 @@
 
 <% if post.parent_id %>
   <div class="ui-corner-all ui-state-highlight notice notice-child">
-    This post belongs to a <%= link_to "parent", post_path(post.parent_id) %> (<%= link_to "learn more", wiki_pages_path(:title => "help:post_relationships") %>) <%= link_to "show &raquo;".html_safe, "#", :id => "child-relationship-preview-link" %>
+    <%= belongs_to_parent_message(post, @child_post_set) %>
     <div id="child-relationship-preview"><%= @child_post_set.presenter.post_previews_html(self) %></div>
   </div>
 <% end %>
 
 <% if post.has_children? %>
   <div class="ui-corner-all ui-state-highlight notice notice-parent">
-    This post has <%= link_to "children", posts_path(:tags => "parent:#{post.id}") %> (<%= link_to "learn more", wiki_pages_path(:title => "help:post_relationships") %>) <%= link_to "show &raquo;".html_safe, "#", :id => "parent-relationship-preview-link" %>
+    <%= has_children_message(post, @parent_post_set) %>
     <div id="parent-relationship-preview"><%= @parent_post_set.presenter.post_previews_html(self) %></div>
   </div>
 <% end %>
