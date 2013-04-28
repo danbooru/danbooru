@@ -14,6 +14,11 @@
       </div>
 
       <div class="input">
+        <label for="search_max_level">Max Level</label>
+        <%= select("search", "max_level", [""] + User.level_hash.to_a) %>
+      </div>
+
+      <div class="input">
         <label for="search_order">Order</label>
         <%= select("search", "order", [["Join date", "date"], ["Name", "name"], ["Upload count", "post_upload_count"], ["Note count", "note_count"], ["Post update count", "post_update_count"]]) %>
       </div>
