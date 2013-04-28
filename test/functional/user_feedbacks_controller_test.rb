@@ -4,7 +4,7 @@ class UserFeedbacksControllerTest < ActionController::TestCase
   context "The user feedbacks controller" do
     setup do
       @user = FactoryGirl.create(:user)
-      @critic = FactoryGirl.create(:privileged_user)
+      @critic = FactoryGirl.create(:gold_user)
       CurrentUser.user = @critic
       CurrentUser.ip_addr = "127.0.0.1"
     end

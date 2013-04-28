@@ -7,7 +7,7 @@ class User < ActiveRecord::Base
   module Levels
     BLOCKED = 10
     MEMBER = 20
-    PRIVILEGED = 30
+    GOLD = 30
     PLATINUM = 31
     BUILDER = 32
     CONTRIBUTOR = 33
@@ -17,7 +17,7 @@ class User < ActiveRecord::Base
   end
 
   attr_accessor :password, :old_password
-  attr_accessible :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr, :time_zone, :default_image_size, :enable_sequential_post_navigation, :per_page, :hide_deleted_posts, :style_usernames, :as => [:moderator, :janitor, :contributor, :privileged, :member, :anonymous, :default, :builder, :admin]
+  attr_accessible :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr, :time_zone, :default_image_size, :enable_sequential_post_navigation, :per_page, :hide_deleted_posts, :style_usernames, :as => [:moderator, :janitor, :contributor, :gold, :member, :anonymous, :default, :builder, :admin]
   attr_accessible :level, :as => :admin
   validates_length_of :name, :within => 2..100, :on => :create
   validates_format_of :name, :with => /\A[^\s:]+\Z/, :on => :create, :message => "cannot have whitespace or colons"
@@ -229,7 +229,7 @@ class User < ActiveRecord::Base
       def level_hash
         return {
           "Member" => Levels::MEMBER,
-          "Gold" => Levels::PRIVILEGED,
+          "Gold" => Levels::GOLD,
           "Platinum" => Levels::PLATINUM,
           "Builder" => Levels::BUILDER,
           "Contributor" => Levels::CONTRIBUTOR,
@@ -255,8 +255,8 @@ class User < ActiveRecord::Base
       when Levels::MEMBER
         :member
 
-      when Levels::PRIVILEGED
-        :privileged
+      when Levels::GOLD
+        :gold
 
       when Levels::BUILDER
         :builder
@@ -286,7 +286,7 @@ class User < ActiveRecord::Base
       when Levels::BUILDER
         "Builder"
 
-      when Levels::PRIVILEGED
+      when Levels::GOLD
         "Gold"
 
       when Levels::PLATINUM
@@ -321,8 +321,8 @@ class User < ActiveRecord::Base
       level >= Levels::BUILDER
     end
 
-    def is_privileged?
-      level >= Levels::PRIVILEGED
+    def is_gold?
+      level >= Levels::GOLD
     end
 
     def is_platinum?
@@ -356,7 +356,7 @@ class User < ActiveRecord::Base
     end
     
     def set_per_page
-      if per_page.nil? || !is_privileged?
+      if per_page.nil? || !is_gold?
         self.per_page = Danbooru.config.posts_per_page
       end
       
@@ -398,7 +398,7 @@ class User < ActiveRecord::Base
 
   module ForumMethods
     def has_forum_been_updated?
-      return false unless is_privileged?
+      return false unless is_gold?
       newest_topic = ForumTopic.order("updated_at desc").first
       return false if newest_topic.nil?
       return true if last_forum_read_at.nil?
@@ -426,7 +426,7 @@ class User < ActiveRecord::Base
     end
 
     def can_comment?
-      if is_privileged?
+      if is_gold?
         true
       else
         created_at <= Danbooru.config.member_comment_time_threshold
@@ -434,7 +434,7 @@ class User < ActiveRecord::Base
     end
 
     def is_comment_limited?
-      if is_privileged?
+      if is_gold?
         false
       else
         Comment.where("creator_id = ? and created_at > ?", id, 1.hour.ago).count >= Danbooru.config.member_comment_limit
@@ -470,7 +470,7 @@ class User < ActiveRecord::Base
     def tag_query_limit
       if is_platinum?
         Danbooru.config.base_tag_query_limit * 2
-      elsif is_privileged?
+      elsif is_gold?
         Danbooru.config.base_tag_query_limit
       else
         2
@@ -480,7 +480,7 @@ class User < ActiveRecord::Base
     def favorite_limit
       if is_platinum?
         nil
-      elsif is_privileged?
+      elsif is_gold?
         20_000
       else
         10_000
@@ -490,7 +490,7 @@ class User < ActiveRecord::Base
     def api_hourly_limit
       if is_platinum?
         20_000
-      elsif is_privileged?
+      elsif is_gold?
         10_000
       else
         3_000
@@ -500,7 +500,7 @@ class User < ActiveRecord::Base
     def statement_timeout
       if is_platinum?
         9_000
-      elsif is_privileged?
+      elsif is_gold?
         6_000
       else
         3_000

@@ -12,7 +12,7 @@
       <li>|</li>
       <% if @user.id == CurrentUser.id %>
         <li><%= link_to "Settings", edit_user_path(CurrentUser.user) %></li>
-        <% if @user.is_privileged? %>
+        <% if @user.is_gold? %>
           <li><%= link_to "Edit subscriptions", tag_subscriptions_path %></li>
         <% end %>
         <li><%= link_to "Profile", user_path(CurrentUser.user) %></li>
@@ -21,7 +21,7 @@
         <li><%= link_to "Send message", new_dmail_path(:dmail => {:to_id => @user.id}) %></li>
       <% end %>
 
-      <% if !CurrentUser.is_privileged? %>
+      <% if !CurrentUser.is_gold? %>
         <li><%= link_to "Upgrade", upgrade_information_users_path %></li>
       <% end %>
 

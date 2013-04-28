@@ -3,7 +3,7 @@
     <aside id="sidebar">
       <%= render "posts/partials/common/search", :path => favorites_path, :tags => @favorite_set.tag_string %>
 
-      <% if CurrentUser.is_privileged? %>
+      <% if CurrentUser.is_gold? %>
         <section id="mode-box">
           <%= render "posts/partials/index/mode_menu" %>
         </section>

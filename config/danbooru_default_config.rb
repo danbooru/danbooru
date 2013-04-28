@@ -46,8 +46,8 @@ module Danbooru
       true
     end
 
-    # Set to true to give all new users privileged access.
-    def start_as_privileged?
+    # Set to true to give all new users gold access.
+    def start_as_gold?
       false
     end
 
@@ -109,7 +109,7 @@ module Danbooru
 
     # Determines who can see ads.
     def can_see_ads?(user)
-      !user.is_privileged?
+      !user.is_gold?
     end
 
     # Users cannot search for more than X regular tags at a time.
@@ -231,7 +231,7 @@ module Danbooru
     end
 
     def is_user_restricted?(user)
-      !user.is_privileged?
+      !user.is_gold?
     end
 
     def is_user_advertiser?(user)

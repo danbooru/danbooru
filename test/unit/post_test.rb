@@ -704,7 +704,7 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
-      should "decrement the post's score for privileged users" do
+      should "decrement the post's score for gold users" do
         @post.remove_favorite!(@user)
         @post.reload
         assert_equal(0, @post.score)
@@ -757,7 +757,7 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
-      should "increment the post's score for privileged users" do
+      should "increment the post's score for gold users" do
         @post.add_favorite!(@user)
         @post.reload
         assert_equal(1, @post.score)

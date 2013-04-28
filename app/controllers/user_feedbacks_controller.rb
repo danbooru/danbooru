@@ -1,5 +1,5 @@
 class UserFeedbacksController < ApplicationController
-  before_filter :privileged_only, :only => [:new, :edit, :create, :update, :destroy]
+  before_filter :gold_only, :only => [:new, :edit, :create, :update, :destroy]
   respond_to :html, :xml, :json
   rescue_from User::PrivilegeError, :with => "static/access_denied"
 

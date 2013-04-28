@@ -4,7 +4,7 @@ module Moderator
       choices = [
         ["", ""],
         ["Member", 20],
-        ["Privileged", 30],
+        ["Gold", 30],
         ["Contributor", 33],
         ["Janitor", 35],
         ["Moderator", 40],

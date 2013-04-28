@@ -9,7 +9,7 @@
         <div class="input">
           <label>Name</label>
           
-          <% if CurrentUser.user.is_privileged? %>
+          <% if CurrentUser.user.is_gold? %>
             <p><%= link_to "Request a name change", new_user_name_change_request_path %></p>
           <% else %>
             <p>You must <%= link_to "upgrade your account", upgrade_information_users_path %> to request a name change</p>
@@ -21,7 +21,7 @@
         <%= f.input :comment_threshold, :hint => "Comments below this score will be hidden by default" %>
         <%= f.input :default_image_size, :hint => "Show original image or show resampled #{Danbooru.config.large_image_width} pixel version", :label => "Default image width", :collection => [["850px", "large"], ["original", "original"]], :include_blank => false %>
         
-        <% if CurrentUser.user.is_privileged? %>
+        <% if CurrentUser.user.is_gold? %>
           <%= f.input :per_page, :label => "Posts per page", :as => :select, :collection => (1..100), :include_blank => false %>
         <% end %>
         

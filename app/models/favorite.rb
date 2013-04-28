@@ -11,7 +11,7 @@ class Favorite < ActiveRecord::Base
     return if Favorite.for_user(user.id).exists?(:user_id => user.id, :post_id => post.id)
     Favorite.create(:user_id => user.id, :post_id => post.id)
     Post.update_all("fav_count = fav_count + 1", "id = #{post.id}")
-    Post.update_all("score = score + 1", "id = #{post.id}") if user.is_privileged?
+    Post.update_all("score = score + 1", "id = #{post.id}") if user.is_gold?
     post.append_user_to_fav_string(user.id)
     user.add_favorite!(post)
     user.increment!(:favorite_count)
@@ -22,7 +22,7 @@ class Favorite < ActiveRecord::Base
     return unless Favorite.for_user(user.id).exists?(:user_id => user.id, :post_id => post.id)
     Favorite.destroy_all(:user_id => user.id, :post_id => post.id)
     Post.update_all("fav_count = fav_count - 1", "id = #{post.id}")
-    Post.update_all("score = score - 1", "id = #{post.id}") if user.is_privileged?
+    Post.update_all("score = score - 1", "id = #{post.id}") if user.is_gold?
     post.delete_user_from_fav_string(user.id)
     user.remove_favorite!(post)
     user.decrement!(:favorite_count)

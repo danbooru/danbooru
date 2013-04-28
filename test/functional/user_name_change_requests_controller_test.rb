@@ -3,7 +3,7 @@ require 'test_helper'
 class UserNameChangeRequestsControllerTest < ActionController::TestCase
   context "The user name change requests controller" do
     setup do
-      @user = FactoryGirl.create(:privileged_user)
+      @user = FactoryGirl.create(:gold_user)
       @admin = FactoryGirl.create(:admin_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"

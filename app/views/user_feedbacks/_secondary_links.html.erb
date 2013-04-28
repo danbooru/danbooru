@@ -1,6 +1,6 @@
 <% content_for(:secondary_links) do %>
   <menu>
-    <% if CurrentUser.is_privileged? %>
+    <% if CurrentUser.is_gold? %>
       <% if @user_feedback %>
         <li><%= link_to "New", new_user_feedback_path(:user_feedback => {:user_id => @user_feedback.user_id}) %></li>
       <% elsif params[:search] && params[:search][:user_id] %>

@@ -15,7 +15,7 @@ FactoryGirl.define do
       ban {|x| x.association(:ban)}
     end
 
-    factory(:privileged_user) do
+    factory(:gold_user) do
       level 30
     end
 

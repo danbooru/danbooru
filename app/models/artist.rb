@@ -11,7 +11,7 @@ class Artist < ActiveRecord::Base
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :tag_alias, :foreign_key => "antecedent_name", :primary_key => "name"
   accepts_nested_attributes_for :wiki_page
-  attr_accessible :body, :name, :url_string, :other_names, :other_names_comma, :group_name, :wiki_page_attributes, :notes, :as => [:member, :privileged, :builder, :platinum, :contributor, :janitor, :moderator, :default, :admin]
+  attr_accessible :body, :name, :url_string, :other_names, :other_names_comma, :group_name, :wiki_page_attributes, :notes, :as => [:member, :gold, :builder, :platinum, :contributor, :janitor, :moderator, :default, :admin]
   attr_accessible :is_active, :as => [:builder, :contributor, :janitor, :moderator, :default, :admin]
   attr_accessible :is_banned, :as => :admin
 
@@ -116,8 +116,8 @@ class Artist < ActiveRecord::Base
       Artist.new.tap do |artist|
         if params[:name]
           artist.name = params[:name]
-          if CurrentUser.user.is_privileged?
-            # below privileged users are limited to two tags
+          if CurrentUser.user.is_gold?
+            # below gold users are limited to two tags
             post = Post.tag_match("source:http #{artist.name} status:any").first
           else
             post = Post.tag_match("source:http #{artist.name}").first

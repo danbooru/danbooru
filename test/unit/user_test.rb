@@ -89,7 +89,7 @@ class UserTest < ActiveSupport::TestCase
 
     should "limit comments" do
       assert(!@user.can_comment?)
-      @user.update_column(:level, User::Levels::PRIVILEGED)
+      @user.update_column(:level, User::Levels::GOLD)
       assert(@user.can_comment?)
       @user.update_column(:level, User::Levels::MEMBER)
       @user.update_column(:created_at, 1.year.ago)
@@ -124,42 +124,42 @@ class UserTest < ActiveSupport::TestCase
       assert(user.is_moderator?)
       assert(user.is_janitor?)
       assert(user.is_contributor?)
-      assert(user.is_privileged?)
+      assert(user.is_gold?)
 
       user = FactoryGirl.create(:user, :level => User::Levels::MODERATOR)
       assert(!user.is_admin?)
       assert(user.is_moderator?)
       assert(user.is_janitor?)
       assert(user.is_contributor?)
-      assert(user.is_privileged?)
+      assert(user.is_gold?)
 
       user = FactoryGirl.create(:user, :level => User::Levels::JANITOR)
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
       assert(user.is_janitor?)
       assert(user.is_contributor?)
-      assert(user.is_privileged?)
+      assert(user.is_gold?)
 
       user = FactoryGirl.create(:user, :level => User::Levels::CONTRIBUTOR)
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
       assert(!user.is_janitor?)
       assert(user.is_contributor?)
-      assert(user.is_privileged?)
+      assert(user.is_gold?)
 
-      user = FactoryGirl.create(:user, :level => User::Levels::PRIVILEGED)
+      user = FactoryGirl.create(:user, :level => User::Levels::GOLD)
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
       assert(!user.is_janitor?)
       assert(!user.is_contributor?)
-      assert(user.is_privileged?)
+      assert(user.is_gold?)
 
       user = FactoryGirl.create(:user)
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
       assert(!user.is_janitor?)
       assert(!user.is_contributor?)
-      assert(!user.is_privileged?)
+      assert(!user.is_gold?)
     end
 
     context "name" do

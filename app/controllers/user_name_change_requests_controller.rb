@@ -1,5 +1,5 @@
 class UserNameChangeRequestsController < ApplicationController
-  before_filter :privileged_only, :only => [:new, :create, :show]
+  before_filter :gold_only, :only => [:new, :create, :show]
   before_filter :admin_only, :only => [:index, :approve, :reject, :destroy]
   rescue_from User::PrivilegeError, :with => :access_denied
 

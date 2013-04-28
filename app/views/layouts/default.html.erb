@@ -40,7 +40,7 @@
       <%= render "users/sign_up_notice" %>
     <% end %>
 
-    <% if !CurrentUser.is_anonymous? && !CurrentUser.is_privileged? && cookies[:hide_upgrade_account_notice].blank? && params[:action] != "upgrade_information" %>
+    <% if !CurrentUser.is_anonymous? && !CurrentUser.is_gold? && cookies[:hide_upgrade_account_notice].blank? && params[:action] != "upgrade_information" %>
       <%= render "users/upgrade_notice" %>
     <% end %>
 
@@ -52,7 +52,7 @@
       <%= render "users/dmail_notice" %>
     <% end %>
 
-    <% if cookies["accepted_tos"].blank? && !CurrentUser.is_privileged? %>
+    <% if cookies["accepted_tos"].blank? && !CurrentUser.is_gold? %>
       <%= render "users/tos" %>
     <% end %>
 

@@ -12,7 +12,7 @@ class Pool < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   after_save :create_version
   before_destroy :create_mod_action_for_destroy
-  attr_accessible :name, :description, :post_ids, :post_id_array, :post_count, :is_active, :as => [:member, :privileged, :platinum, :contributor, :janitor, :moderator, :admin, :default]
+  attr_accessible :name, :description, :post_ids, :post_id_array, :post_count, :is_active, :as => [:member, :gold, :platinum, :contributor, :janitor, :moderator, :admin, :default]
   attr_accessible :is_deleted, :as => [:janitor, :moderator, :admin]
 
   module SearchMethods

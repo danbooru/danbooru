@@ -98,7 +98,7 @@ module PostSets
           @set = PostSets::Post.new("a b c")
         end
 
-        context "for a non-privileged user" do
+        context "for a non-gold user" do
           should "fail" do
             assert_raises(::Post::SearchError) do
               @set.posts
@@ -106,9 +106,9 @@ module PostSets
           end
         end
 
-        context "for a privileged user" do
+        context "for a gold user" do
           setup do
-            CurrentUser.user = FactoryGirl.create(:privileged_user)
+            CurrentUser.user = FactoryGirl.create(:gold_user)
           end
 
           should "pass" do

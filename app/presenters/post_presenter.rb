@@ -4,7 +4,7 @@ class PostPresenter < Presenter
       return ""
     end
     
-    if post.is_banned? && !CurrentUser.is_privileged?
+    if post.is_banned? && !CurrentUser.is_gold?
       return ""
     end
 
@@ -113,8 +113,8 @@ class PostPresenter < Presenter
   end
 
   def image_html(template)
-    return template.content_tag("p", "The artist requested removal of this image") if @post.is_banned? && !CurrentUser.user.is_privileged?
-    return template.content_tag("p", template.link_to("You need a privileged account to see this image.", template.upgrade_information_users_path)) if !Danbooru.config.can_user_see_post?(CurrentUser.user, @post)
+    return template.content_tag("p", "The artist requested removal of this image") if @post.is_banned? && !CurrentUser.user.is_gold?
+    return template.content_tag("p", template.link_to("You need a gold account to see this image.", template.upgrade_information_users_path)) if !Danbooru.config.can_user_see_post?(CurrentUser.user, @post)
 
     if @post.is_flash?
       template.render("posts/partials/show/flash", :post => @post)
@@ -127,12 +127,12 @@ class PostPresenter < Presenter
 
   def tag_list_html(template, options = {})
     @tag_set_presenter ||= TagSetPresenter.new(@post.tag_array)
-    @tag_set_presenter.tag_list_html(template, options.merge(:show_extra_links => CurrentUser.user.is_privileged?))
+    @tag_set_presenter.tag_list_html(template, options.merge(:show_extra_links => CurrentUser.user.is_gold?))
   end
 
   def split_tag_list_html(template, options = {})
     @tag_set_presenter ||= TagSetPresenter.new(@post.tag_array)
-    @tag_set_presenter.split_tag_list_html(template, options.merge(:show_extra_links => CurrentUser.user.is_privileged?))
+    @tag_set_presenter.split_tag_list_html(template, options.merge(:show_extra_links => CurrentUser.user.is_gold?))
   end
 
   def has_nav_links?(template)

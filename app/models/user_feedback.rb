@@ -5,7 +5,7 @@ class UserFeedback < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   attr_accessible :body, :user_id, :category, :user_name
   validates_presence_of :user, :creator, :body, :category
-  validate :creator_is_privileged
+  validate :creator_is_gold
   validate :user_is_not_creator
   after_create :create_dmail
 
@@ -73,9 +73,9 @@ class UserFeedback < ActiveRecord::Base
     Dmail.create_split(:to_id => user_id, :title => "Your user record has been updated", :body => body)
   end
 
-  def creator_is_privileged
-    if !creator.is_privileged?
-      errors[:creator] << "must be privileged"
+  def creator_is_gold
+    if !creator.is_gold?
+      errors[:creator] << "must be gold"
       return false
     else
       return true
