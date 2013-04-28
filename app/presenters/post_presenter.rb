@@ -14,14 +14,7 @@ class PostPresenter < Presenter
 
     path = options[:path_prefix] || "/posts"
 
-    klass = "post-preview"
-    klass << " post-status-pending" if post.is_pending?
-    klass << " post-status-flagged" if post.is_flagged?
-    klass << " post-status-deleted" if post.is_deleted?
-    klass << " post-status-has-parent" if post.parent_id
-    klass << " post-status-has-children" if post.has_children?
-
-    html =  %{<article class="#{klass}" id="post_#{post.id}" data-id="#{post.id}" data-tags="#{h(post.tag_string)}" data-uploader="#{h(post.uploader_name)}" data-rating="#{post.rating}" data-width="#{post.image_width}" data-height="#{post.image_height}" data-flags="#{post.status_flags}" data-parent-id="#{post.parent_id}" data-has-children="#{post.has_children?}" data-score="#{post.score}" data-fav-count="#{post.fav_count}">}
+    html =  %{<article class="#{preview_class(post)}" id="post_#{post.id}" data-id="#{post.id}" data-tags="#{h(post.tag_string)}" data-uploader="#{h(post.uploader_name)}" data-rating="#{post.rating}" data-width="#{post.image_width}" data-height="#{post.image_height}" data-flags="#{post.status_flags}" data-parent-id="#{post.parent_id}" data-has-children="#{post.has_children?}" data-score="#{post.score}" data-fav-count="#{post.fav_count}">}
     if options[:tags].present?
       tag_param = "?tags=#{CGI::escape(options[:tags])}"
     elsif options[:pool_id]
@@ -34,6 +27,16 @@ class PostPresenter < Presenter
     html << %{</a>}
     html << %{</article>}
     html.html_safe
+  end
+
+  def self.preview_class(post)
+    klass = "post-preview"
+    klass << " post-status-pending" if post.is_pending?
+    klass << " post-status-flagged" if post.is_flagged?
+    klass << " post-status-deleted" if post.is_deleted?
+    klass << " post-status-has-parent" if post.parent_id
+    klass << " post-status-has-children" if post.has_children?
+    klass
   end
 
   def initialize(post)
