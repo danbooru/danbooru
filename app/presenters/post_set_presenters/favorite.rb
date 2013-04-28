@@ -1,13 +1,13 @@
 module PostSetPresenters
   class Favorite < Base
-    attr_accessor :favorite_set, :tag_set_presenter
-    delegate :favorites, :to => :favorite_set
+    attr_accessor :post_set, :tag_set_presenter
+    delegate :favorites, :to => :post_set
 
-    def initialize(favorite_set)
-      @favorite_set = favorite_set
+    def initialize(post_set)
+      @post_set = post_set
       @tag_set_presenter = TagSetPresenter.new(
         RelatedTagCalculator.calculate_from_sample_to_array(
-          favorite_set.tag_string
+          post_set.tag_string
         ).map {|x| x[0]}
       )
     end
@@ -17,7 +17,7 @@ module PostSetPresenters
     end
 
     def posts
-      @posts ||= favorite_set.posts
+      @posts ||= post_set.posts
     end
   end
 end
