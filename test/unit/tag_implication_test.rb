@@ -15,6 +15,14 @@ class TagImplicationTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
+    should "ignore pending implications when building descendant names" do
+      ti2 = FactoryGirl.build(:tag_implication, :antecedent_name => "b", :consequent_name => "c")
+      ti2.save
+      ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "a", :consequent_name => "b")
+      ti1.reload
+      assert_equal("b", ti1.descendant_names)
+    end
+
     should "populate the creator information" do
       ti = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       assert_equal(CurrentUser.user.id, ti.creator_id)
