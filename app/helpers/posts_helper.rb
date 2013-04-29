@@ -41,30 +41,36 @@ module PostsHelper
     end
   end
 
-  def belongs_to_parent_message(post, child_post_set)
+  def has_parent_message(post, parent_post_set, siblings_post_set)
     html = ""
 
     html << "This post belongs to a "
     html << link_to("parent", post_path(post.parent_id))
-    html << " (deleted)" if child_post_set.posts.first.is_deleted?
+    html << " (deleted)" if parent_post_set.posts.first.is_deleted?
+
+    if siblings_post_set.posts.count > 1
+      html << " and has "
+      text = siblings_post_set.posts.count > 2 ? "#{siblings_post_set.posts.count - 1} siblings" : "a sibling"
+      html << link_to(text, posts_path(:tags => "parent:#{post.parent_id}"))
+    end
 
     html << " (#{link_to("learn more", wiki_pages_path(:title => "help:post_relationships"))}) "
 
-    html << link_to("show &raquo;".html_safe, "#", :id => "child-relationship-preview-link")
+    html << link_to("show &raquo;".html_safe, "#", :id => "has-parent-relationship-preview-link")
 
     html.html_safe
   end
 
-  def has_children_message(post, parent_post_set)
+  def has_children_message(post, children_post_set)
     html = ""
 
     html << "This post has "
-    text = parent_post_set.posts.count == 1 ? "a child" : "#{parent_post_set.posts.count} children"
+    text = children_post_set.posts.count == 1 ? "a child" : "#{children_post_set.posts.count} children"
     html << link_to(text, posts_path(:tags => "parent:#{post.id}"))
 
     html << " (#{link_to("learn more", wiki_pages_path(:title => "help:post_relationships"))}) "
 
-    html << link_to("show &raquo;".html_safe, "#", :id => "parent-relationship-preview-link")
+    html << link_to("show &raquo;".html_safe, "#", :id => "has-children-relationship-preview-link")
 
     html.html_safe
   end
