@@ -56,7 +56,7 @@ module PostsHelper
 
     html << " (#{link_to("learn more", wiki_pages_path(:title => "help:post_relationships"))}) "
 
-    html << link_to("show &raquo;".html_safe, "#", :id => "has-parent-relationship-preview-link")
+    html << link_to("&laquo; hide".html_safe, "#", :id => "has-parent-relationship-preview-link")
 
     html.html_safe
   end
@@ -70,7 +70,7 @@ module PostsHelper
 
     html << " (#{link_to("learn more", wiki_pages_path(:title => "help:post_relationships"))}) "
 
-    html << link_to("show &raquo;".html_safe, "#", :id => "has-children-relationship-preview-link")
+    html << link_to("&laquo; hide".html_safe, "#", :id => "has-children-relationship-preview-link")
 
     html.html_safe
   end

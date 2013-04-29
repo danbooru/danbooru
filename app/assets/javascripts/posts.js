@@ -140,30 +140,28 @@
     var current_post_id = $("meta[name=post-id]").attr("content");
     $("#post_" + current_post_id).css("background-color", "rgba(0,0,0,0.05)");
 
-    $("#has-children-relationship-preview").hide();
-    $("#has-parent-relationship-preview").hide();
+    this.toggle_relationship_preview($("#has-children-relationship-preview"), $("#has-children-relationship-preview-link"));
+    this.toggle_relationship_preview($("#has-parent-relationship-preview"), $("#has-parent-relationship-preview-link"));
 
     $("#has-children-relationship-preview-link").click(function(e) {
-      $("#has-children-relationship-preview").toggle();
-      if ($("#has-children-relationship-preview").is(":visible")) {
-        $(this).html("&laquo; hide");
-      }
-      else {
-        $(this).html("show &raquo;");
-      }
+      Danbooru.Post.toggle_relationship_preview($("#has-children-relationship-preview"), $(this));
       e.preventDefault();
     });
 
     $("#has-parent-relationship-preview-link").click(function(e) {
-      $("#has-parent-relationship-preview").toggle();
-      if ($("#has-parent-relationship-preview").is(":visible")) {
-        $(this).html("&laquo; hide");
-      }
-      else {
-        $(this).html("show &raquo;");
-      }
+      Danbooru.Post.toggle_relationship_preview($("#has-parent-relationship-preview"), $(this));
       e.preventDefault();
     });
+  }
+
+  Danbooru.Post.toggle_relationship_preview = function(preview, preview_link) {
+    preview.toggle();
+    if (preview.is(":visible")) {
+      preview_link.html("&laquo; hide");
+    }
+    else {
+      preview_link.html("show &raquo;");
+    }
   }
 
   Danbooru.Post.initialize_favlist = function() {
