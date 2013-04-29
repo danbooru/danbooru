@@ -20,6 +20,10 @@ module PostSets
       false
     end
 
+    def tag_string
+      nil
+    end
+
     def presenter
       raise NotImplementedError
     end
