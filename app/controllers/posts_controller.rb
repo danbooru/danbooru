@@ -22,10 +22,13 @@ class PostsController < ApplicationController
     @post = Post.find(params[:id])
     @post_flag = PostFlag.new(:post_id => @post.id)
     @post_appeal = PostAppeal.new(:post_id => @post.id)
+
     @children_post_set = PostSets::Post.new("parent:#{@post.id} -id:#{@post.id}", 1, 200)
+    @children_post_set.posts.reverse!
     @parent_post_set = PostSets::Post.new("id:#{@post.parent_id} status:any")
     @siblings_post_set = PostSets::Post.new("parent:#{@post.parent_id} -id:#{@post.parent_id}", 1, 200)
     @siblings_post_set.posts.reverse!
+
     respond_with(@post)
   end
 
