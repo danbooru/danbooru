@@ -55,6 +55,14 @@ div#note-container {
       border: 1px solid red;
     }
   }
+  
+  div#note-helper {
+    position: absolute;
+    border: 1px solid red;
+    opacity: 0.6;
+    display: none;
+    background: white;
+  }
 }
 
 div.note-edit-dialog {
