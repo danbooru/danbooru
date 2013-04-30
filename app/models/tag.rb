@@ -554,7 +554,7 @@ class Tag < ActiveRecord::Base
         q = q.reorder("name")
 
       else
-        q = q.reorder("post_count desc")
+        q = q.reorder("id desc")
       end
 
       q
