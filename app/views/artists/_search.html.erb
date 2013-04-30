@@ -5,7 +5,7 @@
         <th><label for="search_name">Name</label>
         <td>
           <div class="input">
-            <%= text_field "search", "name" %>
+            <%= text_field "search", "name", :value => params[:search][:name] %>
             <span class="hint">You can search on any name or URL</span>
           </div>
         </td>
@@ -15,7 +15,7 @@
         <th><label for="search_sort">Sort</label>
         <td>
           <div class="input">
-            <%= select "search", "sort", [["Date", "date"], ["Name", "name"]] %>
+            <%= select "search", "sort", [["Date", "date"], ["Name", "name"]], :selected => params[:search][:sort] %>
           </div>
         </td>
       </tr>
