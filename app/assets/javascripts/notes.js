@@ -408,22 +408,75 @@ Danbooru.Note = {
 
       Danbooru.Note.TranslationMode.active = true;
       $("#original-file-link").click();
-      $("#image").one("click", Danbooru.Note.TranslationMode.create_note);
-      Danbooru.notice('Click on the image to create a note (shortcut is <span class="key">n</span>)');
+      $("#image").one("click", function() { $(".note-box").show() }); /* override the 'hide all note boxes' click event */
+      $("#image").one("mousedown", Danbooru.Note.TranslationMode.Drag.start).one("mouseup", Danbooru.Note.TranslationMode.Drag.stop);
+      Danbooru.notice('Click or drag on the image to create a note (shortcut is <span class="key">n</span>)');
     },
 
     stop: function() {
       Danbooru.Note.TranslationMode.active = false;
     },
 
-    create_note: function(e) {
+    create_note: function(e,dragged,x,y,w,h) {
       Danbooru.Note.TranslationMode.active = false;
       var offset = $("#image").offset();
-      Danbooru.Note.new(e.pageX - offset.left, e.pageY - offset.top);
+      
+      if(dragged) {
+        if(w > 9 && h > 9) { /* minimum note size: 10px */
+          Danbooru.Note.new(x-offset.left,y-offset.top,w,h);
+        }
+      } else {
+        Danbooru.Note.new(e.pageX - offset.left, e.pageY - offset.top);
+      }
       Danbooru.Note.TranslationMode.stop();
       $(".note-box").show();
       e.stopPropagation();
       e.preventDefault();
+    },
+    
+    Drag: {
+      dragging: false,
+      dragStartX: 0,
+      dragStartY: 0,
+      dragDistanceY: 0,
+      dragDistanceY: 0,
+      
+      start: function (e) {
+        e.preventDefault(); /* don't drag the image */
+        $(window).mousemove(Danbooru.Note.TranslationMode.Drag.drag);
+        Danbooru.Note.TranslationMode.Drag.dragStartX = e.pageX;
+        Danbooru.Note.TranslationMode.Drag.dragStartY = e.pageY;
+      },
+      
+      drag: function (e) {
+        Danbooru.Note.TranslationMode.Drag.dragDistanceX = e.pageX - Danbooru.Note.TranslationMode.Drag.dragStartX;
+        Danbooru.Note.TranslationMode.Drag.dragDistanceY = e.pageY - Danbooru.Note.TranslationMode.Drag.dragStartY;
+        
+        if(Danbooru.Note.TranslationMode.Drag.dragDistanceX > 9 && Danbooru.Note.TranslationMode.Drag.dragDistanceY > 9) {
+          Danbooru.Note.TranslationMode.Drag.dragging = true; /* must drag at least 10pixels (minimum note size) in both dimensions. */
+        }
+        if(Danbooru.Note.TranslationMode.Drag.dragging) {
+          var offset = $("#image").offset();
+          $('#note-helper').css({ /* preview of the note you are dragging */
+            display: 'block',
+            left: (Danbooru.Note.TranslationMode.Drag.dragStartX - offset.left + 1),
+            top: (Danbooru.Note.TranslationMode.Drag.dragStartY - offset.top + 1),
+            width: (Danbooru.Note.TranslationMode.Drag.dragDistanceX - 3),
+            height: (Danbooru.Note.TranslationMode.Drag.dragDistanceY - 3)
+          });
+        }
+      },
+      
+      stop: function (e) {
+        $(window).unbind("mousemove");
+        if(Danbooru.Note.TranslationMode.Drag.dragging) {
+          $('#note-helper').css({display:'none'});
+          Danbooru.Note.TranslationMode.create_note(e, true, Danbooru.Note.TranslationMode.Drag.dragStartX, Danbooru.Note.TranslationMode.Drag.dragStartY, Danbooru.Note.TranslationMode.Drag.dragDistanceX-1, Danbooru.Note.TranslationMode.Drag.dragDistanceY-1);
+          Danbooru.Note.TranslationMode.Drag.dragging = false; /* border of the note is pixel-perfect on the preview border */
+        } else { /* no dragging -> create a normal note */
+          Danbooru.Note.TranslationMode.create_note(e);
+        }
+      }
     }
   },
 
