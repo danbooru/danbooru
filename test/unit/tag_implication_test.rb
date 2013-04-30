@@ -19,7 +19,6 @@ class TagImplicationTest < ActiveSupport::TestCase
       ti2 = FactoryGirl.build(:tag_implication, :antecedent_name => "b", :consequent_name => "c")
       ti2.save
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "a", :consequent_name => "b")
-      ti1.reload
       assert_equal("b", ti1.descendant_names)
     end
 
