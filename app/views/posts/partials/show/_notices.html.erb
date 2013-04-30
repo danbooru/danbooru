@@ -48,8 +48,8 @@
 
 <% if post.parent_id %>
   <div class="ui-corner-all ui-state-highlight notice notice-child">
-    <%= has_parent_message(post, @parent_post_set, @siblings_post_set) %>
-    <div id="has-parent-relationship-preview"><%= @parent_post_set.presenter.post_previews_html(self) %><%= @siblings_post_set.presenter.post_previews_html(self) %></div>
+    <%= has_parent_message(post, @parent_post_set) %>
+    <div id="has-parent-relationship-preview"><%= @parent_post_set.presenter.post_previews_html(self) %></div>
   </div>
 <% end %>
 
