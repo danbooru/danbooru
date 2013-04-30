@@ -4,7 +4,11 @@ class Favorite < ActiveRecord::Base
 
   # this is necessary because there's no trigger for deleting favorites
   def self.destroy_all(hash)
-    connection.execute("delete from favorites_#{hash[:user_id] % 100} where user_id = #{hash[:user_id]} and post_id = #{hash[:post_id]}")
+    if hash[:user_id] && hash[:post_id]
+      connection.execute("delete from favorites_#{hash[:user_id] % 100} where user_id = #{hash[:user_id]} and post_id = #{hash[:post_id]}")
+    elsif hash[:user_id]
+      connection.execute("delete from favorites_#{hash[:user_id] % 100} where user_id = #{hash[:user_id]}")
+    end
   end
 
   def self.add(post, user)

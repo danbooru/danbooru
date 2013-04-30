@@ -14,6 +14,29 @@ class UserTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
+    context "that has been deleted" do
+      setup do
+        @post = FactoryGirl.create(:post)
+        Favorite.add(@post, @user)
+        @user.delete!
+        @post.reload
+      end
+
+      should "rename the user" do
+        assert_equal("user#{@user.id}", @user.name)
+      end
+
+      should "remove all favorites" do
+        assert_equal(0, @user.favorite_count)
+        assert_equal(0, Favorite.for_user(@user.id).count)
+        assert_equal("", @post.fav_string)
+      end
+
+      should "reset the password" do
+        assert_nil(User.authenticate(@user.name, "password"))
+      end
+    end
+
     context "favoriting a post" do
       setup do
         @user.update_column(:favorite_count, 999)
