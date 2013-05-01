@@ -451,6 +451,10 @@ Danbooru.Note = {
       dragStartY: 0,
       dragDistanceY: 0,
       dragDistanceY: 0,
+      x: 0,
+      y: 0,
+      w: 0,
+      h: 0,
       
       start: function (e) {
         e.preventDefault(); /* don't drag the image */
@@ -462,18 +466,35 @@ Danbooru.Note = {
       drag: function (e) {
         Danbooru.Note.TranslationMode.Drag.dragDistanceX = e.pageX - Danbooru.Note.TranslationMode.Drag.dragStartX;
         Danbooru.Note.TranslationMode.Drag.dragDistanceY = e.pageY - Danbooru.Note.TranslationMode.Drag.dragStartY;
-        
-        if(Danbooru.Note.TranslationMode.Drag.dragDistanceX > 9 && Danbooru.Note.TranslationMode.Drag.dragDistanceY > 9) {
+
+        if (Danbooru.Note.TranslationMode.Drag.dragDistanceX > 9 && Danbooru.Note.TranslationMode.Drag.dragDistanceY > 9) {
           Danbooru.Note.TranslationMode.Drag.dragging = true; /* must drag at least 10pixels (minimum note size) in both dimensions. */
         }
-        if(Danbooru.Note.TranslationMode.Drag.dragging) {
+        if (Danbooru.Note.TranslationMode.Drag.dragging) {
           var offset = $("#image").offset();
+
+          if (Danbooru.Note.TranslationMode.Drag.dragDistanceX < 0) {
+            Danbooru.Note.TranslationMode.Drag.x = Danbooru.Note.TranslationMode.Drag.dragStartX + Danbooru.Note.TranslationMode.Drag.dragDistanceX;
+            Danbooru.Note.TranslationMode.Drag.w = -Danbooru.Note.TranslationMode.Drag.dragDistanceX;
+          } else {
+            Danbooru.Note.TranslationMode.Drag.x = Danbooru.Note.TranslationMode.Drag.dragStartX;
+            Danbooru.Note.TranslationMode.Drag.w = Danbooru.Note.TranslationMode.Drag.dragDistanceX;
+          }
+
+          if (Danbooru.Note.TranslationMode.Drag.dragDistanceY < 0) {
+            Danbooru.Note.TranslationMode.Drag.y = Danbooru.Note.TranslationMode.Drag.dragStartY + Danbooru.Note.TranslationMode.Drag.dragDistanceY;
+            Danbooru.Note.TranslationMode.Drag.h = -Danbooru.Note.TranslationMode.Drag.dragDistanceY;
+          } else {
+            Danbooru.Note.TranslationMode.Drag.y = Danbooru.Note.TranslationMode.Drag.dragStartY;
+            Danbooru.Note.TranslationMode.Drag.h = Danbooru.Note.TranslationMode.Drag.dragDistanceY;
+          }
+
           $('#note-helper').css({ /* preview of the note you are dragging */
             display: 'block',
-            left: (Danbooru.Note.TranslationMode.Drag.dragStartX - offset.left + 1),
-            top: (Danbooru.Note.TranslationMode.Drag.dragStartY - offset.top + 1),
-            width: (Danbooru.Note.TranslationMode.Drag.dragDistanceX - 3),
-            height: (Danbooru.Note.TranslationMode.Drag.dragDistanceY - 3)
+            left: (Danbooru.Note.TranslationMode.Drag.x - offset.left + 1),
+            top: (Danbooru.Note.TranslationMode.Drag.y - offset.top + 1),
+            width: (Danbooru.Note.TranslationMode.Drag.w - 3),
+            height: (Danbooru.Note.TranslationMode.Drag.h - 3)
           });
         }
       },
@@ -482,7 +503,7 @@ Danbooru.Note = {
         $(window).unbind("mousemove");
         if(Danbooru.Note.TranslationMode.Drag.dragging) {
           $('#note-helper').css({display:'none'});
-          Danbooru.Note.TranslationMode.create_note(e, true, Danbooru.Note.TranslationMode.Drag.dragStartX, Danbooru.Note.TranslationMode.Drag.dragStartY, Danbooru.Note.TranslationMode.Drag.dragDistanceX-1, Danbooru.Note.TranslationMode.Drag.dragDistanceY-1);
+          Danbooru.Note.TranslationMode.create_note(e, true, Danbooru.Note.TranslationMode.Drag.x, Danbooru.Note.TranslationMode.Drag.y, Danbooru.Note.TranslationMode.Drag.w-1, Danbooru.Note.TranslationMode.Drag.h-1);
           Danbooru.Note.TranslationMode.Drag.dragging = false; /* border of the note is pixel-perfect on the preview border */
         } else { /* no dragging -> create a normal note */
           Danbooru.Note.TranslationMode.create_note(e);
