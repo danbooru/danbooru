@@ -281,11 +281,12 @@ Danbooru.Note = {
       $dialog.append($textarea);
       $dialog.data("id", $note_body.data("id"));
       $dialog.dialog({
-        width: 350,
+        width: 360,
         dialogClass: "note-edit-dialog",
         title: "Edit note",
         buttons: {
           "Save": Danbooru.Note.Edit.save,
+          "Preview": Danbooru.Note.Edit.preview,
           "Cancel": Danbooru.Note.Edit.cancel,
           "Delete": Danbooru.Note.Edit.delete,
           "History": Danbooru.Note.Edit.history
@@ -362,6 +363,16 @@ Danbooru.Note = {
           success: Danbooru.Note.Edit.success_handler
         });
       }
+    },
+
+    preview: function() {
+      var $this = $(this);
+      var $textarea = $this.find("textarea");
+      var id = $this.data("id");
+      var $note_body = Danbooru.Note.Body.find(id);
+      var text = $textarea.val();
+      Danbooru.Note.Body.set_text($note_body, text);
+      $this.dialog("close");
     },
 
     cancel: function() {
