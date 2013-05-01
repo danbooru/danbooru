@@ -6,7 +6,8 @@ group :test do
   gem "mocha", :require => "mocha/setup"
   gem "ffaker", :git => "http://github.com/EmmanuelOga/ffaker.git"
   gem "simplecov", :require => false
-  gem "testrbl"
+  gem "pry"
+  gem "vcr"
 end
 
 group :assets do
