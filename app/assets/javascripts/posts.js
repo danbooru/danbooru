@@ -92,7 +92,7 @@
 
   Danbooru.Post.initialize_shortcuts = function() {
     $(document).bind("keydown.q", function(e) {
-      $("#tags").trigger("focus");
+      $("#tags").trigger("focus").selectEnd();
       e.preventDefault();
     });
 
