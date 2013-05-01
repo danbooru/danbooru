@@ -516,12 +516,14 @@ Danbooru.Note = {
     Danbooru.Note.Body.set_text($note_body, text);
   },
 
-  new: function(x, y) {
+  new: function(x, y, w, h) {
     var $note_box = Danbooru.Note.Box.create(Danbooru.Note.id);
     var $note_body = Danbooru.Note.Body.create(Danbooru.Note.id);
     $note_box.css({
       top: y,
-      left: x
+      left: x,
+      width: w,
+      height: h
     });
     $note_box.find(".note-box-inner-border").addClass("unsaved");
     $note_body.html("<em>Click to edit</em>");
