@@ -801,7 +801,7 @@ class Post < ActiveRecord::Base
     end
 
     def post_is_not_its_own_parent
-      if id == parent_id
+      if parent_id.present? && id == parent_id
         errors[:base] << "Post cannot have itself as a parent"
         false
       end
