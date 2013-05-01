@@ -31,6 +31,7 @@ class Post < ActiveRecord::Base
   has_many :disapprovals, :class_name => "PostDisapproval", :dependent => :destroy
   validates_uniqueness_of :md5
   validates_presence_of :parent, :if => lambda {|rec| !rec.parent_id.nil?}
+  validate :post_is_not_its_own_parent
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at, :parent_id, :as => [:member, :builder, :gold, :platinum, :contributor, :janitor, :moderator, :admin, :default]
   attr_accessible :is_rating_locked, :is_note_locked, :as => [:builder, :contributor, :janitor, :moderator, :admin]
   attr_accessible :is_status_locked, :as => [:admin]
@@ -797,6 +798,13 @@ class Post < ActiveRecord::Base
       end
 
       update_column(:score, 0)
+    end
+
+    def post_is_not_its_own_parent
+      if id == parent_id
+        errors[:base] << "Post cannot have itself as a parent"
+        false
+      end
     end
   end
 
