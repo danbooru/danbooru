@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
   before_filter :set_current_user
   after_filter :reset_current_user
   before_filter :set_title
+  before_filter :normalize_search
   before_filter :set_started_at_session
   before_filter :api_check
   layout "default"
@@ -99,5 +100,9 @@ protected
 
   def set_title
     @page_title = Danbooru.config.app_name + "/#{params[:controller]}"
+  end
+
+  def normalize_search
+    params[:search] ||= {}
   end
 end

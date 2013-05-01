@@ -41,16 +41,17 @@ module PostsHelper
     end
   end
 
-  def has_parent_message(post, parent_post_set, siblings_post_set)
+  def has_parent_message(post, parent_post_set)
     html = ""
 
     html << "This post belongs to a "
     html << link_to("parent", post_path(post.parent_id))
-    html << " (deleted)" if parent_post_set.posts.first.is_deleted?
+    html << " (deleted)" if parent_post_set.parent.first.is_deleted?
 
-    if siblings_post_set.posts.count > 1
+    sibling_count = parent_post_set.children.count - 1
+    if sibling_count > 0
       html << " and has "
-      text = siblings_post_set.posts.count > 2 ? "#{siblings_post_set.posts.count - 1} siblings" : "a sibling"
+      text = sibling_count == 1 ? "a sibling" : "#{sibling_count} siblings"
       html << link_to(text, posts_path(:tags => "parent:#{post.parent_id}"))
     end
 
@@ -65,7 +66,7 @@ module PostsHelper
     html = ""
 
     html << "This post has "
-    text = children_post_set.posts.count == 1 ? "a child" : "#{children_post_set.posts.count} children"
+    text = children_post_set.children.count == 1 ? "a child" : "#{children_post_set.children.count} children"
     html << link_to(text, posts_path(:tags => "parent:#{post.id}"))
 
     html << " (#{link_to("learn more", wiki_pages_path(:title => "help:post_relationships"))}) "

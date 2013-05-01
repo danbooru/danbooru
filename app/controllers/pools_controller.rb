@@ -68,6 +68,8 @@ class PoolsController < ApplicationController
     @pool = Pool.find(params[:id])
     @version = PoolVersion.find(params[:version_id])
     @pool.revert_to!(@version)
-    respond_with(@pool, :notice => "Pool reverted")
+    respond_with(@pool) do |format|
+      format.js
+    end
   end
 end

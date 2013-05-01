@@ -7,7 +7,9 @@ module Downloads
         @source = "http://img65.pixiv.net/img/kiyoringo/21755794_p2.png"
         @tempfile = Tempfile.new("danbooru-test")
         @download = Downloads::File.new(@source, @tempfile.path)
-        @download.download!
+        VCR.use_cassette("download-pixiv-manga", :record => :new_episodes) do
+          @download.download!
+        end
       end
 
       should "instead download the big version" do
@@ -21,7 +23,9 @@ module Downloads
         @source = "http://www.pixiv.net/member_illust.php?mode=big&illust_id=4348318"
         @tempfile = Tempfile.new("danbooru-test")
         @download = Downloads::File.new(@source, @tempfile.path)
-        @download.download!
+        VCR.use_cassette("download-pixiv-html", :record => :new_episodes) do
+          @download.download!
+        end
       end
 
       should "work" do
@@ -34,7 +38,9 @@ module Downloads
         @source = "http://img02.pixiv.net/img/wanwandoh/4348318_m.jpg"
         @tempfile = Tempfile.new("danbooru-test")
         @download = Downloads::File.new(@source, @tempfile.path)
-        @download.download!
+        VCR.use_cassette("download-pixiv-small", :record => :new_episodes) do
+          @download.download!
+        end
       end
 
       should "instead download the original version" do

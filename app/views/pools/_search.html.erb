@@ -5,7 +5,7 @@
         <th><label for="search_name_matches">Name</label></th>
         <td>
           <div class="input">
-            <%= text_field "search", "name_matches" %>
+            <%= text_field "search", "name_matches", :value => params[:search][:name_matches] %>
           </div>
         </td>
       </tr>
@@ -14,7 +14,7 @@
         <th><label for="search_description_matches">Description</label></th>
         <td>
           <div class="input">
-            <%= text_field "search", "description_matches" %>
+            <%= text_field "search", "description_matches", :value => params[:search][:description_matches] %>
           </div>
         </td>
       </tr>
@@ -23,7 +23,7 @@
         <th><label for="search_creator_name">Creator</th>
         <td>
           <div class="input">
-            <%= text_field "search", "creator_name" %>
+            <%= text_field "search", "creator_name", :value => params[:search][:creator_name] %>
           </div>
         </td>
       </tr>
@@ -32,7 +32,7 @@
         <th><label for="search_sort">Order</th>
         <td>
           <div class="input">
-            <%= select "search", "sort", [["Last updated", "updated_at"], ["Name", "name"]] %>
+            <%= select "search", "sort", [["Last updated", "updated_at"], ["Name", "name"]], :selected => params[:search][:sort] %>
           </div>
         </td>
       </tr>

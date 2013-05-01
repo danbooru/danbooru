@@ -6,8 +6,9 @@ module Sources
   class PixivTest < ActiveSupport::TestCase
     context "The source site for pixiv" do
       setup do
-        @site = Sources::Site.new("http://www.pixiv.net/member_illust.php?mode=big&illust_id=9646484")
-        @site.get
+        VCR.use_cassette("source-pixiv-unit-test", :record => :new_episodes) do
+          @site = Sources::Site.new("http://www.pixiv.net/member_illust.php?mode=big&illust_id=9646484")
+        end
       end
 
       should "get the profile" do
