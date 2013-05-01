@@ -351,7 +351,7 @@ class User < ActiveRecord::Base
 
     def create_mod_action
       if level_changed?
-        ModAction.create(:description => "#{name} level changed #{level_string(level_was)} -> #{level_string} by #{CurrentUser.name}")
+        ModAction.create(:description => %{"#{name}":/users/#{id} level changed #{level_string(level_was)} -> #{level_string}})
       end
     end
     
