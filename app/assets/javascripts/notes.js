@@ -372,7 +372,7 @@ Danbooru.Note = {
       var $note_body = Danbooru.Note.Body.find(id);
       var text = $textarea.val();
       Danbooru.Note.Body.set_text($note_body, text);
-      $this.dialog("close");
+      $note_body.show();
     },
 
     cancel: function() {
