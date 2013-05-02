@@ -467,7 +467,7 @@ Danbooru.Note = {
         Danbooru.Note.TranslationMode.Drag.dragDistanceX = e.pageX - Danbooru.Note.TranslationMode.Drag.dragStartX;
         Danbooru.Note.TranslationMode.Drag.dragDistanceY = e.pageY - Danbooru.Note.TranslationMode.Drag.dragStartY;
 
-        if (Danbooru.Note.TranslationMode.Drag.dragDistanceX > 9 && Danbooru.Note.TranslationMode.Drag.dragDistanceY > 9) {
+        if (Math.abs(Danbooru.Note.TranslationMode.Drag.dragDistanceX) > 9 && Math.abs(Danbooru.Note.TranslationMode.Drag.dragDistanceY) > 9) {
           Danbooru.Note.TranslationMode.Drag.dragging = true; /* must drag at least 10pixels (minimum note size) in both dimensions. */
         }
         if (Danbooru.Note.TranslationMode.Drag.dragging) {
