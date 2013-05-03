@@ -51,5 +51,16 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
         end
       end
     end
+
+    should "rename an aliased tag's artist entry and wiki page" do
+      tag1 = FactoryGirl.create(:tag, :name => "aaa", :category => 1)
+      tag2 = FactoryGirl.create(:tag, :name => "bbb")
+      artist = FactoryGirl.create(:artist, :name => "aaa", :notes => "testing")
+      @importer = AliasAndImplicationImporter.new("create alias aaa -> bbb", "", "1")
+      @importer.process!
+      artist.reload
+      assert_equal("bbb", artist.name)
+      assert_match(/automatically renamed/, artist.notes)
+    end
   end
 end

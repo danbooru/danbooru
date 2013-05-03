@@ -26,6 +26,13 @@ create implication aaa -> bbb
         <%= text_field "batch", "forum_id" %>
       </div>
 
+      <div class="input">
+        <label for="batch_rename_aliased_pages">
+          <%= check_box "batch", "rename_aliased_pages" %>
+          Automatically rename all wiki pages and artists for aliases in this batch
+        </label>
+      </div>
+
       <%= submit_tag %>
     <% end %>
   </div>

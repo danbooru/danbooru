@@ -1,14 +1,19 @@
 class AliasAndImplicationImporter
-  attr_accessor :text, :commands, :forum_id
+  attr_accessor :text, :commands, :forum_id, :rename_aliased_pages
 
-  def initialize(text, forum_id)
+  def initialize(text, forum_id, rename_aliased_pages = "0")
     @forum_id = forum_id
     @text = text
+    @rename_aliased_pages = rename_aliased_pages
   end
 
   def process!
     tokens = tokenize(text)
     parse(tokens)
+  end
+
+  def rename_aliased_pages?
+    @rename_aliased_pages == "1"
   end
 
 private
@@ -40,6 +45,7 @@ private
         case token[0]
         when :create_alias
           tag_alias = TagAlias.create(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2])
+          tag_alias.rename_wiki_and_artist if rename_aliased_pages?
           tag_alias.delay(:queue => "default").process!
 
         when :create_implication
