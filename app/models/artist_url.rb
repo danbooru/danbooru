@@ -11,8 +11,8 @@ class ArtistUrl < ActiveRecord::Base
       url = url.gsub(/^http:\/\/blog\d+\.fc2/, "http://blog.fc2")
       url = url.gsub(/^http:\/\/blog-imgs-\d+\.fc2/, "http://blog.fc2")
       url = url.gsub(/^http:\/\/blog-imgs-\d+-\w+\.fc2/, "http://blog.fc2")
-      url = url.gsub(/^http:\/\/img\d+\.pixiv\.net/, "http://img.pixiv.net")
-      url = url.gsub(/^http:\/\/i\d+\.pixiv\.net\/img\d+/, "http://img.pixiv.net")
+      url = url.gsub(/^http:\/\/img\d+\.pixiv\.net\/img/, "http://img.pixiv.net")
+      url = url.gsub(/^http:\/\/i\d+\.pixiv\.net\/img\d+\/img/, "http://img.pixiv.net")
       url = url.gsub(/\/+\Z/, "")
       url + "/"
     end
@@ -27,8 +27,8 @@ class ArtistUrl < ActiveRecord::Base
     url = url.gsub(/^http:\/\/blog\d+\.fc2/, "http://blog*.fc2")
     url = url.gsub(/^http:\/\/blog-imgs-\d+\.fc2/, "http://blog*.fc2")
     url = url.gsub(/^http:\/\/blog-imgs-\d+-\w+\.fc2/, "http://blog*.fc2")
-    url = url.gsub(/^http:\/\/img\d+\.pixiv\.net/, "http://img*.pixiv.net")
-    url = url.gsub(/^http:\/\/i\d+\.pixiv\.net\/img\d+/, "http://*.pixiv.net/img*")
+    url = url.gsub(/^http:\/\/img\d+\.pixiv\.net\/img/, "http://img*.pixiv.net")
+    url = url.gsub(/^http:\/\/i\d+\.pixiv\.net\/img\d+\/img/, "http://*.pixiv.net/img*")
   end
 
   def normalize
