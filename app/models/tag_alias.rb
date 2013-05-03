@@ -130,6 +130,7 @@ class TagAlias < ActiveRecord::Base
       escaped_antecedent_name = Regexp.escape(antecedent_name)
       fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_antecedent_name}(?:\Z| )/, " #{consequent_name} ").strip
       CurrentUser.scoped(creator, creator_ip_addr) do
+        post.disable_versioning = true
         post.update_attributes(
           :tag_string => fixed_tags
         )

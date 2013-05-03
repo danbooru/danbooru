@@ -62,18 +62,6 @@ class TagAliasTest < ActiveSupport::TestCase
       end
     end
 
-    should "record the alias's creator in the tag history" do
-      uploader = FactoryGirl.create(:user)
-      post = nil
-      CurrentUser.scoped(uploader, "127.0.0.1") do
-        post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
-      end
-      tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "xxx")
-      post.reload
-      assert_not_equal(tag_alias.creator_id, post.uploader_id)
-      assert_equal(tag_alias.creator_id, post.versions.last.updater_id)
-    end
-
     should "push the antecedent's category to the consequent" do
       tag1 = FactoryGirl.create(:tag, :name => "aaa", :category => 1)
       tag2 = FactoryGirl.create(:tag, :name => "bbb")

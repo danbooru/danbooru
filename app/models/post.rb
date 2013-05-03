@@ -3,7 +3,7 @@ class Post < ActiveRecord::Base
   class DisapprovalError < Exception ; end
   class SearchError < Exception ; end
 
-  attr_accessor :old_tag_string, :old_parent_id, :has_constraints
+  attr_accessor :old_tag_string, :old_parent_id, :has_constraints, :disable_versioning
   after_destroy :delete_files
   after_destroy :delete_remote_files
   after_save :create_version
@@ -868,6 +868,8 @@ class Post < ActiveRecord::Base
 
   module VersionMethods
     def create_version
+      return if disable_versioning
+
       if created_at == updated_at
         CurrentUser.increment!(:post_update_count)
         versions.create(
