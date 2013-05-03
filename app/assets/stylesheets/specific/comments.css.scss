@@ -15,13 +15,13 @@ div.comments-for-post {
   div.list-of-comments {
     article.comment {
       margin-bottom: 2em;
+      word-wrap: break-word;
 
       div.author {
         width: 12em;
         float: left;
         overflow: hidden;
         margin-right: 2em;
-        word-wrap: break-word;
 
         h1 {
           display: block;

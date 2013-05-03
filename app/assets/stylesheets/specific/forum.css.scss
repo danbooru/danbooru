@@ -7,12 +7,12 @@ div.list-of-forum-posts {
 
   article {
     margin-bottom: 3em;
+    word-wrap: break-word;
 
     div.author {
       width: 12em;
       float: left;
       margin-right: 2em;
-      word-wrap: break-word;
     }
 
     div.content {
