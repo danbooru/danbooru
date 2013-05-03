@@ -7,11 +7,11 @@ http_interactions:
       encoding: US-ASCII
       string: ''
     headers:
-      User-Agent:
+      user-agent:
       - _/2.8.0
-      Referer:
+      referer:
       - http://www.pixiv.net
-      Accept:
+      accept:
       - ! '*/*'
   response:
     status:
@@ -19,39 +19,39 @@ http_interactions:
       message: !binary |-
         T0s=
     headers:
-      !binary "U2VydmVy":
+      !binary "c2VydmVy":
       - !binary |-
         bmdpbng=
-      !binary "RGF0ZQ==":
+      !binary "ZGF0ZQ==":
       - !binary |-
-        V2VkLCAwMSBNYXkgMjAxMyAwMDozNDoyNCBHTVQ=
-      !binary "Q29udGVudC1UeXBl":
+        RnJpLCAwMyBNYXkgMjAxMyAyMzoyMzoxOCBHTVQ=
+      !binary "Y29udGVudC10eXBl":
       - !binary |-
         aW1hZ2UvanBlZw==
-      !binary "Q29udGVudC1MZW5ndGg=":
+      !binary "Y29udGVudC1sZW5ndGg=":
       - !binary |-
         MTg1Nzc4
-      !binary "Q29ubmVjdGlvbg==":
+      !binary "Y29ubmVjdGlvbg==":
       - !binary |-
         a2VlcC1hbGl2ZQ==
-      !binary "TGFzdC1Nb2RpZmllZA==":
+      !binary "bGFzdC1tb2RpZmllZA==":
       - !binary |-
         VHVlLCAxOSBNYXkgMjAwOSAyMzozNDoxMSBHTVQ=
-      !binary "RXRhZw==":
+      !binary "ZXRhZw==":
       - !binary |-
         ImFkZDExYzktMmQ1YjItNDZhNGM1OTBlMjJjMCI=
-      !binary "QWNjZXB0LVJhbmdlcw==":
+      !binary "YWNjZXB0LXJhbmdlcw==":
       - !binary |-
         Ynl0ZXM=
-      !binary "Q2FjaGUtQ29udHJvbA==":
+      !binary "Y2FjaGUtY29udHJvbA==":
       - !binary |-
         bWF4LWFnZT0xMjA5NjAw
-      !binary "RXhwaXJlcw==":
+      !binary "ZXhwaXJlcw==":
       - !binary |-
-        VHVlLCAxNCBNYXkgMjAxMyAyMzoyNzoxOCBHTVQ=
-      !binary "QWdl":
+        RnJpLCAxNyBNYXkgMjAxMyAxMTozMTozMyBHTVQ=
+      !binary "YWdl":
       - !binary |-
-        NDAyNg==
+        NDI3MDU=
     body:
       encoding: ASCII-8BIT
       string: !binary |-
@@ -4184,6 +4184,7 @@ http_interactions:
         DvGOzZcGUrHy3Ep4MunzY5Ue4KSoe+oGXGtuq4FVkqjqSa+gLfx3N0nxMF54
         uS9vPLxbgUolXkf60QkHs5F291RMWfqRh/kmOpY7fIklQbpB7wD9danFlWB5
         bJUdD6Cp8Tgup+OwhWnRD//Z
-    http_version: 
-  recorded_at: Wed, 01 May 2013 00:34:25 GMT
+    http_version: !binary |-
+      MS4x
+  recorded_at: Fri, 03 May 2013 23:23:18 GMT
 recorded_with: VCR 2.4.0

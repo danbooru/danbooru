@@ -7,44 +7,44 @@ http_interactions:
       encoding: US-ASCII
       string: ''
     headers:
-      Referer:
+      referer:
       - http://www.pixiv.net
-      User-Agent:
+      user-agent:
       - ./2.8.0
-      Accept:
+      accept:
       - ! '*/*'
   response:
     status:
       code: 200
       message: OK
     headers:
-      Server:
+      server:
       - nginx
-      Date:
-      - Wed, 01 May 2013 00:34:22 GMT
-      Content-Type:
+      date:
+      - Fri, 03 May 2013 23:23:12 GMT
+      content-type:
       - image/png
-      Content-Length:
+      content-length:
       - '1782713'
-      Connection:
+      connection:
       - keep-alive
-      Last-Modified:
+      last-modified:
       - Wed, 14 Sep 2011 17:28:13 GMT
-      Etag:
+      etag:
       - ! '"2e3303bf-1b33b9-4acea15afa540"'
-      Accept-Ranges:
+      accept-ranges:
       - bytes
-      Cache-Control:
+      cache-control:
       - max-age=1209600
-      Expires:
-      - Tue, 14 May 2013 23:27:19 GMT
-      Age:
-      - '4023'
+      expires:
+      - Fri, 17 May 2013 23:23:12 GMT
+      age:
+      - '0'
     body:
       encoding: US-ASCII
       string: ''
-    http_version: 
-  recorded_at: Wed, 01 May 2013 00:34:22 GMT
+    http_version: '1.1'
+  recorded_at: Fri, 03 May 2013 23:23:12 GMT
 - request:
     method: get
     uri: http://img65.pixiv.net/img/kiyoringo/21755794_big_p2.png
@@ -52,51 +52,39 @@ http_interactions:
       encoding: US-ASCII
       string: ''
     headers:
-      User-Agent:
+      user-agent:
       - _/2.8.0
-      Referer:
+      referer:
       - http://www.pixiv.net
-      Accept:
+      accept:
       - ! '*/*'
   response:
     status:
       code: 200
-      message: !binary |-
-        T0s=
+      message: OK
     headers:
-      !binary "U2VydmVy":
-      - !binary |-
-        bmdpbng=
-      !binary "RGF0ZQ==":
-      - !binary |-
-        V2VkLCAwMSBNYXkgMjAxMyAwMDozNDoyMiBHTVQ=
-      !binary "Q29udGVudC1UeXBl":
-      - !binary |-
-        aW1hZ2UvcG5n
-      !binary "Q29udGVudC1MZW5ndGg=":
-      - !binary |-
-        MTc4MjcxMw==
-      !binary "Q29ubmVjdGlvbg==":
-      - !binary |-
-        a2VlcC1hbGl2ZQ==
-      !binary "TGFzdC1Nb2RpZmllZA==":
-      - !binary |-
-        V2VkLCAxNCBTZXAgMjAxMSAxNzoyODoxMyBHTVQ=
-      !binary "RXRhZw==":
-      - !binary |-
-        IjJlMzMwM2JmLTFiMzNiOS00YWNlYTE1YWZhNTQwIg==
-      !binary "QWNjZXB0LVJhbmdlcw==":
-      - !binary |-
-        Ynl0ZXM=
-      !binary "Q2FjaGUtQ29udHJvbA==":
-      - !binary |-
-        bWF4LWFnZT0xMjA5NjAw
-      !binary "RXhwaXJlcw==":
-      - !binary |-
-        VHVlLCAxNCBNYXkgMjAxMyAyMzoyNzoxOSBHTVQ=
-      !binary "QWdl":
-      - !binary |-
-        NDAyMw==
+      server:
+      - nginx
+      date:
+      - Fri, 03 May 2013 23:23:12 GMT
+      content-type:
+      - image/png
+      content-length:
+      - '1782713'
+      connection:
+      - keep-alive
+      last-modified:
+      - Wed, 14 Sep 2011 17:28:13 GMT
+      etag:
+      - ! '"2e3303bf-1b33b9-4acea15afa540"'
+      accept-ranges:
+      - bytes
+      cache-control:
+      - max-age=1209600
+      expires:
+      - Fri, 17 May 2013 23:23:12 GMT
+      age:
+      - '0'
     body:
       encoding: ASCII-8BIT
       string: !binary |-
@@ -39716,6 +39704,6 @@ http_interactions:
         AgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAAB
         AgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAAB
         AgQIECBAgAABAgQIECDwAYE/YMgpRKYZ7IsAAAAASUVORK5CYII=
-    http_version: 
-  recorded_at: Wed, 01 May 2013 00:34:23 GMT
+    http_version: '1.1'
+  recorded_at: Fri, 03 May 2013 23:23:17 GMT
 recorded_with: VCR 2.4.0
