@@ -41,6 +41,10 @@ module PostsHelper
     end
   end
 
+  def post_favlist(post)
+    post.favorited_users.reverse_each.map{|user| link_to_user(user)}.join(", ").html_safe
+  end
+
   def has_parent_message(post, parent_post_set)
     html = ""
 
