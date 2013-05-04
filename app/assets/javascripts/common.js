@@ -18,6 +18,7 @@ $(function() {
 
   $("#close-notice-link").click(function(e) {
     $('#notice').fadeOut("fast");
+    e.preventDefault();
   });
 });
 
