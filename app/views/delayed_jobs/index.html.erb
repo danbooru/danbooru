@@ -34,3 +34,7 @@
 </table>
 
 <%= numbered_paginator(@delayed_jobs) %>
+
+<% content_for(:page_title) do %>
+  Delayed Jobs - <%= Danbooru.config.app_name %>
+<% end %>
