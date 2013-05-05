@@ -527,6 +527,8 @@ class User < ActiveRecord::Base
       options ||= {}
       options[:except] ||= []
       options[:except] += hidden_attributes
+      options[:methods] ||= []
+      options[:methods] += [:wiki_page_version_count, :artist_version_count, :pool_version_count, :forum_post_count, :comment_count]
       super(options, &block)
     end
 
