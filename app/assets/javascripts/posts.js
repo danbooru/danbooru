@@ -218,9 +218,9 @@
     if (border_colors.length > 1) {
       $img.css("border", "2px solid");
       if (border_colors.length === 3) {
-        $img.css("border-color", border_colors[0] + " " + border_colors[2] + " " + border_colors[1]);
+        $img.css("border-color", border_colors[0] + " " + border_colors[2] + " " + border_colors[2] + " " + border_colors[1]);
       } else if (border_colors.length === 2) {
-        $img.css("border-color", border_colors[0] + " " + border_colors[1]);
+        $img.css("border-color", border_colors[0] + " " + border_colors[1] + " " + border_colors[1] + " " + border_colors[0]);
       }
     }
   }
