@@ -139,10 +139,6 @@ Danbooru.Note = {
         top: $note_box.position().top + $note_box.height() + 5,
         left: $note_box.position().left
       });
-      if (!$note_body.data('resized')) {
-        Danbooru.Note.Body.resize($note_body);
-        $note_body.data('resized', 'true');
-      }
       Danbooru.Note.Body.bound_position($note_body);
     },
 
@@ -173,8 +169,12 @@ Danbooru.Note = {
       Danbooru.Note.Body.hide_all();
       Danbooru.Note.clear_timeouts();
       var $note_body = Danbooru.Note.Body.find(id);
-      Danbooru.Note.Body.initialize($note_body);
+      if (!$note_body.data('resized')) {
+        Danbooru.Note.Body.resize($note_body);
+        $note_body.data('resized', 'true');
+      }
       $note_body.show();
+      Danbooru.Note.Body.initialize($note_body);
     },
 
     find: function(id) {
