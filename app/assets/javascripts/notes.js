@@ -107,6 +107,10 @@ Danbooru.Note = {
     },
 
     toggle_all: function() {
+      // Ignore the click event when adding a note
+      if ((new Date).getTime() < Danbooru.Note.ignore_click_until) {
+        return;
+      }
       $(".note-box").toggle();
     }
   },
@@ -419,7 +423,6 @@ Danbooru.Note = {
 
       Danbooru.Note.TranslationMode.active = true;
       $("#original-file-link").click();
-      $("#image").one("click", function() { $(".note-box").show() }); /* override the 'hide all note boxes' click event */
       $("#image").one("mousedown", Danbooru.Note.TranslationMode.Drag.start);
       $(window).bind("mouseup", Danbooru.Note.TranslationMode.Drag.stop);
       Danbooru.notice('Click or drag on the image to create a note (shortcut is <span class="key">n</span>)');
@@ -444,6 +447,10 @@ Danbooru.Note = {
       $(".note-box").show();
       e.stopPropagation();
       e.preventDefault();
+
+      // Hack to ignore clicks for some milliseconds
+      // The mouseup event is executed before the click event, so it's hard to do this properly
+      Danbooru.Note.ignore_click_until = (new Date).getTime() + 200;
     },
     
     Drag: {
@@ -541,6 +548,7 @@ Danbooru.Note = {
   editing: false,
   timeouts: [],
   pending: {},
+  ignore_click_until: 0,
 
   add: function(id, x, y, w, h, text) {
     var $note_box = Danbooru.Note.Box.create(id);
