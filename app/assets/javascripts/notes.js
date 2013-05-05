@@ -433,9 +433,14 @@ Danbooru.Note = {
       Danbooru.Note.TranslationMode.active = false;
       var offset = $("#image").offset();
       
-      if(dragged) {
-        if(w > 9 && h > 9) { /* minimum note size: 10px */
-          Danbooru.Note.new(x-offset.left,y-offset.top,w,h);
+      if (dragged) {
+        if (w > 9 || h > 9) { /* minimum note size: 10px */
+          if (w <= 9) {
+            w = 10;
+          } else if (h <= 9) {
+            h = 10;
+          }
+          Danbooru.Note.new(x - offset.left, y - offset.top, w, h);
         }
       } else {
         Danbooru.Note.new(e.pageX - offset.left, e.pageY - offset.top);
