@@ -111,7 +111,9 @@ Danbooru.Note = {
       if ((new Date).getTime() < Danbooru.Note.ignore_click_until) {
         return;
       }
-      $(".note-box").toggle();
+      var is_hidden = document.getElementById('note-container').style.display == 'none';
+      // Why does toggle() not work here?
+      $("#note-container").toggle(is_hidden);
     }
   },
 
