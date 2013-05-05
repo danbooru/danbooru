@@ -89,13 +89,13 @@ Danbooru.Note = {
 
     scale: function($note_box) {
       var $image = $("#image");
-      var ratio = $image.width() / parseFloat($("#image").data("original-width"));
-      var $note = $("#notes > article[data-id=" + $note_box.data("id") + "]");
+      var ratio = $image.width() / parseFloat($image.data("original-width"));
+      var MIN_SIZE = 5;
       $note_box.css({
-        top: Math.ceil(parseFloat($note.data("y")) * ratio),
-        left: Math.ceil(parseFloat($note.data("x")) * ratio),
-        width: Math.ceil(parseFloat($note.data("width")) * ratio),
-        height: Math.ceil(parseFloat($note.data("height")) * ratio)
+        top: Math.ceil(parseFloat($note_box.data("y")) * ratio),
+        left: Math.ceil(parseFloat($note_box.data("x")) * ratio),
+        width: Math.max(MIN_SIZE, Math.ceil(parseFloat($note_box.data("width")) * ratio)),
+        height: Math.max(MIN_SIZE, Math.ceil(parseFloat($note_box.data("height")) * ratio))
       });
       Danbooru.Note.Box.resize_inner_border($note_box);
     },
@@ -139,6 +139,10 @@ Danbooru.Note = {
         top: $note_box.position().top + $note_box.height() + 5,
         left: $note_box.position().left
       });
+      if (!$note_body.data('resized')) {
+        Danbooru.Note.Body.resize($note_body);
+        $note_body.data('resized', 'true');
+      }
       Danbooru.Note.Body.bound_position($note_body);
     },
 
@@ -169,8 +173,8 @@ Danbooru.Note = {
       Danbooru.Note.Body.hide_all();
       Danbooru.Note.clear_timeouts();
       var $note_body = Danbooru.Note.Body.find(id);
-      $note_body.show();
       Danbooru.Note.Body.initialize($note_body);
+      $note_body.show();
     },
 
     find: function(id) {
@@ -223,7 +227,7 @@ Danbooru.Note = {
           }
         } while ((hi - lo) > 4)
         if ($note_body.height() > h) {
-          $note_body.css("minWidth", hi);
+          $note_body.css("min-width", hi);
         }
       }
     },
@@ -557,23 +561,19 @@ Danbooru.Note = {
   pending: {},
   ignore_click_until: 0,
 
-  add: function(id, x, y, w, h, text) {
+  add: function(container, id, x, y, w, h, text) {
     var $note_box = Danbooru.Note.Box.create(id);
     var $note_body = Danbooru.Note.Body.create(id);
 
-    $note_box.css({
-      left: x,
-      top: y,
-      width: w,
-      height: h,
-      display: 'none'
-    });
-
-    $("#note-container").append($note_box);
-    $("#note-container").append($note_body);
+    $note_box.data('x', x);
+    $note_box.data('y', y);
+    $note_box.data('width', w);
+    $note_box.data('height', h);
+    container.appendChild($note_box[0]);
+    container.appendChild($note_body[0]);
     $note_body.data("original-body", text);
     Danbooru.Note.Box.scale($note_box);
-    Danbooru.Note.Body.set_text($note_body, text);
+    Danbooru.Note.Body.display_text($note_body, text);
   },
 
   new: function(x, y, w, h) {
@@ -603,9 +603,11 @@ Danbooru.Note = {
   },
 
   load_all: function() {
+    var fragment = document.createDocumentFragment();
     $.each($("#notes article"), function(i, article) {
       var $article = $(article);
       Danbooru.Note.add(
+        fragment,
         $article.data("id"),
         $article.data("x"),
         $article.data("y"),
@@ -614,12 +616,7 @@ Danbooru.Note = {
         $article.html()
       );
     });
-    
-    $('#note-container').css('display','none');
-    $('.note-box').each(function(i, v) {
-      $(v).css('display','block')
-    });
-    $('#note-container').css('display','block');
+    $("#note-container").append(fragment);
   }
 }
 
