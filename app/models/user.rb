@@ -517,6 +517,8 @@ class User < ActiveRecord::Base
       options ||= {}
       options[:except] ||= []
       options[:except] += hidden_attributes
+      options[:methods] ||= []
+      options[:methods] += [:wiki_page_version_count, :artist_version_count, :pool_version_count, :forum_post_count, :comment_count]
       super(options)
     end
 
@@ -535,6 +537,28 @@ class User < ActiveRecord::Base
         "level" => level,
         "created_at" => created_at.strftime("%Y-%m-%d %H:%M")
       }.to_json
+    end
+  end
+
+  module CountMethods
+    def wiki_page_version_count
+      WikiPageVersion.for_user(id).count
+    end
+
+    def artist_version_count
+      ArtistVersion.for_user(id).count
+    end
+
+    def pool_version_count
+      PoolVersion.for_user(id).count
+    end
+
+    def forum_post_count
+      ForumPost.for_user(id).count
+    end
+
+    def comment_count
+      Comment.for_creator(id).count
     end
   end
 
@@ -628,6 +652,7 @@ class User < ActiveRecord::Base
   include LimitMethods
   include InvitationMethods
   include ApiMethods
+  include CountMethods
   extend SearchMethods
 
   def initialize_default_image_size
