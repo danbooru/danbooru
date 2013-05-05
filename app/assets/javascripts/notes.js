@@ -101,9 +101,14 @@ Danbooru.Note = {
     },
 
     scale_all: function() {
+      var container = document.getElementById('note-container');
+      // Hide notes while rescaling, to prevent unnecessary reflowing
+      var was_visible = container.style.display != 'none';
+      if (was_visible) container.style.display = 'none';
       $(".note-box").each(function(i, v) {
         Danbooru.Note.Box.scale($(v));
       });
+      if (was_visible) container.style.display = 'block';
     },
 
     toggle_all: function() {
