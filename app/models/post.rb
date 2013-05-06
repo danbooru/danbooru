@@ -324,8 +324,6 @@ class Post < ActiveRecord::Base
     def update_tag_post_counts
       decrement_tags = tag_array_was - tag_array
       increment_tags = tag_array - tag_array_was
-      Post.execute_sql("UPDATE tags SET post_count = post_count - 1 WHERE name IN (?)", decrement_tags) if decrement_tags.any?
-      Post.execute_sql("UPDATE tags SET post_count = post_count + 1 WHERE name IN (?)", increment_tags) if increment_tags.any?
       Post.expire_cache_for_all(decrement_tags) if decrement_tags.any?
       Post.expire_cache_for_all(increment_tags) if increment_tags.any?
       Post.expire_cache_for_all([""]) if new_record? || id <= 100_000
@@ -338,7 +336,7 @@ class Post < ActiveRecord::Base
       self.tag_count_copyright = 0
       self.tag_count_character = 0
 
-      categories = Tag.categories_for(tag_array)
+      categories = Tag.categories_for(tag_array, :disable_caching => true)
       categories.each_value do |category|
         self.tag_count += 1
 

@@ -66,20 +66,21 @@ class Tag < ActiveRecord::Base
         select_value_sql("SELECT category FROM tags WHERE name = ?", tag_name).to_i
       end
 
-      def category_for(tag_name)
-        Cache.get("tc:#{Cache.sanitize(tag_name)}") do
+      def category_for(tag_name, options = {})
+        if options[:disable_caching]
           select_category_for(tag_name)
+        else
+          Cache.get("tc:#{Cache.sanitize(tag_name)}") do
+            select_category_for(tag_name)
+          end
         end
       end
 
-      def categories_for(tag_names)
+      def categories_for(tag_names, options)
         Array(tag_names).inject({}) do |hash, tag_name|
-          hash[tag_name] = category_for(tag_name)
+          hash[tag_name] = category_for(tag_name, options)
           hash
         end
-        # Cache.get_multi(tag_names, "tc") do |name|
-        #   select_category_for(name)
-        # end
       end
     end
 
