@@ -510,13 +510,15 @@ class User < ActiveRecord::Base
 
   module ApiMethods
     def hidden_attributes
-      super + [:password_hash, :bcrypt_password_hash, :email, :email_verification_key, :time_zone, :created_at, :updated_at, :receive_email_notifications, :last_logged_in_at, :last_forum_read_at, :has_mail, :default_image_size, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :base_upload_limit, :recent_tags, :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :enable_sequential_post_navigation, :hide_deleted_posts, :per_page, :style_usernames]
+      super + [:password_hash, :bcrypt_password_hash, :email, :email_verification_key, :time_zone, :updated_at, :receive_email_notifications, :last_logged_in_at, :last_forum_read_at, :has_mail, :default_image_size, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :recent_tags, :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :enable_sequential_post_navigation, :hide_deleted_posts, :per_page, :style_usernames]
     end
 
     def serializable_hash(options = {})
       options ||= {}
       options[:except] ||= []
       options[:except] += hidden_attributes
+      options[:methods] ||= []
+      options[:methods] += [:wiki_page_version_count, :artist_version_count, :pool_version_count, :forum_post_count, :comment_count]
       super(options)
     end
 
@@ -525,6 +527,8 @@ class User < ActiveRecord::Base
       options ||= {}
       options[:except] ||= []
       options[:except] += hidden_attributes
+      options[:methods] ||= []
+      options[:methods] += [:wiki_page_version_count, :artist_version_count, :pool_version_count, :forum_post_count, :comment_count]
       super(options, &block)
     end
 
@@ -535,6 +539,28 @@ class User < ActiveRecord::Base
         "level" => level,
         "created_at" => created_at.strftime("%Y-%m-%d %H:%M")
       }.to_json
+    end
+  end
+
+  module CountMethods
+    def wiki_page_version_count
+      WikiPageVersion.for_user(id).count
+    end
+
+    def artist_version_count
+      ArtistVersion.for_user(id).count
+    end
+
+    def pool_version_count
+      PoolVersion.for_user(id).count
+    end
+
+    def forum_post_count
+      ForumPost.for_user(id).count
+    end
+
+    def comment_count
+      Comment.for_creator(id).count
     end
   end
 
@@ -628,6 +654,7 @@ class User < ActiveRecord::Base
   include LimitMethods
   include InvitationMethods
   include ApiMethods
+  include CountMethods
   extend SearchMethods
 
   def initialize_default_image_size

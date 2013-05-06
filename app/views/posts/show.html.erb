@@ -41,7 +41,8 @@
       <%= render "posts/partials/show/notices", :post => @post %>
 
       <section id="image-container" data-tags="<%= @post.tag_string %>" data-user="<%= @post.uploader_name %>" data-rating="<%= @post.rating %>" data-flags="<%= @post.status_flags %>">
-        <div id="note-container"><div id="note-helper"></div></div>
+        <div id="note-container"></div>
+        <div id="note-preview"></div>
         <%= @post.presenter.image_html(self) %>
       </section>
 

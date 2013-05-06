@@ -57,7 +57,7 @@
       var link = $("<a/>");
       var count = $("<span/>");
 
-      link.html(entry.tags);
+      link.text(entry.tags);
       link.click(Danbooru.Blacklist.toggle_entry);
       count.html(entry.hits);
       item.append(link);

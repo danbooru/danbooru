@@ -89,25 +89,36 @@ Danbooru.Note = {
 
     scale: function($note_box) {
       var $image = $("#image");
-      var ratio = $image.width() / parseFloat($("#image").data("original-width"));
-      var $note = $("#notes > article[data-id=" + $note_box.data("id") + "]");
+      var ratio = $image.width() / parseFloat($image.data("original-width"));
+      var MIN_SIZE = 5;
       $note_box.css({
-        top: Math.ceil(parseFloat($note.data("y")) * ratio),
-        left: Math.ceil(parseFloat($note.data("x")) * ratio),
-        width: Math.ceil(parseFloat($note.data("width")) * ratio),
-        height: Math.ceil(parseFloat($note.data("height")) * ratio)
+        top: Math.ceil(parseFloat($note_box.data("y")) * ratio),
+        left: Math.ceil(parseFloat($note_box.data("x")) * ratio),
+        width: Math.max(MIN_SIZE, Math.ceil(parseFloat($note_box.data("width")) * ratio)),
+        height: Math.max(MIN_SIZE, Math.ceil(parseFloat($note_box.data("height")) * ratio))
       });
       Danbooru.Note.Box.resize_inner_border($note_box);
     },
 
     scale_all: function() {
+      var container = document.getElementById('note-container');
+      // Hide notes while rescaling, to prevent unnecessary reflowing
+      var was_visible = container.style.display != 'none';
+      if (was_visible) container.style.display = 'none';
       $(".note-box").each(function(i, v) {
         Danbooru.Note.Box.scale($(v));
       });
+      if (was_visible) container.style.display = 'block';
     },
 
     toggle_all: function() {
-      $(".note-box").toggle();
+      // Ignore the click event when adding a note
+      if ((new Date).getTime() < Danbooru.Note.ignore_click_until) {
+        return;
+      }
+      var is_hidden = document.getElementById('note-container').style.display == 'none';
+      // Why does toggle() not work here?
+      $("#note-container").toggle(is_hidden);
     }
   },
 
@@ -158,6 +169,10 @@ Danbooru.Note = {
       Danbooru.Note.Body.hide_all();
       Danbooru.Note.clear_timeouts();
       var $note_body = Danbooru.Note.Body.find(id);
+      if (!$note_body.data('resized')) {
+        Danbooru.Note.Body.resize($note_body);
+        $note_body.data('resized', 'true');
+      }
       $note_body.show();
       Danbooru.Note.Body.initialize($note_body);
     },
@@ -212,7 +227,7 @@ Danbooru.Note = {
           }
         } while ((hi - lo) > 4)
         if ($note_body.height() > h) {
-          $note_body.css("minWidth", hi);
+          $note_body.css("min-width", hi);
         }
       }
     },
@@ -419,7 +434,6 @@ Danbooru.Note = {
 
       Danbooru.Note.TranslationMode.active = true;
       $("#original-file-link").click();
-      $("#image").one("click", function() { $(".note-box").show() }); /* override the 'hide all note boxes' click event */
       $("#image").one("mousedown", Danbooru.Note.TranslationMode.Drag.start);
       $(window).bind("mouseup", Danbooru.Note.TranslationMode.Drag.stop);
       Danbooru.notice('Click or drag on the image to create a note (shortcut is <span class="key">n</span>)');
@@ -433,17 +447,26 @@ Danbooru.Note = {
       Danbooru.Note.TranslationMode.active = false;
       var offset = $("#image").offset();
       
-      if(dragged) {
-        if(w > 9 && h > 9) { /* minimum note size: 10px */
-          Danbooru.Note.new(x-offset.left,y-offset.top,w,h);
+      if (dragged) {
+        if (w > 9 || h > 9) { /* minimum note size: 10px */
+          if (w <= 9) {
+            w = 10;
+          } else if (h <= 9) {
+            h = 10;
+          }
+          Danbooru.Note.new(x - offset.left, y - offset.top, w, h);
         }
       } else {
         Danbooru.Note.new(e.pageX - offset.left, e.pageY - offset.top);
       }
       Danbooru.Note.TranslationMode.stop();
-      $(".note-box").show();
+      $("#note-container").show();
       e.stopPropagation();
       e.preventDefault();
+
+      // Hack to ignore clicks for some milliseconds
+      // The mouseup event is executed before the click event, so it's hard to do this properly
+      Danbooru.Note.ignore_click_until = (new Date).getTime() + 200;
     },
     
     Drag: {
@@ -506,10 +529,10 @@ Danbooru.Note = {
             Danbooru.Note.TranslationMode.Drag.h = -Danbooru.Note.TranslationMode.Drag.dragDistanceY;
           }
 
-          $('#note-helper').css({ /* preview of the note you are dragging */
+          $('#note-preview').css({
             display: 'block',
-            left: (Danbooru.Note.TranslationMode.Drag.x - offset.left + 1),
-            top: (Danbooru.Note.TranslationMode.Drag.y - offset.top + 1),
+            left: (Danbooru.Note.TranslationMode.Drag.x + 1),
+            top: (Danbooru.Note.TranslationMode.Drag.y + 1),
             width: (Danbooru.Note.TranslationMode.Drag.w - 3),
             height: (Danbooru.Note.TranslationMode.Drag.h - 3)
           });
@@ -523,7 +546,7 @@ Danbooru.Note = {
         $(window).unbind("mousemove");
 
         if(Danbooru.Note.TranslationMode.Drag.dragging) {
-          $('#note-helper').css({display:'none'});
+          $('#note-preview').css({display:'none'});
           Danbooru.Note.TranslationMode.create_note(e, true, Danbooru.Note.TranslationMode.Drag.x, Danbooru.Note.TranslationMode.Drag.y, Danbooru.Note.TranslationMode.Drag.w-1, Danbooru.Note.TranslationMode.Drag.h-1);
           Danbooru.Note.TranslationMode.Drag.dragging = false; /* border of the note is pixel-perfect on the preview border */
         } else { /* no dragging -> create a normal note */
@@ -541,24 +564,21 @@ Danbooru.Note = {
   editing: false,
   timeouts: [],
   pending: {},
+  ignore_click_until: 0,
 
-  add: function(id, x, y, w, h, text) {
+  add: function(container, id, x, y, w, h, text) {
     var $note_box = Danbooru.Note.Box.create(id);
     var $note_body = Danbooru.Note.Body.create(id);
 
-    $note_box.css({
-      left: x,
-      top: y,
-      width: w,
-      height: h,
-      display: 'none'
-    });
-
-    $("#note-container").append($note_box);
-    $("#note-container").append($note_body);
+    $note_box.data('x', x);
+    $note_box.data('y', y);
+    $note_box.data('width', w);
+    $note_box.data('height', h);
+    container.appendChild($note_box[0]);
+    container.appendChild($note_body[0]);
     $note_body.data("original-body", text);
     Danbooru.Note.Box.scale($note_box);
-    Danbooru.Note.Body.set_text($note_body, text);
+    Danbooru.Note.Body.display_text($note_body, text);
   },
 
   new: function(x, y, w, h) {
@@ -574,7 +594,6 @@ Danbooru.Note = {
     $note_body.html("<em>Click to edit</em>");
     $("#note-container").append($note_box);
     $("#note-container").append($note_body);
-    Danbooru.Note.Body.resize($note_body);
     Danbooru.Note.Box.resize_inner_border($note_box);
     Danbooru.Note.id += "x";
   },
@@ -588,9 +607,11 @@ Danbooru.Note = {
   },
 
   load_all: function() {
+    var fragment = document.createDocumentFragment();
     $.each($("#notes article"), function(i, article) {
       var $article = $(article);
       Danbooru.Note.add(
+        fragment,
         $article.data("id"),
         $article.data("x"),
         $article.data("y"),
@@ -599,12 +620,7 @@ Danbooru.Note = {
         $article.html()
       );
     });
-    
-    $('#note-container').css('display','none');
-    $('.note-box').each(function(i, v) {
-      $(v).css('display','block')
-    });
-    $('#note-container').css('display','block');
+    $("#note-container").append(fragment);
   }
 }
 

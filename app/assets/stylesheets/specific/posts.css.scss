@@ -134,8 +134,8 @@ body.mode-tag-script {
 div#c-posts {
   div.notice {
     font-size: 0.8em;
-    padding: 1em;
-    margin-bottom: 1em;
+    padding: 0.5em;
+    margin-bottom: 0.5em;
     overflow: hidden;
 
     ul {
@@ -153,7 +153,7 @@ div#c-posts {
   }
 
   div.nav-notice {
-    padding: 1em;
+    padding: 0.5em;
     margin-bottom: 1em;
     background: #EEE;
     border: 1px solid #AAA;
@@ -249,7 +249,7 @@ div#c-posts {
 
     #nav-links {
       margin: 1em 0;
-      padding: 1em 0.5em;
+      padding: 0.5em;
     }
     
     #content.with-ads {
@@ -262,6 +262,8 @@ div#c-posts {
     }
 
     #pool-nav, #search-seq-nav, #nav-help {
+      margin: 0px 0px 0.5em 0px;
+      
       li {
         position: relative;
         text-align: center;

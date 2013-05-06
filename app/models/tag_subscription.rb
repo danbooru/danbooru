@@ -6,7 +6,7 @@ class TagSubscription < ActiveRecord::Base
   before_save :limit_tag_count
   attr_accessible :name, :tag_query, :post_ids, :is_public, :is_visible_on_profile
   validates_presence_of :name, :tag_query, :creator_id
-  validates_format_of :tag_query, :with => /^(?:\S+\s*){1,20}$/m, :message => "can have up to 20 tags"
+  validates_format_of :tag_query, :with => /\A(?:\S*\s*){1,20}\Z/, :message => "can have up to 20 tags"
   validate :creator_can_create_subscriptions, :on => :create
 
   def normalize_name

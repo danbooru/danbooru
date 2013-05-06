@@ -1,9 +1,9 @@
 <div id="c-user-feedbacks">
   <div id="a-show">
-    <h1>User Feedback For <%= @user_feedback.user_name %></h1>
+    <h1>User Feedback For <%= link_to_user @user_feedback.user %></h1>
 
     <ul>
-      <li><strong>Creator</strong> <%= @user_feedback.creator.name %></li>
+      <li><strong>Creator</strong> <%= link_to_user @user_feedback.creator %></li>
       <li><strong>Date</strong> <%= @user_feedback.created_at %></li>
       <li><strong>Category</strong> <%= @user_feedback.category %></li>
       <li><strong>Message</strong> <%= format_text @user_feedback.body %></li>
