@@ -32,7 +32,7 @@
   }
 
   Danbooru.Blacklist.toggle_entry = function(e) {
-    var tags = $(e.target).html();
+    var tags = $(e.target).text();
     var match = $.grep(Danbooru.Blacklist.entries, function(entry, i) {
       return entry.tags === tags;
     })[0];
