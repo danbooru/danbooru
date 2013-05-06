@@ -460,7 +460,7 @@ Danbooru.Note = {
         Danbooru.Note.new(e.pageX - offset.left, e.pageY - offset.top);
       }
       Danbooru.Note.TranslationMode.stop();
-      $(".note-box").show();
+      $("#note-container").show();
       e.stopPropagation();
       e.preventDefault();
 
@@ -529,10 +529,10 @@ Danbooru.Note = {
             Danbooru.Note.TranslationMode.Drag.h = -Danbooru.Note.TranslationMode.Drag.dragDistanceY;
           }
 
-          $('#note-helper').css({ /* preview of the note you are dragging */
+          $('#note-preview').css({
             display: 'block',
-            left: (Danbooru.Note.TranslationMode.Drag.x - offset.left + 1),
-            top: (Danbooru.Note.TranslationMode.Drag.y - offset.top + 1),
+            left: (Danbooru.Note.TranslationMode.Drag.x + 1),
+            top: (Danbooru.Note.TranslationMode.Drag.y + 1),
             width: (Danbooru.Note.TranslationMode.Drag.w - 3),
             height: (Danbooru.Note.TranslationMode.Drag.h - 3)
           });
@@ -546,7 +546,7 @@ Danbooru.Note = {
         $(window).unbind("mousemove");
 
         if(Danbooru.Note.TranslationMode.Drag.dragging) {
-          $('#note-helper').css({display:'none'});
+          $('#note-preview').css({display:'none'});
           Danbooru.Note.TranslationMode.create_note(e, true, Danbooru.Note.TranslationMode.Drag.x, Danbooru.Note.TranslationMode.Drag.y, Danbooru.Note.TranslationMode.Drag.w-1, Danbooru.Note.TranslationMode.Drag.h-1);
           Danbooru.Note.TranslationMode.Drag.dragging = false; /* border of the note is pixel-perfect on the preview border */
         } else { /* no dragging -> create a normal note */
