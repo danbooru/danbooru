@@ -4,6 +4,7 @@
       <h1>New Pool</h1>
       <%= f.input :name %>
       <%= f.input :description %>
+      <%= f.input :category, :collection => ["series", "collection"], :include_blank => false %>
       <%= f.button :submit %>
     <% end %>
   </div>

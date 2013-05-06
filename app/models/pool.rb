@@ -3,6 +3,7 @@ require 'ostruct'
 class Pool < ActiveRecord::Base
   validates_uniqueness_of :name
   validates_format_of :name, :with => /\A[^\s;,]+\Z/, :on => :create, :message => "cannot have whitespace, commas, or semicolons"
+  validates_inclusion_of :category, :in => %w(series collection)
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
   has_many :versions, :class_name => "PoolVersion", :dependent => :destroy, :order => "pool_versions.id ASC"
@@ -12,12 +13,20 @@ class Pool < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   after_save :create_version
   before_destroy :create_mod_action_for_destroy
-  attr_accessible :name, :description, :post_ids, :post_id_array, :post_count, :is_active, :as => [:member, :gold, :platinum, :contributor, :janitor, :moderator, :admin, :default]
+  attr_accessible :name, :description, :post_ids, :post_id_array, :post_count, :is_active, :category, :as => [:member, :gold, :platinum, :contributor, :janitor, :moderator, :admin, :default]
   attr_accessible :is_deleted, :as => [:janitor, :moderator, :admin]
 
   module SearchMethods
     def active
       where("is_deleted = false")
+    end
+
+    def series
+      where("category = ?", "series")
+    end
+
+    def collection
+      where("category = ?", "collection")
     end
 
     def search(params)
@@ -52,6 +61,12 @@ class Pool < ActiveRecord::Base
         q = q.order("name")
       else
         q = q.order("updated_at desc")
+      end
+
+      if params[:category] == "series"
+        q = q.series
+      elsif params[:category] == "collection"
+        q = q.collection
       end
 
       q
@@ -236,7 +251,7 @@ class Pool < ActiveRecord::Base
   end
 
   def create_version
-    if post_ids_changed? || name_changed? || description_changed? || is_active_changed? || is_deleted_changed?
+    if post_ids_changed? || name_changed? || description_changed? || is_active_changed? || is_deleted_changed? || category_changed?
       last_version = versions.last
 
       if last_version && CurrentUser.ip_addr == last_version.updater_ip_addr && CurrentUser.id == last_version.updater_id
