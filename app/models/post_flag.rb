@@ -68,9 +68,6 @@ class PostFlag < ActiveRecord::Base
     if post.is_deleted?
       errors[:post] << "is deleted"
       false
-    elsif post.is_pending?
-      errors[:post] << "is pending"
-      false
     else
       true
     end
