@@ -594,7 +594,6 @@ Danbooru.Note = {
     $note_body.html("<em>Click to edit</em>");
     $("#note-container").append($note_box);
     $("#note-container").append($note_body);
-    Danbooru.Note.Body.resize($note_body);
     Danbooru.Note.Box.resize_inner_border($note_box);
     Danbooru.Note.id += "x";
   },
