@@ -164,7 +164,7 @@
     var $ul = $("<ul/>");
     $ul.append(
       $("<li/>").append(
-        $("<em/>").html(
+        $("<em/>").text(
           query.replace(/_/g, " ")
         )
       )
@@ -173,7 +173,7 @@
     $.each(related_tags, function(i, tag) {
       if (tag[0][0] !== " ") {
         var $link = $("<a/>");
-        $link.html(tag[0].replace(/_/g, " "));
+        $link.text(tag[0].replace(/_/g, " "));
         $link.addClass("tag-type-" + tag[1]);
         $link.attr("href", "/posts?tags=" + encodeURIComponent(tag[0]));
         $link.click(Danbooru.RelatedTag.toggle_tag);
@@ -184,7 +184,7 @@
           $("<li/>").append($link)
         );
       } else {
-        $ul.append($("<li/>").html(tag[0]));
+        $ul.append($("<li/>").text(tag[0]));
       }
     });
 
