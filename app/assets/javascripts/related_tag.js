@@ -155,6 +155,15 @@
       return "";
     }
 
+    query = query.replace(/_/g, " ");
+    var header = $("<em/>");
+
+    if (match = query.match(/^wiki:(.+)/)) {
+      header.html($("<a/>").attr("href", "/wiki_pages?title=" + match[1]).attr("target", "_blank").text(query));
+    } else {
+      header.text(query);
+    }
+
     var current = $("#upload_tag_string,#post_tag_string").val().match(/\S+/g) || [];
     var $div = $("<div/>");
     $div.addClass("tag-column")
@@ -164,9 +173,7 @@
     var $ul = $("<ul/>");
     $ul.append(
       $("<li/>").append(
-        $("<em/>").text(
-          query.replace(/_/g, " ")
-        )
+        header
       )
     );
 

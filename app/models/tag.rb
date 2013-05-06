@@ -76,7 +76,7 @@ class Tag < ActiveRecord::Base
         end
       end
 
-      def categories_for(tag_names, options)
+      def categories_for(tag_names, options = {})
         Array(tag_names).inject({}) do |hash, tag_name|
           hash[tag_name] = category_for(tag_name, options)
           hash
