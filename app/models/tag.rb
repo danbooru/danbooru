@@ -66,20 +66,21 @@ class Tag < ActiveRecord::Base
         select_value_sql("SELECT category FROM tags WHERE name = ?", tag_name).to_i
       end
 
-      def category_for(tag_name)
-        Cache.get("tc:#{Cache.sanitize(tag_name)}") do
+      def category_for(tag_name, options = {})
+        if options[:disable_caching]
           select_category_for(tag_name)
+        else
+          Cache.get("tc:#{Cache.sanitize(tag_name)}") do
+            select_category_for(tag_name)
+          end
         end
       end
 
-      def categories_for(tag_names)
+      def categories_for(tag_names, options)
         Array(tag_names).inject({}) do |hash, tag_name|
-          hash[tag_name] = category_for(tag_name)
+          hash[tag_name] = category_for(tag_name, options)
           hash
         end
-        # Cache.get_multi(tag_names, "tc") do |name|
-        #   select_category_for(name)
-        # end
       end
     end
 
@@ -104,11 +105,7 @@ class Tag < ActiveRecord::Base
         Post.raw_tag_match(name).find_each do |post|
           post.reload
           post.set_tag_counts
-          post.update_column(:tag_count, post.tag_count)
-          post.update_column(:tag_count_general, post.tag_count_general)
-          post.update_column(:tag_count_artist, post.tag_count_artist)
-          post.update_column(:tag_count_copyright, post.tag_count_copyright)
-          post.update_column(:tag_count_character, post.tag_count_character)
+          Post.update_all({:tag_count => post.tag_count, :tag_count_general => post.tag_count_general, :tag_count_artist => post.tag_count_artist, :tag_count_copyright => post.tag_count_copyright, :tag_count_character => post.tag_count_character}, {:id => post.id})
         end
       end
     end
