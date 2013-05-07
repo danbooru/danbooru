@@ -120,7 +120,7 @@
           tags.push([" " + url.url, 0]);
         });
       } else if (Danbooru.RelatedTag.recent_artists.length >= 10) {
-        tags.push([" no artist found", 0]);
+        tags.push([" none", 0]);
       } else {
         $.each(Danbooru.RelatedTag.recent_artists, function(i, artist) {
           tags.push([artist.name, 1]);
