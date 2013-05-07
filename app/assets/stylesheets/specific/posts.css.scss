@@ -153,7 +153,7 @@ div#c-posts {
   }
 
   div.nav-notice {
-    padding: 0.5em;
+    padding: 0.5em 0.5em 0;
     margin-bottom: 1em;
     background: #EEE;
     border: 1px solid #AAA;
@@ -267,7 +267,7 @@ div#c-posts {
       li {
         position: relative;
         text-align: center;
-        padding: 0px 4.5em;
+        padding: 0px 5.5em;
 
         .prev {
           position: absolute;
