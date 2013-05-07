@@ -208,13 +208,13 @@ class PostPresenter < Presenter
     pool_html << '</span> '
 
     if pool.neighbors(@post).next
-      pool_html << template.link_to("next&thinsp;&rsaquo;".html_safe, template.post_path(pool.neighbors(@post).next, :pool_id => pool.id), :class => "#{klass} next")
+      pool_html << template.link_to("next&thinsp;&rsaquo;".html_safe, template.post_path(pool.neighbors(@post).next, :pool_id => pool.id), :rel => next_rel, :class => "#{klass} next")
       match_found = true
     else
       pool_html << '<span class="next">next&thinsp;&rsaquo;</span>'
     end
 
-    pool_html << template.link_to("&raquo;".html_safe, template.post_path(pool.post_id_array.last, :pool_id => pool.id), :rel => next_rel, :class => "#{klass} last")
+    pool_html << template.link_to("&raquo;".html_safe, template.post_path(pool.post_id_array.last, :pool_id => pool.id), :class => "#{klass} last")
 
     pool_html << "</li>"
     pool_html
