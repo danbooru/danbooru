@@ -40,7 +40,19 @@ class NoteTest < ActiveSupport::TestCase
       should "not validate if the note is outside the image" do
         @note = FactoryGirl.build(:note, :x => 1001, :y => 500, :post => @post)
         @note.save
-        assert_equal(["Coordinates must be inside the image"], @note.errors.full_messages)
+        assert_equal(["Note must be inside the image"], @note.errors.full_messages)
+      end
+
+      should "not validate if the note is larger than the image" do
+        @note = FactoryGirl.build(:note, :x => 500, :y => 500, :height => 501, :width => 500, :post => @post)
+        @note.save
+        assert_equal(["Note must be inside the image"], @note.errors.full_messages)
+      end
+
+      should "not validate if the post does not exist" do
+        @note = FactoryGirl.build(:note, :x => 500, :y => 500, :post_id => -1)
+        @note.save
+        assert_equal(["Post must exist"], @note.errors.full_messages)
       end
 
       should "create a version" do

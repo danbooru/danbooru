@@ -7,7 +7,8 @@ class Note < ActiveRecord::Base
   before_validation :initialize_updater
   before_validation :blank_body
   validates_presence_of :post_id, :creator_id, :updater_id, :x, :y, :width, :height
-  validate :coordinates_in_range, :message => "must be inside the image"
+  validate :post_must_exist
+  validate :note_within_image, :message => "must be inside the image"
   has_many :versions, :class_name => "NoteVersion", :order => "note_versions.id ASC"
   after_save :update_post
   after_save :create_version
@@ -96,9 +97,9 @@ class Note < ActiveRecord::Base
     self.updater_ip_addr = CurrentUser.ip_addr
   end
 
-  def coordinates_in_range
-    if x < 0 || y < 0 || (x > post.image_width) || (y > post.image_height)
-      self.errors.add(:coordinates, "must be inside the image")
+  def post_must_exist
+    if !Post.exists?(post_id)
+      errors.add :post, "must exist"
       return false
     end
   end
@@ -106,6 +107,14 @@ class Note < ActiveRecord::Base
   def post_must_not_be_note_locked
     if is_locked?
       errors.add :post, "is note locked"
+      return false
+    end
+  end
+
+  def note_within_image
+    return false unless post.present?
+    if x < 0 || y < 0 || (x > post.image_width) || (y > post.image_height) || width < 0 || height < 0 || (x + width > post.image_width) || (y + height > post.image_height)
+      self.errors.add(:note, "must be inside the image")
       return false
     end
   end
