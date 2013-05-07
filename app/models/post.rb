@@ -627,11 +627,9 @@ class Post < ActiveRecord::Base
     def vote!(score)
       if can_be_voted_by?(CurrentUser.user)
         if score == "up"
-          increment!(:score)
-          increment!(:up_score)
+          Post.update_all("score = score + 1, up_score = up_score + 1", {:id => id})
         elsif score == "down"
-          decrement!(:score)
-          decrement!(:down_score)
+          Post.update_all("score = score - 1, down_score = down_score - 1", {:id => id})
         end
 
         votes.create(:score => score)
