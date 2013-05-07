@@ -10,6 +10,12 @@ Note.update_all("x = 0", "x > (select _.image_width from posts _ where _.id = no
 Note.update_all("y = 0", "y > (select _.image_height from posts _ where _.id = notes.id limit 1)")
 
 Post.where("created_at >= '2013-02-01'").select("id, score, up_score, down_score").find_each do |post|
-  fav_count = 
-  post.update_column(:score, post.up_score + post.down_score)
+  fav_count = Favorite.where("post_id = #{post.id}").joins("join users on favorites.user_id = users.id").where("users.level >= ?", User::Levels::GOLD).count
+  post.update_column(:score, post.up_score + post.down_score + fav_count)
 end ; true
+
+Post.where("is_deleted = true and created_at >= '2013-02-01'").find_each do |post|
+  if post.flags.empty?
+    post.flags.create(:reason => "Unapproved in three days", :is_resolved => true)
+  end
+end
