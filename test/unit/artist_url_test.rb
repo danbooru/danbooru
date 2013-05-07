@@ -42,7 +42,7 @@ class ArtistUrlTest < ActiveSupport::TestCase
     should "normalize pixiv urls" do
       url = FactoryGirl.create(:artist_url, :url => "http://img55.pixiv.net/img/monet")
       assert_equal("http://img55.pixiv.net/img/monet", url.url)
-      assert_equal("http://img.pixiv.net/monet/", url.normalized_url)
+      assert_equal("http://img.pixiv.net/img/monet/", url.normalized_url)
     end
   end
 end

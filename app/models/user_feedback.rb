@@ -5,6 +5,7 @@ class UserFeedback < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   attr_accessible :body, :user_id, :category, :user_name
   validates_presence_of :user, :creator, :body, :category
+  validates_inclusion_of :category, :in => %w(positive negative neutral)
   validate :creator_is_gold
   validate :user_is_not_creator
   after_create :create_dmail
