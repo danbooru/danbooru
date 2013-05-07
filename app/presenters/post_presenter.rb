@@ -194,7 +194,11 @@ class PostPresenter < Presenter
       klass = ""
     end
 
-    pool_html << template.link_to("&laquo;".html_safe, template.post_path(pool.post_id_array.first, :pool_id => pool.id), :class => "#{klass} first")
+    if @post.id != pool.post_id_array.first
+      pool_html << template.link_to("&laquo;".html_safe, template.post_path(pool.post_id_array.first, :pool_id => pool.id), :class => "#{klass} first")
+    else
+      pool_html << '<span class="first">&laquo;</span>'
+    end
 
     if pool.neighbors(@post).previous
       pool_html << template.link_to("&lsaquo;&thinsp;prev".html_safe, template.post_path(pool.neighbors(@post).previous, :pool_id => pool.id), :rel => prev_rel, :class => "#{klass} prev")
@@ -214,7 +218,11 @@ class PostPresenter < Presenter
       pool_html << '<span class="next">next&thinsp;&rsaquo;</span>'
     end
 
-    pool_html << template.link_to("&raquo;".html_safe, template.post_path(pool.post_id_array.last, :pool_id => pool.id), :class => "#{klass} last")
+    if @post.id != pool.post_id_array.last
+      pool_html << template.link_to("&raquo;".html_safe, template.post_path(pool.post_id_array.last, :pool_id => pool.id), :class => "#{klass} last")
+    else
+      pool_html << '<span class="last">&raquo;</span>'
+    end
 
     pool_html << "</li>"
     pool_html
