@@ -326,11 +326,11 @@ class Post < ActiveRecord::Base
       increment_tags = tag_array - tag_array_was
       if increment_tags.any?
         Tag.update_all("post_count = post_count + 1", {:name => increment_tags})
-        Post.expire_cache_for_all(increment_tags) if increment_tags.any?
+        Post.expire_cache_for_all(increment_tags)
       end
       if decrement_tags.any?
         Tag.update_all("post_count = post_count - 1", {:name => decrement_tags})
-        Post.expire_cache_for_all(decrement_tags) if decrement_tags.any?
+        Post.expire_cache_for_all(decrement_tags)
       end
       Post.expire_cache_for_all([""]) if new_record? || id <= 100_000
     end
