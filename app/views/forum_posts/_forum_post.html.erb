@@ -1,5 +1,5 @@
 <% if CurrentUser.is_janitor? || !forum_post.is_deleted? %>
-  <article data-forum-post-id="<%= forum_post.id %>">
+  <article id="forum_post_<%= forum_post.id %>" data-forum-post-id="<%= forum_post.id %>">
     <div class="author">
       <h4>
         <%= link_to_user forum_post.creator %>
@@ -37,7 +37,7 @@
             <li><%= link_to "Edit", edit_forum_post_path(forum_post.id) %></li>
           <% end %>
         <% end %>
-        <li><%= link_to "Parent", forum_topic_path(forum_post.topic, :page => forum_post.forum_topic_page) %></li>
+        <li><%= link_to "Parent", forum_topic_path(forum_post.topic, :page => forum_post.forum_topic_page, :anchor => "forum_post_#{forum_post.id}") %></li>
         <li><%= link_to "Permalink", forum_post_path(forum_post) %></li>
       </menu>
     </div>
