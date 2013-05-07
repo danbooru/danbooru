@@ -544,11 +544,17 @@ class Tag < ActiveRecord::Base
       elsif params[:order] == "date"
         q = q.reorder("id desc")
 
+      elsif params[:order] == "count"
+        q = q.reorder("post_count desc")
+
       elsif params[:sort] == "date"
         q = q.reorder("id desc")
 
       elsif params[:sort] == "name"
         q = q.reorder("name")
+
+      elsif params[:sort] == "count"
+        q = q.reorder("post_count desc")
 
       else
         q = q.reorder("id desc")
