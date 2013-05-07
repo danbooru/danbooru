@@ -690,6 +690,7 @@ class PostTest < ActiveSupport::TestCase
         CurrentUser.ip_addr = "127.0.0.1"
         @post = FactoryGirl.create(:post)
         @post.add_favorite!(@user)
+        @user.reload
       end
 
       teardown do
@@ -698,9 +699,9 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "decrement the user's favorite_count" do
-        assert_difference("CurrentUser.favorite_count", -1) do
+        assert_difference("@user.favorite_count", -1) do
           @post.remove_favorite!(@user)
-          CurrentUser.reload
+          @user.reload
         end
       end
 
@@ -721,9 +722,9 @@ class PostTest < ActiveSupport::TestCase
 
       should "not decrement the user's favorite_count if the user did not favorite the post" do
         @post2 = FactoryGirl.create(:post)
-        assert_difference("CurrentUser.favorite_count", 0) do
+        assert_difference("@user.favorite_count", 0) do
           @post2.remove_favorite!(@user)
-          CurrentUser.reload
+          @user.reload
         end
       end
     end
