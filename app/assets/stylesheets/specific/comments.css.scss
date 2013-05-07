@@ -1,7 +1,6 @@
 @import "../common/000_vars.css.scss";
 
 div.comments-for-post {
-  float: left;
   div.notices {
     margin: 1em 0;
   }
@@ -21,7 +20,7 @@ div.comments-for-post {
         width: 12em;
         float: left;
         overflow: hidden;
-        margin-right: 2em;
+        margin-right: 1em;
 
         h1 {
           display: block;
@@ -30,8 +29,8 @@ div.comments-for-post {
       }
 
       div.content {
-        width: 40em;
-        float: left;
+        margin-left: 13em;
+        min-width: 17em;
 
         menu {
           li {
@@ -58,6 +57,12 @@ div.comments-for-post {
 
   div.comment-preview {
     margin-bottom: 2em;
+  }
+}
+
+div#c-posts {
+  div.comments-for-post {
+    float: left;
   }
 }
 
@@ -96,8 +101,21 @@ div#c-comments {
       margin-bottom: 4em;
 
       div.comments-for-post {
-        float: left;
-        width: 55em;
+        margin-left: 184px;
+        min-width: 30em;
+        
+        div.list-of-comments {
+          float: left;
+          width: 100%;
+        }
+      }
+    }
+    
+    div.comments-for-post {
+      div.post {
+        article.comment {
+          margin-left: 184px;
+        }
       }
     }
 
