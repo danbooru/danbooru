@@ -95,6 +95,12 @@ class ArtistTest < ActiveSupport::TestCase
       assert_equal(["http://not.rembrandt.com/test.jpg"], artist.urls.map(&:to_s).sort)
     end
 
+    should "ignore pixiv.net/ and pixiv.net/img/ url matches" do
+      a1 = FactoryGirl.create(:artist, :name => "yomosaka", :url_string => "http://i2.pixiv.net/img100/img/yomosaka/27618292.jpg")
+      a2 = FactoryGirl.create(:artist, :name => "niwatazumi_bf", :url_string => "http://i2.pixiv.net/img16/img/niwatazumi_bf/35488864_big_p6.jpg")
+      assert_equal([], Artist.find_all_by_url("http://i2.pixiv.net/img28/img/kyang692/35563903.jpg"))
+    end
+
     should "find matches by url" do
       a1 = FactoryGirl.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/x/test.jpg")
       a2 = FactoryGirl.create(:artist, :name => "subway", :url_string => "http://subway.com/x/test.jpg")
