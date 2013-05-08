@@ -4,7 +4,7 @@
   Danbooru.NewsUpdate.initialize = function() {
     var key = $("#news-updates").data("id");
 
-    if (Danbooru.Cookie.get("news-ticker") === key) {
+    if (Danbooru.Cookie.get("news-ticker") == key) {
       $("#news-updates").hide();
     } else {
       $("#close-news-ticker-link").click(function(e) {
