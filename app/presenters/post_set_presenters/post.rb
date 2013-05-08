@@ -9,7 +9,9 @@ module PostSetPresenters
     end
 
     def related_tags
-      if post_set.is_pattern_search?
+      if post_set.is_empty_search?
+        suggested_tags
+      elsif post_set.is_pattern_search?
         pattern_tags
       elsif post_set.is_tag_subscription?
         post_set.tag_subscription_tags
@@ -37,6 +39,12 @@ module PostSetPresenters
 
     def pattern_tags
       Tag.name_matches(post_set.tag_string).all(:select => "name", :limit => Danbooru.config.tag_query_limit, :order => "post_count DESC").map(&:name)
+    end
+
+    def suggested_tags
+      if post_set.tag_string.length >= 3
+        Tag.name_matches("*#{post_set.tag_string}*").where("post_count > 0").all(:select => "name", :limit => Danbooru.config.tag_query_limit, :order => "post_count DESC").map(&:name)
+      end
     end
 
     def related_tags_for_group
