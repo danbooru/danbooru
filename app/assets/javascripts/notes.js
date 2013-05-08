@@ -360,7 +360,11 @@ Danbooru.Note = {
       var $note_box = Danbooru.Note.Box.find(id);
       var text = $textarea.val();
       $note_body.data("original-body", text);
-      Danbooru.Note.Body.set_text($note_body, text);
+      Danbooru.Note.Body.set_text($note_body, "Loading...");
+      $.get("/note_previews.json", {body: text}).success(function(data) {
+        Danbooru.Note.Body.set_text($note_body, data.body);
+        $note_body.show();
+      });
       $this.dialog("close");
 
       if (id.match(/\d/)) {
@@ -386,8 +390,11 @@ Danbooru.Note = {
       var id = $this.data("id");
       var $note_body = Danbooru.Note.Body.find(id);
       var text = $textarea.val();
-      Danbooru.Note.Body.set_text($note_body, text);
-      $note_body.show();
+      Danbooru.Note.Body.set_text($note_body, "Loading...");
+      $.get("/note_previews.json", {body: text}).success(function(data) {
+        Danbooru.Note.Body.set_text($note_body, data.body);
+        $note_body.show();
+      });
     },
 
     cancel: function() {
