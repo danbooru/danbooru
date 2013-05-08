@@ -7,7 +7,7 @@
     <li><%= link_to "Recent changes", artist_versions_path %></li>
     <% if @artist && !@artist.new_record? %>
       <li>|</li>
-      <li><%= link_to "Posts", posts_path(:tags => @artist.name) %></li>
+      <li><%= link_to "Posts (#{Post.fast_count(@artist.name)})", posts_path(:tags => @artist.name) %></li>
       <li><%= link_to "Show", artist_path(@artist) %></li>
       <% if CurrentUser.is_member? %>
         <li><%= link_to "Edit", edit_artist_path(@artist) %></li>
