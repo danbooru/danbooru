@@ -97,7 +97,10 @@ class ForumPost < ActiveRecord::Base
   end
 
   def update_topic_updated_at_on_destroy
-    topic.update_column(:updated_at, ForumPost.where(:topic_id => topic.id).maximum(:updated_at))
+    max = ForumPost.where(:topic_id => topic.id).maximum(:updated_at)
+    if max
+      topic.update_column(:updated_at, max)
+    end
   end
 
   def initialize_creator

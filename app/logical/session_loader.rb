@@ -74,7 +74,7 @@ private
   end
 
   def ban_expired?
-    CurrentUser.user.is_banned? && CurrentUser.user.ban && CurrentUser.user.ban.expired?
+    CurrentUser.user.is_banned? && CurrentUser.user.recent_ban && CurrentUser.user.recent_ban.expired?
   end
 
   def cookie_password_hash_valid?

@@ -40,7 +40,8 @@ class User < ActiveRecord::Base
   before_create :promote_to_admin_if_first_user
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
   has_many :posts, :foreign_key => "uploader_id"
-  has_one :ban
+  has_many :bans, :order => "bans.id desc"
+  has_one :recent_ban, :class_name => "Ban", :order => "bans.id desc"
   has_many :subscriptions, :class_name => "TagSubscription", :foreign_key => "creator_id", :order => "name"
   has_many :note_versions, :foreign_key => "updater_id"
   has_many :dmails, :foreign_key => "owner_id", :order => "dmails.id desc"

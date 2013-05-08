@@ -28,7 +28,7 @@
       <% if CurrentUser.is_moderator? %>
         <li><%= link_to "Promote", edit_admin_user_path(@user) %></li>
         <% if @user.is_banned? %>
-          <li><%= link_to "Unban", ban_path(@user.ban) %></li>
+          <li><%= link_to "Unban", ban_path(@user.recent_ban) %></li>
         <% else %>
           <li><%= link_to "Ban", new_ban_path(:ban => {:user_id => @user.id}) %></li>
         <% end %>
