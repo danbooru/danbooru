@@ -18,9 +18,11 @@ class ForumPostTest < ActiveSupport::TestCase
       setup do
         Danbooru.config.stubs(:posts_per_page).returns(3)
         @posts = []
-        10.times do
+        9.times do
           @posts << FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
         end
+        sleep 2
+        @posts << FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
       end
 
       should "know which page it's on" do
@@ -28,6 +30,12 @@ class ForumPostTest < ActiveSupport::TestCase
         assert_equal(2, @posts[4].forum_topic_page)
         assert_equal(2, @posts[5].forum_topic_page)
         assert_equal(3, @posts[6].forum_topic_page)
+      end
+
+      should "update the topic's updated_at when deleted" do
+        @posts.last.destroy
+        @topic.reload
+        assert_equal(@posts[0].updated_at.to_s, @topic.updated_at.to_s)
       end
     end
 
