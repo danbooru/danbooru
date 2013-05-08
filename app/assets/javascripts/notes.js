@@ -480,7 +480,7 @@ Danbooru.Note = {
       dragging: false,
       dragStartX: 0,
       dragStartY: 0,
-      dragDistanceY: 0,
+      dragDistanceX: 0,
       dragDistanceY: 0,
       x: 0,
       y: 0,
