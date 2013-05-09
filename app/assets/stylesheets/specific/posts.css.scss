@@ -46,6 +46,15 @@ a.blacklisted-active {
   border: 2px solid #F00;
 }
 
+#has-parent-relationship-preview, #has-children-relationship-preview {
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+#has-parent-relationship-preview article.post-preview, #has-children-relationship-preview article.post-preview {
+  float: none;
+}
+
 .category-1 a, a.tag-type-1 {
   color: #A00;
 }
