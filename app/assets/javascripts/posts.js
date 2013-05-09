@@ -4,8 +4,6 @@
   Danbooru.Post.pending_update_count = 0;
 
   Danbooru.Post.initialize_all = function() {
-    this.initialize_post_previews();
-
     if ($("#c-posts").length) {
       if (Danbooru.meta("enable-js-navigation") === "true") {
         this.initialize_shortcuts();
@@ -29,6 +27,8 @@
         $("#image-resize-to-window-link").click();
       }
     }
+
+    this.initialize_post_previews();
   }
 
   Danbooru.Post.initialize_similar = function() {
@@ -137,7 +137,7 @@
 
   Danbooru.Post.initialize_post_relationship_previews = function() {
     var current_post_id = $("meta[name=post-id]").attr("content");
-    $("#post_" + current_post_id).css("background-color", "rgba(0,0,0,0.05)");
+    $("#post_" + current_post_id).addClass("post-status-current");
 
     if (Danbooru.Cookie.get("show-relationship-previews") === "0") {
       this.toggle_relationship_preview($("#has-children-relationship-preview"), $("#has-children-relationship-preview-link"));
@@ -218,13 +218,18 @@
     } else if ($post.hasClass("post-status-flagged")) {
       border_colors.push("#F00");
     }
+    if ($post.hasClass("post-status-current")) {
+      border_colors.push("#F80");
+    }
 
     if (border_colors.length > 1) {
       $img.css("border", "2px solid");
-      if (border_colors.length === 3) {
-        $img.css("border-color", border_colors[0] + " " + border_colors[2] + " " + border_colors[2] + " " + border_colors[1]);
-      } else if (border_colors.length === 2) {
+      if (border_colors.length === 2) {
         $img.css("border-color", border_colors[0] + " " + border_colors[1] + " " + border_colors[1] + " " + border_colors[0]);
+      } else if (border_colors.length === 3) {
+        $img.css("border-color", border_colors[0] + " " + border_colors[2] + " " + border_colors[2] + " " + border_colors[1]);
+      } else if (border_colors.length === 4) {
+        $img.css("border-color", border_colors[0] + " " + border_colors[2] + " " + border_colors[3] + " " + border_colors[1]);
       }
     }
   }
