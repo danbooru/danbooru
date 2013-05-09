@@ -139,8 +139,10 @@
     var current_post_id = $("meta[name=post-id]").attr("content");
     $("#post_" + current_post_id).css("background-color", "rgba(0,0,0,0.05)");
 
-    this.toggle_relationship_preview($("#has-children-relationship-preview"), $("#has-children-relationship-preview-link"));
-    this.toggle_relationship_preview($("#has-parent-relationship-preview"), $("#has-parent-relationship-preview-link"));
+    if (Danbooru.Cookie.get("show-relationship-previews") === "0") {
+      this.toggle_relationship_preview($("#has-children-relationship-preview"), $("#has-children-relationship-preview-link"));
+      this.toggle_relationship_preview($("#has-parent-relationship-preview"), $("#has-parent-relationship-preview-link"));
+    }
 
     $("#has-children-relationship-preview-link").click(function(e) {
       Danbooru.Post.toggle_relationship_preview($("#has-children-relationship-preview"), $(this));
@@ -157,9 +159,11 @@
     preview.toggle();
     if (preview.is(":visible")) {
       preview_link.html("&laquo; hide");
+      Danbooru.Cookie.put("show-relationship-previews", "1");
     }
     else {
       preview_link.html("show &raquo;");
+      Danbooru.Cookie.put("show-relationship-previews", "0");
     }
   }
 
