@@ -53,6 +53,8 @@ a.blacklisted-active {
 
 #has-parent-relationship-preview article.post-preview, #has-children-relationship-preview article.post-preview {
   float: none;
+  width: auto;
+  border: none;
 }
 
 .category-1 a, a.tag-type-1 {
