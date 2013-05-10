@@ -69,10 +69,6 @@ module PostSets
       tag_string =~ /\*/
     end
 
-    def is_empty_search?
-      posts.count == 0
-    end
-
     def current_page
       [page.to_i, 1].max
     end
