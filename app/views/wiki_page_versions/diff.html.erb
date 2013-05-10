@@ -11,3 +11,7 @@
 </div>
 
 <%= render "wiki_pages/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Wiki Page Version - <%= @wiki_page.pretty_title %> - <%= Danbooru.config.app_name %>
+<% end %>
