@@ -46,15 +46,22 @@ a.blacklisted-active {
   border: 2px solid #F00;
 }
 
+.post-preview.current-post {
+  background-color: rgba(0,0,0,0.1);
+}
+
 #has-parent-relationship-preview, #has-children-relationship-preview {
   overflow-x: auto;
   white-space: nowrap;
-}
-
-#has-parent-relationship-preview article.post-preview, #has-children-relationship-preview article.post-preview {
-  float: none;
-  width: auto;
-  border: none;
+  margin-top: 5px;
+  
+  article.post-preview {
+    float: none;
+    width: auto;
+    border: none;
+    margin: 0px;
+    padding: 0 5px 10px;
+  }
 }
 
 .category-1 a, a.tag-type-1 {
