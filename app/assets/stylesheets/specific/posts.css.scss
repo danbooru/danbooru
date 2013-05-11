@@ -170,8 +170,8 @@ div#c-posts {
   }
 
   div.nav-notice {
-    padding: 0.5em 0.5em 0;
-    margin-bottom: 1em;
+    padding: 0.5em;
+    margin: 1em 0;
     background: #EEE;
     border: 1px solid #AAA;
     position: relative;
@@ -262,11 +262,6 @@ div#c-posts {
 
     .pool-name, .search-name {
       word-wrap: break-word;
-    }
-
-    #nav-links {
-      margin: 1em 0;
-      padding: 0.5em;
     }
 
     #content.with-ads {
