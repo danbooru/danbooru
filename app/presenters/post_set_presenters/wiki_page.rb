@@ -1,5 +1,5 @@
 module PostSetPresenters
-  class WikiPage < Post
+  class WikiPage < PostSetPresenters::Post
     def posts
       @post_set.posts
     rescue ActiveRecord::StatementInvalid, PGError
