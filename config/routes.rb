@@ -239,7 +239,7 @@ Danbooru::Application.routes.draw do
   match "/comment/index" => redirect {|params, req| "/comments?page=#{req.params[:page]}"}
   match "/comment/show/:id" => redirect("/comments/%{id}")
   match "/comment/new" => redirect("/comments")
-  match "/comment/search" => redirect("/comments/search")
+  match "/comment/search" => redirect {|params, req| "/comments?group_by=comment&search[creator_name]=#{CGI::escape(req.params[:query].to_s).sub!(/^user(%3A|%253A|:)/, '')}"}
 
   match "/favorite" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
   match "/favorite/index" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
