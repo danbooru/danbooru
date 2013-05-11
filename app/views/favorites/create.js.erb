@@ -5,5 +5,11 @@
   $("a#remove-from-favorites").show();
   $("#score-for-post-<%= @post.id %>").html(<%= @post.score %>);
   $("#favcount-for-post-<%= @post.id %>").html(<%= @post.fav_count %>);
+  <% if CurrentUser.is_gold? %>
+    $("#favlist").html("<%= escape_javascript(post_favlist(@post)) %>");
+    if (!$("#favlist").is(":visible")) {
+      $("#show-favlist-link").show();
+    }
+  <% end %>
   Danbooru.notice("You have favorited this post");
 <% end %>

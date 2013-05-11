@@ -170,6 +170,10 @@
   Danbooru.Post.initialize_favlist = function() {
     $("#favlist").hide();
     $("#hide-favlist-link").hide();
+    var fav_count = $("#show-favlist-link").prev().text();
+    if (fav_count === "0") {
+      $("#show-favlist-link").hide();
+    }
 
     $("#show-favlist-link").click(function(e) {
       $("#favlist").show();
