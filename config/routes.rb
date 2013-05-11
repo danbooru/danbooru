@@ -289,7 +289,10 @@ Danbooru::Application.routes.draw do
   match "/post/view/:id" => redirect("/posts/%{id}")
   match "/post/flag/:id" => redirect("/posts/%{id}")
 
-  match "/post_tag_history" => redirect {|params, req| "/post_versions?page=#{req.params[:page]}"}
+  match("/post_tag_history" => redirect do |params, req|
+    page = req.params[:before_id].present? ? "b#{req.params[:before_id]}" : req.params[:page]
+    "/post_versions?page=#{page}&search[updater_id]=#{req.params[:user_id]}"
+  end)
   match "/post_tag_history/index" => redirect {|params, req| "/post_versions?page=#{req.params[:page]}"}
 
   match "/tag/index.xml", :controller => "legacy", :action => "tags", :format => "xml"
