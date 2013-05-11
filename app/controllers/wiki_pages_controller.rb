@@ -69,6 +69,9 @@ class WikiPagesController < ApplicationController
     @wiki_page = WikiPage.find_by_title(params[:title])
     if @wiki_page
       redirect_to wiki_page_path(@wiki_page)
+    else
+      @wiki_page = WikiPage.new(params[:wiki_page])
+      respond_with(@wiki_page)
     end
   end
 

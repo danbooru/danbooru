@@ -18,12 +18,7 @@
         <%= wiki_page_alias_and_implication_list(@wiki_page) %>
       </div>
 
-      <div id="wiki-page-posts">
-        <% if Post.fast_count(@wiki_page.title) > 0 %>
-          <h2>Posts</h2>
-        <% end %>
-        <%= @wiki_page.post_set.presenter.post_previews_html(self) %>
-      </div>
+      <%= wiki_page_post_previews(@wiki_page) %>
     </section>
   </div>
 </div>

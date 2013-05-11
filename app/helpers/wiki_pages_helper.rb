@@ -33,4 +33,17 @@ module WikiPagesHelper
 
     html.html_safe
   end
+
+  def wiki_page_post_previews(wiki_page)
+    html = '<div id="wiki-page-posts">'
+
+    if Post.fast_count(wiki_page.title) > 0
+      html << "<h2>Posts</h2>"
+      html << wiki_page.post_set.presenter.post_previews_html(self)
+    end
+    
+    html << "</div>"
+
+    html.html_safe
+  end
 end
