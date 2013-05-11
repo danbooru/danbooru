@@ -263,7 +263,12 @@ div#c-posts {
     .pool-name, .search-name {
       word-wrap: break-word;
     }
-    
+
+    #nav-links {
+      margin: 1em 0;
+      padding: 0.5em;
+    }
+
     #content.with-ads {
       margin-right: 7em;
     }
@@ -273,9 +278,11 @@ div#c-posts {
       word-wrap: break-word;
     }
 
+    #search-seq-nav + #pool-nav {
+      margin-top: 0.5em;
+    }
+
     #pool-nav, #search-seq-nav, #nav-help {
-      margin: 0px 0px 0.5em 0px;
-      
       li {
         position: relative;
         text-align: center;
