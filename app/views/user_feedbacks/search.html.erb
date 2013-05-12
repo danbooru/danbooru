@@ -9,7 +9,7 @@
         <%= search_field "creator_name", :label => "Creator" %>
 
         <label for="search_category">Category</label>
-        <%= select "search", "category", %w(positive negative neutral) %>
+        <%= select "search", "category", %w(positive negative neutral), :include_blank => true %>
       </div>
 
       <div class="input">
