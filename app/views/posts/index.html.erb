@@ -17,10 +17,10 @@
 
     <section id="content" class="<%= Danbooru.config.can_see_ads?(CurrentUser.user) ? "with-ads" : "without-ads" %>">
       <menu id="post-sections">
-        <li class="active"><a href="#posts" id="show-posts-link">Posts</a></li>
+        <li class="active"><a href="#" id="show-posts-link">Posts</a></li>
 
         <% if @post_set.has_wiki? %>
-          <li><a href="#wiki-except" id="show-wiki-excerpt-link">Wiki</a></li>
+          <li><%= link_to "Wiki", wiki_page_path(@post_set.wiki_page), :id => "show-wiki-excerpt-link" %></li>
         <% end %>
       </menu>
 
