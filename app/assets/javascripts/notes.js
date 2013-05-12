@@ -66,8 +66,18 @@ Danbooru.Note = {
           var $note_box_inner = $(e.currentTarget);
           if (e.type === "mouseover") {
             Danbooru.Note.Body.show($note_box_inner.data("id"));
+            if (Danbooru.Note.editing) {
+              var $this = $(this);
+              $this.resizable("enable");
+              $this.draggable("enable");
+            }
           } else if (e.type === "mouseout") {
             Danbooru.Note.Body.hide($note_box_inner.data("id"));
+            if (Danbooru.Note.editing) {
+              var $this = $(this);
+              $this.resizable("disable");
+              $this.draggable("disable");
+            }
           }
 
           e.stopPropagation();
@@ -162,10 +172,6 @@ Danbooru.Note = {
     },
 
     show: function(id) {
-      if (Danbooru.Note.editing) {
-        return;
-      }
-
       Danbooru.Note.Body.hide_all();
       Danbooru.Note.clear_timeouts();
       var $note_body = Danbooru.Note.Body.find(id);
@@ -312,7 +318,7 @@ Danbooru.Note = {
         $(".note-box").resizable("enable");
         $(".note-box").draggable("enable");
       });
-      // Danbooru.Note.editing = true;
+      Danbooru.Note.editing = true;
     },
 
     parameterize_note: function($note_box, $note_body) {
@@ -410,7 +416,7 @@ Danbooru.Note = {
       var id = $this.data("id");
       Danbooru.Note.Box.find(id).remove();
       Danbooru.Note.Body.find(id).remove();
-      $(this).dialog("close");
+      $this.dialog("close");
 
       if (id.match(/\d/)) {
         $.ajax("/notes/" + id + ".js", {
