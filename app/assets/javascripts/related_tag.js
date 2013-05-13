@@ -220,6 +220,8 @@
     if (Danbooru.RelatedTag.recent_artist && $("#artist-tags-container").css("display") === "block") {
       Danbooru.RelatedTag.process_artist(Danbooru.RelatedTag.recent_artist);
     }
+
+    $field.focus();
     e.preventDefault();
   }
 
