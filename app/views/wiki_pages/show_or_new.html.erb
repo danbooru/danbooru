@@ -4,15 +4,25 @@
 
     <section id="content">
       <h1 id="wiki-page-title"><%= params[:title] %></h1>
-      <div id="wiki-page-body" class="prose">
-        <p>This wiki page does not exist. <%= link_to "Create new wiki page", new_wiki_page_path(:wiki_page => {:title => params[:title]}) %>.</p>
+
+      <% if params[:redirected_from].present? %>
+        <div class="hint redirected-from">Redirected from <%= link_to params[:redirected_from], show_or_new_wiki_pages_path(:title => params[:redirected_from], :no_redirect => true) %>.</div>
+      <% end %>
+
+      <div class="ui-corner-all ui-state-highlight notice">
+        This wiki page does not yet exist. <%= link_to "Create a new wiki page", new_wiki_page_path(:wiki_page => {:title => params[:title]}) %>.
       </div>
+
+      <%= wiki_page_alias_and_implication_list(@wiki_page)%>
+
+      <%= wiki_page_post_previews(@wiki_page) %>
+
     </section>
   </div>
 </div>
 
+<%= render "secondary_links" %>
+
 <% content_for(:page_title) do %>
   Wiki - <%= params[:title] %> - <%= Danbooru.config.app_name %>
 <% end %>
-
-<%= render "secondary_links" %>

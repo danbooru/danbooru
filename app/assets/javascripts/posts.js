@@ -137,10 +137,12 @@
 
   Danbooru.Post.initialize_post_relationship_previews = function() {
     var current_post_id = $("meta[name=post-id]").attr("content");
-    $("#post_" + current_post_id).css("background-color", "rgba(0,0,0,0.05)");
+    $("#post_" + current_post_id).addClass("current-post");
 
-    this.toggle_relationship_preview($("#has-children-relationship-preview"), $("#has-children-relationship-preview-link"));
-    this.toggle_relationship_preview($("#has-parent-relationship-preview"), $("#has-parent-relationship-preview-link"));
+    if (Danbooru.Cookie.get("show-relationship-previews") === "0") {
+      this.toggle_relationship_preview($("#has-children-relationship-preview"), $("#has-children-relationship-preview-link"));
+      this.toggle_relationship_preview($("#has-parent-relationship-preview"), $("#has-parent-relationship-preview-link"));
+    }
 
     $("#has-children-relationship-preview-link").click(function(e) {
       Danbooru.Post.toggle_relationship_preview($("#has-children-relationship-preview"), $(this));
@@ -157,15 +159,21 @@
     preview.toggle();
     if (preview.is(":visible")) {
       preview_link.html("&laquo; hide");
+      Danbooru.Cookie.put("show-relationship-previews", "1");
     }
     else {
       preview_link.html("show &raquo;");
+      Danbooru.Cookie.put("show-relationship-previews", "0");
     }
   }
 
   Danbooru.Post.initialize_favlist = function() {
     $("#favlist").hide();
     $("#hide-favlist-link").hide();
+    var fav_count = $("#show-favlist-link").prev().text();
+    if (fav_count === "0") {
+      $("#show-favlist-link").hide();
+    }
 
     $("#show-favlist-link").click(function(e) {
       $("#favlist").show();
@@ -217,10 +225,10 @@
 
     if (border_colors.length > 1) {
       $img.css("border", "2px solid");
-      if (border_colors.length === 3) {
-        $img.css("border-color", border_colors[0] + " " + border_colors[2] + " " + border_colors[2] + " " + border_colors[1]);
-      } else if (border_colors.length === 2) {
+      if (border_colors.length === 2) {
         $img.css("border-color", border_colors[0] + " " + border_colors[1] + " " + border_colors[1] + " " + border_colors[0]);
+      } else if (border_colors.length === 3) {
+        $img.css("border-color", border_colors[0] + " " + border_colors[2] + " " + border_colors[2] + " " + border_colors[1]);
       }
     }
   }

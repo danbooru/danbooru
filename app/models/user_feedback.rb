@@ -47,6 +47,10 @@ class UserFeedback < ActiveRecord::Base
         q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].mb_chars.downcase)
       end
 
+      if params[:category].present?
+        q = q.where("category = ?", params[:category])
+      end
+
       q
     end
   end

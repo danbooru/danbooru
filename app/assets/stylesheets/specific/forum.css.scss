@@ -53,4 +53,8 @@ div#c-forum-topics {
   span.locked-topic {
     color: #666;
   }
+  
+  tr.forum-topic-row td:last-child {
+    white-space: nowrap;
+  }
 }

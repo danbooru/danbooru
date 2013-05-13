@@ -7,6 +7,9 @@
   }
 
   Danbooru.Dtext.call_preview = function(e, $button, $input, $preview) {
+    $button.val("Edit");
+    $input.hide();
+    $preview.text("Loading...").fadeIn("fast");
     $.ajax({
       type: "post",
       url: "/dtext_preview",
@@ -14,8 +17,6 @@
         body: $input.val()
       },
       success: function(data) {
-        $button.val("Edit");
-        $input.hide();
         $preview.html(data).fadeIn("fast");
       }
     });

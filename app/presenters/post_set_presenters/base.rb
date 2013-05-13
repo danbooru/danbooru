@@ -13,6 +13,7 @@ module PostSetPresenters
 
       posts.each do |post|
         html << PostPresenter.preview(post, :tags => @post_set.tag_string)
+        html << "\n"
       end
 
       html.html_safe

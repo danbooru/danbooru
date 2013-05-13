@@ -239,7 +239,13 @@ Danbooru::Application.routes.draw do
   match "/comment/index" => redirect {|params, req| "/comments?page=#{req.params[:page]}"}
   match "/comment/show/:id" => redirect("/comments/%{id}")
   match "/comment/new" => redirect("/comments")
-  match "/comment/search" => redirect("/comments/search")
+  match("/comment/search" => redirect do |params, req|
+    if req.params[:query] =~ /^user:(.+)/i
+      "/comments?group_by=comment&search[creator_name]=#{CGI::escape($1)}"
+    else
+      "/comments/search"
+    end
+  end)
 
   match "/favorite" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
   match "/favorite/index" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
@@ -283,7 +289,10 @@ Danbooru::Application.routes.draw do
   match "/post/view/:id" => redirect("/posts/%{id}")
   match "/post/flag/:id" => redirect("/posts/%{id}")
 
-  match "/post_tag_history" => redirect {|params, req| "/post_versions?page=#{req.params[:page]}"}
+  match("/post_tag_history" => redirect do |params, req|
+    page = req.params[:before_id].present? ? "b#{req.params[:before_id]}" : req.params[:page]
+    "/post_versions?page=#{page}&search[updater_id]=#{req.params[:user_id]}"
+  end)
   match "/post_tag_history/index" => redirect {|params, req| "/post_versions?page=#{req.params[:page]}"}
 
   match "/tag/index.xml", :controller => "legacy", :action => "tags", :format => "xml"

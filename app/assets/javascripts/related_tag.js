@@ -160,8 +160,9 @@
     query = query.replace(/_/g, " ");
     var header = $("<em/>");
 
-    if (match = query.match(/^wiki:(.+)/)) {
-      header.html($("<a/>").attr("href", "/wiki_pages?title=" + match[1]).attr("target", "_blank").text(query));
+    var match = query.match(/^wiki:(.+)/);
+    if (match) {
+      header.html($("<a/>").attr("href", "/wiki_pages?title=" + encodeURIComponent(match[1])).attr("target", "_blank").text(query));
     } else {
       header.text(query);
     }

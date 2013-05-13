@@ -1,5 +1,6 @@
 set :stages, %w(production staging)
 set :default_stage, "staging"
+set :unicorn_env, "staging"
 require 'capistrano/ext/multistage'
 
 require 'bundler/capistrano'
