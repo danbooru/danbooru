@@ -4,6 +4,8 @@
       <h1>New Pool</h1>
       <%= f.input :name %>
       <%= f.input :description %>
+      <%= f.input :post_ids, :label => "Posts" %>
+      <%= f.input :is_active %>
       <%= f.button :submit %>
     <% end %>
   </div>
