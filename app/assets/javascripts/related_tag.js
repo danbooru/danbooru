@@ -47,10 +47,10 @@
     // 5. abc| def   -> abc
     // 6. ab|c def   -> abc
     // 7. |abc def   -> abc
-    // 8. | abc def  -> abc   -- not supported by this code but a pretty rare case
+    // 8. | abc def  -> abc
 
     var $field = $("#upload_tag_string,#post_tag_string");
-    var string = $field.val().trim();
+    var string = $field.val();
     var n = string.length;
     var a = $field.get(0).selectionStart;
     var b = $field.get(0).selectionStart;
@@ -59,6 +59,11 @@
       // 4 is the only case where we need to scan forward. in all other cases we
       // can drag a backwards, and then drag b forwards.
 
+      while ((b < n) && (!/\s/.test(string[b]))) {
+        b++;
+      }
+    } else if (string.search(/\S/) > b) { // case 8
+      b = string.search(/\S/);
       while ((b < n) && (!/\s/.test(string[b]))) {
         b++;
       }
