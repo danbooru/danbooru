@@ -124,7 +124,13 @@ class TagSubscription < ActiveRecord::Base
   end
 
   def self.find_posts(user_id, name = nil, limit = Danbooru.config.tag_subscription_post_limit)
-    Post.where(["id in (?)", find_post_ids(user_id, name, limit)]).order("id DESC").limit(limit)
+    arel = Post.where(["id in (?)", find_post_ids(user_id, name, limit)])
+
+    if CurrentUser.user.hide_deleted_posts?
+      arel = arel.where("is_deleted = false")
+    end
+
+    arel.order("id DESC").limit(limit)
   end
 
   def self.process_all
