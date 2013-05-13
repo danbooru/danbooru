@@ -1,5 +1,5 @@
 class Tag < ActiveRecord::Base
-  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|-pool|pool|-fav|fav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|score|favcount|filesize|source|id|-id|date|age|order|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|-parent|pixiv_id|pixiv"
+  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|-pool|pool|-fav|fav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|score|favcount|filesize|source|-source|id|-id|date|age|order|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|-parent|pixiv_id|pixiv"
   attr_accessible :category
   has_one :wiki_page, :foreign_key => "name", :primary_key => "title"
 
@@ -398,6 +398,9 @@ class Tag < ActiveRecord::Base
 
           when "source"
             q[:source] = ($2.to_escaped_for_sql_like + "%").gsub(/%+/, '%')
+
+          when "-source"
+            q[:source_neg] = ($2.to_escaped_for_sql_like + "%").gsub(/%+/, '%')
 
           when "date"
             q[:date] = parse_helper($2, :date)
