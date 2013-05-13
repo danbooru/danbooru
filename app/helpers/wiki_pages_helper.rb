@@ -15,7 +15,7 @@ module WikiPagesHelper
 
     if consequent_aliases.any?
       html << "<p class='hint'>The following tags are aliased to this tag: "
-      html << raw(consequent_aliases.map {|x| link_to(x.antecedent_name, show_or_new_wiki_pages_path(:title => x.antecedent_name, :no_redirect => true))}.join(", "))
+      html << raw(consequent_aliases.map {|x| link_to(x.antecedent_name, show_or_new_wiki_pages_path(:title => x.antecedent_name))}.join(", "))
       html << ".</p>"
     end
 

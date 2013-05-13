@@ -67,12 +67,8 @@ class WikiPagesController < ApplicationController
 
   def show_or_new
     @wiki_page = WikiPage.find_by_title(params[:title])
-    tag_alias = TagAlias.where("status = 'active' and antecedent_name = ?", params[:title]).first
-
-    if tag_alias && params[:no_redirect].blank?
-      redirect_to show_or_new_wiki_pages_path(:title => tag_alias.consequent_name, :redirected_from => params[:title])
-    elsif @wiki_page
-      redirect_to wiki_page_path(@wiki_page, :redirected_from => params[:redirected_from])
+    if @wiki_page
+      redirect_to wiki_page_path(@wiki_page)
     else
       @wiki_page = WikiPage.new(:title => params[:title])
       respond_with(@wiki_page)

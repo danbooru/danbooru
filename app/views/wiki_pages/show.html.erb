@@ -12,10 +12,6 @@
         <% end %>
       </h1>
 
-      <% if params[:redirected_from].present? %>
-        <div class="hint redirected-from">Redirected from <%= link_to params[:redirected_from], show_or_new_wiki_pages_path(:title => params[:redirected_from], :no_redirect => true) %>.</div>
-      <% end %>
-
       <div id="wiki-page-body" class="prose">
         <%= format_text(@wiki_page.body) %>
 
