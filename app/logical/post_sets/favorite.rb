@@ -6,10 +6,6 @@ module PostSets
       @params = params
       @user = ::User.find(user_id)
       @favorites = ::Favorite.for_user(user.id).paginate(page, :limit => limit).order("favorites.id desc")
-
-      if CurrentUser.user.hide_deleted_posts?
-        @favorites = @favorites.where("is_deleted = false")
-      end
     end
 
     def limit
