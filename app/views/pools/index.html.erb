@@ -17,7 +17,7 @@
 
             </td>
             <td>
-              <%= link_to h(pool.pretty_name), pool_path(pool) %>
+              <%= link_to h(pool.pretty_name), pool_path(pool), :class => "pool-category-#{pool.category}" %>
             </td>
             <td>
               <%= link_to_user pool.creator %>

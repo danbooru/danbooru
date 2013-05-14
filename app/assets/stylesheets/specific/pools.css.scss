@@ -1,5 +1,13 @@
 @import "../common/000_vars.css.scss";
 
+a.pool-category-collection, span.pool-category-collection a {
+  color: #A0A;
+
+  &:hover {
+    color: #B6B;
+  }
+}
+
 div#c-pool-elements {
   div#a-new {
     font-size: 0.8em;
