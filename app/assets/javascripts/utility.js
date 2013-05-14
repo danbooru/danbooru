@@ -103,4 +103,11 @@
     this.selectRange(this.val().length, this.val().length);
     return this;
   }
+
+  $.fn.focusWithoutScroll = function(){
+    var x = window.scrollX;
+    var y = window.scrollY;
+    this.focus();
+    window.scrollTo(x, y);
+  };
 })();
