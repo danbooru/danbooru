@@ -3,7 +3,7 @@ class NewsUpdatesController < ApplicationController
   respond_to :html
 
   def index
-    @news_updates = NewsUpdate.order("id desc").paginate(params[:page])
+    @news_updates = NewsUpdate.order("id desc").paginate(params[:page], :limit => params[:limit])
     respond_with(@news_updates)
   end
 

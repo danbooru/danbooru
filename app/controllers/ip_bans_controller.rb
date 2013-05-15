@@ -17,7 +17,7 @@ class IpBansController < ApplicationController
 
   def index
     @search = IpBan.search(params[:search])
-    @ip_bans = @search.order("id desc").paginate(params[:page])
+    @ip_bans = @search.order("id desc").paginate(params[:page], :limit => params[:limit])
   end
 
   def destroy

@@ -83,7 +83,7 @@ private
   end
 
   def index_by_comment
-    @comments = Comment.search(params[:search]).order("comments.id DESC").paginate(params[:page], :search_count => params[:search])
+    @comments = Comment.search(params[:search]).order("comments.id DESC").paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@comments) do |format|
       format.html {render :action => "index_by_comment"}
       format.xml do
