@@ -29,6 +29,10 @@ class Pool < ActiveRecord::Base
       where("category = ?", "collection")
     end
 
+    def series_first
+      order("(case category when 'series' then 0 else 1 end), name")
+    end
+
     def search(params)
       q = scoped
       params = {} if params.blank?
