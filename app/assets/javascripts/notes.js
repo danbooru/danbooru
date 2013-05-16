@@ -479,7 +479,7 @@ Danbooru.Note = {
         Danbooru.Note.new(e.pageX - offset.left, e.pageY - offset.top);
       }
       Danbooru.Note.TranslationMode.stop();
-      $("#note-container").css(visibility, 'visible');
+      $("#note-container").css('visibility', 'visible');
       e.stopPropagation();
       e.preventDefault();
 
