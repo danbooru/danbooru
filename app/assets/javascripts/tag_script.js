@@ -52,6 +52,6 @@
       $post.data("tags", Danbooru.TagScript.process(array, x).join(" "));
     });
 
-    Danbooru.Post.update(post_id, {"post[old_tag_string]": old_tags, "post[tag_string]": $post.data("tags")});
+    Danbooru.Post.update(post_id, {"post[old_tag_string]": old_tags, "post[tag_string]": $post.data("tags")}, Danbooru.Post.update_title_with_data);
   }
 })();

@@ -203,6 +203,12 @@
     $img.attr("title", $post.attr("data-tags") + " user:" + $post.attr("data-uploader") + " rating:" + $post.data("rating") + " score:" + $post.data("score"));
   }
 
+  Danbooru.Post.update_title_with_data = function(post_data) {
+    var $post = $("#post_" + post_data.id);
+    $post.attr("data-tags", post_data.tag_string);
+    Danbooru.Post.initialize_title_for($post);
+  }
+
   Danbooru.Post.initialize_preview_borders_for = function(post) {
     var $post = $(post);
     var $img = $post.find("img");
@@ -354,7 +360,7 @@
     });
   }
 
-  Danbooru.Post.update = function(post_id, params) {
+  Danbooru.Post.update = function(post_id, params, callback) {
     Danbooru.Post.notice_update("inc");
 
     $.ajax({
@@ -371,7 +377,7 @@
         Danbooru.notice("Error: " + data.reason);
         $("#post_" + data.id).effect("shake", {"distance": 20}, "fast");
       }
-    });
+    }).success(callback);
   }
 
   Danbooru.Post.approve = function(post_id) {
