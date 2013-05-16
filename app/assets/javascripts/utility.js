@@ -22,11 +22,11 @@
   }
 
   Danbooru.notice = function(msg) {
-    $('#notice').html(msg).addClass("ui-state-highlight").removeClass("ui-state-error").fadeIn("fast");
+    $('#notice').addClass("ui-state-highlight").removeClass("ui-state-error").fadeIn("fast").children("span").html(msg);
   }
 
   Danbooru.error = function(msg) {
-    $('#notice').html(msg).removeClass("ui-state-highlight").addClass("ui-state-error").fadeIn("fast");
+    $('#notice').removeClass("ui-state-highlight").addClass("ui-state-error").fadeIn("fast").children("span").html(msg);
     Danbooru.scroll_to($("#notice"));
   }
 

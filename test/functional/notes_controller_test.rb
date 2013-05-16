@@ -32,7 +32,7 @@ class NotesControllerTest < ActionController::TestCase
     context "create action" do
       should "create a note" do
         assert_difference("Note.count", 1) do
-          post :create, {:note => {:x => 100, :y => 100, :width => 100, :height => 100, :body => "abc", :post_id => @post.id}}, {:user_id => @user.id}
+          post :create, {:note => {:x => 0, :y => 0, :width => 10, :height => 10, :body => "abc", :post_id => @post.id}, :format => :json}, {:user_id => @user.id}
         end
       end
     end

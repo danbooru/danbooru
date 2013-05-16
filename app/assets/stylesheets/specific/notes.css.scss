@@ -57,6 +57,14 @@ div#note-container {
   }
 }
 
+div#note-preview {
+  position: absolute;
+  border: 1px solid red;
+  opacity: 0.6;
+  display: none;
+  background: white;
+}
+
 div.note-edit-dialog {
   font-size: 0.8em;
 }

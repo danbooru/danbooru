@@ -4,7 +4,7 @@
   Danbooru.Post.pending_update_count = 0;
 
   Danbooru.Post.initialize_all = function() {
-    this.initialize_titles();
+    this.initialize_post_previews();
 
     if ($("#c-posts").length) {
       if (Danbooru.meta("enable-js-navigation") === "true") {
@@ -24,7 +24,6 @@
       this.initialize_post_image_resize_links();
       this.initialize_post_image_resize_to_window_link();
       this.initialize_similar();
-      this.place_jlist_ads();
 
       if (Danbooru.meta("always-resize-images") === "true") {
         $("#image-resize-to-window-link").click();
@@ -92,7 +91,7 @@
 
   Danbooru.Post.initialize_shortcuts = function() {
     $(document).bind("keydown.q", function(e) {
-      $("#tags").trigger("focus");
+      $("#tags").trigger("focus").selectEnd();
       e.preventDefault();
     });
 
@@ -138,10 +137,12 @@
 
   Danbooru.Post.initialize_post_relationship_previews = function() {
     var current_post_id = $("meta[name=post-id]").attr("content");
-    $("#post_" + current_post_id).css("background-color", "rgba(0,0,0,0.05)");
+    $("#post_" + current_post_id).addClass("current-post");
 
-    this.toggle_relationship_preview($("#has-children-relationship-preview"), $("#has-children-relationship-preview-link"));
-    this.toggle_relationship_preview($("#has-parent-relationship-preview"), $("#has-parent-relationship-preview-link"));
+    if (Danbooru.Cookie.get("show-relationship-previews") === "0") {
+      this.toggle_relationship_preview($("#has-children-relationship-preview"), $("#has-children-relationship-preview-link"));
+      this.toggle_relationship_preview($("#has-parent-relationship-preview"), $("#has-parent-relationship-preview-link"));
+    }
 
     $("#has-children-relationship-preview-link").click(function(e) {
       Danbooru.Post.toggle_relationship_preview($("#has-children-relationship-preview"), $(this));
@@ -158,15 +159,21 @@
     preview.toggle();
     if (preview.is(":visible")) {
       preview_link.html("&laquo; hide");
+      Danbooru.Cookie.put("show-relationship-previews", "1");
     }
     else {
       preview_link.html("show &raquo;");
+      Danbooru.Cookie.put("show-relationship-previews", "0");
     }
   }
 
   Danbooru.Post.initialize_favlist = function() {
     $("#favlist").hide();
     $("#hide-favlist-link").hide();
+    var fav_count = $("#show-favlist-link").prev().text();
+    if (fav_count === "0") {
+      $("#show-favlist-link").hide();
+    }
 
     $("#show-favlist-link").click(function(e) {
       $("#favlist").show();
@@ -183,9 +190,10 @@
     });
   }
 
-  Danbooru.Post.initialize_titles = function() {
+  Danbooru.Post.initialize_post_previews = function() {
     $(".post-preview").each(function(i, v) {
       Danbooru.Post.initialize_title_for(v);
+      Danbooru.Post.initialize_preview_borders_for(v);
     });
   }
 
@@ -193,6 +201,36 @@
     var $post = $(post);
     var $img = $post.find("img");
     $img.attr("title", $post.attr("data-tags") + " user:" + $post.attr("data-uploader") + " rating:" + $post.data("rating") + " score:" + $post.data("score"));
+  }
+
+  Danbooru.Post.initialize_preview_borders_for = function(post) {
+    var $post = $(post);
+    var $img = $post.find("img");
+
+    var border_colors = [];
+    
+    if ($post.hasClass("post-status-has-children")) {
+      border_colors.push("#0F0");
+    }
+    if ($post.hasClass("post-status-has-parent")) {
+      border_colors.push("#CC0");
+    }
+    if ($post.hasClass("post-status-deleted")) {
+      border_colors.push("#000");
+    } else if ($post.hasClass("post-status-pending")) {
+      border_colors.push("#00F");
+    } else if ($post.hasClass("post-status-flagged")) {
+      border_colors.push("#F00");
+    }
+
+    if (border_colors.length > 1) {
+      $img.css("border", "2px solid");
+      if (border_colors.length === 2) {
+        $img.css("border-color", border_colors[0] + " " + border_colors[1] + " " + border_colors[1] + " " + border_colors[0]);
+      } else if (border_colors.length === 3) {
+        $img.css("border-color", border_colors[0] + " " + border_colors[2] + " " + border_colors[2] + " " + border_colors[1]);
+      }
+    }
   }
 
   Danbooru.Post.initialize_post_image_resize_links = function() {
@@ -204,7 +242,6 @@
       $image.height($image.data("original-height"));
       Danbooru.Note.Box.scale_all();
       $("#image-resize-notice").hide();
-      Danbooru.Post.place_jlist_ads();
       $image.data("scale_factor", 1);
       e.preventDefault();
     });
@@ -233,7 +270,6 @@
       }
 
       Danbooru.Note.Box.scale_all();
-      Danbooru.Post.place_jlist_ads()
       e.preventDefault();
     });
   }
@@ -354,35 +390,6 @@
         }
       }
     });
-  }
-
-  Danbooru.Post.place_jlist_ads = function() {
-    var jlist = $("#jlist-rss-ads-for-show");
-    if (jlist.length) {
-      var image = $("#image");
-
-      if (image.length) {
-        var x = image.offset().left + image.width() + 50;
-        var y = image.offset().top;
-        if (x > $(window).width()) {
-          jlist.css({
-            position: "absolute",
-            width: "108px",
-            left: x + "px",
-            top: y + "px"
-          });
-        } else {
-          jlist.css({
-            position: "absolute",
-            width: "108px",
-            right: "10px",
-            top: y + "px"
-          });
-        }
-      } else {
-        jlist.hide();
-      }
-    }
   }
 })();
 

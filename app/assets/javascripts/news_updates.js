@@ -2,9 +2,9 @@
   Danbooru.NewsUpdate = {};
 
   Danbooru.NewsUpdate.initialize = function() {
-    var key = $("#news-updates").data("updated-at");
+    var key = $("#news-updates").data("id");
 
-    if (Danbooru.Cookie.get("news-ticker") === key) {
+    if (Danbooru.Cookie.get("news-ticker") == key) {
       $("#news-updates").hide();
     } else {
       $("#close-news-ticker-link").click(function(e) {
@@ -12,7 +12,8 @@
         Danbooru.Cookie.put("news-ticker", key);
 
         // need to reset the more link
-        $("#more-links").hide().offset({top: $("#site-map-link").offset().top + $("#site-map-link").height() + 10, left: $("#site-map-link").offset().left});
+        var $site_map_link = $("#site-map-link");
+        $("#more-links").hide().offset({top: $site_map_link.offset().top + $site_map_link.height() + 10, left: $site_map_link.offset().left});
 
         return false;
       });

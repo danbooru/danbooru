@@ -166,7 +166,7 @@ class PostPresenter < Presenter
       end
     else
       first = true
-      @post.pools.active.each do |pool|
+      @post.pools.each do |pool|
         if first && template.params[:tags].blank?
           html += pool_link_html(template, pool, :include_rel => true)
           first = false
@@ -181,7 +181,7 @@ class PostPresenter < Presenter
   end
 
   def pool_link_html(template, pool, options = {})
-    pool_html = ['<li id="nav-link-for-pool-#{pool.id}">']
+    pool_html = ["<li id='nav-link-for-pool-#{pool.id}'>"]
     match_found = false
 
     if options[:include_rel]
@@ -194,11 +194,17 @@ class PostPresenter < Presenter
       klass = ""
     end
 
+    if @post.id != pool.post_id_array.first
+      pool_html << template.link_to("&laquo;".html_safe, template.post_path(pool.post_id_array.first, :pool_id => pool.id), :class => "#{klass} first")
+    else
+      pool_html << '<span class="first">&laquo;</span>'
+    end
+
     if pool.neighbors(@post).previous
-      pool_html << template.link_to("&laquo;prev".html_safe, template.post_path(pool.neighbors(@post).previous, :pool_id => pool.id), :rel => prev_rel, :class => "#{klass} prev")
+      pool_html << template.link_to("&lsaquo;&thinsp;prev".html_safe, template.post_path(pool.neighbors(@post).previous, :pool_id => pool.id), :rel => prev_rel, :class => "#{klass} prev")
       match_found = true
     else
-      pool_html << '<span class="prev">&laquo;prev</span>'
+      pool_html << '<span class="prev">&lsaquo;&thinsp;prev</span>'
     end
 
     pool_html << ' <span class="pool-name ' + klass + '">'
@@ -206,10 +212,16 @@ class PostPresenter < Presenter
     pool_html << '</span> '
 
     if pool.neighbors(@post).next
-      pool_html << template.link_to("next&raquo;".html_safe, template.post_path(pool.neighbors(@post).next, :pool_id => pool.id), :rel => next_rel, :class => "#{klass} next")
+      pool_html << template.link_to("next&thinsp;&rsaquo;".html_safe, template.post_path(pool.neighbors(@post).next, :pool_id => pool.id), :rel => next_rel, :class => "#{klass} next")
       match_found = true
     else
-      pool_html << '<span class="next">next&raquo;</span>'
+      pool_html << '<span class="next">next&thinsp;&rsaquo;</span>'
+    end
+
+    if @post.id != pool.post_id_array.last
+      pool_html << template.link_to("&raquo;".html_safe, template.post_path(pool.post_id_array.last, :pool_id => pool.id), :class => "#{klass} last")
+    else
+      pool_html << '<span class="last">&raquo;</span>'
     end
 
     pool_html << "</li>"

@@ -32,7 +32,7 @@
   }
 
   Danbooru.Blacklist.toggle_entry = function(e) {
-    var tags = $(e.target).html();
+    var tags = $(e.target).text();
     var match = $.grep(Danbooru.Blacklist.entries, function(entry, i) {
       return entry.tags === tags;
     })[0];
@@ -57,7 +57,7 @@
       var link = $("<a/>");
       var count = $("<span/>");
 
-      link.html(entry.tags);
+      link.text(entry.tags);
       link.click(Danbooru.Blacklist.toggle_entry);
       count.html(entry.hits);
       item.append(link);

@@ -7,7 +7,8 @@ class ForumPost < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   before_validation :initialize_updater
   before_validation :initialize_is_deleted, :on => :create
-  after_create :update_topic_updated_at
+  after_create :update_topic_updated_at_on_create
+  after_destroy :update_topic_updated_at_on_destroy
   validates_presence_of :body, :creator_id
   validate :validate_topic_is_unlocked
   before_destroy :validate_topic_is_unlocked
@@ -87,11 +88,18 @@ class ForumPost < ActiveRecord::Base
     creator_id == user.id || user.is_janitor?
   end
 
-  def update_topic_updated_at
+  def update_topic_updated_at_on_create
     if topic
       topic.updater_id = CurrentUser.id
       topic.response_count = topic.response_count + 1
       topic.save
+    end
+  end
+
+  def update_topic_updated_at_on_destroy
+    max = ForumPost.where(:topic_id => topic.id).maximum(:updated_at)
+    if max
+      topic.update_column(:updated_at, max)
     end
   end
 

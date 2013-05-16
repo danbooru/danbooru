@@ -11,6 +11,7 @@ class Pool < ActiveRecord::Base
   before_validation :initialize_is_active, :on => :create
   before_validation :initialize_creator, :on => :create
   after_save :create_version
+  after_create :synchronize!
   before_destroy :create_mod_action_for_destroy
   attr_accessible :name, :description, :post_ids, :post_id_array, :post_count, :is_active, :as => [:member, :gold, :platinum, :contributor, :janitor, :moderator, :admin, :default]
   attr_accessible :is_deleted, :as => [:janitor, :moderator, :admin]
@@ -25,9 +26,9 @@ class Pool < ActiveRecord::Base
       params = {} if params.blank?
 
       if params[:name_matches].present?
-        params[:name_matches] = params[:name_matches].tr(" ", "_")
-        params[:name_matches] = "*#{params[:name_matches]}*" unless params[:name_matches] =~ /\*/
-        q = q.where("name ilike ? escape E'\\\\'", params[:name_matches].to_escaped_for_sql_like)
+        name_matches = params[:name_matches].tr(" ", "_")
+        name_matches = "*#{name_matches}*" unless name_matches =~ /\*/
+        q = q.where("name ilike ? escape E'\\\\'", name_matches.to_escaped_for_sql_like)
       end
 
       if params[:description_matches].present?

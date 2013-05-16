@@ -19,7 +19,7 @@ class UserPresenter
 
   def ban_reason
     if user.is_banned?
-      "#{user.ban.reason}; expires #{user.ban.expires_at}"
+      "#{user.recent_ban.reason}; expires #{user.recent_ban.expires_at} (#{user.bans.count} bans total)"
     else
       nil
     end
@@ -80,7 +80,7 @@ class UserPresenter
   end
 
   def comment_count(template)
-    template.link_to(Comment.for_creator(user.id).count, template.comments_path(:search => {:creator_id => user.id}, :group_by => "comment"))
+    template.link_to(user.comment_count, template.comments_path(:search => {:creator_id => user.id}, :group_by => "comment"))
   end
 
   def commented_posts_count(template)
@@ -100,19 +100,19 @@ class UserPresenter
   end
 
   def wiki_page_version_count(template)
-    template.link_to(WikiPageVersion.for_user(user.id).count, template.wiki_page_versions_path(:search => {:updater_id => user.id}))
+    template.link_to(user.wiki_page_version_count, template.wiki_page_versions_path(:search => {:updater_id => user.id}))
   end
 
   def artist_version_count(template)
-    template.link_to(ArtistVersion.for_user(user.id).count, template.artist_versions_path(:search => {:updater_id => user.id}))
+    template.link_to(user.artist_version_count, template.artist_versions_path(:search => {:updater_id => user.id}))
   end
 
   def forum_post_count(template)
-    template.link_to(ForumPost.for_user(user.id).count, template.forum_posts_path(:search => {:creator_id => user.id}))
+    template.link_to(user.forum_post_count, template.forum_posts_path(:search => {:creator_id => user.id}))
   end
 
   def pool_version_count(template)
-    template.link_to(PoolVersion.for_user(user.id).count, template.pool_versions_path(:search => {:updater_id => user.id}))
+    template.link_to(user.pool_version_count, template.pool_versions_path(:search => {:updater_id => user.id}))
   end
 
   def inviter(template)

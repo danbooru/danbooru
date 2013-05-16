@@ -1,5 +1,5 @@
 class Tag < ActiveRecord::Base
-  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|-pool|pool|-fav|fav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|score|favcount|filesize|source|id|-id|date|age|order|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|-parent|pixiv_id|pixiv"
+  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|-pool|pool|-fav|fav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|score|favcount|filesize|source|-source|id|-id|date|age|order|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|-parent|pixiv_id|pixiv"
   attr_accessible :category
   has_one :wiki_page, :foreign_key => "name", :primary_key => "title"
 
@@ -66,20 +66,21 @@ class Tag < ActiveRecord::Base
         select_value_sql("SELECT category FROM tags WHERE name = ?", tag_name).to_i
       end
 
-      def category_for(tag_name)
-        Cache.get("tc:#{Cache.sanitize(tag_name)}") do
+      def category_for(tag_name, options = {})
+        if options[:disable_caching]
           select_category_for(tag_name)
+        else
+          Cache.get("tc:#{Cache.sanitize(tag_name)}") do
+            select_category_for(tag_name)
+          end
         end
       end
 
-      def categories_for(tag_names)
+      def categories_for(tag_names, options = {})
         Array(tag_names).inject({}) do |hash, tag_name|
-          hash[tag_name] = category_for(tag_name)
+          hash[tag_name] = category_for(tag_name, options)
           hash
         end
-        # Cache.get_multi(tag_names, "tc") do |name|
-        #   select_category_for(name)
-        # end
       end
     end
 
@@ -104,11 +105,7 @@ class Tag < ActiveRecord::Base
         Post.raw_tag_match(name).find_each do |post|
           post.reload
           post.set_tag_counts
-          post.update_column(:tag_count, post.tag_count)
-          post.update_column(:tag_count_general, post.tag_count_general)
-          post.update_column(:tag_count_artist, post.tag_count_artist)
-          post.update_column(:tag_count_copyright, post.tag_count_copyright)
-          post.update_column(:tag_count_character, post.tag_count_character)
+          Post.update_all({:tag_count => post.tag_count, :tag_count_general => post.tag_count_general, :tag_count_artist => post.tag_count_artist, :tag_count_copyright => post.tag_count_copyright, :tag_count_character => post.tag_count_character}, {:id => post.id})
         end
       end
     end
@@ -253,7 +250,7 @@ class Tag < ActiveRecord::Base
         return [:gt, parse_cast($1, type)]
 
       when /,/
-        return [:in, range.split(/,/)]
+        return [:in, range.split(/,/).map {|x| parse_cast(x, type)}]
 
       else
         return [:eq, parse_cast(range, type)]
@@ -402,6 +399,9 @@ class Tag < ActiveRecord::Base
           when "source"
             q[:source] = ($2.to_escaped_for_sql_like + "%").gsub(/%+/, '%')
 
+          when "-source"
+            q[:source_neg] = ($2.to_escaped_for_sql_like + "%").gsub(/%+/, '%')
+
           when "date"
             q[:date] = parse_helper($2, :date)
 
@@ -547,14 +547,20 @@ class Tag < ActiveRecord::Base
       elsif params[:order] == "date"
         q = q.reorder("id desc")
 
+      elsif params[:order] == "count"
+        q = q.reorder("post_count desc")
+
       elsif params[:sort] == "date"
         q = q.reorder("id desc")
 
       elsif params[:sort] == "name"
         q = q.reorder("name")
 
-      else
+      elsif params[:sort] == "count"
         q = q.reorder("post_count desc")
+
+      else
+        q = q.reorder("id desc")
       end
 
       q

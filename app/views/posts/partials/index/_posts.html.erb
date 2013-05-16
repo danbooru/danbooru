@@ -1,6 +1,4 @@
 <div id="posts">
-  <%= render_advertisement("horizontal") %>
-
   <%= post_set.presenter.post_previews_html(self) %>
 
   <%= numbered_paginator(post_set.posts) %>

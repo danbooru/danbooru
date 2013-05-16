@@ -5,6 +5,7 @@ class UserFeedback < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   attr_accessible :body, :user_id, :category, :user_name
   validates_presence_of :user, :creator, :body, :category
+  validates_inclusion_of :category, :in => %w(positive negative neutral)
   validate :creator_is_gold
   validate :user_is_not_creator
   after_create :create_dmail
@@ -44,6 +45,10 @@ class UserFeedback < ActiveRecord::Base
 
       if params[:creator_name].present?
         q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].mb_chars.downcase)
+      end
+
+      if params[:category].present?
+        q = q.where("category = ?", params[:category])
       end
 
       q

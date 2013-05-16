@@ -19,8 +19,16 @@ div#c-artists {
 
   div#a-edit, div#a-new {
     textarea {
-      height: 5em;
+      height: 10em;
+      
+      &#artist_other_names_comma {
+        height: 3em;
+      }
     }
+
+    .hint {
+      display: block;
+    } 
   }
 
   div.recent-posts {

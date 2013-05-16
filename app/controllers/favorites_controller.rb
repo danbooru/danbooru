@@ -1,15 +1,18 @@
 class FavoritesController < ApplicationController
   before_filter :member_only
+  respond_to :html, :xml, :json
 
   def index
     if params[:tags]
       redirect_to(posts_path(:tags => params[:tags]))
-    elsif request.format == Mime::JS
-      list_favorited_users
-    elsif params[:user_id]
-      @favorite_set = PostSets::Favorite.new(User.find(params[:user_id]), params[:page], params)
     else
-      @favorite_set = PostSets::Favorite.new(CurrentUser.user, params[:page], params)
+      user_id = params[:user_id] || CurrentUser.user.id
+      @favorite_set = PostSets::Favorite.new(user_id, params[:page], params)
+      respond_with(@favorite_set.posts) do |format|
+        format.xml do
+          render :xml => @favorite_set.posts.to_xml(:root => "posts")
+        end
+      end
     end
   end
 
@@ -25,10 +28,5 @@ class FavoritesController < ApplicationController
   def destroy
     @post = Post.find(params[:id])
     @post.remove_favorite!(CurrentUser.user)
-  end
-
-  def list_favorited_users
-    @post = Post.find(params[:post_id])
-    render :action => "list_favorited_users"
   end
 end

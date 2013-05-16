@@ -8,6 +8,7 @@ class TagImplicationTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = "127.0.0.1"
       @user = FactoryGirl.create(:user)
       MEMCACHE.flush_all
+      Delayed::Worker.delay_jobs = false
     end
 
     teardown do
@@ -67,7 +68,18 @@ class TagImplicationTest < ActiveSupport::TestCase
       assert_equal("ddd", ti2.descendant_names)
     end
 
-    should "update the decendants for its parent on create" do
+    should "update the descendants for its parent on destroy" do
+      ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
+      ti2 = FactoryGirl.create(:tag_implication, :antecedent_name => "bbb", :consequent_name => "ccc")
+      ti3 = FactoryGirl.create(:tag_implication, :antecedent_name => "ccc", :consequent_name => "ddd")
+      ti2.destroy
+      ti1.reload
+      ti3.reload
+      assert_equal("bbb", ti1.descendant_names)
+      assert_equal("ddd", ti3.descendant_names)
+    end
+
+    should "update the descendants for its parent on create" do
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       ti1.reload
       assert_equal("active", ti1.status)
@@ -97,7 +109,17 @@ class TagImplicationTest < ActiveSupport::TestCase
       assert_equal("ccc ddd eee", ti2.descendant_names)
       assert_equal("ddd", ti3.descendant_names)
       assert_equal("eee", ti4.descendant_names)
+    end
 
+    should "update any affected post upon destroy" do
+      ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
+      ti2 = FactoryGirl.create(:tag_implication, :antecedent_name => "bbb", :consequent_name => "ccc")
+      ti3 = FactoryGirl.create(:tag_implication, :antecedent_name => "ccc", :consequent_name => "ddd")
+      p1 = FactoryGirl.create(:post, :tag_string => "aaa")
+      assert_equal("aaa bbb ccc ddd", p1.tag_string)
+      ti2.destroy
+      p1.reload
+      assert_equal("aaa bbb ddd", p1.tag_string)
     end
 
     should "update any affected post upon save" do
@@ -106,18 +128,6 @@ class TagImplicationTest < ActiveSupport::TestCase
       ti2 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "yyy")
       p1.reload
       assert_equal("aaa bbb ccc xxx yyy", p1.tag_string)
-    end
-
-    should "record the implication's creator in the tag history" do
-      user = FactoryGirl.create(:user)
-      p1 = nil
-      CurrentUser.scoped(user, "127.0.0.1") do
-        p1 = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
-      end
-      ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "xxx")
-      p1.reload
-      assert_not_equal(ti1.creator_id, p1.uploader_id)
-      assert_equal(ti1.creator_id, p1.versions.last.updater_id)
     end
   end
 end

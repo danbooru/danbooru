@@ -15,6 +15,11 @@ $(function() {
     Danbooru.Cookie.put('hide_upgrade_account_notice', '1', 7);
     e.preventDefault();
   });
+
+  $("#close-notice-link").click(function(e) {
+    $('#notice').fadeOut("fast");
+    e.preventDefault();
+  });
 });
 
 var Danbooru = {};

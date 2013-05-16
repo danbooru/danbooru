@@ -5,7 +5,7 @@
         <th><label for="search_name_matches">Name</label></th>
         <td>
           <div class="input">
-            <%= text_field "search", "name_matches" %>
+            <%= text_field "search", "name_matches", :value => params[:search][:name_matches] %>
             <span class="hint">Use * for wildcard</span>
           </div>
         </td>
@@ -15,7 +15,7 @@
         <th><label for="search_category">Category</label></th>
         <td>
           <div class="input">
-            <%= select "search", "category", [""] + Danbooru.config.canonical_tag_category_mapping.to_a %>
+            <%= select "search", "category", [""] + Danbooru.config.canonical_tag_category_mapping.to_a, :selected => params[:search][:category] %>
           </div>
         </td>
       </tr>
@@ -24,7 +24,7 @@
         <th><label for="search_sort">Sort</label></th>
         <td>
           <div class="input">
-            <%= select "search", "sort", %w(count date name) %>
+            <%= select "search", "sort", %w(count date name), :selected => params[:search][:sort] %>
           </div>
         </td>
       </tr>
@@ -33,7 +33,7 @@
         <th><label for="search_hide_empty">Hide Empty</label></th>
         <td>
           <div class="input">
-            <%= select "search", "hide_empty", ["yes", "no"] %>
+            <%= select "search", "hide_empty", ["yes", "no"], :selected => params[:search][:hide_empty] %>
           </div>
         </td>
       </tr>

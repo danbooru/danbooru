@@ -25,7 +25,12 @@ class TagImplicationsController < ApplicationController
   def destroy
     @tag_implication = TagImplication.find(params[:id])
     @tag_implication.destroy
-    respond_with(@tag_implication)
+    respond_with(@tag_implication) do |format|
+      format.html do
+        flash[:notice] = "Tag implication was deleted"
+        redirect_to(tag_implications_path)
+      end
+    end
   end
 
   def approve

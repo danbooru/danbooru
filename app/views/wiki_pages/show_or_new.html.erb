@@ -1,0 +1,23 @@
+<div id="c-wiki-pages">
+  <div id="a-show">
+    <%= render "sidebar" %>
+
+    <section id="content">
+      <h1 id="wiki-page-title"><%= params[:title] %></h1>
+      <div id="wiki-page-body" class="prose">
+        <p>This wiki page does not exist. <%= link_to "Create new wiki page", new_wiki_page_path(:wiki_page => {:title => params[:title]}) %>.</p>
+      </div>
+
+      <%= wiki_page_alias_and_implication_list(@wiki_page)%>
+
+      <%= wiki_page_post_previews(@wiki_page) %>
+
+    </section>
+  </div>
+</div>
+
+<%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Wiki - <%= params[:title] %> - <%= Danbooru.config.app_name %>
+<% end %>

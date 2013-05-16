@@ -3,7 +3,7 @@ class Post < ActiveRecord::Base
   class DisapprovalError < Exception ; end
   class SearchError < Exception ; end
 
-  attr_accessor :old_tag_string, :old_parent_id, :has_constraints
+  attr_accessor :old_tag_string, :old_parent_id, :has_constraints, :disable_versioning
   after_destroy :delete_files
   after_destroy :delete_remote_files
   after_save :create_version
@@ -31,6 +31,7 @@ class Post < ActiveRecord::Base
   has_many :disapprovals, :class_name => "PostDisapproval", :dependent => :destroy
   validates_uniqueness_of :md5
   validates_presence_of :parent, :if => lambda {|rec| !rec.parent_id.nil?}
+  validate :post_is_not_its_own_parent
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :last_noted_at, :parent_id, :as => [:member, :builder, :gold, :platinum, :contributor, :janitor, :moderator, :admin, :default]
   attr_accessible :is_rating_locked, :is_note_locked, :as => [:builder, :contributor, :janitor, :moderator, :admin]
   attr_accessible :is_status_locked, :as => [:admin]
@@ -313,20 +314,24 @@ class Post < ActiveRecord::Base
     end
 
     def increment_tag_post_counts
-      Post.execute_sql("UPDATE tags SET post_count = post_count + 1 WHERE name IN (?)", tag_array) if tag_array.any?
+      Tag.update_all("post_count = post_count + 1", {:name => tag_array}) if tag_array.any?
     end
 
     def decrement_tag_post_counts
-      Post.execute_sql("UPDATE tags SET post_count = post_count - 1 WHERE name IN (?)", tag_array) if tag_array.any?
+      Tag.update_all("post_count = post_count - 1", {:name => tag_array}) if tag_array.any?
     end
 
     def update_tag_post_counts
       decrement_tags = tag_array_was - tag_array
       increment_tags = tag_array - tag_array_was
-      Post.execute_sql("UPDATE tags SET post_count = post_count - 1 WHERE name IN (?)", decrement_tags) if decrement_tags.any?
-      Post.execute_sql("UPDATE tags SET post_count = post_count + 1 WHERE name IN (?)", increment_tags) if increment_tags.any?
-      Post.expire_cache_for_all(decrement_tags) if decrement_tags.any?
-      Post.expire_cache_for_all(increment_tags) if increment_tags.any?
+      if increment_tags.any?
+        Tag.update_all("post_count = post_count + 1", {:name => increment_tags})
+        Post.expire_cache_for_all(increment_tags)
+      end
+      if decrement_tags.any?
+        Tag.update_all("post_count = post_count - 1", {:name => decrement_tags})
+        Post.expire_cache_for_all(decrement_tags)
+      end
       Post.expire_cache_for_all([""]) if new_record? || id <= 100_000
     end
 
@@ -337,7 +342,7 @@ class Post < ActiveRecord::Base
       self.tag_count_copyright = 0
       self.tag_count_character = 0
 
-      categories = Tag.categories_for(tag_array)
+      categories = Tag.categories_for(tag_array, :disable_caching => true)
       categories.each_value do |category|
         self.tag_count += 1
 
@@ -622,11 +627,9 @@ class Post < ActiveRecord::Base
     def vote!(score)
       if can_be_voted_by?(CurrentUser.user)
         if score == "up"
-          increment!(:score)
-          increment!(:up_score)
+          Post.update_all("score = score + 1, up_score = up_score + 1", {:id => id})
         elsif score == "down"
-          decrement!(:score)
-          decrement!(:down_score)
+          Post.update_all("score = score - 1, down_score = down_score - 1", {:id => id})
         end
 
         votes.create(:score => score)
@@ -798,6 +801,13 @@ class Post < ActiveRecord::Base
 
       update_column(:score, 0)
     end
+
+    def post_is_not_its_own_parent
+      if parent_id.present? && id == parent_id
+        errors[:base] << "Post cannot have itself as a parent"
+        false
+      end
+    end
   end
 
   module DeletionMethods
@@ -860,6 +870,8 @@ class Post < ActiveRecord::Base
 
   module VersionMethods
     def create_version
+      return if disable_versioning
+
       if created_at == updated_at
         CurrentUser.increment!(:post_update_count)
         versions.create(

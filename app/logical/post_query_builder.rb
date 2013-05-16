@@ -170,6 +170,20 @@ class PostQueryBuilder
       end
     end
 
+    if q[:source_neg]
+      if q[:source_neg] == "none%"
+        relation = relation.where("(posts.source != '' AND posts.source IS NOT NULL)")
+      elsif q[:source_neg] == "http%"
+        relation = relation.where("(posts.source not like ?)", "http%")
+      elsif q[:source_neg] =~ /^%\.?pixiv(?:\.net(?:\/img)?)?(?:%\/|(?=%$))(.+)$/
+        relation = relation.where("SourcePattern(posts.source) NOT LIKE ? ESCAPE E'\\\\'", "pixiv/" + $1)
+        has_constraints!
+      else
+        relation = relation.where("SourcePattern(posts.source) NOT LIKE SourcePattern(?) ESCAPE E'\\\\'", q[:source_neg])
+        has_constraints!
+      end
+    end
+
     if q[:subscriptions]
       relation = add_tag_subscription_relation(q[:subscriptions], relation)
       has_constraints!

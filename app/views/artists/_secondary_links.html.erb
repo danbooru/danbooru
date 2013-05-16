@@ -7,14 +7,14 @@
     <li><%= link_to "Recent changes", artist_versions_path %></li>
     <% if @artist && !@artist.new_record? %>
       <li>|</li>
-      <li><%= link_to "Posts", posts_path(:tags => @artist.name) %></li>
+      <li><%= link_to "Posts (#{Post.fast_count(@artist.name)})", posts_path(:tags => @artist.name) %></li>
       <li><%= link_to "Show", artist_path(@artist) %></li>
       <% if CurrentUser.is_member? %>
         <li><%= link_to "Edit", edit_artist_path(@artist) %></li>
       <% end %>
       <li><%= link_to "History", artist_versions_path(:search => {:artist_id => @artist.id}) %></li>
       <% if CurrentUser.is_admin? %>
-        <%= link_to "Ban", ban_artist_path(@artist), :method => :put %>
+        <%= link_to "Ban", ban_artist_path(@artist), :method => :put, :confirm => "Are you sure you want to ban this artist?" %>
       <% end %>
     <% end %>
   </menu>

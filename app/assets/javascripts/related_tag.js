@@ -47,10 +47,10 @@
     // 5. abc| def   -> abc
     // 6. ab|c def   -> abc
     // 7. |abc def   -> abc
-    // 8. | abc def  -> abc   -- not supported by this code but a pretty rare case
+    // 8. | abc def  -> abc
 
     var $field = $("#upload_tag_string,#post_tag_string");
-    var string = $field.val().trim();
+    var string = $field.val();
     var n = string.length;
     var a = $field.get(0).selectionStart;
     var b = $field.get(0).selectionStart;
@@ -59,6 +59,11 @@
       // 4 is the only case where we need to scan forward. in all other cases we
       // can drag a backwards, and then drag b forwards.
 
+      while ((b < n) && (!/\s/.test(string[b]))) {
+        b++;
+      }
+    } else if (string.search(/\S/) > b) { // case 8
+      b = string.search(/\S/);
       while ((b < n) && (!/\s/.test(string[b]))) {
         b++;
       }
@@ -119,6 +124,8 @@
         $.each(Danbooru.RelatedTag.recent_artists[0].urls, function(i, url) {
           tags.push([" " + url.url, 0]);
         });
+      } else if (Danbooru.RelatedTag.recent_artists.length >= 10) {
+        tags.push([" none", 0]);
       } else {
         $.each(Danbooru.RelatedTag.recent_artists, function(i, artist) {
           tags.push([artist.name, 1]);
@@ -155,6 +162,16 @@
       return "";
     }
 
+    query = query.replace(/_/g, " ");
+    var header = $("<em/>");
+
+    var match = query.match(/^wiki:(.+)/);
+    if (match) {
+      header.html($("<a/>").attr("href", "/wiki_pages?title=" + encodeURIComponent(match[1])).attr("target", "_blank").text(query));
+    } else {
+      header.text(query);
+    }
+
     var current = $("#upload_tag_string,#post_tag_string").val().match(/\S+/g) || [];
     var $div = $("<div/>");
     $div.addClass("tag-column")
@@ -164,16 +181,14 @@
     var $ul = $("<ul/>");
     $ul.append(
       $("<li/>").append(
-        $("<em/>").html(
-          query.replace(/_/g, " ")
-        )
+        header
       )
     );
 
     $.each(related_tags, function(i, tag) {
       if (tag[0][0] !== " ") {
         var $link = $("<a/>");
-        $link.html(tag[0].replace(/_/g, " "));
+        $link.text(tag[0].replace(/_/g, " "));
         $link.addClass("tag-type-" + tag[1]);
         $link.attr("href", "/posts?tags=" + encodeURIComponent(tag[0]));
         $link.click(Danbooru.RelatedTag.toggle_tag);
@@ -184,7 +199,7 @@
           $("<li/>").append($link)
         );
       } else {
-        $ul.append($("<li/>").html(tag[0]));
+        $ul.append($("<li/>").text(tag[0]));
       }
     });
 
@@ -210,6 +225,8 @@
     if (Danbooru.RelatedTag.recent_artist && $("#artist-tags-container").css("display") === "block") {
       Danbooru.RelatedTag.process_artist(Danbooru.RelatedTag.recent_artist);
     }
+
+    $field.focus();
     e.preventDefault();
   }
 

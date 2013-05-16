@@ -40,7 +40,8 @@ class User < ActiveRecord::Base
   before_create :promote_to_admin_if_first_user
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
   has_many :posts, :foreign_key => "uploader_id"
-  has_one :ban
+  has_many :bans, :order => "bans.id desc"
+  has_one :recent_ban, :class_name => "Ban", :order => "bans.id desc"
   has_many :subscriptions, :class_name => "TagSubscription", :foreign_key => "creator_id", :order => "name"
   has_many :note_versions, :foreign_key => "updater_id"
   has_many :dmails, :foreign_key => "owner_id", :order => "dmails.id desc"
@@ -351,7 +352,7 @@ class User < ActiveRecord::Base
 
     def create_mod_action
       if level_changed?
-        ModAction.create(:description => "#{name} level changed #{level_string(level_was)} -> #{level_string} by #{CurrentUser.name}")
+        ModAction.create(:description => %{"#{name}":/users/#{id} level changed #{level_string(level_was)} -> #{level_string}})
       end
     end
     
@@ -510,13 +511,15 @@ class User < ActiveRecord::Base
 
   module ApiMethods
     def hidden_attributes
-      super + [:password_hash, :bcrypt_password_hash, :email, :email_verification_key, :time_zone, :created_at, :updated_at, :receive_email_notifications, :last_logged_in_at, :last_forum_read_at, :has_mail, :default_image_size, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :base_upload_limit, :recent_tags, :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :enable_sequential_post_navigation, :hide_deleted_posts, :per_page, :style_usernames]
+      super + [:password_hash, :bcrypt_password_hash, :email, :email_verification_key, :time_zone, :updated_at, :receive_email_notifications, :last_logged_in_at, :last_forum_read_at, :has_mail, :default_image_size, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :recent_tags, :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :enable_sequential_post_navigation, :hide_deleted_posts, :per_page, :style_usernames]
     end
 
     def serializable_hash(options = {})
       options ||= {}
       options[:except] ||= []
       options[:except] += hidden_attributes
+      options[:methods] ||= []
+      options[:methods] += [:wiki_page_version_count, :artist_version_count, :pool_version_count, :forum_post_count, :comment_count]
       super(options)
     end
 
@@ -525,6 +528,8 @@ class User < ActiveRecord::Base
       options ||= {}
       options[:except] ||= []
       options[:except] += hidden_attributes
+      options[:methods] ||= []
+      options[:methods] += [:wiki_page_version_count, :artist_version_count, :pool_version_count, :forum_post_count, :comment_count]
       super(options, &block)
     end
 
@@ -535,6 +540,28 @@ class User < ActiveRecord::Base
         "level" => level,
         "created_at" => created_at.strftime("%Y-%m-%d %H:%M")
       }.to_json
+    end
+  end
+
+  module CountMethods
+    def wiki_page_version_count
+      WikiPageVersion.for_user(id).count
+    end
+
+    def artist_version_count
+      ArtistVersion.for_user(id).count
+    end
+
+    def pool_version_count
+      PoolVersion.for_user(id).count
+    end
+
+    def forum_post_count
+      ForumPost.for_user(id).count
+    end
+
+    def comment_count
+      Comment.for_creator(id).count
     end
   end
 
@@ -657,6 +684,7 @@ class User < ActiveRecord::Base
   include LimitMethods
   include InvitationMethods
   include ApiMethods
+  include CountMethods
   extend SearchMethods
   include DeletionMethods
 

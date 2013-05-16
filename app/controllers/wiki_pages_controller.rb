@@ -70,7 +70,8 @@ class WikiPagesController < ApplicationController
     if @wiki_page
       redirect_to wiki_page_path(@wiki_page)
     else
-      redirect_to new_wiki_page_path(:wiki_page => {:title => params[:title]})
+      @wiki_page = WikiPage.new(:title => params[:title])
+      respond_with(@wiki_page)
     end
   end
 
