@@ -25,8 +25,6 @@
           <%= f.input :per_page, :label => "Posts per page", :as => :select, :collection => (1..100), :include_blank => false %>
         <% end %>
         
-        <%= f.input :style_usernames, :as => :select, :label => "Colored usernames", :hint => "Color each user's name depending on their rank", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
-        
         <%= f.input :blacklisted_tags, :hint => "Put any tag combinations you never want to see here. Each combination should go on a separate line.", :input_html => {:size => "40x5"} %>
         <div class="input text optional field_with_hint">
           <label class="text optional" for="user_favorite_tags">Frequent tags</label>
@@ -37,6 +35,7 @@
       
       <fieldset>
         <legend>Advanced Settings</legend>
+        <%= f.input :style_usernames, :as => :select, :label => "Colored usernames", :hint => "Color each user's name depending on their rank", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
         <%= f.input :always_resize_images, :as => :select, :include_blank => false, :label => "Fit images to window", :hint => "Use JavaScript to resize images to fit window" %>
         <%= f.input :enable_post_navigation, :as => :select, :include_blank => false, :label => "Enable keyboard shortcuts" %>
         <%= f.input :new_post_navigation_layout, :as => :select, :label => "Pool links", :include_blank => false, :collection => [["Bottom", "true"], ["Top", "false"]], :hint => "When browsing pools, where do you want the navigation links to be placed?" %>
@@ -48,6 +47,11 @@
         <legend>Change Password</legend>
         <%= f.input :password, :hint => "Leave blank if you don't want to change your password", :label => "New password", :input_html => {:autocomplete => "off"} %>
         <%= f.input :old_password, :as => :password, :input_html => {:autocomplete => "off"} %>
+      </fieldset>
+
+      <fieldset>
+        <legend>Delete Account</legend>
+        <p><%= link_to "Click here to delete your account", maintenance_user_deletion_path %></p>
       </fieldset>
 
       <%= f.button :submit, "Submit" %>
