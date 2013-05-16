@@ -226,7 +226,9 @@
       Danbooru.RelatedTag.process_artist(Danbooru.RelatedTag.recent_artist);
     }
 
-    $field.focusWithoutScroll();
+    if ($(window).scrollTop() <= $field.offset().top) {
+      $field.focus();
+    }
 
     e.preventDefault();
   }
