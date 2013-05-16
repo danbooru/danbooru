@@ -51,7 +51,9 @@
 
       <fieldset>
         <legend>Delete Account</legend>
-        <p><%= link_to "Click here to delete your account", maintenance_user_deletion_path %></p>
+        <div class="input">
+          <p><%= link_to "Click here to delete your account", maintenance_user_deletion_path %></p>
+        </div>
       </fieldset>
 
       <%= f.button :submit, "Submit" %>
