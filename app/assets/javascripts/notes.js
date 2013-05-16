@@ -126,9 +126,15 @@ Danbooru.Note = {
       if ((new Date).getTime() < Danbooru.Note.ignore_click_until) {
         return;
       }
-      var is_hidden = document.getElementById('note-container').style.display == 'none';
-      // Why does toggle() not work here?
-      $("#note-container").toggle(is_hidden);
+      var $note_container = $("#note-container");
+      var is_hidden = ($note_container.css('visibility') === 'hidden');
+      
+      if (is_hidden) {
+        $note_container.css('visibility', 'visible');
+      }
+      else {
+        $note_container.css('visibility', 'hidden');
+      }
     }
   },
 
@@ -473,7 +479,7 @@ Danbooru.Note = {
         Danbooru.Note.new(e.pageX - offset.left, e.pageY - offset.top);
       }
       Danbooru.Note.TranslationMode.stop();
-      $("#note-container").show();
+      $("#note-container").css(visibility, 'visible');
       e.stopPropagation();
       e.preventDefault();
 
