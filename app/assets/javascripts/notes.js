@@ -296,8 +296,8 @@ Danbooru.Note = {
 
       $textarea = $('<textarea></textarea>');
       $textarea.css({
-        width: "95%",
-        height: "10em"
+        width: "97%",
+        height: "95%"
       });
 
       if ($note_body.html() !== "<em>Click to edit</em>") {
@@ -309,6 +309,7 @@ Danbooru.Note = {
       $dialog.data("id", $note_body.data("id"));
       $dialog.dialog({
         width: 360,
+        height: 210,
         dialogClass: "note-edit-dialog",
         title: "Edit note",
         buttons: {
