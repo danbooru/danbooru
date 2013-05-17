@@ -1,0 +1,19 @@
+<div id="c-artist-versions">
+  <div id="a-search">
+    <h1>Search Changes</h1>
+
+    <div id="search">
+      <%= form_tag(artist_versions_path, :method => :get, :class => "simple_form") do %>
+        <%= search_field "updater_name", :label => "User" %>
+        <%= search_field "name", :label => "Name" %>
+        <%= submit_tag "Search" %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Search Artist Changes - <%= Danbooru.config.app_name %>
+<% end %>
