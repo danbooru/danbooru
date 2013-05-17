@@ -32,7 +32,7 @@
         <th><label for="search_sort">Order</th>
         <td>
           <div class="input">
-            <%= select "search", "sort", [["Last updated", "updated_at"], ["Name", "name"]], :selected => params[:search][:sort] %>
+            <%= select "search", "sort", [["Last updated", "updated_at"], ["Name", "name"], ["Recently created", "created_at"], ["Post count", "post_count"]], :selected => params[:search][:sort] %>
           </div>
         </td>
       </tr>

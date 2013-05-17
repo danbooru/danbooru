@@ -49,8 +49,13 @@ class Pool < ActiveRecord::Base
         q = q.where("is_active = false")
       end
 
-      if params[:sort] == "name"
+      case params[:sort]
+      when "name"
         q = q.order("name")
+      when "created_at"
+        q = q.order("created_at desc")
+      when "post_count"
+        q = q.order("post_count desc")
       else
         q = q.order("updated_at desc")
       end
