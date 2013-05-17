@@ -297,7 +297,8 @@ Danbooru.Note = {
       $textarea = $('<textarea></textarea>');
       $textarea.css({
         width: "97%",
-        height: "95%"
+        height: "95%",
+        resize: "none",
       });
 
       if ($note_body.html() !== "<em>Click to edit</em>") {
