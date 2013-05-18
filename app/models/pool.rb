@@ -144,6 +144,10 @@ class Pool < ActiveRecord::Base
     post_ids =~ /(?:\A| )#{post_id}(?:\Z| )/
   end
 
+  def page_number(post_id)
+    post_id_array.find_index(post_id) + 1
+  end
+
   def deletable_by?(user)
     user.is_janitor?
   end
