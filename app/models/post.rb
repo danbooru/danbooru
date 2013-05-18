@@ -900,6 +900,12 @@ class Post < ActiveRecord::Base
     def last_noted_at_as_integer
       last_noted_at.to_i
     end
+
+    def copy_notes_to(other_post)
+      notes.each do |note|
+        note.copy_to(other_post)
+      end
+    end
   end
 
   module ApiMethods
