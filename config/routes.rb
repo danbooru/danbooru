@@ -142,6 +142,7 @@ Danbooru::Application.routes.draw do
     resources :votes, :controller => "post_votes", :only => [:create, :destroy]
     member do
       put :revert
+      put :copy_notes
       get :show_seq
     end
   end
