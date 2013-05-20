@@ -19,7 +19,7 @@ class ForumTopicsController < ApplicationController
 
   def index
     @search = ForumTopic.active.search(params[:search])
-    @forum_topics = @search.order("is_sticky DESC, updated_at DESC").paginate(params[:page], :search_count => params[:search])
+    @forum_topics = @search.order("is_sticky DESC, updated_at DESC").paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@forum_topics) do |format|
       format.xml do
         render :xml => @forum_topics.to_xml(:root => "forum-topics")

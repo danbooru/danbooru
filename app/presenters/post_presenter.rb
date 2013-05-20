@@ -195,31 +195,31 @@ class PostPresenter < Presenter
     end
 
     if @post.id != pool.post_id_array.first
-      pool_html << template.link_to("&laquo;".html_safe, template.post_path(pool.post_id_array.first, :pool_id => pool.id), :class => "#{klass} first")
+      pool_html << template.link_to("&laquo;".html_safe, template.post_path(pool.post_id_array.first, :pool_id => pool.id), :class => "#{klass} first", :title => "to page 1")
     else
       pool_html << '<span class="first">&laquo;</span>'
     end
 
     if pool.neighbors(@post).previous
-      pool_html << template.link_to("&lsaquo;&thinsp;prev".html_safe, template.post_path(pool.neighbors(@post).previous, :pool_id => pool.id), :rel => prev_rel, :class => "#{klass} prev")
+      pool_html << template.link_to("&lsaquo;&thinsp;prev".html_safe, template.post_path(pool.neighbors(@post).previous, :pool_id => pool.id), :rel => prev_rel, :class => "#{klass} prev", :title => "to page #{pool.page_number(pool.neighbors(@post).previous)}")
       match_found = true
     else
       pool_html << '<span class="prev">&lsaquo;&thinsp;prev</span>'
     end
 
     pool_html << ' <span class="pool-name ' + klass + '">'
-    pool_html << template.link_to("Pool: #{pool.pretty_name}", template.pool_path(pool))
+    pool_html << template.link_to("Pool: #{pool.pretty_name}", template.pool_path(pool), :title => "page #{pool.page_number(@post.id)}/#{pool.post_count}")
     pool_html << '</span> '
 
     if pool.neighbors(@post).next
-      pool_html << template.link_to("next&thinsp;&rsaquo;".html_safe, template.post_path(pool.neighbors(@post).next, :pool_id => pool.id), :rel => next_rel, :class => "#{klass} next")
+      pool_html << template.link_to("next&thinsp;&rsaquo;".html_safe, template.post_path(pool.neighbors(@post).next, :pool_id => pool.id), :rel => next_rel, :class => "#{klass} next", :title => "to page #{pool.page_number(pool.neighbors(@post).next)}")
       match_found = true
     else
       pool_html << '<span class="next">next&thinsp;&rsaquo;</span>'
     end
 
     if @post.id != pool.post_id_array.last
-      pool_html << template.link_to("&raquo;".html_safe, template.post_path(pool.post_id_array.last, :pool_id => pool.id), :class => "#{klass} last")
+      pool_html << template.link_to("&raquo;".html_safe, template.post_path(pool.post_id_array.last, :pool_id => pool.id), :class => "#{klass} last", :title => "to page #{pool.post_count}")
     else
       pool_html << '<span class="last">&raquo;</span>'
     end

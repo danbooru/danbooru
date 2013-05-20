@@ -153,7 +153,7 @@ class Post < ActiveRecord::Base
 
   module ImageMethods
     def has_large?
-      image_width.present? && image_width > Danbooru.config.large_image_width
+      is_image? && image_width.present? && image_width > Danbooru.config.large_image_width
     end
 
     def has_large
@@ -872,15 +872,7 @@ class Post < ActiveRecord::Base
     def create_version
       return if disable_versioning
 
-      if created_at == updated_at
-        CurrentUser.increment!(:post_update_count)
-        versions.create(
-          :rating => rating,
-          :source => source,
-          :tags => tag_string,
-          :parent_id => parent_id
-        )
-      elsif rating_changed? || source_changed? || parent_id_changed? || tag_string_changed?
+      if new_record? || rating_changed? || source_changed? || parent_id_changed? || tag_string_changed?
         CurrentUser.increment!(:post_update_count)
         versions.create(
           :rating => rating,
@@ -907,6 +899,12 @@ class Post < ActiveRecord::Base
   module NoteMethods
     def last_noted_at_as_integer
       last_noted_at.to_i
+    end
+
+    def copy_notes_to(other_post)
+      notes.each do |note|
+        note.copy_to(other_post)
+      end
     end
   end
 

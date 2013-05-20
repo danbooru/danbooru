@@ -3,7 +3,7 @@
     <%= render "sidebar" %>
 
     <section id="content">
-      <h1 id="wiki-page-title"><%= params[:title] %></h1>
+      <h1 id="wiki-page-title"><%= @wiki_page.pretty_title %></h1>
       <div id="wiki-page-body" class="prose">
         <p>This wiki page does not exist. <%= link_to "Create new wiki page", new_wiki_page_path(:wiki_page => {:title => params[:title]}) %>.</p>
       </div>

@@ -126,9 +126,15 @@ Danbooru.Note = {
       if ((new Date).getTime() < Danbooru.Note.ignore_click_until) {
         return;
       }
-      var is_hidden = document.getElementById('note-container').style.display == 'none';
-      // Why does toggle() not work here?
-      $("#note-container").toggle(is_hidden);
+      var $note_container = $("#note-container");
+      var is_hidden = ($note_container.css('visibility') === 'hidden');
+      
+      if (is_hidden) {
+        $note_container.css('visibility', 'visible');
+      }
+      else {
+        $note_container.css('visibility', 'hidden');
+      }
     }
   },
 
@@ -290,8 +296,9 @@ Danbooru.Note = {
 
       $textarea = $('<textarea></textarea>');
       $textarea.css({
-        width: "95%",
-        height: "10em"
+        width: "97%",
+        height: "95%",
+        resize: "none",
       });
 
       if ($note_body.html() !== "<em>Click to edit</em>") {
@@ -303,6 +310,7 @@ Danbooru.Note = {
       $dialog.data("id", $note_body.data("id"));
       $dialog.dialog({
         width: 360,
+        height: 210,
         dialogClass: "note-edit-dialog",
         title: "Edit note",
         buttons: {
@@ -473,7 +481,7 @@ Danbooru.Note = {
         Danbooru.Note.new(e.pageX - offset.left, e.pageY - offset.top);
       }
       Danbooru.Note.TranslationMode.stop();
-      $("#note-container").show();
+      $("#note-container").css('visibility', 'visible');
       e.stopPropagation();
       e.preventDefault();
 

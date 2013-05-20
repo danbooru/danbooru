@@ -15,7 +15,7 @@ class PoolsController < ApplicationController
   end
 
   def index
-    @pools = Pool.active.search(params[:search]).order("updated_at desc").paginate(params[:page], :search_count => params[:search])
+    @pools = Pool.active.search(params[:search]).order("updated_at desc").paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@pools) do |format|
       format.xml do
         render :xml => @pools.to_xml(:root => "pools")
@@ -52,6 +52,7 @@ class PoolsController < ApplicationController
       raise User::PrivilegeError
     end
     @pool.update_attribute(:is_deleted, true)
+    @pool.create_mod_action_for_delete
     respond_with(@pool, :notice => "Pool deleted")
   end
 
@@ -61,6 +62,7 @@ class PoolsController < ApplicationController
       raise User::PrivilegeError
     end
     @pool.update_attribute(:is_deleted, false)
+    @pool.create_mod_action_for_undelete
     respond_with(@pool, :notice => "Pool undeleted")
   end
 

@@ -70,7 +70,7 @@ end
 
 desc "Change ownership of common directory to user"
 task :reset_ownership_of_common_directory do
-  sudo "chown -R #{user}:#{user} /var/www/danbooru2"
+  sudo "chown -R #{user}:#{user} #{deploy_to}"
 end
 
 namespace :deploy do

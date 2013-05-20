@@ -133,6 +133,29 @@
       $("#post_tag_string").trigger("focus");
       e.preventDefault();
     });
+
+    $("#copy-notes").click(function(e) {
+      var current_post_id = $("meta[name=post-id]").attr("content");
+      var other_post_id = prompt("Enter the ID of the post to copy all notes to:");
+
+      if (other_post_id !== null) {
+        $.ajax("/posts/" + current_post_id + "/copy_notes", {
+          type: "PUT",
+          data: {
+            other_post_id: other_post_id
+          },
+          complete: function(data) {
+            if (data.status === 200) {
+              Danbooru.notice("Successfully copied notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
+            } else {
+              Danbooru.error("There was an error copying notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
+            }
+          },
+        });
+      }
+
+      e.preventDefault();
+    });
   }
 
   Danbooru.Post.initialize_post_relationship_previews = function() {
@@ -341,7 +364,7 @@
 
   Danbooru.Post.update_data = function(data) {
     var $post = $("#post_" + data.id);
-    $post.data("tags", data.tag_string);
+    $post.attr("data-tags", data.tag_string);
     $post.data("rating", data.rating);
     Danbooru.Post.initialize_title_for($post);
   }

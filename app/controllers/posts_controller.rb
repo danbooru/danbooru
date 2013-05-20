@@ -1,5 +1,6 @@
 class PostsController < ApplicationController
   before_filter :member_only, :except => [:show, :show_seq, :index]
+  before_filter :builder_only, :only => [:copy_notes]
   after_filter :save_recent_tags, :only => [:update]
   respond_to :html, :xml, :json
   rescue_from PostSets::SearchError, :with => :rescue_exception
@@ -14,7 +15,7 @@ class PostsController < ApplicationController
       format.atom
       format.xml do
         render :xml => @posts.to_xml(:root => "posts") {|builder|
-          builder.tag!(:total_count, @posts.total_count)
+          builder.tag!("total-count", @posts.total_count)
         }
       end
     end
@@ -74,6 +75,13 @@ class PostsController < ApplicationController
     respond_with(@post) do |format|
       format.js
     end
+  end
+
+  def copy_notes
+    @post = Post.find(params[:id])
+    @other_post = Post.find(params[:other_post_id].to_i)
+    @post.copy_notes_to(@other_post)
+    render :nothing => true
   end
 
 private

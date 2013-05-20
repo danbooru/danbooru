@@ -16,7 +16,7 @@ class DmailsController < ApplicationController
   def index
     cookies[:dmail_folder] = params[:folder]
     @search = Dmail.visible.search(params[:search])
-    @dmails = @search.order("dmails.created_at desc").paginate(params[:page])
+    @dmails = @search.order("dmails.created_at desc").paginate(params[:page], :limit => params[:limit])
     respond_with(@dmails) do |format|
       format.xml do
         render :xml => @dmails.to_xml(:root => "dmails")

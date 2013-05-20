@@ -9,6 +9,9 @@
   <% else %>
     <li><%= link_to "Add note", "#", :id => "translate", :title => "Shortcut is N" %></li>
   <% end %>
+  <% if CurrentUser.is_builder? %>
+    <li><%= link_to "Copy all notes", "#", :id => "copy-notes" %></li>
+  <% end %>
   <li><%= link_to "Find similar", "http://danbooru.iqdb.org/db-search.php?url=http://#{Danbooru.config.hostname}#{post.preview_file_url}" %></li>
 
   <% if post.is_status_locked? %>

@@ -21,7 +21,7 @@ class UserFeedbacksController < ApplicationController
 
   def index
     @search = UserFeedback.search(params[:search])
-    @user_feedbacks = @search.paginate(params[:page]).order("created_at desc")
+    @user_feedbacks = @search.paginate(params[:page], :limit => params[:limit]).order("created_at desc")
     respond_with(@user_feedbacks) do |format|
       format.xml do
         render :xml => @user_feedbacks.to_xml(:root => "user-feedbacks")

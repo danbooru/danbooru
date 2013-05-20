@@ -174,6 +174,20 @@ class Note < ActiveRecord::Base
     save!
   end
 
+  def copy_to(new_post)
+    new_note = dup
+    new_note.post_id = new_post.id
+
+    width_ratio = new_post.image_width.to_f / post.image_width
+    height_ratio = new_post.image_height.to_f / post.image_height
+    new_note.x = x * width_ratio
+    new_note.y = y * height_ratio
+    new_note.width = width * width_ratio
+    new_note.height = height * height_ratio
+
+    new_note.save
+  end
+
   def self.undo_changes_by_user(user_id)
     transaction do
       notes = Note.joins(:versions).where(["note_versions.updater_id = ?", user_id]).select("DISTINCT notes.*").all

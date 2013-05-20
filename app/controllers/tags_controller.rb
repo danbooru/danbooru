@@ -9,7 +9,7 @@ class TagsController < ApplicationController
   end
 
   def index
-    @tags = Tag.search(params[:search]).paginate(params[:page], :search_count => params[:search])
+    @tags = Tag.search(params[:search]).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@tags) do |format|
       format.xml do
         render :xml => @tags.to_xml(:root => "tags")

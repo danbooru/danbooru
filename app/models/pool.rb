@@ -49,8 +49,13 @@ class Pool < ActiveRecord::Base
         q = q.where("is_active = false")
       end
 
-      if params[:sort] == "name"
+      case params[:sort]
+      when "name"
         q = q.order("name")
+      when "created_at"
+        q = q.order("created_at desc")
+      when "post_count"
+        q = q.order("post_count desc")
       else
         q = q.order("updated_at desc")
       end
@@ -139,12 +144,24 @@ class Pool < ActiveRecord::Base
     post_ids =~ /(?:\A| )#{post_id}(?:\Z| )/
   end
 
+  def page_number(post_id)
+    post_id_array.find_index(post_id) + 1
+  end
+
   def deletable_by?(user)
     user.is_janitor?
   end
 
+  def create_mod_action_for_delete
+    ModAction.create(:description => "deleted pool ##{id} (name: #{name})")
+  end
+
+  def create_mod_action_for_undelete
+    ModAction.create(:description => "undeleted pool ##{id} (name: #{name})")
+  end
+
   def create_mod_action_for_destroy
-    ModAction.create(:description => "deleted pool ##{id} name=#{name} post_ids=#{post_ids}")
+    ModAction.create(:description => "permanently deleted pool ##{id} name=#{name} post_ids=#{post_ids}")
   end
 
   def add!(post)

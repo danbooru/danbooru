@@ -17,7 +17,7 @@ class TagAliasesController < ApplicationController
 
   def index
     @search = TagAlias.search(params[:search])
-    @tag_aliases = @search.order("(case status when 'pending' then 0 when 'queued' then 1 else 2 end), antecedent_name, consequent_name").paginate(params[:page])
+    @tag_aliases = @search.order("(case status when 'pending' then 0 when 'queued' then 1 else 2 end), antecedent_name, consequent_name").paginate(params[:page], :limit => params[:limit])
     respond_with(@tag_aliases) do |format|
       format.xml do
         render :xml => @tag_aliases.to_xml(:root => "tag-aliases")

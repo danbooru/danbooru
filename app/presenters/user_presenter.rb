@@ -128,9 +128,9 @@ class UserPresenter
   end
 
   def feedbacks(template)
-    positive = UserFeedback.for_user(user.id).positive.count
-    neutral = UserFeedback.for_user(user.id).neutral.count
-    negative = UserFeedback.for_user(user.id).negative.count
+    positive = user.positive_feedback_count
+    neutral = user.neutral_feedback_count
+    negative = user.negative_feedback_count
 
     template.link_to("positive:#{positive} neutral:#{neutral} negative:#{negative}", template.user_feedbacks_path(:search => {:user_id => user.id}))
   end

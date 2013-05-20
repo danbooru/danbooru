@@ -21,7 +21,7 @@ class ForumPostsController < ApplicationController
     else
       @search = ForumPost.active.search(params[:search])
     end
-    @forum_posts = @search.order("forum_posts.id DESC").paginate(params[:page], :search_count => params[:search])
+    @forum_posts = @search.order("forum_posts.id DESC").paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@forum_posts) do |format|
       format.xml do
         render :xml => @forum_posts.to_xml(:root => "forum-posts")
