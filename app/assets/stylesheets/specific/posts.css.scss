@@ -65,26 +65,26 @@ a.blacklisted-active {
 
 .category-1 a, a.tag-type-1 {
   color: #A00;
-}
 
-.category-1 a:hover, a.tag-type-1:hover {
-  color: #B66;
+  &:hover {
+    color: #B66;
+  }
 }
 
 .category-3 a, a.tag-type-3 {
   color: #A0A;
-}
 
-.category-3 a:hover, a.tag-type-3:hover {
-  color: #B6B;
+  &:hover {
+    color: #B6B;
+  }
 }
 
 .category-4 a, a.tag-type-4 {
   color: #0A0;
-}
 
-.category-4 a:hover, a.tag-type-4:hover {
-  color: #6B6;
+  &:hover {
+    color: #6B6;
+  }
 }
 
 .post-count {
