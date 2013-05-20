@@ -32,4 +32,8 @@ class WikiPageVersion < ActiveRecord::Base
   def pretty_title
     title.tr("_", " ")
   end
+
+  def category_name
+    Tag.category_for(title)
+  end
 end
