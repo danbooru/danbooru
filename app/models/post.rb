@@ -870,8 +870,6 @@ class Post < ActiveRecord::Base
 
   module VersionMethods
     def create_version
-      return if disable_versioning
-
       if new_record? || rating_changed? || source_changed? || parent_id_changed? || tag_string_changed?
         CurrentUser.increment!(:post_update_count)
         versions.create(

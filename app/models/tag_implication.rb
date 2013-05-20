@@ -109,7 +109,6 @@ class TagImplication < ActiveRecord::Base
           escaped_tag_name = Regexp.escape(tag_name)
           fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_tag_name}(?:\Z| )/, " ").strip
           CurrentUser.scoped(User.find(creator_id), creator_ip_addr) do
-            post.disable_versioning = true
             post.update_attributes(
               :tag_string => fixed_tags
             )
@@ -155,7 +154,6 @@ class TagImplication < ActiveRecord::Base
       escaped_antecedent_name = Regexp.escape(antecedent_name)
       fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_antecedent_name}(?:\Z| )/, " #{antecedent_name} #{descendant_names} ").strip
       CurrentUser.scoped(creator, creator_ip_addr) do
-        post.disable_versioning = true
         post.update_attributes(
           :tag_string => fixed_tags
         )
