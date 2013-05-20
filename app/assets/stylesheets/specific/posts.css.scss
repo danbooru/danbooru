@@ -87,6 +87,11 @@ a.blacklisted-active {
   }
 }
 
+.category-banned a, a.tag-type-banned {
+  color: black;
+  background-color: red;
+}
+
 .post-count {
   color: #CCC;
   margin-left: 0.2em;

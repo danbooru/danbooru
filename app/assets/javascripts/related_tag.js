@@ -121,6 +121,9 @@
         tags.push([" none", 0]);
       } else if (Danbooru.RelatedTag.recent_artists.length === 1) {
         tags.push([Danbooru.RelatedTag.recent_artists[0].name, 1]);
+        if (Danbooru.RelatedTag.recent_artists[0].is_banned === true) {
+          tags.push(["BANNED_ARTIST", "banned"]);
+        }
         $.each(Danbooru.RelatedTag.recent_artists[0].urls, function(i, url) {
           tags.push([" " + url.url, 0]);
         });
