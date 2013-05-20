@@ -52,6 +52,7 @@ class PoolsController < ApplicationController
       raise User::PrivilegeError
     end
     @pool.update_attribute(:is_deleted, true)
+    @pool.create_mod_action_for_delete
     respond_with(@pool, :notice => "Pool deleted")
   end
 
@@ -61,6 +62,7 @@ class PoolsController < ApplicationController
       raise User::PrivilegeError
     end
     @pool.update_attribute(:is_deleted, false)
+    @pool.create_mod_action_for_undelete
     respond_with(@pool, :notice => "Pool undeleted")
   end
 

@@ -152,8 +152,16 @@ class Pool < ActiveRecord::Base
     user.is_janitor?
   end
 
+  def create_mod_action_for_delete
+    ModAction.create(:description => "deleted pool ##{id} (name: #{name})")
+  end
+
+  def create_mod_action_for_undelete
+    ModAction.create(:description => "undeleted pool ##{id} (name: #{name})")
+  end
+
   def create_mod_action_for_destroy
-    ModAction.create(:description => "deleted pool ##{id} name=#{name} post_ids=#{post_ids}")
+    ModAction.create(:description => "permanently deleted pool ##{id} name=#{name} post_ids=#{post_ids}")
   end
 
   def add!(post)
