@@ -132,9 +132,9 @@ class NoteTest < ActiveSupport::TestCase
     context "when notes have been vandalized by one user" do
       setup do
         @vandal = FactoryGirl.create(:user)
-        @note = FactoryGirl.create(:note, :x => 100, :y => 100)
+        @note = FactoryGirl.create(:note, :x => 5, :y => 5)
         CurrentUser.scoped(@vandal, "127.0.0.1") do
-          @note.update_attributes(:x => 2000, :y => 2000)
+          @note.update_attributes(:x => 10, :y => 10)
         end
       end
 
@@ -142,8 +142,8 @@ class NoteTest < ActiveSupport::TestCase
         should "revert any affected notes" do
           Note.undo_changes_by_user(@vandal.id)
           @note.reload
-          assert_equal(100, @note.x)
-          assert_equal(100, @note.y)
+          assert_equal(5, @note.x)
+          assert_equal(5, @note.y)
         end
       end
     end

@@ -655,35 +655,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  module DeletionMethods
-    def delete!
-      scramble_password
-      remove_all_favorites
-      rename_for_delete
-    end
-
-    def rename_for_delete
-      alt_name = "user#{id}"
-      n = 0
-      while User.where(:name => alt_name).exists?
-        alt_name = "user#{id}_#{n}"
-        n += 1
-      end
-      update_attribute(:name, alt_name)
-
-    end
-
-    def scramble_password
-      update_attribute(:bcrypt_password_hash, User.bcrypt(SecureRandom.hex(16)))
-    end
-
-    def remove_all_favorites
-      Post.tag_match("fav:#{name}").find_each do |post|
-        Favorite.remove(post, self)
-      end
-    end
-  end
-
   include BanMethods
   include NameMethods
   include PasswordMethods
@@ -698,7 +669,6 @@ class User < ActiveRecord::Base
   include ApiMethods
   include CountMethods
   extend SearchMethods
-  include DeletionMethods
 
   def initialize_default_image_size
     self.default_image_size = "large"
