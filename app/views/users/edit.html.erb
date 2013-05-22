@@ -15,7 +15,19 @@
             <p>You must <%= link_to "upgrade your account", upgrade_information_users_path %> to request a name change</p>
           <% end %>
         </div>
-        <%= f.input :email, :required => Danbooru.config.enable_email_verification?, :hint => "Used for messages and for password resets", :as => :email %>
+
+        <div class="input">
+          <label>Email</label>
+          <p>
+            <% if CurrentUser.user.email.present? %>
+              <%= CurrentUser.user.email %>
+            <% else %>
+              <em>blank</em>
+            <% end %>
+            &ndash; 
+            <%= link_to "Change your email", new_maintenance_user_email_change_path %></p>
+        </div>
+
         <%= f.input :time_zone, :include_blank => false %>
         <%= f.input :receive_email_notifications, :as => :select, :include_blank => false %>
         <%= f.input :comment_threshold, :hint => "Comments below this score will be hidden by default" %>
@@ -52,7 +64,7 @@
       <fieldset>
         <legend>Delete Account</legend>
         <div class="input">
-          <p><%= link_to "Click here to delete your account", maintenance_user_deletion_path %></p>
+          <p><%= link_to "Delete your account", maintenance_user_deletion_path %></p>
         </div>
       </fieldset>
 

@@ -48,6 +48,7 @@ Danbooru::Application.routes.draw do
       resource :password_reset, :only => [:new, :create, :edit, :update]
       resource :login_reminder, :only => [:new, :create]
       resource :deletion, :only => [:show, :destroy]
+      resource :email_change, :only => [:new, :create]
     end
   end
 
