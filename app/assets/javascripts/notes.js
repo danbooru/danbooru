@@ -297,7 +297,7 @@ Danbooru.Note = {
       $textarea = $('<textarea></textarea>');
       $textarea.css({
         width: "97%",
-        height: "95%",
+        height: "92%",
         resize: "none",
       });
 
