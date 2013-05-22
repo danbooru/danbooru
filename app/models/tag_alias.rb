@@ -117,7 +117,7 @@ class TagAlias < ActiveRecord::Base
   end
 
   def ensure_category_consistency
-    if antecedent_tag.category != consequent_tag.category
+    if antecedent_tag.category != consequent_tag.category && antecedent_tag.category != Tag.categories.general
       consequent_tag.update_attribute(:category, antecedent_tag.category)
       consequent_tag.update_category_cache_for_all
     end

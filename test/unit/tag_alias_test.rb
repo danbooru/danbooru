@@ -62,9 +62,11 @@ class TagAliasTest < ActiveSupport::TestCase
       end
     end
 
+    should "not push the antecedent's category to the consequent if the antecedent is general"
+
     should "push the antecedent's category to the consequent" do
-      tag1 = FactoryGirl.create(:tag, :name => "aaa", :category => 1)
-      tag2 = FactoryGirl.create(:tag, :name => "bbb")
+      tag1 = FactoryGirl.create(:tag, :name => "aaa")
+      tag2 = FactoryGirl.create(:tag, :name => "bbb", :category => 1)
       ta = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
       tag2.reload
       assert_equal(1, tag2.category)
