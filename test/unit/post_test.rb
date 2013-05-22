@@ -31,6 +31,14 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      should "remove the post from all pools" do
+        pool = FactoryGirl.create(:pool)
+        pool.add!(@post)
+        @post.expunge!
+        pool.reload
+        assert_equal("", pool.post_ids)
+      end
+
       should "destroy the record" do
         @post.expunge!
         assert_equal([], @post.errors.full_messages)

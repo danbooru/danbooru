@@ -617,6 +617,12 @@ class Post < ActiveRecord::Base
       update_column(:pool_string, pool_string) unless new_record?
       pool.remove!(self)
     end
+
+    def remove_from_all_pools
+      pools.find_each do |pool|
+        pool.remove!(self)
+      end
+    end
   end
 
   module VoteMethods
@@ -823,6 +829,7 @@ class Post < ActiveRecord::Base
       update_children_on_destroy
       update_parent_on_destroy
       decrement_tag_post_counts
+      remove_from_all_pools
       destroy
     end
 
