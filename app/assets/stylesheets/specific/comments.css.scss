@@ -122,5 +122,11 @@ div#c-comments {
     div.post.blacklisted {
       display: none;
     }
+    
+    div.list-of-tags {
+      span {
+        display: inline-block;
+      }
+    }
   }
 }
