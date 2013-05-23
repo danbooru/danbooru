@@ -131,6 +131,7 @@ class DText
       str.gsub!(/\s*\[\/quote\]\s*/m, "\n\n[/quote]\n\n")
       str.gsub!(/\s*\[code\]\s*/m, "\n\n[code]\n\n")
       str.gsub!(/\s*\[\/code\]\s*/m, "\n\n[/code]\n\n")
+      str.gsub!(/^(h[1-6]\.\s*.+)$/, "\n\n\\1\n\n")
     end
 
     str.gsub!(/(?:\r?\n){3,}/, "\n\n")
@@ -141,7 +142,7 @@ class DText
 
     html = blocks.map do |block|
       case block
-      when /^(h[1-6])\.\s*(.+)$/
+      when /\A(h[1-6])\.\s*(.+)\Z/
         tag = $1
         content = $2
 
