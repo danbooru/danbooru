@@ -90,16 +90,17 @@ class ForumPost < ActiveRecord::Base
 
   def update_topic_updated_at_on_create
     if topic
-      topic.updater_id = CurrentUser.id
-      topic.response_count = topic.response_count + 1
-      topic.save
+      # need to do this to bypass the topic's original post from getting touched
+      ForumTopic.update_all(["updater_id = ?, response_count = response_count + 1, updated_at = ?", CurrentUser.id, Time.now], {:id => topic.id})
     end
   end
 
   def update_topic_updated_at_on_destroy
     max = ForumPost.where(:topic_id => topic.id).maximum(:updated_at)
     if max
-      topic.update_column(:updated_at, max)
+      ForumTopic.update_all(["response_count = response_count - 1, updated_at = ?", max], {:id => topic.id})
+    else
+      ForumTopic.update_all(["response_count = response_count - 1"], {:id => topic.id})
     end
   end
 
