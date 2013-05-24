@@ -14,9 +14,15 @@ class UserDeletion
     remove_favorites
     rename
     reset_password
+    create_mod_action
   end
 
 private
+  
+  def create_mod_action
+    ModAction.create(:description => "user ##{user.id} deleted")
+  end
+
 
   def clear_user_settings
     user.email = nil
