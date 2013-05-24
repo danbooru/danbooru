@@ -177,6 +177,7 @@ class Note < ActiveRecord::Base
   def copy_to(new_post)
     new_note = dup
     new_note.post_id = new_post.id
+    new_note.version = 0
 
     width_ratio = new_post.image_width.to_f / post.image_width
     height_ratio = new_post.image_height.to_f / post.image_height
