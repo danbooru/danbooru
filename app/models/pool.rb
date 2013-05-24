@@ -96,7 +96,7 @@ class Pool < ActiveRecord::Base
   end
 
   def self.normalize_post_ids(post_ids)
-    post_ids.scan(/\d+/).join(" ")
+    post_ids.scan(/\d+/).uniq.join(" ")
   end
 
   def self.find_by_name(name)
