@@ -23,6 +23,10 @@ div#note-container {
       color: gray;
     }
 
+    p:last-child {
+      margin-bottom: 0;
+    }
+
     b, strong {
       font-weight: bold;
     }
