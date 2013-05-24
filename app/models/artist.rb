@@ -189,7 +189,6 @@ class Artist < ActiveRecord::Base
           tag_implication.delay(:queue => "default").process!
         end
 
-        update_column(:is_active, false)
         update_column(:is_banned, true)
       end
     end
