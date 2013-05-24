@@ -15,7 +15,7 @@
 
   Danbooru.Comment.quote_message = function(data) {
     var stripped_body = data["body"].replace(/\[quote\](?:.|\n|\r)+?\[\/quote\](?:\r\n|\r|\n)*/gm, "");
-    return "[quote]\n" + data["creator_name"] + " said:\n" + stripped_body + "\n[/quote]\n\n";
+    return "[quote]\n" + data["creator_name"] + " said:\n\n" + stripped_body + "\n[/quote]\n\n";
   }
 
   Danbooru.Comment.quote = function(e) {
