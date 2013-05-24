@@ -51,7 +51,7 @@ protected
     render :template => "static/error", :status => 410
   end
 
-  def access_denied
+  def access_denied(exception = nil)
     previous_url = params[:url] || request.fullpath
 
     respond_to do |fmt|
