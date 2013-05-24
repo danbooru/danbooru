@@ -13,6 +13,17 @@ class ArtistsController < ApplicationController
     respond_with(@artist)
   end
 
+  def edit_name
+    @artist = Artist.find(params[:id])
+    respond_with(@artist)
+  end
+
+  def update_name
+    @artist = Artist.find(params[:id])
+    @artist.update_attribute(:name, params[:artist][:name])
+    respond_with(@artist)
+  end
+
   def banned
     @artists = Artist.where("is_banned = ?", true).order("name")
     respond_with(@artists) do |format|

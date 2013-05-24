@@ -11,6 +11,7 @@
       <li><%= link_to "Show", artist_path(@artist) %></li>
       <% if CurrentUser.is_member? %>
         <li><%= link_to "Edit", edit_artist_path(@artist) %></li>
+        <li><%= link_to "Edit name", edit_name_artist_path(@artist) %></li>
       <% end %>
       <li><%= link_to "History", artist_versions_path(:search => {:artist_id => @artist.id}) %></li>
       <% if CurrentUser.is_admin? %>

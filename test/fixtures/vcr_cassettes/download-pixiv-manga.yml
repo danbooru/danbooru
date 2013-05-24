@@ -7,44 +7,44 @@ http_interactions:
       encoding: US-ASCII
       string: ''
     headers:
-      referer:
+      Referer:
       - http://www.pixiv.net
-      user-agent:
-      - ./2.8.0
-      accept:
+      User-Agent:
+      - ./2.12.0
+      Accept:
       - ! '*/*'
   response:
     status:
       code: 200
       message: OK
     headers:
-      server:
+      Server:
       - nginx
-      date:
-      - Fri, 03 May 2013 23:23:12 GMT
-      content-type:
+      Date:
+      - Fri, 24 May 2013 19:51:22 GMT
+      Content-Type:
       - image/png
-      content-length:
+      Content-Length:
       - '1782713'
-      connection:
+      Connection:
       - keep-alive
-      last-modified:
+      Last-Modified:
       - Wed, 14 Sep 2011 17:28:13 GMT
-      etag:
+      Etag:
       - ! '"2e3303bf-1b33b9-4acea15afa540"'
-      accept-ranges:
+      Accept-Ranges:
       - bytes
-      cache-control:
+      Cache-Control:
       - max-age=1209600
-      expires:
-      - Fri, 17 May 2013 23:23:12 GMT
-      age:
-      - '0'
+      Expires:
+      - Fri, 07 Jun 2013 00:30:29 GMT
+      Age:
+      - '69653'
     body:
       encoding: US-ASCII
       string: ''
-    http_version: '1.1'
-  recorded_at: Fri, 03 May 2013 23:23:12 GMT
+    http_version: 
+  recorded_at: Fri, 24 May 2013 19:51:22 GMT
 - request:
     method: get
     uri: http://img65.pixiv.net/img/kiyoringo/21755794_big_p2.png
@@ -52,39 +52,39 @@ http_interactions:
       encoding: US-ASCII
       string: ''
     headers:
-      user-agent:
-      - _/2.8.0
-      referer:
+      User-Agent:
+      - _/2.12.0
+      Referer:
       - http://www.pixiv.net
-      accept:
+      Accept:
       - ! '*/*'
   response:
     status:
       code: 200
       message: OK
     headers:
-      server:
+      Server:
       - nginx
-      date:
-      - Fri, 03 May 2013 23:23:12 GMT
-      content-type:
+      Date:
+      - Fri, 24 May 2013 19:51:22 GMT
+      Content-Type:
       - image/png
-      content-length:
+      Content-Length:
       - '1782713'
-      connection:
+      Connection:
       - keep-alive
-      last-modified:
+      Last-Modified:
       - Wed, 14 Sep 2011 17:28:13 GMT
-      etag:
+      Etag:
       - ! '"2e3303bf-1b33b9-4acea15afa540"'
-      accept-ranges:
+      Accept-Ranges:
       - bytes
-      cache-control:
+      Cache-Control:
       - max-age=1209600
-      expires:
-      - Fri, 17 May 2013 23:23:12 GMT
-      age:
-      - '0'
+      Expires:
+      - Fri, 07 Jun 2013 00:30:29 GMT
+      Age:
+      - '69653'
     body:
       encoding: ASCII-8BIT
       string: !binary |-
@@ -39704,6 +39704,6 @@ http_interactions:
         AgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAAB
         AgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAAB
         AgQIECBAgAABAgQIECDwAYE/YMgpRKYZ7IsAAAAASUVORK5CYII=
-    http_version: '1.1'
-  recorded_at: Fri, 03 May 2013 23:23:17 GMT
+    http_version: 
+  recorded_at: Fri, 24 May 2013 19:51:25 GMT
 recorded_with: VCR 2.4.0

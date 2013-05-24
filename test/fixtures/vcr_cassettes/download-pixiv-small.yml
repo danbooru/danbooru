@@ -7,51 +7,39 @@ http_interactions:
       encoding: US-ASCII
       string: ''
     headers:
-      user-agent:
-      - _/2.8.0
-      referer:
+      User-Agent:
+      - _/2.12.0
+      Referer:
       - http://www.pixiv.net
-      accept:
+      Accept:
       - ! '*/*'
   response:
     status:
       code: 200
-      message: !binary |-
-        T0s=
+      message: OK
     headers:
-      !binary "c2VydmVy":
-      - !binary |-
-        bmdpbng=
-      !binary "ZGF0ZQ==":
-      - !binary |-
-        RnJpLCAwMyBNYXkgMjAxMyAyMzoyMzoxOCBHTVQ=
-      !binary "Y29udGVudC10eXBl":
-      - !binary |-
-        aW1hZ2UvanBlZw==
-      !binary "Y29udGVudC1sZW5ndGg=":
-      - !binary |-
-        MTg1Nzc4
-      !binary "Y29ubmVjdGlvbg==":
-      - !binary |-
-        a2VlcC1hbGl2ZQ==
-      !binary "bGFzdC1tb2RpZmllZA==":
-      - !binary |-
-        VHVlLCAxOSBNYXkgMjAwOSAyMzozNDoxMSBHTVQ=
-      !binary "ZXRhZw==":
-      - !binary |-
-        ImFkZDExYzktMmQ1YjItNDZhNGM1OTBlMjJjMCI=
-      !binary "YWNjZXB0LXJhbmdlcw==":
-      - !binary |-
-        Ynl0ZXM=
-      !binary "Y2FjaGUtY29udHJvbA==":
-      - !binary |-
-        bWF4LWFnZT0xMjA5NjAw
-      !binary "ZXhwaXJlcw==":
-      - !binary |-
-        RnJpLCAxNyBNYXkgMjAxMyAxMTozMTozMyBHTVQ=
-      !binary "YWdl":
-      - !binary |-
-        NDI3MDU=
+      Server:
+      - nginx
+      Date:
+      - Fri, 24 May 2013 19:51:25 GMT
+      Content-Type:
+      - image/jpeg
+      Content-Length:
+      - '185778'
+      Connection:
+      - keep-alive
+      Last-Modified:
+      - Tue, 19 May 2009 23:34:11 GMT
+      Etag:
+      - ! '"add11c9-2d5b2-46a4c590e22c0"'
+      Accept-Ranges:
+      - bytes
+      Cache-Control:
+      - max-age=1209600
+      Expires:
+      - Thu, 06 Jun 2013 22:56:47 GMT
+      Age:
+      - '75278'
     body:
       encoding: ASCII-8BIT
       string: !binary |-
@@ -4184,7 +4172,6 @@ http_interactions:
         DvGOzZcGUrHy3Ep4MunzY5Ue4KSoe+oGXGtuq4FVkqjqSa+gLfx3N0nxMF54
         uS9vPLxbgUolXkf60QkHs5F291RMWfqRh/kmOpY7fIklQbpB7wD9danFlWB5
         bJUdD6Cp8Tgup+OwhWnRD//Z
-    http_version: !binary |-
-      MS4x
-  recorded_at: Fri, 03 May 2013 23:23:18 GMT
+    http_version: 
+  recorded_at: Fri, 24 May 2013 19:51:26 GMT
 recorded_with: VCR 2.4.0

@@ -148,18 +148,11 @@ class Artist < ActiveRecord::Base
     end
 
     def notes=(msg)
-      if name_changed? && name_was.present?
-        wiki_page = WikiPage.titled(name_was).first
-      end
-
       if wiki_page
-        wiki_page.title = name
         wiki_page.body = msg
         wiki_page.save if wiki_page.body_changed? || wiki_page.title_changed?
-      else
-        if msg.present?
-          self.wiki_page = WikiPage.new(:title => name, :body => msg)
-        end
+      elsif msg.present?
+        self.wiki_page = WikiPage.new(:title => name, :body => msg)
       end
     end
   end

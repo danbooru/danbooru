@@ -8,7 +8,8 @@ group :test do
   gem "simplecov", :require => false
   gem "pry"
   gem "vcr"
-  gem "fakeweb"
+  gem "webmock"
+  gem "timecop"
 end
 
 group :assets do

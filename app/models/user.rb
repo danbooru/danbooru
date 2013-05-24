@@ -241,6 +241,10 @@ class User < ActiveRecord::Base
       end
     end
 
+    def promote_to(level)
+      update_attributes({:level => level}, :as => :admin)
+    end
+
     def promote_to_admin_if_first_user
       return if Rails.env.test?
 

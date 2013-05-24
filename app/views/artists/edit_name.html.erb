@@ -1,0 +1,19 @@
+<div id="c-artists">
+  <div id="a-edit">
+    <%= render "sidebar" %>
+
+    <section id="content">
+      <h1>Edit Artist Name</h1>
+      <%= form_tag(update_name_artist_path(@artist), :method => :put) do %>
+        <div class="input"><label for="artist_name">Name</label> <%= text_field :artist, :name %></div>
+        <div><%= submit_tag "Submit" %></div>
+      <% end %>
+    </section>
+  </div>
+</div>
+
+<%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Edit Artist Name - <%= Danbooru.config.app_name %>
+<% end %>

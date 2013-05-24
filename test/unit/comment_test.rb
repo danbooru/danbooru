@@ -67,8 +67,9 @@ class CommentTest < ActiveSupport::TestCase
         Danbooru.config.stubs(:comment_threshold).returns(1)
         p = FactoryGirl.create(:post)
         c1 = FactoryGirl.create(:comment, :post => p)
-        sleep 1
-        c2 = FactoryGirl.create(:comment, :post => p)
+        Timecop.travel(2.seconds.from_now) do
+          c2 = FactoryGirl.create(:comment, :post => p)
+        end
         p.reload
         assert_equal(c1.created_at.to_s, p.last_commented_at.to_s)
       end

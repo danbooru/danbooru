@@ -59,6 +59,8 @@ Danbooru::Application.routes.draw do
     member do
       put :revert
       put :ban
+      get :edit_name
+      put :update_name
     end
     collection do
       get :show_or_new

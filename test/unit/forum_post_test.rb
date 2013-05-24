@@ -21,8 +21,9 @@ class ForumPostTest < ActiveSupport::TestCase
         9.times do
           @posts << FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
         end
-        sleep 2
-        @posts << FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
+        Timecop.travel(2.seconds.from_now) do
+          @posts << FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
+        end
       end
 
       should "know which page it's on" do
@@ -59,11 +60,12 @@ class ForumPostTest < ActiveSupport::TestCase
     end
 
     should "update its parent when saved" do
-      sleep 1
-      original_topic_updated_at = @topic.updated_at
+      Timecop.travel(1.second.from_now) do
+        @original_topic_updated_at = @topic.updated_at
+      end
       post = FactoryGirl.create(:forum_post, :topic_id => @topic.id)
       @topic.reload
-      assert_not_equal(original_topic_updated_at, @topic.updated_at)
+      assert_not_equal(@original_topic_updated_at, @topic.updated_at)
     end
 
     should "be searchable by body content" do
