@@ -65,9 +65,8 @@ class DmailsControllerTest < ActionController::TestCase
       end
 
       should "not show dmails not owned by the current user" do
-        assert_raise(User::PrivilegeError) do
-          get :show, {:id => @dmail.id}, {:user_id => @unrelated_user.id}
-        end
+        get :show, {:id => @dmail.id}, {:user_id => @unrelated_user.id}
+        assert_redirected_to(new_session_path(:url => "/dmails/#{@dmail.id}"))
       end
     end
 
@@ -95,9 +94,7 @@ class DmailsControllerTest < ActionController::TestCase
 
       should "not allow deletion if the dmail is not owned by the current user" do
         assert_difference("Dmail.count", 0) do
-          assert_raises(User::PrivilegeError) do
-            post :destroy, {:id => @dmail.id}, {:user_id => @unrelated_user.id}
-          end
+          post :destroy, {:id => @dmail.id}, {:user_id => @unrelated_user.id}
         end
       end
     end

@@ -34,17 +34,17 @@ module Danbooru
           c = limit(records_per_page)
 
           if before_id.to_i > 0
-            c = c.where("id < ?", before_id.to_i)
+            c = c.where("#{table_name}.id < ?", before_id.to_i)
           end
 
-          c.reorder("id desc").tap do |obj|
+          c.reorder("#{table_name}.id desc").tap do |obj|
             obj.extend(SequentialCollectionExtension)
             obj.sequential_paginator_mode = :before
           end
         end
 
         def paginate_sequential_after(after_id)
-          limit(records_per_page).where("id > ?", after_id.to_i).reorder("id asc").tap do |obj|
+          limit(records_per_page).where("#{table_name}.id > ?", after_id.to_i).reorder("#{table_name}.id asc").tap do |obj|
             obj.extend(SequentialCollectionExtension)
             obj.sequential_paginator_mode = :after
           end
