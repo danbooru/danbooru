@@ -203,6 +203,7 @@ Danbooru.Note = {
     },
 
     resize: function($note_body) {
+      return;
       var w = $note_body.width();
       var h = $note_body.height();
       var golden_ratio = 1.6180339887;
