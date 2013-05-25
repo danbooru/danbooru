@@ -4,7 +4,7 @@ require "tmpdir"
 class Upload < ActiveRecord::Base
   class Error < Exception ; end
 
-  attr_accessor :file, :image_width, :image_height, :file_ext, :md5, :file_size
+  attr_accessor :file, :image_width, :image_height, :file_ext, :md5, :file_size, :as_pending
   belongs_to :uploader, :class_name => "User"
   belongs_to :post
   before_validation :initialize_uploader, :on => :create
@@ -62,7 +62,7 @@ class Upload < ActiveRecord::Base
   end
 
   module ConversionMethods
-    def process! force=false
+    def process!(force = false)
       return if !force && status =~ /processing|completed|error/
 
       CurrentUser.scoped(uploader, uploader_ip_addr) do
@@ -113,7 +113,7 @@ class Upload < ActiveRecord::Base
         p.uploader_ip_addr = uploader_ip_addr
         p.parent_id = parent_id
 
-        unless uploader.is_contributor?
+        if !uploader.is_contributor? || upload_as_pending?
           p.is_pending = true
         end
       end
@@ -423,5 +423,9 @@ class Upload < ActiveRecord::Base
 
   def presenter
     @presenter ||= UploadPresenter.new(self)
+  end
+
+  def upload_as_pending?
+    as_pending == "1"
   end
 end
