@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ArtistTest < ActiveSupport::TestCase
+class CurrentUserTest < ActiveSupport::TestCase
   setup do
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
