@@ -12,7 +12,7 @@
         <% end %>
         <th>Tags</th>
         <% if CurrentUser.is_member? %>
-          <th width="5%"></th>
+          <th width="7%"></th>
         <% end %>
       </tr>
     </thead>
@@ -36,7 +36,7 @@
           <td><%= post_version_diff(post_version) %></td>
           <% if CurrentUser.is_member? %>
             <td>
-              <%= link_to "Revert", revert_post_path(post_version.post_id, :version_id => post_version.id), :method => :put, :remote => true %>
+              <%= link_to "Revert to", revert_post_path(post_version.post_id, :version_id => post_version.id), :method => :put, :remote => true %>
             </td>
           <% end %>
         </tr>

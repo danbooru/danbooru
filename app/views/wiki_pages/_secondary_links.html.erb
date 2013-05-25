@@ -26,6 +26,9 @@
     <% if @wiki_page_version %>
       <li>|</li>
       <li><%= link_to "Newest", wiki_page_path(@wiki_page_version.wiki_page_id) %></li>
+      <% if CurrentUser.is_member? %>
+        <li><%= link_to "Revert to", revert_wiki_page_path(@wiki_page_version.wiki_page_id, :version_id => @wiki_page_version.id), :method => :put, :confirm => "Are you sure you want to revert to this version?" %></li>
+      <% end %>
     <% end %>
   </menu>
 <% end %>
