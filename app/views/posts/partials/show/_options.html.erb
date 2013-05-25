@@ -7,7 +7,7 @@
   <% if post.is_note_locked? %>
     <li><span id="note-locked-notice">Note locked</span></li>
   <% else %>
-    <li><%= link_to "Add note", "#", :id => "translate", :title => "Shortcut is N" %></li>
+    <li><%= link_to "Add notes", "#", :id => "translate", :title => "Shortcut is N" %></li>
   <% end %>
   <% if CurrentUser.is_builder? %>
     <li><%= link_to "Copy all notes", "#", :id => "copy-notes" %></li>
