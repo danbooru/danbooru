@@ -43,6 +43,12 @@ class PostFlag < ActiveRecord::Base
         q = q.where("post_id = ?", params[:post_id].to_i)
       end
 
+      if params[:is_resolved] == "true"
+        q = q.resolved
+      elsif params[is_resolved] == "false"
+        q = q.unresolved
+      end
+
       q
     end
   end
