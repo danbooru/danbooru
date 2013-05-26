@@ -18,6 +18,8 @@ module Danbooru
 
     image.write(write_path) do
       self.quality = resize_quality
+      # setting PlaneInterlace enables progressive encoding for JPEGs
+      self.interlace = Magick::PlaneInterlace
     end
 
     image.destroy!
