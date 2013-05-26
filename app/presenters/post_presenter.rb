@@ -161,12 +161,14 @@ class PostPresenter < Presenter
       return if pool.nil?
       html += pool_link_html(template, pool, :include_rel => true)
 
-      @post.pools.active.where("id <> ?", template.params[:pool_id]).each do |other_pool|
+      other_pools = @post.pools.where("id <> ?", template.params[:pool_id]).series_first
+      other_pools.each do |other_pool|
         html += pool_link_html(template, other_pool)
       end
     else
       first = true
-      @post.pools.each do |pool|
+      pools = @post.pools.series_first
+      pools.each do |pool|
         if first && template.params[:tags].blank?
           html += pool_link_html(template, pool, :include_rel => true)
           first = false
@@ -187,11 +189,11 @@ class PostPresenter < Presenter
     if options[:include_rel]
       prev_rel = "prev"
       next_rel = "next"
-      klass = "active"
+      klass = "active pool-category-#{pool.category}"
     else
       prev_rel = nil
       next_rel = nil
-      klass = ""
+      klass = "pool-category-#{pool.category}"
     end
 
     if @post.id != pool.post_id_array.first
