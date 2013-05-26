@@ -32,6 +32,7 @@ Danbooru.Note = {
         "dragstart resizestart",
         function(e) {
           var $note_box_inner = $(e.currentTarget);
+          $note_box_inner.find(".note-box-inner-border").addClass("unsaved");
           Danbooru.Note.dragging = true;
           Danbooru.Note.clear_timeouts();
           Danbooru.Note.Body.hide_all();
@@ -356,11 +357,14 @@ Danbooru.Note = {
     },
 
     success_handler: function(data, status, xhr) {
-      if (data.html_id) {
+      if (data.html_id) { // new note
         var $note_body = Danbooru.Note.Body.find(data.html_id);
         var $note_box = Danbooru.Note.Box.find(data.html_id);
         $note_body.data("id", String(data.id)).attr("data-id", data.id);
         $note_box.data("id", String(data.id)).attr("data-id", data.id);
+        $note_box.find(".note-box-inner-border").removeClass("unsaved");
+      } else {
+        var $note_box = Danbooru.Note.Box.find(data.id);
         $note_box.find(".note-box-inner-border").removeClass("unsaved");
       }
     },
@@ -403,6 +407,8 @@ Danbooru.Note = {
       var id = $this.data("id");
       var $note_body = Danbooru.Note.Body.find(id);
       var text = $textarea.val();
+      var $note_box = Danbooru.Note.Box.find(id);
+      $note_box.find(".note-box-inner-border").addClass("unsaved");
       Danbooru.Note.Body.set_text($note_body, "Loading...");
       $.get("/note_previews.json", {body: text}).success(function(data) {
         Danbooru.Note.Body.set_text($note_body, data.body);

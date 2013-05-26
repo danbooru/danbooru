@@ -31,7 +31,11 @@ class NotesController < ApplicationController
   def update
     @note = Note.find(params[:id])
     @note.update_attributes(params[:note])
-    respond_with(@note)
+    respond_with(@note) do |format|
+      format.json do
+        render :json => @note.to_json
+      end
+    end
   end
 
   def destroy
