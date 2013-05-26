@@ -1,23 +1,31 @@
-<h1>Delete Account</h1>
+<div id="c-maintenance-user-deletions">
+  <div id="a-show">
+    <h1>Delete Account</h1>
 
-<p>You can delete your account. This will not actually remove your account from the database, but it will do the following things:</p>
+    <p>You can delete your account. This will not actually remove your account from the database, but it will do the following things:</p>
 
-<ul>
-  <li>Rename your account to a generic string</li>
-  <li>Scramble your password</li>
-  <li>Remove all your favorites</li>
-  <li>Blank out your settings (including email)</li>
-</ul>
+    <ul>
+      <li>Rename your account to a generic string</li>
+      <li>Scramble your password</li>
+      <li>Remove all your favorites</li>
+      <li>Blank out your settings (including email)</li>
+    </ul>
 
-<p>You must enter your password to delete your account.</p>
+    <p>You must enter your password to delete your account.</p>
 
-<%= form_tag(maintenance_user_deletion_path, :method => :delete, :class => "simple_form") do %>
-  <div class="input">
-    <label>Password</label>
-    <%= password_field_tag :password %>
+    <%= form_tag(maintenance_user_deletion_path, :method => :delete, :class => "simple_form") do %>
+      <div class="input">
+        <label>Password</label>
+        <%= password_field_tag :password %>
+      </div>
+
+      <div class="input">
+        <%= submit_tag %>
+      </div>
+    <% end %>
   </div>
+</div>
 
-  <div class="input">
-    <%= submit_tag %>
-  </div>
+<% content_for(:page_title) do %>
+  Delete Account - <%= Danbooru.config.app_name %>
 <% end %>
