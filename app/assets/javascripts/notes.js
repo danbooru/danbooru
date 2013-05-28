@@ -420,7 +420,7 @@ Danbooru.Note = {
       $(this).dialog("close");
     },
 
-    delete: function() {
+    "delete": function() {
       if (!confirm("Do you really want to delete this note?")) {
         return
       }
@@ -621,7 +621,7 @@ Danbooru.Note = {
     Danbooru.Note.Body.display_text($note_body, text);
   },
 
-  new: function(x, y, w, h) {
+  "new": function(x, y, w, h) {
     var $note_box = Danbooru.Note.Box.create(Danbooru.Note.id);
     var $note_body = Danbooru.Note.Body.create(Danbooru.Note.id);
     $note_box.css({
