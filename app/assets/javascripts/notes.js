@@ -317,7 +317,7 @@ Danbooru.Note = {
           "Save": Danbooru.Note.Edit.save,
           "Preview": Danbooru.Note.Edit.preview,
           "Cancel": Danbooru.Note.Edit.cancel,
-          "Delete": Danbooru.Note.Edit.delete,
+          "Delete": Danbooru.Note.Edit.destroy,
           "History": Danbooru.Note.Edit.history
         }
       });
@@ -420,7 +420,7 @@ Danbooru.Note = {
       $(this).dialog("close");
     },
 
-    "delete": function() {
+    destroy: function() {
       if (!confirm("Do you really want to delete this note?")) {
         return
       }
@@ -494,10 +494,10 @@ Danbooru.Note = {
           } else if (h <= 9) {
             h = 10;
           }
-          Danbooru.Note.new(x - offset.left, y - offset.top, w, h);
+          Danbooru.Note.create(x - offset.left, y - offset.top, w, h);
         }
       } else {
-        Danbooru.Note.new(e.pageX - offset.left, e.pageY - offset.top);
+        Danbooru.Note.create(e.pageX - offset.left, e.pageY - offset.top);
       }
 
       $("#note-container").css('visibility', 'visible');
@@ -621,7 +621,7 @@ Danbooru.Note = {
     Danbooru.Note.Body.display_text($note_body, text);
   },
 
-  "new": function(x, y, w, h) {
+  create: function(x, y, w, h) {
     var $note_box = Danbooru.Note.Box.create(Danbooru.Note.id);
     var $note_body = Danbooru.Note.Body.create(Danbooru.Note.id);
     $note_box.css({
