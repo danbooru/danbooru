@@ -255,6 +255,14 @@ Danbooru.Note = {
       text = text.replace(/<\/tn>/g, '</p>');
       text = text.replace(/\n/g, '<br>');
       $note_body.html(text);
+
+      $note_body.css("background-color", "");
+      if ($note_body.contents(":not(br)").length === 1) {
+        color = $note_body.children().first().css("background-color");
+        if (color !== "transparent") {
+          $note_body.css("background-color", color);
+        }
+      }
     },
 
     bind_events: function($note_body) {
