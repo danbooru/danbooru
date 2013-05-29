@@ -23,8 +23,13 @@ div#note-container {
       color: gray;
     }
 
-    p:last-child {
+    p {
       margin-bottom: 0;
+      display:inline-block;
+    }
+
+    span {
+      display:inline-block;
     }
 
     b, strong {
