@@ -12,6 +12,7 @@ class UserDeletion
     validate
     clear_user_settings
     remove_favorites
+    clear_tag_subscriptions
     rename
     reset_password
     create_mod_action
@@ -23,6 +24,9 @@ private
     ModAction.create(:description => "user ##{user.id} deleted")
   end
 
+  def clear_tag_subscriptions
+    TagSubscription.where(:creator_id => user.id).destroy_all
+  end
 
   def clear_user_settings
     user.email = nil
