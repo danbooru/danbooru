@@ -45,7 +45,7 @@ class PostFlag < ActiveRecord::Base
 
       if params[:is_resolved] == "true"
         q = q.resolved
-      elsif params[is_resolved] == "false"
+      elsif params[:is_resolved] == "false"
         q = q.unresolved
       end
 
