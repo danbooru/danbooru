@@ -2096,7 +2096,8 @@ CREATE TABLE pools (
     post_count integer DEFAULT 0 NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    category character varying(255) DEFAULT 'series'::character varying NOT NULL
 );
 
 
@@ -6413,3 +6414,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130409191950');
 INSERT INTO schema_migrations (version) VALUES ('20130417221643');
 
 INSERT INTO schema_migrations (version) VALUES ('20130424121410');
+
+INSERT INTO schema_migrations (version) VALUES ('20130506154136');
