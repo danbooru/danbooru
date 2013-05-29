@@ -105,10 +105,10 @@ class TagImplication < ActiveRecord::Base
 
     module ClassMethods
       def update_posts_for_destroy(creator_id, creator_ip_addr, antecedent_name, consequent_name)
-        Post.tag_match("#{antecedent_name} #{consequent_name} status:any").find_each do |post|
-          escaped_tag_name = Regexp.escape(consequent_name)
-          fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_tag_name}(?:\Z| )/, " ").strip
-          CurrentUser.scoped(User.find(creator_id), creator_ip_addr) do
+        CurrentUser.scoped(User.find(creator_id), creator_ip_addr) do
+          Post.tag_match("#{antecedent_name} #{consequent_name} status:any").find_each do |post|
+            escaped_tag_name = Regexp.escape(consequent_name)
+            fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_tag_name}(?:\Z| )/, " ").strip
             post.update_attributes(
               :tag_string => fixed_tags
             )
