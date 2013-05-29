@@ -104,9 +104,9 @@ class TagImplication < ActiveRecord::Base
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def update_posts_for_destroy(creator_id, creator_ip_addr, tag_name)
-        Post.tag_match("#{tag_name} status:any").find_each do |post|
-          escaped_tag_name = Regexp.escape(tag_name)
+      def update_posts_for_destroy(creator_id, creator_ip_addr, antecedent_name, consequent_name)
+        Post.tag_match("#{antecedent_name} #{consequent_name} status:any").find_each do |post|
+          escaped_tag_name = Regexp.escape(consequent_name)
           fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_tag_name}(?:\Z| )/, " ").strip
           CurrentUser.scoped(User.find(creator_id), creator_ip_addr) do
             post.update_attributes(
@@ -118,7 +118,7 @@ class TagImplication < ActiveRecord::Base
     end
 
     def update_posts_for_destroy
-      TagImplication.delay(:queue => "default").update_posts_for_destroy(CurrentUser.user.id, CurrentUser.ip_addr, consequent_name)
+      TagImplication.delay(:queue => "default").update_posts_for_destroy(CurrentUser.user.id, CurrentUser.ip_addr, antecedent_name, consequent_name)
     end
   end
 
