@@ -2,7 +2,6 @@ class TagImplication < ActiveRecord::Base
   before_save :update_descendant_names
   after_save :update_descendant_names_for_parent
   after_destroy :update_descendant_names_for_parent
-  after_destroy :update_posts_for_destroy
   belongs_to :creator, :class_name => "User"
   before_validation :initialize_creator, :on => :create
   before_validation :normalize_names
@@ -100,32 +99,9 @@ class TagImplication < ActiveRecord::Base
     end
   end
 
-  module DeletionMethods
-    extend ActiveSupport::Concern
-
-    module ClassMethods
-      def update_posts_for_destroy(creator_id, creator_ip_addr, tag_name)
-        Post.tag_match("#{tag_name} status:any").find_each do |post|
-          escaped_tag_name = Regexp.escape(tag_name)
-          fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_tag_name}(?:\Z| )/, " ").strip
-          CurrentUser.scoped(User.find(creator_id), creator_ip_addr) do
-            post.update_attributes(
-              :tag_string => fixed_tags
-            )
-          end
-        end
-      end
-    end
-
-    def update_posts_for_destroy
-      TagImplication.delay(:queue => "default").update_posts_for_destroy(CurrentUser.user.id, CurrentUser.ip_addr, consequent_name)
-    end
-  end
-
   include DescendantMethods
   include ParentMethods
   extend SearchMethods
-  include DeletionMethods
 
   def initialize_creator
     self.creator_id = CurrentUser.user.id

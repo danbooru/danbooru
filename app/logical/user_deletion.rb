@@ -3,6 +3,13 @@ class UserDeletion
 
   attr_reader :user, :password
 
+  def self.remove_favorites_for(user_name, user_id)
+    user = User.find(user_id)
+    Post.tag_match("fav:#{user_name}").find_each do |post|
+      Favorite.remove(post, user)
+    end
+  end
+
   def initialize(user, password)
     @user = user
     @password = password
@@ -12,6 +19,7 @@ class UserDeletion
     validate
     clear_user_settings
     remove_favorites
+    clear_tag_subscriptions
     rename
     reset_password
     create_mod_action
@@ -23,6 +31,9 @@ private
     ModAction.create(:description => "user ##{user.id} deleted")
   end
 
+  def clear_tag_subscriptions
+    TagSubscription.where(:creator_id => user.id).destroy_all
+  end
 
   def clear_user_settings
     user.email = nil
@@ -45,9 +56,7 @@ private
   end
 
   def remove_favorites
-    Post.tag_match("fav:#{user.name}").find_each do |post|
-      Favorite.remove(post, user)
-    end
+    UserDeletion.delay.remove_favorites_for(user.name, user.id)
   end
 
   def rename
