@@ -145,6 +145,10 @@ class Pool < ActiveRecord::Base
     name.tr("_", " ")
   end
 
+  def pretty_category
+    category.titleize
+  end
+
   def creator_name
     User.id_to_name(creator_id)
   end

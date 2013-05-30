@@ -3,6 +3,7 @@
     <li><%= render "pools/quick_search" %></li>
     <li><%= link_to "Listing", pools_path %></li>
     <li><%= link_to "New", new_pool_path %></li>
+    <li><%= link_to "Help", wiki_pages_path(:search => {:title => "help:pools"}) %></li>
     <% if CurrentUser.is_member? && @pool && !@pool.new_record? %>
       <li>|</li>
       <li><%= link_to "Show", pool_path(@pool) %></li>

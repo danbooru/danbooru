@@ -1,7 +1,7 @@
 <div id="c-pools">
   <div id="a-show">
     <h1>
-      Pool:
+      <%= @pool.pretty_category %>:
       <%= link_to @pool.pretty_name, pool_path(@pool), :class => "pool-category-#{@pool.category}" %>
       <% if @pool.is_deleted? %>
         <span class="inactive">(deleted)</span>
