@@ -4,6 +4,7 @@ class UserDeletionTest < ActiveSupport::TestCase
   context "an invalid user deletion" do
     context "for an invalid password" do
       setup do
+        Delayed::Worker.delay_jobs = false
         @user = FactoryGirl.create(:user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
@@ -19,6 +20,7 @@ class UserDeletionTest < ActiveSupport::TestCase
 
     context "for an admin" do
       setup do
+        Delayed::Worker.delay_jobs = false
         @user = FactoryGirl.create(:admin_user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
@@ -35,6 +37,8 @@ class UserDeletionTest < ActiveSupport::TestCase
 
   context "a valid user deletion" do
     setup do
+      Delayed::Worker.delay_jobs = false
+
       @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
