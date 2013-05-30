@@ -111,17 +111,6 @@ class TagImplicationTest < ActiveSupport::TestCase
       assert_equal("eee", ti4.descendant_names)
     end
 
-    should "update any affected post upon destroy" do
-      ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
-      ti2 = FactoryGirl.create(:tag_implication, :antecedent_name => "bbb", :consequent_name => "ccc")
-      ti3 = FactoryGirl.create(:tag_implication, :antecedent_name => "ccc", :consequent_name => "ddd")
-      p1 = FactoryGirl.create(:post, :tag_string => "aaa")
-      assert_equal("aaa bbb ccc ddd", p1.tag_string)
-      ti2.destroy
-      p1.reload
-      assert_equal("aaa bbb ddd", p1.tag_string)
-    end
-
     should "update any affected post upon save" do
       p1 = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "xxx")
