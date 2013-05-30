@@ -141,9 +141,11 @@ class PostQueryBuilder
       relation = relation.where("posts.is_deleted = TRUE")
     elsif q[:status] == "banned"
       relation = relation.where("posts.is_banned = TRUE")
+    elsif q[:status] == "active"
+      relation = relation.where("posts.is_pending = FALSE AND posts.is_deleted = FALSE AND posts.is_banned = FALSE")
     elsif q[:status] == "all" || q[:status] == "any"
       # do nothing
-    elsif q[:status_neg] == "pending" || q[:status] == "active"
+    elsif q[:status_neg] == "pending"
       relation = relation.where("posts.is_pending = FALSE")
     elsif q[:status_neg] == "flagged"
       relation = relation.where("posts.is_flagged = FALSE")
