@@ -2,6 +2,7 @@ class ArtistsController < ApplicationController
   respond_to :html, :xml, :json
   before_filter :member_only, :except => [:index, :show, :banned]
   before_filter :admin_only, :only => [:ban]
+  before_filter :builder_only, :only => [:edit_name, :update_name]
 
   def new
     @artist = Artist.new_with_defaults(params)
@@ -20,7 +21,7 @@ class ArtistsController < ApplicationController
 
   def update_name
     @artist = Artist.find(params[:id])
-    @artist.update_attribute(:name, params[:artist][:name])
+    @artist.rename!(params[:artist][:name])
     respond_with(@artist)
   end
 

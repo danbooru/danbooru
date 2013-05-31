@@ -14,6 +14,30 @@ class ArtistTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
+    context "#rename!" do
+      setup do
+        @artist = FactoryGirl.create(:artist, :name => "aaa", :notes => "xxx")
+      end
+
+      should "rename the wiki page" do
+        wiki_page = @artist.wiki_page
+        @artist.rename!("bbb")
+        assert_equal("bbb", @artist.name)
+        wiki_page.reload
+        assert_equal("bbb", wiki_page.title)
+      end
+
+      should "merge the old wiki page into the new one if a wiki page for the new name already exists" do
+        FactoryGirl.create(:wiki_page, :title => "bbb", :body => "abcabc")
+        wiki_page = @artist.wiki_page
+        @artist.rename!("bbb")
+        wiki_page.reload
+        @artist.reload
+        assert_equal("xxx", wiki_page.body)
+        assert_equal("abcabc\n\nxxx", @artist.wiki_page.body)
+      end
+    end
+
     context "with a matching tag alias" do
       setup do
         @tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
