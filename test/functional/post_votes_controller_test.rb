@@ -22,6 +22,14 @@ class PostVotesControllerTest < ActionController::TestCase
         assert_equal(1, @post.score)
       end
 
+      context "that fails" do
+        should "return a 500" do
+          post :create, {:post_id => @post.id, :score => "up", :format => "json"}, {:user_id => @user.id}
+          post :create, {:post_id => @post.id, :score => "up", :format => "json"}, {:user_id => @user.id}
+          assert_equal("{\"success\": false, \"reason\": \"You have already voted for this post\"}", response.body.strip)
+        end
+      end
+
       context "for a post that has already been voted on" do
         setup do
           @post.vote!("up")
