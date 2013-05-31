@@ -9,3 +9,9 @@ Pool.find_each do |pool|
     pool.create_version(true)
   end
 end
+
+ForumTopic.find_each do |topic|
+  last = topic.posts.last
+  topic.update_column(:updater_id, last.creator_id) if topic.updater_id != last.creator_id
+  topic.update_column(:updated_at, last.updated_at) if topic.updated_at != last.updated_at
+end
