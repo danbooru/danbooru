@@ -15,3 +15,13 @@ ForumTopic.find_each do |topic|
   topic.update_column(:updater_id, last.creator_id) if topic.updater_id != last.creator_id
   topic.update_column(:updated_at, last.updated_at) if topic.updated_at != last.updated_at
 end
+
+admin = User.admins.first
+
+CurrentUser.scoped(admin, "127.0.0.1") do
+  Post.where("created_at >= ?", "2013-02-01").find_each do |post|
+    if post.tag_string != post.versions.last.tag_string
+      post.create_version(true)
+    end
+  end
+end

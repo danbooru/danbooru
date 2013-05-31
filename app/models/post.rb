@@ -875,8 +875,8 @@ class Post < ActiveRecord::Base
   end
 
   module VersionMethods
-    def create_version
-      if new_record? || rating_changed? || source_changed? || parent_id_changed? || tag_string_changed?
+    def create_version(force = false)
+      if new_record? || rating_changed? || source_changed? || parent_id_changed? || tag_string_changed? || force
         CurrentUser.increment!(:post_update_count)
         versions.create(
           :rating => rating,
