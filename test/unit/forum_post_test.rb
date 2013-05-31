@@ -59,13 +59,33 @@ class ForumPostTest < ActiveSupport::TestCase
       end
     end
 
-    should "update its parent when saved" do
+    should "update the topic when created" do
+      @original_topic_updated_at = @topic.updated_at
       Timecop.travel(1.second.from_now) do
-        @original_topic_updated_at = @topic.updated_at
+        post = FactoryGirl.create(:forum_post, :topic_id => @topic.id)
       end
-      post = FactoryGirl.create(:forum_post, :topic_id => @topic.id)
       @topic.reload
-      assert_not_equal(@original_topic_updated_at, @topic.updated_at)
+      assert_not_equal(@original_topic_updated_at.to_s, @topic.updated_at.to_s)
+    end
+
+    should "update the topic when updated only for the original post" do
+      posts = []
+      3.times do
+        posts << FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
+      end
+      
+      # updating the original post
+      Timecop.travel(1.second.from_now) do
+        posts.first.update_attributes(:body => "xxx")
+      end
+      @topic.reload
+      assert_equal(posts.first.updated_at.to_s, @topic.updated_at.to_s)
+
+      # updating a non-original post
+      Timecop.travel(2.seconds.from_now) do
+        posts.last.update_attributes(:body => "xxx")
+      end
+      assert_equal(posts.first.updated_at.to_s, @topic.updated_at.to_s)
     end
 
     should "be searchable by body content" do
