@@ -8,7 +8,7 @@ class ForumPost < ActiveRecord::Base
   before_validation :initialize_updater
   before_validation :initialize_is_deleted, :on => :create
   after_create :update_topic_updated_at_on_create
-  after_update :update_topic_updated_at_on_update_for_orignal_posts
+  after_update :update_topic_updated_at_on_update_for_original_posts
   after_destroy :update_topic_updated_at_on_destroy
   validates_presence_of :body, :creator_id
   validate :validate_topic_is_unlocked
@@ -96,7 +96,7 @@ class ForumPost < ActiveRecord::Base
     end
   end
 
-  def update_topic_updated_at_on_update_for_orignal_posts
+  def update_topic_updated_at_on_update_for_original_posts
     if is_original_post?
       topic.touch
     end
