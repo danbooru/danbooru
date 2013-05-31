@@ -2,11 +2,13 @@
   <%= error_messages_for("wiki_page") %>
 
   <%= simple_form_for(@wiki_page) do |f| %>
-    <%= f.input :title, :as => :string %>
+    <% if !@wiki_page.new_record? && CurrentUser.user.is_builder? %>
+      <%= f.input :title, :as => :string %>
+    <% end %>
 
     <%= dtext_field "wiki_page", "body" %>
 
-    <% if CurrentUser.is_janitor? %>
+    <% if CurrentUser.user.is_janitor? %>
       <%= f.input :is_locked %>
     <% end %>
 
