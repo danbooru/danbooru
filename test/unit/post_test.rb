@@ -119,12 +119,6 @@ class PostTest < ActiveSupport::TestCase
         assert(!p1.has_children?, "Old parent should not have a child")
         assert(p2.has_children?, "New parent should have a child")
       end
-
-      should "validate that the parent exists" do
-        post = FactoryGirl.build(:post, :parent_id => 1_000_000)
-        post.save
-        assert(post.errors[:parent].any?, "Parent should be invalid")
-      end
     end
 
     context "Expunging a post with" do
