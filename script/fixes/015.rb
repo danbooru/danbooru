@@ -23,7 +23,7 @@ end
 admin = User.admins.first
 
 CurrentUser.scoped(admin, "127.0.0.1") do
-  Post.where("created_at >= ?", "2013-02-01").find_each do |post|
+  Post.find_each do |post|
     if post.tag_string != post.versions.last.tag_string
       post.create_version(true)
       puts "create post version for #{post.id}"
