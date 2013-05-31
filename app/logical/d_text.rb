@@ -131,6 +131,8 @@ class DText
       str.gsub!(/\s*\[\/quote\]\s*/m, "\n\n[/quote]\n\n")
       str.gsub!(/\s*\[code\]\s*/m, "\n\n[code]\n\n")
       str.gsub!(/\s*\[\/code\]\s*/m, "\n\n[/code]\n\n")
+      str.gsub!(/\[spoilers?\]\s+/m, "\n\n[spoiler]\n\n")
+      str.gsub!(/\s+\[\/spoilers?\]/m, "\n\n[/spoiler]\n\n")
       str.gsub!(/^(h[1-6]\.\s*.+)$/, "\n\n\\1\n\n")
     end
 
@@ -172,6 +174,18 @@ class DText
         else
           ""
         end
+
+      when "[spoiler]"
+        stack << "spoiler"
+        '<div class="spoiler">'
+
+      when "[/spoiler]"
+        if stack.last == "spoiler"
+          stack.pop
+          "</div>"
+        else
+          ""
+        end
         
       when /\[code\](?!\])/
         flags[:code] = true
@@ -197,6 +211,8 @@ class DText
         html << "</div>"
       elsif tag == "pre"
         html << "</pre>"
+      elsif tag == "spoiler"
+        html << "</div>"
       end
     end
 
