@@ -276,8 +276,8 @@ class Pool < ActiveRecord::Base
     end
   end
 
-  def create_version
-    if post_ids_changed? || name_changed? || description_changed? || is_active_changed? || is_deleted_changed? || category_changed?
+  def create_version(force = false)
+    if post_ids_changed? || name_changed? || description_changed? || is_active_changed? || is_deleted_changed? || category_changed? || force
       last_version = versions.last
 
       if last_version && CurrentUser.ip_addr == last_version.updater_ip_addr && CurrentUser.id == last_version.updater_id
