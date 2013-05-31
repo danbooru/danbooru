@@ -1,1 +1,2 @@
-$("article[data-forum-post-id=<%= @forum_post.id %>]").remove();
+
+$("article[data-forum-post-id=<%= @forum_post.id %>] div.author h4").append(" (deleted)");
