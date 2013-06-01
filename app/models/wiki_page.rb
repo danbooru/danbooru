@@ -7,7 +7,7 @@ class WikiPage < ActiveRecord::Base
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
   validates_uniqueness_of :title, :case_sensitive => false
-  validates_presence_of :title, :body
+  validates_presence_of :title
   validate :validate_locker_is_janitor
   attr_accessible :title, :body, :is_locked
   has_one :tag, :foreign_key => "name", :primary_key => "title"
