@@ -820,6 +820,10 @@ class Post < ActiveRecord::Base
         false
       end
     end
+
+    def parent_exists?
+      Post.exists?(parent_id)
+    end
   end
 
   module DeletionMethods
