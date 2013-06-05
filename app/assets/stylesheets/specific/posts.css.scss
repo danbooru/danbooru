@@ -321,8 +321,12 @@ div#c-explore-posts {
     margin: 0 0.5em;
   }
 
+  #popular-nav-links {
+    text-align: center;
+  }
+
   .period {
-    margin: 0 0.5em;
+    margin: 0 5em;
 
     &:first-child {
       margin-left: 0;
