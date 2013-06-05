@@ -92,10 +92,6 @@ private
     end
   end
 
-  def is_index?(template)
-    template.params[:action] == "index"
-  end
-
   def build_list_item(tag, template, options)
     html = ""
     html << %{<li class="category-#{categories[tag]}">}
@@ -108,7 +104,7 @@ private
         html << %{<a class="wiki-link" href="/wiki_pages/show_or_new?title=#{u(tag)}">?</a> }
       end
 
-      if CurrentUser.user.is_gold? && is_index?(template) && current_query.present?
+      if CurrentUser.user.is_gold? && current_query.present?
         html << %{<a href="/posts?tags=#{u(current_query)}+#{u(tag)}" class="search-inc-tag">+</a> }
         html << %{<a href="/posts?tags=#{u(current_query)}+-#{u(tag)}" class="search-exl-tag">&ndash;</a> }
       end
