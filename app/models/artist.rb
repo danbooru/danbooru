@@ -84,7 +84,7 @@ class Artist < ActiveRecord::Base
       if new_wiki_page
         # Merge the old wiki page into the new one
         new_wiki_page.update_attributes(:body => new_wiki_page.body + "\n\n" + notes)
-      else
+      elsif wiki_page
         wiki_page.update_attribute(:title, new_name)
       end
       reload
@@ -317,8 +317,10 @@ class Artist < ActiveRecord::Base
   extend SearchMethods
 
   def status
-    if is_banned?
+    if is_banned? && is_active?
       "Banned"
+    elsif is_banned?
+      "Banned Deleted"
     elsif is_active?
       "Active"
     else
@@ -340,5 +342,9 @@ class Artist < ActiveRecord::Base
 
   def initialize_creator
     self.creator_id = CurrentUser.user.id
+  end
+
+  def deletable_by?(user)
+    user.is_builder?
   end
 end
