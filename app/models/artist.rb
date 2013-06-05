@@ -84,7 +84,7 @@ class Artist < ActiveRecord::Base
       if new_wiki_page
         # Merge the old wiki page into the new one
         new_wiki_page.update_attributes(:body => new_wiki_page.body + "\n\n" + notes)
-      else
+      elsif wiki_page
         wiki_page.update_attribute(:title, new_name)
       end
       reload
