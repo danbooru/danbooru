@@ -2,7 +2,7 @@
   <%= error_messages_for("wiki_page") %>
 
   <%= simple_form_for(@wiki_page) do |f| %>
-    <% if !@wiki_page.new_record? && CurrentUser.user.is_builder? %>
+    <% if @wiki_page.new_record? || CurrentUser.user.is_builder? %>
       <%= f.input :title, :as => :string %>
     <% end %>
 
