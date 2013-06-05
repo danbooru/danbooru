@@ -88,7 +88,7 @@ class ArtistsController < ApplicationController
       raise User::PrivilegeError
     end
     @artist.update_attribute(:is_active, false)
-    respond_with(@artist, :notice => "Artist deleted")
+    redirect_to(artist_path(@artist), :notice => "Artist deleted")
   end
 
   def undelete
@@ -97,7 +97,7 @@ class ArtistsController < ApplicationController
       raise User::PrivilegeError
     end
     @artist.update_attribute(:is_active, true)
-    respond_with(@artist, :notice => "Artist undeleted")
+    redirect_to(artist_path(@artist), :notice => "Artist undeleted")
   end
 
   def revert
