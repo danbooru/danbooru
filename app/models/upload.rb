@@ -182,6 +182,11 @@ class Upload < ActiveRecord::Base
     def add_dimension_tags!
       return if !Danbooru.config.enable_dimension_autotagging
 
+      %w(incredibly_absurdres absurdres highres lowres).each do |tag|
+        escaped_tag = Regexp.escape(tag) 
+        self.tag_string = tag_string.gsub(/(?:\A| )#{escaped_tag}(?:\Z| )/, " ").strip
+      end
+
       if image_width >= 10_000 || image_height >= 10_000
         self.tag_string = "#{tag_string} incredibly_absurdres".strip
       elsif image_width >= 3200 || image_height >= 2400
