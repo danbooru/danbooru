@@ -270,8 +270,10 @@ class PostQueryBuilder
 
     relation = add_tag_string_search_relation(q[:tags], relation)
 
-    if q[:order] == "rank" || q[:order] == "rank2"
+    if q[:order] == "rank"
       relation = relation.where("posts.score > 0 and posts.created_at >= ?", 2.days.ago)
+    elsif q[:order] == "rank2"
+      relation = relation.where("posts.fav_count > 0 and posts.created_at >= ?", 2.days.ago)
     end
 
     case q[:order]
