@@ -270,7 +270,7 @@ class PostQueryBuilder
 
     relation = add_tag_string_search_relation(q[:tags], relation)
 
-    if q[:order] == "rank"
+    if q[:order] == "rank" || q[:order] == "rank2"
       relation = relation.where("posts.score > 0 and posts.created_at >= ?", 2.days.ago)
     end
 
@@ -327,6 +327,9 @@ class PostQueryBuilder
 
     when "rank"
       relation = relation.order("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 45000 DESC")
+
+    when "rank2"
+      relation = relation.order("log(3, posts.fav_count) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 45000 DESC")
 
     else
       relation = relation.order("posts.id DESC")
