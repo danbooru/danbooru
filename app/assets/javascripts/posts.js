@@ -76,25 +76,7 @@
     }
   }
 
-  Danbooru.Post.nav_scroll_down = function() {
-    var scroll_top = $(window).scrollTop() + ($(window).height() * 0.85);
-    Danbooru.scroll_to(scroll_top);
-  }
-
-  Danbooru.Post.nav_scroll_up = function() {
-    var scroll_top = $(window).scrollTop() - ($(window).height() * 0.85);
-    if (scroll_top < 0) {
-      scroll_top = 0;
-    }
-    Danbooru.scroll_to(scroll_top);
-  }
-
   Danbooru.Post.initialize_shortcuts = function() {
-    $(document).bind("keydown.q", function(e) {
-      $("#tags").trigger("focus").selectEnd();
-      e.preventDefault();
-    });
-
     if ($("#a-show").length) {
       $(document).bind("keydown.e", function(e) {
         $("#post-edit-link").trigger("click");
@@ -113,18 +95,10 @@
       });
 
       $(document).bind("keydown.f", function(e) {
-        $("#add-to-favorites").filter(":visible").trigger("click");
+        $("#add-to-favorites:visible").trigger("click");
         e.preventDefault();
       });
     }
-
-    $(document).bind("keydown.s", function(e) {
-      Danbooru.Post.nav_scroll_down();
-    })
-
-    $(document).bind("keydown.w", function(e) {
-      Danbooru.Post.nav_scroll_up();
-    })
   }
 
   Danbooru.Post.initialize_links = function() {
