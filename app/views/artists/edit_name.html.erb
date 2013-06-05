@@ -2,7 +2,12 @@
   <div id="a-edit">
     <h1>Edit Artist Name</h1>
     <%= form_tag(update_name_artist_path(@artist), :method => :put) do %>
-      <div class="input"><label for="artist_name">Name</label> <%= text_field :artist, :name %></div>
+      <div class="input">
+        <label for="artist_name">Name</label>
+        <%= text_field :artist, :name %>
+        [<%= link_to "check", "#", :id => "check-name-link" %>]
+        <span id="check-name-result"></span>
+      </div>
       <div><%= submit_tag "Submit" %></div>
     <% end %>
   </div>
