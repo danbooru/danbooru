@@ -16,6 +16,7 @@ class Post < ActiveRecord::Base
   before_save :set_tag_counts
   before_validation :initialize_uploader, :on => :create
   before_validation :parse_pixiv_id
+  before_validation :blank_out_nonexistent_parents
   belongs_to :updater, :class_name => "User"
   belongs_to :approver, :class_name => "User"
   belongs_to :uploader, :class_name => "User"
@@ -758,6 +759,12 @@ class Post < ActiveRecord::Base
 
     def self.included(m)
       m.extend(ClassMethods)
+    end
+
+    def blank_out_nonexistent_parents
+      if parent_id.present? && parent.nil?
+        self.parent_id = nil
+      end
     end
 
     def validate_parent_does_not_have_a_parent
