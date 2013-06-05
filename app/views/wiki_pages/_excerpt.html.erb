@@ -7,6 +7,8 @@
     <div class="prose">
       <%= format_text(post_set.wiki_page.presenter.excerpt) %>
 
+      <%= wiki_page_alias_and_implication_list(post_set.wiki_page) %>
+
       <p>Read the <%= link_to "full article", wiki_page_path(post_set.wiki_page.id) %>.</p>
     </div>
   <% else %>
