@@ -27,6 +27,11 @@ class ForumTopicTest < ActiveSupport::TestCase
       assert_equal(0, ForumTopic.title_matches("aaa").count)
     end
 
+    should "be searchable by category id" do
+      assert_equal(1, ForumTopic.search(:category_id => 0).count)
+      assert_equal(0, ForumTopic.search(:category_id => 1).count)
+    end
+
     should "initialize its creator" do
       assert_equal(@user.id, @topic.creator_id)
     end

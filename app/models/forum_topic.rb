@@ -1,5 +1,11 @@
 class ForumTopic < ActiveRecord::Base
-  attr_accessible :title, :original_post_attributes, :as => [:member, :builder, :gold, :platinum, :contributor, :janitor, :moderator, :admin, :default]
+  CATEGORIES = {
+    0 => "General",
+    1 => "Tags",
+    2 => "Bugs & Suggestions"
+  }
+
+  attr_accessible :title, :original_post_attributes, :category_id, :as => [:member, :builder, :gold, :platinum, :contributor, :janitor, :moderator, :admin, :default]
   attr_accessible :is_sticky, :is_locked, :is_deleted, :as => [:janitor, :admin, :moderator]
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
@@ -10,7 +16,30 @@ class ForumTopic < ActiveRecord::Base
   before_validation :initialize_is_deleted, :on => :create
   validates_presence_of :title, :creator_id
   validates_associated :original_post
+  validates_inclusion_of :category_id, :in => CATEGORIES.keys
   accepts_nested_attributes_for :original_post
+
+  module CategoryMethods
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+      def categories
+        CATEGORIES.values
+      end
+
+      def reverse_category_mapping
+        @reverse_category_mapping ||= CATEGORIES.invert
+      end
+
+      def for_category_id(cid)
+        where(:category_id => cid)
+      end
+    end
+
+    def category_name
+      CATEGORIES[category_id]
+    end
+  end
 
   module SearchMethods
     def title_matches(title)
@@ -29,6 +58,10 @@ class ForumTopic < ActiveRecord::Base
         q = q.title_matches(params[:title_matches])
       end
 
+      if params[:category_id].present?
+        q = q.for_category_id(params[:category_id])
+      end
+
       if params[:title].present?
         q = q.where("title = ?", params[:title])
       end
@@ -38,6 +71,7 @@ class ForumTopic < ActiveRecord::Base
   end
 
   extend SearchMethods
+  include CategoryMethods
 
   def editable_by?(user)
     creator_id == user.id || user.is_janitor?

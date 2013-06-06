@@ -1780,7 +1780,8 @@ CREATE TABLE forum_topics (
     is_deleted boolean DEFAULT false NOT NULL,
     text_index tsvector NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    category_id integer DEFAULT 0 NOT NULL
 );
 
 
@@ -6416,3 +6417,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130417221643');
 INSERT INTO schema_migrations (version) VALUES ('20130424121410');
 
 INSERT INTO schema_migrations (version) VALUES ('20130506154136');
+
+INSERT INTO schema_migrations (version) VALUES ('20130606224559');
