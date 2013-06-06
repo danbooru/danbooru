@@ -57,6 +57,15 @@
         <%= button_tag "Copyrights", :id => "related-copyrights-button", :type => "button" %>
       </div>
 
+      <% if CurrentUser.is_contributor? %>
+        <div class="input">
+          <label for="upload_as_pending">
+            <%= f.check_box :as_pending %>
+            Upload as pending
+          </label>
+        </div>
+      <% end %>
+
       <div class="input">
         <%= submit_tag "Submit", :class => "large" %>
       </div>
