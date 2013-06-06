@@ -14,6 +14,7 @@ class Post < ActiveRecord::Base
   before_save :create_tags
   before_save :update_tag_post_counts
   before_save :set_tag_counts
+  before_save :strip_source
   before_validation :initialize_uploader, :on => :create
   before_validation :parse_pixiv_id
   before_validation :blank_out_nonexistent_parents
@@ -1135,6 +1136,10 @@ class Post < ActiveRecord::Base
     @tag_categories = nil
     @typed_tags = nil
     self
+  end
+
+  def strip_source
+    self.source = source.strip
   end
 end
 
