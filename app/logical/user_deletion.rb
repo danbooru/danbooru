@@ -5,7 +5,7 @@ class UserDeletion
 
   def self.remove_favorites_for(user_name, user_id)
     user = User.find(user_id)
-    Post.tag_match("fav:#{user_name}").find_each do |post|
+    Post.tag_match("fav:#{user.name}").find_each do |post|
       Favorite.remove(post, user)
     end
   end
