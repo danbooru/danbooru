@@ -14,16 +14,14 @@
   Danbooru.Pool.initialize_add_to_pool_link = function() {
     $("#add-to-pool-dialog").dialog({autoOpen: false});
 
-    $("#c-pool-elements #a-new input[type=text]").autocomplete({
-      source: function(req, resp) {
-        $.getJSON(
-          "/pools.json?search[is_active]=true&search[name_matches]=" + req.term,
-          function(data) {
-            resp(data.map(function(x) {return x.name.replace(/_/g, " ");}));
-          }
-        );
-      },
-      minLength: 2,
+    $("#c-pool-elements #a-new input[type=text]").typeahead({
+      name: "pools",
+      remote: "/pools.json?search[is_active]=true&search[name_matches]=%QUERY",
+      limit: 10,
+      valueKey: "name",
+      template: function(context) {
+        return "<p>" + context.name.replace(/_/g, " ") + "</p>";
+      }
     });
 
     $("#pool").click(function(e) {

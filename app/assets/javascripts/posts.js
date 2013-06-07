@@ -33,16 +33,14 @@
   }
 
   Danbooru.Post.initialize_tag_autocomplete = function() {
-    $("#tags").autocomplete({
-      source: function(req, resp) {
-        $.getJSON(
-          "/tags.json?search[order]=count&search[name_matches]=" + req.term + "*",
-          function(data) {
-            resp(data.map(function(x) {return x.name;}));
-          }
-        );
-      },
-      minLength: 3,
+    $("#tags").typeahead({
+      name: "tags",
+      remote: "/tags.json?search[order]=count&search[name_matches]=%QUERY*",
+      limit: 10,
+      valueKey: "name",
+      template: function(context) {
+        return "<p class=\"category-" + context.category + "\"><a>" + context.name + "</a></p>";
+      }
     });
   }
 
