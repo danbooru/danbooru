@@ -81,6 +81,11 @@ Danbooru::Application.routes.draw do
       get :index_all
     end
   end
+  resources :counts do
+    collection do
+      get :posts
+    end
+  end
   resources :delayed_jobs, :only => [:index]
   resources :dmails do
     collection do
