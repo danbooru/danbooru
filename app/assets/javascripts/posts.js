@@ -5,6 +5,7 @@
 
   Danbooru.Post.initialize_all = function() {
     this.initialize_post_previews();
+    this.initialize_tag_autocomplete();
 
     if ($("#c-posts").length) {
       if (Danbooru.meta("enable-js-navigation") === "true") {
@@ -29,6 +30,20 @@
         $("#image-resize-to-window-link").click();
       }
     }
+  }
+
+  Danbooru.Post.initialize_tag_autocomplete = function() {
+    $("#tags").autocomplete({
+      source: function(req, resp) {
+        $.getJSON(
+          "/tags.json?search[name_matches]=" + req.term + "*",
+          function(data) {
+            resp(data.map(function(x) {return x.name;}));
+          }
+        );
+      },
+      minLength: 3,
+    });
   }
 
   Danbooru.Post.initialize_similar = function() {
