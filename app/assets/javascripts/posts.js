@@ -36,7 +36,7 @@
     $("#tags").autocomplete({
       source: function(req, resp) {
         $.getJSON(
-          "/tags.json?search[name_matches]=" + req.term + "*",
+          "/tags.json?search[order]=count&search[name_matches]=" + req.term + "*",
           function(data) {
             resp(data.map(function(x) {return x.name;}));
           }
