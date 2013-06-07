@@ -111,6 +111,12 @@
   <meta property="og:title" content="<%= h @post.presenter.humanized_essential_tag_string %> - <%= Danbooru.config.app_name %>">
   <meta property="og:description" content="<%= h @post.presenter.humanized_tag_string %>">
   <meta property="og:image" content="<%= @post.preview_file_url %>">
+
+  <!-- Twitter properties -->
+  <% if @post.twitter_card_supported? %>
+    <meta name="twitter:card" content="photo">
+    <meta name="twitter:image" content="<%= @post.file_url %>">
+  <% end %>
 <% end %>
 
 <%= render "posts/partials/common/secondary_links" %>

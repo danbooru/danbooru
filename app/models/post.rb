@@ -153,6 +153,10 @@ class Post < ActiveRecord::Base
   end
 
   module ImageMethods
+    def twitter_card_supported?
+      file_size <= 1.megabyte && image_width.to_i >= 280 && image_height.to_ >= 150
+    end
+
     def has_large?
       is_image? && image_width.present? && image_width > Danbooru.config.large_image_width
     end
