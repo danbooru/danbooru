@@ -4,7 +4,20 @@
   Danbooru.Artist.initialize_all = function() {
     if ($("#c-artists").length) {
       Danbooru.Artist.initialize_check_name_link();
+      Danbooru.Artist.initialize_typeahead();
     }
+  }
+
+  Danbooru.Artist.initialize_typeahead = function() {
+    $("#quick_search_name").typeahead({
+      name: "artists",
+      remote: "/artists.json?search[name]=*%QUERY*",
+      limit: 10,
+      valueKey: "name",
+      template: function(context) {
+        return "<p>" + context.name.replace(/_/g, " ") + "</a></p>";
+      }
+    });
   }
 
   Danbooru.Artist.initialize_check_name_link = function() {
