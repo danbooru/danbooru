@@ -116,6 +116,8 @@
   <% if @post.twitter_card_supported? %>
     <meta name="twitter:card" content="photo">
     <meta name="twitter:image" content="<%= @post.file_url %>">
+    <meta name="twitter:image:width" content="<%= @post.image_width %>">
+    <meta name="twitter:image:height" content="<%= @post.image_height %>">
   <% end %>
 <% end %>
 
