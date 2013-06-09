@@ -13,4 +13,12 @@ class PostVersionsController < ApplicationController
 
   def search
   end
+
+  def undo
+    @post_version = PostVersion.find(params[:id])
+    @post_version.undo!
+    respond_with(@post_version) do |format|
+      format.js
+    end
+  end
 end
