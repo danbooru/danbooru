@@ -14,9 +14,7 @@ class PostsController < ApplicationController
     respond_with(@posts) do |format|
       format.atom
       format.xml do
-        render :xml => @posts.to_xml(:root => "posts") {|builder|
-          builder.tag!("total-count", @posts.total_count)
-        }
+        render :xml => @posts.to_xml(:root => "posts")
       end
     end
   end
