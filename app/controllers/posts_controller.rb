@@ -93,7 +93,7 @@ private
     if @post
       tags = Tag.scan_tags(@post.tag_string)
       tags = TagAlias.to_aliased(tags) + Tag.scan_tags(cookies[:recent_tags])
-      cookies[:recent_tags] = tags.uniq.slice(0, 40).join(" ")
+      cookies[:recent_tags] = Tag.categories_for(tags.uniq.slice(0, 30)).to_a.flatten.join(" ")
     end
   end
 end

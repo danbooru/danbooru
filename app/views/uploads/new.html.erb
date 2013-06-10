@@ -90,7 +90,7 @@
 <% end %>
 
 <% content_for(:html_header) do %>
-  <meta name="favorite-tags" content="<%= CurrentUser.user.favorite_tags %>">
+  <meta name="favorite-tags" content="<%= cookies[:favorite_tags] %>">
 <% end %>
 
 <%= render "posts/partials/common/secondary_links" %>

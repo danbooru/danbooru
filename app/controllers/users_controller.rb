@@ -51,6 +51,7 @@ class UsersController < ApplicationController
     check_privilege(@user)
     sanitize_params!
     @user.update_attributes(params[:user], :as => CurrentUser.role)
+    cookies.delete(:favorite_tags)
     respond_with(@user)
   end
 

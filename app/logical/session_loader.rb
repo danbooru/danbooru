@@ -25,6 +25,7 @@ class SessionLoader
 
     update_last_logged_in_at
     set_time_zone
+    store_favorite_tags_in_cookies
     set_statement_timeout
   end
 
@@ -79,6 +80,12 @@ private
 
   def cookie_password_hash_valid?
     cookies[:password_hash] && cookies.signed[:user_name] && User.authenticate_cookie_hash(cookies.signed[:user_name], cookies[:password_hash])
+  end
+
+  def store_favorite_tags_in_cookies
+    if cookies[:favorite_tags].blank? && CurrentUser.user.favorite_tags.present?
+      cookies[:favorite_tags] = Tag.categories_for(CurrentUser.user.favorite_tags.scan(/\S+/)).to_a.flatten.join(" ")
+    end
   end
 
   def update_last_logged_in_at
