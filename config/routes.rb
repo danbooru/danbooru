@@ -159,6 +159,9 @@ Danbooru::Application.routes.draw do
   resources :post_appeals
   resources :post_flags
   resources :post_versions, :only => [:index, :search] do
+    member do
+      put :undo
+    end
     collection do
       get :search
     end
