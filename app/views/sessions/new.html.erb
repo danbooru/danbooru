@@ -22,6 +22,8 @@
           <%= submit_tag "Submit" %>
         </div>
       <% end %>
+
+      <p><%= link_to "Sign in securely", new_session_path(:protocol => "https", :only_path => false) %></p>
     </section>
   </div>
 </div>
