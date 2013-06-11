@@ -167,6 +167,7 @@ Danbooru::Application.routes.draw do
     end
   end
   resource :related_tag, :only => [:show]
+  match "reports/user_promotions" => "reports#user_promotions"
   resource :session do
     collection do
       get :sign_out
