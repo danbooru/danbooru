@@ -20,7 +20,11 @@ class ApiCacheGenerator
       f.seek(-2, IO::SEEK_END)
       f.print("]\n")
     end
-
+    Zlib::GzipWriter.open("/var/www/danbooru2/shared/system/cache/tags.json.gz") do |gz|
+      gz.write(IO.binread("/var/www/danbooru2/shared/system/cache/tags.json"))
+      gz.close
+    end
     RemoteFileManager.new("/var/www/danbooru2/shared/system/cache/tags.json").distribute
+    RemoteFileManager.new("/var/www/danbooru2/shared/system/cache/tags.json.gz").distribute
   end
 end
