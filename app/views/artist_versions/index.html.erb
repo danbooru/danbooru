@@ -7,7 +7,6 @@
         <thead>
           <tr>
             <th>Name</th>
-            <th>Artist</th>
             <th>Other Names</th>
             <th>Group</th>
             <th>Updated</th>
@@ -23,9 +22,8 @@
           <% @artist_versions.each do |artist_version| %>
             <tr class="<%= cycle 'even', 'odd' %>">
               <td>
-                <%= link_to artist_version.name, artist_versions_path(:search => {:artist_id => artist_version.artist_id}) %>
+                <%= link_to artist_version.name, artist_path(artist_version.artist_id) %>
               </td>
-              <td><%= link_to "artist", artist_path(artist_version.artist_id) %></td>
               <td><%= artist_version_other_names_diff(artist_version) %></td>
               <td><%= artist_version.group_name %></td>
               <td><%= compact_time artist_version.created_at %></td>
