@@ -20,7 +20,7 @@ class Favorite < ActiveRecord::Base
     User.update_all("favorite_count = favorite_count + 1", {:id => user.id})
     user.favorite_count += 1
     post.fav_count += 1
-    post.score += 1
+    post.score += 1 if user.is_gold?
   end
 
   def self.remove(post, user)
@@ -32,6 +32,6 @@ class Favorite < ActiveRecord::Base
     User.update_all("favorite_count = favorite_count - 1", {:id => user.id})
     user.favorite_count -= 1
     post.fav_count -= 1
-    post.score -= 1
+    post.score -= 1 if user.is_gold?
   end
 end
