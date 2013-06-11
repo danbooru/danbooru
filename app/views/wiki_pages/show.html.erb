@@ -15,6 +15,10 @@
       <div id="wiki-page-body" class="prose">
         <%= format_text(@wiki_page.body) %>
 
+        <% if @wiki_page.artist %>
+          <p><%= link_to "View artist", @wiki_page.artist %></p>
+        <% end %>
+
         <%= wiki_page_alias_and_implication_list(@wiki_page) %>
       </div>
 

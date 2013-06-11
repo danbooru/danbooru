@@ -6,6 +6,8 @@
       <div class="prose">
         <%= format_text(@artist.notes) %>
       </div>
+
+      <p><%= link_to "View wiki page", @artist.wiki_page %></p>
     <% end %>
 
     <div>
