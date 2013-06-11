@@ -615,11 +615,11 @@ class User < ActiveRecord::Base
       return q if params.blank?
 
       if params[:name].present?
-        q = q.name_matches(params[:name].mb_chars.downcase.tr(" ", "_"))
+        q = q.name_matches(params[:name].mb_chars.downcase.strip.tr(" ", "_"))
       end
 
       if params[:name_matches].present?
-        q = q.name_matches(params[:name_matches].mb_chars.downcase.tr(" ", "_"))
+        q = q.name_matches(params[:name_matches].mb_chars.downcase.strip.tr(" ", "_"))
       end
 
       if params[:min_level].present?
