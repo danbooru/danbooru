@@ -302,6 +302,10 @@
       $("#wiki-page-excerpt").show();
       e.preventDefault();
     });
+
+    if (/Nobody here but us chickens/.test($("#posts").html()) && !/Deleted posts/.test($("#related_list"))) {
+      $("#show-wiki-excerpt-link").click();
+    }
   }
 
   Danbooru.Post.initialize_post_sections = function() {
