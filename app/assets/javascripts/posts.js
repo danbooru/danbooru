@@ -303,7 +303,7 @@
       e.preventDefault();
     });
 
-    if (/Nobody here but us chickens/.test($("#posts").html()) && !/Deleted posts/.test($("#related_list"))) {
+    if (/Nobody here but us chickens/.test($("#posts").html()) && !/Deleted posts/.test($("#related-box").html())) {
       $("#show-wiki-excerpt-link").click();
     }
   }
