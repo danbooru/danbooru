@@ -14,8 +14,10 @@
           <th>Name</th>
           <th>Posts</th>
           <th>Deleted</th>
-          <th>% Pos</th>
-          <th>% Neg</th>
+          <% if CurrentUser.user.is_janitor? %>
+            <th><abbr title="1+ Favorite(s) Binonimial Confidence Interval">1+ FBCI</abbr></th>
+            <th><abbr title="5+ Favorites Binonimial Confidence Interval">5+ FBCI</abbr></th>
+          <% end %>
           <th>Notes</th>
           <th>Level</th>
           <th>Joined</th>
@@ -37,12 +39,9 @@
             </td>
             <td><%= link_to user.posts.count, posts_path(:tags => "user:#{user.name}") %></td>
             <td><%= user.posts.deleted.count %></td>
-            <% if user.posts.count > 100 %>
-              <td><%= number_to_percentage(100 * user.posts.positive.count.to_f / user.posts.count, :precision => 0) %></td>
-              <td><%= number_to_percentage(100 * user.posts.negative.count.to_f / user.posts.count, :precision => 0) %></td>
-            <% else %>
-              <td></td>
-              <td></td>
+            <% if CurrentUser.user.is_janitor? %>
+              <td><%= number_to_percentage Reports::UserPromotions.confidence_interval_for(user, 1), :precision => 0 %></td>
+              <td><%= number_to_percentage Reports::UserPromotions.confidence_interval_for(user, 5), :precision => 0 %></td>
             <% end %>
             <td><%= link_to user.note_versions.count, note_versions_path(:search => {:updater_id => user.id}) %></td>
             <td><%= user.level_string %></td>

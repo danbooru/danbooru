@@ -1,0 +1,30 @@
+<div id="c-reports">
+  <div id="a-user-promotions">
+    <h1>User Promotion Confidence Intervals</h1>
+
+    <p>Binomial proportion confidence interval for how likely a user's uploads will achieve a fav count of at at least n with 95% confidence within the past 30 days.</p>
+
+    <table width="100%" class="striped">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Level</th>
+          <th>score:1+</th>
+          <th>score:5+</th>
+          <th>score:10+</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @report.users.each do |user| %>
+          <tr>
+            <td><%= link_to user.name, user_path(user) %></td>
+            <td><%= user.level_string %></td>
+            <td><%= number_to_percentage Reports::UserPromotions.confidence_interval_for(user, 1), :precision => 0 %></td>
+            <td><%= number_to_percentage Reports::UserPromotions.confidence_interval_for(user, 5), :precision => 0 %></td>
+            <td><%= number_to_percentage Reports::UserPromotions.confidence_interval_for(user, 10), :precision => 0 %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

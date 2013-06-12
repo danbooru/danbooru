@@ -55,6 +55,12 @@
         <li><%= link_to("Listing", pools_path) %></li>
         <li><%= link_to("Changes", pool_versions_path) %></li>
       </ul>
+      <% if CurrentUser.user.is_janitor? %>
+        <ul>
+          <li><h1>Reports</h1></li>
+          <li><%= link_to("User Promotions", reports_user_promotions_path) %></li>
+        </ul>
+      <% end %>
     </section>
     <section>
       <ul>

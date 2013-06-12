@@ -167,6 +167,7 @@ Danbooru::Application.routes.draw do
     end
   end
   resource :related_tag, :only => [:show]
+  match "reports/user_promotions" => "reports#user_promotions"
   resource :session do
     collection do
       get :sign_out
@@ -326,6 +327,7 @@ Danbooru::Application.routes.draw do
   match "/user/index" => redirect {|params, req| "/users?page=#{req.params[:page]}"}
   match "/user/show/:id" => redirect("/users/%{id}")
   match "/user/login" => redirect("/sessions/new")
+  match "/user_record" => redirect {|params, req| "/user_feedbacks?search[user_id]=#{req.params[:user_id]}"}
 
   match "/wiki" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
   match "/wiki/index" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}

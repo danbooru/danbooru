@@ -38,6 +38,7 @@ gem 'diff-lcs', :require => "diff/lcs/array"
 gem 'bcrypt-ruby', :require => "bcrypt"
 gem 'aws-s3', :require => "aws/s3"
 gem 'awesome_print'
+gem 'statistics2'
 
 group :production do
   gem 'unicorn', :platforms => :ruby
