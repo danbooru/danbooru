@@ -15,12 +15,12 @@
 <% elsif @upload.is_duplicate? %>
   <p>This upload is a duplicate: <%= link_to "post ##{@upload.duplicate_post_id}", post_path(@upload.duplicate_post_id) %></p>
 <% else %>
-  <p>
-    An error occurred: <%= @upload.status %>.
-    <% if @upload.is_downloadable? %>
-      <%= link_to "Retry", upload_path(@upload), :method => :put %>
+  <p>An error occurred: <%= @upload.status %></p>
+  <% if @upload.is_downloadable? %>
+    <%= form_tag(upload_path(@upload), :method => :put) do %>
+      <% submit_tag "Retry" %>
     <% end %>
-  </p>
+  <% end %>
 <% end %>
 
 <p>
