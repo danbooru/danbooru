@@ -1,12 +1,13 @@
 module PostSets
   class Post < Base
-    attr_reader :tag_array, :page, :per_page
+    attr_reader :tag_array, :page, :per_page, :raw
 
-    def initialize(tags, page = 1, per_page = nil)
+    def initialize(tags, page = 1, per_page = nil, raw = false)
       @tag_array = Tag.scan_query(tags)
       @page = page
       @per_page = (per_page || CurrentUser.per_page).to_i
       @per_page = 200 if @per_page > 200
+      @raw = raw.present?
     end
 
     def tag_string
@@ -43,7 +44,11 @@ module PostSets
       end
 
       @posts ||= begin
-        temp = ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+        if raw
+          temp = ::Post.raw_tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+        else
+          temp = ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+        end
         temp.all
         temp
       end

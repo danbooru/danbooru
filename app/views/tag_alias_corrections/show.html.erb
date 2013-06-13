@@ -6,7 +6,7 @@
   <div style="margin-bottom: 1em;">
     <h2>Server: <%= server.hostname %></h2>
     <ul>
-      <li><strong><%= server.antecedent_name %></strong> aliased to <strong><%= server.statistics_hash["antecedent_cache"] %></strong> in cache</li>
+      <li><strong><%= link_to server.antecedent_name, posts_path(:tags => server.antecedent_name, :raw => true) %></strong> aliased to <strong><%= server.statistics_hash["antecedent_cache"] %></strong> in cache</li>
       <li><strong><%= server.consequent_name %></strong> aliased to <strong><%= server.statistics_hash["consequent_cache"] %></strong> in cache</li>
       <li><strong><%= server.antecedent_name %></strong> count is <%= server.statistics_hash["antecedent_count"] %></li>
       <li><strong><%= server.consequent_name %></strong> count is <%= server.statistics_hash["consequent_count"] %></li>
