@@ -1,13 +1,13 @@
 <div id="form-content">
-  <%= simple_form_for(@forum_topic) do |f| %>
+  <%= simple_form_for(forum_topic) do |f| %>
     <%= f.input :title %>
 
     <%= f.simple_fields_for :original_post do |pf| %>
-      <% if !@forum_topic.new_record? %>
-        <%= hidden_field_tag "forum_topic[original_post_attributes][topic_id]", @forum_topic.id %>
+      <% if !forum_topic.new_record? %>
+        <%= hidden_field_tag "forum_topic[original_post_attributes][topic_id]", forum_topic.id %>
       <% end %>
 
-      <%= dtext_field "forum_post", "body", :input_name => "forum_topic[original_post_attributes][body]", :value => @forum_topic.original_post.body %>
+      <%= dtext_field "forum_post", "body", :input_name => "forum_topic[original_post_attributes][body]", :value => forum_topic.original_post.body, :input_id => "forum_post_body_for_#{forum_topic.original_post.id}", :preview_id => "dtext-preview-for-#{forum_topic.original_post.id}" %>
     <% end %>
 
     <% if CurrentUser.is_janitor? %>
@@ -16,6 +16,6 @@
     <% end %>
 
     <%= f.button :submit, "Submit" %>
-    <%= dtext_preview_button "forum_post", "body" %>
+    <%= dtext_preview_button "forum_post", "body", :input_id => "forum_post_body_for_#{forum_topic.original_post.id}", :preview_id => "dtext-preview-for-#{forum_topic.original_post.id}" %>
   <% end %>
 </div>
