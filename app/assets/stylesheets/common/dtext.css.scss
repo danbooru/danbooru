@@ -40,8 +40,40 @@ div.prose {
     font-family: monospace;
     margin: 1em 0;
     padding: 1em 2em;
-    background: #eee;
+    background: #EEE;
     white-space: pre-wrap;
+  }
+
+  div.expandable {
+    margin-bottom: 1em;
+    border: 1px solid #666;
+    background: #EEE;
+  }
+
+  div.expandable-header {
+    padding: 0.7em;
+
+    span {
+      margin-right: 1em;
+    }
+  }
+
+  div.expandable-button {
+    padding: 0.3em;
+    display: inline-block;
+    border: 1px solid #666;
+    border-radius: 3px;
+    background: #CCC;
+    cursor: pointer;
+  }
+
+  div.expandable-content {
+    padding: 0.7em;
+    border-top: 1px solid #666;
+
+    p:last-child {
+      margin-bottom: 0;
+    }
   }
 }
 

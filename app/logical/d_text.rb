@@ -131,6 +131,8 @@ class DText
       str.gsub!(/\s*\[\/quote\]\s*/m, "\n\n[/quote]\n\n")
       str.gsub!(/\s*\[code\]\s*/m, "\n\n[code]\n\n")
       str.gsub!(/\s*\[\/code\]\s*/m, "\n\n[/code]\n\n")
+      str.gsub!(/\s*\[expand(\=[^\]]*)?\]\s*/m, "\n\n[expand\\1]\n\n")
+      str.gsub!(/\s*\[\/expand\]\s*/m, "\n\n[/expand]\n\n")
     end
 
     str.gsub!(/(?:\r?\n){3,}/, "\n\n")
@@ -180,6 +182,20 @@ class DText
         flags[:code] = false
         '</pre>'
 
+      when /\[expand(?:\=([^\]]*))?\](?!\])/
+        stack << "expandable"
+        expand_html = '<div class="expandable"><div class="expandable-header">'
+        expand_html << "<span>#{h($1)}</span>" if $1.present?
+        expand_html << '<div class="expandable-button">Show</div></div>'
+        expand_html << '<div class="expandable-content">'
+        expand_html
+
+      when /\[\/expand\](?!\])/
+        if stack.last == "expandable"
+          stack.pop
+          '</div></div>'
+        end 
+
       else
         if flags[:code]
           CGI.escape_html(block) + "\n\n"
@@ -196,6 +212,8 @@ class DText
         html << "</div>"
       elsif tag == "pre"
         html << "</pre>"
+      elsif tag == "expandable"
+        html << "</div></div>"
       end
     end
 
