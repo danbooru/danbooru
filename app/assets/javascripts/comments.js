@@ -6,6 +6,10 @@
       this.initialize_response_link();
       this.initialize_reply_links();
       this.initialize_expand_links();
+
+      if (!$("#a-edit").length) {
+        this.initialize_edit_links();
+      }
     }
 
     if ($("#c-posts").length && $("#a-show").length) {
@@ -61,6 +65,16 @@
     });
 
     $("div.new-comment form").hide();
+  }
+
+  Danbooru.Comment.initialize_edit_links = function() {
+    $(".edit_comment").hide();
+    $(".edit_comment_link").click(function(e) {
+      var link_id = $(this).attr("id");
+      var comment_id = link_id.match(/^edit_comment_link_(\d+)$/)[1];
+      $("#edit_comment_" + comment_id).fadeToggle("fast");
+      e.preventDefault();
+    });
   }
 
   Danbooru.Comment.highlight_threshold_comments = function(post_id) {
