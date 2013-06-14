@@ -141,6 +141,41 @@ div#c-posts {
       margin-left: 0.5em;
       font-weight: bold;
     }
+
+    &.notice-parent {
+      border-color: #C0FCC0;
+      background: #D8FCD9;
+    }
+
+    &.notice-child {
+      border-color: #FCFCC0;
+      background: #FBFCD8;
+    }
+
+    &.notice-pending {
+      border-color: #C0C0FC;
+      background: #D8D8FC;
+    }
+
+    &.notice-flagged {
+      border-color: #FCC0C0;
+      background: #FCD9D8;
+    }
+
+    &.notice-deleted {
+      border-color: #FF8C8C;
+      background: #FFA7A5;
+    }
+
+    &.notice-appealed {
+      border-color: #C0ECFC;
+      background: #D8F2FC;
+    }
+
+    &.notice-resized {
+      border-color: #E4C0FC;
+      background: #EED8FC;
+    }
   }
 
   div.nav-notice {
