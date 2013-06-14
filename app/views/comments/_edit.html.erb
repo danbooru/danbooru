@@ -1,0 +1,5 @@
+<%= simple_form_for(comment) do |f| %>
+  <%= dtext_field "comment", "body", :value => comment.body, :input_id => "comment_body_for_#{comment.id}", :preview_id => "dtext-preview-for-#{comment.id}" %>
+  <%= f.button :submit, "Submit" %>
+  <%= dtext_preview_button "comment", "body", :input_id => "comment_body_for_#{comment.id}", :preview_id => "dtext-preview-for-#{comment.id}" %>
+<% end %>
