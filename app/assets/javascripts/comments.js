@@ -6,7 +6,10 @@
       this.initialize_response_link();
       this.initialize_reply_links();
       this.initialize_expand_links();
-      this.initialize_edit_links();
+
+      if (!$("#a-edit").length) {
+        this.initialize_edit_links();
+      }
     }
 
     if ($("#c-posts").length && $("#a-show").length) {
