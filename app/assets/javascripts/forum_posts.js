@@ -13,14 +13,14 @@
     $(".edit_forum_post_link").click(function(e) {
       var link_id = $(this).attr("id");
       var forum_post_id = link_id.match(/^edit_forum_post_link_(\d+)$/)[1];
-      $("#edit_forum_post_" + forum_post_id).toggle();
+      $("#edit_forum_post_" + forum_post_id).fadeToggle("fast");
       e.preventDefault();
     });
 
     $(".edit_forum_topic_link").click(function(e) {
       var link_id = $(this).attr("id");
       var forum_topic_id = link_id.match(/^edit_forum_topic_link_(\d+)$/)[1];
-      $("#edit_forum_topic_" + forum_topic_id).toggle();
+      $("#edit_forum_topic_" + forum_topic_id).fadeToggle("fast");
       e.preventDefault();
     });
   }

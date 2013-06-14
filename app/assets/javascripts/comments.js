@@ -72,7 +72,7 @@
     $(".edit_comment_link").click(function(e) {
       var link_id = $(this).attr("id");
       var comment_id = link_id.match(/^edit_comment_link_(\d+)$/)[1];
-      $("#edit_comment_" + comment_id).toggle();
+      $("#edit_comment_" + comment_id).fadeToggle("fast");
       e.preventDefault();
     });
   }
