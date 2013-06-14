@@ -27,7 +27,7 @@
         <% end %>
       </menu>
       <% if comment.editable_by?(CurrentUser.user) %>
-        <%= render "comments/edit", :comment => comment %>
+        <%= render "comments/form", :comment => comment %>
       <% end %>
     <% end %>
   </div>
