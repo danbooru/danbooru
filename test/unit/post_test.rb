@@ -851,24 +851,24 @@ class PostTest < ActiveSupport::TestCase
   end
 
   context "Searching:" do
-    should "return posts for the age:<1m tag" do
+    should "return posts for the age:<1minute tag" do
       post1 = FactoryGirl.create(:post, :tag_string => "aaa")
-      count = Post.tag_match("age:<1m").count
+      count = Post.tag_match("age:<1minute").count
       assert_equal(1, count)
     end
 
-    should "return posts for the age:<1m tag when the user is in Pacific time zone" do
+    should "return posts for the age:<1minute tag when the user is in Pacific time zone" do
       post1 = FactoryGirl.create(:post, :tag_string => "aaa")
       Time.zone = "Pacific Time (US & Canada)"
-      count = Post.tag_match("age:<1m").count
+      count = Post.tag_match("age:<1minute").count
       assert_equal(1, count)
       Time.zone = "Eastern Time (US & Canada)"
     end
 
-    should "return posts for the age:<1m tag when the user is in Tokyo time zone" do
+    should "return posts for the age:<1minute tag when the user is in Tokyo time zone" do
       post1 = FactoryGirl.create(:post, :tag_string => "aaa")
       Time.zone = "Asia/Tokyo"
-      count = Post.tag_match("age:<1m").count
+      count = Post.tag_match("age:<1minute").count
       assert_equal(1, count)
       Time.zone = "Eastern Time (US & Canada)"
     end
