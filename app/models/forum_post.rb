@@ -56,6 +56,10 @@ class ForumPost < ActiveRecord::Base
         q = q.creator_name(params[:creator_name].tr(" ", "_"))
       end
 
+      if params[:topic_category_id].present?
+        q = q.joins(:topic).where("forum_topics.category_id = ?", params[:topic_category_id].to_i)
+      end
+
       q
     end
   end

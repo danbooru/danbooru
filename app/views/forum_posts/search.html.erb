@@ -5,6 +5,10 @@
       <%= search_field "topic_title_matches", :label => "Title" %>
       <%= search_field "body_matches", :label => "Body" %>
       <%= search_field "creator_name", :label => "Author" %>
+      <div class="input">
+        <label for="search_topic_category_id">Category</label>
+        <%= select "search", "topic_category_id", ForumTopic::CATEGORIES.invert.to_a, :include_blank => true %>
+      </div>
       <%= submit_tag "Search" %>
     <% end %>
   </div>
