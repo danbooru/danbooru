@@ -1,9 +1,21 @@
 (function() {
   Danbooru.Dtext = {};
 
+  Danbooru.Dtext.initialize_all = function() {
+    Danbooru.Dtext.initialize_links();
+    Danbooru.Dtext.initialize_expandables();
+  }
+
   Danbooru.Dtext.initialize_links = function() {
     $(".simple_form .dtext-preview").hide();
     $(".simple_form input[value=Preview]").click(Danbooru.Dtext.click_button);
+  }
+
+  Danbooru.Dtext.initialize_expandables = function() {
+    $(".expandable-content").hide();
+    $(".expandable-button").click(function(e) {
+      $(this).parent().next().fadeToggle("fast");
+    });
   }
 
   Danbooru.Dtext.call_preview = function(e, $button, $input, $preview) {
@@ -44,5 +56,5 @@
 })();
 
 $(document).ready(function() {
-  Danbooru.Dtext.initialize_links();
+  Danbooru.Dtext.initialize_all();
 });
