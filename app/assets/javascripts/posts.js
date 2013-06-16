@@ -296,6 +296,9 @@
     });
 
     $("#show-wiki-excerpt-link").click(function(e) {
+      if ($(this).parent("li").hasClass("active")) {
+        return;
+      }
       $("#show-posts-link").parent("li").removeClass("active");
       $("#show-wiki-excerpt-link").parent("li").addClass("active");
       $("#posts").hide();
