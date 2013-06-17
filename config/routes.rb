@@ -40,6 +40,7 @@ Danbooru::Application.routes.draw do
       collection do
         get :popular
         get :hot
+        get :intro
       end
     end
   end

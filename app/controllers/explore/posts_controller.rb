@@ -7,5 +7,10 @@ module Explore
       @posts = @post_set.posts
       respond_with(@posts)
     end
+
+    def intro
+      @presenter = IntroPresenter.new
+      render :layout => "blank"
+    end
   end
 end
