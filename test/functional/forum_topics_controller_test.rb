@@ -8,7 +8,7 @@ class ForumTopicsControllerTest < ActionController::TestCase
       CurrentUser.ip_addr = "127.0.0.1"
       @other_user = FactoryGirl.create(:user)
       @mod = FactoryGirl.create(:moderator_user)
-      @forum_topic = FactoryGirl.create(:forum_topic, :title => "my forum topic", :creator => @user)
+      @forum_topic = FactoryGirl.create(:forum_topic, :title => "my forum topic", :creator => @user, :original_post_attributes => {:body => "xxx"})
     end
 
     teardown do
