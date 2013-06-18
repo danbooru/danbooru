@@ -10,7 +10,7 @@
           limit: 10,
           valueKey: "title",
           template: function(context) {
-            return "<p>" + context.title.replace(/_/g, " ") + "</a></p>";
+            return "<p>" + context.title.replace(/_/g, " ") + "</p>";
           }
         });
       }

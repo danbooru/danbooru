@@ -18,7 +18,7 @@
       limit: 10,
       valueKey: "name",
       template: function(context) {
-        return "<p>" + context.name.replace(/_/g, " ") + "</a></p>";
+        return "<p>" + context.name.replace(/_/g, " ") + "</p>";
       }
     });
   }
