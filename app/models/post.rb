@@ -949,16 +949,8 @@ class Post < ActiveRecord::Base
 
     def to_xml(options = {}, &block)
       options ||= {}
-      options[:procs] ||= []
-      options[:procs] << lambda {|options, record| options[:builder].tag!("uploader-name", record.uploader_name)}
-      options[:procs] << lambda {|options, record| options[:builder].tag!("has-large", record.has_large?, :type => "boolean")}
-      options[:procs] << lambda {|options, record| options[:builder].tag!("tag-string-artist", record.tag_string_artist)}
-      options[:procs] << lambda {|options, record| options[:builder].tag!("tag-string-character", record.tag_string_character)}
-      options[:procs] << lambda {|options, record| options[:builder].tag!("tag-string-copyright", record.tag_string_copyright)}
-      options[:procs] << lambda {|options, record| options[:builder].tag!("tag-string-general", record.tag_string_general)}
-      options[:procs] << lambda {|options, record| options[:builder].tag!("file-url", record.file_url)}
-      options[:procs] << lambda {|options, record| options[:builder].tag!("large-file-url", record.large_file_url)}
-      options[:procs] << lambda {|options, record| options[:builder].tag!("preview-file-url", record.preview_file_url)}
+      options[:methods] ||= []
+      options[:methods] += [:uploader_name, :has_large, :tag_string_artist, :tag_string_character, :tag_string_copyright, :tag_string_general, :file_url, :large_file_url, :preview_file_url]
       super(options, &block)
     end
 
