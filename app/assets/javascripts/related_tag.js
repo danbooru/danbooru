@@ -18,8 +18,8 @@
   }
   
   Danbooru.RelatedTag.tags_include = function(name) {
-    var current = $("#upload_tag_string,#post_tag_string").val().match(/\S+/g) || [];
-    if ($.inArray(name, current) > -1) {
+    var current = $("#upload_tag_string,#post_tag_string").val().toLowerCase().match(/\S+/g) || [];
+    if ($.inArray(name.toLowerCase(), current) > -1) {
       return true;
     } else {
       return false;
@@ -160,7 +160,6 @@
       header.text(query);
     }
 
-    var current = $("#upload_tag_string,#post_tag_string").val().match(/\S+/g) || [];
     var $div = $("<div/>");
     $div.addClass("tag-column")
     if (is_wide_column) {
@@ -180,7 +179,7 @@
         $link.addClass("tag-type-" + tag[1]);
         $link.attr("href", "/posts?tags=" + encodeURIComponent(tag[0]));
         $link.click(Danbooru.RelatedTag.toggle_tag);
-        if ($.inArray(tag[0], current) > -1) {
+        if (Danbooru.RelatedTag.tags_include(tag[0])) {
           $link.addClass("selected");
         }
         $ul.append(
@@ -197,10 +196,9 @@
 
   Danbooru.RelatedTag.toggle_tag = function(e) {
     var $field = $("#upload_tag_string,#post_tag_string");
-    var tags = $field.val().match(/\S+/g) || [];
     var tag = $(e.target).html().replace(/ /g, "_").replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&amp;/g, "&");
 
-    if ($.inArray(tag, tags) > -1) {
+    if (Danbooru.RelatedTag.tags_include(tag)) {
       var escaped_tag = Danbooru.regexp_escape(tag);
       $field.val($field.val().replace(new RegExp("(^|\\s)" + escaped_tag + "($|\\s)", "gi"), "$1$2"));
     } else {
