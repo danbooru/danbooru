@@ -46,7 +46,7 @@
           <% if forum_post.is_original_post? %>
             <%= render "forum_topics/form", :forum_topic => forum_post.topic %>
           <% else %>
-            <%= render "forum_posts/form", :forum_post => forum_post %>
+            <%= render "forum_posts/partials/edit/form", :forum_post => forum_post %>
           <% end %>
         <% end %>
       </menu>
