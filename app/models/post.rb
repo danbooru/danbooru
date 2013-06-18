@@ -941,7 +941,7 @@ class Post < ActiveRecord::Base
       options[:except] += hidden_attributes
       unless options[:builder]
         options[:methods] ||= []
-        options[:methods] += [:uploader_name, :has_large, :tag_string_artist, :tag_string_character, :tag_string_copyright, :tag_string_general]
+        options[:methods] += [:uploader_name, :has_large, :tag_string_artist, :tag_string_character, :tag_string_copyright, :tag_string_general, :file_url, :large_file_url, :preview_file_url]
       end
       hash = super(options)
       hash
@@ -956,6 +956,9 @@ class Post < ActiveRecord::Base
       options[:procs] << lambda {|options, record| options[:builder].tag!("tag-string-character", record.tag_string_character)}
       options[:procs] << lambda {|options, record| options[:builder].tag!("tag-string-copyright", record.tag_string_copyright)}
       options[:procs] << lambda {|options, record| options[:builder].tag!("tag-string-general", record.tag_string_general)}
+      options[:procs] << lambda {|options, record| options[:builder].tag!("file-url", record.file_url)}
+      options[:procs] << lambda {|options, record| options[:builder].tag!("large-file-url", record.large_file_url)}
+      options[:procs] << lambda {|options, record| options[:builder].tag!("preview-file-url", record.preview_file_url)}
       super(options, &block)
     end
 
