@@ -197,6 +197,10 @@ class AnonymousUser
     ""
   end
 
+  def enable_auto_complete
+    true
+  end
+
   %w(member banned gold builder platinum contributor janitor moderator admin).each do |name|
     define_method("is_#{name}?") do
       false

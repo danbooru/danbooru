@@ -4,7 +4,10 @@
   Danbooru.Artist.initialize_all = function() {
     if ($("#c-artists").length) {
       Danbooru.Artist.initialize_check_name_link();
-      Danbooru.Artist.initialize_typeahead();
+
+      if (Danbooru.meta("enable-auto-complete") === "true") {
+        Danbooru.Artist.initialize_typeahead();
+      }
     }
   }
 

@@ -5,7 +5,10 @@
 
   Danbooru.Post.initialize_all = function() {
     this.initialize_post_previews();
-    this.initialize_tag_autocomplete();
+
+    if (Danbooru.meta("enable-tag-autocomplete") === "true") {
+      this.initialize_tag_autocomplete();
+    }
 
     if ($("#c-posts").length) {
       if (Danbooru.meta("enable-js-navigation") === "true") {

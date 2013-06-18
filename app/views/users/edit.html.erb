@@ -53,6 +53,7 @@
         <%= f.input :new_post_navigation_layout, :as => :select, :label => "Pool links", :include_blank => false, :collection => [["Bottom", "true"], ["Top", "false"]], :hint => "When browsing pools, where do you want the navigation links to be placed?" %>
         <%= f.input :enable_sequential_post_navigation, :as => :select, :label => "Enable slideshow mode", :hint => "Show prev/next links when viewing a post", :include_blank => false %>
         <%= f.input :hide_deleted_posts, :as => :select, :label => "Deleted post filter", :hint => "Hide deleted posts at the database level", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
+        <%= f.input :enable_auto_complete, :as => :select, :collection => [["Yes", "true"], ["No", "false"]] %>
       </fieldset>
 
       <fieldset>
