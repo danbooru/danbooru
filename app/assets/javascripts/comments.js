@@ -27,7 +27,7 @@
       "/comments/" + $(e.target).data('comment-id') + ".json",
       function(data) {
         var $link = $(e.target);
-        var $div = $link.closest("div.comments-for-post");
+        var $div = $link.closest("div.comments-for-post").find(".new-comment");
         var $textarea = $div.find("textarea")
         var msg = Danbooru.Comment.quote_message(data);
         if ($textarea.val().length > 0) {
