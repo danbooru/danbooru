@@ -105,8 +105,8 @@
     var $dest = $("#related-tags");
     $dest.empty();
 
-    $dest.append(this.build_html("recent", this.other_tags(Danbooru.Cookie.get("recent_tags"))));
-    $dest.append(this.build_html("frequent", this.other_tags(Danbooru.meta("favorite-tags"))));
+    $dest.append(this.build_html("recent", this.other_tags(Danbooru.Cookie.get("recent_tags_with_categories"))));
+    $dest.append(this.build_html("frequent", this.other_tags(Danbooru.Cookie.get("favorite_tags_with_categories"))));
     $dest.append(this.build_html(query, related_tags));
     if (wiki_page_tags.length) {
       $dest.append(Danbooru.RelatedTag.build_html("wiki:" + query, wiki_page_tags));

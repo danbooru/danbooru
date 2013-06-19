@@ -89,8 +89,4 @@
   Upload - <%= Danbooru.config.app_name %>
 <% end %>
 
-<% content_for(:html_header) do %>
-  <meta name="favorite-tags" content="<%= cookies[:favorite_tags] %>">
-<% end %>
-
 <%= render "posts/partials/common/secondary_links" %>
