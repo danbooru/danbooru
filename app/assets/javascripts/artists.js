@@ -22,6 +22,7 @@
           },
           method: "get",
           success: function(data) {
+            data = data.slice(0, 10);
             resp($.map(data, function(tag) {
               return {
                 label: tag.name,
