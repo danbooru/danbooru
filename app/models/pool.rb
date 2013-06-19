@@ -304,6 +304,7 @@ class Pool < ActiveRecord::Base
 
   def serializable_hash(options = {})
     return {
+      "category" => category,
       "created_at" => created_at,
       "creator_id" => creator_id,
       "creator_name" => creator_name,
