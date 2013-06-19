@@ -26,16 +26,20 @@
           },
           method: "get",
           success: function(data) {
-            resp($.map(data, function(tag) {
+            resp($.map(data, function(pool) {
               return {
-                label: tag.name.replace(/_/g, " "),
-                value: tag.name
+                label: pool.name.replace(/_/g, " "),
+                value: pool.name,
+                category: pool.category
               };
             }));
           }
         });
       }
-    });
+    }).data("autocomplete")._renderItem = function(list, pool) {
+      var $link = $("<a class='pool-category-" + pool.category + "'></a>").text(pool.label);
+      return $("<li></li>").data("item.autocomplete", pool).append($link).appendTo(list);
+    }
 
     $("#pool").click(function(e) {
       e.preventDefault();

@@ -8,6 +8,14 @@ a.pool-category-series, span.pool-category-series a {
   }
 }
 
+a.pool-category-collection, span.pool-category-collection a {
+  color: $link_color;
+
+  &:hover {
+    color: $link_hover_color;
+  }
+}
+
 div#c-pool-elements {
   div#a-new {
     font-size: 0.8em;
