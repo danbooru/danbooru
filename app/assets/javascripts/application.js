@@ -1,10 +1,8 @@
-//= require jquery-1.7.1.min.js
-//= require jquery-ui-1.8.12.custom.min.js
+//= require jquery-1.10.1.min.js
+//= require jquery-ui-1.10.3.min.js
 //= require jquery.hotkeys.js
 //= require jquery.timeout.js
-//= require typeahead.min.js
 //= require rails.js
 //= require common.js
 //= require_self
 //= require_tree .
-
