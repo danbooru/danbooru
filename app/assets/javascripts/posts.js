@@ -42,10 +42,7 @@
         return false;
       },
       select: function(event, ui) {
-        var terms = this.value.match(/\S+/g);
-        terms.pop();
-        terms.push(ui.item.value);
-        this.value = terms.join(" ") + " ";
+        this.value = this.value.replace(/\S+\s*$/g, ui.item.value + " ");
         return false;
       },
       source: function(req, resp) {
