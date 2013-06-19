@@ -39,7 +39,6 @@
     var $fields = $("#tags,#post_tag_string,#upload_tag_string");
 
     $fields.autocomplete({
-      minLength: 1,
       focus: function() {
         return false;
       },
@@ -126,23 +125,23 @@
 
   Danbooru.Post.initialize_shortcuts = function() {
     if ($("#a-show").length) {
-      $(document).bind("keydown.e", function(e) {
+      $(document).bind("keydown", "e", function(e) {
         $("#post-edit-link").trigger("click");
         $("#post_tag_string").focus();
         e.preventDefault();
       });
 
-      $(document).bind("keydown.a", function(e) {
+      $(document).bind("keydown", "a", function(e) {
         Danbooru.Post.nav_prev();
         e.preventDefault();
       });
 
-      $(document).bind("keydown.d", function(e) {
+      $(document).bind("keydown", "d", function(e) {
         Danbooru.Post.nav_next();
         e.preventDefault();
       });
 
-      $(document).bind("keydown.f", function(e) {
+      $(document).bind("keydown", "f", function(e) {
         $("#add-to-favorites:visible").trigger("click");
         e.preventDefault();
       });

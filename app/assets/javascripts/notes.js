@@ -669,7 +669,7 @@ $(function() {
   if ($("#c-posts").length && $("#a-show").length && $("#image").length) {
     if ($("#note-locked-notice").length == 0) {
       $("#translate").bind("click", Danbooru.Note.TranslationMode.toggle);
-      $(document).bind("keydown.n", Danbooru.Note.TranslationMode.toggle);
+      $(document).bind("keydown", "n", Danbooru.Note.TranslationMode.toggle);
     }
     Danbooru.Note.load_all();
     $("#image").click(Danbooru.Note.Box.toggle_all);
