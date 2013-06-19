@@ -36,7 +36,9 @@
   }
 
   Danbooru.Post.initialize_tag_autocomplete = function() {
-    $("#tags,#post_tag_string,#upload_tag_string").autocomplete({
+    var $fields = $("#tags,#post_tag_string,#upload_tag_string");
+
+    $fields.autocomplete({
       minLength: 1,
       focus: function() {
         return false;
@@ -66,10 +68,15 @@
           }
         });
       }
-    }).data("uiAutocomplete")._renderItem = function(list, tag) {
+    });
+
+    var render_tag = function(list, tag) {
       var $link = $("<a/>").addClass("tag-type-" + tag.category).text(tag.label);
       return $("<li/>").data("item.autocomplete", tag).append($link).appendTo(list);
     }
+    $fields.each(function(i, field) {
+      $(field).data("uiAutocomplete")._renderItem = render_tag;
+    });
   }
 
   Danbooru.Post.initialize_similar = function() {
