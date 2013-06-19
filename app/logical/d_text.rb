@@ -19,7 +19,6 @@ class DText
     str.gsub!(/\[i\](.+?)\[\/i\]/i, '<em>\1</em>')
     str.gsub!(/\[s\](.+?)\[\/s\]/i, '<s>\1</s>')
     str.gsub!(/\[u\](.+?)\[\/u\]/i, '<u>\1</u>')
-    str.gsub!(/\[spoilers?\](.+?)\[\/spoilers?\]/i, '<span class="spoiler">\1</span>')
 
     str = parse_links(str)
     str = parse_aliased_wiki_links(str)
@@ -131,8 +130,8 @@ class DText
       str.gsub!(/\s*\[\/quote\]\s*/m, "\n\n[/quote]\n\n")
       str.gsub!(/\s*\[code\]\s*/m, "\n\n[code]\n\n")
       str.gsub!(/\s*\[\/code\]\s*/m, "\n\n[/code]\n\n")
-      str.gsub!(/\[spoilers?\]\s+/m, "\n\n[spoiler]\n\n")
-      str.gsub!(/\s+\[\/spoilers?\]/m, "\n\n[/spoiler]\n\n")
+      str.gsub!(/\s*\[spoilers?\](?!\])\s*/m, "\n\n[spoiler]\n\n")
+      str.gsub!(/\s*\[\/spoilers?\]\s*/m, "\n\n[/spoiler]\n\n")
       str.gsub!(/^(h[1-6]\.\s*.+)$/, "\n\n\\1\n\n")
       str.gsub!(/\s*\[expand(\=[^\]]*)?\]\s*/m, "\n\n[expand\\1]\n\n")
       str.gsub!(/\s*\[\/expand\]\s*/m, "\n\n[/expand]\n\n")
