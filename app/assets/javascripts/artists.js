@@ -32,9 +32,9 @@
           }
         });
       }
-    }).data("autocomplete")._renderItem = function(list, artist) {
-      var $link = $("<a class='tag-type-1'></a>").text(artist.label);
-      return $("<li></li>").data("item.autocomplete", artist).append($link).appendTo(list);
+    }).data("uiAutocomplete")._renderItem = function(list, artist) {
+      var $link = $("<a/>").addClass("tag-type-1").text(artist.label);
+      return $("<li/>").data("item.autocomplete", artist).append($link).appendTo(list);
     }
   }
 

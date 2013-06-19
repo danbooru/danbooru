@@ -69,9 +69,9 @@
           }
         });
       }
-    }).data("autocomplete")._renderItem = function(list, tag) {
-      var $link = $("<a class='tag-type-" + tag.category + "'></a>").text(tag.label);
-      return $("<li></li>").data("item.autocomplete", tag).append($link).appendTo(list);
+    }).data("uiAutocomplete")._renderItem = function(list, tag) {
+      var $link = $("<a/>").addClass("tag-type-" + tag.category).text(tag.label);
+      return $("<li/>").data("item.autocomplete", tag).append($link).appendTo(list);
     }
   }
 

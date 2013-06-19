@@ -36,9 +36,9 @@
           }
         });
       }
-    }).data("autocomplete")._renderItem = function(list, pool) {
-      var $link = $("<a class='pool-category-" + pool.category + "'></a>").text(pool.label);
-      return $("<li></li>").data("item.autocomplete", pool).append($link).appendTo(list);
+    }).data("uiAutocomplete")._renderItem = function(list, pool) {
+      var $link = $("<a/>").addClass("pool-category-" + pool.category).text(pool.label);
+      return $("<li/>").data("item.autocomplete", pool).append($link).appendTo(list);
     }
 
     $("#pool").click(function(e) {
