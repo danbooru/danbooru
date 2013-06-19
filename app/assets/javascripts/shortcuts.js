@@ -2,15 +2,15 @@
   Danbooru.Shortcuts = {};
 
   Danbooru.Shortcuts.initialize = function() {
-    $(document).bind("keydown", "s", function(e) {
+    $(document).bind("keypress", "s", function(e) {
       Danbooru.Shortcuts.nav_scroll_down();
     });
 
-    $(document).bind("keydown", "w", function(e) {
+    $(document).bind("keypress", "w", function(e) {
       Danbooru.Shortcuts.nav_scroll_up();
     });
 
-    $(document).bind("keydown", "q", function(e) {
+    $(document).bind("keypress", "q", function(e) {
       $("#tags, #search_name, #search_name_matches, #query").trigger("focus").selectEnd();
       e.preventDefault();
     });

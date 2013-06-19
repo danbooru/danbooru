@@ -135,23 +135,23 @@
 
   Danbooru.Post.initialize_shortcuts = function() {
     if ($("#a-show").length) {
-      $(document).bind("keydown", "e", function(e) {
+      $(document).bind("keypress", "e", function(e) {
         $("#post-edit-link").trigger("click");
         $("#post_tag_string").focus();
         e.preventDefault();
       });
 
-      $(document).bind("keydown", "a", function(e) {
+      $(document).bind("keypress", "a", function(e) {
         Danbooru.Post.nav_prev();
         e.preventDefault();
       });
 
-      $(document).bind("keydown", "d", function(e) {
+      $(document).bind("keypress", "d", function(e) {
         Danbooru.Post.nav_next();
         e.preventDefault();
       });
 
-      $(document).bind("keydown", "f", function(e) {
+      $(document).bind("keypress", "f", function(e) {
         $("#add-to-favorites:visible").trigger("click");
         e.preventDefault();
       });
