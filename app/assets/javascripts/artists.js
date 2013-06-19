@@ -25,7 +25,7 @@
             data = data.slice(0, 10);
             resp($.map(data, function(tag) {
               return {
-                label: tag.name,
+                label: tag.name.replace(/_/g, " "),
                 value: tag.name
               };
             }));
