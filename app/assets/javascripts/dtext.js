@@ -30,6 +30,7 @@
       },
       success: function(data) {
         $preview.html(data).fadeIn("fast");
+        Danbooru.Dtext.initialize_expandables();
       }
     });
   }
