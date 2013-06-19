@@ -2,7 +2,6 @@
 //= require jquery-ui-1.10.3.min.js
 //= require jquery.hotkeys.js
 //= require jquery.timeout.js
-//= require typeahead.min.js
 //= require rails.js
 //= require common.js
 //= require_self

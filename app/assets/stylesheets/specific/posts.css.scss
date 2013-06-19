@@ -50,27 +50,6 @@ a.blacklisted-active {
   background-color: rgba(0,0,0,0.1);
 }
 
-.tt-suggestions {
-  background: white;
-  display: block;
-  border: 1px solid black;
-  margin: 0;
-  padding: 0;
-}
-
-.tt-suggestion {
-  background: white;
-  padding: 0.25em 0.5em;
-}
-
-.tt-is-under-cursor {
-  background: $highlight_color;
-}
-
-.tt-suggestion p {
-  margin: 0;
-}
-
 #has-parent-relationship-preview, #has-children-relationship-preview {
   overflow-x: auto;
   white-space: nowrap;

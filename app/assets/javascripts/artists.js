@@ -6,19 +6,30 @@
       Danbooru.Artist.initialize_check_name_link();
 
       if (Danbooru.meta("enable-auto-complete") === "true") {
-        Danbooru.Artist.initialize_typeahead();
+        Danbooru.Artist.initialize_auto_complete();
       }
     }
   }
 
-  Danbooru.Artist.initialize_typeahead = function() {
-    $("#quick_search_name").typeahead({
-      name: "artists",
-      remote: "/artists.json?search[name]=*%QUERY*",
-      limit: 10,
-      valueKey: "name",
-      template: function(context) {
-        return "<p>" + context.name.replace(/_/g, " ") + "</p>";
+  Danbooru.Artist.initialize_auto_complete = function() {
+    $("#quick_search_name").autocomplete({
+      source: function(req, resp) {
+        $.ajax({
+          url: "/artists.json",
+          data: {
+            "search[name]": "*" + req.term + "*"
+          },
+          method: "get",
+          minLength: 2,
+          success: function(data) {
+            resp($.map(data, function(tag) {
+              return {
+                label: tag.name,
+                value: tag.name
+              };
+            }));
+          }
+        });
       }
     });
   }

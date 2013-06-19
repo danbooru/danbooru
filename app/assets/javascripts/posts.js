@@ -36,13 +36,36 @@
   }
 
   Danbooru.Post.initialize_tag_autocomplete = function() {
-    $("#tags").typeahead({
-      name: "tags",
-      remote: "/tags.json?search[order]=count&search[name_matches]=%QUERY*",
-      limit: 10,
-      valueKey: "name",
-      template: function(context) {
-        return "<p class=\"category-" + context.category + "\"><a>" + context.name + "</a></p>";
+    $("#tags,#post_tag_string,#upload_tag_string").autocomplete({
+      focus: function() {
+        return false;
+      },
+      select: function(event, ui) {
+        var terms = this.value.match(/\S+/g);
+        terms.pop();
+        terms.push(ui.item.value);
+        this.value = terms.join(" ") + " ";
+        return false;
+      },
+      source: function(req, resp) {
+        var term = req.term.match(/\S+/g).pop();
+        $.ajax({
+          url: "/tags.json",
+          data: {
+            "search[order]": "count",
+            "search[name_matches]": term + "*"
+          },
+          method: "get",
+          minLength: 2,
+          success: function(data) {
+            resp($.map(data, function(tag) {
+              return {
+                label: tag.name,
+                value: tag.name
+              };
+            }));
+          }
+        });
       }
     });
   }
