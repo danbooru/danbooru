@@ -68,6 +68,12 @@
         });
       }
     });
+    $fields.on("autocompleteopen", function() {
+      Danbooru.autocompleting = true;
+    });
+    $fields.on("autocompleteclose", function() {
+      setTimeout(function() {Danbooru.autocompleting = false;}, 100);
+    });
 
     var render_tag = function(list, tag) {
       var $link = $("<a/>").addClass("tag-type-" + tag.category).text(tag.label);
