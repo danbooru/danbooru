@@ -10,6 +10,7 @@
   Danbooru.WikiPage.initialize_typeahead = function() {
     if (Danbooru.meta("enable-auto-complete") === "true") {
       $("#quick_search_title,#wiki_page_title").autocomplete({
+        minLength: 1,
         source: function(req, resp) {
           $.ajax({
             url: "/wiki_pages.json",
@@ -17,7 +18,6 @@
               "search[title]": "*" + req.term + "*"
             },
             method: "get",
-            minLength: 2,
             success: function(data) {
               resp($.map(data, function(tag) {
                 return {

@@ -37,6 +37,7 @@
 
   Danbooru.Post.initialize_tag_autocomplete = function() {
     $("#tags,#post_tag_string,#upload_tag_string").autocomplete({
+      minLength: 1,
       focus: function() {
         return false;
       },
@@ -56,7 +57,6 @@
             "search[name_matches]": term + "*"
           },
           method: "get",
-          minLength: 2,
           success: function(data) {
             resp($.map(data, function(tag) {
               return {

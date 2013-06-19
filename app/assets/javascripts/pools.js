@@ -15,6 +15,7 @@
     $("#add-to-pool-dialog").dialog({autoOpen: false});
 
     $("#c-pool-elements #a-new input[type=text]").autocomplete({
+      minLength: 1,
       source: function(req, resp) {
         $.ajax({
           url: "/pools.json",
@@ -23,7 +24,6 @@
             "search[name_matches]": req.term
           },
           method: "get",
-          minLength: 2,
           success: function(data) {
             resp($.map(data, function(tag) {
               return {
