@@ -123,6 +123,10 @@ Danbooru.Note = {
     },
 
     toggle_all: function() {
+      // Ignore the click event when adding a note
+      if ((new Date).getTime() < Danbooru.Note.ignore_click_until) {
+        return;
+      }
       var $note_container = $("#note-container");
       var is_hidden = ($note_container.css('visibility') === 'hidden');
 
@@ -469,7 +473,7 @@ Danbooru.Note = {
       $("#image").bind("mousedown", Danbooru.Note.TranslationMode.Drag.start);
       $(window).bind("mouseup", Danbooru.Note.TranslationMode.Drag.stop);
 
-      Danbooru.notice('Translation mode is on. Drag on the image to create notes. <a href="#">Turn translation mode off</a> (shortcut is <span class="key">n</span>).');
+      Danbooru.notice('Translation mode is on. Click or drag on the image to create notes. <a href="#">Turn translation mode off</a> (shortcut is <span class="key">n</span>).');
       $("#notice a:contains(Turn translation mode off)").click(Danbooru.Note.TranslationMode.stop);
     },
 
@@ -492,12 +496,18 @@ Danbooru.Note = {
             h = 10;
           }
           Danbooru.Note.create(x - offset.left, y - offset.top, w, h);
-          $("#note-container").css('visibility', 'visible');
         }
+      } else {
+        Danbooru.Note.create(e.pageX - offset.left, e.pageY - offset.top);
       }
 
+      $("#note-container").css('visibility', 'visible');
       e.stopPropagation();
       e.preventDefault();
+
+      // Hack to ignore clicks for some milliseconds
+      // The mouseup event is executed before the click event, so it's hard to do this properly
+      Danbooru.Note.ignore_click_until = (new Date).getTime() + 200;
     },
 
     Drag: {
@@ -595,6 +605,7 @@ Danbooru.Note = {
   editing: false,
   timeouts: [],
   pending: {},
+  ignore_click_until: 0,
 
   add: function(container, id, x, y, w, h, text) {
     var $note_box = Danbooru.Note.Box.create(id);
