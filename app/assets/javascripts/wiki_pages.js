@@ -15,11 +15,11 @@
           $.ajax({
             url: "/wiki_pages.json",
             data: {
-              "search[title]": "*" + req.term + "*"
+              "search[title]": "*" + req.term + "*",
+              "limit": 10
             },
             method: "get",
             success: function(data) {
-              data = data.slice(0, 10);
               resp($.map(data, function(tag) {
                 return {
                   label: tag.title.replace(/_/g, " "),

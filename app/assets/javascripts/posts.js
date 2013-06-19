@@ -54,11 +54,11 @@
           url: "/tags.json",
           data: {
             "search[order]": "count",
-            "search[name_matches]": term + "*"
+            "search[name_matches]": term + "*",
+            "limit": 10
           },
           method: "get",
           success: function(data) {
-            data = data.slice(0, 10);
             resp($.map(data, function(tag) {
               return {
                 label: tag.name.replace(/_/g, " "),

@@ -21,11 +21,11 @@
           url: "/pools.json",
           data: {
             "search[is_active]": "true",
-            "search[name_matches]": req.term
+            "search[name_matches]": req.term,
+            "limit": 10
           },
           method: "get",
           success: function(data) {
-            data = data.slice(0, 10);
             resp($.map(data, function(tag) {
               return {
                 label: tag.name.replace(/_/g, " "),
