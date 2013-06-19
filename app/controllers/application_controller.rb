@@ -16,11 +16,6 @@ class ApplicationController < ActionController::Base
 protected
   def api_check
     if request.format.to_s =~ /\/json|\/xml/
-      if CurrentUser.is_anonymous?
-        render :text => "403 Forbidden\n", :layout => false, :status => 403
-        return false
-      end
-
       if ApiLimiter.throttled?(request.remote_ip)
         render :text => "421 User Throttled\n", :layout => false, :status => 421
         return false
