@@ -62,13 +62,17 @@
             resp($.map(data, function(tag) {
               return {
                 label: tag.name.replace(/_/g, " "),
-                value: tag.name
+                value: tag.name,
+                category: tag.category
               };
             }));
           }
         });
       }
-    });
+    }).data("autocomplete")._renderItem = function(list, tag) {
+      var $link = $("<a class='tag-type-" + tag.category + "'></a>").text(tag.label);
+      return $("<li></li>").data("item.autocomplete", tag).append($link).appendTo(list);
+    }
   }
 
   Danbooru.Post.initialize_similar = function() {
