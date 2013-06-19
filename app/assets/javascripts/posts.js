@@ -68,10 +68,14 @@
         });
       }
     });
+
     $fields.on("autocompleteopen", function() {
       Danbooru.autocompleting = true;
     });
+
     $fields.on("autocompleteclose", function() {
+      // this is needed otherwise the var is disabled by the time the
+      // keydown is triggered
       setTimeout(function() {Danbooru.autocompleting = false;}, 100);
     });
 
