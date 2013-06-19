@@ -6,7 +6,7 @@
   Danbooru.Post.initialize_all = function() {
     this.initialize_post_previews();
 
-    if (Danbooru.meta("enable-tag-autocomplete") === "true") {
+    if (Danbooru.meta("enable-auto-complete") === "true") {
       this.initialize_tag_autocomplete();
     }
 

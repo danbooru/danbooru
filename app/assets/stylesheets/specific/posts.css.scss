@@ -84,6 +84,14 @@ a.blacklisted-active {
   }
 }
 
+.category-0 a, a.tag-type-0 {
+  color: $link_color;
+
+  &:hover {
+    color: $link_hover_color;
+  }
+}
+
 .category-1 a, a.tag-type-1 {
   color: #A00;
 

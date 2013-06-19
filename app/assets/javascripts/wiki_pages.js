@@ -3,7 +3,7 @@
 
   Danbooru.WikiPage.initialize_all = function() {
     if ($("#c-wiki-pages").length) {
-      if (Danbooru.meta("enable-tag-autocomplete") === "true") {
+      if (Danbooru.meta("enable-auto-complete") === "true") {
         $("#quick_search_title,#wiki_page_title").typeahead({
           name: "wiki_pages",
           remote: "/wiki_pages.json?search[title]=*%QUERY*",
