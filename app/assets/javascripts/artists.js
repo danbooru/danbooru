@@ -23,16 +23,19 @@
           },
           method: "get",
           success: function(data) {
-            resp($.map(data, function(tag) {
+            resp($.map(data, function(artist) {
               return {
-                label: tag.name.replace(/_/g, " "),
-                value: tag.name
+                label: artist.name.replace(/_/g, " "),
+                value: artist.name
               };
             }));
           }
         });
       }
-    });
+    }).data("autocomplete")._renderItem = function(list, artist) {
+      var $link = $("<a class='tag-type-1'></a>").text(artist.label);
+      return $("<li></li>").data("item.autocomplete", artist).append($link).appendTo(list);
+    }
   }
 
   Danbooru.Artist.initialize_check_name_link = function() {
