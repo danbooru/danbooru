@@ -1,6 +1,6 @@
 div#note-container {
   position: absolute;
-  z-index: 500;
+  z-index: 50;
 
   div.note-body {
     position: absolute;
@@ -11,7 +11,7 @@ div#note-container {
     line-height: normal;
     cursor: pointer;
     padding: 4px;
-    z-index: 1500;
+    z-index: 150;
     overflow: auto;
 
     h1, h2, h3, h4, h5, h6, a, span, div, blockquote, br, p, ul, li, ol, em, strong, small, big, b, i, font, u, s, code, center {
