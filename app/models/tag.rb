@@ -161,7 +161,7 @@ class Tag < ActiveRecord::Base
 
   module ParseMethods
     def normalize(query)
-      query.to_s.downcase.strip
+      query.to_s.strip
     end
 
     def scan_query(query)

@@ -44,7 +44,7 @@ module PostSetPresenters
     end
 
     def related_tags_for_single
-      tag = Tag.find_by_name(post_set.tag_string)
+      tag = Tag.find_by_name(post_set.tag_string.downcase)
 
       if tag
         tag.related_tag_array.map(&:first)
