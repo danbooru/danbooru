@@ -52,6 +52,7 @@ class UsersController < ApplicationController
     sanitize_params!
     @user.update_attributes(params[:user], :as => CurrentUser.role)
     cookies.delete(:favorite_tags)
+    cookies.delete(:favorite_tags_with_categories)
     respond_with(@user)
   end
 
