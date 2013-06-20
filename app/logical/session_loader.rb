@@ -83,7 +83,7 @@ private
   end
 
   def store_favorite_tags_in_cookies
-    if cookies[:favorite_tags].blank? && CurrentUser.user.favorite_tags.present?
+    if (cookies[:favorite_tags].blank? || cookies[:favorite_tags_with_categories].blank?) && CurrentUser.user.favorite_tags.present?
       favorite_tags = CurrentUser.user.favorite_tags.slice(0, 1024)
       cookies[:favorite_tags] = favorite_tags
       cookies[:favorite_tags_with_categories] = Tag.categories_for(favorite_tags.scan(/\S+/)).to_a.flatten.join(" ")
