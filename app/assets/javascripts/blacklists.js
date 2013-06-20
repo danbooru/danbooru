@@ -97,7 +97,7 @@
   }
 
   Danbooru.Blacklist.posts = function() {
-    return $(".post-preview, #image-container")
+    return $(".post-preview, #image-container");
   }
 
   Danbooru.Blacklist.post_match = function(post, entry) {

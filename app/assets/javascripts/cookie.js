@@ -47,7 +47,7 @@
     var loc = location.href;
 
     if (loc.match(/^http/)) {
-      loc = loc.replace(/^https?:\/\/[^\/]+/, "")
+      loc = loc.replace(/^https?:\/\/[^\/]+/, "");
     }
 
 		if (this.get("hide-upgrade-account") != "1") {

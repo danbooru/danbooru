@@ -161,7 +161,7 @@
     }
 
     var $div = $("<div/>");
-    $div.addClass("tag-column")
+    $div.addClass("tag-column");
     if (is_wide_column) {
       $div.addClass("wide-column");
     }

@@ -38,7 +38,7 @@ Danbooru.Note = {
           Danbooru.Note.Body.hide_all();
           e.stopPropagation();
         }
-      )
+      );
 
       $note_box.bind(
         "resize",
@@ -238,7 +238,7 @@ Danbooru.Note = {
           } else {
             hi = x;
           }
-        } while ((hi - lo) > 4)
+        } while ((hi - lo) > 4);
         if ($note_body.height() > h) {
           $note_body.css("min-width", hi);
         }
@@ -276,7 +276,7 @@ Danbooru.Note = {
           var $note_body_inner = $(e.currentTarget);
           Danbooru.Note.Edit.show($note_body_inner);
           e.stopPropagation();
-        })
+        });
       } else {
         $note_body.click(function(e) {
           Danbooru.notice("You must be logged in to edit notes");

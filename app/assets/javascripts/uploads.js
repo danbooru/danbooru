@@ -28,7 +28,7 @@
   Danbooru.Upload.initialize_similar = function() {
     $("#similar-button").click(function(e) {
       var old_source_name = $("#upload_source").attr("name");
-  		var old_file_name = $("#upload_file").attr("name")
+  		var old_file_name = $("#upload_file").attr("name");
   		var old_action = $("#form").attr("action");
 
   		$("#upload_source").attr("name", "url");

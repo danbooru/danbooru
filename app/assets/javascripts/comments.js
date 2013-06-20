@@ -28,7 +28,7 @@
       function(data) {
         var $link = $(e.target);
         var $div = $link.closest("div.comments-for-post").find(".new-comment");
-        var $textarea = $div.find("textarea")
+        var $textarea = $div.find("textarea");
         var msg = Danbooru.Comment.quote_message(data);
         if ($textarea.val().length > 0) {
           msg = $textarea.val() + "\n\n" + msg;
@@ -85,7 +85,7 @@
       if (parseInt($comment.data("score")) < threshold) {
         $comment.addClass("below-threshold");
       }
-    })
+    });
   }
 
   Danbooru.Comment.hide_threshold_comments = function(post_id) {
@@ -96,7 +96,7 @@
       if (parseInt($comment.data("score")) < threshold) {
         $comment.hide();
       }
-    })
+    });
   }
 })();
 

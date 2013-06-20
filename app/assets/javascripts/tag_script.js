@@ -26,7 +26,7 @@
 
   Danbooru.TagScript.process = function(tags, command) {
     if (command.match(/^\[if/)) {
-      var match = command.match(/\[if\s+(.+?)\s*,\s*(.+?)\]/)
+      var match = command.match(/\[if\s+(.+?)\s*,\s*(.+?)\]/);
       if (Danbooru.TagScript.test(tags, match[1])) {
         return Danbooru.TagScript.process(tags, match[2]);
       } else {

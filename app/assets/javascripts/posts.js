@@ -126,7 +126,7 @@
       var href = $("#search-seq-nav a[rel=next]").attr("href");
       location.href = href;
     } else {
-      var href = $("#pool-nav a.active[rel=next]").attr("href")
+      var href = $("#pool-nav a.active[rel=next]").attr("href");
       if (href) {
         location.href = href;
       }
