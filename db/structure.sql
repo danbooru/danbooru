@@ -2488,7 +2488,8 @@ CREATE TABLE tags (
     related_tags text,
     related_tags_updated_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    is_locked boolean DEFAULT false NOT NULL
 );
 
 
@@ -6422,3 +6423,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130506154136');
 INSERT INTO schema_migrations (version) VALUES ('20130606224559');
 
 INSERT INTO schema_migrations (version) VALUES ('20130618230158');
+
+INSERT INTO schema_migrations (version) VALUES ('20130620215658');

@@ -84,6 +84,22 @@ class TagTest < ActiveSupport::TestCase
       MEMCACHE.flush_all
     end
 
+    should "be lockable by a janitor" do
+      @tag = FactoryGirl.create(:tag)
+      @tag.update_attributes({:is_locked => true}, :as => :janitor)
+      @tag.reload
+      assert_equal(true, @tag.is_locked?)
+    end
+
+    should "not be lockable by a user" do
+      @tag = FactoryGirl.create(:tag)
+      assert_raises(ActiveModel::MassAssignmentSecurity::Error) do
+        @tag.update_attributes({:is_locked => true}, :as => :member)
+      end
+      @tag.reload
+      assert_equal(false, @tag.is_locked?)
+    end
+
     should "know its category name" do
       @tag = FactoryGirl.create(:artist_tag)
       assert_equal("Artist", @tag.category_name)
@@ -151,6 +167,14 @@ class TagTest < ActiveSupport::TestCase
         tag.reload
         assert_equal(Tag.categories.artist, tag.category)
       end
+    end
+
+    should "not change the category is the tag is locked" do
+      tag = FactoryGirl.create(:tag, :is_locked => true)
+      assert_equal(true, tag.is_locked?)
+      Tag.find_or_create_by_name("artist:#{tag.name}")
+      tag.reload
+      assert_equal(0, tag.category)
     end
 
     should "be created when one doesn't exist" do

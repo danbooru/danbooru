@@ -4,6 +4,11 @@
 
     <%= simple_form_for(@tag) do |f| %>
       <%= f.input :category, :collection => Danbooru.config.canonical_tag_category_mapping.to_a, :include_blank => false %>
+
+      <% if CurrentUser.user.is_janitor? %>
+        <%= f.input :is_locked, :collection => [["No", "false"], ["Yes", "true"]] %>
+      <% end %>
+
       <%= f.button :submit, "Submit" %>
     <% end %>
   </div>
