@@ -104,7 +104,7 @@
     if (entry.disabled) {
       return false;
     }
-    
+
     var $post = $(post);
     var tags = String($post.attr("data-tags")).match(/\S+/g) || [];
     tags.push("rating:" + $post.data("rating"));

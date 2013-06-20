@@ -16,7 +16,7 @@
     this.common_bind("#related-copyrights-button", "copyright");
     $("#find-artist-button").click(Danbooru.RelatedTag.find_artist);
   }
-  
+
   Danbooru.RelatedTag.tags_include = function(name) {
     var current = $("#upload_tag_string,#post_tag_string").val().toLowerCase().match(/\S+/g) || [];
     if ($.inArray(name.toLowerCase(), current) > -1) {

@@ -262,7 +262,7 @@
     var $img = $post.find("img");
 
     var border_colors = [];
-    
+
     if ($post.hasClass("post-status-has-children")) {
       border_colors.push("#0F0");
     }
