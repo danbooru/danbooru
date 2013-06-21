@@ -132,7 +132,7 @@ $.widget( "ui.autocomplete", {
           if ( this.menu.active ) {
             this.menu.select( event );
           }
-          n.preventDefault();
+          event.preventDefault();
           break;
         case keyCode.ESCAPE:
           if ( this.menu.element.is( ":visible" ) ) {
@@ -154,7 +154,7 @@ $.widget( "ui.autocomplete", {
       keypress: function( event ) {
         if ( suppressKeyPress ) {
           suppressKeyPress = false;
-          event.preventDefault();
+          // event.preventDefault();
           return;
         }
         if ( suppressKeyPressRepeat ) {

@@ -1,5 +1,5 @@
 --- jquery-ui-autocomplete-1.10.2.js	2013-06-21 11:19:32.000000000 -0700
-+++ jquery-ui-autocomplete-custom.js	2013-06-21 11:48:21.000000000 -0700
++++ jquery-ui-autocomplete-custom.js	2013-06-21 13:07:23.000000000 -0700
 @@ -76,6 +76,16 @@
        .attr( "autocomplete", "off" );
  
@@ -29,7 +29,16 @@
            if ( this.menu.active ) {
              this.menu.select( event );
            }
-+          n.preventDefault();
++          event.preventDefault();
            break;
          case keyCode.ESCAPE:
            if ( this.menu.element.is( ":visible" ) ) {
+@@ -142,7 +154,7 @@
+       keypress: function( event ) {
+         if ( suppressKeyPress ) {
+           suppressKeyPress = false;
+-          event.preventDefault();
++          // event.preventDefault();
+           return;
+         }
+         if ( suppressKeyPressRepeat ) {
