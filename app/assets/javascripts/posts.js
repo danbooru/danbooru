@@ -47,6 +47,10 @@
         return false;
       },
       source: function(req, resp) {
+        if (req.term.match(/ $/)) {
+          return;
+        }
+
         var term = req.term.match(/\S+/g).pop();
         $.ajax({
           url: "/tags.json",
