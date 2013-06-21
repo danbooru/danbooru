@@ -450,7 +450,9 @@ class Post < ActiveRecord::Base
           end
 
         when /^rating:([qse])/i
-          self.rating = $1.downcase
+          unless is_rating_locked?
+            self.rating = $1.downcase
+          end
         end
       end
     end
