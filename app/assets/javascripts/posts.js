@@ -69,7 +69,7 @@
       }
     });
 
-    $fields.on("autocompleteopen", function() {
+    $fields.on("autocompleteselect", function() {
       Danbooru.autocompleting = true;
     });
 

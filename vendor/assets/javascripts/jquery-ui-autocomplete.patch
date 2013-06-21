@@ -1,0 +1,10 @@
+--- jquery-ui-autocomplete-1.10.2.js	2013-06-21 11:19:32.000000000 -0700
++++ jquery-ui-autocomplete-custom.js	2013-06-21 11:20:52.000000000 -0700
+@@ -121,6 +121,7 @@
+           if ( this.menu.active ) {
+             this.menu.select( event );
+           }
++          n.preventDefault();
+           break;
+         case keyCode.ESCAPE:
+           if ( this.menu.element.is( ":visible" ) ) {
