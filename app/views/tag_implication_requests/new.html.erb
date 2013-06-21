@@ -28,3 +28,7 @@
     <%= render "tag_implications/secondary_links" %>
   </div>
 </div>
+
+<% content_for(:page_title) do %>
+  Tag Implication Request - <%= Danbooru.config.app_name %>
+<% end %>

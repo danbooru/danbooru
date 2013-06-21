@@ -22,3 +22,7 @@
 <% end %>
 
 <%= render "tag_aliases/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Tag Alias Correction - <%= Danbooru.config.app_name %>
+<% end %>
