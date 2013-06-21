@@ -76,6 +76,16 @@ $.widget( "ui.autocomplete", {
       .attr( "autocomplete", "off" );
 
     this._on( this.element, {
+      click: function(event) {
+        if ( this.menu.element.is( ":visible" ) ) {
+          this._value( this.term );
+          this.close( event );
+          // Different browsers have different default behavior for escape
+          // Single press can mean undo or clear
+          // Double press in IE means clear the whole form
+          event.preventDefault();
+        }
+      },
       keydown: function( event ) {
         /*jshint maxcomplexity:15*/
         if ( this.element.prop( "readOnly" ) ) {
