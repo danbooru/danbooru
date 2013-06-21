@@ -1,6 +1,23 @@
 --- jquery-ui-autocomplete-1.10.2.js	2013-06-21 11:19:32.000000000 -0700
-+++ jquery-ui-autocomplete-custom.js	2013-06-21 11:34:35.000000000 -0700
-@@ -106,6 +106,7 @@
++++ jquery-ui-autocomplete-custom.js	2013-06-21 11:48:21.000000000 -0700
+@@ -76,6 +76,16 @@
+       .attr( "autocomplete", "off" );
+ 
+     this._on( this.element, {
++      click: function(event) {
++        if ( this.menu.element.is( ":visible" ) ) {
++          this._value( this.term );
++          this.close( event );
++          // Different browsers have different default behavior for escape
++          // Single press can mean undo or clear
++          // Double press in IE means clear the whole form
++          event.preventDefault();
++        }
++      },
+       keydown: function( event ) {
+         /*jshint maxcomplexity:15*/
+         if ( this.element.prop( "readOnly" ) ) {
+@@ -106,6 +116,7 @@
            suppressKeyPress = true;
            this._keyEvent( "next", event );
            break;
@@ -8,7 +25,7 @@
          case keyCode.ENTER:
          case keyCode.NUMPAD_ENTER:
            // when menu is open and has focus
-@@ -121,6 +122,7 @@
+@@ -121,6 +132,7 @@
            if ( this.menu.active ) {
              this.menu.select( event );
            }
