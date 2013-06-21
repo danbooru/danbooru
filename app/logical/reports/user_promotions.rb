@@ -23,7 +23,9 @@ module Reports
     end
 
     def users
-      User.joins(:posts).where("users.level < ?", User::Levels::CONTRIBUTOR).where("posts.created_at >= ? and posts.fav_count >= 1", self.class.min_time).order("users.name")
+      User.with_timeout(30_000) do
+        User.joins(:posts).where("users.level < ?", User::Levels::CONTRIBUTOR).where("posts.created_at >= ? and posts.fav_count >= 1", self.class.min_time).order("users.name")
+      end
     end
   end
 end
