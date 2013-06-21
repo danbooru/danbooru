@@ -28,7 +28,8 @@ class TagAliasRequest
       :title => "Tag alias: #{antecedent_name} -> #{consequent_name}",
       :original_post_attributes => {
         :body => "create alias [[#{antecedent_name}]] -> [[#{consequent_name}]]\n\n\"Link to alias\":/tag_aliases?search[id]=#{tag_alias.id}\n\n#{reason}"
-      }
+      },
+      :category => 1
     )
     if @forum_topic.errors.any?
       raise ValidationError.new(@forum_topic.errors.full_messages.join("; "))

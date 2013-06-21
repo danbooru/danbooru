@@ -28,7 +28,8 @@ class TagImplicationRequest
       :title => "Tag implication: #{antecedent_name} -> #{consequent_name}",
       :original_post_attributes => {
         :body => "create implication [[#{antecedent_name}]] -> [[#{consequent_name}]]\n\n\"Link to implication\":/tag_implications?search[id]=#{tag_implication.id}\n\n#{reason}"
-      }
+      },
+      :category => 1
     )
     if @forum_topic.errors.any?
       raise ValidationError.new(@forum_topic.errors.full_messages.join("; "))
