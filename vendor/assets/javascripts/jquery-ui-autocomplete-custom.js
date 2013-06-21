@@ -106,6 +106,7 @@ $.widget( "ui.autocomplete", {
           suppressKeyPress = true;
           this._keyEvent( "next", event );
           break;
+        case keyCode.SPACE:
         case keyCode.ENTER:
         case keyCode.NUMPAD_ENTER:
           // when menu is open and has focus
