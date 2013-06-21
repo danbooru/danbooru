@@ -56,7 +56,7 @@ private
   end
 
   def remove_favorites
-    UserDeletion.delay.remove_favorites_for(user.name, user.id)
+    UserDeletion.delay(:queue => "default").remove_favorites_for(user.name, user.id)
   end
 
   def rename
