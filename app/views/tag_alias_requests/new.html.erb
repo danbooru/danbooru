@@ -16,12 +16,12 @@
       </div>
 
       <div class="input">
-        <label>Reason</label>
-        <%= text_area "tag_alias_request", "reason" %>
+        <%= dtext_field "tag_alias_request", "reason", :name => "Reason" %>
       </div>
 
       <div class="input">
         <%= submit_tag "Submit" %>
+        <%= dtext_preview_button "tag_alias_request", "reason" %>
       </div>
     <% end %>
 
