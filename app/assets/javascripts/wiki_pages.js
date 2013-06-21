@@ -11,7 +11,6 @@
     if (Danbooru.meta("enable-auto-complete") === "true") {
       $("#quick_search_title,#wiki_page_title").autocomplete({
         minLength: 1,
-        autoFocus: true,
         source: function(req, resp) {
           $.ajax({
             url: "/wiki_pages.json",

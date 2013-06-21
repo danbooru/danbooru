@@ -14,7 +14,6 @@
   Danbooru.Artist.initialize_auto_complete = function() {
     $("#quick_search_name").autocomplete({
       minLength: 1,
-      autoFocus: true,
       source: function(req, resp) {
         $.ajax({
           url: "/artists.json",

@@ -16,7 +16,6 @@
 
     $("#c-pool-elements #a-new input[type=text]").autocomplete({
       minLength: 1,
-      autoFocus: true,
       source: function(req, resp) {
         $.ajax({
           url: "/pools.json",

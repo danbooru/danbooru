@@ -39,7 +39,6 @@
     var $fields = $("#tags,#post_tag_string,#upload_tag_string");
 
     $fields.autocomplete({
-      autoFocus: true,
       focus: function() {
         return false;
       },
