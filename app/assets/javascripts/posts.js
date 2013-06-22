@@ -47,11 +47,13 @@
         return false;
       },
       source: function(req, resp) {
-        if (req.term.match(/ $/)) {
+        var pre_caret_text = req.term.substring(0, this.element.get(0).selectionStart);
+
+        if (pre_caret_text.match(/ $/)) {
           return;
         }
 
-        var term = req.term.match(/\S+/g).pop();
+        var term = pre_caret_text.match(/\S+/g).pop();
         $.ajax({
           url: "/tags.json",
           data: {
