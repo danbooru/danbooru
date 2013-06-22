@@ -69,7 +69,11 @@ class PostsController < ApplicationController
   def revert
     @post = Post.find(params[:id])
     @version = PostVersion.find(params[:version_id])
-    @post.revert_to!(@version)
+
+    if Danbooru.config.can_user_see_post?(CurrentUser.user, @post)
+      @post.revert_to!(@version)
+    end
+    
     respond_with(@post) do |format|
       format.js
     end

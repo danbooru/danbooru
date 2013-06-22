@@ -24,9 +24,7 @@
       <section>
         <h1>History</h1>
         <ul>
-          <% if Danbooru.config.can_user_see_post?(CurrentUser.user, @post) %>
-            <li><%= fast_link_to "Tags", post_versions_path(:search => {:post_id => @post.id}) %></li>
-          <% end %>
+          <li><%= fast_link_to "Tags", post_versions_path(:search => {:post_id => @post.id}) %></li>
           <li><%= fast_link_to "Notes", note_versions_path(:search => {:post_id => @post.id}) %></li>
           <li><%= fast_link_to "Flags", post_flags_path(:search => {:post_id => @post.id}) %></li>
           <li><%= fast_link_to "Appeals", post_appeals_path(:search => {:post_id => @post.id}) %></li>
