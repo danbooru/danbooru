@@ -36,7 +36,15 @@
   }
 
   Danbooru.Post.initialize_tag_autocomplete = function() {
-    var $fields = $("#tags,#post_tag_string,#upload_tag_string,#tag-script-field");
+    var $fields = $(
+      "#tags,#post_tag_string,#upload_tag_string,#tag-script-field," +
+      "#search_post_tags_match,#c-tags #search_name_matches,#c-tag-aliases #query,#c-tag-implications #query," +
+      "#wiki_page_title,#artist_name," +
+      "#tag_alias_request_antecedent_name,#tag_alias_request_consequent_name," +
+      "#tag_implication_request_antecedent_name,#tag_implication_request_consequent_name," +
+      "#tag_alias_antecedent_name,#tag_alias_consequent_name," +
+      "#tag_implication_antecedent_name,#tag_implication_consequent_name"
+    );
 
     $fields.autocomplete({
       focus: function() {
