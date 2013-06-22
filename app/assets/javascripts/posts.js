@@ -36,7 +36,7 @@
   }
 
   Danbooru.Post.initialize_tag_autocomplete = function() {
-    var $fields = $("#tags,#post_tag_string,#upload_tag_string");
+    var $fields = $("#tags,#post_tag_string,#upload_tag_string,#tag-script-field");
 
     $fields.autocomplete({
       focus: function() {

@@ -9,7 +9,7 @@
 
   Danbooru.WikiPage.initialize_typeahead = function() {
     if (Danbooru.meta("enable-auto-complete") === "true") {
-      $("#quick_search_title,#wiki_page_title").autocomplete({
+      $("#search_title,#quick_search_title").autocomplete({
         minLength: 1,
         source: function(req, resp) {
           $.ajax({
