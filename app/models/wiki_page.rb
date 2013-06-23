@@ -64,7 +64,7 @@ class WikiPage < ActiveRecord::Base
       options[:except] += hidden_attributes
       unless options[:builder]
         options[:methods] ||= []
-        options[:methods] += [:creator_name]
+        options[:methods] += [:creator_name, :category_name]
       end
       hash = super(options)
       hash
