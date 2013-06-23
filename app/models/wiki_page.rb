@@ -58,6 +58,10 @@ class WikiPage < ActiveRecord::Base
   end
 
   module ApiMethods
+    def hidden_attributes
+      super + [:body_index]
+    end
+
     def serializable_hash(options = {})
       options ||= {}
       options[:except] ||= []

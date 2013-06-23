@@ -161,4 +161,8 @@ class ForumPost < ActiveRecord::Base
       x.body = x.quoted_response
     end
   end
+
+  def hidden_attributes
+    super + [:text_index]
+  end
 end
