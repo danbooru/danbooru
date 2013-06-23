@@ -79,8 +79,8 @@ class Note < ActiveRecord::Base
 
     def to_xml(options = {}, &block)
       options ||= {}
-      options[:procs] ||= []
-      options[:procs] << lambda {|options, record| options[:builder].tag!("creator-name", record.creator_name)}
+      options[:methods] ||= []
+      options[:methods] += [:creator_name]
       super(options, &block)
     end
   end
