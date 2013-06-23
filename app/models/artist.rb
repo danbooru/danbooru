@@ -81,7 +81,7 @@ class Artist < ActiveRecord::Base
 
     def rename!(new_name)
       new_wiki_page = WikiPage.titled(new_name).first
-      if new_wiki_page
+      if new_wiki_page && wiki_page
         # Merge the old wiki page into the new one
         new_wiki_page.update_attributes(:body => new_wiki_page.body + "\n\n" + notes)
       elsif wiki_page
