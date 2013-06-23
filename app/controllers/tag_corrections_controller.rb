@@ -14,7 +14,7 @@ class TagCorrectionsController < ApplicationController
 
     if params[:commit] == "Fix"
       @correction.fix!
-      redirect_to tags_path(:search => {:name_matches => @correction.tag.name}), :notice => "Tag will be fixed in a few seconds"
+      redirect_to tags_path(:search => {:name_matches => @correction.tag.name, :hide_empty => "no"}), :notice => "Tag will be fixed in a few seconds"
     else
       redirect_to tags_path(:search => {:name_matches => @correction.tag.name})
     end
