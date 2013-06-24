@@ -4,6 +4,10 @@ module PostSets
       false
     end
 
+    def raw
+      false
+    end
+
     def wiki_page
       nil
     end
