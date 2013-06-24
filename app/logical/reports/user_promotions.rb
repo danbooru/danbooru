@@ -24,7 +24,7 @@ module Reports
 
     def users
       User.with_timeout(30_000) do
-        User.joins(:posts).where("users.level < ?", User::Levels::CONTRIBUTOR).where("posts.created_at >= ? and posts.fav_count >= 1", self.class.min_time).order("users.name")
+        User.joins(:posts).where("users.level < ? and users.post_upload_count >= 100", User::Levels::CONTRIBUTOR).where("posts.created_at >= ? and posts.fav_count >= 1", self.class.min_time).order("users.id").select("distinct users.id")
       end
     end
   end
