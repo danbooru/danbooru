@@ -117,9 +117,6 @@ class Tag < ActiveRecord::Base
   end
 
   module StatisticsMethods
-    def trending
-      raise NotImplementedError
-    end
   end
 
   module NameMethods
