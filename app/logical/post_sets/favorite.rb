@@ -8,6 +8,10 @@ module PostSets
       @favorites = ::Favorite.for_user(user.id).paginate(page, :limit => limit).order("favorites.id desc")
     end
 
+    def raw
+      false
+    end
+
     def limit
       params[:limit] || CurrentUser.user.per_page
     end
