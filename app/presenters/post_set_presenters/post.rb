@@ -23,25 +23,7 @@ module PostSetPresenters
     end
 
     def popular_tags
-      Cache.get("popular-tags", 1.hour) do
-        CurrentUser.scoped(User.admins.first, "127.0.0.1") do
-          n = 1
-          results = []
-
-          while results.empty? && n < 256
-            query = n.days.ago.strftime("date:>%Y-%m-%d")
-            results = RelatedTagCalculator.calculate_from_sample_to_array(query)
-            n *= 2
-          end
-
-          results.map! do |tag_name, recent_count|
-            tag = Tag.find_or_create_by_name(tag_name)
-            [tag_name, recent_count.to_f / tag.post_count.to_f]
-          end
-
-          results.sort_by! {|x| -x[1]}.map(&:first)
-        end
-      end
+      Tag.trending
     end
 
     def pattern_tags

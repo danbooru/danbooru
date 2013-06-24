@@ -10,6 +10,8 @@
       <% end %>
     </header>
 
+    <p style="text-align: center;">Type in your favorite anime, manga, or character (last name first). Here are some examples:</p>
+
     <% @presenter.each do |tag, post_set| %>
       <div class="posts">
         <h2><%= link_to tag, posts_path(:tags => tag) %></h2>
@@ -19,3 +21,7 @@
     <% end %>
   </div>
 </div> 
+
+<% content_for(:page_title) do %>
+  <%= Danbooru.config.app_name %>
+<% end %>
