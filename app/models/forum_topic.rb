@@ -96,4 +96,8 @@ class ForumTopic < ActiveRecord::Base
   def presenter(forum_posts)
     @presenter ||= ForumTopicPresenter.new(self, forum_posts)
   end
+  
+  def hidden_attributes
+    super + [:text_index]
+  end
 end

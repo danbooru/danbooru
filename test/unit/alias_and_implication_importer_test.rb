@@ -60,7 +60,7 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
       @importer.process!
       artist.reload
       assert_equal("bbb", artist.name)
-      assert_match(/automatically renamed/, artist.notes)
+      assert_equal("testing", artist.notes)
     end
   end
 end

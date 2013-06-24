@@ -36,10 +36,12 @@
           <td><%= post_version_diff(post_version) %></td>
           <% if CurrentUser.is_member? %>
             <td>
-              <% if post_version.id != post_version.post.versions.first.id %>
-                <%= link_to "Undo", undo_post_version_path(post_version), :method => :put, :remote => true %> |
+              <% if Danbooru.config.can_user_see_post?(CurrentUser.user, post_version.post) %>
+                <% if post_version.id != post_version.post.versions.first.id %>
+                  <%= link_to "Undo", undo_post_version_path(post_version), :method => :put, :remote => true %> |
+                <% end %>
+                <%= link_to "Revert to", revert_post_path(post_version.post_id, :version_id => post_version.id), :method => :put, :remote => true %>
               <% end %>
-              <%= link_to "Revert to", revert_post_path(post_version.post_id, :version_id => post_version.id), :method => :put, :remote => true %>
             </td>
           <% end %>
         </tr>

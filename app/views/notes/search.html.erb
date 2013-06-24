@@ -5,8 +5,8 @@
     <%= form_tag(notes_path, :method => :get, :class => "simple_form") do %>
       <%= hidden_field_tag "group_by", "note" %>
       <%= search_field "body_matches", :label => "Body" %>
-      <%= search_field "post_tags_match", :label => "Tags" %>
       <%= search_field "creator_name", :label => "Author" %>
+      <%= search_field "post_tags_match", :label => "Tags" %>
       <%= submit_tag "Search" %>
     <% end %>
   </div>

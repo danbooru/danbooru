@@ -145,8 +145,7 @@ class TagAlias < ActiveRecord::Base
     if antecedent_wiki.present? && WikiPage.titled(consequent_name).blank?
       CurrentUser.scoped(creator, creator_ip_addr) do
         antecedent_wiki.update_attributes(
-          :title => consequent_name,
-          :body => "[i]This page was automatically renamed from [[#{antecedent_name}]] by a tag alias.[/i]\n\n#{antecedent_wiki.body}"
+          :title => consequent_name
         )
       end
     end

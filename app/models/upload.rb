@@ -396,8 +396,8 @@ class Upload < ActiveRecord::Base
 
     def to_xml(options = {}, &block)
       options ||= {}
-      options[:procs] ||= []
-      options[:procs] << lambda {|options, record| options[:builder].tag!("uploader-name", record.uploader_name)}
+      options[:methods] ||= []
+      options[:methods] += [:uploader_name]
       super(options, &block)
     end
   end

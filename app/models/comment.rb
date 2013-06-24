@@ -140,6 +140,10 @@ class Comment < ActiveRecord::Base
   def editable_by?(user)
     creator_id == user.id || user.is_janitor?
   end
+
+  def hidden_attributes
+    super + [:body_index]
+  end
 end
 
 Comment.connection.extend(PostgresExtensions)

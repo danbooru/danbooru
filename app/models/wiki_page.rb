@@ -58,13 +58,17 @@ class WikiPage < ActiveRecord::Base
   end
 
   module ApiMethods
+    def hidden_attributes
+      super + [:body_index]
+    end
+
     def serializable_hash(options = {})
       options ||= {}
       options[:except] ||= []
       options[:except] += hidden_attributes
       unless options[:builder]
         options[:methods] ||= []
-        options[:methods] += [:creator_name]
+        options[:methods] += [:creator_name, :category_name]
       end
       hash = super(options)
       hash
@@ -72,8 +76,8 @@ class WikiPage < ActiveRecord::Base
 
     def to_xml(options = {}, &block)
       options ||= {}
-      options[:procs] ||= []
-      options[:procs] << lambda {|options, record| options[:builder].tag!("creator-name", record.creator_name)}
+      options[:methods] ||= []
+      options[:methods] += [:creator_name, :category_name]
       super(options, &block)
     end
   end

@@ -81,7 +81,7 @@ class Artist < ActiveRecord::Base
 
     def rename!(new_name)
       new_wiki_page = WikiPage.titled(new_name).first
-      if new_wiki_page
+      if new_wiki_page && wiki_page
         # Merge the old wiki page into the new one
         new_wiki_page.update_attributes(:body => new_wiki_page.body + "\n\n" + notes)
       elsif wiki_page
@@ -306,6 +306,24 @@ class Artist < ActiveRecord::Base
     end
   end
 
+  module ApiMethods
+    def hidden_attributes
+      super + [:other_names_index]
+    end
+
+    def legacy_api_hash
+      return {
+        :id => id,
+        :name => name,
+        :other_names => other_names,
+        :group_name => group_name,
+        :urls => artist_urls.map {|x| x.url},
+        :is_active => is_active?,
+        :updater_id => 0
+      }
+    end
+  end
+
   include UrlMethods
   include NameMethods
   include GroupMethods
@@ -315,6 +333,7 @@ class Artist < ActiveRecord::Base
   include TagMethods
   include BanMethods
   extend SearchMethods
+  include ApiMethods
 
   def status
     if is_banned? && is_active?
@@ -326,18 +345,6 @@ class Artist < ActiveRecord::Base
     else
       "Deleted"
     end
-  end
-
-  def legacy_api_hash
-    return {
-      :id => id,
-      :name => name,
-      :other_names => other_names,
-      :group_name => group_name,
-      :urls => artist_urls.map {|x| x.url},
-      :is_active => is_active?,
-      :updater_id => 0
-    }
   end
 
   def initialize_creator

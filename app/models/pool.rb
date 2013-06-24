@@ -168,7 +168,7 @@ class Pool < ActiveRecord::Base
   end
 
   def page_number(post_id)
-    post_id_array.find_index(post_id) + 1
+    post_id_array.find_index(post_id).to_i + 1
   end
 
   def deletable_by?(user)

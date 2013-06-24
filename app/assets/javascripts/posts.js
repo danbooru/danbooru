@@ -36,22 +36,41 @@
   }
 
   Danbooru.Post.initialize_tag_autocomplete = function() {
-    var $fields = $("#tags,#post_tag_string,#upload_tag_string");
+    var $fields = $(
+      "#tags,#post_tag_string,#upload_tag_string,#tag-script-field," +
+      "#search_post_tags_match,#c-tags #search_name_matches,#c-tag-aliases #query,#c-tag-implications #query," +
+      "#wiki_page_title,#artist_name," +
+      "#tag_alias_request_antecedent_name,#tag_alias_request_consequent_name," +
+      "#tag_implication_request_antecedent_name,#tag_implication_request_consequent_name," +
+      "#tag_alias_antecedent_name,#tag_alias_consequent_name," +
+      "#tag_implication_antecedent_name,#tag_implication_consequent_name"
+    );
 
     $fields.autocomplete({
       focus: function() {
         return false;
       },
       select: function(event, ui) {
-        this.value = this.value.replace(/\S+\s*$/g, ui.item.value + " ");
+        var before_caret_text = this.value.substring(0, this.selectionStart);
+        var after_caret_text = this.value.substring(this.selectionStart);
+
+        this.value = before_caret_text.replace(/\S+\s*$/g, ui.item.value + " ");
+
+        // Preserve original caret position to prevent it from jumping to the end
+        var original_start = this.selectionStart;
+        this.value += after_caret_text;
+        this.selectionStart = this.selectionEnd = original_start;
+
         return false;
       },
       source: function(req, resp) {
-        if (req.term.match(/ $/)) {
+        var before_caret_text = req.term.substring(0, this.element.get(0).selectionStart);
+
+        if (before_caret_text.match(/ $/)) {
           return;
         }
 
-        var term = req.term.match(/\S+/g).pop();
+        var term = before_caret_text.match(/\S+/g).pop();
         $.ajax({
           url: "/tags.json",
           data: {

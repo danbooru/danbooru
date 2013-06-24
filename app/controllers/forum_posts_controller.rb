@@ -50,7 +50,7 @@ class ForumPostsController < ApplicationController
     @forum_post = ForumPost.find(params[:id])
     check_privilege(@forum_post)
     @forum_post.update_attributes(params[:forum_post])
-    respond_with(@forum_post, :location => forum_topic_path(@forum_post.topic, :page => @forum_post.forum_topic_page))
+    respond_with(@forum_post, :location => forum_topic_path(@forum_post.topic, :page => @forum_post.forum_topic_page, :anchor => "forum_post_#{@forum_post.id}"))
   end
 
   def destroy

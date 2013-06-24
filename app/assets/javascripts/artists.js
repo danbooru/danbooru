@@ -6,13 +6,15 @@
       Danbooru.Artist.initialize_check_name_link();
 
       if (Danbooru.meta("enable-auto-complete") === "true") {
-        Danbooru.Artist.initialize_auto_complete();
+        Danbooru.Artist.initialize_autocomplete();
       }
     }
   }
 
-  Danbooru.Artist.initialize_auto_complete = function() {
-    $("#quick_search_name").autocomplete({
+  Danbooru.Artist.initialize_autocomplete = function() {
+    var $fields = $("#search_name,#quick_search_name");
+
+    $fields.autocomplete({
       minLength: 1,
       source: function(req, resp) {
         $.ajax({
@@ -32,10 +34,16 @@
           }
         });
       }
-    }).data("uiAutocomplete")._renderItem = function(list, artist) {
+    });
+
+    var render_artist = function(list, artist) {
       var $link = $("<a/>").addClass("tag-type-1").text(artist.label);
       return $("<li/>").data("item.autocomplete", artist).append($link).appendTo(list);
     }
+
+    $fields.each(function(i, field) {
+      $(field).data("uiAutocomplete")._renderItem = render_artist;
+    });
   }
 
   Danbooru.Artist.initialize_check_name_link = function() {

@@ -16,7 +16,11 @@ class PostVersionsController < ApplicationController
 
   def undo
     @post_version = PostVersion.find(params[:id])
-    @post_version.undo!
+
+    if Danbooru.config.can_user_see_post?(CurrentUser.user, @post_version.post)
+      @post_version.undo!
+    end
+
     respond_with(@post_version) do |format|
       format.js
     end

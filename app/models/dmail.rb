@@ -188,4 +188,8 @@ class Dmail < ActiveRecord::Base
   def visible_to?(user)
     user.is_moderator? || owner_id == user.id
   end
+
+  def hidden_attributes
+    super + [:message_index]
+  end
 end
