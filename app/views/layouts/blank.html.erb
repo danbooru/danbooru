@@ -9,6 +9,7 @@
   <%= stylesheet_link_tag "application", :media => "screen" %>
   <%= javascript_include_tag "application" %>
   <%= Danbooru.config.custom_html_header_content %>
+  <meta name="enable-auto-complete" content="<%= CurrentUser.user.enable_auto_complete %>">
   <%= yield :html_header %>
 </head>
 <body lang="en">
