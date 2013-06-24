@@ -5,7 +5,7 @@ class IntroPresenter
 
   def each
     popular_tags.each do |tag|
-      yield(tag, PostSets::Post.new(tag, 1, 6))
+      yield(tag, PostSets::Intro.new(tag))
     end
   end
 end
