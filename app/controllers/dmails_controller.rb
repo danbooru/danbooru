@@ -14,7 +14,7 @@ class DmailsController < ApplicationController
   end
 
   def index
-    cookies[:dmail_folder] = params[:folder]
+    cookies.permanent[:dmail_folder] = params[:folder]
     @search = Dmail.visible.search(params[:search])
     @dmails = @search.order("dmails.created_at desc").paginate(params[:page], :limit => params[:limit])
     respond_with(@dmails) do |format|
