@@ -32,5 +32,7 @@
 
 
 $(document).ready(function() {
-  Danbooru.Shortcuts.initialize();
+  if (Danbooru.meta("enable-js-navigation") === "true") {
+    Danbooru.Shortcuts.initialize();
+  }
 });
