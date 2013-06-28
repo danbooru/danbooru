@@ -22,8 +22,8 @@ module PostSets
 
       context "a set for the 'a' tag query" do
         setup do
-          @post_4 = FactoryGirl.create(:post, :tag_string => "a")
-          @post_5 = FactoryGirl.create(:post, :tag_string => "a")
+          @post_4 = FactoryGirl.create(:post, :tag_string => "a", :fav_count => 5)
+          @post_5 = FactoryGirl.create(:post, :tag_string => "a", :fav_count => 5)
         end
 
         context "with no page" do
