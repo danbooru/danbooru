@@ -93,7 +93,8 @@
               return {
                 label: tag.name.replace(/_/g, " "),
                 value: tag.name,
-                category: tag.category
+                category: tag.category,
+                post_count: tag.post_count
               };
             }));
           }
@@ -113,6 +114,8 @@
 
     var render_tag = function(list, tag) {
       var $link = $("<a/>").addClass("tag-type-" + tag.category).text(tag.label);
+      var $post_count = $("<span/>").addClass("post-count").css("float", "right").text(tag.post_count);
+      $link.append($post_count);
       return $("<li/>").data("item.autocomplete", tag).append($link).appendTo(list);
     }
     $fields.each(function(i, field) {
