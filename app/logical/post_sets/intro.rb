@@ -6,7 +6,7 @@ module PostSets
 
     def posts
       @posts ||= begin
-        temp = ::Post.tag_match("#{tag_string} fav_count:>3").paginate(page, :search_count => nil, :limit => 6)
+        temp = ::Post.tag_match("#{tag_string} favcount:>3").paginate(page, :search_count => nil, :limit => 6)
         temp.all
         temp
       end
