@@ -71,10 +71,13 @@
         }
 
         var term = before_caret_text.match(/\S+/g).pop();
-        var prefixes = /^(?:-|~|general:|gen:|artist:|art:|copyright:|copy:|co:|character:|char:|ch:)(.+)$/
+        var prefixes = /^(?:-|~|general:|gen:|artist:|art:|copyright:|copy:|co:|character:|char:|ch:)(.*)$/
         var match = term.match(prefixes);
         if (match) {
           term = match[1];
+        }
+        if (term === "") {
+          return;
         }
 
         $.ajax({
