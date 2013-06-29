@@ -80,6 +80,9 @@ Danbooru::Application.routes.draw do
       get :search
       get :index_all
     end
+    member do
+      put :unvote
+    end
   end
   resources :counts do
     collection do
