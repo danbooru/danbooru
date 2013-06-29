@@ -82,6 +82,13 @@ class PostsController < ApplicationController
     render :nothing => true
   end
 
+  def unvote
+    @post = Post.find(params[:id])
+    @post.unvote!
+  rescue PostVote::Error => x
+    @error = x
+  end
+
 private
   def tag_query
     params[:tags] || (params[:post] && params[:post][:tags])

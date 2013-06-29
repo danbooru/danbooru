@@ -650,6 +650,24 @@ class Post < ActiveRecord::Base
         raise PostVote::Error.new("You have already voted for this post")
       end
     end
+
+    def unvote!
+      if can_be_voted_by?(CurrentUser.user)
+        raise PostVote::Error.new("You have not voted for this post")
+      else
+        vote = votes.where("user_id = ?", CurrentUser.user.id).first
+
+        if vote.score == 1
+          Post.update_all("score = score - 1, up_score = up_score - 1", {:id => id})
+          self.score -= 1
+        else
+          Post.update_all("score = score + 1, down_score = down_score + 1", {:id => id})
+          self.score += 1
+        end
+
+        vote.destroy
+      end
+    end
   end
 
   module CountMethods

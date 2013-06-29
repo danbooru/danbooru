@@ -154,6 +154,7 @@ Danbooru::Application.routes.draw do
       put :revert
       put :copy_notes
       get :show_seq
+      put :unvote
     end
   end
   resources :post_appeals
