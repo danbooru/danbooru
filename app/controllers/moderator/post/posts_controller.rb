@@ -13,7 +13,7 @@ module Moderator
         @post = ::Post.find(params[:id])
         if params[:commit] == "Delete"
           @post.flag!(params[:reason])
-          @post.delete!
+          @post.delete!(:reason => params[:reason])
         end
         redirect_to(post_path(@post))
       end
