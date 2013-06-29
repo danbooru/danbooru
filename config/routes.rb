@@ -273,7 +273,7 @@ Danbooru::Application.routes.draw do
 
   match "/forum" => redirect {|params, req| "/forum_topics?page=#{req.params[:page]}"}
   match "/forum/index" => redirect {|params, req| "/forum_topics?page=#{req.params[:page]}"}
-  match "/forum/show/:id" => redirect("/forum_posts/%{id}")
+  match "/forum/show/:id" => redirect {|params, req| "/forum_posts/#{req.params[:id]}?page=#{req.params[:page]}"}
   match "/forum/search" => redirect("/forum_posts/search")
   match "/forum/new" => redirect("/forum_posts/new")
   match "/forum/edit/:id" => redirect("/forum_posts/%{id}/edit")

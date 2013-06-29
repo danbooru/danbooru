@@ -35,7 +35,7 @@ class ForumPostsController < ApplicationController
   def show
     @forum_post = ForumPost.find(params[:id])
     if request.format == "text/html" && @forum_post.id == @forum_post.topic.original_post.id
-      redirect_to(forum_topic_path(@forum_post.topic))
+      redirect_to(forum_topic_path(@forum_post.topic, :page => params[:page]))
     else
       respond_with(@forum_post)
     end
