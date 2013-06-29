@@ -81,6 +81,9 @@ Danbooru::Application.routes.draw do
       get :search
       get :index_all
     end
+    member do
+      put :unvote
+    end
   end
   resources :counts do
     collection do
@@ -155,6 +158,7 @@ Danbooru::Application.routes.draw do
       put :revert
       put :copy_notes
       get :show_seq
+      put :unvote
     end
   end
   resources :post_appeals

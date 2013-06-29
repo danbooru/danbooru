@@ -222,6 +222,8 @@
 
       e.preventDefault();
     });
+
+    $(".unvote-post-link").hide();
   }
 
   Danbooru.Post.initialize_post_relationship_previews = function() {

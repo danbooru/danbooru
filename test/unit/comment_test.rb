@@ -102,6 +102,19 @@ class CommentTest < ActiveSupport::TestCase
         assert_equal(2, CommentVote.count)
       end
 
+      should "allow undoing of votes" do
+        user = FactoryGirl.create(:user)
+        post = FactoryGirl.create(:post)
+        comment = FactoryGirl.create(:comment, :post => post)
+        CurrentUser.scoped(user, "127.0.0.1") do
+          comment.vote!("up")
+          comment.unvote!
+          comment.reload
+          assert_equal(0, comment.score)
+          assert_nothing_raised {comment.vote!("down")}
+        end
+      end
+
       should "be searchable" do
         c1 = FactoryGirl.create(:comment, :body => "aaa bbb ccc")
         c2 = FactoryGirl.create(:comment, :body => "aaa ddd")

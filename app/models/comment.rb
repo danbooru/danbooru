@@ -69,7 +69,41 @@ class Comment < ActiveRecord::Base
     end
   end
 
+  module VoteMethods
+    def vote!(val)
+      numerical_score = val == "up" ? 1 : -1
+      vote = votes.create(:score => numerical_score)
+
+      if vote.errors.empty?
+        if vote.is_positive?
+          update_column(:score, score + 1)
+        elsif vote.is_negative?
+          update_column(:score, score - 1)
+        end
+      end
+
+      return vote
+    end
+
+    def unvote!
+      vote = votes.where("user_id = ?", CurrentUser.user.id).first
+
+      if vote
+        if vote.is_positive?
+          update_column(:score, score - 1)
+        else
+          update_column(:score, score + 1)
+        end
+
+        vote.destroy
+      else
+        raise CommentVote::Error.new("You have not voted for this comment")
+      end
+    end
+  end
+
   extend SearchMethods
+  include VoteMethods
 
   def initialize_creator
     self.creator_id = CurrentUser.user.id
@@ -120,21 +154,6 @@ class Comment < ActiveRecord::Base
 
   def do_not_bump_post?
     do_not_bump_post == "1"
-  end
-
-  def vote!(val)
-    numerical_score = val == "up" ? 1 : -1
-    vote = votes.create(:score => numerical_score)
-
-    if vote.errors.empty?
-      if vote.is_positive?
-        update_column(:score, score + 1)
-      elsif vote.is_negative?
-        update_column(:score, score - 1)
-      end
-    end
-
-    return vote
   end
 
   def editable_by?(user)

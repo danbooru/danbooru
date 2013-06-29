@@ -6,6 +6,7 @@
       this.initialize_response_link();
       this.initialize_reply_links();
       this.initialize_expand_links();
+      this.initialize_vote_links();
 
       if (!$("#a-edit").length) {
         this.initialize_edit_links();
@@ -97,6 +98,10 @@
         $comment.hide();
       }
     });
+  }
+
+  Danbooru.Comment.initialize_vote_links = function() {
+    $(".unvote-comment-link").hide();
   }
 })();
 
