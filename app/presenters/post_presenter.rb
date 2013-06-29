@@ -55,7 +55,10 @@ class PostPresenter < Presenter
     string = []
 
     if @post.character_tags.any?
-      string << @post.character_tags.slice(0, 5).to_sentence
+      chartags = @post.character_tags.slice(0, 5).map do |tag|
+        tag.match(/^(.+?)(?:_\(.+\))?$/)[1]
+      end
+      string << chartags.to_sentence
     end
 
     if @post.copyright_tags.any?
