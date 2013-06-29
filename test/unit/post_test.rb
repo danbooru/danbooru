@@ -1138,6 +1138,18 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(1, post.score)
       end
     end
+
+    should "allow undoing of votes" do
+      user = FactoryGirl.create(:user)
+      post = FactoryGirl.create(:post)
+      CurrentUser.scoped(user, "127.0.0.1") do
+        post.vote!("up")
+        post.unvote!
+        post.reload
+        assert_equal(0, post.score)
+        assert_nothing_raised {post.vote!("down")}
+      end
+    end
   end
 
   context "Counting:" do
