@@ -71,7 +71,7 @@
         }
 
         var term = before_caret_text.match(/\S+/g).pop();
-        var prefixes = /^(?:-|~|general:|gen:|artist:|art:|copyright:|copy:|co:|character:|char:|ch:)(.*)$/
+        var prefixes = /^(?:-|~|general:|gen:|artist:|art:|copyright:|copy:|co:|character:|char:|ch:)(.*)$/;
         var match = term.match(prefixes);
         if (match) {
           term = match[1];
@@ -117,7 +117,8 @@
       var $post_count = $("<span/>").addClass("post-count").css("float", "right").text(tag.post_count);
       $link.append($post_count);
       return $("<li/>").data("item.autocomplete", tag).append($link).appendTo(list);
-    }
+    };
+
     $fields.each(function(i, field) {
       $(field).data("uiAutocomplete")._renderItem = render_tag;
     });

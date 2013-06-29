@@ -38,7 +38,7 @@
     var render_wiki_page = function(list, wiki_page) {
       var $link = $("<a/>").addClass("tag-type-" + wiki_page.category).text(wiki_page.label);
       return $("<li/>").data("item.autocomplete", wiki_page).append($link).appendTo(list);
-    }
+    };
 
     $fields.each(function(i, field) {
       $(field).data("uiAutocomplete")._renderItem = render_wiki_page;

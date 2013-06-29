@@ -39,7 +39,7 @@
     var render_artist = function(list, artist) {
       var $link = $("<a/>").addClass("tag-type-1").text(artist.label);
       return $("<li/>").data("item.autocomplete", artist).append($link).appendTo(list);
-    }
+    };
 
     $fields.each(function(i, field) {
       $(field).data("uiAutocomplete")._renderItem = render_artist;
