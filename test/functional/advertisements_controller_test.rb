@@ -52,7 +52,7 @@ class AdvertisementsControllerTest < ActionController::TestCase
     should "block non-advertisers" do
       regular_user = FactoryGirl.create(:user)
       get :index, {}, {:user_id => regular_user.id}
-      assert_redirected_to("/static/access_denied")
+      assert_redirected_to(new_session_path(:url => advertisements_path))
     end
   end
 end
