@@ -58,7 +58,7 @@ a.blacklisted-active {
     float: none;
     width: auto;
     border: none;
-    margin: 0px;
+    margin: 0;
     padding: 5px 5px 10px;
   }
 }
@@ -269,30 +269,30 @@ div#c-posts {
       li {
         position: relative;
         text-align: center;
-        padding: 0px 5.5em;
+        padding: 0 5.5em;
 
         .prev {
           position: absolute;
           left: 2em;
-          top: 0px;
+          top: 0;
         }
 
         .next {
           position: absolute;
           right: 2em;
-          top: 0px;
+          top: 0;
         }
 
         .first {
           position: absolute;
           left: 0.5em;
-          top: 0px;
+          top: 0;
         }
 
         .last {
           position: absolute;
           right: 0.5em;
-          top: 0px;
+          top: 0;
         }
 
         &:hover {
