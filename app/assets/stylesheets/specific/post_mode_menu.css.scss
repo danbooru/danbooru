@@ -3,7 +3,11 @@ body.mode-view {
 }
 
 body.mode-edit {
-  background-color: #3A3;
+  background-color: #5C5;
+}
+
+body.mode-tag-script {
+  background-color: #D6D;
 }
 
 body.mode-add-fav {
@@ -14,24 +18,24 @@ body.mode-remove-fav {
   background-color: #FFA;
 }
 
-body.mode-rating-q {
-  background-color: #AAA;
-}
-
 body.mode-rating-s {
   background-color: #6F6;
+}
+
+body.mode-rating-q {
+  background-color: #AAA;
 }
 
 body.mode-rating-e {
   background-color: #F66;
 }
 
-body.mode-vote-down {
-  background-color: #FAA;
-}
-
 body.mode-vote-up {
   background-color: #AFA;
+}
+
+body.mode-vote-down {
+  background-color: #FAA;
 }
 
 body.mode-lock-rating {
@@ -43,7 +47,7 @@ body.mode-lock-note {
 }
 
 body.mode-approve {
-  background-color: #26A;
+  background-color: #48C;
 }
 
 body.mode-unapprove {
@@ -54,10 +58,10 @@ body.mode-add-to-pool {
   background-color: #26A;
 }
 
-body.mode-tag-script {
-  background-color: #A3A;
-}
-
 body.mode-translation {
   background-color: #5CD;
+}
+
+#page, #top, #page-footer {
+  background-color: white;
 }
