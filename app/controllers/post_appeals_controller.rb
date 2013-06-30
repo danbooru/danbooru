@@ -1,7 +1,6 @@
 class PostAppealsController < ApplicationController
   before_filter :member_only
   respond_to :html, :xml, :json, :js
-  rescue_from User::PrivilegeError, :with => "static/access_denied"
 
   def new
     @post_appeal = PostAppeal.new

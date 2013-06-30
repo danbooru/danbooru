@@ -2,7 +2,6 @@ class PoolsController < ApplicationController
   respond_to :html, :xml, :json, :js
   before_filter :member_only, :except => [:index, :show]
   before_filter :moderator_only, :only => [:destroy]
-  rescue_from User::PrivilegeError, :with => "static/access_denied"
 
   def new
     @pool = Pool.new

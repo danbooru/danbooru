@@ -1,7 +1,6 @@
 class ForumPostsController < ApplicationController
   respond_to :html, :xml, :json, :js
   before_filter :member_only, :except => [:index, :show]
-  rescue_from User::PrivilegeError, :with => "static/access_denied"
 
   def new
     @forum_topic = ForumTopic.find(params[:topic_id]) if params[:topic_id]

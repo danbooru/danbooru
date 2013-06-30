@@ -48,11 +48,11 @@ class AdvertisementsController < ApplicationController
     redirect_to advertisements_path, :notice => "Advertisement destroyed"
   end
 
-  private
-    def advertiser_only
-      if !Danbooru.config.is_user_advertiser?(CurrentUser.user)
-        redirect_to "/static/access_denied"
-        return false
-      end
+private
+  def advertiser_only
+    if !Danbooru.config.is_user_advertiser?(CurrentUser.user)
+      raise User::PrivilegeError
+      return false
     end
+  end
 end

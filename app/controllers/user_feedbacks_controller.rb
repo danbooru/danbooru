@@ -1,7 +1,6 @@
 class UserFeedbacksController < ApplicationController
   before_filter :gold_only, :only => [:new, :edit, :create, :update, :destroy]
   respond_to :html, :xml, :json
-  rescue_from User::PrivilegeError, :with => "static/access_denied"
 
   def new
     @user_feedback = UserFeedback.new(params[:user_feedback])

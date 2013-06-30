@@ -1,7 +1,6 @@
 class TagSubscriptionsController < ApplicationController
   before_filter :member_only, :only => [:new, :edit, :create, :update, :destroy]
   respond_to :html, :xml, :json
-  rescue_from User::PrivilegeError, :with => "static/access_denied"
 
   def new
     @tag_subscription = TagSubscription.new

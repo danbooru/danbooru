@@ -3,7 +3,6 @@ class ForumTopicsController < ApplicationController
   before_filter :member_only, :except => [:index, :show]
   before_filter :normalize_search, :only => :index
   after_filter :update_last_forum_read_at, :only => [:show]
-  rescue_from User::PrivilegeError, :with => "static/access_denied"
 
   def new
     @forum_topic = ForumTopic.new
