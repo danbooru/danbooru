@@ -339,7 +339,7 @@ Danbooru::Application.routes.draw do
   match "/wiki/revert" => redirect("/wiki_pages")
   match "/wiki/rename" => redirect("/wiki_pages")
   match "/wiki/show" => redirect {|params, req| "/wiki_pages?title=#{CGI::escape(req.params[:title].to_s)}"}
-  match "/wiki/recent_changes" => redirect("/wiki_page_versions")
+  match "/wiki/recent_changes" => redirect {|params, req| "/wiki_page_versions?search[updater_id]=#{req.params[:user_id]}"}
   match "/wiki/history/:title" => redirect("/wiki_page_versions?title=%{title}")
 
   match "/static/keyboard_shortcuts" => "static#keyboard_shortcuts", :as => "keyboard_shortcuts"
