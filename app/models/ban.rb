@@ -1,6 +1,7 @@
 class Ban < ActiveRecord::Base
   after_create :update_feedback
   after_create :update_user_on_create
+  after_create :create_mod_action
   after_destroy :update_user_on_destroy
   belongs_to :user
   belongs_to :banner, :class_name => "User"
@@ -96,5 +97,9 @@ class Ban < ActiveRecord::Base
 
   def expired?
     expires_at < Time.now
+  end
+
+  def create_mod_action
+    ModAction.create(:description => %{Banned "#{user_name}":/users/#{user_id} until #{expires_at}})
   end
 end
