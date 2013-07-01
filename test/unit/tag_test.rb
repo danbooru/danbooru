@@ -16,6 +16,8 @@ class TagTest < ActiveSupport::TestCase
 
   context ".trending" do
     setup do
+      Tag.stubs(:trending_count_limit).returns(0)
+
       Timecop.travel(1.week.ago) do
         FactoryGirl.create(:post, :tag_string => "aaa")
         FactoryGirl.create(:post, :tag_string => "bbb")

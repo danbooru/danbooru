@@ -117,10 +117,14 @@ class Tag < ActiveRecord::Base
   end
 
   module StatisticsMethods
+    def trending_count_limit
+      20
+    end
+
     def trending
-      Cache.get("popular-tags", 1.hour) do
+      Cache.get("popular-tags-v2", 1.hour) do
         CurrentUser.scoped(User.admins.first, "127.0.0.1") do
-          n = 1
+          n = 3
           counts = {}
 
           while counts.empty? && n < 256
@@ -134,12 +138,13 @@ class Tag < ActiveRecord::Base
             n *= 2
           end
 
-          counts = counts.to_a.map do |tag_name, recent_count|
+          counts = counts.to_a.select {|x| x[1] > trending_count_limit}
+          counts = counts.map do |tag_name, recent_count|
             tag = Tag.find_or_create_by_name(tag_name)
             [tag_name, recent_count.to_f / tag.post_count.to_f]
           end
 
-          counts.sort_by {|x| -x[1]}.map(&:first)
+          counts.sort_by {|x| -x[1]}.slice(0, 20).map(&:first)
         end
       end
     end
