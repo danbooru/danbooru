@@ -115,8 +115,16 @@
 
     var render_tag = function(list, tag) {
       var $link = $("<a/>").addClass("tag-type-" + tag.category).text(tag.label);
-      var $post_count = $("<span/>").addClass("post-count").css("float", "right").text(tag.post_count);
+
+      var count;
+      if (tag.post_count > 1000) {
+        count = Math.floor(tag.post_count / 1000) + "k";
+      } else {
+        count = tag.post_count;
+      }
+      var $post_count = $("<span/>").addClass("post-count").css("float", "right").text(count);
       $link.append($post_count);
+
       return $("<li/>").data("item.autocomplete", tag).append($link).appendTo(list);
     };
 
