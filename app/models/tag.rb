@@ -118,17 +118,17 @@ class Tag < ActiveRecord::Base
 
   module StatisticsMethods
     def trending_count_limit
-      20
+      10
     end
 
     def trending
-      Cache.get("popular-tags-v2", 1.hour) do
+      Cache.get("popular-tags-v3", 1.hour) do
         CurrentUser.scoped(User.admins.first, "127.0.0.1") do
-          n = 3
+          n = 8
           counts = {}
 
           while counts.empty? && n < 256
-            tag_strings = Post.select_values_sql("select tag_string from posts where created_at >= ? order by md5 limit 100", n.days.ago)
+            tag_strings = Post.select_values_sql("select tag_string from posts where created_at >= ?", n.hours.ago)
             tag_strings.each do |tag_string|
               tag_string.scan(/\S+/).each do |tag|
                 counts[tag] ||= 0
@@ -144,7 +144,7 @@ class Tag < ActiveRecord::Base
             [tag_name, recent_count.to_f / tag.post_count.to_f]
           end
 
-          counts.sort_by {|x| -x[1]}.slice(0, 20).map(&:first)
+          counts.sort_by {|x| -x[1]}.slice(0, 25).map(&:first)
         end
       end
     end
