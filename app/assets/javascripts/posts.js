@@ -47,6 +47,7 @@
     );
 
     $fields.autocomplete({
+      delay: 100,
       focus: function() {
         return false;
       },
