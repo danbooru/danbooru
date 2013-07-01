@@ -17,16 +17,16 @@ class TagTest < ActiveSupport::TestCase
   context ".trending" do
     setup do
       Timecop.travel(1.week.ago) do
-        Post.create(:tag_string => "aaa")
-        Post.create(:tag_string => "bbb")
+        FactoryGirl.create(:post, :tag_string => "aaa")
+        FactoryGirl.create(:post, :tag_string => "bbb")
       end
 
-      Post.create(:tag_string => "bbb")
-      Post.create(:tag_string => "ccc")
+      FactoryGirl.create(:post, :tag_string => "bbb")
+      FactoryGirl.create(:post, :tag_string => "ccc")
     end
 
     should "order the results by the total post count" do
-      assert_equal([], Tag.trending)
+      assert_equal(["ccc", "bbb"], Tag.trending)
     end
   end
 

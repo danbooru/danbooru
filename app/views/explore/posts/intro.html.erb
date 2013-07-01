@@ -1,7 +1,7 @@
 <div id="c-explore-posts">
   <div id="a-intro">
     <header>
-      <h1><%= Danbooru.config.app_name %></h1>
+      <h1><%= link_to Danbooru.config.app_name, posts_path %></h1>
       <p class="byline">Find good anime art fast</p>
 
       <%= form_tag(posts_path, :method => :get) do %>
