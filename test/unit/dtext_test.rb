@@ -126,7 +126,11 @@ class DTextTest < ActiveSupport::TestCase
   end
 
   def test_lists_not_preceded_by_newline
-    assert_equal('<p>a</p><ul><li>b</li><li>c</li></ul>', p("a\n* b\n* c").gsub(/\n/, ""))
+    assert_equal('<p>ab</p><ul><li>c</li><li>d</li></ul>', p("a\nb\n* c\n* d").gsub(/\n/, ""))
+  end
+
+  def test_lists_with_multiline_items
+    assert_equal('<p>a</p><ul><li>bc</li><li>de</li></ul>', p("a\n* b\nc\n* d\ne").gsub(/\n/, ""))
   end
 
   def test_inline_tags

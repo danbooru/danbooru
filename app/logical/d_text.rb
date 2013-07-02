@@ -86,15 +86,22 @@ class DText
 
   def self.parse_list(str, options = {})
     html = ""
+    current_item = ""
     layout = []
     nest = 0
 
     str.split(/\n/).each do |line|
       if line =~ /^\s*(\*+) (.+)/
+        if nest > 0
+          html += "<li>#{current_item}</li>"
+        elsif not current_item.strip.empty?
+          html += "<p>#{current_item}</p>"
+        end
+
         nest = $1.size
-        content = parse_inline($2)
+        current_item = parse_inline($2)
       else
-        content = parse_inline(line)
+        current_item += parse_inline(line)
       end
 
       if nest > layout.size
@@ -108,13 +115,9 @@ class DText
           html += "</#{elist}>"
         end
       end
-
-      if nest > 0
-        html += "<li>#{content}</li>"
-      else
-        html += "<p>#{content}</p>"
-      end
     end
+
+    html += "<li>#{current_item}</li>"
 
     while layout.any?
       elist = layout.pop
