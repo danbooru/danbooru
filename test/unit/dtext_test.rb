@@ -100,7 +100,7 @@ class DTextTest < ActiveSupport::TestCase
   def test_auto_urls_in_parentheses
     assert_equal('<p>a (<a href="http://test.com">http://test.com</a>) b</p>', p('a (http://test.com) b'))
   end
-  
+
   def test_old_syle_links
     assert_equal('<p><a href="http://test.com">test</a></p>', p('"test":http://test.com'))
   end
@@ -123,6 +123,14 @@ class DTextTest < ActiveSupport::TestCase
 
   def test_lists_inline
     assert_equal('<ul><li><a href="/posts/1">post #1</a></li></ul>', p("* post #1").gsub(/\n/, ""))
+  end
+
+  def test_lists_not_preceded_by_newline
+    assert_equal('<p>ab</p><ul><li>c</li><li>d</li></ul>', p("a\nb\n* c\n* d").gsub(/\n/, ""))
+  end
+
+  def test_lists_with_multiline_items
+    assert_equal('<p>a</p><ul><li>bc</li><li>de</li></ul>', p("a\n* b\nc\n* d\ne").gsub(/\n/, ""))
   end
 
   def test_inline_tags
