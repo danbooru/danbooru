@@ -141,7 +141,12 @@ class Tag < ActiveRecord::Base
           counts = counts.to_a.select {|x| x[1] > trending_count_limit}
           counts = counts.map do |tag_name, recent_count|
             tag = Tag.find_or_create_by_name(tag_name)
-            [tag_name, recent_count.to_f / tag.post_count.to_f]
+            if tag.category == Danbooru.config.tag_category_mapping["artist"]
+              # we're not interested in artists in the trending list
+              [tag_name, 0]
+            else
+              [tag_name, recent_count.to_f / tag.post_count.to_f]
+            end
           end
 
           counts.sort_by {|x| -x[1]}.slice(0, 25).map(&:first)
