@@ -109,7 +109,11 @@ class DText
         end
       end
 
-      html += "<li>#{content}</li>"
+      if nest > 0
+        html += "<li>#{content}</li>"
+      else
+        html += "<p>#{content}</p>"
+      end
     end
 
     while layout.any?
@@ -187,7 +191,7 @@ class DText
         else
           ""
         end
-        
+
       when /\[code\](?!\])/
         flags[:code] = true
         '<pre>'
@@ -208,7 +212,7 @@ class DText
         if stack.last == "expandable"
           stack.pop
           '</div></div>'
-        end 
+        end
 
       else
         if flags[:code]
