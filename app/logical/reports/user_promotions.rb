@@ -2,6 +2,19 @@ require 'statistics2'
 
 module Reports
   class UserPromotions
+    class User
+      attr_reader :user
+      delegate :name, :post_upload_count, :level_string, :level, :created_at, :to => :user
+
+      def initialize(user)
+        @user = user
+      end
+
+      def confidence_interval_for(n)
+        Reports::UserPromotions.confidence_interval_for(user, n)
+      end
+    end
+
     def self.confidence_interval_for(user, n)
       up_votes = Post.where("created_at >= ?", min_time).where(:uploader_id => user.id).where("fav_count >= ?", n).count
       total_votes = Post.where("created_at >= ?", min_time).where(:uploader_id => user.id).count
@@ -23,7 +36,7 @@ module Reports
     end
 
     def users
-      User.where("users.level < ? and users.post_upload_count >= 100", User::Levels::CONTRIBUTOR).order("created_at desc").limit(50)
+      ::User.where("users.level < ? and users.post_upload_count >= 100", ::User::Levels::CONTRIBUTOR).order("created_at desc").limit(50).map {|x| Reports::UserPromotions::User.new(x)}
     end
   end
 end

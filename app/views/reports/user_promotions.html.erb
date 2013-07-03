@@ -4,25 +4,29 @@
 
     <p>Binomial proportion confidence interval for how likely a user's uploads will achieve a fav count of at at least n with 95% confidence within the past 30 days.</p>
 
-    <table width="100%" class="striped">
+    <table width="100%" class="striped" id="sortable">
       <thead>
         <tr>
-          <th>User</th>
-          <th>Level</th>
-          <th>score:1+</th>
-          <th>score:5+</th>
-          <th>score:10+</th>
+          <th data-sort="string">User</th>
+          <th data-sort="int">Level</th>
+          <th data-sort="int">Uploads</th>
+          <th data-sort="string">Age</th>
+          <th data-sort="int">score:1+</th>
+          <th data-sort="int">score:5+</th>
+          <th data-sort="int">score:10+</th>
         </tr>
       </thead>
       <tbody>
         <% cache("user-promotions-report/#{Date.today}") do %>
           <% @report.users.each do |user| %>
             <tr>
-              <td><%= link_to user.name, user_path(user) %></td>
-              <td><%= user.level_string %></td>
-              <td><%= number_to_percentage Reports::UserPromotions.confidence_interval_for(user, 1), :precision => 0 %></td>
-              <td><%= number_to_percentage Reports::UserPromotions.confidence_interval_for(user, 5), :precision => 0 %></td>
-              <td><%= number_to_percentage Reports::UserPromotions.confidence_interval_for(user, 10), :precision => 0 %></td>
+              <td><%= link_to user.name, user_path(user.user) %></td>
+              <td data-sort-value="<%= user.level %>"><%= user.level_string %></td>
+              <td><%= user.post_upload_count %></td>
+              <td data-sort-value="<%= user.created_at.to_formatted_s(:db) %>"><%= time_ago_in_words user.created_at %></td>
+              <td><%= number_to_percentage user.confidence_interval_for(1), :precision => 0 %></td>
+              <td><%= number_to_percentage user.confidence_interval_for(5), :precision => 0 %></td>
+              <td><%= number_to_percentage user.confidence_interval_for(10), :precision => 0 %></td>
             </tr>
           <% end %>
         <% end %>
@@ -30,3 +34,15 @@
     </table>
   </div>
 </div>
+
+<%= content_for(:html_header) do %>
+  <%= javascript_include_tag "stupidtable" %>
+  <script type="text/javascript">
+    $(function() {
+      $("#sortable").stupidtable().on("aftertablesort", function() {
+        $("#sortable tbody tr:even").removeClass("odd").addClass("even");
+        $("#sortable tbody tr:odd").removeClass("even").addClass("odd");
+      });
+    });
+  </script>
+<% end %>
