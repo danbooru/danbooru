@@ -46,6 +46,8 @@
       "#tag_implication_antecedent_name,#tag_implication_consequent_name"
     );
 
+    var prefixes = "-|~|general:|gen:|artist:|art:|copyright:|copy:|co:|character:|char:|ch:";
+
     $fields.autocomplete({
       delay: 100,
       focus: function() {
@@ -55,7 +57,8 @@
         var before_caret_text = this.value.substring(0, this.selectionStart);
         var after_caret_text = this.value.substring(this.selectionStart);
 
-        this.value = before_caret_text.replace(/\S+\s*$/g, ui.item.value + " ");
+        var regexp = new RegExp("(" + prefixes + ")?\\S+$", "g");
+        this.value = before_caret_text.replace(regexp, "$1" + ui.item.value + " ");
 
         // Preserve original caret position to prevent it from jumping to the end
         var original_start = this.selectionStart;
@@ -72,8 +75,8 @@
         }
 
         var term = before_caret_text.match(/\S+/g).pop();
-        var prefixes = /^(?:-|~|general:|gen:|artist:|art:|copyright:|copy:|co:|character:|char:|ch:)(.*)$/;
-        var match = term.match(prefixes);
+        var regexp = new RegExp("^(?:" + prefixes + ")(.*)$");
+        var match = term.match(regexp);
         if (match) {
           term = match[1];
         }
