@@ -339,11 +339,13 @@
       var $link = $(e.target);
       var $image = $("#image");
       $image.attr("src", $link.attr("href"));
-      $image.width($image.data("original-width"));
-      $image.height($image.data("original-height"));
-      Danbooru.Note.Box.scale_all();
-      $("#image-resize-notice").hide();
-      $image.data("scale_factor", 1);
+      $image.on("load", function() {
+        $image.width($image.data("original-width"));
+        $image.height($image.data("original-height"));        
+        Danbooru.Note.Box.scale_all();
+        $("#image-resize-notice").hide();
+        $image.data("scale_factor", 1);
+      });
       e.preventDefault();
     });
   }
