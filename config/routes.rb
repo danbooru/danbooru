@@ -289,7 +289,7 @@ Danbooru::Application.routes.draw do
 
   match "/note" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
   match "/note/index" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
-  match "/note/history" => redirect("/note_versions")
+  match "/note/history" => redirect {|params, req| "/note_versions?search[updater_id]=#{req.params[:user_id]}"}
 
   match "/pool" => redirect {|params, req| "/pools?page=#{req.params[:page]}"}
   match "/pool/index" => redirect {|params, req| "/pools?page=#{req.params[:page]}"}
