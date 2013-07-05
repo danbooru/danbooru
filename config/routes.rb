@@ -309,6 +309,7 @@ Danbooru::Application.routes.draw do
   match "/post/popular_by_month" => redirect("/explore/posts/popular")
   match "/post/show/:id/:tag_title" => redirect("/posts/%{id}")
   match "/post/show/:id" => redirect("/posts/%{id}")
+  match "/post/show" => redirect {|params, req| "/posts?md5=#{req.params[:md5]}"}
   match "/post/view/:id/:tag_title" => redirect("/posts/%{id}")
   match "/post/view/:id" => redirect("/posts/%{id}")
   match "/post/flag/:id" => redirect("/posts/%{id}")
