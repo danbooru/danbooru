@@ -154,6 +154,9 @@ Danbooru::Application.routes.draw do
   resources :pool_versions, :only => [:index]
   resources :posts do
     resources :votes, :controller => "post_votes", :only => [:create, :destroy]
+    collection do
+      get :home
+    end
     member do
       put :revert
       put :copy_notes
@@ -352,5 +355,5 @@ Danbooru::Application.routes.draw do
   match "/static/benchmark" => "static#benchmark"
   match "/static/name_change" => "static#name_change", :as => "name_change"
 
-  root :to => "explore/posts#intro"
+  root :to => "posts#home"
 end
