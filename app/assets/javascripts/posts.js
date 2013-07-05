@@ -341,9 +341,11 @@
     $("#image-resize-link").click(function(e) {
       var $link = $(e.target);
       var $image = $("#image");
+      $image.removeAttr("src");
+      $image.attr("src", "https://www.google.com")
       $image.attr("src", $link.attr("href"));
       $image.width($image.data("original-width"));
-      $image.height($image.data("original-height"));
+      $image.height($image.data("original-height"));        
       Danbooru.Note.Box.scale_all();
       $("#image-resize-notice").hide();
       $image.data("scale_factor", 1);

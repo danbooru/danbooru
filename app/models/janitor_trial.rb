@@ -3,7 +3,6 @@ class JanitorTrial < ActiveRecord::Base
   before_create :initialize_original_level
   after_create :send_dmail
   after_create :promote_user
-  after_destroy :create_feedback
   validates_presence_of :user
   before_validation :initialize_creator
 
@@ -61,6 +60,7 @@ class JanitorTrial < ActiveRecord::Base
 
   def demote!
     user.update_column(:level, original_level)
+    self.create_feedback
     destroy
   end
 end

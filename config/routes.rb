@@ -154,6 +154,9 @@ Danbooru::Application.routes.draw do
   resources :pool_versions, :only => [:index]
   resources :posts do
     resources :votes, :controller => "post_votes", :only => [:create, :destroy]
+    collection do
+      get :home
+    end
     member do
       put :revert
       put :copy_notes
@@ -286,7 +289,7 @@ Danbooru::Application.routes.draw do
 
   match "/note" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
   match "/note/index" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
-  match "/note/history" => redirect("/note_versions")
+  match "/note/history" => redirect {|params, req| "/note_versions?search[updater_id]=#{req.params[:user_id]}"}
 
   match "/pool" => redirect {|params, req| "/pools?page=#{req.params[:page]}"}
   match "/pool/index" => redirect {|params, req| "/pools?page=#{req.params[:page]}"}
@@ -353,5 +356,5 @@ Danbooru::Application.routes.draw do
   match "/static/benchmark" => "static#benchmark"
   match "/static/name_change" => "static#name_change", :as => "name_change"
 
-  root :to => "posts#index"
+  root :to => "posts#home"
 end

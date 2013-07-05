@@ -1,5 +1,5 @@
 class PostsController < ApplicationController
-  before_filter :member_only, :except => [:show, :show_seq, :index]
+  before_filter :member_only, :except => [:show, :show_seq, :index, :home]
   before_filter :builder_only, :only => [:copy_notes]
   after_filter :save_recent_tags, :only => [:update]
   respond_to :html, :xml, :json
@@ -96,6 +96,14 @@ class PostsController < ApplicationController
     @post.unvote!
   rescue PostVote::Error => x
     @error = x
+  end
+
+  def home
+    if CurrentUser.user.is_anonymous?
+      redirect_to intro_explore_posts_path
+    else
+      redirect_to posts_path(:tags => params[:tags])
+    end
   end
 
 private

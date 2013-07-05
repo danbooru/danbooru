@@ -132,7 +132,9 @@ $.widget( "ui.autocomplete", {
           if ( this.menu.active ) {
             this.menu.select( event );
           }
-          event.preventDefault();
+          if ( !this.menu.element.is( ":visible" ) ) {
+            event.preventDefault();
+          }
           break;
         case keyCode.ESCAPE:
           if ( this.menu.element.is( ":visible" ) ) {
