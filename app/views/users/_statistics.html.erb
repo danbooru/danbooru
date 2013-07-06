@@ -20,7 +20,7 @@
       <% if user.is_banned? %>
         <tr>
           <th>Ban reason</th>
-          <td><%= presenter.ban_reason %></td>
+          <td><%= format_text presenter.ban_reason %></td>
         </tr>
       <% end %>
 
