@@ -7,6 +7,6 @@
   <h1>Search</h1>
   <%= form_tag(path, :method => "get") do %>
     <%= text_field_tag("tags", tags, :size => 20) %>
-    <%= submit_tag "Go" %>
+    <%= submit_tag "Go", :name => nil %>
   <% end %>
 </section>
