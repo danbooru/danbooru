@@ -345,8 +345,8 @@ class Tag < ActiveRecord::Base
       scan_query(query).each do |token|
         q[:tag_count] += 1 unless token == "status:deleted"
 
-        if token =~ /\A(#{METATAGS}):(.+)\Z/
-          case $1
+        if token =~ /\A(#{METATAGS}):(.+)\Z/i
+          case $1.downcase
           when "-user"
             q[:uploader_id_neg] ||= []
             user_id = User.name_to_id($2)
@@ -395,16 +395,16 @@ class Tag < ActiveRecord::Base
             q[:md5] = $2.downcase.split(/,/)
 
           when "-rating"
-            q[:rating_negated] = $2
+            q[:rating_negated] = $2.downcase
 
           when "rating"
-            q[:rating] = $2
+            q[:rating] = $2.downcase
 
           when "-locked"
-            q[:locked_negated] = $2
+            q[:locked_negated] = $2.downcase
 
           when "locked"
-            q[:locked] = $2
+            q[:locked] = $2.downcase
 
           when "id"
             q[:post_id] = parse_helper($2)
