@@ -341,8 +341,7 @@
     $("#image-resize-link").click(function(e) {
       var $link = $(e.target);
       var $image = $("#image");
-      $image.removeAttr("src");
-      $image.attr("src", "https://www.google.com")
+      $image.attr("src", "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==")
       $image.attr("src", $link.attr("href"));
       $image.width($image.data("original-width"));
       $image.height($image.data("original-height"));        
