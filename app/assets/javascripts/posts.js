@@ -341,10 +341,13 @@
     $("#image-resize-link").click(function(e) {
       var $link = $(e.target);
       var $image = $("#image");
-      $image.attr("src", "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==")
       $image.attr("src", $link.attr("href"));
+      $image.css("opacity", "50%");
       $image.width($image.data("original-width"));
       $image.height($image.data("original-height"));        
+      $image.on("load", function() {
+        $image.css("opacity", "100%");
+      })
       Danbooru.Note.Box.scale_all();
       $("#image-resize-notice").hide();
       $image.data("scale_factor", 1);
