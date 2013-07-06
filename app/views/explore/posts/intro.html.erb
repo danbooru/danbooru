@@ -12,12 +12,14 @@
 
     <p style="text-align: center;">Type in your favorite anime, manga, or character (last name first). Here are some examples:</p>
 
-    <% @presenter.each do |tag, post_set| %>
-      <div class="posts">
-        <h2><%= link_to tag, posts_path(:tags => tag) %></h2>
-        <%= post_set.presenter.post_previews_html(self) %>
-        <div class="clearfix"></div>
-      </div>
+    <% cache("intro-page", :expires_in => 1.hour) do %>
+      <% @presenter.each do |tag, post_set| %>
+        <div class="posts">
+          <h2><%= link_to tag, posts_path(:tags => tag) %></h2>
+          <%= post_set.presenter.post_previews_html(self) %>
+          <div class="clearfix"></div>
+        </div>
+      <% end %>
     <% end %>
   </div>
 </div> 

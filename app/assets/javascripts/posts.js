@@ -341,13 +341,16 @@
     $("#image-resize-link").click(function(e) {
       var $link = $(e.target);
       var $image = $("#image");
-      $image.removeAttr("src");
-      $image.attr("src", "https://www.google.com")
       $image.attr("src", $link.attr("href"));
+      $image.css("opacity", "0.25");
       $image.width($image.data("original-width"));
       $image.height($image.data("original-height"));        
+      $image.on("load", function() {
+        $image.css("opacity", "1");
+        $("#image-resize-notice").hide();
+      });
+      $("#image-resize-notice").html("Loading...");
       Danbooru.Note.Box.scale_all();
-      $("#image-resize-notice").hide();
       $image.data("scale_factor", 1);
       e.preventDefault();
     });
