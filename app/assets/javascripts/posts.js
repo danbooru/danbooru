@@ -342,11 +342,11 @@
       var $link = $(e.target);
       var $image = $("#image");
       $image.attr("src", $link.attr("href"));
-      $image.css("opacity", "50%");
+      $image.css("opacity", "0.25");
       $image.width($image.data("original-width"));
       $image.height($image.data("original-height"));        
       $image.on("load", function() {
-        $image.css("opacity", "100%");
+        $image.css("opacity", "1");
       })
       Danbooru.Note.Box.scale_all();
       $("#image-resize-notice").hide();
