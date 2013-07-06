@@ -347,9 +347,10 @@
       $image.height($image.data("original-height"));        
       $image.on("load", function() {
         $image.css("opacity", "1");
-      })
+        $("#image-resize-notice").hide();
+      });
+      $("#image-resize-notice").html("Loading...");
       Danbooru.Note.Box.scale_all();
-      $("#image-resize-notice").hide();
       $image.data("scale_factor", 1);
       e.preventDefault();
     });
