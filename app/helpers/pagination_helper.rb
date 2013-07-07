@@ -24,7 +24,7 @@ module PaginationHelper
     end
 
     html = '<div class="paginator"><menu>'
-    window = 3
+    window = 4
 
     if records.current_page >= 2
       html << "<li>" + link_to("<<", params.merge(:page => records.current_page - 1), :rel => "prev") + "</li>"
