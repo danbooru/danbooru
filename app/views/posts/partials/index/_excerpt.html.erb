@@ -1,0 +1,59 @@
+<!--
+- post_set
+ -->
+
+<div id="excerpt" style="display: none;">
+  <% if post_set.artist %>
+    <% unless post_set.artist.notes.blank? %>
+      <div class="prose">
+        <%= format_text(post_set.artist.notes) %>
+      </div>
+
+      <p><%= link_to "View wiki page", post_set.artist.wiki_page %></p>
+    <% end %>
+
+    <div>
+      <ul>
+        <li><strong>Status</strong> <%= post_set.artist.status %></li>
+        <% if post_set.artist.has_tag_alias? %>
+          <li><strong>Tag Alias</strong> <%= post_set.artist.tag_alias_name %></li>
+        <% end %>
+        <% if post_set.artist.other_names.present? %>
+          <li><strong>Other Names</strong> <%= link_to_artists(post_set.artist.other_names.split(/ /)) %></li>
+        <% end %>
+        <% if post_set.artist.group_name.present? %>
+          <li><strong>Group</strong> <%= link_to_artist(post_set.artist.group_name) %></li>
+        <% end %>
+        <% if post_set.artist.members.any? %>
+          <li><strong>Members</strong> <%= link_to_artists(post_set.artist.members.map(&:name)) %></li>
+        <% end %>
+        <% post_set.artist.urls.each do |url| %>
+          <li>
+            URL: <%= link_to h(url.to_s), h(url.to_s) %>
+            <% if CurrentUser.user.is_moderator? %>
+              (<%= link_to("mass edit", edit_moderator_tag_path(:antecedent => "-#{post_set.artist.name} source:#{ArtistUrl.normalize_for_search(url.to_s)}", :consequent => post_set.artist.name)) %>)
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+
+      <p>Read the <%= link_to "full article", wiki_page_path(post_set.wiki_page.id) %>.</p>
+    </div>
+  <% elsif post_set.wiki_page %>
+    <div class="prose">
+      <%= format_text(post_set.wiki_page.presenter.excerpt) %>
+
+      <% if post_set.wiki_page.artist %>
+        <p><%= link_to "View artist", post_set.wiki_page.artist %></p>
+      <% end %>
+
+      <%= wiki_page_alias_and_implication_list(post_set.wiki_page) %>
+
+      <p>Read the <%= link_to "full article", wiki_page_path(post_set.wiki_page.id) %>.</p>
+    </div>
+  <% else %>
+    <% if post_set.tag_string.present? %>
+      <p>There is currently no wiki page for the tag "<%= post_set.tag_string %>". You can <%= link_to "create one", new_wiki_page_path(:wiki_page => {:title => post_set.tag_string}) %>.</p>
+    <% end %>
+  <% end %>
+</div>

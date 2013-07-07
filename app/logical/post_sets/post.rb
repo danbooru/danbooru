@@ -55,7 +55,7 @@ module PostSets
     end
 
     def has_artist?
-      tag_array.any? && ::Artist.name_equals(tag_string).exists?
+      tag_array.any? && ::Artist.name_matches(tag_string).exists?
     end
 
     def artist
