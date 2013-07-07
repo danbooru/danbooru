@@ -3,15 +3,13 @@
     <h1>Search User Feedbacks</h1>
 
     <%= form_tag(user_feedbacks_path, :method => :get, :class => "simple_form") do %>
+      <%= search_field "user_name", :label => "User" %>
+
+      <%= search_field "creator_name", :label => "Creator" %>
+
       <div class="input">
-        <%= search_field "user_name", :label => "User" %>
-
-        <%= search_field "creator_name", :label => "Creator" %>
-
-        <div class="input">
-          <label for="search_category">Category</label>
-          <%= select "search", "category", %w(positive negative neutral), :include_blank => true %>
-        </div>
+        <label for="search_category">Category</label>
+        <%= select "search", "category", %w(positive negative neutral), :include_blank => true %>
       </div>
 
       <div class="input">
