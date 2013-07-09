@@ -17,7 +17,7 @@
     }
 
     if ($("#c-posts").length && $("#a-index").length) {
-      this.initialize_wiki_page_excerpt();
+      this.initialize_excerpt();
     }
 
     if ($("#c-posts").length && $("#a-show").length) {
@@ -411,30 +411,30 @@
     });
   }
 
-  Danbooru.Post.initialize_wiki_page_excerpt = function() {
-    $("#wiki-page-excerpt").hide();
+  Danbooru.Post.initialize_excerpt = function() {
+    $("#excerpt").hide();
 
     $("#show-posts-link").click(function(e) {
       $("#show-posts-link").parent("li").addClass("active");
-      $("#show-wiki-excerpt-link").parent("li").removeClass("active");
+      $("#show-excerpt-link").parent("li").removeClass("active");
       $("#posts").show();
-      $("#wiki-page-excerpt").hide();
+      $("#excerpt").hide();
       e.preventDefault();
     });
 
-    $("#show-wiki-excerpt-link").click(function(e) {
+    $("#show-excerpt-link").click(function(e) {
       if ($(this).parent("li").hasClass("active")) {
         return;
       }
       $("#show-posts-link").parent("li").removeClass("active");
-      $("#show-wiki-excerpt-link").parent("li").addClass("active");
+      $("#show-excerpt-link").parent("li").addClass("active");
       $("#posts").hide();
-      $("#wiki-page-excerpt").show();
+      $("#excerpt").show();
       e.preventDefault();
     });
 
     if (/Nobody here but us chickens/.test($("#posts").html()) && !/Deleted posts/.test($("#related-box").html())) {
-      $("#show-wiki-excerpt-link").click();
+      $("#show-excerpt-link").click();
     }
   }
 
