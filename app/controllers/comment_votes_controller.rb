@@ -1,5 +1,5 @@
 class CommentVotesController < ApplicationController
-  respond_to :js, :json
+  respond_to :js, :json, :xml
   before_filter :member_only
 
   def create
