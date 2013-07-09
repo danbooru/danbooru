@@ -130,10 +130,8 @@ $.widget( "ui.autocomplete", {
           break;
         case keyCode.TAB:
           if ( this.menu.active ) {
-            this.menu.select( event );
-          }
-          if ( !this.menu.element.is( ":visible" ) ) {
             event.preventDefault();
+            this.menu.select( event );
           }
           break;
         case keyCode.ESCAPE:
