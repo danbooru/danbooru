@@ -39,7 +39,7 @@ module PostSets
     end
 
     def pool_name
-      tag_string.match(/^pool:(\S+)$/).try(:[], 1)
+      tag_string.match(/^pool:(\S+)$/i).try(:[], 1)
     end
 
     def has_pool?
