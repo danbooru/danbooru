@@ -2,7 +2,7 @@
   <div id="a-user-promotions">
     <h1>User Promotion Confidence Intervals</h1>
 
-    <p>Binomial proportion confidence interval for how likely a user's uploads will achieve a fav count of at at least n with 95% confidence within the past 30 days.</p>
+    <p>Binomial proportion confidence interval for how likely a user's uploads will achieve a score of at at least n with 95% confidence within the past 30 days.</p>
 
     <table width="100%" class="striped" id="sortable">
       <thead>
@@ -11,7 +11,6 @@
           <th data-sort="int">Level</th>
           <th data-sort="int">Uploads</th>
           <th data-sort="string">Age</th>
-          <th data-sort="int">score:1+</th>
           <th data-sort="int">score:5+</th>
           <th data-sort="int">score:10+</th>
         </tr>
@@ -19,15 +18,16 @@
       <tbody>
         <% cache("user-promotions-report/#{Date.today}") do %>
           <% @report.users.each do |user| %>
-            <tr>
-              <td><%= link_to user.name, user_path(user.user) %></td>
-              <td data-sort-value="<%= user.level %>"><%= user.level_string %></td>
-              <td><%= user.post_upload_count %></td>
-              <td data-sort-value="<%= user.created_at.to_formatted_s(:db) %>"><%= time_ago_in_words user.created_at %></td>
-              <td><%= number_to_percentage user.confidence_interval_for(1), :precision => 0 %></td>
-              <td><%= number_to_percentage user.confidence_interval_for(5), :precision => 0 %></td>
-              <td><%= number_to_percentage user.confidence_interval_for(10), :precision => 0 %></td>
-            </tr>
+            <% if user.confidence_interval_for(5) > 0 %>
+              <tr>
+                <td><%= link_to user.name, user_path(user.user) %></td>
+                <td data-sort-value="<%= user.level %>"><%= user.level_string %></td>
+                <td><%= user.post_upload_count %></td>
+                <td data-sort-value="<%= user.created_at.to_formatted_s(:db) %>"><%= time_ago_in_words user.created_at %></td>
+                <td><%= number_to_percentage user.confidence_interval_for(5), :precision => 0 %></td>
+                <td><%= number_to_percentage user.confidence_interval_for(10), :precision => 0 %></td>
+              </tr>
+            <% end %>
           <% end %>
         <% end %>
       </tbody>
