@@ -73,6 +73,7 @@
         var before_caret_text = req.term.substring(0, this.element.get(0).selectionStart);
 
         if (before_caret_text.match(/ $/)) {
+          this.close();
           return;
         }
 
