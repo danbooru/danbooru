@@ -36,8 +36,10 @@
   }
 
   Danbooru.Post.initialize_tag_autocomplete = function() {
-    var $fields = $(
-      "#tags,#post_tag_string,#upload_tag_string,#tag-script-field," +
+    var $fields_multiple = $(
+      "#tags,#post_tag_string,#upload_tag_string,#tag-script-field"
+    );
+    var $fields_single = $(
       "#search_post_tags_match,#c-tags #search_name_matches,#c-tag-aliases #query,#c-tag-implications #query," +
       "#wiki_page_title,#artist_name," +
       "#tag_alias_request_antecedent_name,#tag_alias_request_consequent_name," +
@@ -48,7 +50,7 @@
 
     var prefixes = "-|~|general:|gen:|artist:|art:|copyright:|copy:|co:|character:|char:|ch:";
 
-    $fields.autocomplete({
+    $fields_multiple.autocomplete({
       delay: 100,
       focus: function() {
         return false;
@@ -106,14 +108,39 @@
       }
     });
 
-    $fields.on("autocompleteselect", function() {
+    $fields_multiple.on("autocompleteselect", function() {
       Danbooru.autocompleting = true;
     });
 
-    $fields.on("autocompleteclose", function() {
+    $fields_multiple.on("autocompleteclose", function() {
       // this is needed otherwise the var is disabled by the time the
       // keydown is triggered
       setTimeout(function() {Danbooru.autocompleting = false;}, 100);
+    });
+
+    $fields_single.autocomplete({
+      minLength: 1,
+      source: function(req, resp) {
+        $.ajax({
+          url: "/tags.json",
+          data: {
+            "search[order]": "count",
+            "search[name_matches]": req.term + "*",
+            "limit": 10
+          },
+          method: "get",
+          success: function(data) {
+            resp($.map(data, function(tag) {
+              return {
+                label: tag.name.replace(/_/g, " "),
+                value: tag.name,
+                category: tag.category,
+                post_count: tag.post_count
+              };
+            }));
+          }
+        });
+      }
     });
 
     var render_tag = function(list, tag) {
@@ -131,7 +158,7 @@
       return $("<li/>").data("item.autocomplete", tag).append($link).appendTo(list);
     };
 
-    $fields.each(function(i, field) {
+    $.merge($fields_multiple, $fields_single).each(function(i, field) {
       $(field).data("uiAutocomplete")._renderItem = render_tag;
     });
   }
