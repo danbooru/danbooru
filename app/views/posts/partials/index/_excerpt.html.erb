@@ -3,7 +3,7 @@
  -->
 
 <div id="excerpt" style="display: none;">
-  <% if post_set.artist %>
+  <% if post_set.has_artist? %>
     <% unless post_set.artist.notes.blank? %>
       <div class="prose">
         <%= format_text(post_set.artist.notes) %>
@@ -39,7 +39,7 @@
 
       <p>Read the <%= link_to "full article", wiki_page_path(post_set.wiki_page.id) %>.</p>
     </div>
-  <% elsif post_set.wiki_page %>
+  <% elsif post_set.has_wiki? %>
     <div class="prose">
       <%= format_text(post_set.wiki_page.presenter.excerpt) %>
 
@@ -50,6 +50,18 @@
       <%= wiki_page_alias_and_implication_list(post_set.wiki_page) %>
 
       <p>Read the <%= link_to "full article", wiki_page_path(post_set.wiki_page.id) %>.</p>
+    </div>
+  <% elsif post_set.has_pool? %>
+    <h4>
+      <%= post_set.pool.pretty_category %>:
+      <%= link_to post_set.pool.pretty_name, pool_path(post_set.pool), :class => "pool-category-#{post_set.pool.category}" %>
+      <% if post_set.pool.is_deleted? %>
+        <span class="inactive">(deleted)</span>
+      <% end %>
+    </h4>
+
+    <div id="description" class="prose">
+      <%= format_text(post_set.pool.description) %>
     </div>
   <% else %>
     <% if post_set.tag_string.present? %>

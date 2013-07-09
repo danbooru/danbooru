@@ -23,6 +23,8 @@
           <li><%= link_to "Artist", artist_path(@post_set.artist), :id => "show-excerpt-link" %></li>
         <% elsif @post_set.has_wiki? %>
           <li><%= link_to "Wiki", wiki_page_path(@post_set.wiki_page), :id => "show-excerpt-link" %></li>
+        <% elsif @post_set.has_pool? %>
+          <li><%= link_to "Pool", pool_path(@post_set.pool), :id => "show-excerpt-link" %></li>
         <% end %>
       </menu>
 

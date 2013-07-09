@@ -30,6 +30,26 @@ module PostSets
       end
     end
 
+    def has_artist?
+      tag_array.any? && ::Artist.name_matches(tag_string).exists?
+    end
+
+    def artist
+      ::Artist.name_matches(tag_string).first
+    end
+
+    def pool_name
+      tag_string.match(/^pool:(\S+)$/).try(:[], 1)
+    end
+
+    def has_pool?
+      tag_array.size == 1 && pool_name && pool
+    end
+
+    def pool
+      ::Pool.find(::Pool.name_to_id(pool_name))
+    end
+
     def has_deleted?
       CurrentUser.is_gold? && tag_string !~ /status/ && ::Post.tag_match("#{tag_string} status:deleted").exists?
     end
@@ -52,14 +72,6 @@ module PostSets
         temp.all
         temp
       end
-    end
-
-    def has_artist?
-      tag_array.any? && ::Artist.name_matches(tag_string).exists?
-    end
-
-    def artist
-      ::Artist.name_matches(tag_string).first
     end
 
     def is_single_tag?
