@@ -98,6 +98,8 @@ protected
   end
 
   def normalize_search
-    params[:search] ||= {}
+    if request.get?
+      params[:search] ||= {}
+    end
   end
 end
