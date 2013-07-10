@@ -1,6 +1,6 @@
 class IntroPresenter
   def popular_tags
-    Tag.where("category = 3").order("post_count desc").limit(12).map(&:name)
+    Tag.where("category = 3").order("post_count desc").limit(8).map(&:name)
   end
 
   def each

@@ -356,5 +356,5 @@ Danbooru::Application.routes.draw do
   match "/static/benchmark" => "static#benchmark"
   match "/static/name_change" => "static#name_change", :as => "name_change"
 
-  root :to => "posts#home"
+  root :to => "posts#index"
 end
