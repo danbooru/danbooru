@@ -53,9 +53,9 @@ class Advertisement < ActiveRecord::Base
 
       File.chmod(0644, image_path)
       File.open(image_path, "rb") do |file|
-        image_size = ImageSize.new(file.read)
-        self.width = image_size.get_width
-        self.height = image_size.get_height
+        image_size = ImageSpec.new(file)
+        self.width = image_size.width
+        self.height = image_size.height
       end
 
       if width > height

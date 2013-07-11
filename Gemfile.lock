@@ -153,6 +153,7 @@ GEM
       json (~> 1.4)
     ref (1.0.4)
     rmagick (2.13.2)
+    ruby-imagespec (0.3.1)
     ruby-prof (0.13.0)
     sass (3.2.7)
     sass-rails (3.2.6)
@@ -236,6 +237,7 @@ DEPENDENCIES
   pry
   rails (= 3.2.12)
   rmagick
+  ruby-imagespec
   ruby-prof
   sanitize!
   sass-rails

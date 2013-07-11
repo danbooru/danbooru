@@ -22,7 +22,7 @@ class UploadTest < ActiveSupport::TestCase
       teardown do
         FileUtils.rm_f(Dir.glob("#{Rails.root}/tmp/test.*"))
       end
-      
+
       context "from a user that is limited" do
         setup do
           CurrentUser.user = FactoryGirl.create(:user, :created_at => 1.year.ago)
@@ -62,6 +62,13 @@ class UploadTest < ActiveSupport::TestCase
       end
 
       context "image size calculator" do
+        should "discover the dimensions for a compressed SWF" do
+          @upload = FactoryGirl.create(:upload, :file_path => "#{Rails.root}/test/files/compressed.swf")
+          @upload.calculate_dimensions(@upload.file_path)
+          assert_equal(607, @upload.image_width)
+          assert_equal(756, @upload.image_height)
+        end
+
         should "discover the dimensions for a JPG" do
           @upload = FactoryGirl.create(:jpg_upload)
           assert_nothing_raised {@upload.calculate_dimensions(@upload.file_path)}
