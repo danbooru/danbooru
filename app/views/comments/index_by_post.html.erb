@@ -7,7 +7,7 @@
     <% end %>
 
     <% @posts.select {|x| Danbooru.config.can_user_see_post?(CurrentUser.user, x)}.each do |post| %>
-      <div class="post <%= PostPresenter.preview_class(post) %>" data-tags="<%= post.tag_string %>" data-uploader="<%= post.uploader_name %>" data-rating="<%= post.rating %>" data-flags="<%= post.status %>" data-score="<%= post.score %>" data-fav-count="<%= post.fav_count %>" data-parent-id="<%= post.parent_id %>" data-has-children="<%= post.has_children? %>" data-id="<%= post.id %>" data-width="<%= post.image_width %>" data-height="<%= post.image_height %>">
+      <div class="post <%= PostPresenter.preview_class(post) %>" <%= PostPresenter.preview_attributes(post) %>>
         <div class="preview">
           <%= link_to(image_tag(post.preview_file_url), post_path(post)) %>
         </div>
