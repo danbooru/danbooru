@@ -280,7 +280,7 @@ class Pool < ActiveRecord::Base
     if post_ids_changed? || name_changed? || description_changed? || is_active_changed? || is_deleted_changed? || category_changed? || force
       last_version = versions.last
 
-      if last_version && CurrentUser.ip_addr == last_version.updater_ip_addr && CurrentUser.id == last_version.updater_id
+      if last_version && CurrentUser.ip_addr == last_version.updater_ip_addr && CurrentUser.id == last_version.updater_id && last_version.created_at > 1.hour.ago
         last_version.update_column(:post_ids, post_ids)
         last_version.update_column(:name, name)
       else
