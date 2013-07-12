@@ -19,6 +19,9 @@
   <meta name="enable-auto-complete" content="<%= CurrentUser.user.enable_auto_complete %>">
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
   <%= stylesheet_link_tag "application", :media => "screen" %>
+  <style>
+    <%= CurrentUser.user.custom_style %>
+  </style>
   <%= javascript_include_tag "application" %>
   <%= raw Danbooru.config.custom_html_header_content %>
   <%= yield :html_header %>
