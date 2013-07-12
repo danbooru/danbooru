@@ -6,6 +6,9 @@
       this.initialize_buttons();
       $("#related-tags-container").hide();
       $("#artist-tags-container").hide();
+      $("#upload_tag_string,#post_tag_string").keyup(function(e) {
+        Danbooru.RelatedTag.build_all();
+      });
     }
   }
 
