@@ -201,6 +201,10 @@ class AnonymousUser
     true
   end
 
+  def custom_style
+    nil
+  end
+
   %w(member banned gold builder platinum contributor janitor moderator admin).each do |name|
     define_method("is_#{name}?") do
       false
