@@ -33,7 +33,7 @@ class PoolsController < ApplicationController
 
   def create
     @pool = Pool.create(params[:pool])
-    respond_with(@pool, :notice => "Pool created")
+    respond_with(@pool)
   end
 
   def update
@@ -42,7 +42,7 @@ class PoolsController < ApplicationController
     @pool.attributes = params[:pool]
     @pool.synchronize!
     @pool.save
-    respond_with(@pool, :notice => "Pool updated")
+    respond_with(@pool)
   end
 
   def destroy
@@ -52,7 +52,8 @@ class PoolsController < ApplicationController
     end
     @pool.update_attribute(:is_deleted, true)
     @pool.create_mod_action_for_delete
-    respond_with(@pool, :notice => "Pool deleted")
+    flash[:notice] = "Pool deleted"
+    respond_with(@pool)
   end
 
   def undelete
@@ -62,7 +63,8 @@ class PoolsController < ApplicationController
     end
     @pool.update_attribute(:is_deleted, false)
     @pool.create_mod_action_for_undelete
-    respond_with(@pool, :notice => "Pool undeleted")
+    flash[:notice] = "Pool undeleted"
+    respond_with(@pool)
   end
 
   def revert
