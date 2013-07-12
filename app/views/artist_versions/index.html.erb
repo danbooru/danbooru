@@ -11,6 +11,9 @@
             <th>Group</th>
             <th>Updated</th>
             <th>Updated by</th>
+            <% if CurrentUser.is_janitor? %>
+              <th>IP Address</th>
+            <% end %>
             <th>Active</th>
             <th>URLs</th>
             <% if CurrentUser.is_member? %>
@@ -28,6 +31,11 @@
               <td><%= artist_version.group_name %></td>
               <td><%= compact_time artist_version.created_at %></td>
               <td><%= link_to_user artist_version.updater %></td>
+              <% if CurrentUser.is_janitor? %>
+                <td>
+                  <%= artist_version.updater_ip_addr %>
+                </td>
+              <% end %>
               <td><%= artist_version.is_active? %></td>
               <td>
                 <ul>
