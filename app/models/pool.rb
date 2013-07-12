@@ -289,6 +289,10 @@ class Pool < ActiveRecord::Base
     end
   end
 
+  def last_page
+    (post_count / CurrentUser.user.per_page.to_f).ceil
+  end
+
   def reload(options = {})
     super
     @neighbor_posts = nil
