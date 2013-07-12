@@ -80,6 +80,7 @@
         $("#basic-settings-section,#change-password-section,#advanced-settings-section").hide();
         $target.addClass("active")
         $($target.attr("href") + "-section").show();
+        e.preventDefault();
       });
     });
   </script>
