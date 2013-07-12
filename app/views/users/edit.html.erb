@@ -3,7 +3,7 @@
     <h1>Settings</h1>
 
     <%= simple_form_for @user do |f| %>
-      <h2 id="edit-options"><%= link_to "Basic settings", "#basic-settings", :class => 'active' %> | <%= link_to "Advanced settings", "#advanced-settings" %> | <%= link_to "Change password", "#change-password" %> | <%= link_to "Delete account", maintenance_user_deletion_path %></h2>
+      <h2 id="edit-options"><%= link_to "Basic settings", "#basic-settings", :class => 'active' %> | <%= link_to "Advanced settings", "#advanced-settings" %> | <%= link_to "Change password", "#change-password" %> | <%= link_to "Delete account", maintenance_user_deletion_path, :id => "delete-account" %></h2>
 
       <fieldset id="basic-settings-section">
         <div class="input">
@@ -74,7 +74,7 @@
   <script type="text/javascript">
     $(function() {
       $("#change-password-section,#advanced-settings-section").hide();
-      $("#edit-options a").on("click", function(e) {
+      $("#edit-options a:not(#delete-account)").on("click", function(e) {
         var $target = $(e.target);
         $("h2 a").removeClass("active");
         $("#basic-settings-section,#change-password-section,#advanced-settings-section").hide();
