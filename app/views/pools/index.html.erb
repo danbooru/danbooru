@@ -6,7 +6,6 @@
         <tr>
           <th width="5%"></th>
           <th width="60%">Name</th>
-          <th width="25%">Creator</th>
           <th width="10%">Count</th>
         </tr>
       </thead>
@@ -18,9 +17,6 @@
             </td>
             <td>
               <%= link_to h(pool.pretty_name), pool_path(pool), :class => "pool-category-#{pool.category}" %>
-            </td>
-            <td>
-              <%= link_to_user pool.creator %>
             </td>
             <td>
               <%= pool.post_count %>
