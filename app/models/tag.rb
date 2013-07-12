@@ -575,24 +575,14 @@ class Tag < ActiveRecord::Base
         q = q.limit(params[:limit].to_i)
       end
 
-      if params[:order] == "name"
+      params[:order] ||= params.delete(:sort)
+      case params[:order]
+      when "name"
         q = q.reorder("name")
-
-      elsif params[:order] == "date"
+      when "date"
         q = q.reorder("id desc")
-
-      elsif params[:order] == "count"
+      when "count"
         q = q.reorder("post_count desc")
-
-      elsif params[:sort] == "date"
-        q = q.reorder("id desc")
-
-      elsif params[:sort] == "name"
-        q = q.reorder("name")
-
-      elsif params[:sort] == "count"
-        q = q.reorder("post_count desc")
-
       else
         q = q.reorder("id desc")
       end

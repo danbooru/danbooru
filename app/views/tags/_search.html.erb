@@ -21,10 +21,10 @@
       </tr>
 
       <tr>
-        <th><label for="search_sort">Sort</label></th>
+        <th><label for="search_order">Order</label></th>
         <td>
           <div class="input">
-            <%= select "search", "sort", %w(count date name), :selected => params[:search][:sort] %>
+            <%= select "search", "order", %w(count date name), :selected => params[:search][:order] %>
           </div>
         </td>
       </tr>

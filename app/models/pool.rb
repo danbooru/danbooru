@@ -62,7 +62,8 @@ class Pool < ActiveRecord::Base
         q = q.where("is_active = false")
       end
 
-      case params[:sort]
+      params[:order] ||= params.delete(:sort)
+      case params[:order]
       when "name"
         q = q.order("name")
       when "created_at"
