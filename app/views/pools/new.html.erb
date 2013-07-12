@@ -2,7 +2,7 @@
   <div id="c-new">
     <%= simple_form_for(@pool) do |f| %>
       <h1>New Pool</h1>
-      <%= f.input :name %>
+      <%= f.input :name, :as => :string %>
       <%= f.input :description %>
       <%= f.input :post_ids, :label => "Posts" %>
       <%= f.input :category, :collection => ["series", "collection"], :include_blank => false %>
