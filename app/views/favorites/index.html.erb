@@ -25,7 +25,7 @@
     </section>
 
     <% content_for(:page_title) do %>
-      Favorites - <%= CurrentUser.name %> - <%= Danbooru.config.app_name %>
+      Favorites - <%= @user.pretty_name %> - <%= Danbooru.config.app_name %>
     <% end %>
 
     <%= render "posts/partials/common/secondary_links" %>

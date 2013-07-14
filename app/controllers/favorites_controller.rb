@@ -7,6 +7,7 @@ class FavoritesController < ApplicationController
       redirect_to(posts_path(:tags => params[:tags]))
     else
       user_id = params[:user_id] || CurrentUser.user.id
+      @user = User.find(user_id)
       @favorite_set = PostSets::Favorite.new(user_id, params[:page], params)
       respond_with(@favorite_set.posts) do |format|
         format.xml do
