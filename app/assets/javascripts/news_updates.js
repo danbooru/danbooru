@@ -7,6 +7,8 @@
     if (Danbooru.Cookie.get("news-ticker") == key) {
       $("#news-updates").hide();
     } else {
+      $("#news-updates").show();
+
       $("#close-news-ticker-link").click(function(e) {
         $("#news-updates").hide();
         Danbooru.Cookie.put("news-ticker", key);
