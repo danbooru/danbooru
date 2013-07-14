@@ -115,7 +115,7 @@ private
     html << %{<a class="search-tag" href="#{path}?tags=#{u(tag)}">#{h(humanized_tag)}</a> }
 
     unless options[:name_only]
-      if counts[tag].to_i > 1_000
+      if counts[tag].to_i >= 1_000
         post_count = "#{counts[tag].to_i / 1_000}k"
       else
         post_count = counts[tag].to_s

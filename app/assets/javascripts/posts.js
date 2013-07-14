@@ -148,7 +148,7 @@
       var $link = $("<a/>").addClass("tag-type-" + tag.category).text(tag.label);
 
       var count;
-      if (tag.post_count > 1000) {
+      if (tag.post_count >= 1000) {
         count = Math.floor(tag.post_count / 1000) + "k";
       } else {
         count = tag.post_count;
