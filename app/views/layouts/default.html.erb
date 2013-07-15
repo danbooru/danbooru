@@ -8,7 +8,7 @@
   <meta name="current-user-name" content="<%= CurrentUser.name %>">
   <meta name="current-user-id" content="<%= CurrentUser.id %>">
   <meta name="user-comment-threshold" content="<%= CurrentUser.comment_threshold %>">
-  <% unless CurrentUser.user.blacklisted_tags.blank? %>
+  <% if CurrentUser.user.blacklisted_tags.present? %>
     <meta name="blacklisted-tags" content="<%= CurrentUser.user.blacklisted_tags.gsub(/(?:\r|\n)+/, ",") %>">
   <% end %>
   <% if flash[:notice] =~ /error/ %>
@@ -19,9 +19,9 @@
   <meta name="enable-auto-complete" content="<%= CurrentUser.user.enable_auto_complete %>">
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
   <%= stylesheet_link_tag "application", :media => "screen" %>
-  <style>
-    <%= CurrentUser.user.custom_style %>
-  </style>
+  <% if CurrentUser.user.custom_style.present? %>
+    <style><%= CurrentUser.user.custom_style %></style>
+  <% end %>
   <%= javascript_include_tag "application" %>
   <%= raw Danbooru.config.custom_html_header_content %>
   <%= yield :html_header %>
