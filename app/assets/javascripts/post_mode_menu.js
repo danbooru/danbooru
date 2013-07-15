@@ -29,7 +29,7 @@
   Danbooru.PostModeMenu.initialize_edit_form = function() {
     $("#quick-edit-div").hide();
     $("#quick-edit-form input[value=Cancel]").click(function(e) {
-      $("#quick-edit-div").slideUp("fast");
+      Danbooru.PostModeMenu.close_edit_form();
       e.preventDefault();
     });
 
@@ -46,12 +46,19 @@
           Danbooru.Post.update_data(data);
           $("#post_" + data.id).effect("shake", {distance: 5, times: 1}, 100);
           Danbooru.notice("Post #" + data.id + " updated");
-          $("#quick-edit-div").slideUp("fast");
+          Danbooru.PostModeMenu.close_edit_form();
         }
       });
 
       e.preventDefault();
     });
+  }
+
+  Danbooru.PostModeMenu.close_edit_form = function() {
+    $("#quick-edit-div").slideUp("fast");
+    if (Danbooru.meta("enable-auto-complete") === "true") {
+      $("#post_tag_string").data("uiAutocomplete").close();
+    }
   }
 
   Danbooru.PostModeMenu.initialize_tag_script_field = function() {
