@@ -575,10 +575,6 @@ class Tag < ActiveRecord::Base
         q = q.where("post_count > 0")
       end
 
-      if params[:limit].present?
-        q = q.limit(params[:limit].to_i)
-      end
-
       params[:order] ||= params.delete(:sort)
       case params[:order]
       when "name"
