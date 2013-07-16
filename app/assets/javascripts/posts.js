@@ -37,7 +37,7 @@
 
   Danbooru.Post.initialize_tag_autocomplete = function() {
     var $fields_multiple = $(
-      "#tags,#post_tag_string,#upload_tag_string,#tag-script-field"
+      "#tags,#post_tag_string,#upload_tag_string,#tag-script-field,#c-moderator-post-queues #query"
     );
     var $fields_single = $(
       "#search_post_tags_match,#c-tags #search_name_matches,#c-tag-aliases #query,#c-tag-implications #query," +
