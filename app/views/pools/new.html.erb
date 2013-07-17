@@ -4,11 +4,11 @@
       <h1>New Pool</h1>
       <%= f.input :name, :as => :string %>
       <%= dtext_field "pool", "description" %>
-      <%= dtext_preview_button "pool", "description" %>
       <%= f.input :post_ids, :label => "Posts" %>
       <%= f.input :category, :collection => ["series", "collection"], :include_blank => false %>
       <%= f.input :is_active %>
-      <%= f.button :submit %>
+      <%= f.button :submit, "Submit" %>
+      <%= dtext_preview_button "pool", "description" %>
     <% end %>
   </div>
 </div>
