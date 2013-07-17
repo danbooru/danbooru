@@ -3,7 +3,8 @@
     <%= simple_form_for(@pool) do |f| %>
       <h1>New Pool</h1>
       <%= f.input :name, :as => :string %>
-      <%= f.input :description %>
+      <%= dtext_field "pool", "description" %>
+      <%= dtext_preview_button "pool", "description" %>
       <%= f.input :post_ids, :label => "Posts" %>
       <%= f.input :category, :collection => ["series", "collection"], :include_blank => false %>
       <%= f.input :is_active %>
