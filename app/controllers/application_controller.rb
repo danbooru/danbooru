@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base
   before_filter :set_started_at_session
   before_filter :api_check
   before_filter :set_safe_mode
-  before_filter :secure_cookies_check
+  # before_filter :secure_cookies_check
   layout "default"
 
   rescue_from User::PrivilegeError, :with => :access_denied
