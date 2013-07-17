@@ -112,6 +112,11 @@ class PostQueryBuilder
       raise ::Post::SearchError.new("You cannot search for more than #{Danbooru.config.tag_query_limit} tags at a time")
     end
 
+    if CurrentUser.safe_mode?
+      relation = relation.where(:rating => "s")
+      relation = relation.where("created_at <= ?", 3.months.ago)
+    end
+
     relation = add_range_relation(q[:post_id], "posts.id", relation)
     relation = add_range_relation(q[:mpixels], "posts.image_width * posts.image_height / 1000000.0", relation)
     relation = add_range_relation(q[:width], "posts.image_width", relation)

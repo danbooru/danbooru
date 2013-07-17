@@ -42,6 +42,18 @@ class CurrentUser
     user.name
   end
 
+  def self.safe_mode?
+    Thread.current[:safe_mode]
+  end
+
+  def self.set_safe_mode(req)
+    if req.host =~ /safe/
+      Thread.current[:safe_mode] = true
+    else
+      Thread.current[:safe_mode] = false
+    end
+  end
+
   def self.method_missing(method, *params, &block)
     if user.respond_to?(method)
       user.__send__(method, *params, &block)

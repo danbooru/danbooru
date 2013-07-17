@@ -2697,7 +2697,8 @@ CREATE TABLE users (
     per_page integer DEFAULT 20 NOT NULL,
     hide_deleted_posts boolean DEFAULT false NOT NULL,
     style_usernames boolean DEFAULT false NOT NULL,
-    enable_auto_complete boolean DEFAULT true NOT NULL
+    enable_auto_complete boolean DEFAULT true NOT NULL,
+    custom_style text
 );
 
 
@@ -6425,3 +6426,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130606224559');
 INSERT INTO schema_migrations (version) VALUES ('20130618230158');
 
 INSERT INTO schema_migrations (version) VALUES ('20130620215658');
+
+INSERT INTO schema_migrations (version) VALUES ('20130712162600');
