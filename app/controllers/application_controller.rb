@@ -8,6 +8,7 @@ class ApplicationController < ActionController::Base
   before_filter :normalize_search
   before_filter :set_started_at_session
   before_filter :api_check
+  before_filter :secure_cookies_check
   layout "default"
 
   rescue_from User::PrivilegeError, :with => :access_denied
@@ -101,5 +102,15 @@ protected
     if request.get?
       params[:search] ||= {}
     end
+  end
+
+  def secure_cookies_check
+    if true || request.ssl?
+      Danbooru::Application.config.session_store :cookie_store, :key => '_danbooru_session', :secure => true
+    else
+      Danbooru::Application.config.session_store :cookie_store, :key => '_danbooru_session', :secure => false
+    end
+    ap cookies
+    true
   end
 end

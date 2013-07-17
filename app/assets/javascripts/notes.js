@@ -467,6 +467,7 @@ Danbooru.Note = {
         return;
       }
 
+      $("#image").css("cursor", "crosshair");
       Danbooru.Note.TranslationMode.active = true;
       $(document.body).addClass("mode-translation");
       $("#original-file-link").click();
@@ -479,6 +480,7 @@ Danbooru.Note = {
 
     stop: function() {
       Danbooru.Note.TranslationMode.active = false;
+      $("#image").css("cursor", "auto");
       $("#image").unbind("mousedown", Danbooru.Note.TranslationMode.Drag.start);
       $(window).unbind("mouseup", Danbooru.Note.TranslationMode.Drag.stop);
       $(document.body).removeClass("mode-translation");
