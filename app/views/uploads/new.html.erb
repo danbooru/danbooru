@@ -13,6 +13,15 @@
     <%= error_messages_for "upload" %>
 
     <%= form_for(@upload, :html => {:multipart => true, :class => "simple_form", :id => 'form'}) do |f| %>
+      <% if CurrentUser.is_contributor? %>
+        <div class="input">
+          <label for="upload_as_pending">
+            <%= f.check_box :as_pending %>
+            Upload for approval
+          </label>
+        </div>
+      <% end %>
+
       <div class="input">
         <%= f.label :file %>
         <%= f.file_field :file, :size => 50 %>
@@ -56,15 +65,6 @@
         <%= button_tag "Characters", :id => "related-characters-button", :type => "button" %>
         <%= button_tag "Copyrights", :id => "related-copyrights-button", :type => "button" %>
       </div>
-
-      <% if CurrentUser.is_contributor? %>
-        <div class="input">
-          <label for="upload_as_pending">
-            <%= f.check_box :as_pending %>
-            Upload for approval
-          </label>
-        </div>
-      <% end %>
 
       <div class="input">
         <%= submit_tag "Submit", :class => "large" %>
