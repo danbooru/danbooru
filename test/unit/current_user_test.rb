@@ -6,6 +6,20 @@ class CurrentUserTest < ActiveSupport::TestCase
     CurrentUser.ip_addr = nil
   end
 
+  context ".safe_mode?" do
+    should "return true if the host contains the string host" do
+      req = mock(:host => "safebooru")
+      CurrentUser.set_safe_mode(req)
+      assert_equal(true, CurrentUser.safe_mode?)
+    end
+
+    should "return false if the host does not contain the string host" do
+      req = mock(:host => "danbooru")
+      CurrentUser.set_safe_mode(req)
+      assert_equal(false, CurrentUser.safe_mode?)
+    end
+  end 
+
   context "The current user" do
     should "be set only within the scope of the block" do
       user = FactoryGirl.create(:user)
