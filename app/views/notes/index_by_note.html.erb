@@ -8,7 +8,6 @@
           <th>Post</th>
           <th>Created by</th>
           <th>Created at</th>
-          <th>Active?</th>
           <th>Body</th>
         </tr>
       </thead>
@@ -18,8 +17,12 @@
             <td><%= link_to note.post_id, post_path(note.post_id) %></td>
             <td><%= link_to_user note.creator %></td>
             <td><%= compact_time(note.created_at) %></td>
-            <td><%= note.is_active? %></td>
-            <td><%= format_text(note.body) %></td>
+            <td>
+              <%= h(note.body) %>
+              <% unless note.is_active? %>
+                <span class="inactive">(deleted)</span>
+              <% end %>
+            </td>
           </tr>
         <% end %>
       </tbody>

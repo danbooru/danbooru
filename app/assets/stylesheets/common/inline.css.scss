@@ -33,3 +33,7 @@ span.key {
   @include inline-block;
   @include border-radius(3px);
 }
+
+span.inactive {
+  color: #AAA;
+}
