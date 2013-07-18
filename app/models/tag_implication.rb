@@ -110,7 +110,7 @@ class TagImplication < ActiveRecord::Base
 
   def process!
     update_column(:status, "processing")
-    update_posts_for_create
+    update_posts
     update_column(:status, "active")
     update_descendant_names_for_parent
   rescue Exception => e
@@ -125,10 +125,9 @@ class TagImplication < ActiveRecord::Base
     end
   end
 
-  def update_posts_for_create
-    Post.tag_match("#{antecedent_name} status:any").find_each do |post|
-      escaped_antecedent_name = Regexp.escape(antecedent_name)
-      fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_antecedent_name}(?:\Z| )/, " #{antecedent_name} #{descendant_names} ").strip
+  def update_posts
+    Post.raw_tag_match(antecedent_name).find_each do |post|
+      fixed_tags = "#{post.tag_string} #{descendant_names}".strip
       CurrentUser.scoped(creator, creator_ip_addr) do
         post.update_attributes(
           :tag_string => fixed_tags
