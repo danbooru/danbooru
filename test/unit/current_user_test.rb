@@ -6,6 +6,10 @@ class CurrentUserTest < ActiveSupport::TestCase
     CurrentUser.ip_addr = nil
   end
 
+  teardown do
+    Thread.current[:safe_mode] = false
+  end
+
   context ".safe_mode?" do
     should "return true if the host contains the string host" do
       req = mock(:host => "safebooru")
