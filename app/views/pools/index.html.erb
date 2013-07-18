@@ -16,7 +16,7 @@
 
             </td>
             <td>
-              <%= link_to h(pool.pretty_name), pool_path(pool), :class => "pool-category-#{pool.category}" %>
+              <%= link_to pool.pretty_name, pool_path(pool), :class => "pool-category-#{pool.category}" %>
 
               <% if pool.post_count > CurrentUser.user.per_page %>
                 <%= link_to "page #{pool.last_page}", pool_path(pool, :page => pool.last_page), :class => "last-page" %>
