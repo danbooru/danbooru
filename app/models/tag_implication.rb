@@ -15,7 +15,7 @@ class TagImplication < ActiveRecord::Base
     module ClassMethods
       # assumes names are normalized
       def with_descendants(names)
-        (names + where("antecedent_name in (?) and status = ?", names, "active").map(&:descendant_names_array)).flatten.uniq
+        (names + where("antecedent_name in (?) and status in (?)", names, ["active", "processing"]).map(&:descendant_names_array)).flatten.uniq
       end
     end
 
@@ -26,7 +26,7 @@ class TagImplication < ActiveRecord::Base
 
           until children.empty?
             all.concat(children)
-            children = TagImplication.where("antecedent_name IN (?) and status = ?", children, "active").all.map(&:consequent_name)
+            children = TagImplication.where("antecedent_name IN (?) and status in (?)", children, ["active", "processing"]).all.map(&:consequent_name)
           end
         end.sort.uniq
       end
