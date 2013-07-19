@@ -1032,10 +1032,6 @@ class Post < ActiveRecord::Base
       where("is_deleted = ?", true)
     end
 
-    def visible(user)
-      Danbooru.config.can_user_see_post_conditions(user)
-    end
-
     def commented_before(date)
       where("last_commented_at < ?", date).order("last_commented_at DESC")
     end
@@ -1150,6 +1146,13 @@ class Post < ActiveRecord::Base
   include ApiMethods
   extend SearchMethods
   include PixivMethods
+
+  def visible?
+    return false if !Danbooru.config.can_user_see_post?(CurrentUser.user, self)
+    return false if CurrentUser.safe_mode? && rating != "s"
+    return false if is_banned? && !CurrentUser.is_gold?
+    return true
+  end
 
   def reload(options = nil)
     super
