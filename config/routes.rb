@@ -211,6 +211,7 @@ Danbooru::Application.routes.draw do
     collection do
       get :upgrade_information
       get :search
+      get :custom_style
     end
 
     member do

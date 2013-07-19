@@ -20,7 +20,7 @@
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
   <%= stylesheet_link_tag "application", :media => "screen" %>
   <% if CurrentUser.user.custom_style.present? %>
-    <style><%= CurrentUser.user.custom_style %></style>
+    <%= stylesheet_link_tag custom_style_users_path, :media => "screen" %>
   <% end %>
   <%= javascript_include_tag "application" %>
   <%= raw Danbooru.config.custom_html_header_content %>
