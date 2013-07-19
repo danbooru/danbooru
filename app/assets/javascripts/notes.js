@@ -327,6 +327,8 @@ Danbooru.Note = {
         $(".note-box").resizable("enable");
         $(".note-box").draggable("enable");
       });
+
+      $textarea.selectEnd();
       Danbooru.Note.editing = true;
     },
 
