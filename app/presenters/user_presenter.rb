@@ -26,7 +26,13 @@ class UserPresenter
   end
 
   def posts_for_subscription(subscription)
-    Post.where("id in (?)", subscription.post_id_array.slice(0, 6).map(&:to_i)).order("id desc")
+    arel = Post.where("id in (?)", subscription.post_id_array.map(&:to_i)).order("id desc").limit(6)
+
+    if CurrentUser.user.hide_deleted_posts?
+      arel = arel.undeleted
+    end
+
+    arel
   end
 
   def tag_links_for_subscription(template, subscription)
@@ -60,7 +66,15 @@ class UserPresenter
   end
 
   def favorites
-    @favorites ||= user.favorites.limit(6).includes(:post).reorder("favorites.id desc").map(&:post)
+    @favorites ||= begin
+      arel = user.favorites.limit(6).includes(:post).reorder("favorites.id desc")
+
+      if CurrentUser.user.hide_deleted_posts?
+        arel = arel.where("posts.is_deleted = false")
+      end
+
+      arel.map(&:post)
+    end
   end
 
   def has_favorites?
