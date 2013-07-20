@@ -36,7 +36,7 @@ class ForumPostTest < ActiveSupport::TestCase
       should "update the topic's updated_at when deleted" do
         @posts.last.destroy
         @topic.reload
-        assert_equal(@posts[0].updated_at.to_s, @topic.updated_at.to_s)
+        assert_equal(@posts[8].updated_at.to_s, @topic.updated_at.to_s)
       end
     end
 
