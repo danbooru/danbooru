@@ -2,7 +2,7 @@ class Tag < ActiveRecord::Base
   METATAGS = "-user|user|-approver|approver|commenter|comm|noter|-pool|pool|-fav|fav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|score|favcount|filesize|source|-source|id|-id|date|age|order|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|-parent|pixiv_id|pixiv"
   attr_accessible :category, :as => [:moderator, :janitor, :contributor, :gold, :member, :anonymous, :default, :builder, :admin]
   attr_accessible :is_locked, :as => [:moderator, :janitor, :admin]
-  has_one :wiki_page, :foreign_key => "name", :primary_key => "title"
+  has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
 
   module ApiMethods
     def to_legacy_json
