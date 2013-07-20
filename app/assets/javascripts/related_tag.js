@@ -31,7 +31,10 @@
 
   Danbooru.RelatedTag.common_bind = function(button_name, category) {
     $(button_name).click(function(e) {
-      $("#related-tags").html("<em>Loading...</em>");
+      var $dest = $("#related-tags");
+      $dest.empty();
+      Danbooru.RelatedTag.build_recent_and_frequent($dest);
+      $dest.append("<em>Loading...</em>");
       $("#related-tags-container").show();
       $.get("/related_tag.json", {
         "query": Danbooru.RelatedTag.current_tag(),
@@ -108,14 +111,8 @@
     var $dest = $("#related-tags");
     $dest.empty();
 
-    var recent_tags = Danbooru.Cookie.get("recent_tags_with_categories");
-    var favorite_tags = Danbooru.Cookie.get("favorite_tags_with_categories");
-    if (recent_tags.length) {
-      $dest.append(this.build_html("recent", this.other_tags(recent_tags)));
-    }
-    if (favorite_tags.length) {
-      $dest.append(this.build_html("frequent", this.other_tags(favorite_tags)));
-    }
+    this.build_recent_and_frequent($dest);
+
     $dest.append(this.build_html(query, related_tags));
     if (wiki_page_tags.length) {
       $dest.append(Danbooru.RelatedTag.build_html("wiki:" + query, wiki_page_tags));
@@ -140,6 +137,17 @@
         });
       }
      $dest.append(Danbooru.RelatedTag.build_html("artist", tags, true));
+    }
+  }
+
+  Danbooru.RelatedTag.build_recent_and_frequent = function($dest) {
+    var recent_tags = Danbooru.Cookie.get("recent_tags_with_categories");
+    var favorite_tags = Danbooru.Cookie.get("favorite_tags_with_categories");
+    if (recent_tags.length) {
+      $dest.append(this.build_html("recent", this.other_tags(recent_tags)));
+    }
+    if (favorite_tags.length) {
+      $dest.append(this.build_html("frequent", this.other_tags(favorite_tags)));
     }
   }
 
