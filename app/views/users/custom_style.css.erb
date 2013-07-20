@@ -1,1 +1,1 @@
-<%= CurrentUser.user.custom_style.html_safe %>
+<%= CurrentUser.user.custom_style.gsub(/(?:!important)?\s*;?\s*\}/, "!important;}").html_safe %>
