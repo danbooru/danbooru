@@ -19,7 +19,10 @@
       $("#mode-box select").val(Danbooru.Cookie.get("mode"));
     }
 
-    $("#mode-box select").change(Danbooru.PostModeMenu.change);
+    $("#mode-box select").change(function(e) {
+      Danbooru.PostModeMenu.change();
+      $("#tag-script-field:visible").focus().selectEnd();
+    });
   }
 
   Danbooru.PostModeMenu.initialize_preview_link = function() {
@@ -69,12 +72,12 @@
         Danbooru.Cookie.put("tag-script", script);
       } else {
         $("#mode-box select").val("view");
-        Danbooru.PostModeMenu.change(e);
+        Danbooru.PostModeMenu.change();
       }
     });
   }
 
-  Danbooru.PostModeMenu.change = function(e) {
+  Danbooru.PostModeMenu.change = function() {
     $("#quick-edit-div").slideUp("fast");
     var s = $("#mode-box select").val();
     if (s === undefined) {
@@ -88,7 +91,7 @@
     if (s === "tag-script") {
       var script = Danbooru.Cookie.get("tag-script");
 
-      $("#tag-script-field").val(script).show().focus().selectEnd();
+      $("#tag-script-field").val(script).show();
     } else {
       $("#tag-script-field").hide();
     }
