@@ -21,7 +21,7 @@
 
     $("#mode-box select").change(function(e) {
       Danbooru.PostModeMenu.change();
-      $("#tag-script-field:visible").focus().selectEnd();
+      $("#tag-script-field:visible").focus().select();
     });
   }
 
