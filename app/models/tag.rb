@@ -575,6 +575,12 @@ class Tag < ActiveRecord::Base
         q = q.where("post_count > 0")
       end
 
+      if params[:has_wiki] == "yes"
+        q = q.joins(:wiki_page)
+      elsif params[:has_wiki] == "no"
+        q = q.joins("LEFT JOIN wiki_pages ON tags.name = wiki_pages.title").where("wiki_pages.title IS NULL")
+      end
+
       params[:order] ||= params.delete(:sort)
       case params[:order]
       when "name"
