@@ -18,7 +18,11 @@ class Comment < ActiveRecord::Base
     end
 
     def body_matches(query)
-      where("body_index @@ plainto_tsquery(?)", query.to_escaped_for_tsquery_split).order("comments.id DESC")
+      if query =~ /\*/ && CurrentUser.user.is_builder?
+        where("body ILIKE ? ESCAPE E'\\\\'", query.to_escaped_for_sql_like)
+      else
+        where("body_index @@ plainto_tsquery(?)", query.to_escaped_for_tsquery_split).order("comments.id DESC")
+      end
     end
 
     def hidden(user)

@@ -17,7 +17,11 @@ class ForumPost < ActiveRecord::Base
 
   module SearchMethods
     def body_matches(body)
-      where("forum_posts.text_index @@ plainto_tsquery(E?)", body.to_escaped_for_tsquery)
+      if body =~ /\*/ && CurrentUser.user.is_builder?
+        where("forum_posts.body ILIKE ? ESCAPE E'\\\\'", body.to_escaped_for_sql_like)
+      else
+        where("forum_posts.text_index @@ plainto_tsquery(E?)", body.to_escaped_for_tsquery)
+      end
     end
 
     def for_user(user_id)
