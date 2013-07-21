@@ -45,8 +45,8 @@
         <%= f.input :style_usernames, :as => :select, :label => "Colored usernames", :hint => "Color each user's name depending on their level", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
         <%= f.input :always_resize_images, :as => :select, :include_blank => false, :label => "Fit images to window", :hint => "Use JavaScript to resize images to fit window" %>
         <%= f.input :enable_post_navigation, :as => :select, :include_blank => false, :label => "Enable keyboard shortcuts" %>
-        <%= f.input :new_post_navigation_layout, :as => :select, :label => "Navigation bar position", :include_blank => false, :collection => [["Below", "true"], ["Above", "false"]], :hint => "When browsing pools or slideshows, place navigation links above or below the image" %>
         <%= f.input :enable_sequential_post_navigation, :as => :select, :label => "Enable slideshow mode", :hint => "Show prev/next links when viewing a post", :include_blank => false %>
+        <%= f.input :new_post_navigation_layout, :as => :select, :label => "Navigation bar position", :include_blank => false, :collection => [["Below", "true"], ["Above", "false"]], :hint => "When browsing pools or slideshows, place navigation links above or below the image" %>
         <%= f.input :hide_deleted_posts, :as => :select, :label => "Deleted post filter", :hint => "Remove deleted posts from search results", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
         <%= f.input :enable_auto_complete, :as => :select, :collection => [["Yes", "true"], ["No", "false"]], :include_blank => false %>
         <div class="input text optional field_with_hint">
