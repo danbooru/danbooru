@@ -15,6 +15,7 @@
     <meta name="errors" content="true">
   <% end %>
   <meta name="enable-js-navigation" content="<%= CurrentUser.user.enable_post_navigation %>">
+  <meta name="new_post_navigation_layout" content="<%= CurrentUser.user.new_post_navigation_layout %>">
   <meta name="default-image-size" content="<%= CurrentUser.user.default_image_size %>">
   <meta name="enable-auto-complete" content="<%= CurrentUser.user.enable_auto_complete %>">
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
