@@ -433,7 +433,7 @@
       e.preventDefault();
     });
 
-    if (/Nobody here but us chickens/.test($("#posts").html()) && !/Deleted posts/.test($("#related-box").html())) {
+    if (!$(".post-preview").length && /Nobody here but us chickens/.test($("#posts").html()) && !/Deleted posts/.test($("#related-box").html())) {
       $("#show-excerpt-link").click();
     }
   }
