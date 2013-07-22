@@ -103,6 +103,7 @@ class User < ActiveRecord::Base
 
     def update_cache
       Cache.put("uin:#{id}", name)
+      Cache.put("uni:#{Cache.sanitize(name)}", id)
     end
 
     def update_remote_cache
