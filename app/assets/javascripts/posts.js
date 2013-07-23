@@ -65,6 +65,11 @@
     dialog.dialog({
       title: "Edit",
       width: "auto",
+      drag: function(e, ui) {
+        if (Danbooru.meta("enable-auto-complete") === "true") {
+          $("#post_tag_string").data("uiAutocomplete").close();
+        }
+      },
       close: Danbooru.Post.close_edit_dialog
     });
     dialog.dialog("widget").draggable("option", "containment", "none");
