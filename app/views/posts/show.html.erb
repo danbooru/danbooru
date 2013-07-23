@@ -119,6 +119,7 @@
 
   <% if @post.presenter.next_post_in_pool %>
     <link rel="prefetch" href="<%= post_path(@post.presenter.next_post_in_pool, :pool_id => params[:pool_id]) %>">
+    <link rel="prerender" href="<%= post_path(@post.presenter.next_post_in_pool, :pool_id => params[:pool_id]) %>">
   <% end %>
 <% end %>
 
