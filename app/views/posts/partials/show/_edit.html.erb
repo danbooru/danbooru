@@ -63,6 +63,7 @@
     <div>
       <%= f.label :tag_string, "Tags" %>
       <%= f.text_area :tag_string, :size => "50x5", :value => post.presenter.categorized_tag_string + " " %>
+      <span id="open-post-edit-dialog" class="ui-icon ui-icon-arrow-2-ne-sw" title="detach"/>
     </div>
 
     <%= button_tag "Related tags", :id => "related-tags-button", :type => "button" %>
@@ -76,7 +77,7 @@
   </div>
 
   <div id="related-tags-container">
-    <h1>Related Tags</h1>
+    <h1>Related Tags <a href="#" id="toggle-related-tags-link" style="display: none;">&raquo;</a></h1>
     <div id="related-tags" class="related-tags">
     </div>
   </div>
