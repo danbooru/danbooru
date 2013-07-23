@@ -102,6 +102,9 @@
     if (Danbooru.RelatedTag.recent_search === null || Danbooru.RelatedTag.recent_search === undefined) {
       return;
     }
+    if ($("#post-edit-dialog").length && !$("#related-tags").is(":visible")) {
+      return;
+    }
 
     $("#related-tags").show();
 

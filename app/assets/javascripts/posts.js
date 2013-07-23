@@ -28,11 +28,65 @@
       this.initialize_post_image_resize_links();
       this.initialize_post_image_resize_to_window_link();
       this.initialize_similar();
+      this.initialize_edit_dialog();
 
       if (Danbooru.meta("always-resize-images") === "true") {
         $("#image-resize-to-window-link").click();
       }
     }
+  }
+
+  Danbooru.Post.initialize_edit_dialog = function(e) {
+    $("#open-post-edit-dialog").button().click(this.open_edit_dialog);
+
+    $("#toggle-related-tags-link").click(function(e) {
+      if ($("#related-tags").is(":visible")) {
+        $("#related-tags").hide();
+        $(e.target).html("&laquo;");
+      } else {
+        $("#related-tags").show();
+        Danbooru.RelatedTag.build_all();
+        $(e.target).html("&raquo;");
+      }
+      e.preventDefault();
+    });
+  }
+
+  Danbooru.Post.open_edit_dialog = function(e) {
+    $("div.input:has(#post_tag_string)").prevAll().hide();
+    $("#open-post-edit-dialog").hide();
+
+    $("#toggle-related-tags-link").show();
+
+    $("#post_tag_string").css({"resize": "none", "width": "100%"});
+
+    var dialog = $("<div/>").attr("id", "post-edit-dialog");
+    $("#form").appendTo(dialog);
+    dialog.dialog({
+      title: "Edit",
+      width: "auto",
+      close: Danbooru.Post.close_edit_dialog
+    });
+    dialog.dialog("widget").draggable("option", "containment", "none");
+
+    dialog.parent().mouseout(function(e) {
+      dialog.parent().css("opacity", 0.4);
+    })
+    .mouseover(function(e) {
+      dialog.parent().css("opacity", 1);
+    });
+
+    e.preventDefault();
+  }
+
+  Danbooru.Post.close_edit_dialog = function(e, ui) {
+    $("#form").appendTo($("#edit"));
+    $("#post-edit-dialog").remove();
+    $("#related-tags").show();
+    $("#toggle-related-tags-link").html("&raquo;").hide();
+    $("div.input:has(#post_tag_string)").prevAll().show();
+    $("#open-post-edit-dialog").show();
+    $("#post_tag_string").css({"resize": "", "width": ""});
   }
 
   Danbooru.Post.initialize_tag_autocomplete = function() {
