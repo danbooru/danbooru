@@ -75,7 +75,7 @@
     dialog.dialog("widget").draggable("option", "containment", "none");
 
     dialog.parent().mouseout(function(e) {
-      dialog.parent().css("opacity", 0.4);
+      dialog.parent().css("opacity", 0.6);
     })
     .mouseover(function(e) {
       dialog.parent().css("opacity", 1);
