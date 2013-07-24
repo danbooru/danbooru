@@ -1,4 +1,6 @@
 class PostPresenter < Presenter
+  attr_reader :pool, :next_post_in_pool
+
   def self.preview(post, options = {})
     if post.is_deleted? && options[:tags] !~ /status:(?:all|any|deleted|banned)/ && !options[:raw]
       return ""
@@ -231,6 +233,7 @@ class PostPresenter < Presenter
     pool_html << '</span> '
 
     if pool.neighbors(@post).next
+      @next_post_in_pool = pool.neighbors(@post).next
       pool_html << template.link_to("next&thinsp;&rsaquo;".html_safe, template.post_path(pool.neighbors(@post).next, :pool_id => pool.id), :rel => next_rel, :class => "#{klass} next", :title => "to page #{pool.page_number(pool.neighbors(@post).next)}")
       match_found = true
     else

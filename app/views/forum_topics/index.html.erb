@@ -2,6 +2,11 @@
   <div id="a-index">
     <h1>Forum</h1>
 
+    <p>
+      Categories:
+      <%= link_to "All", forum_topics_path %>, <%= ForumTopic::CATEGORIES.map {|id, name| link_to_unless_current(name, forum_topics_path(:search => {:category_id => id}))}.join(", ").html_safe %>
+    </p>
+
     <table width="100%" class="striped">
       <thead>
         <tr>
@@ -13,7 +18,7 @@
       </thead>
       <tbody>
         <% @forum_topics.each do |topic| %>
-          <tr class="forum-topic-row">
+          <tr class="forum-topic-row forum-topic-category-<%= topic.category_id %>">
             <td>
               <% if topic.is_sticky? %>
                 <span class="sticky">Sticky:</span>
