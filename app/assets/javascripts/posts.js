@@ -42,11 +42,11 @@
     $("#toggle-related-tags-link").click(function(e) {
       if ($("#related-tags").is(":visible")) {
         $("#related-tags").hide();
-        $(e.target).html("&laquo;");
+        $(e.target).html("&raquo;");
       } else {
         $("#related-tags").show();
         Danbooru.RelatedTag.build_all();
-        $(e.target).html("&raquo;");
+        $(e.target).html("&laquo;");
       }
       e.preventDefault();
     });
@@ -56,7 +56,7 @@
     $("div.input:has(#post_tag_string)").prevAll().hide();
     $("#open-post-edit-dialog").hide();
 
-    $("#toggle-related-tags-link").show();
+    $("#toggle-related-tags-link").show().click();
 
     $("#post_tag_string").css({"resize": "none", "width": "100%"});
 
