@@ -124,10 +124,10 @@ class Tag < ActiveRecord::Base
     def trending
       Cache.get("popular-tags-v3", 1.hour) do
         CurrentUser.scoped(User.admins.first, "127.0.0.1") do
-          n = 8
+          n = 24
           counts = {}
 
-          while counts.empty? && n < 256
+          while counts.empty? && n < 1000
             tag_strings = Post.select_values_sql("select tag_string from posts where created_at >= ?", n.hours.ago)
             tag_strings.each do |tag_string|
               tag_string.scan(/\S+/).each do |tag|
