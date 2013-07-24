@@ -60,6 +60,7 @@
 
     $("#post_tag_string").css({"resize": "none", "width": "100%"});
 
+    $(window).scrollTop($("#image").offset().top);
     var dialog = $("<div/>").attr("id", "post-edit-dialog");
     $("#form").appendTo(dialog);
     dialog.dialog({
