@@ -155,7 +155,7 @@ class PostQueryBuilder
       relation = relation.where("posts.is_flagged = FALSE")
     elsif q[:status_neg] == "deleted"
       relation = relation.where("posts.is_deleted = FALSE")
-    elsif CurrentUser.user.hide_deleted_posts?
+    elsif CurrentUser.user.hide_deleted_posts? && !CurrentUser.admin_mode?
       relation = relation.where("posts.is_deleted = FALSE")
     end
 
