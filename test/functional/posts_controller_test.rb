@@ -106,6 +106,7 @@ class PostsControllerTest < ActionController::TestCase
 
     context "revert action" do
       setup do
+        @post.stubs(:merge_version?).returns(false)
         @post.update_attributes(:tag_string => "zzz")
       end
 
