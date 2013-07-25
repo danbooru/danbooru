@@ -915,14 +915,37 @@ class Post < ActiveRecord::Base
   module VersionMethods
     def create_version(force = false)
       if new_record? || rating_changed? || source_changed? || parent_id_changed? || tag_string_changed? || force
-        CurrentUser.increment!(:post_update_count)
-        versions.create(
-          :rating => rating,
-          :source => source,
-          :tags => tag_string,
-          :parent_id => parent_id
-        )
+        if merge_version?
+          merge_version
+        else
+          create_new_version
+        end
       end
+    end
+
+    def merge_version?
+      prev = versions.last
+      prev && prev.updater_id == CurrentUser.user.id && prev.updated_at > 1.hour.ago
+    end
+
+    def create_new_version
+      CurrentUser.increment!(:post_update_count)
+      versions.create(
+        :rating => rating,
+        :source => source,
+        :tags => tag_string,
+        :parent_id => parent_id
+      )
+    end
+
+    def merge_version
+      prev = versions.last
+      prev.update_attributes(
+        :rating => rating,
+        :source => source,
+        :tags => tag_string,
+        :parent_id => parent_id
+      )
     end
 
     def revert_to(target)

@@ -17,6 +17,7 @@ class PostVersionTest < ActiveSupport::TestCase
     context "that has multiple versions: " do
       setup do
         @post = FactoryGirl.create(:post, :tag_string => "1")
+        @post.stubs(:merge_version?).returns(false)
         @post.update_attributes(:tag_string => "1 2")
         @post.update_attributes(:tag_string => "2 3")
       end
@@ -59,6 +60,7 @@ class PostVersionTest < ActiveSupport::TestCase
       setup do
         @parent = FactoryGirl.create(:post)
         @post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
+        @post.stubs(:merge_version?).returns(false)
         @post.update_attributes(:tag_string => "bbb ccc xxx", :source => "")
       end
 
