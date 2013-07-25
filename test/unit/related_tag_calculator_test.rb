@@ -14,6 +14,19 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
   end
 
   context "A related tag calculator" do
+    context "for a post set" do
+      setup do
+        FactoryGirl.create(:post, :tag_string => "aaa bbb ccc ddd")
+        FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
+        FactoryGirl.create(:post, :tag_string => "aaa bbb")
+        @post_set = PostSets::Post.new("aaa")
+      end
+
+      should "calculate the related tags" do
+        assert_equal({"aaa"=>3, "bbb"=>3, "ccc"=>2, "ddd"=>1}, RelatedTagCalculator.calculate_from_post_set(@post_set))
+      end
+    end
+
     should "calculate related tags for a tag" do
       posts = []
       posts << FactoryGirl.create(:post, :tag_string => "aaa bbb ccc ddd")

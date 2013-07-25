@@ -40,8 +40,12 @@ module PostSetPresenters
       if tag
         tag.related_tag_array.map(&:first)
       else
-        []
+        calculate_related_tags_from_post_set
       end
+    end
+
+    def calculate_related_tags_from_post_set
+      RelatedTagCalculator.calculate_from_post_set_to_array(post_set).map(&:first)
     end
 
     def tag_list_html(template)
