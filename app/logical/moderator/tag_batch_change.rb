@@ -10,10 +10,12 @@ module Moderator
 
       updater = User.find(updater_id)
 
-      CurrentUser.scoped(updater, updater_ip_addr) do
-        ::Post.tag_match(antecedent).each do |post|
-          tags = (post.tag_array - normalized_antecedent + normalized_consequent).join(" ")
-          post.update_attributes(:tag_string => tags)
+      CurrentUser.without_safe_mode do
+        CurrentUser.scoped(updater, updater_ip_addr) do
+          ::Post.tag_match(antecedent).each do |post|
+            tags = (post.tag_array - normalized_antecedent + normalized_consequent).join(" ")
+            post.update_attributes(:tag_string => tags)
+          end
         end
       end
     end

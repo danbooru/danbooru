@@ -114,7 +114,6 @@ class PostQueryBuilder
 
     if CurrentUser.safe_mode?
       relation = relation.where(:rating => "s")
-      # relation = relation.where("created_at <= ?", 3.months.ago)
     end
 
     relation = add_range_relation(q[:post_id], "posts.id", relation)

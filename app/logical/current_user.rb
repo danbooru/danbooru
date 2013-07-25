@@ -46,6 +46,14 @@ class CurrentUser
     Thread.current[:safe_mode]
   end
 
+  def self.without_safe_mode
+    prev = Thread.current[:safe_mode]
+    Thread.current[:safe_mode] = false
+    yield
+  ensure
+    Thread.current[:safe_mode] = prev
+  end
+
   def self.set_safe_mode(req)
     if req.host =~ /safe/
       Thread.current[:safe_mode] = true

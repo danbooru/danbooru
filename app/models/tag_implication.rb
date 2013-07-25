@@ -126,12 +126,14 @@ class TagImplication < ActiveRecord::Base
   end
 
   def update_posts
-    Post.raw_tag_match(antecedent_name).find_each do |post|
-      fixed_tags = "#{post.tag_string} #{descendant_names}".strip
-      CurrentUser.scoped(creator, creator_ip_addr) do
-        post.update_attributes(
-          :tag_string => fixed_tags
-        )
+    CurrentUser.without_safe_mode do
+      Post.raw_tag_match(antecedent_name).find_each do |post|
+        fixed_tags = "#{post.tag_string} #{descendant_names}".strip
+        CurrentUser.scoped(creator, creator_ip_addr) do
+          post.update_attributes(
+            :tag_string => fixed_tags
+          )
+        end
       end
     end
   end

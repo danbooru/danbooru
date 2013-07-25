@@ -126,18 +126,20 @@ class TagAlias < ActiveRecord::Base
   end
 
   def update_posts
-    Post.raw_tag_match(antecedent_name).find_each do |post|
-      escaped_antecedent_name = Regexp.escape(antecedent_name)
-      fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_antecedent_name}(?:\Z| )/, " #{consequent_name} ").strip
-      CurrentUser.scoped(creator, creator_ip_addr) do
-        post.update_attributes(
-          :tag_string => fixed_tags
-        )
+    CurrentUser.without_safe_mode do
+      Post.raw_tag_match(antecedent_name).find_each do |post|
+        escaped_antecedent_name = Regexp.escape(antecedent_name)
+        fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_antecedent_name}(?:\Z| )/, " #{consequent_name} ").strip
+        CurrentUser.scoped(creator, creator_ip_addr) do
+          post.update_attributes(
+            :tag_string => fixed_tags
+          )
+        end
       end
-    end
 
-    antecedent_tag.fix_post_count if antecedent_tag
-    consequent_tag.fix_post_count if consequent_tag
+      antecedent_tag.fix_post_count if antecedent_tag
+      consequent_tag.fix_post_count if consequent_tag
+    end
   end
 
   def rename_wiki_and_artist

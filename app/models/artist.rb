@@ -182,26 +182,28 @@ class Artist < ActiveRecord::Base
   module BanMethods
     def ban!
       Post.transaction do
-        begin
-          Post.tag_match(name).each do |post|
-            begin
-              post.flag!("Artist requested removal")
-            rescue PostFlag::Error
-              # swallow
+        CurrentUser.without_safe_mode do
+          begin
+            Post.tag_match(name).each do |post|
+              begin
+                post.flag!("Artist requested removal")
+              rescue PostFlag::Error
+                # swallow
+              end
+              post.delete!(:ban => true)
             end
-            post.delete!(:ban => true)
+          rescue Post::SearchError
+            # swallow
           end
-        rescue Post::SearchError
-          # swallow
-        end
 
-        # potential race condition but unlikely
-        unless TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").exists?
-          tag_implication = TagImplication.create(:antecedent_name => name, :consequent_name => "banned_artist")
-          tag_implication.delay(:queue => "default").process!
-        end
+          # potential race condition but unlikely
+          unless TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").exists?
+            tag_implication = TagImplication.create(:antecedent_name => name, :consequent_name => "banned_artist")
+            tag_implication.delay(:queue => "default").process!
+          end
 
-        update_column(:is_banned, true)
+          update_column(:is_banned, true)
+        end
       end
     end
   end
