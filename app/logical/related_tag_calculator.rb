@@ -1,7 +1,9 @@
 class RelatedTagCalculator
   def self.find_tags(tag, limit)
-    Post.with_timeout(5_000, []) do
-      Post.tag_match(tag).limit(limit).select("posts.tag_string").reorder("posts.md5").map(&:tag_string)
+    CurrentUser.without_safe_mode do
+      Post.with_timeout(5_000, []) do
+        Post.tag_match(tag).limit(limit).select("posts.tag_string").reorder("posts.md5").map(&:tag_string)
+      end
     end
   end
 

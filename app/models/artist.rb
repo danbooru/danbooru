@@ -128,11 +128,8 @@ class Artist < ActiveRecord::Base
       Artist.new.tap do |artist|
         if params[:name]
           artist.name = params[:name]
-          if CurrentUser.user.is_gold?
-            # below gold users are limited to two tags
-            post = Post.tag_match("source:http #{artist.name} status:any").first
-          else
-            post = Post.tag_match("source:http #{artist.name}").first
+          post = CurrentUser.without_safe_mode do
+            Post.tag_match("source:http #{artist.name}").first
           end
           unless post.nil? || post.source.blank?
             artist.url_string = post.source

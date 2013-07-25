@@ -728,7 +728,9 @@ class Post < ActiveRecord::Base
 
     def fast_count_search(tags)
       count = Post.with_timeout(500, Danbooru.config.blank_tag_search_fast_count || 1_000_000) do
-        Post.tag_match(tags).count
+        CurrentUser.without_safe_mode do
+          Post.tag_match(tags).count
+        end
       end
       if count > 0
         set_count_in_cache(tags, count)
