@@ -2,7 +2,7 @@ class ForumTopic < ActiveRecord::Base
   CATEGORIES = {
     0 => "General",
     1 => "Tags",
-    2 => "Bugs & Suggestions"
+    2 => "Bugs & Features"
   }
 
   attr_accessible :title, :original_post_attributes, :category_id, :as => [:member, :builder, :gold, :platinum, :contributor, :janitor, :moderator, :admin, :default]
