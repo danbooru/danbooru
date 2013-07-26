@@ -17,16 +17,16 @@
   }
 
   Danbooru.Shortcuts.nav_scroll_down = function() {
-    var scroll_top = $(window).scrollTop() + ($(window).height() * 0.85);
-    Danbooru.scroll_to(scroll_top);
+    var scroll_top = $(window).scrollTop() + ($(window).height() * 0.15);
+    $(window).scrollTop(scroll_top);
   }
 
   Danbooru.Shortcuts.nav_scroll_up = function() {
-    var scroll_top = $(window).scrollTop() - ($(window).height() * 0.85);
+    var scroll_top = $(window).scrollTop() - ($(window).height() * 0.15);
     if (scroll_top < 0) {
       scroll_top = 0;
     }
-    Danbooru.scroll_to(scroll_top);
+    $(window).scrollTop(scroll_top);
   }
 })();
 
