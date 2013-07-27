@@ -31,11 +31,11 @@ module PostSets
     end
 
     def has_artist?
-      tag_array.any? && ::Artist.name_matches(tag_string).exists?
+      tag_array.any? && ::Artist.name_matches(tag_string).active.exists?
     end
 
     def artist
-      ::Artist.name_matches(tag_string).first
+      ::Artist.name_matches(tag_string).active.first
     end
 
     def pool_name
