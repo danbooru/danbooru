@@ -14,6 +14,19 @@
       $("#tags, #search_name, #search_name_matches, #query").trigger("focus").selectEnd();
       e.preventDefault();
     });
+
+    if ($("#image").length) {
+      $(document).bind("keypress", "shift+e", function(e) {
+        if (!$("#edit-dialog").length) {
+          $("#edit").show();
+          $("#comments").hide();
+          $("#share").hide();
+          $("#related-tags-container").show();
+          Danbooru.Post.open_edit_dialog();
+        }
+        e.preventDefault();
+      });
+    }
   }
 
   Danbooru.Shortcuts.nav_scroll_down = function() {

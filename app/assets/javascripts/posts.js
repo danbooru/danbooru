@@ -40,7 +40,11 @@
   }
 
   Danbooru.Post.initialize_edit_dialog = function(e) {
-    $("#open-edit-dialog").button().show().click(this.open_edit_dialog);
+    $("#open-edit-dialog").button().show().click(function(e) {
+      $(window).scrollTop($("#image").offset().top);
+      Danbooru.Post.open_edit_dialog();
+      e.preventDefault();
+    });
 
     $("#toggle-related-tags-link").click(function(e) {
       if ($("#related-tags").is(":visible")) {
@@ -55,16 +59,13 @@
     });
   }
 
-  Danbooru.Post.open_edit_dialog = function(e) {
+  Danbooru.Post.open_edit_dialog = function() {
     var $tag_string = $("#post_tag_string,#upload_tag_string");
     $("div.input").has($tag_string).prevAll().hide();
     $("#open-edit-dialog").hide();
 
     $("#toggle-related-tags-link").show().click();
 
-    $tag_string.css({"resize": "none", "width": "100%"});
-
-    $(window).scrollTop($("#image").offset().top);
     var dialog = $("<div/>").attr("id", "edit-dialog");
     $("#form").appendTo(dialog);
     dialog.dialog({
@@ -86,7 +87,8 @@
       dialog.parent().css("opacity", 1);
     });
 
-    e.preventDefault();
+    $tag_string.css({"resize": "none", "width": "100%"});
+    $tag_string.focus().selectEnd().height($tag_string[0].scrollHeight);
   }
 
   Danbooru.Post.close_edit_dialog = function(e, ui) {
