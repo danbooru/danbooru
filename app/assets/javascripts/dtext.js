@@ -3,7 +3,7 @@
 
   Danbooru.Dtext.initialize_all = function() {
     Danbooru.Dtext.initialize_links();
-    Danbooru.Dtext.initialize_expandables();
+    Danbooru.Dtext.initialize_expandables($(document));
   }
 
   Danbooru.Dtext.initialize_links = function() {
@@ -11,9 +11,9 @@
     $(".simple_form input[value=Preview]").click(Danbooru.Dtext.click_button);
   }
 
-  Danbooru.Dtext.initialize_expandables = function() {
-    $(".expandable-content").hide();
-    $(".expandable-button").click(function(e) {
+  Danbooru.Dtext.initialize_expandables = function($parent) {
+    $parent.find(".expandable-content").hide();
+    $parent.find(".expandable-button").click(function(e) {
       $(this).parent().next().fadeToggle("fast");
     });
   }
@@ -30,7 +30,7 @@
       },
       success: function(data) {
         $preview.html(data).fadeIn("fast");
-        Danbooru.Dtext.initialize_expandables();
+        Danbooru.Dtext.initialize_expandables($preview);
       }
     });
   }
