@@ -1,6 +1,6 @@
 @import "../common/000_vars.css.scss";
 
-a.pool-category-series, span.pool-category-series a {
+.pool-category-series a {
   color: #A0A;
 
   &:hover {
@@ -8,7 +8,7 @@ a.pool-category-series, span.pool-category-series a {
   }
 }
 
-a.pool-category-collection, span.pool-category-collection a {
+.pool-category-collection a {
   color: $link_color;
 
   &:hover {

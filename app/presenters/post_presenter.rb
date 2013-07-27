@@ -202,17 +202,17 @@ class PostPresenter < Presenter
   end
 
   def pool_link_html(template, pool, options = {})
-    pool_html = ["<li id='nav-link-for-pool-#{pool.id}'>"]
+    pool_html = [%{<li id="nav-link-for-pool-#{pool.id}" class="pool-category-#{pool.category}">}]
     match_found = false
 
     if options[:include_rel]
       prev_rel = "prev"
       next_rel = "next"
-      klass = "active pool-category-#{pool.category}"
+      klass = "active"
     else
       prev_rel = nil
       next_rel = nil
-      klass = "pool-category-#{pool.category}"
+      klass = ""
     end
 
     if @post.id != pool.post_id_array.first
