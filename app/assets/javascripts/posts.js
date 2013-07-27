@@ -526,7 +526,6 @@
 
       $("#post-sections li").removeClass("active");
       $(e.target).parent("li").addClass("active");
-      var name = e.target.hash;
       e.preventDefault();
     });
 
