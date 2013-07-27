@@ -30,11 +30,11 @@
             </td>
             <td id="tag-implication-status-for-<%= tag_implication.id %>"><%= tag_implication.status %></td>
             <td>
-              <% if CurrentUser.is_admin? %>
+              <% if tag_implication.deletable_by?(CurrentUser.user) %>
                 <%= link_to "Delete", tag_implication_path(tag_implication), :remote => true, :method => :delete, :confirm => "Are you sure you want to delete this implication?" %>
-                <% if tag_implication.is_pending? %>
-                  | <%= link_to "Approve", approve_tag_implication_path(tag_implication), :remote => true, :method => :post %>
-                <% end %>
+              <% end %>
+              <% if CurrentUser.user.is_admin? && tag_implication.is_pending? %>
+                | <%= link_to "Approve", approve_tag_implication_path(tag_implication), :remote => true, :method => :post %>
               <% end %>
             </td>
           </tr>

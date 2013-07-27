@@ -1,5 +1,5 @@
 class TagAliasesController < ApplicationController
-  before_filter :admin_only, :only => [:approve, :destroy, :new, :create]
+  before_filter :admin_only, :only => [:approve, :new, :create]
   respond_to :html, :xml, :json, :js
 
   def new
@@ -32,10 +32,14 @@ class TagAliasesController < ApplicationController
 
   def destroy
     @tag_alias = TagAlias.find(params[:id])
-    @tag_alias.update_column(:status, "deleted")
-    @tag_alias.clear_all_cache
-    @tag_alias.destroy
-    respond_with(@tag_alias, :location => tag_aliases_path)
+    if @tag_alias.deletable_by?(CurrentUser.user)
+      @tag_alias.update_column(:status, "deleted")
+      @tag_alias.clear_all_cache
+      @tag_alias.destroy
+      respond_with(@tag_alias, :location => tag_aliases_path)
+    else
+      access_denied
+    end
   end
 
   def approve

@@ -1,5 +1,5 @@
 class TagImplicationsController < ApplicationController
-  before_filter :admin_only, :only => [:new, :create, :approve, :destroy]
+  before_filter :admin_only, :only => [:new, :create, :approve]
   respond_to :html, :xml, :json, :js
 
   def new
@@ -24,12 +24,16 @@ class TagImplicationsController < ApplicationController
 
   def destroy
     @tag_implication = TagImplication.find(params[:id])
-    @tag_implication.destroy
-    respond_with(@tag_implication) do |format|
-      format.html do
-        flash[:notice] = "Tag implication was deleted"
-        redirect_to(tag_implications_path)
+    if @tag_implication.deletable_by?(CurrentUser.user)
+      @tag_implication.destroy
+      respond_with(@tag_implication) do |format|
+        format.html do
+          flash[:notice] = "Tag implication was deleted"
+          redirect_to(tag_implications_path)
+        end
       end
+    else
+      access_denied
     end
   end
 

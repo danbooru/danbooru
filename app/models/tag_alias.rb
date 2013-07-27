@@ -163,4 +163,11 @@ class TagAlias < ActiveRecord::Base
       end
     end
   end
+
+  def deletable_by?(user)
+    return true if user.is_admin?
+    return true if is_pending? && user.is_janitor?
+    return true if is_pending? && user.id == creator_id
+    return false
+  end
 end
