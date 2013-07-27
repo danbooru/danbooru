@@ -21,7 +21,10 @@
           $("#edit").show();
           $("#comments").hide();
           $("#share").hide();
+          $("#post-sections li").removeClass("active");
+          $("#post-edit-link").parent("li").addClass("active");
           $("#related-tags-container").show();
+
           Danbooru.Post.open_edit_dialog();
         }
         e.preventDefault();
