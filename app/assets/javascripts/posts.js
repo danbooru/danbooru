@@ -28,16 +28,19 @@
       this.initialize_post_image_resize_links();
       this.initialize_post_image_resize_to_window_link();
       this.initialize_similar();
-      this.initialize_edit_dialog();
 
       if (Danbooru.meta("always-resize-images") === "true") {
         $("#image-resize-to-window-link").click();
       }
     }
+
+    if ($("#image").length) {
+      this.initialize_edit_dialog();
+    }
   }
 
   Danbooru.Post.initialize_edit_dialog = function(e) {
-    $("#open-post-edit-dialog").button().click(this.open_edit_dialog);
+    $("#open-edit-dialog").button().show().click(this.open_edit_dialog);
 
     $("#toggle-related-tags-link").click(function(e) {
       if ($("#related-tags").is(":visible")) {
@@ -53,22 +56,23 @@
   }
 
   Danbooru.Post.open_edit_dialog = function(e) {
-    $("div.input:has(#post_tag_string)").prevAll().hide();
-    $("#open-post-edit-dialog").hide();
+    var $tag_string = $("#post_tag_string,#upload_tag_string");
+    $("div.input").has($tag_string).prevAll().hide();
+    $("#open-edit-dialog").hide();
 
     $("#toggle-related-tags-link").show().click();
 
-    $("#post_tag_string").css({"resize": "none", "width": "100%"});
+    $tag_string.css({"resize": "none", "width": "100%"});
 
     $(window).scrollTop($("#image").offset().top);
-    var dialog = $("<div/>").attr("id", "post-edit-dialog");
+    var dialog = $("<div/>").attr("id", "edit-dialog");
     $("#form").appendTo(dialog);
     dialog.dialog({
-      title: "Edit",
+      title: "Edit tags",
       width: "auto",
       drag: function(e, ui) {
         if (Danbooru.meta("enable-auto-complete") === "true") {
-          $("#post_tag_string").data("uiAutocomplete").close();
+          $tag_string.data("uiAutocomplete").close();
         }
       },
       close: Danbooru.Post.close_edit_dialog
@@ -86,13 +90,14 @@
   }
 
   Danbooru.Post.close_edit_dialog = function(e, ui) {
-    $("#form").appendTo($("#edit"));
-    $("#post-edit-dialog").remove();
+    $("#form").appendTo($("#c-posts #edit,#c-uploads #a-new"));
+    $("#edit-dialog").remove();
     $("#related-tags").show();
     $("#toggle-related-tags-link").html("&raquo;").hide();
-    $("div.input:has(#post_tag_string)").prevAll().show();
-    $("#open-post-edit-dialog").show();
-    $("#post_tag_string").css({"resize": "", "width": ""});
+    var $tag_string = $("#post_tag_string,#upload_tag_string");
+    $("div.input").has($tag_string).prevAll().show();
+    $("#open-edit-dialog").show();
+    $tag_string.css({"resize": "", "width": ""});
   }
 
   Danbooru.Post.initialize_tag_autocomplete = function() {
