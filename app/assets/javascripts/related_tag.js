@@ -6,11 +6,7 @@
       this.initialize_buttons();
       $("#related-tags-container").hide();
       $("#artist-tags-container").hide();
-      $("#upload_tag_string,#post_tag_string").keyup(function(e) {
-        if ($("#related-tags").is(":visible")) {
-          Danbooru.RelatedTag.build_all();
-        }
-      });
+      $("#upload_tag_string,#post_tag_string").keyup(Danbooru.RelatedTag.update_selected);
     }
   }
 
@@ -98,6 +94,18 @@
   Danbooru.RelatedTag.process_response = function(data) {
     Danbooru.RelatedTag.recent_search = data;
     Danbooru.RelatedTag.build_all();
+  }
+
+  Danbooru.RelatedTag.update_selected = function(e) {
+    var current_tags = $("#upload_tag_string,#post_tag_string").val().toLowerCase().match(/\S+/g) || [];
+    var $all_tags = $("#related-tags a");
+    $all_tags.removeClass("selected");
+
+    $all_tags.each(function(i, tag) {
+      if (current_tags.indexOf(tag.textContent.replace(/ /g, "_")) > -1) {
+        $(tag).addClass("selected");
+      }
+    });
   }
 
   Danbooru.RelatedTag.build_all = function() {
