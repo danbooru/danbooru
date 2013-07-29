@@ -47,12 +47,14 @@
     });
 
     $("#toggle-related-tags-link").click(function(e) {
-      if ($("#related-tags").is(":visible")) {
-        $("#related-tags").hide();
+      var $related_tags = $("#related-tags");
+      if ($related_tags.is(":visible")) {
+        $related_tags.hide();
         $(e.target).html("&raquo;");
       } else {
-        $("#related-tags").show();
-        Danbooru.RelatedTag.build_all();
+        $related_tags.show();
+        $("#related-tags-button").trigger("click");
+        $("#find-artist-button").trigger("click");
         $(e.target).html("&laquo;");
       }
       e.preventDefault();
