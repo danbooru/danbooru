@@ -71,6 +71,7 @@
     dialog.dialog({
       title: "Edit tags",
       width: "auto",
+      resizable: false,
       drag: function(e, ui) {
         if (Danbooru.meta("enable-auto-complete") === "true") {
           $tag_string.data("uiAutocomplete").close();
@@ -87,7 +88,7 @@
       dialog.parent().css("opacity", 1);
     });
 
-    $tag_string.css({"resize": "none", "width": "100%"});
+    $tag_string.css({"resize": "vertical", "width": "100%"});
     $tag_string.focus().selectEnd().height($tag_string[0].scrollHeight);
   }
 
