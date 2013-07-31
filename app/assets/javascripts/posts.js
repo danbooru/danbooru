@@ -92,6 +92,10 @@
 
     $tag_string.css({"resize": "vertical", "width": "100%"});
     $tag_string.focus().selectEnd().height($tag_string[0].scrollHeight);
+
+    var $image = $("#c-uploads .ui-wrapper #image, #c-uploads .ui-wrapper:has(#image)");
+    $image.height($image.resizable("option", "maxHeight"));
+    $image.width($image.resizable("option", "maxWidth"));
   }
 
   Danbooru.Post.close_edit_dialog = function(e, ui) {
