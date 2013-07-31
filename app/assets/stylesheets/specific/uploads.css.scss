@@ -4,6 +4,10 @@ div#c-uploads {
       margin-bottom: 2em;
     }
 
+    label[for="upload_as_pending"] {
+      display: inline;
+    }
+
     fieldset.ratings {
       label {
         display: inline;
