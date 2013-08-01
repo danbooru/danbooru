@@ -235,7 +235,7 @@ class PostPresenter < Presenter
 
     if pool.neighbors(@post).next
       @next_post_in_pool = pool.neighbors(@post).next
-      pool_html << template.link_to("next&thinsp;&rsaquo;".html_safe, template.post_path(pool.neighbors(@post).next, :pool_id => pool.id), :rel => next_rel, :class => "#{klass} next", :title => "to page #{pool.page_number(pool.neighbors(@post).next)}")
+      pool_html << template.link_to("next&thinsp;&rsaquo;".html_safe, template.post_path(@next_post_in_pool, :pool_id => pool.id), :rel => next_rel, :class => "#{klass} next", :title => "to page #{pool.page_number(@next_post_in_pool)}")
       match_found = true
     else
       pool_html << '<span class="next">next&thinsp;&rsaquo;</span>'

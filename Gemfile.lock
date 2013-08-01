@@ -82,6 +82,7 @@ GEM
     coderay (1.0.9)
     crack (0.3.2)
     daemons (1.1.9)
+    dalli (2.6.4)
     delayed_job (3.0.5)
       activesupport (~> 3.0)
     delayed_job_active_record (0.4.4)
@@ -106,7 +107,6 @@ GEM
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
-    memcache-client (1.8.5)
     metaclass (0.0.1)
     method_source (0.8.1)
     mime-types (1.22)
@@ -226,13 +226,14 @@ DEPENDENCIES
   bcrypt-ruby
   capistrano-unicorn
   daemons
+  dalli
   delayed_job
   delayed_job_active_record
   diff-lcs
   factory_girl
   ffaker!
+  kgio
   mechanize!
-  memcache-client
   mocha
   net-sftp
   net-ssh
