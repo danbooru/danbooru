@@ -59,6 +59,9 @@
       </menu>
 
       <section id="comments">
+        <% if !CurrentUser.user.is_builder? %>
+          <h2>Before commenting, read the <%= link_to "how to comment guide", wiki_pages_path(:search => {:title => "howto:comment"}) %>.</h2>
+        <% end %>
         <%= render "comments/partials/index/list", :comments => @post.comments.visible(CurrentUser.user), :post => @post, :show_header => false %>
       </section>
 
