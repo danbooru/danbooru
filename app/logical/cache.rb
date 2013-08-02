@@ -32,53 +32,44 @@ class Cache
   end
 
   def self.get(key, expiry = 0)
-    begin
-      start_time = Time.now
-      value = MEMCACHE.get key.slice(0, 200)
-      elapsed = Time.now - start_time
-      ActiveRecord::Base.logger.debug('MemCache Get (%0.6f)  %s -> %s' % [elapsed, key, value])
-      if value.nil? and block_given? then
-        value = yield
-        MEMCACHE.set key, value, expiry
-      end
-      value
-    rescue MemCache::MemCacheError => err
-      ActiveRecord::Base.logger.debug "MemCache Error: #{err.message}"
-      if block_given? then
-        value = yield
-        put key, value, expiry
-      end
-      value
+    start_time = Time.now
+    value = MEMCACHE.get key
+    elapsed = Time.now - start_time
+    ActiveRecord::Base.logger.debug('MemCache Get (%0.6f)  %s -> %s' % [elapsed, key, value])
+    if value.nil? and block_given? then
+      value = yield
+      MEMCACHE.set key, value, expiry
     end
+    value
+  rescue => err
+    ActiveRecord::Base.logger.debug "MemCache Error: #{err.message}"
+    if block_given? then
+      value = yield
+      put key, value, expiry
+    end
+    value
   end
 
   def self.put(key, value, expiry = 0)
-    key.gsub!(/\s/, "_")
-    key = key[0, 200]
-
-    begin
-      start_time = Time.now
-      MEMCACHE.set key, value, expiry
-      elapsed = Time.now - start_time
-      ActiveRecord::Base.logger.debug('MemCache Set (%0.6f)  %s -> %s' % [elapsed, key, value])
-      value
-    rescue MemCache::MemCacheError => err
-      ActiveRecord::Base.logger.debug "MemCache Error: #{err.message}"
-      nil
-    end
+    start_time = Time.now
+    MEMCACHE.set key, value, expiry
+    elapsed = Time.now - start_time
+    ActiveRecord::Base.logger.debug('MemCache Set (%0.6f)  %s -> %s' % [elapsed, key, value])
+    value
+  rescue => err
+    ActiveRecord::Base.logger.debug "MemCache Error: #{err.message}"
+    nil
   end
 
   def self.delete(key, delay = nil)
-    begin
-      start_time = Time.now
-      MEMCACHE.delete key, delay
-      elapsed = Time.now - start_time
-      ActiveRecord::Base.logger.debug('MemCache Delete (%0.6f)  %s' % [elapsed, key])
-      nil
-    rescue MemCache::MemCacheError => err
-      ActiveRecord::Base.logger.debug "MemCache Error: #{err.message}"
-      nil
-    end
+    start_time = Time.now
+    MEMCACHE.delete key, delay
+    elapsed = Time.now - start_time
+    ActiveRecord::Base.logger.debug('MemCache Delete (%0.6f)  %s' % [elapsed, key])
+    nil
+  rescue => err
+    ActiveRecord::Base.logger.debug "MemCache Error: #{err.message}"
+    nil
   end
 
   def self.sanitize(key)
