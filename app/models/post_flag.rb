@@ -49,6 +49,15 @@ class PostFlag < ActiveRecord::Base
         q = q.unresolved
       end
 
+      case params[:category]
+      when "normal"
+        q = q.where("reason != ? and reason != ?", "Unapproved in three days", "Artist requested removal")
+      when "unapproved"
+        q = q.where("reason = ?", "Unapproved in three days")
+      when "banned"
+        q = q.where("reason = ?", "Artist requested removal")
+      end
+
       q
     end
   end
