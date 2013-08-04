@@ -1,6 +1,6 @@
 <table class="search">
   <tbody>
-    <%= form_tag(post_flags_path, :method => :get, :class => "simple_form") do %>
+    <%= form_tag(post_appeals_path, :method => :get, :class => "simple_form") do %>
       <tr>
         <th><label for="search_post_id">Post ID</label></th>
         <td>
@@ -15,6 +15,15 @@
         <td>
           <div class="input">
             <%= text_field "search", "creator_name", :value => params[:search][:creator_name] %>
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <th><label for="search_is_resolved">Resolved</label></th>
+        <td>
+          <div class="input">
+            <%= select "search", "is_resolved", ["true", "false"], :selected => params[:search][:is_resolved], :include_blank => true %>
           </div>
         </td>
       </tr>

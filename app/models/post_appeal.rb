@@ -10,6 +10,14 @@ class PostAppeal < ActiveRecord::Base
   validates_uniqueness_of :creator_id, :scope => :post_id, :message => "have already appealed this post"
 
   module SearchMethods
+    def resolved
+      joins(:post).where("posts.is_deleted = false and posts.is_flagged = false")
+    end
+
+    def unresolved
+      joins(:post).where("posts.is_deleted = true or posts.is_flagged = true")
+    end
+
     def for_user(user_id)
       where("creator_id = ?", user_id)
     end
@@ -32,6 +40,12 @@ class PostAppeal < ActiveRecord::Base
 
       if params[:post_id].present?
         q = q.where("post_id = ?", params[:post_id].to_i)
+      end
+
+      if params[:is_resolved] == "true"
+        q = q.resolved
+      elsif params[:is_resolved] == "false"
+        q = q.unresolved
       end
 
       q
