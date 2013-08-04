@@ -9,7 +9,7 @@
 <% if (post.is_banned? || post.is_deleted?) && post.flags.empty? %>
   <div class="ui-corner-all ui-state-highlight notice notice-deleted">
     <% if post.is_banned? %>
-      This post was deleted because it was requested by the artist
+      This post was removed because it was requested by the artist
     <% else %>
       This post was deleted
     <% end %>
