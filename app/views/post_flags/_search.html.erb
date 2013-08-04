@@ -1,0 +1,38 @@
+<table class="search">
+  <tbody>
+    <%= form_tag(post_flags_path, :method => :get, :class => "simple_form") do %>
+      <tr>
+        <th><label for="search_post_id">Post ID</label></th>
+        <td>
+          <div class="input">
+            <%= text_field "search", "post_id", :value => params[:search][:post_id] %>
+          </div>
+        </td>
+      </tr>
+
+      <% if CurrentUser.user.is_janitor? %>
+        <tr>
+          <th><label for="search_creator_name">Creator</th>
+          <td>
+            <div class="input">
+              <%= text_field "search", "creator_name", :value => params[:search][:creator_name] %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+
+      <tr>
+        <th><label for="search_is_resolved">Resolved</label></th>
+        <td>
+          <div class="input">
+            <%= select "search", "is_resolved", ["true", "false"], :selected => params[:search][:is_resolved], :include_blank => true %>
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td><%= submit_tag "Search" %><td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
