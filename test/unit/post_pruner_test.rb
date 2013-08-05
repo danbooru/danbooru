@@ -7,7 +7,9 @@ class PostPrunerTest < ActiveSupport::TestCase
     CurrentUser.ip_addr = "127.0.0.1"
     MEMCACHE.flush_all
 
-    @flagger = FactoryGirl.create(:user)
+    Timecop.travel(2.weeks.ago) do
+      @flagger = FactoryGirl.create(:gold_user)
+    end
     @old_post = FactoryGirl.create(:post, :created_at => 5.days.ago, :is_pending => true)
     @unresolved_flagged_post = FactoryGirl.create(:post, :is_flagged => true)
     @resolved_flagged_post = FactoryGirl.create(:post, :is_flagged => true)
