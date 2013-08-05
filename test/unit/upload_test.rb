@@ -69,11 +69,25 @@ class UploadTest < ActiveSupport::TestCase
           assert_equal(756, @upload.image_height)
         end
 
-        should "discover the dimensions for a JPG" do
+        should "discover the dimensions for a JPG with JFIF data" do
           @upload = FactoryGirl.create(:jpg_upload)
           assert_nothing_raised {@upload.calculate_dimensions(@upload.file_path)}
           assert_equal(500, @upload.image_width)
           assert_equal(335, @upload.image_height)
+        end
+
+        should "discover the dimensions for a JPG with EXIF data" do
+          @upload = FactoryGirl.create(:exif_jpg_upload)
+          assert_nothing_raised {@upload.calculate_dimensions(@upload.file_path)}
+          assert_equal(529, @upload.image_width)
+          assert_equal(600, @upload.image_height)
+        end
+
+        should "discover the dimensions for a JPG with no header data" do
+          @upload = FactoryGirl.create(:blank_jpg_upload)
+          assert_nothing_raised {@upload.calculate_dimensions(@upload.file_path)}
+          assert_equal(668, @upload.image_width)
+          assert_equal(996, @upload.image_height)
         end
 
         should "discover the dimensions for a PNG" do

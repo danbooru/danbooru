@@ -25,7 +25,8 @@ GIT
 
 GIT
   remote: https://github.com/r888888888/ruby-imagespec.git
-  revision: 41859ac5808cd64f2385082171ee2cc9f80bfcd1
+  revision: 2dab9811f4abb4fbaeea66feb42e388ba545b2d8
+  branch: exif-fixes
   specs:
     ruby-imagespec (0.3.1)
 
