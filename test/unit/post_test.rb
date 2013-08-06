@@ -2,7 +2,9 @@ require 'test_helper'
 
 class PostTest < ActiveSupport::TestCase
   setup do
-    @user = FactoryGirl.create(:user)
+    Timecop.travel(2.weeks.ago) do
+      @user = FactoryGirl.create(:user)
+    end
     CurrentUser.user = @user
     CurrentUser.ip_addr = "127.0.0.1"
     MEMCACHE.flush_all

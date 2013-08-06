@@ -3,7 +3,9 @@ require 'test_helper'
 class PostFlagsControllerTest < ActionController::TestCase
   context "The post flags controller" do
     setup do
-      @user = FactoryGirl.create(:user)
+      Timecop.travel(2.weeks.ago) do
+        @user = FactoryGirl.create(:user)
+      end
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end

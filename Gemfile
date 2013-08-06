@@ -40,7 +40,7 @@ gem 'bcrypt-ruby', :require => "bcrypt"
 gem 'aws-s3', :require => "aws/s3"
 gem 'awesome_print'
 gem 'statistics2'
-gem 'ruby-imagespec', :require => "image_spec", :git => "https://github.com/r888888888/ruby-imagespec.git"
+gem 'ruby-imagespec', :require => "image_spec", :git => "https://github.com/r888888888/ruby-imagespec.git", :branch => "exif-fixes"
 
 group :production do
   gem 'unicorn', :platforms => :ruby
