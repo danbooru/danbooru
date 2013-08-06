@@ -72,8 +72,7 @@
     $("#form").appendTo(dialog);
     dialog.dialog({
       title: "Edit tags",
-      width: "auto",
-      resizable: false,
+      width: $(window).width() / 3,
       drag: function(e, ui) {
         if (Danbooru.meta("enable-auto-complete") === "true") {
           $tag_string.data("uiAutocomplete").close();
@@ -84,13 +83,13 @@
     dialog.dialog("widget").draggable("option", "containment", "none");
 
     dialog.parent().mouseout(function(e) {
-      dialog.parent().css("opacity", 0.6);
+      dialog.parent().css({"opacity": 0.6});
     })
     .mouseover(function(e) {
-      dialog.parent().css("opacity", 1);
+      dialog.parent().css({"opacity": 1});
     });
 
-    $tag_string.css({"resize": "vertical", "width": "100%"});
+    $tag_string.css({"resize": "none", "width": "100%"});
     $tag_string.focus().selectEnd().height($tag_string[0].scrollHeight);
 
     var $image = $("#c-uploads .ui-wrapper #image, #c-uploads .ui-wrapper:has(#image)");
