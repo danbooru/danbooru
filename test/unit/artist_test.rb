@@ -205,5 +205,12 @@ class ArtistTest < ActiveSupport::TestCase
       artist.reload
       assert_equal("yyy", artist.other_names)
     end
+
+    should "update the category of the tag" do
+      tag = FactoryGirl.create(:tag, :name => "abc")
+      artist = FactoryGirl.create(:artist, :name => "abc")
+      tag.reload
+      assert_equal(Tag.categories.artist, tag.category)
+    end
   end
 end
