@@ -43,6 +43,7 @@ class PostPresenter < Presenter
       data-tags="#{h(post.tag_string)}"
       data-pools="#{post.pool_string}"
       data-uploader="#{h(post.uploader_name)}"
+      data-approver-id="#{post.approver_id}"
       data-rating="#{post.rating}"
       data-width="#{post.image_width}"
       data-height="#{post.image_height}"
