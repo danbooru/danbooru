@@ -12,7 +12,7 @@ class PostPresenter < Presenter
 
     path = options[:path_prefix] || "/posts"
 
-    html =  %{<article class="#{preview_class(post)}" #{preview_attributes(post)}>}
+    html =  %{<article id="post_#{post.id}" class="#{preview_class(post)}" #{data_attributes(post)}>}
     if options[:tags].present?
       tag_param = "?tags=#{CGI::escape(options[:tags])}"
     elsif options[:pool_id]
@@ -37,20 +37,19 @@ class PostPresenter < Presenter
     klass
   end
 
-  def self.preview_attributes(post)
+  def self.data_attributes(post)
     %{
-      id="post_#{post.id}" 
-      data-id="#{post.id}" 
-      data-tags="#{h(post.tag_string)}" 
+      data-id="#{post.id}"
+      data-tags="#{h(post.tag_string)}"
       data-pools="#{post.pool_string}"
-      data-uploader="#{h(post.uploader_name)}" 
-      data-rating="#{post.rating}" 
-      data-width="#{post.image_width}" 
-      data-height="#{post.image_height}" 
-      data-flags="#{post.status_flags}" 
-      data-parent-id="#{post.parent_id}" 
-      data-has-children="#{post.has_children?}" 
-      data-score="#{post.score}" 
+      data-uploader="#{h(post.uploader_name)}"
+      data-rating="#{post.rating}"
+      data-width="#{post.image_width}"
+      data-height="#{post.image_height}"
+      data-flags="#{post.status_flags}"
+      data-parent-id="#{post.parent_id}"
+      data-has-children="#{post.has_children?}"
+      data-score="#{post.score}"
       data-fav-count="#{post.fav_count}"
     }.html_safe
   end

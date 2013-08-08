@@ -12,7 +12,7 @@
     <% end %>
 
     <% @posts.select {|x| Danbooru.config.can_user_see_post?(CurrentUser.user, x)}.each do |post| %>
-      <div class="post <%= PostPresenter.preview_class(post) %>" <%= PostPresenter.preview_attributes(post) %>>
+      <div id="post_<%= post.id %>" class="post <%= PostPresenter.preview_class(post) %>" <%= PostPresenter.data_attributes(post) %>>
         <div class="preview">
           <% if post.visible? %>
             <%= link_to(image_tag(post.preview_file_url), post_path(post)) %>
