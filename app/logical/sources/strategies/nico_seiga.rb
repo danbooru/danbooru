@@ -25,7 +25,7 @@ module Sources
     protected
 
       def get_profile_from_page(page)
-        links = page.search("div.illust_user_name a")
+        links = page.search("li a").select {|x| x["href"] =~ /user\/illust/}
 
         if links.any?
           profile_url = "http://seiga.nicovideo.jp" + links[0]["href"]
@@ -39,17 +39,17 @@ module Sources
       end
 
       def get_image_url_from_page(page)
-        links = page.search("a#illust_link")
+        meta = page.search("meta[property='og:image']")
 
-        if links.any?
-          "http://seiga.nicovideo.jp" + links[0]["href"]
+        if meta.any?
+          meta[0]["content"]
         else
           nil
         end
       end
 
       def get_tags_from_page(page)
-        links = page.search("div#tag_block nobr a.tag")
+        links = page.search("a.tag")
 
         links.map do |node|
           [node.text, "http://seiga.nicovideo.jp" + node.attr("href")]
