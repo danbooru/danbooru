@@ -4,7 +4,7 @@ group :test do
   gem "shoulda"
   gem "factory_girl"
   gem "mocha", :require => "mocha/setup"
-  gem "ffaker", :git => "http://github.com/EmmanuelOga/ffaker.git"
+  gem "ffaker"
   gem "simplecov", :require => false
   gem "pry"
   gem "vcr"
@@ -25,10 +25,10 @@ gem "dalli"
 gem "delayed_job"
 gem "delayed_job_active_record"
 gem "simple_form"
-gem "mechanize", :git => 'git://github.com/caribio/mechanize.git'
+gem "mechanize"
 gem "nokogiri"
 gem "whenever", :require => false
-gem "sanitize", :git => "git://github.com/rgrove/sanitize.git"
+gem "sanitize"
 gem 'rmagick', :require => "RMagick"
 gem 'daemons'
 gem 'net-ssh'
