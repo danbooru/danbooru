@@ -169,7 +169,7 @@ class Dmail < ActiveRecord::Base
   end
 
   def quoted_body
-    "[quote]#{body}[/quote]"
+    "[quote]\n#{from_name} said:\n\n#{body}\n[/quote]\n\n"
   end
 
   def send_dmail
