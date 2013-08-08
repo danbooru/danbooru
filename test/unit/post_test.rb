@@ -522,7 +522,7 @@ class PostTest < ActiveSupport::TestCase
 
             context "that doesn't exist" do
               should "create a new pool and add the post to that pool" do
-                @post.update_attributes(:tag_string => "aaa pool:abc")
+                @post.update_attributes(:tag_string => "aaa newpool:abc")
                 @pool = Pool.find_by_name("abc")
                 @post.reload
                 assert_not_nil(@pool)
