@@ -397,7 +397,7 @@ class Post < ActiveRecord::Base
 
     def filter_metatags(tags)
       @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent):/i}
-      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|fav):/i}
+      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav):/i}
       apply_pre_metatags
       return tags
     end
@@ -420,6 +420,10 @@ class Post < ActiveRecord::Base
           add_pool!(pool) if pool
 
         when /^pool:(.+)$/i
+          pool = Pool.find_by_name($1)
+          add_pool!(pool) if pool
+
+        when /^newpool:(.+)$/i
           pool = Pool.find_by_name($1)
           if pool.nil?
             pool = Pool.create(:name => $1, :description => "This pool was automatically generated")
