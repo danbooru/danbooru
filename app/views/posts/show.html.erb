@@ -123,6 +123,8 @@
   <% if @post.presenter.next_post_in_pool %>
     <link rel="prefetch" href="<%= post_path(@post.presenter.next_post_in_pool, :pool_id => params[:pool_id]) %>">
     <link rel="prerender" href="<%= post_path(@post.presenter.next_post_in_pool, :pool_id => params[:pool_id]) %>">
+    <link rel="prefetch" href="<%= Post.find(@post.presenter.next_post_in_pool).file_url_for(CurrentUser.user) %>">
+    <link rel="prerender" href="<%= Post.find(@post.presenter.next_post_in_pool).file_url_for(CurrentUser.user) %>">
   <% end %>
 <% end %>
 
