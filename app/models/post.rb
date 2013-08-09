@@ -973,9 +973,22 @@ class Post < ActiveRecord::Base
     end
 
     def copy_notes_to(other_post)
+      return if notes.active.length == 0
+
       notes.active.each do |note|
         note.copy_to(other_post)
       end
+
+      dummy = Note.new
+      if notes.active.length == 1
+        dummy.body = "Copied 1 note from post ##{id}."
+      else
+        dummy.body = "Copied #{notes.active.length} notes from post ##{id}."
+      end
+      dummy.is_active = false
+      dummy.post_id = other_post.id
+      dummy.x = dummy.y = dummy.width = dummy.height = 0
+      dummy.save
     end
   end
 
