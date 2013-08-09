@@ -248,6 +248,10 @@ class Artist < ActiveRecord::Base
       where("name LIKE ? ESCAPE E'\\\\'", stripped_name)
     end
 
+    def named(name)
+      where("name = ?", normalize_name(name))
+    end
+
     def any_name_matches(name)
       stripped_name = normalize_name(name).to_escaped_for_sql_like
       if name =~ /\*/ && CurrentUser.user.is_builder?
