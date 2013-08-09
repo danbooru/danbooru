@@ -235,7 +235,7 @@
     $field.val($field.val().trim().replace(/ +/g, " ") + " ");
 
     $field[0].selectionStart = $field.val().length;
-    Danbooru.RelatedTag.build_all();
+    Danbooru.RelatedTag.update_selected();
     if (Danbooru.RelatedTag.recent_artist && $("#artist-tags-container").css("display") === "block") {
       Danbooru.RelatedTag.process_artist(Danbooru.RelatedTag.recent_artist);
     }
