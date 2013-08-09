@@ -973,7 +973,7 @@ class Post < ActiveRecord::Base
     end
 
     def copy_notes_to(other_post)
-      notes.each do |note|
+      notes.active.each do |note|
         note.copy_to(other_post)
       end
     end
