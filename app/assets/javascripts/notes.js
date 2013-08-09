@@ -473,7 +473,10 @@ Danbooru.Note = {
       $(window).bind("mouseup", Danbooru.Note.TranslationMode.Drag.stop);
 
       Danbooru.notice('Translation mode is on. Drag on the image to create notes. <a href="#">Turn translation mode off</a> (shortcut is <span class="key">n</span>).');
-      $("#notice a:contains(Turn translation mode off)").click(Danbooru.Note.TranslationMode.stop);
+      $("#notice a:contains(Turn translation mode off)").click(function(e) {
+        Danbooru.Note.TranslationMode.stop();
+        e.preventDefault();
+      });
     },
 
     stop: function() {
