@@ -36,7 +36,7 @@ class UserFeedback < ActiveRecord::Base
       end
 
       if params[:user_name].present?
-        q = q.where("user_id = (select _.id from users _ where lower(_.name) = ?)", params[:user_name].mb_chars.downcase)
+        q = q.where("user_id = (select _.id from users _ where lower(_.name) = ?)", params[:user_name].mb_chars.downcase.strip.tr(" ", "_"))
       end
 
       if params[:creator_id].present?
@@ -44,7 +44,7 @@ class UserFeedback < ActiveRecord::Base
       end
 
       if params[:creator_name].present?
-        q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].mb_chars.downcase)
+        q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].mb_chars.downcase.strip.tr(" ", "_"))
       end
 
       if params[:category].present?
