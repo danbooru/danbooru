@@ -1,5 +1,5 @@
 <% if CurrentUser.is_janitor? || !forum_post.is_deleted? %>
-  <article id="forum_post_<%= forum_post.id %>" data-forum-post-id="<%= forum_post.id %>" data-creator="<%= forum_post.creator.name %>">
+  <article class="forum-post" id="forum_post_<%= forum_post.id %>" data-forum-post-id="<%= forum_post.id %>" data-creator="<%= forum_post.creator.name %>">
     <div class="author">
       <h4>
         <%= link_to_user forum_post.creator %>
