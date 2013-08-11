@@ -11,8 +11,13 @@ div.error-messages {
 div#notice {
   margin: 1em 0;
   padding: 1em;
+  position: fixed;
+  top: 1em;
+  right: 1em;
+  z-index: 100;
 }
 
 a#close-notice-link {
   float: right;
+  margin-left: 1em;
 }
