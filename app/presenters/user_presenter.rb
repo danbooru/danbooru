@@ -137,6 +137,14 @@ class UserPresenter
     end
   end
 
+  def appeal_count(template)
+    template.link_to(user.appeal_count, template.post_appeals_path(:search => {:creator_id => user.id}))
+  end
+
+  def flag_count(template)
+    template.link_to(user.flag_count, template.post_flags_path(:search => {:creator_id => user.id}))
+  end
+
   def approval_count(template)
     template.link_to(Post.where("approver_id = ?", user.id).count, template.posts_path(:tags => "approver:#{user.name}"))
   end

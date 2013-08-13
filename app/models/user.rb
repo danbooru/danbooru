@@ -524,7 +524,7 @@ class User < ActiveRecord::Base
       options[:except] ||= []
       options[:except] += hidden_attributes
       options[:methods] ||= []
-      options[:methods] += [:wiki_page_version_count, :artist_version_count, :pool_version_count, :forum_post_count, :comment_count, :positive_feedback_count, :neutral_feedback_count, :negative_feedback_count]
+      options[:methods] += [:wiki_page_version_count, :artist_version_count, :pool_version_count, :forum_post_count, :comment_count, :appeal_count, :flag_count, :positive_feedback_count, :neutral_feedback_count, :negative_feedback_count]
       super(options)
     end
 
@@ -534,7 +534,7 @@ class User < ActiveRecord::Base
       options[:except] ||= []
       options[:except] += hidden_attributes
       options[:methods] ||= []
-      options[:methods] += [:wiki_page_version_count, :artist_version_count, :pool_version_count, :forum_post_count, :comment_count, :positive_feedback_count, :neutral_feedback_count, :negative_feedback_count]
+      options[:methods] += [:wiki_page_version_count, :artist_version_count, :pool_version_count, :forum_post_count, :comment_count, :appeal_count, :flag_count, :positive_feedback_count, :neutral_feedback_count, :negative_feedback_count]
       super(options, &block)
     end
 
@@ -567,6 +567,14 @@ class User < ActiveRecord::Base
 
     def comment_count
       Comment.for_creator(id).count
+    end
+
+    def appeal_count
+      PostAppeal.for_creator(id).count
+    end
+
+    def flag_count
+      PostFlag.for_creator(id).count
     end
 
     def positive_feedback_count

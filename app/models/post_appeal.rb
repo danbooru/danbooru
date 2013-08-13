@@ -26,6 +26,10 @@ class PostAppeal < ActiveRecord::Base
       where("created_at >= ?", 1.day.ago)
     end
 
+    def for_creator(user_id)
+      where("creator_id = ?", user_id)
+    end
+
     def search(params)
       q = scoped
       return q if params.blank?
