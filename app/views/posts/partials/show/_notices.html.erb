@@ -62,6 +62,6 @@
 
 <% if post.has_large? && CurrentUser.default_image_size == "large" %>
   <div class="ui-corner-all ui-state-highlight notice notice-resized" id="image-resize-notice">
-    Resized to <%= number_to_percentage post.resize_percentage, :precision => 0 %> of original (<%= link_to "view original", post.file_url, :id => "image-resize-link" %>)
+    Resized to <%= number_to_percentage post.resize_percentage.floor, :precision => 0 %> of original (<%= link_to "view original", post.file_url, :id => "image-resize-link" %>)
   </div>
 <% end %>
