@@ -8,18 +8,32 @@ div.prose {
   }
 
   h1 {
+    font-size: $dtext_h1_size;
     padding: $h1_padding;
   }
 
   h2 {
+    font-size: $dtext_h2_size;
     padding: $h2_padding;
   }
 
   h3 {
+    font-size: $dtext_h3_size;
     padding: $h3_padding;
   }
 
-  h4, h5, h6 {
+  h4 {
+    font-size: $dtext_h4_size;
+    padding: 0;
+  }
+
+  h5 {
+    font-size: $dtext_h5_size;
+    padding: 0;
+  }
+
+  h6 {
+    font-size: $dtext_h6_size;
     padding: 0;
   }
 
