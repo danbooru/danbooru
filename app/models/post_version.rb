@@ -121,6 +121,8 @@ class PostVersion < ActiveRecord::Base
     added.each do |tag|
       if tag =~ /^source:/
         post.source = ""
+      elsif tag =~ /^parent:/
+        post.parent_id = nil
       else
         escaped_tag = Regexp.escape(tag)
         post.tag_string = post.tag_string.sub(/(?:\A| )#{escaped_tag}(?:\Z| )/, " ").strip
