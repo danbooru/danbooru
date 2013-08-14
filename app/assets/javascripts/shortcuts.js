@@ -11,7 +11,7 @@
     });
 
     $(document).bind("keypress", "q", function(e) {
-      $("#tags, #search_name, #search_name_matches, #query").trigger("focus").selectEnd();
+      $("#tags, #search_name, #search_name_matches, #query").eq(0).trigger("focus").selectEnd();
       e.preventDefault();
     });
 
