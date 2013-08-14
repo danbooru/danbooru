@@ -14,7 +14,7 @@
   Danbooru.Pool.initialize_add_to_pool_link = function() {
     $("#add-to-pool-dialog").dialog({autoOpen: false});
 
-    $("#c-pool-elements #a-new input[type=text]").autocomplete({
+    $("#add-to-pool-dialog input[type=text]").autocomplete({
       minLength: 1,
       source: function(req, resp) {
         $.ajax({

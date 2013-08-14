@@ -16,26 +16,24 @@ a.pool-category-collection, .pool-category-collection a {
   }
 }
 
-div#c-pool-elements {
-  div#a-new {
-    font-size: 0.8em;
+div#add-to-pool-dialog {
+  font-size: 0.8em;
 
-    form {
-      margin-bottom: 1em;
-    }
+  form {
+    margin-bottom: 1em;
+  }
 
-    li {
-      margin-left: 1em;
-      cursor: pointer;
-    }
+  li {
+    margin-left: 1em;
+    cursor: pointer;
+  }
 
-    h1 {
-      font-size: $h3_size;
-    }
-    
-    .hint {
-      display: block;
-    }
+  h1 {
+    font-size: $h3_size;
+  }
+  
+  .hint {
+    display: block;
   }
 }
 
