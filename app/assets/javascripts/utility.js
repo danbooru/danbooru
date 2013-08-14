@@ -102,7 +102,9 @@
   };
 
   $.fn.selectEnd = function(){
-    this.selectRange(this.val().length, this.val().length);
+    if (this.length) {
+      this.selectRange(this.val().length, this.val().length);
+    }
     return this;
   }
 })();
