@@ -68,6 +68,9 @@ class ArtistVersion < ActiveRecord::Base
     new_urls = url_array
     old_urls = version.present? ? version.url_array : []
 
+    new_urls = new_urls.map {|url| ArtistUrl.normalize(url)}
+    old_urls = old_urls.map {|url| ArtistUrl.normalize(url)}
+
     return {
       :added_urls => new_urls - old_urls,
       :removed_urls => old_urls - new_urls,
@@ -87,7 +90,7 @@ class ArtistVersion < ActiveRecord::Base
   end
 
   def previous
-    ArtistVersion.where("artist_id = ? and updated_at < ?", artist_id, updated_at).order("updated_at desc").first
+    ArtistVersion.where("artist_id = ? and created_at < ?", artist_id, created_at).order("created_at desc").first
   end
 
   def updater_name
