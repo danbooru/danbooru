@@ -18,7 +18,7 @@ class Pool < ActiveRecord::Base
   attr_accessible :is_deleted, :as => [:janitor, :moderator, :admin]
 
   module SearchMethods
-    def active
+    def undeleted
       where("is_deleted = false")
     end
 

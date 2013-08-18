@@ -22,7 +22,7 @@ class PoolElementsController < ApplicationController
   end
 
   def all_select
-    @pools = Pool.active.order("name").select("id, name").all
+    @pools = Pool.undeleted.where("is_active = true").order("name").select("id, name").all
   end
 
 private
