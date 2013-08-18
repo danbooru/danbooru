@@ -11,7 +11,7 @@ class WikiPage < ActiveRecord::Base
   validate :validate_locker_is_janitor
   attr_accessible :title, :body, :is_locked
   has_one :tag, :foreign_key => "name", :primary_key => "title"
-  has_one :artist, :foreign_key => "name", :primary_key => "title"
+  has_one :artist, :foreign_key => "name", :primary_key => "title", :conditions => {:is_active => true}
   has_many :versions, :class_name => "WikiPageVersion", :dependent => :destroy, :order => "wiki_page_versions.id ASC"
 
   module SearchMethods
