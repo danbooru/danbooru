@@ -26,7 +26,7 @@ module PostsHelper
       text = "pixiv/#{$1}"
       source_link = link_to(text, post.normalized_source)
       source_search = "source:#{text}/"
-    elsif post.source =~ /^http/
+    elsif post.source =~ %r{\Ahttps?://}
       text = truncate(post.normalized_source.sub(/^https?:\/\/(?:www\.)?/, ""))
       source_link = link_to(truncate(text, :length => 20), post.normalized_source)
       source_search = "source:#{post.source.sub(/[^\/]*$/, "")}"
