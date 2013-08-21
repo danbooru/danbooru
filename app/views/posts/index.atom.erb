@@ -14,7 +14,7 @@
     <entry>
       <title><%= post.presenter.humanized_essential_tag_string %></title>
       <link href="http://<%= Danbooru.config.hostname %>/posts/<%= post.id %>" rel="alternate"/>
-      <% if post.source =~ /^http/ %>
+      <% if post.source =~ %r{\Ahttps?://} %>
         <link href="<%= post.source %>" rel="related"/>
       <% end %>
       <id>http://<%= Danbooru.config.hostname %>/posts/<%= post.id %></id>
