@@ -35,11 +35,11 @@ class PostFlag < ActiveRecord::Base
       q = scoped
       return q if params.blank?
 
-      if params[:creator_id].present?
+      if params[:creator_id].present? && (CurrentUser.user.is_janitor? || params[:creator_id].to_i == CurrentUser.user.id)
         q = q.where("creator_id = ?", params[:creator_id].to_i)
       end
 
-      if params[:creator_name].present?
+      if params[:creator_name].present? && CurrentUser.user.is_janitor?
         q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].mb_chars.downcase.strip.tr(" ", "_"))
       end
 

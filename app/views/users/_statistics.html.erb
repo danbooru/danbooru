@@ -92,17 +92,17 @@
         </td>
       </tr>
 
-      <tr>
-        <th>Appeals</th>
-        <td><%= presenter.appeal_count(self) %>
-        </td>
-      </tr>
+      <% if CurrentUser.user.id == user.id || CurrentUser.user.is_janitor? %>
+        <tr>
+          <th>Appeals</th>
+          <td><%= presenter.appeal_count(self) %></td>
+        </tr>
+      <% end %>
 
       <% if CurrentUser.user.id == user.id || CurrentUser.user.is_janitor? %>
         <tr>
           <th>Flags</th>
-          <td><%= presenter.flag_count(self) %>
-          </td>
+          <td><%= presenter.flag_count(self) %></td>
         </tr>
       <% end %>
 
