@@ -469,6 +469,7 @@ Danbooru.Note = {
       Danbooru.Note.TranslationMode.active = true;
       $(document.body).addClass("mode-translation");
       $("#original-file-link").click();
+      $("#image").unbind("click", Danbooru.Note.Box.toggle_all);
       $("#image").bind("mousedown", Danbooru.Note.TranslationMode.Drag.start);
       $(window).bind("mouseup", Danbooru.Note.TranslationMode.Drag.stop);
 
@@ -482,6 +483,7 @@ Danbooru.Note = {
     stop: function() {
       Danbooru.Note.TranslationMode.active = false;
       $("#image").css("cursor", "auto");
+      $("#image").bind("click", Danbooru.Note.Box.toggle_all);
       $("#image").unbind("mousedown", Danbooru.Note.TranslationMode.Drag.start);
       $(window).unbind("mouseup", Danbooru.Note.TranslationMode.Drag.stop);
       $(document.body).removeClass("mode-translation");
@@ -503,10 +505,6 @@ Danbooru.Note = {
       $("#note-container").css('visibility', 'visible');
       e.stopPropagation();
       e.preventDefault();
-
-      // Hack to ignore clicks for some milliseconds
-      // The mouseup event is executed before the click event, so it's hard to do this properly
-      Danbooru.Note.ignore_click_until = (new Date).getTime() + 200;
     },
 
     Drag: {
@@ -590,7 +588,7 @@ Danbooru.Note = {
           Danbooru.Note.TranslationMode.create_note(e, Danbooru.Note.TranslationMode.Drag.x, Danbooru.Note.TranslationMode.Drag.y, Danbooru.Note.TranslationMode.Drag.w-1, Danbooru.Note.TranslationMode.Drag.h-1);
           Danbooru.Note.TranslationMode.Drag.dragging = false; /* border of the note is pixel-perfect on the preview border */
         } else { /* no dragging -> toggle display of notes */
-          Danbooru.Note.toggle_all();
+          Danbooru.Note.Box.toggle_all();
         }
 
         Danbooru.Note.TranslationMode.Drag.dragStartX = 0;
@@ -604,7 +602,6 @@ Danbooru.Note = {
   editing: false,
   timeouts: [],
   pending: {},
-  ignore_click_until: 0,
 
   add: function(container, id, x, y, w, h, text) {
     var $note_box = Danbooru.Note.Box.create(id);
@@ -671,11 +668,6 @@ $(function() {
       $(document).bind("keypress", "n", Danbooru.Note.TranslationMode.toggle);
     }
     Danbooru.Note.load_all();
-    $("#image").click(function(e) {
-      // Ignore the click event when adding a note
-      if ((new Date).getTime() >= Danbooru.Note.ignore_click_until) {
-        Danbooru.Note.Box.toggle_all();
-      }
-    });
+    $("#image").bind("click", Danbooru.Note.Box.toggle_all);
   }
 });
