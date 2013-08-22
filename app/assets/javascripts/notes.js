@@ -521,6 +521,9 @@ Danbooru.Note = {
       h: 0,
 
       start: function (e) {
+        if (e.which !== 1) {
+          return;
+        }
         e.preventDefault(); /* don't drag the image */
         $(window).mousemove(Danbooru.Note.TranslationMode.Drag.drag);
         Danbooru.Note.TranslationMode.Drag.dragStartX = e.pageX;
@@ -580,6 +583,9 @@ Danbooru.Note = {
       },
 
       stop: function (e) {
+        if (e.which !== 1) {
+          return;
+        }
         if (Danbooru.Note.TranslationMode.Drag.dragStartX === 0) {
           return; /* 'stop' is bound to window, don't create note if start wasn't triggered */
         }
