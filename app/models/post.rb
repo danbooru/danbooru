@@ -972,6 +972,10 @@ class Post < ActiveRecord::Base
       last_noted_at.to_i
     end
 
+    def has_notes?
+      last_noted_at.present?
+    end
+
     def copy_notes_to(other_post)
       return if notes.active.length == 0
 
@@ -1024,7 +1028,7 @@ class Post < ActiveRecord::Base
         "has_children" => has_children?,
         "created_at" => created_at.to_formatted_s(:db),
         "md5" => md5,
-        "has_notes" => last_noted_at.present?,
+        "has_notes" => has_notes?,
         "rating" => rating,
         "author" => uploader_name,
         "creator_id" => uploader_id,
