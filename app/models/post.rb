@@ -977,7 +977,14 @@ class Post < ActiveRecord::Base
     end
 
     def copy_notes_to(other_post)
-      return if notes.active.length == 0
+      if id == other_post.id
+        errors.add :base, "Source and destination posts are the same"
+        return false
+      end
+      unless has_notes?
+        errors.add :post, "has no notes"
+        return false
+      end
 
       notes.active.each do |note|
         note.copy_to(other_post)

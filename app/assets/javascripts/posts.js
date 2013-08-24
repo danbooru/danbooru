@@ -324,13 +324,18 @@
           data: {
             other_post_id: other_post_id
           },
-          complete: function(data) {
-            if (data.status === 200) {
-              Danbooru.notice("Successfully copied notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
+          success: function(data) {
+            Danbooru.notice("Successfully copied notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
+          },
+          error: function(data) {
+            if (data.status === 404) {
+              Danbooru.error("Error: Invalid destination post");
+            } else if (data.responseJSON && data.responseJSON.reason) {
+              Danbooru.error("Error: " + data.responseJSON.reason);
             } else {
               Danbooru.error("There was an error copying notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
             }
-          },
+          }
         });
       }
 
