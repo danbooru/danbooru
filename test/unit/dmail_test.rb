@@ -72,7 +72,7 @@ class DmailTest < ActiveSupport::TestCase
     should "send an email if the user wants it" do
       user = FactoryGirl.create(:user, :receive_email_notifications => true)
       assert_difference("ActionMailer::Base.deliveries.size", 1) do
-        FactoryGirl.create(:dmail, :to => user, :owner => @user)
+        FactoryGirl.create(:dmail, :to => user, :owner => user)
       end
     end
 
