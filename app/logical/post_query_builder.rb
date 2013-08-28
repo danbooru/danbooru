@@ -274,6 +274,10 @@ class PostQueryBuilder
 
     relation = add_tag_string_search_relation(q[:tags], relation)
 
+    if q[:ordfav].present?
+      relation = relation.joins(:favorites).where("favorites.user_id = ?", q[:ordfav].to_i).order("favorites.id DESC")
+    end
+
     if q[:order] == "rank"
       relation = relation.where("posts.score > 0 and posts.created_at >= ?", 2.days.ago)
     elsif q[:order] == "landscape" || q[:order] == "portrait"
