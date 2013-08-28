@@ -52,6 +52,7 @@ class PostPresenter < Presenter
       data-has-children="#{post.has_children?}"
       data-score="#{post.score}"
       data-fav-count="#{post.fav_count}"
+      data-pixiv-id="#{post.pixiv_id}"
     }.html_safe
   end
 
