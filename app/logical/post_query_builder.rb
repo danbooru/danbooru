@@ -275,7 +275,8 @@ class PostQueryBuilder
     relation = add_tag_string_search_relation(q[:tags], relation)
 
     if q[:ordfav].present?
-      relation = relation.joins(:favorites).where("favorites.user_id = ?", q[:ordfav].to_i).order("favorites.id DESC")
+      user_id = q[:ordfav].to_i
+      relation = relation.joins(:favorites).where("favorites.user_id % 100 = ? and favorites.user_id = ?", user_id % 100, user_id).order("favorites.id DESC")
     end
 
     if q[:order] == "rank"
