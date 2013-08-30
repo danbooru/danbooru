@@ -301,7 +301,11 @@
       });
 
       $(document).bind("keypress", "f", function(e) {
-        $("#add-to-favorites:visible").trigger("click");
+        if ($("#add-to-favorites").is(":visible")) {
+          $("#add-to-favorites").click();
+        } else {
+          Danbooru.notice("You have already favorited this post")
+        }
         e.preventDefault();
       });
     }
