@@ -655,7 +655,7 @@ class PostTest < ActiveSupport::TestCase
           assert_equal(1, new_post.tag_count)
         end
 
-        should "merge any changes that were made after loading the initial set of tags part 1" do
+        should "merge any tag changes that were made after loading the initial set of tags part 1" do
           post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
 
           # user a adds <ddd>
@@ -675,7 +675,7 @@ class PostTest < ActiveSupport::TestCase
           assert_equal(%w(aaa bbb ddd eee), Tag.scan_tags(final_post.tag_string).sort)
         end
 
-        should "merge any changes that were made after loading the initial set of tags part 2" do
+        should "merge any tag changes that were made after loading the initial set of tags part 2" do
           # This is the same as part 1, only the order of operations is reversed.
           # The results should be the same.
 
@@ -696,6 +696,34 @@ class PostTest < ActiveSupport::TestCase
           # final should be <aaa>, <bbb>, <ddd>, <eee>
           final_post = Post.find(post.id)
           assert_equal(%w(aaa bbb ddd eee), Tag.scan_tags(final_post.tag_string).sort)
+        end
+
+        should "merge any parent, source, and rating changes that were made after loading the initial set" do
+          post = FactoryGirl.create(:post, :parent => nil, :source => nil, :rating => "q")
+          parent_post = FactoryGirl.create(:post)
+
+          # user a changes rating to safe, adds parent
+          post_edited_by_user_a = Post.find(post.id)
+          post_edited_by_user_a.old_parent_id = nil
+          post_edited_by_user_a.old_source = nil
+          post_edited_by_user_a.old_rating = "q"
+          post_edited_by_user_a.parent_id = parent_post.id
+          post_edited_by_user_a.rating = "s"
+          post_edited_by_user_a.save
+
+          # user b adds source
+          post_edited_by_user_b = Post.find(post.id)
+          post_edited_by_user_b.old_parent_id = nil
+          post_edited_by_user_b.old_source = nil
+          post_edited_by_user_b.old_rating = "q"
+          post_edited_by_user_b.source = "http://example.com"
+          post_edited_by_user_b.save
+
+          # final post should be rated safe and have the set parent and source
+          final_post = Post.find(post.id)
+          assert_equal(parent_post.id, final_post.parent_id)
+          assert_equal("http://example.com", final_post.source)
+          assert_equal("s", final_post.rating)
         end
       end
 

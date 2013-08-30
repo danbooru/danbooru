@@ -8,6 +8,9 @@
   <%= hidden_field_tag :tags_query, params[:tags] %>
   <%= hidden_field_tag :pool_id, params[:pool_id] %>
   <%= f.hidden_field :old_tag_string, :value => post.tag_string %>
+  <%= f.hidden_field :old_parent_id, :value => post.parent_id %>
+  <%= f.hidden_field :old_source, :value => post.source %>
+  <%= f.hidden_field :old_rating, :value => post.rating %>
 
   <div class="input">
     <% if post.is_rating_locked? %>
