@@ -704,19 +704,22 @@ class PostTest < ActiveSupport::TestCase
 
           # user a changes rating to safe, adds parent
           post_edited_by_user_a = Post.find(post.id)
-          post_edited_by_user_a.old_parent_id = nil
-          post_edited_by_user_a.old_source = nil
+          post_edited_by_user_a.old_parent_id = ""
+          post_edited_by_user_a.old_source = ""
           post_edited_by_user_a.old_rating = "q"
           post_edited_by_user_a.parent_id = parent_post.id
+          post_edited_by_user_a.source = nil
           post_edited_by_user_a.rating = "s"
           post_edited_by_user_a.save
 
           # user b adds source
           post_edited_by_user_b = Post.find(post.id)
-          post_edited_by_user_b.old_parent_id = nil
-          post_edited_by_user_b.old_source = nil
+          post_edited_by_user_b.old_parent_id = ""
+          post_edited_by_user_b.old_source = ""
           post_edited_by_user_b.old_rating = "q"
+          post_edited_by_user_b.parent_id = nil
           post_edited_by_user_b.source = "http://example.com"
+          post_edited_by_user_b.rating = "q"
           post_edited_by_user_b.save
 
           # final post should be rated safe and have the set parent and source
