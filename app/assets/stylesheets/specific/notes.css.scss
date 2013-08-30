@@ -38,6 +38,23 @@ div#note-container {
     small {
       font-size: 0.8em;
     }
+
+    ul {
+      margin-left: 1em;
+      margin-bottom: 1em;
+
+      ul {
+        margin-bottom: 0;
+      }
+
+      li {
+        list-style-type: disc;
+
+        + br {
+          display: none;
+        }
+      }
+    }
   }
 
   div.note-box {
