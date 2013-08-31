@@ -21,11 +21,13 @@
     $('html, body').animate({scrollTop: top}, 300, "linear", function() {Danbooru.scrolling = false;});
   }
 
-  Danbooru.notice = function(msg) {
+  Danbooru.notice = function(msg, permanent) {
     $('#notice').addClass("ui-state-highlight").removeClass("ui-state-error").fadeIn("fast").children("span").html(msg);
-    setTimeout(function() {
-      $("#close-notice-link").click();
-    }, 6000);
+    if (!permanent) {
+      setTimeout(function() {
+        $("#close-notice-link").click();
+      }, 6000);
+    }
   }
 
   Danbooru.error = function(msg) {

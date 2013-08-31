@@ -552,14 +552,14 @@
   Danbooru.Post.notice_update = function(x) {
     if (x === "inc") {
       Danbooru.Post.pending_update_count += 1;
-      Danbooru.notice("Updating posts (" + Danbooru.Post.pending_update_count + " pending)...");
+      Danbooru.notice("Updating posts (" + Danbooru.Post.pending_update_count + " pending)...", true);
     } else {
       Danbooru.Post.pending_update_count -= 1;
 
       if (Danbooru.Post.pending_update_count < 1) {
         Danbooru.notice("Posts updated");
       } else {
-        Danbooru.notice("Updating posts (" + Danbooru.Post.pending_update_count + " pending)...");
+        Danbooru.notice("Updating posts (" + Danbooru.Post.pending_update_count + " pending)...", true);
       }
     }
   }
