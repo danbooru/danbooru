@@ -559,7 +559,7 @@
       if (Danbooru.Post.pending_update_count < 1) {
         Danbooru.notice("Posts updated");
       } else {
-        Danbooru.notice("Updating posts (" + Post.pending_update_count + " pending)...");
+        Danbooru.notice("Updating posts (" + Danbooru.Post.pending_update_count + " pending)...");
       }
     }
   }
