@@ -49,7 +49,10 @@ class TagAlias < ActiveRecord::Base
     end
 
     def clear_all_cache
-      Danbooru.config.all_server_hosts.each do |host|
+      TagAlias.clear_cache_for(antecedent_name)
+      TagAlias.clear_cache_for(consequent_name)
+      
+      Danbooru.config.other_server_hosts.each do |host|
         TagAlias.delay(:queue => host).clear_cache_for(antecedent_name)
         TagAlias.delay(:queue => host).clear_cache_for(consequent_name)
       end
