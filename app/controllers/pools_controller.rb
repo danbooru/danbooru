@@ -33,6 +33,7 @@ class PoolsController < ApplicationController
 
   def create
     @pool = Pool.create(params[:pool])
+    flash[:notice] = "Pool created"
     respond_with(@pool)
   end
 
@@ -42,6 +43,7 @@ class PoolsController < ApplicationController
     @pool.attributes = params[:pool]
     @pool.synchronize!
     @pool.save
+    flash[:notice] = "Pool updated"
     respond_with(@pool)
   end
 
@@ -71,6 +73,7 @@ class PoolsController < ApplicationController
     @pool = Pool.find(params[:id])
     @version = PoolVersion.find(params[:version_id])
     @pool.revert_to!(@version)
+    flash[:notice] = "Pool reverted"
     respond_with(@pool) do |format|
       format.js
     end
