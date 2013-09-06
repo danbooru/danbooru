@@ -19,9 +19,13 @@
     <section id="content">
       <h1>Favorites</h1>
 
-      <%= @favorite_set.presenter.post_previews_html(self) %>
+      <%= render "posts/partials/index/edit" %>
 
-      <%= sequential_paginator(@favorite_set.favorites) %>
+      <div id="posts">
+        <%= @favorite_set.presenter.post_previews_html(self) %>
+
+        <%= sequential_paginator(@favorite_set.favorites) %>
+      </div>
     </section>
 
     <% content_for(:page_title) do %>
