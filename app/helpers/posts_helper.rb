@@ -49,7 +49,7 @@ module PostsHelper
     html = ""
 
     html << "This post belongs to a "
-    html << link_to("parent", post_path(post.parent_id))
+    html << link_to("parent", posts_path(:tags => "parent:#{post.parent_id}"))
     html << " (deleted)" if parent_post_set.parent.first.is_deleted?
 
     sibling_count = parent_post_set.children.count - 1
