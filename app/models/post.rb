@@ -18,6 +18,7 @@ class Post < ActiveRecord::Base
   before_validation :initialize_uploader, :on => :create
   before_validation :parse_pixiv_id
   before_validation :blank_out_nonexistent_parents
+  before_validation :remove_parent_loops
   belongs_to :updater, :class_name => "User"
   belongs_to :approver, :class_name => "User"
   belongs_to :uploader, :class_name => "User"
@@ -811,6 +812,13 @@ class Post < ActiveRecord::Base
     def blank_out_nonexistent_parents
       if parent_id.present? && parent.nil?
         self.parent_id = nil
+      end
+    end
+
+    def remove_parent_loops
+      if parent.present? && parent.parent_id == id
+        parent.parent_id = nil
+        parent.save
       end
     end
 
