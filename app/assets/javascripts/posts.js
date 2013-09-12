@@ -219,6 +219,10 @@
 
     var render_tag = function(list, tag) {
       var $link = $("<a/>").addClass("tag-type-" + tag.category).text(tag.label);
+      $link.attr("href", "/posts?tags=" + encodeURIComponent(tag.value));
+      $link.click(function(e) {
+        e.preventDefault();
+      });
 
       var count;
       if (tag.post_count >= 1000) {
