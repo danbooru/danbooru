@@ -23,13 +23,13 @@ private
     text.gsub!(/\s+$/, "")
     text.gsub!(/ {2,}/, " ")
     text.split(/\r\n|\r|\n/).map do |line|
-      if line =~ /create alias (\S+) -> (\S+)/i
+      if line =~ /^create alias (\S+) -> (\S+)$/i
         [:create_alias, $1, $2]
-      elsif line =~ /create implication (\S+) -> (\S+)/i
+      elsif line =~ /^create implication (\S+) -> (\S+)$/i
         [:create_implication, $1, $2]
-      elsif line =~ /remove alias (\S+) -> (\S+)/i
+      elsif line =~ /^remove alias (\S+) -> (\S+)$/i
         [:remove_alias, $1, $2]
-      elsif line =~ /remove implication (\S+) -> (\S+)/i
+      elsif line =~ /^remove implication (\S+) -> (\S+)$/i
         [:remove_implication, $1, $2]
       elsif line.empty?
         # do nothing
