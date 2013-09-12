@@ -9,6 +9,7 @@ class WikiPage < ActiveRecord::Base
   validates_uniqueness_of :title, :case_sensitive => false
   validates_presence_of :title
   validate :validate_locker_is_janitor
+  validate :validate_not_locked
   attr_accessible :title, :body, :is_locked
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, :foreign_key => "name", :primary_key => "title", :conditions => {:is_active => true}
@@ -97,6 +98,13 @@ class WikiPage < ActiveRecord::Base
   def validate_locker_is_janitor
     if is_locked_changed? && !CurrentUser.is_janitor?
       errors.add(:is_locked, "can be modified by janitors only")
+      return false
+    end
+  end
+
+  def validate_not_locked
+    if is_locked? && !CurrentUser.is_janitor?
+      errors.add(:is_locked, "and cannot be updated")
       return false
     end
   end
