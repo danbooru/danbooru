@@ -19,6 +19,11 @@ $h3_padding: 1.51785em 0;
 $h4_padding: 1.51785em 0;
 $baseline: 1em;
 $basefont: 100%;
+$preview_has_children_color: #0F0;
+$preview_has_parent_color: #CC0;
+$preview_deleted_color: #000;
+$preview_pending_color: #00F;
+$preview_flagged_color: #F00;
 
 @mixin border-radius($val) {
   -moz-border-radius: $val;
