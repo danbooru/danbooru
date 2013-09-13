@@ -1,0 +1,20 @@
+<h1>Tag Implication: <%= @tag_implication.antecedent_name %> -&gt; <%= @tag_implication.consequent_name %></h1>
+
+<ul>
+  <li><strong>From</strong> <%= link_to @tag_implication.antecedent_name, posts_path(:tags => @tag_implication.antecedent_name) %></li>
+  <li><strong>To</strong> <%= link_to @tag_implication.consequent_name, posts_path(:tags => @tag_implication.consequent_name) %></li>
+  <% if @tag_implication.forum_topic_id %>
+    <li><strong>Reference</strong> <%= link_to @tag_implication.forum_topic_id, forum_topic_path(@tag_implication.forum_topic_id) %></li>
+  <% end %>
+  <li><strong>Creator</strong> <%= link_to @tag_implication.creator.name, user_path(@tag_implication.creator) %></li>
+  <li><strong>Date</strong> <%= @tag_implication.created_at %></li>
+  <% if @tag_implication.respond_to?(:reason) %>
+    <li><strong>Reason</strong> <%= format_text @tag_implication.reason %></li>
+  <% end %>
+</ul>
+
+<%= render "tag_implications/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Tag Implication - <%= Danbooru.config.app_name %>
+<% end %>

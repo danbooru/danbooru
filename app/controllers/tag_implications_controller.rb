@@ -2,6 +2,11 @@ class TagImplicationsController < ApplicationController
   before_filter :admin_only, :only => [:new, :create, :approve]
   respond_to :html, :xml, :json, :js
 
+  def show
+    @tag_implication = TagImplication.find(params[:id])
+    respond_with(@tag_implication)
+  end
+
   def new
     @tag_implication = TagImplication.new
     respond_with(@tag_implication)

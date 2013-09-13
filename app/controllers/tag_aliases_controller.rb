@@ -2,6 +2,11 @@ class TagAliasesController < ApplicationController
   before_filter :admin_only, :only => [:approve, :new, :create]
   respond_to :html, :xml, :json, :js
 
+  def show
+    @tag_alias = TagAlias.find(params[:id])
+    respond_with(@tag_alias)
+  end
+
   def new
     @tag_alias = TagAlias.new(params[:tag_alias])
     respond_with(@tag_alias)
