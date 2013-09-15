@@ -24,6 +24,14 @@ class ForumPost < ActiveRecord::Base
       end
     end
 
+    def topic_title_matches(title)
+      if title =~ /\*/ && CurrentUser.user.is_builder?
+        joins(:topic).where("forum_topics.title ILIKE ? ESCAPE E'\\\\'", title.to_escaped_for_sql_like)
+      else
+        joins(:topic).where("forum_topics.text_index @@ plainto_tsquery(E?)", title.to_escaped_for_tsquery_split)
+      end
+    end
+
     def for_user(user_id)
       where("forum_posts.creator_id = ?", user_id)
     end
@@ -49,7 +57,7 @@ class ForumPost < ActiveRecord::Base
       end
 
       if params[:topic_title_matches].present?
-        q = q.joins(:topic).where("forum_topics.text_index @@ plainto_tsquery(E?)", params[:topic_title_matches].to_escaped_for_tsquery_split)
+        q = q.topic_title_matches(params[:topic_title_matches])
       end
 
       if params[:body_matches].present?
