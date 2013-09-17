@@ -6,7 +6,7 @@
   <% if @tag_alias.forum_topic_id %>
     <li><strong>Reference</strong> <%= link_to @tag_alias.forum_topic_id, forum_topic_path(@tag_alias.forum_topic_id) %></li>
   <% end %>
-  <li><strong>Creator</strong> <%= link_to @tag_alias.creator.name, user_path(@tag_alias.creator) %></li>
+  <li><strong>Creator</strong> <%= link_to_user @tag_alias.creator %></li>
   <li><strong>Date</strong> <%= @tag_alias.created_at %></li>
   <% if @tag_alias.respond_to?(:reason) %>
     <li><strong>Reason</strong> <%= format_text @tag_alias.reason %></li>
