@@ -14,7 +14,7 @@
         <% @tag_subscriptions.each do |tag_subscription| %>
           <tr>
             <td><%= tag_subscription.pretty_name %></td>
-            <td><%= tag_subscription.tag_query %></td>
+            <td><%= tag_subscription.pretty_tag_query %></td>
             <td><%= tag_subscription.post_id_array.size %></td>
             <td>
               <%= link_to "edit", edit_tag_subscription_path(tag_subscription) %>
@@ -26,7 +26,7 @@
       </tbody>
     </table>
 
-    <p class="info">You can create up to <%= Danbooru.config.max_tag_subscriptions %> subscriptions with up to 20 tags each.</p>
+    <p class="info">You can create up to <%= Danbooru.config.max_tag_subscriptions %> subscriptions with up to 20 queries each.</p>
   </div>
 </div>
 

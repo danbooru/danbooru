@@ -6,7 +6,7 @@ class TagSubscription < ActiveRecord::Base
   before_save :limit_tag_count
   attr_accessible :name, :tag_query, :post_ids, :is_public, :is_visible_on_profile
   validates_presence_of :name, :tag_query, :creator_id
-  validates_format_of :tag_query, :with => /\A(?:\S*\s*){1,20}\Z/, :message => "can have up to 20 tags"
+  validates_format_of :tag_query, :with => /\A(?:[^\r\n]*(?:\r?\n)*){1,20}\Z/, :message => "can have up to 20 queries"
   validate :creator_can_create_subscriptions, :on => :create
 
   def normalize_name
@@ -15,6 +15,10 @@ class TagSubscription < ActiveRecord::Base
 
   def pretty_name
     name.tr("_", " ")
+  end
+
+  def pretty_tag_query
+    tag_query_array.join(", ")
   end
 
   def initialize_creator
@@ -35,7 +39,7 @@ class TagSubscription < ActiveRecord::Base
   end
 
   def tag_query_array
-    Tag.scan_query(tag_query)
+    tag_query.scan(/[^\r\n]+/)
   end
 
   def limit_tag_count
@@ -44,8 +48,8 @@ class TagSubscription < ActiveRecord::Base
 
   def process
     divisor = [tag_query_array.size / 2, 1].max
-    post_ids = tag_query_array.inject([]) do |all, tag|
-      all += Post.tag_match(tag).limit(Danbooru.config.tag_subscription_post_limit / divisor).select("posts.id").order("posts.id DESC").map(&:id)
+    post_ids = tag_query_array.inject([]) do |all, query|
+      all += Post.tag_match(query).limit(Danbooru.config.tag_subscription_post_limit / divisor).select("posts.id").order("posts.id DESC").map(&:id)
     end
     self.post_ids = post_ids.sort.reverse.slice(0, Danbooru.config.tag_subscription_post_limit).join(",")
   end
@@ -103,7 +107,7 @@ class TagSubscription < ActiveRecord::Base
         relation = relation.where(["name ILIKE ? ESCAPE E'\\\\'", sub_group.to_escaped_for_sql_like])
       end
 
-      relation.map {|x| x.tag_query.split(/ /)}.flatten
+      relation.map {|x| x.tag_query.split(/\r?\n/)}.flatten
     else
       []
     end
@@ -134,8 +138,8 @@ class TagSubscription < ActiveRecord::Base
   end
 
   def self.process_all
-    CurrentUser.scoped(User.admins.first, "127.0.0.1") do
-      find_each do |tag_subscription|
+    find_each do |tag_subscription|
+      CurrentUser.scoped(tag_subscription.creator, "127.0.0.1") do
         if $job_task_daemon_active != false && tag_subscription.creator.is_gold? && tag_subscription.is_active?
           begin
             tag_subscription.process
