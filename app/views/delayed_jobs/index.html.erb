@@ -4,6 +4,7 @@
   <thead>
     <tr>
       <th>ID</th>
+      <th>Name</th>
       <% if CurrentUser.is_admin? %>
         <th>Handler</th>
       <% end %>
@@ -19,6 +20,7 @@
     <% @delayed_jobs.each do |job| %>
       <tr>
         <td><%= job.id %></td>
+        <td><%= raw print_name(job) %></td>
         <% if CurrentUser.is_admin? %>
           <td><%= raw print_handler(job) %></td>
         <% end %>
