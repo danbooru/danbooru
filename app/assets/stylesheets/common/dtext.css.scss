@@ -87,7 +87,7 @@ div.prose {
     padding: 0.7em;
     border-top: 1px solid #666;
 
-    p:last-child {
+    > :last-child {
       margin-bottom: 0;
     }
   }
