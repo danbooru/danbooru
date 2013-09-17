@@ -83,7 +83,7 @@ module PostSets
     end
 
     def is_pattern_search?
-      tag_string =~ /\*/
+      is_single_tag? && tag_string =~ /\*/
     end
 
     def current_page
