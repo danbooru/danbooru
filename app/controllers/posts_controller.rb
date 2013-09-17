@@ -112,6 +112,12 @@ class PostsController < ApplicationController
     end
   end
 
+  def random
+    count = Post.fast_count(params[:tags])
+    @post = Post.tag_match(params[:tags]).offset(rand(count)).first
+    redirect_to post_path(@post, :tags => params[:tags])
+  end
+
 private
   def tag_query
     params[:tags] || (params[:post] && params[:post][:tags])

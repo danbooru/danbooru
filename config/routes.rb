@@ -156,6 +156,7 @@ Danbooru::Application.routes.draw do
     resources :votes, :controller => "post_votes", :only => [:create, :destroy]
     collection do
       get :home
+      get :random
     end
     member do
       put :revert
