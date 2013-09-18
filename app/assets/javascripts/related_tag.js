@@ -124,9 +124,9 @@
 
     this.build_recent_and_frequent($dest);
 
-    $dest.append(this.build_html(query, related_tags));
+    $dest.append(this.build_html(query, related_tags, "general"));
     if (wiki_page_tags.length) {
-      $dest.append(Danbooru.RelatedTag.build_html("wiki:" + query, wiki_page_tags));
+      $dest.append(Danbooru.RelatedTag.build_html("wiki:" + query, wiki_page_tags, "wiki"));
     }
     if (Danbooru.RelatedTag.recent_artists) {
       var tags = [];
@@ -147,7 +147,7 @@
           tags.push([artist.name, 1]);
         });
       }
-     $dest.append(Danbooru.RelatedTag.build_html("artist", tags, true));
+     $dest.append(Danbooru.RelatedTag.build_html("artist", tags, "artist", true));
     }
   }
 
@@ -155,10 +155,10 @@
     var recent_tags = Danbooru.Cookie.get("recent_tags_with_categories");
     var favorite_tags = Danbooru.Cookie.get("favorite_tags_with_categories");
     if (recent_tags.length) {
-      $dest.append(this.build_html("recent", this.other_tags(recent_tags)));
+      $dest.append(this.build_html("recent", this.other_tags(recent_tags), "recent"));
     }
     if (favorite_tags.length) {
-      $dest.append(this.build_html("frequent", this.other_tags(favorite_tags)));
+      $dest.append(this.build_html("frequent", this.other_tags(favorite_tags), "frequent"));
     }
   }
 
@@ -173,7 +173,7 @@
     }
   }
 
-  Danbooru.RelatedTag.build_html = function(query, related_tags, is_wide_column) {
+  Danbooru.RelatedTag.build_html = function(query, related_tags, name, is_wide_column) {
     if (query === null || query === "") {
       return "";
     }
@@ -189,6 +189,7 @@
     }
 
     var $div = $("<div/>");
+    $div.attr("id", name + "-related-tags-column");
     $div.addClass("tag-column");
     if (is_wide_column) {
       $div.addClass("wide-column");
