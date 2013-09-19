@@ -339,9 +339,6 @@ class PostQueryBuilder
     when "rank"
       relation = relation.order("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 45000 DESC")
 
-    when "random"
-      relation = relation.order("random()")
-
     else
       relation = relation.order("posts.id DESC")
     end
