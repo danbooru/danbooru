@@ -1,7 +1,10 @@
 <div id="c-pools">
   <div id="c-new">
+    <h1>New Pool</h1>
+
+    <p style="font-weight: bold;">Before creating a pool, read the <%= link_to "pool guidelines", wiki_page_path(:id => "howto:pools") %>.</p>
+
     <%= simple_form_for(@pool) do |f| %>
-      <h1>New Pool</h1>
       <%= f.input :name, :as => :string, :required => true %>
       <%= dtext_field "pool", "description" %>
       <%= f.input :post_ids, :label => "Posts" %>
