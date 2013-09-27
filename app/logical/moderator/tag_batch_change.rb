@@ -5,8 +5,8 @@ module Moderator
     def perform
       raise Error.new("antecedent is missing") if antecedent.blank?
 
-      normalized_antecedent = TagAlias.to_aliased(::Tag.scan_tags(antecedent))
-      normalized_consequent = TagAlias.to_aliased(::Tag.scan_tags(consequent))
+      normalized_antecedent = TagAlias.to_aliased(::Tag.scan_tags(antecedent.mb_chars.downcase))
+      normalized_consequent = TagAlias.to_aliased(::Tag.scan_tags(consequent.mb_chars.downcase))
 
       updater = User.find(updater_id)
 
