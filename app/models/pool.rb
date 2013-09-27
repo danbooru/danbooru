@@ -2,7 +2,7 @@ require 'ostruct'
 
 class Pool < ActiveRecord::Base
   validates_uniqueness_of :name
-  validates_format_of :name, :with => /\A[^\s,]+\Z/, :on => :create, :message => "cannot have whitespace or commas"
+  validates_format_of :name, :with => /\A[^\s,]+\Z/, :message => "cannot have whitespace or commas"
   validates_inclusion_of :category, :in => %w(series collection)
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
