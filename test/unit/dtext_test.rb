@@ -5,6 +5,10 @@ class DTextTest < ActiveSupport::TestCase
     DText.parse(s)
   end
 
+  def test_sanitize_heart
+    assert_equal('<p>&lt;3</p>', p("<3"))
+  end
+
   def test_sanitize_less_than
     assert_equal('<p>&lt;</p>', p("<"))
   end
