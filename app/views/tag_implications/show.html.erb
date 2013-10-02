@@ -4,7 +4,7 @@
   <li><strong>From</strong> <%= link_to @tag_implication.antecedent_name, posts_path(:tags => @tag_implication.antecedent_name) %></li>
   <li><strong>To</strong> <%= link_to @tag_implication.consequent_name, posts_path(:tags => @tag_implication.consequent_name) %></li>
   <% if @tag_implication.forum_topic_id %>
-    <li><strong>Reference</strong> <%= link_to "topic ##{@tag_implication.forum_topic_id}, forum_topic_path(@tag_implication.forum_topic_id) %></li>
+    <li><strong>Reference</strong> <%= link_to "topic ##{@tag_implication.forum_topic_id}", forum_topic_path(@tag_implication.forum_topic_id) %></li>
   <% end %>
   <li><strong>Creator</strong> <%= link_to_user @tag_implication.creator %></li>
   <li><strong>Date</strong> <%= @tag_implication.created_at %></li>
