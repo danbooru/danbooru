@@ -63,15 +63,15 @@ class TagAliasTest < ActiveSupport::TestCase
     end
 
     should "move existing aliases" do
-      ta1 = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :status => "active")
-      ta2 = FactoryGirl.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc", :status => "active")
+      ta1 = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+      ta2 = FactoryGirl.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc")
       ta1.reload
       assert_equal("ccc", ta1.consequent_name)
     end
 
     should "move existing implications" do
-      ti = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb", :status => "active")
-      ta = FactoryGirl.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc", :status => "active")
+      ti = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
+      ta = FactoryGirl.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc")
       ti.reload
       assert_equal("ccc", ti.consequent_name)
     end
