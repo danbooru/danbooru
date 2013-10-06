@@ -42,8 +42,8 @@ class Post < ActiveRecord::Base
   module FileMethods
     def distribute_files
       RemoteFileManager.new(file_path).distribute
-      RemoteFileManager.new(real_preview_file_path).distribute
-      RemoteFileManager.new(ssd_preview_file_path).distribute if Danbooru.config.ssd_path
+      RemoteFileManager.new(real_preview_file_path).distribute if is_image?
+      RemoteFileManager.new(ssd_preview_file_path).distribute if Danbooru.config.ssd_path && is_image?
       RemoteFileManager.new(large_file_path).distribute if has_large?
     end
 
