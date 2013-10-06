@@ -65,7 +65,7 @@ module PostSets
 
       @posts ||= begin
         if raw
-          temp = ::Post.raw_tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+          temp = ::Post.raw_tag_match(tag_string).order("posts.id DESC").paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
         else
           temp = ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
         end
