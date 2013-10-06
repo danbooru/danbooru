@@ -17,7 +17,7 @@ class TagImplicationTest < ActiveSupport::TestCase
     end
 
     should "ignore pending implications when building descendant names" do
-      ti2 = FactoryGirl.build(:tag_implication, :antecedent_name => "b", :consequent_name => "c")
+      ti2 = FactoryGirl.build(:tag_implication, :antecedent_name => "b", :consequent_name => "c", :status => "pending")
       ti2.save
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "a", :consequent_name => "b")
       assert_equal("b", ti1.descendant_names)
@@ -42,6 +42,14 @@ class TagImplicationTest < ActiveSupport::TestCase
       ti2.save
       assert(ti2.errors.any?, "Tag implication should not have validated.")
       assert_equal("Antecedent name has already been taken", ti2.errors.full_messages.join(""))
+    end
+
+    should "not validate if its consequent is aliased to another tag" do
+      ta = FactoryGirl.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc")
+      ti = FactoryGirl.build(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
+      ti.save
+      assert(ti.errors.any?, "Tag implication should not have validated.")
+      assert_equal("Consequent tag must not be aliased to another tag", ti.errors.full_messages.join(""))
     end
 
     should "calculate all its descendants" do

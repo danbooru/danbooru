@@ -8,6 +8,7 @@ class TagImplication < ActiveRecord::Base
   validates_presence_of :creator_id, :antecedent_name, :consequent_name
   validates_uniqueness_of :antecedent_name, :scope => :consequent_name
   validate :absence_of_circular_relation
+  validate :consequent_is_not_aliased
 
   module DescendantMethods
     extend ActiveSupport::Concern
@@ -121,6 +122,14 @@ class TagImplication < ActiveRecord::Base
     # We don't want a -> b && b -> a chains
     if self.class.exists?(["antecedent_name = ? and consequent_name = ?", consequent_name, antecedent_name])
       self.errors[:base] << "Tag implication can not create a circular relation with another tag implication"
+      false
+    end
+  end
+
+  def consequent_is_not_aliased
+    # We don't want to implicate a -> b if b is already aliased to c
+    if TagAlias.exists?(["antecedent_name = ?", consequent_name])
+      self.errors[:base] << "Consequent tag must not be aliased to another tag"
       false
     end
   end

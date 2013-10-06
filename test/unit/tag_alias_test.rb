@@ -53,13 +53,27 @@ class TagAliasTest < ActiveSupport::TestCase
     end
 
     should "not validate for transitive relations" do
-      ta1 = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+      ta1 = FactoryGirl.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc")
       assert_difference("TagAlias.count", 0) do
-        ta3 = FactoryGirl.build(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ddd")
-        ta3.save
-        assert(ta3.errors.any?, "Tag alias should be invalid")
-        assert_equal("Tag alias can not create a transitive relation with another tag alias", ta3.errors.full_messages.join)
+        ta2 = FactoryGirl.build(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+        ta2.save
+        assert(ta2.errors.any?, "Tag alias should be invalid")
+        assert_equal("Tag alias can not create a transitive relation with another tag alias", ta2.errors.full_messages.join)
       end
+    end
+
+    should "move existing aliases" do
+      ta1 = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :status => "active")
+      ta2 = FactoryGirl.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc", :status => "active")
+      ta1.reload
+      assert_equal("ccc", ta1.consequent_name)
+    end
+
+    should "move existing implications" do
+      ti = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb", :status => "active")
+      ta = FactoryGirl.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc", :status => "active")
+      ti.reload
+      assert_equal("ccc", ti.consequent_name)
     end
 
     should "not push the antecedent's category to the consequent if the antecedent is general" do
