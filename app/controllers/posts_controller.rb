@@ -9,7 +9,6 @@ class PostsController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, :with => :rescue_exception
 
   def index
-    flash[:notice] = "test 1 2 3"
     if params[:md5].present?
       @post = Post.find_by_md5(params[:md5])
       redirect_to post_path(@post)
