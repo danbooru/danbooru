@@ -47,7 +47,7 @@ module PostSets
     end
 
     def pool
-      ::Pool.find(::Pool.name_to_id(pool_name))
+      ::Pool.find_by_name(pool_name)
     end
 
     def has_deleted?
