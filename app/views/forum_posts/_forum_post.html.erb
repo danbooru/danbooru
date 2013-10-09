@@ -23,7 +23,7 @@
         <% if CurrentUser.is_member? && @forum_topic %>
           <li><%= link_to "Quote", new_forum_post_path(:post_id => forum_post.id), :method => :get, :remote => true %></li>
         <% end %>
-        <% if CurrentUser.is_janitor? %>
+        <% if CurrentUser.is_janitor? && !forum_post.is_original_post? %>
           <% if forum_post.is_deleted %>
             <li><%= link_to "Undelete", undelete_forum_post_path(forum_post.id), :method => :post, :remote => true %></li>
           <% else %>

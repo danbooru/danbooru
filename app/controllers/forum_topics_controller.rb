@@ -49,6 +49,7 @@ class ForumTopicsController < ApplicationController
     @forum_topic = ForumTopic.find(params[:id])
     check_privilege(@forum_topic)
     @forum_topic.update_column(:is_deleted, true)
+    flash[:notice] = "Topic deleted"
     respond_with(@forum_topic)
   end
 
@@ -56,6 +57,7 @@ class ForumTopicsController < ApplicationController
     @forum_topic = ForumTopic.find(params[:id])
     check_privilege(@forum_topic)
     @forum_topic.update_column(:is_deleted, false)
+    flash[:notice] = "Topic undeleted"
     respond_with(@forum_topic)
   end
 
