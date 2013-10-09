@@ -559,15 +559,14 @@
       type: "PUT",
       url: "/posts/" + post_id + ".json",
       data: params,
-      complete: function() {
-        Danbooru.Post.notice_update("dec");
-      },
       success: function(data) {
+        Danbooru.Post.notice_update("dec");
         Danbooru.Post.update_data(data);
       },
       error: function(data) {
-        Danbooru.notice("Error: " + data.reason);
-        $("#post_" + data.id).effect("shake", {"distance": 20}, "fast");
+        Danbooru.Post.notice_update("dec");
+        Danbooru.error('There was an error updating <a href="/posts/' + post_id + '">post #' + post_id + '</a>');
+        $("#post_" + post_id).effect("shake", {distance: 5, times: 1}, 100);
       }
     });
   }
