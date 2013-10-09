@@ -190,6 +190,12 @@ class PostQueryBuilder
       end
     end
 
+    if q[:pool] == "none"
+      relation = relation.where("posts.pool_string = ''")
+    elsif q[:pool] == "any"
+      relation = relation.where("posts.pool_string != ''")
+    end
+
     if q[:subscriptions]
       relation = add_tag_subscription_relation(q[:subscriptions], relation)
       has_constraints!

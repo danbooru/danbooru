@@ -379,7 +379,13 @@ class Tag < ActiveRecord::Base
             q[:tags][:exclude] << "pool:#{Pool.name_to_id($2)}"
 
           when "pool"
-            q[:tags][:related] << "pool:#{Pool.name_to_id($2)}"
+            if $2.downcase == "none"
+              q[:pool] = "none"
+            elsif $2.downcase == "any"
+              q[:pool] = "any"
+            else
+              q[:tags][:related] << "pool:#{Pool.name_to_id($2)}"
+            end
 
           when "-fav"
             q[:tags][:exclude] << "fav:#{User.name_to_id($2)}"
