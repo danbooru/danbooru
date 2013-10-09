@@ -246,6 +246,12 @@ class PostQueryBuilder
       has_constraints!
     end
 
+    if q[:child] == "none"
+      relation = relation.where("posts.has_children = FALSE")
+    elsif q[:child] == "any"
+      relation = relation.where("posts.has_children = TRUE")
+    end
+
     if q[:rating] =~ /^q/
       relation = relation.where("posts.rating = 'q'")
     elsif q[:rating] =~ /^s/
