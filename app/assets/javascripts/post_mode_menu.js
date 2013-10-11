@@ -7,7 +7,30 @@
       this.initialize_preview_link();
       this.initialize_edit_form();
       this.initialize_tag_script_field();
+      this.initialize_shortcuts();
       Danbooru.PostModeMenu.change();
+    }
+  }
+
+  Danbooru.PostModeMenu.initialize_shortcuts = function() {
+    $(document).bind("keypress", "1 2 3 4 5 6 7 8 9 0", Danbooru.PostModeMenu.change_tag_script);
+  }
+  
+  Danbooru.PostModeMenu.change_tag_script = function(e) {
+    if ($("#mode-box select").val() === "tag-script") {
+      var old_tag_script_id = Danbooru.Cookie.get("current_tag_script_id") || "1";
+      var old_tag_script = $("#tag-script-field").val();
+      
+      var new_tag_script_id = String.fromCharCode(e.which);
+      var new_tag_script = Danbooru.Cookie.get("tag-script-" + new_tag_script_id);
+    
+      $("#tag-script-field").val(new_tag_script);
+      Danbooru.Cookie.put("current_tag_script_id", new_tag_script_id);
+      if (old_tag_script_id != new_tag_script_id) {
+        Danbooru.notice("Switched to tag script #" + new_tag_script_id + ". To switch tag scripts, use the number keys.");
+      }
+
+      e.preventDefault();
     }
   }
 
@@ -69,7 +92,8 @@
       var script = $(this).val();
 
       if (script) {
-        Danbooru.Cookie.put("tag-script", script);
+        var current_script_id = Danbooru.Cookie.get("current_tag_script_id");
+        Danbooru.Cookie.put("tag-script-" + current_script_id, script);
       } else {
         $("#mode-box select").val("view");
         Danbooru.PostModeMenu.change();
@@ -89,7 +113,12 @@
     Danbooru.Cookie.put("mode", s, 1);
 
     if (s === "tag-script") {
-      var script = Danbooru.Cookie.get("tag-script");
+      var current_script_id = Danbooru.Cookie.get("current_tag_script_id");
+      if (!current_script_id) {
+        current_script_id = "1";
+        Danbooru.Cookie.put("current_tag_script_id", current_script_id);
+      }
+      var script = Danbooru.Cookie.get("tag-script-" + current_script_id);
 
       $("#tag-script-field").val(script).show();
     } else {
@@ -131,7 +160,8 @@
     } else if (s === 'approve') {
       Danbooru.Post.approve(post_id);
     } else if (s === "tag-script") {
-      var tag_script = Danbooru.Cookie.get("tag-script");
+      var current_script_id = Danbooru.Cookie.get("current_tag_script_id");
+      var tag_script = Danbooru.Cookie.get("tag-script-" + current_script_id);
       Danbooru.TagScript.run(post_id, tag_script);
     } else {
       return;
