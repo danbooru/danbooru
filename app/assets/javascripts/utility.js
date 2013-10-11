@@ -21,17 +21,28 @@
     $('html, body').animate({scrollTop: top}, 300, "linear", function() {Danbooru.scrolling = false;});
   }
 
+  Danbooru.notice_timeout_id = undefined;
+
   Danbooru.notice = function(msg, permanent) {
     $('#notice').addClass("ui-state-highlight").removeClass("ui-state-error").fadeIn("fast").children("span").html(msg);
+
+    if (Danbooru.notice_timeout_id !== undefined) {
+      clearTimeout(Danbooru.notice_timeout_id)
+    }
     if (!permanent) {
-      setTimeout(function() {
+      Danbooru.notice_timeout_id = setTimeout(function() {
         $("#close-notice-link").click();
+        Danbooru.notice_timeout_id = undefined;
       }, 6000);
     }
   }
 
   Danbooru.error = function(msg) {
     $('#notice').removeClass("ui-state-highlight").addClass("ui-state-error").fadeIn("fast").children("span").html(msg);
+
+    if (Danbooru.notice_timeout_id !== undefined) {
+      clearTimeout(Danbooru.notice_timeout_id)
+    }
   }
 
   Danbooru.is_subset = function(array, subarray) {
