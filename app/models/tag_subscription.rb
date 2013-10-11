@@ -39,7 +39,7 @@ class TagSubscription < ActiveRecord::Base
   end
 
   def tag_query_array
-    tag_query.scan(/[^\r\n]+/)
+    tag_query.scan(/[^\r\n]+/).map!(&:strip)
   end
 
   def limit_tag_count
