@@ -226,7 +226,7 @@ class Upload < ActiveRecord::Base
       when "image/png"
         "png"
 
-      when "application/x-shockwave-flash"
+      when "application/x-shockwave-flash", "application/shockwave-flash"
         "swf"
 
       else
