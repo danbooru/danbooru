@@ -464,7 +464,7 @@ class Post < ActiveRecord::Base
           self.parent_id = nil
 
         when /^parent:(\d+)$/i
-          if Post.exists?(["id = ? and is_deleted = false", $1.to_i])
+          if $1.to_i != id && Post.exists?(["id = ?", $1.to_i]) && Post.find($1.to_i).parent_id != id
             self.parent_id = $1.to_i
           end
 
@@ -870,7 +870,7 @@ class Post < ActiveRecord::Base
     end
 
     def post_is_not_its_own_parent
-      if parent_id.present? && id == parent_id
+      if !new_record? && id == parent_id
         errors[:base] << "Post cannot have itself as a parent"
         false
       end
