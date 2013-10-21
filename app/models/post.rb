@@ -464,8 +464,9 @@ class Post < ActiveRecord::Base
           self.parent_id = nil
 
         when /^parent:(\d+)$/i
-          if $1.to_i != id && Post.exists?(["id = ?", $1.to_i]) && Post.find($1.to_i).parent_id != id
+          if $1.to_i != id && Post.exists?(["id = ?", $1.to_i])
             self.parent_id = $1.to_i
+            remove_parent_loops
           end
 
         when /^rating:([qse])/i
@@ -816,7 +817,7 @@ class Post < ActiveRecord::Base
     end
 
     def remove_parent_loops
-      if parent.present? && parent.parent_id == id
+      if parent.present? && parent.parent_id.present? && parent.parent_id == id
         parent.parent_id = nil
         parent.save
       end
