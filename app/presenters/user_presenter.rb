@@ -36,7 +36,7 @@ class UserPresenter
   end
 
   def tag_links_for_subscription(template, subscription)
-    subscription.tag_query_array.map {|x| template.link_to(x.tr("_", " "), template.posts_path(:tags => x))}.join(", ").html_safe
+    subscription.tag_query_array.map {|x| template.link_to(x, template.posts_path(:tags => x))}.join(", ").html_safe
   end
 
   def upload_limit
