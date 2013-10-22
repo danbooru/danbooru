@@ -63,7 +63,7 @@ class Cache
 
   def self.delete(key, delay = nil)
     start_time = Time.now
-    MEMCACHE.delete key, delay
+    MEMCACHE.delete key
     elapsed = Time.now - start_time
     ActiveRecord::Base.logger.debug('MemCache Delete (%0.6f)  %s' % [elapsed, key])
     nil
