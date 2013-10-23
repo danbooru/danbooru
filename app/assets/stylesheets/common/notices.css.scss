@@ -9,17 +9,17 @@ div.error-messages {
 }
 
 div#notice {
-  margin: 0;
-  padding: 1em;
+  padding: 0.25em;
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 0.5em;
+  left: 25%;
+  width: 50%;
   z-index: 100;
-  width: 100%;
-  border-bottom: 2px solid #89857B;
+  background-color: lighten(#f47321, 30%);;
+  border: 2px solid #f47321;
 }
 
 a#close-notice-link {
-  float: right;
-  margin-right: 2em;
+  position: absolute;
+  right: 1em;
 }
