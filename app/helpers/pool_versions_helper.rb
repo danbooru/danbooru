@@ -1,14 +1,17 @@
 module PoolVersionsHelper
-  def pool_version_diff(current)
-    prev = PoolVersion.where(["pool_id = ? and updated_at < ?", current.pool_id, current.updated_at]).order("updated_at desc").first
+  def pool_version_diff(pool_version)
+    html = ""
 
-    if prev.nil?
-      return current.post_id_array.map {|x| '<ins><a href="/posts/' + x.to_s + '">' + x.to_s + '</a></ins>'}.join(" ").html_safe
-    end
+    html << pool_version.changes[:added_posts].map do |post_id|
+      '<ins><a href="/posts/' + post_id.to_s + '">' + post_id.to_s + '</a></ins>'
+    end.join(" ")
 
-    added = current.post_id_array - prev.post_id_array
-    removed = prev.post_id_array - current.post_id_array
+    html << " "
 
-    (added.map {|x| '<ins><a href="/posts/' + x.to_s + '">' + x.to_s + '</a></ins>'}.join(" ") + " " + removed.map {|x| '<del><a href="/posts/' + x.to_s + '">' + x.to_s + '</a></del>'}.join(" ")).html_safe
+    html << pool_version.changes[:removed_posts].map do |post_id|
+      '<del><a href="/posts/' + post_id.to_s + '">' + post_id.to_s + '</a></del>'
+    end.join(" ")
+
+    return html.html_safe
   end
 end

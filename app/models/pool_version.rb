@@ -49,4 +49,23 @@ class PoolVersion < ActiveRecord::Base
   def post_id_array
     @post_id_array ||= post_ids.scan(/\d+/).map(&:to_i)
   end
+
+  def diff(version)
+    new_posts = post_id_array
+    old_posts = version.present? ? version.post_id_array : []
+
+    return {
+      :added_posts => new_posts - old_posts,
+      :removed_posts => old_posts - new_posts,
+      :unchanged_posts => new_posts & old_posts
+    }
+  end
+
+  def changes
+    @changes ||= diff(previous)
+  end
+
+  def previous
+    PoolVersion.where(["pool_id = ? and updated_at < ?", pool_id, updated_at]).order("updated_at desc").first
+  end
 end
