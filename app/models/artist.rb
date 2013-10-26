@@ -3,7 +3,7 @@ class Artist < ActiveRecord::Base
   before_save :normalize_name
   after_save :create_version
   after_save :save_url_string
-  after_create :categorize_tag
+  after_save :categorize_tag
   validates_uniqueness_of :name
   belongs_to :creator, :class_name => "User"
   has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
@@ -178,7 +178,9 @@ class Artist < ActiveRecord::Base
     end
 
     def categorize_tag
-      Tag.find_or_create_by_name("artist:#{name}")
+      if new_record? || name_changed?
+        Tag.find_or_create_by_name("artist:#{name}")
+      end
     end
   end
 

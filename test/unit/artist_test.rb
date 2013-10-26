@@ -182,9 +182,18 @@ class ArtistTest < ActiveSupport::TestCase
       assert_equal("yyy", artist.other_names)
     end
 
-    should "update the category of the tag" do
+    should "update the category of the tag when created" do
       tag = FactoryGirl.create(:tag, :name => "abc")
       artist = FactoryGirl.create(:artist, :name => "abc")
+      tag.reload
+      assert_equal(Tag.categories.artist, tag.category)
+    end
+
+    should "update the category of the tag when renamed" do
+      tag = FactoryGirl.create(:tag, :name => "def")
+      artist = FactoryGirl.create(:artist, :name => "abc")
+      artist.name = "def"
+      artist.save
       tag.reload
       assert_equal(Tag.categories.artist, tag.category)
     end
