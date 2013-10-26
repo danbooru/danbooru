@@ -66,28 +66,34 @@ class TagSubscription < ActiveRecord::Base
     post_ids.split(/,/)
   end
 
-  def self.search(params)
-    q = scoped
-    return q if params.blank?
-
-    if params[:creator_id]
-      q = q.where("creator_id = ?", params[:creator_id].to_i)
+  module SearchMethods
+    def visible_to(user)
+      where("(is_public = TRUE OR creator_id = ? OR ?)", user.id, user.is_moderator?)
     end
 
-    if params[:creator_name]
-      q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].mb_chars.downcase.strip.tr(" ", "_"))
+    def owned_by(user)
+      where("creator_id = ?", user.id)
     end
 
-    q
+    def search(params)
+      q = scoped
+      params = {} if params.blank?
+
+      if params[:creator_id]
+        q = q.where("creator_id = ?", params[:creator_id].to_i)
+      elsif params[:creator_name]
+        q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].mb_chars.downcase.strip.tr(" ", "_"))
+      else
+        q = q.where("creator_id = ?", CurrentUser.user.id)
+      end
+
+      q = q.visible_to(CurrentUser.user)
+
+      q
+    end
   end
 
-  def self.visible_to(user)
-    where("(is_public = TRUE OR creator_id = ? OR ?)", user.id, user.is_moderator?)
-  end
-
-  def self.owned_by(user)
-    where("creator_id = ?", user.id)
-  end
+  extend SearchMethods
 
   def self.find_tags(subscription_name)
     if subscription_name =~ /^(.+?):(.+)$/
