@@ -12,9 +12,6 @@
       <% if CurrentUser.is_member? %>
         <li><%= link_to "Edit", edit_artist_path(@artist) %></li>
       <% end %>
-      <% if CurrentUser.is_builder? %>
-        <li><%= link_to "Rename", edit_name_artist_path(@artist) %></li>
-      <% end %>
       <li><%= link_to "History", artist_versions_path(:search => {:artist_id => @artist.id}) %></li>
       <% if @artist.deletable_by?(CurrentUser.user) %>
         <% if @artist.is_active? %>

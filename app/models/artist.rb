@@ -80,18 +80,6 @@ class Artist < ActiveRecord::Base
     def other_names_comma=(string)
       self.other_names = string.split(/,/).map {|x| Artist.normalize_name(x)}.join(" ")
     end
-
-    def rename!(new_name)
-      new_wiki_page = WikiPage.titled(new_name).first
-      if new_wiki_page && wiki_page
-        # Merge the old wiki page into the new one
-        new_wiki_page.update_attributes(:body => new_wiki_page.body + "\n\n" + notes)
-      elsif wiki_page
-        wiki_page.update_attribute(:title, new_name)
-      end
-      reload
-      update_attribute(:name, new_name)
-    end
   end
 
   module GroupMethods
@@ -159,9 +147,21 @@ class Artist < ActiveRecord::Base
     end
 
     def notes=(msg)
+      if name_changed? && name_was.present?
+        old_wiki_page = WikiPage.titled(name_was).first
+      end
+    
       if wiki_page
-        wiki_page.body = msg
-        wiki_page.save if wiki_page.body_changed? || wiki_page.title_changed?
+        if name_changed? && name_was.present?
+          wiki_page.body = wiki_page.body + "\n\n" + msg
+        else
+          wiki_page.body = msg
+        end
+        wiki_page.save if wiki_page.body_changed?
+      elsif old_wiki_page
+        old_wiki_page.title = name
+        old_wiki_page.body = msg
+        old_wiki_page.save if old_wiki_page.body_changed? || old_wiki_page.title_changed?
       elsif msg.present?
         self.wiki_page = WikiPage.new(:title => name, :body => msg)
       end

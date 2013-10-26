@@ -57,6 +57,28 @@ class ArtistsControllerTest < ActionController::TestCase
       assert_redirected_to(artist_path(@artist))
     end
 
+    context "when renaming an artist" do
+      should "automatically rename the artist's wiki page" do
+        artist = FactoryGirl.create(:artist, :name => "aaa", :notes => "testing")
+        wiki_page = artist.wiki_page
+        assert_difference("WikiPage.count", 0) do
+          post :update, {:id => artist.id, :artist => {:name => "bbb", :notes => "more testing"}}, {:user_id => @user.id}
+        end
+        wiki_page.reload
+        assert_equal("bbb", wiki_page.title)
+        assert_equal("more testing", wiki_page.body)
+      end
+
+      should "merge the new notes with the existing wiki page's contents if a wiki page for the new name already exists" do
+        artist = FactoryGirl.create(:artist, :name => "aaa")
+        existing_wiki_page = FactoryGirl.create(:wiki_page, :title => "bbb", :body => "xxx")
+        post :update, {:id => artist.id, :artist => {:name => "bbb", :notes => "yyy"}}, {:user_id => @user.id}
+        existing_wiki_page.reload
+        assert_equal("bbb", existing_wiki_page.title)
+        assert_equal("xxx\n\nyyy", existing_wiki_page.body)
+      end
+    end
+
     should "revert an artist" do
       @artist.update_attributes(:name => "xyz")
       @artist.update_attributes(:name => "abc")

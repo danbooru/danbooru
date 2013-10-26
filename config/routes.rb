@@ -60,8 +60,6 @@ Danbooru::Application.routes.draw do
     member do
       put :revert
       put :ban
-      get :edit_name
-      put :update_name
       post :undelete
     end
     collection do

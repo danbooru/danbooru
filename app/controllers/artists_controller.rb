@@ -1,7 +1,7 @@
 class ArtistsController < ApplicationController
   respond_to :html, :xml, :json
   before_filter :member_only, :except => [:index, :show, :banned]
-  before_filter :builder_only, :only => [:edit_name, :update_name, :destroy]
+  before_filter :builder_only, :only => [:destroy]
   before_filter :admin_only, :only => [:ban]
 
   def new
@@ -11,17 +11,6 @@ class ArtistsController < ApplicationController
 
   def edit
     @artist = Artist.find(params[:id])
-    respond_with(@artist)
-  end
-
-  def edit_name
-    @artist = Artist.find(params[:id])
-    respond_with(@artist)
-  end
-
-  def update_name
-    @artist = Artist.find(params[:id])
-    @artist.rename!(params[:artist][:name])
     respond_with(@artist)
   end
 
@@ -79,7 +68,12 @@ class ArtistsController < ApplicationController
 
   def update
     @artist = Artist.find(params[:id])
-    @artist.update_attributes(params[:artist], :as => CurrentUser.role)
+    body = params[:artist].delete("notes")
+    @artist.assign_attributes(params[:artist], :as => CurrentUser.role)
+    if body
+      @artist.notes = body
+    end
+    @artist.save
     respond_with(@artist)
   end
 

@@ -1,7 +1,7 @@
 <%= simple_form_for(@artist) do |f| %>
   <div class="input">
     <label for="artist_name">Name</label>
-    <% if @artist.new_record? %>
+    <% if @artist.new_record? || CurrentUser.user.is_builder? %>
       <%= text_field "artist", "name" %>
       [<%= link_to "check", "#", :id => "check-name-link" %>]
       <span id="check-name-result"></span>
