@@ -18,6 +18,10 @@ class Pool < ActiveRecord::Base
   attr_accessible :is_deleted, :as => [:janitor, :moderator, :admin]
 
   module SearchMethods
+    def deleted
+      where("is_deleted = true")
+    end
+
     def undeleted
       where("is_deleted = false")
     end
@@ -193,7 +197,7 @@ class Pool < ActiveRecord::Base
     return if is_deleted?
 
     update_attributes(:post_ids => add_number_to_string(post.id, post_ids), :post_count => post_count + 1)
-    post.add_pool!(self)
+    post.add_pool!(self, true)
     clear_post_id_array
   end
 
@@ -202,7 +206,7 @@ class Pool < ActiveRecord::Base
     return if is_deleted?
 
     update_attributes(:post_ids => remove_number_from_string(post.id, post_ids), :post_count => post_count - 1)
-    post.remove_pool!(self)
+    post.remove_pool!(self, true)
     clear_post_id_array
   end
 
@@ -231,12 +235,12 @@ class Pool < ActiveRecord::Base
 
     added.each do |post_id|
       post = Post.find(post_id)
-      post.add_pool!(self)
+      post.add_pool!(self, true)
     end
 
     removed.each do |post_id|
       post = Post.find(post_id)
-      post.remove_pool!(self)
+      post.remove_pool!(self, true)
     end
 
     self.post_count = post_id_array.size

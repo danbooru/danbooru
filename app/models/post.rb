@@ -629,17 +629,17 @@ class Post < ActiveRecord::Base
       pool_string =~ /(?:\A| )pool:#{pool_id}(?:\Z| )/
     end
 
-    def add_pool!(pool)
+    def add_pool!(pool, force = false)
       return if belongs_to_pool?(pool)
-      return if pool.is_deleted?
+      return if pool.is_deleted? && !force
       self.pool_string = "#{pool_string} pool:#{pool.id}".strip
       update_column(:pool_string, pool_string) unless new_record?
       pool.add!(self)
     end
 
-    def remove_pool!(pool)
+    def remove_pool!(pool, force = false)
       return unless belongs_to_pool?(pool)
-      return if pool.is_deleted?
+      return if pool.is_deleted? && !force
       self.pool_string = pool_string.gsub(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ").strip
       update_column(:pool_string, pool_string) unless new_record?
       pool.remove!(self)

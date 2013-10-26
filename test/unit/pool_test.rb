@@ -120,6 +120,29 @@ class PoolTest < ActiveSupport::TestCase
           assert_equal(1, @pool.post_count)
         end
       end
+
+      context "to a deleted pool" do
+        setup do
+          @pool.update_attribute(:is_deleted, true)
+          @pool.post_ids = "#{@pool.post_ids} #{@p2.id}"
+          @pool.synchronize!
+          @pool.save
+          @pool.reload
+          @p2.reload
+        end
+
+        should "add the post to the pool" do
+          assert_equal("#{@p1.id} #{@p2.id}", @pool.post_ids)
+        end
+
+        should "add the pool to the post" do
+          assert_equal("pool:#{@pool.id}", @p2.pool_string)
+        end
+
+        should "increment the post count" do
+          assert_equal(2, @pool.post_count)
+        end
+      end
     end
 
     context "by removing a post" do
