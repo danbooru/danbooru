@@ -84,6 +84,12 @@ class Pool < ActiveRecord::Base
         q = q.collection
       end
 
+      if params[:is_deleted] == "true"
+        q = q.deleted
+      else
+        q = q.undeleted
+      end
+
       q
     end
   end
