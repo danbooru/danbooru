@@ -106,13 +106,13 @@ class UploadTest < ActiveSupport::TestCase
       end
 
       context "content type calculator" do
-        should "know how to parse jpeg, png, gif, and swf file extensions" do
+        should "know how to parse jpeg, png, gif, and swf file headers" do
           @upload = FactoryGirl.create(:jpg_upload)
-          assert_equal("image/jpeg", @upload.file_ext_to_content_type("test.jpeg"))
-          assert_equal("image/gif", @upload.file_ext_to_content_type("test.gif"))
-          assert_equal("image/png", @upload.file_ext_to_content_type("test.png"))
-          assert_equal("application/x-shockwave-flash", @upload.file_ext_to_content_type("test.swf"))
-          assert_equal("application/octet-stream", @upload.file_ext_to_content_type(""))
+          assert_equal("image/jpeg", @upload.file_header_to_content_type("#{Rails.root}/test/files/test.jpg"))
+          assert_equal("image/gif", @upload.file_header_to_content_type("#{Rails.root}/test/files/test.gif"))
+          assert_equal("image/png", @upload.file_header_to_content_type("#{Rails.root}/test/files/test.png"))
+          assert_equal("application/x-shockwave-flash", @upload.file_header_to_content_type("#{Rails.root}/test/files/compressed.swf"))
+          assert_equal("application/octet-stream", @upload.file_header_to_content_type("#{Rails.root}/README"))
         end
 
         should "know how to parse jpeg, png, gif, and swf content types" do
@@ -126,15 +126,13 @@ class UploadTest < ActiveSupport::TestCase
       end
 
       context "downloader" do
-        should "initialize the final path and content type after downloading a file" do
+        should "initialize the final path after downloading a file" do
           @upload = FactoryGirl.create(:source_upload)
           path = "#{Rails.root}/tmp/test.download.jpg"
           assert_nothing_raised {@upload.download_from_source(path)}
           assert(File.exists?(path))
           assert_equal(8558, File.size(path))
-          assert_equal("image/gif", @upload.content_type)
           assert_equal(path, @upload.file_path)
-          assert_equal("gif", @upload.file_ext)
         end
       end
 
@@ -160,20 +158,16 @@ class UploadTest < ActiveSupport::TestCase
           FileUtils.cp("#{Rails.root}/test/files/test.jpg", "#{Rails.root}/tmp")
           @upload = Upload.new(:file => upload_jpeg("#{Rails.root}/tmp/test.jpg"))
           assert_nothing_raised {@upload.convert_cgi_file}
-          assert_equal("image/jpeg", @upload.content_type)
           assert(File.exists?(@upload.file_path))
           assert_equal(28086, File.size(@upload.file_path))
-          assert_equal("jpg", @upload.file_ext)
         end
 
         should "process a transparent png" do
           FileUtils.cp("#{Rails.root}/test/files/alpha.png", "#{Rails.root}/tmp")
           @upload = Upload.new(:file => upload_file("#{Rails.root}/tmp/alpha.png", "image/png", "alpha.png"))
           assert_nothing_raised {@upload.convert_cgi_file}
-          assert_equal("image/png", @upload.content_type)
           assert(File.exists?(@upload.file_path))
           assert_equal(1136, File.size(@upload.file_path))
-          assert_equal("png", @upload.file_ext)
         end
       end
 

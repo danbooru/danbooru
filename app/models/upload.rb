@@ -71,7 +71,7 @@ class Upload < ActiveRecord::Base
           download_from_source(temp_file_path)
         end
         validate_file_exists
-        self.content_type = file_header_to_content_type
+        self.content_type = file_header_to_content_type(file_path)
         self.file_ext = content_type_to_file_ext(content_type)
         validate_file_content_type
         calculate_hash(file_path)
@@ -235,8 +235,8 @@ class Upload < ActiveRecord::Base
       end
     end
 
-    def file_header_to_content_type
-      case File.read(file_path, 10)
+    def file_header_to_content_type(source_path)
+      case File.read(source_path, 10)
       when /^\xff\xd8/
         "image/jpeg"
 
