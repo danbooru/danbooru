@@ -50,7 +50,7 @@ class Upload < ActiveRecord::Base
 
     def validate_file_content_type
       unless is_valid_content_type?
-        raise "invalid content type (#{file_ext} not allowed)"
+        raise "invalid content type (only JPEG, PNG, GIF, and SWF files are allowed)"
       end
     end
 
@@ -71,6 +71,7 @@ class Upload < ActiveRecord::Base
           download_from_source(temp_file_path)
         end
         validate_file_exists
+        self.content_type = file_header_to_content_type
         self.file_ext = content_type_to_file_ext(content_type)
         validate_file_content_type
         calculate_hash(file_path)
@@ -217,7 +218,7 @@ class Upload < ActiveRecord::Base
 
     def content_type_to_file_ext(content_type)
       case content_type
-      when "image/jpeg", "image/jpg"
+      when "image/jpeg"
         "jpg"
 
       when "image/gif"
@@ -226,7 +227,7 @@ class Upload < ActiveRecord::Base
       when "image/png"
         "png"
 
-      when "application/x-shockwave-flash", "application/shockwave-flash"
+      when "application/x-shockwave-flash"
         "swf"
 
       else
@@ -234,19 +235,18 @@ class Upload < ActiveRecord::Base
       end
     end
 
-    # Converts a content type string to a file extension
-    def file_ext_to_content_type(file_ext)
-      case file_ext
-      when /\.jpeg$|\.jpg$/
+    def file_header_to_content_type
+      case File.read(file_path, 10)
+      when /^\xff\xd8/
         "image/jpeg"
 
-      when /\.gif$/
+      when /^GIF87a/, /^GIF89a/
         "image/gif"
 
-      when /\.png$/
+      when /^\x89PNG\r\n\x1a\n/
         "image/png"
 
-      when /\.swf$/
+      when /^CWS/, /^FWS/, /^ZWS/
         "application/x-shockwave-flash"
 
       else
@@ -294,8 +294,6 @@ class Upload < ActiveRecord::Base
       download = Downloads::File.new(source, destination_path)
       download.download!
       self.file_path = destination_path
-      self.content_type = download.content_type || file_ext_to_content_type(source)
-      self.file_ext = content_type_to_file_ext(content_type)
       self.source = download.source
     end
   end
@@ -314,8 +312,6 @@ class Upload < ActiveRecord::Base
         end
       end
       FileUtils.chmod(0664, file_path)
-      self.content_type = file.content_type || file_ext_to_content_type(file.original_filename)
-      self.file_ext = content_type_to_file_ext(content_type)
     end
   end
 
