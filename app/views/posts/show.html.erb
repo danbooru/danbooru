@@ -28,6 +28,7 @@
           <li><%= fast_link_to "Notes", note_versions_path(:search => {:post_id => @post.id}) %></li>
           <li><%= fast_link_to "Flags", post_flags_path(:search => {:post_id => @post.id}) %></li>
           <li><%= fast_link_to "Appeals", post_appeals_path(:search => {:post_id => @post.id}) %></li>
+          <li><%= fast_link_to "Commentary", artist_commentary_versions_path(:search => {:post_id => @post.id}) %></li>
         </ul>
       </section>
 
@@ -45,6 +46,12 @@
         <div id="note-preview"></div>
         <%= @post.presenter.image_html(self) %>
       </section>
+
+      <% if @post.artist_commentary && @post.artist_commentary.any_field_present? %>
+        <div id="artist-commentary">
+          <%= render "artist_commentaries/show", :artist_commentary => @post.artist_commentary %>
+        </div>
+      <% end %>
 
       <% if @post.presenter.has_nav_links?(self) %>
         <%= render "posts/partials/show/nav_links", :post => @post, :position => "bottom" %>
@@ -91,6 +98,10 @@
 
   <div id="add-to-pool-dialog" title="Add to pool" style="display: none;">
     <%= render "pool_elements/new" %>
+  </div>
+
+  <div id="add-commentary-dialog" title="Add artist commentary" style="display: none;">
+    <%= render "artist_commentaries/form", :artist_commentary => @post.artist_commentary %>
   </div>
 </div>
 

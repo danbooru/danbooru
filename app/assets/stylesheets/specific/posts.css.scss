@@ -450,3 +450,14 @@ div#unapprove-dialog {
     font-size: 0.9em;
   }
 }
+
+#add-commentary-dialog {
+  input {
+    width: 70%;
+  }
+
+  textarea {
+    font-size: 1em;
+    width: 100%;
+  }
+}

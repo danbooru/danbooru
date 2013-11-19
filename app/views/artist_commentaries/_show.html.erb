@@ -1,0 +1,26 @@
+<h2>Artist's commentary</h2>
+
+<menu id="commentary-sections">
+  <% if artist_commentary.original_present? && artist_commentary.translated_present? %>
+    <li><a href="#original">Original</a></li> |
+    <li><a href="#translated">Translated</a></li>
+  <% elsif artist_commentary.original_present? %>
+    <li><b>Original</b></li>
+  <% elsif artist_commentary.translated_present? %>
+    <li><b>Translated</b></li>
+  <% end %>
+</menu>
+
+<% if artist_commentary.original_present? %>
+  <section id="original-artist-commentary">
+    <h3><%= artist_commentary.original_title %></h3>
+    <p><%= format_text artist_commentary.original_description %></p>
+  </section>
+<% end %>
+
+<% if artist_commentary.translated_present? %>
+  <section id="translated-artist-commentary">
+    <h3><%= artist_commentary.translated_title %></h3>
+    <p><%= format_text artist_commentary.translated_description %></p>
+  </section>
+<% end %>

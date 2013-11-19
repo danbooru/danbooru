@@ -1,0 +1,19 @@
+<p>If the artist of this image posted some interesting additional information about this work, you can copy it here.</p>
+
+<%= form_tag(create_or_update_artist_commentaries_path, :class => "simple_form", :method => :put) do %>
+  <div class="input">
+    <%= hidden_field :artist_commentary, :post_id, :value => @post.id %>
+
+    <label for="artist_commentary_original_title">Original title</label>
+    <%= text_field :artist_commentary, :original_title, :value => artist_commentary.try(:original_title) %>
+
+    <label for="artist_commentary_original_description">Original description</label>
+    <%= text_area :artist_commentary, :original_description, :size => "40x6", :value => artist_commentary.try(:original_description) %>
+
+    <label for="artist_commentary_translated_title">Translated title</label>
+    <%= text_field :artist_commentary, :translated_title, :value => artist_commentary.try(:translated_title) %>
+
+    <label for="artist_commentary_translated_description">Translated description</label>
+    <%= text_area :artist_commentary, :translated_description, :size => "40x6", :value => artist_commentary.try(:translated_description) %>
+  </div>
+<% end %>
