@@ -449,6 +449,19 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      context "using a tag prefix on an aliased tag" do
+        setup do
+          FactoryGirl.create(:tag_alias, :antecedent_name => "abc", :consequent_name => "xyz")
+          @post = Post.find(@post.id)
+          @post.update_attribute(:tag_string, "art:abc")
+          @post.reload
+        end
+
+        should "convert the tag to its normalized version" do
+          assert_equal("xyz", @post.tag_string)
+        end
+      end
+
       context "tagged with a metatag" do
         context "for a parent" do
           setup do
