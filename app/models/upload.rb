@@ -37,7 +37,6 @@ class Upload < ActiveRecord::Base
     def validate_md5_uniqueness
       md5_post = Post.find_by_md5(md5)
       if md5_post
-        merge_tags(md5_post)
         raise "duplicate: #{md5_post.id}"
       end
     end
@@ -118,11 +117,6 @@ class Upload < ActiveRecord::Base
           p.is_pending = true
         end
       end
-    end
-
-    def merge_tags(post)
-      post.tag_string += " #{tag_string}"
-      post.save
     end
   end
 
