@@ -11,7 +11,6 @@ class Post < ActiveRecord::Base
   after_save :apply_post_metatags, :on => :create
   before_save :merge_old_changes
   before_save :normalize_tags
-  before_save :create_tags
   before_save :update_tag_post_counts
   before_save :set_tag_counts
   before_validation :strip_source
@@ -313,6 +312,7 @@ class Post < ActiveRecord::Base
     end
 
     def create_tags
+      reset_tag_array_cache
       set_tag_string(tag_array.map {|x| Tag.find_or_create_by_name(x).name}.uniq.sort.join(" "))
     end
 
@@ -404,6 +404,7 @@ class Post < ActiveRecord::Base
     end
 
     def normalize_tags
+      create_tags
       normalized_tags = Tag.scan_tags(tag_string)
       normalized_tags = filter_metatags(normalized_tags)
       normalized_tags = normalized_tags.map{|tag| tag.downcase}
