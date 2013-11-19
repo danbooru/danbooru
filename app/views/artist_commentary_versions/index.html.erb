@@ -1,0 +1,58 @@
+<div id="c-artist-commentary-versions">
+  <div id="a-index">
+    <h1>Artist Commentary Changes</h1>
+
+    <table width="100%" class="striped">
+      <thead>
+        <tr>
+          <th width="5%">Post</th>
+          <th>Original</th>
+          <th>Translated</th>
+          <% if CurrentUser.is_janitor? %>
+            <th width="10%">IP Address</th>
+          <% end %>
+          <th width="10%">Edited By</th>
+          <th width="10%">Date</th>
+          <% if CurrentUser.is_member? %>
+            <th width="7%"></th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% @commentary_versions.each do |commentary_version| %>
+          <tr>
+            <td><%= link_to commentary_version.post_id, post_path(commentary_version.post_id) %></td>
+            <td>
+              <h3><%= h(commentary_version.original_title) %></h3>
+              <%= h(commentary_version.original_description) %>
+            </td>
+            <td>
+              <h3><%= h(commentary_version.translated_title) %></h3>
+              <%= h(commentary_version.translated_description) %>
+            </td>
+            <% if CurrentUser.is_janitor? %>
+              <td>
+                <%= commentary_version.updater_ip_addr %>
+              </td>
+            <% end %>
+            <td><%= link_to_user commentary_version.updater %></td>
+            <td><%= compact_time commentary_version.updated_at %></td>
+            <% if CurrentUser.is_member? %>
+              <td>
+                <%= link_to "Revert to", revert_artist_commentary_path(commentary_version.post_id, :version_id => commentary_version.id), :remote => true, :method => :put, :confirm => "Are you sure you want to revert to this version?" %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <%= sequential_paginator(@commentary_versions) %>
+
+    <%= render "posts/partials/common/secondary_links" %>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  Artist Commentary Versions - <%= Danbooru.config.app_name %>
+<% end %>

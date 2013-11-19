@@ -23,6 +23,7 @@ class Post < ActiveRecord::Base
   belongs_to :uploader, :class_name => "User"
   belongs_to :parent, :class_name => "Post"
   has_one :upload, :dependent => :destroy
+  has_one :artist_commentary
   has_many :flags, :class_name => "PostFlag", :dependent => :destroy
   has_many :appeals, :class_name => "PostAppeal", :dependent => :destroy
   has_many :versions, :class_name => "PostVersion", :dependent => :destroy, :order => "post_versions.id ASC"

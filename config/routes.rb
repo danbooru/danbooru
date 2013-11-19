@@ -173,6 +173,15 @@ Danbooru::Application.routes.draw do
       get :search
     end
   end
+  resources :artist_commentaries do
+    collection do
+      put :create_or_update
+    end
+    member do
+      put :revert
+    end
+  end
+  resources :artist_commentary_versions, :only => [:index]
   resource :related_tag, :only => [:show]
   match "reports/user_promotions" => "reports#user_promotions"
   resource :session do

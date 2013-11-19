@@ -10,6 +10,7 @@
   <% else %>
     <li><%= link_to "Add notes", "#", :id => "translate", :title => "Shortcut is N" %></li>
   <% end %>
+  <%= link_to "Add artist commentary", "#", :id => "add-commentary" %>
   <% if CurrentUser.is_builder? && post.has_notes? %>
     <li><%= link_to "Copy all notes", "#", :id => "copy-notes" %></li>
   <% end %>
