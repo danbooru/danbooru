@@ -73,6 +73,11 @@
     dialog.dialog({
       title: "Edit tags",
       width: $(window).width() / 3,
+        position: {
+          my: "right",
+          at: "right-20",
+          of: window
+        },
       drag: function(e, ui) {
         if (Danbooru.meta("enable-auto-complete") === "true") {
           $tag_string.data("uiAutocomplete").close();
