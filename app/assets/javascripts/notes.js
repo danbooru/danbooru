@@ -308,6 +308,11 @@ Danbooru.Note = {
       $dialog.dialog({
         width: 360,
         height: 210,
+        position: {
+          my: "right",
+          at: "right-20",
+          of: window
+        },
         dialogClass: "note-edit-dialog",
         title: "Edit note",
         buttons: {
