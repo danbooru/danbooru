@@ -293,10 +293,27 @@ class Post < ActiveRecord::Base
     end
 
     def normalized_source
-      if source =~ /pixiv\.net\/img(?:\d+\/img)?\//
-        img_id = source[/(\d+)(_s|_m|(_big)?_p\d+)?\.[\w\?]+\s*$/, 1]
+      case source
+      when %r{\Ahttp://img\d+\.pixiv\.net/img/[^\/]+/(\d+)}i, %r{\Ahttp://i\d\.pixiv\.net/img\d+/img/[^\/]+/(\d+)}i
+        "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
 
-        "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{img_id}"
+      when %r{\Ahttp://lohas\.nicoseiga\.jp/priv/(\d+)\?e=\d+&h=[a-f0-9]+}i, %r{\Ahttp://lohas\.nicoseiga\.jp/priv/[a-f0-9]+/\d+/(\d+)}i
+        "http://seiga.nicovideo.jp/seiga/im#{$1}"
+
+      when %r{\Ahttp://d3j5vwomefv46c\.cloudfront\.net/photos/large/(\d+)\.}i
+        base_10_id = $1.to_i
+        base_36_id = base_10_id.to_s(36)
+        "http://twitpic.com/#{base_36_id}"
+
+      when %r{\Ahttp://fc\d+\.deviantart\.net/.+/[a-z0-9_]+_by_([a-z0-9_]+)-d([a-z0-9]+)\.}i
+        "http://#{$1}.deviantart.com/gallery/#/d#{$2}"
+
+      when %r{\Ahttp://www\.karabako\.net/images/karabako_(\d+)\.}i
+        "http://www.karabako.net/post/view/#{$1}"
+
+      when %r{\Ahttp://p\.twpl\.jp/show/orig/([a-z0-9]+)}i
+        "http://p.twipple.jp/#{$1}"
+
       else
         source
       end

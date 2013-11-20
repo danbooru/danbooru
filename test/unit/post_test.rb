@@ -739,6 +739,42 @@ class PostTest < ActiveSupport::TestCase
           assert_equal("aaa", post.tag_string)
         end
       end
+
+      context "normalizing its source" do
+        should "normalize pixiv links" do
+          @post.source = "http://i2.pixiv.net/img12/img/zenze/39749565.png"
+          assert_equal("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=39749565", @post.normalized_source)
+          @post.source = "http://i1.pixiv.net/img53/img/themare/39735353_big_p1.jpg"
+          assert_equal("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=39735353", @post.normalized_source)
+        end
+
+        should "normalize nicoseiga links" do
+          @post.source = "http://lohas.nicoseiga.jp/priv/3521156?e=1382558156&h=f2e089256abd1d453a455ec8f317a6c703e2cedf"
+          assert_equal("http://seiga.nicovideo.jp/seiga/im3521156", @post.normalized_source)
+          @post.source = "http://lohas.nicoseiga.jp/priv/b80f86c0d8591b217e7513a9e175e94e00f3c7a1/1384936074/3583893"
+          assert_equal("http://seiga.nicovideo.jp/seiga/im3583893", @post.normalized_source)
+        end
+
+        should "normalize twitpic links" do
+          @post.source = "http://d3j5vwomefv46c.cloudfront.net/photos/large/820960031.jpg?1384107199"
+          assert_equal("http://twitpic.com/dks0tb", @post.normalized_source)
+        end
+
+        should "normalize deviantart links" do
+          @post.source = "http://fc06.deviantart.net/fs71/f/2013/295/d/7/you_are_already_dead__by_mar11co-d6rgm0e.jpg"
+          assert_equal("http://mar11co.deviantart.com/gallery/#/d6rgm0e", @post.normalized_source)
+        end
+
+        should "normalize karabako links" do
+          @post.source = "http://www.karabako.net/images/karabako_38835.jpg"
+          assert_equal("http://www.karabako.net/post/view/38835", @post.normalized_source)
+        end
+
+        should "normalize twipple links" do
+          @post.source = "http://p.twpl.jp/show/orig/mI2c3"
+          assert_equal("http://p.twipple.jp/mI2c3", @post.normalized_source)
+        end
+      end
     end
   end
 
