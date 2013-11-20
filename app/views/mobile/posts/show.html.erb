@@ -1,0 +1,14 @@
+<%= form_tag(m_posts_path, :method => "get") do %>
+  <%= text_field_tag("tags", params[:tags], :size => 20) %>
+  <%= submit_tag "Go", :name => nil %>
+<% end %>
+
+<%= @post.presenter.image_html(self) %>
+
+<div id="tags">
+  <%= @post.presenter.tag_list_html(self, :name_only => true, :path_prefix => "/m/posts") %>
+</div>
+
+<%= content_for(:html_header) do %>
+  <meta name="viewport" content="width=device-width,initial-scale=<%= @post.device_scale %>">
+<% end %>

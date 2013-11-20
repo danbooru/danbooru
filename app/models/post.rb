@@ -118,6 +118,10 @@ class Post < ActiveRecord::Base
     end
 
     def file_url_for(user)
+      if CurrentUser.mobile_mode?
+        return large_file_url
+      end
+
       case user.default_image_size
       when "large"
         if image_width > Danbooru.config.large_image_width
@@ -132,6 +136,10 @@ class Post < ActiveRecord::Base
     end
 
     def file_path_for(user)
+      if CurrentUser.mobile_mode?
+        return large_file_path
+      end
+      
       case user.default_image_size
       when "large"
         if image_width > Danbooru.config.large_image_width
@@ -155,6 +163,14 @@ class Post < ActiveRecord::Base
   end
 
   module ImageMethods
+    def device_scale
+      if large_image_width > 320
+        320.0 / (large_image_width + 10)
+      else
+        1.0
+      end
+    end
+
     def twitter_card_supported?
       image_width.to_i >= 280 && image_height.to_i >= 150
     end
@@ -181,6 +197,10 @@ class Post < ActiveRecord::Base
     end
 
     def image_width_for(user)
+      if CurrentUser.mobile_mode?
+        return large_image_width
+      end
+
       case user.default_image_size
       when "large"
         large_image_width
@@ -191,6 +211,10 @@ class Post < ActiveRecord::Base
     end
 
     def image_height_for(user)
+      if CurrentUser.mobile_mode?
+        return large_image_height
+      end
+
       case user.default_image_size
       when "large"
         large_image_height
