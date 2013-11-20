@@ -98,12 +98,14 @@
         pos.left -= $(window).scrollLeft();
         pos.top -= $(window).scrollTop();
         dialog_widget.offset(pos).css({position:"fixed"});
+        dialog.dialog("option", "resize", function() { dialog_widget.css({position:"fixed"}); });
 
         pin_button.button("option", "icons", {primary: "ui-icon-pin-s"});
       } else {
         pos.left += $(window).scrollLeft();
         pos.top += $(window).scrollTop();
         dialog_widget.offset(pos).css({position:"absolute"});
+        dialog.dialog("option", "resize", function() {});
 
         pin_button.button("option", "icons", {primary: "ui-icon-pin-w"});
       }
