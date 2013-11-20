@@ -20,7 +20,11 @@ class PostPresenter < Presenter
     else
       tag_param = nil
     end
-    html << %{<a href="#{path}/#{post.id}#{tag_param}">}
+    if options[:mobile]
+      html << %{<a href="/m#{path}/#{post.id}#{tag_param}">}
+    else
+      html << %{<a href="#{path}/#{post.id}#{tag_param}">}
+    end
     html << %{<img src="#{post.preview_file_url}" alt="#{h(post.tag_string)}">}
     html << %{</a>}
     html << %{</article>}

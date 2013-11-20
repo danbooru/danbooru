@@ -3,6 +3,9 @@ Danbooru::Application.routes.draw do
     resources :users, :only => [:edit, :update]
     resource  :alias_and_implication_import, :only => [:new, :create]
   end
+  namespace :mobile do
+    resources :posts, :only => [:index, :show]
+  end
   namespace :moderator do
     resource :dashboard, :only => [:show]
     resources :ip_addrs, :only => [:index] do
@@ -257,6 +260,8 @@ Danbooru::Application.routes.draw do
   resources :wpages, :controller => "wiki_pages"
   resources :ftopics, :controller => "forum_topics"
   resources :fposts, :controller => "forum_posts"
+  match "/m/posts", :controller => "mobile/posts", :action => "index"
+  match "/m/posts/:id", :controller => "mobile/posts", :action => "show"
 
   # legacy aliases
   match "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}&search[name]=#{CGI::escape(req.params[:name].to_s)}"}

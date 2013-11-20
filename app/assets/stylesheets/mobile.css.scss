@@ -1,0 +1,62 @@
+/*
+ *= require "./common/010_reset"
+ *= require "./common/020_base"
+ *= require "./common/030_links"
+*/
+
+body {
+  padding: 5px;
+}
+
+/* paginator */
+div.paginator {
+  font-size: 20pt;
+  font-weight: bold;
+  text-align: center;
+
+  li {
+    display: inline;
+
+    a, span {
+      border: 1px solid #EAEAEA;
+      padding: 3px 18px;
+      margin: 0 3px;
+      display: inline-block;
+    }
+  }
+}
+
+/* posts/index */
+article.post-preview {
+  margin: 15px 0;
+  width: 150px;
+  text-align: center;
+  vertical-align: middle;
+  display: inline-block;
+  a {
+    width: 150px;
+    display: block;
+    margin: 0 auto;
+  }
+  img {
+    margin: 0 auto;
+  }
+}
+
+/* posts/show */
+img#image {
+  margin-top: 5px;
+}
+
+div#tags {
+  margin-top: 10px;
+
+  li {
+    margin: 10px 0;
+  }
+
+  a.search-tag {
+    font-size: 24pt;
+    font-weight: bold;
+  }
+}
