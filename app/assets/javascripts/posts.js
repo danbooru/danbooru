@@ -87,6 +87,28 @@
     });
     dialog.dialog("widget").draggable("option", "containment", "none");
 
+    var pin_button = $("<button/>").button({icons: {primary: "ui-icon-pin-w"}, label: "pin", text: false});
+    pin_button.css({width: "20px", height: "20px", position: "absolute", right: "28.4px"});
+    dialog.parent().children(".ui-dialog-titlebar").append(pin_button);
+    pin_button.click(function(e) {
+      var dialog_widget = $('.ui-dialog:has(#edit-dialog)');
+      var pos = dialog_widget.offset();
+
+      if (dialog_widget.css("position") === "absolute") {
+        pos.left -= $(window).scrollLeft();
+        pos.top -= $(window).scrollTop();
+        dialog_widget.offset(pos).css({position:"fixed"});
+
+        pin_button.button("option", "icons", {primary: "ui-icon-pin-s"});
+      } else {
+        pos.left += $(window).scrollLeft();
+        pos.top += $(window).scrollTop();
+        dialog_widget.offset(pos).css({position:"absolute"});
+
+        pin_button.button("option", "icons", {primary: "ui-icon-pin-w"});
+      }
+    });
+
     dialog.parent().mouseout(function(e) {
       dialog.parent().css({"opacity": 0.6});
     })
