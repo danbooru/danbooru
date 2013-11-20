@@ -233,6 +233,13 @@ class PostQueryBuilder
       has_constraints!
     end
 
+    if q[:artcomm_ids]
+      q[:artcomm_ids].each do |artcomm_id|
+        relation = relation.where(:id => ArtistCommentaryVersion.where("updater_id = ?", artcomm_id).select("post_id").uniq)
+      end
+      has_constraints!
+    end
+
     if q[:post_id_negated]
       relation = relation.where("posts.id <> ?", q[:post_id_negated])
     end
