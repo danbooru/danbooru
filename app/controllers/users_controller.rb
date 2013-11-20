@@ -53,6 +53,9 @@ class UsersController < ApplicationController
     @user.update_attributes(params[:user], :as => CurrentUser.role)
     cookies.delete(:favorite_tags)
     cookies.delete(:favorite_tags_with_categories)
+    if @user.errors.any?
+      flash[:notice] = @user.errors.full_messages.join("; ")
+    end
     respond_with(@user)
   end
 
