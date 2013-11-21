@@ -3,7 +3,7 @@
   <%= submit_tag "Go", :name => nil %>
 <% end %>
 
-<%= @post_set.presenter.post_previews_html(self, :mobile => true) %>
+<%= @post_set.presenter.post_previews_html(self, :path_prefix => "/m/posts") %>
 
 <%= numbered_paginator(@post_set.posts) %>
 

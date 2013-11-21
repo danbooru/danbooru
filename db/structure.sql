@@ -509,6 +509,78 @@ ALTER SEQUENCE amazon_backups_id_seq OWNED BY amazon_backups.id;
 
 
 --
+-- Name: artist_commentaries; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE artist_commentaries (
+    id integer NOT NULL,
+    post_id integer NOT NULL,
+    original_title text,
+    original_description text,
+    translated_title text,
+    translated_description text,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: artist_commentaries_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE artist_commentaries_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: artist_commentaries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE artist_commentaries_id_seq OWNED BY artist_commentaries.id;
+
+
+--
+-- Name: artist_commentary_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE artist_commentary_versions (
+    id integer NOT NULL,
+    post_id integer NOT NULL,
+    updater_id integer NOT NULL,
+    updater_ip_addr inet NOT NULL,
+    original_title text,
+    original_description text,
+    translated_title text,
+    translated_description text,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: artist_commentary_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE artist_commentary_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: artist_commentary_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE artist_commentary_versions_id_seq OWNED BY artist_commentary_versions.id;
+
+
+--
 -- Name: artist_urls; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2818,6 +2890,20 @@ ALTER TABLE ONLY amazon_backups ALTER COLUMN id SET DEFAULT nextval('amazon_back
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY artist_commentaries ALTER COLUMN id SET DEFAULT nextval('artist_commentaries_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY artist_commentary_versions ALTER COLUMN id SET DEFAULT nextval('artist_commentary_versions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY artist_urls ALTER COLUMN id SET DEFAULT nextval('artist_urls_id_seq'::regclass);
 
 
@@ -3798,6 +3884,22 @@ ALTER TABLE ONLY amazon_backups
 
 
 --
+-- Name: artist_commentaries_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY artist_commentaries
+    ADD CONSTRAINT artist_commentaries_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: artist_commentary_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY artist_commentary_versions
+    ADD CONSTRAINT artist_commentary_versions_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: artist_urls_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -4112,6 +4214,27 @@ CREATE INDEX index_advertisement_hits_on_created_at ON advertisement_hits USING 
 --
 
 CREATE INDEX index_advertisements_on_ad_type ON advertisements USING btree (ad_type);
+
+
+--
+-- Name: index_artist_commentaries_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_artist_commentaries_on_post_id ON artist_commentaries USING btree (post_id);
+
+
+--
+-- Name: index_artist_commentary_versions_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_artist_commentary_versions_on_post_id ON artist_commentary_versions USING btree (post_id);
+
+
+--
+-- Name: index_artist_commentary_versions_on_updater_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_artist_commentary_versions_on_updater_id ON artist_commentary_versions USING btree (updater_id);
 
 
 --
@@ -6432,3 +6555,7 @@ INSERT INTO schema_migrations (version) VALUES ('20130712162600');
 INSERT INTO schema_migrations (version) VALUES ('20130914175431');
 
 INSERT INTO schema_migrations (version) VALUES ('20131006193238');
+
+INSERT INTO schema_migrations (version) VALUES ('20131117150705');
+
+INSERT INTO schema_migrations (version) VALUES ('20131118153503');
