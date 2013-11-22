@@ -4,7 +4,7 @@ module PostSetPresenters
       raise NotImplementedError
     end
 
-    def post_previews_html(template)
+    def post_previews_html(template, options = {})
       html = ""
 
       if posts.empty?
@@ -12,7 +12,7 @@ module PostSetPresenters
       end
 
       posts.each do |post|
-        html << PostPresenter.preview(post, :tags => @post_set.tag_string, :raw => @post_set.raw)
+        html << PostPresenter.preview(post, options.merge(:tags => @post_set.tag_string, :raw => @post_set.raw))
         html << "\n"
       end
 

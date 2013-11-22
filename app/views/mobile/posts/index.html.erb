@@ -1,0 +1,16 @@
+<%= form_tag(m_posts_path, :method => "get") do %>
+  <%= text_field_tag("tags", params[:tags], :size => 30) %>
+  <%= submit_tag "Go", :name => nil %>
+<% end %>
+
+<%= @post_set.presenter.post_previews_html(self, :path_prefix => "/m/posts") %>
+
+<%= numbered_paginator(@post_set.posts) %>
+
+<div id="tags">
+  <%= @post_set.presenter.tag_list_html(self, :name_only => true, :path_prefix => "/m/posts") %>
+</div>
+
+<%= content_for(:html_header) do %>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+<% end %>

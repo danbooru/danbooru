@@ -10,5 +10,7 @@
     <% end %>
 
     <li><%= link_to "Random post", random_posts_path(:tags => params[:tags]) %></li>
+
+    <li><%= link_to "Mobile version", m_posts_path(:tags => params[:tags]) %></li>
   </ul>
 </section>
