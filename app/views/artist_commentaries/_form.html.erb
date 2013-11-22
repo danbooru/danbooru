@@ -1,6 +1,6 @@
 <p>If the artist of this image posted some interesting additional information about this work, you can copy it here.</p>
 
-<%= form_tag(create_or_update_artist_commentaries_path, :class => "simple_form", :method => :put) do %>
+<%= form_tag(create_or_update_artist_commentaries_path(:format => :js), :remote => true, :class => "simple_form", :method => :put) do %>
   <div class="input">
     <%= hidden_field :artist_commentary, :post_id, :value => @post.id %>
 

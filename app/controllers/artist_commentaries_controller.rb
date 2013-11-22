@@ -11,7 +11,7 @@ class ArtistCommentariesController < ApplicationController
       @artist_commentary = ArtistCommentary.create(params[:artist_commentary])
     end
 
-    respond_with(@artist_commentary.post)
+    respond_with(@artist_commentary)
   end
 
   def revert
