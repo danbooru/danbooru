@@ -329,7 +329,7 @@ class Post < ActiveRecord::Base
         base_36_id = base_10_id.to_s(36)
         "http://twitpic.com/#{base_36_id}"
 
-      when %r{\Ahttp://fc\d+\.deviantart\.net/.+/[a-z0-9_]+_by_([a-z0-9_]+)-d([a-z0-9]+)\.}i
+      when %r{\Ahttp://(?:fc|th)\d{2}\.deviantart\.net/.+/[a-z0-9_]+_by_([a-z0-9_]+)-d([a-z0-9]+)\.}i
         "http://#{$1}.deviantart.com/gallery/#/d#{$2}"
 
       when %r{\Ahttp://www\.karabako\.net/images/karabako_(\d+)\.}i
