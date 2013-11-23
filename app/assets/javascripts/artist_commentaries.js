@@ -34,7 +34,6 @@
     $("#add-commentary-dialog").dialog({
       autoOpen: false,
       width: 500,
-      modal: true,
       buttons: {
         "Submit": function() {
           $("#add-commentary-dialog form").submit();
