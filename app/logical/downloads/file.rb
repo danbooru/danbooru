@@ -69,7 +69,7 @@ module Downloads
                 if limit == 0 then
                   raise Error.new("Too many redirects")
                 end
-                source = res["location"]
+                @source = res["location"]
                 limit -= 1
 
               else

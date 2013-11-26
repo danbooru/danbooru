@@ -2,7 +2,7 @@ module Downloads
   module Strategies
     class Base
       def self.strategies
-        [Pixiv]
+        [Pixiv, Twitpic]
       end
 
       def rewrite(url, headers)
