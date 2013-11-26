@@ -29,13 +29,13 @@ module Downloads
       end
 
       should "work" do
-        assert_equal(185778, ::File.size(@tempfile.path))
+        assert_equal(185_778, ::File.size(@tempfile.path))
       end
     end
 
-    context "a download for a small image" do
+    context "a download for a small image thumbnail" do
       setup do
-        @source = "http://img02.pixiv.net/img/wanwandoh/4348318_m.jpg"
+        @source = "http://img02.pixiv.net/img/wanwandoh/4348318_s.jpg"
         @tempfile = Tempfile.new("danbooru-test")
         @download = Downloads::File.new(@source, @tempfile.path)
         VCR.use_cassette("download-pixiv-small", :record => :new_episodes) do
@@ -48,7 +48,26 @@ module Downloads
       end
 
       should "work" do
-        assert_equal(185778, ::File.size(@tempfile.path))
+        assert_equal(185_778, ::File.size(@tempfile.path))
+      end
+    end
+
+    context "a download for a medium image thumbnail" do
+      setup do
+        @source = "http://img02.pixiv.net/img/wanwandoh/4348318_m.jpg"
+        @tempfile = Tempfile.new("danbooru-test")
+        @download = Downloads::File.new(@source, @tempfile.path)
+        VCR.use_cassette("download-pixiv-medium", :record => :new_episodes) do
+          @download.download!
+        end
+      end
+
+      should "instead download the original version" do
+        assert_equal("http://img02.pixiv.net/img/wanwandoh/4348318.jpg", @download.source)
+      end
+
+      should "work" do
+        assert_equal(185_778, ::File.size(@tempfile.path))
       end
     end
   end

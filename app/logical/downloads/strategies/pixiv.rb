@@ -5,7 +5,7 @@ module Downloads
         if url =~ /https?:\/\/(?:\w+\.)?pixiv\.net/
           url, headers = rewrite_headers(url, headers)
           url, headers = rewrite_html_pages(url, headers)
-          url, headers = rewrite_small_images(url, headers)
+          url, headers = rewrite_small_and_medium_images(url, headers)
           url, headers = rewrite_small_manga_pages(url, headers)
         end
 
@@ -30,10 +30,13 @@ module Downloads
         end
       end
 
-      def rewrite_small_images(url, headers)
+      def rewrite_small_and_medium_images(url, headers)
         if url =~ %r!(/img/.+?/.+?)_m.+$!
           match = $1
           url.sub!(match + "_m", match)
+        elsif url =~ %r!(/img/.+?/.+?)_s.+$!
+          match = $1
+          url.sub!(match + "_s", match)
         end
 
         return [url, headers]
