@@ -492,6 +492,23 @@ class PostTest < ActiveSupport::TestCase
             end
           end
 
+          context "negated" do
+            setup do
+              @pool = FactoryGirl.create(:pool)
+              @post = FactoryGirl.create(:post, :tag_string => "aaa")
+              @post.add_pool!(@pool)
+              @post.tag_string = "aaa -pool:#{@pool.id}"
+              @post.save
+            end
+
+            should "remove the post from the pool" do
+              @post.reload
+              @pool.reload
+              assert_equal("", @pool.post_ids)
+              assert_equal("", @post.pool_string)
+            end
+          end
+
           context "id" do
             setup do
               @pool = FactoryGirl.create(:pool)

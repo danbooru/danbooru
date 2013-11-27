@@ -353,11 +353,6 @@ class Post < ActiveRecord::Base
       @tag_array_was ||= Tag.scan_tags(tag_string_was)
     end
 
-    def create_tags
-      reset_tag_array_cache
-      set_tag_string(tag_array.map {|x| Tag.find_or_create_by_name(x).name}.uniq.sort.join(" "))
-    end
-
     def increment_tag_post_counts
       Tag.update_all("post_count = post_count + 1", {:name => tag_array}) if tag_array.any?
     end
@@ -446,10 +441,10 @@ class Post < ActiveRecord::Base
     end
 
     def normalize_tags
-      create_tags
       normalized_tags = Tag.scan_tags(tag_string)
       normalized_tags = filter_metatags(normalized_tags)
       normalized_tags = normalized_tags.map{|tag| tag.downcase}
+      normalized_tags = normalized_tags.map {|x| Tag.find_or_create_by_name(x).name}
       normalized_tags = TagAlias.to_aliased(normalized_tags)
       normalized_tags = TagImplication.with_descendants(normalized_tags)
       normalized_tags = %w(tagme) if normalized_tags.empty?
