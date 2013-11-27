@@ -119,17 +119,9 @@ class Post < ActiveRecord::Base
 
     def file_url_for(user)
       if CurrentUser.mobile_mode?
-        return large_file_url
-      end
-
-      case user.default_image_size
-      when "large"
-        if image_width > Danbooru.config.large_image_width
-          large_file_url
-        else
-          file_url
-        end
-
+        large_file_url
+      elsif user.default_image_size == "large" && image_width > Danbooru.config.large_image_width
+        large_file_url
       else
         file_url
       end
@@ -137,17 +129,9 @@ class Post < ActiveRecord::Base
 
     def file_path_for(user)
       if CurrentUser.mobile_mode?
-        return large_file_path
-      end
-      
-      case user.default_image_size
-      when "large"
-        if image_width > Danbooru.config.large_image_width
-          large_file_path
-        else
-          file_path
-        end
-
+        large_file_path
+      elsif user.default_image_size == "large" && image_width > Danbooru.config.large_image_width
+        large_file_path
       else
         file_path
       end
@@ -197,28 +181,16 @@ class Post < ActiveRecord::Base
     end
 
     def image_width_for(user)
-      if CurrentUser.mobile_mode?
-        return large_image_width
-      end
-
-      case user.default_image_size
-      when "large"
+      if CurrentUser.mobile_mode? || user.default_image_size == "large"
         large_image_width
-
       else
         image_width
       end
     end
 
     def image_height_for(user)
-      if CurrentUser.mobile_mode?
-        return large_image_height
-      end
-
-      case user.default_image_size
-      when "large"
+      if CurrentUser.mobile_mode? || user.default_image_size == "large"
         large_image_height
-
       else
         image_height
       end
