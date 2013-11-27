@@ -17,7 +17,6 @@ module Downloads
       end
 
       should "work" do
-        puts ::File.read(@tempfile.path).inspect
         assert_equal(89_409, ::File.size(@tempfile.path))
       end
     end
