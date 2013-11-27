@@ -416,12 +416,19 @@ class Post < ActiveRecord::Base
       normalized_tags = Tag.scan_tags(tag_string)
       normalized_tags = filter_metatags(normalized_tags)
       normalized_tags = normalized_tags.map{|tag| tag.downcase}
+      normalized_tags = remove_negated_tags(normalized_tags)
       normalized_tags = normalized_tags.map {|x| Tag.find_or_create_by_name(x).name}
       normalized_tags = TagAlias.to_aliased(normalized_tags)
       normalized_tags = TagImplication.with_descendants(normalized_tags)
       normalized_tags = %w(tagme) if normalized_tags.empty?
       normalized_tags.sort!
       set_tag_string(normalized_tags.uniq.sort.join(" "))
+    end
+
+    def remove_negated_tags(tags)
+      negated_tags, tags = tags.partition {|x| x =~ /\A-/i}
+      negated_tags.map!{|x| x[1..-1]}
+      return tags - negated_tags
     end
 
     def filter_metatags(tags)

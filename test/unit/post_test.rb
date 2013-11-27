@@ -578,6 +578,15 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      context "tagged with a negated tag" do
+        should "remove the tag if present" do
+          @post.update_attributes(:tag_string => "aaa bbb ccc")
+          @post.update_attributes(:tag_string => "aaa bbb ccc -bbb")
+          @post.reload
+          assert_equal("aaa ccc", @post.tag_string)
+        end
+      end
+
       should "have an array representation of its tags" do
         post = FactoryGirl.create(:post)
         post.set_tag_string("aaa bbb")
