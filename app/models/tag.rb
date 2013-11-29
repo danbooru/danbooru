@@ -1,5 +1,5 @@
 class Tag < ActiveRecord::Base
-  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|artcomm|-pool|pool|-fav|fav|ordfav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|score|favcount|filesize|source|-source|id|-id|date|age|order|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|-parent|child|pixiv_id|pixiv"
+  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|artcomm|-pool|pool|-fav|fav|ordfav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|score|favcount|filesize|source|-source|id|-id|date|age|order|limit|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|-parent|child|pixiv_id|pixiv"
   attr_accessible :category, :as => [:moderator, :janitor, :contributor, :gold, :member, :anonymous, :default, :builder, :admin]
   attr_accessible :is_locked, :as => [:moderator, :janitor, :admin]
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
@@ -343,7 +343,7 @@ class Tag < ActiveRecord::Base
       }
 
       scan_query(query).each do |token|
-        q[:tag_count] += 1 unless token == "status:deleted"
+        q[:tag_count] += 1 unless token == "status:deleted" || token =~ /\Alimit:.+\Z/
 
         if token =~ /\A(#{METATAGS}):(.+)\Z/i
           case $1.downcase
@@ -484,6 +484,9 @@ class Tag < ActiveRecord::Base
 
           when "order"
             q[:order] = $2.downcase
+
+          when "limit"
+            # Do nothing. The controller takes care of it.
 
           when "-status"
             q[:status_neg] = $2.downcase
