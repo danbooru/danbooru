@@ -7779,4 +7779,72 @@ http_interactions:
         pHpW+uDiy5JKkqKgFQCoBUAqA//Z
     http_version: 
   recorded_at: Thu, 28 Nov 2013 18:03:23 GMT
+- request:
+    method: head
+    uri: http://25.media.tumblr.com/tumblr_lxbzel2H5y1r9yjhso1_500h.jpg
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - lowerbooru/2.36.0
+      Accept:
+      - ! '*/*'
+  response:
+    status:
+      code: 403
+      message: Forbidden
+    headers:
+      X-Amz-Request-Id:
+      - 71B57CCD3C6DDA59
+      X-Amz-Id-2:
+      - 4Sf4rVMjOtgOohpJ2G1XkXdjaVQ49LNEBI1DeIAyN+6TdzAEFi4Bf7ASYzgmW+Ly
+      Content-Type:
+      - application/xml
+      Server:
+      - AmazonS3
+      Content-Length:
+      - '1'
+      Date:
+      - Fri, 29 Nov 2013 21:06:02 GMT
+      Connection:
+      - keep-alive
+    body:
+      encoding: US-ASCII
+      string: ''
+    http_version: 
+  recorded_at: Fri, 29 Nov 2013 21:06:05 GMT
+- request:
+    method: head
+    uri: http://24.media.tumblr.com/fc328250915434e66e8e6a92773f79d0/tumblr_mf4nshfibc1s0oswoo1_500h.jpg
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - lowerbooru/2.36.0
+      Accept:
+      - ! '*/*'
+  response:
+    status:
+      code: 403
+      message: Forbidden
+    headers:
+      Content-Type:
+      - application/xml
+      Date:
+      - Fri, 29 Nov 2013 21:06:03 GMT
+      Server:
+      - AmazonS3
+      X-Amz-Id-2:
+      - 3St4wTEbbc78MnStNWxXUEtPjmi9/Kuxk+1nANXxGWlwLr2qEAJiI/TL/gTpsx6v
+      X-Amz-Request-Id:
+      - 2A8C48C6C6C63E02
+      Connection:
+      - close
+    body:
+      encoding: US-ASCII
+      string: ''
+    http_version: 
+  recorded_at: Fri, 29 Nov 2013 21:06:06 GMT
 recorded_with: VCR 2.5.0
