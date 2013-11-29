@@ -339,6 +339,9 @@ class PostQueryBuilder
     when "note_asc"
       relation = relation.order("posts.last_noted_at ASC, posts.id DESC").where("posts.last_noted_at is not null")
 
+    when "artcomm"
+      relation = relation.joins(:artist_commentary).order("artist_commentaries.updated_at DESC, posts.id DESC")
+
     when "mpixels", "mpixels_desc"
       # Use "w*h/1000000", even though "w*h" would give the same result, so this can use
       # the posts_mpixels index.
