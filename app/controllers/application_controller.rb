@@ -103,6 +103,10 @@ protected
   def normalize_search
     if request.get?
       params[:search] ||= {}
+      changed = params[:search].reject! {|k,v| v.blank?}
+      unless changed.nil?
+        redirect_to params
+      end
     end
   end
 
