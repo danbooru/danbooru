@@ -433,7 +433,7 @@ class Post < ActiveRecord::Base
 
     def filter_metatags(tags)
       @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent):/i}
-      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav):/i}
+      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav|child):/i}
       apply_pre_metatags
       return tags
     end
@@ -468,6 +468,11 @@ class Post < ActiveRecord::Base
 
         when /^fav:(.+)$/i
           add_favorite!(CurrentUser.user)
+
+        when /^child:(.+)$/i
+          child = Post.find($1)
+          child.parent_id = id
+          child.save
         end
       end
     end

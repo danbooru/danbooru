@@ -576,6 +576,20 @@ class PostTest < ActiveSupport::TestCase
             assert_equal("fav:#{@user.id}", @post.fav_string)
           end
         end
+
+        context "for a child" do
+          setup do
+            @child = FactoryGirl.create(:post)
+          end
+
+          should "update the parent relationships for both posts" do
+            @post.update_attributes(:tag_string => "aaa child:#{@child.id}")
+            @post.reload
+            @child.reload
+            assert_equal(@post.id, @child.parent_id)
+            assert(@post.has_children?)
+          end
+        end
       end
 
       context "tagged with a negated tag" do
