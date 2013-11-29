@@ -155,6 +155,10 @@ class PostQueryBuilder
       relation = relation.where("posts.is_flagged = FALSE")
     elsif q[:status_neg] == "deleted"
       relation = relation.where("posts.is_deleted = FALSE")
+    elsif q[:status_neg] == "banned"
+      relation = relation.where("posts.is_banned = FALSE")
+    elsif q[:status_neg] == "active"
+      relation = relation.where("posts.is_pending = TRUE OR posts.is_deleted = TRUE OR posts.is_banned = TRUE")
     elsif CurrentUser.user.hide_deleted_posts? && !CurrentUser.admin_mode?
       relation = relation.where("posts.is_deleted = FALSE")
     end
