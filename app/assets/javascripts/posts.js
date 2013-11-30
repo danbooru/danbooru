@@ -353,7 +353,7 @@
 
     $("#copy-notes").click(function(e) {
       var current_post_id = $("meta[name=post-id]").attr("content");
-      var other_post_id = prompt("Enter the ID of the post to copy all notes to:");
+      var other_post_id = parseInt(prompt("Enter the ID of the post to copy all notes to:"));
 
       if (other_post_id !== null) {
         $.ajax("/posts/" + current_post_id + "/copy_notes", {
