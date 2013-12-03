@@ -52,6 +52,12 @@ GEM
       net-ssh-gateway (>= 1.1.0)
     capistrano-unicorn (0.1.10)
       capistrano
+    capybara (2.2.0)
+      mime-types (>= 1.16)
+      nokogiri (>= 1.3.3)
+      rack (>= 1.0.0)
+      rack-test (>= 0.5.4)
+      xpath (~> 2.0)
     chronic (0.9.1)
     coderay (1.0.9)
     crack (0.4.1)
@@ -148,6 +154,7 @@ GEM
       json (~> 1.4)
     ref (1.0.5)
     rmagick (2.13.2)
+    rr (1.1.2)
     ruby-prof (0.13.0)
     safe_yaml (0.9.5)
     sanitize (2.0.6)
@@ -179,6 +186,25 @@ GEM
     statistics2 (0.54)
     term-ansicolor (1.2.2)
       tins (~> 0.8)
+    test-unit (2.5.5)
+    test-unit-activesupport (1.0.1)
+      activesupport
+      test-unit
+    test-unit-capybara (1.0.4)
+      capybara (>= 2.1.0)
+      json
+      test-unit (>= 2.5.3)
+    test-unit-notify (1.0.1)
+      test-unit (>= 2.4.9)
+    test-unit-rails (1.0.2)
+      rails
+      test-unit-activesupport
+      test-unit-capybara
+      test-unit-notify
+      test-unit-rr
+    test-unit-rr (1.0.3)
+      rr (>= 1.1.1)
+      test-unit (>= 2.5.2)
     therubyracer (0.11.4)
       libv8 (~> 3.11.8.12)
       ref
@@ -209,6 +235,8 @@ GEM
       activesupport (>= 2.3.4)
       chronic (>= 0.6.3)
     xml-simple (1.1.2)
+    xpath (2.0.0)
+      nokogiri (~> 1.3)
 
 PLATFORMS
   ruby
@@ -245,6 +273,7 @@ DEPENDENCIES
   simplecov
   statistics2
   term-ansicolor
+  test-unit-rails
   therubyracer
   timecop
   uglifier (>= 1.0.3)

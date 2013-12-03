@@ -4364,10 +4364,10 @@ CREATE INDEX index_comments_on_body_index ON comments USING gin (body_index);
 
 
 --
--- Name: index_comments_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_comments_on_creator_id_and_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_comments_on_creator_id ON comments USING btree (creator_id);
+CREATE INDEX index_comments_on_creator_id_and_post_id ON comments USING btree (creator_id, post_id);
 
 
 --
@@ -5897,10 +5897,10 @@ CREATE INDEX index_notes_on_body_index ON notes USING gin (body_index);
 
 
 --
--- Name: index_notes_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_notes_on_creator_id_and_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_notes_on_creator_id ON notes USING btree (creator_id);
+CREATE INDEX index_notes_on_creator_id_and_post_id ON notes USING btree (creator_id, post_id);
 
 
 --
@@ -6559,3 +6559,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131006193238');
 INSERT INTO schema_migrations (version) VALUES ('20131117150705');
 
 INSERT INTO schema_migrations (version) VALUES ('20131118153503');
+
+INSERT INTO schema_migrations (version) VALUES ('20131130190411');
