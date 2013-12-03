@@ -240,7 +240,7 @@ class DText
       end
     end
 
-    sanitize(html.join("")).html_safe
+    html.join("").html_safe
   end
 
   def self.sanitize(text)

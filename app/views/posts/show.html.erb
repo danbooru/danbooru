@@ -73,7 +73,9 @@
       </section>
 
       <section id="notes" style="display: none;">
-        <%= render :partial => "notes/note", :collection => @post.notes.active %>
+        <% cache("p/#{@post.id}/n/#{@post.last_noted_at.to_i}") do
+          <%= render :partial => "notes/note", :collection => @post.notes.active %>
+        <% end %>
       </section>
 
       <% if CurrentUser.is_member? && Danbooru.config.can_user_see_post?(CurrentUser.user, @post) %>
@@ -129,13 +131,6 @@
     <meta name="twitter:image:src" content="http://<%= Danbooru.config.hostname %><%= @post.large_file_url %>">
     <meta name="twitter:image:width" content="<%= @post.image_width %>">
     <meta name="twitter:image:height" content="<%= @post.image_height %>">
-  <% end %>
-
-  <% if @post.presenter.next_post_in_pool %>
-    <link rel="prefetch" href="<%= post_path(@post.presenter.next_post_in_pool, :pool_id => params[:pool_id]) %>">
-    <link rel="prerender" href="<%= post_path(@post.presenter.next_post_in_pool, :pool_id => params[:pool_id]) %>">
-    <link rel="prefetch" href="<%= Post.find(@post.presenter.next_post_in_pool).file_url_for(CurrentUser.user) %>">
-    <link rel="prerender" href="<%= Post.find(@post.presenter.next_post_in_pool).file_url_for(CurrentUser.user) %>">
   <% end %>
 <% end %>
 
