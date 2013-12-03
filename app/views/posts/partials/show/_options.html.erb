@@ -3,16 +3,16 @@
   <li><%= link_to "Favorite", favorites_path(:post_id => post.id), :remote => true, :method => :post, :id => "add-to-favorites", :title => "Shortcut is F" %></li>
   <li><%= link_to "Unfavorite", favorite_path(post), :remote => true, :method => :delete, :id => "remove-from-favorites" %></li>
   <li><%= link_to "Edit", "#", :id => "side-edit-link" %></li>
-  <li><%= link_to "Random post", random_posts_path(:tags => params[:tags]) %></li>
-  <li><%= link_to "Add to pool", "#", :id => "pool" %></li>
+  <li id="random-post-list"><%= link_to "Random post", random_posts_path(:tags => params[:tags]) %></li>
+  <li id="add-to-pool-list"><%= link_to "Add to pool", "#", :id => "pool" %></li>
   <% if post.is_note_locked? %>
-    <li><span id="note-locked-notice">Note locked</span></li>
+    <li id="add-notes-list"><span id="note-locked-notice">Note locked</span></li>
   <% else %>
-    <li><%= link_to "Add notes", "#", :id => "translate", :title => "Shortcut is N" %></li>
+    <li id="add-notes-list"><%= link_to "Add notes", "#", :id => "translate", :title => "Shortcut is N" %></li>
   <% end %>
-  <%= link_to "Add artist commentary", "#", :id => "add-commentary" %>
+  <li id="add-artist-commentary-list"><%= link_to "Add artist commentary", "#", :id => "add-commentary" %></li>
   <% if CurrentUser.is_builder? && post.has_notes? %>
-    <li><%= link_to "Copy all notes", "#", :id => "copy-notes" %></li>
+    <li id="copy-all-notes-list"><%= link_to "Copy all notes", "#", :id => "copy-notes" %></li>
   <% end %>
   <li><%= link_to "Find similar", "http://danbooru.iqdb.org/db-search.php?url=http://#{Danbooru.config.hostname}#{post.preview_file_url}" %></li>
 
@@ -50,7 +50,7 @@
         <li><%= link_to "Expunge", expunge_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "expunge", :confirm => "This will permanently delete this post (meaning the file will be deleted). Are you sure you want to delete this post?" %></li>
       <% end %>
 
-      <li><%= link_to "Mobile version", mobile_post_path(post) %></li>
+      <li id="mobile-version-list"><%= link_to "Mobile version", mobile_post_path(post) %></li>
     <% end %>
   <% end %>
 </ul>
