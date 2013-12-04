@@ -3,11 +3,11 @@ module PaginationHelper
     html = '<div class="paginator"><menu>'
 
     if records.any?
-      if params[:page] =~ /[ab]/ && params[:f] != "1"
-        html << '<li>' + link_to("< Previous", params.merge(:page => "a#{records[0].id}", :f => nil), :rel => "prev") + '</li>'
+      if params[:page] =~ /[ab]/
+        html << '<li>' + link_to("< Previous", params.merge(:page => "a#{records[0].id}"), :rel => "prev") + '</li>'
       end
 
-      html << '<li>' + link_to("Next >", params.merge(:page => "b#{records[-1].id}", :f => nil), :rel => "next") + '</li>'
+      html << '<li>' + link_to("Next >", params.merge(:page => "b#{records[-1].id}"), :rel => "next") + '</li>'
     end
 
     html << "</menu></div>"
