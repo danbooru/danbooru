@@ -1,5 +1,5 @@
 class PostsController < ApplicationController
-  before_filter :member_only, :except => [:show, :show_seq, :index, :home]
+  before_filter :member_only, :except => [:show, :show_seq, :index, :home, :random]
   before_filter :builder_only, :only => [:copy_notes]
   after_filter :save_recent_tags, :only => [:update]
   respond_to :html, :xml, :json
