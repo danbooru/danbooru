@@ -13,7 +13,6 @@ Disallow: /dmails
 Disallow: /favorite
 Disallow: /ip_bans
 Disallow: /janitor_trials
-Disallow: /legacy
 Disallow: /maintenance
 Disallow: /mobile/
 Disallow: /m/
