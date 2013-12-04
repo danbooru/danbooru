@@ -125,8 +125,12 @@ class Pool < ActiveRecord::Base
     name.gsub(/\s+/, "_")
   end
 
-  def self.normalize_post_ids(post_ids)
-    post_ids.scan(/\d+/).uniq.join(" ")
+  def self.normalize_post_ids(post_ids, unique)
+    hoge = post_ids.scan(/\d+/)
+    if unique
+      hoge = hoge.uniq
+    end
+    hoge.join(" ")
   end
 
   def self.find_by_name(name)
@@ -137,6 +141,14 @@ class Pool < ActiveRecord::Base
     else
       nil
     end
+  end
+
+  def is_series?
+    category == "series"
+  end
+
+  def is_collection?
+    category == "collection"
   end
 
   def initialize_is_active
@@ -165,7 +177,7 @@ class Pool < ActiveRecord::Base
   end
 
   def normalize_post_ids
-    self.post_ids = self.class.normalize_post_ids(post_ids)
+    self.post_ids = self.class.normalize_post_ids(post_ids, is_collection?)
   end
 
   def revert_to!(version)

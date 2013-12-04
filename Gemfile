@@ -10,8 +10,6 @@ group :test do
   gem "vcr"
   gem "webmock"
   gem "timecop"
-  gem "test-unit-rails"
-  gem "ruby-prof"
 end
 
 group :assets do

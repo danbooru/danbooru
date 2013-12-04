@@ -198,11 +198,17 @@ class DText
 
       when /\[code\](?!\])/
         flags[:code] = true
+        stack << "pre"
         '<pre>'
 
       when /\[\/code\](?!\])/
         flags[:code] = false
-        '</pre>'
+        if stack.last == "pre"
+          stack.pop
+          "</pre>"
+        else
+          ""
+        end
 
       when /\[expand(?:\=([^\]]*))?\](?!\])/
         stack << "expandable"

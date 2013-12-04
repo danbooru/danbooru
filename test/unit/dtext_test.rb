@@ -38,7 +38,7 @@ class DTextTest < ActiveSupport::TestCase
   end
 
   def test_spoilers_with_no_closing_tag_1
-    assert_equal("<div class=\"spoiler\">\n<p>this is a spoiler with no closing tag</p>\n<p>new text</p>\n</div>", p("[spoiler]this is a spoiler with no closing tag\n\nnew text"))
+    assert_equal("<div class=\"spoiler\"><p>this is a spoiler with no closing tag</p><p>new text</p></div>", p("[spoiler]this is a spoiler with no closing tag\n\nnew text"))
   end
 
   def test_spoilers_with_no_closing_tag_2
@@ -50,7 +50,7 @@ class DTextTest < ActiveSupport::TestCase
   end
 
   def test_spoilers_nested
-    assert_equal("<div class=\"spoiler\">\n<p>this is</p>\n<div class=\"spoiler\"><p>a nested</p></div>\n<p>spoiler</p>\n</div>", p("[spoiler]this is [spoiler]a nested[/spoiler] spoiler[/spoiler]"))
+    assert_equal("<div class=\"spoiler\"><p>this is</p><div class=\"spoiler\"><p>a nested</p></div><p>spoiler</p></div>", p("[spoiler]this is [spoiler]a nested[/spoiler] spoiler[/spoiler]"))
   end
 
   def test_paragraphs
@@ -74,7 +74,7 @@ class DTextTest < ActiveSupport::TestCase
   end
 
   def test_quote_blocks_nested
-    assert_equal("<blockquote>\n<p>a</p>\n<blockquote><p>b</p></blockquote>\n<p>c</p>\n</blockquote>", p("[quote]\na\n[quote]\nb\n[/quote]\nc\n[/quote]"))
+    assert_equal("<blockquote><p>a</p><blockquote><p>b</p></blockquote><p>c</p></blockquote>", p("[quote]\na\n[quote]\nb\n[/quote]\nc\n[/quote]"))
   end
 
   def test_code
