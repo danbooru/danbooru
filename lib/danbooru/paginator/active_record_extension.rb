@@ -31,7 +31,7 @@ module Danbooru
         end
 
         def paginate_sequential_before(before_id = nil)
-          c = limit(records_per_page)
+          c = limit(records_per_page + 1)
 
           if before_id.to_i > 0
             c = c.where("#{table_name}.id < ?", before_id.to_i)
@@ -44,7 +44,7 @@ module Danbooru
         end
 
         def paginate_sequential_after(after_id)
-          limit(records_per_page).where("#{table_name}.id > ?", after_id.to_i).reorder("#{table_name}.id asc").tap do |obj|
+          limit(records_per_page + 1).where("#{table_name}.id > ?", after_id.to_i).reorder("#{table_name}.id asc").tap do |obj|
             obj.extend(SequentialCollectionExtension)
             obj.sequential_paginator_mode = :after
           end
