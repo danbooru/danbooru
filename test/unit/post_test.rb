@@ -1328,6 +1328,56 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(1, Post.fast_count("ccc"))
       end
     end
+
+    context "The cache" do
+      context "when shared between users on danbooru/safebooru" do
+        setup do
+          FactoryGirl.create(:post, :tag_string => "aaa bbb", :rating => "q")
+          FactoryGirl.create(:post, :tag_string => "aaa bbb", :rating => "s")
+          FactoryGirl.create(:post, :tag_string => "aaa bbb", :rating => "s")
+          CurrentUser.stubs(:safe_mode?).returns(true)
+          Post.fast_count("aaa")
+          CurrentUser.stubs(:safe_mode?).returns(false)
+          Post.fast_count("bbb")
+        end
+
+        should "be accurate on danbooru" do
+          CurrentUser.stubs(:safe_mode?).returns(false)
+          assert_equal(3, Post.fast_count("aaa"))
+          assert_equal(3, Post.fast_count("bbb"))
+        end
+
+        should "be accurate on safebooru" do
+          CurrentUser.stubs(:safe_mode?).returns(true)
+          assert_equal(2, Post.fast_count("aaa"))
+          assert_equal(2, Post.fast_count("bbb"))
+        end
+      end
+
+      context "when shared between users with the deleted post filter on/off" do
+        setup do
+          FactoryGirl.create(:post, :tag_string => "aaa bbb", :is_deleted => true)
+          FactoryGirl.create(:post, :tag_string => "aaa bbb", :is_deleted => false)
+          FactoryGirl.create(:post, :tag_string => "aaa bbb", :is_deleted => false)
+          CurrentUser.user.stubs(:hide_deleted_posts?).returns(true)
+          Post.fast_count("aaa")
+          CurrentUser.user.stubs(:hide_deleted_posts?).returns(false)
+          Post.fast_count("bbb")
+        end
+
+        should "be accurate with the deleted post filter on" do
+          CurrentUser.user.stubs(:hide_deleted_posts?).returns(true)
+          assert_equal(2, Post.fast_count("aaa"))
+          assert_equal(2, Post.fast_count("bbb"))
+        end
+
+        should "be accurate with the deleted post filter off" do
+          CurrentUser.user.stubs(:hide_deleted_posts?).returns(false)
+          assert_equal(3, Post.fast_count("aaa"))
+          assert_equal(3, Post.fast_count("bbb"))
+        end
+      end
+    end
   end
 
   context "Reverting: " do
