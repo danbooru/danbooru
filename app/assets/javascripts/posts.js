@@ -570,6 +570,13 @@
     var $post = $("#post_" + data.id);
     $post.attr("data-tags", data.tag_string);
     $post.data("rating", data.rating);
+    $post.removeClass("post-status-has-parent post-status-has-children");
+    if (data.parent_id) {
+      $post.addClass("post-status-has-parent");
+    }
+    if (data.has_children) {
+      $post.addClass("post-status-has-children");
+    }
     Danbooru.Post.initialize_title_for($post);
   }
 
