@@ -432,7 +432,7 @@ class Post < ActiveRecord::Base
     end
 
     def filter_metatags(tags)
-      @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent):/i}
+      @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent|-parent):/i}
       @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav|child):/i}
       apply_pre_metatags
       return tags
@@ -484,6 +484,11 @@ class Post < ActiveRecord::Base
         case tag
         when /^parent:none$/i, /^parent:0$/i
           self.parent_id = nil
+
+        when /^-parent:(\d+)$/i
+          if parent_id == $1.to_i
+            self.parent_id = nil
+          end
 
         when /^parent:(\d+)$/i
           if $1.to_i != id && Post.exists?(["id = ?", $1.to_i])

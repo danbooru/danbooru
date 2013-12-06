@@ -34,7 +34,7 @@
       }
     } else if (command === "[reset]") {
       return [];
-    } else if (command[0] === "-" && !command.match(/^-pool:/i)) {
+    } else if (command[0] === "-" && !command.match(/^(?:-pool|-parent):/i)) {
       return Danbooru.reject(tags, function(x) {return x === command.substr(1, 100)});
     } else {
       tags.push(command);
