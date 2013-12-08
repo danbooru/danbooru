@@ -755,7 +755,7 @@ class Post < ActiveRecord::Base
       if CurrentUser.safe_mode?
         tags = "#{tags} rating:s".strip
       end
-      if CurrentUser.user && CurrentUser.hide_deleted_posts?
+      if CurrentUser.user && CurrentUser.hide_deleted_posts? && tags !~ /(?:^|\s)(?:-)?status:.+/
         tags = "#{tags} -status:deleted".strip
       end
 
