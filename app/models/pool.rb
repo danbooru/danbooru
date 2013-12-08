@@ -38,14 +38,18 @@ class Pool < ActiveRecord::Base
       order("(case category when 'series' then 0 else 1 end), name")
     end
 
+    def name_matches(name)
+      name = name.tr(" ", "_")
+      name = "*#{name}*" unless name =~ /\*/
+      where("name ilike ? escape E'\\\\'", name.to_escaped_for_sql_like)
+    end
+
     def search(params)
       q = scoped
       params = {} if params.blank?
 
       if params[:name_matches].present?
-        name_matches = params[:name_matches].tr(" ", "_")
-        name_matches = "*#{name_matches}*" unless name_matches =~ /\*/
-        q = q.where("name ilike ? escape E'\\\\'", name_matches.to_escaped_for_sql_like)
+        q = q.name_matches(params[:name_matches])
       end
 
       if params[:description_matches].present?

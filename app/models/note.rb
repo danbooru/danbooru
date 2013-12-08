@@ -32,6 +32,10 @@ class Note < ActiveRecord::Base
       joins(:post).where("posts.tag_index @@ to_tsquery('danbooru', E?)", query.to_escaped_for_tsquery_split)
     end
 
+    def for_creator(user_id)
+      where("creator_id = ?", user_id)
+    end
+
     def creator_name(name)
       where("creator_id = (select _.id from users _ where lower(_.name) = ?)", name.mb_chars.downcase)
     end
