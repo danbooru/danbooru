@@ -237,6 +237,13 @@ class PostQueryBuilder
       has_constraints!
     end
 
+    if q[:note_updater_ids]
+      q[:note_updater_ids].each do |note_updater_id|
+        relation = relation.where(:id => NoteVersion.where("updater_id = ?", note_updater_id).select("post_id").uniq)
+      end
+      has_constraints!
+    end
+
     if q[:artcomm_ids]
       q[:artcomm_ids].each do |artcomm_id|
         relation = relation.where(:id => ArtistCommentaryVersion.where("updater_id = ?", artcomm_id).select("post_id").uniq)
