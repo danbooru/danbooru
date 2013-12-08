@@ -814,6 +814,11 @@ class PostTest < ActiveSupport::TestCase
           @post.source = "http://p.twpl.jp/show/orig/mI2c3"
           assert_equal("http://p.twipple.jp/mI2c3", @post.normalized_source)
         end
+
+        should "normalize hentai foundry links" do
+          @post.source = "http://pictures.hentai-foundry.com//a/AnimeFlux/219123.jpg"
+          assert_equal("http://www.hentai-foundry.com/pictures/user/AnimeFlux/219123", @post.normalized_source)
+        end
       end
     end
   end

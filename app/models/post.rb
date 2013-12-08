@@ -310,6 +310,9 @@ class Post < ActiveRecord::Base
       when %r{\Ahttp://p\.twpl\.jp/show/orig/([a-z0-9]+)}i
         "http://p.twipple.jp/#{$1}"
 
+      when %r{\Ahttp://pictures\.hentai-foundry\.com//a/([^/]+)/(\d+)\.}i
+        "http://www.hentai-foundry.com/pictures/user/#{$1}/#{$2}"
+
       else
         source
       end
