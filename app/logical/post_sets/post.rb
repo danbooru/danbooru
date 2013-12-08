@@ -31,7 +31,7 @@ module PostSets
     end
 
     def has_artist?
-      tag_array.any? && ::Artist.named(tag_string).active.exists?
+      is_single_tag? && ::Artist.named(tag_string).active.exists?
     end
 
     def artist
@@ -43,7 +43,7 @@ module PostSets
     end
 
     def has_pool?
-      tag_array.size == 1 && pool_name && pool
+      is_single_tag? && pool_name && pool
     end
 
     def pool
