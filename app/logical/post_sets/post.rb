@@ -19,11 +19,11 @@ module PostSets
     end
 
     def has_wiki?
-      tag_array.size == 1 && ::WikiPage.titled(tag_string).exists?
+      is_single_tag? && ::WikiPage.titled(tag_string).exists?
     end
 
     def wiki_page
-      if tag_array.any?
+      if is_single_tag?
         ::WikiPage.titled(tag_string).first
       else
         nil

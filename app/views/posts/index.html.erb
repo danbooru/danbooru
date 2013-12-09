@@ -48,7 +48,7 @@
 
 <%= content_for(:html_header) do %>
   <link href="<%= posts_path(:format => 'atom', :tags => params[:tags]) %>" rel="alternate" title="ATOM" type="application/atom+xml" />
-  <% if @post_set.wiki_page %>
+  <% if @post_set.has_wiki? %>
     <meta name="description" content="<%= @post_set.wiki_page.presenter.blurb %>"></meta>
   <% end %>
 <% end %>
