@@ -18,6 +18,10 @@ module PostSets
       tag_array.slice(0, 25).join(" ").tr("_", " ")
     end
 
+    def unordered_tag_array
+      tag_array.reject{|tag| tag =~ /\Aorder:\S+/}
+    end
+
     def has_wiki?
       is_single_tag? && ::WikiPage.titled(tag_string).exists?
     end

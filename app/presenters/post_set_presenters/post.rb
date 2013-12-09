@@ -14,7 +14,9 @@ module PostSetPresenters
       elsif post_set.is_tag_subscription?
         post_set.tag_subscription_tags
       elsif post_set.is_single_tag?
-        related_tags_for_single
+        related_tags_for_single(post_set.tag_string)
+      elsif post_set.unordered_tag_array.size == 1
+        related_tags_for_single(post_set.unordered_tag_array.first)
       elsif post_set.tag_string =~ /(?:^|\s)(?:#{Tag::SUBQUERY_METATAGS}):\S+/
         calculate_related_tags_from_post_set
       elsif post_set.is_empty_tag?
@@ -36,8 +38,8 @@ module PostSetPresenters
       RelatedTagCalculator.calculate_from_sample_to_array(post_set.tag_string).map(&:first)
     end
 
-    def related_tags_for_single
-      tag = Tag.find_by_name(post_set.tag_string.downcase)
+    def related_tags_for_single(tag_string)
+      tag = Tag.find_by_name(tag_string.downcase)
 
       if tag
         tag.related_tag_array.map(&:first)
