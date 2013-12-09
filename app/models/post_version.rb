@@ -65,7 +65,7 @@ class PostVersion < ActiveRecord::Base
   end
 
   def sequence_for_post
-    versions = PostVersion.where(:post_id => post_id).order("updated_at desc").all
+    versions = PostVersion.where(:post_id => post_id).order("updated_at desc, id desc").all
     diffs = []
     versions.each_index do |i|
       if i < versions.size - 1
@@ -130,7 +130,12 @@ class PostVersion < ActiveRecord::Base
   end
 
   def previous
-    PostVersion.where("post_id = ? and updated_at < ?", post_id, updated_at).order("updated_at desc").first
+    if updated_at.to_i == Time.zone.parse("2007-03-14T19:38:12Z").to_i
+      # Old post versions which didn't have updated_at set correctly
+      PostVersion.where("post_id = ? and updated_at = ? and id < ?", post_id, updated_at, id).order("updated_at desc, id desc").first
+    else
+      PostVersion.where("post_id = ? and updated_at < ?", post_id, updated_at).order("updated_at desc, id desc").first
+    end
   end
 
   def truncated_source
