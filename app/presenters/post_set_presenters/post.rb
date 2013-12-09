@@ -15,6 +15,8 @@ module PostSetPresenters
         post_set.tag_subscription_tags
       elsif post_set.is_single_tag?
         related_tags_for_single
+      elsif post_set.tag_string =~ /(?:^|\s)(?:#{Tag::SUBQUERY_METATAGS}):\S+/
+        calculate_related_tags_from_post_set
       elsif post_set.is_empty_tag?
         popular_tags
       else
