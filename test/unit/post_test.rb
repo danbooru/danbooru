@@ -1124,6 +1124,19 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(post1.id, relation.first.id)
     end
 
+    should "return posts for the <pool> metatag with a wildcard" do
+      post1 = FactoryGirl.create(:post)
+      post2 = FactoryGirl.create(:post)
+      post3 = FactoryGirl.create(:post)
+      pool1 = FactoryGirl.create(:pool, :name => "test_a")
+      pool2 = FactoryGirl.create(:pool, :name => "test_b")
+      post1.add_pool!(pool1)
+      post3.add_pool!(pool2)
+      relation = Post.tag_match("pool:test*")
+      assert_equal(2, relation.count)
+      assert_equal([post3.id, post1.id], relation.all.map!(&:id))
+    end
+
     should "return posts for the <user> metatag" do
       second_user = FactoryGirl.create(:user)
       post1 = FactoryGirl.create(:post, :uploader => CurrentUser.user)
