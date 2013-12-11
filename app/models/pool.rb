@@ -251,7 +251,7 @@ class Pool < ActiveRecord::Base
         rescue ActiveRecord::RecordNotFound
           # swallow
         end
-      end.compact!
+      end.compact
     else
       []
     end
