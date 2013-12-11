@@ -246,8 +246,12 @@ class Pool < ActiveRecord::Base
     slice = post_id_array.slice(offset, limit)
     if slice && slice.any?
       slice.map do |id|
-        Post.find(id)
-      end
+        begin
+          Post.find(id)
+        rescue ActiveRecord::RecordNotFound
+          # swallow
+        end
+      end.compact!
     else
       []
     end
