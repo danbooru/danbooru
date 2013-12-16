@@ -55,10 +55,33 @@ class PoolVersion < ActiveRecord::Base
     old_posts = version.present? ? version.post_id_array : []
 
     return {
-      :added_posts => new_posts - old_posts,
-      :removed_posts => old_posts - new_posts,
-      :unchanged_posts => new_posts & old_posts
+      :added_posts => array_difference_with_duplicates(new_posts, old_posts),
+      :removed_posts => array_difference_with_duplicates(old_posts, new_posts),
+      :unchanged_posts => array_intersect_with_duplicates(new_posts, old_posts)
     }
+  end
+
+  def array_difference_with_duplicates(array, other_array)
+    new_array = array.dup
+    other_array.each do |id|
+      index = new_array.index(id)
+      if index
+        new_array.delete_at(index)
+      end
+    end
+    new_array
+  end
+
+  def array_intersect_with_duplicates(array, other_array)
+    other_array = other_array.dup
+    array.inject([]) do |intersect, id|
+      index = other_array.index(id)
+      if index
+        intersect << id
+        other_array.delete_at(index)
+      end
+      intersect        
+    end
   end
 
   def changes
