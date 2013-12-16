@@ -524,7 +524,7 @@ class User < ActiveRecord::Base
       options[:except] ||= []
       options[:except] += hidden_attributes
       options[:methods] ||= []
-      options[:methods] += [:level_string, :wiki_page_version_count, :artist_version_count, :artist_commentary_version_count, :pool_version_count, :forum_post_count, :comment_count, :appeal_count, :flag_count, :positive_feedback_count, :neutral_feedback_count, :negative_feedback_count]
+      options[:methods] += [:level_string]
       super(options)
     end
 
@@ -534,7 +534,7 @@ class User < ActiveRecord::Base
       options[:except] ||= []
       options[:except] += hidden_attributes
       options[:methods] ||= []
-      options[:methods] += [:level_string, :wiki_page_version_count, :artist_version_count, :artist_commentary_version_count, :pool_version_count, :forum_post_count, :comment_count, :appeal_count, :flag_count, :positive_feedback_count, :neutral_feedback_count, :negative_feedback_count]
+      options[:methods] += [:level_string]
       super(options, &block)
     end
 
