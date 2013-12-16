@@ -608,6 +608,33 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(%w(tag1 tag2), post.tag_array_was)
       end
 
+      context "with large dimensions" do
+        setup do
+          @post.image_width = 10_000
+          @post.image_height = 10
+          @post.tag_string = ""
+          @post.save
+        end
+
+        should "have the appropriate dimension tags added automatically" do
+          assert_match(/incredibly_absurdres/, @post.tag_string)
+          assert_match(/absurdres/, @post.tag_string)
+          assert_match(/highres/, @post.tag_string)
+        end
+      end
+
+      context "with a large file size" do
+        setup do
+          @post.file_size = 11.megabytes
+          @post.tag_string = ""
+          @post.save
+        end
+
+        should "have the appropriate file size tags added automatically" do
+          assert_match(/huge_filesize/, @post.tag_string)
+        end
+      end
+
       context "that has been updated" do
         should "create a new version if it's the first version" do
           assert_difference("PostVersion.count", 1) do

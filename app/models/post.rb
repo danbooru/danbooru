@@ -424,6 +424,7 @@ class Post < ActiveRecord::Base
       normalized_tags = TagAlias.to_aliased(normalized_tags)
       normalized_tags = TagImplication.with_descendants(normalized_tags)
       normalized_tags = %w(tagme) if normalized_tags.empty?
+      normalized_tags = add_automatic_tags(normalized_tags)
       normalized_tags.sort!
       set_tag_string(normalized_tags.uniq.sort.join(" "))
     end
@@ -432,6 +433,37 @@ class Post < ActiveRecord::Base
       negated_tags, tags = tags.partition {|x| x =~ /\A-/i}
       negated_tags.map!{|x| x[1..-1]}
       return tags - negated_tags
+    end
+
+    def add_automatic_tags(tags)
+      return tags if !Danbooru.config.enable_dimension_autotagging
+
+      tags -= %w(incredibly_absurdres absurdres highres lowres huge_filesize)
+
+      if image_width >= 10_000 || image_height >= 10_000
+        tags << "incredibly_absurdres"
+      end
+      if image_width >= 3200 || image_height >= 2400
+        tags << "absurdres"
+      end
+      if image_width >= 1600 || image_height >= 1200
+        tags << "highres"
+      end
+      if image_width <= 500 && image_height <= 500
+        tags << "lowres"
+      end
+
+      if file_size >= 10.megabytes
+        tags << "huge_filesize"
+      end
+
+      if image_width >= 1024 && image_width.to_f / image_height >= 4
+        tags << "wide_image"
+      elsif image_height >= 1024 && image_height.to_f / image_width >= 4
+        tags << "tag_image"
+      end
+
+      return tags
     end
 
     def filter_metatags(tags)

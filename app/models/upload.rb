@@ -77,10 +77,8 @@ class Upload < ActiveRecord::Base
         validate_md5_uniqueness
         validate_md5_confirmation
         calculate_file_size(file_path)
-        add_file_size_tags!(file_path)
         if has_dimensions?
           calculate_dimensions(file_path)
-          add_dimension_tags!
         end
         generate_resizes(file_path)
         move_file
@@ -171,31 +169,6 @@ class Upload < ActiveRecord::Base
         image_size = ImageSpec.new(file)
         self.image_width = image_size.width
         self.image_height = image_size.height
-      end
-    end
-
-    def add_dimension_tags!
-      return if !Danbooru.config.enable_dimension_autotagging
-
-      %w(incredibly_absurdres absurdres highres lowres).each do |tag|
-        escaped_tag = Regexp.escape(tag) 
-        self.tag_string = tag_string.gsub(/(?:\A| )#{escaped_tag}(?:\Z| )/, " ").strip
-      end
-
-      if image_width >= 10_000 || image_height >= 10_000
-        self.tag_string = "#{tag_string} incredibly_absurdres".strip
-      elsif image_width >= 3200 || image_height >= 2400
-        self.tag_string = "#{tag_string} absurdres".strip
-      elsif image_width >= 1600 || image_height >= 1200
-        self.tag_string = "#{tag_string} highres".strip
-      elsif image_width <= 500 && image_height <= 500
-        self.tag_string = "#{tag_string} lowres".strip
-      end
-
-      if image_width >= 1024 && image_width.to_f / image_height >= 4
-        self.tag_string = "#{tag_string} wide_image".strip
-      elsif image_height >= 1024 && image_height.to_f / image_width >= 4
-        self.tag_string = "#{tag_string} tall_image".strip
       end
     end
 
@@ -405,12 +378,6 @@ class Upload < ActiveRecord::Base
   include UploaderMethods
   extend SearchMethods
   include ApiMethods
-
-  def add_file_size_tags!(file_path)
-    if file_size >= 10.megabytes
-      self.tag_string = "#{tag_string} huge_filesize".strip
-    end
-  end
 
   def uploader_name
     User.id_to_name(uploader_id)

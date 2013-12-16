@@ -7,8 +7,8 @@ FactoryGirl.define do
     tag_count 2
     tag_count_general 2
     file_ext "jpg"
-    image_width 100
-    image_height 200
+    image_width 1500
+    image_height 1000
     file_size 2000
     rating "q"
   end

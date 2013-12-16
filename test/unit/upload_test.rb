@@ -36,31 +36,6 @@ class UploadTest < ActiveSupport::TestCase
         end
       end
 
-      context "that has incredibly absurd res dimensions" do
-        setup do
-          @upload = FactoryGirl.build(:jpg_upload, :tag_string => "")
-          @upload.image_width = 10_000
-          @upload.image_height = 10
-          @upload.add_dimension_tags!
-        end
-
-        should "have the incredibly_absurdres tag" do
-          assert_match(/incredibly_absurdres/, @upload.tag_string)
-        end
-      end
-
-      context "that has a large flie size" do
-        setup do
-          @upload = FactoryGirl.build(:jpg_upload, :tag_string => "")
-          @upload.file_size = 11.megabytes
-          @upload.add_file_size_tags!(@upload.file_path)
-        end
-
-        should "have the huge_filesize tag" do
-          assert_match(/huge_filesize/, @upload.tag_string)
-        end
-      end
-
       context "image size calculator" do
         should "discover the dimensions for a compressed SWF" do
           @upload = FactoryGirl.create(:upload, :file_path => "#{Rails.root}/test/files/compressed.swf")
