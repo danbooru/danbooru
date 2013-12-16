@@ -1273,7 +1273,7 @@ class PostTest < ActiveSupport::TestCase
     should "return posts ordered by a particular attribute" do
       post1 = FactoryGirl.create(:post, :rating => "s")
       post2 = FactoryGirl.create(:post, :rating => "s")
-      post3 = FactoryGirl.create(:post, :rating => "e", :score => 5, :image_width => 1000)
+      post3 = FactoryGirl.create(:post, :rating => "e", :score => 5, :image_width => 10_000)
       relation = Post.tag_match("order:id")
       assert_equal(post1.id, relation.first.id)
       relation = Post.tag_match("order:mpixels")
