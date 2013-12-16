@@ -18,6 +18,7 @@
   <meta name="new-post-navigation-layout" content="<%= CurrentUser.user.new_post_navigation_layout %>">
   <meta name="default-image-size" content="<%= CurrentUser.user.default_image_size %>">
   <meta name="enable-auto-complete" content="<%= CurrentUser.user.enable_auto_complete %>">
+  <meta name="style-usernames" content="<%= CurrentUser.user.style_usernames? %>">
   <meta name="mobile-mode" content="<%= CurrentUser.mobile_mode? %>">
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
   <%= stylesheet_link_tag "application", :media => "screen" %>

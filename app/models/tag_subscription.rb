@@ -75,6 +75,10 @@ class TagSubscription < ActiveRecord::Base
       where("creator_id = ?", user.id)
     end
 
+    def name_matches(name)
+      where("lower(name) like ? escape E'\\\\'", name.to_escaped_for_sql_like)
+    end
+
     def search(params)
       q = scoped
       params = {} if params.blank?
@@ -85,6 +89,10 @@ class TagSubscription < ActiveRecord::Base
         q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].mb_chars.downcase.strip.tr(" ", "_"))
       else
         q = q.where("creator_id = ?", CurrentUser.user.id)
+      end
+
+      if params[:name_matches]
+        q = q.name_matches(params[:name_matches].mb_chars.downcase.strip.tr(" ", "_"))
       end
 
       q = q.visible_to(CurrentUser.user)
