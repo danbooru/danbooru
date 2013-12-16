@@ -54,6 +54,10 @@ class Artist < ActiveRecord::Base
     def url_string
       @url_string || urls.map {|x| x.url}.join("\n")
     end
+
+    def url_string_changed?
+      url_string.scan(/\S+/) != urls.map(&:url)
+    end
   end
 
   module NameMethods
@@ -89,18 +93,20 @@ class Artist < ActiveRecord::Base
   end
 
   module VersionMethods
-    def create_version
-      ArtistVersion.create(
-        :artist_id => id,
-        :name => name,
-        :updater_id => CurrentUser.user.id,
-        :updater_ip_addr => CurrentUser.ip_addr,
-        :url_string => url_string,
-        :is_active => is_active,
-        :is_banned => is_banned,
-        :other_names => other_names,
-        :group_name => group_name
-      )
+    def create_version(force=false)
+      if name_changed? || url_string_changed? || is_active_changed? || is_banned_changed? || other_names_changed? || group_name_changed? || notes_changed? || force
+        ArtistVersion.create(
+          :artist_id => id,
+          :name => name,
+          :updater_id => CurrentUser.user.id,
+          :updater_ip_addr => CurrentUser.ip_addr,
+          :url_string => url_string,
+          :is_active => is_active,
+          :is_banned => is_banned,
+          :other_names => other_names,
+          :group_name => group_name
+        )
+      end
     end
 
     def revert_to!(version)
@@ -157,14 +163,25 @@ class Artist < ActiveRecord::Base
         else
           wiki_page.body = msg
         end
-        wiki_page.save if wiki_page.body_changed?
+        if wiki_page.body_changed?
+          wiki_page.save
+          @notes_changed = true
+        end
       elsif old_wiki_page
         old_wiki_page.title = name
         old_wiki_page.body = msg
-        old_wiki_page.save if old_wiki_page.body_changed? || old_wiki_page.title_changed?
+        if old_wiki_page.body_changed? || old_wiki_page.title_changed?
+          old_wiki_page.save
+          @notes_changed = true
+        end
       elsif msg.present?
         self.wiki_page = WikiPage.new(:title => name, :body => msg)
+        @notes_changed = true
       end
+    end
+
+    def notes_changed?
+      !!@notes_changed
     end
   end
 
