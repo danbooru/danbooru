@@ -22,7 +22,7 @@
 
     var prefixes = "-|~|general:|gen:|artist:|art:|copyright:|copy:|co:|character:|char:|ch:";
     var metatags = "order|-status|status|-rating|rating|-locked|locked|" + 
-      "-user|user|-approver|approver|commenter|comm|noter|artcomm|-fav|fav|ordfav|" +
+      "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-fav|fav|ordfav|" +
       "sub|-pool|pool";
 
     $fields_multiple.autocomplete({
@@ -94,6 +94,7 @@
         case "commenter":
         case "comm":
         case "noter":
+        case "noteupdater":
         case "artcomm":
         case "fav":
         case "-fav":
