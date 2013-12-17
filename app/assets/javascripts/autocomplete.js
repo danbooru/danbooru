@@ -79,7 +79,7 @@
         case "locked":
         case "-locked":
           Danbooru.Autocomplete.static_metatag_source(term, resp, metatag);
-          break;
+          return;
         }
 
         if (term === "") {
