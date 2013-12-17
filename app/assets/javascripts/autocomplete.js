@@ -139,6 +139,7 @@
           success: function(data) {
             resp($.map(data, function(tag) {
               return {
+                type: "tag",
                 label: tag.name.replace(/_/g, " "),
                 value: tag.name,
                 category: tag.category,
