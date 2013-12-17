@@ -658,7 +658,7 @@ class Post < ActiveRecord::Base
     end
 
     def favorited_users
-      favorited_user_ids.map {|id| User.find_by_id(id)}
+      favorited_user_ids.map {|id| User.find(id)}
     end
   end
 
@@ -929,12 +929,10 @@ class Post < ActiveRecord::Base
     def give_favorites_to_parent
       return if parent.nil?
 
-      favorited_user_ids.each do |user_id|
-        parent.add_favorite!(User.find(user_id))
-        remove_favorite!(User.find(user_id))
+      favorited_users.each do |user|
+        remove_favorite!(user)
+        parent.add_favorite!(user)
       end
-
-      update_column(:score, 0)
     end
 
     def post_is_not_its_own_parent
@@ -987,6 +985,7 @@ class Post < ActiveRecord::Base
         update_column(:is_pending, false)
         update_column(:is_flagged, false)
         update_column(:is_banned, true) if options[:ban] || has_tag?("banned_artist")
+        give_favorites_to_parent if options[:move_favorites]
 
         unless options[:without_mod_action]
           if options[:reason]
