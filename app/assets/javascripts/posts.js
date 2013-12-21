@@ -247,7 +247,7 @@
 
   Danbooru.Post.initialize_post_relationship_previews = function() {
     var current_post_id = $("meta[name=post-id]").attr("content");
-    $("#post_" + current_post_id).addClass("current-post");
+    $("[id=post_" + current_post_id + "]").addClass("current-post");
 
     if (Danbooru.Cookie.get("show-relationship-previews") === "0") {
       this.toggle_relationship_preview($("#has-children-relationship-preview"), $("#has-children-relationship-preview-link"));
