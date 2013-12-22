@@ -335,16 +335,16 @@ class PostQueryBuilder
       relation = relation.order("posts.fav_count ASC, posts.id DESC")
 
     when "comment", "comm"
-      relation = relation.order("posts.last_commented_at DESC, posts.id DESC").where("posts.last_commented_at is not null")
+      relation = relation.order("posts.last_commented_at DESC NULLS LAST, posts.id DESC")
 
     when "comment_asc", "comm_asc"
-      relation = relation.order("posts.last_commented_at ASC, posts.id DESC").where("posts.last_commented_at is not null")
+      relation = relation.order("posts.last_commented_at ASC NULLS FIRST, posts.id DESC")
 
     when "note"
-      relation = relation.order("posts.last_noted_at DESC, posts.id DESC").where("posts.last_noted_at is not null")
+      relation = relation.order("posts.last_noted_at DESC NULLS LAST, posts.id DESC")
 
     when "note_asc"
-      relation = relation.order("posts.last_noted_at ASC, posts.id DESC").where("posts.last_noted_at is not null")
+      relation = relation.order("posts.last_noted_at ASC NULLS FIRST, posts.id DESC")
 
     when "artcomm"
       relation = relation.joins(:artist_commentary).order("artist_commentaries.updated_at DESC, posts.id DESC")
