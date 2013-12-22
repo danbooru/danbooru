@@ -98,7 +98,8 @@ class UserPresenter
   end
 
   def commented_posts_count(template)
-    template.link_to(Post.fast_count("commenter:#{user.name} order:comm"), template.posts_path(:tags => "commenter:#{user.name} order:comm"))
+    count = CurrentUser.without_safe_mode { Post.fast_count("commenter:#{user.name} order:comment") }
+    template.link_to(count, template.posts_path(:tags => "commenter:#{user.name} order:comment"))
   end
 
   def post_version_count(template)
@@ -110,7 +111,8 @@ class UserPresenter
   end
 
   def noted_posts_count(template)
-    template.link_to(Post.fast_count("noteupdater:#{user.name} order:note"), template.posts_path(:tags => "noteupdater:#{user.name} order:note"))
+    count = CurrentUser.without_safe_mode { Post.fast_count("noteupdater:#{user.name} order:note") }
+    template.link_to(count, template.posts_path(:tags => "noteupdater:#{user.name} order:note"))
   end
 
   def wiki_page_version_count(template)
