@@ -14,7 +14,13 @@
   Danbooru.Dtext.initialize_expandables = function($parent) {
     $parent.find(".expandable-content").hide();
     $parent.find(".expandable-button").click(function(e) {
-      $(this).parent().next().fadeToggle("fast");
+      var button = $(this);
+      button.parent().next().fadeToggle("fast");
+      if (button.val() === "Show") {
+        button.val("Hide");
+      } else {
+        button.val("Show");
+      }
     });
   }
 

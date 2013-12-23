@@ -61,30 +61,20 @@ div.prose {
 
   div.expandable {
     margin-bottom: 1em;
-    border: 1px solid #666;
-    background: #EEE;
+    border: 1px inset #666;
   }
 
   div.expandable-header {
-    padding: 0.7em;
+    padding: 0.4em;
 
     span {
-      margin-right: 1em;
+      margin-right: 0.5em;
       font-weight: bold;
     }
   }
 
-  div.expandable-button {
-    padding: 0.3em;
-    display: inline-block;
-    border: 1px solid #666;
-    border-radius: 3px;
-    background: #CCC;
-    cursor: pointer;
-  }
-
   div.expandable-content {
-    padding: 0.7em;
+    padding: 0.4em;
     border-top: 1px solid #666;
 
     > :last-child {

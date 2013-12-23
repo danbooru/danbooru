@@ -214,7 +214,7 @@ class DText
         stack << "expandable"
         expand_html = '<div class="expandable"><div class="expandable-header">'
         expand_html << "<span>#{h($1)}</span>" if $1.present?
-        expand_html << '<div class="expandable-button">Show</div></div>'
+        expand_html << '<input type="button" value="Show" class="expandable-button"/></div>'
         expand_html << '<div class="expandable-content">'
         expand_html
 
