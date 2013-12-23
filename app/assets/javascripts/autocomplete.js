@@ -21,7 +21,7 @@
     );
 
     var prefixes = "-|~|general:|gen:|artist:|art:|copyright:|copy:|co:|character:|char:|ch:";
-    var metatags = "order|-status|status|-rating|rating|-locked|locked|" + 
+    var metatags = "order|-status|status|-rating|rating|-locked|locked|child|" + 
       "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-fav|fav|ordfav|" +
       "sub|-pool|pool";
 
@@ -78,6 +78,7 @@
         case "-rating":
         case "locked":
         case "-locked":
+        case "child":
           Danbooru.Autocomplete.static_metatag_source(term, resp, metatag);
           return;
         }
@@ -233,6 +234,9 @@
     ],
     locked: [
       "rating", "note", "status"
+    ],
+    child: [
+      "any", "none"
     ]
   }
 
