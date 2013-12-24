@@ -836,6 +836,8 @@ class PostTest < ActiveSupport::TestCase
         should "normalize deviantart links" do
           @post.source = "http://fc06.deviantart.net/fs71/f/2013/295/d/7/you_are_already_dead__by_mar11co-d6rgm0e.jpg"
           assert_equal("http://mar11co.deviantart.com/gallery/#/d6rgm0e", @post.normalized_source)
+          @post.source = "http://fc00.deviantart.net/fs71/f/2013/337/3/5/35081351f62b432f84eaeddeb4693caf-d6wlrqs.jpg"
+          assert_equal("http://deviantart.com/gallery/#/d6wlrqs", @post.normalized_source)
         end
 
         should "normalize karabako links" do

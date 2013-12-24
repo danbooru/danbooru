@@ -304,6 +304,9 @@ class Post < ActiveRecord::Base
       when %r{\Ahttp://(?:fc|th)\d{2}\.deviantart\.net/.+/[a-z0-9_]+_by_([a-z0-9_]+)-d([a-z0-9]+)\.}i
         "http://#{$1}.deviantart.com/gallery/#/d#{$2}"
 
+      when %r{\Ahttp://(?:fc|th)\d{2}\.deviantart\.net/.+/[a-f0-9]+-d([a-z0-9]+)\.}i
+        "http://deviantart.com/gallery/#/d#{$1}"
+
       when %r{\Ahttp://www\.karabako\.net/images(?:ub)?/karabako_(\d+)(?:_\d+)?\.}i
         "http://www.karabako.net/post/view/#{$1}"
 
