@@ -25,6 +25,9 @@ module Downloads
         if url =~ %r{^(http://\w+.deviantart.net/\w+/)200H/}
           match = $1
           url.sub!(match + "200H/", match)
+        elsif url =~ %r{^(http://\w+.deviantart.net/\w+/)PRE/}
+          match = $1
+          url.sub!(match + "PRE/", match)
         end
 
         return [url, headers]
