@@ -10,7 +10,6 @@ class Comment < ActiveRecord::Base
   after_create :update_last_commented_at_on_create
   after_destroy :update_last_commented_at_on_destroy
   attr_accessible :body, :post_id, :do_not_bump_post
-  attr_accessor :do_not_bump_post
 
   module SearchMethods
     def recent
@@ -140,8 +139,9 @@ class Comment < ActiveRecord::Base
   end
 
   def update_last_commented_at_on_create
+    Post.update_all(["last_commented_at = ?", created_at], ["id = ?", post_id])
     if Comment.where("post_id = ?", post_id).count <= Danbooru.config.comment_threshold && !do_not_bump_post?
-      Post.update_all(["last_commented_at = ?", created_at], ["id = ?", post_id])
+      Post.update_all(["last_comment_bumped_at = ?", created_at], ["id = ?", post_id])
     end
     true
   end
@@ -153,11 +153,15 @@ class Comment < ActiveRecord::Base
     else
       Post.update_all(["last_commented_at = ?", other_comments.first.created_at], ["id = ?", post_id])
     end
-    true
-  end
 
-  def do_not_bump_post?
-    do_not_bump_post == "1"
+    other_comments = other_comments.where("do_not_bump_post = FALSE")
+    if other_comments.count == 0
+      Post.update_all("last_comment_bumped_at = NULL", ["id = ?", post_id])
+    else
+      Post.update_all(["last_comment_bumped_at = ?", other_comments.first.created_at], ["id = ?", post_id])
+    end
+
+    true
   end
 
   def editable_by?(user)
