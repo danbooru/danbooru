@@ -29,7 +29,7 @@ class PostsController < ApplicationController
     @post = Post.find(params[:id])
     @post_flag = PostFlag.new(:post_id => @post.id)
     @post_appeal = PostAppeal.new(:post_id => @post.id)
-    @parent_post_set = PostSets::PostRelationship.new(@post.parent_id, :include_deleted => @post.is_deleted? || @post.parent.is_deleted?)
+    @parent_post_set = PostSets::PostRelationship.new(@post.parent_id, :include_deleted => @post.is_deleted? || (@post.parent_id.present? && @post.parent.is_deleted?))
     @children_post_set = PostSets::PostRelationship.new(@post.id, :include_deleted => @post.is_deleted?)
     respond_with(@post)
   end
