@@ -110,4 +110,24 @@ class ArtistsController < ApplicationController
       redirect_to new_artist_path(:name => params[:name])
     end
   end
+
+  def finder
+    url = params[:url]
+    headers = {
+      "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
+    }
+    Downloads::Strategies::Base.strategies.each do |strategy|
+      url, headers = strategy.new.rewrite(url, headers)
+    end
+
+    @artists = Artist.url_matches(url).order("id desc").limit(20)
+    respond_with(@artists) do |format|
+      format.xml do
+        render :xml => @artists.to_xml(:include => [:urls], :root => "artists")
+      end
+      format.json do
+        render :json => @artists.to_json(:include => [:urls])
+      end
+    end
+  end
 end

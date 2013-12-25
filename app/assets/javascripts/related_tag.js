@@ -247,7 +247,7 @@
   Danbooru.RelatedTag.find_artist = function(e) {
     $("#artist-tags").html("<em>Loading...</em>");
     var url = $("#upload_source,#post_source");
-    $.get("/artists.json", {"limit": 20, "search[name]": url.val()}).success(Danbooru.RelatedTag.process_artist);
+    $.get("/artists/finder.json", {"url": url.val()}).success(Danbooru.RelatedTag.process_artist);
     e.preventDefault();
   }
 

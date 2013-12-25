@@ -16,7 +16,7 @@
 
     <%= error_messages_for "upload" %>
 
-    <%= form_for(@upload, :html => {:multipart => true, :class => "simple_form", :id => 'form'}) do |f| %>
+    <%= form_for(@upload, :html => {:multipart => true, :class => "simple_form", :id => "form"}) do |f| %>
       <% if CurrentUser.is_contributor? %>
         <div class="input">
           <label for="upload_as_pending">

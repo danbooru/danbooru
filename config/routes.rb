@@ -68,6 +68,7 @@ Danbooru::Application.routes.draw do
     collection do
       get :show_or_new
       get :banned
+      get :finder
     end
   end
   resources :artist_versions, :only => [:index] do
