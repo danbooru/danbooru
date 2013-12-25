@@ -78,7 +78,7 @@ private
   end
 
   def index_by_post
-    @posts = Post.commented_before(Time.now).tag_match(params[:tags]).paginate(params[:page], :limit => 5, :search_count => params[:search])
+    @posts = Post.where("last_commented_at IS NOT NULL").tag_match(params[:tags]).reorder("last_commented_at DESC").paginate(params[:page], :limit => 5, :search_count => params[:search])
     @posts.all
     respond_with(@posts) do |format|
       format.html {render :action => "index_by_post"}
