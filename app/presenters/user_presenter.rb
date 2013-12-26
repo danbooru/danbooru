@@ -58,7 +58,15 @@ class UserPresenter
   end
 
   def uploads
-    @uploads ||= Post.where("uploader_id = ?", user.id).order("id desc").limit(6)
+    @uploads ||= begin
+      arel = Post.where("uploader_id = ?", user.id).order("id desc").limit(6)
+
+      if CurrentUser.user.hide_deleted_posts?
+        arel = arel.undeleted
+      end
+
+      arel
+    end
   end
 
   def has_uploads?
