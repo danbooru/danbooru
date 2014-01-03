@@ -269,13 +269,17 @@ Danbooru.Note = {
 
       if (Danbooru.meta("current-user-name") !== "Anonymous") {
         $note_body.click(function(e) {
-          var $note_body_inner = $(e.currentTarget);
-          Danbooru.Note.Edit.show($note_body_inner);
+          if (e.target.tagName !== "A") {
+            var $note_body_inner = $(e.currentTarget);
+            Danbooru.Note.Edit.show($note_body_inner);
+          }
           e.stopPropagation();
         });
       } else {
         $note_body.click(function(e) {
-          Danbooru.notice("You must be logged in to edit notes");
+          if (e.target.tagName !== "A") {
+            Danbooru.notice("You must be logged in to edit notes");
+          }
           e.stopPropagation();
         });
       }
