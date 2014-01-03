@@ -72,14 +72,22 @@ class PostPresenter < Presenter
     string = []
 
     if @post.character_tags.any?
-      chartags = @post.character_tags.slice(0, 5).map do |tag|
+      chartags = @post.character_tags.slice(0, 5)
+      if @post.character_tags.length > 5
+        chartags << "others"
+      end
+      chartags = chartags.map do |tag|
         tag.match(/^(.+?)(?:_\(.+\))?$/)[1]
       end
       string << chartags.to_sentence
     end
 
     if @post.copyright_tags.any?
-      copytags = @post.copyright_tags.slice(0, 5).to_sentence
+      copytags = @post.copyright_tags.slice(0, 5)
+      if @post.copyright_tags.length > 5
+        copytags << "others"
+      end
+      copytags = copytags.to_sentence
       string << (@post.character_tags.any? ? "(#{copytags})" : copytags)
     end
 
