@@ -7,9 +7,9 @@ class AddLastCommentBumpedAtToPosts < ActiveRecord::Migration
 
     add_column :posts, :last_commented_at, :datetime
 
-    Post.joins(:comments).uniq.find_each do |post|
-      post.update_column(:last_commented_at, post.comments.last.created_at)
-    end
+    # Post.joins(:comments).uniq.find_each do |post|
+    #   post.update_column(:last_commented_at, post.comments.last.created_at)
+    # end
 
     add_column :comments, :do_not_bump_post, :boolean, :null => false, :default => false
   end
