@@ -1,6 +1,6 @@
 class Artist < ActiveRecord::Base
   before_create :initialize_creator
-  before_save :normalize_name
+  before_validation :normalize_name
   after_save :create_version
   after_save :save_url_string
   after_save :categorize_tag
