@@ -41,6 +41,12 @@ class Tag < ActiveRecord::Base
       def counts_for(tag_names)
         select_all_sql("SELECT name, post_count FROM tags WHERE name IN (?)", tag_names)
       end
+
+      def highest_post_count
+        Cache.get("highest-post-count", 4.hours) do
+          select("post_count").order("post_count DESC").first.post_count
+        end
+      end
     end
 
     def real_post_count
