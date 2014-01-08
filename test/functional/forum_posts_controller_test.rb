@@ -51,7 +51,7 @@ class ForumPostsControllerTest < ActionController::TestCase
 
       should "fail if the editor is not the creator of the topic and is not a moderator" do
         get :edit, {:id => @forum_post.id}, {:user_id => @other_user.id}
-        assert_redirected_to(new_session_path(:url => edit_forum_post_path(@forum_post)))
+        assert_response(403)
       end
     end
 

@@ -66,7 +66,7 @@ class DmailsControllerTest < ActionController::TestCase
 
       should "not show dmails not owned by the current user" do
         get :show, {:id => @dmail.id}, {:user_id => @unrelated_user.id}
-        assert_redirected_to(new_session_path(:url => "/dmails/#{@dmail.id}"))
+        assert_response(403)
       end
     end
 

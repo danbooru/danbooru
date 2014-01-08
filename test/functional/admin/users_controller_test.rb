@@ -30,7 +30,7 @@ class Admin::UsersControllerTest < ActionController::TestCase
         context "promoted to an admin" do
           should "fail" do
             put :update, {:id => @user.id, :user => {:level => "50"}}, {:user_id => @mod.id}
-            assert_redirected_to(new_session_path)
+            assert_response(403)
             @user.reload
             assert_equal(20, @user.level)
           end
@@ -39,8 +39,8 @@ class Admin::UsersControllerTest < ActionController::TestCase
 
       context "on an admin user" do
         should "fail" do
-          put :update, {:id => @admin.id, :user => {:level => "30"}}
-          assert_redirected_to new_session_path
+          put :update, {:id => @admin.id, :user => {:level => "30"}}, {:user_id => @mod.id}
+          assert_response(403)
           @admin.reload
           assert_equal(50, @admin.level)
         end
