@@ -2,6 +2,12 @@
   Danbooru.Pool = {};
 
   Danbooru.Pool.initialize_all = function() {
+    if ($("#c-pools").length) {
+      if (Danbooru.meta("enable-auto-complete") === "true") {
+        this.initialize_autocomplete_for("#search_name_matches,#quick_search_name_matches");
+      }
+    }
+
     if ($("#c-posts").length && $("#a-show").length) {
       this.initialize_add_to_pool_link();
     }
@@ -11,10 +17,10 @@
     }
   }
 
-  Danbooru.Pool.initialize_add_to_pool_link = function() {
-    $("#add-to-pool-dialog").dialog({autoOpen: false});
+  Danbooru.Pool.initialize_autocomplete_for = function(selector) {
+    var $fields = $(selector);
 
-    $("#add-to-pool-dialog input[type=text]").autocomplete({
+    $fields.autocomplete({
       minLength: 1,
       source: function(req, resp) {
         $.ajax({
@@ -36,10 +42,22 @@
           }
         });
       }
-    }).data("uiAutocomplete")._renderItem = function(list, pool) {
+    });
+
+    var render_pool = function(list, pool) {
       var $link = $("<a/>").addClass("pool-category-" + pool.category).text(pool.label);
       return $("<li/>").data("item.autocomplete", pool).append($link).appendTo(list);
     };
+
+    $fields.each(function(i, field) {
+      $(field).data("uiAutocomplete")._renderItem = render_pool;
+    });
+  }
+
+  Danbooru.Pool.initialize_add_to_pool_link = function() {
+    $("#add-to-pool-dialog").dialog({autoOpen: false});
+
+    this.initialize_autocomplete_for("#add-to-pool-dialog input[type=text]");
 
     $("#pool").click(function(e) {
       e.preventDefault();
