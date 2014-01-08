@@ -41,8 +41,8 @@ class ArtistTest < ActiveSupport::TestCase
         assert(@post.is_banned?)
       end
 
-      should "delete the post" do
-        assert(@post.is_deleted?)
+      should "not delete the post" do
+        refute(@post.is_deleted?)
       end
 
       should "create a new tag implication" do

@@ -14,6 +14,8 @@
     </div>
   <% end %>
 
+  <p style="font-weight: bold;">Note: If the reason you are planning to delete this post is because it is from a banned artist, please <%= link_to "ban", confirm_ban_moderator_post_post_path(@post) %> this post instead of deleting it.</p>
+
   <div class="input">
     <label for="reason">Reason</label>
     <%= text_area_tag "reason" %>

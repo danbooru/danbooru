@@ -207,12 +207,7 @@ class Artist < ActiveRecord::Base
         CurrentUser.without_safe_mode do
           begin
             Post.tag_match(name).each do |post|
-              begin
-                post.flag!("Artist requested removal")
-              rescue PostFlag::Error
-                # swallow
-              end
-              post.delete!(:ban => true)
+              post.ban!
             end
           rescue Post::SearchError
             # swallow
