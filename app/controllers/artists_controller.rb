@@ -116,9 +116,7 @@ class ArtistsController < ApplicationController
     headers = {
       "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
     }
-    Downloads::Strategies::Base.strategies.each do |strategy|
-      url, headers = strategy.new.rewrite(url, headers)
-    end
+    url, headers = Downloads::Strategies::Pixiv.new.rewrite(url, headers)
 
     @artists = Artist.url_matches(url).order("id desc").limit(20)
     respond_with(@artists) do |format|
