@@ -53,10 +53,14 @@ protected
 
     respond_to do |fmt|
       fmt.html do
-        if request.get?
-          redirect_to new_session_path(:url => previous_url), :notice => "Access denied"
+        if CurrentUser.is_anonymous?
+          if request.get?
+            redirect_to new_session_path(:url => previous_url), :notice => "Access denied"
+          else
+            redirect_to new_session_path, :notice => "Access denied"
+          end
         else
-          redirect_to new_session_path, :notice => "Access denied"
+          render :template => "static/access_denied", :status => 403
         end
       end
       fmt.xml do
