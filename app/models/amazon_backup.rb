@@ -16,7 +16,8 @@ class AmazonBackup < ActiveRecord::Base
     Post.where("id > ?", last_id).limit(200).order("id").each do |post|
       AWS::S3::Base.establish_connection!(
         :access_key_id => Danbooru.config.amazon_s3_access_key_id,
-        :secret_access_key => Danbooru.config.amazon_s3_secret_access_key
+        :secret_access_key => Danbooru.config.amazon_s3_secret_access_key,
+        :server => "s3.amazonaws.com"
       )
 
       if File.exists?(post.file_path)
@@ -24,7 +25,7 @@ class AmazonBackup < ActiveRecord::Base
         AWS::S3::S3Object.store(File.basename(post.file_path), open(post.file_path, "rb"), Danbooru.config.amazon_s3_bucket_name, "Content-MD5" => base64_md5)
       end
 
-      if post.image? && File.exists?(post.preview_file_path)
+      if post.is_image? && File.exists?(post.preview_file_path)
         AWS::S3::S3Object.store("preview/#{post.md5}.jpg", open(post.preview_file_path, "rb"), Danbooru.config.amazon_s3_bucket_name)
       end
 
@@ -32,7 +33,7 @@ class AmazonBackup < ActiveRecord::Base
         AWS::S3::S3Object.store("large/#{post.md5}.jpg", open(post.large_file_path, "rb"), Danbooru.config.amazon_s3_bucket_name)
       end
 
-      AmazonBackup.update_id(last_id)
+      AmazonBackup.update_id(post.id)
     end
   rescue Exception => x
     # probably some network error, retry next time

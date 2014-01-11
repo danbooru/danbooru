@@ -4,7 +4,7 @@ module Danbooru
   class Configuration
     # The version of this Danbooru.
     def version
-      "2.39.0"
+      "2.40.0"
     end
 
     # The name of this Danbooru.
@@ -296,6 +296,10 @@ module Danbooru
     def amazon_ses
       # {:smtp_server_name => "smtp server", :user_name => "user name", :ses_smtp_user_name => "smtp user name", :ses_smtp_password => "smtp password"}
       nil
+    end
+
+    def amazon_s3_bucket_name
+      "danbooru"
     end
 
     def enable_dimension_autotagging
