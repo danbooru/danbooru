@@ -38,7 +38,7 @@
           <%= f.input :per_page, :label => "Posts per page", :as => :select, :collection => (1..100), :include_blank => false %>
         <% end %>
         
-        <%= f.input :blacklisted_tags, :hint => "Put any tag combinations you never want to see here. Each combination should go on a separate line.", :input_html => {:size => "40x5"} %>
+        <%= f.input :blacklisted_tags, :hint => "Put any tag combinations you never want to see here. Each combination should go on a separate line. <a href='/wiki_pages/help:blacklists'>View help.</a>", :input_html => {:size => "40x5"} %>
       </fieldset>
       
       <fieldset id="advanced-settings-section">
