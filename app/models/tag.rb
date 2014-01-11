@@ -1,5 +1,5 @@
 class Tag < ActiveRecord::Base
-  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-pool|pool|-fav|fav|ordfav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|score|favcount|filesize|source|-source|id|-id|date|age|order|limit|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|-parent|child|pixiv_id|pixiv"
+  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-pool|pool|ordpool|-fav|fav|ordfav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|score|favcount|filesize|source|-source|id|-id|date|age|order|limit|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|-parent|child|pixiv_id|pixiv"
   SUBQUERY_METATAGS = "commenter|comm|noter|noteupdater|artcomm"
   attr_accessible :category, :as => [:moderator, :janitor, :contributor, :gold, :member, :anonymous, :default, :builder, :admin]
   attr_accessible :is_locked, :as => [:moderator, :janitor, :admin]
@@ -406,6 +406,11 @@ class Tag < ActiveRecord::Base
             else
               q[:tags][:related] << "pool:#{Pool.name_to_id($2)}"
             end
+
+          when "ordpool"
+            pool_id = Pool.name_to_id($2)
+            q[:tags][:related] << "pool:#{pool_id}"
+            q[:ordpool] = pool_id
 
           when "-fav"
             q[:tags][:exclude] << "fav:#{User.name_to_id($2)}"

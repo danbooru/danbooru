@@ -304,6 +304,11 @@ class PostQueryBuilder
 
     relation = add_tag_string_search_relation(q[:tags], relation)
 
+    if q[:ordpool].present?
+      pool_id = q[:ordpool].to_i
+      relation = relation.order("position(' '||posts.id||' ' in ' '||(select post_ids from pools where id = #{pool_id})||' ')")
+    end
+
     if q[:ordfav].present?
       user_id = q[:ordfav].to_i
       relation = relation.joins(:favorites).where("favorites.user_id % 100 = ? and favorites.user_id = ?", user_id % 100, user_id).order("favorites.id DESC")
