@@ -170,12 +170,12 @@ class PostQueryBuilder
       if q[:source] == "none%"
         relation = relation.where("(posts.source = '' OR posts.source IS NULL)")
       elsif q[:source] == "http%"
-        relation = relation.where("(posts.source like ?)", "http%")
-      elsif q[:source] =~ /^%\.?pixiv(?:\.net(?:\/img)?)?(?:%\/|(?=%$))(.+)$/
-        relation = relation.where("SourcePattern(posts.source) LIKE ? ESCAPE E'\\\\'", "pixiv/" + $1)
+        relation = relation.where("(lower(posts.source) like ?", "http%")
+      elsif q[:source] =~ /^%\.?pixiv(?:\.net(?:\/img)?)?(?:%\/|(?=%$))(.+)$/i
+        relation = relation.where("SourcePattern(lower(posts.source)) LIKE lower(?) ESCAPE E'\\\\'", "pixiv/" + $1)
         has_constraints!
       else
-        relation = relation.where("SourcePattern(posts.source) LIKE SourcePattern(?) ESCAPE E'\\\\'", q[:source])
+        relation = relation.where("SourcePattern(lower(posts.source)) LIKE SourcePattern(lower(?)) ESCAPE E'\\\\'", q[:source])
         has_constraints!
       end
     end
@@ -184,12 +184,12 @@ class PostQueryBuilder
       if q[:source_neg] == "none%"
         relation = relation.where("(posts.source != '' AND posts.source IS NOT NULL)")
       elsif q[:source_neg] == "http%"
-        relation = relation.where("(posts.source not like ?)", "http%")
-      elsif q[:source_neg] =~ /^%\.?pixiv(?:\.net(?:\/img)?)?(?:%\/|(?=%$))(.+)$/
-        relation = relation.where("SourcePattern(posts.source) NOT LIKE ? ESCAPE E'\\\\'", "pixiv/" + $1)
+        relation = relation.where("(lower(posts.source) not like ?)", "http%")
+      elsif q[:source_neg] =~ /^%\.?pixiv(?:\.net(?:\/img)?)?(?:%\/|(?=%$))(.+)$/i
+        relation = relation.where("SourcePattern(lower(posts.source)) NOT LIKE lower(?) ESCAPE E'\\\\'", "pixiv/" + $1)
         has_constraints!
       else
-        relation = relation.where("SourcePattern(posts.source) NOT LIKE SourcePattern(?) ESCAPE E'\\\\'", q[:source_neg])
+        relation = relation.where("SourcePattern(lower(posts.source)) NOT LIKE SourcePattern(lower(?)) ESCAPE E'\\\\'", q[:source_neg])
         has_constraints!
       end
     end

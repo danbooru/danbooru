@@ -1206,10 +1206,10 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(post2.id, relation.first.id)
     end
 
-    should "return posts for a case sensitive source search" do
+    should "return posts for a case insensitive source search" do
       post1 = FactoryGirl.create(:post, :source => "ABCD")
       post2 = FactoryGirl.create(:post, :source => "1234")
-      relation = Post.tag_match("source:ABCD")
+      relation = Post.tag_match("source:abcd")
       assert_equal(1, relation.count)
     end
 
