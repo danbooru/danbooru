@@ -298,6 +298,10 @@ module Danbooru
       nil
     end
 
+    def amazon_s3_bucket_name
+      "danbooru"
+    end
+
     def enable_dimension_autotagging
       true
     end
