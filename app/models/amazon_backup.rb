@@ -16,7 +16,8 @@ class AmazonBackup < ActiveRecord::Base
     Post.where("id > ?", last_id).limit(200).order("id").each do |post|
       AWS::S3::Base.establish_connection!(
         :access_key_id => Danbooru.config.amazon_s3_access_key_id,
-        :secret_access_key => Danbooru.config.amazon_s3_secret_access_key
+        :secret_access_key => Danbooru.config.amazon_s3_secret_access_key,
+        :server => "s3-us-east-1.amazonaws.com"
       )
 
       if File.exists?(post.file_path)
