@@ -13,7 +13,7 @@ class AmazonBackup < ActiveRecord::Base
   def self.execute
     last_id = AmazonBackup.last_id
 
-    Post.where("id > ?", last_id).limit(200).order("id").each do |post|
+    Post.where("id > ?", last_id).limit(1000).order("id").each do |post|
       AWS::S3::Base.establish_connection!(
         :access_key_id => Danbooru.config.amazon_s3_access_key_id,
         :secret_access_key => Danbooru.config.amazon_s3_secret_access_key,
