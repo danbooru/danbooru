@@ -1,5 +1,5 @@
 class Tag < ActiveRecord::Base
-  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-pool|pool|ordpool|-fav|fav|ordfav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|score|favcount|filesize|source|-source|id|-id|date|age|order|limit|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|-parent|child|pixiv_id|pixiv"
+  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-pool|pool|ordpool|-fav|fav|ordfav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|ratio|score|favcount|filesize|source|-source|id|-id|date|age|order|limit|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|-parent|child|pixiv_id|pixiv"
   SUBQUERY_METATAGS = "commenter|comm|noter|noteupdater|artcomm"
   attr_accessible :category, :as => [:moderator, :janitor, :contributor, :gold, :member, :anonymous, :default, :builder, :admin]
   attr_accessible :is_locked, :as => [:moderator, :janitor, :admin]
@@ -252,6 +252,15 @@ class Tag < ActiveRecord::Base
           size.seconds.ago
         end
 
+      when :ratio
+        object =~ /\A(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)\Z/i
+
+        if $1 && $2.to_f != 0.0
+         ($1.to_f / $2.to_f).round(2)
+        else
+          object.to_f.round(2)
+        end
+
       when :filesize
         object =~ /\A(\d+(?:\.\d*)?|\d*\.\d+)([kKmM]?)[bB]?\Z/
 
@@ -456,6 +465,9 @@ class Tag < ActiveRecord::Base
 
           when "mpixels"
             q[:mpixels] = parse_helper($2, :float)
+
+          when "ratio"
+            q[:ratio] = parse_helper($2, :ratio)
 
           when "score"
             q[:score] = parse_helper($2)

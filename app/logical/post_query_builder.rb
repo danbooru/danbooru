@@ -118,6 +118,7 @@ class PostQueryBuilder
 
     relation = add_range_relation(q[:post_id], "posts.id", relation)
     relation = add_range_relation(q[:mpixels], "posts.image_width * posts.image_height / 1000000.0", relation)
+    relation = add_range_relation(q[:ratio], "ROUND(1.0 * posts.image_width / GREATEST(1, posts.image_height), 2)", relation)
     relation = add_range_relation(q[:width], "posts.image_width", relation)
     relation = add_range_relation(q[:height], "posts.image_height", relation)
     relation = add_range_relation(q[:score], "posts.score", relation)
@@ -130,7 +131,7 @@ class PostQueryBuilder
     relation = add_range_relation(q[:copyright_tag_count], "posts.tag_count_copyright", relation)
     relation = add_range_relation(q[:character_tag_count], "posts.tag_count_character", relation)
     relation = add_range_relation(q[:post_tag_count], "posts.tag_count", relation)
-    relation = add_range_relation(q[:pixiv_id], "posts.pixiv_id", relation) 
+    relation = add_range_relation(q[:pixiv_id], "posts.pixiv_id", relation)
 
     if q[:md5]
       relation = relation.where(["posts.md5 IN (?)", q[:md5]])
