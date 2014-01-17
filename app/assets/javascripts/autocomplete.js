@@ -24,7 +24,7 @@
     var prefixes = "-|~|general:|gen:|artist:|art:|copyright:|copy:|co:|character:|char:|ch:";
     var metatags = "order|-status|status|-rating|rating|-locked|locked|child|" + 
       "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-fav|fav|ordfav|" +
-      "sub|-pool|pool";
+      "sub|-pool|pool|ordpool";
 
     $fields_multiple.autocomplete({
       delay: 100,
@@ -108,6 +108,7 @@
           break;
         case "pool":
         case "-pool":
+        case "ordpool":
           Danbooru.Autocomplete.pool_source(term, resp, metatag);
           break;
         default:
@@ -219,6 +220,7 @@
       "id", "id_desc",
       "score", "score_asc",
       "favcount", "favcount_asc",
+      "change", "change_asc",
       "comment", "comment_asc",
       "note", "note_asc",
       "artcomm", "artcomm_asc",
