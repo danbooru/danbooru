@@ -340,6 +340,12 @@ class PostQueryBuilder
     when "favcount_asc"
       relation = relation.order("posts.fav_count ASC, posts.id DESC")
 
+    when "change", "change_desc"
+      relation = relation.order("posts.updated_at DESC, posts.id DESC")
+
+    when "change_asc"
+      relation = relation.order("posts.updated_at ASC, posts.id DESC")
+
     when "comment", "comm"
       relation = relation.order("posts.last_commented_at DESC NULLS LAST, posts.id DESC")
 
