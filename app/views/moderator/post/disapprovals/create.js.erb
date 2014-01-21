@@ -9,7 +9,7 @@ $("#c-posts #disapprove").hide();
 
 $("#pending-approval-notice").hide();
 
-$("#c-moderator-post-queues #post-<%= @post.id %>").hide();
+$("#c-moderator-post-queues #post-<%= @post.id %>").remove();
 Danbooru.notice("Post was hidden");
 
 <% end %>

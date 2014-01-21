@@ -32,7 +32,7 @@
 
           <section>
             <ul>
-              <li><h2><%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :remote => true, :method => :post, :class => "approve-link" %> | <%= link_to "Hide", moderator_post_disapproval_path(:post_id => post.id), :remote => true, :method => :post, :class => 'disapprove-link' %></h2></li>
+              <li><h2><%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :remote => true, :method => :post, :class => "approve-link" %> | <%= link_to "Hide", moderator_post_disapproval_path(:post_id => post.id), :remote => true, :method => :post, :class => "disapprove-link" %></h2></li>
               <li><strong>Rating</strong>: <%= post.pretty_rating %></li>
               <li><strong>Score</strong>: <%= post.score %></li>
               <li>
