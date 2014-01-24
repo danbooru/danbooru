@@ -9,7 +9,7 @@ class UserEmailChange
 
   def process
     if User.authenticate(user.name, password).nil?
-      false
+      user.errors[:base] << "Password was incorrect"
     else
       user.email = new_email
       user.save
