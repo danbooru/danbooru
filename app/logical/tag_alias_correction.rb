@@ -26,7 +26,7 @@ class TagAliasCorrection
       http.request_get("/tag_aliases/#{tag_alias_id}/correction.json") do |res|
         if res === Net::HTTPSuccess
           json = JSON.parse(res.body)
-          statistics_hash["antecedent_cache"] = json["antecdent_cache"]
+          statistics_hash["antecedent_cache"] = json["antecedent_cache"]
           statistics_hash["consequent_cache"] = json["consequent_cache"]
         end
       end
