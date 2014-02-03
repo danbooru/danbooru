@@ -771,7 +771,8 @@ CREATE TABLE comments (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     updater_id integer,
-    updater_ip_addr inet
+    updater_ip_addr inet,
+    do_not_bump_post boolean DEFAULT false NOT NULL
 );
 
 
@@ -2390,7 +2391,7 @@ CREATE TABLE posts (
     fav_string text DEFAULT ''::text NOT NULL,
     pool_string text DEFAULT ''::text NOT NULL,
     last_noted_at timestamp without time zone,
-    last_commented_at timestamp without time zone,
+    last_comment_bumped_at timestamp without time zone,
     fav_count integer DEFAULT 0 NOT NULL,
     tag_string text DEFAULT ''::text NOT NULL,
     tag_index tsvector,
@@ -2406,7 +2407,8 @@ CREATE TABLE posts (
     parent_id integer,
     has_children boolean DEFAULT false NOT NULL,
     is_banned boolean DEFAULT false NOT NULL,
-    pixiv_id integer
+    pixiv_id integer,
+    last_commented_at timestamp without time zone
 );
 
 
@@ -4231,10 +4233,10 @@ CREATE INDEX index_artist_commentary_versions_on_post_id ON artist_commentary_ve
 
 
 --
--- Name: index_artist_commentary_versions_on_updater_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_artist_commentary_versions_on_updater_id_and_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_artist_commentary_versions_on_updater_id ON artist_commentary_versions USING btree (updater_id);
+CREATE INDEX index_artist_commentary_versions_on_updater_id_and_post_id ON artist_commentary_versions USING btree (updater_id, post_id);
 
 
 --
@@ -5876,10 +5878,10 @@ CREATE INDEX index_note_versions_on_post_id ON note_versions USING btree (post_i
 
 
 --
--- Name: index_note_versions_on_updater_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_note_versions_on_updater_id_and_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_note_versions_on_updater_id ON note_versions USING btree (updater_id);
+CREATE INDEX index_note_versions_on_updater_id_and_post_id ON note_versions USING btree (updater_id, post_id);
 
 
 --
@@ -6023,10 +6025,10 @@ CREATE INDEX index_post_versions_on_post_id ON post_versions USING btree (post_i
 
 
 --
--- Name: index_post_versions_on_updated_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_post_versions_on_updated_at_and_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_post_versions_on_updated_at ON post_versions USING btree (updated_at);
+CREATE INDEX index_post_versions_on_updated_at_and_id ON post_versions USING btree (updated_at, id);
 
 
 --
@@ -6086,10 +6088,10 @@ CREATE INDEX index_posts_on_image_width ON posts USING btree (image_width);
 
 
 --
--- Name: index_posts_on_last_commented_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_posts_on_last_comment_bumped_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_posts_on_last_commented_at ON posts USING btree (last_commented_at);
+CREATE INDEX index_posts_on_last_comment_bumped_at ON posts USING btree (last_comment_bumped_at);
 
 
 --
@@ -6131,14 +6133,14 @@ CREATE INDEX index_posts_on_pixiv_id ON posts USING btree (pixiv_id) WHERE (pixi
 -- Name: index_posts_on_source; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_posts_on_source ON posts USING btree (source);
+CREATE INDEX index_posts_on_source ON posts USING btree (lower((source)::text));
 
 
 --
 -- Name: index_posts_on_source_pattern; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_posts_on_source_pattern ON posts USING btree (sourcepattern((source)::text) text_pattern_ops);
+CREATE INDEX index_posts_on_source_pattern ON posts USING btree (sourcepattern(lower((source)::text)) text_pattern_ops);
 
 
 --
@@ -6561,3 +6563,13 @@ INSERT INTO schema_migrations (version) VALUES ('20131117150705');
 INSERT INTO schema_migrations (version) VALUES ('20131118153503');
 
 INSERT INTO schema_migrations (version) VALUES ('20131130190411');
+
+INSERT INTO schema_migrations (version) VALUES ('20131209181023');
+
+INSERT INTO schema_migrations (version) VALUES ('20131217025233');
+
+INSERT INTO schema_migrations (version) VALUES ('20131225002748');
+
+INSERT INTO schema_migrations (version) VALUES ('20131228230219');
+
+INSERT INTO schema_migrations (version) VALUES ('20140111191413');
