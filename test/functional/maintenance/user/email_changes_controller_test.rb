@@ -30,7 +30,6 @@ module Maintenance
           context "with the incorrect password" do
             should "not work" do
               post :create, {:email_change => {:password => "passwordx", :email => "abc@ogres.net"}}, {:user_id => @user.id}
-              assert_response :success
               @user.reload
               assert_equal("bob@ogres.net", @user.email)
             end
