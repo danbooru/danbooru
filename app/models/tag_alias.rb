@@ -123,6 +123,12 @@ class TagAlias < ActiveRecord::Base
       ta.save
     end
 
+    implications = TagImplication.where(["antecedent_name = ?", antecedent_name])
+    implications.each do |ti|
+      ti.antecedent_name = self.consequent_name
+      ti.save
+    end
+
     implications = TagImplication.where(["consequent_name = ?", antecedent_name])
     implications.each do |ti|
       ti.consequent_name = self.consequent_name
