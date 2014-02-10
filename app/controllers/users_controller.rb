@@ -59,6 +59,12 @@ class UsersController < ApplicationController
     respond_with(@user)
   end
 
+  def upgrade_information
+    unless CurrentUser.user.is_anonymous?
+      TransactionLogItem.record_account_upgrade_view(CurrentUser.user, request.referer)
+    end
+  end
+
   def upgrade
     @user = User.find(params[:id])
 

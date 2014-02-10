@@ -12,6 +12,7 @@ module Admin
       sanitize_params!
       @user.level = params[:user][:level]
       @user.inviter_id = CurrentUser.id
+      TransactionLogItem.record_account_upgrade(@user)
       @user.save
       redirect_to edit_admin_user_path(@user), :notice => "User updated"
     end
