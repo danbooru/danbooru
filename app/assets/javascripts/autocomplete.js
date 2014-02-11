@@ -130,32 +130,53 @@
 
     $fields_single.autocomplete({
       minLength: 1,
-      source: function(req, resp) {
-        $.ajax({
-          url: "/tags.json",
-          data: {
-            "search[order]": "count",
-            "search[name_matches]": req.term + "*",
-            "limit": 10
-          },
-          method: "get",
-          success: function(data) {
-            resp($.map(data, function(tag) {
-              return {
-                type: "tag",
-                label: tag.name.replace(/_/g, " "),
-                value: tag.name,
-                category: tag.category,
-                post_count: tag.post_count
-              };
-            }));
-          }
-        });
-      }
+      source: Danbooru.Autocomplete.normal_source
     });
 
     $.merge($fields_multiple, $fields_single).each(function(i, field) {
       $(field).data("uiAutocomplete")._renderItem = Danbooru.Autocomplete.render_item;
+    });
+  }
+
+  Danbooru.Autocomplete.normal_source = function(term, resp) {
+    var key = "ac-" + term;
+    var cached = $.localStorage.get(key);
+    if (cached) {
+      if (cached.expires < new Date()) {
+        console.log("localStorage: removing " + key);
+        $.localStorage.remove(key);
+      } else {
+        console.log("localStorage: reading " + key);
+        resp(cached.value);
+        return;
+      }
+    }
+
+    $.ajax({
+      url: "/tags.json",
+      data: {
+        "search[order]": "count",
+        "search[name_matches]": term + "*",
+        "limit": 10
+      },
+      method: "get",
+      success: function(data) {
+        var data = $.map(data, function(tag) {
+          return {
+            type: "tag",
+            label: tag.name.replace(/_/g, " "),
+            value: tag.name,
+            category: tag.category,
+            post_count: tag.post_count
+          };
+        });
+        var expiry = new Date();
+        expiry.setDate(expiry.getDate() + 7);
+        console.log("localStorage: setting " + key);
+        console.log("localStorage: expires at " + expiry);
+        $.localStorage.set(key, {"value": data, "expires": expiry});
+        resp(data);
+      }
     });
   }
 
@@ -191,29 +212,6 @@
 
     return $("<li/>").data("item.autocomplete", item).append($link).appendTo(list);
   };
-
-  Danbooru.Autocomplete.normal_source = function(term, resp) {
-    $.ajax({
-      url: "/tags.json",
-      data: {
-        "search[order]": "count",
-        "search[name_matches]": term + "*",
-        "limit": 10
-      },
-      method: "get",
-      success: function(data) {
-        resp($.map(data, function(tag) {
-          return {
-            type: "tag",
-            label: tag.name.replace(/_/g, " "),
-            value: tag.name,
-            category: tag.category,
-            post_count: tag.post_count
-          };
-        }));
-      }
-    });
-  }
 
   Danbooru.Autocomplete.static_metatags = {
     order: [
