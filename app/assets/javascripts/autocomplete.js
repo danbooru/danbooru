@@ -4,6 +4,13 @@
   Danbooru.Autocomplete.initialize_all = function() {
     if (Danbooru.meta("enable-auto-complete") === "true") {
       this.initialize_tag_autocomplete();
+      this.prune_local_storage();
+    }
+  }
+
+  Danbooru.Autocomplete.prune_local_storage = function() {
+    if ($.localStorage.keys().length > 10000) {
+      $.localStorage.removeAll();
     }
   }
 
@@ -143,10 +150,8 @@
     var cached = $.localStorage.get(key);
     if (cached) {
       if (cached.expires < new Date()) {
-        console.log("localStorage: removing " + key);
         $.localStorage.remove(key);
       } else {
-        console.log("localStorage: reading " + key);
         resp(cached.value);
         return;
       }
@@ -172,8 +177,6 @@
         });
         var expiry = new Date();
         expiry.setDate(expiry.getDate() + 7);
-        console.log("localStorage: setting " + key);
-        console.log("localStorage: expires at " + expiry);
         $.localStorage.set(key, {"value": data, "expires": expiry});
         resp(data);
       }
