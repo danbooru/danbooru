@@ -130,7 +130,9 @@
 
     $fields_single.autocomplete({
       minLength: 1,
-      source: Danbooru.Autocomplete.normal_source
+      source: function(req, resp) {
+        Danbooru.Autocomplete.normal_source(req.term, resp);
+      }
     });
 
     $.merge($fields_multiple, $fields_single).each(function(i, field) {
