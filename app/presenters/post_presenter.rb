@@ -72,7 +72,7 @@ class PostPresenter < Presenter
     string = []
 
     if !@post.rating == "s"
-      string << "#r18"
+      string << "#r-18"
     end
 
     if @post.character_tags.any?
