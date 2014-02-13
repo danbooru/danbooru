@@ -11,7 +11,7 @@ class Upload < ActiveRecord::Base
   before_validation :initialize_status, :on => :create
   before_create :convert_cgi_file
   after_destroy :delete_temp_file
-  validate :uploader_is_not_limited
+  validate :uploader_is_not_limited, :on => :create
   validate :file_or_source_is_present, :on => :create
 
   module ValidationMethods
