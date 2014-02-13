@@ -3,13 +3,24 @@
 
   Danbooru.Autocomplete.initialize_all = function() {
     if (Danbooru.meta("enable-auto-complete") === "true") {
+      Danbooru.Autocomplete.enable_local_storage = this.test_local_storage();
       this.initialize_tag_autocomplete();
       this.prune_local_storage();
     }
   }
 
+  Danbooru.Autocomplete.test_local_storage = function() {
+    try {
+      localStorage.setItem("test", "test");
+      localStorage.removeItem("test");
+      return true;
+    } catch(e) {
+      return false;
+    }
+  }
+
   Danbooru.Autocomplete.prune_local_storage = function() {
-    if ($.localStorage.keys().length > 10000) {
+    if (this.enable_local_storage && $.localStorage.keys().length > 10000) {
       $.localStorage.removeAll();
     }
   }
@@ -149,14 +160,16 @@
 
   Danbooru.Autocomplete.normal_source = function(term, resp) {
     var key = "ac-" + term;
-    var cached = $.localStorage.get(key);
-    if (cached) {
-      if (cached.expires < new Date()) {
-        $.localStorage.remove(key);
-      } else {
-        resp(cached.value);
-        return;
-      }
+    if (this.enable_local_storage) {
+      var cached = $.localStorage.get(key);
+      if (cached) {
+        if (cached.expires < new Date()) {
+          $.localStorage.remove(key);
+        } else {
+          resp(cached.value);
+          return;
+        }
+      }      
     }
 
     $.ajax({
@@ -177,9 +190,12 @@
             post_count: tag.post_count
           };
         });
-        var expiry = new Date();
-        expiry.setDate(expiry.getDate() + 7);
-        $.localStorage.set(key, {"value": data, "expires": expiry});
+
+        if (Danbooru.Autocomplete.enable_local_storage) {
+          var expiry = new Date();
+          expiry.setDate(expiry.getDate() + 7);
+          $.localStorage.set(key, {"value": data, "expires": expiry});
+        }
         resp(data);
       }
     });
