@@ -71,6 +71,10 @@ class PostPresenter < Presenter
   def humanized_essential_tag_string
     string = []
 
+    if !@post.rating == "s"
+      string << "#r18"
+    end
+
     if @post.character_tags.any?
       chartags = @post.character_tags.slice(0, 5)
       if @post.character_tags.length > 5
