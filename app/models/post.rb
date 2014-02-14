@@ -1101,7 +1101,19 @@ class Post < ActiveRecord::Base
 
   module ApiMethods
     def hidden_attributes
-      super + [:tag_index]
+      list = [:tag_index]
+      if !Danbooru.config.can_user_see_post?(CurrentUser.user, self)
+        list += [:md5, :file_ext]
+      end
+      super + list
+    end
+
+    def method_attributes
+      list = [:uploader_name, :has_large, :tag_string_artist, :tag_string_character, :tag_string_copyright, :tag_string_general]
+      if Danbooru.config.can_user_see_post?(CurrentUser.user, self)
+        list += [:file_url, :large_file_url, :preview_file_url]
+      end
+      list
     end
 
     def serializable_hash(options = {})
@@ -1110,7 +1122,7 @@ class Post < ActiveRecord::Base
       options[:except] += hidden_attributes
       unless options[:builder]
         options[:methods] ||= []
-        options[:methods] += [:uploader_name, :has_large, :tag_string_artist, :tag_string_character, :tag_string_copyright, :tag_string_general, :file_url, :large_file_url, :preview_file_url]
+        options[:methods] += method_attributes
       end
       hash = super(options)
       hash
@@ -1119,32 +1131,37 @@ class Post < ActiveRecord::Base
     def to_xml(options = {}, &block)
       options ||= {}
       options[:methods] ||= []
-      options[:methods] += [:uploader_name, :has_large, :tag_string_artist, :tag_string_character, :tag_string_copyright, :tag_string_general, :file_url, :large_file_url, :preview_file_url]
+      options[:methods] += method_attributes
       super(options, &block)
     end
 
     def to_legacy_json
-      return {
+      hash = {
         "has_comments" => last_commented_at.present?,
         "parent_id" => parent_id,
         "status" => status,
         "has_children" => has_children?,
         "created_at" => created_at.to_formatted_s(:db),
-        "md5" => md5,
         "has_notes" => has_notes?,
         "rating" => rating,
         "author" => uploader_name,
         "creator_id" => uploader_id,
         "width" => image_width,
         "source" => source,
-        "preview_url" => preview_file_url,
         "score" => score,
         "tags" => tag_string,
         "height" => image_height,
         "file_size" => file_size,
         "id" => id,
-        "file_url" => file_url
-      }.to_json
+      }
+
+      if Danbooru.config.can_user_see_post?(CurrentUser.user, self)
+        hash["file_url"] = file_url
+        hash["preview_url"] = preview_file_url
+        hash["md5"] = md5
+      end
+
+      hash
     end
 
     def status
