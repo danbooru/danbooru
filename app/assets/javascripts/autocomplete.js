@@ -20,7 +20,7 @@
   }
 
   Danbooru.Autocomplete.prune_local_storage = function() {
-    if (this.enable_local_storage && $.localStorage.keys().length > 10000) {
+    if (this.enable_local_storage && localStorage.length > 10000) {
       $.localStorage.removeAll();
     }
   }
