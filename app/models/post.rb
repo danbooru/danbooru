@@ -1152,7 +1152,7 @@ class Post < ActiveRecord::Base
         "tags" => tag_string,
         "height" => image_height,
         "file_size" => file_size,
-        "id" => id,
+        "id" => id
       }
 
       if Danbooru.config.can_user_see_post?(CurrentUser.user, self)
