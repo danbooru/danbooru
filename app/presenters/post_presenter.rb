@@ -71,7 +71,7 @@ class PostPresenter < Presenter
   def humanized_essential_tag_string
     string = []
 
-    if !@post.rating == "s"
+    if @post.rating != "s"
       string << "#r-18"
     end
 
