@@ -121,7 +121,7 @@
   <meta name="post-is-flagged" content="<%= @post.is_flagged? %>">
   <meta name="config-large-width" content="<%= Danbooru.config.large_image_width %>">
   <meta name="always-resize-images" content="<%= CurrentUser.user.always_resize_images? %>">
-  <meta property="og:title" content="<%= @post.presenter.humanized_essential_tag_string %> - <%= Danbooru.config.app_name %>">
+  <meta property="og:title" content="<%= '#r-18 ' unless @post.rating == 's' %><%= @post.presenter.humanized_essential_tag_string %> - <%= Danbooru.config.app_name %>">
   <meta property="og:description" content="<%= @post.presenter.humanized_tag_string %>">
   <meta property="og:image" content="<%= @post.preview_file_url %>">
 
