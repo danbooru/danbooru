@@ -1161,7 +1161,7 @@ class Post < ActiveRecord::Base
         hash["md5"] = md5
       end
 
-      hash
+      hash.to_json
     end
 
     def status
