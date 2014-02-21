@@ -37,7 +37,7 @@ class DmailsController < ApplicationController
   end
 
   def create
-    @dmail = Dmail.create_split(params[:dmail])
+    @dmail = Dmail.create_split(params[:dmail].merge(:creator_ip_addr => request.remote_ip))
     respond_with(@dmail)
   end
 

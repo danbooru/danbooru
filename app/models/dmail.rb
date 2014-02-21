@@ -10,7 +10,7 @@ class Dmail < ActiveRecord::Base
   belongs_to :from, :class_name => "User"
   after_create :update_recipient
   after_create :send_dmail
-  attr_accessible :title, :body, :is_deleted, :to_id, :to, :to_name
+  attr_accessible :title, :body, :is_deleted, :to_id, :to, :to_name, :creator_ip_addr
 
   module AddressMethods
     def to_name
