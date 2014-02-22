@@ -94,7 +94,7 @@ class WikiPageTest < ActiveSupport::TestCase
           @wiki_page.title = "yyy"
           @wiki_page.save
         end
-        version = WikiPageVersion.first
+        version = WikiPageVersion.last
         assert_not_equal(@wiki_page.creator_id, version.updater_id)
       end
     end

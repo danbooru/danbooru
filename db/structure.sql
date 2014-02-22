@@ -6475,6 +6475,8 @@ CREATE TRIGGER trigger_wiki_pages_on_update
 -- PostgreSQL database dump complete
 --
 
+SET search_path TO "$user",public;
+
 INSERT INTO schema_migrations (version) VALUES ('20100204211522');
 
 INSERT INTO schema_migrations (version) VALUES ('20100204214746');

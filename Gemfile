@@ -18,7 +18,7 @@ group :assets do
   gem "therubyracer", :platforms => :ruby
 end
 
-gem "rails", "3.2.12"
+gem "rails"
 gem "pg", "0.12.2"
 gem "kgio"
 gem "dalli"
