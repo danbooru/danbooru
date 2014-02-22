@@ -151,18 +151,20 @@ class TagSubscription < ActiveRecord::Base
     arel.order("id DESC").limit(limit)
   end
 
+  def self.process(id)
+    tag_subscription = TagSubscription.find(id)
+    CurrentUser.scoped(tag_subscription.creator, "127.0.0.1") do
+      tag_subscription.process
+      tag_subscription.save
+    end
+  rescue Exception => x
+    raise if Rails.env != "production"
+  end
+
   def self.process_all
     find_each do |tag_subscription|
-      CurrentUser.scoped(tag_subscription.creator, "127.0.0.1") do
-        if $job_task_daemon_active != false && tag_subscription.creator.is_gold? && tag_subscription.is_active?
-          begin
-            tag_subscription.process
-            tag_subscription.save
-            sleep 0
-          rescue Exception => x
-            raise if Rails.env != "production"
-          end
-        end
+      if tag_subscription.creator.is_gold? && tag_subscription.is_active?
+        TagSubscription.delay(:queue => "default").process(tag_subscription.id)
       end
     end
   end
