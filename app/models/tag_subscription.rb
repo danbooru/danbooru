@@ -55,7 +55,7 @@ class TagSubscription < ActiveRecord::Base
   end
 
   def is_active?
-    creator.last_logged_in_at && creator.last_logged_in_at > 3.months.ago
+    creator.is_gold? && creator.last_logged_in_at && creator.last_logged_in_at > 3.months.ago
   end
 
   def editable_by?(user)
@@ -163,7 +163,7 @@ class TagSubscription < ActiveRecord::Base
 
   def self.process_all
     find_each do |tag_subscription|
-      if tag_subscription.creator.is_gold? && tag_subscription.is_active?
+      if tag_subscription.is_active?
         TagSubscription.delay(:queue => "default").process(tag_subscription.id)
       end
     end
