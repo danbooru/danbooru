@@ -11,7 +11,7 @@
     var addthis_config = {"data_track_addressbar": false};
     var addthis_share = {
       "url":"<%= j post_path(post, :only_path => false, :host => Danbooru.config.hostname) %>",
-      "title": "<%= j post.presenter.humanized_essential_tag_string %>"
+      "title": "<%= '#r-18 ' unless post.rating == 's' %><%= j post.presenter.humanized_essential_tag_string %>"
     };
   </script>
   <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4f8dbf8a41066ac7"></script>
