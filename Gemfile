@@ -6,7 +6,6 @@ group :test do
   gem "mocha", :require => "mocha/setup"
   gem "ffaker"
   gem "simplecov", :require => false
-  gem "pry"
   gem "vcr"
   gem "webmock"
   gem "timecop"
@@ -49,6 +48,8 @@ end
 
 group :development do
   gem 'ruby-prof'
-  gem 'pry'
 end
 
+group :development, :test do
+  gem 'pry'
+end
