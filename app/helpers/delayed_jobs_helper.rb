@@ -25,6 +25,9 @@ module DelayedJobsHelper
     when "Tag#update_category_post_counts"
       "<strong>update category post counts</strong>"
 
+    when "Class#process"
+      "<strong>update tag subscription</strong>"
+
     else
       h(job.name)
     end
@@ -55,6 +58,9 @@ module DelayedJobsHelper
 
     when "Tag#update_category_post_counts"
       h(job.payload_object.name)
+
+    when "Class#process"
+      h(job.payload_object.args.flatten.join(" "))
 
     else
       h(job.handler)
