@@ -547,7 +547,7 @@ class Post < ActiveRecord::Base
     end
 
     def has_dup_tag?
-      has_tag?("duplicate") ? true : false
+      has_tag?("duplicate")
     end
 
     def tag_categories

@@ -19,7 +19,18 @@
   }
 
   Danbooru.Comment.quote_message = function(data) {
-    var stripped_body = data["body"].replace(/\[quote\](?:.|\n|\r)+?\[\/quote\](?:\r\n|\r|\n)*/gm, "");
+    var blocks = data["body"].match(/\[\/?quote\]|./gm);
+    var n = 0;
+    var stripped_body = "";
+    $.each(blocks, function(i, block) {
+      if (block === "[quote]") {
+        n += 1;
+      } else if (block == "[/quote]") {
+        n -= 1;
+      } else if (n === 0) {
+        stripped_body += block;
+      }
+    });
     return "[quote]\n" + data["creator_name"] + " said:\n\n" + stripped_body + "\n[/quote]\n\n";
   }
 
