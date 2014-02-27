@@ -10,6 +10,28 @@ class DText
     CGI.escapeHTML(string)
   end
 
+  def self.strip_blocks(string, tag)
+    blocks = string.scan(/\[\/?#{tag}\]|.+?(?=\[\/?#{tag}\]|$)/m)
+    n = 0
+    stripped = ""
+    blocks.each do |block|
+      case block
+      when "[#{tag}]"
+        n += 1
+
+      when "[/#{tag}]"
+        n -= 1
+
+      else
+        if n == 0
+          stripped += block
+        end
+      end
+    end
+
+    stripped.strip
+  end
+
   def self.parse_inline(str, options = {})
     str.gsub!(/&/, "&amp;")
     str.gsub!(/</, "&lt;")
