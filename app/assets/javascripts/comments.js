@@ -19,7 +19,7 @@
   }
 
   Danbooru.Comment.quote_message = function(data) {
-    var blocks = data["body"].match(/\[\/?quote\]|./gm);
+    var blocks = data["body"].match(/\[\/?quote\]|.|\n|\r/gm);
     var n = 0;
     var stripped_body = "";
     $.each(blocks, function(i, block) {
