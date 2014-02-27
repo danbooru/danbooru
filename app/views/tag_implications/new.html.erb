@@ -1,6 +1,9 @@
 <div id="c-tag-aliases">
   <div id="a-new">
     <h1>New Tag Implication</h1>
+
+    <%= error_messages_for :tag_implication %>
+
     <%= simple_form_for(@tag_implication) do |f| %>
       <%= f.input :status, :value => "pending", :as => :hidden %>
       <%= f.input :antecedent_name, :label => "From" %>

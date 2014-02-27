@@ -1,6 +1,9 @@
 <div id="c-tag-aliases">
   <div id="a-new">
     <h1>New Tag Alias</h1>
+
+    <%= error_messages_for :tag_alias %>
+
     <%= simple_form_for(@tag_alias) do |f| %>
       <%= f.input :status, :value => "pending", :as => :hidden %>
       <%= f.input :antecedent_name, :as => :string, :label => "From" %>
