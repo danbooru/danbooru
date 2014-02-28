@@ -81,7 +81,7 @@ class UserPresenter
         arel = arel.where("posts.is_deleted = false")
       end
 
-      arel.map(&:post)
+      arel.map(&:post).compact
     end
   end
 
