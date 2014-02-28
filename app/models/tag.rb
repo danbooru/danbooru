@@ -308,6 +308,17 @@ class Tag < ActiveRecord::Base
       end
     end
 
+    def parse_helper_fudged(range, type)
+      result = parse_helper(range, type)
+      if result[0] == :eq
+        new_min = (result[1] * 0.95).to_i
+        new_max = (result[1] * 1.05).to_i
+        [:between, new_min, new_max]
+      else
+        result
+      end
+    end
+
     def reverse_parse_helper(array)
       case array[0]
       when :between
@@ -464,7 +475,7 @@ class Tag < ActiveRecord::Base
             q[:height] = parse_helper($2)
 
           when "mpixels"
-            q[:mpixels] = parse_helper($2, :float)
+            q[:mpixels] = parse_helper_fudged($2, :float)
 
           when "ratio"
             q[:ratio] = parse_helper($2, :ratio)
@@ -476,7 +487,7 @@ class Tag < ActiveRecord::Base
             q[:fav_count] = parse_helper($2)
 
           when "filesize"
-      	    q[:filesize] = parse_helper($2, :filesize)
+      	    q[:filesize] = parse_helper_fudged($2, :filesize)
 
           when "source"
             q[:source] = ($2.to_escaped_for_sql_like + "%").gsub(/%+/, '%')
