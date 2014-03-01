@@ -139,7 +139,7 @@ protected
     when "artists", "artist_versions"
       /^\/artist/
 
-    when "tags"
+    when "tags", "meta_searches"
       /^\/tags/
 
     when "pools", "pool_versions"
