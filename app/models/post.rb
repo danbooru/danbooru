@@ -23,7 +23,7 @@ class Post < ActiveRecord::Base
   belongs_to :uploader, :class_name => "User"
   belongs_to :parent, :class_name => "Post"
   has_one :upload, :dependent => :destroy
-  has_one :artist_commentary
+  has_one :artist_commentary, :dependent => :destroy
   has_many :flags, :class_name => "PostFlag", :dependent => :destroy
   has_many :appeals, :class_name => "PostAppeal", :dependent => :destroy
   has_many :versions, :class_name => "PostVersion", :dependent => :destroy, :order => "post_versions.updated_at ASC, post_versions.id ASC"
@@ -32,7 +32,7 @@ class Post < ActiveRecord::Base
   has_many :comments, :order => "comments.id", :dependent => :destroy
   has_many :children, :class_name => "Post", :foreign_key => "parent_id", :order => "posts.id"
   has_many :disapprovals, :class_name => "PostDisapproval", :dependent => :destroy
-  has_many :favorites
+  has_many :favorites, :dependent => :destroy
   validates_uniqueness_of :md5
   validate :post_is_not_its_own_parent
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :old_parent_id, :old_source, :old_rating, :last_noted_at, :parent_id, :as => [:member, :builder, :gold, :platinum, :contributor, :janitor, :moderator, :admin, :default]

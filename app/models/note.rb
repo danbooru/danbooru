@@ -9,7 +9,7 @@ class Note < ActiveRecord::Base
   validates_presence_of :post_id, :creator_id, :updater_id, :x, :y, :width, :height
   validate :post_must_exist
   validate :note_within_image, :message => "must be inside the image"
-  has_many :versions, :class_name => "NoteVersion", :order => "note_versions.id ASC"
+  has_many :versions, :class_name => "NoteVersion", :dependent => :destroy, :order => "note_versions.id ASC"
   after_save :update_post
   after_save :create_version
   validate :post_must_not_be_note_locked
