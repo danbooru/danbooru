@@ -17,10 +17,6 @@ module PostsHelper
     end
   end
 
-  def wordbreakify(string)
-    string.gsub(/(.{15})/, "\\1<wbr>")
-  end
-
   def post_source_tag(post)
     if post.source =~ %r!http://img\d+\.pixiv\.net/img/([^\/]+)/!
       text = "pixiv/<wbr>#{wordbreakify($1)}"

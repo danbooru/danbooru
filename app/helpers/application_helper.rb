@@ -1,4 +1,8 @@
 module ApplicationHelper
+  def wordbreakify(string)
+    raw(string.gsub(/(.{10})/, "\\1<wbr>"))
+  end
+
   def nav_link_to(text, url, options = nil)
     if nav_link_match(params[:controller], url)
       klass = "current"
