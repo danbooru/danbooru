@@ -125,7 +125,7 @@
       var script = Danbooru.Cookie.get("tag-script-" + current_script_id);
 
       $("#tag-script-field").val(script).show();
-      Danbooru.PostModeMenu.show_notice(1);
+      Danbooru.PostModeMenu.show_notice(current_script_id);
     } else {
       $("#tag-script-field").hide();
     }
