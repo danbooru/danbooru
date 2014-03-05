@@ -51,7 +51,7 @@ class UserNameChangeRequestsController < ApplicationController
 
 private
   def check_privileges!(change_request)
-    return if CurrentUser.is_janitor?
+    return if CurrentUser.is_admin?
     raise User::PrivilegeError if change_request.user_id != CurrentUser.user.id
   end
 end
