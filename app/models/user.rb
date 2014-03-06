@@ -243,22 +243,7 @@ class User < ActiveRecord::Base
     end
 
     def promote_to!(new_level)
-      self.level = new_level
-      self.inviter_id = CurrentUser.user.id
-      TransactionLogItem.record_account_upgrade(self)
-      if level > level_was
-        body_prefix = "Promoted"
-      elsif level < level_was
-        body_prefix = "Demoted"
-      else
-        body_prefix = ""
-      end
-
-      feedback.create(
-        :category => "neutral",
-        :body => "#{body_prefix} by #{inviter.name} from #{level_string(level_was)} to #{level_string(level)}"
-      )
-      save
+      UserPromotion.new(self, CurrentUser.user, new_level).promote!
     end
 
     def promote_to_admin_if_first_user
@@ -294,6 +279,10 @@ class User < ActiveRecord::Base
       when Levels::ADMIN
         :admin
       end
+    end
+
+    def level_string_was
+      level_string(level_was)
     end
 
     def level_string(value = nil)
@@ -372,7 +361,7 @@ class User < ActiveRecord::Base
 
     def create_mod_action
       if level_changed?
-        ModAction.create(:description => %{"#{name}":/users/#{id} level changed #{level_string(level_was)} -> #{level_string}})
+        ModAction.create(:description => %{"#{name}":/users/#{id} level changed #{level_string_was} -> #{level_string}})
       end
     end
     
