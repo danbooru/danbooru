@@ -13,6 +13,26 @@ class UserTest < ActiveSupport::TestCase
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
+    
+    context "promoting a user" do
+      setup do
+        CurrentUser.user = FactoryGirl.create(:moderator_user)
+      end
+
+      should "create a transaction log item" do
+        assert_difference("TransactionLogItem.count") do
+          @user.promote_to!(User::Levels::GOLD)
+        end
+      end
+
+      should "create a neutral feedback" do
+        assert_difference("UserFeedback.count") do
+          @user.promote_to!(User::Levels::GOLD)
+        end
+
+        assert_equal("Promoted by #{CurrentUser.user.name} from Member to Gold", @user.feedback.last.body)
+      end
+    end
 
     context "favoriting a post" do
       setup do

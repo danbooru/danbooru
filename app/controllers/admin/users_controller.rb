@@ -10,10 +10,7 @@ module Admin
     def update
       @user = User.find(params[:id])
       sanitize_params!
-      @user.level = params[:user][:level]
-      @user.inviter_id = CurrentUser.id
-      TransactionLogItem.record_account_upgrade(@user)
-      @user.save
+      @user.promote_to!(params[:user][:level])
       redirect_to edit_admin_user_path(@user), :notice => "User updated"
     end
 

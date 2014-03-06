@@ -242,8 +242,23 @@ class User < ActiveRecord::Base
       end
     end
 
-    def promote_to(level)
-      update_attributes({:level => level}, :as => :admin)
+    def promote_to!(new_level)
+      self.level = new_level
+      self.inviter_id = CurrentUser.user.id
+      TransactionLogItem.record_account_upgrade(self)
+      if level > level_was
+        body_prefix = "Promoted"
+      elsif level < level_was
+        body_prefix = "Demoted"
+      else
+        body_prefix = ""
+      end
+
+      feedback.create(
+        :category => "neutral",
+        :body => "#{body_prefix} by #{inviter.name} from #{level_string(level_was)} to #{level_string(level)}"
+      )
+      save
     end
 
     def promote_to_admin_if_first_user
