@@ -32,6 +32,12 @@ class UserTest < ActiveSupport::TestCase
 
         assert_equal("Promoted by #{CurrentUser.user.name} from Member to Gold", @user.feedback.last.body)
       end
+
+      should "create a dmail" do
+        assert_difference("Dmail.count", 2) do
+          @user.promote_to!(User::Levels::GOLD)
+        end
+      end
     end
 
     context "favoriting a post" do
