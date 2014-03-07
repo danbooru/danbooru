@@ -242,8 +242,8 @@ class User < ActiveRecord::Base
       end
     end
 
-    def promote_to(level)
-      update_attributes({:level => level}, :as => :admin)
+    def promote_to!(new_level)
+      UserPromotion.new(self, CurrentUser.user, new_level).promote!
     end
 
     def promote_to_admin_if_first_user
@@ -279,6 +279,10 @@ class User < ActiveRecord::Base
       when Levels::ADMIN
         :admin
       end
+    end
+
+    def level_string_was
+      level_string(level_was)
     end
 
     def level_string(value = nil)
@@ -357,7 +361,7 @@ class User < ActiveRecord::Base
 
     def create_mod_action
       if level_changed?
-        ModAction.create(:description => %{"#{name}":/users/#{id} level changed #{level_string(level_was)} -> #{level_string}})
+        ModAction.create(:description => %{"#{name}":/users/#{id} level changed #{level_string_was} -> #{level_string}})
       end
     end
     

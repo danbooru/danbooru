@@ -1,6 +1,7 @@
 <% content_for(:secondary_links) do %>
   <menu>
     <li><%= link_to "Listing", tag_implications_path %></li>
+    <li><%= link_to "MetaSearch", meta_searches_tags_path %></li>
     <% if CurrentUser.is_admin? %>
       <li><%= link_to "New", new_tag_implication_path %></li>
     <% else %>

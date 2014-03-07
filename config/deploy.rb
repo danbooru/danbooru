@@ -14,6 +14,10 @@ set :whenever_command, "bundle exec whenever"
 set :whenever_environment, defer {stage}
 require 'whenever/capistrano'
 
+require 'securerandom'
+set :secret_1, SecureRandom.base64(32)
+set :secret_2, SecureRandom.base64(32)
+
 set :application, "danbooru"
 set :repository,  "git://github.com/r888888888/danbooru.git"
 set :scm, :git
@@ -28,6 +32,15 @@ namespace :local_config do
   desc "Create the shared config directory"
   task :setup_shared_directory do
     run "mkdir -p #{deploy_to}/shared/config"
+  end
+
+  desc "Initialize the secrets"
+  task :setup_secrets do
+    run "mkdir -p ~/.danbooru"
+    run "if [[ ! -e ~/.danbooru/session_secret_key ]] ; then echo '#{secret_1}' > ~/.danbooru/session_secret_key ; fi"
+    run "if [[ ! -e ~/.danbooru/secret_token ]] ; then echo '#{secret_2}' > ~/.danbooru/secret_token ; fi"
+    run "chmod -R 600 ~/.danbooru"
+    run "chown -R #{user}:#{user} ~/.danbooru"
   end
 
   desc "Initialize local config files"
@@ -138,6 +151,7 @@ after "deploy:setup", "reset_ownership_of_common_directory"
 after "deploy:setup", "local_config:setup_shared_directory"
 after "deploy:setup", "local_config:setup_local_files"
 after "deploy:setup", "data:setup_directories"
+after "deploy:setup", "local_config:setup_secrets"
 after "deploy:create_symlink", "local_config:link_local_files"
 after "deploy:create_symlink", "data:link_directories"
 after "deploy:start", "delayed_job:start"

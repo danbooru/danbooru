@@ -624,7 +624,7 @@ class Post < ActiveRecord::Base
 
   module FavoriteMethods
     def clean_fav_string?
-      rand(100) < [Math.log(fav_string.size, 2), 5].min
+      rand(100) < 50
     end
 
     def clean_fav_string!

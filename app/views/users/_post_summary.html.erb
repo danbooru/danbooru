@@ -1,28 +1,24 @@
-<div class="box">
-  <h2><%= link_to "Uploads", posts_path(:tags => "user:#{user.name}") %></h2>
-  <% if presenter.has_uploads? %>
+<% if presenter.has_uploads? %>
+  <div class="box">
+    <h2><%= link_to "Uploads", posts_path(:tags => "user:#{user.name}") %></h2>
     <div>
       <% presenter.uploads.each do |post| %>
         <%= PostPresenter.preview(post, :tags => "user:#{user.name}") %>
       <% end %>
     </div>
-  <% else %>
-    <p>None</p>
-  <% end %>
-</div>
+  </div>
+<% end %>
 
-<div class="box">
-  <h2><%= link_to "Favorites", favorites_path(:user_id => user.id) %></h2>
-  <% if presenter.has_favorites? %>
+<% if presenter.has_favorites? %>
+  <div class="box">
+    <h2><%= link_to "Favorites", favorites_path(:user_id => user.id) %></h2>
     <div>
       <% presenter.favorites.each do |post| %>
         <%= PostPresenter.preview(post, :tags => "fav:#{user.name}") %>
       <% end %>
     </div>
-  <% else %>
-    <p>None</p>
-  <% end %>
-</div>
+  </div>
+<% end %>
 
 <% presenter.subscriptions.each do |subscription| %>
   <div class="box">

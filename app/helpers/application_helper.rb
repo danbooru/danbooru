@@ -1,4 +1,8 @@
 module ApplicationHelper
+  def wordbreakify(string)
+    raw(string.gsub(/(.{10})/, "\\1<wbr>"))
+  end
+
   def nav_link_to(text, url, options = nil)
     if nav_link_match(params[:controller], url)
       klass = "current"
@@ -139,7 +143,7 @@ protected
     when "artists", "artist_versions"
       /^\/artist/
 
-    when "tags"
+    when "tags", "meta_searches"
       /^\/tags/
 
     when "pools", "pool_versions"

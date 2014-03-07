@@ -15,6 +15,10 @@
   Danbooru.PostModeMenu.initialize_shortcuts = function() {
     $(document).bind("keypress", "1 2 3 4 5 6 7 8 9 0", Danbooru.PostModeMenu.change_tag_script);
   }
+
+  Danbooru.PostModeMenu.show_notice = function(i) {
+    Danbooru.notice("Switched to tag script #" + i + ". To switch tag scripts, use the number keys.");    
+  }
   
   Danbooru.PostModeMenu.change_tag_script = function(e) {
     if ($("#mode-box select").val() === "tag-script") {
@@ -27,7 +31,7 @@
       $("#tag-script-field").val(new_tag_script);
       Danbooru.Cookie.put("current_tag_script_id", new_tag_script_id);
       if (old_tag_script_id != new_tag_script_id) {
-        Danbooru.notice("Switched to tag script #" + new_tag_script_id + ". To switch tag scripts, use the number keys.");
+        Danbooru.PostModeMenu.show_notice(new_tag_script_id);
       }
 
       e.preventDefault();
@@ -121,6 +125,7 @@
       var script = Danbooru.Cookie.get("tag-script-" + current_script_id);
 
       $("#tag-script-field").val(script).show();
+      Danbooru.PostModeMenu.show_notice(current_script_id);
     } else {
       $("#tag-script-field").hide();
     }
