@@ -297,7 +297,7 @@ class Artist < ActiveRecord::Base
         q = q.banned
 
       when /status:active/
-        q = q.where("is_banned = false and is_deleted = false")
+        q = q.where("is_banned = false and is_active = true")
 
       when /./
         q = q.any_name_matches(params[:name])
