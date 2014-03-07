@@ -104,4 +104,20 @@ class ForumTopic < ActiveRecord::Base
   def hidden_attributes
     super + [:text_index]
   end
+
+  def read_by?(user, read_forum_topic_ids)
+    return true if read_forum_topic_ids.include?(id.to_s)
+    return false if user.last_forum_read_at.nil?
+    return true if updated_at < user.last_forum_read_at
+    return false
+  end
+
+  def mark_as_read(read_forum_topic_ids)
+    result = (read_forum_topic_ids + [id.to_s]).uniq.join(" ")
+    if result.size > 3000
+      ids = result.scan(/\S+/)
+      result = ids[(ids.size / 2)..-1].join(" ")
+    end
+    result
+  end
 end
