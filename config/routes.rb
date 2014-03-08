@@ -63,6 +63,7 @@ Danbooru::Application.routes.draw do
     member do
       put :revert
       put :ban
+      put :unban
       post :undelete
     end
     collection do

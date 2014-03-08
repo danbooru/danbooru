@@ -37,6 +37,16 @@ class ArtistTest < ActiveSupport::TestCase
         @post.reload
       end
 
+      should "allow unbanning" do
+        assert_difference("TagImplication.count", -1) do
+          @artist.unban!
+        end
+        @post.reload
+        @artist.reload
+        assert(!@artist.is_banned?, "artist should not be banned")
+        assert(!@post.is_banned?, "post should not be banned")
+      end
+
       should "ban the post" do
         assert(@post.is_banned?)
       end
