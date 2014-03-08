@@ -7,6 +7,7 @@ class ArtistTest < ActiveSupport::TestCase
       CurrentUser.user = user
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
+      Delayed::Worker.delay_jobs = false
     end
 
     teardown do
@@ -45,6 +46,7 @@ class ArtistTest < ActiveSupport::TestCase
         @artist.reload
         assert(!@artist.is_banned?, "artist should not be banned")
         assert(!@post.is_banned?, "post should not be banned")
+        assert_equal("aaa", @post.tag_string)
       end
 
       should "ban the post" do
@@ -57,6 +59,7 @@ class ArtistTest < ActiveSupport::TestCase
 
       should "create a new tag implication" do
         assert_equal(1, TagImplication.where(:antecedent_name => "aaa", :consequent_name => "banned_artist").count)
+        assert_equal("aaa banned_artist", @post.tag_string)
       end
     end
 

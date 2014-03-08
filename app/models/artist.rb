@@ -205,16 +205,19 @@ class Artist < ActiveRecord::Base
     def unban!
       Post.transaction do
         CurrentUser.without_safe_mode do
+          ti = TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").first
+          ti.destroy if ti
+
           begin
             Post.tag_match(name).each do |post|
               post.unban!
+              fixed_tags = post.tag_string.sub(/(?:\A| )banned_artist(?:\Z| )/, " ").strip
+              post.update_attributes(:tag_string => fixed_tags)
             end
           rescue Post::SearchError
             # swallow
           end
 
-          ti = TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").first
-          ti.destroy if ti
           update_column(:is_banned, false)
         end
       end
