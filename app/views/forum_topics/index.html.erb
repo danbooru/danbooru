@@ -24,7 +24,7 @@
                 <span class="sticky">Sticky:</span>
               <% end %>
 
-              <% unless topic.read_by?(CurrentUser.user, @read_forum_topic_ids) %>
+              <% if topic.updated_at > (CurrentUser.last_forum_read_at || Time.now) %>
                 <span class="new">NEW</span>
               <% end %>
 

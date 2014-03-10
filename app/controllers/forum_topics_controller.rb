@@ -2,6 +2,7 @@ class ForumTopicsController < ApplicationController
   respond_to :html, :xml, :json
   before_filter :member_only, :except => [:index, :show]
   before_filter :normalize_search, :only => :index
+  after_filter :update_last_forum_read_at, :only => [:show]
 
   def new
     @forum_topic = ForumTopic.new
@@ -18,7 +19,6 @@ class ForumTopicsController < ApplicationController
   def index
     @query = ForumTopic.active.search(params[:search])
     @forum_topics = @query.order("is_sticky DESC, updated_at DESC").paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
-    @read_forum_topic_ids = read_forum_topic_ids
     respond_with(@forum_topics) do |format|
       format.xml do
         render :xml => @forum_topics.to_xml(:root => "forum-topics")
@@ -31,7 +31,6 @@ class ForumTopicsController < ApplicationController
     @forum_posts = ForumPost.search(:topic_id => @forum_topic.id).order("forum_posts.id").paginate(params[:page])
     @forum_posts.all
     respond_with(@forum_topic)
-    session[:read_forum_topics] = @forum_topic.mark_as_read(read_forum_topic_ids)
   end
 
   def create
@@ -68,6 +67,14 @@ class ForumTopicsController < ApplicationController
   end
 
 private
+  def update_last_forum_read_at
+    return if CurrentUser.is_anonymous?
+
+    if CurrentUser.last_forum_read_at.nil? || CurrentUser.last_forum_read_at < @forum_topic.updated_at
+      CurrentUser.update_column(:last_forum_read_at, @forum_topic.updated_at)
+    end
+  end
+
   def normalize_search
     if params[:title_matches]
       params[:search] ||= {}
@@ -78,14 +85,6 @@ private
       params[:search] ||= {}
       params[:search][:title] = params.delete(:title)
     end
-  end
-
-  def read_forum_topics
-    session[:read_forum_topics].to_s
-  end
-
-  def read_forum_topic_ids
-    read_forum_topics.scan(/\S+/)
   end
 
   def check_privilege(forum_topic)
