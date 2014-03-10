@@ -155,10 +155,6 @@ class Upload < ActiveRecord::Base
       end
 
       Danbooru.resize(source_path, resized_file_path_for(width), width, height, quality)
-
-      if width == Danbooru.config.small_image_width && Danbooru.config.ssd_path
-        Danbooru.resize(source_path, ssd_file_path, width, height, quality)
-      end
     end
   end
 
@@ -226,11 +222,6 @@ class Upload < ActiveRecord::Base
     def md5_file_path
       prefix = Rails.env == "test" ? "test." : ""
       "#{Rails.root}/public/data/#{prefix}#{md5}.#{file_ext}"
-    end
-
-    def ssd_file_path
-      prefix = Rails.env == "test" ? "test." : ""
-      "#{Danbooru.config.ssd_path}/public/data/preview/#{prefix}#{md5}.jpg"
     end
 
     def resized_file_path_for(width)

@@ -43,21 +43,18 @@ class Post < ActiveRecord::Base
     def distribute_files
       RemoteFileManager.new(file_path).distribute
       RemoteFileManager.new(real_preview_file_path).distribute if is_image?
-      RemoteFileManager.new(ssd_preview_file_path).distribute if Danbooru.config.ssd_path && is_image?
       RemoteFileManager.new(large_file_path).distribute if has_large?
     end
 
     def delete_remote_files
       RemoteFileManager.new(file_path).delete
       RemoteFileManager.new(real_preview_file_path).delete if is_image?
-      RemoteFileManager.new(ssd_preview_file_path).delete if Danbooru.config.ssd_path && is_image?
       RemoteFileManager.new(large_file_path).delete if has_large?
     end
 
     def delete_files
       FileUtils.rm_f(file_path)
       FileUtils.rm_f(large_file_path)
-      FileUtils.rm_f(ssd_preview_file_path) if Danbooru.config.ssd_path
       FileUtils.rm_f(real_preview_file_path)
     end
 
@@ -77,20 +74,8 @@ class Post < ActiveRecord::Base
       end
     end
 
-    def real_preview_file_path
-      "#{Rails.root}/public/data/preview/#{file_path_prefix}#{md5}.jpg"
-    end
-
-    def ssd_preview_file_path
-      "#{Danbooru.config.ssd_path}/public/data/preview/#{file_path_prefix}#{md5}.jpg"
-    end
-
     def preview_file_path
-      if Danbooru.config.ssd_path
-        ssd_preview_file_path
-      else
-        real_preview_file_path
-      end
+      "#{Rails.root}/public/data/preview/#{file_path_prefix}#{md5}.jpg"
     end
 
     def file_url
@@ -110,11 +95,7 @@ class Post < ActiveRecord::Base
         return "/images/download-preview.png"
       end
 
-      if Danbooru.config.ssd_path
-        "/ssd/data/preview/#{file_path_prefix}#{md5}.jpg"
-      else
-        "/data/preview/#{file_path_prefix}#{md5}.jpg"
-      end
+      "/data/preview/#{file_path_prefix}#{md5}.jpg"
     end
 
     def file_url_for(user)

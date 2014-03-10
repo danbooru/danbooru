@@ -82,11 +82,6 @@ module Danbooru
       300
     end
 
-    # If a solid state drive is availble, cache the thumbnails on the SSD to reduce disk seek times.
-    def ssd_path
-      nil
-    end
-
     # Where the ad banners are stored in the file system
     def advertisement_path
       nil
