@@ -19,11 +19,11 @@ module PostsHelper
 
   def post_source_tag(post)
     if post.source =~ %r!http://img\d+\.pixiv\.net/img/([^\/]+)/!
-      text = "pixiv/<wbr>#{wordbreakify($1)}"
+      text = "pixiv/<wbr>#{wordbreakify($1)}".html_safe
       source_link = link_to(text, post.normalized_source)
       source_search = "source:#{text}/"
     elsif post.source =~ %r!http://i\d\.pixiv\.net/img\d+/img/([^\/]+)/!
-      text = "pixiv/<wbr>#{wordbreakify($1)}"
+      text = "pixiv/<wbr>#{wordbreakify($1)}".html_safe
       source_link = link_to(text, post.normalized_source)
       source_search = "source:#{text}/"
     elsif post.source =~ %r{\Ahttps?://}

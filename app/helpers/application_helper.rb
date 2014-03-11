@@ -1,6 +1,8 @@
 module ApplicationHelper
   def wordbreakify(string)
-    raw(string.gsub(/(.{10})/, "\\1<wbr>"))
+    lines = string.scan(/.{1,10}/)
+    wordbreaked_string = lines.map{|str| h(str)}.join("<wbr>")
+    raw(wordbreaked_string)
   end
 
   def nav_link_to(text, url, options = nil)
