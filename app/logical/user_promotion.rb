@@ -8,10 +8,11 @@ class UserPromotion
   end
 
   def promote!
+    validate
+
     user.level = new_level
     user.inviter_id = promoter.id
 
-    validate
     create_transaction_log_item
     create_user_feedback
     create_dmail

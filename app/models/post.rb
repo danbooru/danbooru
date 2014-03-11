@@ -42,20 +42,20 @@ class Post < ActiveRecord::Base
   module FileMethods
     def distribute_files
       RemoteFileManager.new(file_path).distribute
-      RemoteFileManager.new(real_preview_file_path).distribute if is_image?
+      RemoteFileManager.new(preview_file_path).distribute if is_image?
       RemoteFileManager.new(large_file_path).distribute if has_large?
     end
 
     def delete_remote_files
       RemoteFileManager.new(file_path).delete
-      RemoteFileManager.new(real_preview_file_path).delete if is_image?
+      RemoteFileManager.new(preview_file_path).delete if is_image?
       RemoteFileManager.new(large_file_path).delete if has_large?
     end
 
     def delete_files
       FileUtils.rm_f(file_path)
       FileUtils.rm_f(large_file_path)
-      FileUtils.rm_f(real_preview_file_path)
+      FileUtils.rm_f(preview_file_path)
     end
 
     def file_path_prefix
