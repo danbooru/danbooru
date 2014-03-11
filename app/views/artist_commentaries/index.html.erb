@@ -1,0 +1,38 @@
+<div id="c-artist-commentaries">
+  <div id="a-index">
+    <h1>Artist Commentary</h1>
+
+    <table width="100%" class="striped">
+      <thead>
+        <tr>
+          <th width="1%">Post</th>
+          <th>Original</th>
+          <th>Translated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @commentaries.each do |commentary| %>
+          <tr>
+            <td><%= PostPresenter.preview(commentary.post) %></td>
+            <td>
+              <h3><%= h(commentary.original_title) %></h3>
+              <%= h(commentary.original_description) %>
+            </td>
+            <td>
+              <h3><%= h(commentary.translated_title) %></h3>
+              <%= h(commentary.translated_description) %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <%= numbered_paginator(@commentaries) %>
+
+    <%= render "secondary_links" %>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  Artist Commentary - <%= Danbooru.config.app_name %>
+<% end %>

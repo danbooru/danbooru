@@ -1,0 +1,27 @@
+<div id="c-artist-commentaries">
+  <div id="a-search">
+    <h1>Search Artist Commentary</h1>
+    <%= form_tag(artist_commentaries_path, :method => :get, :class => "simple_form") do %>
+      <%= search_field "text_matches", :label => "Text" %>
+
+      <div class="input">
+        <label for="search_original_present">Original present?</label>
+        <%= select "search", "original_present", ["yes", "no"], :include_blank => true %>
+      </div>
+
+      <div class="input">
+        <label for="search_translated_present">Translation present?</label>
+        <%= select "search", "translated_present", ["yes", "no"], :include_blank => true %>
+      </div>
+
+      <%= search_field "post_tags_match", :label => "Tags", :hint => "Meta-tags not supported" %>
+      <%= submit_tag "Search" %>
+    <% end %>
+  </div>
+</div>
+
+<%= render "forum_topics/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Search Artist Commentary - <%= Danbooru.config.app_name %>
+<% end %>

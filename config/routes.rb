@@ -181,6 +181,7 @@ Danbooru::Application.routes.draw do
   resources :artist_commentaries do
     collection do
       put :create_or_update
+      get :search
     end
     member do
       put :revert

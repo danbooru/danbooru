@@ -1,0 +1,9 @@
+<% content_for(:secondary_links) do %>
+  <menu>
+    <li><%= render "artist_commentaries/quick_search" %></li>
+    <li><%= link_to "Search", search_artist_commentaries_path %></li>
+    <li><%= link_to "Listing", artist_commentaries_path %></li>
+    <li><%= link_to "Recent changes", artist_commentary_versions_path %></li>
+    <li><%= link_to "Translation requests", artist_commentaries_path(:search => {:post_tags_match => "commentary_request"}) %></li>
+  </menu>
+<% end %>

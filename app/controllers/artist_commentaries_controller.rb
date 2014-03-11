@@ -2,6 +2,15 @@ class ArtistCommentariesController < ApplicationController
   respond_to :html, :xml, :json, :js
   before_filter :member_only
 
+  def index
+    @commentaries = ArtistCommentary.search(params[:search]).order("artist_commentaries.id desc").paginate(params[:page], :limit => params[:limit])
+    respond_with(@commentaries) do |format|
+      format.xml do
+        render :xml => @commentaries.to_xml(:root => "artist-commentaries")
+      end
+    end
+  end
+
   def create_or_update
     @artist_commentary = ArtistCommentary.find_by_post_id(params[:artist_commentary][:post_id])
 
