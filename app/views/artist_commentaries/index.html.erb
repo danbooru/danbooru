@@ -16,11 +16,15 @@
             <td><%= PostPresenter.preview(commentary.post) %></td>
             <td>
               <h3><%= h(commentary.original_title) %></h3>
-              <%= h(commentary.original_description) %>
+              <div class="prose">
+                <%= format_text(commentary.original_description) %>
+              </div>
             </td>
             <td>
               <h3><%= h(commentary.translated_title) %></h3>
-              <%= h(commentary.translated_description) %>
+              <div class="prose">
+                <%= format_text(commentary.translated_description) %>
+              </div>
             </td>
           </tr>
         <% end %>
