@@ -13,7 +13,6 @@ class SessionCreator
   def authenticate
     if User.authenticate(name, password)
       user = User.find_by_name(name)
-      user.update_column(:last_logged_in_at, Time.now)
 
       if remember.present?
         cookies.permanent.signed[:user_name] = {
