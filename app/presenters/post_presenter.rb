@@ -53,6 +53,11 @@ class PostPresenter < Presenter
       data-score="#{post.score}"
       data-fav-count="#{post.fav_count}"
       data-pixiv-id="#{post.pixiv_id}"
+      data-md5="#{post.md5}"
+      data-file-ext="#{post.file_ext}"
+      data-file-url="#{post.file_url}"
+      data-large-file-url="#{post.large_file_url}"
+      data-preview-file-url="#{post.preview_file_url}"
     }.html_safe
   end
 
