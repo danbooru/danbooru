@@ -21,11 +21,11 @@ module PostsHelper
     if post.source =~ %r!http://img\d+\.pixiv\.net/img/([^\/]+)/!
       text = "pixiv/<wbr>#{wordbreakify($1)}".html_safe
       source_link = link_to(text, post.normalized_source)
-      source_search = "source:#{text}/"
+      source_search = "source:pixiv/#{$1}/"
     elsif post.source =~ %r!http://i\d\.pixiv\.net/img\d+/img/([^\/]+)/!
       text = "pixiv/<wbr>#{wordbreakify($1)}".html_safe
       source_link = link_to(text, post.normalized_source)
-      source_search = "source:#{text}/"
+      source_search = "source:pixiv/#{$1}/"
     elsif post.source =~ %r{\Ahttps?://}
       text = truncate(post.normalized_source.sub(/^https?:\/\/(?:www\.)?/, ""))
       source_link = link_to(truncate(text, :length => 20), post.normalized_source)
