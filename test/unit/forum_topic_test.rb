@@ -14,6 +14,40 @@ class ForumTopicTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
+    context "#read_by?" do
+      context "for a topic that was never read by the user" do
+        should "return false" do
+          assert_equal(false, @topic.read_by?(@user, [[(@topic.id + 1).to_s, "1"]]))
+        end
+      end
+
+      context "for a topic that was read by the user but has been updated since then" do
+        should "return false" do
+          assert_equal(false, @topic.read_by?(@user, [["#{@topic.id}", "#{1.day.ago.to_i}"]]))
+        end
+      end
+
+      context "for a topic that was read by the user and has not been updated since" do
+        should "return true" do
+          assert_equal(true, @topic.read_by?(@user, [["#{@topic.id}", "#{1.day.from_now.to_i}"]]))
+        end
+      end
+    end
+
+    context "#mark_as_read" do
+      should "include the topic id and updated_at timestamp" do
+        plus_one = @topic.id + 1
+        result = @topic.mark_as_read([["#{plus_one}", "2"]])
+        assert_equal("#{plus_one} 2 #{@topic.id} #{@topic.updated_at.to_i}", result)
+      end
+
+      should "prune the string if it gets too long" do
+        array = (1..1_000).to_a.map(&:to_s).in_groups_of(2)
+        result = @topic.mark_as_read(array)
+        assert_equal("502 503", result[0..6])
+      end
+    end
+
     context "constructed with nested attributes for its original post" do
       should "create a matching forum post" do
         assert_difference(["ForumTopic.count", "ForumPost.count"], 1) do

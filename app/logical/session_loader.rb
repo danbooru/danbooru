@@ -13,6 +13,10 @@ class SessionLoader
       load_session_user
     elsif cookie_password_hash_valid?
       load_cookie_user
+
+      # this means a new session is being created, so assume
+      # all the old forum topics can be marked as read
+      update_forum_last_read_at
     else
       load_session_for_api
     end
@@ -72,6 +76,7 @@ private
   def load_cookie_user
     CurrentUser.user = User.find_by_name(cookies.signed[:user_name])
     CurrentUser.ip_addr = request.remote_ip
+    session[:user_id] = CurrentUser.user.id
   end
 
   def ban_expired?
@@ -98,6 +103,13 @@ private
 
   def set_time_zone
     Time.zone = CurrentUser.user.time_zone
+  end
+
+  def update_forum_last_read_at
+    unless CurrentUser.user.is_anonymous?
+      CurrentUser.user.update_column(:last_forum_read_at, CurrentUser.user.last_logged_in_at)
+      CurrentUser.user.update_column(:last_logged_in_at, Time.now)
+    end
   end
 end
 
