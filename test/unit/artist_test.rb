@@ -185,7 +185,9 @@ class ArtistTest < ActiveSupport::TestCase
 
       assert_difference("ArtistVersion.count") do
         artist.other_names = "xxx"
-        artist.save
+        Timecop.travel(1.day.from_now) do
+          artist.save
+        end
       end
 
       first_version = ArtistVersion.first

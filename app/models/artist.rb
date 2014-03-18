@@ -95,18 +95,42 @@ class Artist < ActiveRecord::Base
   module VersionMethods
     def create_version(force=false)
       if name_changed? || url_string_changed? || is_active_changed? || is_banned_changed? || other_names_changed? || group_name_changed? || notes_changed? || force
-        ArtistVersion.create(
-          :artist_id => id,
-          :name => name,
-          :updater_id => CurrentUser.user.id,
-          :updater_ip_addr => CurrentUser.ip_addr,
-          :url_string => url_string,
-          :is_active => is_active,
-          :is_banned => is_banned,
-          :other_names => other_names,
-          :group_name => group_name
-        )
+        if merge_version?
+          merge_version
+        else
+          create_new_version
+        end
       end
+    end
+
+    def create_new_version
+      ArtistVersion.create(
+        :artist_id => id,
+        :name => name,
+        :updater_id => CurrentUser.user.id,
+        :updater_ip_addr => CurrentUser.ip_addr,
+        :url_string => url_string,
+        :is_active => is_active,
+        :is_banned => is_banned,
+        :other_names => other_names,
+        :group_name => group_name
+      )
+    end
+
+    def merge_version
+      prev = versions.last
+      prev.update_attributes(
+        :url_string => url_string,
+        :is_active => is_active,
+        :is_banned => is_banned,
+        :other_names => other_names,
+        :group_name => group_name
+      )
+    end
+
+    def merge_version?
+      prev = versions.last
+      prev && prev.updater_id == CurrentUser.user.id && prev.updated_at > 1.hour.ago
     end
 
     def revert_to!(version)
