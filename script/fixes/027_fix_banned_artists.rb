@@ -9,8 +9,13 @@ CurrentUser.ip_addr = "127.0.0.1"
 
 CurrentUser.without_safe_mode do
   Artist.where(:is_banned => true).find_each do |artist|
-    Post.tag_match(artist.name).where(:is_banned => true, :is_deleted => true).find_each do |post|
-      unless post.post_flags.any?
+    Post.tag_match(artist.name).where(:is_banned => false).find_each do |post|
+      post.ban!
+    end
+
+    Post.tag_match(artist.name).where(:is_deleted => true).find_each do |post|
+      reasons = post.flags.map(&:reason)
+      unless reasons.any? {|x| x =~ /Unapproved in three days/}
         post.undelete!
       end
     end
