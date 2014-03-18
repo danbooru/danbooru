@@ -136,15 +136,37 @@ class WikiPage < ActiveRecord::Base
     title.tr("_", " ")
   end
 
+  def merge_version
+    prev = versions.last
+    prev.update_attributes(
+      :title => title,
+      :body => body,
+      :is_locked => is_locked
+    )
+  end
+
+  def merge_version?
+    prev = versions.last
+    prev && prev.updater_id == CurrentUser.user.id && prev.updated_at > 1.hour.ago
+  end
+
+  def create_new_version
+    versions.create(
+      :updater_id => CurrentUser.user.id,
+      :updater_ip_addr => CurrentUser.ip_addr,
+      :title => title,
+      :body => body,
+      :is_locked => is_locked
+    )
+  end
+
   def create_version
     if title_changed? || body_changed? || is_locked_changed?
-      versions.create(
-        :updater_id => CurrentUser.user.id,
-        :updater_ip_addr => CurrentUser.ip_addr,
-        :title => title,
-        :body => body,
-        :is_locked => is_locked
-      )
+      if merge_version?
+        merge_version
+      else
+        create_new_version
+      end
     end
   end
   
