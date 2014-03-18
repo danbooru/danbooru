@@ -14,6 +14,19 @@ class ForumTopicTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
+    context "#merge" do
+      setup do
+        @topic2 = FactoryGirl.create(:forum_topic, :title => "yyy")
+        FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => "xxx")
+        FactoryGirl.create(:forum_post, :topic_id => @topic2.id, :body => "xxx")
+      end
+
+      should "merge all the posts in one topic into the other" do
+        @topic.merge(@topic2)
+        assert_equal(2, @topic.posts.count)
+      end
+    end
+
     context "#read_by?" do
       context "for a topic that was never read by the user" do
         should "return false" do

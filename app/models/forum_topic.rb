@@ -130,4 +130,9 @@ class ForumTopic < ActiveRecord::Base
     end
     result
   end
+
+  def merge(topic)
+    ForumPost.update_all({:topic_id => id}, :id => topic.posts.map(&:id))
+    update_attribute(:is_deleted, true)
+  end
 end

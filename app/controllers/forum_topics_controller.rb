@@ -1,6 +1,7 @@
 class ForumTopicsController < ApplicationController
   respond_to :html, :xml, :json
   before_filter :member_only, :except => [:index, :show]
+  before_filter :janitor_only, :only => [:new_merge, :create_merge]
   before_filter :normalize_search, :only => :index
 
   def new
@@ -66,6 +67,17 @@ class ForumTopicsController < ApplicationController
   def mark_all_as_read
     CurrentUser.user.update_attribute(:last_forum_read_at, Time.now)
     redirect_to forum_topics_path, :notice => "All topics marked as read"
+  end
+
+  def new_merge
+    @forum_topic = ForumTopic.find(params[:id])
+  end
+
+  def create_merge
+    @forum_topic = ForumTopic.find(params[:id])
+    @merged_topic = ForumTopic.find(params[:merged_id])
+    @forum_topic.merge(@merged_topic)
+    redirect_to forum_topic_path(@forum_topic)
   end
 
 private
