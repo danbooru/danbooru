@@ -834,26 +834,19 @@ class Post < ActiveRecord::Base
     #
     # After expunging a child:
     # - Move favorites to parent.
-    # - Does the parent have any active children?
+    # - Does the parent have any children?
     #   - Yes: Done.
     #   - No: Update parent's has_children flag to false.
     #
     # After expunging a parent:
     # - Move favorites to the first child.
-    # - Reparent all active children to the first active child.
+    # - Reparent all children to the first child.
 
     module ClassMethods
       def update_has_children_flag_for(post_id)
         return if post_id.nil?
-        has_children = Post.exists?(["is_deleted = ? AND parent_id = ?", false, post_id])
+        has_children = Post.where("parent_id = ?", post_id).exists?
         execute_sql("UPDATE posts SET has_children = ? WHERE id = ?", has_children, post_id)
-      end
-
-      def recalculate_has_children_for_all_posts
-        transaction do
-          execute_sql("UPDATE posts SET has_children = false WHERE has_children = true")
-          execute_sql("UPDATE posts SET has_children = true WHERE id IN (SELECT p.parent_id FROM posts p WHERE p.parent_id IS NOT NULL AND is_deleted = FALSE)")
-        end
       end
     end
 
@@ -882,9 +875,7 @@ class Post < ActiveRecord::Base
     end
 
     def update_parent_on_destroy
-      Post.update_has_children_flag_for(id)
       Post.update_has_children_flag_for(parent_id) if parent_id
-      Post.update_has_children_flag_for(parent_id_was) if parent_id_was && parent_id != parent_id_was
     end
 
     def update_children_on_destroy
@@ -894,8 +885,10 @@ class Post < ActiveRecord::Base
         children.first.update_column(:parent_id, nil)
       else
         cached_children = children
-        cached_children[0].update_column(:parent_id, nil)
-        Post.update_all({:parent_id => cached_children[0].id}, :id => cached_children[1..-1].map(&:id))
+        eldest = cached_children[0]
+        siblings = cached_children[1..-1]
+        eldest.update_column(:parent_id, nil)
+        Post.update_all({:parent_id => eldest.id}, :id => siblings.map(&:id))
       end
     end
 
@@ -942,10 +935,10 @@ class Post < ActiveRecord::Base
       delete!(:without_mod_action => true)
       give_favorites_to_parent
       update_children_on_destroy
-      update_parent_on_destroy
       decrement_tag_post_counts
       remove_from_all_pools
       destroy
+      update_parent_on_destroy
     end
 
     def ban!
@@ -970,6 +963,7 @@ class Post < ActiveRecord::Base
         update_column(:is_flagged, false)
         update_column(:is_banned, true) if options[:ban] || has_tag?("banned_artist")
         give_favorites_to_parent if options[:move_favorites]
+
 
         unless options[:without_mod_action]
           if options[:reason]
