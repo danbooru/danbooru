@@ -57,7 +57,9 @@ class NoteTest < ActiveSupport::TestCase
 
       should "create a version" do
         assert_difference("NoteVersion.count", 1) do
-          @note = FactoryGirl.create(:note, :post => @post)
+          Timecop.travel(1.day.from_now) do
+            @note = FactoryGirl.create(:note, :post => @post)
+          end
         end
 
         assert_equal(1, @note.versions.count)
@@ -109,7 +111,9 @@ class NoteTest < ActiveSupport::TestCase
 
       should "create a version" do
         assert_difference("NoteVersion.count", 1) do
-          @note.update_attributes(:body => "fafafa")
+          Timecop.travel(1.day.from_now) do
+            @note.update_attributes(:body => "fafafa")
+          end
         end
         assert_equal(2, @note.versions.count)
         assert_equal(2, @note.versions.last.version)

@@ -155,6 +155,14 @@ class Note < ActiveRecord::Base
     CurrentUser.user.increment!(:note_update_count)
     update_column(:version, version.to_i + 1)
 
+    if merge_version?
+      merge_version
+    else
+      create_new_version
+    end
+  end
+
+  def create_new_version
     versions.create(
       :updater_id => updater_id,
       :updater_ip_addr => updater_ip_addr,
@@ -167,6 +175,24 @@ class Note < ActiveRecord::Base
       :body => body,
       :version => version
     )
+  end
+
+  def merge_version
+    prev = versions.last
+    prev.update_attributes(
+      :x => x,
+      :y => y,
+      :width => width,
+      :height => height,
+      :is_active => is_active,
+      :body => body,
+      :version => version
+    )
+  end
+
+  def merge_version?
+    prev = versions.last
+    prev && prev.updater_id == CurrentUser.user.id && prev.updated_at > 1.hour.ago
   end
 
   def revert_to(version)
