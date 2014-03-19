@@ -38,6 +38,20 @@ class ForumTopicTest < ActiveSupport::TestCase
           @user.reload
           assert_equal(@topics[1].updated_at.to_i, @user.last_forum_read_at.to_i)
         end
+
+        context "when all topics have been read" do
+          setup do
+            @read_forum_topic_ids = ForumTopic.all.map(&:id)
+            @timestamp = Time.now
+            Time.stubs(:now).returns(@timestamp)
+          end
+
+          should "return the current time" do
+            @topic.update_last_forum_read_at(@read_forum_topic_ids)
+            @user.reload
+            assert_equal(@timestamp.to_i, @user.last_forum_read_at.to_i)
+          end
+        end
       end
 
       context "when the user's last_forum_read_at is 2 days from now" do

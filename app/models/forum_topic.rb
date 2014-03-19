@@ -144,6 +144,8 @@ class ForumTopic < ActiveRecord::Base
     topic = query.first
     if topic
       CurrentUser.user.update_attribute(:last_forum_read_at, topic.updated_at)
+    else
+      CurrentUser.user.update_attribute(:last_forum_read_at, Time.now)
     end
   end
 
