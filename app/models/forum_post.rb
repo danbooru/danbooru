@@ -130,9 +130,9 @@ class ForumPost < ActiveRecord::Base
   end
 
   def update_topic_updated_at_on_destroy
-    max = ForumPost.where(:topic_id => topic.id, :is_deleted => false).maximum(:updated_at)
+    max = ForumPost.where(:topic_id => topic.id, :is_deleted => false).order("updated_at desc").first
     if max
-      ForumTopic.update_all(["response_count = response_count - 1, updated_at = ?", max], {:id => topic.id})
+      ForumTopic.update_all(["response_count = response_count - 1, updated_at = ?, updater_id = ?", max.updated_at, max.updater_id], {:id => topic.id})
     else
       ForumTopic.update_all(["response_count = response_count - 1"], {:id => topic.id})
     end
