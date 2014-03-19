@@ -14,6 +14,45 @@ class ForumTopicTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
+    context "#update_last_forum_read_at" do
+      setup do
+        @topics = [@topic]
+        1.upto(6) do |i|
+          Timecop.travel(i.days.from_now) do
+            @topics << FactoryGirl.create(:forum_topic, :title => "xxx")
+          end
+        end
+        @read_forum_topic_ids = []
+        @read_forum_topic_ids << @topics[0]
+        @read_forum_topic_ids << @topics[2]
+        @read_forum_topic_ids << @topics[4]
+      end
+
+      context "when the user's last_forum_read_at is null" do
+        setup do
+          @user.update_attribute(:last_forum_read_at, nil)
+        end
+
+        should "return the oldest unread topic" do
+          @topic.update_last_forum_read_at(@read_forum_topic_ids)
+          @user.reload
+          assert_equal(@topics[1].updated_at.to_i, @user.last_forum_read_at.to_i)
+        end
+      end
+
+      context "when the user's last_forum_read_at is 2 days from now" do
+        setup do
+          @user.update_attribute(:last_forum_read_at, 2.days.from_now)
+        end
+
+        should "return the oldest unread topic" do
+          @topic.update_last_forum_read_at(@read_forum_topic_ids)
+          @user.reload
+          assert_equal(@topics[3].updated_at.to_i, @user.last_forum_read_at.to_i)
+        end
+      end
+    end
+
     context "#merge" do
       setup do
         @topic2 = FactoryGirl.create(:forum_topic, :title => "yyy")

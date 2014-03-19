@@ -128,7 +128,23 @@ class ForumTopic < ActiveRecord::Base
       ids = result.scan(/\S+/)
       result = ids[(ids.size / 2)..-1].join(" ")
     end
+    update_last_forum_read_at(hash.keys)
     result
+  end
+
+  def update_last_forum_read_at(read_forum_topic_ids)
+    query = ForumTopic.scoped
+    if CurrentUser.user.last_forum_read_at.present?
+      query = query.where("updated_at > ?", CurrentUser.last_forum_read_at)
+    end
+    if read_forum_topic_ids.any?
+      query = query.where("id not in (?)", read_forum_topic_ids)
+    end
+    query = query.order("updated_at asc")
+    topic = query.first
+    if topic
+      CurrentUser.user.update_attribute(:last_forum_read_at, topic.updated_at)
+    end
   end
 
   def merge(topic)
