@@ -11,6 +11,7 @@ class Pool < ActiveRecord::Base
   before_validation :normalize_name
   before_validation :initialize_is_active, :on => :create
   before_validation :initialize_creator, :on => :create
+  before_validation :strip_name
   after_save :create_version
   after_create :synchronize!
   before_destroy :create_mod_action_for_destroy
@@ -337,6 +338,10 @@ class Pool < ActiveRecord::Base
     options ||= {}
     options[:methods] = [:creator_name]
     super(options, &block)
+  end
+
+  def strip_name
+    self.name = name.to_s.strip
   end
 
   def serializable_hash(options = {})
