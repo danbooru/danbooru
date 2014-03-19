@@ -64,8 +64,12 @@ class NotesControllerTest < ActionController::TestCase
     context "revert action" do
       setup do
         @note = FactoryGirl.create(:note, :body => "000")
-        @note.update_attributes(:body => "111")
-        @note.update_attributes(:body => "222")
+        Timecop.travel(1.day.from_now) do
+          @note.update_attributes(:body => "111")
+        end
+        Timecop.travel(2.days.from_now) do
+          @note.update_attributes(:body => "222")
+        end
       end
 
       should "revert to a previous version" do

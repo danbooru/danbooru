@@ -82,8 +82,12 @@ class WikiPagesControllerTest < ActionController::TestCase
     context "revert action" do
       setup do
         @wiki_page = FactoryGirl.create(:wiki_page, :body => "1")
-        @wiki_page.update_attributes(:body => "1 2")
-        @wiki_page.update_attributes(:body => "1 2 3")
+        Timecop.travel(1.day.from_now) do
+          @wiki_page.update_attributes(:body => "1 2")
+        end
+        Timecop.travel(2.days.from_now) do
+          @wiki_page.update_attributes(:body => "1 2 3")
+        end
       end
 
       should "revert to a previous version" do
