@@ -171,13 +171,17 @@ class PostVersion < ActiveRecord::Base
     post.save!
   end
 
+  def updater_name
+    User.id_to_name(updater_id)
+  end
+
   def serializable_hash(options = {})
     options ||= {}
     options[:except] ||= []
     options[:except] += hidden_attributes
     unless options[:builder]
       options[:methods] ||= []
-      options[:methods] += [:added_tags, :removed_tags, :obsolete_added_tags, :obsolete_removed_tags, :unchanged_tags]
+      options[:methods] += [:added_tags, :removed_tags, :obsolete_added_tags, :obsolete_removed_tags, :unchanged_tags, :updater_name]
     end
     hash = super(options)
     hash
@@ -186,7 +190,7 @@ class PostVersion < ActiveRecord::Base
   def to_xml(options = {}, &block)
     options ||= {}
     options[:methods] ||= []
-    options[:methods] += [:added_tags, :removed_tags, :obsolete_added_tags, :obsolete_removed_tags, :unchanged_tags]
+    options[:methods] += [:added_tags, :removed_tags, :obsolete_added_tags, :obsolete_removed_tags, :unchanged_tags, :updater_name]
     super(options, &block)
   end
 end
