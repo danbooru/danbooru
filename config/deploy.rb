@@ -4,7 +4,7 @@ set :unicorn_env, defer {stage}
 require 'capistrano/ext/multistage'
 
 require 'bundler/capistrano'
-set :bundle_flags, "--deployment --quiet --binstubs --shebang ruby-local-exec"
+set :bundle_flags, "--deployment --quiet --binstubs --shebang ruby"
 
 set :default_environment, {
   "PATH" => '$HOME/.rbenv/shims:$HOME/.rbenv/bin:$PATH'
