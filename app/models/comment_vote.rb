@@ -35,8 +35,8 @@ class CommentVote < ActiveRecord::Base
   end
 
   def validate_comment_can_be_down_voted
-    if is_negative? && comment.creator.is_janitor?
-      errors.add :base, "You cannot downvote a janitor comment"
+    if is_negative? && comment.creator.is_admin?
+      errors.add :base, "You cannot downvote an admin comment"
       false
     else
       true
