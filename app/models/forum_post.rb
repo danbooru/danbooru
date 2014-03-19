@@ -119,8 +119,18 @@ class ForumPost < ActiveRecord::Base
     end
   end
 
+  def delete!
+    update_attribute(:is_deleted, true)
+    update_topic_updated_at_on_destroy
+  end
+
+  def undelete!
+    update_attribute(:is_deleted, true)
+    update_topic_updated_at_on_create
+  end
+
   def update_topic_updated_at_on_destroy
-    max = ForumPost.where(:topic_id => topic.id).maximum(:updated_at)
+    max = ForumPost.where(:topic_id => topic.id, :is_deleted => false).maximum(:updated_at)
     if max
       ForumTopic.update_all(["response_count = response_count - 1, updated_at = ?", max], {:id => topic.id})
     else

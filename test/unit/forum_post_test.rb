@@ -26,6 +26,16 @@ class ForumPostTest < ActiveSupport::TestCase
         end
       end
 
+      context "that is deleted" do
+        should "update the topic's updated_at timestamp" do
+          @topic.reload
+          assert_equal(@posts[-1].updated_at.to_i, @topic.updated_at.to_i)
+          @posts[-1].delete!
+          @topic.reload
+          assert_equal(@posts[-2].updated_at.to_i, @topic.updated_at.to_i)
+        end
+      end
+
       should "know which page it's on" do
         assert_equal(2, @posts[3].forum_topic_page)
         assert_equal(2, @posts[4].forum_topic_page)
@@ -102,7 +112,7 @@ class ForumPostTest < ActiveSupport::TestCase
     context "that is deleted" do
       setup do
         @post = FactoryGirl.create(:forum_post, :topic_id => @topic.id)
-        @post.update_attribute(:is_deleted, true)
+        @post.delete!
         @topic.reload
       end
 

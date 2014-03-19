@@ -55,14 +55,14 @@ class ForumPostsController < ApplicationController
   def destroy
     @forum_post = ForumPost.find(params[:id])
     check_privilege(@forum_post)
-    @forum_post.update_column(:is_deleted, true)
+    @forum_post.delete!
     respond_with(@forum_post)
   end
 
   def undelete
     @forum_post = ForumPost.find(params[:id])
     check_privilege(@forum_post)
-    @forum_post.update_attribute(:is_deleted, false)
+    @forum_post.undelete!
     respond_with(@forum_post)
   end
 
