@@ -9,7 +9,7 @@
   <%= nav_link_to("Notes", notes_path(:group_by => "post")) %>
   <%= nav_link_to("Artists", artists_path) %>
   <%= nav_link_to("Tags", tags_path) %>
-  <% if CurrentUser.is_moderator? %>
+  <% if CurrentUser.is_builder? %>
     <%= nav_link_to("Aliases", tag_aliases_path) %>
     <%= nav_link_to("Implications", tag_implications_path) %>
   <% end %>
