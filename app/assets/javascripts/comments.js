@@ -53,8 +53,9 @@
     e.preventDefault();
   }
 
-  Danbooru.Comment.initialize_reply_links = function() {
-    $(".reply-link").click(Danbooru.Comment.quote);
+  Danbooru.Comment.initialize_reply_links = function($parent) {
+    $parent = $parent || $(document);
+    $parent.find(".reply-link").click(Danbooru.Comment.quote);
   }
 
   Danbooru.Comment.initialize_expand_links = function() {
@@ -79,9 +80,10 @@
     $("div.new-comment form").hide();
   }
 
-  Danbooru.Comment.initialize_edit_links = function() {
-    $(".edit_comment").hide();
-    $(".edit_comment_link").click(function(e) {
+  Danbooru.Comment.initialize_edit_links = function($parent) {
+    $parent = $parent || $(document);
+    $parent.find(".edit_comment").hide();
+    $parent.find(".edit_comment_link").click(function(e) {
       var link_id = $(this).attr("id");
       var comment_id = link_id.match(/^edit_comment_link_(\d+)$/)[1];
       $("#edit_comment_" + comment_id).fadeToggle("fast");
@@ -111,8 +113,9 @@
     });
   }
 
-  Danbooru.Comment.initialize_vote_links = function() {
-    $(".unvote-comment-link").hide();
+  Danbooru.Comment.initialize_vote_links = function($parent) {
+    $parent = $parent || $(document);
+    $parent.find(".unvote-comment-link").hide();
   }
 })();
 

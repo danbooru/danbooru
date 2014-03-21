@@ -3,7 +3,7 @@
 
   Danbooru.Dtext.initialize_all = function() {
     Danbooru.Dtext.initialize_links();
-    Danbooru.Dtext.initialize_expandables($(document));
+    Danbooru.Dtext.initialize_expandables();
   }
 
   Danbooru.Dtext.initialize_links = function() {
@@ -12,6 +12,7 @@
   }
 
   Danbooru.Dtext.initialize_expandables = function($parent) {
+    $parent = $parent || $(document);
     $parent.find(".expandable-content").hide();
     $parent.find(".expandable-button").click(function(e) {
       var button = $(this);
