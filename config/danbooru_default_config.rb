@@ -300,5 +300,15 @@ module Danbooru
     def enable_dimension_autotagging
       true
     end
+
+    def iqdb_hostname_and_port
+      # ["localhost", 4000]
+      nil
+    end
+
+    def iqdb_file
+      # /var/www/danbooru2/shared/iqdb.db
+      nil
+    end
   end
 end

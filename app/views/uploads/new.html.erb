@@ -59,6 +59,12 @@
         <%= f.text_field :parent_id %>
       </div>
 
+      <% if false && Danbooru.config.iqdb_hostname_and_port && params[:url] %>
+        <div class="input" id="iqdb-similar">
+          <p><em>Loading similar...</em></p>
+        </div>
+      <% end %>
+
       <div class="input">
         <div>
           <%= f.label :tag_string, "Tags" %>
