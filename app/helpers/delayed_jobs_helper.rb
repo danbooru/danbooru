@@ -28,6 +28,9 @@ module DelayedJobsHelper
     when "Class#process"
       "<strong>update tag subscription</strong>"
 
+    when "Class#remove_iqdb"
+      "<strong>remove from iqdb</strong>"
+
     else
       h(job.name)
     end
@@ -60,6 +63,9 @@ module DelayedJobsHelper
       h(job.payload_object.name)
 
     when "Class#process"
+      h(job.payload_object.args.flatten.join(" "))
+
+    when "Class#remove_iqdb"
       h(job.payload_object.args.flatten.join(" "))
 
     else
