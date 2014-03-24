@@ -125,7 +125,7 @@ class ForumPost < ActiveRecord::Base
   end
 
   def undelete!
-    update_attribute(:is_deleted, true)
+    update_attribute(:is_deleted, false)
     update_topic_updated_at_on_create
   end
 
