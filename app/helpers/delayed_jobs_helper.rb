@@ -31,6 +31,9 @@ module DelayedJobsHelper
     when "Class#remove_iqdb"
       "<strong>remove from iqdb</strong>"
 
+    when "Post#update_iqdb"
+      "<strong>update iqdb</strong>"
+
     else
       h(job.name)
     end
@@ -62,11 +65,11 @@ module DelayedJobsHelper
     when "Tag#update_category_post_counts"
       h(job.payload_object.name)
 
-    when "Class#process"
+    when "Class#process", "Class#remove_iqdb"
       h(job.payload_object.args.flatten.join(" "))
 
-    when "Class#remove_iqdb"
-      h(job.payload_object.args.flatten.join(" "))
+    when "Post#update_iqdb"
+      h(job.payload_object.id)
 
     else
       h(job.handler)
