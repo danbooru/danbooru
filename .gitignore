@@ -14,3 +14,4 @@ coverage
 tmp/*.jpg
 tmp/*.png
 danbooru.db
+iqdb.db

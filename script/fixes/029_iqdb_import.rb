@@ -2,4 +2,4 @@
 
 require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'config', 'environment'))
 
-Iqdb::Importer.import!
+Iqdb::Importer.new.import!
