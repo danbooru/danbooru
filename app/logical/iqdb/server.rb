@@ -30,7 +30,7 @@ module Iqdb
     def add(post)
       request do
         hex = post.id.to_s(16)
-        socket.puts "add 0 #{hex} :#{post.preview_file_path}"
+        socket.puts "add 0 #{hex}:#{post.preview_file_path}"
       end
     end
 

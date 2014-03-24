@@ -13,7 +13,7 @@ module Iqdb
     def add(post)
       hex = post.id.to_s(16)
       process do |io|
-        io.puts "add 0 #{hex} :#{post.preview_file_path}"
+        io.puts "add 0 #{hex}:#{post.preview_file_path}"
         io.puts "quit"
       end
     end

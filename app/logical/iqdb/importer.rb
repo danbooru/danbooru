@@ -6,7 +6,7 @@ module Iqdb
           if File.exists?(post.preview_file_path)
             puts post.id
             hex = post.id.to_s(16)
-            io.puts "add 0 #{hex} :#{post.preview_file_path}"
+            io.puts "add 0 #{hex}:#{post.preview_file_path}"
           end
         end
         io.puts "quit"
