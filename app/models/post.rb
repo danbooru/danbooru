@@ -9,8 +9,8 @@ class Post < ActiveRecord::Base
   after_save :create_version
   after_save :update_parent_on_save
   after_save :apply_post_metatags, :on => :create
-  # after_save :update_iqdb, :on => :create
-  # after_destroy :remove_iqdb
+  # after_save :update_iqdb_async, :on => :create
+  # after_destroy :remove_iqdb_async
   before_save :merge_old_changes
   before_save :normalize_tags
   before_save :update_tag_post_counts
@@ -1272,16 +1272,30 @@ class Post < ActiveRecord::Base
   end
 
   module IqdbMethods
-    def update_iqdb
-      Danbooru.config.all_server_hosts.each do |host|
-        Iqdb::Server.delay(:queue => host).add(Danbooru.config.iqdb_file, id, preview_file_path)
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+      def remove_iqdb(post_id)
+        Iqdb::Server.new(*Danbooru.config.iqdb_hostname_and_port).remove(post_id)
+        Iqdb::Command.new(Danbooru.config.iqdb_file).remove(post_id)
       end
     end
 
-    def remove_iqdb
+    def update_iqdb_async
       Danbooru.config.all_server_hosts.each do |host|
-        Iqdb::Server.delay(:queue => host).remove(Danbooru.config.iqdb_file, id)
+        delay(:queue => host).update_iqdb
       end
+    end
+
+    def remove_iqdb_async
+      Danbooru.config.all_server_hosts.each do |host|
+        Post.delay(:queue => host).remove_iqdb(id)
+      end
+    end
+
+    def update_iqdb
+      Iqdb::Server.new(*Danbooru.config.iqdb_hostname_and_port).add(self)
+      Iqdb::Command.new(Danbooru.config.iqdb_file).add(self)
     end
   end
   
@@ -1303,6 +1317,7 @@ class Post < ActiveRecord::Base
   include ApiMethods
   extend SearchMethods
   include PixivMethods
+  include IqdbMethods
 
   def visible?
     return false if !Danbooru.config.can_user_see_post?(CurrentUser.user, self)

@@ -36,3 +36,11 @@ correct.
 debug your Nginx configuration file.
 
 4) Check all log files.
+
+=== IQDB Integration
+
+In order to enable IQDB integration, you must compile and run the IQDB server somewhere (preferably on the local server). There are two Danbooru configuration settings that you must then set: iqdb_hostname_and_port and iqdb_file.
+
+You must then populate the initial database. There is a fix script called 028_iqdb_import.rb to do this for you.
+
+From then on, all new uploads will asynchronously create two tasks: one to update the IQDB database through the server interface (which updates the in-memory representation), and another to the command interface (which updates the disk representation). Expunging posts will also update the database.

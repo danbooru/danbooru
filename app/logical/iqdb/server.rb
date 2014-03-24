@@ -5,26 +5,7 @@ module Iqdb
     FLAG_WIDTH_AS_SET = 0x08
     FLAG_DISCARD_COMMON_COEFFS = 0x16
 
-    attr_reader :hostname, :port
-
-    def self.import(database)
-      IO.popen("iqdb #{database}", "w") do |io|
-        Post.find_each do |post|
-          puts "Adding #{post.id}"
-          io.puts "#{post.id.to_s(16)} :#{post.preview_file_path}"
-        end
-      end
-    end
-
-    def self.add(database, image_id, filename)
-      image_id_hex = image_id.to_s(16)
-      `iqdb add #{database} #{image_id_hex} :#{filename}`
-    end
-
-    def self.remove(database, image_id)
-      image_id_hex = image_id.to_s(16)
-      `iqdb remove 0 #{image_id_hex} #{database}`
-    end
+    attr_reader :hostname, :port, :socket
 
     def initialize(hostname, port)
       @hostname = hostname
@@ -36,7 +17,7 @@ module Iqdb
     end
 
     def close
-      @socket.close
+      socket.close
     end
 
     def request
@@ -46,9 +27,23 @@ module Iqdb
       close
     end
 
-    def query(dbid, results, filename, flags = FLAG_DISCARD_COMMON_COEFFS)
+    def add(post)
       request do
-        @socket.puts "query #{dbid} #{flags} #{results} #{filename}"
+        hex = post.id.to_s(16)
+        socket.puts "add 0 #{hex} :#{post.preview_file_path}"
+      end
+    end
+
+    def remove(post_id)
+      request do
+        hext = post_id.to_s(16)
+        socket.puts "remove 0 #{hex}"
+      end
+    end
+
+    def query(results, filename, flags = FLAG_DISCARD_COMMON_COEFFS)
+      request do
+        socket.puts "query 0 #{flags} #{results} #{filename}"
         responses = Responses::Collection.new(@socket.read)
       end
     end
