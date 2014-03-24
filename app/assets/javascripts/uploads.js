@@ -13,6 +13,14 @@
       $("#related-tags-button").trigger("click");
       $("#find-artist-button").trigger("click");
     }
+
+    if ($("#iqdb-similar").length) {
+      this.initialize_iqdb_source();
+    }
+  }
+
+  Danbooru.Upload.initialize_iqdb_source = function() {
+    $.get("/iqdb/similar_by_source", {"source": $("#upload_source").val()}).done(function(html) {$("#iqdb-similar").html(html)});
   }
 
   Danbooru.Upload.initialize_enter_on_tags = function() {

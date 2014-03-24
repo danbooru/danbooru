@@ -13,3 +13,4 @@ coverage
 *.swp
 tmp/*.jpg
 tmp/*.png
+danbooru.db

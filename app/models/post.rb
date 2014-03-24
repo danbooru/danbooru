@@ -9,6 +9,8 @@ class Post < ActiveRecord::Base
   after_save :create_version
   after_save :update_parent_on_save
   after_save :apply_post_metatags, :on => :create
+  # after_save :update_iqdb, :on => :create
+  # after_destroy :remove_iqdb
   before_save :merge_old_changes
   before_save :normalize_tags
   before_save :update_tag_post_counts
@@ -1265,6 +1267,20 @@ class Post < ActiveRecord::Base
         self.pixiv_id = $1
       else
         self.pixiv_id = nil
+      end
+    end
+  end
+
+  module IqdbMethods
+    def update_iqdb
+      Danbooru.config.all_server_hosts.each do |host|
+        Iqdb::Server.delay(:queue => host).add(Danbooru.config.iqdb_file, id, preview_file_path)
+      end
+    end
+
+    def remove_iqdb
+      Danbooru.config.all_server_hosts.each do |host|
+        Iqdb::Server.delay(:queue => host).remove(Danbooru.config.iqdb_file, id)
       end
     end
   end
