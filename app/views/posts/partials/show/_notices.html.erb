@@ -6,21 +6,20 @@
   </div>
 <% end %>
 
-<% if (post.is_banned? || post.is_deleted?) && post.flags.empty? %>
+<% if post.is_banned? %>
   <div class="ui-corner-all ui-state-highlight notice notice-deleted">
-    <% if post.is_banned? %>
-      This post was removed because it was requested by the artist
-    <% else %>
-      This post was deleted
-    <% end %>
+    This post was removed because it was requested by the artist
   </div>
 <% end %>
 
-<% if post.is_deleted? && post.flags.any? %>
+<% if post.is_deleted? %>
   <div class="ui-corner-all ui-state-highlight notice notice-deleted">
-    <p>This post was deleted for the following reasons: </p>
-
-    <%= post_flag_reasons(post) %>
+    <% if post.flags.any? %>
+      <p>This post was deleted for the following reasons: </p>
+      <%= post_flag_reasons(post) %>
+    <% else %>
+      This post was deleted
+    <% end %>
   </div>
 <% end %>
 
