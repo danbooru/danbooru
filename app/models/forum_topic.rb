@@ -135,7 +135,7 @@ class ForumTopic < ActiveRecord::Base
   def update_last_forum_read_at(read_forum_topic_ids)
     query = ForumTopic.scoped
     if CurrentUser.user.last_forum_read_at.present?
-      query = query.where("updated_at > ?", CurrentUser.last_forum_read_at)
+      query = query.where("updated_at >= ?", CurrentUser.last_forum_read_at)
     end
     if read_forum_topic_ids.any?
       query = query.where("id not in (?)", read_forum_topic_ids)
