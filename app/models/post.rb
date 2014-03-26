@@ -1282,14 +1282,18 @@ class Post < ActiveRecord::Base
     end
 
     def update_iqdb_async
-      Danbooru.config.all_server_hosts.each do |host|
-        delay(:queue => host).update_iqdb
+      if Danbooru.config.iqdb_hostname_and_port
+        Danbooru.config.all_server_hosts.each do |host|
+          delay(:queue => host).update_iqdb
+        end
       end
     end
 
     def remove_iqdb_async
-      Danbooru.config.all_server_hosts.each do |host|
-        Post.delay(:queue => host).remove_iqdb(id)
+      if Danbooru.config.iqdb_hostname_and_port
+        Danbooru.config.all_server_hosts.each do |host|
+          Post.delay(:queue => host).remove_iqdb(id)
+        end
       end
     end
 

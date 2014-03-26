@@ -92,9 +92,16 @@ class DmailTest < ActiveSupport::TestCase
 
     should "notify the recipient he has mail" do
       dmail = FactoryGirl.create(:dmail, :owner => @user)
-      assert(dmail.to(true).has_mail?)
-      dmail.mark_as_read!
-      assert(!dmail.to(true).has_mail?)
+      recipient = dmail.to
+      recipient.reload
+      assert(recipient.has_mail?)
+
+      CurrentUser.scoped(recipient) do
+        dmail.mark_as_read!
+      end
+
+      recipient.reload
+      assert(!recipient.has_mail?)
     end
   end
 end
