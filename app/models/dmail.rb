@@ -181,8 +181,8 @@ class Dmail < ActiveRecord::Base
   def mark_as_read!
     update_column(:is_read, true)
 
-    unless Dmail.where(:is_read => false, :owner_id => owner_id).exists?
-      to.update_column(:has_mail, false)
+    unless Dmail.where(:is_read => false, :owner_id => CurrentUser.user.id).exists?
+      CurrentUser.user.update_column(:has_mail, false)
     end
   end
 
