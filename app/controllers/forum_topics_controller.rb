@@ -68,6 +68,7 @@ class ForumTopicsController < ApplicationController
 
   def mark_all_as_read
     CurrentUser.user.update_attribute(:last_forum_read_at, Time.now)
+    session[:read_forum_topics] = ""
     redirect_to forum_topics_path, :notice => "All topics marked as read"
   end
 
