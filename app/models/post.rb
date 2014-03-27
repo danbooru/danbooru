@@ -1282,7 +1282,7 @@ class Post < ActiveRecord::Base
     end
 
     def update_iqdb_async
-      if Danbooru.config.iqdb_hostname_and_port
+      if Danbooru.config.iqdb_hostname_and_port && File.exists?(preview_file_path)
         Danbooru.config.all_server_hosts.each do |host|
           delay(:queue => host).update_iqdb
         end
@@ -1290,7 +1290,7 @@ class Post < ActiveRecord::Base
     end
 
     def remove_iqdb_async
-      if Danbooru.config.iqdb_hostname_and_port
+      if Danbooru.config.iqdb_hostname_and_port && File.exists?(preview_file_path)
         Danbooru.config.all_server_hosts.each do |host|
           Post.delay(:queue => host).remove_iqdb(id)
         end

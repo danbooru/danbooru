@@ -7,7 +7,7 @@ module Iqdb
     end
 
     def process(&block)
-      IO.popen("iqdb #{database}", "w", &block)
+      IO.popen("iqdb command #{database}", "w", &block)
     end
 
     def add(post)

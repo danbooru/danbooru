@@ -13,7 +13,7 @@ module Iqdb
     end
 
     def open
-      @socket = TCPSocket.new(hostname, port)
+      @socket = TCPSocket.open(hostname, port)
     end
 
     def close
@@ -31,13 +31,17 @@ module Iqdb
       request do
         hex = post.id.to_s(16)
         socket.puts "add 0 #{hex}:#{post.preview_file_path}"
+        socket.puts "done"
+        socket.read
       end
     end
 
     def remove(post_id)
       request do
-        hext = post_id.to_s(16)
+        hex = post_id.to_s(16)
         socket.puts "remove 0 #{hex}"
+        socket.puts "done"
+        socket.read
       end
     end
 
