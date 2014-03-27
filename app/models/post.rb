@@ -8,7 +8,7 @@ class Post < ActiveRecord::Base
   after_destroy :delete_remote_files
   after_save :create_version
   after_save :update_parent_on_save
-  after_create :apply_post_metatags
+  after_save :apply_post_metatags
   after_create :update_iqdb_async
   after_destroy :remove_iqdb_async
   before_save :merge_old_changes
