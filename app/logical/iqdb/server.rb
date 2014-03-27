@@ -3,7 +3,7 @@ module Iqdb
     FLAG_SKETCH = 0x01
     FLAG_GRAYSCALE = 0x02
     FLAG_WIDTH_AS_SET = 0x08
-    FLAG_DISCARD_COMMON_COEFFS = 0x16
+    FLAG_DISCARD_COMMON_COEFFS = 0x10
 
     attr_reader :hostname, :port, :socket
 
@@ -48,6 +48,7 @@ module Iqdb
     def query(results, filename, flags = FLAG_DISCARD_COMMON_COEFFS)
       request do
         socket.puts "query 0 #{flags} #{results} #{filename}"
+        socket.puts "done"
         responses = Responses::Collection.new(@socket.read)
       end
     end
