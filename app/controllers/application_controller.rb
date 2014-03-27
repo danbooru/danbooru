@@ -17,7 +17,7 @@ class ApplicationController < ActionController::Base
 
 protected
   def api_check
-    if request.format.to_s =~ /\/json|\/xml/
+    if request.format.to_s =~ /\/json|\/xml/ || params[:controller] == "iqdb"
       if ApiLimiter.throttled?(request.remote_ip)
         render :text => "421 User Throttled\n", :layout => false, :status => 421
         return false
