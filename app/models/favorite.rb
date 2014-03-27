@@ -19,7 +19,7 @@ class Favorite < ActiveRecord::Base
     post.append_user_to_fav_string(user.id)
     User.update_all("favorite_count = favorite_count + 1", {:id => user.id})
     user.favorite_count += 1
-    post.fav_count += 1
+    # post.fav_count += 1 # this is handled in Post#clean_fav_string!
     post.score += 1 if user.is_gold?
   end
 

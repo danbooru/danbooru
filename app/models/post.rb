@@ -607,7 +607,7 @@ class Post < ActiveRecord::Base
 
   module FavoriteMethods
     def clean_fav_string?
-      rand(100) < 50
+      true
     end
 
     def clean_fav_string!
