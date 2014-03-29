@@ -151,6 +151,12 @@ class Dmail < ActiveRecord::Base
         q = q.where("from_id = ?", params[:from_id].to_i)
       end
 
+      if params[:read] == "true"
+        q = q.where("is_read = true")
+      elsif params[:read] == "false"
+        q = q.unread
+      end
+
       q
     end
   end
