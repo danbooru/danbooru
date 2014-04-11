@@ -19,11 +19,11 @@ group :assets do
 end
 
 gem "rails"
-gem "pg", "0.12.2"
+gem "pg"
 gem "kgio"
 gem "dalli"
 gem "delayed_job"
-gem "delayed_job_active_record", :git => "https://github.com/r888888888/delayed_job_active_record.git", :branch => "postgresql8"
+gem "delayed_job_active_record"
 gem "simple_form"
 gem "mechanize"
 gem "nokogiri"

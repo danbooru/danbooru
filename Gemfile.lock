@@ -1,13 +1,4 @@
 GIT
-  remote: https://github.com/r888888888/delayed_job_active_record.git
-  revision: ed036c188ebc323929a7509a9cebf40466bc0b0d
-  branch: postgresql8
-  specs:
-    delayed_job_active_record (4.0.0)
-      activerecord (>= 3.0, < 4.1)
-      delayed_job (>= 3.0, < 4.1)
-
-GIT
   remote: https://github.com/r888888888/ruby-imagespec.git
   revision: 2dab9811f4abb4fbaeea66feb42e388ba545b2d8
   branch: exif-fixes
@@ -69,6 +60,9 @@ GEM
     dalli (2.6.4)
     delayed_job (4.0.0)
       activesupport (>= 3.0, < 4.1)
+    delayed_job_active_record (4.0.0)
+      activerecord (>= 3.0, < 4.1)
+      delayed_job (>= 3.0, < 4.1)
     diff-lcs (1.2.4)
     domain_name (0.5.12)
       unf (>= 0.0.5, < 1.0.0)
@@ -226,7 +220,7 @@ DEPENDENCIES
   daemons
   dalli
   delayed_job
-  delayed_job_active_record!
+  delayed_job_active_record
   diff-lcs
   factory_girl
   ffaker
@@ -237,7 +231,7 @@ DEPENDENCIES
   net-ssh
   newrelic_rpm
   nokogiri
-  pg (= 0.12.2)
+  pg
   pry
   rails
   rmagick

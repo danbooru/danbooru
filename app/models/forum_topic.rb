@@ -106,7 +106,7 @@ class ForumTopic < ActiveRecord::Base
   end
 
   def read_by?(user, read_forum_topic_ids)
-    return true if updated_at < user.last_forum_read_at
+    return true if user.last_forum_read_at && updated_at < user.last_forum_read_at
     if read_forum_topic_ids.any? {|topic_id, timestamp| id.to_s == topic_id && updated_at.to_i > timestamp.to_i}
       return false
     end
