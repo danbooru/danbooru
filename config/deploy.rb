@@ -39,7 +39,8 @@ namespace :local_config do
     run "mkdir -p ~/.danbooru"
     run "if [[ ! -e ~/.danbooru/session_secret_key ]] ; then echo '#{secret_1}' > ~/.danbooru/session_secret_key ; fi"
     run "if [[ ! -e ~/.danbooru/secret_token ]] ; then echo '#{secret_2}' > ~/.danbooru/secret_token ; fi"
-    run "chmod -R 600 ~/.danbooru"
+    run "chmod 600 ~/.danbooru/secret_token"
+    run "chmod 600 ~/.danbooru/session_secret_key"
     run "chown -R #{user}:#{user} ~/.danbooru"
   end
 
