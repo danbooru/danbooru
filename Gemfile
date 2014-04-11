@@ -6,7 +6,6 @@ group :test do
   gem "mocha", :require => "mocha/setup"
   gem "ffaker"
   gem "simplecov", :require => false
-  gem "pry"
   gem "vcr"
   gem "webmock"
   gem "timecop"
@@ -18,6 +17,7 @@ group :assets do
   gem "therubyracer", :platforms => :ruby
 end
 
+gem "pry", :group => [:test, :development]
 gem "rails"
 gem "pg"
 gem "kgio"
@@ -49,6 +49,5 @@ end
 
 group :development do
   gem 'ruby-prof'
-  gem 'pry'
 end
 
