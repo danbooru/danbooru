@@ -8,9 +8,13 @@ body {
   padding: 5px;
 }
 
+input[type=text], input[type=submit] {
+  font-size: 20pt;
+}
+
 /* paginator */
 div.paginator {
-  font-size: 20pt;
+  font-size: 18pt;
   font-weight: bold;
   text-align: center;
 
@@ -18,7 +22,6 @@ div.paginator {
     display: inline;
 
     a, span {
-      border: 1px solid #EAEAEA;
       padding: 3px 18px;
       margin: 0 3px;
       display: inline-block;
