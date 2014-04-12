@@ -1,6 +1,6 @@
 module Iqdb
   class Download
-    attr_reader :source, :download, :similar_posts
+    attr_reader :source, :download, :matches
 
     def initialize(source)
       @source = source
@@ -14,7 +14,7 @@ module Iqdb
 
     def find_similar
       if Danbooru.config.iqdb_hostname_and_port
-        @similar_posts = Iqdb::Server.new(*Danbooru.config.iqdb_hostname_and_port).query(0, 3, @download.file_path)
+        @matches = Iqdb::Server.new(*Danbooru.config.iqdb_hostname_and_port).query(0, 3, @download.file_path).matches
       end
     end
   end
