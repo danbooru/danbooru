@@ -1,4 +1,4 @@
-<% if @download.matches %>
+<% if @download.matches.any? %>
   <h3>Similar</h3>
   <% @download.matches.each do |match| %>
     <%= PostPresenter.preview(Post.find(match.post_id)) %>
