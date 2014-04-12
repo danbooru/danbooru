@@ -11,4 +11,22 @@
 
 <%= content_for(:html_header) do %>
   <meta name="viewport" content="width=device-width,initial-scale=<%= @post.device_scale %>">
+  <script type="text/javascript">
+    $(function() {
+      $(document).on("swipeleft", function() {
+        var href = $(".paginator a[rel=next]").attr("href");
+        if (href) {
+          window.location = href;
+        }
+      });
+
+      $(document).on("swiperight", function() {
+        window.history.back();
+      })
+    });
+  </script>
+<% end %>
+
+<% content_for(:page_title) do %>
+  <%= @post.presenter.humanized_essential_tag_string %> - <%= Danbooru.config.app_name %>
 <% end %>
