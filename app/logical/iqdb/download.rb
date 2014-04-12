@@ -14,7 +14,7 @@ module Iqdb
 
     def find_similar
       if Danbooru.config.iqdb_hostname_and_port
-        @matches = Iqdb::Server.new(*Danbooru.config.iqdb_hostname_and_port).query(0, 3, @download.file_path).matches
+        @matches = Iqdb::Server.new(*Danbooru.config.iqdb_hostname_and_port).query(3, @download.file_path).matches
       end
     end
   end
