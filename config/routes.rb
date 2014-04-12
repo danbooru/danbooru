@@ -264,6 +264,7 @@ Danbooru::Application.routes.draw do
   resources :fposts, :controller => "forum_posts"
   match "/m/posts", :controller => "mobile/posts", :action => "index"
   match "/m/posts/:id", :controller => "mobile/posts", :action => "show"
+  match "/iqdb/similar_by_source", :controller => "iqdb", :action => "similar_by_source"
 
   # legacy aliases
   match "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}&search[name]=#{CGI::escape(req.params[:name].to_s)}"}
