@@ -1,5 +1,5 @@
 <%= form_tag(m_posts_path, :method => "get") do %>
-  <%= text_field_tag("tags", params[:tags], :size => 17) %>
+  <%= text_field_tag("tags", params[:tags], :size => 14) %>
   <%= submit_tag "Go", :name => nil %>
 <% end %>
 
@@ -12,7 +12,7 @@
   <script type="text/javascript">
   	$(function() {
       $(document).on("swipeleft", function(e) {
-        if (e.gesture.distance > 240) {
+        if (e.gesture.distance > 150) {
           var href = $(".paginator a[rel=next]").attr("href");
           if (href) {
             window.location = href;
@@ -21,7 +21,7 @@
       });
 
       $(document).on("swiperight", function(e) {
-        if (e.gesture.distance > 240) {
+        if (e.gesture.distance > 150) {
           var href = $(".paginator a[rel=prev]").attr("href");
           if (href) {
             window.location = href;

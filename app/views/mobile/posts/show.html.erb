@@ -14,7 +14,7 @@
   <script type="text/javascript">
     $(function() {
       $(document).on("swipeleft", function(e) {
-        if (e.gesture.distance > 240) {
+        if (e.gesture.distance > 150) {
           var href = $(".paginator a[rel=next]").attr("href");
           if (href) {
             window.location = href;
@@ -23,7 +23,7 @@
       });
 
       $(document).on("swiperight", function(e) {
-        if (e.gesture.distance > 240) {
+        if (e.gesture.distance > 150) {
           window.history.back();
         }
       })
