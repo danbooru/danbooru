@@ -11,17 +11,21 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <script type="text/javascript">
   	$(function() {
-      $(document).on("swipeleft", function() {
-        var href = $(".paginator a[rel=next]").attr("href");
-        if (href) {
-          window.location = href;
+      $(document).on("swipeleft", function(e) {
+        if (e.gesture.distance > 240) {
+          var href = $(".paginator a[rel=next]").attr("href");
+          if (href) {
+            window.location = href;
+          }          
         }
       });
 
-      $(document).on("swiperight", function() {
-        var href = $(".paginator a[rel=prev]").attr("href");
-        if (href) {
-          window.location = href;
+      $(document).on("swiperight", function(e) {
+        if (e.gesture.distance > 240) {
+          var href = $(".paginator a[rel=prev]").attr("href");
+          if (href) {
+            window.location = href;
+          }
         }
       })
   	});
