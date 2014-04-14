@@ -113,7 +113,7 @@ class Tag < ActiveRecord::Base
         Post.raw_tag_match(name).find_each do |post|
           post.reload
           post.set_tag_counts
-          Post.update_all({:tag_count => post.tag_count, :tag_count_general => post.tag_count_general, :tag_count_artist => post.tag_count_artist, :tag_count_copyright => post.tag_count_copyright, :tag_count_character => post.tag_count_character}, {:id => post.id})
+          Post.where(:id => post.id).update_all(:tag_count => post.tag_count, :tag_count_general => post.tag_count_general, :tag_count_artist => post.tag_count_artist, :tag_count_copyright => post.tag_count_copyright, :tag_count_character => post.tag_count_character)
         end
       end
     end
@@ -349,7 +349,7 @@ class Tag < ActiveRecord::Base
         output[:include] << tag[1..-1].mb_chars.downcase
 
       elsif tag =~ /\*/
-        matches = Tag.name_matches(tag.downcase).all(:select => "name", :limit => Danbooru.config.tag_query_limit, :order => "post_count DESC").map(&:name)
+        matches = Tag.name_matches(tag.downcase).select("name").limit(Danbooru.config.tag_query_limit).order("post_count DESC").map(&:name)
         matches = ["~no_matches~"] if matches.empty?
         output[:include] += matches
 
@@ -421,8 +421,8 @@ class Tag < ActiveRecord::Base
             elsif $2.downcase == "any"
               q[:pool] = "any"
             elsif $2.include?("*")
-              pools = Pool.name_matches($2).all(:select => "id", :limit => Danbooru.config.tag_query_limit, :order => "post_count DESC")
-              q[:tags][:include] += pools.map!{|pool| "pool:#{pool.id}"}
+              pools = Pool.name_matches($2).select("id").limit(Danbooru.config.tag_query_limit).order("post_count DESC")
+              q[:tags][:include] += pools.map {|pool| "pool:#{pool.id}"}
             else
               q[:tags][:related] << "pool:#{Pool.name_to_id($2)}"
             end
@@ -621,7 +621,7 @@ class Tag < ActiveRecord::Base
     end
 
     def search(params)
-      q = scoped
+      q = where("true")
       params = {} if params.blank?
 
       if params[:name_matches].present?

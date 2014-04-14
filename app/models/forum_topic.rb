@@ -9,8 +9,8 @@ class ForumTopic < ActiveRecord::Base
   attr_accessible :is_sticky, :is_locked, :is_deleted, :as => [:janitor, :admin, :moderator]
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
-  has_many :posts, :class_name => "ForumPost", :order => "forum_posts.id asc", :foreign_key => "topic_id", :dependent => :destroy
-  has_one :original_post, :class_name => "ForumPost", :order => "forum_posts.id asc", :foreign_key => "topic_id"
+  has_many :posts, lambda {order("forum_posts.id asc")}, :class_name => "ForumPost", :foreign_key => "topic_id", :dependent => :destroy
+  has_one :original_post, lambda {order("forum_posts.id asc")}, :class_name => "ForumPost", :foreign_key => "topic_id"
   before_validation :initialize_creator, :on => :create
   before_validation :initialize_updater
   before_validation :initialize_is_deleted, :on => :create
@@ -55,7 +55,7 @@ class ForumTopic < ActiveRecord::Base
     end
 
     def search(params)
-      q = scoped
+      q = where("true")
       return q if params.blank?
 
       if params[:title_matches].present?
@@ -133,7 +133,7 @@ class ForumTopic < ActiveRecord::Base
   end
 
   def update_last_forum_read_at(read_forum_topic_ids)
-    query = ForumTopic.scoped
+    query = ForumTopic.where("true")
     if CurrentUser.user.last_forum_read_at.present?
       query = query.where("updated_at >= ?", CurrentUser.last_forum_read_at)
     end
@@ -150,7 +150,7 @@ class ForumTopic < ActiveRecord::Base
   end
 
   def merge(topic)
-    ForumPost.update_all({:topic_id => id}, :id => topic.posts.map(&:id))
+    ForumPost.where(:id => topic.posts.map(&:id)).update_all(:topic_id => id)
     update_attribute(:is_deleted, true)
   end
 end

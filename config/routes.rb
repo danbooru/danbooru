@@ -1,4 +1,4 @@
-Danbooru::Application.routes.draw do
+Rails.application.routes.draw do
   namespace :admin do
     resources :users, :only => [:edit, :update]
     resource  :alias_and_implication_import, :only => [:new, :create]
@@ -149,7 +149,7 @@ Danbooru::Application.routes.draw do
       put :revert
       post :undelete
     end
-    resource :order, :only => [:edit, :update], :controller => "PoolOrders"
+    resource :order, :only => [:edit, :update], :controller => "pool_orders"
   end
   resource  :pool_element, :only => [:create, :destroy] do
     collection do
@@ -191,7 +191,7 @@ Danbooru::Application.routes.draw do
   end
   resources :artist_commentary_versions, :only => [:index]
   resource :related_tag, :only => [:show]
-  match "reports/user_promotions" => "reports#user_promotions"
+  get "reports/user_promotions" => "reports#user_promotions"
   resource :session do
     collection do
       get :sign_out
@@ -199,10 +199,10 @@ Danbooru::Application.routes.draw do
   end
   resource :source, :only => [:show]
   resources :tags do
-    resource :correction, :only => [:new, :create, :show], :controller => "TagCorrections"
+    resource :correction, :only => [:new, :create, :show], :controller => "tag_corrections"
   end
   resources :tag_aliases do
-    resource :correction, :only => [:create, :new, :show], :controller => "TagAliasCorrections"
+    resource :correction, :only => [:create, :new, :show], :controller => "tag_alias_corrections"
     member do
       post :approve
     end
@@ -262,28 +262,25 @@ Danbooru::Application.routes.draw do
   resources :wpages, :controller => "wiki_pages"
   resources :ftopics, :controller => "forum_topics"
   resources :fposts, :controller => "forum_posts"
-  match "/m/posts", :controller => "mobile/posts", :action => "index"
-  match "/m/posts/:id", :controller => "mobile/posts", :action => "show"
-  match "/iqdb/similar_by_source", :controller => "iqdb", :action => "similar_by_source"
+  get "/m/posts", :controller => "mobile/posts", :action => "index"
+  get "/m/posts/:id", :controller => "mobile/posts", :action => "show"
+  get "/iqdb/similar_by_source", :controller => "iqdb", :action => "similar_by_source"
 
   # legacy aliases
-  match "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}&search[name]=#{CGI::escape(req.params[:name].to_s)}"}
-  match "/artist/index.xml", :controller => "legacy", :action => "artists", :format => "xml"
-  match "/artist/index.json", :controller => "legacy", :action => "artists", :format => "json"
-  match "/artist/index" => redirect {|params, req| "/artists?page=#{req.params[:page]}"}
-  match "/artist/show/:id" => redirect("/artists/%{id}")
-  match "/artist/show" => redirect {|params, req| "/artists?name=#{CGI::escape(req.params[:name].to_s)}"}
-  match "/artist/history/:id" => redirect("/artist_versions?search[artist_id]=%{id}")
-  match "/artist/update/:id" => redirect("/artists/%{id}")
-  match "/artist/destroy/:id" => redirect("/artists/%{id}")
-  match "/artist/recent_changes" => redirect("/artist_versions")
-  match "/artist/create" => redirect("/artists")
+  get "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}&search[name]=#{CGI::escape(req.params[:name].to_s)}"}
+  get "/artist/index.xml", :controller => "legacy", :action => "artists", :format => "xml"
+  get "/artist/index.json", :controller => "legacy", :action => "artists", :format => "json"
+  get "/artist/index" => redirect {|params, req| "/artists?page=#{req.params[:page]}"}
+  get "/artist/show/:id" => redirect("/artists/%{id}")
+  get "/artist/show" => redirect {|params, req| "/artists?name=#{CGI::escape(req.params[:name].to_s)}"}
+  get "/artist/history/:id" => redirect("/artist_versions?search[artist_id]=%{id}")
+  get "/artist/recent_changes" => redirect("/artist_versions")
 
-  match "/comment" => redirect {|params, req| "/comments?page=#{req.params[:page]}"}
-  match "/comment/index" => redirect {|params, req| "/comments?page=#{req.params[:page]}"}
-  match "/comment/show/:id" => redirect("/comments/%{id}")
-  match "/comment/new" => redirect("/comments")
-  match("/comment/search" => redirect do |params, req|
+  get "/comment" => redirect {|params, req| "/comments?page=#{req.params[:page]}"}
+  get "/comment/index" => redirect {|params, req| "/comments?page=#{req.params[:page]}"}
+  get "/comment/show/:id" => redirect("/comments/%{id}")
+  get "/comment/new" => redirect("/comments")
+  get("/comment/search" => redirect do |params, req|
     if req.params[:query] =~ /^user:(.+)/i
       "/comments?group_by=comment&search[creator_name]=#{CGI::escape($1)}"
     else
@@ -291,88 +288,85 @@ Danbooru::Application.routes.draw do
     end
   end)
 
-  match "/favorite" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
-  match "/favorite/index" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
-  match "/favorite/list_users.json", :controller => "legacy", :action => "unavailable"
+  get "/favorite" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
+  get "/favorite/index" => redirect {|params, req| "/favorites?page=#{req.params[:page]}"}
+  get "/favorite/list_users.json", :controller => "legacy", :action => "unavailable"
 
-  match "/forum" => redirect {|params, req| "/forum_topics?page=#{req.params[:page]}"}
-  match "/forum/index" => redirect {|params, req| "/forum_topics?page=#{req.params[:page]}"}
-  match "/forum/show/:id" => redirect {|params, req| "/forum_posts/#{req.params[:id]}?page=#{req.params[:page]}"}
-  match "/forum/search" => redirect("/forum_posts/search")
-  match "/forum/new" => redirect("/forum_posts/new")
-  match "/forum/edit/:id" => redirect("/forum_posts/%{id}/edit")
+  get "/forum" => redirect {|params, req| "/forum_topics?page=#{req.params[:page]}"}
+  get "/forum/index" => redirect {|params, req| "/forum_topics?page=#{req.params[:page]}"}
+  get "/forum/show/:id" => redirect {|params, req| "/forum_posts/#{req.params[:id]}?page=#{req.params[:page]}"}
+  get "/forum/search" => redirect("/forum_posts/search")
 
-  match "/help/:title" => redirect {|params, req| ("/wiki_pages?title=#{CGI::escape('help:' + req.params[:title])}")}
+  get "/help/:title" => redirect {|params, req| ("/wiki_pages?title=#{CGI::escape('help:' + req.params[:title])}")}
 
-  match "/note" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
-  match "/note/index" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
-  match "/note/history" => redirect {|params, req| "/note_versions?search[updater_id]=#{req.params[:user_id]}"}
+  get "/note" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
+  get "/note/index" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
+  get "/note/history" => redirect {|params, req| "/note_versions?search[updater_id]=#{req.params[:user_id]}"}
 
-  match "/pool" => redirect {|params, req| "/pools?page=#{req.params[:page]}"}
-  match "/pool/index" => redirect {|params, req| "/pools?page=#{req.params[:page]}"}
-  match "/pool/show/:id" => redirect("/pools/%{id}")
-  match "/pool/history/:id" => redirect("/pool_versions?search[pool_id]=%{id}")
-  match "/pool/recent_changes" => redirect("/pool_versions")
+  get "/pool" => redirect {|params, req| "/pools?page=#{req.params[:page]}"}
+  get "/pool/index" => redirect {|params, req| "/pools?page=#{req.params[:page]}"}
+  get "/pool/show/:id" => redirect("/pools/%{id}")
+  get "/pool/history/:id" => redirect("/pool_versions?search[pool_id]=%{id}")
+  get "/pool/recent_changes" => redirect("/pool_versions")
 
-  match "/post/index.xml", :controller => "legacy", :action => "posts", :format => "xml"
-  match "/post/index.json", :controller => "legacy", :action => "posts", :format => "json"
-  match "/post/create.xml", :controller => "legacy", :action => "create_post", :format => "xml"
-  match "/post/piclens", :controller => "legacy", :action => "unavailable"
-  match "/post/index" => redirect {|params, req| "/posts?tags=#{CGI::escape(req.params[:tags].to_s)}&page=#{req.params[:page]}"}
-  match "/post" => redirect {|params, req| "/posts?tags=#{CGI::escape(req.params[:tags].to_s)}&page=#{req.params[:page]}"}
-  match "/post/upload" => redirect("/uploads/new")
-  match "/post/moderate" => redirect("/moderator/post/queue")
-  match "/post/atom" => redirect {|params, req| "/posts.atom?tags=#{CGI::escape(req.params[:tags].to_s)}"}
-  match "/post/atom.feed" => redirect {|params, req| "/posts.atom?tags=#{CGI::escape(req.params[:tags].to_s)}"}
-  match "/post/popular_by_day" => redirect("/explore/posts/popular")
-  match "/post/popular_by_week" => redirect("/explore/posts/popular")
-  match "/post/popular_by_month" => redirect("/explore/posts/popular")
-  match "/post/show/:id/:tag_title" => redirect("/posts/%{id}")
-  match "/post/show/:id" => redirect("/posts/%{id}")
-  match "/post/show" => redirect {|params, req| "/posts?md5=#{req.params[:md5]}"}
-  match "/post/view/:id/:tag_title" => redirect("/posts/%{id}")
-  match "/post/view/:id" => redirect("/posts/%{id}")
-  match "/post/flag/:id" => redirect("/posts/%{id}")
+  get "/post/index.xml", :controller => "legacy", :action => "posts", :format => "xml"
+  get "/post/index.json", :controller => "legacy", :action => "posts", :format => "json"
+  get "/post/create.xml", :controller => "legacy", :action => "create_post", :format => "xml"
+  get "/post/piclens", :controller => "legacy", :action => "unavailable"
+  get "/post/index" => redirect {|params, req| "/posts?tags=#{CGI::escape(req.params[:tags].to_s)}&page=#{req.params[:page]}"}
+  get "/post" => redirect {|params, req| "/posts?tags=#{CGI::escape(req.params[:tags].to_s)}&page=#{req.params[:page]}"}
+  get "/post/upload" => redirect("/uploads/new")
+  get "/post/moderate" => redirect("/moderator/post/queue")
+  get "/post/atom" => redirect {|params, req| "/posts.atom?tags=#{CGI::escape(req.params[:tags].to_s)}"}
+  get "/post/atom.feed" => redirect {|params, req| "/posts.atom?tags=#{CGI::escape(req.params[:tags].to_s)}"}
+  get "/post/popular_by_day" => redirect("/explore/posts/popular")
+  get "/post/popular_by_week" => redirect("/explore/posts/popular")
+  get "/post/popular_by_month" => redirect("/explore/posts/popular")
+  get "/post/show/:id/:tag_title" => redirect("/posts/%{id}")
+  get "/post/show/:id" => redirect("/posts/%{id}")
+  get "/post/show" => redirect {|params, req| "/posts?md5=#{req.params[:md5]}"}
+  get "/post/view/:id/:tag_title" => redirect("/posts/%{id}")
+  get "/post/view/:id" => redirect("/posts/%{id}")
+  get "/post/flag/:id" => redirect("/posts/%{id}")
 
-  match("/post_tag_history" => redirect do |params, req|
+  get("/post_tag_history" => redirect do |params, req|
     page = req.params[:before_id].present? ? "b#{req.params[:before_id]}" : req.params[:page]
     "/post_versions?page=#{page}&search[updater_id]=#{req.params[:user_id]}"
   end)
-  match "/post_tag_history/index" => redirect {|params, req| "/post_versions?page=#{req.params[:page]}&search[post_id]=#{req.params[:post_id]}"}
+  get "/post_tag_history/index" => redirect {|params, req| "/post_versions?page=#{req.params[:page]}&search[post_id]=#{req.params[:post_id]}"}
 
-  match "/tag/index.xml", :controller => "legacy", :action => "tags", :format => "xml"
-  match "/tag/index.json", :controller => "legacy", :action => "tags", :format => "json"
-  match "/tag" => redirect {|params, req| "/tags?page=#{req.params[:page]}&search[name_matches]=#{CGI::escape(req.params[:name].to_s)}&search[order]=#{req.params[:order]}&search[category]=#{req.params[:type]}"}
-  match "/tag/index" => redirect {|params, req| "/tags?page=#{req.params[:page]}&search[name_matches]=#{CGI::escape(req.params[:name].to_s)}&search[order]=#{req.params[:order]}"}
+  get "/tag/index.xml", :controller => "legacy", :action => "tags", :format => "xml"
+  get "/tag/index.json", :controller => "legacy", :action => "tags", :format => "json"
+  get "/tag" => redirect {|params, req| "/tags?page=#{req.params[:page]}&search[name_matches]=#{CGI::escape(req.params[:name].to_s)}&search[order]=#{req.params[:order]}&search[category]=#{req.params[:type]}"}
+  get "/tag/index" => redirect {|params, req| "/tags?page=#{req.params[:page]}&search[name_matches]=#{CGI::escape(req.params[:name].to_s)}&search[order]=#{req.params[:order]}"}
 
-  match "/tag_implication" => redirect {|params, req| "/tag_implications?search[name_matches]=#{CGI::escape(req.params[:query].to_s)}"}
+  get "/tag_implication" => redirect {|params, req| "/tag_implications?search[name_matches]=#{CGI::escape(req.params[:query].to_s)}"}
 
-  match "/user/index.xml", :controller => "legacy", :action => "users", :format => "xml"
-  match "/user/index.json", :controller => "legacy", :action => "users", :format => "json"
-  match "/user" => redirect {|params, req| "/users?page=#{req.params[:page]}"}
-  match "/user/index" => redirect {|params, req| "/users?page=#{req.params[:page]}"}
-  match "/user/show/:id" => redirect("/users/%{id}")
-  match "/user/login" => redirect("/sessions/new")
-  match "/user_record" => redirect {|params, req| "/user_feedbacks?search[user_id]=#{req.params[:user_id]}"}
+  get "/user/index.xml", :controller => "legacy", :action => "users", :format => "xml"
+  get "/user/index.json", :controller => "legacy", :action => "users", :format => "json"
+  get "/user" => redirect {|params, req| "/users?page=#{req.params[:page]}"}
+  get "/user/index" => redirect {|params, req| "/users?page=#{req.params[:page]}"}
+  get "/user/show/:id" => redirect("/users/%{id}")
+  get "/user/login" => redirect("/sessions/new")
+  get "/user_record" => redirect {|params, req| "/user_feedbacks?search[user_id]=#{req.params[:user_id]}"}
 
-  match "/wiki" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
-  match "/wiki/index" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
-  match "/wiki/revert" => redirect("/wiki_pages")
-  match "/wiki/rename" => redirect("/wiki_pages")
-  match "/wiki/show" => redirect {|params, req| "/wiki_pages?title=#{CGI::escape(req.params[:title].to_s)}"}
-  match "/wiki/recent_changes" => redirect {|params, req| "/wiki_page_versions?search[updater_id]=#{req.params[:user_id]}"}
-  match "/wiki/history/:title" => redirect("/wiki_page_versions?title=%{title}")
+  get "/wiki" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
+  get "/wiki/index" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
+  get "/wiki/rename" => redirect("/wiki_pages")
+  get "/wiki/show" => redirect {|params, req| "/wiki_pages?title=#{CGI::escape(req.params[:title].to_s)}"}
+  get "/wiki/recent_changes" => redirect {|params, req| "/wiki_page_versions?search[updater_id]=#{req.params[:user_id]}"}
+  get "/wiki/history/:title" => redirect("/wiki_page_versions?title=%{title}")
 
-  match "/static/keyboard_shortcuts" => "static#keyboard_shortcuts", :as => "keyboard_shortcuts"
-  match "/static/bookmarklet" => "static#bookmarklet", :as => "bookmarklet"
-  match "/static/site_map" => "static#site_map", :as => "site_map"
-  match "/static/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
-  match "/static/accept_terms_of_service" => "static#accept_terms_of_service", :as => "accept_terms_of_service"
-  match "/static/mrtg" => "static#mrtg", :as => "mrtg"
-  match "/static/contact" => "static#contact", :as => "contact"
-  match "/static/benchmark" => "static#benchmark"
-  match "/static/name_change" => "static#name_change", :as => "name_change"
-  match "/meta_searches/tags" => "meta_searches#tags", :as => "meta_searches_tags"
+  get "/static/keyboard_shortcuts" => "static#keyboard_shortcuts", :as => "keyboard_shortcuts"
+  get "/static/bookmarklet" => "static#bookmarklet", :as => "bookmarklet"
+  get "/static/site_map" => "static#site_map", :as => "site_map"
+  get "/static/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
+  get "/static/accept_terms_of_service" => "static#accept_terms_of_service", :as => "accept_terms_of_service"
+  get "/static/mrtg" => "static#mrtg", :as => "mrtg"
+  get "/static/contact" => "static#contact", :as => "contact"
+  get "/static/benchmark" => "static#benchmark"
+  get "/static/name_change" => "static#name_change", :as => "name_change"
+  get "/meta_searches/tags" => "meta_searches#tags", :as => "meta_searches_tags"
 
   root :to => "posts#index"
 end

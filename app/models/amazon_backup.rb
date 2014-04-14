@@ -2,6 +2,8 @@ require 'base64'
 require 'digest/md5'
 
 class AmazonBackup < ActiveRecord::Base
+  attr_accessible :last_id
+  
   def self.last_id
     first.last_id
   end

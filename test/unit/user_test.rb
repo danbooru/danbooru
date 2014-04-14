@@ -271,7 +271,7 @@ class UserTest < ActiveSupport::TestCase
         @user.password = "zugzug6"
         @user.password_confirmation = "zugzug5"
         @user.save
-        assert_equal(["Password doesn't match confirmation"], @user.errors.full_messages)
+        assert_equal(["Password confirmation doesn't match Password"], @user.errors.full_messages)
       end
 
       should "not be too short" do

@@ -1,5 +1,5 @@
 module PostSets
-  class Pool < Base
+  class Pool < PostSets::Base
     module ActiveRecordExtension
       attr_accessor :total_pages, :current_page
     end

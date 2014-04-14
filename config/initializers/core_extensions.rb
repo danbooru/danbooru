@@ -23,3 +23,9 @@ end
 class String
   include Danbooru::Extensions::String
 end
+
+class FalseClass
+  def to_i
+    0
+  end
+end

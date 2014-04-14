@@ -15,8 +15,8 @@ class AdvertisementTest < ActiveSupport::TestCase
       assert_difference("AdvertisementHit.count") do
         @ad.hit!("0.0.0.0")
       end
-      assert_equal("0.0.0.0", AdvertisementHit.first.ip_addr)
-      assert_equal(1, AdvertisementHit.first.advertisement_id)
+      assert_equal("0.0.0.0", AdvertisementHit.first.ip_addr.to_s)
+      assert_equal(@ad.id, AdvertisementHit.first.advertisement_id)
       assert_equal(1, @ad.hit_sum(1.day.ago, 1.day.from_now))
       assert_equal(0, @ad.hit_sum(2.days.ago, 1.day.ago))
     end

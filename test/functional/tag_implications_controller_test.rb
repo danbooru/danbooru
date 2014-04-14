@@ -17,7 +17,9 @@ class TagImplicationsControllerTest < ActionController::TestCase
 
     context "index action" do
       setup do
-        @tag_implication = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb", :creator => @user)
+        CurrentUser.scoped(@user, "127.0.0.1") do
+          @tag_implication = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
+        end
       end
 
       should "list all tag implications" do
@@ -41,7 +43,9 @@ class TagImplicationsControllerTest < ActionController::TestCase
 
     context "destroy action" do
       setup do
-        @tag_implication = FactoryGirl.create(:tag_implication, :creator => @user)
+        CurrentUser.scoped(@user, "127.0.0.1") do
+          @tag_implication = FactoryGirl.create(:tag_implication)
+        end
       end
 
       should "destroy a tag_implication" do

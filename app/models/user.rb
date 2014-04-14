@@ -40,11 +40,11 @@ class User < ActiveRecord::Base
   before_create :promote_to_admin_if_first_user
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
   has_many :posts, :foreign_key => "uploader_id"
-  has_many :bans, :order => "bans.id desc"
-  has_one :recent_ban, :class_name => "Ban", :order => "bans.id desc"
-  has_many :subscriptions, :class_name => "TagSubscription", :foreign_key => "creator_id", :order => "name"
+  has_many :bans, lambda {order("bans.id desc")}
+  has_one :recent_ban, lambda {order("bans.id desc")}, :class_name => "Ban"
+  has_many :subscriptions, lambda {order("tag_subscriptions.name")}, :class_name => "TagSubscription", :foreign_key => "creator_id"
   has_many :note_versions, :foreign_key => "updater_id"
-  has_many :dmails, :foreign_key => "owner_id", :order => "dmails.id desc"
+  has_many :dmails, lambda {order("dmails.id desc")}, :foreign_key => "owner_id"
   belongs_to :inviter, :class_name => "User"
   after_update :create_mod_action
 
@@ -207,7 +207,7 @@ class User < ActiveRecord::Base
     end
 
     def clean_favorite_count?
-      favorite_count < 0 || rand(100) < [Math.log(favorite_count, 2), 5].min
+      favorite_count < 0 || Kernel.rand(100) < [Math.log(favorite_count, 2), 5].min
     end
 
     def clean_favorite_count!
@@ -628,7 +628,7 @@ class User < ActiveRecord::Base
     end
 
     def search(params)
-      q = scoped
+      q = where("true")
       return q if params.blank?
 
       if params[:name].present?

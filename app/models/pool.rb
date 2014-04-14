@@ -6,7 +6,7 @@ class Pool < ActiveRecord::Base
   validates_inclusion_of :category, :in => %w(series collection)
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
-  has_many :versions, :class_name => "PoolVersion", :dependent => :destroy, :order => "pool_versions.id ASC"
+  has_many :versions, lambda {order("pool_versions.id ASC")}, :class_name => "PoolVersion", :dependent => :destroy
   before_validation :normalize_post_ids
   before_validation :normalize_name
   before_validation :initialize_is_active, :on => :create
@@ -46,7 +46,7 @@ class Pool < ActiveRecord::Base
     end
 
     def search(params)
-      q = scoped
+      q = where("true")
       params = {} if params.blank?
 
       if params[:name_matches].present?
@@ -105,7 +105,7 @@ class Pool < ActiveRecord::Base
     if name =~ /^\d+$/
       name.to_i
     else
-      select_value_sql("SELECT id FROM pools WHERE lower(name) = ?", name.mb_chars.downcase.tr(" ", "_")).to_i
+      select_value_sql("SELECT id FROM pools WHERE lower(name) = ?", name.downcase.tr(" ", "_")).to_i
     end
   end
 
@@ -314,10 +314,12 @@ class Pool < ActiveRecord::Base
     if post_ids_changed? || name_changed? || description_changed? || is_active_changed? || is_deleted_changed? || category_changed? || force
       last_version = versions.last
 
-      if last_version && CurrentUser.ip_addr == last_version.updater_ip_addr && CurrentUser.id == last_version.updater_id && last_version.created_at > 1.hour.ago
+      if last_version && last_version.updater_ip_addr == CurrentUser.ip_addr && CurrentUser.user.id == last_version.updater_id && last_version.created_at > 1.hour.ago
+        # merge
         last_version.update_column(:post_ids, post_ids)
         last_version.update_column(:name, name)
       else
+        # create
         versions.create(:post_ids => post_ids, :name => name)
       end
     end

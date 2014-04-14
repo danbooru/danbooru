@@ -111,9 +111,7 @@ class TagTest < ActiveSupport::TestCase
 
     should "not be lockable by a user" do
       @tag = FactoryGirl.create(:tag)
-      assert_raises(ActiveModel::MassAssignmentSecurity::Error) do
-        @tag.update_attributes({:is_locked => true}, :as => :member)
-      end
+      @tag.update_attributes({:is_locked => true}, :as => :member)
       @tag.reload
       assert_equal(false, @tag.is_locked?)
     end

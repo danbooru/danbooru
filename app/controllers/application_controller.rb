@@ -120,9 +120,9 @@ protected
 
   def secure_cookies_check
     if request.ssl?
-      Danbooru::Application.config.session_store :cookie_store, :key => '_danbooru_session', :secure => true
+      Rails.application.config.session_store :cookie_store, :key => '_danbooru_session', :secure => true
     else
-      Danbooru::Application.config.session_store :cookie_store, :key => '_danbooru_session', :secure => false
+      Rails.application.config.session_store :cookie_store, :key => '_danbooru_session', :secure => false
     end
   end
 end

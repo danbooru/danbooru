@@ -124,7 +124,7 @@ class Dmail < ActiveRecord::Base
     end
 
     def search(params)
-      q = scoped
+      q = where("true")
       return q if params.blank?
 
       if params[:message_matches].present?

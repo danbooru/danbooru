@@ -5,9 +5,10 @@ class JanitorTrial < ActiveRecord::Base
   after_create :promote_user
   validates_presence_of :user
   before_validation :initialize_creator
+  attr_accessible :user_id
 
   def self.search(params)
-    q = scoped
+    q = where("true")
     return q if params.blank?
 
     if params[:user_name]

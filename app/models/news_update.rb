@@ -4,6 +4,7 @@ class NewsUpdate < ActiveRecord::Base
   scope :recent, lambda {where("created_at >= ?", 2.weeks.ago).order("created_at desc").limit(5)}
   before_validation :initialize_creator, :on => :create
   before_validation :initialize_updater
+  attr_accessible :message
 
   def initialize_creator
     self.creator_id = CurrentUser.id

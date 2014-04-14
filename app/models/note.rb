@@ -3,17 +3,17 @@ class Note < ActiveRecord::Base
   belongs_to :post
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
+  has_many :versions, lambda {order("note_versions.id ASC")}, :class_name => "NoteVersion", :dependent => :destroy
   before_validation :initialize_creator, :on => :create
   before_validation :initialize_updater
   before_validation :blank_body
   validates_presence_of :post_id, :creator_id, :updater_id, :x, :y, :width, :height
   validate :post_must_exist
   validate :note_within_image, :message => "must be inside the image"
-  has_many :versions, :class_name => "NoteVersion", :dependent => :destroy, :order => "note_versions.id ASC"
   after_save :update_post
   after_save :create_version
   validate :post_must_not_be_note_locked
-  attr_accessible :x, :y, :width, :height, :body, :updater_id, :updater_ip_addr, :is_active, :post_id, :html_id
+  attr_accessible :x, :y, :width, :height, :body, :updater_id, :updater_ip_addr, :is_active, :post_id, :post, :html_id
 
   module SearchMethods
     def active
@@ -41,7 +41,7 @@ class Note < ActiveRecord::Base
     end
 
     def search(params)
-      q = scoped
+      q = where("true")
       return q if params.blank?
 
       if params[:body_matches].present?
@@ -144,7 +144,7 @@ class Note < ActiveRecord::Base
   end
 
   def update_post
-    if Note.exists?(["is_active = ? AND post_id = ?", true, post_id])
+    if Note.where(:is_active => true, :post_id => post_id).exists?
       execute_sql("UPDATE posts SET last_noted_at = ? WHERE id = ?", updated_at, post_id)
     else
       execute_sql("UPDATE posts SET last_noted_at = NULL WHERE id = ?", post_id)
@@ -153,7 +153,8 @@ class Note < ActiveRecord::Base
 
   def create_version
     CurrentUser.user.increment!(:note_update_count)
-    update_column(:version, version.to_i + 1)
+    Note.where(:id => id).update_all("version = coalesce(version, 0) + 1")
+    reload
 
     if merge_version?
       merge_version
@@ -227,14 +228,15 @@ class Note < ActiveRecord::Base
     new_note.save
   end
 
-  def self.undo_changes_by_user(user_id)
+  def self.undo_changes_by_user(vandal_id)
     transaction do
-      notes = Note.joins(:versions).where(["note_versions.updater_id = ?", user_id]).select("DISTINCT notes.*").all
-      NoteVersion.destroy_all(["updater_id = ?", user_id])
-      notes.each do |note|
-        first = note.versions.first
-        if first
-          note.revert_to!(first)
+      note_ids = NoteVersion.where(:updater_id => vandal_id).select("note_id").distinct.map(&:note_id)
+      NoteVersion.where(["updater_id = ?", vandal_id]).delete_all
+      note_ids.each do |note_id|
+        note = Note.find(note_id)
+        most_recent = note.versions.last
+        if most_recent
+          note.revert_to!(most_recent)
         end
       end
     end

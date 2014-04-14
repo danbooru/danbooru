@@ -17,7 +17,7 @@ class TagImplicationRequestsControllerTest < ActionController::TestCase
 
     context "new action" do
       should "render" do
-        get :new, {}, {:user => @user.id}
+        get :new, {}, {:user_id => @user.id}
         assert_response :success
       end
     end
@@ -25,7 +25,7 @@ class TagImplicationRequestsControllerTest < ActionController::TestCase
     context "create action" do
       should "render" do
         assert_difference("ForumTopic.count", 1) do
-          post :create, {:tag_implication_request => {:antecedent_name => "aaa", :consequent_name => "bbb", :reason => "ccc"}}, {:user => @user.id}
+          post :create, {:tag_implication_request => {:antecedent_name => "aaa", :consequent_name => "bbb", :reason => "ccc"}}, {:user_id => @user.id}
         end
         assert_redirected_to(forum_topic_path(ForumTopic.last))
       end

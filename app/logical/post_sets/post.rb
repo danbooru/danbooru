@@ -1,5 +1,5 @@
 module PostSets
-  class Post < Base
+  class Post < PostSets::Base
     attr_reader :tag_array, :page, :per_page, :raw
 
     def initialize(tags, page = 1, per_page = nil, raw = false)

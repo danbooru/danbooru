@@ -15,17 +15,17 @@
       <li><%= link_to "History", artist_versions_path(:search => {:artist_id => @artist.id}) %></li>
       <% if @artist.deletable_by?(CurrentUser.user) %>
         <% if @artist.is_active? %>
-          <li><%= link_to "Delete", artist_path(@artist), :method => :delete, :confirm => "Are you sure you want to delete this artist?" %></li>
+          <li><%= link_to "Delete", artist_path(@artist), :method => :delete, :data => {:confirm => "Are you sure you want to delete this artist?"} %></li>
         <% else %>
-          <li><%= link_to "Undelete", undelete_artist_path(@artist), :method => :post, :confirm => "Are you sure you want to undelete this artist?" %></li>
+          <li><%= link_to "Undelete", undelete_artist_path(@artist), :method => :post, :data => {:confirm => "Are you sure you want to undelete this artist?"} %></li>
         <% end %>
       <% end %>
       <% if CurrentUser.is_admin? %>
         <% if @artist.is_banned? %>
-          <li><%= link_to "Unban", unban_artist_path(@artist), :method => :put, :confirm => "Are you sure you want to unban this artist?" %></li>
+          <li><%= link_to "Unban", unban_artist_path(@artist), :method => :put, :data => {:confirm => "Are you sure you want to unban this artist?"} %></li>
 
         <% else %>
-          <li><%= link_to "Ban", ban_artist_path(@artist), :method => :put, :confirm => "Are you sure you want to ban this artist?" %></li>
+          <li><%= link_to "Ban", ban_artist_path(@artist), :method => :put, :data => {:confirm => "Are you sure you want to ban this artist?"} %></li>
         <% end %>
       <% end %>
     <% end %>

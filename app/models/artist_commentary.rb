@@ -2,7 +2,7 @@ class ArtistCommentary < ActiveRecord::Base
   attr_accessible :post_id, :original_description, :original_title, :translated_description, :translated_title
   validates_uniqueness_of :post_id
   belongs_to :post
-  has_many :versions, :class_name => "ArtistCommentaryVersion", :dependent => :destroy, :foreign_key => :post_id, :primary_key => :post_id, :order => "artist_commentary_versions.id ASC"
+  has_many :versions, lambda {order("artist_commentary_versions.id ASC")}, :class_name => "ArtistCommentaryVersion", :dependent => :destroy, :foreign_key => :post_id, :primary_key => :post_id
   after_save :create_version
 
   module SearchMethods
@@ -17,7 +17,7 @@ class ArtistCommentary < ActiveRecord::Base
     end
 
     def search(params)
-      q = scoped
+      q = where("true")
       params = {} if params.blank?
 
       if params[:text_matches].present?

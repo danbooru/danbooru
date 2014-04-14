@@ -28,11 +28,11 @@ class Post < ActiveRecord::Base
   has_one :artist_commentary, :dependent => :destroy
   has_many :flags, :class_name => "PostFlag", :dependent => :destroy
   has_many :appeals, :class_name => "PostAppeal", :dependent => :destroy
-  has_many :versions, :class_name => "PostVersion", :dependent => :destroy, :order => "post_versions.updated_at ASC, post_versions.id ASC"
+  has_many :versions, lambda {order("post_versions.updated_at ASC, post_versions.id ASC")}, :class_name => "PostVersion", :dependent => :destroy
   has_many :votes, :class_name => "PostVote", :dependent => :destroy
   has_many :notes, :dependent => :destroy
-  has_many :comments, :order => "comments.id", :dependent => :destroy
-  has_many :children, :class_name => "Post", :foreign_key => "parent_id", :order => "posts.id"
+  has_many :comments, lambda {order("comments.id")}, :dependent => :destroy
+  has_many :children, lambda {order("posts.id")}, :class_name => "Post", :foreign_key => "parent_id"
   has_many :disapprovals, :class_name => "PostDisapproval", :dependent => :destroy
   has_many :favorites, :dependent => :destroy
   validates_uniqueness_of :md5
@@ -315,22 +315,22 @@ class Post < ActiveRecord::Base
     end
 
     def increment_tag_post_counts
-      Tag.update_all("post_count = post_count + 1", {:name => tag_array}) if tag_array.any?
+      Tag.where(:name => tag_array).update_all("post_count = post_count + 1") if tag_array.any?
     end
 
     def decrement_tag_post_counts
-      Tag.update_all("post_count = post_count - 1", {:name => tag_array}) if tag_array.any?
+      Tag.where(:name => tag_array).update_all("post_count = post_count - 1") if tag_array.any?
     end
 
     def update_tag_post_counts
       decrement_tags = tag_array_was - tag_array
       increment_tags = tag_array - tag_array_was
       if increment_tags.any?
-        Tag.update_all("post_count = post_count + 1", {:name => increment_tags})
+        Tag.where(:name => increment_tags).update_all("post_count = post_count + 1")
         Post.expire_cache_for_all(increment_tags)
       end
       if decrement_tags.any?
-        Tag.update_all("post_count = post_count - 1", {:name => decrement_tags})
+        Tag.where(:name => decrement_tags).update_all("post_count = post_count - 1")
         Post.expire_cache_for_all(decrement_tags)
       end
       Post.expire_cache_for_all([""]) if new_record? || id <= 100_000
@@ -417,7 +417,7 @@ class Post < ActiveRecord::Base
 
     def remove_negated_tags(tags)
       negated_tags, tags = tags.partition {|x| x =~ /\A-/i}
-      negated_tags.map!{|x| x[1..-1]}
+      negated_tags = negated_tags.map {|x| x[1..-1]}
       return tags - negated_tags
     end
 
@@ -708,10 +708,10 @@ class Post < ActiveRecord::Base
     def vote!(score)
       if can_be_voted_by?(CurrentUser.user)
         if score == "up"
-          Post.update_all("score = score + 1, up_score = up_score + 1", {:id => id})
+          Post.where(:id => id).update_all("score = score + 1, up_score = up_score + 1")
           self.score += 1
         elsif score == "down"
-          Post.update_all("score = score - 1, down_score = down_score - 1", {:id => id})
+          Post.where(:id => id).update_all("score = score - 1, down_score = down_score - 1")
           self.score -= 1
         end
 
@@ -728,10 +728,10 @@ class Post < ActiveRecord::Base
         vote = votes.where("user_id = ?", CurrentUser.user.id).first
 
         if vote.score == 1
-          Post.update_all("score = score - 1, up_score = up_score - 1", {:id => id})
+          Post.where(:id => id).update_all("score = score - 1, up_score = up_score - 1")
           self.score -= 1
         else
-          Post.update_all("score = score + 1, down_score = down_score + 1", {:id => id})
+          Post.where(:id => id).update_all("score = score + 1, down_score = down_score + 1")
           self.score += 1
         end
 
@@ -890,7 +890,7 @@ class Post < ActiveRecord::Base
         eldest = cached_children[0]
         siblings = cached_children[1..-1]
         eldest.update_column(:parent_id, nil)
-        Post.update_all({:parent_id => eldest.id}, :id => siblings.map(&:id))
+        Post.where(:id => siblings.map(&:id)).update_all(:parent_id => eldest.id)
       end
     end
 
@@ -1008,7 +1008,7 @@ class Post < ActiveRecord::Base
     end
 
     def create_new_version
-      CurrentUser.increment!(:post_update_count)
+      CurrentUser.user.increment!(:post_update_count)
       versions.create(
         :rating => rating,
         :source => source,
@@ -1019,12 +1019,14 @@ class Post < ActiveRecord::Base
 
     def merge_version
       prev = versions.last
-      prev.update_attributes(
-        :rating => rating,
-        :source => source,
-        :tags => tag_string,
-        :parent_id => parent_id
-      )
+      if prev
+        prev.update_attributes(
+          :rating => rating,
+          :source => source,
+          :tags => tag_string,
+          :parent_id => parent_id
+        )
+      end
     end
 
     def revert_to(target)
@@ -1236,7 +1238,7 @@ class Post < ActiveRecord::Base
     end
 
     def search(params)
-      q = scoped
+      q = where("true")
       return q if params.blank?
 
       if params[:before_id].present?

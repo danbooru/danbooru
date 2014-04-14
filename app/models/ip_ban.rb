@@ -5,13 +5,14 @@ class IpBan < ActiveRecord::Base
   validates_presence_of :reason, :creator, :ip_addr
   validates_format_of :ip_addr, :with => IP_ADDR_REGEX
   validates_uniqueness_of :ip_addr, :if => lambda {|rec| rec.ip_addr =~ IP_ADDR_REGEX}
+  attr_accessible :ip_addr, :reason
 
   def self.is_banned?(ip_addr)
     exists?(["ip_addr = ?", ip_addr])
   end
 
   def self.search(params)
-    q = scoped
+    q = where("true")
     return q if params.blank?
 
     if params[:ip_addr].present?
@@ -36,7 +37,7 @@ class IpBan < ActiveRecord::Base
   end
 
   def self.count_by_ip_addr(table, user_ids, user_id_field = "user_id", ip_addr_field = "ip_addr")
-    select_all_sql("SELECT #{ip_addr_field}, count(*) FROM #{table} WHERE #{user_id_field} IN (?) GROUP BY #{ip_addr_field} ORDER BY count(*) DESC", user_ids)
+    select_all_sql("SELECT #{ip_addr_field}, count(*) FROM #{table} WHERE #{user_id_field} IN (?) GROUP BY #{ip_addr_field} ORDER BY count(*) DESC", user_ids).to_hash
   end
 
   def initialize_creator

@@ -27,7 +27,7 @@
           <% if forum_post.is_deleted %>
             <li><%= link_to "Undelete", undelete_forum_post_path(forum_post.id), :method => :post, :remote => true %></li>
           <% else %>
-            <li><%= link_to "Delete", forum_post_path(forum_post.id), :confirm => "Are you sure you want to delete this forum post?", :method => :delete, :remote => true %></li>
+            <li><%= link_to "Delete", forum_post_path(forum_post.id), :data => {:confirm => "Are you sure you want to delete this forum post?"}, :method => :delete, :remote => true %></li>
           <% end %>
         <% end %>
         <% if forum_post.editable_by?(CurrentUser.user) %>

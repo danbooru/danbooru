@@ -1169,7 +1169,7 @@ class PostTest < ActiveSupport::TestCase
       post3.add_pool!(pool2)
       relation = Post.tag_match("pool:test*")
       assert_equal(2, relation.count)
-      assert_equal([post3.id, post1.id], relation.all.map!(&:id))
+      assert_equal([post3.id, post1.id], relation.all.map(&:id))
     end
 
     should "return posts for the <user> metatag" do

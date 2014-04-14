@@ -1,5 +1,5 @@
 module PostSets
-  class Popular < Base
+  class Popular < PostSets::Base
     attr_reader :date, :scale
 
     def initialize(date, scale)

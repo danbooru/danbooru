@@ -8,4 +8,4 @@ if defined? Unicorn
   use Unicorn::OobGC
 end
 
-run Danbooru::Application
+run Rails.application

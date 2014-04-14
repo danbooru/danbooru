@@ -1,5 +1,5 @@
 module PostSets
-  class Note < Post
+  class Note < PostSets::Post
     attr_reader :params
     
     def initialize(params)

@@ -15,7 +15,7 @@ class Ban < ActiveRecord::Base
   end
 
   def self.search(params)
-    q = scoped
+    q = where("true")
     return q if params.blank?
 
     if params[:banner_name]

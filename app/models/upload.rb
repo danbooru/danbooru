@@ -13,6 +13,7 @@ class Upload < ActiveRecord::Base
   after_destroy :delete_temp_file
   validate :uploader_is_not_limited, :on => :create
   validate :file_or_source_is_present, :on => :create
+  attr_accessible :file, :image_width, :image_height, :file_ext, :md5, :file_size, :as_pending, :source, :file_path, :content_type, :rating, :tag_string, :status, :backtrace, :post_id, :md5_confirmation
 
   module ValidationMethods
     def uploader_is_not_limited
@@ -316,7 +317,7 @@ class Upload < ActiveRecord::Base
     end
 
     def search(params)
-      q = scoped
+      q = where("true")
       return q if params.blank?
 
       if params[:uploader_id].present?

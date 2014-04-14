@@ -3,7 +3,7 @@ unless defined?(MEMCACHE)
 end
 
 if Rails.env.production?
-  Danbooru::Application.configure do
+  Rails.application.configure do
     config.cache_store = :dalli_store, Danbooru.config.memcached_servers
   end
 end

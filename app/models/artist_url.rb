@@ -2,6 +2,7 @@ class ArtistUrl < ActiveRecord::Base
   before_save :normalize
   validates_presence_of :url
   belongs_to :artist
+  attr_accessible :url, :artist_id, :normalized_url
 
   def self.normalize(url)
     if url.nil?

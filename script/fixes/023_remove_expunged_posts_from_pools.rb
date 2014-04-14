@@ -7,7 +7,7 @@ ActiveRecord::Base.connection.execute("set statement_timeout = 0")
 CurrentUser.user = User.admins.first
 CurrentUser.ip_addr = "127.0.0.1"
 
-live_post_ids = Post.order("id asc").all(:select => "id").map!(&:id)
+live_post_ids = Post.order("id asc").all(:select => "id").map(&:id)
 all_post_ids = (1..live_post_ids.last).to_a
 dead_post_ids = all_post_ids - live_post_ids
 

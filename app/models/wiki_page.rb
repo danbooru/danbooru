@@ -12,8 +12,8 @@ class WikiPage < ActiveRecord::Base
   validate :validate_not_locked
   attr_accessible :title, :body, :is_locked
   has_one :tag, :foreign_key => "name", :primary_key => "title"
-  has_one :artist, :foreign_key => "name", :primary_key => "title", :conditions => {:is_active => true}
-  has_many :versions, :class_name => "WikiPageVersion", :dependent => :destroy, :order => "wiki_page_versions.id ASC"
+  has_one :artist, lambda {where(:is_active => true)}, :foreign_key => "name", :primary_key => "title"
+  has_many :versions, lambda {order("wiki_page_versions.id ASC")}, :class_name => "WikiPageVersion", :dependent => :destroy
 
   module SearchMethods
     def titled(title)
@@ -33,7 +33,7 @@ class WikiPage < ActiveRecord::Base
     end
 
     def search(params = {})
-      q = scoped
+      q = where("true")
       params = {} if params.blank?
 
       if params[:title].present?

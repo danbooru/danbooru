@@ -9,6 +9,7 @@ class TagAlias < ActiveRecord::Base
   validate :absence_of_transitive_relation
   belongs_to :creator, :class_name => "User"
   belongs_to :forum_topic
+  attr_accessible :antecedent_name, :consequent_name, :forum_topic_id, :status
 
   module SearchMethods
     def name_matches(name)
@@ -20,7 +21,7 @@ class TagAlias < ActiveRecord::Base
     end
 
     def search(params)
-      q = scoped
+      q = where("true")
       return q if params.blank?
 
       if params[:name_matches].present?

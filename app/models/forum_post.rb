@@ -46,7 +46,7 @@ class ForumPost < ActiveRecord::Base
     end
 
     def search(params)
-      q = scoped
+      q = where("true")
       return q if params.blank?
 
       if params[:creator_id].present?
@@ -109,7 +109,7 @@ class ForumPost < ActiveRecord::Base
   def update_topic_updated_at_on_create
     if topic
       # need to do this to bypass the topic's original post from getting touched
-      ForumTopic.update_all(["updater_id = ?, response_count = response_count + 1, updated_at = ?", CurrentUser.id, Time.now], {:id => topic.id})
+      ForumTopic.where(:id => topic.id).update_all(["updater_id = ?, response_count = response_count + 1, updated_at = ?", CurrentUser.id, Time.now])
     end
   end
 
@@ -132,9 +132,9 @@ class ForumPost < ActiveRecord::Base
   def update_topic_updated_at_on_destroy
     max = ForumPost.where(:topic_id => topic.id, :is_deleted => false).order("updated_at desc").first
     if max
-      ForumTopic.update_all(["response_count = response_count - 1, updated_at = ?, updater_id = ?", max.updated_at, max.updater_id], {:id => topic.id})
+      ForumTopic.where(:id => topic.id).update_all(["response_count = response_count - 1, updated_at = ?, updater_id = ?", max.updated_at, max.updater_id])
     else
-      ForumTopic.update_all(["response_count = response_count - 1"], {:id => topic.id})
+      ForumTopic.where(:id => topic.id).update_all("response_count = response_count - 1")
     end
   end
 

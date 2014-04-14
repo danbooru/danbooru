@@ -5,7 +5,7 @@
     <%= error_messages_for "ip_ban" %>
 
     <%= simple_form_for(@ip_ban) do |f| %>
-      <%= f.input :ip_addr, :label => "IP Address" %>
+      <%= f.input :ip_addr, :label => "IP Address", :as => :string %>
       <%= f.input :reason, :input_html => {:size => "50x5"} %>
       <%= f.button :submit, "Submit" %>
     <% end %>

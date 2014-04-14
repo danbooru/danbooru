@@ -5,6 +5,7 @@ class PostVote < ActiveRecord::Base
   before_validation :initialize_user, :on => :create
   validates_presence_of :post_id, :user_id, :score
   validates_inclusion_of :score, :in => [1, -1]
+  attr_accessible :post_id, :user_id, :score
 
   def score=(x)
     if x == "up"

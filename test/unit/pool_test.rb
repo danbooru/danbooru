@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'test_helper'
 
 class PoolTest < ActiveSupport::TestCase
@@ -20,6 +22,16 @@ class PoolTest < ActiveSupport::TestCase
 
     should "be mapped to a pool id" do
       assert_equal(@pool.id, Pool.name_to_id("xxx"))
+    end
+  end
+
+  context "A multibyte character name" do
+    setup do
+      @mb_pool = FactoryGirl.create(:pool, :name => "àáâãäå")
+    end
+
+    should "be mapped to a pool id" do
+      assert_equal(@mb_pool.id, Pool.name_to_id("àáâãäå"))
     end
   end
 
@@ -188,14 +200,24 @@ class PoolTest < ActiveSupport::TestCase
     end
 
     should "create new versions for each distinct user" do
-      assert_equal(1, @pool.versions(true).size)
-      @pool.post_ids = "#{@p1.id}"
-      CurrentUser.ip_addr = "1.2.3.4"
-      @pool.save
-      assert_equal(2, @pool.versions(true).size)
-      @pool.post_ids = "#{@p1.id} #{@p2.id}"
-      @pool.save
-      assert_equal(2, @pool.versions(true).size)
+      assert_equal(1, @pool.versions.size)
+      user2 = FactoryGirl.create(:user)
+
+      CurrentUser.scoped(user2, "127.0.0.2") do
+        @pool.post_ids = "#{@p1.id}"
+        @pool.save
+      end
+
+      @pool.reload
+      assert_equal(2, @pool.versions.size)
+
+      CurrentUser.scoped(user2, "127.0.0.2") do
+        @pool.post_ids = "#{@p1.id} #{@p2.id}"
+        @pool.save
+      end
+
+      @pool.reload
+      assert_equal(2, @pool.versions.size)
     end
 
     should "know what its post ids were previously" do

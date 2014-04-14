@@ -9,6 +9,7 @@ class PostFlag < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   validates_uniqueness_of :creator_id, :scope => :post_id, :message => "have already flagged this post"
   before_save :update_post
+  attr_accessible :post, :post_id, :reason, :is_resolved
 
   module SearchMethods
     def resolved
@@ -32,7 +33,7 @@ class PostFlag < ActiveRecord::Base
     end
 
     def search(params)
-      q = scoped
+      q = where("true")
       return q if params.blank?
 
       if params[:creator_id].present? && (CurrentUser.user.is_janitor? || params[:creator_id].to_i == CurrentUser.user.id)

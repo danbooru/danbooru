@@ -3,6 +3,7 @@ class Advertisement < ActiveRecord::Base
   has_many :hits, :class_name => "AdvertisementHit"
   after_create :copy_to_servers
   after_destroy :delete_from_servers
+  attr_accessible :ad_type, :width, :height, :referral_url, :status, :file_name, :is_work_safe, :hit_count
 
   def copy_to_servers
     RemoteFileManager.new(image_path).distribute

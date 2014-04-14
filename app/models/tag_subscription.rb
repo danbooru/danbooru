@@ -39,7 +39,7 @@ class TagSubscription < ActiveRecord::Base
   end
 
   def tag_query_array
-    tag_query.scan(/[^\r\n]+/).map!(&:strip)
+    tag_query.scan(/[^\r\n]+/).map(&:strip)
   end
 
   def limit_tag_count
@@ -80,7 +80,7 @@ class TagSubscription < ActiveRecord::Base
     end
 
     def search(params)
-      q = scoped
+      q = where("true")
       params = {} if params.blank?
 
       if params[:creator_id]

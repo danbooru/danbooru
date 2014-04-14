@@ -11,14 +11,12 @@ group :test do
   gem "timecop"
 end
 
-group :assets do
-  gem "sass-rails"
-  gem "uglifier", ">= 1.0.3"
-  gem "therubyracer", :platforms => :ruby
-end
-
+gem 'protected_attributes'
+gem "sass-rails", "~> 4.0.0"
+gem "uglifier"
+gem "therubyracer", :platforms => :ruby
 gem "pry", :group => [:test, :development]
-gem "rails"
+gem "rails", "~> 4.1.0"
 gem "pg"
 gem "kgio"
 gem "dalli"
@@ -37,10 +35,14 @@ gem 'newrelic_rpm'
 gem 'term-ansicolor', :require => "term/ansicolor"
 gem 'diff-lcs', :require => "diff/lcs/array"
 gem 'bcrypt-ruby', :require => "bcrypt"
-gem 'aws-s3', :require => "aws/s3"
 gem 'awesome_print'
 gem 'statistics2'
+
+# needed for looser jpeg header compat
 gem 'ruby-imagespec', :require => "image_spec", :git => "https://github.com/r888888888/ruby-imagespec.git", :branch => "exif-fixes"
+
+# needed for rails 4.1.0 compat
+gem 'aws-s3', :require => "aws/s3", :git => "https://github.com/fnando/aws-s3.git"
 
 group :production do
   gem 'unicorn', :platforms => :ruby

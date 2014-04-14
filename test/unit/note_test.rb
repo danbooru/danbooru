@@ -144,8 +144,15 @@ class NoteTest < ActiveSupport::TestCase
 
       context "the act of undoing all changes by that user" do
         should "revert any affected notes" do
-          Note.undo_changes_by_user(@vandal.id)
+          assert_equal(2, NoteVersion.count)
+          assert_equal([1, 2], @note.versions.map(&:version))
+          assert_equal([@user.id, @vandal.id], @note.versions.map(&:updater_id))
+          Timecop.travel(1.day.from_now) do
+            Note.undo_changes_by_user(@vandal.id)
+          end
           @note.reload
+          assert_equal([1, 3], @note.versions.map(&:version))
+          assert_equal([@user.id, @user.id], @note.versions.map(&:updater_id))
           assert_equal(5, @note.x)
           assert_equal(5, @note.y)
         end
