@@ -203,4 +203,8 @@ class WikiPage < ActiveRecord::Base
   def create_mod_action_for_destroy
     ModAction.create(:description => "permanently deleted wiki page [[#{title}]]")
   end
+
+  def visible?
+    artist.blank? || !artist.is_banned? || CurrentUser.user.is_janitor?
+  end
 end

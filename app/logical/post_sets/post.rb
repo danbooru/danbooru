@@ -35,11 +35,11 @@ module PostSets
     end
 
     def has_artist?
-      is_single_tag? && ::Artist.named(tag_string).active.exists?
+      is_single_tag? && artist.present? && artist.visible?
     end
 
     def artist
-      ::Artist.named(tag_string).active.first
+      @artist ||= ::Artist.named(tag_string).active.first
     end
 
     def pool_name

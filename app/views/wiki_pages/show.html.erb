@@ -13,16 +13,20 @@
       </h1>
 
       <div id="wiki-page-body" class="prose">
-        <%= format_text(@wiki_page.body) %>
+        <% if @wiki_page.visible? %>
+          <%= format_text(@wiki_page.body) %>
 
-        <% if @wiki_page.artist %>
-          <p><%= link_to "View artist", @wiki_page.artist %></p>
+          <% if @wiki_page.artist %>
+            <p><%= link_to "View artist", @wiki_page.artist %></p>
+          <% end %>
+
+          <%= wiki_page_alias_and_implication_list(@wiki_page) %>
+        <% else %>
+          <p>This artist has requested removal of their information.</p>
         <% end %>
-
-        <%= wiki_page_alias_and_implication_list(@wiki_page) %>
       </div>
 
-      <%= wiki_page_post_previews(@wiki_page) %>
+        <%= wiki_page_post_previews(@wiki_page) %>
     </section>
   </div>
 </div>

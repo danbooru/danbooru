@@ -1,6 +1,7 @@
 class WikiPageVersion < ActiveRecord::Base
   belongs_to :wiki_page
   belongs_to :updater, :class_name => "User"
+  belongs_to :artist
   attr_accessible :wiki_page_id, :title, :body, :is_locked, :updater_id, :updater_ip_addr, :version
 
   module SearchMethods
@@ -37,4 +38,9 @@ class WikiPageVersion < ActiveRecord::Base
   def category_name
     Tag.category_for(title)
   end
+
+  def visible?
+    artist.blank? || !artist.is_banned? || CurrentUser.user.is_janitor?
+  end
+
 end
