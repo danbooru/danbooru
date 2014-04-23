@@ -43,7 +43,7 @@
   </header>
 
   <div id="page">
-    <% if CurrentUser.is_anonymous? && session[:started_at] && session[:started_at] < 1.minute.ago && cookies[:hide_sign_up_notice].blank? %>
+    <% if CurrentUser.is_anonymous? && session[:started_at].is_a?(ActiveSupport::TimeWithZone) && session[:started_at] < 1.minute.ago && cookies[:hide_sign_up_notice].blank? %>
       <%= render "users/sign_up_notice" %>
     <% end %>
 
