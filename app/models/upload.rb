@@ -201,13 +201,13 @@ class Upload < ActiveRecord::Base
 
     def file_header_to_content_type(source_path)
       case File.read(source_path, 10)
-      when /^\xff\xd8/
+      when /^\xff\xd8/n
         "image/jpeg"
 
       when /^GIF87a/, /^GIF89a/
         "image/gif"
 
-      when /^\x89PNG\r\n\x1a\n/
+      when /^\x89PNG\r\n\x1a\n/n
         "image/png"
 
       when /^CWS/, /^FWS/, /^ZWS/
