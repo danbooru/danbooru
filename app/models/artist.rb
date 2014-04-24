@@ -431,4 +431,8 @@ class Artist < ActiveRecord::Base
   def deletable_by?(user)
     user.is_builder?
   end
+
+  def visible?
+    !is_banned? || CurrentUser.user.is_janitor?
+  end
 end

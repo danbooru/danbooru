@@ -69,6 +69,9 @@ protected
       fmt.json do
         render :json => {:success => false, :reason => "access denied"}.to_json, :status => 403
       end
+      fmt.js do
+        render :nothing => true, :status => 403
+      end
     end
   end
 
@@ -106,10 +109,15 @@ protected
 
   def normalize_search
     if request.get?
-      params[:search] ||= {}
-      changed = params[:search].reject! {|k,v| v.blank?}
-      unless changed.nil?
-        redirect_to params
+      if params[:search].blank?
+        params[:search] = {}
+      end
+
+      if params[:search].is_a?(Hash)
+        changed = params[:search].reject! {|k,v| v.blank?}
+        unless changed.nil?
+          redirect_to params
+        end
       end
     end
   end

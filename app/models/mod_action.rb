@@ -4,7 +4,7 @@ class ModAction < ActiveRecord::Base
   attr_accessible :description
 
   def self.search(params = {})
-    q = scoped
+    q = where("true")
     return q if params.blank?
 
     if params[:creator_id].present?

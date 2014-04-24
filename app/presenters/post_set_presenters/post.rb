@@ -31,7 +31,7 @@ module PostSetPresenters
     end
 
     def pattern_tags
-      Tag.name_matches(post_set.tag_string).all(:select => "name", :limit => Danbooru.config.tag_query_limit, :order => "post_count DESC").map(&:name)
+      Tag.name_matches(post_set.tag_string).select("name").limit(Danbooru.config.tag_query_limit).order("post_count DESC").map(&:name)
     end
 
     def related_tags_for_group

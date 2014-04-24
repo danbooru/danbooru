@@ -5,7 +5,7 @@ class ArtistCommentaryVersion < ActiveRecord::Base
   attr_accessible :post_id, :original_title, :original_description, :translated_title, :translated_description
 
   def self.search(params)
-    q = scoped
+    q = where("true")
     params = {} if params.blank?
 
     if params[:updater_id]

@@ -75,7 +75,7 @@ class UserPresenter
 
   def favorites
     @favorites ||= begin
-      arel = user.favorites.limit(6).includes(:post).reorder("favorites.id desc")
+      arel = user.favorites.limit(6).joins(:post).reorder("favorites.id desc")
 
       if CurrentUser.user.hide_deleted_posts?
         arel = arel.where("posts.is_deleted = false")
