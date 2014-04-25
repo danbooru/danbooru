@@ -99,6 +99,10 @@ class MockMemcache
   end
 end
 
+if defined?(MEMCACHE)
+  Object.send(:remove_const, :MEMCACHE)
+end
+
 MEMCACHE = MockMemcache.new
 
 VCR.configure do |c|
