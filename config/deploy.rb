@@ -115,7 +115,7 @@ namespace :deploy do
 
   desc "Precompiles assets"
   task :precompile_assets do
-    run "cd #{current_path}; bundle exec rake assets:precompile"
+    run "cd #{current_path}; RAILS_ENV=#{rails_env} bundle exec rake assets:precompile"
   end
 end
 

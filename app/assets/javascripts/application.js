@@ -6,5 +6,4 @@
 //= require jquery.storageapi.js
 //= require rails.js
 //= require common.js
-//= require_self
 //= require_tree .
