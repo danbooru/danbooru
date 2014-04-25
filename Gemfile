@@ -13,7 +13,9 @@ end
 
 gem 'protected_attributes'
 gem "sass-rails", "~> 4.0.0"
+gem "sprockets-rails", :require => "sprockets/railtie"
 gem "uglifier"
+gem 'coffee-rails'
 gem "therubyracer", :platforms => :ruby
 gem "pry", :group => [:test, :development]
 gem "rails", "~> 4.1.0"
