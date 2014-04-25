@@ -63,3 +63,6 @@ group :development do
   # gem 'sql-logging'
 end
 
+group :development, :test do
+  gem 'pry'
+end
