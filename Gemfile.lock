@@ -255,6 +255,7 @@ DEPENDENCIES
   shoulda
   simple_form
   simplecov
+  sprockets-rails
   sql-logging
   statistics2
   term-ansicolor

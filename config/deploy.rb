@@ -116,7 +116,7 @@ namespace :deploy do
   desc "Precompiles assets"
   task :precompile_assets do
     run "cd #{current_path}; RAILS_ENV=#{rails_env} bundle exec rake assets:precompile"
-    run "cd #{current_path}/public/assets; cp application-*.js application.js ; cp application-*.css application.css"
+    # run "cd #{current_path}/public/assets; cp application-*.js application.js ; cp application-*.css application.css"
   end
 end
 
