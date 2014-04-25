@@ -25,7 +25,7 @@ module PostSets
     end
 
     def posts
-      favorites.includes(:post).map(&:post).compact
+      @posts ||= favorites.includes(:post).map(&:post).compact
     end
 
     def presenter
