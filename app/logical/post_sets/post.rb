@@ -73,7 +73,7 @@ module PostSets
         else
           temp = ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
         end
-        temp.all
+        temp.each # hack to force rails to eager load
         temp
       end
     end

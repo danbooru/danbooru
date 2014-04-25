@@ -13,7 +13,7 @@ class AdvertisementsController < ApplicationController
   end
 
   def index
-    @advertisements = Advertisement.order("id desc").all
+    @advertisements = Advertisement.order("id desc")
     @start_date = 1.month.ago.to_date
     @end_date = Date.today
   end

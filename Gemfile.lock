@@ -183,6 +183,8 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (~> 2.8)
+    sql-logging (3.0.8)
+      rails (> 3.0.0)
     statistics2 (0.54)
     term-ansicolor (1.3.0)
       tins (~> 1.0)
@@ -253,6 +255,7 @@ DEPENDENCIES
   shoulda
   simple_form
   simplecov
+  sql-logging
   statistics2
   term-ansicolor
   therubyracer

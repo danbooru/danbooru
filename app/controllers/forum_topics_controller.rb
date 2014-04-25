@@ -31,7 +31,7 @@ class ForumTopicsController < ApplicationController
   def show
     @forum_topic = ForumTopic.find(params[:id])
     @forum_posts = ForumPost.search(:topic_id => @forum_topic.id).order("forum_posts.id").paginate(params[:page])
-    @forum_posts.all
+    @forum_posts.each # hack to force rails to eager load
     respond_with(@forum_topic)
     unless CurrentUser.user.is_anonymous?
       session[:read_forum_topics] = @forum_topic.mark_as_read(read_forum_topic_ids)

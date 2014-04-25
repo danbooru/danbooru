@@ -29,7 +29,7 @@ class TagImplication < ActiveRecord::Base
 
           until children.empty?
             all.concat(children)
-            children = TagImplication.where("antecedent_name IN (?) and status in (?)", children, ["active", "processing"]).all.map(&:consequent_name)
+            children = TagImplication.where("antecedent_name IN (?) and status in (?)", children, ["active", "processing"]).map(&:consequent_name)
           end
         end.sort.uniq
       end

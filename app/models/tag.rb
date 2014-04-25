@@ -607,7 +607,7 @@ class Tag < ActiveRecord::Base
         search_for = "%" + query.to_escaped_for_sql_like + "%"
       end
 
-      Tag.where(["name LIKE ? ESCAPE E'\\\\' AND post_count > 0 AND name <> ?", search_for, query]).all(:order => "post_count DESC", :limit => 6, :select => "name").map(&:name).sort
+      Tag.where(["name LIKE ? ESCAPE E'\\\\' AND post_count > 0 AND name <> ?", search_for, query]).order("post_count DESC").limit(6).select("name").map(&:name).sort
     end
   end
 

@@ -32,7 +32,7 @@ class UserNameChangeRequest < ActiveRecord::Base
   end
   
   def feedback
-    UserFeedback.for_user(user_id).order("id desc").all
+    UserFeedback.for_user(user_id).order("id desc")
   end
   
   def notify_admins

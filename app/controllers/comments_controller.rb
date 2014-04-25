@@ -79,7 +79,7 @@ private
 
   def index_by_post
     @posts = Post.where("last_comment_bumped_at IS NOT NULL").tag_match(params[:tags]).reorder("last_comment_bumped_at DESC").paginate(params[:page], :limit => 5, :search_count => params[:search])
-    @posts.all
+    @posts.each # hack to force rails to eager load
     respond_with(@posts) do |format|
       format.html {render :action => "index_by_post"}
       format.xml do
