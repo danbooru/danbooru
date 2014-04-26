@@ -257,6 +257,7 @@ Rails.application.routes.draw do
       get :diff
     end
   end
+  resources :iqdb_queries, :only => [:create]
 
   # aliases
   resources :wpages, :controller => "wiki_pages"
@@ -264,7 +265,6 @@ Rails.application.routes.draw do
   resources :fposts, :controller => "forum_posts"
   get "/m/posts", :controller => "mobile/posts", :action => "index"
   get "/m/posts/:id", :controller => "mobile/posts", :action => "show"
-  get "/iqdb/similar_by_source", :controller => "iqdb", :action => "similar_by_source"
 
   # legacy aliases
   get "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}&search[name]=#{CGI::escape(req.params[:name].to_s)}"}

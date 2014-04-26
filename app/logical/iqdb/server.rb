@@ -7,6 +7,10 @@ module Iqdb
 
     attr_reader :hostname, :port, :socket
 
+    def self.default
+      new(*Danbooru.config.iqdb_hostname_and_port)
+    end
+
     def initialize(hostname, port)
       @hostname = hostname
       @port = port
@@ -42,6 +46,15 @@ module Iqdb
         socket.puts "remove 0 #{hex}"
         socket.puts "done"
         socket.read
+      end
+    end
+
+    def similar(post_id, results, flags = FLAG_DISCARD_COMMON_COEFFS)
+      request do
+        hex_id = post_id.to_s(16)
+        socket.puts "sim 0 #{flags} #{results} #{hex_id}"
+        socket.puts "done"
+        responses = Responses::Collection.new(@socket.read)
       end
     end
 
