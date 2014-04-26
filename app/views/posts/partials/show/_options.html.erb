@@ -14,7 +14,7 @@
   <% if CurrentUser.is_builder? && post.has_notes? %>
     <li id="copy-all-notes-list"><%= link_to "Copy all notes", "#", :id => "copy-notes" %></li>
   <% end %>
-  <li><%= link_to "Find similar", "http://danbooru.iqdb.org/db-search.php?url=http://#{Danbooru.config.hostname}#{post.preview_file_url}" %></li>
+  <li><%= link_to "Find similar", iqdb_queries_path(:post_id => post.id), :method => :post, :remote => true %></li>
 
   <% if post.is_status_locked? %>
     <li><span id="status-locked-notice">Status locked</span></li>
