@@ -379,6 +379,10 @@ class Artist < ActiveRecord::Base
         q = q.where("creator_id = ?", params[:creator_id].to_i)
       end
 
+      if params[:empty_only] == "true"
+        q = q.joins(:tag).where("tags.post_count = 0")
+      end
+
       q
     end
   end
