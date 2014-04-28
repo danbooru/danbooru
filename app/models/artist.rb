@@ -30,7 +30,10 @@ class Artist < ActiveRecord::Base
           u = u.to_escaped_for_sql_like.gsub(/\*/, '%') + '%'
           artists += Artist.joins(:urls).where(["artists.is_active = TRUE AND artist_urls.normalized_url LIKE ? ESCAPE E'\\\\'", u]).limit(10).order("artists.name").all
           url = File.dirname(url) + "/"
-          break if url =~ /pixiv\.net\/(?:img\/)?$/
+          break if url =~ /pixiv\.net\/(?:img\/)?$/i
+          break if url =~ /lohas\.nicoseiga\.jp\/priv\/$/i
+          break if url =~ /media\.tumblr\.com\/[a-z0-9]+\/$/i
+          break if url =~ /deviantart\.net\//i
         end
 
         artists.inject({}) {|h, x| h[x.name] = x; h}.values.slice(0, 20)
