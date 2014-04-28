@@ -1,5 +1,5 @@
 <% if params[:url] %>
-  <%= image_tag(params[:url], :title => "Preview", :id => "image") %>
+  <%= image_tag(@normalized_url, :title => "Preview", :id => "image") %>
   <% if params[:ref] %>
     <p><strong>Referrer: </strong> <%= params[:ref] %></p>
   <% end %>

@@ -8,6 +8,15 @@ class UploadsController < ApplicationController
     @upload = Upload.new(:rating => "q")
     if params[:url]
       @post = Post.find_by_source(params[:url])
+
+      @normalized_url = params[:url]
+      headers = {
+        "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
+      }
+      Downloads::Strategies::Base.strategies.each do |strategy|
+        @normalized_url, headers = strategy.new.rewrite(@normalized_url, headers)
+      end
+
       begin
         @source = Sources::Site.new(params[:url])
       rescue Exception
