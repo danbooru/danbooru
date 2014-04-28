@@ -46,6 +46,7 @@
 
     $fields_multiple.autocomplete({
       delay: 100,
+      autoFocus: true,
       focus: function() {
         return false;
       },
@@ -148,6 +149,7 @@
 
     $fields_single.autocomplete({
       minLength: 1,
+      autoFocus: true,
       source: function(req, resp) {
         Danbooru.Autocomplete.normal_source(req.term, resp);
       }
