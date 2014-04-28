@@ -2,7 +2,7 @@ module Downloads
   module Strategies
     class DeviantArt < Base
       def rewrite(url, headers)
-        if url =~ /https?:\/\/(?:\w+\.)?deviantart\.(?:com|net)/
+        if url =~ /https?:\/\/(?:.+?\.)?deviantart\.(?:com|net)/
           url, headers = rewrite_html_pages(url, headers)
           url, headers = rewrite_thumbnails(url, headers)
         end
@@ -12,7 +12,7 @@ module Downloads
 
     protected
       def rewrite_html_pages(url, headers)
-        if url =~ %r{^http://\w+\.deviantart\.com/art/\w+}
+        if url =~ %r{^http://.+?\.deviantart\.com/art/}
           source = ::Sources::Strategies::DeviantArt.new(url)
           source.get
           return [source.image_url, headers]
@@ -22,10 +22,10 @@ module Downloads
       end
 
       def rewrite_thumbnails(url, headers)
-        if url =~ %r{^(http://\w+.deviantart.net/\w+/)200H/}
+        if url =~ %r{^(http://.+?\.deviantart\.net/.+?/)200H/}
           match = $1
           url.sub!(match + "200H/", match)
-        elsif url =~ %r{^(http://\w+.deviantart.net/\w+/)PRE/}
+        elsif url =~ %r{^(http://.+?\.deviantart\.net/.+?/)PRE/}
           match = $1
           url.sub!(match + "PRE/", match)
         end

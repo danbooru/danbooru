@@ -2,7 +2,7 @@ module Sources
   module Strategies
     class DeviantArt < Base
       def self.url_match?(url)
-        url =~ /^https?:\/\/(?:\w+\.)?deviantart\.(?:com|net)/
+        url =~ /^https?:\/\/(?:.+?\.)?deviantart\.(?:com|net)/
       end
 
       def site_name
@@ -10,7 +10,7 @@ module Sources
       end
 
       def unique_id
-        profile_url =~ /https?:\/\/(\w+)\.deviantart\.com/
+        profile_url =~ /https?:\/\/(.+?)\.deviantart\.com/
         "deviantart" + $1
       end
 
