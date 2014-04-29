@@ -2,7 +2,7 @@ module Downloads
   module Strategies
     class Base
       def self.strategies
-        [Pixiv, Twitpic, DeviantArt, Tumblr]
+        [Pixiv, NicoSeiga, Twitpic, DeviantArt, Tumblr]
       end
 
       def rewrite(url, headers)

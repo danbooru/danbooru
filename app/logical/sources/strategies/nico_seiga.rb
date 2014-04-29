@@ -15,7 +15,7 @@ module Sources
       end
 
       def get
-        agent.get(url) do |page|
+        agent.get(normalized_url) do |page|
           @artist_name, @profile_url = get_profile_from_page(page)
           @image_url = get_image_url_from_page(page)
           @tags = get_tags_from_page(page)
@@ -39,10 +39,10 @@ module Sources
       end
 
       def get_image_url_from_page(page)
-        meta = page.search("meta[property='og:image']")
+        link = page.search("a#illust_link")
 
-        if meta.any?
-          meta[0]["content"]
+        if link.any?
+          "http://seiga.nicovideo.jp" + link[0]["href"]
         else
           nil
         end
@@ -56,16 +56,36 @@ module Sources
         end
       end
 
+      def normalized_url
+        @normalized_url ||= begin
+          if url =~ %r{\Ahttp://lohas\.nicoseiga\.jp/priv/(\d+)\?e=\d+&h=[a-f0-9]+}i
+            "http://seiga.nicovideo.jp/seiga/im#{$1}"
+          elsif url =~ %r{\Ahttp://lohas\.nicoseiga\.jp/priv/[a-f0-9]+/\d+/(\d+)}i
+            "http://seiga.nicovideo.jp/seiga/im#{$1}"
+          elsif url =~ %r{/seiga/im\d+}
+            url
+          else
+            nil
+          end
+        end
+      end
+
       def agent
         @agent ||= begin
           mech = Mechanize.new
 
           mech.get("https://secure.nicovideo.jp/secure/login_form") do |page|
             page.form_with do |form|
-              form["mail"] = Danbooru.config.nico_seiga_login
+              form["mail_tel"] = Danbooru.config.nico_seiga_login
               form["password"] = Danbooru.config.nico_seiga_password
             end.click_button
           end
+
+          # This cookie needs to be set to allow viewing of adult works
+          cookie = Mechanize::Cookie.new("skip_fetish_warning", "1")
+          cookie.domain = "seiga.nicovideo.jp"
+          cookie.path = "/"
+          mech.cookie_jar.add(cookie)
 
           mech
         end
