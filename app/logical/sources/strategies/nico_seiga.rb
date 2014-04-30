@@ -18,6 +18,13 @@ module Sources
         agent.get(normalized_url) do |page|
           @artist_name, @profile_url = get_profile_from_page(page)
           @image_url = get_image_url_from_page(page)
+        end
+
+        # Log out before getting the tags.
+        # The reason for this is that if you're logged in and viewing a non-adult-rated work, the tags will be added with javascript after the page has loaded meaning we can't extract them easily.
+        # This does not apply if you're logged out (or if you're viewing an adult-rated work).
+        agent.cookie_jar.clear!
+        agent.get(normalized_url) do |page|
           @tags = get_tags_from_page(page)
         end
       end
