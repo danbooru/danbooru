@@ -49,10 +49,17 @@ module Sources
         link = page.search("a#illust_link")
 
         if link.any?
-          "http://seiga.nicovideo.jp" + link[0]["href"]
+          image_url = "http://seiga.nicovideo.jp" + link[0]["href"]
+          page = agent.get(image_url) # need to follow this redirect while logged in or it won't work
+          images = page.search("img").select {|x| x["src"] =~ /\/priv\//}
+          if images.any?
+            image_url = "http://lohas.nicoseiga.jp" + images[0]["src"]
+          end
         else
-          nil
+          image_url = nil
         end
+
+        return image_url
       end
 
       def get_tags_from_page(page)
