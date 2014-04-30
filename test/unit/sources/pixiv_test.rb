@@ -8,6 +8,7 @@ module Sources
       setup do
         VCR.use_cassette("source-pixiv-unit-test", :record => :new_episodes) do
           @site = Sources::Site.new("http://www.pixiv.net/member_illust.php?mode=big&illust_id=9646484")
+          @site.get
         end
       end
 
