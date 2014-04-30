@@ -62,6 +62,8 @@ module Sources
             "http://seiga.nicovideo.jp/seiga/im#{$1}"
           elsif url =~ %r{\Ahttp://lohas\.nicoseiga\.jp/priv/[a-f0-9]+/\d+/(\d+)}i
             "http://seiga.nicovideo.jp/seiga/im#{$1}"
+          elsif url =~ %r{\Ahttp://lohas\.nicoseiga\.jp/priv/(\d+)}i
+            "http://seiga.nicovideo.jp/seiga/im#{$1}"
           elsif url =~ %r{/seiga/im\d+}
             url
           else
