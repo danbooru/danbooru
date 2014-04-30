@@ -13,7 +13,6 @@ module Sources
       Site.strategies.each do |strategy|
         if strategy.url_match?(url)
           @strategy = strategy.new(url)
-          get
           break
         end
       end
