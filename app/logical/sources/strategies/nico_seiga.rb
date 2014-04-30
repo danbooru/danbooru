@@ -29,7 +29,7 @@ module Sources
 
         if links.any?
           profile_url = "http://seiga.nicovideo.jp" + links[0]["href"]
-          artist_name = links[0].text.gsub(/<\/?strong>/, "")
+          artist_name = links[0].search("span")[0].children[0].text
         else
           profile_url = nil
           artist_name = nil
