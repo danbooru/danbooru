@@ -51,6 +51,9 @@ module Sources
         if link.any?
           image_url = "http://seiga.nicovideo.jp" + link[0]["href"]
           page = agent.get(image_url) # need to follow this redirect while logged in or it won't work
+          if page.is_a?(Mechanize::Image)
+            return page.uri.to_s
+          end
           images = page.search("img").select {|x| x["src"] =~ /\/priv\//}
           if images.any?
             image_url = "http://lohas.nicoseiga.jp" + images[0]["src"]
