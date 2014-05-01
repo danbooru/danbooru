@@ -30,7 +30,7 @@ class UserTest < ActiveSupport::TestCase
           @user.promote_to!(User::Levels::GOLD)
         end
 
-        assert_equal("Promoted by #{CurrentUser.user.name} from Member to Gold", @user.feedback.last.body)
+        assert_equal("Promoted from Member to Gold", @user.feedback.last.body)
       end
 
       should "create a dmail" do

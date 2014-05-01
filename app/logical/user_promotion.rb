@@ -48,7 +48,7 @@ private
 
     user.feedback.create(
       :category => "neutral",
-      :body => "#{body_prefix} by #{promoter.name} from #{user.level_string_was} to #{user.level_string}",
+      :body => "#{body_prefix} from #{user.level_string_was} to #{user.level_string}",
       :disable_dmail_notification => true
     )
   end
