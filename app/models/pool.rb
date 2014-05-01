@@ -54,7 +54,7 @@ class Pool < ActiveRecord::Base
       end
 
       if params[:description_matches].present?
-        q = q.where("description like ? escape E'\\\\'", "%" + params[:description_matches].to_escaped_for_sql_like + "%")
+        q = q.where("lower(description) like ? escape E'\\\\'", "%" + params[:description_matches].mb_chars.downcase.to_escaped_for_sql_like + "%")
       end
 
       if params[:creator_name].present?
