@@ -56,6 +56,8 @@ GEM
       net-sftp (>= 2.0.0)
       net-ssh (>= 2.0.14)
       net-ssh-gateway (>= 1.1.0)
+    capistrano-ext (1.2.1)
+      capistrano (>= 1.0.0)
     capistrano-unicorn (0.2.0)
       capistrano (< 3.0)
     chronic (0.10.2)
@@ -233,6 +235,8 @@ DEPENDENCIES
   awesome_print
   aws-s3!
   bcrypt-ruby
+  capistrano
+  capistrano-ext
   capistrano-unicorn
   coffee-rails
   daemons

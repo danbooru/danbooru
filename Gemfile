@@ -39,6 +39,8 @@ gem 'diff-lcs', :require => "diff/lcs/array"
 gem 'bcrypt-ruby', :require => "bcrypt"
 gem 'awesome_print'
 gem 'statistics2'
+gem 'capistrano'
+gem 'capistrano-ext'
 
 # needed for looser jpeg header compat
 gem 'ruby-imagespec', :require => "image_spec", :git => "https://github.com/r888888888/ruby-imagespec.git", :branch => "exif-fixes"

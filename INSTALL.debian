@@ -7,25 +7,23 @@ if [[ "$(whoami)" != "root" ]] ; then
   exit 1
 fi
 
-echo "Danbooru Install"
-echo "This script will install Ruby, Rails, PostgreSQL, and Nginx. By the end,"
-echo "you should be able to connect to the server and create an account."
+echo "* DANBOORU INSTALLATION SCRIPT"
+echo "*"
+echo "* This script will install all the necessary packages to run Danbooru on a   "
+echo "* Debian server."
 echo
-echo "It will create a new user called danbooru which will run the Danbooru"
-echo "processes. It will download the latest copy and install it in"
-echo "/var/www/danbooru2."
-echo
-echo -n "Enter the hostname for this server (ex: danbooru.donmai.us): "
+echo -n "* Enter the hostname for this server (ex: danbooru.donmai.us): "
 read HOSTNAME
 
 if [[ -z "$HOSTNAME" ]] ; then
-  echo "Must enter a hostname"
+  echo "* Must enter a hostname"
   exit 1
 fi
 
 RUBY_VERSION=1.9.3-p327
+GITHUB_INSTALL_SCRIPTS=https://raw.githubusercontent.com/r888888888/danbooru/master/script/install
 
-echo -n "Enter a name for the site (default: Danbooru): "
+echo -n "* Enter a name for the site (default: Danbooru): "
 read SITENAME
 
 if [[ -z "$SITENAME" ]] ; then
@@ -33,123 +31,83 @@ if [[ -z "$SITENAME" ]] ; then
 fi
 
 # Install packages
-echo "Installing packages..."
+echo "* Installing packages..."
 apt-get update
-apt-get -y install build-essential automake openssl libssl-dev libyaml-dev libxml2-dev libxslt-dev autoconf ncurses-dev sudo gcc g++ libreadline-dev zlib1g-dev flex bison bzip2 ragel memcached libmemcache-dev git curl libcurl4-openssl-dev emacs imagemagick libmagickcore-dev libmagickwand-dev sendmail-bin sendmail psmisc postgresql postgresql-contrib libpq-dev
+apt-get -y install build-essential automake libssl-dev libxml2-dev libxslt-dev ncurses-dev sudo libreadline-dev flex bison ragel memcached libmemcache-dev git curl libcurl4-openssl-dev imagemagick libmagickcore-dev libmagickwand-dev sendmail-bin sendmail postgresql postgresql-contrib libpq-dev nginx ssh
 
 if [ $? -ne 0 ]; then
+  echo "* Error installing packages; aborting"
   exit 1
 fi
 
 # Create user account
 useradd -m danbooru
 chsh -s /bin/bash danbooru
-addgroup wheel
-usermod -G root,wheel root
-usermod -G danbooru,wheel danbooru
-
-# Setup danbooru account
-echo
-echo "*************************************************"
-echo "* Enter a new password for the danbooru account *"
-echo "*************************************************"
-echo
-passwd danbooru
+usermod -G danbooru,sudo danbooru
 
 # Install rbenv
-echo "Installing rbenv..."
+echo "* Installing rbenv..."
 cd /
-sudo -u danbooru git clone git://github.com/sstephenson/rbenv.git /home/danbooru/.rbenv
-sudo -u danbooru touch /home/danbooru/.bash_profile
-echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> /home/danbooru/.bash_profile
-echo 'eval "$(rbenv init -)"' >> /home/danbooru/.bash_profile
-sudo -u danbooru mkdir -p /home/danbooru/.rbenv/plugins
-sudo -u danbooru git clone git://github.com/sstephenson/ruby-build.git /home/danbooru/.rbenv/plugins/ruby-build
+sudo -u danbooru git clone git://github.com/sstephenson/rbenv.git ~danbooru/.rbenv
+sudo -u danbooru touch ~danbooru/.bash_profile
+echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~danbooru/.bash_profile
+echo 'eval "$(rbenv init -)"' >> ~danbooru/.bash_profile
+sudo -u danbooru mkdir -p ~danbooru/.rbenv/plugins
+sudo -u danbooru git clone git://github.com/sstephenson/ruby-build.git ~danbooru/.rbenv/plugins/ruby-build
 sudo -u danbooru bash -l -c "rbenv install $RUBY_VERSION"
 sudo -u danbooru bash -l -c "rbenv global $RUBY_VERSION"
 
-#Generate secret token and secret key
-sudo -u danbooru mkdir /home/danbooru/.danbooru/
-sudo -u danbooru openssl rand -hex 32 > /home/danbooru/.danbooru/secret_token
-sudo -u danbooru openssl rand -hex 32 > /home/danbooru/.danbooru/session_secret_key
-chmod 600 /home/danbooru/.danbooru/session_secret_key
-chmod 600 /home/danbooru/.danbooru/secret_token
-chown -R danbooru:danbooru /home/danbooru/.danbooru/
+# Generate secret token and secret key
+echo "* Generating secret keys..."
+sudo -u danbooru mkdir ~danbooru/.danbooru/
+sudo -u danbooru openssl rand -hex 32 > ~danbooru/.danbooru/secret_token
+sudo -u danbooru openssl rand -hex 32 > ~danbooru/.danbooru/session_secret_key
+chmod 600 ~danbooru/.danbooru/*
 
 # Install gems
-sudo -u danbooru bash -l -c 'gem install --no-ri --no-rdoc capistrano'
-sudo -u danbooru bash -l -c 'gem install --no-ri --no-rdoc capistrano-ext'
+echo "* Installing gems..."
 sudo -u danbooru bash -l -c 'gem install --no-ri --no-rdoc bundler'
-sudo -u danbooru bash -l -c 'gem install --no-ri --no-rdoc whenever'
-sudo -u danbooru bash -l -c 'gem install --no-ri --no-rdoc capistrano-unicorn'
 
-# Install Nginx
-curl http://nginx.org/keys/nginx_signing.key > /root/nginx_signing.key
-apt-key add nginx_signing.key
-echo "deb http://nginx.org/packages/debian/ squeeze nginx" >> /etc/apt/sources.list
-echo "deb-src http://nginx.org/packages/debian/ squeeze nginx" >> /etc/apt/sources.list
-apt-get update
-apt-get -y install nginx
-rm -f /etc/nginx/conf.d/*.conf
+echo "* Install configuration scripts..."
 
 # Update PostgreSQL
-PG_HBA_FILE="/etc/postgresql/8.4/main/pg_hba.conf"
-echo "local    all         postgres,danbooru                              trust" > $PG_HBA_FILE
-echo "host     all         postgres,danbooru          127.0.0.1/32        trust" >> $PG_HBA_FILE
-
+curl -L -s $GITHUB_INSTALL_SCRIPTS/postgresql_hba_conf -o /etc/postgresql/9.1/main/pg_hba.conf
 /etc/init.d/postgresql restart
 sudo -u postgres createuser -s danbooru
+sudo -u danbooru createdb danbooru2
 
 # Setup nginx
-update-rc.d -f nginx defaults
-curl -s https://raw.githubusercontent.com/r888888888/danbooru/master/script/install/nginx.danbooru.conf > /etc/nginx/conf.d/danbooru.conf
+curl -L -s $GITHUB_INSTALL_SCRIPTS/nginx.danbooru.conf -o /etc/nginx/conf.d/danbooru.conf
 sed -i -e "s/__hostname__/$HOSTNAME/g" /etc/nginx/conf.d/danbooru.conf
-/etc/init.d/nginx start
-
-echo "%wheel  ALL=(ALL)       ALL" >> /etc/sudoers
+/etc/init.d/nginx restart
 
 # Setup logrotate
-LOGROTATE_CONF_FILE="/etc/logrotate.conf"
-echo >> $LOGROTATE_CONF_FILE
-echo "/var/www/danbooru2/current/log/production.log {" >> $LOGROTATE_CONF_FILE
-echo "  daily" >> $LOGROTATE_CONF_FILE
-echo "  rotate 3" >> $LOGROTATE_CONF_FILE
-echo "  copytruncate" >> $LOGROTATE_CONF_FILE
-echo "}" >> $LOGROTATE_CONF_FILE
+curl -L -s $GITHUB_INSTALL_SCRIPTS/danbooru_logrotate_conf -o /etc/logrotate.d/danbooru.conf
 
-sudo -u danbooru createdb danbooru2
-sudo -u danbooru psql danbooru2 -c 'CREATE LANGUAGE plpgsql;'
+# Setup danbooru account
+echo "* Enter a new password for the danbooru account"
+passwd danbooru
 
-cd /home/danbooru
-sudo -u danbooru mkdir /home/danbooru/apps
-cd /home/danbooru/apps
-git clone git://github.com/r888888888/danbooru.git danbooru
-chown -R danbooru:danbooru danbooru
+echo "* Setting up SSH keys for the danbooru account"
+sudo -u danbooru ssh-keygen
 
-echo
-echo
-echo "**************************************************************"
-echo "* Danbooru is almost ready for deployment.                   *"
-echo "*                                                            *"
-echo "* A local copy has been checked out into /home/danbooru/apps *"
-echo "* but you may want to clone your own copy from               *"
-echo "* http://github.com/r888888888/danbooru.git                  *"
-echo "*                                                            *"
-echo "* You will probably want to create your own branch and       *"
-echo "* modify the config/deploy/staging.rb and production.rb      *"
-echo "* files to point to the correct servers.                     *"
-echo "*                                                            *"
-echo "* You will also need to edit config/deploy.rb and replace    *"
-echo "* albert with danbooru. Then run:                            *"
-echo "*                                                            *"
-echo "* cap deploy:setup && cap deploy                             *"
-echo "* This will run as staging environment                       *"
-echo "*                                                            *"
-echo "* cap production deploy:setup && cap production deploy       *"
-echo "* This will run as production environment                    *"
-echo "*                                                            *"
-echo "* The first account will automatically be made an admin.     *"
-echo "* You can edit the configuration files by editing            *"
-echo "* /var/www/danbooru2/shared/config/local_config and          *"
-echo "* /var/www/danbooru2/shared/config/database.yml              *"
-echo "**************************************************************"
+echo "* Setting up danbooru app..."
+sudo -u danbooru git clone https://github.com/r888888888/danbooru ~danbooru/danbooru
+sudo -u danbooru bash -l -c 'cd ~/danbooru ; bundle'
+
+echo "* Creating a new local git branch called develop"
+sudo -u danbooru git checkout -b develop
+
+echo "* Setting up known_hosts for localhost"
+ssh-keyscan -t rsa,dsa localhost 2>&1 | sort -u - ~/.ssh/known_hosts > ~/.ssh/tmp_hosts
+cat ~/.ssh/tmp_hosts >> ~/.ssh/known_hosts
+
+echo "* Almost done! The code has been checked out at ~danbooru/danbooru. You can  "
+echo "* now login as the danbooru user and run the following commands to deploy to "
+echo "* the server:"
+echo "*"
+echo "*   cd ~/danbooru"
+echo "*   bundle exec cap development deploy:setup"
+echo "*   bundle exec cap development deploy:update"
+
+

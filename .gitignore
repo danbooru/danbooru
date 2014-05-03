@@ -1,6 +1,7 @@
 .bundle
 config/database.yml
 config/danbooru_local_config.rb
+config/deploy/*.rb
 db/*.sqlite3
 log/*.log
 tmp/*
