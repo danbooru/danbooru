@@ -1,7 +1,7 @@
 module Iqdb
   class Importer
     def import!
-      Post.where("created_at >= ?", 3.months.ago).find_each do |post|
+      Post.find_each do |post|
         IO.popen("iqdb command #{Danbooru.config.iqdb_file}", "w+") do |io|
           if File.exists?(post.preview_file_path)
             puts post.id
