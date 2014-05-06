@@ -7,7 +7,7 @@ module Iqdb
     end
 
     def process(&block)
-      IO.popen("iqdb command #{database}", "w", &block)
+      IO.popen("iqdb command #{database}", "w+", &block)
     end
 
     def add(post)
@@ -15,6 +15,7 @@ module Iqdb
       process do |io|
         io.puts "add 0 #{hex}:#{post.preview_file_path}"
         io.puts "quit"
+        io.read
       end
     end
 
@@ -23,6 +24,7 @@ module Iqdb
       process do |io|
         io.puts "remove 0 #{hex}"
         io.puts "quit"
+        io.read
       end
     end
   end
