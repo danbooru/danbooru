@@ -2,7 +2,8 @@ module Iqdb
   module Responses
     class Collection
       attr_reader :responses
-      delegate :each, :empty?, :any?, :to => :matches
+      include Enumerable
+      delegate :<=>, :each, :to => :matches
       
       def initialize(response_string)
         @responses = response_string.split(/\n/).map do |string|
