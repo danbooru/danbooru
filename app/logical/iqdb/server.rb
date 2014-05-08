@@ -54,7 +54,7 @@ module Iqdb
         hex_id = post_id.to_s(16)
         socket.puts "sim 0 #{flags} #{results} #{hex_id}"
         socket.puts "done"
-        responses = Responses::Collection.new(@socket.read)
+        responses = Responses::Collection.new(socket.read)
       end
     end
 
@@ -62,7 +62,7 @@ module Iqdb
       request do
         socket.puts "query 0 #{flags} #{results} #{filename}"
         socket.puts "done"
-        responses = Responses::Collection.new(@socket.read)
+        responses = Responses::Collection.new(socket.read)
       end
     end
   end
