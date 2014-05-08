@@ -24,7 +24,7 @@ protected
 
   def create_by_post
     @post = Post.find(params[:post_id])
-    @results = Iqdb::Server.default.similar(@post.id, 3)
+    @results = Iqdb::Server.default.query(3, @post.preview_file_path)
     render :layout => false, :action => "create_by_post"
   end
 end

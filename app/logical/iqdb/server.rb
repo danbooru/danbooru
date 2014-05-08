@@ -49,15 +49,6 @@ module Iqdb
       end
     end
 
-    def similar(post_id, results, flags = FLAG_DISCARD_COMMON_COEFFS)
-      request do
-        hex_id = post_id.to_s(16)
-        socket.puts "sim 0 #{flags} #{results} #{hex_id}"
-        socket.puts "done"
-        responses = Responses::Collection.new(socket.read)
-      end
-    end
-
     def query(results, filename, flags = FLAG_DISCARD_COMMON_COEFFS)
       request do
         socket.puts "query 0 #{flags} #{results} #{filename}"

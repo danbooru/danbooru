@@ -53,6 +53,6 @@ end
 
 group :development do
   gem 'ruby-prof'
-  gem 'sql-logging'
+  # gem 'sql-logging'
 end
 
