@@ -5,6 +5,14 @@ module Sources
         url =~ /^https?:\/\/(?:.+?\.)?deviantart\.(?:com|net)/
       end
 
+      def referer_url(template)
+        if template.params[:ref] =~ /deviantart\.com\/art\//
+          template.params[:ref]
+        else
+          template.params[:url]
+        end
+      end
+
       def site_name
         "Deviant Art"
       end
