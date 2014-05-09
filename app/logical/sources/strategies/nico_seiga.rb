@@ -5,6 +5,14 @@ module Sources
         url =~ /^https?:\/\/(?:\w+\.)?nico(?:seiga|video)\.jp/
       end
 
+      def referer_url(template)
+        if template.params[:ref] =~ /seiga\.nicovideo\.jp\/seiga\/im\d+/
+          template.params[:ref]
+        else
+          template.params[:url]
+        end
+      end
+
       def site_name
         "Nico Seiga"
       end
