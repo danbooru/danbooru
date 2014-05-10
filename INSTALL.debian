@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Run: curl -s https://raw.github.com/r888888888/danbooru/master/INSTALL.debian > install.sh ; chmod +x install.sh ; ./install.sh
+# Run: curl -s https://raw.githubusercontent.com/r888888888/danbooru/master/INSTALL.debian > install.sh ; chmod +x install.sh ; ./install.sh
 
 if [[ "$(whoami)" != "root" ]] ; then
   echo "You must run this script as root"
@@ -102,7 +102,7 @@ sudo -u postgres createuser -s danbooru
 
 # Setup nginx
 update-rc.d -f nginx defaults
-curl -s https://raw.github.com/r888888888/danbooru/master/script/install/nginx.danbooru.conf > /etc/nginx/conf.d/danbooru.conf
+curl -s https://raw.githubusercontent.com/r888888888/danbooru/master/script/install/nginx.danbooru.conf > /etc/nginx/conf.d/danbooru.conf
 sed -i -e "s/__hostname__/$HOSTNAME/g" /etc/nginx/conf.d/danbooru.conf
 /etc/init.d/nginx start
 
