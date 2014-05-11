@@ -12,7 +12,7 @@ module Iqdb
       end
 
       def matches
-        @matches ||= responses.select {|x| x.is_a?(Iqdb::Responses::Response_200) && x.score >= 90}
+        @matches ||= responses.select {|x| x.is_a?(Iqdb::Responses::Response_200) && x.score >= 80}
       end
 
       def errored?
