@@ -279,15 +279,15 @@ class Post < ActiveRecord::Base
       when %r{\Ahttp://lohas\.nicoseiga\.jp/priv/(\d+)\?e=\d+&h=[a-f0-9]+}i, %r{\Ahttp://lohas\.nicoseiga\.jp/priv/[a-f0-9]+/\d+/(\d+)}i
         "http://seiga.nicovideo.jp/seiga/im#{$1}"
 
-      when %r{\Ahttp://d3j5vwomefv46c\.cloudfront\.net/photos/large/(\d+)\.}i
+      when %r{\Ahttps?://d3j5vwomefv46c\.cloudfront\.net/photos/large/(\d+)\.}i
         base_10_id = $1.to_i
         base_36_id = base_10_id.to_s(36)
         "http://twitpic.com/#{base_36_id}"
 
-      when %r{\Ahttp://(?:fc|th)\d{2}\.deviantart\.net/.+/[a-z0-9_]*_by_([a-z0-9_]+)-d([a-z0-9]+)\.}i
+      when %r{\Ahttps?://(?:fc|th)\d{2}\.deviantart\.net/.+/[a-z0-9_]*_by_([a-z0-9_]+)-d([a-z0-9]+)\.}i
         "http://#{$1}.deviantart.com/gallery/#/d#{$2}"
 
-      when %r{\Ahttp://(?:fc|th)\d{2}\.deviantart\.net/.+/[a-f0-9]+-d([a-z0-9]+)\.}i
+      when %r{\Ahttps?://(?:fc|th)\d{2}\.deviantart\.net/.+/[a-f0-9]+-d([a-z0-9]+)\.}i
         "http://deviantart.com/gallery/#/d#{$1}"
 
       when %r{\Ahttp://www\.karabako\.net/images(?:ub)?/karabako_(\d+)(?:_\d+)?\.}i
@@ -296,7 +296,7 @@ class Post < ActiveRecord::Base
       when %r{\Ahttp://p\.twpl\.jp/show/orig/([a-z0-9]+)}i
         "http://p.twipple.jp/#{$1}"
 
-      when %r{\Ahttp://pictures\.hentai-foundry\.com//[^/]/([^/]+)/(\d+)\.}i
+      when %r{\Ahttps?://pictures\.hentai-foundry\.com//[^/]/([^/]+)/(\d+)\.}i
         "http://www.hentai-foundry.com/pictures/user/#{$1}/#{$2}"
 
       else
