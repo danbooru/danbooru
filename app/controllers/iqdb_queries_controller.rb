@@ -19,6 +19,7 @@ protected
     @download = Iqdb::Download.new(params[:url])
     @download.download_from_source
     @download.find_similar
+    @results = @download.matches
     render :layout => false, :action => "create_by_url"
   end
 
