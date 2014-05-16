@@ -21,17 +21,6 @@
 
   Danbooru.Autocomplete.prune_local_storage = function() {
     if (this.enable_local_storage) {
-      var now = new Date().getTime();
-      $.each($.localStorage.keys(), function(i, key) {
-        var obj = localStorage.getItem(key);
-        if (obj && obj.expires) {
-          var expiry = Date.parse(obj.expires);
-          if (expiry < now) {
-            $.localStorage.remove(key);
-          }          
-        }
-      });
-
       if ($.localStorage.keys().length > 4000) {
         $.localStorage.removeAll();        
       }
@@ -178,12 +167,8 @@
     if (this.enable_local_storage) {
       var cached = $.localStorage.get(key);
       if (cached) {
-        if (cached.expires < new Date()) {
-          $.localStorage.remove(key);
-        } else {
-          resp(cached.value);
-          return;
-        }
+        resp(cached.value);
+        return;
       }      
     }
 
