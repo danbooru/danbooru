@@ -123,6 +123,7 @@ class Artist < ActiveRecord::Base
     def merge_version
       prev = versions.last
       prev.update_attributes(
+        :name => name,
         :url_string => url_string,
         :is_active => is_active,
         :is_banned => is_banned,
