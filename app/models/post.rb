@@ -299,6 +299,19 @@ class Post < ActiveRecord::Base
       when %r{\Ahttps?://pictures\.hentai-foundry\.com//[^/]/([^/]+)/(\d+)\.}i
         "http://www.hentai-foundry.com/pictures/user/#{$1}/#{$2}"
 
+      when %r{\Ahttp://blog-imgs-\d+(?:-origin)?\.fc2\.com/[^/]/[^/]/[^/]/([^/]+)/([^.]+\.[^?]+)}i
+        username = $1
+        filename = $2
+        "http://#{username}.blog.fc2.com/img/#{filename}/"
+
+      when %r{\Ahttp://diary(\d)?\.fc2\.com/user/([^/]+)/img/(\d+)_(\d+)/(\d+)\.}i
+        server_id = $1
+        username = $2
+        year = $3
+        month = $4
+        day = $5
+        "http://diary#{server_id}.fc2.com/cgi-sys/ed.cgi/#{username}?Y=#{year}&M=#{month}&D=#{day}"
+
       else
         source
       end
