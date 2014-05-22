@@ -1,0 +1,10 @@
+var html = '';
+<% if @results.any? %>
+  <% @results.each do |match| %>
+    html += '<%= j PostPresenter.preview(Post.find(match.post_id)) %>';
+  <% end %>
+<% else %>
+  html += '<p>No matches found</p>';
+<% end %>
+
+$("<div></div>").html(html).dialog({title: "Similar Posts", modal: true, width: "600px"});
