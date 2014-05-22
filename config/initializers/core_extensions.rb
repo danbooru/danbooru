@@ -10,7 +10,7 @@ module Danbooru
       end
 
       def to_escaped_for_tsquery
-        "'#{gsub(/'/, '\0\0').gsub(/\\/, '\0\0\0\0')}'"
+        "'#{gsub(/\0/, '').gsub(/'/, '\0\0').gsub(/\\/, '\0\0\0\0')}'"
       end
 
       def to_escaped_js
