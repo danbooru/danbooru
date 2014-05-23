@@ -18,12 +18,17 @@ module Sources
       end
     end
 
+    def translated_tags
+      WikiPage.other_names_match(tags.map(&:first)).map{|wiki_page| [wiki_page.title, wiki_page.category_name]}
+    end
+
     def to_json
       return {
         :artist_name => artist_name,
         :profile_url => profile_url,
         :image_url => image_url,
         :tags => tags,
+        :translated_tags => translated_tags,
         :danbooru_name => artist_record.try(:first).try(:name),
         :danbooru_id => artist_record.try(:first).try(:id),
         :unique_id => unique_id

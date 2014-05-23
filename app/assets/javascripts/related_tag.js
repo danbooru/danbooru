@@ -125,6 +125,7 @@
     this.build_recent_and_frequent($dest);
 
     $dest.append(this.build_html(query, related_tags, "general"));
+    this.build_translated($dest);
     if (wiki_page_tags.length) {
       $dest.append(Danbooru.RelatedTag.build_html("wiki:" + query, wiki_page_tags, "wiki"));
     }
@@ -170,6 +171,12 @@
       });
     } else {
       return [];
+    }
+  }
+
+  Danbooru.RelatedTag.build_translated = function($dest) {
+    if (Danbooru.RelatedTag.translated_tags && Danbooru.RelatedTag.translated_tags.length) {
+      $dest.append(this.build_html("translated", Danbooru.RelatedTag.translated_tags, "translated"));
     }
   }
 

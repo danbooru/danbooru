@@ -10,7 +10,7 @@ class WikiPage < ActiveRecord::Base
   validates_presence_of :title
   validate :validate_locker_is_janitor
   validate :validate_not_locked
-  attr_accessible :title, :body, :is_locked
+  attr_accessible :title, :body, :is_locked, :other_names
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, lambda {where(:is_active => true)}, :foreign_key => "name", :primary_key => "title"
   has_many :versions, lambda {order("wiki_page_versions.id ASC")}, :class_name => "WikiPageVersion", :dependent => :destroy
@@ -32,6 +32,12 @@ class WikiPage < ActiveRecord::Base
       end
     end
 
+    def other_names_match(names)
+      names = names.map{|name| name.to_escaped_for_tsquery}
+      query_sql = names.join(" | ")
+      where("other_names_index @@ to_tsquery('danbooru', E?)", query_sql)
+    end
+
     def search(params = {})
       q = where("true")
       params = {} if params.blank?
@@ -46,6 +52,10 @@ class WikiPage < ActiveRecord::Base
 
       if params[:body_matches].present?
         q = q.body_matches(params[:body_matches])
+      end
+
+      if params[:other_names_match].present?
+        q = q.other_names_match(params[:other_names_match].split(" "))
       end
 
       if params[:creator_name].present?
@@ -113,6 +123,7 @@ class WikiPage < ActiveRecord::Base
     self.title = version.title
     self.body = version.body
     self.is_locked = version.is_locked
+    self.other_names = version.other_names
   end
 
   def revert_to!(version)
@@ -141,7 +152,8 @@ class WikiPage < ActiveRecord::Base
     prev.update_attributes(
       :title => title,
       :body => body,
-      :is_locked => is_locked
+      :is_locked => is_locked,
+      :other_names => other_names
     )
   end
 
@@ -156,12 +168,13 @@ class WikiPage < ActiveRecord::Base
       :updater_ip_addr => CurrentUser.ip_addr,
       :title => title,
       :body => body,
-      :is_locked => is_locked
+      :is_locked => is_locked,
+      :other_names => other_names
     )
   end
 
   def create_version
-    if title_changed? || body_changed? || is_locked_changed?
+    if title_changed? || body_changed? || is_locked_changed? || other_names_changed?
       if merge_version?
         merge_version
       else
@@ -206,5 +219,9 @@ class WikiPage < ActiveRecord::Base
 
   def visible?
     artist.blank? || !artist.is_banned? || CurrentUser.user.is_janitor?
+  end
+
+  def other_names_array
+    other_names.to_s.scan(/\S+/)
   end
 end

@@ -6,6 +6,8 @@
       <%= f.input :title, :as => :string %>
     <% end %>
 
+    <%= f.input :other_names, :as => :text, :hint => "Names used for this tag on other sites such as Pixiv. Separate with spaces." %>
+
     <%= dtext_field "wiki_page", "body" %>
 
     <% if CurrentUser.user.is_janitor? %>

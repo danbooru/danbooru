@@ -14,6 +14,10 @@
 
       <div id="wiki-page-body" class="prose">
         <% if @wiki_page.visible? %>
+          <% if @wiki_page.other_names.present? %>
+            <p><%= wiki_page_other_names_list(@wiki_page) %></p>
+          <% end %>
+
           <%= format_text(@wiki_page.body) %>
 
           <% if @wiki_page.artist %>
