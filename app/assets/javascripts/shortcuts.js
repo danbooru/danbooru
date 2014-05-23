@@ -16,6 +16,10 @@
     });
 
     if ($("#image").length) {
+      $(document).bind("keypress", "shift+o", function(e) {
+        Danbooru.Post.approve(Danbooru.meta("post-id"));
+      });
+
       $(document).bind("keypress", "shift+e", function(e) {
         if (!$("#edit-dialog").length) {
           $("#edit").show();
