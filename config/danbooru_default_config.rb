@@ -310,5 +310,9 @@ module Danbooru
       # /var/www/danbooru2/shared/iqdb.db
       nil
     end
+
+    def shared_dir_path
+      "/var/www/danbooru2/shared"
+    end
   end
 end
