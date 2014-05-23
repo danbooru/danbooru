@@ -49,7 +49,7 @@ module Iqdb
       end
     end
 
-    def query(results, filename, flags = FLAG_DISCARD_COMMON_COEFFS)
+    def query(results, filename, flags = 0)
       request do
         socket.puts "query 0 #{flags} #{results} #{filename}"
         socket.puts "done"
