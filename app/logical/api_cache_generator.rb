@@ -1,6 +1,6 @@
 class ApiCacheGenerator
   def generate_tag_cache
-    path = File.expand_path(File.join(Rails.root, "..", "shared"))
+    path = Danbooru.config.shared_dir_path
     FileUtils.mkdir_p("#{path}/system/cache")
     File.open("#{path}/system/cache/tags.json", "w") do |f|
       f.print("[")
@@ -26,6 +26,6 @@ class ApiCacheGenerator
       gz.close
     end
     RemoteFileManager.new("#{path}/system/cache/tags.json").distribute
-    RemoteFileManager.new("#{path}/shared/system/cache/tags.json.gz").distribute
+    RemoteFileManager.new("#{path}/system/cache/tags.json.gz").distribute
   end
 end
