@@ -116,6 +116,7 @@ class PostsController < ApplicationController
   def random
     count = Post.fast_count(params[:tags])
     @post = Post.tag_match(params[:tags]).offset(rand(count)).first
+    raise ActiveRecord::RecordNotFound if @post.nil?
     redirect_to post_path(@post, :tags => params[:tags])
   end
 
