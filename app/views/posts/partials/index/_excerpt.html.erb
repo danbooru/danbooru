@@ -41,6 +41,10 @@
     </div>
   <% elsif post_set.has_wiki? %>
     <div class="prose">
+      <% if post_set.wiki_page.other_names.present? %>
+        <p><%= wiki_page_other_names_list(post_set.wiki_page) %></p>
+      <% end %>
+
       <%= format_text(post_set.wiki_page.presenter.excerpt) %>
 
       <% if post_set.wiki_page.artist %>
