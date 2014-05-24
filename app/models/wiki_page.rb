@@ -1,5 +1,6 @@
 class WikiPage < ActiveRecord::Base
   before_save :normalize_title
+  before_save :normalize_other_names
   before_validation :initialize_creator, :on => :create
   before_validation :initialize_updater
   after_save :create_version
@@ -133,6 +134,12 @@ class WikiPage < ActiveRecord::Base
 
   def normalize_title
     self.title = title.mb_chars.downcase.tr(" ", "_")
+  end
+
+  def normalize_other_names
+    normalized_other_names = other_names.to_s.gsub(/\u3000/, " ").scan(/\S+/)
+    normalized_other_names = normalized_other_names.map{|name| name.downcase}
+    self.other_names = normalized_other_names.uniq.join(" ")
   end
 
   def creator_name
