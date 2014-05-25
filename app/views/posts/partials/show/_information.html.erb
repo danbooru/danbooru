@@ -6,7 +6,7 @@
     <li>Approver: <%= link_to_user(post.approver) %></li>
   <% end %>
   <li>
-    Size: <%= link_to_if Danbooru.config.can_user_see_post?(CurrentUser.user, post), number_to_human_size(post.file_size), post.file_url %>
+    Size: <%= link_to_if post.visible?, number_to_human_size(post.file_size), post.file_url %>
     <% if post.is_image? %>
       (<%= post.image_width %>x<%= post.image_height %>)
     <% end %>

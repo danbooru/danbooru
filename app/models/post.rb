@@ -1094,7 +1094,7 @@ class Post < ActiveRecord::Base
   module ApiMethods
     def hidden_attributes
       list = [:tag_index]
-      if !Danbooru.config.can_user_see_post?(CurrentUser.user, self)
+      if !visible?
         list += [:md5, :file_ext]
       end
       super + list
@@ -1102,7 +1102,7 @@ class Post < ActiveRecord::Base
 
     def method_attributes
       list = [:uploader_name, :has_large, :tag_string_artist, :tag_string_character, :tag_string_copyright, :tag_string_general]
-      if Danbooru.config.can_user_see_post?(CurrentUser.user, self)
+      if visible?
         list += [:file_url, :large_file_url, :preview_file_url]
       end
       list
@@ -1147,7 +1147,7 @@ class Post < ActiveRecord::Base
         "id" => id
       }
 
-      if Danbooru.config.can_user_see_post?(CurrentUser.user, self)
+      if visible?
         hash["file_url"] = file_url
         hash["preview_url"] = preview_file_url
         hash["md5"] = md5

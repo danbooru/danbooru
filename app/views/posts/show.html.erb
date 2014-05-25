@@ -59,7 +59,7 @@
 
       <menu id="post-sections">
         <li><a href="#comments">Comments</a></li>
-        <% if CurrentUser.is_member? && Danbooru.config.can_user_see_post?(CurrentUser.user, @post) %>
+        <% if CurrentUser.is_member? && @post.visible? %>
           <li><a href="#edit" id="post-edit-link">Edit</a></li>
         <% end %>
         <li><a href="#share">Share</a></li>
@@ -78,7 +78,7 @@
         <% end %>
       </section>
 
-      <% if CurrentUser.is_member? && Danbooru.config.can_user_see_post?(CurrentUser.user, @post) && (CurrentUser.is_gold? || !@post.is_banned?) %>
+      <% if CurrentUser.is_member? && @post.visible? %>
         <section id="edit" style="display: none;">
           <%= render "posts/partials/show/edit", :post => @post %>
         </section>

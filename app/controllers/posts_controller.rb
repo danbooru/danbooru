@@ -46,7 +46,7 @@ class PostsController < ApplicationController
   def update
     @post = Post.find(params[:id])
 
-    if Danbooru.config.can_user_see_post?(CurrentUser.user, @post)
+    if @post.visible?
       @post.update_attributes(params[:post], :as => CurrentUser.role)
     end
 
@@ -76,7 +76,7 @@ class PostsController < ApplicationController
     @post = Post.find(params[:id])
     @version = PostVersion.find(params[:version_id])
 
-    if Danbooru.config.can_user_see_post?(CurrentUser.user, @post)
+    if @post.visible?
       @post.revert_to!(@version)
     end
     
