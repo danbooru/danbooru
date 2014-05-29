@@ -1,3 +1,5 @@
+﻿# encoding: UTF-8
+
 module Sources
   module Strategies
     class Pixiv < Base
@@ -62,10 +64,18 @@ module Sources
           node["href"] =~ /search\.php/
         end
 
+        original_flag = page.search("a.original-works")
+
         if links.any?
-          links.map do |node|
+          links.map! do |node|
             [node.inner_text, "http://www.pixiv.net" + node.attr("href")]
           end
+
+          if original_flag.any?
+            links << ["オリジナル", "http://www.pixiv.net/search.php?s_mode=s_tag_full&word=%E3%82%AA%E3%83%AA%E3%82%B8%E3%83%8A%E3%83%AB"]
+          end
+
+          links
         else
           []
         end
