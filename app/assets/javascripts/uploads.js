@@ -57,26 +57,41 @@
 
   Danbooru.Upload.initialize_info = function() {
     $("#source-info ul").hide();
-    $("#fetch-data").click(function(e) {
-      $.get(e.target.href).success(function(data) {
-        var tag_html = "";
-        $.each(data.tags, function(i, v) {
-          tag_html += ('<a href="' + v[1] + '">' + v[0] + '</a> ');
-        });
-
-        $("#source-artist").html('<a href="' + data.profile_url + '">' + data.artist_name + '</a>');
-        $("#source-tags").html(tag_html);
-
-        var new_artist_link = '<a target="_blank" href="/artists/new?name=' + data.unique_id + '&other_names=' + data.artist_name + '&urls=' + encodeURIComponent(data.profile_url) + '+' + encodeURIComponent(data.image_url) + '">new</a>';
-
-        $("#source-record").html(new_artist_link);
-
-        $("#source-info p").hide();
-        $("#source-info ul").show();
-      });
+    $("#fetch-data-bookmarklet").click(function(e) {
+      $.get(e.target.href).success(Danbooru.Upload.fill_source_info);
       e.preventDefault();
     });
-    $("#fetch-data").trigger("click");
+    $("#fetch-data-bookmarklet").trigger("click");
+
+    $("#fetch-data-manual").click(function(e) {
+      var source = $("#upload_source").val();
+      if (!/\S/.test(source)) {
+        Danbooru.error("Error: You must enter a URL into the source field to get its data");
+      } else if (!/^https?:\/\//.test(source)) {
+        Danbooru.error("Error: Source is not a URL");
+      } else {
+        $("#source-info span#loading-data").show();
+        $.get("/source.json?url=" + encodeURIComponent(source)).success(Danbooru.Upload.fill_source_info);
+      }
+      e.preventDefault();
+    });
+  }
+
+  Danbooru.Upload.fill_source_info = function(data) {
+    var tag_html = "";
+    $.each(data.tags, function(i, v) {
+      tag_html += ('<a href="' + v[1] + '">' + v[0] + '</a> ');
+    });
+
+    $("#source-artist").html('<a href="' + data.profile_url + '">' + data.artist_name + '</a>');
+    $("#source-tags").html(tag_html);
+
+    var new_artist_link = '<a target="_blank" href="/artists/new?name=' + data.unique_id + '&other_names=' + data.artist_name + '&urls=' + encodeURIComponent(data.profile_url) + '+' + encodeURIComponent(data.image_url) + '">new</a>';
+
+    $("#source-record").html(new_artist_link);
+
+    $("#source-info span#loading-data").hide();
+    $("#source-info ul").show();
   }
 
   Danbooru.Upload.initialize_image = function() {
