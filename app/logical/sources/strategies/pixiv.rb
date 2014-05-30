@@ -8,7 +8,7 @@ module Sources
       end
 
       def referer_url(template)
-        if template.params[:ref] =~ /pixiv\.net\/member_illust/ && template.params[:ref] !~ /mode=manga/
+        if template.params[:ref] =~ /pixiv\.net\/member_illust/ && template.params[:ref] =~ /mode=medium/
           template.params[:ref]
         else
           template.params[:url]
