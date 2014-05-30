@@ -66,9 +66,9 @@ class UsersControllerTest < ActionController::TestCase
       end
 
       should "update a user" do
-        post :update, {:id => @user.id, :user => {:name => "xyz"}}, {:user_id => @user.id}
+        post :update, {:id => @user.id, :user => {:favorite_tags => "xyz"}}, {:user_id => @user.id}
         @user.reload
-        assert_equal("xyz", @user.name)
+        assert_equal("xyz", @user.favorite_tags)
       end
     end
   end
