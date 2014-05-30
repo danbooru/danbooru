@@ -50,7 +50,7 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     check_privilege(@user)
     sanitize_params!
-    @user.update_attributes(params[:user], :as => CurrentUser.role)
+    @user.update_attributes(params[:user].except(:name), :as => CurrentUser.role)
     cookies.delete(:favorite_tags)
     cookies.delete(:favorite_tags_with_categories)
     if @user.errors.any?
