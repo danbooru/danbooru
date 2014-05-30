@@ -48,6 +48,7 @@
         <%= f.input :enable_sequential_post_navigation, :as => :select, :label => "Enable slideshow mode", :hint => "Show prev/next links when viewing a post", :include_blank => false %>
         <%= f.input :new_post_navigation_layout, :as => :select, :label => "Navigation bar position", :include_blank => false, :collection => [["Below", "true"], ["Above", "false"]], :hint => "When browsing pools or slideshows, place navigation links above or below the image" %>
         <%= f.input :hide_deleted_posts, :as => :select, :label => "Deleted post filter", :hint => "Remove deleted posts from search results", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
+        <%= f.input :show_deleted_children, :as => :select, :label => "Show deleted children", :hint => "Indicate that a post has children even if the children are deleted", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
         <%= f.input :enable_auto_complete, :as => :select, :collection => [["Yes", "true"], ["No", "false"]], :include_blank => false %>
         <div class="input text optional field_with_hint">
           <label class="text optional" for="user_favorite_tags">Frequent tags</label>
