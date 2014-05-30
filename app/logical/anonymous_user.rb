@@ -205,6 +205,10 @@ class AnonymousUser
     nil
   end
 
+  def show_deleted_children?
+    false
+  end
+
   %w(member banned gold builder platinum contributor janitor moderator admin).each do |name|
     define_method("is_#{name}?") do
       false

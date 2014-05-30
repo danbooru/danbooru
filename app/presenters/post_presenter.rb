@@ -33,7 +33,7 @@ class PostPresenter < Presenter
     klass << " post-status-flagged" if post.is_flagged?
     klass << " post-status-deleted" if post.is_deleted?
     klass << " post-status-has-parent" if post.parent_id
-    klass << " post-status-has-children" if post.has_children?
+    klass << " post-status-has-children" if post.has_visible_children?
     klass
   end
 

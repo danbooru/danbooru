@@ -848,7 +848,8 @@ class Post < ActiveRecord::Base
       def update_has_children_flag_for(post_id)
         return if post_id.nil?
         has_children = Post.where("parent_id = ?", post_id).exists?
-        execute_sql("UPDATE posts SET has_children = ? WHERE id = ?", has_children, post_id)
+        has_active_children = Post.where("parent_id = ? and is_deleted = ?", post_id, false).exists?
+        execute_sql("UPDATE posts SET has_children = ?, has_active_children = ? WHERE id = ?", has_children, has_active_children, post_id)
       end
     end
 
@@ -923,6 +924,13 @@ class Post < ActiveRecord::Base
 
     def parent_exists?
       Post.exists?(parent_id)
+    end
+
+    def has_visible_children?
+      return true if has_active_children?
+      return true if has_children? && CurrentUser.user.show_deleted_children?
+      return true if has_children? && is_deleted?
+      return false
     end
   end
 

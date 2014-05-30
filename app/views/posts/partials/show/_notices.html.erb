@@ -52,7 +52,7 @@
   </div>
 <% end %>
 
-<% if post.has_children? %>
+<% if post.has_visible_children? %>
   <div class="ui-corner-all ui-state-highlight notice notice-parent">
     <%= has_children_message(post, @children_post_set) %>
     <div id="has-children-relationship-preview"><%= @children_post_set.presenter.post_previews_html(self) %></div>
