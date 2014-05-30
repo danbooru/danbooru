@@ -5,7 +5,7 @@ class UploadsController < ApplicationController
   rescue_from Upload::Error, :with => :rescue_exception
 
   def new
-    @upload = Upload.new(:rating => "q")
+    @upload = Upload.new
     if params[:url]
       @post = Post.find_by_source(params[:url])
 

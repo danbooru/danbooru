@@ -42,11 +42,11 @@
       </div>
 
       <div class="input">
-        <%= f.label :rating_q, "Rating" %>
+        <%= f.label :rating %>
 
         <fieldset class="ratings">
           <%= f.radio_button :rating, :e %>
-          <%= f.label :rating_e, "Explicit", :title => "Hardcore porn, visible genitals, gore" %>
+          <%= f.label :rating_e, "Explicit", :title => "Hardcore porn, visible genitals" %>
 
           <%= f.radio_button :rating, :q %>
           <%= f.label :rating_q, "Questionable", :title => "Nudity, anything erotic" %>
