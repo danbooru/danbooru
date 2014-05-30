@@ -85,6 +85,9 @@
 
     $("#source-artist").html('<a href="' + data.profile_url + '">' + data.artist_name + '</a>');
     $("#source-tags").html(tag_html);
+    
+    Danbooru.RelatedTag.translated_tags = data.translated_tags;
+    Danbooru.RelatedTag.build_all();
 
     var new_artist_link = '<a target="_blank" href="/artists/new?name=' + data.unique_id + '&other_names=' + data.artist_name + '&urls=' + encodeURIComponent(data.profile_url) + '+' + encodeURIComponent(data.image_url) + '">new</a>';
 

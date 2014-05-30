@@ -1,4 +1,4 @@
-div#c-wiki-pages {
+div#c-wiki-pages, div#excerpt {
   span.version {
     color: #AAA;
   }
@@ -26,5 +26,13 @@ div#c-wiki-pages {
   #content {
     margin-left: 15em;
     padding-left: 1em;
+  }
+
+  .hint {
+    display: block;
+  }
+
+  .other-name {
+    font-weight: bold;
   }
 }
