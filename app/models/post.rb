@@ -796,7 +796,7 @@ class Post < ActiveRecord::Base
       "pfc:#{Cache.sanitize(tags)}"
     end
 
-    def fast_count(tags = "")
+    def fast_count(tags = "", options = {})
       tags = tags.to_s.strip
 
       if tags.blank? && Danbooru.config.blank_tag_search_fast_count
@@ -804,12 +804,12 @@ class Post < ActiveRecord::Base
       elsif tags =~ /^rating:\S+$/
         count = Danbooru.config.blank_tag_search_fast_count
       elsif tags =~ /(?:#{Tag::METATAGS}):/
-        count = fast_count_search(tags)
+        count = fast_count_search(tags, options)
       else
         count = get_count_from_cache(tags)
 
         if count.to_i == 0
-          count = fast_count_search(tags)
+          count = fast_count_search(tags, options)
         end
       end
 
@@ -818,8 +818,8 @@ class Post < ActiveRecord::Base
       0
     end
 
-    def fast_count_search(tags)
-      count = Post.with_timeout(500, Danbooru.config.blank_tag_search_fast_count || 1_000_000) do
+    def fast_count_search(tags, options = {})
+      count = Post.with_timeout(options[:statement_timeout] || 500, Danbooru.config.blank_tag_search_fast_count || 1_000_000) do
         Post.tag_match(tags).count
       end
       if count > 0
