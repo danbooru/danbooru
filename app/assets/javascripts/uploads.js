@@ -85,7 +85,7 @@
 
     $("#source-artist").html('<a href="' + data.profile_url + '">' + data.artist_name + '</a>');
     $("#source-tags").html(tag_html);
-    
+
     Danbooru.RelatedTag.translated_tags = data.translated_tags;
     Danbooru.RelatedTag.build_all();
 
