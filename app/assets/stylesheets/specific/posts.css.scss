@@ -368,6 +368,10 @@ div#c-posts {
       background-color: #F8F8F8;
       margin-top: 1em;
       padding: 0.5em;
+
+      .disabled {
+        color: gray;
+      }
     }
   }
 

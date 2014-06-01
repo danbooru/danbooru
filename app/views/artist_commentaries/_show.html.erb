@@ -22,9 +22,19 @@
 
 <% if artist_commentary.translated_present? %>
   <section id="translated-artist-commentary">
-    <h3><%= artist_commentary.translated_title %></h3>
+    <h3>
+      <% if artist_commentary.translated_title.present? %>
+        <%= artist_commentary.translated_title %>
+      <% else %>
+        <span class="disabled"><%= artist_commentary.original_title %></span>
+      <% end %>
+    </h3>
     <div class="prose">
-      <%= format_text(artist_commentary.translated_description) %>
+      <% if artist_commentary.translated_description.present? %>
+        <%= format_text(artist_commentary.translated_description) %>
+      <% else %>
+        <span class="disabled"><%= format_text(artist_commentary.original_description) %></span>
+      <% end %>
     </div>
   </section>
 <% end %>
