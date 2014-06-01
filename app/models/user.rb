@@ -506,6 +506,10 @@ class User < ActiveRecord::Base
         3_000
       end
     end
+
+    def remaining_api_hourly_limit
+      ApiLimiter.remaining_hourly_limit(CurrentUser.ip_addr)
+    end
     
     def statement_timeout
       if is_platinum?
@@ -523,12 +527,20 @@ class User < ActiveRecord::Base
       super + [:password_hash, :bcrypt_password_hash, :email, :email_verification_key, :time_zone, :updated_at, :receive_email_notifications, :last_logged_in_at, :last_forum_read_at, :has_mail, :default_image_size, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :recent_tags, :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :enable_sequential_post_navigation, :hide_deleted_posts, :per_page, :style_usernames, :enable_auto_complete, :custom_style, :show_deleted_children]
     end
 
+    def method_attributes
+      list = [:level_string]
+      if id == CurrentUser.user.id
+        list += [:remaining_api_hourly_limit]
+      end
+      list
+    end
+
     def serializable_hash(options = {})
       options ||= {}
       options[:except] ||= []
       options[:except] += hidden_attributes
       options[:methods] ||= []
-      options[:methods] += [:level_string]
+      options[:methods] += method_attributes
       super(options)
     end
 
@@ -538,7 +550,7 @@ class User < ActiveRecord::Base
       options[:except] ||= []
       options[:except] += hidden_attributes
       options[:methods] ||= []
-      options[:methods] += [:level_string]
+      options[:methods] += method_attributes
       super(options, &block)
     end
 
