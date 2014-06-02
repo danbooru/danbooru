@@ -2516,7 +2516,8 @@ CREATE TABLE posts (
     has_children boolean DEFAULT false NOT NULL,
     is_banned boolean DEFAULT false NOT NULL,
     pixiv_id integer,
-    last_commented_at timestamp without time zone
+    last_commented_at timestamp without time zone,
+    has_active_children boolean DEFAULT false
 );
 
 
@@ -2913,7 +2914,8 @@ CREATE TABLE users (
     hide_deleted_posts boolean DEFAULT false NOT NULL,
     style_usernames boolean DEFAULT false NOT NULL,
     enable_auto_complete boolean DEFAULT true NOT NULL,
-    custom_style text
+    custom_style text,
+    show_deleted_children boolean DEFAULT false NOT NULL
 );
 
 
@@ -2949,7 +2951,8 @@ CREATE TABLE wiki_page_versions (
     body text NOT NULL,
     is_locked boolean NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    other_names text
 );
 
 
@@ -2985,7 +2988,9 @@ CREATE TABLE wiki_pages (
     is_locked boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    updater_id integer
+    updater_id integer,
+    other_names text,
+    other_names_index tsvector
 );
 
 
@@ -6475,6 +6480,13 @@ CREATE INDEX index_wiki_pages_on_body_index_index ON wiki_pages USING gin (body_
 
 
 --
+-- Name: index_wiki_pages_on_other_names_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_wiki_pages_on_other_names_index ON wiki_pages USING gin (other_names_index);
+
+
+--
 -- Name: index_wiki_pages_on_title; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -6556,6 +6568,13 @@ CREATE TRIGGER trigger_posts_on_tag_index_update BEFORE INSERT OR UPDATE ON post
 --
 
 CREATE TRIGGER trigger_wiki_pages_on_update BEFORE INSERT OR UPDATE ON wiki_pages FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('body_index', 'public.danbooru', 'body', 'title');
+
+
+--
+-- Name: trigger_wiki_pages_on_update_for_other_names; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER trigger_wiki_pages_on_update_for_other_names BEFORE INSERT OR UPDATE ON wiki_pages FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('other_names_index', 'public.danbooru', 'other_names');
 
 
 --
@@ -6727,4 +6746,8 @@ INSERT INTO schema_migrations (version) VALUES ('20140111191413');
 INSERT INTO schema_migrations (version) VALUES ('20140204233337');
 
 INSERT INTO schema_migrations (version) VALUES ('20140221213349');
+
+INSERT INTO schema_migrations (version) VALUES ('20140428015134');
+
+INSERT INTO schema_migrations (version) VALUES ('20140505000956');
 
