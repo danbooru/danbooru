@@ -15,3 +15,5 @@ tmp/*.jpg
 tmp/*.png
 danbooru.db
 iqdb.db
+danbooru.sublime-project
+danbooru.sublime-workspace
