@@ -13,6 +13,7 @@ class Upload < ActiveRecord::Base
   after_destroy :delete_temp_file
   validate :uploader_is_not_limited, :on => :create
   validate :file_or_source_is_present, :on => :create
+  validates :rating, :presence => true
   attr_accessible :file, :image_width, :image_height, :file_ext, :md5, :file_size, :as_pending, :source, :file_path, :content_type, :rating, :tag_string, :status, :backtrace, :post_id, :md5_confirmation, :parent_id
 
   module ValidationMethods
