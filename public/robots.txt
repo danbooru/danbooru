@@ -11,6 +11,7 @@ Disallow: /counts
 Disallow: /delayed_jobs
 Disallow: /dmails
 Disallow: /favorite
+Disallow: /iqdb_queries
 Disallow: /ip_bans
 Disallow: /janitor_trials
 Disallow: /maintenance

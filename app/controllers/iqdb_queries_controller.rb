@@ -11,6 +11,8 @@ class IqdbQueriesController < ApplicationController
       create_by_url
     elsif params[:post_id]
       create_by_post
+    else
+      render :nothing => true, :status => 422
     end
   end
 
