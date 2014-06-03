@@ -164,4 +164,8 @@ class DTextTest < ActiveSupport::TestCase
   def test_table
     assert_equal("<table class=\"striped\"><thead><tr><th>header</th></tr></thead><tbody><tr><td><a href=\"/posts/100\">post #100</a></td></tr></tbody></table>", p("[table][thead][tr][th]header[/th][/tr][/thead][tbody][tr][td]post #100[/td][/tr][/tbody][/table]"))
   end
+
+  def test_table_with_newlines
+    assert_equal("<table class=\"striped\"><thead>\n<tr>\n<th>header</th></tr></thead><tbody><tr><td><a href=\"/posts/100\">post #100</a></td></tr></tbody></table>", p("[table]\n[thead]\n[tr]\n[th]header[/th][/tr][/thead][tbody][tr][td]post #100[/td][/tr][/tbody][/table]"))
+  end
 end
