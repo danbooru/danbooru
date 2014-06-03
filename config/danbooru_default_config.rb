@@ -288,6 +288,14 @@ module Danbooru
       nil
     end
 
+    def nijie_login
+      nil
+    end
+
+    def nijie_password
+      nil
+    end
+
     def amazon_ses
       # {:smtp_server_name => "smtp server", :user_name => "user name", :ses_smtp_user_name => "smtp user name", :ses_smtp_password => "smtp password"}
       nil
