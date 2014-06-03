@@ -36,7 +36,7 @@ class DText
     str.gsub!(/&/, "&amp;")
     str.gsub!(/</, "&lt;")
     str.gsub!(/>/, "&gt;")
-    str.gsub!(/\n/m, "<br>")
+    str.gsub!(/\n/m, "<br>") unless options[:ignore_newlines]
     str.gsub!(/\[b\](.+?)\[\/b\]/i, '<strong>\1</strong>')
     str.gsub!(/\[i\](.+?)\[\/i\]/i, '<em>\1</em>')
     str.gsub!(/\[s\](.+?)\[\/s\]/i, '<s>\1</s>')
@@ -48,6 +48,12 @@ class DText
     str = parse_wiki_links(str)
     str = parse_post_links(str)
     str = parse_id_links(str)
+    str
+  end
+
+  def self.parse_table_elements(str)
+    str = parse_inline(str, :ignore_newlines => true)
+    str.gsub!(/\[(\/?(?:tr|td|th|thead|tbody))\]/, '<\1>')
     str
   end
 
@@ -165,6 +171,8 @@ class DText
       str.gsub!(/^(h[1-6]\.\s*.+)$/, "\n\n\\1\n\n")
       str.gsub!(/\s*\[expand(\=[^\]]*)?\]\s*/m, "\n\n[expand\\1]\n\n")
       str.gsub!(/\s*\[\/expand\]\s*/m, "\n\n[/expand]\n\n")
+      str.gsub!(/\s*\[table\]\s*/m, "\n\n[table]\n\n")
+      str.gsub!(/\s*\[\/table\]\s*/m, "\n\n[/table]\n\n")
     end
 
     str.gsub!(/(?:\r?\n){3,}/, "\n\n")
@@ -218,6 +226,20 @@ class DText
           ""
         end
 
+      when "[table]"
+        stack << "table"
+        flags[:table] = true
+        '<table class="striped">'
+
+      when "[/table]"
+        if stack.last == "table"
+          stack.pop
+          flags[:table] = false
+          "</table>"
+        else
+          ""
+        end
+
       when /\[code\](?!\])/
         flags[:code] = true
         stack << "pre"
@@ -249,6 +271,8 @@ class DText
       else
         if flags[:code]
           CGI.escape_html(block) + "\n\n"
+        elsif flags[:table]
+          parse_table_elements(block)
         else
           '<p>' + parse_inline(block) + '</p>'
         end
@@ -266,6 +290,8 @@ class DText
         html << "</div>"
       elsif tag == "expandable"
         html << "</div></div>"
+      elsif tag == "table"
+        html << "</table>"
       end
     end
 
