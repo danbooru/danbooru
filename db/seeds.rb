@@ -80,6 +80,9 @@ if Post.count == 0
   Upload.all.each do |upload|
     upload.process!
   end
+  if Post.count == 0
+    raise "Uploads failed conversion"
+  end
 else
   puts "Skipping posts"
 end

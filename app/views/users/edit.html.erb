@@ -30,8 +30,11 @@
         </div>
 
         <%= f.input :time_zone, :include_blank => false %>
-        <%= f.input :receive_email_notifications, :as => :select, :include_blank => false %>
+
+        <%= f.input :receive_email_notifications, :as => :select, :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
+
         <%= f.input :comment_threshold, :hint => "Comments below this score will be hidden by default" %>
+
         <%= f.input :default_image_size, :hint => "Show original image or show resized #{Danbooru.config.large_image_width} pixel version", :label => "Default image width", :collection => [["850px", "large"], ["original", "original"]], :include_blank => false %>
         
         <% if CurrentUser.user.is_gold? %>
@@ -43,23 +46,33 @@
       
       <fieldset id="advanced-settings-section">
         <%= f.input :style_usernames, :as => :select, :label => "Colored usernames", :hint => "Color each user's name depending on their level", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
-        <%= f.input :always_resize_images, :as => :select, :include_blank => false, :label => "Fit images to window", :hint => "Use JavaScript to resize images to fit window" %>
-        <%= f.input :enable_post_navigation, :as => :select, :include_blank => false, :label => "Enable keyboard shortcuts" %>
-        <%= f.input :enable_sequential_post_navigation, :as => :select, :label => "Enable slideshow mode", :hint => "Show prev/next links when viewing a post", :include_blank => false %>
+
+        <%= f.input :always_resize_images, :as => :select, :include_blank => false, :label => "Fit images to window", :hint => "Use JavaScript to resize images to fit window", :collection => [["Yes", "true"], ["No", "false"]] %>
+
+        <%= f.input :enable_post_navigation, :as => :select, :include_blank => false, :label => "Enable keyboard shortcuts", :collection => [["Yes", "true"], ["No", "false"]] %>
+
+        <%= f.input :enable_sequential_post_navigation, :as => :select, :label => "Enable slideshow mode", :hint => "Show prev/next links when viewing a post", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
+
         <%= f.input :new_post_navigation_layout, :as => :select, :label => "Navigation bar position", :include_blank => false, :collection => [["Below", "true"], ["Above", "false"]], :hint => "When browsing pools or slideshows, place navigation links above or below the image" %>
+
         <%= f.input :hide_deleted_posts, :as => :select, :label => "Deleted post filter", :hint => "Remove deleted posts from search results", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
+
         <%= f.input :show_deleted_children, :as => :select, :label => "Show deleted children", :hint => "Indicate that a post has children even if the children are deleted", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
+
         <%= f.input :enable_auto_complete, :as => :select, :collection => [["Yes", "true"], ["No", "false"]], :include_blank => false %>
+
         <div class="input text optional field_with_hint">
           <label class="text optional" for="user_favorite_tags">Frequent tags</label>
           <textarea id="user_favorite_tags" class="text optional" rows="5" name="user[favorite_tags]" cols="40"><%= raw @user.favorite_tags %></textarea>
           <span class="hint">A list of tags that you use often. They will appear when using the list of Related Tags.</span>
         </div>
+
         <%= f.input :custom_style, :label => "Custom <a href='http://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, :hint => "Style to apply to the whole site.", :input_html => {:size => "40x5"} %>
       </fieldset>
 
       <fieldset id="change-password-section">
         <%= f.input :password, :hint => "Leave blank if you don't want to change your password", :label => "New password", :input_html => {:autocomplete => "off"} %>
+        
         <%= f.input :old_password, :as => :password, :input_html => {:autocomplete => "off"} %>
       </fieldset>
 

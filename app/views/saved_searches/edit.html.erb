@@ -1,0 +1,19 @@
+<div id="c-saved-searches">
+  <div id="a-edit">
+    <h1>Edit Saved Search</h1>
+
+    <%= error_messages_for :saved_search %>
+
+    <%= simple_form_for(@saved_search) do |f| %>
+      <%= f.input :tag_query %>
+      <%= f.input :category %>
+      <%= f.button :submit %>
+    <% end %>
+  </div>
+</div>
+
+<%= render "users/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Edit Saved Search - <%= Danbooru.config.app_name %>
+<% end %>

@@ -1,0 +1,6 @@
+<% if @saved_search.errors.any? %>
+  Danbooru.error("<%= j @saved_search.errors.full_messages.join(', ') %>");
+<% else %>
+  Danbooru.notice("Search '<%= j @saved_search.tag_query %>' was saved");
+  $("#saved-searches-nav").html("<%= j render('saved_searches/interface', :saved_searches => CurrentUser.user.saved_searches) %>");
+<% end %>

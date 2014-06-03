@@ -497,6 +497,13 @@
       }
     });
   }
+
+  Danbooru.Post.save_search = function() {
+    $.post(
+      "/saved_searches.js",
+      {"saved_search[tag_query]": $("#tags").val()}
+    );
+  }
 })();
 
 $(document).ready(function() {

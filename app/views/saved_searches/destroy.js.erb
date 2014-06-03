@@ -1,0 +1,3 @@
+Danbooru.notice("Search '<%= j @saved_search.tag_query %>' was deleted");
+$("#saved-searches-nav").html("<%= j render('saved_searches/interface', :saved_searches => CurrentUser.user.saved_searches) %>");
+$("#saved-search-<%= @saved_search.id %>").remove();

@@ -1,5 +1,13 @@
 <div id="posts">
-  <%= post_set.presenter.post_previews_html(self) %>
+  <div style="overflow: hidden;">
+    <%= post_set.presenter.post_previews_html(self) %>
+  </div>
+
+  <% if params[:tags] %>
+    <div id="saved-searches-nav">
+      <%= render "saved_searches/interface", :saved_searches => CurrentUser.user.saved_searches %>
+    </div>
+  <% end %>
 
   <%= numbered_paginator(post_set.posts) %>
 </div>

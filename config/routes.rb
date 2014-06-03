@@ -198,6 +198,7 @@ Rails.application.routes.draw do
   resources :artist_commentary_versions, :only => [:index]
   resource :related_tag, :only => [:show]
   get "reports/user_promotions" => "reports#user_promotions"
+  resources :saved_searches
   resource :session do
     collection do
       get :sign_out

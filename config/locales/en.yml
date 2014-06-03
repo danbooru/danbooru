@@ -35,3 +35,6 @@ en:
       user_feedback:
         creator: "You"
         creator_id: "You"
+      saved_search:
+        user: "You"
+        user_id: "You"

@@ -6,6 +6,9 @@
     <li><%= link_to "Hot", posts_path(:tags => "order:rank") %></li>
     <% unless CurrentUser.is_anonymous? %>
       <li><%= link_to "Favorites", favorites_path %></li>
+      <% if CurrentUser.user.has_saved_searches? %>
+        <li><%= link_to "Saved searches", saved_searches_path %></li>
+      <% end %>
       <li><%= link_to "Subscriptions", posts_path(:tags => "sub:#{CurrentUser.name}") %></li>
     <% end %>
     <li class="nonessential"><%= link_to "Changes", post_versions_path %></li>

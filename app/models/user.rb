@@ -16,6 +16,22 @@ class User < ActiveRecord::Base
     ADMIN = 50
   end
 
+  BOOLEAN_ATTRIBUTES = {
+    :is_banned                         => 0x0001,
+    :has_mail                          => 0x0002,
+    :receive_email_notifications       => 0x0004,
+    :always_resize_images              => 0x0008,
+    :enable_post_navigation            => 0x0010,
+    :new_post_navigation_layout        => 0x0020,
+    :enable_privacy_mode               => 0x0040,
+    :enable_sequential_post_navigation => 0x0080,
+    :hide_deleted_posts                => 0x0100,
+    :style_usernames                   => 0x0200,
+    :enable_auto_complete              => 0x0400,
+    :show_deleted_children             => 0x0800,
+    :has_saved_searches                => 0x1000
+  }
+
   attr_accessor :password, :old_password
   attr_accessible :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr, :time_zone, :default_image_size, :enable_sequential_post_navigation, :per_page, :hide_deleted_posts, :style_usernames, :enable_auto_complete, :custom_style, :show_deleted_children, :as => [:moderator, :janitor, :contributor, :gold, :member, :anonymous, :default, :builder, :admin]
   attr_accessible :level, :as => :admin
@@ -45,6 +61,7 @@ class User < ActiveRecord::Base
   has_many :subscriptions, lambda {order("tag_subscriptions.name")}, :class_name => "TagSubscription", :foreign_key => "creator_id"
   has_many :note_versions, :foreign_key => "updater_id"
   has_many :dmails, lambda {order("dmails.id desc")}, :foreign_key => "owner_id"
+  has_many :saved_searches
   belongs_to :inviter, :class_name => "User"
   after_update :create_mod_action
 
@@ -417,6 +434,20 @@ class User < ActiveRecord::Base
   end
 
   module LimitMethods
+    def max_saved_searches
+      if is_platinum?
+        1_000
+      elsif is_gold?
+        200
+      else
+        100
+      end
+    end
+
+    def show_saved_searches?
+      id < 1_000
+    end
+
     def can_upload?
       if is_contributor?
         true
@@ -702,6 +733,24 @@ class User < ActiveRecord::Base
   include ApiMethods
   include CountMethods
   extend SearchMethods
+
+  BOOLEAN_ATTRIBUTES.each do |boolean_attribute, bit_flag|
+    define_method(boolean_attribute) do
+      bit_prefs & bit_flag > 0
+    end
+
+    define_method("#{boolean_attribute}?") do
+      bit_prefs & bit_flag > 0
+    end
+
+    define_method("#{boolean_attribute}=") do |val|
+      if val.to_s =~ /t|1|y/
+        self.bit_prefs = bit_prefs | bit_flag
+      else
+        self.bit_prefs = bit_prefs - bit_flag
+      end
+    end
+  end
 
   def initialize_default_image_size
     self.default_image_size = "large"

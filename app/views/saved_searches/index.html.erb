@@ -1,0 +1,34 @@
+<div id="c-saved-searches">
+  <div id="a-index">
+    <h1>Saved Searches</h1>
+
+    <table class="striped" width="100%">
+      <thead>
+        <tr>
+          <th width="80%">Tags</th>
+          <th width="10%">Category</th>
+          <th width="10%"></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% @saved_searches.each do |saved_search| %>
+          <tr id="saved-search-<%= saved_search.id %>">
+            <td><%= link_to saved_search.tag_query, posts_path(:tags => saved_search.tag_query) %></td>
+            <td><%= saved_search.category %></td>
+            <td>
+              <%= link_to "edit", edit_saved_search_path(saved_search) %> |
+              <%= link_to "delete", saved_search_path(saved_search), :method => :delete, :remote => true %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%= render "users/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Saved Searches - <%= Danbooru.config.app_name %>
+<% end %>
