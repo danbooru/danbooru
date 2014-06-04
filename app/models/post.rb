@@ -312,6 +312,9 @@ class Post < ActiveRecord::Base
         day = $5
         "http://diary#{server_id}.fc2.com/cgi-sys/ed.cgi/#{username}?Y=#{year}&M=#{month}&D=#{day}"
 
+      when %r{\Ahttps?://s(?:content|photos)-[^/]+\.fbcdn.net/hphotos-.+/\d+_(\d+)_\d+_[no]\.}i
+        "https://www.facebook.com/photo.php?fbid=#{$1}"
+
       else
         source
       end
