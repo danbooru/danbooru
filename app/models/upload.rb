@@ -13,7 +13,7 @@ class Upload < ActiveRecord::Base
   after_destroy :delete_temp_file
   validate :uploader_is_not_limited, :on => :create
   validate :file_or_source_is_present, :on => :create
-  validates :rating, :presence => true
+  validate :rating_given
   attr_accessible :file, :image_width, :image_height, :file_ext, :md5, :file_size, :as_pending, :source, :file_path, :content_type, :rating, :tag_string, :status, :backtrace, :post_id, :md5_confirmation, :parent_id
 
   module ValidationMethods
@@ -58,6 +58,18 @@ class Upload < ActiveRecord::Base
     def validate_md5_confirmation
       if !md5_confirmation.blank? && md5_confirmation != md5
         raise "md5 mismatch"
+      end
+    end
+
+    def rating_given
+      if rating.present?
+        return true
+      elsif tag_string =~ /(?:\s|^)rating:[qse](?:\s|$)/i
+        self.rating = "q" # Dummy just so the upload can be created. The metatag will set the correct rating on the post after upload.
+        return true
+      else
+        self.errors.add(:base, "Must specify a rating")
+        return false
       end
     end
   end
