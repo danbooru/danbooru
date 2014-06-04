@@ -910,7 +910,7 @@ class Post < ActiveRecord::Base
 
     def update_parent_on_save
       if parent_id == parent_id_was
-        # do nothing
+        Post.update_has_children_flag_for(parent_id)
       elsif !parent_id_was.nil?
         Post.update_has_children_flag_for(parent_id)
         Post.update_has_children_flag_for(parent_id_was)
@@ -986,6 +986,7 @@ class Post < ActiveRecord::Base
         update_column(:is_flagged, false)
         update_column(:is_banned, true) if options[:ban] || has_tag?("banned_artist")
         give_favorites_to_parent if options[:move_favorites]
+        update_parent_on_save
 
 
         unless options[:without_mod_action]
