@@ -215,11 +215,11 @@ class Artist < ActiveRecord::Base
 
   module TagMethods
     def has_tag_alias?
-      TagAlias.exists?(["antecedent_name = ?", name])
+      TagAlias.active.exists?(["antecedent_name = ?", name])
     end
 
     def tag_alias_name
-      TagAlias.find_by_antecedent_name(name).consequent_name
+      TagAlias.active.find_by_antecedent_name(name).consequent_name
     end
 
     def categorize_tag
