@@ -466,6 +466,7 @@
           $post.data("flags", $post.data("flags").replace(/pending/, ""));
           $post.removeClass("post-status-pending");
           Danbooru.notice("Approved post #" + post_id);
+          $("#pending-approval-notice").hide();
         }
       }
     });
