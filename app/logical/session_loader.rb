@@ -107,7 +107,11 @@ private
 
   def update_forum_last_read_at
     unless CurrentUser.user.is_anonymous?
-      CurrentUser.user.update_column(:last_forum_read_at, CurrentUser.user.last_logged_in_at)
+      if CurrentUser.user.last_forum_read_at && CurrentUser.user.last_forum_read_at < CurrentUser.user.last_logged_in_at
+        CurrentUser.user.update_column(:last_forum_read_at, CurrentUser.user.last_logged_in_at)
+      elsif CurrentUser.user.last_forum_read_at.nil?
+        CurrentUser.user.update_column(:last_forum_read_at, CurrentUser.user.last_logged_in_at)
+      end
       CurrentUser.user.update_column(:last_logged_in_at, Time.now)
     end
   end
