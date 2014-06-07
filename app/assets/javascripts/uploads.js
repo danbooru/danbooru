@@ -4,11 +4,12 @@
   Danbooru.Upload.initialize_all = function() {
     if ($("#c-uploads,#c-posts").length) {
       this.initialize_enter_on_tags();
+      this.initialize_info_manual();
     }
 
     if ($("#c-uploads").length) {
       this.initialize_image();
-      this.initialize_info();
+      this.initialize_info_bookmarklet();
       this.initialize_similar();
       $("#related-tags-button").trigger("click");
       $("#find-artist-button").trigger("click");
@@ -55,16 +56,20 @@
     });
   }
 
-  Danbooru.Upload.initialize_info = function() {
+  Danbooru.Upload.initialize_info_bookmarklet = function() {
     $("#source-info ul").hide();
     $("#fetch-data-bookmarklet").click(function(e) {
       $.get(e.target.href).success(Danbooru.Upload.fill_source_info);
       e.preventDefault();
     });
     $("#fetch-data-bookmarklet").trigger("click");
+  }
+
+  Danbooru.Upload.initialize_info_manual = function() {
+    $("#source-info ul").hide();
 
     $("#fetch-data-manual").click(function(e) {
-      var source = $("#upload_source").val();
+      var source = $("#upload_source,#post_source").val();
       if (!/\S/.test(source)) {
         Danbooru.error("Error: You must enter a URL into the source field to get its data");
       } else if (!/^https?:\/\//.test(source)) {

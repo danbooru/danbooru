@@ -373,6 +373,22 @@ div#c-posts {
         color: gray;
       }
     }
+
+    div#source-info {
+      margin: 1em 0;
+      padding: 1em;
+      border: 1px solid gray;
+
+      p {
+        margin: 0;
+      }
+
+      ul {
+        a {
+          margin-right: 1em;
+        }
+      }
+    }
   }
 
   div#quick-edit-div {
