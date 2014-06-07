@@ -10,6 +10,7 @@ class TagImplication < ActiveRecord::Base
   validate :absence_of_circular_relation
   validate :antecedent_is_not_aliased
   validate :consequent_is_not_aliased
+  validate :antecedent_and_consequent_are_different
   attr_accessible :antecedent_name, :consequent_name, :descendant_names, :forum_topic_id, :status, :forum_topic
 
   module DescendantMethods
@@ -140,6 +141,14 @@ class TagImplication < ActiveRecord::Base
     # We don't want to implicate a -> b if b is already aliased to c
     if TagAlias.exists?(["antecedent_name = ?", consequent_name])
       self.errors[:base] << "Consequent tag must not be aliased to another tag"
+      false
+    end
+  end
+
+  def antecedent_and_consequent_are_different
+    normalize_names
+    if antecedent_name == consequent_name
+      self.errors[:base] << "Cannot implicate a tag to itself"
       false
     end
   end

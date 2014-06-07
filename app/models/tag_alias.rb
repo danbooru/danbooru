@@ -7,6 +7,7 @@ class TagAlias < ActiveRecord::Base
   validates_presence_of :creator_id, :antecedent_name, :consequent_name
   validates_uniqueness_of :antecedent_name
   validate :absence_of_transitive_relation
+  validate :antecedent_and_consequent_are_different
   belongs_to :creator, :class_name => "User"
   belongs_to :forum_topic
   attr_accessible :antecedent_name, :consequent_name, :forum_topic_id, :status
@@ -117,23 +118,40 @@ class TagAlias < ActiveRecord::Base
     end
   end
 
+  def antecedent_and_consequent_are_different
+    normalize_names
+    if antecedent_name == consequent_name
+      self.errors[:base] << "Cannot alias a tag to itself"
+      false
+    end
+  end
+
   def move_aliases_and_implications
     aliases = TagAlias.where(["consequent_name = ?", antecedent_name])
     aliases.each do |ta|
       ta.consequent_name = self.consequent_name
-      ta.save
+      success = ta.save
+      if !success && ta.errors.full_messages.join("; ") =~ /Cannot alias a tag to itself/
+        ta.destroy
+      end
     end
 
     implications = TagImplication.where(["antecedent_name = ?", antecedent_name])
     implications.each do |ti|
       ti.antecedent_name = self.consequent_name
-      ti.save
+      success = ti.save
+      if !success && ti.errors.full_messages.join("; ") =~ /Cannot implicate a tag to itself/
+        ti.destroy
+      end
     end
 
     implications = TagImplication.where(["consequent_name = ?", antecedent_name])
     implications.each do |ti|
       ti.consequent_name = self.consequent_name
-      ti.save
+      success = ti.save
+      if !success && ti.errors.full_messages.join("; ") =~ /Cannot implicate a tag to itself/
+        ti.destroy
+      end
     end
   end
 
