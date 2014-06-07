@@ -35,10 +35,14 @@ class WikiPagesController < ApplicationController
   end
 
   def show
-    if params[:id] =~ /[a-zA-Z]/
-      @wiki_page = WikiPage.find_by_title(params[:id])
+    if params[:id] =~ /\A\d+\Z/
+      @wiki_page = WikiPage.find(params[:id])
     else
-      @wiki_page = WikiPage.find_by_id(params[:id])
+      @wiki_page = WikiPage.find_by_title(params[:id])
+      if @wiki_page.nil?
+        redirect_to show_or_new_wiki_pages_path(:title => params[:id])
+        return
+      end
     end
     
     respond_with(@wiki_page)
