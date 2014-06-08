@@ -15,11 +15,7 @@
       e.preventDefault();
     });
 
-    if ($("#image").length) {
-      $(document).bind("keypress", "shift+o", function(e) {
-        Danbooru.Post.approve(Danbooru.meta("post-id"));
-      });
-
+    if ($("#image").length) { // post page or bookmarklet upload page
       $(document).bind("keypress", "shift+e", function(e) {
         if (!$("#edit-dialog").length) {
           $("#edit").show();
@@ -32,6 +28,22 @@
           Danbooru.Post.open_edit_dialog();
         }
         e.preventDefault();
+      });
+    }
+
+    if ($("#c-posts").length && $("#a-show").length) {
+      $(document).bind("keypress", "shift+o", function(e) {
+        Danbooru.Post.approve(Danbooru.meta("post-id"));
+      });
+
+      $(document).bind("keypress", "r", function(e) {
+        $("#random-post")[0].click();
+      });
+    }
+
+    if ($("#c-posts").length && $("#a-index").length) {
+      $(document).bind("keypress", "r", function(e) {
+        $("#random-post")[0].click();
       });
     }
   }
