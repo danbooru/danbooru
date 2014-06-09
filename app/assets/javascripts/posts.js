@@ -304,19 +304,45 @@
     $("#image-resize-link").click(function(e) {
       var $link = $(e.target);
       var $image = $("#image");
+      var $notice = $("#image-resize-notice");
       $image.attr("src", $link.attr("href"));
       $image.css("opacity", "0.25");
       $image.width($image.data("original-width"));
       $image.height($image.data("original-height"));        
       $image.on("load", function() {
         $image.css("opacity", "1");
-        $("#image-resize-notice").hide();
+        $notice.hide();
       });
-      $("#image-resize-notice").html("Loading...");
+      $notice.children().eq(0).hide();
+      $notice.children().eq(1).show(); // Loading message
       Danbooru.Note.Box.scale_all();
       $image.data("scale_factor", 1);
       e.preventDefault();
     });
+
+    if ($("#image-resize-notice").length && Danbooru.meta("enable-js-navigation") === "true") {
+      $(document).bind("keypress", "v", function(e) {
+        if ($("#image-resize-notice").is(":visible")) {
+          $("#image-resize-link").click();
+        } else {
+          var $image = $("#image");
+          var $notice = $("#image-resize-notice");
+          $image.attr("src", $("#image-container").data("large-file-url"));
+          $image.css("opacity", "0.25");
+          $image.width($image.data("large-width"));
+          $image.height($image.data("large-height")); 
+          $notice.children().eq(0).show();
+          $notice.children().eq(1).hide(); // Loading message
+          $image.on("load", function() {
+            $image.css("opacity", "1");
+            $notice.show();
+          });
+          Danbooru.Note.Box.scale_all();
+          $image.data("scale_factor", 1);
+          e.preventDefault();
+        }
+      });
+    }
   }
 
   Danbooru.Post.initialize_post_image_resize_to_window_link = function() {
