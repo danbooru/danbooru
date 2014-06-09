@@ -46,8 +46,8 @@ namespace :local_config do
 
   desc "Initialize local config files"
   task :setup_local_files do
-    run "curl -s https://raw.github.com/r888888888/danbooru/master/script/install/danbooru_local_config.rb.templ > #{deploy_to}/shared/config/danbooru_local_config.rb"
-    run "curl -s https://raw.github.com/r888888888/danbooru/master/script/install/database.yml.templ > #{deploy_to}/shared/config/database.yml"
+    run "curl -s https://raw.githubusercontent.com/r888888888/danbooru/master/script/install/danbooru_local_config.rb.templ > #{deploy_to}/shared/config/danbooru_local_config.rb"
+    run "curl -s https://raw.githubusercontent.com/r888888888/danbooru/master/script/install/database.yml.templ > #{deploy_to}/shared/config/database.yml"
   end
 
   desc "Link the local config files"
