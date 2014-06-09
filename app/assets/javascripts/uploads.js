@@ -36,23 +36,8 @@
 
   Danbooru.Upload.initialize_similar = function() {
     $("#similar-button").click(function(e) {
-      var old_source_name = $("#upload_source").attr("name");
-  		var old_file_name = $("#upload_file").attr("name");
-  		var old_action = $("#form").attr("action");
-
-  		$("#upload_source").attr("name", "url");
-  		$("#upload_file").attr("name", "file");
-  		$("#form").attr("target", "_blank");
-  		$("#form").attr("action", "http://danbooru.iqdb.org/");
-
-      $("#form").trigger("submit");
-
-  		$("#upload_source").attr("name", old_source_name);
-  		$("#upload_file").attr("name", old_file_name);
-  		$("#form").attr("target", "");
-  		$("#form").attr("action", old_action);
-
-  		e.preventDefault();
+      $.post("/iqdb_queries", {"url": $("#upload_source").val()}).done(function(html) {$("#iqdb-similar").html(html).show()});
+      e.preventDefault();
     });
   }
 

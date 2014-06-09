@@ -65,10 +65,14 @@
         <%= f.text_field :parent_id %>
       </div>
 
-      <% if Danbooru.config.iqdb_hostname_and_port && params[:url] %>
-        <div class="input" id="iqdb-similar">
-          <p><em>Loading similar...</em></p>
-        </div>
+      <% if Danbooru.config.iqdb_hostname_and_port %>
+        <% if params[:url] %>
+          <div class="input" id="iqdb-similar">
+            <p><em>Loading similar...</em></p>
+          </div>
+        <% else %>
+          <div class="input" id="iqdb-similar" style="display: none;"></div>
+        <% end %>
       <% end %>
 
       <div class="input">
