@@ -4,7 +4,7 @@ module Danbooru
   class Configuration
     # The version of this Danbooru.
     def version
-      "2.51.0"
+      "2.52.0"
     end
 
     # The name of this Danbooru.
