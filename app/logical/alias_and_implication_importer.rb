@@ -31,7 +31,7 @@ private
         [:remove_alias, $1, $2]
       elsif line =~ /^remove implication (\S+) -> (\S+)$/i
         [:remove_implication, $1, $2]
-      elsif line =~ /^mass update (\S+) -> (\S+)$/i
+      elsif line =~ /^mass update\s+(.+)\s+->\s+(.+)$/i
         [:mass_update, $1, $2]
       elsif line.empty?
         # do nothing
