@@ -315,6 +315,9 @@ class Post < ActiveRecord::Base
       when %r{\Ahttps?://s(?:content|photos)-[^/]+\.fbcdn.net/hphotos-.+/\d+_(\d+)_\d+_[no]\.}i
         "https://www.facebook.com/photo.php?fbid=#{$1}"
 
+      when %r{\Ahttp://c(?:s|han|\d{1}).sankakucomplex.com/data(?:/sample)?/(?:[a-f0-9]{2}/){2}(?:sample-|preview)?([a-f0-9]{32})}i
+        "http://chan.sankakucomplex.com/en/post/show?md5=#{$1}"
+
       else
         source
       end
