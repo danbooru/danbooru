@@ -31,6 +31,8 @@ private
         [:remove_alias, $1, $2]
       elsif line =~ /^remove implication (\S+) -> (\S+)$/i
         [:remove_implication, $1, $2]
+      elsif line =~ /^mass update (\S+) -> (\S+)$/i
+        [:mass_update, $1, $2]
       elsif line.empty?
         # do nothing
       else
@@ -61,6 +63,9 @@ private
           tag_implication = TagImplication.where("antecedent_name = ? and consequent_name = ?", token[1], token[2]).first
           raise "Implication for #{token[1]} not found" if tag_implication.nil?
           tag_implication.destroy
+
+        when :mass_update
+          Delayed::Job.enqueue(TagBatchChange.new(token[1], token[2], CurrentUser.user, CurrentUser.ip_addr))
 
         else
           raise "Unknown token: #{token[0]}"
