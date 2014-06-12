@@ -15,6 +15,10 @@ class CurrentUser
     end
   end
 
+  def self.as_admin(&block)
+    scoped(User.admins.first, "127.0.0.1", &block)
+  end
+
   def self.user=(user)
     Thread.current[:current_user] = user
   end
