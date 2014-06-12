@@ -21,7 +21,9 @@
   }
 
   Danbooru.Upload.initialize_iqdb_source = function() {
-    $.post("/iqdb_queries", {"url": $("#normalized_url").val()}).done(function(html) {$("#iqdb-similar").html(html)});
+    if (/^https?:\/\//.test($("#normalized_url").val())) {
+      $.post("/iqdb_queries", {"url": $("#normalized_url").val()}).done(function(html) {$("#iqdb-similar").html(html)});
+    }
   }
 
   Danbooru.Upload.initialize_enter_on_tags = function() {
