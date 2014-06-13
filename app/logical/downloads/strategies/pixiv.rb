@@ -34,7 +34,7 @@ module Downloads
         if url =~ %r!(/img/.+?/.+?)_m.+$!
           match = $1
           url.sub!(match + "_m", match)
-        elsif url =~ %r!(/img/.+?/.+?)_s.+$!
+        elsif url =~ %r!(/img/.+?/.+?)_s.+$! && url !~ %r!/img-inf/!
           match = $1
           url.sub!(match + "_s", match)
         end
