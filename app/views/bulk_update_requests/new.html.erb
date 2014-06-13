@@ -1,0 +1,29 @@
+<div class="bulk-update-requests">
+  <div class="new">
+    <h1>New Bulk Update Request</h1>
+    <%= simple_form_for(@bulk_update_request) do |f| %>
+      <%= error_messages_for("bulk_update_request") %>
+
+      <pre>
+Use the following format:
+
+remove alias aaa -> bbb
+remove implication aaa -> bbb
+create alias aaa -> bbb
+create implication aaa -> bbb
+mass update aaa -> bbb
+      </pre>
+
+      <%= f.input :script, :as => :text %>
+      <%= f.input :forum_topic_id %>
+      <%= f.button :submit, :value => "Submit" %>
+    <% end %>
+
+  </div>
+</div>
+
+<%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  New Bulk Update Request - <%= Danbooru.config.app_name %>
+<% end %>

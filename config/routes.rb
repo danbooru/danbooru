@@ -78,6 +78,7 @@ Rails.application.routes.draw do
     end
   end
   resources :bans
+  resources :bulk_update_requests
   resources :comments do
     resources :votes, :controller => "comment_votes", :only => [:create, :destroy]
     collection do
@@ -121,6 +122,7 @@ Rails.application.routes.draw do
     end
   end
   resources :ip_bans
+  resources :iqdb_queries, :only => [:create]
   resources :janitor_trials do
     collection do
       get :test
@@ -257,7 +259,6 @@ Rails.application.routes.draw do
       get :diff
     end
   end
-  resources :iqdb_queries, :only => [:create]
 
   # aliases
   resources :wpages, :controller => "wiki_pages"
