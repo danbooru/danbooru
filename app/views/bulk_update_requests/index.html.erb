@@ -1,0 +1,39 @@
+<div class="bans">
+  <div class="index">
+    <h1>Bulk Update Requests</h1>
+
+    <table class="striped" width="100%">
+      <thead>
+        <tr>
+          <th>Creator</th>
+          <th>Script</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @bulk_update_requests.each do |request| %>
+          <tr id="request-<%= request.id %>">
+            <td><%= link_to_user(request.user) %></td>
+            <td><%= request.script %></td>
+            <td><%= request.status %></td>
+            <td>
+              <% if CurrentUser.is_moderator? && request.status == "pending" %>
+                <%= link_to "Approve", bulk_update_request_path(request, :status => "approved"), :method => :put %>
+                | <%= link_to "Reject", bulk_update_request_path(request, :status => "rejected"), :method => :put %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <%= numbered_paginator(@bulk_update_requests) %>
+  </div>
+</div>
+
+<%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Bulk Update Requests - <%= Danbooru.config.app_name %>
+<% end %>
