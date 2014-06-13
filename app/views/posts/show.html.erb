@@ -9,24 +9,24 @@
         <%= @post.presenter.split_tag_list_html(self) %>
       </section>
 
-      <section>
+      <section id="post-information">
         <h1>Information</h1>
         <%= render "posts/partials/show/information", :post => @post %>
       </section>
 
       <% if CurrentUser.is_member? %>
-        <section>
+        <section id="post-options">
           <h1>Options</h1>
           <%= render "posts/partials/show/options", :post => @post %>
         </section>
       <% end %>
 
-      <section>
+      <section id="post-share">
         <h1>Share</h1>
         <%= render "posts/partials/show/share", :post => @post %>
       </section>
 
-      <section>
+      <section id="post-history">
         <h1>History</h1>
         <ul>
           <li><%= fast_link_to "Tags", post_versions_path(:search => {:post_id => @post.id}) %></li>
