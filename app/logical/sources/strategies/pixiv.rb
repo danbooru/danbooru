@@ -29,6 +29,7 @@ module Sources
           @artist_name, @profile_url = get_profile_from_page(page)
           @image_url = get_image_url_from_page(page)
           @tags = get_tags_from_page(page)
+          @page_count = get_page_count_from_page(page)
         end
       end
 
@@ -78,6 +79,19 @@ module Sources
           links
         else
           []
+        end
+      end
+
+      def get_page_count_from_page(page)
+        elements = page.search("ul.meta li").find_all do |node|
+          node.text =~ /Manga/
+        end
+
+        if elements.any?
+          elements[0].text =~ /Manga (\d+)P/
+          $1.to_i
+        else
+          1
         end
       end
 

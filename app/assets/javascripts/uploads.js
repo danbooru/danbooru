@@ -85,6 +85,12 @@
 
     $("#source-record").html(new_artist_link);
 
+    if (data.page_count > 1) {
+      $("#gallery-warning").show();
+    } else {
+      $("#gallery-warning").hide();
+    }
+
     $("#source-info span#loading-data").hide();
     $("#source-info ul").show();
   }

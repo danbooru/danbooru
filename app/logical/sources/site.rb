@@ -1,7 +1,7 @@
 module Sources
   class Site
     attr_reader :url, :strategy
-    delegate :get, :referer_url, :site_name, :artist_name, :profile_url, :image_url, :tags, :artist_record, :unique_id, :to => :strategy
+    delegate :get, :referer_url, :site_name, :artist_name, :profile_url, :image_url, :tags, :artist_record, :unique_id, :page_count, :to => :strategy
 
     def self.strategies
       [Strategies::Pixiv, Strategies::NicoSeiga, Strategies::DeviantArt, Strategies::Nijie]
@@ -31,7 +31,8 @@ module Sources
         :translated_tags => translated_tags,
         :danbooru_name => artist_record.try(:first).try(:name),
         :danbooru_id => artist_record.try(:first).try(:id),
-        :unique_id => unique_id
+        :unique_id => unique_id,
+        :page_count => page_count
       }.to_json
     end
 
