@@ -124,9 +124,11 @@ class ForumTopic < ActiveRecord::Base
     end
     hash[id.to_s] = updated_at.to_i.to_s
     result = hash.to_a.flatten.join(" ")
-    if result.size > 3000
+    while result.size > 3000
       ids = result.scan(/\S+/)
+      print "slicing from #{result.size} to "
       result = ids[(ids.size / 2)..-1].join(" ")
+      puts result.size
     end
     update_last_forum_read_at(hash.keys)
     result

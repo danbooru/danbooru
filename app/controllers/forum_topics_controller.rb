@@ -17,7 +17,6 @@ class ForumTopicsController < ApplicationController
   end
 
   def index
-    # session[:read_forum_topics] = ""
     @query = ForumTopic.active.search(params[:search])
     @forum_topics = @query.order("is_sticky DESC, updated_at DESC").paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     @read_forum_topic_ids = read_forum_topic_ids
