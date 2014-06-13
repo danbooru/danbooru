@@ -30,9 +30,10 @@ module Downloads
       end
 
       def rewrite_thumbnails(url, headers)
-        if url =~ %r{/thumb/(\d+)}
-          id = $1
-          url = "http://seiga.nicovideo.jp/image/source?id=" + id
+        if url =~ %r{/thumb/\d+}
+          source = ::Sources::Strategies::NicoSeiga.new(url)
+          source.get
+          return [source.image_url, headers]
         end
 
         return [url, headers]
