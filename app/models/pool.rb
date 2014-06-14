@@ -53,6 +53,10 @@ class Pool < ActiveRecord::Base
         q = q.name_matches(params[:name_matches])
       end
 
+      if params[:id].present?
+        q = q.where("id in (?)", params[:id].split(","))
+      end
+
       if params[:description_matches].present?
         q = q.where("lower(description) like ? escape E'\\\\'", "%" + params[:description_matches].mb_chars.downcase.to_escaped_for_sql_like + "%")
       end
