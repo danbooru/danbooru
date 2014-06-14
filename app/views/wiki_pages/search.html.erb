@@ -7,6 +7,11 @@
       <%= search_field "other_names_match", :label => "Other names" %>
 
       <div class="input">
+        <label for="search_other_names_present">Other names present?</label>
+        <%= select "search", "other_names_present", ["yes", "no"], :include_blank => true %>
+      </div>
+
+      <div class="input">
         <label for="search_order">Order</label>
         <%= select "search", "order", ["Name", "Date"] %>
       </div>

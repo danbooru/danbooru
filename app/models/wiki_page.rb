@@ -63,6 +63,12 @@ class WikiPage < ActiveRecord::Base
         q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].tr(" ", "_").mb_chars.downcase)
       end
 
+      if params[:other_names_present] == "yes"
+        q = q.where("other_names is not null and other_names != ''")
+      elsif params[:other_names_present] == "no"
+        q = q.where("other_names is null or other_names = ''")
+      end
+
       params[:order] ||= params.delete(:sort)
       if params[:order] == "time" || params[:order] == "Date"
         q = q.order("updated_at desc")
