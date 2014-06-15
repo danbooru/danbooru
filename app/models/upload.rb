@@ -64,8 +64,8 @@ class Upload < ActiveRecord::Base
     def rating_given
       if rating.present?
         return true
-      elsif tag_string =~ /(?:\s|^)rating:[qse](?:\s|$)/i
-        self.rating = "q" # Dummy just so the upload can be created. The metatag will set the correct rating on the post after upload.
+      elsif tag_string =~ /(?:\s|^)rating:([qse])/i
+        self.rating = $1.downcase
         return true
       else
         self.errors.add(:base, "Must specify a rating")
