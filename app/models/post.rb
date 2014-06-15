@@ -312,18 +312,21 @@ class Post < ActiveRecord::Base
         day = $5
         "http://diary#{server_id}.fc2.com/cgi-sys/ed.cgi/#{username}?Y=#{year}&M=#{month}&D=#{day}"
 
-      when %r{\Ahttps?://s(?:content|photos)-[^/]+\.fbcdn.net/hphotos-.+/\d+_(\d+)_\d+_[no]\.}i
+      when %r{\Ahttps?://s(?:content|photos)-[^/]+\.fbcdn\.net/hphotos-.+/\d+_(\d+)_\d+_[no]\.}i
         "https://www.facebook.com/photo.php?fbid=#{$1}"
 
-      when %r{\Ahttp://c(?:s|han|[1-4]).sankakucomplex.com/data(?:/sample)?/(?:[a-f0-9]{2}/){2}(?:sample-|preview)?([a-f0-9]{32})}i
+      when %r{\Ahttp://c(?:s|han|[1-4])\.sankakucomplex\.com/data(?:/sample)?/(?:[a-f0-9]{2}/){2}(?:sample-|preview)?([a-f0-9]{32})}i
         "http://chan.sankakucomplex.com/en/post/show?md5=#{$1}"
 
-      when %r{\Ahttp?://s(?:tatic|[1-4]).zerochan.net/.+(?:\.|\/)(\d+)\.(?:jpe?g?)\z}i
+      when %r{\Ahttp://s(?:tatic|[1-4])\.zerochan\.net/.+(?:\.|\/)(\d+)\.(?:jpe?g?)\z}i
         "http://www.zerochan.net/#{$1}#full"
 
-      when %r{\Ahttp?://static[1-6]?.minitokyo.net/(?:downloads|view)/(?:\d{2}/){2}(\d+)}i
+      when %r{\Ahttp://static[1-6]?\.minitokyo\.net/(?:downloads|view)/(?:\d{2}/){2}(\d+)}i
         "http://gallery.minitokyo.net/download/#{$1}"
 
+      when %r{\Ahttp://(?:(?:s?img|cdn|www)\d?\.)?gelbooru\.com/{1,2}(?:images|samples)/\d+/(?:sample_)?([a-f0-9]{32})\.}i
+        "http://gelbooru.com/index.php?page=post&s=list&md5=#{$1}"
+  
       else
         source
       end
