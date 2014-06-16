@@ -1,3 +1,5 @@
+﻿# encoding: UTF-8
+
 module Sources
   class Site
     attr_reader :url, :strategy
@@ -19,7 +21,16 @@ module Sources
     end
 
     def translated_tags
-      WikiPage.other_names_match(tags.map(&:first)).map{|wiki_page| [wiki_page.title, wiki_page.category_name]}
+      untranslated_tags = tags
+      untranslated_tags = untranslated_tags.map(&:first)
+      untranslated_tags = untranslated_tags.map do |tag|
+        if tag =~ /\A(\S+?)_?\d+users入り\Z/
+          $1
+        else
+          tag
+        end
+      end
+      WikiPage.other_names_match(untranslated_tags).map{|wiki_page| [wiki_page.title, wiki_page.category_name]}
     end
 
     def to_json
