@@ -1,5 +1,5 @@
 class BulkUpdateRequestsController < ApplicationController
-  respond_to :html
+  respond_to :html, :xml, :json
   before_filter :member_only
   before_filter :admin_only, :only => [:update]
 
