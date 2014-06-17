@@ -38,7 +38,24 @@ class BulkUpdateRequest < ActiveRecord::Base
   end
 
   def reason_with_link
-    "[code]\n#{script}\n[/code]\n\nh4. Reason\n\n#{reason}\n\n\"Link to request\":/bulk_update_requests?search[id]=#{id}\n"
+    "#{script_with_links}\n\nh4. Reason\n\n#{reason}\n\n\"Link to request\":/bulk_update_requests?search[id]=#{id}\n"
+  end
+
+  def script_with_links
+    tokens = AliasAndImplicationImporter.tokenize(script)
+    lines = tokens.map do |token|
+      case token[0]
+      when :create_alias, :create_implication, :remove_alias, :remove_implication
+        "#{token[0].to_s.tr("_", " ")} [[#{token[1]}]] -> [[#{token[2]}]]"
+
+      when :mass_update
+        "mass update {{#{token[1]}}} -> #{token[2]}"
+
+      else
+        raise "Unknown token: #{token[0]}"
+      end
+    end
+    lines.join("\n")
   end
 
   def reject!
