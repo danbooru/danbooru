@@ -124,7 +124,7 @@ class ForumTopic < ActiveRecord::Base
     end
     hash[id.to_s] = updated_at.to_i.to_s
     result = hash.to_a.flatten.join(" ")
-    while result.size > 3000
+    while result.size > 500
       ids = result.scan(/\S+/)
       result = ids[(ids.size / 2)..-1].join(" ")
     end

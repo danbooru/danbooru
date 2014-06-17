@@ -110,7 +110,7 @@ class ForumTopicTest < ActiveSupport::TestCase
       should "prune the string if it gets too long" do
         array = (1..1_000).to_a.map(&:to_s).in_groups_of(2)
         result = @topic.mark_as_read(array)
-        assert_operator result.size, :<, 3000
+        assert_operator result.size, :<, 500
       end
     end
 
