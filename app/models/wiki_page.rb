@@ -144,7 +144,6 @@ class WikiPage < ActiveRecord::Base
 
   def normalize_other_names
     normalized_other_names = other_names.to_s.gsub(/\u3000/, " ").scan(/\S+/)
-    normalized_other_names = normalized_other_names.map{|name| name.downcase}
     self.other_names = normalized_other_names.uniq.join(" ")
   end
 
