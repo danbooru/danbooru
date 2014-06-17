@@ -25,7 +25,7 @@ class BulkUpdateRequestsController < ApplicationController
   end
 
   def index
-    @bulk_update_requests = BulkUpdateRequest.order("id desc").paginate(params[:page])
+    @bulk_update_requests = BulkUpdateRequest.order("(case status when 'pending' then 0 when 'approved' then 1 else 2 end), id desc").paginate(params[:page], :limit => params[:limit])
     respond_with(@bulk_update_requests)
   end
 end
