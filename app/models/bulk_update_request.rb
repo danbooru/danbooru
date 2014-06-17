@@ -8,6 +8,7 @@ class BulkUpdateRequest < ActiveRecord::Base
   validates_presence_of :script
   validates_presence_of :title
   validates_inclusion_of :status, :in => %w(pending approved rejected)
+  validate :script_formatted_correctly
   attr_accessible :user_id, :forum_topic_id, :script, :title, :reason
   attr_accessible :status, :as => [:admin]
   before_validation :initialize_attributes, :on => :create
@@ -34,5 +35,13 @@ class BulkUpdateRequest < ActiveRecord::Base
   def initialize_attributes
     self.user_id = CurrentUser.user.id unless self.user_id
     self.status = "pending"
+  end
+
+  def script_formatted_correctly
+    AliasAndImplicationImporter.tokenize(script)
+    return true
+  rescue StandardError => e
+    errors.add(:base, e.message)
+    return false
   end
 end

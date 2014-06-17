@@ -8,7 +8,7 @@ class AliasAndImplicationImporter
   end
 
   def process!
-    tokens = tokenize(text)
+    tokens = AliasAndImplicationImporter.tokenize(text)
     parse(tokens)
   end
 
@@ -16,9 +16,8 @@ class AliasAndImplicationImporter
     @rename_aliased_pages == "1"
   end
 
-private
-
-  def tokenize(text)
+  def self.tokenize(text)
+    text = text.dup
     text.gsub!(/^\s+/, "")
     text.gsub!(/\s+$/, "")
     text.gsub!(/ {2,}/, " ")
@@ -40,6 +39,8 @@ private
       end
     end
   end
+
+private
 
   def parse(tokens)
     ActiveRecord::Base.transaction do
