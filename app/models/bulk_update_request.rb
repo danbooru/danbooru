@@ -14,6 +14,19 @@ class BulkUpdateRequest < ActiveRecord::Base
   before_validation :initialize_attributes, :on => :create
   after_create :create_forum_topic
 
+  module SearchMethods
+    def search(params)
+      q = where("true")
+      return q if params.blank?
+
+      if params[:id].present?
+        q = q.where("id = ?", params[:id].to_i)
+      end
+
+      q
+    end
+  end
+
   def approve!
     AliasAndImplicationImporter.new(script, forum_topic_id, "1").process!
     update_attribute(:status, "approved")
@@ -25,7 +38,7 @@ class BulkUpdateRequest < ActiveRecord::Base
   end
 
   def reason_with_link
-    "[code]\n#{script}\n[/code]\n\nh4. Reason\n\n#{reason}\n\n\"Link to request\":/bulk_update_requests/#{id}\n"
+    "[code]\n#{script}\n[/code]\n\nh4. Reason\n\n#{reason}\n\n\"Link to request\":/bulk_update_requests?search[id]=#{id}\n"
   end
 
   def reject!
