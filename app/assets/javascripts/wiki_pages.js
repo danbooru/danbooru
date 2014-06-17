@@ -6,6 +6,10 @@
       if (Danbooru.meta("enable-auto-complete") === "true") {
         this.initialize_autocomplete();
       }
+
+      if (Danbooru.meta("enable-js-navigation") === "true") {
+        this.initialize_shortcuts();
+      }
     }
   }
 
@@ -43,6 +47,15 @@
     $fields.each(function(i, field) {
       $(field).data("uiAutocomplete")._renderItem = render_wiki_page;
     });
+  }
+
+  Danbooru.WikiPage.initialize_shortcuts = function() {
+    if ($("#a-show").length) {
+      $(document).bind("keypress", "e", function(e) {
+        $("#wiki-page-edit-link")[0].click();
+        e.preventDefault();
+      });
+    }
   }
 })();
 
