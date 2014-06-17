@@ -5,6 +5,8 @@ class BulkUpdateRequest < ActiveRecord::Base
   belongs_to :forum_topic
 
   validates_presence_of :user
+  validates_presence_of :script
+  validates_presence_of :title
   validates_inclusion_of :status, :in => %w(pending approved rejected)
   attr_accessible :user_id, :forum_topic_id, :script, :title, :reason
   attr_accessible :status, :as => [:admin]
