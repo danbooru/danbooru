@@ -25,7 +25,7 @@ class BulkUpdateRequestsController < ApplicationController
   end
 
   def index
-    @bulk_update_requests = BulkUpdateRequest.paginate(params[:page])
+    @bulk_update_requests = BulkUpdateRequest.order("id desc").paginate(params[:page])
     respond_with(@bulk_update_requests)
   end
 end

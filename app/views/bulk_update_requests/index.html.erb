@@ -6,6 +6,7 @@
       <thead>
         <tr>
           <th>Creator</th>
+          <th>Forum</th>
           <th>Script</th>
           <th>Status</th>
           <th></th>
@@ -15,6 +16,7 @@
         <% @bulk_update_requests.each do |request| %>
           <tr id="request-<%= request.id %>">
             <td><%= link_to_user(request.user) %></td>
+            <td><%= link_to(request.forum_topic_id, forum_topic_path(request.forum_topic_id)) %></td>
             <td><%= request.script %></td>
             <td><%= request.status %></td>
             <td>
