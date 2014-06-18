@@ -21,8 +21,11 @@
             <td><%= request.status %></td>
             <td>
               <% if CurrentUser.is_moderator? && request.status == "pending" %>
-                <%= link_to "Approve", bulk_update_request_path(request, :status => "approved"), :method => :put %>
-                | <%= link_to "Reject", bulk_update_request_path(request, :status => "rejected"), :method => :put %>
+                <%= link_to "Approve", approve_bulk_update_request_path(request), :method => :post %> |
+              <% end %>
+              <% if request.editable?(CurrentUser.user) %>
+                <%= link_to "Delete", bulk_update_request_path(request), :method => :delete %> |
+                <%= link_to "Edit", edit_bulk_update_request_path(request) %>
               <% end %>
             </td>
           </tr>

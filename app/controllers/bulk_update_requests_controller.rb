@@ -1,7 +1,8 @@
 class BulkUpdateRequestsController < ApplicationController
   respond_to :html, :xml, :json
   before_filter :member_only
-  before_filter :admin_only, :only => [:update]
+  before_filter :admin_only, :only => [:approve]
+  before_filter :load_bulk_update_request, :except => [:new, :create, :index]
 
   def new
     @bulk_update_request = BulkUpdateRequest.new(:user_id => CurrentUser.user.id)
@@ -13,19 +14,43 @@ class BulkUpdateRequestsController < ApplicationController
     respond_with(@bulk_update_request, :location => bulk_update_requests_path)
   end
 
+  def edit
+  end
+
   def update
-    @bulk_update_request = BulkUpdateRequest.find(params[:id])
-    if params[:status] == "approved"
-      @bulk_update_request.approve!
+    if @bulk_update_request.editable?(CurrentUser.user)
+      @bulk_update_request.update_attributes(params[:bulk_update_request])
+      flash[:notice] = "Bulk update request updated"
+      respond_with(@bulk_update_request, :location => bulk_update_requests_path)
     else
-      @bulk_update_request.reject!
+      access_denied()
     end
-    flash[:notice] = "Bulk update request updated"
+  end
+
+  def approve
+    @bulk_update_request.approve!
+    flash[:notice] = "Bulk update request approved"
     respond_with(@bulk_update_request, :location => bulk_update_requests_path)
+  end
+
+  def destroy
+    if @bulk_update_request.editable?(CurrentUser.user)
+      @bulk_update_request.destroy
+      flash[:notice] = "Bulk update request deleted"
+      respond_with(@bulk_update_request, :location => bulk_update_requests_path)
+    else
+      access_denied()
+    end
   end
 
   def index
     @bulk_update_requests = BulkUpdateRequest.order("(case status when 'pending' then 0 when 'approved' then 1 else 2 end), id desc").paginate(params[:page], :limit => params[:limit])
     respond_with(@bulk_update_requests)
+  end
+
+  private
+
+  def load_bulk_update_request
+    @bulk_update_request = BulkUpdateRequest.find(params[:id])
   end
 end

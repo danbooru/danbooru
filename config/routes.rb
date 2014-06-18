@@ -78,7 +78,11 @@ Rails.application.routes.draw do
     end
   end
   resources :bans
-  resources :bulk_update_requests
+  resources :bulk_update_requests do
+    member do
+      post :approve
+    end
+  end
   resources :comments do
     resources :votes, :controller => "comment_votes", :only => [:create, :destroy]
     collection do

@@ -32,6 +32,10 @@ class BulkUpdateRequest < ActiveRecord::Base
     update_attribute(:status, "approved")
   end
 
+  def editable?(user)
+    user_id == user.id || user.is_janitor?
+  end
+
   def create_forum_topic
     forum_topic = ForumTopic.create(:title => "[bulk] #{title}", :category_id => 1, :original_post_attributes => {:body => reason_with_link})
     update_attribute(:forum_topic_id, forum_topic.id)
