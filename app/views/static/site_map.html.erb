@@ -106,7 +106,7 @@
         <li><h1>Admin</h1></li>
         <li><%= link_to("Mod Actions", mod_actions_path) %></li>
         <li><%= link_to("Jobs", delayed_jobs_path) %></li>
-        <li><%= link_to("Bulk Update Requests", new_bulk_update_request_path) %></li>
+        <li><%= link_to("Bulk Update Requests", bulk_update_requests_path) %></li>
 
         <% if CurrentUser.is_admin? %>
           <li><%= link_to("Janitor Trials", janitor_trials_path) %></li>
