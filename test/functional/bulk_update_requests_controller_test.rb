@@ -17,7 +17,7 @@ class BulkUpdateRequestsControllerTest < ActionController::TestCase
     context "#create" do
       should "succeed" do
         assert_difference("BulkUpdateRequest.count", 1) do
-          post :create, {:bulk_update_request => {:script => "create alias aaa -> bbb"}}, {:user_id => @user.id}
+          post :create, {:bulk_update_request => {:script => "create alias aaa -> bbb", :title => "xxx"}}, {:user_id => @user.id}
         end
       end
     end

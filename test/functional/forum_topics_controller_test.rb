@@ -30,7 +30,7 @@ class ForumTopicsControllerTest < ActionController::TestCase
         should "truncate" do
           get :show, {:id => @forum_topic.id}, {:user_id => @user.id, :read_forum_topics => @cookie_data}
           assert_response :success
-          assert_equal(1570, session[:read_forum_topics].size)
+          assert_equal(395, session[:read_forum_topics].size)
         end
       end
     end

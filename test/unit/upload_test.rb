@@ -175,10 +175,9 @@ class UploadTest < ActiveSupport::TestCase
 
       should "increment the uploaders post_upload_count" do
         @upload = FactoryGirl.create(:source_upload)
-        assert_difference("CurrentUser.post_upload_count", 1) do
+        assert_difference("CurrentUser.user.post_upload_count", 1) do
           @upload.process!
-          puts @upload.errors.full_messages
-          CurrentUser.reload
+          CurrentUser.user.reload
         end
       end
 

@@ -188,12 +188,12 @@ class Dmail < ActiveRecord::Base
     update_column(:is_read, true)
 
     unless Dmail.where(:is_read => false, :owner_id => CurrentUser.user.id).exists?
-      CurrentUser.user.update_column(:has_mail, false)
+      CurrentUser.user.update_attribute(:has_mail, false)
     end
   end
 
   def update_recipient
-    to.update_column(:has_mail, true)
+    to.update_attribute(:has_mail, true)
   end
 
   def visible_to?(user)

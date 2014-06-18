@@ -9,7 +9,7 @@ class SavedSearchTest < ActiveSupport::TestCase
 
     should "update the bitpref on the user" do
       @user.reload
-      assert(@user.has_saved_searchs?, "should have saved_searches bitpref set")
+      assert(@user.has_saved_searches?, "should have saved_searches bitpref set")
     end
   end
 
@@ -34,7 +34,7 @@ class SavedSearchTest < ActiveSupport::TestCase
     end
 
     should "not be able to create another saved search" do
-      assert_equal(["User can only have up to 0 saved searches"], @saved_search.errors.full_messages)
+      assert_equal(["You can only have up to 0 saved searches"], @saved_search.errors.full_messages)
     end
   end
 end
