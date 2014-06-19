@@ -51,6 +51,7 @@ class User < ActiveRecord::Base
   before_validation :set_per_page
   before_create :encrypt_password_on_create
   before_update :encrypt_password_on_update
+  before_create :initialize_default_boolean_attributes
   after_save :update_cache
   after_update :update_remote_cache
   before_create :promote_to_admin_if_first_user
@@ -766,5 +767,12 @@ class User < ActiveRecord::Base
     else
       ""
     end
+  end
+
+  def initialize_default_boolean_attributes
+    self.enable_post_navigation = true
+    self.new_post_navigation_layout = true
+    self.enable_sequential_post_navigation = true
+    self.enable_auto_complete = true
   end
 end
