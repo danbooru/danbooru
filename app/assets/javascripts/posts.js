@@ -404,12 +404,18 @@
       if (e.target.hash === "#comments") {
         $("#comments").show();
         $("#edit").hide();
+        $("#share").hide();
       } else if (e.target.hash === "#edit") {
         $("#edit").show();
         $("#comments").hide();
+        $("#share").hide();
         $("#post_tag_string").focus().selectEnd().height($("#post_tag_string")[0].scrollHeight);
         $("#related-tags-button").trigger("click");
         $("#find-artist-button").trigger("click");
+      } else {
+        $("#edit").hide();
+        $("#comments").hide();
+        $("#share").show();
       }
 
       $("#post-sections li").removeClass("active");

@@ -14,11 +14,6 @@
         <%= render "posts/partials/show/information", :post => @post %>
       </section>
 
-      <section>
-        <h1>Share</h1>
-        <%= render "posts/partials/show/share", :post => @post %>
-      </section>
-
       <% if CurrentUser.is_member? %>
         <section id="post-options">
           <h1>Options</h1>
@@ -67,6 +62,7 @@
         <% if CurrentUser.is_member? && @post.visible? %>
           <li><a href="#edit" id="post-edit-link">Edit</a></li>
         <% end %>
+        <li><a href="#share">Share</a></li>
       </menu>
 
       <section id="comments">
