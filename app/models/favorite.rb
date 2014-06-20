@@ -14,10 +14,13 @@ class Favorite < ActiveRecord::Base
 
   def self.add(post, user)
     Favorite.transaction do
-      return if Favorite.for_user(user.id).where(:user_id => user.id, :post_id => post.id).exists?
+      return if Favorite.for_user(user.id).where(:user_id => user.id, :post_id => post.id).lock("FOR UPDATE NOWAIT").exists?
       Favorite.create!(:user_id => user.id, :post_id => post.id)
-      Post.where(:id => post.id).update_all("fav_count = fav_count + 1")
-      Post.where(:id => post.id).update_all("score = score + 1") if user.is_gold?
+      changes = "fav_count = fav_count + 1"
+      if user.is_gold?
+        changes = "#{changes}, score = score + 1"
+      end
+      Post.where(:id => post.id).update_all(changes)
       post.append_user_to_fav_string(user.id)
       User.where(:id => user.id).update_all("favorite_count = favorite_count + 1")
       user.favorite_count += 1
@@ -28,7 +31,7 @@ class Favorite < ActiveRecord::Base
 
   def self.remove(post, user)
     Favorite.transaction do
-      return unless Favorite.for_user(user.id).where(:user_id => user.id, :post_id => post.id).exists?
+      return unless Favorite.for_user(user.id).where(:user_id => user.id, :post_id => post.id).lock("FOR UPDATE NOWAIT").exists?
       Favorite.destroy_all(:user_id => user.id, :post_id => post.id)
       Post.where(:id => post.id).update_all("fav_count = fav_count - 1")
       Post.where(:id => post.id).update_all("Score = score - 1") if user.is_gold?
