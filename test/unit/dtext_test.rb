@@ -168,4 +168,8 @@ class DTextTest < ActiveSupport::TestCase
   def test_table_with_newlines
     assert_equal("<table class=\"striped\"><thead>\n<tr>\n<th>header</th></tr></thead><tbody><tr><td><a href=\"/posts/100\">post #100</a></td></tr></tbody></table>", p("[table]\n[thead]\n[tr]\n[th]header[/th][/tr][/thead][tbody][tr][td]post #100[/td][/tr][/tbody][/table]"))
   end
+
+  def test_forum_links
+    assert_equal('<p><a href="/forum_topics/1234?page=4">topic #1234</a></p>', p("topic #1234/p4"))
+  end
 end
