@@ -176,7 +176,7 @@
 
   Danbooru.RelatedTag.build_translated = function($dest) {
     if (Danbooru.RelatedTag.translated_tags && Danbooru.RelatedTag.translated_tags.length) {
-      $dest.append(this.build_html("translated", Danbooru.RelatedTag.translated_tags, "translated"));
+      $dest.append(this.build_html("Translated Tags", Danbooru.RelatedTag.translated_tags, "translated"));
     }
   }
 
