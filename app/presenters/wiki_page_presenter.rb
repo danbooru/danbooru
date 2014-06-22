@@ -14,19 +14,19 @@ class WikiPagePresenter
   end
 
   def consequent_tag_aliases
-    @consequent_tag_aliases ||= TagAlias.where("status = 'active' and consequent_name = ?", wiki_page.title)
+    @consequent_tag_aliases ||= TagAlias.where("status in ('active', 'processing') and consequent_name = ?", wiki_page.title)
   end
 
   def antecedent_tag_alias
-    @antecedent_tag_alias ||= TagAlias.where("status = 'active' and antecedent_name = ?", wiki_page.title).first
+    @antecedent_tag_alias ||= TagAlias.where("status in ('active', 'processing') and antecedent_name = ?", wiki_page.title).first
   end
 
   def consequent_tag_implications
-    @consequent_tag_implications ||= TagImplication.where("status = 'active' and consequent_name = ?", wiki_page.title)
+    @consequent_tag_implications ||= TagImplication.where("status in ('active', 'processing') and consequent_name = ?", wiki_page.title)
   end
 
   def antecedent_tag_implications
-    @antecedent_tag_implications ||= TagImplication.where("status = 'active' and antecedent_name = ?", wiki_page.title)
+    @antecedent_tag_implications ||= TagImplication.where("status in ('active', 'processing') and antecedent_name = ?", wiki_page.title)
   end
 
   # Produce a formatted page that shows the difference between two versions of a page.
