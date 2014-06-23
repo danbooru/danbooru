@@ -336,6 +336,9 @@ class Post < ActiveRecord::Base
         sha1hash = $1
         filename = $2
       "http://g.e-hentai.org/?f_shash=#{sha1hash}&fs_from=#{filename}"
+      
+      when %r{\Ahttp://e-shuushuu.net/images/\d{4}-(?:\d{2}-){2}(\d+)}i
+      "http://e-shuushuu.net/image/#{$1}"
 
       else
         source
