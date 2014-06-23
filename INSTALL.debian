@@ -96,7 +96,7 @@ sudo -u danbooru git clone https://github.com/r888888888/danbooru ~danbooru/danb
 sudo -u danbooru bash -l -c 'cd ~/danbooru ; bundle'
 
 echo "* Creating a new local git branch called develop"
-sudo -u danbooru git checkout -b develop
+sudo -u danbooru bash -l -c 'cd ~danbooru ; git checkout -b develop'
 
 echo "* Setting up known_hosts for localhost"
 ssh-keyscan -t rsa,dsa localhost 2>&1 | sort -u - ~/.ssh/known_hosts > ~/.ssh/tmp_hosts
