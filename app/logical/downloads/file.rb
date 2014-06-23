@@ -89,7 +89,7 @@ module Downloads
     end # def
 
     def fix_image_board_sources
-      if source =~ /\/src\/\d{12,}|urnc\.yi\.org|yui\.cynthia\.bne\.jp/
+      if source =~ /i\.4cdn\.org|\/src\/\d{12,}|urnc\.yi\.org|yui\.cynthia\.bne\.jp/
         @source = "Image board"
       end
     end
