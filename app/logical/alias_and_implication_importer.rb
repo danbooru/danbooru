@@ -66,7 +66,7 @@ private
           tag_implication.destroy
 
         when :mass_update
-          Delayed::Job.enqueue(Moderator::TagBatchChange.new(token[1], token[2], CurrentUser.user, CurrentUser.ip_addr))
+          Delayed::Job.enqueue(Moderator::TagBatchChange.new(token[1], token[2], CurrentUser.user, CurrentUser.ip_addr), :queue => "default")
 
         else
           raise "Unknown token: #{token[0]}"
