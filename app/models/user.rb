@@ -747,9 +747,9 @@ class User < ActiveRecord::Base
 
     define_method("#{boolean_attribute}=") do |val|
       if val.to_s =~ /t|1|y/
-        self.bit_prefs = bit_prefs | bit_flag
+        self.bit_prefs |= bit_flag
       else
-        self.bit_prefs = bit_prefs - (bit_prefs & bit_flag)
+        self.bit_prefs &= ~bit_flag
       end
     end
   end
