@@ -245,9 +245,7 @@ class PostPresenter < Presenter
 
     pool_html << ' <span class="pool-name ' + klass + '">'
     pool_html << template.link_to("Pool: #{pool.pretty_name}", template.pool_path(pool), :title => "page #{pool.page_number(@post.id)}/#{pool.post_count}")
-    pool_html << ' ['
-    pool_html << template.link_to("remove", template.pool_element_path(:pool_id => pool.id, :post_id => @post.id), :remote => true, :method => :delete, :data => {:confirm => "Are you sure you want to remove this post from the pool #{pool.pretty_name}?"})
-    pool_html << ']</span> '
+    pool_html << '</span> '
 
     if pool.neighbors(@post).next
       @next_post_in_pool = pool.neighbors(@post).next
