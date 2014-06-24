@@ -75,7 +75,8 @@ class User < ActiveRecord::Base
     end
 
     def unban!
-      update_column(:is_banned, false)
+      self.is_banned = false
+      save
       ban.destroy
     end
   end

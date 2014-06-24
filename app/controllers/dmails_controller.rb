@@ -53,7 +53,8 @@ class DmailsController < ApplicationController
     Dmail.visible.unread.each do |x|
       x.update_column(:is_read, true)
     end
-    CurrentUser.user.update_column(:has_mail, false)
+    CurrentUser.user.has_mail = false
+    CurrentUser.user.save
   end
 
 private
