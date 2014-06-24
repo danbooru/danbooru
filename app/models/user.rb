@@ -749,7 +749,7 @@ class User < ActiveRecord::Base
       if val.to_s =~ /t|1|y/
         self.bit_prefs = bit_prefs | bit_flag
       else
-        self.bit_prefs = bit_prefs - bit_flag
+        self.bit_prefs = bit_prefs - (bit_prefs & bit_flag)
       end
     end
   end
