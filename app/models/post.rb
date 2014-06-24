@@ -339,6 +339,9 @@ class Post < ActiveRecord::Base
       
       when %r{\Ahttp://e-shuushuu.net/images/\d{4}-(?:\d{2}-){2}(\d+)}i
       "http://e-shuushuu.net/image/#{$1}"
+      
+      when %r{\Ahttp://jpg\.nijigen-daiaru\.com/(\d+)}i
+      "http://nijigen-daiaru.com/book.php?idb=#{$1}"
 
       else
         source
