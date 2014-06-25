@@ -50,9 +50,12 @@ module Sources
       end
 
       def get_image_url_from_page(page)
-        element = page.search("div.works_display a img").first
-        if element
-          element.attr("src").sub(/_[ms]\./, ".")
+        elements = page.search("div.works_display a img").find_all do |node|
+          node["src"] !~ /source\.pixiv\.net/
+        end
+
+        if elements.any?
+          elements.first.attr("src").sub(/_[ms]\./, ".")
         else
           nil
         end
