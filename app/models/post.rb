@@ -342,6 +342,9 @@ class Post < ActiveRecord::Base
       
       when %r{\Ahttp://jpg\.nijigen-daiaru\.com/(\d+)}i
       "http://nijigen-daiaru.com/book.php?idb=#{$1}"
+      
+      when %r{\Ahttp://rule34-(?:data-\d{3}|images)\.paheal\.net/(?:_images/)?([a-f0-9]{32})}i
+      "http://rule34.paheal.net/post/list/md5:#{$1}/1"
 
       else
         source
