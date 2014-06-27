@@ -348,6 +348,15 @@ class Post < ActiveRecord::Base
 
       when %r{\Ahttp://rule34-(?:data-\d{3}|images)\.paheal\.net/(?:_images/)?([a-f0-9]{32})}i
         "http://rule34.paheal.net/post/list/md5:#{$1}/1"
+        
+      when %r{\Ahttp://(?:(?:(?:img\d?|cdn)\.)?rule34\.xxx|img\.booru\.org/(?:rule34|r34))(?:/(?:img/rule34|r34))?/{1,2}images/\d+/(?:[a-f0-9]{32}|[a-f0-9]{40})\.}i
+        "http://rule34.xxx/index.php?page=post&s=list&md5=#{md5}"
+        
+      when %r{\Ahttps?://(?:s3\.amazonaws\.com/imgly_production|img\.ly/system/uploads)/((?:\d{3}/){3}|\d+/)}i
+        imgly_id = $1
+        imgly_id = imgly_id.gsub(/[^0-9]/, '')
+        base_62 = imgly_id.to_i.encode62
+        "http://img.ly/#{base_62}"
 
       else
         source
