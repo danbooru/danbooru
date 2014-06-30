@@ -360,6 +360,11 @@ class Post < ActiveRecord::Base
         imgly_id = imgly_id.gsub(/[^0-9]/, '')
         base_62 = imgly_id.to_i.encode62
         "http://img.ly/#{base_62}"
+        
+      when %r{(\Ahttp://.+)/diarypro/d(?:ata/upfile/|iary\.cgi\?mode=image&upfile=)(\d+)}i
+        base_url = $1
+        entry_no = $2
+        "#{base_url}/diarypro/diary.cgi?no=#{entry_no}"
 
       else
         source
