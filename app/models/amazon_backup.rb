@@ -27,7 +27,7 @@ class AmazonBackup < ActiveRecord::Base
         AWS::S3::S3Object.store(File.basename(post.file_path), open(post.file_path, "rb"), Danbooru.config.amazon_s3_bucket_name, "Content-MD5" => base64_md5)
       end
 
-      if post.is_image? && File.exists?(post.preview_file_path)
+      if post.has_preview? && File.exists?(post.preview_file_path)
         AWS::S3::S3Object.store("preview/#{post.md5}.jpg", open(post.preview_file_path, "rb"), Danbooru.config.amazon_s3_bucket_name)
       end
 

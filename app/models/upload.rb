@@ -51,7 +51,7 @@ class Upload < ActiveRecord::Base
 
     def validate_file_content_type
       unless is_valid_content_type?
-        raise "invalid content type (only JPEG, PNG, GIF, and SWF files are allowed)"
+        raise "invalid content type (only JPEG, PNG, GIF, SWF, and WebM files are allowed)"
       end
     end
 
@@ -72,6 +72,18 @@ class Upload < ActiveRecord::Base
         return false
       end
     end
+
+    def validate_no_audio
+      if is_video? && video.audio_channels.present?
+        raise "video must not have audio channels"
+      end
+    end
+
+    def validate_video_duration
+      if is_video? && video.duration > 120
+        raise "video must not be longer than 2 minutes"
+      end
+    end
   end
 
   module ConversionMethods
@@ -90,6 +102,8 @@ class Upload < ActiveRecord::Base
         calculate_hash(file_path)
         validate_md5_uniqueness
         validate_md5_confirmation
+        validate_no_audio
+        validate_video_duration
         calculate_file_size(file_path)
         if has_dimensions?
           calculate_dimensions(file_path)
@@ -151,15 +165,23 @@ class Upload < ActiveRecord::Base
     end
 
     def is_image?
-      ["jpg", "gif", "png"].include?(file_ext)
+      %w(jpg gif png).include?(file_ext)
+    end
+
+    def is_flash?
+      %w(swf).include?(file_ext)
+    end
+
+    def is_video?
+      %w(webm).include?(file_ext)
     end
   end
 
   module ResizerMethods
     def generate_resizes(source_path)
-      if is_image?
-        generate_resize_for(Danbooru.config.small_image_width, Danbooru.config.small_image_width, source_path, 85)
-        generate_resize_for(Danbooru.config.large_image_width, nil, source_path) if image_width > Danbooru.config.large_image_width
+      generate_resize_for(Danbooru.config.small_image_width, Danbooru.config.small_image_width, source_path, 85)
+      if is_image? && image_width > Danbooru.config.large_image_width
+        generate_resize_for(Danbooru.config.large_image_width, nil, source_path)
       end
     end
 
@@ -168,29 +190,45 @@ class Upload < ActiveRecord::Base
         raise Error.new("file not found")
       end
 
-      Danbooru.resize(source_path, resized_file_path_for(width), width, height, quality)
+      if is_image?
+        Danbooru.resize(source_path, resized_file_path_for(width), width, height, quality)
+      elsif is_video?
+        dimension_ratio = image_width.to_f / image_height
+        if dimension_ratio > 1
+          height = (width / dimension_ratio).to_i
+        else
+          width = (height * dimension_ratio).to_i
+        end
+        video.screenshot(resized_file_path_for(width), {:seek_time => 0, :resolution => "#{width}x#{height}"})
+        FileUtils.chmod(0664, resized_file_path_for(width))
+      end
     end
   end
 
   module DimensionMethods
     # Figures out the dimensions of the image.
     def calculate_dimensions(file_path)
-      File.open(file_path, "rb") do |file|
-        image_size = ImageSpec.new(file)
-        self.image_width = image_size.width
-        self.image_height = image_size.height
+      if is_video?
+        self.image_width = video.width
+        self.image_height = video.height
+      else
+        File.open(file_path, "rb") do |file|
+          image_size = ImageSpec.new(file)
+          self.image_width = image_size.width
+          self.image_height = image_size.height
+        end
       end
     end
 
     # Does this file have image dimensions?
     def has_dimensions?
-      %w(jpg gif png swf).include?(file_ext)
+      %w(jpg gif png swf webm).include?(file_ext)
     end
   end
 
   module ContentTypeMethods
     def is_valid_content_type?
-      file_ext =~ /jpg|gif|png|swf/
+      file_ext =~ /jpg|gif|png|swf|webm/
     end
 
     def content_type_to_file_ext(content_type)
@@ -206,6 +244,9 @@ class Upload < ActiveRecord::Base
 
       when "application/x-shockwave-flash"
         "swf"
+
+      when "video/webm"
+        "webm"
 
       else
         "bin"
@@ -225,6 +266,9 @@ class Upload < ActiveRecord::Base
 
       when /^CWS/, /^FWS/, /^ZWS/
         "application/x-shockwave-flash"
+
+      when /^\x1a\x45\xdf\xa3/
+        "video/webm"
 
       else
         "application/octet-stream"
@@ -320,6 +364,12 @@ class Upload < ActiveRecord::Base
     end
   end
 
+  module VideoMethods
+    def video
+      @video ||= FFMPEG::Movie.new(file_path)
+    end
+  end
+
   module SearchMethods
     def uploaded_by(user_id)
       where("uploader_id = ?", user_id)
@@ -381,6 +431,7 @@ class Upload < ActiveRecord::Base
   include CgiFileMethods
   include StatusMethods
   include UploaderMethods
+  include VideoMethods
   extend SearchMethods
   include ApiMethods
 

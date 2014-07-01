@@ -44,13 +44,13 @@ class Post < ActiveRecord::Base
   module FileMethods
     def distribute_files
       RemoteFileManager.new(file_path).distribute
-      RemoteFileManager.new(preview_file_path).distribute if is_image?
+      RemoteFileManager.new(preview_file_path).distribute if has_preview?
       RemoteFileManager.new(large_file_path).distribute if has_large?
     end
 
     def delete_remote_files
       RemoteFileManager.new(file_path).delete
-      RemoteFileManager.new(preview_file_path).delete if is_image?
+      RemoteFileManager.new(preview_file_path).delete if has_preview?
       RemoteFileManager.new(large_file_path).delete if has_large?
     end
 
@@ -93,7 +93,7 @@ class Post < ActiveRecord::Base
     end
 
     def preview_file_url
-      if !is_image?
+      if !has_preview?
         return "/images/download-preview.png"
       end
 
@@ -126,6 +126,18 @@ class Post < ActiveRecord::Base
 
     def is_flash?
       file_ext =~ /swf/i
+    end
+
+    def is_video?
+      file_ext =~ /webm/i
+    end
+
+    def has_preview?
+      is_image? || is_video?
+    end
+
+    def has_dimensions?
+      is_image? || is_flash? || is_video?
     end
   end
 

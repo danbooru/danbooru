@@ -38,7 +38,7 @@
               <li>
                 <strong>Size:</strong>
                 <%= number_to_human_size(post.file_size) %>
-                <% if post.is_image? %>
+                <% if post.has_dimensions? %>
                   (<%= post.image_width %>x<%= post.image_height %>)
                 <% end %>
               </li>
