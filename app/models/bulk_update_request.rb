@@ -39,7 +39,9 @@ class BulkUpdateRequest < ActiveRecord::Base
   end
 
   def create_forum_topic
-    unless forum_topic_id
+    if forum_topic_id
+      ForumPost.create(:body => reason_with_link, :topic_id => forum_topic_id)
+    else
       forum_topic = ForumTopic.create(:title => "[bulk] #{title}", :category_id => 1, :original_post_attributes => {:body => reason_with_link})
       update_attribute(:forum_topic_id, forum_topic.id)
     end
