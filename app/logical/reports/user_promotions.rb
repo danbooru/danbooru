@@ -13,12 +13,22 @@ module Reports
       def confidence_interval_for(n)
         Reports::UserPromotions.confidence_interval_for(user, n)
       end
+
+      def deletion_confidence_interval
+        Reports::UserPromotions.deletion_confidence_interval(user)
+      end
     end
 
     def self.confidence_interval_for(user, n)
       up_votes = Post.where("created_at >= ?", min_time).where(:is_deleted => false, :uploader_id => user.id).where("score >= ?", n).count
       total_votes = Post.where("created_at >= ?", min_time).where(:uploader_id => user.id).count
       ci_lower_bound(up_votes, total_votes, 0.95)
+    end
+
+    def self.deletion_confidence_interval_for(user)
+      deletions = Post.where(:uploader_id => user.id, :is_deleted => true).count
+      total = Post.where(:uploader_id => user.id).count
+      ci_lower_bound(deletions, total, 0.95)
     end
 
     def self.ci_lower_bound(pos, n, confidence)

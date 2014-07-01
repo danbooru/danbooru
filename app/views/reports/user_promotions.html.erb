@@ -13,6 +13,7 @@
           <th data-sort="string">Age</th>
           <th data-sort="int">score:3+</th>
           <th data-sort="int">score:6+</th>
+          <th data-sort="int">deletion</th>
         </tr>
       </thead>
       <tbody>
@@ -26,6 +27,7 @@
                 <td data-sort-value="<%= user.created_at.to_formatted_s(:db) %>"><%= time_ago_in_words user.created_at %></td>
                 <td><%= number_to_percentage user.confidence_interval_for(3), :precision => 0 %></td>
                 <td><%= number_to_percentage user.confidence_interval_for(6), :precision => 0 %></td>
+                <td><%= number_to_percentage user.deletion_confidence_interval, :precision => 0 %></td>
               </tr>
             <% end %>
           <% end %>
