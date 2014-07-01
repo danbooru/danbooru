@@ -16,6 +16,7 @@ GIT
 
 GEM
   remote: http://gemcutter.org/
+  remote: https://rubygems.org/
   specs:
     actionmailer (4.1.0)
       actionpack (= 4.1.0)
@@ -139,6 +140,7 @@ GEM
     rack (1.5.2)
     rack-test (0.6.2)
       rack (>= 1.0)
+    radix62 (1.0.1)
     rails (4.1.0)
       actionmailer (= 4.1.0)
       actionpack (= 4.1.0)
@@ -193,6 +195,7 @@ GEM
       activesupport (>= 3.0)
       sprockets (~> 2.8)
     statistics2 (0.54)
+    streamio-ffmpeg (1.0.0)
     term-ansicolor (1.3.0)
       tins (~> 1.0)
     therubyracer (0.12.1)
@@ -256,6 +259,7 @@ DEPENDENCIES
   pg
   protected_attributes
   pry
+  radix62 (~> 1.0.1)
   rails (~> 4.1.0)
   rmagick
   ruby-imagespec!
@@ -267,6 +271,7 @@ DEPENDENCIES
   simplecov
   sprockets-rails
   statistics2
+  streamio-ffmpeg
   term-ansicolor
   therubyracer
   timecop
