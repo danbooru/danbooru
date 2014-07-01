@@ -1,4 +1,3 @@
-source 'http://gemcutter.org'
 source 'https://rubygems.org/'
 
 group :test do
