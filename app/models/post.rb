@@ -311,7 +311,7 @@ class Post < ActiveRecord::Base
       when %r{\Ahttps?://pictures\.hentai-foundry\.com//[^/]/([^/]+)/(\d+)\.}i
         "http://www.hentai-foundry.com/pictures/user/#{$1}/#{$2}"
 
-      when %r{\Ahttp://blog-imgs-\d+(?:-origin)?\.fc2\.com/[^/]/[^/]/[^/]/([^/]+)/([^.]+\.[^?]+)}i
+      when %r{\Ahttp://blog(?:(?:-imgs-)?\d*(?:-origin)?)?\.fc2\.com/(?:(?:[^/]/){3}|(?:[^/]/))([^/]+)/(?:file/)?([^\.]+\.[^\?]+)}i
         username = $1
         filename = $2
         "http://#{username}.blog.fc2.com/img/#{filename}/"
