@@ -101,12 +101,14 @@ class PostQueryBuilder
     relation
   end
 
-  def build
+  def build(relation = nil)
     unless query_string.is_a?(Hash)
       q = Tag.parse_query(query_string)
     end
 
-    relation = Post.where("true")
+    if relation.nil?
+      relation = Post.where("true")
+    end
 
     if q[:tag_count].to_i > Danbooru.config.tag_query_limit
       raise ::Post::SearchError.new("You cannot search for more than #{Danbooru.config.tag_query_limit} tags at a time")

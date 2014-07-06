@@ -13,7 +13,7 @@ class ArtistCommentary < ActiveRecord::Base
     end
 
     def post_tags_match(query)
-      joins(:post).where("posts.tag_index @@ to_tsquery('danbooru', ?)", query.to_escaped_for_tsquery_split)
+      PostQueryBuilder.new(query).build(self.joins(:post))
     end
 
     def search(params)
