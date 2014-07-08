@@ -105,16 +105,8 @@ class ForumTopic < ActiveRecord::Base
     super + [:text_index]
   end
 
-  def read_by?(user, read_forum_topic_ids)
-    if read_forum_topic_ids.any? {|topic_id, timestamp| id.to_s == topic_id && updated_at.to_i > timestamp.to_i}
-      return false
-    end
-    if read_forum_topic_ids.any? {|topic_id, timestamp| id.to_s == topic_id && updated_at.to_i <= timestamp.to_i}
-      return true
-    end
-    return false if user.last_forum_read_at.nil?
-    return true if updated_at < user.last_forum_read_at
-    return false
+  def check!(user)
+    ForumTopicVisit.check!(user, self)
   end
 
   def mark_as_read(read_forum_topic_ids)

@@ -1,0 +1,14 @@
+class CreateForumTopicVisits < ActiveRecord::Migration
+  def change
+    create_table :forum_topic_visits do |t|
+      t.integer :user_id
+      t.integer :forum_topic_id
+      t.timestamp :last_read_at
+
+      t.timestamps
+    end
+
+    add_index :forum_topic_visits, :user_id
+    add_index :forum_topic_visits, :forum_topic_id
+  end
+end

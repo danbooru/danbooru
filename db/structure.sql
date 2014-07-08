@@ -3,6 +3,7 @@
 --
 
 SET statement_timeout = 0;
+SET lock_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
@@ -1980,6 +1981,39 @@ ALTER SEQUENCE forum_posts_id_seq OWNED BY forum_posts.id;
 
 
 --
+-- Name: forum_topic_visits; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE forum_topic_visits (
+    id integer NOT NULL,
+    user_id integer,
+    forum_topic_id integer,
+    last_read_at timestamp without time zone,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: forum_topic_visits_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE forum_topic_visits_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: forum_topic_visits_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE forum_topic_visits_id_seq OWNED BY forum_topic_visits.id;
+
+
+--
 -- Name: forum_topics; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3885,6 +3919,13 @@ ALTER TABLE ONLY forum_posts ALTER COLUMN id SET DEFAULT nextval('forum_posts_id
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY forum_topic_visits ALTER COLUMN id SET DEFAULT nextval('forum_topic_visits_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY forum_topics ALTER COLUMN id SET DEFAULT nextval('forum_topics_id_seq'::regclass);
 
 
@@ -4210,6 +4251,14 @@ ALTER TABLE ONLY favorites
 
 ALTER TABLE ONLY forum_posts
     ADD CONSTRAINT forum_posts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: forum_topic_visits_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY forum_topic_visits
+    ADD CONSTRAINT forum_topic_visits_pkey PRIMARY KEY (id);
 
 
 --
@@ -6076,6 +6125,20 @@ CREATE INDEX index_forum_posts_on_topic_id ON forum_posts USING btree (topic_id)
 
 
 --
+-- Name: index_forum_topic_visits_on_forum_topic_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_forum_topic_visits_on_forum_topic_id ON forum_topic_visits USING btree (forum_topic_id);
+
+
+--
+-- Name: index_forum_topic_visits_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_forum_topic_visits_on_user_id ON forum_topic_visits USING btree (user_id);
+
+
+--
 -- Name: index_forum_topics_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -6863,4 +6926,6 @@ INSERT INTO schema_migrations (version) VALUES ('20140603225334');
 INSERT INTO schema_migrations (version) VALUES ('20140604002414');
 
 INSERT INTO schema_migrations (version) VALUES ('20140613004559');
+
+INSERT INTO schema_migrations (version) VALUES ('20140701224800');
 

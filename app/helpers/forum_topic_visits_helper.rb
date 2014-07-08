@@ -1,0 +1,2 @@
+module ForumTopicVisitsHelper
+end
