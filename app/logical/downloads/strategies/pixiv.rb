@@ -4,6 +4,7 @@ module Downloads
       def rewrite(url, headers)
         if url =~ /https?:\/\/(?:\w+\.)?pixiv\.net/
           url, headers = rewrite_headers(url, headers)
+          url, headers = rewrite_cdn(url, headers)
           url, headers = rewrite_html_pages(url, headers)
           url, headers = rewrite_small_and_medium_images(url, headers)
           url, headers = rewrite_small_manga_pages(url, headers)
@@ -50,6 +51,14 @@ module Downloads
           if http_exists?(big_url, headers)
             url = big_url
           end
+        end
+
+        return [url, headers]
+      end
+
+      def rewrite_cdn(url, headers)
+        if url =~ %r{https?:\/\/(?:\w+\.)?pixiv\.net\.edgesuite\.net}
+          url.sub!(".edgesuite.net", "")
         end
 
         return [url, headers]
