@@ -99,6 +99,11 @@ class TagImplication < ActiveRecord::Base
         q = q.where("consequent_name = ?", params[:consequent_name])
       end
 
+      case params[:order]
+      when "created_at"
+        q = q.order("created_at desc")
+      end
+
       q
     end
   end

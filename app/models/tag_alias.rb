@@ -37,6 +37,11 @@ class TagAlias < ActiveRecord::Base
         q = q.where("id = ?", params[:id].to_i)
       end
 
+      case params[:order]
+      when "created_at"
+        q = q.order("created_at desc")
+      end
+
       q
     end
   end
