@@ -276,6 +276,8 @@ class Pool < ActiveRecord::Base
       post.remove_pool!(self, true)
     end
 
+    normalize_post_ids
+    clear_post_id_array
     self.post_count = post_id_array.size
     save
   end
