@@ -327,6 +327,11 @@ Danbooru.Note = {
           "History": Danbooru.Note.Edit.history
         }
       });
+      $dialog.data("uiDialog")._title = function(title) {
+        title.html(this.options.title); // Allow unescaped html in dialog title
+      }
+      $dialog.dialog("option", "title", 'Edit note (<a href="/wiki_pages/help:notes">view help</a>)');
+
       $dialog.bind("dialogclose", function() {
         Danbooru.Note.editing = false;
         $(".note-box").resizable("enable");
