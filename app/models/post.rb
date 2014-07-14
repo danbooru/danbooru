@@ -377,6 +377,9 @@ class Post < ActiveRecord::Base
         base_url = $1
         entry_no = $2
         "#{base_url}/diarypro/diary.cgi?no=#{entry_no}"
+        
+      when %r{\Ahttp://i(?:\d)?\.minus\.com/(?:i|j)([^\.]{12,})}i
+        "http://minus.com/i/#{$1}"
 
       else
         source
