@@ -8,6 +8,7 @@ article.post-preview {
   overflow: hidden;
   text-align: center;
   @include inline-block;
+  position: relative;
 
   img {
     margin: auto;
