@@ -8,11 +8,14 @@ article.post-preview {
   overflow: hidden;
   text-align: center;
   @include inline-block;
-  position: relative;
 
   img {
     margin: auto;
   }
+}
+
+.post-preview {
+  position: relative;
 
   &[data-tags~=animated]:before, &[data-file-ext=swf]:before, &[data-file-ext=webm]:before {
     content: "►";
@@ -22,6 +25,10 @@ article.post-preview {
     color: white; 
     background-color: rgba(0,0,0,0.5);
     margin: 2px;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    text-align: center;
   }
 }
 
