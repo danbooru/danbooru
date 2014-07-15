@@ -79,6 +79,10 @@ class TagImplication < ActiveRecord::Base
       where("(antecedent_name like ? escape E'\\\\' or consequent_name like ? escape E'\\\\')", name.downcase.to_escaped_for_sql_like, name.downcase.to_escaped_for_sql_like)
     end
 
+    def active
+      where("status IN (?)", ["active", "processing"])
+    end
+
     def search(params)
       q = where("true")
       return q if params.blank?
@@ -118,6 +122,9 @@ class TagImplication < ActiveRecord::Base
   end
 
   def process!
+    unless valid?
+      raise errors.full_messages.join("; ")
+    end
     update_column(:status, "processing")
     update_posts
     update_column(:status, "active")
@@ -128,7 +135,7 @@ class TagImplication < ActiveRecord::Base
 
   def absence_of_circular_relation
     # We don't want a -> b && b -> a chains
-    if self.class.exists?(["antecedent_name = ? and consequent_name = ?", consequent_name, antecedent_name])
+    if self.class.active.exists?(["antecedent_name = ? and consequent_name = ?", consequent_name, antecedent_name])
       self.errors[:base] << "Tag implication can not create a circular relation with another tag implication"
       false
     end
@@ -136,7 +143,7 @@ class TagImplication < ActiveRecord::Base
 
   def antecedent_is_not_aliased
     # We don't want to implicate a -> b if a is already aliased to c
-    if TagAlias.exists?(["antecedent_name = ?", antecedent_name])
+    if TagAlias.active.exists?(["antecedent_name = ?", antecedent_name])
       self.errors[:base] << "Antecedent tag must not be aliased to another tag"
       false
     end
@@ -144,7 +151,7 @@ class TagImplication < ActiveRecord::Base
 
   def consequent_is_not_aliased
     # We don't want to implicate a -> b if b is already aliased to c
-    if TagAlias.exists?(["antecedent_name = ?", consequent_name])
+    if TagAlias.active.exists?(["antecedent_name = ?", consequent_name])
       self.errors[:base] << "Consequent tag must not be aliased to another tag"
       false
     end

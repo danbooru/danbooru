@@ -78,6 +78,9 @@ class TagAlias < ActiveRecord::Base
   end
 
   def process!
+    unless valid?
+      raise errors.full_messages.join("; ")
+    end
     update_column(:status, "processing")
     move_aliases_and_implications
     clear_all_cache
@@ -117,7 +120,7 @@ class TagAlias < ActiveRecord::Base
   def absence_of_transitive_relation
     # We don't want a -> b && b -> c chains if the b -> c alias was created first.
     # If the a -> b alias was created first, the new one will be allowed and the old one will be moved automatically instead.
-    if self.class.exists?(["antecedent_name = ?", consequent_name])
+    if self.class.active.exists?(["antecedent_name = ?", consequent_name])
       self.errors[:base] << "Tag alias can not create a transitive relation with another tag alias"
       false
     end
