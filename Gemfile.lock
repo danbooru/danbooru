@@ -15,7 +15,6 @@ GIT
     ruby-imagespec (0.3.1)
 
 GEM
-  remote: http://gemcutter.org/
   remote: https://rubygems.org/
   specs:
     actionmailer (4.1.0)
