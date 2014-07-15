@@ -190,8 +190,9 @@ class Upload < ActiveRecord::Base
         raise Error.new("file not found")
       end
 
+      output_path = resized_file_path_for(width)
       if is_image?
-        Danbooru.resize(source_path, resized_file_path_for(width), width, height, quality)
+        Danbooru.resize(source_path, output_path, width, height, quality)
       elsif is_video?
         dimension_ratio = image_width.to_f / image_height
         if dimension_ratio > 1
@@ -199,8 +200,8 @@ class Upload < ActiveRecord::Base
         else
           width = (height * dimension_ratio).to_i
         end
-        video.screenshot(resized_file_path_for(width), {:seek_time => 0, :resolution => "#{width}x#{height}"})
-        FileUtils.chmod(0664, resized_file_path_for(width))
+        video.screenshot(output_path, {:seek_time => 0, :resolution => "#{width}x#{height}"})
+        FileUtils.chmod(0664, output_path)
       end
     end
   end
