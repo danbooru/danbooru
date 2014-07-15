@@ -145,14 +145,8 @@ class TagAlias < ActiveRecord::Base
     implications.each do |ti|
       ti.antecedent_name = self.consequent_name
       success = ti.save
-      if !success
-        case ti.errors.full_messages.join("; ")
-        when /Cannot implicate a tag to itself/
-          ti.destroy
-        when /Consequent tag must not be aliased to another tag/
-          ti.consequent_name = TagAlias.to_aliased(ti.consequent_name).first
-          ti.save
-        end
+      if !success && ti.errors.full_messages.join("; ") =~ /Cannot implicate a tag to itself/
+        ti.destroy
       end
     end
 
@@ -160,14 +154,8 @@ class TagAlias < ActiveRecord::Base
     implications.each do |ti|
       ti.consequent_name = self.consequent_name
       success = ti.save
-      if !success
-        case ti.errors.full_messages.join("; ")
-        when /Cannot implicate a tag to itself/
-          ti.destroy
-        when /Antecedent tag must not be aliased to another tag/
-          ti.antecedent_name = TagAlias.to_aliased(ti.antecedent_name).first
-          ti.save
-        end
+      if !success && ti.errors.full_messages.join("; ") =~ /Cannot implicate a tag to itself/
+        ti.destroy
       end
     end
   end
