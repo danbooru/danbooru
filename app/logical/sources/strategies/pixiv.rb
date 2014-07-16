@@ -87,11 +87,11 @@ module Sources
 
       def get_page_count_from_page(page)
         elements = page.search("ul.meta li").find_all do |node|
-          node.text =~ /Manga/
+          node.text =~ /Manga|漫画/
         end
 
         if elements.any?
-          elements[0].text =~ /Manga (\d+)P/
+          elements[0].text =~ /(?:Manga|漫画) (\d+)P/
           $1.to_i
         else
           1
