@@ -29,7 +29,7 @@ class Note < ActiveRecord::Base
     end
 
     def post_tags_match(query)
-      PostQueryBuilder.new(query).build(self.joins(:post))
+      PostQueryBuilder.new(query).build(self.joins(:post)).reorder("")
     end
 
     def for_creator(user_id)
