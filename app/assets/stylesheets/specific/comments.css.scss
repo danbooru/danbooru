@@ -98,20 +98,20 @@ div#c-comments {
     }
 
     div.post-preview {
-      position: relative;
+      &[data-tags~=animated], &[data-file-ext=swf], &[data-file-ext=webm] {
+        div.preview {
+          position: relative;
 
-      &[data-tags~=animated]:before, &[data-file-ext=swf]:before, &[data-file-ext=webm]:before {
-        content: "►";
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        color: white; 
-        background-color: rgba(0,0,0,0.5);
-        margin: 2px;
-        top: 0;
-        left: 0;
-        z-index: 1;
-        text-align: center;
+          &:before {
+            content: "►";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            color: white; 
+            background-color: rgba(0,0,0,0.5);
+            margin: 2px;
+          }
+        }
       }
     }
 
