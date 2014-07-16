@@ -30,10 +30,10 @@
   Danbooru.Autocomplete.initialize_tag_autocomplete = function() {
     var $fields_multiple = $(
       "#tags,#post_tag_string,#upload_tag_string,#tag-script-field,#c-moderator-post-queues #query," +
-      "#user_blacklisted_tags,#user_favorite_tags,#tag_subscription_tag_query"
+      "#user_blacklisted_tags,#user_favorite_tags,#tag_subscription_tag_query,#search_post_tags_match"
     );
     var $fields_single = $(
-      "#search_post_tags_match,#c-tags #search_name_matches,#c-tag-aliases #query,#c-tag-implications #query," +
+      "#c-tags #search_name_matches,#c-tag-aliases #query,#c-tag-implications #query," +
       "#wiki_page_title,#artist_name," +
       "#tag_alias_request_antecedent_name,#tag_alias_request_consequent_name," +
       "#tag_implication_request_antecedent_name,#tag_implication_request_consequent_name," +
