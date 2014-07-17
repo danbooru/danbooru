@@ -6132,6 +6132,13 @@ CREATE INDEX index_forum_topic_visits_on_forum_topic_id ON forum_topic_visits US
 
 
 --
+-- Name: index_forum_topic_visits_on_last_read_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_forum_topic_visits_on_last_read_at ON forum_topic_visits USING btree (last_read_at);
+
+
+--
 -- Name: index_forum_topic_visits_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 

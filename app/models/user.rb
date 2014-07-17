@@ -428,10 +428,10 @@ class User < ActiveRecord::Base
   module ForumMethods
     def has_forum_been_updated?
       return false unless is_gold?
-      newest_topic = ForumTopic.order("updated_at desc").first
-      return false if newest_topic.nil?
+      max_updated_at = ForumTopic.maximum(:updated_at)
+      return false if max_updated_at.nil?
       return true if last_forum_read_at.nil?
-      return newest_topic.updated_at > last_forum_read_at
+      return max_updated_at > last_forum_read_at
     end
   end
 

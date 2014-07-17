@@ -74,8 +74,34 @@ class ForumTopic < ActiveRecord::Base
     end
   end
 
+  module VisitMethods
+    def read_by?(user = nil)
+      user ||= CurrentUser.user
+
+      if user.last_forum_read_at && updated_at <= user.last_forum_read_at
+        return true
+      end
+
+      ForumTopicVisit.where("user_id = ? and forum_topic_id = ? and last_read_at >= ?", user.id, id, updated_at).exists?
+    end
+
+    def mark_as_read!(user = nil)
+      user ||= CurrentUser.user
+      
+      match = ForumTopicVisit.where(:user_id => user.id, :forum_topic_id => id).first
+      if match
+        match.update_attribute(:last_read_at, updated_at)
+      else
+        ForumTopicVisit.create(:user_id => user.id, :forum_topic_id => id, :last_read_at => updated_at)
+      end
+
+      # user.update_attribute(:last';¬≥÷_forum_read_at, ForumTopicVisit.where(:user_id => user.id, :forum_topic_id => id).minimum(:last_read_at) || updated_at)
+    end
+  end
+
   extend SearchMethods
   include CategoryMethods
+  include VisitMethods
 
   def editable_by?(user)
     creator_id == user.id || user.is_janitor?
@@ -94,7 +120,7 @@ class ForumTopic < ActiveRecord::Base
   end
 
   def last_page
-    (posts.count / Danbooru.config.posts_per_page.to_f).ceil
+    (response_count / Danbooru.config.posts_per_page.to_f).ceil
   end
 
   def presenter(forum_posts)
@@ -103,42 +129,6 @@ class ForumTopic < ActiveRecord::Base
   
   def hidden_attributes
     super + [:text_index]
-  end
-
-  def check!(user)
-    ForumTopicVisit.check!(user, self)
-  end
-
-  def mark_as_read(read_forum_topic_ids)
-    hash = read_forum_topic_ids.inject({}) do |hash, x|
-      hash[x[0].to_s] = x[1].to_s
-      hash
-    end
-    hash[id.to_s] = updated_at.to_i.to_s
-    result = hash.to_a.flatten.join(" ")
-    while result.size > 500
-      ids = result.scan(/\S+/)
-      result = ids[(ids.size / 2)..-1].join(" ")
-    end
-    update_last_forum_read_at(hash.keys)
-    result
-  end
-
-  def update_last_forum_read_at(read_forum_topic_ids)
-    query = ForumTopic.where("true")
-    if CurrentUser.user.last_forum_read_at.present?
-      query = query.where("updated_at >= ?", CurrentUser.last_forum_read_at)
-    end
-    if read_forum_topic_ids.any?
-      query = query.where("id not in (?)", read_forum_topic_ids)
-    end
-    query = query.order("updated_at asc")
-    topic = query.first
-    if topic
-      CurrentUser.user.update_attribute(:last_forum_read_at, topic.updated_at)
-    else
-      CurrentUser.user.update_attribute(:last_forum_read_at, Time.now)
-    end
   end
 
   def merge(topic)

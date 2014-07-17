@@ -14,55 +14,102 @@ class ForumTopicTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
-    context "#update_last_forum_read_at" do
-      setup do
-        @topics = [@topic]
-        1.upto(6) do |i|
-          Timecop.travel(i.days.from_now) do
-            @topics << FactoryGirl.create(:forum_topic, :title => "xxx")
-          end
-        end
-        @read_forum_topic_ids = []
-        @read_forum_topic_ids << @topics[0]
-        @read_forum_topic_ids << @topics[2]
-        @read_forum_topic_ids << @topics[4]
-      end
-
-      context "when the user's last_forum_read_at is null" do
+    context "#read_by?" do
+      context "with a populated @user.last_forum_read_at" do
         setup do
-          @user.update_attribute(:last_forum_read_at, nil)
+          @user.update_attribute(:last_forum_read_at, Time.now)
         end
 
-        should "return the oldest unread topic" do
-          @topic.update_last_forum_read_at(@read_forum_topic_ids)
-          @user.reload
-          assert_equal(@topics[1].updated_at.to_i, @user.last_forum_read_at.to_i)
-        end
-
-        context "when all topics have been read" do
+        context "and no visits for a topic" do
           setup do
-            @read_forum_topic_ids = ForumTopic.all.map(&:id)
-            @timestamp = Time.now
-            Time.stubs(:now).returns(@timestamp)
+            @topic.update_column(:updated_at, 1.day.from_now)
           end
 
-          should "return the current time" do
-            @topic.update_last_forum_read_at(@read_forum_topic_ids)
-            @user.reload
-            assert_equal(@timestamp.to_i, @user.last_forum_read_at.to_i)
+          should "return false" do
+            assert_equal(false, @topic.read_by?(@user))
+          end
+        end
+
+        context "and a visit for a topic" do
+          setup do
+            @topic.update_column(:updated_at, 1.day.from_now)
+          end
+
+          context "that predates the topic" do
+            setup do
+              FactoryGirl.create(:forum_topic_visit, user: @user, forum_topic: @topic, last_read_at: 16.hours.from_now)
+            end
+
+            should "return false" do
+              assert_equal(false, @topic.read_by?(@user))
+            end
+          end
+
+          context "that postdates the topic" do
+            setup do
+              FactoryGirl.create(:forum_topic_visit, user: @user, forum_topic: @topic, last_read_at: 2.days.from_now)
+            end            
+
+            should "return true" do
+              assert_equal(true, @topic.read_by?(@user))
+            end
           end
         end
       end
 
-      context "when the user's last_forum_read_at is 2 days from now" do
-        setup do
-          @user.update_attribute(:last_forum_read_at, 2.days.from_now)
+      context "with a blank @user.last_forum_read_at" do
+        context "and no visits" do
+          should "return false" do
+            assert_equal(false, @topic.read_by?(@user))
+          end
         end
 
-        should "return the oldest unread topic" do
-          @topic.update_last_forum_read_at(@read_forum_topic_ids)
+        context "and a visit" do
+          context "that predates the topic" do
+            setup do
+              FactoryGirl.create(:forum_topic_visit, user: @user, forum_topic: @topic, last_read_at: 1.day.ago)
+            end
+
+            should "return false" do
+              assert_equal(false, @topic.read_by?(@user))
+            end
+          end
+
+          context "that postdates the topic" do
+            setup do
+              FactoryGirl.create(:forum_topic_visit, user: @user, forum_topic: @topic, last_read_at: 1.days.from_now)
+            end
+
+            should "return true" do
+              assert_equal(true, @topic.read_by?(@user))
+            end
+          end
+        end
+      end
+    end
+
+    context "#mark_as_read!" do
+      context "without a previous visit" do
+        should "create a new visit" do
+          assert_difference("ForumTopicVisit.count", 1) do
+            @topic.mark_as_read!(@user)
+          end
           @user.reload
-          assert_equal(@topics[3].updated_at.to_i, @user.last_forum_read_at.to_i)
+          assert_equal(@topic.updated_at, ForumTopicVisit.last.last_read_at)
+        end
+      end
+
+      context "with a previous visit" do
+        setup do
+          FactoryGirl.create(:forum_topic_visit, user: @user, forum_topic: @topic, last_read_at: 1.day.ago)
+        end
+
+        should "update the visit" do
+          assert_difference("ForumTopicVisit.count", 0) do
+            @topic.mark_as_read!(@user)
+          end
+          @user.reload
+          assert_equal(@topic.updated_at, ForumTopicVisit.last.last_read_at)
         end
       end
     end
@@ -77,40 +124,6 @@ class ForumTopicTest < ActiveSupport::TestCase
       should "merge all the posts in one topic into the other" do
         @topic.merge(@topic2)
         assert_equal(2, @topic.posts.count)
-      end
-    end
-
-    context "#read_by?" do
-      context "for a topic that was never read by the user" do
-        should "return false" do
-          assert_equal(false, @topic.read_by?(@user, [[(@topic.id + 1).to_s, "1"]]))
-        end
-      end
-
-      context "for a topic that was read by the user but has been updated since then" do
-        should "return false" do
-          assert_equal(false, @topic.read_by?(@user, [["#{@topic.id}", "#{1.day.ago.to_i}"]]))
-        end
-      end
-
-      context "for a topic that was read by the user and has not been updated since" do
-        should "return true" do
-          assert_equal(true, @topic.read_by?(@user, [["#{@topic.id}", "#{1.day.from_now.to_i}"]]))
-        end
-      end
-    end
-
-    context "#mark_as_read" do
-      should "include the topic id and updated_at timestamp" do
-        plus_one = @topic.id + 1
-        result = @topic.mark_as_read([["#{plus_one}", "2"]])
-        assert_equal("#{plus_one} 2 #{@topic.id} #{@topic.updated_at.to_i}", result)
-      end
-
-      should "prune the string if it gets too long" do
-        array = (1..1_000).to_a.map(&:to_s).in_groups_of(2)
-        result = @topic.mark_as_read(array)
-        assert_operator result.size, :<=, 500
       end
     end
 

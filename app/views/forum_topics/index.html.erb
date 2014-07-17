@@ -24,7 +24,7 @@
                 <span class="sticky">Sticky:</span>
               <% end %>
 
-              <% unless topic.read_by?(CurrentUser.user, @read_forum_topic_ids) %>
+              <% unless topic.read_by?(CurrentUser.user) %>
                 <span class="new">NEW</span>
               <% end %>
 

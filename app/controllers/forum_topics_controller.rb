@@ -18,8 +18,7 @@ class ForumTopicsController < ApplicationController
 
   def index
     @query = ForumTopic.active.search(params[:search])
-    @forum_topics = @query.order("is_sticky DESC, updated_at DESC").paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
-    @read_forum_topic_ids = read_forum_topic_ids
+    @forum_topics = @query.includes([:creator, :updater]).order("is_sticky DESC, updated_at DESC").paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@forum_topics) do |format|
       format.xml do
         render :xml => @forum_topics.to_xml(:root => "forum-topics")
@@ -29,12 +28,10 @@ class ForumTopicsController < ApplicationController
 
   def show
     @forum_topic = ForumTopic.find(params[:id])
+    @forum_topic.mark_as_read!(CurrentUser.user)
     @forum_posts = ForumPost.search(:topic_id => @forum_topic.id).order("forum_posts.id").paginate(params[:page])
     @forum_posts.each # hack to force rails to eager load
     respond_with(@forum_topic)
-    unless CurrentUser.user.is_anonymous?
-      session[:read_forum_topics] = @forum_topic.mark_as_read(read_forum_topic_ids)
-    end
   end
 
   def create
@@ -67,7 +64,7 @@ class ForumTopicsController < ApplicationController
 
   def mark_all_as_read
     CurrentUser.user.update_attribute(:last_forum_read_at, Time.now)
-    session[:read_forum_topics] = ""
+    ForumTopicVisit.prune!(CurrentUser.user)
     redirect_to forum_topics_path, :notice => "All topics marked as read"
   end
 
@@ -93,14 +90,6 @@ private
       params[:search] ||= {}
       params[:search][:title] = params.delete(:title)
     end
-  end
-
-  def read_forum_topics
-    session[:read_forum_topics].to_s
-  end
-
-  def read_forum_topic_ids
-    read_forum_topics.scan(/(\S+) (\S+)/)
   end
 
   def check_privilege(forum_topic)

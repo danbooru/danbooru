@@ -21,18 +21,6 @@ class ForumTopicsControllerTest < ActionController::TestCase
         get :show, {:id => @forum_topic.id}
         assert_response :success
       end
-
-      context "when the read_forum_topics session exceeds the maximum cookie size" do
-        setup do
-          @cookie_data = 1.upto(10_000).to_a.join(" ")
-        end
-
-        should "truncate" do
-          get :show, {:id => @forum_topic.id}, {:user_id => @user.id, :read_forum_topics => @cookie_data}
-          assert_response :success
-          assert_equal(395, session[:read_forum_topics].size)
-        end
-      end
     end
 
     context "index action" do

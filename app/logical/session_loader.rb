@@ -13,10 +13,6 @@ class SessionLoader
       load_session_user
     elsif cookie_password_hash_valid?
       load_cookie_user
-
-      # this means a new session is being created, so assume
-      # all the old forum topics can be marked as read
-      update_forum_last_read_at
     else
       load_session_for_api
     end
@@ -103,17 +99,6 @@ private
 
   def set_time_zone
     Time.zone = CurrentUser.user.time_zone
-  end
-
-  def update_forum_last_read_at
-    unless CurrentUser.user.is_anonymous?
-      if CurrentUser.user.last_forum_read_at && CurrentUser.user.last_forum_read_at < CurrentUser.user.last_logged_in_at
-        CurrentUser.user.update_column(:last_forum_read_at, CurrentUser.user.last_logged_in_at)
-      elsif CurrentUser.user.last_forum_read_at.nil?
-        CurrentUser.user.update_column(:last_forum_read_at, CurrentUser.user.last_logged_in_at)
-      end
-      CurrentUser.user.update_column(:last_logged_in_at, Time.now)
-    end
   end
 end
 

@@ -1,30 +1,9 @@
 class ForumTopicVisit < ActiveRecord::Base
-  def self.check!(user, topic)
-    match = where(:user_id => user.id, :forum_topic_id => topic.id).first
-    result = false
-    if match
-      if match.last_read_at < topic.updated_at
-        result = true
-      end
-      match.update_attribute(:last_read_at, topic.updated_at)
-    else
-      create(:user_id => user.id, :forum_topic_id => topic.id, :last_read_at => topic.updated_at)
-    end
-    result
-  end
+  belongs_to :user
+  belongs_to :forum_topic
+  attr_accessible :user_id, :user, :forum_topic_id, :forum_topic, :last_read_at
 
-  def self.check_list!(user, topics)
-    matches = where(:user_id => user.id, :forum_topic_id => topics.map(&:id)).to_a.inject({}) do |hash, x|
-      hash[x.forum_topic_id] = x
-      hash
-    end
-    topics.each do |topic|
-      if matches[topic.id]
-        matches[topic.id].update_attribute(:last_read_at, topic.updated_at)
-      else
-        create(:user_id => user.id,, :forum_topic_id => topic.id, :last_read_at => topic.updated_at)
-      end
-    end
-    matches
+  def self.prune!(user)
+    where("last_read_at < ?", user.last_forum_read_at).delete_all
   end
 end

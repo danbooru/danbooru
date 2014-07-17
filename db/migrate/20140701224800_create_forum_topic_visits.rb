@@ -10,5 +10,6 @@ class CreateForumTopicVisits < ActiveRecord::Migration
 
     add_index :forum_topic_visits, :user_id
     add_index :forum_topic_visits, :forum_topic_id
+    add_index :forum_topic_visits, :last_read_at
   end
 end
