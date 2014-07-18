@@ -12,6 +12,20 @@ class TagAliasesController < ApplicationController
     respond_with(@tag_alias)
   end
 
+  def edit
+    @tag_alias = TagAlias.find(params[:id])
+  end
+
+  def update
+    @tag_alias = TagAlias.find(params[:id])
+
+    if @tag_alias.is_pending? && @tag_alias.editable_by?(CurrentUser.user)
+      @tag_alias.update_attributes(params[:tag_alias])
+    end
+
+    respond_with(@tag_alias)
+  end
+
   def index
     @search = TagAlias.search(params[:search])
     @tag_aliases = @search.order("(case status when 'pending' then 0 when 'queued' then 1 else 2 end), antecedent_name, consequent_name").paginate(params[:page], :limit => params[:limit])

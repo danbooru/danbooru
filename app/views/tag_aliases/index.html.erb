@@ -32,6 +32,11 @@
             </td>
             <td>
               <%= link_to "Show", tag_alias_path(tag_alias) %>
+
+              <% if tag_alias.editable_by?(CurrentUser.user) %>
+                | <%= link_to "Edit", edit_tag_alias_path(tag_alias) %>
+              <% end %>
+
               <% if tag_alias.deletable_by?(CurrentUser.user) %>
                 | <%= link_to "Delete", tag_alias_path(tag_alias), :remote => true, :method => :delete, :data => {:confirm => "Are you sure you want to delete this alias?"} %>
               <% end %>

@@ -222,4 +222,8 @@ class TagAlias < ActiveRecord::Base
     return true if is_pending? && user.id == creator_id
     return false
   end
+
+  def editable_by?(user)
+    deletable_by?(user)
+  end
 end

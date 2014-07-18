@@ -12,6 +12,20 @@ class TagImplicationsController < ApplicationController
     respond_with(@tag_implication)
   end
 
+  def edit
+    @tag_implication = TagImplication.find(params[:id])
+  end
+
+  def update
+    @tag_implication = TagImplication.find(params[:id])
+
+    if @tag_implication.is_pending? && @tag_implication.editable_by?(CurrentUser.user)
+      @tag_implication.update_attributes(params[:tag_implication])
+    end
+
+    respond_with(@tag_implication)
+  end
+
   def index
     @search = TagImplication.search(params[:search])
     @tag_implications = @search.order("(case status when 'pending' then 0 when 'queued' then 1 else 2 end), antecedent_name, consequent_name").paginate(params[:page], :limit => params[:limit])

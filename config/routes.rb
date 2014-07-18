@@ -210,7 +210,7 @@ Rails.application.routes.draw do
     resource :correction, :only => [:new, :create, :show], :controller => "tag_corrections"
   end
   resources :tag_aliases do
-    resource :correction, :only => [:create, :new, :show], :controller => "tag_alias_corrections"
+    resource :correction, :controller => "tag_alias_corrections"
     member do
       post :approve
     end

@@ -15,6 +15,48 @@ class TagImplicationsControllerTest < ActionController::TestCase
       CurrentUser.ip_addr = nil
     end
 
+
+    context "edit action" do
+      setup do
+        @tag_implication = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
+      end
+
+      should "render" do
+        get :edit, {:id => @tag_implication.id}
+        assert_response :success
+      end
+    end
+
+    context "update action" do
+      setup do
+        @tag_implication = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
+      end
+
+      context "for a pending implication" do
+        setup do
+          @tag_implication.update_attribute(:status, "pending")
+        end
+
+        should "succeed" do
+          post :update, {:id => @tag_implication.id, :tag_implication => {:antecedent_name => "xxx"}}, {:user_id => @user.id}
+          @tag_implication.reload
+          assert_equal("xxx", @tag_implication.antecedent_name)
+        end
+      end
+
+      context "for an approved implication" do
+        setup do
+          @tag_implication.update_attribute(:status, "approved")
+        end
+
+        should "fail" do
+          post :update, {:id => @tag_implication.id, :tag_implication => {:antecedent_name => "xxx"}}, {:user_id => @user.id}
+          @tag_implication.reload
+          assert_equal("aaa", @tag_implication.antecedent_name)
+        end
+      end
+    end
+
     context "index action" do
       setup do
         CurrentUser.scoped(@user, "127.0.0.1") do
