@@ -15,7 +15,7 @@ module Reports
       end
 
       def deletion_confidence_interval
-        Reports::UserPromotions.deletion_confidence_interval(user)
+        Reports::UserPromotions.deletion_confidence_interval_for(user)
       end
     end
 
