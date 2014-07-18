@@ -447,7 +447,7 @@ class User < ActiveRecord::Base
     end
 
     def show_saved_searches?
-      id < 50_000
+      id < 300_000
     end
 
     def can_upload?
