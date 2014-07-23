@@ -19,15 +19,16 @@ class PostsControllerTest < ActionController::TestCase
       context "passing the api limit" do
         setup do
           User.any_instance.stubs(:api_hourly_limit).returns(5)
+          ApiKey.generate!(@user)
         end
         
         should "work" do
           CurrentUser.user.api_hourly_limit.times do
-            get :index, {:format => "json", :login => @user.name, :api_key => @user.bcrypt_cookie_password_hash}
+            get :index, {:format => "json", :login => @user.name, :api_key => @user.api_key.key}
             assert_response :success
           end
 
-          get :index, {:format => "json", :login => @user.name, :api_key => @user.bcrypt_cookie_password_hash}
+          get :index, {:format => "json", :login => @user.name, :api_key => @user.api_key.key}
           assert_response 421
         end
       end

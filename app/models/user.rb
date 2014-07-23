@@ -59,6 +59,7 @@ class User < ActiveRecord::Base
   has_many :posts, :foreign_key => "uploader_id"
   has_many :bans, lambda {order("bans.id desc")}
   has_one :recent_ban, lambda {order("bans.id desc")}, :class_name => "Ban"
+  has_one :api_key
   has_many :subscriptions, lambda {order("tag_subscriptions.name")}, :class_name => "TagSubscription", :foreign_key => "creator_id"
   has_many :note_versions, :foreign_key => "updater_id"
   has_many :dmails, lambda {order("dmails.id desc")}, :foreign_key => "owner_id"
@@ -190,6 +191,15 @@ class User < ActiveRecord::Base
     module ClassMethods
       def authenticate(name, pass)
         authenticate_hash(name, sha1(pass))
+      end
+
+      def authenticate_api_key(name, api_key)
+        key = ApiKey.where(:key => api_key).first
+        return nil if key.nil?
+        user = find_by_name(name)
+        return nil if user.nil?
+        return user if key.user_id == user.id
+        nil
       end
 
       def authenticate_hash(name, hash)
@@ -531,9 +541,9 @@ class User < ActiveRecord::Base
     end
     
     def api_hourly_limit
-      if is_platinum?
+      if is_platinum? && api_key.present?
         20_000
-      elsif is_gold?
+      elsif is_gold? && api_key.present?
         10_000
       else
         3_000

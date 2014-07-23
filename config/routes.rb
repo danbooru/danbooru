@@ -59,6 +59,7 @@ Rails.application.routes.draw do
   resources :advertisements do
     resources :hits, :controller => "advertisement_hits", :only => [:create]
   end
+  resources :api_keys, :only => [:new, :create]
   resources :artists do
     member do
       put :revert

@@ -131,7 +131,13 @@
       <% if CurrentUser.user.id == user.id %>
         <tr>
           <th>API Key</th>
-          <td><%= CurrentUser.user.bcrypt_cookie_password_hash %></td>
+          <td>
+            <% if CurrentUser.user.api_key %>
+              <%= CurrentUser.user.api_key.key %>
+            <% else %>
+              <%= link_to "Generate key", new_api_key_path %>
+            <% end %>
+          </td>
         </tr>
       <% end %>
   </table>
