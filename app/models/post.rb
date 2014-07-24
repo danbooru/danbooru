@@ -324,7 +324,7 @@ class Post < ActiveRecord::Base
         day = $5
         "http://diary#{server_id}.fc2.com/cgi-sys/ed.cgi/#{username}?Y=#{year}&M=#{month}&D=#{day}"
 
-      when %r{\Ahttps?://s(?:content|photos)-[^/]+\.fbcdn\.net/hphotos-.+/\d+_(\d+)_\d+_[no]\.}i
+      when %r{\Ahttps?://(?:fbcdn-)?s(?:content|photos)-[^/]+\.(?:fbcdn|akamaihd)\.net/hphotos-.+/\d+_(\d+)_(?:\d+_){1,3}[no]\.}i
         "https://www.facebook.com/photo.php?fbid=#{$1}"
 
       when %r{\Ahttp://c(?:s|han|[1-4])\.sankakucomplex\.com/data(?:/sample)?/(?:[a-f0-9]{2}/){2}(?:sample-|preview)?([a-f0-9]{32})}i
