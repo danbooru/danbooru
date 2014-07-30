@@ -63,7 +63,7 @@ module PostSets
     end
 
     def posts
-      if tag_array.any? {|x| x =~ /^source:.*\*.*pixiv/} && !CurrentUser.user.is_builder?
+      if tag_array.any? {|x| x =~ /^-?source:.*\*.*pixiv/} && !CurrentUser.user.is_builder?
         raise SearchError.new("Your search took too long to execute and was canceled")
       end
 
@@ -87,7 +87,7 @@ module PostSets
     end
 
     def is_pattern_search?
-      is_single_tag? && tag_string =~ /\*/
+      is_single_tag? && tag_string =~ /\*/ && !tag_array.any? {|x| x =~ /^-?source:.+/}
     end
 
     def current_page
