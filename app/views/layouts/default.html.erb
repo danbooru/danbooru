@@ -20,7 +20,6 @@
   <meta name="enable-auto-complete" content="<%= CurrentUser.user.enable_auto_complete %>">
   <meta name="style-usernames" content="<%= CurrentUser.user.style_usernames? %>">
   <meta name="mobile-mode" content="<%= CurrentUser.mobile_mode? %>">
-  <meta name="read-forum-topic-ids" content="<%= session[:read_forum_topics].to_s %>">
   <meta name="last-forum-read-at" content="<%= CurrentUser.user.last_forum_read_at %>">
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
   <%= stylesheet_link_tag "application", :media => "screen" %>
