@@ -17,7 +17,7 @@
           <tr id="request-<%= request.id %>">
             <td><%= link_to_user(request.user) %></td>
             <td><%= link_to(request.forum_topic_id, forum_topic_path(request.forum_topic_id)) %></td>
-            <td><%= request.script %></td>
+            <td><%= script_with_line_breaks(request.script) %></td>
             <td><%= request.status %></td>
             <td>
               <% if CurrentUser.is_moderator? && request.status == "pending" %>
