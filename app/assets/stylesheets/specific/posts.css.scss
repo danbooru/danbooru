@@ -384,6 +384,11 @@ div#c-posts {
       margin-top: 1em;
       padding: 0.5em;
 
+      #original-artist-commentary, #translated-artist-commentary {
+        max-height: 20em;
+        overflow-y: auto;
+      }
+
       .disabled {
         color: gray;
       }
