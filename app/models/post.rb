@@ -137,7 +137,7 @@ class Post < ActiveRecord::Base
     end
 
     def has_dimensions?
-      is_image? || is_flash? || is_video?
+      image_width.present? && image_height.present?
     end
   end
 
@@ -508,27 +508,29 @@ class Post < ActiveRecord::Base
 
       tags -= %w(incredibly_absurdres absurdres highres lowres huge_filesize)
 
-      if image_width >= 10_000 || image_height >= 10_000
-        tags << "incredibly_absurdres"
-      end
-      if image_width >= 3200 || image_height >= 2400
-        tags << "absurdres"
-      end
-      if image_width >= 1600 || image_height >= 1200
-        tags << "highres"
-      end
-      if image_width <= 500 && image_height <= 500
-        tags << "lowres"
+      if has_dimensions?
+        if image_width >= 10_000 || image_height >= 10_000
+          tags << "incredibly_absurdres"
+        end
+        if image_width >= 3200 || image_height >= 2400
+          tags << "absurdres"
+        end
+        if image_width >= 1600 || image_height >= 1200
+          tags << "highres"
+        end
+        if image_width <= 500 && image_height <= 500
+          tags << "lowres"
+        end
+
+        if image_width >= 1024 && image_width.to_f / image_height >= 4
+          tags << "wide_image long_image"
+        elsif image_height >= 1024 && image_height.to_f / image_width >= 4
+          tags << "tall_image long_image"
+        end
       end
 
       if file_size >= 10.megabytes
         tags << "huge_filesize"
-      end
-
-      if image_width >= 1024 && image_width.to_f / image_height >= 4
-        tags << "wide_image long_image"
-      elsif image_height >= 1024 && image_height.to_f / image_width >= 4
-        tags << "tall_image long_image"
       end
 
       return tags
