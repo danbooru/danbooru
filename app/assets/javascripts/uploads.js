@@ -81,7 +81,7 @@
     Danbooru.RelatedTag.translated_tags = data.translated_tags;
     Danbooru.RelatedTag.build_all();
 
-    var new_artist_link = '<a target="_blank" href="/artists/new?other_names=' + data.artist_name + '&urls=' + encodeURIComponent(data.profile_url) + '+' + encodeURIComponent(data.image_url) + '">new</a>';
+    var new_artist_link = '<a target="_blank" href="/artists/new?other_names=' + data.artist_name + '&urls=' + encodeURIComponent(data.profile_url + '\n' + data.image_url) + '">new</a>';
 
     $("#source-record").html(new_artist_link);
 
