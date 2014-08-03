@@ -115,7 +115,7 @@ class PostQueryBuilder
     end
 
     if CurrentUser.safe_mode?
-      relation = relation.where(:rating => "s")
+      relation = relation.where("posts.rating = 's'")
     end
 
     relation = add_range_relation(q[:post_id], "posts.id", relation)
