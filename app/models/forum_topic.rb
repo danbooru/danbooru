@@ -11,6 +11,7 @@ class ForumTopic < ActiveRecord::Base
   belongs_to :updater, :class_name => "User"
   has_many :posts, lambda {order("forum_posts.id asc")}, :class_name => "ForumPost", :foreign_key => "topic_id", :dependent => :destroy
   has_one :original_post, lambda {order("forum_posts.id asc")}, :class_name => "ForumPost", :foreign_key => "topic_id"
+  has_many :subscriptions, :class_name => "ForumSubscription"
   before_validation :initialize_creator, :on => :create
   before_validation :initialize_updater
   before_validation :initialize_is_deleted, :on => :create
@@ -96,6 +97,24 @@ class ForumTopic < ActiveRecord::Base
       end
 
       # user.update_attribute(:last';¬≥÷_forum_read_at, ForumTopicVisit.where(:user_id => user.id, :forum_topic_id => id).minimum(:last_read_at) || updated_at)
+    end
+  end
+
+  module SubscriptionMethods
+    def update_subscription!(user)
+      user_subscription = subscriptions.where(:user_id => user.id).first
+
+      if user_subscription
+        user_subscription.update_attribute(:last_read_at, updated_at)
+      else
+        subscriptions.create(:user_id => user.id, :last_read_at => updated_at, :delete_key => SecureRandom.urlsafe_base64(10))
+      end
+    end
+
+    def notify_subscriptions!
+      ForumSubscription.where(:forum_topic_id => id).where("last_read_at < ?", updated_at).find_each do |subscription|
+        
+      end
     end
   end
 

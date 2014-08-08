@@ -11,5 +11,6 @@ class DailyMaintenance
     UserUploadClamper.new.clamp_all!
     TagSubscription.process_all
     ApiCacheGenerator.new.generate_tag_cache
+    ForumSubscription.process_all!
   end
 end
