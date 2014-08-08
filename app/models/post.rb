@@ -380,6 +380,9 @@ class Post < ActiveRecord::Base
         
       when %r{\Ahttp://i(?:\d)?\.minus\.com/(?:i|j)([^\.]{12,})}i
         "http://minus.com/i/#{$1}"
+        
+      when %r{\Ahttps?://pic0[1-4]\.nijie\.info/nijie_picture/(?:diff/main/)?\d+_(\d+)_(?:\d+{10}|\d+_\d+{14})}i
+        "http://nijie.info/view.php?id=#{$1}"
 
       else
         source
