@@ -385,14 +385,14 @@ class Post < ActiveRecord::Base
         "http://nijie.info/view.php?id=#{$1}"
         
       when %r{\Ahttps?://(?:o|image-proxy-origin)\.twimg\.com/\d/proxy\.jpg\?t=(\w+)&}i
-	      str = Base64.decode64($1)
-	      url = URI.extract(str, ['http', 'https'])
-	      if (url[0] =~ /^https?:\/\/twitpic.com\/show\/large\/[a-z0-9]+/i)
-		      url[0].gsub!(/show\/large\//, "")
-		      index = url[0].rindex('.')
-		      url[0] = url[0][0..index-1]
-	      end
-	      "#{url[0]}"
+	str = Base64.decode64($1)
+	url = URI.extract(str, ['http', 'https'])
+	if (url[0] =~ /^https?:\/\/twitpic.com\/show\/large\/[a-z0-9]+/i)
+	  url[0].gsub!(/show\/large\//, "")
+	  index = url[0].rindex('.')
+	  url[0] = url[0][0..index-1]
+	end
+	"#{url[0]}"
 
       else
         source
