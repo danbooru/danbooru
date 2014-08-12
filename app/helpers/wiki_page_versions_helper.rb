@@ -1,9 +1,15 @@
 module WikiPageVersionsHelper
   def wiki_page_diff(thispage, otherpage)
     pattern = Regexp.new('(?:<.+?>)|(?:\w+)|(?:[ \t]+)|(?:\r?\n)|(?:.+?)')
+    other_names_pattern = Regexp.new('\S+|\s+')
 
     thisarr = thispage.body.scan(pattern)
     otharr = otherpage.body.scan(pattern)
+
+    if thispage.other_names.present? || otherpage.other_names.present?
+      thisarr = "#{thispage.other_names}\n\n".scan(other_names_pattern) + thisarr
+      otharr = "#{otherpage.other_names}\n\n".scan(other_names_pattern) + otharr
+    end
 
     cbo = Diff::LCS::ContextDiffCallbacks.new
     diffs = thisarr.diff(otharr, cbo)
@@ -47,25 +53,5 @@ module WikiPageVersionsHelper
     end
 
     output.join.gsub(/\r?\n/, '<br>').html_safe
-  end
-
-  def wiki_page_other_names_diff(thispage, otherpage)
-    new_names = otherpage.other_names_array
-    old_names = thispage.other_names_array
-    added_names = new_names - old_names
-    removed_names = old_names - new_names
-    unchanged_names = new_names & old_names
-
-    html = []
-    added_names.each do |name|
-      html << '<ins>' + name + '</ins>'
-    end
-    removed_names.each do |name|
-      html << '<del>' + name + '</del>'
-    end
-    unchanged_names.each do |name|
-      html << '<span>' + name + '</span>'
-    end
-    return html.join(" ").html_safe
   end
 end
