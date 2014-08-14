@@ -11,24 +11,25 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <script type="text/javascript">
   	$(function() {
-      $(document).on("swipeleft", function(e) {
-        if (e.gesture.distance > 150) {
-          var href = $(".paginator a[rel=next]").attr("href");
-          if (href) {
-            window.location = href;
-          }          
-        }
-      });
-
-      $(document).on("swiperight", function(e) {
-        if (e.gesture.distance > 150) {
-          var href = $(".paginator a[rel=prev]").attr("href");
-          if (href) {
-            window.location = href;
+      $(document)
+        .hammer()
+        .on("swipeleft", function(e) {
+          if (e.gesture.distance > 125) {
+            var href = $(".paginator a[rel=next]").attr("href");
+            if (href) {
+              window.location = href;
+            }          
           }
-        }
-      })
-  	});
+        })
+        .on("swiperight", function(e) {
+          if (e.gesture.distance > 125) {
+            var href = $(".paginator a[rel=prev]").attr("href");
+            if (href) {
+              window.location = href;
+            }
+          }
+        });
+  	})
   </script>
 <% end %>
 
