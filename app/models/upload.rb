@@ -87,9 +87,7 @@ class Upload < ActiveRecord::Base
   end
 
   module ConversionMethods
-    def process!(force = false)
-      return if !force && status =~ /processing|completed|error/
-
+    def process_once
       CurrentUser.scoped(uploader, uploader_ip_addr) do
         update_attribute(:status, "processing")
         if is_downloadable?
@@ -119,8 +117,25 @@ class Upload < ActiveRecord::Base
           update_attribute(:status, "error: " + post.errors.full_messages.join(", "))
         end
       end
+    end
+
+    def process!(force = false)
+      @tries ||= 0
+      return if !force && status =~ /processing|completed|error/
+
+      process_once
+
+    rescue Timeout::Error, Net::HTTP::Persistent::Error => x
+      if @tries > 3
+        update_attributes(:status => "error: #{x.class} - #{x.message}", :backtrace => x.backtrace.join("\n"))
+      else
+        @tries += 1
+        retry
+      end
+
     rescue Exception => x
       update_attributes(:status => "error: #{x.class} - #{x.message}", :backtrace => x.backtrace.join("\n"))
+      
     ensure
       delete_temp_file
     end
