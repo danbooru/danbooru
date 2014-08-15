@@ -13,19 +13,16 @@
   <meta name="viewport" content="width=device-width,initial-scale=<%= @post.device_scale %>">
   <script type="text/javascript">
     $(function() {
-      $(document).on("swipeleft", function(e) {
-        if (e.gesture.distance > 150) {
-          var href = $(".paginator a[rel=next]").attr("href");
-          if (href) {
-            window.location = href;
-          }
+      var doc = new Hammer(document);
+      doc.on("swipeleft", function(e) {
+        var href = $(".paginator a[rel=next]").attr("href");
+        if (href) {
+          window.location = href;
         }
       });
 
-      $(document).on("swiperight", function(e) {
-        if (e.gesture.distance > 150) {
-          window.history.back();
-        }
+      doc.on("swiperight", function(e) {
+        window.history.back();
       })
     });
   </script>
