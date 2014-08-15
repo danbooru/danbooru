@@ -1,5 +1,5 @@
 class ApiKeysController < ApplicationController
-  before_filter :gold_only
+  before_filter :member_only
 
   def new
     @api_key = ApiKey.new(:user_id => CurrentUser.user.id)
