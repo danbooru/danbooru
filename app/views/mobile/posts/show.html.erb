@@ -13,7 +13,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=<%= @post.device_scale %>">
   <script type="text/javascript">
     $(function() {
-      var doc = new Hammer(document);
+      var doc = new Hammer(document.body);
+      
       doc.on("swipeleft", function(e) {
         var href = $(".paginator a[rel=next]").attr("href");
         if (href) {
