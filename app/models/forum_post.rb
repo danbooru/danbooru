@@ -112,6 +112,7 @@ class ForumPost < ActiveRecord::Base
     if topic
       # need to do this to bypass the topic's original post from getting touched
       ForumTopic.where(:id => topic.id).update_all(["updater_id = ?, response_count = response_count + 1, updated_at = ?", CurrentUser.id, Time.now])
+      topic.response_count += 1
     end
   end
 
@@ -135,8 +136,10 @@ class ForumPost < ActiveRecord::Base
     max = ForumPost.where(:topic_id => topic.id, :is_deleted => false).order("updated_at desc").first
     if max
       ForumTopic.where(:id => topic.id).update_all(["response_count = response_count - 1, updated_at = ?, updater_id = ?", max.updated_at, max.updater_id])
+      topic.response_count -= 1
     else
       ForumTopic.where(:id => topic.id).update_all("response_count = response_count - 1")
+      topic.response_count -= 1
     end
   end
 
