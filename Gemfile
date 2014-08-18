@@ -18,7 +18,7 @@ gem "uglifier"
 gem 'coffee-rails'
 gem "therubyracer", :platforms => :ruby
 gem "pry", :group => [:test, :development]
-gem "rails", "~> 4.1.0"
+gem "rails", "~> 4.1.5"
 gem "pg"
 gem "kgio"
 gem "dalli"
