@@ -62,28 +62,4 @@ div#tags {
     font-size: 24pt;
     font-weight: bold;
   }
-
-  .category-1 a, a.tag-type-1 {
-    color: #A00;
-
-    &:hover {
-      color: #B66;
-    }
-  }
-
-  .category-3 a, a.tag-type-3 {
-    color: #A0A;
-
-    &:hover {
-      color: #B6B;
-    }
-  }
-
-  .category-4 a, a.tag-type-4 {
-    color: #0A0;
-
-    &:hover {
-      color: #6B6;
-    }
-  }
 }
