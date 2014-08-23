@@ -11,7 +11,7 @@ class ForumPost < ActiveRecord::Base
   after_create :update_topic_updated_at_on_create
   after_update :update_topic_updated_at_on_update_for_original_posts
   after_destroy :update_topic_updated_at_on_destroy
-  validates_presence_of :body, :creator_id
+  validates_presence_of :body, :creator_id, :topic
   validate :validate_topic_is_unlocked
   before_destroy :validate_topic_is_unlocked
   after_save :delete_topic_if_original_post

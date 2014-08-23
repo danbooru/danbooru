@@ -7,6 +7,7 @@ class BulkUpdateRequest < ActiveRecord::Base
   validates_presence_of :user
   validates_presence_of :script
   validates_presence_of :title
+  validates_presence_of :forum_topic, :message => "is invalid"
   validates_inclusion_of :status, :in => %w(pending approved rejected)
   validate :script_formatted_correctly
   attr_accessible :user_id, :forum_topic_id, :script, :title, :reason
