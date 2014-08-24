@@ -7,9 +7,9 @@ class BulkUpdateRequest < ActiveRecord::Base
   validates_presence_of :user
   validates_presence_of :script
   validates_presence_of :title
-  validates_presence_of :forum_topic, :message => "is invalid"
   validates_inclusion_of :status, :in => %w(pending approved rejected)
   validate :script_formatted_correctly
+  validate :forum_topic_id_not_invalid
   attr_accessible :user_id, :forum_topic_id, :script, :title, :reason
   attr_accessible :status, :as => [:admin]
   before_validation :initialize_attributes, :on => :create
@@ -84,5 +84,11 @@ class BulkUpdateRequest < ActiveRecord::Base
   rescue StandardError => e
     errors.add(:base, e.message)
     return false
+  end
+
+  def forum_topic_id_not_invalid
+    if forum_topic_id && !forum_topic
+      errors.add(:base, "Forum topic ID is invalid")
+    end
   end
 end

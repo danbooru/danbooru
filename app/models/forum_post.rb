@@ -11,8 +11,9 @@ class ForumPost < ActiveRecord::Base
   after_create :update_topic_updated_at_on_create
   after_update :update_topic_updated_at_on_update_for_original_posts
   after_destroy :update_topic_updated_at_on_destroy
-  validates_presence_of :body, :creator_id, :topic
+  validates_presence_of :body, :creator_id
   validate :validate_topic_is_unlocked
+  validate :topic_id_not_invalid
   before_destroy :validate_topic_is_unlocked
   after_save :delete_topic_if_original_post
   after_save :update_email_notifications
@@ -101,6 +102,12 @@ class ForumPost < ActiveRecord::Base
       return false
     else
       return true
+    end
+  end
+
+  def topic_id_not_invalid
+    if topic_id && !topic
+      errors.add(:base, "Topic ID is invalid")
     end
   end
 
