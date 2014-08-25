@@ -12,23 +12,33 @@ class PostPresenter < Presenter
 
     path = options[:path_prefix] || "/posts"
 
-    html =  %{<article id="post_#{post.id}" class="#{preview_class(post)}" #{data_attributes(post)}>}
+    html =  %{<article id="post_#{post.id}" class="#{preview_class(post, options[:pool])}" #{data_attributes(post)}>}
     if options[:tags].present?
       tag_param = "?tags=#{CGI::escape(options[:tags])}"
-    elsif options[:pool_id]
-      tag_param = "?pool_id=#{options[:pool_id]}"
+    elsif options[:pool_id] || options[:pool]
+      tag_param = "?pool_id=#{CGI::escape((options[:pool_id] || options[:pool].id).to_s)}"
     else
       tag_param = nil
     end
     html << %{<a href="#{path}/#{post.id}#{tag_param}">}
     html << %{<img src="#{post.preview_file_url}" alt="#{h(post.tag_string)}">}
     html << %{</a>}
+
+    if options[:pool]
+      html << %{<p class="desc">}
+      html << %{<a href="/pools/#{options[:pool].id}">}
+      html << options[:pool].pretty_name.truncate(40)
+      html << %{</a>}
+      html << %{</p>}
+    end
+
     html << %{</article>}
     html.html_safe
   end
 
-  def self.preview_class(post)
+  def self.preview_class(post, description = nil)
     klass = "post-preview"
+    klass << " pooled" if description
     klass << " post-status-pending" if post.is_pending?
     klass << " post-status-flagged" if post.is_flagged?
     klass << " post-status-deleted" if post.is_deleted?

@@ -157,6 +157,9 @@ Rails.application.routes.draw do
       put :revert
       post :undelete
     end
+    collection do
+      get :gallery
+    end
     resource :order, :only => [:edit, :update], :controller => "pool_orders"
   end
   resource  :pool_element, :only => [:create, :destroy] do

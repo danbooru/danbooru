@@ -1,0 +1,15 @@
+<div id="c-pools">
+  <div id="a-gallery">
+    <section>
+      <%= @post_set.presenter.post_previews_html(self) %>
+
+      <%= numbered_paginator(@pools) %>
+    </section>
+  </div>
+</div>
+
+<%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Pool Gallery - <%= Danbooru.config.app_name %>
+<% end %>

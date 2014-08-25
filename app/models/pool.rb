@@ -2,7 +2,7 @@ require 'ostruct'
 
 class Pool < ActiveRecord::Base
   validates_uniqueness_of :name, :case_sensitive => false
-  validates_format_of :name, :with => /\A[^\s,]+\Z/, :message => "cannot have whitespace or commas"
+  validates_format_of :name, :with => /\A[^,]+\Z/, :message => "cannot have commas"
   validates_inclusion_of :category, :in => %w(series collection)
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
@@ -314,6 +314,10 @@ class Pool < ActiveRecord::Base
         OpenStruct.new
       end
     end
+  end
+
+  def cover_post_id
+    post_ids[/^(\d+)/, 1]
   end
 
   def create_version(force = false)

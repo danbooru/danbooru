@@ -22,6 +22,11 @@ class PoolsController < ApplicationController
     end
   end
 
+  def gallery
+    @pools = Pool.series.search(params[:search]).order("updated_at desc").paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
+    @post_set = PostSets::PoolGallery.new(@pools)
+  end
+
   def search
   end
 

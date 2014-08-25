@@ -10,6 +10,10 @@ article.post-preview {
   @include inline-block;
   position: relative;
 
+  &.pooled {
+    height: 194px;
+  }
+
   img {
     margin: auto;
   }
