@@ -5,6 +5,15 @@
 
 <%= @post.presenter.image_html(self) %>
 
+<div id="options">
+  <% if @post.favorited_by?(CurrentUser.user.id) %>
+    <%= link_to "Unfavorite", favorite_path(@post), :method => :delete %> |
+  <% else %>
+    <%= link_to "Favorite", favorites_path(:post_id => @post.id), :method => :post %> |
+  <% end %>
+  <%= link_to "Non-mobile Version", post_path(@post.id) %>
+</div>
+
 <div id="tags">
   <%= @post.presenter.tag_list_html(self, :name_only => true, :path_prefix => "/m/posts") %>
 </div>
