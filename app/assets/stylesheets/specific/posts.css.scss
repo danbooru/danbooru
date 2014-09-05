@@ -11,7 +11,11 @@ article.post-preview {
   position: relative;
 
   &.pooled {
-    height: 194px;
+    height: 214px;
+  }
+
+  .desc {
+    font-size: 80%;
   }
 
   img {
