@@ -29,6 +29,7 @@ class FavoritesController < ApplicationController
       format.html do
         redirect_to(mobile_post_path(@post))
       end
+      format.js
     end
   end
 
@@ -40,6 +41,7 @@ class FavoritesController < ApplicationController
       format.html do
         redirect_to(mobile_post_path(@post))
       end
+      format.js
     end
   end
 end
