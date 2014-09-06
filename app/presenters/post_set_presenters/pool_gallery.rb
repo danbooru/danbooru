@@ -14,10 +14,9 @@ module PostSetPresenters
         return template.render("post_sets/blank")
       end
 
-      posts = ::Post.where(id: pools.map(&:cover_post_id)).to_a.inject({}) {|h, x| h[x.id] = x; h}
-
       pools.each do |pool|
-        if post = posts[pool.cover_post_id.to_i]
+        if pool.cover_post_id
+          post = ::Post.find(pool.cover_post_id)
           html << PostPresenter.preview(post, options.merge(:tags => @post_set.tag_string, :raw => @post_set.raw, :pool => pool))
           html << "\n"
         end
