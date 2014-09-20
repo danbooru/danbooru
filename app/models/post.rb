@@ -536,9 +536,11 @@ class Post < ActiveRecord::Base
         end
 
         if image_width >= 1024 && image_width.to_f / image_height >= 4
-          tags << "wide_image long_image"
+          tags << "wide_image"
+          tags << "long_image"
         elsif image_height >= 1024 && image_height.to_f / image_width >= 4
-          tags << "tall_image long_image"
+          tags << "tall_image"
+          tags << "long_image"
         end
       end
 
