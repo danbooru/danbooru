@@ -519,8 +519,6 @@ class Post < ActiveRecord::Base
     def add_automatic_tags(tags)
       return tags if !Danbooru.config.enable_dimension_autotagging
 
-      tags -= %w(incredibly_absurdres absurdres highres lowres huge_filesize wide_image tall_image long_image)
-
       if has_dimensions?
         if image_width >= 10_000 || image_height >= 10_000
           tags << "incredibly_absurdres"
@@ -536,9 +534,9 @@ class Post < ActiveRecord::Base
         end
 
         if image_width >= 1024 && image_width.to_f / image_height >= 4
-          tags << "wide_image long_image"
+          tags += %w(wide_image long_image)
         elsif image_height >= 1024 && image_height.to_f / image_width >= 4
-          tags << "tall_image long_image"
+          tags += %w(tall_image long_image)
         end
       end
 
