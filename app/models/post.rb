@@ -502,10 +502,10 @@ class Post < ActiveRecord::Base
       normalized_tags = normalized_tags.map{|tag| tag.downcase}
       normalized_tags = remove_negated_tags(normalized_tags)
       normalized_tags = normalized_tags.map {|x| Tag.find_or_create_by_name(x).name}
-      normalized_tags = TagAlias.to_aliased(normalized_tags)
-      normalized_tags = TagImplication.with_descendants(normalized_tags)
       normalized_tags = %w(tagme) if normalized_tags.empty?
       normalized_tags = add_automatic_tags(normalized_tags)
+      normalized_tags = TagAlias.to_aliased(normalized_tags)
+      normalized_tags = TagImplication.with_descendants(normalized_tags)
       normalized_tags.sort!
       set_tag_string(normalized_tags.uniq.sort.join(" "))
     end
