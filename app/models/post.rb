@@ -519,7 +519,7 @@ class Post < ActiveRecord::Base
     def add_automatic_tags(tags)
       return tags if !Danbooru.config.enable_dimension_autotagging
 
-      tags -= %w(incredibly_absurdres absurdres highres lowres huge_filesize)
+      tags -= %w(incredibly_absurdres absurdres highres lowres huge_filesize flash webm)
 
       if has_dimensions?
         if image_width >= 10_000 || image_height >= 10_000
@@ -546,6 +546,14 @@ class Post < ActiveRecord::Base
 
       if file_size >= 10.megabytes
         tags << "huge_filesize"
+      end
+
+      if file_ext == "swf"
+        tags << "flash"
+      end
+
+      if file_ext == "webm"
+        tags << "webm"
       end
 
       return tags
