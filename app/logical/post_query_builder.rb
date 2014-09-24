@@ -370,11 +370,13 @@ class PostQueryBuilder
       relation = relation.order("artist_commentaries.updated_at ASC, posts.id DESC")
 
     when "mpixels", "mpixels_desc"
+      relation = relation.where("posts.image_width is not null and posts.image_height is not null")
       # Use "w*h/1000000", even though "w*h" would give the same result, so this can use
       # the posts_mpixels index.
       relation = relation.order("posts.image_width * posts.image_height / 1000000.0 DESC, posts.id DESC")
 
     when "mpixels_asc"
+      relation = relation.where("posts.image_width is not null and posts.image_height is not null")
       relation = relation.order("posts.image_width * posts.image_height / 1000000.0 ASC, posts.id DESC")
 
     when "portrait"
