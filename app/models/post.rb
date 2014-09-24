@@ -288,6 +288,9 @@ class Post < ActiveRecord::Base
       when %r{\Ahttp://img\d+\.pixiv\.net/img/[^\/]+/(\d+)}i, %r{\Ahttp://i\d\.pixiv\.net/img\d+/img/[^\/]+/(\d+)}i
         "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
 
+      when %r{\Ahttp://i\d\.pixiv\.net/img-original/img/(?:\d+\/)+(\d+)_p}
+        "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
+
       when %r{\Ahttp://lohas\.nicoseiga\.jp/priv/(\d+)\?e=\d+&h=[a-f0-9]+}i, %r{\Ahttp://lohas\.nicoseiga\.jp/priv/[a-f0-9]+/\d+/(\d+)}i
         "http://seiga.nicovideo.jp/seiga/im#{$1}"
 
@@ -1380,6 +1383,8 @@ class Post < ActiveRecord::Base
       elsif source =~ %r!http://img\d+\.pixiv\.net/img/[^\/]+/(\d+)!
         self.pixiv_id = $1
       elsif source =~ %r!http://i\d\.pixiv\.net/img\d+/img/[^\/]+/(\d+)!
+        self.pixiv_id = $1
+      elsif source =~ %r!http://i\d\.pixiv\.net/img-original/img/(?:\d+\/)+(\d+)_p!
         self.pixiv_id = $1
       elsif source =~ /pixiv\.net/ && source =~ /illust_id=(\d+)/
         self.pixiv_id = $1
