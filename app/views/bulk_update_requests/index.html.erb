@@ -2,36 +2,7 @@
   <div class="index">
     <h1>Bulk Update Requests</h1>
 
-    <table class="striped" width="100%">
-      <thead>
-        <tr>
-          <th>Creator</th>
-          <th>Forum</th>
-          <th>Script</th>
-          <th>Status</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @bulk_update_requests.each do |request| %>
-          <tr id="request-<%= request.id %>">
-            <td><%= link_to_user(request.user) %></td>
-            <td><%= link_to(request.forum_topic_id, forum_topic_path(request.forum_topic_id)) %></td>
-            <td><%= script_with_line_breaks(request.script) %></td>
-            <td><%= request.status %></td>
-            <td>
-              <% if CurrentUser.is_moderator? && request.status == "pending" %>
-                <%= link_to "Approve", approve_bulk_update_request_path(request), :method => :post %> |
-              <% end %>
-              <% if request.editable?(CurrentUser.user) %>
-                <%= link_to "Delete", bulk_update_request_path(request), :method => :delete, :data => {:confirm => "Are you sure you want to delete this bulk update request?"} %> |
-                <%= link_to "Edit", edit_bulk_update_request_path(request) %>
-              <% end %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+    <%= render "listing", :bulk_update_requests => @bulk_update_requests %>
 
     <%= numbered_paginator(@bulk_update_requests) %>
   </div>
