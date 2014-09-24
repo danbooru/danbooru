@@ -1,5 +1,6 @@
 <div id="c-pools">
   <div id="a-gallery">
+    <%= render "search", :path => gallery_pools_path %>
     <section>
       <%= @post_set.presenter.post_previews_html(self) %>
 

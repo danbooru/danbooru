@@ -1,6 +1,6 @@
 <table class="search">
   <tbody>
-    <%= form_tag pools_path, :method => :get, :class => "simple_form" do %>
+    <%= form_tag path, :method => :get, :class => "simple_form" do %>
       <tr>
         <th><label for="search_name_matches">Name</label></th>
         <td>
@@ -28,14 +28,16 @@
         </td>
       </tr>
 
-      <tr>
-        <th><label for="search_category">Category</th>
-        <td>
-          <div class="input">
-            <%= select "search", "category", [["Series", "series"], ["Collection", "collection"]], :selected => params[:search][:category], :include_blank => true %>
-          </div>
-        </td>
-      </tr>
+      <% if path != gallery_pools_path %>
+        <tr>
+          <th><label for="search_category">Category</th>
+          <td>
+            <div class="input">
+              <%= select "search", "category", [["Series", "series"], ["Collection", "collection"]], :selected => params[:search][:category], :include_blank => true %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
 
       <tr>
         <th><label for="search_order">Order</th>
