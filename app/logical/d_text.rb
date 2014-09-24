@@ -163,16 +163,16 @@ class DText
     # Make sure quote tags are surrounded by newlines
 
     unless options[:inline]
-      str.gsub!(/\s*\[quote\]\s*/m, "\n\n[quote]\n\n")
+      str.gsub!(/\s*\[quote\](?!\])\s*/m, "\n\n[quote]\n\n")
       str.gsub!(/\s*\[\/quote\]\s*/m, "\n\n[/quote]\n\n")
-      str.gsub!(/\s*\[code\]/m, "\n\n[code]\n\n")
+      str.gsub!(/\s*\[code\](?!\])/m, "\n\n[code]\n\n")
       str.gsub!(/\[\/code\]\s*/m, "\n\n[/code]\n\n")
       str.gsub!(/\s*\[spoilers?\](?!\])\s*/m, "\n\n[spoiler]\n\n")
       str.gsub!(/\s*\[\/spoilers?\]\s*/m, "\n\n[/spoiler]\n\n")
       str.gsub!(/^(h[1-6]\.\s*.+)$/, "\n\n\\1\n\n")
-      str.gsub!(/\s*\[expand(\=[^\]]*)?\]\s*/m, "\n\n[expand\\1]\n\n")
+      str.gsub!(/\s*\[expand(\=[^\]]*)?\](?!\])\s*/m, "\n\n[expand\\1]\n\n")
       str.gsub!(/\s*\[\/expand\]\s*/m, "\n\n[/expand]\n\n")
-      str.gsub!(/\s*\[table\]\s*/m, "\n\n[table]\n\n")
+      str.gsub!(/\s*\[table\](?!\])\s*/m, "\n\n[table]\n\n")
       str.gsub!(/\s*\[\/table\]\s*/m, "\n\n[/table]\n\n")
     end
 
