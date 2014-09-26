@@ -34,6 +34,10 @@ module Sources
           pixiv_artist_id = metadata[1]
           file_ext        = metadata[2]
 
+          # http://i1.pixiv.net/img35/img/kinokoyarou/mobile/46165361_480mw.jpg?1411573716
+          metadata[9] =~ /(?:jpg|jpeg|png|gif)\?(\d+)$/i
+          revision = $1
+
           # We want "img04", not "img4"
           image_directory = "img" + metadata[4].rjust(2, "0")
 
@@ -53,6 +57,8 @@ module Sources
             @page_count = 1
             @image_url  = "http://i1.pixiv.net/#{image_directory}/img/#{@pixiv_moniker}/#{illust_id}.#{file_ext}"
           end
+
+          @image_url += "?#{revision}" unless revision.nil?
         end
       end
 
