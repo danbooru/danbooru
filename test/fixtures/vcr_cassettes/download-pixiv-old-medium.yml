@@ -8,7 +8,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - _/2.12.0
+      - Danbooru/2.59.0
       Referer:
       - http://www.pixiv.net
       Accept:
@@ -16,30 +16,33 @@ http_interactions:
   response:
     status:
       code: 200
-      message: OK
+      message: !binary |-
+        T0s=
     headers:
-      Server:
-      - nginx
-      Date:
-      - Fri, 24 May 2013 19:51:25 GMT
-      Content-Type:
-      - image/jpeg
-      Content-Length:
-      - '185778'
-      Connection:
-      - keep-alive
-      Last-Modified:
-      - Tue, 19 May 2009 23:34:11 GMT
-      Etag:
-      - ! '"add11c9-2d5b2-46a4c590e22c0"'
-      Accept-Ranges:
-      - bytes
-      Cache-Control:
-      - max-age=1209600
-      Expires:
-      - Thu, 06 Jun 2013 22:56:47 GMT
-      Age:
-      - '75278'
+      !binary "U2VydmVy":
+      - !binary |-
+        bmdpbng=
+      !binary "Q29udGVudC1UeXBl":
+      - !binary |-
+        aW1hZ2UvanBlZw==
+      !binary "Q29udGVudC1MZW5ndGg=":
+      - !binary |-
+        MTg1Nzc4
+      !binary "Q29ubmVjdGlvbg==":
+      - !binary |-
+        a2VlcC1hbGl2ZQ==
+      !binary "TGFzdC1Nb2RpZmllZA==":
+      - !binary |-
+        VHVlLCAxOSBNYXkgMjAwOSAyMzozNDoxMSBHTVQ=
+      !binary "QWNjZXB0LVJhbmdlcw==":
+      - !binary |-
+        Ynl0ZXM=
+      !binary "Q2FjaGUtQ29udHJvbA==":
+      - !binary |-
+        bWF4LWFnZT0xMjA5NjAw
+      !binary "RXhwaXJlcw==":
+      - !binary |-
+        U2F0LCAxMSBPY3QgMjAxNCAwMDoyNTo1NiBHTVQ=
     body:
       encoding: ASCII-8BIT
       string: !binary |-
@@ -4173,5 +4176,5 @@ http_interactions:
         uS9vPLxbgUolXkf60QkHs5F291RMWfqRh/kmOpY7fIklQbpB7wD9danFlWB5
         bJUdD6Cp8Tgup+OwhWnRD//Z
     http_version: 
-  recorded_at: Fri, 24 May 2013 19:51:26 GMT
-recorded_with: VCR 2.4.0
+  recorded_at: Sat, 27 Sep 2014 05:53:24 GMT
+recorded_with: VCR 2.9.0
