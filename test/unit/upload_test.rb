@@ -104,10 +104,13 @@ class UploadTest < ActiveSupport::TestCase
         should "initialize the final path after downloading a file" do
           @upload = FactoryGirl.create(:source_upload)
           path = "#{Rails.root}/tmp/test.download.jpg"
-          assert_nothing_raised {@upload.download_from_source(path)}
-          assert(File.exists?(path))
-          assert_equal(8558, File.size(path))
-          assert_equal(path, @upload.file_path)
+
+          VCR.use_cassette("upload-test-file", :record => :once) do
+            assert_nothing_raised {@upload.download_from_source(path)}
+            assert(File.exists?(path))
+            assert_equal(8558, File.size(path))
+            assert_equal(path, @upload.file_path)
+          end
         end
       end
 
