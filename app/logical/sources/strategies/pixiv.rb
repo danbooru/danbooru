@@ -103,7 +103,7 @@ module Sources
         # http://i1.pixiv.net/c/150x150/img-master/img/2014/09/24/23/25/08/46168376_p0_master1200.jpg
         # http://i1.pixiv.net/img-original/img/2014/09/25/23/09/29/46183440_p0.jpg
         # http://i2.pixiv.net/img-inf/img/2014/09/25/00/57/24/46170939_128x128.jpg
-        if url =~ /\/(\d+)(?:_big|_480mw)?(?:_s|_m|_p\d+|_\d+x\d+)?(?:_master\d+)?\.(?:jpg|jpeg|png|gif)/i
+        if url =~ %r!/(\d+)(?:_\w+)?\.(?:jpg|jpeg|png|gif)!i
           $1
 
         # http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939
@@ -127,7 +127,7 @@ module Sources
         # ...but not for images that aren't part of a gallery:
         # * http://i1.pixiv.net/c/600x600/img-master/img/2014/09/24/23/25/08/46168376_p0_master1200.jpg
         # * http://i1.pixiv.net/img-original/img/2014/09/25/23/09/29/46183440_p0.jpg
-        if url =~ %r!pixiv.net/img\d+/img/\w+/(?:mobile/)?\d+(?:_big|_480mw)?_p(\d+)\.(?:jpg|jpeg|png|gif)!i
+        if url =~ %r!/img/[^/]+/(?:mobile/)?\d+(?:_big|_480mw)?_p(\d+)\.(?:jpg|jpeg|png|gif)!i
           $1
 
         # http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=46170939&page=0
