@@ -6,30 +6,37 @@ module Sources
   class PixivTest < ActiveSupport::TestCase
     context "The source site for pixiv" do
       setup do
-        VCR.use_cassette("source-pixiv-unit-test", :record => :new_episodes) do
-          @site = Sources::Site.new("http://www.pixiv.net/member_illust.php?mode=big&illust_id=9646484")
+        VCR.use_cassette("source-pixiv-unit-test", :record => :once) do
+          @site = Sources::Site.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46212123")
           @site.get
         end
       end
 
       should "get the profile" do
-        assert_equal("http://www.pixiv.net/member.php?id=4015", @site.profile_url)
+        assert_equal("http://www.pixiv.net/member.php?id=4713734", @site.profile_url)
       end
 
       should "get the artist name" do
-        assert_equal("シビレ罠", @site.artist_name)
+        assert_equal("D-Savio", @site.artist_name)
       end
 
-      should "get the image url" do
-        assert_equal("http://i1.pixiv.net/img01/img/nisieda/9646484.jpg", @site.image_url)
+      should "get the old-style image url" do
+        assert_equal("http://i1.pixiv.net/img109/img/baka_narue/46212123.jpg", @site.image_url)
       end
 
       should "get the tags" do
-        assert(@site.tags.size > 0)
+        assert(@site.tags.size == 9)
+
         first_tag = @site.tags.first
-        assert_equal(2, first_tag.size)
-        assert(first_tag[0] =~ /./)
+        assert_equal(first_tag[0], "このは")
         assert(first_tag[1] =~ /search\.php/)
+      end
+
+      should "be tagged オリジナル if the post is in the Original category, even when オリジナル isn't one of the Pixiv tags" do
+        last_tag = @site.tags.last
+
+        assert_equal(last_tag[0], "オリジナル")
+        assert(last_tag[1] =~ /search\.php/)
       end
 
       should "convert a page into a json representation" do
