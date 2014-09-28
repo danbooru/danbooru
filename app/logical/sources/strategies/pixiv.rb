@@ -22,43 +22,18 @@ module Sources
       end
 
       def unique_id
-        @pixiv_moniker
+        @pixiv_username
       end
 
       def get
-        agent.get(spapi_url) do |page|
-          rows = CSV.parse(page.content.force_encoding("UTF-8"))
-          metadata = rows[0]
-
-          illust_id       = metadata[0]
-          pixiv_artist_id = metadata[1]
-          file_ext        = metadata[2]
-
-          # http://i1.pixiv.net/img35/img/kinokoyarou/mobile/46165361_480mw.jpg?1411573716
-          metadata[9] =~ /(?:jpg|jpeg|png|gif)\?(\d+)$/i
-          revision = $1
-
-          # We want "img04", not "img4"
-          image_directory = "img" + metadata[4].rjust(2, "0")
-
+        get_metadata_from_spapi do |metadata|
           @artist_name = metadata[5]
-          @profile_url = "http://www.pixiv.net/member.php?id=#{pixiv_artist_id}"
-          @pixiv_moniker = metadata[24]
+          @profile_url = "http://www.pixiv.net/member.php?id=#{metadata[1]}"
+          @image_url   = build_image_url(metadata)
+          @tags        = get_tags(metadata[13])
+          @page_count  = metadata[19] || 1
 
-          @tags = metadata[13].split(/\s+/).map do |tag|
-              [tag, "http://www.pixiv.net/search.php?s_mode=s_tag_full&word=#{tag}"]
-          end
-
-          # Is this image in a gallery?
-          if not metadata[19].nil?
-            @page_count = metadata[19]
-            @image_url  = "http://i1.pixiv.net/#{image_directory}/img/#{@pixiv_moniker}/#{illust_id}_big_p#{gallery_index_from_url}.#{file_ext}"
-          else
-            @page_count = 1
-            @image_url  = "http://i1.pixiv.net/#{image_directory}/img/#{@pixiv_moniker}/#{illust_id}.#{file_ext}"
-          end
-
-          @image_url += "?#{revision}" unless revision.nil?
+          @pixiv_username = metadata[24]
         end
       end
 
@@ -79,15 +54,53 @@ module Sources
         end
       end
 
-      # Pixiv's API requires the PHPSESSID to be passed as a query parameter
-      # instead of in a cookie. If PHPSESSID isn't passed then the API
-      # won't return results for R-18 images.
-      def spapi_url
-        "http://spapi.pixiv.net/iphone/illust.php?illust_id=#{illust_id_from_url}&PHPSESSID=#{phpsessid}"
+      # Refer to http://danbooru.donmai.us/wiki_pages/58938 for documentation on the Pixiv API.
+      def get_metadata_from_spapi
+        phpsessid = agent.cookies.select do |cookie| cookie.name == "PHPSESSID" end.first.value
+        spapi_url = "http://spapi.pixiv.net/iphone/illust.php?illust_id=#{illust_id_from_url}&PHPSESSID=#{phpsessid}"
+
+        agent.get(spapi_url) do |response|
+          metadata = CSV.parse(response.content.force_encoding("UTF-8")).first
+
+          if metadata.nil?
+            raise "Couldn't get metadata from Pixiv API."
+          else
+            yield metadata
+          end
+        end
       end
 
-      def phpsessid
-        agent.cookies.select do |cookie| cookie.name == "PHPSESSID" end.first.value
+      def build_image_url(metadata)
+        file_ext = metadata[2]
+        pixiv_username = metadata[24]
+
+        # We want "img04", not "img4"
+        image_directory = "img" + metadata[4].rjust(2, "0")
+
+        manga_page_count = metadata[19]
+        if manga_page_count.nil?
+          image_url = "http://i1.pixiv.net/#{image_directory}/img/#{pixiv_username}/#{illust_id_from_url}.#{file_ext}"
+        else
+          image_url = "http://i1.pixiv.net/#{image_directory}/img/#{pixiv_username}/#{illust_id_from_url}_big_p#{gallery_index_from_url}.#{file_ext}"
+        end
+
+        # http://i1.pixiv.net/img35/img/kinokoyarou/mobile/46165361_480mw.jpg?1411573716
+        metadata[9] =~ /(?:jpg|jpeg|png|gif)\?(\d+)$/i
+        revision = $1
+
+        image_url += "?#{revision}" unless revision.nil?
+
+        image_url
+      end
+
+      def get_tags(pixiv_tag_string)
+        pixiv_tags = pixiv_tag_string.split(/\s+/)
+
+        tags = pixiv_tags.map do |tag|
+            [tag, "http://www.pixiv.net/search.php?s_mode=s_tag_full&word=#{tag}"]
+        end
+
+        tags
       end
 
       def illust_id_from_url
