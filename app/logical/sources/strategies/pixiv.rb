@@ -106,6 +106,16 @@ module Sources
             [tag, "http://www.pixiv.net/search.php?s_mode=s_tag_full&word=#{tag}"]
         end
 
+        unless pixiv_tags.include?("オリジナル")
+          html_page_url = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{illust_id_from_url}"
+
+          agent.get(html_page_url) do |page|
+            if page.search("a.original-works").any?
+              tags << ["オリジナル", "http://www.pixiv.net/search.php?s_mode=s_tag_full&word=%E3%82%AA%E3%83%AA%E3%82%B8%E3%83%8A%E3%83%AB"]
+            end
+          end
+        end
+
         tags
       end
 
