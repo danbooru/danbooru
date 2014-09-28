@@ -27,7 +27,7 @@ module Downloads
       def rewrite_unnormalized_urls(url, headers)
         if url !~ %r!/img/[^/]+/\d+(?:_big_p\d+)?\.(?:jpg|jpeg|png|gif)!i
           source = ::Sources::Strategies::Pixiv.new(url)
-          source.get
+          source.get_image_url
           url = source.image_url
         end
 

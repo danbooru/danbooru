@@ -37,6 +37,12 @@ module Sources
         end
       end
 
+      def get_image_url
+        get_metadata_from_spapi do |metadata|
+          @image_url = build_image_url(metadata)
+        end
+      end
+
       protected
 
       def agent
