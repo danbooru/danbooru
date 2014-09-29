@@ -31,14 +31,14 @@ http_interactions:
       Cache-Control:
       - max-age=1209600
       Expires:
-      - Wed, 08 Oct 2014 15:57:48 GMT
+      - Sun, 12 Oct 2014 10:56:22 GMT
       Accept-Ranges:
       - bytes
     body:
       encoding: US-ASCII
       string: ''
     http_version: 
-  recorded_at: Sat, 27 Sep 2014 05:53:26 GMT
+  recorded_at: Mon, 29 Sep 2014 08:15:05 GMT
 - request:
     method: head
     uri: http://img04.pixiv.net/img/syounen_no_uta/46170939_big_p0.jpg
@@ -77,5 +77,5 @@ http_interactions:
       encoding: US-ASCII
       string: ''
     http_version: 
-  recorded_at: Sat, 27 Sep 2014 05:53:26 GMT
+  recorded_at: Mon, 29 Sep 2014 08:15:05 GMT
 recorded_with: VCR 2.9.0

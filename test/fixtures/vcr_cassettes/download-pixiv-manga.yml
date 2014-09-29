@@ -28,17 +28,17 @@ http_interactions:
       - keep-alive
       Last-Modified:
       - Wed, 14 Sep 2011 17:28:13 GMT
+      Accept-Ranges:
+      - bytes
       Cache-Control:
       - max-age=1209600
       Expires:
       - Fri, 10 Oct 2014 23:56:15 GMT
-      Accept-Ranges:
-      - bytes
     body:
       encoding: US-ASCII
       string: ''
     http_version: 
-  recorded_at: Sat, 27 Sep 2014 05:52:51 GMT
+  recorded_at: Mon, 29 Sep 2014 08:14:47 GMT
 - request:
     method: get
     uri: http://img65.pixiv.net/img/kiyoringo/21755794_big_p2.png
@@ -39693,5 +39693,5 @@ http_interactions:
         AgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAAB
         AgQIECBAgAABAgQIECDwAYE/YMgpRKYZ7IsAAAAASUVORK5CYII=
     http_version: 
-  recorded_at: Sat, 27 Sep 2014 05:52:55 GMT
+  recorded_at: Mon, 29 Sep 2014 08:14:51 GMT
 recorded_with: VCR 2.9.0
