@@ -25,7 +25,7 @@ module Sources
       end
 
       def get
-        agent.get(URI.parse(normalized_url).request_uri) do |page|
+        agent.get(URI.parse(normalized_url)) do |page|
           @artist_name, @profile_url = get_profile_from_page(page)
           @image_url = get_image_url_from_page(page)
           @tags = get_tags_from_page(page)
@@ -116,11 +116,21 @@ module Sources
         @agent ||= begin
           mech = Mechanize.new
 
-          mech.get("http://www.pixiv.net") do |page|
-            page.form_with(:action => "/login.php") do |form|
-              form['pixiv_id'] = Danbooru.config.pixiv_login
-              form['pass'] = Danbooru.config.pixiv_password
-            end.click_button
+          phpsessid = Cache.get("pixiv-phpsessid")
+          if phpsessid
+            cookie = Mechanize::Cookie.new("PHPSESSID", phpsessid)
+            cookie.domain = ".pixiv.net"
+            cookie.path = "/"
+            mech.cookie_jar.add(cookie)
+          else
+            mech.get("http://www.pixiv.net") do |page|
+              page.form_with(:action => "/login.php") do |form|
+                form['pixiv_id'] = Danbooru.config.pixiv_login
+                form['pass'] = Danbooru.config.pixiv_password
+              end.click_button
+            end
+            phpsessid = mech.cookie_jar.cookies.select{|c| c.name == "PHPSESSID"}.first
+            Cache.put("pixiv-phpsessid", phpsessid.value, 1.month) if phpsessid
           end
 
           mech
