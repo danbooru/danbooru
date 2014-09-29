@@ -2,13 +2,92 @@
 http_interactions:
 - request:
     method: get
-    uri: http://img02.pixiv.net/img/wanwandoh/4348318.jpg
+    uri: http://spapi.pixiv.net/iphone/illust.php?PHPSESSID=696859_a35e66809372234b413ccc30f7107fc5&illust_id=4348318
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - ! '*/*'
+      User-Agent:
+      - Mechanize/2.7.2 Ruby/1.9.3p327 (http://github.com/sparklemotion/mechanize/)
+      Accept-Encoding:
+      - gzip,deflate,identity
+      Accept-Charset:
+      - ISO-8859-1,utf-8;q=0.7,*;q=0.7
+      Accept-Language:
+      - en-us,en;q=0.5
+      Cookie:
+      - PHPSESSID=696859_a35e66809372234b413ccc30f7107fc5
+      Host:
+      - spapi.pixiv.net
+      Connection:
+      - keep-alive
+      Keep-Alive:
+      - 300
+  response:
+    status:
+      code: 200
+      message: !binary |-
+        T0s=
+    headers:
+      !binary "U2VydmVy":
+      - !binary |-
+        bmdpbng=
+      !binary "RGF0ZQ==":
+      - !binary |-
+        TW9uLCAyOSBTZXAgMjAxNCAwODoxMjo1MSBHTVQ=
+      !binary "Q29udGVudC1UeXBl":
+      - !binary |-
+        dGV4dC9wbGFpbjsgY2hhcnNldD11dGYtOA==
+      !binary "Q29udGVudC1MZW5ndGg=":
+      - !binary |-
+        NTI3
+      !binary "Q29ubmVjdGlvbg==":
+      - !binary |-
+        a2VlcC1hbGl2ZQ==
+      !binary "WC1Ib3N0LVRpbWU=":
+      - !binary |-
+        MTQz
+      !binary "RXhwaXJlcw==":
+      - !binary |-
+        VGh1LCAxOSBOb3YgMTk4MSAwODo1MjowMCBHTVQ=
+      !binary "Q2FjaGUtQ29udHJvbA==":
+      - !binary |-
+        bm8tc3RvcmUsIG5vLWNhY2hlLCBtdXN0LXJldmFsaWRhdGUsIHBvc3QtY2hl
+        Y2s9MCwgcHJlLWNoZWNrPTA=
+      !binary "UHJhZ21h":
+      - !binary |-
+        bm8tY2FjaGU=
+      !binary "WC1Db250ZW50LVR5cGUtT3B0aW9ucw==":
+      - !binary |-
+        bm9zbmlmZg==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        IjQzNDgzMTgiLCIxMzg5NCIsImpwZyIsIumAj+OBkSIsIjIiLCLniqzjgZPj
+        go0iLCJodHRwOi8vaTEucGl4aXYubmV0L2ltZy1pbmYvaW1nLzIwMDkvMDUv
+        MjAvMDgvMzQvMTEvNDM0ODMxOF8xMjh4MTI4LmpwZyIsLCwiaHR0cDovL2ky
+        LnBpeGl2Lm5ldC9pbWcwMi9pbWcvd2Fud2FuZG9oL21vYmlsZS80MzQ4MzE4
+        XzQ4MG13LmpwZyIsLCwiMjAwOS0wNS0yMCAwODozNDoxMSIsIuOBiuOBo+OB
+        seOBhCDlk7LlraYg5pyA6auY44Gr44Ko44Ot44GE44O744O744O7KO+9uu++
+        nu+9uO++mCDoh6rnhLblhYnjga7libXjgorlh7rjgZnoh7Ppq5jjga7nvo4g
+        44GG44O744O744O75rWu44GE44Gm44KL44O744O744O7ISE/IOOBiuOBo+OB
+        seOBhOOBq+imi+OBiOOBquOBhOS9leOBiyDnvo7kubMiLCJQaG90b3Nob3Ai
+        LCI0MzUiLCI0MjM5IiwiMTQwMjUiLCLpgIPpgb8iLCwsLCIyODgiLCIwIiwi
+        d2Fud2FuZG9oIiwsIjAiLCwsImh0dHA6Ly9pMi5waXhpdi5uZXQvaW1nMDIv
+        cHJvZmlsZS93YW53YW5kb2gvMTEyOTc2Ny5naWYiLAo=
+    http_version: 
+  recorded_at: Mon, 29 Sep 2014 08:14:58 GMT
+- request:
+    method: get
+    uri: http://i1.pixiv.net/img02/img/wanwandoh/4348318.jpg
     body:
       encoding: US-ASCII
       string: ''
     headers:
       User-Agent:
-      - lowerbooru/2.36.0
+      - Danbooru/2.59.0
       Referer:
       - http://www.pixiv.net
       Accept:
@@ -22,9 +101,6 @@ http_interactions:
       !binary "U2VydmVy":
       - !binary |-
         bmdpbng=
-      !binary "RGF0ZQ==":
-      - !binary |-
-        VHVlLCAyNiBOb3YgMjAxMyAxODoxOToxOSBHTVQ=
       !binary "Q29udGVudC1UeXBl":
       - !binary |-
         aW1hZ2UvanBlZw==
@@ -37,21 +113,15 @@ http_interactions:
       !binary "TGFzdC1Nb2RpZmllZA==":
       - !binary |-
         VHVlLCAxOSBNYXkgMjAwOSAyMzozNDoxMSBHTVQ=
-      !binary "RXRhZw==":
-      - !binary |-
-        ImFkZDExYzktMmQ1YjItNDZhNGM1OTBlMjJjMCI=
-      !binary "QWNjZXB0LVJhbmdlcw==":
-      - !binary |-
-        Ynl0ZXM=
       !binary "Q2FjaGUtQ29udHJvbA==":
       - !binary |-
         bWF4LWFnZT0xMjA5NjAw
       !binary "RXhwaXJlcw==":
       - !binary |-
-        TW9uLCAwOSBEZWMgMjAxMyAxNzo0MjoxNCBHTVQ=
-      !binary "QWdl":
+        RnJpLCAxMCBPY3QgMjAxNCAyMzo0NTozNSBHTVQ=
+      !binary "QWNjZXB0LVJhbmdlcw==":
       - !binary |-
-        ODg2MjU=
+        Ynl0ZXM=
     body:
       encoding: ASCII-8BIT
       string: !binary |-
@@ -4185,5 +4255,5 @@ http_interactions:
         uS9vPLxbgUolXkf60QkHs5F291RMWfqRh/kmOpY7fIklQbpB7wD9danFlWB5
         bJUdD6Cp8Tgup+OwhWnRD//Z
     http_version: 
-  recorded_at: Tue, 26 Nov 2013 18:19:22 GMT
-recorded_with: VCR 2.5.0
+  recorded_at: Mon, 29 Sep 2014 08:14:59 GMT
+recorded_with: VCR 2.9.0

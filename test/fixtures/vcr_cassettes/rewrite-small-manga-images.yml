@@ -1,0 +1,81 @@
+---
+http_interactions:
+- request:
+    method: head
+    uri: http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_big_p0.jpg
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Referer:
+      - http://www.pixiv.net
+      Accept:
+      - ! '*/*'
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Content-Type:
+      - image/jpeg
+      Content-Length:
+      - '474738'
+      Connection:
+      - keep-alive
+      Last-Modified:
+      - Wed, 24 Sep 2014 15:54:59 GMT
+      Cache-Control:
+      - max-age=1209600
+      Expires:
+      - Sun, 12 Oct 2014 10:56:22 GMT
+      Accept-Ranges:
+      - bytes
+    body:
+      encoding: US-ASCII
+      string: ''
+    http_version: 
+  recorded_at: Mon, 29 Sep 2014 08:15:05 GMT
+- request:
+    method: head
+    uri: http://img04.pixiv.net/img/syounen_no_uta/46170939_big_p0.jpg
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Referer:
+      - http://www.pixiv.net
+      Accept:
+      - ! '*/*'
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Content-Type:
+      - image/jpeg
+      Content-Length:
+      - '474738'
+      Connection:
+      - keep-alive
+      Last-Modified:
+      - Wed, 24 Sep 2014 15:54:59 GMT
+      Accept-Ranges:
+      - bytes
+      Cache-Control:
+      - max-age=1209600
+      Expires:
+      - Fri, 10 Oct 2014 16:09:02 GMT
+    body:
+      encoding: US-ASCII
+      string: ''
+    http_version: 
+  recorded_at: Mon, 29 Sep 2014 08:15:05 GMT
+recorded_with: VCR 2.9.0

@@ -1,0 +1,121 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://spapi.pixiv.net/iphone/illust.php?PHPSESSID=696859_a35e66809372234b413ccc30f7107fc5&illust_id=46170739
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - ! '*/*'
+      User-Agent:
+      - Mechanize/2.7.2 Ruby/1.9.3p327 (http://github.com/sparklemotion/mechanize/)
+      Accept-Encoding:
+      - gzip,deflate,identity
+      Accept-Charset:
+      - ISO-8859-1,utf-8;q=0.7,*;q=0.7
+      Accept-Language:
+      - en-us,en;q=0.5
+      Cookie:
+      - PHPSESSID=696859_a35e66809372234b413ccc30f7107fc5
+      Host:
+      - spapi.pixiv.net
+      Connection:
+      - keep-alive
+      Keep-Alive:
+      - 300
+  response:
+    status:
+      code: 200
+      message: !binary |-
+        T0s=
+    headers:
+      !binary "U2VydmVy":
+      - !binary |-
+        bmdpbng=
+      !binary "RGF0ZQ==":
+      - !binary |-
+        TW9uLCAyOSBTZXAgMjAxNCAwODoxMjo0NCBHTVQ=
+      !binary "Q29udGVudC1UeXBl":
+      - !binary |-
+        dGV4dC9wbGFpbjsgY2hhcnNldD11dGYtOA==
+      !binary "VHJhbnNmZXItRW5jb2Rpbmc=":
+      - !binary |-
+        Y2h1bmtlZA==
+      !binary "Q29ubmVjdGlvbg==":
+      - !binary |-
+        a2VlcC1hbGl2ZQ==
+      !binary "VmFyeQ==":
+      - !binary |-
+        QWNjZXB0LUVuY29kaW5n
+      !binary "WC1Ib3N0LVRpbWU=":
+      - !binary |-
+        MTQz
+      !binary "RXhwaXJlcw==":
+      - !binary |-
+        VGh1LCAxOSBOb3YgMTk4MSAwODo1MjowMCBHTVQ=
+      !binary "Q2FjaGUtQ29udHJvbA==":
+      - !binary |-
+        bm8tc3RvcmUsIG5vLWNhY2hlLCBtdXN0LXJldmFsaWRhdGUsIHBvc3QtY2hl
+        Y2s9MCwgcHJlLWNoZWNrPTA=
+      !binary "UHJhZ21h":
+      - !binary |-
+        bm8tY2FjaGU=
+      !binary "WC1Db250ZW50LVR5cGUtT3B0aW9ucw==":
+      - !binary |-
+        bm9zbmlmZg==
+      !binary "Q29udGVudC1FbmNvZGluZw==":
+      - !binary |-
+        Z3ppcA==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        H4sIAAAAAAAAA5VT3VLTQBS+9ykyuabs5ocmZRyfgTdgQCutiKltdXrZsyki
+        pZ0KArUzOohQ+kcpIxcoP/VhTpPUK1/BswkwwMiFmezJ7uac75zvO7uqGdcs
+        bhkJdULVTDNu6DR5kVkgGzSGgfsehUD4gGLVq3UQqtJNuqD8c0qTVD6fmWYs
+        rU9m0oX028lXyTx7yjTdLtBg6aWF2NJcLp/MyinTuWYynmD6FOOcmTYzLHZd
+        wGzu9Zu5bFLTOZ8MC5h4CNy0eSER5/8FHhVxB1wWE+OJmD6lcD5t2tOGJYnB
+        O4RNFPvodpR/SqCgu45uH90VFHuKV6n723WEI3/tREEoe6tVhAFCA6GF0PP7
+        5yg+hvMSijWKraF7Qer5rU+UbSbl5J1cyskoM04umaUdy5BG52Q13dLog9BG
+        EBSM4nsY+xXFObonKH7JJfTkXzgKNk8RKihKCHsIB/6XJsIOFsXj+azCnniX
+        5Dm418xbgBvjgzWEfYR1mQjaQY/srt//hjBEUUZB6UgSshvechNFhVJEyLdB
+        vBYVCVHe0XlZxkJr3D2WecUA3S4KAiS1dkZnhF8JSrsIVHDbO6v/3pL1j1e6
+        /jL5HN0HJ2ousZbvnwugN3KILJ2ouF9vBrWh97mNxeJVE6EW9RHFT1I8bBhx
+        6IYidkIy1EWidEwhweGhZo4uqzeA9h1AQVFU/Q90y+j2In/dsG8CrsqFXqhO
+        xFzypAaMO1ujIfEkCWifhKN2hmcMtkPypFGD3NQJelRNdtymkXIWF+fSzxza
+        VukwPHAZ6FJpOstknefpl0l2HcOWnHm5jtsJy7Djs/bVjXr0F5ni0dLuAwAA
+    http_version: 
+  recorded_at: Mon, 29 Sep 2014 08:14:51 GMT
+- request:
+    method: get
+    uri: http://i1.pixiv.net/img12/img/hokkaido/46170739.jpg
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Danbooru/2.59.0
+      Referer:
+      - http://www.pixiv.net
+      Accept:
+      - ! '*/*'
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      Server:
+      - nginx
+      Content-Type:
+      - text/html; charset=iso-8859-1
+      Content-Length:
+      - '34'
+      Connection:
+      - keep-alive
+    body:
+      encoding: US-ASCII
+      string: <h1>This Page is Not Found :(</h1>
+    http_version: 
+  recorded_at: Mon, 29 Sep 2014 08:14:52 GMT
+recorded_with: VCR 2.9.0

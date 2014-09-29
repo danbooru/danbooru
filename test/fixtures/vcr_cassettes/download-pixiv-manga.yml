@@ -7,10 +7,10 @@ http_interactions:
       encoding: US-ASCII
       string: ''
     headers:
+      User-Agent:
+      - Danbooru/2.59.0
       Referer:
       - http://www.pixiv.net
-      User-Agent:
-      - ./2.12.0
       Accept:
       - ! '*/*'
   response:
@@ -20,8 +20,6 @@ http_interactions:
     headers:
       Server:
       - nginx
-      Date:
-      - Fri, 24 May 2013 19:51:22 GMT
       Content-Type:
       - image/png
       Content-Length:
@@ -30,21 +28,17 @@ http_interactions:
       - keep-alive
       Last-Modified:
       - Wed, 14 Sep 2011 17:28:13 GMT
-      Etag:
-      - ! '"2e3303bf-1b33b9-4acea15afa540"'
       Accept-Ranges:
       - bytes
       Cache-Control:
       - max-age=1209600
       Expires:
-      - Fri, 07 Jun 2013 00:30:29 GMT
-      Age:
-      - '69653'
+      - Fri, 10 Oct 2014 23:56:15 GMT
     body:
       encoding: US-ASCII
       string: ''
     http_version: 
-  recorded_at: Fri, 24 May 2013 19:51:22 GMT
+  recorded_at: Mon, 29 Sep 2014 08:14:47 GMT
 - request:
     method: get
     uri: http://img65.pixiv.net/img/kiyoringo/21755794_big_p2.png
@@ -53,7 +47,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - _/2.12.0
+      - Danbooru/2.59.0
       Referer:
       - http://www.pixiv.net
       Accept:
@@ -65,8 +59,6 @@ http_interactions:
     headers:
       Server:
       - nginx
-      Date:
-      - Fri, 24 May 2013 19:51:22 GMT
       Content-Type:
       - image/png
       Content-Length:
@@ -75,16 +67,12 @@ http_interactions:
       - keep-alive
       Last-Modified:
       - Wed, 14 Sep 2011 17:28:13 GMT
-      Etag:
-      - ! '"2e3303bf-1b33b9-4acea15afa540"'
-      Accept-Ranges:
-      - bytes
       Cache-Control:
       - max-age=1209600
       Expires:
-      - Fri, 07 Jun 2013 00:30:29 GMT
-      Age:
-      - '69653'
+      - Fri, 10 Oct 2014 23:56:15 GMT
+      Accept-Ranges:
+      - bytes
     body:
       encoding: ASCII-8BIT
       string: !binary |-
@@ -39705,5 +39693,5 @@ http_interactions:
         AgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAAB
         AgQIECBAgAABAgQIECDwAYE/YMgpRKYZ7IsAAAAASUVORK5CYII=
     http_version: 
-  recorded_at: Fri, 24 May 2013 19:51:25 GMT
-recorded_with: VCR 2.4.0
+  recorded_at: Mon, 29 Sep 2014 08:14:51 GMT
+recorded_with: VCR 2.9.0
