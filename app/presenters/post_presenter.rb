@@ -27,7 +27,7 @@ class PostPresenter < Presenter
     if options[:pool]
       html << %{<p class="desc">}
       html << %{<a href="/pools/#{options[:pool].id}">}
-      html << options[:pool].pretty_name.truncate(80)
+      html << h(options[:pool].pretty_name.truncate(80))
       html << %{</a>}
       html << %{</p>}
     end
