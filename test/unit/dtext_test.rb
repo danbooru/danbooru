@@ -170,6 +170,6 @@ class DTextTest < ActiveSupport::TestCase
   end
 
   def test_forum_links
-    assert_equal('<p><a href="/forum_topics/1234?page=4">topic #1234</a></p>', p("topic #1234/p4"))
+    assert_equal('<p><a href="/forum_topics/1234?page=4">topic #1234/p4</a></p>', p("topic #1234/p4"))
   end
 end

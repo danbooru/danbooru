@@ -208,7 +208,7 @@ class ForumPost < ActiveRecord::Base
   def update_email_notifications
     subscription = ForumSubscription.where(:forum_topic_id => topic_id, :user_id => CurrentUser.user.id).first
 
-    if receive_email_notifications == "1"
+    if receive_email_notifications == "1" || receive_email_notifications == true
       if subscription
         subscription.update_attribute(:last_read_at, updated_at)
       else
