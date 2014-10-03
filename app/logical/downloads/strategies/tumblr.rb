@@ -2,7 +2,8 @@ module Downloads
   module Strategies
     class Tumblr < Base
       def rewrite(url, headers)
-        if url =~ %r{^http?://(?:(?:\d+\.)\w+\.)?tumblr\.com}
+        if url =~ %r{^https?://.*tumblr\.com}
+          url, headers = rewrite_cdn(url, headers)
           url, headers = rewrite_thumbnails(url, headers)
         end
 
@@ -19,6 +20,14 @@ module Downloads
           if http_exists?(big_1280_url, headers)
             return [big_1280_url, headers]
           end
+        end
+
+        return [url, headers]
+      end
+
+      def rewrite_cdn(url, headers)
+        if url =~ %r{https?://gs1\.wac\.edgecastcdn\.net/8019B6/data\.tumblr\.com/}
+          url.sub!("gs1.wac.edgecastcdn.net/8019B6/", "")
         end
 
         return [url, headers]
