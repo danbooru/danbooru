@@ -1,0 +1,129 @@
+---
+http_interactions:
+- request:
+    method: head
+    uri: http://i1.pixiv.net/img07/img/pasirism/18557054_big_p0.png
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Danbooru/2.60.0
+      Referer:
+      - http://www.pixiv.net
+      Accept:
+      - ! '*/*'
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Content-Type:
+      - image/png
+      Content-Length:
+      - '1964'
+      Connection:
+      - keep-alive
+      Last-Modified:
+      - Sun, 01 May 2011 14:27:59 GMT
+      Cache-Control:
+      - max-age=1209600
+      Expires:
+      - Fri, 17 Oct 2014 09:17:43 GMT
+      X-Content-Type-Options:
+      - nosniff
+      Accept-Ranges:
+      - bytes
+    body:
+      encoding: US-ASCII
+      string: ''
+    http_version: 
+  recorded_at: Sat, 04 Oct 2014 00:12:33 GMT
+- request:
+    method: get
+    uri: http://i1.pixiv.net/img07/img/pasirism/18557054_big_p0.png
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Danbooru/2.60.0
+      Referer:
+      - http://www.pixiv.net
+      Accept:
+      - ! '*/*'
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Content-Type:
+      - image/png
+      Content-Length:
+      - '1964'
+      Connection:
+      - keep-alive
+      Last-Modified:
+      - Sun, 01 May 2011 14:27:59 GMT
+      Cache-Control:
+      - max-age=1209600
+      Expires:
+      - Fri, 17 Oct 2014 09:17:43 GMT
+      X-Content-Type-Options:
+      - nosniff
+      Accept-Ranges:
+      - bytes
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        iVBORw0KGgoAAAANSUhEUgAAANgAAADYCAMAAAC+/t3fAAADAFBMVEXWvur3
+        8v/76vn8zLnut6utcmqiU2BTT1Y0NEERGC2wqcF5dY1TRU/WMFMAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAx
+        BHIjAAAEZ0lEQVR4nO3d21LjMBAEUEISsAn8/+9upKpp0ju6jGNIZNP9lNiy
+        NMcPU7Jh2ZeXQA4p0zUflkvK+1MzX5MLiwgEE0ywh8PMNA3iocymE0yw5+ZO
+        GPeMwUzfWd5FBHtuBNs3LA3Ml2GzgYkmyxzMg3Cx9iiYYCPCeMMR9VSSbolg
+        ggm2R9jBUJWGeN+qdeWPMQ1X0wkm2AAwv+EgWC5m5fJ+z4KtzMqZBRNsUQRb
+        nOWwnF95R8CPPytxggl2fx4B8xsOMk3+8GJhr0NAuA733zZfMMEEewqsbPLm
+        i8VbwjBUJphgfwx2oWCzYF8Y7gcvgqG8xunGPIIJJthDYf5pJRXlG9RkwanK
+        mHKJvcF0WDDB9g1r1LGo1s7gxj6jUb1gggk2JCzvGPz1aIb3w3C+d6Q8c/iU
+        YIJtAFYuiGHpyDnF3QA0mRkfaOkeXjDBBBsf5t8IVBZLRzIDp9KHUwoNBgxm
+        xpfnWV59o5cKJti4MNt0FN65zy4nSxmWT+EDMQDDzIIJJti2YX5GmE634SOp
+        zAbM3xfMgVOTq1MwwfYGwxuB5TAIAEtUbh64isLmCGy6jWCCCfY8WP6KpxWa
+        EatWqvJUXHW8pgJrMCMw3A7BBNs+zK/cwGHDnj8A5vH+iF0pmGCCbQmWB+CN
+        AHny0l/XYDROHewbSnxNSUfyh6MlAqNvggm2S5g/l5JMX6m6gwV7kdmjCAYc
+        Eyi0KWFY2dSD4Y7nn/kJJphgo8HwW7Xp9Gsn6XJvQvKCHlbueJOLYIJtF/Z2
+        DWBH03Hz+Aok4XBfcCV/Q2+h6j0sj2noBBNMsEfCMKOH5U5VrhfP/wj6YD5P
+        +xEPqwSrexTuqGCC7Q12dEm1Zlh5r9GA5TqwcUEdERjGCCaYYBuC+eqP5cNl
+        WA7a2qeF2izK4FpxRDDBdgLDHA1YvW/k8H7F3w6UiNM4+u7SMQE2G+oFEUww
+        wX4XVpkIMOw+ojDU2njq4c6ZBqNEKmUSTLC/AWOhp0ZSfkrAnVoBwxjBBBNs
+        ENgZv2ReFi6CNbhpPV9GGEXjvh9bBBNsNBgPMNwb4Zj6A7Az/dMzMgkmmGAb
+        gOEcXqXjiN+CnC0rUWmuvEQZRfc4DINCMMG2AjNcYa9/LiZiyhsO6hu9Wjso
+        zCOYYII9D4YfePP8ZVyE4VEn64gRVMPkYdAJJtgoMJ6sATMcv9JfbDqaaQ6Y
+        ejDMI5hggg0H84sRLmLhPopaIqgOLMfDUgQTbCgYmXoww71ZAzk6Clvypj9d
+        MBsqauqi6jjBBBPsobD00jsCg+5UjlH41X+lqsr0ggm2R5iZuqhbHOdMFqRc
+        Zmf2MMzrBBNMsLFhLCy3SF9idNIVOMEE2xss/41yj7trLsEEE2wDMFwfflop
+        o/Cl0gzvQy2GQSeYYOPCfPj/h+/UwT1jESGyhGCCCTYIjD2XQGidD+qIAXcl
+        +E/CIqtHcIIJNgpstpGRWZlBMKya/7qKG9dDRVbH325BzYIJJthGYJ93pWNq
+        oTqzCibY+LB/VRvceHvc/+YAAAAASUVORK5CYII=
+    http_version: 
+  recorded_at: Sat, 04 Oct 2014 00:12:34 GMT
+recorded_with: VCR 2.9.0
