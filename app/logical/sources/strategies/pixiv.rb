@@ -112,17 +112,8 @@ module Sources
       end
 
       def normalized_url
-        @normalized_url ||= begin
-          if url =~ /\/(\d+)(?:_big)?(?:_m|_p\d+)?\.(?:jpg|jpeg|png|gif)/i
-            "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
-          elsif url =~ /mode=big/
-            url.sub(/mode=big/, "mode=medium")
-          elsif url =~ /member_illust\.php/ && url =~ /illust_id=/
-            url
-          else
-            nil
-          end
-        end
+        illust_id = illust_id_from_url(@url)
+        "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{illust_id}"
       end
 
       # Refer to http://danbooru.donmai.us/wiki_pages/58938 for documentation on the Pixiv API.
