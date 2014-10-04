@@ -118,11 +118,7 @@ class ArtistsController < ApplicationController
   end
 
   def finder
-    url = params[:url]
-    headers = {
-      "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
-    }
-    url, headers = Downloads::Strategies::Pixiv.new.rewrite(url, headers)
+    url = Sources::Strategies::Pixiv.new(url).normalize_for_artist_finder!(params[:url])
 
     @artists = Artist.url_matches(url).order("id desc").limit(20)
     respond_with(@artists) do |format|

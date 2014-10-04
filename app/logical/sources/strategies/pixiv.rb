@@ -25,6 +25,21 @@ module Sources
         @pixiv_moniker
       end
 
+      def normalize_for_artist_finder!(url)
+        illust_id = illust_id_from_url(url)
+
+        # http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_m.jpg
+        if url =~ %r!/img/([^/]+)/\d+(?:_\w+)?\.(?:jpg|jpeg|png|gif)!i
+          username = $1
+        else
+          get_metadata_from_spapi!(illust_id) do |metadata|
+            username = metadata[24]
+          end
+        end
+
+        "http://img.pixiv.net/img/#{username}"
+      end
+
       def get
         agent.get(URI.parse(normalized_url)) do |page|
           @artist_name, @profile_url = get_profile_from_page(page)
