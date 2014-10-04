@@ -7,7 +7,7 @@ module Downloads
           url, headers = rewrite_cdn(url, headers)
           url, headers = rewrite_html_pages(url, headers)
           url, headers = rewrite_small_and_medium_images(url, headers)
-          url, headers = rewrite_small_manga_pages(url, headers)
+          url, headers = rewrite_old_small_manga_pages(url, headers)
         end
 
         return [url, headers]
@@ -43,8 +43,15 @@ module Downloads
         return [url, headers]
       end
 
-      def rewrite_small_manga_pages(url, headers)
-        if url =~ %r!(\d+_p\d+)\.!
+      # Rewrite these:
+      #   http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_p0.jpg
+      #   http://img04.pixiv.net/img/syounen_no_uta/46170939_p0.jpg
+      # but not these:
+      #   http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_big_p0.jpg
+      #   http://i1.pixiv.net/c/600x600/img-master/img/2014/09/24/23/25/08/46168376_p0_master1200.jpg
+      #   http://i1.pixiv.net/img-original/img/2014/09/25/23/09/29/46183440_p0.jpg
+      def rewrite_old_small_manga_pages(url, headers)
+        if url !~ %r!/img-(?:original|master)/img/!i && url =~ %r!/(\d+_p\d+)\.!i
           match = $1
           repl = match.sub(/_p/, "_big_p")
           big_url = url.sub(match, repl)
