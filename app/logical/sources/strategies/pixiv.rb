@@ -20,13 +20,13 @@ module Sources
       end
 
       def unique_id
-        image_url =~ /\/img\/([^\/]+)/
-        $1
+        @pixiv_moniker
       end
 
       def get
         agent.get(URI.parse(normalized_url)) do |page|
           @artist_name, @profile_url = get_profile_from_page(page)
+          @pixiv_moniker = get_moniker_from_page(page)
           @image_url = get_image_url_from_page(page)
           @tags = get_tags_from_page(page)
           @page_count = get_page_count_from_page(page)
@@ -47,6 +47,17 @@ module Sources
         end
 
         return [artist_name, profile_url]
+      end
+
+      def get_moniker_from_page(page)
+        # <a class="tab-feed" href="/stacc/gennmai-226">Feed</a>
+        stacc_link = page.search("a.tab-feed").first
+
+        if not stacc_link.nil?
+          stacc_link.attr("href").sub(%r!^/stacc/!i, '')
+        else
+          raise "Couldn't find Pixiv moniker in page: #{normalized_url}"
+        end
       end
 
       def get_image_url_from_page(page)
