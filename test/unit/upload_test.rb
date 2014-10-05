@@ -104,10 +104,13 @@ class UploadTest < ActiveSupport::TestCase
         should "initialize the final path after downloading a file" do
           @upload = FactoryGirl.create(:source_upload)
           path = "#{Rails.root}/tmp/test.download.jpg"
-          assert_nothing_raised {@upload.download_from_source(path)}
-          assert(File.exists?(path))
-          assert_equal(8558, File.size(path))
-          assert_equal(path, @upload.file_path)
+
+          VCR.use_cassette("upload-test-file", :record => :once) do
+            assert_nothing_raised {@upload.download_from_source(path)}
+            assert(File.exists?(path))
+            assert_equal(8558, File.size(path))
+            assert_equal(path, @upload.file_path)
+          end
         end
       end
 
@@ -176,7 +179,10 @@ class UploadTest < ActiveSupport::TestCase
       should "increment the uploaders post_upload_count" do
         @upload = FactoryGirl.create(:source_upload)
         assert_difference("CurrentUser.user.post_upload_count", 1) do
-          @upload.process!
+          VCR.use_cassette("upload-test-file", :record => :once) do
+            @upload.process!
+          end
+
           CurrentUser.user.reload
         end
       end
@@ -188,7 +194,9 @@ class UploadTest < ActiveSupport::TestCase
           :tag_string => "hoge foo"
         )
         assert_difference("Post.count") do
-          assert_nothing_raised {@upload.process!}
+          VCR.use_cassette("upload-test-file", :record => :once) do
+            assert_nothing_raised {@upload.process!}
+          end
         end
 
         post = Post.last

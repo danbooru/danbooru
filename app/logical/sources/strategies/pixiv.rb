@@ -1,5 +1,7 @@
 ﻿# encoding: UTF-8
 
+require 'csv'
+
 module Sources
   module Strategies
     class Pixiv < Base
@@ -20,20 +22,111 @@ module Sources
       end
 
       def unique_id
-        image_url =~ /\/img\/([^\/]+)/
-        $1
+        @pixiv_moniker
+      end
+
+      def normalize_for_artist_finder!
+        # http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_m.jpg
+        if url =~ %r!/img/([^/]+)/\d+(?:_\w+)?\.(?:jpg|jpeg|png|gif)!i
+          username = $1
+        else
+          illust_id = illust_id_from_url(url)
+          get_metadata_from_spapi!(illust_id) do |metadata|
+            username = metadata[24]
+          end
+        end
+
+        "http://img.pixiv.net/img/#{username}"
       end
 
       def get
         agent.get(URI.parse(normalized_url)) do |page|
           @artist_name, @profile_url = get_profile_from_page(page)
-          @image_url = get_image_url_from_page(page)
+          @pixiv_moniker = get_moniker_from_page(page)
           @tags = get_tags_from_page(page)
           @page_count = get_page_count_from_page(page)
+
+          is_manga   = @page_count > 1
+          @image_url = get_image_url_from_page(page, is_manga)
         end
       end
 
+      def rewrite_thumbnails(thumbnail_url, is_manga=nil)
+        thumbnail_url = rewrite_new_medium_images(thumbnail_url)
+        thumbnail_url = rewrite_old_small_and_medium_images(thumbnail_url, is_manga)
+        return thumbnail_url
+      end
+
     protected
+
+      # http://i1.pixiv.net/c/600x600/img-master/img/2014/10/02/13/51/23/46304396_p1_master1200.jpg
+      # => http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p1.png
+      def rewrite_new_medium_images(thumbnail_url)
+        if thumbnail_url =~ %r!/c/\d+x\d+/img-master/img/.*/\d+_p\d+_\w+\.jpg!i
+          thumbnail_url = thumbnail_url.sub(%r!/c/\d+x\d+/img-master/!i, '/img-original/')
+          # => http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p1_master1200.jpg
+
+          page = manga_page_from_url(@url)
+          thumbnail_url = thumbnail_url.sub(%r!_p(\d+)_\w+\.jpg$!i, "_p#{page}.")
+          # => http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p1.
+
+          illust_id = illust_id_from_url(@url)
+          get_metadata_from_spapi!(illust_id) do |metadata|
+            file_ext = metadata[2]
+            thumbnail_url += file_ext
+            # => http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p1.png
+          end
+        end
+
+        thumbnail_url
+      end
+
+      # If the thumbnail is for a manga gallery, it needs to be rewritten like this:
+      #
+      # http://i2.pixiv.net/img18/img/evazion/14901720_m.png
+      # => http://i2.pixiv.net/img18/img/evazion/14901720_big_p0.png
+      #
+      # Otherwise, it needs to be rewritten like this:
+      #
+      # http://i2.pixiv.net/img18/img/evazion/14901720_m.png
+      # => http://i2.pixiv.net/img18/img/evazion/14901720.png
+      #
+      def rewrite_old_small_and_medium_images(thumbnail_url, is_manga)
+        if thumbnail_url =~ %r!/img/[^/]+/\d+_[ms]\.(?:jpg|jpeg|png|gif)!i
+          if is_manga.nil?
+            illust_id = illust_id_from_url(@url)
+            get_metadata_from_spapi!(illust_id) do |metadata|
+              page_count = metadata[19].to_i || 1
+              is_manga   = page_count > 1
+            end
+          end
+
+          if is_manga
+            page = manga_page_from_url(@url)
+            return thumbnail_url.sub(/_[ms]\./, "_big_p#{page}.")
+          else
+            return thumbnail_url.sub(/_[ms]\./, ".")
+          end
+        end
+
+        return thumbnail_url
+      end
+
+      def manga_page_from_url(url)
+        # http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_p0.jpg
+        # http://i1.pixiv.net/c/600x600/img-master/img/2014/09/24/23/25/08/46168376_p0_master1200.jpg
+        # http://i1.pixiv.net/img-original/img/2014/09/25/23/09/29/46183440_p0.jpg
+        if url =~ %r!/\d+_p(\d+)(?:_\w+)?\.(?:jpg|jpeg|png|gif|zip)!i
+          $1
+
+        # http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=46170939&page=0
+        elsif url =~ /page=(\d+)/i
+          $1
+
+        else
+          0
+        end
+      end
 
       def get_profile_from_page(page)
         profile_url = page.search("a.user-link").first
@@ -49,15 +142,27 @@ module Sources
         return [artist_name, profile_url]
       end
 
-      def get_image_url_from_page(page)
+      def get_moniker_from_page(page)
+        # <a class="tab-feed" href="/stacc/gennmai-226">Feed</a>
+        stacc_link = page.search("a.tab-feed").first
+
+        if not stacc_link.nil?
+          stacc_link.attr("href").sub(%r!^/stacc/!i, '')
+        else
+          raise Sources::Error.new("Couldn't find Pixiv moniker in page: #{normalized_url}")
+        end
+      end
+
+      def get_image_url_from_page(page, is_manga)
         elements = page.search("div.works_display a img").find_all do |node|
           node["src"] !~ /source\.pixiv\.net/
         end
 
         if elements.any?
-          elements.first.attr("src").sub(/_[ms]\./, ".")
+          thumbnail_url = elements.first.attr("src")
+          return rewrite_thumbnails(thumbnail_url, is_manga)
         else
-          nil
+          raise Sources::Error.new("Couldn't find image thumbnail URL in page: #{normalized_url}")
         end
       end
 
@@ -87,11 +192,11 @@ module Sources
 
       def get_page_count_from_page(page)
         elements = page.search("ul.meta li").find_all do |node|
-          node.text =~ /Manga|漫画/
+          node.text =~ /Manga|漫画|複数枚投稿/
         end
 
         if elements.any?
-          elements[0].text =~ /(?:Manga|漫画) (\d+)P/
+          elements[0].text =~ /(?:Manga|漫画|複数枚投稿) (\d+)P/
           $1.to_i
         else
           1
@@ -99,16 +204,58 @@ module Sources
       end
 
       def normalized_url
-        @normalized_url ||= begin
-          if url =~ /\/(\d+)(?:_big)?(?:_m|_p\d+)?\.(?:jpg|jpeg|png|gif)/i
-            "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
-          elsif url =~ /mode=big/
-            url.sub(/mode=big/, "mode=medium")
-          elsif url =~ /member_illust\.php/ && url =~ /illust_id=/
-            url
+        illust_id = illust_id_from_url(@url)
+        "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{illust_id}"
+      end
+
+      # Refer to http://danbooru.donmai.us/wiki_pages/58938 for documentation on the Pixiv API.
+      def get_metadata_from_spapi!(illust_id)
+        phpsessid = agent.cookies.select do |cookie| cookie.name == "PHPSESSID" end.first.value
+        spapi_url = "http://spapi.pixiv.net/iphone/illust.php?illust_id=#{illust_id}&PHPSESSID=#{phpsessid}"
+
+        agent.get(spapi_url) do |response|
+          metadata = CSV.parse(response.content.force_encoding("UTF-8")).first
+
+          if metadata.nil?
+            raise Sources::Error.new("Couldn't get Pixiv API metadata from #{spapi_url}.")
           else
-            nil
+            yield metadata
           end
+        end
+      end
+
+      def illust_id_from_url(url)
+        # http://img18.pixiv.net/img/evazion/14901720.png
+        #
+        # http://i2.pixiv.net/img18/img/evazion/14901720.png
+        # http://i2.pixiv.net/img18/img/evazion/14901720_m.png
+        # http://i2.pixiv.net/img18/img/evazion/14901720_s.png
+        # http://i1.pixiv.net/img07/img/pasirism/18557054_p1.png
+        # http://i1.pixiv.net/img07/img/pasirism/18557054_big_p1.png
+        #
+        # http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_64x64.jpg
+        # http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_s.png
+        #
+        # http://i1.pixiv.net/c/600x600/img-master/img/2014/10/02/13/51/23/46304396_p0_master1200.jpg
+        # http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p0.png
+        #
+        # http://i1.pixiv.net/img-zip-ugoira/img/2014/10/03/17/29/16/46323924_ugoira1920x1080.zip
+        if url =~ %r!/(\d+)(?:_\w+)?\.(?:jpg|jpeg|png|gif|zip)!i
+          $1
+
+        # http://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054
+        # http://www.pixiv.net/member_illust.php?mode=big&illust_id=18557054
+        # http://www.pixiv.net/member_illust.php?mode=manga&illust_id=18557054
+        # http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=18557054&page=1
+        elsif url =~ /illust_id=(\d+)/i
+          $1
+
+        # http://www.pixiv.net/i/18557054
+        elsif url =~ %r!pixiv\.net/i/(\d+)!i
+          $1
+
+        else
+          raise Sources::Error.new("Couldn't get illust ID from URL: #{url}")
         end
       end
 

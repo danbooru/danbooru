@@ -1,6 +1,22 @@
 require 'test_helper'
 
 class ArtistTest < ActiveSupport::TestCase
+  def assert_artist_found(expected_name, source_url)
+    VCR.use_cassette("unit/artist/#{source_url}", :record => :once) do
+      artists = Artist.find_all_by_url(source_url)
+
+      assert_equal(1, artists.size)
+      assert_equal(expected_name, artists.first.name, "Testing URL: #{source_url}")
+    end
+  end
+
+  def assert_artist_not_found(source_url)
+    VCR.use_cassette("unit/artist/#{source_url}", :record => :once) do
+      artists = Artist.find_all_by_url(source_url)
+      assert_equal(0, artists.size, "Testing URL: #{source_url}")
+    end
+  end
+
   context "An artist" do
     setup do
       user = FactoryGirl.create(:user)
@@ -134,6 +150,71 @@ class ArtistTest < ActiveSupport::TestCase
     should "hide deleted artists" do
       FactoryGirl.create(:artist, :name => "warhol", :url_string => "http://warhol.com/a/image.jpg", :is_active => false)
       assert_equal([], Artist.find_all_by_url("http://warhol.com/a/image.jpg").map(&:name))
+    end
+
+    context "when finding deviantart artists" do
+      setup do
+        FactoryGirl.create(:artist, :name => "artgerm", :url_string => "http://artgerm.deviantart.com/")
+        FactoryGirl.create(:artist, :name => "trixia",  :url_string => "http://trixdraws.deviantart.com/")
+      end
+
+      should "find the correct artist for page URLs" do
+        assert_artist_found("artgerm", "http://artgerm.deviantart.com/art/Peachy-Princess-Ver-2-457220550")
+
+        assert_artist_found("trixia", "http://trixdraws.deviantart.com/art/My-Queen-426745289")
+        assert_artist_found("trixia", "http://trixdraws.deviantart.com/gallery/#/d722mrt")
+      end
+
+      should_eventually "find the correct artist for image URLs" do
+        assert_artist_found("artgerm", "http://th05.deviantart.net/fs71/200H/f/2014/150/d/c/peachy_princess_by_artgerm-d7k7tmu.jpg")
+        assert_artist_found("artgerm", "http://th05.deviantart.net/fs71/PRE/f/2014/150/d/c/peachy_princess_by_artgerm-d7k7tmu.jpg")
+        assert_artist_found("artgerm", "http://fc06.deviantart.net/fs71/f/2014/150/d/c/peachy_princess_by_artgerm-d7k7tmu.jpg")
+
+        assert_artist_found("trixia", "http://fc01.deviantart.net/fs71/i/2014/050/d/e/my_queen_by_trixdraws-d722mrt.jpg")
+        assert_artist_found("trixia", "http://th01.deviantart.net/fs71/200H/i/2014/050/d/e/my_queen_by_trixdraws-d722mrt.jpg")
+        assert_artist_found("trixia", "http://th09.deviantart.net/fs71/PRE/i/2014/050/d/e/my_queen_by_trixdraws-d722mrt.jpg")
+      end
+    end
+
+    context "when finding pixiv artists" do
+      setup do
+        FactoryGirl.create(:artist, :name => "masao",:url_string => "http://i2.pixiv.net/img04/img/syounen_no_uta/")
+        FactoryGirl.create(:artist, :name => "bkub", :url_string => "http://i1.pixiv.net/img01/img/bkubb/")
+      end
+
+      should "find the correct artist for old image URLs" do
+        assert_artist_found("masao", "http://i2.pixiv.net/img04/img/syounen_no_uta/46170939.jpg")
+        assert_artist_found("bkub",  "http://i1.pixiv.net/img01/img/bkubb/46239857_m.jpg")
+      end
+
+      should "find the correct artist for new image URLs" do
+        assert_artist_found("masao", "http://i2.pixiv.net/c/1200x1200/img-master/img/2014/09/25/00/57/24/46170939_p0_master1200.jpg")
+        assert_artist_found("masao", "http://i2.pixiv.net/img-original/img/2014/09/25/00/57/24/46170939_p0.jpg")
+
+        assert_artist_found("bkub",  "http://i2.pixiv.net/c/1200x1200/img-master/img/2014/09/28/21/59/44/46239857_p0.jpg")
+        assert_artist_found("bkub",  "http://i2.pixiv.net/img-original/img/2014/09/28/21/59/44/46239857_p0.jpg")
+      end
+
+      should "find the correct artist for page URLs" do
+        assert_artist_found("masao", "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939")
+        assert_artist_found("masao", "http://www.pixiv.net/member_illust.php?mode=big&illust_id=46170939")
+        assert_artist_found("masao", "http://www.pixiv.net/member_illust.php?mode=manga&illust_id=46170939")
+        assert_artist_found("masao", "http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=46170939&page=0")
+        assert_artist_found("masao", "http://www.pixiv.net/i/46170939")
+
+        assert_artist_found("bkub",  "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46239857")
+        assert_artist_found("bkub",  "http://www.pixiv.net/member_illust.php?mode=big&illust_id=46239857")
+        assert_artist_found("bkub",  "http://www.pixiv.net/i/46239857")
+      end
+
+      should "find nothing for malformed URLs" do
+        assert_artist_not_found("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=herpderp")
+        assert_artist_not_found("http://www.pixiv.net/wharrgarbl")
+      end
+
+      should "find nothing for bad IDs" do
+        assert_artist_not_found("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=32049358")
+      end
     end
 
     should "normalize its other names" do
