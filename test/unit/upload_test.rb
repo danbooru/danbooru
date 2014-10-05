@@ -179,7 +179,10 @@ class UploadTest < ActiveSupport::TestCase
       should "increment the uploaders post_upload_count" do
         @upload = FactoryGirl.create(:source_upload)
         assert_difference("CurrentUser.user.post_upload_count", 1) do
-          @upload.process!
+          VCR.use_cassette("upload-test-file", :record => :once) do
+            @upload.process!
+          end
+
           CurrentUser.user.reload
         end
       end
@@ -191,7 +194,9 @@ class UploadTest < ActiveSupport::TestCase
           :tag_string => "hoge foo"
         )
         assert_difference("Post.count") do
-          assert_nothing_raised {@upload.process!}
+          VCR.use_cassette("upload-test-file", :record => :once) do
+            assert_nothing_raised {@upload.process!}
+          end
         end
 
         post = Post.last
