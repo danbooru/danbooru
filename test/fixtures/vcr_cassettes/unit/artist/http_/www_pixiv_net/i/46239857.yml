@@ -1,0 +1,85 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://spapi.pixiv.net/iphone/illust.php?PHPSESSID=696859_b9becee82841e8fde3d723c763dc1350&illust_id=46239857
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - ! '*/*'
+      User-Agent:
+      - Mechanize/2.7.2 Ruby/1.9.3p327 (http://github.com/sparklemotion/mechanize/)
+      Accept-Encoding:
+      - gzip,deflate,identity
+      Accept-Charset:
+      - ISO-8859-1,utf-8;q=0.7,*;q=0.7
+      Accept-Language:
+      - en-us,en;q=0.5
+      Cookie:
+      - PHPSESSID=696859_b9becee82841e8fde3d723c763dc1350
+      Host:
+      - spapi.pixiv.net
+      Connection:
+      - keep-alive
+      Keep-Alive:
+      - 300
+  response:
+    status:
+      code: 200
+      message: !binary |-
+        T0s=
+    headers:
+      !binary "U2VydmVy":
+      - !binary |-
+        bmdpbng=
+      !binary "RGF0ZQ==":
+      - !binary |-
+        U3VuLCAwNSBPY3QgMjAxNCAxODoyMDo1MyBHTVQ=
+      !binary "Q29udGVudC1UeXBl":
+      - !binary |-
+        dGV4dC9wbGFpbjsgY2hhcnNldD11dGYtOA==
+      !binary "Q29udGVudC1MZW5ndGg=":
+      - !binary |-
+        NjYx
+      !binary "Q29ubmVjdGlvbg==":
+      - !binary |-
+        a2VlcC1hbGl2ZQ==
+      !binary "WC1Ib3N0LVRpbWU=":
+      - !binary |-
+        MTQy
+      !binary "RXhwaXJlcw==":
+      - !binary |-
+        VGh1LCAxOSBOb3YgMTk4MSAwODo1MjowMCBHTVQ=
+      !binary "Q2FjaGUtQ29udHJvbA==":
+      - !binary |-
+        bm8tc3RvcmUsIG5vLWNhY2hlLCBtdXN0LXJldmFsaWRhdGUsIHBvc3QtY2hl
+        Y2s9MCwgcHJlLWNoZWNrPTA=
+      !binary "UHJhZ21h":
+      - !binary |-
+        bm8tY2FjaGU=
+      !binary "WC1Db250ZW50LVR5cGUtT3B0aW9ucw==":
+      - !binary |-
+        bm9zbmlmZg==
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        IjQ2MjM5ODU3IiwiOTk0OCIsImpwZyIsIuODneODl+ODhuODlOODlOODg+OC
+        r+esrOS6jOipseOBr+OBmOOBvuOCiuOBvuOBl+OBnyIsIjEiLCLlpKflt53j
+        gbbjgY/jgbYvYmt1YiIsImh0dHA6Ly9pMi5waXhpdi5uZXQvaW1nLWluZi9p
+        bWcvMjAxNC8wOS8yOC8yMS81OS80NC80NjIzOTg1N18xMjh4MTI4LmpwZyIs
+        LCwiaHR0cDovL2kxLnBpeGl2Lm5ldC9pbWcwMS9pbWcvYmt1YmIvbW9iaWxl
+        LzQ2MjM5ODU3XzQ4MG13LmpwZyIsLCwiMjAxNC0wOS0yOCAyMTo1OTo0NCIs
+        IuOCquODquOCuOODiuODqyDjg53jg5fjg4bjg5Tjg5Tjg4Pjgq8iLCwiMzI5
+        IiwiMzI0NiIsIjgzMDEiLCI8YSBocmVmPSIiaHR0cDovL21hbmdhbGlmZXdp
+        bi50YWtlc2hvYm8uY28uanAvcmVuc2FpL3BvcHV0ZS9wb3B1dGUtMDAyLzEz
+        MTYxLyIiIHRhcmdldD0iIl9ibGFuayIiPmh0dHA6Ly9tYW5nYWxpZmV3aW4u
+        dGFrZXNob2JvLmNvLmpwL3JlbnNhaS9wb3B1dGUvcG9wdXRlLTAwMi8xMzE2
+        MS88L2E+PGJyIC8+77yR77yR5pel6ZaT5pu05paw44Gn44GZ44CA44KI44KN
+        44GX44GP44GK44Gt44GM44GE44GX44G+44GZIiwsLCwiODgiLCIxNCIsImJr
+        dWJiIiwsIjAiLCwsImh0dHA6Ly9pMS5waXhpdi5uZXQvaW1nMDEvcHJvZmls
+        ZS9ia3ViYi9tb2JpbGUvNTcyODA5XzgwLmpwZyIsCg==
+    http_version: 
+  recorded_at: Sun, 05 Oct 2014 18:21:02 GMT
+recorded_with: VCR 2.9.0
