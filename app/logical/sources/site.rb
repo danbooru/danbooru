@@ -20,6 +20,14 @@ module Sources
       end
     end
 
+    def normalize_for_artist_finder!
+      if available?
+        return strategy.normalize_for_artist_finder!
+      else
+        return url
+      end
+    end
+
     def translated_tags
       untranslated_tags = tags
       untranslated_tags = untranslated_tags.map(&:first)

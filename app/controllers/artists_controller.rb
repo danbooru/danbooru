@@ -118,7 +118,7 @@ class ArtistsController < ApplicationController
   end
 
   def finder
-    url = Sources::Strategies::Pixiv.new(url).normalize_for_artist_finder!(params[:url])
+    url = Sources::Site.new(params[:url]).normalize_for_artist_finder!
 
     @artists = Artist.url_matches(url).order("id desc").limit(20)
     respond_with(@artists) do |format|
