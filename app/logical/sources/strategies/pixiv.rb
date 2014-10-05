@@ -149,7 +149,7 @@ module Sources
         if not stacc_link.nil?
           stacc_link.attr("href").sub(%r!^/stacc/!i, '')
         else
-          raise "Couldn't find Pixiv moniker in page: #{normalized_url}"
+          raise Sources::Error.new("Couldn't find Pixiv moniker in page: #{normalized_url}")
         end
       end
 
@@ -162,7 +162,7 @@ module Sources
           thumbnail_url = elements.first.attr("src")
           return rewrite_thumbnails(thumbnail_url, is_manga)
         else
-          raise "Couldn't find image thumbnail URL in page: #{normalized_url}"
+          raise Sources::Error.new("Couldn't find image thumbnail URL in page: #{normalized_url}")
         end
       end
 
@@ -217,7 +217,7 @@ module Sources
           metadata = CSV.parse(response.content.force_encoding("UTF-8")).first
 
           if metadata.nil?
-            raise "Couldn't get Pixiv API metadata from #{spapi_url}."
+            raise Sources::Error.new("Couldn't get Pixiv API metadata from #{spapi_url}.")
           else
             yield metadata
           end
@@ -255,7 +255,7 @@ module Sources
           $1
 
         else
-          raise "Couldn't get illust ID from URL: #{url}"
+          raise Sources::Error.new("Couldn't get illust ID from URL: #{url}")
         end
       end
 

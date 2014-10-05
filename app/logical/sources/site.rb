@@ -1,6 +1,8 @@
 ﻿# encoding: UTF-8
 
 module Sources
+  class Error < Exception ; end
+
   class Site
     attr_reader :url, :strategy
     delegate :get, :referer_url, :site_name, :artist_name, :profile_url, :image_url, :tags, :artist_record, :unique_id, :page_count, :to => :strategy
@@ -22,7 +24,11 @@ module Sources
 
     def normalize_for_artist_finder!
       if available?
-        return strategy.normalize_for_artist_finder!
+        begin
+          return strategy.normalize_for_artist_finder!
+        rescue Sources::Error
+          return url
+        end
       else
         return url
       end
