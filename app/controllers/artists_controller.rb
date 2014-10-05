@@ -118,9 +118,7 @@ class ArtistsController < ApplicationController
   end
 
   def finder
-    url = Sources::Site.new(params[:url]).normalize_for_artist_finder!
-
-    @artists = Artist.url_matches(url).order("id desc").limit(20)
+    @artists = Artist.url_matches(params[:url]).order("id desc").limit(20)
     respond_with(@artists) do |format|
       format.xml do
         render :xml => @artists.to_xml(:include => [:urls], :root => "artists")

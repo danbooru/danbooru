@@ -22,6 +22,7 @@ class Artist < ActiveRecord::Base
 
     module ClassMethods
       def find_all_by_url(url)
+        url = Sources::Site.new(url).normalize_for_artist_finder!
         url = ArtistUrl.normalize(url)
         artists = []
 
