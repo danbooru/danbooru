@@ -26,7 +26,7 @@ class PixivUgoiraConverter
       image_blob = file.get_input_stream.read
       image = Magick::Image.from_blob(image_blob).first
       image.ticks_per_second = 1000
-      delay = frame_data[i]["delay"]
+      delay = @frame_data[i]["delay"]
       rounded_delay = (delay_sum + delay).round(-1) - delay_sum.round(-1)
       image.delay = rounded_delay
       delay_sum += delay
@@ -41,7 +41,7 @@ class PixivUgoiraConverter
     Dir.mktmpdir do |tmpdir|
       FileUtils.mkdir_p("#{tmpdir}/images")
       folder.each_with_index do |file, i|
-        path = File.join(tmpdir, file.name)
+        path = File.join(tmpdir, "images", file.name)
         image_blob = file.get_input_stream.read
         File.open(path, "wb") do |f|
           f.write(image_blob)
@@ -52,7 +52,7 @@ class PixivUgoiraConverter
       timecodes_path = File.join(tmpdir, "timecodes.tc")
       File.open(timecodes_path, "w+") do |f|
         f.write("# timecode format v2\n")
-        frame_data.each do |img|
+        @frame_data.each do |img|
           f.write("#{delay_sum}\n")
           delay_sum += img["delay"]
         end
@@ -61,9 +61,7 @@ class PixivUgoiraConverter
       
       ext = folder.first.name.match(/\.(.+)$/)[1]
       system("ffmpeg -i #{tmpdir}/images/%06d.#{ext} -codec:v libvpx -crf 4 -b:v 5000k -an #{tmpdir}/tmp.webm")
-      system("mkvmerge -o #{tmpdir}/output.webm --timecodes 0:#{tmpdir}/timecodes.tc #{tmpdir}/tmp.webm")
-      
-      FileUtils.rm_rf(tmpdir)
+      system("mkvmerge -o #{write_path} --timecodes 0:#{tmpdir}/timecodes.tc #{tmpdir}/tmp.webm")
     end      
   end
 
@@ -73,7 +71,7 @@ class PixivUgoiraConverter
         frame_path = File.join("pixiv_anim_#{pixiv_id}", "frame#{"%03d" % i}.png")
       delay_path = File.join("pixiv_anim_#{pixiv_id}", "frame#{"%03d" % i}.txt")
         image_blob = file.get_input_stream.read
-      delay = frame_data[i]["delay"]
+      delay = @frame_data[i]["delay"]
       image = Magick::Image.from_blob(image_blob).first
       image.format="PNG"
       image.write(frame_path)
@@ -88,11 +86,13 @@ class PixivUgoiraConverter
   end
 
   def unpack(zipped_body)
-    Zip::CentralDirectory.new.read_from_stream(StringIO.new(zipped_body))
+    folder = Zip::CentralDirectory.new
+    folder.read_from_stream(StringIO.new(zipped_body))
+    folder
   end
 
   def fetch_zipped_body
-    zip_uri, frame_data = fetch_frames
+    zip_uri, @frame_data = fetch_frames
 
     zip_body = Net::HTTP.start(zip_uri.host) do |http|
       http.get(zip_uri.path, {"Referer" => "http://pixiv.net"}).body
@@ -102,14 +102,14 @@ class PixivUgoiraConverter
   def fetch_frames
     agent.get(url) do |page|
       # Get the zip url and frame delay by parsing javascript contained in a <script> tag on the page.
-      # Not an neat solution, but I haven't found any other location that has the frame delays listed.
+      # Not a neat solution, but I haven't found any other location that has the frame delays listed.
       scripts = page.search("body script").find_all do |node|
         node.text =~ /_ugoira600x600\.zip/
       end
 
       if scripts.any?
         javascript = scripts.first.text
-        json = javascript.match(/;pixiv\.context\.ugokuIllustData\s+=\s+(\{.+\});(?:$|pixiv\.context)/)[1]
+        json = javascript.match(/;pixiv\.context\.ugokuIllustData\s+=\s+(\{.+?\});(?:$|pixiv\.context)/)[1]
         data = JSON.parse(json)
         zip_uri = URI(data["src"].sub("_ugoira600x600.zip", "_ugoira1920x1080.zip"))
         frame_data = data["frames"]
