@@ -76,11 +76,21 @@ module Sources
         @agent ||= begin
           mech = Mechanize.new
 
-          mech.get("http://nijie.info/login.php") do |page|
-            page.form_with(:action => "/login_int.php") do |form|
-              form['email'] = Danbooru.config.nijie_login
-              form['password'] = Danbooru.config.nijie_password
-            end.click_button
+          session = Cache.get("nijie-session")
+          if session
+            cookie = Mechanize::Cookie.new("NIJIEIJIEID", session)
+            cookie.domain = ".nijie.info"
+            cookie.path = "/"
+            mech.cookie_jar.add(cookie)
+          else
+            mech.get("http://nijie.info/login.php") do |page|
+              page.form_with(:action => "/login_int.php") do |form|
+                form['email'] = Danbooru.config.nijie_login
+                form['password'] = Danbooru.config.nijie_password
+              end.click_button
+            end
+            session = mech.cookie_jar.cookies.select{|c| c.name == "NIJIEIJIEID"}.first
+            Cache.put("nijie-session", session.value, 1.month) if session
           end
 
           # This cookie needs to be set to allow viewing of adult works while anonymous

@@ -103,11 +103,21 @@ module Sources
         @agent ||= begin
           mech = Mechanize.new
 
-          mech.get("https://secure.nicovideo.jp/secure/login_form") do |page|
-            page.form_with do |form|
-              form["mail_tel"] = Danbooru.config.nico_seiga_login
-              form["password"] = Danbooru.config.nico_seiga_password
-            end.click_button
+          session = Cache.get("nico-seiga-session")
+          if session
+            cookie = Mechanize::Cookie.new("user_session", session)
+            cookie.domain = ".nicovideo.jp"
+            cookie.path = "/"
+            mech.cookie_jar.add(cookie)
+          else
+            mech.get("https://secure.nicovideo.jp/secure/login_form") do |page|
+              page.form_with do |form|
+                form["mail_tel"] = Danbooru.config.nico_seiga_login
+                form["password"] = Danbooru.config.nico_seiga_password
+              end.click_button
+            end
+            session = mech.cookie_jar.cookies.select{|c| c.name == "user_session"}.first
+            Cache.put("nico-seiga-session", session.value, 1.month) if session
           end
 
           # This cookie needs to be set to allow viewing of adult works
