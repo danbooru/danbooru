@@ -48,6 +48,15 @@ class PixivUgoiraConverter
         end
       end
       
+      # Duplicate last frame to avoid it being displayed only for a very short amount of time.
+      folder.to_a.last.name =~ /\A(\d{6})(\..+)\Z/
+      new_last_index = $1.to_i + 1
+      file_ext = $2
+      new_last_filename = ("%06d" % new_last_index) + file_ext
+      path_from = File.join(tmpdir, "images", folder.to_a.last.name)
+      path_to = File.join(tmpdir, "images", new_last_filename)
+      FileUtils.cp(path_from, path_to)
+      
       delay_sum = 0
       timecodes_path = File.join(tmpdir, "timecodes.tc")
       File.open(timecodes_path, "w+") do |f|
@@ -56,6 +65,7 @@ class PixivUgoiraConverter
           f.write("#{delay_sum}\n")
           delay_sum += img["delay"]
         end
+        f.write("#{delay_sum}\n")
         f.write("#{delay_sum}\n")
       end
       
