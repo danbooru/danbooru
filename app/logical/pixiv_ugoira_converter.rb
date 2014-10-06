@@ -1,14 +1,13 @@
 class PixivUgoiraConverter
   attr_reader :agent, :url, :write_path, :format
 
-  def initialize(agent, url, write_path, format)
-    @agent = agent
+  def initialize(url, write_path, format)
     @url = url
     @write_path = write_path
     @format = format
   end
 
-  def process
+  def process!
     folder = unpack(fetch_zipped_body)
 
     if format == :gif
@@ -78,23 +77,21 @@ class PixivUgoiraConverter
   end
 
   def write_apng(folder)
-      FileUtils.mkdir_p("pixiv_anim_#{pixiv_id}")
+    Dir.mktmpdir do |tmpdir|
       folder.each_with_index do |file, i|
-        frame_path = File.join("pixiv_anim_#{pixiv_id}", "frame#{"%03d" % i}.png")
-      delay_path = File.join("pixiv_anim_#{pixiv_id}", "frame#{"%03d" % i}.txt")
+        frame_path = File.join(tmpdir, "frame#{"%03d" % i}.png")
+        delay_path = File.join(tmpdir, "frame#{"%03d" % i}.txt")
         image_blob = file.get_input_stream.read
-      delay = @frame_data[i]["delay"]
-      image = Magick::Image.from_blob(image_blob).first
-      image.format="PNG"
-      image.write(frame_path)
-      File.open(delay_path, "wb") do |f|
+        delay = @frame_data[i]["delay"]
+        image = Magick::Image.from_blob(image_blob).first
+        image.format = "PNG"
+        image.write(frame_path)
+        File.open(delay_path, "wb") do |f|
           f.write("delay=#{delay}/1000")
         end
       end
-      system("apngasm pixiv_anim_#{pixiv_id}.png pixiv_anim_#{pixiv_id}/frame*.png")
-      FileUtils.rm_rf("pixiv_anim_#{pixiv_id}")
-      
-      puts "Animation successfully created as pixiv_anim_#{pixiv_id}.png"
+      system("apngasm -o -F #{write_path} #{tmpdir}/frame*.png")
+    end
   end
 
   def unpack(zipped_body)
@@ -104,11 +101,18 @@ class PixivUgoiraConverter
   end
 
   def fetch_zipped_body
-    zip_uri, @frame_data = fetch_frames
+    zip_body = nil
+    zip_url, @frame_data = fetch_frames
 
-    zip_body = Net::HTTP.start(zip_uri.host) do |http|
-      http.get(zip_uri.path, {"Referer" => "http://pixiv.net"}).body
+    Downloads::File.new(zip_url, nil).http_get_streaming do |response|
+      zip_body = response.body
     end
+
+    zip_body
+  end
+
+  def agent
+    @agent ||= Sources::Strategies::Pixiv.new(url).agent
   end
 
   def fetch_frames
@@ -123,9 +127,9 @@ class PixivUgoiraConverter
         javascript = scripts.first.text
         json = javascript.match(/;pixiv\.context\.ugokuIllustData\s+=\s+(\{.+?\});(?:$|pixiv\.context)/)[1]
         data = JSON.parse(json)
-        zip_uri = URI(data["src"].sub("_ugoira600x600.zip", "_ugoira1920x1080.zip"))
+        zip_url = data["src"].sub("_ugoira600x600.zip", "_ugoira1920x1080.zip")
         frame_data = data["frames"]
-        return [zip_uri, frame_data]
+        return [zip_url, frame_data]
       else
         raise "Can't find javascript with frame data"
       end

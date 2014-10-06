@@ -11,6 +11,11 @@ module Downloads
       @tries = 0
     end
 
+    def download_ugoira!
+      converter = PixivUgoiraConverter.new(source, file_path, :webm)
+      converter.process!
+    end
+
     def download!
       http_get_streaming do |response|
         self.content_type = response["Content-Type"]

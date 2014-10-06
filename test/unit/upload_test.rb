@@ -101,6 +101,21 @@ class UploadTest < ActiveSupport::TestCase
       end
 
       context "downloader" do
+        context "that is an ugoira" do
+          setup do
+            @url = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654"
+            @upload = FactoryGirl.create(:source_upload, :source => @url, :tag_string => "ugoira")
+            @output_path = "#{Rails.root}/tmp/test.download.webm"
+          end
+          
+          should "process successfully" do
+            VCR.use_cassette("ugoira-converter", :record => :new_episodes) do
+              @upload.download_from_source(@output_path)
+            end
+            assert_operator(File.size(@output_path), :>, 1_000)
+          end
+        end
+
         should "initialize the final path after downloading a file" do
           @upload = FactoryGirl.create(:source_upload)
           path = "#{Rails.root}/tmp/test.download.jpg"
