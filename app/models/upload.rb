@@ -321,10 +321,18 @@ class Upload < ActiveRecord::Base
       source =~ /^https?:\/\// && file_path.blank?
     end
 
+    def is_ugoira?
+      tag_string =~ /\bugoira\b/i
+    end
+
     # Downloads the file to destination_path
     def download_from_source(destination_path)
       download = Downloads::File.new(source, destination_path)
-      download.download!
+      if is_ugoira?
+        download.download_ugoira!
+      else
+        download.download!
+      end
       self.file_path = destination_path
       self.source = download.source
     end
