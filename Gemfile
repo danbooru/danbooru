@@ -43,7 +43,7 @@ gem 'capistrano'
 gem 'capistrano-ext'
 gem 'radix62', '~> 1.0.1'
 gem 'streamio-ffmpeg'
-gem 'rubyzip'
+gem 'rubyzip', :require => "zip"
 
 # needed for looser jpeg header compat
 gem 'ruby-imagespec', :require => "image_spec", :git => "https://github.com/r888888888/ruby-imagespec.git", :branch => "exif-fixes"

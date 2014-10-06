@@ -1,13 +1,14 @@
 class PixivUgoiraConverter
-  attr_reader :agent, :url, :write_path
+  attr_reader :agent, :url, :write_path, :format
 
-  def initialize(agent, url, write_path)
+  def initialize(agent, url, write_path, format)
     @agent = agent
     @url = url
     @write_path = write_path
+    @format = format
   end
 
-  def process(format)
+  def process
     folder = unpack(fetch_zipped_body)
 
     if format == :gif
@@ -34,7 +35,7 @@ class PixivUgoiraConverter
     end
     
     anim = anim.optimize_layers(Magick::OptimizeTransLayer)
-    anim.write(write_path)
+    anim.write("gif:" + write_path)
   end
 
   def write_webm(folder)
@@ -49,11 +50,12 @@ class PixivUgoiraConverter
       end
       
       # Duplicate last frame to avoid it being displayed only for a very short amount of time.
-      folder.to_a.last.name =~ /\A(\d{6})(\..+)\Z/
+      last_file_name = folder.to_a.last.name
+      last_file_name =~ /\A(\d{6})(\..+)\Z/
       new_last_index = $1.to_i + 1
       file_ext = $2
       new_last_filename = ("%06d" % new_last_index) + file_ext
-      path_from = File.join(tmpdir, "images", folder.to_a.last.name)
+      path_from = File.join(tmpdir, "images", last_file_name)
       path_to = File.join(tmpdir, "images", new_last_filename)
       FileUtils.cp(path_from, path_to)
       
@@ -68,7 +70,7 @@ class PixivUgoiraConverter
         f.write("#{delay_sum}\n")
         f.write("#{delay_sum}\n")
       end
-      
+
       ext = folder.first.name.match(/\.(.+)$/)[1]
       system("ffmpeg -i #{tmpdir}/images/%06d.#{ext} -codec:v libvpx -crf 4 -b:v 5000k -an #{tmpdir}/tmp.webm")
       system("mkvmerge -o #{write_path} --timecodes 0:#{tmpdir}/timecodes.tc #{tmpdir}/tmp.webm")
