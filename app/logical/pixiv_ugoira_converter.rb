@@ -50,7 +50,7 @@ class PixivUgoiraConverter
       
       # Duplicate last frame to avoid it being displayed only for a very short amount of time.
       last_file_name = folder.to_a.last.name
-      last_file_name =~ /\A(\d{6})(\..+)\Z/
+      last_file_name =~ /\A(\d{6})(\.\w{,4})\Z/
       new_last_index = $1.to_i + 1
       file_ext = $2
       new_last_filename = ("%06d" % new_last_index) + file_ext
@@ -70,7 +70,7 @@ class PixivUgoiraConverter
         f.write("#{delay_sum}\n")
       end
 
-      ext = folder.first.name.match(/\.(.+)$/)[1]
+      ext = folder.first.name.match(/\.(\w{,4})$/)[1]
       system("ffmpeg -i #{tmpdir}/images/%06d.#{ext} -codec:v libvpx -crf 4 -b:v 5000k -an #{tmpdir}/tmp.webm")
       system("mkvmerge -o #{write_path} --timecodes 0:#{tmpdir}/timecodes.tc #{tmpdir}/tmp.webm")
     end      
