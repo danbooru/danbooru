@@ -1,5 +1,5 @@
 module Downloads
-  module Strategies
+  module RewriteStrategies
     class DeviantArt < Base
       def rewrite(url, headers)
         if url =~ /https?:\/\/(?:.+?\.)?deviantart\.(?:com|net)/
