@@ -1,5 +1,5 @@
 module Downloads
-  module Strategies
+  module RewriteStrategies
     class Twitpic < Base
       def rewrite(url, headers)
         if url =~ %r{https?://twitpic\.com} || url =~ %r{^https?://d3j5vwomefv46c\.cloudfront\.net}

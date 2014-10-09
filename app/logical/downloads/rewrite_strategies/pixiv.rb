@@ -1,5 +1,5 @@
 module Downloads
-  module Strategies
+  module RewriteStrategies
     class Pixiv < Base
       def rewrite(url, headers)
         if url =~ /https?:\/\/(?:\w+\.)?pixiv\.net/

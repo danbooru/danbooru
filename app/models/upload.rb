@@ -327,14 +327,17 @@ class Upload < ActiveRecord::Base
 
     # Downloads the file to destination_path
     def download_from_source(destination_path)
-      download = Downloads::File.new(source, destination_path)
-      if is_ugoira?
-        download.download_ugoira!
-      else
-        download.download!
-      end
       self.file_path = destination_path
-      self.source = download.source
+
+      if is_ugoira?
+        converter = PixivUgoiraConverter.new(source, destination_path, :webm)
+        converter.process!
+        self.source = source
+      else
+        download = Downloads::File.new(source, destination_path)
+        download.download!
+        self.source = download.source
+      end
     end
   end
 

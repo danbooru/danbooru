@@ -1,5 +1,5 @@
 module Downloads
-  module Strategies
+  module RewriteStrategies
     class Base
       def self.strategies
         [Pixiv, NicoSeiga, Twitpic, DeviantArt, Tumblr, Moebooru]

@@ -1,5 +1,5 @@
 module Downloads
-  module Strategies
+  module RewriteStrategies
     class Tumblr < Base
       def rewrite(url, headers)
         if url =~ %r{^https?://.*tumblr\.com}

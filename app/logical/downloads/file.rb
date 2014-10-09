@@ -11,11 +11,6 @@ module Downloads
       @tries = 0
     end
 
-    def download_ugoira!
-      converter = PixivUgoiraConverter.new(source, file_path, :webm)
-      converter.process!
-    end
-
     def download!
       http_get_streaming do |response|
         self.content_type = response["Content-Type"]
@@ -27,7 +22,7 @@ module Downloads
     end
 
     def before_download(url, headers)
-      Strategies::Base.strategies.each do |strategy|
+      RewriteStrategies::Base.strategies.each do |strategy|
         url, headers = strategy.new.rewrite(url, headers)
       end
 

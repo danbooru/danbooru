@@ -1,5 +1,5 @@
 module Downloads
-  module Strategies
+  module RewriteStrategies
     class Moebooru < Base
       DOMAINS = '(?:[^.]+\.)?yande\.re|konachan\.com'
 
