@@ -2361,6 +2361,38 @@ ALTER SEQUENCE notes_id_seq OWNED BY notes.id;
 
 
 --
+-- Name: pixiv_ugoira_frame_data; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE pixiv_ugoira_frame_data (
+    id integer NOT NULL,
+    post_id integer,
+    data text,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: pixiv_ugoira_frame_data_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE pixiv_ugoira_frame_data_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: pixiv_ugoira_frame_data_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE pixiv_ugoira_frame_data_id_seq OWNED BY pixiv_ugoira_frame_data.id;
+
+
+--
 -- Name: pool_versions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -4060,6 +4092,13 @@ ALTER TABLE ONLY notes ALTER COLUMN id SET DEFAULT nextval('notes_id_seq'::regcl
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY pixiv_ugoira_frame_data ALTER COLUMN id SET DEFAULT nextval('pixiv_ugoira_frame_data_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY pool_versions ALTER COLUMN id SET DEFAULT nextval('pool_versions_id_seq'::regclass);
 
 
@@ -4417,6 +4456,14 @@ ALTER TABLE ONLY note_versions
 
 ALTER TABLE ONLY notes
     ADD CONSTRAINT notes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pixiv_ugoira_frame_data_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY pixiv_ugoira_frame_data
+    ADD CONSTRAINT pixiv_ugoira_frame_data_pkey PRIMARY KEY (id);
 
 
 --
@@ -6352,6 +6399,13 @@ CREATE INDEX index_notes_on_post_id ON notes USING btree (post_id);
 
 
 --
+-- Name: index_pixiv_ugoira_frame_data_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_pixiv_ugoira_frame_data_on_post_id ON pixiv_ugoira_frame_data USING btree (post_id);
+
+
+--
 -- Name: index_pool_versions_on_pool_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -7054,4 +7108,6 @@ INSERT INTO schema_migrations (version) VALUES ('20140701224800');
 INSERT INTO schema_migrations (version) VALUES ('20140722225753');
 
 INSERT INTO schema_migrations (version) VALUES ('20140725003232');
+
+INSERT INTO schema_migrations (version) VALUES ('20141009231234');
 

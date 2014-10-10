@@ -3,12 +3,12 @@ module Downloads
     class Moebooru < Base
       DOMAINS = '(?:[^.]+\.)?yande\.re|konachan\.com'
 
-      def rewrite(url, headers)
+      def rewrite(url, headers, data = {})
         if url =~ %r{https?://(?:#{DOMAINS})}
           url, headers = rewrite_jpeg_versions(url, headers)
         end
 
-        return [url, headers]
+        return [url, headers, data]
       end
 
     protected

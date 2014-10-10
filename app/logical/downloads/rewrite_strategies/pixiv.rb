@@ -1,16 +1,16 @@
 module Downloads
   module RewriteStrategies
     class Pixiv < Base
-      def rewrite(url, headers)
+      def rewrite(url, headers, data = {})
         if url =~ /https?:\/\/(?:\w+\.)?pixiv\.net/
           url, headers = rewrite_headers(url, headers)
           url, headers = rewrite_cdn(url, headers)
-          url, headers = rewrite_html_pages(url, headers)
+          url, headers, data = rewrite_html_pages(url, headers, data)
           url, headers = rewrite_thumbnails(url, headers)
           url, headers = rewrite_old_small_manga_pages(url, headers)
         end
 
-        return [url, headers]
+        return [url, headers, data]
       end
 
     protected
@@ -31,9 +31,12 @@ module Downloads
         if url =~ /illust_id=\d+/i || url =~ %r!pixiv\.net/img-inf/img/!i
           source = ::Sources::Strategies::Pixiv.new(url)
           source.get
-          return [source.image_url, headers]
+          data[:ugoira_frame_data] = source.ugoira_frame_data
+          data[:ugoira_width] = source.ugoira_width
+          data[:ugoira_height] = source.ugoira_height
+          return [source.file_url, headers, data]
         else
-          return [url, headers]
+          return [url, headers, data]
         end
       end
 

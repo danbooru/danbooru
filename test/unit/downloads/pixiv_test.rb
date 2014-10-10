@@ -27,7 +27,27 @@ module Downloads
       assert_rewritten(source, source)
     end
 
+    context "An ugoira site for pixiv" do
+      setup do
+        @tempfile = Tempfile.new("danbooru-test")
+        @download = Downloads::File.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654", @tempfile.path)
+        VCR.use_cassette("ugoira-converter", :record => :new_episodes) do
+          @download.download!
+        end
+      end
 
+      teardown do
+        @tempfile.unlink
+      end
+
+      should "download the zip file and update the source" do
+        assert_equal("http://i1.pixiv.net/img-zip-ugoira/img/2014/10/05/23/42/23/46378654_ugoira1920x1080.zip", @download.source)
+      end
+
+      should "capture the frame data" do
+        assert_equal([{"file"=>"000000.jpg", "delay"=>200}, {"file"=>"000001.jpg", "delay"=>200}, {"file"=>"000002.jpg", "delay"=>200}, {"file"=>"000003.jpg", "delay"=>200}, {"file"=>"000004.jpg", "delay"=>250}], @download.data[:ugoira_frame_data])
+      end
+    end
 
     # Test an old illustration (one uploaded before 2014-09-16). New
     # /img-original/ and /img-master/ URLs currently don't work for images
@@ -80,6 +100,7 @@ module Downloads
         assert_downloaded(42, @new_medium_thumbnail, "download-pixiv-old-png-new-medium-thumbnail")
 
         assert_downloaded(@file_size, @new_full_size_image, "download-pixiv-old-png-new-full-size")
+
       end
     end
 

@@ -1,13 +1,13 @@
 module Downloads
   module RewriteStrategies
     class Tumblr < Base
-      def rewrite(url, headers)
+      def rewrite(url, headers, data = {})
         if url =~ %r{^https?://.*tumblr\.com}
           url, headers = rewrite_cdn(url, headers)
           url, headers = rewrite_thumbnails(url, headers)
         end
 
-        return [url, headers]
+        return [url, headers, data]
       end
 
     protected

@@ -1,14 +1,14 @@
 module Downloads
   module RewriteStrategies
     class NicoSeiga < Base
-      def rewrite(url, headers)
+      def rewrite(url, headers, data = {})
         if url =~ %r{https?://lohas\.nicoseiga\.jp} || url =~ %r{https?://seiga\.nicovideo\.jp}
           url, headers = rewrite_headers(url, headers)
           url, headers = rewrite_html_pages(url, headers)
           url, headers = rewrite_thumbnails(url, headers)
         end
 
-        return [url, headers]
+        return [url, headers, data]
       end
 
     protected

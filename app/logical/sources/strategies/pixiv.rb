@@ -5,6 +5,8 @@ require 'csv'
 module Sources
   module Strategies
     class Pixiv < Base
+      attr_reader :zip_url, :ugoira_frame_data, :ugoira_width, :ugoira_height
+      
       def self.url_match?(url)
         url =~ /^https?:\/\/(?:\w+\.)?pixiv\.net/
       end
@@ -43,6 +45,8 @@ module Sources
         agent.get(URI.parse(normalized_url)) do |page|
           @artist_name, @profile_url = get_profile_from_page(page)
           @pixiv_moniker = get_moniker_from_page(page)
+          @image_url = get_image_url_from_page(page)
+          @zip_url, @ugoira_frame_data, @ugoira_width, @ugoira_height = get_zip_url_from_page(page)
           @tags = get_tags_from_page(page)
           @page_count = get_page_count_from_page(page)
 
@@ -58,28 +62,11 @@ module Sources
       end
 
       def agent
-        @agent ||= begin
-          mech = Mechanize.new
+        @agent ||= PixivWebAgent.build
+      end
 
-          phpsessid = Cache.get("pixiv-phpsessid")
-          if phpsessid
-            cookie = Mechanize::Cookie.new("PHPSESSID", phpsessid)
-            cookie.domain = ".pixiv.net"
-            cookie.path = "/"
-            mech.cookie_jar.add(cookie)
-          else
-            mech.get("http://www.pixiv.net") do |page|
-              page.form_with(:action => "/login.php") do |form|
-                form['pixiv_id'] = Danbooru.config.pixiv_login
-                form['pass'] = Danbooru.config.pixiv_password
-              end.click_button
-            end
-            phpsessid = mech.cookie_jar.cookies.select{|c| c.name == "PHPSESSID"}.first
-            Cache.put("pixiv-phpsessid", phpsessid.value, 1.month) if phpsessid
-          end
-
-          mech
-        end
+      def file_url
+        image_url || zip_url
       end
       
     protected
@@ -188,6 +175,31 @@ module Sources
           return rewrite_thumbnails(thumbnail_url, is_manga)
         else
           raise Sources::Error.new("Couldn't find image thumbnail URL in page: #{normalized_url}")
+        end
+      end
+
+      def get_zip_url_from_page(page)
+        scripts = page.search("body script").find_all do |node|
+          node.text =~ /_ugoira600x600\.zip/
+        end
+
+        if scripts.any?
+          javascript = scripts.first.text
+
+          json = javascript.match(/;pixiv\.context\.ugokuIllustData\s+=\s+(\{.+?\});(?:$|pixiv\.context)/)[1]
+          data = JSON.parse(json)
+          zip_url = data["src"].sub("_ugoira600x600.zip", "_ugoira1920x1080.zip")
+          frame_data = data["frames"]
+
+          if javascript =~ /illustSize\s*=\s*\[\s*(\d+)\s*,\s*(\d+)\s*\]/
+            image_width = $1.to_i
+            image_height = $2.to_i
+          else
+            image_width = 600
+            image_height = 600
+          end
+
+          return [zip_url, frame_data, image_width, image_height]
         end
       end
 

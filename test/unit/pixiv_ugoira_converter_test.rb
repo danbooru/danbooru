@@ -3,36 +3,28 @@ require "test_helper"
 class PixivUgoiraConverterTest < ActiveSupport::TestCase
   context "An ugoira converter" do
     setup do
-      @url = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654"
-      @write_file = Tempfile.new("output")
+      @zipped_body = "#{Rails.root}/test/fixtures/ugoira.zip"
+      @write_file = Tempfile.new("converted")
+      @preview_write_file = Tempfile.new("preview")
+      @frame_data = [
+        {"file" => "000000.jpg", "delay" => 200},
+        {"file" => "000001.jpg", "delay" => 200},
+        {"file" => "000002.jpg", "delay" => 200},
+        {"file" => "000003.jpg", "delay" => 200},
+        {"file" => "000004.jpg", "delay" => 250}
+      ]
     end
 
     teardown do
       @write_file.unlink
-    end
-
-    should "output to gif" do
-      @converter = PixivUgoiraConverter.new(@url, @write_file.path, :gif)
-      VCR.use_cassette("ugoira-converter", :record => :new_episodes) do
-        @converter.process!
-      end
-      assert_operator(File.size(@converter.write_path), :>, 1_000)
+      @preview_write_file.unlink
     end
 
     should "output to webm" do
-      @converter = PixivUgoiraConverter.new(@url, @write_file.path, :webm)
-      VCR.use_cassette("ugoira-converter", :record => :new_episodes) do
-        @converter.process!
-      end
-      assert_operator(File.size(@converter.write_path), :>, 1_000)
+      @converter = PixivUgoiraConverter.new
+      @converter.convert(@zipped_body, @write_file.path, @preview_write_file.path, @frame_data)
+      assert_operator(File.size(@write_file.path), :>, 1_000)
+      assert_operator(File.size(@preview_write_file.path), :>, 0)
     end
-
-    # should "output to apng" do
-    #   @converter = PixivUgoiraConverter.new(@url, @write_file.path, :apng)
-    #   VCR.use_cassette("ugoira-converter", :record => :new_episodes) do
-    #     @converter.process!
-    #   end
-    #   assert_operator(File.size(@converter.write_path), :>, 1_000)
-    # end
   end
 end

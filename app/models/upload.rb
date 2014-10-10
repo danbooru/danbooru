@@ -112,6 +112,7 @@ class Upload < ActiveRecord::Base
         post.distribute_files
         if post.save
           CurrentUser.increment!(:post_upload_count)
+          ugoira_service.process(post)
           update_attributes(:status => "completed", :post_id => post.id)
         else
           update_attribute(:status, "error: " + post.errors.full_messages.join(", "))
@@ -138,6 +139,10 @@ class Upload < ActiveRecord::Base
       
     ensure
       delete_temp_file
+    end
+
+    def ugoira_service
+      @ugoira_service ||= PixivUgoiraService.new
     end
 
     def convert_to_post
@@ -190,14 +195,30 @@ class Upload < ActiveRecord::Base
     def is_video?
       %w(webm).include?(file_ext)
     end
+
+    def is_ugoira?
+      %w(zip).include?(file_ext)
+    end
   end
 
   module ResizerMethods
     def generate_resizes(source_path)
       generate_resize_for(Danbooru.config.small_image_width, Danbooru.config.small_image_width, source_path, 85)
+
       if is_image? && image_width > Danbooru.config.large_image_width
         generate_resize_for(Danbooru.config.large_image_width, nil, source_path)
       end
+    end
+
+    def generate_video_preview_for(width, height, output_path)
+      dimension_ratio = image_width.to_f / image_height
+      if dimension_ratio > 1
+        height = (width / dimension_ratio).to_i
+      else
+        width = (height * dimension_ratio).to_i
+      end
+      video.screenshot(output_path, {:seek_time => 0, :resolution => "#{width}x#{height}"})
+      FileUtils.chmod(0664, output_path)
     end
 
     def generate_resize_for(width, height, source_path, quality = 90)
@@ -208,15 +229,10 @@ class Upload < ActiveRecord::Base
       output_path = resized_file_path_for(width)
       if is_image?
         Danbooru.resize(source_path, output_path, width, height, quality)
+      elsif is_ugoira?
+        ugoira_service.generate_resizes(source_path, resized_file_path_for(Danbooru.config.large_image_width), resized_file_path_for(Danbooru.config.small_image_width))
       elsif is_video?
-        dimension_ratio = image_width.to_f / image_height
-        if dimension_ratio > 1
-          height = (width / dimension_ratio).to_i
-        else
-          width = (height * dimension_ratio).to_i
-        end
-        video.screenshot(output_path, {:seek_time => 0, :resolution => "#{width}x#{height}"})
-        FileUtils.chmod(0664, output_path)
+        generate_video_preview_for(width, height, output_path)
       end
     end
   end
@@ -227,6 +243,9 @@ class Upload < ActiveRecord::Base
       if is_video?
         self.image_width = video.width
         self.image_height = video.height
+      elsif is_ugoira?
+        self.image_width = ugoira_service.width
+        self.image_height = ugoira_service.height
       else
         File.open(file_path, "rb") do |file|
           image_size = ImageSpec.new(file)
@@ -238,13 +257,13 @@ class Upload < ActiveRecord::Base
 
     # Does this file have image dimensions?
     def has_dimensions?
-      %w(jpg gif png swf webm).include?(file_ext)
+      %w(jpg gif png swf webm zip).include?(file_ext)
     end
   end
 
   module ContentTypeMethods
     def is_valid_content_type?
-      file_ext =~ /jpg|gif|png|swf|webm/
+      file_ext =~ /jpg|gif|png|swf|webm|zip/
     end
 
     def content_type_to_file_ext(content_type)
@@ -263,6 +282,9 @@ class Upload < ActiveRecord::Base
 
       when "video/webm"
         "webm"
+
+      when "application/zip"
+        "zip"
 
       else
         "bin"
@@ -285,6 +307,9 @@ class Upload < ActiveRecord::Base
 
       when /^\x1a\x45\xdf\xa3/
         "video/webm"
+
+      when /^PK\x03\x04/
+        "application/zip"
 
       else
         "application/octet-stream"
@@ -321,23 +346,17 @@ class Upload < ActiveRecord::Base
       source =~ /^https?:\/\// && file_path.blank?
     end
 
-    def is_ugoira?
+    def has_ugoira_tag?
       tag_string =~ /\bugoira\b/i
     end
 
     # Downloads the file to destination_path
     def download_from_source(destination_path)
       self.file_path = destination_path
-
-      if is_ugoira?
-        converter = PixivUgoiraConverter.new(source, destination_path, :webm)
-        converter.process!
-        self.source = source
-      else
-        download = Downloads::File.new(source, destination_path)
-        download.download!
-        self.source = download.source
-      end
+      download = Downloads::File.new(source, destination_path, :is_ugoira => has_ugoira_tag?)
+      download.download!
+      self.source = download.source
+      ugoira_service.load(download.data)
     end
   end
 
