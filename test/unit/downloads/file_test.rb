@@ -20,9 +20,8 @@ module Downloads
 
         should "retry three times" do
           assert_raises(Errno::ETIMEDOUT) do
-            @download.http_get_streaming {}
+            @download.http_get_streaming(@source) {}
           end
-          assert_equal(3, @download.tries)
         end
       end
 

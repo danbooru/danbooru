@@ -12,6 +12,28 @@ module Sources
       end
     end
 
+    context "An ugoira source site for pixiv" do
+      setup do
+        VCR.use_cassette("ugoira-converter") do
+          @site = Sources::Site.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654")
+          @site.get
+        end
+      end
+
+      should "get the file url" do
+        assert_equal("http://i1.pixiv.net/img-zip-ugoira/img/2014/10/05/23/42/23/46378654_ugoira1920x1080.zip", @site.file_url)
+      end
+
+      should "capture the frame data" do
+        assert_equal([{"file"=>"000000.jpg", "delay"=>200}, {"file"=>"000001.jpg", "delay"=>200}, {"file"=>"000002.jpg", "delay"=>200}, {"file"=>"000003.jpg", "delay"=>200}, {"file"=>"000004.jpg", "delay"=>250}], @site.ugoira_frame_data)
+      end
+
+      should "capture the image dimensions" do
+        assert_equal(60, @site.ugoira_width)
+        assert_equal(60, @site.ugoira_height)
+      end
+    end
+
     context "fetching source data for a new manga image" do
       setup do
         get_source("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46324488", "source-pixiv-new-manga")

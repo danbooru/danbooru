@@ -5,8 +5,8 @@ module Downloads
         [Pixiv, NicoSeiga, Twitpic, DeviantArt, Tumblr, Moebooru]
       end
 
-      def rewrite(url, headers)
-        return [url, headers]
+      def rewrite(url, headers, data = {})
+        return [url, headers, data]
       end
 
     protected

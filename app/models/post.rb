@@ -26,6 +26,7 @@ class Post < ActiveRecord::Base
   belongs_to :parent, :class_name => "Post"
   has_one :upload, :dependent => :destroy
   has_one :artist_commentary, :dependent => :destroy
+  has_one :pixiv_ugoira_frame_data, :class_name => "PixivUgoiraFrameData"
   has_many :flags, :class_name => "PostFlag", :dependent => :destroy
   has_many :appeals, :class_name => "PostAppeal", :dependent => :destroy
   has_many :versions, lambda {order("post_versions.updated_at ASC, post_versions.id ASC")}, :class_name => "PostVersion", :dependent => :destroy
@@ -70,9 +71,17 @@ class Post < ActiveRecord::Base
 
     def large_file_path
       if has_large?
-        "#{Rails.root}/public/data/sample/#{file_path_prefix}#{Danbooru.config.large_image_prefix}#{md5}.jpg"
+        "#{Rails.root}/public/data/sample/#{file_path_prefix}#{Danbooru.config.large_image_prefix}#{md5}.#{large_file_ext}"
       else
         file_path
+      end
+    end
+
+    def large_file_ext
+      if is_ugoira?
+        "webm"
+      else
+        "jpg"
       end
     end
 
@@ -129,7 +138,7 @@ class Post < ActiveRecord::Base
     end
 
     def is_video?
-      file_ext =~ /webm/i
+      file_ext =~ /webm|zip/i
     end
 
     def has_preview?

@@ -1,13 +1,13 @@
 module Downloads
   module RewriteStrategies
     class DeviantArt < Base
-      def rewrite(url, headers)
+      def rewrite(url, headers, data = {})
         if url =~ /https?:\/\/(?:.+?\.)?deviantart\.(?:com|net)/
           url, headers = rewrite_html_pages(url, headers)
           url, headers = rewrite_thumbnails(url, headers)
         end
 
-        return [url, headers]
+        return [url, headers, data]
       end
 
     protected

@@ -105,14 +105,20 @@ class UploadTest < ActiveSupport::TestCase
           setup do
             @url = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654"
             @upload = FactoryGirl.create(:source_upload, :source => @url, :tag_string => "ugoira")
-            @output_path = "#{Rails.root}/tmp/test.download.webm"
+            @output_file = Tempfile.new("download")
+          end
+
+          teardown do
+            @output_file.unlink
           end
           
           should "process successfully" do
             VCR.use_cassette("ugoira-converter", :record => :new_episodes) do
-              @upload.download_from_source(@output_path)
+              @upload.download_from_source(@output_file.path)
             end
-            assert_operator(File.size(@output_path), :>, 1_000)
+            assert_operator(File.size(@output_file.path), :>, 1_000)
+            assert_equal("application/zip", @upload.file_header_to_content_type(@output_file.path))
+            assert_equal("zip", @upload.content_type_to_file_ext(@upload.file_header_to_content_type(@output_file.path)))
           end
         end
 
@@ -226,6 +232,27 @@ class UploadTest < ActiveSupport::TestCase
         assert_equal(8558, post.file_size)
         assert_equal(post.id, @upload.post_id)
         assert_equal("completed", @upload.status)
+      end
+    end
+
+    should "process completely for an ugoira" do
+      @upload = FactoryGirl.create(:source_upload,
+        :source => "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654",
+        :rating => "s",
+        :uploader_ip_addr => "127.0.0.1",
+        :tag_string => "hoge foo"
+      )
+      VCR.use_cassette("ugoira-converter", :record => :new_episodes) do
+        assert_difference(["Post.count", "PixivUgoiraFrameData.count"]) do
+          @upload.process!
+        end
+        post = Post.last
+        assert_not_nil(post.pixiv_ugoira_frame_data)
+        assert_equal("0d94800c4b520bf3d8adda08f95d31e2", post.md5)
+        assert_equal(60, post.image_width)
+        assert_equal(60, post.image_height)
+        assert_operator(File.size(post.large_file_path), :>, 0)
+        assert_operator(File.size(post.preview_file_path), :>, 0)            
       end
     end
 
