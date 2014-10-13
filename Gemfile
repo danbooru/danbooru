@@ -18,6 +18,7 @@ gem "uglifier"
 gem 'coffee-rails'
 gem "therubyracer", :platforms => :ruby
 gem "pry", :group => [:test, :development]
+gem "pry-debugger", :group => [:test, :development]
 gem "rails", "~> 4.1.5"
 gem "pg"
 gem "kgio"
