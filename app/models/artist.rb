@@ -77,6 +77,10 @@ class Artist < ActiveRecord::Base
       self.name = Artist.normalize_name(name)
     end
 
+    def pretty_name
+      name.tr("_", " ")
+    end
+
     def other_names_array
       other_names.try(:split, /\s/)
     end
@@ -221,6 +225,10 @@ class Artist < ActiveRecord::Base
 
     def tag_alias_name
       TagAlias.active.find_by_antecedent_name(name).consequent_name
+    end
+
+    def category_name
+      Tag.category_for(name)
     end
 
     def categorize_tag

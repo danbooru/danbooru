@@ -1,6 +1,6 @@
 <div id="c-artists">
   <div id="a-show">
-    <h1>Artist: <%= @artist.name.tr("_", " ") %></h1>
+    <h1>Artist: <%= link_to @artist.pretty_name, posts_path(:tags => @artist.name), :class => "tag-type-#{@artist.category_name}" %></h1>
 
     <% if @artist.notes.present? && (!@artist.is_banned? || CurrentUser.user.is_member?) %>
       <div class="prose">

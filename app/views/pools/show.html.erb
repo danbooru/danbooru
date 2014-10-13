@@ -2,7 +2,7 @@
   <div id="a-show">
     <h1>
       <%= @pool.pretty_category %>:
-      <%= link_to @pool.pretty_name, pool_path(@pool), :class => "pool-category-#{@pool.category}" %>
+      <%= link_to @pool.pretty_name, posts_path(:tags => "pool:#{@pool.id}"), :class => "pool-category-#{@pool.category}" %>
       <% if @pool.is_deleted? %>
         <span class="inactive">(deleted)</span>
       <% end %>

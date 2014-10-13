@@ -5,7 +5,7 @@
     <section id="content">
       <h1 id="wiki-page-title">
 
-        <%= link_to @wiki_page.pretty_title, wiki_page_path(@wiki_page), :class => "tag-type-#{@wiki_page.category_name}" %>
+        <%= link_to @wiki_page.pretty_title, posts_path(:tags => @wiki_page.title), :class => "tag-type-#{@wiki_page.category_name}" %>
 
         <% if @wiki_page.is_locked? %>
           (locked)
