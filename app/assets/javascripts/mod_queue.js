@@ -24,7 +24,7 @@
   }
 
   Danbooru.ModQueue.initialize_hilights = function() {
-    $.each($("article.post"), function(i, v) {
+    $.each($("div.post"), function(i, v) {
       var $post = $(v);
       var score = parseInt($post.data("score"));
       if (score >= 3) {

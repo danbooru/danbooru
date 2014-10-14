@@ -25,7 +25,7 @@
       </div>
 
       <% @posts.each do |post| %>
-        <article class="post" id="post-<%= post.id %>" data-score="<%= post.score %>" data-has-children="<%= post.has_children? %>" data-has-dup="<%= post.has_dup_tag? %>">
+        <div id="post-<%= post.id %>" class="post <%= PostPresenter.preview_class(post) %>" <%= PostPresenter.data_attributes(post) %> data-has-dup="<%= post.has_dup_tag? %>">
           <aside>
             <%= link_to(image_tag(post.preview_file_url), post_path(post), :target => "_blank") %>
           </aside>
@@ -42,7 +42,7 @@
                   (<%= post.image_width %>x<%= post.image_height %>)
                 <% end %>
               </li>
-              <li><strong>Uploader</strong>: <%= link_to(post.uploader.name, user_path(post.uploader_id)) %> <%= time_ago_in_words_tagged(post.created_at) %></li>
+              <li><strong>Uploader</strong>: <%= link_to_user(post.uploader) %> <%= time_ago_in_words_tagged(post.created_at) %></li>
               <% if post.is_flagged? %>
                 <li><strong>Flagged</strong>: <%= post_flag_reasons(post) %></li>
               <% end %>
@@ -53,7 +53,7 @@
               <li><strong>Tags</strong>: <%= post.tag_string %></li>
             </ul>
           </section>
-        </article>
+        </div>
       <% end %>
     </div>
 
