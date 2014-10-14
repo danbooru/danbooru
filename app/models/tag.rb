@@ -320,7 +320,10 @@ class Tag < ActiveRecord::Base
 
     def parse_helper_fudged(range, type)
       result = parse_helper(range, type)
-      if result[0] == :eq
+      # Don't fudge the filesize when searching filesize:123b or filesize:123.
+      if result[0] == :eq && type == :filesize && range !~ /[km]b?\Z/i
+        result
+      elsif result[0] == :eq
         new_min = (result[1] * 0.95).to_i
         new_max = (result[1] * 1.05).to_i
         [:between, new_min, new_max]
