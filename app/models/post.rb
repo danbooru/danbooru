@@ -1042,6 +1042,10 @@ class Post < ActiveRecord::Base
       return true if has_children? && is_deleted?
       return false
     end
+
+    def has_visible_children
+      has_visible_children?
+    end
   end
 
   module DeletionMethods
@@ -1207,7 +1211,7 @@ class Post < ActiveRecord::Base
     end
 
     def method_attributes
-      list = [:uploader_name, :has_large, :tag_string_artist, :tag_string_character, :tag_string_copyright, :tag_string_general]
+      list = [:uploader_name, :has_large, :tag_string_artist, :tag_string_character, :tag_string_copyright, :tag_string_general, :has_visible_children]
       if visible?
         list += [:file_url, :large_file_url, :preview_file_url]
       end

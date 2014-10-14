@@ -451,7 +451,7 @@
     if (data.parent_id) {
       $post.addClass("post-status-has-parent");
     }
-    if (data.has_children) {
+    if (data.has_visible_children) {
       $post.addClass("post-status-has-children");
     }
     Danbooru.Post.initialize_title_for($post);
