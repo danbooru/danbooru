@@ -2368,6 +2368,7 @@ CREATE TABLE pixiv_ugoira_frame_data (
     id integer NOT NULL,
     post_id integer,
     data text,
+    content_type character varying(255),
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -6298,6 +6299,13 @@ CREATE INDEX index_forum_subscriptions_on_user_id ON forum_subscriptions USING b
 --
 
 CREATE INDEX index_forum_topic_visits_on_forum_topic_id ON forum_topic_visits USING btree (forum_topic_id);
+
+
+--
+-- Name: index_forum_topic_visits_on_last_read_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_forum_topic_visits_on_last_read_at ON forum_topic_visits USING btree (last_read_at);
 
 
 --

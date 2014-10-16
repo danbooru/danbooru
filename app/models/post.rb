@@ -138,7 +138,11 @@ class Post < ActiveRecord::Base
     end
 
     def is_video?
-      file_ext =~ /webm|zip/i
+      file_ext =~ /webm/i
+    end
+
+    def is_ugoira?
+      file_ext =~ /zip/i
     end
 
     def has_preview?

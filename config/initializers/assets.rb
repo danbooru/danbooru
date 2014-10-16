@@ -1,1 +1,1 @@
-Rails.application.config.assets.precompile += %w( stupidtable.js )
+Rails.application.config.assets.precompile += %w( stupidtable.js ugoira_player.js )

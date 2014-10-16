@@ -3,6 +3,7 @@ class CreatePixivUgoiraFrameData < ActiveRecord::Migration
     create_table :pixiv_ugoira_frame_data do |t|
       t.integer :post_id
       t.text :data
+      t.string :content_type
       t.timestamps
     end
 

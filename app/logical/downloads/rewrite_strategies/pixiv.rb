@@ -34,6 +34,7 @@ module Downloads
           data[:ugoira_frame_data] = source.ugoira_frame_data
           data[:ugoira_width] = source.ugoira_width
           data[:ugoira_height] = source.ugoira_height
+          data[:ugoira_content_type] = source.ugoira_content_type
           return [source.file_url, headers, data]
         else
           return [url, headers, data]
