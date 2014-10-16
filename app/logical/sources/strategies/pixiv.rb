@@ -5,7 +5,7 @@ require 'csv'
 module Sources
   module Strategies
     class Pixiv < Base
-      attr_reader :zip_url, :ugoira_frame_data, :ugoira_width, :ugoira_height
+      attr_reader :zip_url, :ugoira_frame_data, :ugoira_width, :ugoira_height, :ugoira_content_type
       
       def self.url_match?(url)
         url =~ /^https?:\/\/(?:\w+\.)?pixiv\.net/
@@ -46,7 +46,7 @@ module Sources
           @artist_name, @profile_url = get_profile_from_page(page)
           @pixiv_moniker = get_moniker_from_page(page)
           @image_url = get_image_url_from_page(page)
-          @zip_url, @ugoira_frame_data, @ugoira_width, @ugoira_height = get_zip_url_from_page(page)
+          @zip_url, @ugoira_frame_data, @ugoira_width, @ugoira_height, @ugoira_content_type = get_zip_url_from_page(page)
           @tags = get_tags_from_page(page)
           @page_count = get_page_count_from_page(page)
 
@@ -190,6 +190,7 @@ module Sources
           data = JSON.parse(json)
           zip_url = data["src"].sub("_ugoira600x600.zip", "_ugoira1920x1080.zip")
           frame_data = data["frames"]
+          content_type = data["mime_type"]
 
           if javascript =~ /illustSize\s*=\s*\[\s*(\d+)\s*,\s*(\d+)\s*\]/
             image_width = $1.to_i
@@ -199,7 +200,7 @@ module Sources
             image_height = 600
           end
 
-          return [zip_url, frame_data, image_width, image_height]
+          return [zip_url, frame_data, image_width, image_height, content_type]
         end
       end
 

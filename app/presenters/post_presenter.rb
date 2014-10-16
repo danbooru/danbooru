@@ -167,6 +167,8 @@ class PostPresenter < Presenter
       template.render("posts/partials/show/flash", :post => @post)
     elsif @post.is_video?
       template.render("posts/partials/show/video", :post => @post)
+    elsif @post.is_ugoira?
+      template.render("posts/partials/show/ugoira", :post => @post)      
     elsif !@post.is_image?
       template.render("posts/partials/show/download", :post => @post)
     elsif @post.is_image?

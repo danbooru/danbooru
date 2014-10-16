@@ -1,0 +1,43 @@
+<%= content_tag(:canvas, nil, :width => post.image_width, :height => post.image_height, :id => "ugoira-canvas") %>
+
+<p>
+  <%= link_to "Play", "#", :id => "ugoira-play" %>
+  | <%= link_to "Pause", "#", :id => "ugoira-pause" %>  
+  | <%= link_to "Rewind", "#", :id => "ugoira-rewind" %>
+  | <%= link_to "Stop", "#", :id => "ugoira-stop" %>
+  | <%= link_to "Save as video (right click and save)", post.large_file_url %>
+</p>
+
+<% content_for(:html_header) do %>
+  <%= javascript_include_tag "ugoira_player" %>
+  <script type="text/javascript">
+    Danbooru.Ugoira = {};
+
+    Danbooru.Ugoira.create_player = function() {
+      var meta_data = {
+        mime_type: <%= raw @post.pixiv_ugoira_frame_data.content_type.to_json %>,
+        frames: <%= raw @post.pixiv_ugoira_frame_data.data.to_json %>
+      };
+      var options = {
+        canvas: document.getElementById("ugoira-canvas"),
+        source: "<%= @post.file_url %>",
+        metadata: meta_data,
+        chunkSize: 300000,
+        loop: true,
+        autoStart: true,
+        debug: false,
+      }
+      this.player = new ZipImagePlayer(options);
+    }
+
+    Danbooru.Ugoira.player = null;
+
+    $(function() {
+      Danbooru.Ugoira.create_player();
+      $("#ugoira-play").click(function() {Danbooru.Ugoira.player.play();})
+      $("#ugoira-pause").click(function() {Danbooru.Ugoira.player.pause();})
+      $("#ugoira-rewind").click(function() {Danbooru.Ugoira.player.rewind();})
+      $("#ugoira-stop").click(function() {Danbooru.Ugoira.player.stop();})
+    });
+  </script>
+<% end %>
