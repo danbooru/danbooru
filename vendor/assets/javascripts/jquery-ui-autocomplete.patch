@@ -1,6 +1,6 @@
---- jquery-ui-autocomplete-1.10.2.js	2013-06-21 11:19:32.000000000 -0700
-+++ jquery-ui-autocomplete-custom.js	2013-06-21 13:07:23.000000000 -0700
-@@ -76,6 +76,16 @@
+--- jquery-ui-autocomplete-1.11.2.js	2014-10-16 15:17:29.000000000 -0700
++++ jquery-ui-autocomplete-custom.js	2014-10-16 15:16:59.000000000 -0700
+@@ -68,6 +68,16 @@
        .attr( "autocomplete", "off" );
  
      this._on( this.element, {
@@ -15,30 +15,13 @@
 +        }
 +      },
        keydown: function( event ) {
-         /*jshint maxcomplexity:15*/
          if ( this.element.prop( "readOnly" ) ) {
-@@ -106,6 +116,7 @@
+           suppressKeyPress = true;
+@@ -97,6 +107,7 @@
            suppressKeyPress = true;
            this._keyEvent( "next", event );
            break;
 +        case keyCode.SPACE:
          case keyCode.ENTER:
-         case keyCode.NUMPAD_ENTER:
            // when menu is open and has focus
-@@ -121,6 +132,7 @@
            if ( this.menu.active ) {
-             this.menu.select( event );
-           }
-+          event.preventDefault();
-           break;
-         case keyCode.ESCAPE:
-           if ( this.menu.element.is( ":visible" ) ) {
-@@ -142,7 +154,7 @@
-       keypress: function( event ) {
-         if ( suppressKeyPress ) {
-           suppressKeyPress = false;
--          event.preventDefault();
-+          // event.preventDefault();
-           return;
-         }
-         if ( suppressKeyPressRepeat ) {

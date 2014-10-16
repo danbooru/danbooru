@@ -95,7 +95,7 @@ class Post < ActiveRecord::Base
 
     def large_file_url
       if has_large?
-        "/data/sample/#{file_path_prefix}#{Danbooru.config.large_image_prefix}#{md5}.jpg"
+        "/data/sample/#{file_path_prefix}#{Danbooru.config.large_image_prefix}#{md5}.#{large_file_ext}"
       else
         file_url
       end
@@ -146,7 +146,7 @@ class Post < ActiveRecord::Base
     end
 
     def has_preview?
-      is_image? || is_video?
+      is_image? || is_video? || is_ugoira?
     end
 
     def has_dimensions?
@@ -168,7 +168,7 @@ class Post < ActiveRecord::Base
     end
 
     def has_large?
-      is_image? && image_width.present? && image_width > Danbooru.config.large_image_width
+      is_ugoira? || (is_image? && image_width.present? && image_width > Danbooru.config.large_image_width)
     end
 
     def has_large
