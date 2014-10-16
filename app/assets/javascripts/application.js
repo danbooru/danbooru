@@ -1,5 +1,5 @@
-//= require jquery-1.10.1.min.js
-//= require jquery-ui-1.10.2.min.js
+//= require jquery-1.11.1.min.js
+//= require jquery-ui-1.11.2.min.js
 //= require jquery.hotkeys.js
 //= require jquery.timeout.js
 //= require jquery-ui-autocomplete-custom.js

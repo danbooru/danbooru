@@ -1,5 +1,7 @@
 <%= content_tag(:canvas, nil, :width => post.image_width, :height => post.image_height, :id => "ugoira-canvas") %>
 
+<div id="progressbar"></div>
+
 <p>
   <%= link_to "Play", "#", :id => "ugoira-play" %>
   | <%= link_to "Pause", "#", :id => "ugoira-pause" %>  
@@ -34,10 +36,30 @@
 
     $(function() {
       Danbooru.Ugoira.create_player();
-      $("#ugoira-play").click(function() {Danbooru.Ugoira.player.play();})
-      $("#ugoira-pause").click(function() {Danbooru.Ugoira.player.pause();})
-      $("#ugoira-rewind").click(function() {Danbooru.Ugoira.player.rewind();})
-      $("#ugoira-stop").click(function() {Danbooru.Ugoira.player.stop();})
+      $(Danbooru.Ugoira.player).on("loadProgress", function(ev, progress) {
+        $("#progressbar").progressbar({value: progress * 100});
+      });
+      $(Danbooru.Ugoira.player).on("loadingStateChanged", function(ev, state) {
+        if (state === 2) {
+          $("#progressbar").remove();
+        }
+      });
+      $("#ugoira-play").click(function(e) {
+        Danbooru.Ugoira.player.play();
+        e.preventDefault();
+      })
+      $("#ugoira-pause").click(function(e) {
+        Danbooru.Ugoira.player.pause();
+        e.preventDefault();
+      });
+      $("#ugoira-rewind").click(function(e) {
+        Danbooru.Ugoira.player.rewind();
+        e.preventDefault();
+      });
+      $("#ugoira-stop").click(function(e) {
+        Danbooru.Ugoira.player.stop();
+        e.preventDefault();
+      });
     });
   </script>
 <% end %>

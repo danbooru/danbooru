@@ -355,7 +355,6 @@ class Upload < ActiveRecord::Base
       self.file_path = destination_path
       download = Downloads::File.new(source, destination_path, :is_ugoira => has_ugoira_tag?)
       download.download!
-      self.source = download.source
       ugoira_service.load(download.data)
     end
   end
