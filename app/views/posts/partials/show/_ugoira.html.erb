@@ -1,4 +1,20 @@
-<%= content_tag(:canvas, nil, :width => post.image_width, :height => post.image_height, :id => "ugoira-canvas") %>
+<%= content_tag(:canvas, nil,
+                :id => "image",
+                :width => post.image_width,
+                :height => post.image_height,
+                "data-original-width" => post.image_width,
+                "data-original-height" => post.image_height,
+                "data-large-width" => post.image_width,
+                "data-large-height" => post.image_height,
+                "data-tags" => post.tag_string,
+                "data-uploader" => post.uploader_name,
+                "data-rating" => post.rating,
+                "data-flags" => post.status_flags,
+                "data-parent-id" => post.parent_id,
+                "data-has-children" => post.has_children?,
+                "data-has-active-children" => post.has_active_children?,
+                "data-score" => post.score,
+                "data-fav-count" => post.fav_count) %>
 
 <div id="progressbar"></div>
 
@@ -21,7 +37,7 @@
         frames: <%= raw @post.pixiv_ugoira_frame_data.data.to_json %>
       };
       var options = {
-        canvas: document.getElementById("ugoira-canvas"),
+        canvas: document.getElementById("image"),
         source: "<%= @post.file_url %>",
         metadata: meta_data,
         chunkSize: 300000,
