@@ -1,6 +1,6 @@
 class PixivUgoiraConverter
   def convert(source_path, output_path, preview_path, frame_data)
-    folder = unpack(File.open(source_path))
+    folder = Zip::File.new(source_path)
     write_webm(folder, output_path, frame_data)
     write_preview(folder, preview_path)
   end
@@ -49,11 +49,5 @@ class PixivUgoiraConverter
     image_blob = file.get_input_stream.read
     image = Magick::Image.from_blob(image_blob).first
     image.write(path)
-  end
-
-  def unpack(zip_file)
-    folder = Zip::CentralDirectory.new
-    folder.read_from_stream(zip_file)
-    folder
   end
 end
