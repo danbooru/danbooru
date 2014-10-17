@@ -27,7 +27,7 @@ module Downloads
       #   http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=18557054&page=1
       # Plus this:
       #   i2.pixiv.net/img-inf/img/2014/09/25/00/57/24/46170939_64x64.jpg
-      def rewrite_html_pages(url, headers)
+      def rewrite_html_pages(url, headers, data)
         if url =~ /illust_id=\d+/i || url =~ %r!pixiv\.net/img-inf/img/!i
           source = ::Sources::Strategies::Pixiv.new(url)
           source.get
