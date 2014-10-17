@@ -26,7 +26,7 @@ class Post < ActiveRecord::Base
   belongs_to :parent, :class_name => "Post"
   has_one :upload, :dependent => :destroy
   has_one :artist_commentary, :dependent => :destroy
-  has_one :pixiv_ugoira_frame_data, :class_name => "PixivUgoiraFrameData"
+  has_one :pixiv_ugoira_frame_data, :class_name => "PixivUgoiraFrameData", :dependent => :destroy
   has_many :flags, :class_name => "PostFlag", :dependent => :destroy
   has_many :appeals, :class_name => "PostAppeal", :dependent => :destroy
   has_many :versions, lambda {order("post_versions.updated_at ASC, post_versions.id ASC")}, :class_name => "PostVersion", :dependent => :destroy
