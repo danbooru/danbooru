@@ -13,7 +13,7 @@ class UploadsController < ApplicationController
         "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
       }
       Downloads::RewriteStrategies::Base.strategies.each do |strategy|
-        @normalized_url, headers = strategy.new.rewrite(@normalized_url, headers)
+        @normalized_url, headers = strategy.new(@normalized_url).rewrite(@normalized_url, headers)
       end
 
       @post = Post.find_by_source(@normalized_url)
