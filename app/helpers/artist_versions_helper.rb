@@ -3,13 +3,13 @@ module ArtistVersionsHelper
     diff = artist_version.other_names_diff(artist_version.previous)
     html = []
     diff[:added_names].each do |name|
-      html << '<ins>' + name + '</ins>'
+      html << '<ins>' + h(name) + '</ins>'
     end
     diff[:removed_names].each do |name|
-      html << '<del>' + name + '</del>'
+      html << '<del>' + h(name) + '</del>'
     end
     diff[:unchanged_names].each do |name|
-      html << '<span>' + name + '</span>'
+      html << '<span>' + h(name) + '</span>'
     end
     return html.join(" ").html_safe
   end
@@ -18,13 +18,13 @@ module ArtistVersionsHelper
     diff = artist_version.urls_diff(artist_version.previous)
     html = []
     diff[:added_urls].each do |url|
-      html << '<li><ins>' + url + '</ins></li>'
+      html << '<li><ins>' + h(url) + '</ins></li>'
     end
     diff[:removed_urls].each do |url|
-      html << '<li><del>' + url + '</del></li>'
+      html << '<li><del>' + h(url) + '</del></li>'
     end
     diff[:unchanged_urls].each do |url|
-      html << '<li><span>' + url + '</span></li>'
+      html << '<li><span>' + h(url) + '</span></li>'
     end
     return html.join(" ").html_safe
   end
