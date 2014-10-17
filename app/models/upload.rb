@@ -331,7 +331,15 @@ class Upload < ActiveRecord::Base
         "#{Rails.root}/public/data/preview/#{prefix}#{md5}.jpg"
 
       when Danbooru.config.large_image_width
-        "#{Rails.root}/public/data/sample/#{Danbooru.config.large_image_prefix}#{prefix}#{md5}.jpg"
+        "#{Rails.root}/public/data/sample/#{Danbooru.config.large_image_prefix}#{prefix}#{md5}.#{large_file_ext}"
+      end
+    end
+
+    def large_file_ext
+      if is_ugoira?
+        "webm"
+      else
+        "jpg"
       end
     end
 
