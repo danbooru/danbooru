@@ -29,7 +29,7 @@ module Downloads
 
     def before_download(url, headers, datums)
       RewriteStrategies::Base.strategies.each do |strategy|
-        url, headers, datums = strategy.new.rewrite(url, headers, datums)
+        url, headers, datums = strategy.new(url).rewrite(url, headers, datums)
       end
 
       return [url, headers, datums]

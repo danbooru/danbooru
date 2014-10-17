@@ -1,6 +1,10 @@
 module Downloads
   module RewriteStrategies
     class Base
+      def initialize(url = nil)
+        @url = url
+      end
+
       def self.strategies
         [Pixiv, NicoSeiga, Twitpic, DeviantArt, Tumblr, Moebooru]
       end
