@@ -3,6 +3,8 @@ class PixivUgoiraConverter
     folder = Zip::File.new(source_path)
     write_webm(folder, output_path, frame_data)
     write_preview(folder, preview_path)
+    RemoteFileManager.new(output_path).distribute
+    RemoteFileManager.new(preview_path).distribute
   end
 
   def write_webm(folder, write_path, frame_data)
@@ -38,7 +40,7 @@ class PixivUgoiraConverter
       ext = folder.first.name.match(/\.(\w{,4})$/)[1]
       system("ffmpeg -loglevel quiet -i #{tmpdir}/images/%06d.#{ext} -codec:v libvpx -crf 4 -b:v 5000k -an #{tmpdir}/tmp.webm")
       system("mkvmerge -q -o #{write_path} --webm --timecodes 0:#{tmpdir}/timecodes.tc #{tmpdir}/tmp.webm")
-    end      
+    end
   end
 
   def write_preview(folder, path)
