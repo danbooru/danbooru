@@ -10,7 +10,7 @@ class PixivUgoiraConverter
       FileUtils.mkdir_p("#{tmpdir}/images")
       folder.each_with_index do |file, i|
         path = File.join(tmpdir, "images", file.name)
-        image_blob = file.get_input_stream.read
+        image_blob = file.get_input_stream {|is| is.read}
         File.open(path, "wb") do |f|
           f.write(image_blob)
         end
@@ -46,7 +46,7 @@ class PixivUgoiraConverter
 
   def write_preview(folder, path)
     file = folder.first
-    image_blob = file.get_input_stream.read
+    image_blob = file.get_input_stream {|is| is.read}
     image = Magick::Image.from_blob(image_blob).first
     image.write(path)
   end
