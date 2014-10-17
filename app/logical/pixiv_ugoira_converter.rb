@@ -10,10 +10,7 @@ class PixivUgoiraConverter
       FileUtils.mkdir_p("#{tmpdir}/images")
       folder.each_with_index do |file, i|
         path = File.join(tmpdir, "images", file.name)
-        image_blob = file.get_input_stream {|is| is.read}
-        File.open(path, "wb") do |f|
-          f.write(image_blob)
-        end
+        file.extract(path)
       end
       
       # Duplicate last frame to avoid it being displayed only for a very short amount of time.
