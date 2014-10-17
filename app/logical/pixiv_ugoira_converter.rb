@@ -45,9 +45,11 @@ class PixivUgoiraConverter
   end
 
   def write_preview(folder, path)
-    file = folder.first
-    image_blob = file.get_input_stream {|is| is.read}
-    image = Magick::Image.from_blob(image_blob).first
-    image.write(path)
+    Dir.mktmpdir do |tmpdir|
+      file = folder.first
+      temp_path = File.join(tmpdir, file.name)
+      file.extract(temp_path)
+      Danbooru.resize(temp_path, path, Danbooru.config.small_image_width, Danbooru.config.small_image_width, 85)
+    end
   end
 end
