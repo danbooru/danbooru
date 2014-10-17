@@ -45,13 +45,15 @@ module Sources
         agent.get(URI.parse(normalized_url)) do |page|
           @artist_name, @profile_url = get_profile_from_page(page)
           @pixiv_moniker = get_moniker_from_page(page)
-          @image_url = get_image_url_from_page(page)
           @zip_url, @ugoira_frame_data, @ugoira_width, @ugoira_height, @ugoira_content_type = get_zip_url_from_page(page)
           @tags = get_tags_from_page(page)
           @page_count = get_page_count_from_page(page)
 
-          is_manga   = @page_count > 1
-          @image_url = get_image_url_from_page(page, is_manga)
+          is_manga = @page_count > 1
+
+          if !@zip_url
+            @image_url = get_image_url_from_page(page, is_manga)
+          end
         end
       end
 
