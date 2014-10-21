@@ -112,7 +112,7 @@ class Upload < ActiveRecord::Base
         post.distribute_files
         if post.save
           CurrentUser.increment!(:post_upload_count)
-          ugoira_service.process(post)
+          ugoira_service.process(post) if is_ugoira?
           update_attributes(:status => "completed", :post_id => post.id)
         else
           update_attribute(:status, "error: " + post.errors.full_messages.join(", "))
@@ -138,7 +138,17 @@ class Upload < ActiveRecord::Base
       update_attributes(:status => "error: #{x.class} - #{x.message}", :backtrace => x.backtrace.join("\n"))
       
     ensure
-      delete_temp_file
+      if async_conversion?
+        # need to delay this because we have to process the file
+        # before deleting it
+        delay(:queue => Socket.gethostname).delete_temp_file(temp_file_path) 
+      else
+        delete_temp_file
+      end
+    end
+
+    def async_conversion?
+      is_ugoira?
     end
 
     def ugoira_service
@@ -167,8 +177,8 @@ class Upload < ActiveRecord::Base
   end
 
   module FileMethods
-    def delete_temp_file
-      FileUtils.rm_f(temp_file_path)
+    def delete_temp_file(path = nil)
+      FileUtils.rm_f(path || temp_file_path)
     end
 
     def move_file

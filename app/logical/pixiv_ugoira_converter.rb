@@ -1,5 +1,5 @@
 class PixivUgoiraConverter
-  def convert(source_path, output_path, preview_path, frame_data)
+  def self.convert(source_path, output_path, preview_path, frame_data)
     folder = Zip::File.new(source_path)
     write_webm(folder, output_path, frame_data)
     write_preview(folder, preview_path)
@@ -7,7 +7,7 @@ class PixivUgoiraConverter
     RemoteFileManager.new(preview_path).distribute
   end
 
-  def write_webm(folder, write_path, frame_data)
+  def self.write_webm(folder, write_path, frame_data)
     Dir.mktmpdir do |tmpdir|
       FileUtils.mkdir_p("#{tmpdir}/images")
       folder.each_with_index do |file, i|
@@ -43,7 +43,7 @@ class PixivUgoiraConverter
     end
   end
 
-  def write_preview(folder, path)
+  def self.write_preview(folder, path)
     Dir.mktmpdir do |tmpdir|
       file = folder.first
       temp_path = File.join(tmpdir, file.name)

@@ -113,7 +113,7 @@ class UploadTest < ActiveSupport::TestCase
           end
           
           should "process successfully" do
-            VCR.use_cassette("ugoira-converter", :record => :new_episodes) do
+            VCR.use_cassette("ugoira-converter", :record => :none) do
               @upload.download_from_source(@output_file.path)
             end
             assert_operator(File.size(@output_file.path), :>, 1_000)
@@ -126,7 +126,7 @@ class UploadTest < ActiveSupport::TestCase
           @upload = FactoryGirl.create(:source_upload)
           path = "#{Rails.root}/tmp/test.download.jpg"
 
-          VCR.use_cassette("upload-test-file", :record => :once) do
+          VCR.use_cassette("upload-test-file", :record => :none) do
             assert_nothing_raised {@upload.download_from_source(path)}
             assert(File.exists?(path))
             assert_equal(8558, File.size(path))
@@ -200,7 +200,7 @@ class UploadTest < ActiveSupport::TestCase
       should "increment the uploaders post_upload_count" do
         @upload = FactoryGirl.create(:source_upload)
         assert_difference("CurrentUser.user.post_upload_count", 1) do
-          VCR.use_cassette("upload-test-file", :record => :once) do
+          VCR.use_cassette("upload-test-file", :record => :none) do
             @upload.process!
           end
 
@@ -215,7 +215,7 @@ class UploadTest < ActiveSupport::TestCase
           :tag_string => "hoge foo"
         )
         assert_difference("Post.count") do
-          VCR.use_cassette("upload-test-file", :record => :once) do
+          VCR.use_cassette("upload-test-file", :record => :none) do
             assert_nothing_raised {@upload.process!}
           end
         end
@@ -242,7 +242,7 @@ class UploadTest < ActiveSupport::TestCase
         :uploader_ip_addr => "127.0.0.1",
         :tag_string => "hoge foo"
       )
-      VCR.use_cassette("ugoira-converter", :record => :new_episodes) do
+      VCR.use_cassette("ugoira-converter", :record => :none) do
         assert_difference(["Post.count", "PixivUgoiraFrameData.count"]) do
           @upload.process!
         end

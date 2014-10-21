@@ -1,8 +1,12 @@
 class PixivWebAgent
+  def self.phpsessid(agent)
+    agent.cookies.select do |cookie| cookie.name == "PHPSESSID" end.first.try(:value)
+  end
+
   def self.build
     mech = Mechanize.new
-
     phpsessid = Cache.get("pixiv-phpsessid")
+
     if phpsessid
       cookie = Mechanize::Cookie.new("PHPSESSID", phpsessid)
       cookie.domain = ".pixiv.net"

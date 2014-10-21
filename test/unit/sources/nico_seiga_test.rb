@@ -6,12 +6,12 @@ module Sources
   class NicoSeigaTest < ActiveSupport::TestCase
     context "The source site for nico seiga" do
       setup do
-        VCR.use_cassette("source-nico-seiga-unit-test-1", :record => :new_episodes) do
+        VCR.use_cassette("source-nico-seiga-unit-test-1", :record => :none) do
           @site_1 = Sources::Site.new("http://lohas.nicoseiga.jp/priv/9a7b691a4696cd970e4e762fbb7c07c19b29f22b/1398877469/3329388")
           @site_1.get
         end
 
-        VCR.use_cassette("source-nico-seiga-unit-test-2", :record => :new_episodes) do
+        VCR.use_cassette("source-nico-seiga-unit-test-2", :record => :none) do
           @site_2 = Sources::Site.new("http://seiga.nicovideo.jp/seiga/im3324796")
           @site_2.get
         end
@@ -28,8 +28,8 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("http://lohas.nicoseiga.jp/priv/6d168c4fb6eb2f1d522606e961704bd0a9271961/1398887476/3329388", @site_1.image_url)
-        assert_equal("http://lohas.nicoseiga.jp/priv/eda0bab8cbab69d6aa884c28f1b1b45c61d88f30/1398887483/3324796", @site_2.image_url)
+        assert_equal("http://lohas.nicoseiga.jp/priv/63d3abda3e8c613f731869c3ba2c483564f8a2f3/1414023626/3329388", @site_1.image_url)
+        assert_equal("http://lohas.nicoseiga.jp/priv/19c9c6504fca0e199c4cfa651475be8b93ab9e59/1414023628/3324796", @site_2.image_url)
       end
 
       should "get the tags" do

@@ -21,7 +21,7 @@ class PixivUgoiraConverterTest < ActiveSupport::TestCase
     end
 
     should "output to webm" do
-      @converter = PixivUgoiraConverter.new
+      @converter = PixivUgoiraConverter
       @converter.convert(@zipped_body, @write_file.path, @preview_write_file.path, @frame_data)
       assert_operator(File.size(@write_file.path), :>, 1_000)
       assert_operator(File.size(@preview_write_file.path), :>, 0)

@@ -3,6 +3,7 @@ require 'test_helper'
 class AliasAndImplicationImporterTest < ActiveSupport::TestCase
   context "The alias and implication importer" do
     setup do
+      Delayed::Worker.delay_jobs = true
       @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"

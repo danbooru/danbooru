@@ -250,8 +250,7 @@ module Sources
 
       # Refer to http://danbooru.donmai.us/wiki_pages/58938 for documentation on the Pixiv API.
       def get_metadata_from_spapi!(illust_id)
-        phpsessid = agent.cookies.select do |cookie| cookie.name == "PHPSESSID" end.first.value
-        spapi_url = "http://spapi.pixiv.net/iphone/illust.php?illust_id=#{illust_id}&PHPSESSID=#{phpsessid}"
+        spapi_url = "http://spapi.pixiv.net/iphone/illust.php?illust_id=#{illust_id}&PHPSESSID=#{PixivWebAgent.phpsessid(agent)}"
 
         agent.get(spapi_url) do |response|
           metadata = CSV.parse(response.content.force_encoding("UTF-8")).first
@@ -296,31 +295,6 @@ module Sources
 
         else
           raise Sources::Error.new("Couldn't get illust ID from URL: #{url}")
-        end
-      end
-
-      def agent
-        @agent ||= begin
-          mech = Mechanize.new
-
-          phpsessid = Cache.get("pixiv-phpsessid")
-          if phpsessid
-            cookie = Mechanize::Cookie.new("PHPSESSID", phpsessid)
-            cookie.domain = ".pixiv.net"
-            cookie.path = "/"
-            mech.cookie_jar.add(cookie)
-          else
-            mech.get("http://www.pixiv.net") do |page|
-              page.form_with(:action => "/login.php") do |form|
-                form['pixiv_id'] = Danbooru.config.pixiv_login
-                form['pass'] = Danbooru.config.pixiv_password
-              end.click_button
-            end
-            phpsessid = mech.cookie_jar.cookies.select{|c| c.name == "PHPSESSID"}.first
-            Cache.put("pixiv-phpsessid", phpsessid.value, 1.month) if phpsessid
-          end
-
-          mech
         end
       end
     end

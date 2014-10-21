@@ -1,8 +1,6 @@
 ﻿# encoding: UTF-8
 
 module Sources
-  class Error < Exception ; end
-
   class Site
     attr_reader :url, :strategy
     delegate :get, :referer_url, :site_name, :artist_name, :profile_url, :image_url, :tags, :artist_record, :unique_id, :page_count, :file_url, :ugoira_frame_data, :ugoira_width, :ugoira_height, :to => :strategy
