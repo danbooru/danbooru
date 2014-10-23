@@ -149,7 +149,7 @@ class Upload < ActiveRecord::Base
     end
 
     def async_conversion?
-      has_ugoira_tag?
+      is_ugoira?
     end
 
     def ugoira_service
@@ -366,16 +366,12 @@ class Upload < ActiveRecord::Base
       source =~ /^https?:\/\// && file_path.blank?
     end
 
-    def has_ugoira_tag?
-      tag_string =~ /\bugoira\b/i
-    end
-
     # Downloads the file to destination_path
     def download_from_source(destination_path)
       self.file_path = destination_path
-      download = Downloads::File.new(source, destination_path, :is_ugoira => has_ugoira_tag?)
+      download = Downloads::File.new(source, destination_path)
       download.download!
-      ugoira_service.load(download.data) if has_ugoira_tag?
+      ugoira_service.load(download.data)
     end
   end
 

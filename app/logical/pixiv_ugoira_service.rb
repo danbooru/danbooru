@@ -19,9 +19,11 @@ class PixivUgoiraService
   end
 
   def load(data)
-    @frame_data = data[:ugoira_frame_data]
-    @width = data[:ugoira_width]
-    @height = data[:ugoira_height]
-    @content_type = data[:ugoira_content_type]
+    if data[:is_ugoira]
+      @frame_data = data[:ugoira_frame_data]
+      @width = data[:ugoira_width]
+      @height = data[:ugoira_height]
+      @content_type = data[:ugoira_content_type]
+    end
   end
 end

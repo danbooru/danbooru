@@ -14,7 +14,7 @@ module Downloads
       @file_path = file_path
 
       # we sometimes need to capture data from the source page
-      @data = {:is_ugoira => options[:is_ugoira]}
+      @data = {}
     end
 
     def download!
