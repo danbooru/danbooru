@@ -10,7 +10,8 @@ class PixivUgoiraService
   end
 
   def generate_resizes(source_path, output_path, preview_path)
-    PixivUgoiraConverter.delay(:queue => Socket.gethostname).convert(source_path, output_path, preview_path, @frame_data)
+    # Run this a bit in the future to give the upload process time to move the file
+    PixivUgoiraConverter.delay(:queue => Socket.gethostname, :run_at => 2.seconds.from_now).convert(source_path, output_path, preview_path, @frame_data)
 
     # since the resizes will be delayed, just touch the output file so the
     # file distribution wont break

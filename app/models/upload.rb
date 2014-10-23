@@ -241,7 +241,8 @@ class Upload < ActiveRecord::Base
       if is_image?
         Danbooru.resize(source_path, output_path, width, height, quality)
       elsif is_ugoira?
-        ugoira_service.generate_resizes(source_path, resized_file_path_for(Danbooru.config.large_image_width), resized_file_path_for(Danbooru.config.small_image_width))
+        # by the time this runs we'll have moved source_path to md5_file_path
+        ugoira_service.generate_resizes(md5_file_path, resized_file_path_for(Danbooru.config.large_image_width), resized_file_path_for(Danbooru.config.small_image_width))
       elsif is_video?
         generate_video_preview_for(width, height, output_path)
       end
@@ -374,7 +375,7 @@ class Upload < ActiveRecord::Base
       self.file_path = destination_path
       download = Downloads::File.new(source, destination_path, :is_ugoira => has_ugoira_tag?)
       download.download!
-      ugoira_service.load(download.data)
+      ugoira_service.load(download.data) if has_ugoira_tag?
     end
   end
 

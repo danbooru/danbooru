@@ -17,7 +17,7 @@ module Downloads
         end
 
         # http://i2.pixiv.net/img-zip-ugoira/img/2014/08/05/06/01/10/44524589_ugoira1920x1080.zip
-        if url =~ %r!\Ahttps?://i[12]\.pixiv\.net/img-zip-ugoira/img/\d{4}/\d{2}/\d{2}/\d{2}/\d{2}/\d{2}/\d+_ugoira\d+x\d+\.zip\z!i
+        if url =~ %r!\Ahttps?://i\d+\.pixiv\.net/img-zip-ugoira/img/\d{4}/\d{2}/\d{2}/\d{2}/\d{2}/\d{2}/\d+_ugoira\d+x\d+\.zip\z!i
           data[:ugoira_frame_data] = source.ugoira_frame_data
           data[:ugoira_width] = source.ugoira_width
           data[:ugoira_height] = source.ugoira_height
