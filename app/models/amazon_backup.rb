@@ -32,7 +32,7 @@ class AmazonBackup < ActiveRecord::Base
       end
 
       if File.exists?(post.large_file_path)
-        AWS::S3::S3Object.store("large/#{post.md5}.jpg", open(post.large_file_path, "rb"), Danbooru.config.amazon_s3_bucket_name)
+        AWS::S3::S3Object.store("large/#{post.md5}.#{post.large_file_ext}", open(post.large_file_path, "rb"), Danbooru.config.amazon_s3_bucket_name)
       end
 
       AmazonBackup.update_id(post.id)

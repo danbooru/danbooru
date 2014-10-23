@@ -22,7 +22,7 @@ article.post-preview {
     margin: auto;
   }
 
-  &[data-tags~=animated]:before, &[data-file-ext=swf]:before, &[data-file-ext=webm]:before {
+  &[data-tags~=animated]:before, &[data-file-ext=swf]:before, &[data-file-ext=webm]:before, &[data-file-ext=zip]:before {
     content: "►";
     position: absolute;
     width: 20px;
@@ -519,5 +519,16 @@ div#unapprove-dialog {
   textarea {
     font-size: 1em;
     width: 100%;
+  }
+}
+
+#ugoira-controls {
+  button {
+    height: 2em;
+    width: 5em;
+  }
+
+  #progressbar {
+    height: 1.5em;
   }
 }

@@ -5,6 +5,8 @@ require 'csv'
 module Sources
   module Strategies
     class Pixiv < Base
+      attr_reader :zip_url, :ugoira_frame_data, :ugoira_width, :ugoira_height, :ugoira_content_type
+      
       def self.url_match?(url)
         url =~ /^https?:\/\/(?:\w+\.)?pixiv\.net/
       end
@@ -43,11 +45,15 @@ module Sources
         agent.get(URI.parse(normalized_url)) do |page|
           @artist_name, @profile_url = get_profile_from_page(page)
           @pixiv_moniker = get_moniker_from_page(page)
+          @zip_url, @ugoira_frame_data, @ugoira_width, @ugoira_height, @ugoira_content_type = get_zip_url_from_page(page)
           @tags = get_tags_from_page(page)
           @page_count = get_page_count_from_page(page)
 
-          is_manga   = @page_count > 1
-          @image_url = get_image_url_from_page(page, is_manga)
+          is_manga = @page_count > 1
+
+          if !@zip_url
+            @image_url = get_image_url_from_page(page, is_manga)
+          end
         end
       end
 
@@ -57,6 +63,14 @@ module Sources
         return thumbnail_url
       end
 
+      def agent
+        @agent ||= PixivWebAgent.build
+      end
+
+      def file_url
+        image_url || zip_url
+      end
+      
     protected
 
       # http://i1.pixiv.net/c/600x600/img-master/img/2014/10/02/13/51/23/46304396_p1_master1200.jpg
@@ -166,6 +180,32 @@ module Sources
         end
       end
 
+      def get_zip_url_from_page(page)
+        scripts = page.search("body script").find_all do |node|
+          node.text =~ /_ugoira600x600\.zip/
+        end
+
+        if scripts.any?
+          javascript = scripts.first.text
+
+          json = javascript.match(/;pixiv\.context\.ugokuIllustData\s+=\s+(\{.+?\});(?:$|pixiv\.context)/)[1]
+          data = JSON.parse(json)
+          zip_url = data["src"].sub("_ugoira600x600.zip", "_ugoira1920x1080.zip")
+          frame_data = data["frames"]
+          content_type = data["mime_type"]
+
+          if javascript =~ /illustSize\s*=\s*\[\s*(\d+)\s*,\s*(\d+)\s*\]/
+            image_width = $1.to_i
+            image_height = $2.to_i
+          else
+            image_width = 600
+            image_height = 600
+          end
+
+          return [zip_url, frame_data, image_width, image_height, content_type]
+        end
+      end
+
       def get_tags_from_page(page)
         # puts page.root.to_xhtml
 
@@ -210,8 +250,7 @@ module Sources
 
       # Refer to http://danbooru.donmai.us/wiki_pages/58938 for documentation on the Pixiv API.
       def get_metadata_from_spapi!(illust_id)
-        phpsessid = agent.cookies.select do |cookie| cookie.name == "PHPSESSID" end.first.value
-        spapi_url = "http://spapi.pixiv.net/iphone/illust.php?illust_id=#{illust_id}&PHPSESSID=#{phpsessid}"
+        spapi_url = "http://spapi.pixiv.net/iphone/illust.php?illust_id=#{illust_id}&PHPSESSID=#{PixivWebAgent.phpsessid(agent)}"
 
         agent.get(spapi_url) do |response|
           metadata = CSV.parse(response.content.force_encoding("UTF-8")).first
@@ -256,31 +295,6 @@ module Sources
 
         else
           raise Sources::Error.new("Couldn't get illust ID from URL: #{url}")
-        end
-      end
-
-      def agent
-        @agent ||= begin
-          mech = Mechanize.new
-
-          phpsessid = Cache.get("pixiv-phpsessid")
-          if phpsessid
-            cookie = Mechanize::Cookie.new("PHPSESSID", phpsessid)
-            cookie.domain = ".pixiv.net"
-            cookie.path = "/"
-            mech.cookie_jar.add(cookie)
-          else
-            mech.get("http://www.pixiv.net") do |page|
-              page.form_with(:action => "/login.php") do |form|
-                form['pixiv_id'] = Danbooru.config.pixiv_login
-                form['pass'] = Danbooru.config.pixiv_password
-              end.click_button
-            end
-            phpsessid = mech.cookie_jar.cookies.select{|c| c.name == "PHPSESSID"}.first
-            Cache.put("pixiv-phpsessid", phpsessid.value, 1.month) if phpsessid
-          end
-
-          mech
         end
       end
     end

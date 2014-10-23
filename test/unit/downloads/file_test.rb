@@ -20,15 +20,14 @@ module Downloads
 
         should "retry three times" do
           assert_raises(Errno::ETIMEDOUT) do
-            @download.http_get_streaming {}
+            @download.http_get_streaming(@source) {}
           end
-          assert_equal(3, @download.tries)
         end
       end
 
       should "stream a file from an HTTP source" do
-        VCR.use_cassette("download-file-http", :record => :once) do
-          @download.http_get_streaming do |resp|
+        VCR.use_cassette("download-file-http", :record => :none) do
+          @download.http_get_streaming(@source) do |resp|
             assert_equal("200", resp.code)
             assert(resp["Content-Length"].to_i > 0, "File should be larger than 0 bytes")
           end
@@ -37,15 +36,15 @@ module Downloads
 
       should "throw an exception when the file is larger than the maximum" do
         assert_raise(Downloads::File::Error) do
-          VCR.use_cassette("download-file-http", :record => :once) do
-            @download.http_get_streaming(:max_size => 1) do |resp|
+          VCR.use_cassette("download-file-http", :record => :none) do
+            @download.http_get_streaming(@source, {}, :max_size => 1) do |resp|
             end
           end
         end
       end
 
       should "store the file in the tempfile path" do
-        VCR.use_cassette("download-file-http", :record => :once) do
+        VCR.use_cassette("download-file-http", :record => :none) do
           @download.download!
         end
 
@@ -75,8 +74,8 @@ module Downloads
       end
 
       should "stream a file from an HTTPS source" do
-        VCR.use_cassette("download-file-https", :record => :once) do
-          @download.http_get_streaming do |resp|
+        VCR.use_cassette("download-file-https", :record => :none) do
+          @download.http_get_streaming(@source) do |resp|
             assert_equal("200", resp.code)
             assert(resp["Content-Length"].to_i > 0, "File should be larger than 0 bytes")
           end

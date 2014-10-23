@@ -98,7 +98,7 @@ div#c-comments {
     }
 
     div.post-preview {
-      &[data-tags~=animated], &[data-file-ext=swf], &[data-file-ext=webm] {
+      &[data-tags~=animated], &[data-file-ext=swf], &[data-file-ext=webm], &[data-file-ext=zip] {
         div.preview {
           position: relative;
 
