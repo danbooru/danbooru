@@ -108,6 +108,7 @@ class Upload < ActiveRecord::Base
         end
         generate_resizes(file_path)
         move_file
+        save
         post = convert_to_post
         post.distribute_files
         if post.save
@@ -148,7 +149,7 @@ class Upload < ActiveRecord::Base
     end
 
     def async_conversion?
-      is_ugoira?
+      has_ugoira_tag?
     end
 
     def ugoira_service
