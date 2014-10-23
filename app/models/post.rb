@@ -437,12 +437,10 @@ class Post < ActiveRecord::Base
       decrement_tags = tag_array_was - tag_array
       increment_tags = tag_array - tag_array_was
       if increment_tags.any?
-        Tag.where(:name => increment_tags).update_all("post_count = post_count + 1")
-        Post.expire_cache_for_all(increment_tags)
+        Tag.delay(:queue => "default").increment_post_counts(increment_tags)
       end
       if decrement_tags.any?
-        Tag.where(:name => decrement_tags).update_all("post_count = post_count - 1")
-        Post.expire_cache_for_all(decrement_tags)
+        Tag.delay(:queue => "default").decrement_post_counts(decrement_tags)
       end
       Post.expire_cache_for_all([""]) if new_record? || id <= 100_000
     end

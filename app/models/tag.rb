@@ -47,6 +47,16 @@ class Tag < ActiveRecord::Base
           select("post_count").order("post_count DESC").first.post_count
         end
       end
+
+      def increment_post_counts(tag_names)
+        Tag.where(:name => tag_names).update_all("post_count = post_count + 1")
+        Post.expire_cache_for_all(tag_names)
+      end
+
+      def decrement_post_counts(tag_names)
+        Tag.where(:name => tag_names).update_all("post_count = post_count - 1")
+        Post.expire_cache_for_all(tag_names)
+      end
     end
 
     def real_post_count
