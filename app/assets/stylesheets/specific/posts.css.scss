@@ -183,6 +183,22 @@ a.blacklisted-active {
 }
 
 div#c-posts {
+
+  #ugoira-controls {
+    div#seek-slider {
+      margin-top: 0.5em;
+      float: right;
+    }
+
+    #save-video-link {
+      margin: 0.5em 0;
+    }
+
+    button {
+      margin-top: 0.3em;
+    }
+  }
+
   div.notice {
     font-size: 0.8em;
     padding: 0.5em;
@@ -519,20 +535,5 @@ div#unapprove-dialog {
   textarea {
     font-size: 1em;
     width: 100%;
-  }
-}
-
-#ugoira-controls {
-  button {
-    height: 2em;
-    width: 5em;
-  }
-
-  #progressbar {
-    height: 1.5em;
-  }
-
-  #seek-slider {
-    margin: 0.5em 0 0.5em 0;
   }
 }

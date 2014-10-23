@@ -1,28 +1,33 @@
-<%= content_tag(:canvas, nil,
-                :id => "image",
-                :width => post.image_width,
-                :height => post.image_height,
-                "data-original-width" => post.image_width,
-                "data-original-height" => post.image_height,
-                "data-large-width" => post.image_width,
-                "data-large-height" => post.image_height,
-                "data-tags" => post.tag_string,
-                "data-uploader" => post.uploader_name,
-                "data-rating" => post.rating,
-                "data-flags" => post.status_flags,
-                "data-parent-id" => post.parent_id,
-                "data-has-children" => post.has_children?,
-                "data-has-active-children" => post.has_active_children?,
-                "data-score" => post.score,
-                "data-fav-count" => post.fav_count) %>
+<%= content_tag(
+  :canvas, 
+  nil,
+  :id => "image",
+  :width => post.image_width,
+  :height => post.image_height,
+  "data-original-width" => post.image_width,
+  "data-original-height" => post.image_height,
+  "data-large-width" => post.image_width,
+  "data-large-height" => post.image_height,
+  "data-tags" => post.tag_string,
+  "data-uploader" => post.uploader_name,
+  "data-rating" => post.rating,
+  "data-flags" => post.status_flags,
+  "data-parent-id" => post.parent_id,
+  "data-has-children" => post.has_children?,
+  "data-has-active-children" => post.has_active_children?,
+  "data-score" => post.score,
+  "data-fav-count" => post.fav_count
+) %>
 
 <div id="ugoira-controls">
-  <div id="progressbar" style="width: <%= post.image_width %>px;"></div>
-  <div id="seek-slider" style="width: <%= post.image_width %>px;"></div>
-  <%= button_tag "Play", :id => "ugoira-play", :style => "display: none;" %>
-  <%= button_tag "Pause", :id => "ugoira-pause" %>  
-  <%= button_tag "Rewind", :id => "ugoira-rewind" %>
-  <%= link_to "Save as video (right click and save)", post.large_file_url %>
+  <p id="ugoira-load-progress">Loaded <span id="ugoira-load-percentage">0</span>%</p>
+  <div id="ugoira-control-panel" style="width: <%= @post.image_width %>px;">
+    <%= button_tag "Rewind", :id => "ugoira-rewind" %>
+    <%= button_tag "Play", :id => "ugoira-play", :style => "display: none;" %>
+    <%= button_tag "Pause", :id => "ugoira-pause" %>  
+    <div id="seek-slider" style="display: none; width: <%= @post.image_width - 150 %>px;"></div>
+  </div>
+  <p id="save-video-link"><%= link_to "Save as video (right click and save)", post.large_file_url %></p>
 </div>
 
 <% content_for(:html_header) do %>
@@ -52,11 +57,12 @@
     $(function() {
       Danbooru.Ugoira.create_player();
       $(Danbooru.Ugoira.player).on("loadProgress", function(ev, progress) {
-        $("#progressbar").progressbar({value: progress * 100});
+        $("#ugoira-load-percentage").val(progress * 100);
       });
       $(Danbooru.Ugoira.player).on("loadingStateChanged", function(ev, state) {
         if (state === 2) {
-          $("#progressbar").remove();
+          $("#ugoira-load-progress").remove();
+          $("#seek-slider").show();
         }
       });
 
