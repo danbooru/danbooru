@@ -562,12 +562,16 @@ class Post < ActiveRecord::Base
         tags << "huge_filesize"
       end
 
-      if file_ext == "swf"
+      if is_flash?
         tags << "flash"
       end
 
-      if file_ext == "webm"
+      if is_video?
         tags << "webm"
+      end
+
+      if is_ugoira?
+        tags << "ugoira"
       end
 
       return tags
