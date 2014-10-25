@@ -174,7 +174,7 @@ class PostQueryBuilder
         relation = relation.where("(posts.source = '' OR posts.source IS NULL)")
       elsif q[:source] == "http%"
         relation = relation.where("(lower(posts.source) like ?)", "http%")
-      elsif q[:source] =~ /^%\.?pixiv(?:\.net(?:\/img)?)?(?:%\/|(?=%$))(.+)$/i
+      elsif q[:source] =~ /^(?:https?:\/\/)?%\.?pixiv(?:\.net(?:\/img)?)?(?:%\/img\/|%\/|(?=%$))(.+)$/i
         relation = relation.where("SourcePattern(lower(posts.source)) LIKE lower(?) ESCAPE E'\\\\'", "pixiv/" + $1)
         has_constraints!
       else
@@ -188,7 +188,7 @@ class PostQueryBuilder
         relation = relation.where("(posts.source != '' AND posts.source IS NOT NULL)")
       elsif q[:source_neg] == "http%"
         relation = relation.where("(lower(posts.source) not like ?)", "http%")
-      elsif q[:source_neg] =~ /^%\.?pixiv(?:\.net(?:\/img)?)?(?:%\/|(?=%$))(.+)$/i
+      elsif q[:source_neg] =~ /^(?:https?:\/\/)?%\.?pixiv(?:\.net(?:\/img)?)?(?:%\/img\/|%\/|(?=%$))(.+)$/i
         relation = relation.where("SourcePattern(lower(posts.source)) NOT LIKE lower(?) ESCAPE E'\\\\'", "pixiv/" + $1)
         has_constraints!
       else

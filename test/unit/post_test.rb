@@ -1218,6 +1218,8 @@ class PostTest < ActiveSupport::TestCase
       post = FactoryGirl.create(:post, :source => url)
       assert_equal(1, Post.tag_match("source:*.pixiv.net/img*/artist-name/*").count)
       assert_equal(0, Post.tag_match("source:*.pixiv.net/img*/artist-fake/*").count)
+      assert_equal(1, Post.tag_match("source:http://*.pixiv.net/img*/img/artist-name/*").count)
+      assert_equal(0, Post.tag_match("source:http://*.pixiv.net/img*/img/artist-fake/*").count)
       assert_equal(1, Post.tag_match("source:pixiv/artist-name/*").count)
       assert_equal(0, Post.tag_match("source:pixiv/artist-fake/*").count)
     end
