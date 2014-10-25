@@ -1229,8 +1229,14 @@ class Post < ActiveRecord::Base
       list
     end
 
+    def associated_attributes
+      [ :pixiv_ugoira_frame_data ]
+    end
+
     def serializable_hash(options = {})
       options ||= {}
+      options[:include] ||= []
+      options[:include] += associated_attributes
       options[:except] ||= []
       options[:except] += hidden_attributes
       unless options[:builder]
