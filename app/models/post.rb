@@ -172,7 +172,7 @@ class Post < ActiveRecord::Base
     end
 
     def has_large
-      has_large?
+      !!has_large?
     end
 
     def large_image_width
