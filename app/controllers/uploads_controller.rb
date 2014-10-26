@@ -17,11 +17,7 @@ class UploadsController < ApplicationController
       end
 
       @post = Post.find_by_source(@normalized_url)
-
-      begin
-        @source = Sources::Site.new(params[:url])
-      rescue Exception
-      end
+      @source = Sources::Site.new(params[:url])
     end
     respond_with(@upload)
   end
