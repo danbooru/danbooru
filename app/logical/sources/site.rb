@@ -6,7 +6,7 @@ module Sources
     delegate :get, :referer_url, :site_name, :artist_name, :profile_url, :image_url, :tags, :artist_record, :unique_id, :page_count, :file_url, :ugoira_frame_data, :ugoira_width, :ugoira_height, :normalize_for_dupe_search, :to => :strategy
 
     def self.strategies
-      [Strategies::Pixiv, Strategies::NicoSeiga, Strategies::DeviantArt, Strategies::Nijie]
+      [Strategies::Pixiv, Strategies::NicoSeiga, Strategies::DeviantArt, Strategies::Nijie, Strategies::FC2]
     end
 
     def initialize(url)
