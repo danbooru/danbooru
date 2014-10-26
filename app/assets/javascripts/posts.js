@@ -360,11 +360,13 @@
           $img.data("scale_factor", ratio);
           $img.css("width", $img.data("original_width") * ratio);
           $img.css("height", $img.data("original_height") * ratio);
+          Danbooru.Post.resize_ugoira_controls();
         }
       } else {
         $img.data("scale_factor", 1);
         $img.width($img.data("original_width"));
         $img.height($img.data("original_height"));
+        Danbooru.Post.resize_ugoira_controls();
       }
 
       Danbooru.Note.Box.scale_all();
@@ -426,6 +428,12 @@
     $("#post-sections li:first-child").addClass("active");
     $("#notes").hide();
     $("#edit").hide();
+  }
+
+  Danbooru.Post.resize_ugoira_controls = function() {
+    var $img = $("#image");
+    $("#ugoira-control-panel").css("width", $img.width());
+    $("#seek-slider").css("width", $img.width() - 81);
   }
 
   Danbooru.Post.notice_update = function(x) {
