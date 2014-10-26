@@ -18,18 +18,15 @@ module Sources
           break
         end
       end
+
+      # Default to the base strategy if no other strategy was found.
+      @strategy ||= Sources::Strategies::Base.new(url)
     end
 
     def normalize_for_artist_finder!
-      if available?
-        begin
-          return strategy.normalize_for_artist_finder!
-        rescue Sources::Error
-          return url
-        end
-      else
-        return url
-      end
+      return strategy.normalize_for_artist_finder!
+    rescue Sources::Error
+      return url
     end
 
     def translated_tags
@@ -59,8 +56,9 @@ module Sources
       }.to_json
     end
 
+    # When a strategy is available, the upload form will fetch source data automatically.
     def available?
-      strategy.present?
+      !strategy.instance_of?(Sources::Strategies::Base)
     end
   end
 end
