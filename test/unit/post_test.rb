@@ -641,6 +641,42 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      context "with a .zip file extension" do
+        setup do
+          @post.file_ext = "zip"
+          @post.tag_string = ""
+          @post.save
+        end
+
+        should "have the appropriate file type tag added automatically" do
+          assert_match(/ugoira/, @post.tag_string)
+        end
+      end
+
+      context "with a .webm file extension" do
+        setup do
+          @post.file_ext = "webm"
+          @post.tag_string = ""
+          @post.save
+        end
+
+        should "have the appropriate file type tag added automatically" do
+          assert_match(/webm/, @post.tag_string)
+        end
+      end
+
+      context "with a .swf file extension" do
+        setup do
+          @post.file_ext = "swf"
+          @post.tag_string = ""
+          @post.save
+        end
+
+        should "have the appropriate file type tag added automatically" do
+          assert_match(/flash/, @post.tag_string)
+        end
+      end
+
       context "that has been updated" do
         should "create a new version if it's the first version" do
           assert_difference("PostVersion.count", 1) do
