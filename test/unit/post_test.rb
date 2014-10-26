@@ -1328,6 +1328,19 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(post3.id, relation.first.id)
     end
 
+    should "return posts for a filesize search" do
+      post = FactoryGirl.create(:post, :file_size => 1.megabyte)
+      assert_equal(1, Post.tag_match("filesize:1mb").count)
+      assert_equal(1, Post.tag_match("filesize:1000kb").count)
+      assert_equal(1, Post.tag_match("filesize:1048576b").count)
+    end
+
+    should "not perform fuzzy matching for an exact filesize search" do
+      post = FactoryGirl.create(:post, :file_size => 1.megabyte)
+      assert_equal(0, Post.tag_match("filesize:1048000b").count)
+      assert_equal(0, Post.tag_match("filesize:1048000").count)
+    end
+
     should "fail for more than 6 tags" do
       post1 = FactoryGirl.create(:post, :rating => "s")
 
