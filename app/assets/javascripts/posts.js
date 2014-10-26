@@ -358,8 +358,8 @@
         if ($img.width() > client_width) {
           var ratio = client_width / $img.width();
           $img.data("scale_factor", ratio);
-          $img.css("width", $img.width() * ratio);
-          $img.css("height", $img.height() * ratio);
+          $img.css("width", $img.data("original_width") * ratio);
+          $img.css("height", $img.data("original_height") * ratio);
         }
       } else {
         $img.data("scale_factor", 1);
