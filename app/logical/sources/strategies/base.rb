@@ -22,6 +22,16 @@ module Sources
         url
       end
 
+      # Subclasses should override this to return a string for a source: search
+      # that should find duplicate posts uploaded from URLs functionally
+      # equivalent to the given URL.
+      #
+      # Usually this just means replacing the parts of the URL that can vary
+      # with wildcards.
+      def normalize_for_dupe_search
+        url
+      end
+
       def site_name
         raise NotImplementedError
       end

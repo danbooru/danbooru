@@ -16,8 +16,10 @@ class UploadsController < ApplicationController
         @normalized_url, headers = strategy.new(@normalized_url).rewrite(@normalized_url, headers)
       end
 
-      @post = Post.find_by_source(@normalized_url)
       @source = Sources::Site.new(params[:url])
+      @post   = CurrentUser.without_safe_mode do
+        Post.tag_match("source:#{@source.normalize_for_dupe_search}").first
+      end
     end
     respond_with(@upload)
   end

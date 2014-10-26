@@ -41,6 +41,12 @@ module Sources
         "http://img.pixiv.net/img/#{username}"
       end
 
+      #    http://i4.pixiv.net/img-original/img/2014/10/18/16/52/44/40456235_p63.jpg
+      # => http://i*.pixiv.net/img-original/img/2014/10/18/16/52/44/40456235_p63.jpg
+      def normalize_for_dupe_search
+        url.sub(%r!\A(?:https?://)?i\d+\.pixiv\.net/!i, "http://i*.pixiv.net/")
+      end
+
       def get
         agent.get(URI.parse(normalized_url)) do |page|
           @artist_name, @profile_url = get_profile_from_page(page)
