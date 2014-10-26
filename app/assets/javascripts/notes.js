@@ -682,7 +682,7 @@ Danbooru.Note = {
 }
 
 $(function() {
-  if ($("#c-posts").length && $("#a-show").length && $("#image").length) {
+  if ($("#c-posts").length && $("#a-show").length && $("#image").length && !$("video#image").length) {
     if ($("#note-locked-notice").length == 0) {
       $("#translate").bind("click", Danbooru.Note.TranslationMode.toggle);
       $(document).bind("keypress", "n", Danbooru.Note.TranslationMode.toggle);
