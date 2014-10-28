@@ -87,6 +87,10 @@ div#c-users {
     max-width: 40em;
     font-size: 1.2em;
 
+    form.stripe {
+      display: inline;
+    }
+
     div#feature-comparison {
       overflow: hidden;
       margin-bottom: 1em;

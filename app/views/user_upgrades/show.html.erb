@@ -1,0 +1,22 @@
+<div id="c-users">
+  <div id="a-upgrade-result">
+    <% if flash[:disable] %>
+      <p>You can upgrade your account at <%= link_to "Safebooru", new_user_upgrade_path(:protocol => "https", :host => "safebooru.donmai.us", :only_path => false) %>.</p>
+    <% elsif flash[:success] %>
+      <h1>Congradulations!</h1>
+
+      <p>You are now a <%= CurrentUser.user.level_string %> level account. Thanks for supporting the site!</p>
+      <p><%= link_to "Return to posts", posts_path %> </p>
+    <% elsif flash[:error] %>
+      <h1>An error occurred!</h1>
+      <p><%= flash[:error] %></p>
+      <p><%= link_to "Try again", new_user_upgrade_path %></p>
+    <% end %>
+  </div>
+</div>
+
+<%= render "users/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Upgrade - <%= Danbooru.config.app_name %>
+<% end %>

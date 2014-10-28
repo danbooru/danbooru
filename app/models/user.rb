@@ -271,8 +271,8 @@ class User < ActiveRecord::Base
       end
     end
 
-    def promote_to!(new_level)
-      UserPromotion.new(self, CurrentUser.user, new_level).promote!
+    def promote_to!(new_level, options = {})
+      UserPromotion.new(self, CurrentUser.user, new_level, options).promote!
     end
 
     def promote_to_admin_if_first_user

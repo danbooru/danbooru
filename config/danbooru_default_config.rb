@@ -9,7 +9,11 @@ module Danbooru
 
     # The name of this Danbooru.
     def app_name
-      "Danbooru"
+      if CurrentUser.safe_mode?
+        "Safebooru"
+      else
+        "Danbooru"
+      end
     end
 
     # The hostname of the server.
@@ -321,6 +325,14 @@ module Danbooru
 
     def shared_dir_path
       "/var/www/danbooru2/shared"
+    end
+
+    def stripe_secret_key
+      "sk_test_kHviyCxbt9kBxeu46TeefJQH"
+    end
+
+    def stripe_publishable_key
+      "pk_test_5lKN65jYpUw8EActq8RMkQxH"
     end
   end
 end

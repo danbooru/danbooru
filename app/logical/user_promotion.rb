@@ -1,10 +1,11 @@
 class UserPromotion
-  attr_reader :user, :promoter, :new_level
+  attr_reader :user, :promoter, :new_level, :options
 
-  def initialize(user, promoter, new_level)
+  def initialize(user, promoter, new_level, options = {})
     @user = user
     @promoter = promoter
     @new_level = new_level
+    @options = options
   end
 
   def promote!
@@ -14,7 +15,7 @@ class UserPromotion
     user.inviter_id = promoter.id
 
     create_transaction_log_item
-    create_user_feedback
+    create_user_feedback unless options[:skip_feedback]
     create_dmail
 
     user.save

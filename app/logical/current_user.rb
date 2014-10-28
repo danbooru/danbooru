@@ -74,7 +74,7 @@ class CurrentUser
   end
 
   def self.set_safe_mode(req)
-    if req.host =~ /safe/
+    if req.host =~ /safe/ || req.params[:safe_mode]
       Thread.current[:safe_mode] = true
     else
       Thread.current[:safe_mode] = false
