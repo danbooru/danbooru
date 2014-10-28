@@ -22,10 +22,10 @@
 ) %>
 
 <div id="ugoira-controls">
-  <p id="ugoira-load-progress">Loaded <span id="ugoira-load-percentage">0</span>%</p>
   <div id="ugoira-control-panel" style="width: <%= @post.image_width %>px;">
     <%= button_tag "Play", :id => "ugoira-play", :style => "display: none;" %>
     <%= button_tag "Pause", :id => "ugoira-pause" %>
+    <p id="ugoira-load-progress">Loaded <span id="ugoira-load-percentage">0</span>%</p>
     <div id="seek-slider" style="display: none; width: <%= @post.image_width - 81 %>px;"></div>
   </div>
   <p id="save-video-link"><%= link_to "Save as video (right click and save)", post.large_file_url %></p>
