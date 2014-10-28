@@ -123,7 +123,7 @@ end
 namespace :delayed_job do
   desc "Start delayed_job process"
   task :start, :roles => :app do
-    run "cd #{current_path}; RAILS_ENV=#{rails_env} bundle exec ruby script/delayed_job --queues=default,`hostname` start"
+    run "cd #{current_path}; RAILS_ENV=#{rails_env} bundle exec ruby script/delayed_job --queues=default,`hostname` -n 2 start"
   end
 
   desc "Stop delayed_job process"
