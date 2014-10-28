@@ -152,6 +152,10 @@ class Post < ActiveRecord::Base
     def has_dimensions?
       image_width.present? && image_height.present?
     end
+
+    def has_ugoira_webm?
+      created_at < 1.minute.ago || File.exists?(preview_file_path) 
+    end
   end
 
   module ImageMethods

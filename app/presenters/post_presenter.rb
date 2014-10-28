@@ -10,6 +10,11 @@ class PostPresenter < Presenter
       return ""
     end
 
+    if post.is_ugoira? && !post.has_ugoira_webm?
+      # ugoira preview gen is async so dont render it immediately
+      return ""
+    end
+
     path = options[:path_prefix] || "/posts"
 
     html =  %{<article id="post_#{post.id}" class="#{preview_class(post, options[:pool])}" #{data_attributes(post)}>}

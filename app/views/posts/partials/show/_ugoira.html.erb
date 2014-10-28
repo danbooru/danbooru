@@ -28,7 +28,13 @@
     <p id="ugoira-load-progress">Loaded <span id="ugoira-load-percentage">0</span>%</p>
     <div id="seek-slider" style="display: none; width: <%= @post.image_width - 81 %>px;"></div>
   </div>
-  <p id="save-video-link"><%= link_to "Save as video (right click and save)", post.large_file_url %></p>
+  <p id="save-video-link">
+    <% if post.has_ugoira_webm? %>
+      <%= link_to "Save as video (right click and save)", post.large_file_url %>
+    <% else %>
+      WebM conversion pending
+    <% end %>
+  </p>
 </div>
 
 <% content_for(:html_header) do %>
