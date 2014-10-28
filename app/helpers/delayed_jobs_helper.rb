@@ -34,6 +34,9 @@ module DelayedJobsHelper
     when "Post#update_iqdb"
       "<strong>update iqdb</strong>"
 
+    when "Class#convert"
+      "<strong>convert ugoira</strong>"
+
     else
       h(job.name)
     end
@@ -70,6 +73,9 @@ module DelayedJobsHelper
 
     when "Post#update_iqdb"
       h(job.payload_object.id)
+
+    when "Class#convert"
+      h(job.payload_object.args[0])
 
     else
       h(job.handler)
