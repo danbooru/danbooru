@@ -1,7 +1,7 @@
 class TagImplication < ActiveRecord::Base
   before_save :update_descendant_names
-  after_save :update_descendant_names_for_parent
-  after_destroy :update_descendant_names_for_parent
+  after_save :update_descendant_names_for_parents
+  after_destroy :update_descendant_names_for_parents
   belongs_to :creator, :class_name => "User"
   before_validation :initialize_creator, :on => :create
   before_validation :normalize_names
@@ -50,12 +50,10 @@ class TagImplication < ActiveRecord::Base
       update_column(:descendant_names, descendant_names)
     end
 
-    def update_descendant_names_for_parent
-      p = parent
-
-      while p
-        p.update_descendant_names!
-        p = p.parent
+    def update_descendant_names_for_parents
+      parents.each do |parent|
+        parent.update_descendant_names!
+        parent.update_descendant_names_for_parents
       end
     end
 
@@ -65,12 +63,12 @@ class TagImplication < ActiveRecord::Base
   end
 
   module ParentMethods
-    def parent
-      @parent ||= self.class.where(["consequent_name = ?", antecedent_name]).first
+    def parents
+      @parents ||= self.class.where(["consequent_name = ?", antecedent_name])
     end
 
-    def clear_parent_cache
-      @parent = nil
+    def clear_parents_cache
+      @parents = nil
     end
   end
 
@@ -128,7 +126,7 @@ class TagImplication < ActiveRecord::Base
     update_column(:status, "processing")
     update_posts
     update_column(:status, "active")
-    update_descendant_names_for_parent
+    update_descendant_names_for_parents
   rescue Exception => e
     update_column(:status, "error: #{e}")
   end
@@ -201,7 +199,7 @@ class TagImplication < ActiveRecord::Base
 
   def reload(options = {})
     super
-    clear_parent_cache
+    clear_parents_cache
     clear_descendants_cache
   end
 

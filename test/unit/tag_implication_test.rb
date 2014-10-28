@@ -67,6 +67,8 @@ class TagImplicationTest < ActiveSupport::TestCase
     should "update its descendants on save" do
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       ti2 = FactoryGirl.create(:tag_implication, :antecedent_name => "ccc", :consequent_name => "ddd")
+      ti1.reload
+      ti2.reload
       ti2.update_attributes(
         :antecedent_name => "bbb"
       )
@@ -76,18 +78,29 @@ class TagImplicationTest < ActiveSupport::TestCase
       assert_equal("ddd", ti2.descendant_names)
     end
 
-    should "update the descendants for its parent on destroy" do
+    should "update the descendants for all of its parents on destroy" do
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
-      ti2 = FactoryGirl.create(:tag_implication, :antecedent_name => "bbb", :consequent_name => "ccc")
-      ti3 = FactoryGirl.create(:tag_implication, :antecedent_name => "ccc", :consequent_name => "ddd")
-      ti2.destroy
+      ti2 = FactoryGirl.create(:tag_implication, :antecedent_name => "xxx", :consequent_name => "bbb")
+      ti3 = FactoryGirl.create(:tag_implication, :antecedent_name => "bbb", :consequent_name => "ccc")
+      ti4 = FactoryGirl.create(:tag_implication, :antecedent_name => "ccc", :consequent_name => "ddd")
       ti1.reload
+      ti2.reload
       ti3.reload
+      ti4.reload
+      assert_equal("bbb ccc ddd", ti1.descendant_names)
+      assert_equal("bbb ccc ddd", ti2.descendant_names)
+      assert_equal("ccc ddd", ti3.descendant_names)
+      assert_equal("ddd", ti4.descendant_names)
+      ti3.destroy
+      ti1.reload
+      ti2.reload
+      ti4.reload
       assert_equal("bbb", ti1.descendant_names)
-      assert_equal("ddd", ti3.descendant_names)
+      assert_equal("bbb", ti2.descendant_names)
+      assert_equal("ddd", ti4.descendant_names)
     end
 
-    should "update the descendants for its parent on create" do
+    should "update the descendants for all of its parents on create" do
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       ti1.reload
       assert_equal("active", ti1.status)
@@ -117,6 +130,18 @@ class TagImplicationTest < ActiveSupport::TestCase
       assert_equal("ccc ddd eee", ti2.descendant_names)
       assert_equal("ddd", ti3.descendant_names)
       assert_equal("eee", ti4.descendant_names)
+
+      ti5 = FactoryGirl.create(:tag_implication, :antecedent_name => "xxx", :consequent_name => "bbb")
+      ti1.reload
+      ti2.reload
+      ti3.reload
+      ti4.reload
+      ti5.reload
+      assert_equal("bbb ccc ddd eee", ti1.descendant_names)
+      assert_equal("ccc ddd eee", ti2.descendant_names)
+      assert_equal("ddd", ti3.descendant_names)
+      assert_equal("eee", ti4.descendant_names)
+      assert_equal("bbb ccc ddd eee", ti5.descendant_names)
     end
 
     should "update any affected post upon save" do
