@@ -2368,7 +2368,8 @@ CREATE TABLE pixiv_ugoira_frame_data (
     id integer NOT NULL,
     post_id integer,
     data text NOT NULL,
-    content_type character varying(255) NOT NULL
+    content_type character varying(255) NOT NULL,
+    console_log text
 );
 
 
@@ -7111,4 +7112,6 @@ INSERT INTO schema_migrations (version) VALUES ('20140725003232');
 INSERT INTO schema_migrations (version) VALUES ('20141009231234');
 
 INSERT INTO schema_migrations (version) VALUES ('20141017231608');
+
+INSERT INTO schema_migrations (version) VALUES ('20141028202032');
 
