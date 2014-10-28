@@ -1,5 +1,5 @@
 <%= content_tag(
-  :canvas, 
+  :canvas,
   nil,
   :id => "image",
   :width => post.image_width,
@@ -25,7 +25,7 @@
   <p id="ugoira-load-progress">Loaded <span id="ugoira-load-percentage">0</span>%</p>
   <div id="ugoira-control-panel" style="width: <%= @post.image_width %>px;">
     <%= button_tag "Play", :id => "ugoira-play", :style => "display: none;" %>
-    <%= button_tag "Pause", :id => "ugoira-pause" %>  
+    <%= button_tag "Pause", :id => "ugoira-pause" %>
     <div id="seek-slider" style="display: none; width: <%= @post.image_width - 81 %>px;"></div>
   </div>
   <p id="save-video-link"><%= link_to "Save as video (right click and save)", post.large_file_url %></p>
@@ -58,7 +58,7 @@
     $(function() {
       Danbooru.Ugoira.create_player();
       $(Danbooru.Ugoira.player).on("loadProgress", function(ev, progress) {
-        $("#ugoira-load-percentage").val(progress * 100);
+        $("#ugoira-load-percentage").text(Math.floor(progress * 100));
       });
       $(Danbooru.Ugoira.player).on("loadingStateChanged", function(ev, state) {
         if (state === 2) {
