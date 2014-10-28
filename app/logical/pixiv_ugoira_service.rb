@@ -1,6 +1,17 @@
 class PixivUgoiraService
   attr_reader :width, :height, :frame_data, :content_type
 
+  def self.regen(post)
+    service = new()
+    service.load(
+      :is_ugoira => true,
+      :ugoira_width => post.image_width,
+      :ugoira_height => post.image_height,
+      :ugoira_frame_data => post.pixiv_ugoira_frame_data.data
+    )
+    service.generate_resizes(post.file_path, post.large_file_path, post.preview_file_path, false)
+  end
+
   def process(post)
     save_frame_data(post)
   end
@@ -9,9 +20,13 @@ class PixivUgoiraService
     PixivUgoiraFrameData.create(:data => @frame_data, :content_type => @content_type, :post_id => post.id)
   end
 
-  def generate_resizes(source_path, output_path, preview_path)
+  def generate_resizes(source_path, output_path, preview_path, delay = true)
     # Run this a bit in the future to give the upload process time to move the file
-    PixivUgoiraConverter.delay(:queue => Socket.gethostname, :run_at => 2.seconds.from_now).convert(source_path, output_path, preview_path, @frame_data)
+    if delay
+      PixivUgoiraConverter.delay(:queue => Socket.gethostname, :run_at => 2.seconds.from_now).convert(source_path, output_path, preview_path, @frame_data)
+    else
+      PixivUgoiraConverter.convert(source_path, output_path, preview_path, @frame_data)
+    end
 
     # since the resizes will be delayed, just touch the output file so the
     # file distribution wont break
