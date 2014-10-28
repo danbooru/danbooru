@@ -37,6 +37,12 @@ module DelayedJobsHelper
     when "Class#convert"
       "<strong>convert ugoira</strong>"
 
+    when "Class#increment_post_counts"
+      "<strong>increment post counts</strong>"
+
+    when "Class#decrement_post_counts"
+      "<strong>decrement post counts</strong>"
+
     else
       h(job.name)
     end
@@ -76,6 +82,12 @@ module DelayedJobsHelper
 
     when "Class#convert"
       h(job.payload_object.args[0])
+
+    when "Class#increment_post_counts"
+      h(job.payload_object.args.join(" "))
+
+    when "Class#decrement_post_counts"
+      h(job.payload_object.args.join(" "))
 
     else
       h(job.handler)
