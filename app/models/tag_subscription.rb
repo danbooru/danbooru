@@ -164,7 +164,7 @@ class TagSubscription < ActiveRecord::Base
   def self.process_all
     find_each do |tag_subscription|
       if tag_subscription.is_active?
-        TagSubscription.delay(:queue => "default").process(tag_subscription.id)
+        TagSubscription.delay(:queue => "default", :priority => 10).process(tag_subscription.id)
       end
     end
   end
