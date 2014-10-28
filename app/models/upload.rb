@@ -139,13 +139,7 @@ class Upload < ActiveRecord::Base
       update_attributes(:status => "error: #{x.class} - #{x.message}", :backtrace => x.backtrace.join("\n"))
       
     ensure
-      if async_conversion?
-        # need to delay this because we have to process the file
-        # before deleting it
-        delay(:queue => Socket.gethostname).delete_temp_file(temp_file_path) 
-      else
-        delete_temp_file
-      end
+      delete_temp_file
     end
 
     def async_conversion?
