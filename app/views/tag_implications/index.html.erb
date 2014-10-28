@@ -31,7 +31,7 @@
             <td>
               <%= link_to "Show", tag_implication_path(tag_implication) %>
 
-              <% if tag_implication.editable_by?(CurrentUser.user) %>
+              <% if tag_implication.is_pending? && tag_implication.editable_by?(CurrentUser.user) %>
                 | <%= link_to "Edit", edit_tag_implication_path(tag_implication) %>
               <% end %>
 
