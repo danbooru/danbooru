@@ -5,15 +5,9 @@ class PixivUgoiraService
     service = new()
     service.load(
       :is_ugoira => true,
-      :ugoira_width => post.image_width,
-      :ugoira_height => post.image_height,
       :ugoira_frame_data => post.pixiv_ugoira_frame_data.data
     )
     service.generate_resizes(post.file_path, post.large_file_path, post.preview_file_path, false)
-  end
-
-  def process(post)
-    save_frame_data(post)
   end
 
   def save_frame_data(post)
@@ -33,11 +27,24 @@ class PixivUgoiraService
     FileUtils.touch([output_path, preview_path])
   end
 
+  def calculate_dimensions(source_path)
+    folder = Zip::File.new(source_path)
+    tempfile = Tempfile.new("ugoira-dimensions")
+
+    begin
+      folder.first.extract(tempfile.path) {true}
+      image_size = ImageSpec.new(tempfile.path)
+      @width = image_size.width
+      @height = image_size.height
+    ensure
+      tempfile.close
+      tempfile.unlink
+    end
+  end
+
   def load(data)
     if data[:is_ugoira]
       @frame_data = data[:ugoira_frame_data]
-      @width = data[:ugoira_width]
-      @height = data[:ugoira_height]
       @content_type = data[:ugoira_content_type]
     end
   end

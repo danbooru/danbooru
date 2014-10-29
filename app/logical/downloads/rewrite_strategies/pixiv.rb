@@ -20,8 +20,6 @@ module Downloads
         if url =~ %r!\Ahttps?://i\d+\.pixiv\.net/img-zip-ugoira/img/\d{4}/\d{2}/\d{2}/\d{2}/\d{2}/\d{2}/\d+_ugoira\d+x\d+\.zip\z!i
           data[:is_ugoira] = true
           data[:ugoira_frame_data] = source.ugoira_frame_data
-          data[:ugoira_width] = source.ugoira_width
-          data[:ugoira_height] = source.ugoira_height
           data[:ugoira_content_type] = source.ugoira_content_type
         end
 

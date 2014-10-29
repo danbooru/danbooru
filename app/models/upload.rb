@@ -113,7 +113,7 @@ class Upload < ActiveRecord::Base
         post.distribute_files
         if post.save
           CurrentUser.increment!(:post_upload_count)
-          ugoira_service.process(post) if is_ugoira?
+          ugoira_service.save_frame_data(post) if is_ugoira?
           update_attributes(:status => "completed", :post_id => post.id)
         else
           update_attribute(:status, "error: " + post.errors.full_messages.join(", "))
@@ -250,6 +250,7 @@ class Upload < ActiveRecord::Base
         self.image_width = video.width
         self.image_height = video.height
       elsif is_ugoira?
+        ugoira_service.calculate_dimensions(file_path)
         self.image_width = ugoira_service.width
         self.image_height = ugoira_service.height
       else
@@ -418,6 +419,10 @@ class Upload < ActiveRecord::Base
       self.uploader_id = CurrentUser.user.id
       self.uploader_ip_addr = CurrentUser.ip_addr
     end
+
+    def uploader_name
+      User.id_to_name(uploader_id)
+    end
   end
 
   module VideoMethods
@@ -490,10 +495,6 @@ class Upload < ActiveRecord::Base
   include VideoMethods
   extend SearchMethods
   include ApiMethods
-
-  def uploader_name
-    User.id_to_name(uploader_id)
-  end
 
   def presenter
     @presenter ||= UploadPresenter.new(self)

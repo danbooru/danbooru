@@ -5,7 +5,7 @@ require 'csv'
 module Sources
   module Strategies
     class Pixiv < Base
-      attr_reader :zip_url, :ugoira_frame_data, :ugoira_width, :ugoira_height, :ugoira_content_type
+      attr_reader :zip_url, :ugoira_frame_data, :ugoira_content_type
       
       def self.url_match?(url)
         url =~ /^https?:\/\/(?:\w+\.)?pixiv\.net/
@@ -45,7 +45,7 @@ module Sources
         agent.get(URI.parse(normalized_url)) do |page|
           @artist_name, @profile_url = get_profile_from_page(page)
           @pixiv_moniker = get_moniker_from_page(page)
-          @zip_url, @ugoira_frame_data, @ugoira_width, @ugoira_height, @ugoira_content_type = get_zip_url_from_page(page)
+          @zip_url, @ugoira_frame_data, @ugoira_content_type = get_zip_url_from_page(page)
           @tags = get_tags_from_page(page)
           @page_count = get_page_count_from_page(page)
 
@@ -194,15 +194,7 @@ module Sources
           frame_data = data["frames"]
           content_type = data["mime_type"]
 
-          if javascript =~ /illustSize\s*=\s*\[\s*(\d+)\s*,\s*(\d+)\s*\]/
-            image_width = $1.to_i
-            image_height = $2.to_i
-          else
-            image_width = 600
-            image_height = 600
-          end
-
-          return [zip_url, frame_data, image_width, image_height, content_type]
+          return [zip_url, frame_data, content_type]
         end
       end
 

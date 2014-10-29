@@ -34,11 +34,6 @@ module Sources
         should "capture the frame data" do
           assert_equal([{"file"=>"000000.jpg", "delay"=>200}, {"file"=>"000001.jpg", "delay"=>200}, {"file"=>"000002.jpg", "delay"=>200}, {"file"=>"000003.jpg", "delay"=>200}, {"file"=>"000004.jpg", "delay"=>250}], @site.ugoira_frame_data)
         end
-
-        should "capture the image dimensions" do
-          assert_equal(60, @site.ugoira_width)
-          assert_equal(60, @site.ugoira_height)
-        end
       end
 
       context "fetching source data for a new manga image" do
