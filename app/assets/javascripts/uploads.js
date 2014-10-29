@@ -70,20 +70,22 @@
   }
 
   Danbooru.Upload.fill_source_info = function(data) {
-    var tag_html = "";
+    $("#source-tags").empty();
     $.each(data.tags, function(i, v) {
-      tag_html += ('<a href="' + v[1] + '">' + v[0] + '</a> ');
+      $("<a>").attr("href", v[1]).text(v[0]).appendTo("#source-tags");
     });
 
-    $("#source-artist").html('<a href="' + data.profile_url + '">' + data.artist_name + '</a>');
-    $("#source-tags").html(tag_html);
+    $("#source-artist").html($("<a>").attr("href", data.profile_url).text(data.artist_name));
 
     Danbooru.RelatedTag.translated_tags = data.translated_tags;
     Danbooru.RelatedTag.build_all();
 
-    var new_artist_link = '<a target="_blank" href="/artists/new?other_names=' + data.artist_name + '&urls=' + encodeURIComponent(data.profile_url + '\n' + data.image_url) + '">new</a>';
+    var new_artist_href = "/artists/new?other_names="
+                        + encodeURIComponent(data.artist_name)
+                        + "&urls="
+                        + encodeURIComponent([data.profile_url, data.image_url].join("\n"));
 
-    $("#source-record").html(new_artist_link);
+    $("#source-record").html($("<a>").attr("href", new_artist_href).text("Create New"));
 
     if (data.page_count > 1) {
       $("#gallery-warning").show();
