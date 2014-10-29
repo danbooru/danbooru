@@ -1,6 +1,21 @@
 require 'test_helper'
 
 class UploadsControllerTest < ActionController::TestCase
+  def assert_duplicate_found(expected_source, test_source)
+    get :new, { :url => test_source }, { :user_id => @user.id }
+
+    assert_response :success
+    assert_not_nil(assigns(:post))
+    assert_equal(expected_source, assigns(:post).source)
+  end
+
+  def assert_duplicate_not_found(test_source)
+    get :new, { :url => test_source }, { :user_id => @user.id }
+
+    assert_response :success
+    assert_nil(assigns(:post))
+  end
+
   context "The uploads controller" do
     setup do
       @user = FactoryGirl.create(:contributor_user)
@@ -21,13 +36,58 @@ class UploadsControllerTest < ActionController::TestCase
 
       context "for a post that has already been uploaded" do
         setup do
-          @post = FactoryGirl.create(:post, :source => "aaa")
+          @dupe1 = "http://site1.com"
+          @dupe2 = "http://site2.com"
+
+          FactoryGirl.create(:post, :source => @dupe1)
+          FactoryGirl.create(:post, :source => @dupe2)
         end
 
-        should "initialize the post" do
-          get :new, {:url => "aaa"}, {:user_id => @user.id}
-          assert_response :success
-          assert_not_nil(assigns(:post))
+        should "find the post" do
+          assert_duplicate_found(@dupe1, "http://site1.com")
+          assert_duplicate_found(@dupe2, "http://site2.com")
+          assert_duplicate_not_found("http://site3.com")
+        end
+      end
+
+      context "for a Pixiv post that has already been uploaded" do
+        setup do
+          @dupe1 = "http://i2.pixiv.net/img-original/img/2014/10/18/16/52/44/40456235_p63.jpg"
+          @dupe2 = "http://i3.pixiv.net/img-original/img/2014/10/18/16/52/44/40456235_p0.jpg"
+
+          FactoryGirl.create(:post, :source => @dupe1)
+          FactoryGirl.create(:post, :source => @dupe2)
+        end
+
+        should "find the duplicate post" do
+          VCR.use_cassette("upload-pixiv-dupes", :record => :none) do
+            assert_duplicate_found(@dupe1, "http://i4.pixiv.net/img-original/img/2014/10/18/16/52/44/40456235_p63.jpg")
+            assert_duplicate_found(@dupe2, "http://i1.pixiv.net/img-original/img/2014/10/18/16/52/44/40456235_p0.jpg")
+          end
+        end
+      end
+
+      context "for a FC2 post that has already been uploaded" do
+        setup do
+          @dupe1 = "http://newrp.blog34.fc2.com/img/fc2blog_20140718045830c1a.jpg/"
+          @dupe2 = "http://blog-imgs-58-origin.fc2.com/t/e/n/tenchisouha/ratifa01.jpg"
+
+          FactoryGirl.create(:post, :source => @dupe1)
+          FactoryGirl.create(:post, :source => @dupe2)
+        end
+
+        should "find the duplicate post" do
+          assert_duplicate_found(@dupe1, "http://newrp.blog123.fc2.com/img/fc2blog_20140718045830c1a.jpg/")
+          assert_duplicate_found(@dupe1, "http://newrp.blog.fc2.com/img/fc2blog_20140718045830c1a.jpg/")
+
+          assert_duplicate_found(@dupe2, "http://blog-imgs-58.fc2.com/t/e/n/tenchisouha/ratifa01.jpg")
+          assert_duplicate_found(@dupe2, "http://blog-imgs-58-origin.fc2.com/t/e/n/tenchisouha/ratifa01.jpg")
+
+          assert_duplicate_not_found("http://blog.fc2.com/m/mueyama/file/20060911-640.jpg")
+          assert_duplicate_not_found("http://blog-imgs-63.fc2.com/p/u/c/pucco2/2032gou(2).jpg")
+          assert_duplicate_not_found("http://flanvia.blog.fc2.com/img/20140306184507199.png/")
+          assert_duplicate_not_found("http://diary1.fc2.com/user/hitorigoto3/img/2011_9/25.jpg")
+          assert_duplicate_not_found("http://diary.fc2.com/cgi-sys/ed.cgi/kazuharoom?Y=2014&M=10&D=26")
         end
       end
     end
