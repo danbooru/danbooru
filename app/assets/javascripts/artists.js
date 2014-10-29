@@ -55,11 +55,18 @@
       }
 
       $.get("/artists.json?name=" + artist_name,
-        function(data) {
-          if (data.length) {
-            $("#check-name-result").html("Taken");
+        function(artists) {
+          $("check-name-result").empty();
+
+          if (artists.length) {
+            $("#check-name-result").text("Taken: ");
+
+            $.map(artists.slice(0, 5), function (artist) {
+              var link = $("<a>").attr("href", "/artists/" + artist.id).text(artist.name);
+              $("#check-name-result").append(link);
+            });
           } else {
-            $("#check-name-result").html("OK");
+            $("#check-name-result").text("OK");
           }
         }
       );
