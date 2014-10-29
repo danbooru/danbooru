@@ -91,7 +91,7 @@ class Upload < ActiveRecord::Base
       CurrentUser.scoped(uploader, uploader_ip_addr) do
         update_attribute(:status, "processing")
         if is_downloadable?
-          download_from_source(temp_file_path)
+          self.source = download_from_source(temp_file_path)
         end
         validate_file_exists
         self.content_type = file_header_to_content_type(file_path)
@@ -366,6 +366,7 @@ class Upload < ActiveRecord::Base
       download = Downloads::File.new(source, destination_path)
       download.download!
       ugoira_service.load(download.data)
+      download.source
     end
   end
 
