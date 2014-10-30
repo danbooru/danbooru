@@ -85,19 +85,19 @@ a.blacklisted-active {
   }
 
 
-  &.post-status-pending img {
+  &.post-status-pending:not(.mod-queue-preview) img {
     border-color: $preview_pending_color;
   }
 
-  &.post-status-has-children.post-status-pending img {
+  &.post-status-has-children.post-status-pending:not(.mod-queue-preview) img {
     border-color: $preview_has_children_color $preview_pending_color $preview_pending_color $preview_has_children_color;
   }
 
-  &.post-status-has-parent.post-status-pending img {
+  &.post-status-has-parent.post-status-pending:not(.mod-queue-preview) img {
     border-color: $preview_has_parent_color $preview_pending_color $preview_pending_color $preview_has_parent_color;
   }
 
-  &.post-status-has-children.post-status-has-parent.post-status-pending img {
+  &.post-status-has-children.post-status-has-parent.post-status-pending:not(.mod-queue-preview) img {
     border-color: $preview_has_children_color $preview_pending_color $preview_pending_color $preview_has_parent_color;
   }
 
