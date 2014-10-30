@@ -1421,6 +1421,8 @@ class Post < ActiveRecord::Base
         self.pixiv_id = $1
       elsif source =~ /pixiv\.net/ && source =~ /illust_id=(\d+)/
         self.pixiv_id = $1
+      elsif source =~ %r!http://i\d\.pixiv\.net/img-zip-ugoira/img/(?:\d+\/)+(\d+)_ugoira!
+        self.pixiv_id = $1
       else
         self.pixiv_id = nil
       end
