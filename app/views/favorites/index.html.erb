@@ -3,15 +3,21 @@
     <aside id="sidebar">
       <%= render "posts/partials/common/search", :path => favorites_path, :tags => @favorite_set.tag_string %>
 
-      <% if CurrentUser.is_gold? %>
-        <section id="mode-box">
-          <%= render "posts/partials/index/mode_menu" %>
-        </section>
-      <% end %>
+      <%= render "posts/partials/index/mode_menu" %>
 
-      <section id="blacklist-box">
-        <h1>Blacklisted</h1>
-        <ul id="blacklist-list">
+      <%= render "posts/partials/index/blacklist" %>
+
+      <section id="tag-box">
+        <h1>Tags</h1>
+        <%= @favorite_set.presenter.tag_list_html(self) %>
+      </section>
+
+      <section id="related-box">
+        <h1>Related</h1>
+        <ul id="related-list">
+          <li><%= link_to "Deleted posts", posts_path(:tags => "#{@favorite_set.tag_string} status:deleted") %></li>
+
+          <li><%= link_to "Random post", random_posts_path(:tags => @favorite_set.tag_string), :id => "random-post" %></li>
         </ul>
       </section>
     </aside>
