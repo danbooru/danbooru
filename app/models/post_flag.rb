@@ -7,9 +7,10 @@ class PostFlag < ActiveRecord::Base
   validate :validate_creator_is_not_limited
   validate :validate_post_is_active
   before_validation :initialize_creator, :on => :create
-  validates_uniqueness_of :creator_id, :scope => :post_id, :message => "have already flagged this post"
+  validates_uniqueness_of :creator_id, :scope => :post_id, :on => :create, :unless => :is_deletion, :message => "have already flagged this post"
   before_save :update_post
-  attr_accessible :post, :post_id, :reason, :is_resolved
+  attr_accessible :post, :post_id, :reason, :is_resolved, :is_deletion
+  attr_accessor :is_deletion
 
   module SearchMethods
     def resolved

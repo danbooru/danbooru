@@ -218,12 +218,12 @@ class Post < ActiveRecord::Base
       !is_status_locked? && (is_pending? || is_flagged? || is_deleted?) && approver_id != CurrentUser.id
     end
 
-    def flag!(reason)
+    def flag!(reason, options = {})
       if is_status_locked?
         raise PostFlag::Error.new("Post is locked and cannot be flagged")
       end
 
-      flag = flags.create(:reason => reason, :is_resolved => false)
+      flag = flags.create(:reason => reason, :is_resolved => false, :is_deletion => options[:is_deletion])
 
       if flag.errors.any?
         raise PostFlag::Error.new(flag.errors.full_messages.join("; "))
