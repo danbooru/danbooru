@@ -12,6 +12,8 @@
       <%= format_text(@pool.description) %>
     </div>
 
+    <%= render "posts/partials/common/inline_blacklist" %>
+
     <section>
       <%= @post_set.presenter.post_previews_html(self) %>
 

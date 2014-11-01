@@ -4,7 +4,7 @@
 
     <%= @post_set.presenter.nav_links(self) %>
 
-    <%= render "blacklists" %>
+    <%= render "posts/partials/common/inline_blacklist" %>
 
     <%= @post_set.presenter.post_previews_html(self) %>
   </div>
