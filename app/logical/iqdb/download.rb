@@ -10,6 +10,9 @@ module Iqdb
       tempfile = Tempfile.new("iqdb-#{$PROCESS_ID}")
       @download = Downloads::File.new(source, tempfile.path)
       @download.download!
+    ensure
+      tempfile.close
+      tempfile.unlink
     end
 
     def find_similar
