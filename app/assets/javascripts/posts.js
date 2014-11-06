@@ -432,8 +432,9 @@
 
   Danbooru.Post.resize_ugoira_controls = function() {
     var $img = $("#image");
-    $("#ugoira-control-panel").css("width", $img.width());
-    $("#seek-slider").css("width", $img.width() - 81);
+    var width = Math.max($img.width(), 350);
+    $("#ugoira-control-panel").css("width", width);
+    $("#seek-slider").css("width", width - 81);
   }
 
   Danbooru.Post.notice_update = function(x) {
