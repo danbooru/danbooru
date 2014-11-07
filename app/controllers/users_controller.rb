@@ -59,24 +59,6 @@ class UsersController < ApplicationController
     respond_with(@user)
   end
 
-  def upgrade_information
-    unless CurrentUser.user.is_anonymous?
-      TransactionLogItem.record_account_upgrade_view(CurrentUser.user, request.referer)
-    end
-  end
-
-  def upgrade
-    @user = User.find(params[:id])
-
-    if params[:email] =~ /paypal/
-      UserMailer.upgrade_fail(params[:email]).deliver
-    else
-      UserMailer.upgrade(@user, params[:email]).deliver
-    end
-
-    redirect_to user_path(@user), :notice => "Email was sent"
-  end
-
   def cache
     @user = User.find(params[:id])
     @user.update_cache

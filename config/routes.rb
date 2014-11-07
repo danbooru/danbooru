@@ -235,16 +235,15 @@ Rails.application.routes.draw do
   resources :uploads
   resources :users do
     collection do
-      get :upgrade_information
       get :search
       get :custom_style
     end
 
     member do
       delete :cache
-      post :upgrade
     end
   end
+  resource :user_upgrade, :only => [:new, :create, :show]
   resources :user_feedbacks do
     collection do
       get :search

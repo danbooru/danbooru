@@ -21,8 +21,8 @@
         <li><%= link_to "Send message", new_dmail_path(:dmail => {:to_id => @user.id}) %></li>
       <% end %>
 
-      <% if !CurrentUser.is_gold? %>
-        <li><%= link_to "Upgrade", upgrade_information_users_path %></li>
+      <% if CurrentUser.is_member? || CurrentUser.is_gold? %>
+        <li><%= link_to "Upgrade", new_user_upgrade_path %></li>
       <% end %>
 
       <% if CurrentUser.is_moderator? %>

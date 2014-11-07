@@ -14,6 +14,15 @@ GIT
   specs:
     ruby-imagespec (0.3.1)
 
+GIT
+  remote: https://github.com/stripe/stripe-ruby
+  revision: da216fd53b7a5386c136e93bdfe5efaff20682b7
+  specs:
+    stripe (1.16.0)
+      json (~> 1.8.1)
+      mime-types (>= 1.25, < 3.0)
+      rest-client (~> 1.4)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -131,6 +140,7 @@ GEM
     net-ssh (2.8.0)
     net-ssh-gateway (1.2.0)
       net-ssh (>= 2.6.5)
+    netrc (0.8.0)
     newrelic_rpm (3.9.6.257)
     nokogiri (1.6.1)
       mini_portile (~> 0.5.0)
@@ -168,6 +178,9 @@ GEM
     raindrops (0.13.0)
     rake (10.3.2)
     ref (1.0.5)
+    rest-client (1.7.2)
+      mime-types (>= 1.16, < 3.0)
+      netrc (~> 0.7)
     rmagick (2.13.3)
     ruby-prof (0.14.2)
     rubyzip (1.1.6)
@@ -284,6 +297,7 @@ DEPENDENCIES
   sprockets-rails
   statistics2
   streamio-ffmpeg
+  stripe!
   term-ansicolor
   therubyracer
   timecop
