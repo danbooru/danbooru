@@ -1,0 +1,29 @@
+<div id="c-admin-dashboards">
+  <div id="a-show">
+    <h1>Admin Dashboard</h1>
+
+    <div class="section">
+      <h2>Aliases</h2>
+      <%= render "tag_aliases/listing", :tag_aliases => @dashboard.tag_aliases %>
+    </div>
+
+    <div class="section">
+      <h2>Implications</h2>
+      <%= render "tag_implications/listing", :tag_implications => @dashboard.tag_implications %>
+    </div>
+
+    <div class="section">
+      <h2>Bulk Update Requests</h2>
+      <%= render "bulk_update_requests/listing", :bulk_update_requests => @dashboard.update_requests %>
+    </div>
+
+    <div class="section">
+      <h2>Forum Topics</h2>
+      <%= render "forum_topics/listing", :forum_topics => @dashboard.forum_topics %>
+    </div>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  Admin Dashboard - <%= Danbooru.config.app_name %>
+<% end %>

@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   namespace :admin do
     resources :users, :only => [:edit, :update]
     resource  :alias_and_implication_import, :only => [:new, :create]
+    resource  :dashboard, :only => [:show]
   end
   namespace :mobile do
     resources :posts, :only => [:index, :show]
