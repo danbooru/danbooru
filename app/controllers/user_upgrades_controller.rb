@@ -15,7 +15,8 @@ class UserUpgradesController < ApplicationController
       cost = 2000
 
     else
-      raise "Invalid desc"
+      render :text => "invalid desc", :status => 422
+      return
     end
 
     @user = CurrentUser.user
