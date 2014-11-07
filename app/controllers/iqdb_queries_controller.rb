@@ -19,8 +19,7 @@ class IqdbQueriesController < ApplicationController
 protected
   def create_by_url
     @download = Iqdb::Download.new(params[:url])
-    @download.download_from_source
-    @download.find_similar
+    @download.download_and_find_similar
     @results = @download.matches
     render :layout => false, :action => "create_by_url"
   end
