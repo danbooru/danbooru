@@ -18,7 +18,8 @@ class UserNameChangeRequestsController < ApplicationController
     if @change_request.errors.any?
       render :action => "new"
     else
-      redirect_to user_name_change_request_path(@change_request), :notice => "Your request has been submitted and is pending admin review"
+      @change_request.approve! 
+      redirect_to user_name_change_request_path(@change_request), :notice => "Your name has been changed"
     end
   end
   
