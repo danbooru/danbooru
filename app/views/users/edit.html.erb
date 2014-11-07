@@ -12,7 +12,7 @@
           <% if CurrentUser.user.is_gold? %>
             <p><%= link_to "Request a name change", new_user_name_change_request_path %></p>
           <% else %>
-            <p>You must <%= link_to "upgrade your account", upgrade_information_users_path %> to request a name change</p>
+            <p>You must <%= link_to "upgrade your account", new_user_upgrade_path %> to request a name change</p>
           <% end %>
         </div>
 
