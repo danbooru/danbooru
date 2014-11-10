@@ -165,7 +165,7 @@ class PostPresenter < Presenter
 
   def image_html(template)
     return template.content_tag("p", "The artist requested removal of this image") if @post.is_banned? && !CurrentUser.user.is_gold?
-    return template.content_tag("p", template.link_to("You need a gold account to see this image.", template.upgrade_information_users_path)) if !Danbooru.config.can_user_see_post?(CurrentUser.user, @post)
+    return template.content_tag("p", template.link_to("You need a gold account to see this image.", template.new_user_upgrade_path)) if !Danbooru.config.can_user_see_post?(CurrentUser.user, @post)
     return template.content_tag("p", "This image is unavailable") if !@post.visible?
 
     if @post.is_flash?
