@@ -131,12 +131,25 @@ class ForumPost < ActiveRecord::Base
 
   def delete!
     update_attribute(:is_deleted, true)
-    update_topic_updated_at_on_destroy
+    update_topic_updated_at_on_delete
   end
 
   def undelete!
     update_attribute(:is_deleted, false)
-    update_topic_updated_at_on_create
+    update_topic_updated_at_on_undelete
+  end
+
+  def update_topic_updated_at_on_delete
+    max = ForumPost.where(:topic_id => topic.id, :is_deleted => false).order("updated_at desc").first
+    if max
+      ForumTopic.where(:id => topic.id).update_all(["updated_at = ?, updater_id = ?", max.updated_at, max.updater_id])
+    end
+  end
+
+  def update_topic_updated_at_on_undelete
+    if topic
+      ForumTopic.where(:id => topic.id).update_all(["updater_id = ?, updated_at = ?", CurrentUser.id, Time.now])
+    end
   end
 
   def update_topic_updated_at_on_destroy
