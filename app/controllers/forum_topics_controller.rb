@@ -78,7 +78,7 @@ class ForumTopicsController < ApplicationController
     @forum_topic = ForumTopic.find(params[:id])
     @merged_topic = ForumTopic.find(params[:merged_id])
     @forum_topic.merge(@merged_topic)
-    redirect_to forum_topic_path(@forum_topic)
+    redirect_to forum_topic_path(@merged_topic)
   end
 
 private

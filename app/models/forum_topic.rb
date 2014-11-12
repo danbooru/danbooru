@@ -151,7 +151,8 @@ class ForumTopic < ActiveRecord::Base
   end
 
   def merge(topic)
-    ForumPost.where(:id => topic.posts.map(&:id)).update_all(:topic_id => id)
-    update_attribute(:is_deleted, true)
+    ForumPost.where(:id => self.posts.map(&:id)).update_all(:topic_id => topic.id)
+    topic.update_attribute(:response_count, topic.response_count + self.posts.length)
+    self.update_columns(:response_count => 0, :is_deleted => true)
   end
 end
