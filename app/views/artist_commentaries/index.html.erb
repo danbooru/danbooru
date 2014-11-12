@@ -13,7 +13,7 @@
       <tbody>
         <% @commentaries.each do |commentary| %>
           <tr>
-            <td><%= PostPresenter.preview(commentary.post) %></td>
+            <td><%= PostPresenter.preview(commentary.post, :tags => "status:any") %></td>
             <td>
               <h3><%= h(commentary.original_title) %></h3>
               <div class="prose">
