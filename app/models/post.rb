@@ -1484,7 +1484,7 @@ class Post < ActiveRecord::Base
   def visible?
     return false if !Danbooru.config.can_user_see_post?(CurrentUser.user, self)
     return false if CurrentUser.safe_mode? && rating != "s"
-    return false if CurrentUser.safe_mode? && post.has_tag?("toddlercon|toddler|diaper|tentacle|rape|bestiality|beastiality|lolita|loli|nude|shota|pussy|penis")
+    return false if CurrentUser.safe_mode? && has_tag?("toddlercon|toddler|diaper|tentacle|rape|bestiality|beastiality|lolita|loli|nude|shota|pussy|penis")
     return false if is_banned? && !CurrentUser.is_gold?
     return true
   end
