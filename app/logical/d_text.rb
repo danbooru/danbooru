@@ -58,19 +58,24 @@ class DText
   end
 
   def self.parse_links(str)
-    str.gsub(/("[^"]+":(https?:\/\/|\/)[^\s\r\n<>]+|https?:\/\/[^\s\r\n<>]+)+/) do |url|
-      if url =~ /^"([^"]+)":(.+)$/
+    str.gsub(/("[^"]+":(https?:\/\/|\/)[^\s\r\n<>]+|https?:\/\/[^\s\r\n<>]+|"[^"]+":\[(https?:\/\/|\/)[^\s\r\n<>\]]+\])+/) do |url|
+      ch = ""
+
+      if url =~ /^"([^"]+)":\[(.+)\]$/
         text = $1
         url = $2
       else
-        text = url
-      end
+        if url =~ /^"([^"]+)":(.+)$/
+          text = $1
+          url = $2
+        else
+          text = url
+        end
 
-      if url =~ /([;,.!?\)\]<>])$/
-        url.chop!
-        ch = $1
-      else
-        ch = ""
+        if url =~ /([;,.!?\)\]<>])$/
+          url.chop!
+          ch = $1
+        end
       end
 
       '<a href="' + url + '">' + text + '</a>' + ch

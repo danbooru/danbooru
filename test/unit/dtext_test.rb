@@ -105,12 +105,22 @@ class DTextTest < ActiveSupport::TestCase
     assert_equal('<p>a (<a href="http://test.com">http://test.com</a>) b</p>', p('a (http://test.com) b'))
   end
 
-  def test_old_syle_links
+  def test_old_style_links
     assert_equal('<p><a href="http://test.com">test</a></p>', p('"test":http://test.com'))
   end
 
   def test_old_style_links_with_special_entities
     assert_equal('<p>"1" <a href="http://three.com">2 &amp; 3</a></p>', p('"1" "2 & 3":http://three.com'))
+  end
+
+  def test_new_style_links
+    assert_equal('<p><a href="http://test.com">test</a></p>', p('"test":[http://test.com]'))
+  end
+
+  def test_new_style_links_with_parentheses
+    assert_equal('<p><a href="http://test.com/(parentheses)">test</a></p>', p('"test":[http://test.com/(parentheses)]'))
+    assert_equal('<p>(<a href="http://test.com/(parentheses)">test</a>)</p>', p('("test":[http://test.com/(parentheses)])'))
+    assert_equal('<p>[<a href="http://test.com/(parentheses)">test</a>]</p>', p('["test":[http://test.com/(parentheses)]]'))
   end
 
   def test_lists_1
