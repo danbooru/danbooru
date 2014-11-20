@@ -53,6 +53,10 @@ class Upload < ActiveRecord::Base
       unless is_valid_content_type?
         raise "invalid content type (only JPEG, PNG, GIF, SWF, and WebM files are allowed)"
       end
+
+      if is_ugoira? && ugoira_service.empty?
+        raise "missing frame data for ugoira"
+      end
     end
 
     def validate_md5_confirmation

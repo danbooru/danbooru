@@ -32,6 +32,10 @@ module UploadTestMethods
   def upload_jpeg(path)
   	upload_file(path, "image/jpeg", File.basename(path))
   end
+
+  def upload_zip(path)
+    upload_file(path, "application/zip", File.basename(path))
+  end
 end
 
 class ActiveSupport::TestCase

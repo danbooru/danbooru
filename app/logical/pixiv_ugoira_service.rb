@@ -48,4 +48,8 @@ class PixivUgoiraService
       @content_type = data[:ugoira_content_type]
     end
   end
+
+  def empty?
+    @frame_data.nil?
+  end
 end
