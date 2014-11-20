@@ -16,6 +16,23 @@ class DmailTest < ActiveSupport::TestCase
       CurrentUser.user = nil
     end
 
+    context "filter" do
+      setup do
+        @recipient = FactoryGirl.create(:user)
+        @recipient.create_dmail_filter(:words => "banned")
+        @dmail = FactoryGirl.build(:dmail, :title => "xxx", :owner => @recipient, :body => "banned word here", :to => @recipient)
+      end
+
+      should "detect banned words" do
+        assert(@recipient.dmail_filter.filtered?(@dmail))
+      end
+
+      should "autodelete if it has a banned word" do
+        @dmail.save
+        assert(@dmail.is_deleted)
+      end
+    end
+
     context "from a banned user" do
       setup do
         @user.update_attribute(:is_banned, true)

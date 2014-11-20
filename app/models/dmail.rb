@@ -8,6 +8,7 @@ class Dmail < ActiveRecord::Base
   belongs_to :owner, :class_name => "User"
   belongs_to :to, :class_name => "User"
   belongs_to :from, :class_name => "User"
+  before_create :auto_delete_if_filtered
   after_create :update_recipient
   after_create :send_dmail
   attr_accessible :title, :body, :is_deleted, :to_id, :to, :to_name, :creator_ip_addr
@@ -192,8 +193,16 @@ class Dmail < ActiveRecord::Base
     end
   end
 
+  def auto_delete_if_filtered
+    if owner_id != CurrentUser.user.id && to.dmail_filter.try(:filtered?, self)
+      self.is_deleted = true
+    end
+  end
+
   def update_recipient
-    to.update_attribute(:has_mail, true)
+    unless is_deleted
+      to.update_attribute(:has_mail, true)
+    end
   end
 
   def visible_to?(user)
