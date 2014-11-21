@@ -8,7 +8,7 @@ class UserNameChangeRequest < ActiveRecord::Base
   validates_length_of :desired_name, :within => 2..100, :on => :create
   validates_format_of :desired_name, :with => /\A[^\s:]+\Z/, :on => :create, :message => "cannot have whitespace or colons"
   before_validation :normalize_name
-  after_create :notify_admins
+  # after_create :notify_admins
   attr_accessible :status, :user_id, :original_name, :desired_name, :change_reason, :rejection_reason, :approver_id
   
   def self.pending
