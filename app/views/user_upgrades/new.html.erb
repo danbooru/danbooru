@@ -82,12 +82,6 @@
         </tbody>
       </table>
     </div>
-
-    <% if CurrentUser.safe_mode? %>
-      <%= render "stripe_payment" %>
-    <% else %>
-      <%= render "unavailable_payment" %>
-    <% end %>
   </div>
 </div>
 
