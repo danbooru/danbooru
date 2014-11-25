@@ -3,7 +3,7 @@ class DmailFilter < ActiveRecord::Base
   attr_accessible :user_id, :words, :as => [:moderator, :janitor, :contributor, :gold, :member, :anonymous, :default, :builder, :admin]
 
   def filtered?(dmail)
-    dmail.body =~ regexp || dmail.subject =~ regexp
+    dmail.from.level <= User::Levels::MODERATOR && (dmail.body =~ regexp || dmail.subject =~ regexp)
   end
 
   def regexp
