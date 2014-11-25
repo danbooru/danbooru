@@ -1,5 +1,6 @@
 div.ui-dialog {
   overflow: visible;
+  font-size: 1em;
 
   ul {
     margin-left: 1em;
@@ -15,8 +16,4 @@ div.ui-dialog {
 .ui-state-error {
   border: 1px solid #FBC7C6;
   background: #FDDFDE;
-}
-
-.ui-widget.ui-dialog {
-  font-size: 1em;
 }
