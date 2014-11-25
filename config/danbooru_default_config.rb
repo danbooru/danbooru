@@ -326,5 +326,14 @@ module Danbooru
     def shared_dir_path
       "/var/www/danbooru2/shared"
     end
+
+    def coinbase_secret
+    end
+
+    def coinbase_api_key
+    end
+
+    def coinbase_api_secret
+    end
   end
 end

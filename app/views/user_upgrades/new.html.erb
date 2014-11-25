@@ -82,6 +82,10 @@
         </tbody>
       </table>
     </div>
+
+    <% if Danbooru.config.coinbase_api_key %>
+      <%= render "coinbase_payment" %>
+    <% end %>
   </div>
 </div>
 
