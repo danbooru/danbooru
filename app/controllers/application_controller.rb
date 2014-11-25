@@ -14,6 +14,7 @@ class ApplicationController < ActionController::Base
 
   rescue_from User::PrivilegeError, :with => :access_denied
   rescue_from Danbooru::Paginator::PaginationError, :with => :render_pagination_limit
+  rescue_from Exception, :with => :rescue_exception
 
 protected
   def api_check

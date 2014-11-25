@@ -1,5 +1,11 @@
-<% if @error_message %>
-  <p><%= @error_message %></p>
+<% if CurrentUser.user.is_builder? %>
+  <h1><%= @exception.class.to_s %> exception raised</h1>
+  <ul style="font-family: monospace; font-size: 1.2em; list-style-type: none;">
+    <li><%= @exception.message %></li>
+    <%- @exception.backtrace.each do |b| -%>
+      <li style="list-style-type: none;"><%= b %></li>
+    <%- end -%>
+  </ul>
 <% else %>
-  <p>Error: <%= @exception.to_s %></p>
+  <p><%= @exception.message %></p>
 <% end %>
