@@ -327,12 +327,13 @@ module Danbooru
       "/var/www/danbooru2/shared"
     end
 
-    def stripe_secret_key
-      "sk_test_kHviyCxbt9kBxeu46TeefJQH"
+    def coinbase_secret
     end
 
-    def stripe_publishable_key
-      "pk_test_5lKN65jYpUw8EActq8RMkQxH"
+    def coinbase_api_key
+    end
+
+    def coinbase_api_secret
     end
   end
 end

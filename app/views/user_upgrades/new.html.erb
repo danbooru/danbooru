@@ -83,10 +83,8 @@
       </table>
     </div>
 
-    <% if CurrentUser.safe_mode? %>
-      <%= render "stripe_payment" %>
-    <% else %>
-      <%= render "unavailable_payment" %>
+    <% if Danbooru.config.coinbase_api_key %>
+      <%= render "coinbase_payment" %>
     <% end %>
   </div>
 </div>
