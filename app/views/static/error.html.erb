@@ -6,6 +6,8 @@
       <li style="list-style-type: none;"><%= b %></li>
     <%- end -%>
   </ul>
+<% elsif @error_message %>
+  <p><%= @error_message %></p>
 <% else %>
   <p><%= @exception.message %></p>
 <% end %>

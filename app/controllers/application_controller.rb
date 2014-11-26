@@ -32,11 +32,9 @@ protected
     @exception = exception
 
     if exception.is_a?(::ActiveRecord::StatementInvalid) && exception.to_s =~ /statement timeout/
-      @exception = nil
       @error_message = "The database timed out running your query."
       render :template => "static/error", :status => 500
     elsif exception.is_a?(::ActiveRecord::RecordNotFound)
-      @exception = nil
       @error_message = "That record was not found"
       render :template => "static/error", :status => 404
     else
