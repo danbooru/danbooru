@@ -14,7 +14,7 @@ class SavedSearchesController < ApplicationController
   end
 
   def create
-    @saved_search = saved_searches.create(:tag_query => params[:tags])
+    @saved_search = saved_searches.create(:tag_query => params[:tags], :category => params[:category])
   end
 
   def destroy

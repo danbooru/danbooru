@@ -3,7 +3,7 @@
   <% if CurrentUser.user.has_saved_searches? && saved_searches.tagged(params[:tags]) %>
     <%= button_to "Remove this saved search", saved_search_path(saved_searches.tagged(params[:tags]), :tags => params[:tags]), :remote => true, :method => :delete %>
   <% elsif CurrentUser.user.is_member? %>
-    <%= button_to "Save this search", saved_searches_path(:tags => params[:tags]), :remote => true, :method => :post %>
+    <%= button_tag "Save this search", :id => "save-search" %>
   <% end %>
   
 <% end %>

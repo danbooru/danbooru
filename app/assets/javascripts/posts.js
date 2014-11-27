@@ -14,6 +14,7 @@
 
     if ($("#c-posts").length && $("#a-index").length) {
       this.initialize_excerpt();
+      this.initialize_saved_searches();
     }
 
     if ($("#c-posts").length && $("#a-show").length) {
@@ -513,11 +514,19 @@
     });
   }
 
-  Danbooru.Post.save_search = function() {
-    $.post(
-      "/saved_searches.js",
-      {"saved_search[tag_query]": $("#tags").val()}
-    );
+  Danbooru.Post.initialize_saved_searches = function() {
+    $("#save-search").click(function() {
+      var input = window.prompt("Category for this saved search (optional):");
+      if (input !== null) {
+        $.post(
+          "/saved_searches.js",
+          {
+            "tags": $("#tags").attr("value"),
+            "category": input
+          }
+        );
+      }
+    });
   }
 })();
 
