@@ -2,7 +2,9 @@ class SavedSearchesController < ApplicationController
   respond_to :html, :js
   
   def index
-    @saved_searches = saved_searches.order("name")
+    @saved_searches = saved_searches.order("tag_query")
+    @categories = @saved_searches.group_by{|saved_search| saved_search.category.to_s}
+    @categories = @categories.sort_by{|category, saved_searches| category.to_s}
   end
 
   def create
