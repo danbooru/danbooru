@@ -362,8 +362,11 @@ class Artist < ActiveRecord::Base
       end
 
       params[:order] ||= params.delete(:sort)
-      if params[:order] == "name"
+      case params[:order]
+      when "name"
         q = q.reorder("name")
+      when "updated_at"
+        q = q.reorder("updated_at desc")
       else
         q = q.reorder("id desc")
       end
