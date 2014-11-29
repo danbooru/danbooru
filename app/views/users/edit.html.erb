@@ -69,6 +69,7 @@
 
         <div class="input text optional field_with_hint">
           <label class="text optional" for="user_dmail_filter_attributes_words">Dmail filter</label>
+          <%= hidden_field_tag "user[dmail_filter_attributes][id]", @user.dmail_filter.try(:id) %>
           <%= text_field_tag "user[dmail_filter_attributes][words]", @user.dmail_filter.try(:words), :id => "user_dmail_filter_attributes_words", :class => "text optional", :size => 40 %>
           <span class="hint">A list of banned words (space delimited). Any dmail you receive with a banned word will automatically be deleted.</span>
         </div>
