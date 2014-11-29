@@ -10,7 +10,9 @@ class UserUpgradesController < ApplicationController
       user = User.find(user_id)
 
       if user.level < User::Levels::PLATINUM && level >= User::Levels::GOLD && level <= User::Levels::PLATINUM
-        user.promote_to!(level, :skip_feedback => true)
+        CurrentUser.scoped(User.admins.first, "127.0.0.1") do
+          user.promote_to!(level, :skip_feedback => true)
+        end
       end
     end
 
