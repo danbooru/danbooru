@@ -6,7 +6,7 @@ class DmailFilter < ActiveRecord::Base
 
   def initialize_user
     unless user_id
-      self.user_id = CurrentUser.user.user_id
+      self.user_id = CurrentUser.user.id
     end
   end
 
