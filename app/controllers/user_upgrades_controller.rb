@@ -11,12 +11,9 @@ class UserUpgradesController < ApplicationController
       if user.level < User::Levels::PLATINUM && level >= User::Levels::GOLD && level <= User::Levels::PLATINUM
         user.promote_to!(level, :skip_feedback => true)
       end
-
-      flash[:success] = true
-    else
-      flash[:error] = true
     end
-    redirect_to user_upgrade_path
+
+    render :nothing => true
   end
 
   def new
