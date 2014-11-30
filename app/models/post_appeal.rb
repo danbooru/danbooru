@@ -11,6 +11,11 @@ class PostAppeal < ActiveRecord::Base
   attr_accessible :post_id, :post, :reason
 
   module SearchMethods
+    def reason_matches(query)
+      query = "*#{query}*" unless query =~ /\*/
+      where("reason ILIKE ? ESCAPE E'\\\\'", query.to_escaped_for_sql_like)
+    end
+
     def resolved
       joins(:post).where("posts.is_deleted = false and posts.is_flagged = false")
     end
@@ -34,6 +39,10 @@ class PostAppeal < ActiveRecord::Base
     def search(params)
       q = where("true")
       return q if params.blank?
+
+      if params[:reason_matches].present?
+        q = q.reason_matches(params[:reason_matches])
+      end
 
       if params[:creator_id].present?
         q = q.for_user(params[:creator_id].to_i)

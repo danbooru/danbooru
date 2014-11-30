@@ -13,6 +13,11 @@ class PostFlag < ActiveRecord::Base
   attr_accessor :is_deletion
 
   module SearchMethods
+    def reason_matches(query)
+      query = "*#{query}*" unless query =~ /\*/
+      where("reason ILIKE ? ESCAPE E'\\\\'", query.to_escaped_for_sql_like)
+    end
+
     def resolved
       where("is_resolved = ?", true)
     end
@@ -36,6 +41,10 @@ class PostFlag < ActiveRecord::Base
     def search(params)
       q = where("true")
       return q if params.blank?
+
+      if params[:reason_matches].present?
+        q = q.reason_matches(params[:reason_matches])
+      end
 
       if params[:creator_id].present? && (CurrentUser.user.is_janitor? || params[:creator_id].to_i == CurrentUser.user.id)
         q = q.where("creator_id = ?", params[:creator_id].to_i)

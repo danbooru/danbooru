@@ -2,6 +2,15 @@
   <tbody>
     <%= form_tag(post_flags_path, :method => :get, :class => "simple_form") do %>
       <tr>
+        <th><label for="search_reason_matches">Reason</label></th>
+        <td>
+          <div class="input">
+            <%= text_field "search", "reason_matches", :label => "Reason", :value => params[:search][:reason_matches] %>
+          </div>
+        </td>
+      </tr>
+
+      <tr>
         <th><label for="search_post_id">Post ID</label></th>
         <td>
           <div class="input">
