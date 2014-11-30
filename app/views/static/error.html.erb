@@ -1,4 +1,6 @@
-<% if CurrentUser.user.is_builder? %>
+<% if @error_message %>
+  <p><%= @error_message %></p>
+<% elsif CurrentUser.user.is_builder? %>
   <h1><%= @exception.class.to_s %> exception raised</h1>
   <ul style="font-family: monospace; font-size: 1.2em; list-style-type: none;">
     <li><%= @exception.message %></li>
@@ -6,8 +8,6 @@
       <li style="list-style-type: none;"><%= b %></li>
     <%- end -%>
   </ul>
-<% elsif @error_message %>
-  <p><%= @error_message %></p>
 <% else %>
   <p><%= @exception.message %></p>
 <% end %>
