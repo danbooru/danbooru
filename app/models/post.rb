@@ -154,7 +154,7 @@ class Post < ActiveRecord::Base
     end
 
     def has_ugoira_webm?
-      created_at < 1.minute.ago || File.exists?(preview_file_path) 
+      created_at < 1.minute.ago || (File.exists?(preview_file_path) && File.size(preview_file_path) > 0)
     end
   end
 
