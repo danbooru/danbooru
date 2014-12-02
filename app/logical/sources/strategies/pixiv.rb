@@ -59,6 +59,7 @@ module Sources
 
       def rewrite_thumbnails(thumbnail_url, is_manga=nil)
         thumbnail_url = rewrite_new_medium_images(thumbnail_url)
+        thumbnail_url = rewrite_medium_ugoiras(thumbnail_url)
         thumbnail_url = rewrite_old_small_and_medium_images(thumbnail_url, is_manga)
         return thumbnail_url
       end
@@ -90,6 +91,16 @@ module Sources
             thumbnail_url += file_ext
             # => http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p1.png
           end
+        end
+
+        thumbnail_url
+      end
+
+      # http://i3.pixiv.net/img-zip-ugoira/img/2014/12/03/04/58/24/47378698_ugoira600x600.zip
+      # => http://i3.pixiv.net/img-zip-ugoira/img/2014/12/03/04/58/24/47378698_ugoira1920x1080.zip
+      def rewrite_medium_ugoiras(thumbnail_url)
+        if thumbnail_url =~ %r!/img-zip-ugoira/img/.*/\d+_ugoira600x600.zip!i
+          thumbnail_url = thumbnail_url.sub("_ugoira600x600.zip", "_ugoira1920x1080.zip")
         end
 
         thumbnail_url
