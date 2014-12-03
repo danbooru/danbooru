@@ -20,7 +20,7 @@ class DmailTest < ActiveSupport::TestCase
       setup do
         @recipient = FactoryGirl.create(:user)
         @recipient.create_dmail_filter(:words => "banned")
-        @dmail = FactoryGirl.build(:dmail, :title => "xxx", :owner => @recipient, :body => "banned word here", :to => @recipient)
+        @dmail = FactoryGirl.build(:dmail, :title => "xxx", :owner => @recipient, :body => "banned word here", :to => @recipient, :from => @user)
       end
 
       should "detect banned words" do

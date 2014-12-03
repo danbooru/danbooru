@@ -123,7 +123,7 @@ class ForumTopicTest < ActiveSupport::TestCase
 
       should "merge all the posts in one topic into the other" do
         @topic.merge(@topic2)
-        assert_equal(2, @topic.posts.count)
+        assert_equal(2, @topic2.posts.count)
       end
     end
 

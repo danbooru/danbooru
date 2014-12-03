@@ -74,17 +74,6 @@ class UserNameChangeRequestTest < ActiveSupport::TestCase
     end
     
     context "creating a new request" do
-      should "send dmails to the admin" do
-        assert_difference("Dmail.count", 2) do
-          UserNameChangeRequest.create(
-            :user_id => @requester.id,
-            :original_name => @requester.name,
-            :status => "pending",
-            :desired_name => "abc"
-          )
-        end
-      end
-      
       should "not validate if the desired name already exists" do
         assert_difference("UserNameChangeRequest.count", 0) do
           req = UserNameChangeRequest.create(
