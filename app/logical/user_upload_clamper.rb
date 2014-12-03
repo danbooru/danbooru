@@ -19,7 +19,9 @@ class UserUploadClamper
     upload_limit = (Post.for_user(user).deleted.where("is_banned = false").count / 4) + 10
     user.update_attribute(:base_upload_limit, upload_limit)
     user.promote_to!(User::Levels::BUILDER) if user.is_contributor?
-    Dmail.create_split(:to_id => user.id, :from_id => User.admins.first.id, :subject => "Post Upload Limit", :body => "You are receiving this message because a large percentage of your uploads are being deleted. For this reason you will now be limited to 10 uploads a day.")
-    ModAction.create(:description => "user ##{user.id} (#{user.name}) clamped")
+    CurrentUser.scoped(User.admins.first, "127.0.0.1") do
+      Dmail.create_split(:to_id => user.id, :title => "Post Upload Limit", :body => "You are receiving this message because a large percentage of your uploads are being deleted. For this reason you will now be limited to 10 uploads a day.")
+      ModAction.create(:description => "user ##{user.id} (#{user.name}) clamped")
+    end
   end
 end
