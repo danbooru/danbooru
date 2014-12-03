@@ -44,9 +44,14 @@ class Artist < ActiveRecord::Base
 
     def save_url_string
       if @url_string
-        urls.clear
+        prev = urls.map(&:url)
+        curr = @url_string.scan(/\S+/)
 
-        @url_string.scan(/\S+/).each do |url|
+        (prev - curr).each do |url|
+          urls.where(:url => url).destroy_all
+        end
+
+        (curr - prev).each do |url|
           urls.create(:url => url)
         end
       end
