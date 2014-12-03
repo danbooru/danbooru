@@ -14,7 +14,7 @@ module Sources
       EXT = "(?:jpg|jpeg|png|gif)"
 
       WEB = "^(?:https?://)?www\\.pixiv\\.net"
-      I12 = "^(?:https?://)?i[12]\\.pixiv\\.net"
+      I12 = "^(?:https?://)?i[0-9]+\\.pixiv\\.net"
       IMG = "^(?:https?://)?img[0-9]*\\.pixiv\\.net"
 
       def self.url_match?(url)
@@ -404,31 +404,6 @@ module Sources
         return true if url =~ %r!#{I12}/img-inf/img/#{TIMESTAMP}/\d+_\w+\.#{EXT}!i
 
         return false
-      end
-
-      def agent
-        @agent ||= begin
-          mech = Mechanize.new
-
-          phpsessid = Cache.get("pixiv-phpsessid")
-          if phpsessid
-            cookie = Mechanize::Cookie.new("PHPSESSID", phpsessid)
-            cookie.domain = ".pixiv.net"
-            cookie.path = "/"
-            mech.cookie_jar.add(cookie)
-          else
-            mech.get("http://www.pixiv.net") do |page|
-              page.form_with(:action => "/login.php") do |form|
-                form['pixiv_id'] = Danbooru.config.pixiv_login
-                form['pass'] = Danbooru.config.pixiv_password
-              end.click_button
-            end
-            phpsessid = mech.cookie_jar.cookies.select{|c| c.name == "PHPSESSID"}.first
-            Cache.put("pixiv-phpsessid", phpsessid.value, 1.month) if phpsessid
-          end
-
-          mech
-        end
       end
     end
   end
