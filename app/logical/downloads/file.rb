@@ -2,7 +2,7 @@ module Downloads
   class File
     class Error < Exception ; end
 
-    attr_reader :data
+    attr_reader :data, :options
     attr_accessor :source, :content_type, :file_path
 
     def initialize(source, file_path, options = {})
@@ -15,6 +15,10 @@ module Downloads
 
       # we sometimes need to capture data from the source page
       @data = {}
+
+      @options = options
+
+      @data[:get_thumbnail] = options[:get_thumbnail]
     end
 
     def download!

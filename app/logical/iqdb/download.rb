@@ -8,7 +8,7 @@ module Iqdb
 
     def download_and_find_similar
       tempfile = Tempfile.new("iqdb-#{$PROCESS_ID}")
-      @download = Downloads::File.new(source, tempfile.path)
+      @download = Downloads::File.new(source, tempfile.path, :get_thumbnail => true)
       @download.download!
 
       if Danbooru.config.iqdb_hostname_and_port

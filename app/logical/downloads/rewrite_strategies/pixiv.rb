@@ -14,6 +14,7 @@ module Downloads
           url, headers = rewrite_html_pages(url, headers)
           url, headers = rewrite_thumbnails(url, headers)
           url, headers = rewrite_old_small_manga_pages(url, headers)
+          url, headers = rewrite_to_thumbnails(url, headers) if data.delete(:get_thumbnail)
         end
 
         # http://i2.pixiv.net/img-zip-ugoira/img/2014/08/05/06/01/10/44524589_ugoira1920x1080.zip
@@ -27,6 +28,18 @@ module Downloads
       end
 
     protected
+      def rewrite_to_thumbnails(url, headers)
+        if url =~ %r!https?://(i\d+)\.pixiv\.net/img-zip-ugoira/img/(\d{4}/\d{2}/\d{2}/\d{2}/\d{2}/\d{2})/(\d+)_ugoira\d+x\d+\.zip!
+          url = "http://#{$1}.pixiv.net/c/150x150/img-master/img/#{$2}/#{$3}_master1200.jpg"
+        elsif url =~ %r!https?://(i\d+)\.pixiv\.net/img-original/img/(\d{4}/\d{2}/\d{2}/\d{2}/\d{2}/\d{2})/(\d+_p\d+)\.jpg!
+          url = "http://#{$1}.pixiv.net/c/150x150/img-master/img/#{$2}/#{$3}_master1200.jpg"
+        elsif url =~ %r!http://(i\d+)\.pixiv\.net/img(\d+)/img/(.+?)/(\d+)\.jpg!
+          url = "http://#{$1}.pixiv.net/img#{$2}/img/#{$3}/mobile/#{$4}_240mw.jpg"
+        end
+
+        return [url, headers]
+      end
+
       def rewrite_headers(url, headers)
         headers["Referer"] = "http://www.pixiv.net"
         return [url, headers]
