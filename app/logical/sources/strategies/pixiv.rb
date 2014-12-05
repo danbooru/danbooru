@@ -3,8 +3,6 @@
 require 'csv'
 
 module Sources
-  class Error < StandardError ; end
-
   module Strategies
     class Pixiv < Base
       attr_reader :zip_url, :ugoira_frame_data, :ugoira_content_type
