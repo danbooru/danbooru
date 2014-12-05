@@ -83,7 +83,9 @@ module Sources
 
       def normalized_url
         @normalized_url ||= begin
-          if url =~ %r{\Ahttp://lohas\.nicoseiga\.jp/priv/(\d+)\?e=\d+&h=[a-f0-9]+}i
+          if url =~ %r!\Ahttp://lohas\.nicoseiga\.jp/o/[a-f0-9]+/\d+/(\d+)!
+            "http://seiga.nicovideo.jp/seiga/im#{$1}"
+          elsif url =~ %r{\Ahttp://lohas\.nicoseiga\.jp/priv/(\d+)\?e=\d+&h=[a-f0-9]+}i
             "http://seiga.nicovideo.jp/seiga/im#{$1}"
           elsif url =~ %r{\Ahttp://lohas\.nicoseiga\.jp/priv/[a-f0-9]+/\d+/(\d+)}i
             "http://seiga.nicovideo.jp/seiga/im#{$1}"
