@@ -24,6 +24,10 @@ class ArtistCommentary < ActiveRecord::Base
         q = q.text_matches(params[:text_matches])
       end
 
+      if params[:post_id].present?
+        q = q.where("post_id = ?", params[:post_id].to_i)
+      end
+
       if params[:original_present] == "yes"
         q = q.where("(original_title is not null and original_title != '') or (original_description is not null and original_description != '')")
       elsif params[:original_present] == "no"
