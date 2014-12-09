@@ -69,8 +69,8 @@ class ArtistVersion < ActiveRecord::Base
     new_urls = url_array
     old_urls = version.present? ? version.url_array : []
 
-    new_urls = new_urls.map {|url| ArtistUrl.normalize(url)}
-    old_urls = old_urls.map {|url| ArtistUrl.normalize(url)}
+    new_urls = new_urls.map {|url| ArtistUrl.legacy_normalize(url)}
+    old_urls = old_urls.map {|url| ArtistUrl.legacy_normalize(url)}
 
     return {
       :added_urls => new_urls - old_urls,
