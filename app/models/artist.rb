@@ -49,7 +49,8 @@ class Artist < ActiveRecord::Base
 
         duplicates = prev.select{|url| prev.count(url) > 1}.uniq
         duplicates.each do |url|
-          urls.where(:url => url).first.destroy
+          count = prev.count(url)
+          urls.where(:url => url).limit(count-1).destroy_all
         end
 
         (prev - curr).each do |url|
