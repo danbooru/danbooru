@@ -25,9 +25,6 @@ class UserUpgradesController < ApplicationController
     end
   end
 
-  def gift
-  end
-
   def show
   end
 
