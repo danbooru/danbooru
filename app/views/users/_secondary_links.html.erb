@@ -22,7 +22,11 @@
       <% end %>
 
       <% if CurrentUser.is_member? || CurrentUser.is_gold? %>
-        <li><%= link_to "Upgrade", new_user_upgrade_path %></li>
+        <% if @user.id == CurrentUser.user.id %>
+          <li><%= link_to "Upgrade", new_user_upgrade_path %></li>
+        <% else %>
+          <li><%= link_to "Gift Upgrade", new_user_upgrade_path(:user_id => @user.id) %></li>
+        <% end %>
       <% end %>
 
       <% if CurrentUser.is_moderator? %>

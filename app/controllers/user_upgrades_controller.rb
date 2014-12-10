@@ -1,17 +1,17 @@
 class UserUpgradesController < ApplicationController
   before_filter :member_only, :only => [:new, :show]
-  helper_method :encrypt_custom, :coinbase
+  helper_method :encrypt_custom, :coinbase, :user
   force_ssl :if => :ssl_enabled?
   skip_before_action :verify_authenticity_token, only: [:create]
 
   def create
     if params[:order][:status] == "completed"
       user_id, level = decrypt_custom
-      user = User.find(user_id)
+      member = User.find(user_id)
 
-      if user.level < User::Levels::PLATINUM && level >= User::Levels::GOLD && level <= User::Levels::PLATINUM
+      if member.level < User::Levels::PLATINUM && level >= User::Levels::GOLD && level <= User::Levels::PLATINUM
         CurrentUser.scoped(User.admins.first, "127.0.0.1") do
-          user.promote_to!(level, :skip_feedback => true)
+          member.promote_to!(level, :skip_feedback => true)
         end
       end
     end
@@ -25,15 +25,26 @@ class UserUpgradesController < ApplicationController
     end
   end
 
+  def gift
+  end
+
   def show
   end
 
   def encrypt_custom(level)
-    crypt.encrypt_and_sign("#{CurrentUser.user.id},#{level}")
+    crypt.encrypt_and_sign("#{user.id},#{level}")
   end
 
   def coinbase
     @coinbase_api ||= Coinbase::Client.new(Danbooru.config.coinbase_api_key, Danbooru.config.coinbase_api_secret)
+  end
+
+  def user
+    if params[:user_id]
+      User.find(params[:user_id])
+    else
+      CurrentUser.user
+    end
   end
 
   private
