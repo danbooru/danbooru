@@ -12,9 +12,9 @@ class ApplicationController < ActionController::Base
   # before_filter :secure_cookies_check
   layout "default"
 
+  rescue_from Exception, :with => :rescue_exception
   rescue_from User::PrivilegeError, :with => :access_denied
   rescue_from Danbooru::Paginator::PaginationError, :with => :render_pagination_limit
-  rescue_from Exception, :with => :rescue_exception
 
 protected
   def api_check
