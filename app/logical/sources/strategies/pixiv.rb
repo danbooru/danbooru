@@ -211,7 +211,13 @@ module Sources
       end
 
       def get_image_url_from_page(page, is_manga)
-        elements = page.search("div.works_display div img.big")
+        if is_manga
+          elements = page.search("div.works_display a img").find_all do |node|
+            node["src"] !~ /source\.pixiv\.net/
+          end
+        else
+          elements = page.search("div.works_display div img.big")
+        end
 
         if elements.any?
           element = elements.first
