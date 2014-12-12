@@ -217,6 +217,7 @@ module Sources
           end
         else
           elements = page.search("div.works_display div img.big")
+          elements = page.search("div.works_display div img") if elements.empty?
         end
 
         if elements.any?
