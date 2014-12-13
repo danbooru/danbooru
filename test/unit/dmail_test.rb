@@ -31,6 +31,16 @@ class DmailTest < ActiveSupport::TestCase
         @dmail.save
         assert(@dmail.is_deleted)
       end
+
+      context "that is empty" do
+        setup do
+          @recipient.dmail_filter.update_attributes(:words => "   ")
+        end
+
+        should "not filter everything" do
+          assert(!@recipient.dmail_filter.filtered?(@dmail))
+        end
+      end
     end
 
     context "from a banned user" do
