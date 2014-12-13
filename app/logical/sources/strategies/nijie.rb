@@ -36,7 +36,7 @@ module Sources
         links = page.search("a.name")
 
         if links.any?
-          profile_url = "http://nijie.info" + links[0]["href"]
+          profile_url = "http://nijie.info/" + links[0]["href"]
           artist_name = links[0].text
         else
           profile_url = nil
@@ -50,7 +50,7 @@ module Sources
         image = page.search("div#gallery a img")
 
         if image.any?
-          image[0]["src"]
+          image[0]["src"].try(:sub, %r!^//!, "http://")
         else
           nil
         end
