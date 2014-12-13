@@ -196,11 +196,12 @@ class Dmail < ActiveRecord::Base
   def auto_delete_if_filtered
     if owner_id != CurrentUser.user.id && to.dmail_filter.try(:filtered?, self)
       self.is_deleted = true
+      self.is_read = true
     end
   end
 
   def update_recipient
-    unless is_deleted
+    unless is_deleted?
       to.update_attribute(:has_mail, true)
     end
   end

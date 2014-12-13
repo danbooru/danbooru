@@ -29,7 +29,14 @@ class DmailTest < ActiveSupport::TestCase
 
       should "autodelete if it has a banned word" do
         @dmail.save
-        assert(@dmail.is_deleted)
+        assert_equal(true, @dmail.is_deleted?)
+        assert_equal(true, @dmail.is_read?)
+      end
+
+      should "not update the recipient's has_mail if filtered" do
+        @dmail.save
+        @recipient.reload
+        assert_equal(false, @recipient.has_mail?)
       end
 
       context "that is empty" do
