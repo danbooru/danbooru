@@ -36,7 +36,7 @@
       <div class="input">
         <%= f.label :source %>
         <% if params[:url].present? %>
-          <%= f.text_field :source, :size => 50, :value => @normalized_url %>
+          <%= f.text_field :source, :size => 50, :value => params[:url] %>
         <% else %>
           <%= f.text_field :source, :size => 50 %>
         <% end %>
