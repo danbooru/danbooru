@@ -41,8 +41,9 @@ module Downloads
     end
 
     def after_download(src)
-      fix_image_board_sources(src)
-      fix_twitter_sources(src)
+      src = fix_image_board_sources(src)
+      src = fix_twitter_sources(src)
+      src
     end
 
     def http_get_streaming(src, datums = {}, options = {})
