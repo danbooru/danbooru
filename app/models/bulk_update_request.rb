@@ -6,7 +6,7 @@ class BulkUpdateRequest < ActiveRecord::Base
 
   validates_presence_of :user
   validates_presence_of :script
-  validates_presence_of :title
+  validates_presence_of :title, :if => lambda {|rec| rec.forum_topic_id.blank?}
   validates_inclusion_of :status, :in => %w(pending approved rejected)
   validate :script_formatted_correctly
   validate :forum_topic_id_not_invalid
