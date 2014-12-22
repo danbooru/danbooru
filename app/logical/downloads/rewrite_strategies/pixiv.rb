@@ -31,9 +31,9 @@ module Downloads
       def rewrite_to_thumbnails(url, headers)
         if url =~ %r!https?://(i\d+)\.pixiv\.net/img-zip-ugoira/img/(\d{4}/\d{2}/\d{2}/\d{2}/\d{2}/\d{2})/(\d+)_ugoira\d+x\d+\.zip!
           url = "http://#{$1}.pixiv.net/c/150x150/img-master/img/#{$2}/#{$3}_master1200.jpg"
-        elsif url =~ %r!https?://(i\d+)\.pixiv\.net/img-original/img/(\d{4}/\d{2}/\d{2}/\d{2}/\d{2}/\d{2})/(\d+_p\d+)\.jpg!
+        elsif url =~ %r!https?://(i\d+)\.pixiv\.net/img-original/img/(\d{4}/\d{2}/\d{2}/\d{2}/\d{2}/\d{2})/(\d+_p\d+)\.!
           url = "http://#{$1}.pixiv.net/c/150x150/img-master/img/#{$2}/#{$3}_master1200.jpg"
-        elsif url =~ %r!https?://(i\d+)\.pixiv\.net/img(\d+)/img/(.+?)/(\d+)\.jpg!
+        elsif url =~ %r!https?://(i\d+)\.pixiv\.net/img(\d+)/img/(.+?)/(\d+)\.!
           url = "http://#{$1}.pixiv.net/img#{$2}/img/#{$3}/mobile/#{$4}_240mw.jpg"
         end
 
