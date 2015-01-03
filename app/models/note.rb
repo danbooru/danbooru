@@ -144,10 +144,12 @@ class Note < ActiveRecord::Base
   end
 
   def update_post
-    if Note.where(:is_active => true, :post_id => post_id).exists?
-      execute_sql("UPDATE posts SET last_noted_at = ? WHERE id = ?", updated_at, post_id)
-    else
-      execute_sql("UPDATE posts SET last_noted_at = NULL WHERE id = ?", post_id)
+    if self.changed?
+      if Note.where(:is_active => true, :post_id => post_id).exists?
+        execute_sql("UPDATE posts SET last_noted_at = ? WHERE id = ?", updated_at, post_id)
+      else
+        execute_sql("UPDATE posts SET last_noted_at = NULL WHERE id = ?", post_id)
+      end
     end
   end
 
