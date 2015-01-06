@@ -2,7 +2,7 @@ module Downloads
   module RewriteStrategies
     class Twitpic < Base
       def rewrite(url, headers, data = {})
-        if url =~ %r{https?://twitpic\.com} || url =~ %r{^https?://d3j5vwomefv46c\.cloudfront\.net}
+        if url =~ %r{https?://twitpic\.com} || url =~ %r{^https?://(?:d3j5vwomefv46c|dn3pm25xmtlyu)\.cloudfront\.net}
           url, headers = rewrite_html_pages(url, headers)
           url, headers = rewrite_thumbnails(url, headers)
         end
@@ -24,7 +24,7 @@ module Downloads
       end
 
       def rewrite_thumbnails(url, headers)
-        if url =~ %r{^https?://d3j5vwomefv46c\.cloudfront\.net/photos/thumb/(\d+\..+)$}
+        if url =~ %r{^https?://(?:d3j5vwomefv46c|dn3pm25xmtlyu)\.cloudfront\.net/photos/thumb/(\d+\..+)$}
           match = $1
           url.sub!("/thumb/" + match, "/large/" + match)
         end

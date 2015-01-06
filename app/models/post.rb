@@ -313,7 +313,7 @@ class Post < ActiveRecord::Base
       when %r{\Ahttp://lohas\.nicoseiga\.jp/priv/(\d+)\?e=\d+&h=[a-f0-9]+}i, %r{\Ahttp://lohas\.nicoseiga\.jp/priv/[a-f0-9]+/\d+/(\d+)}i
         "http://seiga.nicovideo.jp/seiga/im#{$1}"
 
-      when %r{\Ahttps?://d3j5vwomefv46c\.cloudfront\.net/photos/large/(\d+)\.}i
+      when %r{\Ahttps?://(?:d3j5vwomefv46c|dn3pm25xmtlyu)\.cloudfront\.net/photos/large/(\d+)\.}i
         base_10_id = $1.to_i
         base_36_id = base_10_id.to_s(36)
         "http://twitpic.com/#{base_36_id}"
