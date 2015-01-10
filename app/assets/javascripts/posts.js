@@ -419,6 +419,7 @@
         $("#edit").hide();
         $("#comments").hide();
         $("#share").show();
+        addthis.init();
       }
 
       $("#post-sections li").removeClass("active");
