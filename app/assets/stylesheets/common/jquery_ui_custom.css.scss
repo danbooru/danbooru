@@ -1,6 +1,7 @@
 div.ui-dialog {
   overflow: visible;
   font-size: 1em;
+  z-index: 999 !important;
 
   ul {
     margin-left: 1em;
