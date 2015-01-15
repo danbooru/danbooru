@@ -48,6 +48,12 @@ class Note < ActiveRecord::Base
         q = q.body_matches(params[:body_matches])
       end
 
+      if params[:is_active] == "true"
+        q = q.active
+      elsif params[:is_active] == "false"
+        q = q.where("is_active = false")
+      end
+
       if params[:post_id].present?
         q = q.where("post_id = ?", params[:post_id].to_i)
       end
