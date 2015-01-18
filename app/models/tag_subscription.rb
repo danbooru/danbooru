@@ -173,7 +173,8 @@ class TagSubscription < ActiveRecord::Base
   def self.process_all
     find_each do |tag_subscription|
       if tag_subscription.is_active?
-        TagSubscription.delay(:queue => "default", :priority => 10).process(tag_subscription.id)
+        time = rand(4 * 60 * 60).seconds.from_now
+        TagSubscription.delay(:run_at => time, :queue => "default", :priority => 10).process(tag_subscription.id)
       end
     end
   end
