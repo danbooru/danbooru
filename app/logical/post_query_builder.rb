@@ -119,6 +119,7 @@ class PostQueryBuilder
     end
 
     relation = add_range_relation(q[:post_id], "posts.id", relation)
+    relation = add_range_relation(q[:mpixels], "posts.image_width * posts.image_height / 1000000.0", relation)
     relation = add_range_relation(q[:ratio], "ROUND(1.0 * posts.image_width / GREATEST(1, posts.image_height), 2)", relation)
     relation = add_range_relation(q[:width], "posts.image_width", relation)
     relation = add_range_relation(q[:height], "posts.image_height", relation)
@@ -367,6 +368,16 @@ class PostQueryBuilder
     when "artcomm_asc"
       relation = relation.joins("INNER JOIN artist_commentaries ON artist_commentaries.post_id = posts.id")
       relation = relation.order("artist_commentaries.updated_at ASC, posts.id DESC")
+
+    when "mpixels", "mpixels_desc"
+      relation = relation.where("posts.image_width is not null and posts.image_height is not null")
+      # Use "w*h/1000000", even though "w*h" would give the same result, so this can use
+      # the posts_mpixels index.
+      relation = relation.order("posts.image_width * posts.image_height / 1000000.0 DESC, posts.id DESC")
+
+    when "mpixels_asc"
+      relation = relation.where("posts.image_width is not null and posts.image_height is not null")
+      relation = relation.order("posts.image_width * posts.image_height / 1000000.0 ASC, posts.id DESC")
 
     when "portrait"
       relation = relation.order("1.0 * posts.image_width / GREATEST(1, posts.image_height) ASC, posts.id DESC")

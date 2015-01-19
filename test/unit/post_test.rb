@@ -1332,6 +1332,8 @@ class PostTest < ActiveSupport::TestCase
       post3 = FactoryGirl.create(:post, :rating => "e", :score => 5, :image_width => 10_000)
       relation = Post.tag_match("order:id")
       assert_equal(post1.id, relation.first.id)
+      relation = Post.tag_match("order:mpixels")
+      assert_equal(post3.id, relation.first.id)
       relation = Post.tag_match("order:landscape")
       assert_equal(post3.id, relation.first.id)
     end

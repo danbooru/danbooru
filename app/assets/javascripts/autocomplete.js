@@ -243,6 +243,7 @@
       "comment", "comment_asc",
       "note", "note_asc",
       "artcomm", "artcomm_asc",
+      "mpixels", "mpixels_asc",
       "portrait", "landscape",
       "filesize", "filesize_asc",
       "rank"
