@@ -4,12 +4,16 @@ class SavedSearchTest < ActiveSupport::TestCase
   context "Creating a saved search" do
     setup do
       @user = FactoryGirl.create(:user)
-      @saved_search = @user.saved_searches.create(:tag_query => "xxx")
+      @saved_search = @user.saved_searches.create(:tag_query => " xxx ")
     end
 
     should "update the bitpref on the user" do
       @user.reload
       assert(@user.has_saved_searches?, "should have saved_searches bitpref set")
+    end
+
+    should "normalize whitespace" do
+      assert_equal("xxx", @saved_search.tag_query)
     end
   end
 

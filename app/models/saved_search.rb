@@ -6,9 +6,14 @@ class SavedSearch < ActiveRecord::Base
   before_create :update_user_on_create
   after_destroy :update_user_on_destroy
   validates_uniqueness_of :tag_query, :scope => :user_id
+  before_validation :normalize
 
   def self.tagged(tags)
     where(:tag_query => tags).first
+  end
+
+  def normalize
+    self.tag_query = Tag.scan_query(tag_query).join(" ")
   end
 
   def validate_count
