@@ -20,15 +20,8 @@ if [[ -z "$HOSTNAME" ]] ; then
   exit 1
 fi
 
-RUBY_VERSION=1.9.3-p327
-GITHUB_INSTALL_SCRIPTS=https://raw.githubusercontent.com/r888888888/danbooru/master/script/install
-
-echo -n "* Enter a name for the site (default: Danbooru): "
-read SITENAME
-
-if [[ -z "$SITENAME" ]] ; then
-  SITENAME=Danbooru
-fi
+export RUBY_VERSION=2.1.5
+export GITHUB_INSTALL_SCRIPTS=https://raw.githubusercontent.com/r888888888/danbooru/master/script/install
 
 # Install packages
 echo "* Installing packages..."
@@ -97,10 +90,6 @@ sudo -u danbooru bash -l -c 'cd ~/danbooru ; bundle'
 
 echo "* Creating a new local git branch called develop"
 sudo -u danbooru bash -l -c 'cd ~danbooru ; git checkout -b develop'
-
-echo "* Setting up known_hosts for localhost"
-ssh-keyscan -t rsa,dsa localhost 2>&1 | sort -u - ~/.ssh/known_hosts > ~/.ssh/tmp_hosts
-cat ~/.ssh/tmp_hosts >> ~/.ssh/known_hosts
 
 echo "* Almost done! The code has been checked out at ~danbooru/danbooru. You can  "
 echo "* now login as the danbooru user and run the following commands to deploy to "
