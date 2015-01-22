@@ -148,6 +148,7 @@ GEM
     net-ssh (2.8.0)
     net-ssh-gateway (1.2.0)
       net-ssh (>= 2.6.5)
+    netrc (0.10.2)
     newrelic_rpm (3.9.6.257)
     nokogiri (1.6.1)
       mini_portile (~> 0.5.0)
@@ -187,6 +188,9 @@ GEM
     raindrops (0.13.0)
     rake (10.4.2)
     ref (1.0.5)
+    rest-client (1.7.2)
+      mime-types (>= 1.16, < 3.0)
+      netrc (~> 0.7)
     rmagick (2.13.3)
     ruby-prof (0.14.2)
     rubyzip (1.1.6)
@@ -225,6 +229,10 @@ GEM
       sprockets (>= 2.8, < 4.0)
     statistics2 (0.54)
     streamio-ffmpeg (1.0.0)
+    stripe (1.18.0)
+      json (~> 1.8.1)
+      mime-types (>= 1.25, < 3.0)
+      rest-client (~> 1.4)
     term-ansicolor (1.3.0)
       tins (~> 1.0)
     therubyracer (0.12.1)
@@ -301,6 +309,7 @@ DEPENDENCIES
   sprockets-rails
   statistics2
   streamio-ffmpeg
+  stripe
   term-ansicolor
   therubyracer
   timecop

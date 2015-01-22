@@ -5,18 +5,11 @@ class UserUpgradesController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:create]
 
   def create
-    if params[:order][:status] == "completed"
-      user_id, level = decrypt_custom
-      member = User.find(user_id)
-
-      if member.level < User::Levels::PLATINUM && level >= User::Levels::GOLD && level <= User::Levels::PLATINUM
-        CurrentUser.scoped(User.admins.first, "127.0.0.1") do
-          member.promote_to!(level, :skip_feedback => true)
-        end
-      end
+    if params[:stripeToken]
+      create_stripe
+    elsif params[:order]
+      create_coinbase
     end
-
-    render :nothing => true
   end
 
   def new
@@ -45,6 +38,53 @@ class UserUpgradesController < ApplicationController
   end
 
   private
+
+  def create_stripe
+    @user = user
+
+    if params[:desc] == "Upgrade to Gold"
+      level = User::Levels::GOLD
+      cost = 2000
+    elsif params[:desc] == "Upgrade to Platinum"
+      level = User::Levels::PLATINUM
+      cost = 4000
+    elsif params[:desc] == "Upgrade Gold to Platinum" && @user.level == User::Levels::GOLD
+      level = User::Levels::PLATINUM
+      cost = 2000
+    else
+      raise "Invalid desc"
+    end
+
+    begin
+      charge = Stripe::Charge.create(
+        :amount => cost,
+        :currency => "usd",
+        :card => params[:stripeToken],
+        :description => params[:desc]
+      )
+      @user.promote_to!(level, :skip_feedback => true)
+      flash[:success] = true
+    rescue Stripe::CardError => e
+      flash[:error] = e.message
+    end
+
+    redirect_to user_upgrade_path
+  end
+
+  def create_coinbase
+    if params[:order][:status] == "completed"
+      user_id, level = decrypt_custom
+      member = User.find(user_id)
+
+      if member.level < User::Levels::PLATINUM && level >= User::Levels::GOLD && level <= User::Levels::PLATINUM
+        CurrentUser.scoped(User.admins.first, "127.0.0.1") do
+          member.promote_to!(level, :skip_feedback => true)
+        end
+      end
+    end
+
+    render :nothing => true
+  end
 
   def decrypt_custom
     crypt.decrypt_and_verify(params[:order][:custom]).split(/,/).map(&:to_i)

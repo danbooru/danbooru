@@ -85,8 +85,24 @@
       </div>
     <% end %>
 
+    <div class="section">
+      <% if params[:user_id] %>
+        <p>You are gifting this account upgrade to <%= link_to user.pretty_name, user_path(params[:user_id]) %>.</p>
+      <% else %>
+        <p>You can also upgrade someone else's account for the same price. The easiest way is to go to their profile page and look for a "Gift Upgrade" link.</p>
+      <% end %>
+    </div>
+    
     <% if Danbooru.config.coinbase_api_key %>
       <%= render "coinbase_payment" %>
+    <% end %>
+
+    <% if Danbooru.config.stripe_publishable_key %>
+      <% if CurrentUser.safe_mode? %>
+        <%= render "stripe_payment" %>
+      <% else %>
+        <%= render "stripe_payment_safebooru" %>
+      <% end %>
     <% end %>
   </div>
 </div>

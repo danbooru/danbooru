@@ -335,5 +335,11 @@ module Danbooru
 
     def coinbase_api_secret
     end
+
+    def stripe_secret_key
+    end
+    
+    def stripe_publishable_key
+    end
   end
 end
