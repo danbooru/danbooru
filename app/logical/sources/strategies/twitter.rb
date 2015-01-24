@@ -14,6 +14,7 @@ module Sources::Strategies
 
     def get
       agent.get(url) do |page|
+        puts page.body
         @artist_name, @profile_url = get_profile_from_page(page)
         @image_url = get_image_url_from_page(page)
       end
@@ -52,10 +53,18 @@ module Sources::Strategies
         session = Cache.get("twitter-session")
 
         if session
+          auth_token = Cache.get("twitter-auth-token")
+
           cookie = Mechanize::Cookie.new("_twitter_sess", session)
           cookie.domain = ".twitter.com"
           cookie.path = "/"
           mech.cookie_jar.add(cookie)
+
+          cookie = Mechanize::Cookie.new("auth_token", auth_token)
+          cookie.domain = ".twitter.com"
+          cookie.path = "/"
+          mech.cookie_jar.add(cookie)
+
         elsif Danbooru.config.twitter_login
           mech.get("https://twitter.com/login") do |page|
             page.form_with(:action => "https://twitter.com/sessions") do |form|
@@ -65,6 +74,8 @@ module Sources::Strategies
           end
           session = mech.cookie_jar.cookies.select{|c| c.name == "_twitter_sess"}.first
           Cache.put("twitter-session", session.value, 1.month) if session
+          auth_token = mech.cookie_jar.cookies.select{|c| c.name == "auth_token"}.first
+          Cache.put("twitter-auth-token", auth_token.value, 1.month) if auth_token
         end
 
         mech
