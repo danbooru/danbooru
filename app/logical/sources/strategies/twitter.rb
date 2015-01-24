@@ -47,7 +47,28 @@ module Sources::Strategies
     private
 
     def agent
-      @agent ||= Mechanize.new
+      @agent ||= begin
+        mech = Mechanize.new
+        session = Cache.get("twitter-session")
+
+        if session
+          cookie = Mechanize::Cookie.new("_twitter_sess", session)
+          cookie.domain = ".twitter.com"
+          cookie.path = "/"
+          mech.cookie_jar.add(cookie)
+        elsif Danbooru.config.twitter_login
+          mech.get("https://twitter.com/login") do |page|
+            page.form_with(:action => "https://twitter.com/sessions") do |form|
+              form["session[username_or_email]"] = Danbooru.config.twitter_login
+              form["session[password]"] = Danbooru.config.twitter_password
+            end.click_button
+          end
+          session = mech.cookie_jar.cookies.select{|c| c.name == "_twitter_sess"}.first
+          Cache.put("twitter-session", session.value, 1.month) if session
+        end
+
+        mech
+      end
     end
   end
 end

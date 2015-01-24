@@ -6381,6 +6381,13 @@ CREATE INDEX index_forum_topics_on_text_index ON forum_topics USING gin (text_in
 
 
 --
+-- Name: index_forum_topics_on_updated_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_forum_topics_on_updated_at ON forum_topics USING btree (updated_at);
+
+
+--
 -- Name: index_ip_bans_on_ip_addr; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -6682,13 +6689,6 @@ CREATE INDEX index_posts_on_pixiv_id ON posts USING btree (pixiv_id) WHERE (pixi
 
 
 --
--- Name: index_posts_on_source; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_posts_on_source ON posts USING btree (lower((source)::text));
-
-
---
 -- Name: index_posts_on_source_pattern; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -6707,13 +6707,6 @@ CREATE INDEX index_posts_on_tags_index ON posts USING gin (tag_index);
 --
 
 CREATE INDEX index_posts_on_uploader_id ON posts USING btree (uploader_id);
-
-
---
--- Name: index_posts_on_uploader_ip_addr; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_posts_on_uploader_ip_addr ON posts USING btree (uploader_ip_addr);
 
 
 --
@@ -7173,4 +7166,8 @@ INSERT INTO schema_migrations (version) VALUES ('20141009231234');
 INSERT INTO schema_migrations (version) VALUES ('20141017231608');
 
 INSERT INTO schema_migrations (version) VALUES ('20141120045943');
+
+INSERT INTO schema_migrations (version) VALUES ('20150119191042');
+
+INSERT INTO schema_migrations (version) VALUES ('20150120005624');
 
