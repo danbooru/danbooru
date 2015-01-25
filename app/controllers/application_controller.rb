@@ -115,7 +115,7 @@ protected
       if params[:search].is_a?(Hash)
         changed = params[:search].reject! {|k,v| v.blank?}
         unless changed.nil?
-          redirect_to params
+          redirect_to url_for(params)
         end
       end
     end
