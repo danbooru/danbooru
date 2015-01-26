@@ -15,10 +15,32 @@ Danbooru.Note = {
       $note_box.addClass("note-box");
       $note_box.data("id", String(id));
       $note_box.attr("data-id", String(id));
-      $note_box.draggable({containment: $("#image")});
+      $note_box.draggable({
+        containment: $("#image"),
+        stop: function(e, ui) {
+          var $image = $("#image");
+          var ratio = $image.width() / parseFloat($image.data("original-width"));
+          var new_x = parseFloat($note_box.css("left"));
+          var new_y = parseFloat($note_box.css("top"));
+          new_x = parseInt(new_x / ratio);
+          new_y = parseInt(new_y / ratio);
+          $note_box.data("x", new_x);
+          $note_box.data("y", new_y);
+        }
+      });
       $note_box.resizable({
         containment: $("#image"),
-        handles: "se"
+        handles: "se",
+        stop: function(e, ui) {
+          var $image = $("#image");
+          var ratio = $image.width() / parseFloat($image.data("original-width"));
+          var new_width = parseFloat($note_box.css("width"));
+          var new_height = parseFloat($note_box.css("height"));
+          new_width = parseInt(new_width / ratio);
+          new_height = parseInt(new_height / ratio);
+          $note_box.data("width", new_width);
+          $note_box.data("height", new_height);
+        }
       });
       $note_box.css({position: "absolute"});
       $note_box.append($inner_border);
@@ -115,11 +137,15 @@ Danbooru.Note = {
       var container = document.getElementById('note-container');
       // Hide notes while rescaling, to prevent unnecessary reflowing
       var was_visible = container.style.display != 'none';
-      if (was_visible) container.style.display = 'none';
+      if (was_visible) {
+        container.style.display = 'none';
+      }
       $(".note-box").each(function(i, v) {
         Danbooru.Note.Box.scale($(v));
       });
-      if (was_visible) container.style.display = 'block';
+      if (was_visible) {
+        container.style.display = 'block';
+      }
     },
 
     toggle_all: function() {
