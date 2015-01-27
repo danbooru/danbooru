@@ -316,7 +316,7 @@ class Upload < ActiveRecord::Base
       when /^CWS/, /^FWS/, /^ZWS/
         "application/x-shockwave-flash"
 
-      when /^\x1a\x45\xdf\xa3/
+      when /^\x1a\x45\xdf\xa3/n
         "video/webm"
 
       when /^PK\x03\x04/
