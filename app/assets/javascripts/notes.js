@@ -4,8 +4,15 @@ Danbooru.Note = {
       var $inner_border = $('<div/>');
       $inner_border.addClass("note-box-inner-border");
 
+      var opacity = 0;
+      if (Danbooru.meta("post-has-embedded-notes") === "true") {
+        opacity = 0.9
+      } else {
+        opacity = 0.5
+      }
+
       $inner_border.css({
-        opacity: 0.5,
+        opacity: opacity,
         "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)",
         "filter": "alpha(opacity=50)",
         zoom: 1
@@ -269,7 +276,9 @@ Danbooru.Note = {
 
     set_text: function($note_body, $note_box, text) {
       Danbooru.Note.Body.display_text($note_body, text);
-      Danbooru.Note.Body.display_text($note_box.children("div"), text);
+      if (Danbooru.meta("post-has-embedded-notes") === "true") {
+        Danbooru.Note.Body.display_text($note_box.children("div"), text);
+      }
       Danbooru.Note.Body.resize($note_body);
       Danbooru.Note.Body.bound_position($note_body);
     },
@@ -663,7 +672,9 @@ Danbooru.Note = {
     $note_body.data("original-body", text);
     Danbooru.Note.Box.scale($note_box);
     Danbooru.Note.Body.display_text($note_body, text);
-    Danbooru.Note.Body.display_text($note_box.children("div"), text);
+    if (Danbooru.meta("post-has-embedded-notes") === "true") {
+      Danbooru.Note.Body.display_text($note_box.children("div"), text);
+    }
   },
 
   create: function(x, y, w, h) {
