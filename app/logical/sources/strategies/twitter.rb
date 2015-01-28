@@ -47,23 +47,22 @@ module Sources::Strategies
 
     private
 
+    def add_cookie(mech, name, value)
+      cookie = Mechanize::Cookie.new(name, value)
+      cookie.domain = ".twitter.com"
+      cookie.path = "/"
+      mech.cookie_jar.add(cookie)
+    end
+
     def agent
       @agent ||= begin
         mech = Mechanize.new
         session = Cache.get("twitter-session")
+        auth_token = Cache.get("twitter-auth-token")
 
-        if session
-          auth_token = Cache.get("twitter-auth-token")
-
-          cookie = Mechanize::Cookie.new("_twitter_sess", session)
-          cookie.domain = ".twitter.com"
-          cookie.path = "/"
-          mech.cookie_jar.add(cookie)
-
-          cookie = Mechanize::Cookie.new("auth_token", auth_token)
-          cookie.domain = ".twitter.com"
-          cookie.path = "/"
-          mech.cookie_jar.add(cookie)
+        if session && auth_token
+          add_cookie(mech, "_twitter_sess", session)
+          add_cookie(mech, "auth_token", auth_token)
 
         elsif Danbooru.config.twitter_login
           mech.get("https://twitter.com/login") do |page|
