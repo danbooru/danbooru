@@ -71,6 +71,12 @@ div#note-container {
       border: 1px solid red;
     }
   }
+
+  div.note-box.embedded div.note-box-inner-border {
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+  }
 }
 
 div#note-preview {

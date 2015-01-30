@@ -20,6 +20,11 @@ Danbooru.Note = {
 
       var $note_box = $('<div/>');
       $note_box.addClass("note-box");
+
+      if (Danbooru.Note.embed) {
+        $note_box.addClass("embedded");
+      }
+
       $note_box.data("id", String(id));
       $note_box.attr("data-id", String(id));
       $note_box.draggable({
