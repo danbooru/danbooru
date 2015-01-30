@@ -6,7 +6,7 @@ Danbooru.Note = {
 
       var opacity = 0;
       if (Danbooru.Note.embed) {
-        opacity = 0.9
+        opacity = 0.95
       } else {
         opacity = 0.5
       }
@@ -383,7 +383,7 @@ Danbooru.Note = {
         $(".note-box").draggable("enable");
 
         if (Danbooru.Note.embed) {
-          $(".note-box").css("opacity", "0.9");
+          $(".note-box").css("opacity", "0.95");
         }
       });
 
