@@ -1,3 +1,4 @@
+set :keep_releases, 10
 set :stages, %w(production development staging)
 set :default_stage, "staging"
 set :unicorn_env, defer {stage}
@@ -163,3 +164,4 @@ after "deploy:update", "unicorn:restart"
 after "deploy:update", "deploy:precompile_assets"
 after "deploy:update", "deploy:web:enable"
 after "delayed_job:stop", "delayed_job:kill"
+after "deploy:update", "deploy:cleanup"
