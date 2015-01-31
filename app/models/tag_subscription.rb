@@ -130,7 +130,7 @@ class TagSubscription < ActiveRecord::Base
         relation = relation.where(["name ILIKE ? ESCAPE E'\\\\'", sub_group.to_escaped_for_sql_like])
       end
 
-      relation.map {|x| x.tag_query.split(/\r?\n/)}.flatten
+      relation.map {|x| x.tag_query_array}.flatten
     else
       []
     end
