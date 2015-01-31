@@ -9,15 +9,11 @@ class SavedSearch < ActiveRecord::Base
   before_validation :normalize
 
   def self.tagged(tags)
-    where(:tag_query => SavedSearch.normalize(tags)).first
-  end
-
-  def self.normalize(tag_query)
-    Tag.scan_query(tag_query).join(" ")
+    where(:tag_query => tags).first
   end
 
   def normalize
-    self.tag_query = SavedSearch.normalize(tag_query)
+    self.tag_query = Tag.scan_query(tag_query).join(" ")
   end
 
   def validate_count

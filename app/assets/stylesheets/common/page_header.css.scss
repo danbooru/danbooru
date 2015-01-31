@@ -1,5 +1,9 @@
 @import "000_vars.css.scss";
 
+#maintoggle {
+  display: none;
+}
+
 header#top {
   h1 {
     font-size: 2.5em;
