@@ -3,6 +3,10 @@ class Post < ActiveRecord::Base
   class DisapprovalError < Exception ; end
   class SearchError < Exception ; end
 
+  BOOLEAN_ATTRIBUTES = {
+    :has_embedded_notes => 0x0001
+  }
+
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning
   after_destroy :delete_files
   after_destroy :delete_remote_files
@@ -38,7 +42,7 @@ class Post < ActiveRecord::Base
   has_many :favorites, :dependent => :destroy
   validates_uniqueness_of :md5
   validate :post_is_not_its_own_parent
-  attr_accessible :source, :rating, :tag_string, :old_tag_string, :old_parent_id, :old_source, :old_rating, :last_noted_at, :parent_id, :as => [:member, :builder, :gold, :platinum, :contributor, :janitor, :moderator, :admin, :default]
+  attr_accessible :source, :rating, :tag_string, :old_tag_string, :old_parent_id, :old_source, :old_rating, :last_noted_at, :parent_id, :has_embedded_notes, :as => [:member, :builder, :gold, :platinum, :contributor, :janitor, :moderator, :admin, :default]
   attr_accessible :is_rating_locked, :is_note_locked, :as => [:builder, :contributor, :janitor, :moderator, :admin]
   attr_accessible :is_status_locked, :as => [:admin]
 
@@ -1485,6 +1489,24 @@ class Post < ActiveRecord::Base
   extend SearchMethods
   include PixivMethods
   include IqdbMethods
+
+  BOOLEAN_ATTRIBUTES.each do |boolean_attribute, bit_flag|
+    define_method(boolean_attribute) do
+      bit_flags & bit_flag > 0
+    end
+
+    define_method("#{boolean_attribute}?") do
+      bit_flags & bit_flag > 0
+    end
+
+    define_method("#{boolean_attribute}=") do |val|
+      if val.to_s =~ /t|1|y/
+        self.bit_flags |= bit_flag
+      else
+        self.bit_flags &= ~bit_flag
+      end
+    end
+  end
 
   def visible?
     return false if !Danbooru.config.can_user_see_post?(CurrentUser.user, self)

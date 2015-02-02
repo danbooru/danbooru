@@ -71,6 +71,11 @@ div#note-container {
       border: 1px solid red;
     }
   }
+
+  div.note-box.embedded div.note-box-inner-border {
+    text-align: center;
+    word-wrap: break-word;
+  }
 }
 
 div#note-preview {

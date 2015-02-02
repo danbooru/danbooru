@@ -4,8 +4,15 @@ Danbooru.Note = {
       var $inner_border = $('<div/>');
       $inner_border.addClass("note-box-inner-border");
 
+      var opacity = 0;
+      if (Danbooru.Note.embed) {
+        opacity = 0.95
+      } else {
+        opacity = 0.5
+      }
+
       $inner_border.css({
-        opacity: 0.5,
+        opacity: opacity,
         "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)",
         "filter": "alpha(opacity=50)",
         zoom: 1
@@ -13,6 +20,11 @@ Danbooru.Note = {
 
       var $note_box = $('<div/>');
       $note_box.addClass("note-box");
+
+      if (Danbooru.Note.embed) {
+        $note_box.addClass("embedded");
+      }
+
       $note_box.data("id", String(id));
       $note_box.attr("data-id", String(id));
       $note_box.draggable({
@@ -267,8 +279,11 @@ Danbooru.Note = {
       }
     },
 
-    set_text: function($note_body, text) {
+    set_text: function($note_body, $note_box, text) {
       Danbooru.Note.Body.display_text($note_body, text);
+      if (Danbooru.Note.embed) {
+        Danbooru.Note.Body.display_text($note_box.children("div"), text);
+      }
       Danbooru.Note.Body.resize($note_body);
       Danbooru.Note.Body.bound_position($note_body);
     },
@@ -321,6 +336,10 @@ Danbooru.Note = {
       $(".note-box").resizable("disable");
       $(".note-box").draggable("disable");
 
+      if (Danbooru.Note.embed) {
+        $(".note-box").css("opacity", "0.5");
+      }
+
       $textarea = $('<textarea></textarea>');
       $textarea.css({
         width: "97%",
@@ -362,6 +381,10 @@ Danbooru.Note = {
         Danbooru.Note.editing = false;
         $(".note-box").resizable("enable");
         $(".note-box").draggable("enable");
+
+        if (Danbooru.Note.embed) {
+          $(".note-box").css("opacity", "0.95");
+        }
       });
 
       $textarea.selectEnd();
@@ -416,9 +439,9 @@ Danbooru.Note = {
       var $note_box = Danbooru.Note.Box.find(id);
       var text = $textarea.val();
       $note_body.data("original-body", text);
-      Danbooru.Note.Body.set_text($note_body, "Loading...");
+      Danbooru.Note.Body.set_text($note_body, $note_box, "Loading...");
       $.get("/note_previews.json", {body: text}).success(function(data) {
-        Danbooru.Note.Body.set_text($note_body, data.body);
+        Danbooru.Note.Body.set_text($note_body, $note_box, data.body);
         $note_body.show();
       });
       $this.dialog("close");
@@ -448,9 +471,9 @@ Danbooru.Note = {
       var text = $textarea.val();
       var $note_box = Danbooru.Note.Box.find(id);
       $note_box.find(".note-box-inner-border").addClass("unsaved");
-      Danbooru.Note.Body.set_text($note_body, "Loading...");
+      Danbooru.Note.Body.set_text($note_body, $note_box, "Loading...");
       $.get("/note_previews.json", {body: text}).success(function(data) {
-        Danbooru.Note.Body.set_text($note_body, data.body);
+        Danbooru.Note.Body.set_text($note_body, $note_box, data.body);
         $note_body.show();
       });
     },
@@ -662,6 +685,9 @@ Danbooru.Note = {
     $note_body.data("original-body", text);
     Danbooru.Note.Box.scale($note_box);
     Danbooru.Note.Body.display_text($note_body, text);
+    if (Danbooru.Note.embed) {
+      Danbooru.Note.Body.display_text($note_box.children("div"), text);
+    }
   },
 
   create: function(x, y, w, h) {
@@ -713,6 +739,7 @@ $(function() {
       $("#translate").bind("click", Danbooru.Note.TranslationMode.toggle);
       $(document).bind("keypress", "n", Danbooru.Note.TranslationMode.toggle);
     }
+    Danbooru.Note.embed = (Danbooru.meta("post-has-embedded-notes") === "true");
     Danbooru.Note.load_all();
     $("#image").bind("click", Danbooru.Note.Box.toggle_all);
   }
