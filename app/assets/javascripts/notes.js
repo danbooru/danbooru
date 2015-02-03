@@ -130,6 +130,14 @@ Danbooru.Note = {
         height: $note_box.height() - 2,
         width: $note_box.width() - 2
       });
+
+      if ($inner_border.width() >= $note_box.width() - 2) {
+        $note_box.width($inner_border.width() + 2);
+      }
+
+      if ($inner_border.height() >= $note_box.height() - 2) {
+        $note_box.height($inner_border.height() + 2);
+      }
     },
 
     scale: function($note_box) {

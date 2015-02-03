@@ -74,7 +74,8 @@ div#note-container {
 
   div.note-box.embedded div.note-box-inner-border {
     text-align: center;
-    word-wrap: break-word;
+    display: table-cell;
+    vertical-align: middle;
   }
 }
 
