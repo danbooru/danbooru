@@ -738,6 +738,11 @@ Danbooru.Note = {
       );
     });
     $("#note-container").append(fragment);
+    if (Danbooru.Note.embed) {
+      $.each($(".note-box"), function(i, note_box) {
+        Danbooru.Note.Box.resize_inner_border($(note_box));
+      });
+    }
   }
 }
 
