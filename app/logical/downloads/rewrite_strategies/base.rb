@@ -6,7 +6,7 @@ module Downloads
       end
 
       def self.strategies
-        [Pixiv, NicoSeiga, Twitpic, DeviantArt, Tumblr, Moebooru, Twitter]
+        [Downloads::RewriteStrategies::Pixiv, Downloads::RewriteStrategies::NicoSeiga, Downloads::RewriteStrategies::Twitpic, Downloads::RewriteStrategies::DeviantArt, Downloads::RewriteStrategies::Tumblr, Downloads::RewriteStrategies::Moebooru, Downloads::RewriteStrategies::Twitter]
       end
 
       def rewrite(url, headers, data = {})

@@ -49,6 +49,7 @@ GEM
     bcrypt (3.1.7)
     bcrypt-ruby (3.1.5)
       bcrypt (>= 3.1.3)
+    buftok (0.2.0)
     builder (3.2.2)
     byebug (3.2.0)
       columnize (~> 0.8)
@@ -94,6 +95,7 @@ GEM
     docile (1.1.3)
     domain_name (0.5.18)
       unf (>= 0.0.5, < 1.0.0)
+    equalizer (0.0.9)
     erubis (2.7.0)
     execjs (2.0.2)
     factory_girl (4.4.0)
@@ -104,8 +106,11 @@ GEM
     hashie (3.3.1)
     highline (1.6.21)
     hike (1.2.3)
+    http (0.6.3)
+      http_parser.rb (~> 0.6.0)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
+    http_parser.rb (0.6.0)
     httparty (0.13.3)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
@@ -125,6 +130,8 @@ GEM
       nokogiri (~> 1.4)
       ntlm-http (~> 0.1, >= 0.1.1)
       webrobots (>= 0.0.9, < 0.2)
+    memoizable (0.4.2)
+      thread_safe (~> 0.3, >= 0.3.1)
     metaclass (0.0.4)
     method_source (0.8.2)
     mime-types (1.25.1)
@@ -139,6 +146,7 @@ GEM
     multi_json (1.10.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
+    naught (1.0.0)
     net-http-digest_auth (1.4)
     net-http-persistent (2.9.4)
     net-scp (1.2.0)
@@ -212,6 +220,7 @@ GEM
     simple_form (3.0.2)
       actionpack (~> 4.0)
       activemodel (~> 4.0)
+    simple_oauth (0.3.1)
     simplecov (0.8.2)
       docile (~> 1.1.0)
       multi_json
@@ -243,6 +252,17 @@ GEM
     tilt (1.4.1)
     timecop (0.7.1)
     tins (1.1.0)
+    twitter (5.13.0)
+      addressable (~> 2.3)
+      buftok (~> 0.2.0)
+      equalizer (~> 0.0.9)
+      faraday (~> 0.9.0)
+      http (~> 0.6.0)
+      http_parser.rb (~> 0.6.0)
+      json (~> 1.8)
+      memoizable (~> 0.4.0)
+      naught (~> 1.0)
+      simple_oauth (~> 0.3.0)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
     uglifier (2.5.0)
@@ -313,6 +333,7 @@ DEPENDENCIES
   term-ansicolor
   therubyracer
   timecop
+  twitter
   uglifier
   unicorn
   vcr

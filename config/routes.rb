@@ -232,7 +232,11 @@ Rails.application.routes.draw do
       get :posts
     end
   end
-  resources :uploads
+  resources :uploads do
+    collection do
+      get :batch
+    end
+  end
   resources :users do
     collection do
       get :search

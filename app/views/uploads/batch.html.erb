@@ -1,0 +1,31 @@
+<div id="c-uploads">
+  <div id="a-new">
+    <h1>Batch Upload</h1>
+
+    <ul id="links">
+      <% @urls.each.with_index do |url, i| %>
+        <li><%= link_to "Image ##{i}", new_upload_path(:url => url, :ref => params[:url]), :target => "_blank" %></li>
+      <% end %>
+    </ul>
+
+    <p><%= link_to "Open all links in new windows", "#", :id => "link" %></p>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  Batch Upload - <%= Danbooru.config.app_name %>
+<% end %>
+
+<% content_for(:html_header) do %>
+  <script type="text/javascript">
+    $(function() {
+      $("#link").click(function() {
+        $("#links a").each(function(i, v) {
+          window.open(v.href);
+        });
+      });
+    })
+  </script>
+<% end %>
+
+<%= render "posts/partials/common/secondary_links" %>

@@ -26,6 +26,13 @@ class UploadsController < ApplicationController
     respond_with(@upload)
   end
 
+  def batch
+    if params[:url] =~ /twitter/
+      @service = TwitterService.new
+    end
+    @urls = @service.image_urls(params[:url])
+  end
+
   def index
     @search = Upload.search(params[:search])
     @uploads = @search.order("id desc").paginate(params[:page], :limit => params[:limit])

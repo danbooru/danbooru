@@ -342,10 +342,10 @@ module Danbooru
     def stripe_publishable_key
     end
 
-    def twitter_login
+    def twitter_api_key
     end
 
-    def twitter_password
+    def twitter_api_secret
     end
   end
 end
