@@ -1,28 +1,20 @@
 ---
 http_interactions:
 - request:
-    method: get
-    uri: https://twitter.com/login
+    method: post
+    uri: https://xxx:xxx@api.twitter.com/oauth2/token
     body:
-      encoding: US-ASCII
-      string: ''
+      encoding: UTF-8
+      string: grant_type=client_credentials
     headers:
-      Accept-Encoding:
-      - gzip,deflate,identity
       Accept:
       - "*/*"
       User-Agent:
-      - Mechanize/2.7.2 Ruby/2.1.5p273 (http://github.com/sparklemotion/mechanize/)
-      Accept-Charset:
-      - ISO-8859-1,utf-8;q=0.7,*;q=0.7
-      Accept-Language:
-      - en-us,en;q=0.5
-      Host:
-      - twitter.com
-      Connection:
-      - keep-alive
-      Keep-Alive:
-      - 300
+      - TwitterRubyGem/5.13.0
+      Content-Type:
+      - application/x-www-form-urlencoded; charset=UTF-8
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
   response:
     status:
       code: 200
@@ -30,369 +22,16 @@ http_interactions:
     headers:
       Cache-Control:
       - no-cache, no-store, must-revalidate, pre-check=0, post-check=0
-      Content-Encoding:
-      - gzip
       Content-Length:
-      - '10789'
-      Content-Security-Policy:
-      - 'default-src https:; connect-src https:; font-src https: data:; frame-src
-        https: twitter:; img-src https: data:; media-src https:; object-src https:;
-        script-src ''unsafe-inline'' ''unsafe-eval'' https:; style-src ''unsafe-inline''
-        https:; report-uri https://twitter.com/i/csp_report?a=NVQWGYLXFVZXO2LGOQ%3D%3D%3D%3D%3D%3D&ro=false;'
+      - '151'
       Content-Type:
-      - text/html;charset=utf-8
+      - application/json;charset=utf-8
       Date:
-      - Sat, 24 Jan 2015 20:11:08 UTC
+      - Tue, 10 Feb 2015 00:55:58 UTC
       Expires:
       - Tue, 31 Mar 1981 05:00:00 GMT
       Last-Modified:
-      - Sat, 24 Jan 2015 20:11:08 GMT
-      Ms:
-      - S
-      Pragma:
-      - no-cache
-      Server:
-      - tsa_a
-      Set-Cookie:
-      - _twitter_sess=BAh7CSIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7ADoPY3JlYXRlZF9hdGwrCGfIkR1LAToMY3NyZl9p%250AZCIlNmY2MGMzODFlYzQ2MWYyYjQ2MmM3ZTQwYTQyNDNlNTk6B2lkIiViNDA0%250ANDBiMmNjODRkY2I1ZmM5YzM3MGE0ZjQzMDY1OQ%253D%253D--1fb754933ee4e6491553ce04017f255c94c6e713;
-        Path=/; Domain=.twitter.com; Secure; HTTPOnly
-      - guest_id=v1%3A142213026826270413; Domain=.twitter.com; Path=/; Expires=Mon,
-        23-Jan-2017 20:11:08 UTC
-      Status:
-      - 200 OK
-      Strict-Transport-Security:
-      - max-age=631138519
-      X-Connection-Hash:
-      - d19046ab394a92be496430338b873edb
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - SAMEORIGIN
-      X-Response-Time:
-      - '16'
-      X-Transaction:
-      - cf79b9019be6c712
-      X-Twitter-Response-Tags:
-      - BouncerCompliant
-      X-Ua-Compatible:
-      - IE=edge,chrome=1
-      X-Xss-Protection:
-      - 1; mode=block
-    body:
-      encoding: ASCII-8BIT
-      string: !binary |-
-        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
-    http_version: 
-  recorded_at: Sat, 24 Jan 2015 20:11:08 GMT
-- request:
-    method: post
-    uri: https://twitter.com/sessions
-    body:
-      encoding: UTF-8
-      string: session%5Busername_or_email%5D=uroobnad&session%5Bpassword%5D=muTxNnd%2505PJ&remember_me=1&scribe_log=&redirect_after_login=&authenticity_token=bf0460ef5fa8160a21dcd4c49fad1fc86ae5c808
-    headers:
-      Accept-Encoding:
-      - gzip,deflate,identity
-      Accept:
-      - "*/*"
-      User-Agent:
-      - Mechanize/2.7.2 Ruby/2.1.5p273 (http://github.com/sparklemotion/mechanize/)
-      Accept-Charset:
-      - ISO-8859-1,utf-8;q=0.7,*;q=0.7
-      Accept-Language:
-      - en-us,en;q=0.5
-      Cookie:
-      - _twitter_sess=BAh7CSIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7ADoPY3JlYXRlZF9hdGwrCGfIkR1LAToMY3NyZl9p%250AZCIlNmY2MGMzODFlYzQ2MWYyYjQ2MmM3ZTQwYTQyNDNlNTk6B2lkIiViNDA0%250ANDBiMmNjODRkY2I1ZmM5YzM3MGE0ZjQzMDY1OQ%253D%253D--1fb754933ee4e6491553ce04017f255c94c6e713;
-        guest_id=v1%3A142213026826270413
-      Host:
-      - twitter.com
-      Referer:
-      - &1 !ruby/object:URI::HTTPS
-        scheme: https
-        user: 
-        password: 
-        host: twitter.com
-        port: 443
-        path: "/login"
-        query: 
-        opaque: 
-        registry: 
-        fragment: 
-        parser: 
-      Content-Type:
-      - application/x-www-form-urlencoded
-      Content-Length:
-      - '184'
-      Connection:
-      - keep-alive
-      Keep-Alive:
-      - 300
-  response:
-    status:
-      code: 302
-      message: Found
-    headers:
-      Cache-Control:
-      - no-cache, no-store, must-revalidate, pre-check=0, post-check=0
-      Content-Encoding:
-      - gzip
-      Content-Length:
-      - '103'
-      Content-Security-Policy:
-      - default-src 'none'; connect-src 'self'; font-src https://abs.twimg.com data:;
-        frame-src 'self' twitter:; img-src https://abs.twimg.com https://pbs.twimg.com
-        data:; media-src 'none'; object-src 'none'; script-src https://abs.twimg.com
-        https://abs-0.twimg.com; style-src https://abs.twimg.com https://abs-0.twimg.com;
-        report-uri https://twitter.com/i/csp_report?a=NVQWGYLXFVWG6Z3JNY%3D%3D%3D%3D%3D%3D&ro=false;
-      Content-Type:
-      - text/html;charset=utf-8
-      Date:
-      - Sat, 24 Jan 2015 20:11:08 UTC
-      Expires:
-      - Tue, 31 Mar 1981 05:00:00 GMT
-      Last-Modified:
-      - Sat, 24 Jan 2015 20:11:08 GMT
-      Location:
-      - https://twitter.com/
+      - Tue, 10 Feb 2015 00:55:58 GMT
       Ml:
       - S
       Pragma:
@@ -400,30 +39,22 @@ http_interactions:
       Server:
       - tsa_a
       Set-Cookie:
-      - _twitter_sess=BAh7CiIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7ADoPY3JlYXRlZF9hdGwrCGfIkR1LAToMY3NyZl9p%250AZCIlNmY2MGMzODFlYzQ2MWYyYjQ2MmM3ZTQwYTQyNDNlNTk6B2lkIiViNDA0%250ANDBiMmNjODRkY2I1ZmM5YzM3MGE0ZjQzMDY1OToJdXNlcmwrBzQOcLI%253D--ea988b8e4016887b50a4b54914ddc5b13a8dc8b3;
-        Path=/; Domain=.twitter.com; Secure; HTTPOnly
-      - auth_token=99A97F1DAC8E2576EAAC6A5376D979412C764C2A; Expires=Tue, 21 Jan 2025
-        20:11:08 GMT; Path=/; Domain=.twitter.com; Secure; HTTPOnly
-      - device_token="QEMP4JIY1RE546Wu+t0zHb+ubz3BoOGr6826KW4BP7ERdpqGLyJmHfC13bOe0/QFq9orBOJBKDFyq2Tq/OVLiHhm6vumtDaTsM4fXJ4hwmXJULNGuySoGDDuTyMtJkhOqplwqxINQSaLPMoNMayZ4oniSdpiUL5PMqxJLYOWFbwknExbx1lB9g==";
-        Expires=Mon, 23 Jan 2017 20:11:08 GMT; Path=/; Domain=.twitter.com; Secure;
-        HTTPOnly
-      - dnt=1; Expires=Tue, 21 Jan 2025 20:11:08 GMT; Path=/; Domain=.twitter.com
-      - remember_checked_on=1; Expires=Tue, 21 Jan 2025 20:11:08 GMT; Path=/; Domain=.twitter.com
-      - twid="u=2993688116"; Path=/; Domain=.twitter.com; Secure
+      - guest_id=v1%3A142352975842219761; Domain=.twitter.com; Path=/; Expires=Thu,
+        09-Feb-2017 00:55:58 UTC
       Status:
-      - 302 Found
+      - 200 OK
       Strict-Transport-Security:
       - max-age=631138519
       X-Connection-Hash:
-      - c00f22bc96474e3a5a1f9039c858de7c
+      - 55a223e902e02f414b40edc9354fbbab
       X-Content-Type-Options:
       - nosniff
       X-Frame-Options:
       - SAMEORIGIN
       X-Response-Time:
-      - '153'
+      - '10'
       X-Transaction:
-      - 8cfb37c6ea038f6c
+      - 13141271361bfec5
       X-Twitter-Response-Tags:
       - BouncerCompliant
       X-Ua-Compatible:
@@ -431,42 +62,25 @@ http_interactions:
       X-Xss-Protection:
       - 1; mode=block
     body:
-      encoding: ASCII-8BIT
-      string: !binary |-
-        H4sIAAAAAAAAABzM2wmAMAwAwFVCB2j+JWYPP/uIbcFaiRFxe6E3wFG1fjDF
-        kT/exgNBBaK0swAFqCr76qrZdS+I9jYzUZ9GR8cquakkk0wY2BPOgnB+PwAA
-        AP//AwDKwyzvVgAAAA==
+      encoding: UTF-8
+      string: '{"token_type":"bearer","access_token":"xxx"}'
     http_version: 
-  recorded_at: Sat, 24 Jan 2015 20:11:08 GMT
+  recorded_at: Tue, 10 Feb 2015 00:55:58 GMT
 - request:
     method: get
-    uri: https://twitter.com/
+    uri: https://api.twitter.com/1.1/statuses/show/556440271961858051.json
     body:
       encoding: US-ASCII
       string: ''
     headers:
-      Accept-Encoding:
-      - gzip,deflate,identity
       Accept:
-      - "*/*"
+      - application/json
       User-Agent:
-      - Mechanize/2.7.2 Ruby/2.1.5p273 (http://github.com/sparklemotion/mechanize/)
-      Accept-Charset:
-      - ISO-8859-1,utf-8;q=0.7,*;q=0.7
-      Accept-Language:
-      - en-us,en;q=0.5
-      Cookie:
-      - _twitter_sess=BAh7CiIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7ADoPY3JlYXRlZF9hdGwrCGfIkR1LAToMY3NyZl9p%250AZCIlNmY2MGMzODFlYzQ2MWYyYjQ2MmM3ZTQwYTQyNDNlNTk6B2lkIiViNDA0%250ANDBiMmNjODRkY2I1ZmM5YzM3MGE0ZjQzMDY1OToJdXNlcmwrBzQOcLI%253D--ea988b8e4016887b50a4b54914ddc5b13a8dc8b3;
-        auth_token=99A97F1DAC8E2576EAAC6A5376D979412C764C2A; device_token=QEMP4JIY1RE546Wu+t0zHb+ubz3BoOGr6826KW4BP7ERdpqGLyJmHfC13bOe0/QFq9orBOJBKDFyq2Tq/OVLiHhm6vumtDaTsM4fXJ4hwmXJULNGuySoGDDuTyMtJkhOqplwqxINQSaLPMoNMayZ4oniSdpiUL5PMqxJLYOWFbwknExbx1lB9g==;
-        dnt=1; guest_id=v1%3A142213026826270413; remember_checked_on=1; twid=u=2993688116
-      Host:
-      - twitter.com
-      Referer:
-      - *1
-      Connection:
-      - keep-alive
-      Keep-Alive:
-      - 300
+      - TwitterRubyGem/5.13.0
+      Authorization:
+      - Bearer xxx
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
   response:
     status:
       code: 200
@@ -474,292 +88,56 @@ http_interactions:
     headers:
       Cache-Control:
       - no-cache, no-store, must-revalidate, pre-check=0, post-check=0
-      Content-Encoding:
-      - gzip
       Content-Length:
-      - '1177'
-      Content-Security-Policy:
-      - 'default-src https:; connect-src https:; font-src https: data:; frame-src
-        https: twitter:; img-src https: data:; media-src https:; object-src https:;
-        script-src ''unsafe-inline'' ''unsafe-eval'' https:; style-src ''unsafe-inline''
-        https:; report-uri https://twitter.com/i/csp_report?a=NVQWGYLXFVZXO2LGOQ%3D%3D%3D%3D%3D%3D&ro=false;'
+      - '1472'
       Content-Type:
-      - text/html;charset=utf-8
+      - application/json;charset=utf-8
       Date:
-      - Sat, 24 Jan 2015 20:11:08 UTC
+      - Tue, 10 Feb 2015 00:55:58 UTC
       Expires:
       - Tue, 31 Mar 1981 05:00:00 GMT
       Last-Modified:
-      - Sat, 24 Jan 2015 20:11:08 GMT
+      - Tue, 10 Feb 2015 00:55:58 GMT
       Pragma:
       - no-cache
       Server:
       - tsa_a
       Set-Cookie:
-      - _twitter_sess=BAh7CiIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7ADoPY3JlYXRlZF9hdGwrCGfIkR1LAToMY3NyZl9p%250AZCIlNmY2MGMzODFlYzQ2MWYyYjQ2MmM3ZTQwYTQyNDNlNTk6B2lkIiViNDA0%250ANDBiMmNjODRkY2I1ZmM5YzM3MGE0ZjQzMDY1OToJdXNlcmwrBzQOcLI%253D--ea988b8e4016887b50a4b54914ddc5b13a8dc8b3;
-        Path=/; Domain=.twitter.com; Secure; HTTPOnly
-      - dnt=1; Expires=Tue, 21 Jan 2025 20:11:08 GMT; Path=/; Domain=.twitter.com
-      - lang=en
+      - guest_id=v1%3A142352975850125158; Domain=.twitter.com; Path=/; Expires=Thu,
+        09-Feb-2017 00:55:58 UTC
       Status:
       - 200 OK
       Strict-Transport-Security:
       - max-age=631138519
+      X-Access-Level:
+      - read
       X-Connection-Hash:
-      - a681e28f33666386daf21cd3b7e64986
+      - 8c1742af5cd3addbaf963a32d6974484
       X-Content-Type-Options:
       - nosniff
       X-Frame-Options:
       - SAMEORIGIN
+      X-Rate-Limit-Limit:
+      - '180'
+      X-Rate-Limit-Remaining:
+      - '172'
+      X-Rate-Limit-Reset:
+      - '1423529853'
       X-Response-Time:
-      - '13'
+      - '18'
       X-Transaction:
-      - 6f875c175551132c
+      - 84fcef2a4472ee50
       X-Twitter-Response-Tags:
       - BouncerCompliant
       X-Xss-Protection:
       - 1; mode=block
     body:
-      encoding: ASCII-8BIT
-      string: !binary |-
-        H4sIAAAAAAAC/+xW3U8kRRB/56/oG85jRqiZXR+MByyG3Bmj0ReDTwimmW12
-        RmZ31plePjQks3wcMRpBURRE4MBTQuBAg3wuzAO+LNHExMstl80lC3Mv7oX0
-        v2APu3C73mkO3i65ySbV3VX1q66q3qqq12jUQGFMMYSJTfUYproZg4RlhARF
-        iZptukFk2qVTSixZNaOK0FCvERxuqED8q7dVS49TRHviJCRQ0k2VD3AnLpwK
-        BRmEFKX+UvO1641Njc3FE7E9EVN9Q2JE+rh4hlAntpDhL0IoIhumenKVmjO2
-        /+EC25A1i7TLFokbWCWiUPnCS0GhRqi8JEjl8rZtFOBiuFOPYGpacsImVmOE
-        xKhsE2ypmqh0kbYOnSq6hC6FEATLEeKWSU3VNDiKD/YqEjRK43atgGoLy1qh
-        ruJMA4ewbMcNnYonl2kOtpQw9XaRO1DiMPIdwbbGsQWOUnp86tqZ+Wr0xHwI
-        nIHPpJVWsbn1PaVFUmoE5XJQkKRHqL2IGDZBpdZPAm6q3HyJmbCpJqJ+eE4X
-        rxnkZB8htJFSS29LUB7yJz0ZQSrx1vcXiYYcx1SL4ShBoRCqUqrQlSunXvNo
-        V1VJZTcq3Emz+JWU1mYMHwXg6vt7DuyN7X0Le2t7G7Dn/uZAejg9Cumv0mOQ
-        /iY9nv4uPZeeTy+nf9n/ZP/T/e3fHfhj+XDDgcNt908H/nLvOHDnp6P1GTha
-        d/PjDuQnpu9+AXfdTBIyfZkByAxmhjIjkFnIrEBmlS1+CWxxni0ucLLGFjc4
-        SbHFXbbkAFtKsqV+TgbY0g1Ohg9G4GDiYAbuTd+7DdnR7NeQncxOQXY+uwDZ
-        5ewWZFNZ9/4I3HdzszO52VnIzS7m5n6A3BzHGwF2+2e2PApsdYf9yndrw2yN
-        G18fYusrnGyzTU42V9nmGrDt1JHzWW4jCbmNrdymA7nNzw8HuI9DrjewAt6N
-        wfytGcjfcvMrDhxPLR9PrcDxtMt2bwJzJ72+m+D1b3n9KU522c6PwHan2c4K
-        S3GrqXGW4lKpLbaTBLYz4SWT4PWNeX3jnEx5Iw48WHMf8Hj+7br5SQceTroP
-        v+dkZprN8JDMT3tOv+cMes52y4t+zp4n7NlJ2PP/2DOXsurLSlmZLdZMXjLD
-        RDXD5N133hALFVa2E202tcSgJMnUfMvsItY1bBNRqitT9+u0Jkcx5c1Qs6R/
-        V2R00iOqebH2MSmO8CJejbRyjN6SXW/Z9R71Mg5T2o+Kq15J7NJjYbPrjKco
-        LS3F+UIpjBLFXcws3fKDKKEY+U0YyIcJvTMk8KnAIrYmINWMUd60QkKgzp9l
-        Cj37Pwaaoqly9MexVaxqBHxgyzRKLERxN+AICQUEpJxXN2bCCetiqjafZy6i
-        Gk3YFCzSiQ2dt/GLIMRNjsBZaseF3I5b5Cm0SXdc59ksTea5pJsSpAYFguhN
-        HEPBq68EULA2EOA/9PrbTf8DFLdwJIrPl6TH313wqd5dvXI6TNe3meEeZNMe
-        g0/SbVjtiFhmIhbmwTNMqxZVhsOEtL/Mp2/FF2yo4Jp8cm+o+AcAAP//AwCg
-        vHJxwQsAAA==
+      encoding: UTF-8
+      string: '{"created_at":"Sat Jan 17 13:17:53 +0000 2015","id":556440271961858051,"id_str":"556440271961858051","text":"\u30d6\u30ec\u30b6\u30fc\u304c\u63cf\u304d\u305f\u304b\u3063\u305f\u306e\u3067JK\u9234\u8c37
+        http:\/\/t.co\/ychGEqRI8i","source":"\u003ca href=\"https:\/\/about.twitter.com\/products\/tweetdeck\"
+        rel=\"nofollow\"\u003eTweetDeck\u003c\/a\u003e","truncated":false,"in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"user":{"id":93332575,"id_str":"93332575","name":"\u6bd4\u6751\u5947\u77f3","screen_name":"Strangestone","location":"\u795e\u5948\u5ddd","profile_location":null,"description":"\u6f2b\u753b\u5bb6\u3002\u96fb\u6483G''s\u30b3\u30df\u30c3\u30af\u306b\u3066\u300c\u30bd\u30fc\u30c9\u30a2\u30fc\u30c8\u30fb\u30aa\u30f3\u30e9\u30a4\u30f3\u3000\u30d7\u30ed\u30b0\u30ec\u30c3\u30b7\u30d6\u300d\u9023\u8f09\u4e2d\uff08WEB\u7248\u21d2http:\/\/t.co\/6zK6INxjQC\uff09\u3002\u540c\u4eba\u3067\u306f\u300c\u30a2\u30c1\u30e3\u5b50\u300d\u3068\u304b\u300c\u9b54\u6027\u306e\u6f6e\u300d\u3068\u304b\u3002tumblr
+        : http:\/\/t.co\/Xlngj27fPh","url":"http:\/\/t.co\/PPNOncQVYh","entities":{"url":{"urls":[{"url":"http:\/\/t.co\/PPNOncQVYh","expanded_url":"http:\/\/www10.plala.or.jp\/strangestone\/","display_url":"www10.plala.or.jp\/strangestone\/","indices":[0,22]}]},"description":{"urls":[{"url":"http:\/\/t.co\/6zK6INxjQC","expanded_url":"http:\/\/comic-walker.com\/contents\/detail\/KDCW_AM08000004010000_68\/","display_url":"comic-walker.com\/contents\/detai\u2026","indices":[46,68]},{"url":"http:\/\/t.co\/Xlngj27fPh","expanded_url":"http:\/\/himura-kiseki.tumblr.com\/","display_url":"himura-kiseki.tumblr.com","indices":[100,122]}]}},"protected":false,"followers_count":55091,"friends_count":2824,"listed_count":1804,"created_at":"Sun
+        Nov 29 05:21:21 +0000 2009","favourites_count":316,"utc_offset":32400,"time_zone":"Tokyo","geo_enabled":false,"verified":false,"statuses_count":16637,"lang":"ja","contributors_enabled":false,"is_translator":false,"is_translation_enabled":false,"profile_background_color":"000000","profile_background_image_url":"http:\/\/abs.twimg.com\/images\/themes\/theme7\/bg.gif","profile_background_image_url_https":"https:\/\/abs.twimg.com\/images\/themes\/theme7\/bg.gif","profile_background_tile":false,"profile_image_url":"http:\/\/pbs.twimg.com\/profile_images\/557819686662844416\/RMwCGmCU_normal.png","profile_image_url_https":"https:\/\/pbs.twimg.com\/profile_images\/557819686662844416\/RMwCGmCU_normal.png","profile_banner_url":"https:\/\/pbs.twimg.com\/profile_banners\/93332575\/1406790494","profile_link_color":"4A86FF","profile_sidebar_border_color":"000000","profile_sidebar_fill_color":"000000","profile_text_color":"000000","profile_use_background_image":false,"default_profile":false,"default_profile_image":false,"following":null,"follow_request_sent":null,"notifications":null},"geo":null,"coordinates":null,"place":null,"contributors":null,"retweet_count":1474,"favorite_count":3554,"entities":{"hashtags":[],"symbols":[],"user_mentions":[],"urls":[],"media":[{"id":556440240374575105,"id_str":"556440240374575105","indices":[18,40],"media_url":"http:\/\/pbs.twimg.com\/media\/B7jfc1JCcAEyeJh.png","media_url_https":"https:\/\/pbs.twimg.com\/media\/B7jfc1JCcAEyeJh.png","url":"http:\/\/t.co\/ychGEqRI8i","display_url":"pic.twitter.com\/ychGEqRI8i","expanded_url":"http:\/\/twitter.com\/Strangestone\/status\/556440271961858051\/photo\/1","type":"photo","sizes":{"large":{"w":598,"h":1100,"resize":"fit"},"thumb":{"w":150,"h":150,"resize":"crop"},"small":{"w":340,"h":625,"resize":"fit"},"medium":{"w":598,"h":1100,"resize":"fit"}}}]},"extended_entities":{"media":[{"id":556440240374575105,"id_str":"556440240374575105","indices":[18,40],"media_url":"http:\/\/pbs.twimg.com\/media\/B7jfc1JCcAEyeJh.png","media_url_https":"https:\/\/pbs.twimg.com\/media\/B7jfc1JCcAEyeJh.png","url":"http:\/\/t.co\/ychGEqRI8i","display_url":"pic.twitter.com\/ychGEqRI8i","expanded_url":"http:\/\/twitter.com\/Strangestone\/status\/556440271961858051\/photo\/1","type":"photo","sizes":{"large":{"w":598,"h":1100,"resize":"fit"},"thumb":{"w":150,"h":150,"resize":"crop"},"small":{"w":340,"h":625,"resize":"fit"},"medium":{"w":598,"h":1100,"resize":"fit"}}}]},"favorited":false,"retweeted":false,"possibly_sensitive":true,"lang":"ja"}'
     http_version: 
-  recorded_at: Sat, 24 Jan 2015 20:11:08 GMT
-- request:
-    method: get
-    uri: https://mobile.twitter.com/Strangestone/status/556440271961858051
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
-      Accept-Encoding:
-      - gzip,deflate,identity
-      Accept:
-      - "*/*"
-      User-Agent:
-      - Mechanize/2.7.2 Ruby/2.1.5p273 (http://github.com/sparklemotion/mechanize/)
-      Accept-Charset:
-      - ISO-8859-1,utf-8;q=0.7,*;q=0.7
-      Accept-Language:
-      - en-us,en;q=0.5
-      Cookie:
-      - _twitter_sess=BAh7CiIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7ADoPY3JlYXRlZF9hdGwrCGfIkR1LAToMY3NyZl9p%250AZCIlNmY2MGMzODFlYzQ2MWYyYjQ2MmM3ZTQwYTQyNDNlNTk6B2lkIiViNDA0%250ANDBiMmNjODRkY2I1ZmM5YzM3MGE0ZjQzMDY1OToJdXNlcmwrBzQOcLI%253D--ea988b8e4016887b50a4b54914ddc5b13a8dc8b3;
-        auth_token=99A97F1DAC8E2576EAAC6A5376D979412C764C2A; device_token=QEMP4JIY1RE546Wu+t0zHb+ubz3BoOGr6826KW4BP7ERdpqGLyJmHfC13bOe0/QFq9orBOJBKDFyq2Tq/OVLiHhm6vumtDaTsM4fXJ4hwmXJULNGuySoGDDuTyMtJkhOqplwqxINQSaLPMoNMayZ4oniSdpiUL5PMqxJLYOWFbwknExbx1lB9g==;
-        dnt=1; guest_id=v1%3A142213026826270413; remember_checked_on=1; twid=u=2993688116
-      Host:
-      - mobile.twitter.com
-      Connection:
-      - keep-alive
-      Keep-Alive:
-      - 300
-  response:
-    status:
-      code: 200
-      message: OK
-    headers:
-      Cache-Control:
-      - no-cache, no-store, must-revalidate, pre-check=0, post-check=0
-      Content-Encoding:
-      - gzip
-      Content-Language:
-      - en
-      Content-Length:
-      - '5325'
-      Content-Security-Policy:
-      - 'default-src ''self''; connect-src ''self''; font-src ''self'' data:; frame-src
-        https://*.twitter.com twitter: https://www.google.com; img-src https://twitter.com
-        https://*.twitter.com https://*.twimg.com https://maps.google.com https://www.google-analytics.com
-        https://www.google.com data:; media-src https://*.twitter.com https://*.twimg.com;
-        object-src ''self''; script-src ''unsafe-inline'' ''unsafe-eval'' https://*.twitter.com
-        https://*.twimg.com https://www.google.com https://www.google-analytics.com;
-        style-src ''unsafe-inline'' https://*.twitter.com https://*.twimg.com; report-uri
-        https://twitter.com/i/csp_report?a=O5SWEZTPOJQWY3A%3D&ro=false;'
-      Content-Type:
-      - text/html;charset=utf-8
-      Date:
-      - Sat, 24 Jan 2015 20:11:10 UTC
-      Expires:
-      - Tue, 31 Mar 1981 05:00:00 GMT
-      Last-Modified:
-      - Sat, 24 Jan 2015 20:11:09 GMT
-      Pragma:
-      - no-cache
-      Server:
-      - tsa_a
-      Set-Cookie:
-      - _mobile_sess=BAh7BjoQX2NzcmZfdG9rZW4iJTM5MzdjMGFmM2FjMzljMTlkNGQ5MmJmZTMwYjE2ZDU5--e2ca8004447bb90a1fb19ad5cec4f43d0c6b658c;
-        Expires=Wed, 25 Mar 2015 20:11:10 GMT; Path=/; Secure; HTTPOnly
-      - _twitter_sess=BAh7CiIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7ADoPY3JlYXRlZF9hdGwrCGfIkR1LAToMY3NyZl9p%250AZCIlNmY2MGMzODFlYzQ2MWYyYjQ2MmM3ZTQwYTQyNDNlNTk6B2lkIiViNDA0%250ANDBiMmNjODRkY2I1ZmM5YzM3MGE0ZjQzMDY1OToJdXNlcmwrBzQOcLI%253D--ea988b8e4016887b50a4b54914ddc5b13a8dc8b3;
-        Path=/; Domain=.twitter.com; Secure; HTTPOnly
-      - d=32; Expires=Sun, 24 Jan 2016 20:11:10 GMT; Path=/; Secure
-      - lang=en
-      - m2_metrics_token=142213026979288582; Expires=Mon, 23 Jan 2017 20:11:10 GMT;
-        Path=/; Domain=.mobile.twitter.com; Secure; HTTPOnly
-      - u=d14efcb2b4a2681616cefc4c5dca1351ccdd6f12; Expires=Sun, 24 Jan 2016 20:11:10
-        GMT; Path=/; Secure
-      Strict-Transport-Security:
-      - max-age=631138519
-      Vary:
-      - Accept-Encoding
-      X-Connection-Hash:
-      - 861b8be4d2dc431f46e00aaf5aafccbd
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - SAMEORIGIN
-      X-Response-Time:
-      - '82'
-      X-Transaction:
-      - aea436b1c7c067cd
-      X-Xss-Protection:
-      - 1; mode=block
-    body:
-      encoding: ASCII-8BIT
-      string: !binary |-
-        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
-        CQAA//8DAMS9X/7xlAAA
-    http_version: 
-  recorded_at: Sat, 24 Jan 2015 20:11:10 GMT
+  recorded_at: Tue, 10 Feb 2015 00:55:58 GMT
 recorded_with: VCR 2.9.0

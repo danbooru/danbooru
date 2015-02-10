@@ -11,15 +11,9 @@ module Downloads
 
     protected
       def rewrite_image_url(url, headers)
-        # example: http://twitter.com/status
-        url = url.sub(%r!^https?://twitter\.com!, "http://mobile.twitter.com")
-
-        if url =~ %r!^https?://mobile\.twitter\.com/\w+/status/\d+!
-          source = ::Sources::Strategies::Twitter.new(url)
-          source.get
-          url = source.image_url
-        end
-
+        source = ::Sources::Strategies::Twitter.new(url)
+        source.get
+        url = source.image_url
         return [url, headers]
       end
     end

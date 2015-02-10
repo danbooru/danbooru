@@ -2,6 +2,11 @@ require 'test_helper'
 
 module Sources
   class TwitterTest < ActiveSupport::TestCase
+    setup do
+      Danbooru.config.stubs(:twitter_api_key).returns("xxx")
+      Danbooru.config.stubs(:twitter_api_secret).returns("xxx")
+    end
+    
     context "The source site for a restricted twitter" do
       setup do
         VCR.use_cassette("source-twitter-unit-test-2", :record => :none) do
@@ -11,7 +16,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("https://pbs.twimg.com/media/B7jfc1JCcAEyeJh.png:large", @site.image_url)
+        assert_equal("http://pbs.twimg.com/media/B7jfc1JCcAEyeJh.png:large", @site.image_url)
       end
     end
 
@@ -32,7 +37,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:large", @site.image_url)
+        assert_equal("http://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:large", @site.image_url)
       end
 
       should "get the tags" do
