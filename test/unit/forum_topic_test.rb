@@ -91,11 +91,9 @@ class ForumTopicTest < ActiveSupport::TestCase
     context "#mark_as_read!" do
       context "without a previous visit" do
         should "create a new visit" do
-          assert_difference("ForumTopicVisit.count", 1) do
-            @topic.mark_as_read!(@user)
-          end
+          @topic.mark_as_read!(@user)
           @user.reload
-          assert_equal(@topic.updated_at, ForumTopicVisit.last.last_read_at)
+          assert_equal(@topic.updated_at.to_i, @user.last_forum_read_at.to_i)
         end
       end
 
@@ -105,11 +103,9 @@ class ForumTopicTest < ActiveSupport::TestCase
         end
 
         should "update the visit" do
-          assert_difference("ForumTopicVisit.count", 0) do
-            @topic.mark_as_read!(@user)
-          end
+          @topic.mark_as_read!(@user)
           @user.reload
-          assert_equal(@topic.updated_at, ForumTopicVisit.last.last_read_at)
+          assert_equal(@topic.updated_at.to_i, @user.last_forum_read_at.to_i)
         end
       end
     end
