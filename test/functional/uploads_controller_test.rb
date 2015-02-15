@@ -13,6 +13,22 @@ class UploadsControllerTest < ActionController::TestCase
       CurrentUser.ip_addr = nil
     end
 
+    context "batch action" do
+      context "for twitter galleries" do
+        setup do
+          Danbooru.config.stubs(:twitter_api_key).returns("xxx")
+          Danbooru.config.stubs(:twitter_api_secret).returns("xxx")
+        end
+
+        should "render" do
+          VCR.use_cassette("functional/upload/twitter", :record => :none) do
+            get :batch, {:url => "https://twitter.com/lvlln/status/567054278486151168"}, {:user_id => @user.id}
+          end
+          assert_response :success
+        end
+      end
+    end
+
     context "new action" do
       should "render" do
         get :new, {}, {:user_id => @user.id}
