@@ -1,21 +1,13 @@
-<!doctype html>
-<html>
-<head>
-  <%= stylesheet_link_tag "application", :media => "screen" %>
-</head>
-<body>
-<p><%= @forum_topic.title %> was updated:</p>
+<p>"<%= @forum_topic.title %>" was updated:</p>
 
 <% @forum_posts.each do |forum_post| %>
-  <div class="prose">
-    <p class="author">
-      <%= forum_post.creator_name %> said:
-    </p>
-    <%= format_text(forum_post.body) %>
-  </div>
+  <p>
+    <strong><%= forum_post.creator_name %> said:</strong>
+  </p>
+  <%= format_text(forum_post.body) %>
+  <br>
+  <hr>
+  <br>
 <% end %>
 
 <p><%= link_to "View topic", forum_topic_path(@forum_topic, :page => @forum_topic.last_page, :host => Danbooru.config.hostname, :only_path => false) %></p>
-
-</body>
-</html>
