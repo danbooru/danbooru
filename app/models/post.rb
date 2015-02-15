@@ -176,7 +176,9 @@ class Post < ActiveRecord::Base
     end
 
     def has_large?
-      is_ugoira? || (is_image? && image_width.present? && image_width > Danbooru.config.large_image_width)
+      return false if has_tag?("animated_gif|animated_png")
+      return true if is_ugoira?
+      is_image? && image_width.present? && image_width > Danbooru.config.large_image_width
     end
 
     def has_large
