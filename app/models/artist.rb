@@ -309,9 +309,23 @@ class Artist < ActiveRecord::Base
 
       if matches.any?
         where("id in (?)", matches)
+      elsif matches = search_for_profile(string)
+        where("id in (?)", matches)
       else
         where("false")
       end
+    end
+
+    def search_for_profile(url)
+      source = Sources::Site.new(url)
+      if source.strategy
+        source.get
+        find_all_by_url(source.profile_url)
+      else
+        nil
+      end
+    rescue
+      nil
     end
 
     def other_names_match(string)
