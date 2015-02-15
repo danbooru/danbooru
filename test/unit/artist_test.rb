@@ -2,8 +2,8 @@ require 'test_helper'
 
 class ArtistTest < ActiveSupport::TestCase
   def assert_artist_found(expected_name, source_url)
-    VCR.use_cassette("unit/artist/#{source_url}", :record => :once) do
-      artists = Artist.find_all_by_url(source_url)
+    VCR.use_cassette("unit/artist/#{source_url}", :record => :none) do
+      artists = Artist.url_matches(source_url).to_a
 
       assert_equal(1, artists.size)
       assert_equal(expected_name, artists.first.name, "Testing URL: #{source_url}")
@@ -11,7 +11,7 @@ class ArtistTest < ActiveSupport::TestCase
   end
 
   def assert_artist_not_found(source_url)
-    VCR.use_cassette("unit/artist/#{source_url}", :record => :once) do
+    VCR.use_cassette("unit/artist/#{source_url}", :record => :none) do
       artists = Artist.find_all_by_url(source_url)
       assert_equal(0, artists.size, "Testing URL: #{source_url}")
     end
@@ -188,6 +188,11 @@ class ArtistTest < ActiveSupport::TestCase
       setup do
         FactoryGirl.create(:artist, :name => "masao",:url_string => "http://i2.pixiv.net/img04/img/syounen_no_uta/")
         FactoryGirl.create(:artist, :name => "bkub", :url_string => "http://i1.pixiv.net/img01/img/bkubb/")
+        FactoryGirl.create(:artist, :name => "ryuura", :url_string => "http://www.pixiv.net/member.php?id=8678371")
+      end
+
+      should "find the correct artist by looking up the profile url" do
+        assert_artist_found("ryuura", "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=48788677")
       end
 
       should "find the correct artist for old image URLs" do
