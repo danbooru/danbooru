@@ -16,7 +16,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("http://pbs.twimg.com/media/B7jfc1JCcAEyeJh.png:large", @site.image_url)
+        assert_equal("http://pbs.twimg.com/media/B7jfc1JCcAEyeJh.png:orig", @site.image_url)
       end
     end
 
@@ -37,7 +37,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("http://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:large", @site.image_url)
+        assert_equal("http://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig", @site.image_url)
       end
 
       should "get the tags" do
