@@ -239,8 +239,12 @@ class Upload < ActiveRecord::Base
       if is_image?
         Danbooru.resize(source_path, output_path, width, height, quality)
       elsif is_ugoira?
-        # by the time this runs we'll have moved source_path to md5_file_path
-        ugoira_service.generate_resizes(md5_file_path, resized_file_path_for(Danbooru.config.large_image_width), resized_file_path_for(Danbooru.config.small_image_width))
+        if Delayed::Worker.delay_jobs
+          # by the time this runs we'll have moved source_path to md5_file_path
+          ugoira_service.generate_resizes(md5_file_path, resized_file_path_for(Danbooru.config.large_image_width), resized_file_path_for(Danbooru.config.small_image_width))
+        else
+          ugoira_service.generate_resizes(source_path, resized_file_path_for(Danbooru.config.large_image_width), resized_file_path_for(Danbooru.config.small_image_width))
+        end
       elsif is_video?
         generate_video_preview_for(width, height, output_path)
       end
@@ -342,7 +346,7 @@ class Upload < ActiveRecord::Base
         "#{Rails.root}/public/data/preview/#{prefix}#{md5}.jpg"
 
       when Danbooru.config.large_image_width
-        "#{Rails.root}/public/data/sample/#{Danbooru.config.large_image_prefix}#{prefix}#{md5}.#{large_file_ext}"
+        "#{Rails.root}/public/data/sample/#{prefix}#{Danbooru.config.large_image_prefix}#{md5}.#{large_file_ext}"
       end
     end
 

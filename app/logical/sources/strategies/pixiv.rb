@@ -188,8 +188,6 @@ module Sources
 
         if not stacc_link.nil?
           stacc_link.attr("href").sub(%r!^/stacc/!i, '')
-        else
-          raise Sources::Error.new("Couldn't find Pixiv moniker in page: #{normalized_url}")
         end
       end
 
@@ -224,8 +222,6 @@ module Sources
           element = elements.first
           thumbnail_url = element.attr("src") || element.attr("data-src")
           return rewrite_thumbnails(thumbnail_url, is_manga)
-        else
-          raise Sources::Error.new("Couldn't find image thumbnail URL in page: #{normalized_url}")
         end
       end
 

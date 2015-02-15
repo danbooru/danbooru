@@ -4,6 +4,8 @@ module Sources
   class NicoSeigaTest < ActiveSupport::TestCase
     context "The source site for nico seiga" do
       setup do
+        Cache.put("nico-seiga-session", "user_session_23669858_ea46b9d1b3e64785a14d5a5d9c6606f5b5c24b4a233835d84362b9820f20a758")
+        
         VCR.use_cassette("source-nico-seiga-unit-test-1", :record => :none) do
           @site_1 = Sources::Site.new("http://lohas.nicoseiga.jp/o/59c833da35d7bc6586a8292103e5e38c9df23b7c/1417762099/4496506")
           @site_1.get
