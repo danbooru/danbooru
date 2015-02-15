@@ -151,5 +151,25 @@ class TagImplicationTest < ActiveSupport::TestCase
       p1.reload
       assert_equal("aaa bbb ccc xxx yyy", p1.tag_string)
     end
+
+    context "with an associated forum topic" do
+      setup do
+        @admin = FactoryGirl.create(:admin_user)
+        @topic = FactoryGirl.create(:forum_topic)
+        @implication = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic)
+      end
+
+      should "update the topic when processed" do
+        assert_difference("ForumPost.count") do
+          @implication.process!
+        end
+      end
+
+      should "update the topic when rejected" do
+        assert_difference("ForumPost.count") do
+          @implication.reject!
+        end
+      end
+    end
   end
 end

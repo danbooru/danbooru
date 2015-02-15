@@ -3,6 +3,7 @@ class TagImplication < ActiveRecord::Base
   after_save :update_descendant_names_for_parents
   after_destroy :update_descendant_names_for_parents
   belongs_to :creator, :class_name => "User"
+  belongs_to :forum_topic
   before_validation :initialize_creator, :on => :create
   before_validation :normalize_names
   validates_presence_of :creator_id, :antecedent_name, :consequent_name
@@ -127,6 +128,7 @@ class TagImplication < ActiveRecord::Base
     update_posts
     update_column(:status, "active")
     update_descendant_names_for_parents
+    update_forum_topic_for_approve
   rescue Exception => e
     update_column(:status, "error: #{e}")
   end
@@ -212,5 +214,30 @@ class TagImplication < ActiveRecord::Base
 
   def editable_by?(user)
     deletable_by?(user)
+  end
+
+  def update_forum_topic_for_approve
+    if forum_topic
+      CurrentUser.scoped(User.admins.first, "127.0.0.1") do
+        forum_topic.posts.create(
+          :body => "The tag implication #{antecedent_name} -> #{consequent_name} has been approved."
+        )
+      end
+    end
+  end
+
+  def update_forum_topic_for_reject
+    if forum_topic
+      CurrentUser.scoped(User.admins.first, "127.0.0.1") do
+        forum_topic.posts.create(
+          :body => "The tag implication #{antecedent_name} -> #{consequent_name} has been rejected."
+        )
+      end
+    end
+  end
+
+  def reject!
+    update_forum_topic_for_reject
+    destroy
   end
 end

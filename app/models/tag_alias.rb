@@ -86,6 +86,7 @@ class TagAlias < ActiveRecord::Base
     clear_all_cache
     ensure_category_consistency
     update_posts
+    update_forum_topic_for_approve
     update_column(:status, "active")
   rescue Exception => e
     update_column(:status, "error: #{e}")
@@ -225,5 +226,32 @@ class TagAlias < ActiveRecord::Base
 
   def editable_by?(user)
     deletable_by?(user)
+  end
+
+  def update_forum_topic_for_approve
+    if forum_topic
+      CurrentUser.scoped(User.admins.first, "127.0.0.1") do
+        forum_topic.posts.create(
+          :body => "The tag alias #{antecedent_name} -> #{consequent_name} has been approved."
+        )
+      end
+    end
+  end
+
+  def update_forum_topic_for_reject
+    if forum_topic
+      CurrentUser.scoped(User.admins.first, "127.0.0.1") do
+        forum_topic.posts.create(
+          :body => "The tag alias #{antecedent_name} -> #{consequent_name} has been rejected."
+        )
+      end
+    end
+  end
+
+  def reject!
+    update_column(:status, "deleted")
+    clear_all_cache
+    update_forum_topic_for_reject
+    destroy
   end
 end

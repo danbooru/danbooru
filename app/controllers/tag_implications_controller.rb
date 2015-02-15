@@ -44,7 +44,7 @@ class TagImplicationsController < ApplicationController
   def destroy
     @tag_implication = TagImplication.find(params[:id])
     if @tag_implication.deletable_by?(CurrentUser.user)
-      @tag_implication.destroy
+      @tag_implication.reject!
       respond_with(@tag_implication) do |format|
         format.html do
           flash[:notice] = "Tag implication was deleted"

@@ -31,6 +31,7 @@ class BulkUpdateRequest < ActiveRecord::Base
   extend SearchMethods
 
   def approve!
+    update_forum_topic_for_approve
     AliasAndImplicationImporter.new(script, forum_topic_id, "1").process!
     update_attribute(:status, "approved")
   end
@@ -70,6 +71,7 @@ class BulkUpdateRequest < ActiveRecord::Base
   end
 
   def reject!
+    update_forum_topic_for_reject
     update_attribute(:status, "rejected")
   end
 
@@ -89,6 +91,27 @@ class BulkUpdateRequest < ActiveRecord::Base
   def forum_topic_id_not_invalid
     if forum_topic_id && !forum_topic
       errors.add(:base, "Forum topic ID is invalid")
+    end
+  end
+
+
+  def update_forum_topic_for_approve
+    if forum_topic
+      CurrentUser.scoped(User.admins.first, "127.0.0.1") do
+        forum_topic.posts.create(
+          :body => "The bulk update request ##{id} has been approved."
+        )
+      end
+    end
+  end
+
+  def update_forum_topic_for_reject
+    if forum_topic
+      CurrentUser.scoped(User.admins.first, "127.0.0.1") do
+        forum_topic.posts.create(
+          :body => "The bulk update request ##{id} has been rejected."
+        )
+      end
     end
   end
 end

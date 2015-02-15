@@ -91,5 +91,25 @@ class TagAliasTest < ActiveSupport::TestCase
       tag2.reload
       assert_equal(1, tag2.category)
     end
+
+    context "with an associated forum topic" do
+      setup do
+        @admin = FactoryGirl.create(:admin_user)
+        @topic = FactoryGirl.create(:forum_topic)
+        @alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic)
+      end
+
+      should "update the topic when processed" do
+        assert_difference("ForumPost.count") do
+          @alias.process!
+        end
+      end
+
+      should "update the topic when rejected" do
+        assert_difference("ForumPost.count") do
+          @alias.reject!
+        end
+      end
+    end
   end
 end
