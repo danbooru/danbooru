@@ -15,6 +15,8 @@
       <% end %>
 
       <%= dtext_field "forum_post", "body", :input_name => "forum_topic[original_post_attributes][body]", :value => forum_topic.original_post.body, :input_id => "forum_post_body_for_#{forum_topic.original_post.id}", :preview_id => "dtext-preview-for-#{forum_topic.original_post.id}" %>
+
+      <%= pf.input :receive_email_notifications, :as => :boolean %>
     <% end %>
 
     <% if CurrentUser.is_janitor? %>
