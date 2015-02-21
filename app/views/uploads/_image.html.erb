@@ -1,7 +1,12 @@
 <% if params[:url] %>
   <%= image_tag(@normalized_url, :title => "Preview", :id => "image") %>
+
   <% if params[:ref] %>
     <p><strong>Referrer: </strong> <%= params[:ref] %></p>
+  <% end %>
+
+  <% if @remote_size %>
+    <p><strong>Size:</strong> <%= number_to_human_size(@remote_size) %></p>
   <% end %>
 
   <p id="scale"></p>

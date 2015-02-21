@@ -37,6 +37,12 @@ class PostPresenter < Presenter
       html << %{</p>}
     end
 
+    if options[:size]
+      html << %{<p class="desc">}
+      html << post.file_size.to_formatted_s(:human_size)
+      html << %{</p>}
+    end
+
     html << %{</article>}
     html.html_safe
   end

@@ -22,6 +22,20 @@ module Downloads
       @data[:get_thumbnail] = options[:get_thumbnail]
     end
 
+    def size
+      headers = {
+        "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
+      }
+      @source, headers, @data = before_download(@source, headers, @data)
+      url = URI.parse(@source)
+      Net::HTTP.start(url.host, url.port, :use_ssl => url.is_a?(URI::HTTPS)) do |http|
+        http.read_timeout = 3
+        http.request_head(url.request_uri, headers) do |res|
+          return res.content_length
+        end
+      end
+    end
+
     def download!
       @source, @data = http_get_streaming(@source, @data) do |response|
         self.content_type = response["Content-Type"]

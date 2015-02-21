@@ -18,6 +18,10 @@ module Sources
         raise NotImplementedError
       end
 
+      def get_size
+        @get_size ||= Downloads::File.new(@image_url).size
+      end
+
       # Subclasses should return true only if the URL is in its final normalized form.
       #
       # Sources::Site.new("http://img.pixiv.net/img/evazion").normalized_for_artist_finder?
