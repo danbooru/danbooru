@@ -39,6 +39,10 @@ article.post-preview {
 
 #iqdb-similar {
   overflow: hidden;
+
+  .post-preview {
+    height: 169px;
+  }
 }
 
 #saved-searches-nav {
