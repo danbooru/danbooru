@@ -35,7 +35,8 @@
     <%= render "news_updates/listing" %>
 
     <h1><%= link_to Danbooru.config.app_name, "/" %></h1>
-    <nav>
+    <span id="maintoggle"> ☰ </span> <!-- Maybe icon would be better, I'm not sure -->
+    <nav id="nav">
       <%= render "layouts/main_links" %>
       <%= yield :secondary_links %>
     </nav>
