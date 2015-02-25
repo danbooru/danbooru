@@ -70,6 +70,12 @@ Danbooru.Note = {
           Danbooru.Note.dragging = true;
           Danbooru.Note.clear_timeouts();
           Danbooru.Note.Body.hide_all();
+          if (Danbooru.Note.embed) {
+            var $bg = $note_box_inner.find("div.bg")
+            if ($bg.length) {
+              $bg.hide();
+            }
+          }
           e.stopPropagation();
         }
       );
@@ -87,6 +93,14 @@ Danbooru.Note = {
         "dragstop resizestop",
         function(e) {
           Danbooru.Note.dragging = false;
+          if (Danbooru.Note.embed) {
+            var $note_box_inner = $(e.currentTarget);
+            var $bg = $note_box_inner.find("div.bg")
+            if ($bg.length) {
+              $bg.show();
+              Danbooru.Note.Box.resize_inner_border($note_box_inner.closest(".note-box"));
+            }
+          }
           e.stopPropagation();
         }
       );
@@ -137,6 +151,14 @@ Danbooru.Note = {
 
       if ($inner_border.height() >= $note_box.height() - 2) {
         $note_box.height($inner_border.height() + 2);
+      }
+
+      if (Danbooru.Note.embed) {
+        var $bg = $inner_border.find("div.bg");
+        if ($bg.length) {
+          $bg.height($inner_border.height());
+          $bg.width($inner_border.width());
+        }
       }
     },
 

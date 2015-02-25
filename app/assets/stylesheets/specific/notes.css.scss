@@ -61,6 +61,7 @@ div#note-container {
     height: 100px;
     cursor: move;
     background: transparent;
+    line-height: normal;
 
     div.note-box-inner-border {
       border: 1px solid black;
@@ -70,12 +71,21 @@ div#note-container {
     div.note-box-inner-border.unsaved {
       border: 1px solid red;
     }
-  }
 
-  div.note-box.embedded div.note-box-inner-border {
-    text-align: center;
-    display: table-cell;
-    vertical-align: middle;
+    &.embedded {
+      div.bg {
+        height: 100%;
+        text-align: center;
+        display: table-cell;
+        vertical-align: middle;
+      }
+
+      div.note-box-inner-border {
+        text-align: center;
+        display: table-cell;
+        vertical-align: middle;
+      }
+    }
   }
 }
 
