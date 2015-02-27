@@ -1,36 +1,38 @@
-/* Content */
+@import "000_vars.css.scss";
 
-/* i. e. the images in posts */
-img#image {
-  /* Images in posts are called in such form:
-       @post.presenter.image_html(self)
-     I have no idea what that 'presenter' method means
-     This gives them fixed width
-     It causes window to overextend on smaller screens
-   */
-  max-width: 95%;
-  height: auto;
-  margin: auto;
+#responsive-tag-list {
+  display: none;
 }
 
 @media screen and (max-width: 660px) {
-  
+  #responsive-tag-list {
+    display: block;
+
+    input[type=text] {
+      width: 75%;
+    }
+  }
+
+  #saved-searches-nav {
+    display: none;
+  }
+
   #maintoggle {
     display: inline;
-    background-color: #70599A;
-    padding: 0.5em 1em 0.7em 1em;
+    background-color: lighten($link_color, 13%);
+    padding: 0.8em 1.2em 0.8em 1.2em;
     border-radius: 20% 20% 0 0;
     font-weight: bold;
     color: #fff;
-  }
-  
-  #maintoggle.toggler-active {
-    background-color: #D3CBE0;
-    color: #000;
+
+    &.toggler-active {
+      background-color: lighten($link_color, 25%);
+      color: #000;    
+    }
   }
 
   h1 {
-    font-size: 1.2em;
+    display: none;
   }
 
   input[type=text], input[type=submit] {
@@ -38,104 +40,91 @@ img#image {
   }
  
   div#page section#content {
-    margin-left: 0em;
+    margin: 0;
+    padding: 0;
   }
 
+  #comments h2 {
+    display: none;
+  }
 
-  
-/* Sidebar */
+  #sidebar {
+    display: none;
+  }
 
-#sidebar {
-  display: none;
-}
+  div.paginator {
+    font-size: 16pt;
+    font-weight: bold;
+    text-align: left;
+    background-color: #F7F7FF;
+    border-radius: 15%;
+    padding: 3pt;
 
-/* paginator */
-div.paginator {
-  font-size: 16pt;
-  font-weight: bold;
-  text-align: left;
-  background-color: #F7F7FF;
-  border-radius: 15%;
-  padding: 3pt;
+    li {
+      display: inline;
+      line-height: 1.4em;
 
-  li {
-    display: inline;
-    line-height: 1.4em;
-
-    a, span {
-      padding: 3px 18px;
-      margin: 0 3px;
-      display: inline-block;
-      border-radius: 15%;
+      a, span {
+        padding: 3px 18px;
+        margin: 0 3px;
+        display: inline-block;
+        border-radius: 15%;
+      }
     }
   }
-}
 
-/* posts/index */
-article.post-preview {
-  margin: 15px 0;
-  width: 150px;
-  text-align: center;
-  vertical-align: middle;
-  display: inline-block;
-  a {
+  article.post-preview {
+    margin: 15px 0;
     width: 150px;
-    display: block;
-    margin: 0 auto;
-  }
-  img {
-    margin: 0 auto;
-  }
-}
-
-/* posts/show */
-img#image {
-  margin-top: 5px;
-}
-
-div#options {
-  margin-top: 10px;
-  font-size: 24pt;
-  font-weight: bold;
-}
-
-div#tags {
-  margin-top: 30px;
-
-  li {
-    margin: 10px 0;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+    a {
+      width: 150px;
+      display: block;
+      margin: 0 auto;
+    }
+    img {
+      margin: 0 auto;
+    }
   }
 
-  a.search-tag {
+  img#image {
+    margin-top: 5px;
+  }
+
+  div#options {
+    margin-top: 10px;
     font-size: 24pt;
     font-weight: bold;
   }
-}
 
-/* tag list */
+  div#tags {
+    margin-top: 30px;
 
-section#responsive-tag-list {
-  display: block;
-  h1 {
-    font-size: 1em;
+    li {
+      margin: 10px 0;
+    }
+
+    a.search-tag {
+      font-size: 24pt;
+      font-weight: bold;
+    }
   }
-}
 
-/* comments */
-
-//Comments themselves
-
-div#page {
-  div.comments-for-post div.list-of-comments article.comment div.content {
-    clear: both;
-    margin-left: 0;
-    margin: 0 0 0 0;
+  section#responsive-tag-list {
+    display: block;
+    h1 {
+      font-size: 1em;
+    }
   }
-}
 
-  /**********************************
-  HEADER
-  ***********************************/
+  div#page {
+    div.comments-for-post div.list-of-comments article.comment div.content {
+      clear: both;
+      margin: 0;
+    }
+  }
 
   nav {
     background: none;
@@ -149,29 +138,26 @@ div#page {
   }
   
   header#top menu.main {
-    background-color: #d3cbe0;
-  
+    background-color: lighten($link_color, 25%);
   }
   
   header#top menu {
     width: 100%;
   }
   
-  #logo {
-    /* There is logo? */
-  }
-  
   h1 {
+    display: block;
     font-size: 2em;
+    margin: 1em 0 0 0;
   }
   
   h2 {
     font-size: 0.825em;
-    margin-bottom: 20px;
+    margin: 1em 0 0 0;
   }
   
   header {
-    border-bottom: 5px solid #70599a;
+    border-bottom: 2px solid lighten($link_color, 13%);
     text-align: center;
     line-height: 2em;
     h1 {
@@ -179,24 +165,20 @@ div#page {
     }
   }
   
-  /* Body */
-  
   div#page {
-    margin: 0 3%;
+    margin: 0;
   }
-  
-  #posts {
-    img {
-      width: 100%;
-    }
-    article.post-preview a {
-      width: 100%;
-    }
-  }
-
 }
 
 @media screen and (max-width: 440px) {
+  #responsive-tag-list {
+    display: block;
+  }
+
+  #image {
+    max-width: 400px;
+  }
+
   body {
     width: 100%;
   }
@@ -206,48 +188,9 @@ div#page {
   }
   
   div article.post-preview {
-    max-width: 45%;
-    width: 100%;
-    height: 100%;
     overflow: visible;
   }
-  
-  input {
-    max-width: 100%;
-  }
 }
-  
-/* Dashboard */
-  
-div#page {
-  div#c-moderator-dashboards {
-    div#col1 {
-      width: 100%;
-    }
-    div#col2 {
-      width: 100%;
-      clear: both;
-    }
-  }
-}
-
-/* Artist search */
-
-table.search {
-  clear: both;
-}
-
-input#search-name {
-  max-width: 100%;
-}
-
-/* Site map */
-
-div#c-static div#a-site-map section {
-  clear: both;
-}
-
-/* Warnings & notices */
 
 #tos-notice {
   display: none;
