@@ -40,6 +40,7 @@ class PostPresenter < Presenter
     if options[:size]
       html << %{<p class="desc">}
       html << post.file_size.to_formatted_s(:human_size)
+      html << " (#{post.image_width}x#{post.image_height})"
       html << %{</p>}
     end
 
