@@ -12,7 +12,7 @@ module Downloads
 
     protected
       def rewrite_thumbnails(url, headers)
-        if url =~ %r{^http?://.+\.tumblr\.com/(?:\w+/)?(?:tumblr_)?(\w+_)(250|400|500)\..+$}
+        if url =~ %r{^http?://.+\.tumblr\.com/(?:\w+/)?(?:tumblr_)?(\w+_)(\d+)\..+$}
           match = $1
           given_size = $2
 
