@@ -69,5 +69,7 @@ RUN /etc/init.d/postgresql start && sudo -u danbooru createdb danbooru2 && /etc/
 USER danbooru
 RUN git clone git://github.com/r888888888/danbooru.git ~/danbooru
 RUN ["/bin/bash", "-l", "-c", "cd ~/danbooru && bundle install"]
+ADD $GITHUB_INSTALL/danbooru_local_config.rb.templ ~/danbooru/config/danbooru_local_config.rb
+ADD $GITHUB_INSTALL/database.yml.templ ~/danbooru/config/database.yml
 
 CMD supervisord -c /etc/supervisord.conf
