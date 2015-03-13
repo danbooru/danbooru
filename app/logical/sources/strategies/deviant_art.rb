@@ -47,10 +47,10 @@ module Sources
       end
 
       def get_image_url_from_page(page)
-        image = page.search("div.dev-view-deviation img.dev-content-normal")
+        download_link = page.link_with(:class => /dev-page-download/)
 
-        if image.any?
-          image[0]["src"]
+        if download_link
+          download_link.click.uri.to_s # need to follow the redirect now to get the full size url, following it later seems to not work.
         else
           nil
         end
@@ -58,9 +58,9 @@ module Sources
 
       def normalized_url
         @normalized_url ||= begin
-          if url =~ %r{\Ahttps?://(?:fc|th)\d{2}\.deviantart\.net/.+/[a-z0-9_]*_by_[a-z0-9_]+-d([a-z0-9]+)\.}i
+          if url =~ %r{\Ahttps?://(?:fc|th|pre|orig|img)\d{2}\.deviantart\.net/.+/[a-z0-9_]*_by_[a-z0-9_]+-d([a-z0-9]+)\.}i
             "http://fav.me/d#{$1}"
-          elsif url =~ %r{\Ahttps?://(?:fc|th)\d{2}\.deviantart\.net/.+/[a-f0-9]+-d([a-z0-9]+)\.}i
+          elsif url =~ %r{\Ahttps?://(?:fc|th|pre|orig|img)\d{2}\.deviantart\.net/.+/[a-f0-9]+-d([a-z0-9]+)\.}i
             "http://fav.me/d#{$1}"
           elsif url =~ %r{deviantart\.com/art/}
             url
