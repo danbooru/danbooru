@@ -21,10 +21,10 @@ class TwitterService
     attrs = client.status(tweet_url).attrs
     urls = []
     attrs[:entities][:media].each do |obj|
-      urls << obj[:media_url]
+      urls << obj[:media_url] + ":orig"
     end
     attrs[:extended_entities][:media].each do |obj|
-      urls << obj[:media_url]
+      urls << obj[:media_url] + ":orig"
     end
     urls.uniq
   rescue
