@@ -930,9 +930,10 @@ class Post < ActiveRecord::Base
 
       if tags.blank? && Danbooru.config.blank_tag_search_fast_count
         count = Danbooru.config.blank_tag_search_fast_count
-      elsif tags =~ /^rating:\S+$/
+      elsif tags =~ /^-?rating:\S+$/
         count = Danbooru.config.blank_tag_search_fast_count
       elsif tags =~ /(?:#{Tag::METATAGS}):/
+        options[:statement_timeout] = 500
         count = fast_count_search(tags, options)
       else
         count = get_count_from_cache(tags)
