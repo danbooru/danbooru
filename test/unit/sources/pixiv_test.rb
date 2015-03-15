@@ -19,6 +19,20 @@ module Sources
         PixivWebAgent.stubs(:phpsessid).returns(PHPSESSID)
       end
 
+      context "A gallery page" do
+        setup do
+          VCR.use_cassette("pixiv-gallery", :record => :none) do
+            @site = Sources::Site.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=49270482")
+            @site.get
+            @image_urls = @site.image_urls
+          end
+        end
+
+        should "get all the image urls" do
+          assert_equal(["http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=49270482&page=0", "http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=49270482&page=1"], @image_urls)
+        end
+      end
+
       context "An ugoira source site for pixiv" do
         setup do
           VCR.use_cassette("ugoira-converter", :record => :none) do

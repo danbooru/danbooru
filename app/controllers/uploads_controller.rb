@@ -28,10 +28,9 @@ class UploadsController < ApplicationController
   end
 
   def batch
-    if params[:url] =~ /twitter/
-      @service = TwitterService.new
-    end
-    @urls = @service.image_urls(params[:url])
+    @source = Sources::Site.new(params[:url])
+    @source.get
+    @urls = @source.image_urls
   end
 
   def index

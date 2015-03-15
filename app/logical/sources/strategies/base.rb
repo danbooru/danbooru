@@ -67,6 +67,10 @@ module Sources
         template.params[:ref] || template.params[:url]
       end
 
+      def image_urls
+        [image_url]
+      end
+
     protected
       def agent
         raise NotImplementedError

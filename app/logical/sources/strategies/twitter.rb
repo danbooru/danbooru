@@ -18,5 +18,9 @@ module Sources::Strategies
       @profile_url = "https://twitter.com/" + attrs[:user][:screen_name]
       @image_url = attrs[:entities][:media][0][:media_url] + ":orig"
     end
+
+    def image_urls
+      TwitterService.new.image_urls(url)
+    end
   end
 end
