@@ -8,7 +8,7 @@ http_interactions:
       string: ''
     headers:
       Accept:
-      - ! '*/*'
+      - "*/*"
       User-Agent:
       - Mechanize/2.7.2 Ruby/1.9.3p327 (http://github.com/sparklemotion/mechanize/)
       Accept-Encoding:
@@ -26,44 +26,27 @@ http_interactions:
   response:
     status:
       code: 200
-      message: !binary |-
-        T0s=
+      message: OK
     headers:
-      !binary "RGF0ZQ==":
-      - !binary |-
-        V2VkLCAyMiBPY3QgMjAxNCAyMzozNjoxOCBHTVQ=
-      !binary "U2VydmVy":
-      - !binary |-
-        QXBhY2hl
-      !binary "Q2FjaGUtQ29udHJvbA==":
-      - !binary |-
-        cHJpdmF0ZQ==
-      !binary "UDNw":
-      - !binary |-
-        cG9saWN5cmVmPSIvdzNjL3AzcC54bWwiLCBDUD0iTk9JIERTUCBDT1IgQ1VS
-        YSBPVVIgU1RQIg==
-      !binary "U2V0LUNvb2tpZQ==":
-      - !binary |-
-        dXNlcmluZm89X183NTVjN2Q5MjJjNGZkZTM3ZmMyZiUzQiU3QiUyMnVzZXJu
-        YW1lJTIyJTNBJTIyJTIyJTJDJTIydW5pcXVlaWQlMjIlM0ElMjJlM2YyMzZh
-        ZjMyMWM1YWJlNzY5MjdlNzYyMmMzNzQzNCUyMiUyQyUyMnZkJTIyJTNBJTIy
-        MTQxNDAyMDk3OCUyQzE0MTQwMjA5NzglMkMxNDE0MDIwOTc4JTJDMSUyQzE1
-        NyUyQyUyQzElMkMwJTJDMSUyQzE0MTQwMjA5NzglMkMxNDE0MDIwOTc4JTJD
-        MSUyQzElMkMwJTJDMTQxNDAyMDk3OCUyQzQlMkMwJTIyJTdEOyBleHBpcmVz
-        PUZyaSwgMjEtTm92LTIwMTQgMjM6MzY6MTkgR01UOyBwYXRoPS87IGRvbWFp
-        bj0uZGV2aWFudGFydC5jb20=
-      !binary "Q29udGVudC1FbmNvZGluZw==":
-      - !binary |-
-        Z3ppcA==
-      !binary "VmFyeQ==":
-      - !binary |-
-        QWNjZXB0LUVuY29kaW5n
-      !binary "VHJhbnNmZXItRW5jb2Rpbmc=":
-      - !binary |-
-        Y2h1bmtlZA==
-      !binary "Q29udGVudC1UeXBl":
-      - !binary |-
-        dGV4dC9odG1s
+      Date:
+      - Wed, 22 Oct 2014 23:36:18 GMT
+      Server:
+      - Apache
+      Cache-Control:
+      - private
+      P3p:
+      - policyref="/w3c/p3p.xml", CP="NOI DSP COR CURa OUR STP"
+      Set-Cookie:
+      - userinfo=__755c7d922c4fde37fc2f%3B%7B%22username%22%3A%22%22%2C%22uniqueid%22%3A%22e3f236af321c5abe76927e7622c37434%22%2C%22vd%22%3A%221414020978%2C1414020978%2C1414020978%2C1%2C157%2C%2C1%2C0%2C1%2C1414020978%2C1414020978%2C1%2C1%2C0%2C1414020978%2C4%2C0%22%7D;
+        expires=Fri, 21-Nov-2014 23:36:19 GMT; path=/; domain=.deviantart.com
+      Content-Encoding:
+      - gzip
+      Vary:
+      - Accept-Encoding
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - text/html
     body:
       encoding: ASCII-8BIT
       string: !binary |-
@@ -718,40 +701,30 @@ http_interactions:
       User-Agent:
       - _/2.61.0
       Accept:
-      - ! '*/*'
+      - "*/*"
   response:
     status:
       code: 200
-      message: !binary |-
-        T0s=
+      message: OK
     headers:
-      !binary "QWNjZXB0LVJhbmdlcw==":
-      - !binary |-
-        Ynl0ZXM=
-      !binary "Q2FjaGUtQ29udHJvbA==":
-      - !binary |-
-        bWF4LWFnZT0zMTUzNjAwMA==
-      !binary "Q29udGVudC1UeXBl":
-      - !binary |-
-        aW1hZ2UvanBlZw==
-      !binary "RGF0ZQ==":
-      - !binary |-
-        V2VkLCAyMiBPY3QgMjAxNCAyMzozNjoxOSBHTVQ=
-      !binary "RXhwaXJlcw==":
-      - !binary |-
-        VGh1LCAyMiBPY3QgMjAxNSAyMzozNjoxOSBHTVQ=
-      !binary "TGFzdC1Nb2RpZmllZA==":
-      - !binary |-
-        U3VuLCAyNSBOb3YgMjAxMiAwODoxMjo0MCBHTVQ=
-      !binary "U2VydmVy":
-      - !binary |-
-        RUNBY2MgKGNwbS9GOEI0KQ==
-      !binary "WC1DYWNoZQ==":
-      - !binary |-
-        SElU
-      !binary "Q29udGVudC1MZW5ndGg=":
-      - !binary |-
-        MjU1Njgz
+      Accept-Ranges:
+      - bytes
+      Cache-Control:
+      - max-age=31536000
+      Content-Type:
+      - image/jpeg
+      Date:
+      - Wed, 22 Oct 2014 23:36:19 GMT
+      Expires:
+      - Thu, 22 Oct 2015 23:36:19 GMT
+      Last-Modified:
+      - Sun, 25 Nov 2012 08:12:40 GMT
+      Server:
+      - ECAcc (cpm/F8B4)
+      X-Cache:
+      - HIT
+      Content-Length:
+      - '255683'
     body:
       encoding: ASCII-8BIT
       string: !binary |-
@@ -6439,4 +6412,112 @@ http_interactions:
         C6TpU8v8fD7tCo6T3Qk/jQ/HU7VTt3IEbbeI6/8AjqAoZYuv/9k=
     http_version: 
   recorded_at: Wed, 22 Oct 2014 23:36:24 GMT
+- request:
+    method: get
+    uri: http://www.deviantart.com/download/339610451/resolution_by_mochikko-d5m713n.jpg?token=f828643e6e86a658e80f362745a0b20e20880fc6&ts=1414021578
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip,deflate,identity
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Mechanize/2.7.2 Ruby/2.1.5p273 (http://github.com/sparklemotion/mechanize/)
+      Accept-Charset:
+      - ISO-8859-1,utf-8;q=0.7,*;q=0.7
+      Accept-Language:
+      - en-us,en;q=0.5
+      Host:
+      - www.deviantart.com
+      Referer:
+      - !ruby/object:URI::HTTP
+        scheme: http
+        user: 
+        password: 
+        host: mochikko.deviantart.com
+        port: 80
+        path: "/art/RESOLUTION-339610451"
+        query: 
+        opaque: 
+        registry: 
+        fragment: 
+        parser: 
+      Connection:
+      - keep-alive
+      Keep-Alive:
+      - 300
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - text/html
+      Date:
+      - Sun, 15 Mar 2015 21:03:54 GMT
+      P3p:
+      - policyref="/w3c/p3p.xml", CP="NOI DSP COR CURa OUR STP"
+      Server:
+      - Apache
+      Set-Cookie:
+      - userinfo=__469f48a7e61048916c0c%3B%7B%22username%22%3A%22%22%2C%22uniqueid%22%3A%22196e94ff75a21043bfd7b9ae7eb68e09%22%2C%22vd%22%3A%221426453434%2C1426453434%2C0%2C1%2C0%2C%2C1%2C0%2C1%2C1426453434%2C1426453434%2C0%2C0%2C0%2C0%2C8%2C0%2C1%2C0%2C%2C0%2C0%22%7D;
+        expires=Tue, 14-Apr-2015 21:03:54 GMT; path=/; domain=.deviantart.com
+      Vary:
+      - Accept-Encoding
+      Content-Length:
+      - '210'
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        H4sIAAAAAAAAA3XQwUoDQQwG4FcZ9u7E0lZoSeciHgpiodrbXsaZyMTdnSzT
+        2Nq3t+0getDbz0/4QoJJh95hIh8dKmtPbkuRCwVlyQi1QqgDrxJPDveh8KhG
+        TyOtGqVPhXd/8LVt3JFzlKPtJfgLYVOht1WTVMdlCy0MEhJ3ndhIB/ZZfVEb
+        ZGjhHFrYPjxvHncv683TzXS6uJvczuaTBqHaDrN8J29+ufCfekH/Nt19z6Ez
+        iQoZFRMkK+cPsgj+fO3PHqgnw/VNX+b/CdYtAQAA
+    http_version: 
+  recorded_at: Sun, 15 Mar 2015 21:03:54 GMT
+- request:
+    method: get
+    uri: http://www.deviantart.com/download/339610451/resolution_by_mochikko-d5m713n.jpg?token=f828643e6e86a658e80f362745a0b20e20880fc6&ts=1414021578
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Danbooru/2.74.0
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - text/html
+      Date:
+      - Sun, 15 Mar 2015 21:03:54 GMT
+      P3p:
+      - policyref="/w3c/p3p.xml", CP="NOI DSP COR CURa OUR STP"
+      Server:
+      - Apache
+      Set-Cookie:
+      - userinfo=__7a17ba46fc166f97abde%3B%7B%22username%22%3A%22%22%2C%22uniqueid%22%3A%2219479ea891a58534c643ccb9538256fd%22%2C%22vd%22%3A%221426453434%2C1426453434%2C0%2C1%2C0%2C%2C1%2C0%2C1%2C1426453434%2C1426453434%2C0%2C0%2C0%2C0%2C8%2C0%2C1%2C0%2C%2C0%2C0%22%7D;
+        expires=Tue, 14-Apr-2015 21:03:54 GMT; path=/; domain=.deviantart.com
+      Vary:
+      - Accept-Encoding
+      Content-Length:
+      - '210'
+    body:
+      encoding: UTF-8
+      string: <html><head><title>Redirection</title></head><body><script type="text/javascript">window.location.href="http:\/\/mochikko.deviantart.com\/art\/RESOLUTION-339610451"</script><noscript><a
+        href="http://mochikko.deviantart.com/art/RESOLUTION-339610451">Click here
+        to continue.</a></noscript></body></html>
+    http_version: 
+  recorded_at: Sun, 15 Mar 2015 21:03:54 GMT
 recorded_with: VCR 2.9.0
