@@ -1,7 +1,7 @@
 module Sources::Strategies
   class Twitter < Base
     def self.url_match?(url)
-      url =~ %r!https?://mobile\.twitter\.com/\w+/status/\d+!
+      url =~ %r!https?://(?:mobile\.)?twitter\.com/\w+/status/\d+!
     end
 
     def tags
