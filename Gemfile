@@ -29,7 +29,7 @@ gem "simple_form"
 gem "mechanize"
 gem "nokogiri"
 gem "whenever", :require => false
-gem "sanitize"
+gem "sanitize", "~> 3.1.0"
 gem 'rmagick', :require => "RMagick"
 gem 'daemons'
 gem 'net-ssh'
