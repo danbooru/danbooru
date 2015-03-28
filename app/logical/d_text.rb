@@ -321,7 +321,8 @@ class DText
         "a" => {
           "href" => ["http", "https", :relative]
         }
-      }
+      },
+      :css => Sanitize::Config::RELAXED[:css]
     )
   end
 end
