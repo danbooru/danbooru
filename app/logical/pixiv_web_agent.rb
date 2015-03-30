@@ -13,7 +13,7 @@ class PixivWebAgent
       cookie.path = "/"
       mech.cookie_jar.add(cookie)
     else
-      mech.get("http://www.pixiv.net") do |page|
+      mech.get("https://www.secure.pixiv.net") do |page|
         page.form_with(:action => "https://www.secure.pixiv.net/login.php") do |form|
           form['pixiv_id'] = Danbooru.config.pixiv_login
           form['pass'] = Danbooru.config.pixiv_password
