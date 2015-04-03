@@ -254,4 +254,8 @@ class TagAlias < ActiveRecord::Base
     update_forum_topic_for_reject
     destroy
   end
+
+  def self.update_cached_post_counts_for_all
+    execute_sql("UPDATE tag_aliases SET post_count = tags.post_count FROM tags WHERE tags.name = tag_aliases.consequent_name")
+  end
 end

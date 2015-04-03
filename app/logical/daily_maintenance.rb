@@ -12,5 +12,6 @@ class DailyMaintenance
     TagSubscription.process_all
     ApiCacheGenerator.new.generate_tag_cache
     ForumSubscription.process_all!
+    TagAlias.update_cached_post_counts_for_all
   end
 end
