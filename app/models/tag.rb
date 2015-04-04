@@ -682,6 +682,7 @@ class Tag < ActiveRecord::Base
       query2 = TagAlias.select("tags.name, tag_aliases.post_count, tags.category, tag_aliases.antecedent_name")
         .joins("INNER JOIN tags ON tags.name = tag_aliases.consequent_name")
         .where("tag_aliases.antecedent_name LIKE ? ESCAPE E'\\\\'", name)
+        .active
         .where("tags.name NOT LIKE ? ESCAPE E'\\\\'", name)
         .where("tag_aliases.post_count > 0")
         .order("tag_aliases.post_count desc")
