@@ -679,7 +679,7 @@ class Tag < ActiveRecord::Base
         .search(:name_matches => name, :order => "count").limit(10)
 
       name = name.mb_chars.downcase.to_escaped_for_sql_like
-      query2 = TagAlias.select("tags.name, tag_aliases.post_count, tags.category, tag_aliases.antecedent_name")
+      query2 = TagAlias.select("tags.name, tags.post_count, tags.category, tag_aliases.antecedent_name")
         .joins("INNER JOIN tags ON tags.name = tag_aliases.consequent_name")
         .where("tag_aliases.antecedent_name LIKE ? ESCAPE E'\\\\'", name)
         .active
