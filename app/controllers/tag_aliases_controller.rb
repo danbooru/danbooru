@@ -7,11 +7,6 @@ class TagAliasesController < ApplicationController
     respond_with(@tag_alias)
   end
 
-  def new
-    @tag_alias = TagAlias.new(params[:tag_alias])
-    respond_with(@tag_alias)
-  end
-
   def edit
     @tag_alias = TagAlias.find(params[:id])
   end
@@ -34,11 +29,6 @@ class TagAliasesController < ApplicationController
         render :xml => @tag_aliases.to_xml(:root => "tag-aliases")
       end
     end
-  end
-
-  def create
-    @tag_alias = TagAlias.create(params[:tag_alias])
-    respond_with(@tag_alias, :location => tag_aliases_path(:search => {:id => @tag_alias.id}))
   end
 
   def destroy

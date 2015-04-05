@@ -7,11 +7,6 @@ class TagImplicationsController < ApplicationController
     respond_with(@tag_implication)
   end
 
-  def new
-    @tag_implication = TagImplication.new
-    respond_with(@tag_implication)
-  end
-
   def edit
     @tag_implication = TagImplication.find(params[:id])
   end
@@ -34,11 +29,6 @@ class TagImplicationsController < ApplicationController
         render :xml => @tag_implications.to_xml(:root => "tag-implications")
       end
     end
-  end
-
-  def create
-    @tag_implication = TagImplication.create(params[:tag_implication])
-    respond_with(@tag_implication, :location => tag_implications_path(:search => {:id => @tag_implication.id}))
   end
 
   def destroy
