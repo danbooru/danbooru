@@ -31,8 +31,8 @@ class BulkUpdateRequest < ActiveRecord::Base
   extend SearchMethods
 
   def approve!
-    update_forum_topic_for_approve
     AliasAndImplicationImporter.new(script, forum_topic_id, "1").process!
+    update_forum_topic_for_approve
     update_attribute(:status, "approved")
   end
 
