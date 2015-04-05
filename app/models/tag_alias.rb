@@ -87,6 +87,7 @@ class TagAlias < ActiveRecord::Base
     ensure_category_consistency
     update_posts
     update_forum_topic_for_approve
+    update_column(:post_count, consequent_tag.post_count)
     update_column(:status, "active")
   rescue Exception => e
     update_column(:status, "error: #{e}")
