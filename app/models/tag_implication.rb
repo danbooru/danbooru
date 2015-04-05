@@ -120,7 +120,7 @@ class TagImplication < ActiveRecord::Base
     self.creator_ip_addr = CurrentUser.ip_addr
   end
 
-  def process!
+  def process!(update_topic=true)
     unless valid?
       raise errors.full_messages.join("; ")
     end
@@ -128,7 +128,7 @@ class TagImplication < ActiveRecord::Base
     update_posts
     update_column(:status, "active")
     update_descendant_names_for_parents
-    update_forum_topic_for_approve
+    update_forum_topic_for_approve if update_topic
   rescue Exception => e
     update_column(:status, "error: #{e}")
   end
