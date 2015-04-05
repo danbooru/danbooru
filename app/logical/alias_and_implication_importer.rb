@@ -48,11 +48,17 @@ private
         case token[0]
         when :create_alias
           tag_alias = TagAlias.create(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2])
+          unless tag_alias.valid?
+            raise "Error: #{tag_alias.errors.full_messages.join("; ")} (create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name})"
+          end
           tag_alias.rename_wiki_and_artist if rename_aliased_pages?
           tag_alias.delay(:queue => "default").process!
 
         when :create_implication
           tag_implication = TagImplication.create(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2])
+          unless tag_implication.valid?
+            raise "Error: #{tag_implication.errors.full_messages.join("; ")} (create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name})"
+          end
           tag_implication.delay(:queue => "default").process!
 
         when :remove_alias
