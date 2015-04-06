@@ -16,7 +16,11 @@ class UploadsController < ApplicationController
         @normalized_url, headers = strategy.new(@normalized_url).rewrite(@normalized_url, headers)
       end
 
-      @post = Post.where(source: [params[:url], @normalized_url]).first
+      if @normalized_url.nil?
+        @post = Post.where(source: params[:url]).first
+      else
+        @post = Post.where(source: [params[:url], @normalized_url]).first
+      end
 
       begin
         @source = Sources::Site.new(params[:url])
