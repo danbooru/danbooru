@@ -206,7 +206,8 @@
     if (item.antecedent) {
       var antecedent = item.antecedent.replace(/_/g, " ");
       var arrow = $("<span/>").html(" &rarr; ").addClass("autocomplete-arrow");
-      $link.append(document.createTextNode(antecedent));
+      var antecedent_element = $("<span/>").text(antecedent).addClass("autocomplete-antecedent");
+      $link.append(antecedent_element);
       $link.append(arrow);
     }
 
