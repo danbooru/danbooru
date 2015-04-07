@@ -668,7 +668,7 @@ class Post < ActiveRecord::Base
     end
 
     def has_tag?(tag)
-      !!(tag_string =~ /(?:^| )#{tag}(?:$| )/)
+      !!(tag_string =~ /(?:^| )(?:#{tag})(?:$| )/)
     end
 
     def has_dup_tag?

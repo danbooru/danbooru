@@ -77,7 +77,7 @@ class TagAlias < ActiveRecord::Base
     end.uniq
   end
 
-  def process!
+  def process!(update_topic=true)
     unless valid?
       raise errors.full_messages.join("; ")
     end
@@ -86,7 +86,7 @@ class TagAlias < ActiveRecord::Base
     clear_all_cache
     ensure_category_consistency
     update_posts
-    update_forum_topic_for_approve
+    update_forum_topic_for_approve if update_topic
     update_column(:post_count, consequent_tag.post_count)
     update_column(:status, "active")
   rescue Exception => e

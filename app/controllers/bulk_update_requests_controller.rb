@@ -35,7 +35,7 @@ class BulkUpdateRequestsController < ApplicationController
 
   def destroy
     if @bulk_update_request.editable?(CurrentUser.user)
-      @bulk_update_request.destroy
+      @bulk_update_request.reject!
       flash[:notice] = "Bulk update request deleted"
       respond_with(@bulk_update_request, :location => bulk_update_requests_path)
     else

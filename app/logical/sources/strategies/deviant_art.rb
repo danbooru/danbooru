@@ -47,12 +47,18 @@ module Sources
       end
 
       def get_image_url_from_page(page)
-        download_link = page.link_with(:class => /dev-page-download/)
+        image = page.search("div.dev-view-deviation img.dev-content-full")
 
-        if download_link
-          download_link.click.uri.to_s # need to follow the redirect now to get the full size url, following it later seems to not work.
+        if image.any?
+          image[0]["src"]
         else
-          nil
+          download_link = page.link_with(:class => /dev-page-download/)
+
+          if download_link
+            download_link.click.uri.to_s # need to follow the redirect now to get the full size url, following it later seems to not work.
+          else
+            nil
+          end
         end
       end
 
