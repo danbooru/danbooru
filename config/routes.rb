@@ -213,6 +213,9 @@ Rails.application.routes.draw do
   resource :source, :only => [:show]
   resources :tags do
     resource :correction, :only => [:new, :create, :show], :controller => "tag_corrections"
+    collection do
+      get :autocomplete
+    end
   end
   resources :tag_aliases do
     resource :correction, :controller => "tag_alias_corrections"

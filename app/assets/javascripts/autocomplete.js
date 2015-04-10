@@ -173,11 +173,9 @@
     }
 
     $.ajax({
-      url: "/tags.json",
+      url: "/tags/autocomplete.json",
       data: {
-        "search[order]": "count",
         "search[name_matches]": term + "*",
-        "limit": 10
       },
       method: "get",
       success: function(data) {
@@ -185,6 +183,7 @@
           return {
             type: "tag",
             label: tag.name.replace(/_/g, " "),
+            antecedent: tag.antecedent_name,
             value: tag.name,
             category: tag.category,
             post_count: tag.post_count
@@ -202,7 +201,17 @@
   }
 
   Danbooru.Autocomplete.render_item = function(list, item) {
-    var $link = $("<a/>").text(item.label);
+    var $link = $("<a/>");
+
+    if (item.antecedent) {
+      var antecedent = item.antecedent.replace(/_/g, " ");
+      var arrow = $("<span/>").html(" &rarr; ").addClass("autocomplete-arrow");
+      var antecedent_element = $("<span/>").text(antecedent).addClass("autocomplete-antecedent");
+      $link.append(antecedent_element);
+      $link.append(arrow);
+    }
+
+    $link.append(document.createTextNode(item.label));
     $link.attr("href", "/posts?tags=" + encodeURIComponent(item.value));
     $link.click(function(e) {
       e.preventDefault();
