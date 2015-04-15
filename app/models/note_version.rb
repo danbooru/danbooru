@@ -28,6 +28,10 @@ class NoteVersion < ActiveRecord::Base
     self.updater_ip_addr = CurrentUser.ip_addr
   end
 
+  def previous
+    NoteVersion.where("note_id = ? and created_at < ?", note_id, created_at).order("created_at desc").first
+  end
+
   def updater_name
     User.id_to_name(updater_id)
   end
