@@ -1,6 +1,8 @@
 (function() {
   Danbooru.Autocomplete = {};
 
+  Danbooru.Autocomplete.AUTOCOMPLETE_VERSION = 1;
+
   Danbooru.Autocomplete.initialize_all = function() {
     if (Danbooru.meta("enable-auto-complete") === "true") {
       Danbooru.Autocomplete.enable_local_storage = this.test_local_storage();
@@ -21,8 +23,14 @@
 
   Danbooru.Autocomplete.prune_local_storage = function() {
     if (this.enable_local_storage) {
-      if ($.localStorage.keys().length > 4000) {
-        $.localStorage.removeAll();        
+      var cached_autocomplete_version = $.localStorage.get("danbooru-autocomplete-version");
+      if (cached_autocomplete_version !== this.AUTOCOMPLETE_VERSION || $.localStorage.keys().length > 4000) {
+        $.each($.localStorage.keys(), function(i, key) {
+          if (key.substr(0, 3) === "ac-") {
+            $.localStorage.remove(key);
+          }
+        });
+        $.localStorage.set("danbooru-autocomplete-version", this.AUTOCOMPLETE_VERSION);
       }
     }
   }
@@ -42,7 +50,7 @@
     );
 
     var prefixes = "-|~|general:|gen:|artist:|art:|copyright:|copy:|co:|character:|char:|ch:";
-    var metatags = "order|-status|status|-rating|rating|-locked|locked|child|" + 
+    var metatags = "order|-status|status|-rating|rating|-locked|locked|child|" +
       "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-fav|fav|ordfav|" +
       "sub|-pool|pool|ordpool";
 
@@ -167,9 +175,13 @@
     if (this.enable_local_storage) {
       var cached = $.localStorage.get(key);
       if (cached) {
-        resp(cached.value);
-        return;
-      }      
+        if (Date.parse(cached.expires) < new Date().getTime()) {
+          $.localStorage.remove(key);
+        } else {
+          resp(cached.value);
+          return;
+        }
+      }
     }
 
     $.ajax({
