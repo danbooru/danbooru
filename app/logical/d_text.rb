@@ -322,7 +322,9 @@ class DText
           "href" => ["http", "https", :relative]
         }
       },
-      :css => Sanitize::Config::RELAXED[:css]
+      :css => Sanitize::Config::RELAXED[:css].merge({
+        :protocols => []
+      })
     )
   end
 end
