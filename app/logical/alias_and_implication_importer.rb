@@ -32,7 +32,7 @@ class AliasAndImplicationImporter
         [:remove_implication, $1, $2]
       elsif line =~ /^mass update (.+?) -> (.*)$/i
         [:mass_update, $1, $2]
-      elsif line.empty?
+      elsif line.strip.empty?
         # do nothing
       else
         raise "Unparseable line: #{line}"

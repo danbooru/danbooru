@@ -35,6 +35,29 @@ class BulkUpdateRequest < ActiveRecord::Base
     AliasAndImplicationImporter.new(script, forum_topic_id, "1").process!
     update_forum_topic_for_approve
     update_attribute(:status, "approved")
+
+  rescue Exception => x
+    admin = User.admins.first
+    msg = <<-EOS
+      Bulk Update Request ##{id} failed\n
+      Exception: #{x.class}\n
+      Message: #{x.to_s}\n
+      Stack trace:\n
+    EOS
+
+    x.backtrace.each do |line|
+      msg += "#{line}\n"
+    end
+
+    dmail = Dmail.new(
+      :from_id => admin.id,
+      :to_id => admin.id,
+      :owner_id => admin.id,
+      :title => "Bulk update request approval failed",
+      :body => msg
+    )
+    dmail.owner_id = admin.id
+    dmail.save
   end
 
   def editable?(user)

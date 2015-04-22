@@ -6,28 +6,28 @@ module BulkUpdateRequestsHelper
         arg1_count = Tag.find_by_name(arg1).try(:post_count).to_i
         arg2_count = Tag.find_by_name(arg2).try(:post_count).to_i
 
-        "create_alias " + link_to(arg1, posts_path(:tags => arg1)) + " (#{arg1_count}) -&gt; " + link_to(arg2, posts_path(:tags => arg2)) + " (#{arg2_count})"
+        "create alias " + link_to(arg1, posts_path(:tags => arg1)) + " (#{arg1_count}) -&gt; " + link_to(arg2, posts_path(:tags => arg2)) + " (#{arg2_count})"
 
       when :create_implication
         arg1_count = Tag.find_by_name(arg1).try(:post_count).to_i
         arg2_count = Tag.find_by_name(arg2).try(:post_count).to_i
 
-        "create_implication " + link_to(arg1, posts_path(:tags => arg1)) + " (#{arg1_count}) -&gt; " + link_to(arg2, posts_path(:tags => arg2)) + " (#{arg2_count})"
+        "create implication " + link_to(arg1, posts_path(:tags => arg1)) + " (#{arg1_count}) -&gt; " + link_to(arg2, posts_path(:tags => arg2)) + " (#{arg2_count})"
 
       when :remove_alias
         arg1_count = Tag.find_by_name(arg1).try(:post_count).to_i
         arg2_count = Tag.find_by_name(arg2).try(:post_count).to_i
 
-        "remove_alias " + link_to(arg1, posts_path(:tags => arg1)) + " (#{arg1_count}) -&gt; " + link_to(arg2, posts_path(:tags => arg2)) + " (#{arg2_count})"
+        "remove alias " + link_to(arg1, posts_path(:tags => arg1)) + " (#{arg1_count}) -&gt; " + link_to(arg2, posts_path(:tags => arg2)) + " (#{arg2_count})"
 
       when :remove_implication
         arg1_count = Tag.find_by_name(arg1).try(:post_count).to_i
         arg2_count = Tag.find_by_name(arg2).try(:post_count).to_i
 
-        "remove_implication " + link_to(arg1, posts_path(:tags => arg1)) + " (#{arg1_count}) -&gt; " + link_to(arg2, posts_path(:tags => arg2)) + " (#{arg2_count})"
+        "remove implication " + link_to(arg1, posts_path(:tags => arg1)) + " (#{arg1_count}) -&gt; " + link_to(arg2, posts_path(:tags => arg2)) + " (#{arg2_count})"
 
       when :mass_update
-        "mass_update " + link_to(arg1, posts_path(:tags => arg1)) + " -&gt; " + link_to(arg2, posts_path(:tags => arg2))
+        "mass update " + link_to(arg1, posts_path(:tags => arg1)) + " -&gt; " + link_to(arg2, posts_path(:tags => arg2))
 
       end
     end.join("\n")
