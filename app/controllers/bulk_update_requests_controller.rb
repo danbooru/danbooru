@@ -1,5 +1,5 @@
 class BulkUpdateRequestsController < ApplicationController
-  respond_to :html, :xml, :json
+  respond_to :html, :xml, :json, :js
   before_filter :member_only
   before_filter :admin_only, :only => [:approve]
   before_filter :load_bulk_update_request, :except => [:new, :create, :index]
@@ -36,7 +36,7 @@ class BulkUpdateRequestsController < ApplicationController
   def destroy
     if @bulk_update_request.editable?(CurrentUser.user)
       @bulk_update_request.reject!
-      flash[:notice] = "Bulk update request deleted"
+      flash[:notice] = "Bulk update request rejected"
       respond_with(@bulk_update_request, :location => bulk_update_requests_path)
     else
       access_denied()

@@ -13,6 +13,7 @@ class BulkUpdateRequest < ActiveRecord::Base
   attr_accessible :user_id, :forum_topic_id, :script, :title, :reason
   attr_accessible :status, :as => [:admin]
   before_validation :initialize_attributes, :on => :create
+  before_validation :normalize_text
   after_create :create_forum_topic
 
   module SearchMethods
@@ -113,5 +114,9 @@ class BulkUpdateRequest < ActiveRecord::Base
         )
       end
     end
+  end
+
+  def normalize_text
+    self.script = script.downcase
   end
 end
