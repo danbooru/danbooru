@@ -711,6 +711,10 @@ class User < ActiveRecord::Base
       if params[:id].present?
         q = q.where("id in (?)", params[:id].split(",").map(&:to_i))
       end
+
+      if params[:current_user_first] == "true" && !CurrentUser.is_anonymous?
+        q = q.order("id = #{CurrentUser.user.id.to_i} desc")
+      end
       
       case params[:order]
       when "name"

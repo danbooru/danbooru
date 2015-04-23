@@ -301,6 +301,7 @@
       url: "/users.json",
       data: {
         "search[order]": "post_upload_count",
+        "search[current_user_first]": "true",
         "search[name_matches]": term + "*",
         "limit": 10,
       },
