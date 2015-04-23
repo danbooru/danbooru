@@ -22,12 +22,12 @@
   Danbooru.PostPopular.initialize_all = function() {
     if ($("#c-explore-posts").length) {
       if (Danbooru.meta("enable-js-navigation") === "true") {
-        $(document).bind("keypress", "a", function(e) {
+        $(document).bind("keydown", "a", function(e) {
           Danbooru.PostPopular.nav_prev();
           e.preventDefault();
         });
 
-        $(document).bind("keypress", "d", function(e) {
+        $(document).bind("keydown", "d", function(e) {
           Danbooru.PostPopular.nav_next();
           e.preventDefault();
         });

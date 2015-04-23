@@ -2,21 +2,21 @@
   Danbooru.Shortcuts = {};
 
   Danbooru.Shortcuts.initialize = function() {
-    $(document).bind("keypress", "s", function(e) {
+    $(document).bind("keydown", "s", function(e) {
       Danbooru.Shortcuts.nav_scroll_down();
     });
 
-    $(document).bind("keypress", "w", function(e) {
+    $(document).bind("keydown", "w", function(e) {
       Danbooru.Shortcuts.nav_scroll_up();
     });
 
-    $(document).bind("keypress", "q", function(e) {
+    $(document).bind("keydown", "q", function(e) {
       $("#tags, #search_name, #search_name_matches, #query").trigger("focus").selectEnd();
       e.preventDefault();
     });
 
     if ($("#image").length) { // post page or bookmarklet upload page
-      $(document).bind("keypress", "shift+e", function(e) {
+      $(document).bind("keydown", "shift+e", function(e) {
         if (!$("#edit-dialog").length) {
           $("#edit").show();
           $("#comments").hide();
@@ -32,17 +32,17 @@
     }
 
     if ($("#c-posts").length && $("#a-show").length) {
-      $(document).bind("keypress", "shift+o", function(e) {
+      $(document).bind("keydown", "shift+o", function(e) {
         Danbooru.Post.approve(Danbooru.meta("post-id"));
       });
 
-      $(document).bind("keypress", "r", function(e) {
+      $(document).bind("keydown", "r", function(e) {
         $("#random-post")[0].click();
       });
     }
 
     if ($("#c-posts").length && $("#a-index").length) {
-      $(document).bind("keypress", "r", function(e) {
+      $(document).bind("keydown", "r", function(e) {
         $("#random-post")[0].click();
       });
     }

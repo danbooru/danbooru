@@ -169,23 +169,23 @@
 
   Danbooru.Post.initialize_shortcuts = function() {
     if ($("#a-show").length) {
-      $(document).bind("keypress", "e", function(e) {
+      $(document).bind("keydown", "e", function(e) {
         $("#post-edit-link").trigger("click");
         $("#post_tag_string").focus();
         e.preventDefault();
       });
 
-      $(document).bind("keypress", "a", function(e) {
+      $(document).bind("keydown", "a", function(e) {
         Danbooru.Post.nav_prev();
         e.preventDefault();
       });
 
-      $(document).bind("keypress", "d", function(e) {
+      $(document).bind("keydown", "d", function(e) {
         Danbooru.Post.nav_next();
         e.preventDefault();
       });
 
-      $(document).bind("keypress", "f", function(e) {
+      $(document).bind("keydown", "f", function(e) {
         if ($("#add-to-favorites").is(":visible")) {
           $("#add-to-favorites").click();
         } else {
@@ -322,7 +322,7 @@
     });
 
     if ($("#image-resize-notice").length && Danbooru.meta("enable-js-navigation") === "true") {
-      $(document).bind("keypress", "v", function(e) {
+      $(document).bind("keydown", "v", function(e) {
         if ($("#image-resize-notice").is(":visible")) {
           $("#image-resize-link").click();
         } else {
