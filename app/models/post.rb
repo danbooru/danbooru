@@ -137,6 +137,14 @@ class Post < ActiveRecord::Base
       file_ext =~ /jpg|jpeg|gif|png/i
     end
 
+    def is_animated_gif?
+      if file_ext =~ /gif/i
+        return Magick::Image.ping(file_path).length > 1
+      else
+        return false
+      end
+    end
+
     def is_flash?
       file_ext =~ /swf/i
     end
@@ -550,7 +558,7 @@ class Post < ActiveRecord::Base
     def add_automatic_tags(tags)
       return tags if !Danbooru.config.enable_dimension_autotagging
 
-      tags -= %w(incredibly_absurdres absurdres highres lowres huge_filesize flash webm)
+      tags -= %w(incredibly_absurdres absurdres highres lowres huge_filesize animated_gif flash webm)
 
       if has_dimensions?
         if image_width >= 10_000 || image_height >= 10_000
@@ -577,6 +585,10 @@ class Post < ActiveRecord::Base
 
       if file_size >= 10.megabytes
         tags << "huge_filesize"
+      end
+
+      if is_animated_gif?
+        tags << "animated_gif"
       end
 
       if is_flash?
