@@ -426,13 +426,23 @@ class Tag < ActiveRecord::Base
             q[:artcomm_ids] << user_id unless user_id.blank?
 
           when "-pool"
-            q[:tags][:exclude] << "pool:#{Pool.name_to_id($2)}"
+            if $2.downcase == "series"
+              q[:tags][:exclude] << "pool:series"
+            elsif $2.downcase == "collection"
+              q[:tags][:exclude] << "pool:collection"
+            else
+              q[:tags][:exclude] << "pool:#{Pool.name_to_id($2)}"
+            end
 
           when "pool"
             if $2.downcase == "none"
               q[:pool] = "none"
             elsif $2.downcase == "any"
               q[:pool] = "any"
+            elsif $2.downcase == "series"
+              q[:tags][:related] << "pool:series"
+            elsif $2.downcase == "collection"
+              q[:tags][:related] << "pool:collection"
             elsif $2.include?("*")
               pools = Pool.name_matches($2).select("id").limit(Danbooru.config.tag_query_limit).order("post_count DESC")
               q[:tags][:include] += pools.map {|pool| "pool:#{pool.id}"}

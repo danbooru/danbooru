@@ -43,6 +43,9 @@ module DelayedJobsHelper
     when "Class#decrement_post_counts"
       "<strong>decrement post counts</strong>"
 
+    when "Pool#update_category_pseudo_tags_for_posts"
+      "<strong>update pool category pseudo tags for posts</strong>"
+
     else
       h(job.name)
     end
@@ -88,6 +91,9 @@ module DelayedJobsHelper
 
     when "Class#decrement_post_counts"
       h(job.payload_object.args.join(" "))
+
+    when "Pool#update_category_pseudo_tags_for_posts"
+      %{<a href="/pools/#{job.payload_object.id}">#{h(job.payload_object.name)}</a>}
 
     else
       h(job.handler)

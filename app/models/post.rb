@@ -19,6 +19,7 @@ class Post < ActiveRecord::Base
   before_save :normalize_tags
   before_save :update_tag_post_counts
   before_save :set_tag_counts
+  before_save :set_pool_category_pseudo_tags
   before_validation :strip_source
   before_validation :initialize_uploader, :on => :create
   before_validation :parse_pixiv_id
@@ -835,6 +836,7 @@ class Post < ActiveRecord::Base
       return if belongs_to_pool?(pool)
       return if pool.is_deleted? && !force
       self.pool_string = "#{pool_string} pool:#{pool.id}".strip
+      set_pool_category_pseudo_tags
       update_column(:pool_string, pool_string) unless new_record?
       pool.add!(self)
     end
@@ -843,6 +845,7 @@ class Post < ActiveRecord::Base
       return unless belongs_to_pool?(pool)
       return if pool.is_deleted? && !force
       self.pool_string = pool_string.gsub(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ").strip
+      set_pool_category_pseudo_tags
       update_column(:pool_string, pool_string) unless new_record?
       pool.remove!(self)
     end
@@ -850,6 +853,18 @@ class Post < ActiveRecord::Base
     def remove_from_all_pools
       pools.find_each do |pool|
         pool.remove!(self)
+      end
+    end
+
+    def set_pool_category_pseudo_tags
+      self.pool_string = (pool_string.scan(/\S+/) - ["pool:series", "pool:collection"]).join(" ")
+
+      pool_categories = pools.select("category").map(&:category)
+      if pool_categories.include?("series")
+        self.pool_string = "#{pool_string} pool:series".strip
+      end
+      if pool_categories.include?("collection")
+        self.pool_string = "#{pool_string} pool:collection".strip
       end
     end
   end

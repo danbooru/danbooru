@@ -2,6 +2,9 @@
   <div id="a-edit">
     <%= simple_form_for(@pool) do |f| %>
       <h1>Edit Pool: <%= @pool.pretty_name %></h1>
+
+      <%= error_messages_for "pool" %>
+
       <%= f.input :name, :as => :string, :input_html => { :value => @pool.pretty_name } %>
       <%= dtext_field "pool", "description" %>
       <%= dtext_preview_button "pool", "description" %>
