@@ -5,6 +5,7 @@ class Pool < ActiveRecord::Base
   validates_format_of :name, :with => /\A[^,]+\Z/, :message => "cannot have commas"
   validates_inclusion_of :category, :in => %w(series collection)
   validate :updater_can_change_category
+  validate :name_does_not_conflict_with_metatags
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
   has_many :versions, lambda {order("pool_versions.id ASC")}, :class_name => "PoolVersion", :dependent => :destroy
@@ -400,6 +401,15 @@ class Pool < ActiveRecord::Base
   def updater_can_change_category
     if category_changed? && !category_changeable_by?(CurrentUser.user)
       errors[:base] << "You cannot change the category of pools with greater than 100 posts"
+      false
+    else
+      true
+    end
+  end
+
+  def name_does_not_conflict_with_metatags
+    if %w(any none series collection).include?(name.downcase.tr(" ", "_"))
+      errors[:base] << "Pools cannot have the following names: any, none, series, collection"
       false
     else
       true
