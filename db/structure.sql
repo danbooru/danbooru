@@ -2790,7 +2790,8 @@ CREATE TABLE tag_aliases (
     forum_topic_id integer,
     status text DEFAULT 'pending'::text NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    post_count integer DEFAULT 0 NOT NULL
 );
 
 
@@ -6739,10 +6740,24 @@ CREATE INDEX index_tag_aliases_on_antecedent_name ON tag_aliases USING btree (an
 
 
 --
+-- Name: index_tag_aliases_on_antecedent_name_pattern; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_tag_aliases_on_antecedent_name_pattern ON tag_aliases USING btree (antecedent_name text_pattern_ops);
+
+
+--
 -- Name: index_tag_aliases_on_consequent_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_tag_aliases_on_consequent_name ON tag_aliases USING btree (consequent_name);
+
+
+--
+-- Name: index_tag_aliases_on_post_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_tag_aliases_on_post_count ON tag_aliases USING btree (post_count);
 
 
 --
@@ -7173,4 +7188,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150119191042');
 INSERT INTO schema_migrations (version) VALUES ('20150120005624');
 
 INSERT INTO schema_migrations (version) VALUES ('20150128005954');
+
+INSERT INTO schema_migrations (version) VALUES ('20150403224949');
 
