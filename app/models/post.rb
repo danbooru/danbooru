@@ -195,12 +195,16 @@ class Post < ActiveRecord::Base
     end
 
     def large_image_width
-      [Danbooru.config.large_image_width, image_width].min
+      if has_large?
+        [Danbooru.config.large_image_width, image_width].min
+      else
+        image_width
+      end
     end
 
     def large_image_height
       ratio = Danbooru.config.large_image_width.to_f / image_width.to_f
-      if ratio < 1
+      if has_large? && ratio < 1
         (image_height * ratio).to_i
       else
         image_height
