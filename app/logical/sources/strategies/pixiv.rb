@@ -57,19 +57,26 @@ module Sources
       end
 
       def get
-        agent.get(URI.parse(normalized_url)) do |page|
-          @artist_name, @profile_url = get_profile_from_page(page)
-          @pixiv_moniker = get_moniker_from_page(page)
-          @zip_url, @ugoira_frame_data, @ugoira_content_type = get_zip_url_from_page(page)
-          @tags = get_tags_from_page(page)
-          @page_count = get_page_count_from_page(page)
-          @gallery_link = get_gallery_link(page)
+        page = agent.get(URI.parse(normalized_url))
+        
+        if page.search("body.not-logged-in").any?
+          # Session cache is invalid, clear it and log in normally.
+          Cache.delete("pixiv-phpsessid")
+          @agent = nil
+          page = agent.get(URI.parse(normalized_url))
+        end
+        
+        @artist_name, @profile_url = get_profile_from_page(page)
+        @pixiv_moniker = get_moniker_from_page(page)
+        @zip_url, @ugoira_frame_data, @ugoira_content_type = get_zip_url_from_page(page)
+        @tags = get_tags_from_page(page)
+        @page_count = get_page_count_from_page(page)
+        @gallery_link = get_gallery_link(page)
 
-          is_manga = @page_count > 1
+        is_manga = @page_count > 1
 
-          if !@zip_url
-            @image_url = get_image_url_from_page(page, is_manga)
-          end
+        if !@zip_url
+          @image_url = get_image_url_from_page(page, is_manga)
         end
       end
 
