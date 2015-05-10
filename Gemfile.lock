@@ -104,6 +104,7 @@ GEM
     faraday (0.9.0)
       multipart-post (>= 1.2, < 3)
     ffaker (1.24.0)
+    gctools (0.2.3)
     hashie (3.3.1)
     highline (1.6.21)
     hike (1.2.3)
@@ -310,6 +311,7 @@ DEPENDENCIES
   diff-lcs
   factory_girl
   ffaker
+  gctools
   kgio
   mechanize
   mocha

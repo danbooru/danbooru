@@ -57,6 +57,8 @@ gem 'aws-s3', :require => "aws/s3", :git => "https://github.com/fnando/aws-s3.gi
 
 group :production do
   gem 'unicorn', :platforms => :ruby
+  # gem 'unicorn-worker-killer'
+  gem 'gctools'
   gem 'capistrano-unicorn', :require => false
 end
 

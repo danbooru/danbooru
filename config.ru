@@ -3,9 +3,8 @@
 require ::File.expand_path('../config/environment',  __FILE__)
 
 if defined? Unicorn
-  require_dependency 'unicorn/oob_gc'
-  GC.disable
-  use Unicorn::OobGC
+  require_dependency 'gctools/oobgc'
+  use GC::OOB::UnicornMiddleware
 end
 
 run Rails.application
