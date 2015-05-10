@@ -202,7 +202,7 @@ GEM
     rest-client (1.7.2)
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
-    rmagick (2.13.3)
+    rmagick (2.15.0)
     ruby-prof (0.14.2)
     rubyzip (1.1.6)
     safe_yaml (1.0.2)
