@@ -30,7 +30,7 @@ gem "mechanize"
 gem "nokogiri"
 gem "whenever", :require => false
 gem "sanitize", "~> 3.1.0"
-gem 'rmagick', :require => "RMagick"
+gem 'rmagick'
 gem 'daemons'
 gem 'net-ssh'
 gem 'net-sftp'
