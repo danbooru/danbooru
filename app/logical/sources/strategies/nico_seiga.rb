@@ -23,10 +23,17 @@ module Sources
       end
 
       def get
-        agent.get(normalized_url) do |page|
-          @artist_name, @profile_url = get_profile_from_page(page)
-          @image_url = get_image_url_from_page(page)
+        page = agent.get(normalized_url)
+
+        if page.search("a#link_btn_login").any?
+          # Session cache is invalid, clear it and log in normally.
+          Cache.delete("nico-seiga-session")
+          @agent = nil
+          page = agent.get(normalized_url)
         end
+
+        @artist_name, @profile_url = get_profile_from_page(page)
+        @image_url = get_image_url_from_page(page)
 
         # Log out before getting the tags.
         # The reason for this is that if you're logged in and viewing a non-adult-rated work, the tags will be added with javascript after the page has loaded meaning we can't extract them easily.
