@@ -81,7 +81,7 @@ module Sources
       end
 
       def rewrite_thumbnails(thumbnail_url, is_manga=nil)
-        thumbnail_url = rewrite_new_medium_images(thumbnail_url)
+        # thumbnail_url = rewrite_new_medium_images(thumbnail_url)
         thumbnail_url = rewrite_medium_ugoiras(thumbnail_url)
         thumbnail_url = rewrite_old_small_and_medium_images(thumbnail_url, is_manga)
         return thumbnail_url
