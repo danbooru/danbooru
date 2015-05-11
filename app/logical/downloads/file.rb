@@ -79,6 +79,7 @@ module Downloads
         url = URI.parse(src)
 
         begin
+          puts url.request_uri
           Net::HTTP.start(url.host, url.port, :use_ssl => url.is_a?(URI::HTTPS)) do |http|
             http.read_timeout = 10
             http.request_get(url.request_uri, headers) do |res|

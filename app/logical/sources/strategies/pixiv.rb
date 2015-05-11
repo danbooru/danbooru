@@ -126,8 +126,8 @@ module Sources
           # => http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p1_master1200.jpg
 
           page = manga_page_from_url(@url)
-          thumbnail_url = thumbnail_url.sub(%r!_p(\d+)_\w+\.jpg$!i, "_p#{page}.")
-          # => http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p1.
+          thumbnail_url = thumbnail_url.sub(%r!_p(\d+)_\w+\.jpg$!i, "_p#{page}")
+          # => http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p1
 
           illust_id = illust_id_from_url(@url)
           get_metadata_from_papi!(illust_id) do |metadata|
