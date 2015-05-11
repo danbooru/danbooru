@@ -316,6 +316,9 @@ module Sources
 
       # Refer to http://danbooru.donmai.us/wiki_pages/58938 for documentation on the Pixiv API.
       def get_metadata_from_spapi!(illust_id)
+        yield []
+        return
+
         spapi_url = "http://spapi.pixiv.net/iphone/illust.php?illust_id=#{illust_id}&PHPSESSID=#{PixivWebAgent.phpsessid(agent)}"
 
         agent.get(spapi_url) do |response|
