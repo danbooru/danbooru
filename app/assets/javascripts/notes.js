@@ -565,6 +565,7 @@ Danbooru.Note = {
       $("#image").unbind("click", Danbooru.Note.Box.toggle_all);
       $("#image").bind("mousedown", Danbooru.Note.TranslationMode.Drag.start);
       $(window).bind("mouseup", Danbooru.Note.TranslationMode.Drag.stop);
+      $("#mark-as-translated-section").show();
 
       Danbooru.notice('Translation mode is on. Drag on the image to create notes. <a href="#">Turn translation mode off</a> (shortcut is <span class="key">n</span>).');
       $("#notice a:contains(Turn translation mode off)").click(function(e) {
@@ -581,6 +582,7 @@ Danbooru.Note = {
       $(window).unbind("mouseup", Danbooru.Note.TranslationMode.Drag.stop);
       $(document.body).removeClass("mode-translation");
       $("#close-notice-link").click();
+      $("#mark-as-translated-section").hide();
     },
 
     create_note: function(e, x, y, w, h) {

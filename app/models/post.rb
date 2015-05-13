@@ -1566,6 +1566,32 @@ class Post < ActiveRecord::Base
   def strip_source
     self.source = source.try(:strip)
   end
+
+  def mark_as_translated(params)
+    tags = self.tag_array.dup
+
+    if params["check_translation"] == "1"
+      tags << "check_translation"
+    elsif params["check_translation"] == "0"
+      tags -= ["check_translation"]
+    end
+    if params["partially_translated"] == "1"
+      tags << "partially_translated"
+    elsif params["partially_translated"] == "0"
+      tags -= ["partially_translated"]
+    end
+
+    if params["check_translation"] == "1" || params["partially_translated"] == "1"
+      tags << "translation_request"
+      tags -= ["translated"]
+    else
+      tags << "translated"
+      tags -= ["translation_request"]
+    end
+
+    self.tag_string = tags.join(" ")
+    save
+  end
 end
 
 Post.connection.extend(PostgresExtensions)

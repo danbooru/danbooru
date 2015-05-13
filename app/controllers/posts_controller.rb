@@ -122,6 +122,12 @@ class PostsController < ApplicationController
     redirect_to post_path(@post, :tags => params[:tags])
   end
 
+  def mark_as_translated
+    @post = Post.find(params[:id])
+    @post.mark_as_translated(params[:post])
+    respond_with(@post)
+  end
+
 private
   def tag_query
     params[:tags] || (params[:post] && params[:post][:tags])

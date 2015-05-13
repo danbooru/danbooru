@@ -180,6 +180,7 @@ Rails.application.routes.draw do
       put :copy_notes
       get :show_seq
       put :unvote
+      put :mark_as_translated
     end
   end
   resources :post_appeals
