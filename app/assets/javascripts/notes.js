@@ -226,13 +226,13 @@ Danbooru.Note = {
       var $image = $("#image");
       var doc_width = $image.offset().left + $image.width();
 
-      while ($note_body[0].clientHeight < $note_body[0].scrollHeight) {
+      /*while ($note_body[0].clientHeight < $note_body[0].scrollHeight) {
         $note_body.css({height: $note_body.height() + 5});
       }
 
       while ($note_body[0].clientWidth < $note_body[0].scrollWidth) {
         $note_body.css({width: $note_body.width() + 5});
-      }
+      }*/
 
       if ($note_body.offset().left + $note_body.width() > doc_width) {
         $note_body.css({
