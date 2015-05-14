@@ -1,0 +1,69 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://public-api.secure.pixiv.net/v1/works/46239857.json?image_sizes=large&include_stats=true
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Referer:
+      - http://www.pixiv.net
+      User-Agent:
+      - crystal/2.79.2
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Authorization:
+      - Bearer blCMr6Kmxgtqzn_dsk2YTxeLgmw8mHoLjVTL8dEx7a8
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Thu, 14 May 2015 23:42:17 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      X-Content-Type-Options:
+      - nosniff
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJzdGF0dXMiOiJzdWNjZXNzIiwicmVzcG9uc2UiOlt7ImlkIjo0NjIzOTg1
+        NywidGl0bGUiOiLjg53jg5fjg4bjg5Tjg5Tjg4Pjgq/nrKzkuozoqbHjga/j
+        gZjjgb7jgorjgb7jgZfjgZ8iLCJjYXB0aW9uIjoiaHR0cDovL21hbmdhbGlm
+        ZXdpbi50YWtlc2hvYm8uY28uanAvcmVuc2FpL3BvcHV0ZS9wb3B1dGUtMDAy
+        LzEzMTYxL1xyXG7vvJHvvJHml6XplpPmm7TmlrDjgafjgZnjgIDjgojjgo3j
+        gZfjgY/jgYrjga3jgYzjgYTjgZfjgb7jgZkiLCJ0YWdzIjpbIuOCquODquOC
+        uOODiuODqyIsIuODneODl+ODhuODlOODlOODg+OCryJdLCJ0b29scyI6W10s
+        ImltYWdlX3VybHMiOnsibGFyZ2UiOiJodHRwOi8vaTIucGl4aXYubmV0L2lt
+        Zy1vcmlnaW5hbC9pbWcvMjAxNC8wOS8yOC8yMS81OS80NC80NjIzOTg1N19w
+        MC5qcGcifSwid2lkdGgiOjk2MCwiaGVpZ2h0IjoxMjAwLCJzdGF0cyI6eyJz
+        Y29yZWRfY291bnQiOjQ2OSwic2NvcmUiOjQ2MDcsInZpZXdzX2NvdW50Ijoy
+        NTYwMiwiZmF2b3JpdGVkX2NvdW50Ijp7InB1YmxpYyI6MTA4LCJwcml2YXRl
+        Ijo3fSwiY29tbWVudGVkX2NvdW50IjoxN30sInB1YmxpY2l0eSI6MCwiYWdl
+        X2xpbWl0IjoiYWxsLWFnZSIsImNyZWF0ZWRfdGltZSI6IjIwMTQtMDktMjgg
+        MjE6NTk6NDQiLCJyZXVwbG9hZGVkX3RpbWUiOiIyMDE0LTA5LTI4IDIxOjU5
+        OjQ0IiwidXNlciI6eyJpZCI6OTk0OCwiYWNjb3VudCI6ImJrdWJiIiwibmFt
+        ZSI6IuWkp+W3neOBtuOBj+OBti9ia3ViIiwiaXNfZm9sbG93aW5nIjpmYWxz
+        ZSwiaXNfZm9sbG93ZXIiOmZhbHNlLCJpc19mcmllbmQiOmZhbHNlLCJpc19w
+        cmVtaXVtIjpudWxsLCJwcm9maWxlX2ltYWdlX3VybHMiOnsicHhfNTB4NTAi
+        OiJodHRwOi8vaTEucGl4aXYubmV0L2ltZzAxL3Byb2ZpbGUvYmt1YmIvNTcy
+        ODA5X3MucG5nIn0sInN0YXRzIjpudWxsLCJwcm9maWxlIjpudWxsfSwiaXNf
+        bWFuZ2EiOmZhbHNlLCJpc19saWtlZCI6ZmFsc2UsImZhdm9yaXRlX2lkIjow
+        LCJwYWdlX2NvdW50IjoxLCJib29rX3N0eWxlIjoibm9uZSIsInR5cGUiOiJp
+        bGx1c3RyYXRpb24iLCJtZXRhZGF0YSI6bnVsbCwiY29udGVudF90eXBlIjpu
+        dWxsfV0sImNvdW50IjoxfQ==
+    http_version: 
+  recorded_at: Thu, 14 May 2015 23:42:26 GMT
+recorded_with: VCR 2.9.0

@@ -2,7 +2,7 @@ require 'test_helper'
 
 class ArtistsControllerTest < ActionController::TestCase
   def assert_artist_found(expected_artist, source_url)
-    VCR.use_cassette("functional/artists_controller/#{source_url}", :record => :once) do
+    VCR.use_cassette("functional/artists_controller/#{Digest::SHA1.hexdigest(source_url)}", :record => :none) do
       get :finder, { :format => :json, :url => source_url }, { :user_id => @user.id }
     end
 
@@ -12,7 +12,7 @@ class ArtistsControllerTest < ActionController::TestCase
   end
 
   def assert_artist_not_found(source_url)
-    VCR.use_cassette("functional/artists_controller/#{source_url}", :record => :once) do
+    VCR.use_cassette("functional/artists_controller/#{Digest::SHA1.hexdigest(source_url)}", :record => :none) do
       get :finder, { :format => :json, :url => source_url }, { :user_id => @user.id }
     end
 

@@ -4,10 +4,10 @@ require 'test_helper'
 
 module Sources
   class PixivTest < ActiveSupport::TestCase
-    PHPSESSID = "696859_60ab47b3a9a11b41d833853881cc5e40"
+    PHPSESSID = "696859_678b7a07e1fff94719fb6560eed5958f"
 
-    def get_source(source, cassette)
-      VCR.use_cassette(cassette, :record => :none) do
+    def get_source(source, cassette, record = :none)
+      VCR.use_cassette(cassette, :record => record) do
         @site = Sources::Site.new(source)
         @site.get
         @site
@@ -42,7 +42,7 @@ module Sources
         end
 
         should "get the file url" do
-          assert_equal("http://i1.pixiv.net/img-zip-ugoira/img/2014/10/05/23/42/23/46378654_ugoira1920x1080.zip", @site.file_url)
+          assert_equal("http://i3.pixiv.net/img-zip-ugoira/img/2014/10/05/23/42/23/46378654_ugoira1920x1080.zip", @site.file_url)
         end
 
         should "capture the frame data" do
@@ -96,7 +96,7 @@ module Sources
         end
 
         should "get the full size image url" do
-          assert_equal("http://i2.pixiv.net/img18/img/ringo78/45792845_big_p0.jpg", @site.image_url)
+          assert_equal("http://i2.pixiv.net/img-original/img/2014/09/05/05/53/53/45792845_p0.jpg", @site.image_url)
         end
       end
 
@@ -110,7 +110,7 @@ module Sources
         end
 
         should "get the full size image url" do
-          assert_equal("http://i2.pixiv.net/img-original/img/2014/10/04/03/59/52/46337015_p0.png", @site.image_url)
+          assert_equal("http://i4.pixiv.net/img-original/img/2014/10/04/03/59/52/46337015_p0.png", @site.image_url)
         end
       end
 

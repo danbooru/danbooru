@@ -1,0 +1,94 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://oauth.secure.pixiv.net/auth/token
+    body:
+      encoding: US-ASCII
+      string: username=uroobnad&password=uroobnad556&grant_type=password&client_id=bYGKuGVw91e0NMfPGp44euvGt59s&client_secret=HP3RmkgAmEGro0gn1x9ioawQE8WMfvLXDz3ZqxpK
+    headers:
+      Referer:
+      - http://www.pixiv.net
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Thu, 14 May 2015 23:42:03 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '502'
+      Connection:
+      - keep-alive
+      Set-Cookie:
+      - PHPSESSID=696859_bb99419d588815f6d8d0d93ddeca5a41; expires=Fri, 15-May-2015
+        00:42:03 GMT; Max-Age=3600; path=/; domain=.pixiv.net; secure
+      Expires:
+      - Thu, 19 Nov 1981 08:52:00 GMT
+      Cache-Control:
+      - no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+      Pragma:
+      - no-cache
+      X-Content-Type-Options:
+      - nosniff
+    body:
+      encoding: UTF-8
+      string: '{"response":{"access_token":"zD6ZcX8Z7CQe21ZfkK_rdk_d0OzMUZoS0_gXRBY4Ng0","expires_in":3600,"token_type":"bearer","scope":"unlimited","refresh_token":"JhZyWkXIbfqBYj7YAl5FTBP4PupFgtK1xKA8YKXTqMg","user":{"profile_image_urls":{"px_16x16":"http:\/\/source.pixiv.net\/common\/images\/no_profile_ss.png","px_50x50":"http:\/\/source.pixiv.net\/common\/images\/no_profile_s.png","px_170x170":"http:\/\/source.pixiv.net\/common\/images\/no_profile.png"},"id":"696859","name":"uroobnad","account":"uroobnad"}}}'
+    http_version: 
+  recorded_at: Thu, 14 May 2015 23:42:12 GMT
+- request:
+    method: get
+    uri: https://public-api.secure.pixiv.net/v1/works/32049358.json?image_sizes=large&include_stats=true
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Referer:
+      - http://www.pixiv.net
+      User-Agent:
+      - crystal/2.79.2
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Authorization:
+      - Bearer zD6ZcX8Z7CQe21ZfkK_rdk_d0OzMUZoS0_gXRBY4Ng0
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 400
+      message: Bad Request
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Thu, 14 May 2015 23:42:04 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '160'
+      Connection:
+      - keep-alive
+      X-Content-Type-Options:
+      - nosniff
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJzdGF0dXMiOiJmYWlsdXJlIiwiaGFzX2Vycm9yIjp0cnVlLCJlcnJvcnMi
+        Onsic3lzdGVtIjp7Im1lc3NhZ2UiOiLlr77osaHjga7jgqTjg6njgrnjg4jj
+        ga/opovjgaTjgYvjgorjgb7jgZvjgpPjgafjgZfjgZ/jgIIoaWxsdXN0X2lk
+        OjMyMDQ5MzU4KSIsImNvZGUiOjIwNn19fQ==
+    http_version: 
+  recorded_at: Thu, 14 May 2015 23:42:12 GMT
+recorded_with: VCR 2.9.0

@@ -2,13 +2,13 @@ require 'test_helper'
 
 module Downloads
   class PixivTest < ActiveSupport::TestCase
-    PHPSESSID = "696859_60ab47b3a9a11b41d833853881cc5e40"
+    PHPSESSID = "696859_678b7a07e1fff94719fb6560eed5958f"
 
-    def assert_downloaded(expected_filesize, source, cassette)
+    def assert_downloaded(expected_filesize, source, cassette, record = :none)
       tempfile = Tempfile.new("danbooru-test")
       download = Downloads::File.new(source, tempfile.path)
 
-      VCR.use_cassette(cassette, :record => :none) do
+      VCR.use_cassette(cassette, :record => record) do
         assert_nothing_raised(Downloads::File::Error) do
           download.download!
         end
@@ -17,18 +17,18 @@ module Downloads
       assert_equal(expected_filesize, tempfile.size, "Tested source URL: #{source}")
     end
 
-    def assert_rewritten(expected_source, test_source, cassette)
+    def assert_rewritten(expected_source, test_source, cassette, record = :none)
       tempfile = Tempfile.new("danbooru-test")
       download = Downloads::File.new(test_source, tempfile.path)
 
-      VCR.use_cassette(cassette, :record => :none) do
+      VCR.use_cassette(cassette, :record => record) do
         rewritten_source, headers, _ = download.before_download(test_source, {}, {})
         assert_equal(expected_source, rewritten_source, "Tested source URL: #{test_source}")
       end
     end
 
-    def assert_not_rewritten(source, cassette)
-      assert_rewritten(source, source, cassette)
+    def assert_not_rewritten(source, cassette, record = :none)
+      assert_rewritten(source, source, cassette, record)
     end
 
     context "An ugoira site for pixiv" do
@@ -46,7 +46,7 @@ module Downloads
       end
 
       should "download the zip file and update the source" do
-        assert_equal("http://i1.pixiv.net/img-zip-ugoira/img/2014/10/05/23/42/23/46378654_ugoira1920x1080.zip", @download.source)
+        assert_equal("http://i3.pixiv.net/img-zip-ugoira/img/2014/10/05/23/42/23/46378654_ugoira1920x1080.zip", @download.source)
       end
 
       should "capture the frame data" do
@@ -100,11 +100,9 @@ module Downloads
         # These tests aren't expected to pass. This is just to test if Pixiv has changed to using new URLs for old images.
         should_eventually "work when using new URLs" do
           # Don't know the actual file size of the thumbnails since they don't work.
-          assert_downloaded(42, @new_small_thumbnail,  "download-pixiv-old-png-new-small-thumbnail")
-          assert_downloaded(42, @new_medium_thumbnail, "download-pixiv-old-png-new-medium-thumbnail")
-
+          assert_downloaded(1083, @new_small_thumbnail,  "download-pixiv-old-png-new-small-thumbnail")
+          assert_downloaded(1083, @new_medium_thumbnail, "download-pixiv-old-png-new-medium-thumbnail")
           assert_downloaded(@file_size, @new_full_size_image, "download-pixiv-old-png-new-full-size")
-
         end
       end
 
@@ -119,12 +117,12 @@ module Downloads
           @big_page    = "http://www.pixiv.net/member_illust.php?mode=big&illust_id=46337015"
 
           @medium_thumbnail = "http://i2.pixiv.net/c/600x600/img-master/img/2014/10/04/03/59/52/46337015_p0_master1200.jpg"
-          @full_size_image  = "http://i2.pixiv.net/img-original/img/2014/10/04/03/59/52/46337015_p0.png"
+          @full_size_image  = "http://i4.pixiv.net/img-original/img/2014/10/04/03/59/52/46337015_p0.png"
 
           @file_size = 5_141
         end
 
-        should "download the full size image" do
+        should "1111 download the full size image" do
           assert_not_rewritten(@full_size_image, "rewrite-pixiv-new-png-full-size")
           assert_downloaded(@file_size, @full_size_image, "download-pixiv-new-png-full-size")
         end
@@ -154,8 +152,10 @@ module Downloads
           @p0_large_thumbnail  = "http://i1.pixiv.net/img07/img/pasirism/18557054_p0.png"
           @p1_large_thumbnail  = "http://i1.pixiv.net/img07/img/pasirism/18557054_p1.png"
 
-          @p0_full_size_image  = "http://i1.pixiv.net/img07/img/pasirism/18557054_big_p0.png"
-          @p1_full_size_image  = "http://i1.pixiv.net/img07/img/pasirism/18557054_big_p1.png"
+          @p0_full_size_image   = "http://i3.pixiv.net/img07/img/pasirism/18557054_big_p0.png"
+          @p0_full_size_image_1 = "http://i1.pixiv.net/img07/img/pasirism/18557054_big_p0.png"
+          @p1_full_size_image   = "http://i1.pixiv.net/img07/img/pasirism/18557054_big_p1.png"
+          @p1_full_size_image_3 = "http://i3.pixiv.net/img07/img/pasirism/18557054_big_p1.png"
 
           @p0_file_size = 1964
           @p1_file_size = 1927
@@ -171,7 +171,7 @@ module Downloads
         should "download the full size image instead of the HTML page" do
           assert_rewritten(@p0_full_size_image, @medium_page, "rewrite-pixiv-old-manga-p0-medium-html")
           assert_rewritten(@p0_full_size_image, @manga_page, "rewrite-pixiv-old-manga-p0-big-html")
-          assert_rewritten(@p1_full_size_image, @manga_big_p1_page, "rewrite-pixiv-old-manga-p1-big-html")
+          assert_rewritten(@p1_full_size_image_3, @manga_big_p1_page, "rewrite-pixiv-old-manga-p1-big-html")
           assert_downloaded(@p0_file_size, @medium_page,       "download-pixiv-old-manga-p0-medium-html")
           assert_downloaded(@p0_file_size, @manga_page,        "download-pixiv-old-manga-p0-big-html")
           assert_downloaded(@p1_file_size, @manga_big_p1_page, "download-pixiv-old-manga-p1-big-html")
@@ -180,7 +180,7 @@ module Downloads
         should "download the full size image instead of the thumbnail" do
           assert_rewritten(@p0_full_size_image, @p0_tiny_thumbnail, "download-pixiv-old-manga-p0-tiny-thumbnail")
           assert_rewritten(@p0_full_size_image, @p0_small_thumbnail, "download-pixiv-old-manga-p0-small-thumbnail")
-          assert_rewritten(@p0_full_size_image, @p0_large_thumbnail, "download-pixiv-old-manga-p0-large-thumbnail")
+          assert_rewritten(@p0_full_size_image_1, @p0_large_thumbnail, "download-pixiv-old-manga-p0-large-thumbnail")
           assert_rewritten(@p1_full_size_image, @p1_large_thumbnail, "download-pixiv-old-manga-p1-large-thumbnail")
           assert_downloaded(@p0_file_size, @p0_tiny_thumbnail,  "download-pixiv-old-manga-p0-tiny-thumbnail")
           assert_downloaded(@p0_file_size, @p0_small_thumbnail, "download-pixiv-old-manga-p0-small-thumbnail")
@@ -189,12 +189,10 @@ module Downloads
         end
 
         should "download the full size image instead of the medium thumbnail" do
-          assert_rewritten(@p0_full_size_image, @p0_medium_thumbnail, "rewrite-pixiv-old-manga-p0-medium-thumbnail")
+          assert_rewritten(@p0_full_size_image_1, @p0_medium_thumbnail, "rewrite-pixiv-old-manga-p0-medium-thumbnail")
           assert_downloaded(@p0_file_size, @p0_medium_thumbnail, "download-pixiv-old-manga-p0-medium-thumbnail")
         end
       end
-
-
 
       context "downloading a new manga image" do
         setup do
@@ -205,7 +203,9 @@ module Downloads
           @p0_large_thumbnail = "http://i1.pixiv.net/c/1200x1200/img-master/img/2014/10/02/14/21/39/46304614_p0_master1200.jpg"
           @p1_large_thumbnail = "http://i1.pixiv.net/c/1200x1200/img-master/img/2014/10/02/14/21/39/46304614_p1_master1200.jpg"
           @p0_full_size_image = "http://i1.pixiv.net/img-original/img/2014/10/02/14/21/39/46304614_p0.gif"
+          @p0_full_size_image_3 = "http://i3.pixiv.net/img-original/img/2014/10/02/14/21/39/46304614_p0.gif"
           @p1_full_size_image = "http://i1.pixiv.net/img-original/img/2014/10/02/14/21/39/46304614_p1.gif"
+          @p1_full_size_image_3 = "http://i3.pixiv.net/img-original/img/2014/10/02/14/21/39/46304614_p1.gif"
 
           @p0_file_size = 61_131
           @p1_file_size = 46_818
@@ -220,23 +220,21 @@ module Downloads
         end
 
         should "download the full size image instead of the HTML page" do
-          assert_rewritten(@p0_full_size_image, @medium_page, "rewrite-pixiv-new-manga-p0-medium-html")
-          assert_rewritten(@p0_full_size_image, @manga_page, "rewrite-pixiv-new-manga-p0-big-html")
-          assert_rewritten(@p1_full_size_image, @manga_big_p1_page, "rewrite-pixiv-new-manga-p1-big-html")
+          assert_rewritten(@p0_full_size_image_3, @medium_page, "rewrite-pixiv-new-manga-p0-medium-html")
+          assert_rewritten(@p0_full_size_image_3, @manga_page, "rewrite-pixiv-new-manga-p0-big-html")
+          assert_rewritten(@p1_full_size_image_3, @manga_big_p1_page, "rewrite-pixiv-new-manga-p1-big-html")
           assert_downloaded(@p0_file_size, @medium_page,       "download-pixiv-new-manga-p0-medium-html")
           assert_downloaded(@p0_file_size, @manga_page,        "download-pixiv-new-manga-p0-big-html")
           assert_downloaded(@p1_file_size, @manga_big_p1_page, "download-pixiv-new-manga-p1-big-html")
         end
 
         should "download the full size image instead of the thumbnail" do
-          assert_rewritten(@p0_full_size_image, @p0_large_thumbnail, "rewrite-pixiv-new-manga-p0-large-thumbnail")
-          assert_rewritten(@p1_full_size_image, @p1_large_thumbnail, "rewrite-pixiv-new-manga-p1-large-thumbnail")
-          assert_downloaded(@p0_file_size, @p0_large_thumbnail, "download-pixiv-new-manga-p0-large-thumbnail")
-          assert_downloaded(@p1_file_size, @p1_large_thumbnail, "download-pixiv-new-manga-p1-large-thumbnail")
+          assert_rewritten(@p0_full_size_image_3, @p0_large_thumbnail, "rewrite-pixiv-new-manga-p0-large-thumbnail")
+          assert_rewritten(@p1_full_size_image_3, @p1_large_thumbnail, "rewrite-pixiv-new-manga-p1-large-thumbnail")
+          assert_downloaded(@p0_file_size, @p0_large_thumbnail, "download-pixiv-new-manga-p0-large-thumbnail", :all)
+          assert_downloaded(@p1_file_size, @p1_large_thumbnail, "download-pixiv-new-manga-p1-large-thumbnail", :all)
         end
       end
-
-
 
       context "downloading a ugoira" do
         setup do
@@ -258,7 +256,6 @@ module Downloads
 
         should "download the zip file" do
           assert_not_rewritten(@zip_file, "rewrite-pixiv-ugoira-zip-file")
-
           assert_downloaded(@file_size, @zip_file, "download-pixiv-ugoira-zip-file")
         end
       end
