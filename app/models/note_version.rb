@@ -29,7 +29,7 @@ class NoteVersion < ActiveRecord::Base
   end
 
   def previous
-    NoteVersion.where("note_id = ? and created_at < ?", note_id, created_at).order("created_at desc").first
+    NoteVersion.where("note_id = ? and updated_at < ?", note_id, updated_at).order("updated_at desc").first
   end
 
   def updater_name
