@@ -74,7 +74,11 @@ module PostSets
           temp = []
           limit = [per_page, count].min
           limit.times do
-            post = ::Post.tag_match(tag_string).offset(rand(count)).first
+            q = ::Post.tag_match(tag_string)
+            unless temp.empty?
+              q = q.where("id not in (?)", temp.map(&:id))
+            end
+            post = q.offset(rand(count - temp.length)).first
             if post
               temp << post
             end

@@ -7,6 +7,12 @@
   <h1>Search</h1>
   <%= form_tag(path, :method => "get") do %>
     <%= text_field_tag("tags", tags, :size => 20) %>
+    <% if params[:raw] %>
+      <%= hidden_field_tag :raw, params[:raw] %>
+    <% end %>
+    <% if params[:random] %>
+      <%= hidden_field_tag :random, params[:random] %>
+    <% end %>
     <%= submit_tag "Go", :name => nil %>
   <% end %>
 </section>
