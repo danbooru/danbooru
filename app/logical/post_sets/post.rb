@@ -1,13 +1,14 @@
 module PostSets
   class Post < PostSets::Base
-    attr_reader :tag_array, :page, :per_page, :raw
+    attr_reader :tag_array, :page, :per_page, :raw, :random
 
-    def initialize(tags, page = 1, per_page = nil, raw = false)
+    def initialize(tags, page = 1, per_page = nil, raw = false, random = false)
       @tag_array = Tag.scan_query(tags)
       @page = page
       @per_page = (per_page || CurrentUser.per_page).to_i
       @per_page = 200 if @per_page > 200
       @raw = raw.present?
+      @random = random.present?
     end
 
     def tag_string
@@ -68,12 +69,24 @@ module PostSets
       end
 
       @posts ||= begin
-        if raw
-          temp = ::Post.raw_tag_match(tag_string).order("posts.id DESC").paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+        if random
+          count = ::Post.fast_count(tag_string, :statement_timeout => CurrentUser.user.statement_timeout)
+          temp = []
+          limit = [per_page, count].min
+          limit.times do
+            post = ::Post.tag_match(tag_string).offset(rand(count)).first
+            if post
+              temp << post
+            end
+          end
         else
-          temp = ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+          if raw
+            temp = ::Post.raw_tag_match(tag_string).order("posts.id DESC").paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+          else
+            temp = ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+          end
+          temp.each # hack to force rails to eager load
         end
-        temp.each # hack to force rails to eager load
         temp
       end
     end

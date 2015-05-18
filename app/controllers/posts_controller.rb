@@ -14,7 +14,7 @@ class PostsController < ApplicationController
       redirect_to post_path(@post)
     else
       limit = params[:limit] || (params[:tags] =~ /(?:^|\s)limit:(\d+)(?:$|\s)/ && $1) || CurrentUser.user.per_page
-      @post_set = PostSets::Post.new(tag_query, params[:page], limit, params[:raw])
+      @post_set = PostSets::Post.new(tag_query, params[:page], limit, params[:raw], params[:random])
       @posts = @post_set.posts
       respond_with(@posts) do |format|
         format.atom

@@ -9,5 +9,7 @@
     </div>
   <% end %>
 
-  <%= numbered_paginator(post_set.posts) %>
+  <% unless params[:random].present? %>
+    <%= numbered_paginator(post_set.posts) %>
+  <% end %>
 </div>
