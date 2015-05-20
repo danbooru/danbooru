@@ -42,7 +42,7 @@ Danbooru.Note = {
       });
       $note_box.resizable({
         containment: $("#image"),
-        handles: "se",
+        handles: "se, nw",
         stop: function(e, ui) {
           var $image = $("#image");
           var ratio = $image.width() / parseFloat($image.data("original-width"));
