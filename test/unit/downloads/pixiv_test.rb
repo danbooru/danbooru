@@ -231,8 +231,8 @@ module Downloads
         should "download the full size image instead of the thumbnail" do
           assert_rewritten(@p0_full_size_image_3, @p0_large_thumbnail, "rewrite-pixiv-new-manga-p0-large-thumbnail")
           assert_rewritten(@p1_full_size_image_3, @p1_large_thumbnail, "rewrite-pixiv-new-manga-p1-large-thumbnail")
-          assert_downloaded(@p0_file_size, @p0_large_thumbnail, "download-pixiv-new-manga-p0-large-thumbnail", :all)
-          assert_downloaded(@p1_file_size, @p1_large_thumbnail, "download-pixiv-new-manga-p1-large-thumbnail", :all)
+          assert_downloaded(@p0_file_size, @p0_large_thumbnail, "download-pixiv-new-manga-p0-large-thumbnail")
+          assert_downloaded(@p1_file_size, @p1_large_thumbnail, "download-pixiv-new-manga-p1-large-thumbnail")
         end
       end
 

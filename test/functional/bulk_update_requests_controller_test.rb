@@ -44,9 +44,9 @@ class BulkUpdateRequestsControllerTest < ActionController::TestCase
 
       context "for the creator" do
         should "succeed" do
-          assert_difference("BulkUpdateRequest.count", -1) do
-            delete :destroy, {:id => @bulk_update_request.id}, {:user_id => @user.id}
-          end
+          delete :destroy, {:id => @bulk_update_request.id}, {:user_id => @user.id}
+          @bulk_update_request.reload
+          assert_equal("rejected", @bulk_update_request.status)
         end
       end
 
@@ -64,9 +64,9 @@ class BulkUpdateRequestsControllerTest < ActionController::TestCase
 
       context "for an admin" do
         should "succeed" do
-          assert_difference("BulkUpdateRequest.count", -1) do
-            delete :destroy, {:id => @bulk_update_request.id}, {:user_id => @admin.id}
-          end
+          delete :destroy, {:id => @bulk_update_request.id}, {:user_id => @admin.id}
+          @bulk_update_request.reload
+          assert_equal("rejected", @bulk_update_request.status)
         end
       end
     end

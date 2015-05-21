@@ -87,7 +87,7 @@ class PoolTest < ActiveSupport::TestCase
 
     should "update any new posts that were added" do
       @p1.reload
-      assert_equal("pool:#{@pool.id}", @p1.pool_string)
+      assert_equal("pool:#{@pool.id} pool:series", @p1.pool_string)
     end
   end
 
