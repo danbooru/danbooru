@@ -46,7 +46,11 @@
   Danbooru.Upload.initialize_info_bookmarklet = function() {
     $("#source-info ul").hide();
     $("#fetch-data-bookmarklet").click(function(e) {
-      $.get(e.target.href).success(Danbooru.Upload.fill_source_info);
+      var xhr = $.get(e.target.href);
+      xhr.success(Danbooru.Upload.fill_source_info);
+      xhr.fail(function(data) {
+        $("#source-info span#loading-data").html("Error: " + data.responseJSON["message"])
+      });
       e.preventDefault();
     });
     $("#fetch-data-bookmarklet").trigger("click");
@@ -63,7 +67,11 @@
         Danbooru.error("Error: Source is not a URL");
       } else {
         $("#source-info span#loading-data").show();
-        $.get("/source.json?url=" + encodeURIComponent(source)).success(Danbooru.Upload.fill_source_info);
+        var xhr = $.get("/source.json?url=" + encodeURIComponent(source));
+        xhr.success(Danbooru.Upload.fill_source_info);
+        xhr.fail(function(data) {
+          $("#source-info span#loading-data").html("Error: " + data.responseJSON["message"])
+        });
       }
       e.preventDefault();
     });
