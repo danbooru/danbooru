@@ -33,18 +33,23 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
-      should "remove the post from all pools" do
-        pool = FactoryGirl.create(:pool)
-        pool.add!(@post)
-        @post.expunge!
-        pool.reload
-        assert_equal("", pool.post_ids)
-      end
+      context "that belongs to a pool" do
+        setup do
+          @pool = FactoryGirl.create(:pool)
+          @pool.add!(@post)
+          @post.reload
+          @post.expunge!
+        end
 
-      should "destroy the record" do
-        @post.expunge!
-        assert_equal([], @post.errors.full_messages)
-        assert_equal(0, Post.where("id = ?", @post.id).count)
+        should "remove the post from all pools" do
+          @pool.reload
+          assert_equal("", @pool.post_ids)
+        end
+
+        should "destroy the record" do
+          assert_equal([], @post.errors.full_messages)
+          assert_equal(0, Post.where("id = ?", @post.id).count)
+        end
       end
     end
 
@@ -423,6 +428,18 @@ class PostTest < ActiveSupport::TestCase
     context "A post" do
       setup do
         @post = FactoryGirl.create(:post)
+      end
+
+      context "with a banned artist" do
+        setup do
+          @artist = FactoryGirl.create(:artist)
+          @artist.ban!
+          @post = FactoryGirl.create(:post, :tag_string => @artist.name)
+        end
+
+        should "ban the post" do
+          assert_equal(true, @post.is_banned?)
+        end
       end
 
       context "with an artist tag that is then changed to copyright" do
