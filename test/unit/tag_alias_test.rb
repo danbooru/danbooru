@@ -99,6 +99,19 @@ class TagAliasTest < ActiveSupport::TestCase
         @alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic)
       end
 
+      context "and conflicting wiki pages" do
+        setup do
+          @wiki1 = FactoryGirl.create(:wiki_page, :title => "aaa")
+          @wiki2 = FactoryGirl.create(:wiki_page, :title => "bbb")
+        end
+
+        should "update the topic when processed" do
+          assert_difference("ForumPost.count") do
+            @alias.rename_wiki_and_artist
+          end
+        end
+      end
+
       should "update the topic when processed" do
         assert_difference("ForumPost.count") do
           @alias.process!
