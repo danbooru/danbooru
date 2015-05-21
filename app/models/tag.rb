@@ -192,6 +192,11 @@ class Tag < ActiveRecord::Base
         if category
           category_id = categories.value_for(category)
 
+          # in case a category change hasn't propagated to this server yet,
+          # force an update the local cache. This may get overwritten in the
+          # next few lines if the category is changed.
+          tag.update_category_cache
+
           if category_id != tag.category && !tag.is_locked? && (CurrentUser.is_builder? || tag.post_count <= 50)
             tag.update_column(:category, category_id)
             tag.update_category_cache_for_all
