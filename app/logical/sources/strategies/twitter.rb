@@ -18,6 +18,12 @@ module Sources::Strategies
       @artist_name = attrs[:user][:name]
       @profile_url = "https://twitter.com/" + attrs[:user][:screen_name]
       @image_url = attrs[:entities][:media][0][:media_url] + ":orig"
+      @artist_commentary_title = ""
+      @artist_commentary_desc = attrs[:text]
+    end
+
+    def has_artist_commentary?
+      @artist_commentary_desc.present?
     end
 
     def image_urls

@@ -7,6 +7,7 @@ class PixivApiClient
 
   class WorksResponse
     attr_reader :json, :pages, :moniker, :page_count
+    attr_reader :artist_commentary_title, :artist_commentary_desc
 
     def initialize(json)
       # Sample response: 
@@ -91,6 +92,8 @@ class PixivApiClient
       @json = json
       @moniker = json["user"]["account"]
       @page_count = json["page_count"].to_i
+      @artist_commentary_title = json["title"]
+      @artist_commentary_desc = json["caption"]
 
       if page_count > 1
         @pages = json["metadata"]["pages"].map {|x| x["image_urls"]["large"]}

@@ -4,7 +4,9 @@ require "tmpdir"
 class Upload < ActiveRecord::Base
   class Error < Exception ; end
 
-  attr_accessor :file, :image_width, :image_height, :file_ext, :md5, :file_size, :as_pending
+  attr_accessor :file, :image_width, :image_height, :file_ext, :md5, 
+    :file_size, :as_pending, :artist_commentary_title, 
+    :artist_commentary_desc, :include_artist_commentary
   belongs_to :uploader, :class_name => "User"
   belongs_to :post
   before_validation :initialize_uploader, :on => :create
@@ -14,7 +16,11 @@ class Upload < ActiveRecord::Base
   validate :uploader_is_not_limited, :on => :create
   validate :file_or_source_is_present, :on => :create
   validate :rating_given
-  attr_accessible :file, :image_width, :image_height, :file_ext, :md5, :file_size, :as_pending, :source, :file_path, :content_type, :rating, :tag_string, :status, :backtrace, :post_id, :md5_confirmation, :parent_id, :server
+  attr_accessible :file, :image_width, :image_height, :file_ext, :md5, 
+    :file_size, :as_pending, :source, :file_path, :content_type, :rating, 
+    :tag_string, :status, :backtrace, :post_id, :md5_confirmation, 
+    :parent_id, :server, :artist_commentary_title,
+    :artist_commentary_desc, :include_artist_commentary
 
   module ValidationMethods
     def uploader_is_not_limited
@@ -117,6 +123,7 @@ class Upload < ActiveRecord::Base
         post.distribute_files
         if post.save
           CurrentUser.increment!(:post_upload_count)
+          create_artist_commentary(post) if include_artist_commentary
           ugoira_service.save_frame_data(post) if is_ugoira?
           update_attributes(:status => "completed", :post_id => post.id)
         else
@@ -489,6 +496,19 @@ class Upload < ActiveRecord::Base
     end
   end
 
+  module ArtistCommentaryMethods
+    def create_artist_commentary(post)
+      post.create_artist_commentary(
+        :original_title => artist_commentary_title,
+        :original_description => artist_commentary_desc
+      )
+    end
+
+    def has_artist_commentary?
+      artist_commentary_desc.present?
+    end
+  end
+
   include ConversionMethods
   include ValidationMethods
   include FileMethods
@@ -503,6 +523,7 @@ class Upload < ActiveRecord::Base
   include VideoMethods
   extend SearchMethods
   include ApiMethods
+  include ArtistCommentaryMethods
 
   def presenter
     @presenter ||= UploadPresenter.new(self)

@@ -44,6 +44,10 @@ module Sources
         assert_equal([], @site.tags)
       end
 
+      should "get the artist commentary" do
+        assert_not_nil(@site.artist_commentary_desc)
+      end
+
       should "convert a page into a json representation" do
         assert_nothing_raised do
           @site.to_json

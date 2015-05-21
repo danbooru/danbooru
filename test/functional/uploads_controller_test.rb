@@ -35,6 +35,18 @@ class UploadsControllerTest < ActionController::TestCase
         assert_response :success
       end
 
+      context "for a twitter post" do
+        setup do
+          VCR.use_cassette("upload-new-twitter", :record => :once) do
+            get :new, {:url => "https://twitter.com/frappuccino/status/566030116182949888"}, {:user_id => @user.id}
+          end
+        end
+
+        should "render" do
+          assert_response :success
+        end
+      end
+
       context "for a post that has already been uploaded" do
         setup do
           @post = FactoryGirl.create(:post, :source => "aaa")

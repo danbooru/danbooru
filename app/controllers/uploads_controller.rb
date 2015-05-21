@@ -8,19 +8,15 @@ class UploadsController < ApplicationController
     @upload = Upload.new
     if params[:url]
       @normalized_url = params[:url]
+      headers = default_headers()
+      data = {}
 
-      headers = {
-        "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
-      }
       Downloads::RewriteStrategies::Base.strategies.each do |strategy|
-        @normalized_url, headers = strategy.new(@normalized_url).rewrite(@normalized_url, headers)
+        @normalized_url, headers, data = strategy.new(@normalized_url).rewrite(@normalized_url, headers, data)
       end
 
-      if @normalized_url.nil?
-        @post = Post.where(source: params[:url]).first
-      else
-        @post = Post.where(source: [params[:url], @normalized_url]).first
-      end
+      @post = find_post_by_url(@normalized_url)
+      extract_artist_commentary(@upload, data)
 
       begin
         @source = Sources::Site.new(params[:url])
@@ -71,6 +67,27 @@ class UploadsController < ApplicationController
   end
 
 protected
+  def extract_artist_commentary(upload, data)
+    if data[:artist_commentary_desc]
+      upload.artist_commentary_title = data[:artist_commentary_title]
+      upload.artist_commentary_desc = data[:artist_commentary_desc]
+    end
+  end
+
+  def find_post_by_url(normalized_url)
+    if normalized_url.nil?
+      Post.where(source: params[:url]).first
+    else
+      Post.where(source: [params[:url], @normalized_url]).first
+    end
+  end
+
+  def default_headers
+    {
+      "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
+    }
+  end
+
   def save_recent_tags
     if @upload
       tags = Tag.scan_tags(@upload.tag_string)

@@ -3,6 +3,7 @@ module Sources
     class Base
       attr_reader :url
       attr_reader :artist_name, :profile_url, :image_url, :tags, :page_count
+      attr_reader :artist_commentary_title, :artist_commentary_desc
 
       def self.url_match?(url)
         false
@@ -40,6 +41,11 @@ module Sources
       # Sources::Site.new("http://dic.pixiv.net/a/THUNDERproject").normalizable_for_artist_finder?
       # => false
       def normalizable_for_artist_finder?
+        false
+      end
+
+      # Determines whether or not to automatically create an ArtistCommentary
+      def has_artist_commentary?
         false
       end
 

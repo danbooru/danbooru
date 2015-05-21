@@ -79,6 +79,11 @@ module Sources
           assert_contains(pixiv_links, /search\.php/)
         end
 
+        should "get the artist commentary" do
+          assert_not_nil(@site.artist_commentary_title)
+          assert_not_nil(@site.artist_commentary_desc)
+        end
+
         should "convert a page into a json representation" do
           assert_nothing_raised do
             @site.to_json

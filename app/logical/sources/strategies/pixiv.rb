@@ -35,6 +35,10 @@ module Sources
         @pixiv_moniker
       end
 
+      def has_artist_commentary?
+        @artist_commentary_desc.present?
+      end
+
       def normalized_for_artist_finder?
         url =~ %r!http://img\.pixiv\.net/img/#{MONIKER}/?$!i
       end
@@ -47,15 +51,18 @@ module Sources
         if has_moniker?
           moniker = get_moniker_from_url
         else
-          illust_id = illust_id_from_url(url)
-          metadata = get_metadata_from_papi(illust_id)
-          moniker = metadata.moniker
+          @illust_id = illust_id_from_url(url)
+          @metadata = get_metadata_from_papi(@illust_id)
+          moniker = @metadata.moniker
         end
 
         "http://img.pixiv.net/img/#{moniker}/"
       end
 
       def get
+        @illust_id = illust_id_from_url(url)
+        @metadata = get_metadata_from_papi(@illust_id)
+
         page = agent.get(URI.parse(normalized_url))
         
         if page.search("body.not-logged-in").any?
@@ -71,6 +78,8 @@ module Sources
         @tags = get_tags_from_page(page)
         @page_count = get_page_count_from_page(page)
         @gallery_link = get_gallery_link(page)
+        @artist_commentary_title = @metadata.artist_commentary_title
+        @artist_commentary_desc = @metadata.artist_commentary_desc
 
         is_manga = @page_count > 1
 
@@ -122,10 +131,7 @@ module Sources
       def rewrite_new_medium_images(thumbnail_url)
         if thumbnail_url =~ %r!/c/\d+x\d+/img-master/img/#{TIMESTAMP}/\d+_p\d+_\w+\.jpg!i
           page = manga_page_from_url(@url).to_i
-          illust_id = illust_id_from_url(@url)
-
-          metadata = get_metadata_from_papi(illust_id)
-          thumbnail_url = metadata.pages[page]
+          thumbnail_url = @metadata.pages[page]
         end
 
         thumbnail_url
@@ -154,9 +160,7 @@ module Sources
       def rewrite_old_small_and_medium_images(thumbnail_url, is_manga)
         if thumbnail_url =~ %r!/img/#{MONIKER}/\d+_[ms]\.#{EXT}!i
           if is_manga.nil?
-            illust_id = illust_id_from_url(@url)
-            metadata = get_metadata_from_papi(illust_id)
-            page_count = metadata.page_count
+            page_count = @metadata.page_count
             is_manga = page_count > 1
           end
 
@@ -300,8 +304,7 @@ module Sources
       end
 
       def normalized_url
-        illust_id = illust_id_from_url(@url)
-        "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{illust_id}"
+        "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{@illust_id}"
       end
 
       def get_metadata_from_papi(illust_id)

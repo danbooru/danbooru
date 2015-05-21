@@ -3,7 +3,11 @@
 module Sources
   class Site
     attr_reader :url, :strategy
-    delegate :get, :get_size, :referer_url, :site_name, :artist_name, :profile_url, :image_url, :tags, :artist_record, :unique_id, :page_count, :file_url, :ugoira_frame_data, :image_urls, :to => :strategy
+    delegate :get, :get_size, :referer_url, :site_name, :artist_name, 
+      :profile_url, :image_url, :tags, :artist_record, :unique_id, 
+      :page_count, :file_url, :ugoira_frame_data, :image_urls, 
+      :has_artist_commentary?, :artist_commentary_title,
+      :artist_commentary_desc, :to => :strategy
 
     def self.strategies
       [Strategies::Pixiv, Strategies::NicoSeiga, Strategies::DeviantArt, Strategies::Nijie, Strategies::Twitter]
