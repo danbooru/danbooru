@@ -52,26 +52,7 @@ class PostsController < ApplicationController
       @post.update_attributes(params[:post], :as => CurrentUser.role)
     end
 
-    respond_with(@post) do |format|
-      format.html do
-        if @post.errors.any?
-          @error_message = @post.errors.full_messages.join("; ")
-          render :template => "static/error", :status => 500
-        elsif params[:tags_query].present? && params[:pool_id].present?
-          redirect_to post_path(@post, :tags => params[:tags_query], :pool_id => params[:pool_id])
-        elsif params[:tags_query].present?
-          redirect_to post_path(@post, :tags => params[:tags_query])
-        elsif params[:pool_id].present?
-          redirect_to post_path(@post, :pool_id => params[:pool_id])
-        else
-          redirect_to post_path(@post)
-        end
-      end
-
-      format.json do
-        render :json => @post.to_json
-      end
-    end
+    respond_with_post_after_update(@post)
   end
 
   def revert
@@ -125,7 +106,7 @@ class PostsController < ApplicationController
   def mark_as_translated
     @post = Post.find(params[:id])
     @post.mark_as_translated(params[:post])
-    respond_with(@post)
+    respond_with_post_after_update(@post)
   end
 
 private
@@ -139,6 +120,29 @@ private
       tags = (TagAlias.to_aliased(tags) + Tag.scan_tags(cookies[:recent_tags])).uniq.slice(0, 30)
       cookies[:recent_tags] = tags.join(" ")
       cookies[:recent_tags_with_categories] = Tag.categories_for(tags).to_a.flatten.join(" ")
+    end
+  end
+
+  def respond_with_post_after_update(post)
+    respond_with(post) do |format|
+      format.html do
+        if post.errors.any?
+          @error_message = post.errors.full_messages.join("; ")
+          render :template => "static/error", :status => 500
+        elsif params[:tags_query].present? && params[:pool_id].present?
+          redirect_to post_path(post, :tags => params[:tags_query], :pool_id => params[:pool_id])
+        elsif params[:tags_query].present?
+          redirect_to post_path(post, :tags => params[:tags_query])
+        elsif params[:pool_id].present?
+          redirect_to post_path(post, :pool_id => params[:pool_id])
+        else
+          redirect_to post_path(post)
+        end
+      end
+
+      format.json do
+        render :json => post.to_json
+      end
     end
   end
 end
