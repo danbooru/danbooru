@@ -72,14 +72,6 @@ class TagAliasesControllerTest < ActionController::TestCase
       end
     end
 
-    context "create action" do
-      should "create a tag alias" do
-        assert_difference("TagAlias.count", 1) do
-          post :create, {:tag_alias => {:antecedent_name => "xxx", :consequent_name => "yyy"}}, {:user_id => @user.id}
-        end
-      end
-    end
-
     context "destroy action" do
       setup do
         @tag_alias = FactoryGirl.create(:tag_alias)

@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory(:tag) do
-    name {Faker::Name.first_name.downcase}
+    name {"#{Faker::Name.first_name.downcase}#{rand(1000)}"}
     post_count 0
     category {Tag.categories.general}
     related_tags ""

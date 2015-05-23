@@ -198,11 +198,15 @@ class TagAlias < ActiveRecord::Base
 
   def rename_wiki_and_artist
     antecedent_wiki = WikiPage.titled(antecedent_name).first
-    if antecedent_wiki.present? && WikiPage.titled(consequent_name).blank?
-      CurrentUser.scoped(creator, creator_ip_addr) do
-        antecedent_wiki.update_attributes(
-          :title => consequent_name
-        )
+    if antecedent_wiki.present? 
+      if WikiPage.titled(consequent_name).blank?
+        CurrentUser.scoped(creator, creator_ip_addr) do
+          antecedent_wiki.update_attributes(
+            :title => consequent_name
+          )
+        end
+      else
+        update_forum_topic_for_wiki_conflict
       end
     end
 
@@ -244,6 +248,16 @@ class TagAlias < ActiveRecord::Base
       CurrentUser.scoped(User.admins.first, "127.0.0.1") do
         forum_topic.posts.create(
           :body => "The tag alias #{antecedent_name} -> #{consequent_name} has been rejected."
+        )
+      end
+    end
+  end
+
+  def update_forum_topic_for_wiki_conflict
+    if forum_topic
+      CurrentUser.scoped(User.admins.first, "127.0.0.1") do
+        forum_topic.posts.create(
+          :body => "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] has conflicting wiki pages. [[#{consequent_name}]] should be updated to include information from [[#{antecedent_name}]] if necessary."
         )
       end
     end

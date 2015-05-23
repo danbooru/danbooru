@@ -749,7 +749,7 @@ http_interactions:
   recorded_at: Wed, 22 Oct 2014 23:29:57 GMT
 - request:
     method: get
-    uri: http://i1.pixiv.net/img-zip-ugoira/img/2014/10/05/23/42/23/46378654_ugoira1920x1080.zip
+    uri: http://i3.pixiv.net/img-zip-ugoira/img/2014/10/05/23/42/23/46378654_ugoira1920x1080.zip
     body:
       encoding: US-ASCII
       string: ''

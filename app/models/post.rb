@@ -20,6 +20,7 @@ class Post < ActiveRecord::Base
   before_save :update_tag_post_counts
   before_save :set_tag_counts
   before_save :set_pool_category_pseudo_tags
+  before_create :autoban
   before_validation :strip_source
   before_validation :initialize_uploader, :on => :create
   before_validation :parse_pixiv_id
@@ -289,6 +290,12 @@ class Post < ActiveRecord::Base
 
     def disapproved_by?(user)
       PostDisapproval.where(:user_id => user.id, :post_id => id).exists?
+    end
+
+    def autoban
+      if has_tag?("banned_artist")
+        self.is_banned = true
+      end
     end
   end
 
@@ -1490,7 +1497,13 @@ class Post < ActiveRecord::Base
     def update_iqdb_async
       if Danbooru.config.iqdb_hostname_and_port && File.exists?(preview_file_path)
         Danbooru.config.all_server_hosts.each do |host|
-          delay(:queue => host).update_iqdb
+          if has_tag?("ugoira")
+            run_at = 10.seconds.from_now
+          else
+            run_at = Time.from_now
+          end
+
+          delay(:queue => host, :run_at => run_at).update_iqdb
         end
       end
     end
@@ -1558,6 +1571,7 @@ class Post < ActiveRecord::Base
   def reload(options = nil)
     super
     reset_tag_array_cache
+    @pools = nil
     @tag_categories = nil
     @typed_tags = nil
     self

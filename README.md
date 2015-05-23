@@ -1,23 +1,23 @@
-=== Installation
+### Installation
 
 It is recommended that you install Danbooru on a Debian-based system
-since most of the required packages are available on APT.  Danbooru
+since most of the required packages are available on APT. Danbooru
 has been successfully installed on Fedora, CentOS, FreeBSD, and OS X.
 The INSTALL.debian install script is straightforward and should be
-simple to adapt for other platforms.  If you want something similar to
-Danbooru that is easier to install, try Shimmie
-(http://code.shishnet.org/shimmie2/). Shimmie uses PHP and MySQL and
-should be straightforward to install on most hosts.
+simple to adapt for other platforms.
 
 For best performance, you will need at least 256MB of RAM for
 PostgreSQL and Rails. The memory requirement will grow as your
-database gets bigger.
+database gets bigger. 
+
+On production Danbooru uses PostgreSQL 9.4, but any 9.x release should
+work.
 
 Use your operating system's package management system whenever
 possible.  This will simplify the process of installing init scripts,
 which will not always happen when compiling from source.
 
-=== Troubleshooting
+### Troubleshooting
 
 These instructions won't work for everyone. If your setup is not
 working, here are the steps I usually recommend to people:
@@ -37,7 +37,7 @@ debug your Nginx configuration file.
 
 4) Check all log files.
 
-=== IQDB Integration
+### IQDB Integration
 
 In order to enable IQDB integration, you must compile and run the IQDB server somewhere (preferably on the local server). There are two Danbooru configuration settings that you must then set: iqdb_hostname_and_port and iqdb_file.
 
