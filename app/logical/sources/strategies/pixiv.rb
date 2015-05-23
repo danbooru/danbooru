@@ -109,7 +109,7 @@ module Sources
     protected
 
       def get_gallery_link(page)
-        link = page.search("a.multiple").first
+        link = page.search("div.works_display a").first
         if link
           link.attr("href")
         else
