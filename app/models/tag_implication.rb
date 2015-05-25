@@ -192,11 +192,11 @@ class TagImplication < ActiveRecord::Base
   end
 
   def antecedent_tag
-    Tag.find_by_name(antecedent_name)
+    Tag.find_or_create_by_name(antecedent_name)
   end
 
   def consequent_tag
-    Tag.find_by_name(consequent_name)
+    Tag.find_or_create_by_name(consequent_name)
   end
 
   def reload(options = {})
