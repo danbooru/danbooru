@@ -18,7 +18,7 @@ private
   def rescue_exception(exception)
     respond_with do |format|
       format.json do
-        render :json => {:message => exception.to_s}, :status => :error
+        render :json => {:message => exception.to_s, :backtrace => exception.backtrace}, :status => :error
       end
     end
   end
