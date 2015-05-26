@@ -26,7 +26,7 @@ module Sources
         agent.get(URI.parse(normalized_url)) do |page|
           @artist_name, @profile_url = get_profile_from_page(page)
           @image_url = get_image_url_from_page(page)
-          @tags = []
+          @tags = get_tags_from_page(page)
         end
       end
 
@@ -59,6 +59,14 @@ module Sources
           else
             nil
           end
+        end
+      end
+
+      def get_tags_from_page(page)
+        links = page.search("a.discoverytag")
+
+        links.map do |node|
+          [node.attr("data-canonical-tag"), node.attr("href")]
         end
       end
 
