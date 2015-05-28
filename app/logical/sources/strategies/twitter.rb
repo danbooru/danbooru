@@ -25,8 +25,8 @@ module Sources::Strategies
     end
 
     def status_id_from_url(url)
-      if url =~ %r{^https?://twitter\.com/[^/]+/status/(\d+)}
-        $1
+      if url =~ %r{^https?://(?:mobile\.)?twitter\.com/\w+/status/(\d+)}
+        $1.to_i
       else
         raise Sources::Error.new("Couldn't get status ID from URL: #{url}")
       end
