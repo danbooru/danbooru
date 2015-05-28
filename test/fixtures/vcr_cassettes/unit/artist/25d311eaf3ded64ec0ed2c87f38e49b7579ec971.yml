@@ -5,7 +5,7 @@ http_interactions:
     uri: https://oauth.secure.pixiv.net/auth/token
     body:
       encoding: US-ASCII
-      string: username=uroobnad&password=uroobnad556&grant_type=password&client_id=bYGKuGVw91e0NMfPGp44euvGt59s&client_secret=HP3RmkgAmEGro0gn1x9ioawQE8WMfvLXDz3ZqxpK
+      string: username=SENSITIVE&password=SENSITIVE&grant_type=password&client_id=bYGKuGVw91e0NMfPGp44euvGt59s&client_secret=HP3RmkgAmEGro0gn1x9ioawQE8WMfvLXDz3ZqxpK
     headers:
       Referer:
       - http://www.pixiv.net
@@ -43,7 +43,7 @@ http_interactions:
       - nosniff
     body:
       encoding: UTF-8
-      string: '{"response":{"access_token":"t3pU96rokoR8rlPhVL68_E3JgNjRo2CXTR_ju_YX3sw","expires_in":3600,"token_type":"bearer","scope":"unlimited","refresh_token":"y8RlnJ4vKUSVUgw5koor90kHLCsjIyXbakXu0TuTzNU","user":{"profile_image_urls":{"px_16x16":"http:\/\/source.pixiv.net\/common\/images\/no_profile_ss.png","px_50x50":"http:\/\/source.pixiv.net\/common\/images\/no_profile_s.png","px_170x170":"http:\/\/source.pixiv.net\/common\/images\/no_profile.png"},"id":"696859","name":"uroobnad","account":"uroobnad"}}}'
+      string: '{"response":{"access_token":"t3pU96rokoR8rlPhVL68_E3JgNjRo2CXTR_ju_YX3sw","expires_in":3600,"token_type":"bearer","scope":"unlimited","refresh_token":"y8RlnJ4vKUSVUgw5koor90kHLCsjIyXbakXu0TuTzNU","user":{"profile_image_urls":{"px_16x16":"http:\/\/source.pixiv.net\/common\/images\/no_profile_ss.png","px_50x50":"http:\/\/source.pixiv.net\/common\/images\/no_profile_s.png","px_170x170":"http:\/\/source.pixiv.net\/common\/images\/no_profile.png"},"id":"696859","name":"SENSITIVE","account":"SENSITIVE"}}}'
     http_version: 
   recorded_at: Thu, 14 May 2015 23:42:13 GMT
 - request:
@@ -483,7 +483,7 @@ http_interactions:
     uri: https://www.secure.pixiv.net/login.php
     body:
       encoding: UTF-8
-      string: mode=login&return_to=%2F&pixiv_id=uroobnad&pass=uroobnad556&skip=1
+      string: mode=login&return_to=%2F&pixiv_id=SENSITIVE&pass=SENSITIVE&skip=1
     headers:
       Accept-Encoding:
       - gzip,deflate,identity

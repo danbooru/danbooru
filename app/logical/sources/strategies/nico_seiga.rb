@@ -126,7 +126,11 @@ module Sources
               end.click_button
             end
             session = mech.cookie_jar.cookies.select{|c| c.name == "user_session"}.first
-            Cache.put("nico-seiga-session", session.value, 1.month) if session
+            if session
+              Cache.put("nico-seiga-session", session.value, 1.month)
+            else
+              raise "Session not found"
+            end
           end
 
           # This cookie needs to be set to allow viewing of adult works

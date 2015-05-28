@@ -12,6 +12,7 @@ end
 
 require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
+require 'cache'
 
 Dir[File.expand_path(File.dirname(__FILE__) + "/factories/*.rb")].each {|file| require file}
 
@@ -40,6 +41,22 @@ end
 
 class ActiveSupport::TestCase
   include UploadTestMethods
+
+  def setup_vcr
+    @record = false
+
+    # instead of trying to persist these across tests just clear it out every time
+    Cache.delete("pixiv-phpsessid")
+    Cache.delete("pixiv-papi-access-token")
+    Cache.delete("nico-seiga-session")
+    Cache.delete("twitter-api-token")
+
+    unless @record
+      [:pixiv_login, :pixiv_password, :tinami_login, :tinami_password, :nico_seiga_login, :nico_seiga_password, :pixa_login, :pixa_password, :nijie_login, :nijie_password, :twitter_api_key, :twitter_api_secret].each do |key|
+        Danbooru.config.stubs(key).returns("SENSITIVE")
+      end
+    end
+  end
 end
 
 class ActionController::TestCase

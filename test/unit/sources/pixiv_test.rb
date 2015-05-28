@@ -4,9 +4,7 @@ require 'test_helper'
 
 module Sources
   class PixivTest < ActiveSupport::TestCase
-    PHPSESSID = "696859_678b7a07e1fff94719fb6560eed5958f"
-
-    def get_source(source, cassette, record = :none)
+    def get_source(source, cassette, record = :once)
       VCR.use_cassette(cassette, :record => record) do
         @site = Sources::Site.new(source)
         @site.get
@@ -14,14 +12,15 @@ module Sources
       end
     end
 
-    context "in all cases" do
-      setup do
-        PixivWebAgent.stubs(:phpsessid).returns(PHPSESSID)
-      end
+    def setup
+      super
+      setup_vcr
+    end
 
+    context "in all cases" do
       context "A gallery page" do
         setup do
-          VCR.use_cassette("pixiv-gallery", :record => :none) do
+          VCR.use_cassette("pixiv-gallery", :record => :once) do
             @site = Sources::Site.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=49270482")
             @site.get
             @image_urls = @site.image_urls
@@ -35,7 +34,7 @@ module Sources
 
       context "An ugoira source site for pixiv" do
         setup do
-          VCR.use_cassette("ugoira-converter", :record => :none) do
+          VCR.use_cassette("ugoira-converter", :record => :once) do
             @site = Sources::Site.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654")
             @site.get
           end

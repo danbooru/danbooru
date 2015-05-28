@@ -2,9 +2,7 @@ require 'test_helper'
 
 module Downloads
   class PixivTest < ActiveSupport::TestCase
-    PHPSESSID = "696859_678b7a07e1fff94719fb6560eed5958f"
-
-    def assert_downloaded(expected_filesize, source, cassette, record = :none)
+    def assert_downloaded(expected_filesize, source, cassette, record = :once)
       tempfile = Tempfile.new("danbooru-test")
       download = Downloads::File.new(source, tempfile.path)
 
@@ -17,7 +15,7 @@ module Downloads
       assert_equal(expected_filesize, tempfile.size, "Tested source URL: #{source}")
     end
 
-    def assert_rewritten(expected_source, test_source, cassette, record = :none)
+    def assert_rewritten(expected_source, test_source, cassette, record = :once)
       tempfile = Tempfile.new("danbooru-test")
       download = Downloads::File.new(test_source, tempfile.path)
 
@@ -27,8 +25,13 @@ module Downloads
       end
     end
 
-    def assert_not_rewritten(source, cassette, record = :none)
+    def assert_not_rewritten(source, cassette, record = :once)
       assert_rewritten(source, source, cassette, record)
+    end
+
+    def setup
+      super
+      setup_vcr
     end
 
     context "An ugoira site for pixiv" do
@@ -36,7 +39,7 @@ module Downloads
         Delayed::Worker.delay_jobs = false
         @tempfile = Tempfile.new("danbooru-test")
         @download = Downloads::File.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654", @tempfile.path)
-        VCR.use_cassette("download-ugoira-converter", :record => :none) do
+        VCR.use_cassette("download-ugoira-converter", :record => :once) do
           @download.download!
         end
       end
@@ -45,20 +48,13 @@ module Downloads
         @tempfile.unlink
       end
 
-      should "download the zip file and update the source" do
+      should "capture the data" do
         assert_equal("http://i3.pixiv.net/img-zip-ugoira/img/2014/10/05/23/42/23/46378654_ugoira1920x1080.zip", @download.source)
-      end
-
-      should "capture the frame data" do
         assert_equal([{"file"=>"000000.jpg", "delay"=>200}, {"file"=>"000001.jpg", "delay"=>200}, {"file"=>"000002.jpg", "delay"=>200}, {"file"=>"000003.jpg", "delay"=>200}, {"file"=>"000004.jpg", "delay"=>250}], @download.data[:ugoira_frame_data])
       end
     end
 
     context "in all cases" do
-      setup do
-        PixivWebAgent.stubs(:phpsessid).returns(PHPSESSID)
-      end
-
       # Test an old illustration (one uploaded before 2014-09-16). New
       # /img-original/ and /img-master/ URLs currently don't work for images
       # uploaded before this date. Only old /imgXX/img/username/ URLs work.
@@ -182,10 +178,10 @@ module Downloads
           assert_rewritten(@p0_full_size_image, @p0_small_thumbnail, "download-pixiv-old-manga-p0-small-thumbnail")
           assert_rewritten(@p0_full_size_image_1, @p0_large_thumbnail, "download-pixiv-old-manga-p0-large-thumbnail")
           assert_rewritten(@p1_full_size_image, @p1_large_thumbnail, "download-pixiv-old-manga-p1-large-thumbnail")
-          assert_downloaded(@p0_file_size, @p0_tiny_thumbnail,  "download-pixiv-old-manga-p0-tiny-thumbnail")
-          assert_downloaded(@p0_file_size, @p0_small_thumbnail, "download-pixiv-old-manga-p0-small-thumbnail")
-          assert_downloaded(@p0_file_size, @p0_large_thumbnail, "download-pixiv-old-manga-p0-large-thumbnail")
-          assert_downloaded(@p1_file_size, @p1_large_thumbnail, "download-pixiv-old-manga-p1-large-thumbnail")
+          assert_downloaded(@p0_file_size, @p0_tiny_thumbnail,  "download-pixiv-old-manga-p0-tiny-thumbnail-2")
+          assert_downloaded(@p0_file_size, @p0_small_thumbnail, "download-pixiv-old-manga-p0-small-thumbnail-2")
+          assert_downloaded(@p0_file_size, @p0_large_thumbnail, "download-pixiv-old-manga-p0-large-thumbnail-2")
+          assert_downloaded(@p1_file_size, @p1_large_thumbnail, "download-pixiv-old-manga-p1-large-thumbnail-2")
         end
 
         should "download the full size image instead of the medium thumbnail" do

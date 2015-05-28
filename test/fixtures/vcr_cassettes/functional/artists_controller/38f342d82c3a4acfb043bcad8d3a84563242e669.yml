@@ -413,7 +413,7 @@ http_interactions:
     uri: https://www.secure.pixiv.net/login.php
     body:
       encoding: UTF-8
-      string: mode=login&return_to=%2F&pixiv_id=uroobnad&pass=uroobnad556&skip=1
+      string: mode=login&return_to=%2F&pixiv_id=SENSITIVE&pass=SENSITIVE&skip=1
     headers:
       Accept-Encoding:
       - gzip,deflate,identity

@@ -2,44 +2,47 @@
 
 module Sources
   class NicoSeigaTest < ActiveSupport::TestCase
+    def setup
+      super
+      setup_vcr
+    end
+
     context "The source site for nico seiga" do
       setup do
-        Cache.put("nico-seiga-session", "user_session_23669858_ea46b9d1b3e64785a14d5a5d9c6606f5b5c24b4a233835d84362b9820f20a758")
-        
-        VCR.use_cassette("source-nico-seiga-unit-test-1", :record => :none) do
-          @site_1 = Sources::Site.new("http://lohas.nicoseiga.jp/o/59c833da35d7bc6586a8292103e5e38c9df23b7c/1417762099/4496506")
+        VCR.use_cassette("source-nico-seiga-unit-test-1", :record => :once) do
+          @site_1 = Sources::Site.new("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663")
           @site_1.get
         end
 
-        VCR.use_cassette("source-nico-seiga-unit-test-2", :record => :none) do
-          @site_2 = Sources::Site.new("http://seiga.nicovideo.jp/seiga/im4496506")
+        VCR.use_cassette("source-nico-seiga-unit-test-2", :record => :once) do
+          @site_2 = Sources::Site.new("http://seiga.nicovideo.jp/seiga/im4937663")
           @site_2.get
         end
       end
 
       should "get the profile" do
-        assert_equal("http://seiga.nicovideo.jp/user/illust/18302053", @site_1.profile_url)
-        assert_equal("http://seiga.nicovideo.jp/user/illust/18302053", @site_2.profile_url)
+        assert_equal("http://seiga.nicovideo.jp/user/illust/7017777", @site_1.profile_url)
+        assert_equal("http://seiga.nicovideo.jp/user/illust/7017777", @site_2.profile_url)
       end
 
       should "get the artist name" do
-        assert_equal("ポテち", @site_1.artist_name)
-        assert_equal("ポテち", @site_2.artist_name)
+        assert_equal("osamari", @site_1.artist_name)
+        assert_equal("osamari", @site_2.artist_name)
       end
 
       should "get the image url" do
-        assert_equal("http://lohas.nicoseiga.jp/priv/99d2b59c51e74b93c41cce3ea82137365f88dcff/1417763778/4496506", @site_1.image_url)
-        assert_equal("http://lohas.nicoseiga.jp/priv/f28fa72d148505b4f4dc2a72cf5f52d2ecba66b7/1417763873/4496506", @site_2.image_url)
+        assert_equal("http://lohas.nicoseiga.jp/priv/6dadd39237a6b8d3ab0ba85c0651ffab66e57711/1433298875/4937663", @site_1.image_url)
+        assert_equal("http://lohas.nicoseiga.jp/priv/0295d92ed5e468ab1b440da6697bb030e5061a3f/1433298877/4937663", @site_2.image_url)
       end
 
       should "get the tags" do
         assert(@site_1.tags.size > 0)
         first_tag = @site_1.tags.first
-        assert_equal(["オリジナル", "http://seiga.nicovideo.jp/tag/%E3%82%AA%E3%83%AA%E3%82%B8%E3%83%8A%E3%83%AB"], first_tag)
+        assert_equal(["アニメ", "http://seiga.nicovideo.jp/tag/%E3%82%A2%E3%83%8B%E3%83%A1"], first_tag)
 
         assert(@site_2.tags.size > 0)
         first_tag = @site_2.tags.first
-        assert_equal(["オリジナル", "http://seiga.nicovideo.jp/tag/%E3%82%AA%E3%83%AA%E3%82%B8%E3%83%8A%E3%83%AB"], first_tag)
+        assert_equal(["アニメ", "http://seiga.nicovideo.jp/tag/%E3%82%A2%E3%83%8B%E3%83%A1"], first_tag)
       end
 
       should "convert a page into a json representation" do
