@@ -5,7 +5,7 @@ module Downloads
         if url =~ %r!^https?://(?:mobile\.)?twitter\.com!
           url, headers = rewrite_status_page(url, headers)
         elsif url =~ %r{^https?://pbs\.twimg\.com}
-          url, headers = rewrite_direct_image_url(url, headers)
+          url, headers = rewrite_thumbnails(url, headers)
         end
 
         return [url, headers, data]
@@ -19,7 +19,7 @@ module Downloads
         return [url, headers]
       end
 
-      def rewrite_direct_image_url(url, headers)
+      def rewrite_thumbnails(url, headers)
         if url =~ %r{^(https?://pbs\.twimg\.com/media/[^:]+)}
           url = $1 + ":orig"
         end
