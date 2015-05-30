@@ -77,7 +77,14 @@ module PostSets
             chance = per_page / count.to_f
           end
 
-          temp = ::Post.tag_match(tag_string).where("random() < ?", chance).reorder("").limit(per_page)
+          temp = []
+          temp += ::Post.tag_match(tag_string).where("random() < ?", chance).reorder("").limit(per_page)
+          3.times do
+            missing = per_page - temp.length
+            if missing >= 1
+              temp += ::Post.tag_match(tag_string).where("random() < ?", chance*2).reorder("").limit(missing)
+            end
+          end
         elsif raw
           temp = ::Post.raw_tag_match(tag_string).order("posts.id DESC").paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
         else
