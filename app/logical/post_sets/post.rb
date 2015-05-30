@@ -71,26 +71,19 @@ module PostSets
       @posts ||= begin
         if random
           count = ::Post.fast_count(tag_string, :statement_timeout => CurrentUser.user.statement_timeout)
-          temp = []
-          limit = [per_page, count].min
-          limit.times do
-            q = ::Post.tag_match(tag_string)
-            unless temp.empty?
-              q = q.where("id not in (?)", temp.map(&:id))
-            end
-            post = q.offset(rand(count - temp.length)).first
-            if post
-              temp << post
-            end
-          end
-        else
-          if raw
-            temp = ::Post.raw_tag_match(tag_string).order("posts.id DESC").paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+          if count == 1_000_000 # count timed out
+            chance = 0.01
           else
-            temp = ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+            chance = per_page / count.to_f
           end
-          temp.each # hack to force rails to eager load
+
+          temp = ::Post.tag_match(tag_string).where("random() < ?", chance).reorder("").limit(per_page)
+        elsif raw
+          temp = ::Post.raw_tag_match(tag_string).order("posts.id DESC").paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+        else
+          temp = ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
         end
+        temp.each # hack to force rails to eager load
         temp
       end
     end
