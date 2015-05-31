@@ -30,28 +30,14 @@ Danbooru.Note = {
       $note_box.draggable({
         containment: $("#image"),
         stop: function(e, ui) {
-          var $image = $("#image");
-          var ratio = $image.width() / parseFloat($image.data("original-width"));
-          var new_x = parseFloat($note_box.css("left"));
-          var new_y = parseFloat($note_box.css("top"));
-          new_x = parseInt(new_x / ratio);
-          new_y = parseInt(new_y / ratio);
-          $note_box.data("x", new_x);
-          $note_box.data("y", new_y);
+          Danbooru.Note.Box.update_data_attributes($note_box);
         }
       });
       $note_box.resizable({
         containment: $("#image"),
         handles: "se, nw",
         stop: function(e, ui) {
-          var $image = $("#image");
-          var ratio = $image.width() / parseFloat($image.data("original-width"));
-          var new_width = parseFloat($note_box.css("width"));
-          var new_height = parseFloat($note_box.css("height"));
-          new_width = parseInt(new_width / ratio);
-          new_height = parseInt(new_height / ratio);
-          $note_box.data("width", new_width);
-          $note_box.data("height", new_height);
+          Danbooru.Note.Box.update_data_attributes($note_box);
         }
       });
       $note_box.css({position: "absolute"});
@@ -59,6 +45,23 @@ Danbooru.Note = {
       Danbooru.Note.Box.bind_events($note_box);
 
       return $note_box;
+    },
+
+    update_data_attributes: function($note_box) {
+      var $image = $("#image");
+      var ratio = $image.width() / parseFloat($image.data("original-width"));
+      var new_x = parseFloat($note_box.css("left"));
+      var new_y = parseFloat($note_box.css("top"));
+      var new_width = parseFloat($note_box.css("width"));
+      var new_height = parseFloat($note_box.css("height"));
+      new_x = parseInt(new_x / ratio);
+      new_y = parseInt(new_y / ratio);
+      new_width = parseInt(new_width / ratio);
+      new_height = parseInt(new_height / ratio);
+      $note_box.data("x", new_x);
+      $note_box.data("y", new_y);
+      $note_box.data("width", new_width);
+      $note_box.data("height", new_height);
     },
 
     bind_events: function($note_box) {
@@ -731,6 +734,7 @@ Danbooru.Note = {
       width: w,
       height: h
     });
+    Danbooru.Note.Box.update_data_attributes($note_box);
     $note_box.find(".note-box-inner-border").addClass("unsaved");
     $note_body.html("<em>Click to edit</em>");
     $("#note-container").append($note_box);
