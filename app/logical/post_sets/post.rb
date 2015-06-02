@@ -82,7 +82,11 @@ module PostSets
           3.times do
             missing = per_page - temp.length
             if missing >= 1
-              temp += ::Post.tag_match(tag_string).where("random() < ?", chance*2).reorder("").limit(missing)
+              q = ::Post.tag_match(tag_string).where("random() < ?", chance*2).reorder("").limit(missing)
+              unless temp.empty?
+                q = q.where("id not in (?)", temp.map(&:id))
+              end
+              temp += q
             end
           end
         elsif raw
