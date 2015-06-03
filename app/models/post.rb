@@ -1500,7 +1500,7 @@ class Post < ActiveRecord::Base
           if has_tag?("ugoira")
             run_at = 10.seconds.from_now
           else
-            run_at = Time.from_now
+            run_at = Time.now
           end
 
           delay(:queue => host, :run_at => run_at).update_iqdb
