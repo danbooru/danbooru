@@ -41,7 +41,12 @@ article.post-preview {
   overflow: hidden;
 
   .post-preview {
-    height: 169px;
+    height: auto;
+    margin-bottom: 0;
+  }
+
+  p {
+    margin-bottom: 0;
   }
 }
 
