@@ -1,8 +1,16 @@
 module Sources::Strategies
   class Twitter < Base
     def self.url_match?(url)
-      url =~ %r!https?://(?:mobile\.)?twitter\.com/\w+/status/\d+!
+      url =~ %r!https?://(?:mobile\.)?twitter\.com/\w+/status/\d+! || url =~ %r{https?://pbs\.twimg\.com/media/}
     end
+
+      def referer_url(template)
+        if template.params[:ref] =~ %r!https?://(?:mobile\.)?twitter\.com/\w+/status/\d+! && template.params[:url] =~ %r{https?://pbs\.twimg\.com/media/}
+          template.params[:ref]
+        else
+          template.params[:url]
+        end
+      end
 
     def tags
       []
