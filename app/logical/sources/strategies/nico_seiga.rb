@@ -6,7 +6,7 @@ module Sources
       end
 
       def referer_url(template)
-        if template.params[:ref] =~ /seiga\.nicovideo\.jp\/seiga\/im\d+/
+        if template.params[:ref] =~ /seiga\.nicovideo\.jp\/seiga\/im\d+/ && template.params[:url] =~ /http:\/\/lohas\.nicoseiga\.jp\/priv\//
           template.params[:ref]
         else
           template.params[:url]

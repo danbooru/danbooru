@@ -70,7 +70,7 @@ module Sources
       end
 
       def referer_url(template)
-        template.params[:ref] || template.params[:url]
+        raise NotImplementedError
       end
 
       def image_urls

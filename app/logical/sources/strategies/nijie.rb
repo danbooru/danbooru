@@ -6,7 +6,7 @@ module Sources
       end
 
       def referer_url(template)
-        if template.params[:ref] =~ /nijie\.info\/view\.php/ && template.params[:ref] =~ /id=\d+/
+        if template.params[:ref] =~ /nijie\.info\/view\.php.+id=\d+/ && template.params[:url] =~ /pic\d+\.nijie.info\/nijie_picture\//
           template.params[:ref]
         else
           template.params[:url]

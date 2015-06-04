@@ -6,7 +6,7 @@ module Sources
       end
 
       def referer_url(template)
-        if template.params[:ref] =~ /deviantart\.com\/art\//
+        if template.params[:ref] =~ /deviantart\.com\/art\// && template.params[:url] =~ /https?:\/\/(?:fc|th|pre|orig|img)\d{2}\.deviantart\.net\//
           template.params[:ref]
         else
           template.params[:url]

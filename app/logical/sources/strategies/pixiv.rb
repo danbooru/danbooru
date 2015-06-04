@@ -20,7 +20,7 @@ module Sources
       end
 
       def referer_url(template)
-        if template.params[:ref] =~ /pixiv\.net\/member_illust/ && template.params[:ref] =~ /mode=medium/
+        if template.params[:ref] =~ /pixiv\.net\/member_illust.+mode=medium/ && template.params[:url] =~ /#{IMG}|#{I12}/
           template.params[:ref]
         else
           template.params[:url]
