@@ -123,7 +123,7 @@ class Upload < ActiveRecord::Base
         post.distribute_files
         if post.save
           CurrentUser.increment!(:post_upload_count)
-          create_artist_commentary(post) if include_artist_commentary
+          create_artist_commentary(post) if include_artist_commentary?
           ugoira_service.save_frame_data(post) if is_ugoira?
           update_attributes(:status => "completed", :post_id => post.id)
         else
@@ -531,5 +531,9 @@ class Upload < ActiveRecord::Base
 
   def upload_as_pending?
     as_pending == "1"
+  end
+
+  def include_artist_commentary?
+    include_artist_commentary == "1"
   end
 end
