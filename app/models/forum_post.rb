@@ -1,5 +1,5 @@
 class ForumPost < ActiveRecord::Base
-  attr_accessible :body, :topic_id, :receive_email_notifications, :as => [:member, :builder, :janitor, :gold, :platinum, :contributor, :admin, :moderator, :default]
+  attr_accessible :body, :topic_id, :as => [:member, :builder, :janitor, :gold, :platinum, :contributor, :admin, :moderator, :default]
   attr_accessible :is_locked, :is_sticky, :is_deleted, :as => [:admin, :moderator, :janitor]
   attr_readonly :topic_id
   belongs_to :creator, :class_name => "User"
@@ -16,8 +16,6 @@ class ForumPost < ActiveRecord::Base
   validate :topic_id_not_invalid
   before_destroy :validate_topic_is_unlocked
   after_save :delete_topic_if_original_post
-  after_save :update_email_notifications
-  attr_accessor :receive_email_notifications
 
   module SearchMethods
     def body_matches(body)
@@ -212,23 +210,5 @@ class ForumPost < ActiveRecord::Base
 
   def hidden_attributes
     super + [:text_index]
-  end
-
-  def receive_email_notifications
-    @receive_email_notifications ||= ForumSubscription.where(:forum_topic_id => topic_id, :user_id => CurrentUser.user.id).exists?
-  end
-
-  def update_email_notifications
-    subscription = ForumSubscription.where(:forum_topic_id => topic_id, :user_id => CurrentUser.user.id).first
-
-    if receive_email_notifications == "1" || receive_email_notifications == true
-      if subscription
-        subscription.update_attribute(:last_read_at, updated_at)
-      else
-        ForumSubscription.create(:forum_topic_id => topic_id, :user_id => CurrentUser.user.id, :last_read_at => updated_at)
-      end
-    else
-      subscription.destroy if subscription
-    end
   end
 end

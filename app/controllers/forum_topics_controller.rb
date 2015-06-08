@@ -81,6 +81,24 @@ class ForumTopicsController < ApplicationController
     redirect_to forum_topic_path(@merged_topic)
   end
 
+  def subscribe
+    @forum_topic = ForumTopic.find(params[:id])
+    subscription = ForumSubscription.where(:forum_topic_id => @forum_topic.id, :user_id => CurrentUser.user.id).first
+    unless subscription
+      ForumSubscription.create(:forum_topic_id => @forum_topic.id, :user_id => CurrentUser.user.id, :last_read_at => @forum_topic.updated_at)
+    end
+    respond_with(@forum_topic)
+  end
+
+  def unsubscribe
+    @forum_topic = ForumTopic.find(params[:id])
+    subscription = ForumSubscription.where(:forum_topic_id => @forum_topic.id, :user_id => CurrentUser.user.id).first
+    if subscription
+      subscription.destroy
+    end
+    respond_with(@forum_topic)
+  end
+
 private
   def normalize_search
     if params[:title_matches]

@@ -108,26 +108,15 @@ class ForumTopic < ActiveRecord::Base
   end
 
   module SubscriptionMethods
-    def update_subscription!(user)
-      user_subscription = subscriptions.where(:user_id => user.id).first
-
-      if user_subscription
-        user_subscription.update_attribute(:last_read_at, updated_at)
-      else
-        subscriptions.create(:user_id => user.id, :last_read_at => updated_at, :delete_key => SecureRandom.urlsafe_base64(10))
-      end
-    end
-
-    def notify_subscriptions!
-      ForumSubscription.where(:forum_topic_id => id).where("last_read_at < ?", updated_at).find_each do |subscription|
-        
-      end
+    def user_subscription(user)
+      subscriptions.where(:user_id => user.id).first
     end
   end
 
   extend SearchMethods
   include CategoryMethods
   include VisitMethods
+  include SubscriptionMethods
 
   def editable_by?(user)
     creator_id == user.id || user.is_janitor?

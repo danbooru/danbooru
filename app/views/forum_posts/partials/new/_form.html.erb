@@ -4,8 +4,6 @@
   <%= f.input :topic_id, :as => :hidden %>
   <%= dtext_field "forum_post", "body" %>
 
-  <%= f.input :receive_email_notifications, :as => :boolean %>
-
   <%= f.button :submit, "Submit" %>
   <%= dtext_preview_button "forum_post", "body" %>
 <% end %>
