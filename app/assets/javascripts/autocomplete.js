@@ -267,7 +267,8 @@
       "mpixels", "mpixels_asc",
       "portrait", "landscape",
       "filesize", "filesize_asc",
-      "rank"
+      "rank",
+      "random"
     ],
     status: [
       "any", "deleted", "active", "pending", "flagged", "banned"
