@@ -315,7 +315,7 @@ Danbooru.Note = {
     set_text: function($note_body, $note_box, text) {
       Danbooru.Note.Body.display_text($note_body, text);
       if (Danbooru.Note.embed) {
-        Danbooru.Note.Body.display_text($note_box.children("div"), text);
+        Danbooru.Note.Body.display_text($note_box.children("div.note-box-inner-border"), text);
       }
       Danbooru.Note.Body.resize($note_body);
       Danbooru.Note.Body.bound_position($note_body);
@@ -721,7 +721,7 @@ Danbooru.Note = {
     Danbooru.Note.Box.scale($note_box);
     Danbooru.Note.Body.display_text($note_body, text);
     if (Danbooru.Note.embed) {
-      Danbooru.Note.Body.display_text($note_box.children("div"), text);
+      Danbooru.Note.Body.display_text($note_box.children("div.note-box-inner-border"), text);
     }
   },
 
