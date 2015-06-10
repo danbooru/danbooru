@@ -44,6 +44,7 @@ class TagAliasesController < ApplicationController
   def approve
     @tag_alias = TagAlias.find(params[:id])
     @tag_alias.update_column(:status, "queued")
+    @tag_alias.rename_wiki_and_artist
     @tag_alias.delay(:queue => "default").process!
     respond_with(@tag_alias, :location => tag_alias_path(@tag_alias))
   end
