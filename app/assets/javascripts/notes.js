@@ -475,6 +475,7 @@ Danbooru.Note = {
       Danbooru.Note.Body.set_text($note_body, $note_box, "Loading...");
       $.get("/note_previews.json", {body: text}).success(function(data) {
         Danbooru.Note.Body.set_text($note_body, $note_box, data.body);
+        Danbooru.Note.Box.resize_inner_border($note_box);
         $note_body.show();
       });
       $this.dialog("close");
