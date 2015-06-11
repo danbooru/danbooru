@@ -19,7 +19,7 @@ class UploadsController < ApplicationController
       extract_artist_commentary(@upload, data)
 
       begin
-        @source = Sources::Site.new(params[:url])
+        @source = Sources::Site.new(params[:url], :referer_url => params[:ref])
         @remote_size = Downloads::File.new(@normalized_url, ".").size
       rescue Exception
       end
@@ -28,7 +28,7 @@ class UploadsController < ApplicationController
   end
 
   def batch
-    @source = Sources::Site.new(params[:url])
+    @source = Sources::Site.new(params[:url], :referer_url => params[:ref])
     @source.get
     @urls = @source.image_urls
   end

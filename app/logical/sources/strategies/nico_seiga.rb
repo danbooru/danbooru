@@ -5,11 +5,11 @@ module Sources
         url =~ /^https?:\/\/(?:\w+\.)?nico(?:seiga|video)\.jp/
       end
 
-      def referer_url(template)
-        if template.params[:ref] =~ /seiga\.nicovideo\.jp\/seiga\/im\d+/ && template.params[:url] =~ /http:\/\/lohas\.nicoseiga\.jp\/priv\//
-          template.params[:ref]
+      def referer_url
+        if @referer_url =~ /seiga\.nicovideo\.jp\/seiga\/im\d+/ && @url =~ /http:\/\/lohas\.nicoseiga\.jp\/priv\//
+          @referer_url
         else
-          template.params[:url]
+          @url
         end
       end
 

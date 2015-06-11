@@ -19,11 +19,11 @@ module Sources
         url =~ /#{WEB}|#{IMG}|#{I12}/i
       end
 
-      def referer_url(template)
-        if template.params[:ref] =~ /pixiv\.net\/member_illust.+mode=medium/ && template.params[:url] =~ /#{IMG}|#{I12}/
-          template.params[:ref]
+      def referer_url
+        if @referer_url =~ /pixiv\.net\/member_illust.+mode=medium/ && @url =~ /#{IMG}|#{I12}/
+          @referer_url
         else
-          template.params[:url]
+          @url
         end
       end
 

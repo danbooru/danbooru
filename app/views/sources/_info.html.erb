@@ -4,7 +4,7 @@
 
 <div id="source-info">
   <% if source.try(:available?) %>
-    <p><%= link_to "Fetch source data", source_path(:format => "json", :url => source.referer_url(self)), :id => "fetch-data-bookmarklet", :style => "display: none;" %></p>
+    <p><%= link_to "Fetch source data", source_path(:format => "json", :url => source.referer_url), :id => "fetch-data-bookmarklet", :style => "display: none;" %></p>
     <p><%= content_tag "span", "Loading #{source.site_name} data...", :id => "loading-data" %></p>
   <% else %>
     <p><%= link_to "Fetch source data", source_path(:format => "json"), :id => "fetch-data-manual" %></p>

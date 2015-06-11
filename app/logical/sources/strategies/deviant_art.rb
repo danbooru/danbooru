@@ -5,11 +5,11 @@ module Sources
         url =~ /^https?:\/\/(?:.+?\.)?deviantart\.(?:com|net)/
       end
 
-      def referer_url(template)
-        if template.params[:ref] =~ /deviantart\.com\/art\// && template.params[:url] =~ /https?:\/\/(?:fc|th|pre|orig|img)\d{2}\.deviantart\.net\//
-          template.params[:ref]
+      def referer_url
+        if @referer_url =~ /deviantart\.com\/art\// && @url =~ /https?:\/\/(?:fc|th|pre|orig|img)\d{2}\.deviantart\.net\//
+          @referer_url
         else
-          template.params[:url]
+          @url
         end
       end
 

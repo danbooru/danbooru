@@ -3,7 +3,7 @@ class SourcesController < ApplicationController
   respond_to :json
 
   def show
-    @source = Sources::Site.new(params[:url])
+    @source = Sources::Site.new(params[:url], :referer_url => params[:ref])
     @source.get
 
     respond_with(@source) do |format|

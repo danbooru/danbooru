@@ -1,7 +1,7 @@
 module Sources
   module Strategies
     class Base
-      attr_reader :url
+      attr_reader :url, :referer_url
       attr_reader :artist_name, :profile_url, :image_url, :tags, :page_count
       attr_reader :artist_commentary_title, :artist_commentary_desc
 
@@ -9,8 +9,9 @@ module Sources
         false
       end
 
-      def initialize(url)
+      def initialize(url, referer_url)
         @url = url
+        @referer_url = referer_url
         @page_count = 1
       end
 
@@ -67,10 +68,6 @@ module Sources
         else
           nil
         end
-      end
-
-      def referer_url(template)
-        raise NotImplementedError
       end
 
       def image_urls
