@@ -95,6 +95,10 @@ class Post < ActiveRecord::Base
       "#{Rails.root}/public/data/preview/#{file_path_prefix}#{md5}.jpg"
     end
 
+    def file_name
+      "#{file_path_prefix}#{md5}.#{file_ext}"
+    end
+
     def file_url
       "/data/#{file_path_prefix}#{md5}.#{file_ext}"
     end
