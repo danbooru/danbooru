@@ -9,7 +9,7 @@ module Sources
         false
       end
 
-      def initialize(url, referer_url)
+      def initialize(url, referer_url = nil)
         @url = url
         @referer_url = referer_url
         @page_count = 1

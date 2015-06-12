@@ -7,7 +7,7 @@ module Sources
       :profile_url, :image_url, :tags, :artist_record, :unique_id, 
       :page_count, :file_url, :ugoira_frame_data, :image_urls, 
       :has_artist_commentary?, :artist_commentary_title,
-      :artist_commentary_desc, :referer_url, :to => :strategy
+      :artist_commentary_desc, :to => :strategy
 
     def self.strategies
       [Strategies::Pixiv, Strategies::NicoSeiga, Strategies::DeviantArt, Strategies::Nijie, Strategies::Twitter]
@@ -22,6 +22,10 @@ module Sources
           break
         end
       end
+    end
+
+    def referer_url
+      strategy.try(:referer_url)
     end
 
     def normalized_for_artist_finder?
