@@ -1,0 +1,208 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://ocqPCKeWr01mvWzCIcveJYRTY:8GECMr2Ves7oK3bmAneHYMLSfDPoJvTizh5gSd4pLBNbJfYNz5@api.twitter.com/oauth2/token
+    body:
+      encoding: UTF-8
+      string: grant_type=client_credentials
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - TwitterRubyGem/5.13.0
+      Content-Type:
+      - application/x-www-form-urlencoded; charset=UTF-8
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, no-store, must-revalidate, pre-check=0, post-check=0
+      Content-Disposition:
+      - attachment; filename=json.json
+      Content-Length:
+      - '151'
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Fri, 12 Jun 2015 04:51:04 GMT
+      Expires:
+      - Tue, 31 Mar 1981 05:00:00 GMT
+      Last-Modified:
+      - Fri, 12 Jun 2015 04:51:04 GMT
+      Ml:
+      - S
+      Pragma:
+      - no-cache
+      Server:
+      - tsa_b
+      Set-Cookie:
+      - guest_id=v1%3A143408466430438117; Domain=.twitter.com; Path=/; Expires=Sun,
+        11-Jun-2017 04:51:04 UTC
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631138519
+      X-Connection-Hash:
+      - cec49fc98954d6be2b882737bf836056
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Response-Time:
+      - '106'
+      X-Transaction:
+      - 9b4a10e04933fdf2
+      X-Tsa-Request-Body-Time:
+      - '2'
+      X-Twitter-Response-Tags:
+      - BouncerCompliant
+      X-Ua-Compatible:
+      - IE=edge,chrome=1
+      X-Xss-Protection:
+      - 1; mode=block
+    body:
+      encoding: UTF-8
+      string: '{"token_type":"bearer","access_token":"AAAAAAAAAAAAAAAAAAAAAPV7eAAAAAAAN7q56yJ8wNHhsagDn06qiJ0Io00%3DfdvXQaVKHFS3q1hd3y8fVQdIbntIHN2iTsBTk0f6jQK7lxcDo5"}'
+    http_version: 
+  recorded_at: Fri, 12 Jun 2015 04:51:04 GMT
+- request:
+    method: get
+    uri: https://api.twitter.com/1.1/statuses/show/566030116182949888.json
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/json
+      User-Agent:
+      - TwitterRubyGem/5.13.0
+      Authorization:
+      - Bearer AAAAAAAAAAAAAAAAAAAAAPV7eAAAAAAAN7q56yJ8wNHhsagDn06qiJ0Io00%3DfdvXQaVKHFS3q1hd3y8fVQdIbntIHN2iTsBTk0f6jQK7lxcDo5
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, no-store, must-revalidate, pre-check=0, post-check=0
+      Content-Disposition:
+      - attachment; filename=json.json
+      Content-Length:
+      - '1254'
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Fri, 12 Jun 2015 04:51:04 GMT
+      Expires:
+      - Tue, 31 Mar 1981 05:00:00 GMT
+      Last-Modified:
+      - Fri, 12 Jun 2015 04:51:04 GMT
+      Pragma:
+      - no-cache
+      Server:
+      - tsa_b
+      Set-Cookie:
+      - guest_id=v1%3A143408466476813785; Domain=.twitter.com; Path=/; Expires=Sun,
+        11-Jun-2017 04:51:04 UTC
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631138519
+      X-Access-Level:
+      - read
+      X-Connection-Hash:
+      - e2d4cf83697658035172a98c60ac1baf
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Rate-Limit-Limit:
+      - '180'
+      X-Rate-Limit-Remaining:
+      - '179'
+      X-Rate-Limit-Reset:
+      - '1434085564'
+      X-Response-Time:
+      - '20'
+      X-Transaction:
+      - 033e4b0bf5892168
+      X-Twitter-Response-Tags:
+      - BouncerCompliant
+      X-Xss-Protection:
+      - 1; mode=block
+    body:
+      encoding: UTF-8
+      string: '{"created_at":"Fri Feb 13 00:24:30 +0000 2015","id":566030116182949888,"id_str":"566030116182949888","text":"What
+        do you give the Caramel Frappuccino that already has everything? The gift
+        of mocha drizzle. http:\/\/t.co\/2MWtXbYhf0","source":"\u003ca href=\"http:\/\/twitter.com\/download\/iphone\"
+        rel=\"nofollow\"\u003eTwitter for iPhone\u003c\/a\u003e","truncated":false,"in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"user":{"id":127566622,"id_str":"127566622","name":"Frappuccino","screen_name":"frappuccino","location":"Seattle,
+        WA","description":"Le yum. #FanFlavors","url":"http:\/\/t.co\/0o8bfJcGJW","entities":{"url":{"urls":[{"url":"http:\/\/t.co\/0o8bfJcGJW","expanded_url":"http:\/\/sbux.co\/FanFlavors","display_url":"sbux.co\/FanFlavors","indices":[0,22]}]},"description":{"urls":[]}},"protected":false,"followers_count":183232,"friends_count":68060,"listed_count":719,"created_at":"Mon
+        Mar 29 16:30:39 +0000 2010","favourites_count":3731,"utc_offset":-25200,"time_zone":"Pacific
+        Time (US & Canada)","geo_enabled":true,"verified":true,"statuses_count":12141,"lang":"en","contributors_enabled":false,"is_translator":false,"is_translation_enabled":false,"profile_background_color":"9AE4E8","profile_background_image_url":"http:\/\/pbs.twimg.com\/profile_background_images\/486908690591535104\/roRpLqRU.jpeg","profile_background_image_url_https":"https:\/\/pbs.twimg.com\/profile_background_images\/486908690591535104\/roRpLqRU.jpeg","profile_background_tile":true,"profile_image_url":"http:\/\/pbs.twimg.com\/profile_images\/593460960020402176\/B_NNVW9D_normal.png","profile_image_url_https":"https:\/\/pbs.twimg.com\/profile_images\/593460960020402176\/B_NNVW9D_normal.png","profile_banner_url":"https:\/\/pbs.twimg.com\/profile_banners\/127566622\/1420826895","profile_link_color":"0084B4","profile_sidebar_border_color":"FFFFFF","profile_sidebar_fill_color":"DDFFCC","profile_text_color":"333333","profile_use_background_image":true,"default_profile":false,"default_profile_image":false,"following":null,"follow_request_sent":null,"notifications":null},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":632,"favorite_count":2379,"entities":{"hashtags":[],"symbols":[],"user_mentions":[],"urls":[],"media":[{"id":566030112210972672,"id_str":"566030112210972672","indices":[97,119],"media_url":"http:\/\/pbs.twimg.com\/media\/B9rxY1qCcAAbeo0.jpg","media_url_https":"https:\/\/pbs.twimg.com\/media\/B9rxY1qCcAAbeo0.jpg","url":"http:\/\/t.co\/2MWtXbYhf0","display_url":"pic.twitter.com\/2MWtXbYhf0","expanded_url":"http:\/\/twitter.com\/frappuccino\/status\/566030116182949888\/photo\/1","type":"photo","sizes":{"thumb":{"w":150,"h":150,"resize":"crop"},"small":{"w":340,"h":191,"resize":"fit"},"medium":{"w":600,"h":337,"resize":"fit"},"large":{"w":1024,"h":576,"resize":"fit"}}}]},"extended_entities":{"media":[{"id":566030112210972672,"id_str":"566030112210972672","indices":[97,119],"media_url":"http:\/\/pbs.twimg.com\/media\/B9rxY1qCcAAbeo0.jpg","media_url_https":"https:\/\/pbs.twimg.com\/media\/B9rxY1qCcAAbeo0.jpg","url":"http:\/\/t.co\/2MWtXbYhf0","display_url":"pic.twitter.com\/2MWtXbYhf0","expanded_url":"http:\/\/twitter.com\/frappuccino\/status\/566030116182949888\/photo\/1","type":"photo","sizes":{"thumb":{"w":150,"h":150,"resize":"crop"},"small":{"w":340,"h":191,"resize":"fit"},"medium":{"w":600,"h":337,"resize":"fit"},"large":{"w":1024,"h":576,"resize":"fit"}}}]},"favorited":false,"retweeted":false,"possibly_sensitive":false,"possibly_sensitive_appealable":false,"lang":"en"}'
+    http_version: 
+  recorded_at: Fri, 12 Jun 2015 04:51:04 GMT
+- request:
+    method: head
+    uri: http://pbs.twimg.com/media/B9rxY1qCcAAbeo0.jpg:orig
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Danbooru/2.81.1
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - max-age=604800, must-revalidate
+      Content-Md5:
+      - owAkLGZeD7NZTChJ3z0/EA==
+      Content-Type:
+      - image/jpeg
+      Last-Modified:
+      - Fri, 13 Feb 2015 00:24:29 GMT
+      Server:
+      - tsa_a
+      X-Connection-Hash:
+      - 0ed4d1e87aacad7f1ed6ae7e719cf566
+      X-Response-Time:
+      - '32'
+      Content-Length:
+      - '56808'
+      Accept-Ranges:
+      - bytes
+      Date:
+      - Fri, 12 Jun 2015 04:51:06 GMT
+      Via:
+      - 1.1 varnish
+      Age:
+      - '0'
+      Connection:
+      - keep-alive
+      X-Served-By:
+      - cache-tw-sjc1-cr1-12-TWSJC1
+      X-Cache:
+      - MISS
+      X-Cache-Hits:
+      - '0'
+      Expires:
+      - Sat, 27 Jun 2015 04:51:06 GMT
+      X-Content-Type-Options:
+      - nosniff
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Fri, 12 Jun 2015 04:51:06 GMT
+recorded_with: VCR 2.9.0

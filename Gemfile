@@ -36,7 +36,6 @@ gem 'rmagick'
 gem 'daemons'
 gem 'net-ssh'
 gem 'net-sftp'
-gem 'newrelic_rpm'
 gem 'term-ansicolor', :require => "term/ansicolor"
 gem 'diff-lcs', :require => "diff/lcs/array"
 gem 'bcrypt-ruby', :require => "bcrypt"
@@ -58,6 +57,7 @@ gem 'ruby-imagespec', :require => "image_spec", :git => "https://github.com/r888
 gem 'aws-s3', :require => "aws/s3", :git => "https://github.com/fnando/aws-s3.git"
 
 group :production do
+  gem 'newrelic_rpm'
   gem 'unicorn', :platforms => :ruby
   # gem 'unicorn-worker-killer'
   gem 'gctools', :platforms => :ruby

@@ -14,33 +14,6 @@ class ForumPostTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
-    context "#receive_email_notifications" do
-      should "return true if a matching subscription exists" do
-        FactoryGirl.create(:forum_subscription, :forum_topic_id => @topic.id, :user_id => CurrentUser.user.id)
-        assert_equal(true, ForumPost.new(:topic_id => @topic.id).receive_email_notifications)
-      end
-
-      should "return false if there is no matching subscription" do
-        assert_equal(false, ForumPost.new(:topic_id => @topic.id).receive_email_notifications)
-      end
-    end
-
-    context "#update_email_notifications" do
-      should "create a forum subscription if one doesn't exist" do
-        assert_difference("ForumSubscription.count", 1) do
-          FactoryGirl.create(:forum_post, :topic_id => @topic.id, :receive_email_notifications => true)
-        end
-      end
-
-      should "update the forum subscription if one already exists" do
-        FactoryGirl.create(:forum_subscription, :forum_topic_id => @topic.id, :user_id => CurrentUser.user.id)
-        assert_difference("ForumSubscription.count", 0) do
-          FactoryGirl.create(:forum_post, :topic_id => @topic.id, :receive_email_notifications => true)
-        end
-        assert_not_nil(ForumSubscription.last.last_read_at)
-      end
-    end
-
     context "that belongs to a topic with several pages of posts" do
       setup do
         Danbooru.config.stubs(:posts_per_page).returns(3)

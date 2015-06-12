@@ -1,6 +1,11 @@
 require 'test_helper'
 
 class UploadsControllerTest < ActionController::TestCase
+  def setup
+    super
+    setup_vcr
+  end
+
   context "The uploads controller" do
     setup do
       @user = FactoryGirl.create(:contributor_user)
@@ -15,13 +20,8 @@ class UploadsControllerTest < ActionController::TestCase
 
     context "batch action" do
       context "for twitter galleries" do
-        setup do
-          Danbooru.config.stubs(:twitter_api_key).returns("xxx")
-          Danbooru.config.stubs(:twitter_api_secret).returns("xxx")
-        end
-
         should "render" do
-          VCR.use_cassette("functional/upload/twitter", :record => :none) do
+          VCR.use_cassette("functional/upload/twitter", :record => :once) do
             get :batch, {:url => "https://twitter.com/lvlln/status/567054278486151168"}, {:user_id => @user.id}
           end
           assert_response :success
