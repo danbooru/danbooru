@@ -1,7 +1,5 @@
 class JanitorPruner
   def inactive_janitors
-    admin = User.admins.first
-
     User.where("level = ?", User::Levels::JANITOR).select do |user|
       approval_count = Post.where("created_at >= ? and approver_id = ?", 2.months.ago, user.id).count
       approval_count == 0
@@ -9,6 +7,8 @@ class JanitorPruner
   end
 
   def prune!
+    admin = User.admins.first
+
     inactive_janitors.each do |user|
       CurrentUser.scoped(admin, "127.0.0.1") do
         Dmail.create_split(
