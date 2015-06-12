@@ -5,7 +5,7 @@ module Sources
         url =~ /^https?:\/\/(?:.+?\.)?nijie\.info/
       end
 
-      def referer_url(template)
+      def referer_url
         if @referer_url =~ /nijie\.info\/view\.php.+id=\d+/ && @url =~ /pic\d+\.nijie.info\/nijie_picture\//
           @referer_url
         else
