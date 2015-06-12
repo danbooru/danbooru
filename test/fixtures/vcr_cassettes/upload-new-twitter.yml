@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: post
-    uri: https://ocqPCKeWr01mvWzCIcveJYRTY:8GECMr2Ves7oK3bmAneHYMLSfDPoJvTizh5gSd4pLBNbJfYNz5@api.twitter.com/oauth2/token
+    uri: https://SENSITIVE:SENSITIVE@api.twitter.com/oauth2/token
     body:
       encoding: UTF-8
       string: grant_type=client_credentials

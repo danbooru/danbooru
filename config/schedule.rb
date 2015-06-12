@@ -19,6 +19,10 @@ every 1.week, :at => "1:30 am" do
   runner "WeeklyMaintenance.new.run"
 end
 
+every 1.month, :at => "2:00 am" do
+  runner "MonthlyMaintenance.new.run"
+end
+
 if environment == "production"
   every 1.hour do
     runner "AmazonBackup.execute"

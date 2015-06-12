@@ -1,7 +1,6 @@
-class WeeklyMaintenance
+class MonthlyMaintenance
   def run
     ActiveRecord::Base.connection.execute("set statement_timeout = 0")
-    UserPasswordResetNonce.prune!
-    JanitorPruner.new.prune!
+    JanitorTrial.new.message_candidates!
   end
 end
