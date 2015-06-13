@@ -66,7 +66,7 @@ class JanitorTrial < ActiveRecord::Base
   end
 
   def send_dmail
-    body = "You have been selected as a test janitor. You can now approve pending posts and have access to the moderation interface. You should reacquaint yourself with the [[howto:upload]] guide to make sure you understand the site rules.\n\nOver the next several weeks your approvals will be monitored. If the majority of them are quality uploads. If you fail the trial period, you will be demoted back to your original level and you'll receive a negative user record indicating you previously attempted and failed a test janitor trial.\n\nThere is a minimum quota of 1 approval a month to indicate that you are being active. Remember, the goal isn't to approve as much as possible. It's to filter out borderline-quality art.\n\nIf you have any questions please respond to this message."
+    body = "You have been selected as a test janitor. You can now approve pending posts and have access to the moderation interface. You should reacquaint yourself with the [[howto:upload]] guide to make sure you understand the site rules.\n\nOver the next several weeks your approvals will be monitored. If the majority of them are not quality uploads you will fail the trial period and be demoted back to your original level. You will also receive a negative user record indicating you previously attempted and failed a test janitor trial.\n\nThere is a minimum quota of 1 approval a month to indicate that you are being active. Remember, the goal isn't to approve as much as possible. It's to filter out borderline-quality art.\n\nIf you have any questions please respond to this message."
 
     Dmail.create_split(:title => "Test Janitor Trial Period", :body => body, :to_id => user_id)
   end
@@ -78,7 +78,7 @@ class JanitorTrial < ActiveRecord::Base
   def create_feedback
     user.feedback.create(
       :category => "negative",
-      :body => "Demoted from janitor trial"
+      :body => "Demoted from Janitor trial"
     )
   end
 
