@@ -72,7 +72,7 @@ class JanitorTrial < ActiveRecord::Base
   end
 
   def promote_user
-    user.update_column(:level, User::Levels::JANITOR)
+    user.promote_to!(User::Levels::JANITOR, :skip_dmail => true)
   end
 
   def create_feedback

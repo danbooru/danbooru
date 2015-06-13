@@ -17,7 +17,7 @@ class JanitorPruner
           janitor_trial.demote!
           unknown_level = nil
         else
-          user.promote_to!(User::Levels::PLATINUM)
+          user.promote_to!(User::Levels::PLATINUM, :skip_dmail => true)
           unknown_level = "\n\nYour previous user level was unknown so your user level has defaulted to Platinum. If you feel this to be in error please reply to this message with your original level."
         end
  

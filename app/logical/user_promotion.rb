@@ -16,7 +16,7 @@ class UserPromotion
 
     create_transaction_log_item
     create_user_feedback unless options[:skip_feedback]
-    create_dmail
+    create_dmail unless options[:skip_dmail]
 
     user.save
   end
