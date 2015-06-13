@@ -91,4 +91,12 @@ class JanitorTrial < ActiveRecord::Base
     user.update_column(:level, original_level)
     self.create_feedback
   end
+
+  def active?
+    status == "active"
+  end
+
+  def inactive?
+    status == "inactive"
+  end
 end

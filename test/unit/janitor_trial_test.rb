@@ -47,9 +47,8 @@ class JanitorTrialTest < ActiveSupport::TestCase
       end
 
       should "destroy the trial object" do
-        assert_difference("JanitorTrial.count", -1) do
-          @janitor_trial.promote!
-        end
+        @janitor_trial.promote!
+        assert_equal(false, @janitor_trial.active?)
       end
     end
   end
