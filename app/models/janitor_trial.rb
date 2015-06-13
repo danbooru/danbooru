@@ -6,9 +6,11 @@ class JanitorTrial < ActiveRecord::Base
   validates_presence_of :user
   before_validation :initialize_creator
   attr_accessible :user_id
+  validates_inclusion_of :status, :in => %w(active inactive)
+  before_validation :initialize_status
 
   def self.search(params)
-    q = where("true")
+    q = where("status = ?", "active")
     return q if params.blank?
 
     if params[:user_name]
@@ -41,6 +43,10 @@ class JanitorTrial < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def initialize_status
+    self.status = "active"
   end
 
   def initialize_creator
@@ -77,9 +83,11 @@ class JanitorTrial < ActiveRecord::Base
   end
 
   def promote!
+    update_attribute(:status, "inactive")
   end
 
   def demote!
+    update_attribute(:status, "inactive")
     user.update_column(:level, original_level)
     self.create_feedback
   end
