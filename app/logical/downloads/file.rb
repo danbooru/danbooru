@@ -57,6 +57,9 @@ module Downloads
     def after_download(src)
       src = fix_image_board_sources(src)
       src = fix_twitter_sources(src)
+      if options[:referer_url].present?
+        src = set_source_to_referer(src)
+      end
       src
     end
 
@@ -127,6 +130,15 @@ module Downloads
     def fix_twitter_sources(src)
       if src =~ %r!^https?://pbs\.twimg\.com/! && original_source =~ %r!^https?://twitter\.com/!
         original_source
+      else
+        src
+      end
+    end
+
+    def set_source_to_referer(src)
+      if Sources::Strategies::Nijie.url_match?(src) || Sources::Strategies::Twitter.url_match?(src) || Sources::Strategies::Tumblr.url_match?(src)
+        strategy = Sources::Site.new(src, :referer_url => options[:referer_url])
+        strategy.referer_url
       else
         src
       end

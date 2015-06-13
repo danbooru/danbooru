@@ -15,7 +15,7 @@
 
       <%= form_for(@upload, :html => {:multipart => true, :class => "simple_form", :id => "form"}) do |f| %>
         <%= hidden_field_tag :normalized_url, @normalized_url %>
-        <%= hidden_field_tag :referer_url, @source.try(:referer_url) %>
+        <%= f.hidden_field :referer_url, :value => @source.try(:referer_url) %>
 
         <% if CurrentUser.is_contributor? %>
           <div class="input">

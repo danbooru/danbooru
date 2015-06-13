@@ -6,7 +6,8 @@ class Upload < ActiveRecord::Base
 
   attr_accessor :file, :image_width, :image_height, :file_ext, :md5, 
     :file_size, :as_pending, :artist_commentary_title, 
-    :artist_commentary_desc, :include_artist_commentary
+    :artist_commentary_desc, :include_artist_commentary,
+    :referer_url
   belongs_to :uploader, :class_name => "User"
   belongs_to :post
   before_validation :initialize_uploader, :on => :create
@@ -20,7 +21,8 @@ class Upload < ActiveRecord::Base
     :file_size, :as_pending, :source, :file_path, :content_type, :rating, 
     :tag_string, :status, :backtrace, :post_id, :md5_confirmation, 
     :parent_id, :server, :artist_commentary_title,
-    :artist_commentary_desc, :include_artist_commentary
+    :artist_commentary_desc, :include_artist_commentary,
+    :referer_url
 
   module ValidationMethods
     def uploader_is_not_limited
@@ -379,7 +381,7 @@ class Upload < ActiveRecord::Base
     # Downloads the file to destination_path
     def download_from_source(destination_path)
       self.file_path = destination_path
-      download = Downloads::File.new(source, destination_path)
+      download = Downloads::File.new(source, destination_path, :referer_url => referer_url)
       download.download!
       ugoira_service.load(download.data)
       download.source
