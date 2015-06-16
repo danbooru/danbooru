@@ -34,11 +34,11 @@ class JanitorTrialsControllerTest < ActionController::TestCase
       end
 
       should "promote the janitor trial" do
-        assert_difference("JanitorTrial.count", -1) do
-          post :promote, {:id => @janitor_trial.id}, {:user_id => @admin.id}
-        end
+        post :promote, {:id => @janitor_trial.id}, {:user_id => @admin.id}
         @user.reload
         assert(@user.is_janitor?)
+        @janitor_trial.reload
+        assert_equal(false, @janitor_trial.active?)
       end
     end
 
@@ -48,11 +48,11 @@ class JanitorTrialsControllerTest < ActionController::TestCase
       end
 
       should "demote the janitor trial" do
-        assert_difference("JanitorTrial.count", -1) do
-          post :demote, {:id => @janitor_trial.id}, {:user_id => @admin.id}
-        end
+        post :demote, {:id => @janitor_trial.id}, {:user_id => @admin.id}
         @user.reload
         assert(!@user.is_janitor?)
+        @janitor_trial.reload
+        assert_equal(false, @janitor_trial.active?)
       end
     end
 
