@@ -1,0 +1,61 @@
+<div id="c-reports">
+  <div id="a-user-promotions">
+    <h1>Janitor Trial Report</h1>
+
+    <table width="100%" class="striped" id="sortable" style="margin-bottom: 1em;">
+      <thead>
+        <tr>
+          <th data-sort="string">User</th>
+          <th data-sort="int">Approvals</th>
+          <th data-sort="int">Deleted</th>
+          <th data-sort="int" title="25% of approvals received this score or less">Quartile Score</th>
+          <th data-sort="int" title="50% of approvals received this score or less">Median Score</th>
+          <th>Explicit %</th>
+          <th>Questionable %</th>
+          <th>Safe %</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% cache("janitor-trials-report/#{Date.today}") do %>
+          <% @report.janitors.each do |janitor| %>
+            <tr>
+              <td><%= link_to_user janitor.user %></td>
+              <td><%= link_to janitor.approval_count, posts_path(:tags => "approver:#{janitor.user.name}") %></td>
+              <td><%= link_to janitor.deleted_count, posts_path(:tags => "approver:#{janitor.user.name} status:deleted") %></td>
+              <td><%= janitor.percentile_25_score %></td>
+              <td><%= janitor.percentile_50_score %></td>
+              <td><%= number_to_percentage janitor.rating_e_percentage, :precision => 0 %></td>
+              <td><%= number_to_percentage janitor.rating_q_percentage, :precision => 0 %></td>
+              <td><%= number_to_percentage janitor.rating_s_percentage, :precision => 0 %></td>
+              <td>
+                <% if CurrentUser.user.is_moderator? %>
+                  <%= link_to "Promote", promote_janitor_trial_path(janitor.trial), :method => :put, :remote => true %>
+                  | <%= link_to "Demote", demote_janitor_trial_path(janitor.trial), :method => :put, :remote => true %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+
+    <p>All numbers shown are for the past 3 months.</p>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  Janitor Trial Report - <%= Danbooru.config.app_name %>
+<% end %>
+
+<%= content_for(:html_header) do %>
+  <%= javascript_include_tag "stupidtable" %>
+  <script type="text/javascript">
+    $(function() {
+      $("#sortable").stupidtable().on("aftertablesort", function() {
+        $("#sortable tbody tr:even").removeClass("odd").addClass("even");
+        $("#sortable tbody tr:odd").removeClass("even").addClass("odd");
+      });
+    });
+  </script>
+<% end %>

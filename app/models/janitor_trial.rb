@@ -8,6 +8,7 @@ class JanitorTrial < ActiveRecord::Base
   attr_accessible :user_id, :user_name
   validates_inclusion_of :status, :in => %w(active inactive)
   before_validation :initialize_status
+  validates_uniqueness_of :user_id
 
   def self.search(params)
     q = where("status = ?", "active")
