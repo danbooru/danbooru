@@ -17,6 +17,14 @@ module Reports
       def deletion_confidence_interval
         Reports::UserPromotions.deletion_confidence_interval_for(user)
       end
+
+      def median_score
+        ActiveRecord::Base.select_value_sql("select percentile_cont(0.50) within group (order by score) from posts where created_at >= ? and uploader_id = ?", 30.days.ago, user.id).to_i
+      end
+
+      def quartile_score
+        ActiveRecord::Base.select_value_sql("select percentile_cont(0.25) within group (order by score) from posts where created_at >= ? and uploader_id = ?", 30.days.ago, user.id).to_i
+      end
     end
 
     def self.confidence_interval_for(user, n)
@@ -46,7 +54,7 @@ module Reports
     end
 
     def users
-      ::User.where("users.level < ? and users.post_upload_count >= 150", ::User::Levels::CONTRIBUTOR).order("created_at desc").limit(50).map {|x| Reports::UserPromotions::User.new(x)}
+      ::User.where("users.level < ? and users.post_upload_count >= 250", ::User::Levels::CONTRIBUTOR).order("created_at desc").limit(50).map {|x| Reports::UserPromotions::User.new(x)}
     end
   end
 end
