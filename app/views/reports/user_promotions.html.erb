@@ -29,9 +29,9 @@
                 <td data-sort-value="<%= user.created_at.to_formatted_s(:db) %>"><%= time_ago_in_words user.created_at %></td>
                 <td><%= number_to_percentage user.confidence_interval_for(3), :precision => 0 %></td>
                 <td><%= number_to_percentage user.confidence_interval_for(6), :precision => 0 %></td>
-                <td><%= number_to_percentage user.deletion_confidence_interval, :precision => 0 %></td>
                 <td><%= user.quartile_score %></td>
                 <td><%= user.median_score %></td>
+                <td><%= number_to_percentage user.deletion_confidence_interval, :precision => 0 %></td>
               </tr>
             <% end %>
           <% end %>
