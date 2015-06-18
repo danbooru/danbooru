@@ -1,14 +1,14 @@
 module Reports
   class JanitorTrials
     class Janitor
-      attr_reader :trial
+      attr_reader :user
 
-      def initialize(trial)
-        @trial = trial
+      def initialize(user)
+        @user = user
       end
 
-      def user
-        trial.user
+      def trial
+        JanitorTrial.where(user_id: user.id).first
       end
 
       def since
@@ -39,7 +39,7 @@ module Reports
     end
 
     def janitors
-      JanitorTrial.where(status: "active").to_a.map {|x| Janitor.new(x)}
+      User.where("level >= ?", User::Levels::JANITOR).to_a.map {|x| Janitor.new(x)}
     end
   end
 end

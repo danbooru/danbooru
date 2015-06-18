@@ -2,7 +2,7 @@
   <div id="a-user-promotions">
     <h1>Janitor Trial Report</h1>
 
-    <p>All numbers shown are for the past 3 months. Binomial proportion confidence interval for how likely a janitor's approvals will achieve a score of at at least n with 95% confidence.</p>
+    <p>All numbers shown are for the past 3 months. Binomial proportion confidence interval for how likely a janitor's approvals will achieve a score of at at least n with 95% confidence. Most statistics are not significant unless there are at least 300 approvals.</p>
 
     <table width="100%" class="striped" id="sortable">
       <thead>
@@ -29,7 +29,7 @@
               <td><%= janitor.percentile_50_score %></td>
               <td><%= number_to_percentage janitor.confidence_interval, :precision => 0 %></td>
               <td>
-                <% if CurrentUser.user.is_moderator? %>
+                <% if CurrentUser.user.is_moderator? && janitor.trial %>
                   <%= link_to "Promote", promote_janitor_trial_path(janitor.trial), :method => :put, :remote => true %>
                   | <%= link_to "Demote", demote_janitor_trial_path(janitor.trial), :method => :put, :remote => true %>
                 <% end %>
