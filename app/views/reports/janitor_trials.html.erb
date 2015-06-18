@@ -22,7 +22,7 @@
           <% @report.janitors.each do |janitor| %>
             <tr>
               <td><%= link_to_user janitor.user %></td>
-              <td data-sort-value="<%= user.level %>"><%= janitor.user.level_string %></td>
+              <td data-sort-value="<%= janitor.user.level %>"><%= janitor.user.level_string %></td>
               <td><%= link_to janitor.approval_count, posts_path(:tags => "approver:#{janitor.user.name}") %></td>
               <td><%= link_to janitor.deleted_count, posts_path(:tags => "approver:#{janitor.user.name} status:deleted") %></td>
               <td><%= janitor.percentile_25_score %></td>
