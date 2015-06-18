@@ -13,7 +13,7 @@ class JanitorPruner
       CurrentUser.scoped(admin, "127.0.0.1") do
         janitor_trial = JanitorTrial.where(user_id: user.id).first
 
-        if janitor_trial
+        if janitor_trial && user.level <= User::Levels::JANITOR
           janitor_trial.demote!
           unknown_level = nil
         else
