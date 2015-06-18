@@ -15,11 +15,7 @@ class ForumPostsController < ApplicationController
   end
 
   def index
-    if CurrentUser.is_janitor?
-      @query = ForumPost.search(params[:search])
-    else
-      @query = ForumPost.active.search(params[:search])
-    end
+    @query = ForumPost.search(params[:search])
     @forum_posts = @query.order("forum_posts.id DESC").paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@forum_posts) do |format|
       format.xml do

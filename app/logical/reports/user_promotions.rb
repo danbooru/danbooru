@@ -19,11 +19,11 @@ module Reports
       end
 
       def median_score
-        ActiveRecord::Base.select_value_sql("select percentile_cont(0.50) within group (order by score) from posts where created_at >= ? and uploader_id = ?", 30.days.ago, user.id).to_i
+        ActiveRecord::Base.select_value_sql("select percentile_cont(0.50) within group (order by score) from posts where created_at >= ? and uploader_id = ?", ::Reports::UserPromotions.min_time, user.id).to_i
       end
 
       def quartile_score
-        ActiveRecord::Base.select_value_sql("select percentile_cont(0.25) within group (order by score) from posts where created_at >= ? and uploader_id = ?", 30.days.ago, user.id).to_i
+        ActiveRecord::Base.select_value_sql("select percentile_cont(0.25) within group (order by score) from posts where created_at >= ? and uploader_id = ?", ::Reports::UserPromotions.min_time, user.id).to_i
       end
     end
 

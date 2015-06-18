@@ -31,16 +31,10 @@ module Reports
         ActiveRecord::Base.select_value_sql("select percentile_cont(0.50) within group (order by score) from posts where created_at >= ? and approver_id = ?", since, user.id).to_i
       end
 
-      def rating_e_percentage
-        100 * Post.where("approver_id = ? and created_at >= ? and rating = 'e'", user.id, since).count.to_f / [approval_count, 1].max
-      end
-
-      def rating_q_percentage
-        100 * Post.where("approver_id = ? and created_at >= ? and rating = 'q'", user.id, since).count.to_f / [approval_count, 1].max
-      end
-
-      def rating_s_percentage
-        100 * Post.where("approver_id = ? and created_at >= ? and rating = 's'", user.id, since).count.to_f / [approval_count, 1].max
+      def confidence_interval
+        hits = Post.where("approver_id = ? and created_at >= ? and score >= 3", user.id, since).count
+        total = Post.where("approver_id = ? and created_at >= ?", user.id, since).count
+        Reports::UserPromotions.ci_lower_bound(hits, total, 0.95)
       end
     end
 
