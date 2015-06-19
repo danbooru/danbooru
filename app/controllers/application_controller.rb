@@ -14,6 +14,7 @@ class ApplicationController < ActionController::Base
 
   rescue_from Exception, :with => :rescue_exception
   rescue_from User::PrivilegeError, :with => :access_denied
+  rescue_from SessionLoader::AuthenticationFailure, :with => :authentication_failed
   rescue_from Danbooru::Paginator::PaginationError, :with => :render_pagination_limit
 
 protected
@@ -45,6 +46,18 @@ protected
   def render_pagination_limit
     @error_message = "You can only view up to #{Danbooru.config.max_numbered_pages} pages. Please narrow your search terms."
     render :template => "static/error", :status => 410
+  end
+
+  def authentication_failed
+    respond_to do |fmt|
+      fmt.html do
+        render :text => "authentication failed", :status => 401
+      end
+
+      fmt.json do
+        render :json => {:success => false, :reason => "authentication failed"}, :status => 401
+      end
+    end
   end
 
   def access_denied(exception = nil)

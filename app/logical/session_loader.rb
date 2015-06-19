@@ -1,4 +1,6 @@
 class SessionLoader
+  class AuthenticationFailure < Exception ; end
+
   attr_reader :session, :cookies, :request, :params
 
   def initialize(session, cookies, request, params)
@@ -57,11 +59,19 @@ private
   def authenticate_api_key(name, api_key)
     CurrentUser.ip_addr = request.remote_ip
     CurrentUser.user = User.authenticate_api_key(name, api_key)
+
+    if CurrentUser.user.nil?
+      raise AuthenticationFailure.new
+    end
   end
   
   def authenticate_legacy_api_key(name, password_hash)
     CurrentUser.ip_addr = request.remote_ip
     CurrentUser.user = User.authenticate_hash(name, password_hash)
+
+    if CurrentUser.user.nil?
+      raise AuthenticationFailure.new
+    end
   end
 
   def load_session_user
