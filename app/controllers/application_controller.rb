@@ -55,7 +55,7 @@ protected
       end
 
       fmt.json do
-        render :json => {:success => false, :reason => "authentication failed"}, :status => 401
+        render :json => {:success => false, :reason => "authentication failed"}.to_json, :status => 401
       end
     end
   end
