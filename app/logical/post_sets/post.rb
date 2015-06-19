@@ -73,6 +73,8 @@ module PostSets
           count = ::Post.fast_count(tag_string, :statement_timeout => CurrentUser.user.statement_timeout)
           if count == 1_000_000 # count timed out
             chance = 0.01
+          elsif count == 0
+            chance = 1
           else
             chance = per_page / count.to_f
           end
