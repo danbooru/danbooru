@@ -2,6 +2,10 @@ class PostPresenter < Presenter
   attr_reader :pool, :next_post_in_pool
 
   def self.preview(post, options = {})
+    if post.nil?
+      return "Expunged"
+    end
+
     if post.is_deleted? && options[:tags] !~ /status:(?:all|any|deleted|banned)/ && !options[:raw]
       return ""
     end
