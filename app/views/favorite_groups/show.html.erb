@@ -1,0 +1,22 @@
+<div id="c-favorite-groups">
+  <div id="a-show">
+    <h1>
+      Favorite Group:
+      <%= link_to @favorite_group.pretty_name, posts_path(:tags => "favgroup:#{@favorite_group.id}") %>
+    </h1>
+
+    <%= render "posts/partials/common/inline_blacklist" %>
+
+    <section>
+      <%= @post_set.presenter.post_previews_html(self) %>
+
+      <%= numbered_paginator(@post_set) %>
+    </section>
+  </div>
+</div>
+
+<%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Favorite Group - <%= @favorite_group.pretty_name %> - <%= Danbooru.config.app_name %>
+<% end %>

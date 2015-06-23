@@ -253,6 +253,10 @@ class User < ActiveRecord::Base
     def remove_favorite!(post)
       Favorite.remove(post, self)
     end
+
+    def favorite_groups
+      FavoriteGroup.for_creator(CurrentUser.user.id)
+    end
   end
 
   module LevelMethods
@@ -541,7 +545,17 @@ class User < ActiveRecord::Base
         10_000
       end
     end
-    
+
+    def favorite_group_limit
+      if is_platinum?
+        10
+      elsif is_gold?
+        5
+      else
+        3
+      end
+    end
+
     def api_hourly_limit
       if is_platinum? && api_key.present?
         20_000
@@ -632,6 +646,10 @@ class User < ActiveRecord::Base
 
     def comment_count
       Comment.for_creator(id).count
+    end
+
+    def favorite_group_count
+      FavoriteGroup.for_creator(id).count
     end
 
     def appeal_count

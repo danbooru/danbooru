@@ -368,11 +368,11 @@ div#c-posts {
       word-wrap: break-word;
     }
 
-    #search-seq-nav + #pool-nav {
+    #search-seq-nav + #pool-nav, #search-seq-nav + #favgroup-nav, #pool-nav + #favgroup-nav {
       margin-top: 0.5em;
     }
 
-    #pool-nav, #search-seq-nav {
+    #pool-nav, #search-seq-nav, #favgroup-nav {
       li {
         position: relative;
         text-align: center;

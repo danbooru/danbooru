@@ -7,5 +7,9 @@
     <% if post.pools.any? %>
       <%= render "posts/partials/show/pools", :post => post %>
     <% end %>
+
+    <% if post.favorite_groups.any? %>
+      <%= render "posts/partials/show/favorite_groups", :post => post %>
+    <% end %>
   </div>
 <% end %>

@@ -312,6 +312,12 @@ class PostQueryBuilder
       relation = relation.order("position(' '||posts.id||' ' in ' '||(select post_ids from pools where id = #{pool_id})||' ')")
     end
 
+    if q[:favgroup].present?
+      favgroup_id = q[:favgroup].to_i
+      post_ids = FavoriteGroup.find(favgroup_id).post_id_array
+      relation = relation.where("posts.id in (?)", post_ids)
+    end
+
     if q[:ordfav].present?
       user_id = q[:ordfav].to_i
       relation = relation.joins("INNER JOIN favorites ON favorites.post_id = posts.id")

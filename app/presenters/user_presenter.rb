@@ -101,6 +101,10 @@ class UserPresenter
     template.link_to(user.favorite_count, template.favorites_path(:user_id => user.id))
   end
 
+  def favorite_group_count(template)
+    template.link_to(user.favorite_group_count, template.favorite_groups_path(:search => {:creator_id => user.id}))
+  end
+
   def comment_count(template)
     template.link_to(user.comment_count, template.comments_path(:search => {:creator_id => user.id}, :group_by => "comment"))
   end
