@@ -1,6 +1,6 @@
 module Moderator
   class IpAddrsController < ApplicationController
-    before_filter :janitor_only
+    before_filter :moderator_only
 
     def index
       @search = IpAddrSearch.new(params[:search])

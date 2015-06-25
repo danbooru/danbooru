@@ -1,5 +1,5 @@
 <menu class="main">
-  <% if CurrentUser.user.is_anonymous? %>
+  <% if CurrentUser.is_anonymous? %>
     <%= nav_link_to("Sign in", new_session_path, :class => "login") %>
   <% else %>
     <%= nav_link_to("My Account #{CurrentUser.dmail_count}", user_path(CurrentUser.user)) %>
@@ -15,8 +15,8 @@
   <% end %>
   <%= nav_link_to("Pools", pools_path) %>
   <%= nav_link_to("Wiki", wiki_pages_path(:title => "help:home")) %>
-  <%= nav_link_to("Forum", forum_topics_path, :class => (CurrentUser.user.has_forum_been_updated? ? "forum-updated" : nil)) %>
-  <% if CurrentUser.is_janitor? %>
+  <%= nav_link_to("Forum", forum_topics_path, :class => (CurrentUser.has_forum_been_updated? ? "forum-updated" : nil)) %>
+  <% if CurrentUser.is_moderator? %>
     <%= nav_link_to("Dashboard", moderator_dashboard_path) %>
   <% end %>
   <%= nav_link_to("More &raquo;".html_safe, site_map_path, :id => "site-map-link") %>

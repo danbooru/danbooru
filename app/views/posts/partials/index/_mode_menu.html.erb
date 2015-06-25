@@ -17,7 +17,7 @@
           <option value="lock-rating">Lock rating</option>
           <option value="lock-note">Lock notes</option>
         <% end %>
-        <% if CurrentUser.is_janitor? %>
+        <% if CurrentUser.can_approve_posts? %>
           <option value="approve">Approve</option>
         <% end %>
       </select>

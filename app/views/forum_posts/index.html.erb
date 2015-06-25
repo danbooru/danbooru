@@ -11,7 +11,7 @@
       </thead>
       <tbody>
         <% @forum_posts.each do |forum_post| %>
-          <% if CurrentUser.is_janitor? || !forum_post.is_deleted? %>
+          <% if CurrentUser.is_moderator? || !forum_post.is_deleted? %>
             <tr>
               <td><%= link_to forum_post.topic.title, forum_topic_path(forum_post.topic) %></td>
               <td>

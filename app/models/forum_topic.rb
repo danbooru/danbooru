@@ -119,7 +119,7 @@ class ForumTopic < ActiveRecord::Base
   include SubscriptionMethods
 
   def editable_by?(user)
-    creator_id == user.id || user.is_janitor?
+    creator_id == user.id || user.is_moderator?
   end
 
   def initialize_is_deleted

@@ -18,7 +18,7 @@
     <%= render "forum_posts/listing", :forum_posts => @forum_posts %>
 
     <% if CurrentUser.is_member? %>
-      <% if CurrentUser.is_janitor? || !@forum_topic.is_locked? %>
+      <% if CurrentUser.is_moderator? || !@forum_topic.is_locked? %>
         <p><%= link_to "Reply &raquo;".html_safe, new_forum_post_path(:topic_id => @forum_topic.id), :id => "new-response-link" %></p>
 
         <div style="display: none;" id="topic-response">

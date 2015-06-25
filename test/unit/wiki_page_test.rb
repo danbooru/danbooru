@@ -14,25 +14,25 @@ class WikiPageTest < ActiveSupport::TestCase
   context "A wiki page" do
     context "that is locked" do
       should "not be editable by a member" do
-        CurrentUser.user = FactoryGirl.create(:janitor_user)
+        CurrentUser.user = FactoryGirl.create(:moderator_user)
         @wiki_page = FactoryGirl.create(:wiki_page, :is_locked => true)
         CurrentUser.user = FactoryGirl.create(:user)
         @wiki_page.update_attributes(:body => "hello")
         assert_equal(["Is locked and cannot be updated"], @wiki_page.errors.full_messages)
       end
 
-      should "be editable by a janitor" do
-        CurrentUser.user = FactoryGirl.create(:janitor_user)
+      should "be editable by a moderator" do
+        CurrentUser.user = FactoryGirl.create(:moderator_user)
         @wiki_page = FactoryGirl.create(:wiki_page, :is_locked => true)
-        CurrentUser.user = FactoryGirl.create(:janitor_user)
+        CurrentUser.user = FactoryGirl.create(:moderator_user)
         @wiki_page.update_attributes(:body => "hello")
         assert_equal([], @wiki_page.errors.full_messages)
       end
     end
 
-    context "updated by a janitor" do
+    context "updated by a moderator" do
       setup do
-        @user = FactoryGirl.create(:janitor_user)
+        @user = FactoryGirl.create(:moderator_user)
         CurrentUser.user = @user
         @wiki_page = FactoryGirl.create(:wiki_page)
       end
@@ -53,7 +53,7 @@ class WikiPageTest < ActiveSupport::TestCase
 
       should "not allow the is_locked attribute to be updated" do
         @wiki_page.update_attributes(:is_locked => true)
-        assert_equal(["Is locked can be modified by janitors only", "Is locked and cannot be updated"], @wiki_page.errors.full_messages)
+        assert_equal(["Is locked can be modified by moderators only", "Is locked and cannot be updated"], @wiki_page.errors.full_messages)
         @wiki_page.reload
         assert_equal(false, @wiki_page.is_locked?)
       end

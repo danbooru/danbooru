@@ -34,14 +34,17 @@ FactoryGirl.define do
 
     factory(:janitor_user) do
       level 35
+      can_approve_posts true
     end
 
     factory(:moderator_user) do
       level 40
+      can_approve_posts true
     end
 
     factory(:admin_user) do
       level 50
+      can_approve_posts true
     end
   end
 end

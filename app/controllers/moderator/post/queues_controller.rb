@@ -2,7 +2,7 @@ module Moderator
   module Post
     class QueuesController < ApplicationController
       respond_to :html, :json
-      before_filter :janitor_only
+      before_filter :post_approvers_only
 
       def show
         ::Post.without_timeout do

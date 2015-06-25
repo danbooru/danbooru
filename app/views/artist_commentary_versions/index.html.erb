@@ -8,7 +8,7 @@
           <th width="5%">Post</th>
           <th>Original</th>
           <th>Translated</th>
-          <% if CurrentUser.is_janitor? %>
+          <% if CurrentUser.is_moderator? %>
             <th width="10%">IP Address</th>
           <% end %>
           <th width="10%">Edited By</th>
@@ -30,7 +30,7 @@
               <h3><%= h(commentary_version.translated_title) %></h3>
               <%= h(commentary_version.translated_description) %>
             </td>
-            <% if CurrentUser.is_janitor? %>
+            <% if CurrentUser.is_moderator? %>
               <td>
                 <%= commentary_version.updater_ip_addr %>
               </td>

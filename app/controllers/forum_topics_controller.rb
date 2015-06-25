@@ -1,7 +1,7 @@
 class ForumTopicsController < ApplicationController
   respond_to :html, :xml, :json
   before_filter :member_only, :except => [:index, :show]
-  before_filter :janitor_only, :only => [:new_merge, :create_merge]
+  before_filter :moderator_only, :only => [:new_merge, :create_merge]
   before_filter :normalize_search, :only => :index
 
   def new

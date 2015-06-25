@@ -9,7 +9,7 @@
         <%= f.input :category, :collection => Danbooru.config.canonical_tag_category_mapping.to_a, :include_blank => false %>
       <% end %>
 
-      <% if CurrentUser.user.is_janitor? %>
+      <% if CurrentUser.is_moderator? %>
         <%= f.input :is_locked, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
       <% end %>
 

@@ -92,7 +92,7 @@ class ForumPost < ActiveRecord::Base
   end
 
   def validate_topic_is_unlocked
-    return if CurrentUser.user.is_janitor?
+    return if CurrentUser.user.is_moderator?
     return if topic.nil?
 
     if topic.is_locked?
@@ -110,7 +110,7 @@ class ForumPost < ActiveRecord::Base
   end
 
   def editable_by?(user)
-    creator_id == user.id || user.is_janitor?
+    creator_id == user.id || user.is_moderator?
   end
 
   def update_topic_updated_at_on_create

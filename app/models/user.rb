@@ -29,7 +29,8 @@ class User < ActiveRecord::Base
     :style_usernames                   => 0x0200,
     :enable_auto_complete              => 0x0400,
     :show_deleted_children             => 0x0800,
-    :has_saved_searches                => 0x1000
+    :has_saved_searches                => 0x1000,
+    :can_approve_posts                 => 0x2000
   }
 
   attr_accessor :password, :old_password

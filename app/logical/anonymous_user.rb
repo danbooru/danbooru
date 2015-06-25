@@ -108,6 +108,10 @@ class AnonymousUser
     false
   end
 
+  def can_approve_posts?
+    false
+  end
+
   def blacklisted_tags
     ""
   end

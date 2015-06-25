@@ -7,7 +7,7 @@
         <th width="10%">User</th>
         <th width="5%">Rating</th>
         <th width="5%">Parent</th>
-        <% if CurrentUser.is_janitor? %>
+        <% if CurrentUser.is_moderator? %>
           <th width="10%">IP Address</th>
         <% end %>
         <th>Tags</th>
@@ -28,7 +28,7 @@
           </td>
           <td><%= post_version.rating %></td>
           <td><%= post_version.parent_id %></td>
-          <% if CurrentUser.is_janitor? %>
+          <% if CurrentUser.is_moderator? %>
             <td>
               <%= post_version.updater_ip_addr %>
             </td>

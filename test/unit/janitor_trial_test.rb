@@ -22,10 +22,10 @@ class JanitorTrialTest < ActiveSupport::TestCase
         end
       end
 
-      should "toggle the janitor flag on the user" do
+      should "toggle the can_approve_posts flag on the user" do
         janitor_trial = JanitorTrial.create(:user_id => @user.id)
         @user.reload
-        assert(@user.is_janitor?)
+        assert(@user.can_approve_posts?)
       end
     end
 
@@ -38,6 +38,12 @@ class JanitorTrialTest < ActiveSupport::TestCase
         assert_difference("UserFeedback.count", 1) do
           @janitor_trial.demote!
         end
+      end
+
+      should "revoke approval privileges" do
+        @janitor_trial.demote!
+        @user.reload
+        assert_equal(false, @user.can_approve_posts?)
       end
     end
 

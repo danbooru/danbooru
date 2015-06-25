@@ -1,7 +1,7 @@
 module Moderator
   module Post
     class PostsController < ApplicationController
-      before_filter :janitor_only, :only => [:delete, :undelete, :ban, :unban, :confirm_delete, :confirm_ban]
+      before_filter :moderator_only, :only => [:delete, :undelete, :ban, :unban, :confirm_delete, :confirm_ban]
       before_filter :admin_only, :only => [:expunge]
       rescue_from ::PostFlag::Error, :with => :rescue_exception
 

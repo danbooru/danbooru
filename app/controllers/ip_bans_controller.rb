@@ -1,5 +1,5 @@
 class IpBansController < ApplicationController
-  before_filter :janitor_only
+  before_filter :moderator_only
 
   def new
     @ip_ban = IpBan.new

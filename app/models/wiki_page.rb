@@ -9,7 +9,7 @@ class WikiPage < ActiveRecord::Base
   belongs_to :updater, :class_name => "User"
   validates_uniqueness_of :title, :case_sensitive => false
   validates_presence_of :title
-  validate :validate_locker_is_janitor
+  validate :validate_locker_is_moderator
   validate :validate_not_locked
   attr_accessible :title, :body, :is_locked, :other_names
   has_one :tag, :foreign_key => "name", :primary_key => "title"
@@ -112,15 +112,15 @@ class WikiPage < ActiveRecord::Base
     titled(title).select("title, id").first
   end
 
-  def validate_locker_is_janitor
-    if is_locked_changed? && !CurrentUser.is_janitor?
-      errors.add(:is_locked, "can be modified by janitors only")
+  def validate_locker_is_moderator
+    if is_locked_changed? && !CurrentUser.is_moderator?
+      errors.add(:is_locked, "can be modified by moderators only")
       return false
     end
   end
 
   def validate_not_locked
-    if is_locked? && !CurrentUser.is_janitor?
+    if is_locked? && !CurrentUser.is_moderator?
       errors.add(:is_locked, "and cannot be updated")
       return false
     end
@@ -230,7 +230,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def visible?
-    artist.blank? || !artist.is_banned? || CurrentUser.user.is_janitor?
+    artist.blank? || !artist.is_banned? || CurrentUser.is_moderator?
   end
 
   def other_names_array

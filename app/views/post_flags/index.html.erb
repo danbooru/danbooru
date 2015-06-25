@@ -7,7 +7,7 @@
       <thead>
         <tr>
           <th width="1%"></th>
-          <% if CurrentUser.user.is_janitor? %>
+          <% if CurrentUser.user.is_moderator? %>
             <th width="10%">Creator</th>
           <% end %>
           <th>Reason</th>
@@ -18,7 +18,7 @@
         <% @post_flags.each do |post_flag| %>
           <tr class="resolved-<%= post_flag.is_resolved? %>">
             <td><%= PostPresenter.preview(post_flag.post, :tags => "status:any") %></td>
-            <% if CurrentUser.user.is_janitor? %>
+            <% if CurrentUser.user.is_moderator? %>
               <td>
                 <%= link_to_user post_flag.creator %>
               </td>

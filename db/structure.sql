@@ -668,8 +668,7 @@ CREATE TABLE artist_versions (
     url_string text,
     is_banned boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    normalized_url_string text
+    updated_at timestamp without time zone
 );
 
 
@@ -977,6 +976,40 @@ CREATE SEQUENCE dmails_id_seq
 --
 
 ALTER SEQUENCE dmails_id_seq OWNED BY dmails.id;
+
+
+--
+-- Name: favorite_groups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favorite_groups (
+    id integer NOT NULL,
+    name text NOT NULL,
+    creator_id integer NOT NULL,
+    post_ids text DEFAULT ''::text NOT NULL,
+    post_count integer DEFAULT 0 NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: favorite_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE favorite_groups_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: favorite_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE favorite_groups_id_seq OWNED BY favorite_groups.id;
 
 
 --
@@ -2190,7 +2223,7 @@ CREATE TABLE janitor_trials (
     id integer NOT NULL,
     creator_id integer NOT NULL,
     user_id integer NOT NULL,
-    original_level integer NOT NULL,
+    original_level integer,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     status character varying(255) DEFAULT 'active'::character varying NOT NULL
@@ -3350,6 +3383,13 @@ ALTER TABLE ONLY dmails ALTER COLUMN id SET DEFAULT nextval('dmails_id_seq'::reg
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY favorite_groups ALTER COLUMN id SET DEFAULT nextval('favorite_groups_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY favorites ALTER COLUMN id SET DEFAULT nextval('favorites_id_seq'::regclass);
 
 
@@ -4413,6 +4453,14 @@ ALTER TABLE ONLY dmails
 
 
 --
+-- Name: favorite_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY favorite_groups
+    ADD CONSTRAINT favorite_groups_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: favorites_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -4913,6 +4961,20 @@ CREATE INDEX index_dmails_on_message_index ON dmails USING gin (message_index);
 --
 
 CREATE INDEX index_dmails_on_owner_id ON dmails USING btree (owner_id);
+
+
+--
+-- Name: index_favorite_groups_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_favorite_groups_on_creator_id ON favorite_groups USING btree (creator_id);
+
+
+--
+-- Name: index_favorite_groups_on_lower_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_favorite_groups_on_lower_name ON favorite_groups USING btree (lower(name));
 
 
 --
@@ -6673,6 +6735,13 @@ CREATE UNIQUE INDEX index_posts_on_md5 ON posts USING btree (md5);
 
 
 --
+-- Name: index_posts_on_mpixels; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_posts_on_mpixels ON posts USING btree (((((image_width * image_height))::numeric / 1000000.0)));
+
+
+--
 -- Name: index_posts_on_parent_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -7179,10 +7248,6 @@ INSERT INTO schema_migrations (version) VALUES ('20141017231608');
 
 INSERT INTO schema_migrations (version) VALUES ('20141120045943');
 
-INSERT INTO schema_migrations (version) VALUES ('20141203230229');
-
-INSERT INTO schema_migrations (version) VALUES ('20150116013315');
-
 INSERT INTO schema_migrations (version) VALUES ('20150119191042');
 
 INSERT INTO schema_migrations (version) VALUES ('20150120005624');
@@ -7192,4 +7257,8 @@ INSERT INTO schema_migrations (version) VALUES ('20150128005954');
 INSERT INTO schema_migrations (version) VALUES ('20150403224949');
 
 INSERT INTO schema_migrations (version) VALUES ('20150613010904');
+
+INSERT INTO schema_migrations (version) VALUES ('20150623191904');
+
+INSERT INTO schema_migrations (version) VALUES ('20150629235905');
 

@@ -207,7 +207,7 @@ class Pool < ActiveRecord::Base
   end
 
   def deletable_by?(user)
-    user.is_janitor?
+    user.is_moderator?
   end
 
   def create_mod_action_for_delete

@@ -46,11 +46,11 @@ class PostFlag < ActiveRecord::Base
         q = q.reason_matches(params[:reason_matches])
       end
 
-      if params[:creator_id].present? && (CurrentUser.user.is_janitor? || params[:creator_id].to_i == CurrentUser.user.id)
+      if params[:creator_id].present? && (CurrentUser.is_moderator? || params[:creator_id].to_i == CurrentUser.user.id)
         q = q.where("creator_id = ?", params[:creator_id].to_i)
       end
 
-      if params[:creator_name].present? && CurrentUser.user.is_janitor?
+      if params[:creator_name].present? && CurrentUser.is_moderator?
         q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].mb_chars.downcase.strip.tr(" ", "_"))
       end
 
@@ -84,7 +84,7 @@ class PostFlag < ActiveRecord::Base
   end
 
   def validate_creator_is_not_limited
-    if CurrentUser.is_janitor?
+    if CurrentUser.can_approve_posts?
       # do nothing
     elsif creator.created_at > 1.week.ago
       errors[:creator] << "cannot flag within the first week of sign up"

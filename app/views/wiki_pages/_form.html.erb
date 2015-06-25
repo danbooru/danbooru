@@ -18,7 +18,7 @@
 
     <%= dtext_field "wiki_page", "body" %>
 
-    <% if CurrentUser.user.is_janitor? %>
+    <% if CurrentUser.is_moderator? %>
       <%= f.input :is_locked %>
     <% end %>
 

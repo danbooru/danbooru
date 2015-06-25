@@ -7,7 +7,7 @@ module PostFlagsHelper
       html << '<li>'
       html << DText.parse_inline(flag.reason).html_safe
 
-      if CurrentUser.is_janitor?
+      if CurrentUser.is_moderator?
         html << ' - ' + link_to_user(flag.creator)
       end
 

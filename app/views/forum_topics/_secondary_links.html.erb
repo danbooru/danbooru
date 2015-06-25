@@ -20,7 +20,7 @@
       <% end %>
       <% if !@forum_topic.new_record? && @forum_topic.editable_by?(CurrentUser.user) %>
         <li><%= link_to "Edit", edit_forum_topic_path(@forum_topic) %></li>
-        <% if CurrentUser.is_janitor? %>
+        <% if CurrentUser.is_moderator? %>
           <% if @forum_topic.is_deleted? %>
             <li><%= link_to "Undelete", undelete_forum_topic_path(@forum_topic), :method => :post %></li>
           <% else %>

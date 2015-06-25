@@ -36,7 +36,7 @@ class JanitorTrialsControllerTest < ActionController::TestCase
       should "promote the janitor trial" do
         post :promote, {:id => @janitor_trial.id}, {:user_id => @admin.id}
         @user.reload
-        assert(@user.is_janitor?)
+        assert(@user.can_approve_posts?)
         @janitor_trial.reload
         assert_equal(false, @janitor_trial.active?)
       end
@@ -50,7 +50,7 @@ class JanitorTrialsControllerTest < ActionController::TestCase
       should "demote the janitor trial" do
         post :demote, {:id => @janitor_trial.id}, {:user_id => @admin.id}
         @user.reload
-        assert(!@user.is_janitor?)
+        assert(!@user.can_approve_posts?)
         @janitor_trial.reload
         assert_equal(false, @janitor_trial.active?)
       end

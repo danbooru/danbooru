@@ -102,9 +102,9 @@ class TagTest < ActiveSupport::TestCase
       MEMCACHE.flush_all
     end
 
-    should "be lockable by a janitor" do
+    should "be lockable by a moderator" do
       @tag = FactoryGirl.create(:tag)
-      @tag.update_attributes({:is_locked => true}, :as => :janitor)
+      @tag.update_attributes({:is_locked => true}, :as => :moderator)
       @tag.reload
       assert_equal(true, @tag.is_locked?)
     end

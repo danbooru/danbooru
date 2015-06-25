@@ -4,6 +4,7 @@ class PostsControllerTest < ActionController::TestCase
   context "The posts controller" do
     setup do
       @user = FactoryGirl.create(:user)
+      @api_key = ApiKey.generate!(@user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
       @post = FactoryGirl.create(:post, :uploader_id => @user.id, :tag_string => "aaaa")
@@ -19,7 +20,6 @@ class PostsControllerTest < ActionController::TestCase
       context "passing the api limit" do
         setup do
           User.any_instance.stubs(:api_hourly_limit).returns(5)
-          ApiKey.generate!(@user)
         end
         
         should "work" do
@@ -35,30 +35,30 @@ class PostsControllerTest < ActionController::TestCase
       
       context "using http basic auth" do
         should "succeed for password matches" do
-          @basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:#{@user.bcrypt_cookie_password_hash}")}"
+          @basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:#{@api_key.key}")}"
           @request.env['HTTP_AUTHORIZATION'] = @basic_auth_string
           get :index, {:format => "json"}
           assert_response :success
         end
         
-        # should "fail for password mismatches" do
-        #   @basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:badpassword")}"
-        #   @request.env['HTTP_AUTHORIZATION'] = @basic_auth_string
-        #   get :index, {:format => "json"}
-        #   assert_response 403
-        # end
+        should "fail for password mismatches" do
+          @basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:badpassword")}"
+          @request.env['HTTP_AUTHORIZATION'] = @basic_auth_string
+          get :index, {:format => "json"}
+          assert_response 401
+        end
       end
       
       context "using the api_key parameter" do
         should "succeed for password matches" do
-          get :index, {:format => "json", :login => @user.name, :api_key => @user.bcrypt_cookie_password_hash}
+          get :index, {:format => "json", :login => @user.name, :api_key => @api_key.key}
           assert_response :success
         end
         
-        # should "fail for password mismatches" do
-        #   get :index, {:format => "json", :login => @user.name, :api_key => "bad"}
-        #   assert_response 403
-        # end
+        should "fail for password mismatches" do
+          get :index, {:format => "json", :login => @user.name, :api_key => "bad"}
+          assert_response 401
+        end
       end
       
       context "using the password_hash parameter" do

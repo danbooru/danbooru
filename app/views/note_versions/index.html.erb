@@ -10,7 +10,7 @@
           <th width="5%">Note</th>
           <th>Body</th>
           <th width="5%">Position</th>
-          <% if CurrentUser.is_janitor? %>
+          <% if CurrentUser.is_moderator? %>
             <th width="10%">IP Address</th>
           <% end %>
           <th width="10%">Edited By</th>
@@ -36,7 +36,7 @@
             <td>
               <%= note_version_position_diff(note_version) %>
             </td>
-            <% if CurrentUser.is_janitor? %>
+            <% if CurrentUser.is_moderator? %>
               <td>
                 <%= note_version.updater_ip_addr %>
               </td>

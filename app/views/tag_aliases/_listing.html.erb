@@ -36,7 +36,7 @@
             | <%= link_to "Approve", approve_tag_alias_path(tag_alias), :remote => true, :method => :post %>
           <% end %>
 
-          <% if CurrentUser.is_janitor? %>
+          <% if CurrentUser.is_builder? %>
             | <%= link_to "Fix", tag_alias_correction_path(:tag_alias_id => tag_alias.id) %>
           <% end %>
         </td>
