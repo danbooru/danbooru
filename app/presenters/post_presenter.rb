@@ -235,7 +235,7 @@ class PostPresenter < Presenter
       first = true
       pools = @post.pools.series_first
       pools.each do |pool|
-        if first && template.params[:tags].blank?
+        if first && template.params[:tags].blank? && template.params[:favgroup_id].blank?
           html += pool_link_html(template, pool, :include_rel => true)
           first = false
         else
