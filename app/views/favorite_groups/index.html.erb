@@ -1,0 +1,40 @@
+<div id="c-favorite-groups">
+  <div id="a-index">
+    <table class="striped" width="100%">
+      <thead>
+        <tr>
+          <th width="5%"></th>
+          <th width="60%">Name</th>
+          <th width="10%">Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @favorite_groups.each do |favgroup| %>
+          <%= content_tag(:tr, :id => "favorite-group-#{favgroup.id}") do %>
+            <td>
+
+            </td>
+            <td>
+              <%= link_to favgroup.pretty_name, favorite_group_path(favgroup) %>
+
+              <% if favgroup.post_count > CurrentUser.user.per_page %>
+                <%= link_to "page #{favgroup.last_page}", favorite_group_path(favgroup, :page => favgroup.last_page), :class => "last-page" %>
+              <% end %>
+            </td>
+            <td>
+              <%= favgroup.post_count %>
+            </td>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+
+    <%= numbered_paginator(@favorite_groups) %>
+
+    <%= render "secondary_links" %>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  Favorite Groups - <%= Danbooru.config.app_name %>
+<% end %>

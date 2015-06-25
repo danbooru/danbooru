@@ -1,0 +1,25 @@
+<div id="favgroup-nav">
+  <ul>
+    <% post.favorite_groups.each do |favgroup| %>
+      <li>
+        <% klass = "active" if favgroup.id == params[:favgroup_id].to_i %>
+
+        <% if favgroup.neighbors(post).previous %>
+          <%= link_to("&lsaquo;&thinsp;prev".html_safe, post_path(favgroup.neighbors(post).previous, :favgroup_id => favgroup.id), :rel => "prev", :class => "prev #{klass}") %>
+        <% else %>
+          <span class="prev">&lsaquo;&thinsp;prev</span>
+        <% end %>
+
+        <span class="favgroup-name <%= klass %>">
+          <%= link_to("Favorite group: #{favgroup.name}", favorite_group_path(favgroup)) %>
+        </span>
+
+        <% if favgroup.neighbors(post).next %>
+          <%= link_to("next&thinsp;&rsaquo;".html_safe, post_path(favgroup.neighbors(post).next, :favgroup_id => favgroup.id), :rel => "next", :class => "next #{klass}") %>
+        <% else %>
+          <span class="next">next&thinsp;&rsaquo;</span>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</div>

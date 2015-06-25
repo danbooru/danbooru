@@ -130,14 +130,10 @@ private
         if post.errors.any?
           @error_message = post.errors.full_messages.join("; ")
           render :template => "static/error", :status => 500
-        elsif params[:tags_query].present? && params[:pool_id].present?
-          redirect_to post_path(post, :tags => params[:tags_query], :pool_id => params[:pool_id])
-        elsif params[:tags_query].present?
-          redirect_to post_path(post, :tags => params[:tags_query])
-        elsif params[:pool_id].present?
-          redirect_to post_path(post, :pool_id => params[:pool_id])
         else
-          redirect_to post_path(post)
+          response_params = {:tags => params[:tags_query], :pool_id => params[:pool_id], :favgroup_id => params[:favgroup_id]}
+          response_params.reject!{|key, value| value.blank?}
+          redirect_to post_path(post, response_params)
         end
       end
 

@@ -629,7 +629,7 @@ class Post < ActiveRecord::Base
 
     def filter_metatags(tags)
       @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent|-parent):/i}
-      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav|child):/i}
+      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav|child|-favgroup|favgroup):/i}
       apply_pre_metatags
       return tags
     end
@@ -669,6 +669,22 @@ class Post < ActiveRecord::Base
           child = Post.find($1)
           child.parent_id = id
           child.save
+
+        when /^-favgroup:(\d+)$/i
+          favgroup = FavoriteGroup.where("id = ?", $1.to_i).for_creator(CurrentUser.user.id).first
+          favgroup.remove!(self) if favgroup
+
+        when /^-favgroup:(.+)$/i
+          favgroup = FavoriteGroup.named($1).for_creator(CurrentUser.user.id).first
+          favgroup.remove!(self) if favgroup
+
+        when /^favgroup:(\d+)$/i
+          favgroup = FavoriteGroup.where("id = ?", $1.to_i).for_creator(CurrentUser.user.id).first
+          favgroup.add!(self) if favgroup
+
+        when /^favgroup:(.+)$/i
+          favgroup = FavoriteGroup.named($1).for_creator(CurrentUser.user.id).first
+          favgroup.add!(self) if favgroup
         end
       end
     end
@@ -820,6 +836,14 @@ class Post < ActiveRecord::Base
 
     def favorited_users
       favorited_user_ids.map {|id| User.find(id)}
+    end
+
+    def favorite_groups
+      @favorite_groups ||= begin
+        CurrentUser.user.favorite_groups.select do |favgroup|
+          favgroup.contains?(self.id)
+        end
+      end
     end
   end
 
@@ -1578,6 +1602,7 @@ class Post < ActiveRecord::Base
     super
     reset_tag_array_cache
     @pools = nil
+    @favorite_groups = nil
     @tag_categories = nil
     @typed_tags = nil
     self

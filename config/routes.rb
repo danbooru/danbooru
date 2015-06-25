@@ -109,6 +109,7 @@ Rails.application.routes.draw do
   end
   resource  :dtext_preview, :only => [:create]
   resources :favorites
+  resources :favorite_groups
   resources :forum_posts do
     member do
       post :undelete

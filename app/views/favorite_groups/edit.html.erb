@@ -1,0 +1,19 @@
+<div id="c-favorite-groups">
+  <div id="a-edit">
+    <h1>Edit Favorite Group: <%= @favorite_group.pretty_name %></h1>
+
+    <%= error_messages_for "favorite_group" %>
+
+    <%= simple_form_for(@favorite_group) do |f| %>
+      <%= f.input :name, :as => :string, :input_html => { :value => @favorite_group.pretty_name } %>
+      <%= f.input :post_ids, :label => "Posts" %>
+      <%= f.button :submit, "Submit" %>
+    <% end %>
+  </div>
+</div>
+
+<%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Edit Favorite Group - <%= Danbooru.config.app_name %>
+<% end %>
