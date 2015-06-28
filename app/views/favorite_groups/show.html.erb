@@ -4,6 +4,9 @@
       Favorite Group:
       <%= link_to @favorite_group.pretty_name, posts_path(:tags => "favgroup:#{@favorite_group.id}") %>
     </h1>
+    Creator: <%= link_to_user @favorite_group.creator %>
+    <br>
+    <br>
 
     <%= render "posts/partials/common/inline_blacklist" %>
 
