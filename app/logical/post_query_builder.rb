@@ -314,8 +314,10 @@ class PostQueryBuilder
 
     if q[:favgroup].present?
       favgroup_id = q[:favgroup].to_i
-      post_ids = FavoriteGroup.find(favgroup_id).post_id_array
-      relation = relation.where("posts.id in (?)", post_ids)
+      favgroup = FavoriteGroup.where("favorite_groups.id = ?", favgroup_id).first
+      if favgroup
+        relation = relation.where("posts.id in (?)", favgroup.post_id_array)
+      end
     end
 
     if q[:ordfav].present?
