@@ -1,6 +1,6 @@
 <div id="favgroup-nav">
   <ul>
-    <% post.favorite_groups.each do |favgroup| %>
+    <% post.favorite_groups(active_id=params[:favgroup_id]).each do |favgroup| %>
       <li>
         <% klass = "active" if favgroup.id == params[:favgroup_id].to_i %>
 
