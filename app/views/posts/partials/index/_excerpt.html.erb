@@ -69,6 +69,12 @@
     </div>
 
     <p><%= link_to "View pool", pool_path(post_set.pool.id) %></p>
+  <% elsif post_set.has_favgroup? %>
+    <h4>
+      Favorite Group:
+      <%= link_to post_set.favgroup.pretty_name, favorite_group_path(post_set.favgroup) %>
+    </h4>
+    Creator: <%= link_to_user post_set.favgroup.creator %>
   <% else %>
     <% if post_set.tag_string.present? %>
       <p>There is currently no wiki page for the tag "<%= post_set.tag_string %>". You can <%= link_to "create one", new_wiki_page_path(:wiki_page => {:title => post_set.tag_string}) %>.</p>

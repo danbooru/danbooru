@@ -84,8 +84,22 @@ class FavoriteGroup < ActiveRecord::Base
     self.post_ids = post_ids.scan(/\d+/).uniq.join(" ")
   end
 
+  def self.normalize_name(name)
+    name.gsub(/\s+/, "_")
+  end
+
   def normalize_name
-    self.name = name.gsub(/\s+/, "_")
+    self.name = FavoriteGroup.normalize_name(name)
+  end
+
+  def self.find_by_name(name)
+    if name =~ /^\d+$/
+      where("id = ?", name.to_i).first
+    elsif name
+      where("lower(name) = ?", normalize_name(name).mb_chars.downcase).first
+    else
+      nil
+    end
   end
 
   def initialize_creator
