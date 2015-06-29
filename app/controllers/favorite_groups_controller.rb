@@ -42,12 +42,9 @@ class FavoriteGroupsController < ApplicationController
   end
 
   def update
-    # need to do this in order for synchronize! to work correctly
     @favorite_group = FavoriteGroup.find(params[:id])
     check_privilege(@favorite_group)
-    @favorite_group.attributes = params[:favorite_group]
-    @favorite_group.synchronize
-    @favorite_group.save
+    @favorite_group.update_attributes(params[:favorite_group])
     unless @favorite_group.errors.any?
       flash[:notice] = "Favorite group updated"
     end

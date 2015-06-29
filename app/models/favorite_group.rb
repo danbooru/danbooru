@@ -10,7 +10,7 @@ class FavoriteGroup < ActiveRecord::Base
   before_validation :strip_name
   validate :creator_can_create_favorite_groups, :on => :create
   validate :validate_number_of_posts
-  after_create :synchronize!
+  before_save :update_post_count
   attr_accessible :name, :post_ids, :post_id_array, :as => [:member, :gold, :platinum, :builder, :contributor, :janitor, :moderator, :admin, :default]
 
   module SearchMethods
@@ -149,32 +149,24 @@ class FavoriteGroup < ActiveRecord::Base
     @post_id_array_was = nil
   end
 
-  def synchronize
-    added = post_id_array - post_id_array_was
-    removed = post_id_array_was - post_id_array
-
+  def update_post_count
     normalize_post_ids
     clear_post_id_array
     self.post_count = post_id_array.size
   end
 
-  def synchronize!
-    synchronize
-    save
-  end
-
   def add!(post)
     return if contains?(post.id)
 
-    update_attributes(:post_ids => add_number_to_string(post.id, post_ids), :post_count => post_count + 1)
     clear_post_id_array
+    update_attributes(:post_ids => add_number_to_string(post.id, post_ids))
   end
 
   def remove!(post)
     return unless contains?(post.id)
 
-    update_attributes(:post_ids => remove_number_from_string(post.id, post_ids), :post_count => post_count - 1)
     clear_post_id_array
+    update_attributes(:post_ids => remove_number_from_string(post.id, post_ids))
   end
 
   def add_number_to_string(number, string)
