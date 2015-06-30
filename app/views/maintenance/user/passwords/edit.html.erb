@@ -1,0 +1,15 @@
+<div id="c-users">
+  <div id="a-edit">
+    <h1>Change Password</h1>
+
+    <%= simple_form_for @user do |f| %>
+      <%= f.input :old_password, :as => :password, :input_html => {:autocomplete => "off"} %>
+      <%= f.input :password, :label => "New password", :input_html => {:autocomplete => "off"} %>
+      <%= f.button :submit, "Submit" %>
+    <% end %>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  Change Password - <%= Danbooru.config.app_name %>
+<% end %>

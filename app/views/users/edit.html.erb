@@ -3,7 +3,14 @@
     <h1>Settings</h1>
 
     <%= simple_form_for @user do |f| %>
-      <h2 id="edit-options"><%= link_to "Basic settings", "#basic-settings", :class => "active" %> | <%= link_to "Advanced settings", "#advanced-settings" %> | <%= link_to "Change password", "#change-password" %> | <%= link_to "Delete account", maintenance_user_deletion_path, :id => "delete-account" %></h2>
+      <h2 id="edit-options">
+        <%= link_to "Basic settings", "#basic-settings", :class => "active" %> 
+        | <%= link_to "Advanced settings", "#advanced-settings" %> 
+        <% if CurrentUser.user.id == @user.id %>
+          | <%= link_to "Change password", edit_user_password_path(:user_id => @user.id), :id => "change-password" %> 
+          | <%= link_to "Delete account", maintenance_user_deletion_path, :id => "delete-account" %>
+        <% end %>
+      </h2>
 
       <fieldset id="basic-settings-section">
         <div class="input">
@@ -77,12 +84,6 @@
         <%= f.input :custom_style, :label => "Custom <a href='http://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, :hint => "Style to apply to the whole site.", :input_html => {:size => "40x5"} %>
       </fieldset>
 
-      <fieldset id="change-password-section">
-        <%= f.input :password, :hint => "Leave blank if you don't want to change your password", :label => "New password", :input_html => {:autocomplete => "off"} %>
-        
-        <%= f.input :old_password, :as => :password, :input_html => {:autocomplete => "off"} %>
-      </fieldset>
-
       <%= f.button :submit, "Submit" %>
     <% end %>
   </div>
@@ -95,11 +96,11 @@
 <% content_for(:html_header) do %>
   <script type="text/javascript">
     $(function() {
-      $("#change-password-section,#advanced-settings-section").hide();
-      $("#edit-options a:not(#delete-account)").on("click", function(e) {
+      $("#advanced-settings-section").hide();
+      $("#edit-options a:not(#delete-account):not(#change-password)").on("click", function(e) {
         var $target = $(e.target);
         $("h2 a").removeClass("active");
-        $("#basic-settings-section,#change-password-section,#advanced-settings-section").hide();
+        $("#basic-settings-section,#advanced-settings-section").hide();
         $target.addClass("active")
         $($target.attr("href") + "-section").show();
         e.preventDefault();

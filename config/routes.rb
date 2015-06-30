@@ -248,6 +248,8 @@ Rails.application.routes.draw do
     end
   end
   resources :users do
+    resource :password, :only => [:edit], :controller => "maintenance/user/passwords"
+
     collection do
       get :search
       get :custom_style
