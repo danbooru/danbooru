@@ -109,7 +109,9 @@ Rails.application.routes.draw do
   end
   resource  :dtext_preview, :only => [:create]
   resources :favorites
-  resources :favorite_groups
+  resources :favorite_groups do
+    resource :order, :only => [:edit], :controller => "favorite_group_orders"
+  end
   resources :forum_posts do
     member do
       post :undelete
@@ -164,7 +166,7 @@ Rails.application.routes.draw do
     collection do
       get :gallery
     end
-    resource :order, :only => [:edit, :update], :controller => "pool_orders"
+    resource :order, :only => [:edit], :controller => "pool_orders"
   end
   resource  :pool_element, :only => [:create, :destroy] do
     collection do

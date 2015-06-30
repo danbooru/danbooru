@@ -1,0 +1,24 @@
+<div id="c-favorite-group-orders">
+  <div id="a-edit">
+    <h1>Order Favorite Group: <%= @favorite_group.pretty_name %></h1>
+    <p>Drag and drop the list below to determine ordering.</p>
+
+    <ul id="sortable">
+      <% @favorite_group.posts(:limit => 1_000).each do |post| %>
+        <li class="ui-state-default" id="favorite_group[post_id_array]_<%= post.id %>">
+          <%= link_to(image_tag(post.preview_file_url), post_path(post)) %>
+        </li>
+      <% end %>
+    </ul>
+
+    <%= simple_form_for(@favorite_group, :format => :js, :html => {:id => "ordering-form"}) do |f| %>
+      <%= submit_tag "Save" %>
+    <% end %>
+  </div>
+</div>
+
+<%= render "favorite_groups/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Order Favorite Group - <%= Danbooru.config.app_name %>
+<% end %>

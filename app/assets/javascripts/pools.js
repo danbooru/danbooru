@@ -12,7 +12,7 @@
       this.initialize_add_to_pool_link();
     }
 
-    if ($("#c-pool-orders").length) {
+    if ($("#c-pool-orders,#c-favorite-group-orders").length) {
       this.initialize_simple_edit();
     }
   }
