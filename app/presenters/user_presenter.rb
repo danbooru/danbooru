@@ -25,6 +25,16 @@ class UserPresenter
     end
   end
 
+  def permissions
+    permissions = []
+
+    if user.can_approve_posts?
+      permissions << "approve posts"
+    end
+
+    permissions.join(", ")
+  end
+
   def posts_for_subscription(subscription)
     arel = Post.where("id in (?)", subscription.post_id_array.map(&:to_i)).order("id desc").limit(6)
 

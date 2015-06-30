@@ -17,6 +17,11 @@
         <td><%= presenter.level %></td>
       </tr>
 
+      <tr>
+        <th>Permissions</th>
+        <td><%= presenter.permissions %></td>
+      </tr>
+
       <% if user.is_banned? && user.recent_ban %>
         <tr>
           <th>Ban reason</th>
