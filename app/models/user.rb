@@ -256,7 +256,7 @@ class User < ActiveRecord::Base
     end
 
     def favorite_groups
-      FavoriteGroup.for_creator(CurrentUser.user.id)
+      FavoriteGroup.for_creator(CurrentUser.user.id).order("updated_at desc")
     end
   end
 

@@ -1,0 +1,11 @@
+<p>Select a favorite group to add this post to:</p>
+
+<% CurrentUser.favorite_groups.each_with_index do |favgroup, i| %>
+  <div>
+    <%= i + 1 %>.
+    <%= link_to favgroup.name,
+      add_post_favorite_group_path(favgroup, :post_id => post.id, :format => :js),
+      :id => "add-to-favgroup-#{i + 1}", :class => "add-to-favgroup",
+      :method => :put, :remote => true %>
+  </div>
+<% end %>

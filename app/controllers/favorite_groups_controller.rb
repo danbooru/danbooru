@@ -1,6 +1,6 @@
 class FavoriteGroupsController < ApplicationController
   before_filter :member_only, :except => [:index, :show]
-  respond_to :html, :xml, :json
+  respond_to :html, :xml, :json, :js
 
   def index
     @favorite_groups = FavoriteGroup.search(params[:search]).order("updated_at desc").paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
@@ -57,6 +57,13 @@ class FavoriteGroupsController < ApplicationController
     @favorite_group.destroy
     flash[:notice] = "Favorite group deleted"
     redirect_to favorite_groups_path
+  end
+
+  def add_post
+    @favorite_group = FavoriteGroup.find(params[:id])
+    check_privilege(@favorite_group)
+    @post = Post.find(params[:post_id])
+    @favorite_group.add!(@post)
   end
 
 private
