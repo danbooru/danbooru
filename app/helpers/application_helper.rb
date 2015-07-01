@@ -77,7 +77,9 @@ module ApplicationHelper
   end
 
   def link_to_user(user)
-    user_class = CurrentUser.user.style_usernames? ? "#{user.level_class} with-style" : user.level_class
+    user_class = user.level_class
+    user_class = user_class + " user-post-approver" if user.can_approve_posts?
+    user_class = user_class + " with-style" if CurrentUser.user.style_usernames?
     link_to(user.pretty_name, user_path(user), :class => user_class)
   end
 
