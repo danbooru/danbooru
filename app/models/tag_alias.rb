@@ -235,21 +235,17 @@ class TagAlias < ActiveRecord::Base
 
   def update_forum_topic_for_approve
     if forum_topic
-      CurrentUser.scoped(User.admins.first, "127.0.0.1") do
-        forum_topic.posts.create(
-          :body => "The tag alias #{antecedent_name} -> #{consequent_name} has been approved."
-        )
-      end
+      forum_topic.posts.create(
+        :body => "The tag alias #{antecedent_name} -> #{consequent_name} has been approved."
+      )
     end
   end
 
   def update_forum_topic_for_reject
     if forum_topic
-      CurrentUser.scoped(User.admins.first, "127.0.0.1") do
-        forum_topic.posts.create(
-          :body => "The tag alias #{antecedent_name} -> #{consequent_name} has been rejected."
-        )
-      end
+      forum_topic.posts.create(
+        :body => "The tag alias #{antecedent_name} -> #{consequent_name} has been rejected."
+      )
     end
   end
 
