@@ -248,6 +248,7 @@ Rails.application.routes.draw do
   resources :uploads do
     collection do
       get :batch
+      get :image_proxy
     end
   end
   resources :users do

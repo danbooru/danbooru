@@ -33,6 +33,27 @@ class UploadsController < ApplicationController
     @urls = @source.image_urls
   end
 
+  def image_proxy
+    if params[:url].blank? || params[:ref].blank?
+      raise "Must specify url and referer"
+    end
+
+    url = URI.parse(params[:url])
+    headers = {
+      "Referer" => params[:ref],
+      "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
+    }
+
+    Net::HTTP.start(url.host, url.port) do |http|
+      resp = http.request_get(url.request_uri, headers)
+      if resp.is_a?(Net::HTTPSuccess)
+        send_data resp.body, type: resp.content_type, disposition: "inline"
+      else
+        raise "HTTP error code: #{resp.code} #{resp.message}"
+      end
+    end
+  end
+
   def index
     @search = Upload.search(params[:search])
     @uploads = @search.order("id desc").paginate(params[:page], :limit => params[:limit])
