@@ -56,7 +56,7 @@ class CommentsController < ApplicationController
   def destroy
     @comment = Comment.find(params[:id])
     check_privilege(@comment)
-    @comment.destroy
+    @comment.delete!
     respond_with(@comment) do |format|
       format.js
     end

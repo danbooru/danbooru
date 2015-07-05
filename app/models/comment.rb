@@ -171,6 +171,10 @@ class Comment < ActiveRecord::Base
   def hidden_attributes
     super + [:body_index]
   end
+
+  def delete!
+    update_attribute(:is_deleted, true)
+  end
 end
 
 Comment.connection.extend(PostgresExtensions)
