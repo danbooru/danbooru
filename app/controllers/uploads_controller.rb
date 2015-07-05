@@ -34,24 +34,8 @@ class UploadsController < ApplicationController
   end
 
   def image_proxy
-    if params[:url].blank? || params[:ref].blank?
-      raise "Must specify url and referer"
-    end
-
-    url = URI.parse(params[:url])
-    headers = {
-      "Referer" => params[:ref],
-      "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
-    }
-
-    Net::HTTP.start(url.host, url.port) do |http|
-      resp = http.request_get(url.request_uri, headers)
-      if resp.is_a?(Net::HTTPSuccess)
-        send_data resp.body, type: resp.content_type, disposition: "inline"
-      else
-        raise "HTTP error code: #{resp.code} #{resp.message}"
-      end
-    end
+    resp = ImageProxy.get_image(params[:url])
+    send_data resp.body, :type => resp.content_type, :disposition => "inline"
   end
 
   def index

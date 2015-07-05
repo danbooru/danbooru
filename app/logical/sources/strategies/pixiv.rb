@@ -6,7 +6,7 @@ module Sources
   module Strategies
     class Pixiv < Base
       attr_reader :zip_url, :ugoira_frame_data, :ugoira_content_type
-      
+
       MONIKER   = '(?:[a-zA-Z0-9_-]+)'
       TIMESTAMP = '(?:[0-9]{4}/[0-9]{2}/[0-9]{2}/[0-9]{2}/[0-9]{2}/[0-9]{2})'
       EXT = "(?:jpg|jpeg|png|gif)"
@@ -33,6 +33,10 @@ module Sources
 
       def unique_id
         @pixiv_moniker
+      end
+
+      def fake_referer
+        "http://www.pixiv.net"
       end
 
       def has_artist_commentary?

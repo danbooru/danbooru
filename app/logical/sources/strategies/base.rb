@@ -74,6 +74,11 @@ module Sources
         [image_url]
       end
 
+      # Should be set to a url for sites that prevent hotlinking, or left nil for sites that don't.
+      def fake_referer
+        nil
+      end
+
     protected
       def agent
         raise NotImplementedError
