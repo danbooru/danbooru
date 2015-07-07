@@ -845,7 +845,8 @@ CREATE TABLE comments (
     updated_at timestamp without time zone,
     updater_id integer,
     updater_ip_addr inet,
-    do_not_bump_post boolean DEFAULT false NOT NULL
+    do_not_bump_post boolean DEFAULT false NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL
 );
 
 
@@ -7261,4 +7262,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150613010904');
 INSERT INTO schema_migrations (version) VALUES ('20150623191904');
 
 INSERT INTO schema_migrations (version) VALUES ('20150629235905');
+
+INSERT INTO schema_migrations (version) VALUES ('20150705014135');
 

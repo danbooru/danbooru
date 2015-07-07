@@ -108,7 +108,7 @@ class PoolTest < ActiveSupport::TestCase
       end
 
       should "add the pool to the post" do
-        assert_equal("pool:#{@pool.id}", @p1.pool_string)
+        assert_equal("pool:#{@pool.id} pool:series", @p1.pool_string)
       end
 
       should "increment the post count" do
@@ -125,7 +125,7 @@ class PoolTest < ActiveSupport::TestCase
         end
 
         should "not double add the pool to the post" do
-          assert_equal("pool:#{@pool.id}", @p1.pool_string)
+          assert_equal("pool:#{@pool.id} pool:series", @p1.pool_string)
         end
 
         should "not double increment the post count" do
@@ -190,7 +190,7 @@ class PoolTest < ActiveSupport::TestCase
         end
 
         should "not affect the post" do
-          assert_equal("pool:#{@pool.id}", @p1.pool_string)
+          assert_equal("pool:#{@pool.id} pool:series", @p1.pool_string)
         end
 
         should "not affect the post count" do
@@ -271,7 +271,7 @@ class PoolTest < ActiveSupport::TestCase
         @p2.reload
         @p3.reload
         assert_equal("", @p1.pool_string)
-        assert_equal("pool:#{@pool.id}", @p2.pool_string)
+        assert_equal("pool:#{@pool.id} pool:series", @p2.pool_string)
         assert_equal("", @p3.pool_string)
       end
     end
