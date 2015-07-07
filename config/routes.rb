@@ -56,6 +56,7 @@ Rails.application.routes.draw do
       resource :login_reminder, :only => [:new, :create]
       resource :deletion, :only => [:show, :destroy]
       resource :email_change, :only => [:new, :create]
+      resource :dmail_filter, :only => [:edit, :update]
     end
   end
 

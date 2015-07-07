@@ -20,6 +20,10 @@ class AnonymousUser
     Time.now
   end
 
+  def dmail_filter
+    nil
+  end
+
   def name
     "Anonymous"
   end

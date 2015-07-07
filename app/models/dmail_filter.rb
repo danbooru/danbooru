@@ -11,7 +11,7 @@ class DmailFilter < ActiveRecord::Base
   end
 
   def filtered?(dmail)
-    dmail.from.level <= User::Levels::MODERATOR && has_filter? && (dmail.body =~ regexp || dmail.title =~ regexp)
+    dmail.from.level <= User::Levels::MODERATOR && has_filter? && (dmail.body =~ regexp || dmail.title =~ regexp || dmail.from.name =~ regexp)
   end
 
   def has_filter?
@@ -19,6 +19,6 @@ class DmailFilter < ActiveRecord::Base
   end
 
   def regexp
-    @regexp ||= Regexp.compile(words.scan(/\S+/).map {|x| Regexp.escape(x)}.join("|"))
+    @regexp ||= Regexp.compile('\b(?:' + words.scan(/\S+/).map {|x| Regexp.escape(x)}.join("|") + ')\b')
   end
 end
