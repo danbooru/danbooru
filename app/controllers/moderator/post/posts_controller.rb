@@ -1,7 +1,7 @@
 module Moderator
   module Post
     class PostsController < ApplicationController
-      before_filter :moderator_only, :only => [:delete, :undelete, :ban, :unban, :confirm_delete, :confirm_ban]
+      before_filter :moderator_only, :only => [:delete, :undelete, :move_favorites, :ban, :unban, :confirm_delete, :confirm_move_favorites, :confirm_ban]
       before_filter :admin_only, :only => [:expunge]
       rescue_from ::PostFlag::Error, :with => :rescue_exception
 
@@ -21,6 +21,18 @@ module Moderator
       def undelete
         @post = ::Post.find(params[:id])
         @post.undelete!
+      end
+
+      def confirm_move_favorites
+        @post = ::Post.find(params[:id])
+      end
+
+      def move_favorites
+        @post = ::Post.find(params[:id])
+        if params[:commit] == "Submit"
+          @post.give_favorites_to_parent
+        end
+        redirect_to(post_path(@post))
       end
 
       def expunge

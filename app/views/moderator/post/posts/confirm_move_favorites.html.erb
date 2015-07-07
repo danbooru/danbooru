@@ -1,0 +1,12 @@
+<h1>Move Favorites to Parent</h1>
+
+<div>
+  <%= PostPresenter.preview(@post, :tags => "status:any") %>
+</div>
+
+<p style="clear: both;">This will move all the post's favorites to its parent post. Are you sure?</p>
+
+<%= form_tag(move_favorites_moderator_post_post_path, :style => "clear: both;", :class => "simple_form") do %>
+  <%= submit_tag "Submit" %>
+  <%= submit_tag "Cancel" %>
+<% end %>
