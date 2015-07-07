@@ -6,7 +6,7 @@ module Sources
       end
 
       def referer_url
-        if @referer_url =~ /seiga\.nicovideo\.jp\/seiga\/im\d+/ && @url =~ /http:\/\/lohas\.nicoseiga\.jp\/priv\//
+        if @referer_url =~ /seiga\.nicovideo\.jp\/seiga\/im\d+/ && @url =~ /http:\/\/lohas\.nicoseiga\.jp\/(?:priv|o)\//
           @referer_url
         else
           @url

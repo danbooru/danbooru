@@ -6,6 +6,7 @@ module Downloads
           url, headers = rewrite_headers(url, headers)
           url, headers = rewrite_html_pages(url, headers)
           url, headers = rewrite_thumbnails(url, headers)
+          url, headers = rewrite_view_big_pages(url, headers)
         end
 
         return [url, headers, data]
@@ -37,6 +38,18 @@ module Downloads
         end
 
         return [url, headers]
+      end
+
+      def rewrite_view_big_pages(url, headers)
+        # example: http://lohas.nicoseiga.jp/o/40aeedd2848a7780b6046747e75b3566b423a10c/1436307639/5026559
+
+        if url =~ %r{http://lohas\.nicoseiga\.jp/o/}
+          source = ::Sources::Strategies::NicoSeiga.new(url)
+          source.get
+          return [source.image_url, headers]
+        else
+          return [url, headers]
+        end
       end
     end
   end
