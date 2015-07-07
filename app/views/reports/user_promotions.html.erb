@@ -24,13 +24,13 @@
             <tr>
               <td><%= link_to_user user.user %></td>
               <td data-sort-value="<%= user.level %>"><%= user.level_string %></td>
-              <td><%= link_to user.post_upload_count, posts_path(:tags => "uploader:#{user.name} order:random", :limit => 300) %></td>
+              <td><%= link_to user.post_upload_count, posts_path(:tags => "uploader:#{user.name} order:random", :limit => 200) %></td>
               <td data-sort-value="<%= user.created_at.to_formatted_s(:db) %>"><%= time_ago_in_words user.created_at %></td>
               <td><%= number_to_percentage user.confidence_interval_for(3), :precision => 0 %></td>
               <td><%= number_to_percentage user.confidence_interval_for(6), :precision => 0 %></td>
               <td><%= user.quartile_score %></td>
               <td><%= user.median_score %></td>
-              <td><%= link_to number_to_percentage(user.deletion_confidence_interval, :precision => 0), posts_path(:tags => "uploader:#{user.name} status:deleted", :limit => 300) %></td>
+              <td><%= link_to number_to_percentage(user.deletion_confidence_interval, :precision => 0), posts_path(:tags => "uploader:#{user.name} status:deleted", :limit => 200) %></td>
             </tr>
           <% end %>
         <% end %>
