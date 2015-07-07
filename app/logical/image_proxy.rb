@@ -4,7 +4,7 @@ class ImageProxy
   end
 
   def self.fake_referer_for(url)
-    Sources::Site.new(url).strategy.fake_referer
+    Sources::Site.new(url).strategy.try(:fake_referer)
   end
 
   def self.get_image(url)
