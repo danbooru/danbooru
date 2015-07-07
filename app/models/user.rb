@@ -16,6 +16,9 @@ class User < ActiveRecord::Base
     ADMIN = 50
   end
 
+
+  # bit_prefs is 64 bits signed so theoretical maximum 
+  # is 0x8000 0000 0000 0000
   BOOLEAN_ATTRIBUTES = {
     :is_banned                         => 0x0001,
     :has_mail                          => 0x0002,
