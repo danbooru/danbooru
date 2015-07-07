@@ -37,6 +37,11 @@ class BulkUpdateRequest < ActiveRecord::Base
     update_attribute(:status, "approved")
 
   rescue Exception => x
+    message_admin_on_failure(x)
+    update_topic_on_failure(x)
+  end
+
+  def message_admin_on_failure(x)
     admin = User.admins.first
     msg = <<-EOS
       Bulk Update Request ##{id} failed\n
@@ -58,6 +63,13 @@ class BulkUpdateRequest < ActiveRecord::Base
     )
     dmail.owner_id = admin.id
     dmail.save
+  end
+
+  def update_topic_on_failure(x)
+    if forum_topic_id
+      body = "Bulk update request ##{id} failed: #{x.to_s}"
+      ForumPost.create(:body => body, :topic_id => forum_topic_id)
+    end
   end
 
   def editable?(user)
