@@ -120,7 +120,7 @@ module Sources
             mech.cookie_jar.add(cookie)
           else
             mech.get("https://secure.nicovideo.jp/secure/login_form") do |page|
-              page.form_with do |form|
+              page.form_with(:id => "login_form") do |form|
                 form["mail_tel"] = Danbooru.config.nico_seiga_login
                 form["password"] = Danbooru.config.nico_seiga_password
               end.click_button
