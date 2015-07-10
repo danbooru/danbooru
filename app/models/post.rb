@@ -1034,7 +1034,7 @@ class Post < ActiveRecord::Base
     end
 
     def fast_count_search(tags, options = {})
-      count = Post.with_timeout(options[:statement_timeout] || 500, Danbooru.config.blank_tag_search_fast_count || 1_000_000) do
+      count = Post.with_timeout(options[:statement_timeout] || 500, Danbooru.config.blank_tag_search_fast_count || 1_000_000, :tags => tags) do
         Post.tag_match(tags).count
       end
       if count > 0

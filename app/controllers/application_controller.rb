@@ -58,6 +58,10 @@ protected
         render :text => "authentication failed", :status => 401
       end
 
+      fmt.xml do
+        render :xml => {:sucess => false, :reason => "authentication failed"}.to_xml(:root => "response"), :status => 401
+      end
+
       fmt.json do
         render :json => {:success => false, :reason => "authentication failed"}.to_json, :status => 401
       end
