@@ -173,7 +173,7 @@ class Comment < ActiveRecord::Base
   end
 
   def delete!
-    update_attribute(:is_deleted, true)
+    update_attributes(:is_deleted => true)
   end
 end
 

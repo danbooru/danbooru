@@ -151,4 +151,12 @@ class ForumTopic < ActiveRecord::Base
     topic.update_attribute(:response_count, topic.response_count + self.posts.length)
     self.update_columns(:response_count => 0, :is_deleted => true)
   end
+
+  def delete!
+    update_attributes(:is_deleted => true)
+  end
+
+  def undelete!
+    update_attributes(:is_deleted => false)
+  end
 end
