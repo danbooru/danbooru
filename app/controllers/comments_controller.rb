@@ -62,6 +62,15 @@ class CommentsController < ApplicationController
     end
   end
 
+  def undelete
+    @comment = Comment.find(params[:id])
+    check_privilege(@comment)
+    @comment.undelete!
+    respond_with(@comment) do |format|
+      format.js
+    end
+  end
+
   def unvote
     @comment = Comment.find(params[:id])
     @comment.unvote!

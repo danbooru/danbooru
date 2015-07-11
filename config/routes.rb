@@ -96,6 +96,7 @@ Rails.application.routes.draw do
     end
     member do
       put :unvote
+      post :undelete
     end
   end
   resources :counts do
