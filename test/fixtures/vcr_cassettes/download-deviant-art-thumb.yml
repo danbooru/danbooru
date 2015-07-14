@@ -8,42 +8,72 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - _/2.61.0
+      - dior/2.85.0
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
-      - ! '*/*'
+      - "*/*"
+  response:
+    status:
+      code: 301
+      message: Moved Permanently
+    headers:
+      Content-Type:
+      - text/html
+      Date:
+      - Tue, 14 Jul 2015 22:12:20 GMT
+      Location:
+      - http://orig02.deviantart.net/a45d/f/2012/330/e/7/resolution_by_mochikko-d5m713n.jpg
+      Server:
+      - nginx
+      Content-Length:
+      - '178'
+    body:
+      encoding: UTF-8
+      string: "<html>\r\n<head><title>301 Moved Permanently</title></head>\r\n<body
+        bgcolor=\"white\">\r\n<center><h1>301 Moved Permanently</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n"
+    http_version: 
+  recorded_at: Tue, 14 Jul 2015 22:12:25 GMT
+- request:
+    method: get
+    uri: http://orig02.deviantart.net/a45d/f/2012/330/e/7/resolution_by_mochikko-d5m713n.jpg
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - dior/2.85.0
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
   response:
     status:
       code: 200
-      message: !binary |-
-        T0s=
+      message: OK
     headers:
-      !binary "QWNjZXB0LVJhbmdlcw==":
-      - !binary |-
-        Ynl0ZXM=
-      !binary "Q2FjaGUtQ29udHJvbA==":
-      - !binary |-
-        bWF4LWFnZT0zMTUzNjAwMA==
-      !binary "Q29udGVudC1UeXBl":
-      - !binary |-
-        aW1hZ2UvanBlZw==
-      !binary "RGF0ZQ==":
-      - !binary |-
-        V2VkLCAyMiBPY3QgMjAxNCAyMzozNjoxOSBHTVQ=
-      !binary "RXhwaXJlcw==":
-      - !binary |-
-        VGh1LCAyMiBPY3QgMjAxNSAyMzozNjoxOSBHTVQ=
-      !binary "TGFzdC1Nb2RpZmllZA==":
-      - !binary |-
-        U3VuLCAyNSBOb3YgMjAxMiAwODoxMjo0MCBHTVQ=
-      !binary "U2VydmVy":
-      - !binary |-
-        RUNBY2MgKHNqYy80RTlGKQ==
-      !binary "WC1DYWNoZQ==":
-      - !binary |-
-        SElU
-      !binary "Q29udGVudC1MZW5ndGg=":
-      - !binary |-
-        MjU1Njgz
+      Accept-Ranges:
+      - bytes
+      Cache-Control:
+      - max-age=259200
+      Content-Type:
+      - image/jpeg
+      Date:
+      - Tue, 14 Jul 2015 22:12:20 GMT
+      Etag:
+      - '"33a5ef3af6158ccb669e8ee22b9d4a54"'
+      Last-Modified:
+      - Fri, 22 May 2015 00:40:24 GMT
+      Server:
+      - ECAcc (sjc/16FA)
+      X-Amz-Id-2:
+      - 3GwpuEJtUDl6pP2C1PfWEESTxj3Tt7uiqZTDuY2drguHH95ZpTxMhrtgHRaw0Ums
+      X-Amz-Request-Id:
+      - CC4A2CDD5512378F
+      X-Cache:
+      - HIT
+      Content-Length:
+      - '255683'
     body:
       encoding: ASCII-8BIT
       string: !binary |-
@@ -5730,5 +5760,5 @@ http_interactions:
         qi+/x/rqDmoF4w7t/Eb/AIaEhlWHYi7AsKjqP2j922hIAKo0ROVP86f5j4aF
         C6TpU8v8fD7tCo6T3Qk/jQ/HU7VTt3IEbbeI6/8AjqAoZYuv/9k=
     http_version: 
-  recorded_at: Wed, 22 Oct 2014 23:36:24 GMT
+  recorded_at: Tue, 14 Jul 2015 22:12:25 GMT
 recorded_with: VCR 2.9.0

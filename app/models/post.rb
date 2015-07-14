@@ -1003,6 +1003,7 @@ class Post < ActiveRecord::Base
       if CurrentUser.safe_mode?
         tags = "#{tags} rating:s".strip
       end
+      
       if CurrentUser.user && CurrentUser.hide_deleted_posts? && tags !~ /(?:^|\s)(?:-)?status:.+/
         tags = "#{tags} -status:deleted".strip
       end
@@ -1010,16 +1011,16 @@ class Post < ActiveRecord::Base
       "pfc:#{Cache.sanitize(tags)}"
     end
 
+    def slow_query?(tags)
+      !CurrentUser.is_gold? && (CurrentUser.safe_mode? || tags.blank? || tags =~ /(?:#{Tag::METATAGS}):/ || tags =~ / /)
+    end
+
     def fast_count(tags = "", options = {})
       tags = tags.to_s.strip
+      max_count = Danbooru.config.blank_tag_search_fast_count
 
-      if tags.blank? && Danbooru.config.blank_tag_search_fast_count
-        count = Danbooru.config.blank_tag_search_fast_count
-      elsif tags =~ /^-?rating:\S+$/
-        count = Danbooru.config.blank_tag_search_fast_count
-      elsif tags =~ /(?:#{Tag::METATAGS}):/
-        options[:statement_timeout] = 500
-        count = fast_count_search(tags, options)
+      if max_count && slow_query?(tags)
+        count = max_count
       else
         count = get_count_from_cache(tags)
 

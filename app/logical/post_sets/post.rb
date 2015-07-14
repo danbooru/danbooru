@@ -1,14 +1,15 @@
 module PostSets
   class Post < PostSets::Base
-    attr_reader :tag_array, :page, :per_page, :raw, :random
+    attr_reader :tag_array, :page, :per_page, :raw, :random, :post_count, :format
 
-    def initialize(tags, page = 1, per_page = nil, raw = false, random = false)
+    def initialize(tags, page = 1, per_page = nil, options = {})
       @tag_array = Tag.scan_query(tags)
       @page = page
       @per_page = (per_page || CurrentUser.per_page).to_i
       @per_page = 200 if @per_page > 200
-      @raw = raw.present?
-      @random = random.present?
+      @raw = options[:raw].present?
+      @random = options[:random].present?
+      @format = options[:format] || "html"
     end
 
     def tag_string
@@ -75,42 +76,67 @@ module PostSets
       posts.any? {|x| x.rating == "e"}
     end
 
+    def use_sequential_paginator?
+      unknown_post_count? && !CurrentUser.is_gold?
+    end
+
+    def get_post_count
+      if %w(json atom xml).include?(format.downcase)
+        # no need to get counts for formats that don't use a paginator
+        return Danbooru.config.blank_tag_search_fast_count
+      else
+        ::Post.fast_count(tag_string)
+      end
+    end
+
+    def get_random_posts
+      if unknown_post_count?
+        chance = 0.01
+      elsif post_count == 0
+        chance = 1
+      else
+        chance = per_page / post_count.to_f
+      end
+
+      temp = []
+      temp += ::Post.tag_match(tag_string).where("random() < ?", chance).reorder("").limit(per_page)
+
+      3.times do
+        missing = per_page - temp.length
+        if missing >= 1
+          q = ::Post.tag_match(tag_string).where("random() < ?", chance*2).reorder("").limit(missing)
+          unless temp.empty?
+            q = q.where("id not in (?)", temp.map(&:id))
+          end
+          temp += q
+        end
+      end
+
+      temp
+    end
+
     def posts
       if tag_array.any? {|x| x =~ /^-?source:.*\*.*pixiv/} && !CurrentUser.user.is_builder?
         raise SearchError.new("Your search took too long to execute and was canceled")
       end
 
       @posts ||= begin
-        if random
-          count = ::Post.fast_count(tag_string, :statement_timeout => CurrentUser.user.statement_timeout)
-          if count == 1_000_000 # count timed out
-            chance = 0.01
-          elsif count == 0
-            chance = 1
-          else
-            chance = per_page / count.to_f
-          end
+        @post_count = get_post_count()
 
-          temp = []
-          temp += ::Post.tag_match(tag_string).where("random() < ?", chance).reorder("").limit(per_page)
-          3.times do
-            missing = per_page - temp.length
-            if missing >= 1
-              q = ::Post.tag_match(tag_string).where("random() < ?", chance*2).reorder("").limit(missing)
-              unless temp.empty?
-                q = q.where("id not in (?)", temp.map(&:id))
-              end
-              temp += q
-            end
-          end
+        if random
+          temp = get_random_posts()
         elsif raw
-          temp = ::Post.raw_tag_match(tag_string).order("posts.id DESC").paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+          temp = ::Post.raw_tag_match(tag_string).order("posts.id DESC").paginate(page, :count => post_count, :limit => per_page)
         else
-          temp = ::Post.tag_match(tag_string).paginate(page, :count => ::Post.fast_count(tag_string), :limit => per_page)
+          temp = ::Post.tag_match(tag_string).paginate(page, :count => post_count, :limit => per_page)
         end
         temp.each # hack to force rails to eager load
         temp
       end
+    end
+
+    def unknown_post_count?
+      post_count == Danbooru.config.blank_tag_search_fast_count
     end
 
     def is_single_tag?

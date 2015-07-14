@@ -28,6 +28,14 @@ module PostSets
       nil
     end
 
+    def unknown_post_count?
+      false
+    end
+
+    def use_sequential_paginator?
+      false
+    end
+
     def presenter
       raise NotImplementedError
     end

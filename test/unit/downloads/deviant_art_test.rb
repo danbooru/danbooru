@@ -7,13 +7,13 @@ module Downloads
         @source = "http://mochikko.deviantart.com/art/RESOLUTION-339610451"
         @tempfile = Tempfile.new("danbooru-test")
         @download = Downloads::File.new(@source, @tempfile.path)
-        VCR.use_cassette("download-deviant-art-html", :record => :none) do
+        VCR.use_cassette("download-deviant-art-html", :record => :once) do
           @download.download!
         end
       end
 
-      should "set the direct image link as the source" do
-        assert_equal("http://fc03.deviantart.net/fs71/f/2012/330/e/7/resolution_by_mochikko-d5m713n.jpg", @download.source)
+      should "set the html page as the source" do
+        assert_equal("http://orig02.deviantart.net/a45d/f/2012/330/e/7/resolution_by_mochikko-d5m713n.jpg", @download.source)
       end
 
       should "work" do
@@ -26,13 +26,13 @@ module Downloads
         @source = "http://fc03.deviantart.net/fs71/200H/f/2012/330/e/7/resolution_by_mochikko-d5m713n.jpg"
         @tempfile = Tempfile.new("danbooru-test")
         @download = Downloads::File.new(@source, @tempfile.path)
-        VCR.use_cassette("download-deviant-art-thumb", :record => :none) do
+        VCR.use_cassette("download-deviant-art-thumb", :record => :once) do
           @download.download!
         end
       end
 
       should "instead download the original version" do
-        assert_equal("http://fc03.deviantart.net/fs71/f/2012/330/e/7/resolution_by_mochikko-d5m713n.jpg", @download.source)
+        assert_equal("http://orig02.deviantart.net/a45d/f/2012/330/e/7/resolution_by_mochikko-d5m713n.jpg", @download.source)
       end
 
       should "work" do

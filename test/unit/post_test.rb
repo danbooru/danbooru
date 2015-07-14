@@ -1463,6 +1463,7 @@ class PostTest < ActiveSupport::TestCase
     context "The cache" do
       context "when shared between users on danbooru/safebooru" do
         setup do
+          Danbooru.config.stubs(:blank_tag_search_fast_count).returns(nil)
           FactoryGirl.create(:post, :tag_string => "aaa bbb", :rating => "q")
           FactoryGirl.create(:post, :tag_string => "aaa bbb", :rating => "s")
           FactoryGirl.create(:post, :tag_string => "aaa bbb", :rating => "s")

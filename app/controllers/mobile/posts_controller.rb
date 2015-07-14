@@ -3,7 +3,7 @@ class Mobile::PostsController < ApplicationController
   before_filter :set_mobile_mode
   
   def index
-    @post_set = PostSets::Post.new(params[:tags], params[:page], CurrentUser.user.per_page, false)
+    @post_set = PostSets::Post.new(params[:tags], params[:page], CurrentUser.user.per_page, raw: false)
     @posts = @post_set.posts
   end
 

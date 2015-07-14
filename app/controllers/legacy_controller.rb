@@ -3,7 +3,7 @@ class LegacyController < ApplicationController
   rescue_from PostSets::SearchError, :with => :rescue_exception
 
   def posts
-    @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit])
+    @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], format: "json")
     @posts = @post_set.posts
   end
 
