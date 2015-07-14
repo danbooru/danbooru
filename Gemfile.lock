@@ -1,13 +1,4 @@
 GIT
-  remote: https://github.com/fnando/aws-s3.git
-  revision: fef95c2dc17758f3e417630e794fcfad76eb33b3
-  specs:
-    aws-s3 (0.6.3)
-      builder
-      mime-types
-      xml-simple
-
-GIT
   remote: https://github.com/r888888888/ruby-imagespec.git
   revision: 2dab9811f4abb4fbaeea66feb42e388ba545b2d8
   branch: exif-fixes
@@ -46,6 +37,10 @@ GEM
     addressable (2.3.6)
     arel (5.0.1.20140414130214)
     awesome_print (1.2.0)
+    aws-s3 (0.6.3)
+      builder
+      mime-types
+      xml-simple
     bcrypt (3.1.10)
     bcrypt (3.1.10-x64-mingw32)
     bcrypt-ruby (3.1.5)
@@ -311,7 +306,7 @@ PLATFORMS
 
 DEPENDENCIES
   awesome_print
-  aws-s3!
+  aws-s3
   bcrypt-ruby
   byebug
   capistrano
