@@ -5,16 +5,16 @@ div#c-moderator-post-queues {
     margin-bottom: 4em;
     overflow: hidden;
 
+    &.post-pos-score {
+      background: rgb(230, 255, 230);
+    }
+
     &.post-has-dup {
       background: rgb(255, 255, 100);
     }
 
     &.post-neg-score {
       background: rgb(255, 230, 230);
-    }
-
-    &.post-pos-score {
-      background: rgb(230, 255, 230);
     }
 
     aside {
