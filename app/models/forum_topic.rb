@@ -153,10 +153,10 @@ class ForumTopic < ActiveRecord::Base
   end
 
   def delete!
-    update_attributes(:is_deleted => true)
+    update_attributes({:is_deleted => true}, :as => CurrentUser.role)
   end
 
   def undelete!
-    update_attributes(:is_deleted => false)
+    update_attributes({:is_deleted => false}, :as => CurrentUser.role)
   end
 end
