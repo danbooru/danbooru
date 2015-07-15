@@ -74,9 +74,13 @@ class UploadsController < ApplicationController
 protected
   def extract_artist_commentary(upload, data)
     if data[:artist_commentary_desc]
-      upload.artist_commentary_title = data[:artist_commentary_title]
-      upload.artist_commentary_desc = data[:artist_commentary_desc]
+      upload.artist_commentary_title = strip_tags(data[:artist_commentary_title])
+      upload.artist_commentary_desc = strip_tags(data[:artist_commentary_desc])
     end
+  end
+
+  def strip_tags(s)
+    HTML::FullSanitizer.new.sanitize(s)
   end
 
   def find_post_by_url(normalized_url)
