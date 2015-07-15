@@ -85,7 +85,8 @@ class ForumTopicsControllerTest < ActionController::TestCase
       end
 
       should "destroy the topic and any associated posts" do
-        post :destroy, {:id => @forum_topic.id}, {:user_id => @user.id}
+        CurrentUser.user = @mod
+        post :destroy, {:id => @forum_topic.id}, {:user_id => @mod.id}
         assert_redirected_to(forum_topic_path(@forum_topic))
         @forum_topic.reload
         assert_equal(true, @forum_topic.is_deleted?)
@@ -98,7 +99,8 @@ class ForumTopicsControllerTest < ActionController::TestCase
       end
 
       should "restore the topic" do
-        post :undelete, {:id => @forum_topic.id}, {:user_id => @user.id}
+        CurrentUser.user = @mod
+        post :undelete, {:id => @forum_topic.id}, {:user_id => @mod.id}
         assert_redirected_to(forum_topic_path(@forum_topic))
         @forum_topic.reload
         assert_equal(false, @forum_topic.is_deleted?)

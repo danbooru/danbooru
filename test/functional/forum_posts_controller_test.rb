@@ -89,7 +89,8 @@ class ForumPostsControllerTest < ActionController::TestCase
       end
 
       should "restore the post" do
-        post :undelete, {:id => @forum_post.id}, {:user_id => @user.id}
+        CurrentUser.user = @mod
+        post :undelete, {:id => @forum_post.id}, {:user_id => @mod.id}
         assert_redirected_to(forum_post_path(@forum_post))
         @forum_post.reload
         assert_equal(false, @forum_post.is_deleted?)
