@@ -18,7 +18,7 @@ class ForumTopicsController < ApplicationController
 
   def index
     @query = ForumTopic.active.search(params[:search])
-    @forum_topics = @query.includes([:creator, :updater]).order("is_sticky DESC, updated_at DESC").paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
+    @forum_topics = @query.includes([:creator, :updater]).order("is_sticky DESC, updated_at DESC").paginate(params[:page], :limit => per_page, :search_count => params[:search])
     respond_with(@forum_topics) do |format|
       format.xml do
         render :xml => @forum_topics.to_xml(:root => "forum-topics")
@@ -100,6 +100,10 @@ class ForumTopicsController < ApplicationController
   end
 
 private
+  def per_page
+    params[:limit] || 40
+  end
+
   def normalize_search
     if params[:title_matches]
       params[:search] ||= {}
