@@ -9,7 +9,7 @@ class Cache
     ActiveRecord::Base.logger.debug('MemCache Decr %s' % [key])
   end
 
-  def self.get_multi(keys, prefix, expiry = 0)
+  def self.get_multi(keys, prefix, expiry_in_seconds = nil)
     key_to_sanitized_key_hash = keys.inject({}) do |hash, x|
       hash[x] = "#{prefix}:#{Cache.sanitize(x)}"
       hash
@@ -23,7 +23,7 @@ class Cache
           result_hash[key] = sanitized_key_to_value_hash[sanitized_key]
         else
           result_hash[key] = yield(key)
-          Cache.put(sanitized_key, result_hash[key], expiry)
+          Cache.put(sanitized_key, result_hash[key], expiry_in_seconds)
         end
       end
 
@@ -31,10 +31,15 @@ class Cache
     end
   end
 
-  def self.get(key, expiry = 0)
+  def self.get(key, expiry_in_seconds = nil)
     start_time = Time.now
     value = MEMCACHE.get key
     elapsed = Time.now - start_time
+    if expiry_in_seconds
+      expiry = expiry_in_seconds.seconds.from_now.to_i if expiry_in_seconds
+    else
+      expiry = 0
+    end
     ActiveRecord::Base.logger.debug('MemCache Get (%0.6f)  %s -> %s' % [elapsed, key, value])
     if value.nil? and block_given? then
       value = yield
@@ -43,15 +48,16 @@ class Cache
     value
   rescue => err
     ActiveRecord::Base.logger.debug "MemCache Error: #{err.message}"
-    if block_given? then
-      value = yield
-      put key, value, expiry
-    end
-    value
+    nil
   end
 
-  def self.put(key, value, expiry = 0)
+  def self.put(key, value, expiry_in_seconds = nil)
     start_time = Time.now
+    if expiry_in_seconds
+      expiry = expiry_in_seconds.seconds.from_now.to_i
+    else
+      expiry = 0
+    end      
     MEMCACHE.set key, value, expiry
     elapsed = Time.now - start_time
     ActiveRecord::Base.logger.debug('MemCache Set (%0.6f)  %s -> %s' % [elapsed, key, value])
