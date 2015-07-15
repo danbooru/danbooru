@@ -36,7 +36,7 @@ class Cache
     value = MEMCACHE.get key
     elapsed = Time.now - start_time
     if expiry_in_seconds
-      expiry = expiry_in_seconds.seconds.from_now.to_i if expiry_in_seconds
+      expiry = expiry_in_seconds.seconds.from_now.to_i
     else
       expiry = 0
     end
