@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <feed xmlns="http://www.w3.org/2005/Atom">
-	<title><%= Danbooru.config.app_name %></title>
+	<title><%= Danbooru.config.app_name %>: <%= params[:tags] %></title>
 	<link href="http://<%= Danbooru.config.hostname %>/posts.atom?tags=<%= params[:tags] %>" rel="self"/>
   <link href="http://<%= Danbooru.config.hostname %>/posts?tags=<%= params[:tags] %>" rel="alternate"/>
   <id>http://<%= Danbooru.config.hostname %>/posts.atom?tags=<%= params[:tags] %></id>
