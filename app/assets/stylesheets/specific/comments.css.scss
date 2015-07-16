@@ -103,13 +103,7 @@ div#c-comments {
           position: relative;
 
           &:before {
-            content: "►";
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            color: white; 
-            background-color: rgba(0,0,0,0.5);
-            margin: 2px;
+            @include animated-icon;
           }
         }
       }

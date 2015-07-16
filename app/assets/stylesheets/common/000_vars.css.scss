@@ -66,3 +66,14 @@ $preview_flagged_color: #F00;
   *vertical-align: auto;
 }
 
+@mixin animated-icon {
+  content: "►";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  color: white; 
+  background-color: rgba(0,0,0,0.5);
+  margin: 2px;
+  text-align: center;
+}
+

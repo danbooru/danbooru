@@ -28,6 +28,12 @@ div#c-moderator-post-queues {
       float: left;
       width: 600px;
     }
+
+    &[data-tags~=animated], &[data-file-ext=swf], &[data-file-ext=webm], &[data-file-ext=zip] {
+      aside:before {
+        @include animated-icon;
+      }
+    }
   }
 
   div#moderation-guideline {
