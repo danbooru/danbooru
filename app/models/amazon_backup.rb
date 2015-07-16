@@ -1,4 +1,4 @@
-require 'base64'
+rerequire 'base64'
 require 'digest/md5'
 
 class AmazonBackup < ActiveRecord::Base
@@ -15,12 +15,16 @@ class AmazonBackup < ActiveRecord::Base
   def self.execute
     last_id = AmazonBackup.last_id
     credentials = Aws::Credentials.new(Danbooru.config.amazon_s3_access_key_id, Danbooru.config.amazon_s3_secret_access_key)
-    client = Aws::S3::Client.new(region: "us-west-2", credentials: credentials)
+    Aws.config.update({
+      region: "us-east-1",
+      credentials: credentials
+    })
+    client = Aws::S3::Client.new
     bucket = Danbooru.config.amazon_s3_bucket_name
 
     Post.where("id > ?", last_id).limit(1000).order("id").each do |post|
       if File.exists?(post.file_path)
-        base64_md5 = Base64.encode64(Digest::MD5.digest(File.read(post.file_path)))
+        base64_md5 = Digest::MD5.base64digest(File.read(post.file_path))
         key = File.basename(post.file_path)
         body = open(post.file_path, "rb")
         client.put_object(bucket: bucket, key: key, body: body, content_md5: base64_md5)
