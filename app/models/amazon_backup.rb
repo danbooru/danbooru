@@ -1,4 +1,4 @@
-rerequire 'base64'
+require 'base64'
 require 'digest/md5'
 
 class AmazonBackup < ActiveRecord::Base
