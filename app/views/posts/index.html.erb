@@ -1,7 +1,7 @@
 <div id="c-posts">
   <div id="a-index">
     <aside id="sidebar">
-      <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:tags] %>
+      <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:tags], :tags_dom_id => "tags" %>
 
       <%= render "posts/partials/index/mode_menu" %>
 
@@ -36,7 +36,7 @@
     </section>
     
     <section id="responsive-tag-list">
-      <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:tags] %>
+      <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:tags], :tags_dom_id => "responsive-tags" %>
       <%= @post_set.presenter.tag_list_html(self) %>
     </section>
 
