@@ -37,10 +37,12 @@ GEM
     addressable (2.3.6)
     arel (5.0.1.20140414130214)
     awesome_print (1.2.0)
-    aws-sdk (1.28.1)
-      json (~> 1.4)
-      nokogiri (>= 1.4.4)
-      uuidtools (~> 2.1)
+    aws-sdk (2.1.7)
+      aws-sdk-resources (= 2.1.7)
+    aws-sdk-core (2.1.7)
+      jmespath (~> 1.0)
+    aws-sdk-resources (2.1.7)
+      aws-sdk-core (= 2.1.7)
     bcrypt (3.1.10)
     bcrypt (3.1.10-x64-mingw32)
     bcrypt-ruby (3.1.5)
@@ -116,7 +118,9 @@ GEM
       json (~> 1.8)
       multi_xml (>= 0.5.2)
     i18n (0.6.11)
-    json (1.8.1)
+    jmespath (1.0.2)
+      multi_json (~> 1.0)
+    json (1.8.3)
     jwt (1.2.0)
     kgio (2.9.2)
     libv8 (3.16.14.3)
@@ -290,7 +294,6 @@ GEM
       kgio (~> 2.6)
       rack
       raindrops (~> 0.7)
-    uuidtools (2.1.4)
     vcr (2.9.0)
     webmock (1.17.4)
       addressable (>= 2.2.7)
@@ -306,7 +309,7 @@ PLATFORMS
 
 DEPENDENCIES
   awesome_print
-  aws-sdk
+  aws-sdk (~> 2)
   bcrypt-ruby
   byebug
   capistrano

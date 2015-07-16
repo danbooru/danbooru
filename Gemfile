@@ -49,7 +49,7 @@ gem 'rubyzip', :require => "zip"
 gem 'coinbase'
 gem 'stripe'
 gem 'twitter'
-gem 'aws-sdk'
+gem 'aws-sdk', '~> 2'
 
 # needed for looser jpeg header compat
 gem 'ruby-imagespec', :require => "image_spec", :git => "https://github.com/r888888888/ruby-imagespec.git", :branch => "exif-fixes"
