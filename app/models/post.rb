@@ -1012,7 +1012,7 @@ class Post < ActiveRecord::Base
     end
 
     def slow_query?(tags)
-      !CurrentUser.is_gold? && (CurrentUser.safe_mode? || tags.blank? || tags =~ /(?:#{Tag::METATAGS}):/ || tags =~ / /)
+      tags.blank?
     end
 
     def fast_count(tags = "", options = {})
