@@ -1,7 +1,7 @@
 <div id="c-favorites">
   <div id="a-index">
     <aside id="sidebar">
-      <%= render "posts/partials/common/search", :path => favorites_path, :tags => @favorite_set.tag_string %>
+      <%= render "posts/partials/common/search", :path => favorites_path, :tags => @favorite_set.tag_string, :tags_dom_id => "tags" %>
 
       <%= render "posts/partials/index/mode_menu" %>
 
