@@ -10,10 +10,6 @@
   <% end %>
 
   <% unless @random.present? %>
-    <% if post_set.use_sequential_paginator? %>
-      <%= sequential_paginator(post_set.posts) %>
-    <% else %>
-      <%= numbered_paginator(post_set.posts) %>
-    <% end %>
+    <%= numbered_paginator(post_set.posts) %>
   <% end %>
 </div>
