@@ -8,6 +8,7 @@ en:
       post:
         approver: "You"
         approver_id: "You"
+        updater_id: "You"
       post_flag:
         creator: "You"
         creator_id: "You"

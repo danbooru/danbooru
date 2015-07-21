@@ -430,6 +430,18 @@ class PostTest < ActiveSupport::TestCase
         @post = FactoryGirl.create(:post)
       end
 
+      context "as a new user" do
+        setup do
+          CurrentUser.user = FactoryGirl.create(:user)
+          @post.update_attribute(:tag_string, "aaa bbb ccc ddd")
+        end
+
+        should "not allow you to remove more than 2 tags" do
+          @post.update_attributes(:tag_string => "aaa")
+          assert_equal(["You must have an account at least 1 week old to remove tags"], @post.errors.full_messages)
+        end
+      end
+
       context "with a banned artist" do
         setup do
           @artist = FactoryGirl.create(:artist)

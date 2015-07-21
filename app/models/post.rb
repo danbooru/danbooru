@@ -481,6 +481,12 @@ class Post < ActiveRecord::Base
 
     def update_tag_post_counts
       decrement_tags = tag_array_was - tag_array
+
+      if decrement_tags.size > 1 && !CurrentUser.is_builder? && CurrentUser.created_at > 1.week.ago
+        self.errors.add(:updater_id, "must have an account at least 1 week old to remove tags")
+        return false
+      end
+
       increment_tags = tag_array - tag_array_was
       if increment_tags.any?
         Tag.delay(:queue => "default").increment_post_counts(increment_tags)
