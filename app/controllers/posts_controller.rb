@@ -1,6 +1,7 @@
 class PostsController < ApplicationController
   before_filter :member_only, :except => [:show, :show_seq, :index, :home, :random]
   before_filter :builder_only, :only => [:copy_notes]
+  before_filter :enable_cors, :only => [:index, :show]
   after_filter :save_recent_tags, :only => [:update]
   respond_to :html, :xml, :json
   rescue_from PostSets::SearchError, :with => :rescue_exception

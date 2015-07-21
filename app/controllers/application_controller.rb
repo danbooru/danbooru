@@ -18,6 +18,10 @@ class ApplicationController < ActionController::Base
   rescue_from Danbooru::Paginator::PaginationError, :with => :render_pagination_limit
 
 protected
+  def enable_cors
+    response.headers["Access-Control-Allow-Origin"] = "*"
+  end
+  
   def api_check
     if request.format.to_s =~ /\/json|\/xml/ || params[:controller] == "iqdb"
       if ApiLimiter.throttled?(request.remote_ip)
