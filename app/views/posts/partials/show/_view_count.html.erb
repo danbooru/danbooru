@@ -1,0 +1,9 @@
+<script type="text/javascript">
+  $(function() {
+    $.post("<%= Danbooru.config.report_server %>/hits", {
+      key: "<%= key %>",
+      value: "<%= value %>",
+      sig: "<%= sig %>"
+    });
+  });
+</script>

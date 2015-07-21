@@ -139,6 +139,8 @@
   </div>
 </div>
 
+<%= post_view_count_js %>
+
 <% content_for(:page_title) do %>
   <%= @post.presenter.humanized_essential_tag_string %> - <%= Danbooru.config.app_name %>
 <% end %>
@@ -157,6 +159,10 @@
   <meta property="og:title" content="<%= @post.presenter.humanized_essential_tag_string %> - <%= Danbooru.config.app_name %>">
   <meta property="og:description" content="<%= @post.presenter.humanized_tag_string %>">
   <meta property="og:image" content="http://<%= Danbooru.config.hostname %><%= @post.large_file_url %>">
+
+  <% if Danbooru.config.enable_view_counts %>
+    <meta name="report-server" content="<%= Danbooru.config.report_server %>">
+  <% end %>
 
   <!-- Twitter properties -->
   <% if @post.twitter_card_supported? %>

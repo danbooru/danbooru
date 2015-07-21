@@ -1,4 +1,20 @@
 module PostsHelper
+  def post_view_count_js
+    return nil unless Danbooru.config.enable_view_counts
+    
+    if action_name == "index"
+      return nil
+    elsif action_name == "show"
+      key = "show-#{params[:id]}"
+      value = session.id
+      digest = OpenSSL::Digest.new("sha256")
+      sig = OpenSSL::HMAC.hexdigest(digest, Danbooru.config.shared_remote_key, "#{key},#{value}")
+      return render("posts/partials/show/view_count", key: key, value: value, sig: sig)
+    end
+
+    return nil
+  end
+
   def resize_image_links(post, user)
     links = []
 

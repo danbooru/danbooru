@@ -347,5 +347,17 @@ module Danbooru
 
     def twitter_api_secret
     end
+
+    def shared_remote_key
+      "blah blah blah blah blah blah"
+    end
+
+    def report_server
+      "https://isshiki.donmai.us"
+    end
+
+    def enable_view_counts
+      false
+    end
   end
 end
