@@ -2575,7 +2575,8 @@ CREATE TABLE post_disapprovals (
     user_id integer NOT NULL,
     post_id integer NOT NULL,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    reason character varying(255) DEFAULT 'legacy'::character varying
 );
 
 
@@ -7264,4 +7265,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150623191904');
 INSERT INTO schema_migrations (version) VALUES ('20150629235905');
 
 INSERT INTO schema_migrations (version) VALUES ('20150705014135');
+
+INSERT INTO schema_migrations (version) VALUES ('20150721214646');
 

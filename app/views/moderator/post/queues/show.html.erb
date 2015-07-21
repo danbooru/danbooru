@@ -21,7 +21,9 @@
           <% end %>
         </p>
 
+        <!-- 
         <p><%= button_tag "Approve all", :id => "approve-all-button" %><%= button_tag "Hide all", :id => "hide-all-button" %></p>
+        -->
       </div>
 
       <% @posts.each do |post| %>
@@ -32,7 +34,14 @@
 
           <section>
             <ul>
-              <li><h2><%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :remote => true, :method => :post, :class => "approve-link" %> | <%= link_to "Hide", moderator_post_disapproval_path(:post_id => post.id), :remote => true, :method => :post, :class => "disapprove-link" %></h2></li>
+              <li>
+                <h2>
+                  <%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :remote => true, :method => :post, :class => "approve-link" %> 
+                  | <%= link_to "Breaks Rules", moderator_post_disapproval_path(:post_id => post.id, :reason => "breaks_rules"), :remote => true, :method => :post, :class => "disapprove-link" %>
+                  | <%= link_to "Poor Quality", moderator_post_disapproval_path(:post_id => post.id, :reason => "poor_quality"), :remote => true, :method => :post, :class => "disapprove-link" %>
+                  | <%= link_to "No Interest", moderator_post_disapproval_path(:post_id => post.id, :reason => "disinterest"), :remote => true, :method => :post, :class => "disapprove-link" %>
+                </h2>
+              </li>
               <li><strong>Rating</strong>: <%= post.pretty_rating %></li>
               <li><strong>Score</strong>: <%= post.score %></li>
               <li>
@@ -49,7 +58,18 @@
               <% if (post.is_flagged? || post.is_deleted?) && post.appeals.any? %>
                 <li><strong>Appeals</strong>: <%= post_appeal_reasons(post) %></li>
               <% end %>
-              <li><strong>Hidden</strong>: <%= post.disapprovals.count %></li>
+              <li>
+                <strong>Hidden</strong>: 
+                <% if post.disapprovals.breaks_rules.exists? %>
+                  (breaks rules: <%= post.disapprovals.breaks_rules.count %>)
+                <% end %>
+                <% if post.disapprovals.poor_quality.exists? %>
+                  (poor quality: <%= post.disapprovals.poor_quality.count %>)
+                <% end %>
+                <% if post.disapprovals.disinterest.exists? %>
+                  (no interest: <%= post.disapprovals.disinterest.count %>)
+                <% end %>
+              </li>
               <li><strong>Tags</strong>: <%= post.tag_string %></li>
             </ul>
           </section>

@@ -5,7 +5,7 @@ module Moderator
 
       def create
         @post = ::Post.find(params[:post_id])
-        @post_disapproval = PostDisapproval.create(:post => @post, :user => CurrentUser.user)
+        @post_disapproval = PostDisapproval.create(:post => @post, :user => CurrentUser.user, :reason => params[:reason] || "disinterest")
       end
     end
   end
