@@ -23,7 +23,7 @@ class TagImplicationsController < ApplicationController
 
   def index
     @search = TagImplication.search(params[:search])
-    @tag_implications = @search.order("(case status when 'pending' then 0 when 'queued' then 1 else 2 end), antecedent_name, consequent_name").paginate(params[:page], :limit => params[:limit])
+    @tag_implications = @search.order("(case status when 'pending' then 1 when 'queued' then 2 when 'active' then 3 else 0 end), antecedent_name, consequent_name").paginate(params[:page], :limit => params[:limit])
     respond_with(@tag_implications) do |format|
       format.xml do
         render :xml => @tag_implications.to_xml(:root => "tag-implications")
