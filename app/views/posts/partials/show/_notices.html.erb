@@ -26,7 +26,19 @@
 <% if post.is_pending? || post.is_flagged? %>
   <div class="ui-corner-all ui-state-highlight notice notice-pending" id="pending-approval-notice">
     <% if post.is_pending? %>
-      This post is pending approval (<%= link_to "learn more", wiki_pages_path(:title => "about:mod_queue") %>)
+      This post is pending approval. 
+      It has been reviewed by <%= pluralize post.disapprovals.count, "moderator" %>. 
+      <% if post.disapprovals.breaks_rules.count > 0 %>
+        <%= post.disapprovals.breaks_rules.count %> believe it breaks the rules.
+      <% end %>
+      <% if post.disapprovals.poor_quality.count > 0 %>
+        <%= post.disapprovals.poor_quality.count %> believe it has poor quality.
+      <% end %>
+      <% if post.disapprovals.disinterest.count > 0 %>
+        <%= post.disapprovals.disinterest.count %> did not like the post enough to approve it.
+      <% end %>
+
+      (<%= link_to "learn more", wiki_pages_path(:title => "about:mod_queue") %>)
     <% else %>
       This post was flagged and is pending approval (<%= link_to "learn more", wiki_pages_path(:title => "about:mod_queue") %>)
     <% end %>
