@@ -37,7 +37,7 @@ gem 'daemons'
 gem 'net-ssh'
 gem 'net-sftp'
 gem 'term-ansicolor', :require => "term/ansicolor"
-gem 'diff-lcs', :require => "diff/lcs/array"
+gem 'diff-lcs', :require => "diff/lcs/array", :git => "https://github.com/halostatue/diff-lcs.git"
 gem 'bcrypt-ruby', :require => "bcrypt"
 gem 'awesome_print'
 gem 'statistics2'

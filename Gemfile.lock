@@ -1,4 +1,10 @@
 GIT
+  remote: https://github.com/halostatue/diff-lcs.git
+  revision: ff796c262db5a22f14b4765c09655b4faccc132a
+  specs:
+    diff-lcs (1.3)
+
+GIT
   remote: https://github.com/r888888888/ruby-imagespec.git
   revision: 2dab9811f4abb4fbaeea66feb42e388ba545b2d8
   branch: exif-fixes
@@ -92,7 +98,6 @@ GEM
     delayed_job_active_record (4.0.1)
       activerecord (>= 3.0, < 4.2)
       delayed_job (>= 3.0, < 4.1)
-    diff-lcs (1.2.5)
     docile (1.1.3)
     domain_name (0.5.18)
       unf (>= 0.0.5, < 1.0.0)
@@ -321,7 +326,7 @@ DEPENDENCIES
   dalli
   delayed_job
   delayed_job_active_record
-  diff-lcs
+  diff-lcs!
   factory_girl
   ffaker
   gctools
