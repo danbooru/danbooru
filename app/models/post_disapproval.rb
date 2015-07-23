@@ -12,9 +12,7 @@ class PostDisapproval < ActiveRecord::Base
   scope :disinterest, lambda {where(:reason => ["disinterest", "legacy"])}
 
   def self.prune!
-    PostDisapproval.joins(:post).where("posts.is_pending = FALSE AND posts.is_flagged = FALSE and post_disapprovals.created_at < ?", DELETION_THRESHOLD.ago).each do |post_disapproval|
-      post_disapproval.destroy
-    end
+    PostDisapproval.destroy_all(["created_at < ?", DELETION_THRESHOLD.ago])
   end
 
   def create_downvote
