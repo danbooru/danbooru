@@ -12,15 +12,17 @@
     <% end %>
 
     <% @posts.select {|x| x.visible?}.each do |post| %>
-      <div id="post_<%= post.id %>" class="post <%= PostPresenter.preview_class(post) %>" <%= PostPresenter.data_attributes(post) %>>
-        <div class="preview">
-          <% if post.visible? %>
-            <%= link_to(image_tag(post.preview_file_url), post_path(post)) %>
-          <% end %>
+      <% if CurrentUser.is_moderator? || post.comments.undeleted.exists? %>
+        <div id="post_<%= post.id %>" class="post <%= PostPresenter.preview_class(post) %>" <%= PostPresenter.data_attributes(post) %>>
+          <div class="preview">
+            <% if post.visible? %>
+              <%= link_to(image_tag(post.preview_file_url), post_path(post)) %>
+            <% end %>
+          </div>
+          <%= render "comments/partials/index/list", :post => post, :comments => post.comments.visible(CurrentUser.user).recent.reverse, :show_header => true %>
+          <div class="clearfix"></div>
         </div>
-        <%= render "comments/partials/index/list", :post => post, :comments => post.comments.visible(CurrentUser.user).recent.reverse, :show_header => true %>
-        <div class="clearfix"></div>
-      </div>
+      <% end %>
     <% end %>
 
     <%= numbered_paginator(@posts) %>

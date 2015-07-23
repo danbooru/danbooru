@@ -32,6 +32,10 @@ class Comment < ActiveRecord::Base
       where("score >= ?", user.comment_threshold)
     end
 
+    def undeleted
+      where("is_deleted = false")
+    end
+
     def post_tags_match(query)
       PostQueryBuilder.new(query).build(self.joins(:post)).reorder("")
     end
