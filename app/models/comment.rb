@@ -32,6 +32,10 @@ class Comment < ActiveRecord::Base
       where("score >= ?", user.comment_threshold)
     end
 
+    def deleted
+      where("is_deleted = true")
+    end
+
     def undeleted
       where("is_deleted = false")
     end
@@ -70,6 +74,12 @@ class Comment < ActiveRecord::Base
 
       if params[:creator_id].present?
         q = q.for_creator(params[:creator_id].to_i)
+      end
+
+      if params[:is_deleted] == "true"
+        q = q.deleted
+      elsif params[:is_deleted] == "false"
+        q = q.undeleted
       end
 
       q
