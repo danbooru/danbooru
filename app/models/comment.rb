@@ -33,11 +33,11 @@ class Comment < ActiveRecord::Base
     end
 
     def deleted
-      where("is_deleted = true")
+      where("comments.is_deleted = true")
     end
 
     def undeleted
-      where("is_deleted = false")
+      where("comments.is_deleted = false")
     end
 
     def post_tags_match(query)
