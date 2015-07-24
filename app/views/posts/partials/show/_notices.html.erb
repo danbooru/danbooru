@@ -21,9 +21,7 @@
       <p>This post was deleted</p>
     <% end %>
 
-    <% if post.disapprovals.count > 0 %>
-      <p><%= render "post_disapprovals/counts", :disapprovals => post.disapprovals %></p>
-    <% end %>
+    <%= render "post_disapprovals/counts", :disapprovals => post.disapprovals %>
   </div>
 <% end %>
 
@@ -31,11 +29,12 @@
   <div class="ui-corner-all ui-state-highlight notice notice-pending" id="pending-approval-notice">
     <% if post.is_pending? %>
       This post is pending approval. 
-      <%= render "post_disapprovals/counts", :disapprovals => post.disapprovals %>
       (<%= link_to "learn more", wiki_pages_path(:title => "about:mod_queue") %>)
     <% else %>
       This post was flagged and is pending approval (<%= link_to "learn more", wiki_pages_path(:title => "about:mod_queue") %>)
     <% end %>
+
+    <%= render "post_disapprovals/counts", :disapprovals => post.disapprovals %>
 
     <% if CurrentUser.can_approve_posts? && !post.disapproved_by?(CurrentUser.user) %>
       <div class="quick-mod">

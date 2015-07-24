@@ -1,13 +1,17 @@
-It has been reviewed by <%= pluralize disapprovals.count, "moderator" %>. 
+<% if disapprovals.count > 0 %>
+  <p>
+    It has been reviewed by <%= pluralize disapprovals.count, "moderator" %>. 
 
-<% if disapprovals.breaks_rules.count > 0 %>
-  <%= disapprovals.breaks_rules.count %> believe it breaks the rules.
-<% end %>
+    <% if disapprovals.breaks_rules.count > 0 %>
+      <%= disapprovals.breaks_rules.count %> believe it breaks the rules.
+    <% end %>
 
-<% if disapprovals.poor_quality.count > 0 %>
-  <%= disapprovals.poor_quality.count %> believe it has poor quality.
-<% end %>
+    <% if disapprovals.poor_quality.count > 0 %>
+      <%= disapprovals.poor_quality.count %> believe it has poor quality.
+    <% end %>
 
-<% if disapprovals.disinterest.count > 0 %>
-  <%= disapprovals.disinterest.count %> did not like the post enough to approve it.
+    <% if disapprovals.disinterest.count > 0 %>
+      <%= disapprovals.disinterest.count %> did not like the post enough to approve it.
+    <% end %>
+  </p>
 <% end %>
