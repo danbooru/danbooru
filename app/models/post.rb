@@ -7,7 +7,7 @@ class Post < ActiveRecord::Base
     :has_embedded_notes => 0x0001
   }
 
-  attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning
+  attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :view_count
   after_destroy :delete_files
   after_destroy :delete_remote_files
   after_save :create_version

@@ -79,6 +79,7 @@ class PostPresenter < Presenter
       data-parent-id="#{post.parent_id}"
       data-has-children="#{post.has_children?}"
       data-score="#{post.score}"
+      data-views="#{post.view_count}"
       data-fav-count="#{post.fav_count}"
       data-pixiv-id="#{post.pixiv_id}"
       data-md5="#{post.md5}"

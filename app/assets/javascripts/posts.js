@@ -299,7 +299,13 @@
   Danbooru.Post.initialize_title_for = function(post) {
     var $post = $(post);
     var $img = $post.find("img");
-    $img.attr("title", $post.attr("data-tags") + " user:" + $post.attr("data-uploader") + " rating:" + $post.data("rating") + " score:" + $post.data("score"));
+    var score = null;
+    if ($post.data("views")) {
+      score = " views:" + $post.data("views");
+    } else {
+      score = " score:" + $post.data("score");
+    }
+    $img.attr("title", $post.attr("data-tags") + " user:" + $post.attr("data-uploader") + " rating:" + $post.data("rating") + score);
   }
 
   Danbooru.Post.initialize_post_image_resize_links = function() {

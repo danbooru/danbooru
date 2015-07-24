@@ -42,9 +42,10 @@ Rails.application.routes.draw do
     end
   end
   namespace :explore do
-    resources :posts, :only => [:popular, :hot] do
+    resources :posts do
       collection do
         get :popular
+        get :popular_view
         get :hot
         get :intro
       end
