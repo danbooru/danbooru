@@ -1214,7 +1214,6 @@ class Post < ActiveRecord::Base
         give_favorites_to_parent if options[:move_favorites]
         update_parent_on_save
 
-
         unless options[:without_mod_action]
           if options[:reason]
             ModAction.create(:description => "deleted post ##{id}, reason: #{options[:reason]}")
@@ -1229,6 +1228,14 @@ class Post < ActiveRecord::Base
       if is_status_locked?
         self.errors.add(:is_status_locked, "; cannot undelete post")
         return false
+      end
+
+      if !CurrentUser.is_admin? 
+        if approver_id == CurrentUser.id
+          raise ApprovalError.new("You have previously approved this post and cannot undelete it")
+        elsif uploader_id == CurrentUser.id
+          raise ApprovalError.new("You cannot undelete a post you uploaded")
+        end
       end
 
       self.is_deleted = false

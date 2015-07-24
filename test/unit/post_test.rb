@@ -301,6 +301,37 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      context "that is undeleted" do
+        setup do
+          @mod = FactoryGirl.create(:moderator_user)
+          CurrentUser.user = @mod
+        end
+
+        context "by the approver" do
+          setup do
+            @post.update_attribute(:approver_id, @mod.id)
+          end
+
+          should "not be permitted" do
+            assert_raises(::Post::ApprovalError) do
+              @post.undelete!
+            end
+          end
+        end
+
+        context "by the uploader" do
+          setup do
+            @post.update_attribute(:uploader_id, @mod.id)
+          end
+
+          should "not be permitted" do
+            assert_raises(::Post::ApprovalError) do
+              @post.undelete!
+            end
+          end
+        end
+      end
+
       should "be undeleted" do
         @post.undelete!
         @post.reload
