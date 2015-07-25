@@ -34,7 +34,7 @@ class TagAlias < ActiveRecord::Base
       end
 
       if params[:id].present?
-        q = q.where("id = ?", params[:id].to_i)
+        q = q.where("id in (?)", params[:id].split(",").map(&:to_i))
       end
 
       case params[:order]

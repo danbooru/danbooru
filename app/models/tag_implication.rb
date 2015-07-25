@@ -87,7 +87,7 @@ class TagImplication < ActiveRecord::Base
       return q if params.blank?
 
       if params[:id].present?
-        q = q.where("id = ?", params[:id].to_i)
+        q = q.where("id in (?)", params[:id].split(",").map(&:to_i))
       end
 
       if params[:name_matches].present?

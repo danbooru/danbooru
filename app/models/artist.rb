@@ -410,7 +410,7 @@ class Artist < ActiveRecord::Base
       end
 
       if params[:id].present?
-        q = q.where("id = ?", params[:id])
+        q = q.where("id in (?)", params[:id].split(",").map(&:to_i))
       end
 
       if params[:creator_name].present?
