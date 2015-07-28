@@ -183,6 +183,7 @@ Rails.application.routes.draw do
   end
   resources :pool_versions, :only => [:index]
   resources :posts do
+    resources :events, :only => [:index], :controller => "post_events"
     resources :votes, :controller => "post_votes", :only => [:create, :destroy]
     collection do
       get :home
