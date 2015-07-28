@@ -25,7 +25,6 @@
       this.initialize_post_image_resize_links();
       this.initialize_post_image_resize_to_window_link();
       this.initialize_similar();
-      this.initialize_view_count();
 
       if (Danbooru.meta("always-resize-images") === "true") {
         $("#image-resize-to-window-link").click();
@@ -535,25 +534,6 @@
         );
       }
     });
-  }
-
-  Danbooru.Post.initialize_view_count = function() {
-    if ($("#views-for-post").length) {
-      $("#views-for-post-li").hide();
-      var current_post_id = $("meta[name=post-id]").attr("content");
-      $.ajax({
-        url: Danbooru.meta("report-server") + "/hits/pv-" + current_post_id, 
-        success: function(data) {
-          $("#views-for-post").html(data);
-          $("#views-for-post-li").show();
-        },
-        dataType: "text"
-      });
-    }
-  }
-
-  Danbooru.Post.set_view_count = function(count) {
-    $("#views-for-post").html(count);
   }
 })();
 

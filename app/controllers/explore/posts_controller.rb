@@ -8,10 +8,9 @@ module Explore
       respond_with(@posts)
     end
 
-    def popular_view
-      @post_set = PostSets::PopularView.new(params[:date], params[:scale])
-      @posts = @post_set.posts
-      respond_with(@posts)
+    def searches
+      @date = params[:date] ? Date.parse(params[:date]) : Date.today
+      @search_service = PopularSearchService.new(@date, params[:scale] || "day")
     end
 
     def intro

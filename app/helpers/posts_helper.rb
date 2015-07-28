@@ -1,15 +1,17 @@
 module PostsHelper
-  def post_view_count_js
-    return nil unless Danbooru.config.enable_view_counts
+  def post_search_count_js
+    return nil unless Danbooru.config.enable_post_search_counts
     
-    if action_name == "index"
-      return nil
-    elsif action_name == "show"
-      key = "show-#{params[:id]}"
-      value = session.id
-      digest = OpenSSL::Digest.new("sha256")
-      sig = OpenSSL::HMAC.hexdigest(digest, Danbooru.config.shared_remote_key, "#{key},#{value}")
-      return render("posts/partials/show/view_count", key: key, value: value, sig: sig)
+    if action_name == "index" && params[:page].nil?
+      tags = Tag.scan_query(params[:tags]).sort.join(" ")
+
+      if tags.present?
+        key = "ps-#{tags}"
+        value = session.id
+        digest = OpenSSL::Digest.new("sha256")
+        sig = OpenSSL::HMAC.hexdigest(digest, Danbooru.config.shared_remote_key, "#{key},#{value}")
+        return render("posts/partials/index/search_count", key: key, value: value, sig: sig)
+      end
     end
 
     return nil

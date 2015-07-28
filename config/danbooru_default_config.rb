@@ -356,7 +356,7 @@ module Danbooru
       "https://isshiki.donmai.us"
     end
 
-    def enable_view_counts
+    def enable_post_search_counts
       false
     end
   end

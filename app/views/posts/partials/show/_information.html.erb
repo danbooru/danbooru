@@ -14,9 +14,6 @@
   <li>Source: <%= post_source_tag(post) %></li>
   <li>Rating: <%= post.pretty_rating %></li>
   <li>Score: <span id="score-for-post-<%= post.id %>"><%= post.score %></span> <% if CurrentUser.is_gold? %>(<span id="vote-links-for-post-<%= post.id %>">vote <%= link_to "up", post_votes_path(:post_id => post.id, :score => "up"), :remote => true, :method => :post %>/<%= link_to "down", post_votes_path(:post_id => post.id, :score => "down"), :remote => true, :method => :post %></span><%= link_to "unvote", unvote_post_path(post), :remote => true, :method => :put, :id => "unvote-link-for-post-#{post.id}", :class => "unvote-post-link" %>)<% end %></li>
-  <% if Danbooru.config.enable_view_counts %>
-    <li id="views-for-post-li">Views: <span id="views-for-post"><em>loading...</em></span></li>
-  <% end %>
   <li>Favorites: <span id="favcount-for-post-<%= post.id %>"><%= post.fav_count %></span>
   <% if CurrentUser.is_gold? %>
     <%= link_to "Show &raquo;".html_safe, "#", :id => "show-favlist-link" %>
