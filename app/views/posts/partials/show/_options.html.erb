@@ -11,10 +11,11 @@
   <% else %>
     <li id="add-notes-list"><%= link_to "Add notes", "#", :id => "translate", :title => "Shortcut is N" %></li>
   <% end %>
-  <li id="add-artist-commentary-list"><%= link_to "Add artist commentary", "#", :id => "add-commentary" %></li>
   <% if CurrentUser.is_builder? && post.has_notes? %>
     <li id="copy-all-notes-list"><%= link_to "Copy all notes", "#", :id => "copy-notes" %></li>
   <% end %>
+  <li id="add-artist-commentary-list"><%= link_to "Add artist commentary", "#", :id => "add-commentary" %></li>
+  <li><%= link_to "Add to favorite group", "#", :id => "open-favgroup-dialog-link" %></li>
   <li><%= link_to "Find similar", iqdb_queries_path(:post_id => post.id), :method => :post, :remote => true %></li>
 
   <% if post.is_status_locked? %>

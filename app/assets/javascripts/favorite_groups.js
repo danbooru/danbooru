@@ -19,7 +19,7 @@
       }
     });
 
-    $(document).bind("keydown", "g", function(e) {
+    var open_favgroup_dialog = function(e) {
       if ($(".add-to-favgroup").length === 1) {
         // If the user only has one favorite group we don't need to ask which group to add the post to.
         $(".add-to-favgroup").click();
@@ -27,7 +27,10 @@
         $("#add-to-favgroup-dialog").dialog("open");
       }
       e.preventDefault();
-    });
+    }
+
+    $(document).bind("keydown", "g", open_favgroup_dialog);
+    $("#open-favgroup-dialog-link").click(open_favgroup_dialog);
   }
 
   Danbooru.FavoriteGroup.add_to_favgroup = function(e) {
