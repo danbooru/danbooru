@@ -8,7 +8,7 @@ class PopularSearchService
   end
 
   def each_search(&block)
-    fetch_data.scan(/\S+/).in_groups_of(2).each(&block)
+    fetch_data.scan(/(.+?) (\d+)\.0\n/).each(&block)
   end
 
   def fetch_data
