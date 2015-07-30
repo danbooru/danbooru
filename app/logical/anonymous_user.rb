@@ -117,7 +117,7 @@ class AnonymousUser
   end
 
   def blacklisted_tags
-    ""
+    ["spoilers", "guro", "scat", "furry -rating:s"].join("\n")
   end
 
   def time_zone
@@ -126,10 +126,6 @@ class AnonymousUser
 
   def default_image_size
     "large"
-  end
-
-  def blacklisted_tags
-    []
   end
 
   def email
