@@ -30,6 +30,13 @@ class FavoritesController < ApplicationController
         redirect_to(mobile_post_path(@post))
       end
       format.js
+      format.json do
+        if @post
+          render :json => {:success => true}.to_json
+        else
+          render :json => {:success => false, :reason => @error_msg}.to_json, :status => 422
+        end
+      end
     end
   end
 
@@ -42,6 +49,9 @@ class FavoritesController < ApplicationController
         redirect_to(mobile_post_path(@post))
       end
       format.js
+      format.json do
+        render :json => {:success => true}.to_json
+      end
     end
   end
 end
