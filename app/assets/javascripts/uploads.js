@@ -107,7 +107,7 @@
 
   Danbooru.Upload.initialize_image = function() {
     var $image = $("#image");
-    if ($image.size() > 0) {
+    if ($image.length) {
       var height = $image.height();
       var width = $image.width();
       if (height > 400) {
@@ -128,6 +128,9 @@
             $("#scale").html("Scaled " + parseInt(100 * ratio) + "% (original: " + origin_width + "x" + origin_height + ")");
           }
         });
+      } else if (!this.retried) {
+        this.retried = true;
+        window.setTimeout(Danbooru.Upload.initialize_image, 200);
       }
     }
   }
