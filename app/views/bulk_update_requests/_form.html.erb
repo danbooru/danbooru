@@ -7,11 +7,11 @@
     <label class="text optional" for="bulk_update_request_script">Script</label>
 <pre class="hint">
 Use the following format:
-remove alias aaa -> bbb
-remove implication aaa -> bbb
-create alias aaa -> bbb
-create implication aaa -> bbb
-mass update aaa -> bbb
+unalias aaa -> bbb
+unimply aaa -> bbb
+alias aaa -> bbb
+imply aaa -> bbb
+update aaa -> bbb
 </pre>
     <%= text_area :bulk_update_request, :script, :size => "50x10" %>
   </div>

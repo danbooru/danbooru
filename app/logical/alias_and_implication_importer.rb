@@ -22,16 +22,21 @@ class AliasAndImplicationImporter
     text.gsub!(/\s+$/, "")
     text.gsub!(/ {2,}/, " ")
     text.split(/\r\n|\r|\n/).map do |line|
-      if line =~ /^create alias (\S+) -> (\S+)$/i
+      if line =~ /^(?:create alias|aliasing|alias) (\S+) -> (\S+)$/i
         [:create_alias, $1, $2]
-      elsif line =~ /^create implication (\S+) -> (\S+)$/i
+
+      elsif line =~ /^(?:create implication|implicating|implicate|imply) (\S+) -> (\S+)$/i
         [:create_implication, $1, $2]
-      elsif line =~ /^remove alias (\S+) -> (\S+)$/i
+
+      elsif line =~ /^(?:remove alias|unaliasing|unalias) (\S+) -> (\S+)$/i
         [:remove_alias, $1, $2]
-      elsif line =~ /^remove implication (\S+) -> (\S+)$/i
+
+      elsif line =~ /^(?:remove implication|unimplicating|unimplicate|unimply) (\S+) -> (\S+)$/i
         [:remove_implication, $1, $2]
-      elsif line =~ /^mass update (.+?) -> (.*)$/i
+
+      elsif line =~ /^(?:mass update|updating|update|change) (.+?) -> (.*)$/i
         [:mass_update, $1, $2]
+
       elsif line.strip.empty?
         # do nothing
       else
