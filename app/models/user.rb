@@ -1,4 +1,5 @@
 require 'digest/sha1'
+require 'danbooru/has_bit_flags'
 
 class User < ActiveRecord::Base
   class Error < Exception ; end
@@ -16,25 +17,25 @@ class User < ActiveRecord::Base
     ADMIN = 50
   end
 
+  BOOLEAN_ATTRIBUTES = %w(
+    is_banned
+    has_mail
+    receive_email_notifications
+    always_resize_images
+    enable_post_navigation
+    new_post_navigation_layout
+    enable_privacy_mode
+    enable_sequential_post_navigation
+    hide_deleted_posts
+    style_usernames
+    enable_auto_complete
+    show_deleted_children
+    has_saved_searches
+    can_approve_posts
+  )
 
-  # bit_prefs is 64 bits signed so theoretical maximum 
-  # is 0x8000 0000 0000 0000
-  BOOLEAN_ATTRIBUTES = {
-    :is_banned                         => 0x0001,
-    :has_mail                          => 0x0002,
-    :receive_email_notifications       => 0x0004,
-    :always_resize_images              => 0x0008,
-    :enable_post_navigation            => 0x0010,
-    :new_post_navigation_layout        => 0x0020,
-    :enable_privacy_mode               => 0x0040,
-    :enable_sequential_post_navigation => 0x0080,
-    :hide_deleted_posts                => 0x0100,
-    :style_usernames                   => 0x0200,
-    :enable_auto_complete              => 0x0400,
-    :show_deleted_children             => 0x0800,
-    :has_saved_searches                => 0x1000,
-    :can_approve_posts                 => 0x2000
-  }
+  include Danbooru::HasBitFlags
+  has_bit_flags BOOLEAN_ATTRIBUTES, :field => "bit_prefs"
 
   attr_accessor :password, :old_password
   attr_accessible :dmail_filter_attributes, :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr, :time_zone, :default_image_size, :enable_sequential_post_navigation, :per_page, :hide_deleted_posts, :style_usernames, :enable_auto_complete, :custom_style, :show_deleted_children, :as => [:moderator, :janitor, :contributor, :gold, :member, :anonymous, :default, :builder, :admin]
@@ -773,24 +774,6 @@ class User < ActiveRecord::Base
   include ApiMethods
   include CountMethods
   extend SearchMethods
-
-  BOOLEAN_ATTRIBUTES.each do |boolean_attribute, bit_flag|
-    define_method(boolean_attribute) do
-      bit_prefs & bit_flag > 0
-    end
-
-    define_method("#{boolean_attribute}?") do
-      bit_prefs & bit_flag > 0
-    end
-
-    define_method("#{boolean_attribute}=") do |val|
-      if val.to_s =~ /t|1|y/
-        self.bit_prefs |= bit_flag
-      else
-        self.bit_prefs &= ~bit_flag
-      end
-    end
-  end
 
   def initialize_default_image_size
     self.default_image_size = "large"

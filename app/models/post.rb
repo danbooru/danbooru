@@ -1,11 +1,9 @@
+require 'danbooru/has_bit_flags'
+
 class Post < ActiveRecord::Base
   class ApprovalError < Exception ; end
   class DisapprovalError < Exception ; end
   class SearchError < Exception ; end
-
-  BOOLEAN_ATTRIBUTES = {
-    :has_embedded_notes => 0x0001
-  }
 
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :view_count
   after_destroy :delete_files
@@ -1597,24 +1595,12 @@ class Post < ActiveRecord::Base
   extend SearchMethods
   include PixivMethods
   include IqdbMethods
+  include Danbooru::HasBitFlags
 
-  BOOLEAN_ATTRIBUTES.each do |boolean_attribute, bit_flag|
-    define_method(boolean_attribute) do
-      bit_flags & bit_flag > 0
-    end
-
-    define_method("#{boolean_attribute}?") do
-      bit_flags & bit_flag > 0
-    end
-
-    define_method("#{boolean_attribute}=") do |val|
-      if val.to_s =~ /t|1|y/
-        self.bit_flags |= bit_flag
-      else
-        self.bit_flags &= ~bit_flag
-      end
-    end
-  end
+  BOOLEAN_ATTRIBUTES = %w(
+    has_embedded_notes
+  )
+  has_bit_flags BOOLEAN_ATTRIBUTES
 
   def visible?
     return false if !Danbooru.config.can_user_see_post?(CurrentUser.user, self)
