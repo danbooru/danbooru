@@ -143,7 +143,7 @@ a.blacklisted-active {
   }
 }
 
-.category-0 a, a.tag-type-0 {
+.category-0 a, a.tag-type-0, .ui-state-focus a.tag-type-0 {
   color: $link_color;
 
   &:hover {
@@ -151,7 +151,7 @@ a.blacklisted-active {
   }
 }
 
-.category-1 a, a.tag-type-1 {
+.category-1 a, a.tag-type-1, .ui-state-focus a.tag-type-1 {
   color: #A00;
 
   &:hover {
@@ -159,7 +159,7 @@ a.blacklisted-active {
   }
 }
 
-.category-3 a, a.tag-type-3 {
+.category-3 a, a.tag-type-3, .ui-state-focus a.tag-type-3 {
   color: #A0A;
 
   &:hover {
@@ -167,7 +167,7 @@ a.blacklisted-active {
   }
 }
 
-.category-4 a, a.tag-type-4 {
+.category-4 a, a.tag-type-4, .ui-state-focus a.tag-type-4 {
   color: #0A0;
 
   &:hover {
@@ -175,7 +175,7 @@ a.blacklisted-active {
   }
 }
 
-.category-banned a, a.tag-type-banned {
+.category-banned a, a.tag-type-banned,, .ui-state-focus a.tag-type-banned {
   color: black;
   background-color: red;
 }
