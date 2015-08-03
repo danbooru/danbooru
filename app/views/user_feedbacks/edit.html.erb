@@ -1,0 +1,23 @@
+<div id="c-user-feedbacks">
+  <div id="a-new">
+    <h1>Edit User Feedback</h1>
+
+    <div id="preview">
+    </div>
+
+    <%= error_messages_for "user_feedback" %>
+
+    <%= simple_form_for(@user_feedback) do |f| %>
+      <%= f.input :category, :collection => ["positive", "neutral", "negative"], :include_blank => false %>
+      <%= dtext_field "user_feedback", "body" %>
+      <%= f.button :submit, "Submit" %>
+      <%= dtext_preview_button "user_feedback", "body" %>
+    <% end %>
+
+    <%= render "secondary_links" %>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  Edit Feedback - <%= Danbooru.config.app_name %>
+<% end %>

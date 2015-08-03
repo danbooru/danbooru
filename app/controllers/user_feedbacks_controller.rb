@@ -33,6 +33,13 @@ class UserFeedbacksController < ApplicationController
     respond_with(@user_feedback)
   end
 
+  def update
+    @user_feedback = UserFeedback.find(params[:id])
+    check_privilege(@user_feedback)
+    @user_feedback.update_attributes(params[:user_feedback])
+    respond_with(@user_feedback)
+  end
+
   def destroy
     @user_feedback = UserFeedback.find(params[:id])
     check_privilege(@user_feedback)

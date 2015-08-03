@@ -8,6 +8,10 @@
       <li><strong>Category</strong> <%= @user_feedback.category %></li>
       <li><strong>Message</strong> <%= format_text @user_feedback.body %></li>
     </ul>
+
+    <% if @user_feedback.creator_id == CurrentUser.id || CurrentUser.is_moderator? %>
+      <p><%= link_to "Edit", edit_user_feedback_path(@user_feedback) %></p>
+    <% end %>
   </div>
 </div>
 
