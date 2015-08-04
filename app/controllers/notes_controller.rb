@@ -23,7 +23,11 @@ class NotesController < ApplicationController
     @note = Note.create(params[:note])
     respond_with(@note) do |fmt|
       fmt.json do
-        render :json => @note.to_json(:methods => [:html_id])
+        if @note.errors.any?
+          render :json => {:success => false, :reasons => @note.errors.full_messages}.to_json, :status => 422
+        else
+          render :json => @note.to_json(:methods => [:html_id])
+        end
       end
     end
   end
@@ -33,7 +37,11 @@ class NotesController < ApplicationController
     @note.update_attributes(params[:note])
     respond_with(@note) do |format|
       format.json do
-        render :json => @note.to_json
+        if @note.errors.any?
+          render :json => {:success => false, :reasons => @note.errors.full_messages}.to_json, :status => 422
+        else
+          render :json => @note.to_json
+        end
       end
     end
   end
