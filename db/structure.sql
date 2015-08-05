@@ -2576,7 +2576,8 @@ CREATE TABLE post_disapprovals (
     post_id integer NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    reason character varying(255) DEFAULT 'legacy'::character varying
+    reason character varying(255) DEFAULT 'legacy'::character varying,
+    message text
 );
 
 
@@ -3166,7 +3167,10 @@ CREATE TABLE users (
     comment_threshold integer DEFAULT (-1) NOT NULL,
     default_image_size character varying(255) DEFAULT 'large'::character varying NOT NULL,
     favorite_tags text,
-    blacklisted_tags text,
+    blacklisted_tags text DEFAULT 'spoilers
+guro
+scat
+furry -rating:s'::text,
     time_zone character varying(255) DEFAULT 'Eastern Time (US & Canada)'::character varying NOT NULL,
     bcrypt_password_hash text,
     per_page integer DEFAULT 20 NOT NULL,
@@ -7267,4 +7271,8 @@ INSERT INTO schema_migrations (version) VALUES ('20150629235905');
 INSERT INTO schema_migrations (version) VALUES ('20150705014135');
 
 INSERT INTO schema_migrations (version) VALUES ('20150721214646');
+
+INSERT INTO schema_migrations (version) VALUES ('20150728170433');
+
+INSERT INTO schema_migrations (version) VALUES ('20150805010245');
 

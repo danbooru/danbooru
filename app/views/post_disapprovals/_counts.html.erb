@@ -13,5 +13,9 @@
     <% if disapprovals.disinterest.count > 0 %>
       <%= disapprovals.disinterest.count %> did not like the post enough to approve it.
     <% end %>
+
+    <% if disapprovals.with_message.any? %>
+      Messages: <%= disapprovals.with_message.map(&:message).to_sentence %>
+    <% end %>
   </p>
 <% end %>
