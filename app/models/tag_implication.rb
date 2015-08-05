@@ -131,6 +131,7 @@ class TagImplication < ActiveRecord::Base
     update_forum_topic_for_approve if update_topic
   rescue Exception => e
     update_column(:status, "error: #{e}")
+    NewRelic::Agent.notice_error(e, :custom_params => {:tag_implication_id => id, :antecedent_name => antecedent_name, :consequent_name => consequent_name})
   end
 
   def absence_of_circular_relation

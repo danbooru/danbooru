@@ -91,6 +91,7 @@ class TagAlias < ActiveRecord::Base
     update_column(:status, "active")
   rescue Exception => e
     update_column(:status, "error: #{e}")
+    NewRelic::Agent.notice_error(e, :custom_params => {:tag_alias_id => id, :antecedent_name => antecedent_name, :consequent_name => consequent_name})
   end
 
   def is_pending?
