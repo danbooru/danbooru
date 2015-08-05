@@ -39,7 +39,7 @@ class JanitorTrial < ActiveRecord::Base
               Janitors on #{Danbooru.config.app_name} are responsible for helping maintain a high level of quality on the site. They approve uploads from other users and help with other moderation efforts. You would be expected at a minimum to approve a few posts a week. If you are interested, please respond to this message.
             EOS
 
-            Dmail.create_split(:title => "Test Janitor Invitation", :body => body, :to_id => user_id, :from_id => admin.id)
+            Dmail.create_split(:title => "Test Janitor Invitation", :body => body, :to_id => user.id)
           end
         end
       end
