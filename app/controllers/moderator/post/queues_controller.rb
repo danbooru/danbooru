@@ -6,7 +6,7 @@ module Moderator
 
       def show
         if params[:per_page]
-          session["mq_per_page"] = params[:per_page]
+          cookies["mq_per_page"] = params[:per_page]
         end
 
         ::Post.without_timeout do
@@ -19,7 +19,7 @@ module Moderator
     protected
 
       def per_page
-        session["mq_per_page"] || params[:per_page] || 25
+        cookies["mq_per_page"] || params[:per_page] || 25
       end
     end
   end
