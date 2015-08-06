@@ -15,8 +15,14 @@
       <div class="prose">
         <%= format_text(forum_post.body) %>
       </div>
-      <% if forum_post.updated_at - forum_post.created_at > 5.minutes %>
-        <p class="info">Updated by <%= link_to_user forum_post.updater %> <%= time_ago_in_words_tagged(forum_post.updated_at) %></p>
+      <% if forum_post.is_original_post? %>
+        <% if @forum_topic.updated_at - @forum_topic.created_at > 5.minutes %>
+          <p class="info">Updated by <%= link_to_user @forum_topic.updater %> <%= time_ago_in_words_tagged(@forum_topic.updated_at) %></p>
+        <% end %>
+      <% else %>
+        <% if forum_post.updated_at - forum_post.created_at > 5.minutes %>
+          <p class="info">Updated by <%= link_to_user forum_post.updater %> <%= time_ago_in_words_tagged(forum_post.updated_at) %></p>
+        <% end %>
       <% end %>
       <menu>
         <li>ID: <%= forum_post.id %></li>
