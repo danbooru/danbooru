@@ -14,6 +14,19 @@ class NoteTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
+    context "#merge_version" do
+      setup do
+        @post = FactoryGirl.create(:post)
+        @note = FactoryGirl.create(:note, :post => @post)
+      end
+
+      should "not increment version" do
+        @note.update_attributes(:x => 100)       
+        assert_equal(1, @note.versions.count)
+        assert_equal(1, @note.versions.first.version)
+      end
+    end
+
     context "for a post that already has a note" do
       setup do
         @post = FactoryGirl.create(:post)

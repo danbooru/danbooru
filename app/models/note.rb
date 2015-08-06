@@ -195,7 +195,7 @@ class Note < ActiveRecord::Base
       :height => height,
       :is_active => is_active,
       :body => body,
-      :version => version
+      :version => versions.where("id <> ?", prev.id).maximum(:version) || 1
     )
   end
 
