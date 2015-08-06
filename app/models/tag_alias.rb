@@ -86,7 +86,10 @@ class TagAlias < ActiveRecord::Base
     clear_all_cache
     ensure_category_consistency
     update_posts
-    update_forum_topic_for_approve if update_topic
+    admin = CurrentUser.user || User.admins.first
+    CurrentUser.scoped(admin, "127.0.0.1") do
+      update_forum_topic_for_approve if update_topic
+    end
     update_column(:post_count, consequent_tag.post_count)
     update_column(:status, "active")
   rescue Exception => e

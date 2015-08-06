@@ -92,7 +92,7 @@ class ForumPost < ActiveRecord::Base
   end
 
   def validate_topic_is_unlocked
-    return if CurrentUser.user.is_moderator?
+    return if CurrentUser.is_moderator?
     return if topic.nil?
 
     if topic.is_locked?

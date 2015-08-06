@@ -37,6 +37,8 @@
         <% end %>
       </ul>
 
+      <%= artist_alias_and_implication_list(post_set.artist) %>
+
       <p><%= link_to "View artist", artist_path(post_set.artist.id) %></p>
     </div>
   <% elsif post_set.has_wiki? %>
