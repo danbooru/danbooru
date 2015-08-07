@@ -76,12 +76,13 @@ class JanitorTrial < ActiveRecord::Base
   def create_feedback
     user.feedback.create(
       :category => "negative",
-      :body => "Demoted from Janitor trial"
+      :body => "Lost approval privileges"
     )
   end
 
   def promote!
     update_attribute(:status, "inactive")
+    user.feedback.create(:category => "neutral", :body => "Gained approval privileges")
   end
 
   def demote!
