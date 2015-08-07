@@ -20,9 +20,9 @@ class PostDisapproval < ActiveRecord::Base
     admin = User.admins.first
     disapprovals = {}
 
-    PostDisapproval.with_message.where("created_at >= ?", 1.year.ago).find_each do |disapproval|
-      disapprovals[disapproval.user_id] ||= []
-      disapprovals[disapproval.user_id] << disapproval
+    PostDisapproval.with_message.where("created_at >= ?", 1.day.ago).find_each do |disapproval|
+      disapprovals[disapproval.post.uploader_id] ||= []
+      disapprovals[disapproval.post.uploader_id] << disapproval
     end
 
     disapprovals.each do |user_id, list|
