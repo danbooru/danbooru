@@ -70,6 +70,31 @@
     $("#blacklist-box").show();
   }
 
+  Danbooru.Blacklist.initialize_disable_all_blacklists = function() {
+    if (Danbooru.Cookie.get("disable-all-blacklists") === "1") {
+      $("#re-enable-all-blacklists").show();
+      $("#blacklist-list a:not(.blacklisted-active)").click();
+      Danbooru.Blacklist.apply();
+    } else {
+      $("#disable-all-blacklists").show()
+    }
+
+    $("#disable-all-blacklists").click(function(e) {
+      $("#disable-all-blacklists").hide();
+      $("#re-enable-all-blacklists").show();
+      $("#blacklist-list a:not(.blacklisted-active)").click();
+      Danbooru.Cookie.put("disable-all-blacklists", "1");
+      e.preventDefault();
+    });
+    $("#re-enable-all-blacklists").click(function(e) {
+      $("#disable-all-blacklists").show();
+      $("#re-enable-all-blacklists").hide();
+      $("#blacklist-list a.blacklisted-active").click();
+      Danbooru.Cookie.put("disable-all-blacklists", "0");
+      e.preventDefault();
+    });
+  }
+
   Danbooru.Blacklist.apply = function() {
     $.each(this.entries, function(i, entry) {
       entry.hits = 0;
@@ -126,6 +151,7 @@
 
     if (Danbooru.Blacklist.apply() > 0) {
       Danbooru.Blacklist.update_sidebar();
+      Danbooru.Blacklist.initialize_disable_all_blacklists();
     } else {
       $("#blacklist-box").hide();
     }
