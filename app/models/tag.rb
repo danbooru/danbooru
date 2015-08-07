@@ -57,6 +57,12 @@ class Tag < ActiveRecord::Base
         Tag.where(:name => tag_names).update_all("post_count = post_count - 1")
         Post.expire_cache_for_all(tag_names)
       end
+
+      def clean_up_negative_post_counts!
+        Tag.where("post_count < 0").find_each do |tag|
+          tag.fix_post_count
+        end
+      end
     end
 
     def real_post_count
