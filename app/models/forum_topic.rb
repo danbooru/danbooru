@@ -19,6 +19,7 @@ class ForumTopic < ActiveRecord::Base
   validates_associated :original_post
   validates_inclusion_of :category_id, :in => CATEGORIES.keys
   accepts_nested_attributes_for :original_post
+  after_update :update_orignal_post
 
   module CategoryMethods
     extend ActiveSupport::Concern
@@ -158,5 +159,11 @@ class ForumTopic < ActiveRecord::Base
 
   def undelete!
     update_attributes({:is_deleted => false}, :as => CurrentUser.role)
+  end
+
+  def update_orignal_post
+    if original_post
+      original_post.update_columns(:updater_id => CurrentUser.id, :updated_at => Time.now)
+    end
   end
 end
