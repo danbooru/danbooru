@@ -13,6 +13,7 @@ class ArtistUrl < ActiveRecord::Base
       url = url.gsub(/^http:\/\/blog\d+\.fc2/, "http://blog.fc2")
       url = url.gsub(/^http:\/\/blog-imgs-\d+\.fc2/, "http://blog.fc2")
       url = url.gsub(/^http:\/\/blog-imgs-\d+-\w+\.fc2/, "http://blog.fc2")
+      url = url.sub(%r!(http://seiga.nicovideo.jp/user/illust/\d+)\?.+!, '\1')
       begin
         url = Sources::Site.new(url).normalize_for_artist_finder!
       rescue PixivApiClient::Error

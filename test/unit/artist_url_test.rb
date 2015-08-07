@@ -39,6 +39,11 @@ class ArtistUrlTest < ActiveSupport::TestCase
       assert_equal("http://blog.fc2.com/monet/", url.normalized_url)
     end
 
+    should "normalize nico seiga artist urls" do
+      url = FactoryGirl.create(:artist_url, :url => "http://seiga.nicovideo.jp/user/illust/1826959?target=illust_all")
+      assert_equal("http://seiga.nicovideo.jp/user/illust/1826959/", url.normalized_url)
+    end
+
     should "normalize pixiv urls" do
       url = FactoryGirl.create(:artist_url, :url => "http://img55.pixiv.net/img/monet")
       assert_equal("http://img55.pixiv.net/img/monet", url.url)
