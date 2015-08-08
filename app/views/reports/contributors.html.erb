@@ -10,9 +10,6 @@
           <th data-sort="string">User</th>
           <th data-sort="int">Level</th>
           <th data-sort="int">Uploads</th>
-          <th data-sort="int">score:3+</th>
-          <th data-sort="int" title="25% of uploads received this score or less">quartile score</th>
-          <th data-sort="int" title="50% of uploads received this score or less">median score</th>
           <th data-sort="int">deletion</th>
         </tr>
       </thead>
@@ -23,9 +20,6 @@
               <td><%= link_to_user user.user %></td>
               <td data-sort-value="<%= user.level %>"><%= user.level_string %></td>
               <td><%= link_to user.post_upload_count, posts_path(:tags => "uploader:#{user.name} order:random", :limit => 200) %></td>
-              <td><%= number_to_percentage user.confidence_interval_for(3), :precision => 0 %></td>
-              <td><%= user.quartile_score %></td>
-              <td><%= user.median_score %></td>
               <td><%= link_to number_to_percentage(user.deletion_confidence_interval, :precision => 0), posts_path(:tags => "uploader:#{user.name} status:deleted", :limit => 200) %></td>
             </tr>
           <% end %>
