@@ -760,6 +760,12 @@ class User < ActiveRecord::Base
     end
   end
 
+  module StatisticsMethods
+    def deletion_confidence(days = 30)
+      Reports::UserPromotion.deletion_confidence_interval_for(self, days)
+    end
+  end
+
   include BanMethods
   include NameMethods
   include PasswordMethods
@@ -774,6 +780,7 @@ class User < ActiveRecord::Base
   include ApiMethods
   include CountMethods
   extend SearchMethods
+  include StatisticsMethods
 
   def initialize_default_image_size
     self.default_image_size = "large"

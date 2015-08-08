@@ -30,16 +30,17 @@ module Reports
     def self.confidence_interval_for(user, n)
       up_votes = Post.where("created_at >= ?", min_time).where(:is_deleted => false, :uploader_id => user.id).where("score >= ?", n).count
       total_votes = Post.where("created_at >= ?", min_time).where(:uploader_id => user.id).count
-      ci_lower_bound(up_votes, total_votes, 0.95)
+      ci_lower_bound(up_votes, total_votes)
     end
 
-    def self.deletion_confidence_interval_for(user)
-      deletions = Post.where(:uploader_id => user.id, :is_deleted => true).count
-      total = Post.where(:uploader_id => user.id).count
-      ci_lower_bound(deletions, total, 0.95)
+    def self.deletion_confidence_interval_for(user, days = nil)
+      date = (days || 30).days.ago
+      deletions = Post.where("created_at >= ?", date).where(:uploader_id => user.id, :is_deleted => true).count
+      total = Post.where("created_at >= ?", date).where(:uploader_id => user.id).count
+      ci_lower_bound(deletions, total)
     end
 
-    def self.ci_lower_bound(pos, n, confidence)
+    def self.ci_lower_bound(pos, n, confidence = 0.95)
       if n == 0
         return 0
       end

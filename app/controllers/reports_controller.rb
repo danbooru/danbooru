@@ -6,4 +6,8 @@ class ReportsController < ApplicationController
   def janitor_trials
     @report = Reports::JanitorTrials.new
   end
+
+  def contributors
+    @report = Reports::Contributors.new
+  end
 end
