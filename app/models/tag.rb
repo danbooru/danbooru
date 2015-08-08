@@ -60,7 +60,11 @@ class Tag < ActiveRecord::Base
 
       def clean_up_negative_post_counts!
         Tag.where("post_count < 0").find_each do |tag|
+          tag_alias = TagAlias.where("status in ('active', 'processing') and antecedent_name = ?", tag.name).first
           tag.fix_post_count
+          if tag_alias
+            tag_alias.consequent_tag.fix_post_count
+          end
         end
       end
     end
