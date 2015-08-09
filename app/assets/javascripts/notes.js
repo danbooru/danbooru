@@ -572,13 +572,12 @@ Danbooru.Note = {
       $("#mark-as-translated-section").show();
 
       Danbooru.notice('Translation mode is on. Drag on the image to create notes. <a href="#">Turn translation mode off</a> (shortcut is <span class="key">n</span>).');
-      $("#notice a:contains(Turn translation mode off)").click(function(e) {
-        Danbooru.Note.TranslationMode.stop();
-        e.preventDefault();
-      });
+      $("#notice a:contains(Turn translation mode off)").click(Danbooru.Note.TranslationMode.stop);
     },
 
-    stop: function() {
+    stop: function(e) {
+      e.preventDefault();
+
       Danbooru.Note.TranslationMode.active = false;
       $("#image").css("cursor", "auto");
       $("#image").bind("click", Danbooru.Note.Box.toggle_all);
