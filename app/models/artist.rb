@@ -145,8 +145,7 @@ class Artist < ActiveRecord::Base
         :is_active => is_active,
         :is_banned => is_banned,
         :other_names => other_names,
-        :group_name => group_name,
-        :version => versions.where("id <> ?", prev.id).maximum(:version) || 1
+        :group_name => group_name
       )
     end
 
