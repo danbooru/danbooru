@@ -159,5 +159,9 @@
 })();
 
 $(document).ready(function() {
+  if ($("#c-moderator-post-queues").length) {
+    return;
+  }
+  
   Danbooru.Blacklist.initialize_all();
 });
