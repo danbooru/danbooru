@@ -84,7 +84,7 @@
     </div>
     <p><strong>Upgrading from Gold to Platinum will only cost $20.</strong> If you have any further questions or concerns, feel free to contact me at <%= mail_to Danbooru.config.contact_email, nil, :encode => :javascript %>.</p>
 
-    <% if true || CurrentUser.user.level < User::Levels::GOLD %>
+    <% if CurrentUser.user.level < User::Levels::GOLD %>
       <%= stripe_button("Upgrade to Gold", 2000) %>
       <%= stripe_button("Upgrade to Platinum", 4000) %>
     <% elsif CurrentUser.user.level < User::Levels::PLATINUM %>
