@@ -2,14 +2,18 @@
   Danbooru.Cookie = {};
 
   Danbooru.Cookie.put = function(name, value, days) {
-    if (days == null) {
-      days = 365;
+    var expires = "";
+    if (days !== "session") {
+      if (!days) {
+        days = 365;
+      }
+
+      var date = new Date();
+      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+      expires = "expires=" + date.toGMTString() + "; ";
     }
 
-    var date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-    var expires = "; expires=" + date.toGMTString();
-    document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/";
+    document.cookie = name + "=" + encodeURIComponent(value) + "; " + expires + "path=/";
   }
 
   Danbooru.Cookie.raw_get = function(name) {

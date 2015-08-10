@@ -99,6 +99,15 @@
     return string.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
   }
 
+  String.prototype.hash = function() {
+    var hash = 5381, i = this.length;
+
+    while(i)
+      hash = (hash * 33) ^ this.charCodeAt(--i)
+
+    return hash >>> 0;
+  }
+
   $.fn.selectRange = function(start, end) {
     return this.each(function() {
       if (this.setSelectionRange) {

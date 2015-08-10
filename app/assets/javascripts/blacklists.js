@@ -38,9 +38,12 @@
     })[0];
     if (match) {
       match.disabled = !match.disabled;
+      var hash = tags.hash();
       if (match.disabled) {
+        Danbooru.Cookie.put("bl:" + hash, "1", "session");
         $(e.target).addClass("blacklisted-active");
       } else {
+        Danbooru.Cookie.remove("bl:" + hash);
         $(e.target).removeClass("blacklisted-active");
       }
     }
@@ -56,9 +59,13 @@
       var item = $("<li/>");
       var link = $("<a/>");
       var count = $("<span/>");
+      var hash = entry.tags.hash();
 
       link.text(entry.tags);
       link.click(Danbooru.Blacklist.toggle_entry);
+      if (Danbooru.Cookie.get("bl:" + hash)) {
+        link.click();
+      }
       count.html(entry.hits);
       item.append(link);
       item.append(" ");
@@ -162,6 +169,6 @@ $(document).ready(function() {
   if ($("#c-moderator-post-queues").length) {
     return;
   }
-  
+
   Danbooru.Blacklist.initialize_all();
 });
