@@ -11,6 +11,12 @@ module Danbooru
         attributes.each.with_index do |attribute, i|
           bit_flag = 1 << i
 
+          define_singleton_method("flag_value_for") do |key|
+            index = attributes.index(key)
+            raise IndexError if index.nil?
+            1 << index
+          end
+
           define_method(attribute) do
             send(field) & bit_flag > 0
           end

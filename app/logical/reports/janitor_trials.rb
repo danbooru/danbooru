@@ -39,7 +39,7 @@ module Reports
     end
 
     def janitors
-      User.where("level >= ?", User::Levels::JANITOR).to_a.map {|x| Janitor.new(x)}
+      User.where("bit_prefs & ? > 0", User.flag_value_for("can_approve_posts")).to_a.map {|x| Janitor.new(x)}
     end
   end
 end
