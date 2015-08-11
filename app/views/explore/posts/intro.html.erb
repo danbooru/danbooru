@@ -10,7 +10,7 @@
       <% end %>
     </header>
 
-    <p style="text-align: center;">Type in your favorite anime, manga, or character (last name first). Here are some examples:</p>
+    <p style="text-align: center;">Type in your favorite anime, manga, or character (last name first). Here are some popular examples:</p>
 
     <% cache("intro-page", :expires_in => 1.hour) do %>
       <% @presenter.each do |tag, post_set| %>

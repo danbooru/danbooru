@@ -7,8 +7,8 @@ class PopularSearchService
     @scale = scale
   end
 
-  def each_search(&block)
-    fetch_data.scan(/(.+?) (\d+)\.0\n/).each(&block)
+  def each_search(&block, limit = 100)
+    fetch_data.scan(/(.+?) (\d+)\.0\n/).slice(0, limit).each(&block)
   end
 
   def fetch_data
