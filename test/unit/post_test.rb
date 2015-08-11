@@ -959,6 +959,9 @@ class PostTest < ActiveSupport::TestCase
         should "normalize hentai foundry links" do
           @post.source = "http://pictures.hentai-foundry.com//a/AnimeFlux/219123.jpg"
           assert_equal("http://www.hentai-foundry.com/pictures/user/AnimeFlux/219123", @post.normalized_source)
+
+          @post.source = "http://pictures.hentai-foundry.com/a/AnimeFlux/219123.jpg"
+          assert_equal("http://www.hentai-foundry.com/pictures/user/AnimeFlux/219123", @post.normalized_source)
         end
       end
     end
