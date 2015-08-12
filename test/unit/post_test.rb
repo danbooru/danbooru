@@ -960,7 +960,7 @@ class PostTest < ActiveSupport::TestCase
           @post.source = "http://pictures.hentai-foundry.com//a/AnimeFlux/219123.jpg"
           assert_equal("http://www.hentai-foundry.com/pictures/user/AnimeFlux/219123", @post.normalized_source)
 
-          @post.source = "http://pictures.hentai-foundry.com/a/AnimeFlux/219123.jpg"
+          @post.source = "http://pictures.hentai-foundry.com/a/AnimeFlux/219123/Mobile-Suit-Equestria-rainbow-run.jpg"
           assert_equal("http://www.hentai-foundry.com/pictures/user/AnimeFlux/219123", @post.normalized_source)
         end
       end
