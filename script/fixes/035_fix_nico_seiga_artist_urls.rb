@@ -7,4 +7,4 @@ ActiveRecord::Base.connection.execute("set statement_timeout = 0")
 CurrentUser.user = User.admins.first
 CurrentUser.ip_addr = "127.0.0.1"
 
-ArtistUrl.update_all("normalized_url = replace(normalized_url, '?target=illust_all/', '/')", "normalized_url like 'http://seiga.nicovideo.jp/user/illust/%'")
+ArtistUrl.where("normalized_url like 'http://seiga.nicovideo.jp/user/illust/%'").update_all("normalized_url = replace(normalized_url, '?target=illust_all/', '/')")
