@@ -6,7 +6,7 @@ class PostPresenter < Presenter
       return "Expunged"
     end
 
-    if post.is_deleted? && options[:tags] !~ /status:(?:all|any|deleted|banned)/ && !options[:raw]
+    if !options[:show_deleted] && post.is_deleted? && options[:tags] !~ /status:(?:all|any|deleted|banned)/ && !options[:raw]
       return ""
     end
 
