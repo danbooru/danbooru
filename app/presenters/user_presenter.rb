@@ -54,12 +54,17 @@ class UserPresenter
       return "none"
     end
     
-    dcon = [user.deletion_confidence(120), 15].min
-    multiplier = (1 - (dcon / 15.0))
-    max_count = [(user.base_upload_limit * multiplier).ceil, 5].max
-    uploaded_count = Post.for_user(user.id).where("created_at >= ?", 24.hours.ago).count
+    deleted_count = Post.for_user(user.id).deleted.where("is_banned = false").count
+    pending_count = Post.for_user(user.id).pending.count
+    approved_count = Post.where("is_flagged = false and is_pending = false and is_deleted = false and uploader_id = ?", user.id).count
 
-    "(#{user.base_upload_limit} * #{'%0.2f' % multiplier}) - #{uploaded_count} = #{user.upload_limit}"
+    if user.base_upload_limit.to_i != 0
+      string = "max(base:#{user.base_upload_limit} - (deleted:#{deleted_count} / 4), 4) - pending:#{pending_count}"
+    else
+      string = "max(10 + (approved:#{approved_count} / 10) - (deleted:#{deleted_count} / 4), 4) - pending:#{pending_count}"
+    end
+    
+    "#{string} = #{user.upload_limit}"
   end
 
   def uploads

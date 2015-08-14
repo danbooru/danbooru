@@ -7,10 +7,6 @@
         <p>Before uploading, please read the <%= link_to "how to upload guide", wiki_pages_path(:title => "howto:upload") %>.</p>
       </div>
 
-      <% unless CurrentUser.is_contributor? %>
-        <p>You can upload <strong><%= pluralize CurrentUser.upload_limit, "more post" %></strong> today.</p>
-      <% end %>
-
       <% if params[:url].blank? %>
         <div id="bookmarklet-notice">
           <p><span style="font-weight: bold;">You should be using Danbooru's official <%= link_to "upload bookmarklet", bookmarklet_path %> to upload!</span> It makes uploading more convenient and does several things for you automatically such as fixing incorrect sources and optionally copying the artist's commentary.</p>
