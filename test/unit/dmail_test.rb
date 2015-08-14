@@ -27,9 +27,8 @@ class DmailTest < ActiveSupport::TestCase
         assert(@recipient.dmail_filter.filtered?(@dmail))
       end
 
-      should "autodelete if it has a banned word" do
+      should "autoread if it has a banned word" do
         @dmail.save
-        assert_equal(true, @dmail.is_deleted?)
         assert_equal(true, @dmail.is_read?)
       end
 
