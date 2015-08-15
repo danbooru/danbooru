@@ -12,13 +12,22 @@ module Downloads
 
     protected
       def rewrite_thumbnails(url, headers)
-        if url =~ %r{^https?://.+\.tumblr\.com/(?:\w+/)?(?:tumblr_)?(\w+_)(\d+)\..+$}
+        if url =~ %r{^https?://.+\.tumblr\.com/(?:\w+/)?(?:tumblr_)?(\w+_)(\d+)(\..+)$}
           match = $1
           given_size = $2
+          file_ext = $3
 
           big_1280_url = url.sub(match + given_size, match + "1280")
-          if http_exists?(big_1280_url, headers)
-            return [big_1280_url, headers]
+          if file_ext == ".gif"
+            res = http_head_request(big_1280_url, headers)
+            # Sometimes the 1280 version of a gif is actually a static jpeg. We don't want that so we only use the 1280 version if it really is a gif.
+            if res.is_a?(Net::HTTPSuccess) && res["content-type"] == "image/gif"
+              return [big_1280_url, headers]
+            end
+          else
+            if http_exists?(big_1280_url, headers)
+              return [big_1280_url, headers]
+            end
           end
         end
 
