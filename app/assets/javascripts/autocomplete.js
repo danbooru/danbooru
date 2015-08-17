@@ -7,6 +7,7 @@
     if (Danbooru.meta("enable-auto-complete") === "true") {
       Danbooru.Autocomplete.enable_local_storage = this.test_local_storage();
       this.initialize_tag_autocomplete();
+      this.initialize_mention_autocomplete();
       this.prune_local_storage();
     }
   }
@@ -33,6 +34,49 @@
         $.localStorage.set("danbooru-autocomplete-version", this.AUTOCOMPLETE_VERSION);
       }
     }
+  }
+
+  Danbooru.Autocomplete.initialize_mention_autocomplete = function() {
+    var $fields = $("#forum_post_body");
+    $fields.autocomplete({
+      delay: 500,
+      minLength: 2,
+      autoFocus: true,
+      select: function(event, ui) {
+        var before_caret_text = this.value.substring(0, this.selectionStart).replace(/\S+$/, ui.item.value + " ");
+        var after_caret_text = this.value.substring(this.selectionStart);
+        this.value = before_caret_text;
+
+        // Preserve original caret position to prevent it from jumping to the end
+        var original_start = this.selectionStart;
+        this.value += after_caret_text;
+        this.selectionStart = this.selectionEnd = original_start;
+
+        return false;
+      },
+      source: function(req, resp) {
+        var cursor = this.element.get(0).selectionStart;
+        var i;
+        var name = null;
+
+        for (i=cursor; i>=1; --i) {
+          if (req.term[i-1] === " ") {
+            return;
+          }
+
+          if (req.term[i-1] === "@") {
+            name = req.term.substring(i, cursor);
+            break;
+          }
+        }
+
+        if (name) {
+          Danbooru.Autocomplete.user_source(name, resp, "@");
+        }
+
+        return;
+      }
+    });
   }
 
   Danbooru.Autocomplete.initialize_tag_autocomplete = function() {
@@ -63,7 +107,6 @@
       select: function(event, ui) {
         var before_caret_text = this.value.substring(0, this.selectionStart);
         var after_caret_text = this.value.substring(this.selectionStart);
-
         var regexp = new RegExp("(" + prefixes + ")?\\S+$", "g");
         this.value = before_caret_text.replace(regexp, "$1" + ui.item.value + " ");
 
@@ -312,11 +355,18 @@
       },
       method: "get",
       success: function(data) {
+        var prefix;
+        if (metatag === "@") {
+          prefix = "@";
+        } else {
+          prefix = metatag + ":";
+        }
+
         resp($.map(data, function(user) {
           return {
             type: "user",
             label: user.name.replace(/_/g, " "),
-            value: metatag + ":" + user.name,
+            value: prefix + user.name,
             level: user.level_string
           };
         }));
