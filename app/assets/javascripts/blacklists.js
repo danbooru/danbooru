@@ -63,13 +63,14 @@
 
       link.text(entry.tags);
       link.click(Danbooru.Blacklist.toggle_entry);
-      if (Danbooru.Cookie.get("bl:" + hash)) {
-        link.click();
-      }
       count.html(entry.hits);
       item.append(link);
       item.append(" ");
       item.append(count);
+
+      if (Danbooru.Cookie.get("bl:" + hash)) {
+        link.click();
+      }
 
       $("#blacklist-list").append(item);
     });
