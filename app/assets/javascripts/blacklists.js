@@ -62,6 +62,7 @@
       var hash = entry.tags.hash();
 
       link.text(entry.tags);
+      link.addClass("blacklist-toggle");
       link.click(Danbooru.Blacklist.toggle_entry);
       count.html(entry.hits);
       item.append(link);

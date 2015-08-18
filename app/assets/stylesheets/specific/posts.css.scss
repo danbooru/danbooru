@@ -48,8 +48,12 @@ article.post-preview {
   margin-top: 1em;
 }
 
+a.blacklist-toggle {
+  text-decoration: line-through;
+}
+
 a.blacklisted-active {
-  font-weight: bold;
+  text-decoration: none;
 }
 
 .post-preview.blacklisted-active, #image-container.blacklisted-active {
