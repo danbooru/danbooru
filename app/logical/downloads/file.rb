@@ -63,6 +63,13 @@ module Downloads
       src
     end
 
+    def validate_local_hosts(url)
+      ip_addr = Resolv.getaddress(url.hostname)
+      if Danbooru.config.banned_ip_for_download?(ip_addr)
+        raise Error.new("Banned server for download")
+      end
+    end
+
     def http_get_streaming(src, datums = {}, options = {})
       max_size = options[:max_size] || Danbooru.config.max_file_size
       max_size = nil if max_size == 0 # unlimited
@@ -80,6 +87,8 @@ module Downloads
         }
         src, headers, datums = before_download(src, headers, datums)
         url = URI.parse(src)
+
+        validate_local_hosts(url)
 
         begin
           Net::HTTP.start(url.host, url.port, :use_ssl => url.is_a?(URI::HTTPS)) do |http|

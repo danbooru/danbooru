@@ -359,5 +359,10 @@ module Danbooru
     def enable_post_search_counts
       false
     end
+
+    # For downloads, if the host matches any of these IPs, block it
+    def banned_ip_for_download?(ip_addr)
+      ip_addr =~ /^(?:127\.0\.0\.1|::1|169\.254\.\d+\.\d+|fe80::.*)$/
+    end
   end
 end
