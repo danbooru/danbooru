@@ -48,12 +48,8 @@ article.post-preview {
   margin-top: 1em;
 }
 
-a.blacklist-toggle {
-  text-decoration: line-through;
-}
-
 a.blacklisted-active {
-  text-decoration: none;
+  text-decoration: line-through;
 }
 
 .post-preview.blacklisted-active, #image-container.blacklisted-active {
@@ -525,8 +521,9 @@ div#c-explore-posts, div#c-post-appeals, div#c-post-flags, div#c-pools, div#c-no
       cursor: pointer;
     }
 
-    span {
+    span.count {
       color: #AAA;
+      margin-left: 0;
     }
   }
 }
