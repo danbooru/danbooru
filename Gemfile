@@ -19,7 +19,7 @@ gem 'coffee-rails'
 gem "therubyracer", :platforms => :ruby
 gem "pry", :group => [:test, :development]
 gem "byebug", :group => [:test, :development]
-gem "rails", "~> 4.1.8"
+gem "rails", "~> 4.2.0"
 gem "pg"
 gem "kgio", :platforms => :ruby
 gem "dalli", :platforms => :ruby
