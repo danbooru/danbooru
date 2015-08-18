@@ -362,7 +362,19 @@ module Danbooru
 
     # For downloads, if the host matches any of these IPs, block it
     def banned_ip_for_download?(ip_addr)
-      ip_addr =~ /^(?:127\.0\.0\.1|::1|169\.254\.\d+\.\d+|fe80::.*)$/
+      raise ArgumentError unless ip_addr.is_a?(IPAddr)
+
+      if IPAddr.new("127.0.0.1") == ip_addr
+        true
+      elsif IPAddr.new("169.254.0.0/16").include?(ip_addr)
+        true
+      elsif IPAddr.new("::1") == ip_addr
+        true
+      elsif IPAddr.new("fe80::/10").include?(ip_addr)
+        true
+      else
+        false
+      end
     end
   end
 end

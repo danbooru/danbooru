@@ -64,7 +64,7 @@ module Downloads
     end
 
     def validate_local_hosts(url)
-      ip_addr = Resolv.getaddress(url.hostname)
+      ip_addr = IPAddr.new(Resolv.getaddress(url.hostname))
       if Danbooru.config.banned_ip_for_download?(ip_addr)
         raise Error.new("Banned server for download")
       end
