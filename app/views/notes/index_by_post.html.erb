@@ -2,6 +2,8 @@
   <div id="a-index">
     <h1>Notes</h1>
 
+    <%= render "posts/partials/common/inline_blacklist" %>
+
     <%= @post_set.presenter.post_previews_html(self) %>
 
     <%= numbered_paginator(@posts, false) %>
