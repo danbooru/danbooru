@@ -20,6 +20,7 @@ module Danbooru
     config.action_mailer.smtp_settings = {:enable_starttls_auto => false}
     config.action_mailer.perform_deliveries = true
     config.log_tags = [lambda {|req| "PID:#{Process.pid}"}]
+    config.active_support.test_order = :random
   end
 
   I18n.enforce_available_locales = false

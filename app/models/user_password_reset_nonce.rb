@@ -10,7 +10,7 @@ class UserPasswordResetNonce < ActiveRecord::Base
   end
 
   def deliver_notice
-    Maintenance::User::PasswordResetMailer.reset_request(user, self).deliver
+    Maintenance::User::PasswordResetMailer.reset_request(user, self).deliver_now
   end
 
   def initialize_key

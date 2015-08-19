@@ -1,6 +1,8 @@
 FactoryGirl.define do
   factory(:post) do
-    md5 {|x| Time.now.to_f.to_s}
+    sequence :md5 do |n|
+      n.to_s
+    end
     uploader :factory => :user
     uploader_ip_addr "127.0.0.1"
     tag_string "tag1 tag2"

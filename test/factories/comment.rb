@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory(:comment) do |f|
     post
-    body {Faker::Lorem.sentences.join(" ")}
+    body {FFaker::Lorem.sentences.join(" ")}
   end
 end

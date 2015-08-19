@@ -31,8 +31,8 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("http://lohas.nicoseiga.jp/priv/2da967039fd50a09c634dba26c1162ecf1c35ef7/1436234417/4937663", @site_1.image_url)
-        assert_equal("http://lohas.nicoseiga.jp/priv/ee9cb45867d86771abf4ba90c74de07bdc4c7e1a/1436234419/4937663", @site_2.image_url)
+        assert_equal("http://lohas.nicoseiga.jp/priv/3a50d7fe7e55e57937e08eeadccb69611d8485bf/1439946517/4937663", @site_1.image_url)
+        assert_equal("http://lohas.nicoseiga.jp/priv/2bd59bd4b014227d23aa78488ddec8d414c1bd38/1439946519/4937663", @site_2.image_url)
       end
 
       should "get the tags" do

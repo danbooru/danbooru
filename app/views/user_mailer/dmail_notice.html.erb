@@ -10,6 +10,6 @@
   <%= DText.parse(@dmail.body) %>
 </div>
 
-<p><%= link_to "View message", dmail_path(@dmail, :host => Danbooru.config.hostname, :only_path => false) %></p>
+<p><%= link_to "View message", dmail_url(@dmail, :host => Danbooru.config.hostname, :only_path => false) %></p>
 </body>
 </html>

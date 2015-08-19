@@ -181,7 +181,7 @@ class Dmail < ActiveRecord::Base
 
   def send_dmail
     if to.receive_email_notifications? && to.email.include?("@") && owner_id == to.id
-      UserMailer.dmail_notice(self).deliver
+      UserMailer.dmail_notice(self).deliver_now
     end
   end
 

@@ -8,8 +8,8 @@ module Maintenance
           @user = FactoryGirl.create(:user)
         end
 
-        should "send the notie" do
-          LoginReminderMailer.notice(@user).deliver
+        should "send the notice" do
+          LoginReminderMailer.notice(@user).deliver_now
           assert !ActionMailer::Base.deliveries.empty?
         end
       end

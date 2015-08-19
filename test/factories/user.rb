@@ -3,7 +3,7 @@ FactoryGirl.define do
     name {(rand(1_000_000) + 10).to_s}
     password "password"
     password_hash {User.sha1("password")}
-    email {Faker::Internet.email}
+    email {FFaker::Internet.email}
     default_image_size "large"
     base_upload_limit 10
     level 20

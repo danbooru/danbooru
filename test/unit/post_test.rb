@@ -463,8 +463,8 @@ class PostTest < ActiveSupport::TestCase
 
       context "as a new user" do
         setup do
-          CurrentUser.user = FactoryGirl.create(:user)
           @post.update_attribute(:tag_string, "aaa bbb ccc ddd")
+          CurrentUser.user = FactoryGirl.create(:user)
         end
 
         should "not allow you to remove more than 2 tags" do

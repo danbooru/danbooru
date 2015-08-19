@@ -7,7 +7,7 @@ FactoryGirl.define do
     width 1
     height 1
     is_active true
-    body {Faker::Lorem.sentences.join(" ")}
+    body {FFaker::Lorem.sentences.join(" ")}
     updater_id :factory => :user
     updater_ip_addr "127.0.0.1"
   end

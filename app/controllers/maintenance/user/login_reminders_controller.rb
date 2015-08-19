@@ -7,7 +7,7 @@ module Maintenance
       def create
         @user = ::User.with_email(params[:user][:email]).first
         if @user
-          LoginReminderMailer.notice(@user).deliver
+          LoginReminderMailer.notice(@user).deliver_now
           flash[:notice] = "Email sent"
         else
           flash[:notice] = "Email address not found"

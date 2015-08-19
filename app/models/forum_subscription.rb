@@ -14,7 +14,7 @@ class ForumSubscription < ActiveRecord::Base
         CurrentUser.scoped(subscription.user, "127.0.0.1") do
           forum_posts = forum_topic.posts.where("created_at > ?", subscription.last_read_at).order("id desc")
           begin
-            UserMailer.forum_notice(subscription.user, forum_topic, forum_posts).deliver
+            UserMailer.forum_notice(subscription.user, forum_topic, forum_posts).deliver_now
           rescue Net::SMTPSyntaxError
           end
           subscription.update_attribute(:last_read_at, forum_topic.updated_at)

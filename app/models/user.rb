@@ -188,7 +188,7 @@ class User < ActiveRecord::Base
 
     def reset_password_and_deliver_notice
       new_password = reset_password()
-      Maintenance::User::PasswordResetMailer.confirmation(self, new_password).deliver
+      Maintenance::User::PasswordResetMailer.confirmation(self, new_password).deliver_now
     end
   end
 
