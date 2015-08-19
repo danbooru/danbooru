@@ -141,7 +141,7 @@ namespace :delayed_job do
     procs = capture("ps -A -o pid,command").split(/\r\n|\r|\n/).grep(/delayed_job/).map(&:to_i)
 
     if procs.any?
-      run "for i in #{procs.join(' ')} ; do kill -SIGTERM $i ; done"
+      run "for i in #{procs.join(' ')} ; do kill -s TERM $i ; done"
     end
   end
 end
