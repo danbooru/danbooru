@@ -1,1 +1,1 @@
-server "localhost", :web, :app, :db, :primary => true
+server "localhost", :roles => %w(web app db), :primary => true
