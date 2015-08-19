@@ -15,13 +15,6 @@ module Explore
           assert_response :success
         end
       end
-
-      context "#intro" do
-        should "render" do
-          get :intro
-          assert_response :success
-        end
-      end
     end
   end
 end
