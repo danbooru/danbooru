@@ -27,8 +27,14 @@ module Reports
         ActiveRecord::Base.select_value_sql("select percentile_cont(0.50) within group (order by score) from posts where created_at >= ? and approver_id = ?", since, user.id).to_i
       end
 
-      def deletion_confidence
+      def deletion_chance
         hits = Post.where("approver_id = ? and created_at >= ? and is_deleted = true", user.id, since).count
+        total = Post.where("approver_id = ? and created_at >= ?", user.id, since).count
+        Reports::UserPromotions.ci_lower_bound(hits, total, 0.95).to_i
+      end
+
+      def neg_score_chance
+        hits = Post.where("approver_id = ? and created_at >= ? and score < 0", user.id, since).count
         total = Post.where("approver_id = ? and created_at >= ?", user.id, since).count
         Reports::UserPromotions.ci_lower_bound(hits, total, 0.95).to_i
       end
