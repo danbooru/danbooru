@@ -10,10 +10,9 @@
           <th data-sort="string">User</th>
           <th data-sort="int">Level</th>
           <th data-sort="int">Approvals</th>
-          <th data-sort="int">Deleted</th>
+          <th data-sort="int">Del Chance</th>
           <th data-sort="int" title="25% of approvals received this score or less">Quartile Score</th>
           <th data-sort="int" title="50% of approvals received this score or less">Median Score</th>
-          <th data-sort="int" title="Likelihood an approval will get a score of 3 or higher">score:3+</th>
           <th></th>
         </tr>
       </thead>
@@ -23,10 +22,9 @@
             <td><%= link_to_user janitor.user %></td>
             <td data-sort-value="<%= janitor.user.level %>"><%= janitor.user.level_string %></td>
             <td><%= link_to janitor.approval_count, posts_path(:tags => "approver:#{janitor.user.name} order:random", :limit => 200) %></td>
-            <td><%= link_to janitor.deleted_count, posts_path(:tags => "approver:#{janitor.user.name} status:deleted", :limit => 200) %></td>
+            <td><%= link_to janitor.deletion_confidence, posts_path(:tags => "approver:#{janitor.user.name} status:deleted", :limit => 200) %></td>
             <td><%= janitor.percentile_25_score %></td>
             <td><%= janitor.percentile_50_score %></td>
-            <td><%= number_to_percentage janitor.confidence_interval, :precision => 0 %></td>
             <td>
               <% if CurrentUser.user.is_moderator? && janitor.trial %>
                 <%= link_to "Promote", promote_janitor_trial_path(janitor.trial), :method => :put, :remote => true %>
