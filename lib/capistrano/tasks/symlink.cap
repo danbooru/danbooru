@@ -23,3 +23,6 @@ namespace :symlink do
     end
   end
 end
+
+after "deploy:symlink:shared", "symlink:local_files"
+after "deploy:symlink:shared", "symlink:directories"

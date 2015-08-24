@@ -26,6 +26,7 @@ namespace :delayed_job do
     end
   end
 
+  desc "Kill delayed_job process"
   task :kill do
     on roles(:app) do
       procs = capture("ps -A -o pid,command").split(/\r\n|\r|\n/).grep(/delayed_job/).map(&:to_i)
@@ -36,3 +37,7 @@ namespace :delayed_job do
     end
   end
 end
+
+after "delayed_job:stop", "delayed_job:kill"
+before "deploy:started", "delayed_job:stop"
+after "deploy:published", "delayed_job:start"
