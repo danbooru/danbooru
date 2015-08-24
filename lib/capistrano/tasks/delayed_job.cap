@@ -3,8 +3,10 @@ namespace :delayed_job do
   task :start do
     on roles(:app) do
       within current_path do
-        hostname = capture("hostname").strip
-        execute :bundle, "exec", "script/delayed_job", "--queues=default,#{hostname}", "-n 2", "start"
+        with rails_env: fetch(:rails_env) do
+          hostname = capture("hostname").strip
+          execute :bundle, "exec", "script/delayed_job", "--queues=default,#{hostname}", "-n 2", "start"
+        end
       end
     end
   end
@@ -13,7 +15,9 @@ namespace :delayed_job do
   task :stop do
     on roles(:app) do
       within current_path do
-        execute :bundle, "exec", "script/delayed_job", "stop"
+        with rails_env: fetch(:rails_env) do
+          execute :bundle, "exec", "script/delayed_job", "stop"
+        end
       end
     end
   end
