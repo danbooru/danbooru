@@ -142,7 +142,7 @@ private
   end
 
   def access_token
-    Cache.get("pixiv-papi-access-token", 3000) do
+    Cache.get("pixiv-papi-access-token", 300) do
       access_token = nil
       headers = {
         "Referer" => "http://www.pixiv.net"
