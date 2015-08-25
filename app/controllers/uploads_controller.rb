@@ -80,7 +80,7 @@ protected
   end
 
   def strip_tags(s)
-    HTML::FullSanitizer.new.sanitize(s)
+    Rails::Html::FullSanitizer.new.sanitize(s)
   end
 
   def find_post_by_url(normalized_url)
