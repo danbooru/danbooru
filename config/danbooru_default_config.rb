@@ -392,5 +392,9 @@ module Danbooru
         false
       end
     end
+
+    def twitter_site
+      "@teruyo"
+    end
   end
 end

@@ -163,10 +163,11 @@
 
   <!-- Twitter properties -->
   <% if @post.twitter_card_supported? %>
-    <meta name="twitter:card" content="photo">
-    <meta name="twitter:image:src" content="http://<%= Danbooru.config.hostname %><%= @post.large_file_url %>">
-    <meta name="twitter:image:width" content="<%= @post.image_width %>">
-    <meta name="twitter:image:height" content="<%= @post.image_height %>">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="<%= Danbooru.config.twitter_site %>">
+    <meta name="twitter:title" content="<%= @post.presenter.humanized_essential_tag_string %> - <%= Danbooru.config.app_name %>">
+    <meta name="twitter:description" content="<%= @post.presenter.humanized_tag_string %> - <%= Danbooru.config.app_name %>">
+    <meta name="twitter:image" content="http://<%= Danbooru.config.hostname %><%= @post.large_file_url %>">
   <% end %>
 <% end %>
 
