@@ -124,11 +124,15 @@ class TagImplication < ActiveRecord::Base
     unless valid?
       raise errors.full_messages.join("; ")
     end
-    update_column(:status, "processing")
-    update_posts
-    update_column(:status, "active")
-    update_descendant_names_for_parents
-    update_forum_topic_for_approve if update_topic
+
+    admin = CurrentUser.user || User.admins.first
+    CurrentUser.scoped(admin, "127.0.0.1") do
+      update_column(:status, "processing")
+      update_posts
+      update_column(:status, "active")
+      update_descendant_names_for_parents
+      update_forum_topic_for_approve if update_topic
+    end
   rescue Exception => e
     update_column(:status, "error: #{e}")
     NewRelic::Agent.notice_error(e, :custom_params => {:tag_implication_id => id, :antecedent_name => antecedent_name, :consequent_name => consequent_name})
@@ -219,9 +223,11 @@ class TagImplication < ActiveRecord::Base
 
   def update_forum_topic_for_approve
     if forum_topic
-      forum_topic.posts.create(
-        :body => "The tag implication #{antecedent_name} -> #{consequent_name} has been approved."
-      )
+      CurrentUser.scoped(admin, "127.0.0.1") do
+        forum_topic.posts.create(
+          :body => "The tag implication #{antecedent_name} -> #{consequent_name} has been approved."
+        )
+      end
     end
   end
 

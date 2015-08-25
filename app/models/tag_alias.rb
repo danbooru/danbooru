@@ -81,17 +81,18 @@ class TagAlias < ActiveRecord::Base
     unless valid?
       raise errors.full_messages.join("; ")
     end
-    update_column(:status, "processing")
-    move_aliases_and_implications
-    clear_all_cache
-    ensure_category_consistency
-    update_posts
+
     admin = CurrentUser.user || User.admins.first
     CurrentUser.scoped(admin, "127.0.0.1") do
+      update_column(:status, "processing")
+      move_aliases_and_implications
+      clear_all_cache
+      ensure_category_consistency
+      update_posts
       update_forum_topic_for_approve if update_topic
+      update_column(:post_count, consequent_tag.post_count)
+      update_column(:status, "active")
     end
-    update_column(:post_count, consequent_tag.post_count)
-    update_column(:status, "active")
   rescue Exception => e
     update_column(:status, "error: #{e}")
     NewRelic::Agent.notice_error(e, :custom_params => {:tag_alias_id => id, :antecedent_name => antecedent_name, :consequent_name => consequent_name})
