@@ -48,6 +48,15 @@
       </tr>
 
       <tr>
+        <th><label for="search_has_artist">Has an Artist Entry</label></th>
+        <td>
+          <div class="input">
+            <%= select "search", "has_artist", ["yes", "no"], :selected => params[:search][:has_artist], :include_blank => true %>
+          </div>
+        </td>
+      </tr>
+
+      <tr>
         <td><%= submit_tag "Search" %><td>
       </tr>
     <% end %>

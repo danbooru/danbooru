@@ -692,6 +692,12 @@ class Tag < ActiveRecord::Base
         q = q.joins("LEFT JOIN wiki_pages ON tags.name = wiki_pages.title").where("wiki_pages.title IS NULL")
       end
 
+      if params[:has_artist] == "yes"
+        q = q.joins("INNER JOIN artists ON tags.name = artists.name").where("artists.is_active = true")
+      elsif params[:has_artist] == "no"
+        q = q.joins("LEFT JOIN artists ON tags.name = artists.name").where("artists.name IS NULL OR artists.is_active = false")
+      end
+
       params[:order] ||= params.delete(:sort)
       case params[:order]
       when "name"
