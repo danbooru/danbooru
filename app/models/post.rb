@@ -153,8 +153,16 @@ class Post < ActiveRecord::Base
       file_ext =~ /swf/i
     end
 
-    def is_video?
+    def is_webm?
       file_ext =~ /webm/i
+    end
+
+    def is_mp4?
+      file_ext =~ /mp4/i
+    end
+
+    def is_video?
+      is_webm? || is_mp4?
     end
 
     def is_ugoira?
@@ -620,8 +628,12 @@ class Post < ActiveRecord::Base
         tags << "flash"
       end
 
-      if is_video?
+      if is_webm?
         tags << "webm"
+      end
+
+      if is_mp4?
+        tags << "mp4"
       end
 
       if is_ugoira?

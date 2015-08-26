@@ -59,7 +59,7 @@ class Upload < ActiveRecord::Base
 
     def validate_file_content_type
       unless is_valid_content_type?
-        raise "invalid content type (only JPEG, PNG, GIF, SWF, and WebM files are allowed)"
+        raise "invalid content type (only JPEG, PNG, GIF, SWF, MP4, and WebM files are allowed)"
       end
 
       if is_ugoira? && ugoira_service.empty?
@@ -211,7 +211,7 @@ class Upload < ActiveRecord::Base
     end
 
     def is_video?
-      %w(webm).include?(file_ext)
+      %w(webm mp4).include?(file_ext)
     end
 
     def is_ugoira?
@@ -281,13 +281,13 @@ class Upload < ActiveRecord::Base
 
     # Does this file have image dimensions?
     def has_dimensions?
-      %w(jpg gif png swf webm zip).include?(file_ext)
+      %w(jpg gif png swf webm mp4 zip).include?(file_ext)
     end
   end
 
   module ContentTypeMethods
     def is_valid_content_type?
-      file_ext =~ /jpg|gif|png|swf|webm|zip/
+      file_ext =~ /jpg|gif|png|swf|webm|mp4|zip/
     end
 
     def content_type_to_file_ext(content_type)
@@ -307,6 +307,9 @@ class Upload < ActiveRecord::Base
       when "video/webm"
         "webm"
 
+      when "video/mp4"
+        "mp4"
+
       when "application/zip"
         "zip"
 
@@ -316,7 +319,7 @@ class Upload < ActiveRecord::Base
     end
 
     def file_header_to_content_type(source_path)
-      case File.read(source_path, 10)
+      case File.read(source_path, 16)
       when /^\xff\xd8/n
         "image/jpeg"
 
@@ -331,6 +334,9 @@ class Upload < ActiveRecord::Base
 
       when /^\x1a\x45\xdf\xa3/n
         "video/webm"
+
+      when /^....ftyp(?:isom|3gp5|mp42|MSNV)/
+        "video/mp4"
 
       when /^PK\x03\x04/
         "application/zip"
