@@ -85,9 +85,9 @@ class Upload < ActiveRecord::Base
       end
     end
 
-    def validate_no_audio
+    def tag_audio
       if is_video? && video.audio_channels.present?
-        raise "video must not have audio channels"
+        self.tag_string = "#{tag_string} audio"
       end
     end
 
@@ -112,7 +112,7 @@ class Upload < ActiveRecord::Base
         calculate_hash(file_path)
         validate_md5_uniqueness
         validate_md5_confirmation
-        validate_no_audio
+        tag_audio
         validate_video_duration
         calculate_file_size(file_path)
         if has_dimensions?

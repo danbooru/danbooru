@@ -77,3 +77,13 @@ $preview_flagged_color: #F00;
   text-align: center;
 }
 
+@mixin audio-icon {
+  content: "♪";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  color: white; 
+  background-color: rgba(0,0,0,0.5);
+  margin: 2px;
+  text-align: center;
+}

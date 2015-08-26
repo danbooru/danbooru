@@ -68,6 +68,7 @@ class PostPresenter < Presenter
   def self.data_attributes(post)
     %{
       data-id="#{post.id}"
+      data-has-audio="#{post.has_tag?('audio')}"
       data-tags="#{h(post.tag_string)}"
       data-pools="#{post.pool_string}"
       data-uploader="#{h(post.uploader_name)}"

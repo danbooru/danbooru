@@ -26,8 +26,12 @@ article.post-preview {
     margin: auto;
   }
 
-  &[data-tags~=animated]:before, &[data-file-ext=swf]:before, &[data-file-ext=webm]:before, &[data-file-ext=zip]:before {
+  &[data-tags~=animated]:before, &[data-file-ext=swf]:before, &[data-file-ext=webm]:before, &[data-file-ext=mp4]:before, &[data-file-ext=zip]:before {
     @include animated-icon;
+  }
+
+  &[data-has-audio=true]:before {
+    @include audio-icon;
   }
 }
 
