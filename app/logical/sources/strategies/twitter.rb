@@ -25,7 +25,7 @@ module Sources::Strategies
       attrs = TwitterService.new.client.status(status_id).attrs
       @artist_name = attrs[:user][:name]
       @profile_url = "https://twitter.com/" + attrs[:user][:screen_name]
-      @image_url = attrs[:entities][:media][0][:media_url] + ":orig"
+      @image_url = image_urls.first
       @artist_commentary_title = ""
       @artist_commentary_desc = attrs[:text]
     end

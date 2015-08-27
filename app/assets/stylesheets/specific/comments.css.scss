@@ -108,12 +108,12 @@ div#c-comments {
         }
       }
 
-      &[data-has-audio=true] {
+      &[data-has-sound=true] {
         div.preview {
           position: relative;
 
           &:before {
-            @include audio-icon;
+            @include sound-icon;
           }
         }
       }

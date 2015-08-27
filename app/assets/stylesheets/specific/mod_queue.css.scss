@@ -35,9 +35,9 @@ div#c-moderator-post-queues {
       }
     }
 
-    &[data-has-audio=true] {
+    &[data-has-sound=true] {
       aside:before {
-        @include audio-icon;
+        @include sound-icon;
       }
     }
   }

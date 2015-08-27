@@ -30,8 +30,8 @@ article.post-preview {
     @include animated-icon;
   }
 
-  &[data-has-audio=true]:before {
-    @include audio-icon;
+  &[data-has-sound=true]:before {
+    @include sound-icon;
   }
 }
 

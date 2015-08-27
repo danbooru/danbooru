@@ -87,7 +87,7 @@ class Upload < ActiveRecord::Base
 
     def tag_audio
       if is_video? && video.audio_channels.present?
-        self.tag_string = "#{tag_string} audio"
+        self.tag_string = "#{tag_string} video_with_sound"
       end
     end
 
