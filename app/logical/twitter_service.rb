@@ -24,7 +24,13 @@ class TwitterService
       urls << obj[:media_url] + ":orig"
     end
     attrs[:extended_entities][:media].each do |obj|
-      urls << obj[:media_url] + ":orig"
+      if obj[:video_info]
+        largest = obj[:video_info][:variants].select {|x| x[:url] =~ /\.mp4$/}.max_by {|x| x[:bitrate]}
+        urls.clear
+        urls << largest[:url] if largest
+      else
+        urls << obj[:media_url] + ":orig"
+      end
     end
     urls.uniq
   rescue
