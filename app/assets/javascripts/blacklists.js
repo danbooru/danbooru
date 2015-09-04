@@ -93,13 +93,20 @@
       $("#re-enable-all-blacklists").show();
       $("#blacklist-list a:not(.blacklisted-active)").click();
       Danbooru.Cookie.put("disable-all-blacklists", "1");
+      $.each(Danbooru.Blacklist.entries, function(i, entry) {
+        Danbooru.Cookie.put("bl:" + entry.tags.hash(), "1", "session");
+      });
       e.preventDefault();
     });
+
     $("#re-enable-all-blacklists").click(function(e) {
       $("#disable-all-blacklists").show();
       $("#re-enable-all-blacklists").hide();
       $("#blacklist-list a.blacklisted-active").click();
       Danbooru.Cookie.put("disable-all-blacklists", "0");
+      $.each(Danbooru.Blacklist.entries, function(i, entry) {
+        Danbooru.Cookie.remove("bl:" + entry.tags.hash());
+      });
       e.preventDefault();
     });
   }
