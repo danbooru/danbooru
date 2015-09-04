@@ -1,5 +1,6 @@
 class UserMailer < ActionMailer::Base
   add_template_helper ApplicationHelper
+  add_template_helper UsersHelper
   default :from => Danbooru.config.contact_email, :content_type => "text/html"
 
   def dmail_notice(dmail)
@@ -16,6 +17,7 @@ class UserMailer < ActionMailer::Base
   end
 
   def forum_notice(user, forum_topic, forum_posts)
+    @user = user
     @forum_topic = forum_topic
     @forum_posts = forum_posts
     mail(:to => "#{user.name} <#{user.email}>", :subject => "#{Danbooru.config.app_name} forum topic #{forum_topic.title} updated")
