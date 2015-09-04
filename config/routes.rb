@@ -53,6 +53,7 @@ Rails.application.routes.draw do
   end
   namespace :maintenance do
     namespace :user do
+      resource :email_notification, :only => [:show, :destroy]
       resource :password_reset, :only => [:new, :create, :edit, :update]
       resource :login_reminder, :only => [:new, :create]
       resource :deletion, :only => [:show, :destroy]
