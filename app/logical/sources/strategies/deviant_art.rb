@@ -27,6 +27,8 @@ module Sources
           @artist_name, @profile_url = get_profile_from_page(page)
           @image_url = get_image_url_from_page(page)
           @tags = get_tags_from_page(page)
+          @artist_commentary_title = get_artist_commentary_title_from_page(page)
+          @artist_commentary_desc = get_artist_commentary_desc_from_page(page)
         end
       end
 
@@ -67,6 +69,24 @@ module Sources
 
         links.map do |node|
           [node.attr("data-canonical-tag"), node.attr("href")]
+        end
+      end
+
+      def get_artist_commentary_title_from_page(page)
+        title = page.search("div.dev-title-container a").find_all do |node|
+          node["data-ga_click_event"] =~ /description_title/
+        end
+
+        if title.any?
+          title[0].inner_text
+        end
+      end
+
+      def get_artist_commentary_desc_from_page(page)
+        desc = page.search("div.dev-description div.text.block")
+
+        if desc.any?
+          desc[0].inner_text
         end
       end
 

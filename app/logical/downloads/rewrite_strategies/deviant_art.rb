@@ -1,10 +1,18 @@
 module Downloads
   module RewriteStrategies
     class DeviantArt < Base
+      attr_accessor :url, :source
+
+      def initialize(url)
+        @url  = url
+      end
+
       def rewrite(url, headers, data = {})
         if url =~ /https?:\/\/(?:.+?\.)?deviantart\.(?:com|net)/
           url, headers = rewrite_html_pages(url, headers)
           url, headers = rewrite_thumbnails(url, headers)
+          data[:artist_commentary_title] = source.artist_commentary_title
+          data[:artist_commentary_desc] = source.artist_commentary_desc
         end
 
         return [url, headers, data]
@@ -13,8 +21,6 @@ module Downloads
     protected
       def rewrite_html_pages(url, headers)
         if url =~ %r{^https?://.+?\.deviantart\.com/art/}
-          source = ::Sources::Strategies::DeviantArt.new(url)
-          source.get
           return [source.image_url, headers]
         else
           return [url, headers]
@@ -29,12 +35,20 @@ module Downloads
           match = $1
           url.sub!(match + "PRE/", match)
         elsif url =~ %r{^https?://(?:pre|img)\d{2}\.deviantart\.net/}
-          source = ::Sources::Strategies::DeviantArt.new(url)
-          source.get
           return [source.image_url, headers]
         end
 
         return [url, headers]
+      end
+
+      # Cache the source data so it gets fetched at most once.
+      def source
+        @source ||= begin
+          source = ::Sources::Strategies::DeviantArt.new(url)
+          source.get
+
+          source
+        end
       end
     end
   end
