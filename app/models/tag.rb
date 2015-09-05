@@ -659,11 +659,11 @@ class Tag < ActiveRecord::Base
 
   module SearchMethods
     def name_matches(name)
-      where("name LIKE ? ESCAPE E'\\\\'", name.mb_chars.downcase.to_escaped_for_sql_like)
+      where("tags.name LIKE ? ESCAPE E'\\\\'", name.mb_chars.downcase.to_escaped_for_sql_like)
     end
 
     def named(name)
-      where("name = ?", TagAlias.to_aliased([name]).join(""))
+      where("tags.name = ?", TagAlias.to_aliased([name]).join(""))
     end
 
     def search(params)
@@ -675,7 +675,7 @@ class Tag < ActiveRecord::Base
       end
 
       if params[:name].present?
-        q = q.where("name in (?)", params[:name].split(","))
+        q = q.where("tags.name in (?)", params[:name].split(","))
       end
 
       if params[:category].present?
