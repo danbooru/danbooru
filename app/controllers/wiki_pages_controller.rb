@@ -24,7 +24,7 @@ class WikiPagesController < ApplicationController
           if @wiki_pages.count == 1
             redirect_to(wiki_page_path(@wiki_pages.first))
           elsif @wiki_pages.count == 0 && params[:search][:title].present?
-            redirect_to(new_wiki_page_path(:wiki_page => {:title => params[:search][:title]}))
+            redirect_to(show_or_new_wiki_pages_path(:title => params[:search][:title]))
           end
         end
       end
