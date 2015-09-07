@@ -105,7 +105,17 @@ module Sources
       end
 
       def agent
-        @agent ||= Mechanize.new
+        @agent ||= begin
+          mech = Mechanize.new
+          
+          # This cookie needs to be set to allow viewing of mature works
+          cookie = Mechanize::Cookie.new("agegate_state", "1")
+          cookie.domain = ".deviantart.com"
+          cookie.path = "/"
+          mech.cookie_jar.add(cookie)
+
+          mech
+        end
       end
     end
   end
