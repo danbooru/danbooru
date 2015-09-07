@@ -11,7 +11,7 @@
         <% end %>
 
         <span class="favgroup-name <%= klass %>">
-          <%= link_to("Favorite group: #{favgroup.name}", favorite_group_path(favgroup)) %>
+          <%= link_to("Favorite group: #{favgroup.pretty_name}", favorite_group_path(favgroup)) %>
         </span>
 
         <% if favgroup.neighbors(post).next %>
