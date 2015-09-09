@@ -161,12 +161,12 @@ class Note < ActiveRecord::Base
 
   def create_version
     CurrentUser.user.increment!(:note_update_count)
-    Note.where(:id => id).update_all("version = coalesce(version, 0) + 1")
-    reload
 
     if merge_version?
       merge_version
     else
+      Note.where(:id => id).update_all("version = coalesce(version, 0) + 1")
+      reload
       create_new_version
     end
   end
@@ -194,8 +194,7 @@ class Note < ActiveRecord::Base
       :width => width,
       :height => height,
       :is_active => is_active,
-      :body => body,
-      :version => versions.where("id <> ?", prev.id).maximum(:version) || 1
+      :body => body
     )
   end
 
