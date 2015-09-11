@@ -485,7 +485,7 @@ class User < ActiveRecord::Base
       if created_at > 1.week.ago
         "cannot upload during your first week of registration"
       else
-        "can not upload until your pending posts have been approved"
+        "have reached your upload limit for the day"
       end
     end
 
@@ -513,22 +513,33 @@ class User < ActiveRecord::Base
       created_at <= 1.week.ago
     end
 
-    def upload_limit
-      deleted_count = Post.for_user(id).deleted.where("is_banned = false").count
-      pending_count = Post.for_user(id).pending.count
-      approved_count = Post.where("is_flagged = false and is_pending = false and is_deleted = false and uploader_id = ?", id).count
-
-      if base_upload_limit.to_i != 0
-        limit = [base_upload_limit - (deleted_count / 4), 4].max - pending_count
+    def base_upload_limit
+      if created_at >= 1.month.ago
+        10
+      elsif created_at >= 2.months.ago
+        20
+      elsif created_at >= 3.months.ago
+        30
+      elsif created_at >= 4.months.ago
+        40
       else
-        limit = [10 + (approved_count / 10) - (deleted_count / 4), 4].max - pending_count
+        50
       end
+    end
 
-      if limit < 0
-        limit = 0
+    def upload_limit
+      @upload_limit ||= begin
+        dcon = [deletion_confidence(120), 15].min
+        max_count = [(base_upload_limit * (1 - (dcon / 15.0))).ceil, 10].max
+        uploaded_count = Post.for_user(id).where("created_at >= ?", 24.hours.ago).count
+        limit = max_count - uploaded_count
+
+        if limit < 0
+          limit = 0
+        end
+
+        limit
       end
-
-      limit
     end
 
     def tag_query_limit
@@ -762,7 +773,7 @@ class User < ActiveRecord::Base
 
   module StatisticsMethods
     def deletion_confidence(days = 30)
-      Reports::UserPromotion.deletion_confidence_interval_for(self, days)
+      Reports::UserPromotions.deletion_confidence_interval_for(self, days)
     end
   end
 
