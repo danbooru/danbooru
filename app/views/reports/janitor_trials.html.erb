@@ -8,6 +8,7 @@
       <thead>
         <tr>
           <th data-sort="string">User</th>
+          <th data-sort="int">Age</th>
           <th data-sort="int">Level</th>
           <th data-sort="int">Approvals</th>
           <th data-sort="int">Del Chance</th>
@@ -21,6 +22,7 @@
         <% @report.janitors.each do |janitor| %>
           <tr>
             <td><%= link_to_user janitor.user %></td>
+            <td data-sort-value="<%= janitor.created_at.to_i %>"><%= time_ago_in_words(janitor.created_at) %></td>
             <td data-sort-value="<%= janitor.user.level %>"><%= janitor.user.level_string %></td>
             <td><%= link_to janitor.approval_count, posts_path(:tags => "approver:#{janitor.user.name} order:random", :limit => 200) %></td>
             <td><%= link_to janitor.deletion_chance, posts_path(:tags => "approver:#{janitor.user.name} status:deleted", :limit => 200) %></td>
