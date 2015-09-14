@@ -15,6 +15,7 @@
           <th data-sort="int" title="25% of uploads received this score or less">quartile score</th>
           <th data-sort="int" title="50% of uploads received this score or less">median score</th>
           <th data-sort="int">deletion</th>
+          <th data-sort="int">limit</th>
         </tr>
       </thead>
       <tbody>
@@ -29,6 +30,7 @@
               <td><%= user.quartile_score %></td>
               <td><%= user.median_score %></td>
               <td><%= link_to number_to_percentage(user.deletion_confidence_interval, :precision => 0), posts_path(:tags => "uploader:#{user.name} status:deleted", :limit => 200) %></td>
+              <td><%= user.upload_limit %></td>
             </tr>
           <% end %>
         <% end %>
