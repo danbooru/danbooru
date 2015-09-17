@@ -11,11 +11,9 @@
           <th data-sort="int">Level</th>
           <th data-sort="int">Uploads</th>
           <th data-sort="string">Age</th>
-          <th data-sort="int">score:3+</th>
-          <th data-sort="int" title="25% of uploads received this score or less">quartile score</th>
-          <th data-sort="int" title="50% of uploads received this score or less">median score</th>
-          <th data-sort="int">deletion</th>
-          <th data-sort="int">limit</th>
+          <th data-sort="int">Del Chance</th>
+          <th data-sort="int">Neg Score Chance</th>
+          <th data-sort="int">Limit</th>
         </tr>
       </thead>
       <tbody>
@@ -24,12 +22,10 @@
             <tr>
               <td><%= link_to_user user.user %></td>
               <td data-sort-value="<%= user.level %>"><%= user.level_string %></td>
-              <td><%= link_to user.post_upload_count, posts_path(:tags => "uploader:#{user.name} order:random", :limit => 200) %></td>
+              <td><%= link_to user.post_upload_count, posts_path(:tags => "user:#{user.name} order:random", :limit => 200) %></td>
               <td data-sort-value="<%= user.created_at.to_formatted_s(:db) %>"><%= time_ago_in_words user.created_at %></td>
-              <td><%= number_to_percentage user.confidence_interval_for(3), :precision => 0 %></td>
-              <td><%= user.quartile_score %></td>
-              <td><%= user.median_score %></td>
-              <td><%= link_to number_to_percentage(user.deletion_confidence_interval, :precision => 0), posts_path(:tags => "uploader:#{user.name} status:deleted", :limit => 200) %></td>
+              <td><%= link_to number_to_percentage(user.deletion_confidence_interval, :precision => 0), posts_path(:tags => "user:#{user.name} status:deleted", :limit => 200) %></td>
+              <td><%= link_to number_to_percentage(user.negative_score_confidence_interval, :precision => 0), posts_path(:tags => "user:#{user.name} score:<0", :limit => 200) %></td>
               <td><%= user.upload_limit %></td>
             </tr>
           <% end %>

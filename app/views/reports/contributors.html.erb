@@ -10,7 +10,8 @@
           <th data-sort="string">User</th>
           <th data-sort="int">Level</th>
           <th data-sort="int">Uploads</th>
-          <th data-sort="int">deletion</th>
+          <th data-sort="int">Del Chance</th>
+          <th data-sort="int">Neg Score Chance</th>
         </tr>
       </thead>
       <tbody>
@@ -19,8 +20,9 @@
             <tr>
               <td><%= link_to_user user.user %></td>
               <td data-sort-value="<%= user.level %>"><%= user.level_string %></td>
-              <td><%= link_to user.post_upload_count, posts_path(:tags => "uploader:#{user.name} order:random", :limit => 200) %></td>
-              <td><%= link_to number_to_percentage(user.deletion_confidence_interval, :precision => 0), posts_path(:tags => "uploader:#{user.name} status:deleted", :limit => 200) %></td>
+              <td><%= link_to user.post_upload_count, posts_path(:tags => "user:#{user.name} order:random", :limit => 200) %></td>
+              <td><%= link_to number_to_percentage(user.deletion_confidence_interval, :precision => 0), posts_path(:tags => "user:#{user.name} status:deleted", :limit => 200) %></td>
+              <td><%= link_to number_to_percentage(user.negative_score_confidence_interval, :precision => 0), posts_path(:tags => "user:#{user.name} score:<0", :limit => 200) %></td>
             </tr>
           <% end %>
         <% end %>

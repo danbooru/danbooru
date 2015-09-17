@@ -18,6 +18,10 @@ module Reports
         Reports::UserPromotions.deletion_confidence_interval_for(user)
       end
 
+      def negative_score_confidence_interval
+        Reports::UserPromotions.negative_score_confidence_interval_for(user)
+      end
+
       def median_score
         ActiveRecord::Base.select_value_sql("select percentile_cont(0.50) within group (order by score) from posts where created_at >= ? and uploader_id = ?", ::Reports::UserPromotions.min_time, user.id).to_i
       end
@@ -38,6 +42,13 @@ module Reports
       deletions = Post.where("created_at >= ?", date).where(:uploader_id => user.id, :is_deleted => true).count
       total = Post.where("created_at >= ?", date).where(:uploader_id => user.id).count
       ci_lower_bound(deletions, total)
+    end
+
+    def self.negative_score_confidence_interval_for(user, days = nil)
+      date = (days || 30).days.ago
+      hits = Post.where("created_at >= ? and score < 0", date).where(:uploader_id => user.id).count
+      total = Post.where("created_at >= ?", date).where(:uploader_id => user.id).count
+      ci_lower_bound(hits, total)
     end
 
     def self.ci_lower_bound(pos, n, confidence = 0.95)
