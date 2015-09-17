@@ -12,7 +12,7 @@ module Reports
       end
 
       def created_at
-        trial.created_at
+        trial.try(:created_at) || 10.years.ago
       end
 
       def since
