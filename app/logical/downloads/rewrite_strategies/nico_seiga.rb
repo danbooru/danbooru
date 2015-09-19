@@ -1,6 +1,12 @@
 module Downloads
   module RewriteStrategies
     class NicoSeiga < Base
+      attr_accessor :url, :source
+
+      def initialize(url)
+        @url  = url
+      end
+
       def rewrite(url, headers, data = {})
         if url =~ %r{https?://lohas\.nicoseiga\.jp} || url =~ %r{https?://seiga\.nicovideo\.jp}
           url, headers = rewrite_headers(url, headers)
@@ -22,8 +28,6 @@ module Downloads
         # example: http://seiga.nicovideo.jp/seiga/im1389842
 
         if url =~ %r{https?://seiga\.nicovideo\.jp/seiga/im\d+}
-          source = ::Sources::Strategies::NicoSeiga.new(url)
-          source.get
           return [source.image_url, headers]
         else
           return [url, headers]
@@ -32,8 +36,6 @@ module Downloads
 
       def rewrite_thumbnails(url, headers)
         if url =~ %r{/thumb/\d+}
-          source = ::Sources::Strategies::NicoSeiga.new(url)
-          source.get
           return [source.image_url, headers]
         end
 
@@ -44,11 +46,19 @@ module Downloads
         # example: http://lohas.nicoseiga.jp/o/40aeedd2848a7780b6046747e75b3566b423a10c/1436307639/5026559
 
         if url =~ %r{http://lohas\.nicoseiga\.jp/o/}
-          source = ::Sources::Strategies::NicoSeiga.new(url)
-          source.get
           return [source.image_url, headers]
         else
           return [url, headers]
+        end
+      end
+
+      # Cache the source data so it gets fetched at most once.
+      def source
+        @source ||= begin
+          source = ::Sources::Strategies::NicoSeiga.new(url)
+          source.get
+
+          source
         end
       end
     end

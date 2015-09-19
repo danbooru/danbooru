@@ -1,6 +1,12 @@
 module Downloads
   module RewriteStrategies
     class Twitter < Base
+      attr_accessor :url, :source
+
+      def initialize(url)
+        @url  = url
+      end
+
       def rewrite(url, headers, data = {})
         if url =~ %r!^https?://(?:mobile\.)?twitter\.com!
           url, headers = rewrite_status_page(url, headers, data)
@@ -13,7 +19,6 @@ module Downloads
 
     protected
       def rewrite_status_page(url, headers, data)
-        source = build_source(url)
         url = source.image_url
         data[:artist_commentary_desc] = source.artist_commentary_desc
         return [url, headers, data]
@@ -27,9 +32,13 @@ module Downloads
         return [url, headers]
       end
 
-      def build_source(url)
-        ::Sources::Strategies::Twitter.new(url).tap do |x|
-          x.get
+      # Cache the source data so it gets fetched at most once.
+      def source
+        @source ||= begin
+          source = ::Sources::Strategies::Twitter.new(url)
+          source.get
+
+          source
         end
       end
     end
