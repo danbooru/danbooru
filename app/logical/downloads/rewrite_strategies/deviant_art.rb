@@ -8,7 +8,7 @@ module Downloads
       end
 
       def rewrite(url, headers, data = {})
-        if url =~ /https?:\/\/(?:.+?\.)?deviantart\.(?:com|net)/
+        if url =~ %r{deviantart\.com/art/} || url =~ %r{deviantart\.net/.+/[a-z0-9_]+(_by_[a-z0-9_]+)?-d([a-z0-9]+)\.}i
           url, headers = rewrite_html_pages(url, headers)
           url, headers = rewrite_thumbnails(url, headers)
           data[:artist_commentary_title] = source.artist_commentary_title
