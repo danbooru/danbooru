@@ -1,7 +1,7 @@
 class JanitorPruner
   def inactive_janitors
-    User.where("level = ?", User::Levels::JANITOR).select do |user|
-      approval_count = Post.where("created_at >= ? and approver_id = ?", 2.months.ago, user.id).count
+    User.where("bit_prefs & ? > 0", User.flag_value_for("can_approve_posts")).select do |user|
+      approval_count = Post.where("created_at >= ? and approver_id = ?", 3.months.ago, user.id).count
       approval_count == 0
     end
   end
@@ -13,7 +13,7 @@ class JanitorPruner
       CurrentUser.scoped(admin, "127.0.0.1") do
         janitor_trial = JanitorTrial.where(user_id: user.id).first
 
-        if janitor_trial && user.level <= User::Levels::JANITOR
+        if janitor_trial && user.can_approve_posts?
           janitor_trial.demote!
           unknown_level = nil
         else
