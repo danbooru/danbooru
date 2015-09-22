@@ -26,7 +26,7 @@
               <td data-sort-value="<%= user.created_at.to_formatted_s(:db) %>"><%= time_ago_in_words user.created_at %></td>
               <td><%= link_to number_to_percentage(user.deletion_confidence_interval, :precision => 0), posts_path(:tags => "user:#{user.name} status:deleted", :limit => 200) %></td>
               <td><%= link_to number_to_percentage(user.negative_score_confidence_interval, :precision => 0), posts_path(:tags => "user:#{user.name} score:<0", :limit => 200) %></td>
-              <td><%= user.upload_limit %></td>
+              <td><%= user.max_upload_limit %></td>
             </tr>
           <% end %>
         <% end %>

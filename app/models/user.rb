@@ -527,13 +527,16 @@ class User < ActiveRecord::Base
       end
     end
 
+    def max_upload_limit
+      dcon = [deletion_confidence(120), 15].min
+      [(base_upload_limit * (1 - (dcon / 15.0))).ceil, 10].max
+    end
+
     def upload_limit
       @upload_limit ||= begin
-        dcon = [deletion_confidence(120), 15].min
-        max_count = [(base_upload_limit * (1 - (dcon / 15.0))).ceil, 10].max
         uploaded_count = Post.for_user(id).where("created_at >= ?", 24.hours.ago).count
         uploaded_comic_count = Post.for_user(id).tag_match("comic").where("created_at >= ?", 24.hours.ago).count / 3
-        limit = max_count - (uploaded_count - uploaded_comic_count)
+        limit = max_upload_limit - (uploaded_count - uploaded_comic_count)
 
         if limit < 0
           limit = 0
