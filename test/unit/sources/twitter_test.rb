@@ -33,7 +33,7 @@ module Sources
       end
 
       should "get the artist name" do
-        assert_equal("The Noun Project", @site.artist_name)
+        assert_equal("Noun Project", @site.artist_name)
       end
 
       should "get the image url" do

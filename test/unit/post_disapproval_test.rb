@@ -53,7 +53,9 @@ class PostDisapprovalTest < ActiveSupport::TestCase
         setup do
           @post = FactoryGirl.create(:post)
           @user = FactoryGirl.create(:user)
-          @disapproval = PostDisapproval.create(:user => @user, :post => @post)
+          Timecop.travel(2.months.ago) do
+            @disapproval = PostDisapproval.create(:user => @user, :post => @post)
+          end
         end
 
         should "be pruned" do

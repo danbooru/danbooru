@@ -204,7 +204,7 @@ class Dmail < ActiveRecord::Base
   end
 
   def update_recipient
-    if owner_id != CurrentUser.user.id && !is_deleted?
+    if owner_id != CurrentUser.user.id && !is_deleted? && !is_read?
       to.update_attribute(:has_mail, true)
     end
   end

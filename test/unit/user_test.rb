@@ -91,16 +91,18 @@ class UserTest < ActiveSupport::TestCase
       @user.update_column(:level, User::Levels::CONTRIBUTOR)
       assert(@user.can_upload?)
       @user.update_column(:level, User::Levels::MEMBER)
-      @user.update_column(:created_at, 1.month.ago)
+      @user.update_column(:created_at, 15.days.ago)
       assert_equal(10, @user.upload_limit)
 
       9.times do
         FactoryGirl.create(:post, :uploader => @user, :is_pending => true)
       end
 
+      @user = User.find(@user.id)
       assert_equal(1, @user.upload_limit)
       assert(@user.can_upload?)
       FactoryGirl.create(:post, :uploader => @user, :is_pending => true)
+      @user = User.find(@user.id)
       assert(!@user.can_upload?)
     end
 

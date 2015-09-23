@@ -36,7 +36,7 @@ class UploadTest < ActiveSupport::TestCase
         should "fail creation" do
           @upload = FactoryGirl.build(:jpg_upload, :tag_string => "")
           @upload.save
-          assert_equal(["You can not upload until your pending posts have been approved"], @upload.errors.full_messages)
+          assert_equal(["You have reached your upload limit for the day"], @upload.errors.full_messages)
         end
       end
 
