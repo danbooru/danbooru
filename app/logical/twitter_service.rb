@@ -35,7 +35,7 @@ class TwitterService
       end
     end
     urls.uniq
-  # rescue
-  #   []
+  rescue => e
+    []
   end
 end

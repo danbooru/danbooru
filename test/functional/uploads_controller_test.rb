@@ -20,7 +20,7 @@ class UploadsControllerTest < ActionController::TestCase
 
     context "batch action" do
       context "for twitter galleries" do
-        should "render" do
+        should "1234 render" do
           VCR.use_cassette("functional/upload/twitter", :record => :once) do
             get :batch, {:url => "https://twitter.com/lvlln/status/567054278486151168"}, {:user_id => @user.id}
           end
