@@ -4,7 +4,7 @@ module Reports
   class UserPromotions
     class User
       attr_reader :user
-      delegate :name, :post_upload_count, :level_string, :level, :created_at, :upload_limit, :to => :user
+      delegate :name, :post_upload_count, :level_string, :level, :created_at, :upload_limit, :max_upload_limit, :to => :user
 
       def initialize(user)
         @user = user
