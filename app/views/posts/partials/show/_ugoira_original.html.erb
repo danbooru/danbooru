@@ -25,8 +25,7 @@
   <div id="ugoira-control-panel" style="width: <%= [@post.image_width, 350].max %>px;">
     <%= button_tag "Play", :id => "ugoira-play", :style => "display: none;" %>
     <%= button_tag "Pause", :id => "ugoira-pause" %>
-    <p id="ugoira-load-progress">Loaded <span id="ugoira-load-percentage">0</span>%</p>
-    <div id="seek-slider" style="display: none; width: <%= [@post.image_width, 350].max - 81 %>px;"></div>
+    <div id="seek-slider" style="width: <%= [@post.image_width, 350].max - 81 %>px;"></div>
   </div>
   <p id="save-video-link">
     <% if post.has_ugoira_webm? %>
@@ -64,13 +63,7 @@
     $(function() {
       Danbooru.Ugoira.create_player();
       $(Danbooru.Ugoira.player).on("loadProgress", function(ev, progress) {
-        $("#ugoira-load-percentage").text(Math.floor(progress * 100));
-      });
-      $(Danbooru.Ugoira.player).on("loadingStateChanged", function(ev, state) {
-        if (state === 2) {
-          $("#ugoira-load-progress").remove();
-          $("#seek-slider").show();
-        }
+        $("#seek-slider").progressbar("value", Math.floor(progress * 100));
       });
 
       var player_manually_paused = false;
@@ -87,6 +80,10 @@
         $("#ugoira-play").show();
         player_manually_paused = true;
         e.preventDefault();
+      });
+
+      $("#seek-slider").progressbar({
+        value: 0
       });
 
       $("#seek-slider").slider({

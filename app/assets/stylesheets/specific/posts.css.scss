@@ -199,6 +199,12 @@ div#c-posts {
     div#seek-slider {
       margin-top: 0.5em;
       float: right;
+      overflow: visible;
+      background: #EEE;
+
+      .ui-progressbar-value {
+        background: white;
+      }
     }
 
     #save-video-link {
