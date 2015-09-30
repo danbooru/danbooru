@@ -136,7 +136,7 @@
         }
 
         regexp = new RegExp("^(" + metatags + "):(.*)$", "i");
-        var match = term.match(regexp);
+        match = term.match(regexp);
         var metatag;
         if (match) {
           metatag = match[1].toLowerCase();
@@ -234,11 +234,11 @@
     $.ajax({
       url: "/tags/autocomplete.json",
       data: {
-        "search[name_matches]": term + "*",
+        "search[name_matches]": term + "*"
       },
       method: "get",
       success: function(data) {
-        var data = $.map(data, function(tag) {
+        var d = $.map(data, function(tag) {
           return {
             type: "tag",
             label: tag.name.replace(/_/g, " "),
@@ -252,9 +252,9 @@
         if (Danbooru.Autocomplete.enable_local_storage) {
           var expiry = new Date();
           expiry.setDate(expiry.getDate() + 7);
-          $.localStorage.set(key, {"value": data, "expires": expiry});
+          $.localStorage.set(key, {"value": d, "expires": expiry});
         }
-        resp(data);
+        resp(d);
       }
     });
   }
@@ -351,7 +351,7 @@
         "search[order]": "post_upload_count",
         "search[current_user_first]": "true",
         "search[name_matches]": term + "*",
-        "limit": 10,
+        "limit": 10
       },
       method: "get",
       success: function(data) {
@@ -369,7 +369,7 @@
         resp($.map(data, function(user) {
           return {
             type: "user",
-            label: display_name(user.name);
+            label: display_name(user.name),
             value: prefix + user.name,
             level: user.level_string
           };
