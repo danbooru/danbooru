@@ -356,16 +356,20 @@
       method: "get",
       success: function(data) {
         var prefix;
+        var display_name;
+
         if (metatag === "@") {
           prefix = "@";
+          display_name = function(name) {return name;};
         } else {
           prefix = metatag + ":";
+          display_name = function(name) {return name.replace(/_/g, " ");};
         }
 
         resp($.map(data, function(user) {
           return {
             type: "user",
-            label: user.name.replace(/_/g, " "),
+            label: display_name(user.name);
             value: prefix + user.name,
             level: user.level_string
           };
