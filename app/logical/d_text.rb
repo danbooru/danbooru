@@ -33,6 +33,7 @@ class DText
   end
 
   def self.parse_inline(str, options = {})
+    puts str
     str.gsub!(/&/, "&amp;")
     str.gsub!(/</, "&lt;")
     str.gsub!(/>/, "&gt;")
@@ -42,6 +43,7 @@ class DText
     str.gsub!(/\[s\](.+?)\[\/s\]/i, '<s>\1</s>')
     str.gsub!(/\[u\](.+?)\[\/u\]/i, '<u>\1</u>')
     str.gsub!(/\[tn\](.+?)\[\/tn\]/i, '<p class="tn">\1</p>')
+    str.gsub!(/@\w+/) {|name| '<a href="/users?name=' + u(CGI.unescapeHTML(name[1..-1])) + '">' + name + '</a>'}
 
     str = parse_links(str)
     str = parse_aliased_wiki_links(str)
