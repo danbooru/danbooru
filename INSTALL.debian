@@ -99,6 +99,4 @@ echo "* now login as the danbooru user and run the following commands to deploy 
 echo "* the server:"
 echo "*"
 echo "*   cd ~/danbooru"
-echo "*   bundle exec cap development deploy:cold"
-
-
+echo "*   bundle exec cap development deploy"
