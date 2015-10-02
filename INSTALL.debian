@@ -89,14 +89,16 @@ sudo -u danbooru git clone https://github.com/r888888888/danbooru ~danbooru/danb
 sudo -u danbooru bash -l -c 'cd ~/danbooru ; bundle'
 
 echo "* Creating a new local git branch called develop"
-sudo -u danbooru bash -l -c 'cd ~danbooru ; git checkout -b develop'
+sudo -u danbooru bash -l -c 'cd ~/danbooru ; git checkout -b develop'
+
+mkdir -p /var/www/danbooru2
+chown danbooru:danbooru /var/www/danbooru2
 
 echo "* Almost done! The code has been checked out at ~danbooru/danbooru. You can  "
 echo "* now login as the danbooru user and run the following commands to deploy to "
 echo "* the server:"
 echo "*"
 echo "*   cd ~/danbooru"
-echo "*   bundle exec cap development deploy:setup"
-echo "*   bundle exec cap development deploy:update"
+echo "*   bundle exec cap development deploy:cold"
 
 
