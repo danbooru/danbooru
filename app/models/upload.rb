@@ -102,6 +102,7 @@ class Upload < ActiveRecord::Base
     def process_once
       CurrentUser.scoped(uploader, uploader_ip_addr) do
         update_attribute(:status, "processing")
+        self.source = strip_source
         if is_downloadable?
           self.source = download_from_source(temp_file_path)
         end
@@ -379,6 +380,10 @@ class Upload < ActiveRecord::Base
   end
 
   module DownloaderMethods
+    def strip_source
+      source.try(:strip)
+    end
+
     # Determines whether the source is downloadable
     def is_downloadable?
       source =~ /^https?:\/\// && file_path.blank?
