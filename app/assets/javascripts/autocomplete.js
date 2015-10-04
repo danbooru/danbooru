@@ -42,6 +42,9 @@
       delay: 500,
       minLength: 2,
       autoFocus: true,
+      focus: function() {
+        return false;
+      },
       select: function(event, ui) {
         var before_caret_text = this.value.substring(0, this.selectionStart).replace(/\S+$/, ui.item.value + " ");
         var after_caret_text = this.value.substring(this.selectionStart);
