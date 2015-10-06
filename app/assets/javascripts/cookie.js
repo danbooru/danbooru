@@ -13,7 +13,14 @@
       expires = "expires=" + date.toGMTString() + "; ";
     }
 
-    document.cookie = name + "=" + encodeURIComponent(value) + "; " + expires + "path=/";
+    var new_val = name + "=" + encodeURIComponent(value) + "; " + expires + "path=/";
+    if (document.cookie.length < (4090 - new_val.length)) {
+      document.cookie = new_val;
+      return true;
+    } else {
+      Danbooru.error("You have too many cookies on this site. Consider deleting them all.")
+      return false;
+    }
   }
 
   Danbooru.Cookie.raw_get = function(name) {
