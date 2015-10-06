@@ -31,6 +31,12 @@ class ArtistTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
+    should "should have a valid name" do
+      @artist = Artist.new(:name => "-blah")
+      @artist.save
+      assert_equal(["Name cannot begin with - or ~"], @artist.errors.full_messages)
+    end
+
     context "with a matching tag alias" do
       setup do
         @tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
