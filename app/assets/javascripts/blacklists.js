@@ -40,7 +40,9 @@
       match.disabled = !match.disabled;
       var hash = tags.hash();
       if (match.disabled) {
-        Danbooru.Cookie.put("b" + hash, "1", "session");
+        if (Danbooru.Cookie.get("dab") !== "1") {
+          Danbooru.Cookie.put("b" + hash, "1", "session");
+        }
         $(e.target).addClass("blacklisted-active");
       } else {
         Danbooru.Cookie.remove("b" + hash);
@@ -91,10 +93,10 @@
     $("#disable-all-blacklists").click(function(e) {
       $("#disable-all-blacklists").hide();
       $("#re-enable-all-blacklists").show();
-      $("#blacklist-list a:not(.blacklisted-active)").click();
       Danbooru.Cookie.put("dab", "1");
+      $("#blacklist-list a:not(.blacklisted-active)").click();
       $.each(Danbooru.Blacklist.entries, function(i, entry) {
-        Danbooru.Cookie.put("b" + entry.tags.hash(), "1", "session");
+        Danbooru.Cookie.remove("b" + entry.tags.hash());
       });
       e.preventDefault();
     });
@@ -102,8 +104,8 @@
     $("#re-enable-all-blacklists").click(function(e) {
       $("#disable-all-blacklists").show();
       $("#re-enable-all-blacklists").hide();
-      $("#blacklist-list a.blacklisted-active").click();
       Danbooru.Cookie.put("dab", "0");
+      $("#blacklist-list a.blacklisted-active").click();
       $.each(Danbooru.Blacklist.entries, function(i, entry) {
         Danbooru.Cookie.remove("b" + entry.tags.hash());
       });
