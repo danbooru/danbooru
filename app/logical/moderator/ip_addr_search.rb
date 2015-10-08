@@ -9,11 +9,11 @@ module Moderator
 
     def execute
       if params[:user_id].present?
-        search_by_user_id(params[:user_id].split(/,/))
+        search_by_user_id(params[:user_id].split(/,/).map(&:strip))
       elsif params[:user_name].present?
-        search_by_user_name(params[:user_name].split(/,/))
+        search_by_user_name(params[:user_name].split(/,/).map(&:strip))
       elsif params[:ip_addr].present?
-        search_by_ip_addr(params[:ip_addr].split(/,/))
+        search_by_ip_addr(params[:ip_addr].split(/,/).map(&:strip))
       else
         []
       end

@@ -2,22 +2,11 @@
   <div id="a-index">
     <h1>IP Addresses</h1>
 
-    <table class="striped">
-      <thead>
-        <tr>
-          <th>Key</th>
-          <th>Count</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @search.execute.each do |k, count| %>
-          <tr>
-            <td><%= k %></td>
-            <td><%= count %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+    <% if params[:search][:user_id].present? || params[:search][:user_name].present? %>
+      <%= render "ip_listing" %>
+    <% else %>
+      <%= render "user_listing" %>
+    <% end %>
   </div>
 </div>
 

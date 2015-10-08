@@ -4,6 +4,7 @@ module Moderator
 
     def index
       @search = IpAddrSearch.new(params[:search])
+      @results = @search.execute
     end
 
     def search

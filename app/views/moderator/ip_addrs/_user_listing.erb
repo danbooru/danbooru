@@ -1,0 +1,20 @@
+<%= link_to "Perform another search for IP addresses associated with these accounts", moderator_ip_addrs_path(:search => {:user_id => @results.map{|k, count| k}.join(",")}) %>
+
+<table class="striped">
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>User ID</th>
+      <th>Number of Occurrences</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @results.each do |user_id, count| %>
+      <tr>
+        <td><%= link_to_user User.find(user_id) %></td>
+        <td><%= user_id %></td>
+        <td><%= count %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
