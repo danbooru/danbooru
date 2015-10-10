@@ -93,9 +93,9 @@ sudo -u danbooru bash -l -c 'cd ~/danbooru ; git checkout -b develop'
 
 mkdir -p /var/www/danbooru2/shared/config
 mkdir -p /var/www/danbooru2/shared/data
+chown -R danbooru:danbooru /var/www/danbooru2
 sudo -u danbooru bash -l -c 'cp ~/danbooru/script/install/database.yml.templ /var/www/danbooru2/shared/config/database.yml'
 sudo -u danbooru bash -l -c 'cp ~/danbooru/script/install/danbooru_local_config.rb.templ /var/www/danbooru2/shared/config/danbooru_local_config.rb'
-chown -R danbooru:danbooru /var/www/danbooru2
 
 echo "* Almost done! The code has been checked out at ~danbooru/danbooru. You can  "
 echo "* now login as the danbooru user and run the following commands to deploy to "
