@@ -1,4 +1,6 @@
 class ForumPost < ActiveRecord::Base
+  include Mentionable
+
   attr_accessible :body, :topic_id, :as => [:member, :builder, :janitor, :gold, :platinum, :contributor, :admin, :moderator, :default]
   attr_accessible :is_locked, :is_sticky, :is_deleted, :as => [:admin, :moderator]
   attr_readonly :topic_id
@@ -16,6 +18,12 @@ class ForumPost < ActiveRecord::Base
   validate :topic_id_not_invalid
   before_destroy :validate_topic_is_unlocked
   after_save :delete_topic_if_original_post
+  mentionable(
+    :message_field => :body, 
+    :user_field => :creator_id, 
+    :title => "You were mentioned in a forum topic",
+    :body => lambda {|rec, user_name| "You were mentioned in the forum topic \"#{rec.topic.title}\":#{Danbooru.config.hostname}/forum_topics/#{rec.topic_id}?page=#{rec.forum_topic_page}\n\n<hr>\n\n#{ActionController::Base.helpers.excerpt(rec.body, user_name)}"}
+  )
 
   module SearchMethods
     def body_matches(body)

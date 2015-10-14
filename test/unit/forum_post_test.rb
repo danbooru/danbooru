@@ -14,6 +14,22 @@ class ForumPostTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
+    context "that mentions a user" do
+      setup do
+        @user2 = FactoryGirl.create(:user)
+        @post = FactoryGirl.build(:forum_post, :topic_id => @topic.id, :body => "Hey @#{@user2.name} check this out!")
+      end
+
+      should "create a dmail" do
+        assert_difference("Dmail.count", 1) do
+          @post.save
+        end
+
+        dmail = Dmail.last
+        assert_equal("You were mentioned in the forum topic \"#{@topic.title}\":#{Danbooru.config.hostname}/forum_topics/#{@topic.id}?page=1\n\n<hr>\n\nHey @#{@user2.name} check this out!", dmail.body)
+      end
+    end
+
     context "that belongs to a topic with several pages of posts" do
       setup do
         Danbooru.config.stubs(:posts_per_page).returns(3)

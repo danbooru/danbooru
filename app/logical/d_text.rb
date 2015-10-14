@@ -2,6 +2,8 @@ require 'cgi'
 require 'uri'
 
 class DText
+  MENTION_REGEXP = /(?:^| )@\S+/
+  
   def self.u(string)
     CGI.escape(string)
   end
@@ -36,7 +38,7 @@ class DText
     str.gsub!(/&/, "&amp;")
     str.gsub!(/</, "&lt;")
     str.gsub!(/>/, "&gt;")
-    str.gsub!(/(?:^| )@\S+/) do |name| 
+    str.gsub!(MENTION_REGEXP) do |name| 
       if name =~ /([:;,.!?\)\]<>])$/
         name.chop!
         ch = $1
