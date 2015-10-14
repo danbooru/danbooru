@@ -18,15 +18,6 @@
         <li><%= link_to "Profile", user_path(CurrentUser.user) %></li>
         <li><%= link_to "Messages #{CurrentUser.user.dmail_count}", dmails_current_folder_path %></li>
 
-        <% if !@user.is_platinum? %>
-          <li><%= link_to "Upgrade", new_user_upgrade_path %></li>
-        <% end %>
-      <% else %>
-        <li><%= link_to "Send message", new_dmail_path(:dmail => {:to_id => @user.id}) %></li>
-        <% if !@user.is_platinum? %>
-          <li><%= link_to "Gift upgrade", new_user_upgrade_path(:user_id => @user.id) %></li>
-        <% end %>
-      <% end %>
 
       <% if CurrentUser.user.is_moderator? %>
         <li><%= link_to "Promote", edit_admin_user_path(@user) %></li>

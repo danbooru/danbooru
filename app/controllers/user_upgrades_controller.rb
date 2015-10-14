@@ -1,7 +1,7 @@
 class UserUpgradesController < ApplicationController
   before_filter :member_only, :only => [:new, :show]
   helper_method :encrypt_custom, :coinbase, :user
-  force_ssl :if => :ssl_enabled?
+  #force_ssl :if => :ssl_enabled?
   skip_before_action :verify_authenticity_token, only: [:create]
 
   def create

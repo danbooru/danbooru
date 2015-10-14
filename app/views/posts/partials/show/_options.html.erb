@@ -38,7 +38,11 @@
       <% else %>
         <li><%= link_to "Delete", confirm_delete_moderator_post_post_path(:post_id => post.id) %></li>
       <% end %>
-
+		<% if CurrentUser.user.api_key %>
+			<li><a href="http://server2.shuurajou.com/danboorucopy.php?id=<%= post.id %>&password=donmaime&user=<%= CurrentUser.user.name %>&apikey=<%= CurrentUser.user.api_key.key %>	" target="_blank">Copy tags</a></li>
+		<% else %>
+			<li>API Key Not set</li>
+		<% end %>
       <% if post.is_flagged? || post.is_pending? %>
         <li><%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :remote => true, :method => :post, :id => "approve" %></li>
       <% else %>

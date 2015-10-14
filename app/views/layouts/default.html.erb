@@ -34,7 +34,7 @@
   <header id="top">
     <%= render "news_updates/listing" %>
 
-    <h1><%= link_to Danbooru.config.app_name, "/" %></h1>
+    <h1><a href="/"><img src="/banners/atfbooru_banner.jpg" height="270"></a></h1>
     <span id="maintoggle"> ☰ </span> <!-- Maybe icon would be better, I'm not sure -->
     <nav id="nav">
       <%= render "layouts/main_links" %>
@@ -49,9 +49,6 @@
       <%= render "users/sign_up_notice" %>
     <% end %>
 
-    <% if !CurrentUser.is_anonymous? && !CurrentUser.is_gold? && cookies[:hide_upgrade_account_notice].blank? && params[:action] != "upgrade_information" %>
-      <%= render "users/upgrade_notice" %>
-    <% end %>
 
     <% if CurrentUser.user.is_banned? %>
       <%= render "users/ban_notice" %>
