@@ -116,7 +116,7 @@ protected
     end
   end
 
-  %w(member banned builder gold platinum contributor janitor moderator admin).each do |level|
+  %w(member banned builder gold platinum janitor moderator admin).each do |level|
     define_method("#{level}_only") do
       if !CurrentUser.user.is_banned? && CurrentUser.user.__send__("is_#{level}?")
         true

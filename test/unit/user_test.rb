@@ -59,22 +59,23 @@ class UserTest < ActiveSupport::TestCase
       end
 
       should "work" do
-        @user.invite!(User::Levels::CONTRIBUTOR)
+        @user.invite!(User::Levels::BUILDER, "1")
         @user.reload
-        assert_equal(User::Levels::CONTRIBUTOR, @user.level)
+        assert_equal(User::Levels::BUILDER, @user.level)
+        assert_equal(true, @user.can_upload_free)
       end
 
       should "not allow invites up to janitor level or beyond" do
-        @user.invite!(User::Levels::JANITOR)
+        @user.invite!(User::Levels::JANITOR, "1")
         @user.reload
         assert_equal(User::Levels::MEMBER, @user.level)
       end
 
       should "create a mod action" do
         assert_difference("ModAction.count") do
-          @user.invite!(User::Levels::CONTRIBUTOR)
+          @user.invite!(User::Levels::BUILDER, "1")
         end
-        assert_equal(%{"#{@user.name}":/users/#{@user.id} level changed Member -> Contributor}, ModAction.last.description)
+        assert_equal(%{"#{@user.name}":/users/#{@user.id} level changed Member -> Builder}, ModAction.last.description)
       end
     end
 
@@ -88,10 +89,8 @@ class UserTest < ActiveSupport::TestCase
 
     should "limit post uploads" do
       assert(!@user.can_upload?)
-      @user.update_column(:level, User::Levels::CONTRIBUTOR)
-      assert(@user.can_upload?)
-      @user.update_column(:level, User::Levels::MEMBER)
       @user.update_column(:created_at, 15.days.ago)
+      assert(@user.can_upload?)
       assert_equal(10, @user.upload_limit)
 
       9.times do
@@ -156,42 +155,30 @@ class UserTest < ActiveSupport::TestCase
       user = FactoryGirl.create(:user, :level => User::Levels::ADMIN)
       assert(user.is_moderator?)
       assert(user.is_janitor?)
-      assert(user.is_contributor?)
       assert(user.is_gold?)
 
       user = FactoryGirl.create(:user, :level => User::Levels::MODERATOR)
       assert(!user.is_admin?)
       assert(user.is_moderator?)
       assert(user.is_janitor?)
-      assert(user.is_contributor?)
       assert(user.is_gold?)
 
       user = FactoryGirl.create(:user, :level => User::Levels::JANITOR)
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
       assert(user.is_janitor?)
-      assert(user.is_contributor?)
-      assert(user.is_gold?)
-
-      user = FactoryGirl.create(:user, :level => User::Levels::CONTRIBUTOR)
-      assert(!user.is_admin?)
-      assert(!user.is_moderator?)
-      assert(!user.is_janitor?)
-      assert(user.is_contributor?)
       assert(user.is_gold?)
 
       user = FactoryGirl.create(:user, :level => User::Levels::GOLD)
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
       assert(!user.is_janitor?)
-      assert(!user.is_contributor?)
       assert(user.is_gold?)
 
       user = FactoryGirl.create(:user)
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
       assert(!user.is_janitor?)
-      assert(!user.is_contributor?)
       assert(!user.is_gold?)
     end
 

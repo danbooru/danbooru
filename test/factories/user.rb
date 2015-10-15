@@ -29,7 +29,8 @@ FactoryGirl.define do
     end
 
     factory(:contributor_user) do
-      level 33
+      level 32
+      bit_prefs User.flag_value_for("can_upload_free")
     end
 
     factory(:janitor_user) do

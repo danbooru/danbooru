@@ -178,7 +178,7 @@ class Upload < ActiveRecord::Base
         p.uploader_ip_addr = uploader_ip_addr
         p.parent_id = parent_id
 
-        if !uploader.is_contributor? || upload_as_pending?
+        if !uploader.can_upload_free? || upload_as_pending?
           p.is_pending = true
         end
       end

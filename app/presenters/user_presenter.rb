@@ -50,7 +50,7 @@ class UserPresenter
   end
 
   def upload_limit
-    if user.is_contributor?
+    if user.can_upload_free?
       return "none"
     end
     

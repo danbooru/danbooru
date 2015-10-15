@@ -19,10 +19,11 @@ module Moderator
       end
 
       should "create a new invite" do
-        post :create, {:invitation => {:user_id => @user_1.id, :level => User::Levels::CONTRIBUTOR}}, {:user_id => @mod.id}
+        post :create, {:invitation => {:user_id => @user_1.id, :level => User::Levels::BUILDER, :can_upload_free => "1"}}, {:user_id => @mod.id}
         assert_redirected_to(moderator_invitations_path)
         @user_1.reload
-        assert_equal(User::Levels::CONTRIBUTOR, @user_1.level)
+        assert_equal(User::Levels::BUILDER, @user_1.level)
+        assert_equal(true, @user_1.can_upload_free?)
       end
 
       should "list invites" do

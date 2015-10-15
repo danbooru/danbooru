@@ -11,7 +11,6 @@ class User < ActiveRecord::Base
     GOLD = 30
     PLATINUM = 31
     BUILDER = 32
-    CONTRIBUTOR = 33
     JANITOR = 35
     MODERATOR = 40
     ADMIN = 50
@@ -32,13 +31,14 @@ class User < ActiveRecord::Base
     show_deleted_children
     has_saved_searches
     can_approve_posts
+    can_upload_free
   )
 
   include Danbooru::HasBitFlags
   has_bit_flags BOOLEAN_ATTRIBUTES, :field => "bit_prefs"
 
   attr_accessor :password, :old_password
-  attr_accessible :dmail_filter_attributes, :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr, :time_zone, :default_image_size, :enable_sequential_post_navigation, :per_page, :hide_deleted_posts, :style_usernames, :enable_auto_complete, :custom_style, :show_deleted_children, :as => [:moderator, :janitor, :contributor, :gold, :member, :anonymous, :default, :builder, :admin]
+  attr_accessible :dmail_filter_attributes, :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr, :time_zone, :default_image_size, :enable_sequential_post_navigation, :per_page, :hide_deleted_posts, :style_usernames, :enable_auto_complete, :custom_style, :show_deleted_children, :as => [:moderator, :janitor, :gold, :member, :anonymous, :default, :builder, :admin]
   attr_accessible :level, :as => :admin
   validates_length_of :name, :within => 2..100, :on => :create
   validates_format_of :name, :with => /\A[^\s:]+\Z/, :on => :create, :message => "cannot have whitespace or colons"
@@ -90,8 +90,14 @@ class User < ActiveRecord::Base
   end
 
   module InvitationMethods
-    def invite!(level)
-      if level.to_i <= Levels::CONTRIBUTOR
+    def invite!(level, can_upload_free)
+      if can_upload_free
+        self.can_upload_free = true
+      else
+        self.can_upload_free = false
+      end
+
+      if level.to_i <= Levels::BUILDER
         self.level = level
         self.inviter_id = CurrentUser.id
         save
@@ -274,7 +280,6 @@ class User < ActiveRecord::Base
           "Gold" => Levels::GOLD,
           "Platinum" => Levels::PLATINUM,
           "Builder" => Levels::BUILDER,
-          "Contributor" => Levels::CONTRIBUTOR,
           "Janitor" => Levels::JANITOR,
           "Moderator" => Levels::MODERATOR,
           "Admin" => Levels::ADMIN
@@ -306,9 +311,6 @@ class User < ActiveRecord::Base
 
       when Levels::BUILDER
         :builder
-
-      when Levels::CONTRIBUTOR
-        :contributor
 
       when Levels::MODERATOR
         :moderator
@@ -342,9 +344,6 @@ class User < ActiveRecord::Base
       when Levels::PLATINUM
         "Platinum"
 
-      when Levels::CONTRIBUTOR
-        "Contributor"
-
       when Levels::JANITOR
         "Janitor"
 
@@ -377,10 +376,6 @@ class User < ActiveRecord::Base
 
     def is_platinum?
       level >= Levels::PLATINUM
-    end
-
-    def is_contributor?
-      level >= Levels::CONTRIBUTOR
     end
 
     def is_janitor?
@@ -472,7 +467,7 @@ class User < ActiveRecord::Base
     end
 
     def can_upload?
-      if is_contributor?
+      if can_upload_free?
         true
       elsif created_at > 1.week.ago
         false

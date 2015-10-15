@@ -2,12 +2,12 @@
   <div id="a-new">
     <h1>Upload</h1>
 
-    <% if CurrentUser.user.can_upload? %>
+    <% if CurrentUser.can_upload? %>
       <div id="upload-guide-notice">
         <p>Before uploading, please read the <%= link_to "how to upload guide", wiki_pages_path(:title => "howto:upload") %>.</p>
       </div>
 
-      <% unless CurrentUser.is_contributor? %>
+      <% unless CurrentUser.can_upload_free? %>
         <p>You can upload <strong><%= pluralize CurrentUser.upload_limit, "more post" %></strong> today.</p>
       <% end %>
 
@@ -27,7 +27,7 @@
         <%= hidden_field_tag :normalized_url, @normalized_url %>
         <%= f.hidden_field :referer_url, :value => @source.try(:referer_url) %>
 
-        <% if CurrentUser.is_contributor? %>
+        <% if CurrentUser.can_upload_free? %>
           <div class="input">
             <label for="upload_as_pending">
               <%= f.check_box :as_pending %>

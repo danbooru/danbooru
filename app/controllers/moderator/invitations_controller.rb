@@ -6,7 +6,7 @@ module Moderator
     end
 
     def create
-      User.find(params[:invitation][:user_id]).invite!(params[:invitation][:level])
+      User.find(params[:invitation][:user_id]).invite!(params[:invitation][:level], params[:invitation][:can_upload_free])
       redirect_to moderator_invitations_path
     end
 

@@ -3,7 +3,7 @@ module Moderator
     def level_select
       choices = []
       choices << ["Gold", User::Levels::GOLD]
-      choices << ["Contributor", User::Levels::CONTRIBUTOR]
+      choices << ["Platinum", User::Levels::PLATINUM]
       select(:invitation, :level, choices)
     end
   end

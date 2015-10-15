@@ -5,7 +5,7 @@ class ForumTopic < ActiveRecord::Base
     2 => "Bugs & Features"
   }
 
-  attr_accessible :title, :original_post_attributes, :category_id, :as => [:member, :builder, :gold, :platinum, :contributor, :janitor, :moderator, :admin, :default]
+  attr_accessible :title, :original_post_attributes, :category_id, :as => [:member, :builder, :gold, :platinum, :janitor, :moderator, :admin, :default]
   attr_accessible :is_sticky, :is_locked, :is_deleted, :as => [:admin, :moderator]
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"

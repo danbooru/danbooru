@@ -96,7 +96,7 @@ module ApplicationHelper
       html << " [" + link_to("+", new_user_feedback_path(:user_feedback => {:category => "positive", :user_id => user.id})) + "]"
 
       unless user.is_gold?
-        html << " [" + link_to("invite", new_moderator_invitation_path(:invitation => {:name => user.name, :level => User::Levels::CONTRIBUTOR})) + "]"
+        html << " [" + link_to("invite", new_moderator_invitation_path(:invitation => {:name => user.name}, :flag => "can_upload_free")) + "]"
       end
     else
       html << " [" + link_to("&ndash;".html_safe, new_user_feedback_path(:user_feedback => {:category => "negative", :user_id => user.id})) + "]"

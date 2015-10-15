@@ -229,7 +229,11 @@ class AnonymousUser
     []
   end
 
-  %w(member banned gold builder platinum contributor janitor moderator admin).each do |name|
+  def can_upload_free?
+    false
+  end
+
+  %w(member banned gold builder platinum janitor moderator admin).each do |name|
     define_method("is_#{name}?") do
       false
     end
