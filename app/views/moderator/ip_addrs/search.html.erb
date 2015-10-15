@@ -4,6 +4,7 @@
 
     <%= form_tag(moderator_ip_addrs_path, :method => :get, :class => "simple_form") do %>
       <%= search_field "user_name", :label => "User" %>
+      <%= search_field "ip_addr", :label => "IP Addr" %>
       <%= submit_tag "Search" %>
     <% end %>
   </div>

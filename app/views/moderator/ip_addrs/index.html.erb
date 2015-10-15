@@ -2,24 +2,11 @@
   <div id="a-index">
     <h1>IP Addresses</h1>
 
-    <p>The following users share IP addresses used by <%= params[:search][:user_name] %>. This searches across comments, post changes, note changes, pool changes, wiki changes, and dmails over the past 3 months.</p>
-
-    <table class="striped">
-      <thead>
-        <tr>
-          <th>User</th>
-          <th>Count</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @search.find_common_users.each do |user_id, count| %>
-          <tr>
-            <td><%= link_to User.id_to_name(user_id), user_path(user_id) %></td>
-            <td><%= count %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+    <% if params[:search][:user_id].present? || params[:search][:user_name].present? %>
+      <%= render "ip_listing" %>
+    <% else %>
+      <%= render "user_listing" %>
+    <% end %>
   </div>
 </div>
 
