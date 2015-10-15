@@ -79,6 +79,7 @@ module ApplicationHelper
   def link_to_user(user, options = {})
     user_class = user.level_class
     user_class = user_class + " user-post-approver" if user.can_approve_posts?
+    user_class = user_class + " user-post-uploader" if user.can_upload_free?
     user_class = user_class + " with-style" if CurrentUser.user.style_usernames?
     if options[:raw_name]
       name = user.name
@@ -96,7 +97,7 @@ module ApplicationHelper
       html << " [" + link_to("+", new_user_feedback_path(:user_feedback => {:category => "positive", :user_id => user.id})) + "]"
 
       unless user.is_gold?
-        html << " [" + link_to("invite", new_moderator_invitation_path(:invitation => {:name => user.name}, :flag => "can_upload_free")) + "]"
+        html << " [" + link_to("invite", new_moderator_invitation_path(:invitation => {:name => user.name, :can_upload_free => "1"})) + "]"
       end
     else
       html << " [" + link_to("&ndash;".html_safe, new_user_feedback_path(:user_feedback => {:category => "negative", :user_id => user.id})) + "]"
