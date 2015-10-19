@@ -69,6 +69,7 @@ class JanitorTrial < ActiveRecord::Base
   end
 
   def promote_user
+    user.feedback.create(:category => "neutral", :body => "Gained approval privileges")
     user.can_approve_posts = true
     user.save
   end
@@ -82,7 +83,6 @@ class JanitorTrial < ActiveRecord::Base
 
   def promote!
     update_attribute(:status, "inactive")
-    user.feedback.create(:category => "neutral", :body => "Gained approval privileges")
   end
 
   def demote!
