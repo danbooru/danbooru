@@ -47,10 +47,23 @@ class Upload < ActiveRecord::Base
     def validate_md5_uniqueness
       md5_post = Post.find_by_md5(md5)
       if md5_post
+		merge_tags(md5_post)
         raise "duplicate: #{md5_post.id}"
       end
     end
 
+	def merge_tags(post)
+		if tag_string.include?("tagme")
+			tag_string.gsub! 'tagme', ''
+		end
+		post.tag_string += " #{tag_string}"
+		if post.tag_string.split.size > 15 && post.tag_string.include?("tagme")
+			post.tag_string.gsub! 'tagme', ''
+		end
+		post.save
+	end
+	
+	
     def validate_file_exists
       unless file_path && File.exists?(file_path)
         raise "file does not exist"
@@ -92,8 +105,8 @@ class Upload < ActiveRecord::Base
     end
 
     def validate_video_duration
-      if is_video? && video.duration > 120
-        raise "video must not be longer than 2 minutes"
+      if is_video? && video.duration > 600
+        raise "video must not be longer than 10 minutes"
       end
     end
   end
@@ -230,7 +243,7 @@ class Upload < ActiveRecord::Base
     end
 
     def generate_video_preview_for(width, height, output_path)
-      dimension_ratio = image_width.to_f / image_height
+      dimension_ratio = image_width.to_f / image_height.to_f
       if dimension_ratio > 1
         height = (width / dimension_ratio).to_i
       else

@@ -18,6 +18,10 @@
     }
 
     if ($("#c-posts").length && $("#a-show").length) {
+
+	  $( document ).ready(function() {
+		  $(window).scrollTop(340);
+	  });
       this.initialize_links();
       this.initialize_post_relationship_previews();
       this.initialize_favlist();
@@ -25,6 +29,7 @@
       this.initialize_post_image_resize_links();
       this.initialize_post_image_resize_to_window_link();
       this.initialize_similar();
+	  
 
       if (Danbooru.meta("always-resize-images") === "true") {
         $("#image-resize-to-window-link").click();

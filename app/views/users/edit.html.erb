@@ -44,9 +44,9 @@
 
         <%= f.input :default_image_size, :hint => "Show original image or show resized #{Danbooru.config.large_image_width} pixel version", :label => "Default image width", :collection => [["850px", "large"], ["original", "original"]], :include_blank => false %>
         
-        <% if CurrentUser.user.is_gold? %>
-          <%= f.input :per_page, :label => "Posts per page", :as => :select, :collection => (1..100), :include_blank => false %>
-        <% end %>
+        
+        <%= f.input :per_page, :label => "Posts per page", :as => :select, :collection => (1..100), :include_blank => false %>
+        
         
         <%= f.input :blacklisted_tags, :hint => "Put any tag combinations you never want to see here. Each combination should go on a separate line. <a href='/wiki_pages/help:blacklists'>View help.</a>".html_safe, :input_html => {:size => "40x5"} %>
       </fieldset>

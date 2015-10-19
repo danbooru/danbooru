@@ -120,6 +120,7 @@ GEM
     gctools (0.2.3)
     globalid (0.3.6)
       activesupport (>= 4.1.0)
+    hashie (3.4.2)
     highline (1.7.3)
     hike (1.2.3)
     http (0.6.4)
@@ -131,6 +132,7 @@ GEM
     jmespath (1.0.2)
       multi_json (~> 1.0)
     json (1.8.3)
+    jwt (1.5.1)
     kgio (2.9.3)
     libv8 (3.16.14.11)
     loofah (2.0.3)
@@ -157,6 +159,7 @@ GEM
     mocha (1.1.0)
       metaclass (~> 0.0.1)
     multi_json (1.11.2)
+    multi_xml (0.5.5)
     multipart-post (2.0.0)
     naught (1.0.0)
     net-http-digest_auth (1.4)
@@ -175,6 +178,22 @@ GEM
     nokogumbo (1.2.0)
       nokogiri
     ntlm-http (0.1.1)
+    oauth2 (1.0.0)
+      faraday (>= 0.8, < 0.10)
+      jwt (~> 1.0)
+      multi_json (~> 1.3)
+      multi_xml (~> 0.5)
+      rack (~> 1.2)
+    omniauth (1.2.2)
+      hashie (>= 1.2, < 4)
+      rack (~> 1.0)
+    omniauth-coinbase (2.1.0)
+      coinbase (~> 4.0)
+      multi_json (~> 1.3)
+      omniauth-oauth2 (~> 1.2)
+    omniauth-oauth2 (1.3.1)
+      oauth2 (~> 1.0)
+      omniauth (~> 1.2)
     pg (0.18.2)
     pg (0.18.2-x64-mingw32)
     protected_attributes (1.1.3)
@@ -355,6 +374,7 @@ DEPENDENCIES
   net-ssh
   newrelic_rpm
   nokogiri
+  omniauth-coinbase
   pg
   protected_attributes
   pry
@@ -386,4 +406,4 @@ DEPENDENCIES
   whenever
 
 BUNDLED WITH
-   1.10.0
+   1.10.6

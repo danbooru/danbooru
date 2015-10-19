@@ -17,7 +17,7 @@
   <li id="add-artist-commentary-list"><%= link_to "Add artist commentary", "#", :id => "add-commentary" %></li>
   <li><%= link_to "Add to favorite group", "#", :id => "open-favgroup-dialog-link" %></li>
   <li><%= link_to "Find similar", iqdb_queries_path(:post_id => post.id), :method => :post, :remote => true %></li>
-
+  <li><a href="http://iqdb.org/?url=atfbooru.ninja<%= post.file_url %>" target="_blank">IQDB Find similar</a></li>
   <% if post.is_status_locked? %>
     <li><span id="status-locked-notice">Status locked</span></li>
   <% else %>
@@ -38,7 +38,6 @@
       <% else %>
         <li><%= link_to "Delete", confirm_delete_moderator_post_post_path(:post_id => post.id) %></li>
       <% end %>
-
       <% if post.is_flagged? || post.is_pending? %>
         <li><%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :remote => true, :method => :post, :id => "approve" %></li>
       <% else %>

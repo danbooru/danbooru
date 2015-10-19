@@ -15,7 +15,7 @@
   <% end %>
   <%= nav_link_to("Pools", pools_path) %>
   <%= nav_link_to("Wiki", wiki_pages_path(:title => "help:home")) %>
-  <%= nav_link_to("Forum", forum_topics_path, :class => (CurrentUser.has_forum_been_updated? ? "forum-updated" : nil)) %>
+  <a href="https://allthefallen.ninja/index.php?/forum/29-gallery/">Forum</a>
   <% if CurrentUser.is_moderator? %>
     <%= nav_link_to("Dashboard", moderator_dashboard_path) %>
   <% end %>
