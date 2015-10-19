@@ -400,5 +400,9 @@ module Danbooru
     def twitter_site
       "@teruyo"
     end
+
+    def addthis_key
+      nil
+    end
   end
 end

@@ -8,7 +8,7 @@
   <a class="addthis_counter addthis_bubble_style"></a>
   </div>
   <script type="text/javascript">
-    var addthis_config = {"data_track_addressbar": false, "pubid": "ra-4f8dbf8a41066ac7"};
+    var addthis_config = {"data_track_addressbar": false, "pubid": "<%= Danbooru.config.addthis_key %>"};
     var addthis_share = {
       "url":"<%= j post_url(post, :only_path => false, :host => Danbooru.config.hostname) %>",
       "title": "<%= '#r_18 ' unless post.rating == 's' %><%= escape_javascript post.presenter.humanized_essential_tag_string.html_safe %>"
