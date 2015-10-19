@@ -58,7 +58,7 @@ class UserPresenter
       return "none"
     end
     
-    dcon = [user.deletion_confidence(120), 15].min
+    dcon = [user.deletion_confidence(60), 15].min
     multiplier = (1 - (dcon / 15.0))
     max_count = [(user.base_upload_limit * multiplier).ceil, 5].max
     uploaded_count = Post.for_user(user.id).where("created_at >= ?", 24.hours.ago).count

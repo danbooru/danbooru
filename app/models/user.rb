@@ -523,7 +523,7 @@ class User < ActiveRecord::Base
     end
 
     def max_upload_limit
-      dcon = [deletion_confidence(120), 15].min
+      dcon = [deletion_confidence(60), 15].min
       [(base_upload_limit * (1 - (dcon / 15.0))).ceil, 10].max
     end
 
