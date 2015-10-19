@@ -515,15 +515,15 @@ class User < ActiveRecord::Base
 
     def base_upload_limit
       if created_at >= 1.month.ago
-        10
+        100
       elsif created_at >= 2.months.ago
-        20
+        200
       elsif created_at >= 3.months.ago
-        30
+        300
       elsif created_at >= 4.months.ago
-        40
+        400
       else
-        50
+        500
       end
     end
 
