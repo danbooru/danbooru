@@ -5,6 +5,8 @@ class SavedSearch < ActiveRecord::Base
   attr_accessible :tag_query, :category
   before_create :update_user_on_create
   after_destroy :update_user_on_destroy
+  before_create :update_listbooru_on_create
+  after_destroy :update_listbooru_on_destroy
   validates_uniqueness_of :tag_query, :scope => :user_id
   before_validation :normalize
 
@@ -35,6 +37,21 @@ class SavedSearch < ActiveRecord::Base
   def update_user_on_destroy
     if user.saved_searches.count == 0
       user.update_attribute(:has_saved_searches, false)
+    end
+  end
+
+  def update_listbooru_on_create
+    return unless Danbooru.config.listbooru_auth_key
+    Net::HTTP.post_form(Danbooru.config.listbooru_server, {"user_id" => user_id, "query" => tag_query, "key" => Danbooru.config.listbooru_auth_key})
+  end
+
+  def update_listbooru_on_destroy
+    return unless Danbooru.config.listbooru_auth_key
+    uri = URI.parse(Danbooru.config.listbooru_server)
+    Net::HTTP.start(uri.host, uri.port) do |http|
+      req = Net::HTTP::Delete.new("/searches")
+      req.set_form_data("user_id" => user_id, "query" => tag_query, "key" => Danbooru.config.listbooru_auth_key)
+      http.request(req)
     end
   end
 end
