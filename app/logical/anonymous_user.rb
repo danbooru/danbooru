@@ -40,6 +40,10 @@ class AnonymousUser
     false
   end
 
+  def is_banned_or_ip_banned?
+    false
+  end
+
   def has_mail?
     false
   end

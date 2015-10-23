@@ -75,6 +75,10 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :dmail_filter
 
   module BanMethods
+    def is_banned_or_ip_banned?
+      return is_banned? || IpBan.is_banned?(CurrentUser.ip_addr)
+    end
+
     def validate_ip_addr_is_not_banned
       if IpBan.is_banned?(CurrentUser.ip_addr)
         self.errors[:base] << "IP address is banned"
