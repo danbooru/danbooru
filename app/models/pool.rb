@@ -6,6 +6,7 @@ class Pool < ActiveRecord::Base
   validates_inclusion_of :category, :in => %w(series collection)
   validate :updater_can_change_category
   validate :name_does_not_conflict_with_metatags
+  validate :updater_can_remove_posts
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
   has_many :versions, lambda {order("pool_versions.id ASC")}, :class_name => "PoolVersion", :dependent => :destroy
@@ -233,6 +234,7 @@ class Pool < ActiveRecord::Base
 
   def remove!(post)
     return unless contains?(post.id)
+    return unless CurrentUser.user.can_remove_from_pools?
     return if is_deleted?
 
     update_attributes(:post_ids => remove_number_from_string(post.id, post_ids), :post_count => post_count - 1)
@@ -410,6 +412,16 @@ class Pool < ActiveRecord::Base
   def name_does_not_conflict_with_metatags
     if %w(any none series collection).include?(name.downcase.tr(" ", "_"))
       errors[:base] << "Pools cannot have the following names: any, none, series, collection"
+      false
+    else
+      true
+    end
+  end
+
+  def updater_can_remove_posts
+    removed = post_id_array_was - post_id_array
+    if removed.any? && !CurrentUser.user.can_remove_from_pools?
+      errors[:base] << "You cannot removes posts from pools within the first week of sign up"
       false
     else
       true

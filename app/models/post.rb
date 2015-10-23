@@ -916,6 +916,7 @@ class Post < ActiveRecord::Base
 
     def remove_pool!(pool, force = false)
       return unless belongs_to_pool?(pool)
+      return unless CurrentUser.user.can_remove_from_pools?
       return if pool.is_deleted? && !force
       reload
       self.pool_string = pool_string.gsub(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ").strip
