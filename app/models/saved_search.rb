@@ -42,7 +42,7 @@ class SavedSearch < ActiveRecord::Base
 
   def update_listbooru_on_create
     return unless Danbooru.config.listbooru_auth_key
-    Net::HTTP.post_form(Danbooru.config.listbooru_server, {"user_id" => user_id, "query" => tag_query, "key" => Danbooru.config.listbooru_auth_key})
+    Net::HTTP.post_form(Danbooru.config.listbooru_server, {"user_id" => user_id, "query" => tag_query, "key" => Danbooru.config.listbooru_auth_key, "name" => "saved"})
   end
 
   def update_listbooru_on_destroy
@@ -50,7 +50,7 @@ class SavedSearch < ActiveRecord::Base
     uri = URI.parse(Danbooru.config.listbooru_server)
     Net::HTTP.start(uri.host, uri.port) do |http|
       req = Net::HTTP::Delete.new("/searches")
-      req.set_form_data("user_id" => user_id, "query" => tag_query, "key" => Danbooru.config.listbooru_auth_key)
+      req.set_form_data("user_id" => user_id, "query" => tag_query, "key" => Danbooru.config.listbooru_auth_key, "name" => "saved")
       http.request(req)
     end
   end
