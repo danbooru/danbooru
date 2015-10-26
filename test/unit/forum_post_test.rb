@@ -26,7 +26,7 @@ class ForumPostTest < ActiveSupport::TestCase
         end
 
         dmail = Dmail.last
-        assert_equal("You were mentioned in the forum topic \"#{@topic.title}\":#{Danbooru.config.hostname}/forum_topics/#{@topic.id}?page=1\n\n<hr>\n\nHey @#{@user2.name} check this out!", dmail.body)
+        assert_equal("You were mentioned in the forum topic \"#{@topic.title}\":#{Danbooru.config.hostname}/forum_topics/#{@topic.id}?page=1\n\n---\n\nHey @#{@user2.name} check this out!", dmail.body)
       end
     end
 
