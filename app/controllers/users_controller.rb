@@ -50,6 +50,7 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     check_privilege(@user)
     sanitize_params!
+    handle_promotion!
     @user.update_attributes(params[:user].except(:name), :as => CurrentUser.role)
     cookies.delete(:favorite_tags)
     cookies.delete(:favorite_tags_with_categories)
@@ -73,6 +74,12 @@ private
     
     if params[:user] && params[:user][:level].to_i >= User::Levels::MODERATOR
       params[:user][:level] = User::Levels::JANITOR
+    end
+  end
+
+  def handle_promotion!
+    if params[:user] && params[:user][:level]
+      UserPromotion.new(@user, CurrentUser.user, params[:user].delete(:level)).promote!
     end
   end
 

@@ -23,6 +23,22 @@ class UserPromotion
     user.save
   end
 
+  def create_user_feedback
+    if user.level > user.level_was
+      body_prefix = "Promoted"
+    elsif user.level < user.level_was
+      body_prefix = "Demoted"
+    else
+      body_prefix = "Updated"
+    end
+
+    user.feedback.create(
+      :category => "neutral",
+      :body => "#{body_prefix} from #{user.level_string_was} to #{user.level_string}",
+      :disable_dmail_notification => true
+    )
+  end
+
 private
   
   def validate
@@ -38,22 +54,6 @@ private
 
   def create_transaction_log_item
     TransactionLogItem.record_account_upgrade(user)
-  end
-
-  def create_user_feedback
-    if user.level > user.level_was
-      body_prefix = "Promoted"
-    elsif user.level < user.level_was
-      body_prefix = "Demoted"
-    else
-      body_prefix = "Updated"
-    end
-
-    user.feedback.create(
-      :category => "neutral",
-      :body => "#{body_prefix} from #{user.level_string_was} to #{user.level_string}",
-      :disable_dmail_notification => true
-    )
   end
 
   def create_dmail
