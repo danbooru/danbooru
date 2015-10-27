@@ -1,4 +1,4 @@
-<% if disapprovals.count > 0 %>
+<% if disapprovals.count > 0 && (CurrentUser.can_approve_posts? || post.created_at < 3.days.ago) %>
   <% if disapprovals.breaks_rules.count > 0 %>
     (breaks rules: <%= disapprovals.breaks_rules.count %>)
   <% end %>

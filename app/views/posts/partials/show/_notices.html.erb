@@ -21,7 +21,7 @@
       <p>This post was deleted</p>
     <% end %>
 
-    <%= render "post_disapprovals/counts", :disapprovals => post.disapprovals %>
+    <%= render "post_disapprovals/counts", :disapprovals => post.disapprovals, :post => post %>
   </div>
 <% end %>
 
@@ -34,7 +34,7 @@
       This post was flagged and is pending approval (<%= link_to "learn more", wiki_pages_path(:title => "about:mod_queue") %>)
     <% end %>
 
-    <%= render "post_disapprovals/counts", :disapprovals => post.disapprovals %>
+    <%= render "post_disapprovals/counts", :disapprovals => post.disapprovals, :post => post %>
 
     <% if CurrentUser.can_approve_posts? && !post.disapproved_by?(CurrentUser.user) %>
       <div class="quick-mod">

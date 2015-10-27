@@ -1,4 +1,4 @@
-<% if disapprovals.count > 0 %>
+<% if disapprovals.count > 0 && (CurrentUser.can_approve_posts? || post.created_at < 3.days.ago) %>
   <p>
     It has been reviewed by <%= pluralize disapprovals.count, "moderator" %>. 
 

@@ -61,7 +61,7 @@
                 <li><strong>Appeals</strong>: <%= post_appeal_reasons(post) %></li>
               <% end %>
               <li>
-                <strong>Hidden</strong>: <%= render "post_disapprovals/compact_counts", :disapprovals => post.disapprovals %>
+                <strong>Hidden</strong>: <%= render "post_disapprovals/compact_counts", :disapprovals => post.disapprovals, :post => post %>
               </li>
               <li><strong>Tags</strong>: <%= post.tag_string %></li>
             </ul>
