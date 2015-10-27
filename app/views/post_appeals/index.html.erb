@@ -10,6 +10,7 @@
           <th width="10%">Creator</th>
           <th>Reason</th>
           <th width="15%">Date</th>
+          <th width="5%">Resolved?</th>
         </tr>
       </thead>
       <tbody>
@@ -19,6 +20,7 @@
             <td><%= link_to_user post_appeal.creator %></td>
             <td><%= format_text post_appeal.reason %></td>
             <td><%= compact_time post_appeal.updated_at %></td>
+            <td><%= post_appeal.resolved? %></td>
           </tr>
         <% end %>
       </tbody>

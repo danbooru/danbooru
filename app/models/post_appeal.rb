@@ -68,6 +68,10 @@ class PostAppeal < ActiveRecord::Base
 
   extend SearchMethods
 
+  def resolved?
+    !post.is_deleted? && !post.is_flagged?
+  end
+
   def validate_creator_is_not_limited
     if appeal_count_for_creator >= Danbooru.config.max_appeals_per_day
       errors[:creator] << "can appeal at most #{Danbooru.config.max_appeals_per_day} post a day"
