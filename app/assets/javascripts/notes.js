@@ -523,13 +523,15 @@ Danbooru.Note = {
 
       var $this = $(this);
       var id = $this.data("id");
-      Danbooru.Note.Box.find(id).remove();
-      Danbooru.Note.Body.find(id).remove();
-      $this.dialog("close");
 
       if (id.match(/\d/)) {
-        $.ajax("/notes/" + id + ".js", {
-          type: "DELETE"
+        $.ajax("/notes/" + id + ".json", {
+          type: "DELETE",
+          success: function() {
+            Danbooru.Note.Box.find(id).remove();
+            Danbooru.Note.Body.find(id).remove();
+            $this.dialog("close");
+          }
         });
       }
     },
