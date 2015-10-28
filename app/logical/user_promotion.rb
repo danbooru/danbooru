@@ -1,5 +1,5 @@
 class UserPromotion
-  attr_reader :user, :promoter, :new_level, :options
+  attr_reader :user, :promoter, :new_level, :options, :old_can_approve_posts, :old_can_upload_free
 
   def initialize(user, promoter, new_level, options = {})
     @user = user
@@ -10,6 +10,9 @@ class UserPromotion
 
   def promote!
     validate
+
+    @old_can_approve_posts = user.can_approve_posts?
+    @old_can_upload_free = user.can_upload_free?
 
     user.level = new_level
     user.can_approve_posts = options[:can_approve_posts]
@@ -43,27 +46,27 @@ private
   def build_messages
     messages = []
 
-    if user.can_approve_posts?
-      messages << "You can approve posts."
-    else
-      messages << "You cannot approve posts."
-    end
-
-    if user.can_upload_free?
-      messages << "You can upload posts without limit."
-    else
-      messages << "You cannot upload posts without limit."
-    end
-
     if user.level_changed?
       if user.level > user.level_was
-        messages << "You have been promoted to a #{user.level_string} level account."
+        messages << "You have been promoted to a #{user.level_string} level account from #{user.level_string_was}."
       elsif user.level < user.level_was
-        messages << "You have been demoted to a #{user.level_string} level account."
+        messages << "You have been demoted to a #{user.level_string} level account from #{user.level_string_was}."
       end
     end
 
-    messages.join(" ")
+    if user.can_approve_posts? && !old_can_approve_posts
+      messages << "You gained the ability to approve posts."
+    elsif !user.can_approve_posts? && old_can_approve_posts
+      messages << "You lost the ability to approve posts."
+    end
+
+    if user.can_upload_free? && !old_can_upload_free
+      messages << "You gained the ability to upload posts without limit."
+    elsif !user.can_upload_free? && old_can_upload_free
+      messages << "You lost the ability to upload posts without limit."
+    end
+
+    messages.join("\n")
   end
 
   def create_dmail
