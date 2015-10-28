@@ -1,11 +1,43 @@
 class SavedSearch < ActiveRecord::Base
+  module ListbooruMethods
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+      def update_listbooru_on_create(user_id, query)
+        uri = URI.parse("#{Danbooru.config.listbooru_server}/searches")
+        Net::HTTP.post_form(uri, {"user_id" => user_id, "query" => query, "key" => Danbooru.config.listbooru_auth_key})
+      end
+
+      def update_listbooru_on_destroy(user_id, query)
+        uri = URI.parse("#{Danbooru.config.listbooru_server}/searches")
+        Net::HTTP.start(uri.host, uri.port) do |http|
+          req = Net::HTTP::Delete.new("/searches")
+          req.set_form_data("user_id" => user_id, "query" => query, "key" => Danbooru.config.listbooru_auth_key)
+          http.request(req)
+        end
+      end
+    end
+
+    def update_listbooru_on_create
+      return unless Danbooru.config.listbooru_auth_key
+      SavedSearch.delay(:queue => "default").update_listbooru_on_create(user_id, tag_query)
+    end
+
+    def update_listbooru_on_destroy
+      return unless Danbooru.config.listbooru_auth_key
+      SavedSearch.delay(:queue => "default").update_listbooru_on_destroy(user_id, tag_query)
+    end
+  end
+
+  include ListbooruMethods
+
   belongs_to :user
   validates :tag_query, :presence => true
   validate :validate_count
   attr_accessible :tag_query, :category
   before_create :update_user_on_create
   after_destroy :update_user_on_destroy
-  before_create :update_listbooru_on_create
+  after_create :update_listbooru_on_create
   after_destroy :update_listbooru_on_destroy
   validates_uniqueness_of :tag_query, :scope => :user_id
   before_validation :normalize
@@ -40,18 +72,4 @@ class SavedSearch < ActiveRecord::Base
     end
   end
 
-  def update_listbooru_on_create
-    return unless Danbooru.config.listbooru_auth_key
-    Net::HTTP.post_form(Danbooru.config.listbooru_server, {"user_id" => user_id, "query" => tag_query, "key" => Danbooru.config.listbooru_auth_key, "name" => "saved"})
-  end
-
-  def update_listbooru_on_destroy
-    return unless Danbooru.config.listbooru_auth_key
-    uri = URI.parse(Danbooru.config.listbooru_server)
-    Net::HTTP.start(uri.host, uri.port) do |http|
-      req = Net::HTTP::Delete.new("/searches")
-      req.set_form_data("user_id" => user_id, "query" => tag_query, "key" => Danbooru.config.listbooru_auth_key, "name" => "saved")
-      http.request(req)
-    end
-  end
 end

@@ -17,7 +17,6 @@
             <tr id="saved-search-<%= saved_search.id %>">
               <td><%= link_to saved_search.tag_query, posts_path(:tags => saved_search.tag_query) %></td>
               <td>
-                <%= link_to "edit", edit_saved_search_path(saved_search) %> |
                 <%= link_to "delete", saved_search_path(saved_search), :method => :delete, :remote => true %>
               </td>
             </tr>
