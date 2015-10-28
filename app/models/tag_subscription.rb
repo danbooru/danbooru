@@ -9,6 +9,15 @@ class TagSubscription < ActiveRecord::Base
   validate :validate_number_of_queries
   validate :creator_can_create_subscriptions, :on => :create
 
+  def migrate_to_saved_searches
+    tag_query.split(/\r\n|\r|\n/).each do |query|
+      creator.saved_searches.create(
+        :tag_query => query,
+        :category => name
+      )
+    end
+  end
+
   def normalize_name
     self.name = name.gsub(/\s+/, "_")
   end
