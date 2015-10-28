@@ -3,12 +3,20 @@ class SavedSearch < ActiveRecord::Base
     extend ActiveSupport::Concern
 
     module ClassMethods
+      def refresh_listbooru(user_id)
+        return unless Danbooru.config.listbooru_auth_key
+        uri = URI.parse("#{Danbooru.config.listbooru_server}/users/#{user_id}")
+        Net::HTTP.get_response(uri)
+      end
+
       def update_listbooru_on_create(user_id, query)
+        return unless Danbooru.config.listbooru_auth_key
         uri = URI.parse("#{Danbooru.config.listbooru_server}/searches")
         Net::HTTP.post_form(uri, {"user_id" => user_id, "query" => query, "key" => Danbooru.config.listbooru_auth_key})
       end
 
       def update_listbooru_on_destroy(user_id, query)
+        return unless Danbooru.config.listbooru_auth_key
         uri = URI.parse("#{Danbooru.config.listbooru_server}/searches")
         Net::HTTP.start(uri.host, uri.port) do |http|
           req = Net::HTTP::Delete.new("/searches")
