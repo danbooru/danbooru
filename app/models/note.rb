@@ -200,7 +200,7 @@ class Note < ActiveRecord::Base
 
   def merge_version?
     prev = versions.last
-    prev && prev.updater_id == CurrentUser.user.id && prev.updated_at > 1.hour.ago
+    prev && prev.updater_id == CurrentUser.user.id && prev.updated_at > 1.hour.ago && !is_active_changed?
   end
 
   def revert_to(version)
