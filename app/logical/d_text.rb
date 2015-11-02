@@ -2,7 +2,7 @@ require 'cgi'
 require 'uri'
 
 class DText
-  MENTION_REGEXP = /(?:^| )@\S+/
+  MENTION_REGEXP = /(?<=^| )@\S+/
   
   def self.u(string)
     CGI.escape(string)
@@ -38,7 +38,26 @@ class DText
     str.gsub!(/&/, "&amp;")
     str.gsub!(/</, "&lt;")
     str.gsub!(/>/, "&gt;")
+    str.gsub!(/\n/m, "<br>") unless options[:ignore_newlines]
+    str.gsub!(/\[b\](.+?)\[\/b\]/i, '<strong>\1</strong>')
+    str.gsub!(/\[i\](.+?)\[\/i\]/i, '<em>\1</em>')
+    str.gsub!(/\[s\](.+?)\[\/s\]/i, '<s>\1</s>')
+    str.gsub!(/\[u\](.+?)\[\/u\]/i, '<u>\1</u>')
+    str.gsub!(/\[tn\](.+?)\[\/tn\]/i, '<p class="tn">\1</p>')
+
+    str = parse_mentions(str)
+    str = parse_links(str)
+    str = parse_aliased_wiki_links(str)
+    str = parse_wiki_links(str)
+    str = parse_post_links(str)
+    str = parse_id_links(str)
+    str
+  end
+
+  def self.parse_mentions(str)
     str.gsub!(MENTION_REGEXP) do |name| 
+      next name unless name =~ /[a-z0-9]/i
+
       if name =~ /([:;,.!?\)\]<>])$/
         name.chop!
         ch = $1
@@ -48,18 +67,6 @@ class DText
 
       '<a href="/users?name=' + u(CGI.unescapeHTML(name[1..-1])) + '">' + name + '</a>' + ch
     end
-    str.gsub!(/\n/m, "<br>") unless options[:ignore_newlines]
-    str.gsub!(/\[b\](.+?)\[\/b\]/i, '<strong>\1</strong>')
-    str.gsub!(/\[i\](.+?)\[\/i\]/i, '<em>\1</em>')
-    str.gsub!(/\[s\](.+?)\[\/s\]/i, '<s>\1</s>')
-    str.gsub!(/\[u\](.+?)\[\/u\]/i, '<u>\1</u>')
-    str.gsub!(/\[tn\](.+?)\[\/tn\]/i, '<p class="tn">\1</p>')
-
-    str = parse_links(str)
-    str = parse_aliased_wiki_links(str)
-    str = parse_wiki_links(str)
-    str = parse_post_links(str)
-    str = parse_id_links(str)
     str
   end
 

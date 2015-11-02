@@ -5,6 +5,13 @@ class DTextTest < ActiveSupport::TestCase
     DText.parse(s)
   end
 
+  def test_mentions
+    assert_equal('<p><a href="/users?name=bob">@bob</a></p>', p("@bob"))
+    assert_equal('<p>hi <a href="/users?name=bob">@bob</a></p>', p("hi @bob"))
+    assert_equal('<p>this is not @.@ @_@ <a href="/users?name=bob">@bob</a></p>', p("this is not @.@ @_@ @bob"))
+    assert_equal('<p>multiple <a href="/users?name=bob">@bob</a> <a href="/users?name=anna">@anna</a></p>', p("multiple @bob @anna"))
+  end
+
   def test_sanitize_heart
     assert_equal('<p>&lt;3</p>', p("<3"))
   end
