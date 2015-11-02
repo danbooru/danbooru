@@ -24,7 +24,7 @@ module Mentionable
     text.scan(DText::MENTION_REGEXP).each do |mention|
       mention.gsub!(/(?:^\s*@)|(?:[:;,.!?\)\]<>]$)/, "")
       user = User.find_by_name(mention)
-      body = DText.parse(self.class.mentionable_option(:body).call(self, user.name))
+      body = self.class.mentionable_option(:body).call(self, user.name)
 
       if user
         dmail = Dmail.new(
