@@ -3,24 +3,30 @@ class SavedSearch < ActiveRecord::Base
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def refresh_listbooru(user_id)
+      def refresh_listbooru(user_id, name)
         return unless Danbooru.config.listbooru_auth_key
-        uri = URI.parse("#{Danbooru.config.listbooru_server}/users/#{user_id}")
+        params = {
+          :user_id => user_id,
+          :name => name,
+          :key => Danbooru.config.listbooru_auth_key
+        }
+        uri = URI.parse("#{Danbooru.config.listbooru_server}/users")
+        uri.query = URI.encode_www_form(params)
         Net::HTTP.get_response(uri)
       end
 
-      def update_listbooru_on_create(user_id, query)
+      def update_listbooru_on_create(user_id, name, query)
         return unless Danbooru.config.listbooru_auth_key
         uri = URI.parse("#{Danbooru.config.listbooru_server}/searches")
-        Net::HTTP.post_form(uri, {"user_id" => user_id, "query" => query, "key" => Danbooru.config.listbooru_auth_key})
+        Net::HTTP.post_form(uri, {"user_id" => user_id, "name" => name.try(:downcase), "query" => query, "key" => Danbooru.config.listbooru_auth_key})
       end
 
-      def update_listbooru_on_destroy(user_id, query)
+      def update_listbooru_on_destroy(user_id, name, query)
         return unless Danbooru.config.listbooru_auth_key
         uri = URI.parse("#{Danbooru.config.listbooru_server}/searches")
         Net::HTTP.start(uri.host, uri.port) do |http|
           req = Net::HTTP::Delete.new("/searches")
-          req.set_form_data("user_id" => user_id, "query" => query, "key" => Danbooru.config.listbooru_auth_key)
+          req.set_form_data("user_id" => user_id, "name" => name.try(:downcase), "query" => query, "key" => Danbooru.config.listbooru_auth_key)
           http.request(req)
         end
       end
@@ -28,12 +34,12 @@ class SavedSearch < ActiveRecord::Base
 
     def update_listbooru_on_create
       return unless Danbooru.config.listbooru_auth_key
-      SavedSearch.delay(:queue => "default").update_listbooru_on_create(user_id, tag_query)
+      SavedSearch.delay(:queue => "default").update_listbooru_on_create(user_id, category, tag_query)
     end
 
     def update_listbooru_on_destroy
       return unless Danbooru.config.listbooru_auth_key
-      SavedSearch.delay(:queue => "default").update_listbooru_on_destroy(user_id, tag_query)
+      SavedSearch.delay(:queue => "default").update_listbooru_on_destroy(user_id, category, tag_query)
     end
   end
 

@@ -523,10 +523,15 @@
 
   Danbooru.Post.initialize_saved_searches = function() {
     $("#save-search").click(function() {
+      var input = null;
+      if (Danbooru.meta("enable-categorized-saved-searches") === "true") {
+        input = window.prompt("Category for this saved search (optional):");
+      }
       $.post(
         "/saved_searches.js",
         {
-          "tags": $("#tags").attr("value")
+          "tags": $("#tags").attr("value"),
+          "category": input
         }
       );
     });
