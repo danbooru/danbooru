@@ -1,4 +1,4 @@
-<%= form_tag(pool_element_path, :class => "simple_form") do %>
+<%= form_tag(pool_element_path, :class => "simple_form", :remote => true, :format => :js) do %>
   <%= hidden_field_tag "post_id", @post.id %>
 
   <div class="input">
