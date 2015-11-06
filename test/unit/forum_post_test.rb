@@ -15,18 +15,44 @@ class ForumPostTest < ActiveSupport::TestCase
     end
 
     context "that mentions a user" do
-      setup do
-        @user2 = FactoryGirl.create(:user)
-        @post = FactoryGirl.build(:forum_post, :topic_id => @topic.id, :body => "Hey @#{@user2.name} check this out!")
-      end
-
-      should "create a dmail" do
-        assert_difference("Dmail.count", 1) do
-          @post.save
+      context "in a quote block" do
+        setup do
+          @user2 = FactoryGirl.create(:user)
         end
 
-        dmail = Dmail.last
-        assert_equal("You were mentioned in the forum topic \"#{@topic.title}\":#{Danbooru.config.hostname}/forum_topics/#{@topic.id}?page=1\n\n---\n\nHey @#{@user2.name} check this out!", dmail.body)
+        should "not create a dmail" do
+          assert_difference("Dmail.count", 0) do
+            FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => "[quote]@#{@user2.name}[/quote]")
+          end
+
+          assert_difference("Dmail.count", 0) do
+            FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => "[quote]@#{@user2.name}[/quote] blah [quote]@#{@user2.name}[/quote]")
+          end
+
+          assert_difference("Dmail.count", 0) do
+            FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => "[quote][quote]@#{@user2.name}[/quote][/quote]")
+          end
+
+          assert_difference("Dmail.count", 1) do
+            FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => "[quote]@#{@user2.name}[/quote] @#{@user2.name}")
+          end
+        end
+      end
+
+      context "outside a quote block" do
+        setup do
+          @user2 = FactoryGirl.create(:user)
+          @post = FactoryGirl.build(:forum_post, :topic_id => @topic.id, :body => "Hey @#{@user2.name} check this out!")
+        end
+
+        should "create a dmail" do
+          assert_difference("Dmail.count", 1) do
+            @post.save
+          end
+
+          dmail = Dmail.last
+          assert_equal("You were mentioned in the forum topic \"#{@topic.title}\":http://#{Danbooru.config.hostname}/forum_topics/#{@topic.id}?page=1\n\n---\n\nHey @#{@user2.name} check this out!", dmail.body)
+        end
       end
     end
 
