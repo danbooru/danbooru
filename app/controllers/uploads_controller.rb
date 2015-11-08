@@ -1,6 +1,5 @@
 class UploadsController < ApplicationController
   before_filter :member_only
-  after_filter :save_recent_tags, :only => [:create]
   respond_to :html, :xml, :json, :js
   rescue_from Upload::Error, :with => :rescue_exception
 
@@ -62,6 +61,7 @@ class UploadsController < ApplicationController
   def create
     @upload = Upload.create(params[:upload].merge(:server => Socket.gethostname))
     @upload.process! if @upload.errors.empty?
+    save_recent_tags
     respond_with(@upload)
   end
 
