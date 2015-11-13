@@ -1,0 +1,16 @@
+<div id="c-counts">
+  <div id="a-posts">
+    Post count for <%= link_to params[:tags].present? ? params[:tags] : "/posts", posts_path(:tags => params[:tags]) %>:
+    <% if @count == (Danbooru.config.blank_tag_search_fast_count || 1_000_000) %>
+      timed out
+    <% else %>
+      <%= @count %>
+    <% end %>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  Post Counts - <%= Danbooru.config.app_name %>
+<% end %>
+
+<%= render "posts/partials/common/secondary_links" %>
