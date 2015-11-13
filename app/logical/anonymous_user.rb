@@ -237,7 +237,7 @@ class AnonymousUser
     false
   end
 
-  def enable_categorized_saved_searches?
+  def disable_categorized_saved_searches?
     false
   end
 

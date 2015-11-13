@@ -68,7 +68,7 @@
 
         <%= f.input :enable_auto_complete, :as => :select, :collection => [["Yes", "true"], ["No", "false"]], :include_blank => false %>
 
-        <%= f.input :enable_categorized_saved_searches, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
+        <%= f.input :disable_categorized_saved_searches, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
 
         <div class="input text optional field_with_hint">
           <label class="text optional" for="user_favorite_tags">Frequent tags</label>
