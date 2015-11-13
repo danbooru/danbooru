@@ -525,17 +525,25 @@
 
   Danbooru.Post.initialize_saved_searches = function() {
     $("#save-search").click(function() {
-      var input = null;
       if (Danbooru.meta("disable-categorized-saved-searches") === "false") {
-        input = window.prompt("Category for this saved search (optional):");
-      }
-      $.post(
-        "/saved_searches.js",
-        {
-          "tags": $("#tags").attr("value"),
-          "category": input
+        var input = window.prompt("Category for this saved search (optional):");
+        if (input !== null) {
+          $.post(
+            "/saved_searches.js",
+            {
+              "tags": $("#tags").attr("value"),
+              "category": input
+            }
+          );
         }
-      );
+      } else {
+        $.post(
+          "/saved_searches.js",
+          {
+            "tags": $("#tags").attr("value")
+          }
+        );
+      }
     });
   }
 })();
