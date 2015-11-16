@@ -72,6 +72,10 @@ class PostAppeal < ActiveRecord::Base
     !post.is_deleted? && !post.is_flagged?
   end
 
+  def is_resolved
+    resolved?
+  end
+
   def validate_creator_is_not_limited
     if appeal_count_for_creator >= Danbooru.config.max_appeals_per_day
       errors[:creator] << "can appeal at most #{Danbooru.config.max_appeals_per_day} post a day"
@@ -97,5 +101,24 @@ class PostAppeal < ActiveRecord::Base
 
   def appeal_count_for_creator
     PostAppeal.for_user(creator_id).recent.count
+  end
+
+  def serializable_hash(options = {})
+    options ||= {}
+    options[:except] ||= []
+    options[:except] += hidden_attributes
+    unless options[:builder]
+      options[:methods] ||= []
+      options[:methods] += [:is_resolved]
+    end
+    hash = super(options)
+    hash
+  end
+
+  def to_xml(options = {}, &block)
+    options ||= {}
+    options[:methods] ||= []
+    options[:methods] += [:is_resolved]
+    super(options, &block)
   end
 end
