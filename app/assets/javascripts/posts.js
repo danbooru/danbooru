@@ -532,9 +532,10 @@
           method: "get",
           success: function(data) {
             resp($.map(data, function(saved_search) {
+              var category = saved_search.category === null ? "Uncategorized" : saved_search.category;
               return {
-                label: saved_search.category,
-                value: saved_search.category
+                label: category,
+                value: category
               };
             }));
           }
