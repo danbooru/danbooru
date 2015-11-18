@@ -3,7 +3,9 @@ class SavedSearchesController < ApplicationController
   respond_to :html, :xml, :json, :js
   
   def index
-    SavedSearch.delay(:queue => "default").refresh_listbooru(CurrentUser.id)
+    if Danbooru.config.listbooru_server
+      SavedSearch.delay(:queue => "default").refresh_listbooru(CurrentUser.id)
+    end
 
     @saved_searches = saved_searches.order("tag_query")
     @categories = @saved_searches.group_by{|saved_search| saved_search.category.to_s}
@@ -16,8 +18,18 @@ class SavedSearchesController < ApplicationController
     end
   end
 
+  def categories
+    @categories = saved_searches.select(:category).distinct
+    respond_with(@categories)
+  end
+
   def create
-    @saved_search = saved_searches.create(:tag_query => params[:tags], :category => params[:category])
+    @saved_search = saved_searches.create(:tag_query => params[:saved_search_tags], :category => params[:saved_search_category])
+
+    if params[:saved_search_disable_categories]
+      CurrentUser.disable_categorized_saved_searches = true
+      CurrentUser.save
+    end
   end
 
   def destroy
