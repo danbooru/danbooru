@@ -30,6 +30,23 @@ class SavedSearch < ActiveRecord::Base
           http.request(req)
         end
       end
+
+      def update_listbooru_on_update(user_id, old_name, old_query, new_name, new_query)
+        return unless Danbooru.config.listbooru_auth_key
+        uri = URI.parse("#{Danbooru.config.listbooru_server}/searches")
+        Net::HTTP.start(uri.host, uri.port) do |http|
+          req = Net::HTTP::Put.new("/searches")
+          req.set_form_data(
+            "user_id" => user_id, 
+            "old_name" => old_name.try(:downcase),
+            "old_query" => old_query,
+            "new_name" => new_name.try(:downcase), 
+            "new_query" => new_query, 
+            "key" => Danbooru.config.listbooru_auth_key
+          )
+          http.request(req)
+        end
+      end
     end
 
     def update_listbooru_on_create
@@ -41,6 +58,11 @@ class SavedSearch < ActiveRecord::Base
       return unless Danbooru.config.listbooru_auth_key
       SavedSearch.delay(:queue => "default").update_listbooru_on_destroy(user_id, category, tag_query)
     end
+
+    def update_listbooru_on_update
+      return unless Danbooru.config.listbooru_auth_key
+      SavedSearch.delay(:queue => "default").update_listbooru_on_update(user_id, category_was, tag_query_was, category, tag_query)
+    end
   end
 
   include ListbooruMethods
@@ -50,6 +72,7 @@ class SavedSearch < ActiveRecord::Base
   validate :validate_count
   attr_accessible :tag_query, :category
   before_create :update_user_on_create
+  before_update :update_listbooru_on_update
   after_destroy :update_user_on_destroy
   after_create :update_listbooru_on_create
   after_destroy :update_listbooru_on_destroy

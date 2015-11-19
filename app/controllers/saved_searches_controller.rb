@@ -37,6 +37,16 @@ class SavedSearchesController < ApplicationController
     @saved_search.destroy
   end
 
+  def edit
+    @saved_search = saved_searches.find(params[:id])
+  end
+
+  def update
+    @saved_search = saved_searches.find(params[:id])
+    @saved_search.update_attributes(params[:saved_search])
+    respond_with(@saved_search, :location => saved_searches_path)
+  end
+
 private
 
   def saved_searches
