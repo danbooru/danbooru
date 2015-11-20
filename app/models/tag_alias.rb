@@ -82,20 +82,31 @@ class TagAlias < ActiveRecord::Base
       raise errors.full_messages.join("; ")
     end
 
-    admin = CurrentUser.user || User.admins.first
-    CurrentUser.scoped(admin, "127.0.0.1") do
-      update_column(:status, "processing")
-      move_aliases_and_implications
-      clear_all_cache
-      ensure_category_consistency
-      update_posts
-      update_forum_topic_for_approve if update_topic
-      update_column(:post_count, consequent_tag.post_count)
-      update_column(:status, "active")
+    tries = 0
+
+    begin
+      admin = CurrentUser.user || User.admins.first
+      CurrentUser.scoped(admin, "127.0.0.1") do
+        update_column(:status, "processing")
+        move_aliases_and_implications
+        clear_all_cache
+        ensure_category_consistency
+        update_posts
+        update_forum_topic_for_approve if update_topic
+        update_column(:post_count, consequent_tag.post_count)
+        update_column(:status, "active")
+      end
+    rescue Exception => e
+      if tries < 5
+        tries += 1
+        sleep 2 ** tries
+        retry
+      end
+
+      update_forum_topic_for_error(e)
+      update_column(:status, "error: #{e}")
+      NewRelic::Agent.notice_error(e, :custom_params => {:tag_alias_id => id, :antecedent_name => antecedent_name, :consequent_name => consequent_name})
     end
-  rescue Exception => e
-    update_column(:status, "error: #{e}")
-    NewRelic::Agent.notice_error(e, :custom_params => {:tag_alias_id => id, :antecedent_name => antecedent_name, :consequent_name => consequent_name})
   end
 
   def is_pending?
@@ -242,6 +253,14 @@ class TagAlias < ActiveRecord::Base
     if forum_topic
       forum_topic.posts.create(
         :body => "The tag alias #{antecedent_name} -> #{consequent_name} has been approved."
+      )
+    end
+  end
+
+  def update_forum_topic_for_error(e)
+    if forum_topic
+      forum_topic.posts.create(
+        :body => "The tag alias #{antecedent_name} -> #{consequent_name} failed during processing. Reason: #{e}"
       )
     end
   end

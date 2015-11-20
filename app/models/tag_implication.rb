@@ -125,17 +125,28 @@ class TagImplication < ActiveRecord::Base
       raise errors.full_messages.join("; ")
     end
 
-    admin = CurrentUser.user || User.admins.first
-    CurrentUser.scoped(admin, "127.0.0.1") do
-      update_column(:status, "processing")
-      update_posts
-      update_column(:status, "active")
-      update_descendant_names_for_parents
-      update_forum_topic_for_approve if update_topic
+    tries = 0
+
+    begin
+      admin = CurrentUser.user || User.admins.first
+      CurrentUser.scoped(admin, "127.0.0.1") do
+        update_column(:status, "processing")
+        update_posts
+        update_column(:status, "active")
+        update_descendant_names_for_parents
+        update_forum_topic_for_approve if update_topic
+      end
+    rescue Exception => e
+      if tries < 5
+        tries += 1
+        sleep 2 ** tries
+        retry
+      end
+
+      update_forum_topic_for_error(e)
+      update_column(:status, "error: #{e}")
+      NewRelic::Agent.notice_error(e, :custom_params => {:tag_implication_id => id, :antecedent_name => antecedent_name, :consequent_name => consequent_name})
     end
-  rescue Exception => e
-    update_column(:status, "error: #{e}")
-    NewRelic::Agent.notice_error(e, :custom_params => {:tag_implication_id => id, :antecedent_name => antecedent_name, :consequent_name => consequent_name})
   end
 
   def absence_of_circular_relation
@@ -233,6 +244,14 @@ class TagImplication < ActiveRecord::Base
     if forum_topic
       forum_topic.posts.create(
         :body => "The tag implication #{antecedent_name} -> #{consequent_name} has been rejected."
+      )
+    end
+  end
+
+  def update_forum_topic_for_error(e)
+    if forum_topic
+      forum_topic.posts.create(
+        :body => "The tag implication #{antecedent_name} -> #{consequent_name} failed during processing. Reason: #{e}"
       )
     end
   end
