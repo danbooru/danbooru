@@ -3,11 +3,10 @@ class SavedSearch < ActiveRecord::Base
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def refresh_listbooru(user_id, name)
+      def refresh_listbooru(user_id)
         return unless Danbooru.config.listbooru_auth_key
         params = {
           :user_id => user_id,
-          :name => name,
           :key => Danbooru.config.listbooru_auth_key
         }
         uri = URI.parse("#{Danbooru.config.listbooru_server}/users")
