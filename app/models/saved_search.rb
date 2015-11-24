@@ -86,6 +86,25 @@ class SavedSearch < ActiveRecord::Base
     Tag.scan_query(tag_query).join(" ")
   end
 
+  def self.post_ids(user_id, name = nil)
+    params = {
+      "key" => Danbooru.config.listbooru_auth_key,
+      "user_id" => user_id,
+      "name" => name
+    }
+    uri = URI.parse("#{Danbooru.config.listbooru_server}/users")
+    uri.query = URI.encode_www_form(params)
+
+    Net::HTTP.start(uri.host, uri.port) do |http|
+      resp = http.request_get(uri.request_uri)
+      if resp.is_a?(Net::HTTPSuccess)
+        resp.body.scan(/\d+/).map(&:to_i)
+      else
+        raise "HTTP error code: #{resp.code} #{resp.message}"
+      end
+    end
+  end
+
   def normalize
     self.tag_query = SavedSearch.normalize(tag_query)
   end
@@ -105,25 +124,6 @@ class SavedSearch < ActiveRecord::Base
   def update_user_on_destroy
     if user.saved_searches.count == 0
       user.update_attribute(:has_saved_searches, false)
-    end
-  end
-
-  def post_ids
-    params = {
-      "key" => Danbooru.config.listbooru_auth_key,
-      "user_id" => user_id,
-      "name" => category
-    }
-    uri = URI.parse("#{Danbooru.config.listbooru_server}/users")
-    uri.query = URI.encode_www_form(params)
-
-    Net::HTTP.start(uri.host, uri.port) do |http|
-      resp = http.request_get(uri.request_uri)
-      if resp.is_a?(Net::HTTPSuccess)
-        resp.body.scan(/\d+/)
-      else
-        raise "HTTP error code: #{resp.code} #{resp.message}"
-      end
     end
   end
 end
