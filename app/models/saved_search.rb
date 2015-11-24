@@ -5,6 +5,9 @@ class SavedSearch < ActiveRecord::Base
     module ClassMethods
       def refresh_listbooru(user_id)
         return unless Danbooru.config.listbooru_auth_key
+        user = User.find(user_id)
+        return unless user.is_gold?
+        
         params = {
           :user_id => user_id,
           :key => Danbooru.config.listbooru_auth_key
