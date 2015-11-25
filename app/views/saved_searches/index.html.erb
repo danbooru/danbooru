@@ -5,7 +5,7 @@
     <% @categories.each do |category, saved_searches| %>
       <h2>
         <% if category.present? %>
-          <%= link_to category, posts_path(:tags => "search:#{category}") %>
+          <%= link_to category.tr("_", " "), posts_path(:tags => "search:#{category}") %>
         <% else %>
           Uncategorized
         <% end %>
