@@ -103,16 +103,10 @@ class PostQueryBuilder
 
   def add_saved_search_relation(saved_searches, relation)
     saved_searches.each do |saved_search|
-      if saved_search =~ /^(.+?):(.+)$/
-        user_name = $1
-        name = $2
-        user = User.find_by_name(user_name)
-        return relation if user.nil?
-        post_ids = SavedSearch.post_ids(user.id, name)
+      if saved_search == "all"
+        post_ids = SavedSearch.post_ids(CurrentUser.id)
       else
-        user = User.find_by_name(saved_search)
-        return relation if user.nil?
-        post_ids = SavedSearch.post_ids(user.id, nil)
+        post_ids = SavedSearch.post_ids(CurrentUser.id, saved_search)
       end
 
       post_ids = [0] if post_ids.empty?

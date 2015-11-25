@@ -3,7 +3,13 @@
     <h1>Saved Searches</h1>
 
     <% @categories.each do |category, saved_searches| %>
-      <h2><%= category.present? ? category : "Uncategorized" %></h2>
+      <h2>
+        <% if category.present? %>
+          <%= link_to category, posts_path(:tags => "search:#{category}") %>
+        <% else %>
+          Uncategorized
+        <% end %>
+      </h2>
       <table class="striped" width="100%">
         <thead>
           <tr>
@@ -27,7 +33,7 @@
   </div>
 </div>
 
-<%= render "users/secondary_links" %>
+<%= render "secondary_links" %>
 
 <% content_for(:page_title) do %>
   Saved Searches - <%= Danbooru.config.app_name %>

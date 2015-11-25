@@ -109,6 +109,7 @@ class SavedSearch < ActiveRecord::Base
   end
 
   def normalize
+    self.category = category.strip.gsub(/\s+/, "_").downcase if category
     self.tag_query = SavedSearch.normalize(tag_query)
   end
 
