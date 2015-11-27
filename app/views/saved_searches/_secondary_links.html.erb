@@ -1,0 +1,6 @@
+<% content_for(:secondary_links) do %>
+  <menu>
+    <li><%= link_to "Gallery", posts_path(:tags => "search:all") %></li>
+    <li><%= link_to "Listing", saved_searches_path %></li>
+  </menu>
+<% end %>

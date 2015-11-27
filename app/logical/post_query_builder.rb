@@ -101,6 +101,21 @@ class PostQueryBuilder
     relation
   end
 
+  def add_saved_search_relation(saved_searches, relation)
+    saved_searches.each do |saved_search|
+      if saved_search == "all"
+        post_ids = SavedSearch.post_ids(CurrentUser.id)
+      else
+        post_ids = SavedSearch.post_ids(CurrentUser.id, saved_search)
+      end
+
+      post_ids = [0] if post_ids.empty?
+      relation = relation.where(["posts.id IN (?)", post_ids])
+    end
+
+    relation
+  end
+
   def build(relation = nil)
     unless query_string.is_a?(Hash)
       q = Tag.parse_query(query_string)
@@ -205,6 +220,11 @@ class PostQueryBuilder
 
     if q[:subscriptions]
       relation = add_tag_subscription_relation(q[:subscriptions], relation)
+      has_constraints!
+    end
+
+    if q[:saved_searches]
+      relation = add_saved_search_relation(q[:saved_searches], relation)
       has_constraints!
     end
 
