@@ -38,7 +38,10 @@ module Moderator
     end
 
     def search_by_user_name(user_names)
-      users = User.where("name in (?)", user_names)
+      user_names = user_names.map do |username|
+        username.downcase.strip.tr(" ", "_")
+      end
+      users = User.where("lower(name) in (?)", user_names)
       search_by_user_id(users.map(&:id))
     end
 
