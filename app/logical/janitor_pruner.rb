@@ -26,7 +26,7 @@ class JanitorPruner
         Dmail.create_split(
           :to_id => user.id,
           :title => "Janitor inactivity",
-          :body => "You haven't approved a post in the past two months. In order to make sure the list of active janitors is up-to-date, you have lost your janitor privileges. Please reply to this message if you want to be reinstated.#{unknown_level}"
+          :body => "You haven't approved a post in the past three months. In order to make sure the list of active janitors is up-to-date, you have lost your janitor privileges. Please reply to this message if you want to be reinstated.#{unknown_level}"
         )
       end
     end
