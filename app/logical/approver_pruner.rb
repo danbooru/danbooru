@@ -1,5 +1,5 @@
-class JanitorPruner
-  def inactive_janitors
+class ApproverPruner
+  def inactive_approvers
     User.where("bit_prefs & ? > 0", User.flag_value_for("can_approve_posts")).select do |user|
       approval_count = Post.where("created_at >= ? and approver_id = ?", 3.months.ago, user.id).count
       approval_count == 0
@@ -9,7 +9,7 @@ class JanitorPruner
   def prune!
     admin = User.admins.first
 
-    inactive_janitors.each do |user|
+    inactive_approvers.each do |user|
       CurrentUser.scoped(admin, "127.0.0.1") do
         next if user.is_admin?
 
@@ -24,8 +24,8 @@ class JanitorPruner
  
         Dmail.create_split(
           :to_id => user.id,
-          :title => "Janitor inactivity",
-          :body => "You haven't approved a post in the past three months. In order to make sure the list of active janitors is up-to-date, you have lost your janitor privileges. Please reply to this message if you want to be reinstated."
+          :title => "Approver inactivity",
+          :body => "You haven't approved a post in the past three months. In order to make sure the list of active approvers is up-to-date, you have lost your approver privileges. Please reply to this message if you want to be reinstated."
         )
       end
     end
