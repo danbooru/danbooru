@@ -17,18 +17,15 @@ class JanitorPruner
 
         if janitor_trial && user.can_approve_posts?
           janitor_trial.demote!
-          unknown_level = nil
         else
           user.can_approve_posts = false
           user.save
-          user.promote_to!(User::Levels::PLATINUM, :skip_dmail => true)
-          unknown_level = "\n\nYour previous user level was unknown so your user level has defaulted to Platinum. If you feel this to be in error please reply to this message with your original level."
         end
  
         Dmail.create_split(
           :to_id => user.id,
           :title => "Janitor inactivity",
-          :body => "You haven't approved a post in the past three months. In order to make sure the list of active janitors is up-to-date, you have lost your janitor privileges. Please reply to this message if you want to be reinstated.#{unknown_level}"
+          :body => "You haven't approved a post in the past three months. In order to make sure the list of active janitors is up-to-date, you have lost your janitor privileges. Please reply to this message if you want to be reinstated."
         )
       end
     end
