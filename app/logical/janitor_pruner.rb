@@ -11,6 +11,8 @@ class JanitorPruner
 
     inactive_janitors.each do |user|
       CurrentUser.scoped(admin, "127.0.0.1") do
+        next if user.is_admin?
+
         janitor_trial = JanitorTrial.where(user_id: user.id).first
 
         if janitor_trial && user.can_approve_posts?
