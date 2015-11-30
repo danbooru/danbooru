@@ -192,7 +192,7 @@ class Post < ActiveRecord::Base
     end
 
     def twitter_card_supported?
-      image_width.to_i >= 280 && image_height.to_i >= 150 && file_size <= 1.megabyte
+      image_width.to_i >= 280 && image_height.to_i >= 150
     end
 
     def has_large?
