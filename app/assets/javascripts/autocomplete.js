@@ -37,7 +37,7 @@
   }
 
   Danbooru.Autocomplete.initialize_mention_autocomplete = function() {
-    var $fields = $("#forum_post_body");
+    var $fields = $("#forum_post_body,.comment-form textarea");
     $fields.autocomplete({
       delay: 500,
       minLength: 2,

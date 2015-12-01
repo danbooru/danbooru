@@ -14,6 +14,55 @@ class CommentTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
+
+    context "that mentions a user" do
+      setup do
+        @post = FactoryGirl.create(:post)
+        Danbooru.config.stubs(:member_comment_limit).returns(100)
+        Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
+      end
+
+      context "in a quote block" do
+        setup do
+          @user2 = FactoryGirl.create(:user, :created_at => 2.weeks.ago)
+        end
+
+        should "not create a dmail" do
+          assert_difference("Dmail.count", 0) do
+            FactoryGirl.create(:comment, :post_id => @post.id, :body => "[quote]@#{@user2.name}[/quote]")
+          end
+
+          assert_difference("Dmail.count", 0) do
+            FactoryGirl.create(:comment, :post_id => @post.id, :body => "[quote]@#{@user2.name}[/quote] blah [quote]@#{@user2.name}[/quote]")
+          end
+
+          assert_difference("Dmail.count", 0) do
+            FactoryGirl.create(:comment, :post_id => @post.id, :body => "[quote][quote]@#{@user2.name}[/quote][/quote]")
+          end
+
+          assert_difference("Dmail.count", 1) do
+            FactoryGirl.create(:comment, :post_id => @post.id, :body => "[quote]@#{@user2.name}[/quote] @#{@user2.name}")
+          end
+        end
+      end
+
+      context "outside a quote block" do
+        setup do
+          @user2 = FactoryGirl.create(:user)
+          @comment = FactoryGirl.build(:comment, :post_id => @post.id, :body => "Hey @#{@user2.name} check this out!")
+        end
+
+        should "create a dmail" do
+          assert_difference("Dmail.count", 1) do
+            @comment.save
+          end
+
+          dmail = Dmail.last
+          assert_equal("You were mentioned in a \"comment\":http://#{Danbooru.config.hostname}/posts/#{@comment.post_id}#comment-#{@comment.id}\n\n---\n\n[i]#{CurrentUser.name} said:[/i]\n\nHey @#{@user2.name} check this out!", dmail.body)
+        end
+      end
+    end
+
     context "created by a limited user" do
       setup do
         Danbooru.config.stubs(:member_comment_limit).returns(5)

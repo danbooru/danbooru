@@ -1,7 +1,7 @@
 <div class="comment-preview dtext dtext-preview">
 </div>
 
-<%= form_tag(comments_path, :class => "simple_form") do %>
+<%= form_tag(comments_path, :class => "simple_form comment-form") do %>
   <%= hidden_field "comment", "post_id", :value => post.id %>
   <%= dtext_field "comment", "body", :input_id => "comment_response_for_#{post.id}", :preview_id => "dtext-preview-for-#{post.id}" %>
   <%= submit_tag "Post", :data => { :disable_with => "Submitting..." } %>

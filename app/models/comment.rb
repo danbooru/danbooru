@@ -1,4 +1,6 @@
 class Comment < ActiveRecord::Base
+  include Mentionable
+
   validate :validate_creator_is_not_limited, :on => :create
   validates_format_of :body, :with => /\S/, :message => 'has no content'
   belongs_to :post
@@ -10,6 +12,12 @@ class Comment < ActiveRecord::Base
   after_create :update_last_commented_at_on_create
   after_destroy :update_last_commented_at_on_destroy
   attr_accessible :body, :post_id, :do_not_bump_post, :is_deleted
+  mentionable(
+    :message_field => :body, 
+    :user_field => :creator_id, 
+    :title => "You were mentioned in a comment",
+    :body => lambda {|rec, user_name| "You were mentioned in a \"comment\":http://#{Danbooru.config.hostname}/posts/#{rec.post_id}#comment-#{rec.id}\n\n---\n\n[i]#{rec.creator.name} said:[/i]\n\n#{ActionController::Base.helpers.excerpt(rec.body, user_name)}"}
+  )
 
   module SearchMethods
     def recent
