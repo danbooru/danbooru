@@ -463,13 +463,19 @@ class PostTest < ActiveSupport::TestCase
 
       context "as a new user" do
         setup do
-          @post.update_attribute(:tag_string, "aaa bbb ccc ddd")
+          @post.update_attribute(:tag_string, "aaa bbb ccc ddd tagme")
           CurrentUser.user = FactoryGirl.create(:user)
         end
 
-        should "not allow you to remove more than 2 tags" do
+        should "not allow you to remove tags" do
           @post.update_attributes(:tag_string => "aaa")
           assert_equal(["You must have an account at least 1 week old to remove tags"], @post.errors.full_messages)
+        end
+
+        should "allow you to remove request tags" do
+          @post.update_attributes(:tag_string => "aaa bbb ccc ddd")
+          @post.reload
+          assert_equal("aaa bbb ccc ddd", @post.tag_string)
         end
       end
 
