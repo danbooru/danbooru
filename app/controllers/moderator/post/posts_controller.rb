@@ -38,6 +38,8 @@ module Moderator
       def expunge
         @post = ::Post.find(params[:id])
         @post.expunge!
+      rescue StandardError => x
+        @error = x
       end
 
       def confirm_ban
