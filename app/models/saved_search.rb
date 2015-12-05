@@ -17,6 +17,22 @@ class SavedSearch < ActiveRecord::Base
         Net::HTTP.get_response(uri)
       end
 
+      def reset_listbooru(user_id)
+        return unless Danbooru.config.listbooru_auth_key
+
+        uri = URI.parse("#{Danbooru.config.listbooru_server}/searches")
+        Net::HTTP.start(uri.host, uri.port) do |http|
+          req = Net::HTTP::Delete.new("/searches")
+          req.set_form_data("user_id" => user_id, "all" => "true", "key" => Danbooru.config.listbooru_auth_key)
+          http.request(req)
+        end
+
+        user = User.find(user_id)
+        user.saved_searches.each do |saved_search|
+          update_listbooru_on_create(user_id, saved_search.category, saved_search.tag_query)
+        end
+      end
+
       def update_listbooru_on_create(user_id, name, query)
         return unless Danbooru.config.listbooru_auth_key
         uri = URI.parse("#{Danbooru.config.listbooru_server}/searches")
