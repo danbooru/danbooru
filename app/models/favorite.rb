@@ -34,7 +34,7 @@ class Favorite < ActiveRecord::Base
       User.where(:id => user.id).select("id").lock("FOR UPDATE NOWAIT").first
 
       return unless Favorite.for_user(user.id).where(:user_id => user.id, :post_id => post.id).exists?
-      Favorite.destroy_all(:user_id => user.id, :post_id => post.id)
+      Favorite.for_user(user.id).where(post_id: post.id).delete_all
       updates = "fav_count = fav_count - 1"
       updates = "#{updates}, score = score - 1" if user.is_gold?
       Post.where(:id => post.id).update_all(updates)

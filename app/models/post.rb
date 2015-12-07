@@ -1194,12 +1194,14 @@ class Post < ActiveRecord::Base
 
       ModAction.create(:description => "permanently deleted post ##{id}")
       delete!(:without_mod_action => true)
-      give_favorites_to_parent
-      update_children_on_destroy
-      decrement_tag_post_counts
-      remove_from_all_pools
-      destroy
-      update_parent_on_destroy
+      Post.without_timeout do
+        give_favorites_to_parent
+        update_children_on_destroy
+        decrement_tag_post_counts
+        remove_from_all_pools
+        destroy
+        update_parent_on_destroy
+      end
     end
 
     def ban!
