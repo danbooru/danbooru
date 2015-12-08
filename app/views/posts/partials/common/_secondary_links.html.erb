@@ -4,7 +4,9 @@
     <li class="nonessential"><%= link_to "Upload", new_upload_path %></li>
     <li><%= link_to "Popular", popular_explore_posts_path %></li>
     <li><%= link_to "Hot", posts_path(:tags => "order:rank") %></li>
-    <li><%= link_to "Searches", searches_explore_posts_path %></li>
+    <% if Danbooru.config.report_server %>
+      <li><%= link_to "Searches", searches_explore_posts_path %></li>
+    <% end %>
     <% unless CurrentUser.is_anonymous? %>
       <li><%= link_to "Favorites", favorites_path %></li>
       <li><%= link_to "Favorite groups", favorite_groups_path %></li>
