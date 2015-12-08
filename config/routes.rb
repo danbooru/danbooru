@@ -411,5 +411,7 @@ Rails.application.routes.draw do
   get "/static/name_change" => "static#name_change", :as => "name_change"
   get "/meta_searches/tags" => "meta_searches#tags", :as => "meta_searches_tags"
 
+  get "/intro" => redirect("/explore/posts/intro")
+
   root :to => "posts#index"
 end
