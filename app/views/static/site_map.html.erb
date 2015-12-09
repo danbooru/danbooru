@@ -14,7 +14,7 @@
         <% if CurrentUser.can_approve_posts? %>
           <li><%= link_to("Moderate", moderator_post_queue_path) %></li>
         <% end %>
-        <% if CurrentUser.is_admin? %>
+        <% if CurrentUser.is_moderator? %>
           <li><%= link_to("Mass Edit", edit_moderator_tag_path) %></li>
         <% end %>
       </ul>
@@ -89,7 +89,7 @@
     <section>
       <ul>
         <li><h1>Users</h1></li>
-        <% if CurrentUser.can_approve_posts? %>
+        <% if CurrentUser.is_moderator? %>
           <li><%= link_to("Dashboard", moderator_dashboard_path) %></li>
         <% end %>
         <li><%= link_to("Help", wiki_pages_path(:title => "help:users")) %></li>
@@ -109,10 +109,13 @@
         <li><%= link_to("Mod Actions", mod_actions_path) %></li>
         <li><%= link_to("Jobs", delayed_jobs_path) %></li>
         <li><%= link_to("Bulk Update Requests", bulk_update_requests_path) %></li>
+        <li><%= link_to("Janitor Trials", janitor_trials_path) %></li>
+
+        <% if CurrentUser.is_moderator? %>
+          <li><%= link_to("IP Bans", ip_bans_path) %></li>
+        <% end %>
 
         <% if CurrentUser.is_admin? %>
-          <li><%= link_to("Janitor Trials", janitor_trials_path) %></li>
-          <li><%= link_to("IP Bans", ip_bans_path) %></li>
           <li><%= link_to("News Updates", news_updates_path) %></li>
           <li><%= link_to("Alias & Implication Import", new_admin_alias_and_implication_import_path) %></li>
           <li><%= link_to("Admin Dashboard", admin_dashboard_path) %></li>
