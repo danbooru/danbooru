@@ -222,6 +222,7 @@ Rails.application.routes.draw do
   get "reports/user_promotions" => "reports#user_promotions"
   get "reports/janitor_trials" => "reports#janitor_trials"
   get "reports/contributors" => "reports#contributors"
+  get "reports/uploads" => "reports#uploads"
   resources :saved_searches, :except => [:show] do
     collection do
       get :categories
