@@ -45,11 +45,6 @@ module Danbooru
       "choujin-steiner"
     end
 
-    # Set to true to allow new account signups.
-    def enable_signups?
-      true
-    end
-
     # Set to true to give all new users gold access.
     def start_as_gold?
       false
