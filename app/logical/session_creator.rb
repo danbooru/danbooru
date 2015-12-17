@@ -1,11 +1,12 @@
 class SessionCreator
-  attr_reader :session, :cookies, :name, :password, :remember, :secure
+  attr_reader :session, :cookies, :name, :password, :ip_addr, :remember, :secure
 
-  def initialize(session, cookies, name, password, remember = false, secure = false)
+  def initialize(session, cookies, name, password, ip_addr, remember = false, secure = false)
     @session = session
     @cookies = cookies
     @name = name
     @password = password
+    @ip_addr = ip_addr
     @remember = remember
     @secure = secure
   end
@@ -27,6 +28,7 @@ class SessionCreator
       end
 
       session[:user_id] = user.id
+      user.update_column(:last_ip_addr, ip_addr)
       return true
     else
       return false

@@ -17,7 +17,9 @@ class SessionsControllerTest < ActionController::TestCase
       should "create a new session" do
         post :create, {:name => @user.name, :password => "password"}
         assert_redirected_to posts_path
+        @user.reload
         assert_equal(@user.id, session[:user_id])
+        assert_not_nil(@user.last_ip_addr)
       end
     end
 

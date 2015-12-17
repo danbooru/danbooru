@@ -4,7 +4,7 @@ class SessionsController < ApplicationController
   end
 
   def create
-    session_creator = SessionCreator.new(session, cookies, params[:name], params[:password], params[:remember], request.ssl?)
+    session_creator = SessionCreator.new(session, cookies, params[:name], params[:password], request.remote_ip, params[:remember], request.ssl?)
 
     if session_creator.authenticate
       url = params[:url] if params[:url] && params[:url].start_with?("/")

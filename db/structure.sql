@@ -3175,7 +3175,8 @@ furry -rating:s'::text,
     bcrypt_password_hash text,
     per_page integer DEFAULT 20 NOT NULL,
     custom_style text,
-    bit_prefs bigint DEFAULT 0 NOT NULL
+    bit_prefs bigint DEFAULT 0 NOT NULL,
+    last_ip_addr inet
 );
 
 
@@ -7275,4 +7276,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150721214646');
 INSERT INTO schema_migrations (version) VALUES ('20150728170433');
 
 INSERT INTO schema_migrations (version) VALUES ('20150805010245');
+
+INSERT INTO schema_migrations (version) VALUES ('20151217213321');
 

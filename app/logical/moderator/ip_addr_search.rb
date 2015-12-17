@@ -27,6 +27,7 @@ module Moderator
     def search_by_ip_addr(ip_addrs)
       sums = Hash.new {|h, k| h[k] = 0}
 
+      add_row(sums, "select id as k, 1 as count from users where last_ip_addr in (?)", ip_addrs)
       add_row(sums, "select creator_id as k, count(*) from comments where ip_addr in (?) group by k", ip_addrs)
       add_row(sums, "select updater_id as k, count(*) from post_versions where updater_ip_addr in (?) group by k", ip_addrs)
       add_row(sums, "select updater_id as k, count(*) from note_versions where updater_ip_addr in (?) group by k", ip_addrs)
