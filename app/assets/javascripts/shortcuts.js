@@ -46,6 +46,12 @@
         $("#random-post")[0].click();
       });
     }
+
+    if ($("#c-favorites").length && $("#a-index").length) {
+      $(document).bind("keydown", "r", function(e) {
+        $("#random-post")[0].click();
+      });
+    }
   }
 
   Danbooru.Shortcuts.nav_scroll_down = function() {
