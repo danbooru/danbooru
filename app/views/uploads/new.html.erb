@@ -24,6 +24,8 @@
       <%= error_messages_for "upload" %>
 
       <%= form_for(@upload, :html => {:multipart => true, :class => "simple_form", :id => "form"}) do |f| %>
+        <%= hidden_field_tag :url, params[:url] %>
+        <%= hidden_field_tag :ref, params[:ref] %>
         <%= hidden_field_tag :normalized_url, @normalized_url %>
         <%= f.hidden_field :referer_url, :value => @source.try(:referer_url) %>
 
