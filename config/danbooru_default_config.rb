@@ -295,15 +295,6 @@ module Danbooru
       nil
     end
 
-    def amazon_ses
-      # {:smtp_server_name => "smtp server", :user_name => "user name", :ses_smtp_user_name => "smtp user name", :ses_smtp_password => "smtp password"}
-      nil
-    end
-
-    def amazon_s3_bucket_name
-      "danbooru"
-    end
-
     def enable_dimension_autotagging
       true
     end
@@ -396,10 +387,51 @@ module Danbooru
     def addthis_key
     end
 
+    # listbooru options
+    def listbooru_enabled?
+      false
+    end
+
     def listbooru_server
     end
 
     def listbooru_auth_key
+    end
+
+    # AWS config options
+    def aws_access_key_id
+      nil
+    end
+
+    def aws_secret_access_key
+      nil
+    end
+
+    def aws_ses_enabled?
+      false
+    end
+
+    def aws_ses_options
+      # {:smtp_server_name => "smtp server", :user_name => "user name", :ses_smtp_user_name => "smtp user name", :ses_smtp_password => "smtp password"}
+      nil
+    end
+
+    def aws_s3_enabled?
+      false
+    end
+
+    def aws_s3_bucket_name
+      "danbooru"
+    end
+
+    def aws_sqs_enabled?
+      false
+    end
+
+    def aws_sqs_queue_url
+    end
+
+    def aws_sqs_region
     end
   end
 end

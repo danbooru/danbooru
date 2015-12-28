@@ -3,87 +3,48 @@ class SavedSearch < ActiveRecord::Base
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def posts_search_available?
-        Danbooru.config.listbooru_server.present? && CurrentUser.is_gold?
-      end
-
       def refresh_listbooru(user_id)
-        return unless Danbooru.config.listbooru_auth_key
-        user = User.find(user_id)
-        return unless user.is_gold?
-        
-        params = {
-          :user_id => user_id,
-          :key => Danbooru.config.listbooru_auth_key
-        }
-        uri = URI.parse("#{Danbooru.config.listbooru_server}/users")
-        uri.query = URI.encode_www_form(params)
-        Net::HTTP.get_response(uri)
+        return false unless Danbooru.config.listbooru_enabled?
+
+        sqs = SqsService.new(Danbooru.config.aws_sqs_queue_url)
+        sqs.send_message("refresh\n#{user_id}")
       end
 
       def reset_listbooru(user_id)
-        return unless Danbooru.config.listbooru_auth_key
+        return false unless Danbooru.config.listbooru_enabled?
 
-        uri = URI.parse("#{Danbooru.config.listbooru_server}/searches")
-        Net::HTTP.start(uri.host, uri.port) do |http|
-          req = Net::HTTP::Delete.new("/searches")
-          req.set_form_data("user_id" => user_id, "all" => "true", "key" => Danbooru.config.listbooru_auth_key)
-          http.request(req)
-        end
-
+        sqs = SqsService.new(Danbooru.config.aws_sqs_queue_url)
         user = User.find(user_id)
+
+        sqs.send_message("delete\n#{user_id}\nall\n")
+
         user.saved_searches.each do |saved_search|
-          update_listbooru_on_create(user_id, saved_search.category, saved_search.tag_query)
+          sqs.send_message("create\n#{user_id}\n#{saved_search.category}\n#{saved_search.tag_query}", :delay_seconds => 30)
         end
-      end
 
-      def update_listbooru_on_create(user_id, name, query)
-        return unless Danbooru.config.listbooru_auth_key
-        uri = URI.parse("#{Danbooru.config.listbooru_server}/searches")
-        Net::HTTP.post_form(uri, {"user_id" => user_id, "name" => name.try(:downcase), "query" => query, "key" => Danbooru.config.listbooru_auth_key})
-      end
-
-      def update_listbooru_on_destroy(user_id, name, query)
-        return unless Danbooru.config.listbooru_auth_key
-        uri = URI.parse("#{Danbooru.config.listbooru_server}/searches")
-        Net::HTTP.start(uri.host, uri.port) do |http|
-          req = Net::HTTP::Delete.new("/searches")
-          req.set_form_data("user_id" => user_id, "name" => name.try(:downcase), "query" => query, "key" => Danbooru.config.listbooru_auth_key)
-          http.request(req)
-        end
-      end
-
-      def update_listbooru_on_update(user_id, old_name, old_query, new_name, new_query)
-        return unless Danbooru.config.listbooru_auth_key
-        uri = URI.parse("#{Danbooru.config.listbooru_server}/searches")
-        Net::HTTP.start(uri.host, uri.port) do |http|
-          req = Net::HTTP::Put.new("/searches")
-          req.set_form_data(
-            "user_id" => user_id, 
-            "old_name" => old_name.try(:downcase),
-            "old_query" => old_query,
-            "new_name" => new_name.try(:downcase), 
-            "new_query" => new_query, 
-            "key" => Danbooru.config.listbooru_auth_key
-          )
-          http.request(req)
-        end
+        true
       end
     end
 
     def update_listbooru_on_create
-      return unless Danbooru.config.listbooru_auth_key
-      SavedSearch.delay(:queue => "default").update_listbooru_on_create(user_id, category, tag_query)
+      return false unless Danbooru.config.listbooru_enabled?
+
+      sqs = SqsService.new(Danbooru.config.aws_sqs_queue_url)
+      sqs.send_message("create\n#{user_id}\n#{category}\n#{tag_query}")
     end
 
     def update_listbooru_on_destroy
-      return unless Danbooru.config.listbooru_auth_key
-      SavedSearch.delay(:queue => "default").update_listbooru_on_destroy(user_id, category, tag_query)
+      return false unless Danbooru.config.listbooru_enabled?
+
+      sqs = SqsService.new(Danbooru.config.aws_sqs_queue_url)
+      sqs.send_message("delete\n#{user_id}\n#{category}\n#{tag_query}")
     end
 
     def update_listbooru_on_update
-      return unless Danbooru.config.listbooru_auth_key
-      SavedSearch.delay(:queue => "default").update_listbooru_on_update(user_id, category_was, tag_query_was, category, tag_query)
+      return false unless Danbooru.config.listbooru_enabled?
+
+      sqs = SqsService.new(Danbooru.config.aws_sqs_queue_url)
+      sqs.send_message("update\n#{user_id}\n#{category_was}\n#{tag_query_was}\n#{category}\n#{tag_query}")
     end
   end
 
@@ -110,6 +71,8 @@ class SavedSearch < ActiveRecord::Base
   end
 
   def self.post_ids(user_id, name = nil)
+    return [] unless Danbooru.config.listbooru_enabled?
+
     params = {
       "key" => Danbooru.config.listbooru_auth_key,
       "user_id" => user_id,

@@ -1,3 +1,0 @@
-#!/bin/bash
-
-PGOPTIONS="-c statement_timeout=0" pg_dump -Fc -hdbserver -f /var/www/danbooru2/shared/backup/db-`date +"%Y-%m-%d-%H-%M"`.dump danbooru2

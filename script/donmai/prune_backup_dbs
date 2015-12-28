@@ -1,3 +1,0 @@
-#!/bin/bash
-
-find /var/www/danbooru2/shared/backup -name 'db-*.dump' -mtime +30 -exec /bin/rm -f {} \;

@@ -4,7 +4,7 @@ class SavedSearchesController < ApplicationController
   
   def index
     if Danbooru.config.listbooru_server
-      SavedSearch.delay(:queue => "default").refresh_listbooru(CurrentUser.id)
+      SavedSearch.refresh_listbooru(CurrentUser.id)
     end
 
     @saved_searches = saved_searches.order("tag_query")

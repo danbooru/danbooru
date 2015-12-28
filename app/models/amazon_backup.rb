@@ -13,14 +13,16 @@ class AmazonBackup < ActiveRecord::Base
   end
 
   def self.execute
+    return false unless Danbooru.config.aws_s3_enabled?
+    
     last_id = AmazonBackup.last_id
-    credentials = Aws::Credentials.new(Danbooru.config.amazon_s3_access_key_id, Danbooru.config.amazon_s3_secret_access_key)
+    credentials = Aws::Credentials.new(Danbooru.config.aws_access_key_id, Danbooru.config.aws_secret_access_key)
     Aws.config.update({
       region: "us-east-1",
       credentials: credentials
     })
     client = Aws::S3::Client.new
-    bucket = Danbooru.config.amazon_s3_bucket_name
+    bucket = Danbooru.config.aws_s3_bucket_name
 
     Post.where("id > ?", last_id).limit(1000).order("id").each do |post|
       if File.exists?(post.file_path)
