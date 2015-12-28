@@ -27,21 +27,21 @@ class SavedSearch < ActiveRecord::Base
     end
 
     def update_listbooru_on_create
-      return false unless Danbooru.config.listbooru_enabled?
+      return unless Danbooru.config.listbooru_enabled?
 
       sqs = SqsService.new(Danbooru.config.aws_sqs_queue_url)
       sqs.send_message("create\n#{user_id}\n#{category}\n#{tag_query}")
     end
 
     def update_listbooru_on_destroy
-      return false unless Danbooru.config.listbooru_enabled?
+      return unless Danbooru.config.listbooru_enabled?
 
       sqs = SqsService.new(Danbooru.config.aws_sqs_queue_url)
       sqs.send_message("delete\n#{user_id}\n#{category}\n#{tag_query}")
     end
 
     def update_listbooru_on_update
-      return false unless Danbooru.config.listbooru_enabled?
+      return unless Danbooru.config.listbooru_enabled?
 
       sqs = SqsService.new(Danbooru.config.aws_sqs_queue_url)
       sqs.send_message("update\n#{user_id}\n#{category_was}\n#{tag_query_was}\n#{category}\n#{tag_query}")
