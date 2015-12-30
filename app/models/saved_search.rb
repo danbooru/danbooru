@@ -28,6 +28,7 @@ class SavedSearch < ActiveRecord::Base
 
     def update_listbooru_on_create
       return unless Danbooru.config.listbooru_enabled?
+      return unless user.is_gold?
 
       sqs = SqsService.new(Danbooru.config.aws_sqs_queue_url)
       sqs.send_message("create\n#{user_id}\n#{category}\n#{tag_query}")
@@ -42,6 +43,7 @@ class SavedSearch < ActiveRecord::Base
 
     def update_listbooru_on_update
       return unless Danbooru.config.listbooru_enabled?
+      return unless user.is_gold?
 
       sqs = SqsService.new(Danbooru.config.aws_sqs_queue_url)
       sqs.send_message("update\n#{user_id}\n#{category_was}\n#{tag_query_was}\n#{category}\n#{tag_query}")
