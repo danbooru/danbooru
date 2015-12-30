@@ -3,8 +3,8 @@ class SavedSearchesController < ApplicationController
   respond_to :html, :xml, :json, :js
   
   def index
-    if Danbooru.config.listbooru_server
-      SavedSearch.refresh_listbooru(CurrentUser.id)
+    if Danbooru.config.listbooru_server && CurrentUser.is_gold?
+      SavedSearch.refresh_listbooru(CurrentUser.user_id)
     end
 
     @saved_searches = saved_searches.order("tag_query")
