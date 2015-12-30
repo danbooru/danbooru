@@ -4,7 +4,7 @@ class SavedSearchesController < ApplicationController
   
   def index
     if Danbooru.config.listbooru_server && CurrentUser.is_gold?
-      SavedSearch.refresh_listbooru(CurrentUser.user_id)
+      SavedSearch.refresh_listbooru(CurrentUser.id)
     end
 
     @saved_searches = saved_searches.order("tag_query")
