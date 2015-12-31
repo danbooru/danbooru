@@ -1,0 +1,21 @@
+#c-reports {
+	#a-similar-users {
+    div.box {
+      h2, h3 {
+        color: #333;
+      }
+
+      margin-bottom: 2em;
+    }
+
+    /* clearfix hacks */
+    div.box:before, div.box:after {
+      content: "";
+      display: table;
+    }
+
+    div.box:after {
+      clear: both;
+    }
+  }
+}
