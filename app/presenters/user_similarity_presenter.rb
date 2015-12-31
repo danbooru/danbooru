@@ -1,5 +1,5 @@
 class UserSimilarityPresenter
-  attr_reader :report, :not_ready
+  attr_reader :report, :user_ids, :not_ready
 
   def initialize(report)
     @report = report
@@ -17,7 +17,7 @@ class UserSimilarityPresenter
   def fetch
     user_ids = report.fetch_similar_user_ids
 
-    if user_ids = "not ready"
+    if user_ids == "not ready"
       @not_ready = true
     else
       @user_ids = user_ids.scan(/\d+/).slice(0, 10)
