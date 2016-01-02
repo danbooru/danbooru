@@ -1032,17 +1032,19 @@ class Post < ActiveRecord::Base
     def fast_count(tags = "", options = {})
       tags = tags.to_s.strip
 
+      # optimize some cases. these are just estimates but at these
+      # quantities being off by a few hundred doesn't matter much
       if tags == ""
-        return Post.maximum(:id) * (2200402.0 / 2232212)
+        return (Post.maximum(:id) * (2200402.0 / 2232212)).floor
 
       elsif tags == "rating:s"
-        return Post.maximum(:id) * (1648652.0 / 2200402)
+        return (Post.maximum(:id) * (1648652.0 / 2200402)).floor
 
       elsif tags == "rating:q"
-        return Post.maximum(:id) * (350101.0 / 2200402)
+        return (Post.maximum(:id) * (350101.0 / 2200402)).floor
 
       elsif tags == "rating:e"
-        return Post.maximum(:id) * (201650.0 / 2200402)
+        return (Post.maximum(:id) * (201650.0 / 2200402)).floor
       end
 
       count = get_count_from_cache(tags)
@@ -1057,13 +1059,34 @@ class Post < ActiveRecord::Base
     end
 
     def fast_count_search(tags, options = {})
-      count = Post.with_timeout(options[:statement_timeout] || 500, Danbooru.config.blank_tag_search_fast_count || 1_000_000, :tags => tags) do
+      count = Post.with_timeout(options[:statement_timeout] || 500, nil, :tags => tags) do
         Post.tag_match(tags).count
       end
-      if count > 0 && count != (Danbooru.config.blank_tag_search_fast_count || 1_000_000)
-        set_count_in_cache(tags, count)
+
+      if count == nil && tags !~ / /
+        count = fast_count_search_batched(tags, options)
       end
+
+      if count > 0
+        set_count_in_cache(tags, count)
+      else
+        count = Danbooru.config.blank_tag_search_fast_count
+      end
+
       count
+    end
+
+    def fast_count_search_batched(tags, options)
+      # this is slower but less likely to timeout
+      i = Post.maximum(:id)
+      sum = 0
+      while i > 0
+        count = Post.with_timeout(options[:statement_timeout] || 500, nil, :tags => tags) do
+          sum += Post.tag_match(tags).where("id between <= ? and > ?", i, i - 25_000).count
+          i -= 25_000
+        end
+      end
+      sum
     end
   end
 
