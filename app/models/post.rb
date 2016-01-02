@@ -1029,22 +1029,26 @@ class Post < ActiveRecord::Base
       "pfc:#{Cache.sanitize(tags)}"
     end
 
-    def slow_query?(tags)
-      tags.blank?
-    end
-
     def fast_count(tags = "", options = {})
       tags = tags.to_s.strip
-      max_count = Danbooru.config.blank_tag_search_fast_count
 
-      if max_count && slow_query?(tags)
-        count = max_count
-      else
-        count = get_count_from_cache(tags)
+      if tags == ""
+        return Post.maximum(:id) * (2200402.0 / 2232212)
 
-        if count.to_i == 0
-          count = fast_count_search(tags, options)
-        end
+      elsif tags == "rating:s"
+        return Post.maximum(:id) * (1648652.0 / 2200402)
+
+      elsif tags == "rating:q"
+        return Post.maximum(:id) * (350101.0 / 2200402)
+
+      elsif tags == "rating:e"
+        return Post.maximum(:id) * (201650.0 / 2200402)
+      end
+
+      count = get_count_from_cache(tags)
+
+      if count.to_i == 0
+        count = fast_count_search(tags, options)
       end
 
       count.to_i
