@@ -1037,13 +1037,13 @@ class Post < ActiveRecord::Base
       if tags == ""
         return (Post.maximum(:id) * (2200402.0 / 2232212)).floor
 
-      elsif tags == "rating:s"
+      elsif tags =~ /^rating:s(?:afe)?/
         return (Post.maximum(:id) * (1648652.0 / 2200402)).floor
 
-      elsif tags == "rating:q"
+      elsif tags =~ /^rating:q(?:uestionable)?/
         return (Post.maximum(:id) * (350101.0 / 2200402)).floor
 
-      elsif tags == "rating:e"
+      elsif tags =~ /^rating:e(?:xplicit)?/
         return (Post.maximum(:id) * (201650.0 / 2200402)).floor
       end
 
@@ -1067,7 +1067,7 @@ class Post < ActiveRecord::Base
         count = fast_count_search_batched(tags, options)
       end
 
-      if count > 0
+      if count
         set_count_in_cache(tags, count)
       else
         count = Danbooru.config.blank_tag_search_fast_count
@@ -1084,6 +1084,10 @@ class Post < ActiveRecord::Base
         count = Post.with_timeout(options[:statement_timeout] || 500, nil, :tags => tags) do
           sum += Post.tag_match(tags).where("id between <= ? and > ?", i, i - 25_000).count
           i -= 25_000
+        end
+
+        if count.nil?
+          return nil
         end
       end
       sum
