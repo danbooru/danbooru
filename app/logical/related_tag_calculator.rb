@@ -2,7 +2,7 @@ class RelatedTagCalculator
   def self.find_tags(tag, limit)
     CurrentUser.without_safe_mode do
       Post.with_timeout(5_000, []) do
-        Post.tag_match(tag).limit(limit).select("posts.tag_string").reorder("posts.md5").pluck(:tag_string)
+        Post.tag_match(tag).limit(limit).reorder("posts.md5").pluck(:tag_string)
       end
     end
   end
@@ -41,7 +41,7 @@ class RelatedTagCalculator
 
     CurrentUser.without_safe_mode do
       Post.with_timeout(5_000, []) do
-        Post.tag_match(tag).limit(400).select("posts.tag_string").reorder("posts.md5").pluck(:tag_string).each do |tag_string|
+        Post.tag_match(tag).limit(400).reorder("posts.md5").pluck(:tag_string).each do |tag_string|
           tag_string.scan(/\S+/).each do |tag|
             counts[tag] += 1
           end
