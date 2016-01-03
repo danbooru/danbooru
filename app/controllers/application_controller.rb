@@ -21,6 +21,13 @@ protected
   def enable_cors
     response.headers["Access-Control-Allow-Origin"] = "*"
   end
+
+  def require_shared_key
+    unless params[:key] == Danbooru.config.shared_remote_key
+      render(text: "forbidden", status: 403)
+      return false
+    end
+  end
   
   def api_check
     if request.format.to_s =~ /\/json|\/xml/ || params[:controller] == "iqdb"
