@@ -1082,7 +1082,7 @@ class Post < ActiveRecord::Base
       sum = 0
       while i > 0
         count = Post.with_timeout(options[:statement_timeout] || 500, nil, :tags => tags) do
-          sum += Post.tag_match(tags).where("id between <= ? and > ?", i, i - 25_000).count
+          sum += Post.tag_match(tags).where("id <= ? and id > ?", i, i - 25_000).count
           i -= 25_000
         end
 
