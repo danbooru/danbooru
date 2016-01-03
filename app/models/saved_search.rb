@@ -3,6 +3,10 @@ class SavedSearch < ActiveRecord::Base
     extend ActiveSupport::Concern
 
     module ClassMethods
+      def posts_search_available?
+        Danbooru.config.listbooru_server.present? && CurrentUser.is_gold?
+      end
+
       def refresh_listbooru(user_id)
         return false unless Danbooru.config.listbooru_enabled?
 

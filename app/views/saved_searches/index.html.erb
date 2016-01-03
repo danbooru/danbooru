@@ -7,7 +7,7 @@
         <% if category.present? %>
           <%= link_to_if SavedSearch.posts_search_available?, category.tr("_", " "), posts_path(:tags => "search:#{category}") %>
         <% else %>
-          <%= link_to "Uncategorized", posts_path(:tags => "search:all") %>
+          <%= link_to_if SavedSearch.posts_search_available?, "Uncategorized", posts_path(:tags => "search:all") %>
         <% end %>
       </h2>
       <table class="striped" width="100%">
