@@ -626,7 +626,7 @@ class Tag < ActiveRecord::Base
         if post_count < COSINE_SIMILARITY_RELATED_TAG_THRESHOLD && Delayed::Job.count < 200
           delay(:queue => "default").update_related
         elsif post_count >= COSINE_SIMILARITY_RELATED_TAG_THRESHOLD
-          sqs = SqsService.new(Danbooru.config.aws_sqs_queue_reltagcalc_url)
+          sqs = SqsService.new(Danbooru.config.aws_sqs_reltagcalc_url)
           sqs.send_message("calculate #{name}")
         end
       end
