@@ -431,6 +431,9 @@ module Danbooru
     def aws_sqs_queue_url
     end
 
+    def aws_sqs_queue_reltagcalc_url
+    end
+
     def aws_sqs_region
     end
   end
