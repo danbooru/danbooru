@@ -1,5 +1,5 @@
 class Tag < ActiveRecord::Base
-  COSINE_SIMILARITY_RELATED_TAG_THRESHOLD = 100_000
+  COSINE_SIMILARITY_RELATED_TAG_THRESHOLD = 50_000
   METATAGS = "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-pool|pool|ordpool|-favgroup|favgroup|-fav|fav|ordfav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|ratio|score|favcount|filesize|source|-source|id|-id|date|age|order|limit|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|-parent|child|pixiv_id|pixiv|search"
   SUBQUERY_METATAGS = "commenter|comm|noter|noteupdater|artcomm"
   attr_accessible :category, :as => [:moderator, :janitor, :gold, :member, :anonymous, :default, :builder, :admin]
@@ -634,8 +634,8 @@ class Tag < ActiveRecord::Base
 
     def related_cache_expiry
       base = Math.sqrt([post_count, 0].max)
-      if base > 24 * 7
-        24 * 7
+      if base > 24 * 30
+        24 * 30
       elsif base < 24
         24
       else
