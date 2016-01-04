@@ -13,7 +13,7 @@ class RelatedTagsController < ApplicationController
 
   def update
     @tag = Tag.find_by_name(params[:name])
-    @tag.related_tags = params[:related_tags].scan(/\S+/).in_groups_of(2)
+    @tag.related_tags = params[:related_tags]
     @tag.related_tags_updated_at = Time.now
     @tag.save
 
