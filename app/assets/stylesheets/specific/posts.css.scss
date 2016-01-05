@@ -57,7 +57,8 @@ a.blacklisted-active {
 }
 
 .post-preview.blacklisted-active, #image-container.blacklisted-active {
-  display: none;
+  filter: brightness(10%);
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=10)";
 }
 
 .post-preview {
