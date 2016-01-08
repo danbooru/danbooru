@@ -384,6 +384,3 @@ DEPENDENCIES
   vcr
   webmock
   whenever
-
-BUNDLED WITH
-   1.10.0
