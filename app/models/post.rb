@@ -1037,13 +1037,13 @@ class Post < ActiveRecord::Base
       if tags == ""
         return (Post.maximum(:id) * (2200402.0 / 2232212)).floor
 
-      elsif tags =~ /^rating:s(?:afe)?/
+      elsif tags =~ /^rating:s(?:afe)?$/
         return (Post.maximum(:id) * (1648652.0 / 2200402)).floor
 
-      elsif tags =~ /^rating:q(?:uestionable)?/
+      elsif tags =~ /^rating:q(?:uestionable)?$/
         return (Post.maximum(:id) * (350101.0 / 2200402)).floor
 
-      elsif tags =~ /^rating:e(?:xplicit)?/
+      elsif tags =~ /^rating:e(?:xplicit)?$/
         return (Post.maximum(:id) * (201650.0 / 2200402)).floor
       end
 
