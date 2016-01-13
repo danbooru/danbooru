@@ -20,6 +20,10 @@
     });
 
     var open_favgroup_dialog = function(e) {
+      if (Danbooru.meta("current-user-id") == "") { // anonymous
+        return;
+      }
+
       if ($(".add-to-favgroup").length === 1) {
         // If the user only has one favorite group we don't need to ask which group to add the post to.
         $(".add-to-favgroup").click();

@@ -560,6 +560,11 @@ Danbooru.Note = {
     start: function(e) {
       e.preventDefault();
 
+      if (Danbooru.meta("current-user-id") == "") {
+        Danbooru.notice("You must be logged in to edit notes");
+        return;
+      }
+
       if (Danbooru.Note.TranslationMode.active) {
         return;
       }

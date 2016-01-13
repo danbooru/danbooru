@@ -189,7 +189,11 @@
         if ($("#add-to-favorites").is(":visible")) {
           $("#add-to-favorites").click();
         } else {
-          Danbooru.notice("You have already favorited this post")
+          if (Danbooru.meta("current-user-id") == "") {
+            Danbooru.notice("You must be logged in to favorite posts");
+          } else {
+            Danbooru.notice("You have already favorited this post");
+          }
         }
         e.preventDefault();
       });

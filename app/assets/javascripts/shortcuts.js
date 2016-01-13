@@ -17,6 +17,10 @@
 
     if ($("#image").length) { // post page or bookmarklet upload page
       $(document).bind("keydown", "shift+e", function(e) {
+        if (Danbooru.meta("current-user-id") == "") { // anonymous
+          return;
+        }
+
         if (!$("#edit-dialog").length) {
           $("#edit").show();
           $("#comments").hide();
@@ -33,7 +37,9 @@
 
     if ($("#c-posts").length && $("#a-show").length) {
       $(document).bind("keydown", "shift+o", function(e) {
-        Danbooru.Post.approve(Danbooru.meta("post-id"));
+        if (Danbooru.meta("current-user-can-approve-posts") === "true") {
+          Danbooru.Post.approve(Danbooru.meta("post-id"));
+        }
       });
 
       $(document).bind("keydown", "r", function(e) {
