@@ -8,6 +8,10 @@
       margin-bottom: 2em;
     }
 
+    span.accuracy {
+      color: #666;
+    }
+
     /* clearfix hacks */
     div.box:before, div.box:after {
       content: "";

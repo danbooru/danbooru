@@ -3,15 +3,15 @@
     <h1>Similar Users</h1>
 
     <% if @presenter.insufficient_data? %>
-      <p>You need at least 500 favorites before Danbooru can calculate users similar to you.</p>
+      <p>You need at least 300 favorites before Danbooru can calculate users similar to you.</p>
 
     <% elsif @presenter.not_ready? %>
       <p>The report is still being generated. Check back in a few minutes.</p>
 
     <% else %>
-      <% @presenter.each_user do |user| %>
+      <% @presenter.each_user do |user, score| %>
         <div class="box">
-          <h2><%= link_to user.pretty_name, user_path(user) %></h2>
+          <h2><%= link_to user.pretty_name, user_path(user) %> <span class="accuracy">(<%= number_to_percentage score, :precision => 2 %>)</span></h2>
           <div>
             <% @presenter.each_favorite_for(user) do |post| %>
               <%= PostPresenter.preview(post, :tags => "fav:#{user.name}") %>

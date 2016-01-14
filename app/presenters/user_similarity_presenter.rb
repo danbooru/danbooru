@@ -1,5 +1,5 @@
 class UserSimilarityPresenter
-  attr_reader :report, :user_ids, :not_ready
+  attr_reader :report, :user_ids, :user_ids_with_scores, :not_ready
 
   def initialize(report)
     @report = report
@@ -11,21 +11,31 @@ class UserSimilarityPresenter
   end
 
   def insufficient_data?
-    report.user.favorite_count < 500
+    report.user.favorite_count < 300
   end
 
   def fetch
-    user_ids = report.fetch_similar_user_ids
+    data = report.fetch_similar_user_ids
 
-    if user_ids == "not ready"
+    if data == "not ready"
       @not_ready = true
     else
-      @user_ids = user_ids.scan(/\d+/).slice(0, 10)
+      @user_ids_with_scores = data.scan(/\S+/).in_groups_of(2)
     end
   end
 
+  def user_ids
+    user_ids_with_scores.map(&:first)
+  end
+
+  def scores
+    user_ids_with_scores.map(&:last)
+  end
+
   def each_user(&block)
-    User.where(id: user_ids).each(&block)
+    user_ids_with_scores.each do |user_id, score|
+      yield(User.find(user_id), 100 * score.to_f)
+    end
   end
 
   def each_favorite_for(user, &block)
