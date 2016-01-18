@@ -73,6 +73,12 @@ class Upload < ActiveRecord::Base
       end
     end
 
+    def validate_md5_confirmation_after_move
+      if !md5_confirmation.blank? && md5_confirmation != Digest::MD5.file(md5_file_path).hexdigest
+        raise "md5 mismatch"
+      end
+    end
+
     def rating_given
       if rating.present?
         return true
@@ -121,6 +127,7 @@ class Upload < ActiveRecord::Base
         end
         generate_resizes(file_path)
         move_file
+        validate_md5_confirmation_after_move
         save
         post = convert_to_post
         post.distribute_files
@@ -191,6 +198,7 @@ class Upload < ActiveRecord::Base
     end
 
     def move_file
+      return if File.exists?(md5_file_path)
       FileUtils.mv(file_path, md5_file_path)
     end
 
