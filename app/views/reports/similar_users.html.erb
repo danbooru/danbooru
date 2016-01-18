@@ -3,10 +3,10 @@
     <h1>Similar Users</h1>
 
     <% if @presenter.insufficient_data? %>
-      <p>You need at least 300 favorites before Danbooru can calculate users similar to you.</p>
+      <p>You need at least 200 favorites before Danbooru can calculate users similar to you.</p>
 
     <% elsif @presenter.not_ready? %>
-      <p>The report is still being generated. Check back in a few minutes.</p>
+      <p>The report is being generated. Check back in a few minutes.</p>
 
     <% else %>
       <% @presenter.each_user do |user, score| %>
@@ -25,4 +25,10 @@
 
 <% content_for(:page_title) do %>
   Similar Users - <%= Danbooru.config.app_name %>
+<% end %>
+
+<% if @presenter.not_ready? %>
+  <% content_for(:html_header) do %> 
+    <meta http-equiv="refresh" content="60">
+  <% end %>
 <% end %>
