@@ -171,6 +171,10 @@ a.blacklisted-active {
     border: none;
     margin: 0;
     padding: 5px 5px 10px;
+
+    &.blacklisted-active {
+      width: 154px;
+    }
   }
 }
 
