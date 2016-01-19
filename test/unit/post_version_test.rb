@@ -3,7 +3,9 @@ require 'test_helper'
 class PostVersionTest < ActiveSupport::TestCase
   context "A post" do
     setup do
-      @user = FactoryGirl.create(:user)
+      Timecop.travel(1.month.ago) do
+        @user = FactoryGirl.create(:user)
+      end
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
@@ -18,6 +20,7 @@ class PostVersionTest < ActiveSupport::TestCase
       setup do
         @post = FactoryGirl.create(:post, :tag_string => "1")
         @post.stubs(:merge_version?).returns(false)
+        @post.stubs(:tag_string_changed?).returns(true)
         @post.update_attributes(:tag_string => "1 2")
         @post.update_attributes(:tag_string => "2 3")
       end

@@ -17,7 +17,7 @@ class JanitorTrialTest < ActiveSupport::TestCase
 
     context "upon creation" do
       should "create a dmail when testing a new janitor" do
-        assert_difference("Dmail.count", 2) do
+        assert_difference("Dmail.count", 4) do
           JanitorTrial.create(:user_id => @user.id)
         end
       end

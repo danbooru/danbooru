@@ -387,6 +387,11 @@ module Danbooru
     def addthis_key
     end
 
+    # enable some (donmai-specific) optimizations for post counts
+    def estimate_post_counts
+      true
+    end
+
     # listbooru options
     def listbooru_enabled?
       false

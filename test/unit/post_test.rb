@@ -81,6 +81,7 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "update the fast count" do
+        Danbooru.config.stubs(:estimate_post_counts).returns(false)
         post = FactoryGirl.create(:post, :tag_string => "aaa")
         assert_equal(1, Post.fast_count)
         assert_equal(1, Post.fast_count("aaa"))
@@ -1491,6 +1492,7 @@ class PostTest < ActiveSupport::TestCase
     context "Creating a post" do
       setup do
         Danbooru.config.stubs(:blank_tag_search_fast_count).returns(nil)
+        Danbooru.config.stubs(:estimate_post_counts).returns(false)
       end
 
       context "with a primed cache" do
@@ -1505,7 +1507,7 @@ class PostTest < ActiveSupport::TestCase
 
         should "be counted correctly in fast_count" do
           assert_equal(1, Post.count)
-          assert_equal(Danbooru.config.blank_tag_search_fast_count, Post.fast_count(""))
+          assert_equal(1, Post.fast_count(""))
           assert_equal(1, Post.fast_count("aaa"))
           assert_equal(1, Post.fast_count("alias"))
           assert_equal(0, Post.fast_count("bbb"))

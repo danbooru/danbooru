@@ -19,7 +19,7 @@ class ArtistTest < ActiveSupport::TestCase
 
   context "An artist" do
     setup do
-      user = FactoryGirl.create(:user)
+      user = Timecop.travel(1.month.ago) {FactoryGirl.create(:user)}
       CurrentUser.user = user
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all

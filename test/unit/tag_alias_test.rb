@@ -3,8 +3,10 @@ require 'test_helper'
 class TagAliasTest < ActiveSupport::TestCase
   context "A tag alias" do
     setup do
-      user = FactoryGirl.create(:user)
-      CurrentUser.user = user
+      Timecop.travel(1.month.ago) do
+        user = FactoryGirl.create(:user)
+        CurrentUser.user = user
+      end
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
       Delayed::Worker.delay_jobs = false

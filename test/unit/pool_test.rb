@@ -4,8 +4,10 @@ require 'test_helper'
 
 class PoolTest < ActiveSupport::TestCase
   setup do
-    user = FactoryGirl.create(:user)
-    CurrentUser.user = user
+    Timecop.travel(1.month.ago) do
+      user = FactoryGirl.create(:user)
+      CurrentUser.user = user
+    end
     CurrentUser.ip_addr = "127.0.0.1"
     MEMCACHE.flush_all
   end
@@ -201,7 +203,7 @@ class PoolTest < ActiveSupport::TestCase
 
     should "create new versions for each distinct user" do
       assert_equal(1, @pool.versions.size)
-      user2 = FactoryGirl.create(:user)
+      user2 = Timecop.travel(1.month.ago) {FactoryGirl.create(:user)}
 
       CurrentUser.scoped(user2, "127.0.0.2") do
         @pool.post_ids = "#{@p1.id}"
@@ -294,7 +296,7 @@ class PoolTest < ActiveSupport::TestCase
 
   context "An anonymous pool" do
     setup do
-      user = FactoryGirl.create(:user)
+      user = Timecop.travel(1.month.ago) {FactoryGirl.create(:user)}
       CurrentUser.user = user
     end
 

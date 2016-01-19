@@ -44,6 +44,7 @@ class SavedSearchTest < ActiveSupport::TestCase
 
   context "Destroying a saved search" do
     setup do
+      SqsService.any_instance.stubs(:send_message)
       @user = FactoryGirl.create(:user)
       @saved_search = @user.saved_searches.create(:tag_query => "xxx")
       @saved_search.destroy
