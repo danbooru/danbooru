@@ -3,7 +3,7 @@ require "test_helper"
 class PostsControllerTest < ActionController::TestCase
   context "The posts controller" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = Timecop.travel(1.month.ago) {FactoryGirl.create(:user)}
       @api_key = ApiKey.generate!(@user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"

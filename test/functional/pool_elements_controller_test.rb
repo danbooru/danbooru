@@ -3,7 +3,7 @@ require 'test_helper'
 class PoolElementsControllerTest < ActionController::TestCase
   context "The pools posts controller" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = Timecop.travel(1.month.ago) {FactoryGirl.create(:user)}
       @mod = FactoryGirl.create(:moderator_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
