@@ -57,24 +57,9 @@ a.blacklisted-active {
 }
 
 .post-preview.blacklisted-active, #image-container.blacklisted-active {
-  img {
-    display: none;
-  }
-  &:before {
-    display: none;
-  }
-
-  background-color: black;
-
-  &:after {
-    position: absolute;
-    content: "Blacklisted";
-    color: white;
-    top: 45%;
-    right: 0;
-    left: 0;
-    font-size: 130%;
-  }
+  filter: brightness(0%);
+  -webkit-filter: brightness(0%);
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
 }
 
 .post-preview {
