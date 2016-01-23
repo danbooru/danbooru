@@ -11,7 +11,7 @@ class UserSimilarityPresenter
   end
 
   def insufficient_data?
-    report.user.favorite_count < 300
+    report.user.favorite_count < 200
   end
 
   def fetch
