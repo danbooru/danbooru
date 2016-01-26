@@ -67,7 +67,7 @@ class TagSubscription < ActiveRecord::Base
   def process
     divisor = [tag_query_array.size / 2, 1].max
     post_ids = tag_query_array.inject([]) do |all, query|
-      all += Post.tag_match(query).limit(Danbooru.config.tag_subscription_post_limit / divisor).select("posts.id").order("posts.id DESC").map(&:id)
+      all += PostReadOnly.tag_match(query).limit(Danbooru.config.tag_subscription_post_limit / divisor).select("posts.id").order("posts.id DESC").map(&:id)
     end
     self.post_ids = post_ids.sort.reverse.slice(0, Danbooru.config.tag_subscription_post_limit).join(",")
   end
