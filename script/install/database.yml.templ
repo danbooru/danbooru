@@ -20,3 +20,20 @@ production:
   database: danbooru2
   pool: 5
   timeout: 5000
+
+# read only databases, just point to local copies if you have no need
+ro_development:
+  adapter: postgresql
+  database: danbooru2
+
+ro_test:
+  adapter: postgresql
+  database: danbooru2_test
+
+ro_production:
+  adapter: postgresql
+  database: danbooru2
+
+ro_staging:
+  adapter: postgresql
+  database: danbooru2

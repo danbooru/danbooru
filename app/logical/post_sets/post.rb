@@ -1,6 +1,6 @@
 module PostSets
   class Post < PostSets::Base
-    attr_reader :tag_array, :page, :per_page, :raw, :random, :post_count, :format
+    attr_reader :tag_array, :page, :per_page, :raw, :random, :post_count, :format, :read_only
 
     def initialize(tags, page = 1, per_page = nil, options = {})
       @tag_array = Tag.scan_query(tags)
@@ -10,6 +10,7 @@ module PostSets
       @raw = options[:raw].present?
       @random = options[:random].present?
       @format = options[:format] || "html"
+      @read_only = options[:read_only]
     end
 
     def tag_string
@@ -128,7 +129,7 @@ module PostSets
         elsif raw
           temp = ::Post.raw_tag_match(tag_string).order("posts.id DESC").paginate(page, :count => post_count, :limit => per_page)
         else
-          temp = ::Post.tag_match(tag_string).paginate(page, :count => post_count, :limit => per_page)
+          temp = ::Post.tag_match(tag_string, read_only).paginate(page, :count => post_count, :limit => per_page)
         end
         temp.each # hack to force rails to eager load
         temp

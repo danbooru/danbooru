@@ -1513,8 +1513,12 @@ class Post < ActiveRecord::Base
       where("posts.tag_index @@ to_tsquery('danbooru', E?)", tag.to_escaped_for_tsquery)
     end
 
-    def tag_match(query)
-      PostQueryBuilder.new(query).build
+    def tag_match(query, read_only = false)
+      if read_only
+        PostQueryBuilder.new(query).build(PostReadOnly.where("true"))
+      else
+        PostQueryBuilder.new(query).build
+      end
     end
 
     def positive
