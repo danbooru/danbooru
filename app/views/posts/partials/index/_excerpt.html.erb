@@ -4,43 +4,45 @@
 
 <div id="excerpt" style="display: none;">
   <% if post_set.has_artist? %>
-    <% unless post_set.artist.notes.blank? %>
-      <div class="prose">
-        <%= format_text(post_set.artist.notes) %>
+    <% if post_set.artist.visible? %>
+      <% unless post_set.artist.notes.blank? %>
+        <div class="prose">
+          <%= format_text(post_set.artist.notes) %>
+        </div>
+
+        <p><%= link_to "View wiki page", post_set.artist.wiki_page %></p>
+      <% end %>
+
+      <div>
+        <ul>
+          <li><strong>Status</strong> <%= post_set.artist.status %></li>
+          <% if post_set.artist.has_tag_alias? %>
+            <li><strong>Tag Alias</strong> <%= post_set.artist.tag_alias_name %></li>
+          <% end %>
+          <% if post_set.artist.other_names.present? %>
+            <li><strong>Other Names</strong> <%= link_to_artists(post_set.artist.other_names.split(/ /)) %></li>
+          <% end %>
+          <% if post_set.artist.group_name.present? %>
+            <li><strong>Group</strong> <%= link_to_artist(post_set.artist.group_name) %></li>
+          <% end %>
+          <% if post_set.artist.members.any? %>
+            <li><strong>Members</strong> <%= link_to_artists(post_set.artist.members.map(&:name)) %></li>
+          <% end %>
+          <% post_set.artist.urls.each do |url| %>
+            <li>
+              URL: <%= link_to h(url.to_s), h(url.to_s) %>
+              <% if CurrentUser.user.is_moderator? %>
+                (<%= link_to("mass edit", edit_moderator_tag_path(:antecedent => "-#{post_set.artist.name} source:#{ArtistUrl.normalize_for_search(url.to_s)}", :consequent => post_set.artist.name)) %>)
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+
+        <%= artist_alias_and_implication_list(post_set.artist) %>
+
+        <p><%= link_to "View artist", artist_path(post_set.artist.id) %></p>
       </div>
-
-      <p><%= link_to "View wiki page", post_set.artist.wiki_page %></p>
     <% end %>
-
-    <div>
-      <ul>
-        <li><strong>Status</strong> <%= post_set.artist.status %></li>
-        <% if post_set.artist.has_tag_alias? %>
-          <li><strong>Tag Alias</strong> <%= post_set.artist.tag_alias_name %></li>
-        <% end %>
-        <% if post_set.artist.other_names.present? %>
-          <li><strong>Other Names</strong> <%= link_to_artists(post_set.artist.other_names.split(/ /)) %></li>
-        <% end %>
-        <% if post_set.artist.group_name.present? %>
-          <li><strong>Group</strong> <%= link_to_artist(post_set.artist.group_name) %></li>
-        <% end %>
-        <% if post_set.artist.members.any? %>
-          <li><strong>Members</strong> <%= link_to_artists(post_set.artist.members.map(&:name)) %></li>
-        <% end %>
-        <% post_set.artist.urls.each do |url| %>
-          <li>
-            URL: <%= link_to h(url.to_s), h(url.to_s) %>
-            <% if CurrentUser.user.is_moderator? %>
-              (<%= link_to("mass edit", edit_moderator_tag_path(:antecedent => "-#{post_set.artist.name} source:#{ArtistUrl.normalize_for_search(url.to_s)}", :consequent => post_set.artist.name)) %>)
-            <% end %>
-          </li>
-        <% end %>
-      </ul>
-
-      <%= artist_alias_and_implication_list(post_set.artist) %>
-
-      <p><%= link_to "View artist", artist_path(post_set.artist.id) %></p>
-    </div>
   <% elsif post_set.has_wiki? %>
     <div class="prose">
       <% if post_set.wiki_page.other_names.present? %>

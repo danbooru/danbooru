@@ -3,6 +3,7 @@ class ArtistsController < ApplicationController
   before_filter :member_only, :except => [:index, :show, :banned]
   before_filter :builder_only, :only => [:destroy]
   before_filter :admin_only, :only => [:ban, :unban]
+  before_filter :load_artist, :only => [:ban, :unban, :show, :edit, :update, :destroy, :undelete, :revert]
 
   def new
     @artist = Artist.new_with_defaults(params)
@@ -10,7 +11,6 @@ class ArtistsController < ApplicationController
   end
 
   def edit
-    @artist = Artist.find(params[:id])
     respond_with(@artist)
   end
 
@@ -27,13 +27,11 @@ class ArtistsController < ApplicationController
   end
 
   def ban
-    @artist = Artist.find(params[:id])
     @artist.ban!
     redirect_to(artist_path(@artist), :notice => "Artist was banned")
   end
 
   def unban
-    @artist = Artist.find(params[:id])
     @artist.unban!
     redirect_to(artist_path(@artist), :notice => "Artist was unbanned")
   end
@@ -73,7 +71,6 @@ class ArtistsController < ApplicationController
   end
 
   def update
-    @artist = Artist.find(params[:id])
     body = params[:artist].delete("notes")
     @artist.assign_attributes(params[:artist], :as => CurrentUser.role)
     if body
@@ -84,7 +81,6 @@ class ArtistsController < ApplicationController
   end
 
   def destroy
-    @artist = Artist.find(params[:id])
     if !@artist.deletable_by?(CurrentUser.user)
       raise User::PrivilegeError
     end
@@ -93,7 +89,6 @@ class ArtistsController < ApplicationController
   end
 
   def undelete
-    @artist = Artist.find(params[:id])
     if !@artist.deletable_by?(CurrentUser.user)
       raise User::PrivilegeError
     end
@@ -102,7 +97,6 @@ class ArtistsController < ApplicationController
   end
 
   def revert
-    @artist = Artist.find(params[:id])
     @version = ArtistVersion.find(params[:version_id])
     @artist.revert_to!(@version)
     respond_with(@artist)
@@ -131,4 +125,11 @@ class ArtistsController < ApplicationController
       end
     end
   end
+
+private
+
+  def load_artist
+    @artist = Artist.find(params[:id])
+  end
+
 end

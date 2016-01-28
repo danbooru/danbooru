@@ -4,7 +4,12 @@
 
     <section id="content">
       <h1>Edit Wiki</h1>
-      <%= render "form" %>
+
+      <% if @wiki_page.visible? %>
+        <%= render "form" %>
+      <% else %>
+        <p>The artist requested removal of this page.</p>
+      <% end %>
     </section>
   </div>
 </div>

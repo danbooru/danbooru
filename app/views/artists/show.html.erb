@@ -2,7 +2,7 @@
   <div id="a-show">
     <h1>Artist: <%= link_to @artist.pretty_name, posts_path(:tags => @artist.name), :class => "tag-type-#{@artist.category_name}" %></h1>
 
-    <% if @artist.notes.present? && (!@artist.is_banned? || CurrentUser.user.is_member?) %>
+    <% if @artist.notes.present? && @artist.visible? %>
       <div class="prose">
         <%= format_text(@artist.notes) %>
       </div>
@@ -10,34 +10,39 @@
       <p><%= link_to "View wiki page", @artist.wiki_page %></p>
     <% end %>
 
-    <div>
-      <ul>
-        <li><strong>Status</strong> <%= @artist.status %></li>
+    <% if @artist.visible? %>
+      <div>
+        <ul>
+          <li><strong>Status</strong> <%= @artist.status %></li>
 
-        <% if !@artist.is_banned? || CurrentUser.user.is_member? %>
-          <% if @artist.has_tag_alias? %>
-            <li><strong>Tag Alias</strong> <%= @artist.tag_alias_name %></li>
+          <% if !@artist.is_banned? || CurrentUser.user.is_member? %>
+            <% if @artist.has_tag_alias? %>
+              <li><strong>Tag Alias</strong> <%= @artist.tag_alias_name %></li>
+            <% end %>
+            <% if @artist.other_names.present? %>
+              <li><strong>Other Names</strong> <%= link_to_artists(@artist.other_names.split(/ /)) %></li>
+            <% end %>
+            <% if @artist.group_name.present? %>
+              <li><strong>Group</strong> <%= link_to_artist(@artist.group_name) %></li>
+            <% end %>
+            <% if @artist.members.any? %>
+              <li><strong>Members</strong> <%= link_to_artists(@artist.members.map(&:name)) %></li>
+            <% end %>
+            <% @artist.urls.each do |url| %>
+              <li>
+                URL: <%= link_to h(url.to_s), h(url.to_s) %>
+                <% if CurrentUser.user.is_moderator? %>
+                  (<%= link_to("mass edit", edit_moderator_tag_path(:antecedent => "-#{@artist.name} source:#{ArtistUrl.normalize_for_search(url.to_s)}", :consequent => @artist.name)) %>)
+                <% end %>
+              </li>
+            <% end %>
           <% end %>
-          <% if @artist.other_names.present? %>
-            <li><strong>Other Names</strong> <%= link_to_artists(@artist.other_names.split(/ /)) %></li>
-          <% end %>
-          <% if @artist.group_name.present? %>
-            <li><strong>Group</strong> <%= link_to_artist(@artist.group_name) %></li>
-          <% end %>
-          <% if @artist.members.any? %>
-            <li><strong>Members</strong> <%= link_to_artists(@artist.members.map(&:name)) %></li>
-          <% end %>
-          <% @artist.urls.each do |url| %>
-            <li>
-              URL: <%= link_to h(url.to_s), h(url.to_s) %>
-              <% if CurrentUser.user.is_moderator? %>
-                (<%= link_to("mass edit", edit_moderator_tag_path(:antecedent => "-#{@artist.name} source:#{ArtistUrl.normalize_for_search(url.to_s)}", :consequent => @artist.name)) %>)
-              <% end %>
-            </li>
-          <% end %>
-        <% end %>
-      </ul>
-    </div>
+        </ul>
+      </div>
+
+    <% else %>
+      <p>The artist requested removal of this page.</p>
+    <% end %>
 
     <%= render "secondary_links" %>
   </div>

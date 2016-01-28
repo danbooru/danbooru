@@ -1,7 +1,12 @@
 <div id="c-artists">
   <div id="a-edit">
     <h1>Edit Artist</h1>
-    <%= render "form" %>
+
+    <% if @artist.visible? %>
+      <%= render "form" %>
+    <% else %>
+      <p>The artist requested removal of this page.</p>
+    <% end %>
   </div>
 </div>
 
