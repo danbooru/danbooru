@@ -1061,8 +1061,8 @@ class Post < ActiveRecord::Base
     end
 
     def fast_count_search(tags, options = {})
-      count = Post.with_timeout(options[:statement_timeout] || 500, nil, :tags => tags) do
-        Post.tag_match(tags).count
+      count = PostReadOnly.with_timeout(3_000, nil) do
+        PostReadOnly.tag_match(tags).count
       end
 
       if count == nil && tags !~ / /
@@ -1083,8 +1083,8 @@ class Post < ActiveRecord::Base
       i = Post.maximum(:id)
       sum = 0
       while i > 0
-        count = Post.with_timeout(options[:statement_timeout] || 500, nil, :tags => tags) do
-          sum += Post.tag_match(tags).where("id <= ? and id > ?", i, i - 25_000).count
+        count = PostReadOnly.with_timeout(1_000, nil) do
+          sum += PostReadOnly.tag_match(tags).where("id <= ? and id > ?", i, i - 25_000).count
           i -= 25_000
         end
 
