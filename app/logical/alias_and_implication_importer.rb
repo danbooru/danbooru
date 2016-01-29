@@ -12,6 +12,11 @@ class AliasAndImplicationImporter
     parse(tokens)
   end
 
+  def validate!
+    tokens = AliasAndImplicationImporter.tokenize(text)
+    validate(tokens)
+  end
+
   def rename_aliased_pages?
     @rename_aliased_pages == "1"
   end
@@ -41,6 +46,30 @@ class AliasAndImplicationImporter
         # do nothing
       else
         raise "Unparseable line: #{line}"
+      end
+    end
+  end
+
+  def validate(tokens)
+    tokens.map do |token|
+      case token[0]
+      when :create_alias
+        tag_alias = TagAlias.new(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2])
+        unless tag_alias.valid?
+          raise "Error: #{tag_alias.errors.full_messages.join("; ")} (create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name})"
+        end
+
+      when :create_implication
+        tag_implication = TagImplication.new(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2])
+        unless tag_implication.valid?
+          raise "Error: #{tag_implication.errors.full_messages.join("; ")} (create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name})"
+        end
+
+      when :remove_alias, :remove_implication, :mass_update
+        # okay
+
+      else
+        raise "Unknown token: #{token[0]}"
       end
     end
   end

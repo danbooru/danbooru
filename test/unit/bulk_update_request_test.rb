@@ -4,15 +4,31 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
   context "creation" do
     setup do
       CurrentUser.user = FactoryGirl.create(:user)
+      CurrentUser.ip_addr = "127.0.0.1"
     end
 
     teardown do
       CurrentUser.user = nil
+      CurrentUser.ip_addr = nil
     end
 
     should "create a forum topic" do
       assert_difference("ForumTopic.count", 1) do
         BulkUpdateRequest.create(:title => "abc", :reason => "zzz", :script => "create alias aaa -> bbb")
+      end
+    end
+
+    context "that has an invalid alias" do
+      setup do
+        @alias1 = FactoryGirl.create(:tag_alias)
+        @req = FactoryGirl.build(:bulk_update_request, :script => "create alias bbb -> aaa")
+      end
+
+      should "not validate" do
+        assert_difference("TagAlias.count", 0) do
+          @req.save
+        end
+        assert_equal(["Error: A tag alias for aaa already exists (create alias bbb -> aaa)"], @req.errors.full_messages)
       end
     end
 

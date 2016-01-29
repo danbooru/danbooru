@@ -60,7 +60,7 @@ class TagAliasTest < ActiveSupport::TestCase
         ta2 = FactoryGirl.build(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
         ta2.save
         assert(ta2.errors.any?, "Tag alias should be invalid")
-        assert_equal("Tag alias can not create a transitive relation with another tag alias", ta2.errors.full_messages.join)
+        assert_equal("A tag alias for bbb already exists", ta2.errors.full_messages.join)
       end
     end
 

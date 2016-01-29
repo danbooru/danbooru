@@ -10,6 +10,7 @@ class BulkUpdateRequest < ActiveRecord::Base
   validates_inclusion_of :status, :in => %w(pending approved rejected)
   validate :script_formatted_correctly
   validate :forum_topic_id_not_invalid
+  validate :validate_script
   attr_accessible :user_id, :forum_topic_id, :script, :title, :reason
   attr_accessible :status, :as => [:admin]
   before_validation :initialize_attributes, :on => :create
@@ -130,7 +131,6 @@ class BulkUpdateRequest < ActiveRecord::Base
     end
   end
 
-
   def update_forum_topic_for_approve
     if forum_topic
       forum_topic.posts.create(
@@ -149,5 +149,16 @@ class BulkUpdateRequest < ActiveRecord::Base
 
   def normalize_text
     self.script = script.downcase
+  end
+
+  def validate_script
+    begin
+      AliasAndImplicationImporter.new(script, forum_topic_id, "1").validate!
+    rescue RuntimeError => e
+      self.errors[:base] = e.message
+      return false
+    end
+
+    errors.empty?
   end
 end

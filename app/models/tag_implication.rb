@@ -12,6 +12,7 @@ class TagImplication < ActiveRecord::Base
   validate :antecedent_is_not_aliased
   validate :consequent_is_not_aliased
   validate :antecedent_and_consequent_are_different
+  # validate :wiki_pages_present
   attr_accessible :antecedent_name, :consequent_name, :descendant_names, :forum_topic_id, :status, :forum_topic
 
   module DescendantMethods
@@ -253,6 +254,20 @@ class TagImplication < ActiveRecord::Base
       forum_topic.posts.create(
         :body => "The tag implication #{antecedent_name} -> #{consequent_name} failed during processing. Reason: #{e}"
       )
+    end
+  end
+
+  def wiki_pages_present
+    return if !Danbooru.config.strict_tag_requirements
+
+    unless WikiPage.titled(consequent_name).exists?
+      self.errors[:base] = "The #{consequent_name} tag needs a corresponding wiki page"
+      return false
+    end
+
+    unless WikiPage.titled(antecedent_name).exists?
+      self.errors[:base] = "The #{antecedent_name} tag needs a corresponding wiki page"
+      return false
     end
   end
 

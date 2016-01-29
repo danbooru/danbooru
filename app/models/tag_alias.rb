@@ -8,6 +8,8 @@ class TagAlias < ActiveRecord::Base
   validates_uniqueness_of :antecedent_name
   validate :absence_of_transitive_relation
   validate :antecedent_and_consequent_are_different
+  # validate :consequent_has_wiki_page
+  # validate :mininum_antecedent_count
   belongs_to :creator, :class_name => "User"
   belongs_to :forum_topic
   attr_accessible :antecedent_name, :consequent_name, :forum_topic_id, :status
@@ -139,7 +141,7 @@ class TagAlias < ActiveRecord::Base
     # We don't want a -> b && b -> c chains if the b -> c alias was created first.
     # If the a -> b alias was created first, the new one will be allowed and the old one will be moved automatically instead.
     if self.class.active.exists?(["antecedent_name = ?", consequent_name])
-      self.errors[:base] << "Tag alias can not create a transitive relation with another tag alias"
+      self.errors[:base] << "A tag alias for #{consequent_name} already exists"
       false
     end
   end
@@ -288,6 +290,23 @@ class TagAlias < ActiveRecord::Base
     clear_all_cache
     update_forum_topic_for_reject
     destroy
+  end
+
+  def consequent_has_wiki_page
+    return if !Danbooru.config.strict_tag_requirements
+
+    unless WikiPage.titled(consequent_name).exists?
+      self.errors[:base] = "The #{consequent_name} tag needs a corresponding wiki page"
+      return false
+    end
+  end
+
+  def mininum_antecedent_count
+    return if !Danbooru.config.strict_tag_requirements
+
+    unless Post.fast_count(antecedent_name) >= 50
+      self.errors[:base] = "The #{antecedent_name} tag must have at least 50 posts for an alias to be created"
+    end
   end
 
   def self.update_cached_post_counts_for_all
