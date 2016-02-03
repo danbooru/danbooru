@@ -1,0 +1,28 @@
+<div id="c-explore-posts">
+  <div id="a-index">
+    <h1>Missed Searches (past seven days)</h1>
+
+    <table class="striped" width="100%">
+      <thead>
+        <tr>
+          <th>Tags</th>
+          <th style="text-align: right;">Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @search_service.each_search do |tags, count| %>
+          <tr class="category-<%= Tag.category_for(tags) %>">
+            <td><%= link_to tags, posts_path(:tags => tags) %></td>
+            <td style="text-align: right;"><%= count.to_i %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%= render "posts/partials/common/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Missed Searches - <%= Danbooru.config.app_name %>
+<% end %>

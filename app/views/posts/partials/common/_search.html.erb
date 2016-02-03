@@ -13,6 +13,7 @@
     <% if params[:random] %>
       <%= hidden_field_tag :random, params[:random] %>
     <% end %>
+    <%= hidden_field_tag "ms", "1" %>
     <%= submit_tag "Go", :name => nil %>
   <% end %>
 </section>

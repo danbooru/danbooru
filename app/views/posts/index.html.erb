@@ -59,4 +59,5 @@
   <% if @post_set.has_wiki? %>
     <meta name="description" content="<%= @post_set.wiki_page.presenter.blurb %>"></meta>
   <% end %>
+  <%= missed_post_search_count_js %>
 <% end %>

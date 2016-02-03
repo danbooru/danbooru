@@ -1,0 +1,12 @@
+<script type="text/javascript">
+  $(function() {
+    var tags = $("#tags").val();
+    if (Danbooru.get_url_parameter("ms") === "1" && tags && tags.length > 0 && $(".post-preview").size() < 10) {
+      $.post("<%= Danbooru.config.report_server %>/missed_searches", {
+        session_id: "<%= session_id %>",
+        tags: $("#tags").val(),
+        sig: "<%= sig %>"
+      });
+    }
+  });
+</script>

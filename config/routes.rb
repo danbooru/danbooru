@@ -46,6 +46,7 @@ Rails.application.routes.draw do
       collection do
         get :popular
         get :searches
+        get :missed_searches
         get :hot
         get :intro
       end
