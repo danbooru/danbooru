@@ -5,7 +5,7 @@ class MissedSearchService
   end
 
   def fetch_data
-    # Cache.get("ms", 1.minute) do
+    Cache.get("ms", 1.minute) do
       url = URI.parse("#{Danbooru.config.report_server}/missed_searches")
       response = ""
       Net::HTTP.start(url.host, url.port, :use_ssl => url.is_a?(URI::HTTPS)) do |http|
@@ -17,6 +17,6 @@ class MissedSearchService
         end
       end
       response
-    # end
+    end
   end
 end
