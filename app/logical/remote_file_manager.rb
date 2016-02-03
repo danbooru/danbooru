@@ -18,8 +18,9 @@ class RemoteFileManager
           ftp.rename!(temp_path, path)
         rescue Net::SFTP::StatusException
           # this typically means the file already exists
-          # so just clean up
-          ftp.remove(temp_path)
+          # so delete and try renaming again
+          ftp.remove!(path)
+          ftp.rename!(temp_path, path)
         end
       end
     end
