@@ -2,10 +2,12 @@ module PostsHelper
   def missed_post_search_count_js
     return nil unless Danbooru.config.enable_post_search_counts
     
-    session_id = session.id
-    digest = OpenSSL::Digest.new("sha256")
-    sig = OpenSSL::HMAC.hexdigest(digest, Danbooru.config.shared_remote_key, ",#{session_id}")
-    return render("posts/partials/index/missed_search_count", session_id: session_id, sig: sig)
+    if params[:ms] == "1" && params[:tags].to_s.scan(/\S+/).size == 1
+      session_id = session.id
+      digest = OpenSSL::Digest.new("sha256")
+      sig = OpenSSL::HMAC.hexdigest(digest, Danbooru.config.shared_remote_key, ",#{session_id}")
+      return render("posts/partials/index/missed_search_count", session_id: session_id, sig: sig)
+    end
   end
 
   def post_search_count_js
