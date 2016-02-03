@@ -17,7 +17,7 @@ class PixivUgoiraService
   def generate_resizes(source_path, output_path, preview_path, delay = true)
     # Run this a bit in the future to give the upload process time to move the file
     if delay
-      PixivUgoiraConverter.delay(:queue => Socket.gethostname, :run_at => 2.seconds.from_now, :priority => -1).convert(source_path, output_path, preview_path, @frame_data)
+      PixivUgoiraConverter.delay(:queue => Socket.gethostname, :run_at => 10.seconds.from_now, :priority => -1).convert(source_path, output_path, preview_path, @frame_data)
     else
       PixivUgoiraConverter.convert(source_path, output_path, preview_path, @frame_data)
     end
