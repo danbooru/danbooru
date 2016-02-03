@@ -12,11 +12,12 @@ class MissedSearchService
         http.read_timeout = 1
         http.request_get(url.request_uri) do |res|
           if res.is_a?(Net::HTTPSuccess)
+            puts res.inspect
             response = res.body
           end
         end
       end
-      response
+      response.force_encoding("utf-8")
     end
   end
 end
