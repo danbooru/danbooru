@@ -323,6 +323,24 @@ class DText
     html.join("").html_safe
   end
 
+  def self.strip(s)
+    s.gsub!(/[\r\n]+/m, " ")
+    s.gsub!(/\[\/?(?:b|i|s|u|tn|tr|td|th|thead|tbody|quote|code|spoilers|spoiler|expand|table)\]/, "")
+    s.gsub!(/\[\[([^\|\]]+)\|([^\]]+)\]\]/m, '\2')
+    s.gsub!(/\[\[([^\]]+)\]\]/, '\1')
+    s.gsub!(/\{\{([^\}]+)\}\}/, '\1')
+    s.gsub!(/("[^"]+":(https?:\/\/|\/)[^\s\r\n<>]+|https?:\/\/[^\s\r\n<>]+|"[^"]+":\[(https?:\/\/|\/)[^\s\r\n<>\]]+\])+/) do |url|
+      if url =~ /^"([^"]+)":\[(.+)\]$/
+        $1
+      elsif url =~ /^"([^"]+)":(.+)$/
+        $1
+      else
+        url
+      end
+    end
+    s
+  end
+
   def self.sanitize(text)
     text.gsub!(/<( |-|3|:|>|\Z)/, "&lt;\\1")
 

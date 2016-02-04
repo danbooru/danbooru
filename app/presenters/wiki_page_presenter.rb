@@ -10,7 +10,7 @@ class WikiPagePresenter
   end
 
   def blurb
-    excerpt.try(:gsub, /<.+?>/, "")
+    DText.strip(excerpt.to_s)
   end
 
   def consequent_tag_aliases
