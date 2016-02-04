@@ -233,7 +233,7 @@ module Danbooru
     end
 
     def can_user_see_post?(user, post)
-      if is_user_restricted?(user) && is_post_restricted?(post)
+     if is_user_restricted?(user) && is_post_restricted?(post)
         false
       else
         true

@@ -2,7 +2,7 @@ module PostsHelper
   def missed_post_search_count_js
     return nil unless Danbooru.config.enable_post_search_counts
     
-    if params[:ms] == "1" && params[:tags].to_s.scan(/\S+/).size == 1
+    if params[:ms] == "1" && @post_set.post_count == 0 && @post_set.is_single_tag?
       session_id = session.id
       digest = OpenSSL::Digest.new("sha256")
       sig = OpenSSL::HMAC.hexdigest(digest, Danbooru.config.shared_remote_key, ",#{session_id}")
