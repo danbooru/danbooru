@@ -60,4 +60,7 @@
     <meta name="description" content="<%= @post_set.wiki_page.presenter.blurb %>"></meta>
   <% end %>
   <%= missed_post_search_count_js %>
+  <% if @post_set.hide_from_crawler? %>
+    <meta name="robots" content="none">
+  <% end %>
 <% end %>
