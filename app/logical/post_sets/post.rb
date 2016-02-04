@@ -143,7 +143,7 @@ module PostSets
     def hide_from_crawler?
       return true if !is_single_tag?
       return true if is_pattern_search?
-      return true if params[:page].to_i > 1
+      return true if page.to_i > 1
       return true if is_metatag_search?
       false
     end

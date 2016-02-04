@@ -31,6 +31,32 @@
   <%= javascript_include_tag "application" %>
   <%= raw Danbooru.config.custom_html_header_content %>
   <%= yield :html_header %>
+  <% if Danbooru.config.twitter_site %>
+    <script type="application/ld+json">
+      {
+        "@context" : "http://schema.org",
+        "@type" : "Organization",
+        "name" : "<%= Danbooru.config.app_name %>",
+        "url" : "http://<%= Danbooru.config.hostname%>",
+        "sameAs" : [
+          "http://twitter.com/<%= Danbooru.config.twitter_site[1..-1] %>"
+        ]
+      }
+    </script>
+  <% end %>
+  <script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "url" : "http://<%= Danbooru.config.hostname%>",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "http://<%= Danbooru.config.hostname%>/posts?tags={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
 </head>
 <body lang="en">
   <header id="top">
