@@ -1,7 +1,7 @@
 <ul>
   <li>ID: <%= post.id %></li>
-  <li>Uploader: <%= link_to_user(post.uploader) + "&nbsp;".html_safe + link_to("&raquo;".html_safe, posts_path(:tags => "user:#{post.uploader.name}")) %></li>
-  <li>Date: <%= link_to time_ago_in_words_tagged(post.created_at), posts_path(:tags => "date:#{post.created_at.to_date}") %></li>
+  <li>Uploader: <%= link_to_user(post.uploader) + "&nbsp;".html_safe + link_to("&raquo;".html_safe, posts_path(:tags => "user:#{post.uploader.name}"), :rel => "nofollow") %></li>
+  <li>Date: <%= link_to time_ago_in_words_tagged(post.created_at), posts_path(:tags => "date:#{post.created_at.to_date}"), :rel => "nofollow" %></li>
   <% if post.approver %>
     <li>Approver: <%= link_to_user(post.approver) %></li>
   <% end %>

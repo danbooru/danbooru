@@ -120,7 +120,7 @@ class DText
   def self.parse_post_links(str)
     str.gsub(/\{\{([^\}]+)\}\}/) do
       tags = CGI.unescapeHTML($1)
-      %{<a href="/posts?tags=#{u(tags)}">#{h(tags)}</a>}
+      %{<a rel="nofollow" href="/posts?tags=#{u(tags)}">#{h(tags)}</a>}
     end
   end
 

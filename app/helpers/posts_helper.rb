@@ -67,7 +67,7 @@ module PostsHelper
     end
 
     if CurrentUser.is_builder? && !source_search.blank?
-      source_link + "&nbsp;".html_safe + link_to("&raquo;".html_safe, posts_path(:tags => source_search))
+      source_link + "&nbsp;".html_safe + link_to("&raquo;".html_safe, posts_path(:tags => source_search), :rel => "nofollow")
     else
       source_link
     end
