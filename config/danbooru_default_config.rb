@@ -16,6 +16,10 @@ module Danbooru
       end
     end
 
+    def description
+      "Find good anime art fast"
+    end
+
     # The hostname of the server.
     def hostname
       Socket.gethostname

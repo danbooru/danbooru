@@ -51,6 +51,10 @@ module ApplicationHelper
     DText.parse(text)
   end
 
+  def strip_dtext(text)
+    DText.strip(text)
+  end
+
   def error_messages_for(instance_name)
     instance = instance_variable_get("@#{instance_name}")
 

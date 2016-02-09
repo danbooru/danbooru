@@ -42,3 +42,7 @@
 <% content_for(:page_title) do %>
   Pools - <%= Danbooru.config.app_name %>
 <% end %>
+
+<% content_for(:html_header) do %>
+  <meta name="description" content="Pools are groups of posts with something in common. The most common use of pools is for posts that are part of a series (such as a comic, or a group of images released by an artist).">
+<% end %>

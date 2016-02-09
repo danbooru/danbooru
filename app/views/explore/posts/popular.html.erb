@@ -15,3 +15,7 @@
 <% content_for(:page_title) do %>
   Popular - <%= Danbooru.config.app_name %>
 <% end %>
+
+<% content_for(:html_header) do %>
+  <meta name="description" content="The most popular posts per day">
+<% end %>

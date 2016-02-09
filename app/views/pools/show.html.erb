@@ -27,3 +27,7 @@
 <% content_for(:page_title) do %>
   Pool - <%= @pool.pretty_name %> - <%= Danbooru.config.app_name %>
 <% end %>
+
+<% content_for(:html_header) do %>
+  <meta name="description" content="<%= strip_dtext(@pool.description) %>">
+<% end %>
