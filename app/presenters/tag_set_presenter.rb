@@ -12,7 +12,7 @@ class TagSetPresenter < Presenter
   def tag_list_html(template, options = {})
     html = ""
     if @tags.present?
-      html << "<ul>"
+      html << '<ul itemscope itemtype="http://schema.org/ImageObject">'
       @tags.each do |tag|
         html << build_list_item(tag, template, options)
       end
@@ -112,7 +112,12 @@ private
 
     humanized_tag = tag.tr("_", " ")
     path = options[:path_prefix] || "/posts"
-    html << %{<a class="search-tag" href="#{path}?tags=#{u(tag)}">#{h(humanized_tag)}</a> }
+    if categories[tag] == Tag.categories.artist
+      itemprop = 'itemprop="author"'
+    else
+      itemprop = nil
+    end
+    html << %{<a class="search-tag" #{itemprop} href="#{path}?tags=#{u(tag)}">#{h(humanized_tag)}</a> }
 
     unless options[:name_only]
       if counts[tag].to_i >= 10_000

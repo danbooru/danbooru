@@ -1,14 +1,17 @@
-<ul>
+<ul itemscope itemtype="http://schema.org">
   <li>ID: <%= post.id %></li>
   <li>Uploader: <%= link_to_user(post.uploader) + "&nbsp;".html_safe + link_to("&raquo;".html_safe, posts_path(:tags => "user:#{post.uploader.name}"), :rel => "nofollow") %></li>
-  <li>Date: <%= link_to time_ago_in_words_tagged(post.created_at), posts_path(:tags => "date:#{post.created_at.to_date}"), :rel => "nofollow" %></li>
+  <li>
+    Date: <%= link_to time_ago_in_words_tagged(post.created_at), posts_path(:tags => "date:#{post.created_at.to_date}"), :rel => "nofollow" %>
+    <meta itemprop="uploadDate" content="<%= post.created_at.iso8601 %>">
+  </li>
   <% if post.approver %>
     <li>Approver: <%= link_to_user(post.approver) %></li>
   <% end %>
   <li>
-    Size: <%= link_to_if post.visible?, number_to_human_size(post.file_size), post.file_url %>
+    Size: <%= link_to_if post.visible?, number_to_human_size(post.file_size), post.file_url, :itemprop => "contentSize" %>
     <% if post.has_dimensions? %>
-      (<%= post.image_width %>x<%= post.image_height %>)
+      (<span itemprop="width"><%= post.image_width %></span>x<span itemprop="height"><%= post.image_height %></span>)
     <% end %>
   </li>
   <li>Source: <%= post_source_tag(post) %></li>
