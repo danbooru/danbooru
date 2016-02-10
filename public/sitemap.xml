@@ -7,6 +7,36 @@
       <priority>1.0</priority>
    </url>
    <url>
+      <loc>http://danbooru.donmai.us/posts?tags=kantai_collection</loc>
+      <changefreq>hourly</changefreq>
+      <priority>0.7</priority>
+   </url>
+   <url>
+      <loc>http://danbooru.donmai.us/posts?tags=touhou</loc>
+      <changefreq>hourly</changefreq>
+      <priority>0.7</priority>
+   </url>
+   <url>
+      <loc>http://danbooru.donmai.us/posts?tags=league_of_legends</loc>
+      <changefreq>daily</changefreq>
+      <priority>0.3</priority>
+   </url>
+   <url>
+      <loc>http://danbooru.donmai.us/posts?tags=fate/grand_order</loc>
+      <changefreq>daily</changefreq>
+      <priority>0.3</priority>
+   </url>
+   <url>
+      <loc>http://danbooru.donmai.us/posts?tags=girls_und_panzer</loc>
+      <changefreq>daily</changefreq>
+      <priority>0.3</priority>
+   </url>
+   <url>
+      <loc>http://danbooru.donmai.us/posts?tags=granblue_fantasy</loc>
+      <changefreq>daily</changefreq>
+      <priority>0.3</priority>
+   </url>
+   <url>
       <loc>http://danbooru.donmai.us/wiki_pages</loc>
       <changefreq>daily</changefreq>
       <priority>0.3</priority>
