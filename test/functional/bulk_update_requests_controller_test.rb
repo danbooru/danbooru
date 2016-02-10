@@ -17,8 +17,28 @@ class BulkUpdateRequestsControllerTest < ActionController::TestCase
     context "#create" do
       should "succeed" do
         assert_difference("BulkUpdateRequest.count", 1) do
-          post :create, {:bulk_update_request => {:script => "create alias aaa -> bbb", :title => "xxx"}}, {:user_id => @user.id}
+          post :create, {:bulk_update_request => {:skip_secondary_validations => "1", :script => "create alias aaa -> bbb", :title => "xxx"}}, {:user_id => @user.id}
         end
+      end
+    end
+
+    context "#update" do
+      setup do
+        CurrentUser.scoped(@user) do
+          @bulk_update_request = FactoryGirl.create(:bulk_update_request)
+        end
+      end
+
+      should "still handle enabled secondary validations correctly" do
+        post :update, {:id => @bulk_update_request.id, :bulk_update_request => {:script => "create alias zzz -> 222", :skip_secondary_validations => "0"}}, {:user_id => @user.id}
+        @bulk_update_request.reload
+        assert_equal("create alias aaa -> bbb", @bulk_update_request.script)
+      end
+
+      should "still handle disabled secondary validations correctly" do
+        post :update, {:id => @bulk_update_request.id, :bulk_update_request => {:script => "create alias zzz -> 222", :skip_secondary_validations => "1"}}, {:user_id => @user.id}
+        @bulk_update_request.reload
+        assert_equal("create alias zzz -> 222", @bulk_update_request.script)
       end
     end
 

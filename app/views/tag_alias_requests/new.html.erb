@@ -2,6 +2,8 @@
   <div id="a-request-new">
     <h1>Tag Alias Request</h1>
 
+    <%= error_messages_for :tag_alias_request %>
+
     <p>You can request a new tag alias be created. This will create a corresponding forum topic for community review.</p>
 
     <%= form_tag(tag_alias_request_path, :class => "simple_form") do %>
@@ -17,6 +19,14 @@
 
       <div class="input">
         <%= dtext_field "tag_alias_request", "reason", :name => "Reason" %>
+      </div>
+
+      <div class="input">
+        <label class="checkbox optional" for="tag_alias_request_skip_secondary_validations">
+          <%= check_box "tag_alias_request", "skip_secondary_validations" %>
+          Skip validations
+        </label>
+        <p class="hint">You can ignore the wiki page and minimum count requirements</p>
       </div>
 
       <div class="input">

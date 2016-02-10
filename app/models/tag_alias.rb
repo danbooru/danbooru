@@ -1,4 +1,6 @@
 class TagAlias < ActiveRecord::Base
+  attr_accessor :skip_secondary_validations
+
   before_save :ensure_tags_exist
   after_save :clear_all_cache
   after_destroy :clear_all_cache
@@ -8,11 +10,11 @@ class TagAlias < ActiveRecord::Base
   validates_uniqueness_of :antecedent_name
   validate :absence_of_transitive_relation
   validate :antecedent_and_consequent_are_different
-  # validate :consequent_has_wiki_page
-  # validate :mininum_antecedent_count
+  validate :consequent_has_wiki_page, :on => :create
+  validate :mininum_antecedent_count, :on => :create
   belongs_to :creator, :class_name => "User"
   belongs_to :forum_topic
-  attr_accessible :antecedent_name, :consequent_name, :forum_topic_id, :status
+  attr_accessible :antecedent_name, :consequent_name, :forum_topic_id, :status, :skip_secondary_validations
 
   module SearchMethods
     def name_matches(name)
@@ -293,7 +295,7 @@ class TagAlias < ActiveRecord::Base
   end
 
   def consequent_has_wiki_page
-    return if !Danbooru.config.strict_tag_requirements
+    return if skip_secondary_validations
 
     unless WikiPage.titled(consequent_name).exists?
       self.errors[:base] = "The #{consequent_name} tag needs a corresponding wiki page"
@@ -302,7 +304,7 @@ class TagAlias < ActiveRecord::Base
   end
 
   def mininum_antecedent_count
-    return if !Danbooru.config.strict_tag_requirements
+    return if skip_secondary_validations
 
     unless Post.fast_count(antecedent_name) >= 50
       self.errors[:base] = "The #{antecedent_name} tag must have at least 50 posts for an alias to be created"

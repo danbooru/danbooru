@@ -1,5 +1,5 @@
 class BulkUpdateRequest < ActiveRecord::Base
-  attr_accessor :title, :reason
+  attr_accessor :title, :reason, :skip_secondary_validations
 
   belongs_to :user
   belongs_to :forum_topic
@@ -11,7 +11,7 @@ class BulkUpdateRequest < ActiveRecord::Base
   validate :script_formatted_correctly
   validate :forum_topic_id_not_invalid
   validate :validate_script
-  attr_accessible :user_id, :forum_topic_id, :script, :title, :reason
+  attr_accessible :user_id, :forum_topic_id, :script, :title, :reason, :skip_secondary_validations
   attr_accessible :status, :as => [:admin]
   before_validation :initialize_attributes, :on => :create
   before_validation :normalize_text
@@ -33,7 +33,7 @@ class BulkUpdateRequest < ActiveRecord::Base
   extend SearchMethods
 
   def approve!
-    AliasAndImplicationImporter.new(script, forum_topic_id, "1").process!
+    AliasAndImplicationImporter.new(script, forum_topic_id, "1", true).process!
     update_forum_topic_for_approve
     update_attribute(:status, "approved")
 
@@ -151,9 +151,17 @@ class BulkUpdateRequest < ActiveRecord::Base
     self.script = script.downcase
   end
 
+  def skip_secondary_validations=(v)
+    if v == "1" or v == true
+      @skip_secondary_validations = true
+    else
+      @skip_secondary_validations = false
+    end
+  end
+
   def validate_script
     begin
-      AliasAndImplicationImporter.new(script, forum_topic_id, "1").validate!
+      AliasAndImplicationImporter.new(script, forum_topic_id, "1", skip_secondary_validations).validate!
     rescue RuntimeError => e
       self.errors[:base] = e.message
       return false
