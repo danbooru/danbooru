@@ -39,6 +39,6 @@ class UserSimilarityPresenter
   end
 
   def each_favorite_for(user, &block)
-    user.favorites.limit(6).joins(:post).reorder("favorites.id desc").map(&:post).each(&block)
+    user.favorites.limit(18).joins(:post).reorder("favorites.id desc").map(&:post).each(&block)
   end
 end
