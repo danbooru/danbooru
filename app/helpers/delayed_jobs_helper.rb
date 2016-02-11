@@ -1,6 +1,9 @@
 module DelayedJobsHelper
   def print_name(job)
     case job.name
+    when "TagSubscription.process"
+      "<strong>process tag subscription</strong>"
+
     when "Class#expire_cache"
       "<strong>expire post count cache</strong>"
 
@@ -53,6 +56,9 @@ module DelayedJobsHelper
 
   def print_handler(job)
     case job.name
+    when "TagSubscription.process"
+      ""
+
     when "Class#expire_cache"
       h(job.payload_object.args.flatten.join(" "))
 
