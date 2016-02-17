@@ -23,8 +23,7 @@
       View by 
       <%= link_to "day", searches_explore_posts_path(:date => params[:date], :scale => "day") %> | 
       <%= link_to "week", searches_explore_posts_path(:date => params[:date], :scale => "week") %> |
-      <%= link_to "month", searches_explore_posts_path(:date => params[:date], :scale => "month") %> |
-      <%= link_to "year", searches_explore_posts_path(:date => params[:date], :scale => "year") %>.
+      <%= link_to "month", searches_explore_posts_path(:date => params[:date], :scale => "month") %>.
 
       Back one 
       <%= link_to "day", searches_explore_posts_path(:date => 1.day.ago(@date), :scale => params[:scale]) %> | 
