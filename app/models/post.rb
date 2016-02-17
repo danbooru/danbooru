@@ -1046,6 +1046,10 @@ class Post < ActiveRecord::Base
 
         elsif tags =~ /^rating:e(?:xplicit)?$/
           return (Post.maximum(:id) * (201650.0 / 2200402)).floor
+
+        elsif tags =~ /status:deleted.status:deleted/
+          # temp fix for degenerate crawlers
+          return 0
         end
       end
 
@@ -1514,6 +1518,11 @@ class Post < ActiveRecord::Base
     end
 
     def tag_match(query, read_only = false)
+      if query =~ /status:deleted.status:deleted/
+        # temp fix for degenerate crawlers
+        raise ActiveRecord::RecordNotFound
+      end
+
       if read_only
         PostQueryBuilder.new(query).build(PostReadOnly.where("true"))
       else
