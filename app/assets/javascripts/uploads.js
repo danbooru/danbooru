@@ -128,6 +128,8 @@
             $("#scale").html("Scaled " + parseInt(100 * ratio) + "% (original: " + origin_width + "x" + origin_height + ")");
           }
         });
+      } else {
+        $("#scale").html("(original: " + width + "x" + height + ")");
       }
     } else if (!this.tries || this.tries < 10) {
       this.tries = (this.tries || 0) + 1;
