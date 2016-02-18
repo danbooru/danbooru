@@ -64,7 +64,8 @@ WITH constants AS (
 -- autovacuum stats
 SELECT relname, last_vacuum, last_autovacuum, last_analyze, last_autoanalyze  
 FROM pg_stat_all_tables  
-WHERE schemaname = 'public';
+WHERE schemaname = 'public'
+and relname = 'posts';
 
 
 -- cache hit rate
