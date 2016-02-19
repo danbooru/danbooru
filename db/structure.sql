@@ -4866,6 +4866,13 @@ CREATE INDEX index_artist_versions_on_updater_id ON artist_versions USING btree 
 
 
 --
+-- Name: index_artists_on_group_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_artists_on_group_name ON artists USING btree (group_name);
+
+
+--
 -- Name: index_artists_on_group_name_trgm; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -7303,4 +7310,6 @@ INSERT INTO schema_migrations (version) VALUES ('20151217213321');
 INSERT INTO schema_migrations (version) VALUES ('20160219004022');
 
 INSERT INTO schema_migrations (version) VALUES ('20160219010854');
+
+INSERT INTO schema_migrations (version) VALUES ('20160219172840');
 
