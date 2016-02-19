@@ -19,7 +19,7 @@
             <td>
               <%= link_to "edit", edit_tag_subscription_path(tag_subscription) %>
               | <%= link_to "delete", tag_subscription_path(tag_subscription), :method => :delete, :data => {:confirm => "Are you sure you want to delete this subscription?"} %>
-              | <%= link_to "posts", posts_path(:tags => "sub:#{tag_subscription.creator.name}:#{tag_subscription.name}") %>
+              | <%= link_to "posts", posts_path(:tags => "sub:#{tag_subscription.creator.name}:#{tag_subscription.name}"), :rel => "nofollow" %>
             </td>
           </tr>
         <% end %>
