@@ -3,7 +3,10 @@
     <h1><%= link_to_user @user %></h1>
 
     <%= render "statistics", :presenter => @presenter, :user => @user %>
-    <%= render "post_summary", :presenter => @presenter, :user => @user %>
+
+    <% if !@user.enable_privacy_mode? || CurrentUser.id == @user.id %>
+      <%= render "post_summary", :presenter => @presenter, :user => @user %>
+    <% end %>
   </div>
 </div>
 

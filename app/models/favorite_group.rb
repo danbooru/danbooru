@@ -33,9 +33,21 @@ class FavoriteGroup < ActiveRecord::Base
       params = {} if params.blank?
 
       if params[:creator_id].present?
-        q = q.where("creator_id = ?", params[:creator_id].to_i)
+        user = User.find(params[:creator_id])
+        
+        if user.hide_favorites?
+          raise User::PrivilegeError.new
+        end
+
+        q = q.where("creator_id = ?", user.id)
       elsif params[:creator_name].present?
-        q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].tr(" ", "_").mb_chars.downcase)
+        user = User.find_by_name(params[:creator_name])
+
+        if user.hide_favorites?
+          raise User::PrivilegeError.new
+        end
+
+        q = q.where("creator_id = ?", user.id)
       else
         q = q.where("creator_id = ?", CurrentUser.user.id)
       end

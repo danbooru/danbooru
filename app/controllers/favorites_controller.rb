@@ -8,6 +8,11 @@ class FavoritesController < ApplicationController
     else
       user_id = params[:user_id] || CurrentUser.user.id
       @user = User.find(user_id)
+
+      if @user.hide_favorites?
+        raise User::PrivilegeError.new
+      end
+
       @favorite_set = PostSets::Favorite.new(user_id, params[:page], params)
       respond_with(@favorite_set.posts) do |format|
         format.xml do

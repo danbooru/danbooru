@@ -811,6 +811,10 @@ class User < ActiveRecord::Base
     end
   end
 
+  def hide_favorites?
+    enable_privacy_mode? && CurrentUser.user.id != id
+  end
+
   def initialize_default_boolean_attributes
     self.enable_post_navigation = true
     self.new_post_navigation_layout = true

@@ -34,7 +34,11 @@ class UserSimilarityPresenter
 
   def each_user(&block)
     user_ids_with_scores.each do |user_id, score|
-      yield(User.find(user_id), 100 * score.to_f)
+      user = User.find(user_id)
+
+      if !user.hide_favorites?
+        yield(user, 100 * score.to_f)
+      end
     end
   end
 
