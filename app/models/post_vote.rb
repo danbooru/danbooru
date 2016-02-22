@@ -7,6 +7,10 @@ class PostVote < ActiveRecord::Base
   validates_inclusion_of :score, :in => [1, -1]
   attr_accessible :post_id, :user_id, :score
 
+  def self.prune!
+    where("created_at < ?", 30.days.ago).delete_all
+  end
+
   def score=(x)
     if x == "up"
       write_attribute(:score, 1)

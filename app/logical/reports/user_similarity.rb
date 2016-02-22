@@ -1,5 +1,7 @@
 module Reports
   class UserSimilarity
+    NOT_READY_STRING = "not ready"
+
     attr_reader :user_id
 
     def initialize(user_id)
@@ -8,6 +10,16 @@ module Reports
 
     def user
       User.find(user_id)
+    end
+
+    def prime
+      10.times do
+        if fetch_similar_user_ids == NOT_READY_STRING
+          sleep(60)
+        else
+          break
+        end
+      end
     end
 
     def fetch_similar_user_ids

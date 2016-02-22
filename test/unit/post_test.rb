@@ -1463,6 +1463,24 @@ class PostTest < ActiveSupport::TestCase
   end
 
   context "Voting:" do
+    context "with a super voter" do
+      setup do
+        @user = FactoryGirl.create(:user)
+        FactoryGirl.create(:super_voter, user: @user)
+        @post = FactoryGirl.create(:post)
+      end
+      
+      should "account for magnitude" do
+        CurrentUser.scoped(@user, "127.0.0.1") do
+          assert_nothing_raised {@post.vote!("up")}
+          assert_raises(PostVote::Error) {@post.vote!("up")}
+          @post.reload
+          assert_equal(1, PostVote.count)
+          assert_equal(SuperVoter::MAGNITUDE, @post.score)
+        end
+      end
+    end
+
     should "not allow duplicate votes" do
       user = FactoryGirl.create(:user)
       post = FactoryGirl.create(:post)

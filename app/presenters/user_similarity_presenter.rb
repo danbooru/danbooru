@@ -17,7 +17,7 @@ class UserSimilarityPresenter
   def fetch
     data = report.fetch_similar_user_ids
 
-    if data == "not ready"
+    if data == Reports::UserSimilarity::NOT_READY_STRING
       @not_ready = true
     else
       @user_ids_with_scores = data.scan(/\S+/).in_groups_of(2)

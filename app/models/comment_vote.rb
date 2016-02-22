@@ -12,7 +12,7 @@ class CommentVote < ActiveRecord::Base
   attr_accessible :comment_id, :user_id, :score
 
   def self.prune!
-    destroy_all("created_at < ?", 14.days.ago)
+    where("created_at < ?", 14.days.ago).delete_all
   end
 
   def self.search(params)

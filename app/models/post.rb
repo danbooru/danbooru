@@ -952,14 +952,22 @@ class Post < ActiveRecord::Base
       !PostVote.exists?(:user_id => user.id, :post_id => id)
     end
 
+    def vote_magnitude
+      if CurrentUser.is_super_voter?
+        SuperVoter::MAGNITUDE
+      else
+        1
+      end
+    end
+
     def vote!(score)
       if can_be_voted_by?(CurrentUser.user)
         if score == "up"
-          Post.where(:id => id).update_all("score = score + 1, up_score = up_score + 1")
-          self.score += 1
+          Post.where(:id => id).update_all("score = score + #{vote_magnitude}, up_score = up_score + #{vote_magnitude}")
+          self.score += vote_magnitude
         elsif score == "down"
-          Post.where(:id => id).update_all("score = score - 1, down_score = down_score - 1")
-          self.score -= 1
+          Post.where(:id => id).update_all("score = score - #{vote_magnitude}, down_score = down_score - #{vote_magnitude}")
+          self.score -= vote_magnitude
         end
 
         votes.create(:score => score)
@@ -975,11 +983,11 @@ class Post < ActiveRecord::Base
         vote = votes.where("user_id = ?", CurrentUser.user.id).first
 
         if vote.score == 1
-          Post.where(:id => id).update_all("score = score - 1, up_score = up_score - 1")
-          self.score -= 1
+          Post.where(:id => id).update_all("score = score - #{vote_magnitude}, up_score = up_score - #{vote_magnitude}")
+          self.score -= vote_magnitude
         else
-          Post.where(:id => id).update_all("score = score + 1, down_score = down_score + 1")
-          self.score += 1
+          Post.where(:id => id).update_all("score = score + #{vote_magnitude}, down_score = down_score + #{vote_magnitude}")
+          self.score += vote_magnitude
         end
 
         vote.destroy
