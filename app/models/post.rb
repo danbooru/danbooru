@@ -840,6 +840,8 @@ class Post < ActiveRecord::Base
 
     def add_favorite!(user)
       Favorite.add(self, user)
+      vote!("up")
+    rescue PostVote::Error
     end
 
     def delete_user_from_fav_string(user_id)
@@ -848,6 +850,8 @@ class Post < ActiveRecord::Base
 
     def remove_favorite!(user)
       Favorite.remove(self, user)
+      unvote!
+    rescue PostVote::Error
     end
 
     def favorited_user_ids

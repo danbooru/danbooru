@@ -18,14 +18,11 @@ class Favorite < ActiveRecord::Base
 
       return if Favorite.for_user(user.id).where(:user_id => user.id, :post_id => post.id).exists?
       Favorite.create!(:user_id => user.id, :post_id => post.id)
-      updates = "fav_count = fav_count + 1"
-      updates = "#{updates}, score = score + 1" if user.is_gold?
-      Post.where(:id => post.id).update_all(updates)
+      Post.where(:id => post.id).update_all("fav_count = fav_count + 1")
       post.append_user_to_fav_string(user.id)
       User.where(:id => user.id).update_all("favorite_count = favorite_count + 1")
       user.favorite_count += 1
       # post.fav_count += 1 # this is handled in Post#clean_fav_string!
-      post.score += 1 if user.is_gold?
     end
   end
 
@@ -35,14 +32,11 @@ class Favorite < ActiveRecord::Base
 
       return unless Favorite.for_user(user.id).where(:user_id => user.id, :post_id => post.id).exists?
       Favorite.destroy_all(user_id: user.id, post_id: post.id)
-      updates = "fav_count = fav_count - 1"
-      updates = "#{updates}, score = score - 1" if user.is_gold?
-      Post.where(:id => post.id).update_all(updates)
+      Post.where(:id => post.id).update_all("fav_count = fav_count - 1")
       post.delete_user_from_fav_string(user.id)
       User.where(:id => user.id).update_all("favorite_count = favorite_count - 1")
       user.favorite_count -= 1
       post.fav_count -= 1
-      post.score -= 1 if user.is_gold?
     end
   end
 end
