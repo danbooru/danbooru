@@ -70,7 +70,7 @@ module PostSets
     end
 
     def has_deleted?
-      tag_string !~ /status/ && ::Post.tag_match("#{tag_string} status:deleted").exists?
+      tag_string !~ /status/ && ::Post.tag_match("#{tag_string} status:deleted").where("true /* PostSets::Post#has_deleted */").exists?
     end
 
     def has_explicit?
@@ -127,9 +127,9 @@ module PostSets
         if random
           temp = get_random_posts()
         elsif raw
-          temp = ::Post.raw_tag_match(tag_string).order("posts.id DESC").paginate(page, :count => post_count, :limit => per_page)
+          temp = ::Post.raw_tag_match(tag_string).order("posts.id DESC").where("true /* PostSets::Post#posts:1 */").paginate(page, :count => post_count, :limit => per_page)
         else
-          temp = ::Post.tag_match(tag_string, read_only).paginate(page, :count => post_count, :limit => per_page)
+          temp = ::Post.tag_match(tag_string, read_only).where("true /* PostSets::Post#posts:2 */").paginate(page, :count => post_count, :limit => per_page)
         end
         temp.each # hack to force rails to eager load
         temp

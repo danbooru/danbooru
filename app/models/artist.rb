@@ -183,7 +183,7 @@ class Artist < ActiveRecord::Base
         if params[:name]
           artist.name = params[:name]
           post = CurrentUser.without_safe_mode do
-            Post.tag_match("source:http #{artist.name}").first
+            Post.tag_match("source:http #{artist.name}").where("true /* Artist.new_with_defaults */").first
           end
           unless post.nil? || post.source.blank?
             artist.url_string = post.source
@@ -271,7 +271,7 @@ class Artist < ActiveRecord::Base
           ti.destroy if ti
 
           begin
-            Post.tag_match(name).each do |post|
+            Post.tag_match(name).where("true /* Artist.unban */").each do |post|
               post.unban!
               fixed_tags = post.tag_string.sub(/(?:\A| )banned_artist(?:\Z| )/, " ").strip
               post.update_attributes(:tag_string => fixed_tags)
@@ -289,7 +289,7 @@ class Artist < ActiveRecord::Base
       Post.transaction do
         CurrentUser.without_safe_mode do
           begin
-            Post.tag_match(name).each do |post|
+            Post.tag_match(name).where("true /* Artist.ban */").each do |post|
               post.ban!
             end
           rescue Post::SearchError

@@ -1,4 +1,5 @@
 require 'set'
+require 'timecop'
 
 CurrentUser.ip_addr = "127.0.0.1"
 Delayed::Worker.delay_jobs = false
@@ -38,11 +39,14 @@ end
 
 if User.count == 0
   puts "Creating users"
-  user = User.create(
-    :name => "admin",
-    :password => "password1",
-    :password_confirmation => "password1"
-  )
+
+  Timecop.travel(1.month.ago) do
+    user = User.create(
+      :name => "admin",
+      :password => "password1",
+      :password_confirmation => "password1"
+    )
+  end
 
   0.upto(10) do |i|
     User.create(
@@ -69,7 +73,7 @@ if Upload.count == 0
     url = "http://ipsumimage.appspot.com/#{width}x#{height}"
     tags = rand_sentence(12).scan(/[a-z]+/).join(" ")
 
-    Upload.create(:source => url, :content_type => "image/gif", :rating => "q", :tag_string => tags, :server => Socket.gethostname)
+    Upload.create!(:source => url, :content_type => "image/gif", :rating => "q", :tag_string => tags, :server => Socket.gethostname)
   end
 else
   puts "Skipping uploads"

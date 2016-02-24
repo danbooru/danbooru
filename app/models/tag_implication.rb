@@ -186,7 +186,7 @@ class TagImplication < ActiveRecord::Base
 
   def update_posts
     Post.without_timeout do
-      Post.raw_tag_match(antecedent_name).find_each do |post|
+      Post.raw_tag_match(antecedent_name).where("true /* TagImplication#update_posts */").find_each do |post|
         fixed_tags = "#{post.tag_string} #{descendant_names}".strip
         CurrentUser.scoped(creator, creator_ip_addr) do
           post.update_attributes(

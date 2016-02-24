@@ -6,7 +6,7 @@ class UserDeletion
   def self.remove_favorites_for(user_id)
     user = User.find(user_id)
     Post.without_timeout do
-      Post.raw_tag_match("fav:#{user_id}").find_each do |post|
+      Post.raw_tag_match("fav:#{user_id}").where("true /* UserDeletion.remove_favorites_for */").find_each do |post|
         Favorite.remove(post, user)
       end
     end
