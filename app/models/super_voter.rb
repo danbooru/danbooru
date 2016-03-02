@@ -1,5 +1,5 @@
 class SuperVoter < ActiveRecord::Base
-  MAGNITUDE = 5
+  MAGNITUDE = 3
   DURATION = 1.week
 
   belongs_to :user
