@@ -1,7 +1,8 @@
 require "mkmf"
 
-have_header "sds.h"
+pkg_config "glib-2.0"
+
+have_library "glib-2.0"
+have_header "glib.h"
 have_header "dtext.h"
-have_header "sds.h"
-have_header "sdsalloc.h"
 create_makefile "dtext/dtext"

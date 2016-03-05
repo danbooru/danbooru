@@ -25,7 +25,7 @@ task :ragel do
 end
 
 task test: %w(ragel compile) do
-	ruby '-Ilib', '-rdtext', '-e', "p DTextRagel.parse('hello world')"
+	ruby '-Ilib', '-rdtext', '-e', "puts DTextRagel.parse('hello [spoiler]this http://www.google.com/search?q=blah is a spoiler[/spoiler] world')"
 end
 
 task default: :test
