@@ -434,7 +434,7 @@ class PostQueryBuilder
       relation = relation.order("posts.file_size ASC")
 
     when "rank"
-      relation = relation.order("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 45000 DESC")
+      relation = relation.order("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 35000 DESC")
 
     else
       relation = relation.order("posts.id DESC")
