@@ -679,8 +679,8 @@ main := |*
     fhold;
 
     if (g_queue_is_empty(sm->dstack)) {
-      append(sm, "<p>");
       dstack_push(sm, &BLOCK_P);
+      append_block(sm, "<p>");
     }
 
     fcall inline;
@@ -692,7 +692,7 @@ main := |*
 %% write data;
 
 static inline void underscore_string(char * str, size_t len) {
-  for (int i=0; i<len; ++i) {
+  for (size_t i=0; i<len; ++i) {
     if (str[i] == ' ') {
       str[i] = '_';
     }
