@@ -25,7 +25,7 @@ typedef struct StateMachine {
   GQueue * dstack;
 } StateMachine;
 
-static const int MAX_STACK_DEPTH = 256;
+static const int MAX_STACK_DEPTH = 512;
 static const int BLOCK_P = 1;
 static const int INLINE_SPOILER = 2;
 static const int BLOCK_SPOILER = 3;
@@ -57,7 +57,7 @@ variable top sm->top;
 variable ts sm->ts;
 variable te sm->te;
 variable act sm->act;
-variable stack sm->stack->data;
+variable stack ((int *)sm->stack->data);
 
 prepush {
   size_t len = sm->stack->len;
@@ -91,6 +91,7 @@ action mark_b2 {
 name_boundary = ':' | '?';
 newline = '\r\n' | '\r' | '\n';
 
+nonnewline = !newline;
 nonquote = ^'"';
 nonbracket = ^']';
 nonpipe = ^'|';
@@ -121,8 +122,10 @@ pixiv_id = 'pixiv #' digit+ >mark_a1 %mark_a2;
 pixiv_paged_id = 'pixiv #' digit+ >mark_a1 %mark_a2 '/p' digit+ >mark_b1 %mark_b2;
 
 ws = ' ' | '\t';
-header = 'h' [123456] >mark_a1 %mark_a2 '.' ws* print+ >mark_b1 %mark_b2;
+header = 'h' [123456] >mark_a1 %mark_a2 '.' ws* nonnewline+ >mark_b1 %mark_b2;
 aliased_expand = '[expand=' (nonbracket+ >mark_a1 %mark_a2) ']';
+
+list_marker = '*'+ >mark_a1 %mark_a2;
 
 inline := |*
   post_id => {
@@ -372,6 +375,12 @@ inline := |*
 
   # these are block level elements that should kick us out of the inline
   # scanner
+  header => {
+    dstack_close(sm);
+    fexec sm->a1 - 1;
+    fret;
+  };
+
   '[quote]' => {
     dstack_close(sm);
     fexec sm->p - 7;
@@ -452,9 +461,7 @@ inline := |*
     fret;
   };
 
-  newline => {
-    append_block(sm, "<br>");
-  };
+  newline;
 
   any => {
     append_c(sm, fc);
@@ -657,6 +664,10 @@ main := |*
     fcall inline;
   };
 
+  list_marker => {
+
+  };
+
   '&' => {
     append(sm, "&amp;");
   };
@@ -745,11 +756,15 @@ static inline int * dstack_peek(StateMachine * sm) {
 
 static inline bool dstack_check(StateMachine * sm, int expected_element) {
   int * top = dstack_peek(sm);
-  if (top && *top == expected_element) {
-    return true;
-  } else {
-    return false;
-  }
+  return top && *top == expected_element;
+}
+
+static void dstack_print_element(gpointer data, gpointer user_data) {
+  printf("%i\n", *(int *)data);
+}
+
+static void dstack_dump(StateMachine * sm) {
+  g_queue_foreach(sm->dstack, dstack_print_element, NULL);
 }
 
 static void dstack_close(StateMachine * sm) {
@@ -863,11 +878,12 @@ static void free_machine(StateMachine * sm) {
   g_string_free(sm->output, TRUE);
   g_array_free(sm->stack, FALSE);
   g_queue_free(sm->dstack);
-  free(sm);
+  g_free(sm);
 }
 
 static VALUE parse(VALUE self, VALUE input) {
-  StateMachine * sm = (StateMachine *)malloc(sizeof(StateMachine));
+  StateMachine * sm = (StateMachine *)g_malloc0(sizeof(StateMachine));
+  input = rb_str_cat(input, "\0", 1);
   init_machine(sm, input);
 
   %% write init;

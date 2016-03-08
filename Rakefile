@@ -25,7 +25,8 @@ task :ragel do
 end
 
 task test: %w(ragel compile) do
-	ruby '-Ilib', '-rdtext', '-e', "puts DTextRagel.parse('hello [spoiler]this http://www.google.com/search?q=blah is a spoiler[/spoiler] world')"
+	ruby '-Ilib', '-rdtext', '-e', "puts DTextRagel.parse(File.read('test/wiki.txt'))"
+	#ruby '-Ilib', '-rdtext', '-e', 'puts DTextRagel.parse("pixiv account: http://www.pixiv.net/member.php?id=2631072\nh6. NO-POST ARTIST: DELETION REQUEST/CEASE AND DESIST RECEIVED")'
 end
 
 task default: :test
