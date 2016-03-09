@@ -20,9 +20,12 @@ typedef struct StateMachine {
   const char * b2;
   bool f_inline;
   bool boundary;
+  bool list_mode;
   GString * output;
   GArray * stack;
   GQueue * dstack;
+  GQueue * list_stack;
+  int list_nest;
 } StateMachine;
 
 static const int MAX_STACK_DEPTH = 512;
@@ -45,6 +48,8 @@ static const int BLOCK_TABLE = 16;
 static const int BLOCK_THEAD = 17;
 static const int BLOCK_TBODY = 18;
 static const int BLOCK_TR = 19;
+static const int BLOCK_UL = 20;
+static const int BLOCK_LI = 21;
 
 %%{
 machine dtext;
@@ -91,7 +96,7 @@ action mark_b2 {
 name_boundary = ':' | '?';
 newline = '\r\n' | '\r' | '\n';
 
-nonnewline = !newline;
+nonnewline = any - (newline | '\0');
 nonquote = ^'"';
 nonbracket = ^']';
 nonpipe = ^'|';
@@ -125,7 +130,7 @@ ws = ' ' | '\t';
 header = 'h' [123456] >mark_a1 %mark_a2 '.' ws* nonnewline+ >mark_b1 %mark_b2;
 aliased_expand = '[expand=' (nonbracket+ >mark_a1 %mark_a2) ']';
 
-list_marker = '*'+ >mark_a1 %mark_a2;
+list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
 
 inline := |*
   post_id => {
@@ -363,7 +368,7 @@ inline := |*
   '[/tn]' => {
     if (dstack_check(sm, BLOCK_TN)) {
       dstack_pop(sm);
-      append(sm, "</p>");
+      append(sm, "</p>\n");
       fret;
     } else if (dstack_check(sm, INLINE_TN)) {
       dstack_pop(sm);
@@ -390,12 +395,12 @@ inline := |*
   '[/quote]' => {
     if (dstack_check(sm, BLOCK_P)) {
       dstack_pop(sm);
-      append_block(sm, "</p>");
+      append_block(sm, "</p>\n");
     } 
 
     if (dstack_check(sm, BLOCK_QUOTE)) {
       dstack_pop(sm);
-      append_block(sm, "</blockquote>");
+      append_block(sm, "\n</blockquote>\n\n");
       fret;
     } else {
       append(sm, "[/quote]");
@@ -413,7 +418,7 @@ inline := |*
       append(sm, "</span>");
     } else if (dstack_check(sm, BLOCK_SPOILER)) {
       dstack_pop(sm);
-      append_block(sm, "</p></div>");
+      append_block(sm, "\n</p></div>\n\n");
       fret;
     } else {
       append(sm, "[/spoiler]");
@@ -428,7 +433,7 @@ inline := |*
 
   '[/expand]' => {
     if (dstack_check(sm, BLOCK_EXPAND)) {
-      append_block(sm, "</div></div>");
+      append_block(sm, "\n</div></div>\n\n");
       dstack_pop(sm);
       fret;
     } else {
@@ -444,7 +449,7 @@ inline := |*
   '[/td]' => {
     if (dstack_check(sm, BLOCK_TD)) {
       dstack_pop(sm);
-      append_block(sm, "</td>");
+      append_block(sm, "\n</td>\n");
       fret;
     } else {
       append(sm, "[/td]");
@@ -458,10 +463,22 @@ inline := |*
 
   newline{2,} => {
     dstack_close(sm);
+    sm->list_mode = false;
     fret;
   };
 
-  newline;
+  newline => {
+    if (sm->list_mode) {
+      if (dstack_check(sm, BLOCK_LI)) {
+        dstack_pop(sm);
+        append_block(sm, "</li>\n");
+      }
+      fhold;
+      fret;
+    } else {
+      append(sm, "<br>\n");
+    }
+  };
 
   any => {
     append_c(sm, fc);
@@ -472,7 +489,7 @@ code := |*
   '[/code]' => {
     if (dstack_check(sm, BLOCK_CODE)) {
       dstack_pop(sm);
-      append_block(sm, "</pre>");
+      append_block(sm, "\n</pre>\n\n");
     } else {
       append(sm, "[/code]");
     }
@@ -493,7 +510,7 @@ nodtext := |*
   '[/nodtext]' => {
     if (dstack_check(sm, BLOCK_NODTEXT)) {
       dstack_pop(sm);
-      append_block(sm, "</p>");
+      append_block(sm, "\n</p>\n\n");
       fret;
     } else if (dstack_check(sm, INLINE_NODTEXT)) {
       dstack_pop(sm);
@@ -528,13 +545,13 @@ nodtext := |*
 table := |*
   '[thead]' => {
     dstack_push(sm, &BLOCK_THEAD);
-    append_block(sm, "<thead>");
+    append_block(sm, "\n<thead>\n");
   };
 
   '[/thead]' => {
     if (dstack_check(sm, BLOCK_THEAD)) {
       dstack_pop(sm);
-      append_block(sm, "</thead>");
+      append_block(sm, "\n</thead>\n");
     } else {
       append(sm, "[/thead]");
     }
@@ -542,13 +559,13 @@ table := |*
 
   '[tbody]' => {
     dstack_push(sm, &BLOCK_TBODY);
-    append_block(sm, "<tbody>");
+    append_block(sm, "\n<tbody>\n");
   };
 
   '[/tbody]' => {
     if (dstack_check(sm, BLOCK_TBODY)) {
       dstack_pop(sm);
-      append_block(sm, "</tbody>");
+      append_block(sm, "\n</tbody>\n");
     } else {
       append(sm, "[/tbody]");
     }
@@ -556,13 +573,13 @@ table := |*
 
   '[tr]' => {
     dstack_push(sm, &BLOCK_TR);
-    append_block(sm, "<tr>");
+    append_block(sm, "\n<tr>\n");
   };
 
   '[/tr]' => {
     if (dstack_check(sm, BLOCK_TR)) {
       dstack_pop(sm);
-      append_block(sm, "</tr>");
+      append_block(sm, "\n</tr>\n");
     } else {
       append(sm, "[/tr]");
     }
@@ -570,14 +587,14 @@ table := |*
 
   '[td]' => {
     dstack_push(sm, &BLOCK_TD);
-    append_block(sm, "<td>");
+    append_block(sm, "\n<td>\n");
     fcall inline;
   };
 
   '[/table]' => {
     if (dstack_check(sm, BLOCK_TABLE)) {
       dstack_pop(sm);
-      append_block(sm, "</table>");
+      append_block(sm, "\n</table>\n\n");
       fret;
     } else {
       append(sm, "[/table]");
@@ -592,6 +609,48 @@ table := |*
   any;
 *|;
 
+list := |*
+  list_item => {
+    int prev_nest = sm->list_nest;
+    sm->list_mode = true;
+    sm->list_nest = sm->a2 - sm->a1;
+    fexec sm->b1;
+
+    if (sm->list_nest > prev_nest) {
+      for (int i=prev_nest; i<sm->list_nest; ++i) {
+        append_block(sm, "<ul>\n");
+        dstack_push(sm, &BLOCK_UL);
+      }
+    } else if (sm->list_nest < prev_nest) {
+      for (int i=sm->list_nest; i<prev_nest; ++i) {
+        if (dstack_check(sm, BLOCK_UL)) {
+          dstack_pop(sm);
+          append_block(sm, "</ul>\n");
+        }
+      }
+    }
+
+    append_block(sm, "<li>");
+    dstack_push(sm, &BLOCK_LI);
+
+    fcall inline;
+  };
+
+  # exit list
+  (newline{2,} | '\0') => {
+    fexec sm->ts;
+    fret;
+  };
+
+  newline;
+
+  any => {
+    dstack_close(sm);
+    fhold;
+    fret;
+  };
+*|;
+
 main := |*
   header => {
     char header = *sm->a1;
@@ -600,72 +659,76 @@ main := |*
       header = '6';
     }
 
-    append(sm, "<h");
+    append(sm, "\n\n<h");
     append_c(sm, header);
     append_c(sm, '>');
-    append_segment(sm, sm->b1, sm->b2);
+    append_segment(sm, sm->b1, sm->b2 - 1);
     append(sm, "</h");
     append_c(sm, header);
-    append_c(sm, '>');
+    append(sm, ">\n\n");
   };
 
   '[quote]' => {
     dstack_push(sm, &BLOCK_QUOTE);
-    append_block(sm, "<blockquote>");
+    append_block(sm, "\n\n<blockquote>\n");
     fcall inline;
   };
 
   '[spoiler]' => {
     dstack_push(sm, &BLOCK_SPOILER);
-    append_block(sm, "<div class=\"spoiler\"><p>");
+    append_block(sm, "\n\n<div class=\"spoiler\"><p>\n");
     fcall inline;
   };
 
   '[code]' => {
     dstack_push(sm, &BLOCK_CODE);
-    append_block(sm, "<pre>");
+    append_block(sm, "\n\n<pre>\n");
     fcall code;
   };
 
   '[expand]' => {
     dstack_push(sm, &BLOCK_EXPAND);
-    append_block(sm, "<div class=\"expandable\"><div class=\"expandable-header\">");
+    append_block(sm, "\n\n<div class=\"expandable\"><div class=\"expandable-header\">");
     append_block(sm, "<input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div>");
-    append_block(sm, "<div class=\"expandable-content\">");
+    append_block(sm, "<div class=\"expandable-content\">\n");
     fcall inline;
   };
 
   aliased_expand => {
     dstack_push(sm, &BLOCK_EXPAND);
-    append_block(sm, "<div class=\"expandable\"><div class=\"expandable-header\">");
+    append_block(sm, "\n\n<div class=\"expandable\"><div class=\"expandable-header\">");
     append(sm, "<span>");
     append_segment_html_escaped(sm, sm->a1, sm->a2);
     append(sm, "</span>");
     append_block(sm, "<input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div>");
-    append_block(sm, "<div class=\"expandable-content\">");
+    append_block(sm, "<div class=\"expandable-content\">\n");
     fcall inline;
   };
 
   '[nodtext]' => {
     dstack_push(sm, &BLOCK_NODTEXT);
-    append_block(sm, "<p>");
+    append_block(sm, "\n<p>");
     fcall nodtext;
   };
 
   '[table]' => {
     dstack_push(sm, &BLOCK_TABLE);
-    append_block(sm, "<table class=\"striped\">");
+    append_block(sm, "\n\n<table class=\"striped\">");
     fcall table;
   };
 
   '[tn]' => {
     dstack_push(sm, &BLOCK_TN);
-    append_block(sm, "<p class=\"tn\">");
+    append_block(sm, "\n\n<p class=\"tn\">");
     fcall inline;
   };
 
-  list_marker => {
-
+  list_item => {
+    sm->list_nest = 0;
+    sm->list_mode = true;
+    dstack_close(sm);
+    fexec sm->ts;
+    fcall list;
   };
 
   '&' => {
@@ -691,7 +754,7 @@ main := |*
 
     if (g_queue_is_empty(sm->dstack)) {
       dstack_push(sm, &BLOCK_P);
-      append_block(sm, "<p>");
+      append_block(sm, "\n<p>");
     }
 
     fcall inline;
@@ -773,7 +836,7 @@ static void dstack_close(StateMachine * sm) {
 
     switch (*top) {
       case BLOCK_P:
-        append_block(sm, "</p>");
+        append_block(sm, "</p>\n");
         break;
 
       case INLINE_SPOILER:
@@ -793,7 +856,7 @@ static void dstack_close(StateMachine * sm) {
         break;
 
       case BLOCK_NODTEXT:
-        append_block(sm, "</p>");
+        append_block(sm, "</p>\n");
         break;
 
       case BLOCK_CODE:
@@ -828,7 +891,7 @@ static void dstack_close(StateMachine * sm) {
         break;
 
       case BLOCK_TN:
-        append_block(sm, "</p>");
+        append_block(sm, "</p>\n");
         break;
 
       case BLOCK_TABLE:
@@ -845,6 +908,14 @@ static void dstack_close(StateMachine * sm) {
 
       case BLOCK_TR:
         append_block(sm, "</tr>");
+        break;
+
+      case BLOCK_UL:
+        append_block(sm, "</ul>\n");
+        break;
+
+      case BLOCK_LI:
+        append_block(sm, "</li>\n");
         break;
     }
   }
@@ -870,14 +941,18 @@ static void init_machine(StateMachine * sm, VALUE input) {
   sm->b2 = NULL;
   sm->f_inline = false;
   sm->boundary = false;
-  sm->stack = g_array_sized_new(FALSE, TRUE, sizeof(int), 128);
+  sm->stack = g_array_sized_new(FALSE, TRUE, sizeof(int), 16);
   sm->dstack = g_queue_new();
+  sm->list_stack = g_queue_new();
+  sm->list_nest = 0;
+  sm->list_mode = false;
 }
 
 static void free_machine(StateMachine * sm) {
   g_string_free(sm->output, TRUE);
   g_array_free(sm->stack, FALSE);
   g_queue_free(sm->dstack);
+  g_queue_free(sm->list_stack);
   g_free(sm);
 }
 
