@@ -1,4 +1,3 @@
-irb(main):002:0> WikiPage.limit(500).each {|x| puts x.body; puts}
 pixiv account: http://www.pixiv.net/member.php?id=2631072
 
 h6. NO-POST ARTIST: DELETION REQUEST/CEASE AND DESIST RECEIVED
