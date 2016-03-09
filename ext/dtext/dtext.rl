@@ -24,7 +24,6 @@ typedef struct StateMachine {
   GString * output;
   GArray * stack;
   GQueue * dstack;
-  GQueue * list_stack;
   int list_nest;
 } StateMachine;
 
@@ -238,26 +237,26 @@ inline := |*
   };
 
   basic_wiki_link => {
-    GString * segment = g_string_new_len(sm->a1, sm->a2 - sm->a1 + 1);
+    GString * segment = g_string_new_len(sm->a1, sm->a2 - sm->a1);
     underscore_string(segment->str, segment->len);
 
     append(sm, "<a href=\"/wiki_pages/show_or_new?title=");
     append_segment_uri_escaped(sm, segment->str, segment->str + segment->len - 1);
     append(sm, "\">");
-    append_segment_html_escaped(sm, sm->a1, sm->a2);
+    append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, "</a>");
 
     g_string_free(segment, TRUE);
   };
 
   aliased_wiki_link => {
-    GString * segment = g_string_new_len(sm->a1, sm->a2 - sm->a1 + 1);
+    GString * segment = g_string_new_len(sm->a1, sm->a2 - sm->a1);
     underscore_string(segment->str, segment->len);
 
     append(sm, "<a href=\"/wiki_pages/show_or_new?title=");
     append_segment_uri_escaped(sm, segment->str, segment->str + segment->len - 1);
     append(sm, "\">");
-    append_segment_html_escaped(sm, sm->b1, sm->b2);
+    append_segment_html_escaped(sm, sm->b1, sm->b2 - 1);
     append(sm, "</a>");
 
     g_string_free(segment, TRUE);
@@ -943,7 +942,6 @@ static void init_machine(StateMachine * sm, VALUE input) {
   sm->boundary = false;
   sm->stack = g_array_sized_new(FALSE, TRUE, sizeof(int), 16);
   sm->dstack = g_queue_new();
-  sm->list_stack = g_queue_new();
   sm->list_nest = 0;
   sm->list_mode = false;
 }
@@ -952,7 +950,6 @@ static void free_machine(StateMachine * sm) {
   g_string_free(sm->output, TRUE);
   g_array_free(sm->stack, FALSE);
   g_queue_free(sm->dstack);
-  g_queue_free(sm->list_stack);
   g_free(sm);
 }
 
