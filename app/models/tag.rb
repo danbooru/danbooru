@@ -130,7 +130,7 @@ class Tag < ActiveRecord::Base
     end
 
     def update_category_post_counts
-      Post.with_timeout(30_000, nil) do
+      Post.with_timeout(30_000, nil, {:tags => name}) do
         Post.raw_tag_match(name).where("true /* Tag#update_category_post_counts */").find_each do |post|
           post.reload
           post.set_tag_counts

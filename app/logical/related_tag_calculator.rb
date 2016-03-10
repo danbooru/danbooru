@@ -1,7 +1,7 @@
 class RelatedTagCalculator
   def self.find_tags(tag, limit)
     CurrentUser.without_safe_mode do
-      Post.with_timeout(5_000, []) do
+      Post.with_timeout(5_000, [], {:tags => tag}) do
         Post.tag_match(tag).limit(limit).reorder("posts.md5").pluck(:tag_string)
       end
     end
@@ -40,7 +40,7 @@ class RelatedTagCalculator
     counts = Hash.new {|h, k| h[k] = 0}
 
     CurrentUser.without_safe_mode do
-      Post.with_timeout(5_000, []) do
+      Post.with_timeout(5_000, [], {:tags => tag}) do
         Post.tag_match(tag).limit(400).reorder("posts.md5").pluck(:tag_string).each do |tag_string|
           tag_string.scan(/\S+/).each do |tag|
             counts[tag] += 1
@@ -53,7 +53,7 @@ class RelatedTagCalculator
     candidates = convert_hash_to_array(counts, 100)
     similar_counts = Hash.new {|h, k| h[k] = 0}
     CurrentUser.without_safe_mode do
-      PostReadOnly.with_timeout(5_000) do
+      PostReadOnly.with_timeout(5_000, nil, {:tags => tag}) do
         candidates.each do |ctag, _|
           acount = PostReadOnly.tag_match("#{tag} #{ctag}").count
           ctag_record = Tag.find_by_name(ctag)
