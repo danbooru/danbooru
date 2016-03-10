@@ -464,6 +464,7 @@ inline := |*
       append_block(sm, "</blockquote>");
       append_newline(sm);
       append_newline(sm);
+
       fret;
     } else {
       append(sm, "[/quote]");
@@ -874,7 +875,7 @@ main := |*
   any => {
     fhold;
 
-    if (g_queue_is_empty(sm->dstack)) {
+    if (g_queue_is_empty(sm->dstack) || dstack_check(sm, BLOCK_QUOTE)) {
       dstack_push(sm, &BLOCK_P);
       append_newline(sm);
       append_block(sm, "<p>");
