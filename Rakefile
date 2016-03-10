@@ -24,11 +24,12 @@ task :ragel do
 	sh "ragel -G2 -C ext/dtext/dtext.rl -o ext/dtext/dtext.c"
 end
 
-task test: %w(ragel compile) do
-	#ruby '-Ilib', '-rdtext', '-e', "puts DTextRagel.parse(File.read('test/wiki.txt'))"
-	#ruby '-Ilib', '-rdtext', '-rdtext_ruby', '-e', "puts DTextRuby.parse(File.read('test/wiki.txt'))"
-
+task test_inline: %w(ragel compile) do
 	ruby '-Ilib', '-rdtext', '-e', 'puts DTextRagel.parse("[b]mismatched [u]tags[/b] blah[/u]")'
+end
+
+task test: %w(ragel compile) do
+	ruby "-Ilib", '-rdtext', "test/dtext_test.rb"
 end
 
 task default: :test

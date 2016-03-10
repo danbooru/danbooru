@@ -54,6 +54,7 @@ static const int BLOCK_TBODY = 18;
 static const int BLOCK_TR = 19;
 static const int BLOCK_UL = 20;
 static const int BLOCK_LI = 21;
+static const int BLOCK_TH = 22;
 
 %%{
 machine dtext;
@@ -139,17 +140,17 @@ list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
 inline := |*
   post_id => {
     append(sm, "<a href=\"/posts/");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "\">post #");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "</a>");
   };
 
   forum_post_id => {
     append(sm, "<a href=\"/forum_posts/");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "\">forum #");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "</a>");
   };
 
@@ -163,81 +164,81 @@ inline := |*
 
   forum_topic_paged_id => {
     append(sm, "<a href=\"/forum_topics/");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "?page=");
-    append_segment(sm, sm->b1, sm->b2);
+    append_segment(sm, sm->b1, sm->b2 - 1);
     append(sm, "\">topic #");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "/p");
-    append_segment(sm, sm->b1, sm->b2);
+    append_segment(sm, sm->b1, sm->b2 - 1);
     append(sm, "</a>");
   };
 
   comment_id => {
     append(sm, "<a href=\"/comments/");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "\">comment #");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "</a>");
   };
 
   pool_id => {
     append(sm, "<a href=\"/pools/");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "\">pool #");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "</a>");
   };
 
   user_id => {
     append(sm, "<a href=\"/users/");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "\">user #");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "</a>");
   };
 
   artist_id => {
     append(sm, "<a href=\"/artists/");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "\">artist #");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "</a>");
   };
 
   github_issue_id => {
     append(sm, "<a href=\"https://github.com/r888888888/danbooru/issues/");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "\">issue #");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "</a>");
   };
 
   pixiv_id => {
     append(sm, "<a href=\"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "\">pixiv #");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "</a>");
   };
 
   pixiv_paged_id => {
     append(sm, "<a href=\"http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "&page=");
-    append_segment(sm, sm->b1, sm->b2);
+    append_segment(sm, sm->b1, sm->b2 - 1);
     append(sm, "\">pixiv #");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "/p");
-    append_segment(sm, sm->b1, sm->b2);
+    append_segment(sm, sm->b1, sm->b2 - 1);
     append(sm, "</a>");
   };
 
   post_link => {
     append(sm, "<a rel=\"nofollow\" href=\"/posts?tags=");
-    append_segment_html_escaped(sm, sm->a1, sm->a2);
+    append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, "\">");
-    append_segment_html_escaped(sm, sm->a1, sm->a2);
+    append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, "</a>");
   };
 
@@ -253,7 +254,7 @@ inline := |*
     }
 
     append(sm, "<a href=\"/wiki_pages/show_or_new?title=");
-    append_segment_html_escaped(sm, lowercase_segment->str, lowercase_segment->str + lowercase_segment->len - 1);
+    append_segment_uri_escaped(sm, lowercase_segment->str, lowercase_segment->str + lowercase_segment->len - 1);
     append(sm, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, "</a>");
@@ -274,7 +275,7 @@ inline := |*
     }
 
     append(sm, "<a href=\"/wiki_pages/show_or_new?title=");
-    append_segment_html_escaped(sm, lowercase_segment->str, lowercase_segment->str + lowercase_segment->len - 1);
+    append_segment_uri_escaped(sm, lowercase_segment->str, lowercase_segment->str + lowercase_segment->len - 1);
     append(sm, "\">");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - 1);
     append(sm, "</a>");
@@ -293,19 +294,19 @@ inline := |*
     }
 
     append(sm, "<a href=\"");
-    append_segment_html_escaped(sm, sm->b1, sm->b2 - sm->d);
+    append_segment_uri_escaped(sm, sm->b1, sm->b2 - sm->d);
     append(sm, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, "</a>");
 
     if (sm->b) {
-      append_c(sm, fc);
+      append_c_html_escaped(sm, fc);
     }
   };
 
   bracketed_textile_link => {
     append(sm, "<a href=\"");
-    append_segment_html_escaped(sm, sm->b1, sm->b2 - 1);
+    append_segment_uri_escaped(sm, sm->b1, sm->b2 - 1);
     append(sm, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, "</a>");
@@ -321,13 +322,13 @@ inline := |*
     }
 
     append(sm, "<a href=\"");
-    append_segment_html_escaped(sm, sm->ts, sm->te - sm->d);
+    append_segment_uri_escaped(sm, sm->ts, sm->te - sm->d);
     append(sm, "\">");
     append_segment_html_escaped(sm, sm->ts, sm->te - sm->d);
     append(sm, "</a>");
 
     if (sm->b) {
-      append_c(sm, fc);
+      append_c_html_escaped(sm, fc);
     }
   };
 
@@ -346,13 +347,13 @@ inline := |*
     }
 
     append(sm, "<a rel=\"nofollow\" href=\"/users?name=");
-    append_segment_html_escaped(sm, sm->a1, sm->a2 - sm->d);
+    append_segment_uri_escaped(sm, sm->a1, sm->a2 - sm->d);
     append(sm, "\">@");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - sm->d);
     append(sm, "</a>");
 
     if (sm->b) {
-      append_c(sm, fc);
+      append_c_html_escaped(sm, fc);
     }
   };
 
@@ -440,7 +441,12 @@ inline := |*
   };
 
   (space* '[quote]') => {
-    dstack_close(sm);
+    if (dstack_check(sm, BLOCK_P)) {
+      dstack_pop(sm);
+      append_block(sm, "</p>");
+      append_newline(sm);
+    } 
+
     fexec sm->p - 6;
     fret;
   };
@@ -489,7 +495,6 @@ inline := |*
   (space* '[expand]' space*) => {
     dstack_close(sm);
     fexec(sm->p - 8);
-    printf("%c\n", fc);
     fret;
   };
 
@@ -509,6 +514,18 @@ inline := |*
   '[nodtext]' => {
     dstack_push(sm, &INLINE_NODTEXT);
     fcall nodtext;
+  };
+
+  '[/th]' => {
+    if (dstack_check(sm, BLOCK_TH)) {
+      dstack_pop(sm);
+      append_newline(sm);
+      append_block(sm, "</th>");
+      append_newline(sm);
+      fret;
+    } else {
+      append(sm, "[/th]");
+    }
   };
 
   '[/td]' => {
@@ -550,20 +567,8 @@ inline := |*
     }
   };
 
-  '>' => {
-    append(sm, "&gt;");
-  };
-
-  '<' => {
-    append(sm, "&lt;");
-  };
-
-  '&' => {
-    append(sm, "&amp;");
-  };
-
   any => {
-    append_c(sm, fc);
+    append_c_html_escaped(sm, fc);
   };
 *|;
 
@@ -587,7 +592,7 @@ code := |*
   };
 
   any => {
-    append_c(sm, fc);
+    append_c_html_escaped(sm, fc);
   };
 *|;
 
@@ -608,25 +613,13 @@ nodtext := |*
     }
   };
 
-  '&' => {
-    append(sm, "&amp;");
-  };
-
-  '<' => {
-    append(sm, "&lt;");
-  };
-
-  '>' => {
-    append(sm, "&gt;");
-  };
-
   '\0' => {
     fhold;
     fret;
   };
 
   any => {
-    append_c(sm, fc);
+    append_c_html_escaped(sm, fc);
   };
 *|;
 
@@ -665,6 +658,14 @@ table := |*
     } else {
       append(sm, "[/tbody]");
     }
+  };
+
+  '[th]' => {
+    dstack_push(sm, &BLOCK_TH);
+    append_newline(sm);
+    append_block(sm, "<th>");
+    append_newline(sm);
+    fcall inline;
   };
 
   '[tr]' => {
@@ -782,9 +783,10 @@ main := |*
 
   ('[quote]' space*) => {
     dstack_push(sm, &BLOCK_QUOTE);
+    dstack_push(sm, &BLOCK_P);
     append_newline(sm);
     append_newline(sm);
-    append_block(sm, "<blockquote>");
+    append_block(sm, "<blockquote><p>");
     append_newline(sm);
     fcall inline;
   };
@@ -863,18 +865,6 @@ main := |*
     fcall list;
   };
 
-  '&' => {
-    append(sm, "&amp;");
-  };
-
-  '<' => {
-    append(sm, "&lt;");
-  };
-
-  '>' => {
-    append(sm, "&gt;");
-  };
-
   '\0' => {
     dstack_close(sm);
   };
@@ -920,8 +910,36 @@ static inline void append_c(StateMachine * sm, char s) {
   sm->output = g_string_append_c(sm->output, s);
 }
 
+static inline void append_c_html_escaped(StateMachine * sm, char s) {
+  switch (s) {
+    case '<':
+      sm->output = g_string_append(sm->output, "&lt;");
+      break;
+
+    case '>':
+      sm->output = g_string_append(sm->output, "&gt;");
+      break;
+
+    case '&':
+      sm->output = g_string_append(sm->output, "&amp;");
+      break;
+
+    default:
+      sm->output = g_string_append_c(sm->output, s);
+      break;
+  }
+}
+
 static inline void append_segment(StateMachine * sm, const char * a, const char * b) {
   sm->output = g_string_append_len(sm->output, a, b - a + 1);
+}
+
+static inline void append_segment_uri_escaped(StateMachine * sm, const char * a, const char * b) {
+  GString * segment_string = g_string_new_len(a, b - a + 1);
+  char * segment = g_uri_escape_string(segment_string->str, G_URI_RESERVED_CHARS_ALLOWED_IN_PATH "#", TRUE);
+  sm->output = g_string_append(sm->output, segment);
+  g_string_free(segment_string, TRUE);
+  g_free(segment);
 }
 
 static inline void append_segment_html_escaped(StateMachine * sm, const char * a, const char * b) {
@@ -978,7 +996,7 @@ static void dstack_close(StateMachine * sm) {
         break;
 
       case BLOCK_SPOILER:
-        append_block(sm, "</div>");
+        append_block(sm, "</p></div>");
         break;
 
       case BLOCK_QUOTE:
