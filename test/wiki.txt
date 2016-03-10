@@ -194,7 +194,6 @@ h6. Justifications for Negative Records
 * Notes and Translations
 ** Using notes for personal comments, as seen on Yahoo! Flickr or Photobucket.
 *** Notes are for Translations and Comments Relevant to the illustration only (such as character identification in [[absolutely_everyone]] murals).
-
 ** Persistently downright inaccurate translations.
 *** Minor misinterpretations are tolerated and will be fixed by a fluent translator, but providing inaccurate translations and tagging a post as translated makes it difficult to track down bad translations.
 

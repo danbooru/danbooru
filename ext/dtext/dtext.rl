@@ -4,6 +4,10 @@
 #include <stdbool.h>
 #include <glib.h>
 
+// situationally print newlines to make the generated html
+// easier to read
+#define PRETTY_PRINT 0
+
 typedef struct StateMachine {
   int top;
   int cs;
@@ -19,12 +23,13 @@ typedef struct StateMachine {
   const char * b1;
   const char * b2;
   bool f_inline;
-  bool boundary;
   bool list_mode;
   GString * output;
   GArray * stack;
   GQueue * dstack;
   int list_nest;
+  int d;
+  int b;
 } StateMachine;
 
 static const int MAX_STACK_DEPTH = 512;
@@ -92,7 +97,6 @@ action mark_b2 {
   sm->b2 = sm->p;
 }
 
-name_boundary = ':' | '?';
 newline = '\r\n' | '\r' | '\n';
 
 nonnewline = any - (newline | '\0');
@@ -102,11 +106,12 @@ nonpipe = ^'|';
 nonpipebracket = nonpipe & nonbracket;
 noncurly = ^'}';
 
-mention = '@' >{sm->boundary = false;} (graph+) >mark_a1 %mark_a2 :>> name_boundary? @{sm->boundary = true;};
+mention = '@' graph+ >mark_a1 %mark_a2;
 
 url = 'http' 's'? '://' graph+;
-basic_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':' url >mark_b1 %mark_b2;
-bracketed_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':[' url >mark_b1 %mark_b2 :>> ']';
+internal_url = '/' graph+;
+basic_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':' (url | internal_url) >mark_b1 %mark_b2;
+bracketed_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':[' (url | internal_url) >mark_b1 %mark_b2 :>> ']';
 
 basic_wiki_link = '[[' nonpipebracket+ >mark_a1 %mark_a2 ']]';
 aliased_wiki_link = '[[' nonpipebracket+ >mark_a1 %mark_a2 '|' nonbracket+ >mark_b1 %mark_b2 ']]';
@@ -150,9 +155,9 @@ inline := |*
 
   forum_topic_id => {
     append(sm, "<a href=\"/forum_topics/");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "\">topic #");
-    append_segment(sm, sm->a1, sm->a2);
+    append_segment(sm, sm->a1, sm->a2 - 1);
     append(sm, "</a>");
   };
 
@@ -230,7 +235,7 @@ inline := |*
 
   post_link => {
     append(sm, "<a rel=\"nofollow\" href=\"/posts?tags=");
-    append_segment_uri_escaped(sm, sm->a1, sm->a2);
+    append_segment_html_escaped(sm, sm->a1, sm->a2);
     append(sm, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2);
     append(sm, "</a>");
@@ -239,51 +244,91 @@ inline := |*
   basic_wiki_link => {
     GString * segment = g_string_new_len(sm->a1, sm->a2 - sm->a1);
     underscore_string(segment->str, segment->len);
+    GString * lowercase_segment = NULL;
+
+    if (g_utf8_validate(segment->str, -1, NULL)) {
+      lowercase_segment = g_string_new(g_utf8_strdown(segment->str, -1));
+    } else {
+      lowercase_segment = g_string_new(g_ascii_strdown(segment->str, -1));
+    }
 
     append(sm, "<a href=\"/wiki_pages/show_or_new?title=");
-    append_segment_uri_escaped(sm, segment->str, segment->str + segment->len - 1);
+    append_segment_html_escaped(sm, lowercase_segment->str, lowercase_segment->str + lowercase_segment->len - 1);
     append(sm, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, "</a>");
 
+    g_string_free(lowercase_segment, TRUE);
     g_string_free(segment, TRUE);
   };
 
   aliased_wiki_link => {
     GString * segment = g_string_new_len(sm->a1, sm->a2 - sm->a1);
     underscore_string(segment->str, segment->len);
+    GString * lowercase_segment = NULL;
+
+    if (g_utf8_validate(segment->str, -1, NULL)) {
+      lowercase_segment = g_string_new(g_utf8_strdown(segment->str, -1));
+    } else {
+      lowercase_segment = g_string_new(g_ascii_strdown(segment->str, -1));
+    }
 
     append(sm, "<a href=\"/wiki_pages/show_or_new?title=");
-    append_segment_uri_escaped(sm, segment->str, segment->str + segment->len - 1);
+    append_segment_html_escaped(sm, lowercase_segment->str, lowercase_segment->str + lowercase_segment->len - 1);
     append(sm, "\">");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - 1);
     append(sm, "</a>");
 
+    g_string_free(lowercase_segment, TRUE);
     g_string_free(segment, TRUE);
   };
 
   basic_textile_link => {
-    append(sm, "<a rel=\"nofollow\" href=\"");
-    append_segment_uri_escaped(sm, sm->b1, sm->b2);
+    if (is_boundary_c(fc)) {
+      sm->d = 2;
+      sm->b = true;
+    } else {
+      sm->d = 1;
+      sm->b = false;
+    }
+
+    append(sm, "<a href=\"");
+    append_segment_html_escaped(sm, sm->b1, sm->b2 - sm->d);
     append(sm, "\">");
-    append_segment_html_escaped(sm, sm->a1, sm->a2);
+    append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, "</a>");
+
+    if (sm->b) {
+      append_c(sm, fc);
+    }
   };
 
   bracketed_textile_link => {
-    append(sm, "<a rel=\"nofollow\" href=\"");
-    append_segment_uri_escaped(sm, sm->b1, sm->b2);
+    append(sm, "<a href=\"");
+    append_segment_html_escaped(sm, sm->b1, sm->b2 - 1);
     append(sm, "\">");
-    append_segment_html_escaped(sm, sm->a1, sm->a2);
+    append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, "</a>");
   };
 
   url => {
-    append(sm, "<a rel=\"nofollow\" href=\"");
-    append_segment_uri_escaped(sm, sm->ts, sm->te - 1);
+    if (is_boundary_c(fc)) {
+      sm->b = true;
+      sm->d = 2;
+    } else {
+      sm->b = false;
+      sm->d = 1;
+    }
+
+    append(sm, "<a href=\"");
+    append_segment_html_escaped(sm, sm->ts, sm->te - sm->d);
     append(sm, "\">");
-    append_segment_html_escaped(sm, sm->ts, sm->te - 1);
+    append_segment_html_escaped(sm, sm->ts, sm->te - sm->d);
     append(sm, "</a>");
+
+    if (sm->b) {
+      append_c(sm, fc);
+    }
   };
 
   # probably a tag. examples include @.@ and @_@
@@ -292,14 +337,22 @@ inline := |*
   };
 
   mention => {
+    if (is_boundary_c(fc)) {
+      sm->b = true;
+      sm->d = 2;
+    } else {
+      sm->b = false;
+      sm->d = 1;
+    }
+
     append(sm, "<a rel=\"nofollow\" href=\"/users?name=");
-    append_segment_uri_escaped(sm, sm->a1, sm->a2);
+    append_segment_html_escaped(sm, sm->a1, sm->a2 - sm->d);
     append(sm, "\">@");
-    append_segment_html_escaped(sm, sm->a2, sm->a2);
+    append_segment_html_escaped(sm, sm->a1, sm->a2 - sm->d);
     append(sm, "</a>");
-    if (sm->boundary) {
+
+    if (sm->b) {
       append_c(sm, fc);
-      sm->boundary = false;
     }
   };
 
@@ -367,7 +420,8 @@ inline := |*
   '[/tn]' => {
     if (dstack_check(sm, BLOCK_TN)) {
       dstack_pop(sm);
-      append(sm, "</p>\n");
+      append(sm, "</p>");
+      append_newline(sm);
       fret;
     } else if (dstack_check(sm, INLINE_TN)) {
       dstack_pop(sm);
@@ -385,21 +439,25 @@ inline := |*
     fret;
   };
 
-  '[quote]' => {
+  (space* '[quote]') => {
     dstack_close(sm);
-    fexec sm->p - 7;
+    fexec sm->p - 6;
     fret;
   };
 
-  '[/quote]' => {
+  (space* '[/quote]') => {
     if (dstack_check(sm, BLOCK_P)) {
       dstack_pop(sm);
-      append_block(sm, "</p>\n");
+      append_block(sm, "</p>");
+      append_newline(sm);
     } 
 
     if (dstack_check(sm, BLOCK_QUOTE)) {
       dstack_pop(sm);
-      append_block(sm, "\n</blockquote>\n\n");
+      append_newline(sm);
+      append_block(sm, "</blockquote>");
+      append_newline(sm);
+      append_newline(sm);
       fret;
     } else {
       append(sm, "[/quote]");
@@ -411,28 +469,36 @@ inline := |*
     append(sm, "<span class=\"spoiler\">");
   };
 
-  '[/spoiler]' => {
+  (space* '[/spoiler]') => {
     if (dstack_check(sm, INLINE_SPOILER)) {
       dstack_pop(sm);
       append(sm, "</span>");
     } else if (dstack_check(sm, BLOCK_SPOILER)) {
       dstack_pop(sm);
-      append_block(sm, "\n</p></div>\n\n");
+      append_newline(sm);
+      append_block(sm, "</p></div>");
+      append_newline(sm);
+      append_newline(sm);
+
       fret;
     } else {
       append(sm, "[/spoiler]");
     }
   };
 
-  '[expand]' => {
+  (space* '[expand]' space*) => {
     dstack_close(sm);
     fexec(sm->p - 8);
+    printf("%c\n", fc);
     fret;
   };
 
-  '[/expand]' => {
+  (space* '[/expand]') => {
     if (dstack_check(sm, BLOCK_EXPAND)) {
-      append_block(sm, "\n</div></div>\n\n");
+      append_newline(sm);
+      append_block(sm, "</div></div>");
+      append_newline(sm);
+      append_newline(sm);
       dstack_pop(sm);
       fret;
     } else {
@@ -448,7 +514,9 @@ inline := |*
   '[/td]' => {
     if (dstack_check(sm, BLOCK_TD)) {
       dstack_pop(sm);
-      append_block(sm, "\n</td>\n");
+      append_newline(sm);
+      append_block(sm, "</td>");
+      append_newline(sm);
       fret;
     } else {
       append(sm, "[/td]");
@@ -463,6 +531,7 @@ inline := |*
   newline{2,} => {
     dstack_close(sm);
     sm->list_mode = false;
+    fexec sm->ts;
     fret;
   };
 
@@ -470,13 +539,27 @@ inline := |*
     if (sm->list_mode) {
       if (dstack_check(sm, BLOCK_LI)) {
         dstack_pop(sm);
-        append_block(sm, "</li>\n");
+        append_block(sm, "</li>");
+        append_newline(sm);
       }
       fhold;
       fret;
     } else {
-      append(sm, "<br>\n");
+      append(sm, "<br>");
+      append_newline(sm);
     }
+  };
+
+  '>' => {
+    append(sm, "&gt;");
+  };
+
+  '<' => {
+    append(sm, "&lt;");
+  };
+
+  '&' => {
+    append(sm, "&amp;");
   };
 
   any => {
@@ -488,7 +571,10 @@ code := |*
   '[/code]' => {
     if (dstack_check(sm, BLOCK_CODE)) {
       dstack_pop(sm);
-      append_block(sm, "\n</pre>\n\n");
+      append_newline(sm);
+      append_block(sm, "</pre>");
+      append_newline(sm);
+      append_newline(sm);
     } else {
       append(sm, "[/code]");
     }
@@ -509,7 +595,10 @@ nodtext := |*
   '[/nodtext]' => {
     if (dstack_check(sm, BLOCK_NODTEXT)) {
       dstack_pop(sm);
-      append_block(sm, "\n</p>\n\n");
+      append_newline(sm);
+      append_block(sm, "</p>");
+      append_newline(sm);
+      append_newline(sm);
       fret;
     } else if (dstack_check(sm, INLINE_NODTEXT)) {
       dstack_pop(sm);
@@ -544,13 +633,17 @@ nodtext := |*
 table := |*
   '[thead]' => {
     dstack_push(sm, &BLOCK_THEAD);
-    append_block(sm, "\n<thead>\n");
+    append_newline(sm);
+    append_block(sm, "<thead>");
+    append_newline(sm);
   };
 
   '[/thead]' => {
     if (dstack_check(sm, BLOCK_THEAD)) {
       dstack_pop(sm);
-      append_block(sm, "\n</thead>\n");
+      append_newline(sm);
+      append_block(sm, "</thead>");
+      append_newline(sm);
     } else {
       append(sm, "[/thead]");
     }
@@ -558,13 +651,17 @@ table := |*
 
   '[tbody]' => {
     dstack_push(sm, &BLOCK_TBODY);
-    append_block(sm, "\n<tbody>\n");
+    append_newline(sm);
+    append_block(sm, "<tbody>");
+    append_newline(sm);
   };
 
   '[/tbody]' => {
     if (dstack_check(sm, BLOCK_TBODY)) {
       dstack_pop(sm);
-      append_block(sm, "\n</tbody>\n");
+      append_newline(sm);
+      append_block(sm, "</tbody>");
+      append_newline(sm);
     } else {
       append(sm, "[/tbody]");
     }
@@ -572,13 +669,17 @@ table := |*
 
   '[tr]' => {
     dstack_push(sm, &BLOCK_TR);
-    append_block(sm, "\n<tr>\n");
+    append_newline(sm);
+    append_block(sm, "<tr>");
+    append_newline(sm);
   };
 
   '[/tr]' => {
     if (dstack_check(sm, BLOCK_TR)) {
       dstack_pop(sm);
-      append_block(sm, "\n</tr>\n");
+      append_newline(sm);
+      append_block(sm, "</tr>");
+      append_newline(sm);
     } else {
       append(sm, "[/tr]");
     }
@@ -586,14 +687,19 @@ table := |*
 
   '[td]' => {
     dstack_push(sm, &BLOCK_TD);
-    append_block(sm, "\n<td>\n");
+    append_newline(sm);
+    append_block(sm, "<td>");
+    append_newline(sm);
     fcall inline;
   };
 
   '[/table]' => {
     if (dstack_check(sm, BLOCK_TABLE)) {
       dstack_pop(sm);
-      append_block(sm, "\n</table>\n\n");
+      append_newline(sm);
+      append_block(sm, "</table>");
+      append_newline(sm);
+      append_newline(sm);
       fret;
     } else {
       append(sm, "[/table]");
@@ -617,14 +723,16 @@ list := |*
 
     if (sm->list_nest > prev_nest) {
       for (int i=prev_nest; i<sm->list_nest; ++i) {
-        append_block(sm, "<ul>\n");
+        append_block(sm, "<ul>");
+        append_newline(sm);
         dstack_push(sm, &BLOCK_UL);
       }
     } else if (sm->list_nest < prev_nest) {
       for (int i=sm->list_nest; i<prev_nest; ++i) {
         if (dstack_check(sm, BLOCK_UL)) {
           dstack_pop(sm);
-          append_block(sm, "</ul>\n");
+          append_block(sm, "</ul>");
+          append_newline(sm);
         }
       }
     }
@@ -637,6 +745,7 @@ list := |*
 
   # exit list
   (newline{2,} | '\0') => {
+    dstack_close(sm);
     fexec sm->ts;
     fret;
   };
@@ -658,67 +767,91 @@ main := |*
       header = '6';
     }
 
-    append(sm, "\n\n<h");
+    append_newline(sm);
+    append_newline(sm);
+    append(sm, "<h");
     append_c(sm, header);
     append_c(sm, '>');
     append_segment(sm, sm->b1, sm->b2 - 1);
     append(sm, "</h");
     append_c(sm, header);
-    append(sm, ">\n\n");
+    append(sm, ">");
+    append_newline(sm);
+    append_newline(sm);
   };
 
-  '[quote]' => {
+  ('[quote]' space*) => {
     dstack_push(sm, &BLOCK_QUOTE);
-    append_block(sm, "\n\n<blockquote>\n");
+    append_newline(sm);
+    append_newline(sm);
+    append_block(sm, "<blockquote>");
+    append_newline(sm);
     fcall inline;
   };
 
-  '[spoiler]' => {
+  ('[spoiler]' space*) => {
     dstack_push(sm, &BLOCK_SPOILER);
-    append_block(sm, "\n\n<div class=\"spoiler\"><p>\n");
+    append_newline(sm);
+    append_newline(sm);
+    append_block(sm, "<div class=\"spoiler\"><p>");
+    append_newline(sm);
     fcall inline;
   };
 
-  '[code]' => {
+  ('[code]' space*) => {
     dstack_push(sm, &BLOCK_CODE);
-    append_block(sm, "\n\n<pre>\n");
+    append_newline(sm);
+    append_newline(sm);
+    append_block(sm, "<pre>");
+    append_newline(sm);
     fcall code;
   };
 
-  '[expand]' => {
+  ('[expand]' space*) => {
     dstack_push(sm, &BLOCK_EXPAND);
-    append_block(sm, "\n\n<div class=\"expandable\"><div class=\"expandable-header\">");
+    append_newline(sm);
+    append_newline(sm);
+    append_block(sm, "<div class=\"expandable\"><div class=\"expandable-header\">");
     append_block(sm, "<input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div>");
-    append_block(sm, "<div class=\"expandable-content\">\n");
+    append_block(sm, "<div class=\"expandable-content\">");
+    append_newline(sm);
     fcall inline;
   };
 
-  aliased_expand => {
+  (aliased_expand space*) => {
     dstack_push(sm, &BLOCK_EXPAND);
-    append_block(sm, "\n\n<div class=\"expandable\"><div class=\"expandable-header\">");
+    append_newline(sm);
+    append_newline(sm);
+    append_block(sm, "<div class=\"expandable\"><div class=\"expandable-header\">");
     append(sm, "<span>");
     append_segment_html_escaped(sm, sm->a1, sm->a2);
     append(sm, "</span>");
     append_block(sm, "<input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div>");
-    append_block(sm, "<div class=\"expandable-content\">\n");
+    append_block(sm, "<div class=\"expandable-content\">");
+    append_newline(sm);
     fcall inline;
   };
 
-  '[nodtext]' => {
+  ('[nodtext]' space*) => {
     dstack_push(sm, &BLOCK_NODTEXT);
-    append_block(sm, "\n<p>");
+    append_newline(sm);
+    append_block(sm, "<p>");
     fcall nodtext;
   };
 
   '[table]' => {
     dstack_push(sm, &BLOCK_TABLE);
-    append_block(sm, "\n\n<table class=\"striped\">");
+    append_newline(sm);
+    append_newline(sm);
+    append_block(sm, "<table class=\"striped\">");
     fcall table;
   };
 
   '[tn]' => {
     dstack_push(sm, &BLOCK_TN);
-    append_block(sm, "\n\n<p class=\"tn\">");
+    append_newline(sm);
+    append_newline(sm);
+    append_block(sm, "<p class=\"tn\">");
     fcall inline;
   };
 
@@ -753,7 +886,8 @@ main := |*
 
     if (g_queue_is_empty(sm->dstack)) {
       dstack_push(sm, &BLOCK_P);
-      append_block(sm, "\n<p>");
+      append_newline(sm);
+      append_block(sm, "<p>");
     }
 
     fcall inline;
@@ -776,18 +910,18 @@ static inline void append(StateMachine * sm, const char * s) {
   sm->output = g_string_append(sm->output, s);
 }
 
+static inline void append_newline(StateMachine * sm) {
+#if (PRETTY_PRINT)
+  g_string_append_c(sm->output, '\n');
+#endif
+}
+
 static inline void append_c(StateMachine * sm, char s) {
   sm->output = g_string_append_c(sm->output, s);
 }
 
 static inline void append_segment(StateMachine * sm, const char * a, const char * b) {
   sm->output = g_string_append_len(sm->output, a, b - a + 1);
-}
-
-static inline void append_segment_uri_escaped(StateMachine * sm, const char * a, const char * b) {
-  GString * segment = g_string_new_len(a, b - a + 1);
-  sm->output = g_string_append_uri_escaped(sm->output, segment->str, ":/?&=", TRUE);
-  g_string_free(segment, TRUE);
 }
 
 static inline void append_segment_html_escaped(StateMachine * sm, const char * a, const char * b) {
@@ -835,7 +969,8 @@ static void dstack_close(StateMachine * sm) {
 
     switch (*top) {
       case BLOCK_P:
-        append_block(sm, "</p>\n");
+        append_block(sm, "</p>");
+        append_newline(sm);
         break;
 
       case INLINE_SPOILER:
@@ -855,7 +990,8 @@ static void dstack_close(StateMachine * sm) {
         break;
 
       case BLOCK_NODTEXT:
-        append_block(sm, "</p>\n");
+        append_block(sm, "</p>");
+        append_newline(sm);
         break;
 
       case BLOCK_CODE:
@@ -890,7 +1026,8 @@ static void dstack_close(StateMachine * sm) {
         break;
 
       case BLOCK_TN:
-        append_block(sm, "</p>\n");
+        append_block(sm, "</p>");
+        append_newline(sm);
         break;
 
       case BLOCK_TABLE:
@@ -910,14 +1047,34 @@ static void dstack_close(StateMachine * sm) {
         break;
 
       case BLOCK_UL:
-        append_block(sm, "</ul>\n");
+        append_block(sm, "</ul>");
+        append_newline(sm);
         break;
 
       case BLOCK_LI:
-        append_block(sm, "</li>\n");
+        append_block(sm, "</li>");
+        append_newline(sm);
         break;
     }
   }
+}
+
+static inline bool is_boundary_c(char c) {
+  switch (c) {
+    case ':':
+    case ';':
+    case '.':
+    case ',':
+    case '!':
+    case '?':
+    case ')':
+    case ']':
+    case '<':
+    case '>':
+      return true;
+  }
+
+  return false;
 }
 
 static void init_machine(StateMachine * sm, VALUE input) {
@@ -939,7 +1096,6 @@ static void init_machine(StateMachine * sm, VALUE input) {
   sm->b1 = NULL;
   sm->b2 = NULL;
   sm->f_inline = false;
-  sm->boundary = false;
   sm->stack = g_array_sized_new(FALSE, TRUE, sizeof(int), 16);
   sm->dstack = g_queue_new();
   sm->list_nest = 0;

@@ -26,9 +26,9 @@ end
 
 task test: %w(ragel compile) do
 	#ruby '-Ilib', '-rdtext', '-e', "puts DTextRagel.parse(File.read('test/wiki.txt'))"
-	ruby '-Ilib', '-rdtext', '-rdtext_ruby', '-e', "puts DTextRagel.parse(File.read('test/wiki.txt'))"
+	#ruby '-Ilib', '-rdtext', '-rdtext_ruby', '-e', "puts DTextRuby.parse(File.read('test/wiki.txt'))"
 
-	#ruby '-Ilib', '-rdtext', '-e', 'puts DTextRagel.parse("* hello world\n** another one\n*** third\n* fourth")'
+	ruby '-Ilib', '-rdtext', '-e', 'puts DTextRagel.parse("[b]mismatched [u]tags[/b] blah[/u]")'
 end
 
 task default: :test
