@@ -840,7 +840,7 @@ class Post < ActiveRecord::Base
 
     def add_favorite!(user)
       Favorite.add(self, user)
-      vote!("up")
+      vote!("up") if CurrentUser.is_gold?
     rescue PostVote::Error
     end
 
@@ -850,7 +850,7 @@ class Post < ActiveRecord::Base
 
     def remove_favorite!(user)
       Favorite.remove(self, user)
-      unvote!
+      unvote! if CurrentUser.is_gold?
     rescue PostVote::Error
     end
 
