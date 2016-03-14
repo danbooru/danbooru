@@ -241,6 +241,14 @@ class AnonymousUser
     false
   end
 
+  def is_voter?
+    false
+  end
+
+  def is_super_voter?
+    false
+  end
+
   %w(member banned gold builder platinum janitor moderator admin).each do |name|
     define_method("is_#{name}?") do
       false

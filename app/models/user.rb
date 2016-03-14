@@ -401,6 +401,10 @@ class User < ActiveRecord::Base
       level >= Levels::ADMIN
     end
 
+    def is_voter?
+      is_gold? || is_super_voter?
+    end
+
     def create_mod_action
       if level_changed?
         ModAction.create(:description => %{"#{name}":/users/#{id} level changed #{level_string_was} -> #{level_string}})
