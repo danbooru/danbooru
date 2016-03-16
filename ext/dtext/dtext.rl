@@ -1,12 +1,12 @@
+// situationally print newlines to make the generated html
+// easier to read
+#define PRETTY_PRINT 0
+
 #include <ruby.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <glib.h>
-
-// situationally print newlines to make the generated html
-// easier to read
-#define PRETTY_PRINT 0
 
 typedef struct StateMachine {
   int top;
@@ -357,6 +357,19 @@ inline := |*
     }
   };
 
+  list_item => {
+    g_debug("inline list");
+
+    if (dstack_check(sm, BLOCK_P)) {
+      g_debug("  rewind p");
+      dstack_rewind(sm);
+    }
+
+    g_debug("  call list");
+    fexec sm->ts;
+    fcall list;
+  };
+
   '[b]' => {
     dstack_push(sm, &INLINE_B);
     append(sm, "<strong>");
@@ -421,7 +434,7 @@ inline := |*
   '[/tn]' => {
     if (dstack_check(sm, BLOCK_TN)) {
       dstack_pop(sm);
-      append(sm, "</p>");
+      append_closing_p(sm);
       append_newline(sm);
       fret;
     } else if (dstack_check(sm, INLINE_TN)) {
@@ -435,15 +448,20 @@ inline := |*
   # these are block level elements that should kick us out of the inline
   # scanner
   header => {
-    dstack_close(sm);
+    dstack_rewind(sm);
     fexec sm->a1 - 1;
     fret;
   };
 
   (space* '[quote]') => {
+    g_debug("inline [quote]");
+
     if (dstack_check(sm, BLOCK_P)) {
+      g_debug("  pop dstack");
+      g_debug("  print </p>");
+
       dstack_pop(sm);
-      append_block(sm, "</p>");
+      append_closing_p(sm);
       append_newline(sm);
     } 
 
@@ -452,19 +470,14 @@ inline := |*
   };
 
   (space* '[/quote]') => {
+    g_debug("inline [/quote]");
+
     if (dstack_check(sm, BLOCK_P)) {
-      dstack_pop(sm);
-      append_block(sm, "</p>");
-      append_newline(sm);
-    } 
+      dstack_rewind(sm);
+    }
 
     if (dstack_check(sm, BLOCK_QUOTE)) {
-      dstack_pop(sm);
-      append_newline(sm);
-      append_block(sm, "</blockquote>");
-      append_newline(sm);
-      append_newline(sm);
-
+      dstack_rewind(sm);
       fret;
     } else {
       append(sm, "[/quote]");
@@ -472,18 +485,29 @@ inline := |*
   };
 
   '[spoiler]' => {
+    g_debug("inline [spoiler]");
+    g_debug("  push <span>");
     dstack_push(sm, &INLINE_SPOILER);
     append(sm, "<span class=\"spoiler\">");
   };
 
   (space* '[/spoiler]') => {
+    g_debug("inline [/spoiler]");
+
     if (dstack_check(sm, INLINE_SPOILER)) {
+      g_debug("  pop dstack");
+      g_debug("  print </span>");
       dstack_pop(sm);
       append(sm, "</span>");
-    } else if (dstack_check(sm, BLOCK_SPOILER)) {
+    } else if (dstack_check(sm, BLOCK_P) && dstack_check2(sm, BLOCK_SPOILER)) {
+      g_debug("  pop dstack");
+      g_debug("  print </p></div>");
+      g_debug("  return");
+      dstack_pop(sm);
       dstack_pop(sm);
       append_newline(sm);
-      append_block(sm, "</p></div>");
+      append_closing_p(sm);
+      append_block(sm, "</div>");
       append_newline(sm);
       append_newline(sm);
 
@@ -494,12 +518,18 @@ inline := |*
   };
 
   (space* '[expand]' space*) => {
-    dstack_close(sm);
+    dstack_rewind(sm);
     fexec(sm->p - 8);
     fret;
   };
 
   (space* '[/expand]') => {
+    if (dstack_check(sm, BLOCK_P)) {
+      append_closing_p(sm);
+      append_newline(sm);
+      dstack_pop(sm);
+    }
+
     if (dstack_check(sm, BLOCK_EXPAND)) {
       append_newline(sm);
       append_block(sm, "</div></div>");
@@ -542,26 +572,34 @@ inline := |*
   };
 
   '\0' => {
+    g_debug("inline 0");
+    g_debug("  return");
+
     fhold;
     fret;
   };
 
   newline{2,} => {
-    dstack_close(sm);
-    sm->list_mode = false;
+    g_debug("inline newline2");
+    g_debug("  return");
+
+    if (sm->list_mode) {
+      if (dstack_check(sm, BLOCK_LI)) {
+        dstack_rewind(sm);
+      }
+
+      sm->list_mode = false;
+    }
+
     fexec sm->ts;
     fret;
   };
 
   newline => {
-    if (sm->list_mode) {
-      if (dstack_check(sm, BLOCK_LI)) {
-        dstack_pop(sm);
-        append_block(sm, "</li>");
-        append_newline(sm);
-      }
-      fhold;
-      fret;
+    g_debug("inline newline");
+
+    if (sm->list_mode && (*(sm->p+1) == '*') && dstack_check(sm, BLOCK_LI)) {
+      dstack_rewind(sm);
     } else {
       append(sm, "<br>");
       append_newline(sm);
@@ -569,6 +607,7 @@ inline := |*
   };
 
   any => {
+    g_debug("inline c: %c", fc);
     append_c_html_escaped(sm, fc);
   };
 *|;
@@ -576,11 +615,7 @@ inline := |*
 code := |*
   '[/code]' => {
     if (dstack_check(sm, BLOCK_CODE)) {
-      dstack_pop(sm);
-      append_newline(sm);
-      append_block(sm, "</pre>");
-      append_newline(sm);
-      append_newline(sm);
+      dstack_rewind(sm);
     } else {
       append(sm, "[/code]");
     }
@@ -602,7 +637,7 @@ nodtext := |*
     if (dstack_check(sm, BLOCK_NODTEXT)) {
       dstack_pop(sm);
       append_newline(sm);
-      append_block(sm, "</p>");
+      append_closing_p(sm);
       append_newline(sm);
       append_newline(sm);
       fret;
@@ -718,6 +753,8 @@ table := |*
 
 list := |*
   list_item => {
+    g_debug("list start");
+
     int prev_nest = sm->list_nest;
     sm->list_mode = true;
     sm->list_nest = sm->a2 - sm->a1;
@@ -725,6 +762,8 @@ list := |*
 
     if (sm->list_nest > prev_nest) {
       for (int i=prev_nest; i<sm->list_nest; ++i) {
+        g_debug("  dstack push ul");
+        g_debug("  print <ul>");
         append_block(sm, "<ul>");
         append_newline(sm);
         dstack_push(sm, &BLOCK_UL);
@@ -732,6 +771,8 @@ list := |*
     } else if (sm->list_nest < prev_nest) {
       for (int i=sm->list_nest; i<prev_nest; ++i) {
         if (dstack_check(sm, BLOCK_UL)) {
+          g_debug("  dstack pop");
+          g_debug("  print </ul>");
           dstack_pop(sm);
           append_block(sm, "</ul>");
           append_newline(sm);
@@ -742,12 +783,16 @@ list := |*
     append_block(sm, "<li>");
     dstack_push(sm, &BLOCK_LI);
 
+    g_debug("  print <li>");
+    g_debug("  push li");
+    g_debug("  call inline");
+
     fcall inline;
   };
 
   # exit list
   (newline{2,} | '\0') => {
-    dstack_close(sm);
+    dstack_rewind(sm);
     fexec sm->ts;
     fret;
   };
@@ -755,7 +800,7 @@ list := |*
   newline;
 
   any => {
-    dstack_close(sm);
+    dstack_rewind(sm);
     fhold;
     fret;
   };
@@ -783,6 +828,13 @@ main := |*
   };
 
   ('[quote]' space*) => {
+    g_debug("block [quote]");
+    g_debug("  push quote");
+    g_debug("  push p");
+    g_debug("  print <blockquote>");
+    g_debug("  print <p>");
+    g_debug("  call inline");
+
     dstack_push(sm, &BLOCK_QUOTE);
     dstack_push(sm, &BLOCK_P);
     append_newline(sm);
@@ -793,12 +845,29 @@ main := |*
   };
 
   ('[spoiler]' space*) => {
+    g_debug("block [spoiler]");
+    g_debug("  push spoiler");
+    g_debug("  push p");
+    g_debug("  print <div>");
+    g_debug("  print <p>");
+    g_debug("  call inline");
     dstack_push(sm, &BLOCK_SPOILER);
+    dstack_push(sm, &BLOCK_P);
     append_newline(sm);
     append_newline(sm);
     append_block(sm, "<div class=\"spoiler\"><p>");
     append_newline(sm);
     fcall inline;
+  };
+
+  '[/spoiler]' => {
+    if (dstack_check(sm, BLOCK_P)) {
+      dstack_rewind(sm);
+    }
+
+    if (dstack_check(sm, BLOCK_SPOILER)) {
+      dstack_rewind(sm);
+    }
   };
 
   ('[code]' space*) => {
@@ -812,17 +881,20 @@ main := |*
 
   ('[expand]' space*) => {
     dstack_push(sm, &BLOCK_EXPAND);
+    dstack_push(sm, &BLOCK_P);
     append_newline(sm);
     append_newline(sm);
     append_block(sm, "<div class=\"expandable\"><div class=\"expandable-header\">");
     append_block(sm, "<input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div>");
     append_block(sm, "<div class=\"expandable-content\">");
+    append_block(sm, "<p>");
     append_newline(sm);
     fcall inline;
   };
 
   (aliased_expand space*) => {
     dstack_push(sm, &BLOCK_EXPAND);
+    dstack_push(sm, &BLOCK_P);
     append_newline(sm);
     append_newline(sm);
     append_block(sm, "<div class=\"expandable\"><div class=\"expandable-header\">");
@@ -859,23 +931,43 @@ main := |*
   };
 
   list_item => {
+    g_debug("inline list");
     sm->list_nest = 0;
     sm->list_mode = true;
-    dstack_close(sm);
+    if (dstack_check(sm, BLOCK_P)) {
+      g_debug("  pop dstack");
+      dstack_rewind(sm);
+    }
+    g_debug("  call list");
     fexec sm->ts;
     fcall list;
   };
 
   '\0' => {
+    g_debug("block 0");
+    g_debug("  close dstack");
     dstack_close(sm);
   };
 
-  newline;
+  newline{2,} => {
+    g_debug("block newline2");
+    if (dstack_check(sm, BLOCK_P)) {
+      g_debug("  pop p");
+      dstack_rewind(sm);
+    }
+  };
+
+  newline => {
+    g_debug("block newline");
+  };
 
   any => {
+    g_debug("block c: %c", fc);
     fhold;
 
-    if (g_queue_is_empty(sm->dstack) || dstack_check(sm, BLOCK_QUOTE)) {
+    if (g_queue_is_empty(sm->dstack) || dstack_check(sm, BLOCK_QUOTE) || dstack_check(sm, BLOCK_SPOILER)) {
+      g_debug("  push p");
+      g_debug("  print <p>");
       dstack_push(sm, &BLOCK_P);
       append_newline(sm);
       append_block(sm, "<p>");
@@ -957,6 +1049,16 @@ static inline void append_block(StateMachine * sm, const char * s) {
   }
 }
 
+static inline void append_closing_p(StateMachine * sm) {
+  size_t i = sm->output->len;
+
+  if (i > 4 && !strncmp(sm->output->str + i - 4, "<br>", 4)) {
+    sm->output = g_string_truncate(sm->output, sm->output->len - 4);
+  }
+
+  append_block(sm, "</p>");
+}
+
 static inline void dstack_push(StateMachine * sm, const int * element) {
   g_queue_push_tail(sm->dstack, (gpointer)element);
 }
@@ -969,9 +1071,22 @@ static inline int * dstack_peek(StateMachine * sm) {
   return g_queue_peek_tail(sm->dstack);
 }
 
+static inline bool dstack_search(StateMachine * sm, const int * element) {
+  return g_queue_find(sm->dstack, (gconstpointer)element);
+}
+
 static inline bool dstack_check(StateMachine * sm, int expected_element) {
   int * top = dstack_peek(sm);
   return top && *top == expected_element;
+}
+
+static inline bool dstack_check2(StateMachine * sm, int expected_element) {
+  if (sm->dstack->length < 2) {
+    return false;
+  }
+
+  int * top2 = g_queue_peek_nth(sm->dstack, sm->dstack->length - 2);
+  return top2 && *top2 == expected_element;
 }
 
 static void dstack_print_element(gpointer data, gpointer user_data) {
@@ -982,99 +1097,107 @@ static void dstack_dump(StateMachine * sm) {
   g_queue_foreach(sm->dstack, dstack_print_element, NULL);
 }
 
+static void dstack_rewind(StateMachine * sm) {
+  int * element = dstack_pop(sm);
+
+  if (element == NULL) {
+    return;
+  }
+
+  switch (*element) {
+  case BLOCK_P:
+    append_closing_p(sm);
+    append_newline(sm);
+    break;
+
+  case INLINE_SPOILER:
+    append(sm, "</span>");
+    break;
+
+  case BLOCK_SPOILER:
+    append_block(sm, "</div>");
+    break;
+
+  case BLOCK_QUOTE:
+    append_block(sm, "</blockquote>");
+    break;
+
+  case BLOCK_EXPAND:
+    append_block(sm, "</div></div>");
+    break;
+
+  case BLOCK_NODTEXT:
+    append_closing_p(sm);
+    append_newline(sm);
+    break;
+
+  case BLOCK_CODE:
+    append_block(sm, "</pre>");
+    break;
+
+  case BLOCK_TD:
+    append_block(sm, "</td>");
+    break;
+
+  case INLINE_NODTEXT:
+    break;
+
+  case INLINE_B:
+    append(sm, "</strong>");
+    break;
+
+  case INLINE_I:
+    append(sm, "</em>");
+    break;
+
+  case INLINE_U:
+    append(sm, "</u>");
+    break;
+
+  case INLINE_S:
+    append(sm, "</s>");
+    break;
+
+  case INLINE_TN:
+    append(sm, "</span>");
+    break;
+
+  case BLOCK_TN:
+    append_closing_p(sm);
+    append_newline(sm);
+    break;
+
+  case BLOCK_TABLE:
+    append_block(sm, "</table>");
+    break;
+
+  case BLOCK_THEAD:
+    append_block(sm, "</thead>");
+    break;
+
+  case BLOCK_TBODY:
+    append_block(sm, "</tbody>");
+    break;
+
+  case BLOCK_TR:
+    append_block(sm, "</tr>");
+    break;
+
+  case BLOCK_UL:
+    append_block(sm, "</ul>");
+    append_newline(sm);
+    break;
+
+  case BLOCK_LI:
+    append_block(sm, "</li>");
+    append_newline(sm);
+    break;
+}
+}
+
 static void dstack_close(StateMachine * sm) {
   while (dstack_peek(sm) != NULL) {
-    int * top = dstack_pop(sm);
-
-    switch (*top) {
-      case BLOCK_P:
-        append_block(sm, "</p>");
-        append_newline(sm);
-        break;
-
-      case INLINE_SPOILER:
-        append(sm, "</span>");
-        break;
-
-      case BLOCK_SPOILER:
-        append_block(sm, "</p></div>");
-        break;
-
-      case BLOCK_QUOTE:
-        append_block(sm, "</blockquote>");
-        break;
-
-      case BLOCK_EXPAND:
-        append_block(sm, "</div></div>");
-        break;
-
-      case BLOCK_NODTEXT:
-        append_block(sm, "</p>");
-        append_newline(sm);
-        break;
-
-      case BLOCK_CODE:
-        append_block(sm, "</pre>");
-        break;
-
-      case BLOCK_TD:
-        append_block(sm, "</td>");
-        break;
-
-      case INLINE_NODTEXT:
-        break;
-
-      case INLINE_B:
-        append(sm, "</strong>");
-        break;
-
-      case INLINE_I:
-        append(sm, "</em>");
-        break;
-
-      case INLINE_U:
-        append(sm, "</u>");
-        break;
-
-      case INLINE_S:
-        append(sm, "</s>");
-        break;
-
-      case INLINE_TN:
-        append(sm, "</span>");
-        break;
-
-      case BLOCK_TN:
-        append_block(sm, "</p>");
-        append_newline(sm);
-        break;
-
-      case BLOCK_TABLE:
-        append_block(sm, "</table>");
-        break;
-
-      case BLOCK_THEAD:
-        append_block(sm, "</thead>");
-        break;
-
-      case BLOCK_TBODY:
-        append_block(sm, "</tbody>");
-        break;
-
-      case BLOCK_TR:
-        append_block(sm, "</tr>");
-        break;
-
-      case BLOCK_UL:
-        append_block(sm, "</ul>");
-        append_newline(sm);
-        break;
-
-      case BLOCK_LI:
-        append_block(sm, "</li>");
-        append_newline(sm);
-        break;
-    }
+    dstack_rewind(sm);
   }
 }
 
@@ -1129,6 +1252,8 @@ static void free_machine(StateMachine * sm) {
 }
 
 static VALUE parse(VALUE self, VALUE input) {
+  g_debug("start\n");
+  
   StateMachine * sm = (StateMachine *)g_malloc0(sizeof(StateMachine));
   input = rb_str_cat(input, "\0", 1);
   init_machine(sm, input);

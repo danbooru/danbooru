@@ -46,7 +46,7 @@ class DTextTest < Minitest::Test
   end
 
   def test_spoilers_with_no_closing_tag_1
-    assert_parse("<div class=\"spoiler\"><p>this is a spoiler with no closing tag</p></div><p>new text</p>", "[spoiler]this is a spoiler with no closing tag\n\nnew text")
+    assert_parse("<div class=\"spoiler\"><p>this is a spoiler with no closing tag</p><p>new text</p></div>", "[spoiler]this is a spoiler with no closing tag\n\nnew text")
   end
 
   def test_spoilers_with_no_closing_tag_2
@@ -83,6 +83,15 @@ class DTextTest < Minitest::Test
 
   def test_quote_blocks_nested
     assert_parse("<blockquote><p>a</p><blockquote><p>b</p></blockquote><p>c</p></blockquote>", "[quote]\na\n[quote]\nb\n[/quote]\nc\n[/quote]")
+  end
+
+  def test_quote_blocks_nested_spoiler
+    assert_parse("<blockquote><p>a<br><span class=\"spoiler\">blah</span><br>c</p></blockquote>", "[quote]\na\n[spoiler]blah[/spoiler]\nc[/quote]")
+    assert_parse("<blockquote><p>a</p><div class=\"spoiler\"><p>blah</p></div><p>c</p></blockquote>", "[quote]\na\n\n[spoiler]blah[/spoiler]\n\nc[/quote]")
+  end
+
+  def test_quote_blocks_nested_expand
+    assert_parse("<blockquote><p>a</p><div class=\"expandable\"><div class=\"expandable-header\"><input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div><div class=\"expandable-content\"><p>b</p></div></div><p>c</p></blockquote>", "[quote]\na\n[expand]\nb\n[/expand]\nc\n[/quote]")
   end
 
   def test_code
@@ -148,11 +157,12 @@ class DTextTest < Minitest::Test
   end
 
   def test_lists_not_preceded_by_newline
-    assert_parse('<p>ab</p><ul><li>c</li><li>d</li></ul>', "a\nb\n* c\n* d")
+    assert_parse('<p>a<br>b</p><ul><li>c</li><li>d</li></ul>', "a\nb\n* c\n* d")
   end
 
   def test_lists_with_multiline_items
-    assert_parse('<p>a</p><ul><li>bc</li><li>de</li></ul>', "a\n* b\nc\n* d\ne")
+    assert_parse('<p>a</p><ul><li>b<br>c</li><li>d<br>e</li></ul><p>another one</p>', "a\n* b\nc\n* d\ne\n\nanother one")
+    assert_parse('<p>a</p><ul><li>b<br>c</li><ul><li>d<br>e</li></ul></ul><p>another one</p>', "a\n* b\nc\n** d\ne\n\nanother one")
   end
 
   def test_inline_tags

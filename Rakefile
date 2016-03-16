@@ -1,6 +1,8 @@
 require "rake/extensiontask"
 require "rubygems/package_task"
 
+#ENV["G_MESSAGES_DEBUG"] = "all"
+
 Rake::ExtensionTask.new "dtext" do |ext|
 	ext.lib_dir = "lib/dtext"
 end
@@ -28,8 +30,12 @@ task test_inline: %w(ragel compile) do
 	ruby '-Ilib', '-rdtext', '-e', 'puts DTextRagel.parse("[b]mismatched [u]tags[/b] blah[/u]")'
 end
 
+task test_file: %w(ragel compile) do
+	ruby "-Ilib", '-rdtext', "-e", "puts DTextRagel.parse(File.read('test/wiki.txt'))"
+end
+
 task test: %w(ragel compile) do
-	ruby "-Ilib", '-rdtext', "test/dtext_test.rb"
+	ruby "-Ilib", '-rdtext', "test/dtext_test.rb" #, '--name=test_urls_with_newline'
 end
 
 task default: :test
