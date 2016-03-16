@@ -26,11 +26,15 @@ task :ragel do
 	sh "ragel -G2 -C ext/dtext/dtext.rl -o ext/dtext/dtext.c"
 end
 
-task test_inline: %w(ragel compile) do
+task test_inline_ragel: %w(ragel compile) do
 	ruby '-Ilib', '-rdtext', '-e', 'puts DTextRagel.parse("[b]mismatched [u]tags[/b] blah[/u]")'
 end
 
-task test_file: %w(ragel compile) do
+task test_file_ruby: %w(ragel compile) do
+	ruby '-Ilib', '-rdtext_ruby', '-e', "puts DTextRuby.parse(File.read('test/wiki.txt'))"
+end
+
+task test_file_ragel: %w(ragel compile) do
 	ruby "-Ilib", '-rdtext', "-e", "puts DTextRagel.parse(File.read('test/wiki.txt'))"
 end
 

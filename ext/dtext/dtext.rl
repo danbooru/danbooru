@@ -1029,7 +1029,7 @@ static inline void append_segment(StateMachine * sm, const char * a, const char 
 
 static inline void append_segment_uri_escaped(StateMachine * sm, const char * a, const char * b) {
   GString * segment_string = g_string_new_len(a, b - a + 1);
-  char * segment = g_uri_escape_string(segment_string->str, G_URI_RESERVED_CHARS_ALLOWED_IN_PATH "#", TRUE);
+  char * segment = g_uri_escape_string(segment_string->str, G_URI_RESERVED_CHARS_ALLOWED_IN_PATH "#%?", TRUE);
   sm->output = g_string_append(sm->output, segment);
   g_string_free(segment_string, TRUE);
   g_free(segment);
