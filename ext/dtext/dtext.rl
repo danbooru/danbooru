@@ -1251,12 +1251,30 @@ static void free_machine(StateMachine * sm) {
   g_free(sm);
 }
 
-static VALUE parse(VALUE self, VALUE input) {
+static VALUE parse(int argc, VALUE * argv, VALUE self) {
   g_debug("start\n");
+
+  if (argc == 0) {
+    rb_raise(rb_eArgError, "wrong number of arguments (0 for 1)");
+  }
+
+  VALUE input = argv[0];
   
   StateMachine * sm = (StateMachine *)g_malloc0(sizeof(StateMachine));
   input = rb_str_cat(input, "\0", 1);
   init_machine(sm, input);
+
+  if (argc > 1) {
+    VALUE options = argv[1];
+
+    if (!NIL_P(options)) {
+      VALUE opt_inline = rb_hash_aref(options, ID2SYM(rb_intern("inline")));
+
+      if (RTEST(opt_inline)) {
+        sm->f_inline = true;
+      }
+    }
+  }
 
   %% write init;
   %% write exec;
@@ -1264,6 +1282,7 @@ static VALUE parse(VALUE self, VALUE input) {
   dstack_close(sm);
 
   VALUE ret = rb_str_new(sm->output->str, sm->output->len);
+
   free_machine(sm);
 
   return ret;
@@ -1271,5 +1290,5 @@ static VALUE parse(VALUE self, VALUE input) {
 
 void Init_dtext() {
   VALUE mDTextRagel = rb_define_module("DTextRagel");
-  rb_define_singleton_method(mDTextRagel, "parse", parse, 1);
+  rb_define_singleton_method(mDTextRagel, "parse", parse, -1);
 }

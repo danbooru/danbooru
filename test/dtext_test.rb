@@ -204,4 +204,8 @@ class DTextTest < Minitest::Test
   def test_boundary_exploit
     assert_parse('<p><a rel="nofollow" href="/users?name=mack">@mack</a>&lt;</p>', "@mack<")
   end
+
+  def test_inline_mode
+    assert_equal("hello", DTextRagel.parse("hello", :inline => true).strip)
+  end
 end
