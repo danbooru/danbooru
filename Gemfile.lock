@@ -5,6 +5,15 @@ GIT
     diff-lcs (1.3)
 
 GIT
+  remote: https://github.com/r888888888/dtext_rb.git
+  revision: 22ff0d482b2319b5ed2ca2454319e6fce06e3209
+  specs:
+    dtext_rb (1.0.0)
+      jeweler (~> 2.0)
+      minitest (~> 5.8)
+      rake-compiler (~> 0.9)
+
+GIT
   remote: https://github.com/r888888888/ruby-imagespec.git
   revision: 2dab9811f4abb4fbaeea66feb42e388ba545b2d8
   branch: exif-fixes
@@ -105,6 +114,8 @@ GEM
     delayed_job_active_record (4.0.3)
       activerecord (>= 3.0, < 5.0)
       delayed_job (>= 3.0, < 4.1)
+    descendants_tracker (0.0.4)
+      thread_safe (~> 0.3, >= 0.3.1)
     docile (1.1.5)
     domain_name (0.5.24)
       unf (>= 0.0.5, < 1.0.0)
@@ -118,8 +129,18 @@ GEM
     ffaker (2.1.0)
     ffi (1.9.10-x64-mingw32)
     gctools (0.2.3)
+    git (1.3.0)
+    github_api (0.13.0)
+      addressable (~> 2.3)
+      descendants_tracker (~> 0.0.4)
+      faraday (~> 0.8, < 0.10)
+      hashie (>= 3.4)
+      multi_json (>= 1.7.5, < 2.0)
+      nokogiri (~> 1.6.6)
+      oauth2
     globalid (0.3.6)
       activesupport (>= 4.1.0)
+    hashie (3.4.3)
     highline (1.7.3)
     hike (1.2.3)
     http (0.6.4)
@@ -128,9 +149,19 @@ GEM
       domain_name (~> 0.5)
     http_parser.rb (0.6.0)
     i18n (0.7.0)
+    jeweler (2.0.1)
+      builder
+      bundler (>= 1.0)
+      git (>= 1.2.5)
+      github_api
+      highline (>= 1.6.15)
+      nokogiri (>= 1.5.10)
+      rake
+      rdoc
     jmespath (1.0.2)
       multi_json (~> 1.0)
     json (1.8.3)
+    jwt (1.5.1)
     kgio (2.9.3)
     libv8 (3.16.14.11)
     loofah (2.0.3)
@@ -157,6 +188,7 @@ GEM
     mocha (1.1.0)
       metaclass (~> 0.0.1)
     multi_json (1.11.2)
+    multi_xml (0.5.5)
     multipart-post (2.0.0)
     naught (1.0.0)
     net-http-digest_auth (1.4)
@@ -175,6 +207,12 @@ GEM
     nokogumbo (1.2.0)
       nokogiri
     ntlm-http (0.1.1)
+    oauth2 (1.1.0)
+      faraday (>= 0.8, < 0.10)
+      jwt (~> 1.0, < 1.5.2)
+      multi_json (~> 1.3)
+      multi_xml (~> 0.5)
+      rack (>= 1.2, < 3)
     pg (0.18.2)
     pg (0.18.2-x64-mingw32)
     protected_attributes (1.1.3)
@@ -218,6 +256,10 @@ GEM
       thor (>= 0.18.1, < 2.0)
     raindrops (0.15.0)
     rake (10.5.0)
+    rake-compiler (0.9.7)
+      rake
+    rdoc (4.2.2)
+      json (~> 1.4)
     ref (2.0.0)
     responders (2.1.0)
       railties (>= 4.2.0, < 5)
@@ -343,6 +385,7 @@ DEPENDENCIES
   delayed_job
   delayed_job_active_record
   diff-lcs!
+  dtext_rb!
   factory_girl
   ffaker
   gctools
