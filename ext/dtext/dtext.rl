@@ -9,7 +9,7 @@
 #include <glib.h>
 
 typedef struct StateMachine {
-  int top;
+  size_t top;
   int cs;
   int act;
   const char * p;
@@ -32,7 +32,8 @@ typedef struct StateMachine {
   int b;
 } StateMachine;
 
-static const int MAX_STACK_DEPTH = 512;
+static const size_t MAX_STACK_DEPTH = 512;
+
 static const int BLOCK_P = 1;
 static const int INLINE_SPOILER = 2;
 static const int BLOCK_SPOILER = 3;
@@ -244,8 +245,8 @@ inline := |*
 
   basic_wiki_link => {
     GString * segment = g_string_new_len(sm->a1, sm->a2 - sm->a1);
-    underscore_string(segment->str, segment->len);
     GString * lowercase_segment = NULL;
+    underscore_string(segment->str, segment->len);
 
     if (g_utf8_validate(segment->str, -1, NULL)) {
       lowercase_segment = g_string_new(g_utf8_strdown(segment->str, -1));
@@ -265,8 +266,8 @@ inline := |*
 
   aliased_wiki_link => {
     GString * segment = g_string_new_len(sm->a1, sm->a2 - sm->a1);
-    underscore_string(segment->str, segment->len);
     GString * lowercase_segment = NULL;
+    underscore_string(segment->str, segment->len);
 
     if (g_utf8_validate(segment->str, -1, NULL)) {
       lowercase_segment = g_string_new(g_utf8_strdown(segment->str, -1));
@@ -753,9 +754,9 @@ table := |*
 
 list := |*
   list_item => {
+    int prev_nest = sm->list_nest;
     g_debug("list start");
 
-    int prev_nest = sm->list_nest;
     sm->list_mode = true;
     sm->list_nest = sm->a2 - sm->a1;
     fexec sm->b1;
@@ -1083,20 +1084,14 @@ static inline bool dstack_check(StateMachine * sm, int expected_element) {
 }
 
 static inline bool dstack_check2(StateMachine * sm, int expected_element) {
+  int * top2 = NULL;
+
   if (sm->dstack->length < 2) {
     return false;
   }
 
-  int * top2 = g_queue_peek_nth(sm->dstack, sm->dstack->length - 2);
+  top2 = g_queue_peek_nth(sm->dstack, sm->dstack->length - 2);
   return top2 && *top2 == expected_element;
-}
-
-static void dstack_print_element(gpointer data, gpointer user_data) {
-  printf("%i\n", *(int *)data);
-}
-
-static void dstack_dump(StateMachine * sm) {
-  g_queue_foreach(sm->dstack, dstack_print_element, NULL);
 }
 
 static void dstack_rewind(StateMachine * sm) {
@@ -1106,95 +1101,73 @@ static void dstack_rewind(StateMachine * sm) {
     return;
   }
 
-  switch (*element) {
-  case BLOCK_P:
+  if (*element == BLOCK_P) {
     append_closing_p(sm);
     append_newline(sm);
-    break;
 
-  case INLINE_SPOILER:
+  } else if (*element == INLINE_SPOILER) {
     append(sm, "</span>");
-    break;
 
-  case BLOCK_SPOILER:
+  } else if (*element == BLOCK_SPOILER) {
     append_block(sm, "</div>");
-    break;
 
-  case BLOCK_QUOTE:
+  } else if (*element == BLOCK_QUOTE) {
     append_block(sm, "</blockquote>");
-    break;
 
-  case BLOCK_EXPAND:
+  } else if (*element == BLOCK_EXPAND) {
     append_block(sm, "</div></div>");
-    break;
 
-  case BLOCK_NODTEXT:
+  } else if (*element == BLOCK_NODTEXT) {
     append_closing_p(sm);
     append_newline(sm);
-    break;
 
-  case BLOCK_CODE:
+  } else if (*element == BLOCK_CODE) {
     append_block(sm, "</pre>");
-    break;
 
-  case BLOCK_TD:
+  } else if (*element == BLOCK_TD) {
     append_block(sm, "</td>");
-    break;
 
-  case INLINE_NODTEXT:
-    break;
+  } else if (*element == INLINE_NODTEXT) {
 
-  case INLINE_B:
+  } else if (*element == INLINE_B) {
     append(sm, "</strong>");
-    break;
 
-  case INLINE_I:
+  } else if (*element == INLINE_I) {
     append(sm, "</em>");
-    break;
 
-  case INLINE_U:
+  } else if (*element == INLINE_U) {
     append(sm, "</u>");
-    break;
 
-  case INLINE_S:
+  } else if (*element == INLINE_S) {
     append(sm, "</s>");
-    break;
 
-  case INLINE_TN:
+  } else if (*element == INLINE_TN) {
     append(sm, "</span>");
-    break;
 
-  case BLOCK_TN:
+  } else if (*element == BLOCK_TN) {
     append_closing_p(sm);
     append_newline(sm);
-    break;
 
-  case BLOCK_TABLE:
+  } else if (*element == BLOCK_TABLE) {
     append_block(sm, "</table>");
-    break;
 
-  case BLOCK_THEAD:
+  } else if (*element == BLOCK_THEAD) {
     append_block(sm, "</thead>");
-    break;
 
-  case BLOCK_TBODY:
+  } else if (*element == BLOCK_TBODY) {
     append_block(sm, "</tbody>");
-    break;
 
-  case BLOCK_TR:
+  } else if (*element == BLOCK_TR) {
     append_block(sm, "</tr>");
-    break;
 
-  case BLOCK_UL:
+  } else if (*element == BLOCK_UL) {
     append_block(sm, "</ul>");
     append_newline(sm);
-    break;
 
-  case BLOCK_LI:
+  } else if (*element == BLOCK_LI) {
     append_block(sm, "</li>");
     append_newline(sm);
-    break;
-}
+  }
 }
 
 static void dstack_close(StateMachine * sm) {
@@ -1222,6 +1195,7 @@ static inline bool is_boundary_c(char c) {
 }
 
 static void init_machine(StateMachine * sm, VALUE input) {
+  size_t output_length = 0;
   sm->p = RSTRING_PTR(input);
   sm->pe = sm->p + RSTRING_LEN(input);
   sm->eof = sm->pe;
@@ -1230,7 +1204,7 @@ static void init_machine(StateMachine * sm, VALUE input) {
   sm->cs = 0;
   sm->act = 0;
   sm->top = 0;
-  size_t output_length = RSTRING_LEN(input);
+  output_length = RSTRING_LEN(input);
   if (output_length < (INT16_MAX / 2)) {
     output_length *= 2;
   }
@@ -1254,23 +1228,29 @@ static void free_machine(StateMachine * sm) {
 }
 
 static VALUE parse(int argc, VALUE * argv, VALUE self) {
+  VALUE input;
+  VALUE options;
+  VALUE opt_inline;
+  VALUE ret;
+  StateMachine * sm = NULL;
+
   g_debug("start\n");
 
   if (argc == 0) {
     rb_raise(rb_eArgError, "wrong number of arguments (0 for 1)");
   }
 
-  VALUE input = argv[0];
+  input = argv[0];
   
-  StateMachine * sm = (StateMachine *)g_malloc0(sizeof(StateMachine));
+  sm = (StateMachine *)g_malloc0(sizeof(StateMachine));
   input = rb_str_cat(input, "\0", 1);
   init_machine(sm, input);
 
   if (argc > 1) {
-    VALUE options = argv[1];
+    options = argv[1];
 
     if (!NIL_P(options)) {
-      VALUE opt_inline = rb_hash_aref(options, ID2SYM(rb_intern("inline")));
+      opt_inline = rb_hash_aref(options, ID2SYM(rb_intern("inline")));
 
       if (RTEST(opt_inline)) {
         sm->f_inline = true;
@@ -1283,7 +1263,7 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
 
   dstack_close(sm);
 
-  VALUE ret = rb_str_new(sm->output->str, sm->output->len);
+  ret = rb_str_new(sm->output->str, sm->output->len);
 
   free_machine(sm);
 
