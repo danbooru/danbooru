@@ -761,7 +761,8 @@ list := |*
     fexec sm->b1;
 
     if (sm->list_nest > prev_nest) {
-      for (int i=prev_nest; i<sm->list_nest; ++i) {
+      int i=0;
+      for (i=prev_nest; i<sm->list_nest; ++i) {
         g_debug("  dstack push ul");
         g_debug("  print <ul>");
         append_block(sm, "<ul>");
@@ -769,7 +770,8 @@ list := |*
         dstack_push(sm, &BLOCK_UL);
       }
     } else if (sm->list_nest < prev_nest) {
-      for (int i=sm->list_nest; i<prev_nest; ++i) {
+      int i=0;
+      for (i=sm->list_nest; i<prev_nest; ++i) {
         if (dstack_check(sm, BLOCK_UL)) {
           g_debug("  dstack pop");
           g_debug("  print </ul>");

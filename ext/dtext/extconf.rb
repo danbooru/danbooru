@@ -1,5 +1,7 @@
 require "mkmf"
 
+$CFLAGS << " -std=c99"
+
 pkg_config "glib-2.0"
 
 have_library "glib-2.0"
