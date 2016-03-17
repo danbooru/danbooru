@@ -1,5 +1,27 @@
 require "rake/extensiontask"
 require "rubygems/package_task"
+require "bundler"
+require "jeweler"
+
+begin
+  Bundler.setup(:default, :development)
+rescue Bundler::BundlerError => e
+  $stderr.puts e.message
+  $stderr.puts "Run `bundle install` to install missing gems"
+  exit e.status_code
+end
+
+Jeweler::Tasks.new do |gem|
+  # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
+  gem.name = "dtext_rb"
+  gem.homepage = "http://github.com/r888888888/dtext_rb"
+  gem.license = "MIT"
+  gem.summary = %Q{Compiled DText parser}
+  gem.description = %Q{Compield DText parser}
+  gem.email = "r888888888@gmail.com"
+  gem.authors = ["r888888888"]
+end
+Jeweler::RubygemsDotOrgTasks.new
 
 #ENV["G_MESSAGES_DEBUG"] = "all"
 
