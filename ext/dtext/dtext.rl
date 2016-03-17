@@ -23,6 +23,7 @@ typedef struct StateMachine {
   const char * b1;
   const char * b2;
   bool f_inline;
+  bool f_strip;
   bool list_mode;
   GString * output;
   GArray * stack;
@@ -140,107 +141,118 @@ list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
 
 inline := |*
   post_id => {
-    append(sm, "<a href=\"/posts/");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "\">post #");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "</a>");
+    append(sm, true, "<a href=\"/posts/");
+    append_segment(sm, true, sm->a1, sm->a2 - 1);
+    append(sm, true, "\">");
+    append(sm, false, "post #");
+    append_segment(sm, false, sm->a1, sm->a2 - 1);
+    append(sm, true, "</a>");
   };
 
   forum_post_id => {
-    append(sm, "<a href=\"/forum_posts/");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "\">forum #");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "</a>");
+    append(sm, true, "<a href=\"/forum_posts/");
+    append_segment(sm, true, sm->a1, sm->a2 - 1);
+    append(sm, true, "\">");
+    append(sm, false, "forum #");
+    append_segment(sm, false, sm->a1, sm->a2 - 1);
+    append(sm, true, "</a>");
   };
 
   forum_topic_id => {
-    append(sm, "<a href=\"/forum_topics/");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "\">topic #");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "</a>");
+    append(sm, true, "<a href=\"/forum_topics/");
+    append_segment(sm, true, sm->a1, sm->a2 - 1);
+    append(sm, true, "\">");
+    append(sm, false, "topic #");
+    append_segment(sm, false, sm->a1, sm->a2 - 1);
+    append(sm, true, "</a>");
   };
 
   forum_topic_paged_id => {
-    append(sm, "<a href=\"/forum_topics/");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "?page=");
-    append_segment(sm, sm->b1, sm->b2 - 1);
-    append(sm, "\">topic #");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "/p");
-    append_segment(sm, sm->b1, sm->b2 - 1);
-    append(sm, "</a>");
+    append(sm, true, "<a href=\"/forum_topics/");
+    append_segment(sm, true, sm->a1, sm->a2 - 1);
+    append(sm, true, "?page=");
+    append_segment(sm, true, sm->b1, sm->b2 - 1);
+    append(sm, true, "\">");
+    append(sm, false, "topic #");
+    append_segment(sm, false, sm->a1, sm->a2 - 1);
+    append(sm, false, "/p");
+    append_segment(sm, false, sm->b1, sm->b2 - 1);
+    append(sm, true, "</a>");
   };
 
   comment_id => {
-    append(sm, "<a href=\"/comments/");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "\">comment #");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "</a>");
+    append(sm, true, "<a href=\"/comments/");
+    append_segment(sm, true, sm->a1, sm->a2 - 1);
+    append(sm, true, "\">");
+    append(sm, false, "comment #");
+    append_segment(sm, false, sm->a1, sm->a2 - 1);
+    append(sm, true, "</a>");
   };
 
   pool_id => {
-    append(sm, "<a href=\"/pools/");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "\">pool #");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "</a>");
+    append(sm, true, "<a href=\"/pools/");
+    append_segment(sm, true, sm->a1, sm->a2 - 1);
+    append(sm, true, "\">");
+    append(sm, false, "pool #");
+    append_segment(sm, false, sm->a1, sm->a2 - 1);
+    append(sm, true, "</a>");
   };
 
   user_id => {
-    append(sm, "<a href=\"/users/");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "\">user #");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "</a>");
+    append(sm, true, "<a href=\"/users/");
+    append_segment(sm, true, sm->a1, sm->a2 - 1);
+    append(sm, true, "\">");
+    append(sm, false, "user #");
+    append_segment(sm, false, sm->a1, sm->a2 - 1);
+    append(sm, true, "</a>");
   };
 
   artist_id => {
-    append(sm, "<a href=\"/artists/");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "\">artist #");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "</a>");
+    append(sm, true, "<a href=\"/artists/");
+    append_segment(sm, true, sm->a1, sm->a2 - 1);
+    append(sm, true, "\">");
+    append(sm, false, "artist #");
+    append_segment(sm, false, sm->a1, sm->a2 - 1);
+    append(sm, true, "</a>");
   };
 
   github_issue_id => {
-    append(sm, "<a href=\"https://github.com/r888888888/danbooru/issues/");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "\">issue #");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "</a>");
+    append(sm, true, "<a href=\"https://github.com/r888888888/danbooru/issues/");
+    append_segment(sm, true, sm->a1, sm->a2 - 1);
+    append(sm, true, "\">");
+    append(sm, false, "issue #");
+    append_segment(sm, false, sm->a1, sm->a2 - 1);
+    append(sm, true, "</a>");
   };
 
   pixiv_id => {
-    append(sm, "<a href=\"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "\">pixiv #");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "</a>");
+    append(sm, true, "<a href=\"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=");
+    append_segment(sm, true, sm->a1, sm->a2 - 1);
+    append(sm, true, "\">");
+    append(sm, false, "pixiv #");
+    append_segment(sm, false, sm->a1, sm->a2 - 1);
+    append(sm, true, "</a>");
   };
 
   pixiv_paged_id => {
-    append(sm, "<a href=\"http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "&page=");
-    append_segment(sm, sm->b1, sm->b2 - 1);
-    append(sm, "\">pixiv #");
-    append_segment(sm, sm->a1, sm->a2 - 1);
-    append(sm, "/p");
-    append_segment(sm, sm->b1, sm->b2 - 1);
-    append(sm, "</a>");
+    append(sm, true, "<a href=\"http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=");
+    append_segment(sm, true, sm->a1, sm->a2 - 1);
+    append(sm, true, "&page=");
+    append_segment(sm, true, sm->b1, sm->b2 - 1);
+    append(sm, true, "\">");
+    append(sm, false, "pixiv #");
+    append_segment(sm, false, sm->a1, sm->a2 - 1);
+    append(sm, false, "/p");
+    append_segment(sm, false, sm->b1, sm->b2 - 1);
+    append(sm, true, "</a>");
   };
 
   post_link => {
-    append(sm, "<a rel=\"nofollow\" href=\"/posts?tags=");
+    append(sm, true, "<a rel=\"nofollow\" href=\"/posts?tags=");
     append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
-    append(sm, "\">");
+    append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
-    append(sm, "</a>");
+    append(sm, true, "</a>");
   };
 
   basic_wiki_link => {
@@ -254,11 +266,11 @@ inline := |*
       lowercase_segment = g_string_new(g_ascii_strdown(segment->str, -1));
     }
 
-    append(sm, "<a href=\"/wiki_pages/show_or_new?title=");
+    append(sm, true, "<a href=\"/wiki_pages/show_or_new?title=");
     append_segment_uri_escaped(sm, lowercase_segment->str, lowercase_segment->str + lowercase_segment->len - 1);
-    append(sm, "\">");
+    append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
-    append(sm, "</a>");
+    append(sm, true, "</a>");
 
     g_string_free(lowercase_segment, TRUE);
     g_string_free(segment, TRUE);
@@ -275,11 +287,11 @@ inline := |*
       lowercase_segment = g_string_new(g_ascii_strdown(segment->str, -1));
     }
 
-    append(sm, "<a href=\"/wiki_pages/show_or_new?title=");
+    append(sm, true, "<a href=\"/wiki_pages/show_or_new?title=");
     append_segment_uri_escaped(sm, lowercase_segment->str, lowercase_segment->str + lowercase_segment->len - 1);
-    append(sm, "\">");
+    append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - 1);
-    append(sm, "</a>");
+    append(sm, true, "</a>");
 
     g_string_free(lowercase_segment, TRUE);
     g_string_free(segment, TRUE);
@@ -294,11 +306,11 @@ inline := |*
       sm->b = false;
     }
 
-    append(sm, "<a href=\"");
+    append(sm, true, "<a href=\"");
     append_segment_uri_escaped(sm, sm->b1, sm->b2 - sm->d);
-    append(sm, "\">");
+    append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
-    append(sm, "</a>");
+    append(sm, true, "</a>");
 
     if (sm->b) {
       append_c_html_escaped(sm, fc);
@@ -306,11 +318,11 @@ inline := |*
   };
 
   bracketed_textile_link => {
-    append(sm, "<a href=\"");
+    append(sm, true, "<a href=\"");
     append_segment_uri_escaped(sm, sm->b1, sm->b2 - 1);
-    append(sm, "\">");
+    append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
-    append(sm, "</a>");
+    append(sm, true, "</a>");
   };
 
   url => {
@@ -322,11 +334,11 @@ inline := |*
       sm->d = 1;
     }
 
-    append(sm, "<a href=\"");
+    append(sm, true, "<a href=\"");
     append_segment_uri_escaped(sm, sm->ts, sm->te - sm->d);
-    append(sm, "\">");
+    append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->ts, sm->te - sm->d);
-    append(sm, "</a>");
+    append(sm, true, "</a>");
 
     if (sm->b) {
       append_c_html_escaped(sm, fc);
@@ -335,7 +347,7 @@ inline := |*
 
   # probably a tag. examples include @.@ and @_@
   '@' graph '@' => {
-    append_segment(sm, sm->ts, sm->te - 1);
+    append_segment_html_escaped(sm, sm->ts, sm->te - 1);
   };
 
   mention => {
@@ -347,11 +359,12 @@ inline := |*
       sm->d = 1;
     }
 
-    append(sm, "<a rel=\"nofollow\" href=\"/users?name=");
+    append(sm, true, "<a rel=\"nofollow\" href=\"/users?name=");
     append_segment_uri_escaped(sm, sm->a1, sm->a2 - sm->d);
-    append(sm, "\">@");
+    append(sm, true, "\">");
+    append_c(sm, '@');
     append_segment_html_escaped(sm, sm->a1, sm->a2 - sm->d);
-    append(sm, "</a>");
+    append(sm, true, "</a>");
 
     if (sm->b) {
       append_c_html_escaped(sm, fc);
@@ -373,63 +386,63 @@ inline := |*
 
   '[b]' => {
     dstack_push(sm, &INLINE_B);
-    append(sm, "<strong>");
+    append(sm, true, "<strong>");
   };
 
   '[/b]' => {
     if (dstack_check(sm, INLINE_B)) {
       dstack_pop(sm);
-      append(sm, "</strong>");
+      append(sm, true, "</strong>");
     } else {
-      append(sm, "[/b]");
+      append(sm, true, "[/b]");
     }
   };
 
   '[i]' => {
     dstack_push(sm, &INLINE_I);
-    append(sm, "<em>");
+    append(sm, true, "<em>");
   };
 
   '[/i]' => {
     if (dstack_check(sm, INLINE_I)) {
       dstack_pop(sm);
-      append(sm, "</em>");
+      append(sm, true, "</em>");
     } else {
-      append(sm, "[/i]");
+      append(sm, true, "[/i]");
     }
   };
 
   '[s]' => {
     dstack_push(sm, &INLINE_S);
-    append(sm, "<s>");
+    append(sm, true, "<s>");
   };
 
   '[/s]' => {
     if (dstack_check(sm, INLINE_S)) {
       dstack_pop(sm);
-      append(sm, "</s>");
+      append(sm, true, "</s>");
     } else {
-      append(sm, "[/s]");
+      append(sm, true, "[/s]");
     }
   };
 
   '[u]' => {
     dstack_push(sm, &INLINE_U);
-    append(sm, "<u>");
+    append(sm, true, "<u>");
   };
 
   '[/u]' => {
     if (dstack_check(sm, INLINE_U)) {
       dstack_pop(sm);
-      append(sm, "</u>");
+      append(sm, true, "</u>");
     } else {
-      append(sm, "[/u]");
+      append(sm, true, "[/u]");
     }
   };
 
   '[tn]' => {
     dstack_push(sm, &INLINE_TN);
-    append(sm, "<span class=\"tn\">");
+    append(sm, true, "<span class=\"tn\">");
   };
 
   '[/tn]' => {
@@ -440,9 +453,9 @@ inline := |*
       fret;
     } else if (dstack_check(sm, INLINE_TN)) {
       dstack_pop(sm);
-      append(sm, "</span>");
+      append(sm, true, "</span>");
     } else {
-      append(sm, "[/tn]");
+      append_block(sm, "[/tn]");
     }
   };
 
@@ -454,7 +467,7 @@ inline := |*
     fret;
   };
 
-  (space* '[quote]') => {
+  '[quote]' => {
     g_debug("inline [quote]");
 
     if (dstack_check(sm, BLOCK_P)) {
@@ -466,11 +479,11 @@ inline := |*
       append_newline(sm);
     } 
 
-    fexec sm->p - 6;
+    fexec sm->ts;
     fret;
   };
 
-  (space* '[/quote]') => {
+  '[/quote]' space* => {
     g_debug("inline [/quote]");
 
     if (dstack_check(sm, BLOCK_P)) {
@@ -481,7 +494,7 @@ inline := |*
       dstack_rewind(sm);
       fret;
     } else {
-      append(sm, "[/quote]");
+      append_block(sm, "[/quote]");
     }
   };
 
@@ -489,17 +502,17 @@ inline := |*
     g_debug("inline [spoiler]");
     g_debug("  push <span>");
     dstack_push(sm, &INLINE_SPOILER);
-    append(sm, "<span class=\"spoiler\">");
+    append(sm, true, "<span class=\"spoiler\">");
   };
 
-  (space* '[/spoiler]') => {
+  '[/spoiler]' => {
     g_debug("inline [/spoiler]");
 
     if (dstack_check(sm, INLINE_SPOILER)) {
       g_debug("  pop dstack");
       g_debug("  print </span>");
       dstack_pop(sm);
-      append(sm, "</span>");
+      append(sm, true, "</span>");
     } else if (dstack_check(sm, BLOCK_P) && dstack_check2(sm, BLOCK_SPOILER)) {
       g_debug("  pop dstack");
       g_debug("  print </p></div>");
@@ -514,17 +527,18 @@ inline := |*
 
       fret;
     } else {
-      append(sm, "[/spoiler]");
+      append_block(sm, "[/spoiler]");
     }
   };
 
-  (space* '[expand]' space*) => {
+  '[expand]' => {
+    g_debug("inline [expand]");
     dstack_rewind(sm);
-    fexec(sm->p - 8);
+    fexec(sm->p - 7);
     fret;
   };
 
-  (space* '[/expand]') => {
+  '[/expand]' => {
     if (dstack_check(sm, BLOCK_P)) {
       append_closing_p(sm);
       append_newline(sm);
@@ -539,7 +553,7 @@ inline := |*
       dstack_pop(sm);
       fret;
     } else {
-      append(sm, "[/expand]");
+      append_block(sm, "[/expand]");
     }
   };
 
@@ -556,7 +570,7 @@ inline := |*
       append_newline(sm);
       fret;
     } else {
-      append(sm, "[/th]");
+      append_block(sm, "[/th]");
     }
   };
 
@@ -568,7 +582,7 @@ inline := |*
       append_newline(sm);
       fret;
     } else {
-      append(sm, "[/td]");
+      append_block(sm, "[/td]");
     }
   };
 
@@ -602,7 +616,7 @@ inline := |*
     if (sm->list_mode && (*(sm->p+1) == '*') && dstack_check(sm, BLOCK_LI)) {
       dstack_rewind(sm);
     } else {
-      append(sm, "<br>");
+      append(sm, true, "<br>");
       append_newline(sm);
     }
   };
@@ -618,7 +632,7 @@ code := |*
     if (dstack_check(sm, BLOCK_CODE)) {
       dstack_rewind(sm);
     } else {
-      append(sm, "[/code]");
+      append(sm, true, "[/code]");
     }
     fret;
   };
@@ -646,7 +660,7 @@ nodtext := |*
       dstack_pop(sm);
       fret;
     } else {
-      append(sm, "[/nodtext]");
+      append(sm, true, "[/nodtext]");
     }
   };
 
@@ -675,7 +689,7 @@ table := |*
       append_block(sm, "</thead>");
       append_newline(sm);
     } else {
-      append(sm, "[/thead]");
+      append(sm, true, "[/thead]");
     }
   };
 
@@ -693,7 +707,7 @@ table := |*
       append_block(sm, "</tbody>");
       append_newline(sm);
     } else {
-      append(sm, "[/tbody]");
+      append(sm, true, "[/tbody]");
     }
   };
 
@@ -719,7 +733,7 @@ table := |*
       append_block(sm, "</tr>");
       append_newline(sm);
     } else {
-      append(sm, "[/tr]");
+      append(sm, true, "[/tr]");
     }
   };
 
@@ -740,7 +754,7 @@ table := |*
       append_newline(sm);
       fret;
     } else {
-      append(sm, "[/table]");
+      append(sm, true, "[/table]");
     }
   };
 
@@ -819,18 +833,22 @@ main := |*
 
     append_newline(sm);
     append_newline(sm);
-    append(sm, "<h");
-    append_c(sm, header);
-    append_c(sm, '>');
-    append_segment(sm, sm->b1, sm->b2 - 1);
-    append(sm, "</h");
-    append_c(sm, header);
-    append(sm, ">");
+    if (!sm->f_strip) {
+      append(sm, true, "<h");
+      append_c(sm, header);
+      append_c(sm, '>');
+    }
+    append_segment(sm, false, sm->b1, sm->b2 - 1);
+    if (!sm->f_strip) {
+      append(sm, true, "</h");
+      append_c(sm, header);
+      append_c(sm, '>');
+    }
     append_newline(sm);
     append_newline(sm);
   };
 
-  ('[quote]' space*) => {
+  '[quote]' space* => {
     g_debug("block [quote]");
     g_debug("  push quote");
     g_debug("  push p");
@@ -847,7 +865,7 @@ main := |*
     fcall inline;
   };
 
-  ('[spoiler]' space*) => {
+  '[spoiler]' space* => {
     g_debug("block [spoiler]");
     g_debug("  push spoiler");
     g_debug("  push p");
@@ -873,7 +891,7 @@ main := |*
     }
   };
 
-  ('[code]' space*) => {
+  '[code]' space* => {
     dstack_push(sm, &BLOCK_CODE);
     append_newline(sm);
     append_newline(sm);
@@ -882,7 +900,7 @@ main := |*
     fcall code;
   };
 
-  ('[expand]' space*) => {
+  '[expand]' space* => {
     dstack_push(sm, &BLOCK_EXPAND);
     dstack_push(sm, &BLOCK_P);
     append_newline(sm);
@@ -895,22 +913,22 @@ main := |*
     fcall inline;
   };
 
-  (aliased_expand space*) => {
+  aliased_expand space* => {
     dstack_push(sm, &BLOCK_EXPAND);
     dstack_push(sm, &BLOCK_P);
     append_newline(sm);
     append_newline(sm);
     append_block(sm, "<div class=\"expandable\"><div class=\"expandable-header\">");
-    append(sm, "<span>");
+    append(sm, true, "<span>");
     append_segment_html_escaped(sm, sm->a1, sm->a2);
-    append(sm, "</span>");
+    append(sm, true, "</span>");
     append_block(sm, "<input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div>");
     append_block(sm, "<div class=\"expandable-content\">");
     append_newline(sm);
     fcall inline;
   };
 
-  ('[nodtext]' space*) => {
+  '[nodtext]' space* => {
     dstack_push(sm, &BLOCK_NODTEXT);
     append_newline(sm);
     append_block(sm, "<p>");
@@ -968,7 +986,7 @@ main := |*
     g_debug("block c: %c", fc);
     fhold;
 
-    if (g_queue_is_empty(sm->dstack) || dstack_check(sm, BLOCK_QUOTE) || dstack_check(sm, BLOCK_SPOILER)) {
+    if (g_queue_is_empty(sm->dstack) || dstack_check(sm, BLOCK_QUOTE) || dstack_check(sm, BLOCK_SPOILER) || dstack_check(sm, BLOCK_EXPAND)) {
       g_debug("  push p");
       g_debug("  print <p>");
       dstack_push(sm, &BLOCK_P);
@@ -992,8 +1010,10 @@ static inline void underscore_string(char * str, size_t len) {
   }
 }
 
-static inline void append(StateMachine * sm, const char * s) {
-  sm->output = g_string_append(sm->output, s);
+static inline void append(StateMachine * sm, bool is_markup, const char * s) {
+  if (!(is_markup && sm->f_strip)) {
+    sm->output = g_string_append(sm->output, s);
+  }
 }
 
 static inline void append_newline(StateMachine * sm) {
@@ -1026,11 +1046,17 @@ static inline void append_c_html_escaped(StateMachine * sm, char s) {
   }
 }
 
-static inline void append_segment(StateMachine * sm, const char * a, const char * b) {
-  sm->output = g_string_append_len(sm->output, a, b - a + 1);
+static inline void append_segment(StateMachine * sm, bool is_markup, const char * a, const char * b) {
+  if (!(is_markup && sm->f_strip)) {
+    sm->output = g_string_append_len(sm->output, a, b - a + 1);
+  }
 }
 
 static inline void append_segment_uri_escaped(StateMachine * sm, const char * a, const char * b) {
+  if (sm->f_strip) {
+    return;
+  }
+
   GString * segment_string = g_string_new_len(a, b - a + 1);
   char * segment = g_uri_escape_string(segment_string->str, G_URI_RESERVED_CHARS_ALLOWED_IN_PATH "#%?", TRUE);
   sm->output = g_string_append(sm->output, segment);
@@ -1047,6 +1073,8 @@ static inline void append_segment_html_escaped(StateMachine * sm, const char * a
 static inline void append_block(StateMachine * sm, const char * s) {
   if (sm->f_inline) {
     sm->output = g_string_append_c(sm->output, ' ');
+  } else if (sm->f_strip) {
+    // do nothing
   } else {
     sm->output = g_string_append(sm->output, s);
   }
@@ -1106,7 +1134,7 @@ static void dstack_rewind(StateMachine * sm) {
     append_newline(sm);
 
   } else if (*element == INLINE_SPOILER) {
-    append(sm, "</span>");
+    append(sm, true, "</span>");
 
   } else if (*element == BLOCK_SPOILER) {
     append_block(sm, "</div>");
@@ -1130,19 +1158,19 @@ static void dstack_rewind(StateMachine * sm) {
   } else if (*element == INLINE_NODTEXT) {
 
   } else if (*element == INLINE_B) {
-    append(sm, "</strong>");
+    append(sm, true, "</strong>");
 
   } else if (*element == INLINE_I) {
-    append(sm, "</em>");
+    append(sm, true, "</em>");
 
   } else if (*element == INLINE_U) {
-    append(sm, "</u>");
+    append(sm, true, "</u>");
 
   } else if (*element == INLINE_S) {
-    append(sm, "</s>");
+    append(sm, true, "</s>");
 
   } else if (*element == INLINE_TN) {
-    append(sm, "</span>");
+    append(sm, true, "</span>");
 
   } else if (*element == BLOCK_TN) {
     append_closing_p(sm);
@@ -1214,6 +1242,7 @@ static void init_machine(StateMachine * sm, VALUE input) {
   sm->b1 = NULL;
   sm->b2 = NULL;
   sm->f_inline = false;
+  sm->f_strip = false;
   sm->stack = g_array_sized_new(FALSE, TRUE, sizeof(int), 16);
   sm->dstack = g_queue_new();
   sm->list_nest = 0;
@@ -1231,6 +1260,7 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
   VALUE input;
   VALUE options;
   VALUE opt_inline;
+  VALUE opt_strip;
   VALUE ret;
   StateMachine * sm = NULL;
 
@@ -1250,8 +1280,12 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
     options = argv[1];
 
     if (!NIL_P(options)) {
-      opt_inline = rb_hash_aref(options, ID2SYM(rb_intern("inline")));
+      opt_strip  = rb_hash_aref(options, ID2SYM(rb_intern("strip")));
+      if (RTEST(opt_strip)) {
+        sm->f_strip = true;
+      }
 
+      opt_inline = rb_hash_aref(options, ID2SYM(rb_intern("inline")));
       if (RTEST(opt_inline)) {
         sm->f_inline = true;
       }

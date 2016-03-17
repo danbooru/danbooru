@@ -61,7 +61,7 @@ task test_file_ragel: %w(ragel compile) do
 end
 
 task test: %w(ragel compile) do
-	ruby "-Ilib", '-rdtext', "test/dtext_test.rb" #, '--name=test_urls_with_newline'
+	ruby "-Ilib", '-rdtext', "test/dtext_test.rb" #, '--name=test_strip'
 end
 
 task default: :test

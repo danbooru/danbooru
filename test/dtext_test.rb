@@ -99,7 +99,7 @@ class DTextTest < Minitest::Test
   end
 
   def test_urls
-    assert_parse('<p>a <a href="http://test.com">http://test.com</a> b</p>', p('a http://test.com b'))
+    assert_parse('<p>a <a href="http://test.com">http://test.com</a> b</p>', 'a http://test.com b')
   end
 
   def test_urls_with_newline
@@ -107,41 +107,41 @@ class DTextTest < Minitest::Test
   end
 
   def test_urls_with_paths
-    assert_parse('<p>a <a href="http://test.com/~bob/image.jpg">http://test.com/~bob/image.jpg</a> b</p>', p('a http://test.com/~bob/image.jpg b'))
+    assert_parse('<p>a <a href="http://test.com/~bob/image.jpg">http://test.com/~bob/image.jpg</a> b</p>', 'a http://test.com/~bob/image.jpg b')
   end
 
   def test_urls_with_fragment
-    assert_parse('<p>a <a href="http://test.com/home.html#toc">http://test.com/home.html#toc</a> b</p>', p('a http://test.com/home.html#toc b'))
+    assert_parse('<p>a <a href="http://test.com/home.html#toc">http://test.com/home.html#toc</a> b</p>', 'a http://test.com/home.html#toc b')
   end
 
   def test_auto_urls
-    assert_parse('<p>a <a href="http://test.com">http://test.com</a>. b</p>', p('a http://test.com. b'))
+    assert_parse('<p>a <a href="http://test.com">http://test.com</a>. b</p>', 'a http://test.com. b')
   end
 
   def test_auto_urls_in_parentheses
-    assert_parse('<p>a (<a href="http://test.com">http://test.com</a>) b</p>', p('a (http://test.com) b'))
+    assert_parse('<p>a (<a href="http://test.com">http://test.com</a>) b</p>', 'a (http://test.com) b')
   end
 
   def test_old_style_links
-    assert_parse('<p><a href="http://test.com">test</a></p>', p('"test":http://test.com'))
+    assert_parse('<p><a href="http://test.com">test</a></p>', '"test":http://test.com')
   end
 
   def test_old_style_links_with_special_entities
-    assert_parse('<p>"1" <a href="http://three.com">2 &amp; 3</a></p>', p('"1" "2 & 3":http://three.com'))
+    assert_parse('<p>"1" <a href="http://three.com">2 &amp; 3</a></p>', '"1" "2 & 3":http://three.com')
   end
 
   def test_new_style_links
-    assert_parse('<p><a href="http://test.com">test</a></p>', p('"test":[http://test.com]'))
+    assert_parse('<p><a href="http://test.com">test</a></p>', '"test":[http://test.com]')
   end
 
   def test_new_style_links_with_parentheses
-    assert_parse('<p><a href="http://test.com/(parentheses)">test</a></p>', p('"test":[http://test.com/(parentheses)]'))
-    assert_parse('<p>(<a href="http://test.com/(parentheses)">test</a>)</p>', p('("test":[http://test.com/(parentheses)])'))
-    assert_parse('<p>[<a href="http://test.com/(parentheses)">test</a>]</p>', p('["test":[http://test.com/(parentheses)]]'))
+    assert_parse('<p><a href="http://test.com/(parentheses)">test</a></p>', '"test":[http://test.com/(parentheses)]')
+    assert_parse('<p>(<a href="http://test.com/(parentheses)">test</a>)</p>', '("test":[http://test.com/(parentheses)])')
+    assert_parse('<p>[<a href="http://test.com/(parentheses)">test</a>]</p>', '["test":[http://test.com/(parentheses)]]')
   end
 
   def test_lists_1
-    assert_parse('<ul><li>a</li></ul>', p('* a'))
+    assert_parse('<ul><li>a</li></ul>', '* a')
   end
 
   def test_lists_2
@@ -206,6 +206,10 @@ class DTextTest < Minitest::Test
   end
 
   def test_inline_mode
-    assert_equal("hello", DTextRagel.parse("hello", :inline => true).strip)
+    assert_equal("hello", DTextRagel.parse_inline("hello").strip)
+  end
+
+  def test_strip
+    assert_equal("hellozworld", DTextRagel.parse_strip("h[b]e[/b]llo[quote]z[/quote]wo[expand]rld[/expand]"))
   end
 end
