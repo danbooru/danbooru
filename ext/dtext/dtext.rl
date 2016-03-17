@@ -100,7 +100,7 @@ action mark_b2 {
   sm->b2 = sm->p;
 }
 
-newline = '\r\n' | '\r' | '\n';
+newline = '\r\n' | '\n';
 
 nonnewline = any - (newline | '\0');
 nonquote = ^'"';
