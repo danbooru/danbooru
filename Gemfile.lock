@@ -53,9 +53,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  jeweler
-  minitest
-  rake-compiler
+  jeweler (~> 2.0)
+  minitest (~> 5.8)
+  rake-compiler (~> 0.9)
 
 BUNDLED WITH
    1.11.2

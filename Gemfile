@@ -1,6 +1,6 @@
 # A sample Gemfile
 source "https://rubygems.org"
 
-gem "minitest"
-gem "rake-compiler"
-gem "jeweler"
+gem "minitest", "~> 5.8"
+gem "rake-compiler", "~> 0.9"
+gem "jeweler", "~> 2.0"
