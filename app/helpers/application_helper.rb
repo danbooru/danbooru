@@ -48,11 +48,11 @@ module ApplicationHelper
   end
 
   def format_text(text, options = {})
-    DText.parse(text)
+    DTextRagel.parse(text)
   end
 
   def strip_dtext(text)
-    DText.strip(text)
+    DTextRagel.parse_strip(text)
   end
 
   def error_messages_for(instance_name)
