@@ -48,8 +48,12 @@ task :ragel do
 	sh "ragel -G2 -C ext/dtext/dtext.rl -o ext/dtext/dtext.c"
 end
 
+task test_forum_posts: %w(ragel compile) do
+  ruby '-Ilib', '-rdtext', '-rdtext_ruby', 'test/script.rb'
+end
+
 task test_inline_ragel: %w(ragel compile) do
-	ruby '-Ilib', '-rdtext', '-e', 'puts DTextRagel.parse("[b]mismatched [u]tags[/b] blah[/u]")'
+	ruby '-Ilib', '-rdtext', '-e', 'puts DTextRagel.parse("hello\r\nworld")'
 end
 
 task test_file_ruby: %w(ragel compile) do
@@ -61,7 +65,7 @@ task test_file_ragel: %w(ragel compile) do
 end
 
 task test: %w(ragel compile) do
-	ruby "-Ilib", '-rdtext', "test/dtext_test.rb" #, '--name=test_strip'
+	ruby "-Ilib", '-rdtext', "test/dtext_test.rb" #, '--name=test_lists_2'
 end
 
 task default: :test

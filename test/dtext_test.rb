@@ -135,9 +135,9 @@ class DTextTest < Minitest::Test
   end
 
   def test_new_style_links_with_parentheses
-    assert_parse('<p><a href="http://test.com/(parentheses)">test</a></p>', '"test":[http://test.com/(parentheses)]')
-    assert_parse('<p>(<a href="http://test.com/(parentheses)">test</a>)</p>', '("test":[http://test.com/(parentheses)])')
-    assert_parse('<p>[<a href="http://test.com/(parentheses)">test</a>]</p>', '["test":[http://test.com/(parentheses)]]')
+    assert_parse('<p><a href="http://test.com/%28parentheses%29">test</a></p>', '"test":[http://test.com/(parentheses)]')
+    assert_parse('<p>(<a href="http://test.com/%28parentheses%29">test</a>)</p>', '("test":[http://test.com/(parentheses)])')
+    assert_parse('<p>[<a href="http://test.com/%28parentheses%29">test</a>]</p>', '["test":[http://test.com/(parentheses)]]')
   end
 
   def test_lists_1
@@ -211,5 +211,9 @@ class DTextTest < Minitest::Test
 
   def test_strip
     assert_equal("hellozworld", DTextRagel.parse_strip("h[b]e[/b]llo[quote]z[/quote]wo[expand]rld[/expand]"))
+  end
+
+  def test_old_asterisks
+    assert_parse("<p>hello *world* neutral</p>", "hello *world* neutral")
   end
 end

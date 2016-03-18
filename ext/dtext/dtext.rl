@@ -13,6 +13,7 @@ typedef struct StateMachine {
   int cs;
   int act;
   const char * p;
+  const char * pb;
   const char * pe;
   const char * eof;
   const char * ts;
@@ -121,17 +122,17 @@ aliased_wiki_link = '[[' nonpipebracket+ >mark_a1 %mark_a2 '|' nonbracket+ >mark
 
 post_link = '{{' noncurly+ >mark_a1 %mark_a2 '}}';
 
-post_id = 'post #' digit+ >mark_a1 %mark_a2;
-forum_post_id = 'forum #' digit+ >mark_a1 %mark_a2;
-forum_topic_id = 'topic #' digit+ >mark_a1 %mark_a2;
-forum_topic_paged_id = 'topic #' digit+ >mark_a1 %mark_a2 '/p' digit+ >mark_b1 %mark_b2;
-comment_id = 'comment #' digit+ >mark_a1 %mark_a2;
-pool_id = 'pool #' digit+ >mark_a1 %mark_a2;
-user_id = 'user #' digit+ >mark_a1 %mark_a2;
-artist_id = 'artist #' digit+ >mark_a1 %mark_a2;
-github_issue_id = 'issue #' digit+ >mark_a1 %mark_a2;
-pixiv_id = 'pixiv #' digit+ >mark_a1 %mark_a2;
-pixiv_paged_id = 'pixiv #' digit+ >mark_a1 %mark_a2 '/p' digit+ >mark_b1 %mark_b2;
+post_id = 'post #'i digit+ >mark_a1 %mark_a2;
+forum_post_id = 'forum #'i digit+ >mark_a1 %mark_a2;
+forum_topic_id = 'topic #'i digit+ >mark_a1 %mark_a2;
+forum_topic_paged_id = 'topic #'i digit+ >mark_a1 %mark_a2 '/p' digit+ >mark_b1 %mark_b2;
+comment_id = 'comment #'i digit+ >mark_a1 %mark_a2;
+pool_id = 'pool #'i digit+ >mark_a1 %mark_a2;
+user_id = 'user #'i digit+ >mark_a1 %mark_a2;
+artist_id = 'artist #'i digit+ >mark_a1 %mark_a2;
+github_issue_id = 'issue #'i digit+ >mark_a1 %mark_a2;
+pixiv_id = 'pixiv #'i digit+ >mark_a1 %mark_a2;
+pixiv_paged_id = 'pixiv #'i digit+ >mark_a1 %mark_a2 '/p' digit+ >mark_b1 %mark_b2;
 
 ws = ' ' | '\t';
 header = 'h' [123456] >mark_a1 %mark_a2 '.' ws* nonnewline+ >mark_b1 %mark_b2;
@@ -371,16 +372,19 @@ inline := |*
     }
   };
 
-  list_item => {
+  newline list_item => {
     g_debug("inline list");
 
-    if (dstack_check(sm, BLOCK_P)) {
+    if (dstack_check(sm, BLOCK_LI)) {
+      g_debug("  rewind li");
+      dstack_rewind(sm);
+    } else if (dstack_check(sm, BLOCK_P)) {
       g_debug("  rewind p");
       dstack_rewind(sm);
     }
 
     g_debug("  call list");
-    fexec sm->ts;
+    fexec sm->ts + 1;
     fcall list;
   };
 
@@ -613,12 +617,8 @@ inline := |*
   newline => {
     g_debug("inline newline");
 
-    if (sm->list_mode && (*(sm->p+1) == '*') && dstack_check(sm, BLOCK_LI)) {
-      dstack_rewind(sm);
-    } else {
-      append(sm, true, "<br>");
-      append_newline(sm);
-    }
+    append(sm, true, "<br>");
+    append_newline(sm);
   };
 
   any => {
@@ -920,7 +920,7 @@ main := |*
     append_newline(sm);
     append_block(sm, "<div class=\"expandable\"><div class=\"expandable-header\">");
     append(sm, true, "<span>");
-    append_segment_html_escaped(sm, sm->a1, sm->a2);
+    append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, true, "</span>");
     append_block(sm, "<input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div>");
     append_block(sm, "<div class=\"expandable-content\">");
@@ -952,7 +952,7 @@ main := |*
   };
 
   list_item => {
-    g_debug("inline list");
+    g_debug("block list");
     sm->list_nest = 0;
     sm->list_mode = true;
     if (dstack_check(sm, BLOCK_P)) {
@@ -1058,7 +1058,7 @@ static inline void append_segment_uri_escaped(StateMachine * sm, const char * a,
   }
 
   GString * segment_string = g_string_new_len(a, b - a + 1);
-  char * segment = g_uri_escape_string(segment_string->str, G_URI_RESERVED_CHARS_ALLOWED_IN_PATH "#%?", TRUE);
+  char * segment = g_uri_escape_string(segment_string->str, ":/=&#%?+", TRUE);
   sm->output = g_string_append(sm->output, segment);
   g_string_free(segment_string, TRUE);
   g_free(segment);
@@ -1085,6 +1085,11 @@ static inline void append_closing_p(StateMachine * sm) {
 
   if (i > 4 && !strncmp(sm->output->str + i - 4, "<br>", 4)) {
     sm->output = g_string_truncate(sm->output, sm->output->len - 4);
+  }
+
+  if (i > 3 && !strncmp(sm->output->str + i - 3, "<p>", 3)) {
+    sm->output = g_string_truncate(sm->output, sm->output->len - 3);
+    return;
   }
 
   append_block(sm, "</p>");
@@ -1222,9 +1227,15 @@ static inline bool is_boundary_c(char c) {
   return false;
 }
 
+static bool print_machine(StateMachine * sm) {
+  printf("p=%c\n", *sm->p);
+  return true;
+}
+
 static void init_machine(StateMachine * sm, VALUE input) {
   size_t output_length = 0;
   sm->p = RSTRING_PTR(input);
+  sm->pb = sm->p;
   sm->pe = sm->p + RSTRING_LEN(input);
   sm->eof = sm->pe;
   sm->ts = NULL;
