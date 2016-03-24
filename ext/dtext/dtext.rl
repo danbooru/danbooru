@@ -26,6 +26,7 @@ typedef struct StateMachine {
   bool f_inline;
   bool f_strip;
   bool list_mode;
+  bool header_mode;
   GString * output;
   GArray * stack;
   GQueue * dstack;
@@ -58,6 +59,12 @@ static const int BLOCK_TR = 19;
 static const int BLOCK_UL = 20;
 static const int BLOCK_LI = 21;
 static const int BLOCK_TH = 22;
+static const int BLOCK_H1 = 23;
+static const int BLOCK_H2 = 24;
+static const int BLOCK_H3 = 25;
+static const int BLOCK_H4 = 26;
+static const int BLOCK_H5 = 27;
+static const int BLOCK_H6 = 28;
 
 %%{
 machine dtext;
@@ -103,7 +110,7 @@ action mark_b2 {
 
 newline = '\r\n' | '\n';
 
-nonnewline = any - (newline | '\0');
+nonnewline = any - (newline | '\0' | '\r');
 nonquote = ^'"';
 nonbracket = ^']';
 nonpipe = ^'|';
@@ -135,7 +142,7 @@ pixiv_id = 'pixiv #'i digit+ >mark_a1 %mark_a2;
 pixiv_paged_id = 'pixiv #'i digit+ >mark_a1 %mark_a2 '/p' digit+ >mark_b1 %mark_b2;
 
 ws = ' ' | '\t';
-header = 'h' [123456] >mark_a1 %mark_a2 '.' ws* nonnewline+ >mark_b1 %mark_b2;
+header = 'h' [123456] >mark_a1 %mark_a2 '.' ws*;
 aliased_expand = '[expand=' (nonbracket+ >mark_a1 %mark_a2) ']';
 
 list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
@@ -308,7 +315,7 @@ inline := |*
     }
 
     append(sm, true, "<a href=\"");
-    append_segment_uri_escaped(sm, sm->b1, sm->b2 - sm->d);
+    append_segment_html_escaped(sm, sm->b1, sm->b2 - sm->d);
     append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, true, "</a>");
@@ -320,7 +327,7 @@ inline := |*
 
   bracketed_textile_link => {
     append(sm, true, "<a href=\"");
-    append_segment_uri_escaped(sm, sm->b1, sm->b2 - 1);
+    append_segment_html_escaped(sm, sm->b1, sm->b2 - 1);
     append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, true, "</a>");
@@ -336,7 +343,7 @@ inline := |*
     }
 
     append(sm, true, "<a href=\"");
-    append_segment_uri_escaped(sm, sm->ts, sm->te - sm->d);
+    append_segment_html_escaped(sm, sm->ts, sm->te - sm->d);
     append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->ts, sm->te - sm->d);
     append(sm, true, "</a>");
@@ -383,9 +390,9 @@ inline := |*
       dstack_rewind(sm);
     }
 
-    g_debug("  call list");
+    g_debug("  next list");
     fexec sm->ts + 1;
-    fcall list;
+    fnext list;
   };
 
   '[b]' => {
@@ -450,10 +457,10 @@ inline := |*
   };
 
   '[/tn]' => {
+    dstack_close_before_block(sm);
+
     if (dstack_check(sm, BLOCK_TN)) {
       dstack_pop(sm);
-      append_closing_p(sm);
-      append_newline(sm);
       fret;
     } else if (dstack_check(sm, INLINE_TN)) {
       dstack_pop(sm);
@@ -473,25 +480,17 @@ inline := |*
 
   '[quote]' => {
     g_debug("inline [quote]");
-
-    if (dstack_check(sm, BLOCK_P)) {
-      g_debug("  pop dstack");
-      g_debug("  print </p>");
-
-      dstack_pop(sm);
-      append_closing_p(sm);
-      append_newline(sm);
-    } 
-
+    dstack_close_before_block(sm);
     fexec sm->ts;
     fret;
   };
 
   '[/quote]' space* => {
     g_debug("inline [/quote]");
+    dstack_close_before_block(sm);
 
-    if (dstack_check(sm, BLOCK_P)) {
-      dstack_rewind(sm);
+    if (dstack_check(sm, BLOCK_LI)) {
+      dstack_close_list(sm);
     }
 
     if (dstack_check(sm, BLOCK_QUOTE)) {
@@ -511,24 +510,19 @@ inline := |*
 
   '[/spoiler]' => {
     g_debug("inline [/spoiler]");
+    dstack_close_before_block(sm);
 
     if (dstack_check(sm, INLINE_SPOILER)) {
       g_debug("  pop dstack");
       g_debug("  print </span>");
       dstack_pop(sm);
       append(sm, true, "</span>");
-    } else if (dstack_check(sm, BLOCK_P) && dstack_check2(sm, BLOCK_SPOILER)) {
+    } else if (dstack_check(sm, BLOCK_SPOILER)) {
       g_debug("  pop dstack");
-      g_debug("  print </p></div>");
+      g_debug("  print </div>");
       g_debug("  return");
       dstack_pop(sm);
-      dstack_pop(sm);
-      append_newline(sm);
-      append_closing_p(sm);
       append_block(sm, "</div>");
-      append_newline(sm);
-      append_newline(sm);
-
       fret;
     } else {
       append_block(sm, "[/spoiler]");
@@ -543,17 +537,10 @@ inline := |*
   };
 
   '[/expand]' => {
-    if (dstack_check(sm, BLOCK_P)) {
-      append_closing_p(sm);
-      append_newline(sm);
-      dstack_pop(sm);
-    }
+    dstack_close_before_block(sm);
 
     if (dstack_check(sm, BLOCK_EXPAND)) {
-      append_newline(sm);
       append_block(sm, "</div></div>");
-      append_newline(sm);
-      append_newline(sm);
       dstack_pop(sm);
       fret;
     } else {
@@ -569,9 +556,7 @@ inline := |*
   '[/th]' => {
     if (dstack_check(sm, BLOCK_TH)) {
       dstack_pop(sm);
-      append_newline(sm);
       append_block(sm, "</th>");
-      append_newline(sm);
       fret;
     } else {
       append_block(sm, "[/th]");
@@ -581,9 +566,7 @@ inline := |*
   '[/td]' => {
     if (dstack_check(sm, BLOCK_TD)) {
       dstack_pop(sm);
-      append_newline(sm);
       append_block(sm, "</td>");
-      append_newline(sm);
       fret;
     } else {
       append_block(sm, "[/td]");
@@ -603,10 +586,7 @@ inline := |*
     g_debug("  return");
 
     if (sm->list_mode) {
-      if (dstack_check(sm, BLOCK_LI)) {
-        dstack_rewind(sm);
-      }
-
+      dstack_close_list(sm);
       sm->list_mode = false;
     }
 
@@ -617,12 +597,21 @@ inline := |*
   newline => {
     g_debug("inline newline");
 
-    append(sm, true, "<br>");
-    append_newline(sm);
+    if (sm->header_mode) {
+      sm->header_mode = false;
+      dstack_rewind(sm);
+      fret;
+    } else {
+      append(sm, true, "<br>");
+    }
+  };
+
+  '\r' => {
+    append_c(sm, ' ');
   };
 
   any => {
-    g_debug("inline c: %c", fc);
+    g_debug("inline char: %c", fc);
     append_c_html_escaped(sm, fc);
   };
 *|;
@@ -651,10 +640,7 @@ nodtext := |*
   '[/nodtext]' => {
     if (dstack_check(sm, BLOCK_NODTEXT)) {
       dstack_pop(sm);
-      append_newline(sm);
-      append_closing_p(sm);
-      append_newline(sm);
-      append_newline(sm);
+      append_block(sm, "</p>");
       fret;
     } else if (dstack_check(sm, INLINE_NODTEXT)) {
       dstack_pop(sm);
@@ -677,17 +663,13 @@ nodtext := |*
 table := |*
   '[thead]' => {
     dstack_push(sm, &BLOCK_THEAD);
-    append_newline(sm);
     append_block(sm, "<thead>");
-    append_newline(sm);
   };
 
   '[/thead]' => {
     if (dstack_check(sm, BLOCK_THEAD)) {
       dstack_pop(sm);
-      append_newline(sm);
       append_block(sm, "</thead>");
-      append_newline(sm);
     } else {
       append(sm, true, "[/thead]");
     }
@@ -695,17 +677,13 @@ table := |*
 
   '[tbody]' => {
     dstack_push(sm, &BLOCK_TBODY);
-    append_newline(sm);
     append_block(sm, "<tbody>");
-    append_newline(sm);
   };
 
   '[/tbody]' => {
     if (dstack_check(sm, BLOCK_TBODY)) {
       dstack_pop(sm);
-      append_newline(sm);
       append_block(sm, "</tbody>");
-      append_newline(sm);
     } else {
       append(sm, true, "[/tbody]");
     }
@@ -713,25 +691,19 @@ table := |*
 
   '[th]' => {
     dstack_push(sm, &BLOCK_TH);
-    append_newline(sm);
     append_block(sm, "<th>");
-    append_newline(sm);
     fcall inline;
   };
 
   '[tr]' => {
     dstack_push(sm, &BLOCK_TR);
-    append_newline(sm);
     append_block(sm, "<tr>");
-    append_newline(sm);
   };
 
   '[/tr]' => {
     if (dstack_check(sm, BLOCK_TR)) {
       dstack_pop(sm);
-      append_newline(sm);
       append_block(sm, "</tr>");
-      append_newline(sm);
     } else {
       append(sm, true, "[/tr]");
     }
@@ -739,19 +711,14 @@ table := |*
 
   '[td]' => {
     dstack_push(sm, &BLOCK_TD);
-    append_newline(sm);
     append_block(sm, "<td>");
-    append_newline(sm);
     fcall inline;
   };
 
   '[/table]' => {
     if (dstack_check(sm, BLOCK_TABLE)) {
       dstack_pop(sm);
-      append_newline(sm);
       append_block(sm, "</table>");
-      append_newline(sm);
-      append_newline(sm);
       fret;
     } else {
       append(sm, true, "[/table]");
@@ -769,8 +736,8 @@ table := |*
 list := |*
   list_item => {
     int prev_nest = sm->list_nest;
+    append_closing_p_if(sm);
     g_debug("list start");
-
     sm->list_mode = true;
     sm->list_nest = sm->a2 - sm->a1;
     fexec sm->b1;
@@ -781,7 +748,6 @@ list := |*
         g_debug("  dstack push ul");
         g_debug("  print <ul>");
         append_block(sm, "<ul>");
-        append_newline(sm);
         dstack_push(sm, &BLOCK_UL);
       }
     } else if (sm->list_nest < prev_nest) {
@@ -792,7 +758,6 @@ list := |*
           g_debug("  print </ul>");
           dstack_pop(sm);
           append_block(sm, "</ul>");
-          append_newline(sm);
         }
       }
     }
@@ -809,7 +774,7 @@ list := |*
 
   # exit list
   (newline{2,} | '\0') => {
-    dstack_rewind(sm);
+    dstack_close_list(sm);
     fexec sm->ts;
     fret;
   };
@@ -831,135 +796,128 @@ main := |*
       header = '6';
     }
 
-    append_newline(sm);
-    append_newline(sm);
     if (!sm->f_strip) {
-      append(sm, true, "<h");
-      append_c(sm, header);
-      append_c(sm, '>');
+      switch (header) {
+        case '1':
+          dstack_push(sm, &BLOCK_H1);
+          append_block(sm, "<h1>");
+          break;
+
+        case '2':
+          dstack_push(sm, &BLOCK_H2);
+          append_block(sm, "<h2>");
+          break;
+
+        case '3':
+          dstack_push(sm, &BLOCK_H3);
+          append_block(sm, "<h3>");
+          break;
+
+        case '4':
+          dstack_push(sm, &BLOCK_H4);
+          append_block(sm, "<h4>");
+          break;
+
+        case '5':
+          dstack_push(sm, &BLOCK_H5);
+          append_block(sm, "<h5>");
+          break;
+
+        case '6':
+          dstack_push(sm, &BLOCK_H6);
+          append_block(sm, "<h6>");
+          break;
+      }
     }
-    append_segment(sm, false, sm->b1, sm->b2 - 1);
-    if (!sm->f_strip) {
-      append(sm, true, "</h");
-      append_c(sm, header);
-      append_c(sm, '>');
-    }
-    append_newline(sm);
-    append_newline(sm);
+
+    sm->header_mode = true;
+    fcall inline;
   };
 
   '[quote]' space* => {
     g_debug("block [quote]");
     g_debug("  push quote");
-    g_debug("  push p");
     g_debug("  print <blockquote>");
-    g_debug("  print <p>");
-    g_debug("  call inline");
-
+    dstack_close_before_block(sm);
     dstack_push(sm, &BLOCK_QUOTE);
-    dstack_push(sm, &BLOCK_P);
-    append_newline(sm);
-    append_newline(sm);
-    append_block(sm, "<blockquote><p>");
-    append_newline(sm);
-    fcall inline;
+    append_block(sm, "<blockquote>");
   };
 
   '[spoiler]' space* => {
     g_debug("block [spoiler]");
     g_debug("  push spoiler");
-    g_debug("  push p");
     g_debug("  print <div>");
-    g_debug("  print <p>");
-    g_debug("  call inline");
+    dstack_close_before_block(sm);
     dstack_push(sm, &BLOCK_SPOILER);
-    dstack_push(sm, &BLOCK_P);
-    append_newline(sm);
-    append_newline(sm);
-    append_block(sm, "<div class=\"spoiler\"><p>");
-    append_newline(sm);
-    fcall inline;
+    append_block(sm, "<div class=\"spoiler\">");
   };
 
   '[/spoiler]' => {
-    if (dstack_check(sm, BLOCK_P)) {
-      dstack_rewind(sm);
-    }
-
+    g_debug("block [/spoiler]");
+    dstack_close_before_block(sm);
     if (dstack_check(sm, BLOCK_SPOILER)) {
+      g_debug("  rewind");
       dstack_rewind(sm);
     }
   };
 
   '[code]' space* => {
+    g_debug("block [code]");
+    dstack_close_before_block(sm);
     dstack_push(sm, &BLOCK_CODE);
-    append_newline(sm);
-    append_newline(sm);
     append_block(sm, "<pre>");
-    append_newline(sm);
     fcall code;
   };
 
   '[expand]' space* => {
+    g_debug("block [expand]");
+    dstack_close_before_block(sm);
     dstack_push(sm, &BLOCK_EXPAND);
-    dstack_push(sm, &BLOCK_P);
-    append_newline(sm);
-    append_newline(sm);
     append_block(sm, "<div class=\"expandable\"><div class=\"expandable-header\">");
     append_block(sm, "<input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div>");
     append_block(sm, "<div class=\"expandable-content\">");
-    append_block(sm, "<p>");
-    append_newline(sm);
-    fcall inline;
   };
 
   aliased_expand space* => {
+    g_debug("block [expand=]");
+    dstack_close_before_block(sm);
     dstack_push(sm, &BLOCK_EXPAND);
-    dstack_push(sm, &BLOCK_P);
-    append_newline(sm);
-    append_newline(sm);
     append_block(sm, "<div class=\"expandable\"><div class=\"expandable-header\">");
     append(sm, true, "<span>");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, true, "</span>");
     append_block(sm, "<input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div>");
     append_block(sm, "<div class=\"expandable-content\">");
-    append_newline(sm);
-    fcall inline;
   };
 
   '[nodtext]' space* => {
+    g_debug("block [nodtext]");
+    dstack_close_before_block(sm);
     dstack_push(sm, &BLOCK_NODTEXT);
-    append_newline(sm);
+    dstack_push(sm, &BLOCK_P);
     append_block(sm, "<p>");
     fcall nodtext;
   };
 
   '[table]' => {
+    dstack_close_before_block(sm);
     dstack_push(sm, &BLOCK_TABLE);
-    append_newline(sm);
-    append_newline(sm);
     append_block(sm, "<table class=\"striped\">");
     fcall table;
   };
 
   '[tn]' => {
     dstack_push(sm, &BLOCK_TN);
-    append_newline(sm);
-    append_newline(sm);
     append_block(sm, "<p class=\"tn\">");
     fcall inline;
   };
 
   list_item => {
     g_debug("block list");
+    g_debug("  call list");
     sm->list_nest = 0;
     sm->list_mode = true;
-    if (dstack_check(sm, BLOCK_P)) {
-      g_debug("  pop dstack");
-      dstack_rewind(sm);
-    }
-    g_debug("  call list");
+    append_closing_p_if(sm);
     fexec sm->ts;
     fcall list;
   };
@@ -972,9 +930,12 @@ main := |*
 
   newline{2,} => {
     g_debug("block newline2");
-    if (dstack_check(sm, BLOCK_P)) {
-      g_debug("  pop p");
+
+    if (sm->header_mode) {
+      sm->header_mode = false;
       dstack_rewind(sm);
+    } else {
+      dstack_close_before_block(sm);
     }
   };
 
@@ -983,14 +944,13 @@ main := |*
   };
 
   any => {
-    g_debug("block c: %c", fc);
+    g_debug("block char: %c", fc);
     fhold;
 
     if (g_queue_is_empty(sm->dstack) || dstack_check(sm, BLOCK_QUOTE) || dstack_check(sm, BLOCK_SPOILER) || dstack_check(sm, BLOCK_EXPAND)) {
       g_debug("  push p");
       g_debug("  print <p>");
       dstack_push(sm, &BLOCK_P);
-      append_newline(sm);
       append_block(sm, "<p>");
     }
 
@@ -1008,91 +968,6 @@ static inline void underscore_string(char * str, size_t len) {
       str[i] = '_';
     }
   }
-}
-
-static inline void append(StateMachine * sm, bool is_markup, const char * s) {
-  if (!(is_markup && sm->f_strip)) {
-    sm->output = g_string_append(sm->output, s);
-  }
-}
-
-static inline void append_newline(StateMachine * sm) {
-#if (PRETTY_PRINT)
-  g_string_append_c(sm->output, '\n');
-#endif
-}
-
-static inline void append_c(StateMachine * sm, char s) {
-  sm->output = g_string_append_c(sm->output, s);
-}
-
-static inline void append_c_html_escaped(StateMachine * sm, char s) {
-  switch (s) {
-    case '<':
-      sm->output = g_string_append(sm->output, "&lt;");
-      break;
-
-    case '>':
-      sm->output = g_string_append(sm->output, "&gt;");
-      break;
-
-    case '&':
-      sm->output = g_string_append(sm->output, "&amp;");
-      break;
-
-    default:
-      sm->output = g_string_append_c(sm->output, s);
-      break;
-  }
-}
-
-static inline void append_segment(StateMachine * sm, bool is_markup, const char * a, const char * b) {
-  if (!(is_markup && sm->f_strip)) {
-    sm->output = g_string_append_len(sm->output, a, b - a + 1);
-  }
-}
-
-static inline void append_segment_uri_escaped(StateMachine * sm, const char * a, const char * b) {
-  if (sm->f_strip) {
-    return;
-  }
-
-  GString * segment_string = g_string_new_len(a, b - a + 1);
-  char * segment = g_uri_escape_string(segment_string->str, ":/=&#%?+", TRUE);
-  sm->output = g_string_append(sm->output, segment);
-  g_string_free(segment_string, TRUE);
-  g_free(segment);
-}
-
-static inline void append_segment_html_escaped(StateMachine * sm, const char * a, const char * b) {
-  gchar * segment = g_markup_escape_text(a, b - a + 1);
-  sm->output = g_string_append(sm->output, segment);
-  g_free(segment);
-}
-
-static inline void append_block(StateMachine * sm, const char * s) {
-  if (sm->f_inline) {
-    sm->output = g_string_append_c(sm->output, ' ');
-  } else if (sm->f_strip) {
-    // do nothing
-  } else {
-    sm->output = g_string_append(sm->output, s);
-  }
-}
-
-static inline void append_closing_p(StateMachine * sm) {
-  size_t i = sm->output->len;
-
-  if (i > 4 && !strncmp(sm->output->str + i - 4, "<br>", 4)) {
-    sm->output = g_string_truncate(sm->output, sm->output->len - 4);
-  }
-
-  if (i > 3 && !strncmp(sm->output->str + i - 3, "<p>", 3)) {
-    sm->output = g_string_truncate(sm->output, sm->output->len - 3);
-    return;
-  }
-
-  append_block(sm, "</p>");
 }
 
 static inline void dstack_push(StateMachine * sm, const int * element) {
@@ -1127,6 +1002,103 @@ static inline bool dstack_check2(StateMachine * sm, int expected_element) {
   return top2 && *top2 == expected_element;
 }
 
+static inline void append(StateMachine * sm, bool is_markup, const char * s) {
+  if (!(is_markup && sm->f_strip)) {
+    sm->output = g_string_append(sm->output, s);
+  }
+}
+
+static inline void append_c(StateMachine * sm, char s) {
+  sm->output = g_string_append_c(sm->output, s);
+}
+
+static inline void append_c_html_escaped(StateMachine * sm, char s) {
+  switch (s) {
+    case '<':
+      sm->output = g_string_append(sm->output, "&lt;");
+      break;
+
+    case '>':
+      sm->output = g_string_append(sm->output, "&gt;");
+      break;
+
+    case '&':
+      sm->output = g_string_append(sm->output, "&amp;");
+      break;
+
+    // case '"':
+    //   sm->output = g_string_append(sm->output, "&quot;");
+    //   break;
+
+    default:
+      sm->output = g_string_append_c(sm->output, s);
+      break;
+  }
+}
+
+static inline void append_segment(StateMachine * sm, bool is_markup, const char * a, const char * b) {
+  if (!(is_markup && sm->f_strip)) {
+    sm->output = g_string_append_len(sm->output, a, b - a + 1);
+  }
+}
+
+static inline void append_segment_uri_escaped(StateMachine * sm, const char * a, const char * b) {
+  if (sm->f_strip) {
+    return;
+  }
+
+  char * segment1 = NULL;
+  char * segment2 = NULL;
+  GString * segment_string = g_string_new_len(a, b - a + 1);
+
+  segment1 = g_uri_escape_string(segment_string->str, NULL, TRUE);
+  segment2 = g_markup_escape_text(segment1, -1);
+  sm->output = g_string_append(sm->output, segment2);
+  g_string_free(segment_string, TRUE);
+  g_free(segment1);
+  g_free(segment2);
+}
+
+static inline void append_segment_html_escaped(StateMachine * sm, const char * a, const char * b) {
+  gchar * segment = g_markup_escape_text(a, b - a + 1);
+  sm->output = g_string_append(sm->output, segment);
+  g_free(segment);
+}
+
+static inline void append_block(StateMachine * sm, const char * s) {
+  if (sm->f_inline) {
+    sm->output = g_string_append_c(sm->output, ' ');
+  } else if (sm->f_strip) {
+    // do nothing
+  } else {
+    sm->output = g_string_append(sm->output, s);
+  }
+}
+
+static void append_closing_p(StateMachine * sm) {
+  size_t i = sm->output->len;
+
+  if (i > 4 && !strncmp(sm->output->str + i - 4, "<br>", 4)) {
+    sm->output = g_string_truncate(sm->output, sm->output->len - 4);
+  }
+
+  if (i > 3 && !strncmp(sm->output->str + i - 3, "<p>", 3)) {
+    sm->output = g_string_truncate(sm->output, sm->output->len - 3);
+    return;
+  }
+
+  append_block(sm, "</p>");
+}
+
+static void append_closing_p_if(StateMachine * sm) {
+  if (!dstack_check(sm, BLOCK_P)) {
+    return;
+  }
+
+  dstack_pop(sm);
+  append_closing_p(sm);
+}
+
 static void dstack_rewind(StateMachine * sm) {
   int * element = dstack_pop(sm);
 
@@ -1136,7 +1108,6 @@ static void dstack_rewind(StateMachine * sm) {
 
   if (*element == BLOCK_P) {
     append_closing_p(sm);
-    append_newline(sm);
 
   } else if (*element == INLINE_SPOILER) {
     append(sm, true, "</span>");
@@ -1152,7 +1123,6 @@ static void dstack_rewind(StateMachine * sm) {
 
   } else if (*element == BLOCK_NODTEXT) {
     append_closing_p(sm);
-    append_newline(sm);
 
   } else if (*element == BLOCK_CODE) {
     append_block(sm, "</pre>");
@@ -1179,7 +1149,6 @@ static void dstack_rewind(StateMachine * sm) {
 
   } else if (*element == BLOCK_TN) {
     append_closing_p(sm);
-    append_newline(sm);
 
   } else if (*element == BLOCK_TABLE) {
     append_block(sm, "</table>");
@@ -1195,16 +1164,51 @@ static void dstack_rewind(StateMachine * sm) {
 
   } else if (*element == BLOCK_UL) {
     append_block(sm, "</ul>");
-    append_newline(sm);
 
   } else if (*element == BLOCK_LI) {
     append_block(sm, "</li>");
-    append_newline(sm);
+
+  } else if (*element == BLOCK_H6) {
+    append_block(sm, "</h6>");
+
+  } else if (*element == BLOCK_H5) {
+    append_block(sm, "</h5>");
+
+  } else if (*element == BLOCK_H4) {
+    append_block(sm, "</h4>");
+
+  } else if (*element == BLOCK_H3) {
+    append_block(sm, "</h3>");
+
+  } else if (*element == BLOCK_H2) {
+    append_block(sm, "</h2>");
+
+  } else if (*element == BLOCK_H1) {
+    append_block(sm, "</h1>");
+  } 
+}
+
+static void dstack_close_before_block(StateMachine * sm) {
+  while (1) {
+    if (dstack_check(sm, BLOCK_P)) {
+      dstack_pop(sm);
+      append_closing_p(sm);
+    } else if (dstack_check(sm, BLOCK_LI) || dstack_check(sm, BLOCK_UL)) {
+      dstack_rewind(sm);
+    } else {
+      return;
+    }
   }
 }
 
 static void dstack_close(StateMachine * sm) {
   while (dstack_peek(sm) != NULL) {
+    dstack_rewind(sm);
+  }
+}
+
+static void dstack_close_list(StateMachine * sm) {
+  while (dstack_check(sm, BLOCK_LI) || dstack_check(sm, BLOCK_UL)) {
     dstack_rewind(sm);
   }
 }
@@ -1258,6 +1262,9 @@ static void init_machine(StateMachine * sm, VALUE input) {
   sm->dstack = g_queue_new();
   sm->list_nest = 0;
   sm->list_mode = false;
+  sm->header_mode = false;
+  sm->d = 0;
+  sm->b = 0;
 }
 
 static void free_machine(StateMachine * sm) {

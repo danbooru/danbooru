@@ -81,6 +81,11 @@ class DTextTest < Minitest::Test
     assert_parse('<blockquote><p>test</p></blockquote>', "[quote]\ntest\n[/quote]")
   end
 
+  def test_quote_blocks_with_list
+    assert_parse("<blockquote><ul><li>hello</li><li>there<br></li></ul></blockquote><p>abc</p>", "[quote]\n* hello\n* there\n[/quote]\nabc")
+    assert_parse("<blockquote><ul><li>hello</li><li>there</li></ul></blockquote><p>abc</p>", "[quote]\n* hello\n* there\n\n[/quote]\nabc")
+  end
+
   def test_quote_blocks_nested
     assert_parse("<blockquote><p>a</p><blockquote><p>b</p></blockquote><p>c</p></blockquote>", "[quote]\na\n[quote]\nb\n[/quote]\nc\n[/quote]")
   end
@@ -127,7 +132,7 @@ class DTextTest < Minitest::Test
   end
 
   def test_old_style_links_with_special_entities
-    assert_parse('<p>"1" <a href="http://three.com">2 &amp; 3</a></p>', '"1" "2 & 3":http://three.com')
+    assert_parse('<p>&quot;1&quot; <a href="http://three.com">2 &amp; 3</a></p>', '"1" "2 & 3":http://three.com')
   end
 
   def test_new_style_links
@@ -135,9 +140,9 @@ class DTextTest < Minitest::Test
   end
 
   def test_new_style_links_with_parentheses
-    assert_parse('<p><a href="http://test.com/%28parentheses%29">test</a></p>', '"test":[http://test.com/(parentheses)]')
-    assert_parse('<p>(<a href="http://test.com/%28parentheses%29">test</a>)</p>', '("test":[http://test.com/(parentheses)])')
-    assert_parse('<p>[<a href="http://test.com/%28parentheses%29">test</a>]</p>', '["test":[http://test.com/(parentheses)]]')
+    assert_parse('<p><a href="http://test.com/(parentheses)">test</a></p>', '"test":[http://test.com/(parentheses)]')
+    assert_parse('<p>(<a href="http://test.com/(parentheses)">test</a>)</p>', '("test":[http://test.com/(parentheses)])')
+    assert_parse('<p>[<a href="http://test.com/(parentheses)">test</a>]</p>', '["test":[http://test.com/(parentheses)]]')
   end
 
   def test_lists_1
@@ -183,10 +188,11 @@ class DTextTest < Minitest::Test
 
   def test_complex_links_1
     assert_parse("<p><a href=\"/wiki_pages/show_or_new?title=1\">2 3</a> | <a href=\"/wiki_pages/show_or_new?title=4\">5 6</a></p>", "[[1|2 3]] | [[4|5 6]]")
+    assert_parse("", "[[chaos_(dff)|Chaos]]")
   end
 
   def test_complex_links_2
-    assert_parse("<p>Tags <strong>(<a href=\"/wiki_pages/show_or_new?title=howto:tag\">Tagging Guidelines</a> | <a href=\"/wiki_pages/show_or_new?title=howto:tag_checklist\">Tag Checklist</a> | <a href=\"/wiki_pages/show_or_new?title=tag_groups\">Tag Groups</a>)</strong></p>", "Tags [b]([[howto:tag|Tagging Guidelines]] | [[howto:tag_checklist|Tag Checklist]] | [[Tag Groups]])[/b]")
+    assert_parse("<p>Tags <strong>(<a href=\"/wiki_pages/show_or_new?title=howto%3Atag\">Tagging Guidelines</a> | <a href=\"/wiki_pages/show_or_new?title=howto%3Atag_checklist\">Tag Checklist</a> | <a href=\"/wiki_pages/show_or_new?title=tag_groups\">Tag Groups</a>)</strong></p>", "Tags [b]([[howto:tag|Tagging Guidelines]] | [[howto:tag_checklist|Tag Checklist]] | [[Tag Groups]])[/b]")
   end
 
   def test_table
@@ -203,6 +209,22 @@ class DTextTest < Minitest::Test
 
   def test_boundary_exploit
     assert_parse('<p><a rel="nofollow" href="/users?name=mack">@mack</a>&lt;</p>', "@mack<")
+  end
+
+  def test_expand
+    assert_parse("<div class=\"expandable\"><div class=\"expandable-header\"><input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div><div class=\"expandable-content\"><p>hello world</p></div></div>", "[expand]hello world[/expand]")
+  end
+
+  def test_aliased_expand
+    assert_parse("<div class=\"expandable\"><div class=\"expandable-header\"><span>hello</span><input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div><div class=\"expandable-content\"><p>blah blah</p></div></div>", "[expand=hello]blah blah[/expand]")
+  end
+
+  def test_expand_with_nested_code
+    assert_parse("<div class=\"expandable\"><div class=\"expandable-header\"><input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div><div class=\"expandable-content\"><pre>hello\n</pre></div></div>", "[expand]\n[code]\nhello\n[/code]\n[/expand]")
+  end
+
+  def test_expand_with_nested_list
+    assert_parse("<div class=\"expandable\"><div class=\"expandable-header\"><input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div><div class=\"expandable-content\"><ul><li>a</li><li>b<br></li></ul></div></div><p>c</p>", "[expand]\n* a\n* b\n[/expand]\nc")
   end
 
   def test_inline_mode

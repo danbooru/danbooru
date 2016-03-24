@@ -23,7 +23,7 @@ Jeweler::Tasks.new do |gem|
 end
 Jeweler::RubygemsDotOrgTasks.new
 
-#ENV["G_MESSAGES_DEBUG"] = "all"
+# ENV["G_MESSAGES_DEBUG"] = "all"
 
 Rake::ExtensionTask.new "dtext" do |ext|
 	ext.lib_dir = "lib/dtext"
@@ -49,7 +49,11 @@ task :ragel do
 end
 
 task test_forum_posts: %w(ragel compile) do
-  ruby '-Ilib', '-rdtext', '-rdtext_ruby', 'test/script.rb'
+  ruby '-Ilib', '-rdtext', '-rdtext_ruby', 'test/test_forum_posts.rb'
+end
+
+task test_wiki_pages: %w(ragel compile) do
+  ruby '-Ilib', '-rdtext', '-rdtext_ruby', 'test/test_wiki_pages.rb'
 end
 
 task test_inline_ragel: %w(ragel compile) do
@@ -65,7 +69,7 @@ task test_file_ragel: %w(ragel compile) do
 end
 
 task test: %w(ragel compile) do
-	ruby "-Ilib", '-rdtext', "test/dtext_test.rb" #, '--name=test_lists_2'
+	ruby "-Ilib", '-rdtext', "test/dtext_test.rb" #, '--name=test_special'
 end
 
 task default: :test
