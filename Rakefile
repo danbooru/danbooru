@@ -1,3 +1,5 @@
+#ENV["G_MESSAGES_DEBUG"] = "all"
+
 require "rake/extensiontask"
 require "rubygems/package_task"
 require "bundler"
@@ -22,8 +24,6 @@ Jeweler::Tasks.new do |gem|
   gem.authors = ["r888888888"]
 end
 Jeweler::RubygemsDotOrgTasks.new
-
-# ENV["G_MESSAGES_DEBUG"] = "all"
 
 Rake::ExtensionTask.new "dtext" do |ext|
 	ext.lib_dir = "lib/dtext"
@@ -69,7 +69,7 @@ task test_file_ragel: %w(ragel compile) do
 end
 
 task test: %w(ragel compile) do
-	ruby "-Ilib", '-rdtext', "test/dtext_test.rb" #, '--name=test_special'
+	ruby "-Ilib", '-rdtext', "test/dtext_test.rb", '--name=test_headers'
 end
 
 task default: :test

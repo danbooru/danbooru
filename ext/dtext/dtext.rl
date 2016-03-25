@@ -388,6 +388,9 @@ inline := |*
     } else if (dstack_check(sm, BLOCK_P)) {
       g_debug("  rewind p");
       dstack_rewind(sm);
+    } else if (sm->header_mode) {
+      g_debug("  rewind header");
+      dstack_rewind(sm);
     }
 
     g_debug("  next list");
@@ -587,7 +590,6 @@ inline := |*
 
     if (sm->list_mode) {
       dstack_close_list(sm);
-      sm->list_mode = false;
     }
 
     fexec sm->ts;
@@ -934,6 +936,8 @@ main := |*
     if (sm->header_mode) {
       sm->header_mode = false;
       dstack_rewind(sm);
+    } else if (sm->list_mode) {
+      dstack_close_list(sm);
     } else {
       dstack_close_before_block(sm);
     }
@@ -1211,6 +1215,9 @@ static void dstack_close_list(StateMachine * sm) {
   while (dstack_check(sm, BLOCK_LI) || dstack_check(sm, BLOCK_UL)) {
     dstack_rewind(sm);
   }
+
+  sm->list_mode = false;
+  sm->list_nest = 0;
 }
 
 static inline bool is_boundary_c(char c) {
