@@ -188,7 +188,6 @@ class DTextTest < Minitest::Test
 
   def test_complex_links_1
     assert_parse("<p><a href=\"/wiki_pages/show_or_new?title=1\">2 3</a> | <a href=\"/wiki_pages/show_or_new?title=4\">5 6</a></p>", "[[1|2 3]] | [[4|5 6]]")
-    assert_parse("", "[[chaos_(dff)|Chaos]]")
   end
 
   def test_complex_links_2

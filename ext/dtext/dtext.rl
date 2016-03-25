@@ -1026,9 +1026,9 @@ static inline void append_c_html_escaped(StateMachine * sm, char s) {
       sm->output = g_string_append(sm->output, "&amp;");
       break;
 
-    // case '"':
-    //   sm->output = g_string_append(sm->output, "&quot;");
-    //   break;
+    case '"':
+      sm->output = g_string_append(sm->output, "&quot;");
+      break;
 
     default:
       sm->output = g_string_append_c(sm->output, s);
