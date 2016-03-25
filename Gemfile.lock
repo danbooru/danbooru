@@ -6,9 +6,9 @@ GIT
 
 GIT
   remote: https://github.com/r888888888/dtext_rb.git
-  revision: e349031a5dcc74079d636c40243e099bde3e47d5
+  revision: e2dd779f994ad8b4010ec36a92ad93ad43b2e3f1
   specs:
-    dtext_rb (1.0.2)
+    dtext_rb (1.0.3)
       jeweler (~> 2.0)
       minitest (~> 5.8)
       rake-compiler (~> 0.9)

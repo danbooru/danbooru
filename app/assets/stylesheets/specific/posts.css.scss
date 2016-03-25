@@ -60,6 +60,12 @@ a.blacklisted-active {
   display: none;
 }
 
+#image-container p.desc {
+  font-size: 80%;
+  color: grey;
+  font-style: italic;
+}
+
 .post-preview {
   img {
     border: 2px solid transparent;

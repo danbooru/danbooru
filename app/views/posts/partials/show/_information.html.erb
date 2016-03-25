@@ -1,4 +1,4 @@
-<ul itemscope itemtype="http://schema.org">
+<ul itemscope itemtype="http://schema.org/ImageObject">
   <li>ID: <%= post.id %></li>
   <li>Uploader: <%= link_to_user(post.uploader) + "&nbsp;".html_safe + link_to("&raquo;".html_safe, posts_path(:tags => "user:#{post.uploader.name}"), :rel => "nofollow") %></li>
   <li>
@@ -9,7 +9,7 @@
     <li>Approver: <%= link_to_user(post.approver) %></li>
   <% end %>
   <li>
-    Size: <%= link_to_if post.visible?, number_to_human_size(post.file_size), post.file_url, :itemprop => "contentSize" %>
+    Size: <%= link_to_if post.visible?, number_to_human_size(post.file_size), post.file_url %>
     <% if post.has_dimensions? %>
       (<span itemprop="width"><%= post.image_width %></span>x<span itemprop="height"><%= post.image_height %></span>)
     <% end %>
