@@ -884,7 +884,7 @@ main := |*
     dstack_push(sm, &BLOCK_EXPAND);
     append_block(sm, "<div class=\"expandable\"><div class=\"expandable-header\">");
     append(sm, true, "<span>");
-    append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
+    append_segment_html_escaped(sm, sm->a1, sm->a2 - 2);
     append(sm, true, "</span>");
     append_block(sm, "<input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div>");
     append_block(sm, "<div class=\"expandable-content\">");
