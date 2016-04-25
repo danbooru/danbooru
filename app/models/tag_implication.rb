@@ -123,7 +123,7 @@ class TagImplication < ActiveRecord::Base
     self.creator_ip_addr = CurrentUser.ip_addr
   end
 
-  def process!(update_topic=true)
+  def process!(update_topic=true, approver_id=nil)
     unless valid?
       raise errors.full_messages.join("; ")
     end
@@ -131,7 +131,7 @@ class TagImplication < ActiveRecord::Base
     tries = 0
 
     begin
-      admin = CurrentUser.user || User.admins.first
+      admin = CurrentUser.user || User.where(id: approver_id).first || User.admins.first
       CurrentUser.scoped(admin, "127.0.0.1") do
         update_column(:status, "processing")
         update_posts
