@@ -5,7 +5,7 @@ module PostFlagsHelper
 
     post.flags.each do |flag|
       html << '<li>'
-      html << DTextRagel.parse_inline(flag.reason).html_safe
+      html << DText.parse_inline(flag.reason).html_safe
 
       if CurrentUser.is_moderator?
         html << ' - ' + link_to_user(flag.creator)
