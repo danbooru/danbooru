@@ -128,12 +128,14 @@
             $("#scale").html("Scaled " + parseInt(100 * ratio) + "% (original: " + origin_width + "x" + origin_height + ")");
           }
         });
+      } else if (height === 0) {
+        if (!this.tries || this.tries < 10) {
+          this.tries = (this.tries || 0) + 1;
+          window.setTimeout(Danbooru.Upload.initialize_image, 200);
+        }
       } else {
         $("#scale").html("(original: " + width + "x" + height + ")");
       }
-    } else if (!this.tries || this.tries < 10) {
-      this.tries = (this.tries || 0) + 1;
-      window.setTimeout(Danbooru.Upload.initialize_image, 200);
     }
   }
 })();
