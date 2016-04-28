@@ -1,6 +1,29 @@
 require 'danbooru_image_resizer/danbooru_image_resizer'
 
 namespace :images do
+  desc "Redownload an image from Pixiv"
+  task :download_pixiv => :environment do
+    post_id = ENV["id"]
+
+    if post_id !~ /\d+/
+      raise "Usage: regen_img.rb POST_ID"
+    end
+
+    post = Post.find(post_id)
+    post.source =~ /(\d{5,})/
+    if illust_id = $1
+      response = PixivApiClient.new.works(illust_id)
+      upload = Upload.new
+      upload.source = response.pages.first
+      upload.file_ext = post.file_ext
+      upload.image_width = post.image_width
+      upload.image_height = post.image_height
+      upload.md5 = post.md5
+      upload.download_from_source(post.file_path)
+      post.distribute_files
+    end
+  end
+
   desc "Regenerates all images for a post id"
   task :regen => :environment do
     post_id = ENV["id"]
