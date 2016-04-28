@@ -6,9 +6,9 @@ GIT
 
 GIT
   remote: https://github.com/r888888888/dtext_rb.git
-  revision: 600f80ba497eae302eaa985b0d9a298c52fb1b30
+  revision: 422d4d83c9e49a7e8324f65c3f7e30a6e3e24976
   specs:
-    dtext_rb (1.0.4)
+    dtext_rb (1.0.5)
       jeweler (~> 2.0)
       minitest (~> 5.8)
       rake-compiler (~> 0.9)
@@ -148,7 +148,7 @@ GEM
       domain_name (~> 0.5)
     http_parser.rb (0.6.0)
     i18n (0.7.0)
-    jeweler (2.0.1)
+    jeweler (2.1.1)
       builder
       bundler (>= 1.0)
       git (>= 1.2.5)
@@ -157,6 +157,7 @@ GEM
       nokogiri (>= 1.5.10)
       rake
       rdoc
+      semver
     jmespath (1.0.2)
       multi_json (~> 1.0)
     json (1.8.3)
@@ -186,7 +187,7 @@ GEM
     minitest (5.8.4)
     mocha (1.1.0)
       metaclass (~> 0.0.1)
-    multi_json (1.11.2)
+    multi_json (1.11.3)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
     naught (1.0.0)
@@ -254,7 +255,7 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     raindrops (0.15.0)
-    rake (11.1.1)
+    rake (11.1.2)
     rake-compiler (0.9.7)
       rake
     rdoc (4.2.2)
@@ -285,6 +286,7 @@ GEM
       sass (~> 3.2.2)
       sprockets (~> 2.8, < 3.0)
       sprockets-rails (~> 2.0)
+    semver (1.0.1)
     shoulda (3.5.0)
       shoulda-context (~> 1.0, >= 1.0.1)
       shoulda-matchers (>= 1.4.1, < 3.0)
