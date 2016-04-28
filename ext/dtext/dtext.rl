@@ -3,6 +3,7 @@
 #define PRETTY_PRINT 0
 
 #include <ruby.h>
+#include <ruby/encoding.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -1287,6 +1288,7 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
   VALUE opt_inline;
   VALUE opt_strip;
   VALUE ret;
+  rb_encoding * encoding = NULL;
   StateMachine * sm = NULL;
 
   g_debug("start\n");
@@ -1322,7 +1324,8 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
 
   dstack_close(sm);
 
-  ret = rb_str_new(sm->output->str, sm->output->len);
+  encoding = rb_enc_find("utf-8");
+  ret = rb_enc_str_new(sm->output->str, sm->output->len, encoding);
 
   free_machine(sm);
 
