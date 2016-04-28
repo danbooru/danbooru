@@ -323,6 +323,10 @@ class DText
     html.join("").html_safe
   end
 
+  def self.parse_strip(s)
+    strip(s)
+  end
+
   def self.strip(s)
     s.gsub!(/[\r\n]+/m, " ")
     s.gsub!(/\[\/?(?:b|i|s|u|tn|tr|td|th|thead|tbody|quote|code|spoilers|spoiler|expand|table)\]/, "")
