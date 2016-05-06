@@ -13,6 +13,7 @@ class Post < ActiveRecord::Base
   after_save :update_parent_on_save
   after_save :apply_post_metatags
   after_create :update_iqdb_async
+  after_commit :pg_notify
   before_save :merge_old_changes
   before_save :normalize_tags
   before_save :update_tag_post_counts
@@ -1342,6 +1343,10 @@ class Post < ActiveRecord::Base
       revert_to(target)
       save!
     end
+
+    def pg_notify
+      execute_sql("notify changes_posts, '#{id}'")
+    end
   end
 
   module NoteMethods
@@ -1706,6 +1711,18 @@ class Post < ActiveRecord::Base
 
     self.tag_string = tags.join(" ")
     save
+  end
+
+  def update_column(name, value)
+    ret = super(name, value)
+    pg_notify
+    ret
+  end
+
+  def update_columns(attributes)
+    ret = super(attributes)
+    pg_notify
+    ret
   end
 end
 
