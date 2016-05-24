@@ -121,7 +121,7 @@ class Post < ActiveRecord::Base
     end
 
     def seo_tags
-      @seo_tags ||= humanized_essential_tag_string.gsub(/[^a-z0-9]+/, "-").gsub(/(^-+)|(-+$)/, "")
+      @seo_tags ||= humanized_essential_tag_string.gsub(/[^a-z0-9]+/, "-").gsub(/(?:^-+)|(?:-+$)/, "").gsub(/-{2,}/, "-")
     end
 
     def preview_file_url
