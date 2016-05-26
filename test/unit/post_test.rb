@@ -191,28 +191,24 @@ class PostTest < ActiveSupport::TestCase
       context "a parent" do
         should "not reassign favorites to the parent by default" do
           p1 = FactoryGirl.create(:post)
-          c1 = FactoryGirl.create(:post, :parent_id => p1.id, :score => 1)
+          c1 = FactoryGirl.create(:post, :parent_id => p1.id)
           user = FactoryGirl.create(:gold_user)
           c1.add_favorite!(user)
           c1.delete!
           p1.reload
           assert(Favorite.exists?(:post_id => c1.id, :user_id => user.id))
           assert(!Favorite.exists?(:post_id => p1.id, :user_id => user.id))
-          assert_equal(2, c1.score)
-          assert_equal(0, p1.score)
         end
 
         should "reassign favorites to the parent if specified" do
           p1 = FactoryGirl.create(:post)
-          c1 = FactoryGirl.create(:post, :parent_id => p1.id, :score => 1)
+          c1 = FactoryGirl.create(:post, :parent_id => p1.id)
           user = FactoryGirl.create(:gold_user)
           c1.add_favorite!(user)
           c1.delete!(:move_favorites => true)
           p1.reload
           assert(!Favorite.exists?(:post_id => c1.id, :user_id => user.id), "Child should not still have favorites")
           assert(Favorite.exists?(:post_id => p1.id, :user_id => user.id), "Parent should have favorites")
-          assert_equal(1, c1.score)
-          assert_equal(1, p1.score)
         end
 
         should "not update the parent's has_children flag" do

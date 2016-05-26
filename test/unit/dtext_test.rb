@@ -155,15 +155,15 @@ class DTextTest < ActiveSupport::TestCase
   end
 
   def test_inline_tags
-    assert_equal('<p><a href="/posts?tags=tag">tag</a></p>', p("{{tag}}"))
+    assert_equal('<p><a rel="nofollow" href="/posts?tags=tag">tag</a></p>', p("{{tag}}"))
   end
 
   def test_inline_tags_conjunction
-    assert_equal('<p><a href="/posts?tags=tag1+tag2">tag1 tag2</a></p>', p("{{tag1 tag2}}"))
+    assert_equal('<p><a rel="nofollow" href="/posts?tags=tag1+tag2">tag1 tag2</a></p>', p("{{tag1 tag2}}"))
   end
 
   def test_inline_tags_special_entities
-    assert_equal('<p><a href="/posts?tags=%3C3">&lt;3</a></p>', p("{{<3}}"))
+    assert_equal('<p><a rel="nofollow" href="/posts?tags=%3C3">&lt;3</a></p>', p("{{<3}}"))
   end
 
   def test_extra_newlines

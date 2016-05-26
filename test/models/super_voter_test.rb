@@ -13,7 +13,7 @@ class SuperVoterTest < ActiveSupport::TestCase
     end
 
     should "create super voter objects" do
-      assert_difference("SuperVoter.count") do
+      assert_difference("SuperVoter.count", 2) do
         SuperVoter.init!
       end
     end
