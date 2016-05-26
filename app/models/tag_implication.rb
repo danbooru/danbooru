@@ -5,6 +5,7 @@ class TagImplication < ActiveRecord::Base
   after_save :update_descendant_names_for_parents
   after_destroy :update_descendant_names_for_parents
   belongs_to :creator, :class_name => "User"
+  belongs_to :approver, :class_name => "User"
   belongs_to :forum_topic
   before_validation :initialize_creator, :on => :create
   before_validation :normalize_names
@@ -123,7 +124,7 @@ class TagImplication < ActiveRecord::Base
     self.creator_ip_addr = CurrentUser.ip_addr
   end
 
-  def process!(update_topic=true, approver_id=nil)
+  def process!(update_topic=true)
     unless valid?
       raise errors.full_messages.join("; ")
     end
@@ -131,7 +132,7 @@ class TagImplication < ActiveRecord::Base
     tries = 0
 
     begin
-      admin = CurrentUser.user || User.where(id: approver_id).first || User.admins.first
+      admin = CurrentUser.user || approver || User.admins.first
       CurrentUser.scoped(admin, "127.0.0.1") do
         update_column(:status, "processing")
         update_posts
@@ -271,6 +272,13 @@ class TagImplication < ActiveRecord::Base
       self.errors[:base] = "The #{antecedent_name} tag needs a corresponding wiki page"
       return false
     end
+  end
+
+  def approve!(approver_id)
+    self.status = "queued"
+    self.approver_id = approver_id
+    save
+    delay(:queue => "default").process!(true)
   end
 
   def reject!

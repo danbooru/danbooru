@@ -1,11 +1,12 @@
 <table width="100%" class="striped">
   <thead>
     <tr>
-      <th width="30%">From</th>
-      <th width="30%">To</th>
+      <th width="25%">From</th>
+      <th width="25%">To</th>
       <th width="10%">Reference</th>
-      <th width="10%">Status</th>
-      <th width="20%"></th>
+      <th width="15%">Approver</th>
+      <th width="5%">Status</th>
+      <th width="15%"></th>
     </tr>
   </thead>
   <tbody>
@@ -18,6 +19,7 @@
             <%= link_to tag_alias.forum_topic_id, forum_topic_path(tag_alias.forum_topic_id) %>
           <% end %>
         </td>
+        <td><%= link_to_user(tag_alias.approver) if tag_alias.approver %></td>
         <td id="tag-alias-status-for-<%= tag_alias.id %>">
           <%= tag_alias.status %>
         </td>

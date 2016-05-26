@@ -48,8 +48,7 @@ class TagImplicationsController < ApplicationController
 
   def approve
     @tag_implication = TagImplication.find(params[:id])
-    @tag_implication.update_column(:status, "queued")
-    @tag_implication.delay(:queue => "default").process!(true, CurrentUser.id)
+    @tag_implication.approve!(CurrentUser.user.id)
     respond_with(@tag_implication, :location => tag_implication_path(@tag_implication))
   end
 end

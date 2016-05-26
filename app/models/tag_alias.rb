@@ -13,6 +13,7 @@ class TagAlias < ActiveRecord::Base
   validate :consequent_has_wiki_page, :on => :create
   validate :mininum_antecedent_count, :on => :create
   belongs_to :creator, :class_name => "User"
+  belongs_to :approver, :class_name => "User"
   belongs_to :forum_topic
   attr_accessible :antecedent_name, :consequent_name, :forum_topic_id, :status, :skip_secondary_validations
 
@@ -81,7 +82,16 @@ class TagAlias < ActiveRecord::Base
     end.uniq
   end
 
-  def process!(update_topic=true, approver_id = nil)
+  def approve!(approver_id)
+    self.status = "queued"
+    self.approver_id = approver_id
+    save
+
+    rename_wiki_and_artist
+    delay(:queue => "default").process!(true)
+  end
+
+  def process!(update_topic=true)
     unless valid?
       raise errors.full_messages.join("; ")
     end
@@ -89,7 +99,7 @@ class TagAlias < ActiveRecord::Base
     tries = 0
 
     begin
-      admin = CurrentUser.user || User.where(id: approver_id).first || User.admins.first
+      admin = CurrentUser.user || approver || User.admins.first
       CurrentUser.scoped(admin, "127.0.0.1") do
         update_column(:status, "processing")
         move_aliases_and_implications

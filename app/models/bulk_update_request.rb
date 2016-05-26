@@ -3,6 +3,7 @@ class BulkUpdateRequest < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :forum_topic
+  belongs_to :approver, :class_name => "User"
 
   validates_presence_of :user
   validates_presence_of :script
@@ -12,7 +13,7 @@ class BulkUpdateRequest < ActiveRecord::Base
   validate :forum_topic_id_not_invalid
   validate :validate_script
   attr_accessible :user_id, :forum_topic_id, :script, :title, :reason, :skip_secondary_validations
-  attr_accessible :status, :as => [:admin]
+  attr_accessible :status, :approver_id, :as => [:admin]
   before_validation :initialize_attributes, :on => :create
   before_validation :normalize_text
   after_create :create_forum_topic
@@ -34,16 +35,15 @@ class BulkUpdateRequest < ActiveRecord::Base
 
   def approve!
     AliasAndImplicationImporter.new(script, forum_topic_id, "1", true).process!
+    update_columns(:status => "approved", :approver_id => CurrentUser.user.id)
     update_forum_topic_for_approve
-    update_attribute(:status, "approved")
 
   rescue Exception => x
-    message_admin_on_failure(x)
+    message_approver_on_failure(x)
     update_topic_on_failure(x)
   end
 
-  def message_admin_on_failure(x)
-    admin = User.admins.first
+  def message_approver_on_failure(x)
     msg = <<-EOS
       Bulk Update Request ##{id} failed\n
       Exception: #{x.class}\n
@@ -56,13 +56,13 @@ class BulkUpdateRequest < ActiveRecord::Base
     end
 
     dmail = Dmail.new(
-      :from_id => admin.id,
-      :to_id => admin.id,
-      :owner_id => admin.id,
+      :from_id => approver.id,
+      :to_id => approver.id,
+      :owner_id => approver.id,
       :title => "Bulk update request approval failed",
       :body => msg
     )
-    dmail.owner_id = admin.id
+    dmail.owner_id = approver.id
     dmail.save
   end
 
