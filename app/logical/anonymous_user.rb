@@ -249,6 +249,10 @@ class AnonymousUser
     false
   end
 
+  def disable_tagged_filenames?
+    false
+  end
+
   %w(member banned gold builder platinum janitor moderator admin).each do |name|
     define_method("is_#{name}?") do
       false

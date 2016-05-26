@@ -99,24 +99,22 @@ class Post < ActiveRecord::Base
     end
 
     def file_url
-      if Danbooru.config.enable_seo_post_urls
-        # the seo tags should be stripped out by nginx
-        "/data/--#{seo_tags}--#{file_path_prefix}#{md5}.#{file_ext}"
-      else
-        "/data/#{file_path_prefix}#{md5}.#{file_ext}"
-      end
+      "/data/#{seo_tag_string}#{file_path_prefix}#{md5}.#{file_ext}"
     end
 
     def large_file_url
       if has_large?
-        if Danbooru.config.enable_seo_post_urls
-          # the seo tags should be stripped out by nginx
-          "/data/sample/--#{seo_tags}--#{file_path_prefix}#{Danbooru.config.large_image_prefix}#{md5}.#{large_file_ext}"
-        else
-          "/data/sample/#{file_path_prefix}#{Danbooru.config.large_image_prefix}#{md5}.#{large_file_ext}"
-        end 
+        "/data/sample/#{seo_tag_string}#{file_path_prefix}#{Danbooru.config.large_image_prefix}#{md5}.#{large_file_ext}"
       else
         file_url
+      end
+    end
+
+    def seo_tag_string
+      if Danbooru.config.enable_seo_post_urls && !CurrentUser.user.disable_tagged_filenames?
+        "--#{seo_tags}--"
+      else
+        nil
       end
     end
 
