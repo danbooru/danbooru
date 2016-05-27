@@ -4,7 +4,7 @@ class UserNameChangeRequest < ActiveRecord::Base
   belongs_to :user
   belongs_to :approver, :class_name => "User"
   validate :uniqueness_of_desired_name
-  validate :not_limited
+  validate :not_limited, :on => :create
   validates_length_of :desired_name, :within => 2..100, :on => :create
   validates_format_of :desired_name, :with => /\A[^\s:]+\Z/, :on => :create, :message => "cannot have whitespace or colons"
   before_validation :normalize_name
