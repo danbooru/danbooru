@@ -128,7 +128,7 @@ module Sources
         end
 
         should "get the full size image url" do
-          assert_equal("http://i2.pixiv.net/img18/img/evazion/14901720.png", @site.image_url)
+          assert_equal("http://i1.pixiv.net/img-original/img/2010/11/30/08/39/58/14901720_p0.png", @site.image_url)
         end
 
         should "get the tags" do

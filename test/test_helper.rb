@@ -45,6 +45,14 @@ class ActiveSupport::TestCase
   def setup_vcr
     @record = false
 
+    if @record
+      # %x(find test/fixtures/vcr_cassettes -name '*pixiv*' -delete)
+      # %x(find test/fixtures/vcr_cassettes -name '*ugoira*' -delete)
+      # %x(find test/fixtures/vcr_cassettes -name '*seiga*' -delete)
+      # %x(find test/fixtures/vcr_cassettes -name '*twitter*' -delete)
+      # %x(find test/fixtures/vcr_cassettes -name '*artist*' -delete)
+    end
+
     # instead of trying to persist these across tests just clear it out every time
     Cache.delete("pixiv-phpsessid")
     Cache.delete("pixiv-papi-access-token")

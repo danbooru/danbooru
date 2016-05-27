@@ -23,16 +23,16 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Thu, 14 May 2015 23:42:03 GMT
+      - Sat, 28 May 2016 19:45:43 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '502'
+      - '343'
       Connection:
       - keep-alive
       Set-Cookie:
-      - PHPSESSID=696859_bb99419d588815f6d8d0d93ddeca5a41; expires=Fri, 15-May-2015
-        00:42:03 GMT; Max-Age=3600; path=/; domain=.pixiv.net; secure
+      - PHPSESSID=696859_855b6b9fed082a239985ede0345ae847; expires=Sat, 28-May-2016
+        20:45:43 GMT; Max-Age=3600; path=/; domain=.pixiv.net; secure
       Expires:
       - Thu, 19 Nov 1981 08:52:00 GMT
       Cache-Control:
@@ -41,11 +41,13 @@ http_interactions:
       - no-cache
       X-Content-Type-Options:
       - nosniff
+      Vary:
+      - Accept-Encoding
     body:
       encoding: UTF-8
-      string: '{"response":{"access_token":"zD6ZcX8Z7CQe21ZfkK_rdk_d0OzMUZoS0_gXRBY4Ng0","expires_in":3600,"token_type":"bearer","scope":"unlimited","refresh_token":"JhZyWkXIbfqBYj7YAl5FTBP4PupFgtK1xKA8YKXTqMg","user":{"profile_image_urls":{"px_16x16":"http:\/\/source.pixiv.net\/common\/images\/no_profile_ss.png","px_50x50":"http:\/\/source.pixiv.net\/common\/images\/no_profile_s.png","px_170x170":"http:\/\/source.pixiv.net\/common\/images\/no_profile.png"},"id":"696859","name":"SENSITIVE","account":"SENSITIVE"}}}'
+      string: '{"response":{"access_token":"AVn4tY4dcs13udy2w5Ln0rRbGUW208pNVQLGxWj-Wag","expires_in":3600,"token_type":"bearer","scope":"unlimited","refresh_token":"fRQTzGnMLtxtWZCnzvTy9xpPOR6r4eZPt2_9b1NY8Pg","user":{"profile_image_urls":{"px_16x16":"http:\/\/source.pixiv.net\/common\/images\/no_profile_ss.png","px_50x50":"http:\/\/source.pixiv.net\/common\/images\/no_profile_s.png","px_170x170":"http:\/\/source.pixiv.net\/common\/images\/no_profile.png"},"id":"696859","name":"SENSITIVE","account":"SENSITIVE","is_premium":false,"x_restrict":2,"is_mail_authorized":true}}}'
     http_version: 
-  recorded_at: Thu, 14 May 2015 23:42:12 GMT
+  recorded_at: Sat, 28 May 2016 19:45:43 GMT
 - request:
     method: get
     uri: https://public-api.secure.pixiv.net/v1/works/32049358.json?image_sizes=large&include_stats=true
@@ -56,11 +58,11 @@ http_interactions:
       Referer:
       - http://www.pixiv.net
       User-Agent:
-      - crystal/2.79.2
+      - Danbooru/2.102.0
       Content-Type:
       - application/x-www-form-urlencoded
       Authorization:
-      - Bearer zD6ZcX8Z7CQe21ZfkK_rdk_d0OzMUZoS0_gXRBY4Ng0
+      - Bearer AVn4tY4dcs13udy2w5Ln0rRbGUW208pNVQLGxWj-Wag
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -73,15 +75,17 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Thu, 14 May 2015 23:42:04 GMT
+      - Sat, 28 May 2016 19:45:44 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '160'
+      - '175'
       Connection:
       - keep-alive
       X-Content-Type-Options:
       - nosniff
+      Vary:
+      - Accept-Encoding
     body:
       encoding: ASCII-8BIT
       string: !binary |-
@@ -90,5 +94,5 @@ http_interactions:
         ga/opovjgaTjgYvjgorjgb7jgZvjgpPjgafjgZfjgZ/jgIIoaWxsdXN0X2lk
         OjMyMDQ5MzU4KSIsImNvZGUiOjIwNn19fQ==
     http_version: 
-  recorded_at: Thu, 14 May 2015 23:42:12 GMT
-recorded_with: VCR 2.9.0
+  recorded_at: Sat, 28 May 2016 19:45:44 GMT
+recorded_with: VCR 2.9.3

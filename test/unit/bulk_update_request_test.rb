@@ -59,6 +59,8 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       end
 
       should "update the topic when rejected" do
+        @req.approver_id = @admin.id
+
         assert_difference("ForumPost.count") do
           @req.reject!
         end

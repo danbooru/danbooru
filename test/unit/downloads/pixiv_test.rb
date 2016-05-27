@@ -63,10 +63,6 @@ module Downloads
           @medium_page = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=14901720"
           @big_page    = "http://www.pixiv.net/member_illust.php?mode=big&illust_id=14901720"
 
-          @old_small_thumbnail  = "http://i2.pixiv.net/img18/img/evazion/14901720_s.png"
-          @old_medium_thumbnail = "http://i2.pixiv.net/img18/img/evazion/14901720_m.png"
-          @old_full_size_image  = "http://i2.pixiv.net/img18/img/evazion/14901720.png"
-
           @new_small_thumbnail  = "http://i1.pixiv.net/c/150x150/img-master/img/2010/11/30/08/39/58/14901720_p0_master1200.jpg"
           @new_medium_thumbnail = "http://i1.pixiv.net/c/600x600/img-master/img/2010/11/30/08/39/58/14901720_p0_master1200.jpg"
           @new_full_size_image  = "http://i1.pixiv.net/img-original/img/2010/11/30/08/39/58/14901720_p0.png"
@@ -74,27 +70,7 @@ module Downloads
           @file_size = 1_083
         end
 
-        should "download the full size image" do
-          assert_not_rewritten(@full_size_image, "rewrite-pixiv-old-png-full-size")
-          assert_downloaded(@file_size, @old_full_size_image, "download-pixiv-old-png-full-size")
-        end
-
-        should "download the full size image instead of the HTML page" do
-          assert_rewritten(@old_full_size_image, @medium_page, "rewrite-pixiv-old-png-medium-html")
-          assert_rewritten(@old_full_size_image, @big_page, "rewrite-pixiv-old-png-big-html")
-          assert_downloaded(@file_size, @medium_page, "download-pixiv-old-png-medium-html")
-          assert_downloaded(@file_size, @big_page,    "download-pixiv-old-png-big-html")
-        end
-
-        should "download the full size image instead of the thumbnail" do
-          assert_rewritten(@old_full_size_image, @old_small_thumbnail, "rewrite-pixiv-old-png-old-small-thumbnail")
-          assert_rewritten(@old_full_size_image, @old_medium_thumbnail, "rewrite-pixiv-old-png-old-medium-thumbnail")
-          assert_downloaded(@file_size, @old_small_thumbnail,  "download-pixiv-old-png-old-small-thumbnail")
-          assert_downloaded(@file_size, @old_medium_thumbnail, "download-pixiv-old-png-old-medium-thumbnail")
-        end
-
-        # These tests aren't expected to pass. This is just to test if Pixiv has changed to using new URLs for old images.
-        should_eventually "work when using new URLs" do
+        should "work when using new URLs" do
           # Don't know the actual file size of the thumbnails since they don't work.
           assert_downloaded(1083, @new_small_thumbnail,  "download-pixiv-old-png-new-small-thumbnail")
           assert_downloaded(1083, @new_medium_thumbnail, "download-pixiv-old-png-new-medium-thumbnail")
@@ -118,7 +94,7 @@ module Downloads
           @file_size = 5_141
         end
 
-        should "1111 download the full size image" do
+        should "download the full size image" do
           assert_not_rewritten(@full_size_image, "rewrite-pixiv-new-png-full-size")
           assert_downloaded(@file_size, @full_size_image, "download-pixiv-new-png-full-size")
         end
@@ -133,60 +109,6 @@ module Downloads
         should "download the full size image instead of the thumbnail" do
           assert_rewritten(@full_size_image, @medium_thumbnail, "rewrite-pixiv-new-png-medium-thumbnail")
           assert_downloaded(@file_size, @medium_thumbnail, "download-pixiv-new-png-medium-thumbnail")
-        end
-      end
-
-      context "downloading an old manga image" do
-        setup do
-          @medium_page = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054"
-          @manga_page  = "http://www.pixiv.net/member_illust.php?mode=manga&illust_id=18557054"
-          @manga_big_p1_page = "http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=18557054&page=1"
-
-          @p0_tiny_thumbnail   = "http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_64x64.jpg"
-          @p0_small_thumbnail  = "http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_s.png"
-          @p0_medium_thumbnail = "http://i1.pixiv.net/img07/img/pasirism/18557054_m.png"
-          @p0_large_thumbnail  = "http://i1.pixiv.net/img07/img/pasirism/18557054_p0.png"
-          @p1_large_thumbnail  = "http://i1.pixiv.net/img07/img/pasirism/18557054_p1.png"
-
-          @p0_full_size_image   = "http://i3.pixiv.net/img07/img/pasirism/18557054_big_p0.png"
-          @p0_full_size_image_1 = "http://i1.pixiv.net/img07/img/pasirism/18557054_big_p0.png"
-          @p1_full_size_image   = "http://i1.pixiv.net/img07/img/pasirism/18557054_big_p1.png"
-          @p1_full_size_image_3 = "http://i3.pixiv.net/img07/img/pasirism/18557054_big_p1.png"
-
-          @p0_file_size = 1964
-          @p1_file_size = 1927
-        end
-
-        should "download the full size image" do
-          assert_not_rewritten(@p0_full_size_image, "rewrite-pixiv-old-manga-p0-full-size")
-          assert_not_rewritten(@p1_full_size_image, "rewrite-pixiv-old-manga-p1-full-size")
-          assert_downloaded(@p0_file_size, @p0_full_size_image, "download-pixiv-old-manga-p0-full-size")
-          assert_downloaded(@p1_file_size, @p1_full_size_image, "download-pixiv-old-manga-p1-full-size")
-        end
-
-        should "download the full size image instead of the HTML page" do
-          assert_rewritten(@p0_full_size_image, @medium_page, "rewrite-pixiv-old-manga-p0-medium-html")
-          assert_rewritten(@p0_full_size_image, @manga_page, "rewrite-pixiv-old-manga-p0-big-html")
-          assert_rewritten(@p1_full_size_image_3, @manga_big_p1_page, "rewrite-pixiv-old-manga-p1-big-html")
-          assert_downloaded(@p0_file_size, @medium_page,       "download-pixiv-old-manga-p0-medium-html")
-          assert_downloaded(@p0_file_size, @manga_page,        "download-pixiv-old-manga-p0-big-html")
-          assert_downloaded(@p1_file_size, @manga_big_p1_page, "download-pixiv-old-manga-p1-big-html")
-        end
-
-        should "download the full size image instead of the thumbnail" do
-          assert_rewritten(@p0_full_size_image, @p0_tiny_thumbnail, "download-pixiv-old-manga-p0-tiny-thumbnail")
-          assert_rewritten(@p0_full_size_image, @p0_small_thumbnail, "download-pixiv-old-manga-p0-small-thumbnail")
-          assert_rewritten(@p0_full_size_image_1, @p0_large_thumbnail, "download-pixiv-old-manga-p0-large-thumbnail")
-          assert_rewritten(@p1_full_size_image, @p1_large_thumbnail, "download-pixiv-old-manga-p1-large-thumbnail")
-          assert_downloaded(@p0_file_size, @p0_tiny_thumbnail,  "download-pixiv-old-manga-p0-tiny-thumbnail-2")
-          assert_downloaded(@p0_file_size, @p0_small_thumbnail, "download-pixiv-old-manga-p0-small-thumbnail-2")
-          assert_downloaded(@p0_file_size, @p0_large_thumbnail, "download-pixiv-old-manga-p0-large-thumbnail-2")
-          assert_downloaded(@p1_file_size, @p1_large_thumbnail, "download-pixiv-old-manga-p1-large-thumbnail-2")
-        end
-
-        should "download the full size image instead of the medium thumbnail" do
-          assert_rewritten(@p0_full_size_image_1, @p0_medium_thumbnail, "rewrite-pixiv-old-manga-p0-medium-thumbnail")
-          assert_downloaded(@p0_file_size, @p0_medium_thumbnail, "download-pixiv-old-manga-p0-medium-thumbnail")
         end
       end
 

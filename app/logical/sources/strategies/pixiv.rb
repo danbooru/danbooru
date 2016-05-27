@@ -296,11 +296,11 @@ module Sources
 
       def get_page_count_from_page(page)
         elements = page.search("ul.meta li").find_all do |node|
-          node.text =~ /Manga|漫画|複数枚投稿/
+          node.text =~ /Manga|漫画|複数枚投稿|Multiple images/
         end
 
         if elements.any?
-          elements[0].text =~ /(?:Manga|漫画|複数枚投稿) (\d+)P/
+          elements[0].text =~ /(?:Manga|漫画|複数枚投稿|Multiple images):? (\d+)P/
           $1.to_i
         else
           1
