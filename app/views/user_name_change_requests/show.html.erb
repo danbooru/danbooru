@@ -38,7 +38,7 @@
       <h2>Request was rejected</h2>
     </section>
   
-  <% elsif @change_request.approved? %>
+  <% elsif @change_request.approved? && @change_request.approver %>
     <section>
       <h2>Request was approved by <%= @change_request.approver.name %></h2>
     </section>
