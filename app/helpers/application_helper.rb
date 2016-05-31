@@ -50,7 +50,7 @@ module ApplicationHelper
   end
 
   def format_text(text, options = {})
-    if CurrentUser.id == 1
+    if CurrentUser.id < 1_000
       raw(DTextRagel.parse(text))
     else
       DText.parse(text)
@@ -58,7 +58,7 @@ module ApplicationHelper
   end
 
   def strip_dtext(text, options = {})
-    if CurrentUser.id == 1
+    if CurrentUser.id < 1_000
       raw(DTextRagel.parse_strip(text))
     else
       DText.parse_strip(text)
