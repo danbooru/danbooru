@@ -148,6 +148,16 @@ aliased_expand = '[expand=' (nonbracket+ >mark_a1 %mark_a2) ']';
 
 list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
 
+textile_link_desc := |*
+  '":' (internal_url | url);
+*|;
+
+textile_link := |*
+  '"';
+
+  any;
+*|;
+
 inline := |*
   post_id => {
     append(sm, true, "<a href=\"/posts/");

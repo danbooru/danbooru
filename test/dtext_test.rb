@@ -132,6 +132,10 @@ class DTextTest < Minitest::Test
     assert_parse('<p><a href="http://test.com">test</a></p>', '"test":http://test.com')
   end
 
+  def test_old_style_links_with_inline_tags
+    assert_parse('<p><a href="http://test.com"><em>test</em></a></p>', '"[i]test[/i]":http://test.com')
+  end
+
   def test_old_style_links_with_special_entities
     assert_parse('<p>&quot;1&quot; <a href="http://three.com">2 &amp; 3</a></p>', '"1" "2 & 3":http://three.com')
   end

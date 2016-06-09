@@ -1,6 +1,6 @@
-Dir["/dev_exclusions/dtext_bench/wiki_pages/*.txt"].sort.slice(30, 10).each do |file|
+Dir["/dev_exclusions/dtext_bench/wiki_pages/*.txt"].sort.slice(10, 10).each do |file|
   input = File.read(file)
-  o1 = DTextRagel.parse(input.dup).gsub(/\s+<\/p>/, "</p>")
+  o1 = DTextRagel.parse(input.dup).gsub(/\s+<\/p>/, "</p>").gsub(/&quot;/, "\"")
   o2 = DTextRuby.parse(input.dup).gsub(/\r/, "").gsub(/\s+<\/p>/, "</p>")
   if o1.size != o2.size
     puts input
