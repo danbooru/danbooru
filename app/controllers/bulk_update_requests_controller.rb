@@ -14,6 +14,9 @@ class BulkUpdateRequestsController < ApplicationController
     respond_with(@bulk_update_request, :location => bulk_update_requests_path)
   end
 
+  def show
+  end
+
   def edit
   end
 

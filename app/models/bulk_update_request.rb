@@ -137,7 +137,7 @@ class BulkUpdateRequest < ActiveRecord::Base
   def update_forum_topic_for_approve
     if forum_topic
       forum_topic.posts.create(
-        :body => "\"The bulk update request ##{id} has been approved.\":/bulk_update_requests/#{id}"
+        :body => "\"The bulk update request ##{id} has been approved.\":/bulk_update_requests?search%5Bid%5D=#{id}"
       )
     end
   end
@@ -145,7 +145,7 @@ class BulkUpdateRequest < ActiveRecord::Base
   def update_forum_topic_for_reject
     if forum_topic
       forum_topic.posts.create(
-        :body => "\"The bulk update request ##{id} has been rejected.\":/bulk_update_requests/#{id}"
+        :body => "\"The bulk update request ##{id} has been rejected.\":/bulk_update_requests?search%5Bid%5D=#{id}"
       )
     end
   end
