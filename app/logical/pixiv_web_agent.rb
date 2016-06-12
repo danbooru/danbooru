@@ -38,7 +38,7 @@ class PixivWebAgent
       if mech.current_page.body =~ /"error":false/
         cookie = mech.cookies.select {|x| x.name == "PHPSESSID"}.first
         phpsessid = cookie.value
-        Cache.put("pixiv-phpsessid", phpsessid.value, 1.month)
+        Cache.put("pixiv-phpsessid", phpsessid, 1.month)
       end
     end
 
