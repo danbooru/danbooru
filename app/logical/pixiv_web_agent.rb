@@ -13,14 +13,33 @@ class PixivWebAgent
       cookie.path = "/"
       mech.cookie_jar.add(cookie)
     else
-      mech.get("http://www.pixiv.net/tags.php") do |page|
-        page.form_with(:action => "/login.php") do |form|
-          form['pixiv_id'] = Danbooru.config.pixiv_login
-          form['pass'] = Danbooru.config.pixiv_password
-        end.click_button
+      headers = {
+        "Origin" => "https://accounts.pixiv.net",
+        "Referer" => "https://accounts.pixiv.net/login?lang=en^source=pc&view_type=page&ref=wwwtop_accounts_index"
+      }
+
+      params = {
+        pixiv_id: Danbooru.config.pixiv_login,
+        password: Danbooru.config.pixiv_password,
+        captcha: nil,
+        g_captcha_response: nil,
+        source: "pc",
+        post_key: nil
+      }
+
+      mech.get("https://accounts.pixiv.net/login?lang=en&source=pc&view_type=page&ref=wwwtop_accounts_index") do |page|
+        json = page.search("input#init-config").first.attr("value")
+        if json =~ /pixivAccount\.postKey":"([a-f0-9]+)/
+          params[:post_key] = $1
+        end
       end
-      phpsessid = mech.cookie_jar.cookies.select{|c| c.name == "PHPSESSID"}.first
-      Cache.put("pixiv-phpsessid", phpsessid.value, 1.month) if phpsessid
+
+      mech.post("https://accounts.pixiv.net/api/login?lang=en", params, headers)
+      if mech.current_page.body =~ /"error":false/
+        cookie = mech.cookies.select {|x| x.name == "PHPSESSID"}.first
+        phpsessid = cookie.value
+        Cache.put("pixiv-phpsessid", phpsessid.value, 1.month)
+      end
     end
 
     mech
