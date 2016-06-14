@@ -1,14 +1,25 @@
 class PixivWebAgent
+  SESSION_CACHE_KEY = "pixiv-phpsessid"
+  COMIC_SESSION_CACHE_KEY = "pixiv-comicsessid"
+  SESSION_COOKIE_KEY = "PHPSESSID"
+  COMIC_SESSION_COOKIE_KEY = "_pixiv-comic_session"
+
   def self.phpsessid(agent)
-    agent.cookies.select do |cookie| cookie.name == "PHPSESSID" end.first.try(:value)
+    agent.cookies.select do |cookie| cookie.name == SESSION_COOKIE_KEY end.first.try(:value)
   end
 
   def self.build
     mech = Mechanize.new
-    phpsessid = Cache.get("pixiv-phpsessid")
+    phpsessid = Cache.get(SESSION_CACHE_KEY)
+    comicsessid = Cache.get(COMIC_SESSION_CACHE_KEY)
 
-    if phpsessid
-      cookie = Mechanize::Cookie.new("PHPSESSID", phpsessid)
+    if phpsessid && comicsessid
+      cookie = Mechanize::Cookie.new(SESSION_COOKIE_KEY, phpsessid)
+      cookie.domain = ".pixiv.net"
+      cookie.path = "/"
+      mech.cookie_jar.add(cookie)
+
+      cookie = Mechanize::Cookie.new(COMIC_SESSION_COOKIE_KEY, comicsessid)
       cookie.domain = ".pixiv.net"
       cookie.path = "/"
       mech.cookie_jar.add(cookie)
@@ -36,9 +47,17 @@ class PixivWebAgent
 
       mech.post("https://accounts.pixiv.net/api/login?lang=en", params, headers)
       if mech.current_page.body =~ /"error":false/
-        cookie = mech.cookies.select {|x| x.name == "PHPSESSID"}.first
-        phpsessid = cookie.value
-        Cache.put("pixiv-phpsessid", phpsessid, 1.month)
+        cookie = mech.cookies.select {|x| x.name == SESSION_COOKIE_KEY}.first
+        if cookie
+          Cache.put(SESSION_CACHE_KEY, cookie.value, 1.month)
+        end
+      end
+
+      mech.get("https://comic.pixiv.net") do |page|
+        cookie = mech.cookies.select {|x| x.name == COMIC_SESSION_COOKIE_KEY}.first
+        if cookie
+          Cache.put(COMIC_SESSION_CACHE_KEY, cookie.value, 1.month)
+        end
       end
     end
 
