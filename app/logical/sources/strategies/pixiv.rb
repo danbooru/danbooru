@@ -81,7 +81,6 @@ module Sources
         @zip_url, @ugoira_frame_data, @ugoira_content_type = get_zip_url_from_page(page)
         @tags = get_tags_from_page(page)
         @page_count = get_page_count_from_page(page)
-        @gallery_link = get_gallery_link(page)
         @artist_commentary_title = @metadata.artist_commentary_title
         @artist_commentary_desc = @metadata.artist_commentary_desc
 
@@ -108,27 +107,10 @@ module Sources
       end
 
       def image_urls
-        results = []
-
-        if @gallery_link
-          agent.get("http://www.pixiv.net/" + @gallery_link) do |page|
-            results = page.search("a.full-size-container").map {|x| "http://www.pixiv.net" + x.attr("href")}
-          end
-        end
-
-        results
+        @metadata.pages
       end
       
     protected
-
-      def get_gallery_link(page)
-        link = page.search("div.works_display a").first
-        if link
-          link.attr("href")
-        else
-          nil
-        end
-      end
 
       # http://i1.pixiv.net/c/600x600/img-master/img/2014/10/02/13/51/23/46304396_p1_master1200.jpg
       # => http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p1.png
