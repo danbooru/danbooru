@@ -1,1 +1,5 @@
-$("#request-status-for-<%= @bulk_update_request.id %>").html("queued");
+<% if @bulk_update_request.errors.any? %>
+  Danbooru.error(<%= j @bulk_update_request.errors.full_messages.join(',') %>);
+<% else %>
+  $("#request-status-for-<%= @bulk_update_request.id %>").html("queued");
+<% end %>
