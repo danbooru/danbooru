@@ -11,7 +11,7 @@ class BulkUpdateRequest < ActiveRecord::Base
   validates_inclusion_of :status, :in => %w(pending approved rejected)
   validate :script_formatted_correctly
   validate :forum_topic_id_not_invalid
-  validate :validate_script
+  validate :validate_script, :on => :create
   attr_accessible :user_id, :forum_topic_id, :script, :title, :reason, :skip_secondary_validations
   attr_accessible :status, :approver_id, :as => [:admin]
   before_validation :initialize_attributes, :on => :create
