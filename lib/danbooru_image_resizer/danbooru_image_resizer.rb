@@ -15,6 +15,7 @@ module Danbooru
     end
 
     image = flatten(image, width, height)
+    image.strip!
 
     image.write(write_path) do
       self.quality = resize_quality

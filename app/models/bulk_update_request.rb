@@ -58,6 +58,8 @@ class BulkUpdateRequest < ActiveRecord::Base
       msg += "#{line}\n"
     end
 
+    self.approver_id = User.admins.first.id if approver.nil?
+
     dmail = Dmail.new(
       :from_id => approver.id,
       :to_id => approver.id,

@@ -106,7 +106,7 @@ class BulkUpdateRequestsControllerTest < ActionController::TestCase
         end
       end
 
-      context "1234 for an admin" do
+      context "for an admin" do
         should "succeed" do
           post :approve, {:id => @bulk_update_request.id}, {:user_id => @admin.id}
           @bulk_update_request.reload
