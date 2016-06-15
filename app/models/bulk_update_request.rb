@@ -71,7 +71,7 @@ class BulkUpdateRequest < ActiveRecord::Base
 
   def update_topic_on_failure(x)
     if forum_topic_id
-      body = "Bulk update request ##{id} failed: #{x.to_s}"
+      body = "\"Bulk update request ##{id}\":/bulk_update_requests?search%5Bid%5D=#{id} failed: #{x.to_s}"
       ForumPost.create(:body => body, :topic_id => forum_topic_id)
     end
   end
@@ -137,7 +137,7 @@ class BulkUpdateRequest < ActiveRecord::Base
   def update_forum_topic_for_approve
     if forum_topic
       forum_topic.posts.create(
-        :body => "\"The bulk update request ##{id} has been approved.\":/bulk_update_requests?search%5Bid%5D=#{id}"
+        :body => "The \"bulk update request ##{id}\":/bulk_update_requests?search%5Bid%5D=#{id} has been approved."
       )
     end
   end
@@ -145,7 +145,7 @@ class BulkUpdateRequest < ActiveRecord::Base
   def update_forum_topic_for_reject
     if forum_topic
       forum_topic.posts.create(
-        :body => "\"The bulk update request ##{id} has been rejected.\":/bulk_update_requests?search%5Bid%5D=#{id}"
+        :body => "The \"bulk update request ##{id}\":/bulk_update_requests?search%5Bid%5D=#{id} has been rejected."
       )
     end
   end
