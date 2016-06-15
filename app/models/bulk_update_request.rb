@@ -34,9 +34,9 @@ class BulkUpdateRequest < ActiveRecord::Base
   extend SearchMethods
 
   def approve!(approver_id)
+    self.approver_id = approver_id
     AliasAndImplicationImporter.new(script, forum_topic_id, "1", true).process!
     self.status = "approved"
-    self.approver_id = approver_id
     self.skip_secondary_validations = true
     save
     update_forum_topic_for_approve
@@ -57,8 +57,6 @@ class BulkUpdateRequest < ActiveRecord::Base
     x.backtrace.each do |line|
       msg += "#{line}\n"
     end
-
-    self.approver_id = User.admins.first.id if approver.nil?
 
     dmail = Dmail.new(
       :from_id => approver.id,
