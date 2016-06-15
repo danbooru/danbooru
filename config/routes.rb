@@ -257,6 +257,7 @@ Rails.application.routes.draw do
   resource :tag_implication_request, :only => [:new, :create]
   resources :tag_subscriptions do
     member do
+      post :migrate
       get :posts
     end
   end

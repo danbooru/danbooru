@@ -61,6 +61,14 @@ class TagSubscriptionsController < ApplicationController
     @posts = @post_set.posts
   end
 
+  def migrate
+    @tag_subscription = TagSubscription.find(params[:id])
+    check_privilege(@tag_subscription)
+    @tag_subscription.migrate_to_saved_searches
+    flash[:notice] = "Tag subscription will be migrated to a saved search. Please wait a few minutes for the search to refresh."
+    redirect_to tag_subscriptions_path
+  end
+
 private
   def check_privilege(tag_subscription)
     raise User::PrivilegeError unless tag_subscription.editable_by?(CurrentUser.user)

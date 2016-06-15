@@ -16,6 +16,8 @@ class TagSubscription < ActiveRecord::Base
         :category => name
       )
     end
+    
+    destroy
   end
 
   def normalize_name
