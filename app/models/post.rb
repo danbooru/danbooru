@@ -12,6 +12,7 @@ class Post < ActiveRecord::Base
   after_save :create_version
   after_save :update_parent_on_save
   after_save :apply_post_metatags
+  after_save :expire_essential_tag_string_cache
   after_create :update_iqdb_async
   after_commit :pg_notify
   before_save :merge_old_changes
@@ -790,8 +791,12 @@ class Post < ActiveRecord::Base
       end
     end
 
+    def expire_essential_tag_string_cache
+      Cache.delete("hets-#{id}")
+    end
+
     def humanized_essential_tag_string
-      @humanized_essential_tag_string ||= begin
+      @humanized_essential_tag_string ||= Cache.get("hets-#{id}", 1.hour.to_i) do
         string = []
 
         if character_tags.any?
