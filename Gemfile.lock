@@ -6,9 +6,9 @@ GIT
 
 GIT
   remote: https://github.com/r888888888/dtext_rb.git
-  revision: 422d4d83c9e49a7e8324f65c3f7e30a6e3e24976
+  revision: e59a57337ceebc001238319be63b73fd6b4b55c6
   specs:
-    dtext_rb (1.0.5)
+    dtext_rb (1.0.6)
       jeweler (~> 2.0)
       minitest (~> 5.8)
       rake-compiler (~> 0.9)
@@ -130,16 +130,15 @@ GEM
     ffi (1.9.10-x64-mingw32)
     gctools (0.2.3)
     git (1.3.0)
-    github_api (0.13.1)
+    github_api (0.14.0)
       addressable (~> 2.4.0)
       descendants_tracker (~> 0.0.4)
       faraday (~> 0.8, < 0.10)
       hashie (>= 3.4)
-      multi_json (>= 1.7.5, < 2.0)
       oauth2
     globalid (0.3.6)
       activesupport (>= 4.1.0)
-    hashie (3.4.3)
+    hashie (3.4.4)
     highline (1.7.8)
     hike (1.2.3)
     http (0.6.4)
@@ -183,11 +182,11 @@ GEM
     metaclass (0.0.4)
     method_source (0.8.2)
     mime-types (2.99.1)
-    mini_portile2 (2.0.0)
-    minitest (5.8.4)
+    mini_portile2 (2.1.0)
+    minitest (5.9.0)
     mocha (1.1.0)
       metaclass (~> 0.0.1)
-    multi_json (1.11.3)
+    multi_json (1.12.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
     naught (1.0.0)
@@ -200,10 +199,12 @@ GEM
     net-ssh (2.9.2)
     netrc (0.10.3)
     newrelic_rpm (3.13.0.299)
-    nokogiri (1.6.7.2)
-      mini_portile2 (~> 2.0.0.rc2)
-    nokogiri (1.6.7.2-x64-mingw32)
-      mini_portile2 (~> 2.0.0.rc2)
+    nokogiri (1.6.8)
+      mini_portile2 (~> 2.1.0)
+      pkg-config (~> 1.1.7)
+    nokogiri (1.6.8-x64-mingw32)
+      mini_portile2 (~> 2.1.0)
+      pkg-config (~> 1.1.7)
     nokogumbo (1.2.0)
       nokogiri
     ntlm-http (0.1.1)
@@ -215,6 +216,7 @@ GEM
       rack (>= 1.2, < 3)
     pg (0.18.2)
     pg (0.18.2-x64-mingw32)
+    pkg-config (1.1.7)
     protected_attributes (1.1.3)
       activemodel (>= 4.0.1, < 5.0)
     pry (0.10.1)
@@ -255,8 +257,8 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     raindrops (0.15.0)
-    rake (11.1.2)
-    rake-compiler (0.9.7)
+    rake (11.2.2)
+    rake-compiler (0.9.9)
       rake
     rdoc (4.2.2)
       json (~> 1.4)
@@ -430,4 +432,4 @@ DEPENDENCIES
   whenever
 
 BUNDLED WITH
-   1.11.2
+   1.12.3
