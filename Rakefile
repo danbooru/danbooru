@@ -45,7 +45,7 @@ Gem::PackageTask.new(s) do
 end
 
 task :ragel do
-	sh "ragel -G2 -C ext/dtext/dtext.rl -o ext/dtext/dtext.c"
+	sh "ragel -G1 -C ext/dtext/dtext.rl -o ext/dtext/dtext.c"
 end
 
 task test_forum_posts: %w(ragel compile) do
