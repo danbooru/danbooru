@@ -50,7 +50,7 @@ module ApplicationHelper
   end
 
   def format_text(text, options = {})
-    if !CurrentUser.is_anonymous? && CurrentUser.id < 500
+    if !CurrentUser.is_anonymous? && CurrentUser.id < 0
       raw(DTextRagel.parse(text))
     else
       DText.parse(text)
@@ -58,7 +58,7 @@ module ApplicationHelper
   end
 
   def strip_dtext(text, options = {})
-    if !CurrentUser.is_anonymous? && CurrentUser.id < 500
+    if !CurrentUser.is_anonymous? && CurrentUser.id < 0
       raw(DTextRagel.parse_strip(text))
     else
       DText.parse_strip(text)
