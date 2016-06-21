@@ -1,6 +1,7 @@
 class ReportsController < ApplicationController
   before_filter :member_only
   before_filter :gold_only, :only => [:similar_users]
+  before_filter :janitor_only, :only => [:post_versions, :post_versions_create]
 
   def user_promotions
     @report = Reports::UserPromotions.new
@@ -21,5 +22,19 @@ class ReportsController < ApplicationController
   def similar_users
     @report = Reports::UserSimilarity.new(CurrentUser.id)
     @presenter = UserSimilarityPresenter.new(@report)
+  end
+
+  def post_versions
+  end
+
+  def post_versions_create
+    if params[:type] == "added"
+      @report = Reports::PostVersionsAdded.new(params[:tag])
+    else
+      @report = Reports::PostVersionRemoved.new(params[:tag])
+    end
+    @report.process!
+    flash[:notice] = "Report is being generated and will be emailed to you shortly"
+    redirect_to reports_post_versions_path
   end
 end

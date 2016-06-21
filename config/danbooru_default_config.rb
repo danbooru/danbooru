@@ -453,6 +453,9 @@ module Danbooru
     def aws_sqs_reltagcalc_url
     end
 
+    def aws_sqs_post_versions_url
+    end
+
     def aws_sqs_region
     end
   end
