@@ -33,7 +33,7 @@
       <% if artist_commentary.translated_description.present? %>
         <%= format_text(artist_commentary.translated_description, :ragel => true) %>
       <% else %>
-        <span class="disabled"><%= format_text(artist_commentary.original_description) %></span>
+        <span class="disabled"><%= format_text(artist_commentary.original_description, :ragel => true) %></span>
       <% end %>
     </div>
   </section>
