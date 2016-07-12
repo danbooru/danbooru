@@ -496,6 +496,7 @@ static void free_machine(StateMachine * sm) {
 
 static VALUE parse(int argc, VALUE * argv, VALUE self) {
   VALUE input;
+  VALUE input0;
   VALUE options;
   VALUE opt_inline;
   VALUE opt_strip;
@@ -510,10 +511,11 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
   }
 
   input = argv[0];
+  input0 = rb_str_dup(input);
   
   sm = (StateMachine *)g_malloc0(sizeof(StateMachine));
-  input = rb_str_cat(input, "\0", 1);
-  init_machine(sm, input);
+  input0 = rb_str_cat(input0, "\0", 1);
+  init_machine(sm, input0);
 
   if (argc > 1) {
     options = argv[1];
@@ -532,7 +534,7 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
   }
 
   
-#line 536 "ext/dtext/dtext.c"
+#line 538 "ext/dtext/dtext.c"
 	{
 	 sm->cs = dtext_start;
 	( sm->top) = 0;
@@ -541,9 +543,9 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
 	( sm->act) = 0;
 	}
 
-#line 1333 "ext/dtext/dtext.rl"
+#line 1335 "ext/dtext/dtext.rl"
   
-#line 547 "ext/dtext/dtext.c"
+#line 549 "ext/dtext/dtext.c"
 	{
 	if ( ( sm->p) == ( sm->pe) )
 		goto _test_eof;
@@ -555,7 +557,7 @@ _resume:
 #line 1 "NONE"
 	{( sm->ts) = ( sm->p);}
 	break;
-#line 559 "ext/dtext/dtext.c"
+#line 561 "ext/dtext/dtext.c"
 	}
 
 	switch (  sm->cs ) {
@@ -4086,7 +4088,7 @@ _again:
 #line 1 "NONE"
 	{( sm->ts) = 0;}
 	break;
-#line 4090 "ext/dtext/dtext.c"
+#line 4092 "ext/dtext/dtext.c"
 	}
 
 	if (  sm->cs == 0 )
@@ -4405,7 +4407,7 @@ _again:
 	_out: {}
 	}
 
-#line 1334 "ext/dtext/dtext.rl"
+#line 1336 "ext/dtext/dtext.rl"
 
   dstack_close(sm);
 
