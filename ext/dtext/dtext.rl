@@ -1294,6 +1294,7 @@ static void free_machine(StateMachine * sm) {
 
 static VALUE parse(int argc, VALUE * argv, VALUE self) {
   VALUE input;
+  VALUE input0;
   VALUE options;
   VALUE opt_inline;
   VALUE opt_strip;
@@ -1308,10 +1309,11 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
   }
 
   input = argv[0];
+  input0 = rb_str_dup(input);
   
   sm = (StateMachine *)g_malloc0(sizeof(StateMachine));
-  input = rb_str_cat(input, "\0", 1);
-  init_machine(sm, input);
+  input0 = rb_str_cat(input0, "\0", 1);
+  init_machine(sm, input0);
 
   if (argc > 1) {
     options = argv[1];
