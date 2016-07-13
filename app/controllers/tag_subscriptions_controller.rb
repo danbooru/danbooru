@@ -1,5 +1,5 @@
 class TagSubscriptionsController < ApplicationController
-  before_filter :member_only, :only => [:new, :edit, :create, :update, :destroy]
+  before_filter :member_only, :only => [:new, :edit, :create, :update, :destroy, :migrate]
   respond_to :html, :xml, :json
 
   def new

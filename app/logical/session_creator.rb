@@ -18,7 +18,8 @@ class SessionCreator
       if remember.present?
         cookies.permanent.signed[:user_name] = {
           :value => user.name,
-          :secure => secure
+          :secure => secure,
+          :httponly => true
         }
         cookies.permanent[:password_hash] = {
           :value => user.bcrypt_cookie_password_hash,

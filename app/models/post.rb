@@ -1326,10 +1326,10 @@ class Post < ActiveRecord::Base
     def create_version(force = false)
       if new_record? || rating_changed? || source_changed? || parent_id_changed? || tag_string_changed? || force
         if merge_version?
-          merge_version
-        else
-          create_new_version
+          delete_previous_version
         end
+
+        create_new_version
       end
     end
 
@@ -1348,16 +1348,9 @@ class Post < ActiveRecord::Base
       )
     end
 
-    def merge_version
+    def delete_previous_version
       prev = versions.last
-      if prev
-        prev.update_attributes(
-          :rating => rating,
-          :source => source,
-          :tags => tag_string,
-          :parent_id => parent_id
-        )
-      end
+      prev.destroy
     end
 
     def revert_to(target)

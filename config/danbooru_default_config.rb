@@ -403,7 +403,7 @@ module Danbooru
 
     # enable some (donmai-specific) optimizations for post counts
     def estimate_post_counts
-      true
+      false
     end
 
     # listbooru options

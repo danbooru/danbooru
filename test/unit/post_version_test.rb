@@ -59,6 +59,20 @@ class PostVersionTest < ActiveSupport::TestCase
       end
     end
 
+    context "that should be merged" do
+      setup do
+        @parent = FactoryGirl.create(:post)
+        @post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
+      end
+
+      should "delete the previous version" do
+        assert_equal(1, @post.versions.count)
+        @post.update_attributes(:tag_string => "bbb ccc xxx", :source => "")
+        @post.reload
+        assert_equal(1, @post.versions.count)
+      end
+    end
+
     context "that has been updated" do
       setup do
         @parent = FactoryGirl.create(:post)
