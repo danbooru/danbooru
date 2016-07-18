@@ -28,6 +28,14 @@ class SessionCreator
         }
       end
 
+      if secure
+        cookies.permanent[:ssl_login] = {
+          :value => "1",
+          :secure => true,
+          :httponly => true
+        }
+      end
+
       session[:user_id] = user.id
       user.update_column(:last_ip_addr, ip_addr)
       return true

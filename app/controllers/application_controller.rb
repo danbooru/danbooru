@@ -11,6 +11,7 @@ class ApplicationController < ActionController::Base
   before_filter :set_safe_mode
   # before_filter :secure_cookies_check
   layout "default"
+  force_ssl :if => :ssl_login?
 
   rescue_from Exception, :with => :rescue_exception
   rescue_from User::PrivilegeError, :with => :access_denied
@@ -18,6 +19,10 @@ class ApplicationController < ActionController::Base
   rescue_from Danbooru::Paginator::PaginationError, :with => :render_pagination_limit
 
 protected
+  def ssl_login?
+    cookies[:ssl_login].present?
+  end
+
   def enable_cors
     response.headers["Access-Control-Allow-Origin"] = "*"
   end
