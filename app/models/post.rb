@@ -352,15 +352,15 @@ class Post < ActiveRecord::Base
 
     def normalized_source
       case source
-      when %r{\Ahttp://img\d+\.pixiv\.net/img/[^\/]+/(\d+)}i, %r{\Ahttp://i\d\.pixiv\.net/img\d+/img/[^\/]+/(\d+)}i
+      when %r{\Ahttps?://img\d+\.pixiv\.net/img/[^\/]+/(\d+)}i, %r{\Ahttps?://i\d\.pixiv\.net/img\d+/img/[^\/]+/(\d+)}i
         "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
 
-      when %r{\Ahttp://i\d+\.pixiv\.net/img-original/img/(?:\d+\/)+(\d+)_p}i,
-           %r{\Ahttp://i\d+\.pixiv\.net/c/\d+x\d+/img-master/img/(?:\d+\/)+(\d+)_p}i,
-           %r{\Ahttp://i\d+\.pixiv\.net/img-zip-ugoira/img/(?:\d+\/)+(\d+)_ugoira\d+x\d+\.zip}i
+      when %r{\Ahttps?://i\d+\.pixiv\.net/img-original/img/(?:\d+\/)+(\d+)_p}i,
+           %r{\Ahttps?://i\d+\.pixiv\.net/c/\d+x\d+/img-master/img/(?:\d+\/)+(\d+)_p}i,
+           %r{\Ahttps?://i\d+\.pixiv\.net/img-zip-ugoira/img/(?:\d+\/)+(\d+)_ugoira\d+x\d+\.zip}i
         "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
 
-      when %r{\Ahttp://lohas\.nicoseiga\.jp/priv/(\d+)\?e=\d+&h=[a-f0-9]+}i, %r{\Ahttp://lohas\.nicoseiga\.jp/priv/[a-f0-9]+/\d+/(\d+)}i
+      when %r{\Ahttps?://lohas\.nicoseiga\.jp/priv/(\d+)\?e=\d+&h=[a-f0-9]+}i, %r{\Ahttps?://lohas\.nicoseiga\.jp/priv/[a-f0-9]+/\d+/(\d+)}i
         "http://seiga.nicovideo.jp/seiga/im#{$1}"
 
       when %r{\Ahttps?://(?:d3j5vwomefv46c|dn3pm25xmtlyu)\.cloudfront\.net/photos/large/(\d+)\.}i
