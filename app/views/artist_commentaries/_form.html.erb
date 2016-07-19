@@ -1,19 +1,49 @@
 <p>If the artist of this image posted some interesting additional information about this work, you can copy it here. <%= link_to "View help.", wiki_pages_path(:search => {:title => "help:artist_commentary"}) %></p>
 
 <%= form_tag(create_or_update_artist_commentaries_path(:format => :js), :remote => true, :class => "simple_form", :method => :put) do %>
-  <div class="input">
-    <%= hidden_field :artist_commentary, :post_id, :value => @post.id %>
+  <%= hidden_field :artist_commentary, :post_id, :value => @post.id %>
 
+  <div class="input">
     <label for="artist_commentary_original_title">Original title</label>
     <%= text_field :artist_commentary, :original_title, :value => artist_commentary.try(:original_title) %>
+  </div>
 
+  <div class="input">
     <label for="artist_commentary_original_description">Original description</label>
     <%= text_area :artist_commentary, :original_description, :size => "40x6", :value => artist_commentary.try(:original_description) %>
+  </div>
 
+  <div class="input">
     <label for="artist_commentary_translated_title">Translated title</label>
     <%= text_field :artist_commentary, :translated_title, :value => artist_commentary.try(:translated_title) %>
+  </div>
 
+  <div class="input">
     <label for="artist_commentary_translated_description">Translated description</label>
     <%= text_area :artist_commentary, :translated_description, :size => "40x6", :value => artist_commentary.try(:translated_description) %>
   </div>
+
+  <% if @post.has_tag?("commentary") %>
+    <div class="input">
+      <label for="artist_commentary_remove_commentary_tag">Remove <em>commentary</em> tag</label>
+      <%= check_box :artist_commentary, :remove_commentary_tag %>
+    </div>
+  <% else %>
+    <div class="input">
+      <label for="artist_commentary_add_commentary_tag">Add <em>commentary</em> tag</label>
+      <%= check_box :artist_commentary, :add_commentary_tag %>
+    </div>
+  <% end %>
+
+  <% if @post.has_tag?("commentary_request") %>
+    <div class="input">
+      <label for="artist_commentary_remove_commentary_request_tag">Remove <em>commentary_request</em> tag</label>
+      <%= check_box :artist_commentary, :remove_commentary_request_tag %>
+    </div>
+  <% else %>
+    <div class="input">
+      <label for="artist_commentary_add_commentary_request_tag">Add <em>commentary_request</em> tag</label>
+      <%= check_box :artist_commentary, :add_commentary_request_tag %>
+    </div>  
+  <% end %>
 <% end %>

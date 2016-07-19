@@ -754,6 +754,14 @@ class Post < ActiveRecord::Base
       !!(tag_string =~ /(?:^| )(?:#{tag})(?:$| )/)
     end
 
+    def add_tag(tag)
+      set_tag_string("#{tag_string} #{tag}")
+    end
+
+    def remove_tag(tag)
+      set_tag_string((tag_array - tag).join(" "))
+    end
+
     def has_dup_tag?
       has_tag?("duplicate")
     end

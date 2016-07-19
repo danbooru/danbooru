@@ -567,6 +567,10 @@ div#unapprove-dialog {
     width: 70%;
   }
 
+  input[type=checkbox] {
+    width: auto;
+  }
+
   textarea {
     font-size: 1em;
     width: 100%;

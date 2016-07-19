@@ -1,9 +1,12 @@
 class ArtistCommentary < ActiveRecord::Base
-  attr_accessible :post_id, :original_description, :original_title, :translated_description, :translated_title
+  attr_accessor :remove_commentary_tag, :remove_commentary_request_tag
+  attr_accessor :add_commentary_tag, :add_commentary_request_tag
+  attr_accessible :post_id, :original_description, :original_title, :translated_description, :translated_title, :remove_commentary_tag, :remove_commentary_request_tag, :add_commentary_tag, :add_commentary_request_tag
   validates_uniqueness_of :post_id
   belongs_to :post
   has_many :versions, lambda {order("artist_commentary_versions.id ASC")}, :class_name => "ArtistCommentaryVersion", :dependent => :destroy, :foreign_key => :post_id, :primary_key => :post_id
   after_save :create_version
+  after_commit :tag_post
 
   module SearchMethods
     def text_matches(query)
@@ -82,5 +85,25 @@ class ArtistCommentary < ActiveRecord::Base
   def revert_to!(version)
     revert_to(version)
     save!
+  end
+
+  def tag_post
+    if remove_commentary_tag == "1"
+      post.remove_tag("commentary")
+    end
+
+    if add_commentary_tag == "1"
+      post.add_tag("commentary")
+    end
+
+    if remove_commentary_request_tag == "1"
+      post.remove_tag("commentary_request")
+    end
+
+    if add_commentary_request_tag == "1"
+      post.add_tag("commentary_request")
+    end
+
+    post.save if post.tag_string_changed?
   end
 end
