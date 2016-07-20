@@ -479,6 +479,8 @@ class User < ActiveRecord::Base
     def can_upload?
       if can_upload_free?
         true
+      elsif is_admin?
+        true
       elsif created_at > 1.week.ago
         false
       else
