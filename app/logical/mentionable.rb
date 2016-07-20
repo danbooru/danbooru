@@ -42,18 +42,22 @@ module Mentionable
     title = self.class.mentionable_option(:title)
     from_id = read_attribute(self.class.mentionable_option(:user_field))
     text = strip_quote_blocks(read_attribute(self.class.mentionable_option(:message_field)))
+    bodies = {}
 
     text.scan(DText::MENTION_REGEXP).each do |mention|
       mention.gsub!(/(?:^\s*@)|(?:[:;,.!?\)\]<>]$)/, "")
-      user = User.find_by_name(mention)
-      body = self.class.mentionable_option(:body).call(self, user.name)
+      bodies[mention] = self.class.mentionable_option(:body).call(self, mention)
+    end
+
+    bodies.each do |name, text|
+      user = User.find_by_name(name)
 
       if user
         dmail = Dmail.new(
           from_id: from_id,
           to_id: user.id,
           title: title,
-          body: body
+          body: text
         )
         dmail.owner_id = user.id
         dmail.save
