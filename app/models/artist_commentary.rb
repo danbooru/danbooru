@@ -1,7 +1,7 @@
 class ArtistCommentary < ActiveRecord::Base
-  attr_accessor :remove_commentary_tag, :remove_commentary_request_tag
-  attr_accessor :add_commentary_tag, :add_commentary_request_tag
-  attr_accessible :post_id, :original_description, :original_title, :translated_description, :translated_title, :remove_commentary_tag, :remove_commentary_request_tag, :add_commentary_tag, :add_commentary_request_tag
+  attr_accessor :remove_commentary_tag, :remove_commentary_request_tag, :remove_commentary_check_tag
+  attr_accessor :add_commentary_tag, :add_commentary_request_tag, :add_commentary_check_tag
+  attr_accessible :post_id, :original_description, :original_title, :translated_description, :translated_title, :remove_commentary_tag, :remove_commentary_request_tag, :add_commentary_tag, :add_commentary_request_tag, :add_commentary_check_tag, :remove_commentary_check_tag
   validates_uniqueness_of :post_id
   belongs_to :post
   has_many :versions, lambda {order("artist_commentary_versions.id ASC")}, :class_name => "ArtistCommentaryVersion", :dependent => :destroy, :foreign_key => :post_id, :primary_key => :post_id
@@ -102,6 +102,14 @@ class ArtistCommentary < ActiveRecord::Base
 
     if add_commentary_request_tag == "1"
       post.add_tag("commentary_request")
+    end
+
+    if remove_commentary_check_tag == "1"
+      post.remove_tag("commentary_check")
+    end
+
+    if add_commentary_check_tag == "1"
+      post.add_tag("commentary_check")
     end
 
     post.save if post.tag_string_changed?

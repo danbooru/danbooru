@@ -25,25 +25,49 @@
 
   <% if @post.has_tag?("commentary") %>
     <div class="input">
-      <label for="artist_commentary_remove_commentary_tag">Remove <em>commentary</em> tag</label>
-      <%= check_box :artist_commentary, :remove_commentary_tag %>
+      <label>
+        <%= check_box :artist_commentary, :remove_commentary_tag %>
+        Remove <em>commentary</em> tag
+      </label>
     </div>
   <% else %>
     <div class="input">
-      <label for="artist_commentary_add_commentary_tag">Add <em>commentary</em> tag</label>
-      <%= check_box :artist_commentary, :add_commentary_tag %>
+      <label>
+        <%= check_box :artist_commentary, :add_commentary_tag %>
+        Add <em>commentary</em> tag
+      </label>
     </div>
   <% end %>
 
   <% if @post.has_tag?("commentary_request") %>
     <div class="input">
-      <label for="artist_commentary_remove_commentary_request_tag">Remove <em>commentary_request</em> tag</label>
-      <%= check_box :artist_commentary, :remove_commentary_request_tag %>
+      <label>
+        <%= check_box :artist_commentary, :remove_commentary_request_tag %>
+        Remove <em>commentary_request</em> tag
+      </label>
     </div>
   <% else %>
     <div class="input">
-      <label for="artist_commentary_add_commentary_request_tag">Add <em>commentary_request</em> tag</label>
-      <%= check_box :artist_commentary, :add_commentary_request_tag %>
+      <label>
+        <%= check_box :artist_commentary, :add_commentary_request_tag %>
+        Add <em>commentary_request</em> tag
+      </label>
+    </div>  
+  <% end %>
+
+  <% if @post.has_tag?("commentary_check") %>
+    <div class="input">
+      <label>
+        <%= check_box :artist_commentary, :remove_commentary_check_tag %>
+        Remove <em>commentary_check</em> tag
+      </label>
+    </div>
+  <% else %>
+    <div class="input">
+      <label>
+        <%= check_box :artist_commentary, :add_commentary_check_tag %>
+        Add <em>commentary_check</em> tag
+      </label>
     </div>  
   <% end %>
 <% end %>
