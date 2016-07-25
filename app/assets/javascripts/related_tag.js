@@ -222,7 +222,21 @@
           $("<li/>").append($link)
         );
       } else {
-        $ul.append($("<li/>").text(tag[0]));
+        var text = tag[0];
+        if (text.match(/^ http/)) {
+          text = text.substring(1, 1000);
+          var $url = $("<a/>");
+          $url.text("open");
+          $url.attr("href", text);
+          $url.attr("target", "_blank");
+          var $li = $("<li/>");
+          $li.append(text + " [");
+          $li.append($url);
+          $li.append("]");
+          $ul.append($li);
+        } else {
+          $ul.append($("<li/>").text(text));
+        }
       }
     });
 
