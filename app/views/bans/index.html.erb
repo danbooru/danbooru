@@ -16,7 +16,7 @@
           <tr id="ban-<%= ban.id %>">
             <td><%= link_to_user(ban.user) %></td>
             <td><%= ban.expires_at %></td>
-            <td><%= format_text ban.reason %></td>
+            <td><%= format_text ban.reason, :ragel => true %></td>
             <td>
               <% if CurrentUser.is_moderator? %>
                 <%= link_to "Edit", edit_ban_path(ban) %>

@@ -10,7 +10,7 @@
     <% @dashboard.mod_actions.each do |mod_action| %>
       <tr>
         <td><%= link_to_user mod_action.creator %></td>
-        <td><%= format_text(mod_action.description) %></td>
+        <td><%= format_text(mod_action.description, :ragel => true) %></td>
       </tr>
     <% end %>
   </tbody>

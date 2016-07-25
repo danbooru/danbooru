@@ -23,7 +23,7 @@
                 <%= link_to_user post_flag.creator %>
               </td>
             <% end %>
-            <td><%= format_text post_flag.reason %></td>
+            <td><%= format_text post_flag.reason, :ragel => true %></td>
             <td><%= compact_time post_flag.updated_at %></td>
           </tr>
         <% end %>

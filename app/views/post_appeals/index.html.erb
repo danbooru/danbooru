@@ -18,7 +18,7 @@
           <tr>
             <td><%= PostPresenter.preview(post_appeal.post, :tags => "status:any") %></td>
             <td><%= link_to_user post_appeal.creator %></td>
-            <td><%= format_text post_appeal.reason %></td>
+            <td><%= format_text post_appeal.reason, :ragel => true %></td>
             <td><%= compact_time post_appeal.updated_at %></td>
             <td><%= post_appeal.resolved? %></td>
           </tr>

@@ -23,7 +23,7 @@
                 <%= link_to_user event.creator %>
               </td>
             <% end %>
-            <td><%= format_text event.reason %></td>
+            <td><%= format_text event.reason, :ragel => true %></td>
             <td>
               <% if event.is_resolved %>
                 yes
