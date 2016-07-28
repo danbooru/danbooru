@@ -760,7 +760,7 @@ class Post < ActiveRecord::Base
     end
 
     def remove_tag(tag)
-      set_tag_string((tag_array - tag).join(" "))
+      set_tag_string((tag_array - Array(tag)).join(" "))
     end
 
     def has_dup_tag?
