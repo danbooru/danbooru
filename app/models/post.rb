@@ -1,4 +1,5 @@
 require 'danbooru/has_bit_flags'
+require 'google/apis/pubsub_v1'
 
 class Post < ActiveRecord::Base
   class ApprovalError < Exception ; end
@@ -14,7 +15,7 @@ class Post < ActiveRecord::Base
   after_save :apply_post_metatags
   after_save :expire_essential_tag_string_cache
   after_create :update_iqdb_async
-  after_commit :pg_notify
+  after_commit :notify_pubsub
   before_save :merge_old_changes
   before_save :normalize_tags
   before_save :update_tag_post_counts
@@ -1373,8 +1374,16 @@ class Post < ActiveRecord::Base
       save!
     end
 
-    def pg_notify
-      execute_sql("notify changes_posts, '#{id}'")
+    def notify_pubsub
+      return unless Danbooru.config.google_api_project
+
+      require 'google/apis/pubsub_v1'
+      pubsub = Google::Apis::PubsubV1::PubsubService.new
+      pubsub.authorization = Google::Auth.get_application_default([Google::Apis::PubsubV1::AUTH_PUBSUB])
+      topic = "projects/#{Danbooru.config.google_api_project}/topics/post_updates"
+      request = Google::Apis::PubsubV1::PublishRequest.new(messages: [])
+      request.messages << Google::Apis::PubsubV1::Message.new(data: id.to_s)
+      pubsub.publish_topic(topic, request)
     end
   end
 
@@ -1744,13 +1753,13 @@ class Post < ActiveRecord::Base
 
   def update_column(name, value)
     ret = super(name, value)
-    pg_notify
+    notify_pubsub
     ret
   end
 
   def update_columns(attributes)
     ret = super(attributes)
-    pg_notify
+    notify_pubsub
     ret
   end
 end

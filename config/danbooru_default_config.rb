@@ -417,6 +417,10 @@ module Danbooru
     def listbooru_auth_key
     end
 
+    # google api options
+    def google_api_project
+    end
+
     # AWS config options
     def aws_access_key_id
       nil
