@@ -492,6 +492,6 @@ class Artist < ActiveRecord::Base
   end
 
   def visible?
-    !is_banned? || CurrentUser.is_moderator?
+    !is_banned? || CurrentUser.is_gold?
   end
 end
