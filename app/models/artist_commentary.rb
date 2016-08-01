@@ -105,11 +105,11 @@ class ArtistCommentary < ActiveRecord::Base
     end
 
     if remove_commentary_check_tag == "1"
-      post.remove_tag("commentary_check")
+      post.remove_tag("check_commentary")
     end
 
     if add_commentary_check_tag == "1"
-      post.add_tag("commentary_check")
+      post.add_tag("check_commentary")
     end
 
     post.save if post.tag_string_changed?
