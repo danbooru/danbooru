@@ -55,18 +55,18 @@
     </div>  
   <% end %>
 
-  <% if @post.has_tag?("commentary_check") %>
+  <% if @post.has_tag?("check_commentary") %>
     <div class="input">
       <label>
         <%= check_box :artist_commentary, :remove_commentary_check_tag %>
-        Remove <em>commentary_check</em> tag
+        Remove <em>check_commentary</em> tag
       </label>
     </div>
   <% else %>
     <div class="input">
       <label>
         <%= check_box :artist_commentary, :add_commentary_check_tag %>
-        Add <em>commentary_check</em> tag
+        Add <em>check_commentary</em> tag
       </label>
     </div>  
   <% end %>
