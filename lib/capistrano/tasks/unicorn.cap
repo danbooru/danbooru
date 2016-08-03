@@ -2,15 +2,10 @@ namespace :unicorn do
   desc "Terminate unicorn processes (blocks until complete)"
   task :terminate do
     on roles(:app) do
-      n = 0
-      while n < 10 && !capture("pgrep -f unicorn").blank?
-        execute "pgrep -f unicorn | xargs -SIGTERM"
-        n += 1
-      end
-
-      if n == 10
-        execute "pgrep -f unicorn | xargs -SIGKILL"
-      end
+      execute "[[ -n $(pgrep -f unicorn) ]] && pgrep -f unicorn | xargs kill -SIGTERM"
     end
   end
 end
+
+after "deploy:published", "unicorn:terminate"
+after "deploy:published", "unicorn:start"
