@@ -1022,11 +1022,13 @@ class Post < ActiveRecord::Base
   module CountMethods
     def fix_post_counts
       post.set_tag_counts
-      post.update_column(:tag_count, post.tag_count)
-      post.update_column(:tag_count_general, post.tag_count_general)
-      post.update_column(:tag_count_artist, post.tag_count_artist)
-      post.update_column(:tag_count_copyright, post.tag_count_copyright)
-      post.update_column(:tag_count_character, post.tag_count_character)
+      post.update_columns(
+        :tag_count => post.tag_count,
+        :tag_count_general => post.tag_count_general,
+        :tag_count_artist => post.tag_count_artist,
+        :tag_count_copyright => post.tag_count_copyright,
+        :tag_count_character => post.tag_count_character
+      )
     end
 
     def get_count_from_cache(tags)
@@ -1292,10 +1294,16 @@ class Post < ActiveRecord::Base
       end
 
       Post.transaction do
-        update_column(:is_deleted, true)
-        update_column(:is_pending, false)
-        update_column(:is_flagged, false)
-        update_column(:is_banned, true) if options[:ban] || has_tag?("banned_artist")
+        self.is_deleted = true
+        self.is_pending = false
+        self.is_flagged = false
+        self.is_banned = true if options[:ban] || has_tag?("banned_artist")
+        update_columns(
+          :is_deleted => is_deleted,
+          :is_pending => is_pending,
+          :is_flagged => is_flagged,
+          :is_banned => is_banned
+        )
         give_favorites_to_parent if options[:move_favorites]
         update_parent_on_save
 
