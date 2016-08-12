@@ -1377,12 +1377,11 @@ class Post < ActiveRecord::Base
     def notify_pubsub
       return unless Danbooru.config.google_api_project
 
-      require 'google/apis/pubsub_v1'
       pubsub = Google::Apis::PubsubV1::PubsubService.new
       pubsub.authorization = Google::Auth.get_application_default([Google::Apis::PubsubV1::AUTH_PUBSUB])
       topic = "projects/#{Danbooru.config.google_api_project}/topics/post_updates"
       request = Google::Apis::PubsubV1::PublishRequest.new(messages: [])
-      request.messages << Google::Apis::PubsubV1::Message.new(data: id.to_s)
+      request.messages << Google::Apis::PubsubV1::Message.new(data: "1")
       pubsub.publish_topic(topic, request)
     end
   end
