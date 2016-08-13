@@ -1383,6 +1383,7 @@ class Post < ActiveRecord::Base
     end
 
     def notify_pubsub
+      return
       return unless Danbooru.config.google_api_project
 
       pubsub = Google::Apis::PubsubV1::PubsubService.new
