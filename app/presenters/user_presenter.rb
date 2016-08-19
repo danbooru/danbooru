@@ -39,6 +39,26 @@ class UserPresenter
     permissions.join(", ")
   end
 
+  def posts_for_saved_search_category(category)
+    if category == SavedSearch::UNCATEGORIZED_NAME
+      ids = SavedSearch.post_ids(CurrentUser.user.id)
+    else
+      ids = SavedSearch.post_ids(CurrentUser.user.id, category)
+    end
+
+    if ids.any?
+      arel = Post.where("id in (?)", id.map(&:to_i)).order("id desc").limit(10)
+
+      if CurrentUser.user.hide_deleted_posts?
+        arel = arel.undeleted
+      end
+
+      arel
+    else
+      Post.where("false")
+    end
+  end
+
   def posts_for_subscription(subscription)
     arel = Post.where("id in (?)", subscription.post_id_array.map(&:to_i)).order("id desc").limit(6)
 

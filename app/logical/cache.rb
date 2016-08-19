@@ -81,4 +81,8 @@ class Cache
   def self.sanitize(key)
     key.gsub(/\W/) {|x| "%#{x.ord}"}.slice(0, 230)
   end
+
+  def self.hash(string)
+    CityHash.hash64(string).to_s(36)
+  end
 end

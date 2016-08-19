@@ -1,4 +1,6 @@
 class SavedSearch < ActiveRecord::Base
+  UNCATEGORIZED_NAME = "Uncategorized"
+
   module ListbooruMethods
     extend ActiveSupport::Concern
 
@@ -79,22 +81,32 @@ class SavedSearch < ActiveRecord::Base
   def self.post_ids(user_id, name = nil)
     return [] unless Danbooru.config.listbooru_enabled?
 
-    params = {
-      "key" => Danbooru.config.listbooru_auth_key,
-      "user_id" => user_id,
-      "name" => name
-    }
-    uri = URI.parse("#{Danbooru.config.listbooru_server}/users")
-    uri.query = URI.encode_www_form(params)
+    if name
+      hash_name = Cache.hash(name)
+    else
+      hash_name = nil
+    end
 
-    Net::HTTP.start(uri.host, uri.port) do |http|
-      resp = http.request_get(uri.request_uri)
-      if resp.is_a?(Net::HTTPSuccess)
-        resp.body.scan(/\d+/).map(&:to_i)
-      else
-        raise "HTTP error code: #{resp.code} #{resp.message}"
+    body = Cache.fetch("ss-pids-#{user_id}-#{hash_name}", 60) do
+      params = {
+        "key" => Danbooru.config.listbooru_auth_key,
+        "user_id" => user_id,
+        "name" => name
+      }
+      uri = URI.parse("#{Danbooru.config.listbooru_server}/users")
+      uri.query = URI.encode_www_form(params)
+
+      Net::HTTP.start(uri.host, uri.port) do |http|
+        resp = http.request_get(uri.request_uri)
+        if resp.is_a?(Net::HTTPSuccess)
+          resp.body
+        else
+          raise "HTTP error code: #{resp.code} #{resp.message}"
+        end
       end
     end
+
+    body.scan(/\d+/).map(&:to_i)
   end
 
   def normalize

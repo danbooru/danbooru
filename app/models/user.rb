@@ -788,6 +788,12 @@ class User < ActiveRecord::Base
     end
   end
 
+  module SavedSearchMethods
+    def unique_saved_search_categories
+      [SavedSearch::UNCATEGORIZED_NAME] + saved_searches.pluck(:category).reject {|x| x.blank?}.uniq
+    end
+  end
+
   include BanMethods
   include NameMethods
   include PasswordMethods
@@ -803,6 +809,7 @@ class User < ActiveRecord::Base
   include CountMethods
   extend SearchMethods
   include StatisticsMethods
+  include SavedSearchMethods
 
   def initialize_default_image_size
     self.default_image_size = "large"
