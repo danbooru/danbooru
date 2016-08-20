@@ -2655,6 +2655,15 @@ ALTER SEQUENCE post_flags_id_seq OWNED BY post_flags.id;
 
 
 --
+-- Name: post_updates; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE UNLOGGED TABLE post_updates (
+    post_id integer
+);
+
+
+--
 -- Name: post_versions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4748,6 +4757,14 @@ ALTER TABLE ONLY tags
 
 ALTER TABLE ONLY transaction_log_items
     ADD CONSTRAINT transaction_log_items_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: unique_post_id; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY post_updates
+    ADD CONSTRAINT unique_post_id UNIQUE (post_id);
 
 
 --
@@ -7390,4 +7407,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160219172840');
 INSERT INTO schema_migrations (version) VALUES ('20160222211328');
 
 INSERT INTO schema_migrations (version) VALUES ('20160526174848');
+
+INSERT INTO schema_migrations (version) VALUES ('20160820003534');
 
