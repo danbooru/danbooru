@@ -106,7 +106,7 @@ class SavedSearch < ActiveRecord::Base
       end
     end
 
-    body.scan(/\d+/).map(&:to_i)
+    body.to_s.scan(/\d+/).map(&:to_i)
   end
 
   def normalize

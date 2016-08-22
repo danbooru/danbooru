@@ -212,6 +212,14 @@ class UserPresenter
       user.subscriptions.select {|x| x.is_public?}
     end
   end
+
+  def saved_search_categories
+    if CurrentUser.user.id == user.id
+      user.unique_saved_search_categories
+    else
+      []
+    end
+  end
   
   def previous_names
     UserNameChangeRequest.approved.where("user_id = ?", user.id).map(&:original_name).join(", ")
