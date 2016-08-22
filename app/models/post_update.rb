@@ -1,6 +1,7 @@
 class PostUpdate
   def self.insert(post_id)
-    ActiveRecord::Base.execute_sql("insert into post_updates (post_id) values (?) on conflict do nothing", post_id)
+    ActiveRecord::Base.execute_sql("insert into post_updates (post_id) values (?)", post_id)
+  rescue ActiveRecord::RecordNotUnique
   end
 
   def self.get
