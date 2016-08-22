@@ -47,7 +47,7 @@ class UserPresenter
     end
 
     if ids.any?
-      arel = Post.where("id in (?)", id.map(&:to_i)).order("id desc").limit(10)
+      arel = Post.where("id in (?)", ids.map(&:to_i)).order("id desc").limit(10)
 
       if CurrentUser.user.hide_deleted_posts?
         arel = arel.undeleted
