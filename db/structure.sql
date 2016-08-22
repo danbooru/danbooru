@@ -4760,14 +4760,6 @@ ALTER TABLE ONLY transaction_log_items
 
 
 --
--- Name: unique_post_id; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY post_updates
-    ADD CONSTRAINT unique_post_id UNIQUE (post_id);
-
-
---
 -- Name: uploads_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -7409,4 +7401,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160222211328');
 INSERT INTO schema_migrations (version) VALUES ('20160526174848');
 
 INSERT INTO schema_migrations (version) VALUES ('20160820003534');
+
+INSERT INTO schema_migrations (version) VALUES ('20160822230752');
 

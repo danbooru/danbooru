@@ -3,7 +3,9 @@
     $.post("<%= Danbooru.config.report_server %>/hits", {
       key: "<%= key %>",
       value: "<%= value %>",
-      uid: <%= CurrentUser.user.id.to_s %>,
+      <% if CurrentUser.user.is_platinum? %>
+        uid: <%= CurrentUser.user.id %>,
+      <% end %>
       sig: "<%= sig %>"
     });
   });

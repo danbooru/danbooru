@@ -1383,7 +1383,7 @@ class Post < ActiveRecord::Base
     end
 
     def notify_pubsub
-      return unless Danbooru.config.google_api_project
+      #return unless Danbooru.config.google_api_project
 
       PostUpdate.insert(id)
     end

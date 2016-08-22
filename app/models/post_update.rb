@@ -1,11 +1,10 @@
 class PostUpdate
   def self.insert(post_id)
     ActiveRecord::Base.execute_sql("insert into post_updates (post_id) values (?)", post_id)
-  rescue ActiveRecord::RecordNotUnique
   end
 
   def self.get
-    ActiveRecord::Base.select_values_sql("delete from post_updates returning post_id")
+    ActiveRecord::Base.select_values_sql("delete from post_updates returning post_id").uniq
   end
 
   def self.push
