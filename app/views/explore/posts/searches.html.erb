@@ -22,17 +22,14 @@
     <p style="margin-top: 2em;">
       View by 
       <%= link_to "day", searches_explore_posts_path(:date => params[:date], :scale => "day") %> | 
-      <%= link_to "week", searches_explore_posts_path(:date => params[:date], :scale => "week") %> |
       <%= link_to "month", searches_explore_posts_path(:date => params[:date], :scale => "month") %>.
 
       Back one 
       <%= link_to "day", searches_explore_posts_path(:date => 1.day.ago(@date), :scale => params[:scale]) %> | 
-      <%= link_to "week", searches_explore_posts_path(:date => 1.week.ago(@date), :scale => params[:scale]) %> |
       <%= link_to "month", searches_explore_posts_path(:date => 1.month.ago(@date), :scale => params[:scale]) %>.
 
       Forward one
       <%= link_to "day", searches_explore_posts_path(:date => 1.day.since(@date), :scale => params[:scale]) %> | 
-      <%= link_to "week", searches_explore_posts_path(:date => 1.week.since(@date), :scale => params[:scale]) %> |
       <%= link_to "month", searches_explore_posts_path(:date => 1.month.since(@date), :scale => params[:scale]) %>.
     </p>
   </div>
