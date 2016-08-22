@@ -87,7 +87,7 @@ class SavedSearch < ActiveRecord::Base
       hash_name = nil
     end
 
-    body = Cache.fetch("ss-pids-#{user_id}-#{hash_name}", 60) do
+    body = Cache.get("ss-pids-#{user_id}-#{hash_name}", 60) do
       params = {
         "key" => Danbooru.config.listbooru_auth_key,
         "user_id" => user_id,
