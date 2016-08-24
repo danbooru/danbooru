@@ -28,6 +28,18 @@ module PostsHelper
     return nil
   end
 
+  def common_searches_html(user)
+    return nil unless Danbooru.config.enable_post_search_counts
+    return nil unless user.is_platinum?
+    return nil unless user.enable_recent_searches?
+
+    key = "uid"
+    value = user.id
+    digest = OpenSSL::Digest.new("sha256")
+    sig = OpenSSL::HMAC.hexdigest(digest, Danbooru.config.shared_remote_key, "#{key},#{value}")
+    render("users/common_searches", user: user, sig: sig)
+  end
+
   def resize_image_links(post, user)
     links = []
 

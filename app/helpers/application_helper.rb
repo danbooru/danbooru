@@ -145,7 +145,7 @@ module ApplicationHelper
     string += '</div>'
     string.html_safe
   end
-
+  
 protected
   def nav_link_match(controller, url)
     url =~ case controller
