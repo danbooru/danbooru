@@ -26,6 +26,7 @@ class SessionLoader
     end
 
     update_last_logged_in_at
+    update_last_ip_addr
     set_time_zone
     store_favorite_tags_in_cookies
     set_statement_timeout
@@ -106,6 +107,12 @@ private
     return if CurrentUser.last_logged_in_at && CurrentUser.last_logged_in_at > 1.week.ago
     CurrentUser.user.update_attribute(:last_logged_in_at, Time.now)
     refresh_listbooru
+  end
+
+  def update_last_ip_addr
+    return if CurrentUser.is_anonymous?
+    return if CurrentUser.user.last_ip_addr == @request.remote_ip
+    CurrentUser.user.update_attribute(:last_ip_addr, @request.remote_ip)
   end
 
   def refresh_listbooru

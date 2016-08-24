@@ -42,7 +42,9 @@ class UsersController < ApplicationController
   end
 
   def create
-    @user = User.create(params[:user], :as => CurrentUser.role)
+    @user = User.new(params[:user], :as => CurrentUser.role)
+    @user.last_ip_addr = request.remote_ip
+    @user.save
     if @user.errors.empty?
       session[:user_id] = @user.id
     end

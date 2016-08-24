@@ -64,6 +64,7 @@ class User < ActiveRecord::Base
   after_save :update_cache
   after_update :update_remote_cache
   before_create :promote_to_admin_if_first_user
+  #after_create :notify_sock_puppets
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
   has_many :posts, :foreign_key => "uploader_id"
   has_many :bans, lambda {order("bans.id desc")}
@@ -799,6 +800,19 @@ class User < ActiveRecord::Base
       end
 
       categories
+    end
+  end
+
+  module SockPuppetMethods
+    def notify_sock_puppets
+      sock_puppet_suspects.each do |user|
+      end
+    end
+
+    def sock_puppet_suspects
+      if last_ip_addr.present?
+        User.where(:last_ip_addr => last_ip_addr)
+      end
     end
   end
 
