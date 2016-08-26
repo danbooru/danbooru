@@ -36,6 +36,10 @@ class UserPresenter
       permissions << "unrestricted uploads"
     end
 
+    if user.is_super_voter?
+      permissions << "super voter"
+    end
+
     permissions.join(", ")
   end
 
