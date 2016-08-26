@@ -79,7 +79,11 @@ class PostFlag < ActiveRecord::Base
 
   module ApiMethods
     def hidden_attributes
-      super + [:creator_id]
+      list = []
+      unless CurrentUser.is_moderator?
+        list += [:creator_id]
+      end
+      super + list
     end
 
     def serializable_hash(options = {})
