@@ -616,7 +616,7 @@ class User < ActiveRecord::Base
     end
 
     def method_attributes
-      list = [:is_banned, :level_string]
+      list = [:is_banned, :can_approve_posts, :can_upload_free, :level_string]
       if id == CurrentUser.user.id
         list += [:remaining_api_hourly_limit]
       end
