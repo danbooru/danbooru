@@ -9,12 +9,16 @@
       "require": [],
       "exclude": [],
       "disabled": false,
-      "hits": 0
+      "hits": 0,
+      "min_score": null
     };
     var matches = string.match(/\S+/g) || [];
     $.each(matches, function(i, tag) {
       if (tag.charAt(0) === '-') {
         entry.exclude.push(tag.slice(1));
+      } else if (tag.match(/^score:<.+/)) {
+        var score = tag.match(/^score:<(.+)/)[1];
+        entry.min_score = parseInt(score);
       } else {
         entry.require.push(tag);
       }
@@ -134,6 +138,13 @@
     }
 
     var $post = $(post);
+    var score = parseInt($post.attr("data-score"));
+
+    if (entry.min_score !== null && score < entry.min_score) {
+      console.log("post too low");
+      return true;
+    }
+
     var tags = String($post.attr("data-tags")).match(/\S+/g) || [];
     tags = tags.concat(String($post.attr("data-pools")).match(/\S+/g) || []);
     tags.push("rating:" + $post.data("rating"));
