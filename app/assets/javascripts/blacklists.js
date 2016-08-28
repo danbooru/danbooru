@@ -141,7 +141,6 @@
     var score = parseInt($post.attr("data-score"));
 
     if (entry.min_score !== null && score < entry.min_score) {
-      console.log("post too low");
       return true;
     }
 
