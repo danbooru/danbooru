@@ -3,10 +3,12 @@ module ArtistVersionsHelper
     diff = artist_version.other_names_diff(artist_version.previous)
     html = []
     diff[:added_names].each do |name|
-      html << '<ins>' + h(name) + '</ins>'
+      prefix = diff[:obsolete_added_names].include?(name) ? '<ins class="obsolete">' : '<ins>'
+      html << prefix + h(name) + '</ins>'
     end
     diff[:removed_names].each do |name|
-      html << '<del>' + h(name) + '</del>'
+      prefix = diff[:obsolete_removed_names].include?(name) ? '<del class="obsolete">' : '<del>'
+      html << prefix + h(name) + '</del>'
     end
     diff[:unchanged_names].each do |name|
       html << '<span>' + h(name) + '</span>'
@@ -18,10 +20,12 @@ module ArtistVersionsHelper
     diff = artist_version.urls_diff(artist_version.previous)
     html = []
     diff[:added_urls].each do |url|
-      html << '<li><ins>' + h(url) + '</ins></li>'
+      prefix = diff[:obsolete_added_urls].include?(url) ? '<ins class="obsolete">' : '<ins>'
+      html << '<li>' + prefix + h(url) + '</ins></li>'
     end
     diff[:removed_urls].each do |url|
-      html << '<li><del>' + h(url) + '</del></li>'
+      prefix = diff[:obsolete_removed_urls].include?(url) ? '<del class="obsolete">' : '<del>'
+      html << '<li>' + prefix + h(url) + '</del></li>'
     end
     diff[:unchanged_urls].each do |url|
       html << '<li><span>' + h(url) + '</span></li>'

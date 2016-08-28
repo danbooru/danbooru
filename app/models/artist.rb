@@ -43,9 +43,13 @@ class Artist < ActiveRecord::Base
       end
     end
 
+    def url_array
+      urls.map(&:url)
+    end
+
     def save_url_string
       if @url_string
-        prev = urls.map(&:url)
+        prev = url_array
         curr = @url_string.scan(/\S+/).uniq
 
         duplicates = prev.select{|url| prev.count(url) > 1}.uniq
@@ -69,11 +73,11 @@ class Artist < ActiveRecord::Base
     end
 
     def url_string
-      @url_string || urls.map {|x| x.url}.join("\n")
+      @url_string || url_array.join("\n")
     end
 
     def url_string_changed?
-      url_string.scan(/\S+/) != urls.map(&:url)
+      url_string.scan(/\S+/) != url_array
     end
   end
 

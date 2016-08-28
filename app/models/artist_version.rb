@@ -67,26 +67,39 @@ class ArtistVersion < ActiveRecord::Base
   end
 
   def urls_diff(version)
+    latest_urls = artist.url_array
     new_urls = url_array
     old_urls = version.present? ? version.url_array : []
 
+    latest_urls  = latest_urls.map {|url| ArtistUrl.legacy_normalize(url)}
     new_urls = new_urls.map {|url| ArtistUrl.legacy_normalize(url)}
     old_urls = old_urls.map {|url| ArtistUrl.legacy_normalize(url)}
 
+    added_urls = new_urls - old_urls
+    removed_urls = old_urls - new_urls
+
     return {
-      :added_urls => new_urls - old_urls,
-      :removed_urls => old_urls - new_urls,
+      :added_urls => added_urls,
+      :removed_urls => removed_urls,
+      :obsolete_added_urls => added_urls - latest_urls,
+      :obsolete_removed_urls => removed_urls & latest_urls,
       :unchanged_urls => new_urls & old_urls,
     }
   end
 
   def other_names_diff(version)
+    latest_names = artist.other_names_array
     new_names = other_names_array
     old_names = version.present? ? version.other_names_array : []
 
+    added_names = new_names - old_names
+    removed_names = old_names - new_names
+
     return {
-      :added_names => new_names - old_names,
-      :removed_names => old_names - new_names,
+      :added_names => added_names,
+      :removed_names => removed_names,
+      :obsolete_added_names => added_names - latest_names,
+      :obsolete_removed_names => removed_names & latest_names,
       :unchanged_names => new_names & old_names,
     }
   end
