@@ -823,8 +823,8 @@ class User < ActiveRecord::Base
     def unique_saved_search_categories
       categories = saved_searches.pluck(:category)
       
-      if categories.any? {|x| x.nil?}
-        categories.compact!
+      if categories.any? {|x| x.blank?}
+        categories.reject! {|x| x.blank?}
         categories.unshift(SavedSearch::UNCATEGORIZED_NAME)
       end
       
