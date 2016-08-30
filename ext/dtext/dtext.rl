@@ -143,7 +143,7 @@ pixiv_id = 'pixiv #'i digit+ >mark_a1 %mark_a2;
 pixiv_paged_id = 'pixiv #'i digit+ >mark_a1 %mark_a2 '/p' digit+ >mark_b1 %mark_b2;
 
 ws = ' ' | '\t';
-header = 'h' [123456] >mark_a1 %mark_a2 '.' ws*;
+header = 'h'i [123456] >mark_a1 %mark_a2 '.' ws*;
 aliased_expand = '[expand='i (nonbracket+ >mark_a1 %mark_a2) ']';
 
 list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
