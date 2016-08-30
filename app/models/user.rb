@@ -798,7 +798,8 @@ class User < ActiveRecord::Base
         categories.compact!
         categories.unshift(SavedSearch::UNCATEGORIZED_NAME)
       end
-
+      
+      categories.uniq!
       categories
     end
   end
