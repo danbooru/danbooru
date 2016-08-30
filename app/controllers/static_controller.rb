@@ -8,6 +8,10 @@ class StaticController < ApplicationController
     redirect_to(url || posts_path)
   end
 
+  def not_found
+    render text: "not found", status: :not_found
+  end
+
   def error
   end
 end
