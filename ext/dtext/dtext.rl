@@ -1299,6 +1299,11 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
   }
 
   input = argv[0];
+
+  if (NIL_P(input)) {
+    return Qnil;
+  }
+
   input0 = rb_str_dup(input);
   
   sm = (StateMachine *)g_malloc0(sizeof(StateMachine));

@@ -505,6 +505,11 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
   }
 
   input = argv[0];
+
+  if (NIL_P(input)) {
+    return Qnil;
+  }
+
   input0 = rb_str_dup(input);
   
   sm = (StateMachine *)g_malloc0(sizeof(StateMachine));
@@ -528,7 +533,7 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
   }
 
   
-#line 532 "ext/dtext/dtext.c"
+#line 537 "ext/dtext/dtext.c"
 	{
 	 sm->cs = dtext_start;
 	( sm->top) = 0;
@@ -537,9 +542,9 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
 	( sm->act) = 0;
 	}
 
-#line 1325 "ext/dtext/dtext.rl"
+#line 1330 "ext/dtext/dtext.rl"
   
-#line 543 "ext/dtext/dtext.c"
+#line 548 "ext/dtext/dtext.c"
 	{
 	if ( ( sm->p) == ( sm->pe) )
 		goto _test_eof;
@@ -549,7 +554,7 @@ _resume:
 #line 1 "NONE"
 	{( sm->ts) = ( sm->p);}
 	break;
-#line 553 "ext/dtext/dtext.c"
+#line 558 "ext/dtext/dtext.c"
 	}
 
 	switch (  sm->cs ) {
@@ -4230,7 +4235,7 @@ _again:
 #line 1 "NONE"
 	{( sm->ts) = 0;}
 	break;
-#line 4234 "ext/dtext/dtext.c"
+#line 4239 "ext/dtext/dtext.c"
 	}
 
 	if ( ++( sm->p) != ( sm->pe) )
@@ -4546,7 +4551,7 @@ _again:
 
 	}
 
-#line 1326 "ext/dtext/dtext.rl"
+#line 1331 "ext/dtext/dtext.rl"
 
   dstack_close(sm);
 
