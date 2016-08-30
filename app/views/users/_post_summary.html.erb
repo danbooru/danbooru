@@ -1,5 +1,5 @@
 <% if presenter.has_uploads? %>
-  <div class="box">
+  <div class="box user-uploads">
     <h2><%= link_to "Uploads", posts_path(:tags => "user:#{user.name}") %></h2>
     <div>
       <% presenter.uploads.each do |post| %>
@@ -10,7 +10,7 @@
 <% end %>
 
 <% if presenter.has_favorites? %>
-  <div class="box">
+  <div class="box user-favorites">
     <h2><%= link_to "Favorites", favorites_path(:user_id => user.id) %></h2>
     <div>
       <% presenter.favorites.each do |post| %>
@@ -21,7 +21,7 @@
 <% end %>
 
 <% presenter.subscriptions.each do |subscription| %>
-  <div class="box">
+  <div class="box user-subscription" data-name="<%= subscription.name %>">
     <h2>
       Subscription: <%= link_to subscription.pretty_name, posts_path(:tags => "sub:#{user.name}:#{subscription.name}") %>
     </h2>
@@ -36,7 +36,7 @@
 
 <% if CurrentUser.user.id == @user.id && @user.has_saved_searches? && @user.is_gold? %>
   <% presenter.saved_search_categories.each do |category| %>
-    <div class="box">
+    <div class="box user-saved-search" data-category="<%= category %>">
       <h2>
         Saved Search: <%= link_to category, posts_path(:tags => "search:#{category}") %>
       </h2>
