@@ -144,7 +144,7 @@ pixiv_paged_id = 'pixiv #'i digit+ >mark_a1 %mark_a2 '/p' digit+ >mark_b1 %mark_
 
 ws = ' ' | '\t';
 header = 'h' [123456] >mark_a1 %mark_a2 '.' ws*;
-aliased_expand = '[expand=' (nonbracket+ >mark_a1 %mark_a2) ']';
+aliased_expand = '[expand='i (nonbracket+ >mark_a1 %mark_a2) ']';
 
 list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
 
@@ -409,12 +409,12 @@ inline := |*
     fnext list;
   };
 
-  '[b]' => {
+  '[b]'i => {
     dstack_push(sm, &INLINE_B);
     append(sm, true, "<strong>");
   };
 
-  '[/b]' => {
+  '[/b]'i => {
     if (dstack_check(sm, INLINE_B)) {
       dstack_pop(sm);
       append(sm, true, "</strong>");
@@ -423,12 +423,12 @@ inline := |*
     }
   };
 
-  '[i]' => {
+  '[i]'i => {
     dstack_push(sm, &INLINE_I);
     append(sm, true, "<em>");
   };
 
-  '[/i]' => {
+  '[/i]'i => {
     if (dstack_check(sm, INLINE_I)) {
       dstack_pop(sm);
       append(sm, true, "</em>");
@@ -437,12 +437,12 @@ inline := |*
     }
   };
 
-  '[s]' => {
+  '[s]'i => {
     dstack_push(sm, &INLINE_S);
     append(sm, true, "<s>");
   };
 
-  '[/s]' => {
+  '[/s]'i => {
     if (dstack_check(sm, INLINE_S)) {
       dstack_pop(sm);
       append(sm, true, "</s>");
@@ -451,12 +451,12 @@ inline := |*
     }
   };
 
-  '[u]' => {
+  '[u]'i => {
     dstack_push(sm, &INLINE_U);
     append(sm, true, "<u>");
   };
 
-  '[/u]' => {
+  '[/u]'i => {
     if (dstack_check(sm, INLINE_U)) {
       dstack_pop(sm);
       append(sm, true, "</u>");
@@ -465,12 +465,12 @@ inline := |*
     }
   };
 
-  '[tn]' => {
+  '[tn]'i => {
     dstack_push(sm, &INLINE_TN);
     append(sm, true, "<span class=\"tn\">");
   };
 
-  '[/tn]' => {
+  '[/tn]'i => {
     dstack_close_before_block(sm);
 
     if (dstack_check(sm, BLOCK_TN)) {
@@ -492,14 +492,14 @@ inline := |*
     fret;
   };
 
-  '[quote]' => {
+  '[quote]'i => {
     g_debug("inline [quote]");
     dstack_close_before_block(sm);
     fexec sm->ts;
     fret;
   };
 
-  '[/quote]' space* => {
+  '[/quote]'i space* => {
     g_debug("inline [/quote]");
     dstack_close_before_block(sm);
 
@@ -515,14 +515,14 @@ inline := |*
     }
   };
 
-  '[spoiler]' => {
+  '[spoiler]'i => {
     g_debug("inline [spoiler]");
     g_debug("  push <span>");
     dstack_push(sm, &INLINE_SPOILER);
     append(sm, true, "<span class=\"spoiler\">");
   };
 
-  '[/spoiler]' => {
+  '[/spoiler]'i => {
     g_debug("inline [/spoiler]");
     dstack_close_before_block(sm);
 
@@ -543,14 +543,14 @@ inline := |*
     }
   };
 
-  '[expand]' => {
+  '[expand]'i => {
     g_debug("inline [expand]");
     dstack_rewind(sm);
     fexec(sm->p - 7);
     fret;
   };
 
-  '[/expand]' => {
+  '[/expand]'i => {
     dstack_close_before_block(sm);
 
     if (dstack_check(sm, BLOCK_EXPAND)) {
@@ -562,12 +562,12 @@ inline := |*
     }
   };
 
-  '[nodtext]' => {
+  '[nodtext]'i => {
     dstack_push(sm, &INLINE_NODTEXT);
     fcall nodtext;
   };
 
-  '[/th]' => {
+  '[/th]'i => {
     if (dstack_check(sm, BLOCK_TH)) {
       dstack_pop(sm);
       append_block(sm, "</th>");
@@ -577,7 +577,7 @@ inline := |*
     }
   };
 
-  '[/td]' => {
+  '[/td]'i => {
     if (dstack_check(sm, BLOCK_TD)) {
       dstack_pop(sm);
       append_block(sm, "</td>");
@@ -630,7 +630,7 @@ inline := |*
 *|;
 
 code := |*
-  '[/code]' => {
+  '[/code]'i => {
     if (dstack_check(sm, BLOCK_CODE)) {
       dstack_rewind(sm);
     } else {
@@ -650,7 +650,7 @@ code := |*
 *|;
 
 nodtext := |*
-  '[/nodtext]' => {
+  '[/nodtext]'i => {
     if (dstack_check(sm, BLOCK_NODTEXT)) {
       dstack_pop(sm);
       append_block(sm, "</p>");
@@ -674,12 +674,12 @@ nodtext := |*
 *|;
 
 table := |*
-  '[thead]' => {
+  '[thead]'i => {
     dstack_push(sm, &BLOCK_THEAD);
     append_block(sm, "<thead>");
   };
 
-  '[/thead]' => {
+  '[/thead]'i => {
     if (dstack_check(sm, BLOCK_THEAD)) {
       dstack_pop(sm);
       append_block(sm, "</thead>");
@@ -688,12 +688,12 @@ table := |*
     }
   };
 
-  '[tbody]' => {
+  '[tbody]'i => {
     dstack_push(sm, &BLOCK_TBODY);
     append_block(sm, "<tbody>");
   };
 
-  '[/tbody]' => {
+  '[/tbody]'i => {
     if (dstack_check(sm, BLOCK_TBODY)) {
       dstack_pop(sm);
       append_block(sm, "</tbody>");
@@ -702,18 +702,18 @@ table := |*
     }
   };
 
-  '[th]' => {
+  '[th]'i => {
     dstack_push(sm, &BLOCK_TH);
     append_block(sm, "<th>");
     fcall inline;
   };
 
-  '[tr]' => {
+  '[tr]'i => {
     dstack_push(sm, &BLOCK_TR);
     append_block(sm, "<tr>");
   };
 
-  '[/tr]' => {
+  '[/tr]'i => {
     if (dstack_check(sm, BLOCK_TR)) {
       dstack_pop(sm);
       append_block(sm, "</tr>");
@@ -722,13 +722,13 @@ table := |*
     }
   };
 
-  '[td]' => {
+  '[td]'i => {
     dstack_push(sm, &BLOCK_TD);
     append_block(sm, "<td>");
     fcall inline;
   };
 
-  '[/table]' => {
+  '[/table]'i => {
     if (dstack_check(sm, BLOCK_TABLE)) {
       dstack_pop(sm);
       append_block(sm, "</table>");
@@ -847,7 +847,7 @@ main := |*
     fcall inline;
   };
 
-  '[quote]' space* => {
+  '[quote]'i space* => {
     g_debug("block [quote]");
     g_debug("  push quote");
     g_debug("  print <blockquote>");
@@ -856,7 +856,7 @@ main := |*
     append_block(sm, "<blockquote>");
   };
 
-  '[spoiler]' space* => {
+  '[spoiler]'i space* => {
     g_debug("block [spoiler]");
     g_debug("  push spoiler");
     g_debug("  print <div>");
@@ -865,7 +865,7 @@ main := |*
     append_block(sm, "<div class=\"spoiler\">");
   };
 
-  '[/spoiler]' => {
+  '[/spoiler]'i => {
     g_debug("block [/spoiler]");
     dstack_close_before_block(sm);
     if (dstack_check(sm, BLOCK_SPOILER)) {
@@ -874,7 +874,7 @@ main := |*
     }
   };
 
-  '[code]' space* => {
+  '[code]'i space* => {
     g_debug("block [code]");
     dstack_close_before_block(sm);
     dstack_push(sm, &BLOCK_CODE);
@@ -882,7 +882,7 @@ main := |*
     fcall code;
   };
 
-  '[expand]' space* => {
+  '[expand]'i space* => {
     g_debug("block [expand]");
     dstack_close_before_block(sm);
     dstack_push(sm, &BLOCK_EXPAND);
@@ -903,7 +903,7 @@ main := |*
     append_block(sm, "<div class=\"expandable-content\">");
   };
 
-  '[nodtext]' space* => {
+  '[nodtext]'i space* => {
     g_debug("block [nodtext]");
     dstack_close_before_block(sm);
     dstack_push(sm, &BLOCK_NODTEXT);
@@ -912,14 +912,14 @@ main := |*
     fcall nodtext;
   };
 
-  '[table]' => {
+  '[table]'i => {
     dstack_close_before_block(sm);
     dstack_push(sm, &BLOCK_TABLE);
     append_block(sm, "<table class=\"striped\">");
     fcall table;
   };
 
-  '[tn]' => {
+  '[tn]'i => {
     dstack_push(sm, &BLOCK_TN);
     append_block(sm, "<p class=\"tn\">");
     fcall inline;

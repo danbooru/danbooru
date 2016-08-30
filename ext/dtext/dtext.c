@@ -627,6 +627,12 @@ case 3:
 case 262:
 	switch( (*( sm->p)) ) {
 		case 47: goto tr314;
+		case 67: goto tr315;
+		case 69: goto tr316;
+		case 78: goto tr317;
+		case 81: goto tr318;
+		case 83: goto tr319;
+		case 84: goto tr320;
 		case 99: goto tr315;
 		case 101: goto tr316;
 		case 110: goto tr317;
@@ -636,48 +642,68 @@ case 262:
 	}
 	goto tr311;
 case 4:
-	if ( (*( sm->p)) == 115 )
-		goto tr7;
+	switch( (*( sm->p)) ) {
+		case 83: goto tr7;
+		case 115: goto tr7;
+	}
 	goto tr2;
 case 5:
-	if ( (*( sm->p)) == 112 )
-		goto tr8;
+	switch( (*( sm->p)) ) {
+		case 80: goto tr8;
+		case 112: goto tr8;
+	}
 	goto tr2;
 case 6:
-	if ( (*( sm->p)) == 111 )
-		goto tr9;
+	switch( (*( sm->p)) ) {
+		case 79: goto tr9;
+		case 111: goto tr9;
+	}
 	goto tr2;
 case 7:
-	if ( (*( sm->p)) == 105 )
-		goto tr10;
+	switch( (*( sm->p)) ) {
+		case 73: goto tr10;
+		case 105: goto tr10;
+	}
 	goto tr2;
 case 8:
-	if ( (*( sm->p)) == 108 )
-		goto tr11;
+	switch( (*( sm->p)) ) {
+		case 76: goto tr11;
+		case 108: goto tr11;
+	}
 	goto tr2;
 case 9:
-	if ( (*( sm->p)) == 101 )
-		goto tr12;
+	switch( (*( sm->p)) ) {
+		case 69: goto tr12;
+		case 101: goto tr12;
+	}
 	goto tr2;
 case 10:
-	if ( (*( sm->p)) == 114 )
-		goto tr13;
+	switch( (*( sm->p)) ) {
+		case 82: goto tr13;
+		case 114: goto tr13;
+	}
 	goto tr2;
 case 11:
 	if ( (*( sm->p)) == 93 )
 		goto tr14;
 	goto tr2;
 case 12:
-	if ( (*( sm->p)) == 111 )
-		goto tr15;
+	switch( (*( sm->p)) ) {
+		case 79: goto tr15;
+		case 111: goto tr15;
+	}
 	goto tr2;
 case 13:
-	if ( (*( sm->p)) == 100 )
-		goto tr16;
+	switch( (*( sm->p)) ) {
+		case 68: goto tr16;
+		case 100: goto tr16;
+	}
 	goto tr2;
 case 14:
-	if ( (*( sm->p)) == 101 )
-		goto tr17;
+	switch( (*( sm->p)) ) {
+		case 69: goto tr17;
+		case 101: goto tr17;
+	}
 	goto tr2;
 case 15:
 	if ( (*( sm->p)) == 93 )
@@ -690,24 +716,34 @@ case 263:
 		goto tr18;
 	goto tr321;
 case 16:
-	if ( (*( sm->p)) == 120 )
-		goto tr19;
+	switch( (*( sm->p)) ) {
+		case 88: goto tr19;
+		case 120: goto tr19;
+	}
 	goto tr2;
 case 17:
-	if ( (*( sm->p)) == 112 )
-		goto tr20;
+	switch( (*( sm->p)) ) {
+		case 80: goto tr20;
+		case 112: goto tr20;
+	}
 	goto tr2;
 case 18:
-	if ( (*( sm->p)) == 97 )
-		goto tr21;
+	switch( (*( sm->p)) ) {
+		case 65: goto tr21;
+		case 97: goto tr21;
+	}
 	goto tr2;
 case 19:
-	if ( (*( sm->p)) == 110 )
-		goto tr22;
+	switch( (*( sm->p)) ) {
+		case 78: goto tr22;
+		case 110: goto tr22;
+	}
 	goto tr2;
 case 20:
-	if ( (*( sm->p)) == 100 )
-		goto tr23;
+	switch( (*( sm->p)) ) {
+		case 68: goto tr23;
+		case 100: goto tr23;
+	}
 	goto tr2;
 case 21:
 	switch( (*( sm->p)) ) {
@@ -736,28 +772,40 @@ case 265:
 		goto tr25;
 	goto tr324;
 case 24:
-	if ( (*( sm->p)) == 111 )
-		goto tr29;
+	switch( (*( sm->p)) ) {
+		case 79: goto tr29;
+		case 111: goto tr29;
+	}
 	goto tr2;
 case 25:
-	if ( (*( sm->p)) == 100 )
-		goto tr30;
+	switch( (*( sm->p)) ) {
+		case 68: goto tr30;
+		case 100: goto tr30;
+	}
 	goto tr2;
 case 26:
-	if ( (*( sm->p)) == 116 )
-		goto tr31;
+	switch( (*( sm->p)) ) {
+		case 84: goto tr31;
+		case 116: goto tr31;
+	}
 	goto tr2;
 case 27:
-	if ( (*( sm->p)) == 101 )
-		goto tr32;
+	switch( (*( sm->p)) ) {
+		case 69: goto tr32;
+		case 101: goto tr32;
+	}
 	goto tr2;
 case 28:
-	if ( (*( sm->p)) == 120 )
-		goto tr33;
+	switch( (*( sm->p)) ) {
+		case 88: goto tr33;
+		case 120: goto tr33;
+	}
 	goto tr2;
 case 29:
-	if ( (*( sm->p)) == 116 )
-		goto tr34;
+	switch( (*( sm->p)) ) {
+		case 84: goto tr34;
+		case 116: goto tr34;
+	}
 	goto tr2;
 case 30:
 	if ( (*( sm->p)) == 93 )
@@ -770,20 +818,28 @@ case 266:
 		goto tr35;
 	goto tr325;
 case 31:
-	if ( (*( sm->p)) == 117 )
-		goto tr36;
+	switch( (*( sm->p)) ) {
+		case 85: goto tr36;
+		case 117: goto tr36;
+	}
 	goto tr2;
 case 32:
-	if ( (*( sm->p)) == 111 )
-		goto tr37;
+	switch( (*( sm->p)) ) {
+		case 79: goto tr37;
+		case 111: goto tr37;
+	}
 	goto tr2;
 case 33:
-	if ( (*( sm->p)) == 116 )
-		goto tr38;
+	switch( (*( sm->p)) ) {
+		case 84: goto tr38;
+		case 116: goto tr38;
+	}
 	goto tr2;
 case 34:
-	if ( (*( sm->p)) == 101 )
-		goto tr39;
+	switch( (*( sm->p)) ) {
+		case 69: goto tr39;
+		case 101: goto tr39;
+	}
 	goto tr2;
 case 35:
 	if ( (*( sm->p)) == 93 )
@@ -796,28 +852,40 @@ case 267:
 		goto tr40;
 	goto tr326;
 case 36:
-	if ( (*( sm->p)) == 112 )
-		goto tr41;
+	switch( (*( sm->p)) ) {
+		case 80: goto tr41;
+		case 112: goto tr41;
+	}
 	goto tr2;
 case 37:
-	if ( (*( sm->p)) == 111 )
-		goto tr42;
+	switch( (*( sm->p)) ) {
+		case 79: goto tr42;
+		case 111: goto tr42;
+	}
 	goto tr2;
 case 38:
-	if ( (*( sm->p)) == 105 )
-		goto tr43;
+	switch( (*( sm->p)) ) {
+		case 73: goto tr43;
+		case 105: goto tr43;
+	}
 	goto tr2;
 case 39:
-	if ( (*( sm->p)) == 108 )
-		goto tr44;
+	switch( (*( sm->p)) ) {
+		case 76: goto tr44;
+		case 108: goto tr44;
+	}
 	goto tr2;
 case 40:
-	if ( (*( sm->p)) == 101 )
-		goto tr45;
+	switch( (*( sm->p)) ) {
+		case 69: goto tr45;
+		case 101: goto tr45;
+	}
 	goto tr2;
 case 41:
-	if ( (*( sm->p)) == 114 )
-		goto tr46;
+	switch( (*( sm->p)) ) {
+		case 82: goto tr46;
+		case 114: goto tr46;
+	}
 	goto tr2;
 case 42:
 	if ( (*( sm->p)) == 93 )
@@ -831,21 +899,29 @@ case 268:
 	goto tr327;
 case 43:
 	switch( (*( sm->p)) ) {
+		case 65: goto tr48;
+		case 78: goto tr49;
 		case 97: goto tr48;
 		case 110: goto tr49;
 	}
 	goto tr2;
 case 44:
-	if ( (*( sm->p)) == 98 )
-		goto tr50;
+	switch( (*( sm->p)) ) {
+		case 66: goto tr50;
+		case 98: goto tr50;
+	}
 	goto tr2;
 case 45:
-	if ( (*( sm->p)) == 108 )
-		goto tr51;
+	switch( (*( sm->p)) ) {
+		case 76: goto tr51;
+		case 108: goto tr51;
+	}
 	goto tr2;
 case 46:
-	if ( (*( sm->p)) == 101 )
-		goto tr52;
+	switch( (*( sm->p)) ) {
+		case 69: goto tr52;
+		case 101: goto tr52;
+	}
 	goto tr2;
 case 47:
 	if ( (*( sm->p)) == 93 )
@@ -1500,19 +1576,34 @@ case 302:
 case 303:
 	switch( (*( sm->p)) ) {
 		case 47: goto tr398;
-		case 91: goto tr399;
-		case 98: goto tr400;
-		case 101: goto tr401;
-		case 105: goto tr402;
-		case 110: goto tr403;
-		case 113: goto tr404;
-		case 115: goto tr405;
-		case 116: goto tr406;
-		case 117: goto tr407;
+		case 66: goto tr399;
+		case 69: goto tr400;
+		case 73: goto tr401;
+		case 78: goto tr402;
+		case 81: goto tr403;
+		case 83: goto tr404;
+		case 84: goto tr405;
+		case 85: goto tr406;
+		case 91: goto tr407;
+		case 98: goto tr399;
+		case 101: goto tr400;
+		case 105: goto tr401;
+		case 110: goto tr402;
+		case 113: goto tr403;
+		case 115: goto tr404;
+		case 116: goto tr405;
+		case 117: goto tr406;
 	}
 	goto tr358;
 case 141:
 	switch( (*( sm->p)) ) {
+		case 66: goto tr160;
+		case 69: goto tr161;
+		case 73: goto tr162;
+		case 81: goto tr163;
+		case 83: goto tr164;
+		case 84: goto tr165;
+		case 85: goto tr166;
 		case 98: goto tr160;
 		case 101: goto tr161;
 		case 105: goto tr162;
@@ -1527,24 +1618,34 @@ case 142:
 		goto tr167;
 	goto tr74;
 case 143:
-	if ( (*( sm->p)) == 120 )
-		goto tr168;
+	switch( (*( sm->p)) ) {
+		case 88: goto tr168;
+		case 120: goto tr168;
+	}
 	goto tr74;
 case 144:
-	if ( (*( sm->p)) == 112 )
-		goto tr169;
+	switch( (*( sm->p)) ) {
+		case 80: goto tr169;
+		case 112: goto tr169;
+	}
 	goto tr74;
 case 145:
-	if ( (*( sm->p)) == 97 )
-		goto tr170;
+	switch( (*( sm->p)) ) {
+		case 65: goto tr170;
+		case 97: goto tr170;
+	}
 	goto tr74;
 case 146:
-	if ( (*( sm->p)) == 110 )
-		goto tr171;
+	switch( (*( sm->p)) ) {
+		case 78: goto tr171;
+		case 110: goto tr171;
+	}
 	goto tr74;
 case 147:
-	if ( (*( sm->p)) == 100 )
-		goto tr172;
+	switch( (*( sm->p)) ) {
+		case 68: goto tr172;
+		case 100: goto tr172;
+	}
 	goto tr74;
 case 148:
 	if ( (*( sm->p)) == 93 )
@@ -1555,20 +1656,28 @@ case 149:
 		goto tr174;
 	goto tr74;
 case 150:
-	if ( (*( sm->p)) == 117 )
-		goto tr175;
+	switch( (*( sm->p)) ) {
+		case 85: goto tr175;
+		case 117: goto tr175;
+	}
 	goto tr74;
 case 151:
-	if ( (*( sm->p)) == 111 )
-		goto tr176;
+	switch( (*( sm->p)) ) {
+		case 79: goto tr176;
+		case 111: goto tr176;
+	}
 	goto tr74;
 case 152:
-	if ( (*( sm->p)) == 116 )
-		goto tr177;
+	switch( (*( sm->p)) ) {
+		case 84: goto tr177;
+		case 116: goto tr177;
+	}
 	goto tr74;
 case 153:
-	if ( (*( sm->p)) == 101 )
-		goto tr178;
+	switch( (*( sm->p)) ) {
+		case 69: goto tr178;
+		case 101: goto tr178;
+	}
 	goto tr74;
 case 154:
 	if ( (*( sm->p)) == 93 )
@@ -1582,29 +1691,40 @@ case 304:
 	goto tr408;
 case 155:
 	switch( (*( sm->p)) ) {
-		case 93: goto tr180;
-		case 112: goto tr181;
+		case 80: goto tr180;
+		case 93: goto tr181;
+		case 112: goto tr180;
 	}
 	goto tr74;
 case 156:
-	if ( (*( sm->p)) == 111 )
-		goto tr182;
+	switch( (*( sm->p)) ) {
+		case 79: goto tr182;
+		case 111: goto tr182;
+	}
 	goto tr74;
 case 157:
-	if ( (*( sm->p)) == 105 )
-		goto tr183;
+	switch( (*( sm->p)) ) {
+		case 73: goto tr183;
+		case 105: goto tr183;
+	}
 	goto tr74;
 case 158:
-	if ( (*( sm->p)) == 108 )
-		goto tr184;
+	switch( (*( sm->p)) ) {
+		case 76: goto tr184;
+		case 108: goto tr184;
+	}
 	goto tr74;
 case 159:
-	if ( (*( sm->p)) == 101 )
-		goto tr185;
+	switch( (*( sm->p)) ) {
+		case 69: goto tr185;
+		case 101: goto tr185;
+	}
 	goto tr74;
 case 160:
-	if ( (*( sm->p)) == 114 )
-		goto tr186;
+	switch( (*( sm->p)) ) {
+		case 82: goto tr186;
+		case 114: goto tr186;
+	}
 	goto tr74;
 case 161:
 	if ( (*( sm->p)) == 93 )
@@ -1612,6 +1732,9 @@ case 161:
 	goto tr74;
 case 162:
 	switch( (*( sm->p)) ) {
+		case 68: goto tr188;
+		case 72: goto tr189;
+		case 78: goto tr190;
 		case 100: goto tr188;
 		case 104: goto tr189;
 		case 110: goto tr190;
@@ -1634,151 +1757,194 @@ case 166:
 		goto tr194;
 	goto tr74;
 case 167:
+	if ( (*( sm->p)) == 93 )
+		goto tr195;
+	goto tr74;
+case 168:
+	switch( (*( sm->p)) ) {
+		case 88: goto tr196;
+		case 120: goto tr196;
+	}
+	goto tr74;
+case 169:
+	switch( (*( sm->p)) ) {
+		case 80: goto tr197;
+		case 112: goto tr197;
+	}
+	goto tr74;
+case 170:
+	switch( (*( sm->p)) ) {
+		case 65: goto tr198;
+		case 97: goto tr198;
+	}
+	goto tr74;
+case 171:
+	switch( (*( sm->p)) ) {
+		case 78: goto tr199;
+		case 110: goto tr199;
+	}
+	goto tr74;
+case 172:
+	switch( (*( sm->p)) ) {
+		case 68: goto tr200;
+		case 100: goto tr200;
+	}
+	goto tr74;
+case 173:
+	if ( (*( sm->p)) == 93 )
+		goto tr201;
+	goto tr74;
+case 174:
+	if ( (*( sm->p)) == 93 )
+		goto tr202;
+	goto tr74;
+case 175:
+	switch( (*( sm->p)) ) {
+		case 79: goto tr203;
+		case 111: goto tr203;
+	}
+	goto tr74;
+case 176:
+	switch( (*( sm->p)) ) {
+		case 68: goto tr204;
+		case 100: goto tr204;
+	}
+	goto tr74;
+case 177:
+	switch( (*( sm->p)) ) {
+		case 84: goto tr205;
+		case 116: goto tr205;
+	}
+	goto tr74;
+case 178:
+	switch( (*( sm->p)) ) {
+		case 69: goto tr206;
+		case 101: goto tr206;
+	}
+	goto tr74;
+case 179:
+	switch( (*( sm->p)) ) {
+		case 88: goto tr207;
+		case 120: goto tr207;
+	}
+	goto tr74;
+case 180:
+	switch( (*( sm->p)) ) {
+		case 84: goto tr208;
+		case 116: goto tr208;
+	}
+	goto tr74;
+case 181:
+	if ( (*( sm->p)) == 93 )
+		goto tr209;
+	goto tr74;
+case 182:
+	switch( (*( sm->p)) ) {
+		case 85: goto tr210;
+		case 117: goto tr210;
+	}
+	goto tr74;
+case 183:
+	switch( (*( sm->p)) ) {
+		case 79: goto tr211;
+		case 111: goto tr211;
+	}
+	goto tr74;
+case 184:
+	switch( (*( sm->p)) ) {
+		case 84: goto tr212;
+		case 116: goto tr212;
+	}
+	goto tr74;
+case 185:
+	switch( (*( sm->p)) ) {
+		case 69: goto tr213;
+		case 101: goto tr213;
+	}
+	goto tr74;
+case 186:
+	if ( (*( sm->p)) == 93 )
+		goto tr214;
+	goto tr74;
+case 187:
+	switch( (*( sm->p)) ) {
+		case 80: goto tr215;
+		case 93: goto tr216;
+		case 112: goto tr215;
+	}
+	goto tr74;
+case 188:
+	switch( (*( sm->p)) ) {
+		case 79: goto tr217;
+		case 111: goto tr217;
+	}
+	goto tr74;
+case 189:
+	switch( (*( sm->p)) ) {
+		case 73: goto tr218;
+		case 105: goto tr218;
+	}
+	goto tr74;
+case 190:
+	switch( (*( sm->p)) ) {
+		case 76: goto tr219;
+		case 108: goto tr219;
+	}
+	goto tr74;
+case 191:
+	switch( (*( sm->p)) ) {
+		case 69: goto tr220;
+		case 101: goto tr220;
+	}
+	goto tr74;
+case 192:
+	switch( (*( sm->p)) ) {
+		case 82: goto tr221;
+		case 114: goto tr221;
+	}
+	goto tr74;
+case 193:
+	if ( (*( sm->p)) == 93 )
+		goto tr222;
+	goto tr74;
+case 194:
+	switch( (*( sm->p)) ) {
+		case 78: goto tr223;
+		case 110: goto tr223;
+	}
+	goto tr74;
+case 195:
+	if ( (*( sm->p)) == 93 )
+		goto tr224;
+	goto tr74;
+case 196:
+	if ( (*( sm->p)) == 93 )
+		goto tr225;
+	goto tr74;
+case 197:
 	switch( (*( sm->p)) ) {
 		case 93: goto tr74;
 		case 124: goto tr74;
 	}
-	goto tr195;
-case 168:
-	switch( (*( sm->p)) ) {
-		case 93: goto tr197;
-		case 124: goto tr198;
-	}
-	goto tr196;
-case 169:
-	if ( (*( sm->p)) == 93 )
-		goto tr199;
-	goto tr74;
-case 170:
-	if ( (*( sm->p)) == 93 )
-		goto tr74;
-	goto tr200;
-case 171:
-	if ( (*( sm->p)) == 93 )
-		goto tr202;
-	goto tr201;
-case 172:
-	if ( (*( sm->p)) == 93 )
-		goto tr203;
-	goto tr74;
-case 173:
-	if ( (*( sm->p)) == 93 )
-		goto tr204;
-	goto tr74;
-case 174:
-	if ( (*( sm->p)) == 120 )
-		goto tr205;
-	goto tr74;
-case 175:
-	if ( (*( sm->p)) == 112 )
-		goto tr206;
-	goto tr74;
-case 176:
-	if ( (*( sm->p)) == 97 )
-		goto tr207;
-	goto tr74;
-case 177:
-	if ( (*( sm->p)) == 110 )
-		goto tr208;
-	goto tr74;
-case 178:
-	if ( (*( sm->p)) == 100 )
-		goto tr209;
-	goto tr74;
-case 179:
-	if ( (*( sm->p)) == 93 )
-		goto tr210;
-	goto tr74;
-case 180:
-	if ( (*( sm->p)) == 93 )
-		goto tr211;
-	goto tr74;
-case 181:
-	if ( (*( sm->p)) == 111 )
-		goto tr212;
-	goto tr74;
-case 182:
-	if ( (*( sm->p)) == 100 )
-		goto tr213;
-	goto tr74;
-case 183:
-	if ( (*( sm->p)) == 116 )
-		goto tr214;
-	goto tr74;
-case 184:
-	if ( (*( sm->p)) == 101 )
-		goto tr215;
-	goto tr74;
-case 185:
-	if ( (*( sm->p)) == 120 )
-		goto tr216;
-	goto tr74;
-case 186:
-	if ( (*( sm->p)) == 116 )
-		goto tr217;
-	goto tr74;
-case 187:
-	if ( (*( sm->p)) == 93 )
-		goto tr218;
-	goto tr74;
-case 188:
-	if ( (*( sm->p)) == 117 )
-		goto tr219;
-	goto tr74;
-case 189:
-	if ( (*( sm->p)) == 111 )
-		goto tr220;
-	goto tr74;
-case 190:
-	if ( (*( sm->p)) == 116 )
-		goto tr221;
-	goto tr74;
-case 191:
-	if ( (*( sm->p)) == 101 )
-		goto tr222;
-	goto tr74;
-case 192:
-	if ( (*( sm->p)) == 93 )
-		goto tr223;
-	goto tr74;
-case 193:
-	switch( (*( sm->p)) ) {
-		case 93: goto tr224;
-		case 112: goto tr225;
-	}
-	goto tr74;
-case 194:
-	if ( (*( sm->p)) == 111 )
-		goto tr226;
-	goto tr74;
-case 195:
-	if ( (*( sm->p)) == 105 )
-		goto tr227;
-	goto tr74;
-case 196:
-	if ( (*( sm->p)) == 108 )
-		goto tr228;
-	goto tr74;
-case 197:
-	if ( (*( sm->p)) == 101 )
-		goto tr229;
-	goto tr74;
+	goto tr226;
 case 198:
-	if ( (*( sm->p)) == 114 )
-		goto tr230;
-	goto tr74;
+	switch( (*( sm->p)) ) {
+		case 93: goto tr228;
+		case 124: goto tr229;
+	}
+	goto tr227;
 case 199:
 	if ( (*( sm->p)) == 93 )
-		goto tr231;
+		goto tr230;
 	goto tr74;
 case 200:
-	if ( (*( sm->p)) == 110 )
-		goto tr232;
-	goto tr74;
+	if ( (*( sm->p)) == 93 )
+		goto tr74;
+	goto tr231;
 case 201:
 	if ( (*( sm->p)) == 93 )
 		goto tr233;
-	goto tr74;
+	goto tr232;
 case 202:
 	if ( (*( sm->p)) == 93 )
 		goto tr234;
@@ -1860,20 +2026,28 @@ case 310:
 		goto tr419;
 	goto tr418;
 case 214:
-	if ( (*( sm->p)) == 99 )
-		goto tr248;
+	switch( (*( sm->p)) ) {
+		case 67: goto tr248;
+		case 99: goto tr248;
+	}
 	goto tr247;
 case 215:
-	if ( (*( sm->p)) == 111 )
-		goto tr249;
+	switch( (*( sm->p)) ) {
+		case 79: goto tr249;
+		case 111: goto tr249;
+	}
 	goto tr247;
 case 216:
-	if ( (*( sm->p)) == 100 )
-		goto tr250;
+	switch( (*( sm->p)) ) {
+		case 68: goto tr250;
+		case 100: goto tr250;
+	}
 	goto tr247;
 case 217:
-	if ( (*( sm->p)) == 101 )
-		goto tr251;
+	switch( (*( sm->p)) ) {
+		case 69: goto tr251;
+		case 101: goto tr251;
+	}
 	goto tr247;
 case 218:
 	if ( (*( sm->p)) == 93 )
@@ -1890,32 +2064,46 @@ case 312:
 		goto tr424;
 	goto tr423;
 case 219:
-	if ( (*( sm->p)) == 110 )
-		goto tr254;
+	switch( (*( sm->p)) ) {
+		case 78: goto tr254;
+		case 110: goto tr254;
+	}
 	goto tr253;
 case 220:
-	if ( (*( sm->p)) == 111 )
-		goto tr255;
+	switch( (*( sm->p)) ) {
+		case 79: goto tr255;
+		case 111: goto tr255;
+	}
 	goto tr253;
 case 221:
-	if ( (*( sm->p)) == 100 )
-		goto tr256;
+	switch( (*( sm->p)) ) {
+		case 68: goto tr256;
+		case 100: goto tr256;
+	}
 	goto tr253;
 case 222:
-	if ( (*( sm->p)) == 116 )
-		goto tr257;
+	switch( (*( sm->p)) ) {
+		case 84: goto tr257;
+		case 116: goto tr257;
+	}
 	goto tr253;
 case 223:
-	if ( (*( sm->p)) == 101 )
-		goto tr258;
+	switch( (*( sm->p)) ) {
+		case 69: goto tr258;
+		case 101: goto tr258;
+	}
 	goto tr253;
 case 224:
-	if ( (*( sm->p)) == 120 )
-		goto tr259;
+	switch( (*( sm->p)) ) {
+		case 88: goto tr259;
+		case 120: goto tr259;
+	}
 	goto tr253;
 case 225:
-	if ( (*( sm->p)) == 116 )
-		goto tr260;
+	switch( (*( sm->p)) ) {
+		case 84: goto tr260;
+		case 116: goto tr260;
+	}
 	goto tr253;
 case 226:
 	if ( (*( sm->p)) == 93 )
@@ -1930,15 +2118,22 @@ case 313:
 case 314:
 	switch( (*( sm->p)) ) {
 		case 47: goto tr429;
+		case 84: goto tr430;
 		case 116: goto tr430;
 	}
 	goto tr428;
 case 227:
-	if ( (*( sm->p)) == 116 )
-		goto tr263;
+	switch( (*( sm->p)) ) {
+		case 84: goto tr263;
+		case 116: goto tr263;
+	}
 	goto tr262;
 case 228:
 	switch( (*( sm->p)) ) {
+		case 65: goto tr264;
+		case 66: goto tr265;
+		case 72: goto tr266;
+		case 82: goto tr267;
 		case 97: goto tr264;
 		case 98: goto tr265;
 		case 104: goto tr266;
@@ -1946,48 +2141,66 @@ case 228:
 	}
 	goto tr262;
 case 229:
-	if ( (*( sm->p)) == 98 )
-		goto tr268;
+	switch( (*( sm->p)) ) {
+		case 66: goto tr268;
+		case 98: goto tr268;
+	}
 	goto tr262;
 case 230:
-	if ( (*( sm->p)) == 108 )
-		goto tr269;
+	switch( (*( sm->p)) ) {
+		case 76: goto tr269;
+		case 108: goto tr269;
+	}
 	goto tr262;
 case 231:
-	if ( (*( sm->p)) == 101 )
-		goto tr270;
+	switch( (*( sm->p)) ) {
+		case 69: goto tr270;
+		case 101: goto tr270;
+	}
 	goto tr262;
 case 232:
 	if ( (*( sm->p)) == 93 )
 		goto tr271;
 	goto tr262;
 case 233:
-	if ( (*( sm->p)) == 111 )
-		goto tr272;
+	switch( (*( sm->p)) ) {
+		case 79: goto tr272;
+		case 111: goto tr272;
+	}
 	goto tr262;
 case 234:
-	if ( (*( sm->p)) == 100 )
-		goto tr273;
+	switch( (*( sm->p)) ) {
+		case 68: goto tr273;
+		case 100: goto tr273;
+	}
 	goto tr262;
 case 235:
-	if ( (*( sm->p)) == 121 )
-		goto tr274;
+	switch( (*( sm->p)) ) {
+		case 89: goto tr274;
+		case 121: goto tr274;
+	}
 	goto tr262;
 case 236:
 	if ( (*( sm->p)) == 93 )
 		goto tr275;
 	goto tr262;
 case 237:
-	if ( (*( sm->p)) == 101 )
-		goto tr276;
+	switch( (*( sm->p)) ) {
+		case 69: goto tr276;
+		case 101: goto tr276;
+	}
 	goto tr262;
 case 238:
-	if ( (*( sm->p)) == 97 )
-		goto tr277;
+	switch( (*( sm->p)) ) {
+		case 65: goto tr277;
+		case 97: goto tr277;
+	}
 	goto tr262;
 case 239:
-	if ( (*( sm->p)) == 100 )
-		goto tr278;
+	switch( (*( sm->p)) ) {
+		case 68: goto tr278;
+		case 100: goto tr278;
+	}
 	goto tr262;
 case 240:
 	if ( (*( sm->p)) == 93 )
@@ -1999,6 +2212,10 @@ case 241:
 	goto tr262;
 case 242:
 	switch( (*( sm->p)) ) {
+		case 66: goto tr281;
+		case 68: goto tr282;
+		case 72: goto tr283;
+		case 82: goto tr284;
 		case 98: goto tr281;
 		case 100: goto tr282;
 		case 104: goto tr283;
@@ -2006,16 +2223,22 @@ case 242:
 	}
 	goto tr262;
 case 243:
-	if ( (*( sm->p)) == 111 )
-		goto tr285;
+	switch( (*( sm->p)) ) {
+		case 79: goto tr285;
+		case 111: goto tr285;
+	}
 	goto tr262;
 case 244:
-	if ( (*( sm->p)) == 100 )
-		goto tr286;
+	switch( (*( sm->p)) ) {
+		case 68: goto tr286;
+		case 100: goto tr286;
+	}
 	goto tr262;
 case 245:
-	if ( (*( sm->p)) == 121 )
-		goto tr287;
+	switch( (*( sm->p)) ) {
+		case 89: goto tr287;
+		case 121: goto tr287;
+	}
 	goto tr262;
 case 246:
 	if ( (*( sm->p)) == 93 )
@@ -2027,17 +2250,22 @@ case 247:
 	goto tr262;
 case 248:
 	switch( (*( sm->p)) ) {
-		case 93: goto tr290;
-		case 101: goto tr291;
+		case 69: goto tr290;
+		case 93: goto tr291;
+		case 101: goto tr290;
 	}
 	goto tr262;
 case 249:
-	if ( (*( sm->p)) == 97 )
-		goto tr292;
+	switch( (*( sm->p)) ) {
+		case 65: goto tr292;
+		case 97: goto tr292;
+	}
 	goto tr262;
 case 250:
-	if ( (*( sm->p)) == 100 )
-		goto tr293;
+	switch( (*( sm->p)) ) {
+		case 68: goto tr293;
+		case 100: goto tr293;
+	}
 	goto tr262;
 case 251:
 	if ( (*( sm->p)) == 93 )
@@ -2271,7 +2499,7 @@ case 255:
 	tr177:  sm->cs = 153; goto _again;
 	tr178:  sm->cs = 154; goto _again;
 	tr164:  sm->cs = 155; goto _again;
-	tr181:  sm->cs = 156; goto _again;
+	tr180:  sm->cs = 156; goto _again;
 	tr182:  sm->cs = 157; goto _again;
 	tr183:  sm->cs = 158; goto _again;
 	tr184:  sm->cs = 159; goto _again;
@@ -2283,43 +2511,43 @@ case 255:
 	tr190:  sm->cs = 165; goto _again;
 	tr166:  sm->cs = 166; goto _again;
 	tr399:  sm->cs = 167; goto _again;
-	tr196:  sm->cs = 168; goto _again;
-	tr195:  sm->cs = 168; goto f6;
-	tr197:  sm->cs = 169; goto f4;
-	tr198:  sm->cs = 170; goto f4;
-	tr201:  sm->cs = 171; goto _again;
-	tr200:  sm->cs = 171; goto f3;
-	tr202:  sm->cs = 172; goto f27;
-	tr400:  sm->cs = 173; goto _again;
+	tr400:  sm->cs = 168; goto _again;
+	tr196:  sm->cs = 169; goto _again;
+	tr197:  sm->cs = 170; goto _again;
+	tr198:  sm->cs = 171; goto _again;
+	tr199:  sm->cs = 172; goto _again;
+	tr200:  sm->cs = 173; goto _again;
 	tr401:  sm->cs = 174; goto _again;
-	tr205:  sm->cs = 175; goto _again;
-	tr206:  sm->cs = 176; goto _again;
-	tr207:  sm->cs = 177; goto _again;
-	tr208:  sm->cs = 178; goto _again;
-	tr209:  sm->cs = 179; goto _again;
-	tr402:  sm->cs = 180; goto _again;
-	tr403:  sm->cs = 181; goto _again;
-	tr212:  sm->cs = 182; goto _again;
-	tr213:  sm->cs = 183; goto _again;
-	tr214:  sm->cs = 184; goto _again;
-	tr215:  sm->cs = 185; goto _again;
-	tr216:  sm->cs = 186; goto _again;
-	tr217:  sm->cs = 187; goto _again;
-	tr404:  sm->cs = 188; goto _again;
-	tr219:  sm->cs = 189; goto _again;
-	tr220:  sm->cs = 190; goto _again;
-	tr221:  sm->cs = 191; goto _again;
-	tr222:  sm->cs = 192; goto _again;
-	tr405:  sm->cs = 193; goto _again;
-	tr225:  sm->cs = 194; goto _again;
-	tr226:  sm->cs = 195; goto _again;
-	tr227:  sm->cs = 196; goto _again;
-	tr228:  sm->cs = 197; goto _again;
-	tr229:  sm->cs = 198; goto _again;
-	tr230:  sm->cs = 199; goto _again;
-	tr406:  sm->cs = 200; goto _again;
+	tr402:  sm->cs = 175; goto _again;
+	tr203:  sm->cs = 176; goto _again;
+	tr204:  sm->cs = 177; goto _again;
+	tr205:  sm->cs = 178; goto _again;
+	tr206:  sm->cs = 179; goto _again;
+	tr207:  sm->cs = 180; goto _again;
+	tr208:  sm->cs = 181; goto _again;
+	tr403:  sm->cs = 182; goto _again;
+	tr210:  sm->cs = 183; goto _again;
+	tr211:  sm->cs = 184; goto _again;
+	tr212:  sm->cs = 185; goto _again;
+	tr213:  sm->cs = 186; goto _again;
+	tr404:  sm->cs = 187; goto _again;
+	tr215:  sm->cs = 188; goto _again;
+	tr217:  sm->cs = 189; goto _again;
+	tr218:  sm->cs = 190; goto _again;
+	tr219:  sm->cs = 191; goto _again;
+	tr220:  sm->cs = 192; goto _again;
+	tr221:  sm->cs = 193; goto _again;
+	tr405:  sm->cs = 194; goto _again;
+	tr223:  sm->cs = 195; goto _again;
+	tr406:  sm->cs = 196; goto _again;
+	tr407:  sm->cs = 197; goto _again;
+	tr227:  sm->cs = 198; goto _again;
+	tr226:  sm->cs = 198; goto f6;
+	tr228:  sm->cs = 199; goto f4;
+	tr229:  sm->cs = 200; goto f4;
 	tr232:  sm->cs = 201; goto _again;
-	tr407:  sm->cs = 202; goto _again;
+	tr231:  sm->cs = 201; goto f3;
+	tr233:  sm->cs = 202; goto f36;
 	tr409:  sm->cs = 203; goto f6;
 	tr410:  sm->cs = 204; goto _again;
 	tr236:  sm->cs = 205; goto _again;
@@ -2367,7 +2595,7 @@ case 255:
 	tr287:  sm->cs = 246; goto _again;
 	tr282:  sm->cs = 247; goto _again;
 	tr283:  sm->cs = 248; goto _again;
-	tr291:  sm->cs = 249; goto _again;
+	tr290:  sm->cs = 249; goto _again;
 	tr292:  sm->cs = 250; goto _again;
 	tr293:  sm->cs = 251; goto _again;
 	tr284:  sm->cs = 252; goto _again;
@@ -2421,22 +2649,22 @@ case 255:
 	tr167:  sm->cs = 274; goto f17;
 	tr173:  sm->cs = 274; goto f18;
 	tr174:  sm->cs = 274; goto f19;
-	tr180:  sm->cs = 274; goto f20;
+	tr181:  sm->cs = 274; goto f20;
 	tr187:  sm->cs = 274; goto f21;
 	tr191:  sm->cs = 274; goto f22;
 	tr192:  sm->cs = 274; goto f23;
 	tr193:  sm->cs = 274; goto f24;
 	tr194:  sm->cs = 274; goto f25;
-	tr199:  sm->cs = 274; goto f26;
-	tr203:  sm->cs = 274; goto f28;
-	tr204:  sm->cs = 274; goto f29;
-	tr210:  sm->cs = 274; goto f30;
-	tr211:  sm->cs = 274; goto f31;
-	tr218:  sm->cs = 274; goto f32;
-	tr223:  sm->cs = 274; goto f33;
-	tr224:  sm->cs = 274; goto f34;
-	tr231:  sm->cs = 274; goto f35;
-	tr233:  sm->cs = 274; goto f36;
+	tr195:  sm->cs = 274; goto f26;
+	tr201:  sm->cs = 274; goto f27;
+	tr202:  sm->cs = 274; goto f28;
+	tr209:  sm->cs = 274; goto f29;
+	tr214:  sm->cs = 274; goto f30;
+	tr216:  sm->cs = 274; goto f31;
+	tr222:  sm->cs = 274; goto f32;
+	tr224:  sm->cs = 274; goto f33;
+	tr225:  sm->cs = 274; goto f34;
+	tr230:  sm->cs = 274; goto f35;
 	tr234:  sm->cs = 274; goto f37;
 	tr246:  sm->cs = 274; goto f38;
 	tr335:  sm->cs = 274; goto f74;
@@ -2530,7 +2758,7 @@ case 255:
 	tr280:  sm->cs = 313; goto f47;
 	tr288:  sm->cs = 313; goto f48;
 	tr289:  sm->cs = 313; goto f49;
-	tr290:  sm->cs = 313; goto f50;
+	tr291:  sm->cs = 313; goto f50;
 	tr294:  sm->cs = 313; goto f51;
 	tr295:  sm->cs = 313; goto f52;
 	tr425:  sm->cs = 313; goto f107;
@@ -2569,7 +2797,7 @@ f3:
   sm->b1 = sm->p;
 }
 	goto _again;
-f27:
+f36:
 #line 108 "ext/dtext/dtext.rl"
 	{
   sm->b2 = sm->p;
@@ -2601,7 +2829,7 @@ f38:
     append(sm, true, "</a>");
   }}
 	goto _again;
-f26:
+f35:
 #line 277 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     GString * segment = g_string_new_len(sm->a1, sm->a2 - sm->a1);
@@ -2624,7 +2852,7 @@ f26:
     g_string_free(segment, TRUE);
   }}
 	goto _again;
-f28:
+f37:
 #line 298 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     GString * segment = g_string_new_len(sm->a1, sm->a2 - sm->a1);
@@ -2647,7 +2875,7 @@ f28:
     g_string_free(segment, TRUE);
   }}
 	goto _again;
-f29:
+f26:
 #line 412 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &INLINE_B);
@@ -2665,7 +2893,7 @@ f17:
     }
   }}
 	goto _again;
-f31:
+f28:
 #line 426 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &INLINE_I);
@@ -2683,7 +2911,7 @@ f19:
     }
   }}
 	goto _again;
-f34:
+f31:
 #line 440 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &INLINE_S);
@@ -2701,7 +2929,7 @@ f20:
     }
   }}
 	goto _again;
-f37:
+f34:
 #line 454 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &INLINE_U);
@@ -2719,7 +2947,7 @@ f25:
     }
   }}
 	goto _again;
-f36:
+f33:
 #line 468 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &INLINE_TN);
@@ -2742,7 +2970,7 @@ f24:
     }
   }}
 	goto _again;
-f33:
+f30:
 #line 495 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("inline [quote]");
@@ -2751,7 +2979,7 @@ f33:
     { sm->cs = ( ((int *)sm->stack->data))[--( sm->top)];goto _again;}
   }}
 	goto _again;
-f35:
+f32:
 #line 518 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("inline [spoiler]");
@@ -2783,7 +3011,7 @@ f21:
     }
   }}
 	goto _again;
-f30:
+f27:
 #line 546 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("inline [expand]");
@@ -2806,7 +3034,7 @@ f18:
     }
   }}
 	goto _again;
-f32:
+f29:
 #line 565 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &INLINE_NODTEXT);
@@ -4088,7 +4316,7 @@ _again:
 #line 1 "NONE"
 	{( sm->ts) = 0;}
 	break;
-#line 4092 "ext/dtext/dtext.c"
+#line 4320 "ext/dtext/dtext.c"
 	}
 
 	if (  sm->cs == 0 )
