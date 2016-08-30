@@ -2,6 +2,6 @@
   <%= f.input :to_name, :label => "To" %>
   <%= f.input :title, :as => :string %>
   <%= dtext_field "dmail", "body" %>
-  <%= f.button :submit, "Send" %>
+  <%= f.button :submit, "Send", :data => { :disable_with => "Sending..." } %>
   <%= dtext_preview_button "dmail", "body" %>
 <% end %>

@@ -8,7 +8,7 @@
       <%= f.input :antecedent_name, :as => :string, :label => "From" %>
       <%= f.input :consequent_name, :label => "To" %>
       <%= f.input :forum_topic_id, :label => "Forum" %>
-      <%= f.button :submit %>
+      <%= f.button :submit, :data => { :disable_with => "Updating..." } %>
     <% end %>
   </div>
 </div>

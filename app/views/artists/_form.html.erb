@@ -19,6 +19,6 @@
   <%= f.input :url_string, :label => "URLs", :as => :text, :input_html => {:size => "50x5"} %>
 
   <%= dtext_field "artist", "notes" %>
-  <%= f.button :submit, "Submit" %>
+  <%= f.button :submit, "Submit", :data => { :disable_with => "Submitting..." } %>
   <%= dtext_preview_button "artist", "notes" %>
 <% end %>

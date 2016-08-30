@@ -4,6 +4,6 @@
   <%= f.input :topic_id, :as => :hidden %>
   <%= dtext_field "forum_post", "body" %>
 
-  <%= f.button :submit, "Submit" %>
+  <%= f.button :submit, "Submit", :data => { :disable_with => "Submitting..." } %>
   <%= dtext_preview_button "forum_post", "body" %>
 <% end %>

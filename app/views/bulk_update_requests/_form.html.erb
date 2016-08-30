@@ -31,6 +31,6 @@ update aaa -> bbb
   <% end %>
 
   <%= f.input :forum_topic_id, :hint => " (optional)" %>
-  <%= f.button :submit, :value => "Submit" %>
+  <%= f.button :submit, :value => "Submit", :data => { :disable_with => "Submitting..." } %>
   <%= dtext_preview_button "bulk_update_request", "reason" %>
 <% end %>

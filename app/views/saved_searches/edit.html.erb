@@ -7,7 +7,7 @@
     <%= simple_form_for(@saved_search) do |f| %>
       <%= f.input :tag_query %>
       <%= f.input :category %>
-      <%= f.button :submit %>
+      <%= f.button :submit, :data => { :disable_with => "Submitting..." } %>
     <% end %>
   </div>
 </div>

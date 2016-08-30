@@ -22,7 +22,7 @@
       <%= f.input :is_locked %>
     <% end %>
 
-    <%= f.button :submit, "Submit" %>
+    <%= f.button :submit, "Submit", :data => { :disable_with => "Submitting..." } %>
     <%= dtext_preview_button "forum_post", "body", :input_id => "forum_post_body_for_#{forum_topic.original_post.id}", :preview_id => "dtext-preview-for-#{forum_topic.original_post.id}" %>
   <% end %>
 </div>

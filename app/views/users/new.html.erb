@@ -14,7 +14,7 @@
         <%= f.input :email, :required => false, :as => :email %>
         <%= f.input :password %>
         <%= f.input :password_confirmation %>
-        <%= f.button :submit, "Sign up" %>
+        <%= f.button :submit, "Sign up", :data => { :disable_with => "Signing up..." } %>
       <% end %>
     </div>
   </div>

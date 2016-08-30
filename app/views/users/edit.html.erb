@@ -92,7 +92,7 @@
         <%= f.input :custom_style, :label => "Custom <a href='http://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, :hint => "Style to apply to the whole site.", :input_html => {:size => "40x5"} %>
       </fieldset>
 
-      <%= f.button :submit, "Submit" %>
+      <%= f.button :submit, "Submit", :data => { :disable_with => "Submitting..." } %>
     <% end %>
   </div>
 </div>

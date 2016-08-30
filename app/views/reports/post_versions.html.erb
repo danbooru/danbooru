@@ -16,7 +16,7 @@
         <%= text_field_tag "email", CurrentUser.user.email %>
       </div>
 
-      <%= submit_tag "Submit" %>
+      <%= submit_tag "Submit", :data => { :disable_with => "Submitting..." } %>
     <% end %>
 
   </div>

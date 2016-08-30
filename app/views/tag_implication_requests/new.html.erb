@@ -30,7 +30,7 @@
       </div>
 
       <div class="input">
-        <%= submit_tag "Submit" %>
+        <%= submit_tag "Submit", :data => { :disable_with => "Submitting..." } %>
         <%= dtext_preview_button "tag_implication_request", "reason" %>
       </div>
     <% end %>
