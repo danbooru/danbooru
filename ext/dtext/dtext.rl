@@ -322,7 +322,10 @@ inline := |*
     append(sm, true, "<a href=\"");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - sm->d);
     append(sm, true, "\">");
-    append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
+    link_content_sm = parse_helper(sm->a1, sm->a2 - sm->a1, false, true);
+    append(sm, true, link_content_sm->output->str);
+    free_machine(link_content_sm);
+    link_content_sm = NULL;
     append(sm, true, "</a>");
 
     if (sm->b) {
@@ -1289,6 +1292,7 @@ static void free_machine(StateMachine * sm) {
 
 static StateMachine * parse_helper(const char * src, size_t len, bool f_strip, bool f_inline) {
   StateMachine * sm = NULL;
+  StateMachine * link_content_sm = NULL;
 
   sm = (StateMachine *)g_malloc0(sizeof(StateMachine));
   init_machine(sm, src, len);

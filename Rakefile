@@ -1,4 +1,4 @@
-#ENV["G_MESSAGES_DEBUG"] = "all"
+ENV["G_MESSAGES_DEBUG"] = "all"
 
 require "rake/extensiontask"
 require "rubygems/package_task"
