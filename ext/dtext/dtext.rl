@@ -34,6 +34,10 @@ typedef struct StateMachine {
   int list_nest;
   int d;
   int b;
+  int quote;
+
+  GString * tlc; // textile link content
+  GString * tlu; // textile link url
 } StateMachine;
 
 static const size_t MAX_STACK_DEPTH = 512;
@@ -1244,18 +1248,18 @@ static bool print_machine(StateMachine * sm) {
   return true;
 }
 
-static void init_machine(StateMachine * sm, VALUE input) {
+static void init_machine(StateMachine * sm, const char * src, size_t len) {
   size_t output_length = 0;
-  sm->p = RSTRING_PTR(input);
+  sm->p = src;
   sm->pb = sm->p;
-  sm->pe = sm->p + RSTRING_LEN(input);
+  sm->pe = sm->p + len;
   sm->eof = sm->pe;
   sm->ts = NULL;
   sm->te = NULL;
   sm->cs = 0;
   sm->act = 0;
   sm->top = 0;
-  output_length = RSTRING_LEN(input);
+  output_length = len;
   if (output_length < (INT16_MAX / 2)) {
     output_length *= 2;
   }
@@ -1273,6 +1277,7 @@ static void init_machine(StateMachine * sm, VALUE input) {
   sm->header_mode = false;
   sm->d = 0;
   sm->b = 0;
+  sm->quote = 0;
 }
 
 static void free_machine(StateMachine * sm) {
@@ -1280,6 +1285,22 @@ static void free_machine(StateMachine * sm) {
   g_array_free(sm->stack, FALSE);
   g_queue_free(sm->dstack);
   g_free(sm);
+}
+
+static StateMachine * parse_helper(const char * src, size_t len, bool f_strip, bool f_inline) {
+  StateMachine * sm = NULL;
+
+  sm = (StateMachine *)g_malloc0(sizeof(StateMachine));
+  init_machine(sm, src, len);
+  sm->f_strip = f_strip;
+  sm->f_inline = f_inline;
+
+  %% write init;
+  %% write exec;
+
+  dstack_close(sm);
+
+  return sm;
 }
 
 static VALUE parse(int argc, VALUE * argv, VALUE self) {
@@ -1291,6 +1312,8 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
   VALUE ret;
   rb_encoding * encoding = NULL;
   StateMachine * sm = NULL;
+  bool f_strip = false;
+  bool f_inline = false;
 
   g_debug("start\n");
 
@@ -1305,31 +1328,25 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
   }
 
   input0 = rb_str_dup(input);
-  
-  sm = (StateMachine *)g_malloc0(sizeof(StateMachine));
   input0 = rb_str_cat(input0, "\0", 1);
-  init_machine(sm, input0);
-
+  
   if (argc > 1) {
     options = argv[1];
 
     if (!NIL_P(options)) {
       opt_strip  = rb_hash_aref(options, ID2SYM(rb_intern("strip")));
       if (RTEST(opt_strip)) {
-        sm->f_strip = true;
+        f_strip = true;
       }
 
       opt_inline = rb_hash_aref(options, ID2SYM(rb_intern("inline")));
       if (RTEST(opt_inline)) {
-        sm->f_inline = true;
+        f_inline = true;
       }
     }
   }
 
-  %% write init;
-  %% write exec;
-
-  dstack_close(sm);
+  sm = parse_helper(RSTRING_PTR(input0), RSTRING_LEN(input0), f_strip, f_inline);
 
   encoding = rb_enc_find("utf-8");
   ret = rb_enc_str_new(sm->output->str, sm->output->len, encoding);
