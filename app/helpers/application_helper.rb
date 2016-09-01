@@ -76,8 +76,7 @@ module ApplicationHelper
   end
 
   def time_tag(content, time)
-    zone = time.strftime("%z")
-    datetime = time.strftime("%Y-%m-%dT%H:%M" + zone[0, 3] + ":" + zone[3, 2])
+    datetime = time.strftime("%Y-%m-%dT%H:%M%:z")
 
     content_tag(:time, content || datetime, :datetime => datetime, :title => time.to_formatted_s)
   end
