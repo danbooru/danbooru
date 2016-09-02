@@ -1,4 +1,4 @@
-ENV["G_MESSAGES_DEBUG"] = "all"
+#ENV["G_MESSAGES_DEBUG"] = "all"
 
 require "rake/extensiontask"
 require "rubygems/package_task"
@@ -69,7 +69,7 @@ task test_file_ragel: %w(ragel compile) do
 end
 
 task test: %w(ragel compile) do
-	ruby "-Ilib", '-rdtext', "test/dtext_test.rb" #, '--name=test_headers'
+	ruby "-Ilib", '-rdtext', "test/dtext_test.rb" #, '--name=test_old_style_links_with_inline_tags'
 end
 
 task default: :test

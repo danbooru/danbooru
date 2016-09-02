@@ -35,9 +35,6 @@ typedef struct StateMachine {
   int d;
   int b;
   int quote;
-
-  GString * tlc; // textile link content
-  GString * tlu; // textile link url
 } StateMachine;
 
 static const size_t MAX_STACK_DEPTH = 512;
@@ -1079,7 +1076,7 @@ static inline void append_segment_html_escaped(StateMachine * sm, const char * a
 
 static inline void append_block(StateMachine * sm, const char * s) {
   if (sm->f_inline) {
-    sm->output = g_string_append_c(sm->output, ' ');
+    // sm->output = g_string_append_c(sm->output, ' ');
   } else if (sm->f_strip) {
     // do nothing
   } else {
