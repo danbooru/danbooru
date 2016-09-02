@@ -144,7 +144,9 @@ pixiv_id = 'pixiv #'i digit+ >mark_a1 %mark_a2;
 pixiv_paged_id = 'pixiv #'i digit+ >mark_a1 %mark_a2 '/p' digit+ >mark_b1 %mark_b2;
 
 ws = ' ' | '\t';
+nonperiod = graph - ('.' | '"');
 header = 'h'i [123456] >mark_a1 %mark_a2 '.' ws*;
+header_with_id = 'h'i [123456] >mark_a1 %mark_a2 '#' nonperiod+ >mark_b1 %mark_b2 '.' ws*;
 aliased_expand = '[expand='i (nonbracket+ >mark_a1 %mark_a2) ']';
 
 list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
@@ -486,6 +488,12 @@ inline := |*
     fret;
   };
 
+  header_with_id => {
+    dstack_rewind(sm);
+    fexec sm->a1 - 1;
+    fret;
+  };
+
   '[quote]'i => {
     g_debug("inline [quote]");
     dstack_close_before_block(sm);
@@ -796,6 +804,66 @@ list := |*
 *|;
 
 main := |*
+  header_with_id => {
+    char header = *sm->a1;
+    GString * id_name = g_string_new_len(sm->b1, sm->b2 - sm->b1);
+
+    if (sm->f_inline) {
+      header = '6';
+    }
+
+    if (!sm->f_strip) {
+      switch (header) {
+        case '1':
+          dstack_push(sm, &BLOCK_H1);
+          append_block(sm, "<h1 id=\"");
+          append_block(sm, id_name->str);
+          append_block(sm, "\">");
+          break;
+
+        case '2':
+          dstack_push(sm, &BLOCK_H2);
+          append_block(sm, "<h2 id=\"");
+          append_block(sm, id_name->str);
+          append_block(sm, "\">");
+          break;
+
+        case '3':
+          dstack_push(sm, &BLOCK_H3);
+          append_block(sm, "<h3 id=\"");
+          append_block(sm, id_name->str);
+          append_block(sm, "\">");
+          break;
+
+        case '4':
+          dstack_push(sm, &BLOCK_H4);
+          append_block(sm, "<h4 id=\"");
+          append_block(sm, id_name->str);
+          append_block(sm, "\">");
+          break;
+
+        case '5':
+          dstack_push(sm, &BLOCK_H5);
+          append_block(sm, "<h5 id=\"");
+          append_block(sm, id_name->str);
+          append_block(sm, "\">");
+          break;
+
+        case '6':
+          dstack_push(sm, &BLOCK_H6);
+          append_block(sm, "<h6 id=\"");
+          append_block(sm, id_name->str);
+          append_block(sm, "\">");
+          break;
+      }
+    }
+
+    sm->header_mode = true;
+    g_string_free(id_name, false);
+    id_name = NULL;
+    fcall inline;
+  };
+
   header => {
     char header = *sm->a1;
 

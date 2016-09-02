@@ -69,7 +69,7 @@ task test_file_ragel: %w(ragel compile) do
 end
 
 task test: %w(ragel compile) do
-	ruby "-Ilib", '-rdtext', "test/dtext_test.rb" #, '--name=test_old_style_links_with_inline_tags'
+	ruby "-Ilib", '-rdtext', "test/dtext_test.rb" #, '--name=test_headers_with_ids'
 end
 
 task default: :test

@@ -82,6 +82,14 @@ class DTextTest < Minitest::Test
     assert_parse("<ul><li>a</li></ul><h1>header</h1><ul><li>list</li></ul>", "* a\n\nh1. header\n* list")
   end
 
+  def test_headers_with_ids
+    assert_parse("<h1 id=\"blah-blah\">header</h1>", "h1#blah-blah. header")
+  end
+
+  def test_headers_with_ids_with_quote
+    assert_parse("<p>h1#blah-&quot;blah. header</p>", "h1#blah-\"blah. header")
+  end
+
   def test_quote_blocks
     assert_parse('<blockquote><p>test</p></blockquote>', "[quote]\ntest\n[/quote]")
   end
