@@ -1,4 +1,13 @@
 GIT
+  remote: https://github.com/abronte/BigQuery.git
+  revision: b92b4e0b54574e3fde7ad910f39a67538ed387ad
+  ref: b92b4e0b54574e3fde7ad910f39a67538ed387ad
+  specs:
+    bigquery (0.9.0)
+      google-api-client (~> 0.9.3)
+      googleauth (~> 0.5.0)
+
+GIT
   remote: https://github.com/halostatue/diff-lcs.git
   revision: ff796c262db5a22f14b4765c09655b4faccc132a
   specs:
@@ -412,6 +421,7 @@ DEPENDENCIES
   awesome_print
   aws-sdk (~> 2)
   bcrypt-ruby
+  bigquery!
   byebug
   capistrano (~> 3.4.0)
   capistrano-rails
