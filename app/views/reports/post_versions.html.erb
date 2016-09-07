@@ -2,7 +2,7 @@
   <div id="a-post-versions">
     <h1>Post Changes Report</h1>
 
-    <p>You can search all post changes to find when and where a tag was added or removed. Because these queries can take a long time to generate the results will be emailed to you. Only the 1,000 most recent changes will be returned.</p>
+    <p>You can search all post changes to find when and where a tag was added or removed. Only the 1,000 most recent changes will be returned.</p>
 
     <%= form_tag(reports_post_versions_create_path, :method => :post, :class => "simple_form") do %>
       <div class="input">
@@ -10,12 +10,6 @@
         <%= text_field_tag "tag" %>
         <%= select_tag "type", options_for_select(%w(added removed)) %>
       </div>
-
-      <div class="input">
-        <label for="Email">Email</label>
-        <%= text_field_tag "email", CurrentUser.user.email %>
-      </div>
-
       <%= submit_tag "Submit", :data => { :disable_with => "Submitting..." } %>
     <% end %>
 

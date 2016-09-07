@@ -28,13 +28,6 @@ class ReportsController < ApplicationController
   end
 
   def post_versions_create
-    if params[:type] == "added"
-      @report = Reports::PostVersionsAdded.new(params[:tag], params[:email])
-    else
-      @report = Reports::PostVersionsRemoved.new(params[:tag], params[:email])
-    end
-    @report.process!
-    flash[:notice] = "Report is being generated and will be emailed to you shortly"
-    redirect_to reports_post_versions_path
+    @report = Reports::PostVersions.new(params[:tag], params[:type])
   end
 end
