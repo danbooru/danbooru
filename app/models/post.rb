@@ -163,6 +163,16 @@ class Post < ActiveRecord::Base
         return false
       end
     end
+    
+    def is_animated_png?
+      if file_ext =~ /png/i
+        apng = APNGInspector.new(file_path)
+        apng.inspect!
+        return apng.animated?
+      else
+        return false
+      end
+    end
 
     def is_flash?
       file_ext =~ /swf/i
@@ -607,7 +617,7 @@ class Post < ActiveRecord::Base
     def add_automatic_tags(tags)
       return tags if !Danbooru.config.enable_dimension_autotagging
 
-      tags -= %w(incredibly_absurdres absurdres highres lowres huge_filesize animated_gif flash webm mp4)
+      tags -= %w(incredibly_absurdres absurdres highres lowres huge_filesize animated_gif animated_png flash webm mp4)
 
       if has_dimensions?
         if image_width >= 10_000 || image_height >= 10_000
@@ -638,6 +648,10 @@ class Post < ActiveRecord::Base
 
       if is_animated_gif?
         tags << "animated_gif"
+      end
+      
+      if is_animated_png?
+        tags << "animated_png"
       end
 
       if is_flash?
