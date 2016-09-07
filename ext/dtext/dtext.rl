@@ -366,23 +366,30 @@ inline := |*
   };
 
   mention => {
-    if (is_boundary_c(fc)) {
-      sm->b = true;
-      sm->d = 2;
+    if (sm->a1 > sm->pb && sm->a1 - 1 > sm->pb && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n') {
+      // handle emails
+      append_c(sm, '@');
+      append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
+
     } else {
-      sm->b = false;
-      sm->d = 1;
-    }
+      if (is_boundary_c(fc)) {
+        sm->b = true;
+        sm->d = 2;
+      } else {
+        sm->b = false;
+        sm->d = 1;
+      }
 
-    append(sm, true, "<a rel=\"nofollow\" href=\"/users?name=");
-    append_segment_uri_escaped(sm, sm->a1, sm->a2 - sm->d);
-    append(sm, true, "\">");
-    append_c(sm, '@');
-    append_segment_html_escaped(sm, sm->a1, sm->a2 - sm->d);
-    append(sm, true, "</a>");
+      append(sm, true, "<a rel=\"nofollow\" href=\"/users?name=");
+      append_segment_uri_escaped(sm, sm->a1, sm->a2 - sm->d);
+      append(sm, true, "\">");
+      append_c(sm, '@');
+      append_segment_html_escaped(sm, sm->a1, sm->a2 - sm->d);
+      append(sm, true, "</a>");
 
-    if (sm->b) {
-      append_c_html_escaped(sm, fc);
+      if (sm->b) {
+        append_c_html_escaped(sm, fc);
+      }
     }
   };
 
