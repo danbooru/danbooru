@@ -26,6 +26,7 @@ typedef struct StateMachine {
   const char * b2;
   bool f_inline;
   bool f_strip;
+  bool f_mentions;
   bool list_mode;
   bool header_mode;
   GString * output;
@@ -321,7 +322,7 @@ inline := |*
     append(sm, true, "<a href=\"");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - sm->d);
     append(sm, true, "\">");
-    link_content_sm = parse_helper(sm->a1, sm->a2 - sm->a1, false, true);
+    link_content_sm = parse_helper(sm->a1, sm->a2 - sm->a1, false, true, false);
     append(sm, true, link_content_sm->output->str);
     free_machine(link_content_sm);
     link_content_sm = NULL;
@@ -366,7 +367,7 @@ inline := |*
   };
 
   mention => {
-    if (sm->a1 > sm->pb && sm->a1 - 1 > sm->pb && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n') {
+    if (!sm->f_mentions || (sm->a1 > sm->pb && sm->a1 - 1 > sm->pb && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n')) {
       // handle emails
       append_c(sm, '@');
       append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
@@ -1345,6 +1346,7 @@ static void init_machine(StateMachine * sm, const char * src, size_t len) {
   sm->b2 = NULL;
   sm->f_inline = false;
   sm->f_strip = false;
+  sm->f_mentions = true;
   sm->stack = g_array_sized_new(FALSE, TRUE, sizeof(int), 16);
   sm->dstack = g_queue_new();
   sm->list_nest = 0;
@@ -1362,7 +1364,7 @@ static void free_machine(StateMachine * sm) {
   g_free(sm);
 }
 
-static StateMachine * parse_helper(const char * src, size_t len, bool f_strip, bool f_inline) {
+static StateMachine * parse_helper(const char * src, size_t len, bool f_strip, bool f_inline, bool f_mentions) {
   StateMachine * sm = NULL;
   StateMachine * link_content_sm = NULL;
 
@@ -1370,6 +1372,7 @@ static StateMachine * parse_helper(const char * src, size_t len, bool f_strip, b
   init_machine(sm, src, len);
   sm->f_strip = f_strip;
   sm->f_inline = f_inline;
+  sm->f_mentions = f_mentions;
 
   %% write init;
   %% write exec;
@@ -1385,11 +1388,13 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
   VALUE options;
   VALUE opt_inline;
   VALUE opt_strip;
+  VALUE opt_mentions;
   VALUE ret;
   rb_encoding * encoding = NULL;
   StateMachine * sm = NULL;
   bool f_strip = false;
   bool f_inline = false;
+  bool f_mentions = true;
 
   g_debug("start\n");
 
@@ -1419,10 +1424,15 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
       if (RTEST(opt_inline)) {
         f_inline = true;
       }
+
+      opt_mentions = rb_hash_aref(options, ID2SYM(rb_intern("disable_mentions")));
+      if (RTEST(opt_mentions)) {
+        f_mentions = false;
+      }
     }
   }
 
-  sm = parse_helper(RSTRING_PTR(input0), RSTRING_LEN(input0), f_strip, f_inline);
+  sm = parse_helper(RSTRING_PTR(input0), RSTRING_LEN(input0), f_strip, f_inline, f_mentions);
 
   encoding = rb_enc_find("utf-8");
   ret = rb_enc_str_new(sm->output->str, sm->output->len, encoding);

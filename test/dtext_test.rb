@@ -12,6 +12,7 @@ class DTextTest < Minitest::Test
     assert_parse('<p>this is not @.@ @_@ <a rel="nofollow" href="/users?name=bob">@bob</a></p>', "this is not @.@ @_@ @bob")
     assert_parse('<p>this is an email@address.com and should not trigger</p>', "this is an email@address.com and should not trigger")
     assert_parse('<p>multiple <a rel="nofollow" href="/users?name=bob">@bob</a> <a rel="nofollow" href="/users?name=anna">@anna</a></p>', "multiple @bob @anna")
+    assert_equal('<p>hi @bob</p>', DTextRagel.parse("hi @bob", :disable_mentions => true))
   end
 
   def test_sanitize_heart

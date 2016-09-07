@@ -28,6 +28,7 @@ typedef struct StateMachine {
   const char * b2;
   bool f_inline;
   bool f_strip;
+  bool f_mentions;
   bool list_mode;
   bool header_mode;
   GString * output;
@@ -71,11 +72,11 @@ static const int BLOCK_H5 = 27;
 static const int BLOCK_H6 = 28;
 
 
-#line 1045 "ext/dtext/dtext.rl"
+#line 1046 "ext/dtext/dtext.rl"
 
 
 
-#line 79 "ext/dtext/dtext.c"
+#line 80 "ext/dtext/dtext.c"
 static const unsigned char _dtext_to_state_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
@@ -174,7 +175,7 @@ static const int dtext_en_list = 308;
 static const int dtext_en_main = 249;
 
 
-#line 1048 "ext/dtext/dtext.rl"
+#line 1049 "ext/dtext/dtext.rl"
 
 static inline void underscore_string(char * str, size_t len) {
   for (size_t i=0; i<len; ++i) {
@@ -475,6 +476,7 @@ static void init_machine(StateMachine * sm, const char * src, size_t len) {
   sm->b2 = NULL;
   sm->f_inline = false;
   sm->f_strip = false;
+  sm->f_mentions = true;
   sm->stack = g_array_sized_new(FALSE, TRUE, sizeof(int), 16);
   sm->dstack = g_queue_new();
   sm->list_nest = 0;
@@ -492,7 +494,7 @@ static void free_machine(StateMachine * sm) {
   g_free(sm);
 }
 
-static StateMachine * parse_helper(const char * src, size_t len, bool f_strip, bool f_inline) {
+static StateMachine * parse_helper(const char * src, size_t len, bool f_strip, bool f_inline, bool f_mentions) {
   StateMachine * sm = NULL;
   StateMachine * link_content_sm = NULL;
 
@@ -500,9 +502,10 @@ static StateMachine * parse_helper(const char * src, size_t len, bool f_strip, b
   init_machine(sm, src, len);
   sm->f_strip = f_strip;
   sm->f_inline = f_inline;
+  sm->f_mentions = f_mentions;
 
   
-#line 506 "ext/dtext/dtext.c"
+#line 509 "ext/dtext/dtext.c"
 	{
 	 sm->cs = dtext_start;
 	( sm->top) = 0;
@@ -511,9 +514,9 @@ static StateMachine * parse_helper(const char * src, size_t len, bool f_strip, b
 	( sm->act) = 0;
 	}
 
-#line 1375 "ext/dtext/dtext.rl"
+#line 1378 "ext/dtext/dtext.rl"
   
-#line 517 "ext/dtext/dtext.c"
+#line 520 "ext/dtext/dtext.c"
 	{
 	if ( ( sm->p) == ( sm->pe) )
 		goto _test_eof;
@@ -523,7 +526,7 @@ _resume:
 #line 1 "NONE"
 	{( sm->ts) = ( sm->p);}
 	break;
-#line 527 "ext/dtext/dtext.c"
+#line 530 "ext/dtext/dtext.c"
 	}
 
 	switch (  sm->cs ) {
@@ -2742,25 +2745,25 @@ case 248:
 	tr297:  sm->cs = 313; goto f3;
 
 f7:
-#line 97 "ext/dtext/dtext.rl"
+#line 98 "ext/dtext/dtext.rl"
 	{
   sm->a1 = sm->p;
 }
 	goto _again;
 f4:
-#line 101 "ext/dtext/dtext.rl"
+#line 102 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
 	goto _again;
 f3:
-#line 105 "ext/dtext/dtext.rl"
+#line 106 "ext/dtext/dtext.rl"
 	{
   sm->b1 = sm->p;
 }
 	goto _again;
 f5:
-#line 109 "ext/dtext/dtext.rl"
+#line 110 "ext/dtext/dtext.rl"
 	{
   sm->b2 = sm->p;
 }
@@ -2770,7 +2773,7 @@ f61:
 	{( sm->te) = ( sm->p)+1;}
 	goto _again;
 f38:
-#line 262 "ext/dtext/dtext.rl"
+#line 263 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     append(sm, true, "<a rel=\"nofollow\" href=\"/posts?tags=");
     append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
@@ -2780,7 +2783,7 @@ f38:
   }}
 	goto _again;
 f36:
-#line 270 "ext/dtext/dtext.rl"
+#line 271 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     GString * segment = g_string_new_len(sm->a1, sm->a2 - sm->a1);
     GString * lowercase_segment = NULL;
@@ -2803,7 +2806,7 @@ f36:
   }}
 	goto _again;
 f37:
-#line 291 "ext/dtext/dtext.rl"
+#line 292 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     GString * segment = g_string_new_len(sm->a1, sm->a2 - sm->a1);
     GString * lowercase_segment = NULL;
@@ -2826,14 +2829,14 @@ f37:
   }}
 	goto _again;
 f27:
-#line 415 "ext/dtext/dtext.rl"
+#line 416 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &INLINE_B);
     append(sm, true, "<strong>");
   }}
 	goto _again;
 f18:
-#line 420 "ext/dtext/dtext.rl"
+#line 421 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, INLINE_B)) {
       dstack_pop(sm);
@@ -2844,14 +2847,14 @@ f18:
   }}
 	goto _again;
 f29:
-#line 429 "ext/dtext/dtext.rl"
+#line 430 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &INLINE_I);
     append(sm, true, "<em>");
   }}
 	goto _again;
 f20:
-#line 434 "ext/dtext/dtext.rl"
+#line 435 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, INLINE_I)) {
       dstack_pop(sm);
@@ -2862,14 +2865,14 @@ f20:
   }}
 	goto _again;
 f32:
-#line 443 "ext/dtext/dtext.rl"
+#line 444 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &INLINE_S);
     append(sm, true, "<s>");
   }}
 	goto _again;
 f21:
-#line 448 "ext/dtext/dtext.rl"
+#line 449 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, INLINE_S)) {
       dstack_pop(sm);
@@ -2880,14 +2883,14 @@ f21:
   }}
 	goto _again;
 f35:
-#line 457 "ext/dtext/dtext.rl"
+#line 458 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &INLINE_U);
     append(sm, true, "<u>");
   }}
 	goto _again;
 f26:
-#line 462 "ext/dtext/dtext.rl"
+#line 463 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, INLINE_U)) {
       dstack_pop(sm);
@@ -2898,14 +2901,14 @@ f26:
   }}
 	goto _again;
 f34:
-#line 471 "ext/dtext/dtext.rl"
+#line 472 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &INLINE_TN);
     append(sm, true, "<span class=\"tn\">");
   }}
 	goto _again;
 f25:
-#line 476 "ext/dtext/dtext.rl"
+#line 477 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_close_before_block(sm);
 
@@ -2921,7 +2924,7 @@ f25:
   }}
 	goto _again;
 f31:
-#line 504 "ext/dtext/dtext.rl"
+#line 505 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("inline [quote]");
     dstack_close_before_block(sm);
@@ -2930,7 +2933,7 @@ f31:
   }}
 	goto _again;
 f33:
-#line 527 "ext/dtext/dtext.rl"
+#line 528 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("inline [spoiler]");
     g_debug("  push <span>");
@@ -2939,7 +2942,7 @@ f33:
   }}
 	goto _again;
 f22:
-#line 534 "ext/dtext/dtext.rl"
+#line 535 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("inline [/spoiler]");
     dstack_close_before_block(sm);
@@ -2962,7 +2965,7 @@ f22:
   }}
 	goto _again;
 f28:
-#line 555 "ext/dtext/dtext.rl"
+#line 556 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("inline [expand]");
     dstack_rewind(sm);
@@ -2971,7 +2974,7 @@ f28:
   }}
 	goto _again;
 f19:
-#line 562 "ext/dtext/dtext.rl"
+#line 563 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_close_before_block(sm);
 
@@ -2985,7 +2988,7 @@ f19:
   }}
 	goto _again;
 f30:
-#line 574 "ext/dtext/dtext.rl"
+#line 575 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &INLINE_NODTEXT);
     {
@@ -3003,7 +3006,7 @@ f30:
   }}
 	goto _again;
 f24:
-#line 579 "ext/dtext/dtext.rl"
+#line 580 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, BLOCK_TH)) {
       dstack_pop(sm);
@@ -3015,7 +3018,7 @@ f24:
   }}
 	goto _again;
 f23:
-#line 589 "ext/dtext/dtext.rl"
+#line 590 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, BLOCK_TD)) {
       dstack_pop(sm);
@@ -3027,7 +3030,7 @@ f23:
   }}
 	goto _again;
 f73:
-#line 599 "ext/dtext/dtext.rl"
+#line 600 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("inline 0");
     g_debug("  return");
@@ -3037,14 +3040,14 @@ f73:
   }}
 	goto _again;
 f72:
-#line 635 "ext/dtext/dtext.rl"
+#line 636 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("inline char: %c", (*( sm->p)));
     append_c_html_escaped(sm, (*( sm->p)));
   }}
 	goto _again;
 f99:
-#line 343 "ext/dtext/dtext.rl"
+#line 344 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     if (is_boundary_c((*( sm->p)))) {
       sm->b = true;
@@ -3066,7 +3069,7 @@ f99:
   }}
 	goto _again;
 f89:
-#line 492 "ext/dtext/dtext.rl"
+#line 493 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     dstack_rewind(sm);
     {( sm->p) = (( sm->a1 - 1))-1;}
@@ -3074,7 +3077,7 @@ f89:
   }}
 	goto _again;
 f88:
-#line 498 "ext/dtext/dtext.rl"
+#line 499 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     dstack_rewind(sm);
     {( sm->p) = (( sm->a1 - 1))-1;}
@@ -3082,7 +3085,7 @@ f88:
   }}
 	goto _again;
 f98:
-#line 511 "ext/dtext/dtext.rl"
+#line 512 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("inline [/quote]");
     dstack_close_before_block(sm);
@@ -3100,7 +3103,7 @@ f98:
   }}
 	goto _again;
 f76:
-#line 607 "ext/dtext/dtext.rl"
+#line 608 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("inline newline2");
     g_debug("  return");
@@ -3114,7 +3117,7 @@ f76:
   }}
 	goto _again;
 f75:
-#line 619 "ext/dtext/dtext.rl"
+#line 620 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("inline newline");
 
@@ -3128,20 +3131,20 @@ f75:
   }}
 	goto _again;
 f78:
-#line 631 "ext/dtext/dtext.rl"
+#line 632 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append_c(sm, ' ');
   }}
 	goto _again;
 f79:
-#line 635 "ext/dtext/dtext.rl"
+#line 636 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("inline char: %c", (*( sm->p)));
     append_c_html_escaped(sm, (*( sm->p)));
   }}
 	goto _again;
 f17:
-#line 173 "ext/dtext/dtext.rl"
+#line 174 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
     append(sm, true, "<a href=\"/forum_topics/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -3152,7 +3155,7 @@ f17:
   }}
 	goto _again;
 f16:
-#line 240 "ext/dtext/dtext.rl"
+#line 241 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
     append(sm, true, "<a href=\"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -3163,7 +3166,7 @@ f16:
   }}
 	goto _again;
 f12:
-#line 619 "ext/dtext/dtext.rl"
+#line 620 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
     g_debug("inline newline");
 
@@ -3177,7 +3180,7 @@ f12:
   }}
 	goto _again;
 f13:
-#line 635 "ext/dtext/dtext.rl"
+#line 636 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
     g_debug("inline char: %c", (*( sm->p)));
     append_c_html_escaped(sm, (*( sm->p)));
@@ -3193,7 +3196,7 @@ f10:
 	break;
 	case 19:
 	{{( sm->p) = ((( sm->te)))-1;}
-    if (sm->a1 > sm->pb && sm->a1 - 1 > sm->pb && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n') {
+    if (!sm->f_mentions || (sm->a1 > sm->pb && sm->a1 - 1 > sm->pb && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n')) {
       // handle emails
       append_c(sm, '@');
       append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
@@ -3250,7 +3253,7 @@ f10:
 	}
 	goto _again;
 f40:
-#line 642 "ext/dtext/dtext.rl"
+#line 643 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, BLOCK_CODE)) {
       dstack_rewind(sm);
@@ -3261,32 +3264,32 @@ f40:
   }}
 	goto _again;
 f101:
-#line 651 "ext/dtext/dtext.rl"
+#line 652 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     ( sm->p)--;
     { sm->cs = ( ((int *)sm->stack->data))[--( sm->top)];goto _again;}
   }}
 	goto _again;
 f100:
-#line 656 "ext/dtext/dtext.rl"
+#line 657 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     append_c_html_escaped(sm, (*( sm->p)));
   }}
 	goto _again;
 f102:
-#line 656 "ext/dtext/dtext.rl"
+#line 657 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append_c_html_escaped(sm, (*( sm->p)));
   }}
 	goto _again;
 f39:
-#line 656 "ext/dtext/dtext.rl"
+#line 657 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
     append_c_html_escaped(sm, (*( sm->p)));
   }}
 	goto _again;
 f42:
-#line 662 "ext/dtext/dtext.rl"
+#line 663 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, BLOCK_NODTEXT)) {
       dstack_pop(sm);
@@ -3301,39 +3304,39 @@ f42:
   }}
 	goto _again;
 f104:
-#line 675 "ext/dtext/dtext.rl"
+#line 676 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     ( sm->p)--;
     { sm->cs = ( ((int *)sm->stack->data))[--( sm->top)];goto _again;}
   }}
 	goto _again;
 f103:
-#line 680 "ext/dtext/dtext.rl"
+#line 681 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     append_c_html_escaped(sm, (*( sm->p)));
   }}
 	goto _again;
 f105:
-#line 680 "ext/dtext/dtext.rl"
+#line 681 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append_c_html_escaped(sm, (*( sm->p)));
   }}
 	goto _again;
 f41:
-#line 680 "ext/dtext/dtext.rl"
+#line 681 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
     append_c_html_escaped(sm, (*( sm->p)));
   }}
 	goto _again;
 f51:
-#line 686 "ext/dtext/dtext.rl"
+#line 687 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &BLOCK_THEAD);
     append_block(sm, "<thead>");
   }}
 	goto _again;
 f46:
-#line 691 "ext/dtext/dtext.rl"
+#line 692 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, BLOCK_THEAD)) {
       dstack_pop(sm);
@@ -3344,14 +3347,14 @@ f46:
   }}
 	goto _again;
 f48:
-#line 700 "ext/dtext/dtext.rl"
+#line 701 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &BLOCK_TBODY);
     append_block(sm, "<tbody>");
   }}
 	goto _again;
 f45:
-#line 705 "ext/dtext/dtext.rl"
+#line 706 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, BLOCK_TBODY)) {
       dstack_pop(sm);
@@ -3362,7 +3365,7 @@ f45:
   }}
 	goto _again;
 f50:
-#line 714 "ext/dtext/dtext.rl"
+#line 715 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &BLOCK_TH);
     append_block(sm, "<th>");
@@ -3381,14 +3384,14 @@ f50:
   }}
 	goto _again;
 f52:
-#line 720 "ext/dtext/dtext.rl"
+#line 721 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &BLOCK_TR);
     append_block(sm, "<tr>");
   }}
 	goto _again;
 f47:
-#line 725 "ext/dtext/dtext.rl"
+#line 726 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, BLOCK_TR)) {
       dstack_pop(sm);
@@ -3399,7 +3402,7 @@ f47:
   }}
 	goto _again;
 f49:
-#line 734 "ext/dtext/dtext.rl"
+#line 735 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &BLOCK_TD);
     append_block(sm, "<td>");
@@ -3418,7 +3421,7 @@ f49:
   }}
 	goto _again;
 f44:
-#line 740 "ext/dtext/dtext.rl"
+#line 741 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, BLOCK_TABLE)) {
       dstack_pop(sm);
@@ -3430,26 +3433,26 @@ f44:
   }}
 	goto _again;
 f107:
-#line 750 "ext/dtext/dtext.rl"
+#line 751 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     ( sm->p)--;
     { sm->cs = ( ((int *)sm->stack->data))[--( sm->top)];goto _again;}
   }}
 	goto _again;
 f106:
-#line 755 "ext/dtext/dtext.rl"
+#line 756 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;}
 	goto _again;
 f108:
-#line 755 "ext/dtext/dtext.rl"
+#line 756 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;}
 	goto _again;
 f43:
-#line 755 "ext/dtext/dtext.rl"
+#line 756 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}}
 	goto _again;
 f110:
-#line 798 "ext/dtext/dtext.rl"
+#line 799 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_close_list(sm);
     {( sm->p) = (( sm->ts))-1;}
@@ -3457,7 +3460,7 @@ f110:
   }}
 	goto _again;
 f109:
-#line 806 "ext/dtext/dtext.rl"
+#line 807 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_rewind(sm);
     ( sm->p)--;
@@ -3465,7 +3468,7 @@ f109:
   }}
 	goto _again;
 f112:
-#line 806 "ext/dtext/dtext.rl"
+#line 807 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     dstack_rewind(sm);
     ( sm->p)--;
@@ -3473,7 +3476,7 @@ f112:
   }}
 	goto _again;
 f55:
-#line 806 "ext/dtext/dtext.rl"
+#line 807 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
     dstack_rewind(sm);
     ( sm->p)--;
@@ -3497,7 +3500,7 @@ f53:
 	}
 	goto _again;
 f6:
-#line 937 "ext/dtext/dtext.rl"
+#line 938 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("block [/spoiler]");
     dstack_close_before_block(sm);
@@ -3508,7 +3511,7 @@ f6:
   }}
 	goto _again;
 f8:
-#line 984 "ext/dtext/dtext.rl"
+#line 985 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_close_before_block(sm);
     dstack_push(sm, &BLOCK_TABLE);
@@ -3528,7 +3531,7 @@ f8:
   }}
 	goto _again;
 f9:
-#line 991 "ext/dtext/dtext.rl"
+#line 992 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &BLOCK_TN);
     append_block(sm, "<p class=\"tn\">");
@@ -3547,7 +3550,7 @@ f9:
   }}
 	goto _again;
 f59:
-#line 1007 "ext/dtext/dtext.rl"
+#line 1008 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("block 0");
     g_debug("  close dstack");
@@ -3555,7 +3558,7 @@ f59:
   }}
 	goto _again;
 f58:
-#line 1030 "ext/dtext/dtext.rl"
+#line 1031 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("block char: %c", (*( sm->p)));
     ( sm->p)--;
@@ -3582,7 +3585,7 @@ f58:
   }}
 	goto _again;
 f64:
-#line 814 "ext/dtext/dtext.rl"
+#line 815 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     char header = *sm->a1;
     GString * id_name = g_string_new_len(sm->b1, sm->b2 - sm->b1);
@@ -3655,7 +3658,7 @@ f64:
   }}
 	goto _again;
 f65:
-#line 874 "ext/dtext/dtext.rl"
+#line 875 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     char header = *sm->a1;
 
@@ -3713,7 +3716,7 @@ f65:
   }}
 	goto _again;
 f70:
-#line 919 "ext/dtext/dtext.rl"
+#line 920 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [quote]");
     g_debug("  push quote");
@@ -3724,7 +3727,7 @@ f70:
   }}
 	goto _again;
 f71:
-#line 928 "ext/dtext/dtext.rl"
+#line 929 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [spoiler]");
     g_debug("  push spoiler");
@@ -3735,7 +3738,7 @@ f71:
   }}
 	goto _again;
 f66:
-#line 946 "ext/dtext/dtext.rl"
+#line 947 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [code]");
     dstack_close_before_block(sm);
@@ -3756,7 +3759,7 @@ f66:
   }}
 	goto _again;
 f68:
-#line 954 "ext/dtext/dtext.rl"
+#line 955 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [expand]");
     dstack_close_before_block(sm);
@@ -3767,7 +3770,7 @@ f68:
   }}
 	goto _again;
 f67:
-#line 963 "ext/dtext/dtext.rl"
+#line 964 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [expand=]");
     dstack_close_before_block(sm);
@@ -3781,7 +3784,7 @@ f67:
   }}
 	goto _again;
 f69:
-#line 975 "ext/dtext/dtext.rl"
+#line 976 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [nodtext]");
     dstack_close_before_block(sm);
@@ -3803,7 +3806,7 @@ f69:
   }}
 	goto _again;
 f62:
-#line 1030 "ext/dtext/dtext.rl"
+#line 1031 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block char: %c", (*( sm->p)));
     ( sm->p)--;
@@ -3830,7 +3833,7 @@ f62:
   }}
 	goto _again;
 f2:
-#line 1030 "ext/dtext/dtext.rl"
+#line 1031 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
     g_debug("block char: %c", (*( sm->p)));
     ( sm->p)--;
@@ -3882,11 +3885,11 @@ f0:
 	}
 	goto _again;
 f94:
-#line 101 "ext/dtext/dtext.rl"
+#line 102 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 155 "ext/dtext/dtext.rl"
+#line 156 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a href=\"/posts/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -3897,11 +3900,11 @@ f94:
   }}
 	goto _again;
 f87:
-#line 101 "ext/dtext/dtext.rl"
+#line 102 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 164 "ext/dtext/dtext.rl"
+#line 165 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a href=\"/forum_posts/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -3912,11 +3915,11 @@ f87:
   }}
 	goto _again;
 f95:
-#line 101 "ext/dtext/dtext.rl"
+#line 102 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 173 "ext/dtext/dtext.rl"
+#line 174 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a href=\"/forum_topics/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -3927,11 +3930,11 @@ f95:
   }}
 	goto _again;
 f86:
-#line 101 "ext/dtext/dtext.rl"
+#line 102 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 195 "ext/dtext/dtext.rl"
+#line 196 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a href=\"/comments/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -3942,11 +3945,11 @@ f86:
   }}
 	goto _again;
 f93:
-#line 101 "ext/dtext/dtext.rl"
+#line 102 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 204 "ext/dtext/dtext.rl"
+#line 205 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a href=\"/pools/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -3957,11 +3960,11 @@ f93:
   }}
 	goto _again;
 f97:
-#line 101 "ext/dtext/dtext.rl"
+#line 102 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 213 "ext/dtext/dtext.rl"
+#line 214 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a href=\"/users/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -3972,11 +3975,11 @@ f97:
   }}
 	goto _again;
 f85:
-#line 101 "ext/dtext/dtext.rl"
+#line 102 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 222 "ext/dtext/dtext.rl"
+#line 223 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a href=\"/artists/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -3987,11 +3990,11 @@ f85:
   }}
 	goto _again;
 f90:
-#line 101 "ext/dtext/dtext.rl"
+#line 102 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 231 "ext/dtext/dtext.rl"
+#line 232 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a href=\"https://github.com/r888888888/danbooru/issues/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -4002,11 +4005,11 @@ f90:
   }}
 	goto _again;
 f91:
-#line 101 "ext/dtext/dtext.rl"
+#line 102 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 240 "ext/dtext/dtext.rl"
+#line 241 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a href=\"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -4017,13 +4020,13 @@ f91:
   }}
 	goto _again;
 f81:
-#line 101 "ext/dtext/dtext.rl"
+#line 102 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 368 "ext/dtext/dtext.rl"
+#line 369 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
-    if (sm->a1 > sm->pb && sm->a1 - 1 > sm->pb && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n') {
+    if (!sm->f_mentions || (sm->a1 > sm->pb && sm->a1 - 1 > sm->pb && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n')) {
       // handle emails
       append_c(sm, '@');
       append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
@@ -4051,7 +4054,7 @@ f81:
   }}
 	goto _again;
 f84:
-#line 101 "ext/dtext/dtext.rl"
+#line 102 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
@@ -4064,7 +4067,7 @@ f84:
 	break;
 	case 19:
 	{{( sm->p) = ((( sm->te)))-1;}
-    if (sm->a1 > sm->pb && sm->a1 - 1 > sm->pb && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n') {
+    if (!sm->f_mentions || (sm->a1 > sm->pb && sm->a1 - 1 > sm->pb && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n')) {
       // handle emails
       append_c(sm, '@');
       append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
@@ -4121,11 +4124,11 @@ f84:
 	}
 	goto _again;
 f14:
-#line 109 "ext/dtext/dtext.rl"
+#line 110 "ext/dtext/dtext.rl"
 	{
   sm->b2 = sm->p;
 }
-#line 335 "ext/dtext/dtext.rl"
+#line 336 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     append(sm, true, "<a href=\"");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - 1);
@@ -4135,11 +4138,11 @@ f14:
   }}
 	goto _again;
 f96:
-#line 109 "ext/dtext/dtext.rl"
+#line 110 "ext/dtext/dtext.rl"
 	{
   sm->b2 = sm->p;
 }
-#line 182 "ext/dtext/dtext.rl"
+#line 183 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a href=\"/forum_topics/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -4154,11 +4157,11 @@ f96:
   }}
 	goto _again;
 f92:
-#line 109 "ext/dtext/dtext.rl"
+#line 110 "ext/dtext/dtext.rl"
 	{
   sm->b2 = sm->p;
 }
-#line 249 "ext/dtext/dtext.rl"
+#line 250 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a href=\"http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -4173,11 +4176,11 @@ f92:
   }}
 	goto _again;
 f80:
-#line 109 "ext/dtext/dtext.rl"
+#line 110 "ext/dtext/dtext.rl"
 	{
   sm->b2 = sm->p;
 }
-#line 312 "ext/dtext/dtext.rl"
+#line 313 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     if (is_boundary_c((*( sm->p)))) {
       sm->d = 2;
@@ -4190,7 +4193,7 @@ f80:
     append(sm, true, "<a href=\"");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - sm->d);
     append(sm, true, "\">");
-    link_content_sm = parse_helper(sm->a1, sm->a2 - sm->a1, false, true);
+    link_content_sm = parse_helper(sm->a1, sm->a2 - sm->a1, false, true, false);
     append(sm, true, link_content_sm->output->str);
     free_machine(link_content_sm);
     link_content_sm = NULL;
@@ -4202,11 +4205,11 @@ f80:
   }}
 	goto _again;
 f77:
-#line 109 "ext/dtext/dtext.rl"
+#line 110 "ext/dtext/dtext.rl"
 	{
   sm->b2 = sm->p;
 }
-#line 396 "ext/dtext/dtext.rl"
+#line 397 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("inline list");
 
@@ -4227,11 +4230,11 @@ f77:
   }}
 	goto _again;
 f113:
-#line 109 "ext/dtext/dtext.rl"
+#line 110 "ext/dtext/dtext.rl"
 	{
   sm->b2 = sm->p;
 }
-#line 759 "ext/dtext/dtext.rl"
+#line 760 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     int prev_nest = sm->list_nest;
     append_closing_p_if(sm);
@@ -4282,11 +4285,11 @@ f113:
   }}
 	goto _again;
 f63:
-#line 109 "ext/dtext/dtext.rl"
+#line 110 "ext/dtext/dtext.rl"
 	{
   sm->b2 = sm->p;
 }
-#line 997 "ext/dtext/dtext.rl"
+#line 998 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block list");
     g_debug("  call list");
@@ -4311,7 +4314,7 @@ f63:
 f15:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 97 "ext/dtext/dtext.rl"
+#line 98 "ext/dtext/dtext.rl"
 	{
   sm->a1 = sm->p;
 }
@@ -4319,49 +4322,49 @@ f15:
 f83:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 364 "ext/dtext/dtext.rl"
+#line 365 "ext/dtext/dtext.rl"
 	{( sm->act) = 18;}
 	goto _again;
 f82:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 368 "ext/dtext/dtext.rl"
+#line 369 "ext/dtext/dtext.rl"
 	{( sm->act) = 19;}
 	goto _again;
 f11:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 607 "ext/dtext/dtext.rl"
+#line 608 "ext/dtext/dtext.rl"
 	{( sm->act) = 43;}
 	goto _again;
 f74:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 619 "ext/dtext/dtext.rl"
+#line 620 "ext/dtext/dtext.rl"
 	{( sm->act) = 44;}
 	goto _again;
 f54:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 798 "ext/dtext/dtext.rl"
+#line 799 "ext/dtext/dtext.rl"
 	{( sm->act) = 65;}
 	goto _again;
 f111:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 804 "ext/dtext/dtext.rl"
+#line 805 "ext/dtext/dtext.rl"
 	{( sm->act) = 66;}
 	goto _again;
 f1:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 1013 "ext/dtext/dtext.rl"
+#line 1014 "ext/dtext/dtext.rl"
 	{( sm->act) = 81;}
 	goto _again;
 f60:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 1026 "ext/dtext/dtext.rl"
+#line 1027 "ext/dtext/dtext.rl"
 	{( sm->act) = 82;}
 	goto _again;
 
@@ -4371,7 +4374,7 @@ _again:
 #line 1 "NONE"
 	{( sm->ts) = 0;}
 	break;
-#line 4375 "ext/dtext/dtext.c"
+#line 4378 "ext/dtext/dtext.c"
 	}
 
 	if ( ++( sm->p) != ( sm->pe) )
@@ -4693,7 +4696,7 @@ _again:
 
 	}
 
-#line 1376 "ext/dtext/dtext.rl"
+#line 1379 "ext/dtext/dtext.rl"
 
   dstack_close(sm);
 
@@ -4706,11 +4709,13 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
   VALUE options;
   VALUE opt_inline;
   VALUE opt_strip;
+  VALUE opt_mentions;
   VALUE ret;
   rb_encoding * encoding = NULL;
   StateMachine * sm = NULL;
   bool f_strip = false;
   bool f_inline = false;
+  bool f_mentions = true;
 
   g_debug("start\n");
 
@@ -4740,10 +4745,15 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
       if (RTEST(opt_inline)) {
         f_inline = true;
       }
+
+      opt_mentions = rb_hash_aref(options, ID2SYM(rb_intern("disable_mentions")));
+      if (RTEST(opt_mentions)) {
+        f_mentions = false;
+      }
     }
   }
 
-  sm = parse_helper(RSTRING_PTR(input0), RSTRING_LEN(input0), f_strip, f_inline);
+  sm = parse_helper(RSTRING_PTR(input0), RSTRING_LEN(input0), f_strip, f_inline, f_mentions);
 
   encoding = rb_enc_find("utf-8");
   ret = rb_enc_str_new(sm->output->str, sm->output->len, encoding);
