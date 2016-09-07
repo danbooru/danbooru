@@ -45,7 +45,7 @@ class DText
     str.gsub!(/\[u\](.+?)\[\/u\]/i, '<u>\1</u>')
     str.gsub!(/\[tn\](.+?)\[\/tn\]/i, '<p class="tn">\1</p>')
 
-    str = parse_mentions(str)
+    str = parse_mentions(str, options)
     str = parse_links(str)
     str = parse_aliased_wiki_links(str)
     str = parse_wiki_links(str)
@@ -54,7 +54,9 @@ class DText
     str
   end
 
-  def self.parse_mentions(str)
+  def self.parse_mentions(str, options = {})
+    return if options[:disable_mentions]
+
     str.gsub!(MENTION_REGEXP) do |name| 
       next name unless name =~ /[a-z0-9]/i
 
