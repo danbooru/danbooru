@@ -1,6 +1,6 @@
 require "big_query"
 
-module BigQuery
+module GoogleBigQuery
   class Base
     def query(q)
       client.query(q)
@@ -20,13 +20,17 @@ module BigQuery
 
     def client_options
       @_client_options ||= {
-        google_key_path: "/var/www/danbooru/shared/google-key.json",
+        google_key_path: Danbooru.config.google_api_json_key_path,
         google_data_set: "danbooru_#{Rails.env}"
       }
     end
 
     def google_config
       @_google_config ||= JSON.parse(File.read(client_options[:google_key_path]))
+    end
+
+    def data_set
+      client_options[:google_data_set]
     end
   end
 end

@@ -421,6 +421,10 @@ module Danbooru
     def google_api_project
     end
 
+    def google_api_json_key_path
+      "/var/www/danbooru/shared/config/google-key.json"
+    end
+
     # AWS config options
     def aws_access_key_id
       nil

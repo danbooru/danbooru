@@ -6,13 +6,13 @@ module Reports
       @tag = tag
 
       if query_type == "added"
-        @query = BigQuery::PostVersion.new.find_added(tag)
+        @query = GoogleBigQuery::PostVersion.new.find_added(tag)
       else
-        @query = BigQuery::PostVersion.new.find_removed(tag)
+        @query = GoogleBigQuery::PostVersion.new.find_removed(tag)
       end
     end
 
-    def mock_version(raw)
+    def mock_version(row)
       PostVersion.new.tap do |x|
         x.id = row["f"][0]["v"]
         x.post_id = row["f"][1]["v"]
