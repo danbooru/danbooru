@@ -5,6 +5,8 @@
     
     <% if CurrentUser.is_member? %>
       <li><%= link_to "New", new_forum_topic_path %></li>
+      <li><%= link_to "Request alias", new_tag_alias_request_path %></li>
+      <li><%= link_to "Request implication", new_tag_implication_request_path %></li>
       <li><%= link_to "Mark all as read", mark_all_as_read_forum_topics_path, :method => :post %></li>
     <% end %>
     
