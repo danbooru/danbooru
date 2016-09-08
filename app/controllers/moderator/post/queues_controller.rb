@@ -31,9 +31,6 @@ module Moderator
 
     protected
 
-      def get_posts
-      end
-
       def per_page
         cookies["mq_per_page"] || params[:per_page] || 25
       end

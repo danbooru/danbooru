@@ -27,7 +27,7 @@ class PostsController < ApplicationController
   end
 
   def show
-    if CurrentUser.is_janitor? && (cookies[:moderated].blank? || Time.at(cookies[:moderated].to_i) < 1.day.ago)
+    if CurrentUser.can_approve_posts? && (cookies[:moderated].blank? || Time.at(cookies[:moderated].to_i) < 1.day.ago)
       flash[:notice] = "You haven't moderated any posts recently. Consider checking the queue."
       #redirect_to(random_moderator_post_queue_path(:return_to => request.original_url))
       #return
