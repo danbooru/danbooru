@@ -219,7 +219,7 @@ class DText
         else
           "<#{tag}>" + parse_inline(content, options) + "</#{tag}>"
         end
-       when /\A(h[1-6])\#([A-z][_A-z0-9-]+)\.\s*(.+)\Z/
+      when /\A(h[1-6])\#([A-z][_A-z0-9-]+)\.\s*(.+)\Z/
         tag = $1
         header_id = $2
         content = $3
@@ -339,6 +339,8 @@ class DText
   end
 
   def self.strip(s)
+    return "" if s.blank?
+
     s.gsub!(/[\r\n]+/m, " ")
     s.gsub!(/\[\/?(?:b|i|s|u|tn|tr|td|th|thead|tbody|quote|code|spoilers|spoiler|expand|table)\]/, "")
     s.gsub!(/\[\[([^\|\]]+)\|([^\]]+)\]\]/m, '\2')
