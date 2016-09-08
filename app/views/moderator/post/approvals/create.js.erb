@@ -13,4 +13,6 @@ $("#pending-approval-notice").hide();
 $("#c-moderator-post-queues #post-<%= @post.id %>").hide();
 Danbooru.notice("Post was approved");
 
+Danbooru.ModQueue.increment_processed();
+
 <% end %>

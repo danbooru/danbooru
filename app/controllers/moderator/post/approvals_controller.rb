@@ -4,6 +4,7 @@ module Moderator
       before_filter :post_approvers_only
 
       def create
+        cookies[:moderated] = Time.now.to_i
         @post = ::Post.find(params[:post_id])
         if @post.is_deleted? || @post.is_flagged? || @post.is_pending?
           @post.approve!

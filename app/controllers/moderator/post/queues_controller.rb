@@ -5,6 +5,8 @@ module Moderator
       before_filter :post_approvers_only
 
       def show
+        cookies[:moderated] = Time.now.to_i
+
         if params[:per_page]
           cookies.permanent["mq_per_page"] = params[:per_page]
         end
@@ -16,7 +18,21 @@ module Moderator
         respond_with(@posts)
       end
 
+      def random
+        cookies[:moderated] = Time.now.to_i
+
+        ::Post.without_timeout do
+          @posts = ::Post.order("posts.id asc").pending_or_flagged.available_for_moderation(false).reorder("random()").limit(5)
+          @posts.each # hack to force rails to eager load
+        end
+
+        respond_with(@posts)
+      end
+
     protected
+
+      def get_posts
+      end
 
       def per_page
         cookies["mq_per_page"] || params[:per_page] || 25

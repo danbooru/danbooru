@@ -1,6 +1,18 @@
 (function() {
   Danbooru.ModQueue = {};
 
+  Danbooru.ModQueue.processed = 0;
+
+  Danbooru.ModQueue.increment_processed = function() {
+    if (Danbooru.meta("random-mode") === "1") {
+      Danbooru.ModQueue.processed += 1;
+
+      if (Danbooru.ModQueue.processed === 5) {
+        window.location = Danbooru.meta("return-to");
+      }
+    }
+  }
+
   Danbooru.ModQueue.initialize_approve_all_button = function() {
     $("#approve-all-button").click(function(e) {
       if (!confirm("Are you sure you want to approve every post on this page?")) {
