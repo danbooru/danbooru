@@ -85,7 +85,7 @@ class DTextTest < Minitest::Test
   end
 
   def test_headers_with_ids
-    assert_parse("<h1 id=\"blah-blah\">header</h1>", "h1#blah-blah. header")
+    assert_parse("<h1 id=\"dtext-blah-blah\">header</h1>", "h1#blah-blah. header")
   end
 
   def test_headers_with_ids_with_quote

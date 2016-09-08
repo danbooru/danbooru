@@ -72,7 +72,7 @@ static const int BLOCK_H5 = 27;
 static const int BLOCK_H6 = 28;
 
 
-#line 1046 "ext/dtext/dtext.rl"
+#line 1047 "ext/dtext/dtext.rl"
 
 
 
@@ -175,7 +175,7 @@ static const int dtext_en_list = 308;
 static const int dtext_en_main = 249;
 
 
-#line 1049 "ext/dtext/dtext.rl"
+#line 1050 "ext/dtext/dtext.rl"
 
 static inline void underscore_string(char * str, size_t len) {
   for (size_t i=0; i<len; ++i) {
@@ -514,7 +514,7 @@ static StateMachine * parse_helper(const char * src, size_t len, bool f_strip, b
 	( sm->act) = 0;
 	}
 
-#line 1378 "ext/dtext/dtext.rl"
+#line 1379 "ext/dtext/dtext.rl"
   
 #line 520 "ext/dtext/dtext.c"
 	{
@@ -3500,7 +3500,7 @@ f53:
 	}
 	goto _again;
 f6:
-#line 938 "ext/dtext/dtext.rl"
+#line 939 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("block [/spoiler]");
     dstack_close_before_block(sm);
@@ -3511,7 +3511,7 @@ f6:
   }}
 	goto _again;
 f8:
-#line 985 "ext/dtext/dtext.rl"
+#line 986 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_close_before_block(sm);
     dstack_push(sm, &BLOCK_TABLE);
@@ -3531,7 +3531,7 @@ f8:
   }}
 	goto _again;
 f9:
-#line 992 "ext/dtext/dtext.rl"
+#line 993 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &BLOCK_TN);
     append_block(sm, "<p class=\"tn\">");
@@ -3550,7 +3550,7 @@ f9:
   }}
 	goto _again;
 f59:
-#line 1008 "ext/dtext/dtext.rl"
+#line 1009 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("block 0");
     g_debug("  close dstack");
@@ -3558,7 +3558,7 @@ f59:
   }}
 	goto _again;
 f58:
-#line 1031 "ext/dtext/dtext.rl"
+#line 1032 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("block char: %c", (*( sm->p)));
     ( sm->p)--;
@@ -3589,6 +3589,7 @@ f64:
 	{( sm->te) = ( sm->p);( sm->p)--;{
     char header = *sm->a1;
     GString * id_name = g_string_new_len(sm->b1, sm->b2 - sm->b1);
+    id_name = g_string_prepend(id_name, "dtext-");
 
     if (sm->f_inline) {
       header = '6';
@@ -3658,7 +3659,7 @@ f64:
   }}
 	goto _again;
 f65:
-#line 875 "ext/dtext/dtext.rl"
+#line 876 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     char header = *sm->a1;
 
@@ -3716,7 +3717,7 @@ f65:
   }}
 	goto _again;
 f70:
-#line 920 "ext/dtext/dtext.rl"
+#line 921 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [quote]");
     g_debug("  push quote");
@@ -3727,7 +3728,7 @@ f70:
   }}
 	goto _again;
 f71:
-#line 929 "ext/dtext/dtext.rl"
+#line 930 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [spoiler]");
     g_debug("  push spoiler");
@@ -3738,7 +3739,7 @@ f71:
   }}
 	goto _again;
 f66:
-#line 947 "ext/dtext/dtext.rl"
+#line 948 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [code]");
     dstack_close_before_block(sm);
@@ -3759,7 +3760,7 @@ f66:
   }}
 	goto _again;
 f68:
-#line 955 "ext/dtext/dtext.rl"
+#line 956 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [expand]");
     dstack_close_before_block(sm);
@@ -3770,7 +3771,7 @@ f68:
   }}
 	goto _again;
 f67:
-#line 964 "ext/dtext/dtext.rl"
+#line 965 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [expand=]");
     dstack_close_before_block(sm);
@@ -3784,7 +3785,7 @@ f67:
   }}
 	goto _again;
 f69:
-#line 976 "ext/dtext/dtext.rl"
+#line 977 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [nodtext]");
     dstack_close_before_block(sm);
@@ -3806,7 +3807,7 @@ f69:
   }}
 	goto _again;
 f62:
-#line 1031 "ext/dtext/dtext.rl"
+#line 1032 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block char: %c", (*( sm->p)));
     ( sm->p)--;
@@ -3833,7 +3834,7 @@ f62:
   }}
 	goto _again;
 f2:
-#line 1031 "ext/dtext/dtext.rl"
+#line 1032 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
     g_debug("block char: %c", (*( sm->p)));
     ( sm->p)--;
@@ -4289,7 +4290,7 @@ f63:
 	{
   sm->b2 = sm->p;
 }
-#line 998 "ext/dtext/dtext.rl"
+#line 999 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block list");
     g_debug("  call list");
@@ -4358,13 +4359,13 @@ f111:
 f1:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 1014 "ext/dtext/dtext.rl"
+#line 1015 "ext/dtext/dtext.rl"
 	{( sm->act) = 81;}
 	goto _again;
 f60:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 1027 "ext/dtext/dtext.rl"
+#line 1028 "ext/dtext/dtext.rl"
 	{( sm->act) = 82;}
 	goto _again;
 
@@ -4374,7 +4375,7 @@ _again:
 #line 1 "NONE"
 	{( sm->ts) = 0;}
 	break;
-#line 4378 "ext/dtext/dtext.c"
+#line 4379 "ext/dtext/dtext.c"
 	}
 
 	if ( ++( sm->p) != ( sm->pe) )
@@ -4696,7 +4697,7 @@ _again:
 
 	}
 
-#line 1379 "ext/dtext/dtext.rl"
+#line 1380 "ext/dtext/dtext.rl"
 
   dstack_close(sm);
 

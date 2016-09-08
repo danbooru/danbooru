@@ -815,6 +815,7 @@ main := |*
   header_with_id => {
     char header = *sm->a1;
     GString * id_name = g_string_new_len(sm->b1, sm->b2 - sm->b1);
+    id_name = g_string_prepend(id_name, "dtext-");
 
     if (sm->f_inline) {
       header = '6';
