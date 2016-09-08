@@ -68,8 +68,12 @@
           }
 
           if (req.term[i-1] === "@") {
-            name = req.term.substring(i, cursor);
-            break;
+            if (i == 1 || /[ \r\n]/.test(req.term[i-2])) {
+              name = req.term.substring(i, cursor);
+              break;
+            } else {
+              return;
+            }
           }
         }
 
