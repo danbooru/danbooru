@@ -1,5 +1,6 @@
 <footer id="page-footer">
   Running Danbooru <%= link_to "v#{Danbooru.config.version}", "https://github.com/r888888888/danbooru/releases" %>
+  (<%= Rails.application.config.x.git_hash %>)
   &ndash; <%= link_to "Rules", terms_of_service_path %>
   &ndash; <%= link_to "Contact", contact_path %>
   <% if CurrentUser.user.enable_post_navigation %>

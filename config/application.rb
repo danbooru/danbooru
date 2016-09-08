@@ -21,6 +21,8 @@ module Danbooru
     config.action_mailer.perform_deliveries = true
     config.log_tags = [lambda {|req| "PID:#{Process.pid}"}]
     config.active_record.raise_in_transactional_callbacks = true
+
+    config.x.git_hash = `git rev-parse --short HEAD`.strip
   end
 
   I18n.enforce_available_locales = false
