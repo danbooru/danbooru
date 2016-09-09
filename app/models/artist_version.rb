@@ -67,7 +67,7 @@ class ArtistVersion < ActiveRecord::Base
   end
 
   def urls_diff(version)
-    latest_urls = artist.url_array
+    latest_urls = artist.url_array || []
     new_urls = url_array
     old_urls = version.present? ? version.url_array : []
 
@@ -88,7 +88,7 @@ class ArtistVersion < ActiveRecord::Base
   end
 
   def other_names_diff(version)
-    latest_names = artist.other_names_array
+    latest_names = artist.other_names_array || []
     new_names = other_names_array
     old_names = version.present? ? version.other_names_array : []
 
