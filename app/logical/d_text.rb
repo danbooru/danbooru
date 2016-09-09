@@ -225,9 +225,9 @@ class DText
         content = $3
         
         if options[:inline]
-          "<h6 id=\"#{header_id}\">" + parse_inline(content, options) + "</h6>"
+          "<h6 id=\"dtext-#{header_id}\">" + parse_inline(content, options) + "</h6>"
         else
-          "<#{tag} id=\"#{header_id}\">" + parse_inline(content, options) + "</#{tag}>"
+          "<#{tag} id=\"dtext-#{header_id}\">" + parse_inline(content, options) + "</#{tag}>"
         end
       when /^\s*\*+ /
         parse_list(block, options)
