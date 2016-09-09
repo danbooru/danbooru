@@ -12,7 +12,7 @@ module Reports
       User.find(user_id)
     end
 
-    def prime_similar_users(endpoint = "user_similarity")
+    def prime(endpoint = "user_similarity")
       10.times do
         result = fetch_similar_user_ids(endpoint)
         if result == NOT_READY_STRING

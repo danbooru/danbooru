@@ -348,6 +348,18 @@ class PostQueryBuilder
       end
     end
 
+    if q[:upvote].present?
+      user_id = q[:upvote]
+      post_ids = PostVote.where(:user_id => user_id).where("score > 0").limit(400).pluck(:post_id)
+      relation = relation.where("posts.id in (?)", post_ids)
+    end
+
+    if q[:downvote].present?
+      user_id = q[:downvote]
+      post_ids = PostVote.where(:user_id => user_id).where("score < 0").limit(400).pluck(:post_id)
+      relation = relation.where("posts.id in (?)", post_ids)
+    end
+
     if q[:ordfav].present?
       user_id = q[:ordfav].to_i
       user = User.find(user_id)

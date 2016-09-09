@@ -14,7 +14,7 @@ class SuperVoter < ActiveRecord::Base
   def self.init!
     prune!
     report = Reports::UserSimilarity.new(User.admins.first.id)
-    report.prime_similar_users("post_vote_similarity")
+    report.prime("post_vote_similarity")
 
     report.result.scan(/\S+/).in_groups_of(2).each do |user_id, score|
       unless where("user_id = ?", user_id.to_i).exists?
