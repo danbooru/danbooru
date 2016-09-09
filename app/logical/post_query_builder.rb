@@ -242,7 +242,13 @@ class PostQueryBuilder
     end
 
     if q[:approver_id]
-      relation = relation.where("posts.approver_id = ?", q[:approver_id])
+      if q[:approver_id] == "any"
+        relation = relation.where("posts.approver_id is not null")
+      elsif q[:approver_id] == "none"
+        relation = relation.where("posts.approver_id is null")
+      else
+        relation = relation.where("posts.approver_id = ?", q[:approver_id])
+      end
       has_constraints!
     end
 

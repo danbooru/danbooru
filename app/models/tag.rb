@@ -418,8 +418,14 @@ class Tag < ActiveRecord::Base
             q[:approver_id_neg] << user_id unless user_id.blank?
 
           when "approver"
-            user_id = User.name_to_id($2)
-            q[:approver_id] = user_id unless user_id.blank?
+            if $2 == "none"
+              q[:approver_id] = "none"              
+            elsif $2 == "any"
+              q[:approver_id] = "any"
+            else
+              user_id = User.name_to_id($2)
+              q[:approver_id] = user_id unless user_id.blank?
+            end
 
           when "commenter", "comm"
             q[:commenter_ids] ||= []
