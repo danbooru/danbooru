@@ -2,7 +2,7 @@ module Reports
   class UserSimilarity
     NOT_READY_STRING = "not ready"
 
-    attr_reader :user_id
+    attr_reader :user_id, :result
 
     def initialize(user_id)
       @user_id = user_id
@@ -12,9 +12,10 @@ module Reports
       User.find(user_id)
     end
 
-    def prime
+    def prime_similar_users(endpoint = "user_similarity")
       10.times do
-        if fetch_similar_user_ids == NOT_READY_STRING
+        result = fetch_similar_user_ids(endpoint)
+        if result == NOT_READY_STRING
           sleep(60)
         else
           break
@@ -22,14 +23,14 @@ module Reports
       end
     end
 
-    def fetch_similar_user_ids
+    def fetch_similar_user_ids(endpoint = "user_similarity")
       return NotImplementedError unless Danbooru.config.report_server
 
       params = {
         "key" => Danbooru.config.shared_remote_key,
         "user_id" => user_id
       }
-      uri = URI.parse("#{Danbooru.config.report_server}/reports/user_similarity")
+      uri = URI.parse("#{Danbooru.config.report_server}/reports/#{endpoint}")
       uri.query = URI.encode_www_form(params)
 
       Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.is_a?(URI::HTTPS)) do |http|
