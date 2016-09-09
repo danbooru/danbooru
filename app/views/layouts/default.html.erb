@@ -89,6 +89,10 @@
       <%= render "users/dmail_notice" %>
     <% end %>
 
+    <% if CurrentUser.user.can_approve_posts? %>
+      <%= render "moderator/post/queues/notice" %>
+    <% end %>
+
     <% if cookies["accepted_tos"].blank? && !CurrentUser.is_gold? %>
       <%= render "users/tos" %>
     <% end %>

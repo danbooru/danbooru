@@ -27,8 +27,6 @@ class PostsController < ApplicationController
   end
 
   def show
-    notify_inactive_janitors
-
     @post = Post.find(params[:id])
     @post_flag = PostFlag.new(:post_id => @post.id)
     @post_appeal = PostAppeal.new(:post_id => @post.id)
@@ -114,13 +112,6 @@ class PostsController < ApplicationController
   end
 
 private
-  def notify_inactive_janitors
-    if CurrentUser.can_approve_posts? && flash[:notice].blank? && (cookies[:moderated].blank? || Time.at(cookies[:moderated].to_i) < 1.day.ago)
-      flash[:notice] = "You haven't moderated any posts recently. Consider checking the queue."
-      #redirect_to(random_moderator_post_queue_path(:return_to => request.original_url))
-      #return
-    end
-  end
 
   def tag_query
     params[:tags] || (params[:post] && params[:post][:tags])

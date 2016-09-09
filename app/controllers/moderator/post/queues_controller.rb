@@ -31,6 +31,10 @@ module Moderator
 
     protected
 
+      def show_moderation_notice?
+        false
+      end
+
       def per_page
         cookies["mq_per_page"] || params[:per_page] || 25
       end
