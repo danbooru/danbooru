@@ -77,7 +77,7 @@ class DTextTest < ActiveSupport::TestCase
   end
   
   def test_headers_with_ids
-    assert_equal("<h1 id=\"header-id\">header</h1>", p("h1#header-id. header"))
+    assert_equal("<h1 id=\"dtext-header-id\">header</h1>", p("h1#header-id. header"))
   end
 
   def test_quote_blocks
