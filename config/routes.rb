@@ -236,6 +236,7 @@ Rails.application.routes.draw do
       get :categories
     end
   end
+  resource :saved_search_category_change, :only => [:new, :create]
   resource :session do
     collection do
       get :sign_out

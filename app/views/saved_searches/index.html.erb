@@ -6,6 +6,7 @@
       <h2>
         <% if category.present? %>
           <%= link_to_if SavedSearch.posts_search_available?, category.tr("_", " "), posts_path(:tags => "search:#{category}") %>
+          (<%= link_to "rename", new_saved_search_category_change_path(:old => category) %>)
         <% else %>
           <%= link_to_if SavedSearch.posts_search_available?, SavedSearch::UNCATEGORIZED_NAME, posts_path(:tags => "search:all") %>
         <% end %>
@@ -13,8 +14,8 @@
       <table class="striped" width="100%">
         <thead>
           <tr>
-            <th width="90%">Tags</th>
-            <th width="10%"></th>
+            <th width="80%">Tags</th>
+            <th width="20%"></th>
           </tr>
         </thead>
 

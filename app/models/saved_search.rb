@@ -30,6 +30,15 @@ class SavedSearch < ActiveRecord::Base
 
         true
       end
+
+      def rename_listbooru(user_id, old_category, new_category)
+        return false unless Danbooru.config.listbooru_enabled?
+
+        sqs = SqsService.new(Danbooru.config.aws_sqs_queue_url)
+        sqs.send_message("rename\n#{user_id}\n#{old_category}\n#{new_category}\n")
+
+        true
+      end
     end
 
     def update_listbooru_on_create
@@ -71,11 +80,23 @@ class SavedSearch < ActiveRecord::Base
   before_validation :normalize
 
   def self.tagged(tags)
-    where(:tag_query => SavedSearch.normalize(tags)).first
+    where(:tag_query => normalize(tags)).first
   end
 
   def self.normalize(tag_query)
     Tag.scan_query(tag_query).join(" ")
+  end
+
+  def self.normalize_category(category)
+    category.to_s.strip.gsub(/\s+/, "_").downcase
+  end
+
+  def self.rename(user_id, old_category, new_category)
+    user = User.find(user_id)
+    old_category = normalize_category(old_category)
+    new_category = normalize_category(new_category)
+    user.saved_searches.where(category: old_category).update_all(category: new_category)
+    rename_listbooru(user_id, old_category, new_category)
   end
 
   def self.post_ids(user_id, name = nil)
@@ -110,7 +131,7 @@ class SavedSearch < ActiveRecord::Base
   end
 
   def normalize
-    self.category = category.strip.gsub(/\s+/, "_").downcase if category
+    self.category = SavedSearch.normalize_category(category) if category
     self.tag_query = SavedSearch.normalize(tag_query)
   end
 
