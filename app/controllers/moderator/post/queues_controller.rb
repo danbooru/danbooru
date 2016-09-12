@@ -5,7 +5,7 @@ module Moderator
       before_filter :post_approvers_only
 
       def show
-        cookies[:moderated] = Time.now.to_i
+        cookies.permanent[:moderated] = Time.now.to_i
 
         if params[:per_page]
           cookies.permanent["mq_per_page"] = params[:per_page]
@@ -19,7 +19,7 @@ module Moderator
       end
 
       def random
-        cookies[:moderated] = Time.now.to_i
+        cookies.permanent[:moderated] = Time.now.to_i
 
         ::Post.without_timeout do
           @posts = ::Post.order("posts.id asc").pending_or_flagged.available_for_moderation(false).reorder("random()").limit(5)
