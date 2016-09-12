@@ -84,22 +84,36 @@ passwd danbooru
 echo "* Setting up SSH keys for the danbooru account"
 sudo -u danbooru ssh-keygen
 
-echo "* Setting up danbooru app..."
-sudo -u danbooru git clone https://github.com/r888888888/danbooru ~danbooru/danbooru
-sudo -u danbooru bash -l -c 'cd ~/danbooru ; bundle'
-
-echo "* Creating a new local git branch called develop"
-sudo -u danbooru bash -l -c 'cd ~/danbooru ; git checkout -b develop'
-
 mkdir -p /var/www/danbooru2/shared/config
 mkdir -p /var/www/danbooru2/shared/data
 chown -R danbooru:danbooru /var/www/danbooru2
 sudo -u danbooru bash -l -c 'cp ~/danbooru/script/install/database.yml.templ /var/www/danbooru2/shared/config/database.yml'
 sudo -u danbooru bash -l -c 'cp ~/danbooru/script/install/danbooru_local_config.rb.templ /var/www/danbooru2/shared/config/danbooru_local_config.rb'
 
-echo "* Almost done! The code has been checked out at ~danbooru/danbooru. You can  "
-echo "* now login as the danbooru user and run the following commands to deploy to "
-echo "* the server:"
+echo "* Almost done! You are now ready to deploy Danbooru onto this server."
+echo "* Log into Github and fork https://github.com/r888888888/danbooru into"
+echo "* your own repository. Clone your fork onto your local development"
+echo "* machine and modify the following files:"
 echo "*"
-echo "*   cd ~/danbooru"
-echo "*   bundle exec cap development deploy"
+echo "*   config/deploy.rb (github repo url)"
+echo "*   config/deploy/production.rb (servers and users)"
+echo "*   config/unicorn/production.rb (users)"
+echo "*   config/application.rb (time zone)"
+echo "*"
+echo "* On the remote server you will want to modify this file:"
+echo "*"
+echo "*   /var/www/danbooru2/shared/config/danbooru_local_config.rb"
+echo "*"
+echo "* Commit your changes and push them to your fork. You are now ready to"
+echo "* deploy with the following command:"
+echo "*"
+echo "*   bundle exec capistrano production deploy"
+echo "*"
+echo "* You can also run a server locally without having to deal with deploys"
+echo "* by running the following command:"
+echo "*"
+echo "*   bundle exec rails server"
+echo "*"
+echo "* This will start a web process running on port 3000 that you can"
+echo "* connect to. This is useful for development and testing purposes."
+echo "* If something breaks post about it on the Danbooru Github. Good luck!"
