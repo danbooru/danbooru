@@ -21,10 +21,6 @@
             <%= link_to "View hidden posts", moderator_post_queue_path(:query => params[:query], :hidden => true) %>.
           <% end %>
         </p>
-
-        <!-- 
-        <p><%= button_tag "Approve all", :id => "approve-all-button" %><%= button_tag "Hide all", :id => "hide-all-button" %></p>
-        -->
       </div>
 
       <% @posts.each do |post| %>
@@ -63,6 +59,7 @@
               <li>
                 <strong>Hidden</strong>: <%= render "post_disapprovals/compact_counts", :disapprovals => post.disapprovals, :post => post %>
               </li>
+              <li><strong>Source</strong>: <%= post.source %></li>
               <li><strong>Tags</strong>: <%= post.tag_string %></li>
             </ul>
           </section>
