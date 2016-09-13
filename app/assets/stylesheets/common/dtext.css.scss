@@ -24,17 +24,17 @@ div.prose {
 
   h4 {
     font-size: $dtext_h4_size;
-    padding: 0;
+    padding: $h4_padding;
   }
 
   h5 {
     font-size: $dtext_h5_size;
-    padding: 0;
+    padding: $h4_padding;
   }
 
   h6 {
     font-size: $dtext_h6_size;
-    padding: 0;
+    padding: $h4_padding;
   }
 
   ul {
