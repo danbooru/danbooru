@@ -3,8 +3,10 @@ require 'test_helper'
 class PoolsControllerTest < ActionController::TestCase
   context "The pools controller" do
     setup do
-      @user = Timecop.travel(1.month.ago) {FactoryGirl.create(:user)}
-      @mod = FactoryGirl.create(:moderator_user)
+      Timecop.travel(1.month.ago) do
+        @user = FactoryGirl.create(:user)
+        @mod = FactoryGirl.create(:moderator_user)
+      end
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
       @post = FactoryGirl.create(:post)
@@ -98,11 +100,12 @@ class PoolsControllerTest < ActionController::TestCase
 
       should "revert to a previous version" do
         assert_equal(2, PoolVersion.count)
-        version = @pool.versions(true).first
+        @pool.reload
+        version = @pool.versions.first
         assert_equal("#{@post.id}", version.post_ids)
         post :revert, {:id => @pool.id, :version_id => version.id}, {:user_id => @mod.id}
         @pool.reload
-        assert_equal("#{@post.id}", @pool.post_ids)
+        assert_equal([@post.id], @pool.post_id_array)
       end
     end
   end
