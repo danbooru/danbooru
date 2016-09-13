@@ -32,7 +32,7 @@ class BulkUpdateRequestsControllerTest < ActionController::TestCase
       should "still handle enabled secondary validations correctly" do
         post :update, {:id => @bulk_update_request.id, :bulk_update_request => {:script => "create alias zzz -> 222", :skip_secondary_validations => "0"}}, {:user_id => @user.id}
         @bulk_update_request.reload
-        assert_equal("create alias aaa -> bbb", @bulk_update_request.script)
+        assert_equal("create alias zzz -> 222", @bulk_update_request.script)
       end
 
       should "still handle disabled secondary validations correctly" do

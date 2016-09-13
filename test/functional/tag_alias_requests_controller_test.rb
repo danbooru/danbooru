@@ -25,7 +25,7 @@ class TagAliasRequestsControllerTest < ActionController::TestCase
     context "create action" do
       should "render" do
         assert_difference("ForumTopic.count", 1) do
-          post :create, {:tag_alias_request => {:antecedent_name => "aaa", :consequent_name => "bbb", :reason => "ccc"}}, {:user_id => @user.id}
+          post :create, {:tag_alias_request => {:antecedent_name => "aaa", :consequent_name => "bbb", :reason => "ccc", :skip_secondary_validations => true}}, {:user_id => @user.id}
         end
         assert_redirected_to(forum_topic_path(ForumTopic.last))
       end
