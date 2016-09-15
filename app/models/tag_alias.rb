@@ -103,6 +103,7 @@ class TagAlias < ActiveRecord::Base
       CurrentUser.scoped(admin, "127.0.0.1") do
         update_column(:status, "processing")
         move_aliases_and_implications
+        move_saved_searches
         clear_all_cache
         ensure_category_consistency
         update_posts
@@ -163,6 +164,14 @@ class TagAlias < ActiveRecord::Base
     if antecedent_name == consequent_name
       self.errors[:base] << "Cannot alias a tag to itself"
       false
+    end
+  end
+
+  def move_saved_searches
+    escaped = Regexp.escape(antecedent_name)
+    SavedSearch.where("tag_query like ?", "%#{antecedent_name}%").find_each do |ss|
+      ss.tag_query = ss.tag_query.sub(/(?:^| )#{escaped}(?:$| )/, " #{consequent_name} ").strip.gsub(/  /, " ")
+      ss.save
     end
   end
 

@@ -17,6 +17,13 @@ module Moderator
             tags = (post.tag_array - normalized_antecedent + normalized_consequent).join(" ")
             post.update_attributes(:tag_string => tags)
           end
+
+          escaped = Regexp.escape(antecedent)
+          SavedSearch.where("tag_query like ?", "%#{antecedent}%").find_each do |ss|
+            ss.tag_query = ss.tag_query.sub(/(?:^| )#{escaped}(?:$| )/, " #{consequent} ").strip.gsub(/  /, " ")
+            ss.save
+          end
+
         end
       end
     end
