@@ -14,8 +14,8 @@ module Reports
 
     def prime(endpoint = "user_similarity")
       10.times do
-        result = fetch_similar_user_ids(endpoint)
-        if result == NOT_READY_STRING
+        @result = fetch_similar_user_ids(endpoint)
+        if @result == NOT_READY_STRING
           sleep(60)
         else
           break
