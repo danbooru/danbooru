@@ -762,7 +762,7 @@ class User < ActiveRecord::Base
       bitprefs_include = nil
       bitprefs_exclude = nil
 
-      [:can_approve_posts, :can_upload_free, :is_super_voter].each do |x|
+      [:can_approve_posts, :can_upload_free, :is_super_voter, :is_banned].each do |x|
         if params[x].present?
           attr_idx = BOOLEAN_ATTRIBUTES.index(x.to_s)
           if params[x] == "true"
