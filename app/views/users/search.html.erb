@@ -19,6 +19,26 @@
       </div>
 
       <div class="input">
+        <label for="search_can_approve_posts">Can approve posts</label>
+        <%= select("search", "can_approve_posts", [[""], ["Yes", "true"], ["No", "false"]]) %>
+      </div>
+
+      <div class="input">
+        <label for="search_can_upload_free">Unrestricted uploads</label>
+        <%= select("search", "can_upload_free", [[""], ["Yes", "true"], ["No", "false"]]) %>
+      </div>
+
+      <div class="input">
+        <label for="search_is_super_voter">Supervoter</label>
+        <%= select("search", "is_super_voter", [[""], ["Yes", "true"], ["No", "false"]]) %>
+      </div>
+
+      <div class="input">
+        <label for="search_is_banned">Banned</label>
+        <%= select("search", "is_banned", [[""], ["Yes", "true"], ["No", "false"]]) %>
+      </div>
+
+      <div class="input">
         <label for="search_order">Order</label>
         <%= select("search", "order", [["Join date", "date"], ["Name", "name"], ["Upload count", "post_upload_count"], ["Note count", "note_count"], ["Post update count", "post_update_count"]]) %>
       </div>
