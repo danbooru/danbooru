@@ -1,3 +1,5 @@
+require 'digest/sha1'
+
 class Dmail < ActiveRecord::Base
   validates_presence_of :to_id
   validates_presence_of :from_id
@@ -78,6 +80,32 @@ class Dmail < ActiveRecord::Base
     end
   end
 
+  module ApiMethods
+    def hidden_attributes
+      super + [:message_index]
+    end
+    
+    def method_attributes
+      list = [:hash]
+      list
+    end
+    
+    def serializable_hash(options = {})
+      options ||= {}
+      options[:methods] ||= []
+      options[:methods] += method_attributes
+      super(options)
+    end
+    
+    def to_xml(options = {}, &block)
+      # to_xml ignores the serializable_hash method
+      options ||= {}
+      options[:methods] ||= []
+      options[:methods] += method_attributes
+      super(options, &block)
+    end
+  end
+  
   module SearchMethods
     def for(user)
       where("owner_id = ?", user)
@@ -164,6 +192,7 @@ class Dmail < ActiveRecord::Base
 
   include AddressMethods
   include FactoryMethods
+  include ApiMethods
   extend SearchMethods
 
   def validate_sender_is_not_banned
@@ -208,12 +237,13 @@ class Dmail < ActiveRecord::Base
       to.update_attribute(:has_mail, true)
     end
   end
-
-  def visible_to?(user)
-    user.is_moderator? || owner_id == user.id
+  
+  def hash
+    Digest::SHA1.hexdigest("#{title} #{body}")
+  end
+  
+  def visible_to?(user, key)
+    owner_id == user.id || (user.is_moderator? && key == self.hash)
   end
 
-  def hidden_attributes
-    super + [:message_index]
-  end
 end

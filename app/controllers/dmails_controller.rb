@@ -59,7 +59,7 @@ class DmailsController < ApplicationController
 
 private
   def check_privilege(dmail)
-    if !dmail.visible_to?(CurrentUser.user)
+    if !dmail.visible_to?(CurrentUser.user, params[:key])
       raise User::PrivilegeError
     end
   end
