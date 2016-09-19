@@ -243,6 +243,7 @@ Rails.application.routes.draw do
     end
   end
   resource :source, :only => [:show]
+  resources :super_voters, :only => [:index]
   resources :tags do
     resource :correction, :only => [:new, :create, :show], :controller => "tag_corrections"
     collection do
