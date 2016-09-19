@@ -674,7 +674,7 @@ class Post < ActiveRecord::Base
     end
 
     def filter_metatags(tags)
-      @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent|-parent):/i}
+      @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent|-parent|source):/i}
       @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav|-fav|child|-favgroup|favgroup):/i}
       apply_pre_metatags
       return tags
@@ -756,6 +756,15 @@ class Post < ActiveRecord::Base
             self.parent_id = $1.to_i
             remove_parent_loops
           end
+
+        when /^source:none$/i
+          self.source = nil
+
+        when /^source:"(.*)"$/i
+          self.source = $1
+
+        when /^source:(.*)$/i
+          self.source = $1
 
         when /^rating:([qse])/i
           unless is_rating_locked?
