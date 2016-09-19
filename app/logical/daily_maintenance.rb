@@ -16,5 +16,6 @@ class DailyMaintenance
     PostDisapproval.dmail_messages!
     Tag.clean_up_negative_post_counts!
     SuperVoter.init!
+    AntiVote.init!
   end
 end
