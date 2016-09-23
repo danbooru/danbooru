@@ -422,7 +422,7 @@ module Danbooru
     end
 
     def google_api_json_key_path
-      "/var/www/danbooru/shared/config/google-key.json"
+      "/var/www/danbooru2/shared/config/google-key.json"
     end
 
     # AWS config options
