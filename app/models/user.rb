@@ -759,28 +759,33 @@ class User < ActiveRecord::Base
         q = q.where("id in (?)", params[:id].split(",").map(&:to_i))
       end
 
+      bitprefs_length = BOOLEAN_ATTRIBUTES.length
       bitprefs_include = nil
       bitprefs_exclude = nil
 
-      [:can_approve_posts, :can_upload_free, :is_super_voter, :is_banned].each do |x|
+      [:can_approve_posts, :can_upload_free, :is_super_voter].each do |x|
         if params[x].present?
           attr_idx = BOOLEAN_ATTRIBUTES.index(x.to_s)
           if params[x] == "true"
-            bitprefs_include ||= []
-            bitprefs_include << attr_idx
+            bitprefs_include ||= "0"*bitprefs_length
+            bitprefs_include[attr_idx] = '1'
           elsif params[x] == "false"
-            bitprefs_exclude ||= 0
-            bitprefs_exclude |= (1 << attr_idx)
+            bitprefs_exclude ||= "0"*bitprefs_length
+            bitprefs_exclude[attr_idx] = '1'
           end
         end
       end
-      
+
       if bitprefs_include
-        q = q.where("bit_position_array(bit_prefs) @> ARRAY[?]::integer[]", bitprefs_include)
+        bitprefs_include.reverse!
+        q = q.where("bit_prefs::bit(:len) & :bits::bit(:len) = :bits::bit(:len)",
+                    {:len => bitprefs_length, :bits => bitprefs_include})
       end
-      
+
       if bitprefs_exclude
-        q = q.where("bit_prefs & ? = 0", bitprefs_exclude)
+        bitprefs_exclude.reverse!
+        q = q.where("bit_prefs::bit(:len) & :bits::bit(:len) = 0::bit(:len)",
+                    {:len => bitprefs_length, :bits => bitprefs_exclude})
       end
 
       if params[:current_user_first] == "true" && !CurrentUser.is_anonymous?
