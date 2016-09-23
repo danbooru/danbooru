@@ -2,7 +2,7 @@
   <h1><%= @exception.class.to_s %> exception raised</h1>
   <ul style="font-family: monospace; font-size: 1.2em; list-style-type: none;">
     <li><%= @exception.message %></li>
-    <%- @exception.backtrace.each do |b| -%>
+    <%- Rails.backtrace_cleaner.clean(@exception.backtrace).each do |b| -%>
       <li style="list-style-type: none;"><%= b %></li>
     <%- end -%>
   </ul>
