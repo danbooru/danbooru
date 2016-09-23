@@ -53,10 +53,11 @@ module Downloads
       #   http://www.pixiv.net/member_illust.php?mode=big&illust_id=18557054
       #   http://www.pixiv.net/member_illust.php?mode=manga&illust_id=18557054
       #   http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=18557054&page=1
+      #   http://www.pixiv.net/whitecube/user/277898/illust/59182257
       # Plus this:
       #   i2.pixiv.net/img-inf/img/2014/09/25/00/57/24/46170939_64x64.jpg
       def rewrite_html_pages(url, headers)
-        if url =~ /illust_id=\d+/i || url =~ %r!pixiv\.net/img-inf/img/!i
+        if url =~ /illust_id=\d+/i || url =~ %r!pixiv\.net/img-inf/img/!i || url =~ /illust\/\d+/
           return [source.file_url, headers]
         else
           return [url, headers]

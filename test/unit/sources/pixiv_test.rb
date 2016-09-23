@@ -18,9 +18,23 @@ module Sources
     end
 
     context "in all cases" do
+      context "A whitecube page" do
+        setup do
+          VCR.use_cassette("pixiv-whitecube-ilust", :record => :none) do
+            @site = Sources::Site.new("https://www.pixiv.net/whitecube/user/277898/illust/59182257")
+            @site.get
+            @image_urls = @site.image_urls
+          end
+        end
+
+        should "1234 get all the image urls" do
+          assert_equal(["http://i2.pixiv.net/img-original/img/2016/09/26/21/30/41/59182257_p0.jpg"], @image_urls)
+        end
+      end
+
       context "A gallery page" do
         setup do
-          VCR.use_cassette("pixiv-gallery", :record => :once) do
+          VCR.use_cassette("pixiv-gallery", :record => :none) do
             @site = Sources::Site.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=49270482")
             @site.get
             @image_urls = @site.image_urls
@@ -34,7 +48,7 @@ module Sources
 
       context "An ugoira source site for pixiv" do
         setup do
-          VCR.use_cassette("ugoira-converter", :record => :once) do
+          VCR.use_cassette("ugoira-converter", :record => :none) do
             @site = Sources::Site.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654")
             @site.get
           end

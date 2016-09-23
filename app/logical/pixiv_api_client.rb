@@ -6,7 +6,7 @@ class PixivApiClient
   class Error < Exception ; end
 
   class WorksResponse
-    attr_reader :json, :pages, :moniker, :page_count
+    attr_reader :json, :pages, :name, :moniker, :user_id, :page_count, :tags
     attr_reader :artist_commentary_title, :artist_commentary_desc
 
     def initialize(json)
@@ -90,10 +90,13 @@ class PixivApiClient
       # }
 
       @json = json
+      @name = json["user"]["name"]
+      @user_id = json["user"]["id"]
       @moniker = json["user"]["account"]
       @page_count = json["page_count"].to_i
       @artist_commentary_title = json["title"]
       @artist_commentary_desc = json["caption"]
+      @tags = json["tags"]
 
       if page_count > 1
         @pages = json["metadata"]["pages"].map {|x| x["image_urls"]["large"]}
