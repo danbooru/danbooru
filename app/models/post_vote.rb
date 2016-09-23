@@ -9,7 +9,7 @@ class PostVote < ActiveRecord::Base
   after_destroy :update_post_on_destroy
 
   def self.prune!
-    where("created_at < ?", 30.days.ago).delete_all
+    where("created_at < ?", 90.days.ago).delete_all
   end
 
   def self.positive_user_ids

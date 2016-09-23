@@ -71,7 +71,6 @@ Rails.application.routes.draw do
     resources :hits, :controller => "advertisement_hits", :only => [:create]
   end
   resources :api_keys, :only => [:new, :create]
-  resources :anti_voters, :only => [:index]
   resources :artists do
     member do
       put :revert
