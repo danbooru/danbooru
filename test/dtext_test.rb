@@ -256,4 +256,16 @@ class DTextTest < Minitest::Test
   def test_old_asterisks
     assert_parse("<p>hello *world* neutral</p>", "hello *world* neutral")
   end
+
+  def test_utf8_mentions
+    assert_parse('<p><a rel="nofollow" href="/users?name=葉月">@葉月</a></p>', "@葉月")
+    assert_parse('<p>Hello <a rel="nofollow" href="/users?name=葉月">@葉月</a> and <a rel="nofollow" href="/users?name=Alice">@Alice</a></p>', "Hello @葉月 and @Alice")
+    assert_parse('<p>Should not parse 葉月@葉月</p>', "Should not parse 葉月@葉月")
+  end
+
+  def test_utf8_links
+    assert_parse('<p><a href="/posts?tags=approver:葉月">7893</a></p>', '"7893":/posts?tags=approver:葉月')
+    assert_parse('<p><a href="/posts?tags=approver:葉月">7893</a></p>', '"7893":[/posts?tags=approver:葉月]')
+    assert_parse('<p><a href="http://danbooru.donmai.us/posts?tags=approver:葉月">http://danbooru.donmai.us/posts?tags=approver:葉月</a></p>', 'http://danbooru.donmai.us/posts?tags=approver:葉月')
+  end
 end
