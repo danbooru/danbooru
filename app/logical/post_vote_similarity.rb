@@ -25,17 +25,17 @@ class PostVoteSimilarity
   # returns user ids with strong positive correlation
   def calculate_positive(limit = 10)
     posts0 = PostVote.positive_post_ids(user_id)
-    set = SortedSet.new
+    set = []
 
     PostVote.positive_user_ids.each do |uid|
       posts1 = PostVote.positive_post_ids(uid)
       score = calculate_with_cosine(posts0, posts1)
       if score >= THRESHOLD
-        set.add(Element.new(uid, score))
+        set << Element.new(uid, score)
       end
     end
 
-    set.first(limit)
+    set.sort.reverse.first(limit)
   end
 
   def calculate_with_cosine(posts0, posts1)
