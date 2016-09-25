@@ -15,9 +15,9 @@ class SuperVoter < ActiveRecord::Base
     prune!
     report = PostVoteSimilarity.new(User.admins.first.id)
 
-    report.calculate_positive.each do |element|
-      unless where("user_id = ?", element.user_id).exists?
-        create(:user_id => element.user_id)
+    report.calculate_positive(15).each do |element|
+      unless SuperVoter.where("user_id = ?", element.user_id).exists?
+        SuperVoter.create(:user_id => element.user_id)
       end
     end
   end
