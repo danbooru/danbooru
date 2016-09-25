@@ -5,11 +5,11 @@
     <% if !@artist.is_active? %>
       <p>This artist entry is inactive and cannot be edited.</p>
 
-    <% elsif @artist.editable_by?(CurrentUser.user) %>
-      <%= render "form" %>
+    <% elsif @artist.is_banned? %>
+      <p>The artist requested removal of this page.</p>
 
     <% else %>
-      <p>The artist requested removal of this page.</p>
+      <%= render "form" %>
     <% end %>
   </div>
 </div>
