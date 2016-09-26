@@ -31,6 +31,8 @@ module Reports
     def post_versions
       if query["rows"].present?
         query["rows"].map {|x| mock_version(x)}
+      else
+        []
       end
     end
   end
