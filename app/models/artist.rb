@@ -495,6 +495,10 @@ class Artist < ActiveRecord::Base
     user.is_builder?
   end
 
+  def editable_by?(user)
+    user.is_builder? || (!is_banned? && is_active?)
+  end
+
   def visible?
     !is_banned? || CurrentUser.is_gold?
   end
