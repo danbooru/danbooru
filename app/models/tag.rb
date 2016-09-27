@@ -231,11 +231,15 @@ class Tag < ActiveRecord::Base
     end
 
     def scan_query(query)
-      normalize(query).scan(/\S+/).uniq
+      tagstr = normalize(query)
+      list = tagstr.scan(/-?source:".*?"/) || []
+      list + tagstr.gsub(/-?source:".*?"/, "").scan(/\S+/).uniq
     end
 
     def scan_tags(tags)
-      normalize(tags).gsub(/[%,]/, "").scan(/\S+/).uniq
+      tagstr = normalize(tags)
+      list = tagstr.scan(/source:".*?"/) || []
+      list + tagstr.gsub(/source:".*?"/, "").gsub(/[%,]/, "").scan(/\S+/).uniq
     end
 
     def parse_cast(object, type)
@@ -547,10 +551,12 @@ class Tag < ActiveRecord::Base
       	    q[:filesize] = parse_helper_fudged($2, :filesize)
 
           when "source"
-            q[:source] = ($2.to_escaped_for_sql_like + "%").gsub(/%+/, '%')
+            src = $2.gsub(/\A"(.*)"\Z/, '\1')
+            q[:source] = (src.to_escaped_for_sql_like + "%").gsub(/%+/, '%')
 
           when "-source"
-            q[:source_neg] = ($2.to_escaped_for_sql_like + "%").gsub(/%+/, '%')
+            src = $2.gsub(/\A"(.*)"\Z/, '\1')
+            q[:source_neg] = (src.to_escaped_for_sql_like + "%").gsub(/%+/, '%')
 
           when "date"
             q[:date] = parse_helper($2, :date)
