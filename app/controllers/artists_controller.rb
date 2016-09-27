@@ -112,10 +112,15 @@ class ArtistsController < ApplicationController
   end
 
   def finder
-    @artists = Artist.url_matches(params[:url]).order("id desc").limit(20)
-    if @artists.empty? && params[:referer_url].present? && params[:referer_url] != params[:url]
-      @artists = Artist.url_matches(params[:referer_url]).order("id desc").limit(20)
+    begin
+      @artists = Artist.url_matches(params[:url]).order("id desc").limit(20)
+      if @artists.empty? && params[:referer_url].present? && params[:referer_url] != params[:url]
+        @artists = Artist.url_matches(params[:referer_url]).order("id desc").limit(20)
+      end
+    rescue PixivApiClient::Error => e
+      @artists = []
     end
+
     respond_with(@artists) do |format|
       format.xml do
         render :xml => @artists.to_xml(:include => [:urls], :root => "artists")
@@ -131,5 +136,4 @@ private
   def load_artist
     @artist = Artist.find(params[:id])
   end
-
 end

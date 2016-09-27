@@ -2,7 +2,7 @@ require 'test_helper'
 
 class ArtistTest < ActiveSupport::TestCase
   def assert_artist_found(expected_name, source_url)
-    VCR.use_cassette("unit/artist/#{Digest::SHA1.hexdigest(source_url)}", :record => :once) do
+    VCR.use_cassette("artist-test/#{Digest::SHA1.hexdigest(source_url)}", :record => @vcr_record_option) do
       artists = Artist.url_matches(source_url).to_a
 
       assert_equal(1, artists.size)
@@ -11,10 +11,16 @@ class ArtistTest < ActiveSupport::TestCase
   end
 
   def assert_artist_not_found(source_url)
-    VCR.use_cassette("unit/artist/#{Digest::SHA1.hexdigest(source_url)}", :record => :once) do
+    VCR.use_cassette("artist-test/#{Digest::SHA1.hexdigest(source_url)}", :record => @vcr_record_option) do
       artists = Artist.find_all_by_url(source_url)
       assert_equal(0, artists.size, "Testing URL: #{source_url}")
     end
+  end
+
+  def setup
+    super
+    @record = false
+    setup_vcr
   end
 
   context "An artist" do

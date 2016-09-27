@@ -11,13 +11,12 @@ module Sources
       TIMESTAMP = '(?:[0-9]{4}/[0-9]{2}/[0-9]{2}/[0-9]{2}/[0-9]{2}/[0-9]{2})'
       EXT = "(?:jpg|jpeg|png|gif)"
 
-      WHITECUBE = /^https?:\/\/wwww\.pixiv\.net\/whitecube/i
       WEB = "^(?:https?://)?www\\.pixiv\\.net"
       I12 = "^(?:https?://)?i[0-9]+\\.pixiv\\.net"
       IMG = "^(?:https?://)?img[0-9]*\\.pixiv\\.net"
 
       def self.url_match?(url)
-        url !~ WHITECUBE && url =~ /#{WEB}|#{IMG}|#{I12}/i
+        url =~ /#{WEB}|#{IMG}|#{I12}/i
       end
 
       def referer_url

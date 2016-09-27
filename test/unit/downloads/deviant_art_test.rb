@@ -2,41 +2,28 @@ require 'test_helper'
 
 module Downloads
   class DeviantArtTest < ActiveSupport::TestCase
+    def setup
+      super
+      @record = false
+      setup_vcr
+    end
+
     context "a download for a deviant art html page" do
       setup do
-        @source = "http://mochikko.deviantart.com/art/RESOLUTION-339610451"
+        @source = "http://starbitt.deviantart.com/art/09271X-636962118"
         @tempfile = Tempfile.new("danbooru-test")
         @download = Downloads::File.new(@source, @tempfile.path)
-        VCR.use_cassette("download-deviant-art-html", :record => :once) do
+        VCR.use_cassette("downloads-deviant-art-test/html", :record => @vcr_record_option) do
           @download.download!
         end
       end
 
       should "set the html page as the source" do
-        assert_equal("http://orig02.deviantart.net/a45d/f/2012/330/e/7/resolution_by_mochikko-d5m713n.jpg", @download.source)
+        assert_equal("http://orig00.deviantart.net/82ef/f/2016/271/7/1/aaaaaa_by_starbitt-daj8b46.gif", @download.source)
       end
 
       should "work" do
-        assert_equal(255_683, ::File.size(@tempfile.path))
-      end
-    end
-
-    context "a download for a deviant art thumbnail" do
-      setup do
-        @source = "http://fc03.deviantart.net/fs71/200H/f/2012/330/e/7/resolution_by_mochikko-d5m713n.jpg"
-        @tempfile = Tempfile.new("danbooru-test")
-        @download = Downloads::File.new(@source, @tempfile.path)
-        VCR.use_cassette("download-deviant-art-thumb", :record => :once) do
-          @download.download!
-        end
-      end
-
-      should "instead download the original version" do
-        assert_equal("http://orig02.deviantart.net/a45d/f/2012/330/e/7/resolution_by_mochikko-d5m713n.jpg", @download.source)
-      end
-
-      should "work" do
-        assert_equal(255_683, ::File.size(@tempfile.path))
+        assert_equal(2948, ::File.size(@tempfile.path))
       end
     end
   end

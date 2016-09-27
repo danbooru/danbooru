@@ -43,14 +43,10 @@ class ActiveSupport::TestCase
   include UploadTestMethods
 
   def setup_vcr
-    @record = false
+    @vcr_record_option = :none
 
     if @record
-      # %x(find test/fixtures/vcr_cassettes -name '*pixiv*' -delete)
-      # %x(find test/fixtures/vcr_cassettes -name '*ugoira*' -delete)
-      # %x(find test/fixtures/vcr_cassettes -name '*seiga*' -delete)
-      # %x(find test/fixtures/vcr_cassettes -name '*twitter*' -delete)
-      # %x(find test/fixtures/vcr_cassettes -name '*artist*' -delete)
+      @vcr_record_option = :once
     end
 
     # instead of trying to persist these across tests just clear it out every time

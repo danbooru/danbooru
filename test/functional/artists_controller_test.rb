@@ -2,7 +2,7 @@ require 'test_helper'
 
 class ArtistsControllerTest < ActionController::TestCase
   def assert_artist_found(expected_artist, source_url)
-    VCR.use_cassette("functional/artists_controller/#{Digest::SHA1.hexdigest(source_url)}", :record => :none) do
+    VCR.use_cassette("artist-controller-test/#{Digest::SHA1.hexdigest(source_url)}", :record => @vcr_record_option) do
       get :finder, { :format => :json, :url => source_url }, { :user_id => @user.id }
     end
 
@@ -12,12 +12,18 @@ class ArtistsControllerTest < ActionController::TestCase
   end
 
   def assert_artist_not_found(source_url)
-    VCR.use_cassette("functional/artists_controller/#{Digest::SHA1.hexdigest(source_url)}", :record => :none) do
+    VCR.use_cassette("artist-controller-test/#{Digest::SHA1.hexdigest(source_url)}", :record => @vcr_record_option) do
       get :finder, { :format => :json, :url => source_url }, { :user_id => @user.id }
     end
 
     assert_response :success
     assert_equal(0, assigns(:artists).size, "Testing URL: #{source_url}")
+  end
+
+  def setup
+    super
+    @record = false
+    setup_vcr
   end
 
   context "An artists controller" do
@@ -81,7 +87,7 @@ class ArtistsControllerTest < ActionController::TestCase
 
       should "find artists by page URL" do
         url = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939"
-        VCR.use_cassette("functional/artists_controller/#{url}", :record => :once) do
+        VCR.use_cassette("artist-controller-test/#{Digest::SHA1.hexdigest(url)}", :record => @vcr_record_option) do
           get :index, { :name => url }
         end
 
@@ -162,7 +168,7 @@ class ArtistsControllerTest < ActionController::TestCase
       end
 
       should "not fail for Pixiv bad IDs" do
-        assert_artist_not_found("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=32049358")
+        assert_artist_not_found("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=0")
       end
     end
   end
