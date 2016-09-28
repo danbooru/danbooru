@@ -56,7 +56,12 @@
 
       <tr>
         <th>Post Changes</th>
-        <td><%= presenter.post_version_count(self) %></td>
+        <td>
+          <%= presenter.post_version_count(self) %>
+          <% if CurrentUser.is_janitor? %>
+            [<%= link_to "revert all", new_user_revert_path(user_id: user.id) %>]
+          <% end %>
+        </td>
       </tr>
 
       <tr>

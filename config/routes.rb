@@ -299,6 +299,7 @@ Rails.application.routes.draw do
       post :reject
     end
   end
+  resource :user_revert, :only => [:new, :create]
   resources :wiki_pages do
     member do
       put :revert
