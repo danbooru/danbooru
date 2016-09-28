@@ -3,6 +3,7 @@ require 'test_helper'
 class UploadsControllerTest < ActionController::TestCase
   def setup
     super
+    @record = false
     setup_vcr
   end
 
@@ -21,7 +22,7 @@ class UploadsControllerTest < ActionController::TestCase
     context "batch action" do
       context "for twitter galleries" do
         should "render" do
-          VCR.use_cassette("functional/upload/twitter", :record => :none) do
+          VCR.use_cassette("upload-controller-test/twitter-batch", :record => @vcr_record_option) do
             get :batch, {:url => "https://twitter.com/lvlln/status/567054278486151168"}, {:user_id => @user.id}
           end
           assert_response :success
@@ -37,7 +38,7 @@ class UploadsControllerTest < ActionController::TestCase
 
       context "for a twitter post" do
         setup do
-          VCR.use_cassette("upload-new-twitter", :record => :none) do
+          VCR.use_cassette("upload-controller-test/twitter", :record => @vcr_record_option) do
             get :new, {:url => "https://twitter.com/frappuccino/status/566030116182949888"}, {:user_id => @user.id}
           end
         end

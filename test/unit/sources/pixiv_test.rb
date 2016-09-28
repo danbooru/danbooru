@@ -4,8 +4,8 @@ require 'test_helper'
 
 module Sources
   class PixivTest < ActiveSupport::TestCase
-    def get_source(source, cassette, record = :once)
-      VCR.use_cassette(cassette, :record => record) do
+    def get_source(source, cassette, record = nil)
+      VCR.use_cassette(cassette, :record => (record || @vcr_record_option)) do
         @site = Sources::Site.new(source)
         @site.get
         @site
@@ -14,13 +14,28 @@ module Sources
 
     def setup
       super
+      @record = false
       setup_vcr
     end
 
     context "in all cases" do
+      context "A whitecube page" do
+        setup do
+          VCR.use_cassette("sources-pixiv-test/whitecube-ilust", :record => @vcr_record_option) do
+            @site = Sources::Site.new("https://www.pixiv.net/whitecube/user/277898/illust/59182257")
+            @site.get
+            @image_urls = @site.image_urls
+          end
+        end
+
+        should "get all the image urls" do
+          assert_equal(["http://i2.pixiv.net/img-original/img/2016/09/26/21/30/41/59182257_p0.jpg"], @image_urls)
+        end
+      end
+
       context "A gallery page" do
         setup do
-          VCR.use_cassette("pixiv-gallery", :record => :once) do
+          VCR.use_cassette("sources-pixiv-test/gallery", :record => @vcr_record_option) do
             @site = Sources::Site.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=49270482")
             @site.get
             @image_urls = @site.image_urls
@@ -28,13 +43,13 @@ module Sources
         end
 
         should "get all the image urls" do
-          assert_equal(["http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=49270482&page=0", "http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=49270482&page=1"], @image_urls)
+          assert_equal(["http://i3.pixiv.net/img-original/img/2015/03/14/17/53/32/49270482_p0.jpg", "http://i3.pixiv.net/img-original/img/2015/03/14/17/53/32/49270482_p1.jpg"], @image_urls)
         end
       end
 
       context "An ugoira source site for pixiv" do
         setup do
-          VCR.use_cassette("ugoira-converter", :record => :once) do
+          VCR.use_cassette("sources-pixiv-test/ugoira-converter", :record => @vcr_record_option) do
             @site = Sources::Site.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654")
             @site.get
           end
@@ -51,7 +66,7 @@ module Sources
 
       context "fetching source data for a new manga image" do
         setup do
-          get_source("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46324488", "source-pixiv-new-manga")
+          get_source("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46324488", "sources-pixiv-test/new-manga")
         end
 
         should "get the profile" do
@@ -92,7 +107,7 @@ module Sources
 
       context "fetching source data for an old manga image" do
         setup do
-          get_source("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=45792845", "source-pixiv-old-manga")
+          get_source("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=45792845", "sources-pixiv-test/old-manga")
         end
 
         should "get the page count" do
@@ -106,7 +121,7 @@ module Sources
 
       context "fetching source data for a new illustration" do
         setup do
-          get_source("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46337015", "source-pixiv-new-illust")
+          get_source("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46337015", "sources-pixiv-test/new-illust")
         end
 
         should "get the page count" do
@@ -120,7 +135,7 @@ module Sources
 
       context "fetching source data for an old illustration" do
         setup do
-          get_source("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=14901720", "source-pixiv-old-illust")
+          get_source("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=14901720", "sources-pixiv-test/old-illust")
         end
 
         should "get the page count" do

@@ -261,7 +261,7 @@ class Upload < ActiveRecord::Base
           # by the time this runs we'll have moved source_path to md5_file_path
           ugoira_service.generate_resizes(md5_file_path, resized_file_path_for(Danbooru.config.large_image_width), resized_file_path_for(Danbooru.config.small_image_width))
         else
-          ugoira_service.generate_resizes(source_path, resized_file_path_for(Danbooru.config.large_image_width), resized_file_path_for(Danbooru.config.small_image_width))
+          ugoira_service.generate_resizes(source_path, resized_file_path_for(Danbooru.config.large_image_width), resized_file_path_for(Danbooru.config.small_image_width), false)
         end
       elsif is_video?
         generate_video_preview_for(width, height, output_path)

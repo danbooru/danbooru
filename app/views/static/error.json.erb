@@ -1,5 +1,5 @@
 <% if @error_message %>
-{"success": false, "message": <%= raw @error_message.to_json %>}
+{"success": false, "message": <%= raw @error_message.encode("utf-8", {:invalid => :replace, :undef => :replace, :replace => "?"}).to_json %>}
 <% else %>
-{"success": false, "message": <%= raw @exception.to_s.to_json %>}
+{"success": false, "message": <%= raw @exception.to_s.encode("utf-8", {:invalid => :replace, :undef => :replace, :replace => "?"}).to_json %>}
 <% end %>

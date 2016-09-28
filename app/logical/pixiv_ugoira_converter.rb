@@ -31,7 +31,7 @@ class PixivUgoiraConverter
         f.write("# timecode format v2\n")
         frame_data.each do |img|
           f.write("#{delay_sum}\n")
-          delay_sum += img["delay"]
+          delay_sum += (img["delay"] || img["delay_msec"])
         end
         f.write("#{delay_sum}\n")
         f.write("#{delay_sum}\n")

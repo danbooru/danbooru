@@ -3,13 +3,14 @@ require 'test_helper'
 class SavedSearchTest < ActiveSupport::TestCase
   context "Fetching the post ids for a search" do
     setup do
+      Danbooru.config.stubs(:listbooru_enabled?).returns(true)
       Danbooru.config.stubs(:listbooru_auth_key).returns("blahblahblah")
       Danbooru.config.stubs(:listbooru_server).returns("http://localhost:3001")
     end
 
     context "with a name" do
       should "return a list of ids" do
-        VCR.use_cassette("unit/saved_searches/get-named", :record => :once) do
+        VCR.use_cassette("saved_search-test/get-named", :record => :none) do
           post_ids = SavedSearch.post_ids(1, "blah")
           assert_equal([1,2,3,4], post_ids)
         end
@@ -18,7 +19,7 @@ class SavedSearchTest < ActiveSupport::TestCase
 
     context "without a name" do
       should "return a list of ids" do
-        VCR.use_cassette("unit/saved_searches/get-unnamed", :record => :once) do
+        VCR.use_cassette("saved_search-test/get-unnamed", :record => :none) do
           post_ids = SavedSearch.post_ids(1)
           assert_equal([1,2,3,4], post_ids)
         end

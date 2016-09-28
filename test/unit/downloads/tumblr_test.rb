@@ -2,12 +2,18 @@ require 'test_helper'
 
 module Downloads
   class TumblrTest < ActiveSupport::TestCase
+    def setup
+      super
+      @record = true
+      setup_vcr
+    end
+
     context "a download for a tumblr 500 sample" do
       setup do
         @source = "http://24.media.tumblr.com/fc328250915434e66e8e6a92773f79d0/tumblr_mf4nshfibc1s0oswoo1_500.jpg"
         @tempfile = Tempfile.new("danbooru-test")
         @download = Downloads::File.new(@source, @tempfile.path)
-        VCR.use_cassette("download-tumblr-sample", :record => :new_episodes) do
+        VCR.use_cassette("downloads-tumblr-test/sample", :record => @vcr_record_option) do
           @download.download!
         end
       end
@@ -26,7 +32,7 @@ module Downloads
         @source = "http://25.media.tumblr.com/tumblr_lxbzel2H5y1r9yjhso1_500.jpg"
         @tempfile = Tempfile.new("danbooru-test")
         @download = Downloads::File.new(@source, @tempfile.path)
-        VCR.use_cassette("download-tumblr-sample", :record => :new_episodes) do
+        VCR.use_cassette("downloads-tumblr-test/sample", :record => @vcr_record_option) do
           @download.download!
         end
       end

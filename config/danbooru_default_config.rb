@@ -267,6 +267,14 @@ module Danbooru
       nil
     end
 
+    def pixiv_whitecube_login
+      nil
+    end
+
+    def pixiv_whitecube_password
+      nil
+    end
+
     def tinami_login
       nil
     end
