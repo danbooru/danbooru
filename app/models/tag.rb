@@ -604,12 +604,12 @@ class Tag < ActiveRecord::Base
             q[:pixiv_id] = parse_helper($2)
 
           when "upvote"
-            if CurrentUser.user.is_janitor?
+            if CurrentUser.user.is_moderator?
               q[:upvote] = User.name_to_id($2)
             end
 
           when "downvote"
-            if CurrentUser.user.is_janitor?
+            if CurrentUser.user.is_moderator?
               q[:downvote] = User.name_to_id($2)
             end
 
