@@ -1,7 +1,7 @@
 class ReportsController < ApplicationController
   before_filter :member_only
   before_filter :gold_only, :only => [:similar_users]
-  before_filter :janitor_only, :only => [:post_versions, :post_versions_create]
+  before_filter :moderator_only, :only => [:post_versions, :post_versions_create]
 
   def user_promotions
     @report = Reports::UserPromotions.new
