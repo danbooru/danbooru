@@ -32,7 +32,6 @@ module PostsHelper
     return nil unless Danbooru.config.enable_post_search_counts
     return nil unless user.is_platinum?
     return nil unless user.enable_recent_searches?
-    return unless params[:ms] == "1"
 
     key = "uid"
     value = user.id
