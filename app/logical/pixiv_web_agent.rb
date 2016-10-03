@@ -13,16 +13,18 @@ class PixivWebAgent
     phpsessid = Cache.get(SESSION_CACHE_KEY)
     comicsessid = Cache.get(COMIC_SESSION_CACHE_KEY)
 
-    if phpsessid && comicsessid
+    if phpsessid
       cookie = Mechanize::Cookie.new(SESSION_COOKIE_KEY, phpsessid)
       cookie.domain = ".pixiv.net"
       cookie.path = "/"
       mech.cookie_jar.add(cookie)
 
-      cookie = Mechanize::Cookie.new(COMIC_SESSION_COOKIE_KEY, comicsessid)
-      cookie.domain = ".pixiv.net"
-      cookie.path = "/"
-      mech.cookie_jar.add(cookie)
+      if comicsessid
+        cookie = Mechanize::Cookie.new(COMIC_SESSION_COOKIE_KEY, comicsessid)
+        cookie.domain = ".pixiv.net"
+        cookie.path = "/"
+        mech.cookie_jar.add(cookie)
+      end
     else
       headers = {
         "Origin" => "https://accounts.pixiv.net",
@@ -53,11 +55,15 @@ class PixivWebAgent
         end
       end
 
-      mech.get("https://comic.pixiv.net") do |page|
-        cookie = mech.cookies.select {|x| x.name == COMIC_SESSION_COOKIE_KEY}.first
-        if cookie
-          Cache.put(COMIC_SESSION_CACHE_KEY, cookie.value, 1.month)
+      begin
+        mech.get("https://comic.pixiv.net") do |page|
+          cookie = mech.cookies.select {|x| x.name == COMIC_SESSION_COOKIE_KEY}.first
+          if cookie
+            Cache.put(COMIC_SESSION_CACHE_KEY, cookie.value, 1.month)
+          end
         end
+      rescue Net::HTTPServiceUnavailable
+        # ignore
       end
     end
 
