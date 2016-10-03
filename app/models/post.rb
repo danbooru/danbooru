@@ -1644,23 +1644,7 @@ class Post < ActiveRecord::Base
   
   module PixivMethods
     def parse_pixiv_id
-      if source =~ %r!http://i\d\.pixiv\.net/img-inf/img/\d+/\d+/\d+/\d+/\d+/\d+/(\d+)_s.jpg!
-        self.pixiv_id = $1
-      elsif source =~ %r!http://img\d+\.pixiv\.net/img/[^\/]+/(\d+)!
-        self.pixiv_id = $1
-      elsif source =~ %r!http://i\d\.pixiv\.net/img\d+/img/[^\/]+/(\d+)!
-        self.pixiv_id = $1
-      elsif source =~ %r!http://i\d\.pixiv\.net/img-original/img/(?:\d+\/)+(\d+)_p!
-        self.pixiv_id = $1
-      elsif source =~ %r!http://i\d\.pixiv\.net/c/\d+x\d+/img-master/img/(?:\d+\/)+(\d+)_p!
-        self.pixiv_id = $1
-      elsif source =~ /pixiv\.net/ && source =~ /illust_id=(\d+)/
-        self.pixiv_id = $1
-      elsif source =~ %r!http://i\d\.pixiv\.net/img-zip-ugoira/img/(?:\d+\/)+(\d+)_ugoira!
-        self.pixiv_id = $1
-      else
-        self.pixiv_id = nil
-      end
+      self.pixiv_id = Sources::Strategies::Pixiv.illust_id_from_url(source)
     end
   end
 

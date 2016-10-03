@@ -912,7 +912,97 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
-      context "normalizing its source" do
+      context "with a source" do
+        context "that is not from pixiv" do
+          should "clear the pixiv id" do
+            @post.pixiv_id = 1234
+            @post.update(source: "http://fc06.deviantart.net/fs71/f/2013/295/d/7/you_are_already_dead__by_mar11co-d6rgm0e.jpg")
+            assert_equal(nil, @post.pixiv_id)
+
+            @post.pixiv_id = 1234
+            @post.update(source: "http://pictures.hentai-foundry.com//a/AnimeFlux/219123.jpg")
+            assert_equal(nil, @post.pixiv_id)
+          end
+        end
+
+        context "that is from pixiv" do
+          should "save the pixiv id" do
+            @post.update(source: "https://img18.pixiv.net/img/evazion/14901720.png")
+            assert_equal(14901720, @post.pixiv_id)
+            @post.pixiv_id = nil
+
+            @post.update(source: "http://img18.pixiv.net/img/evazion/14901720.png")
+            assert_equal(14901720, @post.pixiv_id)
+            @post.pixiv_id = nil
+
+            @post.update(source: "http://i2.pixiv.net/img18/img/evazion/14901720.png")
+            assert_equal(14901720, @post.pixiv_id)
+            @post.pixiv_id = nil
+
+            @post.update(source: "http://i2.pixiv.net/img18/img/evazion/14901720_m.png")
+            assert_equal(14901720, @post.pixiv_id)
+            @post.pixiv_id = nil
+
+            @post.update(source: "http://i2.pixiv.net/img18/img/evazion/14901720_s.png")
+            assert_equal(14901720, @post.pixiv_id)
+            @post.pixiv_id = nil
+
+            @post.update(source: "http://i1.pixiv.net/img07/img/pasirism/18557054_p1.png")
+            assert_equal(18557054, @post.pixiv_id)
+            @post.pixiv_id = nil
+
+            @post.update(source: "http://i1.pixiv.net/img07/img/pasirism/18557054_big_p1.png")
+            assert_equal(18557054, @post.pixiv_id)
+            @post.pixiv_id = nil
+
+            @post.update(source: "http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_64x64.jpg")
+            assert_equal(18557054, @post.pixiv_id)
+            @post.pixiv_id = nil
+
+            @post.update(source: "http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_s.png")
+            assert_equal(18557054, @post.pixiv_id)
+            @post.pixiv_id = nil
+
+            @post.update(source: "http://i1.pixiv.net/c/600x600/img-master/img/2014/10/02/13/51/23/46304396_p0_master1200.jpg")
+            assert_equal(46304396, @post.pixiv_id)
+            @post.pixiv_id = nil
+
+            @post.update(source: "http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p0.png")
+            assert_equal(46304396, @post.pixiv_id)
+            @post.pixiv_id = nil
+
+            @post.update(source: "http://i1.pixiv.net/img-zip-ugoira/img/2014/10/03/17/29/16/46323924_ugoira1920x1080.zip")
+            assert_equal(46323924, @post.pixiv_id)
+            @post.pixiv_id = nil
+
+
+
+            @post.update(source: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054")
+            assert_equal(18557054, @post.pixiv_id)
+            @post.pixiv_id = nil
+
+            @post.update(source: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054")
+            assert_equal(18557054, @post.pixiv_id)
+            @post.pixiv_id = nil
+
+            @post.update(source: "http://www.pixiv.net/member_illust.php?mode=big&illust_id=18557054")
+            assert_equal(18557054, @post.pixiv_id)
+            @post.pixiv_id = nil
+
+            @post.update(source: "http://www.pixiv.net/member_illust.php?mode=manga&illust_id=18557054")
+            assert_equal(18557054, @post.pixiv_id)
+            @post.pixiv_id = nil
+
+            @post.update(source: "http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=18557054")
+            assert_equal(18557054, @post.pixiv_id)
+            @post.pixiv_id = nil
+
+            @post.update(source: "http://www.pixiv.net/i/18557054")
+            assert_equal(18557054, @post.pixiv_id)
+            @post.pixiv_id = nil
+          end
+        end
+
         should "normalize pixiv links" do
           @post.source = "http://i2.pixiv.net/img12/img/zenze/39749565.png"
           assert_equal("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=39749565", @post.normalized_source)
