@@ -1,0 +1,5 @@
+<% if @error %>
+  {"success": false, "reason": <%= @error.to_s.to_json.html_safe %>}
+<% else %>
+  {"success": true}
+<% end %>

@@ -8,6 +8,13 @@ class PostVotesController < ApplicationController
     @error = x
   end
 
+  def destroy
+    @post = Post.find(params[:post_id])
+    @post.unvote!
+  rescue PostVote::Error => x
+    @error = x
+  end
+
 protected
 
   def voter_only

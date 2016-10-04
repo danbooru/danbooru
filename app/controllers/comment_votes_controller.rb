@@ -7,4 +7,11 @@ class CommentVotesController < ApplicationController
     @comment_vote = @comment.vote!(params[:score])
     respond_with(@comment_vote)
   end
+
+  def destroy
+    @comment = Comment.find(params[:comment_id])
+    @comment.unvote!(params[:score])
+  rescue CommentVote::Error => x
+    @error = x
+  end
 end
