@@ -12,7 +12,7 @@ class ArtistTest < ActiveSupport::TestCase
 
   def assert_artist_not_found(source_url)
     VCR.use_cassette("artist-test/#{Digest::SHA1.hexdigest(source_url)}", :record => @vcr_record_option) do
-      artists = Artist.find_all_by_url(source_url)
+      artists = Artist.url_matches(source_url).to_a
       assert_equal(0, artists.size, "Testing URL: #{source_url}")
     end
   end
@@ -241,6 +241,39 @@ class ArtistTest < ActiveSupport::TestCase
 
       should "find nothing for bad IDs" do
         assert_artist_not_found("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=32049358")
+      end
+    end
+
+    context "when finding twitter artists" do
+      setup do
+        FactoryGirl.create(:artist, :name => "hammer_(sunset_beach)", :url_string => "http://twitter.com/hamaororon")
+        FactoryGirl.create(:artist, :name => "haruyama_kazunori",  :url_string => "https://twitter.com/kazuharoom")
+      end
+
+      should "find the correct artist for twitter.com sources" do
+        assert_artist_found("hammer_(sunset_beach)", "http://twitter.com/hamaororon/status/684338785744637952")
+        assert_artist_found("hammer_(sunset_beach)", "https://twitter.com/hamaororon/status/684338785744637952")
+
+        assert_artist_found("haruyama_kazunori", "http://twitter.com/kazuharoom/status/733355069966426113")
+        assert_artist_found("haruyama_kazunori", "https://twitter.com/kazuharoom/status/733355069966426113")
+      end
+
+      should "find the correct artist for mobile.twitter.com sources" do
+        assert_artist_found("hammer_(sunset_beach)", "http://mobile.twitter.com/hamaororon/status/684338785744637952")
+        assert_artist_found("hammer_(sunset_beach)", "https://mobile.twitter.com/hamaororon/status/684338785744637952")
+
+        assert_artist_found("haruyama_kazunori", "http://mobile.twitter.com/kazuharoom/status/733355069966426113")
+        assert_artist_found("haruyama_kazunori", "https://mobile.twitter.com/kazuharoom/status/733355069966426113")
+      end
+
+      should "return nothing for unknown twitter.com sources" do
+        assert_artist_not_found("http://twitter.com/bkub_comic/status/782880825700343808")
+        assert_artist_not_found("https://twitter.com/bkub_comic/status/782880825700343808")
+      end
+
+      should "return nothing for unknown mobile.twitter.com sources" do
+        assert_artist_not_found("http://mobile.twitter.com/bkub_comic/status/782880825700343808")
+        assert_artist_not_found("https://mobile.twitter.com/bkub_comic/status/782880825700343808")
       end
     end
 
