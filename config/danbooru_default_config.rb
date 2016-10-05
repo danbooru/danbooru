@@ -62,6 +62,7 @@ module Danbooru
       # user.default_image_size = "large"
       # user.per_page = 20
       # user.disable_tagged_filenames = false
+      true
     end
 
     # What method to use to store images.
