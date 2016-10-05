@@ -307,6 +307,9 @@ class User < ActiveRecord::Base
 
       if User.count == 0
         self.level = Levels::ADMIN
+        self.can_approve_posts = true
+        self.can_upload_free = true
+        self.is_super_voter = true
       else
         self.level = Levels::MEMBER
       end
