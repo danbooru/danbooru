@@ -37,6 +37,7 @@ class Artist < ActiveRecord::Base
           break if url =~ /lohas\.nicoseiga\.jp\/priv\/$/i
           break if url =~ /(?:data|media)\.tumblr\.com\/[a-z0-9]+\/$/i
           break if url =~ /deviantart\.net\//i
+          break if url =~ %r!\Ahttps?://(?:mobile\.)?twitter\.com/\Z!i
         end
 
         artists.inject({}) {|h, x| h[x.name] = x; h}.values.slice(0, 20)
