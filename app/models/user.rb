@@ -64,6 +64,7 @@ class User < ActiveRecord::Base
   after_save :update_cache
   after_update :update_remote_cache
   before_create :promote_to_admin_if_first_user
+  before_create :customize_new_user
   #after_create :notify_sock_puppets
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
   has_many :posts, :foreign_key => "uploader_id"
@@ -309,6 +310,10 @@ class User < ActiveRecord::Base
       else
         self.level = Levels::MEMBER
       end
+    end
+
+    def customize_new_user
+      Danbooru.config.customize_new_user(self)
     end
 
     def role

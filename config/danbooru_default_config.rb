@@ -49,14 +49,19 @@ module Danbooru
       "choujin-steiner"
     end
 
-    # Set to true to give all new users gold access.
-    def start_as_gold?
-      false
-    end
-
-    # Set to true to give all new users contributor access.
-    def start_as_contributor?
-      false
+    # Set the default level, permissions, and other settings for new users here.
+    def customize_new_user(user)
+      # user.level = User::Levels::MEMBER
+      # user.can_approve_posts = false
+      # user.can_upload_free = false
+      # user.is_super_voter = false
+      #
+      # user.base_upload_limit = 10
+      # user.comment_threshold = -1
+      # user.blacklisted_tags = ["spoilers", "guro", "scat", "furry -rating:s"].join("\n")
+      # user.default_image_size = "large"
+      # user.per_page = 20
+      # user.disable_tagged_filenames = false
     end
 
     # What method to use to store images.
