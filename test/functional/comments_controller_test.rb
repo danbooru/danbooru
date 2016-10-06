@@ -65,6 +65,11 @@ class CommentsControllerTest < ActionController::TestCase
         comment = Comment.last
         assert_redirected_to post_path(comment.post)
       end
+
+      should "not allow commenting on nonexistent posts" do
+        post :create, {:comment => FactoryGirl.attributes_for(:comment, :post_id => -1)}, {:user_id => @user.id}
+        assert_response :error
+      end
     end
   end
 end
