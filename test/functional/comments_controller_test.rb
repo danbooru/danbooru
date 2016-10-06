@@ -33,6 +33,28 @@ class CommentsControllerTest < ActionController::TestCase
         post :update, {:id => @comment.id, :comment => {:body => "abc"}}, {:user_id => @comment.creator_id}
         assert_redirected_to post_path(@comment.post)
       end
+
+      should "only allow changing the body" do
+        params = {
+          id: @comment.id,
+          comment: {
+            body: "herp derp",
+            do_not_bump_post: true,
+            is_deleted: true,
+            post_id: FactoryGirl.create(:post).id,
+          }
+        }
+
+        post :update, params, { :user_id => @comment.creator_id }
+        @comment.reload
+
+        assert_equal("herp derp", @comment.body)
+        assert_equal(false, @comment.do_not_bump_post)
+        assert_equal(false, @comment.is_deleted)
+        assert_equal(@post.id, @comment.post_id)
+
+        assert_redirected_to post_path(@post)
+      end
     end
 
     context "create action"do
@@ -42,6 +64,11 @@ class CommentsControllerTest < ActionController::TestCase
         end
         comment = Comment.last
         assert_redirected_to post_path(comment.post)
+      end
+
+      should "not allow commenting on nonexistent posts" do
+        post :create, {:comment => FactoryGirl.attributes_for(:comment, :post_id => -1)}, {:user_id => @user.id}
+        assert_response :error
       end
     end
   end

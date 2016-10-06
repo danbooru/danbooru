@@ -101,6 +101,13 @@ class CommentTest < ActiveSupport::TestCase
         assert(comment.errors.empty?, comment.errors.full_messages.join(", "))
       end
 
+      should "not validate if the post does not exist" do
+        comment = FactoryGirl.build(:comment, :post_id => -1)
+
+        assert_not(comment.valid?)
+        assert_equal(["must exist"], comment.errors[:post])
+      end
+
       should "not bump the parent post" do
         post = FactoryGirl.create(:post)
         comment = FactoryGirl.create(:comment, :do_not_bump_post => true, :post => post)

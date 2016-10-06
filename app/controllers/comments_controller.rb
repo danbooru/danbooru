@@ -23,7 +23,7 @@ class CommentsController < ApplicationController
   def update
     @comment = Comment.find(params[:id])
     check_privilege(@comment)
-    @comment.update_attributes(params[:comment])
+    @comment.update_attributes(params[:comment].permit(:body))
     respond_with(@comment, :location => post_path(@comment.post_id))
   end
 

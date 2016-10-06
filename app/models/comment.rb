@@ -1,6 +1,7 @@
 class Comment < ActiveRecord::Base
   include Mentionable
 
+  validate :validate_post_exists, :on => :create
   validate :validate_creator_is_not_limited, :on => :create
   validates_format_of :body, :with => /\S/, :message => 'has no content'
   belongs_to :post
@@ -146,6 +147,10 @@ class Comment < ActiveRecord::Base
 
   def updater_name
     User.id_to_name(updater_id)
+  end
+
+  def validate_post_exists
+    errors.add(:post, "must exist") unless Post.exists?(post_id)
   end
 
   def validate_creator_is_not_limited
