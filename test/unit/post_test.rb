@@ -1723,5 +1723,9 @@ class PostTest < ActiveSupport::TestCase
       end
     end
   end
+
+  context "Mass assignment: " do
+    should_not allow_mass_assignment_of(:last_noted_at).as(:member)
+  end
 end
 
