@@ -53,8 +53,8 @@ sudo -u danbooru bash -l -c "rbenv global $RUBY_VERSION"
 # Generate secret token and secret key
 echo "* Generating secret keys..."
 sudo -u danbooru mkdir ~danbooru/.danbooru/
-sudo -u danbooru openssl rand -hex 32 > ~danbooru/.danbooru/secret_token
-sudo -u danbooru openssl rand -hex 32 > ~danbooru/.danbooru/session_secret_key
+sudo -u danbooru sh -c 'openssl rand -hex 32 > ~danbooru/.danbooru/secret_token'
+sudo -u danbooru sh -c 'openssl rand -hex 32 > ~danbooru/.danbooru/session_secret_key'
 chmod 600 ~danbooru/.danbooru/*
 
 # Install gems
