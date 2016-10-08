@@ -1033,11 +1033,7 @@ class Post < ActiveRecord::Base
         vote = PostVote.where("post_id = ? and user_id = ?", id, CurrentUser.user.id).first
         vote.destroy
 
-        if vote.score > 0
-          self.score -= vote.score
-        else
-          self.score += vote.score
-        end
+        self.reload
       end
     end
   end
