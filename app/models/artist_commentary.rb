@@ -1,4 +1,6 @@
 class ArtistCommentary < ActiveRecord::Base
+  class RevertError < Exception ; end
+
   attr_accessor :remove_commentary_tag, :remove_commentary_request_tag, :remove_commentary_check_tag
   attr_accessor :add_commentary_tag, :add_commentary_request_tag, :add_commentary_check_tag
   attr_accessible :post_id, :original_description, :original_title, :translated_description, :translated_title, :remove_commentary_tag, :remove_commentary_request_tag, :add_commentary_tag, :add_commentary_request_tag, :add_commentary_check_tag, :remove_commentary_check_tag
@@ -76,6 +78,10 @@ class ArtistCommentary < ActiveRecord::Base
   end
 
   def revert_to(version)
+    if post_id != version.post_id
+      raise RevertError.new("You cannot revert to a previous artist commentary of another post.")
+    end
+
     self.original_description = version.original_description
     self.original_title = version.original_title
     self.translated_description = version.translated_description

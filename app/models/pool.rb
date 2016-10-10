@@ -1,6 +1,8 @@
 require 'ostruct'
 
 class Pool < ActiveRecord::Base
+  class RevertError < Exception ; end
+
   validates_uniqueness_of :name, :case_sensitive => false
   validates_format_of :name, :with => /\A[^,]+\Z/, :message => "cannot have commas"
   validates_inclusion_of :category, :in => %w(series collection)
@@ -194,6 +196,10 @@ class Pool < ActiveRecord::Base
   end
 
   def revert_to!(version)
+    if id != version.pool_id
+      raise RevertError.new("You cannot revert to a previous version of another pool.")
+    end
+
     self.post_ids = version.post_ids
     self.name = version.name
     synchronize!

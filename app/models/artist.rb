@@ -1,4 +1,6 @@
 class Artist < ActiveRecord::Base
+  class RevertError < Exception ; end
+
   before_create :initialize_creator
   before_validation :normalize_name
   after_save :create_version
@@ -173,6 +175,10 @@ class Artist < ActiveRecord::Base
     end
 
     def revert_to!(version)
+      if id != version.artist_id
+        raise RevertError.new("You cannot revert to a previous version of another artist.")
+      end
+
       self.name = version.name
       self.url_string = version.url_string
       self.is_active = version.is_active
