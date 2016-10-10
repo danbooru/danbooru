@@ -1582,12 +1582,27 @@ class PostTest < ActiveSupport::TestCase
     should "allow undoing of votes" do
       user = FactoryGirl.create(:user)
       post = FactoryGirl.create(:post)
+
+      # We deliberately don't call post.reload until the end to verify that
+      # post.unvote! returns the correct score even when not forcibly reloaded.
       CurrentUser.scoped(user, "127.0.0.1") do
         post.vote!("up")
+        assert_equal(1, post.score)
+
         post.unvote!
-        post.reload
         assert_equal(0, post.score)
+
         assert_nothing_raised {post.vote!("down")}
+        assert_equal(-1, post.score)
+
+        post.unvote!
+        assert_equal(0, post.score)
+
+        assert_nothing_raised {post.vote!("up")}
+        assert_equal(1, post.score)
+
+        post.reload
+        assert_equal(1, post.score)
       end
     end
   end
