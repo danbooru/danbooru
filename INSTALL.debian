@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Run: curl -s https://raw.githubusercontent.com/r888888888/danbooru/master/INSTALL.debian > install.sh ; chmod +x install.sh ; ./install.sh
+# Run: curl -L -s https://raw.githubusercontent.com/r888888888/danbooru/master/INSTALL.debian -o install.sh ; chmod +x install.sh ; ./install.sh
 
 if [[ "$(whoami)" != "root" ]] ; then
   echo "You must run this script as root"
@@ -26,7 +26,7 @@ export GITHUB_INSTALL_SCRIPTS=https://raw.githubusercontent.com/r888888888/danbo
 # Install packages
 echo "* Installing packages..."
 apt-get update
-apt-get -y install build-essential automake libssl-dev libxml2-dev libxslt-dev ncurses-dev sudo libreadline-dev flex bison ragel memcached libmemcached-dev git curl libcurl4-openssl-dev imagemagick libmagickcore-dev libmagickwand-dev sendmail-bin sendmail postgresql postgresql-contrib libpq-dev nginx ssh
+apt-get -y install build-essential automake libssl-dev libxml2-dev libxslt-dev ncurses-dev sudo libreadline-dev flex bison ragel memcached libmemcached-dev git curl libcurl4-openssl-dev imagemagick libmagickcore-dev libmagickwand-dev sendmail-bin sendmail postgresql libpq-dev postgresql-server-dev-all nginx ssh
 
 if [ $? -ne 0 ]; then
   echo "* Error installing packages; aborting"
@@ -37,6 +37,12 @@ fi
 useradd -m danbooru
 chsh -s /bin/bash danbooru
 usermod -G danbooru,sudo danbooru
+
+# Set up Postgres
+export PG_VERSION=`pg_config --version | egrep -o '[0-9]{1,}\.[0-9]{1,}'`
+git clone https://github.com/r888888888/test_parser.git /tmp/test_parser
+cd /tmp/test_parser
+make install
 
 # Install rbenv
 echo "* Installing rbenv..."
@@ -64,14 +70,14 @@ sudo -u danbooru bash -l -c 'gem install --no-ri --no-rdoc bundler'
 echo "* Install configuration scripts..."
 
 # Update PostgreSQL
-curl -L -s $GITHUB_INSTALL_SCRIPTS/postgresql_hba_conf -o /etc/postgresql/9.1/main/pg_hba.conf
+curl -L -s $GITHUB_INSTALL_SCRIPTS/postgresql_hba_conf -o /etc/postgresql/$PG_VERSION/main/pg_hba.conf
 /etc/init.d/postgresql restart
 sudo -u postgres createuser -s danbooru
 sudo -u danbooru createdb danbooru2
 
 # Setup nginx
-curl -L -s $GITHUB_INSTALL_SCRIPTS/nginx.danbooru.conf -o /etc/nginx/conf.d/danbooru.conf
-sed -i -e "s/__hostname__/$HOSTNAME/g" /etc/nginx/conf.d/danbooru.conf
+curl -L -s $GITHUB_INSTALL_SCRIPTS/nginx.danbooru.conf -o /etc/nginx/sites-enabled/danbooru.conf
+sed -i -e "s/__hostname__/$HOSTNAME/g" /etc/nginx/sites-enabled/danbooru.conf
 /etc/init.d/nginx restart
 
 # Setup logrotate
@@ -89,8 +95,8 @@ mkdir -p /var/www/danbooru2/shared/data
 mkdir -p /var/www/danbooru2/shared/data/preview
 mkdir -p /var/www/danbooru2/shared/data/sample
 chown -R danbooru:danbooru /var/www/danbooru2
-sudo -u danbooru bash -l -c 'cp ~/danbooru/script/install/database.yml.templ /var/www/danbooru2/shared/config/database.yml'
-sudo -u danbooru bash -l -c 'cp ~/danbooru/script/install/danbooru_local_config.rb.templ /var/www/danbooru2/shared/config/danbooru_local_config.rb'
+curl -L -s $GITHUB_INSTALL_SCRIPTS/database.yml.templ -o /var/www/danbooru2/shared/config/database.yml
+curl -L -s $GITHUB_INSTALL_SCRIPTS/danbooru_local_config.rb.templ -o /var/www/danbooru2/shared/config/danbooru_local_config.rb
 
 echo "* Almost done! You are now ready to deploy Danbooru onto this server."
 echo "* Log into Github and fork https://github.com/r888888888/danbooru into"
