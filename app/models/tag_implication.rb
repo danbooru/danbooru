@@ -9,7 +9,11 @@ class TagImplication < ActiveRecord::Base
   belongs_to :forum_topic
   before_validation :initialize_creator, :on => :create
   before_validation :normalize_names
+  validates_format_of :status, :with => /\A(active|deleted|pending|processing|queued|error: .*)\Z/
   validates_presence_of :creator_id, :antecedent_name, :consequent_name
+  validates :creator, presence: { message: "must exist" }, if: lambda { creator_id.present? }
+  validates :approver, presence: { message: "must exist" }, if: lambda { approver_id.present? }
+  validates :forum_topic, presence: { message: "must exist" }, if: lambda { forum_topic_id.present? }
   validates_uniqueness_of :antecedent_name, :scope => :consequent_name
   validate :absence_of_circular_relation
   validate :antecedent_is_not_aliased
