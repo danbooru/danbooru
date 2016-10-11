@@ -136,11 +136,23 @@ class ArtistsControllerTest < ActionController::TestCase
       end
     end
 
-    should "revert an artist" do
-      @artist.update_attributes(:name => "xyz")
-      @artist.update_attributes(:name => "abc")
-      version = @artist.versions.first
-      post :revert, {:id => @artist.id, :version_id => version.id}
+    context "reverting an artist" do
+      should "work" do
+        @artist.update_attributes(:name => "xyz")
+        @artist.update_attributes(:name => "abc")
+        version = @artist.versions.first
+        post :revert, {:id => @artist.id, :version_id => version.id}
+      end
+
+      should "not allow reverting to a previous version of another artist" do
+        @artist2 = FactoryGirl.create(:artist)
+
+        post :revert, { :id => @artist.id, :version_id => @artist2.versions(true).first.id }, {:user_id => @user.id}
+        @artist.reload
+
+        assert_not_equal(@artist.name, @artist2.name)
+        assert_response :missing
+      end
     end
 
     context "when finding an artist" do

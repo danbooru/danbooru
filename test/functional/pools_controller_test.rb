@@ -107,6 +107,16 @@ class PoolsControllerTest < ActionController::TestCase
         @pool.reload
         assert_equal([@post.id], @pool.post_id_array)
       end
+
+      should "not allow reverting to a previous version of another pool" do
+        @pool2 = FactoryGirl.create(:pool)
+
+        post :revert, { :id => @pool.id, :version_id => @pool2.versions(true).first.id }, {:user_id => @user.id}
+        @pool.reload
+
+        assert_not_equal(@pool.name, @pool2.name)
+        assert_response :missing
+      end
     end
   end
 end
