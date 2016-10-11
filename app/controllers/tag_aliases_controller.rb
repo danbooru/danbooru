@@ -15,7 +15,7 @@ class TagAliasesController < ApplicationController
     @tag_alias = TagAlias.find(params[:id])
 
     if @tag_alias.is_pending? && @tag_alias.editable_by?(CurrentUser.user)
-      @tag_alias.update_attributes(params[:tag_alias])
+      @tag_alias.update_attributes(update_params)
     end
 
     respond_with(@tag_alias)
@@ -45,5 +45,11 @@ class TagAliasesController < ApplicationController
     @tag_alias = TagAlias.find(params[:id])
     @tag_alias.approve!(CurrentUser.user.id)
     respond_with(@tag_alias, :location => tag_alias_path(@tag_alias))
+  end
+
+private
+
+  def update_params
+    params.require(:tag_alias).permit(:antecedent_name, :consequent_name, :forum_topic_id)
   end
 end

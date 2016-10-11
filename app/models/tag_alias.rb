@@ -19,7 +19,8 @@ class TagAlias < ActiveRecord::Base
   belongs_to :creator, :class_name => "User"
   belongs_to :approver, :class_name => "User"
   belongs_to :forum_topic
-  attr_accessible :antecedent_name, :consequent_name, :forum_topic_id, :status, :skip_secondary_validations
+  attr_accessible :antecedent_name, :consequent_name, :forum_topic_id, :skip_secondary_validations
+  attr_accessible :status, :as => [:admin]
 
   module SearchMethods
     def name_matches(name)

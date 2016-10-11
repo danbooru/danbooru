@@ -20,7 +20,8 @@ class TagImplication < ActiveRecord::Base
   validate :consequent_is_not_aliased
   validate :antecedent_and_consequent_are_different
   validate :wiki_pages_present, :on => :create
-  attr_accessible :antecedent_name, :consequent_name, :descendant_names, :forum_topic_id, :status, :forum_topic, :skip_secondary_validations
+  attr_accessible :antecedent_name, :consequent_name, :forum_topic_id, :skip_secondary_validations
+  attr_accessible :status, :as => [:admin]
 
   module DescendantMethods
     extend ActiveSupport::Concern
