@@ -9,7 +9,11 @@ class SuperVoterTest < ActiveSupport::TestCase
   context "#init" do
     setup do
       @admin = FactoryGirl.create(:admin_user)
-      Reports::UserSimilarity.any_instance.stubs(:fetch_similar_user_ids).returns("#{@user.id} 1")
+      @user_mock = mock("user")
+      @user_mock.expects(:user_id).twice.returns(@user.id)
+      @admin_mock = mock("admin")
+      @admin_mock.expects(:user_id).twice.returns(@admin.id)
+      PostVoteSimilarity.any_instance.stubs(:calculate_positive).returns([@admin_mock, @user_mock])
     end
 
     should "create super voter objects" do
