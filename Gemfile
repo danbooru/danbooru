@@ -69,7 +69,7 @@ end
 group :production do
   gem 'newrelic_rpm'
   # gem 'unicorn-worker-killer'
-  gem 'gctools', :platforms => :ruby
+  # gem 'gctools', :platforms => :ruby
 end
 
 group :development do

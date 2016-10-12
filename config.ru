@@ -2,9 +2,9 @@
 
 require ::File.expand_path('../config/environment',  __FILE__)
 
-if defined?(Unicorn) && Rails.env.production?
-  require_dependency 'gctools/oobgc'
-  use GC::OOB::UnicornMiddleware
-end
+# if defined?(Unicorn) && Rails.env.production?
+#   require_dependency 'gctools/oobgc'
+#   use GC::OOB::UnicornMiddleware
+# end
 
 run Rails.application
