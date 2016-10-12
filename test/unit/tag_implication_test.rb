@@ -16,6 +16,38 @@ class TagImplicationTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
+    context "on validation" do
+      subject do
+        FactoryGirl.create(:tag, :name => "aaa")
+        FactoryGirl.create(:tag, :name => "bbb")
+        FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
+      end
+
+      should allow_value('active').for(:status)
+      should allow_value('deleted').for(:status)
+      should allow_value('pending').for(:status)
+      should allow_value('processing').for(:status)
+      should allow_value('queued').for(:status)
+      should allow_value('error: derp').for(:status)
+
+      should_not allow_value('ACTIVE').for(:status)
+      should_not allow_value('error').for(:status)
+      should_not allow_value('derp').for(:status)
+
+      should allow_value(nil).for(:forum_topic_id)
+      should_not allow_value(-1).for(:forum_topic_id).with_message("must exist", against: :forum_topic)
+
+      should allow_value(nil).for(:approver_id)
+      should_not allow_value(-1).for(:approver_id).with_message("must exist", against: :approver)
+
+      should_not allow_value(nil).for(:creator_id)
+      should_not allow_value(-1).for(:creator_id).with_message("must exist", against: :creator)
+
+      should_not allow_mass_assignment_of(:status).as(:member)
+      should_not allow_mass_assignment_of(:forum_topic).as(:member)
+      should_not allow_mass_assignment_of(:descendant_names).as(:member)
+    end
+
     should "ignore pending implications when building descendant names" do
       ti2 = FactoryGirl.build(:tag_implication, :antecedent_name => "b", :consequent_name => "c", :status => "pending")
       ti2.save

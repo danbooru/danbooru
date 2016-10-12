@@ -17,6 +17,36 @@ class TagAliasTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
+    context "on validation" do
+      subject do
+        FactoryGirl.create(:tag, :name => "aaa")
+        FactoryGirl.create(:tag, :name => "bbb")
+        FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+      end
+
+      should allow_value('active').for(:status)
+      should allow_value('deleted').for(:status)
+      should allow_value('pending').for(:status)
+      should allow_value('processing').for(:status)
+      should allow_value('queued').for(:status)
+      should allow_value('error: derp').for(:status)
+
+      should_not allow_value('ACTIVE').for(:status)
+      should_not allow_value('error').for(:status)
+      should_not allow_value('derp').for(:status)
+
+      should allow_value(nil).for(:forum_topic_id)
+      should_not allow_value(-1).for(:forum_topic_id).with_message("must exist", against: :forum_topic)
+
+      should allow_value(nil).for(:approver_id)
+      should_not allow_value(-1).for(:approver_id).with_message("must exist", against: :approver)
+
+      should_not allow_value(nil).for(:creator_id)
+      should_not allow_value(-1).for(:creator_id).with_message("must exist", against: :creator)
+
+      should_not allow_mass_assignment_of(:status).as(:member)
+    end
+
     should "populate the creator information" do
       ta = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
       assert_equal(CurrentUser.user.id, ta.creator_id)

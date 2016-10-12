@@ -42,6 +42,15 @@ class TagImplicationsControllerTest < ActionController::TestCase
           @tag_implication.reload
           assert_equal("xxx", @tag_implication.antecedent_name)
         end
+
+        should "not allow changing the status" do
+          post :update, {:id => @tag_implication.id, :tag_implication => {:status => "active"}}, {:user_id => @user.id}
+          @tag_implication.reload
+          assert_equal("pending", @tag_implication.status)
+        end
+
+        # TODO: Broken in shoulda-matchers 2.8.0. Need to upgrade to 3.1.1.
+        should_eventually permit(:antecedent_name, :consequent_name, :forum_topic_id).for(:update)
       end
 
       context "for an approved implication" do

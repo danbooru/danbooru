@@ -41,6 +41,15 @@ class TagAliasesControllerTest < ActionController::TestCase
           @tag_alias.reload
           assert_equal("xxx", @tag_alias.antecedent_name)
         end
+
+        should "not allow changing the status" do
+          post :update, {:id => @tag_alias.id, :tag_alias => {:status => "active"}}, {:user_id => @user.id}
+          @tag_alias.reload
+          assert_equal("pending", @tag_alias.status)
+        end
+
+        # TODO: Broken in shoulda-matchers 2.8.0. Need to upgrade to 3.1.1.
+        should_eventually permit(:antecedent_name, :consequent_name, :forum_topic_id).for(:update)
       end
 
       context "for an approved alias" do
