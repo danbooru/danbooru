@@ -59,7 +59,7 @@ class PostsController < ApplicationController
 
   def revert
     @post = Post.find(params[:id])
-    @version = PostVersion.find(params[:version_id])
+    @version = @post.versions.find(params[:version_id])
 
     if @post.visible?
       @post.revert_to!(@version)

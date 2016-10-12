@@ -4,6 +4,7 @@ require 'google/apis/pubsub_v1'
 class Post < ActiveRecord::Base
   class ApprovalError < Exception ; end
   class DisapprovalError < Exception ; end
+  class RevertError < Exception ; end
   class SearchError < Exception ; end
 
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :view_count
@@ -1390,6 +1391,10 @@ class Post < ActiveRecord::Base
     end
 
     def revert_to(target)
+      if id != target.post_id
+        raise RevertError.new("You cannot revert to a previous version of another post.")
+      end
+
       self.tag_string = target.tags
       self.rating = target.rating
       self.source = target.source

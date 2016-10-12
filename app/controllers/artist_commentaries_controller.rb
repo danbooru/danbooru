@@ -24,8 +24,8 @@ class ArtistCommentariesController < ApplicationController
   end
 
   def revert
-    @artist_commentary = ArtistCommentary.find_by_post_id(params[:id])
-    @version = ArtistCommentaryVersion.find(params[:version_id])
+    @artist_commentary = ArtistCommentary.find_by_post_id!(params[:id])
+    @version = @artist_commentary.versions.find(params[:version_id])
     @artist_commentary.revert_to!(@version)
     respond_with(@artist_commentary)
   end

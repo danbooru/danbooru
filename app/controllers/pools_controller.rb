@@ -79,7 +79,7 @@ class PoolsController < ApplicationController
 
   def revert
     @pool = Pool.find(params[:id])
-    @version = PoolVersion.find(params[:version_id])
+    @version = @pool.versions.find(params[:version_id])
     @pool.revert_to!(@version)
     flash[:notice] = "Pool reverted"
     respond_with(@pool) do |format|

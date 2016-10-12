@@ -77,6 +77,16 @@ class NotesControllerTest < ActionController::TestCase
         @note.reload
         assert_equal("000", @note.body)
       end
+
+      should "not allow reverting to a previous version of another note" do
+        @note2 = FactoryGirl.create(:note, :body => "note 2")
+
+        post :revert, { :id => @note.id, :version_id => @note2.versions(true).first.id }, {:user_id => @user.id}
+        @note.reload
+
+        assert_not_equal(@note.body, @note2.body)
+        assert_response :missing
+      end
     end
   end
 end

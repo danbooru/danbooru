@@ -1,4 +1,6 @@
 class WikiPage < ActiveRecord::Base
+  class RevertError < Exception ; end
+
   before_save :normalize_title
   before_save :normalize_other_names
   before_validation :initialize_creator, :on => :create
@@ -127,6 +129,10 @@ class WikiPage < ActiveRecord::Base
   end
 
   def revert_to(version)
+    if id != version.wiki_page_id
+      raise RevertError.new("You cannot revert to a previous version of another wiki page.")
+    end
+
     self.title = version.title
     self.body = version.body
     self.is_locked = version.is_locked

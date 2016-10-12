@@ -1,4 +1,6 @@
 class Note < ActiveRecord::Base
+  class RevertError < Exception ; end
+
   attr_accessor :updater_id, :updater_ip_addr, :html_id
   belongs_to :post
   belongs_to :creator, :class_name => "User"
@@ -204,6 +206,10 @@ class Note < ActiveRecord::Base
   end
 
   def revert_to(version)
+    if id != version.note_id
+      raise RevertError.new("You cannot revert to a previous version of another note.")
+    end
+
     self.x = version.x
     self.y = version.y
     self.post_id = version.post_id
