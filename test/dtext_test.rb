@@ -39,6 +39,11 @@ class DTextTest < Minitest::Test
     assert_parse("<p>a <a href=\"/wiki_pages/show_or_new?title=spoiler\">spoiler</a> c</p>", "a [[spoiler]] c")
   end
 
+  def test_wiki_links_edge
+    assert_parse("<p><a href=\"/wiki_pages/show_or_new?title=%7C_%7C\">|_|</a></p>", "[[|_|]]")
+    assert_parse("<p><a href=\"/wiki_pages/show_or_new?title=%7C%7C_%7C%7C\">||_||</a></p>", "[[||_||]]")
+  end
+
   def test_wiki_links_nested_b
     assert_parse("<p><strong>[[</strong>tag<strong>]]</strong></p>", "[b][[[/b]tag[b]]][/b]")
   end
