@@ -155,7 +155,10 @@ class TagImplication < ActiveRecord::Base
 
       update_forum_topic_for_error(e)
       update({ :status => "error: #{e}" }, :as => CurrentUser.role)
-      NewRelic::Agent.notice_error(e, :custom_params => {:tag_implication_id => id, :antecedent_name => antecedent_name, :consequent_name => consequent_name})
+
+      if Rails.env.production?
+        NewRelic::Agent.notice_error(e, :custom_params => {:tag_implication_id => id, :antecedent_name => antecedent_name, :consequent_name => consequent_name})
+      end
     end
   end
 
