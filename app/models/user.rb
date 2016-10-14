@@ -430,6 +430,10 @@ class User < ActiveRecord::Base
       is_gold? || is_super_voter?
     end
 
+    def is_approver?
+      can_approve_posts?
+    end
+
     def create_mod_action
       if level_changed?
         ModAction.create(:description => %{"#{name}":/users/#{id} level changed #{level_string_was} -> #{level_string}})

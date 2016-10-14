@@ -174,13 +174,4 @@ protected
       Rails.application.config.session_store :cookie_store, :key => '_danbooru_session', :secure => false
     end
   end
-
-  def post_approvers_only
-    if CurrentUser.can_approve_posts?
-      true
-    else
-      access_denied()
-      false
-    end
-  end
 end
