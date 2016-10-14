@@ -38,7 +38,7 @@ class Ban < ActiveRecord::Base
   end
 
   def initialize_banner_id
-    self.banner_id = CurrentUser.id
+    self.banner_id = CurrentUser.id if self.banner_id.blank?
   end
 
   def user_is_inferior

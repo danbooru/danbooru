@@ -13,7 +13,11 @@ FactoryGirl.define do
 
     factory(:banned_user) do
       is_banned true
-      ban {|x| x.association(:ban)}
+      after(:create) { |user| create(:ban, user: user) }
+    end
+
+    factory(:member_user) do
+      level 20
     end
 
     factory(:gold_user) do
