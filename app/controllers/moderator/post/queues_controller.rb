@@ -2,7 +2,7 @@ module Moderator
   module Post
     class QueuesController < ApplicationController
       respond_to :html, :json
-      before_filter :post_approvers_only
+      before_filter :approver_only
 
       def show
         cookies.permanent[:moderated] = Time.now.to_i

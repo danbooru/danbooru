@@ -133,9 +133,9 @@ protected
     end
   end
 
-  %w(member banned builder gold platinum janitor moderator admin).each do |level|
-    define_method("#{level}_only") do
-      if !CurrentUser.user.is_banned_or_ip_banned? && CurrentUser.user.__send__("is_#{level}?")
+  User::Roles.each do |role|
+    define_method("#{role}_only") do
+      if !CurrentUser.user.is_banned_or_ip_banned? && CurrentUser.user.__send__("is_#{role}?")
         true
       else
         access_denied()
@@ -172,15 +172,6 @@ protected
       Rails.application.config.session_store :cookie_store, :key => '_danbooru_session', :secure => true
     else
       Rails.application.config.session_store :cookie_store, :key => '_danbooru_session', :secure => false
-    end
-  end
-
-  def post_approvers_only
-    if CurrentUser.can_approve_posts?
-      true
-    else
-      access_denied()
-      false
     end
   end
 end
