@@ -14,10 +14,4 @@ class PostVotesController < ApplicationController
   rescue PostVote::Error => x
     @error = x
   end
-
-protected
-
-  def voter_only
-    CurrentUser.is_voter?
-  end
 end

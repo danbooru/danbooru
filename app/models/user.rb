@@ -16,6 +16,16 @@ class User < ActiveRecord::Base
     ADMIN = 50
   end
 
+  # Used for `before_filter :<role>_only`. Must have a corresponding `is_<role>?` method.
+  Roles = Levels.constants.map(&:downcase) + [
+    :anonymous,
+    :banned,
+    :approver,
+    :voter,
+    :super_voter,
+    :verified,
+  ]
+
   BOOLEAN_ATTRIBUTES = %w(
     is_banned
     has_mail
@@ -382,6 +392,10 @@ class User < ActiveRecord::Base
 
     def is_member?
       true
+    end
+
+    def is_blocked?
+      is_banned?
     end
 
     def is_builder?

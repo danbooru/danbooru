@@ -133,9 +133,9 @@ protected
     end
   end
 
-  %w(member banned builder gold platinum janitor moderator admin).each do |level|
-    define_method("#{level}_only") do
-      if !CurrentUser.user.is_banned_or_ip_banned? && CurrentUser.user.__send__("is_#{level}?")
+  User::Roles.each do |role|
+    define_method("#{role}_only") do
+      if !CurrentUser.user.is_banned_or_ip_banned? && CurrentUser.user.__send__("is_#{role}?")
         true
       else
         access_denied()
