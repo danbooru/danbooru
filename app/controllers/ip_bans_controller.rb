@@ -1,4 +1,5 @@
 class IpBansController < ApplicationController
+  respond_to :html, :xml, :json
   before_filter :moderator_only
 
   def new
@@ -7,21 +8,18 @@ class IpBansController < ApplicationController
 
   def create
     @ip_ban = IpBan.create(params[:ip_ban])
-
-    if @ip_ban.errors.any?
-      render :action => "new"
-    else
-      redirect_to ip_bans_path
-    end
+    respond_with(@ip_ban)
   end
 
   def index
     @search = IpBan.search(params[:search])
     @ip_bans = @search.order("id desc").paginate(params[:page], :limit => params[:limit])
+    respond_with(@ip_bans)
   end
 
   def destroy
     @ip_ban = IpBan.find(params[:id])
     @ip_ban.destroy
+    respond_with(@ip_ban)
   end
 end
