@@ -1,5 +1,6 @@
 class BansController < ApplicationController
   before_filter :moderator_only, :except => [:show, :index]
+  respond_to :html, :xml, :json
 
   def new
     @ban = Ban.new(params[:ban])
@@ -12,10 +13,12 @@ class BansController < ApplicationController
   def index
     @search = Ban.search(params[:search]).order("id desc")
     @bans = @search.paginate(params[:page], :limit => params[:limit])
+    respond_with(@bans)
   end
 
   def show
     @ban = Ban.find(params[:id])
+    respond_with(@ban)
   end
 
   def create

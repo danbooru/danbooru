@@ -26,11 +26,13 @@ class SavedSearchesController < ApplicationController
       CurrentUser.disable_categorized_saved_searches = true
       CurrentUser.save
     end
+    respond_with(@saved_search)
   end
 
   def destroy
     @saved_search = saved_searches.find(params[:id])
     @saved_search.destroy
+    respond_with(@saved_search)
   end
 
   def edit
