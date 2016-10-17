@@ -98,7 +98,7 @@ module Danbooru
 
     # List of memcached servers
     def memcached_servers
-      %w(localhost:11211)
+      %w(127.0.0.1:11211)
     end
 
     # After a post receives this many comments, new comments will no longer bump the post in comment/index.

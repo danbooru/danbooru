@@ -210,6 +210,7 @@ GEM
       ntlm-http (~> 0.1, >= 0.1.1)
       webrobots (>= 0.0.9, < 0.2)
     memcache-client (1.8.5)
+    memcache_mock (0.0.14)
     memoist (0.14.0)
     memoizable (0.4.2)
       thread_safe (~> 0.3, >= 0.3.1)
@@ -439,6 +440,7 @@ DEPENDENCIES
   kgio
   mechanize
   memcache-client
+  memcache_mock
   mocha
   net-sftp
   net-ssh
