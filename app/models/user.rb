@@ -611,20 +611,34 @@ class User < ActiveRecord::Base
       end
     end
 
-    def api_hourly_limit
-      if is_platinum? && api_key.present?
-        20_000
+    def api_hourly_limit(idempotent = true)
+      base = if is_platinum? && api_key.present?
+        2000
       elsif is_gold? && api_key.present?
-        10_000
+        1000
       else
-        3_000
+        300
+      end
+
+      if idempotent
+        base * 10
+      else
+        base
       end
     end
 
     def remaining_api_hourly_limit
-      ApiLimiter.remaining_hourly_limit(CurrentUser.ip_addr)
+      ApiLimiter.remaining_hourly_limit(CurrentUser.ip_addr, true)
     end
-    
+
+    def remaining_api_hourly_limit_read
+      ApiLimiter.remaining_hourly_limit(CurrentUser.ip_addr, true)
+    end
+
+    def remaining_api_hourly_limit_write
+      ApiLimiter.remaining_hourly_limit(CurrentUser.ip_addr, false)
+    end
+
     def statement_timeout
       if is_platinum?
         9_000
@@ -644,7 +658,7 @@ class User < ActiveRecord::Base
     def method_attributes
       list = [:is_banned, :can_approve_posts, :can_upload_free, :is_super_voter, :level_string]
       if id == CurrentUser.user.id
-        list += [:remaining_api_hourly_limit]
+        list += [:remaining_api_hourly_limit, :remaining_api_hourly_limit_read, :remaining_api_hourly_limit_write]
       end
       list
     end

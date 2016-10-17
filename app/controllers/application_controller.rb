@@ -41,7 +41,7 @@ protected
   
   def api_check
     if request.format.to_s =~ /\/json|\/xml/ || params[:controller] == "iqdb"
-      if ApiLimiter.throttled?(request.remote_ip)
+      if ApiLimiter.throttled?(request.remote_ip, request.request_method)
         render :text => "421 User Throttled\n", :layout => false, :status => 421
         return false
       end
