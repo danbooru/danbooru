@@ -133,10 +133,8 @@ internal_url = '/' utf8graph+;
 basic_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':' (url | internal_url) >mark_b1 %mark_b2;
 bracketed_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':[' (url | internal_url) >mark_b1 %mark_b2 :>> ']';
 
-edge_case_wiki_link_1 = '[[|_|]]';
-edge_case_wiki_link_2 = '[[||_||]]';
 basic_wiki_link = '[[' (nonbracket nonpipebracket*) >mark_a1 %mark_a2 ']]';
-aliased_wiki_link = '[[' (nonbracket nonpipebracket*) >mark_a1 %mark_a2 '|' nonbracket+ >mark_b1 %mark_b2 ']]';
+aliased_wiki_link = '[[' nonpipebracket+ >mark_a1 %mark_a2 '|' nonpipebracket+ >mark_b1 %mark_b2 ']]';
 
 post_link = '{{' noncurly+ >mark_a1 %mark_a2 '}}';
 
@@ -274,18 +272,6 @@ inline := |*
     append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, true, "</a>");
-  };
-
-  edge_case_wiki_link_1 => {
-    append(sm, true, "<a href=\"/wiki_pages/show_or_new?title=");
-    append_segment_uri_escaped(sm, "|_|", NULL);
-    append(sm, true, "\">|_|</a>");
-  };
-
-  edge_case_wiki_link_2 => {
-    append(sm, true, "<a href=\"/wiki_pages/show_or_new?title=");
-    append_segment_uri_escaped(sm, "||_||", NULL);
-    append(sm, true, "\">||_||</a>");
   };
 
   basic_wiki_link => {
