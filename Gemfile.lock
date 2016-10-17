@@ -114,7 +114,6 @@ GEM
     coinbase (4.0.7)
       bigdecimal
     colorize (0.7.7)
-    concurrent-ruby (1.0.2)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
     crass (1.0.2)
@@ -217,7 +216,6 @@ GEM
     metaclass (0.0.4)
     method_source (0.8.2)
     mime-types (2.99.3)
-    mime-types-data (3.2016.0521)
     mini_portile2 (2.1.0)
     minitest (5.9.1)
     mocha (1.1.0)

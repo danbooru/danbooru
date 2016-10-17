@@ -1,6 +1,8 @@
 module Moderator
   module Post
     class QueuesController < ApplicationController
+      RANDOM_COUNT = 12
+      
       respond_to :html, :json
       before_filter :approver_only
 
@@ -22,7 +24,7 @@ module Moderator
         cookies.permanent[:moderated] = Time.now.to_i
 
         ::Post.without_timeout do
-          @posts = ::Post.order("posts.id asc").pending_or_flagged.available_for_moderation(false).reorder("random()").limit(5)
+          @posts = ::Post.order("posts.id asc").pending_or_flagged.available_for_moderation(false).reorder("random()").limit(RANDOM_COUNT)
           @posts.each # hack to force rails to eager load
 
           if @posts.empty?
