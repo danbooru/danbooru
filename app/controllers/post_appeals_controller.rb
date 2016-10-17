@@ -1,5 +1,5 @@
 class PostAppealsController < ApplicationController
-  before_filter :member_only
+  before_filter :member_only, :except => [:index, :show]
   respond_to :html, :xml, :json, :js
 
   def new
