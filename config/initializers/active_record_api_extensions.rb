@@ -26,6 +26,12 @@ module Danbooru
   end
 end
 
+class Delayed::Job
+  def hidden_attributes
+    [:handler]
+  end
+end
+
 class ActiveRecord::Base
   include Danbooru::Extensions::ActiveRecordApi
 end
