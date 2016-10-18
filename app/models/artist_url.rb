@@ -45,6 +45,7 @@ class ArtistUrl < ActiveRecord::Base
       url = File.dirname(url)
     end
 
+    url = url.downcase
     url = url.gsub(/^https:\/\//, "http://")
     url = url.gsub(/^http:\/\/blog\d+\.fc2/, "http://blog*.fc2")
     url = url.gsub(/^http:\/\/blog-imgs-\d+\.fc2/, "http://blog*.fc2")
