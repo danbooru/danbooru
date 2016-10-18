@@ -181,8 +181,12 @@ class AnonymousUser
     true
   end
   
-  def api_hourly_limit
-    500
+  def api_hourly_limit(idempotent = false)
+    if idempotent
+      500
+    else
+      5
+    end
   end
   
   def statement_timeout
