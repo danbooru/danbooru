@@ -10,6 +10,10 @@
         <% if @wiki_page.is_locked? %>
           (locked)
         <% end %>
+
+        <% if @wiki_page.is_deleted? %>
+          (deleted)
+        <% end %>
       </h1>
 
       <div id="wiki-page-body" class="prose">

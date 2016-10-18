@@ -16,6 +16,11 @@
         <%= select "search", "order", ["Name", "Date"] %>
       </div>
 
+      <div class="input">
+        <label for="search_hide_deleted">Hide Deleted</label>
+        <%= select "search", "hide_deleted", ["Yes", "No"] %>
+      </div>
+
       <%= submit_tag "Search" %>
     <% end %>
   </div>

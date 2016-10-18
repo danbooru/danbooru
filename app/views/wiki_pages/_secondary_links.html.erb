@@ -18,7 +18,7 @@
         <% if CurrentUser.is_member? %>
           <li><%= link_to "Edit", edit_wiki_page_path(@wiki_page), :id => "wiki-page-edit-link" %></li>
         <% end %>
-        <% if CurrentUser.is_moderator? %>
+        <% if CurrentUser.is_builder? && !@wiki_page.is_deleted? %>
           <li><%= link_to "Delete", wiki_page_path(@wiki_page), :remote => true, :method => :delete, :data => {:confirm => "Are you sure you want to delete this wiki page?"} %></li>
         <% end %>
       <% end %>

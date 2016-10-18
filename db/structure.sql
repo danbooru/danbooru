@@ -3305,7 +3305,8 @@ CREATE TABLE wiki_page_versions (
     is_locked boolean NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    other_names text
+    other_names text,
+    is_deleted boolean DEFAULT false NOT NULL
 );
 
 
@@ -3343,7 +3344,8 @@ CREATE TABLE wiki_pages (
     updated_at timestamp without time zone,
     updater_id integer,
     other_names text,
-    other_names_index tsvector
+    other_names_index tsvector,
+    is_deleted boolean DEFAULT false NOT NULL
 );
 
 
@@ -7451,4 +7453,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160820003534');
 INSERT INTO schema_migrations (version) VALUES ('20160822230752');
 
 INSERT INTO schema_migrations (version) VALUES ('20160919234407');
+
+INSERT INTO schema_migrations (version) VALUES ('20161018221128');
 

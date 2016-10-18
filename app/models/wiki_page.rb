@@ -6,14 +6,13 @@ class WikiPage < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   before_validation :initialize_updater
   after_save :create_version
-  before_destroy :create_mod_action_for_destroy
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
   validates_uniqueness_of :title, :case_sensitive => false
   validates_presence_of :title
-  validate :validate_locker_is_moderator
+  validate :validate_locker_is_builder
   validate :validate_not_locked
-  attr_accessible :title, :body, :is_locked, :other_names
+  attr_accessible :title, :body, :is_locked, :is_deleted, :other_names
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, lambda {where(:is_active => true)}, :foreign_key => "name", :primary_key => "title"
   has_many :versions, lambda {order("wiki_page_versions.id ASC")}, :class_name => "WikiPageVersion", :dependent => :destroy
@@ -21,6 +20,10 @@ class WikiPage < ActiveRecord::Base
   module SearchMethods
     def titled(title)
       where("title = ?", title.mb_chars.downcase.tr(" ", "_"))
+    end
+
+    def active
+      where("is_deleted = false")
     end
 
     def recent
@@ -63,6 +66,10 @@ class WikiPage < ActiveRecord::Base
 
       if params[:creator_name].present?
         q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].tr(" ", "_").mb_chars.downcase)
+      end
+
+      if params[:hide_deleted] =~ /y/i
+        q = q.where("is_deleted = false")
       end
 
       if params[:other_names_present] == "yes"
@@ -114,15 +121,15 @@ class WikiPage < ActiveRecord::Base
     titled(title).select("title, id").first
   end
 
-  def validate_locker_is_moderator
-    if is_locked_changed? && !CurrentUser.is_moderator?
-      errors.add(:is_locked, "can be modified by moderators only")
+  def validate_locker_is_builder
+    if is_locked_changed? && !CurrentUser.is_builder?
+      errors.add(:is_locked, "can be modified by builders only")
       return false
     end
   end
 
   def validate_not_locked
-    if is_locked? && !CurrentUser.is_moderator?
+    if is_locked? && !CurrentUser.is_builder?
       errors.add(:is_locked, "and cannot be updated")
       return false
     end
@@ -187,12 +194,13 @@ class WikiPage < ActiveRecord::Base
       :title => title,
       :body => body,
       :is_locked => is_locked,
+      :is_deleted => is_deleted,
       :other_names => other_names
     )
   end
 
   def create_version
-    if title_changed? || body_changed? || is_locked_changed? || other_names_changed?
+    if title_changed? || body_changed? || is_locked_changed? || is_deleted_changed? || other_names_changed?
       if merge_version?
         merge_version
       else
@@ -231,12 +239,8 @@ class WikiPage < ActiveRecord::Base
     end.map {|x| x.mb_chars.downcase.tr(" ", "_").to_s}
   end
 
-  def create_mod_action_for_destroy
-    ModAction.create(:description => "permanently deleted wiki page [[#{title}]]")
-  end
-
   def visible?
-    artist.blank? || !artist.is_banned? || CurrentUser.is_moderator?
+    artist.blank? || !artist.is_banned? || CurrentUser.is_builder?
   end
 
   def other_names_array

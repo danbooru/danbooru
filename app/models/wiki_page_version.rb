@@ -41,7 +41,7 @@ class WikiPageVersion < ActiveRecord::Base
   end
 
   def visible?
-    artist.blank? || !artist.is_banned? || CurrentUser.is_moderator?
+    artist.blank? || !artist.is_banned? || CurrentUser.is_builder?
   end
 
   def other_names_array

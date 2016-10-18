@@ -1,7 +1,7 @@
 class WikiPagesController < ApplicationController
   respond_to :html, :xml, :json, :js
   before_filter :member_only, :except => [:index, :show, :show_or_new]
-  before_filter :moderator_only, :only => [:destroy]
+  before_filter :builder_only, :only => [:destroy]
   before_filter :normalize_search_params, :only => [:index]
   rescue_from ActiveRecord::StatementInvalid, :with => :rescue_exception
   rescue_from ActiveRecord::RecordNotFound, :with => :rescue_exception
@@ -61,7 +61,7 @@ class WikiPagesController < ApplicationController
 
   def destroy
     @wiki_page = WikiPage.find(params[:id])
-    @wiki_page.destroy
+    @wiki_page.update_attribute(:is_deleted, true)
     respond_with(@wiki_page)
   end
 

@@ -18,8 +18,12 @@
 
     <%= dtext_field "wiki_page", "body" %>
 
-    <% if CurrentUser.is_moderator? %>
-      <%= f.input :is_locked %>
+    <% if CurrentUser.is_builder? && @wiki_page.is_deleted? %>
+      <%= f.input :is_deleted, :label => "Deleted", :hint => "Uncheck to restore this wiki page" %>
+    <% end %>
+
+    <% if CurrentUser.is_builder? %>
+      <%= f.input :is_locked, :label => "Locked" %>
     <% end %>
 
     <%= f.button :submit, "Submit", :data => { :disable_with => "Submitting..." } %>
