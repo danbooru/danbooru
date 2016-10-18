@@ -39,7 +39,7 @@ class WikiPagesController < ApplicationController
       @wiki_page = WikiPage.find(params[:id])
     else
       @wiki_page = WikiPage.find_by_title(params[:id])
-      if @wiki_page.nil?
+      if @wiki_page.nil? && request.format.symbol == :html
         redirect_to show_or_new_wiki_pages_path(:title => params[:id])
         return
       end

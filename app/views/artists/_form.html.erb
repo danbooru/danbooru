@@ -3,13 +3,13 @@
     <label for="artist_name">Name</label>
     <% if @artist.new_record? %>
       <%= text_field "artist", "name" %>
-      [<%= link_to "check", "#", :id => "check-name-link" %>]
       <span id="check-name-result"></span>
+
     <% elsif CurrentUser.user.is_builder? %>
       <%= text_field "artist", "name" %>
-      [<%= link_to "check", "#", :id => "check-name-link" %>]
       <span id="check-name-result"></span>
       <span class="hint">Change to rename this artist entry and its wiki page</span>
+
     <% else %>
       <p><%= @artist.name %></p>
     <% end %>

@@ -3,12 +3,32 @@
 
   Danbooru.Artist.initialize_all = function() {
     if ($("#c-artists").length) {
-      Danbooru.Artist.initialize_check_name_link();
+      Danbooru.Artist.initialize_check_name();
 
       if (Danbooru.meta("enable-auto-complete") === "true") {
         Danbooru.Artist.initialize_autocomplete();
       }
     }
+  }
+
+  Danbooru.Artist.initialize_check_name = function() {
+    $("#artist_name").keyup(function(e) {
+      if ($("#artist_name").val().length > 0) {
+        $("#check-name-result").html("");
+
+        $.getJSON("/artists?search[name]=" + escape($("#artist_name").val()), function(data) {
+          if (data.length === 0) {
+            $.getJSON("/wiki_pages/" + escape($("#artist_name").val()), function(data) {
+              if (data !== null) {
+                $("#check-name-result").html("<a href='/wiki_pages/" + escape($("#artist_name").val()) + "'>A wiki page with this name already exists</a>. You must either move the wiki page or pick another artist name.")
+              }
+            });
+          } else {
+            $("#check-name-result").html("An artist with this name already exists.")
+          }
+        });
+      }
+    });
   }
 
   Danbooru.Artist.initialize_autocomplete = function() {
@@ -43,34 +63,6 @@
 
     $fields.each(function(i, field) {
       $(field).data("uiAutocomplete")._renderItem = render_artist;
-    });
-  }
-
-  Danbooru.Artist.initialize_check_name_link = function() {
-    $("#check-name-link").click(function(e) {
-      var artist_name = $("#artist_name").val();
-
-      if (artist_name.length === 0) {
-        $("#check-name-result").html("OK");
-      }
-
-      $.get("/artists.json?name=" + artist_name,
-        function(artists) {
-          $("check-name-result").empty();
-
-          if (artists.length) {
-            $("#check-name-result").text("Taken: ");
-
-            $.map(artists.slice(0, 5), function (artist) {
-              var link = $("<a>").attr("href", "/artists/" + artist.id).text(artist.name);
-              $("#check-name-result").append(link);
-            });
-          } else {
-            $("#check-name-result").text("OK");
-          }
-        }
-      );
-      e.preventDefault();
     });
   }
 })();

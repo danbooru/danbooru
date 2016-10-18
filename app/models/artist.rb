@@ -8,6 +8,7 @@ class Artist < ActiveRecord::Base
   after_save :categorize_tag
   validates_uniqueness_of :name
   validate :name_is_valid
+  validate :wiki_is_empty, :on => :create
   belongs_to :creator, :class_name => "User"
   has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
   has_many :urls, :dependent => :destroy, :class_name => "ArtistUrl"
@@ -251,6 +252,13 @@ class Artist < ActiveRecord::Base
 
     def notes_changed?
       !!@notes_changed
+    end
+
+    def wiki_is_empty
+      if WikiPage.titled(name).exists?
+        errors.add(:name, "conflicts with a wiki page")
+        return false
+      end
     end
   end
 
