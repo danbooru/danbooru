@@ -29,7 +29,7 @@ class PostsControllerTest < ActionController::TestCase
           end
 
           get :index, {:format => "json", :login => @user.name, :api_key => @user.api_key.key}
-          assert_response 421
+          assert_response 429
         end
       end
       

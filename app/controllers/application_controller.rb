@@ -41,15 +41,18 @@ protected
   
   def api_check
     if request.format.to_s =~ /\/json|\/xml/ || params[:controller] == "iqdb"
-      if ApiLimiter.throttled?(request.remote_ip, request.request_method)
-        render :text => "421 User Throttled\n", :layout => false, :status => 421
+      if ApiLimiter.throttled?(CurrentUser.id || request.remote_ip, request.request_method)
+        render :text => "429 Too Many Requests\n", :layout => false, :status => 429
         return false
       end
+    # elsif request.format.to_s =~ /\/html/ && !ApiLimiter.idempotent?(request.request_method)
+    #   if ApiLimiter.throttled?(CurrentUser.id || request.remote_ip, request.request_method)
+    #     render :template => "static/too_many_requests", :status => 429
+    #   end
     end
     
     return true
   end
-
   def rescue_exception(exception)
     @exception = exception
 
