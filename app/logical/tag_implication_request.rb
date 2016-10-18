@@ -28,12 +28,13 @@ class TagImplicationRequest
   end
 
   def build_tag_implication
-    TagImplication.new(
+    x = TagImplication.new(
       :antecedent_name => antecedent_name, 
       :consequent_name => consequent_name, 
-      :status => "pending", 
       :skip_secondary_validations => skip_secondary_validations
     )
+    x.status = "pending"
+    x
   end
 
   def build_forum_topic(tag_implication_id)

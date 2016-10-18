@@ -2,6 +2,7 @@
 config/database.yml
 config/danbooru_local_config.rb
 config/deploy/*.rb
+config/application.yml
 db/*.sqlite3
 log/*.log
 tmp/*
