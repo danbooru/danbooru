@@ -181,7 +181,7 @@ class AnonymousUser
     true
   end
   
-  def api_hourly_limit
+  def api_hourly_limit(idempotent = true)
     500
   end
   
