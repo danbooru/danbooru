@@ -1,7 +1,7 @@
 module ApiLimiter
   def self.idempotent?(method)
     case method
-    when "POST", "PUT", "DELETE"
+    when "POST", "PUT", "DELETE", "PATCH"
       false
 
     else
