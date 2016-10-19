@@ -19,7 +19,7 @@ module ApiLimiter
   def remaining_hourly_limit(user_key, idempotent = true)
     key = "api/#{user_key}/#{Time.now.hour}/#{idempotent}"
     requests = MEMCACHE.fetch(key, 1.hour, :raw => true) {0}.to_i
-    CurrentUser.user.api_hourly_limit - requests
+    CurrentUser.user.api_hourly_limit(idempotent) - requests
   end
   
   module_function :throttled?, :remaining_hourly_limit
