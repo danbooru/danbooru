@@ -4,6 +4,7 @@ class TagAlias < ActiveRecord::Base
   before_save :ensure_tags_exist
   after_save :clear_all_cache
   after_destroy :clear_all_cache
+  after_save :create_mod_action
   before_validation :initialize_creator, :on => :create
   before_validation :normalize_names
   validates_format_of :status, :with => /\A(active|deleted|pending|processing|queued|error: .*)\Z/
@@ -106,15 +107,14 @@ class TagAlias < ActiveRecord::Base
     begin
       admin = CurrentUser.user || approver || User.admins.first
       CurrentUser.scoped(admin, "127.0.0.1") do
-        update_column(:status, "processing")
+        update({ :status => "processing" }, :as => CurrentUser.role)
         move_aliases_and_implications
         move_saved_searches
         clear_all_cache
         ensure_category_consistency
         update_posts
         update_forum_topic_for_approve if update_topic
-        update_column(:post_count, consequent_tag.post_count)
-        update_column(:status, "active")
+        update({ :status => "active", :post_count => consequent_tag.post_count }, :as => CurrentUser.role)
       end
     rescue Exception => e
       if tries < 5
@@ -124,7 +124,7 @@ class TagAlias < ActiveRecord::Base
       end
 
       update_forum_topic_for_error(e)
-      update_column(:status, "error: #{e}")
+      update({ :status => "error: #{e}" }, :as => CurrentUser.role)
       NewRelic::Agent.notice_error(e, :custom_params => {:tag_alias_id => id, :antecedent_name => antecedent_name, :consequent_name => consequent_name})
     end
   end
@@ -312,7 +312,7 @@ class TagAlias < ActiveRecord::Base
   end
 
   def reject!
-    update_column(:status, "deleted")
+    update({ :status => "deleted", }, :as => CurrentUser.role)
     clear_all_cache
     update_forum_topic_for_reject
     destroy
@@ -338,6 +338,26 @@ class TagAlias < ActiveRecord::Base
   def self.update_cached_post_counts_for_all
     TagAlias.without_timeout do
       execute_sql("UPDATE tag_aliases SET post_count = tags.post_count FROM tags WHERE tags.name = tag_aliases.consequent_name")
+    end
+  end
+
+  def create_mod_action
+    alias_desc = %Q("tag alias ##{id}":[#{Rails.application.routes.url_helpers.tag_alias_path(self)}] ([[#{antecedent_name}]] -> [[#{consequent_name}]]))
+
+    if id_changed?
+      ModAction.create(:description => "created #{status} #{alias_desc}.")
+    else
+      # format the changes hash more nicely.
+      change_desc = changes.except(:updated_at).map do |attribute, values|
+        old, new = values[0], values[1]
+        if old.nil?
+          %Q(set #{attribute} to "#{new}")
+        else
+          %Q(changed #{attribute} from "#{old}" to "#{new}")
+        end
+      end.join(", ")
+
+      ModAction.create(:description => "updated #{alias_desc}: #{change_desc}.")
     end
   end
 end
