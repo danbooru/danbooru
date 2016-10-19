@@ -613,7 +613,7 @@ class User < ActiveRecord::Base
 
     def api_hourly_limit(idempotent = true)
       base = if is_platinum? && api_key.present?
-        2000
+        5000
       elsif is_gold? && api_key.present?
         1000
       else
