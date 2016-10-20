@@ -47,6 +47,13 @@ class NotesControllerTest < ActionController::TestCase
         @note.reload
         assert_equal("xyz", @note.body)
       end
+
+      should "not allow changing the post id to another post" do
+        @other = FactoryGirl.create(:post)
+        post :update, {:format => "json", :id => @note.id, :note => {:post_id => @other.id}}, {:user_id => @user.id}
+
+        assert_not_equal(@other.id, @note.reload.post_id)
+      end
     end
 
     context "destroy action" do
