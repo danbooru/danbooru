@@ -1060,6 +1060,24 @@ class PostTest < ActiveSupport::TestCase
     end
   end
 
+  context "Updating:" do
+    context "A rating unlocked post" do
+      setup { @post = FactoryGirl.create(:post) }
+      subject { @post }
+
+      should_not allow_value("S", "safe", "derp").for(:rating)
+      should allow_value("s", "q", "e").for(:rating)
+    end
+
+    context "A rating locked post" do
+      setup { @post = FactoryGirl.create(:post, :is_rating_locked => true) }
+      subject { @post }
+
+      should_not allow_value("S", "safe", "derp").for(:rating)
+      should_not allow_value("s", "q", "e").for(:rating)
+    end
+  end
+
   context "Favorites:" do
     context "Removing a post from a user's favorites" do
       setup do
@@ -1704,6 +1722,34 @@ class PostTest < ActiveSupport::TestCase
   end
 
   context "Reverting: " do
+    context "a post that is rating locked" do
+      setup do
+        @post = FactoryGirl.create(:post, :rating => "s")
+        Timecop.travel(2.hours.from_now) do
+          @post.update({ :rating => "q", :is_rating_locked => true }, :as => :builder)
+        end
+      end
+
+      should "not revert the rating" do
+        assert_raises ActiveRecord::RecordInvalid do
+          @post.revert_to!(@post.versions.first)
+        end
+
+        assert_equal(["Rating is locked and cannot be changed. Unlock the post first."], @post.errors.full_messages)
+        assert_equal(@post.versions.last.rating, @post.reload.rating)
+      end
+
+      should "revert the rating after unlocking" do
+        @post.update({ :rating => "e", :is_rating_locked => false }, :as => :builder)
+        assert_nothing_raised do
+          @post.revert_to!(@post.versions.first)
+        end
+
+        assert(@post.valid?)
+        assert_equal(@post.versions.first.rating, @post.rating)
+      end
+    end
+
     context "a post that has been updated" do
       setup do
         @post = FactoryGirl.create(:post, :rating => "q", :tag_string => "aaa")
