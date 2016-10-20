@@ -20,7 +20,7 @@ class NotesController < ApplicationController
   end
 
   def create
-    @note = Note.create(params[:note])
+    @note = Note.create(create_params)
     respond_with(@note) do |fmt|
       fmt.json do
         if @note.errors.any?
@@ -34,7 +34,7 @@ class NotesController < ApplicationController
 
   def update
     @note = Note.find(params[:id])
-    @note.update_attributes(params[:note])
+    @note.update_attributes(update_params)
     respond_with(@note) do |format|
       format.json do
         if @note.errors.any?
@@ -60,6 +60,14 @@ class NotesController < ApplicationController
   end
 
 private
+  def update_params
+    params.require(:note).permit(:x, :y, :width, :height, :body)
+  end
+
+  def create_params
+    params.require(:note).permit(:x, :y, :width, :height, :body, :post_id)
+  end
+
   def pass_html_id
     if params[:note] && params[:note][:html_id]
       response.headers["X-Html-Id"] = params[:note][:html_id]
