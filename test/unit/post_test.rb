@@ -1060,6 +1060,16 @@ class PostTest < ActiveSupport::TestCase
     end
   end
 
+  context "Updating:" do
+    context "A rating unlocked post" do
+      setup { @post = FactoryGirl.create(:post) }
+      subject { @post }
+
+      should_not allow_value("S", "safe", "derp").for(:rating)
+      should allow_value("s", "q", "e").for(:rating)
+    end
+  end
+
   context "Favorites:" do
     context "Removing a post from a user's favorites" do
       setup do
