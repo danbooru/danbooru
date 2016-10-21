@@ -460,7 +460,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "as a new user" do
         setup do
-          @post.update_attribute(:tag_string, "aaa bbb ccc ddd tagme")
+          @post.update(:tag_string => "aaa bbb ccc ddd tagme")
           CurrentUser.user = FactoryGirl.create(:user)
         end
 
@@ -493,9 +493,9 @@ class PostTest < ActiveSupport::TestCase
           CurrentUser.user = FactoryGirl.create(:builder_user)
           Delayed::Worker.delay_jobs = false
           @post = Post.find(@post.id)
-          @post.update_attribute(:tag_string, "art:abc")
+          @post.update(:tag_string => "art:abc")
           @post = Post.find(@post.id)
-          @post.update_attribute(:tag_string, "copy:abc")
+          @post.update(:tag_string => "copy:abc")
           @post.reload
         end
 
@@ -522,7 +522,7 @@ class PostTest < ActiveSupport::TestCase
         setup do
           FactoryGirl.create(:tag_alias, :antecedent_name => "abc", :consequent_name => "xyz")
           @post = Post.find(@post.id)
-          @post.update_attribute(:tag_string, "art:abc")
+          @post.update(:tag_string => "art:abc")
           @post.reload
         end
 
