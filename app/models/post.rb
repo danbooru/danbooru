@@ -7,8 +7,10 @@ class Post < ActiveRecord::Base
   class RevertError < Exception ; end
   class SearchError < Exception ; end
 
-  before_validation :strip_source
   before_validation :initialize_uploader, :on => :create
+  before_validation :merge_old_changes
+  before_validation :normalize_tags
+  before_validation :strip_source
   before_validation :parse_pixiv_id
   before_validation :blank_out_nonexistent_parents
   before_validation :remove_parent_loops
@@ -16,8 +18,6 @@ class Post < ActiveRecord::Base
   validates_inclusion_of :rating, in: %w(s q e), message: "rating must be s, q, or e"
   validate :post_is_not_its_own_parent
   validate :updater_can_change_rating
-  before_save :merge_old_changes
-  before_save :normalize_tags
   before_save :update_tag_post_counts
   before_save :set_tag_counts
   before_save :set_pool_category_pseudo_tags
