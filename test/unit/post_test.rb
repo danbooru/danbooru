@@ -478,8 +478,10 @@ class PostTest < ActiveSupport::TestCase
 
       context "with a banned artist" do
         setup do
-          @artist = FactoryGirl.create(:artist)
-          @artist.ban!
+          CurrentUser.scoped(FactoryGirl.create(:admin_user)) do
+            @artist = FactoryGirl.create(:artist)
+            @artist.ban!
+          end
           @post = FactoryGirl.create(:post, :tag_string => @artist.name)
         end
 
