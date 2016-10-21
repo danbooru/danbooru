@@ -107,7 +107,7 @@ class PostTest < ActiveSupport::TestCase
   end
 
   context "Parenting:" do
-    context "Assignining a parent to a post" do
+    context "Assigning a parent to a post" do
       should "update the has_children flag on the parent" do
         p1 = FactoryGirl.create(:post)
         assert(!p1.has_children?, "Parent should not have any children")
@@ -544,6 +544,27 @@ class PostTest < ActiveSupport::TestCase
             assert_equal(@parent.id, @post.parent_id)
             assert(@parent.has_children?)
           end
+
+          should "not allow self-parenting" do
+            @post.update(:tag_string => "parent:#{@post.id}")
+            assert_nil(@post.parent_id)
+          end
+
+          should "clear the parent with parent:none" do
+            @post.update(:parent_id => @parent.id)
+            assert_equal(@parent.id, @post.parent_id)
+
+            @post.update(:tag_string => "parent:none")
+            assert_nil(@post.parent_id)
+          end
+
+          should "clear the parent with -parent:1234" do
+            @post.update(:parent_id => @parent.id)
+            assert_equal(@parent.id, @post.parent_id)
+
+            @post.update(:tag_string => "-parent:#{@parent.id}")
+            assert_nil(@post.parent_id)
+          end
         end
 
         context "for a pool" do
@@ -622,7 +643,7 @@ class PostTest < ActiveSupport::TestCase
 
         context "for a rating" do
           context "that is valid" do
-            should "update the rating" do
+            should "update the rating if the post is unlocked" do
               @post.update_attributes(:tag_string => "aaa rating:e")
               @post.reload
               assert_equal("e", @post.rating)
@@ -636,13 +657,34 @@ class PostTest < ActiveSupport::TestCase
               assert_equal("q", @post.rating)
             end
           end
+
+          context "that is locked" do
+            should "change the rating if locked in the same update" do
+              @post.update({ :tag_string => "rating:e", :is_rating_locked => true }, :as => :builder)
+
+              assert(@post.valid?)
+              assert_equal("e", @post.reload.rating)
+            end
+
+            should "not change the rating if locked previously" do
+              @post.is_rating_locked = true
+              @post.save
+
+              @post.update(:tag_string => "rating:e")
+
+              assert(@post.invalid?)
+              assert_not_equal("e", @post.reload.rating)
+            end
+          end
         end
 
         context "for a fav" do
-          should "add the current user to the post's favorite listing" do
+          should "add/remove the current user to the post's favorite listing" do
             @post.update_attributes(:tag_string => "aaa fav:self")
-            @post.reload
             assert_equal("fav:#{@user.id}", @post.fav_string)
+
+            @post.update_attributes(:tag_string => "aaa -fav:self")
+            assert_equal("", @post.fav_string)
           end
         end
 
@@ -657,6 +699,34 @@ class PostTest < ActiveSupport::TestCase
             @child.reload
             assert_equal(@post.id, @child.parent_id)
             assert(@post.has_children?)
+          end
+        end
+
+        context "for a source" do
+          should "set the source with source:foo_bar_baz" do
+            @post.update(:tag_string => "source:foo_bar_baz")
+            assert_equal("foo_bar_baz", @post.source)
+          end
+
+          should 'set the source with source:"foo bar baz"' do
+            @post.update(:tag_string => 'source:"foo bar baz"')
+            assert_equal("foo bar baz", @post.source)
+          end
+
+          should 'strip the source with source:"  foo bar baz  "' do
+            @post.update(:tag_string => 'source:"  foo bar baz  "')
+            assert_equal("foo bar baz", @post.source)
+          end
+
+          should "clear the source with source:none" do
+            @post.update(:source => "foobar")
+            @post.update(:tag_string => "source:none")
+            assert_nil(@post.source)
+          end
+
+          should "set the pixiv id with source:https://img18.pixiv.net/img/evazion/14901720.png" do
+            @post.update(:tag_string => "source:https://img18.pixiv.net/img/evazion/14901720.png")
+            assert_equal(14901720, @post.pixiv_id)
           end
         end
       end
