@@ -731,6 +731,75 @@ class PostTest < ActiveSupport::TestCase
             assert_equal(14901720, @post.pixiv_id)
           end
         end
+
+        context "of" do
+          setup do
+            @builder = FactoryGirl.build(:builder_user)
+          end
+
+          context "locked:notes" do
+            context "by a member" do
+              should "not lock the notes" do
+                @post.update(:tag_string => "locked:notes")
+                assert_equal(false, @post.is_note_locked)
+              end
+            end
+
+            context "by a builder" do
+              should "lock/unlock the notes" do
+                CurrentUser.scoped(@builder) do
+                  @post.update(:tag_string => "locked:notes")
+                  assert_equal(true, @post.is_note_locked)
+
+                  @post.update(:tag_string => "-locked:notes")
+                  assert_equal(false, @post.is_note_locked)
+                end
+              end
+            end
+          end
+
+          context "locked:rating" do
+            context "by a member" do
+              should "not lock the rating" do
+                @post.update(:tag_string => "locked:rating")
+                assert_equal(false, @post.is_rating_locked)
+              end
+            end
+
+            context "by a builder" do
+              should "lock/unlock the rating" do
+                CurrentUser.scoped(@builder) do
+                  @post.update(:tag_string => "locked:rating")
+                  assert_equal(true, @post.is_rating_locked)
+
+                  @post.update(:tag_string => "-locked:rating")
+                  assert_equal(false, @post.is_rating_locked)
+                end
+              end
+            end
+          end
+
+          context "locked:status" do
+            context "by a member" do
+              should "not lock the status" do
+                @post.update(:tag_string => "locked:status")
+                assert_equal(false, @post.is_status_locked)
+              end
+            end
+
+            context "by an admin" do
+              should "lock/unlock the status" do
+                CurrentUser.scoped(FactoryGirl.build(:admin_user)) do
+                  @post.update(:tag_string => "locked:status")
+                  assert_equal(true, @post.is_status_locked)
+
+                  @post.update(:tag_string => "-locked:status")
+                  assert_equal(false, @post.is_status_locked)
+                end
+              end
+            end
+          end
+        end
       end
 
       context "tagged with a negated tag" do

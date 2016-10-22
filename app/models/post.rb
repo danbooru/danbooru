@@ -679,7 +679,7 @@ class Post < ActiveRecord::Base
     end
 
     def filter_metatags(tags)
-      @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent|-parent|source):/i}
+      @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent|-parent|source|-?locked):/i}
       @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav|-fav|child|-favgroup|favgroup):/i}
       apply_pre_metatags
       return tags
@@ -773,6 +773,15 @@ class Post < ActiveRecord::Base
 
         when /^rating:([qse])/i
           self.rating = $1.downcase
+
+        when /^(-?)locked:notes?$/i
+          assign_attributes({ is_note_locked: $1 != "-" }, as: CurrentUser.role)
+
+        when /^(-?)locked:rating$/i
+          assign_attributes({ is_rating_locked: $1 != "-" }, as: CurrentUser.role)
+
+        when /^(-?)locked:status$/i
+          assign_attributes({ is_status_locked: $1 != "-" }, as: CurrentUser.role)
         end
       end
     end
