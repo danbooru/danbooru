@@ -614,6 +614,7 @@ class Post < ActiveRecord::Base
     def remove_negated_tags(tags)
       negated_tags, tags = tags.partition {|x| x =~ /\A-/i}
       negated_tags = negated_tags.map {|x| x[1..-1]}
+      negated_tags = TagAlias.to_aliased(negated_tags)
       return tags - negated_tags
     end
 
