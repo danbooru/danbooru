@@ -103,7 +103,7 @@ module Downloads
       # Cache the source data so it gets fetched at most once.
       def source
         @source ||= begin
-          source = ::Sources::Strategies::Pixiv.new(url)
+          source = ::Sources::Site.new(url)
           source.get
 
           source

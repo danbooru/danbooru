@@ -5,9 +5,9 @@ module Sources
     attr_reader :url, :strategy
     delegate :get, :get_size, :site_name, :artist_name, 
       :profile_url, :image_url, :tags, :artist_record, :unique_id, 
-      :page_count, :file_url, :ugoira_frame_data, :image_urls, 
+      :page_count, :file_url, :ugoira_frame_data, :ugoira_content_type, :image_urls,
       :has_artist_commentary?, :artist_commentary_title,
-      :artist_commentary_desc, :to => :strategy
+      :artist_commentary_desc, :rewrite_thumbnails, :to => :strategy
 
     def self.strategies
       [Strategies::PixivWhitecube, Strategies::Pixiv, Strategies::NicoSeiga, Strategies::DeviantArt, Strategies::Nijie, Strategies::Twitter, Strategies::Tumblr]
