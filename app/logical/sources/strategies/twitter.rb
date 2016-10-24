@@ -38,6 +38,14 @@ module Sources::Strategies
       TwitterService.new.image_urls(url)
     end
 
+    def normalize_for_artist_finder!
+      url.downcase
+    end
+
+    def normalizable_for_artist_finder?
+      true
+    end
+
     def status_id_from_url(url)
       if url =~ %r{^https?://(?:mobile\.)?twitter\.com/\w+/status/(\d+)}
         $1.to_i

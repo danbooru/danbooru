@@ -54,5 +54,11 @@ class ArtistUrlTest < ActiveSupport::TestCase
       assert_equal("http://img55.pixiv.net/img/monet", url.url)
       assert_equal("http://img.pixiv.net/img/monet/", url.normalized_url)
     end
+
+    should "normalize twitter urls" do
+      url = FactoryGirl.create(:artist_url, :url => "https://twitter.com/MONET/status/12345")
+      assert_equal("https://twitter.com/MONET/status/12345", url.url)
+      assert_equal("http://twitter.com/monet/status/12345/", url.normalized_url)
+    end
   end
 end
