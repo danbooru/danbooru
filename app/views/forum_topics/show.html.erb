@@ -2,8 +2,13 @@
   <div id="a-show">
     <h1>
       Topic: <%= @forum_topic.title %>
+
+      <% if @forum_topic.min_level >= User::Levels::BUILDER %>
+        <span class="level-topic">(<%= User.level_string(@forum_topic.min_level).downcase %> only)</span>
+      <% end %>
+
       <% if @forum_topic.is_deleted? %>
-        (deleted)
+        <span class="locked-topic">(deleted)</span>
       <% end %>
     </h1>
 

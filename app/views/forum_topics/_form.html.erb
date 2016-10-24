@@ -22,6 +22,10 @@
       <%= f.input :is_locked %>
     <% end %>
 
+    <% if CurrentUser.is_builder? %>
+      <%= f.input :min_level, :as => :select, :collection => User.level_hash.to_a %>
+    <% end %>
+
     <%= f.button :submit, "Submit", :data => { :disable_with => "Submitting..." } %>
     <%= dtext_preview_button "forum_post", "body", :input_id => "forum_post_body_for_#{forum_topic.original_post.id}", :preview_id => "dtext-preview-for-#{forum_topic.original_post.id}" %>
   <% end %>

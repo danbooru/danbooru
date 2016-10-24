@@ -2210,7 +2210,8 @@ CREATE TABLE forum_topics (
     text_index tsvector NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    category_id integer DEFAULT 0 NOT NULL
+    category_id integer DEFAULT 0 NOT NULL,
+    min_level integer DEFAULT 0 NOT NULL
 );
 
 
@@ -7455,4 +7456,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160822230752');
 INSERT INTO schema_migrations (version) VALUES ('20160919234407');
 
 INSERT INTO schema_migrations (version) VALUES ('20161018221128');
+
+INSERT INTO schema_migrations (version) VALUES ('20161024220345');
 

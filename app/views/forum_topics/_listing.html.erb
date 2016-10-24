@@ -9,30 +9,36 @@
   </thead>
   <tbody>
     <% forum_topics.each do |topic| %>
-      <tr class="forum-topic-row forum-topic-category-<%= topic.category_id %>">
-        <td>
-          <% if topic.is_sticky? %>
-            <span class="sticky">Sticky:</span>
-          <% end %>
+      <% if CurrentUser.user.level >= topic.min_level %>
+        <tr class="forum-topic-row forum-topic-category-<%= topic.category_id %>">
+          <td>
+            <% if topic.is_sticky? %>
+              <span class="sticky">Sticky:</span>
+            <% end %>
 
-          <% unless topic.read_by?(CurrentUser.user) %>
-            <span class="new">NEW</span>
-          <% end %>
+            <% unless topic.read_by?(CurrentUser.user) %>
+              <span class="new">NEW</span>
+            <% end %>
 
-          <%= link_to topic.title, forum_topic_path(topic) %>
+            <%= link_to topic.title, forum_topic_path(topic) %>
 
-          <% if topic.response_count > Danbooru.config.posts_per_page %>
-            <%= link_to "page #{topic.last_page}", forum_topic_path(topic, :page => topic.last_page), :class => "last-page" %>
-          <% end %>
+            <% if topic.response_count > Danbooru.config.posts_per_page %>
+              <%= link_to "page #{topic.last_page}", forum_topic_path(topic, :page => topic.last_page), :class => "last-page" %>
+            <% end %>
 
-          <% if topic.is_locked? %>
-            <span class="locked-topic">(locked)</span>
-          <% end %>
-        </td>
-        <td><%= link_to_user topic.creator %></td>
-        <td><%= link_to_user topic.updater %></td>
-        <td><%= compact_time topic.updated_at %></td>
-      </tr>
+            <% if topic.is_locked? %>
+              <span class="locked-topic">(locked)</span>
+            <% end %>
+
+            <% if topic.min_level > 0 %>
+              <span class="level-topic">(<%= User.level_string(topic.min_level).downcase %> only)</span>
+            <% end %>
+          </td>
+          <td><%= link_to_user topic.creator %></td>
+          <td><%= link_to_user topic.updater %></td>
+          <td><%= compact_time topic.updated_at %></td>
+        </tr>
+      <% end %>
     <% end %>
   </tbody>
 </table>

@@ -306,6 +306,37 @@ class User < ActiveRecord::Base
           "Admin" => Levels::ADMIN
         }
       end
+
+      def level_string(value)
+        case value
+        when Levels::BLOCKED
+          "Banned"
+
+        when Levels::MEMBER
+          "Member"
+
+        when Levels::BUILDER
+          "Builder"
+
+        when Levels::GOLD
+          "Gold"
+
+        when Levels::PLATINUM
+          "Platinum"
+
+        when Levels::JANITOR
+          "Janitor"
+
+        when Levels::MODERATOR
+          "Moderator"
+
+        when Levels::ADMIN
+          "Admin"
+          
+        else
+          ""
+        end
+      end
     end
 
     def promote_to!(new_level, options = {})
@@ -356,34 +387,7 @@ class User < ActiveRecord::Base
     end
 
     def level_string(value = nil)
-      case (value || level)
-      when Levels::BLOCKED
-        "Banned"
-
-      when Levels::MEMBER
-        "Member"
-
-      when Levels::BUILDER
-        "Builder"
-
-      when Levels::GOLD
-        "Gold"
-
-      when Levels::PLATINUM
-        "Platinum"
-
-      when Levels::JANITOR
-        "Janitor"
-
-      when Levels::MODERATOR
-        "Moderator"
-
-      when Levels::ADMIN
-        "Admin"
-        
-      else
-        ""
-      end
+      User.level_string(value || level)
     end
 
     def is_anonymous?

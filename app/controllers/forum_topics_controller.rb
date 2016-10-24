@@ -3,6 +3,8 @@ class ForumTopicsController < ApplicationController
   before_filter :member_only, :except => [:index, :show]
   before_filter :moderator_only, :only => [:new_merge, :create_merge]
   before_filter :normalize_search, :only => :index
+  before_filter :load_topic, :only => [:edit, :show, :update, :destroy, :undelete, :new_merge, :create_merge, :subscribe, :unsubscribe]
+  before_filter :check_min_level, :only => [:show, :edit, :update, :new_merge, :create_merge, :destroy, :undelete, :subscribe, :unsubscribe]
 
   def new
     @forum_topic = ForumTopic.new
@@ -11,7 +13,6 @@ class ForumTopicsController < ApplicationController
   end
 
   def edit
-    @forum_topic = ForumTopic.find(params[:id])
     check_privilege(@forum_topic)
     respond_with(@forum_topic)
   end
@@ -27,7 +28,6 @@ class ForumTopicsController < ApplicationController
   end
 
   def show
-    @forum_topic = ForumTopic.find(params[:id])
     unless CurrentUser.user.is_anonymous?
       @forum_topic.mark_as_read!(CurrentUser.user)
     end
@@ -42,14 +42,12 @@ class ForumTopicsController < ApplicationController
   end
 
   def update
-    @forum_topic = ForumTopic.find(params[:id])
     check_privilege(@forum_topic)
     @forum_topic.update_attributes(params[:forum_topic], :as => CurrentUser.role)
     respond_with(@forum_topic)
   end
 
   def destroy
-    @forum_topic = ForumTopic.find(params[:id])
     check_privilege(@forum_topic)
     @forum_topic.delete!
     flash[:notice] = "Topic deleted"
@@ -57,7 +55,6 @@ class ForumTopicsController < ApplicationController
   end
 
   def undelete
-    @forum_topic = ForumTopic.find(params[:id])
     check_privilege(@forum_topic)
     @forum_topic.undelete!
     flash[:notice] = "Topic undeleted"
@@ -71,18 +68,15 @@ class ForumTopicsController < ApplicationController
   end
 
   def new_merge
-    @forum_topic = ForumTopic.find(params[:id])
   end
 
   def create_merge
-    @forum_topic = ForumTopic.find(params[:id])
     @merged_topic = ForumTopic.find(params[:merged_id])
     @forum_topic.merge(@merged_topic)
     redirect_to forum_topic_path(@merged_topic)
   end
 
   def subscribe
-    @forum_topic = ForumTopic.find(params[:id])
     subscription = ForumSubscription.where(:forum_topic_id => @forum_topic.id, :user_id => CurrentUser.user.id).first
     unless subscription
       ForumSubscription.create(:forum_topic_id => @forum_topic.id, :user_id => CurrentUser.user.id, :last_read_at => @forum_topic.updated_at)
@@ -91,7 +85,6 @@ class ForumTopicsController < ApplicationController
   end
 
   def unsubscribe
-    @forum_topic = ForumTopic.find(params[:id])
     subscription = ForumSubscription.where(:forum_topic_id => @forum_topic.id, :user_id => CurrentUser.user.id).first
     if subscription
       subscription.destroy
@@ -119,6 +112,31 @@ private
   def check_privilege(forum_topic)
     if !forum_topic.editable_by?(CurrentUser.user)
       raise User::PrivilegeError
+    end
+  end
+
+  def load_topic
+    @forum_topic = ForumTopic.find(params[:id])
+  end
+
+  def check_min_level
+    if CurrentUser.user.level < @forum_topic.min_level
+      respond_with(@forum_topic) do |fmt|
+        fmt.html do
+          flash[:notice] = "Access denied"
+          redirect_to forum_topics_path
+        end
+
+        fmt.json do
+          render :nothing => true, :status => 403
+        end
+
+        fmt.xml do
+          render :nothing => true, :status => 403
+        end
+      end
+
+      return false
     end
   end
 end

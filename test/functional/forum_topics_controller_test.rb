@@ -16,6 +16,17 @@ class ForumTopicsControllerTest < ActionController::TestCase
       CurrentUser.ip_addr = nil
     end
 
+    context "for a level restricted topic" do
+      setup do
+        @forum_topic.update_attribute(:min_level, 50)
+      end
+
+      should "not allow users to see the topic" do
+        get :show, {:id => @forum_topic.id}  
+        assert_redirected_to forum_topics_path
+      end
+    end
+
     context "show action" do
       should "render" do
         get :show, {:id => @forum_topic.id}
