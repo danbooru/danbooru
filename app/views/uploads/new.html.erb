@@ -4,7 +4,10 @@
 
     <% if CurrentUser.can_upload? %>
       <div id="upload-guide-notice">
-        <p>Before uploading, please read the <%= link_to "how to upload guide", wiki_pages_path(:title => "howto:upload") %>.</p>
+        <p><strong>Before uploading, please read the <%= link_to "how to upload guide", wiki_pages_path(:title => "howto:upload") %></strong>.
+        If you plan to upload your own art, you should read <%= Danbooru.config.app_name %>'s
+        <%= link_to "specific policy guidance", wiki_pages_path(:title => "howto:upload", :anchor => "dtext-self-upload") %>
+        first. More suitable sites to uploading your own artwork include DeviantArt, Tumblr, Twitter, Pixiv, etc.</p>
       </div>
 
       <% unless CurrentUser.can_upload_free? %>
