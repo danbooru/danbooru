@@ -740,6 +740,13 @@ class PostTest < ActiveSupport::TestCase
           @post.reload
           assert_equal("aaa ccc", @post.tag_string)
         end
+
+        should "resolve aliases" do
+          FactoryGirl.create(:tag_alias, :antecedent_name => "/tr", :consequent_name => "translation_request")
+          @post.update(:tag_string => "aaa translation_request -/tr")
+
+          assert_equal("aaa", @post.tag_string)
+        end
       end
 
       should "have an array representation of its tags" do
