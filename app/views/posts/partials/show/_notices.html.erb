@@ -1,6 +1,6 @@
 <% if post.is_flagged? && !post.is_deleted? && post.flags.any? %>
   <div class="ui-corner-all ui-state-highlight notice notice-flagged">
-    <p>This post was flagged for deletion: </p>
+    <p>This post was flagged for review (<%= link_to "learn more", wiki_pages_path(:title => "howto:flag") %>): </p>
 
     <%= post_flag_reasons(post) %>
   </div>
