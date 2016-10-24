@@ -7,27 +7,31 @@ class Post < ActiveRecord::Base
   class RevertError < Exception ; end
   class SearchError < Exception ; end
 
-  attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :view_count
-  after_destroy :remove_iqdb_async
-  after_destroy :delete_files
-  after_destroy :delete_remote_files
-  after_save :create_version
-  after_save :update_parent_on_save
-  after_save :apply_post_metatags
-  after_save :expire_essential_tag_string_cache
-  after_create :update_iqdb_async
-  after_commit :notify_pubsub
-  before_save :merge_old_changes
-  before_save :normalize_tags
+  before_validation :initialize_uploader, :on => :create
+  before_validation :merge_old_changes
+  before_validation :normalize_tags
+  before_validation :strip_source
+  before_validation :parse_pixiv_id
+  before_validation :blank_out_nonexistent_parents
+  before_validation :remove_parent_loops
+  validates_uniqueness_of :md5
+  validates_inclusion_of :rating, in: %w(s q e), message: "rating must be s, q, or e"
+  validate :post_is_not_its_own_parent
+  validate :updater_can_change_rating
   before_save :update_tag_post_counts
   before_save :set_tag_counts
   before_save :set_pool_category_pseudo_tags
   before_create :autoban
-  before_validation :strip_source
-  before_validation :initialize_uploader, :on => :create
-  before_validation :parse_pixiv_id
-  before_validation :blank_out_nonexistent_parents
-  before_validation :remove_parent_loops
+  after_create :update_iqdb_async
+  after_save :create_version
+  after_save :update_parent_on_save
+  after_save :apply_post_metatags
+  after_save :expire_essential_tag_string_cache
+  after_destroy :remove_iqdb_async
+  after_destroy :delete_files
+  after_destroy :delete_remote_files
+  after_commit :notify_pubsub
+
   belongs_to :updater, :class_name => "User"
   belongs_to :approver, :class_name => "User"
   belongs_to :uploader, :class_name => "User"
@@ -44,13 +48,10 @@ class Post < ActiveRecord::Base
   has_many :children, lambda {order("posts.id")}, :class_name => "Post", :foreign_key => "parent_id"
   has_many :disapprovals, :class_name => "PostDisapproval", :dependent => :destroy
   has_many :favorites, :dependent => :destroy
-  validates_uniqueness_of :md5
-  validates_inclusion_of :rating, in: %w(s q e), message: "rating must be s, q, or e"
-  validate :post_is_not_its_own_parent
-  validate :updater_can_change_rating
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :old_parent_id, :old_source, :old_rating, :parent_id, :has_embedded_notes, :as => [:member, :builder, :gold, :platinum, :janitor, :moderator, :admin, :default]
   attr_accessible :is_rating_locked, :is_note_locked, :as => [:builder, :janitor, :moderator, :admin]
   attr_accessible :is_status_locked, :as => [:admin]
+  attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :view_count
 
   module FileMethods
     def distribute_files
