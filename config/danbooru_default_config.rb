@@ -34,6 +34,22 @@ module Danbooru
       contact_email
     end
 
+    def source_code_url
+      "https://github.com/r888888888/danbooru"
+    end
+
+    def commit_url(hash)
+      "#{source_code_url}/commit/#{hash}"
+    end
+
+    def releases_url
+      "#{source_code_url}/releases"
+    end
+
+    def issues_url
+      "#{source_code_url}/issues"
+    end
+
     # Stripped of any special characters.
     def safe_app_name
       app_name.gsub(/[^a-zA-Z0-9_-]/, "_")

@@ -1,7 +1,7 @@
 <footer id="page-footer">
-  Running Danbooru <%= link_to "v#{Danbooru.config.version}", "https://github.com/r888888888/danbooru/releases" %>
+  Running <%= Danbooru.config.app_name %> <%= link_to "v#{Danbooru.config.version}", Danbooru.config.releases_url %>
   <% if Rails.application.config.x.git_hash %>
-    (<%= Rails.application.config.x.git_hash %>)
+    (<%= link_to Rails.application.config.x.git_hash, Danbooru.config.commit_url(Rails.application.config.x.git_hash) %>)
   <% end %>
   &ndash; <%= link_to "Rules", terms_of_service_path %>
   &ndash; <%= link_to "Contact", contact_path %>
