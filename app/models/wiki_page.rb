@@ -94,23 +94,8 @@ class WikiPage < ActiveRecord::Base
       super + [:body_index, :other_names_index]
     end
 
-    def serializable_hash(options = {})
-      options ||= {}
-      options[:except] ||= []
-      options[:except] += hidden_attributes
-      unless options[:builder]
-        options[:methods] ||= []
-        options[:methods] += [:creator_name, :category_name]
-      end
-      hash = super(options)
-      hash
-    end
-
-    def to_xml(options = {}, &block)
-      options ||= {}
-      options[:methods] ||= []
-      options[:methods] += [:creator_name, :category_name]
-      super(options, &block)
+    def method_attributes
+      super + [:creator_name, :category_name]
     end
   end
 

@@ -18,6 +18,7 @@ class ForumTopic < ActiveRecord::Base
   validates_presence_of :title, :creator_id
   validates_associated :original_post
   validates_inclusion_of :category_id, :in => CATEGORIES.keys
+  validates_inclusion_of :min_level, :in => [0, User::Levels::MODERATOR, User::Levels::ADMIN]
   accepts_nested_attributes_for :original_post
   after_update :update_orignal_post
 
@@ -114,10 +115,27 @@ class ForumTopic < ActiveRecord::Base
     end
   end
 
+  module UserLevelMethods
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+      def available_min_user_levels
+        if CurrentUser.is_admin?
+          [["Moderator", User::Levels::MODERATOR], ["Admin", User::Levels::ADMIN]]
+        elsif CurrentUser.is_moderator?
+          [["Moderator", User::Levels::MODERATOR]]
+        else
+          []
+        end
+      end
+    end
+  end
+
   extend SearchMethods
   include CategoryMethods
   include VisitMethods
   include SubscriptionMethods
+  include UserLevelMethods
 
   def editable_by?(user)
     creator_id == user.id || user.is_moderator?
@@ -142,9 +160,25 @@ class ForumTopic < ActiveRecord::Base
   def presenter(forum_posts)
     @presenter ||= ForumTopicPresenter.new(self, forum_posts)
   end
-  
+
+  def as_json(options = {})
+    if CurrentUser.user.level < min_level
+      options[:only] = [:id]
+    end
+
+    super(options)
+  end
+
+  def to_xml(options = {})
+    if CurrentUser.user.level < min_level
+      options[:only] = [:id]
+    end
+
+    super(options)
+  end
+
   def hidden_attributes
-    super + [:text_index]
+    [:text_index, :min_level]
   end
 
   def merge(topic)

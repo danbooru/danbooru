@@ -20,7 +20,11 @@ class ForumTopicsController < ApplicationController
   def index
     @query = ForumTopic.active.search(params[:search])
     @forum_topics = @query.includes([:creator, :updater]).order("is_sticky DESC, updated_at DESC").paginate(params[:page], :limit => per_page, :search_count => params[:search])
+
     respond_with(@forum_topics) do |format|
+      format.json do
+        render :json => @forum_topics.to_json
+      end
       format.xml do
         render :xml => @forum_topics.to_xml(:root => "forum-topics")
       end

@@ -86,23 +86,7 @@ class Dmail < ActiveRecord::Base
     end
     
     def method_attributes
-      list = [:hash]
-      list
-    end
-    
-    def serializable_hash(options = {})
-      options ||= {}
-      options[:methods] ||= []
-      options[:methods] += method_attributes
-      super(options)
-    end
-    
-    def to_xml(options = {}, &block)
-      # to_xml ignores the serializable_hash method
-      options ||= {}
-      options[:methods] ||= []
-      options[:methods] += method_attributes
-      super(options, &block)
+      super + [:hash]
     end
   end
   

@@ -1472,25 +1472,11 @@ class Post < ActiveRecord::Base
       [ :pixiv_ugoira_frame_data ]
     end
 
-    def serializable_hash(options = {})
+    def as_json(options = {})
       options ||= {}
       options[:include] ||= []
       options[:include] += associated_attributes
-      options[:except] ||= []
-      options[:except] += hidden_attributes
-      unless options[:builder]
-        options[:methods] ||= []
-        options[:methods] += method_attributes
-      end
-      hash = super(options)
-      hash
-    end
-
-    def to_xml(options = {}, &block)
-      options ||= {}
-      options[:methods] ||= []
-      options[:methods] += method_attributes
-      super(options, &block)
+      super(options)
     end
 
     def to_legacy_json

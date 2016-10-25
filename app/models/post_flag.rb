@@ -85,13 +85,6 @@ class PostFlag < ActiveRecord::Base
       end
       super + list
     end
-
-    def serializable_hash(options = {})
-      options ||= {}
-      options[:except] ||= []
-      options[:except] += hidden_attributes
-      super(options)
-    end
   end
 
   extend SearchMethods

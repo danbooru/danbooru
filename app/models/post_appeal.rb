@@ -103,22 +103,7 @@ class PostAppeal < ActiveRecord::Base
     PostAppeal.for_user(creator_id).recent.count
   end
 
-  def serializable_hash(options = {})
-    options ||= {}
-    options[:except] ||= []
-    options[:except] += hidden_attributes
-    unless options[:builder]
-      options[:methods] ||= []
-      options[:methods] += [:is_resolved]
-    end
-    hash = super(options)
-    hash
-  end
-
-  def to_xml(options = {}, &block)
-    options ||= {}
-    options[:methods] ||= []
-    options[:methods] += [:is_resolved]
-    super(options, &block)
+  def method_attributes
+    super + [:is_resolved]
   end
 end

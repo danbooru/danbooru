@@ -86,7 +86,30 @@ class ForumPost < ActiveRecord::Base
     end
   end
 
+  module ApiMethods
+    def as_json(options = {})
+      if CurrentUser.user.level < topic.min_level
+        options[:only] = [:id]
+      end
+
+      super(options)
+    end
+
+    def to_xml(options = {})
+      if CurrentUser.user.level < topic.min_level
+        options[:only] = [:id]
+      end
+
+      super(options)
+    end
+    
+    def hidden_attributes
+      [:text_index]
+    end
+  end
+
   extend SearchMethods
+  include ApiMethods
 
   def self.new_reply(params)
     if params[:topic_id]
@@ -214,9 +237,5 @@ class ForumPost < ActiveRecord::Base
     dup.tap do |x|
       x.body = x.quoted_response
     end
-  end
-
-  def hidden_attributes
-    super + [:text_index]
   end
 end

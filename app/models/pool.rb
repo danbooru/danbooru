@@ -360,32 +360,12 @@ class Pool < ActiveRecord::Base
     clear_post_id_array
   end
 
-  def to_xml(options = {}, &block)
-    # to_xml ignores the serializable_hash method
-    options ||= {}
-    options[:methods] = [:creator_name]
-    super(options, &block)
+  def method_attributes
+    super + [:creator_name]
   end
 
   def strip_name
     self.name = name.to_s.strip
-  end
-
-  def serializable_hash(options = {})
-    return {
-      "category" => category,
-      "created_at" => created_at,
-      "creator_id" => creator_id,
-      "creator_name" => creator_name,
-      "description" => description,
-      "id" => id,
-      "is_active" => is_active?,
-      "is_deleted" => is_deleted?,
-      "name" => name,
-      "post_count" => post_count,
-      "post_ids" => post_ids,
-      "updated_at" => updated_at
-    }
   end
 
   def update_category_pseudo_tags_for_posts_async
