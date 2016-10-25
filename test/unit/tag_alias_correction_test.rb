@@ -27,7 +27,7 @@ class TagAliasCorrectionTest < ActiveSupport::TestCase
 
       should "have the correct statistics hash" do
         assert_equal("zzz", @correction.statistics_hash["antecedent_cache"])
-        assert_equal("bbb", @correction.statistics_hash["consequent_cache"])
+        assert_equal(nil, @correction.statistics_hash["consequent_cache"])
         assert_equal(-3, @correction.statistics_hash["antecedent_count"])
         assert_equal(1, @correction.statistics_hash["consequent_count"])
       end

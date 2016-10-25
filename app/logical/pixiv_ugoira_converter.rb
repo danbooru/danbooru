@@ -38,8 +38,7 @@ class PixivUgoiraConverter
       end
 
       ext = folder.first.name.match(/\.(\w{,4})$/)[1]
-      ffmpeg_out, status_ = Open3.capture2e("ffmpeg -i #{tmpdir}/images/%06d.#{ext} -codec:v libvpx -crf 4 -b:v 5000k -an #{tmpdir}/tmp.webm")
-      mkvmerge_out, status = Open3.capture2e("mkvmerge -o #{write_path} --webm --timecodes 0:#{tmpdir}/timecodes.tc #{tmpdir}/tmp.webm")
+      ffmpeg_out, status = Open3.capture2e("ffmpeg -i #{tmpdir}/images/%06d.#{ext} -codec:v libvpx -crf 4 -b:v 5000k -an #{tmpdir}/tmp.webm")
 
       if !status.success?
         Rails.logger.error "[write_webm] ******************************"
@@ -48,10 +47,21 @@ class PixivUgoiraConverter
         ffmpeg_out.split(/\n/).each do |line|
           Rails.logger.error "[write_webm][ffmpeg] #{line}"
         end
+        Rails.logger.error "[write_webm] ******************************"
+        return
+      end
+
+      mkvmerge_out, status = Open3.capture2e("mkvmerge -o #{write_path} --webm --timecodes 0:#{tmpdir}/timecodes.tc #{tmpdir}/tmp.webm")
+
+      if !status.success?
+        Rails.logger.error "[write_webm] ******************************"
+        Rails.logger.error "[write_webm] failed write_path=#{write_path}"
         Rails.logger.error "[write_webm] mkvmerge output:"
         mkvmerge_out.split(/\n/).each do |line|
           Rails.logger.error "[write_webm][mkvmerge] #{line}"
         end
+        Rails.logger.error "[write_webm] ******************************"
+        return
       end
     end
   end
