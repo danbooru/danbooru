@@ -1,15 +1,46 @@
 require 'test_helper'
 
 class BulkUpdateRequestTest < ActiveSupport::TestCase
-  context "creation" do
+  context "a bulk update request" do
     setup do
-      CurrentUser.user = FactoryGirl.create(:user)
+      @admin = FactoryGirl.create(:admin_user)
+      CurrentUser.user = @admin
       CurrentUser.ip_addr = "127.0.0.1"
+      Delayed::Worker.delay_jobs = false
     end
 
     teardown do
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
+    end
+
+    context "on approval" do
+      setup do
+        @script = %q(
+          create alias foo -> bar
+          create implication bar -> baz
+        )
+
+        @bur = FactoryGirl.create(:bulk_update_request, :script => @script)
+        @bur.approve!(@admin.id)
+
+        @ta = TagAlias.where(:antecedent_name => "foo", :consequent_name => "bar").first
+        @ti = TagImplication.where(:antecedent_name => "bar", :consequent_name => "baz").first
+      end
+
+      should "set the BUR approver" do
+        assert_equal(@admin.id, @bur.approver.id)
+      end
+
+      should "create aliases/implications" do
+        assert_equal("active", @ta.status)
+        assert_equal("active", @ti.status)
+      end
+
+      should "set the alias/implication approvers" do
+        assert_equal(@admin.id, @ta.approver.id)
+        assert_equal(@admin.id, @ti.approver.id)
+      end
     end
 
     should "create a forum topic" do
@@ -34,7 +65,6 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
     context "with an associated forum topic" do
       setup do
-        @admin = FactoryGirl.create(:admin_user)
         @topic = FactoryGirl.create(:forum_topic)
         @req = FactoryGirl.create(:bulk_update_request, :script => "create alias AAA -> BBB", :forum_topic => @topic)
       end
