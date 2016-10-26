@@ -22,7 +22,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         )
 
         @bur = FactoryGirl.create(:bulk_update_request, :script => @script)
-        @bur.approve!(@admin.id)
+        @bur.approve!(@admin)
 
         @ta = TagAlias.where(:antecedent_name => "foo", :consequent_name => "bar").first
         @ti = TagImplication.where(:antecedent_name => "bar", :consequent_name => "baz").first
@@ -72,7 +72,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       should "handle errors gracefully" do
         @req.stubs(:update_forum_topic_for_approve).raises(RuntimeError.new("blah"))
         assert_difference("Dmail.count", 1) do
-          @req.approve!(@admin.id)
+          @req.approve!(@admin)
         end
         assert_match(/Exception: RuntimeError/, Dmail.last.body)
         assert_match(/Message: blah/, Dmail.last.body)
@@ -84,7 +84,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
       should "update the topic when processed" do
         assert_difference("ForumPost.count") do
-          @req.approve!(@admin.id)
+          @req.approve!(@admin)
         end
       end
 

@@ -22,7 +22,7 @@ class TagImplication < ActiveRecord::Base
   validate :antecedent_and_consequent_are_different
   validate :wiki_pages_present, :on => :create
   attr_accessible :antecedent_name, :consequent_name, :forum_topic_id, :skip_secondary_validations
-  attr_accessible :status, :as => [:admin]
+  attr_accessible :status, :approver_id, :as => [:admin]
 
   module DescendantMethods
     extend ActiveSupport::Concern
@@ -138,11 +138,10 @@ class TagImplication < ActiveRecord::Base
     tries = 0
 
     begin
-      admin = CurrentUser.user || approver || User.admins.first
-      CurrentUser.scoped(admin, "127.0.0.1") do
-        update({ :status => "processing" }, :as => CurrentUser.role)
+      CurrentUser.scoped(approver, CurrentUser.ip_addr) do
+        update({ :status => "processing" }, :as => approver.role)
         update_posts
-        update({ :status => "active" }, :as => CurrentUser.role)
+        update({ :status => "active" }, :as => approver.role)
         update_descendant_names_for_parents
         update_forum_topic_for_approve if update_topic
       end
@@ -283,11 +282,9 @@ class TagImplication < ActiveRecord::Base
     end
   end
 
-  def approve!(approver_id)
-    self.status = "queued"
-    self.approver_id = approver_id
-    save
-    delay(:queue => "default").process!(true)
+  def approve!(approver = CurrentUser.user, update_topic: true)
+    update({ :status => "queued", :approver_id => approver.id }, :as => approver.role)
+    delay(:queue => "default").process!(update_topic)
   end
 
   def reject!

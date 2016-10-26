@@ -21,7 +21,7 @@ class TagAlias < ActiveRecord::Base
   belongs_to :approver, :class_name => "User"
   belongs_to :forum_topic
   attr_accessible :antecedent_name, :consequent_name, :forum_topic_id, :skip_secondary_validations
-  attr_accessible :status, :as => [:admin]
+  attr_accessible :status, :approver_id, :as => [:admin]
 
   module SearchMethods
     def name_matches(name)
@@ -88,9 +88,9 @@ class TagAlias < ActiveRecord::Base
     end.uniq
   end
 
-  def approve!(approver_id)
-    update_attributes(:status => "queued", :approver_id => approver_id)
-    delay(:queue => "default").process!(true)
+  def approve!(approver = CurrentUser.user, update_topic: true)
+    update({ :status => "queued", :approver_id => approver.id }, :as => approver.role)
+    delay(:queue => "default").process!(update_topic)
   end
 
   def process!(update_topic=true)
@@ -102,9 +102,8 @@ class TagAlias < ActiveRecord::Base
     forum_message = []
 
     begin
-      admin = CurrentUser.user || approver || User.admins.first
-      CurrentUser.scoped(admin, "127.0.0.1") do
-        update({ :status => "processing" }, :as => CurrentUser.role)
+      CurrentUser.scoped(approver, CurrentUser.ip_addr) do
+        update({ :status => "processing" }, :as => approver.role)
         move_aliases_and_implications
         move_saved_searches
         clear_all_cache
@@ -112,7 +111,7 @@ class TagAlias < ActiveRecord::Base
         update_posts
         forum_message << "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has been approved."
         forum_message << rename_wiki_and_artist
-        update({ :status => "active", :post_count => consequent_tag.post_count }, :as => CurrentUser.role)
+        update({ :status => "active", :post_count => consequent_tag.post_count }, :as => approver.role)
       end
     rescue Exception => e
       if tries < 5

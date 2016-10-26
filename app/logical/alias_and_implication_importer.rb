@@ -8,9 +8,9 @@ class AliasAndImplicationImporter
     @skip_secondary_validations = skip_secondary_validations
   end
 
-  def process!
+  def process!(approver = CurrentUser.user)
     tokens = AliasAndImplicationImporter.tokenize(text)
-    parse(tokens)
+    parse(tokens, approver)
   end
 
   def validate!
@@ -77,7 +77,7 @@ class AliasAndImplicationImporter
 
 private
 
-  def parse(tokens)
+  def parse(tokens, approver)
     ActiveRecord::Base.transaction do
       tokens.map do |token|
         case token[0]
@@ -87,14 +87,14 @@ private
             raise "Error: #{tag_alias.errors.full_messages.join("; ")} (create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name})"
           end
           tag_alias.rename_wiki_and_artist if rename_aliased_pages?
-          tag_alias.delay(:queue => "default").process!(false)
+          tag_alias.approve!(approver, update_topic: false)
 
         when :create_implication
           tag_implication = TagImplication.create(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2], :skip_secondary_validations => skip_secondary_validations)
           unless tag_implication.valid?
             raise "Error: #{tag_implication.errors.full_messages.join("; ")} (create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name})"
           end
-          tag_implication.delay(:queue => "default").process!(false)
+          tag_implication.approve!(approver)
 
         when :remove_alias
           tag_alias = TagAlias.where("antecedent_name = ?", token[1]).first
