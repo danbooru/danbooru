@@ -178,7 +178,7 @@ class ForumTopic < ActiveRecord::Base
   end
 
   def hidden_attributes
-    [:text_index, :min_level]
+    super + [:text_index, :min_level]
   end
 
   def merge(topic)

@@ -79,7 +79,7 @@ class PostFlag < ActiveRecord::Base
 
   module ApiMethods
     def hidden_attributes
-      list = []
+      list = super
       unless CurrentUser.is_moderator?
         list += [:creator_id]
       end

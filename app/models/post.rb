@@ -1469,7 +1469,7 @@ class Post < ActiveRecord::Base
 
   module ApiMethods
     def hidden_attributes
-      list = [:tag_index]
+      list = super + [:tag_index]
       if !visible?
         list += [:md5, :file_ext]
       end
@@ -1477,7 +1477,7 @@ class Post < ActiveRecord::Base
     end
 
     def method_attributes
-      list = [:uploader_name, :has_large, :tag_string_artist, :tag_string_character, :tag_string_copyright, :tag_string_general, :has_visible_children]
+      list = super + [:uploader_name, :has_large, :tag_string_artist, :tag_string_character, :tag_string_copyright, :tag_string_general, :has_visible_children]
       if visible?
         list += [:file_url, :large_file_url, :preview_file_url]
       end

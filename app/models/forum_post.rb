@@ -104,7 +104,7 @@ class ForumPost < ActiveRecord::Base
     end
     
     def hidden_attributes
-      [:text_index]
+      super + [:text_index]
     end
   end
 
