@@ -33,12 +33,10 @@ class BulkUpdateRequest < ActiveRecord::Base
 
   extend SearchMethods
 
-  def approve!(approver_id)
-    self.approver_id = approver_id
-    AliasAndImplicationImporter.new(script, forum_topic_id, "1", true).process!
-    self.status = "approved"
-    self.skip_secondary_validations = true
-    save
+  def approve!(approver)
+    AliasAndImplicationImporter.new(script, forum_topic_id, "1", true).process!(approver)
+
+    update({ :status => "approved", :approver_id => approver.id, :skip_secondary_validations => true }, :as => approver.role)
     update_forum_topic_for_approve
 
   rescue Exception => x

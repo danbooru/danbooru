@@ -62,7 +62,8 @@ class ArtistTest < ActiveSupport::TestCase
       setup do
         @post = FactoryGirl.create(:post, :tag_string => "aaa")
         @artist = FactoryGirl.create(:artist, :name => "aaa")
-        @artist.ban!
+        @admin = FactoryGirl.create(:admin_user)
+        CurrentUser.scoped(@admin) { @artist.ban! }
         @post.reload
       end
 
@@ -88,6 +89,11 @@ class ArtistTest < ActiveSupport::TestCase
       should "create a new tag implication" do
         assert_equal(1, TagImplication.where(:antecedent_name => "aaa", :consequent_name => "banned_artist").count)
         assert_equal("aaa banned_artist", @post.tag_string)
+      end
+
+      should "set the approver of the banned_artist implication" do
+        ta = TagImplication.where(:antecedent_name => "aaa", :consequent_name => "banned_artist").first
+        assert_equal(@admin.id, ta.approver.id)
       end
     end
 

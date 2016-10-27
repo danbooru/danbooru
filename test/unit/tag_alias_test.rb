@@ -137,25 +137,30 @@ class TagAliasTest < ActiveSupport::TestCase
       setup do
         @admin = FactoryGirl.create(:admin_user)
         @topic = FactoryGirl.create(:forum_topic)
-        @alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic)
+        @alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic, :status => "pending")
       end
 
       context "and conflicting wiki pages" do
         setup do
           @wiki1 = FactoryGirl.create(:wiki_page, :title => "aaa")
           @wiki2 = FactoryGirl.create(:wiki_page, :title => "bbb")
+          @alias.approve!(@admin)
+          @admin.reload # reload to get the forum post the approval created.
         end
 
-        should "update the topic when processed" do
-          assert_difference("ForumPost.count") do
-            @alias.rename_wiki_and_artist
-          end
+        should "update the forum topic when approved" do
+          assert(@topic.posts.last, @admin.forum_posts.last)
+          assert_match(/The tag alias .* been approved/, @admin.forum_posts.last.body)
+        end
+
+        should "warn about conflicting wiki pages when approved" do
+          assert_match(/has conflicting wiki pages/, @admin.forum_posts.last.body)
         end
       end
 
       should "update the topic when processed" do
         assert_difference("ForumPost.count") do
-          @alias.process!
+          @alias.approve!(@admin)
         end
       end
 
@@ -163,6 +168,15 @@ class TagAliasTest < ActiveSupport::TestCase
         assert_difference("ForumPost.count") do
           @alias.reject!
         end
+      end
+
+      should "update the topic when failed" do
+        @alias.stubs(:sleep).returns(true)
+        @alias.stubs(:update_posts).raises(Exception, "oh no")
+        @alias.approve!(@admin)
+
+        assert_match(/error: oh no/, @alias.status)
+        assert_match(/The tag alias .* failed during processing/, @admin.forum_posts.last.body)
       end
     end
   end

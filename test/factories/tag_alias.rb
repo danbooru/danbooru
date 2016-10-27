@@ -7,7 +7,8 @@ FactoryGirl.define do
 
     after(:create) do |tag_alias|
       unless tag_alias.status == "pending"
-        tag_alias.process!
+        approver = FactoryGirl.create(:admin_user) unless approver.present?
+        tag_alias.approve!(approver)
       end
     end
   end

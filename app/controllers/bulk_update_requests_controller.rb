@@ -31,7 +31,7 @@ class BulkUpdateRequestsController < ApplicationController
   end
 
   def approve
-    @bulk_update_request.approve!(CurrentUser.user.id)
+    @bulk_update_request.approve!(CurrentUser.user)
     respond_with(@bulk_update_request, :location => bulk_update_requests_path)
   end
 

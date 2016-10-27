@@ -21,7 +21,7 @@ class TagAlias < ActiveRecord::Base
   belongs_to :approver, :class_name => "User"
   belongs_to :forum_topic
   attr_accessible :antecedent_name, :consequent_name, :forum_topic_id, :skip_secondary_validations
-  attr_accessible :status, :as => [:admin]
+  attr_accessible :status, :approver_id, :as => [:admin]
 
   module SearchMethods
     def name_matches(name)
@@ -88,13 +88,9 @@ class TagAlias < ActiveRecord::Base
     end.uniq
   end
 
-  def approve!(approver_id)
-    self.status = "queued"
-    self.approver_id = approver_id
-    save
-
-    rename_wiki_and_artist
-    delay(:queue => "default").process!(true)
+  def approve!(approver = CurrentUser.user, update_topic: true)
+    update({ :status => "queued", :approver_id => approver.id }, :as => approver.role)
+    delay(:queue => "default").process!(update_topic)
   end
 
   def process!(update_topic=true)
@@ -103,18 +99,19 @@ class TagAlias < ActiveRecord::Base
     end
 
     tries = 0
+    forum_message = []
 
     begin
-      admin = CurrentUser.user || approver || User.admins.first
-      CurrentUser.scoped(admin, "127.0.0.1") do
-        update({ :status => "processing" }, :as => CurrentUser.role)
+      CurrentUser.scoped(approver, CurrentUser.ip_addr) do
+        update({ :status => "processing" }, :as => approver.role)
         move_aliases_and_implications
         move_saved_searches
         clear_all_cache
         ensure_category_consistency
         update_posts
-        update_forum_topic_for_approve if update_topic
-        update({ :status => "active", :post_count => consequent_tag.post_count }, :as => CurrentUser.role)
+        forum_message << "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has been approved."
+        forum_message << rename_wiki_and_artist
+        update({ :status => "active", :post_count => consequent_tag.post_count }, :as => approver.role)
       end
     rescue Exception => e
       if tries < 5
@@ -123,9 +120,18 @@ class TagAlias < ActiveRecord::Base
         retry
       end
 
-      update_forum_topic_for_error(e)
-      update({ :status => "error: #{e}" }, :as => CurrentUser.role)
-      NewRelic::Agent.notice_error(e, :custom_params => {:tag_alias_id => id, :antecedent_name => antecedent_name, :consequent_name => consequent_name})
+      forum_message << "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) failed during processing. Reason: #{e}"
+      update({ :status => "error: #{e}" }, :as => approver.role)
+
+      if Rails.env.production?
+        NewRelic::Agent.notice_error(e, :custom_params => {:tag_alias_id => id, :antecedent_name => antecedent_name, :consequent_name => consequent_name})
+      end
+    ensure
+      if update_topic && forum_topic.present?
+        CurrentUser.scoped(approver, CurrentUser.ip_addr) do
+          forum_topic.posts.create(:body => forum_message.join("\n\n"))
+        end
+      end
     end
   end
 
@@ -241,6 +247,8 @@ class TagAlias < ActiveRecord::Base
   end
 
   def rename_wiki_and_artist
+    message = ""
+
     antecedent_wiki = WikiPage.titled(antecedent_name).first
     if antecedent_wiki.present? 
       if WikiPage.titled(consequent_name).blank?
@@ -250,7 +258,7 @@ class TagAlias < ActiveRecord::Base
           )
         end
       else
-        update_forum_topic_for_wiki_conflict
+        message = "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has conflicting wiki pages. [[#{consequent_name}]] should be updated to include information from [[#{antecedent_name}]] if necessary."
       end
     end
 
@@ -264,6 +272,8 @@ class TagAlias < ActiveRecord::Base
         end
       end
     end
+
+    message
   end
 
   def deletable_by?(user)
@@ -277,37 +287,11 @@ class TagAlias < ActiveRecord::Base
     deletable_by?(user)
   end
 
-  def update_forum_topic_for_approve
-    if forum_topic
-      forum_topic.posts.create(
-        :body => "The tag alias #{antecedent_name} -> #{consequent_name} has been approved."
-      )
-    end
-  end
-
-  def update_forum_topic_for_error(e)
-    if forum_topic
-      forum_topic.posts.create(
-        :body => "The tag alias #{antecedent_name} -> #{consequent_name} failed during processing. Reason: #{e}"
-      )
-    end
-  end
-
   def update_forum_topic_for_reject
     if forum_topic
       forum_topic.posts.create(
-        :body => "The tag alias #{antecedent_name} -> #{consequent_name} has been rejected."
+        :body => "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has been rejected."
       )
-    end
-  end
-
-  def update_forum_topic_for_wiki_conflict
-    if forum_topic
-      CurrentUser.scoped(User.admins.first, "127.0.0.1") do
-        forum_topic.posts.create(
-          :body => "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] has conflicting wiki pages. [[#{consequent_name}]] should be updated to include information from [[#{antecedent_name}]] if necessary."
-        )
-      end
     end
   end
 
