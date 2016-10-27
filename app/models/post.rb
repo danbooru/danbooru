@@ -679,8 +679,8 @@ class Post < ActiveRecord::Base
     end
 
     def filter_metatags(tags)
-      @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent|-parent|source):/i}
-      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav|-fav|child|-favgroup|favgroup):/i}
+      @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent|-parent|source|-?locked):/i}
+      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav|-fav|child|-favgroup|favgroup|upvote|downvote):/i}
       apply_pre_metatags
       return tags
     end
@@ -718,6 +718,9 @@ class Post < ActiveRecord::Base
 
         when /^-fav:(.+)$/i
           remove_favorite!(CurrentUser.user)
+
+        when /^(up|down)vote:(.+)$/i
+          vote!($1)
 
         when /^child:(.+)$/i
           child = Post.find($1)
@@ -773,6 +776,15 @@ class Post < ActiveRecord::Base
 
         when /^rating:([qse])/i
           self.rating = $1.downcase
+
+        when /^(-?)locked:notes?$/i
+          assign_attributes({ is_note_locked: $1 != "-" }, as: CurrentUser.role)
+
+        when /^(-?)locked:rating$/i
+          assign_attributes({ is_rating_locked: $1 != "-" }, as: CurrentUser.role)
+
+        when /^(-?)locked:status$/i
+          assign_attributes({ is_status_locked: $1 != "-" }, as: CurrentUser.role)
         end
       end
     end
@@ -1021,12 +1033,16 @@ class Post < ActiveRecord::Base
     end
 
     def vote!(score)
-      if can_be_voted_by?(CurrentUser.user)
-        vote = PostVote.create(:post_id => id, :score => score)
-        self.score += vote.score
-      else
+      unless CurrentUser.is_voter?
+        raise PostVote::Error.new("You do not have permission to vote")
+      end
+
+      unless can_be_voted_by?(CurrentUser.user)
         raise PostVote::Error.new("You have already voted for this post")
       end
+
+      PostVote.create(:post_id => id, :score => score)
+      reload # PostVote.create modifies our score. Reload to get the new score.
     end
 
     def unvote!
