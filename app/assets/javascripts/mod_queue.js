@@ -7,7 +7,7 @@
     if (Danbooru.meta("random-mode") === "1") {
       Danbooru.ModQueue.processed += 1;
 
-      if (Danbooru.ModQueue.processed === 5) {
+      if (Danbooru.ModQueue.processed === 12) {
         window.location = Danbooru.meta("return-to");
       }
     }
