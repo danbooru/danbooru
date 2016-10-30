@@ -36,6 +36,31 @@ class ForumPostsControllerTest < ActionController::TestCase
           assert_equal(0, assigns(:forum_posts).size)
         end
       end
+
+      context "with private topics" do
+        setup do
+          @mod_topic = FactoryGirl.create(:mod_up_forum_topic)
+          @mod_posts = 2.times.map do
+            FactoryGirl.create(:forum_post, :topic_id => @mod_topic.id)
+          end
+          @mod_post_ids = ([@forum_post] + @mod_posts).map(&:id).reverse
+        end
+
+        should "list only permitted posts for members" do
+          get :index, {}, { :user_id => @user.id }
+
+          assert_response :success
+          assert_equal([@forum_post.id], assigns(:forum_posts).map(&:id))
+        end
+
+        should "list only permitted posts for mods" do
+          CurrentUser.user = @mod
+          get :index, {}, { :user_id => @mod.id }
+
+          assert_response :success
+          assert_equal(@mod_post_ids, assigns(:forum_posts).map(&:id))
+        end
+      end
     end
 
     context "edit action" do
