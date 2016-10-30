@@ -489,7 +489,7 @@ class User < ActiveRecord::Base
   module ForumMethods
     def has_forum_been_updated?
       return false unless is_gold?
-      max_updated_at = ForumTopic.active.maximum(:updated_at)
+      max_updated_at = ForumTopic.permitted.active.maximum(:updated_at)
       return false if max_updated_at.nil?
       return true if last_forum_read_at.nil?
       return max_updated_at > last_forum_read_at

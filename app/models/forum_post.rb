@@ -54,8 +54,12 @@ class ForumPost < ActiveRecord::Base
       where("forum_posts.is_deleted = false")
     end
 
+    def permitted
+      joins(:topic).where("min_level <= ?", CurrentUser.level)
+    end
+
     def search(params)
-      q = where("true")
+      q = permitted
       return q if params.blank?
 
       if params[:creator_id].present?
