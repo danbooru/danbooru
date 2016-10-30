@@ -57,8 +57,12 @@ class ForumTopic < ActiveRecord::Base
       where("is_deleted = false")
     end
 
+    def permitted
+      where("min_level <= ?", CurrentUser.level)
+    end
+
     def search(params)
-      q = where("true")
+      q = permitted
       return q if params.blank?
 
       if params[:title_matches].present?
