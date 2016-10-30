@@ -25,6 +25,26 @@ class ForumTopicsControllerTest < ActionController::TestCase
         get :show, {:id => @forum_topic.id}  
         assert_redirected_to forum_topics_path
       end
+
+      should "not bump the forum for users without access" do
+        @gold_user = FactoryGirl.create(:gold_user)
+        CurrentUser.user = @gold_user
+
+        # An open topic should bump...
+        @open_topic = FactoryGirl.create(:forum_topic)
+        assert_equal(true, @gold_user.has_forum_been_updated?)
+
+        # Marking it as read should clear it...
+        CurrentUser.scoped(@gold_user) do
+          post :mark_all_as_read, {}, {:user_id => @gold_user.id}
+        end
+        assert_redirected_to(forum_topics_path)
+        assert_equal(false, @gold_user.reload.has_forum_been_updated?)
+
+        # Then adding an unread private topic should not bump.
+        FactoryGirl.create(:forum_post, :topic_id => @forum_topic.id)
+        assert_equal(false, @gold_user.reload.has_forum_been_updated?)
+      end
     end
 
     context "show action" do
