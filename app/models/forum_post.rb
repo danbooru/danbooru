@@ -55,7 +55,7 @@ class ForumPost < ActiveRecord::Base
     end
 
     def permitted
-      joins(:topic).where("min_level <= ?", CurrentUser.level)
+      joins(:topic).where("forum_topics.min_level <= ?", CurrentUser.level)
     end
 
     def search(params)
@@ -63,11 +63,11 @@ class ForumPost < ActiveRecord::Base
       return q if params.blank?
 
       if params[:creator_id].present?
-        q = q.where("creator_id = ?", params[:creator_id].to_i)
+        q = q.where("forum_posts.creator_id = ?", params[:creator_id].to_i)
       end
 
       if params[:topic_id].present?
-        q = q.where("topic_id = ?", params[:topic_id].to_i)
+        q = q.where("forum_posts.topic_id = ?", params[:topic_id].to_i)
       end
 
       if params[:topic_title_matches].present?
