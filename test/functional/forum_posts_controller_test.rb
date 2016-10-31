@@ -35,6 +35,12 @@ class ForumPostsControllerTest < ActionController::TestCase
           assert_response :success
           assert_equal(0, assigns(:forum_posts).size)
         end
+
+        should "list by creator id" do
+          get :index, {:search => {:creator_id => @user.id}}
+          assert_response :success
+          assert_equal(1, assigns(:forum_posts).size)
+        end
       end
 
       context "with private topics" do
