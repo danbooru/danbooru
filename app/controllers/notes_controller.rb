@@ -65,7 +65,7 @@ private
   end
 
   def create_params
-    params.require(:note).permit(:x, :y, :width, :height, :body, :post_id)
+    params.require(:note).permit(:x, :y, :width, :height, :body, :post_id, :html_id)
   end
 
   def pass_html_id
