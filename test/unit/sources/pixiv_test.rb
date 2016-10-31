@@ -33,6 +33,19 @@ module Sources
         end
       end
 
+      context "A touch page" do
+        setup do
+          VCR.use_cassette("sources-pixiv-test/touch", :record => @vcr_record_option) do
+            @site = Sources::Site.new("http://touch.pixiv.net/member_illust.php?mode=medium&illust_id=59687915")
+            @image_urls = @site.get
+          end
+        end
+
+        should "get all the image urls" do
+          assert_equal("http://i4.pixiv.net/img-original/img/2016/10/29/17/13/23/59687915_p0.png", @image_urls)
+        end
+      end
+
       context "A gallery page" do
         setup do
           VCR.use_cassette("sources-pixiv-test/gallery", :record => @vcr_record_option) do

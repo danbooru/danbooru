@@ -11,12 +11,13 @@ module Sources
       TIMESTAMP = '(?:[0-9]{4}/[0-9]{2}/[0-9]{2}/[0-9]{2}/[0-9]{2}/[0-9]{2})'
       EXT = "(?:jpg|jpeg|png|gif)"
 
-      WEB = "^(?:https?://)?www\\.pixiv\\.net"
-      I12 = "^(?:https?://)?i[0-9]+\\.pixiv\\.net"
-      IMG = "^(?:https?://)?img[0-9]*\\.pixiv\\.net"
+      WEB =   "^(?:https?://)?www\\.pixiv\\.net"
+      I12 =   "^(?:https?://)?i[0-9]+\\.pixiv\\.net"
+      IMG =   "^(?:https?://)?img[0-9]*\\.pixiv\\.net"
+      TOUCH = "^(?:https?://)?touch\\.pixiv\\.net"
 
       def self.url_match?(url)
-        url =~ /#{WEB}|#{IMG}|#{I12}/i
+        url =~ /#{WEB}|#{IMG}|#{I12}|#{TOUCH}/i
       end
 
       def referer_url
@@ -343,8 +344,8 @@ module Sources
       end
 
       def work_page?
-        return true if url =~ %r!#{WEB}/member_illust\.php\?mode=(?:medium|big|manga|manga_big)&illust_id=\d+!i
-        return true if url =~ %r!#{WEB}/i/\d+$!i
+        return true if url =~ %r!(?:#{WEB}|#{TOUCH})/member_illust\.php\?mode=(?:medium|big|manga|manga_big)&illust_id=\d+!i
+        return true if url =~ %r!(?:#{WEB}|#{TOUCH})/i/\d+$!i
         return false
       end
 
