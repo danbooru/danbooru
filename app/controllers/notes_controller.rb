@@ -1,7 +1,6 @@
 class NotesController < ApplicationController
   respond_to :html, :xml, :json, :js
   before_filter :member_only, :except => [:index, :show]
-  before_filter :pass_html_id, :only => [:create]
 
   def search
   end
@@ -65,13 +64,7 @@ private
   end
 
   def create_params
-    params.require(:note).permit(:x, :y, :width, :height, :body, :post_id)
-  end
-
-  def pass_html_id
-    if params[:note] && params[:note][:html_id]
-      response.headers["X-Html-Id"] = params[:note][:html_id]
-    end
+    params.require(:note).permit(:x, :y, :width, :height, :body, :post_id, :html_id)
   end
 
   def index_by_post
