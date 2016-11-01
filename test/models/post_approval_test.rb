@@ -19,6 +19,7 @@ class PostApprovalTest < ActiveSupport::TestCase
 
 		teardown do
 			CurrentUser.user = nil
+			CurrentUser.ip_addr = nil
 		end
 
 		should "allow approval" do
