@@ -18,6 +18,11 @@ class FavoriteGroup < ActiveRecord::Base
       where("favorite_groups.creator_id = ?", user_id)
     end
 
+    def for_post(post_id)
+      regexp = "(^#{post_id}$|^#{post_id} | #{post_id}$| #{post_id} )"
+      where("favorite_groups.post_ids ~ ?", regexp)
+    end
+
     def named(name)
       where("lower(name) = ?", name.to_s.mb_chars.downcase.strip)
     end

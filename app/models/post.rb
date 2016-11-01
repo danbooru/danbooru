@@ -959,6 +959,12 @@ class Post < ActiveRecord::Base
         groups.uniq
       end
     end
+
+    def remove_from_fav_groups
+      FavoriteGroup.for_post(id).find_each do |group|
+        group.remove!(self)
+      end
+    end
   end
 
   module UploaderMethods
@@ -1313,6 +1319,7 @@ class Post < ActiveRecord::Base
         update_children_on_destroy
         decrement_tag_post_counts
         remove_from_all_pools
+        remove_from_fav_groups
         destroy
         update_parent_on_destroy
       end
