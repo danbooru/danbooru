@@ -1,0 +1,92 @@
+<div id="c-moderator-bulk-reverts">
+  <div id="a-new">
+    <h1>New Bulk Revert</h1>
+
+    <%= form_tag(moderator_bulk_revert_path, :class => "simple_form") do %>
+      <div class="input">
+        <label>Updater</label>
+        <%= text_field :constraints, :user_name, :value => @constraints[:user_name] %>
+      </div>
+
+      <div class="input">
+        <label>Min Version Id</label>
+        <%= text_field :constraints, :min_version_id, :value => @constraints[:min_version_id] %>
+      </div>
+
+      <div class="input">
+        <label>Max Version Id</label>
+        <%= text_field :constraints, :max_version_id, :value => @constraints[:max_version_id] %>
+      </div>
+
+      <div class="input" id="added-tags-input">
+        <label>Added Tags</label>
+        <%= text_field :constraints, :added_tags, :value => @constraints[:added_tags] %>
+      </div>
+
+      <div class="input" id="removed-tags-input">
+        <label>Removed Tags</label>
+        <%= text_field :constraints, :removed_tags, :value => @constraints[:removed_tags] %>
+      </div>
+
+      <%= submit_tag "Test" %>
+      <%#= submit_tag %>
+    <% end %>
+
+    <% if @bulk_revert %>
+      <div>
+        <p>Preview limited to 200 changes</p>
+
+        <table class="striped" width="100%">
+          <thead>
+            <tr>
+              <th>Post</th>
+              <th>Date</th>
+              <th>User</th>
+              <th>Changes</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <% @bulk_revert.preview.limit(200).each do |post_version| %>
+              <tr>
+                <td><%= link_to("#{post_version.post_id}.#{post_version.id}", post_path(post_version.post_id)) %></td>
+                <td><%= compact_time(post_version.updated_at) %></td>
+                <td> 
+                  <% if post_version.updater %>
+                    <%= link_to_user(post_version.updater) %>
+                  <% end %>
+                </td>
+                <td><%= post_version_diff(post_version) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  New Bulk Revert - <%= Danbooru.config.app_name %>
+<% end %>
+
+<% content_for(:html_header) do %>
+  <%= javascript_tag do %>
+    $(function() {
+      if ($("#constraints_user_name").val().length === 0) {
+        $("#added-tags-input").hide();
+        $("#removed-tags-input").hide();
+      }
+
+      $("#constraints_user_name").keyup(function() {
+        if ($("#constraints_user_name").val().length > 0) {
+          $("#added-tags-input").show();
+          $("#removed-tags-input").show();
+        } else {
+          $("#added-tags-input").hide();
+          $("#removed-tags-input").hide();          
+        }
+      });
+    });
+  <% end %>
+<% end %>
