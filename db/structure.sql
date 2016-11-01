@@ -2618,6 +2618,38 @@ ALTER SEQUENCE post_appeals_id_seq OWNED BY post_appeals.id;
 
 
 --
+-- Name: post_approvals; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE post_approvals (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    post_id integer NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: post_approvals_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE post_approvals_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: post_approvals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE post_approvals_id_seq OWNED BY post_approvals.id;
+
+
+--
 -- Name: post_disapprovals; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4311,6 +4343,13 @@ ALTER TABLE ONLY post_appeals ALTER COLUMN id SET DEFAULT nextval('post_appeals_
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY post_approvals ALTER COLUMN id SET DEFAULT nextval('post_approvals_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY post_disapprovals ALTER COLUMN id SET DEFAULT nextval('post_disapprovals_id_seq'::regclass);
 
 
@@ -4710,6 +4749,14 @@ ALTER TABLE ONLY pools
 
 ALTER TABLE ONLY post_appeals
     ADD CONSTRAINT post_appeals_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: post_approvals_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY post_approvals
+    ADD CONSTRAINT post_approvals_pkey PRIMARY KEY (id);
 
 
 --
@@ -6769,6 +6816,20 @@ CREATE INDEX index_post_appeals_on_post_id ON post_appeals USING btree (post_id)
 
 
 --
+-- Name: index_post_approvals_on_post_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_approvals_on_post_id ON post_approvals USING btree (post_id);
+
+
+--
+-- Name: index_post_approvals_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_approvals_on_user_id ON post_approvals USING btree (user_id);
+
+
+--
 -- Name: index_post_disapprovals_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7458,4 +7519,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160919234407');
 INSERT INTO schema_migrations (version) VALUES ('20161018221128');
 
 INSERT INTO schema_migrations (version) VALUES ('20161024220345');
+
+INSERT INTO schema_migrations (version) VALUES ('20161101003139');
 

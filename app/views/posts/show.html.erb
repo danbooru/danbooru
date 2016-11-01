@@ -148,7 +148,9 @@
   <meta name="favorites" content="<%= @post.fav_string %>">
   <meta name="pools" content="<%= @post.pool_string %>">
   <meta name="post-id" content="<%= @post.id %>">
-  <meta name="post-is-approvable" content="<%= @post.is_approvable? %>">
+  <% if CurrentUser.can_approve_posts? %>
+    <meta name="post-is-approvable" content="<%= @post.is_approvable? %>">
+  <% end %>
   <meta name="post-is-deleted" content="<%= @post.is_deleted? %>">
   <meta name="post-is-flagged" content="<%= @post.is_flagged? %>">
   <meta name="config-large-width" content="<%= Danbooru.config.large_image_width %>">

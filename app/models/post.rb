@@ -274,7 +274,7 @@ class Post < ActiveRecord::Base
 
   module ApprovalMethods
     def is_approvable?
-      !is_status_locked? && (is_pending? || is_flagged? || is_deleted?) && approver_id != CurrentUser.id
+      !is_status_locked? && (is_pending? || is_flagged? || is_deleted?) && !PostApproval.approved?(CurrentUser.id, id)
     end
 
     def flag!(reason, options = {})
@@ -314,7 +314,7 @@ class Post < ActiveRecord::Base
         raise ApprovalError.new("You cannot approve a post you uploaded")
       end
 
-      if approver_id == CurrentUser.id
+      if approver_id == CurrentUser.id || PostApproval.approved?(CurrentUser.id, id)
         errors.add(:approver, "have already approved this post")
         raise ApprovalError.new("You have previously approved this post and cannot approve it again")
       end
@@ -324,6 +324,9 @@ class Post < ActiveRecord::Base
       self.is_pending = false
       self.is_deleted = false
       self.approver_id = CurrentUser.id
+
+      PostApproval.create(user_id: CurrentUser.id, post_id: id)
+
       save!
     end
 
@@ -1362,7 +1365,7 @@ class Post < ActiveRecord::Base
       end
 
       if !CurrentUser.is_admin? 
-        if approver_id == CurrentUser.id
+        if approver_id == CurrentUser.id || PostApproval.approved?(CurrentUser.id, id)
           raise ApprovalError.new("You have previously approved this post and cannot undelete it")
         elsif uploader_id == CurrentUser.id
           raise ApprovalError.new("You cannot undelete a post you uploaded")
