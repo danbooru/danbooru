@@ -94,7 +94,7 @@ private
           unless tag_implication.valid?
             raise "Error: #{tag_implication.errors.full_messages.join("; ")} (create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name})"
           end
-          tag_implication.approve!(approver)
+          tag_implication.approve!(approver, update_topic: false)
 
         when :remove_alias
           tag_alias = TagAlias.where("antecedent_name = ?", token[1]).first
