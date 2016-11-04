@@ -142,7 +142,11 @@ class ForumTopic < ActiveRecord::Base
   include UserLevelMethods
 
   def editable_by?(user)
-    creator_id == user.id || user.is_moderator?
+    (creator_id == user.id || user.is_moderator?) && visible?(user)
+  end
+
+  def visible?(user)
+    user.level >= min_level
   end
 
   def initialize_is_deleted

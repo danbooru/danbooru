@@ -45,6 +45,7 @@ class ForumPostsControllerTest < ActionController::TestCase
 
       context "with private topics" do
         setup do
+          CurrentUser.user = @mod
           @mod_topic = FactoryGirl.create(:mod_up_forum_topic)
           @mod_posts = 2.times.map do
             FactoryGirl.create(:forum_post, :topic_id => @mod_topic.id)
@@ -53,6 +54,7 @@ class ForumPostsControllerTest < ActionController::TestCase
         end
 
         should "list only permitted posts for members" do
+          CurrentUser.user = @user
           get :index, {}, { :user_id => @user.id }
 
           assert_response :success

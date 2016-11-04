@@ -3,7 +3,7 @@
     <h1>
       Topic: <%= @forum_topic.title %>
 
-      <% if @forum_topic.min_level >= User::Levels::BUILDER %>
+      <% if @forum_topic.min_level >= User::Levels::MODERATOR %>
         <span class="level-topic">(<%= User.level_string(@forum_topic.min_level).downcase %>+ only)</span>
       <% end %>
 

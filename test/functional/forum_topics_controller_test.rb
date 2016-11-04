@@ -18,7 +18,9 @@ class ForumTopicsControllerTest < ActionController::TestCase
 
     context "for a level restricted topic" do
       setup do
-        @forum_topic.update_attribute(:min_level, 50)
+        CurrentUser.user = @mod
+        @forum_topic.update_attribute(:min_level, User::Levels::MODERATOR)
+        CurrentUser.user = @user
       end
 
       should "not allow users to see the topic" do
@@ -42,7 +44,9 @@ class ForumTopicsControllerTest < ActionController::TestCase
         assert_equal(false, @gold_user.reload.has_forum_been_updated?)
 
         # Then adding an unread private topic should not bump.
-        FactoryGirl.create(:forum_post, :topic_id => @forum_topic.id)
+        CurrentUser.scoped(@mod) do
+          FactoryGirl.create(:forum_post, :topic_id => @forum_topic.id)
+        end
         assert_equal(false, @gold_user.reload.has_forum_been_updated?)
       end
     end

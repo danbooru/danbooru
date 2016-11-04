@@ -73,9 +73,9 @@ class WikiPagesControllerTest < ActionController::TestCase
       end
 
       should "destroy a wiki_page" do
-        assert_difference("WikiPage.count", -1) do
-          post :destroy, {:id => @wiki_page.id}, {:user_id => @mod.id}
-        end
+        post :destroy, {:id => @wiki_page.id}, {:user_id => @mod.id}
+        @wiki_page.reload
+        assert_equal(true, @wiki_page.is_deleted?)
       end
     end
 

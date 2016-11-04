@@ -16,6 +16,7 @@ class ForumPost < ActiveRecord::Base
   validates_presence_of :body, :creator_id
   validate :validate_topic_is_unlocked
   validate :topic_id_not_invalid
+  validate :topic_is_not_restricted, :on => :create
   before_destroy :validate_topic_is_unlocked
   after_save :delete_topic_if_original_post
   mentionable(
@@ -144,8 +145,18 @@ class ForumPost < ActiveRecord::Base
     end
   end
 
+  def topic_is_not_restricted
+    if topic && !topic.visible?(creator)
+      errors.add(:topic, "restricted")
+    end
+  end
+
   def editable_by?(user)
-    creator_id == user.id || user.is_moderator?
+    (creator_id == user.id || user.is_moderator?) && visible?(user)
+  end
+
+  def visible?(user)
+    user.is_moderator? || (topic.visible?(user) && !is_deleted?)
   end
 
   def update_topic_updated_at_on_create

@@ -34,7 +34,7 @@ module Maintenance
             post :create, {:user => {:email => ""}}
             assert_equal("Email address not found", flash[:notice])
             @blank_email_user.reload
-            assert_equal(@blank_email_user.created_at, @blank_email_user.updated_at)
+            assert_equal(@blank_email_user.created_at.to_i, @blank_email_user.updated_at.to_i)
             assert_equal(0, ActionMailer::Base.deliveries.size)
           end
         end

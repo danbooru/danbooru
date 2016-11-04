@@ -5,7 +5,10 @@ class ForumPostsController < ApplicationController
   before_filter :check_min_level, :only => [:edit, :show, :update, :destroy, :undelete]
 
   def new
-    @forum_topic = ForumTopic.find(params[:topic_id]) if params[:topic_id]
+    if params[:topic_id]
+      @forum_topic = ForumTopic.find(params[:topic_id]) 
+      raise User::PrivilegeError.new unless @forum_topic.visible?(CurrentUser.user)
+    end
     @forum_post = ForumPost.new_reply(params)
     respond_with(@forum_post)
   end
