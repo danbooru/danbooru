@@ -12,7 +12,7 @@
   <% if CurrentUser.user.blacklisted_tags.present? %>
     <meta name="blacklisted-tags" content="<%= CurrentUser.user.blacklisted_tags.gsub(/(?:\r|\n)+/, ",") %>">
   <% end %>
-  <% if flash[:notice] =~ /error/ %>
+  <% if flash[:notice] =~ /error/i %>
     <meta name="errors" content="true">
   <% end %>
   <meta name="enable-js-navigation" content="<%= CurrentUser.user.enable_post_navigation %>">

@@ -1,5 +1,16 @@
 class BulkRevert
+  BIG_QUERY_LIMIT = 5_000
   attr_reader :constraints
+
+  class ConstraintTooGeneralError < Exception ; end
+
+  def self.process(constraints)
+    obj = BulkRevert.new(constraints)
+
+    obj.find_post_versions.order("updated_at, id").each do |version|
+      version.undo!
+    end
+  end
 
   def initialize(constraints)
     @constraints = constraints
@@ -18,14 +29,19 @@ class BulkRevert
 
     if constraints[:user_id]
       q = q.where("post_versions.updater_id = ?", constraints[:user_id])
+    end
 
-      if constraints[:added_tags] || constraints[:removed_tags]
-        hash = CityHash.hash64("#{constraints[:added_tags]} #{constraints{removed_tags}}").to_s(36)
-        sub_ids = Cache.get("br/fpv/#{hash}", 300) do
-          sub_ids = GoogleBigQuery::PostVersion.new.find(constraints[:user_id], constraints[:added_tags], constraints[:removed_tags])
-        end
-        q = q.where("post_versions.id in (?)", sub_ids)
+    if constraints[:added_tags] || constraints[:removed_tags]
+      hash = CityHash.hash64("#{constraints[:added_tags]} #{constraints{removed_tags}} #{constraints[:min_version_id]} #{constraints[:max_version_id]}").to_s(36)
+      sub_ids = Cache.get("br/fpv/#{hash}", 300) do
+        GoogleBigQuery::PostVersion.new.find(constraints[:user_id], constraints[:added_tags], constraints[:removed_tags], constraints[:min_version_id], constraints[:max_version_id], BIG_QUERY_LIMIT)
       end
+
+      if sub_ids.size >= BIG_QUERY_LIMIT
+        raise ConstraintTooGeneralError.new
+      end
+
+      q = q.where("post_versions.id in (?)", sub_ids)
     end
 
     if constraints[:min_version_id].present?
