@@ -2,9 +2,18 @@
 
 require ::File.expand_path('../config/environment',  __FILE__)
 
-# if defined?(Unicorn) && Rails.env.production?
-#   require_dependency 'gctools/oobgc'
-#   use GC::OOB::UnicornMiddleware
-# end
+if defined?(Unicorn) && Rails.env.production?
+  # Unicorn self-process killer
+  require 'unicorn/worker_killer'
+
+  # Max requests per worker
+  use Unicorn::WorkerKiller::MaxRequests, 10_000, 15_000
+
+  # Max memory size (RSS) per worker
+  #use Unicorn::WorkerKiller::Oom, (192*(1024**2)), (256*(1024**2))
+
+  require 'gctools/oobgc'
+  use GC::OOB::UnicornMiddleware
+end
 
 run Rails.application
