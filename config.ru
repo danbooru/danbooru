@@ -7,7 +7,7 @@ if defined?(Unicorn) && Rails.env.production?
   require 'unicorn/worker_killer'
 
   # Max requests per worker
-  use Unicorn::WorkerKiller::MaxRequests, 10_000, 15_000
+  use Unicorn::WorkerKiller::MaxRequests, 5_000, 10_000
 
   # Max memory size (RSS) per worker
   #use Unicorn::WorkerKiller::Oom, (192*(1024**2)), (256*(1024**2))
