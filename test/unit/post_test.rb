@@ -932,6 +932,20 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      context "with *_(cosplay) tags" do
+        setup do
+          @post.add_tag("hakurei_reimu_(cosplay)")
+          @post.add_tag("hatsune_miku_(cosplay)")
+          @post.save
+        end
+
+        should "add the character tags and the cosplay tag" do
+          assert(@post.has_tag?("hakurei_reimu"))
+          assert(@post.has_tag?("hatsune_miku"))
+          assert(@post.has_tag?("cosplay"))
+        end
+      end
+
       context "that has been updated" do
         should "create a new version if it's the first version" do
           assert_difference("PostVersion.count", 1) do
