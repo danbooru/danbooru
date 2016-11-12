@@ -160,17 +160,26 @@ class CommentTest < ActiveSupport::TestCase
         user = FactoryGirl.create(:user)
         post = FactoryGirl.create(:post)
         c1 = FactoryGirl.create(:comment, :post => post)
-        comment_vote = c1.vote!("up")
+        comment_vote = c1.vote!("down")
         assert_equal([], comment_vote.errors.full_messages)
-        comment_vote = c1.vote!("up")
+        comment_vote = c1.vote!("down")
         assert_equal(["You have already voted for this comment"], comment_vote.errors.full_messages)
         assert_equal(1, CommentVote.count)
-        assert_equal(1, CommentVote.last.score)
+        assert_equal(-1, CommentVote.last.score)
 
         c2 = FactoryGirl.create(:comment, :post => post)
-        comment_vote = c2.vote!("up")
+        comment_vote = c2.vote!("down")
         assert_equal([], comment_vote.errors.full_messages)
         assert_equal(2, CommentVote.count)
+      end
+
+      should "not allow upvotes by the creator" do
+        user = FactoryGirl.create(:user)
+        post = FactoryGirl.create(:post)
+        c1 = FactoryGirl.create(:comment, :post => post)
+        comment_vote = c1.vote!("up")
+
+        assert_equal(["You cannot upvote your own comments"], comment_vote.errors.full_messages)
       end
 
       should "allow undoing of votes" do
