@@ -11,7 +11,7 @@ class DmailFilter < ActiveRecord::Base
   end
 
   def filtered?(dmail)
-    dmail.from.level <= User::Levels::MODERATOR && has_filter? && (dmail.body =~ regexp || dmail.title =~ regexp || dmail.from.name =~ regexp)
+    dmail.from.level < User::Levels::MODERATOR && has_filter? && (dmail.body =~ regexp || dmail.title =~ regexp || dmail.from.name =~ regexp)
   end
 
   def has_filter?
