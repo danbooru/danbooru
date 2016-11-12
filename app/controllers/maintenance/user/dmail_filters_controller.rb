@@ -10,7 +10,7 @@ module Maintenance
 
       def update
         @dmail_filter = CurrentUser.dmail_filter || DmailFilter.new
-        @dmail_filter.update_attributes(params[:dmail_filter])
+        @dmail_filter.update(params.require(:dmail_filter).permit(:words), :as => CurrentUser.role)
         flash[:notice] = "Filter updated"
         redirect_to(dmail_path(@dmail.id))
       end
