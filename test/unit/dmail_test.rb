@@ -38,6 +38,16 @@ class DmailTest < ActiveSupport::TestCase
         assert_equal(false, @recipient.has_mail?)
       end
 
+      should "be ignored when sender is a moderator" do
+        CurrentUser.scoped(FactoryGirl.create(:moderator_user), "127.0.0.1") do
+          @dmail = FactoryGirl.create(:dmail, :owner => @recipient, :body => "banned word here", :to => @recipient)
+        end
+
+        assert_equal(false, !!@recipient.dmail_filter.filtered?(@dmail))
+        assert_equal(false, @dmail.is_read?)
+        assert_equal(true, @recipient.has_mail?)
+      end
+
       context "that is empty" do
         setup do
           @recipient.dmail_filter.update_attributes(:words => "   ")
