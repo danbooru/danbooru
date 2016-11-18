@@ -17,7 +17,7 @@ class Comment < ActiveRecord::Base
     :message_field => :body, 
     :user_field => :creator_id, 
     :title => "You were mentioned in a comment",
-    :body => lambda {|rec, user_name| "You were mentioned in a \"comment\":http://#{Danbooru.config.hostname}/posts/#{rec.post_id}#comment-#{rec.id}\n\n---\n\n[i]#{rec.creator.name} said:[/i]\n\n#{ActionController::Base.helpers.excerpt(rec.body, user_name)}"}
+    :body => lambda {|rec, user_name| "You were mentioned in a \"comment\":/posts/#{rec.post_id}#comment-#{rec.id}\n\n---\n\n[i]#{rec.creator.name} said:[/i]\n\n#{ActionController::Base.helpers.excerpt(rec.body, user_name)}"}
   )
 
   module SearchMethods
