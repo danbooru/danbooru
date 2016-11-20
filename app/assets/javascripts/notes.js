@@ -714,7 +714,7 @@ Danbooru.Note = {
   timeouts: [],
   pending: {},
 
-  add: function(container, id, x, y, w, h, text) {
+  add: function(container, id, x, y, w, h, original_body, sanitized_body) {
     var $note_box = Danbooru.Note.Box.create(id);
     var $note_body = Danbooru.Note.Body.create(id);
 
@@ -724,11 +724,11 @@ Danbooru.Note = {
     $note_box.data('height', h);
     container.appendChild($note_box[0]);
     container.appendChild($note_body[0]);
-    $note_body.data("original-body", text);
+    $note_body.data("original-body", original_body);
     Danbooru.Note.Box.scale($note_box);
-    Danbooru.Note.Body.display_text($note_body, text);
+    Danbooru.Note.Body.display_text($note_body, sanitized_body);
     if (Danbooru.Note.embed) {
-      Danbooru.Note.Body.display_text($note_box.children("div.note-box-inner-border"), text);
+      Danbooru.Note.Body.display_text($note_box.children("div.note-box-inner-border"), sanitized_body);
     }
   },
 
@@ -769,6 +769,7 @@ Danbooru.Note = {
         $article.data("y"),
         $article.data("width"),
         $article.data("height"),
+        $article.data("body"),
         $article.html()
       );
     });
