@@ -5,6 +5,7 @@ class UploadsController < ApplicationController
 
   def new
     @upload = Upload.new
+    @upload_notice_wiki = WikiPage.titled(Danbooru.config.upload_notice_wiki_page).first
     if params[:url]
       @normalized_url = params[:url]
       headers = default_headers()
