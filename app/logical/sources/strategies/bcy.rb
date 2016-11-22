@@ -58,6 +58,16 @@ module Sources
       def get
       end
 
+      def referer_url
+        if url =~ PAGE_URL
+          url
+        elsif @referer_url =~ PAGE_URL
+          @referer_url
+        else
+          ""
+        end
+      end
+
       def image_url
         image_urls.first
       end
