@@ -341,6 +341,14 @@ module Danbooru
       nil
     end
 
+    def bcy_email
+      nil
+    end
+
+    def bcy_password
+      nil
+    end
+
     def enable_dimension_autotagging
       true
     end
