@@ -5,6 +5,8 @@ module Downloads
 
       def rewrite(url, headers, data = {})
         return [url, headers, data] unless source.class.url_match?(url)
+        data[:artist_commentary_title] = source.artist_commentary_title
+        data[:artist_commentary_desc] = source.artist_commentary_desc
         return [source.image_url, headers, data]
       end
 
