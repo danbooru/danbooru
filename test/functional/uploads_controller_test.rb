@@ -28,6 +28,15 @@ class UploadsControllerTest < ActionController::TestCase
           assert_response :success
         end
       end
+
+      context "for a bcy.net gallery" do
+        should "render" do
+          VCR.use_cassette("upload-controller-test/bcy.net-batch", :record => @vcr_record_option) do
+            get :new, {:url => "http://bcy.net/illust/detail/76491/919312"}, {:user_id => @user.id}
+            assert_response :success
+          end
+        end
+      end
     end
 
     context "new action" do
@@ -45,6 +54,15 @@ class UploadsControllerTest < ActionController::TestCase
 
         should "render" do
           assert_response :success
+        end
+      end
+
+      context "for a bcy.net post" do
+        should "render" do
+          VCR.use_cassette("upload-controller-test/bcy.net", :record => @vcr_record_option) do
+            get :new, {:url => "http://bcy.net/illust/detail/76491/919312"}, {:user_id => @user.id}
+            assert_response :success
+          end
         end
       end
 

@@ -40,10 +40,6 @@ module Downloads
       @full_gif_size = 15048
     end
 
-    def teardown
-      Cache.delete(BCYWebAgent::CACHE_KEY)
-    end
-
     context "bcy.net:" do
       context "Downloading a work page" do
         context "that has one image" do

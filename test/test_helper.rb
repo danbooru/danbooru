@@ -86,6 +86,7 @@ class ActiveSupport::TestCase
     Cache.delete("pixiv-papi-access-token")
     Cache.delete("nico-seiga-session")
     Cache.delete("twitter-api-token")
+    Cache.delete(BCYWebAgent::CACHE_KEY)
 
     unless @record
       [
