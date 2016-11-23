@@ -56,6 +56,7 @@ module Sources
       end
 
       def get
+        work_page
       end
 
       def referer_url
