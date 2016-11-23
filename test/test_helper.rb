@@ -40,9 +40,10 @@ module UploadTestMethods
 end
 
 module DownloadTestMethods
-  def assert_downloaded(expected_filesize, source, cassette, record = nil)
+  def assert_downloaded(expected_filesize, source, cassette = nil, record = nil)
     tempfile = Tempfile.new("danbooru-test")
     download = Downloads::File.new(source, tempfile.path)
+    cassette ||= "download-test/assert_downloaded-#{source.gsub(/[\?\.\/:&]/, "-").gsub(/-+/, "-")}"
 
     VCR.use_cassette(cassette, :record => (record || @vcr_record_option)) do
       assert_nothing_raised(Downloads::File::Error) do
@@ -53,9 +54,10 @@ module DownloadTestMethods
     assert_equal(expected_filesize, tempfile.size, "Tested source URL: #{source}")
   end
 
-  def assert_rewritten(expected_source, test_source, cassette, record = nil)
+  def assert_rewritten(expected_source, test_source, cassette = nil, record = nil)
     tempfile = Tempfile.new("danbooru-test")
     download = Downloads::File.new(test_source, tempfile.path)
+    cassette ||= "download-test/assert_rewritten-#{test_source.gsub(/[\?\.\/:&]/, "-").gsub(/-+/, "-")}"
 
     VCR.use_cassette(cassette, :record => (record || @vcr_record_option)) do
       rewritten_source, headers, _ = download.before_download(test_source, {}, {})
@@ -63,7 +65,7 @@ module DownloadTestMethods
     end
   end
 
-  def assert_not_rewritten(source, cassette, record = nil)
+  def assert_not_rewritten(source, cassette = nil, record = nil)
     assert_rewritten(source, source, cassette, record)
   end
 end
@@ -86,7 +88,15 @@ class ActiveSupport::TestCase
     Cache.delete("twitter-api-token")
 
     unless @record
-      [:pixiv_login, :pixiv_password, :tinami_login, :tinami_password, :nico_seiga_login, :nico_seiga_password, :pixa_login, :pixa_password, :nijie_login, :nijie_password, :twitter_api_key, :twitter_api_secret].each do |key|
+      [
+        :pixiv_login, :pixiv_password,
+        :tinami_login, :tinami_password,
+        :nico_seiga_login, :nico_seiga_password,
+        :pixa_login, :pixa_password,
+        :nijie_login, :nijie_password,
+        :twitter_api_key, :twitter_api_secret,
+        :bcy_email, :bcy_password
+      ].each do |key|
         Danbooru.config.stubs(key).returns("SENSITIVE")
       end
     end

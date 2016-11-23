@@ -1,10 +1,11 @@
 class BCYWebAgent
   LOGIN_URL = "http://bcy.net/public/dologin"
+  CACHE_KEY = "bcy-credentials"
 
   def self.build
     mech = Mechanize.new
 
-    phpsessid, logged_user = Cache.get("bcy-credentials", 1.day) do
+    phpsessid, logged_user = Cache.get(CACHE_KEY, 1.day) do
       params = {
         email: Danbooru.config.bcy_email,
         password: Danbooru.config.bcy_password,
