@@ -39,8 +39,38 @@ module UploadTestMethods
   end
 end
 
+module DownloadTestMethods
+  def assert_downloaded(expected_filesize, source, cassette, record = nil)
+    tempfile = Tempfile.new("danbooru-test")
+    download = Downloads::File.new(source, tempfile.path)
+
+    VCR.use_cassette(cassette, :record => (record || @vcr_record_option)) do
+      assert_nothing_raised(Downloads::File::Error) do
+        download.download!
+      end
+    end
+
+    assert_equal(expected_filesize, tempfile.size, "Tested source URL: #{source}")
+  end
+
+  def assert_rewritten(expected_source, test_source, cassette, record = nil)
+    tempfile = Tempfile.new("danbooru-test")
+    download = Downloads::File.new(test_source, tempfile.path)
+
+    VCR.use_cassette(cassette, :record => (record || @vcr_record_option)) do
+      rewritten_source, headers, _ = download.before_download(test_source, {}, {})
+      assert_equal(expected_source, rewritten_source, "Tested source URL: #{test_source}")
+    end
+  end
+
+  def assert_not_rewritten(source, cassette, record = nil)
+    assert_rewritten(source, source, cassette, record)
+  end
+end
+
 class ActiveSupport::TestCase
   include UploadTestMethods
+  include DownloadTestMethods
 
   def setup_vcr
     @vcr_record_option = :none
