@@ -4,12 +4,6 @@ module ForumTopicsHelper
   end
 
   def available_min_user_levels
-    if CurrentUser.is_admin?
-      [["Moderator", User::Levels::MODERATOR], ["Admin", User::Levels::ADMIN]]
-    elsif CurrentUser.is_moderator?
-      [["Moderator", User::Levels::MODERATOR]]
-    else
-      []
-    end
+    ForumTopic::MIN_LEVELS.select { |name, level| level <= CurrentUser.level }.to_a
   end
 end

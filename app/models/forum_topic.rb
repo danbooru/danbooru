@@ -5,6 +5,12 @@ class ForumTopic < ActiveRecord::Base
     2 => "Bugs & Features"
   }
 
+  MIN_LEVELS = {
+    None: 0,
+    Moderator: User::Levels::MODERATOR,
+    Admin: User::Levels::ADMIN,
+  }
+
   attr_accessible :title, :original_post_attributes, :category_id, :as => [:member, :builder, :gold, :platinum, :janitor, :moderator, :admin, :default]
   attr_accessible :is_sticky, :is_locked, :is_deleted, :min_level, :as => [:admin, :moderator]
   belongs_to :creator, :class_name => "User"
@@ -18,7 +24,7 @@ class ForumTopic < ActiveRecord::Base
   validates_presence_of :title, :creator_id
   validates_associated :original_post
   validates_inclusion_of :category_id, :in => CATEGORIES.keys
-  validates_inclusion_of :min_level, :in => [0, User::Levels::MODERATOR, User::Levels::ADMIN]
+  validates_inclusion_of :min_level, :in => MIN_LEVELS.values
   accepts_nested_attributes_for :original_post
   after_update :update_orignal_post
 

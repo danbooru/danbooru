@@ -18,7 +18,7 @@
     <% end %>
 
     <% if CurrentUser.is_moderator? %>
-      <%= f.input :min_level, :as => :select, :collection => available_min_user_levels.to_a %>
+      <%= f.input :min_level, :include_blank => false, :collection => available_min_user_levels %>
       <%= f.input :is_sticky, :label => "Sticky" %>
       <%= f.input :is_locked, :label => "Locked" %>
     <% end %>
