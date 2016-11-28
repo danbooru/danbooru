@@ -55,7 +55,6 @@ module Downloads
     end
 
     def after_download(src)
-      src = fix_image_board_sources(src)
       src = fix_twitter_sources(src)
       if options[:referer_url].present?
         src = set_source_to_referer(src)
@@ -127,14 +126,6 @@ module Downloads
 
       [src, datums]
     end # def
-
-    def fix_image_board_sources(src)
-      if src =~ /i\.4cdn\.org|\/src\/\d{12,}|urnc\.yi\.org|yui\.cynthia\.bne\.jp/
-        "Image board"
-      else
-        src
-      end
-    end
 
     def fix_twitter_sources(src)
       if src =~ %r!^https?://pbs\.twimg\.com/! && original_source =~ %r!^https?://twitter\.com/!
