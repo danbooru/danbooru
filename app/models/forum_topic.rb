@@ -119,27 +119,10 @@ class ForumTopic < ActiveRecord::Base
     end
   end
 
-  module UserLevelMethods
-    extend ActiveSupport::Concern
-
-    module ClassMethods
-      def available_min_user_levels
-        if CurrentUser.is_admin?
-          [["Moderator", User::Levels::MODERATOR], ["Admin", User::Levels::ADMIN]]
-        elsif CurrentUser.is_moderator?
-          [["Moderator", User::Levels::MODERATOR]]
-        else
-          []
-        end
-      end
-    end
-  end
-
   extend SearchMethods
   include CategoryMethods
   include VisitMethods
   include SubscriptionMethods
-  include UserLevelMethods
 
   def editable_by?(user)
     (creator_id == user.id || user.is_moderator?) && visible?(user)
