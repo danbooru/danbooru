@@ -20,7 +20,7 @@
             <td><%= compact_time(feedback.created_at) %></td>
             <td><%= format_text(feedback.body) %></td>
             <td>
-              <% if feedback.creator_id == CurrentUser.id || CurrentUser.is_moderator? %>
+              <% if feedback.editable_by?(CurrentUser.user) %>
                 <%= link_to "edit", edit_user_feedback_path(feedback) %>
                 | <%= link_to "delete", user_feedback_path(feedback), :method => :delete, :data => {:confirm => "Are you sure you want to delete this user feedback?"} %>
               <% end %>

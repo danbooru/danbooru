@@ -49,6 +49,6 @@ class UserFeedbacksController < ApplicationController
 
 private
   def check_privilege(user_feedback)
-    raise User::PrivilegeError unless (user_feedback.creator_id == CurrentUser.id || CurrentUser.is_moderator?)
+    raise User::PrivilegeError unless user_feedback.editable_by?(CurrentUser.user)
   end
 end

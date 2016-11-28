@@ -98,4 +98,8 @@ class UserFeedback < ActiveRecord::Base
       return true
     end
   end
+
+  def editable_by?(editor)
+    (editor.is_moderator? && editor != user) || creator == editor
+  end
 end

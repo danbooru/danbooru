@@ -5,6 +5,7 @@ class UserFeedbacksControllerTest < ActionController::TestCase
     setup do
       @user = FactoryGirl.create(:user)
       @critic = FactoryGirl.create(:gold_user)
+      @mod = FactoryGirl.create(:moderator_user)
       CurrentUser.user = @critic
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -62,12 +63,27 @@ class UserFeedbacksControllerTest < ActionController::TestCase
 
     context "destroy action" do
       setup do
-        @user_feedback = FactoryGirl.create(:user_feedback)
+        @user_feedback = FactoryGirl.create(:user_feedback, user: @user)
       end
 
       should "delete a feedback" do
         assert_difference "UserFeedback.count", -1 do
           post :destroy, {:id => @user_feedback.id}, {:user_id => @critic.id}
+        end
+      end
+
+      context "by a moderator" do
+        should "allow deleting feedbacks given to other users" do
+          assert_difference "UserFeedback.count", -1 do
+            post :destroy, {:id => @user_feedback.id}, {:user_id => @mod.id}
+          end
+        end
+
+        should "not allow deleting feedbacks given to themselves" do
+          @user_feedback = FactoryGirl.create(:user_feedback, user: @mod)
+          assert_difference "UserFeedback.count", 0 do
+            post :destroy, {:id => @user_feedback.id}, {:user_id => @mod.id}
+          end
         end
       end
     end
