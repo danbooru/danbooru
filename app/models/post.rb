@@ -327,6 +327,10 @@ class Post < ActiveRecord::Base
 
       PostApproval.create(user_id: CurrentUser.id, post_id: id)
 
+      if is_deleted_was == true
+        ModAction.create(:description => "undeleted post ##{id}")
+      end
+
       save!
     end
 

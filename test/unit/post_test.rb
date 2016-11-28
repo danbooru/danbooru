@@ -329,10 +329,30 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
-      should "be undeleted" do
-        @post.undelete!
-        @post.reload
-        assert_equal(false, @post.is_deleted?)
+      context "when undeleted" do
+        should "be undeleted" do
+          @post.undelete!
+          assert_equal(false, @post.reload.is_deleted?)
+        end
+
+        should "create a mod action" do
+          assert_difference("ModAction.count", 1) do
+            @post.undelete!
+          end
+        end
+      end
+
+      context "when approved" do
+        should "be undeleted" do
+          @post.approve!
+          assert_equal(false, @post.reload.is_deleted?)
+        end
+
+        should "create a mod action" do
+          assert_difference("ModAction.count", 1) do
+            @post.approve!
+          end
+        end
       end
 
       should "be appealed" do
