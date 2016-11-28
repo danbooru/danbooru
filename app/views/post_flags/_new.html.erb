@@ -1,20 +1,4 @@
-<p>If you believe a post does not belong on this site, you can flag for its deletion. As a reminder, the following are some common reasons for flagging a post:</p>
-
-<ul>
-  <li>Not anime-related</li>
-  <li>Third-Party Watermark: text or logo inserted by someone besides the original artist</li>
-  <li>Poor compression: JPEG artifacts</li>
-  <li>Bad proportions: extremely large breasts or penises</li>
-  <li>Manga: Multiple pages of a manga, doujinshi, or comic that don't stand up to individual scrutiny</li>
-  <li>Fake translations: Made up translations are banned</li>
-</ul>
-
-<p>The following are <strong>NOT</strong> valid reasons for flagging a post:</p>
-
-<ul>
-  <li>Duplicate: just parent to the original</li>
-  <li>Banned artist: request that a member of site staff ban this post instead</li>
-</ul>
+<%= format_text(WikiPage.titled(Danbooru.config.flag_notice_wiki_page).first.try(&:body)) %>
 
 <p>Enter a reason:</p>
 

@@ -241,6 +241,14 @@ module Danbooru
       nil
     end
 
+    def upload_notice_wiki_page
+      "help:upload_notice"
+    end
+
+    def flag_notice_wiki_page
+      "help:flag_notice"
+    end
+
     # The number of posts displayed per page.
     def posts_per_page
       20
