@@ -341,16 +341,6 @@ module Danbooru
       true
     end
 
-    def iqdb_hostname_and_port
-      # ["localhost", 4000]
-      nil
-    end
-
-    def iqdb_file
-      # /var/www/danbooru2/shared/iqdb.db
-      nil
-    end
-
     def shared_dir_path
       "/var/www/danbooru2/shared"
     end
@@ -376,16 +366,11 @@ module Danbooru
     def twitter_api_secret
     end
 
-    def shared_remote_key
-    end
-
-    def report_server
-    end
-
     def enable_post_search_counts
       false
     end
 
+    # you should override this
     def email_key
       "zDMSATq0W3hmA5p3rKTgD"
     end
@@ -444,7 +429,14 @@ module Danbooru
       false
     end
 
-    # listbooru options
+    # reportbooru options - see https://github.com/r888888888/reportbooru
+    def reportbooru_server
+    end
+
+    def reportbooru_key
+    end
+
+    # listbooru options - see https://github.com/r888888888/listbooru
     def listbooru_enabled?
       false
     end
@@ -455,11 +447,19 @@ module Danbooru
     def listbooru_auth_key
     end
 
-    # iqdbs options
+    # iqdbs options - see https://github.com/r888888888/iqdbs
     def iqdbs_auth_key
     end
 
     def iqdbs_server
+    end
+
+    def iqdb_hostname_and_port # TODO: remove
+      nil
+    end
+
+    def iqdb_file # TODO: remove
+      nil
     end
 
     # google api options

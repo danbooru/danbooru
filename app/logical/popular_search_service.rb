@@ -15,7 +15,7 @@ class PopularSearchService
     dates = date.strftime("%Y-%m-%d")
 
     Cache.get("ps-#{scale}-#{dates}", 1.minute) do
-      url = URI.parse("#{Danbooru.config.report_server}/hits/#{scale}?date=#{dates}")
+      url = URI.parse("#{Danbooru.config.reportbooru_server}/hits/#{scale}?date=#{dates}")
       response = ""
       Net::HTTP.start(url.host, url.port, :use_ssl => url.is_a?(URI::HTTPS)) do |http|
         http.read_timeout = 1

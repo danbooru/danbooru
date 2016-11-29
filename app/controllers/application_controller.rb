@@ -32,8 +32,8 @@ protected
     response.headers["Access-Control-Allow-Origin"] = "*"
   end
 
-  def require_shared_key
-    unless params[:key] == Danbooru.config.shared_remote_key
+  def require_reportbooru_key
+    unless params[:key] == Danbooru.config.reportbooru_key
       render(text: "forbidden", status: 403)
       return false
     end

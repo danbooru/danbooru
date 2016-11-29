@@ -24,13 +24,13 @@ module Reports
     end
 
     def fetch_similar_user_ids(endpoint = "user_similarity")
-      return NotImplementedError unless Danbooru.config.report_server
+      return NotImplementedError unless Danbooru.config.reportbooru_server
 
       params = {
-        "key" => Danbooru.config.shared_remote_key,
+        "key" => Danbooru.config.reportbooru_key,
         "user_id" => user_id
       }
-      uri = URI.parse("#{Danbooru.config.report_server}/reports/#{endpoint}")
+      uri = URI.parse("#{Danbooru.config.reportbooru_server}/reports/#{endpoint}")
       uri.query = URI.encode_www_form(params)
 
       Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.is_a?(URI::HTTPS)) do |http|

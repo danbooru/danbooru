@@ -5,7 +5,7 @@ module PostsHelper
     if params[:ms] == "1" && @post_set.post_count == 0 && @post_set.is_single_tag?
       session_id = session.id
       digest = OpenSSL::Digest.new("sha256")
-      sig = OpenSSL::HMAC.hexdigest(digest, Danbooru.config.shared_remote_key, ",#{session_id}")
+      sig = OpenSSL::HMAC.hexdigest(digest, Danbooru.config.reportbooru_key, ",#{session_id}")
       return render("posts/partials/index/missed_search_count", session_id: session_id, sig: sig)
     end
   end
@@ -20,7 +20,7 @@ module PostsHelper
         key = "ps-#{tags}"
         value = session.id
         digest = OpenSSL::Digest.new("sha256")
-        sig = OpenSSL::HMAC.hexdigest(digest, Danbooru.config.shared_remote_key, "#{key},#{value}")
+        sig = OpenSSL::HMAC.hexdigest(digest, Danbooru.config.reportbooru_key, "#{key},#{value}")
         return render("posts/partials/index/search_count", key: key, value: value, sig: sig)
       end
     end
@@ -36,7 +36,7 @@ module PostsHelper
     key = "uid"
     value = user.id
     digest = OpenSSL::Digest.new("sha256")
-    sig = OpenSSL::HMAC.hexdigest(digest, Danbooru.config.shared_remote_key, "#{key},#{value}")
+    sig = OpenSSL::HMAC.hexdigest(digest, Danbooru.config.reportbooru_key, "#{key},#{value}")
     render("users/common_searches", user: user, sig: sig)
   end
 

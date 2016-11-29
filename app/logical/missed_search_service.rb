@@ -6,7 +6,7 @@ class MissedSearchService
 
   def fetch_data
     Cache.get("ms", 1.minute) do
-      url = URI.parse("#{Danbooru.config.report_server}/missed_searches")
+      url = URI.parse("#{Danbooru.config.reportbooru_server}/missed_searches")
       response = ""
       Net::HTTP.start(url.host, url.port, :use_ssl => url.is_a?(URI::HTTPS)) do |http|
         http.read_timeout = 1

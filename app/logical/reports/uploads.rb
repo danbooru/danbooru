@@ -20,7 +20,7 @@ module Reports
 
     def generate_sig
       digest = OpenSSL::Digest.new("sha256")
-      OpenSSL::HMAC.hexdigest(digest, Danbooru.config.shared_remote_key, "#{min_date},#{max_date},#{queries}")
+      OpenSSL::HMAC.hexdigest(digest, Danbooru.config.reportbooru_key, "#{min_date},#{max_date},#{queries}")
     end
   end
 end
