@@ -455,6 +455,13 @@ module Danbooru
     def listbooru_auth_key
     end
 
+    # iqdbs options
+    def iqdbs_auth_key
+    end
+
+    def iqdbs_server
+    end
+
     # google api options
     def google_api_project
     end
@@ -465,11 +472,9 @@ module Danbooru
 
     # AWS config options
     def aws_access_key_id
-      nil
     end
 
     def aws_secret_access_key
-      nil
     end
 
     def aws_ses_enabled?
@@ -478,7 +483,6 @@ module Danbooru
 
     def aws_ses_options
       # {:smtp_server_name => "smtp server", :user_name => "user name", :ses_smtp_user_name => "smtp user name", :ses_smtp_password => "smtp password"}
-      nil
     end
 
     def aws_s3_enabled?
@@ -503,6 +507,9 @@ module Danbooru
     end
 
     def aws_sqs_region
+    end
+
+    def aws_sqs_iqdb_url
     end
   end
 end
