@@ -136,6 +136,10 @@ class Post < ActiveRecord::Base
       "/data/preview/#{file_path_prefix}#{md5}.jpg"
     end
 
+    def complete_preview_file_url
+      "http://#{Danbooru.config.hostname}#{preview_file_url}"
+    end
+
     def file_url_for(user)
       if CurrentUser.mobile_mode?
         large_file_url
@@ -1704,7 +1708,7 @@ class Post < ActiveRecord::Base
       if File.exists?(preview_file_path)
         if Danbooru.config.aws_sqs_iqdb_url
           client = SqsService.new(Danbooru.config.aws_sqs_iqdb_url)
-          client.send_message("update\n#{id}\n#{preview_url}")
+          client.send_message("update\n#{id}\n#{complete_preview_file_url}")
         elsif Danbooru.config.iqdb_hostname_and_port
           Danbooru.config.all_server_hosts.each do |host|
             if has_tag?("ugoira")
@@ -1735,7 +1739,7 @@ class Post < ActiveRecord::Base
     def update_iqdb
       if Danbooru.config.aws_sqs_iqdb_url
         client = SqsService.new(Danbooru.config.aws_sqs_iqdb_url)
-        client.send_message("update\n#{id}\n#{preview_url}")
+        client.send_message("update\n#{id}\n#{complete_preview_file_url}")
       else
         Iqdb::Server.new(*Danbooru.config.iqdb_hostname_and_port).add(self)
         Iqdb::Command.new(Danbooru.config.iqdb_file).add(self)
