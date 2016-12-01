@@ -1,3 +1,4 @@
+# todo: move this to iqdbs
 class IqdbQueriesController < ApplicationController
   before_filter :member_only
 
@@ -19,14 +20,16 @@ class IqdbQueriesController < ApplicationController
 protected
   def create_by_url
     @download = Iqdb::Download.new(params[:url])
-    @download.download_and_find_similar
+    @download.find_similar
     @results = @download.matches
     render :layout => false, :action => "create_by_url"
   end
 
   def create_by_post
     @post = Post.find(params[:post_id])
-    @results = Iqdb::Server.default.query(3, @post.preview_file_path)
-    render :layout => false, :action => "create_by_post"
+    @download = Iqdb::Download.new(@post.complete_preview_file_url)
+    @download.find_similar
+    @results = @download.matches
+    render :layout => false, :action => "create_by_url"
   end
 end
