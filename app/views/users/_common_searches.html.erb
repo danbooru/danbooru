@@ -6,7 +6,7 @@
 
 <script type="text/javascript">
   $(function() {
-    $.get("<%= Danbooru.config.report_server %>/user_searches", {
+    $.get("<%= Danbooru.config.reportbooru_server %>/user_searches", {
       uid: <%= user.id %>,
       sig: "<%= sig %>"
     }, function(data) {

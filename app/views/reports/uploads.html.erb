@@ -23,7 +23,7 @@
     <% end %>
 
     <% if params[:queries] %>
-      <%= content_tag("iframe", "Loading...", :src => "#{Danbooru.config.report_server}/reports/uploads?min=#{@report.min_date}&max=#{@report.max_date}&tags=#{u(@report.queries)}&sig=#{@report.generate_sig}", :height => "700", :width => "1200", :style => "border: none;") %>
+      <%= content_tag("iframe", "Loading...", :src => "#{Danbooru.config.reportbooru_server}/reports/uploads?min=#{@report.min_date}&max=#{@report.max_date}&tags=#{u(@report.queries)}&sig=#{@report.generate_sig}", :height => "700", :width => "1200", :style => "border: none;") %>
     <% end %>
   </div>
 </div>
