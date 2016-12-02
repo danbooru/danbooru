@@ -22,7 +22,7 @@ class ImageProxy
       "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
     }
 
-    Net::HTTP.start(uri.host, uri.port) do |http|
+    Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.is_a?(URI::HTTPS)) do |http|
       resp = http.request_get(uri.request_uri, headers)
       if resp.is_a?(Net::HTTPSuccess)
         return resp
