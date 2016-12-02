@@ -48,7 +48,6 @@ gem 'radix62', '~> 1.0.1'
 gem 'streamio-ffmpeg'
 gem 'rubyzip', :require => "zip"
 gem 'stripe'
-gem 'coinbase'
 gem 'twitter'
 gem 'aws-sdk', '~> 2'
 gem 'responders'

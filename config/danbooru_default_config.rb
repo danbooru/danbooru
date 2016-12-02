@@ -345,15 +345,6 @@ module Danbooru
       "/var/www/danbooru2/shared"
     end
 
-    def coinbase_secret
-    end
-
-    def coinbase_api_key
-    end
-
-    def coinbase_api_secret
-    end
-
     def stripe_secret_key
     end
     
