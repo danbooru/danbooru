@@ -1,3 +1,11 @@
+# This is a collection of strategies for extracting information about a 
+# resource. At a minimum it tries to extract the artist name and a canonical 
+# URL to download the image from. But it can also be used to normalize a URL 
+# for use with the artist finder. It differs from Downloads::RewriteStrategies
+# in that the latter is more for normalizing and rewriting a URL until it is 
+# suitable for downloading, whereas Sources::Strategies is more for meta-data 
+# that can only be obtained by downloading and parsing the resource.
+
 module Sources
   module Strategies
     class Base

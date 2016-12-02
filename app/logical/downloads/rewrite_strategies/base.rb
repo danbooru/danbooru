@@ -1,3 +1,7 @@
+# This is a collection of strategies for normalizing URLs. Most strategies 
+# typically work by parsing and rewriting the URL itself, but some strategies 
+# may delegate to Sources::Strategies to obtain a more canonical URL.
+
 module Downloads
   module RewriteStrategies
     class Base
