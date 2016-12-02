@@ -42,18 +42,7 @@ module Iqdb
           end
         end
       else
-        begin
-          tempfile = Tempfile.new("iqdb-#{$PROCESS_ID}")
-          @download = Downloads::File.new(source, tempfile.path, :get_thumbnail => true)
-          @download.download!
-
-          if Danbooru.config.iqdb_hostname_and_port
-            @matches = Iqdb::Server.default.query(3, @download.file_path).matches
-          end
-        ensure
-          tempfile.close
-          tempfile.unlink
-        end
+        raise NotImplementedError
       end
     end
   end

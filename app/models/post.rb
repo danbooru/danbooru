@@ -1697,42 +1697,21 @@ class Post < ActiveRecord::Base
         if Danbooru.config.aws_sqs_iqdb_url
           client = SqsService.new(Danbooru.config.aws_sqs_iqdb_url)
           client.send_message("remove\n#{post_id}")
-        else
-          Iqdb::Server.new(*Danbooru.config.iqdb_hostname_and_port).remove(post_id)
-          Iqdb::Command.new(Danbooru.config.iqdb_file).remove(post_id)
         end
       end
     end
 
     def update_iqdb_async
-      if File.exists?(preview_file_path)
-        if Danbooru.config.aws_sqs_iqdb_url
-          client = SqsService.new(Danbooru.config.aws_sqs_iqdb_url)
-          client.send_message("update\n#{id}\n#{complete_preview_file_url}")
-        elsif Danbooru.config.iqdb_hostname_and_port
-          Danbooru.config.all_server_hosts.each do |host|
-            if has_tag?("ugoira")
-              run_at = 10.seconds.from_now
-            else
-              run_at = Time.now
-            end
-
-            delay(:queue => host, :run_at => run_at).update_iqdb
-          end
-        end
+      if File.exists?(preview_file_path) && Danbooru.config.aws_sqs_iqdb_url
+        client = SqsService.new(Danbooru.config.aws_sqs_iqdb_url)
+        client.send_message("update\n#{id}\n#{complete_preview_file_url}")
       end
     end
 
     def remove_iqdb_async
-      if File.exists?(preview_file_path)
-        if Danbooru.config.aws_sqs_iqdb_url
-          client = SqsService.new(Danbooru.config.aws_sqs_iqdb_url)
-          client.send_message("remove\n#{id}")
-        elsif Danbooru.config.iqdb_hostname_and_port
-          Danbooru.config.all_server_hosts.each do |host|
-            Post.delay(:queue => host).remove_iqdb(id)
-          end
-        end
+      if File.exists?(preview_file_path) && Danbooru.config.aws_sqs_iqdb_url
+        client = SqsService.new(Danbooru.config.aws_sqs_iqdb_url)
+        client.send_message("remove\n#{id}")
       end
     end
 
@@ -1740,9 +1719,6 @@ class Post < ActiveRecord::Base
       if Danbooru.config.aws_sqs_iqdb_url
         client = SqsService.new(Danbooru.config.aws_sqs_iqdb_url)
         client.send_message("update\n#{id}\n#{complete_preview_file_url}")
-      else
-        Iqdb::Server.new(*Danbooru.config.iqdb_hostname_and_port).add(self)
-        Iqdb::Command.new(Danbooru.config.iqdb_file).add(self)
       end
     end
   end

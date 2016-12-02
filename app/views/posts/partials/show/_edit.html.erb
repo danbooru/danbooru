@@ -72,7 +72,7 @@
     <%= button_tag "Artist", :id => "find-artist-button", :type => "button" %>
   </div>
 
-  <% if Danbooru.config.iqdb_hostname_and_port %>
+  <% if Danbooru.config.iqdbs_server %>
     <div class="input" id="iqdb-similar" style="display: none;"></div>
   <% end %>
 

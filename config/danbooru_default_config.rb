@@ -454,14 +454,6 @@ module Danbooru
     def iqdbs_server
     end
 
-    def iqdb_hostname_and_port # TODO: remove
-      nil
-    end
-
-    def iqdb_file # TODO: remove
-      nil
-    end
-
     # google api options
     def google_api_project
     end

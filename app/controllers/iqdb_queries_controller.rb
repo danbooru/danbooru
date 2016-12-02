@@ -3,7 +3,7 @@ class IqdbQueriesController < ApplicationController
   before_filter :member_only
 
   def create
-    if !Danbooru.config.iqdb_hostname_and_port
+    if !Danbooru.config.iqdbs_server
       render :nothing => true
       return
     end
