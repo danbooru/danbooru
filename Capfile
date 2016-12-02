@@ -9,6 +9,9 @@ require 'capistrano/rbenv'
 require 'capistrano/rails'
 require 'whenever/capistrano'
 require 'capistrano3/unicorn'
+require 'new_relic/recipies'
 
 # Load custom tasks from `lib/capistrano/tasks` if you have any defined
 Dir.glob('lib/capistrano/tasks/*.cap').each { |r| import r }
+
+after "deploy:updated", "newrelic:notice_deployment"
