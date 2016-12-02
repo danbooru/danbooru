@@ -33,9 +33,9 @@ module Iqdb
           if resp.is_a?(Net::HTTPSuccess)
             json = JSON.parse(resp.body)
             if json.is_a?(Array)
-              json
+              @matches = json
             else
-              []
+              @matches = []
             end
           else
             raise "HTTP error code: #{resp.code} #{resp.message}"

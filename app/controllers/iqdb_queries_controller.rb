@@ -30,6 +30,6 @@ protected
     @download = Iqdb::Download.new(@post.complete_preview_file_url)
     @download.find_similar
     @results = @download.matches
-    render :layout => false, :action => "create_by_url"
+    render :layout => false, :action => "create_by_post"
   end
 end
