@@ -82,7 +82,6 @@ GEM
       bcrypt (>= 3.1.3)
     bcrypt-ruby (3.1.5-x64-mingw32)
       bcrypt (>= 3.1.3)
-    bigdecimal (1.2.7)
     buftok (0.2.0)
     builder (3.2.2)
     byebug (6.0.0)
@@ -111,8 +110,6 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.9.1.1)
-    coinbase (4.0.7)
-      bigdecimal
     colorize (0.7.7)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
@@ -430,7 +427,6 @@ DEPENDENCIES
   capistrano3-unicorn
   cityhash
   coffee-rails
-  coinbase
   daemons
   dalli
   delayed_job
@@ -483,4 +479,4 @@ DEPENDENCIES
   whenever
 
 BUNDLED WITH
-   1.13.3
+   1.13.6
