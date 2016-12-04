@@ -65,7 +65,8 @@ module Sources
       end
 
       def get
-        @illust_id = illust_id_from_url!
+        return unless illust_id_from_url
+        @illust_id = illust_id_from_url
         @metadata = get_metadata_from_papi(@illust_id)
 
         page = agent.get(URI.parse(normalized_url))
