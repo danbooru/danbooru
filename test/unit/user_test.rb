@@ -111,7 +111,7 @@ class UserTest < ActiveSupport::TestCase
       assert(@user.can_comment_vote?)
       10.times do
         comment = FactoryGirl.create(:comment)
-        FactoryGirl.create(:comment_vote, :comment_id => comment.id)
+        FactoryGirl.create(:comment_vote, :comment_id => comment.id, :score => -1)
       end
 
       assert(!@user.can_comment_vote?)
