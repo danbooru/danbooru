@@ -178,6 +178,53 @@ module Downloads
           assert_downloaded(@file_size, @zip_file, "downloads-pixiv-test/download-ugoira-zip-file")
         end
       end
+
+      context "downloading a profile image" do
+        should "download old profile images" do
+          @file_url = "http://img12.pixiv.net/profile/rapattu/119950.jpg"
+          @file_size = 16238
+
+          assert_not_rewritten(@file_url)
+          assert_downloaded(@file_size, @file_url)
+        end
+
+        should "download new profile images" do
+          @file_url = "http://i2.pixiv.net/img130/profile/minono_aki/8733472.jpg"
+          @file_size = 23266
+
+          assert_not_rewritten(@file_url)
+          assert_downloaded(@file_size, @file_url)
+        end
+
+      end
+
+      context "downloading a background image" do
+        should "download the image" do
+          @file_url = "http://i1.pixiv.net/background/img/2016/05/17/12/05/48/2074388_d4ac52034f7ca0af3e083d59fde7e97f.jpg"
+          @file_size = 386_500
+
+          assert_not_rewritten(@file_url)
+          assert_downloaded(@file_size, @file_url)
+        end
+      end
+
+      context "downloading a novel image" do
+        should "download old novel images" do
+          @file_url = "http://i2.pixiv.net/img20/img/a-park/novel/3607898.jpg"
+          @file_size = 125_635
+
+          assert_not_rewritten(@file_url)
+          assert_downloaded(@file_size, @file_url)
+        end
+
+        should "download new novel images" do
+          @file_url = "http://i1.pixiv.net/novel-cover-original/img/2016/11/03/20/10/58/7436075_f75af69f3eacd1656d3733c72aa959cf.jpg"
+          @file_size = 316_133
+
+          assert_not_rewritten(@file_url)
+          assert_downloaded(@file_size, @file_url)
+        end
+      end
     end
   end
 end
