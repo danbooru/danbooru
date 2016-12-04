@@ -1227,6 +1227,26 @@ class PostTest < ActiveSupport::TestCase
             assert_equal(18557054, @post.pixiv_id)
             @post.pixiv_id = nil
           end
+
+          context "but doesn't have a pixiv id" do
+            should "not save the pixiv id" do
+              @post.pixiv_id = 1234
+              @post.update(source: "http://i1.pixiv.net/novel-cover-original/img/2016/11/03/20/10/58/7436075_f75af69f3eacd1656d3733c72aa959cf.jpg")
+              assert_equal(nil, @post.pixiv_id)
+
+              @post.pixiv_id = 1234
+              @post.update(source: "http://i2.pixiv.net/background/img/2016/10/30/12/27/30/7059005_da9946b806c10d391a81ed1117cd33d6.jpg")
+              assert_equal(nil, @post.pixiv_id)
+
+              @post.pixiv_id = 1234
+              @post.update(source: "http://i1.pixiv.net/img15/img/omega777/novel/2612734.jpg")
+              assert_equal(nil, @post.pixiv_id)
+
+              @post.pixiv_id = 1234
+              @post.update(source: "http://img08.pixiv.net/profile/nice/1408837.jpg")
+              assert_equal(nil, @post.pixiv_id)
+            end
+          end
         end
 
         should "normalize pixiv links" do
