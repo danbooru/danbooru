@@ -56,7 +56,7 @@ module Sources
         if has_moniker?
           moniker = get_moniker_from_url
         else
-          @illust_id = self.class.illust_id_from_url!(url)
+          @illust_id = illust_id_from_url!
           @metadata = get_metadata_from_papi(@illust_id)
           moniker = @metadata.moniker
         end
@@ -65,7 +65,7 @@ module Sources
       end
 
       def get
-        @illust_id = self.class.illust_id_from_url!(url)
+        @illust_id = illust_id_from_url!
         @metadata = get_metadata_from_papi(@illust_id)
 
         page = agent.get(URI.parse(normalized_url))
@@ -111,9 +111,9 @@ module Sources
         @metadata.pages
       end
 
-      def self.illust_id_from_url(url)
-        if url_match?(url)
-          illust_id_from_url!(url)
+      def illust_id_from_url
+        if sample_image? || full_image? || work_page?
+          illust_id_from_url!
         else
           nil
         end
@@ -121,7 +121,7 @@ module Sources
         nil
       end
 
-      def self.illust_id_from_url!(url)
+      def illust_id_from_url!
         # http://img18.pixiv.net/img/evazion/14901720.png
         #
         # http://i2.pixiv.net/img18/img/evazion/14901720.png
@@ -155,8 +155,6 @@ module Sources
           raise Sources::Error.new("Couldn't get illust ID from URL: #{url}")
         end
       end
-      
-    protected
 
       # http://i1.pixiv.net/c/600x600/img-master/img/2014/10/02/13/51/23/46304396_p1_master1200.jpg
       # => http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p1.png
