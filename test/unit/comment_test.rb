@@ -58,7 +58,7 @@ class CommentTest < ActiveSupport::TestCase
           end
 
           dmail = Dmail.last
-          assert_equal("You were mentioned in a \"comment\":http://#{Danbooru.config.hostname}/posts/#{@comment.post_id}#comment-#{@comment.id}\n\n---\n\n[i]#{CurrentUser.name} said:[/i]\n\nHey @#{@user2.name} check this out!", dmail.body)
+          assert_equal("You were mentioned in a \"comment\":/posts/#{@comment.post_id}#comment-#{@comment.id}\n\n---\n\n[i]#{CurrentUser.name} said:[/i]\n\nHey @#{@user2.name} check this out!", dmail.body)
         end
       end
     end
