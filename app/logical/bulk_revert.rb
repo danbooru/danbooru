@@ -20,6 +20,10 @@ class BulkRevert
     @_preview ||= find_post_versions
   end
 
+  def query_gbq(user_id, added_tags, removed_tags, min_version_id, max_version_id)
+    GoogleBigQuery::PostVersion.new.find(user_id, added_tags, removed_tags, min_version_id, max_version_id, BIG_QUERY_LIMIT)
+  end
+
   def find_post_versions
     q = PostVersion.where("true")
 
@@ -34,7 +38,7 @@ class BulkRevert
     if constraints[:added_tags] || constraints[:removed_tags]
       hash = CityHash.hash64("#{constraints[:added_tags]} #{constraints{removed_tags}} #{constraints[:min_version_id]} #{constraints[:max_version_id]}").to_s(36)
       sub_ids = Cache.get("br/fpv/#{hash}", 300) do
-        GoogleBigQuery::PostVersion.new.find(constraints[:user_id], constraints[:added_tags], constraints[:removed_tags], constraints[:min_version_id], constraints[:max_version_id], BIG_QUERY_LIMIT)
+        query_gbq(constraints[:user_id], constraints[:added_tags], constraints[:removed_tags], constraints[:min_version_id], constraints[:max_version_id])
       end
 
       if sub_ids.size >= BIG_QUERY_LIMIT

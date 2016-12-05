@@ -326,10 +326,10 @@ class TagAlias < ActiveRecord::Base
   end
 
   def create_mod_action
-    alias_desc = %Q("tag alias ##{id}":[#{Rails.application.routes.url_helpers.tag_alias_path(self)}] ([[#{antecedent_name}]] -> [[#{consequent_name}]]))
+    alias_desc = %Q("tag alias ##{id}":[#{Rails.application.routes.url_helpers.tag_alias_path(self)}]: [[#{antecedent_name}]] -> [[#{consequent_name}]])
 
     if id_changed?
-      ModAction.create(:description => "created #{status} #{alias_desc}.")
+      ModAction.create(:description => "created #{status} #{alias_desc}")
     else
       # format the changes hash more nicely.
       change_desc = changes.except(:updated_at).map do |attribute, values|
@@ -341,7 +341,7 @@ class TagAlias < ActiveRecord::Base
         end
       end.join(", ")
 
-      ModAction.create(:description => "updated #{alias_desc}: #{change_desc}.")
+      ModAction.create(:description => "updated #{alias_desc}\n#{change_desc}")
     end
   end
 end
