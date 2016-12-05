@@ -1685,7 +1685,7 @@ class Post < ActiveRecord::Base
   
   module PixivMethods
     def parse_pixiv_id
-      self.pixiv_id = Sources::Strategies::Pixiv.illust_id_from_url(source)
+      self.pixiv_id = Sources::Strategies::Pixiv.new(source).illust_id_from_url
     end
   end
 

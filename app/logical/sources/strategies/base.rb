@@ -82,6 +82,10 @@ module Sources
         [image_url]
       end
 
+      def tags
+        @tags || []
+      end
+
       # Should be set to a url for sites that prevent hotlinking, or left nil for sites that don't.
       def fake_referer
         nil
