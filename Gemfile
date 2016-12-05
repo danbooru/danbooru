@@ -74,5 +74,6 @@ end
 
 group :development do
   gem 'ruby-prof'
+  gem 'capistrano-deploytags', '~> 1.0.0', require: false
   # gem 'sql-logging'
 end

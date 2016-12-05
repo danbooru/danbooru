@@ -9,6 +9,7 @@ require 'capistrano/rbenv'
 require 'capistrano/rails'
 require 'whenever/capistrano'
 require 'capistrano3/unicorn'
+require 'capistrano/deploytags'
 require 'new_relic/recipies'
 
 # Load custom tasks from `lib/capistrano/tasks` if you have any defined
