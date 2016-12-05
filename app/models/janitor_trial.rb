@@ -27,7 +27,7 @@ class JanitorTrial < ActiveRecord::Base
   def self.message_candidates!
     admin = User.admins.first
 
-    User.where("last_logged_in_at >= ? and created_at <= ? and email is not null and (favorite_count >= 400 OR post_upload_count >= 400) and bit_prefs & ? = 0", 1.week.ago, 6.months.ago, User.flag_value_for("can_approve_posts")).order("random()").limit(10).each do |user|
+    User.where("last_logged_in_at >= ? and created_at <= ? and email is not null and (favorite_count >= 300 OR post_upload_count >= 300) and bit_prefs & ? = 0", 1.week.ago, 6.months.ago, User.flag_value_for("can_approve_posts")).order("random()").limit(10).each do |user|
       if !Dmail.where("from_id = ? and to_id = ? and title = ?", admin.id, user.id, "Test Janitor Invitation").exists?
         favorites = user.favorites.order("random()").limit(400).map(&:post_id)
         uploads = user.posts.order("random()").limit(400).map(&:id)
