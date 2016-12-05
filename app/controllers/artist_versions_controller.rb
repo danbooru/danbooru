@@ -1,5 +1,5 @@
 class ArtistVersionsController < ApplicationController
-  before_filter :gold_only
+  before_filter :member_only
   respond_to :html, :xml, :json
 
   def index
