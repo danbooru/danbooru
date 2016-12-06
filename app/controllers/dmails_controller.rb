@@ -5,7 +5,9 @@ class DmailsController < ApplicationController
 
   def new
     if params[:respond_to_id]
-      @dmail = Dmail.find(params[:respond_to_id]).build_response(:forward => params[:forward])
+      parent = Dmail.find(params[:respond_to_id])
+      check_privilege(parent)
+      @dmail = parent.build_response(:forward => params[:forward])
     else
       @dmail = Dmail.new(params[:dmail])
     end
@@ -58,6 +60,7 @@ class DmailsController < ApplicationController
   end
 
 private
+
   def check_privilege(dmail)
     if !dmail.visible_to?(CurrentUser.user, params[:key])
       raise User::PrivilegeError

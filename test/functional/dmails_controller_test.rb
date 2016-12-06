@@ -22,6 +22,12 @@ class DmailsControllerTest < ActionController::TestCase
       end
 
       context "with a respond_to_id" do
+        should "check privileges" do
+          @user2 = FactoryGirl.create(:user)
+          get :new, {:respond_to_id => @dmail}, {:user_id => @user2.id}
+          assert_response 403
+        end
+
         should "prefill the fields" do
           get :new, {:respond_to_id => @dmail}, {:user_id => @user.id}
           assert_response :success
