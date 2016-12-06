@@ -68,12 +68,12 @@ end
 
 group :production do
   gem 'unicorn-worker-killer'
+  gem 'newrelic_rpm'
   gem 'gctools', :platforms => :ruby
+  gem 'capistrano-deploytags', '~> 1.0.0', require: false
 end
 
 group :development do
   gem 'ruby-prof'
-  gem 'newrelic_rpm', require: false
-  gem 'capistrano-deploytags', '~> 1.0.0', require: false
   # gem 'sql-logging'
 end

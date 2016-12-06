@@ -3,6 +3,7 @@ namespace :unicorn do
   task :terminate do
     on roles(:app) do
       execute "[[ -n $(pgrep -f unicorn) ]] && pgrep -f unicorn | xargs kill -SIGTERM"
+      sleep(5)
     end
   end
 
@@ -14,7 +15,6 @@ namespace :unicorn do
   end
 end
 
-after "deploy:published", "unicorn:stop"
 after "deploy:published", "unicorn:terminate"
 after "deploy:published", "unicorn:kill"
 after "deploy:published", "unicorn:start"
