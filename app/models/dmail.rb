@@ -86,7 +86,7 @@ class Dmail < ActiveRecord::Base
     end
     
     def method_attributes
-      super + [:hash]
+      super + [:key]
     end
   end
   
@@ -222,12 +222,13 @@ class Dmail < ActiveRecord::Base
     end
   end
   
-  def hash
-    Digest::SHA1.hexdigest("#{title} #{body}")
+  def key
+    digest = OpenSSL::Digest.new("sha256")
+    OpenSSL::HMAC.hexdigest(digest, Danbooru.config.email_key, "#{title} #{body}")
   end
   
   def visible_to?(user, key)
-    owner_id == user.id || (user.is_moderator? && key == self.hash)
+    owner_id == user.id || (user.is_moderator? && key == self.key)
   end
 
 end

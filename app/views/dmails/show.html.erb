@@ -22,6 +22,7 @@
         <%= link_to "Respond", new_dmail_path(:respond_to_id => @dmail) %>
         | <%= link_to "Forward", new_dmail_path(:respond_to_id => @dmail, :forward => true) %>
         | <%= link_to "Filter messages like these", edit_maintenance_user_dmail_filter_path(:dmail_id => @dmail.id) %>
+        | <%= link_to "Permalink", dmail_path(@dmail, :key => @dmail.key), :title => "Use this URL to privately share with a moderator" %>
       </p>
     </div>
   </div>
