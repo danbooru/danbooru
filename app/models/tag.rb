@@ -236,10 +236,14 @@ class Tag < ActiveRecord::Base
       list + tagstr.gsub(/-?source:".*?"/, "").scan(/\S+/).uniq
     end
 
-    def scan_tags(tags)
+    def scan_tags(tags, options = {})
       tagstr = normalize(tags)
       list = tagstr.scan(/source:".*?"/) || []
-      list + tagstr.gsub(/source:".*?"/, "").gsub(/[%,]/, "").scan(/\S+/).uniq
+      list += tagstr.gsub(/source:".*?"/, "").gsub(/[%,]/, "").scan(/\S+/).uniq
+      if options[:strip_metatags]
+        list = list.map {|x| x.sub(/^[-~]/, "")}
+      end
+      list
     end
 
     def parse_cast(object, type)

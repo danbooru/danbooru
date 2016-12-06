@@ -20,9 +20,11 @@ module Moderator
             post.update_attributes(:tag_string => tags)
           end
 
-          escaped = Regexp.escape(antecedent)
-          SavedSearch.where("tag_query like ?", "%#{antecedent}%").find_each do |ss|
-            ss.tag_query = ss.tag_query.sub(/(?:^| )#{escaped}(?:$| )/, " #{consequent} ").strip.gsub(/  /, " ")
+          tags = Tag.scan_tags(antecedent, :strip_metatags => true)
+          conds = tags.map {|x| "tag_query like ?"}.join(" AND ")
+          conds = [conds, *tags.map {|x| "%#{x}%"}]
+          SavedSearch.where(*conds).find_each do |ss|
+            ss.tag_query = (ss.tag_query_array - tags + antecedent).uniq.join(" ")
             ss.save
           end
 

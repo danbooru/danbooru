@@ -152,4 +152,8 @@ class SavedSearch < ActiveRecord::Base
       user.update_attribute(:has_saved_searches, false)
     end
   end
+
+  def tag_query_array
+    Tag.scan_tags(tag_query)
+  end
 end
