@@ -40,6 +40,7 @@ class BulkUpdateRequest < ActiveRecord::Base
     update_forum_topic_for_approve
 
   rescue Exception => x
+    self.approver = approver
     message_approver_on_failure(x)
     update_topic_on_failure(x)
   end
