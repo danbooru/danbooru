@@ -14,7 +14,7 @@
     </div>
     <div class="content">
       <div class="body prose">
-        <%= format_text(comment.body) %>
+        <%= format_text(comment.body, :ragel => true) %>
 
         <% if comment.updated_at - comment.created_at > 5.minutes %>
           <p class="info">Updated by <%= link_to_user comment.updater %> <%= time_ago_in_words_tagged(comment.updated_at) %></p>
