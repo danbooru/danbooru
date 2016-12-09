@@ -51,7 +51,14 @@ module Moderator
         if params[:commit] == "Ban"
           @post.ban!
         end
-        redirect_to(post_path(@post), :notice => "Post was banned")
+
+        respond_to do |fmt|
+          fmt.html do
+            redirect_to(post_path(@post), :notice => "Post was banned")
+          end
+
+          fmt.js
+        end
       end
 
       def unban

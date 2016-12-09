@@ -20,6 +20,9 @@
         <% if CurrentUser.can_approve_posts? %>
           <option value="approve">Approve</option>
         <% end %>
+        <% if CurrentUser.is_admin? %>
+          <option value="ban">Ban</option>
+        <% end %>
       </select>
     </form>
     <input id="tag-script-field" placeholder="Enter tag script" style="display: none; margin-top: 0.5em;"></input>

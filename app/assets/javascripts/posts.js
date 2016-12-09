@@ -502,7 +502,22 @@
       error: function(data) {
         Danbooru.Post.notice_update("dec");
         Danbooru.error('There was an error updating <a href="/posts/' + post_id + '">post #' + post_id + '</a>');
-        $("#post_" + post_id).effect("shake", {distance: 5, times: 1}, 100);
+      }
+    });
+  }
+
+  Danbooru.Post.ban = function(post_id) {
+    $.ajax({
+      type: "POST",
+      url: "/moderator/post/posts/" + post_id + "/ban.js",
+      data: {
+        commit: "Ban"
+      },
+      success: function(data) {
+        $("#post_" + post_id).remove();
+      },
+      error: function(data) {
+        Danbooru.error('There was an error updating <a href="/posts/' + post_id + '">post #' + post_id + '</a>');
       }
     });
   }
