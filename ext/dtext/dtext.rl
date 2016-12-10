@@ -138,6 +138,9 @@ aliased_wiki_link = '[[' nonpipebracket+ >mark_a1 %mark_a2 '|' nonpipebracket+ >
 
 post_link = '{{' noncurly+ >mark_a1 %mark_a2 '}}';
 
+spoilers_open = '[spoiler'i 's'i? ']';
+spoilers_close = '[/spoiler'i 's'i? ']';
+
 post_id = 'post #'i digit+ >mark_a1 %mark_a2;
 forum_post_id = 'forum #'i digit+ >mark_a1 %mark_a2;
 forum_topic_id = 'topic #'i digit+ >mark_a1 %mark_a2;
@@ -531,14 +534,14 @@ inline := |*
     }
   };
 
-  '[spoiler]'i => {
+  spoilers_open => {
     g_debug("inline [spoiler]");
     g_debug("  push <span>");
     dstack_push(sm, &INLINE_SPOILER);
     append(sm, true, "<span class=\"spoiler\">");
   };
 
-  '[/spoiler]'i => {
+  spoilers_close => {
     g_debug("inline [/spoiler]");
     dstack_close_before_block(sm);
 
@@ -933,7 +936,7 @@ main := |*
     append_block(sm, "<blockquote>");
   };
 
-  '[spoiler]'i space* => {
+  spoilers_open space* => {
     g_debug("block [spoiler]");
     g_debug("  push spoiler");
     g_debug("  print <div>");
@@ -942,7 +945,7 @@ main := |*
     append_block(sm, "<div class=\"spoiler\">");
   };
 
-  '[/spoiler]'i => {
+  spoilers_close => {
     g_debug("block [/spoiler]");
     dstack_close_before_block(sm);
     if (dstack_check(sm, BLOCK_SPOILER)) {
