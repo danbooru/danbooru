@@ -15,9 +15,9 @@ GIT
 
 GIT
   remote: https://github.com/r888888888/dtext_rb.git
-  revision: 7dc457fd1ba455aa359beb4b94ec14ea63d086da
+  revision: 841490885db40dff5df61cb890c602012037cd67
   specs:
-    dtext_rb (1.0.14)
+    dtext_rb (1.2.0)
       jeweler (~> 2.0)
       minitest (~> 5.8)
       rake-compiler (~> 0.9)
@@ -67,7 +67,8 @@ GEM
       minitest (~> 5.1)
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
-    addressable (2.4.0)
+    addressable (2.5.0)
+      public_suffix (~> 2.0, >= 2.0.2)
     arel (6.0.3)
     awesome_print (1.6.1)
     aws-sdk (2.1.14)
@@ -140,12 +141,14 @@ GEM
     gctools (0.2.4)
     get_process_mem (0.2.1)
     git (1.3.0)
-    github_api (0.14.5)
-      addressable (~> 2.4.0)
-      descendants_tracker (~> 0.0.4)
+    github_api (0.11.3)
+      addressable (~> 2.3)
+      descendants_tracker (~> 0.0.1)
       faraday (~> 0.8, < 0.10)
-      hashie (>= 3.4)
-      oauth2 (~> 1.0)
+      hashie (>= 1.2)
+      multi_json (>= 1.7.5, < 2.0)
+      nokogiri (~> 1.6.0)
+      oauth2
     globalid (0.3.7)
       activesupport (>= 4.1.0)
     google-api-client (0.9.9)
@@ -177,13 +180,14 @@ GEM
     httpclient (2.8.0)
     hurley (0.2)
     i18n (0.7.0)
-    jeweler (2.1.1)
+    jeweler (2.3.0)
       builder
       bundler (>= 1.0)
       git (>= 1.2.5)
-      github_api
+      github_api (~> 0.11.0)
       highline (>= 1.6.15)
       nokogiri (>= 1.5.10)
+      psych (~> 2.2)
       rake
       rdoc
       semver
@@ -219,11 +223,11 @@ GEM
     method_source (0.8.2)
     mime-types (2.99.3)
     mini_portile2 (2.1.0)
-    minitest (5.9.1)
+    minitest (5.10.1)
     mocha (1.1.0)
       metaclass (~> 0.0.1)
     multi_json (1.12.1)
-    multi_xml (0.5.5)
+    multi_xml (0.6.0)
     multipart-post (2.0.0)
     naught (1.0.0)
     net-http-digest_auth (1.4)
@@ -262,7 +266,9 @@ GEM
       method_source (~> 0.8.1)
       slop (~> 3.4)
       win32console (~> 1.3)
-    rack (1.6.4)
+    psych (2.2.1)
+    public_suffix (2.0.4)
+    rack (1.6.5)
     rack-test (0.6.3)
       rack (>= 1.0)
     radix62 (1.0.1)
@@ -291,11 +297,10 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     raindrops (0.17.0)
-    rake (11.3.0)
+    rake (12.0.0)
     rake-compiler (0.9.9)
       rake
-    rdoc (4.2.2)
-      json (~> 1.4)
+    rdoc (5.0.0)
     ref (2.0.0)
     representable (2.3.0)
       uber (~> 0.0.7)
