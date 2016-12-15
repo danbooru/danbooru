@@ -494,5 +494,8 @@ module Danbooru
 
     def aws_sqs_iqdb_url
     end
+
+    def aws_sqs_archives_url
+    end
   end
 end

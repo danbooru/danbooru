@@ -1,8 +1,13 @@
 require 'test_helper'
+require 'helpers/pool_archive_test_helper'
 
 class PoolElementsControllerTest < ActionController::TestCase
+  include PoolArchiveTestHelper
+
   context "The pools posts controller" do
     setup do
+      mock_pool_archive_service!
+      start_pool_archive_transaction
       @user = Timecop.travel(1.month.ago) {FactoryGirl.create(:user)}
       @mod = FactoryGirl.create(:moderator_user)
       CurrentUser.user = @user
@@ -12,6 +17,7 @@ class PoolElementsControllerTest < ActionController::TestCase
     end
 
     teardown do
+      rollback_pool_archive_transaction
       CurrentUser.user = nil
     end
 

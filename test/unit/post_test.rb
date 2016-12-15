@@ -1,6 +1,9 @@
 require 'test_helper'
+require 'helpers/pool_archive_test_helper'
 
 class PostTest < ActiveSupport::TestCase
+  include PoolArchiveTestHelper
+
   setup do
     Timecop.travel(2.weeks.ago) do
       @user = FactoryGirl.create(:user)
@@ -35,6 +38,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "that belongs to a pool" do
         setup do
+          SqsService.any_instance.stubs(:send_message)
           @pool = FactoryGirl.create(:pool)
           @pool.add!(@post)
           @post.reload
@@ -590,6 +594,15 @@ class PostTest < ActiveSupport::TestCase
         end
 
         context "for a pool" do
+          setup do
+            mock_pool_archive_service!
+            start_pool_archive_transaction
+          end
+
+          teardown do
+            rollback_pool_archive_transaction
+          end
+
           context "on creation" do
             setup do
               @pool = FactoryGirl.create(:pool)
@@ -1143,11 +1156,11 @@ class PostTest < ActiveSupport::TestCase
           should "clear the pixiv id" do
             @post.pixiv_id = 1234
             @post.update(source: "http://fc06.deviantart.net/fs71/f/2013/295/d/7/you_are_already_dead__by_mar11co-d6rgm0e.jpg")
-            assert_equal(nil, @post.pixiv_id)
+            assert_nil(@post.pixiv_id)
 
             @post.pixiv_id = 1234
             @post.update(source: "http://pictures.hentai-foundry.com//a/AnimeFlux/219123.jpg")
-            assert_equal(nil, @post.pixiv_id)
+            assert_nil(@post.pixiv_id)
           end
         end
 
@@ -1232,19 +1245,19 @@ class PostTest < ActiveSupport::TestCase
             should "not save the pixiv id" do
               @post.pixiv_id = 1234
               @post.update(source: "http://i1.pixiv.net/novel-cover-original/img/2016/11/03/20/10/58/7436075_f75af69f3eacd1656d3733c72aa959cf.jpg")
-              assert_equal(nil, @post.pixiv_id)
+              assert_nil(@post.pixiv_id)
 
               @post.pixiv_id = 1234
               @post.update(source: "http://i2.pixiv.net/background/img/2016/10/30/12/27/30/7059005_da9946b806c10d391a81ed1117cd33d6.jpg")
-              assert_equal(nil, @post.pixiv_id)
+              assert_nil(@post.pixiv_id)
 
               @post.pixiv_id = 1234
               @post.update(source: "http://i1.pixiv.net/img15/img/omega777/novel/2612734.jpg")
-              assert_equal(nil, @post.pixiv_id)
+              assert_nil(@post.pixiv_id)
 
               @post.pixiv_id = 1234
               @post.update(source: "http://img08.pixiv.net/profile/nice/1408837.jpg")
-              assert_equal(nil, @post.pixiv_id)
+              assert_nil(@post.pixiv_id)
             end
           end
         end
@@ -1440,6 +1453,10 @@ class PostTest < ActiveSupport::TestCase
   end
 
   context "Pools:" do
+    setup do
+      SqsService.any_instance.stubs(:send_message)
+    end
+
     context "Removing a post from a pool" do
       should "update the post's pool string" do
         post = FactoryGirl.create(:post)
@@ -1615,6 +1632,8 @@ class PostTest < ActiveSupport::TestCase
     end
 
     should "return posts for the <pool> metatag" do
+      SqsService.any_instance.stubs(:send_message)
+
       post1 = FactoryGirl.create(:post)
       post2 = FactoryGirl.create(:post)
       post3 = FactoryGirl.create(:post)
@@ -1626,6 +1645,8 @@ class PostTest < ActiveSupport::TestCase
     end
 
     should "return posts for the <pool> metatag with a wildcard" do
+      SqsService.any_instance.stubs(:send_message)
+
       post1 = FactoryGirl.create(:post)
       post2 = FactoryGirl.create(:post)
       post3 = FactoryGirl.create(:post)
@@ -2020,7 +2041,7 @@ class PostTest < ActiveSupport::TestCase
 
         should "correctly revert all fields" do
           assert_equal("aaa bbb ccc ddd", @post.tag_string)
-          assert_equal(nil, @post.source)
+          assert_nil(@post.source)
           assert_equal("q", @post.rating)
         end
       end

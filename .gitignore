@@ -20,3 +20,4 @@ danbooru.db
 iqdb.db
 danbooru.sublime-project
 danbooru.sublime-workspace
+script/scratch.rb

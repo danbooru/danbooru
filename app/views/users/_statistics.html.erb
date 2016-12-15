@@ -84,10 +84,12 @@
         <td><%= presenter.artist_commentary_version_count(self) %></td>
       </tr>
 
-      <tr>
-        <th>Pool Changes</th>
-        <td><%= presenter.pool_version_count(self) %></td>
-      </tr>
+      <% if PoolArchive.enabled? %>
+        <tr>
+          <th>Pool Changes</th>
+          <td><%= presenter.pool_version_count(self) %></td>
+        </tr>
+      <% end %>
 
       <tr>
         <th>Forum Posts</th>

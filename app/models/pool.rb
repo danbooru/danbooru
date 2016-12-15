@@ -11,7 +11,6 @@ class Pool < ActiveRecord::Base
   validate :updater_can_remove_posts
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
-  has_many :versions, lambda {order("pool_versions.id ASC")}, :class_name => "PoolVersion", :dependent => :destroy
   before_validation :normalize_post_ids
   before_validation :normalize_name
   before_validation :initialize_is_active, :on => :create
@@ -158,6 +157,14 @@ class Pool < ActiveRecord::Base
     end
   end
 
+  def versions
+    if PoolArchive.enabled?
+      PoolArchive.where("pool_id = ?", id).order("id asc")
+    else
+      raise "Archive service not configured"
+    end
+  end
+
   def is_series?
     category == "series"
   end
@@ -200,8 +207,10 @@ class Pool < ActiveRecord::Base
       raise RevertError.new("You cannot revert to a previous version of another pool.")
     end
 
-    self.post_ids = version.post_ids
+    self.post_ids = version.post_ids.join(" ")
     self.name = version.name
+    self.description = version.description
+
     synchronize!
   end
 
@@ -294,7 +303,7 @@ class Pool < ActiveRecord::Base
 
   def synchronize!
     synchronize
-    save
+    save if post_ids_changed?
   end
 
   def post_id_array
@@ -336,17 +345,10 @@ class Pool < ActiveRecord::Base
   end
 
   def create_version(force = false)
-    if post_ids_changed? || name_changed? || description_changed? || is_active_changed? || is_deleted_changed? || category_changed? || force
-      last_version = versions.last
-
-      if last_version && last_version.updater_ip_addr == CurrentUser.ip_addr && CurrentUser.user.id == last_version.updater_id && last_version.created_at > 1.hour.ago
-        # merge
-        last_version.update_column(:post_ids, post_ids)
-        last_version.update_column(:name, name)
-      else
-        # create
-        versions.create(:post_ids => post_ids, :name => name)
-      end
+    if PoolArchive.enabled?
+      PoolArchive.queue(self)
+    else
+      Rails.logger.warn("Archive service is not configured. Pool versions will not be saved.")
     end
   end
 

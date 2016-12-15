@@ -34,6 +34,46 @@ class PoolVersion < ActiveRecord::Base
 
   extend SearchMethods
 
+  def self.export_to_archives(starting_version_id = 0)
+    raise "SQS URL not setup" if Danbooru.config.aws_sqs_archives_url.nil?
+
+    credentials = Aws::Credentials.new(
+      Danbooru.config.aws_access_key_id,
+      Danbooru.config.aws_secret_access_key
+    )
+    sqs = Aws::SQS::Client.new(
+      credentials: credentials,
+      region: Danbooru.config.aws_sqs_region
+    )
+    last_version_id = 0
+
+    where("id > ?", starting_version_id).find_each do |version|
+      last_version_id = version.id
+
+      json = {
+        id: version.id,
+        pool_id: version.pool_id,
+        post_ids: version.post_ids.scan(/\d+/).map(&:to_i),
+        updater_id: version.updater_id,
+        updater_ip_addr: version.updater_ip_addr.to_s,
+        created_at: version.created_at.try(:iso8601),
+        updated_at: version.updated_at.try(:iso8601),
+        description: version.pool.description,
+        name: version.name,
+        is_active: version.pool.is_active?,
+        is_deleted: version.pool.is_deleted?,
+        category: version.pool.category
+      }
+      msg = "add pool version\n#{json.to_json}"
+      sqs.send_message(
+        message_body: msg,
+        queue_url: Danbooru.config.aws_sqs_archives_url
+      )
+    end
+
+    puts "last version id: #{last_version_id}"
+  end
+
   def updater_name
     User.id_to_name(updater_id)
   end
@@ -81,7 +121,7 @@ class PoolVersion < ActiveRecord::Base
         intersect << id
         other_array.delete_at(index)
       end
-      intersect        
+      intersect
     end
   end
 

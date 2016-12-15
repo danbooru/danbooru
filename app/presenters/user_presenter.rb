@@ -178,7 +178,11 @@ class UserPresenter
   end
 
   def pool_version_count(template)
-    template.link_to(user.pool_version_count, template.pool_versions_path(:search => {:updater_id => user.id}))
+    if PoolArchive.enabled?
+      template.link_to(user.pool_version_count, template.pool_versions_path(:search => {:updater_id => user.id}))
+    else
+      "N/A"
+    end
   end
 
   def inviter(template)

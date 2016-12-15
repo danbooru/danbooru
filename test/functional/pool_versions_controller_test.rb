@@ -1,14 +1,20 @@
 require 'test_helper'
+require 'helpers/pool_archive_test_helper'
 
 class PoolVersionsControllerTest < ActionController::TestCase
+  include PoolArchiveTestHelper
+
   context "The pool versions controller" do
     setup do
+      mock_pool_archive_service!
+      start_pool_archive_transaction
       @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
 
     teardown do
+      rollback_pool_archive_transaction
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end

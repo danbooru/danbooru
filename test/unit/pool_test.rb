@@ -1,18 +1,26 @@
 # encoding: utf-8
 
 require 'test_helper'
+require 'helpers/pool_archive_test_helper'
 
 class PoolTest < ActiveSupport::TestCase
+  include PoolArchiveTestHelper
+
   setup do
     Timecop.travel(1.month.ago) do
-      user = FactoryGirl.create(:user)
-      CurrentUser.user = user
+      @user = FactoryGirl.create(:user)
+      CurrentUser.user = @user
     end
+
     CurrentUser.ip_addr = "127.0.0.1"
     MEMCACHE.flush_all
+
+    mock_pool_archive_service!
+    start_pool_archive_transaction
   end
 
   teardown do
+    rollback_pool_archive_transaction
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
   end
@@ -53,33 +61,41 @@ class PoolTest < ActiveSupport::TestCase
 
   context "Reverting a pool" do
     setup do
+      PoolArchive.stubs(:enabled?).returns(true)
+
       @pool = FactoryGirl.create(:pool)
       @p1 = FactoryGirl.create(:post)
       @p2 = FactoryGirl.create(:post)
       @p3 = FactoryGirl.create(:post)
-      CurrentUser.ip_addr = "1.2.3.4"
-      @pool.add!(@p1)
-      CurrentUser.ip_addr = "1.2.3.5"
-      @pool.add!(@p2)
-      CurrentUser.ip_addr = "1.2.3.6"
-      @pool.add!(@p3)
-      CurrentUser.ip_addr = "1.2.3.7"
-      @pool.remove!(@p1)
-      CurrentUser.ip_addr = "1.2.3.8"
-      @pool.revert_to!(@pool.versions.all[1])
+      CurrentUser.scoped(@user, "1.2.3.4") do
+        @pool.add!(@p1)
+      end
+      CurrentUser.scoped(@user, "1.2.3.5") do
+        @pool.add!(@p2)
+      end
+      CurrentUser.scoped(@user, "1.2.3.6") do
+        @pool.add!(@p3)
+      end
+      CurrentUser.scoped(@user, "1.2.3.7") do
+        @pool.remove!(@p1)
+      end
+      CurrentUser.scoped(@user, "1.2.3.8") do
+        version = @pool.versions[1]
+        @pool.revert_to!(version)
+      end
     end
 
     should "have the correct versions" do
       assert_equal(6, @pool.versions.size)
-      assert_equal("", @pool.versions.all[0].post_ids)
-      assert_equal("#{@p1.id}", @pool.versions.all[1].post_ids)
-      assert_equal("#{@p1.id} #{@p2.id}", @pool.versions.all[2].post_ids)
-      assert_equal("#{@p1.id} #{@p2.id} #{@p3.id}", @pool.versions.all[3].post_ids)
-      assert_equal("#{@p2.id} #{@p3.id}", @pool.versions.all[4].post_ids)
+      assert_equal([], @pool.versions.all[0].post_ids)
+      assert_equal([@p1.id], @pool.versions.all[1].post_ids)
+      assert_equal([@p1.id, @p2.id], @pool.versions.all[2].post_ids)
+      assert_equal([@p1.id, @p2.id, @p3.id], @pool.versions.all[3].post_ids)
+      assert_equal([@p2.id, @p3.id], @pool.versions.all[4].post_ids)
     end
 
     should "update its post_ids" do
-      assert_equal("#{@p1.id}", @pool.post_ids)
+      assert_equal([@p1.id], @pool.post_id_array)
     end
 
     should "update any old posts that were removed" do

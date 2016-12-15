@@ -53,7 +53,9 @@
         <li><h1>Pools</h1></li>
         <li><%= link_to("Help", wiki_pages_path(:title => "help:pools")) %></li>
         <li><%= link_to("Listing", pools_path) %></li>
-        <li><%= link_to("Changes", pool_versions_path) %></li>
+        <% if PoolArchive.enabled? %>
+          <li><%= link_to("Changes", pool_versions_path) %></li>
+        <% end %>
       </ul>
       <ul>
         <li><h1>Reports</h1></li>
