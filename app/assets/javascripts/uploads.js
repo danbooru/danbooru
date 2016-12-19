@@ -31,7 +31,9 @@
       if (!Danbooru.autocompleting) {
         $("#form").trigger("submit");
         $("#quick-edit-form").trigger("submit");
+        $("#upload_tag_string,#post_tag_string").unbind("keydown");
       }
+
       e.preventDefault();
     });
   }
