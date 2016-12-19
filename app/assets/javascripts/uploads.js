@@ -8,7 +8,7 @@
     }
 
     if ($("#c-uploads").length) {
-      this.initialize_image();
+      $("#image").load(this.initialize_image);
       this.initialize_info_bookmarklet();
       this.initialize_similar();
       $("#related-tags-button").trigger("click");
@@ -128,11 +128,6 @@
             $("#scale").html("Scaled " + parseInt(100 * ratio) + "% (original: " + origin_width + "x" + origin_height + ")");
           }
         });
-      } else if (height === 0) {
-        if (!this.tries || this.tries < 10) {
-          this.tries = (this.tries || 0) + 1;
-          window.setTimeout(Danbooru.Upload.initialize_image, 200);
-        }
       } else {
         $("#scale").html("(original: " + width + "x" + height + ")");
       }
