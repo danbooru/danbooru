@@ -43,9 +43,9 @@
     if (match) {
       match.disabled = !match.disabled;
       if (match.disabled) {
-        $(e.target).addClass("blacklisted-active");
+        Danbooru.Blacklist.post_hide(e.target);
       } else {
-        $(e.target).removeClass("blacklisted-active");
+        Danbooru.Blacklist.post_unhide(e.target);
       }
     }
     Danbooru.Blacklist.apply();
@@ -121,7 +121,7 @@
       if (post_count > 0) {
         Danbooru.Blacklist.post_hide(post);
       } else {
-        $(post).removeClass("blacklisted-active");
+        Danbooru.Blacklist.post_unhide(post);
       }
     });
 
@@ -157,6 +157,22 @@
   Danbooru.Blacklist.post_hide = function(post) {
     var $post = $(post);
     $post.addClass("blacklisted").addClass("blacklisted-active");
+
+    var $video = $post.find("video").get(0);
+    if ($video) {
+      $video.pause();
+      $video.currentTime = 0;
+    }
+  }
+
+  Danbooru.Blacklist.post_unhide = function(post) {
+    var $post = $(post);
+    $post.addClass("blacklisted").removeClass("blacklisted-active");
+
+    var $video = $post.find("video").get(0);
+    if ($video) {
+      $video.play();
+    }
   }
 
   Danbooru.Blacklist.initialize_all = function() {
