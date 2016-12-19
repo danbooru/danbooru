@@ -1,0 +1,32 @@
+<div id="c-maintenance-user-api-keys">
+  <div id="a-view">
+    <h1>API Key</h1>
+
+    <table class="striped" width="100%">
+      <thead>
+        <tr>
+          <th>API Key</th>
+          <th>Created</th>
+          <th>Updated</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td id="api-key"><%= @api_key.key %></td>
+          <td id="api-key-created"><%= compact_time @api_key.created_at %></td>
+          <td id="api-key-updated"><%= compact_time @api_key.updated_at %></td>
+          <td>
+            <%= button_to "Regenerate", user_api_key_path(CurrentUser.user), method: :put, params: { 'user[password]': @password }, remote: true %>
+            <%= button_to "Delete", user_api_key_path(CurrentUser.user), method: :delete, params: { 'user[password]': @password } %>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  API Key - <%= Danbooru.config.app_name %>
+<% end %>

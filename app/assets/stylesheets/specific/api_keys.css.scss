@@ -1,0 +1,11 @@
+@import "../common/020_base.css.scss";
+
+#c-maintenance-user-api-keys {
+  #api-key {
+    @extend code;
+  }
+
+  .button_to {
+    display: inline-block;
+  }
+}

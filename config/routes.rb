@@ -65,13 +65,15 @@ Rails.application.routes.draw do
       resource :deletion, :only => [:show, :destroy]
       resource :email_change, :only => [:new, :create]
       resource :dmail_filter, :only => [:edit, :update]
+      resource :api_key, :only => [:show, :view, :update, :destroy] do
+        post :view
+      end
     end
   end
 
   resources :advertisements do
     resources :hits, :controller => "advertisement_hits", :only => [:create]
   end
-  resources :api_keys, :only => [:new, :create]
   resources :artists do
     member do
       put :revert
@@ -278,6 +280,9 @@ Rails.application.routes.draw do
   end
   resources :users do
     resource :password, :only => [:edit], :controller => "maintenance/user/passwords"
+    resource :api_key, :only => [:show, :view, :update, :destroy], :controller => "maintenance/user/api_keys" do
+      post :view
+    end
 
     collection do
       get :search

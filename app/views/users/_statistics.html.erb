@@ -147,11 +147,8 @@
         <tr>
           <th>API Key</th>
           <td>
-            <% if CurrentUser.user.api_key %>
-              <%= CurrentUser.user.api_key.key %>
-            <% else %>
-              <%= link_to "Generate key", new_api_key_path %>
-            <% end %>
+            <%= link_to (CurrentUser.api_key ? "View" : "Generate"), user_api_key_path(CurrentUser.user) %>
+            (<%= link_to "help", wiki_pages_path(title: "help:api") %>)
           </td>
         </tr>
       <% end %>

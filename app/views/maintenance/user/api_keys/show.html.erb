@@ -1,0 +1,15 @@
+<div id="c-maintenance-user-api-keys">
+  <div id="a-show">
+    <h1>API Key</h1>
+    <p>You must re-enter your password to view or change your API key.</p>
+
+    <%= simple_form_for CurrentUser.user, url: view_user_api_key_path(CurrentUser.user), method: :post do |f| %>
+      <%= f.input :password, :as => :password, :input_html => {:autocomplete => "off"} %>
+      <%= f.button :submit, "Submit" %>
+    <% end %>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  API Key - <%= Danbooru.config.app_name %>
+<% end %>
