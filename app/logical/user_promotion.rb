@@ -19,7 +19,6 @@ class UserPromotion
     user.can_upload_free = options[:can_upload_free]
     user.inviter_id = promoter.id
 
-    create_transaction_log_item
     create_user_feedback unless options[:skip_feedback]
     create_dmail unless options[:skip_dmail]
     update_saved_searches
@@ -38,10 +37,6 @@ private
 
     # can't promote to admin      
     raise User::PrivilegeError if new_level.to_i >= User::Levels::ADMIN
-  end
-
-  def create_transaction_log_item
-    TransactionLogItem.record_account_upgrade(user)
   end
 
   def build_messages

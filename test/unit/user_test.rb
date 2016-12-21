@@ -19,12 +19,6 @@ class UserTest < ActiveSupport::TestCase
         CurrentUser.user = FactoryGirl.create(:moderator_user)
       end
 
-      should "create a transaction log item" do
-        assert_difference("TransactionLogItem.count") do
-          @user.promote_to!(User::Levels::GOLD)
-        end
-      end
-
       should "create a neutral feedback" do
         assert_difference("UserFeedback.count") do
           @user.promote_to!(User::Levels::GOLD)

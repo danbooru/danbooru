@@ -11,9 +11,6 @@ class UserUpgradesController < ApplicationController
   end
 
   def new
-    unless CurrentUser.user.is_anonymous?
-      TransactionLogItem.record_account_upgrade_view(CurrentUser.user, request.referer)
-    end
   end
 
   def show

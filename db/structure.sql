@@ -3089,39 +3089,6 @@ ALTER SEQUENCE tags_id_seq OWNED BY tags.id;
 
 
 --
--- Name: transaction_log_items; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE transaction_log_items (
-    id integer NOT NULL,
-    category character varying,
-    user_id integer,
-    data text,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: transaction_log_items_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE transaction_log_items_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: transaction_log_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE transaction_log_items_id_seq OWNED BY transaction_log_items.id;
-
-
---
 -- Name: uploads; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4427,13 +4394,6 @@ ALTER TABLE ONLY tags ALTER COLUMN id SET DEFAULT nextval('tags_id_seq'::regclas
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY transaction_log_items ALTER COLUMN id SET DEFAULT nextval('transaction_log_items_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE ONLY uploads ALTER COLUMN id SET DEFAULT nextval('uploads_id_seq'::regclass);
 
 
@@ -4845,14 +4805,6 @@ ALTER TABLE ONLY tag_subscriptions
 
 ALTER TABLE ONLY tags
     ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
-
-
---
--- Name: transaction_log_items_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY transaction_log_items
-    ADD CONSTRAINT transaction_log_items_pkey PRIMARY KEY (id);
 
 
 --
@@ -7089,20 +7041,6 @@ CREATE INDEX index_tags_on_name_pattern ON tags USING btree (name text_pattern_o
 
 
 --
--- Name: index_transaction_log_items_on_created_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_transaction_log_items_on_created_at ON transaction_log_items USING btree (created_at);
-
-
---
--- Name: index_transaction_log_items_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_transaction_log_items_on_user_id ON transaction_log_items USING btree (user_id);
-
-
---
 -- Name: index_uploads_on_uploader_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7521,4 +7459,6 @@ INSERT INTO schema_migrations (version) VALUES ('20161018221128');
 INSERT INTO schema_migrations (version) VALUES ('20161024220345');
 
 INSERT INTO schema_migrations (version) VALUES ('20161101003139');
+
+INSERT INTO schema_migrations (version) VALUES ('20161221225849');
 
