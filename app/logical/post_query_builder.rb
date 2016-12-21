@@ -102,15 +102,17 @@ class PostQueryBuilder
   end
 
   def add_saved_search_relation(saved_searches, relation)
-    saved_searches.each do |saved_search|
-      if saved_search == "all"
-        post_ids = SavedSearch.post_ids(CurrentUser.id)
-      else
-        post_ids = SavedSearch.post_ids(CurrentUser.id, saved_search)
-      end
+    if SavedSearch.enabled?
+      saved_searches.each do |saved_search|
+        if saved_search == "all"
+          post_ids = SavedSearch.post_ids(CurrentUser.id)
+        else
+          post_ids = SavedSearch.post_ids(CurrentUser.id, saved_search)
+        end
 
-      post_ids = [0] if post_ids.empty?
-      relation = relation.where(["posts.id IN (?)", post_ids])
+        post_ids = [0] if post_ids.empty?
+        relation = relation.where(["posts.id IN (?)", post_ids])
+      end
     end
 
     relation

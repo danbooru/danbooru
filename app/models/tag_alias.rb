@@ -180,9 +180,12 @@ class TagAlias < ActiveRecord::Base
 
   def move_saved_searches
     escaped = Regexp.escape(antecedent_name)
-    SavedSearch.where("tag_query like ?", "%#{antecedent_name}%").find_each do |ss|
-      ss.tag_query = ss.tag_query.sub(/(?:^| )#{escaped}(?:$| )/, " #{consequent_name} ").strip.gsub(/  /, " ")
-      ss.save
+
+    if SavedSearch.enabled?
+      SavedSearch.where("tag_query like ?", "%#{antecedent_name}%").find_each do |ss|
+        ss.tag_query = ss.tag_query.sub(/(?:^| )#{escaped}(?:$| )/, " #{consequent_name} ").strip.gsub(/  /, " ")
+        ss.save
+      end
     end
   end
 

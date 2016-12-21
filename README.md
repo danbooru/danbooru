@@ -44,6 +44,12 @@ IQDB integration is now delegated to the [IQDBS service](https://github.com/r888
 You will need to install your own copy and enable the appropriate 
 configuration settings.
 
+### Listbooru Service
+
+In order to access saved search functionality you will need to install and 
+configure the [Listbooru service](https://github.com/r888888888/listbooru).
+
 ### Archive Service
 
-In order to access versioned data for pools (and eventually posts) you will need to install and configure the [Archive service](https://github.com/r888888888/archives).
+In order to access versioned data for pools (and eventually posts) you will 
+need to install and configure the [Archives service](https://github.com/r888888888/archives).

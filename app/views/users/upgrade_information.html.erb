@@ -43,12 +43,14 @@
             <td>2,000</td>
             <td>5,000</td>
           </tr>
-          <tr>
-            <td>Saved Searches</td>
-            <td>No</td>
-            <td>Yes</td>
-            <td>Yes</td>
-          </tr>
+          <% if SavedSearch.enabled? %>
+            <tr>
+              <td>Saved Searches</td>
+              <td>No</td>
+              <td>Yes</td>
+              <td>Yes</td>
+            </tr>
+          <% end %>
           <tr>
             <td>See Censored Tags</td>
             <td>No</td>

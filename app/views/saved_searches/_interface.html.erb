@@ -1,17 +1,19 @@
-<% if CurrentUser.show_saved_searches? %>
+<% if SavedSearch.enabled? && CurrentUser.show_saved_searches? %>
   <%= button_tag "Save search", :id => "save-search" %>
 <% end %>
 
-<div id="save-search-dialog" title="Save Search" style="display: none;">
-  <%= form_tag(saved_searches_path, :class => "simple_form", :remote => true) do %>
-    <%= hidden_field_tag "saved_search_tags", params[:tags] %>
+<% if SavedSearch.enabled? %>
+  <div id="save-search-dialog" title="Save Search" style="display: none;">
+    <%= form_tag(saved_searches_path, :class => "simple_form", :remote => true) do %>
+      <%= hidden_field_tag "saved_search_tags", params[:tags] %>
 
-    <div class="input">
-      <label>
-        <%= text_field_tag "saved_search_category", "", :placeholder => "Category" %>
-      </label>
-    </div>
+      <div class="input">
+        <label>
+          <%= text_field_tag "saved_search_category", "", :placeholder => "Category" %>
+        </label>
+      </div>
 
-    <p><label><%= check_box_tag "saved_search_disable_categories" %> Disable categorization</label></p>
-  <% end %>
-</div>
+      <p><label><%= check_box_tag "saved_search_disable_categories" %> Disable categorization</label></p>
+    <% end %>
+  </div>
+<% end %>

@@ -23,11 +23,12 @@ module Moderator
           tags = Tag.scan_tags(antecedent, :strip_metatags => true)
           conds = tags.map {|x| "tag_query like ?"}.join(" AND ")
           conds = [conds, *tags.map {|x| "%#{x}%"}]
-          SavedSearch.where(*conds).find_each do |ss|
-            ss.tag_query = (ss.tag_query_array - tags + antecedent).uniq.join(" ")
-            ss.save
+          if SavedSearch.enabled?
+            SavedSearch.where(*conds).find_each do |ss|
+              ss.tag_query = (ss.tag_query_array - tags + antecedent).uniq.join(" ")
+              ss.save
+            end
           end
-
         end
       end
     end

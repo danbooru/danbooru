@@ -847,15 +847,19 @@ class User < ActiveRecord::Base
 
   module SavedSearchMethods
     def unique_saved_search_categories
-      categories = saved_searches.pluck(:category)
-      
-      if categories.any? {|x| x.blank?}
-        categories.reject! {|x| x.blank?}
-        categories.unshift(SavedSearch::UNCATEGORIZED_NAME)
+      if SavedSearch.enabled?
+        categories = saved_searches.pluck(:category)
+        
+        if categories.any? {|x| x.blank?}
+          categories.reject! {|x| x.blank?}
+          categories.unshift(SavedSearch::UNCATEGORIZED_NAME)
+        end
+        
+        categories.uniq!
+        categories
+      else
+        []
       end
-      
-      categories.uniq!
-      categories
     end
   end
 

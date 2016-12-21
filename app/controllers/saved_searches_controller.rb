@@ -1,5 +1,6 @@
 class SavedSearchesController < ApplicationController
   before_filter :member_only
+  before_fitler :check_availability
   respond_to :html, :xml, :json, :js
   
   def index
@@ -46,6 +47,22 @@ class SavedSearchesController < ApplicationController
   end
 
 private
+
+  def check_availabililty
+    if !SavedSearch.enabled?
+      respond_to do |format|
+        format.html do
+          flash[:notice] = "Listbooru service is not configured. Saved searches are not available."
+          redirect_to :back
+        end
+        format.json do
+          render json: {success: false, reason: "Listbooru service is not configured"}.to_json, status: 501
+        end
+      end
+
+      return false
+    end
+  end
 
   def saved_searches
     CurrentUser.user.saved_searches

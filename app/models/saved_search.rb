@@ -5,63 +5,96 @@ class SavedSearch < ActiveRecord::Base
     extend ActiveSupport::Concern
 
     module ClassMethods
+      def enabled?
+        Danbooru.config.aws_sqs_saved_search_url.present?
+      end
+
       def posts_search_available?
-        Danbooru.config.listbooru_server.present? && CurrentUser.is_gold?
+        enabled? && CurrentUser.is_gold?
+      end
+
+      def sqs_service
+        SqsService.new(Danbooru.config.aws_sqs_saved_search_url)
       end
 
       def refresh_listbooru(user_id)
-        return false unless Danbooru.config.listbooru_enabled?
+        return false unless enabled?
 
-        sqs = SqsService.new(Danbooru.config.aws_sqs_queue_url)
-        sqs.send_message("refresh\n#{user_id}")
+        sqs_service.send_message("refresh\n#{user_id}")
       end
 
       def reset_listbooru(user_id)
-        return false unless Danbooru.config.listbooru_enabled?
+        return false unless enabled?
 
-        sqs = SqsService.new(Danbooru.config.aws_sqs_queue_url)
         user = User.find(user_id)
 
-        sqs.send_message("delete\n#{user_id}\nall\n")
+        sqs_service.send_message("delete\n#{user_id}\nall\n")
 
         user.saved_searches.each do |saved_search|
-          sqs.send_message("create\n#{user_id}\n#{saved_search.category}\n#{saved_search.tag_query}", :delay_seconds => 30)
+          sqs_service.send_message("create\n#{user_id}\n#{saved_search.category}\n#{saved_search.tag_query}", :delay_seconds => 30)
         end
 
         true
       end
 
       def rename_listbooru(user_id, old_category, new_category)
-        return false unless Danbooru.config.listbooru_enabled?
+        return false unless enabled?
 
-        sqs = SqsService.new(Danbooru.config.aws_sqs_queue_url)
-        sqs.send_message("rename\n#{user_id}\n#{old_category}\n#{new_category}\n")
+        sqs_service.send_message("rename\n#{user_id}\n#{old_category}\n#{new_category}\n")
 
         true
+      end
+
+      def post_ids(user_id, name = nil)
+        return [] unless enabled?
+
+        if name
+          hash_name = Cache.hash(name)
+        else
+          hash_name = nil
+        end
+
+        body = Cache.get("ss-pids-#{user_id}-#{hash_name}", 60) do
+          params = {
+            "key" => Danbooru.config.listbooru_auth_key,
+            "user_id" => user_id,
+            "name" => name
+          }
+          uri = URI.parse("#{Danbooru.config.listbooru_server}/users")
+          uri.query = URI.encode_www_form(params)
+
+          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.is_a?(URI::HTTPS)) do |http|
+            resp = http.request_get(uri.request_uri)
+            if resp.is_a?(Net::HTTPSuccess)
+              resp.body
+            else
+              raise "HTTP error code: #{resp.code} #{resp.message}"
+            end
+          end
+        end
+
+        body.to_s.scan(/\d+/).map(&:to_i)
       end
     end
 
     def update_listbooru_on_create
-      return unless Danbooru.config.listbooru_enabled?
+      return unless SavedSearch.enabled?
       return unless user.is_gold?
 
-      sqs = SqsService.new(Danbooru.config.aws_sqs_queue_url)
-      sqs.send_message("create\n#{user_id}\n#{category}\n#{tag_query}")
+      SavedSearch.sqs_service.send_message("create\n#{user_id}\n#{category}\n#{tag_query}")
     end
 
     def update_listbooru_on_destroy
-      return unless Danbooru.config.listbooru_enabled?
+      return unless SavedSearch.enabled?
 
-      sqs = SqsService.new(Danbooru.config.aws_sqs_queue_url)
-      sqs.send_message("delete\n#{user_id}\n#{category}\n#{tag_query}")
+      SavedSearch.sqs_service.send_message("delete\n#{user_id}\n#{category}\n#{tag_query}")
     end
 
     def update_listbooru_on_update
-      return unless Danbooru.config.listbooru_enabled?
+      return unless SavedSearch.enabled?
       return unless user.is_gold?
 
-      sqs = SqsService.new(Danbooru.config.aws_sqs_queue_url)
-      sqs.send_message("update\n#{user_id}\n#{category_was}\n#{tag_query_was}\n#{category}\n#{tag_query}")
+      SavedSearch.sqs_service.send_message("update\n#{user_id}\n#{category_was}\n#{tag_query_was}\n#{category}\n#{tag_query}")
     end
   end
 
@@ -97,37 +130,6 @@ class SavedSearch < ActiveRecord::Base
     new_category = normalize_category(new_category)
     user.saved_searches.where(category: old_category).update_all(category: new_category)
     rename_listbooru(user_id, old_category, new_category)
-  end
-
-  def self.post_ids(user_id, name = nil)
-    return [] unless Danbooru.config.listbooru_enabled?
-
-    if name
-      hash_name = Cache.hash(name)
-    else
-      hash_name = nil
-    end
-
-    body = Cache.get("ss-pids-#{user_id}-#{hash_name}", 60) do
-      params = {
-        "key" => Danbooru.config.listbooru_auth_key,
-        "user_id" => user_id,
-        "name" => name
-      }
-      uri = URI.parse("#{Danbooru.config.listbooru_server}/users")
-      uri.query = URI.encode_www_form(params)
-
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.is_a?(URI::HTTPS)) do |http|
-        resp = http.request_get(uri.request_uri)
-        if resp.is_a?(Net::HTTPSuccess)
-          resp.body
-        else
-          raise "HTTP error code: #{resp.code} #{resp.message}"
-        end
-      end
-    end
-
-    body.to_s.scan(/\d+/).map(&:to_i)
   end
 
   def normalize

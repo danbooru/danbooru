@@ -480,7 +480,7 @@ module Danbooru
       false
     end
 
-    def aws_sqs_queue_url
+    def aws_sqs_saved_search_url
     end
 
     def aws_sqs_reltagcalc_url

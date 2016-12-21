@@ -44,6 +44,10 @@ class UserPresenter
   end
 
   def posts_for_saved_search_category(category)
+    if !SavedSearch.enabled?
+      return Post.where("false")
+    end
+    
     if category == SavedSearch::UNCATEGORIZED_NAME
       ids = SavedSearch.post_ids(CurrentUser.user.id)
     else
