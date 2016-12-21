@@ -36,7 +36,6 @@
 <% end %>
 
 <%= content_for(:html_header) do %>
-  <%= javascript_include_tag "stupidtable" %>
   <script type="text/javascript">
     $(function() {
       $("#sortable").stupidtable().on("aftertablesort", function() {
