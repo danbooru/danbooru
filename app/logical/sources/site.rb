@@ -65,7 +65,11 @@ module Sources
         :danbooru_name => artist_record.try(:first).try(:name),
         :danbooru_id => artist_record.try(:first).try(:id),
         :unique_id => unique_id,
-        :page_count => page_count
+        :page_count => page_count,
+        :artist_commentary => {
+          :title => artist_commentary_title,
+          :description => artist_commentary_desc,
+        }
       }.to_json
     end
 
