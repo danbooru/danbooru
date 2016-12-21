@@ -1,5 +1,15 @@
 <p>If the artist of this image posted some interesting additional information about this work, you can copy it here. <%= link_to "View help.", wiki_pages_path(:search => {:title => "help:artist_commentary"}) %></p>
 
+<form id="fetch-commentary" class="simple_form">
+  <div class="input">
+    <label>Copy from</label>
+    <%= select_tag :commentary_source_type, options_for_select(%w[Source Post]) %>
+    <%= text_field_tag :commentary_source, @post.source %>
+    <%= text_field_tag :commentary_post_id, (@post.parent.try(&:id) || @post.children.first.try(&:id)), :style => "display: none;" %>
+    <%= button_tag "Fetch" %>
+  </div>
+</form>
+
 <%= form_tag(create_or_update_artist_commentaries_path(:format => :js), :remote => true, :class => "simple_form", :method => :put) do %>
   <%= hidden_field :artist_commentary, :post_id, :value => @post.id %>
 
