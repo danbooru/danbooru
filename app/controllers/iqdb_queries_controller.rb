@@ -2,7 +2,7 @@
 class IqdbQueriesController < ApplicationController
   before_filter :member_only
 
-  def create
+  def index
     if !Danbooru.config.iqdbs_server
       raise NotImplementedError.new("the IQDBs service isn't configured. Similarity searches are not available.")
     end
@@ -15,6 +15,9 @@ class IqdbQueriesController < ApplicationController
       render :nothing => true, :status => 422
     end
   end
+
+  # Support both POST /iqdb_queries and GET /iqdb_queries.
+  alias_method :create, :index
 
 protected
   def create_by_url
