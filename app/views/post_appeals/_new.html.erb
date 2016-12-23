@@ -1,6 +1,4 @@
-<p>If this post was automatically deleted, <strong>then it means at least ten janitors all thought it didn't belong on the site</strong>. If you still believe this image was wrongfully deleted, then you can appeal its deletion.</p>
-
-<p>All users are limited to one appeal a day. For more details, please read the <%= link_to "wiki", wiki_pages_path(:title => "help:deletion_appeals") %>.</p>
+<%= format_text(WikiPage.titled(Danbooru.config.appeal_notice_wiki_page).first.try(&:body)) %>
 
 <%= form_tag(post_appeals_path(:format => :js), :remote => true) do %>
   <%= hidden_field_tag "post_appeal[post_id]", @post_appeal.post_id %>
