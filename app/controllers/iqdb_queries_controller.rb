@@ -1,6 +1,7 @@
 # todo: move this to iqdbs
 class IqdbQueriesController < ApplicationController
   before_filter :member_only
+  respond_to :html, :json, :xml
 
   def index
     if !Danbooru.config.iqdbs_server
@@ -24,7 +25,9 @@ protected
     @download = Iqdb::Download.new(params[:url])
     @download.find_similar
     @results = @download.matches
-    render :layout => false, :action => "create_by_url"
+    respond_with(@results) do |fmt|
+      fmt.html { render :layout => false, :action => "create_by_url" }
+    end
   end
 
   def create_by_post
@@ -32,6 +35,8 @@ protected
     @download = Iqdb::Download.new(@post.complete_preview_file_url)
     @download.find_similar
     @results = @download.matches
-    render :layout => false, :action => "create_by_post"
+    respond_with(@results) do |fmt|
+      fmt.js { render :layout => false, :action => "create_by_post" }
+    end
   end
 end
