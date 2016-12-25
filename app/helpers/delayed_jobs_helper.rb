@@ -1,6 +1,18 @@
 module DelayedJobsHelper
   def print_name(job)
     case job.name
+    when "Tag.increment_post_counts"
+      "<strong>increment post counts</strong>"
+
+    when "Tag.decrement_post_counts"
+      "<strong>decrement post counts</strong>"
+
+    when "Post.expire_cache"
+      "<strong>expire post cache</strong>"
+
+    when "Moderator::TagBatchChange"
+      "<strong>tag batch change</strong>"
+
     when "TagSubscription.process"
       "<strong>process tag subscription</strong>"
 
@@ -56,6 +68,15 @@ module DelayedJobsHelper
 
   def print_handler(job)
     case job.name
+    when "Tag.increment_post_counts", "Tag.decrement_post_counts"
+      ""
+
+    when "Post.expire_cache"
+      ""
+
+    when "Moderator::TagBatchChange"
+      h(job.payload_object.antecedent) + " -> " + h(job.payload_object.consequent)
+
     when "TagSubscription.process"
       ""
 
@@ -69,10 +90,10 @@ module DelayedJobsHelper
       h(job.payload_object.name)
 
     when "TagAlias#process!"
-      h(job.payload_object.antecedent_name) + " -&gt; " + h(job.payload_object.consequent_name)
+      h(job.payload_object.antecedent_name) + " -> " + h(job.payload_object.consequent_name)
 
     when "TagImplication#process!"
-      h(job.payload_object.antecedent_name) + " -&gt; " + h(job.payload_object.consequent_name)
+      h(job.payload_object.antecedent_name) + " -> " + h(job.payload_object.consequent_name)
 
     when "Class#clear_cache_for"
       h(job.payload_object.args.flatten.join(" "))
