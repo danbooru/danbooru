@@ -1,5 +1,9 @@
 class PoolArchive < ActiveRecord::Base
-  establish_connection "archive_#{Rails.env}".to_sym
+  def self.enabled?
+    Danbooru.config.aws_sqs_archives_url.present?
+  end
+
+  establish_connection "archive_#{Rails.env}".to_sym if enabled?
   self.table_name = "pool_versions"
 
   module SearchMethods
@@ -28,10 +32,6 @@ class PoolArchive < ActiveRecord::Base
   end
 
   extend SearchMethods
-
-  def self.enabled?
-    Danbooru.config.aws_sqs_archives_url.present?
-  end
 
   def self.sqs_service
     SqsService.new(Danbooru.config.aws_sqs_archives_url)
