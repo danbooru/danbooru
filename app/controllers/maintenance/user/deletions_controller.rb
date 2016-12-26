@@ -1,8 +1,6 @@
 module Maintenance
   module User
     class DeletionsController < ApplicationController
-      rescue_from UserDeletion::ValidationError, :with => :rescue_exception
-
       def show
       end
 

@@ -1,7 +1,6 @@
 class UploadsController < ApplicationController
   before_filter :member_only
   respond_to :html, :xml, :json, :js
-  rescue_from Upload::Error, :with => :rescue_exception
 
   def new
     @upload = Upload.new

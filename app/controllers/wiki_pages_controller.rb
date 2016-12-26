@@ -3,8 +3,6 @@ class WikiPagesController < ApplicationController
   before_filter :member_only, :except => [:index, :show, :show_or_new]
   before_filter :builder_only, :only => [:destroy]
   before_filter :normalize_search_params, :only => [:index]
-  rescue_from ActiveRecord::StatementInvalid, :with => :rescue_exception
-  rescue_from ActiveRecord::RecordNotFound, :with => :rescue_exception
   
   def new
     @wiki_page = WikiPage.new(params[:wiki_page])

@@ -3,10 +3,6 @@ class PostsController < ApplicationController
   before_filter :builder_only, :only => [:copy_notes]
   before_filter :enable_cors, :only => [:index, :show]
   respond_to :html, :xml, :json
-  rescue_from PostSets::SearchError, :with => :rescue_exception
-  rescue_from Post::SearchError, :with => :rescue_exception
-  rescue_from ActiveRecord::StatementInvalid, :with => :rescue_exception
-  rescue_from ActiveRecord::RecordNotFound, :with => :rescue_exception
 
   def index
     if params[:md5].present?

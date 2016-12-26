@@ -1,6 +1,5 @@
 class LegacyController < ApplicationController
   before_filter :member_only, :only => [:create_post]
-  rescue_from PostSets::SearchError, :with => :rescue_exception
 
   def posts
     @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], format: "json")
