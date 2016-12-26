@@ -1,6 +1,6 @@
 class CommentsController < ApplicationController
   respond_to :html, :xml, :json
-  before_filter :member_only, :only => [:update, :create, :edit, :destroy]
+  before_filter :member_only, :except => [:index, :search, :show]
   rescue_from ActiveRecord::StatementInvalid, :with => :rescue_exception
 
   def index
