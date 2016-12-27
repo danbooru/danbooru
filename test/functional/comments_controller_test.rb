@@ -3,12 +3,17 @@ require 'test_helper'
 class CommentsControllerTest < ActionController::TestCase
   context "A comments controller" do
     setup do
-      CurrentUser.user = FactoryGirl.create(:user)
+      @mod = FactoryGirl.create(:moderator_user)
+      @user = FactoryGirl.create(:member_user)
+      CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
       Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
+
       @post = FactoryGirl.create(:post)
       @comment = FactoryGirl.create(:comment, :post => @post)
-      @user = FactoryGirl.create(:moderator_user)
+      CurrentUser.scoped(@mod) do
+        @mod_comment = FactoryGirl.create(:comment, :post => @post)
+      end
     end
 
     teardown do
@@ -28,13 +33,64 @@ class CommentsControllerTest < ActionController::TestCase
       end
     end
 
+    context "search action" do
+      should "render" do
+        get :search
+        assert_response :success
+      end
+    end
+
+    context "show action" do
+      should "render" do
+        get :show, {:id => @comment.id}
+        assert_response :success
+      end
+    end
+
+    context "edit action" do
+      should "render" do
+        get :edit, {:id => @comment.id}, {:user_id => @user.id}
+        assert_response :success
+      end
+    end
+
     context "update action" do
-      should "update the comment" do
+      context "when updating another user's comment" do
+        should "succeed if updater is a moderator" do
+          post :update, {:id => @comment.id, :comment => {:body => "abc"}}, {:user_id => @mod.id}
+          assert_equal("abc", @comment.reload.body)
+          assert_redirected_to post_path(@comment.post)
+        end
+
+        should "fail if updater is not a moderator" do
+          post :update, {:id => @mod_comment.id, :comment => {:body => "abc"}}, {:user_id => @user.id}
+          assert_not_equal("abc", @mod_comment.reload.body)
+          assert_response 403
+        end
+      end
+
+      context "when stickying a comment" do
+        should "succeed if updater is a moderator" do
+          CurrentUser.user = @mod
+          post :update, {:id => @comment.id, :comment => {:is_sticky => true}}, {:user_id => @mod.id}
+          assert_equal(true, @comment.reload.is_sticky)
+          assert_redirected_to @comment.post
+        end
+
+        should "fail if updater is not a moderator" do
+          post :update, {:id => @comment.id, :comment => {:is_sticky => true}}, {:user_id => @user.id}
+          assert_equal(false, @comment.reload.is_sticky)
+          assert_redirected_to @comment.post
+        end
+      end
+
+      should "update the body" do
         post :update, {:id => @comment.id, :comment => {:body => "abc"}}, {:user_id => @comment.creator_id}
+        assert_equal("abc", @comment.reload.body)
         assert_redirected_to post_path(@comment.post)
       end
 
-      should "only allow changing the body" do
+      should "allow changing the body and is_deleted" do
         params = {
           id: @comment.id,
           comment: {
@@ -50,10 +106,17 @@ class CommentsControllerTest < ActionController::TestCase
 
         assert_equal("herp derp", @comment.body)
         assert_equal(false, @comment.do_not_bump_post)
-        assert_equal(false, @comment.is_deleted)
+        assert_equal(true, @comment.is_deleted)
         assert_equal(@post.id, @comment.post_id)
 
         assert_redirected_to post_path(@post)
+      end
+    end
+
+    context "new action" do
+      should "redirect" do
+        get :new, {}, {:user_id => @user.id}
+        assert_redirected_to comments_path
       end
     end
 
@@ -69,6 +132,14 @@ class CommentsControllerTest < ActionController::TestCase
       should "not allow commenting on nonexistent posts" do
         post :create, {:comment => FactoryGirl.attributes_for(:comment, :post_id => -1)}, {:user_id => @user.id}
         assert_response :error
+      end
+    end
+
+    context "destroy action" do
+      should "mark comment as deleted" do
+        delete :destroy, {:id => @comment.id}, {:user_id => @user.id}
+        assert_equal(true, @comment.reload.is_deleted)
+        assert_redirected_to @comment
       end
     end
   end
