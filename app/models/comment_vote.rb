@@ -39,9 +39,6 @@ class CommentVote < ActiveRecord::Base
     if is_positive? && comment.creator == CurrentUser.user
       errors.add :base, "You cannot upvote your own comments"
       false
-    elsif is_negative? && comment.creator.is_admin?
-      errors.add :base, "You cannot downvote an admin comment"
-      false
     else
       true
     end
