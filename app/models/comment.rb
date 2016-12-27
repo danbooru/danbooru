@@ -54,11 +54,11 @@ class Comment < ActiveRecord::Base
     end
 
     def for_creator(user_id)
-      where("creator_id = ?", user_id)
+      user_id.present? ? where("creator_id = ?", user_id) : where("false")
     end
 
     def for_creator_name(user_name)
-      for_creator(User.name_to_id(user_name).id)
+      for_creator(User.name_to_id(user_name))
     end
 
     def search(params)
