@@ -12,7 +12,8 @@ class Comment < ActiveRecord::Base
   before_validation :initialize_updater
   after_create :update_last_commented_at_on_create
   after_destroy :update_last_commented_at_on_destroy
-  attr_accessible :body, :post_id, :do_not_bump_post, :is_deleted
+  attr_accessible :body, :post_id, :do_not_bump_post, :is_deleted, :as => [:member, :gold, :platinum, :builder, :janitor, :moderator, :admin]
+  attr_accessible :is_sticky, :as => [:moderator, :admin]
   mentionable(
     :message_field => :body, 
     :user_field => :creator_id, 
@@ -34,11 +35,11 @@ class Comment < ActiveRecord::Base
     end
 
     def hidden(user)
-      where("score < ?", user.comment_threshold)
+      where("score < ? and is_sticky = false", user.comment_threshold)
     end
 
     def visible(user)
-      where("score >= ?", user.comment_threshold)
+      where("score >= ? or is_sticky = true", user.comment_threshold)
     end
 
     def deleted
@@ -208,11 +209,11 @@ class Comment < ActiveRecord::Base
   end
 
   def delete!
-    update_attributes(:is_deleted => true)
+    update({ :is_deleted => true }, :as => CurrentUser.role)
   end
 
   def undelete!
-    update_attributes(:is_deleted => false)
+    update({ :is_deleted => false }, :as => CurrentUser.role)
   end
 end
 

@@ -205,6 +205,26 @@ class CommentTest < ActiveSupport::TestCase
         assert_equal(c2.id, matches.all[0].id)
         assert_equal(c1.id, matches.all[1].id)
       end
+
+      context "that is below the score threshold" do
+        should "be hidden if not stickied" do
+          user = FactoryGirl.create(:user, :comment_threshold => 0)
+          post = FactoryGirl.create(:post)
+          comment = FactoryGirl.create(:comment, :post => post, :score => -5)
+
+          assert_equal([comment], post.comments.hidden(user))
+          assert_equal([], post.comments.visible(user))
+        end
+
+        should "be visible if stickied" do
+          user = FactoryGirl.create(:user, :comment_threshold => 0)
+          post = FactoryGirl.create(:post)
+          comment = FactoryGirl.create(:comment, :post => post, :score => -5, :is_sticky => true)
+
+          assert_equal([], post.comments.hidden(user))
+          assert_equal([comment], post.comments.visible(user))
+        end
+      end
     end
   end
 end

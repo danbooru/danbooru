@@ -28,7 +28,7 @@
   <% if CurrentUser.is_member? %>
     <div class="new-comment">
       <p><%= link_to "Post comment", new_comment_path, :class => "expand-comment-response" %></p>
-      <%= render "comments/partials/new/form", :post => post %>
+      <%= render "comments/form", :post => post, :comment => post.comments.new %>
     </div>
   <% end %>
 </div>
