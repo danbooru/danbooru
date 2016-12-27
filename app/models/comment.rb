@@ -58,7 +58,7 @@ class Comment < ActiveRecord::Base
     end
 
     def for_creator_name(user_name)
-      where("creator_id = (select _.id from users _ where lower(_.name) = lower(?))", user_name.mb_chars.downcase)
+      for_creator(User.name_to_id(user_name).id)
     end
 
     def search(params)
@@ -82,7 +82,7 @@ class Comment < ActiveRecord::Base
       end
 
       if params[:creator_name].present?
-        q = q.for_creator_name(params[:creator_name].tr(" ", "_"))
+        q = q.for_creator_name(params[:creator_name])
       end
 
       if params[:creator_id].present?
