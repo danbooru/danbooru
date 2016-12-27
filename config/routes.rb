@@ -102,7 +102,6 @@ Rails.application.routes.draw do
     resources :votes, :controller => "comment_votes", :only => [:create, :destroy]
     collection do
       get :search
-      get :index_all
     end
     member do
       put :unvote

@@ -49,13 +49,6 @@ $preview_flagged_color: #F00;
   text-shadow: $val;
 }
 
-@mixin transparency($value) {
-  opacity: $value;
-  -ms-filter: unqoute("progid:DXImageTransform.Microsoft.Alpha(Opacity=#{$value * 100})");
-  filter: unquote("alpha(opacity=#{$value * 100})");
-  zoom: 1;
-}
-
 @mixin inline-block {
   display: -moz-inline-box;
   -moz-box-orient: vertical;

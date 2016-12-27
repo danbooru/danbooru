@@ -54,11 +54,11 @@ class Comment < ActiveRecord::Base
     end
 
     def for_creator(user_id)
-      where("creator_id = ?", user_id)
+      user_id.present? ? where("creator_id = ?", user_id) : where("false")
     end
 
     def for_creator_name(user_name)
-      where("creator_id = (select _.id from users _ where lower(_.name) = lower(?))", user_name.mb_chars.downcase)
+      for_creator(User.name_to_id(user_name))
     end
 
     def search(params)
@@ -69,8 +69,12 @@ class Comment < ActiveRecord::Base
         q = q.body_matches(params[:body_matches])
       end
 
+      if params[:id].present?
+        q = q.where("id in (?)", params[:id].split(",").map(&:to_i))
+      end
+
       if params[:post_id].present?
-        q = q.where("post_id = ?", params[:post_id].to_i)
+        q = q.where("post_id in (?)", params[:post_id].split(",").map(&:to_i))
       end
 
       if params[:post_tags_match].present?
@@ -78,7 +82,7 @@ class Comment < ActiveRecord::Base
       end
 
       if params[:creator_name].present?
-        q = q.for_creator_name(params[:creator_name].tr(" ", "_"))
+        q = q.for_creator_name(params[:creator_name])
       end
 
       if params[:creator_id].present?
@@ -197,6 +201,10 @@ class Comment < ActiveRecord::Base
 
   def hidden_attributes
     super + [:body_index]
+  end
+
+  def method_attributes
+    super + [:creator_name, :updater_name]
   end
 
   def delete!
