@@ -13,9 +13,6 @@ Danbooru.Note = {
 
       $inner_border.css({
         opacity: opacity,
-        "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)",
-        "filter": "alpha(opacity=50)",
-        zoom: 1
       });
 
       var $note_box = $('<div/>');
