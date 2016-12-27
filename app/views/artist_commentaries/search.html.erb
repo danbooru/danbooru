@@ -3,6 +3,7 @@
     <h1>Search Artist Commentary</h1>
     <%= form_tag(artist_commentaries_path, :method => :get, :class => "simple_form") do %>
       <%= search_field "text_matches", :label => "Text" %>
+      <%= search_field "post_tags_match", :label => "Tags" %>
 
       <div class="input">
         <label for="search_original_present">Original present?</label>
@@ -14,7 +15,6 @@
         <%= select "search", "translated_present", ["yes", "no"], :include_blank => true %>
       </div>
 
-      <%= search_field "post_tags_match", :label => "Tags" %>
       <%= submit_tag "Search" %>
     <% end %>
   </div>

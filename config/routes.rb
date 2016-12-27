@@ -193,6 +193,10 @@ Rails.application.routes.draw do
   resources :pool_versions, :only => [:index]
   resources :posts do
     resources :events, :only => [:index], :controller => "post_events"
+    resource :artist_commentary, :only => [:index, :show] do
+      collection { put :create_or_update }
+      member { put :revert }
+    end
     resources :votes, :controller => "post_votes", :only => [:create, :destroy]
     collection do
       get :home
@@ -216,7 +220,7 @@ Rails.application.routes.draw do
       get :search
     end
   end
-  resources :artist_commentaries do
+  resources :artist_commentaries, :only => [:index, :show] do
     collection do
       put :create_or_update
       get :search
