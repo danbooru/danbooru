@@ -2,13 +2,7 @@
   <div id="a-edit">
     <h1>Edit Comment</h1>
 
-    <%= error_messages_for "comment" %>
-
-    <%= simple_form_for(@comment) do |f| %>
-      <%= dtext_field "comment", "body" %>
-      <%= f.button :submit, "Submit" %>
-      <%= dtext_preview_button "comment", "body" %>
-    <% end %>
+    <%= render "comments/form", :post => @comment.post, :comment => @comment %>
   </div>
 </div>
 

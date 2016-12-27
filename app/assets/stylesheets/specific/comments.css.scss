@@ -48,10 +48,6 @@ div.comments-for-post {
       opacity: 1.0;
     }
   }
-
-  div.comment-preview {
-    margin-bottom: 2em;
-  }
 }
 
 div#c-posts {
@@ -144,5 +140,14 @@ div#c-comments {
         display: inline-block;
       }
     }
+  }
+}
+
+form.edit_comment div.input.boolean {
+  display: inline-block;
+
+  label {
+    font-weight: normal;
+    vertical-align: initial;
   }
 }
