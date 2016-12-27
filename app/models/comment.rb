@@ -199,6 +199,10 @@ class Comment < ActiveRecord::Base
     super + [:body_index]
   end
 
+  def method_attributes
+    super + [:creator_name, :updater_name]
+  end
+
   def delete!
     update_attributes(:is_deleted => true)
   end

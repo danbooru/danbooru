@@ -48,9 +48,7 @@ class CommentsController < ApplicationController
 
   def show
     @comment = Comment.find(params[:id])
-    respond_with(@comment) do |format|
-      format.json {render :json => @comment.to_json(:methods => [:creator_name])}
-    end
+    respond_with(@comment)
   end
 
   def destroy
