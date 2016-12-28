@@ -1,7 +1,18 @@
 require "test_helper"
+require 'helpers/saved_search_test_helper'
 
 module Moderator
   class TagBatchChangeTest < ActiveSupport::TestCase
+    include SavedSearchTestHelper
+
+    def setup
+      super
+      mock_saved_search_service!
+      Danbooru.config.stubs(:listbooru_enabled?).returns(true)
+      Danbooru.config.stubs(:listbooru_auth_key).returns("blahblahblah")
+      Danbooru.config.stubs(:listbooru_server).returns("http://localhost:3001")
+    end
+
     context "a tag batch change" do
       setup do
         @user = FactoryGirl.create(:moderator_user)
@@ -27,7 +38,8 @@ module Moderator
         tag_batch_change = TagBatchChange.new("...", "bbb", @user.id, "127.0.0.1")
         tag_batch_change.perform
         ss.reload
-        assert_equal("123 bbb 456", ss.tag_query)
+        assert_equal("123 456 bbb", ss.tag_query)
+        assert_equal(%w(create update), SavedSearch.sqs_service.commands)
       end
 
       should "raise an error if there is no predicate" do
