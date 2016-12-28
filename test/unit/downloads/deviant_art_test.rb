@@ -2,20 +2,12 @@ require 'test_helper'
 
 module Downloads
   class DeviantArtTest < ActiveSupport::TestCase
-    def setup
-      super
-      @record = false
-      setup_vcr
-    end
-
     context "a download for a deviant art html page" do
       setup do
         @source = "http://starbitt.deviantart.com/art/09271X-636962118"
         @tempfile = Tempfile.new("danbooru-test")
         @download = Downloads::File.new(@source, @tempfile.path)
-        VCR.use_cassette("downloads-deviant-art-test/html", :record => @vcr_record_option) do
-          @download.download!
-        end
+        @download.download!
       end
 
       should "set the html page as the source" do

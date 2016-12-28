@@ -41,26 +41,6 @@ end
 
 class ActiveSupport::TestCase
   include UploadTestMethods
-
-  def setup_vcr
-    @vcr_record_option = :none
-
-    if @record
-      @vcr_record_option = :once
-    end
-
-    # instead of trying to persist these across tests just clear it out every time
-    Cache.delete("pixiv-phpsessid")
-    Cache.delete("pixiv-papi-access-token")
-    Cache.delete("nico-seiga-session")
-    Cache.delete("twitter-api-token")
-
-    unless @record
-      [:pixiv_login, :pixiv_password, :tinami_login, :tinami_password, :nico_seiga_login, :nico_seiga_password, :pixa_login, :pixa_password, :nijie_login, :nijie_password, :twitter_api_key, :twitter_api_secret].each do |key|
-        Danbooru.config.stubs(key).returns("SENSITIVE")
-      end
-    end
-  end
 end
 
 class ActionController::TestCase
@@ -125,16 +105,3 @@ if defined?(MEMCACHE)
 end
 
 MEMCACHE = MockMemcache.new
-
-VCR.configure do |c|
-  c.cassette_library_dir = "test/fixtures/vcr_cassettes"
-  c.hook_into :webmock
-  # c.allow_http_connections_when_no_cassette = true
-
-  c.default_cassette_options = {
-    match_requests_on: [
-      :method,
-      VCR.request_matchers.uri_without_param(:PHPSESSID)
-    ]
-  }
-end

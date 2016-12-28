@@ -2,37 +2,27 @@ require 'test_helper'
 
 module Downloads
   class PixivTest < ActiveSupport::TestCase
-    def assert_downloaded(expected_filesize, source, cassette, record = nil)
+    def assert_downloaded(expected_filesize, source)
       tempfile = Tempfile.new("danbooru-test")
       download = Downloads::File.new(source, tempfile.path)
 
-      VCR.use_cassette(cassette, :record => (record || @vcr_record_option)) do
-        assert_nothing_raised(Downloads::File::Error) do
-          download.download!
-        end
+      assert_nothing_raised(Downloads::File::Error) do
+        download.download!
       end
 
       assert_equal(expected_filesize, tempfile.size, "Tested source URL: #{source}")
     end
 
-    def assert_rewritten(expected_source, test_source, cassette, record = nil)
+    def assert_rewritten(expected_source, test_source)
       tempfile = Tempfile.new("danbooru-test")
       download = Downloads::File.new(test_source, tempfile.path)
 
-      VCR.use_cassette(cassette, :record => (record || @vcr_record_option)) do
-        rewritten_source, headers, _ = download.before_download(test_source, {}, {})
-        assert_equal(expected_source, rewritten_source, "Tested source URL: #{test_source}")
-      end
+      rewritten_source, headers, _ = download.before_download(test_source, {}, {})
+      assert_equal(expected_source, rewritten_source, "Tested source URL: #{test_source}")
     end
 
-    def assert_not_rewritten(source, cassette, record = nil)
-      assert_rewritten(source, source, cassette, record)
-    end
-
-    def setup
-      super
-      @record = false
-      setup_vcr
+    def assert_not_rewritten(source)
+      assert_rewritten(source, source)
     end
 
     context "An ugoira site for pixiv" do
@@ -40,9 +30,7 @@ module Downloads
         Delayed::Worker.delay_jobs = false
         @tempfile = Tempfile.new("danbooru-test")
         @download = Downloads::File.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654", @tempfile.path)
-        VCR.use_cassette("downloads-pixiv-test/ugoira-converter", :record => @vcr_record_option) do
-          @download.download!
-        end
+        @download.download!
       end
 
       teardown do
@@ -73,9 +61,9 @@ module Downloads
 
         should "work when using new URLs" do
           # Don't know the actual file size of the thumbnails since they don't work.
-          assert_downloaded(1083, @new_small_thumbnail,  "downloads-pixiv-test/download-old-png-new-small-thumbnail")
-          assert_downloaded(1083, @new_medium_thumbnail, "downloads-pixiv-test/download-old-png-new-medium-thumbnail")
-          assert_downloaded(@file_size, @new_full_size_image, "downloads-pixiv-test/download-old-png-new-full-size")
+          assert_downloaded(1083, @new_small_thumbnail)
+          assert_downloaded(1083, @new_medium_thumbnail)
+          assert_downloaded(@file_size, @new_full_size_image)
         end
       end
 
@@ -96,20 +84,20 @@ module Downloads
         end
 
         should "download the full size image" do
-          assert_not_rewritten(@full_size_image, "downloads-pixiv-test/rewrite-new-png-full-size")
-          assert_downloaded(@file_size, @full_size_image, "downloads-pixiv-test/download-new-png-full-size")
+          assert_not_rewritten(@full_size_image)
+          assert_downloaded(@file_size, @full_size_image)
         end
 
         should "download the full size image instead of the HTML page" do
-          assert_rewritten(@full_size_image, @medium_page, "downloads-pixiv-test/rewrite-new-png-medium-html")
-          assert_rewritten(@full_size_image, @big_page, "downloads-pixiv-test/rewrite-new-png-big-html")
-          assert_downloaded(@file_size, @medium_page, "downloads-pixiv-test/download-new-png-medium-html")
-          assert_downloaded(@file_size, @big_page,    "downloads-pixiv-test/download-new-png-big-html")
+          assert_rewritten(@full_size_image, @medium_page)
+          assert_rewritten(@full_size_image, @big_page)
+          assert_downloaded(@file_size, @medium_page)
+          assert_downloaded(@file_size, @big_page)
         end
 
         should "download the full size image instead of the thumbnail" do
-          assert_rewritten(@full_size_image, @medium_thumbnail, "downloads-pixiv-test/rewrite-new-png-medium-thumbnail")
-          assert_downloaded(@file_size, @medium_thumbnail, "downloads-pixiv-test/download-new-png-medium-thumbnail")
+          assert_rewritten(@full_size_image, @medium_thumbnail)
+          assert_downloaded(@file_size, @medium_thumbnail)
         end
       end
 
@@ -131,27 +119,27 @@ module Downloads
         end
 
         should "download the full size image" do
-          assert_not_rewritten(@p0_full_size_image, "downloads-pixiv-test/rewrite-new-manga-p0-full-size")
-          assert_not_rewritten(@p1_full_size_image, "downloads-pixiv-test/rewrite-new-manga-p1-full-size")
+          assert_not_rewritten(@p0_full_size_image)
+          assert_not_rewritten(@p1_full_size_image)
 
-          assert_downloaded(@p0_file_size, @p0_full_size_image, "downloads-pixiv-test/download-new-manga-p0-full-size")
-          assert_downloaded(@p1_file_size, @p1_full_size_image, "downloads-pixiv-test/download-new-manga-p1-full-size")
+          assert_downloaded(@p0_file_size, @p0_full_size_image)
+          assert_downloaded(@p1_file_size, @p1_full_size_image)
         end
 
         should "download the full size image instead of the HTML page" do
-          assert_rewritten(@p0_full_size_image_3, @medium_page, "downloads-pixiv-test/rewrite-new-manga-p0-medium-html")
-          assert_rewritten(@p0_full_size_image_3, @manga_page, "downloads-pixiv-test/rewrite-new-manga-p0-big-html")
-          assert_rewritten(@p1_full_size_image_3, @manga_big_p1_page, "downloads-pixiv-test/rewrite-new-manga-p1-big-html")
-          assert_downloaded(@p0_file_size, @medium_page,       "downloads-pixiv-test/download-new-manga-p0-medium-html")
-          assert_downloaded(@p0_file_size, @manga_page,        "downloads-pixiv-test/download-new-manga-p0-big-html")
-          assert_downloaded(@p1_file_size, @manga_big_p1_page, "downloads-pixiv-test/download-new-manga-p1-big-html")
+          assert_rewritten(@p0_full_size_image_3, @medium_page)
+          assert_rewritten(@p0_full_size_image_3, @manga_page)
+          assert_rewritten(@p1_full_size_image_3, @manga_big_p1_page)
+          assert_downloaded(@p0_file_size, @medium_page)
+          assert_downloaded(@p0_file_size, @manga_page)
+          assert_downloaded(@p1_file_size, @manga_big_p1_page)
         end
 
         should "download the full size image instead of the thumbnail" do
-          assert_rewritten(@p0_full_size_image_3, @p0_large_thumbnail, "downloads-pixiv-test/rewrite-new-manga-p0-large-thumbnail")
-          assert_rewritten(@p1_full_size_image_3, @p1_large_thumbnail, "downloads-pixiv-test/rewrite-new-manga-p1-large-thumbnail")
-          assert_downloaded(@p0_file_size, @p0_large_thumbnail, "downloads-pixiv-test/download-new-manga-p0-large-thumbnail")
-          assert_downloaded(@p1_file_size, @p1_large_thumbnail, "downloads-pixiv-test/download-new-manga-p1-large-thumbnail")
+          assert_rewritten(@p0_full_size_image_3, @p0_large_thumbnail)
+          assert_rewritten(@p1_full_size_image_3, @p1_large_thumbnail)
+          assert_downloaded(@p0_file_size, @p0_large_thumbnail)
+          assert_downloaded(@p1_file_size, @p1_large_thumbnail)
         end
       end
 
@@ -164,18 +152,18 @@ module Downloads
         end
 
         should "download the zip file instead of the HTML page" do
-          assert_rewritten(@zip_file, @medium_page, "downloads-pixiv-test/rewrite-ugoira-medium-page")
-          assert_downloaded(@file_size, @medium_page, "downloads-pixiv-test/download-ugoira-medium-page")
+          assert_rewritten(@zip_file, @medium_page)
+          assert_downloaded(@file_size, @medium_page)
         end
 
         should "download the zip file instead of the thumbnail" do
-          assert_rewritten(@zip_file, @small_thumbnail, "downloads-pixiv-test/rewrite-ugoira-small-thumbnail")
-          assert_downloaded(@file_size, @small_thumbnail, "downloads-pixiv-test/download-ugoira-small-thumbnail")
+          assert_rewritten(@zip_file, @small_thumbnail)
+          assert_downloaded(@file_size, @small_thumbnail)
         end
 
         should "download the zip file" do
-          assert_not_rewritten(@zip_file, "downloads-pixiv-test/rewrite-ugoira-zip-file")
-          assert_downloaded(@file_size, @zip_file, "downloads-pixiv-test/download-ugoira-zip-file")
+          assert_not_rewritten(@zip_file)
+          assert_downloaded(@file_size, @zip_file)
         end
       end
 

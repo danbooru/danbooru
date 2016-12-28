@@ -1,5 +1,6 @@
 require 'test_helper'
 require 'helpers/saved_search_test_helper'
+require 'fakeweb'
 
 class SavedSearchTest < ActiveSupport::TestCase
   include SavedSearchTestHelper
@@ -13,23 +14,33 @@ class SavedSearchTest < ActiveSupport::TestCase
   end
 
   context "Fetching the post ids for a search" do
+    setup do
+      MEMCACHE.expects(:get).returns(nil)
+    end
+
+    teardown do
+      FakeWeb.clean_registry
+    end
+
     context "with a name" do
+      setup do
+        FakeWeb.register_uri(:get, "http://localhost:3001/users?key=blahblahblah&user_id=1&name=blah", :body => [1,2,3,4].to_json)
+      end
+
       should "return a list of ids" do
-        MEMCACHE.expects(:get).returns(nil)
-        VCR.use_cassette("saved-search-test/get-named", :record => :none) do
-          post_ids = SavedSearch.post_ids(1, "blah")
-          assert_equal([1,2,3,4], post_ids)
-        end
+        post_ids = SavedSearch.post_ids(1, "blah")
+        assert_equal([1,2,3,4], post_ids)
       end
     end
 
     context "without a name" do
+      setup do
+        FakeWeb.register_uri(:get, "http://localhost:3001/users?key=blahblahblah&user_id=1&name", :body => [1,2,3,4].to_json)
+      end
+
       should "return a list of ids" do
-        MEMCACHE.expects(:get).returns(nil)
-        VCR.use_cassette("saved-search-test/get-unnamed", :record => :none) do
-          post_ids = SavedSearch.post_ids(1)
-          assert_equal([1,2,3,4], post_ids)
-        end
+        post_ids = SavedSearch.post_ids(1)
+        assert_equal([1,2,3,4], post_ids)
       end
     end
   end

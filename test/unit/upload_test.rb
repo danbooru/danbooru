@@ -1,15 +1,13 @@
 require 'test_helper'
+require 'helpers/iqdb_test_helper'
 
 class UploadTest < ActiveSupport::TestCase
+  include IqdbTestHelper
+
   def setup
     super
 
-    @record = false
-    setup_vcr
-
-    if @record
-      `find test/fixtures/vcr_cassettes/upload-test -mtime +1 -delete`
-    end
+    mock_iqdb_service!
   end
 
   context "In all cases" do
@@ -133,9 +131,7 @@ class UploadTest < ActiveSupport::TestCase
           end
           
           should "process successfully" do
-            VCR.use_cassette("upload-test/ugoira-converter-1", :record => @vcr_record_option) do
-              @upload.download_from_source(@output_file.path)
-            end
+            @upload.download_from_source(@output_file.path)
             assert_operator(File.size(@output_file.path), :>, 1_000)
             assert_equal("application/zip", @upload.file_header_to_content_type(@output_file.path))
             assert_equal("zip", @upload.content_type_to_file_ext(@upload.file_header_to_content_type(@output_file.path)))
@@ -145,13 +141,10 @@ class UploadTest < ActiveSupport::TestCase
         should "initialize the final path after downloading a file" do
           @upload = FactoryGirl.create(:source_upload)
           path = "#{Rails.root}/tmp/test.download.jpg"
-
-          VCR.use_cassette("upload-test/file", :record => @vcr_record_option) do
-            assert_nothing_raised {@upload.download_from_source(path)}
-            assert(File.exists?(path))
-            assert_equal(8558, File.size(path))
-            assert_equal(path, @upload.file_path)
-          end
+          assert_nothing_raised {@upload.download_from_source(path)}
+          assert(File.exists?(path))
+          assert_equal(8558, File.size(path))
+          assert_equal(path, @upload.file_path)
         end
       end
 
@@ -220,10 +213,7 @@ class UploadTest < ActiveSupport::TestCase
       should "increment the uploaders post_upload_count" do
         @upload = FactoryGirl.create(:source_upload)
         assert_difference("CurrentUser.user.post_upload_count", 1) do
-          VCR.use_cassette("upload-test/file", :record => @vcr_record_option) do
-            @upload.process!
-          end
-
+          @upload.process!
           CurrentUser.user.reload
         end
       end
@@ -241,10 +231,8 @@ class UploadTest < ActiveSupport::TestCase
         end
 
         should "create an artist commentary when processed" do
-          VCR.use_cassette("upload-test/file", :record => @vcr_record_option) do
-            assert_difference("ArtistCommentary.count") do
-              @upload.process!
-            end
+          assert_difference("ArtistCommentary.count") do
+            @upload.process!
           end
         end
       end
@@ -256,9 +244,7 @@ class UploadTest < ActiveSupport::TestCase
           :tag_string => "hoge foo"
           )
         assert_difference("Post.count") do
-          VCR.use_cassette("upload-test/file", :record => @vcr_record_option) do
-            assert_nothing_raised {@upload.process!}
-          end
+          assert_nothing_raised {@upload.process!}
         end
 
         post = Post.last
@@ -284,20 +270,18 @@ class UploadTest < ActiveSupport::TestCase
         :uploader_ip_addr => "127.0.0.1",
         :tag_string => "hoge foo"
         )
-      VCR.use_cassette("upload-test/ugoira-converter-2", :record => @vcr_record_option) do
-        assert_difference(["PixivUgoiraFrameData.count", "Post.count"]) do
-          @upload.process!
-          assert_equal([], @upload.errors.full_messages)
-        end
-        post = Post.last
-        assert_not_nil(post.pixiv_ugoira_frame_data)
-        assert_equal("0d94800c4b520bf3d8adda08f95d31e2", post.md5)
-        assert_equal(60, post.image_width)
-        assert_equal(60, post.image_height)
-        assert_equal("http://i3.pixiv.net/img-zip-ugoira/img/2014/10/05/23/42/23/46378654_ugoira1920x1080.zip", post.source)
-        assert_operator(File.size(post.large_file_path), :>, 0)
-        assert_operator(File.size(post.preview_file_path), :>, 0)            
+      assert_difference(["PixivUgoiraFrameData.count", "Post.count"]) do
+        @upload.process!
+        assert_equal([], @upload.errors.full_messages)
       end
+      post = Post.last
+      assert_not_nil(post.pixiv_ugoira_frame_data)
+      assert_equal("0d94800c4b520bf3d8adda08f95d31e2", post.md5)
+      assert_equal(60, post.image_width)
+      assert_equal(60, post.image_height)
+      assert_equal("http://i3.pixiv.net/img-zip-ugoira/img/2014/10/05/23/42/23/46378654_ugoira1920x1080.zip", post.source)
+      assert_operator(File.size(post.large_file_path), :>, 0)
+      assert_operator(File.size(post.preview_file_path), :>, 0)
     end
 
     should "process completely for an uploaded image" do

@@ -1,10 +1,12 @@
 require 'test_helper'
+require 'helpers/iqdb_test_helper'
 
 class UploadsControllerTest < ActionController::TestCase
+  include IqdbTestHelper
+
   def setup
     super
-    @record = false
-    setup_vcr
+    mock_iqdb_service!
   end
 
   context "The uploads controller" do
@@ -22,9 +24,7 @@ class UploadsControllerTest < ActionController::TestCase
     context "batch action" do
       context "for twitter galleries" do
         should "render" do
-          VCR.use_cassette("upload-controller-test/twitter-batch", :record => @vcr_record_option) do
-            get :batch, {:url => "https://twitter.com/lvlln/status/567054278486151168"}, {:user_id => @user.id}
-          end
+          get :batch, {:url => "https://twitter.com/lvlln/status/567054278486151168"}, {:user_id => @user.id}
           assert_response :success
         end
       end
@@ -38,9 +38,7 @@ class UploadsControllerTest < ActionController::TestCase
 
       context "for a twitter post" do
         setup do
-          VCR.use_cassette("upload-controller-test/twitter", :record => @vcr_record_option) do
-            get :new, {:url => "https://twitter.com/frappuccino/status/566030116182949888"}, {:user_id => @user.id}
-          end
+          get :new, {:url => "https://twitter.com/frappuccino/status/566030116182949888"}, {:user_id => @user.id}
         end
 
         should "render" do

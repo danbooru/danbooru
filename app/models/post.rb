@@ -1694,32 +1694,36 @@ class Post < ActiveRecord::Base
     extend ActiveSupport::Concern
 
     module ClassMethods
+      def iqdb_sqs_service
+        SqsService.new(Danbooru.config.aws_sqs_iqdb_url)
+      end
+
+      def iqdb_enabled?
+        Danbooru.config.aws_sqs_iqdb_url.present?
+      end
+
       def remove_iqdb(post_id)
-        if Danbooru.config.aws_sqs_iqdb_url
-          client = SqsService.new(Danbooru.config.aws_sqs_iqdb_url)
-          client.send_message("remove\n#{post_id}")
+        if iqdb_enabled?
+          iqdb_sqs_service.send_message("remove\n#{post_id}")
         end
       end
     end
 
     def update_iqdb_async
-      if File.exists?(preview_file_path) && Danbooru.config.aws_sqs_iqdb_url
-        client = SqsService.new(Danbooru.config.aws_sqs_iqdb_url)
-        client.send_message("update\n#{id}\n#{complete_preview_file_url}")
+      if File.exists?(preview_file_path) && Post.iqdb_enabled?
+        Post.iqdb_sqs_service.send_message("update\n#{id}\n#{complete_preview_file_url}")
       end
     end
 
     def remove_iqdb_async
-      if File.exists?(preview_file_path) && Danbooru.config.aws_sqs_iqdb_url
-        client = SqsService.new(Danbooru.config.aws_sqs_iqdb_url)
-        client.send_message("remove\n#{id}")
+      if File.exists?(preview_file_path) && Post.iqdb_enabled?
+        Post.iqdb_sqs_service.send_message("remove\n#{id}")
       end
     end
 
     def update_iqdb
-      if Danbooru.config.aws_sqs_iqdb_url
-        client = SqsService.new(Danbooru.config.aws_sqs_iqdb_url)
-        client.send_message("update\n#{id}\n#{complete_preview_file_url}")
+      if Post.iqdb_enabled? && Post.iqdb_enabled?
+        Post.iqdb_sqs_service.send_message("update\n#{id}\n#{complete_preview_file_url}")
       end
     end
   end

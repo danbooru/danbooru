@@ -1,12 +1,6 @@
 require 'test_helper'
 
 class ArtistUrlTest < ActiveSupport::TestCase
-  def setup
-    super
-    @record = false
-    setup_vcr
-  end
-
   context "An artist url" do
     setup do
       MEMCACHE.flush_all
@@ -49,10 +43,8 @@ class ArtistUrlTest < ActiveSupport::TestCase
       url = FactoryGirl.create(:artist_url, :url => "http://seiga.nicovideo.jp/user/illust/1826959")
       assert_equal("http://seiga.nicovideo.jp/user/illust/1826959", url.normalized_url)
 
-      VCR.use_cassette("artist-url-test/nico-seiga", :record => @vcr_record_option) do
-        url = FactoryGirl.create(:artist_url, :url => "http://seiga.nicovideo.jp/seiga/im4937663")
-        assert_equal("http://seiga.nicovideo.jp/user/illust/7017777/", url.normalized_url)
-      end
+      url = FactoryGirl.create(:artist_url, :url => "http://seiga.nicovideo.jp/seiga/im4937663")
+      assert_equal("http://seiga.nicovideo.jp/user/illust/7017777/", url.normalized_url)
     end
 
     should "normalize hentai foundry artist urls" do

@@ -2,18 +2,10 @@ require 'test_helper'
 
 module Sources
   class TwitterTest < ActiveSupport::TestCase
-    def setup
-      super
-      @record = false
-      setup_vcr
-    end
-
     context "The source site for a restricted twitter" do
       setup do
-        VCR.use_cassette("sources-twitter-test/2", :record => @vcr_record_option) do
-          @site = Sources::Site.new("https://mobile.twitter.com/Strangestone/status/556440271961858051")
-          @site.get
-        end
+        @site = Sources::Site.new("https://mobile.twitter.com/Strangestone/status/556440271961858051")
+        @site.get
       end
 
       should "get the image url" do
@@ -23,10 +15,8 @@ module Sources
 
     context "The source site for twitter" do
       setup do
-        VCR.use_cassette("sources-twitter-test/1", :record => @vcr_record_option) do
-          @site = Sources::Site.new("https://mobile.twitter.com/nounproject/status/540944400767922176")
-          @site.get
-        end
+        @site = Sources::Site.new("https://mobile.twitter.com/nounproject/status/540944400767922176")
+        @site.get
       end
 
       should "get the profile" do

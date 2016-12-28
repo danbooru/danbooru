@@ -6,9 +6,8 @@ group :test do
   gem "mocha", :require => "mocha/setup"
   gem "ffaker"
   gem "simplecov", :require => false
-  gem "vcr"
-  gem "webmock"
   gem "timecop"
+  gem "fakeweb"
 end
 
 gem 'protected_attributes'

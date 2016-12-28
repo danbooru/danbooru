@@ -2,23 +2,13 @@
 
 module Sources
   class NicoSeigaTest < ActiveSupport::TestCase
-    def setup
-      super
-      @record = false
-      setup_vcr
-    end
-
     context "The source site for nico seiga" do
       setup do
-        VCR.use_cassette("sources-nico-test/1", :record => @vcr_record_option) do
-          @site_1 = Sources::Site.new("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663")
-          @site_1.get
-        end
+        @site_1 = Sources::Site.new("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663")
+        @site_1.get
 
-        VCR.use_cassette("sources-nico-test/2", :record => @vcr_record_option) do
-          @site_2 = Sources::Site.new("http://seiga.nicovideo.jp/seiga/im4937663")
-          @site_2.get
-        end
+        @site_2 = Sources::Site.new("http://seiga.nicovideo.jp/seiga/im4937663")
+        @site_2.get
       end
 
       should "get the profile" do

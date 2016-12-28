@@ -2,25 +2,15 @@ require 'test_helper'
 
 class ArtistTest < ActiveSupport::TestCase
   def assert_artist_found(expected_name, source_url)
-    VCR.use_cassette("artist-test/#{Digest::SHA1.hexdigest(source_url)}", :record => @vcr_record_option) do
-      artists = Artist.url_matches(source_url).to_a
+    artists = Artist.url_matches(source_url).to_a
 
-      assert_equal(1, artists.size)
-      assert_equal(expected_name, artists.first.name, "Testing URL: #{source_url}")
-    end
+    assert_equal(1, artists.size)
+    assert_equal(expected_name, artists.first.name, "Testing URL: #{source_url}")
   end
 
   def assert_artist_not_found(source_url)
-    VCR.use_cassette("artist-test/#{Digest::SHA1.hexdigest(source_url)}", :record => @vcr_record_option) do
-      artists = Artist.url_matches(source_url).to_a
-      assert_equal(0, artists.size, "Testing URL: #{source_url}")
-    end
-  end
-
-  def setup
-    super
-    @record = false
-    setup_vcr
+    artists = Artist.url_matches(source_url).to_a
+    assert_equal(0, artists.size, "Testing URL: #{source_url}")
   end
 
   context "An artist" do
@@ -216,8 +206,6 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when finding pixiv artists" do
       setup do
-        setup_vcr
-
         FactoryGirl.create(:artist, :name => "masao",:url_string => "http://i2.pixiv.net/img04/img/syounen_no_uta/")
         FactoryGirl.create(:artist, :name => "bkub", :url_string => "http://i1.pixiv.net/img01/img/bkubb/")
         FactoryGirl.create(:artist, :name => "ryuura", :url_string => "http://www.pixiv.net/member.php?id=8678371")
@@ -258,7 +246,9 @@ class ArtistTest < ActiveSupport::TestCase
       end
 
       should "find nothing for bad IDs" do
-        assert_artist_not_found("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=32049358")
+        assert_raise(PixivApiClient::Error) do
+          assert_artist_not_found("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=32049358")
+        end
       end
     end
 
