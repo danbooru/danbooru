@@ -3,7 +3,7 @@ class PostAppeal < ActiveRecord::Base
 
   belongs_to :creator, :class_name => "User"
   belongs_to :post
-  validates_presence_of :reason, :creator_id, :creator_ip_addr
+  validates_presence_of :post, :reason, :creator_id, :creator_ip_addr
   validate :validate_post_is_inactive
   validate :validate_creator_is_not_limited
   before_validation :initialize_creator, :on => :create
@@ -69,7 +69,7 @@ class PostAppeal < ActiveRecord::Base
   extend SearchMethods
 
   def resolved?
-    !post.is_deleted? && !post.is_flagged?
+    post.present? && !post.is_deleted? && !post.is_flagged?
   end
 
   def is_resolved
@@ -86,7 +86,7 @@ class PostAppeal < ActiveRecord::Base
   end
 
   def validate_post_is_inactive
-    if !post.is_deleted? && !post.is_flagged?
+    if resolved?
       errors[:post] << "is active"
       false
     else
