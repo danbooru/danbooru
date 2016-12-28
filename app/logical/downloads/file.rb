@@ -136,7 +136,10 @@ module Downloads
     end
 
     def set_source_to_referer(src)
-      if Sources::Strategies::Nijie.url_match?(src) || Sources::Strategies::Twitter.url_match?(src) || Sources::Strategies::Tumblr.url_match?(src)
+      if Sources::Strategies::Nijie.url_match?(src) ||
+         Sources::Strategies::Twitter.url_match?(src) ||
+         Sources::Strategies::Tumblr.url_match?(src) ||
+         Sources::Strategies::BCY.url_match?(src)
         strategy = Sources::Site.new(src, :referer_url => options[:referer_url])
         strategy.referer_url
       else
