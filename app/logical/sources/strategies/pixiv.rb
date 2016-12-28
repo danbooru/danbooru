@@ -45,7 +45,7 @@ module Sources
       end
 
       def normalized_for_artist_finder?
-        url =~ %r!http://img\.pixiv\.net/img/#{MONIKER}/?$!i
+        url =~ %r!https?://img\.pixiv\.net/img/#{MONIKER}/?$!i
       end
 
       def normalizable_for_artist_finder?

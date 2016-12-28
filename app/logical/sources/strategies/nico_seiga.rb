@@ -23,14 +23,7 @@ module Sources
       end
 
       def get
-        page = agent.get(normalized_url)
-
-        if page.search("a#link_btn_login").any?
-          # Session cache is invalid, clear it and log in normally.
-          Cache.delete("nico-seiga-session")
-          @agent = nil
-          page = agent.get(normalized_url)
-        end
+        page = load_page
 
         @artist_name, @profile_url = get_profile_from_page(page)
         @image_url = get_image_url_from_page(page)
@@ -44,7 +37,34 @@ module Sources
         end
       end
 
+      def normalized_for_artist_finder?
+        url =~ %r!https?://seiga\.nicovideo\.jp/user/illust/\d+!i
+      end
+
+      def normalizable_for_artist_finder?
+        url =~ %r!https?://seiga\.nicovideo\.jp/seiga/im\d+!i
+      end
+
+      def normalize_for_artist_finder!
+        page = load_page
+        @artist_name, @profile_url = get_profile_from_page(page)
+        profile_url
+      end
+
     protected
+
+      def load_page
+        page = agent.get(normalized_url)
+
+        if page.search("a#link_btn_login").any?
+          # Session cache is invalid, clear it and log in normally.
+          Cache.delete("nico-seiga-session")
+          @agent = nil
+          page = agent.get(normalized_url)
+        end
+
+        page
+      end
 
       def get_profile_from_page(page)
         links = page.search("li a").select {|x| x["href"] =~ /user\/illust/}
