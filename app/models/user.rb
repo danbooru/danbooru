@@ -369,6 +369,9 @@ class User < ActiveRecord::Base
       when Levels::GOLD
         :gold
 
+      when Levels::PLATINUM
+        :platinum
+
       when Levels::BUILDER
         :builder
 
