@@ -362,28 +362,7 @@ class User < ActiveRecord::Base
     end
 
     def role
-      case level
-      when Levels::MEMBER
-        :member
-
-      when Levels::GOLD
-        :gold
-
-      when Levels::PLATINUM
-        :platinum
-
-      when Levels::BUILDER
-        :builder
-
-      when Levels::MODERATOR
-        :moderator
-
-      when Levels::JANITOR
-        :janitor
-
-      when Levels::ADMIN
-        :admin
-      end
+      level_string.downcase.to_sym
     end
 
     def level_string_was
