@@ -130,6 +130,6 @@ class PoolVersion < ActiveRecord::Base
   end
 
   def previous
-    PoolVersion.where(["pool_id = ? and updated_at < ?", pool_id, updated_at]).order("updated_at desc").first
+    PoolArchive.where(["pool_id = ? and updated_at < ?", pool_id, updated_at]).order("updated_at desc").first
   end
 end

@@ -674,7 +674,7 @@ class User < ActiveRecord::Base
     end
 
     def pool_version_count
-      PoolVersion.for_user(id).count
+      PoolArchive.for_user(id).count
     end
 
     def forum_post_count
