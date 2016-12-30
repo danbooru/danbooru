@@ -5,14 +5,20 @@
     <table class="striped" width="100%">
       <thead>
         <tr>
-          <th>Tags</th>
-          <th style="text-align: right;">Count</th>
+          <th width="80%">Tags</th>
+          <th width="10%">Wiki</th>
+          <th width="10%" style="text-align: right;">Count</th>
         </tr>
       </thead>
       <tbody>
         <% @search_service.each_search do |tags, count| %>
           <tr class="category-<%= Tag.category_for(tags) %>">
             <td><%= link_to tags, posts_path(:tags => tags) %></td>
+            <td>
+              <% unless WikiPage.titled(tags).exists? %>
+                N
+              <% end %>
+            </td>
             <td style="text-align: right;"><%= count.to_i %></td>
           </tr>
         <% end %>
