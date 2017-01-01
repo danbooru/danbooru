@@ -102,7 +102,9 @@ class PostsController < ApplicationController
     count = Post.fast_count(params[:tags], :statement_timeout => CurrentUser.user.statement_timeout)
     @post = Post.tag_match(params[:tags]).reorder("").offset(rand(count)).first
     raise ActiveRecord::RecordNotFound if @post.nil?
-    redirect_to post_path(@post, :tags => params[:tags])
+    respond_with(@post) do |format|
+      format.html { redirect_to post_path(@post, :tags => params[:tags]) }
+    end
   end
 
   def mark_as_translated
