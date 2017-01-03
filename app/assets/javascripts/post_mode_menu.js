@@ -72,6 +72,9 @@
             tag_string: $("#post_tag_string").val()
           }
         },
+        complete: function() {
+          $.rails.enableFormElements($("#quick-edit-form"));
+        },
         success: function(data) {
           Danbooru.Post.update_data(data);
           $("#post_" + data.id).effect("shake", {distance: 5, times: 1}, 100);
