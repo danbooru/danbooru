@@ -965,9 +965,7 @@ class Post < ActiveRecord::Base
     end
 
     def favorited_users
-      favorited_user_ids.map {|id| User.find(id)}.select do |x|
-        !x.hide_favorites?
-      end
+      User.find(favorited_user_ids).reject(&:hide_favorites?)
     end
 
     def favorite_groups(active_id=nil)
