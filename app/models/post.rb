@@ -332,7 +332,7 @@ class Post < ActiveRecord::Base
       PostApproval.create(user_id: CurrentUser.id, post_id: id)
 
       if is_deleted_was == true
-        ModAction.create(:description => "undeleted post ##{id}")
+        ModAction.log("undeleted post ##{id}")
       end
 
       save!
@@ -1339,7 +1339,7 @@ class Post < ActiveRecord::Base
         return false
       end
 
-      ModAction.create(:description => "permanently deleted post ##{id}")
+      ModAction.log("permanently deleted post ##{id}")
       delete!(:without_mod_action => true)
       Post.without_timeout do
         give_favorites_to_parent
@@ -1354,12 +1354,12 @@ class Post < ActiveRecord::Base
 
     def ban!
       update_column(:is_banned, true)
-      ModAction.create(:description => "banned post ##{id}")
+      ModAction.log("banned post ##{id}")
     end
 
     def unban!
       update_column(:is_banned, false)
-      ModAction.create(:description => "unbanned post ##{id}")
+      ModAction.log("unbanned post ##{id}")
     end
 
     def delete!(options = {})
@@ -1384,9 +1384,9 @@ class Post < ActiveRecord::Base
 
         unless options[:without_mod_action]
           if options[:reason]
-            ModAction.create(:description => "deleted post ##{id}, reason: #{options[:reason]}")
+            ModAction.log("deleted post ##{id}, reason: #{options[:reason]}")
           else
-            ModAction.create(:description => "deleted post ##{id}")
+            ModAction.log("deleted post ##{id}")
           end
         end
       end
@@ -1410,7 +1410,7 @@ class Post < ActiveRecord::Base
       self.approver_id = CurrentUser.id
       save
       Post.expire_cache_for_all(tag_array)
-      ModAction.create(:description => "undeleted post ##{id}")
+      ModAction.log("undeleted post ##{id}")
     end
   end
 

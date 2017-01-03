@@ -30,7 +30,7 @@ class UserDeletion
 private
   
   def create_mod_action
-    ModAction.create(:description => "user ##{user.id} deleted")
+    ModAction.log("user ##{user.id} deleted")
   end
 
   def clear_tag_subscriptions

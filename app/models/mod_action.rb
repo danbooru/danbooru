@@ -15,6 +15,10 @@ class ModAction < ActiveRecord::Base
     q
   end
 
+  def self.log(desc)
+    create(:description => desc)
+  end
+
   def initialize_creator
     self.creator_id = CurrentUser.id
   end

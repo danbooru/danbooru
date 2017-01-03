@@ -332,7 +332,7 @@ class TagAlias < ActiveRecord::Base
     alias_desc = %Q("tag alias ##{id}":[#{Rails.application.routes.url_helpers.tag_alias_path(self)}]: [[#{antecedent_name}]] -> [[#{consequent_name}]])
 
     if id_changed?
-      ModAction.create(:description => "created #{status} #{alias_desc}")
+      ModAction.log("created #{status} #{alias_desc}")
     else
       # format the changes hash more nicely.
       change_desc = changes.except(:updated_at).map do |attribute, values|
@@ -344,7 +344,7 @@ class TagAlias < ActiveRecord::Base
         end
       end.join(", ")
 
-      ModAction.create(:description => "updated #{alias_desc}\n#{change_desc}")
+      ModAction.log("updated #{alias_desc}\n#{change_desc}")
     end
   end
 end

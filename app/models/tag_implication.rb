@@ -297,7 +297,7 @@ class TagImplication < ActiveRecord::Base
     implication = %Q("tag implication ##{id}":[#{Rails.application.routes.url_helpers.tag_implication_path(self)}]: [[#{antecedent_name}]] -> [[#{consequent_name}]])
 
     if id_changed?
-      ModAction.create(:description => "created #{status} #{implication}")
+      ModAction.log("created #{status} #{implication}")
     else
       # format the changes hash more nicely.
       change_desc = changes.except(:updated_at).map do |attribute, values|
@@ -309,7 +309,7 @@ class TagImplication < ActiveRecord::Base
         end
       end.join(", ")
 
-      ModAction.create(:description => "updated #{implication}\n#{change_desc}")
+      ModAction.log("updated #{implication}\n#{change_desc}")
     end
   end
 end
