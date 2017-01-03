@@ -59,6 +59,10 @@ class PoolArchive < ActiveRecord::Base
     sqs_service.send_message(msg)
   end
 
+  def previous
+    PoolArchive.where("pool_id = ? and version < ?", pool_id, version).order("version desc").first
+  end
+
   def pool
     Pool.find(pool_id)
   end

@@ -12,6 +12,11 @@ module PoolVersionsHelper
       '<del><a href="/posts/' + post_id.to_s + '">' + post_id.to_s + '</a></del>'
     end.join(" ")
 
+    if pool_version.description_changed?
+      html << '<ins>desc:' + h(pool_version.description) + '</ins> '
+      html << '<del>desc:' + h(pool_version.previous.description) + '</del> '
+    end
+
     return html.html_safe
   end
 end
