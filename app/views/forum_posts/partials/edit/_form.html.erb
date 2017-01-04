@@ -2,7 +2,7 @@
 
 <%= simple_form_for(forum_post) do |f| %>
   <%= f.input :topic_id, :as => :hidden %>
-  <%= dtext_field "forum_post", "body", :value => forum_post.body, :input_id => "forum_post_body_for_#{forum_post.id}", :preview_id => "dtext-preview-for-#{forum_post.id}" %>
+  <%= dtext_field "forum_post", "body", :value => forum_post.body, :classes => "autocomplete-mentions", :input_id => "forum_post_body_for_#{forum_post.id}", :preview_id => "dtext-preview-for-#{forum_post.id}" %>
 
   <%= f.button :submit, "Submit" %>
   <%= dtext_preview_button "forum_post", "body", :input_id => "forum_post_body_for_#{forum_post.id}", :preview_id => "dtext-preview-for-#{forum_post.id}" %>
