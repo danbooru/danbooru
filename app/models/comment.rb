@@ -11,7 +11,13 @@ class Comment < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   before_validation :initialize_updater
   after_create :update_last_commented_at_on_create
+  after_update(:if => lambda {|rec| CurrentUser.id != rec.creator_id}) do
+    ModAction.log("comment ##{rec.id} updated by #{CurrentUser.name}")
+  end
   after_destroy :update_last_commented_at_on_destroy
+  after_destroy(:if => lambda {|rec| CurrentUser.id != rec.creator_id}) do
+    ModAction.log("comment ##{rec.id} deleted by #{CurrentUser.name}")
+  end
   attr_accessible :body, :post_id, :do_not_bump_post, :is_deleted, :as => [:member, :gold, :platinum, :builder, :janitor, :moderator, :admin]
   attr_accessible :is_sticky, :as => [:moderator, :admin]
   mentionable(
@@ -19,7 +25,7 @@ class Comment < ActiveRecord::Base
     :user_field => :creator_id, 
     :title => "You were mentioned in a comment",
     :body => lambda {|rec, user_name| "You were mentioned in a \"comment\":/posts/#{rec.post_id}#comment-#{rec.id}\n\n---\n\n[i]#{rec.creator.name} said:[/i]\n\n#{ActionController::Base.helpers.excerpt(rec.body, user_name)}"}
-  )
+    )
 
   module SearchMethods
     def recent

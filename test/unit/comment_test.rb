@@ -14,7 +14,6 @@ class CommentTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
-
     context "that mentions a user" do
       setup do
         @post = FactoryGirl.create(:post)
@@ -204,6 +203,21 @@ class CommentTest < ActiveSupport::TestCase
         assert_equal(2, matches.count)
         assert_equal(c2.id, matches.all[0].id)
         assert_equal(c1.id, matches.all[1].id)
+      end
+
+      context "that is edited by a moderator" do
+        setup do
+          @post = FactoryGirl.create(:post)
+          @comment = FactoryGirl.create(:comment, :post_id => @post.id)
+          @mod = FactoryGirl.create(:moderator_user)
+          CurrentUser.user = @mod
+        end
+
+        should "create a mod action" do
+          assert_difference("ModAction.count") do
+            @comment.update_attributes({:body => "nope"}, :as => :moderator)
+          end
+        end
       end
 
       context "that is below the score threshold" do

@@ -38,12 +38,23 @@ FactoryGirl.define do
       bit_prefs User.flag_value_for("can_upload_free")
     end
 
+    factory(:contrib_user) do
+      level 32
+      bit_prefs User.flag_value_for("can_upload_free")
+    end
+
+
     factory(:janitor_user) do
       level 35
       can_approve_posts true
     end
 
     factory(:moderator_user) do
+      level 40
+      can_approve_posts true
+    end
+
+    factory(:mod_user) do
       level 40
       can_approve_posts true
     end

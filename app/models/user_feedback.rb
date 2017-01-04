@@ -10,6 +10,12 @@ class UserFeedback < ActiveRecord::Base
   validate :creator_is_gold
   validate :user_is_not_creator
   after_create :create_dmail
+  after_update(:if => lambda {|rec| rec.updater_id != rec.creator_id}) do
+    ModAction.log("#{CurrentUser.name} updated user feedback for #{rec.user_name}")
+  end
+  after_destroy(:if => lambda {|rec| rec.updater_id != rec.creator_id}) do
+    ModAction.log("#{CurrentUser.name} deleted user feedback for #{rec.user_name}")
+  end
 
   module SearchMethods
     def positive
