@@ -44,7 +44,7 @@ class Post < ActiveRecord::Base
   has_many :versions, lambda {order("post_versions.updated_at ASC, post_versions.id ASC")}, :class_name => "PostVersion", :dependent => :destroy
   has_many :votes, :class_name => "PostVote", :dependent => :destroy
   has_many :notes, :dependent => :destroy
-  has_many :comments, lambda {order("comments.id")}, :dependent => :destroy
+  has_many :comments, lambda {includes(:creator, :updater).order("comments.id")}, :dependent => :destroy
   has_many :children, lambda {order("posts.id")}, :class_name => "Post", :foreign_key => "parent_id"
   has_many :disapprovals, :class_name => "PostDisapproval", :dependent => :destroy
   has_many :favorites, :dependent => :destroy
@@ -965,9 +965,7 @@ class Post < ActiveRecord::Base
     end
 
     def favorited_users
-      favorited_user_ids.map {|id| User.find(id)}.select do |x|
-        !x.hide_favorites?
-      end
+      User.find(favorited_user_ids).reject(&:hide_favorites?)
     end
 
     def favorite_groups(active_id=nil)
