@@ -14,7 +14,7 @@ class Post < ActiveRecord::Base
   before_validation :parse_pixiv_id
   before_validation :blank_out_nonexistent_parents
   before_validation :remove_parent_loops
-  validates_uniqueness_of :md5
+  validates_uniqueness_of :md5, :on => :create
   validates_inclusion_of :rating, in: %w(s q e), message: "rating must be s, q, or e"
   validate :post_is_not_its_own_parent
   validate :updater_can_change_rating
