@@ -83,6 +83,7 @@ class User < ActiveRecord::Base
   has_one :api_key
   has_one :dmail_filter
   has_one :super_voter
+  has_one :token_bucket
   has_many :subscriptions, lambda {order("tag_subscriptions.name")}, :class_name => "TagSubscription", :foreign_key => "creator_id"
   has_many :note_versions, :foreign_key => "updater_id"
   has_many :dmails, lambda {order("dmails.id desc")}, :foreign_key => "owner_id"
@@ -598,32 +599,31 @@ class User < ActiveRecord::Base
       end
     end
 
-    def api_hourly_limit(idempotent = true)
-      base = if is_platinum? && api_key.present?
-        5000
+    def api_regen_multiplier
+      # regen this amount per second
+      if is_platinum? && api_key.present?
+        4
       elsif is_gold? && api_key.present?
-        1000
+        2
       else
-        300
-      end
-
-      if idempotent
-        base * 10
-      else
-        base
+        1
       end
     end
 
-    def remaining_api_hourly_limit
-      ApiLimiter.remaining_hourly_limit(CurrentUser.ip_addr, true)
+    def api_burst_limit
+      # can make this many api calls at once before being bound by
+      # api_regen_multiplier refilling your pool
+      if is_platinum? && api_key.present?
+        60
+      elsif is_gold? && api_key.present?
+        30
+      else
+        10
+      end
     end
 
-    def remaining_api_hourly_limit_read
-      ApiLimiter.remaining_hourly_limit(CurrentUser.ip_addr, true)
-    end
-
-    def remaining_api_hourly_limit_write
-      ApiLimiter.remaining_hourly_limit(CurrentUser.ip_addr, false)
+    def remaining_api_limit
+      token_bucket.try(:token_count) || api_burst_limit
     end
 
     def statement_timeout
@@ -645,7 +645,7 @@ class User < ActiveRecord::Base
     def method_attributes
       list = super + [:is_banned, :can_approve_posts, :can_upload_free, :is_super_voter, :level_string]
       if id == CurrentUser.user.id
-        list += [:remaining_api_hourly_limit, :remaining_api_hourly_limit_read, :remaining_api_hourly_limit_write]
+        list += [:remaining_api_limit, :api_burst_limit]
       end
       list
     end

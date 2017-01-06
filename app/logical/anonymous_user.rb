@@ -180,13 +180,13 @@ class AnonymousUser
   def enable_sequential_post_navigation
     true
   end
+
+  def api_regen_multiplier
+    1
+  end
   
-  def api_hourly_limit(idempotent = false)
-    if idempotent
-      500
-    else
-      5
-    end
+  def api_burst_limit
+    5
   end
   
   def statement_timeout

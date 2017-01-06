@@ -11,12 +11,12 @@ class Comment < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   before_validation :initialize_updater
   after_create :update_last_commented_at_on_create
-  after_update(:if => lambda {|rec| CurrentUser.id != rec.creator_id}) do
-    ModAction.log("comment ##{id} updated by #{CurrentUser.name}")
+  after_update(:if => lambda {|rec| CurrentUser.id != rec.creator_id}) do |rec|
+    ModAction.log("comment ##{rec.id} updated by #{CurrentUser.name}")
   end
   after_destroy :update_last_commented_at_on_destroy
-  after_destroy(:if => lambda {|rec| CurrentUser.id != rec.creator_id}) do
-    ModAction.log("comment ##{id} deleted by #{CurrentUser.name}")
+  after_destroy(:if => lambda {|rec| CurrentUser.id != rec.creator_id}) do |rec|
+    ModAction.log("comment ##{rec.id} deleted by #{CurrentUser.name}")
   end
   attr_accessible :body, :post_id, :do_not_bump_post, :is_deleted, :as => [:member, :gold, :platinum, :builder, :janitor, :moderator, :admin]
   attr_accessible :is_sticky, :as => [:moderator, :admin]

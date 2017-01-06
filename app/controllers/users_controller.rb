@@ -2,6 +2,7 @@ class UsersController < ApplicationController
   respond_to :html, :xml, :json
   before_filter :member_only, :only => [:edit, :update, :upgrade]
   rescue_from User::PrivilegeError, :with => :access_denied
+  skip_before_filter :api_check
 
   def new
     @user = User.new

@@ -153,6 +153,14 @@
             (<%= link_to "help", wiki_pages_path(title: "help:api") %>)
           </td>
         </tr>
+
+        <tr>
+          <th>API Limits</th>
+          <td>
+            <%= CurrentUser.user.remaining_api_limit %>
+            / <%= CurrentUser.user.api_burst_limit %>,
+          </td>
+        </tr>
       <% end %>
   </table>
 </div>

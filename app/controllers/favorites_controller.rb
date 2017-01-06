@@ -1,6 +1,7 @@
 class FavoritesController < ApplicationController
   before_filter :member_only
   respond_to :html, :xml, :json
+  skip_before_filter :api_check
 
   def index
     if params[:tags]

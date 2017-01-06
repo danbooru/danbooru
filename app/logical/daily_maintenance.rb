@@ -17,5 +17,6 @@ class DailyMaintenance
     Tag.clean_up_negative_post_counts!
     PostApproval.prune!
     SuperVoter.init!
+    TokenBucket.prune!
   end
 end

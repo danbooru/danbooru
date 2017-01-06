@@ -6,11 +6,11 @@ class IpBan < ActiveRecord::Base
   validates_format_of :ip_addr, :with => IP_ADDR_REGEX
   validates_uniqueness_of :ip_addr, :if => lambda {|rec| rec.ip_addr =~ IP_ADDR_REGEX}
   attr_accessible :ip_addr, :reason
-  after_create do
-    ModAction.log("#{CurrentUser.name} created ip ban for #{ip_addr}")
+  after_create do |rec|
+    ModAction.log("#{CurrentUser.name} created ip ban for #{rec.ip_addr}")
   end
-  after_destroy do
-    ModAction.log("#{CurrentUser.name} deleted ip ban for #{ip_addr}")
+  after_destroy do |rec|
+    ModAction.log("#{CurrentUser.name} deleted ip ban for ##{rec.ip_addr}")
   end
 
   def self.is_banned?(ip_addr)

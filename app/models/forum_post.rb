@@ -19,11 +19,11 @@ class ForumPost < ActiveRecord::Base
   validate :topic_is_not_restricted, :on => :create
   before_destroy :validate_topic_is_unlocked
   after_save :delete_topic_if_original_post
-  after_update(:if => lambda {|rec| rec.updater_id != rec.creator_id}) do
-    ModAction.log("#{CurrentUser.name} updated forum post ##{id}")
+  after_update(:if => lambda {|rec| rec.updater_id != rec.creator_id}) do |rec|
+    ModAction.log("#{CurrentUser.name} updated forum post ##{rec.id}")
   end
-  after_destroy(:if => lambda {|rec| rec.updater_id != rec.creator_id}) do
-    ModAction.log("#{CurrentUser.name} deleted forum post ##{id}")
+  after_destroy(:if => lambda {|rec| rec.updater_id != rec.creator_id}) do |rec|
+    ModAction.log("#{CurrentUser.name} deleted forum post ##{rec.id}")
   end
   mentionable(
     :message_field => :body, 

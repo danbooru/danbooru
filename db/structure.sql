@@ -3055,6 +3055,17 @@ ALTER SEQUENCE tags_id_seq OWNED BY tags.id;
 
 
 --
+-- Name: token_buckets; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE UNLOGGED TABLE token_buckets (
+    user_id integer,
+    last_touched_at timestamp without time zone NOT NULL,
+    token_count real NOT NULL
+);
+
+
+--
 -- Name: uploads; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -6964,6 +6975,13 @@ CREATE INDEX index_tags_on_name_pattern ON tags USING btree (name text_pattern_o
 
 
 --
+-- Name: index_token_buckets_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_token_buckets_on_user_id ON token_buckets USING btree (user_id);
+
+
+--
 -- Name: index_uploads_on_uploader_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7388,4 +7406,6 @@ INSERT INTO schema_migrations (version) VALUES ('20161221225849');
 INSERT INTO schema_migrations (version) VALUES ('20161227003428');
 
 INSERT INTO schema_migrations (version) VALUES ('20161229001201');
+
+INSERT INTO schema_migrations (version) VALUES ('20170106012138');
 
