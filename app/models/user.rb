@@ -615,15 +615,15 @@ class User < ActiveRecord::Base
     end
 
     def remaining_api_hourly_limit
-      ApiLimiter.remaining_hourly_limit(CurrentUser.ip_addr, true)
+      ApiLimiter.remaining_hourly_limit(CurrentUser.id, true)
     end
 
     def remaining_api_hourly_limit_read
-      ApiLimiter.remaining_hourly_limit(CurrentUser.ip_addr, true)
+      ApiLimiter.remaining_hourly_limit(CurrentUser.id, true)
     end
 
     def remaining_api_hourly_limit_write
-      ApiLimiter.remaining_hourly_limit(CurrentUser.ip_addr, false)
+      ApiLimiter.remaining_hourly_limit(CurrentUser.id, false)
     end
 
     def statement_timeout
