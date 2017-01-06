@@ -33,6 +33,17 @@ module ApiLimiter
 
     CurrentUser.user.api_hourly_limit(idempotent) - requests
   end
+
+  def limits
+    {
+      "X-Api-Limit-Read" => CurrentUser.api_hourly_limit(true).to_s,
+      "X-Api-Limit-Write" => CurrentUser.api_hourly_limit(false).to_s,
+      "X-Api-Limit-Read-Remaining" => ApiLimiter.remaining_hourly_limit(true).to_s,
+      "X-Api-Limit-Write-Remaining" => ApiLimiter.remaining_hourly_limit(false).to_s,
+      "X-Api-Limit-Reset-At" => Time.now.end_of_hour.to_i.to_s,
+      "X-Api-Limit-Reset-In" => (Time.now.end_of_hour - Time.now).to_i.to_s
+    }
+  end
   
-  module_function :throttled?, :remaining_hourly_limit
+  module_function :limits, :throttled?, :remaining_hourly_limit
 end
