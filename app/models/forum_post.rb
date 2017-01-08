@@ -20,10 +20,10 @@ class ForumPost < ActiveRecord::Base
   before_destroy :validate_topic_is_unlocked
   after_save :delete_topic_if_original_post
   after_update(:if => lambda {|rec| rec.updater_id != rec.creator_id}) do
-    ModAction.log("#{CurrentUser.name} updated forum post ##{rec.id}")
+    ModAction.log("#{CurrentUser.name} updated forum post ##{self.id}")
   end
   after_destroy(:if => lambda {|rec| rec.updater_id != rec.creator_id}) do
-    ModAction.log("#{CurrentUser.name} deleted forum post ##{rec.id}")
+    ModAction.log("#{CurrentUser.name} deleted forum post ##{self.id}")
   end
   mentionable(
     :message_field => :body, 
