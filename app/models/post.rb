@@ -960,12 +960,12 @@ class Post < ActiveRecord::Base
     rescue PostVote::Error
     end
 
-    def favorited_user_ids
-      fav_string.scan(/\d+/)
-    end
-
+    # users who favorited this post, ordered by users who favorited it first
     def favorited_users
-      User.find(favorited_user_ids).reject(&:hide_favorites?)
+      favorited_user_ids = fav_string.scan(/\d+/).map(&:to_i)
+      visible_users = User.find(favorited_user_ids).reject(&:hide_favorites?)
+      ordered_users = visible_users.index_by(&:id).slice(*favorited_user_ids).values
+      ordered_users
     end
 
     def favorite_groups(active_id=nil)
