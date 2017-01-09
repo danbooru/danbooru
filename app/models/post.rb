@@ -1328,6 +1328,12 @@ class Post < ActiveRecord::Base
     def has_visible_children
       has_visible_children?
     end
+
+    def children_ids
+      if has_children?
+        children.map{|p| p.id}.join(' ')
+      end
+    end
   end
 
   module DeletionMethods
@@ -1512,7 +1518,7 @@ class Post < ActiveRecord::Base
     end
 
     def method_attributes
-      list = super + [:uploader_name, :has_large, :tag_string_artist, :tag_string_character, :tag_string_copyright, :tag_string_general, :has_visible_children]
+      list = super + [:uploader_name, :has_large, :tag_string_artist, :tag_string_character, :tag_string_copyright, :tag_string_general, :has_visible_children, :children_ids]
       if visible?
         list += [:file_url, :large_file_url, :preview_file_url]
       end
