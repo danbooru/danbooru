@@ -17,7 +17,7 @@
             <td><%= ip_ban.ip_addr %></td>
             <td><%= ip_ban.creator.name %></td>
             <td><%= ip_ban.reason %></td>
-            <td><%= link_to "Unban", ip_ban_path(ip_ban), :remote => true, :method => :delete, :data => {:confirm => "Do your really want to unban #{ip_ban.creator.name}?"} %></td>
+            <td><%= link_to "Unban", ip_ban_path(ip_ban), :remote => true, :method => :delete, :data => {:confirm => "Do your really want to unban #{ip_ban.ip_addr}?"} %></td>
           </tr>
         <% end %>
       </tbody>
