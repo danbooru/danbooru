@@ -5,13 +5,15 @@
     <tr>
       <th>User</th>
       <th>Number of Occurrences</th>
+      <th/>
     </tr>
   </thead>
   <tbody>
     <% @results.each do |user_id, count| %>
       <tr>
-        <td><%= link_to User.id_to_name(user_id), moderator_ip_addrs_path(:search => {:user_id => user_id}) %></td>
+        <td><%= link_to User.id_to_name(user_id), user_path(user_id) %></td>
         <td><%= count %></td>
+        <td><%= link_to "Show IP addresses", moderator_ip_addrs_path(:search => {:user_id => user_id}) %></td>
       </tr>
     <% end %>
   </tbody>
