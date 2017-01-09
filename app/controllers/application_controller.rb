@@ -41,7 +41,8 @@ protected
   
   def api_check
     if request.format.to_s =~ /\/json|\/xml/ || params[:controller] == "iqdb"
-      if ApiLimiter.throttled?(CurrentUser.id || request.remote_ip, request.request_method)
+      response.headers.merge!(ApiLimiter.limits)
+      if ApiLimiter.throttled?(request.request_method)
         render :text => "429 Too Many Requests\n", :layout => false, :status => 429
         return false
       end
