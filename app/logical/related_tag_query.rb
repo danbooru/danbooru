@@ -26,6 +26,10 @@ class RelatedTagQuery
     results
   end
 
+  def tags_for_html
+    map_with_category_data(tags)
+  end
+
   def to_json
     {:query => query, :category => category, :tags => map_with_category_data(tags), :wiki_page_tags => map_with_category_data(wiki_page_tags)}.to_json
   end

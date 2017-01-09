@@ -3,6 +3,7 @@
     <li><%= render "tags/quick_search" %></li>
     <li><%= link_to "Listing", tags_path %></li>
     <li><%= link_to "MetaSearch", meta_searches_tags_path %></li>
+    <li><%= link_to "Related tags", related_tag_path %></li>
     <li><%= link_to "Cheatsheet", wiki_pages_path(:search => {:title => "help:cheatsheet"}) %></li>
     <li><%= link_to "Help", wiki_pages_path(:search => {:title => "help:tags"}) %></li>
     <% if @tag %>
