@@ -3,7 +3,8 @@ class ForumPostsController < ApplicationController
   before_filter :member_only, :except => [:index, :show]
   before_filter :load_post, :only => [:edit, :show, :update, :destroy, :undelete]
   before_filter :check_min_level, :only => [:edit, :show, :update, :destroy, :undelete]
-
+  skip_before_filter :api_check
+  
   def new
     if params[:topic_id]
       @forum_topic = ForumTopic.find(params[:topic_id]) 

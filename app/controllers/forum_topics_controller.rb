@@ -5,6 +5,7 @@ class ForumTopicsController < ApplicationController
   before_filter :normalize_search, :only => :index
   before_filter :load_topic, :only => [:edit, :show, :update, :destroy, :undelete, :new_merge, :create_merge, :subscribe, :unsubscribe]
   before_filter :check_min_level, :only => [:show, :edit, :update, :new_merge, :create_merge, :destroy, :undelete, :subscribe, :unsubscribe]
+  skip_before_filter :api_check
 
   def new
     @forum_topic = ForumTopic.new

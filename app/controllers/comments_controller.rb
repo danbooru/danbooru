@@ -2,6 +2,7 @@ class CommentsController < ApplicationController
   respond_to :html, :xml, :json
   before_filter :member_only, :except => [:index, :search, :show]
   rescue_from ActiveRecord::StatementInvalid, :with => :rescue_exception
+  skip_before_filter :api_check
 
   def index
     if params[:group_by] == "comment"
