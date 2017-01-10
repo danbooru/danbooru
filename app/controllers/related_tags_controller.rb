@@ -1,5 +1,6 @@
 class RelatedTagsController < ApplicationController
   respond_to :json
+  respond_to :html, :only=>[:show]
   before_filter :require_reportbooru_key, only: [:update]
 
   def show
