@@ -1075,7 +1075,7 @@ class Post < ActiveRecord::Base
         raise PostVote::Error.new("You have already voted for this post")
       end
 
-      PostVote.create(:post_id => id, :score => score)
+      PostVote.create!(:post_id => id, :score => score)
       reload # PostVote.create modifies our score. Reload to get the new score.
     end
 

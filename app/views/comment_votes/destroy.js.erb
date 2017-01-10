@@ -1,0 +1,7 @@
+<% if @error %>
+  Danbooru.error("<%= j @error.to_s %>");
+<% else %>
+  <% if @comment_vote.is_negative? %>
+    $(".comment[data-comment-id=<%= @comment.id %>]").remove();
+  <% end %>
+<% end %>

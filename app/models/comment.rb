@@ -109,14 +109,12 @@ class Comment < ActiveRecord::Base
   module VoteMethods
     def vote!(val)
       numerical_score = val == "up" ? 1 : -1
-      vote = votes.create(:score => numerical_score)
+      vote = votes.create!(:score => numerical_score)
 
-      if vote.errors.empty?
-        if vote.is_positive?
-          update_column(:score, score + 1)
-        elsif vote.is_negative?
-          update_column(:score, score - 1)
-        end
+      if vote.is_positive?
+        update_column(:score, score + 1)
+      elsif vote.is_negative?
+        update_column(:score, score - 1)
       end
 
       return vote

@@ -47,7 +47,7 @@ class ApplicationController < ActionController::Base
       end
 
       throttled = CurrentUser.user.token_bucket.throttled?
-      headers["X-Api-Limit"] = CurrentUser.user.token_bucket.token_count
+      headers["X-Api-Limit"] = CurrentUser.user.token_bucket.token_count.to_s
 
       if throttled
         respond_to do |format|
