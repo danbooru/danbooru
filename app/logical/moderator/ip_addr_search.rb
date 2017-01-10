@@ -20,8 +20,8 @@ module Moderator
     end
 
   private
-    def select_all_sql(sql, *params)
-      ActiveRecord::Base.select_all_sql(sql, *params)
+    def select_all_sql(sql, source, *params)
+      source.select_all_sql(sql, *params)
     end
 
     def search_by_ip_addr(ip_addrs)
@@ -31,7 +31,7 @@ module Moderator
       add_row(sums, "select creator_id as k, count(*) from comments where ip_addr in (?) group by k", ip_addrs)
       add_row(sums, "select updater_id as k, count(*) from post_versions where updater_ip_addr in (?) group by k", ip_addrs)
       add_row(sums, "select updater_id as k, count(*) from note_versions where updater_ip_addr in (?) group by k", ip_addrs)
-#      add_row(sums, "select updater_id as k, count(*) from pool_versions where updater_ip_addr in (?) group by k", ip_addrs)
+      add_row(sums, "select updater_id as k, count(*) from pool_versions where updater_ip_addr in (?) group by k", ip_addrs, PoolArchive)
       add_row(sums, "select updater_id as k, count(*) from wiki_page_versions where updater_ip_addr in (?) group by k", ip_addrs)
       add_row(sums, "select from_id as k, count(*) from dmails where creator_ip_addr in (?) group by k", ip_addrs)
 
@@ -52,15 +52,15 @@ module Moderator
       add_row(sums, "select ip_addr as k, count(*) from comments where creator_id in (?) group by k", user_ids)
       add_row(sums, "select updater_ip_addr as k, count(*) from post_versions where updater_id in (?) group by k", user_ids)
       add_row(sums, "select updater_ip_addr as k, count(*) from note_versions where updater_id in (?) group by k", user_ids)
-#      add_row(sums, "select updater_ip_addr as k, count(*) from pool_versions where updater_id in (?) group by k", user_ids)
+      add_row(sums, "select updater_ip_addr as k, count(*) from pool_versions where updater_id in (?) group by k", user_ids, PoolArchive)
       add_row(sums, "select updater_ip_addr as k, count(*) from wiki_page_versions where updater_id in (?) group by k", user_ids)
       add_row(sums, "select creator_ip_addr as k, count(*) from dmails where from_id in (?) group by k", user_ids)
 
       sums
     end
 
-    def add_row(sums, sql, ip_addrs)
-      select_all_sql(sql, ip_addrs).each do |row|
+    def add_row(sums, sql, ip_addrs, source = ActiveRecord::Base)
+      select_all_sql(sql, source, ip_addrs).each do |row|
         sums[row["k"]] += row["count"].to_i
       end
     end
