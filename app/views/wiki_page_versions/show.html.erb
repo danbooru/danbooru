@@ -11,7 +11,7 @@
             <p><%= wiki_page_other_names_list(@wiki_page_version) %></p>
           <% end %>
 
-          <%= format_text(@wiki_page_version.body) %>
+          <%= format_text(@wiki_page_version.body, :ragel => true) %>
         <% else %>
           <p>The artist has requested removal of this page.</p>
         <% end %>

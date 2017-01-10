@@ -18,7 +18,7 @@
             <td><%= link_to_user feedback.user %></td>
             <td><%= link_to_user feedback.creator %></td>
             <td><%= compact_time(feedback.created_at) %></td>
-            <td><%= format_text(feedback.body) %></td>
+            <td><%= format_text(feedback.body, :ragel => true) %></td>
             <td>
               <% if feedback.editable_by?(CurrentUser.user) %>
                 <%= link_to "edit", edit_user_feedback_path(feedback) %>

@@ -1,4 +1,4 @@
-<%= format_text(WikiPage.titled(Danbooru.config.appeal_notice_wiki_page).first.try(&:body)) %>
+<%= format_text(WikiPage.titled(Danbooru.config.appeal_notice_wiki_page).first.try(&:body), :ragel => true) %>
 
 <%= form_tag(post_appeals_path(:format => :js), :remote => true) do %>
   <%= hidden_field_tag "post_appeal[post_id]", @post_appeal.post_id %>

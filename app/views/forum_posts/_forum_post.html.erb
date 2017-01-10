@@ -13,7 +13,7 @@
     </div>
     <div class="content">
       <div class="prose">
-        <%= format_text(forum_post.body) %>
+        <%= format_text(forum_post.body, :ragel => true) %>
       </div>
       <% if forum_post.updated_at - forum_post.created_at > 5.minutes %>
         <p class="info">Updated by <%= link_to_user forum_post.updater %> <%= time_ago_in_words_tagged(forum_post.updated_at) %></p>

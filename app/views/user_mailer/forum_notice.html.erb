@@ -4,7 +4,7 @@
   <p>
     <strong><%= forum_post.creator_name %> said:</strong>
   </p>
-  <%= format_text(forum_post.body) %>
+  <%= format_text(forum_post.body, :ragel => true) %>
   <br>
   <hr>
   <br>

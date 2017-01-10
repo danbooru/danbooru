@@ -7,7 +7,7 @@
     <% if post_set.artist.visible? %>
       <% unless post_set.artist.notes.blank? %>
         <div class="prose">
-          <%= format_text(post_set.artist.notes) %>
+          <%= format_text(post_set.artist.notes, :ragel => true) %>
         </div>
 
         <p><%= link_to "View wiki page", post_set.artist.wiki_page %></p>
@@ -49,7 +49,7 @@
         <p><%= wiki_page_other_names_list(post_set.wiki_page) %></p>
       <% end %>
 
-      <%= format_text(post_set.wiki_page.presenter.excerpt) %>
+      <%= format_text(post_set.wiki_page.presenter.excerpt, :ragel => true) %>
 
       <% if post_set.wiki_page.artist %>
         <p><%= link_to "View artist", post_set.wiki_page.artist %></p>
@@ -69,7 +69,7 @@
     </h4>
 
     <div id="description" class="prose">
-      <%= format_text(post_set.pool.description) %>
+      <%= format_text(post_set.pool.description, :ragel => true) %>
     </div>
 
     <p><%= link_to "View pool", pool_path(post_set.pool.id) %></p>

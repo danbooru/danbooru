@@ -1,4 +1,4 @@
-<%= format_text(WikiPage.titled(Danbooru.config.flag_notice_wiki_page).first.try(&:body)) %>
+<%= format_text(WikiPage.titled(Danbooru.config.flag_notice_wiki_page).first.try(&:body), :ragel => true) %>
 
 <p>Enter a reason:</p>
 

@@ -4,7 +4,7 @@
 
     <% if CurrentUser.can_upload? %>
       <div id="upload-guide-notice">
-        <%= format_text(@upload_notice_wiki.try(&:body)) %>
+        <%= format_text(@upload_notice_wiki.try(&:body), :ragel => true) %>
       </div>
 
       <% unless CurrentUser.can_upload_free? %>
