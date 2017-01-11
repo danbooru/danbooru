@@ -10,7 +10,7 @@
   </div>
 </form>
 
-<%= form_tag(create_or_update_artist_commentaries_path(:format => :js), :remote => true, :class => "simple_form", :method => :put) do %>
+<%= form_tag(create_or_update_artist_commentaries_path(:format => :js), :remote => true, :id => "edit-commentary", :class => "simple_form", :method => :put) do %>
   <%= hidden_field :artist_commentary, :post_id, :value => @post.id %>
 
   <div class="input">
