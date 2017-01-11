@@ -138,10 +138,10 @@
         </td>
       </tr>
       
-      <% if CurrentUser.is_moderator? && presenter.previous_names.present? %>
+      <% if presenter.previous_names(self).present? %>
         <tr>
           <th>Previous Names</th>
-          <td><%= presenter.previous_names %></td>
+          <td><%= presenter.previous_names(self) %></td>
         </tr>
       <% end %>
 
