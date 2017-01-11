@@ -233,7 +233,7 @@ class UserPresenter
     end
   end
   
-  def previous_names
-    UserNameChangeRequest.approved.where("user_id = ?", user.id).map(&:original_name).join(", ")
+  def previous_names(template)
+    user.user_name_change_requests.map { |req| template.link_to req.original_name, req }.join(", ").html_safe
   end
 end

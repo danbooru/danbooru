@@ -89,6 +89,7 @@ class User < ActiveRecord::Base
   has_many :dmails, lambda {order("dmails.id desc")}, :foreign_key => "owner_id"
   has_many :saved_searches
   has_many :forum_posts, lambda {order("forum_posts.created_at")}, :foreign_key => "creator_id"
+  has_many :user_name_change_requests, lambda {visible.order("user_name_change_requests.created_at desc")}
   belongs_to :inviter, :class_name => "User"
   after_update :create_mod_action
   accepts_nested_attributes_for :dmail_filter

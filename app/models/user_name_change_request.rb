@@ -18,6 +18,16 @@ class UserNameChangeRequest < ActiveRecord::Base
   def self.approved
     where(:status => "approved")
   end
+
+  def self.visible
+    if CurrentUser.is_admin?
+      all
+    elsif CurrentUser.is_member?
+      where("user_name_change_requests.status = 'approved' OR user_name_change_requests.user_id = ?", CurrentUser.id)
+    else
+      none
+    end
+  end
   
   def rejected?
     status == "rejected"
