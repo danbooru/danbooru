@@ -31,7 +31,7 @@ class PostArchive < ActiveRecord::Base
         tags: version.tags,
         added_tags: added_tags,
         removed_tags: removed_tags,
-        updater_id: version.updater_id],
+        updater_id: version.updater_id,
         updater_ip_addr: version.updater_ip_addr.to_s,
         created_at: version.created_at,
         updated_at: version.updated_at,
