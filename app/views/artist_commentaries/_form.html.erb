@@ -4,36 +4,36 @@
   <div class="input">
     <label>Copy from</label>
     <%= select_tag :commentary_source_type, options_for_select(%w[Source Post]) %>
-    <%= text_field_tag :commentary_source, @post.source %>
-    <%= text_field_tag :commentary_post_id, (@post.parent.try(&:id) || @post.children.first.try(&:id)), :style => "display: none;" %>
+    <%= text_field_tag :commentary_source, post.source %>
+    <%= text_field_tag :commentary_post_id, (post.parent.try(&:id) || post.children.first.try(&:id)), :style => "display: none;" %>
     <%= button_tag "Fetch" %>
   </div>
 </form>
 
 <%= form_tag(create_or_update_artist_commentaries_path(:format => :js), :remote => true, :id => "edit-commentary", :class => "simple_form", :method => :put) do %>
-  <%= hidden_field :artist_commentary, :post_id, :value => @post.id %>
+  <%= hidden_field :artist_commentary, :post_id, :value => post.id %>
 
   <div class="input">
     <label for="artist_commentary_original_title">Original title</label>
-    <%= text_field :artist_commentary, :original_title, :value => artist_commentary.try(:original_title) %>
+    <%= text_field :artist_commentary, :original_title, :value => post.artist_commentary.try(:original_title) %>
   </div>
 
   <div class="input">
     <label for="artist_commentary_original_description">Original description</label>
-    <%= text_area :artist_commentary, :original_description, :size => "40x6", :value => artist_commentary.try(:original_description) %>
+    <%= text_area :artist_commentary, :original_description, :size => "40x6", :value => post.artist_commentary.try(:original_description) %>
   </div>
 
   <div class="input">
     <label for="artist_commentary_translated_title">Translated title</label>
-    <%= text_field :artist_commentary, :translated_title, :value => artist_commentary.try(:translated_title) %>
+    <%= text_field :artist_commentary, :translated_title, :value => post.artist_commentary.try(:translated_title) %>
   </div>
 
   <div class="input">
     <label for="artist_commentary_translated_description">Translated description</label>
-    <%= text_area :artist_commentary, :translated_description, :size => "40x6", :value => artist_commentary.try(:translated_description) %>
+    <%= text_area :artist_commentary, :translated_description, :size => "40x6", :value => post.artist_commentary.try(:translated_description) %>
   </div>
 
-  <% if @post.has_tag?("commentary") %>
+  <% if post.has_tag?("commentary") %>
     <div class="input">
       <label>
         <%= check_box :artist_commentary, :remove_commentary_tag %>
@@ -49,7 +49,7 @@
     </div>
   <% end %>
 
-  <% if @post.has_tag?("commentary_request") %>
+  <% if post.has_tag?("commentary_request") %>
     <div class="input">
       <label>
         <%= check_box :artist_commentary, :remove_commentary_request_tag %>
@@ -65,7 +65,7 @@
     </div>  
   <% end %>
 
-  <% if @post.has_tag?("check_commentary") %>
+  <% if post.has_tag?("check_commentary") %>
     <div class="input">
       <label>
         <%= check_box :artist_commentary, :remove_commentary_check_tag %>
