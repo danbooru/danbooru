@@ -36,7 +36,7 @@
       width: 500,
       buttons: {
         "Submit": function() {
-          $("#add-commentary-dialog form").submit();
+          $("#add-commentary-dialog #edit-commentary").submit();
           $(this).dialog("close");
         },
         "Cancel": function() {
@@ -45,7 +45,7 @@
       }
     });
 
-    $('#add-commentary-dialog form').submit(function() {
+    $('#add-commentary-dialog #edit-commentary').submit(function() {
       $('#add-commentary-dialog').dialog('close');
     });
 
