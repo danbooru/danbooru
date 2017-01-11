@@ -2,6 +2,7 @@ module Moderator
   module Post
     class DisapprovalsController < ApplicationController
       before_filter :approver_only
+      skip_before_filter :api_check
 
       def create
         cookies.permanent[:moderated] = Time.now.to_i

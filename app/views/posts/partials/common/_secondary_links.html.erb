@@ -11,7 +11,7 @@
       <li><%= link_to "Favorites", favorites_path %></li>
       <li><%= link_to "Favorite groups", favorite_groups_path %></li>
       <% if CurrentUser.has_saved_searches? %>
-        <li><%= link_to "Saved searches", saved_searches_path %></li>
+        <li><%= link_to "Saved searches", posts_path(:tags => "search:all") %></li>
       <% end %>
       <li><%= link_to "Subscriptions", posts_path(:tags => "sub:#{CurrentUser.name}") %></li>
     <% end %>

@@ -5,6 +5,7 @@ module Moderator
       
       respond_to :html, :json
       before_filter :approver_only
+      skip_before_filter :api_check
 
       def show
         cookies.permanent[:moderated] = Time.now.to_i

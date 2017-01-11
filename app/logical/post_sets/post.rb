@@ -173,6 +173,10 @@ module PostSets
       tag_subscription.present?
     end
 
+    def is_saved_search?
+      tag_string =~ /search:/
+    end
+
     def tag_subscription
       @tag_subscription ||= tag_array.select {|x| x =~ /^sub:/}.map {|x| x.sub(/^sub:/, "")}.first
     end
