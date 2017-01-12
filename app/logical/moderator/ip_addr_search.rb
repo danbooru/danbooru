@@ -19,20 +19,16 @@ module Moderator
     end
 
   private
-    def select_all_sql(sql, source, *params)
-      source.select_all_sql(sql, *params)
-    end
-
     def search_by_ip_addr(ip_addrs)
       sums = Hash.new {|h, k| h[k] = 0}
 
-      add_row(sums, "select id as k, 1 as count from users where last_ip_addr in (?)", ip_addrs)
-      add_row(sums, "select creator_id as k, count(*) from comments where ip_addr in (?) group by k", ip_addrs)
-      add_row(sums, "select updater_id as k, count(*) from post_versions where updater_ip_addr in (?) group by k", ip_addrs)
-      add_row(sums, "select updater_id as k, count(*) from note_versions where updater_ip_addr in (?) group by k", ip_addrs)
-      add_row(sums, "select updater_id as k, count(*) from pool_versions where updater_ip_addr in (?) group by k", ip_addrs, PoolArchive)
-      add_row(sums, "select updater_id as k, count(*) from wiki_page_versions where updater_ip_addr in (?) group by k", ip_addrs)
-      add_row(sums, "select from_id as k, count(*) from dmails where creator_ip_addr in (?) group by k", ip_addrs)
+      add_row(sums, NoteVersion.where(updater_ip_addr: ip_addrs).group(:updater).count)
+      add_row(sums, PoolArchive.where(updater_ip_addr: ip_addrs).group(:updater).count) if PoolArchive.enabled?
+      add_row(sums, PostVersion.where(updater_ip_addr: ip_addrs).group(:updater).count)
+      add_row(sums, WikiPageVersion.where(updater_ip_addr: ip_addrs).group(:updater).count)
+      add_row(sums, Comment.where(ip_addr: ip_addrs).group(:creator).count)
+      add_row(sums, Dmail.where(creator_ip_addr: ip_addrs).group(:from).count)
+      add_row(sums, Hash[User.where(last_ip_addr: ip_addrs).collect { |user| [user, 1] }])
 
       sums
     end
@@ -44,21 +40,20 @@ module Moderator
 
     def search_by_user_id(user_ids)
       sums = Hash.new {|h, k| h[k] = 0}
+      users = User.find(user_ids)
 
-      add_row(sums, "select ip_addr as k, count(*) from comments where creator_id in (?) group by k", user_ids)
-      add_row(sums, "select updater_ip_addr as k, count(*) from post_versions where updater_id in (?) group by k", user_ids)
-      add_row(sums, "select updater_ip_addr as k, count(*) from note_versions where updater_id in (?) group by k", user_ids)
-      add_row(sums, "select updater_ip_addr as k, count(*) from pool_versions where updater_id in (?) group by k", user_ids, PoolArchive)
-      add_row(sums, "select updater_ip_addr as k, count(*) from wiki_page_versions where updater_id in (?) group by k", user_ids)
-      add_row(sums, "select creator_ip_addr as k, count(*) from dmails where from_id in (?) group by k", user_ids)
+      add_row(sums, NoteVersion.where(updater: users).group(:updater_ip_addr).count)
+      add_row(sums, PoolArchive.where(updater: users).group(:updater_ip_addr).count) if PoolArchive.enabled?
+      add_row(sums, PostVersion.where(updater: users).group(:updater_ip_addr).count)
+      add_row(sums, WikiPageVersion.where(updater: users).group(:updater_ip_addr).count)
+      add_row(sums, Comment.where(creator: users).group(:ip_addr).count)
+      add_row(sums, Dmail.where(from: users).group(:creator_ip_addr).count)
 
       sums
     end
 
-    def add_row(sums, sql, ip_addrs, source = ActiveRecord::Base)
-      select_all_sql(sql, source, ip_addrs).each do |row|
-        sums[row["k"]] += row["count"].to_i
-      end
+    def add_row(sums, counts)
+      sums.merge!(counts) { |key, oldcount, newcount| oldcount + newcount }
     end
   end
 end
