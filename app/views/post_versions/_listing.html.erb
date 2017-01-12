@@ -30,7 +30,7 @@
           <td><%= post_version.parent_id %></td>
           <% if CurrentUser.is_moderator? %>
             <td>
-              <%= post_version.updater_ip_addr %>
+              <%= link_to_ip post_version.updater_ip_addr %>
             </td>
           <% end %>
           <td><%= post_version_diff(post_version) %></td>

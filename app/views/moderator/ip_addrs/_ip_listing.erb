@@ -1,4 +1,4 @@
-<p><%= link_to "Search for users with these IP addresses", moderator_ip_addrs_path(:search => {:ip_addr => @results.map {|k, count| k}.reject{|ip| ip == "127.0.0.1"}.join(",")}) %></p>
+<p><%= link_to "Search for users with these IP addresses", moderator_ip_addrs_path(:search => {:ip_addr => @results.keys.reject{|ip| ip == "127.0.0.1"}.join(",")}) %></p>
 
 <table class="striped">
   <thead>
@@ -10,7 +10,7 @@
   <tbody>
     <% @results.each do |ip_address, count| %>
       <tr>
-        <td><%= link_to ip_address, moderator_ip_addrs_path(:search => {:ip_addr => ip_address}) %></td>
+        <td><%= link_to_ip ip_address %></td>
         <td><%= count %></td>
       </tr>
     <% end %>

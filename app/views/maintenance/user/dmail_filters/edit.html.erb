@@ -10,7 +10,7 @@
         <li><strong>Recipient</strong>: <%= link_to_user @dmail.to, :raw => true %></li>
         <li><strong>Date</strong>: <%= compact_time(@dmail.created_at) %></li>
         <% if CurrentUser.user.is_moderator? %>
-          <li><strong>Sender IP</strong>: <%= @dmail.creator_ip_addr %></li>
+          <li><strong>Sender IP</strong>: <%= link_to_ip @dmail.creator_ip_addr %></li>
         <% end %>
       </ul>
 

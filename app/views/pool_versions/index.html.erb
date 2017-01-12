@@ -27,7 +27,7 @@
             <td><%= link_to_user pool_version.updater %></td>
             <% if CurrentUser.is_moderator? %>
               <td>
-                <%= pool_version.updater_ip_addr %>
+                <%= link_to_ip pool_version.updater_ip_addr %>
               </td>
             <% end %>
             <td><%= compact_time pool_version.updated_at %></td>

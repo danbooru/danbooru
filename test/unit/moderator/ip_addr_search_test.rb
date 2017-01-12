@@ -19,17 +19,17 @@ module Moderator
 
       should "find by ip addr" do
         @search = IpAddrSearch.new(:ip_addr => "127.0.0.1")
-        assert_equal({@user.id.to_s => 2}, @search.execute)
+        assert_equal({@user => 2}, @search.execute)
       end
 
       should "find by user id" do
         @search = IpAddrSearch.new(:user_id => @user.id.to_s)
-        assert_equal({"127.0.0.1" => 2}, @search.execute)
+        assert_equal({IPAddr.new("127.0.0.1") => 2}, @search.execute)
       end
 
       should "find by user name" do
         @search = IpAddrSearch.new(:user_name => @user.name)
-        assert_equal({"127.0.0.1" => 2}, @search.execute)
+        assert_equal({IPAddr.new("127.0.0.1") => 2}, @search.execute)
       end
     end
   end

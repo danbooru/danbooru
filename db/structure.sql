@@ -2557,7 +2557,7 @@ CREATE TABLE post_appeals (
     id integer NOT NULL,
     post_id integer NOT NULL,
     creator_id integer NOT NULL,
-    creator_ip_addr integer NOT NULL,
+    creator_ip_addr inet,
     reason text,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
@@ -4882,6 +4882,13 @@ CREATE INDEX index_artist_commentary_versions_on_updater_id_and_post_id ON artis
 
 
 --
+-- Name: index_artist_commentary_versions_on_updater_ip_addr; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_artist_commentary_versions_on_updater_ip_addr ON artist_commentary_versions USING btree (updater_ip_addr);
+
+
+--
 -- Name: index_artist_urls_on_artist_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4935,6 +4942,13 @@ CREATE INDEX index_artist_versions_on_name ON artist_versions USING btree (name)
 --
 
 CREATE INDEX index_artist_versions_on_updater_id ON artist_versions USING btree (updater_id);
+
+
+--
+-- Name: index_artist_versions_on_updater_ip_addr; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_artist_versions_on_updater_ip_addr ON artist_versions USING btree (updater_ip_addr);
 
 
 --
@@ -5033,6 +5047,13 @@ CREATE INDEX index_comments_on_body_index ON comments USING gin (body_index);
 --
 
 CREATE INDEX index_comments_on_creator_id_and_post_id ON comments USING btree (creator_id, post_id);
+
+
+--
+-- Name: index_comments_on_ip_addr; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_comments_on_ip_addr ON comments USING btree (ip_addr);
 
 
 --
@@ -7052,6 +7073,13 @@ CREATE UNIQUE INDEX index_users_on_name ON users USING btree (lower((name)::text
 
 
 --
+-- Name: index_wiki_page_versions_on_updater_ip_addr; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_wiki_page_versions_on_updater_ip_addr ON wiki_page_versions USING btree (updater_ip_addr);
+
+
+--
 -- Name: index_wiki_page_versions_on_wiki_page_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7408,4 +7436,8 @@ INSERT INTO schema_migrations (version) VALUES ('20161227003428');
 INSERT INTO schema_migrations (version) VALUES ('20161229001201');
 
 INSERT INTO schema_migrations (version) VALUES ('20170106012138');
+
+INSERT INTO schema_migrations (version) VALUES ('20170112021922');
+
+INSERT INTO schema_migrations (version) VALUES ('20170112060921');
 
