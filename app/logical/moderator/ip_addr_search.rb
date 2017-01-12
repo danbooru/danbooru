@@ -1,10 +1,9 @@
 module Moderator
   class IpAddrSearch
-    attr_reader :params, :errors
+    attr_reader :params
 
     def initialize(params)
       @params = params
-      @errors = []
     end
 
     def execute
@@ -39,11 +38,8 @@ module Moderator
     end
 
     def search_by_user_name(user_names)
-      user_names = user_names.map do |username|
-        username.downcase.strip.tr(" ", "_")
-      end
-      users = User.where("lower(name) in (?)", user_names)
-      search_by_user_id(users.map(&:id))
+      user_ids = user_names.map { |name| User.name_to_id(name) }
+      search_by_user_id(user_ids)
     end
 
     def search_by_user_id(user_ids)
