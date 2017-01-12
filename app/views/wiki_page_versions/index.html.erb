@@ -54,7 +54,7 @@
                 <td><%= link_to "wiki", wiki_page_path(wiki_page_version.wiki_page_id) %></td>
                 <% if CurrentUser.is_moderator? %>
                   <td>
-                    <%= wiki_page_version.updater_ip_addr %>
+                    <%= link_to_ip wiki_page_version.updater_ip_addr %>
                   </td>
                 <% end %>
                 <td>

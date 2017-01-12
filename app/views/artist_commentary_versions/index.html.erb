@@ -32,7 +32,7 @@
             </td>
             <% if CurrentUser.is_moderator? %>
               <td>
-                <%= commentary_version.updater_ip_addr %>
+                <%= link_to_ip commentary_version.updater_ip_addr %>
               </td>
             <% end %>
             <td><%= link_to_user commentary_version.updater %></td>

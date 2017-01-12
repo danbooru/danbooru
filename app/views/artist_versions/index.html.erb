@@ -37,7 +37,7 @@
               <td><%= link_to_user artist_version.updater %></td>
               <% if CurrentUser.is_moderator? %>
                 <td>
-                  <%= artist_version.updater_ip_addr %>
+                  <%= link_to_ip artist_version.updater_ip_addr %>
                 </td>
               <% end %>
               <td><%= artist_version.is_active? %></td>

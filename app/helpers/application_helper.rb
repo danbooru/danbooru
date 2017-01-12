@@ -89,6 +89,10 @@ module ApplicationHelper
     time_tag(time.strftime("%Y-%m-%d %H:%M"), time)
   end
 
+  def link_to_ip(ip)
+    link_to ip, moderator_ip_addrs_path(:search => {:ip_addr => ip})
+  end
+
   def link_to_user(user, options = {})
     user_class = user.level_class
     user_class = user_class + " user-post-approver" if user.can_approve_posts?

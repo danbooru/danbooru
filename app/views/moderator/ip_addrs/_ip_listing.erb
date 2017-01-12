@@ -10,7 +10,7 @@
   <tbody>
     <% @results.each do |ip_address, count| %>
       <tr>
-        <td><%= link_to ip_address, moderator_ip_addrs_path(:search => {:ip_addr => ip_address}) %></td>
+        <td><%= link_to_ip ip_address %></td>
         <td><%= count %></td>
       </tr>
     <% end %>
