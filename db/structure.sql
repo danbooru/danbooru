@@ -2557,7 +2557,7 @@ CREATE TABLE post_appeals (
     id integer NOT NULL,
     post_id integer NOT NULL,
     creator_id integer NOT NULL,
-    creator_ip_addr integer NOT NULL,
+    creator_ip_addr inet,
     reason text,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
@@ -7438,3 +7438,6 @@ INSERT INTO schema_migrations (version) VALUES ('20161229001201');
 INSERT INTO schema_migrations (version) VALUES ('20170106012138');
 
 INSERT INTO schema_migrations (version) VALUES ('20170112021922');
+
+INSERT INTO schema_migrations (version) VALUES ('20170112060921');
+

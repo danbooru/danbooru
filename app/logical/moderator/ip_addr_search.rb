@@ -55,7 +55,7 @@ module Moderator
       add_row(sums, WikiPageVersion.where(updater: users).group(:updater_ip_addr).count)
       add_row(sums, Comment.where(creator: users).group(:ip_addr).count)
       add_row(sums, Dmail.where(from: users).group(:creator_ip_addr).count)
-      add_row(sums, PostAppeal.where(creator: users).group(:creator_ip_addr).count)
+      add_row(sums, PostAppeal.where(creator: users).where.not(creator_ip_addr: nil).group(:creator_ip_addr).count)
       add_row(sums, PostFlag.where(creator: users).group(:creator_ip_addr).count)
       add_row(sums, Upload.where(uploader: users).group(:uploader_ip_addr).count)
       add_row(sums, User.where(id: users).group(:last_ip_addr).count)
