@@ -583,6 +583,7 @@ inline := |*
 
   '[nodtext]'i => {
     dstack_push(sm, &INLINE_NODTEXT);
+    g_debug("push inline nodtext");
     fcall nodtext;
   };
 
@@ -670,14 +671,18 @@ code := |*
 
 nodtext := |*
   '[/nodtext]'i => {
-    if (dstack_check(sm, BLOCK_NODTEXT)) {
+    if (dstack_check2(sm, BLOCK_NODTEXT)) {
+      g_debug("block dstack check");
+      dstack_pop(sm);
       dstack_pop(sm);
       append_block(sm, "</p>");
       fret;
     } else if (dstack_check(sm, INLINE_NODTEXT)) {
+      g_debug("inline dstack check");
       dstack_pop(sm);
       fret;
     } else {
+      g_debug("else dstack check");
       append(sm, true, "[/nodtext]");
     }
   };
@@ -988,6 +993,8 @@ main := |*
     dstack_close_before_block(sm);
     dstack_push(sm, &BLOCK_NODTEXT);
     dstack_push(sm, &BLOCK_P);
+    g_debug("push block nodtext");
+    g_debug("push block p");
     append_block(sm, "<p>");
     fcall nodtext;
   };
