@@ -1,6 +1,6 @@
 class UserNameChangeRequestsController < ApplicationController
   before_filter :gold_only, :only => [:new, :create, :show]
-  before_filter :admin_only, :only => [:index, :approve, :reject, :destroy]
+  before_filter :admin_only, :only => [:index, :approve, :reject]
   rescue_from User::PrivilegeError, :with => :access_denied
 
   def new
@@ -36,12 +36,6 @@ class UserNameChangeRequestsController < ApplicationController
     @change_request = UserNameChangeRequest.find(params[:id])
     @change_request.approve!
     redirect_to user_name_change_request_path(@change_request), :notice => "Name change request approved"
-  end
-  
-  def destroy
-    @change_request = UserNameChangeRequest.find(params[:id])
-    @change_request.destroy
-    redirect_to user_name_change_requests_path
   end
   
   def reject
