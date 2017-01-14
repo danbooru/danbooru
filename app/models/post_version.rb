@@ -61,17 +61,6 @@ class PostVersion < ActiveRecord::Base
     super
   end
 
-  def sequence_for_post
-    versions = PostVersion.where(:post_id => post_id).order("updated_at desc, id desc")
-    diffs = []
-    versions.each_index do |i|
-      if i < versions.size - 1
-        diffs << versions[i].diff(versions[i + 1])
-      end
-    end
-    return diffs
-  end
-
   def diff(version)
     latest_tags = post.tag_array
     latest_tags << "rating:#{post.rating}" if post.rating.present?

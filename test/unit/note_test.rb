@@ -107,11 +107,14 @@ class NoteTest < ActiveSupport::TestCase
       setup do
         @post = FactoryGirl.create(:post, :image_width => 1000, :image_height => 1000)
         @note = FactoryGirl.create(:note, :post => @post)
+        @note.stubs(:merge_version?).returns(false)
       end
 
       should "increment the updater's note_update_count" do
-        assert_difference("CurrentUser.note_update_count", 1) do
+        @user.reload
+        assert_difference("@user.note_update_count", 1) do
           @note.update_attributes(:body => "zzz")
+          @user.reload
         end
       end
 

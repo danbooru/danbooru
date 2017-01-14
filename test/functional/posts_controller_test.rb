@@ -144,12 +144,12 @@ class PostsControllerTest < ActionController::TestCase
 
     context "revert action" do
       setup do
-        @post.stubs(:merge_version?).returns(false)
+        PostArchive.sqs_service.stubs(:merge?).returns(false)
         @post.update_attributes(:tag_string => "zzz")
       end
 
       should "work" do
-        @version = @post.versions(true).first
+        @version = @post.versions.first
         assert_equal("aaaa", @version.tags)
         post :revert, {:id => @post.id, :version_id => @version.id}, {:user_id => @user.id}
         assert_redirected_to post_path(@post)

@@ -11,6 +11,7 @@ end
 require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
 require 'cache'
+require 'helpers/post_archive_test_helper'
 
 Dir[File.expand_path(File.dirname(__FILE__) + "/factories/*.rb")].each {|file| require file}
 
@@ -22,6 +23,26 @@ end
 
 if defined?(MEMCACHE)
   Object.send(:remove_const, :MEMCACHE)
+end
+
+class ActiveSupport::TestCase
+  include UploadTestMethods
+  include PostArchiveTestHelper
+end
+
+class ActionController::TestCase
+  include UploadTestMethods
+  include PostArchiveTestHelper
+
+  def assert_authentication_passes(action, http_method, role, params, session)
+    __send__(http_method, action, params, session.merge(:user_id => @users[role].id))
+    assert_response :success
+  end
+
+  def assert_authentication_fails(action, http_method, role)
+    __send__(http_method, action, params, session.merge(:user_id => @users[role].id))
+    assert_redirected_to(new_sessions_path)
+  end
 end
 
 MEMCACHE = MemcacheMock.new
