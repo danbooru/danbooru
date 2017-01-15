@@ -40,31 +40,31 @@
       </tr>
     </tbody>
   </table>
-
-  <section>
-    <h2>Feedback</h2>
-    <ul>
-      <% @change_request.feedback.each do |feedback| %>
-        <li class="feedback-category-<%= feedback.category %>">
-          <p><%= feedback.body %></p>
-          <p class="author">Submitted by <%= link_to_user feedback.creator.name %> <%= time_ago_in_words_tagged feedback.created_at %></p>
-        </li>
-      <% end %>
-    </ul>
-  </section>
-
-  <section>
-    <h2>Statistics</h2>
-    <ul>
-      <li>Level: <%= @change_request.user.level_string %></li>
-      <li>Uploads: <%= link_to @change_request.user.post_upload_count, posts_path("user:#{@change_request.user.name}") %></li>
-      <li>Updates: <%= link_to @change_request.user.post_update_count, post_versions_path(:search => {:updater_id => @change_request.user.id}) %></li>
-      <li>Notes: <%= link_to @change_request.user.note_update_count, note_versions_path(:search => {:updater_id => @change_request.user.id}) %></li>
-      <li>Favorites: <%= @change_request.user.favorite_count %></li>
-    </ul>
-  </section>
   
   <% if @change_request.pending? && CurrentUser.user.is_admin? %>
+    <section>
+      <h2>Feedback</h2>
+      <ul>
+        <% @change_request.feedback.each do |feedback| %>
+          <li class="feedback-category-<%= feedback.category %>">
+            <p><%= feedback.body %></p>
+            <p class="author">Submitted by <%= link_to_user feedback.creator.name %> <%= time_ago_in_words_tagged feedback.created_at %></p>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Statistics</h2>
+      <ul>
+        <li>Level: <%= @change_request.user.level_string %></li>
+        <li>Uploads: <%= link_to @change_request.user.post_upload_count, posts_path("user:#{@change_request.user.name}") %></li>
+        <li>Updates: <%= link_to @change_request.user.post_update_count, post_versions_path(:search => {:updater_id => @change_request.user.id}) %></li>
+        <li>Notes: <%= link_to @change_request.user.note_update_count, note_versions_path(:search => {:updater_id => @change_request.user.id}) %></li>
+        <li>Favorites: <%= @change_request.user.favorite_count %></li>
+      </ul>
+    </section>
+
     <section>
       <h2>Options</h2>
       <%= form_tag(approve_user_name_change_request_path(@change_request)) do %>
