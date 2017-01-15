@@ -1,6 +1,7 @@
 class UserNameChangeRequestsController < ApplicationController
-  before_filter :gold_only, :only => [:new, :create, :show]
-  before_filter :admin_only, :only => [:index, :approve, :reject]
+  before_filter :member_only, :only => [:index, :show]
+  before_filter :gold_only, :only => [:new, :create]
+  before_filter :admin_only, :only => [:approve, :reject]
   rescue_from User::PrivilegeError, :with => :access_denied
 
   def new
@@ -29,7 +30,7 @@ class UserNameChangeRequestsController < ApplicationController
   end
   
   def index
-    @change_requests = UserNameChangeRequest.order("id desc").paginate(params[:page], :limit => params[:limit])
+    @change_requests = UserNameChangeRequest.visible.order("id desc").paginate(params[:page], :limit => params[:limit])
   end
   
   def approve
