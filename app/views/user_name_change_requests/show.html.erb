@@ -1,14 +1,45 @@
 <div id="c-user-name-change-requests">
   <h1>Name Change Request</h1>
-  
-  <section>
-    <p><%= @change_request.original_name %> is requesting to change their name to <%= @change_request.desired_name %>.</p>
-  </section>
-  
-  <section>
-    <h2>Reason</h2>
-    <p><%= @change_request.change_reason %></p>
-  </section>
+
+  <table class="aligned-vertical">
+    <tbody>
+      <tr>
+        <th>Date</th>
+        <td>
+          <%= compact_time @change_request.created_at %>
+          <% if @change_request.updated_at - @change_request.created_at > 5.minutes %>
+            (updated <%= time_ago_in_words_tagged @change_request.updated_at %>)
+          <% end %>
+        </td>
+      </tr>
+      <tr>
+        <th>User</th>
+        <td><%= link_to_user @change_request.user %></td>
+      </tr>
+      <tr>
+        <th>Request</th>
+        <td>
+          <strong><%= @change_request.original_name %></strong> ->
+          <strong><%= @change_request.desired_name %></strong>
+        </td>
+      </tr>
+      <tr>
+        <th>Reason</th>
+        <td><%= @change_request.change_reason %></td>
+      </tr>
+      <tr>
+        <th>Status</th>
+        <td>
+          <%= @change_request.status %>
+          <% if @change_request.approved? %>
+            by <%= link_to_user @change_request.approver %>
+          <% elsif @change_request.rejected? %>
+            for reason: <%= link_to @change_request.rejection_reason %>
+          <% end %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
   <section>
     <h2>Feedback</h2>
@@ -16,7 +47,7 @@
       <% @change_request.feedback.each do |feedback| %>
         <li class="feedback-category-<%= feedback.category %>">
           <p><%= feedback.body %></p>
-          <p class="author">Submitted by <%= feedback.creator.name %> <%= time_ago_in_words_tagged feedback.created_at %></p>
+          <p class="author">Submitted by <%= link_to_user feedback.creator.name %> <%= time_ago_in_words_tagged feedback.created_at %></p>
         </li>
       <% end %>
     </ul>
@@ -33,17 +64,7 @@
     </ul>
   </section>
   
-  <% if @change_request.rejected? %>
-    <section>
-      <h2>Request was rejected</h2>
-    </section>
-  
-  <% elsif @change_request.approved? && @change_request.approver %>
-    <section>
-      <h2>Request was approved by <%= @change_request.approver.name %></h2>
-    </section>
-  
-  <% elsif CurrentUser.user.is_admin? %>
+  <% if @change_request.pending? && CurrentUser.user.is_admin? %>
     <section>
       <h2>Options</h2>
       <%= form_tag(approve_user_name_change_request_path(@change_request)) do %>
@@ -69,4 +90,3 @@
     <% end %>
   </section>
 </div>
-
