@@ -3,6 +3,7 @@ class UserNameChangeRequestsController < ApplicationController
   before_filter :gold_only, :only => [:new, :create]
   before_filter :admin_only, :only => [:approve, :reject]
   rescue_from User::PrivilegeError, :with => :access_denied
+  respond_to :html, :json, :xml
 
   def new
   end
@@ -27,10 +28,12 @@ class UserNameChangeRequestsController < ApplicationController
   def show
     @change_request = UserNameChangeRequest.find(params[:id])
     check_privileges!(@change_request)
+    respond_with(@change_request)
   end
   
   def index
     @change_requests = UserNameChangeRequest.visible.order("id desc").paginate(params[:page], :limit => params[:limit])
+    respond_with(@change_requests)
   end
   
   def approve
