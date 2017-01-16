@@ -163,7 +163,7 @@ list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
 
 inline := |*
   post_id => {
-    append(sm, true, "<a href=\"/posts/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-post-id-link\" href=\"/posts/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "post #");
@@ -172,7 +172,7 @@ inline := |*
   };
 
   forum_post_id => {
-    append(sm, true, "<a href=\"/forum_posts/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-forum-post-id-link\" href=\"/forum_posts/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "forum #");
@@ -181,7 +181,7 @@ inline := |*
   };
 
   forum_topic_id => {
-    append(sm, true, "<a href=\"/forum_topics/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "topic #");
@@ -190,7 +190,7 @@ inline := |*
   };
 
   forum_topic_paged_id => {
-    append(sm, true, "<a href=\"/forum_topics/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "?page=");
     append_segment(sm, true, sm->b1, sm->b2 - 1);
@@ -203,7 +203,7 @@ inline := |*
   };
 
   comment_id => {
-    append(sm, true, "<a href=\"/comments/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-comment-id-link\" href=\"/comments/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "comment #");
@@ -212,7 +212,7 @@ inline := |*
   };
 
   pool_id => {
-    append(sm, true, "<a href=\"/pools/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-pool-id-link\" href=\"/pools/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "pool #");
@@ -221,7 +221,7 @@ inline := |*
   };
 
   user_id => {
-    append(sm, true, "<a href=\"/users/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-user-id-link\" href=\"/users/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "user #");
@@ -230,7 +230,7 @@ inline := |*
   };
 
   artist_id => {
-    append(sm, true, "<a href=\"/artists/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-artist-id-link\" href=\"/artists/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "artist #");
@@ -239,7 +239,7 @@ inline := |*
   };
 
   github_issue_id => {
-    append(sm, true, "<a href=\"https://github.com/r888888888/danbooru/issues/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-github-id-link\" href=\"https://github.com/r888888888/danbooru/issues/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "issue #");
@@ -248,7 +248,7 @@ inline := |*
   };
 
   pixiv_id => {
-    append(sm, true, "<a href=\"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "pixiv #");
@@ -257,7 +257,7 @@ inline := |*
   };
 
   pixiv_paged_id => {
-    append(sm, true, "<a href=\"http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "&page=");
     append_segment(sm, true, sm->b1, sm->b2 - 1);
@@ -270,7 +270,7 @@ inline := |*
   };
 
   post_link => {
-    append(sm, true, "<a rel=\"nofollow\" href=\"/posts?tags=");
+    append(sm, true, "<a rel=\"nofollow\" class=\"dtext-link dtext-post-search-link\" href=\"/posts?tags=");
     append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
@@ -288,7 +288,7 @@ inline := |*
       lowercase_segment = g_string_new(g_ascii_strdown(segment->str, -1));
     }
 
-    append(sm, true, "<a href=\"/wiki_pages/show_or_new?title=");
+    append(sm, true, "<a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/show_or_new?title=");
     append_segment_uri_escaped(sm, lowercase_segment->str, lowercase_segment->str + lowercase_segment->len - 1);
     append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
@@ -309,7 +309,7 @@ inline := |*
       lowercase_segment = g_string_new(g_ascii_strdown(segment->str, -1));
     }
 
-    append(sm, true, "<a href=\"/wiki_pages/show_or_new?title=");
+    append(sm, true, "<a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/show_or_new?title=");
     append_segment_uri_escaped(sm, lowercase_segment->str, lowercase_segment->str + lowercase_segment->len - 1);
     append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - 1);
@@ -328,7 +328,7 @@ inline := |*
       sm->b = false;
     }
 
-    append(sm, true, "<a href=\"");
+    append(sm, true, "<a class=\"dtext-link dtext-external-link\" href=\"");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - sm->d);
     append(sm, true, "\">");
     link_content_sm = parse_helper(sm->a1, sm->a2 - sm->a1, false, true, false);
@@ -343,7 +343,7 @@ inline := |*
   };
 
   bracketed_textile_link => {
-    append(sm, true, "<a href=\"");
+    append(sm, true, "<a class=\"dtext-link dtext-external-link\" href=\"");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - 1);
     append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);

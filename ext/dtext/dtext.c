@@ -2912,7 +2912,7 @@ f64:
 f41:
 #line 272 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
-    append(sm, true, "<a rel=\"nofollow\" href=\"/posts?tags=");
+    append(sm, true, "<a rel=\"nofollow\" class=\"dtext-link dtext-post-search-link\" href=\"/posts?tags=");
     append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
@@ -2932,7 +2932,7 @@ f38:
       lowercase_segment = g_string_new(g_ascii_strdown(segment->str, -1));
     }
 
-    append(sm, true, "<a href=\"/wiki_pages/show_or_new?title=");
+    append(sm, true, "<a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/show_or_new?title=");
     append_segment_uri_escaped(sm, lowercase_segment->str, lowercase_segment->str + lowercase_segment->len - 1);
     append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
@@ -2955,7 +2955,7 @@ f39:
       lowercase_segment = g_string_new(g_ascii_strdown(segment->str, -1));
     }
 
-    append(sm, true, "<a href=\"/wiki_pages/show_or_new?title=");
+    append(sm, true, "<a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/show_or_new?title=");
     append_segment_uri_escaped(sm, lowercase_segment->str, lowercase_segment->str + lowercase_segment->len - 1);
     append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - 1);
@@ -3268,7 +3268,7 @@ f83:
 f19:
 #line 183 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
-    append(sm, true, "<a href=\"/forum_topics/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "topic #");
@@ -3279,7 +3279,7 @@ f19:
 f18:
 #line 250 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
-    append(sm, true, "<a href=\"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "pixiv #");
@@ -3321,7 +3321,7 @@ f10:
       sm->b = false;
     }
 
-    append(sm, true, "<a href=\"");
+    append(sm, true, "<a class=\"dtext-link dtext-external-link\" href=\"");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - sm->d);
     append(sm, true, "\">");
     link_content_sm = parse_helper(sm->a1, sm->a2 - sm->a1, false, true, false);
@@ -4071,7 +4071,7 @@ f96:
 }
 #line 165 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
-    append(sm, true, "<a href=\"/posts/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-post-id-link\" href=\"/posts/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "post #");
@@ -4086,7 +4086,7 @@ f91:
 }
 #line 174 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
-    append(sm, true, "<a href=\"/forum_posts/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-forum-post-id-link\" href=\"/forum_posts/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "forum #");
@@ -4101,7 +4101,7 @@ f97:
 }
 #line 183 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
-    append(sm, true, "<a href=\"/forum_topics/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "topic #");
@@ -4116,7 +4116,7 @@ f90:
 }
 #line 205 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
-    append(sm, true, "<a href=\"/comments/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-comment-id-link\" href=\"/comments/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "comment #");
@@ -4131,7 +4131,7 @@ f95:
 }
 #line 214 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
-    append(sm, true, "<a href=\"/pools/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-pool-id-link\" href=\"/pools/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "pool #");
@@ -4146,7 +4146,7 @@ f99:
 }
 #line 223 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
-    append(sm, true, "<a href=\"/users/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-user-id-link\" href=\"/users/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "user #");
@@ -4161,7 +4161,7 @@ f89:
 }
 #line 232 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
-    append(sm, true, "<a href=\"/artists/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-artist-id-link\" href=\"/artists/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "artist #");
@@ -4176,7 +4176,7 @@ f92:
 }
 #line 241 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
-    append(sm, true, "<a href=\"https://github.com/r888888888/danbooru/issues/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-github-id-link\" href=\"https://github.com/r888888888/danbooru/issues/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "issue #");
@@ -4191,7 +4191,7 @@ f93:
 }
 #line 250 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
-    append(sm, true, "<a href=\"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "pixiv #");
@@ -4250,7 +4250,7 @@ f86:
       sm->b = false;
     }
 
-    append(sm, true, "<a href=\"");
+    append(sm, true, "<a class=\"dtext-link dtext-external-link\" href=\"");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - sm->d);
     append(sm, true, "\">");
     link_content_sm = parse_helper(sm->a1, sm->a2 - sm->a1, false, true, false);
@@ -4361,7 +4361,7 @@ f15:
 }
 #line 345 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
-    append(sm, true, "<a href=\"");
+    append(sm, true, "<a class=\"dtext-link dtext-external-link\" href=\"");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - 1);
     append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
@@ -4375,7 +4375,7 @@ f98:
 }
 #line 192 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
-    append(sm, true, "<a href=\"/forum_topics/");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "?page=");
     append_segment(sm, true, sm->b1, sm->b2 - 1);
@@ -4394,7 +4394,7 @@ f94:
 }
 #line 259 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
-    append(sm, true, "<a href=\"http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=");
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "&page=");
     append_segment(sm, true, sm->b1, sm->b2 - 1);
@@ -4421,7 +4421,7 @@ f84:
       sm->b = false;
     }
 
-    append(sm, true, "<a href=\"");
+    append(sm, true, "<a class=\"dtext-link dtext-external-link\" href=\"");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - sm->d);
     append(sm, true, "\">");
     link_content_sm = parse_helper(sm->a1, sm->a2 - sm->a1, false, true, false);

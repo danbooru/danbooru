@@ -32,11 +32,11 @@ class DTextTest < Minitest::Test
   end
 
   def test_wiki_links
-    assert_parse("<p>a <a href=\"/wiki_pages/show_or_new?title=b\">b</a> c</p>", "a [[b]] c")
+    assert_parse("<p>a <a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/show_or_new?title=b\">b</a> c</p>", "a [[b]] c")
   end
 
   def test_wiki_links_spoiler
-    assert_parse("<p>a <a href=\"/wiki_pages/show_or_new?title=spoiler\">spoiler</a> c</p>", "a [[spoiler]] c")
+    assert_parse("<p>a <a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/show_or_new?title=spoiler\">spoiler</a> c</p>", "a [[spoiler]] c")
   end
 
   def test_wiki_links_edge
@@ -160,25 +160,25 @@ class DTextTest < Minitest::Test
   end
 
   def test_old_style_links
-    assert_parse('<p><a href="http://test.com">test</a></p>', '"test":http://test.com')
+    assert_parse('<p><a class="dtext-link dtext-external-link" href="http://test.com">test</a></p>', '"test":http://test.com')
   end
 
   def test_old_style_links_with_inline_tags
-    assert_parse('<p><a href="http://test.com"><em>test</em></a></p>', '"[i]test[/i]":http://test.com')
+    assert_parse('<p><a class="dtext-link dtext-external-link" href="http://test.com"><em>test</em></a></p>', '"[i]test[/i]":http://test.com')
   end
 
   def test_old_style_links_with_special_entities
-    assert_parse('<p>&quot;1&quot; <a href="http://three.com">2 &amp; 3</a></p>', '"1" "2 & 3":http://three.com')
+    assert_parse('<p>&quot;1&quot; <a class="dtext-link dtext-external-link" href="http://three.com">2 &amp; 3</a></p>', '"1" "2 & 3":http://three.com')
   end
 
   def test_new_style_links
-    assert_parse('<p><a href="http://test.com">test</a></p>', '"test":[http://test.com]')
+    assert_parse('<p><a class="dtext-link dtext-external-link" href="http://test.com">test</a></p>', '"test":[http://test.com]')
   end
 
   def test_new_style_links_with_parentheses
-    assert_parse('<p><a href="http://test.com/(parentheses)">test</a></p>', '"test":[http://test.com/(parentheses)]')
-    assert_parse('<p>(<a href="http://test.com/(parentheses)">test</a>)</p>', '("test":[http://test.com/(parentheses)])')
-    assert_parse('<p>[<a href="http://test.com/(parentheses)">test</a>]</p>', '["test":[http://test.com/(parentheses)]]')
+    assert_parse('<p><a class="dtext-link dtext-external-link" href="http://test.com/(parentheses)">test</a></p>', '"test":[http://test.com/(parentheses)]')
+    assert_parse('<p>(<a class="dtext-link dtext-external-link" href="http://test.com/(parentheses)">test</a>)</p>', '("test":[http://test.com/(parentheses)])')
+    assert_parse('<p>[<a class="dtext-link dtext-external-link" href="http://test.com/(parentheses)">test</a>]</p>', '["test":[http://test.com/(parentheses)]]')
   end
 
   def test_lists_1
@@ -194,7 +194,7 @@ class DTextTest < Minitest::Test
   end
 
   def test_lists_inline
-    assert_parse('<ul><li><a href="/posts/1">post #1</a></li></ul>', "* post #1")
+    assert_parse('<ul><li><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1">post #1</a></li></ul>', "* post #1")
   end
 
   def test_lists_not_preceded_by_newline
@@ -207,15 +207,15 @@ class DTextTest < Minitest::Test
   end
 
   def test_inline_tags
-    assert_parse('<p><a rel="nofollow" href="/posts?tags=tag">tag</a></p>', "{{tag}}")
+    assert_parse('<p><a rel="nofollow" class="dtext-link dtext-post-search-link" href="/posts?tags=tag">tag</a></p>', "{{tag}}")
   end
 
   def test_inline_tags_conjunction
-    assert_parse('<p><a rel="nofollow" href="/posts?tags=tag1%20tag2">tag1 tag2</a></p>', "{{tag1 tag2}}")
+    assert_parse('<p><a rel="nofollow" class="dtext-link dtext-post-search-link" href="/posts?tags=tag1%20tag2">tag1 tag2</a></p>', "{{tag1 tag2}}")
   end
 
   def test_inline_tags_special_entities
-    assert_parse('<p><a rel="nofollow" href="/posts?tags=%3C3">&lt;3</a></p>', "{{<3}}")
+    assert_parse('<p><a rel="nofollow" class="dtext-link dtext-post-search-link" href="/posts?tags=%3C3">&lt;3</a></p>', "{{<3}}")
   end
 
   def test_extra_newlines
@@ -223,23 +223,23 @@ class DTextTest < Minitest::Test
   end
 
   def test_complex_links_1
-    assert_parse("<p><a href=\"/wiki_pages/show_or_new?title=1\">2 3</a> | <a href=\"/wiki_pages/show_or_new?title=4\">5 6</a></p>", "[[1|2 3]] | [[4|5 6]]")
+    assert_parse("<p><a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/show_or_new?title=1\">2 3</a> | <a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/show_or_new?title=4\">5 6</a></p>", "[[1|2 3]] | [[4|5 6]]")
   end
 
   def test_complex_links_2
-    assert_parse("<p>Tags <strong>(<a href=\"/wiki_pages/show_or_new?title=howto%3Atag\">Tagging Guidelines</a> | <a href=\"/wiki_pages/show_or_new?title=howto%3Atag_checklist\">Tag Checklist</a> | <a href=\"/wiki_pages/show_or_new?title=tag_groups\">Tag Groups</a>)</strong></p>", "Tags [b]([[howto:tag|Tagging Guidelines]] | [[howto:tag_checklist|Tag Checklist]] | [[Tag Groups]])[/b]")
+    assert_parse("<p>Tags <strong>(<a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/show_or_new?title=howto%3Atag\">Tagging Guidelines</a> | <a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/show_or_new?title=howto%3Atag_checklist\">Tag Checklist</a> | <a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/show_or_new?title=tag_groups\">Tag Groups</a>)</strong></p>", "Tags [b]([[howto:tag|Tagging Guidelines]] | [[howto:tag_checklist|Tag Checklist]] | [[Tag Groups]])[/b]")
   end
 
   def test_table
-    assert_parse("<table class=\"striped\"><thead><tr><th>header</th></tr></thead><tbody><tr><td><a href=\"/posts/100\">post #100</a></td></tr></tbody></table>", "[table][thead][tr][th]header[/th][/tr][/thead][tbody][tr][td]post #100[/td][/tr][/tbody][/table]")
+    assert_parse("<table class=\"striped\"><thead><tr><th>header</th></tr></thead><tbody><tr><td><a class=\"dtext-link dtext-id-link dtext-post-id-link\" href=\"/posts/100\">post #100</a></td></tr></tbody></table>", "[table][thead][tr][th]header[/th][/tr][/thead][tbody][tr][td]post #100[/td][/tr][/tbody][/table]")
   end
 
   def test_table_with_newlines
-    assert_parse("<table class=\"striped\"><thead><tr><th>header</th></tr></thead><tbody><tr><td><a href=\"/posts/100\">post #100</a></td></tr></tbody></table>", "[table]\n[thead]\n[tr]\n[th]header[/th][/tr][/thead][tbody][tr][td]post #100[/td][/tr][/tbody][/table]")
+    assert_parse("<table class=\"striped\"><thead><tr><th>header</th></tr></thead><tbody><tr><td><a class=\"dtext-link dtext-id-link dtext-post-id-link\" href=\"/posts/100\">post #100</a></td></tr></tbody></table>", "[table]\n[thead]\n[tr]\n[th]header[/th][/tr][/thead][tbody][tr][td]post #100[/td][/tr][/tbody][/table]")
   end
 
   def test_forum_links
-    assert_parse('<p><a href="/forum_topics/1234?page=4">topic #1234/p4</a></p>', "topic #1234/p4")
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-forum-topic-id-link" href="/forum_topics/1234?page=4">topic #1234/p4</a></p>', "topic #1234/p4")
   end
 
   def test_boundary_exploit
@@ -281,8 +281,8 @@ class DTextTest < Minitest::Test
   end
 
   def test_utf8_links
-    assert_parse('<p><a href="/posts?tags=approver:葉月">7893</a></p>', '"7893":/posts?tags=approver:葉月')
-    assert_parse('<p><a href="/posts?tags=approver:葉月">7893</a></p>', '"7893":[/posts?tags=approver:葉月]')
+    assert_parse('<p><a class="dtext-link dtext-external-link" href="/posts?tags=approver:葉月">7893</a></p>', '"7893":/posts?tags=approver:葉月')
+    assert_parse('<p><a class="dtext-link dtext-external-link" href="/posts?tags=approver:葉月">7893</a></p>', '"7893":[/posts?tags=approver:葉月]')
     assert_parse('<p><a href="http://danbooru.donmai.us/posts?tags=approver:葉月">http://danbooru.donmai.us/posts?tags=approver:葉月</a></p>', 'http://danbooru.donmai.us/posts?tags=approver:葉月')
   end
 
