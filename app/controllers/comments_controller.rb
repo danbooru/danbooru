@@ -70,13 +70,6 @@ class CommentsController < ApplicationController
     end
   end
 
-  def unvote
-    @comment = Comment.find(params[:id])
-    @comment.unvote!
-  rescue CommentVote::Error => x
-    @error = x
-  end
-
 private
   def index_for_post
     @post = Post.find(params[:post_id])

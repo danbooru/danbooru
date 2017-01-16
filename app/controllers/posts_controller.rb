@@ -83,13 +83,6 @@ class PostsController < ApplicationController
     end
   end
 
-  def unvote
-    @post = Post.find(params[:id])
-    @post.unvote!
-  rescue PostVote::Error => x
-    @error = x
-  end
-
   def home
     if CurrentUser.user.is_anonymous?
       redirect_to intro_explore_posts_path

@@ -99,12 +99,11 @@ Rails.application.routes.draw do
     end
   end
   resources :comments do
-    resources :votes, :controller => "comment_votes", :only => [:create, :destroy]
+    resource :votes, :controller => "comment_votes", :only => [:create, :destroy]
     collection do
       get :search
     end
     member do
-      put :unvote
       post :undelete
     end
   end
@@ -196,7 +195,7 @@ Rails.application.routes.draw do
       collection { put :create_or_update }
       member { put :revert }
     end
-    resources :votes, :controller => "post_votes", :only => [:create, :destroy]
+    resource :votes, :controller => "post_votes", :only => [:create, :destroy]
     collection do
       get :home
       get :random
@@ -205,7 +204,6 @@ Rails.application.routes.draw do
       put :revert
       put :copy_notes
       get :show_seq
-      put :unvote
       put :mark_as_translated
     end
   end

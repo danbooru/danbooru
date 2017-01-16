@@ -13,7 +13,7 @@ class CommentVotesController < ApplicationController
 
   def destroy
     @comment = Comment.find(params[:comment_id])
-    @comment.unvote!(params[:score])
+    @comment.unvote!
   rescue CommentVote::Error => x
     @error = x
     render status: 500

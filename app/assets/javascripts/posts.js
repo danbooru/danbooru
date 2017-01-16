@@ -480,14 +480,6 @@
     Danbooru.Post.initialize_title_for($post);
   }
 
-  Danbooru.Post.vote = function(score, id) {
-    Danbooru.notice("Voting...");
-
-    $.post("/posts/" + id + "/votes.js", {
-       score: score
-    });
-  }
-
   Danbooru.Post.update = function(post_id, params) {
     Danbooru.Post.notice_update("inc");
 
