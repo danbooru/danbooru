@@ -497,43 +497,6 @@ inline := |*
     }
   };
 
-  # these are block level elements that should kick us out of the inline
-  # scanner
-  header => {
-    dstack_rewind(sm);
-    fexec sm->a1 - 1;
-    fret;
-  };
-
-  header_with_id => {
-    dstack_rewind(sm);
-    fexec sm->a1 - 1;
-    fret;
-  };
-
-  '[quote]'i => {
-    g_debug("inline [quote]");
-    dstack_close_before_block(sm);
-    fexec sm->ts;
-    fret;
-  };
-
-  '[/quote]'i space* => {
-    g_debug("inline [/quote]");
-    dstack_close_before_block(sm);
-
-    if (dstack_check(sm, BLOCK_LI)) {
-      dstack_close_list(sm);
-    }
-
-    if (dstack_check(sm, BLOCK_QUOTE)) {
-      dstack_rewind(sm);
-      fret;
-    } else {
-      append_block(sm, "[/quote]");
-    }
-  };
-
   spoilers_open => {
     g_debug("inline [spoiler]");
     g_debug("  push <span>");
@@ -562,6 +525,38 @@ inline := |*
     }
   };
 
+  '[nodtext]'i => {
+    dstack_push(sm, &INLINE_NODTEXT);
+    g_debug("push inline nodtext");
+    fcall nodtext;
+  };
+  
+  # these are block level elements that should kick us out of the inline
+  # scanner
+
+  '[quote]'i => {
+    g_debug("inline [quote]");
+    dstack_close_before_block(sm);
+    fexec sm->ts;
+    fret;
+  };
+
+  '[/quote]'i space* => {
+    g_debug("inline [/quote]");
+    dstack_close_before_block(sm);
+
+    if (dstack_check(sm, BLOCK_LI)) {
+      dstack_close_list(sm);
+    }
+
+    if (dstack_check(sm, BLOCK_QUOTE)) {
+      dstack_rewind(sm);
+      fret;
+    } else {
+      append_block(sm, "[/quote]");
+    }
+  };
+
   '[expand]'i => {
     g_debug("inline [expand]");
     dstack_rewind(sm);
@@ -579,12 +574,6 @@ inline := |*
     } else {
       append_block(sm, "[/expand]");
     }
-  };
-
-  '[nodtext]'i => {
-    dstack_push(sm, &INLINE_NODTEXT);
-    g_debug("push inline nodtext");
-    fcall nodtext;
   };
 
   '[/th]'i => {
