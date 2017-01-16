@@ -25,4 +25,8 @@ class UserRevert
       x.undo!
     end
   end
+
+  def self.can_revert?(user)
+    user.post_update_count <= THRESHOLD
+  end
 end
