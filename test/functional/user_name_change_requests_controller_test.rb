@@ -61,13 +61,6 @@ class UserNameChangeRequestsControllerTest < ActionController::TestCase
           assert_redirected_to(user_name_change_request_path(@change_request))
         end
       end
-      
-      context "destroy action" do
-        should "destroy" do
-          post :destroy, {:id => @change_request.id}, {:user_id => @admin.id}
-          assert_redirected_to(user_name_change_requests_path)
-        end
-      end
     end
   end
 end
