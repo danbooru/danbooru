@@ -10,7 +10,7 @@ class IpBan < ActiveRecord::Base
     ModAction.log("#{CurrentUser.name} created ip ban for #{rec.ip_addr}")
   end
   after_destroy do |rec|
-    ModAction.log("#{CurrentUser.name} deleted ip ban for ##{rec.ip_addr}")
+    ModAction.log("#{CurrentUser.name} deleted ip ban for #{rec.ip_addr}")
   end
 
   def self.is_banned?(ip_addr)
