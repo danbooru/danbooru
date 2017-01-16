@@ -83,7 +83,7 @@ module Sources
       end
 
       def tags
-        @tags.uniq || []
+        (@tags || []).uniq
       end
 
       # Should be set to a url for sites that prevent hotlinking, or left nil for sites that don't.
