@@ -68,6 +68,7 @@ class User < ActiveRecord::Base
   validate :validate_ip_addr_is_not_banned, :on => :create
   before_validation :normalize_blacklisted_tags
   before_validation :set_per_page
+  before_validation :normalize_email
   before_create :encrypt_password_on_create
   before_update :encrypt_password_on_update
   before_create :initialize_default_boolean_attributes
@@ -457,6 +458,10 @@ class User < ActiveRecord::Base
       else
         raise User::Error.new("Verification key does not match")
       end
+    end
+
+    def normalize_email
+      self.email = nil if email.blank?
     end
   end
 
