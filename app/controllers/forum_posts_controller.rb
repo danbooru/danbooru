@@ -10,6 +10,10 @@ class ForumPostsController < ApplicationController
       @forum_topic = ForumTopic.find(params[:topic_id]) 
       raise User::PrivilegeError.new unless @forum_topic.visible?(CurrentUser.user)
     end
+    if params[:post_id]
+      quoted_post = ForumPost.find(params[:post_id])
+      raise User::PrivilegeError.new unless quoted_post.topic.visible?(CurrentUser.user)
+    end
     @forum_post = ForumPost.new_reply(params)
     respond_with(@forum_post)
   end
