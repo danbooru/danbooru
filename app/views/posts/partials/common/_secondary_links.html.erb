@@ -1,24 +1,24 @@
 <% content_for(:secondary_links) do %>
   <menu>
     <li><%= link_to "Listing", posts_path %></li>
-    <li class="nonessential"><%= link_to "Upload", new_upload_path %></li>
-    <li><%= link_to "Popular", popular_explore_posts_path %></li>
-    <li><%= link_to "Hot", posts_path(:tags => "order:rank") %></li>
+    <li id="secondary-links-posts-upload" class="nonessential"><%= link_to "Upload", new_upload_path %></li>
+    <li id="secondary-links-posts-popular"><%= link_to "Popular", popular_explore_posts_path %></li>
+    <li id="secondary-links-posts-hot"><%= link_to "Hot", posts_path(:tags => "order:rank") %></li>
     <% if Danbooru.config.reportbooru_server %>
-      <li><%= link_to "Searches", searches_explore_posts_path %></li>
+      <li id="secondary-links-posts-searches"><%= link_to "Searches", searches_explore_posts_path %></li>
     <% end %>
     <% unless CurrentUser.is_anonymous? %>
-      <li><%= link_to "Favorites", favorites_path %></li>
-      <li><%= link_to "Favorite groups", favorite_groups_path %></li>
+      <li id="secondary-links-posts-favorites"><%= link_to "Favorites", favorites_path %></li>
+      <li id="secondary-links-posts-favorite-groups"><%= link_to "Favorite groups", favorite_groups_path %></li>
       <% if CurrentUser.has_saved_searches? %>
-        <li><%= link_to "Saved searches", posts_path(:tags => "search:all") %></li>
+        <li id="secondary-links-posts-saved-searches"><%= link_to "Saved searches", posts_path(:tags => "search:all") %></li>
       <% end %>
-      <li><%= link_to "Subscriptions", posts_path(:tags => "sub:#{CurrentUser.name}") %></li>
+      <li id="secondary-links-posts-subscriptions"><%= link_to "Subscriptions", posts_path(:tags => "sub:#{CurrentUser.name}") %></li>
     <% end %>
-    <li class="nonessential"><%= link_to "Changes", post_versions_path %></li>
+    <li id="secondary-links-posts-changes" class="nonessential"><%= link_to "Changes", post_versions_path %></li>
     <% if CurrentUser.can_approve_posts? %>
-      <li class="nonessential"><%= link_to "Moderate", moderator_post_queue_path %></li>
+      <li id="secondary-links-posts-moderate" class="nonessential"><%= link_to "Moderate", moderator_post_queue_path %></li>
     <% end %>
-    <li class="nonessential"><%= link_to "Help", wiki_pages_path(:title => "help:posts") %></li>
+    <li id="secondary-links-posts-help" class="nonessential"><%= link_to "Help", wiki_pages_path(:title => "help:posts") %></li>
   </menu>
 <% end %>
