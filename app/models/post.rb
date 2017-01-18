@@ -1579,6 +1579,20 @@ class Post < ActiveRecord::Base
   end
 
   module SearchMethods
+    # returns one single post
+    def random
+      key = Digest::MD5.hexdigest(Time.now.to_f.to_s)
+      random_up(key) || random_down(key)
+    end
+
+    def random_up(key)
+      where("md5 < ?", key).reorder("md5 desc").first
+    end
+
+    def random_down(key)
+      where("md5 >= ?", key).reorder("md5 asc").first
+    end
+
     def pending
       where("is_pending = ?", true)
     end

@@ -93,7 +93,7 @@ class PostsController < ApplicationController
 
   def random
     count = Post.fast_count(params[:tags], :statement_timeout => CurrentUser.user.statement_timeout)
-    @post = Post.tag_match(params[:tags]).reorder("").offset(rand(count)).first
+    @post = Post.tag_match(params[:tags]).random
     raise ActiveRecord::RecordNotFound if @post.nil?
     respond_with(@post) do |format|
       format.html { redirect_to post_path(@post, :tags => params[:tags]) }

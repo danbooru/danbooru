@@ -7073,6 +7073,13 @@ CREATE UNIQUE INDEX index_users_on_name ON users USING btree (lower((name)::text
 
 
 --
+-- Name: index_users_on_name_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_name_trgm ON users USING gin (lower((name)::text) gin_trgm_ops);
+
+
+--
 -- Name: index_wiki_page_versions_on_updater_ip_addr; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7440,4 +7447,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170106012138');
 INSERT INTO schema_migrations (version) VALUES ('20170112021922');
 
 INSERT INTO schema_migrations (version) VALUES ('20170112060921');
+
+INSERT INTO schema_migrations (version) VALUES ('20170117233040');
 

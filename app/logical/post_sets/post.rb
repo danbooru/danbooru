@@ -91,29 +91,9 @@ module PostSets
     end
 
     def get_random_posts
-      if unknown_post_count?
-        chance = 0.01
-      elsif post_count == 0
-        chance = 1
-      else
-        chance = per_page / post_count.to_f
-      end
-
-      temp = []
-      temp += ::Post.tag_match(tag_string).where("random() < ?", chance).reorder("").limit(per_page)
-
-      3.times do
-        missing = per_page - temp.length
-        if missing >= 1
-          q = ::Post.tag_match(tag_string).where("random() < ?", chance*2).reorder("").limit(missing)
-          unless temp.empty?
-            q = q.where("id not in (?)", temp.map(&:id))
-          end
-          temp += q
-        end
-      end
-
-      temp
+      per_page.times.inject([]) do |all, x|
+        all << ::Post.tag_match(tag_string).random
+      end.compact.uniq
     end
 
     def posts
