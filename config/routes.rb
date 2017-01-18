@@ -372,9 +372,10 @@ Rails.application.routes.draw do
   get "/pool/history/:id" => redirect("/pool_versions?search[pool_id]=%{id}")
   get "/pool/recent_changes" => redirect("/pool_versions")
 
-  get "/post/index.xml" => redirect {|params, req| "/posts.xml?tags=#{CGI::escape(req.params[:tags].to_s)}"}
-  get "/post/index.json" => redirect {|params, req| "/posts.json?tags=#{CGI::escape(req.params[:tags].to_s)}"}
+  get "/post/index.xml", :controller => "legacy", :action => "posts", :format => "xml"
+  get "/post/index.json", :controller => "legacy", :action => "posts", :format => "json"
   get "/post/create.xml", :controller => "legacy", :action => "create_post", :format => "xml"
+  get "/post/piclens", :controller => "legacy", :action => "unavailable"
   get "/post/index" => redirect {|params, req| "/posts?tags=#{CGI::escape(req.params[:tags].to_s)}&page=#{req.params[:page]}"}
   get "/post" => redirect {|params, req| "/posts?tags=#{CGI::escape(req.params[:tags].to_s)}&page=#{req.params[:page]}"}
   get "/post/upload" => redirect("/uploads/new")
