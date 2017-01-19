@@ -1,4 +1,7 @@
 class PoolArchive < ActiveRecord::Base
+
+  belongs_to :updater, :class_name => "User"
+
   def self.enabled?
     Danbooru.config.aws_sqs_archives_url.present?
   end
