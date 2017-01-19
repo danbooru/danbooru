@@ -729,6 +729,16 @@ class User < ActiveRecord::Base
       where("level = ?", Levels::ADMIN)
     end
 
+    # UserDeletion#rename renames deleted users to `user_<1234>~`. Tildes
+    # are appended if the username is taken.
+    def deleted
+      where("name ~ 'user_[0-9]+~*'")
+    end
+
+    def undeleted
+      where("name !~ 'user_[0-9]+~*'")
+    end
+
     def with_email(email)
       if email.blank?
         where("FALSE")

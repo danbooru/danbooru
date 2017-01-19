@@ -34,6 +34,15 @@ class UserFeedback < ActiveRecord::Base
       where("user_id = ?", user_id)
     end
 
+    def visible(viewer = CurrentUser.user)
+      if viewer.is_admin?
+        all
+      else
+        # joins(:user).merge(User.undeleted).or(where("body !~ 'Name changed from [^\s:]+ to [^\s:]+'"))
+        joins(:user).where.not("users.name ~ 'user_[0-9]+~*' AND user_feedback.body ~ 'Name changed from [^\s:]+ to [^\s:]+'")
+      end
+    end
+
     def search(params)
       q = where("true")
       return q if params.blank?

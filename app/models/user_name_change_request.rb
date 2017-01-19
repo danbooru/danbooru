@@ -19,11 +19,11 @@ class UserNameChangeRequest < ActiveRecord::Base
     where(:status => "approved")
   end
 
-  def self.visible
-    if CurrentUser.is_admin?
+  def self.visible(viewer = CurrentUser.user)
+    if viewer.is_admin?
       all
-    elsif CurrentUser.is_member?
-      where("user_name_change_requests.status = 'approved' OR user_name_change_requests.user_id = ?", CurrentUser.id)
+    elsif viewer.is_member?
+      joins(:user).merge(User.undeleted).where("user_name_change_requests.status = 'approved' OR user_name_change_requests.user_id = ?", viewer.id)
     else
       none
     end
