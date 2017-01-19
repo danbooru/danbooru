@@ -1,6 +1,8 @@
 <h1>Name Change Request</h1>
 
-<p>You can request a name change but it must be approved. Factors that go into consideration include your upload and update history, and your user feedback.</p>
+<p>You can request a name change once per week. Your previous names will still
+be visible on your profile to other Danbooru members, but they won't be visible
+to search engines.</p>
 
 <%= error_messages_for "change_request" %>
 
@@ -8,11 +10,6 @@
   <div class="input">
     <label for="desired_name">Desired Name</label>
     <%= text_field_tag "desired_name" %>
-  </div>
-
-  <div class="input">
-    <label for="desired_name">Reason</label>
-    <%= text_field_tag "reason" %>
   </div>
   
   <div class="input">
