@@ -89,4 +89,12 @@ class UserNameChangeRequest < ActiveRecord::Base
       return true
     end
   end
+
+  def hidden_attributes
+    if CurrentUser.is_admin? || user == CurrentUser.user
+      []
+    else
+      super + [:change_reason, :rejection_reason]
+    end
+  end
 end
