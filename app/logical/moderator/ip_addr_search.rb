@@ -25,8 +25,6 @@ module Moderator
       add_row(sums, ArtistCommentaryVersion.where(updater_ip_addr: ip_addrs).group(:updater).count)
       add_row(sums, ArtistVersion.where(updater_ip_addr: ip_addrs).group(:updater).count)
       add_row(sums, NoteVersion.where(updater_ip_addr: ip_addrs).group(:updater).count)
-      add_row(sums, PoolArchive.where(updater_ip_addr: ip_addrs).group(:updater).count) if PoolArchive.enabled?
-      add_row(sums, PostVersion.where(updater_ip_addr: ip_addrs).group(:updater).count)
       add_row(sums, WikiPageVersion.where(updater_ip_addr: ip_addrs).group(:updater).count)
       add_row(sums, Comment.where(ip_addr: ip_addrs).group(:creator).count)
       add_row(sums, Dmail.where(creator_ip_addr: ip_addrs).group(:from).count)
@@ -34,6 +32,9 @@ module Moderator
       add_row(sums, PostFlag.where(creator_ip_addr: ip_addrs).group(:creator).count)
       add_row(sums, Upload.where(uploader_ip_addr: ip_addrs).group(:uploader).count)
       add_row(sums, Hash[User.where(last_ip_addr: ip_addrs).collect { |user| [user, 1] }])
+
+      add_row_id(sums, PoolArchive.where(updater_ip_addr: ip_addrs).group(:updater_id).count) if PoolArchive.enabled?
+      add_row_id(sums, PostVersion.where(updater_ip_addr: ip_addrs).group(:updater_id).count)
 
       sums
     end
@@ -50,8 +51,8 @@ module Moderator
       add_row(sums, ArtistCommentaryVersion.where(updater: users).group(:updater_ip_addr).count)
       add_row(sums, ArtistVersion.where(updater: users).group(:updater_ip_addr).count)
       add_row(sums, NoteVersion.where(updater: users).group(:updater_ip_addr).count)
-      add_row(sums, PoolArchive.where(updater: users).group(:updater_ip_addr).count) if PoolArchive.enabled?
-      add_row(sums, PostVersion.where(updater: users).group(:updater_ip_addr).count)
+      add_row(sums, PoolArchive.where(updater_id: users.map(&:id)).group(:updater_ip_addr).count) if PoolArchive.enabled?
+      add_row(sums, PostVersion.where(updater_id: users.map(&:id)).group(:updater_ip_addr).count)
       add_row(sums, WikiPageVersion.where(updater: users).group(:updater_ip_addr).count)
       add_row(sums, Comment.where(creator: users).group(:ip_addr).count)
       add_row(sums, Dmail.where(from: users).group(:creator_ip_addr).count)
@@ -65,6 +66,14 @@ module Moderator
 
     def add_row(sums, counts)
       sums.merge!(counts) { |key, oldcount, newcount| oldcount + newcount }
+    end
+
+    def add_row_id(sums, counts)
+      user_counts = {}
+      counts.each do |k, v|
+        user_counts[User.find(k)] = v
+      end
+      add_row(sums, user_counts)
     end
   end
 end
