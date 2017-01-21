@@ -502,4 +502,16 @@ module Danbooru
     def aws_sqs_archives_url
     end
   end
+
+  class EnvironmentConfiguration
+    def method_missing(method, *args)
+      var = ENV["DANBOORU_#{method.to_s.upcase}"]
+
+      if var.present?
+        var
+      else
+        CustomConfiguration.new.send(method, *args)
+      end
+    end
+  end
 end
