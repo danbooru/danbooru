@@ -415,7 +415,13 @@ class PostQueryBuilder
       relation = relation.order("posts.last_commented_at DESC NULLS LAST, posts.id DESC")
 
     when "comment_asc", "comm_asc"
-      relation = relation.order("posts.last_commented_at ASC NULLS FIRST, posts.id DESC")
+      relation = relation.order("posts.last_commented_at ASC NULLS LAST, posts.id DESC")
+
+    when "comment_bumped"
+      relation = relation.order("posts.last_comment_bumped_at DESC NULLS LAST, posts.id DESC")
+
+    when "comment_bumped_asc"
+      relation = relation.order("posts.last_comment_bumped_at ASC NULLS LAST, posts.id DESC")
 
     when "note"
       relation = relation.order("posts.last_noted_at DESC NULLS LAST, posts.id DESC")

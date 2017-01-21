@@ -1797,6 +1797,21 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(post3.id, relation.first.id)
     end
 
+    should "return posts for order:comment_bumped" do
+      post1 = FactoryGirl.create(:post)
+      post2 = FactoryGirl.create(:post)
+      post3 = FactoryGirl.create(:post)
+
+      CurrentUser.scoped(FactoryGirl.create(:gold_user), "127.0.0.1") do
+        comment1 = FactoryGirl.create(:comment, :post => post1)
+        comment2 = FactoryGirl.create(:comment, :post => post2, :do_not_bump_post => true)
+        comment3 = FactoryGirl.create(:comment, :post => post3)
+      end
+
+      assert_equal([post3.id, post1.id, post2.id], Post.tag_match("order:comment_bumped").map(&:id))
+      assert_equal([post1.id, post3.id, post2.id], Post.tag_match("order:comment_bumped_asc").map(&:id))
+    end
+
     should "return posts for a filesize search" do
       post = FactoryGirl.create(:post, :file_size => 1.megabyte)
       assert_equal(1, Post.tag_match("filesize:1mb").count)
