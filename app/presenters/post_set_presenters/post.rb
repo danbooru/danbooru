@@ -19,6 +19,8 @@ module PostSetPresenters
         related_tags_for_single(post_set.unordered_tag_array.first)
       elsif post_set.tag_string =~ /(?:^|\s)(?:#{Tag::SUBQUERY_METATAGS}):\S+/
         calculate_related_tags_from_post_set
+      elsif post_set.tag_string =~ /search:/
+        saved_search_tags
       elsif post_set.is_empty_tag?
         popular_tags
       else
@@ -50,6 +52,10 @@ module PostSetPresenters
 
     def calculate_related_tags_from_post_set
       RelatedTagCalculator.calculate_from_post_set_to_array(post_set).map(&:first)
+    end
+
+    def saved_search_tags
+      SavedSearch.categories_for(CurrentUser.user).map {|x| "search:#{x}"}
     end
 
     def tag_list_html(template, options = {})

@@ -111,9 +111,7 @@
           <th>Appeals</th>
           <td><%= presenter.appeal_count(self) %></td>
         </tr>
-      <% end %>
 
-      <% if CurrentUser.user.id == user.id || CurrentUser.is_moderator? %>
         <tr>
           <th>Flags</th>
           <td><%= presenter.flag_count(self) %></td>
@@ -145,7 +143,18 @@
         </tr>
       <% end %>
 
-      <% if CurrentUser.user.id == user.id %>
+      <% if CurrentUser.id == user.id %>
+        <% if CurrentUser.has_saved_searches? %>
+          <tr>
+            <th>Saved Searches</th>
+            <td>
+              <% SavedSearch.categories_for(CurrentUser.user).each do |category| %>
+                <p><%= link_to category, posts_path(tags: "search:#{category}") %></p>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+
         <tr>
           <th>API Key</th>
           <td>

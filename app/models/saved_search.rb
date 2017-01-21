@@ -132,6 +132,10 @@ class SavedSearch < ActiveRecord::Base
     rename_listbooru(user_id, old_category, new_category)
   end
 
+  def self.categories_for(user)
+    user.saved_searches.pluck("distinct category")
+  end
+
   def normalize
     self.category = SavedSearch.normalize_category(category) if category
     self.tag_query = SavedSearch.normalize(tag_query)
