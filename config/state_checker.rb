@@ -1,7 +1,17 @@
-class StateChecker
+module StateChecker
+  module_function
+
   def check!
-    check_secret_token
-    check_session_secret_key
+    ENV["SECRET_TOKEN"].present? || check_secret_token
+    ENV["SESSION_SECRET_KEY"].present? || check_session_secret_key
+  end
+
+  def secret_token
+    ENV["SECRET_TOKEN"] || File.read(secret_token_path)
+  end
+
+  def session_secret_key
+    ENV["SESSION_SECRET_KEY"] || File.read(session_secret_key_path)
   end
 
 private
