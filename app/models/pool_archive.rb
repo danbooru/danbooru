@@ -6,7 +6,7 @@ class PoolArchive < ActiveRecord::Base
     Danbooru.config.aws_sqs_archives_url.present?
   end
 
-  establish_connection "archive_#{Rails.env}".to_sym if enabled?
+  establish_connection (ENV["ARCHIVE_DATABASE_URL"] || "archive_#{Rails.env}".to_sym) if enabled?
   self.table_name = "pool_versions"
 
   module SearchMethods

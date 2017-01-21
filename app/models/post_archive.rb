@@ -3,7 +3,7 @@ class PostArchive < ActiveRecord::Base
     Danbooru.config.aws_sqs_archives_url.present?
   end
 
-  establish_connection "archive_#{Rails.env}".to_sym if enabled?
+  establish_connection (ENV["ARCHIVE_DATABASE_URL"] || "archive_#{Rails.env}".to_sym) if enabled?
   self.table_name = "post_versions"
 
   def self.calculate_version(post_id, updated_at, version_id)

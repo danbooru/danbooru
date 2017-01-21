@@ -5,6 +5,7 @@ development:
   database: danbooru2
   pool: 5
   timeout: 5000
+  url: <%= ENV['DATABASE_URL'] %>
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -14,42 +15,52 @@ test:
   database: danbooru2_test
   pool: 5
   timeout: 5000
+  url: <%= ENV['DATABASE_URL'] %>
 
 production:
   adapter: postgresql
   database: danbooru2
   pool: 5
   timeout: 5000
+  url: <%= ENV['DATABASE_URL'] %>
 
 # read only databases, just point to local copies if you have no need
 ro_development:
   adapter: postgresql
   database: danbooru2
+  url: <%= ENV['RO_DATABASE_URL'] %>
 
 ro_test:
   adapter: postgresql
   database: danbooru2_test
+  url: <%= ENV['RO_DATABASE_URL'] %>
 
 ro_production:
   adapter: postgresql
   database: danbooru2
+  url: <%= ENV['RO_DATABASE_URL'] %>
 
 ro_staging:
   adapter: postgresql
   database: danbooru2
+  url: <%= ENV['RO_DATABASE_URL'] %>
 
 archive_development:
   adapter: postgresql
   database: archive_development
+  url: <%= ENV['ARCHIVE_DATABASE_URL'] %>
 
 archive_test:
   adapter: postgresql
   database: archive_test
+  url: <%= ENV['ARCHIVE_DATABASE_URL'] %>
 
 archive_production:
   adapter: postgresql
   database: archive_development
+  url: <%= ENV['ARCHIVE_DATABASE_URL'] %>
 
 archive_staging:
   adapter: postgresql
   database: archive_development
+  url: <%= ENV['ARCHIVE_DATABASE_URL'] %>
