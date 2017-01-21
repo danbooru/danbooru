@@ -127,6 +127,10 @@ GEM
     docile (1.1.5)
     domain_name (0.5.24)
       unf (>= 0.0.5, < 1.0.0)
+    dotenv (2.1.2)
+    dotenv-rails (2.1.2)
+      dotenv (= 2.1.2)
+      railties (>= 3.2, < 5.1)
     equalizer (0.0.11)
     erubis (2.7.0)
     execjs (2.6.0)
@@ -434,6 +438,7 @@ DEPENDENCIES
   delayed_job
   delayed_job_active_record
   diff-lcs!
+  dotenv-rails
   dtext_rb!
   factory_girl
   fakeweb
