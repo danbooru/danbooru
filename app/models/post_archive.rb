@@ -74,7 +74,7 @@ class PostArchive < ActiveRecord::Base
         sqs_service.send_message(msg)
       end
 
-      def export_to_archives(version_id = 1451061)
+      def export_to_archives(version_id = 4394763)
         PostVersion.where("id > ?", version_id).find_each do |version|
           previous = version.previous
           tags = version.tags.scan(/\S+/)
