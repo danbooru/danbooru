@@ -316,6 +316,7 @@
       "favcount", "favcount_asc",
       "change", "change_asc",
       "comment", "comment_asc",
+      "comment_bumped", "comment_bumped_asc",
       "note", "note_asc",
       "artcomm", "artcomm_asc",
       "mpixels", "mpixels_asc",
