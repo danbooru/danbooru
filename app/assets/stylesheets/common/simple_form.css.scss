@@ -43,3 +43,20 @@ form.simple_form {
   }
 }
 
+form.inline-form {
+  display: table;
+
+  > div.input {
+    display: table-row;
+    line-height: 2em;
+
+    label {
+      text-align: right;
+    }
+
+    label, input {
+      display: table-cell;
+      padding-right: 1em;
+    }
+  }
+}
