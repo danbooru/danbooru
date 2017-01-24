@@ -2,21 +2,16 @@
   Danbooru.Shortcuts = {};
 
   Danbooru.Shortcuts.initialize = function() {
-    $(document).bind("keydown", "s", function(e) {
-      Danbooru.Shortcuts.nav_scroll_down();
-    });
+    Danbooru.keydown("s", "scroll_down", Danbooru.Shortcuts.nav_scroll_down);
+    Danbooru.keydown("w", "scroll_up", Danbooru.Shortcuts.nav_scroll_up);
 
-    $(document).bind("keydown", "w", function(e) {
-      Danbooru.Shortcuts.nav_scroll_up();
-    });
-
-    $(document).bind("keydown", "q", function(e) {
+    Danbooru.keydown("q", "focus_search", function(e) {
       $("#tags, #search_name, #search_name_matches, #query").trigger("focus").selectEnd();
       e.preventDefault();
     });
 
     if ($("#image").length) { // post page or bookmarklet upload page
-      $(document).bind("keydown", "shift+e", function(e) {
+      Danbooru.keydown("shift+e", "edit_dialog", function(e) {
         if (Danbooru.meta("current-user-id") == "") { // anonymous
           return;
         }
@@ -36,25 +31,15 @@
     }
 
     if ($("#c-posts").length && $("#a-show").length) {
-      $(document).bind("keydown", "shift+o", function(e) {
+      Danbooru.keydown("shift+o", "approve", function(e) {
         if (Danbooru.meta("current-user-can-approve-posts") === "true") {
           Danbooru.Post.approve(Danbooru.meta("post-id"));
         }
       });
-
-      $(document).bind("keydown", "r", function(e) {
-        $("#random-post")[0].click();
-      });
     }
 
-    if ($("#c-posts").length && $("#a-index").length) {
-      $(document).bind("keydown", "r", function(e) {
-        $("#random-post")[0].click();
-      });
-    }
-
-    if ($("#c-favorites").length && $("#a-index").length) {
-      $(document).bind("keydown", "r", function(e) {
+    if ($("#c-posts #a-index, #c-posts #a-show, #c-favorites #a-index").length) {
+      Danbooru.keydown("r", "random", function(e) {
         $("#random-post")[0].click();
       });
     }
@@ -76,7 +61,5 @@
 
 
 $(document).ready(function() {
-  if (Danbooru.meta("enable-js-navigation") === "true") {
-    Danbooru.Shortcuts.initialize();
-  }
+  Danbooru.Shortcuts.initialize();
 });

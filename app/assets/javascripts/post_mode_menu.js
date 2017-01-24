@@ -13,7 +13,7 @@
   }
 
   Danbooru.PostModeMenu.initialize_shortcuts = function() {
-    $(document).bind("keydown", "1 2 3 4 5 6 7 8 9 0", Danbooru.PostModeMenu.change_tag_script);
+    Danbooru.keydown("1 2 3 4 5 6 7 8 9 0", "change_tag_script", Danbooru.PostModeMenu.change_tag_script);
   }
 
   Danbooru.PostModeMenu.show_notice = function(i) {

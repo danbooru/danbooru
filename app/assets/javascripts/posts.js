@@ -7,9 +7,7 @@
     this.initialize_post_previews();
 
     if ($("#c-posts").length) {
-      if (Danbooru.meta("enable-js-navigation") === "true") {
-        this.initialize_shortcuts();
-      }
+      this.initialize_shortcuts();
     }
 
     if ($("#c-posts").length && $("#a-index").length) {
@@ -141,7 +139,7 @@
     });
   }
 
-  Danbooru.Post.nav_prev = function() {
+  Danbooru.Post.nav_prev = function(e) {
     if ($("#search-seq-nav").length) {
       var href = $("#search-seq-nav a[rel~=prev]").attr("href");
       if (href) {
@@ -153,9 +151,11 @@
         location.href = href;
       }
     }
+
+    e.preventDefault();
   }
 
-  Danbooru.Post.nav_next = function() {
+  Danbooru.Post.nav_next = function(e) {
     if ($("#search-seq-nav").length) {
       var href = $("#search-seq-nav a[rel~=next]").attr("href");
       location.href = href;
@@ -165,27 +165,22 @@
         location.href = href;
       }
     }
+
+    e.preventDefault();
   }
 
   Danbooru.Post.initialize_shortcuts = function() {
     if ($("#a-show").length) {
-      $(document).bind("keydown", "e", function(e) {
+      Danbooru.keydown("e", "edit", function(e) {
         $("#post-edit-link").trigger("click");
         $("#post_tag_string").focus();
         e.preventDefault();
       });
 
-      $(document).bind("keydown", "a", function(e) {
-        Danbooru.Post.nav_prev();
-        e.preventDefault();
-      });
+      Danbooru.keydown("a", "prev_page", Danbooru.Post.nav_prev);
+      Danbooru.keydown("d", "next_page", Danbooru.Post.nav_next);
 
-      $(document).bind("keydown", "d", function(e) {
-        Danbooru.Post.nav_next();
-        e.preventDefault();
-      });
-
-      $(document).bind("keydown", "f", function(e) {
+      Danbooru.keydown("f", "favorite", function(e) {
         if ($("#add-to-favorites").is(":visible")) {
           $("#add-to-favorites").click();
         } else {
@@ -331,8 +326,8 @@
       e.preventDefault();
     });
 
-    if ($("#image-resize-notice").length && Danbooru.meta("enable-js-navigation") === "true") {
-      $(document).bind("keydown", "v", function(e) {
+    if ($("#image-resize-notice").length) {
+      Danbooru.keydown("v", "resize", function(e) {
         if ($("#image-resize-notice").is(":visible")) {
           $("#image-resize-link").click();
         } else {

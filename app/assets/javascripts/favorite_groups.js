@@ -4,7 +4,7 @@
   Danbooru.FavoriteGroup.initialize_all = function() {
     if ($("#c-posts").length && $("#a-show").length) {
       this.initialize_add_to_favgroup_dialog();
-      $(document).bind("keydown", "1 2 3 4 5 6 7 8 9 0", Danbooru.FavoriteGroup.add_to_favgroup);
+      Danbooru.keydown("1 2 3 4 5 6 7 8 9 0", "add_to_favgroup", Danbooru.FavoriteGroup.add_to_favgroup);
     }
   }
 
@@ -33,7 +33,7 @@
       e.preventDefault();
     }
 
-    $(document).bind("keydown", "g", open_favgroup_dialog);
+    Danbooru.keydown("g", "open_favgroup_dialog", open_favgroup_dialog);
     $("#open-favgroup-dialog-link").click(open_favgroup_dialog);
   }
 

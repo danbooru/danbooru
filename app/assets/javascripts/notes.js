@@ -62,7 +62,7 @@ Danbooru.Note = {
     },
 
     bind_events: function($note_box) {
-      $note_box.bind(
+      $note_box.on(
         "dragstart resizestart",
         function(e) {
           var $note_box_inner = $(e.currentTarget);
@@ -80,8 +80,7 @@ Danbooru.Note = {
         }
       );
 
-      $note_box.bind(
-        "resize",
+      $note_box.resize(
         function(e) {
           var $note_box_inner = $(e.currentTarget);
           Danbooru.Note.Box.resize_inner_border($note_box_inner);
@@ -89,7 +88,7 @@ Danbooru.Note = {
         }
       );
 
-      $note_box.bind(
+      $note_box.on(
         "dragstop resizestop",
         function(e) {
           Danbooru.Note.dragging = false;
@@ -105,7 +104,7 @@ Danbooru.Note = {
         }
       );
 
-      $note_box.bind(
+      $note_box.on(
         "mouseover mouseout",
         function(e) {
           if (Danbooru.Note.dragging) {
@@ -407,7 +406,7 @@ Danbooru.Note = {
       }
       $dialog.dialog("option", "title", 'Edit note (<a href="/wiki_pages/help:notes">view help</a>)');
 
-      $dialog.bind("dialogclose", function() {
+      $dialog.on("dialogclose", function() {
         Danbooru.Note.editing = false;
         $(".note-box").resizable("enable");
         $(".note-box").draggable("enable");
@@ -570,9 +569,9 @@ Danbooru.Note = {
       Danbooru.Note.TranslationMode.active = true;
       $(document.body).addClass("mode-translation");
       $("#original-file-link").click();
-      $("#image").unbind("click", Danbooru.Note.Box.toggle_all);
-      $("#image").bind("mousedown", Danbooru.Note.TranslationMode.Drag.start);
-      $(window).bind("mouseup", Danbooru.Note.TranslationMode.Drag.stop);
+      $("#image").off("click", Danbooru.Note.Box.toggle_all);
+      $("#image").mousedown(Danbooru.Note.TranslationMode.Drag.start);
+      $(window).mouseup(Danbooru.Note.TranslationMode.Drag.stop);
       $("#mark-as-translated-section").show();
 
       Danbooru.notice('Translation mode is on. Drag on the image to create notes. <a href="#">Turn translation mode off</a> (shortcut is <span class="key">n</span>).');
@@ -584,9 +583,9 @@ Danbooru.Note = {
 
       Danbooru.Note.TranslationMode.active = false;
       $("#image").css("cursor", "auto");
-      $("#image").bind("click", Danbooru.Note.Box.toggle_all);
-      $("#image").unbind("mousedown", Danbooru.Note.TranslationMode.Drag.start);
-      $(window).unbind("mouseup", Danbooru.Note.TranslationMode.Drag.stop);
+      $("#image").click(Danbooru.Note.Box.toggle_all);
+      $("#image").off("mousedown", Danbooru.Note.TranslationMode.Drag.start);
+      $(window).mouseup(Danbooru.Note.TranslationMode.Drag.stop);
       $(document.body).removeClass("mode-translation");
       $("#close-notice-link").click();
       $("#mark-as-translated-section").hide();
@@ -689,7 +688,7 @@ Danbooru.Note = {
         if (Danbooru.Note.TranslationMode.Drag.dragStartX === 0) {
           return; /* 'stop' is bound to window, don't create note if start wasn't triggered */
         }
-        $(window).unbind("mousemove");
+        $(window).off("mousemove");
 
         if (Danbooru.Note.TranslationMode.Drag.dragging) {
           $('#note-preview').css({display:'none'});
@@ -782,11 +781,11 @@ Danbooru.Note = {
 $(function() {
   if ($("#c-posts").length && $("#a-show").length && $("#image").length && !$("video#image").length) {
     if ($("#note-locked-notice").length == 0) {
-      $("#translate").bind("click", Danbooru.Note.TranslationMode.toggle);
-      $(document).bind("keydown", "n", Danbooru.Note.TranslationMode.toggle);
+      $("#translate").click(Danbooru.Note.TranslationMode.toggle);
+      Danbooru.keydown("n", "translation_mode", Danbooru.Note.TranslationMode.toggle);
     }
     Danbooru.Note.embed = (Danbooru.meta("post-has-embedded-notes") === "true");
     Danbooru.Note.load_all();
-    $("#image").bind("click", Danbooru.Note.Box.toggle_all);
+    $("#image").click(Danbooru.Note.Box.toggle_all);
   }
 });

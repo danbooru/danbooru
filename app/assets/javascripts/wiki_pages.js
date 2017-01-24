@@ -7,9 +7,7 @@
         this.initialize_autocomplete();
       }
 
-      if (Danbooru.meta("enable-js-navigation") === "true") {
-        this.initialize_shortcuts();
-      }
+      this.initialize_shortcuts();
     }
   }
 
@@ -51,7 +49,7 @@
 
   Danbooru.WikiPage.initialize_shortcuts = function() {
     if ($("#a-show").length) {
-      $(document).bind("keydown", "e", function(e) {
+      Danbooru.keydown("e", "edit", function(e) {
         $("#wiki-page-edit-link")[0].click();
         e.preventDefault();
       });

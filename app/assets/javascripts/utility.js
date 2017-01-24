@@ -45,6 +45,12 @@
     }
   }
 
+  Danbooru.keydown = function(keys, namespace, handler) {
+    if (Danbooru.meta("enable-js-navigation") === "true") {
+      $(document).on("keydown" + ".danbooru." + namespace, null, keys, handler);
+    }
+  };
+
   Danbooru.is_subset = function(array, subarray) {
     var all = true;
 
