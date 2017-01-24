@@ -1,5 +1,5 @@
-module StateChecker
-  module_function
+class StateChecker
+  include Singleton
 
   def check!
     ENV["SECRET_TOKEN"].present? || check_secret_token
