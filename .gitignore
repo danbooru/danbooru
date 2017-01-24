@@ -1,3 +1,4 @@
+.env.*
 .bundle
 config/database.yml
 config/danbooru_local_config.rb

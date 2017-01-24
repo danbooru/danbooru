@@ -1,5 +1,7 @@
 source 'https://rubygems.org/'
 
+gem 'dotenv-rails', :require => "dotenv/rails-now"
+
 group :test do
   gem "shoulda"
   gem "factory_girl"

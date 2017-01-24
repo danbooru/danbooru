@@ -1,5 +1,5 @@
 class PostReadOnly < Post
-  establish_connection "ro_#{Rails.env}".to_sym
+  establish_connection (ENV["RO_DATABASE_URL"] || "ro_#{Rails.env}".to_sym)
   attr_readonly *column_names
 
   def with_timeout(n, default_value = nil)

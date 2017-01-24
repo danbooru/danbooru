@@ -3,7 +3,7 @@ require "#{Rails.root}/config/danbooru_local_config"
 
 module Danbooru
   def config
-    @configuration ||= CustomConfiguration.new
+    @configuration ||= EnvironmentConfiguration.new
   end
 
   module_function :config
