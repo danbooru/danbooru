@@ -18,8 +18,8 @@
 
 $(function() {
   if ($(".paginator").length) {
-    Danbooru.keydown("d", "next_page", Danbooru.Paginator.next_page);
-    Danbooru.keydown("a", "prev_page", Danbooru.Paginator.prev_page);
+    Danbooru.keydown("d right", "next_page", Danbooru.Paginator.next_page);
+    Danbooru.keydown("a left", "prev_page", Danbooru.Paginator.prev_page);
   }
 });
 

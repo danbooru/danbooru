@@ -25,8 +25,8 @@
 
   Danbooru.PostPopular.initialize_all = function() {
     if ($("#c-explore-posts").length) {
-      Danbooru.keydown("a", "prev_page", Danbooru.PostPopular.nav_prev);
-      Danbooru.keydown("d", "next_page", Danbooru.PostPopular.nav_next);
+      Danbooru.keydown("a left", "prev_page", Danbooru.PostPopular.nav_prev);
+      Danbooru.keydown("d right", "next_page", Danbooru.PostPopular.nav_next);
     }
   }
 })();

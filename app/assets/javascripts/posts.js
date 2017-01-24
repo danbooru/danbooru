@@ -177,8 +177,8 @@
         e.preventDefault();
       });
 
-      Danbooru.keydown("a", "prev_page", Danbooru.Post.nav_prev);
-      Danbooru.keydown("d", "next_page", Danbooru.Post.nav_next);
+      Danbooru.keydown("a left", "prev_page", Danbooru.Post.nav_prev);
+      Danbooru.keydown("d right", "next_page", Danbooru.Post.nav_next);
 
       Danbooru.keydown("f", "favorite", function(e) {
         if ($("#add-to-favorites").is(":visible")) {
