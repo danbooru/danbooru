@@ -8,7 +8,6 @@ module Moderator
     def setup
       super
       mock_saved_search_service!
-      Danbooru.config.stubs(:listbooru_enabled?).returns(true)
       Danbooru.config.stubs(:listbooru_auth_key).returns("blahblahblah")
       Danbooru.config.stubs(:listbooru_server).returns("http://localhost:3001")
     end

@@ -432,10 +432,6 @@ module Danbooru
     end
 
     # listbooru options - see https://github.com/r888888888/listbooru
-    def listbooru_enabled?
-      false
-    end
-
     def listbooru_server
     end
 
