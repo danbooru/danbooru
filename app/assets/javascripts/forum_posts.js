@@ -2,8 +2,22 @@
   Danbooru.ForumPost = {};
 
   Danbooru.ForumPost.initialize_all = function() {
-    if ($("#c-forum-topics").length && $("#a-show").length) {;
+    if ($("#c-forum-topics #a-show").length) {;
       this.initialize_edit_links();
+
+      Danbooru.keydown("e", "edit", function(e) {
+        $(".edit_forum_topic_link")[0].click();
+      });
+
+      Danbooru.keydown("shift+d", "delete", function(e) {
+        $("#forum-topic-delete a")[0].click();
+      });
+    }
+
+    if ($("#c-forum-topics").length) {
+      Danbooru.keydown("shift+r", "mark_all_as_read", function(e) {
+        $("#secondary-links-mark-all-as-read a").click();
+      });
     }
   }
 

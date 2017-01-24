@@ -16,10 +16,10 @@
       <% unless @wiki_page.new_record? %>
         <li><%= link_to "History", wiki_page_versions_path(:search => {:wiki_page_id => @wiki_page.id}) %></li>
         <% if CurrentUser.is_member? %>
-          <li><%= link_to "Edit", edit_wiki_page_path(@wiki_page), :id => "wiki-page-edit-link" %></li>
+          <li id="wiki-page-edit"><%= link_to "Edit", edit_wiki_page_path(@wiki_page) %></li>
         <% end %>
         <% if CurrentUser.is_builder? && !@wiki_page.is_deleted? %>
-          <li><%= link_to "Delete", wiki_page_path(@wiki_page), :remote => true, :method => :delete, :data => {:confirm => "Are you sure you want to delete this wiki page?"} %></li>
+          <li id="wiki-page-delete"><%= link_to "Delete", wiki_page_path(@wiki_page), :remote => true, :method => :delete, :data => {:confirm => "Are you sure you want to delete this wiki page?"} %></li>
         <% end %>
       <% end %>
     <% end %>

@@ -50,8 +50,11 @@
   Danbooru.WikiPage.initialize_shortcuts = function() {
     if ($("#a-show").length) {
       Danbooru.keydown("e", "edit", function(e) {
-        $("#wiki-page-edit-link")[0].click();
-        e.preventDefault();
+        $("#wiki-page-edit a")[0].click();
+      });
+
+      Danbooru.keydown("shift+d", "delete", function(e) {
+        $("#wiki-page-delete a")[0].click();
       });
     }
   }

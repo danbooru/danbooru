@@ -7,7 +7,7 @@
       <li><%= link_to "New", new_forum_topic_path %></li>
       <li><%= link_to "Request alias", new_tag_alias_request_path %></li>
       <li><%= link_to "Request implication", new_tag_implication_request_path %></li>
-      <li><%= link_to "Mark all as read", mark_all_as_read_forum_topics_path, :method => :post %></li>
+      <li id="forum-topic-mark-all-as-read"><%= link_to "Mark all as read", mark_all_as_read_forum_topics_path, :method => :post %></li>
     <% end %>
     
     <li><%= link_to "Search", search_forum_posts_path %></li>
@@ -26,7 +26,7 @@
           <% if @forum_topic.is_deleted? %>
             <li><%= link_to "Undelete", undelete_forum_topic_path(@forum_topic), :method => :post %></li>
           <% else %>
-            <li><%= link_to "Delete", forum_topic_path(@forum_topic), :method => :delete, :data => {:confirm => "Are you sure you want to delete this forum topic?"} %></li>
+            <li id="forum-topic-delete"><%= link_to "Delete", forum_topic_path(@forum_topic), :method => :delete, :data => {:confirm => "Are you sure you want to delete this forum topic?"} %></li>
           <% end %>
           <% if @forum_topic.is_locked? %>
             <li><%= link_to "Unlock", forum_topic_path(@forum_topic, :forum_topic => {:is_locked => false}), :method => :put %></li>
