@@ -1,37 +1,32 @@
 (function() {
   Danbooru.PostPopular = {};
 
-  Danbooru.PostPopular.nav_prev = function() {
+  Danbooru.PostPopular.nav_prev = function(e) {
     if ($("#popular-nav-links").length) {
       var href = $("#popular-nav-links a[rel=prev]").attr("href");
       if (href) {
         location.href = href;
       }
     }
+
+    e.preventDefault();
   }
 
-  Danbooru.PostPopular.nav_next = function() {
+  Danbooru.PostPopular.nav_next = function(e) {
     if ($("#popular-nav-links").length) {
       var href = $("#popular-nav-links a[rel=next]").attr("href");
       if (href) {
         location.href = href;
       }
     }
+
+    e.preventDefault();
   }
 
   Danbooru.PostPopular.initialize_all = function() {
     if ($("#c-explore-posts").length) {
-      if (Danbooru.meta("enable-js-navigation") === "true") {
-        $(document).bind("keydown", "a", function(e) {
-          Danbooru.PostPopular.nav_prev();
-          e.preventDefault();
-        });
-
-        $(document).bind("keydown", "d", function(e) {
-          Danbooru.PostPopular.nav_next();
-          e.preventDefault();
-        });
-      }
+      Danbooru.keydown("a left", "prev_page", Danbooru.PostPopular.nav_prev);
+      Danbooru.keydown("d right", "next_page", Danbooru.PostPopular.nav_next);
     }
   }
 })();

@@ -17,9 +17,9 @@
 })();
 
 $(function() {
-  if ($(".paginator").length && (Danbooru.meta("enable-js-navigation") === "true")) {
-    $(document).bind("keydown", "d", Danbooru.Paginator.next_page);
-    $(document).bind("keydown", "a", Danbooru.Paginator.prev_page);
+  if ($(".paginator").length) {
+    Danbooru.keydown("d right", "next_page", Danbooru.Paginator.next_page);
+    Danbooru.keydown("a left", "prev_page", Danbooru.Paginator.prev_page);
   }
 });
 

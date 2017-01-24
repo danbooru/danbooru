@@ -4,6 +4,7 @@
   Danbooru.Artist.initialize_all = function() {
     if ($("#c-artists").length) {
       Danbooru.Artist.initialize_check_name();
+      Danbooru.Artist.initialize_shortcuts();
 
       if (Danbooru.meta("enable-auto-complete") === "true") {
         Danbooru.Artist.initialize_autocomplete();
@@ -30,6 +31,18 @@
       }
     });
   }
+
+  Danbooru.Artist.initialize_shortcuts = function() {
+    if ($("#c-artists #a-show").length) {
+      Danbooru.keydown("e", "edit", function(e) {
+        $("#artist-edit a")[0].click();
+      });
+
+      Danbooru.keydown("shift+d", "delete", function(e) {
+        $("#artist-delete a")[0].click();
+      });
+    }
+  };
 
   Danbooru.Artist.initialize_autocomplete = function() {
     var $fields = $("#search_name,#quick_search_name");
