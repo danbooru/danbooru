@@ -500,13 +500,17 @@ module Danbooru
   end
 
   class EnvironmentConfiguration
+    def custom_configuration
+      @custom_configuration ||= CustomConfiguration.new
+    end
+
     def method_missing(method, *args)
       var = ENV["DANBOORU_#{method.to_s.upcase}"]
 
       if var.present?
         var
       else
-        CustomConfiguration.new.send(method, *args)
+        custom_configuration.send(method, *args)
       end
     end
   end
