@@ -1,2 +1,2 @@
-unicorn: bundle exec unicorn -c config/unicorn/unicorn.rb
+unicorn: bundle exec rails server
 jobs: bundle exec script/delayed_job run

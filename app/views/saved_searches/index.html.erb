@@ -8,7 +8,7 @@
           <%= link_to_if SavedSearch.posts_search_available?, category.tr("_", " "), posts_path(:tags => "search:#{category}") %>
           (<%= link_to "rename", new_saved_search_category_change_path(:old => category) %>)
         <% else %>
-          <%= link_to_if SavedSearch.posts_search_available?, SavedSearch::UNCATEGORIZED_NAME, posts_path(:tags => "search:all") %>
+          <%= link_to_if SavedSearch.posts_search_available?, SavedSearch::UNCATEGORIZED_NAME, posts_path(:tags => "search:#{SavedSearch::UNCATEGORIZED_NAME}") %>
         <% end %>
       </h2>
       <table class="striped" width="100%">

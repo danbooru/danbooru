@@ -548,7 +548,7 @@
           method: "get",
           success: function(data) {
             resp($.map(data, function(saved_search) {
-              var category = saved_search.category === null ? "Uncategorized" : saved_search.category;
+              var category = saved_search.category === null ? "uncategorized" : saved_search.category;
               return {
                 label: category,
                 value: category

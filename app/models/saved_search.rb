@@ -1,5 +1,5 @@
 class SavedSearch < ActiveRecord::Base
-  UNCATEGORIZED_NAME = "Uncategorized"
+  UNCATEGORIZED_NAME = "uncategorized"
 
   module ListbooruMethods
     extend ActiveSupport::Concern
@@ -57,9 +57,15 @@ class SavedSearch < ActiveRecord::Base
         body = Cache.get("ss-pids-#{user_id}-#{hash_name}", 60) do
           params = {
             "key" => Danbooru.config.listbooru_auth_key,
-            "user_id" => user_id,
-            "name" => name
+            "user_id" => user_id
           }
+
+          if name == UNCATEGORIZED_NAME
+            params["name"] = nil
+          elsif name.present?
+            params["name"] = name
+          end
+
           uri = URI.parse("#{Danbooru.config.listbooru_server}/users")
           uri.query = URI.encode_www_form(params)
 
@@ -133,7 +139,13 @@ class SavedSearch < ActiveRecord::Base
   end
 
   def self.categories_for(user)
-    user.saved_searches.pluck("distinct category")
+    user.saved_searches.pluck("distinct category").map do |x|
+      if x.blank?
+        SavedSearch::UNCATEGORIZED_NAME
+      else
+        x
+      end
+    end
   end
 
   def normalize
