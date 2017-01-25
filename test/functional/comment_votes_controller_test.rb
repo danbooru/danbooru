@@ -28,7 +28,7 @@ class CommentVotesControllerTest < ActionController::TestCase
         assert_difference("CommentVote.count", 0) do
           post :create, {:format => "json", :comment_id => @comment.id, :score => -1}, {:user_id => @user.id}
           assert_response 422
-          assert_equal("{\"errors\":{\"user_id\":[\"have already voted for this comment\"]}}", @response.body.strip)
+          assert_equal("{\"success\": false, \"errors\": \"Validation failed: You have already voted for this comment\"}", @response.body.strip)
         end
       end
     end
@@ -41,11 +41,11 @@ class CommentVotesControllerTest < ActionController::TestCase
         end
       end
 
-      should "fail silently on errors" do
+      should "fail on errors" do
         FactoryGirl.create(:comment_vote, :comment => @comment, :score => -1)
         assert_difference("CommentVote.count", 0) do
           post :create, {:format => "js", :comment_id => @comment.id, :score => -1}, {:user_id => @user.id}
-          assert_response :success
+          assert_response 422
         end
       end
     end

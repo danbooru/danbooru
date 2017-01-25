@@ -8,7 +8,7 @@ class CommentVotesController < ApplicationController
     @comment_vote = @comment.vote!(params[:score])
   rescue CommentVote::Error, ActiveRecord::RecordInvalid => x
     @error = x
-    render status: 500
+    render status: 422
   end
 
   def destroy
@@ -16,6 +16,6 @@ class CommentVotesController < ApplicationController
     @comment.unvote!
   rescue CommentVote::Error => x
     @error = x
-    render status: 500
+    render status: 422
   end
 end
