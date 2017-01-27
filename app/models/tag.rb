@@ -487,11 +487,13 @@ class Tag < ActiveRecord::Base
 
           when "-favgroup"
             favgroup_id = FavoriteGroup.name_to_id($2)
-            q[:favgroup_neg] = favgroup_id
+            q[:favgroups_neg] ||= []
+            q[:favgroups_neg] << favgroup_id
 
           when "favgroup"
             favgroup_id = FavoriteGroup.name_to_id($2)
-            q[:favgroup] = favgroup_id
+            q[:favgroups] ||= []
+            q[:favgroups] << favgroup_id
 
           when "-fav"
             q[:tags][:exclude] << "fav:#{User.name_to_id($2)}"

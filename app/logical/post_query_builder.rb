@@ -340,19 +340,23 @@ class PostQueryBuilder
       relation = relation.order("position(' '||posts.id||' ' in ' '||(select post_ids from pools where id = #{pool_id})||' ')")
     end
 
-    if q[:favgroup_neg].present?
-      favgroup_id = q[:favgroup_neg].to_i
-      favgroup = FavoriteGroup.where("favorite_groups.id = ?", favgroup_id).first
-      if favgroup
-        relation = relation.where("posts.id NOT in (?)", favgroup.post_id_array)
+    if q[:favgroups_neg].present?
+      q[:favgroups_neg].each do |favgroup_rec|
+        favgroup_id = favgroup_rec.to_i
+        favgroup = FavoriteGroup.where("favorite_groups.id = ?", favgroup_id).first
+        if favgroup
+          relation = relation.where("posts.id NOT in (?)", favgroup.post_id_array)
+        end
       end
     end
 
-    if q[:favgroup].present?
-      favgroup_id = q[:favgroup].to_i
-      favgroup = FavoriteGroup.where("favorite_groups.id = ?", favgroup_id).first
-      if favgroup
-        relation = relation.where("posts.id in (?)", favgroup.post_id_array)
+    if q[:favgroups].present?
+      q[:favgroups].each do |favgroup_rec|
+        favgroup_id = favgroup_rec.to_i
+        favgroup = FavoriteGroup.where("favorite_groups.id = ?", favgroup_id).first
+        if favgroup
+          relation = relation.where("posts.id in (?)", favgroup.post_id_array)
+        end
       end
     end
 
