@@ -118,14 +118,14 @@ class Comment < ActiveRecord::Base
       q = q.sticky if params[:is_sticky] == "true"
       q = q.unsticky if params[:is_sticky] == "false"
 
-      q = q.nonbumping if params[:do_no_bump_post] == "true"
+      q = q.nonbumping if params[:do_not_bump_post] == "true"
       q = q.bumping if params[:do_not_bump_post] == "false"
 
       case params[:order]
       when "post_id", "post_id_desc"
-        q = q.order("comments.post_id DESC")
+        q = q.order("comments.post_id DESC, comments.id DESC")
       when "score", "score_desc"
-        q = q.order("comments.score DESC")
+        q = q.order("comments.score DESC, comments.id DESC")
       when "updated_at", "updated_at_desc"
         q = q.order("comments.updated_at DESC")
       else
