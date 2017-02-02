@@ -22,7 +22,6 @@ class Post < ActiveRecord::Base
   before_save :set_tag_counts
   before_save :set_pool_category_pseudo_tags
   before_create :autoban
-  after_create :update_iqdb_async
   after_save :create_version
   after_save :update_parent_on_save
   after_save :apply_post_metatags
@@ -30,6 +29,7 @@ class Post < ActiveRecord::Base
   after_destroy :remove_iqdb_async
   after_destroy :delete_files
   after_destroy :delete_remote_files
+  after_commit :update_iqdb_async, :on => :create
   after_commit :notify_pubsub
 
   belongs_to :updater, :class_name => "User"
