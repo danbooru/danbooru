@@ -1,6 +1,6 @@
 class Tag < ActiveRecord::Base
   COSINE_SIMILARITY_RELATED_TAG_THRESHOLD = 1000
-  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-pool|pool|ordpool|-favgroup|favgroup|-fav|fav|ordfav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|ratio|score|favcount|filesize|source|-source|id|-id|date|age|order|limit|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|-parent|child|pixiv_id|pixiv|search|upvote|downvote"
+  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-pool|pool|ordpool|-favgroup|favgroup|-fav|fav|ordfav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|ratio|score|favcount|filesize|source|-source|id|-id|date|age|order|limit|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|-parent|child|pixiv_id|pixiv|search|upvote|downvote|filetype|-filetype"
   SUBQUERY_METATAGS = "commenter|comm|noter|noteupdater|artcomm"
   attr_accessible :category, :as => [:moderator, :janitor, :gold, :platinum, :member, :anonymous, :default, :builder, :admin]
   attr_accessible :is_locked, :as => [:moderator, :admin]
@@ -605,6 +605,12 @@ class Tag < ActiveRecord::Base
 
           when "status"
             q[:status] = $2.downcase
+
+          when "filetype"
+            q[:filetype] = $2.downcase
+
+          when "-filetype"
+            q[:filetype_neg] = $2.downcase
 
           when "pixiv_id", "pixiv"
             q[:pixiv_id] = parse_helper($2)

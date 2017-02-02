@@ -101,7 +101,7 @@
     );
 
     var prefixes = "-|~|general:|gen:|artist:|art:|copyright:|copy:|co:|character:|char:|ch:";
-    var metatags = "order|-status|status|-rating|rating|-locked|locked|child|" +
+    var metatags = "order|-status|status|-rating|rating|-locked|locked|child|filetype|-filetype|" +
       "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-fav|fav|ordfav|" +
       "sub|-pool|pool|ordpool|favgroup";
 
@@ -159,6 +159,8 @@
         case "locked":
         case "-locked":
         case "child":
+        case "filetype":
+        case "-filetype":
           Danbooru.Autocomplete.static_metatag_source(term, resp, metatag);
           return;
         }
@@ -336,7 +338,10 @@
     ],
     child: [
       "any", "none"
-    ]
+    ],
+    filetype: [
+      "jpg", "png", "gif", "swf", "zip", "webm", "mp4"
+    ],
   }
 
   Danbooru.Autocomplete.static_metatag_source = function(term, resp, metatag) {
