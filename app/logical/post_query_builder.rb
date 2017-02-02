@@ -183,6 +183,14 @@ class PostQueryBuilder
       relation = relation.where("posts.is_deleted = FALSE")
     end
 
+    if q[:filetype]
+      relation = relation.where("posts.file_ext": q[:filetype])
+    end
+
+    if q[:filetype_neg]
+      relation = relation.where.not("posts.file_ext": q[:filetype_neg])
+    end
+
     # The SourcePattern SQL function replaces Pixiv sources with "pixiv/[suffix]", where
     # [suffix] is everything past the second-to-last slash in the URL.  It leaves non-Pixiv
     # URLs unchanged.  This is to ease database load for Pixiv source searches.
