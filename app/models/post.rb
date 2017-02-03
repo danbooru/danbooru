@@ -1412,6 +1412,7 @@ class Post < ActiveRecord::Base
 
       self.is_deleted = false
       self.approver_id = CurrentUser.id
+      flags.each {|x| x.resolve!}
       save
       Post.expire_cache_for_all(tag_array)
       ModAction.log("undeleted post ##{id}")
