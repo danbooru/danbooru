@@ -148,6 +148,7 @@ class Note < ActiveRecord::Base
 
   def create_version
     User.where(id: CurrentUser.id).update_all("note_update_count = note_update_count + 1")
+    CurrentUser.reload
 
     if merge_version?
       merge_version
