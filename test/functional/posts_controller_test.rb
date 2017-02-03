@@ -22,6 +22,7 @@ class PostsControllerTest < ActionController::TestCase
           @post = FactoryGirl.create(:post)
           @bucket = TokenBucket.create(user_id: @user.id, token_count: 5, last_touched_at: Time.now)
           User.any_instance.stubs(:api_burst_limit).returns(5)
+          User.any_instance.stubs(:api_regen_multiplier).returns(0)
         end
         
         should "work" do
@@ -30,7 +31,7 @@ class PostsControllerTest < ActionController::TestCase
             assert_response :success
           end
 
-            post :update, {:format => "json", :id => @post.id, :post => {:rating => "q"}, :login => @user.name, :api_key => @user.api_key.key}
+          post :update, {:format => "json", :id => @post.id, :post => {:rating => "q"}, :login => @user.name, :api_key => @user.api_key.key}
           assert_response 429
         end
       end

@@ -8,8 +8,6 @@ class SavedSearchTest < ActiveSupport::TestCase
   def setup
     super
     mock_saved_search_service!
-    Danbooru.config.stubs(:listbooru_auth_key).returns("blahblahblah")
-    Danbooru.config.stubs(:listbooru_server).returns("http://localhost:3001")
   end
 
   context "Fetching the post ids for a search" do
@@ -34,7 +32,7 @@ class SavedSearchTest < ActiveSupport::TestCase
 
     context "without a name" do
       setup do
-        FakeWeb.register_uri(:get, "http://localhost:3001/users?key=blahblahblah&user_id=1&name", :body => [1,2,3,4].to_json)
+        FakeWeb.register_uri(:get, "http://localhost:3001/users?key=blahblahblah&user_id=1", :body => [1,2,3,4].to_json)
       end
 
       should "return a list of ids" do

@@ -1,8 +1,10 @@
 require 'test_helper'
 require 'helpers/pool_archive_test_helper'
+require 'helpers/saved_search_test_helper'
 
 class PostTest < ActiveSupport::TestCase
   include PoolArchiveTestHelper
+  include SavedSearchTestHelper
 
   setup do
     Timecop.travel(2.weeks.ago) do
@@ -12,6 +14,7 @@ class PostTest < ActiveSupport::TestCase
     CurrentUser.ip_addr = "127.0.0.1"
     MEMCACHE.flush_all
     Delayed::Worker.delay_jobs = false
+    mock_saved_search_service!
   end
 
   teardown do
@@ -767,7 +770,7 @@ class PostTest < ActiveSupport::TestCase
 
         context "of" do
           setup do
-            @builder = FactoryGirl.build(:builder_user)
+            @builder = FactoryGirl.create(:builder_user)
           end
 
           context "locked:notes" do
@@ -822,7 +825,7 @@ class PostTest < ActiveSupport::TestCase
 
             context "by an admin" do
               should "lock/unlock the status" do
-                CurrentUser.scoped(FactoryGirl.build(:admin_user)) do
+                CurrentUser.scoped(FactoryGirl.create(:admin_user)) do
                   @post.update(:tag_string => "locked:status")
                   assert_equal(true, @post.is_status_locked)
 
@@ -836,7 +839,7 @@ class PostTest < ActiveSupport::TestCase
 
         context "of" do
           setup do
-            @gold = FactoryGirl.build(:gold_user)
+            @gold = FactoryGirl.create(:gold_user)
           end
 
           context "upvote:self or downvote:self" do

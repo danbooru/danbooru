@@ -1,6 +1,9 @@
 require 'test_helper'
+require 'helpers/saved_search_test_helper'
 
 class TagAliasTest < ActiveSupport::TestCase
+  include SavedSearchTestHelper
+
   context "A tag alias" do
     setup do
       Timecop.travel(1.month.ago) do
@@ -10,6 +13,7 @@ class TagAliasTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
       Delayed::Worker.delay_jobs = false
+      mock_saved_search_service!
     end
 
     teardown do
