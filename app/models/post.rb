@@ -1436,6 +1436,8 @@ class Post < ActiveRecord::Base
 
     def create_new_version
       User.where(id: CurrentUser.id).update_all("post_update_count = post_update_count + 1")
+      CurrentUser.reload
+
       versions.create(
         :rating => rating,
         :source => source,
