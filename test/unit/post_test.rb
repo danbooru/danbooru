@@ -13,7 +13,6 @@ class PostTest < ActiveSupport::TestCase
     CurrentUser.user = @user
     CurrentUser.ip_addr = "127.0.0.1"
     MEMCACHE.flush_all
-    Delayed::Worker.delay_jobs = false
     mock_saved_search_service!
   end
 
@@ -520,16 +519,11 @@ class PostTest < ActiveSupport::TestCase
       context "with an artist tag that is then changed to copyright" do
         setup do
           CurrentUser.user = FactoryGirl.create(:builder_user)
-          Delayed::Worker.delay_jobs = false
           @post = Post.find(@post.id)
           @post.update(:tag_string => "art:abc")
           @post = Post.find(@post.id)
           @post.update(:tag_string => "copy:abc")
           @post.reload
-        end
-
-        teardown do
-          Delayed::Worker.delay_jobs = true
         end
 
         should "update the category of the tag" do

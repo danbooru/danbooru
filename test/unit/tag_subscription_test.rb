@@ -5,7 +5,6 @@ class TagSubscriptionTest < ActiveSupport::TestCase
     user = FactoryGirl.create(:user)
     CurrentUser.user = user
     CurrentUser.ip_addr = "127.0.0.1"
-    Delayed::Worker.delay_jobs = false
     MEMCACHE.flush_all
   end
 

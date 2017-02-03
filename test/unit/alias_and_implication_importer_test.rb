@@ -3,7 +3,6 @@ require 'test_helper'
 class AliasAndImplicationImporterTest < ActiveSupport::TestCase
   context "The alias and implication importer" do
     setup do
-      Delayed::Worker.delay_jobs = true
       CurrentUser.user = FactoryGirl.create(:admin_user)
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -20,9 +19,9 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
       end
 
       should "process it" do
-        assert_difference("Delayed::Job.count", 2) do
-          @importer.process!
-        end
+        @importer.process!
+        assert(TagAlias.exists?(antecedent_name: "abc", consequent_name: "def"))
+        assert(TagImplication.exists?(antecedent_name: "aaa", consequent_name: "bbb"))
       end
     end
 

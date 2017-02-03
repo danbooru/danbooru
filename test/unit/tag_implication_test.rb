@@ -8,7 +8,6 @@ class TagImplicationTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = "127.0.0.1"
       @user = FactoryGirl.create(:user)
       MEMCACHE.flush_all
-      Delayed::Worker.delay_jobs = false
     end
 
     teardown do

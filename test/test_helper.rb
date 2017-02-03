@@ -105,3 +105,4 @@ if defined?(MEMCACHE)
 end
 
 MEMCACHE = MockMemcache.new
+Delayed::Worker.delay_jobs = false

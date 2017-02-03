@@ -7,7 +7,6 @@ class TagAliasCorrectionTest < ActiveSupport::TestCase
       CurrentUser.user = @mod
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
-      Delayed::Worker.delay_jobs = false
       @post = FactoryGirl.create(:post, :tag_string => "aaa")
       @tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
     end
