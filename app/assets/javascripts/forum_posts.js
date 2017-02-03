@@ -16,7 +16,7 @@
 
     if ($("#c-forum-topics").length) {
       Danbooru.keydown("shift+r", "mark_all_as_read", function(e) {
-        $("#secondary-links-mark-all-as-read a").click();
+        $("#forum-topic-mark-all-as-read a")[0].click();
       });
     }
   }

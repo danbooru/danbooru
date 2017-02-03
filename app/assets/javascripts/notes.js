@@ -585,7 +585,7 @@ Danbooru.Note = {
       $("#image").css("cursor", "auto");
       $("#image").click(Danbooru.Note.Box.toggle_all);
       $("#image").off("mousedown", Danbooru.Note.TranslationMode.Drag.start);
-      $(window).mouseup(Danbooru.Note.TranslationMode.Drag.stop);
+      $(window).off("mouseup", Danbooru.Note.TranslationMode.Drag.stop);
       $(document.body).removeClass("mode-translation");
       $("#close-notice-link").click();
       $("#mark-as-translated-section").hide();
