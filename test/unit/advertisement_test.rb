@@ -1,6 +1,9 @@
 require 'test_helper'
+require 'helpers/upload_test_helper'
 
 class AdvertisementTest < ActiveSupport::TestCase
+  include UploadTestHelper
+
   context "An advertisement" do
     setup do
       Danbooru.config.stubs(:advertisement_path).returns("/tmp")

@@ -1,8 +1,10 @@
 require 'test_helper'
 require 'helpers/iqdb_test_helper'
+require 'helpers/upload_test_helper'
 
 class UploadTest < ActiveSupport::TestCase
   include IqdbTestHelper
+  include UploadTestHelper
 
   def setup
     super
