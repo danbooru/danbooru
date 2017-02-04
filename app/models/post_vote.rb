@@ -35,7 +35,7 @@ class PostVote < ActiveRecord::Base
   end
 
   def initialize_user
-    self.user_id = CurrentUser.user.id
+    self.user_id ||= CurrentUser.user.id
   end
 
   def update_post_on_destroy
