@@ -16,52 +16,9 @@ require 'cache'
 
 Dir[File.expand_path(File.dirname(__FILE__) + "/factories/*.rb")].each {|file| require file}
 
-class MockMemcache
-  def initialize
-    @memory = {}
-  end
-
-  def flush_all
-    @memory = {}
-  end
-  
-  def fetch key, expiry = 0, raw = false
-    if @memory.has_key?(key)
-      @memory[key]
-    else
-      @memory[key] = yield
-    end
-    @memory[key]
-  end
-
-  def incr key
-    @memory[key] += 1
-  end
-
-  def decr key
-    @memory[key] -= 1
-  end
-
-  def set key, value, expiry = 0
-    @memory[key] = value
-  end
-
-  def get key
-    @memory[key]
-  end
-
-  def delete key, delay = 0
-    @memory.delete key
-  end
-
-  def get_multi *keys
-    Hash[[keys.map{ |key| [key, @memory[key]] }]]
-  end
-end
-
 if defined?(MEMCACHE)
   Object.send(:remove_const, :MEMCACHE)
 end
 
-MEMCACHE = MockMemcache.new
+MEMCACHE = MemcacheMock.new
 Delayed::Worker.delay_jobs = false
