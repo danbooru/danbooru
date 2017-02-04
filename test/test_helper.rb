@@ -43,20 +43,6 @@ class ActiveSupport::TestCase
   include UploadTestMethods
 end
 
-class ActionController::TestCase
-  include UploadTestMethods
-
-  def assert_authentication_passes(action, http_method, role, params, session)
-    __send__(http_method, action, params, session.merge(:user_id => @users[role].id))
-    assert_response :success
-  end
-
-  def assert_authentication_fails(action, http_method, role)
-    __send__(http_method, action, params, session.merge(:user_id => @users[role].id))
-    assert_redirected_to(new_sessions_path)
-  end
-end
-
 class MockMemcache
   def initialize
     @memory = {}
