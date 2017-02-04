@@ -131,6 +131,7 @@ module Sources
       def agent
         @agent ||= begin
           mech = Mechanize.new
+          mech.keep_alive = false
 
           session = Cache.get("nico-seiga-session")
           if session
