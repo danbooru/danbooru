@@ -1330,7 +1330,7 @@ class PostTest < ActiveSupport::TestCase
       subject { @post }
 
       should_not allow_value("S", "safe", "derp").for(:rating)
-      should_not allow_value("s", "q", "e").for(:rating)
+      should_not allow_value("s", "e").for(:rating)
     end
   end
 

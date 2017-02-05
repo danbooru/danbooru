@@ -16,6 +16,12 @@ require 'cache'
 
 Dir[File.expand_path(File.dirname(__FILE__) + "/factories/*.rb")].each {|file| require file}
 
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.library :rails
+  end
+end
+
 if defined?(MEMCACHE)
   Object.send(:remove_const, :MEMCACHE)
 end
