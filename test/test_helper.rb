@@ -3,10 +3,8 @@ ENV["RAILS_ENV"] = "test"
 if ENV["SIMPLECOV"]
   require 'simplecov'
   SimpleCov.start 'rails' do
-    add_filter ".bundle"
-    add_filter "script/"
-    add_filter "test/"
-    add_filter "config/"
+    add_group "Libraries", ["app/logical", "lib"]
+    add_group "Presenters", "app/presenters"
   end
 end
 
