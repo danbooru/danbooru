@@ -18,13 +18,13 @@ class ArtistsControllerTest < ActionController::TestCase
 
   context "An artists controller" do
     setup do
-      CurrentUser.user = FactoryGirl.create(:user)
+      @user = FactoryGirl.create(:user)
+      CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
       @artist = FactoryGirl.create(:artist)
-      @user = FactoryGirl.create(:user)
 
-      FactoryGirl.create(:artist, :name => "masao",   :url_string => "http://i2.pixiv.net/img04/img/syounen_no_uta/")
-      FactoryGirl.create(:artist, :name => "artgerm", :url_string => "http://artgerm.deviantart.com/")
+      @masao = FactoryGirl.create(:artist, :name => "masao",   :url_string => "http://i2.pixiv.net/img04/img/syounen_no_uta/")
+      @artgerm = FactoryGirl.create(:artist, :name => "artgerm", :url_string => "http://artgerm.deviantart.com/")
     end
 
     teardown do
@@ -35,6 +35,14 @@ class ArtistsControllerTest < ActionController::TestCase
     should "get the new page" do
       get :new, {}, {:user_id => @user.id}
       assert_response :success
+    end
+
+    should "get the show_or_new page" do
+      get :show_or_new, { name: "masao" }, { user_id: @user.id }
+      assert_redirected_to(@masao)
+
+      get :show_or_new, { name: "nobody" }, { user_id: @user.id }
+      assert_redirected_to(new_artist_path(name: "nobody"))
     end
 
     should "get the edit page" do
@@ -51,6 +59,32 @@ class ArtistsControllerTest < ActionController::TestCase
       @artist.update_attribute(:name, "-aaa")
       get :show, {:id => @artist.id}
       assert_response :success
+    end
+
+    should "get the banned page" do
+      get :banned
+      assert_response :success
+    end
+
+    should "ban an artist" do
+      CurrentUser.scoped(FactoryGirl.create(:admin_user)) do
+        put :ban, { id: @artist.id }, { user_id: CurrentUser.id }
+      end
+
+      assert_redirected_to(@artist)
+      assert_equal(true, @artist.reload.is_banned)
+      assert_equal(true, TagImplication.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
+    end
+
+    should "unban an artist" do
+      CurrentUser.scoped(FactoryGirl.create(:admin_user)) do
+        @artist.ban!
+        put :unban, { id: @artist.id }, { user_id: CurrentUser.id }
+      end
+
+      assert_redirected_to(@artist)
+      assert_equal(false, @artist.reload.is_banned)
+      assert_equal(false, TagImplication.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
     end
 
     should "get the index page" do
@@ -100,6 +134,24 @@ class ArtistsControllerTest < ActionController::TestCase
       @artist.reload
       assert_equal("xxx", @artist.name)
       assert_redirected_to(artist_path(@artist))
+    end
+
+    should "delete an artist" do
+      CurrentUser.scoped(FactoryGirl.create(:builder_user)) do
+        delete :destroy, { id: @artist.id }, { user_id: CurrentUser.id }
+      end
+
+      assert_redirected_to(artist_path(@artist))
+      assert_equal(false, @artist.reload.is_active)
+    end
+
+    should "undelete an artist" do
+      CurrentUser.scoped(FactoryGirl.create(:builder_user)) do
+        put :undelete, { id: @artist.id }, { user_id: CurrentUser.id }
+      end
+
+      assert_redirected_to(artist_path(@artist))
+      assert_equal(true, @artist.reload.is_active)
     end
 
     context "when renaming an artist" do
