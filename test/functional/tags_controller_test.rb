@@ -26,7 +26,7 @@ class TagsControllerTest < ActionController::TestCase
 
     context "index action" do
       setup do
-        @tag = FactoryGirl.create(:tag, :name => "aaa")
+        @tag = FactoryGirl.create(:tag, name: "aaa", post_count: 1)
       end
 
       should "render" do
@@ -39,6 +39,15 @@ class TagsControllerTest < ActionController::TestCase
           get :index, {:search => {:name_matches => "aaa"}}
           assert_response :success
         end
+      end
+    end
+
+    context "autocomplete action" do
+      should "render" do
+        FactoryGirl.create(:tag, name: "touhou", post_count: 1)
+
+        get :autocomplete, { search: { name_matches: "t" }, format: :json }
+        assert_response :success
       end
     end
 
