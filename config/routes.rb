@@ -160,7 +160,6 @@ Rails.application.routes.draw do
     end
   end
   resources :jobs
-  resource :landing
   resources :mod_actions
   resources :news_updates
   resources :notes do
