@@ -15,7 +15,7 @@ class PostArchive < ActiveRecord::Base
     end
   end
 
-  def self.export(version_id = 0)
+  def self.export(version_id = 9096768)
     PostVersion.where("id > ?", version_id).find_each do |version|
       previous = version.previous
       tags = version.tags.scan(/\S+/)
