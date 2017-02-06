@@ -7,7 +7,6 @@ class TagAliasCorrectionsControllerTest < ActionController::TestCase
       CurrentUser.user = @admin
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
-      Delayed::Worker.delay_jobs = false
       @tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
     end
 

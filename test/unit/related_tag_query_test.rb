@@ -6,7 +6,6 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
     CurrentUser.user = user
     CurrentUser.ip_addr = "127.0.0.1"
     MEMCACHE.flush_all
-    Delayed::Worker.delay_jobs = false
   end
 
   context "a related tag query without a category constraint" do

@@ -1,8 +1,10 @@
 require 'test_helper'
 require 'helpers/iqdb_test_helper'
+require 'helpers/upload_test_helper'
 
 class UploadTest < ActiveSupport::TestCase
   include IqdbTestHelper
+  include UploadTestHelper
 
   def setup
     super
@@ -16,13 +18,11 @@ class UploadTest < ActiveSupport::TestCase
       CurrentUser.user = user
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
-      Delayed::Worker.delay_jobs = false
     end
 
     teardown do
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
-      Delayed::Worker.delay_jobs = true
 
       @upload.delete_temp_file if @upload
     end

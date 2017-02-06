@@ -7,7 +7,6 @@ class TagAliasesControllerTest < ActionController::TestCase
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
       MEMCACHE.flush_all
-      Delayed::Worker.delay_jobs = false
     end
 
     teardown do
@@ -49,7 +48,7 @@ class TagAliasesControllerTest < ActionController::TestCase
         end
 
         # TODO: Broken in shoulda-matchers 2.8.0. Need to upgrade to 3.1.1.
-        should_eventually permit(:antecedent_name, :consequent_name, :forum_topic_id).for(:update)
+        # should_eventually permit(:antecedent_name, :consequent_name, :forum_topic_id).for(:update)
       end
 
       context "for an approved alias" do

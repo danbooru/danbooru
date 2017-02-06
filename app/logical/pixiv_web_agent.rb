@@ -10,6 +10,8 @@ class PixivWebAgent
 
   def self.build
     mech = Mechanize.new
+    mech.keep_alive = false
+
     phpsessid = Cache.get(SESSION_CACHE_KEY)
     comicsessid = Cache.get(COMIC_SESSION_CACHE_KEY)
 

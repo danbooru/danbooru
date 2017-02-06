@@ -3,7 +3,8 @@ source 'https://rubygems.org/'
 gem 'dotenv-rails', :require => "dotenv/rails-now"
 
 group :test do
-  gem "shoulda"
+  gem "shoulda-context"
+  gem "shoulda-matchers"
   gem "factory_girl"
   gem "mocha", :require => "mocha/setup"
   gem "ffaker"
