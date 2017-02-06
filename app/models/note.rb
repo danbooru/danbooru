@@ -89,10 +89,6 @@ class Note < ActiveRecord::Base
   extend SearchMethods
   include ApiMethods
 
-  def presenter
-    @presenter ||= NotePresenter.new(self)
-  end
-
   def initialize_creator
     self.creator_id = CurrentUser.id
   end

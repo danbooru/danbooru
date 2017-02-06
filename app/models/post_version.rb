@@ -56,10 +56,6 @@ class PostVersion < ActiveRecord::Base
     @tag_array ||= tags.scan(/\S+/)
   end
 
-  def presenter
-    PostVersionPresenter.new(self)
-  end
-
   def reload
     @tag_array = nil
     super

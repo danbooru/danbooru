@@ -158,10 +158,6 @@ class ForumTopic < ActiveRecord::Base
     (response_count / Danbooru.config.posts_per_page.to_f).ceil
   end
 
-  def presenter(forum_posts)
-    @presenter ||= ForumTopicPresenter.new(self, forum_posts)
-  end
-
   def as_json(options = {})
     if CurrentUser.user.level < min_level
       options[:only] = [:id]
