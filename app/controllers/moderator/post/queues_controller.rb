@@ -15,7 +15,7 @@ module Moderator
         end
 
         ::Post.without_timeout do
-          @posts = ::Post.order("posts.id asc").pending_or_flagged.available_for_moderation(params[:hidden]).search(:tag_match => params[:query]).paginate(params[:page], :limit => per_page)
+          @posts = ::Post.order("posts.id asc").pending_or_flagged.available_for_moderation(params[:hidden]).tag_match(params[:query]).paginate(params[:page], :limit => per_page)
           @posts.each # hack to force rails to eager load
         end
         respond_with(@posts)
