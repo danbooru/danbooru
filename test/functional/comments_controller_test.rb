@@ -22,6 +22,11 @@ class CommentsControllerTest < ActionController::TestCase
     end
 
     context "index action" do
+      should "render for post" do
+        xhr :get, :index, { post_id: @post.id, group_by: "post", format: "js" }
+        assert_response :success
+      end
+
       should "render by post" do
         get :index, {:group_by => "post"}
         assert_response :success
@@ -140,6 +145,16 @@ class CommentsControllerTest < ActionController::TestCase
         delete :destroy, {:id => @comment.id}, {:user_id => @user.id}
         assert_equal(true, @comment.reload.is_deleted)
         assert_redirected_to @comment
+      end
+    end
+
+    context "undelete action" do
+      should "mark comment as undeleted" do
+        @comment.delete!
+        put :undelete, { id: @comment.id }, { user_id: @user.id }
+
+        assert_equal(false, @comment.reload.is_deleted)
+        assert_redirected_to(@comment)
       end
     end
   end
