@@ -18,6 +18,13 @@ module Moderator
             assert_response :success
           end
         end
+
+        context "random action" do
+          should "render" do
+            get :random, {}, {:user_id => @admin.id}
+            assert_response :success
+          end
+        end
       end
     end
   end
