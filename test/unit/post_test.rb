@@ -2039,7 +2039,7 @@ class PostTest < ActiveSupport::TestCase
 
     context "a post that has been updated" do
       setup do
-        @post = FactoryGirl.create(:post, :rating => "q", :tag_string => "aaa")
+        @post = FactoryGirl.create(:post, :rating => "q", :tag_string => "aaa", :source => nil)
         @post.stubs(:merge_version?).returns(false)
         @post.update_attributes(:tag_string => "aaa bbb ccc ddd")
         @post.update_attributes(:tag_string => "bbb xxx yyy", :source => "xyz")
