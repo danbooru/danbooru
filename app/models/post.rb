@@ -173,7 +173,7 @@ class Post < ActiveRecord::Base
     end
     
     def is_animated_png?
-      if file_ext =~ /png/i
+      if file_ext =~ /png/i && File.exists?(file_path)
         apng = APNGInspector.new(file_path)
         apng.inspect!
         return apng.animated?

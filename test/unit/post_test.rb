@@ -6,6 +6,10 @@ class PostTest < ActiveSupport::TestCase
   include PoolArchiveTestHelper
   include SavedSearchTestHelper
 
+  def assert_tag_match(posts, query)
+    assert_equal(posts.map(&:id), Post.tag_match(query).pluck(:id))
+  end
+
   setup do
     Timecop.travel(2.weeks.ago) do
       @user = FactoryGirl.create(:user)
@@ -1506,230 +1510,346 @@ class PostTest < ActiveSupport::TestCase
 
   context "Searching:" do
     should "return posts for the age:<1minute tag" do
-      post1 = FactoryGirl.create(:post, :tag_string => "aaa")
-      count = Post.tag_match("age:<1minute").count
-      assert_equal(1, count)
+      post = FactoryGirl.create(:post)
+      assert_tag_match([post], "age:<1minute")
     end
 
     should "return posts for the age:<1minute tag when the user is in Pacific time zone" do
-      post1 = FactoryGirl.create(:post, :tag_string => "aaa")
+      post = FactoryGirl.create(:post)
       Time.zone = "Pacific Time (US & Canada)"
-      count = Post.tag_match("age:<1minute").count
-      assert_equal(1, count)
+      assert_tag_match([post], "age:<1minute")
       Time.zone = "Eastern Time (US & Canada)"
     end
 
     should "return posts for the age:<1minute tag when the user is in Tokyo time zone" do
-      post1 = FactoryGirl.create(:post, :tag_string => "aaa")
+      post = FactoryGirl.create(:post)
       Time.zone = "Asia/Tokyo"
-      count = Post.tag_match("age:<1minute").count
-      assert_equal(1, count)
+      assert_tag_match([post], "age:<1minute")
       Time.zone = "Eastern Time (US & Canada)"
     end
 
     should "return posts for the ' tag" do
       post1 = FactoryGirl.create(:post, :tag_string => "'")
       post2 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
-      count = Post.tag_match("'").count
-      assert_equal(1, count)
+
+      assert_tag_match([post1], "'")
     end
 
     should "return posts for the \\ tag" do
       post1 = FactoryGirl.create(:post, :tag_string => "\\")
       post2 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
-      count = Post.tag_match("\\").count
-      assert_equal(1, count)
+
+      assert_tag_match([post1], "\\")
     end
 
     should "return posts for the ( tag" do
       post1 = FactoryGirl.create(:post, :tag_string => "(")
       post2 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
-      count = Post.tag_match("(").count
-      assert_equal(1, count)
+
+      assert_tag_match([post1], "(")
     end
 
     should "return posts for the ? tag" do
       post1 = FactoryGirl.create(:post, :tag_string => "?")
       post2 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
-      count = Post.tag_match("?").count
-      assert_equal(1, count)
+
+      assert_tag_match([post1], "?")
     end
 
     should "return posts for 1 tag" do
       post1 = FactoryGirl.create(:post, :tag_string => "aaa")
       post2 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
       post3 = FactoryGirl.create(:post, :tag_string => "bbb ccc")
-      relation = Post.tag_match("aaa")
-      assert_equal(2, relation.count)
-      assert_equal(post2.id, relation.all[0].id)
-      assert_equal(post1.id, relation.all[1].id)
+
+      assert_tag_match([post2, post1], "aaa")
     end
 
     should "return posts for a 2 tag join" do
       post1 = FactoryGirl.create(:post, :tag_string => "aaa")
       post2 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
       post3 = FactoryGirl.create(:post, :tag_string => "bbb ccc")
-      relation = Post.tag_match("aaa bbb")
-      assert_equal(1, relation.count)
-      assert_equal(post2.id, relation.first.id)
+
+      assert_tag_match([post2], "aaa bbb")
+    end
+
+    should "return posts for a 2 tag union" do
+      post1 = FactoryGirl.create(:post, :tag_string => "aaa")
+      post2 = FactoryGirl.create(:post, :tag_string => "aaab bbb")
+      post3 = FactoryGirl.create(:post, :tag_string => "bbb ccc")
+
+      assert_tag_match([post3, post1], "~aaa ~ccc")
     end
 
     should "return posts for 1 tag with exclusion" do
       post1 = FactoryGirl.create(:post, :tag_string => "aaa")
       post2 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
       post3 = FactoryGirl.create(:post, :tag_string => "bbb ccc")
-      relation = Post.tag_match("aaa -bbb")
-      assert_equal(1, relation.count)
-      assert_equal(post1.id, relation.first.id)
+
+      assert_tag_match([post1], "aaa -bbb")
     end
 
     should "return posts for 1 tag with a pattern" do
       post1 = FactoryGirl.create(:post, :tag_string => "aaa")
       post2 = FactoryGirl.create(:post, :tag_string => "aaab bbb")
       post3 = FactoryGirl.create(:post, :tag_string => "bbb ccc")
-      relation = Post.tag_match("a*")
-      assert_equal(2, relation.count)
-      assert_equal(post2.id, relation.all[0].id)
-      assert_equal(post1.id, relation.all[1].id)
+
+      assert_tag_match([post2, post1], "a*")
     end
 
     should "return posts for 2 tags, one with a pattern" do
       post1 = FactoryGirl.create(:post, :tag_string => "aaa")
       post2 = FactoryGirl.create(:post, :tag_string => "aaab bbb")
       post3 = FactoryGirl.create(:post, :tag_string => "bbb ccc")
-      relation = Post.tag_match("a* bbb")
-      assert_equal(1, relation.count)
-      assert_equal(post2.id, relation.first.id)
+
+      assert_tag_match([post2], "a* bbb")
     end
 
-    should "return posts for the <id> metatag" do
-      post1 = FactoryGirl.create(:post)
-      post2 = FactoryGirl.create(:post)
-      post3 = FactoryGirl.create(:post)
-      relation = Post.tag_match("id:#{post2.id}")
-      assert_equal(1, relation.count)
-      assert_equal(post2.id, relation.first.id)
-      relation = Post.tag_match("id:>#{post2.id}")
-      assert_equal(1, relation.count)
-      assert_equal(post3.id, relation.first.id)
-      relation = Post.tag_match("id:<#{post2.id}")
-      assert_equal(1, relation.count)
-      assert_equal(post1.id, relation.first.id)
+    should "return posts for the id:<N> metatag" do
+      posts = FactoryGirl.create_list(:post, 3)
+
+      assert_tag_match([posts[1]], "id:#{posts[1].id}")
+      assert_tag_match([posts[2]], "id:>#{posts[1].id}")
+      assert_tag_match([posts[0]], "id:<#{posts[1].id}")
+
+      assert_tag_match([posts[2], posts[0]], "-id:#{posts[1].id}")
+      assert_tag_match([posts[2], posts[1]], "id:>=#{posts[1].id}")
+      assert_tag_match([posts[1], posts[0]], "id:<=#{posts[1].id}")
+      assert_tag_match([posts[2], posts[0]], "id:#{posts[0].id},#{posts[2].id}")
+      assert_tag_match(posts.reverse, "id:#{posts[0].id}..#{posts[2].id}")
     end
 
-    should "return posts for the <fav> metatag" do
-      post1 = FactoryGirl.create(:post)
-      post2 = FactoryGirl.create(:post)
-      post3 = FactoryGirl.create(:post)
-      user = FactoryGirl.create(:user)
-      post1.add_favorite!(user)
-      relation = Post.tag_match("fav:#{user.name}")
-      assert_equal(1, relation.count)
-      assert_equal(post1.id, relation.first.id)
-    end
-
-    should "return posts for the <pool> metatag" do
-      SqsService.any_instance.stubs(:send_message)
-
-      post1 = FactoryGirl.create(:post)
-      post2 = FactoryGirl.create(:post)
-      post3 = FactoryGirl.create(:post)
-      pool = FactoryGirl.create(:pool, :name => "xxx")
-      post1.add_pool!(pool)
-      relation = Post.tag_match("pool:xxx")
-      assert_equal(1, relation.count)
-      assert_equal(post1.id, relation.first.id)
-    end
-
-    should "return posts for the <pool> metatag with a wildcard" do
-      SqsService.any_instance.stubs(:send_message)
-
-      post1 = FactoryGirl.create(:post)
-      post2 = FactoryGirl.create(:post)
-      post3 = FactoryGirl.create(:post)
-      pool1 = FactoryGirl.create(:pool, :name => "test_a")
-      pool2 = FactoryGirl.create(:pool, :name => "test_b")
-      post1.add_pool!(pool1)
-      post3.add_pool!(pool2)
-      relation = Post.tag_match("pool:test*")
-      assert_equal(2, relation.count)
-      assert_equal([post3.id, post1.id], relation.all.map(&:id))
-    end
-
-    should "return posts for the <user> metatag" do
-      second_user = FactoryGirl.create(:user)
-      post1 = FactoryGirl.create(:post, :uploader => CurrentUser.user)
-
-      assert_equal(CurrentUser.id, post1.uploader_id)
-
-      CurrentUser.scoped(second_user, "127.0.0.2") do
-        post2 = FactoryGirl.create(:post)
-        post3 = FactoryGirl.create(:post)
+    should "return posts for the fav:<name> metatag" do
+      users = FactoryGirl.create_list(:user, 2)
+      posts = users.map do |u|
+        CurrentUser.scoped(u) { FactoryGirl.create(:post, tag_string: "fav:#{u.name}") }
       end
 
-      relation = Post.tag_match("user:#{CurrentUser.user.name}")
-      assert_equal(1, relation.count)
-      assert_equal(post1.id, relation.first.id)
+      assert_tag_match([posts[0]], "fav:#{users[0].name}")
+      assert_tag_match([posts[1]], "-fav:#{users[0].name}")
     end
 
-    should "return posts for a list of md5 hashes" do
+    should "return posts for the ordfav:<name> metatag" do
+      post1 = FactoryGirl.create(:post, tag_string: "fav:#{CurrentUser.name}")
+      post2 = FactoryGirl.create(:post, tag_string: "fav:#{CurrentUser.name}")
+
+      assert_tag_match([post2, post1], "ordfav:#{CurrentUser.name}")
+    end
+
+    should "return posts for the pool:<name> metatag" do
+      SqsService.any_instance.stubs(:send_message)
+
+      FactoryGirl.create(:pool, name: "test_a", category: "series")
+      FactoryGirl.create(:pool, name: "test_b", category: "collection")
+      post1 = FactoryGirl.create(:post, tag_string: "pool:test_a")
+      post2 = FactoryGirl.create(:post, tag_string: "pool:test_b")
+
+      assert_tag_match([post1], "pool:test_a")
+      assert_tag_match([post2], "-pool:test_a")
+      assert_tag_match([], "-pool:test_a -pool:test_b")
+      assert_tag_match([post2, post1], "pool:test*")
+
+      assert_tag_match([post2, post1], "pool:any")
+      assert_tag_match([], "pool:none")
+
+      assert_tag_match([post1], "pool:series")
+      assert_tag_match([post2], "-pool:series")
+      assert_tag_match([post2], "pool:collection")
+      assert_tag_match([post1], "-pool:collection")
+    end
+
+    should "return posts for the ordpool:<name> metatag" do
+      posts = FactoryGirl.create_list(:post, 2, tag_string: "newpool:test")
+
+      assert_tag_match(posts, "ordpool:test")
+    end
+
+    should "return posts for the parent:<N> metatag" do
+      parent = FactoryGirl.create(:post)
+      child = FactoryGirl.create(:post, tag_string: "parent:#{parent.id}")
+
+      assert_tag_match([parent], "parent:none")
+      assert_tag_match([child], "-parent:none")
+      assert_tag_match([child, parent], "parent:#{parent.id}")
+      assert_tag_match([child], "parent:#{child.id}")
+
+      assert_tag_match([child], "child:none")
+      assert_tag_match([parent], "child:any")
+    end
+
+    should "return posts for the favgroup:<name> metatag" do
+      favgroups = FactoryGirl.create_list(:favorite_group, 2, creator: CurrentUser.user)
+      posts = favgroups.map { |g| FactoryGirl.create(:post, tag_string: "favgroup:#{g.name}") }
+
+      assert_tag_match([posts[0]], "favgroup:#{favgroups[0].name}")
+      assert_tag_match([posts[1]], "-favgroup:#{favgroups[0].name}")
+      assert_tag_match([], "-favgroup:#{favgroups[0].name} -favgroup:#{favgroups[1].name}")
+    end
+
+    should "return posts for the user:<name> metatag" do
+      users = FactoryGirl.create_list(:user, 2)
+      posts = users.map { |u| FactoryGirl.create(:post, uploader: u) }
+
+      assert_tag_match([posts[0]], "user:#{users[0].name}")
+      assert_tag_match([posts[1]], "-user:#{users[0].name}")
+    end
+
+    should "return posts for the approver:<name> metatag" do
+      users = FactoryGirl.create_list(:user, 2)
+      posts = users.map { |u| FactoryGirl.create(:post, approver: u) }
+      posts << FactoryGirl.create(:post, approver: nil)
+
+      assert_tag_match([posts[0]], "approver:#{users[0].name}")
+      assert_tag_match([posts[1]], "-approver:#{users[0].name}")
+      assert_tag_match([posts[1], posts[0]], "approver:any")
+      assert_tag_match([posts[2]], "approver:none")
+    end
+
+    should "return posts for the noter:<name> metatag" do
+      users = FactoryGirl.create_list(:user, 2)
+      posts = FactoryGirl.create_list(:post, 2)
+      notes = users.zip(posts).map { |u, p| FactoryGirl.create(:note, creator: u, post: p) }
+
+      assert_tag_match([posts[0]], "noter:#{users[0].name}")
+      assert_tag_match([posts[1]], "noter:#{users[1].name}")
+    end
+
+    should "return posts for the artcomm:<name> metatag" do
+      users = FactoryGirl.create_list(:user, 2)
+      posts = FactoryGirl.create_list(:post, 2)
+      users.zip(posts).map do |u, p|
+        CurrentUser.scoped(u) { FactoryGirl.create(:artist_commentary, post: p) }
+      end
+
+      assert_tag_match([posts[0]], "artcomm:#{users[0].name}")
+      assert_tag_match([posts[1]], "artcomm:#{users[1].name}")
+    end
+
+    should "return posts for the date:<d> metatag" do
+      post = FactoryGirl.create(:post, created_at: Time.parse("2017-01-01"))
+
+      assert_tag_match([post], "date:2017-01-01")
+    end
+
+    should "return posts for the age:<n> metatag" do
+      post = FactoryGirl.create(:post)
+
+      assert_tag_match([post], "age:<60")
+      assert_tag_match([post], "age:<60s")
+      assert_tag_match([post], "age:<1mi")
+      assert_tag_match([post], "age:<1h")
+      assert_tag_match([post], "age:<1d")
+      assert_tag_match([post], "age:<1w")
+      assert_tag_match([post], "age:<1mo")
+      assert_tag_match([post], "age:<1y")
+    end
+
+    should "return posts for the ratio:<x:y> metatag" do
+      post = FactoryGirl.create(:post, image_width: 1000, image_height: 500)
+
+      assert_tag_match([post], "ratio:2:1")
+      assert_tag_match([post], "ratio:2.0")
+    end
+
+    should "return posts for the status:<type> metatag" do
+      pending = FactoryGirl.create(:post, is_pending: true)
+      flagged = FactoryGirl.create(:post, is_flagged: true)
+      deleted = FactoryGirl.create(:post, is_deleted: true)
+      banned  = FactoryGirl.create(:post, is_banned: true)
+      all = [banned, deleted, flagged, pending]
+
+      assert_tag_match([pending], "status:pending")
+      assert_tag_match([flagged], "status:flagged")
+      assert_tag_match([deleted], "status:deleted")
+      assert_tag_match([banned],  "status:banned")
+      assert_tag_match([flagged], "status:active")
+      assert_tag_match(all, "status:any")
+      assert_tag_match(all, "status:all")
+
+      assert_tag_match(all - [pending], "-status:pending")
+      assert_tag_match(all - [flagged], "-status:flagged")
+      assert_tag_match(all - [deleted], "-status:deleted")
+      assert_tag_match(all - [banned],  "-status:banned")
+      assert_tag_match(all - [flagged], "-status:active")
+    end
+
+    should "return posts for the filetype:<ext> metatag" do
+      png = FactoryGirl.create(:post, file_ext: "png")
+      jpg = FactoryGirl.create(:post, file_ext: "jpg")
+
+      assert_tag_match([png], "filetype:png")
+      assert_tag_match([jpg], "-filetype:png")
+    end
+
+    should "return posts for the tagcount:<n> metatags" do
+      post = FactoryGirl.create(:post, tag_string: "artist:wokada copyright:vocaloid char:hatsune_miku twintails")
+
+      assert_tag_match([post], "tagcount:4")
+      assert_tag_match([post], "arttags:1")
+      assert_tag_match([post], "copytags:1")
+      assert_tag_match([post], "chartags:1")
+      assert_tag_match([post], "gentags:1")
+    end
+
+    should "return posts for the md5:<md5> metatag" do
       post1 = FactoryGirl.create(:post, :md5 => "abcd")
       post2 = FactoryGirl.create(:post)
-      post3 = FactoryGirl.create(:post)
-      relation = Post.tag_match("md5:abcd")
-      assert_equal(1, relation.count)
-      assert_equal(post1.id, relation.first.id)
+
+      assert_tag_match([post1], "md5:abcd")
     end
 
     should "return posts for a source search" do
       post1 = FactoryGirl.create(:post, :source => "abcd")
       post2 = FactoryGirl.create(:post, :source => "abcdefg")
-      post3 = FactoryGirl.create(:post, :source => "xyz")
-      relation = Post.tag_match("source:abcde")
-      assert_equal(1, relation.count)
-      assert_equal(post2.id, relation.first.id)
+      post3 = FactoryGirl.create(:post, :source => "")
+
+      assert_tag_match([post2], "source:abcde")
+      assert_tag_match([post3, post1], "-source:abcde")
+
+      assert_tag_match([post3], "source:none")
+      assert_tag_match([post2, post1], "-source:none")
     end
 
     should "return posts for a case insensitive source search" do
       post1 = FactoryGirl.create(:post, :source => "ABCD")
       post2 = FactoryGirl.create(:post, :source => "1234")
-      relation = Post.tag_match("source:abcd")
-      assert_equal(1, relation.count)
+
+      assert_tag_match([post1], "source:abcd")
     end
 
     should "return posts for a pixiv source search" do
       url = "http://i1.pixiv.net/img123/img/artist-name/789.png"
       post = FactoryGirl.create(:post, :source => url)
-      assert_equal(1, Post.tag_match("source:*.pixiv.net/img*/artist-name/*").count)
-      assert_equal(0, Post.tag_match("source:*.pixiv.net/img*/artist-fake/*").count)
-      assert_equal(1, Post.tag_match("source:http://*.pixiv.net/img*/img/artist-name/*").count)
-      assert_equal(0, Post.tag_match("source:http://*.pixiv.net/img*/img/artist-fake/*").count)
-      assert_equal(1, Post.tag_match("source:pixiv/artist-name/*").count)
-      assert_equal(0, Post.tag_match("source:pixiv/artist-fake/*").count)
+
+      assert_tag_match([post], "source:*.pixiv.net/img*/artist-name/*")
+      assert_tag_match([],     "source:*.pixiv.net/img*/artist-fake/*")
+      assert_tag_match([post], "source:http://*.pixiv.net/img*/img/artist-name/*")
+      assert_tag_match([],     "source:http://*.pixiv.net/img*/img/artist-fake/*")
+      assert_tag_match([post], "source:pixiv/artist-name/*")
+      assert_tag_match([],     "source:pixiv/artist-fake/*")
     end
 
     should "return posts for a pixiv id search (type 1)" do
       url = "http://i1.pixiv.net/img-inf/img/2013/03/14/03/02/36/34228050_s.jpg"
       post = FactoryGirl.create(:post, :source => url)
-      assert_equal(1, Post.tag_match("pixiv_id:34228050").count)
+      assert_tag_match([post], "pixiv_id:34228050")
     end
 
     should "return posts for a pixiv id search (type 2)" do
       url = "http://i1.pixiv.net/img123/img/artist-name/789.png"
       post = FactoryGirl.create(:post, :source => url)
-      assert_equal(1, Post.tag_match("pixiv_id:789").count)
+      assert_tag_match([post], "pixiv_id:789")
     end
     
     should "return posts for a pixiv id search (type 3)" do
       url = "http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=19113635&page=0"
       post = FactoryGirl.create(:post, :source => url)
-      assert_equal(1, Post.tag_match("pixiv_id:19113635").count)
+      assert_tag_match([post], "pixiv_id:19113635")
     end
     
     should "return posts for a pixiv id search (type 4)" do
       url = "http://i2.pixiv.net/img70/img/disappearedstump/34551381_p3.jpg?1364424318"
       post = FactoryGirl.create(:post, :source => url)
-      assert_equal(1, Post.tag_match("pixiv_id:34551381").count)
+      assert_tag_match([post], "pixiv_id:34551381")
     end
     
     # should "return posts for a pixiv novel id search" do
@@ -1746,52 +1866,103 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(1, relation.count)
     end
 
-    should "return posts for a <search> metatag" do
-      SavedSearch.stubs(:update_listbooru_on_create)
-      post1 = FactoryGirl.create(:post, :tag_string => "aaa")
-      sub = FactoryGirl.create(:saved_search, :tag_query => "aaa", :name => "zzz", :user_id => CurrentUser.id)
-      SavedSearch.expects(:post_ids).returns([post1.id])
-      relation = Post.tag_match("search:#{CurrentUser.name}")
-      assert_equal(1, relation.count)
+    should "return posts for a search:<category> metatag" do
+      post1 = FactoryGirl.create(:post, tag_string: "aaa")
+      post2 = FactoryGirl.create(:post, tag_string: "bbb")
+      FactoryGirl.create(:saved_search, tag_query: "aaa", category: "zzz", user: CurrentUser.user)
+      FactoryGirl.create(:saved_search, tag_query: "bbb", category: nil,   user: CurrentUser.user)
+
+      SavedSearch.expects(:post_ids).with(CurrentUser.id, "zzz").returns([post1.id])
+      SavedSearch.expects(:post_ids).with(CurrentUser.id, "uncategorized").returns([post2.id])
+      SavedSearch.expects(:post_ids).with(CurrentUser.id).returns([post1.id, post2.id])
+
+      assert_tag_match([post1], "search:zzz")
+      assert_tag_match([post2], "search:uncategorized")
+      assert_tag_match([post2, post1], "search:all")
     end
 
-    should "return posts for a named <search> metatag" do
-      SavedSearch.stubs(:update_listbooru_on_create)
-      post1 = FactoryGirl.create(:post, :tag_string => "aaa")
-      sub = FactoryGirl.create(:saved_search, :tag_query => "aaa", :name => "zzz", :user_id => CurrentUser.id)
-      SavedSearch.expects(:post_ids).returns([post1.id])
-      relation = Post.tag_match("search:#{CurrentUser.name}:zzz")
-      assert_equal(1, relation.count)
+    should "return posts for a rating:<s|q|e> metatag" do
+      s = FactoryGirl.create(:post, :rating => "s")
+      q = FactoryGirl.create(:post, :rating => "q")
+      e = FactoryGirl.create(:post, :rating => "e")
+      all = [e, q, s]
+
+      assert_tag_match([s], "rating:s")
+      assert_tag_match([q], "rating:q")
+      assert_tag_match([e], "rating:e")
+
+      assert_tag_match(all - [s], "-rating:s")
+      assert_tag_match(all - [q], "-rating:q")
+      assert_tag_match(all - [e], "-rating:e")
     end
 
-    should "return posts for a particular rating" do
-      post1 = FactoryGirl.create(:post, :rating => "s")
-      post2 = FactoryGirl.create(:post, :rating => "q")
-      post3 = FactoryGirl.create(:post, :rating => "e")
-      relation = Post.tag_match("rating:e")
-      assert_equal(1, relation.count)
-      assert_equal(post3.id, relation.first.id)
+    should "return posts for a locked:<rating|note|status> metatag" do
+      rating_locked = FactoryGirl.create(:post, is_rating_locked: true)
+      note_locked   = FactoryGirl.create(:post, is_note_locked: true)
+      status_locked = FactoryGirl.create(:post, is_status_locked: true)
+      all = [status_locked, note_locked, rating_locked]
+
+      assert_tag_match([rating_locked], "locked:rating")
+      assert_tag_match([note_locked], "locked:note")
+      assert_tag_match([status_locked], "locked:status")
+
+      assert_tag_match(all - [rating_locked], "-locked:rating")
+      assert_tag_match(all - [note_locked], "-locked:note")
+      assert_tag_match(all - [status_locked], "-locked:status")
     end
 
-    should "return posts for a particular negated rating" do
-      post1 = FactoryGirl.create(:post, :rating => "s")
-      post2 = FactoryGirl.create(:post, :rating => "s")
-      post3 = FactoryGirl.create(:post, :rating => "e")
-      relation = Post.tag_match("-rating:s")
-      assert_equal(1, relation.count)
-      assert_equal(post3.id, relation.first.id)
+    should "return posts for a upvote:<user>, downvote:<user> metatag" do
+      CurrentUser.scoped(FactoryGirl.create(:mod_user)) do
+        upvoted   = FactoryGirl.create(:post, tag_string: "upvote:self")
+        downvoted = FactoryGirl.create(:post, tag_string: "downvote:self")
+
+        assert_tag_match([upvoted],   "upvote:#{CurrentUser.name}")
+        assert_tag_match([downvoted], "downvote:#{CurrentUser.name}")
+      end
     end
 
     should "return posts ordered by a particular attribute" do
-      post1 = FactoryGirl.create(:post, :rating => "s")
-      post2 = FactoryGirl.create(:post, :rating => "s")
-      post3 = FactoryGirl.create(:post, :rating => "e", :score => 5, :image_width => 10_000)
-      relation = Post.tag_match("order:id")
-      assert_equal(post1.id, relation.first.id)
-      relation = Post.tag_match("order:mpixels")
-      assert_equal(post3.id, relation.first.id)
-      relation = Post.tag_match("order:landscape")
-      assert_equal(post3.id, relation.first.id)
+      posts = (1..2).map do |n|
+        p = FactoryGirl.create(
+          :post,
+          score: n,
+          fav_count: n,
+          file_size: 1.megabyte * n,
+          # posts[0] is portrait, posts[1] is landscape. posts[1].mpixels > posts[0].mpixels.
+          image_height: 100*n*n,
+          image_width: 100*(3-n)*n,
+        )
+
+        FactoryGirl.create(:artist_commentary, post: p)
+        FactoryGirl.create(:comment, post: p, do_not_bump_post: false)
+        FactoryGirl.create(:note, post: p)
+        p
+      end
+
+      assert_tag_match(posts.reverse, "order:id_desc")
+      assert_tag_match(posts.reverse, "order:score")
+      assert_tag_match(posts.reverse, "order:favcount")
+      assert_tag_match(posts.reverse, "order:change")
+      assert_tag_match(posts.reverse, "order:comment")
+      assert_tag_match(posts.reverse, "order:comment_bumped")
+      assert_tag_match(posts.reverse, "order:note")
+      assert_tag_match(posts.reverse, "order:artcomm")
+      assert_tag_match(posts.reverse, "order:mpixels")
+      assert_tag_match(posts.reverse, "order:portrait")
+      assert_tag_match(posts.reverse, "order:filesize")
+      assert_tag_match(posts.reverse, "order:rank")
+
+      assert_tag_match(posts, "order:id_asc")
+      assert_tag_match(posts, "order:score_asc")
+      assert_tag_match(posts, "order:favcount_asc")
+      assert_tag_match(posts, "order:change_asc")
+      assert_tag_match(posts, "order:comment_asc")
+      assert_tag_match(posts, "order:comment_bumped_asc")
+      assert_tag_match(posts, "order:artcomm_asc")
+      assert_tag_match(posts, "order:note_asc")
+      assert_tag_match(posts, "order:mpixels_asc")
+      assert_tag_match(posts, "order:landscape")
+      assert_tag_match(posts, "order:filesize_asc")
     end
 
     should "return posts for order:comment_bumped" do
@@ -1805,21 +1976,23 @@ class PostTest < ActiveSupport::TestCase
         comment3 = FactoryGirl.create(:comment, :post => post3)
       end
 
-      assert_equal([post3.id, post1.id, post2.id], Post.tag_match("order:comment_bumped").map(&:id))
-      assert_equal([post1.id, post3.id, post2.id], Post.tag_match("order:comment_bumped_asc").map(&:id))
+      assert_tag_match([post3, post1, post2], "order:comment_bumped")
+      assert_tag_match([post1, post3, post2], "order:comment_bumped_asc")
     end
 
     should "return posts for a filesize search" do
       post = FactoryGirl.create(:post, :file_size => 1.megabyte)
-      assert_equal(1, Post.tag_match("filesize:1mb").count)
-      assert_equal(1, Post.tag_match("filesize:1000kb").count)
-      assert_equal(1, Post.tag_match("filesize:1048576b").count)
+
+      assert_tag_match([post], "filesize:1mb")
+      assert_tag_match([post], "filesize:1000kb")
+      assert_tag_match([post], "filesize:1048576b")
     end
 
     should "not perform fuzzy matching for an exact filesize search" do
       post = FactoryGirl.create(:post, :file_size => 1.megabyte)
-      assert_equal(0, Post.tag_match("filesize:1048000b").count)
-      assert_equal(0, Post.tag_match("filesize:1048000").count)
+
+      assert_tag_match([], "filesize:1048000b")
+      assert_tag_match([], "filesize:1048000")
     end
 
     should "fail for more than 6 tags" do
