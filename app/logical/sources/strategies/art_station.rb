@@ -7,6 +7,7 @@ module Sources::Strategies
     end
 
     def referer_url
+      @url
     end
 
     def tags
