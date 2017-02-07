@@ -5,12 +5,20 @@ module Downloads
         # example: https://cdnb3.artstation.com/p/assets/images/images/003/716/071/large/aoi-ogata-hate-city.jpg?1476754974
         if url =~ %r!^https?://cdn\w*\.artstation\.com/p/assets/images/images/\d+/\d+/\d+/(?:medium|small|large)/!
           url, headers = rewrite_large_url(url, headers)
+        elsif url =~ %r!https?://\w+\.artstation\.com/artwork/!
+          url, headers = rewrite_html_url(url, headers)
         end
 
         return [url, headers, data]
       end
 
     protected
+      def rewrite_html_url(url, headers)
+        source = Sources::Strategies::Site.new(url)
+        source.get
+        [source.image_url, headers]
+      end
+
       def rewrite_large_url(url, headers)
         # example: https://cdnb3.artstation.com/p/assets/images/images/003/716/071/original/aoi-ogata-hate-city.jpg?1476754974
         url = url.sub(%r!/(?:medium|small|large)/!, "/original/")
