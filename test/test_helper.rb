@@ -26,3 +26,13 @@ end
 
 MEMCACHE = MemcacheMock.new
 Delayed::Worker.delay_jobs = false
+
+require "helpers/reportbooru_helper"
+class ActiveSupport::TestCase
+  include ReportbooruHelper
+
+  setup do
+    mock_popular_search_service!
+    mock_missed_search_service!
+  end
+end

@@ -13,28 +13,44 @@ class UsersControllerTest < ActionController::TestCase
     end
 
     context "index action" do
-      setup do
-        FactoryGirl.create(:user, :name => "abc")
-      end
-
       should "list all users" do
         get :index
         assert_response :success
       end
 
+      should "list all users for /users?name=<name>" do
+        get :index, { name: @user.name }
+        assert_redirected_to(@user)
+      end
+
+      should "raise error for /users?name=<nonexistent>" do
+        get :index, { name: "nobody" }
+        assert_response :error
+      end
+
       should "list all users (with search)" do
-        get :index, {:search => {:name_matches => "abc"}}
+        get :index, {:search => {:name_matches => @user.name}}
         assert_response :success
       end
     end
 
     context "show action" do
       setup do
-        @user = FactoryGirl.create(:user)
+        # flesh out profile to get more test coverage of user presenter.
+        @user = FactoryGirl.create(:banned_user, can_approve_posts: true, is_super_voter: true)
+        FactoryGirl.create(:saved_search, user: @user)
+        FactoryGirl.create(:post, uploader: @user, tag_string: "fav:#{@user.name}")
       end
 
       should "render" do
         get :show, {:id => @user.id}
+        assert_response :success
+      end
+    end
+
+    context "new action" do
+      should "render" do
+        get :new
         assert_response :success
       end
     end

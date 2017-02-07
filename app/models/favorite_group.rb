@@ -120,7 +120,7 @@ class FavoriteGroup < ActiveRecord::Base
   end
 
   def initialize_creator
-    self.creator_id = CurrentUser.id
+    self.creator_id ||= CurrentUser.id
   end
 
   def strip_name
@@ -214,6 +214,7 @@ class FavoriteGroup < ActiveRecord::Base
     super
     @neighbor_posts = nil
     clear_post_id_array
+    self
   end
 
   def last_page

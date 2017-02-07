@@ -208,4 +208,14 @@ class TagTest < ActiveSupport::TestCase
       end
     end
   end
+
+  context "A tag with a negative post count" do
+    should "be fixed" do
+      tag = FactoryGirl.create(:tag, name: "touhou", post_count: -10)
+      post = FactoryGirl.create(:post, tag_string: "touhou")
+
+      Tag.clean_up_negative_post_counts!
+      assert_equal(1, tag.reload.post_count)
+    end
+  end
 end

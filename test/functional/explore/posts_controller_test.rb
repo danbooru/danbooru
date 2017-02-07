@@ -15,6 +15,27 @@ module Explore
           assert_response :success
         end
       end
+
+      context "#searches" do
+        should "render" do
+          get :searches
+          assert_response :success
+        end
+      end
+
+      context "#missed_searches" do
+        should "render" do
+          get :missed_searches
+          assert_response :success
+        end
+      end
+
+      context "#intro" do
+        should "render" do
+          get :intro
+          assert_response :success
+        end
+      end
     end
   end
 end

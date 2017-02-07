@@ -13,5 +13,6 @@ FactoryGirl.define do
     image_height 1000
     file_size 2000
     rating "q"
+    source { FFaker::Internet.http_url }
   end
 end

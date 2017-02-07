@@ -6,7 +6,7 @@ class NotesControllerTest < ActionController::TestCase
       @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @post = FactoryGirl.create(:post)
+      @note = FactoryGirl.create(:note, body: "000")
     end
 
     teardown do
@@ -14,17 +14,32 @@ class NotesControllerTest < ActionController::TestCase
     end
 
     context "index action" do
-      setup do
-        FactoryGirl.create(:note)
-      end
-
       should "list all notes" do
         get :index
         assert_response :success
       end
 
       should "list all notes (with search)" do
-        get :index, {:search => {:body_matches => "abc"}}
+        params = {
+          group_by: "note",
+          search: {
+            body_matches: "000",
+            is_active: true,
+            post_id: @note.post_id,
+            post_tags_match: @note.post.tag_array.first,
+            creator_name: @note.creator_name,
+            creator_id: @note.creator_id,
+          }
+        }
+
+        get :index, params
+        assert_response :success
+      end
+    end
+
+    context "show action" do
+      should "render" do
+        get :show, { id: @note.id, format: "json" }
         assert_response :success
       end
     end
@@ -32,20 +47,16 @@ class NotesControllerTest < ActionController::TestCase
     context "create action" do
       should "create a note" do
         assert_difference("Note.count", 1) do
+          @post = FactoryGirl.create(:post)
           post :create, {:note => {:x => 0, :y => 0, :width => 10, :height => 10, :body => "abc", :post_id => @post.id}, :format => :json}, {:user_id => @user.id}
         end
       end
     end
 
     context "update action" do
-      setup do
-        @note = FactoryGirl.create(:note)
-      end
-
       should "update a note" do
         post :update, {:id => @note.id, :note => {:body => "xyz"}}, {:user_id => @user.id}
-        @note.reload
-        assert_equal("xyz", @note.body)
+        assert_equal("xyz", @note.reload.body)
       end
 
       should "not allow changing the post id to another post" do
@@ -57,20 +68,14 @@ class NotesControllerTest < ActionController::TestCase
     end
 
     context "destroy action" do
-      setup do
-        @note = FactoryGirl.create(:note)
-      end
-
       should "destroy a note" do
         post :destroy, {:id => @note.id}, {:user_id => @user.id}
-        @note.reload
-        assert_equal(false, @note.is_active?)
+        assert_equal(false, @note.reload.is_active?)
       end
     end
 
     context "revert action" do
       setup do
-        @note = FactoryGirl.create(:note, :body => "000")
         Timecop.travel(1.day.from_now) do
           @note.update_attributes(:body => "111")
         end
@@ -81,17 +86,15 @@ class NotesControllerTest < ActionController::TestCase
 
       should "revert to a previous version" do
         post :revert, {:id => @note.id, :version_id => @note.versions(true).first.id}, {:user_id => @user.id}
-        @note.reload
-        assert_equal("000", @note.body)
+        assert_equal("000", @note.reload.body)
       end
 
       should "not allow reverting to a previous version of another note" do
         @note2 = FactoryGirl.create(:note, :body => "note 2")
 
         post :revert, { :id => @note.id, :version_id => @note2.versions(true).first.id }, {:user_id => @user.id}
-        @note.reload
 
-        assert_not_equal(@note.body, @note2.body)
+        assert_not_equal(@note.reload.body, @note2.body)
         assert_response :missing
       end
     end

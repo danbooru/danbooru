@@ -12,6 +12,6 @@ class AdminDashboard
   end
 
   def forum_topics
-    ForumTopic.where(category_id: 1).order("id desc").limit(20)
+    ForumTopic.search(category_id: 1).order("id desc").limit(20)
   end
 end

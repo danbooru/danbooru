@@ -89,6 +89,32 @@ class PostsControllerTest < ActionController::TestCase
           assert_response :success
         end
       end
+
+      context "with an md5 param" do
+        should "render" do
+          get :index, { md5: @post.md5 }
+          assert_redirected_to(@post)
+        end
+      end
+    end
+
+    context "show_seq action" do
+      should "render" do
+        posts = FactoryGirl.create_list(:post, 3)
+
+        get :show_seq, { seq: "prev", id: posts[1].id }
+        assert_redirected_to(posts[2])
+
+        get :show_seq, { seq: "next", id: posts[1].id }
+        assert_redirected_to(posts[0])
+      end
+    end
+
+    context "random action" do
+      should "render" do
+        get :random, { tags: "aaaa" }
+        assert_redirected_to(post_path(@post, tags: "aaaa"))
+      end
     end
 
     context "show action" do
