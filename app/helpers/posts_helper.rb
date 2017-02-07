@@ -40,24 +40,6 @@ module PostsHelper
     render("users/common_searches", user: user, sig: sig)
   end
 
-  def resize_image_links(post, user)
-    links = []
-
-    if post.has_large?
-      links << link_to("L", post.large_file_url, :id => "large-file-link")
-    end
-
-    if post.has_large?
-      links << link_to("O", post.file_url, :id => "original-file-link")
-    end
-
-    if links.any?
-      content_tag("span", raw("Resize: " + links.join(" ")))
-    else
-      nil
-    end
-  end
-
   def post_source_tag(post)
     if post.source =~ %r!\Ahttp://img\d+\.pixiv\.net/img/([^\/]+)/!i
       text = "pixiv/<wbr>#{wordbreakify($1)}".html_safe

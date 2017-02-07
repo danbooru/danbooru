@@ -160,7 +160,6 @@ Rails.application.routes.draw do
     end
   end
   resources :jobs
-  resource :landing
   resources :mod_actions
   resources :news_updates
   resources :notes do
@@ -197,7 +196,6 @@ Rails.application.routes.draw do
     end
     resource :votes, :controller => "post_votes", :only => [:create, :destroy]
     collection do
-      get :home
       get :random
     end
     member do

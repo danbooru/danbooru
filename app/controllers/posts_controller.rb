@@ -83,14 +83,6 @@ class PostsController < ApplicationController
     end
   end
 
-  def home
-    if CurrentUser.user.is_anonymous?
-      redirect_to intro_explore_posts_path
-    else
-      redirect_to posts_path(:tags => params[:tags])
-    end
-  end
-
   def random
     count = Post.fast_count(params[:tags], :statement_timeout => CurrentUser.user.statement_timeout)
     @post = Post.tag_match(params[:tags]).random

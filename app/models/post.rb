@@ -531,10 +531,6 @@ class Post < ActiveRecord::Base
       @tag_array_was ||= Tag.scan_tags(tag_string_was)
     end
 
-    def increment_tag_post_counts
-      Tag.where(:name => tag_array).update_all("post_count = post_count + 1") if tag_array.any?
-    end
-
     def decrement_tag_post_counts
       Tag.where(:name => tag_array).update_all("post_count = post_count - 1") if tag_array.any?
     end
@@ -1476,10 +1472,6 @@ class Post < ActiveRecord::Base
   end
 
   module NoteMethods
-    def last_noted_at_as_integer
-      last_noted_at.to_i
-    end
-
     def has_notes?
       last_noted_at.present?
     end
@@ -1616,10 +1608,6 @@ class Post < ActiveRecord::Base
       where("is_deleted = ?", true)
     end
 
-    def commented_before(date)
-      where("last_commented_at < ?", date).order("last_commented_at DESC")
-    end
-
     def has_notes
       where("last_noted_at is not null")
     end
@@ -1634,10 +1622,6 @@ class Post < ActiveRecord::Base
       else
         where("posts.id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id)
       end
-    end
-
-    def hidden_from_moderation
-      where("id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id)
     end
 
     def raw_tag_match(tag)
@@ -1655,53 +1639,6 @@ class Post < ActiveRecord::Base
       else
         PostQueryBuilder.new(query).build
       end
-    end
-
-    def positive
-      where("score > 1")
-    end
-
-    def negative
-      where("score < -1")
-    end
-
-    def updater_name_matches(name)
-      where("updater_id = (select _.id from users _ where lower(_.name) = ?)", name.mb_chars.downcase)
-    end
-
-    def after_id(num)
-      if num.present?
-        where("id > ?", num.to_i).reorder("id asc")
-      else
-        where("true")
-      end
-    end
-
-    def before_id(num)
-      if num.present?
-        where("id < ?", num.to_i).reorder("id desc")
-      else
-        where("true")
-      end
-    end
-
-    def search(params)
-      q = where("true")
-      return q if params.blank?
-
-      if params[:before_id].present?
-        q = q.before_id(params[:before_id].to_i)
-      end
-
-      if params[:after_id].present?
-        q = q.after_id(params[:after_id].to_i)
-      end
-
-      if params[:tag_match].present?
-        q = q.tag_match(params[:tag_match])
-      end
-
-      q
     end
   end
   
