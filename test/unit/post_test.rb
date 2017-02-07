@@ -1509,6 +1509,10 @@ class PostTest < ActiveSupport::TestCase
   end
 
   context "Searching:" do
+    setup do
+      mock_pool_archive_service!
+    end
+    
     should "return posts for the age:<1minute tag" do
       post = FactoryGirl.create(:post)
       assert_tag_match([post], "age:<1minute")
