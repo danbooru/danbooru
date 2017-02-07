@@ -14,5 +14,18 @@ module Downloads
         assert_equal("https://cdnb3.artstation.com/p/assets/images/images/003/716/071/original/aoi-ogata-hate-city.jpg?1476754974", @download.source)
       end
     end
+
+    context "for an image where an original does not exist" do
+      setup do
+        @source = "https://cdna.artstation.com/p/assets/images/images/004/730/278/large/mendel-oh-dragonll.jpg"
+        @tempfile = Tempfile.new("danbooru-test")
+        @download = Downloads::File.new(@source, @tempfile.path)
+        @download.download!
+      end
+
+      should "not try to download the original" do
+        assert_equal("https://cdna.artstation.com/p/assets/images/images/004/730/278/large/mendel-oh-dragonll.jpg", @download.source)
+      end
+    end
   end
 end

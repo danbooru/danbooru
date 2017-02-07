@@ -4,7 +4,10 @@ module Downloads
       def rewrite(url, headers, data = {})
         # example: https://cdnb3.artstation.com/p/assets/images/images/003/716/071/large/aoi-ogata-hate-city.jpg?1476754974
         if url =~ %r!^https?://cdn\w*\.artstation\.com/p/assets/images/images/\d+/\d+/\d+/(?:medium|small|large)/!
-          url, headers = rewrite_large_url(url, headers)
+          original_url, headers = rewrite_large_url(url, headers)
+          if test_original(original_url)
+            url = original_url
+          end
         elsif url =~ %r!https?://\w+\.artstation\.com/artwork/!
           url, headers = rewrite_html_url(url, headers)
         end
@@ -13,6 +16,11 @@ module Downloads
       end
 
     protected
+      def test_original(url)
+        res = http_head_request(url, {})
+        res.is_a?(Net::HTTPSuccess)
+      end
+
       def rewrite_html_url(url, headers)
         source = Sources::Site.new(url)
         source.get
