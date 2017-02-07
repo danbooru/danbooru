@@ -7,10 +7,11 @@ module Sources::Strategies
     end
 
     def referer_url
-    end
-
-    def tags
-      json["categories"].map {|x| x["name"].downcase.tr(" ", "_")}
+      if @referer_url =~ %r!^https?://\w+\.artstation\.com/artwork/[a-z0-9]+!i
+        @referer_url
+      else
+        @url
+      end
     end
 
     def site_name
@@ -38,7 +39,7 @@ module Sources::Strategies
             y, _, _ = image_url_rewriter.rewrite(x["image_url"], nil)
             y
           end
-          @tags = json["categories"].map {|x| x["name"].downcase.tr(" ", "_")} if json["categories"]
+          @tags = json["tags"].map {|x| [x.downcase.tr(" ", "_"), "https://www.artstation.com/search?q=" + CGI.escape(x)]} if json["tags"]
           @artist_commentary_title = json["title"]
           @artist_commentary_desc = ActionView::Base.full_sanitizer.sanitize(json["description"])
         else
