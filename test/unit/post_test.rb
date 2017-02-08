@@ -558,6 +558,72 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      context "tagged with a valid tag" do
+        subject { @post }
+
+        should allow_value("touhou 100%").for(:tag_string)
+        should allow_value("touhou FOO").for(:tag_string)
+        should allow_value("touhou -foo").for(:tag_string)
+        should allow_value("touhou pool:foo").for(:tag_string)
+        should allow_value("touhou -pool:foo").for(:tag_string)
+        should allow_value("touhou newpool:foo").for(:tag_string)
+        should allow_value("touhou fav:self").for(:tag_string)
+        should allow_value("touhou -fav:self").for(:tag_string)
+        should allow_value("touhou upvote:self").for(:tag_string)
+        should allow_value("touhou downvote:self").for(:tag_string)
+        should allow_value("touhou parent:1").for(:tag_string)
+        should allow_value("touhou child:1").for(:tag_string)
+        should allow_value("touhou source:foo").for(:tag_string)
+        should allow_value("touhou rating:z").for(:tag_string)
+        should allow_value("touhou locked:rating").for(:tag_string)
+        should allow_value("touhou -locked:rating").for(:tag_string)
+
+        # \u3000 = ideographic space, \u00A0 = no-break space
+        should allow_value("touhou\u3000foo").for(:tag_string)
+        should allow_value("touhou\u00A0foo").for(:tag_string)
+      end
+
+      context "tagged with an invalid tag" do
+        subject { @post }
+
+        context "that doesn't already exist" do
+          should_not allow_value("touhou user:evazion").for(:tag_string)
+          should_not allow_value("touhou *~foo").for(:tag_string)
+          should_not allow_value("touhou *-foo").for(:tag_string)
+          should_not allow_value("touhou ,-foo").for(:tag_string)
+
+          should_not allow_value("touhou ___").for(:tag_string)
+          should_not allow_value("touhou ~foo").for(:tag_string)
+          should_not allow_value("touhou _foo").for(:tag_string)
+          should_not allow_value("touhou foo_").for(:tag_string)
+          should_not allow_value("touhou foo__bar").for(:tag_string)
+          should_not allow_value("touhou foo*bar").for(:tag_string)
+          should_not allow_value("touhou foo,bar").for(:tag_string)
+          should_not allow_value("touhou foo\abar").for(:tag_string)
+          should_not allow_value("touhou café").for(:tag_string)
+          should_not allow_value("touhou 東方").for(:tag_string)
+        end
+
+        context "that already exists" do
+          setup do
+            %W(___ ~foo _foo foo_ foo__bar foo*bar foo,bar foo\abar café 東方).each do |tag|
+              FactoryGirl.build(:tag, name: tag).save(validate: false)
+            end
+          end
+
+          should allow_value("touhou ___").for(:tag_string)
+          should allow_value("touhou ~foo").for(:tag_string)
+          should allow_value("touhou _foo").for(:tag_string)
+          should allow_value("touhou foo_").for(:tag_string)
+          should allow_value("touhou foo__bar").for(:tag_string)
+          should allow_value("touhou foo*bar").for(:tag_string)
+          should allow_value("touhou foo,bar").for(:tag_string)
+          should allow_value("touhou foo\abar").for(:tag_string)
+          should allow_value("touhou café").for(:tag_string)
+          should allow_value("touhou 東方").for(:tag_string)
+        end
+      end
+
       context "tagged with a metatag" do
         context "for a parent" do
           setup do
@@ -672,6 +738,13 @@ class PostTest < ActiveSupport::TestCase
                 assert_not_nil(@pool)
                 assert_equal("#{@post.id}", @pool.post_ids)
                 assert_equal("pool:#{@pool.id} pool:series", @post.pool_string)
+              end
+            end
+
+            context "with special characters" do
+              should "not strip '%' from the name" do
+                @post.update(tag_string: "aaa newpool:ichigo_100%")
+                assert(Pool.exists?(name: "ichigo_100%"))
               end
             end
           end
