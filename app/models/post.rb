@@ -105,11 +105,11 @@ class Post < ActiveRecord::Base
     end
 
     def file_url
-      if cdn_hosted?
-        Danbooru.config.danbooru_s3_base_url + "/#{file_path_prefix}#{md5}.#{file_ext}"
-      else
+      # if cdn_hosted?
+      #   Danbooru.config.danbooru_s3_base_url + "/#{file_path_prefix}#{md5}.#{file_ext}"
+      # else
         "/data/#{seo_tag_string}#{file_path_prefix}#{md5}.#{file_ext}"
-      end
+      # end
     end
 
     def large_file_url
