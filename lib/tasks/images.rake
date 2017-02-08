@@ -1,6 +1,27 @@
 require 'danbooru_image_resizer/danbooru_image_resizer'
 
 namespace :images do
+  desc "Enable CDN"
+  task :enable_cdn, [:min_id, :max_id] => :environment do |t, args|
+    CurrentUser.scoped(User.admins.first, "127.0.0.1") do
+      credentials = Aws::Credentials.new(Danbooru.config.aws_access_key_id, Danbooru.config.aws_secret_access_key)
+      Aws.config.update({
+        region: "us-east-1",
+        credentials: credentials
+      })
+      client = Aws::S3::Client.new
+      bucket = Danbooru.config.aws_s3_bucket_name
+
+      Post.where("id >= ? and id <= ?", args[:min_id], args[:max_id]).find_each do |post|
+        post.cdn_hosted = true
+        post.save
+        key = File.basename(post.file_path)
+        client.copy_object(bucket: bucket, key: key, acl: "public-read", storage_class: "STANDARD", copy_source: "/#{bucket}/#{key}", metadata_directive: "COPY")
+        # client.put_object(bucket: bucket, key: key, body: body, content_md5: base64_md5, acl: "public-read", storage_class: "STANDARD")
+      end
+    end
+  end
+
   desc "Redownload an image from Pixiv"
   task :download_pixiv => :environment do
     post_id = ENV["id"]

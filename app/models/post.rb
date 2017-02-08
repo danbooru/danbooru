@@ -105,7 +105,11 @@ class Post < ActiveRecord::Base
     end
 
     def file_url
-      "/data/#{seo_tag_string}#{file_path_prefix}#{md5}.#{file_ext}"
+      if cdn_hosted?
+        Danbooru.config.danbooru_s3_base_url + "/#{file_path_prefix}#{md5}.#{file_ext}"
+      else
+        "/data/#{seo_tag_string}#{file_path_prefix}#{md5}.#{file_ext}"
+      end
     end
 
     def large_file_url
@@ -1709,6 +1713,7 @@ class Post < ActiveRecord::Base
 
   BOOLEAN_ATTRIBUTES = %w(
     has_embedded_notes
+    cdn_hosted
   )
   has_bit_flags BOOLEAN_ATTRIBUTES
 

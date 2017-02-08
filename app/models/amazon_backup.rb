@@ -21,7 +21,8 @@ class AmazonBackup < ActiveRecord::Base
       region: "us-east-1",
       credentials: credentials
     })
-    client = Aws::S3::Client.new
+    logger = Logger.new(STDOUT)
+    client = Aws::S3::Client.new(logger: logger)
     bucket = Danbooru.config.aws_s3_bucket_name
 
     Post.where("id > ?", last_id).limit(1000).order("id").each do |post|
