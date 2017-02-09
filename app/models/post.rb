@@ -1707,7 +1707,8 @@ class Post < ActiveRecord::Base
       new_tags = added_tags - Tag.where(name: added_tags).pluck(:name)
 
       new_tags.each do |name|
-        tag = Tag.new(name: name)
+        tag = Tag.new
+        tag.name = name
         tag.valid?
 
         tag.errors.messages.each do |attribute, messages|
