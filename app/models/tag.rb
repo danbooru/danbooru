@@ -229,13 +229,13 @@ class Tag < ActiveRecord::Base
     def scan_query(query)
       tagstr = normalize(query)
       list = tagstr.scan(/-?source:".*?"/) || []
-      list + tagstr.gsub(/-?source:".*?"/, "").scan(/\S+/).uniq
+      list + tagstr.gsub(/-?source:".*?"/, "").scan(/[^[:space:]]+/).uniq
     end
 
     def scan_tags(tags, options = {})
       tagstr = normalize(tags)
       list = tagstr.scan(/source:".*?"/) || []
-      list += tagstr.gsub(/source:".*?"/, "").gsub(/[%,]/, "").scan(/\S+/).uniq
+      list += tagstr.gsub(/source:".*?"/, "").scan(/[^[:space:]]+/).uniq
       if options[:strip_metatags]
         list = list.map {|x| x.sub(/^[-~]/, "")}
       end
