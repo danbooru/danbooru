@@ -2,7 +2,7 @@ class Tag < ActiveRecord::Base
   COSINE_SIMILARITY_RELATED_TAG_THRESHOLD = 1000
   METATAGS = "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-pool|pool|ordpool|-favgroup|favgroup|-fav|fav|ordfav|sub|md5|-rating|rating|-locked|locked|width|height|mpixels|ratio|score|favcount|filesize|source|-source|id|-id|date|age|order|limit|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|-parent|child|pixiv_id|pixiv|search|upvote|downvote|filetype|-filetype"
   SUBQUERY_METATAGS = "commenter|comm|noter|noteupdater|artcomm"
-  attr_accessible :category, :as => [:moderator, :janitor, :gold, :platinum, :member, :anonymous, :default, :builder, :admin]
+  attr_accessible :name, :category
   attr_accessible :is_locked, :as => [:moderator, :admin]
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
 

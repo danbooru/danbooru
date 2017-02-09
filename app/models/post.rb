@@ -16,6 +16,7 @@ class Post < ActiveRecord::Base
   before_validation :remove_parent_loops
   validates_uniqueness_of :md5, :on => :create
   validates_inclusion_of :rating, in: %w(s q e), message: "rating must be s, q, or e"
+  validate :tag_names_are_valid
   validate :post_is_not_its_own_parent
   validate :updater_can_change_rating
   before_save :update_tag_post_counts
@@ -1696,6 +1697,21 @@ class Post < ActiveRecord::Base
         # Don't forbid changes if the rating lock was just now set in the same update.
         if !is_rating_locked_changed?
           errors.add(:rating, "is locked and cannot be changed. Unlock the post first.")
+        end
+      end
+    end
+
+    def tag_names_are_valid
+      # only validate new tags; allow invalid names for tags that already exist.
+      added_tags = tag_array - tag_array_was
+      new_tags = added_tags - Tag.where(name: added_tags).pluck(:name)
+
+      new_tags.each do |name|
+        tag = Tag.new(name: name)
+        tag.valid?
+
+        tag.errors.messages.each do |attribute, messages|
+          errors[:tag_string] << "tag #{attribute} #{messages.join(';')}"
         end
       end
     end
