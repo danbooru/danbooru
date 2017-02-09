@@ -1,54 +1,10 @@
 require 'danbooru_image_resizer/danbooru_image_resizer'
 
 namespace :images do
-  desc "Upload large images to S3"
-  task :upload_large_to_s3, [:min_id, :max_id] => :environment do |t, args|
-    min_id = args[:min_id]
-    max_id = args[:max_id]
-
-    credentials = Aws::Credentials.new(Danbooru.config.aws_access_key_id, Danbooru.config.aws_secret_access_key)
-    Aws.config.update({
-      region: "us-west-2",
-      credentials: credentials
-    })
-    client = Aws::S3::Client.new
-    bucket = "danbooru-large"
-
-    Post.where("id >= ? and id <= ? and image_width > ?", min_id, max_id, Danbooru.config.large_image_width).find_each do |post|
-      if File.exists?(post.large_file_path)
-        key = File.basename(post.large_file_path)
-        body = open(post.large_file_path, "rb")
-        client.put_object(bucket: bucket, key: key, acl: "authenticated-read", body: body, content_md5: base64_md5)
-      end
-    end
-  end
-
-  desc "Upload previews to S3"
-  task :upload_preview_to_s3, [:min_id, :max_id] => :environment do |t, args|
-    min_id = args[:min_id]
-    max_id = args[:max_id]
-
-    credentials = Aws::Credentials.new(Danbooru.config.aws_access_key_id, Danbooru.config.aws_secret_access_key)
-    Aws.config.update({
-      region: "us-west-2",
-      credentials: credentials
-    })
-    client = Aws::S3::Client.new
-    bucket = "danbooru-preview"
-
-    Post.where("id >= ? and id <= ?", min_id, max_id).find_each do |post|
-      if File.exists?(post.preview_file_path)
-        key = File.basename(post.preview_file_path)
-        body = open(post.large_file_path, "rb")
-        client.put_object(bucket: bucket, key: key, acl: "authenticated-read", body: body, content_md5: base64_md5)
-      end
-    end
-  end
-
   desc "Reset S3 + Storage Class"
   task :reset_s3, [:min_id, :max_id] => :environment do |t, args|
-    min_id = args[:min_id]
-    max_id = args[:max_id]
+    min_id = args[:min_id] # 1
+    max_id = args[:max_id] # 50_000
 
     credentials = Aws::Credentials.new(Danbooru.config.aws_access_key_id, Danbooru.config.aws_secret_access_key)
     Aws.config.update({
@@ -60,10 +16,18 @@ namespace :images do
 
     Post.where("id >= ? and id <= ?", min_id, max_id).find_each do |post|
       key = File.basename(post.file_path)
-      client.copy_object(bucket: bucket, key: key, acl: "authenticated-read", storage_class: "STANDARD", copy_source: "/#{bucket}/#{key}", metadata_directive: "COPY")
+      begin
+        client.copy_object(bucket: bucket, key: key, acl: "authenticated-read", storage_class: "STANDARD", copy_source: "/#{bucket}/#{key}", metadata_directive: "COPY")
+        puts "copied #{post.id}"
+      rescue Aws::S3::Errors::InvalidObjectState
+        puts "invalid state #{post.id}"
+      rescue Aws::S3::Errors::NoSuchKey
+        puts "missing #{post.id}"
+      end
     end
   end
 
+  desc "restore from glacier"
   task :restore_glacier, [:min_id, :max_id] => :environment do |t, args|
     min_id = args[:min_id] # 10_001
     max_id = args[:max_id] # 50_000
@@ -89,7 +53,13 @@ namespace :images do
             }
           }
         )
-      rescue Aws::S3::Errors::InvalidObjectState, Aws::S3::Errors::NoSuchKey, Aws::S3::Errors::RestoreAlreadyInProgress
+        puts "uploaded #{post.id}"
+      rescue Aws::S3::Errors::InvalidObjectState
+        puts "already glaciered #{post.id}"
+      rescue Aws::S3::Errors::NoSuchKey
+        puts "missing #{post.id}"
+      rescue Aws::S3::Errors::RestoreAlreadyInProgress
+        puts "already restoring #{post.id}"
       end
     end
   end
