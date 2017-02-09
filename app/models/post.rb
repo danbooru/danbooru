@@ -1307,13 +1307,6 @@ class Post < ActiveRecord::Base
       end
     end
 
-    def post_is_not_its_own_parent
-      if !new_record? && id == parent_id
-        errors[:base] << "Post cannot have itself as a parent"
-        false
-      end
-    end
-
     def parent_exists?
       Post.exists?(parent_id)
     end
@@ -1689,6 +1682,24 @@ class Post < ActiveRecord::Base
       end
     end
   end
+
+  module ValidationMethods
+    def post_is_not_its_own_parent
+      if !new_record? && id == parent_id
+        errors[:base] << "Post cannot have itself as a parent"
+        false
+      end
+    end
+
+    def updater_can_change_rating
+      if rating_changed? && is_rating_locked?
+        # Don't forbid changes if the rating lock was just now set in the same update.
+        if !is_rating_locked_changed?
+          errors.add(:rating, "is locked and cannot be changed. Unlock the post first.")
+        end
+      end
+    end
+  end
   
   include FileMethods
   include ImageMethods
@@ -1709,6 +1720,7 @@ class Post < ActiveRecord::Base
   extend SearchMethods
   include PixivMethods
   include IqdbMethods
+  include ValidationMethods
   include Danbooru::HasBitFlags
 
   BOOLEAN_ATTRIBUTES = %w(
@@ -1763,15 +1775,6 @@ class Post < ActiveRecord::Base
 
     self.tag_string = tags.join(" ")
     save
-  end
-
-  def updater_can_change_rating
-    if rating_changed? && is_rating_locked?
-      # Don't forbid changes if the rating lock was just now set in the same update.
-      if !is_rating_locked_changed?
-        errors.add(:rating, "is locked and cannot be changed. Unlock the post first.")
-      end
-    end
   end
 
   def update_column(name, value)
