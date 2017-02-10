@@ -6,6 +6,8 @@ class Tag < ActiveRecord::Base
   attr_accessible :is_locked, :as => [:moderator, :admin]
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
 
+  validates :name, uniqueness: true, tag_name: true, on: :create
+
   module ApiMethods
     def to_legacy_json
       return {
@@ -179,7 +181,7 @@ class Tag < ActiveRecord::Base
 
   module NameMethods
     def normalize_name(name)
-      name.mb_chars.downcase.tr(" ", "_").gsub(/\A[-~]+/, "").gsub(/\*/, "").to_s
+      name.to_s.mb_chars.downcase.strip.tr(" ", "_").to_s
     end
 
     def find_or_create_by_name(name, options = {})
@@ -227,13 +229,13 @@ class Tag < ActiveRecord::Base
     def scan_query(query)
       tagstr = normalize(query)
       list = tagstr.scan(/-?source:".*?"/) || []
-      list + tagstr.gsub(/-?source:".*?"/, "").scan(/\S+/).uniq
+      list + tagstr.gsub(/-?source:".*?"/, "").scan(/[^[:space:]]+/).uniq
     end
 
     def scan_tags(tags, options = {})
       tagstr = normalize(tags)
       list = tagstr.scan(/source:".*?"/) || []
-      list += tagstr.gsub(/source:".*?"/, "").gsub(/[%,]/, "").scan(/\S+/).uniq
+      list += tagstr.gsub(/source:".*?"/, "").scan(/[^[:space:]]+/).uniq
       if options[:strip_metatags]
         list = list.map {|x| x.sub(/^[-~]/, "")}
       end

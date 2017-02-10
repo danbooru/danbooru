@@ -16,6 +16,7 @@ class Post < ActiveRecord::Base
   before_validation :remove_parent_loops
   validates_uniqueness_of :md5, :on => :create
   validates_inclusion_of :rating, in: %w(s q e), message: "rating must be s, q, or e"
+  validate :tag_names_are_valid
   validate :post_is_not_its_own_parent
   validate :updater_can_change_rating
   before_save :update_tag_post_counts
@@ -1307,13 +1308,6 @@ class Post < ActiveRecord::Base
       end
     end
 
-    def post_is_not_its_own_parent
-      if !new_record? && id == parent_id
-        errors[:base] << "Post cannot have itself as a parent"
-        false
-      end
-    end
-
     def parent_exists?
       Post.exists?(parent_id)
     end
@@ -1689,6 +1683,40 @@ class Post < ActiveRecord::Base
       end
     end
   end
+
+  module ValidationMethods
+    def post_is_not_its_own_parent
+      if !new_record? && id == parent_id
+        errors[:base] << "Post cannot have itself as a parent"
+        false
+      end
+    end
+
+    def updater_can_change_rating
+      if rating_changed? && is_rating_locked?
+        # Don't forbid changes if the rating lock was just now set in the same update.
+        if !is_rating_locked_changed?
+          errors.add(:rating, "is locked and cannot be changed. Unlock the post first.")
+        end
+      end
+    end
+
+    def tag_names_are_valid
+      # only validate new tags; allow invalid names for tags that already exist.
+      added_tags = tag_array - tag_array_was
+      new_tags = added_tags - Tag.where(name: added_tags).pluck(:name)
+
+      new_tags.each do |name|
+        tag = Tag.new
+        tag.name = name
+        tag.valid?
+
+        tag.errors.messages.each do |attribute, messages|
+          errors[:tag_string] << "tag #{attribute} #{messages.join(';')}"
+        end
+      end
+    end
+  end
   
   include FileMethods
   include ImageMethods
@@ -1709,6 +1737,7 @@ class Post < ActiveRecord::Base
   extend SearchMethods
   include PixivMethods
   include IqdbMethods
+  include ValidationMethods
   include Danbooru::HasBitFlags
 
   BOOLEAN_ATTRIBUTES = %w(
@@ -1763,15 +1792,6 @@ class Post < ActiveRecord::Base
 
     self.tag_string = tags.join(" ")
     save
-  end
-
-  def updater_can_change_rating
-    if rating_changed? && is_rating_locked?
-      # Don't forbid changes if the rating lock was just now set in the same update.
-      if !is_rating_locked_changed?
-        errors.add(:rating, "is locked and cannot be changed. Unlock the post first.")
-      end
-    end
   end
 
   def update_column(name, value)
