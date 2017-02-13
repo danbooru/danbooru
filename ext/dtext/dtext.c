@@ -4,41 +4,14 @@
 // easier to read
 #define PRETTY_PRINT 0
 
-#include <ruby.h>
-#include <ruby/encoding.h>
+#include "dtext.h"
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 #include <glib.h>
-
-typedef struct StateMachine {
-  size_t top;
-  int cs;
-  int act;
-  const char * p;
-  const char * pb;
-  const char * pe;
-  const char * eof;
-  const char * ts;
-  const char * te;
-
-  const char * a1;
-  const char * a2;
-  const char * b1;
-  const char * b2;
-  bool f_inline;
-  bool f_strip;
-  bool f_mentions;
-  bool list_mode;
-  bool header_mode;
-  GString * output;
-  GArray * stack;
-  GQueue * dstack;
-  int list_nest;
-  int d;
-  int b;
-  int quote;
-} StateMachine;
 
 static const size_t MAX_STACK_DEPTH = 512;
 
@@ -72,11 +45,11 @@ static const int BLOCK_H5 = 27;
 static const int BLOCK_H6 = 28;
 
 
-#line 1052 "ext/dtext/dtext.rl"
+#line 1035 "ext/dtext/dtext.rl"
 
 
 
-#line 80 "ext/dtext/dtext.c"
+#line 53 "ext/dtext/dtext.c"
 static const short _dtext_to_state_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
@@ -177,7 +150,7 @@ static const int dtext_en_list = 319;
 static const int dtext_en_main = 263;
 
 
-#line 1055 "ext/dtext/dtext.rl"
+#line 1038 "ext/dtext/dtext.rl"
 
 static inline void underscore_string(char * str, size_t len) {
   for (size_t i=0; i<len; ++i) {
@@ -456,8 +429,10 @@ static bool print_machine(StateMachine * sm) {
   return true;
 }
 
-static void init_machine(StateMachine * sm, const char * src, size_t len) {
+StateMachine* init_machine(const char * src, size_t len, bool f_strip, bool f_inline, bool f_mentions) {
   size_t output_length = 0;
+  StateMachine* sm = (StateMachine *)g_malloc0(sizeof(StateMachine));
+
   sm->p = src;
   sm->pb = sm->p;
   sm->pe = sm->p + len;
@@ -476,38 +451,41 @@ static void init_machine(StateMachine * sm, const char * src, size_t len) {
   sm->a2 = NULL;
   sm->b1 = NULL;
   sm->b2 = NULL;
-  sm->f_inline = false;
-  sm->f_strip = false;
-  sm->f_mentions = true;
+  sm->f_inline = f_inline;
+  sm->f_strip = f_strip;
+  sm->f_mentions = f_mentions;
   sm->stack = g_array_sized_new(FALSE, TRUE, sizeof(int), 16);
   sm->dstack = g_queue_new();
+  sm->error = NULL;
   sm->list_nest = 0;
   sm->list_mode = false;
   sm->header_mode = false;
   sm->d = 0;
   sm->b = 0;
   sm->quote = 0;
+
+  return sm;
 }
 
-static void free_machine(StateMachine * sm) {
+void free_machine(StateMachine * sm) {
   g_string_free(sm->output, TRUE);
   g_array_free(sm->stack, FALSE);
   g_queue_free(sm->dstack);
+  g_clear_error(&sm->error);
   g_free(sm);
 }
 
-static StateMachine * parse_helper(const char * src, size_t len, bool f_strip, bool f_inline, bool f_mentions) {
-  StateMachine * sm = NULL;
-  StateMachine * link_content_sm = NULL;
+GQuark dtext_parse_error_quark() {
+  return g_quark_from_static_string("dtext-parse-error-quark");
+}
 
-  sm = (StateMachine *)g_malloc0(sizeof(StateMachine));
-  init_machine(sm, src, len);
-  sm->f_strip = f_strip;
-  sm->f_inline = f_inline;
-  sm->f_mentions = f_mentions;
+gboolean parse_helper(StateMachine* sm) {
+  StateMachine* link_content_sm = NULL;
+
+  g_debug("start\n");
 
   
-#line 511 "ext/dtext/dtext.c"
+#line 489 "ext/dtext/dtext.c"
 	{
 	 sm->cs = dtext_start;
 	( sm->top) = 0;
@@ -516,9 +494,9 @@ static StateMachine * parse_helper(const char * src, size_t len, bool f_strip, b
 	( sm->act) = 0;
 	}
 
-#line 1384 "ext/dtext/dtext.rl"
+#line 1372 "ext/dtext/dtext.rl"
   
-#line 522 "ext/dtext/dtext.c"
+#line 500 "ext/dtext/dtext.c"
 	{
 	if ( ( sm->p) == ( sm->pe) )
 		goto _test_eof;
@@ -528,7 +506,7 @@ _resume:
 #line 1 "NONE"
 	{( sm->ts) = ( sm->p);}
 	break;
-#line 532 "ext/dtext/dtext.c"
+#line 510 "ext/dtext/dtext.c"
 	}
 
 	switch (  sm->cs ) {
@@ -2882,25 +2860,25 @@ case 262:
 	tr310:  sm->cs = 324; goto f3;
 
 f7:
-#line 98 "ext/dtext/dtext.rl"
+#line 72 "ext/dtext/dtext.rl"
 	{
   sm->a1 = sm->p;
 }
 	goto _again;
 f4:
-#line 102 "ext/dtext/dtext.rl"
+#line 76 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
 	goto _again;
 f3:
-#line 106 "ext/dtext/dtext.rl"
+#line 80 "ext/dtext/dtext.rl"
 	{
   sm->b1 = sm->p;
 }
 	goto _again;
 f5:
-#line 110 "ext/dtext/dtext.rl"
+#line 84 "ext/dtext/dtext.rl"
 	{
   sm->b2 = sm->p;
 }
@@ -2910,7 +2888,7 @@ f64:
 	{( sm->te) = ( sm->p)+1;}
 	goto _again;
 f41:
-#line 272 "ext/dtext/dtext.rl"
+#line 246 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     append(sm, true, "<a rel=\"nofollow\" class=\"dtext-link dtext-post-search-link\" href=\"/posts?tags=");
     append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
@@ -2920,7 +2898,7 @@ f41:
   }}
 	goto _again;
 f38:
-#line 280 "ext/dtext/dtext.rl"
+#line 254 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     GString * segment = g_string_new_len(sm->a1, sm->a2 - sm->a1);
     GString * lowercase_segment = NULL;
@@ -2943,7 +2921,7 @@ f38:
   }}
 	goto _again;
 f39:
-#line 301 "ext/dtext/dtext.rl"
+#line 275 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     GString * segment = g_string_new_len(sm->a1, sm->a2 - sm->a1);
     GString * lowercase_segment = NULL;
@@ -2966,14 +2944,14 @@ f39:
   }}
 	goto _again;
 f29:
-#line 425 "ext/dtext/dtext.rl"
+#line 408 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &INLINE_B);
     append(sm, true, "<strong>");
   }}
 	goto _again;
 f20:
-#line 430 "ext/dtext/dtext.rl"
+#line 413 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, INLINE_B)) {
       dstack_pop(sm);
@@ -2984,14 +2962,14 @@ f20:
   }}
 	goto _again;
 f31:
-#line 439 "ext/dtext/dtext.rl"
+#line 422 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &INLINE_I);
     append(sm, true, "<em>");
   }}
 	goto _again;
 f22:
-#line 444 "ext/dtext/dtext.rl"
+#line 427 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, INLINE_I)) {
       dstack_pop(sm);
@@ -3002,14 +2980,14 @@ f22:
   }}
 	goto _again;
 f34:
-#line 453 "ext/dtext/dtext.rl"
+#line 436 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &INLINE_S);
     append(sm, true, "<s>");
   }}
 	goto _again;
 f23:
-#line 458 "ext/dtext/dtext.rl"
+#line 441 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, INLINE_S)) {
       dstack_pop(sm);
@@ -3020,14 +2998,14 @@ f23:
   }}
 	goto _again;
 f37:
-#line 467 "ext/dtext/dtext.rl"
+#line 450 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &INLINE_U);
     append(sm, true, "<u>");
   }}
 	goto _again;
 f28:
-#line 472 "ext/dtext/dtext.rl"
+#line 455 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, INLINE_U)) {
       dstack_pop(sm);
@@ -3038,14 +3016,14 @@ f28:
   }}
 	goto _again;
 f36:
-#line 481 "ext/dtext/dtext.rl"
+#line 464 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &INLINE_TN);
     append(sm, true, "<span class=\"tn\">");
   }}
 	goto _again;
 f27:
-#line 486 "ext/dtext/dtext.rl"
+#line 469 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_close_before_block(sm);
 
@@ -3061,7 +3039,7 @@ f27:
   }}
 	goto _again;
 f35:
-#line 500 "ext/dtext/dtext.rl"
+#line 483 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("inline [spoiler]");
     g_debug("  push <span>");
@@ -3070,7 +3048,7 @@ f35:
   }}
 	goto _again;
 f24:
-#line 507 "ext/dtext/dtext.rl"
+#line 490 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("inline [/spoiler]");
     dstack_close_before_block(sm);
@@ -3093,7 +3071,7 @@ f24:
   }}
 	goto _again;
 f32:
-#line 528 "ext/dtext/dtext.rl"
+#line 511 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &INLINE_NODTEXT);
     g_debug("push inline nodtext");
@@ -3101,18 +3079,19 @@ f32:
   size_t len = sm->stack->len;
 
   if (len > MAX_STACK_DEPTH) {
-    free_machine(sm);
-    rb_raise(rb_eSyntaxError, "too many nested elements");
+    g_set_error_literal(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_DEPTH_EXCEEDED, "too many nested elements");
+    {( sm->p)++; goto _out; }
   }
 
   if (sm->top >= len) {
+    g_debug("growing sm->stack %zi\n", len + 16);
     sm->stack = g_array_set_size(sm->stack, len + 16);
   }
 {( ((int *)sm->stack->data))[( sm->top)++] =  sm->cs;  sm->cs = 315; goto _again;}}
   }}
 	goto _again;
 f33:
-#line 537 "ext/dtext/dtext.rl"
+#line 520 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("inline [quote]");
     dstack_close_before_block(sm);
@@ -3121,7 +3100,7 @@ f33:
   }}
 	goto _again;
 f30:
-#line 560 "ext/dtext/dtext.rl"
+#line 543 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("inline [expand]");
     dstack_rewind(sm);
@@ -3130,7 +3109,7 @@ f30:
   }}
 	goto _again;
 f21:
-#line 567 "ext/dtext/dtext.rl"
+#line 550 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_close_before_block(sm);
 
@@ -3144,7 +3123,7 @@ f21:
   }}
 	goto _again;
 f26:
-#line 579 "ext/dtext/dtext.rl"
+#line 562 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, BLOCK_TH)) {
       dstack_pop(sm);
@@ -3156,7 +3135,7 @@ f26:
   }}
 	goto _again;
 f25:
-#line 589 "ext/dtext/dtext.rl"
+#line 572 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, BLOCK_TD)) {
       dstack_pop(sm);
@@ -3168,7 +3147,7 @@ f25:
   }}
 	goto _again;
 f76:
-#line 599 "ext/dtext/dtext.rl"
+#line 582 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("inline 0");
     g_debug("  return");
@@ -3178,14 +3157,14 @@ f76:
   }}
 	goto _again;
 f75:
-#line 635 "ext/dtext/dtext.rl"
+#line 618 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("inline char: %c", (*( sm->p)));
     append_c_html_escaped(sm, (*( sm->p)));
   }}
 	goto _again;
 f101:
-#line 353 "ext/dtext/dtext.rl"
+#line 336 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     if (is_boundary_c((*( sm->p)))) {
       sm->b = true;
@@ -3207,7 +3186,7 @@ f101:
   }}
 	goto _again;
 f100:
-#line 544 "ext/dtext/dtext.rl"
+#line 527 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("inline [/quote]");
     dstack_close_before_block(sm);
@@ -3225,7 +3204,7 @@ f100:
   }}
 	goto _again;
 f80:
-#line 607 "ext/dtext/dtext.rl"
+#line 590 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("inline newline2");
     g_debug("  return");
@@ -3239,7 +3218,7 @@ f80:
   }}
 	goto _again;
 f79:
-#line 619 "ext/dtext/dtext.rl"
+#line 602 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("inline newline");
 
@@ -3253,20 +3232,20 @@ f79:
   }}
 	goto _again;
 f82:
-#line 631 "ext/dtext/dtext.rl"
+#line 614 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append_c(sm, ' ');
   }}
 	goto _again;
 f83:
-#line 635 "ext/dtext/dtext.rl"
+#line 618 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("inline char: %c", (*( sm->p)));
     append_c_html_escaped(sm, (*( sm->p)));
   }}
 	goto _again;
 f19:
-#line 183 "ext/dtext/dtext.rl"
+#line 157 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
     append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -3277,7 +3256,7 @@ f19:
   }}
 	goto _again;
 f18:
-#line 250 "ext/dtext/dtext.rl"
+#line 224 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
     append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -3288,7 +3267,7 @@ f18:
   }}
 	goto _again;
 f12:
-#line 619 "ext/dtext/dtext.rl"
+#line 602 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
     g_debug("inline newline");
 
@@ -3302,7 +3281,7 @@ f12:
   }}
 	goto _again;
 f13:
-#line 635 "ext/dtext/dtext.rl"
+#line 618 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
     g_debug("inline char: %c", (*( sm->p)));
     append_c_html_escaped(sm, (*( sm->p)));
@@ -3324,10 +3303,19 @@ f10:
     append(sm, true, "<a class=\"dtext-link dtext-external-link\" href=\"");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - sm->d);
     append(sm, true, "\">");
-    link_content_sm = parse_helper(sm->a1, sm->a2 - sm->a1, false, true, false);
-    append(sm, true, link_content_sm->output->str);
-    free_machine(link_content_sm);
-    link_content_sm = NULL;
+
+    link_content_sm = init_machine(sm->a1, sm->a2 - sm->a1, false, true, false);
+    if (!parse_helper(link_content_sm)) {
+      g_debug("basic_textile_link: parse_helper failed");
+      g_propagate_error(&sm->error, link_content_sm->error);
+      free_machine(link_content_sm);
+      {( sm->p)++; goto _out; }
+    } else {
+      append(sm, true, link_content_sm->output->str);
+      free_machine(link_content_sm);
+      link_content_sm = NULL;
+    }
+
     append(sm, true, "</a>");
 
     if (sm->b) {
@@ -3426,7 +3414,7 @@ f10:
 	}
 	goto _again;
 f43:
-#line 642 "ext/dtext/dtext.rl"
+#line 625 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, BLOCK_CODE)) {
       dstack_rewind(sm);
@@ -3437,32 +3425,32 @@ f43:
   }}
 	goto _again;
 f103:
-#line 651 "ext/dtext/dtext.rl"
+#line 634 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     ( sm->p)--;
     { sm->cs = ( ((int *)sm->stack->data))[--( sm->top)];goto _again;}
   }}
 	goto _again;
 f102:
-#line 656 "ext/dtext/dtext.rl"
+#line 639 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     append_c_html_escaped(sm, (*( sm->p)));
   }}
 	goto _again;
 f104:
-#line 656 "ext/dtext/dtext.rl"
+#line 639 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append_c_html_escaped(sm, (*( sm->p)));
   }}
 	goto _again;
 f42:
-#line 656 "ext/dtext/dtext.rl"
+#line 639 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
     append_c_html_escaped(sm, (*( sm->p)));
   }}
 	goto _again;
 f45:
-#line 662 "ext/dtext/dtext.rl"
+#line 645 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check2(sm, BLOCK_NODTEXT)) {
       g_debug("block dstack check");
@@ -3481,39 +3469,39 @@ f45:
   }}
 	goto _again;
 f106:
-#line 679 "ext/dtext/dtext.rl"
+#line 662 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     ( sm->p)--;
     { sm->cs = ( ((int *)sm->stack->data))[--( sm->top)];goto _again;}
   }}
 	goto _again;
 f105:
-#line 684 "ext/dtext/dtext.rl"
+#line 667 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     append_c_html_escaped(sm, (*( sm->p)));
   }}
 	goto _again;
 f107:
-#line 684 "ext/dtext/dtext.rl"
+#line 667 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append_c_html_escaped(sm, (*( sm->p)));
   }}
 	goto _again;
 f44:
-#line 684 "ext/dtext/dtext.rl"
+#line 667 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
     append_c_html_escaped(sm, (*( sm->p)));
   }}
 	goto _again;
 f54:
-#line 690 "ext/dtext/dtext.rl"
+#line 673 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &BLOCK_THEAD);
     append_block(sm, "<thead>");
   }}
 	goto _again;
 f49:
-#line 695 "ext/dtext/dtext.rl"
+#line 678 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, BLOCK_THEAD)) {
       dstack_pop(sm);
@@ -3524,14 +3512,14 @@ f49:
   }}
 	goto _again;
 f51:
-#line 704 "ext/dtext/dtext.rl"
+#line 687 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &BLOCK_TBODY);
     append_block(sm, "<tbody>");
   }}
 	goto _again;
 f48:
-#line 709 "ext/dtext/dtext.rl"
+#line 692 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, BLOCK_TBODY)) {
       dstack_pop(sm);
@@ -3542,7 +3530,7 @@ f48:
   }}
 	goto _again;
 f53:
-#line 718 "ext/dtext/dtext.rl"
+#line 701 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &BLOCK_TH);
     append_block(sm, "<th>");
@@ -3550,25 +3538,26 @@ f53:
   size_t len = sm->stack->len;
 
   if (len > MAX_STACK_DEPTH) {
-    free_machine(sm);
-    rb_raise(rb_eSyntaxError, "too many nested elements");
+    g_set_error_literal(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_DEPTH_EXCEEDED, "too many nested elements");
+    {( sm->p)++; goto _out; }
   }
 
   if (sm->top >= len) {
+    g_debug("growing sm->stack %zi\n", len + 16);
     sm->stack = g_array_set_size(sm->stack, len + 16);
   }
 {( ((int *)sm->stack->data))[( sm->top)++] =  sm->cs;  sm->cs = 279; goto _again;}}
   }}
 	goto _again;
 f55:
-#line 724 "ext/dtext/dtext.rl"
+#line 707 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &BLOCK_TR);
     append_block(sm, "<tr>");
   }}
 	goto _again;
 f50:
-#line 729 "ext/dtext/dtext.rl"
+#line 712 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, BLOCK_TR)) {
       dstack_pop(sm);
@@ -3579,7 +3568,7 @@ f50:
   }}
 	goto _again;
 f52:
-#line 738 "ext/dtext/dtext.rl"
+#line 721 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &BLOCK_TD);
     append_block(sm, "<td>");
@@ -3587,18 +3576,19 @@ f52:
   size_t len = sm->stack->len;
 
   if (len > MAX_STACK_DEPTH) {
-    free_machine(sm);
-    rb_raise(rb_eSyntaxError, "too many nested elements");
+    g_set_error_literal(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_DEPTH_EXCEEDED, "too many nested elements");
+    {( sm->p)++; goto _out; }
   }
 
   if (sm->top >= len) {
+    g_debug("growing sm->stack %zi\n", len + 16);
     sm->stack = g_array_set_size(sm->stack, len + 16);
   }
 {( ((int *)sm->stack->data))[( sm->top)++] =  sm->cs;  sm->cs = 279; goto _again;}}
   }}
 	goto _again;
 f47:
-#line 744 "ext/dtext/dtext.rl"
+#line 727 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     if (dstack_check(sm, BLOCK_TABLE)) {
       dstack_pop(sm);
@@ -3610,26 +3600,26 @@ f47:
   }}
 	goto _again;
 f109:
-#line 754 "ext/dtext/dtext.rl"
+#line 737 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     ( sm->p)--;
     { sm->cs = ( ((int *)sm->stack->data))[--( sm->top)];goto _again;}
   }}
 	goto _again;
 f108:
-#line 759 "ext/dtext/dtext.rl"
+#line 742 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;}
 	goto _again;
 f110:
-#line 759 "ext/dtext/dtext.rl"
+#line 742 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;}
 	goto _again;
 f46:
-#line 759 "ext/dtext/dtext.rl"
+#line 742 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}}
 	goto _again;
 f112:
-#line 802 "ext/dtext/dtext.rl"
+#line 785 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_close_list(sm);
     {( sm->p) = (( sm->ts))-1;}
@@ -3637,7 +3627,7 @@ f112:
   }}
 	goto _again;
 f111:
-#line 810 "ext/dtext/dtext.rl"
+#line 793 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_rewind(sm);
     ( sm->p)--;
@@ -3645,7 +3635,7 @@ f111:
   }}
 	goto _again;
 f114:
-#line 810 "ext/dtext/dtext.rl"
+#line 793 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     dstack_rewind(sm);
     ( sm->p)--;
@@ -3653,7 +3643,7 @@ f114:
   }}
 	goto _again;
 f58:
-#line 810 "ext/dtext/dtext.rl"
+#line 793 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
     dstack_rewind(sm);
     ( sm->p)--;
@@ -3677,7 +3667,7 @@ f56:
 	}
 	goto _again;
 f6:
-#line 942 "ext/dtext/dtext.rl"
+#line 925 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("block [/spoiler]");
     dstack_close_before_block(sm);
@@ -3688,7 +3678,7 @@ f6:
   }}
 	goto _again;
 f8:
-#line 991 "ext/dtext/dtext.rl"
+#line 974 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_close_before_block(sm);
     dstack_push(sm, &BLOCK_TABLE);
@@ -3697,18 +3687,19 @@ f8:
   size_t len = sm->stack->len;
 
   if (len > MAX_STACK_DEPTH) {
-    free_machine(sm);
-    rb_raise(rb_eSyntaxError, "too many nested elements");
+    g_set_error_literal(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_DEPTH_EXCEEDED, "too many nested elements");
+    {( sm->p)++; goto _out; }
   }
 
   if (sm->top >= len) {
+    g_debug("growing sm->stack %zi\n", len + 16);
     sm->stack = g_array_set_size(sm->stack, len + 16);
   }
 {( ((int *)sm->stack->data))[( sm->top)++] =  sm->cs;  sm->cs = 317; goto _again;}}
   }}
 	goto _again;
 f9:
-#line 998 "ext/dtext/dtext.rl"
+#line 981 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_push(sm, &BLOCK_TN);
     append_block(sm, "<p class=\"tn\">");
@@ -3716,18 +3707,19 @@ f9:
   size_t len = sm->stack->len;
 
   if (len > MAX_STACK_DEPTH) {
-    free_machine(sm);
-    rb_raise(rb_eSyntaxError, "too many nested elements");
+    g_set_error_literal(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_DEPTH_EXCEEDED, "too many nested elements");
+    {( sm->p)++; goto _out; }
   }
 
   if (sm->top >= len) {
+    g_debug("growing sm->stack %zi\n", len + 16);
     sm->stack = g_array_set_size(sm->stack, len + 16);
   }
 {( ((int *)sm->stack->data))[( sm->top)++] =  sm->cs;  sm->cs = 279; goto _again;}}
   }}
 	goto _again;
 f62:
-#line 1014 "ext/dtext/dtext.rl"
+#line 997 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("block 0");
     g_debug("  close dstack");
@@ -3735,7 +3727,7 @@ f62:
   }}
 	goto _again;
 f61:
-#line 1037 "ext/dtext/dtext.rl"
+#line 1020 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("block char: %c", (*( sm->p)));
     ( sm->p)--;
@@ -3751,18 +3743,19 @@ f61:
   size_t len = sm->stack->len;
 
   if (len > MAX_STACK_DEPTH) {
-    free_machine(sm);
-    rb_raise(rb_eSyntaxError, "too many nested elements");
+    g_set_error_literal(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_DEPTH_EXCEEDED, "too many nested elements");
+    {( sm->p)++; goto _out; }
   }
 
   if (sm->top >= len) {
+    g_debug("growing sm->stack %zi\n", len + 16);
     sm->stack = g_array_set_size(sm->stack, len + 16);
   }
 {( ((int *)sm->stack->data))[( sm->top)++] =  sm->cs;  sm->cs = 279; goto _again;}}
   }}
 	goto _again;
 f67:
-#line 818 "ext/dtext/dtext.rl"
+#line 801 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     char header = *sm->a1;
     GString * id_name = g_string_new_len(sm->b1, sm->b2 - sm->b1);
@@ -3825,18 +3818,19 @@ f67:
   size_t len = sm->stack->len;
 
   if (len > MAX_STACK_DEPTH) {
-    free_machine(sm);
-    rb_raise(rb_eSyntaxError, "too many nested elements");
+    g_set_error_literal(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_DEPTH_EXCEEDED, "too many nested elements");
+    {( sm->p)++; goto _out; }
   }
 
   if (sm->top >= len) {
+    g_debug("growing sm->stack %zi\n", len + 16);
     sm->stack = g_array_set_size(sm->stack, len + 16);
   }
 {( ((int *)sm->stack->data))[( sm->top)++] =  sm->cs;  sm->cs = 279; goto _again;}}
   }}
 	goto _again;
 f68:
-#line 879 "ext/dtext/dtext.rl"
+#line 862 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     char header = *sm->a1;
 
@@ -3883,18 +3877,19 @@ f68:
   size_t len = sm->stack->len;
 
   if (len > MAX_STACK_DEPTH) {
-    free_machine(sm);
-    rb_raise(rb_eSyntaxError, "too many nested elements");
+    g_set_error_literal(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_DEPTH_EXCEEDED, "too many nested elements");
+    {( sm->p)++; goto _out; }
   }
 
   if (sm->top >= len) {
+    g_debug("growing sm->stack %zi\n", len + 16);
     sm->stack = g_array_set_size(sm->stack, len + 16);
   }
 {( ((int *)sm->stack->data))[( sm->top)++] =  sm->cs;  sm->cs = 279; goto _again;}}
   }}
 	goto _again;
 f73:
-#line 924 "ext/dtext/dtext.rl"
+#line 907 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [quote]");
     g_debug("  push quote");
@@ -3905,7 +3900,7 @@ f73:
   }}
 	goto _again;
 f74:
-#line 933 "ext/dtext/dtext.rl"
+#line 916 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [spoiler]");
     g_debug("  push spoiler");
@@ -3916,7 +3911,7 @@ f74:
   }}
 	goto _again;
 f69:
-#line 951 "ext/dtext/dtext.rl"
+#line 934 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [code]");
     dstack_close_before_block(sm);
@@ -3926,18 +3921,19 @@ f69:
   size_t len = sm->stack->len;
 
   if (len > MAX_STACK_DEPTH) {
-    free_machine(sm);
-    rb_raise(rb_eSyntaxError, "too many nested elements");
+    g_set_error_literal(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_DEPTH_EXCEEDED, "too many nested elements");
+    {( sm->p)++; goto _out; }
   }
 
   if (sm->top >= len) {
+    g_debug("growing sm->stack %zi\n", len + 16);
     sm->stack = g_array_set_size(sm->stack, len + 16);
   }
 {( ((int *)sm->stack->data))[( sm->top)++] =  sm->cs;  sm->cs = 313; goto _again;}}
   }}
 	goto _again;
 f71:
-#line 959 "ext/dtext/dtext.rl"
+#line 942 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [expand]");
     dstack_close_before_block(sm);
@@ -3948,7 +3944,7 @@ f71:
   }}
 	goto _again;
 f70:
-#line 968 "ext/dtext/dtext.rl"
+#line 951 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [expand=]");
     dstack_close_before_block(sm);
@@ -3962,7 +3958,7 @@ f70:
   }}
 	goto _again;
 f72:
-#line 980 "ext/dtext/dtext.rl"
+#line 963 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [nodtext]");
     dstack_close_before_block(sm);
@@ -3975,18 +3971,19 @@ f72:
   size_t len = sm->stack->len;
 
   if (len > MAX_STACK_DEPTH) {
-    free_machine(sm);
-    rb_raise(rb_eSyntaxError, "too many nested elements");
+    g_set_error_literal(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_DEPTH_EXCEEDED, "too many nested elements");
+    {( sm->p)++; goto _out; }
   }
 
   if (sm->top >= len) {
+    g_debug("growing sm->stack %zi\n", len + 16);
     sm->stack = g_array_set_size(sm->stack, len + 16);
   }
 {( ((int *)sm->stack->data))[( sm->top)++] =  sm->cs;  sm->cs = 315; goto _again;}}
   }}
 	goto _again;
 f65:
-#line 1037 "ext/dtext/dtext.rl"
+#line 1020 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block char: %c", (*( sm->p)));
     ( sm->p)--;
@@ -4002,18 +3999,19 @@ f65:
   size_t len = sm->stack->len;
 
   if (len > MAX_STACK_DEPTH) {
-    free_machine(sm);
-    rb_raise(rb_eSyntaxError, "too many nested elements");
+    g_set_error_literal(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_DEPTH_EXCEEDED, "too many nested elements");
+    {( sm->p)++; goto _out; }
   }
 
   if (sm->top >= len) {
+    g_debug("growing sm->stack %zi\n", len + 16);
     sm->stack = g_array_set_size(sm->stack, len + 16);
   }
 {( ((int *)sm->stack->data))[( sm->top)++] =  sm->cs;  sm->cs = 279; goto _again;}}
   }}
 	goto _again;
 f2:
-#line 1037 "ext/dtext/dtext.rl"
+#line 1020 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
     g_debug("block char: %c", (*( sm->p)));
     ( sm->p)--;
@@ -4029,11 +4027,12 @@ f2:
   size_t len = sm->stack->len;
 
   if (len > MAX_STACK_DEPTH) {
-    free_machine(sm);
-    rb_raise(rb_eSyntaxError, "too many nested elements");
+    g_set_error_literal(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_DEPTH_EXCEEDED, "too many nested elements");
+    {( sm->p)++; goto _out; }
   }
 
   if (sm->top >= len) {
+    g_debug("growing sm->stack %zi\n", len + 16);
     sm->stack = g_array_set_size(sm->stack, len + 16);
   }
 {( ((int *)sm->stack->data))[( sm->top)++] =  sm->cs;  sm->cs = 279; goto _again;}}
@@ -4065,11 +4064,11 @@ f0:
 	}
 	goto _again;
 f96:
-#line 102 "ext/dtext/dtext.rl"
+#line 76 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 165 "ext/dtext/dtext.rl"
+#line 139 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-post-id-link\" href=\"/posts/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -4080,11 +4079,11 @@ f96:
   }}
 	goto _again;
 f91:
-#line 102 "ext/dtext/dtext.rl"
+#line 76 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 174 "ext/dtext/dtext.rl"
+#line 148 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-forum-post-id-link\" href=\"/forum_posts/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -4095,11 +4094,11 @@ f91:
   }}
 	goto _again;
 f97:
-#line 102 "ext/dtext/dtext.rl"
+#line 76 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 183 "ext/dtext/dtext.rl"
+#line 157 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -4110,11 +4109,11 @@ f97:
   }}
 	goto _again;
 f90:
-#line 102 "ext/dtext/dtext.rl"
+#line 76 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 205 "ext/dtext/dtext.rl"
+#line 179 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-comment-id-link\" href=\"/comments/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -4125,11 +4124,11 @@ f90:
   }}
 	goto _again;
 f95:
-#line 102 "ext/dtext/dtext.rl"
+#line 76 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 214 "ext/dtext/dtext.rl"
+#line 188 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-pool-id-link\" href=\"/pools/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -4140,11 +4139,11 @@ f95:
   }}
 	goto _again;
 f99:
-#line 102 "ext/dtext/dtext.rl"
+#line 76 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 223 "ext/dtext/dtext.rl"
+#line 197 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-user-id-link\" href=\"/users/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -4155,11 +4154,11 @@ f99:
   }}
 	goto _again;
 f89:
-#line 102 "ext/dtext/dtext.rl"
+#line 76 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 232 "ext/dtext/dtext.rl"
+#line 206 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-artist-id-link\" href=\"/artists/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -4170,11 +4169,11 @@ f89:
   }}
 	goto _again;
 f92:
-#line 102 "ext/dtext/dtext.rl"
+#line 76 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 241 "ext/dtext/dtext.rl"
+#line 215 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-github-id-link\" href=\"https://github.com/r888888888/danbooru/issues/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -4185,11 +4184,11 @@ f92:
   }}
 	goto _again;
 f93:
-#line 102 "ext/dtext/dtext.rl"
+#line 76 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 250 "ext/dtext/dtext.rl"
+#line 224 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -4200,11 +4199,11 @@ f93:
   }}
 	goto _again;
 f87:
-#line 102 "ext/dtext/dtext.rl"
+#line 76 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
-#line 378 "ext/dtext/dtext.rl"
+#line 361 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     if (!sm->f_mentions || (sm->a1 > sm->pb && sm->a1 - 1 > sm->pb && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n')) {
       // handle emails
@@ -4234,7 +4233,7 @@ f87:
   }}
 	goto _again;
 f86:
-#line 102 "ext/dtext/dtext.rl"
+#line 76 "ext/dtext/dtext.rl"
 	{
   sm->a2 = sm->p;
 }
@@ -4253,10 +4252,19 @@ f86:
     append(sm, true, "<a class=\"dtext-link dtext-external-link\" href=\"");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - sm->d);
     append(sm, true, "\">");
-    link_content_sm = parse_helper(sm->a1, sm->a2 - sm->a1, false, true, false);
-    append(sm, true, link_content_sm->output->str);
-    free_machine(link_content_sm);
-    link_content_sm = NULL;
+
+    link_content_sm = init_machine(sm->a1, sm->a2 - sm->a1, false, true, false);
+    if (!parse_helper(link_content_sm)) {
+      g_debug("basic_textile_link: parse_helper failed");
+      g_propagate_error(&sm->error, link_content_sm->error);
+      free_machine(link_content_sm);
+      {( sm->p)++; goto _out; }
+    } else {
+      append(sm, true, link_content_sm->output->str);
+      free_machine(link_content_sm);
+      link_content_sm = NULL;
+    }
+
     append(sm, true, "</a>");
 
     if (sm->b) {
@@ -4355,11 +4363,11 @@ f86:
 	}
 	goto _again;
 f15:
-#line 110 "ext/dtext/dtext.rl"
+#line 84 "ext/dtext/dtext.rl"
 	{
   sm->b2 = sm->p;
 }
-#line 345 "ext/dtext/dtext.rl"
+#line 328 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     append(sm, true, "<a class=\"dtext-link dtext-external-link\" href=\"");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - 1);
@@ -4369,11 +4377,11 @@ f15:
   }}
 	goto _again;
 f98:
-#line 110 "ext/dtext/dtext.rl"
+#line 84 "ext/dtext/dtext.rl"
 	{
   sm->b2 = sm->p;
 }
-#line 192 "ext/dtext/dtext.rl"
+#line 166 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -4388,11 +4396,11 @@ f98:
   }}
 	goto _again;
 f94:
-#line 110 "ext/dtext/dtext.rl"
+#line 84 "ext/dtext/dtext.rl"
 	{
   sm->b2 = sm->p;
 }
-#line 259 "ext/dtext/dtext.rl"
+#line 233 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=");
     append_segment(sm, true, sm->a1, sm->a2 - 1);
@@ -4407,11 +4415,11 @@ f94:
   }}
 	goto _again;
 f84:
-#line 110 "ext/dtext/dtext.rl"
+#line 84 "ext/dtext/dtext.rl"
 	{
   sm->b2 = sm->p;
 }
-#line 322 "ext/dtext/dtext.rl"
+#line 296 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     if (is_boundary_c((*( sm->p)))) {
       sm->d = 2;
@@ -4424,10 +4432,19 @@ f84:
     append(sm, true, "<a class=\"dtext-link dtext-external-link\" href=\"");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - sm->d);
     append(sm, true, "\">");
-    link_content_sm = parse_helper(sm->a1, sm->a2 - sm->a1, false, true, false);
-    append(sm, true, link_content_sm->output->str);
-    free_machine(link_content_sm);
-    link_content_sm = NULL;
+
+    link_content_sm = init_machine(sm->a1, sm->a2 - sm->a1, false, true, false);
+    if (!parse_helper(link_content_sm)) {
+      g_debug("basic_textile_link: parse_helper failed");
+      g_propagate_error(&sm->error, link_content_sm->error);
+      free_machine(link_content_sm);
+      {( sm->p)++; goto _out; }
+    } else {
+      append(sm, true, link_content_sm->output->str);
+      free_machine(link_content_sm);
+      link_content_sm = NULL;
+    }
+
     append(sm, true, "</a>");
 
     if (sm->b) {
@@ -4436,11 +4453,11 @@ f84:
   }}
 	goto _again;
 f81:
-#line 110 "ext/dtext/dtext.rl"
+#line 84 "ext/dtext/dtext.rl"
 	{
   sm->b2 = sm->p;
 }
-#line 406 "ext/dtext/dtext.rl"
+#line 389 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("inline list");
 
@@ -4461,11 +4478,11 @@ f81:
   }}
 	goto _again;
 f115:
-#line 110 "ext/dtext/dtext.rl"
+#line 84 "ext/dtext/dtext.rl"
 	{
   sm->b2 = sm->p;
 }
-#line 763 "ext/dtext/dtext.rl"
+#line 746 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     int prev_nest = sm->list_nest;
     append_closing_p_if(sm);
@@ -4505,22 +4522,23 @@ f115:
   size_t len = sm->stack->len;
 
   if (len > MAX_STACK_DEPTH) {
-    free_machine(sm);
-    rb_raise(rb_eSyntaxError, "too many nested elements");
+    g_set_error_literal(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_DEPTH_EXCEEDED, "too many nested elements");
+    {( sm->p)++; goto _out; }
   }
 
   if (sm->top >= len) {
+    g_debug("growing sm->stack %zi\n", len + 16);
     sm->stack = g_array_set_size(sm->stack, len + 16);
   }
 {( ((int *)sm->stack->data))[( sm->top)++] =  sm->cs;  sm->cs = 279; goto _again;}}
   }}
 	goto _again;
 f66:
-#line 110 "ext/dtext/dtext.rl"
+#line 84 "ext/dtext/dtext.rl"
 	{
   sm->b2 = sm->p;
 }
-#line 1004 "ext/dtext/dtext.rl"
+#line 987 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block list");
     g_debug("  call list");
@@ -4532,11 +4550,12 @@ f66:
   size_t len = sm->stack->len;
 
   if (len > MAX_STACK_DEPTH) {
-    free_machine(sm);
-    rb_raise(rb_eSyntaxError, "too many nested elements");
+    g_set_error_literal(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_DEPTH_EXCEEDED, "too many nested elements");
+    {( sm->p)++; goto _out; }
   }
 
   if (sm->top >= len) {
+    g_debug("growing sm->stack %zi\n", len + 16);
     sm->stack = g_array_set_size(sm->stack, len + 16);
   }
 {( ((int *)sm->stack->data))[( sm->top)++] =  sm->cs;  sm->cs = 319; goto _again;}}
@@ -4545,7 +4564,7 @@ f66:
 f17:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 98 "ext/dtext/dtext.rl"
+#line 72 "ext/dtext/dtext.rl"
 	{
   sm->a1 = sm->p;
 }
@@ -4553,77 +4572,77 @@ f17:
 f14:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 322 "ext/dtext/dtext.rl"
+#line 296 "ext/dtext/dtext.rl"
 	{( sm->act) = 15;}
 	goto _again;
 f40:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 353 "ext/dtext/dtext.rl"
+#line 336 "ext/dtext/dtext.rl"
 	{( sm->act) = 17;}
 	goto _again;
 f88:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 374 "ext/dtext/dtext.rl"
+#line 357 "ext/dtext/dtext.rl"
 	{( sm->act) = 18;}
 	goto _again;
 f16:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 378 "ext/dtext/dtext.rl"
+#line 361 "ext/dtext/dtext.rl"
 	{( sm->act) = 19;}
 	goto _again;
 f11:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 607 "ext/dtext/dtext.rl"
+#line 590 "ext/dtext/dtext.rl"
 	{( sm->act) = 41;}
 	goto _again;
 f77:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 619 "ext/dtext/dtext.rl"
+#line 602 "ext/dtext/dtext.rl"
 	{( sm->act) = 42;}
 	goto _again;
 f78:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 635 "ext/dtext/dtext.rl"
+#line 618 "ext/dtext/dtext.rl"
 	{( sm->act) = 44;}
 	goto _again;
 f57:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 802 "ext/dtext/dtext.rl"
+#line 785 "ext/dtext/dtext.rl"
 	{( sm->act) = 63;}
 	goto _again;
 f113:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 808 "ext/dtext/dtext.rl"
+#line 791 "ext/dtext/dtext.rl"
 	{( sm->act) = 64;}
 	goto _again;
 f1:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 1020 "ext/dtext/dtext.rl"
+#line 1003 "ext/dtext/dtext.rl"
 	{( sm->act) = 79;}
 	goto _again;
 f63:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 1033 "ext/dtext/dtext.rl"
+#line 1016 "ext/dtext/dtext.rl"
 	{( sm->act) = 80;}
 	goto _again;
 f85:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 98 "ext/dtext/dtext.rl"
+#line 72 "ext/dtext/dtext.rl"
 	{
   sm->a1 = sm->p;
 }
-#line 378 "ext/dtext/dtext.rl"
+#line 361 "ext/dtext/dtext.rl"
 	{( sm->act) = 19;}
 	goto _again;
 
@@ -4633,7 +4652,7 @@ _again:
 #line 1 "NONE"
 	{( sm->ts) = 0;}
 	break;
-#line 4637 "ext/dtext/dtext.c"
+#line 4656 "ext/dtext/dtext.c"
 	}
 
 	if ( ++( sm->p) != ( sm->pe) )
@@ -4964,76 +4983,94 @@ _again:
 	}
 	}
 
+	_out: {}
 	}
 
-#line 1385 "ext/dtext/dtext.rl"
+#line 1373 "ext/dtext/dtext.rl"
 
   dstack_close(sm);
 
-  return sm;
+  return sm->error == NULL;
 }
 
-static VALUE parse(int argc, VALUE * argv, VALUE self) {
-  VALUE input;
-  VALUE input0;
-  VALUE options;
-  VALUE opt_inline;
-  VALUE opt_strip;
-  VALUE opt_mentions;
-  VALUE ret;
-  rb_encoding * encoding = NULL;
-  StateMachine * sm = NULL;
-  bool f_strip = false;
-  bool f_inline = false;
-  bool f_mentions = true;
+static void parse_file(FILE* input, FILE* output, gboolean opt_strip, gboolean opt_inline, gboolean opt_mentions) {
+  char* dtext = NULL;
+  size_t n = 0;
 
-  g_debug("start\n");
+  ssize_t length = getdelim(&dtext, &n, '\0', input);
+  if (length == -1) {
+    free(dtext);
 
-  if (argc == 0) {
-    rb_raise(rb_eArgError, "wrong number of arguments (0 for 1)");
-  }
-
-  input = argv[0];
-
-  if (NIL_P(input)) {
-    return Qnil;
-  }
-
-  input0 = rb_str_dup(input);
-  input0 = rb_str_cat(input0, "\0", 1);
-  
-  if (argc > 1) {
-    options = argv[1];
-
-    if (!NIL_P(options)) {
-      opt_strip  = rb_hash_aref(options, ID2SYM(rb_intern("strip")));
-      if (RTEST(opt_strip)) {
-        f_strip = true;
-      }
-
-      opt_inline = rb_hash_aref(options, ID2SYM(rb_intern("inline")));
-      if (RTEST(opt_inline)) {
-        f_inline = true;
-      }
-
-      opt_mentions = rb_hash_aref(options, ID2SYM(rb_intern("disable_mentions")));
-      if (RTEST(opt_mentions)) {
-        f_mentions = false;
-      }
+    if (ferror(input)) {
+      perror("getdelim failed");
+      exit(1);
+    } else /* EOF (file was empty, continue with the empty string) */ {
+      dtext = NULL;
+      length = 0;
     }
   }
 
-  sm = parse_helper(RSTRING_PTR(input0), RSTRING_LEN(input0), f_strip, f_inline, f_mentions);
+  StateMachine* sm = init_machine(dtext, length, opt_strip, opt_inline, opt_mentions);
+  if (!parse_helper(sm)) {
+    fprintf(stderr, "dtext parse error: %s\n", sm->error->message);
+    exit(1);
+  }
 
-  encoding = rb_enc_find("utf-8");
-  ret = rb_enc_str_new(sm->output->str, sm->output->len, encoding);
+  if (fwrite(sm->output->str, 1, sm->output->len, output) != sm->output->len) {
+    perror("fwrite failed");
+    exit(1);
+  }
 
+  free(dtext);
   free_machine(sm);
-
-  return ret;
 }
 
-void Init_dtext() {
-  VALUE mDTextRagel = rb_define_module("DTextRagel");
-  rb_define_singleton_method(mDTextRagel, "parse", parse, -1);
+int main(int argc, char* argv[]) {
+  GError* error = NULL;
+  gboolean opt_verbose = FALSE;
+  gboolean opt_strip = FALSE;
+  gboolean opt_inline = FALSE;
+  gboolean opt_no_mentions = FALSE;
+
+  GOptionEntry options[] = {
+    { "no-mentions", 'm', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &opt_no_mentions, "Don't parse @mentions", NULL },
+    { "inline",      'i', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &opt_inline,      "Parse in inline mode", NULL },
+    { "strip",       's', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &opt_strip,       "Strip markup", NULL },
+    { "verbose",     'v', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &opt_verbose,     "Print debug output", NULL },
+    { NULL }
+  };
+
+  GOptionContext* context = g_option_context_new("[FILE...]");
+  g_option_context_add_main_entries(context, options, NULL);
+
+  if (!g_option_context_parse(context, &argc, &argv, &error)) {
+    fprintf(stderr, "option parsing failed: %s\n", error->message);
+    g_clear_error(&error);
+    return 1;
+  }
+
+  if (opt_verbose) {
+    g_setenv("G_MESSAGES_DEBUG", "all", TRUE);
+  }
+
+  /* skip first argument (progname) */
+  argc--, argv++;
+
+  if (argc == 0) {
+    parse_file(stdin, stdout, opt_strip, opt_inline, !opt_no_mentions);
+    return 0;
+  }
+
+  for (const char* filename = *argv; argc > 0; argc--, argv++) {
+    FILE* input = fopen(filename, "r");
+    if (!input) {
+      perror("fopen failed");
+      return 1;
+    }
+
+    parse_file(input, stdout, opt_strip, opt_inline, !opt_no_mentions);
+    fclose(input);
+  }
+
+  return 0;
 }
