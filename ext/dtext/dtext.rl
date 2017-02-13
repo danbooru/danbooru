@@ -2,41 +2,13 @@
 // easier to read
 #define PRETTY_PRINT 0
 
-#include <ruby.h>
-#include <ruby/encoding.h>
+#include "dtext.h"
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 #include <glib.h>
-
-typedef struct StateMachine {
-  size_t top;
-  int cs;
-  int act;
-  const char * p;
-  const char * pb;
-  const char * pe;
-  const char * eof;
-  const char * ts;
-  const char * te;
-
-  const char * a1;
-  const char * a2;
-  const char * b1;
-  const char * b2;
-  bool f_inline;
-  bool f_strip;
-  bool f_mentions;
-  bool list_mode;
-  bool header_mode;
-  GString * output;
-  GArray * stack;
-  GQueue * dstack;
-  int list_nest;
-  int d;
-  int b;
-  int quote;
-} StateMachine;
 
 static const size_t MAX_STACK_DEPTH = 512;
 
@@ -86,11 +58,12 @@ prepush {
   size_t len = sm->stack->len;
 
   if (len > MAX_STACK_DEPTH) {
-    free_machine(sm);
-    rb_raise(rb_eSyntaxError, "too many nested elements");
+    g_set_error_literal(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_DEPTH_EXCEEDED, "too many nested elements");
+    fbreak;
   }
 
   if (sm->top >= len) {
+    g_debug("growing sm->stack %zi\n", len + 16);
     sm->stack = g_array_set_size(sm->stack, len + 16);
   }
 }
@@ -331,10 +304,19 @@ inline := |*
     append(sm, true, "<a class=\"dtext-link dtext-external-link\" href=\"");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - sm->d);
     append(sm, true, "\">");
-    link_content_sm = parse_helper(sm->a1, sm->a2 - sm->a1, false, true, false);
-    append(sm, true, link_content_sm->output->str);
-    free_machine(link_content_sm);
-    link_content_sm = NULL;
+
+    link_content_sm = init_machine(sm->a1, sm->a2 - sm->a1, false, true, false);
+    if (!parse_helper(link_content_sm)) {
+      g_debug("basic_textile_link: parse_helper failed");
+      g_propagate_error(&sm->error, link_content_sm->error);
+      free_machine(link_content_sm);
+      fbreak;
+    } else {
+      append(sm, true, link_content_sm->output->str);
+      free_machine(link_content_sm);
+      link_content_sm = NULL;
+    }
+
     append(sm, true, "</a>");
 
     if (sm->b) {
@@ -1330,8 +1312,10 @@ static bool print_machine(StateMachine * sm) {
   return true;
 }
 
-static void init_machine(StateMachine * sm, const char * src, size_t len) {
+StateMachine* init_machine(const char * src, size_t len, bool f_strip, bool f_inline, bool f_mentions) {
   size_t output_length = 0;
+  StateMachine* sm = (StateMachine *)g_malloc0(sizeof(StateMachine));
+
   sm->p = src;
   sm->pb = sm->p;
   sm->pe = sm->p + len;
@@ -1350,105 +1334,43 @@ static void init_machine(StateMachine * sm, const char * src, size_t len) {
   sm->a2 = NULL;
   sm->b1 = NULL;
   sm->b2 = NULL;
-  sm->f_inline = false;
-  sm->f_strip = false;
-  sm->f_mentions = true;
+  sm->f_inline = f_inline;
+  sm->f_strip = f_strip;
+  sm->f_mentions = f_mentions;
   sm->stack = g_array_sized_new(FALSE, TRUE, sizeof(int), 16);
   sm->dstack = g_queue_new();
+  sm->error = NULL;
   sm->list_nest = 0;
   sm->list_mode = false;
   sm->header_mode = false;
   sm->d = 0;
   sm->b = 0;
   sm->quote = 0;
+
+  return sm;
 }
 
-static void free_machine(StateMachine * sm) {
+void free_machine(StateMachine * sm) {
   g_string_free(sm->output, TRUE);
   g_array_free(sm->stack, FALSE);
   g_queue_free(sm->dstack);
+  g_clear_error(&sm->error);
   g_free(sm);
 }
 
-static StateMachine * parse_helper(const char * src, size_t len, bool f_strip, bool f_inline, bool f_mentions) {
-  StateMachine * sm = NULL;
-  StateMachine * link_content_sm = NULL;
+GQuark dtext_parse_error_quark() {
+  return g_quark_from_static_string("dtext-parse-error-quark");
+}
 
-  sm = (StateMachine *)g_malloc0(sizeof(StateMachine));
-  init_machine(sm, src, len);
-  sm->f_strip = f_strip;
-  sm->f_inline = f_inline;
-  sm->f_mentions = f_mentions;
+gboolean parse_helper(StateMachine* sm) {
+  StateMachine* link_content_sm = NULL;
+
+  g_debug("start\n");
 
   %% write init;
   %% write exec;
 
   dstack_close(sm);
 
-  return sm;
-}
-
-static VALUE parse(int argc, VALUE * argv, VALUE self) {
-  VALUE input;
-  VALUE input0;
-  VALUE options;
-  VALUE opt_inline;
-  VALUE opt_strip;
-  VALUE opt_mentions;
-  VALUE ret;
-  rb_encoding * encoding = NULL;
-  StateMachine * sm = NULL;
-  bool f_strip = false;
-  bool f_inline = false;
-  bool f_mentions = true;
-
-  g_debug("start\n");
-
-  if (argc == 0) {
-    rb_raise(rb_eArgError, "wrong number of arguments (0 for 1)");
-  }
-
-  input = argv[0];
-
-  if (NIL_P(input)) {
-    return Qnil;
-  }
-
-  input0 = rb_str_dup(input);
-  input0 = rb_str_cat(input0, "\0", 1);
-  
-  if (argc > 1) {
-    options = argv[1];
-
-    if (!NIL_P(options)) {
-      opt_strip  = rb_hash_aref(options, ID2SYM(rb_intern("strip")));
-      if (RTEST(opt_strip)) {
-        f_strip = true;
-      }
-
-      opt_inline = rb_hash_aref(options, ID2SYM(rb_intern("inline")));
-      if (RTEST(opt_inline)) {
-        f_inline = true;
-      }
-
-      opt_mentions = rb_hash_aref(options, ID2SYM(rb_intern("disable_mentions")));
-      if (RTEST(opt_mentions)) {
-        f_mentions = false;
-      }
-    }
-  }
-
-  sm = parse_helper(RSTRING_PTR(input0), RSTRING_LEN(input0), f_strip, f_inline, f_mentions);
-
-  encoding = rb_enc_find("utf-8");
-  ret = rb_enc_str_new(sm->output->str, sm->output->len, encoding);
-
-  free_machine(sm);
-
-  return ret;
-}
-
-void Init_dtext() {
-  VALUE mDTextRagel = rb_define_module("DTextRagel");
-  rb_define_singleton_method(mDTextRagel, "parse", parse, -1);
+  return sm->error == NULL;
 }
