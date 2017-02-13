@@ -22,7 +22,9 @@ Jeweler::Tasks.new do |gem|
   gem.description = %Q{Compiled DText parser}
   gem.email = "r888888888@gmail.com"
   gem.authors = ["r888888888"]
+  gem.executables = %w(dtext)
   gem.files = %w(
+    bin/dtext
     lib/dtext.rb
     lib/dtext_ruby.rb
     lib/dtext/dtext.so
