@@ -4,6 +4,11 @@
 #include <glib.h>
 #include <stdbool.h>
 
+#ifndef DEBUG
+#undef g_debug
+#define g_debug(...)
+#endif
+
 #define DTEXT_PARSE_ERROR dtext_parse_error_quark()
 #define DTEXT_PARSE_ERROR_FAILED 0
 #define DTEXT_PARSE_ERROR_DEPTH_EXCEEDED 1
