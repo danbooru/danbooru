@@ -1,16 +1,16 @@
 #ENV["G_MESSAGES_DEBUG"] = "all"
 
-require "rake/extensiontask"
-require "rubygems/package_task"
-require "bundler"
-require "jeweler"
-
 begin
+  require "rake/extensiontask"
+  require "rubygems/package_task"
+  require "bundler"
+  require "jeweler"
+
   Bundler.setup(:default, :development)
-rescue Bundler::BundlerError => e
+rescue LoadError, Bundler::BundlerError => e
   $stderr.puts e.message
   $stderr.puts "Run `bundle install` to install missing gems"
-  exit e.status_code
+  exit 1
 end
 
 Jeweler::Tasks.new do |gem|
