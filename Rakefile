@@ -19,9 +19,16 @@ Jeweler::Tasks.new do |gem|
   gem.homepage = "http://github.com/r888888888/dtext_rb"
   gem.license = "MIT"
   gem.summary = %Q{Compiled DText parser}
-  gem.description = %Q{Compield DText parser}
+  gem.description = %Q{Compiled DText parser}
   gem.email = "r888888888@gmail.com"
   gem.authors = ["r888888888"]
+  gem.files = %w(
+    lib/dtext.rb
+    lib/dtext_ruby.rb
+    lib/dtext/dtext.so
+  )
+
+  Gem::PackageTask.new(gem)
 end
 Jeweler::RubygemsDotOrgTasks.new
 
@@ -29,20 +36,6 @@ Rake::ExtensionTask.new "dtext" do |ext|
 	ext.lib_dir = "lib/dtext"
 end
 
-s = Gem::Specification.new "dtext", "1.0" do |s|
-	s.summary = "dtext parser"
-	s.authors = ["r888888888@gmail.com"]
-	s.extensions = %w(ext/dtext/extconf.rb)
-	s.files = %w(
-		Rakefile
-		ext/dtext/extconf.rb
-		ext/dtext/dtext.c
-		lib/dtext.rb
-	)
-end
-
-Gem::PackageTask.new(s) do
-end
 
 task :ragel do
 	sh "ragel -G1 -C ext/dtext/dtext.rl -o ext/dtext/dtext.c"
