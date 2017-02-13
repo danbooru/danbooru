@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 #include <glib.h>
 
@@ -1373,4 +1374,86 @@ gboolean parse_helper(StateMachine* sm) {
   dstack_close(sm);
 
   return sm->error == NULL;
+}
+
+static void parse_file(FILE* input, FILE* output, gboolean opt_strip, gboolean opt_inline, gboolean opt_mentions) {
+  char* dtext = NULL;
+  size_t n = 0;
+
+  ssize_t length = getdelim(&dtext, &n, '\0', input);
+  if (length == -1) {
+    free(dtext);
+
+    if (ferror(input)) {
+      perror("getdelim failed");
+      exit(1);
+    } else /* EOF (file was empty, continue with the empty string) */ {
+      dtext = NULL;
+      length = 0;
+    }
+  }
+
+  StateMachine* sm = init_machine(dtext, length, opt_strip, opt_inline, opt_mentions);
+  if (!parse_helper(sm)) {
+    fprintf(stderr, "dtext parse error: %s\n", sm->error->message);
+    exit(1);
+  }
+
+  if (fwrite(sm->output->str, 1, sm->output->len, output) != sm->output->len) {
+    perror("fwrite failed");
+    exit(1);
+  }
+
+  free(dtext);
+  free_machine(sm);
+}
+
+int main(int argc, char* argv[]) {
+  GError* error = NULL;
+  gboolean opt_verbose = FALSE;
+  gboolean opt_strip = FALSE;
+  gboolean opt_inline = FALSE;
+  gboolean opt_no_mentions = FALSE;
+
+  GOptionEntry options[] = {
+    { "no-mentions", 'm', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &opt_no_mentions, "Don't parse @mentions", NULL },
+    { "inline",      'i', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &opt_inline,      "Parse in inline mode", NULL },
+    { "strip",       's', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &opt_strip,       "Strip markup", NULL },
+    { "verbose",     'v', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &opt_verbose,     "Print debug output", NULL },
+    { NULL }
+  };
+
+  GOptionContext* context = g_option_context_new("[FILE...]");
+  g_option_context_add_main_entries(context, options, NULL);
+
+  if (!g_option_context_parse(context, &argc, &argv, &error)) {
+    fprintf(stderr, "option parsing failed: %s\n", error->message);
+    g_clear_error(&error);
+    return 1;
+  }
+
+  if (opt_verbose) {
+    g_setenv("G_MESSAGES_DEBUG", "all", TRUE);
+  }
+
+  /* skip first argument (progname) */
+  argc--, argv++;
+
+  if (argc == 0) {
+    parse_file(stdin, stdout, opt_strip, opt_inline, !opt_no_mentions);
+    return 0;
+  }
+
+  for (const char* filename = *argv; argc > 0; argc--, argv++) {
+    FILE* input = fopen(filename, "r");
+    if (!input) {
+      perror("fopen failed");
+      return 1;
+    }
+
+    parse_file(input, stdout, opt_strip, opt_inline, !opt_no_mentions);
+    fclose(input);
+  }
+
+  return 0;
 }
