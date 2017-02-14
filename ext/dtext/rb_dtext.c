@@ -59,7 +59,7 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
   if (!parse_helper(sm)) {
     GError* error = g_error_copy(sm->error);
     free_machine(sm);
-    rb_raise(mDTextRagelError, error->message);
+    rb_raise(mDTextRagelError, "%s", error->message);
   }
 
   encoding = rb_enc_find("utf-8");
