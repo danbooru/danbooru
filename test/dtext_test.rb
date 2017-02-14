@@ -208,6 +208,7 @@ class DTextTest < Minitest::Test
 
   def test_inline_tags
     assert_parse('<p><a rel="nofollow" class="dtext-link dtext-post-search-link" href="/posts?tags=tag">tag</a></p>', "{{tag}}")
+    assert_parse('<p>hello <code>tag</code></p>', "hello [code]tag[/code]")
   end
 
   def test_inline_tags_conjunction

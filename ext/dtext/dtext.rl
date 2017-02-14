@@ -41,6 +41,7 @@ static const int BLOCK_H3 = 25;
 static const int BLOCK_H4 = 26;
 static const int BLOCK_H5 = 27;
 static const int BLOCK_H6 = 28;
+static const int INLINE_CODE = 29;
 
 %%{
 machine dtext;
@@ -477,6 +478,20 @@ inline := |*
       append(sm, true, "</span>");
     } else {
       append_block(sm, "[/tn]");
+    }
+  };
+
+  '[code]'i => {
+    dstack_push(sm, &INLINE_CODE);
+    append(sm, true, "<code>");
+  };
+
+  '[/code]'i => {
+    if (dstack_check(sm, INLINE_CODE)) {
+      dstack_pop(sm);
+      append(sm, true, "</code>");
+    } else {
+      append(sm, true, "[/code]");
     }
   };
 
@@ -1056,9 +1071,11 @@ static inline int * dstack_peek(StateMachine * sm) {
   return g_queue_peek_tail(sm->dstack);
 }
 
+/*
 static inline bool dstack_search(StateMachine * sm, const int * element) {
   return g_queue_find(sm->dstack, (gconstpointer)element);
 }
+*/
 
 static inline bool dstack_check(StateMachine * sm, int expected_element) {
   int * top = dstack_peek(sm);
@@ -1221,6 +1238,9 @@ static void dstack_rewind(StateMachine * sm) {
   } else if (*element == INLINE_TN) {
     append(sm, true, "</span>");
 
+  } else if (*element == INLINE_CODE) {
+    append(sm, true, "</code>");
+
   } else if (*element == BLOCK_TN) {
     append_closing_p(sm);
 
@@ -1308,10 +1328,12 @@ static inline bool is_boundary_c(char c) {
   return false;
 }
 
+/*
 static bool print_machine(StateMachine * sm) {
   printf("p=%c\n", *sm->p);
   return true;
 }
+*/
 
 StateMachine* init_machine(const char * src, size_t len, bool f_strip, bool f_inline, bool f_mentions) {
   size_t output_length = 0;
