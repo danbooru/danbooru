@@ -48,11 +48,7 @@ class UserPresenter
       return Post.where("false")
     end
     
-    if category == SavedSearch::UNCATEGORIZED_NAME
-      ids = SavedSearch.post_ids(CurrentUser.user.id)
-    else
-      ids = SavedSearch.post_ids(CurrentUser.user.id, category)
-    end
+    ids = SavedSearch.post_ids(CurrentUser.user.id, category)
 
     if ids.any?
       arel = Post.where("id in (?)", ids.map(&:to_i)).order("id desc").limit(10)
