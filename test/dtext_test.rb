@@ -291,4 +291,8 @@ class DTextTest < Minitest::Test
     assert_parse('<p>[b]not bold[/b]</p><p><strong>hello</strong></p>', "[nodtext][b]not bold[/b][/nodtext]\n\n[b]hello[/b]")
     assert_parse('<p> [b]not bold[/b]</p>', " [nodtext][b]not bold[/b][/nodtext]")
   end
+
+  def test_stack_depth_limit
+    assert_raises(DTextRagel::Error) { DTextRagel.parse("* foo\n" * 513) }
+  end
 end

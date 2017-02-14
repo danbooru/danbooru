@@ -1,6 +1,8 @@
+gmon.out
 tmp/
 pkg/
 *.bundle
 *.o
 *.so
+*.exe
 *~

@@ -1,6 +1,6 @@
 require "mkmf"
 
-$CFLAGS << " -std=c99"
+$CFLAGS << " -std=c99 -D_GNU_SOURCE #{ENV["CFLAGS"]}"
 
 pkg_config "glib-2.0"
 

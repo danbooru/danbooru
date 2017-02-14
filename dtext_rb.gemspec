@@ -6,56 +6,46 @@
 # stub: ext/dtext/extconf.rb
 
 Gem::Specification.new do |s|
-  s.name = "dtext_rb"
+  s.name = "dtext_rb".freeze
   s.version = "1.3.0"
 
-  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.require_paths = ["lib"]
-  s.authors = ["r888888888"]
-  s.date = "2017-01-16"
-  s.description = "Compield DText parser"
-  s.email = "r888888888@gmail.com"
-  s.extensions = ["ext/dtext/extconf.rb"]
+  s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
+  s.require_paths = ["lib".freeze]
+  s.authors = ["r888888888".freeze]
+  s.date = "2017-02-13"
+  s.description = "Compiled DText parser".freeze
+  s.email = "r888888888@gmail.com".freeze
+  s.executables = ["cdtext".freeze, "cdtext.exe".freeze, "dtext".freeze]
+  s.extensions = ["ext/dtext/extconf.rb".freeze]
   s.files = [
-    ".ruby-version",
-    "Gemfile",
-    "Gemfile.lock",
-    "Rakefile",
-    "VERSION",
-    "dtext_rb.gemspec",
-    "ext/dtext/dtext.c",
-    "ext/dtext/dtext.h",
-    "ext/dtext/dtext.rl",
-    "ext/dtext/extconf.rb",
+    "bin/cdtext",
+    "bin/cdtext.exe",
+    "bin/dtext",
     "lib/dtext.rb",
-    "lib/dtext_ruby.rb",
-    "test/dtext_test.rb",
-    "test/ragel_output.txt",
-    "test/test_forum_posts.rb",
-    "test/test_wiki_pages.rb",
-    "test/wiki.txt"
+    "lib/dtext/dtext.so",
+    "lib/dtext_ruby.rb"
   ]
-  s.homepage = "http://github.com/r888888888/dtext_rb"
-  s.licenses = ["MIT"]
-  s.rubygems_version = "2.5.1"
-  s.summary = "Compiled DText parser"
+  s.homepage = "http://github.com/r888888888/dtext_rb".freeze
+  s.licenses = ["MIT".freeze]
+  s.rubygems_version = "2.5.2".freeze
+  s.summary = "Compiled DText parser".freeze
 
   if s.respond_to? :specification_version then
     s.specification_version = 4
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<minitest>, ["~> 5.8"])
-      s.add_runtime_dependency(%q<rake-compiler>, ["~> 0.9"])
-      s.add_runtime_dependency(%q<jeweler>, ["~> 2.0"])
+      s.add_runtime_dependency(%q<minitest>.freeze, ["~> 5.8"])
+      s.add_runtime_dependency(%q<rake-compiler>.freeze, ["~> 0.9"])
+      s.add_runtime_dependency(%q<jeweler>.freeze, ["~> 2.0"])
     else
-      s.add_dependency(%q<minitest>, ["~> 5.8"])
-      s.add_dependency(%q<rake-compiler>, ["~> 0.9"])
-      s.add_dependency(%q<jeweler>, ["~> 2.0"])
+      s.add_dependency(%q<minitest>.freeze, ["~> 5.8"])
+      s.add_dependency(%q<rake-compiler>.freeze, ["~> 0.9"])
+      s.add_dependency(%q<jeweler>.freeze, ["~> 2.0"])
     end
   else
-    s.add_dependency(%q<minitest>, ["~> 5.8"])
-    s.add_dependency(%q<rake-compiler>, ["~> 0.9"])
-    s.add_dependency(%q<jeweler>, ["~> 2.0"])
+    s.add_dependency(%q<minitest>.freeze, ["~> 5.8"])
+    s.add_dependency(%q<rake-compiler>.freeze, ["~> 0.9"])
+    s.add_dependency(%q<jeweler>.freeze, ["~> 2.0"])
   end
 end
 
