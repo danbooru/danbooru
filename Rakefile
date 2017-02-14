@@ -37,8 +37,8 @@ end
 Jeweler::RubygemsDotOrgTasks.new
 
 Rake::ExtensionTask.new "dtext" do |ext|
-        # this goes here to ensure ragel runs *before* the extension is compiled.
-        task :compile => ["ext/dtext/dtext.c", "ext/dtext/rb_dtext.c"]
+  # this goes here to ensure ragel runs *before* the extension is compiled.
+  task :compile => ["ext/dtext/dtext.c", "ext/dtext/rb_dtext.c"]
 	ext.lib_dir = "lib/dtext"
 end
 
@@ -56,24 +56,8 @@ file "ext/dtext/dtext.c" => Dir["ext/dtext/dtext.{rl,h}", "Rakefile"] do
   sh "ragel -G1 -C ext/dtext/dtext.rl -o ext/dtext/dtext.c"
 end
 
-task test_forum_posts: :compile do
-  ruby '-Ilib', '-rdtext', '-rdtext_ruby', 'test/test_forum_posts.rb'
-end
-
-task test_wiki_pages: :compile do
-  ruby '-Ilib', '-rdtext', '-rdtext_ruby', 'test/test_wiki_pages.rb'
-end
-
 task test_inline_ragel: :compile do
 	ruby '-Ilib', '-rdtext', '-e', 'puts DTextRagel.parse("hello\r\nworld")'
-end
-
-task test_file_ruby: :compile do
-	ruby '-Ilib', '-rdtext_ruby', '-e', "puts DTextRuby.parse(File.read('test/wiki.txt'))"
-end
-
-task test_file_ragel: :compile do
-	ruby "-Ilib", '-rdtext', "-e", "puts DTextRagel.parse(File.read('test/wiki.txt'))"
 end
 
 task test: :compile do
