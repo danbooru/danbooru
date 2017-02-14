@@ -22,11 +22,22 @@ class UserPromotion
     create_user_feedback unless options[:skip_feedback]
     create_dmail unless options[:skip_dmail]
     update_saved_searches
+    create_mod_actions
 
     user.save
   end
 
 private
+  
+  def create_mod_actions
+    if old_can_approve_posts != user.can_approve_posts?
+      ModAction.log("#{promoter.name} changed approval privileges for #{user.name} from #{old_can_approve_posts} to [b]#{user.can_approve_posts?}[/b]")
+    end
+
+    if old_can_upload_free != user.can_upload_free?
+      ModAction.log("#{promoter.name} changed unlimited upload privileges for #{user.name} from #{old_can_upload_free} to [b]#{user.can_upload_free?}[/b]")
+    end
+  end
   
   def validate
     # admins can do anything

@@ -47,7 +47,7 @@ class UserPresenter
     if !SavedSearch.enabled?
       return Post.where("false")
     end
-    
+
     ids = SavedSearch.post_ids(CurrentUser.user.id, category)
 
     if ids.any?
@@ -81,7 +81,7 @@ class UserPresenter
     if user.can_upload_free?
       return "none"
     end
-    
+
     dcon = [user.deletion_confidence(60), 15].min
     multiplier = (1 - (dcon / 15.0))
     max_count = [(user.base_upload_limit * multiplier).ceil, 5].max
