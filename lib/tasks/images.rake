@@ -17,7 +17,7 @@ namespace :images do
     Post.where("id >= ? and id <= ?", min_id, max_id).find_each do |post|
       key = File.basename(post.file_path)
       begin
-        client.copy_object(bucket: bucket, key: key, acl: "authenticated-read", storage_class: "STANDARD", copy_source: "/#{bucket}/#{key}", metadata_directive: "COPY")
+        client.copy_object(bucket: bucket, key: key, acl: "public-read", storage_class: "STANDARD", copy_source: "/#{bucket}/#{key}", metadata_directive: "COPY")
         puts "copied #{post.id}"
       rescue Aws::S3::Errors::InvalidObjectState
         puts "invalid state #{post.id}"
@@ -41,7 +41,7 @@ namespace :images do
     bucket = Danbooru.config.aws_s3_bucket_name
 
     Post.where("id >= ? and id <= ?", min_id, max_id).find_each do |post|
-      key = File.basename(post.file_path)
+      key = "preview/" + File.basename(post.preview_file_path)
       begin
         client.restore_object(
           bucket: bucket,
@@ -53,7 +53,7 @@ namespace :images do
             }
           }
         )
-        puts "uploaded #{post.id}"
+        puts "restored #{post.id}"
       rescue Aws::S3::Errors::InvalidObjectState
         puts "already glaciered #{post.id}"
       rescue Aws::S3::Errors::NoSuchKey

@@ -2,12 +2,10 @@
   Danbooru.error("<%= j @error.to_s %>");
 <% elsif @comment_vote.errors.any? %>
   Danbooru.error("<%= j @comment_vote.errors.full_messages.join('; ') %>");
-<% else %>
-  <% if @comment_vote.is_negative? %>
-    $(".comment[data-comment-id=<%= @comment.id %>]").remove();
-  <% end %>
-
-  $("#comment-vote-up-link-for-<%= @comment.id %>").hide();
-  $("#comment-vote-down-link-for-<%= @comment.id %>").hide();
-  $("#comment-unvote-link-for-<%= @comment.id %>").show();
+<% elsif @comment_vote.is_negative? %>
+  $(".comment[data-comment-id=<%= @comment.id %>]").remove();
 <% end %>
+
+$("#comment-vote-up-link-for-<%= @comment.id %>").hide();
+$("#comment-vote-down-link-for-<%= @comment.id %>").hide();
+$("#comment-unvote-link-for-<%= @comment.id %>").show();
