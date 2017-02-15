@@ -1,0 +1,19 @@
+<div id="c-pools">
+  <div id="a-diff">
+    <h1>Pool Version Comparison: <%= @pool_version.name %></h1>
+
+    <ul>
+      <li><strong>Posts</strong>: <%= pool_version_diff(@pool_version, @other_version) %></li>
+      <% if @other_version %>
+        <li><strong>Old Desc</strong>: <%= @other_version.description %></li>
+      <% end %>
+      <li><strong>New Desc</strong>: <%= @pool_version.description %></li>
+    </ul>
+  </div>
+</div>
+
+<%= render "pools/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Pool Version Comparison - <%= @pool_version.name %> - <%= Danbooru.config.app_name %>
+<% end %>

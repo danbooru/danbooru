@@ -187,7 +187,11 @@ Rails.application.routes.draw do
       get :all_select
     end
   end
-  resources :pool_versions, :only => [:index]
+  resources :pool_versions, :only => [:index] do
+    member do
+      get :diff
+    end
+  end
   resources :posts do
     resources :events, :only => [:index], :controller => "post_events"
     resource :artist_commentary, :only => [:index, :show] do

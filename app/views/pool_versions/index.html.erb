@@ -8,6 +8,7 @@
           <th>Pool</th>
           <th>Post Count</th>
           <th>Changes</th>
+          <th>Desc Chg</th>
           <th>Updater</th>
           <% if CurrentUser.is_moderator? %>
             <th>IP Address</th>
@@ -24,6 +25,7 @@
             <td><%= link_to pool_version.pretty_name, pool_path(pool_version.pool_id), :class => "pool-category-#{pool_version.pool.category}" %></td>
             <td><%= link_to pool_version.post_ids.size, pool_versions_path(:search => {:pool_id => pool_version.pool_id}) %></td>
             <td><%= pool_version_diff(pool_version) %></td>
+            <td><%= link_to_if pool_version.description_changed, pool_version.description_changed, diff_pool_version_path(pool_version.id) %></td>
             <td><%= link_to_user pool_version.updater %></td>
             <% if CurrentUser.is_moderator? %>
               <td>

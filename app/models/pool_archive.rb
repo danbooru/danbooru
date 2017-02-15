@@ -62,6 +62,24 @@ class PoolArchive < ActiveRecord::Base
     sqs_service.send_message(msg)
   end
 
+  def build_diff(other = nil)
+    diff = {}
+    prev = previous
+
+    if prev.nil?
+      diff[:added_post_ids] = added_post_ids
+      diff[:removed_post_ids] = removed_post_ids
+      diff[:added_desc] = description
+    else
+      diff[:added_post_ids] = post_ids - prev.post_ids
+      diff[:removed_post_ids] = prev.post_ids - post_ids
+      diff[:added_desc] = description
+      diff[:removed_desc] = prev.description
+    end
+
+    diff
+  end
+
   def previous
     PoolArchive.where("pool_id = ? and version < ?", pool_id, version).order("version desc").first
   end

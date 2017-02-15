@@ -15,6 +15,16 @@ class PoolVersionsController < ApplicationController
     end
   end
 
+  def diff
+    @pool_version = PoolArchive.find(params[:id])
+
+    if params[:other_id]
+      @other_version = PoolArchive.find(params[:other_id])
+    else
+      @other_version = @pool_version.previous
+    end
+  end
+
 private
 
   def check_availabililty
