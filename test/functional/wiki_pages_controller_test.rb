@@ -112,12 +112,23 @@ class WikiPagesControllerTest < ActionController::TestCase
     context "destroy action" do
       setup do
         @wiki_page = FactoryGirl.create(:wiki_page)
+        @mod = FactoryGirl.create(:mod_user)
       end
 
       should "destroy a wiki_page" do
-        post :destroy, {:id => @wiki_page.id}, {:user_id => @mod.id}
+        CurrentUser.scoped(@mod) do
+          post :destroy, {:id => @wiki_page.id}, {:user_id => @mod.id}
+        end
         @wiki_page.reload
         assert_equal(true, @wiki_page.is_deleted?)
+      end
+
+      should "record the deleter" do
+        CurrentUser.scoped(@mod) do
+          post :destroy, {:id => @wiki_page.id}, {:user_id => @mod.id}
+        end
+        @wiki_page.reload
+        assert_equal(@mod.id, @wiki_page.updater_id)
       end
     end
 
