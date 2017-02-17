@@ -296,4 +296,26 @@ class DTextTest < Minitest::Test
   def test_stack_depth_limit
     assert_raises(DTextRagel::Error) { DTextRagel.parse("* foo\n" * 513) }
   end
+
+  def test_null_bytes
+    assert_raises(DTextRagel::Error) { DTextRagel.parse("foo\0bar") }
+  end
+
+  def test_wiki_link_xss
+    assert_raises(DTextRagel::Error) do
+      DTextRagel.parse("[[\xFA<script \xFA>alert(42); //\xFA</script \xFA>]]")
+    end
+  end
+
+  def test_mention_xss
+    assert_raises(DTextRagel::Error) do
+      DTextRagel.parse("@user\xF4<b>xss\xFA</b>")
+    end
+  end
+
+  def test_url_xss
+    assert_raises(DTextRagel::Error) do
+      DTextRagel.parse(%("url":/page\xF4">x\xFA<b>xss\xFA</b>))
+    end
+  end
 end
