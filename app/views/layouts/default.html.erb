@@ -28,7 +28,7 @@
   <% if CurrentUser.user.custom_style.present? %>
     <%= stylesheet_link_tag custom_style_users_path, :media => "screen" %>
   <% end %>
-  <%= javascript_include_tag "application" %>
+  <%= javascript_include_tag "application", :async => true %>
   <%= raw Danbooru.config.custom_html_header_content %>
   <%= yield :html_header %>
   <% if Danbooru.config.twitter_site %>
