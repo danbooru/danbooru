@@ -1,10 +1,10 @@
 <!doctype html>
 <html>
 <body>
-<p><%= h @dmail.from.name %> said:</p>
+<p><%= @dmail.from.name %> said:</p>
 
-<div>
-  <%= DText.parse(@dmail.body) %>
+<div class="prose">
+  <%= format_text(@dmail.body, base_url: root_url) %>
 </div>
 
 <p><%= link_to "View message", dmail_url(@dmail, :host => Danbooru.config.hostname, :only_path => false) %> | <%= link_to "Unsubscribe", maintenance_user_email_notification_url(:user_id => @dmail.owner.id, :sig => email_sig(@dmail.owner), :host => Danbooru.config.hostname, :only_path => false) %></p>

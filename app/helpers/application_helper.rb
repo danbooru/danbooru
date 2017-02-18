@@ -49,9 +49,9 @@ module ApplicationHelper
     raw %{<a href="#{h(url)}" #{attributes}>#{text}</a>}
   end
 
-  def format_text(text, options = {})
-    if options[:ragel]
-      raw(DTextRagel.parse(text))
+  def format_text(text, ragel: true, **options)
+    if ragel
+      raw DTextRagel.parse(text, **options)
     else
       DText.parse(text)
     end
