@@ -88,7 +88,7 @@ action mark_b2 {
 
 newline = '\r\n' | '\n';
 
-nonnewline = any - (newline | '\0' | '\r');
+nonnewline = any - (newline | '\r');
 nonquote = ^'"';
 nonbracket = ^']';
 nonpipe = ^'|';
@@ -594,14 +594,6 @@ inline := |*
     }
   };
 
-  '\0' => {
-    g_debug("inline 0");
-    g_debug("  return");
-
-    fhold;
-    fret;
-  };
-
   newline{2,} => {
     g_debug("inline newline2");
     g_debug("  return");
@@ -646,11 +638,6 @@ code := |*
     fret;
   };
 
-  '\0' => {
-    fhold;
-    fret;
-  };
-
   any => {
     append_c_html_escaped(sm, fc);
   };
@@ -672,11 +659,6 @@ nodtext := |*
       g_debug("else dstack check");
       append(sm, true, "[/nodtext]");
     }
-  };
-
-  '\0' => {
-    fhold;
-    fret;
   };
 
   any => {
@@ -749,11 +731,6 @@ table := |*
     }
   };
 
-  '\0' => {
-    fhold;
-    fret;
-  };
-
   any;
 *|;
 
@@ -797,7 +774,7 @@ list := |*
   };
 
   # exit list
-  (newline{2,} | '\0') => {
+  newline{2,} => {
     dstack_close_list(sm);
     fexec sm->ts;
     fret;
@@ -1007,12 +984,6 @@ main := |*
     append_closing_p_if(sm);
     fexec sm->ts;
     fcall list;
-  };
-
-  '\0' => {
-    g_debug("block 0");
-    g_debug("  close dstack");
-    dstack_close(sm);
   };
 
   newline{2,} => {
@@ -1387,8 +1358,14 @@ GQuark dtext_parse_error_quark() {
 
 gboolean parse_helper(StateMachine* sm) {
   StateMachine* link_content_sm = NULL;
+  const gchar* end = NULL;
 
   g_debug("start\n");
+
+  if (!g_utf8_validate(sm->pb, sm->pe - sm->pb, &end)) {
+    g_set_error(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_INVALID_UTF8, "invalid utf8 starting at byte %td", end - sm->pb + 1);
+    return FALSE;
+  }
 
   %% write init;
   %% write exec;

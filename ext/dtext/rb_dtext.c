@@ -9,7 +9,6 @@ static VALUE mDTextRagelError = Qnil;
 
 static VALUE parse(int argc, VALUE * argv, VALUE self) {
   VALUE input;
-  VALUE input0;
   VALUE options;
   VALUE opt_inline;
   VALUE opt_strip;
@@ -30,9 +29,6 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
   if (NIL_P(input)) {
     return Qnil;
   }
-
-  input0 = rb_str_dup(input);
-  input0 = rb_str_cat(input0, "\0", 1);
 
   if (argc > 1) {
     options = argv[1];
@@ -55,7 +51,7 @@ static VALUE parse(int argc, VALUE * argv, VALUE self) {
     }
   }
 
-  sm = init_machine(RSTRING_PTR(input0), RSTRING_LEN(input0), f_strip, f_inline, f_mentions);
+  sm = init_machine(RSTRING_PTR(input), RSTRING_LEN(input), f_strip, f_inline, f_mentions);
   if (!parse_helper(sm)) {
     GError* error = g_error_copy(sm->error);
     free_machine(sm);

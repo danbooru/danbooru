@@ -12,6 +12,7 @@
 #define DTEXT_PARSE_ERROR dtext_parse_error_quark()
 #define DTEXT_PARSE_ERROR_FAILED 0
 #define DTEXT_PARSE_ERROR_DEPTH_EXCEEDED 1
+#define DTEXT_PARSE_ERROR_INVALID_UTF8 2
 
 typedef struct StateMachine {
   size_t top;
