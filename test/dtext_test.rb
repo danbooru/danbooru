@@ -2,8 +2,20 @@ require 'minitest/autorun'
 require 'dtext/dtext'
 
 class DTextTest < Minitest::Test
-  def assert_parse(expected, input)
-    assert_equal(expected, DTextRagel.parse(input))
+  def assert_parse(expected, input, **options)
+    assert_equal(expected, DTextRagel.parse(input, **options))
+  end
+
+  def test_relative_urls
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="http://danbooru.donmai.us/posts/1234">post #1234</a></p>', "post #1234", base_url: "http://danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link dtext-external-link" href="http://danbooru.donmai.us/posts">posts</a></p>', '"posts":/posts', base_url: "http://danbooru.donmai.us")
+    assert_parse('<p><a rel="nofollow" href="http://danbooru.donmai.us/users?name=evazion">@evazion</a></p>', "@evazion", base_url: "http://danbooru.donmai.us")
+  end
+
+  def test_args
+    assert_parse(nil, nil)
+    assert_parse("", "")
+    assert_raises(TypeError) { DTextRagel.parse(42) }
   end
 
   def test_mentions

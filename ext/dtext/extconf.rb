@@ -1,5 +1,6 @@
 require "mkmf"
 
+$warnflags = "-Wall -Wextra -Wno-unused-parameter"
 $CFLAGS << " -std=c99 -D_GNU_SOURCE #{ENV["CFLAGS"]}"
 
 pkg_config "glib-2.0"

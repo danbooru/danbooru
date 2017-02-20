@@ -1,6 +1,7 @@
 # A sample Gemfile
 source "https://rubygems.org"
 
-gem "minitest", "~> 5.8"
-gem "rake-compiler", "~> 0.9"
-gem "jeweler", "~> 2.0"
+gem "minitest", "~> 5.10", group: :development
+gem "rake-compiler", "~> 1.0", group: :development
+gem "jeweler", "~> 2.3", group: :development
+gem "nokogiri", "~> 1.6"
