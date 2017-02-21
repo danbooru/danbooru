@@ -10,7 +10,9 @@ class PostTest < ActiveSupport::TestCase
     assert_equal(posts.map(&:id), Post.tag_match(query).pluck(:id))
   end
 
-  setup do
+  def setup
+    super
+
     Timecop.travel(2.weeks.ago) do
       @user = FactoryGirl.create(:user)
     end
@@ -20,7 +22,9 @@ class PostTest < ActiveSupport::TestCase
     mock_saved_search_service!
   end
 
-  teardown do
+  def teardown
+    super
+
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
   end
@@ -2290,8 +2294,8 @@ class PostTest < ActiveSupport::TestCase
 
     context "a post that has been updated" do
       setup do
-        @post = FactoryGirl.create(:post, :rating => "q", :tag_string => "aaa")
         PostArchive.sqs_service.stubs(:merge?).returns(false)
+        @post = FactoryGirl.create(:post, :rating => "q", :tag_string => "aaa", :source => nil)
         @post.update_attributes(:tag_string => "aaa bbb ccc ddd")
         @post.update_attributes(:tag_string => "bbb xxx yyy", :source => "xyz")
         @post.update_attributes(:tag_string => "bbb mmm yyy", :source => "abc")

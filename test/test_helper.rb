@@ -26,12 +26,10 @@ if defined?(MEMCACHE)
 end
 
 class ActiveSupport::TestCase
-  include UploadTestMethods
   include PostArchiveTestHelper
 end
 
 class ActionController::TestCase
-  include UploadTestMethods
   include PostArchiveTestHelper
 
   def assert_authentication_passes(action, http_method, role, params, session)
