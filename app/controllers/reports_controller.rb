@@ -3,10 +3,6 @@ class ReportsController < ApplicationController
   before_filter :gold_only, :only => [:similar_users]
   before_filter :moderator_only, :only => [:post_versions, :post_versions_create]
 
-  def user_promotions
-    @report = Reports::UserPromotions.new
-  end
-
   def janitor_trials
     @report = Reports::JanitorTrials.new
   end

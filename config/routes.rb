@@ -230,7 +230,6 @@ Rails.application.routes.draw do
   end
   resources :artist_commentary_versions, :only => [:index]
   resource :related_tag, :only => [:show, :update]
-  get "reports/user_promotions" => "reports#user_promotions"
   get "reports/janitor_trials" => "reports#janitor_trials"
   get "reports/contributors" => "reports#contributors"
   get "reports/uploads" => "reports#uploads"
