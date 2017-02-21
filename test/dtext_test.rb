@@ -3,7 +3,11 @@ require 'dtext/dtext'
 
 class DTextTest < Minitest::Test
   def assert_parse(expected, input, **options)
-    assert_equal(expected, DTextRagel.parse(input, **options))
+    if expected.nil?
+      assert_nil(DTextRagel.parse(input, **options))
+    else
+      assert_equal(expected, DTextRagel.parse(input, **options))
+    end
   end
 
   def test_relative_urls

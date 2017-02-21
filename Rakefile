@@ -56,11 +56,15 @@ file "ext/dtext/dtext.c" => Dir["ext/dtext/dtext.{rl,h}", "Rakefile"] do
 end
 
 task test_inline_ragel: :compile do
-	ruby '-Ilib', '-rdtext', '-e', 'puts DTextRagel.parse("hello\r\nworld")'
+  Bundler.with_clean_env do
+  	ruby '-Ilib', '-rdtext', '-e', 'puts DTextRagel.parse("hello\r\nworld")'
+  end
 end
 
 task test: :compile do
-	ruby "-Ilib", '-rdtext', "test/dtext_test.rb" #, '--name=test_headers_with_ids'
+  Bundler.with_clean_env do
+  	ruby "-Ilib", '-rdtext', "test/dtext_test.rb" #, '--name=test_headers_with_ids'
+  end
 end
 
 task default: :test
