@@ -5085,6 +5085,20 @@ CREATE INDEX index_dmails_on_creator_ip_addr ON dmails USING btree (creator_ip_a
 
 
 --
+-- Name: index_dmails_on_is_deleted; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_dmails_on_is_deleted ON dmails USING btree (is_deleted);
+
+
+--
+-- Name: index_dmails_on_is_read; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_dmails_on_is_read ON dmails USING btree (is_read);
+
+
+--
 -- Name: index_dmails_on_message_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7449,4 +7463,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170112021922');
 INSERT INTO schema_migrations (version) VALUES ('20170112060921');
 
 INSERT INTO schema_migrations (version) VALUES ('20170117233040');
+
+INSERT INTO schema_migrations (version) VALUES ('20170218104710');
 
