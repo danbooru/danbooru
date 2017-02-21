@@ -29,6 +29,12 @@ module Danbooru
     else
       config.x.git_hash = nil
     end
+
+    config.after_initialize do
+      Rails.application.routes.default_url_options = {
+        host: Danbooru.config.hostname,
+      }
+    end
   end
 
   I18n.enforce_available_locales = false
