@@ -15,8 +15,15 @@ class UserPromotion
     @old_can_upload_free = user.can_upload_free?
 
     user.level = new_level
-    user.can_approve_posts = options[:can_approve_posts]
-    user.can_upload_free = options[:can_upload_free]
+
+    if options.has_key?(:can_approve_posts)
+      user.can_approve_posts = options[:can_approve_posts]
+    end
+
+    if options.has_key?(:can_upload_free)
+      user.can_upload_free = options[:can_upload_free]
+    end
+    
     user.inviter_id = promoter.id
 
     create_user_feedback unless options[:skip_feedback]
