@@ -1,5 +1,3 @@
-truncate table advertisement_hits;
-truncate table advertisements;
 update artist_versions set updater_ip_addr = '127.0.0.1';
 truncate table bans;
 truncate table comment_votes;

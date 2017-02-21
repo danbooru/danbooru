@@ -1,6 +1,0 @@
-<%= simple_form_for @advertisement, :html => {:multipart => true} do |f| %>
-  <%= f.input :file, :as => :file %>
-  <%= f.input :referral_url, :as => :string %>
-  <%= f.input :status, :collection => %w(active inactive) %>
-  <%= f.button :submit, "Submit" %>
-<% end %>

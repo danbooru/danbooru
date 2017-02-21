@@ -107,11 +107,6 @@ module Danbooru
       300
     end
 
-    # Where the ad banners are stored in the file system
-    def advertisement_path
-      nil
-    end
-
     # List of memcached servers
     def memcached_servers
       %w(127.0.0.1:11211)
@@ -264,10 +259,6 @@ module Danbooru
 
     def is_user_restricted?(user)
       !user.is_gold?
-    end
-
-    def is_user_advertiser?(user)
-      user.is_admin?
     end
 
     def can_user_see_post?(user, post)

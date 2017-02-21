@@ -71,9 +71,6 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :advertisements do
-    resources :hits, :controller => "advertisement_hits", :only => [:create]
-  end
   resources :artists do
     member do
       put :revert

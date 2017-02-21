@@ -130,10 +130,6 @@
           <li><%= link_to("Alias & Implication Import", new_admin_alias_and_implication_import_path) %></li>
           <li><%= link_to("Admin Dashboard", admin_dashboard_path) %></li>
         <% end %>
-
-        <% if Danbooru.config.is_user_advertiser?(CurrentUser.user) %>
-          <li><%= link_to("Advertisements", advertisements_path) %></li>
-        <% end %>
       </ul>
     </section>
   </div>
