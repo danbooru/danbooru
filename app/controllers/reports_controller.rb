@@ -3,10 +3,6 @@ class ReportsController < ApplicationController
   before_filter :gold_only, :only => [:similar_users]
   before_filter :moderator_only, :only => [:post_versions, :post_versions_create]
 
-  def contributors
-    @report = Reports::Contributors.new
-  end
-
   def uploads
     @report = Reports::Uploads.new(params[:min_date], params[:max_date], params[:queries])
   end
