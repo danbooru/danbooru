@@ -11,15 +11,17 @@
       </thead>
       <tbody>
         <% @artists.each do |artist| %>
-          <%= content_tag(:tr, :id => "artist-#{artist.id}") do %>
-            <td>
-              <%= link_to h(artist.name), artist_path(artist) %>
-              <% if !artist.group_name.blank? %>
-                (group: <%= link_to(artist.group_name, artist_path(artist)) %>)
-              <% end %>
-            </td>
-            <td><%= artist.other_names %></td>
-            <td><%= artist.status %></td>
+          <% if artist.visible? %>
+            <%= content_tag(:tr, :id => "artist-#{artist.id}") do %>
+              <td>
+                <%= link_to h(artist.name), artist_path(artist) %>
+                <% if !artist.group_name.blank? %>
+                  (group: <%= link_to(artist.group_name, artist_path(artist)) %>)
+                <% end %>
+              </td>
+              <td><%= artist.other_names %></td>
+              <td><%= artist.status %></td>
+            <% end %>
           <% end %>
         <% end %>
       </tbody>
