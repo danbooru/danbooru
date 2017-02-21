@@ -15,12 +15,10 @@ GIT
 
 GIT
   remote: https://github.com/r888888888/dtext_rb.git
-  revision: 48a1028cebf082b6636b788d35e8db9cfdeb806e
+  revision: b46c5dd74f134f818b60f22eadd2127bf5ae04d1
   specs:
-    dtext_rb (1.4.1)
-      jeweler (~> 2.0)
-      minitest (~> 5.8)
-      rake-compiler (~> 0.9)
+    dtext_rb (1.4.3)
+      nokogiri (~> 1.6)
 
 GIT
   remote: https://github.com/r888888888/ruby-imagespec.git
@@ -124,8 +122,6 @@ GEM
     delayed_job_active_record (4.0.3)
       activerecord (>= 3.0, < 5.0)
       delayed_job (>= 3.0, < 4.1)
-    descendants_tracker (0.0.4)
-      thread_safe (~> 0.3, >= 0.3.1)
     docile (1.1.5)
     domain_name (0.5.24)
       unf (>= 0.0.5, < 1.0.0)
@@ -145,15 +141,6 @@ GEM
     ffi (1.9.10-x64-mingw32)
     gctools (0.2.4)
     get_process_mem (0.2.1)
-    git (1.3.0)
-    github_api (0.11.3)
-      addressable (~> 2.3)
-      descendants_tracker (~> 0.0.1)
-      faraday (~> 0.8, < 0.10)
-      hashie (>= 1.2)
-      multi_json (>= 1.7.5, < 2.0)
-      nokogiri (~> 1.6.0)
-      oauth2
     globalid (0.3.7)
       activesupport (>= 4.1.0)
     google-api-client (0.9.9)
@@ -174,7 +161,6 @@ GEM
       multi_json (~> 1.11)
       os (~> 0.9)
       signet (~> 0.7)
-    hashie (3.5.3)
     highline (1.7.8)
     hike (1.2.3)
     http (0.6.4)
@@ -185,17 +171,6 @@ GEM
     httpclient (2.8.0)
     hurley (0.2)
     i18n (0.8.0)
-    jeweler (2.3.3)
-      builder
-      bundler (>= 1.0)
-      git (>= 1.2.5)
-      github_api (~> 0.11.0)
-      highline (>= 1.6.15)
-      nokogiri (>= 1.5.10)
-      psych (~> 2.2)
-      rake
-      rdoc
-      semver2
     jmespath (1.3.1)
     json (1.8.6)
     jwt (1.5.6)
@@ -231,7 +206,6 @@ GEM
     mocha (1.2.1)
       metaclass (~> 0.0.1)
     multi_json (1.12.1)
-    multi_xml (0.6.0)
     multipart-post (2.0.0)
     naught (1.0.0)
     net-http-digest_auth (1.4)
@@ -250,12 +224,6 @@ GEM
     nokogumbo (1.2.0)
       nokogiri
     ntlm-http (0.1.1)
-    oauth2 (1.3.0)
-      faraday (>= 0.8, < 0.11)
-      jwt (~> 1.0)
-      multi_json (~> 1.3)
-      multi_xml (~> 0.5)
-      rack (>= 1.2, < 3)
     os (0.9.6)
     pg (0.18.2)
     pg (0.18.2-x64-mingw32)
@@ -265,7 +233,6 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
-    psych (2.2.2)
     public_suffix (2.0.5)
     rack (1.6.5)
     rack-test (0.6.3)
@@ -297,9 +264,6 @@ GEM
       thor (>= 0.18.1, < 2.0)
     raindrops (0.17.0)
     rake (12.0.0)
-    rake-compiler (0.9.9)
-      rake
-    rdoc (5.0.0)
     ref (2.0.0)
     representable (2.3.0)
       uber (~> 0.0.7)
@@ -328,7 +292,6 @@ GEM
       sass (~> 3.2.2)
       sprockets (~> 2.8, < 3.0)
       sprockets-rails (~> 2.0)
-    semver2 (3.4.2)
     shoulda-context (1.2.2)
     shoulda-matchers (3.1.1)
       activesupport (>= 4.0.0)
