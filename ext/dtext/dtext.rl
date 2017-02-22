@@ -13,35 +13,38 @@
 
 static const size_t MAX_STACK_DEPTH = 512;
 
-static const int BLOCK_P = 1;
-static const int INLINE_SPOILER = 2;
-static const int BLOCK_SPOILER = 3;
-static const int BLOCK_QUOTE = 4;
-static const int BLOCK_EXPAND = 5;
-static const int BLOCK_NODTEXT = 6;
-static const int BLOCK_CODE = 7;
-static const int BLOCK_TD = 8;
-static const int INLINE_NODTEXT = 9;
-static const int INLINE_B = 10;
-static const int INLINE_I = 11;
-static const int INLINE_U = 12;
-static const int INLINE_S = 13;
-static const int INLINE_TN = 14;
-static const int BLOCK_TN = 15;
-static const int BLOCK_TABLE = 16;
-static const int BLOCK_THEAD = 17;
-static const int BLOCK_TBODY = 18;
-static const int BLOCK_TR = 19;
-static const int BLOCK_UL = 20;
-static const int BLOCK_LI = 21;
-static const int BLOCK_TH = 22;
-static const int BLOCK_H1 = 23;
-static const int BLOCK_H2 = 24;
-static const int BLOCK_H3 = 25;
-static const int BLOCK_H4 = 26;
-static const int BLOCK_H5 = 27;
-static const int BLOCK_H6 = 28;
-static const int INLINE_CODE = 29;
+typedef enum element_t {
+  QUEUE_EMPTY = 0,
+  BLOCK_P = 1,
+  INLINE_SPOILER = 2,
+  BLOCK_SPOILER = 3,
+  BLOCK_QUOTE = 4,
+  BLOCK_EXPAND = 5,
+  BLOCK_NODTEXT = 6,
+  BLOCK_CODE = 7,
+  BLOCK_TD = 8,
+  INLINE_NODTEXT = 9,
+  INLINE_B = 10,
+  INLINE_I = 11,
+  INLINE_U = 12,
+  INLINE_S = 13,
+  INLINE_TN = 14,
+  BLOCK_TN = 15,
+  BLOCK_TABLE = 16,
+  BLOCK_THEAD = 17,
+  BLOCK_TBODY = 18,
+  BLOCK_TR = 19,
+  BLOCK_UL = 20,
+  BLOCK_LI = 21,
+  BLOCK_TH = 22,
+  BLOCK_H1 = 23,
+  BLOCK_H2 = 24,
+  BLOCK_H3 = 25,
+  BLOCK_H4 = 26,
+  BLOCK_H5 = 27,
+  BLOCK_H6 = 28,
+  INLINE_CODE = 29,
+} element_t;
 
 %%{
 machine dtext;
@@ -370,7 +373,7 @@ inline := |*
   };
 
   '[b]'i => {
-    dstack_push(sm, &INLINE_B);
+    dstack_push(sm, INLINE_B);
     append(sm, true, "<strong>");
   };
 
@@ -384,7 +387,7 @@ inline := |*
   };
 
   '[i]'i => {
-    dstack_push(sm, &INLINE_I);
+    dstack_push(sm, INLINE_I);
     append(sm, true, "<em>");
   };
 
@@ -398,7 +401,7 @@ inline := |*
   };
 
   '[s]'i => {
-    dstack_push(sm, &INLINE_S);
+    dstack_push(sm, INLINE_S);
     append(sm, true, "<s>");
   };
 
@@ -412,7 +415,7 @@ inline := |*
   };
 
   '[u]'i => {
-    dstack_push(sm, &INLINE_U);
+    dstack_push(sm, INLINE_U);
     append(sm, true, "<u>");
   };
 
@@ -426,7 +429,7 @@ inline := |*
   };
 
   '[tn]'i => {
-    dstack_push(sm, &INLINE_TN);
+    dstack_push(sm, INLINE_TN);
     append(sm, true, "<span class=\"tn\">");
   };
 
@@ -445,7 +448,7 @@ inline := |*
   };
 
   '[code]'i => {
-    dstack_push(sm, &INLINE_CODE);
+    dstack_push(sm, INLINE_CODE);
     append(sm, true, "<code>");
   };
 
@@ -461,7 +464,7 @@ inline := |*
   spoilers_open => {
     g_debug("inline [spoiler]");
     g_debug("  push <span>");
-    dstack_push(sm, &INLINE_SPOILER);
+    dstack_push(sm, INLINE_SPOILER);
     append(sm, true, "<span class=\"spoiler\">");
   };
 
@@ -487,7 +490,7 @@ inline := |*
   };
 
   '[nodtext]'i => {
-    dstack_push(sm, &INLINE_NODTEXT);
+    dstack_push(sm, INLINE_NODTEXT);
     g_debug("push inline nodtext");
     fcall nodtext;
   };
@@ -631,7 +634,7 @@ nodtext := |*
 
 table := |*
   '[thead]'i => {
-    dstack_push(sm, &BLOCK_THEAD);
+    dstack_push(sm, BLOCK_THEAD);
     append_block(sm, "<thead>");
   };
 
@@ -645,7 +648,7 @@ table := |*
   };
 
   '[tbody]'i => {
-    dstack_push(sm, &BLOCK_TBODY);
+    dstack_push(sm, BLOCK_TBODY);
     append_block(sm, "<tbody>");
   };
 
@@ -659,13 +662,13 @@ table := |*
   };
 
   '[th]'i => {
-    dstack_push(sm, &BLOCK_TH);
+    dstack_push(sm, BLOCK_TH);
     append_block(sm, "<th>");
     fcall inline;
   };
 
   '[tr]'i => {
-    dstack_push(sm, &BLOCK_TR);
+    dstack_push(sm, BLOCK_TR);
     append_block(sm, "<tr>");
   };
 
@@ -679,7 +682,7 @@ table := |*
   };
 
   '[td]'i => {
-    dstack_push(sm, &BLOCK_TD);
+    dstack_push(sm, BLOCK_TD);
     append_block(sm, "<td>");
     fcall inline;
   };
@@ -712,7 +715,7 @@ list := |*
         g_debug("  dstack push ul");
         g_debug("  print <ul>");
         append_block(sm, "<ul>");
-        dstack_push(sm, &BLOCK_UL);
+        dstack_push(sm, BLOCK_UL);
       }
     } else if (sm->list_nest < prev_nest) {
       int i=0;
@@ -727,7 +730,7 @@ list := |*
     }
 
     append_block(sm, "<li>");
-    dstack_push(sm, &BLOCK_LI);
+    dstack_push(sm, BLOCK_LI);
 
     g_debug("  print <li>");
     g_debug("  push li");
@@ -765,42 +768,42 @@ main := |*
     if (!sm->f_strip) {
       switch (header) {
         case '1':
-          dstack_push(sm, &BLOCK_H1);
+          dstack_push(sm, BLOCK_H1);
           append_block(sm, "<h1 id=\"");
           append_block(sm, id_name->str);
           append_block(sm, "\">");
           break;
 
         case '2':
-          dstack_push(sm, &BLOCK_H2);
+          dstack_push(sm, BLOCK_H2);
           append_block(sm, "<h2 id=\"");
           append_block(sm, id_name->str);
           append_block(sm, "\">");
           break;
 
         case '3':
-          dstack_push(sm, &BLOCK_H3);
+          dstack_push(sm, BLOCK_H3);
           append_block(sm, "<h3 id=\"");
           append_block(sm, id_name->str);
           append_block(sm, "\">");
           break;
 
         case '4':
-          dstack_push(sm, &BLOCK_H4);
+          dstack_push(sm, BLOCK_H4);
           append_block(sm, "<h4 id=\"");
           append_block(sm, id_name->str);
           append_block(sm, "\">");
           break;
 
         case '5':
-          dstack_push(sm, &BLOCK_H5);
+          dstack_push(sm, BLOCK_H5);
           append_block(sm, "<h5 id=\"");
           append_block(sm, id_name->str);
           append_block(sm, "\">");
           break;
 
         case '6':
-          dstack_push(sm, &BLOCK_H6);
+          dstack_push(sm, BLOCK_H6);
           append_block(sm, "<h6 id=\"");
           append_block(sm, id_name->str);
           append_block(sm, "\">");
@@ -824,32 +827,32 @@ main := |*
     if (!sm->f_strip) {
       switch (header) {
         case '1':
-          dstack_push(sm, &BLOCK_H1);
+          dstack_push(sm, BLOCK_H1);
           append_block(sm, "<h1>");
           break;
 
         case '2':
-          dstack_push(sm, &BLOCK_H2);
+          dstack_push(sm, BLOCK_H2);
           append_block(sm, "<h2>");
           break;
 
         case '3':
-          dstack_push(sm, &BLOCK_H3);
+          dstack_push(sm, BLOCK_H3);
           append_block(sm, "<h3>");
           break;
 
         case '4':
-          dstack_push(sm, &BLOCK_H4);
+          dstack_push(sm, BLOCK_H4);
           append_block(sm, "<h4>");
           break;
 
         case '5':
-          dstack_push(sm, &BLOCK_H5);
+          dstack_push(sm, BLOCK_H5);
           append_block(sm, "<h5>");
           break;
 
         case '6':
-          dstack_push(sm, &BLOCK_H6);
+          dstack_push(sm, BLOCK_H6);
           append_block(sm, "<h6>");
           break;
       }
@@ -864,7 +867,7 @@ main := |*
     g_debug("  push quote");
     g_debug("  print <blockquote>");
     dstack_close_before_block(sm);
-    dstack_push(sm, &BLOCK_QUOTE);
+    dstack_push(sm, BLOCK_QUOTE);
     append_block(sm, "<blockquote>");
   };
 
@@ -873,7 +876,7 @@ main := |*
     g_debug("  push spoiler");
     g_debug("  print <div>");
     dstack_close_before_block(sm);
-    dstack_push(sm, &BLOCK_SPOILER);
+    dstack_push(sm, BLOCK_SPOILER);
     append_block(sm, "<div class=\"spoiler\">");
   };
 
@@ -889,7 +892,7 @@ main := |*
   '[code]'i space* => {
     g_debug("block [code]");
     dstack_close_before_block(sm);
-    dstack_push(sm, &BLOCK_CODE);
+    dstack_push(sm, BLOCK_CODE);
     append_block(sm, "<pre>");
     fcall code;
   };
@@ -897,7 +900,7 @@ main := |*
   '[expand]'i space* => {
     g_debug("block [expand]");
     dstack_close_before_block(sm);
-    dstack_push(sm, &BLOCK_EXPAND);
+    dstack_push(sm, BLOCK_EXPAND);
     append_block(sm, "<div class=\"expandable\"><div class=\"expandable-header\">");
     append_block(sm, "<input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div>");
     append_block(sm, "<div class=\"expandable-content\">");
@@ -906,7 +909,7 @@ main := |*
   aliased_expand space* => {
     g_debug("block [expand=]");
     dstack_close_before_block(sm);
-    dstack_push(sm, &BLOCK_EXPAND);
+    dstack_push(sm, BLOCK_EXPAND);
     append_block(sm, "<div class=\"expandable\"><div class=\"expandable-header\">");
     append(sm, true, "<span>");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
@@ -918,8 +921,8 @@ main := |*
   '[nodtext]'i space* => {
     g_debug("block [nodtext]");
     dstack_close_before_block(sm);
-    dstack_push(sm, &BLOCK_NODTEXT);
-    dstack_push(sm, &BLOCK_P);
+    dstack_push(sm, BLOCK_NODTEXT);
+    dstack_push(sm, BLOCK_P);
     g_debug("push block nodtext");
     g_debug("push block p");
     append_block(sm, "<p>");
@@ -928,13 +931,13 @@ main := |*
 
   '[table]'i => {
     dstack_close_before_block(sm);
-    dstack_push(sm, &BLOCK_TABLE);
+    dstack_push(sm, BLOCK_TABLE);
     append_block(sm, "<table class=\"striped\">");
     fcall table;
   };
 
   '[tn]'i => {
-    dstack_push(sm, &BLOCK_TN);
+    dstack_push(sm, BLOCK_TN);
     append_block(sm, "<p class=\"tn\">");
     fcall inline;
   };
@@ -973,7 +976,7 @@ main := |*
     if (g_queue_is_empty(sm->dstack) || dstack_check(sm, BLOCK_QUOTE) || dstack_check(sm, BLOCK_SPOILER) || dstack_check(sm, BLOCK_EXPAND)) {
       g_debug("  push p");
       g_debug("  print <p>");
-      dstack_push(sm, &BLOCK_P);
+      dstack_push(sm, BLOCK_P);
       append_block(sm, "<p>");
     }
 
@@ -993,16 +996,16 @@ static inline void underscore_string(char * str, size_t len) {
   }
 }
 
-static inline void dstack_push(StateMachine * sm, const int * element) {
-  g_queue_push_tail(sm->dstack, (gpointer)element);
+static inline void dstack_push(StateMachine * sm, element_t element) {
+  g_queue_push_tail(sm->dstack, GINT_TO_POINTER(element));
 }
 
-static inline int * dstack_pop(StateMachine * sm) {
-  return g_queue_pop_tail(sm->dstack);
+static inline element_t dstack_pop(StateMachine * sm) {
+  return GPOINTER_TO_INT(g_queue_pop_tail(sm->dstack));
 }
 
-static inline int * dstack_peek(StateMachine * sm) {
-  return g_queue_peek_tail(sm->dstack);
+static inline element_t dstack_peek(const StateMachine * sm) {
+  return GPOINTER_TO_INT(g_queue_peek_tail(sm->dstack));
 }
 
 /*
@@ -1011,20 +1014,18 @@ static inline bool dstack_search(StateMachine * sm, const int * element) {
 }
 */
 
-static inline bool dstack_check(StateMachine * sm, int expected_element) {
-  int * top = dstack_peek(sm);
-  return top && *top == expected_element;
+static inline bool dstack_check(const StateMachine * sm, element_t expected_element) {
+  element_t top = dstack_peek(sm);
+  return top == expected_element;
 }
 
-static inline bool dstack_check2(StateMachine * sm, int expected_element) {
-  int * top2 = NULL;
-
+static inline bool dstack_check2(const StateMachine * sm, element_t expected_element) {
   if (sm->dstack->length < 2) {
     return false;
   }
 
-  top2 = g_queue_peek_nth(sm->dstack, sm->dstack->length - 2);
-  return top2 && *top2 == expected_element;
+  element_t top2 = GPOINTER_TO_INT(g_queue_peek_nth(sm->dstack, sm->dstack->length - 2));
+  return top2 == expected_element;
 }
 
 static inline void append(StateMachine * sm, bool is_markup, const char * s) {
@@ -1147,94 +1148,41 @@ static void append_closing_p_if(StateMachine * sm) {
 }
 
 static void dstack_rewind(StateMachine * sm) {
-  int * element = dstack_pop(sm);
+  element_t element = dstack_pop(sm);
 
-  if (element == NULL) {
-    return;
-  }
+  switch(element) {
+    case BLOCK_P: append_closing_p(sm); break;
+    case INLINE_SPOILER: append(sm, true, "</span>"); break;
+    case BLOCK_SPOILER: append_block(sm, "</div>"); break;
+    case BLOCK_QUOTE: append_block(sm, "</blockquote>"); break;
+    case BLOCK_EXPAND: append_block(sm, "</div></div>"); break;
+    case BLOCK_NODTEXT: append_closing_p(sm); break;
+    case BLOCK_CODE: append_block(sm, "</pre>"); break;
+    case BLOCK_TD: append_block(sm, "</td>"); break;
 
-  if (*element == BLOCK_P) {
-    append_closing_p(sm);
+    case INLINE_NODTEXT: break;
+    case INLINE_B: append(sm, true, "</strong>"); break;
+    case INLINE_I: append(sm, true, "</em>"); break;
+    case INLINE_U: append(sm, true, "</u>"); break;
+    case INLINE_S: append(sm, true, "</s>"); break;
+    case INLINE_TN: append(sm, true, "</span>"); break;
+    case INLINE_CODE: append(sm, true, "</code>"); break;
 
-  } else if (*element == INLINE_SPOILER) {
-    append(sm, true, "</span>");
+    case BLOCK_TN: append_closing_p(sm); break;
+    case BLOCK_TABLE: append_block(sm, "</table>"); break;
+    case BLOCK_THEAD: append_block(sm, "</thead>"); break;
+    case BLOCK_TBODY: append_block(sm, "</tbody>"); break;
+    case BLOCK_TR: append_block(sm, "</tr>"); break;
+    case BLOCK_UL: append_block(sm, "</ul>"); break;
+    case BLOCK_LI: append_block(sm, "</li>"); break;
+    case BLOCK_H6: append_block(sm, "</h6>"); break;
+    case BLOCK_H5: append_block(sm, "</h5>"); break;
+    case BLOCK_H4: append_block(sm, "</h4>"); break;
+    case BLOCK_H3: append_block(sm, "</h3>"); break;
+    case BLOCK_H2: append_block(sm, "</h2>"); break;
+    case BLOCK_H1: append_block(sm, "</h1>"); break;
 
-  } else if (*element == BLOCK_SPOILER) {
-    append_block(sm, "</div>");
-
-  } else if (*element == BLOCK_QUOTE) {
-    append_block(sm, "</blockquote>");
-
-  } else if (*element == BLOCK_EXPAND) {
-    append_block(sm, "</div></div>");
-
-  } else if (*element == BLOCK_NODTEXT) {
-    append_closing_p(sm);
-
-  } else if (*element == BLOCK_CODE) {
-    append_block(sm, "</pre>");
-
-  } else if (*element == BLOCK_TD) {
-    append_block(sm, "</td>");
-
-  } else if (*element == INLINE_NODTEXT) {
-
-  } else if (*element == INLINE_B) {
-    append(sm, true, "</strong>");
-
-  } else if (*element == INLINE_I) {
-    append(sm, true, "</em>");
-
-  } else if (*element == INLINE_U) {
-    append(sm, true, "</u>");
-
-  } else if (*element == INLINE_S) {
-    append(sm, true, "</s>");
-
-  } else if (*element == INLINE_TN) {
-    append(sm, true, "</span>");
-
-  } else if (*element == INLINE_CODE) {
-    append(sm, true, "</code>");
-
-  } else if (*element == BLOCK_TN) {
-    append_closing_p(sm);
-
-  } else if (*element == BLOCK_TABLE) {
-    append_block(sm, "</table>");
-
-  } else if (*element == BLOCK_THEAD) {
-    append_block(sm, "</thead>");
-
-  } else if (*element == BLOCK_TBODY) {
-    append_block(sm, "</tbody>");
-
-  } else if (*element == BLOCK_TR) {
-    append_block(sm, "</tr>");
-
-  } else if (*element == BLOCK_UL) {
-    append_block(sm, "</ul>");
-
-  } else if (*element == BLOCK_LI) {
-    append_block(sm, "</li>");
-
-  } else if (*element == BLOCK_H6) {
-    append_block(sm, "</h6>");
-
-  } else if (*element == BLOCK_H5) {
-    append_block(sm, "</h5>");
-
-  } else if (*element == BLOCK_H4) {
-    append_block(sm, "</h4>");
-
-  } else if (*element == BLOCK_H3) {
-    append_block(sm, "</h3>");
-
-  } else if (*element == BLOCK_H2) {
-    append_block(sm, "</h2>");
-
-  } else if (*element == BLOCK_H1) {
-    append_block(sm, "</h1>");
+    case QUEUE_EMPTY: break;
   } 
 }
 
@@ -1252,7 +1200,7 @@ static void dstack_close_before_block(StateMachine * sm) {
 }
 
 static void dstack_close(StateMachine * sm) {
-  while (dstack_peek(sm) != NULL) {
+  while (!g_queue_is_empty(sm->dstack)) {
     dstack_rewind(sm);
   }
 }
