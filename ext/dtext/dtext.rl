@@ -141,12 +141,7 @@ list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
 
 inline := |*
   post_id => {
-    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-post-id-link\" href=\"/posts/");
-    append_segment(sm, true, sm->a1, sm->a2 - 1);
-    append(sm, true, "\">");
-    append(sm, false, "post #");
-    append_segment(sm, false, sm->a1, sm->a2 - 1);
-    append(sm, true, "</a>");
+    append_link(sm, "post #", "<a class=\"dtext-link dtext-id-link dtext-post-id-link\" href=\"/posts/");
   };
 
   note_id => {
@@ -159,109 +154,47 @@ inline := |*
   };
 
   forum_post_id => {
-    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-forum-post-id-link\" href=\"/forum_posts/");
-    append_segment(sm, true, sm->a1, sm->a2 - 1);
-    append(sm, true, "\">");
-    append(sm, false, "forum #");
-    append_segment(sm, false, sm->a1, sm->a2 - 1);
-    append(sm, true, "</a>");
+    append_link(sm, "forum #", "<a class=\"dtext-link dtext-id-link dtext-forum-post-id-link\" href=\"/forum_posts/");
   };
 
   forum_topic_id => {
-    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/");
-    append_segment(sm, true, sm->a1, sm->a2 - 1);
-    append(sm, true, "\">");
-    append(sm, false, "topic #");
-    append_segment(sm, false, sm->a1, sm->a2 - 1);
-    append(sm, true, "</a>");
+    append_link(sm, "topic #", "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/");
   };
 
   forum_topic_paged_id => {
-    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/");
-    append_segment(sm, true, sm->a1, sm->a2 - 1);
-    append(sm, true, "?page=");
-    append_segment(sm, true, sm->b1, sm->b2 - 1);
-    append(sm, true, "\">");
-    append(sm, false, "topic #");
-    append_segment(sm, false, sm->a1, sm->a2 - 1);
-    append(sm, false, "/p");
-    append_segment(sm, false, sm->b1, sm->b2 - 1);
-    append(sm, true, "</a>");
+    append_paged_link(sm, "topic #", "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/", "?page=");
   };
 
   comment_id => {
-    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-comment-id-link\" href=\"/comments/");
-    append_segment(sm, true, sm->a1, sm->a2 - 1);
-    append(sm, true, "\">");
-    append(sm, false, "comment #");
-    append_segment(sm, false, sm->a1, sm->a2 - 1);
-    append(sm, true, "</a>");
+    append_link(sm, "comment #", "<a class=\"dtext-link dtext-id-link dtext-comment-id-link\" href=\"/comments/");
   };
 
   pool_id => {
-    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-pool-id-link\" href=\"/pools/");
-    append_segment(sm, true, sm->a1, sm->a2 - 1);
-    append(sm, true, "\">");
-    append(sm, false, "pool #");
-    append_segment(sm, false, sm->a1, sm->a2 - 1);
-    append(sm, true, "</a>");
+    append_link(sm, "pool #", "<a class=\"dtext-link dtext-id-link dtext-pool-id-link\" href=\"/pools/");
   };
 
   user_id => {
-    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-user-id-link\" href=\"/users/");
-    append_segment(sm, true, sm->a1, sm->a2 - 1);
-    append(sm, true, "\">");
-    append(sm, false, "user #");
-    append_segment(sm, false, sm->a1, sm->a2 - 1);
-    append(sm, true, "</a>");
+    append_link(sm, "user #", "<a class=\"dtext-link dtext-id-link dtext-user-id-link\" href=\"/users/");
   };
 
   artist_id => {
-    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-artist-id-link\" href=\"/artists/");
-    append_segment(sm, true, sm->a1, sm->a2 - 1);
-    append(sm, true, "\">");
-    append(sm, false, "artist #");
-    append_segment(sm, false, sm->a1, sm->a2 - 1);
-    append(sm, true, "</a>");
+    append_link(sm, "artist #", "<a class=\"dtext-link dtext-id-link dtext-artist-id-link\" href=\"/artists/");
   };
 
   github_issue_id => {
-    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-github-id-link\" href=\"https://github.com/r888888888/danbooru/issues/");
-    append_segment(sm, true, sm->a1, sm->a2 - 1);
-    append(sm, true, "\">");
-    append(sm, false, "issue #");
-    append_segment(sm, false, sm->a1, sm->a2 - 1);
-    append(sm, true, "</a>");
+    append_link(sm, "issue #", "<a class=\"dtext-link dtext-id-link dtext-github-id-link\" href=\"https://github.com/r888888888/danbooru/issues/");
   };
 
   pixiv_id => {
-    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=");
-    append_segment(sm, true, sm->a1, sm->a2 - 1);
-    append(sm, true, "\">");
-    append(sm, false, "pixiv #");
-    append_segment(sm, false, sm->a1, sm->a2 - 1);
-    append(sm, true, "</a>");
+    append_link(sm, "pixiv #", "<a class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=");
   };
 
   pixiv_paged_id => {
-    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=");
-    append_segment(sm, true, sm->a1, sm->a2 - 1);
-    append(sm, true, "&page=");
-    append_segment(sm, true, sm->b1, sm->b2 - 1);
-    append(sm, true, "\">");
-    append(sm, false, "pixiv #");
-    append_segment(sm, false, sm->a1, sm->a2 - 1);
-    append(sm, false, "/p");
-    append_segment(sm, false, sm->b1, sm->b2 - 1);
-    append(sm, true, "</a>");
+    append_paged_link(sm, "pixiv #", "<a class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=", "&page=");
   };
 
   post_link => {
-    append(sm, true, "<a rel=\"nofollow\" class=\"dtext-link dtext-post-search-link\" href=\"/posts?tags=");
-    append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
-    append(sm, true, "\">");
-    append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
-    append(sm, true, "</a>");
+    append_link(sm, "", "<a rel=\"nofollow\" class=\"dtext-link dtext-post-search-link\" href=\"/posts?tags=");
   };
 
   basic_wiki_link => {
@@ -1155,6 +1088,28 @@ static inline void append_segment_html_escaped(StateMachine * sm, const char * a
   gchar * segment = g_markup_escape_text(a, b - a + 1);
   sm->output = g_string_append(sm->output, segment);
   g_free(segment);
+}
+
+static inline void append_link(StateMachine * sm, const char * title, const char * ahref) {
+  append(sm, true, ahref);
+  append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
+  append(sm, true, "\">");
+  append(sm, false, title);
+  append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
+  append(sm, true, "</a>");
+}
+
+static inline void append_paged_link(StateMachine * sm, const char * title, const char * ahref, const char * param) {
+  append(sm, true, ahref);
+  append_segment(sm, true, sm->a1, sm->a2 - 1);
+  append(sm, true, param);
+  append_segment(sm, true, sm->b1, sm->b2 - 1);
+  append(sm, true, "\">");
+  append(sm, false, title);
+  append_segment(sm, false, sm->a1, sm->a2 - 1);
+  append(sm, false, "/p");
+  append_segment(sm, false, sm->b1, sm->b2 - 1);
+  append(sm, true, "</a>");
 }
 
 static inline void append_block(StateMachine * sm, const char * s) {
