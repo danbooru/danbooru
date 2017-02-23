@@ -1,12 +1,15 @@
 require 'digest/sha1'
 
 class Dmail < ActiveRecord::Base
-  validates_presence_of :to_id
-  validates_presence_of :from_id
-  validates_format_of :title, :with => /\S/
-  validates_format_of :body, :with => /\S/
-  validate :validate_sender_is_not_banned
-  before_validation :initialize_from_id, :on => :create
+  with_options on: :create do
+    before_validation :initialize_from_id
+    validates_presence_of :to_id
+    validates_presence_of :from_id
+    validates_format_of :title, :with => /\S/
+    validates_format_of :body, :with => /\S/
+    validate :validate_sender_is_not_banned
+  end
+
   belongs_to :owner, :class_name => "User"
   belongs_to :to, :class_name => "User"
   belongs_to :from, :class_name => "User"
