@@ -58,12 +58,6 @@ class Dmail < ActiveRecord::Base
 
         copy
       end
-
-      def new_blank
-        Dmail.new do |dmail|
-          dmail.from_id = CurrentUser.id
-        end
-      end
     end
 
     def build_response(options = {})
