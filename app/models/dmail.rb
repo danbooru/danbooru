@@ -28,9 +28,7 @@ class Dmail < ActiveRecord::Base
     end
 
     def to_name=(name)
-      user = User.find_by_name(name)
-      return if user.nil?
-      self.to_id = user.id
+      self.to_id = User.name_to_id(name)
     end
 
     def initialize_from_id
