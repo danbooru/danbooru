@@ -86,18 +86,6 @@ class Dmail < ActiveRecord::Base
   end
   
   module SearchMethods
-    def for(user)
-      where("owner_id = ?", user)
-    end
-
-    def inbox
-      where("to_id = owner_id")
-    end
-
-    def sent
-      where("from_id = owner_id")
-    end
-
     def active
       where("is_deleted = ?", false)
     end
@@ -137,10 +125,6 @@ class Dmail < ActiveRecord::Base
 
       if params[:message_matches].present?
         q = q.search_message(params[:message_matches])
-      end
-
-      if params[:owner_id].present?
-        q = q.for(params[:owner_id].to_i)
       end
 
       if params[:to_name].present?

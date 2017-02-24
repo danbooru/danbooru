@@ -48,17 +48,17 @@ class DmailsControllerTest < ActionController::TestCase
 
     context "index action" do
       should "show dmails owned by the current user" do
-        get :index, {:owner_id_equals => @dmail.owner_id, :folder => "sent"}, {:user_id => @dmail.owner_id}
+        get :index, {:search => {:owner_id => @dmail.owner_id, :folder => "sent"}}, {:user_id => @dmail.owner_id}
         assert_response :success
         assert_equal(1, assigns[:dmails].size)
 
-        get :index, {:owner_id_equals => @dmail.owner_id, :folder => "received"}, {:user_id => @dmail.owner_id}
+        get :index, {:search => {:owner_id => @dmail.owner_id, :folder => "received"}}, {:user_id => @dmail.owner_id}
         assert_response :success
         assert_equal(1, assigns[:dmails].size)
       end
 
       should "not show dmails not owned by the current user" do
-        get :index, {:owner_id_equals => @dmail.owner_id}, {:user_id => @unrelated_user.id}
+        get :index, {:search => {:owner_id => @dmail.owner_id}}, {:user_id => @unrelated_user.id}
         assert_response :success
         assert_equal(0, assigns[:dmails].size)
       end
