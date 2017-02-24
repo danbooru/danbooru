@@ -84,7 +84,7 @@ private
   end
 
   def create_dmail
-    Dmail.create_split(
+    Dmail.create_automated(
       :to_id => user.id,
       :title => "You have been promoted",
       :body => build_messages

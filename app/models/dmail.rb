@@ -1,19 +1,22 @@
 require 'digest/sha1'
 
 class Dmail < ActiveRecord::Base
-  validates_presence_of :to_id
-  validates_presence_of :from_id
-  validates_format_of :title, :with => /\S/
-  validates_format_of :body, :with => /\S/
-  validate :validate_sender_is_not_banned
-  before_validation :initialize_from_id, :on => :create
+  with_options on: :create do
+    validates_presence_of :to_id
+    validates_presence_of :from_id
+    validates_format_of :title, :with => /\S/
+    validates_format_of :body, :with => /\S/
+    validate :validate_sender_is_not_banned
+  end
+
   belongs_to :owner, :class_name => "User"
   belongs_to :to, :class_name => "User"
   belongs_to :from, :class_name => "User"
+
+  after_initialize :initialize_attributes, if: :new_record?
   before_create :auto_read_if_filtered
   after_create :update_recipient
   after_create :send_dmail
-  attr_accessible :title, :body, :is_deleted, :to_id, :to, :to_name, :creator_ip_addr
 
   module AddressMethods
     def to_name
@@ -25,13 +28,12 @@ class Dmail < ActiveRecord::Base
     end
 
     def to_name=(name)
-      user = User.find_by_name(name)
-      return if user.nil?
-      self.to_id = user.id
+      self.to_id = User.name_to_id(name)
     end
 
-    def initialize_from_id
-      self.from_id = CurrentUser.id
+    def initialize_attributes
+      self.from_id ||= CurrentUser.id
+      self.creator_ip_addr ||= CurrentUser.ip_addr
     end
   end
 
@@ -43,14 +45,14 @@ class Dmail < ActiveRecord::Base
         copy = nil
 
         Dmail.transaction do
+          # recipient's copy
           copy = Dmail.new(params)
           copy.owner_id = copy.to_id
-          unless copy.to_id == CurrentUser.id
-            copy.save
-          end
+          copy.save unless copy.to_id == copy.from_id
 
+          # sender's copy
           copy = Dmail.new(params)
-          copy.owner_id = CurrentUser.id
+          copy.owner_id = copy.from_id
           copy.is_read = true
           copy.save
         end
@@ -58,10 +60,8 @@ class Dmail < ActiveRecord::Base
         copy
       end
 
-      def new_blank
-        Dmail.new do |dmail|
-          dmail.from_id = CurrentUser.id
-        end
+      def create_automated(params)
+        create_split(from: Danbooru.config.system_user, **params)
       end
     end
 
@@ -91,18 +91,6 @@ class Dmail < ActiveRecord::Base
   end
   
   module SearchMethods
-    def for(user)
-      where("owner_id = ?", user)
-    end
-
-    def inbox
-      where("to_id = owner_id")
-    end
-
-    def sent
-      where("from_id = owner_id")
-    end
-
     def active
       where("is_deleted = ?", false)
     end
@@ -142,10 +130,6 @@ class Dmail < ActiveRecord::Base
 
       if params[:message_matches].present?
         q = q.search_message(params[:message_matches])
-      end
-
-      if params[:owner_id].present?
-        q = q.for(params[:owner_id].to_i)
       end
 
       if params[:to_name].present?
@@ -204,6 +188,10 @@ class Dmail < ActiveRecord::Base
     unless Dmail.where(:is_read => false, :owner_id => CurrentUser.user.id).exists?
       CurrentUser.user.update_attribute(:has_mail, false)
     end
+  end
+
+  def is_automated?
+    from == Danbooru.config.system_user
   end
 
   def filtered?

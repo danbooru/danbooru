@@ -64,6 +64,33 @@ class PostDisapprovalTest < ActiveSupport::TestCase
           end
         end
       end
+
+      context "when sending dmails" do
+        setup do
+          @uploaders = FactoryGirl.create_list(:user, 2)
+          @disapprovers = FactoryGirl.create_list(:mod_user, 2)
+
+          # 2 uploaders, with 2 uploads each, and 2 disapprovals on each upload.
+          @uploaders.each do |uploader|
+            FactoryGirl.create_list(:post, 2, uploader: uploader).each do |post|
+              FactoryGirl.create(:post_disapproval, post: post, user: @disapprovers[0])
+              FactoryGirl.create(:post_disapproval, post: post, user: @disapprovers[1])
+            end
+          end
+        end
+
+        should "dmail the uploaders" do
+          bot = FactoryGirl.create(:user)
+          Danbooru.config.stubs(:system_user).returns(bot)
+
+          assert_difference(["@uploaders[0].dmails.count", "@uploaders[1].dmails.count"], 1) do
+            PostDisapproval.dmail_messages!
+          end
+
+          assert(@uploaders[0].dmails.exists?(from: bot, to: @uploaders[0]))
+          assert(@uploaders[1].dmails.exists?(from: bot, to: @uploaders[1]))
+        end
+      end
     end
   end
 end
