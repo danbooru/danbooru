@@ -110,7 +110,7 @@ Rails.application.routes.draw do
     end
   end
   resources :delayed_jobs, :only => [:index]
-  resources :dmails do
+  resources :dmails, :only => [:new, :create, :index, :show, :destroy] do
     collection do
       get :search
       post :mark_all_as_read
