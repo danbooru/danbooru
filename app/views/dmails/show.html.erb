@@ -16,6 +16,12 @@
       <h3>Body</h3>
       <div class="prose">
         <%= format_text(@dmail.body, :ragel => true) %>
+
+        <% if @dmail.is_automated? %>
+          <p class="tn">
+            This is an automated message. Post in the forums if you have any questions.
+          </p>
+        <% end %>
       </div>
 
       <p>

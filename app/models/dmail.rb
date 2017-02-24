@@ -45,19 +45,23 @@ class Dmail < ActiveRecord::Base
         copy = nil
 
         Dmail.transaction do
+          # recipient's copy
           copy = Dmail.new(params)
           copy.owner_id = copy.to_id
-          unless copy.to_id == CurrentUser.id
-            copy.save
-          end
+          copy.save unless copy.to_id == copy.from_id
 
+          # sender's copy
           copy = Dmail.new(params)
-          copy.owner_id = CurrentUser.id
+          copy.owner_id = copy.from_id
           copy.is_read = true
           copy.save
         end
 
         copy
+      end
+
+      def create_automated(params)
+        create_split(from: Danbooru.config.system_user, **params)
       end
     end
 
@@ -184,6 +188,10 @@ class Dmail < ActiveRecord::Base
     unless Dmail.where(:is_read => false, :owner_id => CurrentUser.user.id).exists?
       CurrentUser.user.update_attribute(:has_mail, false)
     end
+  end
+
+  def is_automated?
+    from == Danbooru.config.system_user
   end
 
   def filtered?

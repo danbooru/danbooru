@@ -22,7 +22,7 @@ class ApproverPruner
           user.save
         end
  
-        Dmail.create_split(
+        Dmail.create_automated(
           :to_id => user.id,
           :title => "Approver inactivity",
           :body => "You haven't approved a post in the past three months. In order to make sure the list of active approvers is up-to-date, you have lost your approver privileges. Please reply to this message if you want to be reinstated."

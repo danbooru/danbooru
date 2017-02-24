@@ -17,27 +17,20 @@ class PostDisapproval < ActiveRecord::Base
   end
 
   def self.dmail_messages!
-    admin = User.admins.first
-    disapprovals = {}
-
-    PostDisapproval.with_message.where("created_at >= ?", 1.day.ago).find_each do |disapproval|
-      disapprovals[disapproval.post.uploader_id] ||= []
-      disapprovals[disapproval.post.uploader_id] << disapproval
+    disapprovals = PostDisapproval.with_message.where("created_at >= ?", 1.day.ago).group_by do |pd|
+      pd.post.uploader
     end
 
-    disapprovals.each do |user_id, list|
-      user = User.find(user_id)
-      CurrentUser.scoped(admin, "127.0.0.1") do
-        message = list.map do |x|
-          "* post ##{x.post_id}: #{x.message}"
-        end.join("\n")
+    disapprovals.each do |uploader, list|
+      message = list.map do |x|
+        "* post ##{x.post_id}: #{x.message}"
+      end.join("\n")
 
-        Dmail.create_split(
-          :to_id => user.id,
-          :title => "Some of your uploads have been critiqued by the moderators",
-          :body => message
-        )
-      end
+      Dmail.create_automated(
+        :to_id => uploader.id,
+        :title => "Some of your uploads have been critiqued by the moderators",
+        :body => message
+      )
     end
   end
 

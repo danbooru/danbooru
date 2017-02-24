@@ -52,7 +52,7 @@ class UserNameChangeRequest < ActiveRecord::Base
     update_attributes(:status => "approved", :approver_id => CurrentUser.user.id)
     user.update_attribute(:name, desired_name)
     body = "Your name change request has been approved. Be sure to log in with your new user name."
-    Dmail.create_split(:title => "Name change request approved", :body => body, :to_id => user_id)
+    Dmail.create_automated(:title => "Name change request approved", :body => body, :to_id => user_id)
     UserFeedback.create(:user_id => user_id, :category => "neutral", :body => "Name changed from #{original_name} to #{desired_name}")
     ModAction.log("Name changed from #{original_name} to #{desired_name}")
   end
@@ -60,7 +60,7 @@ class UserNameChangeRequest < ActiveRecord::Base
   def reject!(reason)
     update_attributes(:status => "rejected", :rejection_reason => reason)
     body = "Your name change request has been rejected for the following reason: #{rejection_reason}"
-    Dmail.create_split(:title => "Name change request rejected", :body => body, :to_id => user_id)
+    Dmail.create_automated(:title => "Name change request rejected", :body => body, :to_id => user_id)
   end
   
   def not_limited

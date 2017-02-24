@@ -30,6 +30,11 @@ module Danbooru
       "webmaster@#{server_host}"
     end
 
+    # System actions, such as sending automated dmails, will be performed with this account.
+    def system_user
+      User.find_by_name("DanbooruBot") || User.admins.first
+    end
+
     def upgrade_account_email
       contact_email
     end
