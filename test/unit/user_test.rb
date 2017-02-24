@@ -13,7 +13,7 @@ class UserTest < ActiveSupport::TestCase
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
     end
-    
+
     context "promoting a user" do
       setup do
         CurrentUser.user = FactoryGirl.create(:moderator_user)
@@ -27,10 +27,16 @@ class UserTest < ActiveSupport::TestCase
         assert_equal("You have been promoted to a Gold level account from Member.", @user.feedback.last.body)
       end
 
-      should "create a dmail" do
+      should "send an automated dmail to the user" do
+        bot = FactoryGirl.create(:user)
+        Danbooru.config.stubs(:system_user).returns(bot)
+
         assert_difference("Dmail.count", 2) do
           @user.promote_to!(User::Levels::GOLD)
         end
+
+        assert(@user.dmails.exists?(from: bot, to: @user, title: "You have been promoted"))
+        assert(bot.dmails.exists?(from: bot, to: @user, title: "You have been promoted"))
       end
     end
 
