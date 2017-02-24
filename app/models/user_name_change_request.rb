@@ -8,7 +8,6 @@ class UserNameChangeRequest < ActiveRecord::Base
   validates_length_of :desired_name, :within => 2..100, :on => :create
   validates_format_of :desired_name, :with => /\A[^\s:]+\Z/, :on => :create, :message => "cannot have whitespace or colons"
   before_validation :normalize_name
-  # after_create :notify_admins
   attr_accessible :status, :user_id, :original_name, :desired_name, :change_reason, :rejection_reason, :approver_id
   
   def self.pending
@@ -47,14 +46,6 @@ class UserNameChangeRequest < ActiveRecord::Base
   
   def feedback
     UserFeedback.for_user(user_id).order("id desc")
-  end
-  
-  def notify_admins
-    title = "#{original_name} is requesting a name change to #{desired_name}"
-    body = title + "\n\n\"See request\":/user_name_change_requests/#{id}"
-    User.admins.find_each do |user|
-      Dmail.create_split(:title => title, :body => body, :to_id => user.id)
-    end
   end
   
   def approve!
