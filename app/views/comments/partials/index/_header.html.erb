@@ -24,11 +24,7 @@
   </div>
   <div class="row list-of-tags">
     <strong>Tags</strong>
-    <% post.tag_array.each do |tag_name| %>
-      <span class="category-<%= Tag.category_for(tag_name) %>">
-        <%= link_to(tag_name.tr("_", " "), posts_path(:tags => tag_name)) %>
-      </span>
-    <% end %>
+    <%= post.presenter.inline_tag_list_html(self) %>
   </div>
 </div>
 

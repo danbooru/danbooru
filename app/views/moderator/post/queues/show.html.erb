@@ -60,7 +60,7 @@
                 <strong>Hidden</strong>: <%= render "post_disapprovals/compact_counts", :disapprovals => post.disapprovals, :post => post %>
               </li>
               <li><strong>Source</strong>: <%= post.source %></li>
-              <li><strong>Tags</strong>: <%= post.tag_string %></li>
+              <li><strong>Tags</strong>: <%= post.presenter.inline_tag_list_html(self) %></li>
             </ul>
           </section>
         </div>
