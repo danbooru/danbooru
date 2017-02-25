@@ -147,5 +147,26 @@ class DmailTest < ActiveSupport::TestCase
       recipient.reload
       assert(!recipient.has_mail?)
     end
+
+    context "that is automated" do
+      setup do
+        @bot = FactoryGirl.create(:user)
+        Danbooru.config.stubs(:system_user).returns(@bot)
+      end
+
+      should "only create a copy for the recipient" do
+        Dmail.create_automated(to: @user, title: "test", body: "test")
+
+        assert @user.dmails.exists?(from: @bot, title: "test", body: "test")
+        assert !@bot.dmails.exists?(from: @bot, title: "test", body: "test")
+      end
+
+      should "fail gracefully if recipient doesn't exist" do
+        assert_nothing_raised do
+          dmail = Dmail.create_automated(to_name: "this_name_does_not_exist", title: "test", body: "test")
+          assert_equal(["can't be blank"], dmail.errors[:to_id])
+        end
+      end
+    end
   end
 end
