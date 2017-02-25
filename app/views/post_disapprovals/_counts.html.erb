@@ -1,20 +1,20 @@
-<% if disapprovals.count > 0 && (CurrentUser.can_approve_posts? || post.created_at < 3.days.ago) %>
+<% if CurrentUser.can_approve_posts? || post.created_at < 3.days.ago %>
   <p>
-    It has been reviewed by <%= pluralize disapprovals.count, "moderator" %>. 
+    It has been reviewed by <%= pluralize disapprovals.length, "moderator" %>. 
 
-    <% if disapprovals.breaks_rules.count > 0 %>
-      <%= disapprovals.breaks_rules.count %> believe it breaks the rules.
+    <% if disapprovals.map(&:reason).grep("breaks_rules").count > 0 %>
+      <%= disapprovals.map(&:reason).grep("breaks_rules").count %> believe it breaks the rules.
     <% end %>
 
-    <% if disapprovals.poor_quality.count > 0 %>
-      <%= disapprovals.poor_quality.count %> believe it has poor quality.
+    <% if disapprovals.map(&:reason).grep("poor_quality").count > 0 %>
+      <%= disapprovals.map(&:reason).grep("poor_quality").count %> believe it has poor quality.
     <% end %>
 
-    <% if disapprovals.disinterest.count > 0 %>
-      <%= disapprovals.disinterest.count %> did not like the post enough to approve it.
+    <% if disapprovals.map(&:reason).grep(/disinterest|legacy/).count > 0 %>
+      <%= disapprovals.map(&:reason).grep(/disinterest|legacy/).count %> did not like the post enough to approve it.
     <% end %>
 
-    <% if disapprovals.with_message.any? %>
+    <% if disapprovals.map(&:message).any?(&:present?) %>
       Messages: <%= disapprovals.map(&:message).select(&:present?).map { |msg| format_text(msg, ragel: true, inline: true) }.to_sentence.html_safe %>.
     <% end %>
   </p>

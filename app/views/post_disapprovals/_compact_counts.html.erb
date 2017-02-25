@@ -1,17 +1,17 @@
-<% if disapprovals.count > 0 && (CurrentUser.can_approve_posts? || post.created_at < 3.days.ago) %>
-  <% if disapprovals.breaks_rules.count > 0 %>
-    (breaks rules: <%= disapprovals.breaks_rules.count %>)
+<% if CurrentUser.can_approve_posts? || post.created_at < 3.days.ago %>
+  <% if disapprovals.map(&:reason).grep("breaks_rules").count > 0 %>
+    (breaks rules: <%= disapprovals.map(&:reason).grep("breaks_rules").count %>)
   <% end %>
 
-  <% if disapprovals.poor_quality.count > 0 %>
-    (poor quality: <%= disapprovals.poor_quality.count %>)
+  <% if disapprovals.map(&:reason).grep("poor_quality").count > 0 %>
+    (poor quality: <%= disapprovals.map(&:reason).grep("poor_quality").count %>)
   <% end %>
 
-  <% if disapprovals.disinterest.count > 0 %>
-    (no interest: <%= disapprovals.disinterest.count %>)
+  <% if disapprovals.map(&:reason).grep(/disinterest|legacy/).count > 0 %>
+    (no interest: <%= disapprovals.map(&:reason).grep(/disinterest|legacy/).count %>)
   <% end %>
 
-  <% if disapprovals.with_message.any? %>
+  <% if disapprovals.map(&:message).any?(&:present?) %>
     (messages: <%= disapprovals.map(&:message).select(&:present?).map { |msg| format_text(msg, ragel: true, inline: true) }.to_sentence.html_safe %>)
   <% end %>
 <% end %>
