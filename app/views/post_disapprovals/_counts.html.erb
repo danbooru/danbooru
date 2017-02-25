@@ -15,7 +15,7 @@
     <% end %>
 
     <% if disapprovals.with_message.any? %>
-      Messages: <%= disapprovals.with_message.map(&:message).to_sentence %>
+      Messages: <%= disapprovals.map(&:message).select(&:present?).map { |msg| format_text(msg, ragel: true, inline: true) }.to_sentence.html_safe %>.
     <% end %>
   </p>
 <% end %>
