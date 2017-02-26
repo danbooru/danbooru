@@ -50,18 +50,7 @@ module Mentionable
     end
 
     bodies.each do |name, text|
-      user = User.find_by_name(name)
-
-      if user
-        dmail = Dmail.new(
-          from_id: from_id,
-          to_id: user.id,
-          title: title,
-          body: text
-        )
-        dmail.owner_id = user.id
-        dmail.save
-      end
+      Dmail.create_automated(to_name: name, title: title, body: body)
     end
   end
 end
