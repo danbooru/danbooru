@@ -197,6 +197,11 @@ class DTextTest < Minitest::Test
     assert_parse('<p>[<a class="dtext-link dtext-external-link" href="http://test.com/(parentheses)">test</a>]</p>', '["test":[http://test.com/(parentheses)]]')
   end
 
+  def test_fragment_only_urls
+    assert_parse('<p><a class="dtext-link dtext-external-link" href="#toc">test</a></p>', '"test":#toc')
+    assert_parse('<p><a class="dtext-link dtext-external-link" href="#toc">test</a></p>', '"test":[#toc]')
+  end
+
   def test_lists_1
     assert_parse('<ul><li>a</li></ul>', '* a')
   end
