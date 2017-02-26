@@ -51,7 +51,13 @@ class ForumPostTest < ActiveSupport::TestCase
           end
 
           dmail = Dmail.last
-          assert_equal("You were mentioned in the forum topic \"#{@topic.title}\":/forum_topics/#{@topic.id}?page=1\n\n---\n\n[i]#{@user.name} said:[/i]\n\nHey @#{@user2.name} check this out!", dmail.body)
+          assert_equal(<<-EOS.strip_heredoc, dmail.body)
+            @#{CurrentUser.name} mentioned you in topic ##{@topic.id} (\"#{@topic.title}\":[/forum_topics/#{@topic.id}?page=1]):
+
+            [quote]
+            Hey @#{@user2.name} check this out!
+            [/quote]
+          EOS
         end
       end
     end
