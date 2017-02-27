@@ -3,7 +3,7 @@ source 'https://rubygems.org/'
 gem 'dotenv-rails', :require => "dotenv/rails-now"
 
 gem 'protected_attributes'
-gem "sass-rails", "~> 4.0.0"
+gem "sass-rails"
 gem "sprockets-rails", :require => "sprockets/railtie"
 gem "uglifier"
 gem "therubyracer", :platforms => :ruby
