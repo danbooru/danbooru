@@ -405,6 +405,7 @@ DEPENDENCIES
   mechanize
   memcache-client
   memcache_mock
+  memoist
   mocha
   net-sftp
   net-ssh

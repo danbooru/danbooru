@@ -18,27 +18,20 @@ class PostVersionTest < ActiveSupport::TestCase
 
     context "that has multiple versions: " do
       setup do
+        PostArchive.sqs_service.stubs(:merge?).returns(false)
         @post = FactoryGirl.create(:post, :tag_string => "1")
-        @post.stubs(:merge_version?).returns(false)
-        @post.stubs(:tag_string_changed?).returns(true)
         @post.update_attributes(:tag_string => "1 2")
         @post.update_attributes(:tag_string => "2 3")
       end
 
       context "a version record" do
         setup do
-          @version = PostVersion.last
+          @version = PostArchive.last
         end
 
         should "know its previous version" do
           assert_not_nil(@version.previous)
           assert_equal("1 2", @version.previous.tags)
-        end
-
-        should "know the seuqence of all versions for the post" do
-          assert_equal(2, @version.sequence_for_post.size)
-          assert_equal(%w(3), @version.sequence_for_post[0][:added_tags])
-          assert_equal(%w(2), @version.sequence_for_post[1][:added_tags])
         end
       end
     end
@@ -75,9 +68,8 @@ class PostVersionTest < ActiveSupport::TestCase
 
     context "that has been updated" do
       setup do
-        @parent = FactoryGirl.create(:post)
+        PostArchive.sqs_service.stubs(:merge?).returns(false)
         @post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
-        @post.stubs(:merge_version?).returns(false)
         @post.update_attributes(:tag_string => "bbb ccc xxx", :source => "")
       end
 

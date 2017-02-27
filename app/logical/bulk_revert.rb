@@ -27,7 +27,7 @@ class BulkRevert
   end
 
   def find_post_versions
-    q = PostVersion.where("true")
+    q = PostArchive.where("true")
 
     if constraints[:user_name]
       constraints[:user_id] = User.find_by_name(constraints[:user_name]).try(:id)

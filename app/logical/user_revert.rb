@@ -15,13 +15,13 @@ class UserRevert
   end
 
   def validate!
-    if PostVersion.where(updater_id: user_id).count > THRESHOLD
+    if PostArchive.where(updater_id: user_id).count > THRESHOLD
       raise TooManyChangesError.new("This user has too many changes to be reverted")
     end
   end
 
   def revert_post_changes
-    PostVersion.where(updater_id: user_id).find_each do |x|
+    PostArchive.where(updater_id: user_id).find_each do |x|
       x.undo!
     end
   end

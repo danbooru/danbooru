@@ -53,7 +53,7 @@ module Moderator
           end
 
           should "render" do
-            assert_equal(1, PostVersion.count)
+            assert_equal(1, PostArchive.count)
             get :show, {}, {:user_id => @admin.id}
             assert_response :success
           end
