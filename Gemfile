@@ -7,8 +7,6 @@ gem "sass-rails", "~> 4.0.0"
 gem "sprockets-rails", :require => "sprockets/railtie"
 gem "uglifier"
 gem "therubyracer", :platforms => :ruby
-gem "pry", :group => [:test, :development]
-gem "byebug", :group => [:test, :development]
 gem "rails", "~> 4.2.0"
 gem "pg"
 gem "dalli", :platforms => :ruby
@@ -60,9 +58,9 @@ group :production do
   gem 'capistrano-deploytags', '~> 1.0.0', require: false
 end
 
-group :development do
+group :development, :test do
+  gem 'pry-byebug'
   gem 'ruby-prof'
-  # gem 'sql-logging'
 end
 
 group :test do
