@@ -68,7 +68,7 @@ GEM
     addressable (2.5.0)
       public_suffix (~> 2.0, >= 2.0.2)
     arel (6.0.3)
-    awesome_print (1.6.1)
+    awesome_print (1.7.0)
     aws-sdk (2.7.4)
       aws-sdk-resources (= 2.7.4)
     aws-sdk-core (2.7.4)

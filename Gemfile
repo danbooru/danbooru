@@ -23,7 +23,6 @@ gem 'net-sftp'
 gem 'term-ansicolor', :require => "term/ansicolor"
 gem 'diff-lcs', :require => "diff/lcs/array", :git => "https://github.com/halostatue/diff-lcs.git"
 gem 'bcrypt-ruby', :require => "bcrypt"
-gem 'awesome_print'
 gem 'statistics2'
 gem 'capistrano', '~> 3.4.0'
 gem 'capistrano-rails'
@@ -59,6 +58,7 @@ group :production do
 end
 
 group :development, :test do
+  gem 'awesome_print'
   gem 'pry-byebug'
   gem 'ruby-prof'
 end
