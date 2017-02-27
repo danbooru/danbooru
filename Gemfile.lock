@@ -274,7 +274,7 @@ GEM
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
     retriable (2.1.0)
-    rmagick (2.15.4)
+    rmagick (2.16.0)
     ruby-prof (0.15.8)
     rubyzip (1.1.7)
     sanitize (3.1.2)
