@@ -221,6 +221,8 @@ class PostArchive < ActiveRecord::Base
 
     if previous
       delta[:unchanged_tags] = tag_array & previous.tag_array
+    else
+      delta[:unchanged_tags] = []
     end
 
     delta
