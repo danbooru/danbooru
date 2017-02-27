@@ -108,7 +108,7 @@ GEM
     coderay (1.1.1)
     colorize (0.7.7)
     crass (1.0.2)
-    dalli (2.7.4)
+    dalli (2.7.6)
     delayed_job (4.1.2)
       activesupport (>= 3.0, < 5.1)
     delayed_job_active_record (4.1.1)
