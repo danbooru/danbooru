@@ -192,7 +192,7 @@ class PostArchive < ActiveRecord::Base
     latest_tags << "parent:#{post.parent_id}" if post.parent_id.present?
     latest_tags << "source:#{post.source}" if post.source.present?
 
-    if parent_changed?
+    if parent_changed
       delta[:added_tags] << "parent:#{parent_id}"
 
       if previous
@@ -200,7 +200,7 @@ class PostArchive < ActiveRecord::Base
       end
     end
 
-    if rating_changed?
+    if rating_changed
       delta[:added_tags] << "rating:#{rating}"
 
       if previous
@@ -208,7 +208,7 @@ class PostArchive < ActiveRecord::Base
       end
     end
 
-    if source_changed?
+    if source_changed
       delta[:added_tags] << "source:#{source}"
 
       if previous
@@ -285,7 +285,7 @@ class PostArchive < ActiveRecord::Base
   end
 
   def method_attributes
-    super + [:added_tags, :removed_tags, :obsolete_added_tags, :obsolete_removed_tags, :unchanged_tags, :updater_name]
+    super + [:obsolete_added_tags, :obsolete_removed_tags, :unchanged_tags, :updater_name]
   end
 
   memoize :previous, :post, :tag_array, :changes, :added_tags_with_fields, :removed_tags_with_fields, :obsolete_removed_tags, :obsolete_added_tags, :unchanged_tags
