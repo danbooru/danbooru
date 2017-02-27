@@ -6,13 +6,11 @@ gem 'protected_attributes'
 gem "sass-rails", "~> 4.0.0"
 gem "sprockets-rails", :require => "sprockets/railtie"
 gem "uglifier"
-gem 'coffee-rails'
 gem "therubyracer", :platforms => :ruby
 gem "pry", :group => [:test, :development]
 gem "byebug", :group => [:test, :development]
 gem "rails", "~> 4.2.0"
 gem "pg"
-gem "kgio", :platforms => :ruby
 gem "dalli", :platforms => :ruby
 gem "memcache-client", :platforms => [:mswin, :mingw, :x64_mingw]
 gem "tzinfo-data", :platforms => [:mswin, :mingw, :x64_mingw]
@@ -20,12 +18,9 @@ gem "delayed_job"
 gem "delayed_job_active_record"
 gem "simple_form"
 gem "mechanize"
-gem "nokogiri"
 gem "whenever", :require => false
 gem "sanitize", "~> 3.1.0"
 gem 'rmagick'
-gem 'daemons'
-gem 'net-ssh'
 gem 'net-sftp'
 gem 'term-ansicolor', :require => "term/ansicolor"
 gem 'diff-lcs', :require => "diff/lcs/array", :git => "https://github.com/halostatue/diff-lcs.git"
