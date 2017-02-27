@@ -363,7 +363,7 @@ GEM
       get_process_mem (~> 0)
       unicorn (>= 4, < 6)
     webrobots (0.1.2)
-    whenever (0.9.4)
+    whenever (0.9.7)
       chronic (>= 0.6.3)
 
 PLATFORMS
