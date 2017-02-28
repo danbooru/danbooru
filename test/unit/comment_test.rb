@@ -57,7 +57,13 @@ class CommentTest < ActiveSupport::TestCase
           end
 
           dmail = Dmail.last
-          assert_equal("You were mentioned in a \"comment\":/posts/#{@comment.post_id}#comment-#{@comment.id}\n\n---\n\n[i]#{CurrentUser.name} said:[/i]\n\nHey @#{@user2.name} check this out!", dmail.body)
+          assert_equal(<<-EOS.strip_heredoc, dmail.body)
+            @#{CurrentUser.name} mentioned you in a \"comment\":/posts/#{@comment.post_id}#comment-#{@comment.id} on post ##{@comment.post_id}:
+
+            [quote]
+            Hey @#{@user2.name} check this out!
+            [/quote]
+          EOS
         end
       end
     end

@@ -31,12 +31,11 @@ class UserTest < ActiveSupport::TestCase
         bot = FactoryGirl.create(:user)
         Danbooru.config.stubs(:system_user).returns(bot)
 
-        assert_difference("Dmail.count", 2) do
+        assert_difference("Dmail.count", 1) do
           @user.promote_to!(User::Levels::GOLD)
         end
 
         assert(@user.dmails.exists?(from: bot, to: @user, title: "You have been promoted"))
-        assert(bot.dmails.exists?(from: bot, to: @user, title: "You have been promoted"))
       end
     end
 

@@ -61,7 +61,10 @@ class Dmail < ActiveRecord::Base
       end
 
       def create_automated(params)
-        create_split(from: Danbooru.config.system_user, **params)
+        dmail = Dmail.new(from: Danbooru.config.system_user, **params)
+        dmail.owner = dmail.to
+        dmail.save
+        dmail
       end
     end
 

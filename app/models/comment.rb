@@ -23,8 +23,8 @@ class Comment < ActiveRecord::Base
   mentionable(
     :message_field => :body, 
     :user_field => :creator_id, 
-    :title => "You were mentioned in a comment",
-    :body => lambda {|rec, user_name| "You were mentioned in a \"comment\":/posts/#{rec.post_id}#comment-#{rec.id}\n\n---\n\n[i]#{rec.creator.name} said:[/i]\n\n#{ActionController::Base.helpers.excerpt(rec.body, user_name)}"}
+    :title => lambda {|user_name| "#{creator_name} mentioned you in a comment on post ##{post_id}"},
+    :body => lambda {|user_name| "@#{creator_name} mentioned you in a \"comment\":/posts/#{post_id}#comment-#{id} on post ##{post_id}:\n\n[quote]\n#{DText.excerpt(body, "@"+user_name)}\n[/quote]\n"},
   )
 
   module SearchMethods
