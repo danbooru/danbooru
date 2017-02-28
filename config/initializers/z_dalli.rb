@@ -1,24 +1,26 @@
-unless defined?(MEMCACHE)
-  MEMCACHE = Dalli::Client.new(Danbooru.config.memcached_servers, :namespace => Danbooru.config.app_name.gsub(/[^A-Za-z0-9]/, "_"))
-end
+Rails.application.configure do
+  begin
+    if Rails.env.test?
+      config.cache_store = :memory_store, { size: 32.megabytes }
+      Rails.cache = ActiveSupport::Cache.lookup_store(Rails.application.config.cache_store)
+    else
+      config.cache_store = :dalli_store, Danbooru.config.memcached_servers, { namespace: Danbooru.config.safe_app_name }
+      Rails.cache = ActiveSupport::Cache.lookup_store(Rails.application.config.cache_store)
 
-begin
-  MEMCACHE.get("x")
-rescue Dalli::RingError => e
-  puts "-" * 40
-  puts "WARNING! MEMCACHE SERVER NOT FOUND! You will experience performance degradation."
-  puts e.to_s
-  puts "-- BEGIN STACKTRACE --"
-  e.backtrace.each do |line|
-    puts line
-  end
-  puts "-- END STACKTRACE --"
-  puts "-" * 40
-  MEMCACHE = MemcacheMock.new
-end
+      Rails.cache.dalli.alive!
+    end
+  rescue Dalli::RingError => e
+    puts "-" * 40
+    puts "WARNING! MEMCACHE SERVER NOT FOUND! You will experience performance degradation."
+    puts e.to_s
+    puts "-- BEGIN STACKTRACE --"
+    e.backtrace.each do |line|
+      puts line
+    end
+    puts "-- END STACKTRACE --"
+    puts "-" * 40
 
-if Rails.env.production?
-  Rails.application.configure do
-    config.cache_store = :dalli_store, Danbooru.config.memcached_servers
+    config.cache_store = :memory_store, { size: 32.megabytes }
+    Rails.cache = ActiveSupport::Cache.lookup_store(Rails.application.config.cache_store)
   end
 end
