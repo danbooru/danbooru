@@ -3,11 +3,8 @@ class UserNameChangeRequest < ActiveRecord::Base
   validates_inclusion_of :status, :in => %w(pending approved rejected)
   belongs_to :user
   belongs_to :approver, :class_name => "User"
-  validate :uniqueness_of_desired_name
   validate :not_limited, :on => :create
-  validates_length_of :desired_name, :within => 2..100, :on => :create
-  validates_format_of :desired_name, :with => /\A[^\s:]+\Z/, :on => :create, :message => "cannot have whitespace or colons"
-  before_validation :normalize_name
+  validates :desired_name, user_name: true
   attr_accessible :status, :user_id, :original_name, :desired_name, :change_reason, :rejection_reason, :approver_id
   
   def self.pending
@@ -40,8 +37,8 @@ class UserNameChangeRequest < ActiveRecord::Base
     status == "pending"
   end
   
-  def normalize_name
-    self.desired_name = desired_name.strip.gsub(/ /, "_")
+  def desired_name=(name)
+    super(User.normalize_name(name))
   end
   
   def feedback
@@ -66,15 +63,6 @@ class UserNameChangeRequest < ActiveRecord::Base
   def not_limited
     if UserNameChangeRequest.where("user_id = ? and created_at >= ?", CurrentUser.user.id, 1.week.ago).exists?
       errors.add(:base, "You can only submit one name change request per week")
-      return false
-    else
-      return true
-    end
-  end
-  
-  def uniqueness_of_desired_name
-    if User.find_by_name(desired_name)
-      errors.add(:desired_name, "already exists")
       return false
     else
       return true
