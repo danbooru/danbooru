@@ -1,0 +1,35 @@
+<div id="c-post-versions">
+  <div id="a-index">
+    <h1>Upload tag changes report for <%= @user.pretty_name %></h1>
+    <table class="striped">
+      <thead>
+        <tr>
+        <th width="10%">Post ID</th>
+        <th width="45%">Tags added by uploader</th>
+        <th width="45%">Tags changed by other users</th>
+        </tr>
+        </thead>
+      <tbody>
+        <% @upload_reports.each do |upload_report| %>
+          <tr>
+            <td><%= link_to(upload_report.id, post_path(:id => upload_report.id ))%></td>
+            <td>
+              <% upload_report.uploader_tags_array.each do |tag_name| %>
+                <span class="category-<%= Tag.category_for(tag_name) %>">
+                  <%= link_to(tag_name.tr("_", " "), posts_path(:tags => tag_name)) %>
+                </span>
+              <% end %>
+            </td>
+            <td><%= diff_to_current(upload_report) %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <%= numbered_paginator(@upload_reports) %>
+    </div>
+</div>
+
+
+<% content_for(:page_title) do %>
+  Upload tag changes for <%= @user.pretty_name %> - <%= Danbooru.config.app_name %>
+<% end %>

@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+
   namespace :admin do
     resources :users, :only => [:edit, :update]
     resource  :alias_and_implication_import, :only => [:new, :create]
@@ -317,6 +318,8 @@ Rails.application.routes.draw do
       get :diff
     end
   end
+
+  resources :upload_tags_report, :only => [:show]
 
   # aliases
   resources :wpages, :controller => "wiki_pages"
