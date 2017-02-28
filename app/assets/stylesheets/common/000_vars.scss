@@ -24,6 +24,8 @@ $preview_has_parent_color: #CC0;
 $preview_deleted_color: #000;
 $preview_pending_color: #00F;
 $preview_flagged_color: #F00;
+$preview_sample_warning_color:  hsl(0,  100%, 90%); // light red
+$preview_quality_warning_color: hsl(50, 100%, 90%); // light yellow
 
 @mixin border-radius($val) {
   -moz-border-radius: $val;
