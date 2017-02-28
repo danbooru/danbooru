@@ -1035,6 +1035,7 @@ case 57:
 	goto tr69;
 case 58:
 	switch( (*( sm->p)) ) {
+		case 35: goto tr73;
 		case 47: goto tr73;
 		case 91: goto tr74;
 		case 104: goto tr75;
@@ -1080,6 +1081,7 @@ case 62:
 	goto tr62;
 case 63:
 	switch( (*( sm->p)) ) {
+		case 35: goto tr80;
 		case 47: goto tr80;
 		case 104: goto tr81;
 	}
@@ -4673,7 +4675,7 @@ _again:
 #line 1 "NONE"
 	{( sm->ts) = 0;}
 	break;
-#line 4677 "ext/dtext/dtext.c"
+#line 4679 "ext/dtext/dtext.c"
 	}
 
 	if ( ++( sm->p) != ( sm->pe) )
