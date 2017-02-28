@@ -163,6 +163,7 @@ class WikiPage < ActiveRecord::Base
       :title => title,
       :body => body,
       :is_locked => is_locked,
+      :is_deleted => is_deleted,
       :other_names => other_names
     )
   end
