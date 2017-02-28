@@ -2,28 +2,13 @@ source 'https://rubygems.org/'
 
 gem 'dotenv-rails', :require => "dotenv/rails-now"
 
-group :test do
-  gem "shoulda-context"
-  gem "shoulda-matchers"
-  gem "factory_girl"
-  gem "mocha", :require => "mocha/setup"
-  gem "ffaker"
-  gem "simplecov", :require => false
-  gem "timecop"
-  gem "fakeweb"
-end
-
 gem 'protected_attributes'
-gem "sass-rails", "~> 4.0.0"
+gem "sass-rails"
 gem "sprockets-rails", :require => "sprockets/railtie"
 gem "uglifier"
-gem 'coffee-rails'
 gem "therubyracer", :platforms => :ruby
-gem "pry", :group => [:test, :development]
-gem "byebug", :group => [:test, :development]
 gem "rails", "~> 4.2.0"
 gem "pg"
-gem "kgio", :platforms => :ruby
 gem "dalli", :platforms => :ruby
 gem "memcache-client", :platforms => [:mswin, :mingw, :x64_mingw]
 gem "tzinfo-data", :platforms => [:mswin, :mingw, :x64_mingw]
@@ -31,17 +16,13 @@ gem "delayed_job"
 gem "delayed_job_active_record"
 gem "simple_form"
 gem "mechanize"
-gem "nokogiri"
 gem "whenever", :require => false
 gem "sanitize", "~> 3.1.0"
 gem 'rmagick'
-gem 'daemons'
-gem 'net-ssh'
 gem 'net-sftp'
 gem 'term-ansicolor', :require => "term/ansicolor"
 gem 'diff-lcs', :require => "diff/lcs/array", :git => "https://github.com/halostatue/diff-lcs.git"
 gem 'bcrypt-ruby', :require => "bcrypt"
-gem 'awesome_print'
 gem 'statistics2'
 gem 'capistrano', '~> 3.4.0'
 gem 'capistrano-rails'
@@ -76,7 +57,19 @@ group :production do
   gem 'capistrano-deploytags', '~> 1.0.0', require: false
 end
 
-group :development do
+group :development, :test do
+  gem 'awesome_print'
+  gem 'pry-byebug'
   gem 'ruby-prof'
-  # gem 'sql-logging'
+end
+
+group :test do
+  gem "shoulda-context"
+  gem "shoulda-matchers"
+  gem "factory_girl"
+  gem "mocha", :require => "mocha/setup"
+  gem "ffaker"
+  gem "simplecov", :require => false
+  gem "timecop"
+  gem "fakeweb"
 end
