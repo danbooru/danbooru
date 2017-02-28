@@ -29,7 +29,7 @@ class UploadTagsReport < Post
   def uploader_tags_array
     @uploader_tags ||= begin
       added_tags = []
-      PostVersion.where(post_id: id, updater_id: uploader_id).each do |version|
+      PostArchive.where(post_id: id, updater_id: uploader_id).each do |version|
         added_tags += version.changes[:added_tags]
       end
       added_tags.uniq.sort

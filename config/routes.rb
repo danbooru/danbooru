@@ -230,6 +230,7 @@ Rails.application.routes.draw do
   resource :related_tag, :only => [:show, :update]
   get "reports/uploads" => "reports#uploads"
   get "reports/similar_users" => "reports#similar_users"
+  get "reports/upload_tags" => "reports#upload_tags"
   get "reports/post_versions" => "reports#post_versions"
   post "reports/post_versions_create" => "reports#post_versions_create"
   resources :saved_searches, :except => [:show] do
@@ -318,8 +319,6 @@ Rails.application.routes.draw do
       get :diff
     end
   end
-
-  resources :upload_tags_report, :only => [:show]
 
   # aliases
   resources :wpages, :controller => "wiki_pages"
