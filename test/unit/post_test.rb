@@ -10,7 +10,9 @@ class PostTest < ActiveSupport::TestCase
     assert_equal(posts.map(&:id), Post.tag_match(query).pluck(:id))
   end
 
-  setup do
+  def setup
+    super
+
     Timecop.travel(2.weeks.ago) do
       @user = FactoryGirl.create(:user)
     end
@@ -20,7 +22,9 @@ class PostTest < ActiveSupport::TestCase
     mock_saved_search_service!
   end
 
-  teardown do
+  def teardown
+    super
+
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
   end
@@ -1055,7 +1059,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "that has been updated" do
         should "create a new version if it's the first version" do
-          assert_difference("PostVersion.count", 1) do
+          assert_difference("PostArchive.count", 1) do
             post = FactoryGirl.create(:post)
           end
         end
@@ -1063,7 +1067,7 @@ class PostTest < ActiveSupport::TestCase
         should "create a new version if it's been over an hour since the last update" do
           post = FactoryGirl.create(:post)
           Timecop.travel(6.hours.from_now) do
-            assert_difference("PostVersion.count", 1) do
+            assert_difference("PostArchive.count", 1) do
               post.update_attributes(:tag_string => "zzz")
             end
           end
@@ -1071,15 +1075,16 @@ class PostTest < ActiveSupport::TestCase
 
         should "merge with the previous version if the updater is the same user and it's been less than an hour" do
           post = FactoryGirl.create(:post)
-          assert_difference("PostVersion.count", 0) do
+          assert_difference("PostArchive.count", 0) do
             post.update_attributes(:tag_string => "zzz")
           end
           assert_equal("zzz", post.versions.last.tags)
         end
 
         should "increment the updater's post_update_count" do
+          PostArchive.sqs_service.stubs(:merge?).returns(false)
           post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
-          post.stubs(:merge_version?).returns(false)
+          CurrentUser.reload
 
           assert_difference("CurrentUser.post_update_count", 1) do
             post.update_attributes(:tag_string => "zzz")
@@ -2289,8 +2294,8 @@ class PostTest < ActiveSupport::TestCase
 
     context "a post that has been updated" do
       setup do
+        PostArchive.sqs_service.stubs(:merge?).returns(false)
         @post = FactoryGirl.create(:post, :rating => "q", :tag_string => "aaa", :source => nil)
-        @post.stubs(:merge_version?).returns(false)
         @post.update_attributes(:tag_string => "aaa bbb ccc ddd")
         @post.update_attributes(:tag_string => "bbb xxx yyy", :source => "xyz")
         @post.update_attributes(:tag_string => "bbb mmm yyy", :source => "abc")

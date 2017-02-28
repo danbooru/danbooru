@@ -54,10 +54,8 @@ class User < ActiveRecord::Base
   attr_accessor :password, :old_password
   attr_accessible :dmail_filter_attributes, :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr, :time_zone, :default_image_size, :enable_sequential_post_navigation, :per_page, :hide_deleted_posts, :style_usernames, :enable_auto_complete, :custom_style, :show_deleted_children, :disable_categorized_saved_searches, :disable_tagged_filenames, :enable_recent_searches, :as => [:moderator, :janitor, :gold, :platinum, :member, :anonymous, :default, :builder, :admin]
   attr_accessible :level, :as => :admin
-  validates_length_of :name, :within => 2..100, :on => :create
-  validates_format_of :name, :with => /\A[^\s:]+\Z/, :on => :create, :message => "cannot have whitespace or colons"
-  validates_format_of :name, :with => /\A[^_].*[^_]\Z/, :on => :create, :message => "cannot begin or end with an underscore"
-  validates_uniqueness_of :name, :case_sensitive => false
+
+  validates :name, user_name: true, on: :create
   validates_uniqueness_of :email, :case_sensitive => false, :if => lambda {|rec| rec.email.present? && rec.email_changed? }
   validates_length_of :password, :minimum => 5, :if => lambda {|rec| rec.new_record? || rec.password.present?}
   validates_inclusion_of :default_image_size, :in => %w(large original)
@@ -152,6 +150,10 @@ class User < ActiveRecord::Base
 
       def id_to_pretty_name(user_id)
         id_to_name(user_id).gsub(/([^_])_+(?=[^_])/, "\\1 \\2")
+      end
+
+      def normalize_name(name)
+        name.to_s.mb_chars.downcase.strip.tr(" ", "_").to_s
       end
     end
 

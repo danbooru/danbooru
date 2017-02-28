@@ -1,7 +1,9 @@
 require 'test_helper'
 
 class PostVoteTest < ActiveSupport::TestCase
-  setup do
+  def setup
+    super
+    
     user = FactoryGirl.create(:user)
     CurrentUser.user = user
     CurrentUser.ip_addr = "127.0.0.1"

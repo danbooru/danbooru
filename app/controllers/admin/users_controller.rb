@@ -1,7 +1,6 @@
 module Admin
   class UsersController < ApplicationController
     before_filter :moderator_only
-    rescue_from User::PrivilegeError, :with => :access_denied
 
     def edit
       @user = User.find(params[:id])

@@ -64,6 +64,17 @@ class TagSetPresenter < Presenter
     html.html_safe
   end
 
+  # compact (horizontal) list, as seen in the /comments index.
+  def inline_tag_list(template)
+    @tags.map do |tag_name|
+      <<-EOS
+        <span class="category-#{Tag.category_for(tag_name)}">
+          #{template.link_to(tag_name.tr("_", " "), template.posts_path(tags: tag_name))}
+        </span>
+      EOS
+    end.join.html_safe
+  end
+
 private
   def general_tags
     @general_tags ||= categories.select {|k, v| v == Tag.categories.general}

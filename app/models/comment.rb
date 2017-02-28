@@ -14,8 +14,8 @@ class Comment < ActiveRecord::Base
   after_update(:if => lambda {|rec| CurrentUser.id != rec.creator_id}) do |rec|
     ModAction.log("comment ##{rec.id} updated by #{CurrentUser.name}")
   end
-  after_destroy :update_last_commented_at_on_destroy
-  after_destroy(:if => lambda {|rec| CurrentUser.id != rec.creator_id}) do |rec|
+  after_update :update_last_commented_at_on_destroy, :if => lambda {|rec| rec.is_deleted? && rec.is_deleted_changed?}
+  after_update(:if => lambda {|rec| rec.is_deleted? && rec.is_deleted_changed? && CurrentUser.id != rec.creator_id}) do |rec|
     ModAction.log("comment ##{rec.id} deleted by #{CurrentUser.name}")
   end
   attr_accessible :body, :post_id, :do_not_bump_post, :is_deleted, :as => [:member, :gold, :platinum, :builder, :janitor, :moderator, :admin]

@@ -186,6 +186,13 @@ class UserTest < ActiveSupport::TestCase
         assert_equal(Danbooru.config.default_guest_name, User.id_to_name(-1))
       end
 
+      should "not contain whitespace" do
+        # U+2007: https://en.wikipedia.org/wiki/Figure_space
+        user = FactoryGirl.build(:user, :name => "foo\u2007bar")
+        user.save
+        assert_equal(["Name cannot have whitespace or colons"], user.errors.full_messages)
+      end
+
       should "not contain a colon" do
         user = FactoryGirl.build(:user, :name => "a:b")
         user.save

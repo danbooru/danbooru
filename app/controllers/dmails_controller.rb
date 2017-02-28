@@ -1,7 +1,6 @@
 class DmailsController < ApplicationController
   respond_to :html, :xml, :json
   before_filter :member_only
-  rescue_from User::PrivilegeError, :with => :access_denied
 
   def new
     if params[:respond_to_id]

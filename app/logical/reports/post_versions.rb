@@ -13,7 +13,7 @@ module Reports
     end
 
     def mock_version(row)
-      PostVersion.new.tap do |x|
+      PostArchive.new.tap do |x|
         x.id = row["f"][0]["v"]
         x.post_id = row["f"][1]["v"]
         x.updated_at = Time.at(row["f"][2]["v"].to_f)

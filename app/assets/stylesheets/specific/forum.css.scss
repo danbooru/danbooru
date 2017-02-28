@@ -9,6 +9,10 @@ div.list-of-forum-posts {
     margin-bottom: 3em;
     word-wrap: break-word;
 
+    &:target {
+      background-color: #FFC;
+    }
+
     div.author {
       width: 12em;
       float: left;
