@@ -1,5 +1,3 @@
-/*
- *= require "jquery-ui-1.11.2.min.css"
- *= require_tree "./common"
- *= require_tree "./specific"
-*/
+@import "jquery-ui-1.11.2.min.scss";
+@import "common/*";
+@import "specific/*";
