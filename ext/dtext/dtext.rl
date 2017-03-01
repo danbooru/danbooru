@@ -1375,6 +1375,9 @@ gboolean parse_helper(StateMachine* sm) {
   return sm->error == NULL;
 }
 
+/* Everything below is optional, it's only needed to build bin/cdtext.exe. */
+#ifdef CDTEXT
+
 static void parse_file(FILE* input, FILE* output, gboolean opt_strip, gboolean opt_inline, gboolean opt_mentions) {
   char* dtext = NULL;
   size_t n = 0;
@@ -1415,10 +1418,10 @@ int main(int argc, char* argv[]) {
   gboolean opt_no_mentions = FALSE;
 
   GOptionEntry options[] = {
-    { "no-mentions", 'm', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &opt_no_mentions, "Don't parse @mentions", NULL },
-    { "inline",      'i', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &opt_inline,      "Parse in inline mode", NULL },
-    { "strip",       's', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &opt_strip,       "Strip markup", NULL },
-    { "verbose",     'v', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &opt_verbose,     "Print debug output", NULL },
+    { "no-mentions", 'm', 0, G_OPTION_ARG_NONE, &opt_no_mentions, "Don't parse @mentions", NULL },
+    { "inline",      'i', 0, G_OPTION_ARG_NONE, &opt_inline,      "Parse in inline mode", NULL },
+    { "strip",       's', 0, G_OPTION_ARG_NONE, &opt_strip,       "Strip markup", NULL },
+    { "verbose",     'v', 0, G_OPTION_ARG_NONE, &opt_verbose,     "Print debug output", NULL },
     { NULL }
   };
 
@@ -1456,3 +1459,5 @@ int main(int argc, char* argv[]) {
 
   return 0;
 }
+
+#endif
