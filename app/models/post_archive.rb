@@ -73,49 +73,6 @@ class PostArchive < ActiveRecord::Base
         msg = "add post version\n#{json.to_json}"
         sqs_service.send_message(msg)
       end
-
-      def export_to_archives(version_id = 4394763)
-        PostVersion.where("id > ?", version_id).find_each do |version|
-          previous = version.previous
-          tags = version.tags.scan(/\S+/)
-          version_number = if version.updated_at.to_i == Time.zone.parse("2007-03-14T19:38:12Z").to_i
-            # Old post versions which didn't have updated_at set correctly
-            1 + PostVersion.where("post_id = ? and updated_at = ? and id < ?", version.post_id, version.updated_at, version.id).count
-          else
-            1 + PostVersion.where("post_id = ? and updated_at < ?", version.post_id, version.updated_at).count
-          end
-
-          if previous
-            prev_tags = previous.tags.scan(/\S+/)
-            added_tags = tags - prev_tags
-            removed_tags = prev_tags - tags
-          else
-            added_tags = tags
-            removed_tags = []
-          end
-
-          rating_changed = previous.nil? || version.rating != previous.rating
-          parent_changed = previous.nil? || version.parent_id != previous.parent_id
-          source_changed = previous.nil? || version.source != previous.source
-          create(
-            post_id: version.post_id,
-            tags: version.tags,
-            added_tags: added_tags,
-            removed_tags: removed_tags,
-            updater_id: version.updater_id,
-            updater_ip_addr: version.updater_ip_addr.to_s,
-            updated_at: version.updated_at,
-            version: version_number,
-            rating: version.rating,
-            rating_changed: rating_changed,
-            parent_id: version.parent_id,
-            parent_changed: parent_changed,
-            source: version.source,
-            source_changed: source_changed
-          )
-          puts "inserted #{version.id}"
-        end
-      end
     end
   end
 
