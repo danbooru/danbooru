@@ -12,7 +12,7 @@ class AmazonBackup < ActiveRecord::Base
     first.update_column(:last_id, new_id)
   end
 
-  def self.restore_from_glacier(min_id, max_id)
+  def self.restore_from_glacier(min_id = 1_431_595, max_id = 2_000_000)
     credentials = Aws::Credentials.new(Danbooru.config.aws_access_key_id, Danbooru.config.aws_secret_access_key)
     Aws.config.update({
       region: "us-east-1",
@@ -73,7 +73,7 @@ class AmazonBackup < ActiveRecord::Base
     end
   end
 
-  def self.copy_to_standard(min_id, max_id)
+  def self.copy_to_standard(min_id = 1_191_247, max_id = 2_000_000)
     credentials = Aws::Credentials.new(Danbooru.config.aws_access_key_id, Danbooru.config.aws_secret_access_key)
     Aws.config.update({
       region: "us-east-1",
