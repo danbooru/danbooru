@@ -831,10 +831,6 @@ class Post < ActiveRecord::Base
       set_tag_string((tag_array - Array(tag)).join(" "))
     end
 
-    def has_dup_tag?
-      has_tag?("duplicate")
-    end
-
     def tag_categories
       @tag_categories ||= Tag.categories_for(tag_array)
     end

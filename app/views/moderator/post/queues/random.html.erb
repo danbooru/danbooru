@@ -13,7 +13,7 @@
       </div>
 
       <% @posts.each do |post| %>
-        <div id="post-<%= post.id %>" class="post mod-queue-preview <%= PostPresenter.preview_class(post) %>" <%= PostPresenter.data_attributes(post) %> data-has-dup="<%= post.has_dup_tag? %>">
+        <div id="post-<%= post.id %>" class="post mod-queue-preview <%= PostPresenter.preview_class(post) %>" <%= PostPresenter.data_attributes(post) %>>
           <aside>
             <%= link_to(image_tag(post.preview_file_url), post_path(post), :target => "_blank") %>
           </aside>

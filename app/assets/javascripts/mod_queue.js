@@ -48,9 +48,6 @@
       if ($post.data("has-children")) {
         $post.addClass("post-has-children");
       }
-      if ($post.data("has-dup")) {
-        $post.addClass("post-has-dup");
-      }
     });
   }
 

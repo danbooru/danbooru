@@ -9,10 +9,6 @@ div#c-moderator-post-queues {
       background: rgb(230, 255, 230);
     }
 
-    &.post-has-dup {
-      background: rgb(255, 255, 100);
-    }
-
     &.post-neg-score {
       background: rgb(255, 230, 230);
     }
@@ -27,6 +23,23 @@ div#c-moderator-post-queues {
     section {
       float: left;
       width: 800px;
+    }
+
+    &[data-tags~="hard_translated"],
+    &[data-tags~="self_upload"],
+    &[data-tags~="nude_filter"],
+    &[data-tags~="photoshop"],
+    &[data-tags~="screencap"] {
+      background-color: $preview_quality_warning_color;
+    }
+
+    &[data-tags~="duplicate"],
+    &[data-tags~="image_sample"],
+    &[data-tags~="md5_mismatch"],
+    &[data-tags~="resized"],
+    &[data-tags~="upscaled"],
+    &[data-tags~="downscaled"] {
+      background-color: $preview_sample_warning_color;
     }
 
     &[data-tags~=animated], &[data-file-ext=swf], &[data-file-ext=webm], &[data-file-ext=zip], &[data-file-ext=mp4] {
