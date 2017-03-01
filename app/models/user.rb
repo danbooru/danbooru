@@ -301,6 +301,10 @@ class User < ActiveRecord::Base
     extend ActiveSupport::Concern
 
     module ClassMethods
+      def system
+        Danbooru.config.system_user
+      end
+
       def level_hash
         return {
           "Member" => Levels::MEMBER,

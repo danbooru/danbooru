@@ -7,10 +7,8 @@ class ApproverPruner
   end
 
   def prune!
-    admin = User.admins.first
-
     inactive_approvers.each do |user|
-      CurrentUser.scoped(admin, "127.0.0.1") do
+      CurrentUser.scoped(User.system, "127.0.0.1") do
         next if user.is_admin?
 
         janitor_trial = JanitorTrial.where(user_id: user.id).first
