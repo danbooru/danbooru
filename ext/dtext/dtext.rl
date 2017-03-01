@@ -1375,6 +1375,9 @@ gboolean parse_helper(StateMachine* sm) {
   return sm->error == NULL;
 }
 
+/* Everything below is optional, it's only needed to build bin/cdtext.exe. */
+#ifdef CDTEXT
+
 static void parse_file(FILE* input, FILE* output, gboolean opt_strip, gboolean opt_inline, gboolean opt_mentions) {
   char* dtext = NULL;
   size_t n = 0;
@@ -1456,3 +1459,5 @@ int main(int argc, char* argv[]) {
 
   return 0;
 }
+
+#endif
