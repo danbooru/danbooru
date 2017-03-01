@@ -1,4 +1,4 @@
-﻿# encoding: UTF-8
+# encoding: UTF-8
 
 require 'csv'
 
