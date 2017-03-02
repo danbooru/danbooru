@@ -1,6 +1,9 @@
 class PostArchive < ActiveRecord::Base
   extend Memoist
 
+  belongs_to :post
+  belongs_to :updater, class_name: "User"
+
   def self.enabled?
     Danbooru.config.aws_sqs_archives_url.present?
   end
@@ -92,16 +95,8 @@ class PostArchive < ActiveRecord::Base
     super
   end
 
-  def post
-    Post.where(id: post_id).first
-  end
-
   def previous
     PostArchive.where("post_id = ? and version < ?", post_id, version).order("version desc").first
-  end
-
-  def updater
-    User.find(updater_id)
   end
 
   def diff(version = nil)
@@ -237,13 +232,9 @@ class PostArchive < ActiveRecord::Base
     post.save!
   end
 
-  def updater
-    User.find_by_id(updater_id)
-  end
-
   def method_attributes
     super + [:obsolete_added_tags, :obsolete_removed_tags, :unchanged_tags, :updater_name]
   end
 
-  memoize :previous, :post, :tag_array, :changes, :added_tags_with_fields, :removed_tags_with_fields, :obsolete_removed_tags, :obsolete_added_tags, :unchanged_tags
+  memoize :previous, :tag_array, :changes, :added_tags_with_fields, :removed_tags_with_fields, :obsolete_removed_tags, :obsolete_added_tags, :unchanged_tags
 end
