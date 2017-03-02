@@ -19,18 +19,19 @@
           <h1>Options</h1>
           <%= render "posts/partials/show/options", :post => @post %>
         </section>
+
+        <section id="post-history">
+          <h1>History</h1>
+          <ul>
+            <li><%= fast_link_to "Tags", post_versions_path(:search => {:post_id => @post.id}) %></li>
+            <li><%= fast_link_to "Notes", note_versions_path(:search => {:post_id => @post.id}) %></li>
+            <li><%= fast_link_to "Flags & Appeals", post_events_path(@post.id) %></li>
+            <li><%= fast_link_to "Commentary", artist_commentary_versions_path(:search => {:post_id => @post.id}) %></li>
+          </ul>
+        </section>
+
       <% end %>
-
-      <section id="post-history">
-        <h1>History</h1>
-        <ul>
-          <li><%= fast_link_to "Tags", post_versions_path(:search => {:post_id => @post.id}) %></li>
-          <li><%= fast_link_to "Notes", note_versions_path(:search => {:post_id => @post.id}) %></li>
-          <li><%= fast_link_to "Flags & Appeals", post_events_path(@post.id) %></li>
-          <li><%= fast_link_to "Commentary", artist_commentary_versions_path(:search => {:post_id => @post.id}) %></li>
-        </ul>
-      </section>
-
+      
     </aside>
 
     <section id="content">

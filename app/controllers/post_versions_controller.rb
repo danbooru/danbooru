@@ -1,4 +1,5 @@
 class PostVersionsController < ApplicationController
+  before_filter :member_only
   respond_to :html, :xml, :json
 
   def index
