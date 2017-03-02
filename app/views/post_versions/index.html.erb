@@ -2,7 +2,7 @@
   <div id="a-index">
     <h1>Changes</h1>
 
-    <% if @post_versions.empty? %>
+    <% if @post_versions.length == 0 %>
       <%= render "post_sets/blank" %>
     <% else %>
       <%= render "listing", :post_versions => @post_versions %>
