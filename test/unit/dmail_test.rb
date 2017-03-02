@@ -6,7 +6,7 @@ class DmailTest < ActiveSupport::TestCase
       MEMCACHE.flush_all
       @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
+      CurrentUser.ip_addr = "1.2.3.4"
       ActionMailer::Base.delivery_method = :test
       ActionMailer::Base.perform_deliveries = true
       ActionMailer::Base.deliveries = []
@@ -110,6 +110,11 @@ class DmailTest < ActiveSupport::TestCase
       assert_difference("Dmail.count", 2) do
         Dmail.create_split(:to_id => @new_user.id, :title => "foo", :body => "foo")
       end
+    end
+
+    should "record the creator's ip addr" do
+      dmail = FactoryGirl.create(:dmail, owner: @user)
+      assert_equal(CurrentUser.ip_addr, dmail.creator_ip_addr.to_s)
     end
 
     should "send an email if the user wants it" do

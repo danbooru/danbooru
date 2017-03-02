@@ -1007,7 +1007,7 @@ CREATE TABLE dmails (
     is_deleted boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    creator_ip_addr inet DEFAULT '127.0.0.1'::inet NOT NULL
+    creator_ip_addr inet NOT NULL
 );
 
 
@@ -7465,4 +7465,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170112060921');
 INSERT INTO schema_migrations (version) VALUES ('20170117233040');
 
 INSERT INTO schema_migrations (version) VALUES ('20170218104710');
+
+INSERT INTO schema_migrations (version) VALUES ('20170302014435');
 
