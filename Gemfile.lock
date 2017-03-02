@@ -15,7 +15,7 @@ GIT
 
 GIT
   remote: https://github.com/r888888888/dtext_rb.git
-  revision: e8537ad7ef5e5c21507dddf60a9bc686a98b1379
+  revision: 93cde168dd48b50da37d9378dc446ccee11db9d4
   specs:
     dtext_rb (1.4.4)
       nokogiri (~> 1.6)
@@ -432,4 +432,4 @@ DEPENDENCIES
   whenever
 
 BUNDLED WITH
-   1.14.3
+   1.14.5
