@@ -7,20 +7,44 @@
       <thead>
         <tr>
           <th width="1%">Post</th>
-          <th width="10%">Creator</th>
           <th>Reason</th>
-          <th width="15%">Date</th>
+          <th width="1%">Appeals</th>
           <th width="5%">Resolved?</th>
+          <th width="15%">Uploaded</th>
+          <th width="15%">Appealed</th>
+          <th width="15%">Approver</th>
         </tr>
       </thead>
       <tbody>
         <% @post_appeals.each do |post_appeal| %>
           <tr>
             <td><%= PostPresenter.preview(post_appeal.post, :tags => "status:any") %></td>
-            <td><%= link_to_user post_appeal.creator %></td>
             <td><%= format_text post_appeal.reason, :ragel => true %></td>
-            <td><%= compact_time post_appeal.updated_at %></td>
-            <td><%= post_appeal.resolved? %></td>
+            <td>
+              <%= link_to post_appeal.post.appeals.size, post_appeals_path(search: { post_id: post_appeal.post_id }) %>
+            </td>
+            <td>
+              <%= link_to post_appeal.is_resolved.to_s, post_appeals_path(search: params[:search].merge(is_resolved: post_appeal.is_resolved)) %>
+            </td>
+            <td>
+              <%= compact_time post_appeal.post.created_at %>
+              <br> by <%= link_to_user post_appeal.post.uploader %>
+            <%= link_to "»", post_appeals_path(search: params[:search].merge(post_tags_match: "#{params[:search][:post_tags_match]} user:#{post_appeal.post.uploader.name}".strip)) %>
+            </td>
+            <td>
+              <%= compact_time post_appeal.created_at %>
+              <br> by <%= link_to_user post_appeal.creator %>
+              <%= link_to "»", post_appeals_path(search: params[:search].merge(creator_name: post_appeal.creator.name)) %>
+            </td>
+            <td>
+              <% if post_appeal.post.approver %>
+                <%= link_to_user post_appeal.post.approver %>
+                <%= link_to "»", post_appeals_path(search: params[:search].merge(post_tags_match: "#{params[:search][:post_tags_match]} approver:#{post_appeal.post.approver.name}".strip)) %>
+              <% else %>
+                <em>none</em>
+                <%= link_to "»", post_appeals_path(search: params[:search].merge(post_tags_match: "#{params[:search][:post_tags_match]} approver:none".strip)) %>
+              <% end %>
+            </td>
           </tr>
         <% end %>
       </tbody>

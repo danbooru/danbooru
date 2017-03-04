@@ -45,7 +45,7 @@ class PostFlag < ActiveRecord::Base
     end
 
     def search(params)
-      q = where("true")
+      q = order("post_flags.id desc")
       return q if params.blank?
 
       if params[:reason_matches].present?

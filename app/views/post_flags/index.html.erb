@@ -6,25 +6,53 @@
     <table width="100%" class="striped">
       <thead>
         <tr>
-          <th width="1%"></th>
-          <% if CurrentUser.user.is_moderator? %>
-            <th width="10%">Creator</th>
-          <% end %>
+          <th width="1%">Post</th>
           <th>Reason</th>
-          <th width="15%">Date</th>
+          <th width="1%">Flags</th>
+          <th width="1%">Category</th>
+          <th width="1%">Resolved?</th>
+          <th width="15%">Uploaded</th>
+          <th width="15%">Flagged</th>
+          <th width="15%">Approver</th>
         </tr>
       </thead>
       <tbody>
         <% @post_flags.each do |post_flag| %>
           <tr class="resolved-<%= post_flag.is_resolved? %>">
             <td><%= PostPresenter.preview(post_flag.post, :tags => "status:any") %></td>
-            <% if CurrentUser.user.is_moderator? %>
-              <td>
-                <%= link_to_user post_flag.creator %>
-              </td>
-            <% end %>
-            <td><%= format_text post_flag.reason, :ragel => true %></td>
-            <td><%= compact_time post_flag.updated_at %></td>
+            <td>
+              <%= format_text post_flag.reason, :ragel => true %>
+            </td>
+            <td>
+              <%= link_to post_flag.post.flags.size, post_flags_path(search: { post_id: post_flag.post_id }) %>
+            </td>
+            <td>
+              <%= link_to post_flag.category.to_s, post_flags_path(search: params[:search].merge(category: post_flag.category)) %>
+            </td>
+            <td>
+              <%= link_to post_flag.is_resolved?.to_s, post_flags_path(search: params[:search].merge(is_resolved: post_flag.is_resolved?)) %>
+            </td>
+            <td>
+              <%= compact_time post_flag.post.created_at %>
+              <br> by <%= link_to_user post_flag.post.uploader %>
+              <%= link_to "»", post_flags_path(search: params[:search].merge(post_tags_match: "#{params[:search][:post_tags_match]} user:#{post_flag.post.uploader.name}".strip)) %>
+            </td>
+            <td>
+              <%= compact_time post_flag.created_at %>
+              <% if CurrentUser.user.is_moderator? %>
+                <br> by <%= link_to_user post_flag.creator %>
+                <%= link_to "»", post_flags_path(search: params[:search].merge(creator_name: post_flag.creator.name)) %>
+              <% end %>
+            </td>
+            <td>
+              <% if post_flag.post.approver %>
+                <%= link_to_user post_flag.post.approver %>
+                <%= link_to "»", post_flags_path(search: params[:search].merge(post_tags_match: "#{params[:search][:post_tags_match]} approver:#{post_flag.post.approver.name}".strip)) %>
+              <% else %>
+                <em>none</em>
+                <%= link_to "»", post_flags_path(search: params[:search].merge(post_tags_match: "#{params[:search][:post_tags_match]} approver:none".strip)) %>
+              <% end %>
+            </td>
           </tr>
         <% end %>
       </tbody>

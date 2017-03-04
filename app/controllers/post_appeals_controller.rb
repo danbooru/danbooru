@@ -8,8 +8,8 @@ class PostAppealsController < ApplicationController
   end
 
   def index
-    @query = PostAppeal.order("post_appeals.id desc").includes(:post).search(params[:search])
-    @post_appeals = @query.paginate(params[:page], :limit => params[:limit])
+    @post_appeals = PostAppeal.includes(:creator).search(params[:search]).includes(post: [:appeals, :uploader, :approver])
+    @post_appeals = @post_appeals.paginate(params[:page], limit: params[:limit])
     respond_with(@post_appeals) do |format|
       format.xml do
         render :xml => @post_appeals.to_xml(:root => "post-appeals")
