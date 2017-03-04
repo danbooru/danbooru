@@ -24,6 +24,10 @@ class PostFlag < ActiveRecord::Base
       where("reason ILIKE ? ESCAPE E'\\\\'", query.to_escaped_for_sql_like)
     end
 
+    def post_tags_match(query)
+      PostQueryBuilder.new(query).build(self.joins(:post))
+    end
+
     def resolved
       where("is_resolved = ?", true)
     end
@@ -62,6 +66,10 @@ class PostFlag < ActiveRecord::Base
 
       if params[:post_id].present?
         q = q.where("post_id = ?", params[:post_id].to_i)
+      end
+
+      if params[:post_tags_match].present?
+        q = q.post_tags_match(params[:post_tags_match])
       end
 
       if params[:is_resolved] == "true"
