@@ -45,6 +45,7 @@ module Sources
     def translated_tags
       untranslated_tags = tags
       untranslated_tags = untranslated_tags.map(&:first)
+      untranslated_tags += untranslated_tags.grep(/\//).map {|x| x.split(/\//)}.flatten
       untranslated_tags = untranslated_tags.map do |tag|
         if tag =~ /\A(\S+?)_?\d+users入り\Z/
           $1
