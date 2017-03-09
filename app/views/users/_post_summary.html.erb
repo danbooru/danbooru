@@ -1,6 +1,11 @@
 <% if presenter.has_uploads? %>
   <div class="box user-uploads">
-    <h2><%= link_to "Uploads", posts_path(:tags => "user:#{user.name}") %></h2>
+    <h2>
+      <%= link_to "Uploads", posts_path(:tags => "user:#{user.name}") %>
+      <% if CurrentUser.is_admin? %>
+        (<%= link_to "random", posts_path(:tags => "user:#{user.name} order:random limit:100") %>)
+      <% end %>
+    </h2>
     <div>
       <% presenter.uploads.each do |post| %>
         <%= PostPresenter.preview(post, :tags => "user:#{user.name}") %>
@@ -11,7 +16,12 @@
 
 <% if presenter.has_favorites? %>
   <div class="box user-favorites">
-    <h2><%= link_to "Favorites", favorites_path(:user_id => user.id) %></h2>
+    <h2>
+      <%= link_to "Favorites", favorites_path(:user_id => user.id) %>
+      <% if CurrentUser.is_admin? %>
+        (<%= link_to "random", posts_path(:tags => "fav:#{user.name} order:random limit:100") %>)
+      <% end %>
+    </h2>
     <div>
       <% presenter.favorites.each do |post| %>
         <%= PostPresenter.preview(post, :tags => "fav:#{user.name}") %>
