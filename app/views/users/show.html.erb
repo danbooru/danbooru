@@ -4,7 +4,7 @@
 
     <%= render "statistics", :presenter => @presenter, :user => @user %>
 
-    <% if !@user.enable_privacy_mode? || CurrentUser.id == @user.id %>
+    <% if !CurrentUser.is_admin? && !@user.enable_privacy_mode? || CurrentUser.id == @user.id %>
       <%= render "post_summary", :presenter => @presenter, :user => @user %>
     <% end %>
   </div>

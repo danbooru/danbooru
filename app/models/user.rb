@@ -914,7 +914,7 @@ class User < ActiveRecord::Base
   end
 
   def hide_favorites?
-    enable_privacy_mode? && CurrentUser.user.id != id
+    !CurrentUser.is_admin? && enable_privacy_mode? && CurrentUser.user.id != id
   end
 
   def initialize_default_boolean_attributes
