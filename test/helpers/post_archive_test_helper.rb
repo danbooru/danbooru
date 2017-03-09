@@ -20,6 +20,12 @@ module PostArchiveTestHelper
         json.delete("created_at")
         json["version"] = 1 + PostArchive.where(post_id: json["post_id"]).count
         prev = PostArchive.where(post_id: json["post_id"]).order("id desc").first
+        if prev
+          json["added_tags"] = json["tags"].scan(/\S+/) - prev.tags.scan(/\S+/)
+          json["removed_tags"] = prev.tags.scan(/\S+/) - json["tags"].scan(/\S+/)
+        else
+          json["added_tags"] = json["tags"].scan(/\S+/)
+        end
         if merge?(prev, json)
           prev.update_columns(json)
         else
