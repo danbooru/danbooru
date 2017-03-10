@@ -410,6 +410,11 @@ module Danbooru
     def addthis_key
     end
 
+    # enable s3-nginx proxy caching
+    def use_s3_proxy?(post)
+      post.id < 100
+    end
+
     # include essential tags in image urls (requires nginx/apache rewrites)
     def enable_seo_post_urls
       false

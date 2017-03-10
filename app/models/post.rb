@@ -105,16 +105,20 @@ class Post < ActiveRecord::Base
     end
 
     def file_url
-      # if cdn_hosted?
-      #   Danbooru.config.danbooru_s3_base_url + "/#{file_path_prefix}#{md5}.#{file_ext}"
-      # else
-        "/data/#{seo_tag_string}#{file_path_prefix}#{md5}.#{file_ext}"
-      # end
+       if Danbooru.config.use_s3_proxy?(self)
+         "/cached/data/#{seo_tag_string}#{file_path_prefix}#{md5}.#{file_ext}"
+       else
+         "/data/#{seo_tag_string}#{file_path_prefix}#{md5}.#{file_ext}"
+       end
     end
 
     def large_file_url
       if has_large?
-        "/data/sample/#{seo_tag_string}#{file_path_prefix}#{Danbooru.config.large_image_prefix}#{md5}.#{large_file_ext}"
+        if Danbooru.config.use_s3_proxy?(self)
+          "/cached/data/sample/#{seo_tag_string}#{file_path_prefix}#{Danbooru.config.large_image_prefix}#{md5}.#{large_file_ext}"
+        else
+          "/data/sample/#{seo_tag_string}#{file_path_prefix}#{Danbooru.config.large_image_prefix}#{md5}.#{large_file_ext}"
+        end
       else
         file_url
       end
