@@ -21,7 +21,7 @@ class SavedSearchesControllerTest < ActionController::TestCase
 
     context "create action" do
       should "render" do
-        params = { saved_search_tags: "bkub", saved_search_category: "artist" }
+        params = { saved_search_tags: "bkub", saved_search_labels: "artist" }
 
         post :create, params, { user_id: @user.id }
         assert_response :redirect
@@ -40,11 +40,11 @@ class SavedSearchesControllerTest < ActionController::TestCase
     context "update action" do
       should "render" do
         saved_search = FactoryGirl.create(:saved_search, user: @user)
-        params = { id: saved_search.id, saved_search: { category: "foo" } }
+        params = { id: saved_search.id, saved_search: { label_string: "foo" } }
 
         put :update, params, { user_id: @user.id }
         assert_redirected_to saved_searches_path
-        assert_equal("foo", saved_search.reload.category)
+        assert_equal(["foo"], saved_search.reload.labels)
       end
     end
 

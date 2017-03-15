@@ -19,9 +19,10 @@ class SavedSearchTest < ActiveSupport::TestCase
       FakeWeb.clean_registry
     end
 
-    context "with a name" do
+    context "with a label" do
       setup do
-        FakeWeb.register_uri(:get, "http://localhost:3001/users?key=blahblahblah&user_id=1&name=blah", :body => [1,2,3,4].to_json)
+        SavedSearch.expects(:queries_for).with(1, "blah").returns(%w(a b c))
+        FakeWeb.register_uri(:post, "http://localhost:3001/v2/search", :body => "1 2 3 4")
       end
 
       should "return a list of ids" do
@@ -30,9 +31,10 @@ class SavedSearchTest < ActiveSupport::TestCase
       end
     end
 
-    context "without a name" do
+    context "without a label" do
       setup do
-        FakeWeb.register_uri(:get, "http://localhost:3001/users?key=blahblahblah&user_id=1", :body => [1,2,3,4].to_json)
+        SavedSearch.expects(:queries_for).with(1, nil).returns(%w(a b c))
+        FakeWeb.register_uri(:post, "http://localhost:3001/v2/search", :body => "1 2 3 4")
       end
 
       should "return a list of ids" do
@@ -45,7 +47,7 @@ class SavedSearchTest < ActiveSupport::TestCase
   context "Creating a saved search" do
     setup do
       @user = FactoryGirl.create(:gold_user)
-      @saved_search = @user.saved_searches.create(:tag_query => " xxx ")
+      @saved_search = @user.saved_searches.create(:query => " xxx ")
     end
 
     should "update the bitpref on the user" do
@@ -54,11 +56,7 @@ class SavedSearchTest < ActiveSupport::TestCase
     end
 
     should "normalize whitespace" do
-      assert_equal("xxx", @saved_search.tag_query)
-    end
-
-    should "send messages" do
-      assert_equal(%w(create), SavedSearch.sqs_service.commands)
+      assert_equal("xxx", @saved_search.query)
     end
   end
 
@@ -73,17 +71,13 @@ class SavedSearchTest < ActiveSupport::TestCase
       @user.reload
       assert(!@user.has_saved_searches?, "should not have the saved_searches bitpref set")
     end
-
-    should "send messages" do
-      assert_equal(%w(create delete), SavedSearch.sqs_service.commands)
-    end
   end
 
   context "A user with max saved searches" do
     setup do
       @user = FactoryGirl.create(:gold_user)
       User.any_instance.stubs(:max_saved_searches).returns(0)
-      @saved_search = @user.saved_searches.create(:tag_query => "xxx")
+      @saved_search = @user.saved_searches.create(:query => "xxx")
     end
 
     should "not be able to create another saved search" do

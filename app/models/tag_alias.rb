@@ -182,8 +182,8 @@ class TagAlias < ActiveRecord::Base
     escaped = Regexp.escape(antecedent_name)
 
     if SavedSearch.enabled?
-      SavedSearch.where("tag_query like ?", "%#{antecedent_name}%").find_each do |ss|
-        ss.tag_query = ss.tag_query.sub(/(?:^| )#{escaped}(?:$| )/, " #{consequent_name} ").strip.gsub(/  /, " ")
+      SavedSearch.where("query like ?", "%#{antecedent_name}%").find_each do |ss|
+        ss.query = ss.query.sub(/(?:^| )#{escaped}(?:$| )/, " #{consequent_name} ").strip.gsub(/  /, " ")
         ss.save
       end
     end

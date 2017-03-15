@@ -31,12 +31,11 @@ module Moderator
       end
 
       should "move saved searches" do
-        ss = FactoryGirl.create(:saved_search, :user => @user, :tag_query => "123 ... 456")
+        ss = FactoryGirl.create(:saved_search, :user => @user, :query => "123 ... 456")
         tag_batch_change = TagBatchChange.new("...", "bbb", @user.id, "127.0.0.1")
         tag_batch_change.perform
         ss.reload
-        assert_equal("123 456 bbb", ss.tag_query)
-        assert_equal(%w(create update), SavedSearch.sqs_service.commands)
+        assert_equal(%w(123 456 bbb), ss.query.scan(/\S+/).sort)
       end
 
       should "raise an error if there is no predicate" do
