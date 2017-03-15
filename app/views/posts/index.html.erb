@@ -52,7 +52,11 @@
       <% end %>
     <% end %>
 
-    <%= render "posts/partials/common/secondary_links" %>
+    <% if params[:tags] =~ /search:/ %>
+      <%= render "saved_searches/secondary_links" %>
+    <% else %>
+      <%= render "posts/partials/common/secondary_links" %>
+    <% end %>
 
     <%= post_search_count_js %>
   </div>

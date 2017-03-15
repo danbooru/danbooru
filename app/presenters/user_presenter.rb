@@ -221,9 +221,9 @@ class UserPresenter
     end
   end
 
-  def saved_search_categories
+  def saved_search_labels
     if CurrentUser.user.id == user.id
-      user.unique_saved_search_categories
+      SavedSearch.labels_for(CurrentUser.user.id)
     else
       []
     end

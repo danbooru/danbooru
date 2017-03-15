@@ -8,12 +8,11 @@
       <%= hidden_field_tag "saved_search_tags", params[:tags] %>
 
       <div class="input">
-        <label>
-          <%= text_field_tag "saved_search_category", "", :placeholder => "Category" %>
-        </label>
+        <label for="saved_search_labels">Label</label>
+        <%= text_field_tag "saved_search_labels", "" %>
       </div>
 
-      <p><label><%= check_box_tag "saved_search_disable_categories" %> Disable categorization</label></p>
+      <p><label><%= check_box_tag "saved_search_disable_labels" %> Disable labels</label></p>
     <% end %>
   </div>
 <% end %>

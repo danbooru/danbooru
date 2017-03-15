@@ -235,10 +235,9 @@ Rails.application.routes.draw do
   post "reports/post_versions_create" => "reports#post_versions_create"
   resources :saved_searches, :except => [:show] do
     collection do
-      get :categories
+      get :labels
     end
   end
-  resource :saved_search_category_change, :only => [:new, :create]
   resource :session do
     collection do
       get :sign_out

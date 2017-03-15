@@ -7,10 +7,6 @@
       <li><%= link_to "Manage subscriptions", tag_subscriptions_path %></li>
     <% end %>
 
-    <% if @post_set.is_saved_search? %>
-      <li><%= link_to "Manage saved searches", saved_searches_path %></li>
-    <% end %>
-
     <li><%= link_to "Random post", random_posts_path(:tags => params[:tags]), :id => "random-post", :rel => "nofollow" %></li>
 
     <li><%= link_to "Mobile version", mobile_posts_path(:tags => params[:tags]) %></li>

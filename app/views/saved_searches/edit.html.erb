@@ -5,9 +5,9 @@
     <%= error_messages_for :saved_search %>
 
     <%= simple_form_for(@saved_search) do |f| %>
-      <%= f.input :tag_query %>
-      <%= f.input :category %>
-      <%= f.button :submit, :data => { :disable_with => "Submitting..." } %>
+      <%= f.input :query %>
+      <%= f.input :label_string, :label => "Labels", :hint => "A list of tags to help categorize this search. Space delimited." %>
+      <%= f.button :submit, :value => "Submit", :data => { :disable_with => "Submitting..." } %>
     <% end %>
   </div>
 </div>

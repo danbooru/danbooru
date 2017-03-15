@@ -1,6 +1,4 @@
 class SavedSearch < ActiveRecord::Base
-  UNCATEGORIZED_NAME = "uncategorized"
-
   module ListbooruMethods
     extend ActiveSupport::Concern
 
@@ -17,140 +15,72 @@ class SavedSearch < ActiveRecord::Base
         SqsService.new(Danbooru.config.aws_sqs_saved_search_url)
       end
 
-      def refresh_listbooru(user_id)
-        return false unless enabled?
-
-        sqs_service.send_message("refresh\n#{user_id}")
-      end
-
-      def reset_listbooru(user_id)
-        return false unless enabled?
-
-        user = User.find(user_id)
-
-        sqs_service.send_message("delete\n#{user_id}\nall\n")
-
-        user.saved_searches.each do |saved_search|
-          sqs_service.send_message("create\n#{user_id}\n#{saved_search.category}\n#{saved_search.tag_query}", :delay_seconds => 30)
-        end
-
-        true
-      end
-
-      def rename_listbooru(user_id, old_category, new_category)
-        return false unless enabled?
-
-        sqs_service.send_message("rename\n#{user_id}\n#{old_category}\n#{new_category}\n")
-
-        true
-      end
-
-      def post_ids(user_id, name = nil)
+      def post_ids(user_id, label = nil)
         return [] unless enabled?
+        label = normalize_label(label) if label
 
-        if name
-          hash_name = Cache.hash(name)
-        else
-          hash_name = nil
-        end
-
-        body = Cache.get("ss-pids-#{user_id}-#{hash_name}", 60) do
-          params = {
+        Cache.get("ss-#{user_id}-#{Cache.hash(label)}", 60) do
+          queries = SavedSearch.queries_for(user_id, label)
+          json = {
             "key" => Danbooru.config.listbooru_auth_key,
-            "user_id" => user_id
-          }
+            "queries" => queries
+          }.to_json
 
-          if name == UNCATEGORIZED_NAME
-            params["name"] = nil
-          elsif name.present?
-            params["name"] = name
-          end
+          uri = URI.parse("#{Danbooru.config.listbooru_server}/v2/search")
 
-          uri = URI.parse("#{Danbooru.config.listbooru_server}/users")
-          uri.query = URI.encode_www_form(params)
-
-          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.is_a?(URI::HTTPS)) do |http|
-            resp = http.request_get(uri.request_uri)
+          body = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.is_a?(URI::HTTPS)) do |http|
+            resp = http.request_post(uri.request_uri, json)
             if resp.is_a?(Net::HTTPSuccess)
               resp.body
             else
               raise "HTTP error code: #{resp.code} #{resp.message}"
             end
           end
+
+          body.to_s.scan(/\d+/).map(&:to_i)
         end
-
-        body.to_s.scan(/\d+/).map(&:to_i)
       end
-    end
-
-    def update_listbooru_on_create
-      return unless SavedSearch.enabled?
-      return unless user.is_gold?
-
-      SavedSearch.sqs_service.send_message("create\n#{user_id}\n#{category}\n#{tag_query}")
-    end
-
-    def update_listbooru_on_destroy
-      return unless SavedSearch.enabled?
-
-      SavedSearch.sqs_service.send_message("delete\n#{user_id}\n#{category}\n#{tag_query}")
-    end
-
-    def update_listbooru_on_update
-      return unless SavedSearch.enabled?
-      return unless user.is_gold?
-
-      SavedSearch.sqs_service.send_message("update\n#{user_id}\n#{category_was}\n#{tag_query_was}\n#{category}\n#{tag_query}")
     end
   end
 
   include ListbooruMethods
 
   belongs_to :user
-  validates :tag_query, :presence => true
+  validates :query, :presence => true
   validate :validate_count
-  attr_accessible :tag_query, :category
+  attr_accessible :query, :label_string
   before_create :update_user_on_create
-  before_update :update_listbooru_on_update
   after_destroy :update_user_on_destroy
-  after_create :update_listbooru_on_create
-  after_destroy :update_listbooru_on_destroy
-  validates_uniqueness_of :tag_query, :scope => :user_id
+  after_save {|rec| Cache.delete(SavedSearch.cache_key(rec.user_id))}
+  after_destroy {|rec| Cache.delete(SavedSearch.cache_key(rec.user_id))}
   before_validation :normalize
+  scope :labeled, lambda {|label| where("labels @> string_to_array(?, '~~~~')", label)}
 
-  def self.tagged(tags)
-    where(:tag_query => normalize(tags)).first
+  def self.normalize_label(label)
+    label.strip.downcase.gsub(/[[:space:]]/, "_")
   end
 
-  def self.normalize(tag_query)
-    Tag.scan_query(tag_query).join(" ")
+  def self.labels_for(user_id)
+    Cache.get(cache_key(user_id)) do
+      SavedSearch.where(user_id: user_id).order("label").pluck("distinct unnest(labels) as label")
+    end
   end
 
-  def self.normalize_category(category)
-    category.to_s.strip.gsub(/\s+/, "_").downcase
+  def self.cache_key(user_id)
+    "ss-labels-#{user_id}"
   end
 
-  def self.rename(user_id, old_category, new_category)
-    user = User.find(user_id)
-    old_category = normalize_category(old_category)
-    new_category = normalize_category(new_category)
-    user.saved_searches.where(category: old_category).update_all(category: new_category)
-    rename_listbooru(user_id, old_category, new_category)
-  end
-
-  def self.categories_for(user)
-    user.saved_searches.pluck("distinct category").map do |x|
-      if x.blank?
-        SavedSearch::UNCATEGORIZED_NAME
-      else
-        x
-      end
+  def self.queries_for(user_id, label = nil, options = {})
+    if label
+      SavedSearch.where(user_id: user_id).labeled(label).pluck("distinct query")
+    else
+      SavedSearch.where(user_id: user_id).pluck("distinct query")
     end
   end
 
   def normalize
-    self.category = SavedSearch.normalize_category(category) if category
-    self.tag_query = SavedSearch.normalize(tag_query)
+    self.query = query_array.sort.join(" ")
+    self.labels = labels.map {|x| SavedSearch.normalize_label(x)}.reject {|x| x.blank?}
   end
 
   def validate_count
@@ -171,7 +101,15 @@ class SavedSearch < ActiveRecord::Base
     end
   end
 
-  def tag_query_array
-    Tag.scan_tags(tag_query)
+  def query_array
+    Tag.scan_tags(query)
+  end
+
+  def label_string
+    labels.join(" ")
+  end
+
+  def label_string=(val)
+    self.labels = val.scan(/\S+/).map {|x| SavedSearch.normalize_label(x)}
   end
 end

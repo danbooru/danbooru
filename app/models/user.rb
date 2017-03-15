@@ -849,24 +849,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  module SavedSearchMethods
-    def unique_saved_search_categories
-      if SavedSearch.enabled?
-        categories = saved_searches.pluck(:category)
-        
-        if categories.any? {|x| x.blank?}
-          categories.reject! {|x| x.blank?}
-          categories.unshift(SavedSearch::UNCATEGORIZED_NAME)
-        end
-        
-        categories.uniq!
-        categories
-      else
-        []
-      end
-    end
-  end
-
   module SockPuppetMethods
     def notify_sock_puppets
       sock_puppet_suspects.each do |user|
@@ -895,7 +877,6 @@ class User < ActiveRecord::Base
   include CountMethods
   extend SearchMethods
   include StatisticsMethods
-  include SavedSearchMethods
 
   def initialize_default_image_size
     self.default_image_size = "large"

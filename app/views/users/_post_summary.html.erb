@@ -30,30 +30,17 @@
   </div>
 <% end %>
 
-<% presenter.subscriptions.each do |subscription| %>
-  <div class="box user-subscription" data-name="<%= subscription.name %>">
-    <h2>
-      Subscription: <%= link_to subscription.pretty_name, posts_path(:tags => "sub:#{user.name}:#{subscription.name}") %>
-    </h2>
-
-    <div class="box">
-      <% presenter.posts_for_subscription(subscription).each do |post| %>
-        <%= PostPresenter.preview(post, :tags => "sub:#{user.name}:#{subscription.name}") %>
-      <% end %>
-    </div>
-  </div>
-<% end %>
-
 <% if CurrentUser.user.id == @user.id && @user.has_saved_searches? && @user.is_gold? %>
-  <% presenter.saved_search_categories.each do |category| %>
-    <div class="box user-saved-search" data-category="<%= category %>">
+  <% presenter.saved_search_labels.each do |label| %>
+    <div class="box user-saved-search" data-label="<%= label %>">
       <h2>
-        Saved Search: <%= link_to category, posts_path(:tags => "search:#{category}") %>
+        Saved Search: <%= link_to label, posts_path(:tags => "search:#{label}") %>
+        (<%= link_to "manage", saved_searches_path(label: label) %>)
       </h2>
 
       <div class="box">
-        <% presenter.posts_for_saved_search_category(category).each do |post| %>
-          <%= PostPresenter.preview(post, :tags => "search:#{category}") %>
+        <% presenter.posts_for_saved_search_category(label).each do |post| %>
+          <%= PostPresenter.preview(post, :tags => "search:#{label}") %>
         <% end %>
       </div>
     </div>

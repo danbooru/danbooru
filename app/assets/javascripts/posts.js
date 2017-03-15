@@ -540,18 +540,20 @@
   }
 
   Danbooru.Post.initialize_saved_searches = function() {
-    $("#saved_search_category").autocomplete({
-      minLength: 1,
+    $("#saved_search_labels").autocomplete({
+      minLength: 2,
       source: function(req, resp) {
         $.ajax({
-          url: "/saved_searches/categories.json",
+          url: "/saved_searches/labels.json",
+          data: {
+            label: req.term
+          },
           method: "get",
           success: function(data) {
             resp($.map(data, function(saved_search) {
-              var category = saved_search.category === null ? "uncategorized" : saved_search.category;
               return {
-                label: category,
-                value: category
+                label: saved_search.replace(/_/g, " "),
+                value: saved_search
               };
             }));
           }
@@ -575,7 +577,7 @@
     });
 
     $("#save-search").click(function() {
-      if (Danbooru.meta("disable-categorized-saved-searches") === "false") {
+      if (Danbooru.meta("disable-labeled-saved-searches") === "false") {
         $("#save-search-dialog").dialog("open");
       } else {
         $.post(
