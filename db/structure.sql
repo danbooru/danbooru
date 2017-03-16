@@ -2762,43 +2762,6 @@ CREATE UNLOGGED TABLE post_updates (
 
 
 --
--- Name: post_versions; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE post_versions (
-    id integer NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    post_id integer NOT NULL,
-    tags text DEFAULT ''::text NOT NULL,
-    rating character(1),
-    parent_id integer,
-    source text,
-    updater_id integer NOT NULL,
-    updater_ip_addr inet NOT NULL
-);
-
-
---
--- Name: post_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE post_versions_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: post_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE post_versions_id_seq OWNED BY post_versions.id;
-
-
---
 -- Name: post_votes; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4384,13 +4347,6 @@ ALTER TABLE ONLY post_flags ALTER COLUMN id SET DEFAULT nextval('post_flags_id_s
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY post_versions ALTER COLUMN id SET DEFAULT nextval('post_versions_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE ONLY post_votes ALTER COLUMN id SET DEFAULT nextval('post_votes_id_seq'::regclass);
 
 
@@ -4794,14 +4750,6 @@ ALTER TABLE ONLY post_disapprovals
 
 ALTER TABLE ONLY post_flags
     ADD CONSTRAINT post_flags_pkey PRIMARY KEY (id);
-
-
---
--- Name: post_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY post_versions
-    ADD CONSTRAINT post_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -6913,34 +6861,6 @@ CREATE INDEX index_post_flags_on_post_id ON post_flags USING btree (post_id);
 
 
 --
--- Name: index_post_versions_on_post_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_post_versions_on_post_id ON post_versions USING btree (post_id);
-
-
---
--- Name: index_post_versions_on_updated_at_and_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_post_versions_on_updated_at_and_id ON post_versions USING btree (updated_at, id);
-
-
---
--- Name: index_post_versions_on_updater_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_post_versions_on_updater_id ON post_versions USING btree (updater_id);
-
-
---
--- Name: index_post_versions_on_updater_ip_addr; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_post_versions_on_updater_ip_addr ON post_versions USING btree (updater_ip_addr);
-
-
---
 -- Name: index_post_votes_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7609,4 +7529,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170302014435');
 INSERT INTO schema_migrations (version) VALUES ('20170314204631');
 
 INSERT INTO schema_migrations (version) VALUES ('20170314235626');
+
+INSERT INTO schema_migrations (version) VALUES ('20170316224630');
 
