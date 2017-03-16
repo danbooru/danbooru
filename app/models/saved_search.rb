@@ -57,7 +57,7 @@ class SavedSearch < ActiveRecord::Base
   scope :labeled, lambda {|label| where("labels @> string_to_array(?, '~~~~')", label)}
 
   def self.normalize_label(label)
-    label.strip.downcase.gsub(/[[:space:]]/, "_")
+    label.to_s.strip.downcase.gsub(/[[:space:]]/, "_")
   end
 
   def self.labels_for(user_id)
