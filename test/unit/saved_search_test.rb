@@ -10,6 +10,36 @@ class SavedSearchTest < ActiveSupport::TestCase
     mock_saved_search_service!
   end
 
+  context ".labels_for" do
+    setup do
+      @user = FactoryGirl.create(:user)
+      FactoryGirl.create(:saved_search, user: @user, label_string: "blah", query: "blah")
+      FactoryGirl.create(:saved_search, user: @user, label_string: "zah", query: "blah")
+    end
+
+    should "fetch the labels used by a user" do
+      assert_equal(%w(blah zah), SavedSearch.labels_for(@user.id))
+    end
+
+    should "expire when a search is updated" do
+      Cache.expects(:delete).once
+      FactoryGirl.create(:saved_search, user: @user, query: "blah")
+    end
+  end
+
+  context ".queries_for" do
+    setup do
+      @user = FactoryGirl.create(:user)
+      FactoryGirl.create(:saved_search, user: @user, label_string: "blah", query: "aaa")
+      FactoryGirl.create(:saved_search, user: @user, label_string: "zah", query: "bbb")
+    end
+
+    should "fetch the queries used by a user for a label" do
+      assert_equal(%w(aaa), SavedSearch.queries_for(@user.id, "blah"))
+      assert_equal(%w(aaa bbb), SavedSearch.queries_for(@user.id))
+    end
+  end
+
   context "Fetching the post ids for a search" do
     setup do
       MEMCACHE.expects(:get).returns(nil)
