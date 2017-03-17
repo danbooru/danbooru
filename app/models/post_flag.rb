@@ -97,6 +97,8 @@ class PostFlag < ActiveRecord::Base
   def validate_creator_is_not_limited
     if CurrentUser.can_approve_posts?
       # do nothing
+    elsif User.system.present? && CurrentUser.id == User.system.id
+      # do nothing
     elsif creator.created_at > 1.week.ago
       errors[:creator] << "cannot flag within the first week of sign up"
     elsif creator.is_gold? && flag_count_for_creator >= 10
