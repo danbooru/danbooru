@@ -28,7 +28,6 @@ class UserPromotion
 
     create_user_feedback unless options[:skip_feedback]
     create_dmail unless options[:skip_dmail]
-    update_saved_searches
     create_mod_actions
 
     user.save
@@ -97,17 +96,5 @@ private
       :body => build_messages,
       :disable_dmail_notification => true
     )
-  end
-
-  def update_saved_searches
-    if user.is_gold?
-      user.saved_searches.each do |ss|
-        ss.update_listbooru_on_create
-      end
-    else
-      user.saved_searches.each do |ss|
-        ss.update_listbooru_on_destroy
-      end
-    end
   end
 end
