@@ -9,6 +9,18 @@
     </div>
   <% end %>
 
+  <% if post_set.hidden_posts.present? %>
+    <div class="tn hidden-posts-notice">
+      <% if post_set.banned_posts.present? %>
+        <%= post_set.banned_posts.size %> post(s) were removed from this page at the artist's request (<%= link_to "learn more", wiki_pages_path(title: "banned_artist") %>).
+      <% end %>
+
+      <% if post_set.censored_posts.present? %>
+        <%= post_set.censored_posts.size %> post(s) on this page require a <%= link_to "Gold account", new_user_upgrade_path %> to view (<%= link_to "learn more", wiki_pages_path(title: "help:censored_tags") %>).
+      <% end %>
+    </div>
+  <% end %>
+
   <% unless @random.present? %>
     <%= numbered_paginator(post_set.posts) %>
   <% end %>
