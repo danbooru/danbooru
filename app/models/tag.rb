@@ -103,8 +103,9 @@ class Tag < ActiveRecord::Base
 
       def categories_for(tag_names, options = {})
         if options[:disable_caching]
-          Array(tag_names).map do |tag|
-            select_category_for(tag)
+          Array(tag_names).inject({}) do |hash, tag_name|
+            hash[tag_name] = select_category_for(tag_name)
+            hash
           end
         else
           Cache.get_multi(Array(tag_names), "tc") do |tag|
