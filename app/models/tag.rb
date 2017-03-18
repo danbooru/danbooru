@@ -102,9 +102,8 @@ class Tag < ActiveRecord::Base
       end
 
       def categories_for(tag_names, options = {})
-        Array(tag_names).inject({}) do |hash, tag_name|
-          hash[tag_name] = category_for(tag_name, options)
-          hash
+        categories = Cache.get_multi(Array(tag_names), "tc") do |tag|
+          Tag.select_category_for(tag)
         end
       end
     end

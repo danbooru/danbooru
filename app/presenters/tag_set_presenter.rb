@@ -68,7 +68,7 @@ class TagSetPresenter < Presenter
   def inline_tag_list(template)
     @tags.map do |tag_name|
       <<-EOS
-        <span class="category-#{Tag.category_for(tag_name)}">
+        <span class="category-#{categories[tag_name]}">
           #{template.link_to(tag_name.tr("_", " "), template.posts_path(tags: tag_name))}
         </span>
       EOS
