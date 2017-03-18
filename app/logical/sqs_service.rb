@@ -5,8 +5,12 @@ class SqsService
     @url = url
   end
 
+  def enabled?
+    Danbooru.config.aws_sqs_enabled? && credentials.set? && url.present?
+  end
+
   def send_message(string, options = {})
-    return unless Danbooru.config.aws_sqs_enabled?
+    return unless enabled?
 
     sqs.send_message(
       options.merge(
@@ -18,16 +22,17 @@ class SqsService
 
 private
 
+  def credentials
+    @credentials ||= Aws::Credentials.new(
+      Danbooru.config.aws_access_key_id,
+      Danbooru.config.aws_secret_access_key
+    )
+  end
+
   def sqs
-    @sqs ||= begin
-      credentials = Aws::Credentials.new(
-        Danbooru.config.aws_access_key_id,
-        Danbooru.config.aws_secret_access_key
-      )
-      Aws::SQS::Client.new(
-        credentials: credentials,
-        region: Danbooru.config.aws_sqs_region
-      )
-    end
+    @sqs ||= Aws::SQS::Client.new(
+      credentials: credentials,
+      region: Danbooru.config.aws_sqs_region
+    )
   end
 end
