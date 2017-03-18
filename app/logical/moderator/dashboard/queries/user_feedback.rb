@@ -3,7 +3,7 @@ module Moderator
     module Queries
       class UserFeedback
         def self.all
-          ::UserFeedback.order("id desc").limit(10)
+          ::UserFeedback.includes(:user).order("id desc").limit(10)
         end
       end
     end

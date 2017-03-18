@@ -1,9 +1,7 @@
 module Moderator
   module Dashboard
     module Queries
-      class Tag
-        attr_reader :user, :count
-
+      class Tag < ::Struct.new(:user, :count)
         def self.all(min_date, max_level)
           return [] unless PostArchive.enabled?
 
@@ -12,10 +10,6 @@ module Moderator
           end
 
           records.select { |rec| rec.user.level <= max_level }.sort_by(&:count).reverse.take(10)
-        end
-
-        def initialize(user, count)
-          @user, @count = user, count
         end
       end
     end
