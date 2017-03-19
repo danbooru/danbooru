@@ -12,7 +12,7 @@
   <tbody>
     <% @dashboard.appeals.each do |post| %>
       <tr>
-        <td><%= link_to image_tag(post.preview_file_url), post_path(post) %></td>
+        <td><%= PostPresenter.preview(post, show_deleted: true) %></td>
         <td><%= mod_link_to_user post.uploader, :negative %></td>
         <td><%= post_flag_reasons(post) %></td>
         <td><%= post_appeal_reasons(post) %></td>
