@@ -45,7 +45,7 @@ module Moderator
       end
 
       def tags
-        ActiveRecord::Base.without_timeout do
+        PostArchive.without_timeout do
           Queries::Tag.all(min_date, max_level)
         end
       end
