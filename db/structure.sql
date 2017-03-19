@@ -4978,6 +4978,13 @@ CREATE INDEX index_artist_versions_on_artist_id ON artist_versions USING btree (
 
 
 --
+-- Name: index_artist_versions_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_artist_versions_on_created_at ON artist_versions USING btree (created_at);
+
+
+--
 -- Name: index_artist_versions_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6707,6 +6714,13 @@ CREATE INDEX index_news_updates_on_created_at ON news_updates USING btree (creat
 
 
 --
+-- Name: index_note_versions_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_note_versions_on_created_at ON note_versions USING btree (created_at);
+
+
+--
 -- Name: index_note_versions_on_note_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6788,6 +6802,13 @@ CREATE INDEX index_pools_on_name ON pools USING btree (name);
 --
 
 CREATE INDEX index_pools_on_name_trgm ON pools USING gin (name gin_trgm_ops);
+
+
+--
+-- Name: index_post_appeals_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_appeals_on_created_at ON post_appeals USING btree (created_at);
 
 
 --
@@ -7145,6 +7166,13 @@ CREATE UNIQUE INDEX index_users_on_name ON users USING btree (lower((name)::text
 --
 
 CREATE INDEX index_users_on_name_trgm ON users USING gin (lower((name)::text) gin_trgm_ops);
+
+
+--
+-- Name: index_wiki_page_versions_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_wiki_page_versions_on_created_at ON wiki_page_versions USING btree (created_at);
 
 
 --
@@ -7532,3 +7560,4 @@ INSERT INTO schema_migrations (version) VALUES ('20170314235626');
 
 INSERT INTO schema_migrations (version) VALUES ('20170316224630');
 
+INSERT INTO schema_migrations (version) VALUES ('20170319000519');
