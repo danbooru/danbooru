@@ -56,7 +56,7 @@ module Sources
       WikiPage.other_names_match(untranslated_tags).map{|wiki_page| [wiki_page.title, wiki_page.category_name]}
     end
 
-    def to_json
+    def to_h
       return {
         :artist_name => artist_name,
         :profile_url => profile_url,
@@ -71,7 +71,7 @@ module Sources
           :title => artist_commentary_title,
           :description => artist_commentary_desc,
         }
-      }.to_json
+      }
     end
 
     def available?
