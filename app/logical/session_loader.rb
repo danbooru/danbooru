@@ -106,19 +106,12 @@ private
     return if CurrentUser.is_anonymous?
     return if CurrentUser.last_logged_in_at && CurrentUser.last_logged_in_at > 1.week.ago
     CurrentUser.user.update_attribute(:last_logged_in_at, Time.now)
-    refresh_listbooru
   end
 
   def update_last_ip_addr
     return if CurrentUser.is_anonymous?
     return if CurrentUser.user.last_ip_addr == @request.remote_ip
     CurrentUser.user.update_attribute(:last_ip_addr, @request.remote_ip)
-  end
-
-  def refresh_listbooru
-    if CurrentUser.is_gold? && CurrentUser.has_saved_searches? && Danbooru.config.listbooru_server && CurrentUser.is_gold?
-      SavedSearch.refresh_listbooru(CurrentUser.id)
-    end
   end
 
   def set_time_zone
