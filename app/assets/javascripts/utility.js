@@ -120,6 +120,15 @@
     }
   };
 
+  Danbooru.sorttable = function(table) {
+    table.stupidtable();
+    table.bind("aftertablesort", function(event, data) {
+      $("#c-saved-searches table tbody tr").removeClass("even odd");
+      $("#c-saved-searches table tbody tr:even").addClass("even");
+      $("#c-saved-searches table tbody tr:odd").addClass("odd");
+    });
+  };
+
   String.prototype.hash = function() {
     var hash = 5381, i = this.length;
 
