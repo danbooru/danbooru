@@ -36,6 +36,13 @@
             <li id="comment-vote-up-link-for-<%= comment.id %>"><%= link_to "Vote up", comment_votes_path(:comment_id => comment.id, :score => "up"), :method => :post, :remote => true %></li>
             <li id="comment-vote-down-link-for-<%= comment.id %>"><%= link_to "Vote down", comment_votes_path(:comment_id => comment.id, :score => "down"), :method => :post, :remote => true %></li>
             <li id="comment-unvote-link-for-<%= comment.id %>" class="unvote-comment-link"><%= link_to "Unvote", comment_votes_path(:comment_id => comment.id), :method => :delete, :remote => true %></li>
+            <% if CurrentUser.is_moderator? %>
+              <li>|</li>
+              <li>
+                <strong>IP</strong>
+                <span><%= link_to_ip comment.ip_addr %></span>
+              </li>
+            <% end %>
           <% end %>
         </menu>
         <% if comment.editable_by?(CurrentUser.user) %>
