@@ -77,6 +77,18 @@ module PostSets
       posts.any? {|x| x.rating == "e"}
     end
 
+    def hidden_posts
+      posts.select { |p| !p.visible? }
+    end
+
+    def banned_posts
+      posts.select(&:is_banned?)
+    end
+
+    def censored_posts
+      hidden_posts - banned_posts
+    end
+
     def use_sequential_paginator?
       unknown_post_count? && !CurrentUser.is_gold?
     end
