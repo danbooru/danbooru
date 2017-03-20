@@ -18,7 +18,7 @@
     <%= submit_tag "+", "data-jq-dropdown" => "#search-dropdown" %>
     <div id="search-dropdown" class="jq-dropdown jq-dropdown-tip">
       <ul class="jq-dropdown-menu">
-        <% if params[:tags].present? && SavedSearch.enabled? && CurrentUser.show_saved_searches? %>
+        <% if SavedSearch.enabled? && CurrentUser.show_saved_searches? %>
           <li><%= link_to "Save search", saved_searches_path, :id => "save-search" %></li>
         <% end %>
 
