@@ -110,6 +110,6 @@ class SavedSearch < ActiveRecord::Base
   end
 
   def label_string=(val)
-    self.labels = val.scan(/\S+/).map {|x| SavedSearch.normalize_label(x)}
+    self.labels = val.to_s.scan(/\S+/).map {|x| SavedSearch.normalize_label(x)}
   end
 end

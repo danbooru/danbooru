@@ -576,7 +576,7 @@
       }
     });
 
-    $("#save-search").click(function() {
+    $("#save-search").click(function(e) {
       if (Danbooru.meta("disable-labeled-saved-searches") === "false") {
         $("#save-search-dialog").dialog("open");
       } else {
@@ -587,6 +587,18 @@
           }
         );
       }
+
+      e.preventDefault();
+    });
+
+    $("#search-dropdown #wiki-search").click(function(e) {
+      window.location.href = "/wiki_pages?search%5Btitle%5D=" + encodeURIComponent($("#tags").val());
+      e.preventDefault();
+    });
+
+    $("#search-dropdown #artist-search").click(function(e) {
+      window.location.href = "/artists?search%5Bname%5D=" + encodeURIComponent($("#tags").val());
+      e.preventDefault();
     });
   }
 })();

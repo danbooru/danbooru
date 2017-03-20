@@ -26,6 +26,6 @@ class PopularSearchService
         end
       end
       response
-    end.force_encoding("utf-8")
+    end.to_s.force_encoding("utf-8")
   end
 end

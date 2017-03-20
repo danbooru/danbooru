@@ -4,6 +4,7 @@
 //= require jquery.timeout.js
 //= require jquery-ui-autocomplete-custom.js
 //= require jquery.storageapi.js
+//= require jquery.dropdown.min.js
 //= require ugoira_player.js
 //= require stupidtable.js
 //= require rails.js
