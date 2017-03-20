@@ -45,9 +45,7 @@ module Moderator
       end
 
       def tags
-        PostArchive.without_timeout do
-          Queries::Tag.all(min_date, max_level)
-        end
+        Queries::Tag.all(min_date, max_level)
       end
 
       def posts
