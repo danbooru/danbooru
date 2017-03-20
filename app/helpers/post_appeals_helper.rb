@@ -6,10 +6,14 @@ module PostAppealsHelper
     post.appeals.each do |appeal|
       reason = DText.parse_inline(appeal.reason).html_safe
       user = link_to_user(appeal.creator)
-      ip = link_to_ip(appeal.creator_ip_addr)
+      if CurrentUser.is_moderator?
+        ip = "(#{link_to_ip(appeal.creator_ip_addr)})"
+      else
+        ip = ""
+      end
       time = time_ago_in_words_tagged(appeal.created_at)
 
-      html << "<li>#{reason} - #{user} (#{ip}) #{time}</li>"
+      html << "<li>#{reason} - #{user} #{ip} #{time}</li>"
     end
 
     html << '</ul>'
