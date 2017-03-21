@@ -23,11 +23,13 @@
       <div class="input" id="added-tags-input">
         <label>Added Tags</label>
         <%= text_field :constraints, :added_tags, :value => @constraints[:added_tags] %>
+        <p class="hint">You must specify a user to add tags</p>
       </div>
 
       <div class="input" id="removed-tags-input">
         <label>Removed Tags</label>
         <%= text_field :constraints, :removed_tags, :value => @constraints[:removed_tags] %>
+        <p class="hint">You must specify a user to add tags</p>
       </div>
 
       <%= submit_tag "Test" %>
@@ -78,18 +80,18 @@
 <% content_for(:html_header) do %>
   <%= javascript_tag do %>
     $(function() {
-      if ($("#constraints_user_name").val().length === 0) {
-        $("#added-tags-input").hide();
-        $("#removed-tags-input").hide();
+      if (!$("#constraints_user_name").val().length) {
+        $("#added-tags-input input").prop("disabled", true);
+        $("#removed-tags-input input").prop("disabled", true);
       }
 
       $("#constraints_user_name").keyup(function() {
-        if ($("#constraints_user_name").val().length > 0) {
-          $("#added-tags-input").show();
-          $("#removed-tags-input").show();
+        if ($("#constraints_user_name").val().length) {
+          $("#added-tags-input input").prop("disabled", false);
+          $("#removed-tags-input input").prop("disabled", false);
         } else {
-          $("#added-tags-input").hide();
-          $("#removed-tags-input").hide();          
+          $("#added-tags-input input").prop("disabled", true);
+          $("#removed-tags-input input").prop("disabled", true);
         }
       });
     });
