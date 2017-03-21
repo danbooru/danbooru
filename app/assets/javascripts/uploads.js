@@ -107,32 +107,27 @@
     $("#source-info ul").show();
   }
 
+  Danbooru.Upload.update_scale = function() {
+    var $image = $("#image");
+    var ratio = $image.data("scale-factor");
+    if (ratio < 1) {
+      $("#scale").html("Scaled " + parseInt(100 * ratio) + "% (original: " + $image.data("original-width") + "x" + $image.data("original-height") + ")");
+    } else {
+      $("#scale").html("Original: " + $image.data("original-width") + "x" + $image.data("original-height"));
+    }
+  }
+
   Danbooru.Upload.initialize_image = function() {
     var $image = $("#image");
     if ($image.length) {
-      var height = $image.height();
       var width = $image.width();
-      if (height > 400) {
-        var ratio = 400.0 / height;
-        $image.height(height * ratio);
-        $image.width(width * ratio);
-        $("#scale").html("Scaled " + parseInt(100 * ratio) + "% (original: " + width + "x" + height + ")");
-        $image.resizable({
-          maxHeight: height,
-          maxWidth: width,
-          aspectRatio: width/height,
-          handles: "e, s, se",
-          resize: function( event, ui ){
-            var origin_width = ui.element.resizable("option","maxWidth");
-            var origin_height = ui.element.resizable("option","maxHeight");
-            var height = ui.size.height;
-            var ratio = height/origin_height;
-            $("#scale").html("Scaled " + parseInt(100 * ratio) + "% (original: " + origin_width + "x" + origin_height + ")");
-          }
-        });
-      } else {
-        $("#scale").html("(original: " + width + "x" + height + ")");
-      }
+      var height = $image.height();
+      $image.data("original-width", width);
+      $image.data("original-height", height);
+      Danbooru.Post.resize_image_to_window($image);
+      Danbooru.Post.initialize_post_image_resize_to_window_link();
+      Danbooru.Upload.update_scale();
+      $("#image-resize-to-window-link").click(Danbooru.Upload.update_scale);
     }
   }
 })();
