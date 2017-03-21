@@ -5,7 +5,7 @@ module Moderator
         attr_reader :user, :count
 
         def self.all(min_date, max_level)
-          return unless PostArchive.enabled?
+          return [] unless PostArchive.enabled?
 
           records = PostArchive.where("updated_at > ?", min_date).group(:updater).count.map do |user, count|
             new(user, count)
