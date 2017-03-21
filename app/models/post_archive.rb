@@ -145,7 +145,9 @@ class PostArchive < ActiveRecord::Base
     latest_tags << "source:#{post.source}" if post.source.present?
 
     if parent_changed
-      delta[:added_tags] << "parent:#{parent_id}"
+      if parent_id.present?
+        delta[:added_tags] << "parent:#{parent_id}"
+      end
 
       if previous
         delta[:removed_tags] << "parent:#{previous.parent_id}"
@@ -161,7 +163,9 @@ class PostArchive < ActiveRecord::Base
     end
 
     if source_changed
-      delta[:added_tags] << "source:#{source}"
+      if source.present?
+        delta[:added_tags] << "source:#{source}"
+      end
 
       if previous
         delta[:removed_tags] << "source:#{previous.source}"
