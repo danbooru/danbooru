@@ -25,6 +25,11 @@ class PostEventsControllerTest < ActionController::TestCase
       get :index, {:post_id => @post.id}, {:user_id => CurrentUser.user.id}
       assert_response :ok      
     end
+
+    should "render for mods" do
+      get :index, {:post_id => @post.id}, {:user_id => FactoryGirl.create(:moderator_user).id }
+      assert_response :success
+    end
   end
 
   context "GET /posts/:post_id/events.xml" do
