@@ -88,7 +88,7 @@ class PostPresenter < Presenter
       data-file-url="#{post.file_url}"
       data-large-file-url="#{post.large_file_url}"
       data-preview-file-url="#{post.preview_file_url}"
-      data-source="#{h(post.source}"
+      data-source="#{h(post.source)}"
       data-normalized-source="#{h(post.normalized_source)}"
     }.html_safe
   end
