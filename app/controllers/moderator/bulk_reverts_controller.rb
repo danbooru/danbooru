@@ -15,7 +15,7 @@ module Moderator
         @bulk_revert.preview
         render action: "new"
       else
-        BulkRevert.delay(:queue => "default").process(@constraints)
+        @bulk_revert.delay(:queue => "default").process(@constraints)
         flash[:notice] = "Reverts queued"
         redirect_to new_bulk_revert_path
       end
