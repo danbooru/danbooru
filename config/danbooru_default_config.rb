@@ -35,6 +35,10 @@ module Danbooru
       User.find_by_name("DanbooruBot") || User.admins.first
     end
 
+    def upload_feedback_topic
+      ForumTopic.where(title: "Upload Feedback Thread").first
+    end
+
     def upgrade_account_email
       contact_email
     end

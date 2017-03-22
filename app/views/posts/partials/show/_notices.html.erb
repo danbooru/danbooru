@@ -22,6 +22,10 @@
     <% end %>
 
     <%= render "post_disapprovals/counts", :disapprovals => post.disapprovals, :post => post %>
+
+    <% if CurrentUser.id == post.uploader_id %>
+      <p>If you don't understand why your uploads keep getting deleted, you should ask on the <%= link_to "forum", forum_topic_path(Danbooru.config.upload_feedback_topic) %> for advice.</p>
+    <% end %>
   </div>
 <% end %>
 

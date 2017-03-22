@@ -1733,7 +1733,6 @@ class Post < ActiveRecord::Base
 
   BOOLEAN_ATTRIBUTES = %w(
     has_embedded_notes
-    cdn_hosted
   )
   has_bit_flags BOOLEAN_ATTRIBUTES
 
