@@ -10,13 +10,13 @@
     </tr>
   </thead>
   <tbody>
-    <% @dashboard.appeals.each do |appeal| %>
+    <% @dashboard.appeals.each do |post| %>
       <tr>
-        <td><%= link_to image_tag(appeal.post.preview_file_url), post_path(appeal.post) %></td>
-        <td><%= mod_link_to_user appeal.post.uploader, :negative %></td>
-        <td><%= post_flag_reasons(appeal.post) %></td>
-        <td><%= post_appeal_reasons(appeal.post) %></td>
-        <td><%= appeal.post.score %></td>
+        <td><%= PostPresenter.preview(post, show_deleted: true) %></td>
+        <td><%= mod_link_to_user post.uploader, :negative %></td>
+        <td><%= post_flag_reasons(post) %></td>
+        <td><%= post_appeal_reasons(post) %></td>
+        <td><%= post.score %></td>
       </tr>
     <% end %>
   </tbody>

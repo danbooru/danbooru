@@ -1,31 +1,18 @@
 module Moderator
   module Dashboard
     module Queries
-      class Comment
-        attr_reader :comment, :count
-
+      class Comment < ::Struct.new(:comment, :count)
         def self.all(min_date, max_level)
-          sql = <<-EOS
-            SELECT comment_votes.comment_id, count(*)
-            FROM comment_votes
-            JOIN comments ON comments.id = comment_id
-            JOIN users ON users.id = comments.creator_id
-            WHERE
-              comment_votes.created_at > ?
-              AND comments.score < 0
-              AND users.level <= ?
-            GROUP BY comment_votes.comment_id
-            HAVING count(*) >= 3
-            ORDER BY count(*) DESC
-            LIMIT 10
-          EOS
-
-          ActiveRecord::Base.select_all_sql(sql, min_date, max_level).map {|x| new(x)}
-        end
-
-        def initialize(hash)
-          @comment = ::Comment.find(hash["comment_id"])
-          @count = hash["count"]
+          ::CommentVote.joins(comment: [:creator])
+            .where("comments.score < 0")
+            .where("comment_votes.created_at > ?", min_date)
+            .where("users.level <= ?", max_level)
+            .group(:comment)
+            .having("count(*) >= 3")
+            .order("count(*) desc")
+            .limit(10)
+            .count
+            .map { |comment, count| new(comment, count) }
         end
       end
     end
