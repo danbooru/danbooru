@@ -32,6 +32,12 @@ class TagImplication < ActiveRecord::Base
       def with_descendants(names)
         (names + where("antecedent_name in (?) and status in (?)", names, ["active", "processing"]).map(&:descendant_names_array)).flatten.uniq
       end
+
+      def automatic_tags_for(names)
+        tags = names.grep(/\A(.+)_\(cosplay\)\Z/) { $1 }
+        tags << "cosplay" if tags.present?
+        tags.uniq
+      end
     end
 
     def descendants
