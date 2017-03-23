@@ -37,6 +37,11 @@ module PostSets
       end
     end
 
+    def tag
+      return nil if !is_single_tag?
+      @tag ||= Tag.find_by(name: Tag.normalize_name(tag_string))
+    end
+
     def has_artist?
       is_single_tag? && artist.present? && artist.visible?
     end

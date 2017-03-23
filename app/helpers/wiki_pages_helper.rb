@@ -1,11 +1,6 @@
 module WikiPagesHelper
   def wiki_page_alias_and_implication_list(wiki_page)
-    antecedent_alias = wiki_page.presenter.antecedent_tag_alias
-    consequent_aliases = wiki_page.presenter.consequent_tag_aliases
-    antecedent_implications = wiki_page.presenter.antecedent_tag_implications
-    consequent_implications = wiki_page.presenter.consequent_tag_implications
-
-    alias_and_implication_list(antecedent_alias, consequent_aliases, antecedent_implications, consequent_implications)
+    alias_and_implication_list(wiki_page.tag)
   end
 
   def wiki_page_post_previews(wiki_page)
