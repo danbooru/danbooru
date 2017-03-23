@@ -82,6 +82,8 @@
   <% else %>
     <% if post_set.tag_string.present? %>
       <p>There is currently no wiki page for the tag "<%= post_set.tag_string %>". You can <%= link_to "create one", new_wiki_page_path(:wiki_page => {:title => post_set.tag_string}) %>.</p>
+
+      <%= alias_and_implication_list(post_set.tag) %>
     <% end %>
   <% end %>
 </div>
