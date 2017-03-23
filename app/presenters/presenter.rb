@@ -1,6 +1,6 @@
 class Presenter
   def self.h(s)
-    CGI.escapeHTML(s)
+    CGI.escapeHTML(s.to_s)
   end
 
   def self.u(s)
