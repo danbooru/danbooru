@@ -1506,6 +1506,42 @@ class PostTest < ActiveSupport::TestCase
         assert(!Favorite.exists?(:user_id => @user.id, :post_id => @post.id))
       end
     end
+
+    context "Moving favorites to a parent post" do
+      setup do
+        @parent = FactoryGirl.create(:post)
+        @child = FactoryGirl.create(:post, parent: @parent)
+
+        @user1 = FactoryGirl.create(:user)
+        @gold1 = FactoryGirl.create(:gold_user)
+        @supervoter1 = FactoryGirl.create(:user, is_super_voter: true)
+
+        @child.add_favorite!(@user1)
+        @child.add_favorite!(@gold1)
+        @child.add_favorite!(@supervoter1)
+        @parent.add_favorite!(@supervoter1)
+
+        @child.give_favorites_to_parent
+        @child.reload
+        @parent.reload
+      end
+
+      should "move the favorites" do
+        assert_equal(0, @child.fav_count)
+        assert_equal(0, @child.favorites.count)
+        assert_equal("", @child.fav_string)
+        assert_equal([], @child.favorites.pluck(:user_id))
+
+        assert_equal(3, @parent.fav_count)
+        assert_equal(3, @parent.favorites.count)
+      end
+
+      should "create a vote for each user who can vote" do
+        assert(@parent.votes.where(user: @gold1).exists?)
+        assert(@parent.votes.where(user: @supervoter1).exists?)
+        assert_equal(4, @parent.score)
+      end
+    end
   end
 
   context "Pools:" do
