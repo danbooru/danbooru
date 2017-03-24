@@ -14,17 +14,17 @@ class PostVoteTest < ActiveSupport::TestCase
 
   context "Voting for a post" do
     should "interpret up as +1 score" do
-      vote = PostVote.create(:post_id => @post.id, :score => "up")
+      vote = PostVote.create(:post_id => @post.id, :vote => "up")
       assert_equal(1, vote.score)
     end
 
     should "interpret down as -1 score" do
-      vote = PostVote.create(:post_id => @post.id, :score => "down")
+      vote = PostVote.create(:post_id => @post.id, :vote => "down")
       assert_equal(-1, vote.score)
     end
 
     should "not accept any other scores" do
-      vote = PostVote.create(:post_id => @post.id, :score => "xxx")
+      vote = PostVote.create(:post_id => @post.id, :vote => "xxx")
       assert(vote.errors.any?)
     end
   end

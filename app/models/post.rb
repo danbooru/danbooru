@@ -1063,7 +1063,7 @@ class Post < ActiveRecord::Base
       !PostVote.exists?(:user_id => user.id, :post_id => id)
     end
 
-    def vote!(score, voter = CurrentUser.user)
+    def vote!(vote, voter = CurrentUser.user)
       unless voter.is_voter?
         raise PostVote::Error.new("You do not have permission to vote")
       end
@@ -1072,7 +1072,7 @@ class Post < ActiveRecord::Base
         raise PostVote::Error.new("You have already voted for this post")
       end
 
-      votes.create!(user: voter, score: vote)
+      votes.create!(user: voter, vote: vote)
       reload # PostVote.create modifies our score. Reload to get the new score.
     end
 
