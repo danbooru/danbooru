@@ -173,7 +173,7 @@ class Post < ActiveRecord::Base
     end
 
     def is_animated_gif?
-      if file_ext =~ /gif/i
+      if file_ext =~ /gif/i && File.exists?(file_path)
         return Magick::Image.ping(file_path).length > 1
       else
         return false
