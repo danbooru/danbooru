@@ -158,7 +158,6 @@
   <meta name="post-has-embedded-notes" content="<%= @post.has_embedded_notes? %>">
   <meta name="always-resize-images" content="<%= CurrentUser.user.always_resize_images? %>">
   <meta property="og:title" content="<%= @post.presenter.humanized_essential_tag_string %> - <%= Danbooru.config.app_name %>">
-  <meta property="og:description" content="<%= @post.presenter.humanized_tag_string %>">
   <meta property="og:image" content="http://<%= Danbooru.config.hostname %><%= @post.large_file_url %>">
 
   <% if Danbooru.config.enable_post_search_counts %>
