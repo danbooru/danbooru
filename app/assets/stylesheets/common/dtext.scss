@@ -59,6 +59,11 @@ div.prose {
     white-space: pre-wrap;
   }
 
+  code {
+    font-family: monospace;
+    background: #EEE;
+  }
+
   div.expandable {
     margin-bottom: 1em;
     border: 1px inset #666;
