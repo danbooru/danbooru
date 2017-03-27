@@ -14,10 +14,11 @@ module Sources
       WEB =   "^(?:https?://)?www\\.pixiv\\.net"
       I12 =   "^(?:https?://)?i[0-9]+\\.pixiv\\.net"
       IMG =   "^(?:https?://)?img[0-9]*\\.pixiv\\.net"
+      PXIMG = "^(?:https?://)?i\\.pximg\\.net"
       TOUCH = "^(?:https?://)?touch\\.pixiv\\.net"
 
       def self.url_match?(url)
-        url =~ /#{WEB}|#{IMG}|#{I12}|#{TOUCH}/i
+        url =~ /#{WEB}|#{IMG}|#{I12}|#{TOUCH}|#{PXIMG}/i
       end
 
       def referer_url
@@ -359,6 +360,9 @@ module Sources
         # http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p0.png
         return true if url =~ %r!#{I12}/img-original/img/#{TIMESTAMP}/\d+_p\d+\.#{EXT}$!i
 
+        # http://i.pximg.net/img-original/img/2017/03/22/17/40/51/62041488_p0.jpg
+        return true if url =~ %r!#{PXIMG}/img-original/img/#{TIMESTAMP}/\d+_\w+\.#{EXT}!i
+
         # http://i1.pixiv.net/img-zip-ugoira/img/2014/10/03/17/29/16/46323924_ugoira1920x1080.zip
         return true if url =~ %r!#{I12}/img-zip-ugoira/img/#{TIMESTAMP}/\d+_ugoira\d+x\d+\.zip$!i
 
@@ -376,6 +380,9 @@ module Sources
         # http://i1.pixiv.net/c/600x600/img-master/img/2014/10/02/13/51/23/46304396_p0_master1200.jpg
         # http://i2.pixiv.net/c/64x64/img-master/img/2014/10/09/12/59/50/46441917_square1200.jpg
         return true if url =~ %r!#{I12}/c/\d+x\d+/img-master/img/#{TIMESTAMP}/\d+_\w+\.#{EXT}$!i
+
+        # http://i.pximg.net/c/600x600/img-master/img/2017/03/22/17/40/51/62041488_p0_master1200.jpg
+        return true if url =~ %r!#{PXIMG}/c/\d+x\d+/img-master/img/#{TIMESTAMP}/\d+_\w+\.#{EXT}!i
 
         # http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_s.png
         # http://i2.pixiv.net/img-inf/img/2010/11/30/08/54/06/14901765_64x64.jpg
