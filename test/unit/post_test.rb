@@ -1420,45 +1420,34 @@ class PostTest < ActiveSupport::TestCase
     context "Removing a post from a user's favorites" do
       setup do
         @user = FactoryGirl.create(:contributor_user)
-        CurrentUser.user = @user
-        CurrentUser.ip_addr = "127.0.0.1"
         @post = FactoryGirl.create(:post)
         @post.add_favorite!(@user)
         @user.reload
       end
 
-      teardown do
-        CurrentUser.user = nil
-        CurrentUser.ip_addr = nil
-      end
-
       should "decrement the user's favorite_count" do
         assert_difference("@user.favorite_count", -1) do
           @post.remove_favorite!(@user)
-          @user.reload
         end
       end
 
       should "decrement the post's score for gold users" do
-        @post.remove_favorite!(@user)
-        @post.reload
-        assert_equal(0, @post.score)
+        assert_difference("@post.score", -1) do
+          @post.remove_favorite!(@user)
+        end
       end
 
       should "not decrement the post's score for basic users" do
         @member = FactoryGirl.create(:user)
-        CurrentUser.scoped(@member, "127.0.0.1") do
-          @post.remove_favorite!(@member)
-        end
-        @post.reload
-        assert_equal(1, @post.score)
+
+        assert_no_difference("@post.score") { @post.add_favorite!(@member) }
+        assert_no_difference("@post.score") { @post.remove_favorite!(@member) }
       end
 
       should "not decrement the user's favorite_count if the user did not favorite the post" do
         @post2 = FactoryGirl.create(:post)
-        assert_difference("@user.favorite_count", 0) do
+        assert_no_difference("@user.favorite_count") do
           @post2.remove_favorite!(@user)
-          @user.reload
         end
       end
     end
@@ -1466,14 +1455,7 @@ class PostTest < ActiveSupport::TestCase
     context "Adding a post to a user's favorites" do
       setup do
         @user = FactoryGirl.create(:contributor_user)
-        CurrentUser.user = @user
-        CurrentUser.ip_addr = "127.0.0.1"
         @post = FactoryGirl.create(:post)
-      end
-
-      teardown do
-        CurrentUser.user = nil
-        CurrentUser.ip_addr = nil
       end
 
       should "periodically clean the fav_string" do
@@ -1486,24 +1468,19 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "increment the user's favorite_count" do
-        assert_difference("CurrentUser.favorite_count", 1) do
+        assert_difference("@user.favorite_count", 1) do
           @post.add_favorite!(@user)
-          CurrentUser.reload
         end
       end
 
       should "increment the post's score for gold users" do
         @post.add_favorite!(@user)
-        @post.reload
         assert_equal(1, @post.score)
       end
 
       should "not increment the post's score for basic users" do
         @member = FactoryGirl.create(:user)
-        CurrentUser.scoped(@member, "127.0.0.1") do
-          @post.add_favorite!(@member)
-        end
-        @post.reload
+        @post.add_favorite!(@member)
         assert_equal(0, @post.score)
       end
 
@@ -1527,6 +1504,42 @@ class PostTest < ActiveSupport::TestCase
         @post.reload
         assert_equal("", @post.fav_string)
         assert(!Favorite.exists?(:user_id => @user.id, :post_id => @post.id))
+      end
+    end
+
+    context "Moving favorites to a parent post" do
+      setup do
+        @parent = FactoryGirl.create(:post)
+        @child = FactoryGirl.create(:post, parent: @parent)
+
+        @user1 = FactoryGirl.create(:user)
+        @gold1 = FactoryGirl.create(:gold_user)
+        @supervoter1 = FactoryGirl.create(:user, is_super_voter: true)
+
+        @child.add_favorite!(@user1)
+        @child.add_favorite!(@gold1)
+        @child.add_favorite!(@supervoter1)
+        @parent.add_favorite!(@supervoter1)
+
+        @child.give_favorites_to_parent
+        @child.reload
+        @parent.reload
+      end
+
+      should "move the favorites" do
+        assert_equal(0, @child.fav_count)
+        assert_equal(0, @child.favorites.count)
+        assert_equal("", @child.fav_string)
+        assert_equal([], @child.favorites.pluck(:user_id))
+
+        assert_equal(3, @parent.fav_count)
+        assert_equal(3, @parent.favorites.count)
+      end
+
+      should "create a vote for each user who can vote" do
+        assert(@parent.votes.where(user: @gold1).exists?)
+        assert(@parent.votes.where(user: @supervoter1).exists?)
+        assert_equal(4, @parent.score)
       end
     end
   end

@@ -77,6 +77,7 @@ class User < ActiveRecord::Base
   #after_create :notify_sock_puppets
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
   has_many :posts, :foreign_key => "uploader_id"
+  has_many :post_votes
   has_many :bans, lambda {order("bans.id desc")}
   has_one :recent_ban, lambda {order("bans.id desc")}, :class_name => "Ban"
   has_one :api_key
