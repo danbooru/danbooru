@@ -72,6 +72,17 @@ class SavedSearchTest < ActiveSupport::TestCase
         assert_equal([1,2,3,4], post_ids)
       end
     end
+
+    context "with a nonexistent label" do
+      setup do
+        SavedSearch.expects(:queries_for).with(1, "empty").returns([])
+      end
+
+      should "return an empty list of ids" do
+        post_ids = SavedSearch.post_ids(1, "empty")
+        assert_equal([], post_ids)
+      end
+    end
   end
 
   context "Creating a saved search" do

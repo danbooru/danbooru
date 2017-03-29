@@ -21,6 +21,8 @@ class SavedSearch < ActiveRecord::Base
 
         Cache.get("ss-#{user_id}-#{Cache.hash(label)}", 60) do
           queries = SavedSearch.queries_for(user_id, label)
+          return [] if queries.empty?
+
           json = {
             "key" => Danbooru.config.listbooru_auth_key,
             "queries" => queries
