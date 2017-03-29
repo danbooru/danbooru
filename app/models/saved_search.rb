@@ -74,14 +74,18 @@ class SavedSearch < ActiveRecord::Base
 
   def self.queries_for(user_id, label = nil, options = {})
     if label
-      SavedSearch.where(user_id: user_id).labeled(label).pluck("distinct query")
+      SavedSearch.where(user_id: user_id).labeled(label).map(&:normalized_query).sort.uniq
     else
-      SavedSearch.where(user_id: user_id).pluck("distinct query")
+      SavedSearch.where(user_id: user_id).map(&:normalized_query).sort.uniq
     end
   end
 
+  def normalized_query
+    Tag.normalize_query(query, sort: true)
+  end
+
   def normalize
-    self.query = query_array.sort.join(" ")
+    self.query = Tag.normalize_query(query, sort: false)
     self.labels = labels.map {|x| SavedSearch.normalize_label(x)}.reject {|x| x.blank?}
   end
 
@@ -101,10 +105,6 @@ class SavedSearch < ActiveRecord::Base
     if user.saved_searches.count == 0
       user.update_attribute(:has_saved_searches, false)
     end
-  end
-
-  def query_array
-    Tag.scan_tags(query)
   end
 
   def label_string
