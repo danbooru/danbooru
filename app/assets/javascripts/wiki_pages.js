@@ -21,6 +21,7 @@
           url: "/wiki_pages.json",
           data: {
             "search[title]": "*" + req.term + "*",
+            "search[hide_deleted]": "Yes",
             "limit": 10
           },
           method: "get",
