@@ -21,6 +21,6 @@ class ReportsController < ApplicationController
 
   def upload_tags
     @user = User.find(params[:user_id])
-    @upload_reports = Reports::UploadTags.for_user(params[:user_id]).order("id desc").paginate(params[:page], :limit => params[:limit])
+    @upload_reports = Reports::UploadTags.includes(versions: [:post]).for_user(params[:user_id]).order("id desc").paginate(params[:page], :limit => params[:limit])
   end
 end

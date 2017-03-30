@@ -12,7 +12,7 @@
       <tbody>
         <% @upload_reports.each do |upload_report| %>
           <tr>
-            <td><%= link_to(upload_report.id, post_path(:id => upload_report.id ))%></td>
+            <td><%= PostPresenter.preview(upload_report, show_deleted: true, tags: "user:#{upload_report.uploader_name}") %></td>
             <td>
               <% upload_report.uploader_tags_array.each do |tag_name| %>
                 <span class="category-<%= Tag.category_for(tag_name) %>">
