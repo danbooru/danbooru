@@ -13,7 +13,7 @@
 
       <div class="input">
         <label for="search_order">Order</label>
-        <%= select "search", "order", ["Name", "Date"] %>
+        <%= select "search", "order", [%w[Name title], %w[Date time], %w[Posts post_count]] %>
       </div>
 
       <div class="input">
