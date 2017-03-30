@@ -54,6 +54,7 @@
           url: "/artists.json",
           data: {
             "search[name]": "*" + req.term + "*",
+            "search[is_active]": true,
             "limit": 10
           },
           method: "get",
