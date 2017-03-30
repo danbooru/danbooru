@@ -27,7 +27,6 @@
         $.ajax({
           url: "/pools.json",
           data: {
-            "search[is_active]": "true",
             "search[name_matches]": req.term,
             "limit": 10
           },
