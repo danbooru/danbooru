@@ -29,9 +29,9 @@ module Reports
 
     def uploader_tags_array
       @uploader_tags ||= begin
-        added_tags = []
-        PostArchive.where(post_id: id, updater_id: uploader_id).each do |version|
-          added_tags += version.changes[:added_tags]
+        uploader_versions = versions.select { |p| p.updater_id == uploader_id }
+        added_tags = uploader_versions.flat_map do |version|
+          version.changes[:added_tags]
         end
         added_tags.uniq.sort
       end

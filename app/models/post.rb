@@ -48,6 +48,11 @@ class Post < ActiveRecord::Base
   has_many :children, lambda {order("posts.id")}, :class_name => "Post", :foreign_key => "parent_id"
   has_many :disapprovals, :class_name => "PostDisapproval", :dependent => :destroy
   has_many :favorites, :dependent => :destroy
+
+  if PostArchive.enabled?
+    has_many :versions, lambda {order("post_versions.updated_at ASC, id ASC")}, :class_name => "PostArchive", :dependent => :destroy
+  end
+
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :old_parent_id, :old_source, :old_rating, :parent_id, :has_embedded_notes, :as => [:member, :builder, :gold, :platinum, :janitor, :moderator, :admin, :default]
   attr_accessible :is_rating_locked, :is_note_locked, :as => [:builder, :janitor, :moderator, :admin]
   attr_accessible :is_status_locked, :as => [:admin]
@@ -1408,14 +1413,6 @@ class Post < ActiveRecord::Base
   end
 
   module VersionMethods
-    def versions
-      if PostArchive.enabled?
-        PostArchive.where(post_id: id).order("updated_at ASC, id asc")
-      else
-        raise "Archive service not configured"
-      end
-    end
-
     def create_version(force = false)
       if new_record? || rating_changed? || source_changed? || parent_id_changed? || tag_string_changed? || force
         create_new_version
