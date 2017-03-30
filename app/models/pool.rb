@@ -45,9 +45,9 @@ class Pool < ActiveRecord::Base
     end
 
     def name_matches(name)
-      name = name.tr(" ", "_")
+      name = normalize_name_for_search(name)
       name = "*#{name}*" unless name =~ /\*/
-      where("name ilike ? escape E'\\\\'", name.to_escaped_for_sql_like)
+      where("lower(name) like ? escape E'\\\\'", name.to_escaped_for_sql_like)
     end
 
     def search(params)
@@ -137,6 +137,10 @@ class Pool < ActiveRecord::Base
 
   def self.normalize_name(name)
     name.gsub(/\s+/, "_")
+  end
+
+  def self.normalize_name_for_search(name)
+    normalize_name(name).mb_chars.downcase
   end
 
   def self.normalize_post_ids(post_ids, unique)
