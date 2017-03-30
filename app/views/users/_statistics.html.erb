@@ -36,7 +36,12 @@
 
       <tr>
         <th>Uploads</th>
-        <td><%= presenter.upload_count(self) %></td>
+        <td>
+          <%= presenter.upload_count(self) %>
+          <% if presenter.has_uploads? %>
+            (<%= link_to "tag changes report", reports_upload_tags_path(user_id: user.id) %>)
+          <% end %>
+        </td>
       </tr>
 
       <tr>
