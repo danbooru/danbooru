@@ -1,9 +1,11 @@
 module Moderator
   module Post
     class PostsController < ApplicationController
-      before_filter :approver_only, :only => [:delete, :undelete, :move_favorites, :ban, :unban, :confirm_delete, :confirm_move_favorites, :confirm_ban]
+      before_filter :approver_only, :only => [:delete, :undelete, :move_favorites, :replace, :ban, :unban, :confirm_delete, :confirm_move_favorites, :confirm_ban]
       before_filter :admin_only, :only => [:expunge]
       skip_before_filter :api_check
+
+      respond_to :html, :json, :xml
 
       def confirm_delete
         @post = ::Post.find(params[:id])
@@ -33,6 +35,15 @@ module Moderator
           @post.give_favorites_to_parent
         end
         redirect_to(post_path(@post))
+      end
+
+      def replace
+        @post = ::Post.find(params[:id])
+        @post.replace!(params[:post][:source])
+
+        respond_with(@post) do |format|
+          format.html { redirect_to(@post) }
+        end
       end
 
       def expunge
