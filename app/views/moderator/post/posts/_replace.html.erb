@@ -1,0 +1,11 @@
+<%= simple_form_for(@post, url: replace_moderator_post_post_path, method: :post) do |f| %>
+  <h1>Replace Image</h1>
+
+  <p>
+    Delete the current image and replace it with another one, keeping
+    everything else in the post intact. This is meant for upgrading
+    lower-quality images, such as image samples, to higher-quality versions.
+  </p>
+
+  <%= f.input :source, label: "New Source", input_html: { value: "" } %>
+<% end %>
