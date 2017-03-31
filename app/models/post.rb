@@ -1393,6 +1393,35 @@ class Post < ActiveRecord::Base
       Post.expire_cache_for_all(tag_array)
       ModAction.log("undeleted post ##{id}")
     end
+
+    def replace!(url)
+      transaction do
+        upload = Upload.create!(source: url, rating: self.rating, tag_string: self.tag_string)
+        upload.process_upload
+        upload.update(status: "completed", post_id: id)
+
+        self.md5 = upload.md5
+        self.file_ext = upload.file_ext
+        self.image_width = upload.image_width
+        self.image_height = upload.image_height
+        self.file_size = upload.file_size
+        self.source = upload.source
+        self.tag_string = upload.tag_string
+
+        ModAction.log(<<-EOS.strip_heredoc)
+          replaced post ##{id}: #{image_width_was}x#{image_height_was} (#{file_size_was.to_formatted_s(:human_size)} #{file_ext_was.upcase}) -> #{image_width}x#{image_height} (#{file_size.to_formatted_s(:human_size)} #{file_ext.upcase})
+          source: #{source_was} -> #{source}
+          md5: "#{md5_was}":[/data/#{md5_was}.#{file_ext_was}] -> "#{md5}":[/data/#{md5}.#{file_ext}]
+        EOS
+
+        save!
+      end
+
+      # point of no return: these things can't be rolled back, so we do them
+      # only after the transaction successfully commits.
+      distribute_files
+      update_iqdb_async
+    end
   end
 
   module VersionMethods
