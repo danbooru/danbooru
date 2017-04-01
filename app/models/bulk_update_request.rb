@@ -3,6 +3,7 @@ class BulkUpdateRequest < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :forum_topic
+  belongs_to :forum_post
   belongs_to :approver, :class_name => "User"
 
   validates_presence_of :user
@@ -31,61 +32,88 @@ class BulkUpdateRequest < ActiveRecord::Base
     end
   end
 
+  module ApprovalMethods
+    def forum_updater
+      @forum_updater ||= begin
+        post = if forum_topic
+          forum_post || forum_topic.posts.first
+        else
+          nil
+        end
+        ForumUpdater.new(
+          forum_topic, 
+          forum_post: post, 
+          expected_title: title
+        )
+      end
+    end
+
+    def approve!(approver)
+      CurrentUser.scoped(approver) do
+        AliasAndImplicationImporter.new(script, forum_topic_id, "1", true).process!
+        update({ :status => "approved", :approver_id => CurrentUser.id, :skip_secondary_validations => true }, :as => CurrentUser.role)
+        forum_updater.update("[i]UPDATE #{date_timestamp}[/i]: The \"bulk update request ##{id}\":/bulk_update_requests?search%5Bid%5D=#{id} has been approved.", "APPROVED")
+      end
+
+    rescue Exception => x
+      self.approver = approver
+      CurrentUser.scoped(approver) do
+        forum_updater.update("[i]UPDATE #{date_timestamp}[/i]: \"Bulk update request ##{id}\":/bulk_update_requests?search%5Bid%5D=#{id} failed: #{x.to_s}", "FAILED")
+      end
+    end
+
+    def date_timestamp
+      Time.now.strftime("%Y-%m-%d")
+    end
+
+    def create_forum_topic
+      if forum_topic_id
+        update_attributes(:forum_post_id => forum_post.id)
+      else
+        forum_topic = ForumTopic.create(:title => title, :category_id => 1, :original_post_attributes => {:body => reason_with_link})
+        update_attributes(:forum_topic_id => forum_topic.id, :forum_post_id => forum_topic.posts.first.id)
+      end
+    end
+
+    def reject!
+      forum_updater.update("[i]UPDATE #{date_timestamp}[/i]: The \"bulk update request ##{id}\":/bulk_update_requests?search%5Bid%5D=#{id} has been rejected.", "REJECTED")
+      update_attribute(:status, "rejected")
+    end
+  end
+
+  module ValidationMethods
+    def script_formatted_correctly
+      AliasAndImplicationImporter.tokenize(script)
+      return true
+    rescue StandardError => e
+      errors.add(:base, e.message)
+      return false
+    end
+
+    def forum_topic_id_not_invalid
+      if forum_topic_id && !forum_topic
+        errors.add(:base, "Forum topic ID is invalid")
+      end
+    end
+
+    def validate_script
+      begin
+        AliasAndImplicationImporter.new(script, forum_topic_id, "1", skip_secondary_validations).validate!
+      rescue RuntimeError => e
+        self.errors[:base] = e.message
+        return false
+      end
+
+      errors.empty?
+    end
+  end
+
   extend SearchMethods
-
-  def approve!(approver)
-    AliasAndImplicationImporter.new(script, forum_topic_id, "1", true).process!(approver)
-
-    update({ :status => "approved", :approver_id => approver.id, :skip_secondary_validations => true }, :as => approver.role)
-    update_forum_topic_for_approve
-
-  rescue Exception => x
-    self.approver = approver
-    message_approver_on_failure(x)
-    update_topic_on_failure(x)
-  end
-
-  def message_approver_on_failure(x)
-    msg = <<-EOS
-      Bulk Update Request ##{id} failed\n
-      Exception: #{x.class}\n
-      Message: #{x.to_s}\n
-      Stack trace:\n
-    EOS
-
-    x.backtrace.each do |line|
-      msg += "#{line}\n"
-    end
-
-    dmail = Dmail.new(
-      :from_id => approver.id,
-      :to_id => approver.id,
-      :owner_id => approver.id,
-      :title => "Bulk update request approval failed",
-      :body => msg
-    )
-    dmail.owner_id = approver.id
-    dmail.save
-  end
-
-  def update_topic_on_failure(x)
-    if forum_topic_id
-      body = "\"Bulk update request ##{id}\":/bulk_update_requests?search%5Bid%5D=#{id} failed: #{x.to_s}"
-      ForumPost.create(:body => body, :topic_id => forum_topic_id)
-    end
-  end
+  include ApprovalMethods
+  include ValidationMethods
 
   def editable?(user)
     user_id == user.id || user.is_builder?
-  end
-
-  def create_forum_topic
-    if forum_topic_id
-      ForumPost.create(:body => reason_with_link, :topic_id => forum_topic_id)
-    else
-      forum_topic = ForumTopic.create(:title => "[bulk] #{title}", :category_id => 1, :original_post_attributes => {:body => reason_with_link})
-      update_attribute(:forum_topic_id, forum_topic.id)
-    end
   end
 
   def reason_with_link
@@ -109,44 +137,9 @@ class BulkUpdateRequest < ActiveRecord::Base
     lines.join("\n")
   end
 
-  def reject!
-    update_forum_topic_for_reject
-    update_attribute(:status, "rejected")
-  end
-
   def initialize_attributes
     self.user_id = CurrentUser.user.id unless self.user_id
     self.status = "pending"
-  end
-
-  def script_formatted_correctly
-    AliasAndImplicationImporter.tokenize(script)
-    return true
-  rescue StandardError => e
-    errors.add(:base, e.message)
-    return false
-  end
-
-  def forum_topic_id_not_invalid
-    if forum_topic_id && !forum_topic
-      errors.add(:base, "Forum topic ID is invalid")
-    end
-  end
-
-  def update_forum_topic_for_approve
-    if forum_topic
-      forum_topic.posts.create(
-        :body => "The \"bulk update request ##{id}\":/bulk_update_requests?search%5Bid%5D=#{id} has been approved."
-      )
-    end
-  end
-
-  def update_forum_topic_for_reject
-    if forum_topic
-      forum_topic.posts.create(
-        :body => "The \"bulk update request ##{id}\":/bulk_update_requests?search%5Bid%5D=#{id} has been rejected."
-      )
-    end
   end
 
   def normalize_text
@@ -159,16 +152,5 @@ class BulkUpdateRequest < ActiveRecord::Base
     else
       @skip_secondary_validations = false
     end
-  end
-
-  def validate_script
-    begin
-      AliasAndImplicationImporter.new(script, forum_topic_id, "1", skip_secondary_validations).validate!
-    rescue RuntimeError => e
-      self.errors[:base] = e.message
-      return false
-    end
-
-    errors.empty?
   end
 end

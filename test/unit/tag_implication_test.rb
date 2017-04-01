@@ -186,20 +186,29 @@ class TagImplicationTest < ActiveSupport::TestCase
     context "with an associated forum topic" do
       setup do
         @admin = FactoryGirl.create(:admin_user)
-        @topic = FactoryGirl.create(:forum_topic)
-        @implication = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic)
+        @topic = FactoryGirl.create(:forum_topic, :title => TagImplicationRequest.topic_title("aaa", "bbb"))
+        @post = FactoryGirl.create(:forum_post, topic_id: @topic.id, :body => TagImplicationRequest.command_string("aaa", "bbb"))
+        @implication = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic, :status => "pending")
       end
 
       should "update the topic when processed" do
         assert_difference("ForumPost.count") do
-          @implication.process!
+          @implication.approve!
         end
+        @post.reload
+        @topic.reload
+        assert_match(/The tag implication .* has been approved/, @post.body)
+        assert_equal("[APPROVED] Tag implication: aaa -> bbb", @topic.title)
       end
 
       should "update the topic when rejected" do
         assert_difference("ForumPost.count") do
           @implication.reject!
         end
+        @post.reload
+        @topic.reload
+        assert_match(/The tag implication .* has been rejected/, @post.body)
+        assert_equal("[REJECTED] Tag implication: aaa -> bbb", @topic.title)
       end
     end
   end

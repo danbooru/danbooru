@@ -20,6 +20,7 @@ class TagAlias < ActiveRecord::Base
   belongs_to :creator, :class_name => "User"
   belongs_to :approver, :class_name => "User"
   belongs_to :forum_topic
+  belongs_to :forum_post
   attr_accessible :antecedent_name, :consequent_name, :forum_topic_id, :skip_secondary_validations
   attr_accessible :status, :approver_id, :as => [:admin]
 
@@ -77,8 +78,56 @@ class TagAlias < ActiveRecord::Base
     end
   end
 
+  module ApprovalMethods
+    def approve!(update_topic: true, approver: CurrentUser.user)
+      CurrentUser.scoped(approver) do
+        update({ :status => "queued", :approver_id => approver.id }, :as => CurrentUser.role)
+        delay(:queue => "default").process!(update_topic: update_topic)
+      end
+    end
+
+    def approval_message
+      "[i]UPDATE #{date_timestamp}[/i]: The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has been approved."
+    end
+
+    def failure_message(e = nil)
+      "[i]UPDATE #{date_timestamp}[/i]: The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) failed during processing. Reason: #{e}"
+    end
+
+    def reject_message
+      "[i]UPDATE #{date_timestamp}[/i]: The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has been rejected."
+    end
+
+    def conflict_message
+      "[i]UPDATE #{date_timestamp}[/i]: The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has conflicting wiki pages. [[#{consequent_name}]] should be updated to include information from [[#{antecedent_name}]] if necessary."
+    end
+
+    def date_timestamp
+      Time.now.strftime("%Y-%m-%d")
+    end
+  end
+
+  module ForumMethods
+    def forum_updater
+      @forum_updater ||= begin
+        post = if forum_topic
+          forum_post || forum_topic.posts.where("body like ?", TagAliasRequest.command_string(antecedent_name, consequent_name) + "%").last
+        else
+          nil
+        end
+        ForumUpdater.new(
+          forum_topic, 
+          forum_post: post,
+          expected_title: TagAliasRequest.topic_title(antecedent_name, consequent_name)
+        )
+      end
+    end
+  end
+
   extend SearchMethods
   include CacheMethods
+  include ApprovalMethods
+  include ForumMethods
 
   def self.to_aliased(names)
     Cache.get_multi(Array(names), "ta") do |tag|
@@ -86,30 +135,25 @@ class TagAlias < ActiveRecord::Base
     end.values
   end
 
-  def approve!(approver = CurrentUser.user, update_topic: true)
-    update({ :status => "queued", :approver_id => approver.id }, :as => approver.role)
-    delay(:queue => "default").process!(update_topic)
-  end
-
-  def process!(update_topic=true)
+  def process!(update_topic: true)
     unless valid?
       raise errors.full_messages.join("; ")
     end
 
     tries = 0
-    forum_message = []
+    messages = []
 
     begin
       CurrentUser.scoped(approver, CurrentUser.ip_addr) do
-        update({ :status => "processing" }, :as => approver.role)
+        update({ :status => "processing" }, :as => CurrentUser.role)
         move_aliases_and_implications
         move_saved_searches
         clear_all_cache
         ensure_category_consistency
         update_posts
-        forum_message << "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has been approved."
-        forum_message << rename_wiki_and_artist
-        update({ :status => "active", :post_count => consequent_tag.post_count }, :as => approver.role)
+        forum_updater.update(approval_message, "APPROVED") if update_topic
+        rename_wiki_and_artist
+        update({ :status => "active", :post_count => consequent_tag.post_count }, :as => CurrentUser.role)
       end
     rescue Exception => e
       if tries < 5
@@ -118,17 +162,13 @@ class TagAlias < ActiveRecord::Base
         retry
       end
 
-      forum_message << "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) failed during processing. Reason: #{e}"
-      update({ :status => "error: #{e}" }, :as => approver.role)
+      CurrentUser.scoped(approver, CurrentUser.ip_addr) do
+        forum_updater.update(failure_message(e), "FAILED") if update_topic
+        update({ :status => "error: #{e}" }, :as => CurrentUser.role)
+      end
 
       if Rails.env.production?
         NewRelic::Agent.notice_error(e, :custom_params => {:tag_alias_id => id, :antecedent_name => antecedent_name, :consequent_name => consequent_name})
-      end
-    ensure
-      if update_topic && forum_topic.present?
-        CurrentUser.scoped(approver, CurrentUser.ip_addr) do
-          forum_topic.posts.create(:body => forum_message.join("\n\n"))
-        end
       end
     end
   end
@@ -248,8 +288,6 @@ class TagAlias < ActiveRecord::Base
   end
 
   def rename_wiki_and_artist
-    message = ""
-
     antecedent_wiki = WikiPage.titled(antecedent_name).first
     if antecedent_wiki.present? 
       if WikiPage.titled(consequent_name).blank?
@@ -257,7 +295,7 @@ class TagAlias < ActiveRecord::Base
           antecedent_wiki.update(title: consequent_name, skip_secondary_validations: true)
         end
       else
-        message = "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has conflicting wiki pages. [[#{consequent_name}]] should be updated to include information from [[#{antecedent_name}]] if necessary."
+        forum_updater.update(conflict_message)
       end
     end
 
@@ -271,8 +309,6 @@ class TagAlias < ActiveRecord::Base
         end
       end
     end
-
-    message
   end
 
   def deletable_by?(user)
@@ -286,18 +322,10 @@ class TagAlias < ActiveRecord::Base
     deletable_by?(user)
   end
 
-  def update_forum_topic_for_reject
-    if forum_topic
-      forum_topic.posts.create(
-        :body => "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has been rejected."
-      )
-    end
-  end
-
   def reject!
-    update({ :status => "deleted", }, :as => CurrentUser.role)
+    update({ :status => "deleted" }, :as => CurrentUser.role)
     clear_all_cache
-    update_forum_topic_for_reject
+    forum_updater.update(reject_message, "REJECTED")
     destroy
   end
 

@@ -6,6 +6,14 @@ class TagAliasRequest
   validate :validate_tag_alias
   validate :validate_forum_topic
 
+  def self.topic_title(antecedent_name, consequent_name)
+    "Tag alias: #{antecedent_name} -> #{consequent_name}"
+  end
+
+  def self.command_string(antecedent_name, consequent_name)
+    "create alias [[#{antecedent_name}]] -> [[#{consequent_name}]]"
+  end
+
   def initialize(attributes)
     @antecedent_name = attributes[:antecedent_name].strip.tr(" ", "_")
     @consequent_name = attributes[:consequent_name].strip.tr(" ", "_")
@@ -23,7 +31,7 @@ class TagAliasRequest
       @forum_topic = build_forum_topic(@tag_alias.id)
       @forum_topic.save
 
-      @tag_alias.update_attribute(:forum_topic_id, @forum_topic.id)
+      @tag_alias.update_attributes(forum_topic_id: @forum_topic.id, forum_post_id: @forum_topic.posts.first.id)
     end
   end
 
@@ -39,9 +47,9 @@ class TagAliasRequest
 
   def build_forum_topic(tag_alias_id)
     ForumTopic.new(
-      :title => "Tag alias: #{antecedent_name} -> #{consequent_name}",
+      :title => TagAliasRequest.topic_title(antecedent_name, consequent_name),
       :original_post_attributes => {
-        :body => "create alias [[#{antecedent_name}]] -> [[#{consequent_name}]]\n\n\"Link to alias\":/tag_aliases?search[id]=#{tag_alias_id}\n\n#{reason}"
+        :body => TagAliasRequest.command_string(antecedent_name, consequent_name) + "\n\n\"Link to alias\":/tag_aliases?search[id]=#{tag_alias_id}\n\n#{reason}"
       },
       :category_id => 1
     )

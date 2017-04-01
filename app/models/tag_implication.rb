@@ -8,6 +8,7 @@ class TagImplication < ActiveRecord::Base
   belongs_to :creator, :class_name => "User"
   belongs_to :approver, :class_name => "User"
   belongs_to :forum_topic
+  belongs_to :forum_post
   before_validation :initialize_creator, :on => :create
   before_validation :normalize_names
   validates_format_of :status, :with => /\A(active|deleted|pending|processing|queued|error: .*)\Z/
@@ -127,91 +128,161 @@ class TagImplication < ActiveRecord::Base
     end
   end
 
+  module ValidationMethods
+    def absence_of_circular_relation
+      # We don't want a -> b && b -> a chains
+      if self.class.active.exists?(["antecedent_name = ? and consequent_name = ?", consequent_name, antecedent_name])
+        self.errors[:base] << "Tag implication can not create a circular relation with another tag implication"
+        false
+      end
+    end
+
+    def antecedent_is_not_aliased
+      # We don't want to implicate a -> b if a is already aliased to c
+      if TagAlias.active.exists?(["antecedent_name = ?", antecedent_name])
+        self.errors[:base] << "Antecedent tag must not be aliased to another tag"
+        false
+      end
+    end
+
+    def consequent_is_not_aliased
+      # We don't want to implicate a -> b if b is already aliased to c
+      if TagAlias.active.exists?(["antecedent_name = ?", consequent_name])
+        self.errors[:base] << "Consequent tag must not be aliased to another tag"
+        false
+      end
+    end
+
+    def antecedent_and_consequent_are_different
+      normalize_names
+      if antecedent_name == consequent_name
+        self.errors[:base] << "Cannot implicate a tag to itself"
+        false
+      end
+    end
+
+    def wiki_pages_present
+      return if skip_secondary_validations
+
+      unless WikiPage.titled(consequent_name).exists?
+        self.errors[:base] = "The #{consequent_name} tag needs a corresponding wiki page"
+        return false
+      end
+
+      unless WikiPage.titled(antecedent_name).exists?
+        self.errors[:base] = "The #{antecedent_name} tag needs a corresponding wiki page"
+        return false
+      end
+    end
+  end
+
+  module ApprovalMethods
+    def process!(update_topic: true)
+      unless valid?
+        raise errors.full_messages.join("; ")
+      end
+
+      tries = 0
+
+      begin
+        CurrentUser.scoped(approver, CurrentUser.ip_addr) do
+          update({ :status => "processing" }, :as => CurrentUser.role)
+          update_posts
+          update({ :status => "active" }, :as => CurrentUser.role)
+          update_descendant_names_for_parents
+          forum_updater.update("[i]UPDATE #{date_timestamp}[/i]: The tag implication #{antecedent_name} -> #{consequent_name} has been approved.", "APPROVED") if update_topic
+        end
+      rescue Exception => e
+        if tries < 5
+          tries += 1
+          sleep 2 ** tries
+          retry
+        end
+
+        forum_updater.update("[i]UPDATE #{date_timestamp}[/i]: The tag implication #{antecedent_name} -> #{consequent_name} failed during processing. Reason: #{e}", "FAILED") if update_topic
+        update({ :status => "error: #{e}" }, :as => CurrentUser.role)
+
+        if Rails.env.production?
+          NewRelic::Agent.notice_error(e, :custom_params => {:tag_implication_id => id, :antecedent_name => antecedent_name, :consequent_name => consequent_name})
+        end
+      end
+    end
+
+    def update_posts
+      Post.without_timeout do
+        Post.raw_tag_match(antecedent_name).where("true /* TagImplication#update_posts */").find_each do |post|
+          fixed_tags = "#{post.tag_string} #{descendant_names}".strip
+          CurrentUser.scoped(creator, creator_ip_addr) do
+            post.update_attributes(
+              :tag_string => fixed_tags
+            )
+          end
+        end
+      end
+    end
+
+    def approve!(approver: CurrentUser.user, update_topic: true)
+      update({ :status => "queued", :approver_id => approver.id }, :as => approver.role)
+      delay(:queue => "default").process!(update_topic: update_topic)
+    end
+
+    def reject!
+      update({ :status => "deleted", }, :as => CurrentUser.role)
+      forum_updater.update("[i]UPDATE #{date_timestamp}[/i]: The tag implication #{antecedent_name} -> #{consequent_name} has been rejected.", "REJECTED")
+      destroy
+    end
+
+    def create_mod_action
+      implication = %Q("tag implication ##{id}":[#{Rails.application.routes.url_helpers.tag_implication_path(self)}]: [[#{antecedent_name}]] -> [[#{consequent_name}]])
+
+      if id_changed?
+        ModAction.log("created #{status} #{implication}")
+      else
+        # format the changes hash more nicely.
+        change_desc = changes.except(:updated_at).map do |attribute, values|
+          old, new = values[0], values[1]
+          if old.nil?
+            %Q(set #{attribute} to "#{new}")
+          else
+            %Q(changed #{attribute} from "#{old}" to "#{new}")
+          end
+        end.join(", ")
+
+        ModAction.log("updated #{implication}\n#{change_desc}")
+      end
+    end
+
+    def date_timestamp
+      Time.now.strftime("%Y-%m-%d")
+    end
+
+    def forum_updater
+      @forum_updater ||= begin
+        post = if forum_topic
+          forum_post || forum_topic.posts.where("body like ?", TagImplicationRequest.command_string(antecedent_name, consequent_name) + "%").last
+        else
+          nil
+        end
+        ForumUpdater.new(
+          forum_topic, 
+          forum_post: post, 
+          expected_title: TagImplicationRequest.topic_title(antecedent_name, consequent_name)
+        )
+      end
+    end
+  end
+
   include DescendantMethods
   include ParentMethods
   extend SearchMethods
+  include ValidationMethods
+  include ApprovalMethods
 
   def initialize_creator
     self.creator_id = CurrentUser.user.id
     self.creator_ip_addr = CurrentUser.ip_addr
   end
 
-  def process!(update_topic=true)
-    unless valid?
-      raise errors.full_messages.join("; ")
-    end
-
-    tries = 0
-
-    begin
-      CurrentUser.scoped(approver, CurrentUser.ip_addr) do
-        update({ :status => "processing" }, :as => approver.role)
-        update_posts
-        update({ :status => "active" }, :as => approver.role)
-        update_descendant_names_for_parents
-        update_forum_topic_for_approve if update_topic
-      end
-    rescue Exception => e
-      if tries < 5
-        tries += 1
-        sleep 2 ** tries
-        retry
-      end
-
-      update_forum_topic_for_error(e)
-      update({ :status => "error: #{e}" }, :as => CurrentUser.role)
-
-      if Rails.env.production?
-        NewRelic::Agent.notice_error(e, :custom_params => {:tag_implication_id => id, :antecedent_name => antecedent_name, :consequent_name => consequent_name})
-      end
-    end
-  end
-
-  def absence_of_circular_relation
-    # We don't want a -> b && b -> a chains
-    if self.class.active.exists?(["antecedent_name = ? and consequent_name = ?", consequent_name, antecedent_name])
-      self.errors[:base] << "Tag implication can not create a circular relation with another tag implication"
-      false
-    end
-  end
-
-  def antecedent_is_not_aliased
-    # We don't want to implicate a -> b if a is already aliased to c
-    if TagAlias.active.exists?(["antecedent_name = ?", antecedent_name])
-      self.errors[:base] << "Antecedent tag must not be aliased to another tag"
-      false
-    end
-  end
-
-  def consequent_is_not_aliased
-    # We don't want to implicate a -> b if b is already aliased to c
-    if TagAlias.active.exists?(["antecedent_name = ?", consequent_name])
-      self.errors[:base] << "Consequent tag must not be aliased to another tag"
-      false
-    end
-  end
-
-  def antecedent_and_consequent_are_different
-    normalize_names
-    if antecedent_name == consequent_name
-      self.errors[:base] << "Cannot implicate a tag to itself"
-      false
-    end
-  end
-
-  def update_posts
-    Post.without_timeout do
-      Post.raw_tag_match(antecedent_name).where("true /* TagImplication#update_posts */").find_each do |post|
-        fixed_tags = "#{post.tag_string} #{descendant_names}".strip
-        CurrentUser.scoped(creator, creator_ip_addr) do
-          post.update_attributes(
-            :tag_string => fixed_tags
-          )
-        end
-      end
-    end
-  end
-  
   def normalize_names
     self.antecedent_name = antecedent_name.downcase.tr(" ", "_")
     self.consequent_name = consequent_name.downcase.tr(" ", "_")
@@ -248,74 +319,5 @@ class TagImplication < ActiveRecord::Base
 
   def editable_by?(user)
     deletable_by?(user)
-  end
-
-  def update_forum_topic_for_approve
-    if forum_topic
-      forum_topic.posts.create(
-        :body => "The tag implication #{antecedent_name} -> #{consequent_name} has been approved."
-      )
-    end
-  end
-
-  def update_forum_topic_for_reject
-    if forum_topic
-      forum_topic.posts.create(
-        :body => "The tag implication #{antecedent_name} -> #{consequent_name} has been rejected."
-      )
-    end
-  end
-
-  def update_forum_topic_for_error(e)
-    if forum_topic
-      forum_topic.posts.create(
-        :body => "The tag implication #{antecedent_name} -> #{consequent_name} failed during processing. Reason: #{e}"
-      )
-    end
-  end
-
-  def wiki_pages_present
-    return if skip_secondary_validations
-
-    unless WikiPage.titled(consequent_name).exists?
-      self.errors[:base] = "The #{consequent_name} tag needs a corresponding wiki page"
-      return false
-    end
-
-    unless WikiPage.titled(antecedent_name).exists?
-      self.errors[:base] = "The #{antecedent_name} tag needs a corresponding wiki page"
-      return false
-    end
-  end
-
-  def approve!(approver = CurrentUser.user, update_topic: true)
-    update({ :status => "queued", :approver_id => approver.id }, :as => approver.role)
-    delay(:queue => "default").process!(update_topic)
-  end
-
-  def reject!
-    update({ :status => "deleted", }, :as => CurrentUser.role)
-    update_forum_topic_for_reject
-    destroy
-  end
-
-  def create_mod_action
-    implication = %Q("tag implication ##{id}":[#{Rails.application.routes.url_helpers.tag_implication_path(self)}]: [[#{antecedent_name}]] -> [[#{consequent_name}]])
-
-    if id_changed?
-      ModAction.log("created #{status} #{implication}")
-    else
-      # format the changes hash more nicely.
-      change_desc = changes.except(:updated_at).map do |attribute, values|
-        old, new = values[0], values[1]
-        if old.nil?
-          %Q(set #{attribute} to "#{new}")
-        else
-          %Q(changed #{attribute} from "#{old}" to "#{new}")
-        end
-      end.join(", ")
-
-      ModAction.log("updated #{implication}\n#{change_desc}")
-    end
   end
 end

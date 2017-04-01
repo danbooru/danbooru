@@ -43,7 +43,7 @@ class TagAliasesController < ApplicationController
 
   def approve
     @tag_alias = TagAlias.find(params[:id])
-    @tag_alias.approve!(CurrentUser.user)
+    @tag_alias.approve!(approver: CurrentUser.user)
     respond_with(@tag_alias, :location => tag_alias_path(@tag_alias))
   end
 

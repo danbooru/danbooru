@@ -74,7 +74,7 @@ class TagAliasTest < ActiveSupport::TestCase
       assert_nil(Cache.get("ta:aaa"))
     end
 
-    should "zzz move saved searches" do
+    should "move saved searches" do
       tag1 = FactoryGirl.create(:tag, :name => "...")
       tag2 = FactoryGirl.create(:tag, :name => "bbb")
       ss = FactoryGirl.create(:saved_search, :query => "123 ... 456", :user => CurrentUser.user)
@@ -139,7 +139,8 @@ class TagAliasTest < ActiveSupport::TestCase
     context "with an associated forum topic" do
       setup do
         @admin = FactoryGirl.create(:admin_user)
-        @topic = FactoryGirl.create(:forum_topic)
+        @topic = FactoryGirl.create(:forum_topic, :title => TagAliasRequest.topic_title("aaa", "bbb"))
+        @post = FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => TagAliasRequest.command_string("aaa", "bbb"))
         @alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic, :status => "pending")
       end
 
@@ -147,24 +148,32 @@ class TagAliasTest < ActiveSupport::TestCase
         setup do
           @wiki1 = FactoryGirl.create(:wiki_page, :title => "aaa")
           @wiki2 = FactoryGirl.create(:wiki_page, :title => "bbb")
-          @alias.approve!(@admin)
+          @alias.approve!(approver: @admin)
           @admin.reload # reload to get the forum post the approval created.
+          @topic.reload
         end
 
         should "update the forum topic when approved" do
-          assert(@topic.posts.last, @admin.forum_posts.last)
-          assert_match(/The tag alias .* been approved/, @admin.forum_posts.last.body)
+          assert_equal("[APPROVED] Tag alias: aaa -> bbb", @topic.title)
+          assert_match(/The tag alias .* been approved/m, @admin.forum_posts[-2].body)
         end
 
         should "warn about conflicting wiki pages when approved" do
-          assert_match(/has conflicting wiki pages/, @admin.forum_posts.last.body)
+          assert_match(/has conflicting wiki pages/m, @admin.forum_posts[-1].body)
         end
       end
 
       should "update the topic when processed" do
         assert_difference("ForumPost.count") do
-          @alias.approve!(@admin)
+          @alias.approve!(approver: @admin)
         end
+      end
+
+      should "update the parent post" do
+        previous = @post.body
+        @alias.approve!(approver: @admin)
+        @post.reload
+        assert_not_equal(previous, @post.body)
       end
 
       should "update the topic when rejected" do
@@ -176,8 +185,10 @@ class TagAliasTest < ActiveSupport::TestCase
       should "update the topic when failed" do
         @alias.stubs(:sleep).returns(true)
         @alias.stubs(:update_posts).raises(Exception, "oh no")
-        @alias.approve!(@admin)
+        @alias.approve!(approver: @admin)
+        @topic.reload
 
+        assert_equal("[FAILED] Tag alias: aaa -> bbb", @topic.title)
         assert_match(/error: oh no/, @alias.status)
         assert_match(/The tag alias .* failed during processing/, @admin.forum_posts.last.body)
       end

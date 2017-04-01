@@ -64,17 +64,21 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
     context "with an associated forum topic" do
       setup do
-        @topic = FactoryGirl.create(:forum_topic)
-        @req = FactoryGirl.create(:bulk_update_request, :script => "create alias AAA -> BBB", :forum_topic => @topic)
+        @topic = FactoryGirl.create(:forum_topic, :title => "[bulk] hoge")
+        @post = FactoryGirl.create(:forum_post, :topic_id => @topic.id)
+        @req = FactoryGirl.create(:bulk_update_request, :script => "create alias AAA -> BBB", :forum_topic_id => @topic.id, :forum_post_id => @post.id, :title => "[bulk] hoge")
       end
 
       should "handle errors gracefully" do
-        @req.stubs(:update_forum_topic_for_approve).raises(RuntimeError.new("blah"))
-        assert_difference("Dmail.count", 1) do
+        @req.stubs(:update).raises(RuntimeError.new("blah"))
+        assert_difference("ForumPost.count", 1) do
           @req.approve!(@admin)
         end
-        assert_match(/Exception: RuntimeError/, Dmail.last.body)
-        assert_match(/Message: blah/, Dmail.last.body)
+
+        @topic.reload
+        @post.reload
+        assert_match(/\[FAILED\]/, @topic.title)
+        assert_match(/UPDATE/, @post.body)
       end
 
       should "downcase the text" do
@@ -85,6 +89,11 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         assert_difference("ForumPost.count") do
           @req.approve!(@admin)
         end
+
+        @topic.reload
+        @post.reload
+        assert_match(/\[APPROVED\]/, @topic.title)
+        assert_match(/UPDATE/, @post.body)
       end
 
       should "update the topic when rejected" do
@@ -93,6 +102,11 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         assert_difference("ForumPost.count") do
           @req.reject!
         end
+
+        @topic.reload
+        @post.reload
+        assert_match(/\[REJECTED\]/, @topic.title)
+        assert_match(/UPDATE/, @post.body)
       end
     end
   end

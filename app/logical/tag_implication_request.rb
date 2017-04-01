@@ -6,6 +6,14 @@ class TagImplicationRequest
   validate :validate_tag_implication
   validate :validate_forum_topic
 
+  def self.topic_title(antecedent_name, consequent_name)
+    "Tag implication: #{antecedent_name} -> #{consequent_name}"
+  end
+
+  def self.command_string(antecedent_name, consequent_name)
+    "create implication [[#{antecedent_name}]] -> [[#{consequent_name}]]"
+  end
+
   def initialize(attributes)
     @antecedent_name = attributes[:antecedent_name].strip.tr(" ", "_")
     @consequent_name = attributes[:consequent_name].strip.tr(" ", "_")
@@ -23,7 +31,7 @@ class TagImplicationRequest
       @forum_topic = build_forum_topic(@tag_implication.id)
       @forum_topic.save
 
-      @tag_implication.update_attribute(:forum_topic_id, @forum_topic.id)
+      @tag_implication.update_attributes(:forum_topic_id => @forum_topic.id, :forum_post_id => @forum_topic.posts.first.id)
     end
   end
 
@@ -39,9 +47,9 @@ class TagImplicationRequest
 
   def build_forum_topic(tag_implication_id)
     ForumTopic.new(
-      :title => "Tag implication: #{antecedent_name} -> #{consequent_name}",
+      :title => TagImplicationRequest.topic_title(antecedent_name, consequent_name),
       :original_post_attributes => {
-        :body => "create implication [[#{antecedent_name}]] -> [[#{consequent_name}]]\n\n\"Link to implication\":/tag_implications?search[id]=#{tag_implication_id}\n\n#{reason}"
+        :body => TagImplicationRequest.command_string(antecedent_name, consequent_name) + "\n\n\"Link to implication\":/tag_implications?search[id]=#{tag_implication_id}\n\n#{reason}"
       },
       :category_id => 1
     )

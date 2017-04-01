@@ -48,7 +48,7 @@ class TagImplicationsController < ApplicationController
 
   def approve
     @tag_implication = TagImplication.find(params[:id])
-    @tag_implication.approve!(CurrentUser.user)
+    @tag_implication.approve!(approver: CurrentUser.user)
     respond_with(@tag_implication, :location => tag_implication_path(@tag_implication))
   end
 
