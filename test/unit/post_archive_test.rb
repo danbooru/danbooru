@@ -87,16 +87,53 @@ class PostArchiveTest < ActiveSupport::TestCase
       setup do
         PostArchive.sqs_service.stubs(:merge?).returns(false)
         @post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
-        @post.update_attributes(:tag_string => "bbb ccc xxx", :source => "")
       end
 
       should "also create a version" do
+        @post.update_attributes(:tag_string => "bbb ccc xxx", :source => "")
+
         assert_equal(2, @post.versions.size)
         @version = @post.versions.last
         assert_equal("bbb ccc xxx", @version.tags)
         assert_equal("q", @version.rating)
         assert_equal("", @version.source)
         assert_nil(@version.parent_id)
+      end
+
+      should "not create a version if updating the post fails" do
+        @post.stubs(:apply_post_metatags).raises(NotImplementedError)
+
+        assert_raise(NotImplementedError) { @post.update(rating: "s") }
+        assert_equal(1, @post.versions.size)
+      end
+
+      should "should create a version if the rating changes" do
+        assert_difference("@post.versions.size", 1) do
+          @post.update(rating: "s")
+          assert_equal("s", @post.versions.last.rating)
+        end
+      end
+
+      should "should create a version if the source changes" do
+        assert_difference("@post.versions.size", 1) do
+          @post.update(source: "blah")
+          assert_equal("blah", @post.versions.last.source)
+        end
+      end
+
+      should "should create a version if the parent changes" do
+        assert_difference("@post.versions.size", 1) do
+          @parent = FactoryGirl.create(:post)
+          @post.update(parent_id: @parent.id)
+          assert_equal(@parent.id, @post.versions.last.parent_id)
+        end
+      end
+
+      should "should create a version if the tags change" do
+        assert_difference("@post.versions.size", 1) do
+          @post.update(tag_string: "blah")
+          assert_equal("blah", @post.versions.last.tags)
+        end
       end
     end
   end
