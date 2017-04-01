@@ -238,6 +238,20 @@ class PoolTest < ActiveSupport::TestCase
       assert_equal(2, @pool.versions.size)
     end
 
+    should "not create a version if updating the pool fails" do
+      @pool.stubs(:synchronize!).raises(NotImplementedError)
+
+      assert_raise(NotImplementedError) { @pool.update(name: "blah") }
+      assert_equal(1, @pool.versions.size)
+    end
+
+    should "should create a version if the name changes" do
+      assert_difference("@pool.versions.size", 1) do
+        @pool.update(name: "blah")
+        assert_equal("blah", @pool.versions.last.name)
+      end
+    end
+
     should "know what its post ids were previously" do
       @pool.post_ids = "#{@p1.id}"
       assert_equal("", @pool.post_ids_was)
