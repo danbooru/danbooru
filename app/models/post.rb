@@ -23,13 +23,13 @@ class Post < ActiveRecord::Base
   before_save :set_tag_counts
   before_save :set_pool_category_pseudo_tags
   before_create :autoban
-  after_save :create_version
   after_save :update_parent_on_save
   after_save :apply_post_metatags
   after_save :expire_essential_tag_string_cache
   after_destroy :remove_iqdb_async
   after_destroy :delete_files
   after_destroy :delete_remote_files
+  after_commit :create_version, :on => [:create, :update]
   after_commit :update_iqdb_async, :on => :create
   after_commit :notify_pubsub
 
@@ -1414,7 +1414,7 @@ class Post < ActiveRecord::Base
 
   module VersionMethods
     def create_version(force = false)
-      if new_record? || rating_changed? || source_changed? || parent_id_changed? || tag_string_changed? || force
+      if force || new_record? || previous_changes.key?("rating") || previous_changes.key?("source") || previous_changes.key?("parent_id") || previous_changes.key?("tag_string")
         create_new_version
       end
     end
