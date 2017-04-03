@@ -160,8 +160,12 @@ module Sources
 
       # http://i1.pixiv.net/c/600x600/img-master/img/2014/10/02/13/51/23/46304396_p1_master1200.jpg
       # => http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p1.png
+      #
+      # http://i.pximg.net/img-master/img/2014/05/15/23/53/59/43521009_p1_master1200.jpg
+      # => http://i.pximg.net/img-original/img/2014/05/15/23/53/59/43521009_p1.jpg
       def rewrite_new_medium_images(thumbnail_url)
-        if thumbnail_url =~ %r!/c/\d+x\d+/img-master/img/#{TIMESTAMP}/\d+_p\d+_\w+\.jpg!i
+        if thumbnail_url =~ %r!/c/\d+x\d+/img-master/img/#{TIMESTAMP}/\d+_p\d+_\w+\.jpg!i ||
+           thumbnail_url =~ %r!/img-master/img/#{TIMESTAMP}/\d+_p\d+_\w+\.jpg!i
           page = manga_page_from_url(@url).to_i
           thumbnail_url = @metadata.pages[page]
         end
@@ -380,6 +384,9 @@ module Sources
         # http://i1.pixiv.net/c/600x600/img-master/img/2014/10/02/13/51/23/46304396_p0_master1200.jpg
         # http://i2.pixiv.net/c/64x64/img-master/img/2014/10/09/12/59/50/46441917_square1200.jpg
         return true if url =~ %r!#{I12}/c/\d+x\d+/img-master/img/#{TIMESTAMP}/\d+_\w+\.#{EXT}$!i
+
+        # http://i.pximg.net/img-master/img/2014/05/15/23/53/59/43521009_p1_master1200.jpg
+        return true if url =~ %r!#{PXIMG}/img-master/img/#{TIMESTAMP}/\d+_\w+\.#{EXT}!i
 
         # http://i.pximg.net/c/600x600/img-master/img/2017/03/22/17/40/51/62041488_p0_master1200.jpg
         return true if url =~ %r!#{PXIMG}/c/\d+x\d+/img-master/img/#{TIMESTAMP}/\d+_\w+\.#{EXT}!i
