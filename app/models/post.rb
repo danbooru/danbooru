@@ -50,7 +50,7 @@ class Post < ActiveRecord::Base
   has_many :favorites, :dependent => :destroy
 
   if PostArchive.enabled?
-    has_many :versions, lambda {order("post_versions.updated_at ASC, id ASC")}, :class_name => "PostArchive", :dependent => :destroy
+    has_many :versions, lambda {order("post_versions.updated_at ASC")}, :class_name => "PostArchive", :dependent => :destroy
   end
 
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :old_parent_id, :old_source, :old_rating, :parent_id, :has_embedded_notes, :as => [:member, :builder, :gold, :platinum, :janitor, :moderator, :admin, :default]
