@@ -8,12 +8,12 @@ module Downloads
       end
 
       def rewrite(url, headers, data = {})
-        if url =~ /\Ahttps?:\/\/(?:\w+\.)?pixiv\.net/ || url =~ /\Ahttps:\/\/i\.pximg\.net/
+        if url =~ /\Ahttps?:\/\/(?:\w+\.)?pixiv\.net/ || url =~ /\Ahttps?:\/\/i\.pximg\.net/
           url, headers = rewrite_headers(url, headers)
           url, headers = rewrite_cdn(url, headers)
         end
 
-        if (url =~ /\Ahttps?:\/\/(?:\w+\.)?pixiv\.net/ || url =~ /\Ahttps:?\/\/i\.pximg\.net/) && source.illust_id_from_url
+        if (url =~ /\Ahttps?:\/\/(?:\w+\.)?pixiv\.net/ || url =~ /\Ahttps?:\/\/i\.pximg\.net/) && source.illust_id_from_url
           url, headers = rewrite_html_pages(url, headers)
           url, headers = rewrite_thumbnails(url, headers)
           url, headers = rewrite_old_small_manga_pages(url, headers)
