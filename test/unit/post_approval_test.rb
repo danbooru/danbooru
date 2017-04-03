@@ -23,7 +23,7 @@ class PostApprovalTest < ActiveSupport::TestCase
     end
 
     should "allow approval" do
-      assert_equal(false, PostApproval.approved?(@approver.id, @post.id))
+      assert_equal(false, @post.approved_by?(@approver))
     end
 
     context "That is approved" do
@@ -43,19 +43,16 @@ class PostApprovalTest < ActiveSupport::TestCase
         end
 
         should "prevent the first approver from approving again" do
-          @post.approve!
+          @post.approve!(@approver)
           CurrentUser.user = @user2
           @post.flag!("blah")
-          CurrentUser.user = @approver2
-          @post.approve!
+          @post.approve!(@approver2)
           assert_not_equal(@approver.id, @post.approver_id)
           CurrentUser.user = @user3
           @post.flag!("blah blah")
-          CurrentUser.user = @approver
 
-          assert_raises(Post::ApprovalError) do
-            @post.approve!
-          end
+          approval = @post.approve!(@approver)
+          assert_includes(approval.errors.full_messages, "You have previously approved this post and cannot approve it again")
         end
       end
     end
