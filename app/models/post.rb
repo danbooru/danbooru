@@ -321,20 +321,8 @@ class Post < ActiveRecord::Base
       end
     end
 
-    def approve!
-      flags.each {|x| x.resolve!}
-      self.is_flagged = false
-      self.is_pending = false
-      self.is_deleted = false
-      self.approver_id = CurrentUser.id
-
-      PostApproval.create(user_id: CurrentUser.id, post_id: id)
-
-      if is_deleted_was == true
-        ModAction.log("undeleted post ##{id}")
-      end
-
-      save!
+    def approve!(approver = CurrentUser.user)
+      approvals.create!(user: approver)
     end
 
     def approved_by?(user)

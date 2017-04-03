@@ -3,6 +3,7 @@ class PostApproval < ActiveRecord::Base
   belongs_to :post, inverse_of: :approvals
 
   validate :validate_approval
+  after_create :approve_post
 
   def self.prune!
     where("created_at < ?", 1.month.ago).delete_all
@@ -20,5 +21,12 @@ class PostApproval < ActiveRecord::Base
     if post.approved_by?(user)
       errors.add(:base, "You have previously approved this post and cannot approve it again")
     end
+  end
+
+  def approve_post
+    ModAction.log("undeleted post ##{id}") if post.is_deleted
+
+    post.flags.each(&:resolve!)
+    post.update({ approver: user, is_flagged: false, is_pending: false, is_deleted: false }, without_protection: true)
   end
 end
