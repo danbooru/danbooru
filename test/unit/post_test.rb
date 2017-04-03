@@ -412,13 +412,10 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "not allow person X to approve that post" do
-          assert_raises(Post::ApprovalError) do
-            CurrentUser.scoped(@post.uploader, "127.0.0.1") do
-              @post.approve!
-            end
-          end
+          approval = @post.approve!(@post.uploader)
 
-          assert_equal(["You cannot approve a post you uploaded"], @post.errors.full_messages)
+          assert(@post.invalid?)
+          assert_includes(approval.errors.full_messages, "You cannot approve a post you uploaded")
         end
       end
 
@@ -431,19 +428,13 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "not allow person X to reapprove that post" do
-          CurrentUser.scoped(@user, "127.0.0.1") do
-            assert_raises(Post::ApprovalError) do
-              @post.approve!
-            end
-          end
+          approval = @post.approve!(@user)
+          assert_includes(approval.errors.full_messages, "You have previously approved this post and cannot approve it again")
         end
 
         should "allow person Y to approve the post" do
-          CurrentUser.scoped(@user2, "127.0.0.1") do
-            assert_nothing_raised do
-              @post.approve!
-            end
-          end
+          @post.approve!(@user2)
+          assert(@post.valid?)
         end
       end
 
@@ -479,9 +470,8 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "not allow approval" do
-        assert_raises(Post::ApprovalError) do
-          @post.approve!
-        end
+        approval = @post.approve!
+        assert_includes(approval.errors.full_messages, "Post is locked and cannot be approved")
       end
     end
   end
