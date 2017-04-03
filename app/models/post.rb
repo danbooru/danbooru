@@ -46,6 +46,7 @@ class Post < ActiveRecord::Base
   has_many :notes, :dependent => :destroy
   has_many :comments, lambda {includes(:creator, :updater).order("comments.id")}, :dependent => :destroy
   has_many :children, lambda {order("posts.id")}, :class_name => "Post", :foreign_key => "parent_id"
+  has_many :approvals, :class_name => "PostApproval", :dependent => :destroy
   has_many :disapprovals, :class_name => "PostDisapproval", :dependent => :destroy
   has_many :favorites, :dependent => :destroy
 
@@ -290,8 +291,8 @@ class Post < ActiveRecord::Base
   end
 
   module ApprovalMethods
-    def is_approvable?
-      !is_status_locked? && (is_pending? || is_flagged? || is_deleted?) && !PostApproval.approved?(CurrentUser.id, id)
+    def is_approvable?(user = CurrentUser.user)
+      !is_status_locked? && (is_pending? || is_flagged? || is_deleted?) && !approved_by?(user)
     end
 
     def flag!(reason, options = {})
@@ -321,21 +322,6 @@ class Post < ActiveRecord::Base
     end
 
     def approve!
-      if is_status_locked?
-        errors.add(:is_status_locked, "; post cannot be approved")
-        raise ApprovalError.new("Post is locked and cannot be approved")
-      end
-
-      if uploader_id == CurrentUser.id
-        errors.add(:base, "You cannot approve a post you uploaded")
-        raise ApprovalError.new("You cannot approve a post you uploaded")
-      end
-
-      if approver_id == CurrentUser.id || PostApproval.approved?(CurrentUser.id, id)
-        errors.add(:approver, "have already approved this post")
-        raise ApprovalError.new("You have previously approved this post and cannot approve it again")
-      end
-
       flags.each {|x| x.resolve!}
       self.is_flagged = false
       self.is_pending = false
@@ -349,6 +335,10 @@ class Post < ActiveRecord::Base
       end
 
       save!
+    end
+
+    def approved_by?(user)
+      approver == user || approvals.where(user: user).exists?
     end
 
     def disapproved_by?(user)
@@ -1396,7 +1386,7 @@ class Post < ActiveRecord::Base
       end
 
       if !CurrentUser.is_admin? 
-        if approver_id == CurrentUser.id || PostApproval.approved?(CurrentUser.id, id)
+        if approved_by?(CurrentUser.user)
           raise ApprovalError.new("You have previously approved this post and cannot undelete it")
         elsif uploader_id == CurrentUser.id
           raise ApprovalError.new("You cannot undelete a post you uploaded")
