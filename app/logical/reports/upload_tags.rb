@@ -33,7 +33,10 @@ module Reports
         added_tags = uploader_versions.flat_map do |version|
           version.changes[:added_tags]
         end
-        added_tags.uniq.sort
+        removed_tags = uploader_versions.flat_map do |version|
+          version.changes[:removed_tags]
+        end
+        (added_tags - removed_tags).uniq.sort
       end
     end
 
