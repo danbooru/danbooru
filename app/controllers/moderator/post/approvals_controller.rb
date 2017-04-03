@@ -3,14 +3,13 @@ module Moderator
     class ApprovalsController < ApplicationController
       before_filter :approver_only
       skip_before_filter :api_check
+      respond_to :json, :xml, :js
 
       def create
         cookies.permanent[:moderated] = Time.now.to_i
-        @post = ::Post.find(params[:post_id])
-        if @post.is_deleted? || @post.is_flagged? || @post.is_pending?
-          @post.approve!
-        end
-      rescue ::Post::ApprovalError
+        post = ::Post.find(params[:post_id])
+        @approval = post.approve!
+        respond_with(@approval)
       end
     end
   end

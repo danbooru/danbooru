@@ -14,6 +14,10 @@ class PostApproval < ActiveRecord::Base
       errors.add(:post, "is locked and cannot be approved")
     end
 
+    if post.status == "active"
+      errors.add(:post, "is already active and cannot be approved")
+    end
+
     if post.uploader == user
       errors.add(:base, "You cannot approve a post you uploaded")
     end

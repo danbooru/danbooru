@@ -1,6 +1,6 @@
-<% if @post.errors.any? %>
+<% if @approval.errors.any? %>
 
-Danbooru.error("Error: " + <%= @post.errors.full_messages.join("; ").to_json.html_safe %>);
+Danbooru.error("Error: " + <%= @approval.errors.full_messages.join("; ").to_json.html_safe %>);
 
 <% else %>
 
@@ -10,7 +10,7 @@ $("#c-posts #flag").show();
 
 $("#pending-approval-notice").hide();
 
-$("#c-moderator-post-queues #post-<%= @post.id %>").hide();
+$("#c-moderator-post-queues #post-<%= @approval.post.id %>").hide();
 Danbooru.notice("Post was approved");
 
 Danbooru.ModQueue.increment_processed();

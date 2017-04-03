@@ -322,7 +322,7 @@ class Post < ActiveRecord::Base
     end
 
     def approve!(approver = CurrentUser.user)
-      approvals.create!(user: approver)
+      approvals.create(user: approver)
     end
 
     def approved_by?(user)
