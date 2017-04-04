@@ -1502,7 +1502,7 @@ class PostTest < ActiveSupport::TestCase
         @parent = FactoryGirl.create(:post)
         @child = FactoryGirl.create(:post, parent: @parent)
 
-        @user1 = FactoryGirl.create(:user)
+        @user1 = FactoryGirl.create(:user, enable_privacy_mode: true)
         @gold1 = FactoryGirl.create(:gold_user)
         @supervoter1 = FactoryGirl.create(:user, is_super_voter: true)
 
