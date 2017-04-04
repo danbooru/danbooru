@@ -29,14 +29,13 @@ module Reports
 
     def uploader_tags_array
       @uploader_tags ||= begin
-        uploader_versions = versions.select { |p| p.updater_id == uploader_id }
-        added_tags = uploader_versions.flat_map do |version|
-          version.changes[:added_tags]
+        uploader_versions = versions.where(updater_id: uploader_id)
+        tags = []
+        uploader_versions.each do |version|
+          tags += version.changes[:added_tags]
+          tags -= version.changes[:removed_tags]
         end
-        removed_tags = uploader_versions.flat_map do |version|
-          version.changes[:removed_tags]
-        end
-        (added_tags - removed_tags).uniq.sort
+        tags.uniq.sort
       end
     end
 
