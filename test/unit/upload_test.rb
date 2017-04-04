@@ -119,7 +119,7 @@ class UploadTest < ActiveSupport::TestCase
           end
         end
 
-        context "that is an ugoira" do
+        context "that is a pixiv ugoira" do
           setup do
             @url = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654"
             @upload = FactoryGirl.create(:source_upload, :source => @url, :tag_string => "ugoira")
@@ -263,7 +263,7 @@ class UploadTest < ActiveSupport::TestCase
       end
     end
 
-    should "process completely for an ugoira" do
+    should "process completely for a pixiv ugoira" do
       @upload = FactoryGirl.create(:source_upload,
         :source => "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654",
         :rating => "s",
@@ -279,7 +279,7 @@ class UploadTest < ActiveSupport::TestCase
       assert_equal("0d94800c4b520bf3d8adda08f95d31e2", post.md5)
       assert_equal(60, post.image_width)
       assert_equal(60, post.image_height)
-      assert_equal("http://i3.pixiv.net/img-zip-ugoira/img/2014/10/05/23/42/23/46378654_ugoira1920x1080.zip", post.source)
+      assert_equal("https://i3.pixiv.net/img-zip-ugoira/img/2014/10/05/23/42/23/46378654_ugoira1920x1080.zip", post.source)
       assert_operator(File.size(post.large_file_path), :>, 0)
       assert_operator(File.size(post.preview_file_path), :>, 0)
     end

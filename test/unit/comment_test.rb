@@ -91,7 +91,7 @@ class CommentTest < ActiveSupport::TestCase
         setup do
           @post = FactoryGirl.create(:post)
           @comment = FactoryGirl.create(:comment, :post_id => @post.id)
-          @comment.destroy
+          @comment.update({is_deleted: true}, as: :member)
           @post.reload
         end
 

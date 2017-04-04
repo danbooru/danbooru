@@ -74,6 +74,10 @@ module Sources
       }
     end
 
+    def to_json
+      to_h.to_json
+    end
+
     def available?
       strategy.present?
     end

@@ -11,6 +11,11 @@ module Moderator
           @post = FactoryGirl.create(:post)
         end
 
+        teardown do
+          CurrentUser.user = nil
+          CurrentUser.ip_addr = nil
+        end
+
         context "confirm_delete action" do
           should "render" do
             get :confirm_delete, { id: @post.id }, { user_id: @admin.id }
@@ -49,7 +54,18 @@ module Moderator
         end
 
         context "move_favorites action" do
-          should "render" do
+          setup do
+            @admin = FactoryGirl.create(:admin_user)
+            CurrentUser.user = @admin
+            CurrentUser.ip_addr = "127.0.0.1"
+          end
+
+          teardown do
+            CurrentUser.user = nil
+            CurrentUser.ip_addr = nil
+          end
+
+          should "1234 render" do
             parent = FactoryGirl.create(:post)
             child = FactoryGirl.create(:post, parent: parent)
             users = FactoryGirl.create_list(:user, 2)
@@ -57,6 +73,7 @@ module Moderator
 
             put :move_favorites, { id: child.id, commit: "Submit" }, { user_id: @admin.id }
 
+            CurrentUser.user = @admin
             assert_redirected_to(child)
             assert_equal(users, parent.reload.favorited_users)
             assert_equal([], child.reload.favorited_users)

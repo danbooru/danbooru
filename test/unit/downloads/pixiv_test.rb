@@ -28,7 +28,7 @@ module Downloads
     context "An ugoira site for pixiv" do
       setup do
         @tempfile = Tempfile.new("danbooru-test")
-        @download = Downloads::File.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654", @tempfile.path)
+        @download = Downloads::File.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364", @tempfile.path)
         @download.download!
       end
 
@@ -37,8 +37,8 @@ module Downloads
       end
 
       should "capture the data" do
-        assert_equal("http://i3.pixiv.net/img-zip-ugoira/img/2014/10/05/23/42/23/46378654_ugoira1920x1080.zip", @download.source)
-        assert_equal([{"file"=>"000000.jpg", "delay"=>200}, {"file"=>"000001.jpg", "delay"=>200}, {"file"=>"000002.jpg", "delay"=>200}, {"file"=>"000003.jpg", "delay"=>200}, {"file"=>"000004.jpg", "delay"=>250}], @download.data[:ugoira_frame_data])
+        assert_equal("https://i1.pixiv.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @download.source)
+        assert_equal([{"file"=>"000000.jpg", "delay"=>125}, {"file"=>"000001.jpg", "delay"=>125}], @download.data[:ugoira_frame_data])
       end
     end
 
@@ -73,13 +73,10 @@ module Downloads
       # don't work for images uploaded after this date.
       context "downloading a new PNG illustration" do
         setup do
-          @medium_page = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46337015"
-          @big_page    = "http://www.pixiv.net/member_illust.php?mode=big&illust_id=46337015"
-
-          @medium_thumbnail = "http://i2.pixiv.net/c/600x600/img-master/img/2014/10/04/03/59/52/46337015_p0_master1200.jpg"
-          @full_size_image  = "http://i4.pixiv.net/img-original/img/2014/10/04/03/59/52/46337015_p0.png"
-
-          @file_size = 5_141
+          @medium_page = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350"
+          @medium_thumbnail = "https://i.pximg.net/c/600x600/img-master/img/2017/04/04/08/54/15/62247350_p0_master1200.jpg"
+          @full_size_image  = "http://i3.pixiv.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png"
+          @file_size = 16275
         end
 
         should "download the full size image" do
@@ -89,9 +86,7 @@ module Downloads
 
         should "download the full size image instead of the HTML page" do
           assert_rewritten(@full_size_image, @medium_page)
-          assert_rewritten(@full_size_image, @big_page)
           assert_downloaded(@file_size, @medium_page)
-          assert_downloaded(@file_size, @big_page)
         end
 
         should "download the full size image instead of the thumbnail" do
@@ -144,20 +139,14 @@ module Downloads
 
       context "downloading a ugoira" do
         setup do
-          @medium_page     = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46323924"
-          @small_thumbnail = "http://i1.pixiv.net/img-inf/img/2014/10/03/17/29/16/46323924_s.jpg"
-          @zip_file        = "http://i1.pixiv.net/img-zip-ugoira/img/2014/10/03/17/29/16/46323924_ugoira1920x1080.zip"
-          @file_size       = 41_171
+          @medium_page     = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364"
+          @zip_file        = "https://i1.pixiv.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip"
+          @file_size       = 2804
         end
 
         should "download the zip file instead of the HTML page" do
           assert_rewritten(@zip_file, @medium_page)
           assert_downloaded(@file_size, @medium_page)
-        end
-
-        should "download the zip file instead of the thumbnail" do
-          assert_rewritten(@zip_file, @small_thumbnail)
-          assert_downloaded(@file_size, @small_thumbnail)
         end
 
         should "download the zip file" do
@@ -167,14 +156,6 @@ module Downloads
       end
 
       context "downloading a profile image" do
-        should "download old profile images" do
-          @file_url = "http://img12.pixiv.net/profile/rapattu/119950.jpg"
-          @file_size = 16238
-
-          assert_not_rewritten(@file_url)
-          assert_downloaded(@file_size, @file_url)
-        end
-
         should "download new profile images" do
           @file_url = "http://i2.pixiv.net/img130/profile/minono_aki/8733472.jpg"
           @file_size = 23266
@@ -196,14 +177,6 @@ module Downloads
       end
 
       context "downloading a novel image" do
-        should "download old novel images" do
-          @file_url = "http://i2.pixiv.net/img20/img/a-park/novel/3607898.jpg"
-          @file_size = 125_635
-
-          assert_not_rewritten(@file_url)
-          assert_downloaded(@file_size, @file_url)
-        end
-
         should "download new novel images" do
           @file_url = "http://i1.pixiv.net/novel-cover-original/img/2016/11/03/20/10/58/7436075_f75af69f3eacd1656d3733c72aa959cf.jpg"
           @file_size = 316_133

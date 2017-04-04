@@ -24,8 +24,8 @@ class PostEventTest < ActiveSupport::TestCase
     should "work" do
       results = PostEvent.find_for_post(@post.id)
       assert_equal(2, results.size)
-      assert(results[0].flag?)
-      assert(results[1].appeal?)
+      assert_equal("appeal", results[0].type_name)
+      assert_equal("flag", results[1].type_name)
     end
   end
 end

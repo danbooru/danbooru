@@ -5,11 +5,15 @@ module PoolArchiveTestHelper
         _, json = msg.split(/\n/)
         json = JSON.parse(json)
         prev = PoolArchive.where(pool_id: json["pool_id"]).order("id desc").first
-        if prev && prev.updater_ip_addr.to_s == json["updater_ip_addr"]
+        if merge?(prev, json)
           prev.update_columns(json)
         else
           PoolArchive.create(json)
         end
+      end
+
+      def merge?(prev, json)
+        prev && (prev.updater_id == json["updater_id"]) && (prev.updated_at >= 1.hour.ago)
       end
     end
 

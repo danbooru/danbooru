@@ -1,18 +1,23 @@
 require 'test_helper'
+require 'helpers/post_archive_test_helper'
 
 class PostVersionsControllerTest < ActionController::TestCase
+  include PostArchiveTestHelper
+
+  def setup
+    super
+    @user = FactoryGirl.create(:user)
+    CurrentUser.user = @user
+    CurrentUser.ip_addr = "127.0.0.1"
+  end
+
+  def teardown
+    super
+    CurrentUser.user = nil
+    CurrentUser.ip_addr = nil
+  end
+
   context "The post versions controller" do
-    setup do
-      @user = FactoryGirl.create(:user)
-      CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
-    end
-
-    teardown do
-      CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
-    end
-
     context "index action" do
       setup do
         @post = FactoryGirl.create(:post)
@@ -21,13 +26,13 @@ class PostVersionsControllerTest < ActionController::TestCase
       end
 
       should "list all versions" do
-        get :index
+        get :index, {}, {:user_id => @user.id}
         assert_response :success
         assert_not_nil(assigns(:post_versions))
       end
 
       should "list all versions that match the search criteria" do
-        get :index, {:search => {:post_id => @post.id}}
+        get :index, {:search => {:post_id => @post.id}}, {:user_id => @user.id}
         assert_response :success
         assert_not_nil(assigns(:post_versions))
       end

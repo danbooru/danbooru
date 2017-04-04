@@ -18,7 +18,7 @@ class UserFeedbackTest < ActiveSupport::TestCase
       member = FactoryGirl.create(:user)
 
       CurrentUser.user = gold
-      assert_difference("Dmail.count", 2) do
+      assert_difference("Dmail.count", 1) do
         FactoryGirl.create(:user_feedback, :user => user)
       end
     end

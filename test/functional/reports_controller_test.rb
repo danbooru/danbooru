@@ -1,7 +1,12 @@
 require 'test_helper'
+require 'helpers/post_archive_test_helper'
 
 class ReportsControllerTest < ActionController::TestCase
-  setup do
+  include PostArchiveTestHelper
+
+  def setup
+    super
+
     CurrentUser.user = FactoryGirl.create(:mod_user)
     CurrentUser.ip_addr = "127.0.0.1"
     session[:user_id] = CurrentUser.user.id
@@ -10,34 +15,15 @@ class ReportsControllerTest < ActionController::TestCase
     @posts = @users.map { |u| FactoryGirl.create(:post, uploader: u) }
   end
 
-  teardown do
+  def teardown
+    super
+
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
     session[:user_id] = nil
   end
 
   context "The reports controller" do
-    context "user_promotions action" do
-      should "render" do
-        get :user_promotions
-        assert_response :success
-      end
-    end
-
-    context "janitor_trials action" do
-      should "render" do
-        get :janitor_trials
-        assert_response :success
-      end
-    end
-
-    context "contributors action" do
-      should "render" do
-        get :contributors
-        assert_response :success
-      end
-    end
-
     context "uploads action" do
       should "render" do
         get :uploads
@@ -56,13 +42,6 @@ class ReportsControllerTest < ActionController::TestCase
       should "render" do
         get :post_versions
         assert_response :success
-      end
-    end
-
-    context "post_versions_create action" do
-      should "render" do
-        #post :post_versions_create, { tag: "touhou", type: "added" }
-        #assert_response :success
       end
     end
   end

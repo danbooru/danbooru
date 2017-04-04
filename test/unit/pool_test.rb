@@ -16,6 +16,7 @@ class PoolTest < ActiveSupport::TestCase
     MEMCACHE.flush_all
 
     mock_pool_archive_service!
+    PoolArchive.sqs_service.stubs(:merge?).returns(false)
     start_pool_archive_transaction
   end
 
@@ -229,20 +230,13 @@ class PoolTest < ActiveSupport::TestCase
       @pool.reload
       assert_equal(2, @pool.versions.size)
 
-      CurrentUser.scoped(user2, "127.0.0.2") do
+      CurrentUser.scoped(user2, "127.0.0.3") do
         @pool.post_ids = "#{@p1.id} #{@p2.id}"
         @pool.save
       end
 
       @pool.reload
-      assert_equal(2, @pool.versions.size)
-    end
-
-    should "not create a version if updating the pool fails" do
-      @pool.stubs(:synchronize!).raises(NotImplementedError)
-
-      assert_raise(NotImplementedError) { @pool.update(name: "blah") }
-      assert_equal(1, @pool.versions.size)
+      assert_equal(3, @pool.versions.size)
     end
 
     should "should create a version if the name changes" do

@@ -14,6 +14,7 @@ class PoolsControllerTest < ActionController::TestCase
       CurrentUser.ip_addr = "127.0.0.1"
       @post = FactoryGirl.create(:post)
       mock_pool_archive_service!
+      PoolArchive.sqs_service.stubs(:merge?).returns(false)
       start_pool_archive_transaction
     end
 

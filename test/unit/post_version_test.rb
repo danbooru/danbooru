@@ -69,7 +69,9 @@ class PostVersionTest < ActiveSupport::TestCase
     context "that has been updated" do
       setup do
         PostArchive.sqs_service.stubs(:merge?).returns(false)
-        @post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
+        Timecop.travel(1.minute.ago) do
+          @post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
+        end
         @post.update_attributes(:tag_string => "bbb ccc xxx", :source => "")
       end
 

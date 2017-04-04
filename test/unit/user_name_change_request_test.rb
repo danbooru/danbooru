@@ -6,6 +6,12 @@ class UserNameChangeRequestTest < ActiveSupport::TestCase
       @admin = FactoryGirl.create(:admin_user)
       @requester = FactoryGirl.create(:user)
       CurrentUser.user = @requester
+      CurrentUser.ip_addr = "127.0.0.1"
+    end
+
+    teardown do
+      CurrentUser.user = nil
+      CurrentUser.ip_addr = nil
     end
     
     context "approving a request" do
@@ -20,7 +26,7 @@ class UserNameChangeRequestTest < ActiveSupport::TestCase
       end
       
       should "create a dmail" do
-        assert_difference("Dmail.count", 4) do
+        assert_difference("Dmail.count", 2) do
           @change_request.approve!
         end
       end
@@ -61,7 +67,7 @@ class UserNameChangeRequestTest < ActiveSupport::TestCase
       end
       
       should "create a dmail" do
-        assert_difference("Dmail.count", 2) do
+        assert_difference("Dmail.count", 1) do
           @change_request.reject!("msg")
         end
       end

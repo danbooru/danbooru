@@ -38,10 +38,10 @@ module Sources
 
       should "convert a page into a json representation" do
         assert_nothing_raised do
-          @site_1.to_json
+          @site_1.to_h
         end
         assert_nothing_raised do
-          @site_2.to_json
+          @site_2.to_h
         end
       end
     end
