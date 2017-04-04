@@ -81,11 +81,9 @@ class TagAlias < ActiveRecord::Base
   include CacheMethods
 
   def self.to_aliased(names)
-    Array(names).flatten.map do |name|
-      Cache.get("ta:#{Cache.sanitize(name)}") do
-        ActiveRecord::Base.select_value_sql("select consequent_name from tag_aliases where status in ('active', 'processing') and antecedent_name = ?", name) || name.to_s
-      end
-    end.uniq
+    Cache.get_multi(Array(names), "ta") do |tag|
+      ActiveRecord::Base.select_value_sql("select consequent_name from tag_aliases where status in ('active', 'processing') and antecedent_name = ?", tag) || tag.to_s
+    end.values
   end
 
   def approve!(approver = CurrentUser.user, update_topic: true)
