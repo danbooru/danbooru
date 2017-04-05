@@ -33,7 +33,13 @@ module Iqdb
           if resp.is_a?(Net::HTTPSuccess)
             json = JSON.parse(resp.body)
             if json.is_a?(Array)
-              @matches = json
+              post_ids = json.map { |match| match["post_id"] }
+              posts = Post.find(post_ids)
+
+              @matches = json.map do |match|
+                post = posts.find { |post| post.id == match["post_id"] }
+                match.with_indifferent_access.merge({ post: post })
+              end
             else
               @matches = []
             end

@@ -1,7 +1,7 @@
 var html = '';
 <% if @results.any? %>
   <% @results.each do |match| %>
-    html += '<%= j PostPresenter.preview(Post.find(match["post_id"]), :tags => "status:any") %>';
+    html += '<%= j PostPresenter.preview(match[:post], :tags => "status:any") %>';
   <% end %>
 <% else %>
   html += '<p>No matches found</p>';
