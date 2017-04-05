@@ -1282,9 +1282,11 @@ class Post < ActiveRecord::Base
     def give_favorites_to_parent
       return if parent.nil?
 
-      favorites.each do |fav|
-        remove_favorite!(fav.user)
-        parent.add_favorite!(fav.user)
+      transaction do
+        favorites.each do |fav|
+          remove_favorite!(fav.user)
+          parent.add_favorite!(fav.user)
+        end
       end
     end
 
