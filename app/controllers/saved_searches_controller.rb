@@ -1,7 +1,6 @@
 class SavedSearchesController < ApplicationController
-  include SavedSearches::CheckAvailability
-
   before_filter :member_only
+  before_filter :check_availability
   respond_to :html, :xml, :json, :js
   
   def index
@@ -55,5 +54,11 @@ class SavedSearchesController < ApplicationController
 private
   def saved_searches
     CurrentUser.user.saved_searches
+  end
+
+  def check_availability
+    if !SavedSearch.enabled?
+      raise NotImplementedError.new("Listbooru service is not configured. Saved searches are not available.")
+    end
   end
 end
