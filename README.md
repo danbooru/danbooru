@@ -37,6 +37,24 @@ debug your Nginx configuration file.
 
 4) Check all log files.
 
+### Amazon Web Services
+
+In order to enable the following features, you will need an AWS SQS 
+account:
+
+* Pool versions
+* Post versions
+* IQDB
+* Saved searches
+* Related tags
+
+### Google APIs
+
+The following features requires a Google API account:
+
+* Bulk revert
+* Post versions report
+
 ### IQDB Integration
 
 IQDB integration is now delegated to the [IQDBS service](https://github.com/r888888888/iqdbs). 
@@ -53,3 +71,14 @@ configure the [Listbooru service](https://github.com/r888888888/listbooru).
 
 In order to access versioned data for pools (and eventually posts) you will 
 need to install and configure the [Archives service](https://github.com/r888888888/archives).
+
+### Reportbooru Service
+
+The following features are delegated to the [Reportbooru service](https://github.com/r888888888/reportbooru):
+
+* Related tags
+* Missed searches report
+* Popular searches report
+* Favorite searches
+* Upload trend graphs
+* Similar users (via favorites and post votes)
