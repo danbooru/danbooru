@@ -35,7 +35,7 @@ class PoolVersion < ActiveRecord::Base
   extend SearchMethods
 
   def self.export_to_archives(starting_version_id = 0)
-    raise "SQS URL not setup" if Danbooru.config.aws_sqs_archives_url.nil?
+    raise NotImplementedError.new("SQS URL not setup") if Danbooru.config.aws_sqs_archives_url.nil?
 
     credentials = Aws::Credentials.new(
       Danbooru.config.aws_access_key_id,

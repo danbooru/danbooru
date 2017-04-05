@@ -60,7 +60,7 @@ class PostArchive < ActiveRecord::Base
       def queue(post)
         # queue updates to sqs so that if archives goes down for whatever reason it won't
         # block post updates
-        raise "Archive service is not configured" if !enabled?
+        raise NotImplementedError.new("Archive service is not configured") if !enabled?
 
         json = {
           "post_id" => post.id,

@@ -1,5 +1,15 @@
 # queries reportbooru to find missed post searches
 class MissedSearchService
+  def self.enabled?
+    Danbooru.config.reportbooru_server.present?
+  end
+
+  def initialize
+    if !MissedSearchService.enabled?
+      raise NotImplementedError.new("the Reportbooru service isn't configured. Missed searches are not available.")
+    end
+  end
+
   def each_search(&block)
     fetch_data.scan(/(.+?) (\d+)\.0\n/).each(&block)
   end

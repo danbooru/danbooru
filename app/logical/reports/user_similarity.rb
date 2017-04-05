@@ -24,7 +24,7 @@ module Reports
     end
 
     def fetch_similar_user_ids(endpoint = "user_similarity")
-      return NotImplementedError unless Danbooru.config.reportbooru_server
+      raise NotImplementedError.new("the Reportbooru service isn't configured. User similarity is not available.") unless Danbooru.config.reportbooru_server
 
       params = {
         "key" => Danbooru.config.reportbooru_key,

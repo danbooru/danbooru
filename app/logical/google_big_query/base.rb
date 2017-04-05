@@ -2,6 +2,14 @@ require "big_query"
 
 module GoogleBigQuery
   class Base
+    def self.enabled?
+      File.exists?(Danbooru.config.google_api_json_key_path)
+    end
+
+    def initialize
+      raise NotImplementedError.new("Google Big Query is not configured.") unless GoogleBigQuery::Base.enabled?
+    end
+
     def query(q)
       client.query(q)
     end

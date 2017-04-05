@@ -4,7 +4,7 @@
     <li id="secondary-links-posts-upload" class="nonessential"><%= link_to "Upload", new_upload_path %></li>
     <li id="secondary-links-posts-popular"><%= link_to "Popular", popular_explore_posts_path %></li>
     <li id="secondary-links-posts-hot"><%= link_to "Hot", posts_path(:tags => "order:rank") %></li>
-    <% if Danbooru.config.reportbooru_server %>
+    <% if PopularSearchService.enabled? %>
       <li id="secondary-links-posts-searches"><%= link_to "Searches", searches_explore_posts_path %></li>
     <% end %>
     <% unless CurrentUser.is_anonymous? %>

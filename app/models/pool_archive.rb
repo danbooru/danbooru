@@ -43,7 +43,7 @@ class PoolArchive < ActiveRecord::Base
   def self.queue(pool)
     # queue updates to sqs so that if archives goes down for whatever reason it won't
     # block pool updates
-    raise "Archive service is not configured" if !enabled?
+    raise NotImplementedError.new("Archive service is not configured.") if !enabled?
 
     json = {
       pool_id: pool.id,

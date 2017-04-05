@@ -4,8 +4,7 @@ class IqdbQueriesController < ApplicationController
 
   def create
     if !Danbooru.config.iqdbs_server
-      render :nothing => true
-      return
+      raise NotImplementedError.new("the IQDBs service isn't configured. Similarity searches are not available.")
     end
 
     if params[:url]

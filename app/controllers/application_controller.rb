@@ -84,6 +84,13 @@ class ApplicationController < ActionController::Base
     elsif exception.is_a?(::ActiveRecord::RecordNotFound)
       @error_message = "That record was not found"
       render :template => "static/error", :status => 404
+    elsif exception.is_a?(NotImplementedError)
+      flash[:notice] = "This feature isn't available: #{@exception.message}"
+      respond_to do |fmt|
+        fmt.html { redirect_to :back }
+        fmt.json { render template: "static/error", status: 501 }
+        fmt.xml  { render template: "static/error", status: 501 }
+      end
     else
       render :template => "static/error", :status => 500
     end
