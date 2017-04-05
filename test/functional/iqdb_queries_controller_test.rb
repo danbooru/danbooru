@@ -28,6 +28,13 @@ class IqdbQueriesControllerTest < ActionController::TestCase
 
         assert_response :success
       end
+
+      should "render for a json response" do
+        mock_iqdb_matches!(@posts[0].source, @posts)
+        get :index, { url: @posts[0].source, format: "json" }, { user_id: @user.id }
+
+        assert_response :success
+      end
     end
   end
 end
