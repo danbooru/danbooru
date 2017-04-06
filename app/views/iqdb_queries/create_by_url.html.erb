@@ -1,7 +1,7 @@
 <% if @results.any? %>
   <h3>Similar</h3>
   <% @results.each do |match| %>
-    <%= PostPresenter.preview(Post.find(match["post_id"]), :tags => "status:any", :size => true) %>
+    <%= PostPresenter.preview(match[:post], :tags => "status:any", :size => true) %>
   <% end %>
 <% else %>
   <h3>Similar</h3>

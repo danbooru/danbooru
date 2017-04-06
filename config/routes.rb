@@ -147,7 +147,7 @@ Rails.application.routes.draw do
     resource :visit, :controller => "forum_topic_visits"
   end
   resources :ip_bans
-  resources :iqdb_queries, :only => [:create]
+  resources :iqdb_queries, :only => [:create, :index]
   resources :janitor_trials do
     collection do
       get :test
@@ -206,6 +206,7 @@ Rails.application.routes.draw do
       get :show_seq
       put :mark_as_translated
     end
+    get :similar, :to => "iqdb_queries#index"
   end
   resources :post_appeals
   resources :post_flags
