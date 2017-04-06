@@ -6,7 +6,7 @@ worker_processes 2
 
 preload_app true
 timeout 180
-listen "127.0.0.1:9000"
+listen "/tmp/.unicorn.sock", :backlog => 512
 
 # Spawn unicorn master worker for user apps (group: apps)
 user 'danbooru', 'danbooru'
