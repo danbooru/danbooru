@@ -21,6 +21,11 @@ class Artist < ActiveRecord::Base
   attr_accessible :is_active, :as => [:builder, :janitor, :moderator, :default, :admin]
   attr_accessible :is_banned, :as => :admin
 
+  scope :active, lambda { where(is_active: true) }
+  scope :deleted, lambda { where(is_active: false) }
+  scope :banned, lambda { where(is_banned: true) }
+  scope :unbanned, lambda { where(is_banned: false) }
+
   module UrlMethods
     extend ActiveSupport::Concern
 
@@ -328,14 +333,6 @@ class Artist < ActiveRecord::Base
   end
 
   module SearchMethods
-    def active
-      where("is_active = true")
-    end
-
-    def banned
-      where("is_banned = true")
-    end
-
     def url_matches(string)
       matches = find_all_by_url(string).map(&:id)
 
@@ -362,33 +359,33 @@ class Artist < ActiveRecord::Base
 
     def other_names_match(string)
       if string =~ /\*/ && CurrentUser.is_builder?
-        where("other_names ILIKE ? ESCAPE E'\\\\'", string.to_escaped_for_sql_like)
+        where("artists.other_names ILIKE ? ESCAPE E'\\\\'", string.to_escaped_for_sql_like)
       else
-        where("other_names_index @@ to_tsquery('danbooru', E?)", Artist.normalize_name(string).to_escaped_for_tsquery)
+        where("artists.other_names_index @@ to_tsquery('danbooru', E?)", Artist.normalize_name(string).to_escaped_for_tsquery)
       end
     end
 
     def group_name_matches(name)
       stripped_name = normalize_name(name).to_escaped_for_sql_like
-      where("group_name LIKE ? ESCAPE E'\\\\'", stripped_name)
+      where("artists.group_name LIKE ? ESCAPE E'\\\\'", stripped_name)
     end
 
     def name_matches(name)
       stripped_name = normalize_name(name).to_escaped_for_sql_like
-      where("name LIKE ? ESCAPE E'\\\\'", stripped_name)
+      where("artists.name LIKE ? ESCAPE E'\\\\'", stripped_name)
     end
 
     def named(name)
-      where("name = ?", normalize_name(name))
+      where(name: normalize_name(name))
     end
 
     def any_name_matches(name)
       stripped_name = normalize_name(name).to_escaped_for_sql_like
       if name =~ /\*/ && CurrentUser.is_builder?
-        where("(name LIKE ? ESCAPE E'\\\\' OR other_names LIKE ? ESCAPE E'\\\\')", stripped_name, stripped_name)
+        where("(artists.name LIKE ? ESCAPE E'\\\\' OR artists.other_names LIKE ? ESCAPE E'\\\\')", stripped_name, stripped_name)
       else
         name_for_tsquery = normalize_name(name).to_escaped_for_tsquery
-        where("(name LIKE ? ESCAPE E'\\\\' OR other_names_index @@ to_tsquery('danbooru', E?))", stripped_name, name_for_tsquery)
+        where("(artists.name LIKE ? ESCAPE E'\\\\' OR artists.other_names_index @@ to_tsquery('danbooru', E?))", stripped_name, name_for_tsquery)
       end
     end
 
@@ -413,7 +410,7 @@ class Artist < ActiveRecord::Base
         q = q.banned
 
       when /status:active/
-        q = q.where("is_banned = false and is_active = true")
+        q = q.unbanned.active
 
       when /./
         q = q.any_name_matches(params[:name])
@@ -422,23 +419,23 @@ class Artist < ActiveRecord::Base
       params[:order] ||= params.delete(:sort)
       case params[:order]
       when "name"
-        q = q.reorder("name")
+        q = q.reorder("artists.name")
       when "updated_at"
-        q = q.reorder("updated_at desc")
+        q = q.reorder("artists.updated_at desc")
       else
-        q = q.reorder("id desc")
+        q = q.reorder("artists.id desc")
       end
 
       if params[:is_active] == "true"
         q = q.active
       elsif params[:is_active] == "false"
-        q = q.where("is_active = false")
+        q = q.deleted
       end
 
       if params[:is_banned] == "true"
         q = q.banned
       elsif params[:is_banned] == "false"
-        q = q.where("is_banned = false")
+        q = q.unbanned
       end
 
       if params[:id].present?
