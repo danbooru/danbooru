@@ -419,11 +419,13 @@ class Artist < ActiveRecord::Base
       params[:order] ||= params.delete(:sort)
       case params[:order]
       when "name"
-        q = q.reorder("artists.name")
+        q = q.order("artists.name")
       when "updated_at"
-        q = q.reorder("artists.updated_at desc")
+        q = q.order("artists.updated_at desc")
+      when "post_count"
+        q = q.joins(:tag).order("tags.post_count desc")
       else
-        q = q.reorder("artists.id desc")
+        q = q.order("artists.id desc")
       end
 
       if params[:is_active] == "true"
