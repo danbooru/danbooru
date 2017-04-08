@@ -2,17 +2,11 @@
   <%= error_messages_for("wiki_page") %>
 
   <%= simple_form_for(@wiki_page) do |f| %>
-    <div class="input">
-      <label for="wiki_page_title">Title</label>
-      <% if @wiki_page.new_record? %>
-        <%= text_field "wiki_page", "title" %>
-      <% elsif CurrentUser.user.is_builder? %>
-        <%= text_field "wiki_page", "title" %>
-        <span class="hint">Change to rename this wiki page</span>
-      <% else %>
-        <p><%= @wiki_page.title %></p>
-      <% end %>
-    </div>
+    <% if @wiki_page.new_record? %>
+      <%= f.input :title, error: false %>
+    <% else %>
+      <%= f.input :title, error: false, hint: "Change to rename this wiki page. Move the tag and update any wikis linking to this page first." %>
+    <% end %>
 
     <%= f.input :other_names, :as => :text, :label => "Other names (<a href='/wiki_pages/help:translated_tags'>view help</a>)".html_safe, :hint => "Names used for this tag on other sites such as Pixiv. Separate with spaces." %>
 
@@ -24,6 +18,10 @@
 
     <% if CurrentUser.is_builder? %>
       <%= f.input :is_locked, :label => "Locked" %>
+    <% end %>
+
+    <% if @wiki_page.errors[:title].present?  %>
+      <%= f.input :skip_secondary_validations, as: :boolean, label: "Force rename", hint: "Ignore the renaming requirements" %>
     <% end %>
 
     <%= f.button :submit, "Submit", :data => { :disable_with => "Submitting..." } %>
