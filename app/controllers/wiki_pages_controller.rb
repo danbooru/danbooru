@@ -15,13 +15,13 @@ class WikiPagesController < ApplicationController
   end
 
   def index
-    @wiki_pages = WikiPage.search(params[:search]).order("updated_at desc").paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
+    @wiki_pages = WikiPage.search(params[:search]).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@wiki_pages) do |format|
       format.html do
         if params[:page].nil? || params[:page].to_i == 1
-          if @wiki_pages.count == 1
+          if @wiki_pages.length == 1
             redirect_to(wiki_page_path(@wiki_pages.first))
-          elsif @wiki_pages.count == 0 && params[:search][:title].present? && params[:search][:title] !~ /\*/
+          elsif @wiki_pages.length == 0 && params[:search][:title].present? && params[:search][:title] !~ /\*/
             redirect_to(wiki_pages_path(:search => {:title => "*#{params[:search][:title]}*"}))
           end
         end

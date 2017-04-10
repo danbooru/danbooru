@@ -7218,6 +7218,13 @@ CREATE INDEX index_wiki_pages_on_title_pattern ON wiki_pages USING btree (title 
 
 
 --
+-- Name: index_wiki_pages_on_updated_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_wiki_pages_on_updated_at ON wiki_pages USING btree (updated_at);
+
+
+--
 -- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7561,4 +7568,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170314235626');
 INSERT INTO schema_migrations (version) VALUES ('20170316224630');
 
 INSERT INTO schema_migrations (version) VALUES ('20170319000519');
+
+INSERT INTO schema_migrations (version) VALUES ('20170329185605');
 

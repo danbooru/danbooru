@@ -15,7 +15,7 @@
         <th><label for="search_order">Order</label>
         <td>
           <div class="input">
-            <%= select "search", "order", [["Recently created", "created_at"], ["Last updated", "updated_at"], ["Name", "name"]], :selected => params[:search][:order] %>
+            <%= select "search", "order", [["Recently created", "created_at"], ["Last updated", "updated_at"], ["Name", "name"], ["Post count", "post_count"]], :selected => params[:search][:order] %>
           </div>
         </td>
       </tr>

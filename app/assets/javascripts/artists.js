@@ -53,7 +53,9 @@
         $.ajax({
           url: "/artists.json",
           data: {
-            "search[name]": "*" + req.term + "*",
+            "search[name]": req.term + "*",
+            "search[is_active]": true,
+            "search[order]": "post_count",
             "limit": 10
           },
           method: "get",

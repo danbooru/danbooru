@@ -20,8 +20,9 @@
         $.ajax({
           url: "/wiki_pages.json",
           data: {
-            "search[title]": "*" + req.term + "*",
+            "search[title]": req.term + "*",
             "search[hide_deleted]": "Yes",
+            "search[order]": "post_count",
             "limit": 10
           },
           method: "get",

@@ -79,10 +79,15 @@ class WikiPage < ActiveRecord::Base
       end
 
       params[:order] ||= params.delete(:sort)
-      if params[:order] == "time" || params[:order] == "Date"
+      case params[:order]
+      when "time"
         q = q.order("updated_at desc")
-      elsif params[:order] == "title" || params[:order] == "Name"
+      when "title"
         q = q.order("title")
+      when "post_count"
+        q = q.joins(:tag).order("tags.post_count desc")
+      else
+        q = q.order("updated_at desc")
       end
 
       q
