@@ -10,9 +10,11 @@ class WikiPage < ActiveRecord::Base
   belongs_to :updater, :class_name => "User"
   validates_uniqueness_of :title, :case_sensitive => false
   validates_presence_of :title
+  validate :validate_rename
   validate :validate_locker_is_builder
   validate :validate_not_locked
-  attr_accessible :title, :body, :is_locked, :is_deleted, :other_names
+  attr_accessor :skip_secondary_validations
+  attr_accessible :title, :body, :is_locked, :is_deleted, :other_names, :skip_secondary_validations
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, lambda {where(:is_active => true)}, :foreign_key => "name", :primary_key => "title"
   has_many :versions, lambda {order("wiki_page_versions.id ASC")}, :class_name => "WikiPageVersion", :dependent => :destroy
@@ -125,6 +127,15 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
+  def validate_rename
+    return if !title_changed? || skip_secondary_validations
+
+    tag_was = Tag.find_by_name(Tag.normalize_name(title_was))
+    if tag_was.present? && tag_was.post_count > 0
+      errors.add(:title, "cannot be changed: '#{tag_was.name}' still has #{tag_was.post_count} posts. Move the posts and update any wikis linking to this page first.")
+    end
+  end
+
   def revert_to(version)
     if id != version.wiki_page_id
       raise RevertError.new("You cannot revert to a previous version of another wiki page.")
@@ -148,6 +159,10 @@ class WikiPage < ActiveRecord::Base
   def normalize_other_names
     normalized_other_names = other_names.to_s.gsub(/\u3000/, " ").scan(/\S+/)
     self.other_names = normalized_other_names.uniq.join(" ")
+  end
+
+  def skip_secondary_validations=(value)
+    @skip_secondary_validations = (value == true || value == "1")
   end
 
   def creator_name

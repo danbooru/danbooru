@@ -254,9 +254,7 @@ class TagAlias < ActiveRecord::Base
     if antecedent_wiki.present? 
       if WikiPage.titled(consequent_name).blank?
         CurrentUser.scoped(creator, creator_ip_addr) do
-          antecedent_wiki.update_attributes(
-            :title => consequent_name
-          )
+          antecedent_wiki.update(title: consequent_name, skip_secondary_validations: true)
         end
       else
         message = "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has conflicting wiki pages. [[#{consequent_name}]] should be updated to include information from [[#{antecedent_name}]] if necessary."

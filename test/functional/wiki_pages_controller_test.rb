@@ -99,13 +99,26 @@ class WikiPagesControllerTest < ActionController::TestCase
 
     context "update action" do
       setup do
-        @wiki_page = FactoryGirl.create(:wiki_page)
+        @tag = FactoryGirl.create(:tag, name: "foo", post_count: 42)
+        @wiki_page = FactoryGirl.create(:wiki_page, title: "foo")
       end
 
       should "update a wiki_page" do
         post :update, {:id => @wiki_page.id, :wiki_page => {:body => "xyz"}}, {:user_id => @user.id}
         @wiki_page.reload
         assert_equal("xyz", @wiki_page.body)
+      end
+
+      should "not rename a wiki page with a non-empty tag" do
+        post :update, {:id => @wiki_page.id, :wiki_page => {:title => "bar"}}, {:user_id => @user.id}
+
+        assert_equal("foo", @wiki_page.reload.title)
+      end
+
+      should "rename a wiki page with a non-empty tag if secondary validations are skipped" do
+        post :update, {:id => @wiki_page.id, :wiki_page => {:title => "bar", :skip_secondary_validations => "1"}}, {:user_id => @user.id}
+
+        assert_equal("bar", @wiki_page.reload.title)
       end
     end
 
