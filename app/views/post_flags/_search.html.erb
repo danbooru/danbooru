@@ -1,56 +1,11 @@
-<table class="search">
-  <tbody>
-    <%= form_tag(post_flags_path, :method => :get, :class => "simple_form") do %>
-      <tr>
-        <th><label for="search_reason_matches">Reason</label></th>
-        <td>
-          <div class="input">
-            <%= text_field "search", "reason_matches", :label => "Reason", :value => params[:search][:reason_matches] %>
-          </div>
-        </td>
-      </tr>
-
-      <tr>
-        <th><label for="search_post_id">Post ID</label></th>
-        <td>
-          <div class="input">
-            <%= text_field "search", "post_id", :value => params[:search][:post_id] %>
-          </div>
-        </td>
-      </tr>
-
-      <% if CurrentUser.user.is_moderator? %>
-        <tr>
-          <th><label for="search_creator_name">Creator</th>
-          <td>
-            <div class="input">
-              <%= text_field "search", "creator_name", :value => params[:search][:creator_name] %>
-            </div>
-          </td>
-        </tr>
-      <% end %>
-
-      <tr>
-        <th><label for="search_is_resolved">Resolved</label></th>
-        <td>
-          <div class="input">
-            <%= select "search", "is_resolved", ["true", "false"], :selected => params[:search][:is_resolved], :include_blank => true %>
-          </div>
-        </td>
-      </tr>
-
-      <tr>
-        <th><label for="search_category">Category</label></th>
-        <td>
-          <div class="input">
-            <%= select "search", "category", ["normal", "unapproved", "banned"], :selected => params[:search][:category], :include_blank => true %>
-          </div>
-        </td>
-      </tr>
-
-      <tr>
-        <td><%= submit_tag "Search" %><td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<%= simple_form_for(:search, url: post_flags_path, method: :get, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+  <%= f.input :reason_matches, label: "Reason", input_html: { value: params[:search][:reason_matches] } %>
+  <%= f.input :post_tags_match, label: "Tags", input_html: { value: params[:search][:post_tags_match] } %>
+  <%= f.input :post_id, label: "Post ID", input_html: { value: params[:search][:post_id] } %>
+  <% if CurrentUser.is_moderator? %>
+    <%= f.input :creator_name, label: "Creator", input_html: { value: params[:search][:creator_name] } %>
+  <% end %>
+  <%= f.input :is_resolved, label: "Resolved?", collection: [["Yes", true], ["No", false]], include_blank: true, selected: params[:search][:is_resolved] %>
+  <%= f.input :category, label: "Category", collection: ["normal", "unapproved", "rejected", "deleted", "banned"], include_blank: true, selected: params[:search][:category] %>
+  <%= f.submit "Search" %>
+<% end %>

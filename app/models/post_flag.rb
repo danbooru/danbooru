@@ -1,6 +1,12 @@
 class PostFlag < ActiveRecord::Base
   class Error < Exception ; end
 
+  module Reasons
+    UNAPPROVED = "Unapproved in three days"
+    REJECTED = "Unapproved in three days after returning to moderation queue%"
+    BANNED = "Artist requested removal"
+  end
+
   belongs_to :creator, :class_name => "User"
   belongs_to :post
   validates_presence_of :reason, :creator_id, :creator_ip_addr
@@ -16,6 +22,10 @@ class PostFlag < ActiveRecord::Base
     def reason_matches(query)
       query = "*#{query}*" unless query =~ /\*/
       where("reason ILIKE ? ESCAPE E'\\\\'", query.to_escaped_for_sql_like)
+    end
+
+    def post_tags_match(query)
+      PostQueryBuilder.new(query).build(self.joins(:post))
     end
 
     def resolved
@@ -39,7 +49,7 @@ class PostFlag < ActiveRecord::Base
     end
 
     def search(params)
-      q = where("true")
+      q = order("post_flags.id desc")
       return q if params.blank?
 
       if params[:reason_matches].present?
@@ -58,6 +68,10 @@ class PostFlag < ActiveRecord::Base
         q = q.where("post_id = ?", params[:post_id].to_i)
       end
 
+      if params[:post_tags_match].present?
+        q = q.post_tags_match(params[:post_tags_match])
+      end
+
       if params[:is_resolved] == "true"
         q = q.resolved
       elsif params[:is_resolved] == "false"
@@ -66,11 +80,15 @@ class PostFlag < ActiveRecord::Base
 
       case params[:category]
       when "normal"
-        q = q.where("reason not in (?)", ["Unapproved in three days", "Unapproved in three days after returning to moderation queue", "Artist requested removal"])
+        q = q.where("reason NOT IN (?) AND reason NOT LIKE ?", [Reasons::UNAPPROVED, Reasons::BANNED], Reasons::REJECTED)
       when "unapproved"
-        q = q.where("reason in (?)", ["Unapproved in three days", "Unapproved in three days after returning to moderation queue"])
+        q = q.where(reason: Reasons::UNAPPROVED)
       when "banned"
-        q = q.where("reason = ?", "Artist requested removal")
+        q = q.where(reason: Reasons::BANNED)
+      when "rejected"
+        q = q.where("reason LIKE ?", Reasons::REJECTED)
+      when "deleted"
+        q = q.where("reason = ? OR reason LIKE ?", Reasons::UNAPPROVED, Reasons::REJECTED)
       end
 
       q
@@ -85,10 +103,27 @@ class PostFlag < ActiveRecord::Base
       end
       super + list
     end
+
+    def method_attributes
+      super + [:category]
+    end
   end
 
   extend SearchMethods
   include ApiMethods
+
+  def category
+    case reason
+    when Reasons::UNAPPROVED
+      :unapproved
+    when /#{Reasons::REJECTED.gsub("%", ".*")}/
+      :rejected
+    when Reasons::BANNED
+      :banned
+    else
+      :normal
+    end
+  end
 
   def update_post
     post.update_column(:is_flagged, true) unless post.is_flagged?

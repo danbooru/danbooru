@@ -16,6 +16,10 @@ class PostAppeal < ActiveRecord::Base
       where("reason ILIKE ? ESCAPE E'\\\\'", query.to_escaped_for_sql_like)
     end
 
+    def post_tags_match(query)
+      PostQueryBuilder.new(query).build(self.joins(:post))
+    end
+
     def resolved
       joins(:post).where("posts.is_deleted = false and posts.is_flagged = false")
     end
@@ -37,7 +41,7 @@ class PostAppeal < ActiveRecord::Base
     end
 
     def search(params)
-      q = where("true")
+      q = order("post_appeals.id desc")
       return q if params.blank?
 
       if params[:reason_matches].present?
@@ -54,6 +58,10 @@ class PostAppeal < ActiveRecord::Base
 
       if params[:post_id].present?
         q = q.where("post_id = ?", params[:post_id].to_i)
+      end
+
+      if params[:post_tags_match].present?
+        q = q.post_tags_match(params[:post_tags_match])
       end
 
       if params[:is_resolved] == "true"
