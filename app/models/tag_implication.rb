@@ -185,7 +185,7 @@ class TagImplication < ActiveRecord::Base
       tries = 0
 
       begin
-        CurrentUser.scoped(approver, CurrentUser.ip_addr) do
+        CurrentUser.scoped(approver) do
           update({ :status => "processing" }, :as => CurrentUser.role)
           update_posts
           update({ :status => "active" }, :as => CurrentUser.role)

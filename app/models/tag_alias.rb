@@ -141,10 +141,9 @@ class TagAlias < ActiveRecord::Base
     end
 
     tries = 0
-    messages = []
 
     begin
-      CurrentUser.scoped(approver, CurrentUser.ip_addr) do
+      CurrentUser.scoped(approver) do
         update({ :status => "processing" }, :as => CurrentUser.role)
         move_aliases_and_implications
         move_saved_searches
@@ -162,7 +161,7 @@ class TagAlias < ActiveRecord::Base
         retry
       end
 
-      CurrentUser.scoped(approver, CurrentUser.ip_addr) do
+      CurrentUser.scoped(approver) do
         forum_updater.update(failure_message(e), "FAILED") if update_topic
         update({ :status => "error: #{e}" }, :as => CurrentUser.role)
       end
