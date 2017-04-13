@@ -1,5 +1,5 @@
 class BulkUpdateRequest < ActiveRecord::Base
-  attr_accessor :title, :reason, :skip_secondary_validations
+  attr_accessor :reason, :skip_secondary_validations
 
   belongs_to :user
   belongs_to :forum_topic
@@ -13,7 +13,7 @@ class BulkUpdateRequest < ActiveRecord::Base
   validate :script_formatted_correctly
   validate :forum_topic_id_not_invalid
   validate :validate_script, :on => :create
-  attr_accessible :user_id, :forum_topic_id, :script, :title, :reason, :skip_secondary_validations
+  attr_accessible :user_id, :forum_topic_id, :forum_post_id, :script, :title, :reason, :skip_secondary_validations
   attr_accessible :status, :approver_id, :as => [:admin]
   before_validation :initialize_attributes, :on => :create
   before_validation :normalize_text
@@ -68,6 +68,7 @@ class BulkUpdateRequest < ActiveRecord::Base
 
     def create_forum_topic
       if forum_topic_id
+        forum_post = forum_topic.posts.create(body: reason_with_link)
         update_attributes(:forum_post_id => forum_post.id)
       else
         forum_topic = ForumTopic.create(:title => title, :category_id => 1, :original_post_attributes => {:body => reason_with_link})
