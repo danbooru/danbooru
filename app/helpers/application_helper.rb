@@ -81,6 +81,14 @@ module ApplicationHelper
     content_tag(:time, content || datetime, :datetime => datetime, :title => time.to_formatted_s)
   end
 
+  def humanized_duration(from, to)
+    duration = distance_of_time_in_words(from, to)
+    datetime = from.iso8601 + "/" + to.iso8601
+    title = "#{from.strftime("%Y-%m-%d %H:%M")} to #{to.strftime("%Y-%m-%d %H:%M")}"
+
+    raw content_tag(:time, duration, datetime: datetime, title: title)
+  end
+
   def time_ago_in_words_tagged(time)
     raw time_tag(time_ago_in_words(time) + " ago", time)
   end

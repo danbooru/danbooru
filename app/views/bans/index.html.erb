@@ -8,7 +8,7 @@
           <th>User</th>
           <th>Banner</th>
           <th>Banned</th>
-          <th>Expires</th>
+          <th>Duration</th>
           <th>Reason</th>
           <th></th>
         </tr>
@@ -19,7 +19,7 @@
             <td><%= link_to_user(ban.user) %></td>
             <td><%= link_to_user(ban.banner) %></td>
             <td><%= time_ago_in_words_tagged(ban.created_at) %></td>
-            <td><%= ban.expires_at %></td>
+            <td><%= humanized_duration(ban.created_at, ban.expires_at) %></td>
             <td class="col-expand"><%= format_text ban.reason, :ragel => true %></td>
             <td>
               <% if CurrentUser.is_moderator? %>
