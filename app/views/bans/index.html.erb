@@ -2,7 +2,7 @@
   <div id="a-index">
     <h1>Bans</h1>
 
-    <table class="striped" width="100%">
+    <table class="striped autofit">
       <thead>
         <tr>
           <th>User</th>
@@ -16,7 +16,7 @@
           <tr id="ban-<%= ban.id %>" data-expired="<%= ban.expired? %>">
             <td><%= link_to_user(ban.user) %></td>
             <td><%= ban.expires_at %></td>
-            <td><%= format_text ban.reason, :ragel => true %></td>
+            <td class="col-expand"><%= format_text ban.reason, :ragel => true %></td>
             <td>
               <% if CurrentUser.is_moderator? %>
                 <%= link_to "Edit", edit_ban_path(ban) %>

@@ -40,6 +40,22 @@ table.striped {
   }
 }
 
+/*
+ * A table where one column expands to fill the screen, while the
+ * other columns shrink to fit their contents.
+ */
+table.autofit {
+  td, th, .col-fit {
+    white-space: nowrap;
+    padding-right: 2em;
+  }
+
+  .col-expand {
+    white-space: normal;
+    width: 100%;
+  }
+}
+
 table.search {
   tr {
     height: 2em;
