@@ -1,5 +1,5 @@
-<div class="bans">
-  <div class="index">
+<div id="c-bans">
+  <div id="a-index">
     <h1>Bans</h1>
 
     <table class="striped" width="100%">
@@ -13,7 +13,7 @@
       </thead>
       <tbody>
         <% @bans.each do |ban| %>
-          <tr id="ban-<%= ban.id %>">
+          <tr id="ban-<%= ban.id %>" data-expired="<%= ban.expired? %>">
             <td><%= link_to_user(ban.user) %></td>
             <td><%= ban.expires_at %></td>
             <td><%= format_text ban.reason, :ragel => true %></td>
