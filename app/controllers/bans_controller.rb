@@ -11,8 +11,8 @@ class BansController < ApplicationController
   end
 
   def index
-    @search = Ban.search(params[:search]).order("id desc")
-    @bans = @search.paginate(params[:page], :limit => params[:limit])
+    @bans = Ban.search(params[:search])
+    @bans = @bans.paginate(params[:page], :limit => params[:limit])
     respond_with(@bans)
   end
 
