@@ -1,6 +1,9 @@
 <%= format_text(WikiPage.titled(Danbooru.config.appeal_notice_wiki_page).first.try(&:body), :ragel => true) %>
 
-<%= form_tag(post_appeals_path(:format => :js), :remote => true) do %>
-  <%= hidden_field_tag "post_appeal[post_id]", @post_appeal.post_id %>
-  <%= text_area :post_appeal, :reason, :size => "40x5" %>
+<!-- XXX dtext_field expects there to be a `post_appeal` instance variable. -->
+<% @post_appeal = post_appeal %>
+<%= simple_form_for(@post_appeal, format: :js, remote: true) do |f| %>
+  <%= f.hidden_field :post_id %>
+  <%= dtext_field "post_appeal", "reason", preview_id: "dtext-preview-for-post-appeal" %>
+  <%= dtext_preview_button "post_appeal", "reason", preview_id: "dtext-preview-for-post-appeal" %>
 <% end %>

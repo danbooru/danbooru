@@ -119,11 +119,11 @@
   </div>
 
   <div id="flag-dialog" class="prose" title="Flag post" style="display: none;">
-    <%= render "post_flags/new" %>
+    <%= render "post_flags/new", post_flag: @post.flags.new %>
   </div>
 
   <div id="appeal-dialog" class="prose" title="Appeal post" style="display: none;">
-    <%= render "post_appeals/new" %>
+    <%= render "post_appeals/new", post_appeal: @post.appeals.new %>
   </div>
 
   <div id="add-to-pool-dialog" title="Add to pool" style="display: none;">

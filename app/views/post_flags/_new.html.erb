@@ -1,8 +1,9 @@
 <%= format_text(WikiPage.titled(Danbooru.config.flag_notice_wiki_page).first.try(&:body), :ragel => true) %>
 
-<p>Enter a reason:</p>
-
-<%= form_tag(post_flags_path(:format => :js), :remote => true) do %>
-  <%= hidden_field :post_flag, :post_id %>
-  <%= text_area :post_flag, :reason, :size => "40x5" %>
+<!-- XXX dtext_field expects there to be a `post_flag` instance variable. -->
+<% @post_flag = post_flag %>
+<%= simple_form_for(@post_flag, format: :js, remote: true) do |f| %>
+  <%= f.hidden_field :post_id %>
+  <%= dtext_field "post_flag", "reason", preview_id: "dtext-preview-for-post-flag" %>
+  <%= dtext_preview_button "post_flag", "reason", preview_id: "dtext-preview-for-post-flag" %>
 <% end %>
