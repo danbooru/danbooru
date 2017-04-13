@@ -29,13 +29,23 @@ class PostVoteSimilarity
 
     PostVote.positive_user_ids.each do |uid|
       posts1 = PostVote.positive_post_ids(uid)
-      score = calculate_with_cosine(posts0, posts1)
+      score = calculate_with_jaccard(posts0, posts1)
       if score >= THRESHOLD
         set << Element.new(uid, score)
       end
     end
 
     set.sort.reverse.first(limit)
+  end
+
+  def calculate_with_jaccard(posts0, posts1)
+    a = (posts0 & posts1).size
+    div = posts0.size + posts1.size - a
+    if div == 0
+      0
+    else
+      a / div.to_f
+    end
   end
 
   def calculate_with_cosine(posts0, posts1)
