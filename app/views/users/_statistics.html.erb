@@ -150,13 +150,7 @@
         <tr>
           <th>Subscriptions</th>
           <td>
-            <% presenter.subscriptions.each do |subscription| %>
-              <p>
-                <strong><%= link_to subscription.pretty_name, posts_path(:tags => "sub:#{user.name}:#{subscription.name}") %></strong>
-                &ndash;
-                <%= presenter.tag_links_for_subscription(self, subscription) %>
-              </p>
-            <% end %>
+            <em>This feature has been disabled. <%= link_to "Migrate your tag subscriptions to saved searches", tag_subscriptions_path %>.</em>
           </td>
         </tr>
 

@@ -1,9 +1,6 @@
 <% content_for(:secondary_links) do %>
   <menu>
     <li><%= link_to "Listing", tag_subscriptions_path %></li>
-    <% if CurrentUser.is_member? %>
-      <li><%= link_to "New", new_tag_subscription_path %></li>
-    <% end %>
     <li><%= link_to "Help", wiki_pages_path(:title => "help:tag_subscriptions") %></li>
 
     <% if @tag_subscription && !@tag_subscription.new_record? && @tag_subscription.editable_by?(CurrentUser.user) %>

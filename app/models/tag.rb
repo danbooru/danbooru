@@ -512,10 +512,6 @@ class Tag < ActiveRecord::Base
             q[:tags][:related] << "fav:#{user_id}"
             q[:ordfav] = user_id
 
-          when "sub"
-            q[:subscriptions] ||= []
-            q[:subscriptions] << $2
-
           when "search"
             q[:saved_searches] ||= []
             q[:saved_searches] << $2

@@ -166,20 +166,8 @@ module PostSets
       [page.to_i, 1].max
     end
 
-    def is_tag_subscription?
-      tag_subscription.present?
-    end
-
     def is_saved_search?
       tag_string =~ /search:/
-    end
-
-    def tag_subscription
-      @tag_subscription ||= tag_array.select {|x| x =~ /^sub:/}.map {|x| x.sub(/^sub:/, "")}.first
-    end
-
-    def tag_subscription_tags
-      @tag_subscription_tags ||= TagSubscription.find_tags(tag_subscription)
     end
 
     def presenter

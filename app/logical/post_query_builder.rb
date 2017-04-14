@@ -80,27 +80,6 @@ class PostQueryBuilder
     relation
   end
 
-  def add_tag_subscription_relation(subscriptions, relation)
-    subscriptions.each do |subscription|
-      if subscription =~ /^(.+?):(.+)$/
-        user_name = $1
-        subscription_name = $2
-        user = User.find_by_name(user_name)
-        return relation if user.nil?
-        post_ids = TagSubscription.find_post_ids(user.id, subscription_name)
-      else
-        user = User.find_by_name(subscription)
-        return relation if user.nil?
-        post_ids = TagSubscription.find_post_ids(user.id)
-      end
-
-      post_ids = [0] if post_ids.empty?
-      relation = relation.where(["posts.id IN (?)", post_ids])
-    end
-
-    relation
-  end
-
   def add_saved_search_relation(saved_searches, relation)
     if SavedSearch.enabled?
       saved_searches.each do |saved_search|
@@ -226,11 +205,6 @@ class PostQueryBuilder
       relation = relation.where("posts.pool_string = ''")
     elsif q[:pool] == "any"
       relation = relation.where("posts.pool_string != ''")
-    end
-
-    if q[:subscriptions]
-      relation = add_tag_subscription_relation(q[:subscriptions], relation)
-      has_constraints!
     end
 
     if q[:saved_searches]

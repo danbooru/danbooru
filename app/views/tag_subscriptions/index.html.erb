@@ -1,6 +1,9 @@
 <div id="c-tag-subscriptions">
   <div id="a-index">
     <h1>Tag Subscriptions</h1>
+
+    <p class="info">The tag subscription feature is being deprecated. You can move your current tag subscriptions to saved searches by clicking the "migrate" link below.</p>
+
     <table class="striped" width="100%">
       <thead>
         <tr>
@@ -17,17 +20,13 @@
             <td><%= tag_subscription.pretty_tag_query %></td>
             <td><%= tag_subscription.post_id_array.size %></td>
             <td>
-              <%= link_to "edit", edit_tag_subscription_path(tag_subscription) %>
-              | <%= link_to "delete", tag_subscription_path(tag_subscription), :method => :delete, :data => {:confirm => "Are you sure you want to delete this subscription?"} %>
-              | <%= link_to "posts", posts_path(:tags => "sub:#{tag_subscription.creator.name}:#{tag_subscription.name}"), :rel => "nofollow" %>
+              <%= link_to "delete", tag_subscription_path(tag_subscription), :method => :delete, :data => {:confirm => "Are you sure you want to delete this subscription?"} %>
               | <%= link_to "migrate", migrate_tag_subscription_path(tag_subscription), :method => :post %>
             </td>
           </tr>
         <% end %>
       </tbody>
     </table>
-
-    <p class="info">You can create up to <%= Danbooru.config.max_tag_subscriptions %> subscriptions with up to 20 queries each.</p>
   </div>
 </div>
 

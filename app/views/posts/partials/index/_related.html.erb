@@ -3,10 +3,6 @@
   <ul id="related-list">
     <li><%= link_to "Deleted posts", posts_path(:tags => "#{params[:tags]} status:deleted"), :rel => "nofollow" %></li>
 
-    <% if @post_set.is_tag_subscription? %>
-      <li><%= link_to "Manage subscriptions", tag_subscriptions_path %></li>
-    <% end %>
-
     <li><%= link_to "Random post", random_posts_path(:tags => params[:tags]), :id => "random-post", :rel => "nofollow" %></li>
 
     <li><%= link_to "Mobile version", mobile_posts_path(:tags => params[:tags]) %></li>

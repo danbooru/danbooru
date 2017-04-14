@@ -63,20 +63,6 @@ class UserPresenter
     end
   end
 
-  def posts_for_subscription(subscription)
-    arel = Post.where("id in (?)", subscription.post_id_array.map(&:to_i)).order("id desc").limit(6)
-
-    if CurrentUser.user.hide_deleted_posts?
-      arel = arel.undeleted
-    end
-
-    arel
-  end
-
-  def tag_links_for_subscription(template, subscription)
-    subscription.tag_query_array.map {|x| template.link_to(x, template.posts_path(:tags => x))}.join(", ").html_safe
-  end
-
   def upload_limit
     if user.can_upload_free?
       return "none"
@@ -211,14 +197,6 @@ class UserPresenter
     negative = user.negative_feedback_count
 
     template.link_to("positive:#{positive} neutral:#{neutral} negative:#{negative}", template.user_feedbacks_path(:search => {:user_id => user.id}))
-  end
-
-  def subscriptions
-    if CurrentUser.user.id == user.id
-      user.subscriptions
-    else
-      user.subscriptions.select {|x| x.is_public?}
-    end
   end
 
   def saved_search_labels

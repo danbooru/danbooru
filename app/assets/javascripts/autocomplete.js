@@ -89,7 +89,7 @@
   Danbooru.Autocomplete.initialize_tag_autocomplete = function() {
     var $fields_multiple = $(
       "#tags,#post_tag_string,#upload_tag_string,#tag-script-field,#c-moderator-post-queues #query," +
-      "#user_blacklisted_tags,#user_favorite_tags,#tag_subscription_tag_query,#search_post_tags_match"
+      "#user_blacklisted_tags,#user_favorite_tags,#search_post_tags_match"
     );
     var $fields_single = $(
       "#c-tags #search_name_matches,#c-tag-aliases #query,#c-tag-implications #query," +
@@ -183,9 +183,6 @@
         case "-fav":
         case "ordfav":
           Danbooru.Autocomplete.user_source(term, resp, metatag);
-          break;
-        case "sub":
-          Danbooru.Autocomplete.subscription_source(term, resp);
           break;
         case "pool":
         case "-pool":
@@ -389,34 +386,6 @@
         }));
       }
     });
-  }
-
-  Danbooru.Autocomplete.subscription_source = function(term, resp) {
-    var match = term.match(/^(.+?):(.*)$/);
-    if (match) {
-      var user_name = match[1];
-      var subscription_name = match[2];
-
-      $.ajax({
-        url: "/tag_subscriptions.json",
-        data: {
-          "search[creator_name]": user_name,
-          "search[name_matches]": subscription_name + "*",
-          "limit": 10
-        },
-        method: "get",
-        success: function(data) {
-          resp($.map(data, function(subscription) {
-            return {
-              label: subscription.name.replace(/_/g, " "),
-              value: "sub:" + user_name + ":" + subscription.name
-            };
-          }));
-        }
-      });
-    } else {
-      Danbooru.Autocomplete.user_source(term, resp, "sub");
-    }
   }
 
   Danbooru.Autocomplete.pool_source = function(term, resp, metatag) {

@@ -13,8 +13,6 @@ module PostSetPresenters
         pattern_tags
       elsif post_set.is_saved_search?
         SavedSearch.labels_for(CurrentUser.user.id).map {|x| "search:#{x}"}
-      elsif post_set.is_tag_subscription?
-        post_set.tag_subscription_tags
       elsif post_set.is_single_tag?
         related_tags_for_single(post_set.tag_string)
       elsif post_set.unordered_tag_array.size == 1

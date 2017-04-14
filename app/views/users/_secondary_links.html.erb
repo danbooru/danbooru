@@ -12,9 +12,6 @@
       <li>|</li>
       <% if @user.id == CurrentUser.user.id %>
         <li><%= link_to "Settings", edit_user_path(CurrentUser.user) %></li>
-        <% if @user.is_gold? %>
-          <li><%= link_to "Edit subscriptions", tag_subscriptions_path %></li>
-        <% end %>
         <li><%= link_to "Profile", user_path(CurrentUser.user) %></li>
         <li><%= link_to "Messages #{CurrentUser.user.dmail_count}", dmails_current_folder_path %></li>
 

@@ -1,4 +1,5 @@
 class TagSubscriptionsController < ApplicationController
+  before_filter :disable_feature, :only => [:create]
   before_filter :member_only, :only => [:new, :edit, :create, :update, :destroy, :migrate]
   respond_to :html, :xml, :json
 
@@ -70,6 +71,12 @@ class TagSubscriptionsController < ApplicationController
   end
 
 private
+  def disable_feature
+    flash[:notice] = "Tag subscriptions are disabled"
+    redirect_to tag_subscriptions_path
+    return false
+  end
+
   def check_privilege(tag_subscription)
     raise User::PrivilegeError unless tag_subscription.editable_by?(CurrentUser.user)
   end
