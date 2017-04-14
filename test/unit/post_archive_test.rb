@@ -69,6 +69,21 @@ class PostArchiveTest < ActiveSupport::TestCase
       end
     end
 
+    context "that is tagged with a pool:<name> metatag" do
+      setup do
+        @pool = FactoryGirl.create(:pool)
+        @post = FactoryGirl.create(:post, tag_string: "tagme pool:#{@pool.id}")
+      end
+
+      should "create a version" do
+        assert_equal("tagme", @post.tag_string)
+        assert_equal("pool:#{@pool.id} pool:series", @post.pool_string)
+
+        assert_equal(1, @post.versions.size)
+        assert_equal("tagme", @post.versions.last.tags)
+      end
+    end
+
     context "that should be merged" do
       setup do
         @parent = FactoryGirl.create(:post)
