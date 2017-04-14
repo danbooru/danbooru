@@ -244,6 +244,7 @@ class PoolTest < ActiveSupport::TestCase
         @pool.update(name: "blah")
         assert_equal("blah", @pool.versions.last.name)
       end
+      assert_equal(2, @pool.versions.size)
     end
 
     should "know what its post ids were previously" do

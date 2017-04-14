@@ -102,11 +102,10 @@ class PostArchiveTest < ActiveSupport::TestCase
       setup do
         PostArchive.sqs_service.stubs(:merge?).returns(false)
         @post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
+        @post.update_attributes(:tag_string => "bbb ccc xxx", :source => "")
       end
 
       should "also create a version" do
-        @post.update_attributes(:tag_string => "bbb ccc xxx", :source => "")
-
         assert_equal(2, @post.versions.size)
         @version = @post.versions.sort_by(&:id).last
         assert_equal("bbb ccc xxx", @version.tags)

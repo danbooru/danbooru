@@ -17,9 +17,9 @@ class Pool < ActiveRecord::Base
   before_validation :initialize_creator, :on => :create
   before_validation :strip_name
   after_save :update_category_pseudo_tags_for_posts_async
+  after_save :create_version
   after_create :synchronize!
   before_destroy :create_mod_action_for_destroy
-  after_commit :create_version, :on => [:create, :update]
   attr_accessible :name, :description, :post_ids, :post_id_array, :post_count, :is_active, :category, :as => [:member, :gold, :platinum, :janitor, :moderator, :admin, :default]
   attr_accessible :is_deleted, :as => [:moderator, :admin]
 

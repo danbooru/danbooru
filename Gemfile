@@ -73,5 +73,4 @@ group :test do
   gem "simplecov", :require => false
   gem "timecop"
   gem "fakeweb"
-  gem "test_after_commit" # XXX remove me after upgrading to rails 5.
 end
