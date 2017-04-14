@@ -10,10 +10,10 @@ module BulkUpdateRequestsHelper
       TagImplication.where(antecedent_name: antecedent, consequent_name: consequent, status: %w(active processing queued)).exists?
 
     when :remove_alias
-      TagAlias.where(antecedent_name: antecedent, consequent_name: consequent, status: "deleted").exists?
+      TagAlias.where(antecedent_name: antecedent, consequent_name: consequent, status: "deleted").exists? || !TagAlias.where(antecedent_name: antecedent, consequent_name: consequent).exists?
 
     when :remove_implication
-      TagImplication.where(antecedent_name: antecedent, consequent_name: consequent, status: "deleted").exists?
+      TagImplication.where(antecedent_name: antecedent, consequent_name: consequent, status: "deleted").exists? || !TagImplication.where(antecedent_name: antecedent, consequent_name: consequent).exists?
 
     when :mass_update
       !Post.raw_tag_match(antecedent).exists?
