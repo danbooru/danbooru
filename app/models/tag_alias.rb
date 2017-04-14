@@ -87,19 +87,19 @@ class TagAlias < ActiveRecord::Base
     end
 
     def approval_message
-      "[i]UPDATE #{date_timestamp}[/i]: The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has been approved."
+      "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has been approved."
     end
 
     def failure_message(e = nil)
-      "[i]UPDATE #{date_timestamp}[/i]: The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) failed during processing. Reason: #{e}"
+      "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) failed during processing. Reason: #{e}"
     end
 
     def reject_message
-      "[i]UPDATE #{date_timestamp}[/i]: The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has been rejected."
+      "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has been rejected."
     end
 
     def conflict_message
-      "[i]UPDATE #{date_timestamp}[/i]: The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has conflicting wiki pages. [[#{consequent_name}]] should be updated to include information from [[#{antecedent_name}]] if necessary."
+      "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has conflicting wiki pages. [[#{consequent_name}]] should be updated to include information from [[#{antecedent_name}]] if necessary."
     end
 
     def date_timestamp

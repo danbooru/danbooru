@@ -52,13 +52,13 @@ class BulkUpdateRequest < ActiveRecord::Base
       CurrentUser.scoped(approver) do
         AliasAndImplicationImporter.new(script, forum_topic_id, "1", true).process!
         update({ :status => "approved", :approver_id => CurrentUser.id, :skip_secondary_validations => true }, :as => CurrentUser.role)
-        forum_updater.update("[i]UPDATE #{date_timestamp}[/i]: The \"bulk update request ##{id}\":/bulk_update_requests?search%5Bid%5D=#{id} has been approved.", "APPROVED")
+        forum_updater.update("The \"bulk update request ##{id}\":/bulk_update_requests?search%5Bid%5D=#{id} has been approved.", "APPROVED")
       end
 
     rescue Exception => x
       self.approver = approver
       CurrentUser.scoped(approver) do
-        forum_updater.update("[i]UPDATE #{date_timestamp}[/i]: \"Bulk update request ##{id}\":/bulk_update_requests?search%5Bid%5D=#{id} failed: #{x.to_s}", "FAILED")
+        forum_updater.update("The \"Bulk update request ##{id}\":/bulk_update_requests?search%5Bid%5D=#{id} has failed: #{x.to_s}", "FAILED")
       end
     end
 
@@ -77,7 +77,7 @@ class BulkUpdateRequest < ActiveRecord::Base
     end
 
     def reject!
-      forum_updater.update("[i]UPDATE #{date_timestamp}[/i]: The \"bulk update request ##{id}\":/bulk_update_requests?search%5Bid%5D=#{id} has been rejected.", "REJECTED")
+      forum_updater.update("The \"bulk update request ##{id}\":/bulk_update_requests?search%5Bid%5D=#{id} has been rejected.", "REJECTED")
       update_attribute(:status, "rejected")
     end
   end

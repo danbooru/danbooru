@@ -190,7 +190,7 @@ class TagImplication < ActiveRecord::Base
           update_posts
           update({ :status => "active" }, :as => CurrentUser.role)
           update_descendant_names_for_parents
-          forum_updater.update("[i]UPDATE #{date_timestamp}[/i]: The tag implication #{antecedent_name} -> #{consequent_name} has been approved.", "APPROVED") if update_topic
+          forum_updater.update("The tag implication #{antecedent_name} -> #{consequent_name} has been approved.", "APPROVED") if update_topic
         end
       rescue Exception => e
         if tries < 5
@@ -199,7 +199,7 @@ class TagImplication < ActiveRecord::Base
           retry
         end
 
-        forum_updater.update("[i]UPDATE #{date_timestamp}[/i]: The tag implication #{antecedent_name} -> #{consequent_name} failed during processing. Reason: #{e}", "FAILED") if update_topic
+        forum_updater.update("The tag implication #{antecedent_name} -> #{consequent_name} failed during processing. Reason: #{e}", "FAILED") if update_topic
         update({ :status => "error: #{e}" }, :as => CurrentUser.role)
 
         if Rails.env.production?
@@ -228,7 +228,7 @@ class TagImplication < ActiveRecord::Base
 
     def reject!
       update({ :status => "deleted", }, :as => CurrentUser.role)
-      forum_updater.update("[i]UPDATE #{date_timestamp}[/i]: The tag implication #{antecedent_name} -> #{consequent_name} has been rejected.", "REJECTED")
+      forum_updater.update("The tag implication #{antecedent_name} -> #{consequent_name} has been rejected.", "REJECTED")
       destroy
     end
 
