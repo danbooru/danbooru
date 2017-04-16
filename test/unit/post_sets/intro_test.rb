@@ -8,7 +8,6 @@ module PostSets
         @user = FactoryGirl.create(:user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
-        MEMCACHE.flush_all
 
         @post_1 = FactoryGirl.create(:post, :tag_string => "a")
         @post_2 = FactoryGirl.create(:post, :tag_string => "b")

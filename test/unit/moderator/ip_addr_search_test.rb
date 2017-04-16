@@ -9,7 +9,6 @@ module Moderator
         CurrentUser.ip_addr = "127.0.0.1"
         Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
         FactoryGirl.create(:comment)
-        MEMCACHE.flush_all
       end
 
       teardown do

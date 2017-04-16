@@ -5,7 +5,6 @@ class PostPrunerTest < ActiveSupport::TestCase
     @user = FactoryGirl.create(:admin_user)
     CurrentUser.user = @user
     CurrentUser.ip_addr = "127.0.0.1"
-    MEMCACHE.flush_all
 
     Timecop.travel(2.weeks.ago) do
       @flagger = FactoryGirl.create(:gold_user)

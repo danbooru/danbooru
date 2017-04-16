@@ -6,7 +6,6 @@ class PostDisapprovalTest < ActiveSupport::TestCase
       @alice = FactoryGirl.create(:moderator_user)
       CurrentUser.user = @alice
       CurrentUser.ip_addr = "127.0.0.1"
-      MEMCACHE.flush_all
     end
 
     teardown do

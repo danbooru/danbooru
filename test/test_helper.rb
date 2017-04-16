@@ -21,12 +21,12 @@ Shoulda::Matchers.configure do |config|
   end
 end
 
-if defined?(MEMCACHE)
-  Object.send(:remove_const, :MEMCACHE)
-end
-
 class ActiveSupport::TestCase
   include PostArchiveTestHelper
+
+  teardown do
+    Cache.clear
+  end
 end
 
 class ActionController::TestCase
@@ -41,9 +41,12 @@ class ActionController::TestCase
     __send__(http_method, action, params, session.merge(:user_id => @users[role].id))
     assert_redirected_to(new_sessions_path)
   end
+
+  teardown do
+    Cache.clear
+  end
 end
 
-MEMCACHE = MemcacheMock.new
 Delayed::Worker.delay_jobs = false
 
 require "helpers/reportbooru_helper"

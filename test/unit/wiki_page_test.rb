@@ -2,7 +2,6 @@ require 'test_helper'
 
 class WikiPageTest < ActiveSupport::TestCase
   setup do
-    MEMCACHE.flush_all
     CurrentUser.ip_addr = "127.0.0.1"
   end
 

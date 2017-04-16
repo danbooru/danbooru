@@ -18,7 +18,6 @@ class PostTest < ActiveSupport::TestCase
     end
     CurrentUser.user = @user
     CurrentUser.ip_addr = "127.0.0.1"
-    MEMCACHE.flush_all
     mock_saved_search_service!
   end
 

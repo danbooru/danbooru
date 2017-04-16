@@ -7,7 +7,6 @@ module Moderator
         @mod = FactoryGirl.create(:moderator_user)
         CurrentUser.user = @mod
         CurrentUser.ip_addr = "127.0.0.1"
-        MEMCACHE.flush_all
 
         @user_1 = FactoryGirl.create(:user)
         @user_2 = FactoryGirl.create(:user, :inviter_id => @mod.id)

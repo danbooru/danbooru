@@ -8,7 +8,6 @@ class PostFlagTest < ActiveSupport::TestCase
       end
       CurrentUser.user = @alice
       CurrentUser.ip_addr = "127.0.0.1"
-      MEMCACHE.flush_all
       @post = FactoryGirl.create(:post, :tag_string => "aaa")
     end
 

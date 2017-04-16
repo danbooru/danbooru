@@ -37,6 +37,10 @@ class Cache
     nil
   end
 
+  def self.clear
+    Rails.cache.clear
+  end
+
   def self.sanitize(key)
     key.gsub(/\W/) {|x| "%#{x.ord}"}.slice(0, 230)
   end

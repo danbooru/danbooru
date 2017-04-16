@@ -6,7 +6,6 @@ class TagImplicationsControllerTest < ActionController::TestCase
       @user = FactoryGirl.create(:admin_user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      MEMCACHE.flush_all
     end
 
     teardown do

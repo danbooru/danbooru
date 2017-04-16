@@ -5,7 +5,6 @@ class FavoriteTest < ActiveSupport::TestCase
     user = FactoryGirl.create(:user)
     CurrentUser.user = user
     CurrentUser.ip_addr = "127.0.0.1"
-    MEMCACHE.flush_all
     Favorite # need to force loading the favorite model
   end
 

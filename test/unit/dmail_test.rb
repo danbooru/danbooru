@@ -3,7 +3,6 @@ require 'test_helper'
 class DmailTest < ActiveSupport::TestCase
   context "A dmail" do
     setup do
-      MEMCACHE.flush_all
       @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "1.2.3.4"

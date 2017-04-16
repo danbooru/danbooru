@@ -8,7 +8,6 @@ module Moderator
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
         FactoryGirl.create(:comment)
-        MEMCACHE.flush_all
       end
 
       should "find by ip addr" do

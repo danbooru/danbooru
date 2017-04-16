@@ -3,7 +3,6 @@ require 'test_helper'
 class ArtistUrlTest < ActiveSupport::TestCase
   context "An artist url" do
     setup do
-      MEMCACHE.flush_all
       CurrentUser.user = FactoryGirl.create(:user)
       CurrentUser.ip_addr = "127.0.0.1"
     end
