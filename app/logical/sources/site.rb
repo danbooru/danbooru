@@ -10,7 +10,7 @@ module Sources
       :artist_commentary_desc, :rewrite_thumbnails, :illust_id_from_url, :to => :strategy
 
     def self.strategies
-      [Strategies::PixivWhitecube, Strategies::Pixiv, Strategies::NicoSeiga, Strategies::DeviantArt, Strategies::ArtStation, Strategies::Nijie, Strategies::Twitter, Strategies::Tumblr]
+      [Strategies::PixivWhitecube, Strategies::Pixiv, Strategies::NicoSeiga, Strategies::DeviantArt, Strategies::ArtStation, Strategies::Nijie, Strategies::Twitter, Strategies::Tumblr, Strategies::Pawoo]
     end
 
     def initialize(url, options = {})

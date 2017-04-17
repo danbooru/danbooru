@@ -42,6 +42,7 @@ gem 'bigquery', :git => "https://github.com/abronte/BigQuery.git", :ref => "b92b
 gem 'memcache_mock'
 gem 'memoist'
 gem 'daemons'
+gem 'oauth2'
 
 # needed for looser jpeg header compat
 gem 'ruby-imagespec', :require => "image_spec", :git => "https://github.com/r888888888/ruby-imagespec.git", :branch => "exif-fixes"

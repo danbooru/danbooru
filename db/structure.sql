@@ -6683,6 +6683,13 @@ CREATE INDEX index_pools_on_name_trgm ON pools USING gin (lower((name)::text) gi
 
 
 --
+-- Name: index_pools_on_updated_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pools_on_updated_at ON pools USING btree (updated_at);
+
+
+--
 -- Name: index_post_appeals_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7464,6 +7471,8 @@ INSERT INTO schema_migrations (version) VALUES ('20170413000209');
 INSERT INTO schema_migrations (version) VALUES ('20170414005856');
 
 INSERT INTO schema_migrations (version) VALUES ('20170414233426');
+
+INSERT INTO schema_migrations (version) VALUES ('20170414233617');
 
 INSERT INTO schema_migrations (version) VALUES ('20170416224142');
 

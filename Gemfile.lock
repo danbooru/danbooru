@@ -198,6 +198,7 @@ GEM
     mocha (1.2.1)
       metaclass (~> 0.0.1)
     multi_json (1.12.1)
+    multi_xml (0.6.0)
     multipart-post (2.0.0)
     naught (1.0.0)
     net-http-digest_auth (1.4.1)
@@ -216,6 +217,12 @@ GEM
     nokogumbo (1.2.0)
       nokogiri
     ntlm-http (0.1.1)
+    oauth2 (1.3.0)
+      faraday (>= 0.8, < 0.11)
+      jwt (~> 1.0)
+      multi_json (~> 1.3)
+      multi_xml (~> 0.5)
+      rack (>= 1.2, < 3)
     os (0.9.6)
     pg (0.19.0)
     pg (0.19.0-x64-mingw32)
@@ -401,6 +408,7 @@ DEPENDENCIES
   mocha
   net-sftp
   newrelic_rpm
+  oauth2
   pg
   protected_attributes
   pry-byebug
