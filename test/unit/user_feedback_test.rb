@@ -4,7 +4,6 @@ class UserFeedbackTest < ActiveSupport::TestCase
   context "A user's feedback" do
     setup do
       CurrentUser.ip_addr = "127.0.0.1"
-      MEMCACHE.flush_all
     end
 
     teardown do

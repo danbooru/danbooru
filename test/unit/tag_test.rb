@@ -5,7 +5,6 @@ class TagTest < ActiveSupport::TestCase
     user = FactoryGirl.create(:builder_user)
     CurrentUser.user = user
     CurrentUser.ip_addr = "127.0.0.1"
-    MEMCACHE.flush_all
   end
 
   teardown do
@@ -32,10 +31,6 @@ class TagTest < ActiveSupport::TestCase
   end
 
   context "A tag category fetcher" do
-    setup do
-      MEMCACHE.flush_all
-    end
-
     should "fetch for a single tag" do
       FactoryGirl.create(:artist_tag, :name => "test")
       assert_equal(Tag.categories.artist, Tag.category_for("test"))
@@ -57,10 +52,6 @@ class TagTest < ActiveSupport::TestCase
   end
 
   context "A tag category mapping" do
-    setup do
-      MEMCACHE.flush_all
-    end
-
     should "exist" do
       assert_nothing_raised {Tag.categories}
     end
@@ -97,10 +88,6 @@ class TagTest < ActiveSupport::TestCase
   end
 
   context "A tag" do
-    setup do
-      MEMCACHE.flush_all
-    end
-
     should "be lockable by a moderator" do
       @tag = FactoryGirl.create(:tag)
       @tag.update_attributes({:is_locked => true}, :as => :moderator)
@@ -123,11 +110,11 @@ class TagTest < ActiveSupport::TestCase
     should "reset its category after updating" do
       tag = FactoryGirl.create(:artist_tag)
       tag.update_category_cache_for_all
-      assert_equal(Tag.categories.artist, MEMCACHE.get("tc:#{tag.name}"))
+      assert_equal(Tag.categories.artist, Cache.get("tc:#{tag.name}"))
 
       tag.update_attribute(:category, Tag.categories.copyright)
       tag.update_category_cache_for_all
-      assert_equal(Tag.categories.copyright, MEMCACHE.get("tc:#{tag.name}"))
+      assert_equal(Tag.categories.copyright, Cache.get("tc:#{tag.name}"))
     end
   end
 

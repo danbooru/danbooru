@@ -6,7 +6,6 @@ class PostAppealTest < ActiveSupport::TestCase
       @alice = FactoryGirl.create(:user)
       CurrentUser.user = @alice
       CurrentUser.ip_addr = "127.0.0.1"
-      MEMCACHE.flush_all
       Danbooru.config.stubs(:max_appeals_per_day).returns(5)
     end
 

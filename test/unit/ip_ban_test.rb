@@ -5,7 +5,6 @@ class IpBanTest < ActiveSupport::TestCase
     @user = FactoryGirl.create(:user)
     CurrentUser.user = @user
     CurrentUser.ip_addr = "127.0.0.1"
-    MEMCACHE.flush_all
     Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
   end
 

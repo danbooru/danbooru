@@ -41,10 +41,6 @@ class SavedSearchTest < ActiveSupport::TestCase
   end
 
   context "Fetching the post ids for a search" do
-    setup do
-      MEMCACHE.expects(:get).returns(nil)
-    end
-
     teardown do
       FakeWeb.clean_registry
     end

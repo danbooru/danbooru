@@ -6,7 +6,6 @@ class TagAliasCorrectionsControllerTest < ActionController::TestCase
       @admin = FactoryGirl.create(:admin_user)
       CurrentUser.user = @admin
       CurrentUser.ip_addr = "127.0.0.1"
-      MEMCACHE.flush_all
       @tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
     end
 

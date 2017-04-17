@@ -8,7 +8,6 @@ class PostsControllerTest < ActionController::TestCase
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
       @post = FactoryGirl.create(:post, :uploader_id => @user.id, :tag_string => "aaaa")
-      MEMCACHE.flush_all
     end
 
     teardown do

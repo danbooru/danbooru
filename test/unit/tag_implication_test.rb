@@ -7,7 +7,6 @@ class TagImplicationTest < ActiveSupport::TestCase
       CurrentUser.user = user
       CurrentUser.ip_addr = "127.0.0.1"
       @user = FactoryGirl.create(:user)
-      MEMCACHE.flush_all
     end
 
     teardown do
