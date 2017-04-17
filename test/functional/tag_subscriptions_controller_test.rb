@@ -54,8 +54,8 @@ class TagSubscriptionsControllerTest < ActionController::TestCase
     end
 
     context "create action" do
-      should "create a new tag subscription" do
-        assert_difference("TagSubscription.count", 1) do
+      should "not create a new tag subscription" do
+        assert_no_difference("TagSubscription.count") do
           post :create, {:tag_subscription => {:name => "aaa", :tag_query => "bbb"}}, {:user_id => @user.id}
         end
       end

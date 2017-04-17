@@ -17,7 +17,7 @@ module Sources
         end
 
         should "get all the image urls" do
-          assert_equal(["http://i2.pixiv.net/img-original/img/2016/09/26/21/30/41/59182257_p0.jpg"], @image_urls)
+          assert_equal(["https://i.pximg.net/img-original/img/2016/09/26/21/30/41/59182257_p0.jpg"], @image_urls)
         end
       end
 
@@ -28,7 +28,7 @@ module Sources
         end
 
         should "get all the image urls" do
-          assert_equal("http://i4.pixiv.net/img-original/img/2016/10/29/17/13/23/59687915_p0.png", @image_urls)
+          assert_equal("https://i.pximg.net/img-original/img/2016/10/29/17/13/23/59687915_p0.png", @image_urls)
         end
       end
 
@@ -40,7 +40,7 @@ module Sources
         end
 
         should "get all the image urls" do
-          assert_equal(["http://i3.pixiv.net/img-original/img/2015/03/14/17/53/32/49270482_p0.jpg", "http://i3.pixiv.net/img-original/img/2015/03/14/17/53/32/49270482_p1.jpg"], @image_urls)
+          assert_equal(["https://i.pximg.net/img-original/img/2015/03/14/17/53/32/49270482_p0.jpg", "https://i.pximg.net/img-original/img/2015/03/14/17/53/32/49270482_p1.jpg"], @image_urls)
         end
       end
 
@@ -73,7 +73,7 @@ module Sources
         end
 
         should "get the full size image url" do
-          assert_equal("http://i3.pixiv.net/img-original/img/2014/10/02/14/21/39/46304614_p0.gif", @site.image_url)
+          assert_equal("https://i.pximg.net/img-original/img/2014/10/02/14/21/39/46304614_p0.gif", @site.image_url)
         end
 
         should "get the page count" do
@@ -110,7 +110,7 @@ module Sources
         end
 
         should "get the full size image url" do
-          assert_equal("http://i4.pixiv.net/img-original/img/2014/10/29/09/27/19/46785915_p0.jpg", @site.image_url)
+          assert_equal("https://i.pximg.net/img-original/img/2014/10/29/09/27/19/46785915_p0.jpg", @site.image_url)
         end
       end
     end

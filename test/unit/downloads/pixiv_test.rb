@@ -75,7 +75,7 @@ module Downloads
         setup do
           @medium_page = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350"
           @medium_thumbnail = "https://i.pximg.net/c/600x600/img-master/img/2017/04/04/08/54/15/62247350_p0_master1200.jpg"
-          @full_size_image  = "http://i3.pixiv.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png"
+          @full_size_image  = "https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png"
           @file_size = 16275
         end
 
@@ -101,12 +101,12 @@ module Downloads
           @manga_page  = "http://www.pixiv.net/member_illust.php?mode=manga&illust_id=46304614"
           @manga_big_p1_page = "http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=46304614&page=1"
 
-          @p0_large_thumbnail = "http://i1.pixiv.net/c/1200x1200/img-master/img/2014/10/02/14/21/39/46304614_p0_master1200.jpg"
-          @p1_large_thumbnail = "http://i1.pixiv.net/c/1200x1200/img-master/img/2014/10/02/14/21/39/46304614_p1_master1200.jpg"
-          @p0_full_size_image = "http://i1.pixiv.net/img-original/img/2014/10/02/14/21/39/46304614_p0.gif"
-          @p0_full_size_image_3 = "http://i3.pixiv.net/img-original/img/2014/10/02/14/21/39/46304614_p0.gif"
-          @p1_full_size_image = "http://i1.pixiv.net/img-original/img/2014/10/02/14/21/39/46304614_p1.gif"
-          @p1_full_size_image_3 = "http://i3.pixiv.net/img-original/img/2014/10/02/14/21/39/46304614_p1.gif"
+          @p0_large_thumbnail = "https://i.pximg.net/c/1200x1200/img-master/img/2014/10/02/14/21/39/46304614_p0_master1200.jpg"
+          @p1_large_thumbnail = "https://i.pximg.net/c/1200x1200/img-master/img/2014/10/02/14/21/39/46304614_p1_master1200.jpg"
+          @p0_full_size_image = "https://i.pximg.net/img-original/img/2014/10/02/14/21/39/46304614_p0.gif"
+          @p0_full_size_image_3 = "https://i.pximg.net/img-original/img/2014/10/02/14/21/39/46304614_p0.gif"
+          @p1_full_size_image = "https://i.pximg.net/img-original/img/2014/10/02/14/21/39/46304614_p1.gif"
+          @p1_full_size_image_3 = "https://i.pximg.net/img-original/img/2014/10/02/14/21/39/46304614_p1.gif"
 
           @p0_file_size = 61_131
           @p1_file_size = 46_818
