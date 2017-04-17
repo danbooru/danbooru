@@ -6805,7 +6805,7 @@ CREATE INDEX index_pools_on_name ON pools USING btree (name);
 -- Name: index_pools_on_name_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_pools_on_name_trgm ON pools USING gin (name gin_trgm_ops);
+CREATE INDEX index_pools_on_name_trgm ON pools USING gin (lower((name)::text) gin_trgm_ops);
 
 
 --
@@ -7580,4 +7580,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170330230231');
 INSERT INTO schema_migrations (version) VALUES ('20170413000209');
 
 INSERT INTO schema_migrations (version) VALUES ('20170414005856');
+
+INSERT INTO schema_migrations (version) VALUES ('20170414233426');
 
