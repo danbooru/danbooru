@@ -6805,7 +6805,7 @@ CREATE INDEX index_pools_on_name ON pools USING btree (name);
 -- Name: index_pools_on_name_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_pools_on_name_trgm ON pools USING gin (name gin_trgm_ops);
+CREATE INDEX index_pools_on_name_trgm ON pools USING gin (lower((name)::text) gin_trgm_ops);
 
 
 --
@@ -6834,6 +6834,13 @@ CREATE INDEX index_post_appeals_on_creator_ip_addr ON post_appeals USING btree (
 --
 
 CREATE INDEX index_post_appeals_on_post_id ON post_appeals USING btree (post_id);
+
+
+--
+-- Name: index_post_appeals_on_reason_tsvector; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_appeals_on_reason_tsvector ON post_appeals USING gin (to_tsvector('english'::regconfig, reason));
 
 
 --
@@ -6883,6 +6890,13 @@ CREATE INDEX index_post_flags_on_creator_ip_addr ON post_flags USING btree (crea
 --
 
 CREATE INDEX index_post_flags_on_post_id ON post_flags USING btree (post_id);
+
+
+--
+-- Name: index_post_flags_on_reason_tsvector; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_flags_on_reason_tsvector ON post_flags USING gin (to_tsvector('english'::regconfig, reason));
 
 
 --
@@ -7580,4 +7594,8 @@ INSERT INTO schema_migrations (version) VALUES ('20170330230231');
 INSERT INTO schema_migrations (version) VALUES ('20170413000209');
 
 INSERT INTO schema_migrations (version) VALUES ('20170414005856');
+
+INSERT INTO schema_migrations (version) VALUES ('20170414233426');
+
+INSERT INTO schema_migrations (version) VALUES ('20170416224142');
 
