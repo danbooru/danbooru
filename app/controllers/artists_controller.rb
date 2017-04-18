@@ -71,12 +71,7 @@ class ArtistsController < ApplicationController
   end
 
   def update
-    body = params[:artist].delete("notes")
-    @artist.assign_attributes(params[:artist], :as => CurrentUser.role)
-    if body
-      @artist.notes = body
-    end
-    @artist.save
+    @artist.update(params[:artist], :as => CurrentUser.role)
     respond_with(@artist)
   end
 

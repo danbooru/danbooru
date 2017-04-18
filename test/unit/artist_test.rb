@@ -310,18 +310,6 @@ class ArtistTest < ActiveSupport::TestCase
       assert_not_nil(Artist.search(:name => "group:cat_or_fish").first)
     end
 
-    should "have an associated wiki" do
-      user = FactoryGirl.create(:user)
-      CurrentUser.user = user
-      artist = FactoryGirl.create(:artist, :name => "max", :wiki_page_attributes => {:title => "xxx", :body => "this is max"})
-      assert_not_nil(artist.wiki_page)
-      assert_equal("this is max", artist.wiki_page.body)
-
-      artist.update_attributes({:wiki_page_attributes => {:id => artist.wiki_page.id, :body => "this is hoge mark ii"}})
-      assert_equal("this is hoge mark ii", artist.wiki_page(true).body)
-      CurrentUser.user = nil
-    end
-
     should "revert to prior versions" do
       user = FactoryGirl.create(:user)
       reverter = FactoryGirl.create(:user)

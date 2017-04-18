@@ -21,7 +21,7 @@ class ArtistsControllerTest < ActionController::TestCase
       @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @artist = FactoryGirl.create(:artist)
+      @artist = FactoryGirl.create(:artist, :notes => "message")
 
       @masao = FactoryGirl.create(:artist, :name => "masao",   :url_string => "http://i2.pixiv.net/img04/img/syounen_no_uta/")
       @artgerm = FactoryGirl.create(:artist, :name => "artgerm", :url_string => "http://artgerm.deviantart.com/")
@@ -129,11 +129,58 @@ class ArtistsControllerTest < ActionController::TestCase
       assert_redirected_to(artist_path(artist))
     end
 
-    should "update an artist" do
-      post :update, {:id => @artist.id, :artist => {:name => "xxx"}}, {:user_id => @user.id}
-      @artist.reload
-      assert_equal("xxx", @artist.name)
-      assert_redirected_to(artist_path(@artist))
+    context "with an artist that has notes" do
+      setup do
+        @artist = FactoryGirl.create(:artist, :name => "aaa", :notes => "testing")
+        @wiki_page = @artist.wiki_page
+        @another_user = FactoryGirl.create(:user)
+      end
+
+      should "update an artist" do
+        old_timestamp = @wiki_page.updated_at
+        Timecop.travel(1.minute.from_now) do
+          post :update, {:id => @artist.id, :artist => {:notes => "rex"}}, {:user_id => @user.id}
+        end
+        @artist.reload
+        @wiki_page.reload
+        assert_equal("rex", @artist.notes)
+        assert_not_equal(old_timestamp, @wiki_page.updated_at)
+        assert_redirected_to(artist_path(@artist))
+      end
+
+      should "not touch the updater_id and updated_at fields when nothing is changed" do
+        old_timestamp = @wiki_page.updated_at
+        old_updater_id = @wiki_page.updater_id
+
+        Timecop.travel(1.minutes.from_now) do
+          CurrentUser.scoped(@another_user) do
+            @artist.update_attributes(notes: "testing")
+          end
+        end
+
+        @wiki_page.reload
+        assert_equal(old_timestamp, @wiki_page.updated_at)
+        assert_equal(old_updater_id, @wiki_page.updater_id)
+      end
+
+      context "when renaming an artist" do
+        should "automatically rename the artist's wiki page" do
+          assert_difference("WikiPage.count", 0) do
+            post :update, {:id => @artist.id, :artist => {:name => "bbb", :notes => "more testing"}}, {:user_id => @user.id}
+          end
+          @wiki_page.reload
+          assert_equal("bbb", @wiki_page.title)
+          assert_equal("more testing", @wiki_page.body)
+        end
+
+        should "merge the new notes with the existing wiki page's contents if a wiki page for the new name already exists" do
+          existing_wiki_page = FactoryGirl.create(:wiki_page, :title => "bbb", :body => "xxx")
+          post :update, {:id => @artist.id, :artist => {:name => "bbb", :notes => "yyy"}}, {:user_id => @user.id}
+          existing_wiki_page.reload
+          assert_equal("bbb", existing_wiki_page.title)
+          assert_equal("xxx\n\nyyy", existing_wiki_page.body)
+        end
+      end
     end
 
     should "delete an artist" do
@@ -152,28 +199,6 @@ class ArtistsControllerTest < ActionController::TestCase
 
       assert_redirected_to(artist_path(@artist))
       assert_equal(true, @artist.reload.is_active)
-    end
-
-    context "when renaming an artist" do
-      should "automatically rename the artist's wiki page" do
-        artist = FactoryGirl.create(:artist, :name => "aaa", :notes => "testing")
-        wiki_page = artist.wiki_page
-        assert_difference("WikiPage.count", 0) do
-          post :update, {:id => artist.id, :artist => {:name => "bbb", :notes => "more testing"}}, {:user_id => @user.id}
-        end
-        wiki_page.reload
-        assert_equal("bbb", wiki_page.title)
-        assert_equal("more testing", wiki_page.body)
-      end
-
-      should "merge the new notes with the existing wiki page's contents if a wiki page for the new name already exists" do
-        artist = FactoryGirl.create(:artist, :name => "aaa")
-        existing_wiki_page = FactoryGirl.create(:wiki_page, :title => "bbb", :body => "xxx")
-        post :update, {:id => artist.id, :artist => {:name => "bbb", :notes => "yyy"}}, {:user_id => @user.id}
-        existing_wiki_page.reload
-        assert_equal("bbb", existing_wiki_page.title)
-        assert_equal("xxx\n\nyyy", existing_wiki_page.body)
-      end
     end
 
     context "reverting an artist" do
