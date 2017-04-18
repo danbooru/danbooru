@@ -2,7 +2,6 @@ class WikiPage < ActiveRecord::Base
   class RevertError < Exception ; end
 
   before_validation :initialize_creator, :on => :create
-  before_validation :initialize_updater
   validates_uniqueness_of :title, :case_sensitive => false
   validates_presence_of :title
   validate :validate_rename
@@ -10,6 +9,7 @@ class WikiPage < ActiveRecord::Base
   validate :validate_not_locked
   before_save :normalize_title
   before_save :normalize_other_names
+  before_save :initialize_updater
   after_save :create_version
 
   belongs_to :creator, :class_name => "User"
@@ -207,8 +207,12 @@ class WikiPage < ActiveRecord::Base
     )
   end
 
+  def create_version?
+    title_changed? || body_changed? || is_locked_changed? || is_deleted_changed? || other_names_changed?
+  end
+
   def create_version
-    if title_changed? || body_changed? || is_locked_changed? || is_deleted_changed? || other_names_changed?
+    if create_version?
       if merge_version?
         merge_version
       else
@@ -226,7 +230,9 @@ class WikiPage < ActiveRecord::Base
   end
   
   def initialize_updater
-    self.updater_id = CurrentUser.user.id
+    if create_version?
+      self.updater_id = CurrentUser.user.id
+    end
   end
 
   def post_set
