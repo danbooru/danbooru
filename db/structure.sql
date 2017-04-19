@@ -778,74 +778,6 @@ ALTER SEQUENCE artists_id_seq OWNED BY artists.id;
 
 
 --
--- Name: bank_balances; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE bank_balances (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    amount integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    nonce character varying NOT NULL
-);
-
-
---
--- Name: bank_balances_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE bank_balances_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: bank_balances_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE bank_balances_id_seq OWNED BY bank_balances.id;
-
-
---
--- Name: bank_transactions; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE bank_transactions (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    amount integer NOT NULL,
-    nonce character varying NOT NULL,
-    type character varying NOT NULL,
-    data text,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: bank_transactions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE bank_transactions_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: bank_transactions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE bank_transactions_id_seq OWNED BY bank_transactions.id;
-
-
---
 -- Name: bans; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3455,20 +3387,6 @@ ALTER TABLE ONLY artists ALTER COLUMN id SET DEFAULT nextval('artists_id_seq'::r
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY bank_balances ALTER COLUMN id SET DEFAULT nextval('bank_balances_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY bank_transactions ALTER COLUMN id SET DEFAULT nextval('bank_transactions_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE ONLY bans ALTER COLUMN id SET DEFAULT nextval('bans_id_seq'::regclass);
 
 
@@ -4533,22 +4451,6 @@ ALTER TABLE ONLY artists
 
 
 --
--- Name: bank_balances_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY bank_balances
-    ADD CONSTRAINT bank_balances_pkey PRIMARY KEY (id);
-
-
---
--- Name: bank_transactions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY bank_transactions
-    ADD CONSTRAINT bank_transactions_pkey PRIMARY KEY (id);
-
-
---
 -- Name: bans_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5049,34 +4951,6 @@ CREATE INDEX index_artists_on_other_names_index ON artists USING gin (other_name
 --
 
 CREATE INDEX index_artists_on_other_names_trgm ON artists USING gin (other_names gin_trgm_ops);
-
-
---
--- Name: index_bank_balances_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_bank_balances_on_user_id ON bank_balances USING btree (user_id);
-
-
---
--- Name: index_bank_transactions_on_created_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bank_transactions_on_created_at ON bank_transactions USING btree (created_at);
-
-
---
--- Name: index_bank_transactions_on_nonce; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_bank_transactions_on_nonce ON bank_transactions USING btree (nonce);
-
-
---
--- Name: index_bank_transactions_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bank_transactions_on_user_id ON bank_transactions USING btree (user_id);
 
 
 --
@@ -7571,15 +7445,9 @@ INSERT INTO schema_migrations (version) VALUES ('20170112060921');
 
 INSERT INTO schema_migrations (version) VALUES ('20170117233040');
 
-INSERT INTO schema_migrations (version) VALUES ('20170126020516');
-
-INSERT INTO schema_migrations (version) VALUES ('20170126214445');
-
 INSERT INTO schema_migrations (version) VALUES ('20170218104710');
 
 INSERT INTO schema_migrations (version) VALUES ('20170302014435');
-
-INSERT INTO schema_migrations (version) VALUES ('20170314204631');
 
 INSERT INTO schema_migrations (version) VALUES ('20170314235626');
 
