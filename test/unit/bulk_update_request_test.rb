@@ -78,7 +78,6 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         @topic.reload
         @post.reload
         assert_match(/\[FAILED\]/, @topic.title)
-        assert_match(/UPDATE/, @post.body)
       end
 
       should "downcase the text" do
@@ -93,7 +92,6 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         @topic.reload
         @post.reload
         assert_match(/\[APPROVED\]/, @topic.title)
-        assert_match(/UPDATE/, @post.body)
       end
 
       should "update the topic when rejected" do
@@ -106,7 +104,6 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         @topic.reload
         @post.reload
         assert_match(/\[REJECTED\]/, @topic.title)
-        assert_match(/UPDATE/, @post.body)
       end
     end
   end
