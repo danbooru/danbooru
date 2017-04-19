@@ -17,22 +17,22 @@
       <priority>0.7</priority>
    </url>
    <url>
+      <loc>http://danbooru.donmai.us/posts?tags=kemono_friends</loc>
+      <changefreq>daily</changefreq>
+      <priority>0.3</priority>
+   </url>
+   <url>
+      <loc>http://danbooru.donmai.us/posts?tags=fate%2fgrand_order</loc>
+      <changefreq>daily</changefreq>
+      <priority>0.3</priority>
+   </url>
+   <url>
       <loc>http://danbooru.donmai.us/posts?tags=pokemon</loc>
       <changefreq>daily</changefreq>
       <priority>0.3</priority>
    </url>
    <url>
       <loc>http://danbooru.donmai.us/posts?tags=overwatch</loc>
-      <changefreq>daily</changefreq>
-      <priority>0.3</priority>
-   </url>
-   <url>
-      <loc>http://danbooru.donmai.us/posts?tags=fate_(series)</loc>
-      <changefreq>daily</changefreq>
-      <priority>0.3</priority>
-   </url>
-   <url>
-      <loc>http://danbooru.donmai.us/posts?tags=granblue_fantasy</loc>
       <changefreq>daily</changefreq>
       <priority>0.3</priority>
    </url>
