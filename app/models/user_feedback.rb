@@ -74,7 +74,7 @@ class UserFeedback < ActiveRecord::Base
   extend SearchMethods
 
   def initialize_creator
-    self.creator_id = CurrentUser.id
+    self.creator_id ||= CurrentUser.id
   end
 
   def user_name
