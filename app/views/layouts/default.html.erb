@@ -49,11 +49,11 @@
     "@context": "http://schema.org",
     "@type": "WebSite",
     "url" : "http://<%= Danbooru.config.hostname%>",
-    "potentialAction": {
+    "potentialAction": [{
       "@type": "SearchAction",
       "target": "http://<%= Danbooru.config.hostname%>/posts?tags={search_term_string}",
       "query-input": "required name=search_term_string"
-    }
+    }]
   }
   </script>
 
