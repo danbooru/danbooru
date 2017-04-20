@@ -27,6 +27,9 @@ $preview_flagged_color: #F00;
 $preview_sample_warning_color:  hsl(0,  100%, 90%); // light red
 $preview_quality_warning_color: hsl(50, 100%, 90%); // light yellow
 
+$error_color: hsl(0, 100%, 95%); // light red
+$success_color: hsl(120, 100%, 95%); // light green
+
 @mixin border-radius($val) {
   -moz-border-radius: $val;
   -webkit-border-radius: $val;

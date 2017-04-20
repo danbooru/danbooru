@@ -10,13 +10,23 @@ class Ban < ActiveRecord::Base
   validates_presence_of :user_id, :reason, :duration
   before_validation :initialize_banner_id, :on => :create
 
+  scope :unexpired, -> { where("bans.expires_at > ?", Time.now) }
+  scope :expired, -> { where("bans.expires_at <= ?", Time.now) }
+
   def self.is_banned?(user)
     exists?(["user_id = ? AND expires_at > ?", user.id, Time.now])
   end
 
+  def self.reason_matches(query)
+    if query =~ /\*/
+      where("lower(bans.reason) LIKE ?", query.to_escaped_for_sql_like)
+    else
+      where("bans.reason @@ plainto_tsquery(?)", query)
+    end
+  end
+
   def self.search(params)
     q = where("true")
-    return q if params.blank?
 
     if params[:banner_name]
       q = q.where("banner_id = (select _.id from users _ where lower(_.name) = ?)", params[:banner_name].mb_chars.downcase)
@@ -32,6 +42,22 @@ class Ban < ActiveRecord::Base
 
     if params[:user_id]
       q = q.where("user_id = ?", params[:user_id].to_i)
+    end
+
+    if params[:reason_matches].present?
+      q = q.reason_matches(params[:reason_matches])
+    end
+
+    case params[:expired]
+    when "true"  then q = q.expired
+    when "false" then q = q.unexpired
+    end
+
+    case params[:order]
+    when "expires_at_desc"
+      q = q.order("bans.expires_at desc")
+    else
+      q = q.order("bans.id desc")
     end
 
     q

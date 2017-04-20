@@ -1,0 +1,8 @@
+<%= simple_form_for(:search, method: :get, url: bans_path, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+  <%= f.input :user_name, label: "User", input_html: { value: params[:search][:user_name] } %>
+  <%= f.input :banner_name, label: "Banner", input_html: { value: params[:search][:banner_name] } %>
+  <%= f.input :reason_matches, label: "Reason", hint: "Use * for wildcard", input_html: { value: params[:search][:reason_matches] } %>
+  <%= f.input :expired, label: "Expired?", collection: [["Yes", true], ["No", false]], include_blank: true, selected: params[:search][:expired] %>
+  <%= f.input :order, include_blank: false, collection: [%w[Created id_desc], %w[Expiration expires_at_desc]], selected: params[:search][:order] %>
+  <%= f.submit "Search" %>
+<% end %>

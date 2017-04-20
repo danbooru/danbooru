@@ -11,9 +11,10 @@ class BansController < ApplicationController
   end
 
   def index
-    @search = Ban.search(params[:search]).order("id desc")
-    @bans = @search.paginate(params[:page], :limit => params[:limit])
-    respond_with(@bans)
+    @bans = Ban.search(params[:search]).paginate(params[:page], :limit => params[:limit])
+    respond_with(@bans) do |fmt|
+      fmt.html { @bans = @bans.includes(:user, :banner) }
+    end
   end
 
   def show

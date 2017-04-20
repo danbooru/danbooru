@@ -165,6 +165,26 @@ class BanTest < ActiveSupport::TestCase
   end
 
   context "Searching for a ban" do
+    should "find a given ban" do
+      CurrentUser.user = FactoryGirl.create(:admin_user)
+      CurrentUser.ip_addr = "127.0.0.1"
+
+      user = FactoryGirl.create(:user)
+      ban = FactoryGirl.create(:ban, user: user)
+      params = {
+        user_name: user.name,
+        banner_name: ban.banner.name,
+        reason: ban.reason,
+        expired: false,
+        order: :id_desc
+      }
+
+      bans = Ban.search(params)
+
+      assert_equal(1, bans.length)
+      assert_equal(ban.id, bans.first.id)
+    end
+
     context "by user id" do
       setup do
         @admin = FactoryGirl.create(:admin_user)
