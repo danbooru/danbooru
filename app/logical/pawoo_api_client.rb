@@ -7,7 +7,7 @@ class PawooApiClient
 		attr_reader :json
 
 		def self.is_match?(url)
-			url =~ %r!https://pawoo.net/web/accounts/(\d+)!
+			url =~ %r!https?://pawoo.net/web/accounts/(\d+)!
 			$1
 		end
 

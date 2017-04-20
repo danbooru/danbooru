@@ -6,6 +6,10 @@ module Sources::Strategies
       PawooApiClient::Status.is_match?(url)
     end
 
+    def referer_url
+      @url
+    end
+
     def site_name
       "Pawoo"
     end

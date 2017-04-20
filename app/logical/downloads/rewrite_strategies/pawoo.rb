@@ -11,7 +11,7 @@ module Downloads
         if PawooApiClient::Status.is_match?(url)
           client = PawooApiClient.new
           response = client.get_status(url)
-          url = client.image_url
+          url = response.image_url
         end
 
         return [url, headers, data]
