@@ -8,11 +8,11 @@
 
     if ($("#c-posts").length) {
       this.initialize_shortcuts();
+      this.initialize_saved_searches();
     }
 
     if ($("#c-posts").length && $("#a-index").length) {
       this.initialize_excerpt();
-      this.initialize_saved_searches();
     }
 
     if ($("#c-posts").length && $("#a-show").length) {
