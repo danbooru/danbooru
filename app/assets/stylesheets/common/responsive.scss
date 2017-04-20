@@ -4,9 +4,23 @@
   display: none;
 }
 
+#desktop-version-link {
+  display: none;
+}
+
 @media screen and (max-width: 660px) {
+  #desktop-version-link {
+    display: inline;
+  }
+
   #responsive-tag-list {
     display: block;
+    font-size: 18pt;
+    font-weight: bold;
+
+    .post-count, .wiki-link {
+      display: none;
+    }
 
     input[type=text] {
       width: 75%;
@@ -37,8 +51,11 @@
 
   input[type=text], input[type=submit] {
     font-size: 18pt;
+    border-color: default;
+    border-style: solid;
+    border-width: .1rem;
   }
- 
+
   div#page section#content {
     margin: 0;
     padding: 0;
@@ -56,8 +73,6 @@
     font-size: 16pt;
     font-weight: bold;
     text-align: left;
-    background-color: #F7F7FF;
-    border-radius: 15%;
     padding: 3pt;
 
     li {
@@ -66,7 +81,7 @@
 
       a, span {
         padding: 3px 18px;
-        margin: 0 3px;
+        margin: 6px 3px;
         display: inline-block;
         border-radius: 15%;
       }
@@ -131,6 +146,7 @@
     float: right;
     font-size: 1.125em;
     width: 100%;
+    margin-bottom: 1em;
   }
   
   #nav {
@@ -139,10 +155,7 @@
   
   header#top menu.main {
     background-color: lighten($link_color, 25%);
-  }
-  
-  header#top menu {
-    width: 100%;
+    padding: 5px 10px;
   }
   
   h1 {
@@ -173,6 +186,10 @@
 @media screen and (max-width: 440px) {
   #responsive-tag-list {
     display: block;
+  }
+
+  input#expand-search {
+    display: none;
   }
 
   body {

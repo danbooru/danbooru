@@ -15,7 +15,7 @@
     <% end %>
     <%= hidden_field_tag "ms", "1" %>
     <%= submit_tag "Go", :name => nil %>
-    <%= submit_tag "+", "data-jq-dropdown" => "#search-dropdown" %>
+    <%= submit_tag "+", :id => "expand-search", "data-jq-dropdown" => "#search-dropdown" %>
     <div id="search-dropdown" class="jq-dropdown jq-dropdown-tip">
       <ul class="jq-dropdown-menu">
         <% if SavedSearch.enabled? && CurrentUser.show_saved_searches? %>
