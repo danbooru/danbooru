@@ -33,6 +33,14 @@ class PostFlag < ActiveRecord::Base
       end
     end
 
+    def duplicate
+      where("to_tsvector('english', post_flags.reason) @@ to_tsquery('dup | duplicate | sample | smaller')")
+    end
+
+    def not_duplicate
+      where("to_tsvector('english', post_flags.reason) @@ to_tsquery('!dup & !duplicate & !sample & !smaller')")
+    end
+
     def post_tags_match(query)
       PostQueryBuilder.new(query).build(self.joins(:post))
     end
@@ -98,6 +106,8 @@ class PostFlag < ActiveRecord::Base
         q = q.where("reason LIKE ?", Reasons::REJECTED)
       when "deleted"
         q = q.where("reason = ? OR reason LIKE ?", Reasons::UNAPPROVED, Reasons::REJECTED)
+      when "duplicate"
+        q = q.duplicate
       end
 
       q

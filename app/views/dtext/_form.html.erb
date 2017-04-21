@@ -4,12 +4,17 @@
 - input_name
 - preview_id
 - value
+- type
  -->
 <div class="input text optional <%= classes %>">
   <label class="text optional" for="<%= input_id %>"><%= name %></label>
 
   <div class="dtext-previewable">
-    <textarea id="<%= input_id %>" class="text optional" rows="20" name="<%= input_name %>" cols="30"><%= value %></textarea>
+    <% if type == "text" %>
+      <textarea id="<%= input_id %>" class="text optional" rows="20" name="<%= input_name %>" cols="30"><%= value %></textarea>
+    <% else %>
+      <input type="text" id="<%= input_id %>" class="text optional" name="<%= input_name %>" value="<%= value %>">
+    <% end %>
     <div id="<%= preview_id %>" class="dtext-preview prose"></div>
   </div>
    <span class="hint">All text is formatted using <%= link_to "DText", wiki_pages_path(:title => "help:dtext"), :target => "_blank" %></span>

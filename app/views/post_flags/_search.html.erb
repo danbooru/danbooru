@@ -6,6 +6,6 @@
     <%= f.input :creator_name, label: "Creator", input_html: { value: params[:search][:creator_name] } %>
   <% end %>
   <%= f.input :is_resolved, label: "Resolved?", collection: [["Yes", true], ["No", false]], include_blank: true, selected: params[:search][:is_resolved] %>
-  <%= f.input :category, label: "Category", collection: ["normal", "unapproved", "rejected", "deleted", "banned"], include_blank: true, selected: params[:search][:category] %>
+  <%= f.input :category, label: "Category", collection: ["normal", "unapproved", "rejected", "deleted", "banned", "duplicate"], include_blank: true, selected: params[:search][:category] %>
   <%= f.submit "Search" %>
 <% end %>

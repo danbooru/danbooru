@@ -144,6 +144,7 @@ module ApplicationHelper
     options[:value] ||= instance_variable_get("@#{object}").try(name)
     options[:preview_id] ||= "dtext-preview"
     options[:classes] ||= ""
+    options[:type] ||= "text"
 
     render "dtext/form", options
   end
