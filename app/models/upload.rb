@@ -344,7 +344,7 @@ class Upload < ActiveRecord::Base
       when /^\x1a\x45\xdf\xa3/n
         "video/webm"
 
-      when /^....ftyp(?:isom|3gp5|mp42|MSNV)/
+      when /^....ftyp(?:isom|3gp5|mp42|MSNV|avc1)/
         "video/mp4"
 
       when /^PK\x03\x04/
