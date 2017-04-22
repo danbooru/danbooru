@@ -3,12 +3,6 @@
     <%= post_set.presenter.post_previews_html(self) %>
   </div>
 
-  <% if params[:tags] %>
-    <div id="saved-searches-nav">
-      <%= render "saved_searches/interface", :saved_searches => CurrentUser.user.saved_searches %>
-    </div>
-  <% end %>
-
   <% if post_set.hidden_posts.present? %>
     <div class="tn hidden-posts-notice">
       <% if post_set.banned_posts.present? %>
