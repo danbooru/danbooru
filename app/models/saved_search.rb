@@ -112,6 +112,11 @@ class SavedSearch < ActiveRecord::Base
   end
 
   def label_string=(val)
-    self.labels = val.to_s.scan(/\S+/).map {|x| SavedSearch.normalize_label(x)}
+    self.labels = val.to_s.split(/[[:space:]]+/)
+  end
+
+  def labels=(labels)
+    labels = labels.map { |label| SavedSearch.normalize_label(label) }
+    super(labels)
   end
 end

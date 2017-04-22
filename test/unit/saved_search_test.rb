@@ -95,6 +95,14 @@ class SavedSearchTest < ActiveSupport::TestCase
     should "normalize whitespace" do
       assert_equal("xxx", @saved_search.query)
     end
+
+    should "normalize the label string" do
+      @saved_search.label_string = "Foo Bar"
+      assert_equal(%w[foo bar], @saved_search.labels)
+
+      @saved_search.labels = ["Artist 1", "Artist 2"]
+      assert_equal(%w[artist_1 artist_2], @saved_search.labels)
+    end
   end
 
   context "Destroying a saved search" do

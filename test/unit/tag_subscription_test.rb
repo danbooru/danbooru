@@ -72,6 +72,16 @@ class TagSubscriptionTest < ActiveSupport::TestCase
         assert_equal([posts[1].id], TagSubscription.find_posts(user.id, "yyy").map(&:id))
       end
     end
+
+    should "migrate to saved searches" do
+      sub = FactoryGirl.create(:tag_subscription, tag_query: "foo bar\r\nbar\nbaz", :name => "Artist 1")
+      sub.migrate_to_saved_searches
+
+      assert_equal(1, CurrentUser.user.subscriptions.size)
+      assert_equal(3, CurrentUser.user.saved_searches.size)
+      assert_equal(["bar foo", "bar", "baz"], CurrentUser.user.saved_searches.pluck(:query))
+      assert_equal([%w[artist_1]]*3, CurrentUser.user.saved_searches.pluck(:labels))
+    end
   end
 
   context "A tag subscription manager" do
