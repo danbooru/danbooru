@@ -22,13 +22,13 @@
 
       <div class="input" id="added-tags-input">
         <label>Added Tags</label>
-        <%= text_field :constraints, :added_tags, :value => @constraints[:added_tags] %>
+        <%= text_field :constraints, :added_tags, :value => @constraints[:added_tags], :data => { :autocomplete => "tag" } %>
         <p class="hint">You must specify a user to add tags</p>
       </div>
 
       <div class="input" id="removed-tags-input">
         <label>Removed Tags</label>
-        <%= text_field :constraints, :removed_tags, :value => @constraints[:removed_tags] %>
+        <%= text_field :constraints, :removed_tags, :value => @constraints[:removed_tags], :data => { :autocomplete => "tag" } %>
         <p class="hint">You must specify a user to add tags</p>
       </div>
 

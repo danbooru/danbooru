@@ -2,7 +2,7 @@
   <h1>Related tags</h1>
   <section>
     <%= form_tag(related_tag_path, :method => :get) do %>
-      <%= text_field_tag "query", params[:query] %>
+      <%= text_field_tag "query", params[:query], :data => { :autocomplete => "tag" } %>
       <%= select_tag "category", options_for_select([""] + Danbooru.config.canonical_tag_category_mapping.map{|x| [x.first, x.first.downcase]}, params[:category]) %>
       <%= submit_tag "Show"%>
     <% end %>

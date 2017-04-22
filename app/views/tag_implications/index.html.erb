@@ -1,7 +1,7 @@
 <div id="c-tag-implications">
   <div id="a-index">
     <%= simple_form_for(:search, method: :get, url: tag_implications_path, defaults: { required: false }) do |f| %>
-      <%= f.input :name_matches, label: "Name", input_html: { value: params[:search][:name_matches] } %>
+      <%= f.input :name_matches, label: "Name", input_html: { value: params[:search][:name_matches], data: { autocomplete: "tag" } } %>
       <%= f.submit "Search" %>
     <% end %>
 

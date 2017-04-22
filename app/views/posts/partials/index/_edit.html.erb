@@ -3,7 +3,7 @@
 
   <%= form_tag("/posts", :class => "simple_form", :method => :put, :id => "quick-edit-form") do %>
     <div class="input">
-      <%= text_area_tag "post[tag_string]", "" %>
+      <%= text_area_tag "post[tag_string]", "", :data => { :autocomplete => "tag-edit" } %>
       <%= submit_tag "Submit", :data => { :disable_with => "Submitting..." } %>
       <%= submit_tag "Cancel" %>
     </div>

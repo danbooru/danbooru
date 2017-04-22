@@ -6,7 +6,7 @@
 <section id="search-box">
   <h1>Search</h1>
   <%= form_tag(path, :method => "get") do %>
-    <%= text_field_tag("tags", tags, :size => 20, :id => tags_dom_id) %>
+    <%= text_field_tag("tags", tags, :size => 20, :id => tags_dom_id, :data => { :autocomplete => "tag-query" }) %>
     <% if params[:raw] %>
       <%= hidden_field_tag :raw, params[:raw] %>
     <% end %>

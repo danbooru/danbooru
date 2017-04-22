@@ -79,7 +79,7 @@
   <div class="input">
     <div>
       <%= f.label :tag_string, "Tags" %>
-      <%= f.text_area :tag_string, :size => "50x5", :value => post.presenter.categorized_tag_string + " " %>
+      <%= f.text_area :tag_string, :size => "50x5", :value => post.presenter.categorized_tag_string + " ", :data => { :autocomplete => "tag-edit" } %>
       <span id="open-edit-dialog" class="ui-icon ui-icon-arrow-1-ne" title="detach" style="display: none;"/>
     </div>
 

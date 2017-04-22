@@ -6,7 +6,7 @@
       <%= hidden_field_tag "group_by", "comment", :id => "group_by_full" %>
       <%= f.input :creator_name, label: "Commenter" %>
       <%= f.input :body_matches, label: "Body" %>
-      <%= f.input :post_tags_match, label: "Tags" %>
+      <%= f.input :post_tags_match, label: "Tags", input_html: { data: { autocomplete: "tag-query" } } %>
       <%= f.input :is_deleted, label: "Deleted?", collection: [["Yes", true], ["No", false]] %>
       <%= f.input :is_sticky, label: "Sticky?", collection: [["Yes", true], ["No", false]] %>
       <%= f.input :do_not_bump_post, label: "Bumping?", collection: [["Yes", false], ["No", true]] %>

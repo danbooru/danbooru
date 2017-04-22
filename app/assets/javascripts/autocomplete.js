@@ -87,18 +87,8 @@
   }
 
   Danbooru.Autocomplete.initialize_tag_autocomplete = function() {
-    var $fields_multiple = $(
-      "#tags,#post_tag_string,#upload_tag_string,#tag-script-field,#c-moderator-post-queues #query," +
-      "#user_blacklisted_tags,#user_favorite_tags,#search_post_tags_match"
-    );
-    var $fields_single = $(
-      "#c-tags #search_name_matches,#c-tag-aliases #query,#c-tag-implications #query," +
-      "#wiki_page_title," +
-      "#tag_alias_request_antecedent_name,#tag_alias_request_consequent_name," +
-      "#tag_implication_request_antecedent_name,#tag_implication_request_consequent_name," +
-      "#tag_alias_antecedent_name,#tag_alias_consequent_name," +
-      "#tag_implication_antecedent_name,#tag_implication_consequent_name"
-    );
+    var $fields_multiple = $('[data-autocomplete="tag-query"], [data-autocomplete="tag-edit"]');
+    var $fields_single = $('[data-autocomplete="tag"]');
 
     var prefixes = "-|~|general:|gen:|artist:|art:|copyright:|copy:|co:|character:|char:|ch:";
     var metatags = "order|-status|status|-rating|rating|-locked|locked|child|filetype|-filetype|" +
