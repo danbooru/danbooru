@@ -11,13 +11,8 @@ class TagSubscription < ActiveRecord::Base
 
   def migrate_to_saved_searches
     tag_query.split(/\r\n|\r|\n/).each do |query|
-      creator.saved_searches.create(
-        :tag_query => query,
-        :category => name
-      )
+      creator.saved_searches.create({query: query, labels: [name]}, without_protection: true)
     end
-    
-    destroy
   end
 
   def normalize_name
