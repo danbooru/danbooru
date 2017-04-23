@@ -1,7 +1,8 @@
 <% content_for(:secondary_links) do %>
   <menu>
     <li><%= render "notes/quick_search" %></li>
-    <li><%= link_to "Listing", notes_path(:group_by => "post") %></li>
+    <li><%= link_to "Listing", notes_path %></li>
+    <li><%= link_to "Posts", posts_path(:tags => "order:note") %></li>
     <li><%= link_to "Search", search_notes_path %></li>
     <li><%= link_to "History", note_versions_path %></li>
     <li><%= link_to "Requests", posts_path(:tags => "translation_request") %></li>
