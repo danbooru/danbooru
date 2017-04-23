@@ -28,6 +28,11 @@ class WikiPagesControllerTest < ActionController::TestCase
         get :index, {:search => {:title => "abc"}}
         assert_redirected_to(wiki_page_path(@wiki_page_abc))
       end
+
+      should "list wiki_pages without tags with order=post_count" do
+        get :index, {:search => {:title => "abc", :order => "post_count"}}
+        assert_redirected_to(wiki_page_path(@wiki_page_abc))
+      end
     end
 
     context "show action" do
