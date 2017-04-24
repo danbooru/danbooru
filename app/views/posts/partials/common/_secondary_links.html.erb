@@ -13,7 +13,6 @@
       <% if CurrentUser.has_saved_searches? %>
         <li id="secondary-links-posts-saved-searches"><%= link_to "Saved searches", posts_path(:tags => "search:all") %></li>
       <% end %>
-      <li id="secondary-links-posts-subscriptions"><%= link_to "Subscriptions", posts_path(:tags => "sub:#{CurrentUser.name}") %></li>
     <% end %>
     <li id="secondary-links-posts-changes" class="nonessential"><%= link_to "Changes", post_versions_path %></li>
     <% if CurrentUser.can_approve_posts? %>
