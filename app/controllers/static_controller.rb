@@ -1,4 +1,6 @@
 class StaticController < ApplicationController
+  before_filter :check_desktop_mode, only: :site_map
+
   def terms_of_service
   end
   
@@ -14,4 +16,18 @@ class StaticController < ApplicationController
 
   def error
   end
+
+  def site_map
+  end
+
+  private
+
+  def check_desktop_mode
+    if params[:dm]
+      cookies[:dm] = "1"
+      redirect_to :back
+      return false
+    end
+  end
+  
 end

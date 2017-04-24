@@ -9,7 +9,6 @@ class ApplicationController < ActionController::Base
   before_filter :set_started_at_session
   before_filter :api_check
   before_filter :set_safe_mode
-  before_filter :check_desktop_mode
   # before_filter :secure_cookies_check
   layout "default"
   force_ssl :if => :ssl_login?
@@ -21,12 +20,6 @@ class ApplicationController < ActionController::Base
   rescue_from Danbooru::Paginator::PaginationError, :with => :render_pagination_limit
 
   protected
-
-  def check_desktop_mode
-    if params[:dm]
-      cookies[:dm] = "1"
-    end
-  end
 
   def show_moderation_notice?
     CurrentUser.can_approve_posts? && (cookies[:moderated].blank? || Time.at(cookies[:moderated].to_i) < 20.hours.ago)
