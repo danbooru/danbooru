@@ -5,7 +5,7 @@
 
       <div id="search">
         <%= form_tag(moderator_post_queue_path, :method => :get) do %>
-          <%= text_field_tag "query", params[:query], :size => 40 %>
+          <%= text_field_tag "query", params[:query], :size => 40, :data => { :autocomplete => "tag-query" } %>
           <%= select_tag "per_page", options_for_select(%w(25 50 100 200), cookies["mq_per_page"])%>
           <%= submit_tag "Search" %>
         <% end %>

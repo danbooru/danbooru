@@ -9,12 +9,12 @@
     <%= form_tag(tag_alias_request_path, :class => "simple_form") do %>
       <div class="input">
         <label>From</label>
-        <%= text_field "tag_alias_request", "antecedent_name" %>
+        <%= text_field "tag_alias_request", "antecedent_name", :data => { :autocomplete => "tag" } %>
       </div>
 
       <div class="input">
         <label>To</label>
-        <%= text_field "tag_alias_request", "consequent_name" %>
+        <%= text_field "tag_alias_request", "consequent_name", :data => { :autocomplete => "tag" } %>
       </div>
 
       <div class="input">

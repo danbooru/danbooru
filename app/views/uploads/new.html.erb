@@ -101,7 +101,7 @@
         <div class="input">
           <div>
             <%= f.label :tag_string, "Tags" %>
-            <%= f.text_area :tag_string, :size => "60x5" %>
+            <%= f.text_area :tag_string, :size => "60x5", :data => { :autocomplete => "tag-edit" } %>
             <span id="open-edit-dialog" class="ui-icon ui-icon-arrow-1-ne" title="detach" style="display: none;"/>
           </div>
 

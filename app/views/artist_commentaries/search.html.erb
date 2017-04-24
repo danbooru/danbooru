@@ -1,21 +1,13 @@
 <div id="c-artist-commentaries">
   <div id="a-search">
     <h1>Search Artist Commentary</h1>
-    <%= form_tag(artist_commentaries_path, :method => :get, :class => "simple_form") do %>
-      <%= search_field "text_matches", :label => "Text" %>
-      <%= search_field "post_tags_match", :label => "Tags" %>
 
-      <div class="input">
-        <label for="search_original_present">Original present?</label>
-        <%= select "search", "original_present", ["yes", "no"], :include_blank => true %>
-      </div>
-
-      <div class="input">
-        <label for="search_translated_present">Translation present?</label>
-        <%= select "search", "translated_present", ["yes", "no"], :include_blank => true %>
-      </div>
-
-      <%= submit_tag "Search" %>
+    <%= simple_form_for(:search, url: artist_commentaries_path, method: :get, defaults: { required: false }) do |f| %>
+      <%= f.input :text_matches, label: "Text" %>
+      <%= f.input :post_tags_match, label: "Tags", input_html: { data: { autocomplete: "tag-query" } } %>
+      <%= f.input :original_present, label: "Original present?", collection: ["yes", "no"], include_blank: true %>
+      <%= f.input :translated_present, label: "Translation present?", collection: ["yes", "no"], include_blank: true %>
+      <%= f.submit "Search" %>
     <% end %>
   </div>
 </div>

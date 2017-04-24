@@ -48,7 +48,7 @@
           <%= f.input :per_page, :label => "Posts per page", :as => :select, :collection => (1..100), :include_blank => false %>
         <% end %>
         
-        <%= f.input :blacklisted_tags, :hint => "Put any tag combinations you never want to see here. Each combination should go on a separate line. <a href='/wiki_pages/help:blacklists'>View help.</a>".html_safe, :input_html => {:size => "40x5"} %>
+        <%= f.input :blacklisted_tags, :hint => "Put any tag combinations you never want to see here. Each combination should go on a separate line. <a href='/wiki_pages/help:blacklists'>View help.</a>".html_safe, :input_html => {:size => "40x5", :data => {:autocomplete => "tag-query"}} %>
       </fieldset>
       
       <fieldset id="advanced-settings-section">
@@ -76,7 +76,7 @@
 
         <%= f.input :enable_recent_searches, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
 
-        <%= f.input :favorite_tags, :label => "Frequent tags", :hint => "A list of tags that you use often. They will appear when using the list of Related Tags.", :input_html => { :rows => 5 } %>
+        <%= f.input :favorite_tags, :label => "Frequent tags", :hint => "A list of tags that you use often. They will appear when using the list of Related Tags.", :input_html => { :rows => 5, :data => { :autocomplete => "tag-query" } } %>
 
         <div class="input text optional field_with_hint">
           <label class="text optional" for="user_dmail_filter_attributes_words">Dmail filter</label>

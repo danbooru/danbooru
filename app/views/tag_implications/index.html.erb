@@ -1,11 +1,9 @@
 <div id="c-tag-implications">
   <div id="a-index">
-    <div class="search">
-      <%= form_tag(tag_implications_path, :method => :get) do %>
-        <%= text_field :search, :name_matches, :value => params[:search][:name_matches] %>
-        <%= submit_tag "Search" %>
-      <% end %>
-    </div>
+    <%= simple_form_for(:search, method: :get, url: tag_implications_path, defaults: { required: false }) do |f| %>
+      <%= f.input :name_matches, label: "Name", input_html: { value: params[:search][:name_matches], data: { autocomplete: "tag" } } %>
+      <%= f.submit "Search" %>
+    <% end %>
 
     <%= render "listing", :tag_implications => @tag_implications %>
 

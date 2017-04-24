@@ -2,13 +2,13 @@
   <div id="a-search">
     <h1>Search Notes</h1>
 
-    <%= form_tag(notes_path, :method => :get, :class => "simple_form") do %>
-      <%= hidden_field_tag "group_by", "note" %>
+    <%= simple_form_for(:search, url: notes_path, method: :get, defaults: { required: false }) do |f| %>
+      <%= f.hidden_field :group_by, value: "note" %>
 
-      <%= search_field "body_matches", :label => "Body" %>
-      <%= search_field "creator_name", :label => "Author" %>
-      <%= search_field "post_tags_match", :label => "Tags" %>
-      <%= submit_tag "Search" %>
+      <%= f.input :body_matches, label: "Body" %>
+      <%= f.input :creator_name, label: "Author" %>
+      <%= f.input :post_tags_match, label: "Tags", input_html: { data: { autocomplete: "tag-query" } } %>
+      <%= f.submit "Search" %>
     <% end %>
   </div>
 </div>

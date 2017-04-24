@@ -5,12 +5,12 @@
     <%= form_tag(moderator_tag_path, :method => :put, :class => "simple_form") do %>
       <div class="input">
         <label>Antecedent</label>
-        <%= text_field :tag, :antecedent, :value => params[:antecedent] %>
+        <%= text_field :tag, :antecedent, :value => params[:antecedent], :data => { :autocomplete => "tag-query" } %>
       </div>
 
       <div class="input">
         <label>Consequent</label>
-        <%= text_field :tag, :consequent, :value => params[:consequent] %>
+        <%= text_field :tag, :consequent, :value => params[:consequent], :data => { :autocomplete => "tag-edit" } %>
       </div>
 
       <div class="input">
