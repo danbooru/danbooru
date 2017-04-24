@@ -11,24 +11,15 @@ class RelatedTagCalculator
     convert_hash_to_array(calculate_from_sample(tags, Danbooru.config.post_sample_size, category_constraint))
   end
 
-  def self.calculate_from_post_set_to_array(post_set, category_constraint = nil)
-    convert_hash_to_array(calculate_from_post_set(post_set, category_constraint))
+  def self.calculate_from_posts_to_array(posts)
+    convert_hash_to_array(calculate_from_posts(posts))
   end
 
-  def self.calculate_from_post_set(post_set, category_constraint = nil)
+  def self.calculate_from_posts(posts)
     counts = Hash.new {|h, k| h[k] = 0}
 
-    post_set.posts.each do |post|
-      post.tag_array.each do |tag|
-        category = Tag.category_for(tag)
-        if category_constraint
-          if category == category_constraint
-            counts[tag] += 1
-          end
-        else
-          counts[tag] += 1
-        end
-      end
+    posts.flat_map(&:tag_array).each do |tag|
+      counts[tag] += 1
     end
 
     counts
