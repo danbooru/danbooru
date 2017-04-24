@@ -437,7 +437,7 @@ class Artist < ActiveRecord::Base
       when "updated_at"
         q = q.order("artists.updated_at desc")
       when "post_count"
-        q = q.joins(:tag).order("tags.post_count desc")
+        q = q.includes(:tag).order("tags.post_count desc nulls last").references(:tags)
       else
         q = q.order("artists.id desc")
       end
