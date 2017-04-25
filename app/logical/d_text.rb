@@ -12,6 +12,11 @@ class DText
     CGI.escapeHTML(string)
   end
 
+  def self.quote(message, creator_name)
+    stripped_body = DText.strip_blocks(message, "quote")
+    "[quote]\n#{creator_name} said:\n\n#{stripped_body}\n[/quote]\n\n"
+  end
+
   def self.strip_blocks(string, tag)
     n = 0
     stripped = ""
