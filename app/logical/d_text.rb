@@ -22,8 +22,8 @@ class DText
     stripped = ""
     string = string.dup
 
-    string.gsub!(/\s*\[#{tag}\](?!\])\s*/m, "\n\n[#{tag}]\n\n")
-    string.gsub!(/\s*\[\/#{tag}\]\s*/m, "\n\n[/#{tag}]\n\n")
+    string.gsub!(/\s*\[#{tag}\](?!\])\s*/mi, "\n\n[#{tag}]\n\n")
+    string.gsub!(/\s*\[\/#{tag}\]\s*/mi, "\n\n[/#{tag}]\n\n")
     string.gsub!(/(?:\r?\n){3,}/, "\n\n")
     string.strip!
 
