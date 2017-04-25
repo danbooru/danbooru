@@ -291,6 +291,8 @@ class ArtistTest < ActiveSupport::TestCase
     should "search on its name should return results" do
       artist = FactoryGirl.create(:artist, :name => "artist")
       assert_not_nil(Artist.search(:name => "artist").first)
+      assert_not_nil(Artist.search(:name_matches => "artist").first)
+      assert_not_nil(Artist.search(:any_name_matches => "artist").first)
     end
 
     should "search on other names should return matches" do
@@ -300,6 +302,9 @@ class ArtistTest < ActiveSupport::TestCase
       assert_not_nil(Artist.other_names_match("ccc_ddd").first)
       assert_not_nil(Artist.search(:name => "other:aaa").first)
       assert_not_nil(Artist.search(:name => "aaa").first)
+
+      assert_not_nil(Artist.search(:other_names_match => "aaa").first)
+      assert_not_nil(Artist.search(:any_name_matches => "aaa").first)
     end
 
     should "search on group name and return matches" do
@@ -308,6 +313,18 @@ class ArtistTest < ActiveSupport::TestCase
       cat_or_fish.reload
       assert_equal("yuu", cat_or_fish.member_names)
       assert_not_nil(Artist.search(:name => "group:cat_or_fish").first)
+
+      assert_not_nil(Artist.search(:group_name_matches => "cat_or_fish").first)
+      assert_not_nil(Artist.search(:any_name_matches => "cat_or_fish").first)
+    end
+
+    should "search on has_tag and return matches" do
+      post = FactoryGirl.create(:post, tag_string: "bkub")
+      bkub = FactoryGirl.create(:artist, name: "bkub")
+      none = FactoryGirl.create(:artist, name: "none")
+
+      assert_equal(bkub.id, Artist.search(has_tag: "true").first.id)
+      assert_equal(none.id, Artist.search(has_tag: "false").first.id)
     end
 
     should "revert to prior versions" do

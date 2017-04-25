@@ -430,6 +430,26 @@ class Artist < ActiveRecord::Base
         q = q.any_name_matches(params[:name])
       end
 
+      if params[:name_matches].present?
+        q = q.name_matches(params[:name_matches])
+      end
+
+      if params[:other_names_match].present?
+        q = q.other_names_match(params[:other_names_match])
+      end
+
+      if params[:group_name_matches].present?
+        q = q.group_name_matches(params[:group_name_matches])
+      end
+
+      if params[:any_name_matches].present?
+        q = q.any_name_matches(params[:any_name_matches])
+      end
+
+      if params[:url_matches].present?
+        q = q.url_matches(params[:url_matches])
+      end
+
       params[:order] ||= params.delete(:sort)
       case params[:order]
       when "name"
@@ -466,8 +486,15 @@ class Artist < ActiveRecord::Base
         q = q.where("creator_id = ?", params[:creator_id].to_i)
       end
 
+      # XXX deprecated, remove at some point.
       if params[:empty_only] == "true"
-        q = q.joins(:tag).where("tags.post_count = 0")
+        params[:has_tag] = "false"
+      end
+
+      if params[:has_tag] == "true"
+        q = q.joins(:tag).where("tags.post_count > 0")
+      elsif params[:has_tag] == "false"
+        q = q.includes(:tag).where("tags.name IS NULL OR tags.post_count <= 0").references(:tags)
       end
 
       q
