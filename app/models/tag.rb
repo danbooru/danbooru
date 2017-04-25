@@ -448,8 +448,15 @@ class Tag < ActiveRecord::Base
 
           when "noter"
             q[:noter_ids] ||= []
-            user_id = User.name_to_id($2)
-            q[:noter_ids] << user_id unless user_id.blank?
+
+            if $2 == "none"
+              q[:noter_ids] << "none"
+            elsif $2 == "any"
+              q[:noter_ids] << "any"
+            else
+              user_id = User.name_to_id($2)
+              q[:noter_ids] << user_id unless user_id.blank?
+            end
 
           when "noteupdater"
             q[:note_updater_ids] ||= []

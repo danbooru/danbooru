@@ -245,7 +245,13 @@ class PostQueryBuilder
 
     if q[:noter_ids]
       q[:noter_ids].each do |noter_id|
-        relation = relation.where("posts.id IN (?)", Note.unscoped.where("creator_id = ?", noter_id).select("post_id").uniq)
+        if noter_id == "any"
+          relation = relation.where("posts.last_noted_at is not null")
+        elsif noter_id == "none"
+          relation = relation.where("posts.last_noted_at is null")
+        else
+          relation = relation.where("posts.id": Note.unscoped.where(creator_id: noter_id).select("post_id").distinct)
+        end
       end
       has_constraints!
     end
