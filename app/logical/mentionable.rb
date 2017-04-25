@@ -16,31 +16,10 @@ module Mentionable
     end
   end
 
-  def strip_quote_blocks(str)
-    stripped = ""
-    str.gsub!(/\s*\[quote\](?!\])\s*/m, "\n\n[quote]\n\n")
-    str.gsub!(/\s*\[\/quote\]\s*/m, "\n\n[/quote]\n\n")
-    str.gsub!(/(?:\r?\n){3,}/, "\n\n")
-    str.strip!
-    nest = 0
-    str.split(/\n{2}/).each do |block|
-      if block == "[quote]"
-        nest += 1
-
-      elsif block == "[/quote]"
-        nest -= 1
-
-      elsif nest == 0
-        stripped << "#{block}\n"
-      end
-    end
-
-    stripped
-  end
-
   def queue_mention_messages
     from_id = read_attribute(self.class.mentionable_option(:user_field))
-    text = strip_quote_blocks(read_attribute(self.class.mentionable_option(:message_field)))
+    text = read_attribute(self.class.mentionable_option(:message_field))
+    text = DText.strip_blocks(text, "quote")
 
     names = text.scan(DText::MENTION_REGEXP).map do |mention|
       mention.gsub!(/(?:^\s*@)|(?:[:;,.!?\)\]<>]$)/, "")

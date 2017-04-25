@@ -13,10 +13,16 @@ class DText
   end
 
   def self.strip_blocks(string, tag)
-    blocks = string.scan(/\[\/?#{tag}\]|.+?(?=\[\/?#{tag}\]|$)/m)
     n = 0
     stripped = ""
-    blocks.each do |block|
+    string = string.dup
+
+    string.gsub!(/\s*\[#{tag}\](?!\])\s*/m, "\n\n[#{tag}]\n\n")
+    string.gsub!(/\s*\[\/#{tag}\]\s*/m, "\n\n[/#{tag}]\n\n")
+    string.gsub!(/(?:\r?\n){3,}/, "\n\n")
+    string.strip!
+
+    string.split(/\n{2}/).each do |block|
       case block
       when "[#{tag}]"
         n += 1
@@ -26,7 +32,7 @@ class DText
 
       else
         if n == 0
-          stripped += block
+          stripped << "#{block}\n\n"
         end
       end
     end
