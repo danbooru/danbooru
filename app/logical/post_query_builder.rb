@@ -238,7 +238,13 @@ class PostQueryBuilder
 
     if q[:commenter_ids]
       q[:commenter_ids].each do |commenter_id|
-        relation = relation.where("posts.id IN (?)", Comment.unscoped.where("creator_id = ?", commenter_id).select("post_id").uniq)
+        if commenter_id == "any"
+          relation = relation.where("posts.last_commented_at is not null")
+        elsif commenter_id == "none"
+          relation = relation.where("posts.last_commented_at is null")
+        else
+          relation = relation.where("posts.id":  Comment.unscoped.where(creator_id: commenter_id).select(:post_id).distinct)
+        end
       end
       has_constraints!
     end
