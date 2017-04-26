@@ -249,6 +249,10 @@ class Comment < ActiveRecord::Base
   def undelete!
     update({ :is_deleted => false }, :as => CurrentUser.role)
   end
+
+  def quoted_response
+    DText.quote(body, creator_name)
+  end
 end
 
 Comment.connection.extend(PostgresExtensions)

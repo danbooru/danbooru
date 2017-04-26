@@ -243,6 +243,33 @@ class CommentTest < ActiveSupport::TestCase
           assert_equal([comment], post.comments.visible(user))
         end
       end
+
+      context "that is quoted" do
+        should "strip [quote] tags correctly" do
+          comment = FactoryGirl.create(:comment, body: <<-EOS.strip_heredoc)
+            paragraph one
+
+            [quote]
+            somebody said:
+
+            blah blah blah
+            [/QUOTE]
+
+            paragraph two
+          EOS
+
+          assert_equal(<<-EOS.strip_heredoc, comment.quoted_response)
+            [quote]
+            #{comment.creator_name} said:
+
+            paragraph one
+
+            paragraph two
+            [/quote]
+
+          EOS
+        end
+      end
     end
   end
 end

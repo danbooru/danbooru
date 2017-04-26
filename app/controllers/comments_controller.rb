@@ -48,7 +48,7 @@ class CommentsController < ApplicationController
 
   def show
     @comment = Comment.find(params[:id])
-    respond_with(@comment)
+    respond_with(@comment, methods: [:quoted_response])
   end
 
   def destroy

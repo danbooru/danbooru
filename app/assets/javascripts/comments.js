@@ -18,22 +18,6 @@
     }
   }
 
-  Danbooru.Comment.quote_message = function(data) {
-    var blocks = data["body"].match(/\[\/?quote\]|.|\n|\r/gm);
-    var n = 0;
-    var stripped_body = "";
-    $.each(blocks, function(i, block) {
-      if (block === "[quote]") {
-        n += 1;
-      } else if (block == "[/quote]") {
-        n -= 1;
-      } else if (n === 0) {
-        stripped_body += block;
-      }
-    });
-    return "[quote]\n" + data["creator_name"] + " said:\n\n" + stripped_body + "\n[/quote]\n\n";
-  }
-
   Danbooru.Comment.quote = function(e) {
     $.get(
       "/comments/" + $(e.target).data('comment-id') + ".json",
@@ -41,7 +25,7 @@
         var $link = $(e.target);
         var $div = $link.closest("div.comments-for-post").find(".new-comment");
         var $textarea = $div.find("textarea");
-        var msg = Danbooru.Comment.quote_message(data);
+        var msg = data["quoted_response"];
         if ($textarea.val().length > 0) {
           msg = $textarea.val() + "\n\n" + msg;
         }

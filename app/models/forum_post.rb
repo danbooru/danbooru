@@ -234,8 +234,7 @@ class ForumPost < ActiveRecord::Base
   end
 
   def quoted_response
-    stripped_body = DText.strip_blocks(body, "quote")
-    "[quote]\n#{creator_name} said:\n\n#{stripped_body}\n[/quote]\n\n"
+    DText.quote(body, creator_name)
   end
 
   def forum_topic_page
