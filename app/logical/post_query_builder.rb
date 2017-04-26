@@ -380,64 +380,64 @@ class PostQueryBuilder
       relation = relation.order("posts.id DESC")
 
     when "score", "score_desc"
-      relation = relation.order("posts.score DESC, posts.id DESC")
+      relation = relation.order("posts.score DESC")
 
     when "score_asc"
-      relation = relation.order("posts.score ASC, posts.id DESC")
+      relation = relation.order("posts.score ASC")
 
     when "favcount"
-      relation = relation.order("posts.fav_count DESC, posts.id DESC")
+      relation = relation.order("posts.fav_count DESC")
 
     when "favcount_asc"
-      relation = relation.order("posts.fav_count ASC, posts.id DESC")
+      relation = relation.order("posts.fav_count ASC")
 
     when "change", "change_desc"
-      relation = relation.order("posts.updated_at DESC, posts.id DESC")
+      relation = relation.order("posts.updated_at DESC")
 
     when "change_asc"
-      relation = relation.order("posts.updated_at ASC, posts.id DESC")
+      relation = relation.order("posts.updated_at ASC")
 
     when "comment", "comm"
-      relation = relation.order("posts.last_commented_at DESC NULLS LAST, posts.id DESC")
+      relation = relation.order("posts.last_commented_at DESC NULLS LAST")
 
     when "comment_asc", "comm_asc"
-      relation = relation.order("posts.last_commented_at ASC NULLS LAST, posts.id DESC")
+      relation = relation.order("posts.last_commented_at ASC NULLS LAST")
 
     when "comment_bumped"
-      relation = relation.order("posts.last_comment_bumped_at DESC NULLS LAST, posts.id DESC")
+      relation = relation.order("posts.last_comment_bumped_at DESC NULLS LAST")
 
     when "comment_bumped_asc"
-      relation = relation.order("posts.last_comment_bumped_at ASC NULLS LAST, posts.id DESC")
+      relation = relation.order("posts.last_comment_bumped_at ASC NULLS LAST")
 
     when "note"
-      relation = relation.order("posts.last_noted_at DESC NULLS LAST, posts.id DESC")
+      relation = relation.order("posts.last_noted_at DESC NULLS LAST")
 
     when "note_asc"
-      relation = relation.order("posts.last_noted_at ASC NULLS FIRST, posts.id DESC")
+      relation = relation.order("posts.last_noted_at ASC NULLS FIRST")
 
     when "artcomm"
       relation = relation.joins("INNER JOIN artist_commentaries ON artist_commentaries.post_id = posts.id")
-      relation = relation.order("artist_commentaries.updated_at DESC, posts.id DESC")
+      relation = relation.order("artist_commentaries.updated_at DESC")
 
     when "artcomm_asc"
       relation = relation.joins("INNER JOIN artist_commentaries ON artist_commentaries.post_id = posts.id")
-      relation = relation.order("artist_commentaries.updated_at ASC, posts.id DESC")
+      relation = relation.order("artist_commentaries.updated_at ASC")
 
     when "mpixels", "mpixels_desc"
       relation = relation.where("posts.image_width is not null and posts.image_height is not null")
       # Use "w*h/1000000", even though "w*h" would give the same result, so this can use
       # the posts_mpixels index.
-      relation = relation.order("posts.image_width * posts.image_height / 1000000.0 DESC, posts.id DESC")
+      relation = relation.order("posts.image_width * posts.image_height / 1000000.0 DESC")
 
     when "mpixels_asc"
       relation = relation.where("posts.image_width is not null and posts.image_height is not null")
-      relation = relation.order("posts.image_width * posts.image_height / 1000000.0 ASC, posts.id DESC")
+      relation = relation.order("posts.image_width * posts.image_height / 1000000.0 ASC")
 
     when "portrait"
-      relation = relation.order("1.0 * posts.image_width / GREATEST(1, posts.image_height) ASC, posts.id DESC")
+      relation = relation.order("1.0 * posts.image_width / GREATEST(1, posts.image_height) ASC")
 
     when "landscape"
-      relation = relation.order("1.0 * posts.image_width / GREATEST(1, posts.image_height) DESC, posts.id DESC")
+      relation = relation.order("1.0 * posts.image_width / GREATEST(1, posts.image_height) DESC")
 
     when "filesize", "filesize_desc"
       relation = relation.order("posts.file_size DESC")
