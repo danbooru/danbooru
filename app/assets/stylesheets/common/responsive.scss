@@ -1,9 +1,5 @@
 @import "000_vars.scss";
 
-#responsive-tag-list {
-  display: none;
-}
-
 #desktop-version-link {
   display: none;
 }
@@ -13,22 +9,12 @@
     display: inline;
   }
 
-  #responsive-tag-list {
-    display: block;
-    font-size: 18pt;
-    font-weight: bold;
-
-    .post-count, .wiki-link {
-      display: none;
-    }
-
-    input[type=text] {
-      width: 75%;
-    }
-  }
-
   #saved-searches-nav {
     display: none;
+  }
+
+  aside {
+    font-size: 18pt;
   }
 
   #maintoggle {
@@ -62,10 +48,6 @@
   }
 
   #comments h2 {
-    display: none;
-  }
-
-  #sidebar {
     display: none;
   }
 

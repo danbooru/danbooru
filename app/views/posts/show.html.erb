@@ -88,11 +88,6 @@
         <li><a href="#share">Share</a></li>
       </menu>
 
-      <section id="responsive-tag-list">
-        <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:tags], :tags_dom_id => "responsive-tags" %>
-        <%= @post.presenter.split_tag_list_html(self) %>
-      </section>
-
       <section id="comments">
         <% if !CurrentUser.user.is_builder? %>
           <h2>Before commenting, read the <%= link_to "how to comment guide", wiki_pages_path(:search => {:title => "howto:comment"}) %>.</h2>

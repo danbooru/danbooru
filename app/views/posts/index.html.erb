@@ -39,11 +39,6 @@
       <%= render "posts/partials/index/posts", :post_set => @post_set %>
     </section>
     
-    <section id="responsive-tag-list">
-      <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:tags], :tags_dom_id => "responsive-tags" %>
-      <%= @post_set.presenter.tag_list_html(self) %>
-    </section>
-
     <% content_for(:page_title) do %>
       <% if @post_set.tag_string.present? %>
         <%= @post_set.humanized_tag_string %> - <%= Danbooru.config.app_name %>
