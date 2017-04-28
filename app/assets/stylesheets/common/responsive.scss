@@ -13,8 +13,21 @@
     display: none;
   }
 
-  aside {
-    font-size: 18pt;
+  div#page {
+    > div /* div#c-$controller */ {
+      > div /* div#a-$action */ {
+        display: flex;
+        flex-direction: column;
+
+        /* Move #sidebar below #content. */
+        > aside#sidebar {
+          font-size: 1.5em;
+          float: none;
+          width: auto;
+          order: 2;
+        }
+      }
+    }
   }
 
   #maintoggle {
