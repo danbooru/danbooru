@@ -30,13 +30,18 @@ class SavedSearchTest < ActiveSupport::TestCase
   context ".queries_for" do
     setup do
       @user = FactoryGirl.create(:user)
+      FactoryGirl.create(:tag_alias, antecedent_name: "bbb", consequent_name: "ccc", creator: @user)
       FactoryGirl.create(:saved_search, user: @user, label_string: "blah", query: "aaa")
-      FactoryGirl.create(:saved_search, user: @user, label_string: "zah", query: "bbb")
+      FactoryGirl.create(:saved_search, user: @user, label_string: "zah", query: "CCC BBB AAA")
+      FactoryGirl.create(:saved_search, user: @user, label_string: "qux", query: " aaa  bbb  ccc ")
     end
 
     should "fetch the queries used by a user for a label" do
       assert_equal(%w(aaa), SavedSearch.queries_for(@user.id, "blah"))
-      assert_equal(%w(aaa bbb), SavedSearch.queries_for(@user.id))
+    end
+
+    should "return fully normalized queries" do
+      assert_equal(["aaa", "aaa ccc"], SavedSearch.queries_for(@user.id))
     end
   end
 
@@ -84,7 +89,8 @@ class SavedSearchTest < ActiveSupport::TestCase
   context "Creating a saved search" do
     setup do
       @user = FactoryGirl.create(:gold_user)
-      @saved_search = @user.saved_searches.create(:query => " xxx ")
+      FactoryGirl.create(:tag_alias, antecedent_name: "zzz", consequent_name: "yyy", creator: @user)
+      @saved_search = @user.saved_searches.create(:query => " ZZZ xxx ")
     end
 
     should "update the bitpref on the user" do
@@ -92,8 +98,8 @@ class SavedSearchTest < ActiveSupport::TestCase
       assert(@user.has_saved_searches?, "should have saved_searches bitpref set")
     end
 
-    should "normalize whitespace" do
-      assert_equal("xxx", @saved_search.query)
+    should "normalize the query aside from the order" do
+      assert_equal("yyy xxx", @saved_search.query)
     end
 
     should "normalize the label string" do
