@@ -6886,13 +6886,6 @@ CREATE INDEX index_posts_on_uploader_id ON posts USING btree (uploader_id);
 
 
 --
--- Name: index_saved_searches_on_category; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_saved_searches_on_category ON saved_searches USING btree (category);
-
-
---
 -- Name: index_saved_searches_on_labels; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7475,4 +7468,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170414233426');
 INSERT INTO schema_migrations (version) VALUES ('20170414233617');
 
 INSERT INTO schema_migrations (version) VALUES ('20170416224142');
+
+INSERT INTO schema_migrations (version) VALUES ('20170428220448');
 
