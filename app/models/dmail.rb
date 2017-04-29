@@ -102,6 +102,11 @@ class Dmail < ActiveRecord::Base
       where("is_deleted = ?", true)
     end
 
+    def title_matches(query)
+      query = "*#{query}*" unless query =~ /\*/
+      where("lower(dmails.title) LIKE ?", query.to_escaped_for_sql_like)
+    end
+
     def search_message(query)
       if query =~ /\*/ && CurrentUser.user.is_builder?
         escaped_query = query.to_escaped_for_sql_like
@@ -130,6 +135,10 @@ class Dmail < ActiveRecord::Base
     def search(params)
       q = where("true")
       return q if params.blank?
+
+      if params[:title_matches].present?
+        q = q.title_matches(params[:title_matches])
+      end
 
       if params[:message_matches].present?
         q = q.search_message(params[:message_matches])
