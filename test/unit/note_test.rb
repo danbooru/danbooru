@@ -67,6 +67,13 @@ class NoteTest < ActiveSupport::TestCase
         assert_equal(["Post must exist"], @note.errors.full_messages)
       end
 
+      should "not validate if the body is blank" do
+        @note = FactoryGirl.build(:note, body: "   ")
+
+        assert_equal(false, @note.valid?)
+        assert_equal(["Body can't be blank"], @note.errors.full_messages)
+      end
+
       should "create a version" do
         assert_difference("NoteVersion.count", 1) do
           Timecop.travel(1.day.from_now) do
