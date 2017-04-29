@@ -681,6 +681,18 @@ class User < ActiveRecord::Base
       list
     end
 
+    # extra attributes returned for /users/:id.json but not for /users.json.
+    def full_attributes
+      [
+        :wiki_page_version_count, :artist_version_count,
+        :artist_commentary_version_count, :pool_version_count,
+        :forum_post_count, :comment_count, :favorite_group_count,
+        :appeal_count, :flag_count, :positive_feedback_count,
+        :neutral_feedback_count, :negative_feedback_count, :upload_limit,
+        :max_upload_limit
+      ]
+    end
+
     def to_legacy_json
       return {
         "name" => name,
