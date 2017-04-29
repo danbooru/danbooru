@@ -447,7 +447,7 @@ Danbooru.Note = {
     },
 
     error_handler: function(xhr, status, exception) {
-      Danbooru.error("There was an error saving the note");
+      Danbooru.error("Error: " + xhr.responseJSON.reasons.join("; "));
     },
 
     success_handler: function(data, status, xhr) {
