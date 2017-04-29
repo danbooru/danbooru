@@ -1,13 +1,13 @@
 <div id="c-dmails">
   <div id="a-search">
     <h1>Search Messages</h1>
-    <%= form_tag(dmails_path, :method => :get, :class => "simple_form") do %>
-      <%= hidden_field_tag :folder, params[:folder] %>
 
-      <%= search_field "message_matches", :label => "Message" %>
-      <%= search_field "to_name", :label => "To" %>
-      <%= search_field "from_name", :label => "From" %>
-      <%= submit_tag "Search" %>
+    <%= simple_form_for(:search, url: dmails_path, method: :get, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+      <%= f.hidden_field :folder, value: params[:folder] %>
+      <%= f.input :message_matches, label: "Message", hint: "Use * for wildcard", input_html: { value: params[:search][:messages_matches] } %>
+      <%= f.input :to_name, label: "To", input_html: { value: params[:search][:to_name] } %>
+      <%= f.input :from_name, label: "From", input_html: { value: params[:search][:from_name] } %>
+      <%= f.submit "Search" %>
     <% end %>
   </div>
 </div>
