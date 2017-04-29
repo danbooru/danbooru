@@ -652,15 +652,32 @@ class User < ActiveRecord::Base
   end
 
   module ApiMethods
+    # blacklist all attributes by default. whitelist only safe attributes.
     def hidden_attributes
-      super + [:password_hash, :bcrypt_password_hash, :email, :email_verification_key, :time_zone, :updated_at, :receive_email_notifications, :last_logged_in_at, :last_forum_read_at, :has_mail, :default_image_size, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :recent_tags, :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :enable_sequential_post_navigation, :hide_deleted_posts, :per_page, :style_usernames, :enable_auto_complete, :custom_style, :show_deleted_children, :has_saved_searches, :last_ip_addr, :bit_prefs, :favorite_count]
+      super + attributes.keys.map(&:to_sym)
     end
 
     def method_attributes
-      list = super + [:is_banned, :can_approve_posts, :can_upload_free, :is_super_voter, :level_string]
+      list = super + [
+        :id, :created_at, :name, :inviter_id, :level, :base_upload_limit,
+        :post_upload_count, :post_update_count, :note_update_count,
+        :is_banned, :can_approve_posts, :can_upload_free, :is_super_voter,
+        :level_string,
+      ]
+
       if id == CurrentUser.user.id
-        list += [:remaining_api_limit, :api_burst_limit]
+        list += BOOLEAN_ATTRIBUTES + [
+          :updated_at, :email, :last_logged_in_at, :last_forum_read_at,
+          :recent_tags, :comment_threshold, :default_image_size,
+          :favorite_tags, :blacklisted_tags, :time_zone, :per_page,
+          :custom_style, :favorite_count,
+          :api_regen_multiplier, :api_burst_limit, :remaining_api_limit,
+          :statement_timeout, :favorite_group_limit, :favorite_limit,
+          :tag_query_limit, :can_comment_vote?, :can_remove_from_pools?,
+          :is_comment_limited?, :can_comment?, :can_upload?, :max_saved_searches,
+        ]
       end
+
       list
     end
 
