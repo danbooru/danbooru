@@ -74,9 +74,14 @@ class DmailTest < ActiveSupport::TestCase
     context "search" do
       should "return results based on title contents" do
         dmail = FactoryGirl.create(:dmail, :title => "xxx", :owner => @user)
-        matches = Dmail.search_message("xxx")
-        assert(matches.any?)
-        matches = Dmail.search_message("aaa")
+
+        matches = Dmail.search(title_matches: "x")
+        assert_equal([dmail.id], matches.map(&:id))
+
+        matches = Dmail.search(message_matches: "xxx")
+        assert_equal([dmail.id], matches.map(&:id))
+
+        matches = Dmail.search(message_matches: "aaa")
         assert(matches.empty?)
       end
 
