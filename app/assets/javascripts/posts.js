@@ -288,7 +288,7 @@
     } else {
       score = " score:" + $post.data("score");
     }
-    $img.attr("title", $post.attr("data-tags") + " user:" + $post.attr("data-uploader") + " rating:" + $post.data("rating") + score);
+    $img.attr("title", $post.attr("data-tags") + " user:" + $post.attr("data-uploader").replace(/_/g, " ") + " rating:" + $post.data("rating") + score);
   }
 
   Danbooru.Post.initialize_post_image_resize_links = function() {

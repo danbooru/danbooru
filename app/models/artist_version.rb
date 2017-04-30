@@ -109,6 +109,6 @@ class ArtistVersion < ActiveRecord::Base
   end
 
   def updater_name
-    User.id_to_name(updater_id).tr("_", " ")
+    User.id_to_name(updater_id)
   end
 end

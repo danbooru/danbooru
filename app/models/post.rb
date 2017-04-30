@@ -1000,7 +1000,7 @@ class Post < ActiveRecord::Base
     end
 
     def uploader_name
-      User.id_to_name(uploader_id).tr("_", " ")
+      User.id_to_name(uploader_id)
     end
   end
 
