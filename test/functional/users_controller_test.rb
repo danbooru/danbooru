@@ -46,6 +46,24 @@ class UsersControllerTest < ActionController::TestCase
         get :show, {:id => @user.id}
         assert_response :success
       end
+
+      should "show hidden attributes to the owner" do
+        get :show, {id: @user.id, format: :json}, {user_id: @user.id}
+        json = JSON.parse(response.body)
+
+        assert_response :success
+        assert_not_nil(json["last_logged_in_at"])
+      end
+
+      should "not show hidden attributes to others" do
+        another = FactoryGirl.create(:user)
+
+        get :show, {id: another.id, format: :json}, {user_id: @user.id}
+        json = JSON.parse(response.body)
+
+        assert_response :success
+        assert_nil(json["last_logged_in_at"])
+      end
     end
 
     context "new action" do
