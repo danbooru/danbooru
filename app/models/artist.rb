@@ -88,6 +88,23 @@ class Artist < ActiveRecord::Base
     def url_string_changed?
       url_string.scan(/\S+/) != url_array
     end
+
+    def map_domain(x)
+      case x
+      when "pximg.net"
+        "pixiv.net"
+
+      when "deviantart.net"
+        "deviantart.com"
+
+      else
+        x
+      end
+    end
+
+    def domains
+      Post.raw_tag_match(name).pluck(:source).map {|x| map_domain(Addressable::URI.parse(x).domain)}.inject(Hash.new(0)) {|h, x| h[x] += 1; h}
+    end
   end
 
   module NameMethods
@@ -504,6 +521,10 @@ class Artist < ActiveRecord::Base
   module ApiMethods
     def hidden_attributes
       super + [:other_names_index]
+    end
+
+    def method_attributes
+      super + [:domains]
     end
 
     def legacy_api_hash

@@ -28,13 +28,26 @@
             <% if @artist.members.any? %>
               <li><strong>Members</strong> <%= link_to_artists(@artist.members.map(&:name)) %></li>
             <% end %>
-            <% @artist.urls.each do |url| %>
-              <li>
-                URL: <%= link_to h(url.to_s), h(url.to_s) %>
-                <% if CurrentUser.user.is_moderator? %>
-                  (<%= link_to("mass edit", edit_moderator_tag_path(:antecedent => "-#{@artist.name} source:#{ArtistUrl.normalize_for_search(url.to_s)}", :consequent => @artist.name)) %>)
+            <% if @artist.domains.any? %>
+              <li><strong>Domains</strong></li>
+              <ul>
+                <% @artist.domains.each do |url, count| %>
+                  <li><%= url %>: <%= count %></li>
                 <% end %>
-              </li>
+              </ul>
+            <% end %>
+            <% if @artist.urls.any? %>
+              <li><strong>URLs</strong></li>
+              <ul>
+                <% @artist.urls.each do |url| %>
+                  <li>
+                    <%= link_to h(url.to_s), h(url.to_s) %>
+                    <% if CurrentUser.user.is_moderator? %>
+                      [<%= link_to("mass edit", edit_moderator_tag_path(:antecedent => "-#{@artist.name} source:#{ArtistUrl.normalize_for_search(url.to_s)}", :consequent => @artist.name)) %>]
+                    <% end %>
+                  </li>
+                <% end %>
+              </ul>
             <% end %>
           <% end %>
         </ul>
