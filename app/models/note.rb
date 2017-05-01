@@ -8,8 +8,7 @@ class Note < ActiveRecord::Base
   has_many :versions, lambda {order("note_versions.id ASC")}, :class_name => "NoteVersion", :dependent => :destroy
   before_validation :initialize_creator, :on => :create
   before_validation :initialize_updater
-  before_validation :blank_body
-  validates_presence_of :post_id, :creator_id, :updater_id, :x, :y, :width, :height
+  validates_presence_of :post_id, :creator_id, :updater_id, :x, :y, :width, :height, :body
   validate :post_must_exist
   validate :note_within_image
   after_save :update_post
@@ -122,10 +121,6 @@ class Note < ActiveRecord::Base
 
   def is_locked?
     Post.exists?(["id = ? AND is_note_locked = ?", post_id, true])
-  end
-
-  def blank_body
-    self.body = "(empty)" if body.blank?
   end
 
   def creator_name
