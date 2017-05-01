@@ -1,4 +1,5 @@
 class Artist < ActiveRecord::Base
+  extend Memoist
   class RevertError < Exception ; end
 
   before_create :initialize_creator
@@ -50,6 +51,10 @@ class Artist < ActiveRecord::Base
 
         artists.inject({}) {|h, x| h[x.name] = x; h}.values.slice(0, 20)
       end
+    end
+
+    included do
+      memoize :domains
     end
 
     def url_array
@@ -250,6 +255,8 @@ class Artist < ActiveRecord::Base
     end
 
     def reload(options = nil)
+      flush_cache
+
       if instance_variable_defined?(:@notes)
         remove_instance_variable(:@notes)
       end
