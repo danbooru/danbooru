@@ -186,8 +186,8 @@ class TagAlias < ActiveRecord::Base
   end
 
   def initialize_creator
-    self.creator_id = CurrentUser.user.id
-    self.creator_ip_addr = CurrentUser.ip_addr
+    self.creator_id ||= CurrentUser.user.id
+    self.creator_ip_addr ||= CurrentUser.ip_addr
   end
 
   def antecedent_tag

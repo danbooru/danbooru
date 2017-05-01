@@ -4,6 +4,7 @@ FactoryGirl.define do
     consequent_name "bbb"
     status "active"
     skip_secondary_validations true
+    creator_ip_addr { FFaker::Internet.ip_v4_address }
 
     after(:create) do |tag_alias|
       unless tag_alias.status == "pending"

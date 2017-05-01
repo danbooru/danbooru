@@ -236,6 +236,15 @@ class Tag < ActiveRecord::Base
       query.to_s.gsub(/\u3000/, " ").strip
     end
 
+    def normalize_query(query, sort: true)
+      tags = Tag.scan_query(query.to_s)
+      tags = tags.map { |t| Tag.normalize_name(t) }
+      tags = TagAlias.to_aliased(tags)
+      tags = tags.sort if sort
+      tags = tags.uniq
+      tags.join(" ")
+    end
+
     def scan_query(query)
       tagstr = normalize(query)
       list = tagstr.scan(/-?source:".*?"/) || []
