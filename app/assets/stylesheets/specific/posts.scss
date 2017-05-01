@@ -102,23 +102,30 @@ a.blacklisted-active {
   }
 
 
-  &.post-status-pending:not(.mod-queue-preview) img {
+  /* Pending and flagged posts have blue borders (except in the modqueue). */
+  &.post-status-pending:not(.mod-queue-preview) img,
+  &.post-status-flagged:not(.mod-queue-preview) img {
     border-color: $preview_pending_color;
   }
 
-  &.post-status-has-children.post-status-pending:not(.mod-queue-preview) img {
+  &.post-status-has-children.post-status-pending:not(.mod-queue-preview) img,
+  &.post-status-has-children.post-status-flagged:not(.mod-queue-preview) img {
     border-color: $preview_has_children_color $preview_pending_color $preview_pending_color $preview_has_children_color;
   }
 
-  &.post-status-has-parent.post-status-pending:not(.mod-queue-preview) img {
+  &.post-status-has-parent.post-status-pending:not(.mod-queue-preview) img,
+  &.post-status-has-parent.post-status-flagged:not(.mod-queue-preview) img {
     border-color: $preview_has_parent_color $preview_pending_color $preview_pending_color $preview_has_parent_color;
   }
 
-  &.post-status-has-children.post-status-has-parent.post-status-pending:not(.mod-queue-preview) img {
+  &.post-status-has-children.post-status-has-parent.post-status-pending:not(.mod-queue-preview) img,
+  &.post-status-has-children.post-status-has-parent.post-status-flagged:not(.mod-queue-preview) img {
     border-color: $preview_has_children_color $preview_pending_color $preview_pending_color $preview_has_parent_color;
   }
+}
 
-
+/* Flagged posts have red borders for approvers. */
+body[data-can-approve-posts="true"] .post-preview {
   &.post-status-flagged img {
     border-color: $preview_flagged_color;
   }
