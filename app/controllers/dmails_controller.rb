@@ -27,9 +27,6 @@ class DmailsController < ApplicationController
     end
   end
 
-  def search
-  end
-
   def show
     @dmail = Dmail.find(params[:id])
     check_privilege(@dmail)
