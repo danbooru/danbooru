@@ -452,13 +452,27 @@ class Tag < ActiveRecord::Base
 
           when "commenter", "comm"
             q[:commenter_ids] ||= []
-            user_id = User.name_to_id($2)
-            q[:commenter_ids] << user_id unless user_id.blank?
+
+            if $2 == "none"
+              q[:commenter_ids] << "none"
+            elsif $2 == "any"
+              q[:commenter_ids] << "any"
+            else
+              user_id = User.name_to_id($2)
+              q[:commenter_ids] << user_id unless user_id.blank?
+            end
 
           when "noter"
             q[:noter_ids] ||= []
-            user_id = User.name_to_id($2)
-            q[:noter_ids] << user_id unless user_id.blank?
+
+            if $2 == "none"
+              q[:noter_ids] << "none"
+            elsif $2 == "any"
+              q[:noter_ids] << "any"
+            else
+              user_id = User.name_to_id($2)
+              q[:noter_ids] << user_id unless user_id.blank?
+            end
 
           when "noteupdater"
             q[:note_updater_ids] ||= []
