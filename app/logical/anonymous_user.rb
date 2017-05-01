@@ -257,7 +257,7 @@ class AnonymousUser
     false
   end
 
-  %w(member banned gold builder platinum janitor moderator admin).each do |name|
+  %w(member banned gold builder platinum moderator admin).each do |name|
     define_method("is_#{name}?") do
       false
     end

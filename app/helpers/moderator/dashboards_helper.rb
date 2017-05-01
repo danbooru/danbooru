@@ -6,7 +6,6 @@ module Moderator
         ["Member", 20],
         ["Gold", 30],
         ["Platinum", 31],
-        ["Janitor", 35],
         ["Moderator", 40],
         ["Admin", 50]
       ]

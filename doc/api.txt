@@ -350,7 +350,6 @@ Users have a number attribute called level representing their role. The current 
 * Gold: 30
 * Platinum: 31
 * Builder: 32
-* Janitor: 35
 * Moderator: 40
 * Admin: 50
 

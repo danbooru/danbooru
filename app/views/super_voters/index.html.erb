@@ -6,7 +6,7 @@
 
     <ul>
       <% @super_voters.each do |super_voter| %>
-        <li><%= link_to_if CurrentUser.user.is_janitor?, super_voter.user.name, posts_path(tags: "upvote:#{super_voter.user.name}") %></li>
+        <li><%= link_to_if CurrentUser.user.is_moderator?, super_voter.user.name, posts_path(tags: "upvote:#{super_voter.user.name}") %></li>
       <% end %>
     </ul>
   </div>

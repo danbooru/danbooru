@@ -11,7 +11,7 @@ class FavoriteGroup < ActiveRecord::Base
   validate :creator_can_create_favorite_groups, :on => :create
   validate :validate_number_of_posts
   before_save :update_post_count
-  attr_accessible :name, :post_ids, :post_id_array, :as => [:member, :gold, :platinum, :builder, :janitor, :moderator, :admin, :default]
+  attr_accessible :name, :post_ids, :post_id_array, :as => [:member, :gold, :platinum, :builder, :moderator, :admin, :default]
 
   module SearchMethods
     def for_creator(user_id)

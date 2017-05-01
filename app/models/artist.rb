@@ -17,8 +17,8 @@ class Artist < ActiveRecord::Base
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :tag_alias, :foreign_key => "antecedent_name", :primary_key => "name"
   has_one :tag, :foreign_key => "name", :primary_key => "name"
-  attr_accessible :body, :notes, :name, :url_string, :other_names, :other_names_comma, :group_name, :notes, :as => [:member, :gold, :builder, :platinum, :janitor, :moderator, :default, :admin]
-  attr_accessible :is_active, :as => [:builder, :janitor, :moderator, :default, :admin]
+  attr_accessible :body, :notes, :name, :url_string, :other_names, :other_names_comma, :group_name, :notes, :as => [:member, :gold, :builder, :platinum, :moderator, :default, :admin]
+  attr_accessible :is_active, :as => [:builder, :moderator, :default, :admin]
   attr_accessible :is_banned, :as => :admin
 
   scope :active, lambda { where(is_active: true) }

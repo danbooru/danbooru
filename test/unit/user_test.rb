@@ -63,12 +63,6 @@ class UserTest < ActiveSupport::TestCase
         assert_equal(true, @user.can_upload_free)
       end
 
-      should "not allow invites up to janitor level or beyond" do
-        @user.invite!(User::Levels::JANITOR, "1")
-        @user.reload
-        assert_equal(User::Levels::MEMBER, @user.level)
-      end
-
       should "create a mod action" do
         assert_difference("ModAction.count") do
           @user.invite!(User::Levels::BUILDER, "1")
@@ -152,31 +146,21 @@ class UserTest < ActiveSupport::TestCase
     should "normalize its level" do
       user = FactoryGirl.create(:user, :level => User::Levels::ADMIN)
       assert(user.is_moderator?)
-      assert(user.is_janitor?)
       assert(user.is_gold?)
 
       user = FactoryGirl.create(:user, :level => User::Levels::MODERATOR)
       assert(!user.is_admin?)
       assert(user.is_moderator?)
-      assert(user.is_janitor?)
-      assert(user.is_gold?)
-
-      user = FactoryGirl.create(:user, :level => User::Levels::JANITOR)
-      assert(!user.is_admin?)
-      assert(!user.is_moderator?)
-      assert(user.is_janitor?)
       assert(user.is_gold?)
 
       user = FactoryGirl.create(:user, :level => User::Levels::GOLD)
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
-      assert(!user.is_janitor?)
       assert(user.is_gold?)
 
       user = FactoryGirl.create(:user)
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
-      assert(!user.is_janitor?)
       assert(!user.is_gold?)
     end
 

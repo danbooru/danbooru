@@ -7,7 +7,7 @@
     <% else %>
       <%= render "listing", :post_versions => @post_versions %>
 
-      <% if params[:lr] && CurrentUser.is_janitor? %>
+      <% if params[:lr] && CurrentUser.is_moderator? %>
         <p><%= link_to "Revert this user's changes", new_user_revert_path(:user_id => params[:lr]) %></p>
       <% end %>
 

@@ -1,7 +1,7 @@
 class ForumPost < ActiveRecord::Base
   include Mentionable
 
-  attr_accessible :body, :topic_id, :as => [:member, :builder, :janitor, :gold, :platinum, :admin, :moderator, :default]
+  attr_accessible :body, :topic_id, :as => [:member, :builder, :gold, :platinum, :admin, :moderator, :default]
   attr_accessible :is_locked, :is_sticky, :is_deleted, :as => [:admin, :moderator]
   attr_readonly :topic_id
   belongs_to :creator, :class_name => "User"

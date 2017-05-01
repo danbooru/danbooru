@@ -35,10 +35,6 @@ class BanTest < ActiveSupport::TestCase
         ban = FactoryGirl.create(:ban, :user => user, :banner => @banner)
         assert(ban.errors.empty?)
 
-        user = FactoryGirl.create(:janitor_user)
-        ban = FactoryGirl.create(:ban, :user => user, :banner => @banner)
-        assert(ban.errors.empty?)
-
         user = FactoryGirl.create(:contributor_user)
         ban = FactoryGirl.create(:ban, :user => user, :banner => @banner)
         assert(ban.errors.empty?)
@@ -79,10 +75,6 @@ class BanTest < ActiveSupport::TestCase
       end
 
       should "be valid against anyone who is not an admin or a moderator" do
-        user = FactoryGirl.create(:janitor_user)
-        ban = FactoryGirl.create(:ban, :user => user, :banner => @banner)
-        assert(ban.errors.empty?)
-
         user = FactoryGirl.create(:contributor_user)
         ban = FactoryGirl.create(:ban, :user => user, :banner => @banner)
         assert(ban.errors.empty?)
@@ -94,52 +86,6 @@ class BanTest < ActiveSupport::TestCase
         user = FactoryGirl.create(:user)
         ban = FactoryGirl.create(:ban, :user => user, :banner => @banner)
         assert(ban.errors.empty?)
-      end
-    end
-
-    context "created by a janitor" do
-      setup do
-        @banner = FactoryGirl.create(:janitor_user)
-        CurrentUser.user = @banner
-        CurrentUser.ip_addr = "127.0.0.1"
-      end
-
-      teardown do
-        @banner = nil
-        CurrentUser.user = nil
-        CurrentUser.ip_addr = nil
-      end
-
-      should "always be invalid" do
-        user = FactoryGirl.create(:admin_user)
-        ban = FactoryGirl.build(:ban, :user => user, :banner => @banner)
-        ban.save
-        assert(ban.errors.any?)
-
-        user = FactoryGirl.create(:moderator_user)
-        ban = FactoryGirl.build(:ban, :user => user, :banner => @banner)
-        ban.save
-        assert(ban.errors.any?)
-
-        user = FactoryGirl.create(:janitor_user)
-        ban = FactoryGirl.build(:ban, :user => user, :banner => @banner)
-        ban.save
-        assert(ban.errors.any?)
-
-        user = FactoryGirl.create(:contributor_user)
-        ban = FactoryGirl.build(:ban, :user => user, :banner => @banner)
-        ban.save
-        assert(ban.errors.any?)
-
-        user = FactoryGirl.create(:gold_user)
-        ban = FactoryGirl.build(:ban, :user => user, :banner => @banner)
-        ban.save
-        assert(ban.errors.any?)
-
-        user = FactoryGirl.create(:user)
-        ban = FactoryGirl.build(:ban, :user => user, :banner => @banner)
-        ban.save
-        assert(ban.errors.any?)
       end
     end
 

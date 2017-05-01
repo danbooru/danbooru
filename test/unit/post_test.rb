@@ -420,8 +420,8 @@ class PostTest < ActiveSupport::TestCase
 
       context "that was previously approved by person X" do
         setup do
-          @user = FactoryGirl.create(:janitor_user, :name => "xxx")
-          @user2 = FactoryGirl.create(:janitor_user, :name => "yyy")
+          @user = FactoryGirl.create(:moderator_user, :name => "xxx")
+          @user2 = FactoryGirl.create(:moderator_user, :name => "yyy")
           @post = FactoryGirl.create(:post, :approver_id => @user.id)
           @post.flag!("bad")
         end
