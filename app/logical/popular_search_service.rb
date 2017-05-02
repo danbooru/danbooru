@@ -19,6 +19,10 @@ class PopularSearchService
     fetch_data.to_s.scan(/(.+?) (\d+)\.0\n/).slice(0, limit).each(&block)
   end
 
+  def tags
+    fetch_data.to_s.scan(/(.+?) (\d+)\.0\n/).map {|x| x[0]}
+  end
+
   def fetch_data
     dates = date.strftime("%Y-%m-%d")
 
