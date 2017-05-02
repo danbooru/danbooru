@@ -105,6 +105,10 @@ class PostArchive < ActiveRecord::Base
     end
   end
 
+  def visible?
+    post && post.visible?
+  end
+
   def diff(version = nil)
     if post.nil?
       latest_tags = tag_array

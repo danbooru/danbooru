@@ -36,7 +36,7 @@
           <td><%= post_version_diff(post_version) %></td>
           <% if CurrentUser.is_member? %>
             <td>
-              <% if post_version.post.visible? %>
+              <% if post_version.visible? %>
                 <% if post_version.version != 1 %>
                   <%= link_to "Undo", undo_post_version_path(post_version), :method => :put, :remote => true %> |
                 <% end %>
