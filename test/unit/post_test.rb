@@ -349,9 +349,8 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "create a mod action" do
-          assert_difference("ModAction.count", 1) do
-            @post.undelete!
-          end
+          @post.undelete!
+          assert_equal("undeleted post ##{@post.id}", ModAction.last.description)
         end
       end
 
@@ -362,9 +361,8 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "create a mod action" do
-          assert_difference("ModAction.count", 1) do
-            @post.approve!
-          end
+          @post.approve!
+          assert_equal("undeleted post ##{@post.id}", ModAction.last.description)
         end
       end
 
