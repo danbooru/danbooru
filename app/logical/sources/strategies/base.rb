@@ -86,9 +86,24 @@ module Sources
         nil
       end
 
+      def dtext_artist_commentary_title
+        self.class.to_dtext(artist_commentary_title)
+      end
+
+      def dtext_artist_commentary_desc
+        self.class.to_dtext(artist_commentary_desc)
+      end
+
     protected
       def agent
         raise NotImplementedError
+      end
+
+      # Convert commentary to dtext by stripping html tags. Sites can override
+      # this to customize how their markup is translated to dtext.
+      def self.to_dtext(text)
+        text = Rails::Html::FullSanitizer.new.sanitize(text, encode_special_chars: false)
+        text
       end
     end
   end

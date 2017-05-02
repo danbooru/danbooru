@@ -7,6 +7,7 @@ module Sources
       :profile_url, :image_url, :tags, :artist_record, :unique_id, 
       :page_count, :file_url, :ugoira_frame_data, :ugoira_content_type, :image_urls,
       :artist_commentary_title, :artist_commentary_desc,
+      :dtext_artist_commentary_title, :dtext_artist_commentary_desc,
       :rewrite_thumbnails, :illust_id_from_url, :to => :strategy
 
     def self.strategies
@@ -70,6 +71,8 @@ module Sources
         :artist_commentary => {
           :title => artist_commentary_title,
           :description => artist_commentary_desc,
+          :dtext_title => dtext_artist_commentary_title,
+          :dtext_description => dtext_artist_commentary_desc,
         }
       }
     end
