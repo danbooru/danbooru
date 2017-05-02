@@ -103,6 +103,7 @@ module Sources
       # this to customize how their markup is translated to dtext.
       def self.to_dtext(text)
         text = Rails::Html::FullSanitizer.new.sanitize(text, encode_special_chars: false)
+        text = CGI::unescapeHTML(text)
         text
       end
     end
