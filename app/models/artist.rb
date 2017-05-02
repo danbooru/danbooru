@@ -108,7 +108,13 @@ class Artist < ActiveRecord::Base
     end
 
     def domains
-      Post.raw_tag_match(name).pluck(:source).map {|x| map_domain(Addressable::URI.parse(x).domain)}.inject(Hash.new(0)) {|h, x| h[x] += 1; h}
+      Post.raw_tag_match(name).pluck(:source).map do |x| 
+        begin
+          map_domain(Addressable::URI.parse(x).domain)
+        rescue Addressable::URI::InvalidURIError
+          nil
+        end
+      end.compact.inject(Hash.new(0)) {|h, x| h[x] += 1; h}
     end
   end
 
