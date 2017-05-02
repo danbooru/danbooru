@@ -142,7 +142,10 @@ class PostArchive < ActiveRecord::Base
   def changes
     delta = {
       :added_tags => added_tags,
-      :removed_tags => removed_tags
+      :removed_tags => removed_tags,
+      :obsolete_removed_tags => [],
+      :obsolete_added_tags => [],
+      :unchanged_tags => []
     }
 
     return delta if post.nil?
