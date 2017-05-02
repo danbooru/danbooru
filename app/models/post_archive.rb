@@ -145,6 +145,8 @@ class PostArchive < ActiveRecord::Base
       :removed_tags => removed_tags
     }
 
+    return delta if post.nil?
+
     latest_tags = post.tag_array
     latest_tags << "rating:#{post.rating}" if post.rating.present?
     latest_tags << "parent:#{post.parent_id}" if post.parent_id.present?
