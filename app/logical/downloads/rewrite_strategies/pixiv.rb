@@ -18,8 +18,6 @@ module Downloads
           url, headers = rewrite_thumbnails(url, headers)
           url, headers = rewrite_old_small_manga_pages(url, headers)
           url, headers = rewrite_to_thumbnails(url, headers) if data.delete(:get_thumbnail)
-          data[:artist_commentary_title] = source.artist_commentary_title
-          data[:artist_commentary_desc] = source.artist_commentary_desc
         end
 
         # http://i2.pixiv.net/img-zip-ugoira/img/2014/08/05/06/01/10/44524589_ugoira1920x1080.zip

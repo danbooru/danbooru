@@ -53,11 +53,6 @@ module Sources
         false
       end
 
-      # Determines whether or not to automatically create an ArtistCommentary
-      def has_artist_commentary?
-        false
-      end
-
       def normalize_for_artist_finder!
         url
       end

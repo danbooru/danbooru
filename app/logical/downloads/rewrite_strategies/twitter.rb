@@ -9,7 +9,7 @@ module Downloads
 
       def rewrite(url, headers, data = {})
         if url =~ %r!^https?://(?:mobile\.)?twitter\.com!
-          url, headers = rewrite_status_page(url, headers, data)
+          url = source.image_url
         elsif url =~ %r{^https?://pbs\.twimg\.com}
           url, headers = rewrite_thumbnails(url, headers, data)
         end
@@ -18,12 +18,6 @@ module Downloads
       end
 
     protected
-      def rewrite_status_page(url, headers, data)
-        url = source.image_url
-        data[:artist_commentary_desc] = source.artist_commentary_desc
-        return [url, headers, data]
-      end
-
       def rewrite_thumbnails(url, headers, data)
         if url =~ %r{^(https?://pbs\.twimg\.com/media/[^:]+)}
           url = $1 + ":orig"
