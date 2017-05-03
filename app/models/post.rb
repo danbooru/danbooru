@@ -1403,6 +1403,21 @@ class Post < ActiveRecord::Base
     end
 
     def replace!(url)
+      # TODO for posts with notes we need to rescale the notes if the dimensions change.
+      if notes.size > 0
+        raise NotImplementedError.new("Replacing images with notes not yet supported.")
+      end
+
+      # TODO for ugoiras we need to replace the frame data.
+      if is_ugoira?
+        raise NotImplementedError.new("Replacing ugoira images not yet supported.")
+      end
+
+      # TODO images hosted on s3 need to be deleted from s3 instead of the local filesystem.
+      if Danbooru.config.use_s3_proxy?(self)
+        raise NotImplementedError.new("Replacing S3 hosted images not yet supported.")
+      end
+
       transaction do
         upload = Upload.create!(source: url, rating: self.rating, tag_string: self.tag_string)
         upload.process_upload
