@@ -61,6 +61,9 @@ module DelayedJobsHelper
     when "Pool#update_category_pseudo_tags_for_posts"
       "<strong>update pool category pseudo tags for posts</strong>"
 
+    when "Post.delete_files"
+      "<strong>delete old files</strong>"
+
     else
       h(job.name)
     end
@@ -121,6 +124,9 @@ module DelayedJobsHelper
 
     when "Pool#update_category_pseudo_tags_for_posts"
       %{<a href="/pools/#{job.payload_object.id}">#{h(job.payload_object.name)}</a>}
+
+    when "Post.delete_files"
+      %{<a href="/posts/#{job.payload_object.args.first}">post ##{job.payload_object.args.first}</a>}
 
     else
       h(job.handler)
