@@ -1588,6 +1588,90 @@ class PostTest < ActiveSupport::TestCase
     end
   end
 
+  context "Replacing: " do
+    setup do
+      Delayed::Worker.delay_jobs = true                    # don't delete the old images right away
+      Danbooru.config.stubs(:use_s3_proxy?).returns(false) # don't fail on post ids < 10000
+
+      @uploader = FactoryGirl.create(:user, created_at: 2.weeks.ago, can_upload_free: true)
+      @replacer = FactoryGirl.create(:user, created_at: 2.weeks.ago, can_approve_posts: true)
+      CurrentUser.user = @replacer
+      CurrentUser.ip_addr = "127.0.0.1"
+
+      CurrentUser.scoped(@uploader, "127.0.0.2") do
+        upload = FactoryGirl.create(:jpg_upload, as_pending: "0")
+        upload.process!
+        @post = upload.post
+      end
+    end
+
+    teardown do
+      Delayed::Worker.delay_jobs = false
+    end
+
+    context "replacing a post from a generic source" do
+      setup do
+        @post.replace!("https://www.google.com/intl/en_ALL/images/logo.gif")
+        @upload = Upload.last
+        @mod_action = ModAction.last
+      end
+
+      should "correctly update the attributes" do
+        assert_equal(@post.id, @upload.post.id)
+        assert_equal("completed", @upload.status)
+
+        assert_equal(276, @post.image_width)
+        assert_equal(110, @post.image_height)
+        assert_equal(8558, @post.file_size)
+        assert_equal("gif", @post.file_ext)
+        assert_equal("e80d1c59a673f560785784fb1ac10959", @post.md5)
+        assert_equal("e80d1c59a673f560785784fb1ac10959", Digest::MD5.file(@post.file_path).hexdigest)
+        assert_equal("https://www.google.com/intl/en_ALL/images/logo.gif", @post.source)
+      end
+
+      should "not change the post status or uploader" do
+        assert_equal("127.0.0.2", @post.uploader_ip_addr.to_s)
+        assert_equal(@uploader.id, @post.uploader_id)
+        assert_equal(false, @post.is_pending)
+      end
+
+      should "log a mod action" do
+        assert_match(/replaced post ##{@post.id}/, @mod_action.description)
+      end
+    end
+
+    context "replacing a post with a pixiv html source" do
+      should "replace with the full size image" do
+        @post.replace!("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
+
+        assert_equal(80, @post.image_width)
+        assert_equal(82, @post.image_height)
+        assert_equal(16275, @post.file_size)
+        assert_equal("png", @post.file_ext)
+        assert_equal("4ceadc314938bc27f3574053a3e1459a", @post.md5)
+        assert_equal("4ceadc314938bc27f3574053a3e1459a", Digest::MD5.file(@post.file_path).hexdigest)
+        assert_equal("https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png", @post.source)
+      end
+
+      should "delete the old files after three days" do
+        old_file_path, old_preview_file_path, old_large_file_path = @post.file_path, @post.preview_file_path, @post.large_file_path
+        @post.replace!("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
+
+        assert(File.exists?(old_file_path))
+        assert(File.exists?(old_preview_file_path))
+        assert(File.exists?(old_large_file_path))
+
+        Timecop.travel(Time.now + Post::DELETION_GRACE_PERIOD + 1.day) do
+          Delayed::Worker.new.work_off
+        end
+
+        assert_not(File.exists?(old_file_path))
+        assert_not(File.exists?(old_preview_file_path))
+        assert_not(File.exists?(old_large_file_path))
+      end
+    end
+  end
+
   context "Searching:" do
     setup do
       mock_pool_archive_service!
