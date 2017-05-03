@@ -44,15 +44,19 @@
     }
   }
 
+  /* Make the quick search box in the navbar full width. */
+  header#top menu form input {
+    width: auto;
+  }
+
   h1 {
     display: none;
   }
 
-  input[type=text], input[type=submit] {
-    font-size: 18pt;
-    border-color: default;
-    border-style: solid;
-    border-width: .1rem;
+  form {
+    input[type=text], input[type=submit], select {
+      font-size: 1.5em;
+    }
   }
 
   div#page section#content {
@@ -129,14 +133,6 @@
     }
   }
 
-  nav {
-    background: none;
-    float: right;
-    font-size: 1.125em;
-    width: 100%;
-    margin-bottom: 1em;
-  }
-  
   #nav {
     display: none;
   }
