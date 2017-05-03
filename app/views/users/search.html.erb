@@ -1,29 +1,18 @@
 <div id="c-users">
   <div id="a-search">
-    <%= form_tag(users_path, :method => :get, :class => "simple_form") do %>
-      <%= search_field "name_matches", :label => "Name" %>
+    <%= simple_form_for(:search, url: users_path, method: :get, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+      <%= f.input :name_matches, label: "Name", hint: "Use * for wildcard", input_html: { value: params[:search][:name_matches] } %>
 
-      <div class="input">
-        <label for="search_level">Level</label>
-        <%= select("search", "level", [""] + User.level_hash.to_a) %>
-      </div>
+      <%= f.input :level, collection: User.level_hash.to_a, include_blank: true, selected: params[:search][:level] %>
+      <%= f.input :min_level, collection: User.level_hash.to_a, include_blank: true, selected: params[:search][:min_level] %>
+      <%= f.input :max_level, collection: User.level_hash.to_a, include_blank: true, selected: params[:search][:max_level] %>
 
-      <div class="input">
-        <label for="search_min_level">Min Level</label>
-        <%= select("search", "min_level", [""] + User.level_hash.to_a) %>
-      </div>
+      <%= f.input :can_upload_free, label: "Unrestricted uploads?", collection: [%w[Yes true], %w[No false]], include_blank: true, selected: params[:search][:can_upload_free] %>
+      <%= f.input :can_approve_posts, label: "Approver?", collection: [%w[Yes true], %w[No false]], include_blank: true, selected: params[:search][:can_approve_posts] %>
+      <%= f.input :is_super_voter, label: "Super voter?", collection: [%w[Yes true], %w[No false]], include_blank: true, selected: params[:search][:is_super_voter] %>
 
-      <div class="input">
-        <label for="search_max_level">Max Level</label>
-        <%= select("search", "max_level", [""] + User.level_hash.to_a) %>
-      </div>
-
-      <div class="input">
-        <label for="search_order">Order</label>
-        <%= select("search", "order", [["Join date", "date"], ["Name", "name"], ["Upload count", "post_upload_count"], ["Note count", "note_count"], ["Post update count", "post_update_count"]]) %>
-      </div>
-
-      <%= submit_tag "Search" %>
+      <%= f.input :order, collection: [["Join date", "date"], ["Name", "name"], ["Upload count", "post_upload_count"], ["Note count", "note_count"], ["Post update count", "post_update_count"]], selected: params[:search][:order] %>
+      <%= f.submit "Search" %>
     <% end %>
   </div>
 </div>
