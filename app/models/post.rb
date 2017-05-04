@@ -301,8 +301,6 @@ class Post < ActiveRecord::Base
       if flag.errors.any?
         raise PostFlag::Error.new(flag.errors.full_messages.join("; "))
       end
-
-      update_column(:is_flagged, true) unless is_flagged?
     end
 
     def appeal!(reason)
