@@ -606,9 +606,9 @@ class User < ActiveRecord::Base
 
     def api_regen_multiplier
       # regen this amount per second
-      if is_platinum? && api_key.present?
+      if is_platinum?
         4
-      elsif is_gold? && api_key.present?
+      elsif is_gold?
         2
       else
         1
@@ -618,9 +618,9 @@ class User < ActiveRecord::Base
     def api_burst_limit
       # can make this many api calls at once before being bound by
       # api_regen_multiplier refilling your pool
-      if is_platinum? && api_key.present?
+      if is_platinum?
         60
-      elsif is_gold? && api_key.present?
+      elsif is_gold?
         30
       else
         10
