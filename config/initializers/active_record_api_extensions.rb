@@ -26,6 +26,11 @@ module Danbooru
         super(options, &block)
       end
 
+      def serializable_hash(*args)
+        hash = super(*args)
+        hash.transform_keys { |key| key.delete("?") }
+      end
+
     protected
       def hidden_attributes
         [:uploader_ip_addr, :updater_ip_addr, :creator_ip_addr, :ip_addr]
