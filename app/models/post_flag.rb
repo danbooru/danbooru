@@ -163,8 +163,8 @@ class PostFlag < ActiveRecord::Base
   end
 
   def initialize_creator
-    self.creator_id = CurrentUser.id
-    self.creator_ip_addr = CurrentUser.ip_addr
+    self.creator_id ||= CurrentUser.id
+    self.creator_ip_addr ||= CurrentUser.ip_addr
   end
 
   def resolve!

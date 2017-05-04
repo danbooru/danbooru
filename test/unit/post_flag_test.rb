@@ -44,7 +44,7 @@ class PostFlagTest < ActiveSupport::TestCase
           @post_flag = PostFlag.create(:post => @post, :reason => "aaa", :is_resolved => false)
         end
 
-        assert_equal(["You have already flagged this post"], @post_flag.errors.full_messages)
+        assert_equal(["have already flagged this post"], @post_flag.errors[:creator_id])
       end
 
       should "not be able to flag more than 10 posts in 24 hours" do
@@ -62,6 +62,23 @@ class PostFlagTest < ActiveSupport::TestCase
           @post_flag = PostFlag.create(:post => @post, :reason => "aaa", :is_resolved => false)
         end
         assert_equal(["Post is deleted"], @post_flag.errors.full_messages)
+      end
+
+      should "not be able to flag a post in the cooldown period" do
+        users = FactoryGirl.create_list(:user, 2, created_at: 2.weeks.ago)
+        flag1 = FactoryGirl.create(:post_flag, post: @post, creator: users.first)
+        @post.approve!
+
+        travel_to(PostFlag::COOLDOWN_PERIOD.from_now - 1.minute) do
+          flag2 = FactoryGirl.build(:post_flag, post: @post, creator: users.second)
+          assert(flag2.invalid?)
+          assert_match(/cannot be flagged more than once/, flag2.errors[:post].join)
+        end
+
+        travel_to(PostFlag::COOLDOWN_PERIOD.from_now + 1.minute) do
+          flag3 = FactoryGirl.build(:post_flag, post: @post, creator: users.second)
+          assert(flag3.valid?)
+        end
       end
 
       should "initialize its creator" do
