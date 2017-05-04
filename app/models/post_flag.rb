@@ -11,7 +11,7 @@ class PostFlag < ActiveRecord::Base
   belongs_to :post
   validates_presence_of :reason, :creator_id, :creator_ip_addr
   validate :validate_creator_is_not_limited
-  validate :validate_post_is_active
+  validate :validate_post
   before_validation :initialize_creator, :on => :create
   validates_uniqueness_of :creator_id, :scope => :post_id, :on => :create, :unless => :is_deletion, :message => "have already flagged this post"
   before_save :update_post
@@ -146,10 +146,9 @@ class PostFlag < ActiveRecord::Base
     end
   end
 
-  def validate_post_is_active
-    if post.is_deleted?
-      errors[:post] << "is deleted"
-    end
+  def validate_post
+    errors[:post] << "is locked and cannot be flagged" if post.is_status_locked?
+    errors[:post] << "is deleted" if post.is_deleted?
   end
 
   def initialize_creator

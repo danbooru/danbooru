@@ -296,10 +296,6 @@ class Post < ActiveRecord::Base
     end
 
     def flag!(reason, options = {})
-      if is_status_locked?
-        raise PostFlag::Error.new("Post is locked and cannot be flagged")
-      end
-
       flag = flags.create(:reason => reason, :is_resolved => false, :is_deletion => options[:is_deletion])
 
       if flag.errors.any?
