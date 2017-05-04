@@ -7,7 +7,7 @@ class Post < ActiveRecord::Base
   class RevertError < Exception ; end
   class SearchError < Exception ; end
 
-  DELETION_GRACE_PERIOD = 3.days
+  DELETION_GRACE_PERIOD = 30.days
 
   before_validation :initialize_uploader, :on => :create
   before_validation :merge_old_changes
