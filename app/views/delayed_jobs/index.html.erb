@@ -14,6 +14,7 @@
           <th>Last error</th>
           <th>Failed at</th>
           <th>Run at</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -28,6 +29,19 @@
             <td class="col-expand"><%= job.last_error %></td>
             <td><%= time_ago_in_words_tagged(job.failed_at) if job.failed_at %></td>
             <td><%= time_ago_in_words_tagged(job.run_at) %></td>
+            <td>
+              <% if CurrentUser.is_admin? %>
+                <% if job.locked_at? %>
+                  Running
+                <% elsif job.failed? %>
+                  <%= link_to "Retry", retry_delayed_job_path(job), method: :put, remote: true %> |
+                  <%= link_to "Delete", delayed_job_path(job), method: :delete, remote: true %>
+                <% else %>
+                  <%= link_to "Run", run_delayed_job_path(job), method: :put, remote: true %> |
+                  <%= link_to "Cancel", cancel_delayed_job_path(job), method: :put, remote: true %>
+                <% end %>
+              <% end %>
+            </td>
           </tr>
         <% end %>
       </tbody>
