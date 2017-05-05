@@ -1593,6 +1593,9 @@ class PostTest < ActiveSupport::TestCase
       Delayed::Worker.delay_jobs = true                    # don't delete the old images right away
       Danbooru.config.stubs(:use_s3_proxy?).returns(false) # don't fail on post ids < 10000
 
+      @system = FactoryGirl.create(:user, created_at: 2.weeks.ago)
+      Danbooru.config.stubs(:system_user).returns(@system)
+
       @uploader = FactoryGirl.create(:user, created_at: 2.weeks.ago, can_upload_free: true)
       @replacer = FactoryGirl.create(:user, created_at: 2.weeks.ago, can_approve_posts: true)
       CurrentUser.user = @replacer
@@ -1637,6 +1640,14 @@ class PostTest < ActiveSupport::TestCase
 
       should "log a mod action" do
         assert_match(/replaced post ##{@post.id}/, @mod_action.description)
+      end
+
+      should "leave a system comment" do
+        comment = @post.comments.last
+
+        assert_not_nil(comment)
+        assert_equal(User.system.id, comment.creator_id)
+        assert_match(/@#{@replacer.name} replaced this post/, comment.body)
       end
     end
 

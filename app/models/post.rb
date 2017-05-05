@@ -1402,7 +1402,7 @@ class Post < ActiveRecord::Base
       ModAction.log("undeleted post ##{id}")
     end
 
-    def replace!(url)
+    def replace!(url, replacer = CurrentUser.user)
       # TODO for posts with notes we need to rescale the notes if the dimensions change.
       if notes.size > 0
         raise NotImplementedError.new("Replacing images with notes not yet supported.")
@@ -1436,11 +1436,8 @@ class Post < ActiveRecord::Base
         self.source = upload.source
         self.tag_string = upload.tag_string
 
-        ModAction.log(<<-EOS.strip_heredoc)
-          replaced post ##{id}: #{image_width_was}x#{image_height_was} (#{file_size_was.to_formatted_s(:human_size)} #{file_ext_was.upcase}) -> #{image_width}x#{image_height} (#{file_size.to_formatted_s(:human_size)} #{file_ext.upcase})
-          source: #{source_was} -> #{source}
-          md5: "#{md5_was}":[/data/#{md5_was}.#{file_ext_was}] -> "#{md5}":[/data/#{md5}.#{file_ext}]
-        EOS
+        comments.create!({creator: User.system, body: presenter.comment_replacement_message(replacer), do_not_bump_post: true}, without_protection: true)
+        ModAction.log(presenter.modaction_replacement_message)
 
         save!
       end
