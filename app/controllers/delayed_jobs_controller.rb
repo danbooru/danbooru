@@ -3,7 +3,7 @@ class DelayedJobsController < ApplicationController
   before_filter :admin_only, except: [:index]
 
   def index
-    @delayed_jobs = Delayed::Job.order("created_at desc").paginate(params[:page], :limit => params[:limit])
+    @delayed_jobs = Delayed::Job.order("run_at asc").paginate(params[:page], :limit => params[:limit])
     respond_with(@delayed_jobs)
   end
 
