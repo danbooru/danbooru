@@ -90,6 +90,10 @@ module Danbooru
       true
     end
 
+    def backup_service
+      NullBackupService.new
+    end
+
     # What method to use to store images.
     # local_flat: Store every image in one directory.
     # local_hierarchy: Store every image in a hierarchical directory, based on the post's MD5 hash. On some file systems this may be faster.
@@ -477,6 +481,7 @@ module Danbooru
       false
     end
 
+    # Used for backing up images to S3. Must be changed to your own S3 bucket.
     def aws_s3_bucket_name
       "danbooru"
     end
