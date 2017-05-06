@@ -90,8 +90,18 @@ module Danbooru
       true
     end
 
+    # What method to use to backup images.
+    #
+    # NullBackupService: Don't backup images at all.
+    #
+    # S3BackupService: Backup to Amazon S3. Must configure aws_access_key_id,
+    # aws_secret_access_key, and aws_s3_bucket_name. Bucket must exist and be writable.
     def backup_service
-      NullBackupService.new
+      if Rails.env.production?
+        S3BackupService.new
+      else
+        NullBackupService.new
+      end
     end
 
     # What method to use to store images.
