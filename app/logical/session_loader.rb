@@ -20,7 +20,7 @@ class SessionLoader
     end
     
     if CurrentUser.user
-      CurrentUser.user.unban! if ban_expired?
+      CurrentUser.user.unban! if CurrentUser.user.ban_expired?
     else
       CurrentUser.user = AnonymousUser.new
     end
@@ -84,10 +84,6 @@ private
     CurrentUser.user = User.find_by_name(cookies.signed[:user_name])
     CurrentUser.ip_addr = request.remote_ip
     session[:user_id] = CurrentUser.user.id
-  end
-
-  def ban_expired?
-    CurrentUser.user.is_banned? && CurrentUser.user.recent_ban && CurrentUser.user.recent_ban.expired?
   end
 
   def cookie_password_hash_valid?
