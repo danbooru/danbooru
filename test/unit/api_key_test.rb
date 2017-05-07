@@ -3,9 +3,8 @@ require 'test_helper'
 class ApiKeyTest < ActiveSupport::TestCase
   context "in all cases a user" do
     setup do
-      @user = FactoryGirl.create(:user, :name => "abcdef")
+      @user = FactoryGirl.create(:gold_user, :name => "abcdef")
       @api_key = ApiKey.generate!(@user)
-      @user.name.mb_chars.downcase
     end
 
     should "authenticate via api key" do
@@ -18,6 +17,12 @@ class ApiKeyTest < ActiveSupport::TestCase
 
     should "not authenticate with the wrong name" do
       assert_nil(User.authenticate_api_key("xxx", @api_key.key))
+    end
+
+    should "have the same limits whether or not they have an api key" do
+      assert_no_difference(["@user.reload.api_regen_multiplier", "@user.reload.api_burst_limit"]) do
+        @user.api_key.destroy
+      end
     end
   end
 end
