@@ -15,10 +15,11 @@ class TokenBucket < ActiveRecord::Base
   end
 
   def add!
-    TokenBucket.where(user_id: user_id).update_all(["token_count = least(token_count + (? * extract(epoch from now() - last_touched_at)), ?), last_touched_at = now()", user.api_regen_multiplier, user.api_burst_limit])
+    now = Time.now
+    TokenBucket.where(user_id: user_id).update_all(["token_count = least(token_count + (? * extract(epoch from ? - last_touched_at)), ?), last_touched_at = ?", user.api_regen_multiplier, now, user.api_burst_limit, now])
 
     # estimate the token count to avoid reloading
-    self.token_count += user.api_regen_multiplier * (Time.now - last_touched_at)
+    self.token_count += user.api_regen_multiplier * (now - last_touched_at)
     self.token_count = user.api_burst_limit if token_count > user.api_burst_limit
   end
 
