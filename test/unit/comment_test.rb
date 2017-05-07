@@ -209,6 +209,13 @@ class CommentTest < ActiveSupport::TestCase
         assert_equal(c1.id, matches.all[1].id)
       end
 
+      should "default to id_desc order when searched with no options specified" do
+        comms = FactoryGirl.create_list(:comment, 3)
+        matches = Comment.search({})
+
+        assert_equal([comms[2].id, comms[1].id, comms[0].id], matches.map(&:id))
+      end
+
       context "that is edited by a moderator" do
         setup do
           @post = FactoryGirl.create(:post)

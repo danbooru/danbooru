@@ -86,7 +86,6 @@ class Comment < ActiveRecord::Base
 
     def search(params)
       q = where("true")
-      return q if params.blank?
 
       if params[:body_matches].present?
         q = q.body_matches(params[:body_matches])
