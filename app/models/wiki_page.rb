@@ -166,7 +166,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def creator_name
-    User.id_to_name(creator_id).tr("_", " ")
+    User.id_to_name(creator_id)
   end
 
   def category_name

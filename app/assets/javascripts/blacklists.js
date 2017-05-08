@@ -147,7 +147,7 @@
     var tags = String($post.attr("data-tags")).match(/\S+/g) || [];
     tags = tags.concat(String($post.attr("data-pools")).match(/\S+/g) || []);
     tags.push("rating:" + $post.data("rating"));
-    tags.push("user:" + $post.attr("data-uploader").toLowerCase().replace(/ /g, "_"));
+    tags.push("user:" + $post.attr("data-uploader").toLowerCase());
     $.each(String($post.data("flags")).match(/\S+/g) || [], function(i, v) {
       tags.push("status:" + v);
     });
