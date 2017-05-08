@@ -64,6 +64,14 @@ class UsersControllerTest < ActionController::TestCase
         assert_response :success
         assert_nil(json["last_logged_in_at"])
       end
+
+      should "strip '?' from attributes" do
+        get :show, {id: @user.id, format: :xml}, {user_id: @user.id}
+        xml = Hash.from_xml(response.body)
+
+        assert_response :success
+        assert_equal(false, xml["user"]["can_upload"])
+      end
     end
 
     context "new action" do
