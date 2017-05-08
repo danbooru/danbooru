@@ -80,6 +80,7 @@ class User < ActiveRecord::Base
   has_many :post_votes
   has_many :bans, lambda {order("bans.id desc")}
   has_one :recent_ban, lambda {order("bans.id desc")}, :class_name => "Ban"
+
   has_one :api_key
   has_one :dmail_filter
   has_one :super_voter
@@ -109,7 +110,10 @@ class User < ActiveRecord::Base
     def unban!
       self.is_banned = false
       save
-      ban.destroy
+    end
+
+    def ban_expired?
+      is_banned? && recent_ban.try(:expired?)
     end
   end
 

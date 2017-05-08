@@ -13,8 +13,9 @@ FactoryGirl.define do
     bit_prefs 0
 
     factory(:banned_user) do
+      transient { ban_duration 3 }
       is_banned true
-      after(:create) { |user| create(:ban, user: user) }
+      after(:create) { |user, ctx| create(:ban, user: user, duration: ctx.ban_duration) }
     end
 
     factory(:member_user) do
