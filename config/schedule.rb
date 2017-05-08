@@ -28,7 +28,7 @@ if environment == "production"
     runner "PostUpdate.push"
   end
 
-  every 1.hour do
-    runner "AmazonBackup.execute"
-  end
+  # every 1.hour do
+  #   runner "AmazonBackup.execute"
+  # end
 end

@@ -4,7 +4,7 @@ class DailyMaintenance
     PostPruner.new.prune!
     TagPruner.new.prune!
     Upload.delete_all(['created_at < ?', 1.day.ago])
-    ModAction.delete_all(['created_at < ?', 3.days.ago])
+    ModAction.delete_all(['created_at < ?', 30.days.ago])
     Delayed::Job.delete_all(['created_at < ?', 7.days.ago])
     PostVote.prune!
     CommentVote.prune!
