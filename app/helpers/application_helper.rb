@@ -90,7 +90,11 @@ module ApplicationHelper
   end
 
   def time_ago_in_words_tagged(time)
-    raw time_tag(time_ago_in_words(time) + " ago", time)
+    if time.past?
+      raw time_tag(time_ago_in_words(time) + " ago", time)
+    else
+      raw time_tag("in " + distance_of_time_in_words(Time.now, time), time)
+    end
   end
 
   def compact_time(time)

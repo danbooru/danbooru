@@ -1,42 +1,56 @@
-<h1>Delayed Jobs</h1>
+<div id="c-delayed-jobs">
+  <div id="a-index">
+    <h1>Delayed Jobs</h1>
 
-<table class="striped" width="100%">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Name</th>
-      <% if CurrentUser.is_admin? %>
-        <th>Handler</th>
-      <% end %>
-      <th>Attempts</th>
-      <th>Priority</th>
-      <th>Last error</th>
-      <th>Run at</th>
-      <th>Failed at</th>
-      <th>Queue</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @delayed_jobs.each do |job| %>
-      <tr>
-        <td><%= job.id %></td>
-        <td><%= raw print_name(job) %></td>
-        <% if CurrentUser.is_admin? %>
-          <td><%= raw print_handler(job) %></td>
+    <table class="striped autofit">
+      <thead>
+        <tr>
+          <th>Queue</th>
+          <th>Name</th>
+          <% if CurrentUser.is_admin? %>
+            <th>Handler</th>
+          <% end %>
+          <th>Attempts</th>
+          <th>Last error</th>
+          <th>Failed at</th>
+          <th>Run at</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @delayed_jobs.each do |job| %>
+          <tr>
+            <td><%= job.queue %></td>
+            <td><%= raw print_name(job) %></td>
+            <% if CurrentUser.is_admin? %>
+              <td class="col-expand"><%= raw print_handler(job) %></td>
+            <% end %>
+            <td><%= job.attempts %></td>
+            <td class="col-expand"><%= job.last_error %></td>
+            <td><%= time_ago_in_words_tagged(job.failed_at) if job.failed_at %></td>
+            <td><%= time_ago_in_words_tagged(job.run_at) %></td>
+            <td>
+              <% if CurrentUser.is_admin? %>
+                <% if job.locked_at? %>
+                  Running
+                <% elsif job.failed? %>
+                  <%= link_to "Retry", retry_delayed_job_path(job), method: :put, remote: true %> |
+                  <%= link_to "Delete", delayed_job_path(job), method: :delete, remote: true %>
+                <% else %>
+                  <%= link_to "Run", run_delayed_job_path(job), method: :put, remote: true %> |
+                  <%= link_to "Cancel", cancel_delayed_job_path(job), method: :put, remote: true %>
+                <% end %>
+              <% end %>
+            </td>
+          </tr>
         <% end %>
-        <td><%= job.attempts %></td>
-        <td><%= job.priority %></td>
-        <td><%= job.last_error %></td>
-        <td><%= job.run_at %></td>
-        <td><%= job.failed_at %></td>
-        <td><%= job.queue %></td>
-      </tr>
+      </tbody>
+    </table>
+
+    <%= numbered_paginator(@delayed_jobs) %>
+
+    <% content_for(:page_title) do %>
+      Delayed Jobs - <%= Danbooru.config.app_name %>
     <% end %>
-  </tbody>
-</table>
-
-<%= numbered_paginator(@delayed_jobs) %>
-
-<% content_for(:page_title) do %>
-  Delayed Jobs - <%= Danbooru.config.app_name %>
-<% end %>
+  </div>
+</div>
