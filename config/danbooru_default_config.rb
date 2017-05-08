@@ -90,6 +90,20 @@ module Danbooru
       true
     end
 
+    # What method to use to backup images.
+    #
+    # NullBackupService: Don't backup images at all.
+    #
+    # S3BackupService: Backup to Amazon S3. Must configure aws_access_key_id,
+    # aws_secret_access_key, and aws_s3_bucket_name. Bucket must exist and be writable.
+    def backup_service
+      if Rails.env.production?
+        S3BackupService.new
+      else
+        NullBackupService.new
+      end
+    end
+
     # What method to use to store images.
     # local_flat: Store every image in one directory.
     # local_hierarchy: Store every image in a hierarchical directory, based on the post's MD5 hash. On some file systems this may be faster.
@@ -477,6 +491,7 @@ module Danbooru
       false
     end
 
+    # Used for backing up images to S3. Must be changed to your own S3 bucket.
     def aws_s3_bucket_name
       "danbooru"
     end

@@ -23,6 +23,7 @@ class Post < ActiveRecord::Base
   before_save :set_tag_counts
   before_save :set_pool_category_pseudo_tags
   before_create :autoban
+  after_save :queue_backup, if: :md5_changed?
   after_save :create_version
   after_save :update_parent_on_save
   after_save :apply_post_metatags
@@ -226,6 +227,23 @@ class Post < ActiveRecord::Base
 
     def has_ugoira_webm?
       created_at < 1.minute.ago || (File.exists?(preview_file_path) && File.size(preview_file_path) > 0)
+    end
+  end
+
+  module BackupMethods
+    extend ActiveSupport::Concern
+
+    def queue_backup
+      Post.delay(queue: "default", priority: -1).backup_file(file_path, id: id, type: :original)
+      Post.delay(queue: "default", priority: -1).backup_file(large_file_path, id: id, type: :large) if has_large?
+      Post.delay(queue: "default", priority: -1).backup_file(preview_file_path, id: id, type: :preview) if has_preview?
+    end
+
+    module ClassMethods
+      def backup_file(file_path, options = {})
+        backup_service = Danbooru.config.backup_service
+        backup_service.backup(file_path, options)
+      end
     end
   end
 
@@ -1695,6 +1713,7 @@ class Post < ActiveRecord::Base
   end
   
   include FileMethods
+  include BackupMethods
   include ImageMethods
   include ApprovalMethods
   include PresenterMethods
