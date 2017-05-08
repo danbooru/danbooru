@@ -49,7 +49,9 @@ class PostApprovalTest < ActiveSupport::TestCase
           @post.approve!(@approver2)
           assert_not_equal(@approver.id, @post.approver_id)
           CurrentUser.user = @user3
-          @post.flag!("blah blah")
+          travel_to(PostFlag::COOLDOWN_PERIOD.from_now + 1.minute) do
+            @post.flag!("blah blah")
+          end
 
           approval = @post.approve!(@approver)
           assert_includes(approval.errors.full_messages, "You have previously approved this post and cannot approve it again")

@@ -7,16 +7,22 @@ class PostFlag < ActiveRecord::Base
     BANNED = "Artist requested removal"
   end
 
+  COOLDOWN_PERIOD = 3.days
+
   belongs_to :creator, :class_name => "User"
   belongs_to :post
   validates_presence_of :reason, :creator_id, :creator_ip_addr
   validate :validate_creator_is_not_limited
-  validate :validate_post_is_active
+  validate :validate_post
   before_validation :initialize_creator, :on => :create
   validates_uniqueness_of :creator_id, :scope => :post_id, :on => :create, :unless => :is_deletion, :message => "have already flagged this post"
   before_save :update_post
   attr_accessible :post, :post_id, :reason, :is_resolved, :is_deletion
   attr_accessor :is_deletion
+
+  scope :by_users, lambda { where.not(creator: User.system) }
+  scope :by_system, lambda { where(creator: User.system) }
+  scope :in_cooldown, lambda { by_users.where("created_at >= ?", COOLDOWN_PERIOD.ago) }
 
   module SearchMethods
     def reason_matches(query)
@@ -146,15 +152,19 @@ class PostFlag < ActiveRecord::Base
     end
   end
 
-  def validate_post_is_active
-    if post.is_deleted?
-      errors[:post] << "is deleted"
+  def validate_post
+    errors[:post] << "is locked and cannot be flagged" if post.is_status_locked?
+    errors[:post] << "is deleted" if post.is_deleted?
+
+    flag = post.flags.in_cooldown.last
+    if flag.present?
+      errors[:post] << "cannot be flagged more than once every #{COOLDOWN_PERIOD.inspect} (last flagged: #{flag.created_at.to_s(:long)})"
     end
   end
 
   def initialize_creator
-    self.creator_id = CurrentUser.id
-    self.creator_ip_addr = CurrentUser.ip_addr
+    self.creator_id ||= CurrentUser.id
+    self.creator_ip_addr ||= CurrentUser.ip_addr
   end
 
   def resolve!
