@@ -96,7 +96,7 @@ class PixivApiClient
       @page_count = json["page_count"].to_i
       @artist_commentary_title = json["title"]
       @artist_commentary_desc = json["caption"]
-      @tags = json["tags"]
+      @tags = [json["tags"], json["tools"]].flatten.compact
 
       if page_count > 1
         @pages = json["metadata"]["pages"].map {|x| x["image_urls"]["large"]}

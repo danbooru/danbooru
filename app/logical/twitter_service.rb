@@ -69,7 +69,7 @@ class TwitterService
     end
 
     urls.uniq
-  # rescue => e
-  #   []
+  rescue => e
+    []
   end
 end
