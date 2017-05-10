@@ -509,10 +509,6 @@ class Upload < ActiveRecord::Base
         :original_description => artist_commentary_desc
       )
     end
-
-    def has_artist_commentary?
-      artist_commentary_desc.present?
-    end
   end
 
   include ConversionMethods

@@ -103,6 +103,9 @@
       $("#gallery-warning").hide();
     }
 
+    $("#upload_artist_commentary_title").val(data.artist_commentary.dtext_title);
+    $("#upload_artist_commentary_desc").val(data.artist_commentary.dtext_description);
+
     $("#source-info span#loading-data").hide();
     $("#source-info ul").show();
   }

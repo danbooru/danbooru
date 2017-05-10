@@ -30,10 +30,6 @@ module Sources::Strategies
       @artist_commentary_desc = attrs[:text]
     end
 
-    def has_artist_commentary?
-      @artist_commentary_desc.present?
-    end
-
     def image_urls
       TwitterService.new.image_urls(url)
     end

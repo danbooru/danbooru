@@ -26,10 +26,6 @@ module Sources
         "http://www.pixiv.net"
       end
 
-      def has_artist_commentary?
-        @artist_commentary_desc.present?
-      end
-
       def normalizable_for_artist_finder?
         true
       end

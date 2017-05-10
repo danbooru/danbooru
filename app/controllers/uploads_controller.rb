@@ -15,7 +15,6 @@ class UploadsController < ApplicationController
       end
 
       @post = find_post_by_url(@normalized_url)
-      extract_artist_commentary(@upload, data)
 
       begin
         @source = Sources::Site.new(params[:url], :referer_url => params[:ref])
@@ -72,17 +71,6 @@ class UploadsController < ApplicationController
   end
 
 protected
-  def extract_artist_commentary(upload, data)
-    if data[:artist_commentary_desc]
-      upload.artist_commentary_title = strip_tags(data[:artist_commentary_title])
-      upload.artist_commentary_desc = strip_tags(data[:artist_commentary_desc])
-    end
-  end
-
-  def strip_tags(s)
-    Rails::Html::FullSanitizer.new.sanitize(s, encode_special_chars: false)
-  end
-
   def find_post_by_url(normalized_url)
     if normalized_url.nil?
       Post.where(source: params[:url]).first
