@@ -13,7 +13,7 @@ class PostDisapproval < ActiveRecord::Base
   scope :disinterest, lambda {where(:reason => ["disinterest", "legacy"])}
 
   def self.prune!
-    PostDisapproval.destroy_all(["created_at < ?", DELETION_THRESHOLD.ago])
+    PostDisapproval.where("post_id in (select _.post_id from post_disapprovals _ where _.created_at < ?)", DELETION_THRESHOLD.ago)
   end
 
   def self.dmail_messages!
@@ -28,7 +28,7 @@ class PostDisapproval < ActiveRecord::Base
 
       Dmail.create_automated(
         :to_id => uploader.id,
-        :title => "Some of your uploads have been critiqued by the moderators",
+        :title => "Someone has commented on your uploads",
         :body => message
       )
     end
