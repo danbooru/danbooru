@@ -91,6 +91,8 @@ module Sources
         should "get the artist commentary" do
           assert_not_nil(@site.artist_commentary_title)
           assert_not_nil(@site.artist_commentary_desc)
+          assert_not_nil(@site.dtext_artist_commentary_title)
+          assert_not_nil(@site.dtext_artist_commentary_desc)
         end
 
         should "convert a page into a json representation" do
@@ -111,6 +113,17 @@ module Sources
 
         should "get the full size image url" do
           assert_equal("https://i.pximg.net/img-original/img/2014/10/29/09/27/19/46785915_p0.jpg", @site.image_url)
+        end
+      end
+
+      context "fetching the commentary" do
+        setup do
+          get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=46337015")
+        end
+
+        should "work when the description is blank" do
+          assert_equal("Illustration (PNG) - foo & bar", @site.dtext_artist_commentary_title)
+          assert_equal("", @site.dtext_artist_commentary_desc)
         end
       end
     end
