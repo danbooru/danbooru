@@ -39,10 +39,10 @@
         <td>
           <%= presenter.upload_count(self) %>
           <% if presenter.has_uploads? %>
-            (<%= link_to "tag changes report", reports_upload_tags_path(user_id: user.id) %>)
+            [<%= link_to "tag changes report", reports_upload_tags_path(user_id: user.id) %>]
           <% end %>
           <% if CurrentUser.is_moderator? %>
-            (<%= link_to "sample", posts_path(:tags => "user:#{user.name} order:random limit:300") %>)
+            [<%= link_to "sample", posts_path(:tags => "user:#{user.name} order:random limit:300") %>]
           <% end %>
         </td>
       </tr>
@@ -52,7 +52,7 @@
         <td>
           <%= presenter.deleted_upload_count(self) %>
           <% if CurrentUser.is_moderator? %>
-            (<%= link_to "sample", posts_path(:tags => "user:#{user.name} order:random limit:300 status:deleted") %>)
+            [<%= link_to "sample", posts_path(:tags => "user:#{user.name} order:random limit:300 status:deleted") %>]
           <% end %>
 
         </td>
@@ -63,7 +63,7 @@
         <td>
           <%= presenter.favorite_count(self) %>
           <% if CurrentUser.is_moderator? %>
-            (<%= link_to "sample", posts_path(:tags => "fav:#{user.name} order:random limit:300") %>)
+            [<%= link_to "sample", posts_path(:tags => "fav:#{user.name} order:random limit:300") %>]
           <% end %>
         </td>
       </tr>

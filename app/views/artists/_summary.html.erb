@@ -1,0 +1,42 @@
+<!--
+  artist
+-->
+<ul>
+  <li><strong>Status</strong> <%= artist.status %></li>
+
+  <% if !artist.is_banned? || CurrentUser.is_member? %>
+    <% if artist.has_tag_alias? %>
+      <li><strong>Tag Alias</strong> <%= artist.tag_alias_name %></li>
+    <% end %>
+    <% if artist.other_names.present? %>
+      <li><strong>Other Names</strong> <%= link_to_artists(artist.other_names.split(/ /)) %></li>
+    <% end %>
+    <% if artist.group_name.present? %>
+      <li><strong>Group</strong> <%= link_to_artist(artist.group_name) %></li>
+    <% end %>
+    <% if artist.members.any? %>
+      <li><strong>Members</strong> <%= link_to_artists(artist.members.map(&:name)) %></li>
+    <% end %>
+    <% if artist.domains.any? %>
+      <li><strong>Domains</strong></li>
+      <ul>
+        <% artist.domains.each do |url, count| %>
+          <li><%= url %>: <%= count %></li>
+        <% end %>
+      </ul>
+    <% end %>
+    <% if artist.urls.any? %>
+      <li><strong>URLs</strong></li>
+      <ul>
+        <% artist.urls.each do |url| %>
+          <li>
+            <%= link_to h(url.to_s), h(url.to_s) %>
+            <% if CurrentUser.user.is_moderator? %>
+              [<%= link_to("mass edit", edit_moderator_tag_path(:antecedent => "-#{artist.name} source:#{ArtistUrl.normalize_for_search(url.to_s)}", :consequent => artist.name)) %>]
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+  <% end %>
+</ul>
