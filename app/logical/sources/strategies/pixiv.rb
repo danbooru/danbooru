@@ -75,7 +75,7 @@ module Sources
           page = agent.get(URI.parse(normalized_url))
         end
         
-        @artist_name = @metadata.artist_name
+        @artist_name = @metadata.name
         @profile_url = get_profile_from_page(page)
         @pixiv_moniker = @metadata.moniker
         @zip_url, @ugoira_frame_data, @ugoira_content_type = get_zip_url_from_page(page)
