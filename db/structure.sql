@@ -2687,6 +2687,40 @@ ALTER SEQUENCE post_flags_id_seq OWNED BY post_flags.id;
 
 
 --
+-- Name: post_replacements; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE post_replacements (
+    id integer NOT NULL,
+    post_id integer NOT NULL,
+    creator_id integer NOT NULL,
+    original_url text NOT NULL,
+    replacement_url text NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: post_replacements_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE post_replacements_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: post_replacements_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE post_replacements_id_seq OWNED BY post_replacements.id;
+
+
+--
 -- Name: post_updates; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4269,6 +4303,13 @@ ALTER TABLE ONLY post_flags ALTER COLUMN id SET DEFAULT nextval('post_flags_id_s
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY post_replacements ALTER COLUMN id SET DEFAULT nextval('post_replacements_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY post_votes ALTER COLUMN id SET DEFAULT nextval('post_votes_id_seq'::regclass);
 
 
@@ -4656,6 +4697,14 @@ ALTER TABLE ONLY post_disapprovals
 
 ALTER TABLE ONLY post_flags
     ADD CONSTRAINT post_flags_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: post_replacements_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY post_replacements
+    ADD CONSTRAINT post_replacements_pkey PRIMARY KEY (id);
 
 
 --
@@ -6781,6 +6830,20 @@ CREATE INDEX index_post_flags_on_reason_tsvector ON post_flags USING gin (to_tsv
 
 
 --
+-- Name: index_post_replacements_on_creator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_replacements_on_creator_id ON post_replacements USING btree (creator_id);
+
+
+--
+-- Name: index_post_replacements_on_post_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_replacements_on_post_id ON post_replacements USING btree (post_id);
+
+
+--
 -- Name: index_post_votes_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7470,4 +7533,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170414233617');
 INSERT INTO schema_migrations (version) VALUES ('20170416224142');
 
 INSERT INTO schema_migrations (version) VALUES ('20170428220448');
+
+INSERT INTO schema_migrations (version) VALUES ('20170512221200');
 

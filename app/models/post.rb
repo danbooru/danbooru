@@ -7,8 +7,6 @@ class Post < ActiveRecord::Base
   class RevertError < Exception ; end
   class SearchError < Exception ; end
 
-  DELETION_GRACE_PERIOD = 30.days
-
   before_validation :initialize_uploader, :on => :create
   before_validation :merge_old_changes
   before_validation :normalize_tags
@@ -51,6 +49,7 @@ class Post < ActiveRecord::Base
   has_many :approvals, :class_name => "PostApproval", :dependent => :destroy
   has_many :disapprovals, :class_name => "PostDisapproval", :dependent => :destroy
   has_many :favorites, :dependent => :destroy
+  has_many :replacements, class_name: "PostReplacement"
 
   if PostArchive.enabled?
     has_many :versions, lambda {order("post_versions.updated_at ASC")}, :class_name => "PostArchive", :dependent => :destroy
@@ -1430,50 +1429,9 @@ class Post < ActiveRecord::Base
       ModAction.log("undeleted post ##{id}")
     end
 
-    def replace!(url, replacer = CurrentUser.user)
-      # TODO for posts with notes we need to rescale the notes if the dimensions change.
-      if notes.size > 0
-        raise NotImplementedError.new("Replacing images with notes not yet supported.")
-      end
-
-      # TODO for ugoiras we need to replace the frame data.
-      if is_ugoira?
-        raise NotImplementedError.new("Replacing ugoira images not yet supported.")
-      end
-
-      # TODO images hosted on s3 need to be deleted from s3 instead of the local filesystem.
-      if Danbooru.config.use_s3_proxy?(self)
-        raise NotImplementedError.new("Replacing S3 hosted images not yet supported.")
-      end
-
-      transaction do
-        upload = Upload.create!(source: url, rating: self.rating, tag_string: self.tag_string)
-        upload.process_upload
-        upload.update(status: "completed", post_id: id)
-
-        # queue the deletion *before* updating the post so that we use the old
-        # md5/file_ext to delete the old files. if saving the post fails,
-        # this is rolled back so the job won't run.
-        Post.delay(queue: "default", run_at: Time.now + DELETION_GRACE_PERIOD).delete_files(id, file_path, large_file_path, preview_file_path)
-
-        self.md5 = upload.md5
-        self.file_ext = upload.file_ext
-        self.image_width = upload.image_width
-        self.image_height = upload.image_height
-        self.file_size = upload.file_size
-        self.source = upload.source
-        self.tag_string = upload.tag_string
-
-        comments.create!({creator: User.system, body: presenter.comment_replacement_message(replacer), do_not_bump_post: true}, without_protection: true)
-        ModAction.log(presenter.modaction_replacement_message)
-
-        save!
-      end
-
-      # point of no return: these things can't be rolled back, so we do them
-      # only after the transaction successfully commits.
-      distribute_files
-      update_iqdb_async
+    def replace!(url)
+      replacement = replacements.create(replacement_url: url)
+      replacement.process!
     end
   end
 

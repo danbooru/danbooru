@@ -1,10 +1,12 @@
 require 'test_helper'
 require 'helpers/pool_archive_test_helper'
 require 'helpers/saved_search_test_helper'
+require 'helpers/iqdb_test_helper'
 
 class PostTest < ActiveSupport::TestCase
   include PoolArchiveTestHelper
   include SavedSearchTestHelper
+  include IqdbTestHelper
 
   def assert_tag_match(posts, query)
     assert_equal(posts.map(&:id), Post.tag_match(query).pluck(:id))
@@ -1588,6 +1590,7 @@ class PostTest < ActiveSupport::TestCase
 
   context "Replacing: " do
     setup do
+      mock_iqdb_service!
       Delayed::Worker.delay_jobs = true                    # don't delete the old images right away
       Danbooru.config.stubs(:use_s3_proxy?).returns(false) # don't fail on post ids < 10000
 
@@ -1612,9 +1615,36 @@ class PostTest < ActiveSupport::TestCase
 
     context "replacing a post from a generic source" do
       setup do
+        @post.update(source: "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png")
         @post.replace!("https://www.google.com/intl/en_ALL/images/logo.gif")
         @upload = Upload.last
         @mod_action = ModAction.last
+      end
+
+      context "that is then undone" do
+        setup do
+          Timecop.travel(Time.now + PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
+            Delayed::Worker.new.work_off
+          end
+
+          @replacement = @post.replacements.first
+          @replacement.undo!
+          @post.reload
+        end
+
+        should "update the attributes" do
+          assert_equal(272, @post.image_width)
+          assert_equal(92, @post.image_height)
+          assert_equal(5969, @post.file_size)
+          assert_equal("png", @post.file_ext)
+          assert_equal("8f9327db2597fa57d2f42b4a6c5a9855", @post.md5)
+          assert_equal("8f9327db2597fa57d2f42b4a6c5a9855", Digest::MD5.file(@post.file_path).hexdigest)
+          assert_equal("https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png", @post.source)
+        end
+      end
+
+      should "create a post replacement record" do
+        assert_equal(@post.id, PostReplacement.last.post_id)
       end
 
       should "correctly update the attributes" do
@@ -1670,7 +1700,7 @@ class PostTest < ActiveSupport::TestCase
         assert(File.exists?(old_preview_file_path))
         assert(File.exists?(old_large_file_path))
 
-        Timecop.travel(Time.now + Post::DELETION_GRACE_PERIOD + 1.day) do
+        Timecop.travel(Time.now + PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
           Delayed::Worker.new.work_off
         end
 
