@@ -4,75 +4,93 @@
 
 <div id="excerpt" style="display: none;">
   <% if post_set.has_artist? %>
-    <% if post_set.artist.visible? %>
-      <% unless post_set.artist.notes.blank? %>
-        <div class="prose">
-          <%= format_text(post_set.artist.notes, :ragel => true) %>
+    <% post_set.artist.tap do |artist| %>
+      <% if artist.visible? %>
+        <% unless artist.notes.blank? %>
+          <div class="prose">
+            <%= format_text(artist.notes, :ragel => true) %>
+          </div>
+        <% end %>
+
+        <div>
+          <ul>
+            <li><strong>Status</strong> <%= artist.status %></li>
+            <% if artist.has_tag_alias? %>
+              <li><strong>Tag Alias</strong> <%= artist.tag_alias_name %></li>
+            <% end %>
+            <% if artist.other_names.present? %>
+              <li><strong>Other Names</strong> <%= link_to_artists(artist.other_names.split(/ /)) %></li>
+            <% end %>
+            <% if artist.group_name.present? %>
+              <li><strong>Group</strong> <%= link_to_artist(artist.group_name) %></li>
+            <% end %>
+            <% if artist.members.any? %>
+              <li><strong>Members</strong> <%= link_to_artists(artist.members.map(&:name)) %></li>
+            <% end %>
+            <% if artist.domains.any? %>
+              <li><strong>Domains</strong></li>
+              <ul>
+                <% artist.domains.each do |url, count| %>
+                  <li><%= url %>: <%= count %></li>
+                <% end %>
+              </ul>
+            <% end %>
+            <% if artist.urls.any? %>
+              <li><strong>URLs</strong></li>
+              <ul>
+                <% artist.urls.each do |url| %>
+                  <li>
+                    <%= link_to h(url.to_s), h(url.to_s) %>
+                    <% if CurrentUser.user.is_moderator? %>
+                      [<%= link_to("mass edit", edit_moderator_tag_path(:antecedent => "-#{artist.name} source:#{ArtistUrl.normalize_for_search(url.to_s)}", :consequent => artist.name)) %>]
+                    <% end %>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+          </ul>
+
+          <%= artist_alias_and_implication_list(artist) %>
+
+          <p class="links">
+            <%= link_to "View wiki", artist.wiki_page %> |
+            <%= link_to "View artist", artist_path(artist.id) %>
+          </p>
         </div>
-
-        <p><%= link_to "View wiki page", post_set.artist.wiki_page %></p>
       <% end %>
-
-      <div>
-        <ul>
-          <li><strong>Status</strong> <%= post_set.artist.status %></li>
-          <% if post_set.artist.has_tag_alias? %>
-            <li><strong>Tag Alias</strong> <%= post_set.artist.tag_alias_name %></li>
-          <% end %>
-          <% if post_set.artist.other_names.present? %>
-            <li><strong>Other Names</strong> <%= link_to_artists(post_set.artist.other_names.split(/ /)) %></li>
-          <% end %>
-          <% if post_set.artist.group_name.present? %>
-            <li><strong>Group</strong> <%= link_to_artist(post_set.artist.group_name) %></li>
-          <% end %>
-          <% if post_set.artist.members.any? %>
-            <li><strong>Members</strong> <%= link_to_artists(post_set.artist.members.map(&:name)) %></li>
-          <% end %>
-          <% post_set.artist.urls.each do |url| %>
-            <li>
-              URL: <%= link_to h(url.to_s), h(url.to_s) %>
-              <% if CurrentUser.user.is_moderator? %>
-                (<%= link_to("mass edit", edit_moderator_tag_path(:antecedent => "-#{post_set.artist.name} source:#{ArtistUrl.normalize_for_search(url.to_s)}", :consequent => post_set.artist.name)) %>)
-              <% end %>
-            </li>
-          <% end %>
-        </ul>
-
-        <%= artist_alias_and_implication_list(post_set.artist) %>
-
-        <p><%= link_to "View artist", artist_path(post_set.artist.id) %></p>
-      </div>
     <% end %>
   <% elsif post_set.has_wiki? %>
-    <div class="prose">
-      <% if post_set.wiki_page.other_names.present? %>
-        <p><%= wiki_page_other_names_list(post_set.wiki_page) %></p>
-      <% end %>
+    <% post_set.wiki_page.tap do |wiki_page| %>
+      <div class="prose">
+        <% if wiki_page.other_names.present? %>
+          <p><%= wiki_page_other_names_list(wiki_page) %></p>
+        <% end %>
 
-      <%= format_text(post_set.wiki_page.presenter.excerpt, :ragel => true) %>
+        <%= format_text(wiki_page.presenter.excerpt, :ragel => true) %>
 
-      <% if post_set.wiki_page.artist %>
-        <p><%= link_to "View artist", post_set.wiki_page.artist %></p>
-      <% end %>
+        <%= wiki_page_alias_and_implication_list(wiki_page) %>
 
-      <%= wiki_page_alias_and_implication_list(post_set.wiki_page) %>
-
-      <p><%= link_to "View wiki page", wiki_page_path(post_set.wiki_page.id) %></p>
-    </div>
+        <p class="links">
+          <%= link_to "View wiki", wiki_page_path(wiki_page.id) %>
+        </p>
+      </div>
+    <% end %>
   <% elsif post_set.has_pool? %>
-    <h4>
-      <%= post_set.pool.pretty_category %>:
-      <%= link_to post_set.pool.pretty_name, pool_path(post_set.pool), :class => "pool-category-#{post_set.pool.category}" %>
-      <% if post_set.pool.is_deleted? %>
-        <span class="inactive">(deleted)</span>
-      <% end %>
-    </h4>
+    <% post_set.pool.tap do |pool| %>
+      <h4>
+        <%= pool.pretty_category %>:
+        <%= link_to pool.pretty_name, pool_path(pool), :class => "pool-category-#{pool.category}" %>
+        <% if pool.is_deleted? %>
+          <span class="inactive">(deleted)</span>
+        <% end %>
+      </h4>
 
-    <div id="description" class="prose">
-      <%= format_text(post_set.pool.description, :ragel => true) %>
-    </div>
+      <div id="description" class="prose">
+        <%= format_text(post_set.pool.description, :ragel => true) %>
+      </div>
 
-    <p><%= link_to "View pool", pool_path(post_set.pool.id) %></p>
+      <p class="links"><%= link_to "View pool", pool_path(post_set.pool.id) %></p>
+    <% end %>
   <% elsif post_set.has_favgroup? %>
     <h4>
       Favorite Group:
