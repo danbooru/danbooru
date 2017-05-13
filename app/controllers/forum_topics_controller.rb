@@ -33,7 +33,7 @@ class ForumTopicsController < ApplicationController
   end
 
   def show
-    unless CurrentUser.user.is_anonymous?
+    if request.format == Mime::HTML
       @forum_topic.mark_as_read!(CurrentUser.user)
     end
     @forum_posts = ForumPost.search(:topic_id => @forum_topic.id).order("forum_posts.id").paginate(params[:page])

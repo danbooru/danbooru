@@ -103,8 +103,8 @@ class ForumTopic < ActiveRecord::Base
       ForumTopicVisit.where("user_id = ? and forum_topic_id = ? and last_read_at >= ?", user.id, id, updated_at).exists?
     end
 
-    def mark_as_read!(user = nil)
-      user ||= CurrentUser.user
+    def mark_as_read!(user = CurrentUser.user)
+      return if user.is_anonymous?
       
       match = ForumTopicVisit.where(:user_id => user.id, :forum_topic_id => id).first
       if match
