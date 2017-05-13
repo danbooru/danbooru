@@ -23,6 +23,7 @@
       this.initialize_post_image_resize_links();
       this.initialize_post_image_resize_to_window_link();
       this.initialize_similar();
+      this.initialize_replace_image_dialog();
 
       if (Danbooru.meta("always-resize-images") === "true") {
         $("#image-resize-to-window-link").click();
@@ -606,6 +607,32 @@
       e.preventDefault();
     });
   }
+
+  Danbooru.Post.initialize_replace_image_dialog = function() {
+    $("#replace-image-dialog").dialog({
+      autoOpen: false,
+      width: 700,
+      modal: true,
+      buttons: {
+        "Submit": function() {
+          $("#replace-image-dialog form").submit();
+          $(this).dialog("close");
+        },
+        "Cancel": function() {
+          $(this).dialog("close");
+        }
+      }
+    });
+
+    $('#replace-image-dialog form').submit(function() {
+      $('#replace-image-dialog').dialog('close');
+    });
+
+    $("#replace-image").click(function(e) {
+      e.preventDefault();
+      $("#replace-image-dialog").dialog("open");
+    });
+  };
 })();
 
 $(document).ready(function() {

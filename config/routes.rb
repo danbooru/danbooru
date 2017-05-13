@@ -30,6 +30,7 @@ Rails.application.routes.draw do
         member do
           get :confirm_delete
           post :expunge
+          post :replace
           post :delete
           post :undelete
           get :confirm_move_favorites

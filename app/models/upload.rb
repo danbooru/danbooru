@@ -105,7 +105,7 @@ class Upload < ActiveRecord::Base
   end
 
   module ConversionMethods
-    def process_once
+    def process_upload
       CurrentUser.scoped(uploader, uploader_ip_addr) do
         update_attribute(:status, "processing")
         self.source = strip_source
@@ -129,16 +129,19 @@ class Upload < ActiveRecord::Base
         move_file
         validate_md5_confirmation_after_move
         save
-        post = convert_to_post
-        post.distribute_files
-        if post.save
-          User.where(id: CurrentUser.id).update_all("post_upload_count = post_upload_count + 1")
-          create_artist_commentary(post) if include_artist_commentary?
-          ugoira_service.save_frame_data(post) if is_ugoira?
-          update_attributes(:status => "completed", :post_id => post.id)
-        else
-          update_attribute(:status, "error: " + post.errors.full_messages.join(", "))
-        end
+      end
+    end
+
+    def create_post_from_upload
+      post = convert_to_post
+      post.distribute_files
+      if post.save
+        User.where(id: CurrentUser.id).update_all("post_upload_count = post_upload_count + 1")
+        create_artist_commentary(post) if include_artist_commentary?
+        ugoira_service.save_frame_data(post) if is_ugoira?
+        update_attributes(:status => "completed", :post_id => post.id)
+      else
+        update_attribute(:status, "error: " + post.errors.full_messages.join(", "))
       end
     end
 
@@ -146,7 +149,8 @@ class Upload < ActiveRecord::Base
       @tries ||= 0
       return if !force && status =~ /processing|completed|error/
 
-      process_once
+      process_upload
+      create_post_from_upload
 
     rescue Timeout::Error, Net::HTTP::Persistent::Error => x
       if @tries > 3

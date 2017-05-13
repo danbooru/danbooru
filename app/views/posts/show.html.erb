@@ -121,6 +121,10 @@
     <%= render "post_appeals/new", post_appeal: @post.appeals.new %>
   </div>
 
+  <div id="replace-image-dialog" class="prose" title="Replace image" style="display: none;">
+    <%= render "moderator/post/posts/replace" %>
+  </div>
+
   <div id="add-to-pool-dialog" title="Add to pool" style="display: none;">
     <%= render "pool_elements/new" %>
   </div>
