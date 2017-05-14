@@ -1,0 +1,7 @@
+<%= simple_form_for(:search, url: bulk_update_requests_path, method: :get, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+  <%= f.input :user_name, label: "Creator", input_html: { value: params[:search][:user_name] } %>
+  <%= f.input :approver_name, label: "Approver", input_html: { value: params[:search][:approver_name] } %>
+  <%= f.input :status, label: "Status", collection: %w[pending approved rejected], include_blank: true, selected: params[:search][:status] %>
+  <%= f.input :order, collection: [%w[Status status_desc], %w[Last\ updated updated_at_desc], %w[Newest id_desc], %w[Oldest id_asc]], include_blank: false, selected: params[:search][:order] %>
+  <%= f.submit "Search" %>
+<% end %>

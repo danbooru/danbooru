@@ -19,13 +19,56 @@ class BulkUpdateRequest < ActiveRecord::Base
   before_validation :normalize_text
   after_create :create_forum_topic
 
+  scope :pending_first, lambda { order("(case status when 'pending' then 0 when 'approved' then 1 else 2 end)") }
+
   module SearchMethods
-    def search(params)
+    def search(params = {})
       q = where("true")
-      return q if params.blank?
 
       if params[:id].present?
         q = q.where("id in (?)", params[:id].split(",").map(&:to_i))
+      end
+
+      if params[:user_name].present?
+        q = q.where(user_id: User.name_to_id(params[:user_name]))
+      end
+
+      if params[:user_id].present?
+        q = q.where(user_id: params[:user_id].split(",").map(&:to_i))
+      end
+
+      if params[:approver_name].present?
+        q = q.where(approver_id: User.name_to_id(params[:approver_name]))
+      end
+
+      if params[:approver_id].present?
+        q = q.where(approver_id: params[:approver_id].split(",").map(&:to_i))
+      end
+
+      if params[:forum_topic_id].present?
+        q = q.where(forum_topic_id: params[:forum_topic_id].split(",").map(&:to_i))
+      end
+
+      if params[:forum_post_id].present?
+        q = q.where(forum_post_id: params[:forum_post_id].split(",").map(&:to_i))
+      end
+
+      if params[:status].present?
+        q = q.where(status: params[:status].split(","))
+      end
+
+      params[:order] ||= "status_desc"
+      case params[:order]
+      when "id_desc"
+        q = q.order(id: :desc)
+      when "id_asc"
+        q = q.order(id: :asc)
+      when "updated_at_desc"
+        q = q.order(updated_at: :desc)
+      when "updated_at_asc"
+        q = q.order(updated_at: :asc)
+      when "status_desc"
+        q = q.pending_first.order(id: :desc)
       end
 
       q
