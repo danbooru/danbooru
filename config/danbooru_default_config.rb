@@ -430,7 +430,7 @@ module Danbooru
 
     # enable s3-nginx proxy caching
     def use_s3_proxy?(post)
-      post.id < 10_000
+      false
     end
 
     # include essential tags in image urls (requires nginx/apache rewrites)
