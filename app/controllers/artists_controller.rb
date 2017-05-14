@@ -55,14 +55,7 @@ class ArtistsController < ApplicationController
   def show
     @artist = Artist.find(params[:id])
     @post_set = PostSets::Artist.new(@artist)
-    respond_with(@artist) do |format|
-      format.xml do
-        render :xml => @artist.to_xml(:include => [:urls])
-      end
-      format.json do
-        render :json => @artist.to_json(:include => [:urls])
-      end
-    end
+    respond_with(@artist, methods: [:domains], include: [:urls])
   end
 
   def create

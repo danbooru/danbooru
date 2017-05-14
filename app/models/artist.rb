@@ -538,10 +538,6 @@ class Artist < ActiveRecord::Base
       super + [:other_names_index]
     end
 
-    def method_attributes
-      super + [:domains]
-    end
-
     def legacy_api_hash
       return {
         :id => id,
