@@ -1,4 +1,4 @@
-<%= simple_form_for(@post, url: replace_moderator_post_post_path, method: :post) do |f| %>
+<%= simple_form_for(post_replacement, url: post_replacements_path(post_id: post_replacement.post_id), method: :post) do |f| %>
   <h1>Replace Image</h1>
 
   <p>
@@ -7,5 +7,5 @@
     lower-quality images, such as image samples, to higher-quality versions.
   </p>
 
-  <%= f.input :source, label: "New Source", input_html: { value: "" } %>
+  <%= f.input :replacement_url, label: "New Source", input_html: { value: "" } %>
 <% end %>

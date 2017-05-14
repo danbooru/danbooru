@@ -1429,9 +1429,12 @@ class Post < ActiveRecord::Base
       ModAction.log("undeleted post ##{id}")
     end
 
-    def replace!(url)
-      replacement = replacements.create(replacement_url: url)
-      replacement.process!
+    def replace!(params)
+      transaction do
+        replacement = replacements.create(params)
+        replacement.process!
+        replacement
+      end
     end
   end
 

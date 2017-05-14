@@ -55,7 +55,7 @@
         <li><%= link_to "Expunge", expunge_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "expunge", :data => {:confirm => "This will permanently delete this post (meaning the file will be deleted). Are you sure you want to delete this post?"} %></li>
       <% end %>
 
-      <li><%= link_to "Replace Image", replace_moderator_post_post_path(:post_id => post.id), :id => "replace-image" %></li>
+      <li><%= link_to "Replace Image", new_post_replacement_path(:post_id => post.id), :id => "replace-image" %></li>
 
       <li id="mobile-version-list"><%= link_to "Mobile version", mobile_post_path(post) %></li>
     <% end %>
