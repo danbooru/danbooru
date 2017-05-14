@@ -30,7 +30,7 @@ class ArtistCommentary < ActiveRecord::Base
       end
 
       if params[:post_id].present?
-        q = q.where("post_id = ?", params[:post_id].to_i)
+        q = q.where(post_id: params[:post_id].split(",").map(&:to_i))
       end
 
       if params[:original_present] == "yes"

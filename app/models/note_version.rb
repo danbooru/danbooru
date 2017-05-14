@@ -9,15 +9,15 @@ class NoteVersion < ActiveRecord::Base
     params = {} if params.blank?
 
     if params[:updater_id]
-      q = q.where("updater_id = ?", params[:updater_id].to_i)
+      q = q.where(updater_id: params[:updater_id].split(",").map(&:to_i))
     end
 
     if params[:post_id]
-      q = q.where("post_id = ?", params[:post_id].to_i)
+      q = q.where(post_id: params[:post_id].split(",").map(&:to_i))
     end
 
     if params[:note_id]
-      q = q.where("note_id = ?", params[:note_id].to_i)
+      q = q.where(note_id: params[:note_id].split(",").map(&:to_i))
     end
 
     q

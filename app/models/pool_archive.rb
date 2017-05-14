@@ -19,7 +19,7 @@ class PoolArchive < ActiveRecord::Base
       return q if params.blank?
 
       if params[:updater_id].present?
-        q = q.for_user(params[:updater_id].to_i)
+        q = q.where(updater_id: params[:updater_id].split(",").map(&:to_i))
       end
 
       if params[:updater_name].present?
@@ -27,7 +27,7 @@ class PoolArchive < ActiveRecord::Base
       end
 
       if params[:pool_id].present?
-        q = q.where("pool_id = ?", params[:pool_id].to_i)
+        q = q.where(pool_id: params[:pool_id].split(",").map(&:to_i))
       end
 
       q

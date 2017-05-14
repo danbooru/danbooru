@@ -56,7 +56,7 @@ class Note < ActiveRecord::Base
       end
 
       if params[:post_id].present?
-        q = q.where("post_id = ?", params[:post_id].to_i)
+        q = q.where(post_id: params[:post_id].split(",").map(&:to_i))
       end
 
       if params[:post_tags_match].present?
@@ -68,7 +68,7 @@ class Note < ActiveRecord::Base
       end
 
       if params[:creator_id].present?
-        q = q.where("creator_id = ?", params[:creator_id].to_i)
+        q = q.where(creator_id: params[:creator_id].split(",").map(&:to_i))
       end
 
       q

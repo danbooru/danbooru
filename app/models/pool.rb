@@ -71,7 +71,7 @@ class Pool < ActiveRecord::Base
       end
 
       if params[:creator_id].present?
-        q = q.where("creator_id = ?", params[:creator_id].to_i)
+        q = q.where(creator_id: params[:creator_id].split(",").map(&:to_i))
       end
 
       if params[:is_active] == "true"
