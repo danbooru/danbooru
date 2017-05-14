@@ -61,4 +61,32 @@ class PostReplacement < ActiveRecord::Base
     post.distribute_files
     post.update_iqdb_async
   end
+
+  module SearchMethods
+    def search(params = {})
+      q = all
+
+      if params[:creator_id].present?
+        q = q.where(creator_id: params[:creator_id].split(",").map(&:to_i))
+      end
+
+      if params[:creator_name].present?
+        q = q.where(creator_name: User.name_to_id(params[:creator_name]))
+      end
+
+      if params[:id].present?
+        q = q.where(id: params[:id].split(",").map(&:to_i))
+      end
+
+      if params[:post_id].present?
+        q = q.where(post_id: params[:post_id].split(",").map(&:to_i))
+      end
+
+      q = q.order("created_at DESC")
+
+      q
+    end
+  end
+
+  extend SearchMethods
 end
