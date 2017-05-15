@@ -76,7 +76,7 @@ module Sources
         end
         
         @artist_name = @metadata.name
-        @profile_url = get_profile_from_page(page)
+        @profile_url = "http://www.pixiv.net/member.php?id=#{@metadata.user_id}"
         @pixiv_moniker = @metadata.moniker
         @zip_url, @ugoira_frame_data, @ugoira_content_type = get_zip_url_from_page(page)
         @tags = @metadata.tags.map do |tag|
@@ -224,20 +224,6 @@ module Sources
         else
           0
         end
-      end
-
-      def get_profile_from_page(page)
-        profile_url = page.search("a.user-link").first
-        if profile_url
-          profile_url = "http://www.pixiv.net" + profile_url["href"]
-        end
-
-        artist_name = page.search("h1.user").first
-        if artist_name
-          artist_name = artist_name.inner_text
-        end
-
-        return [artist_name, profile_url]
       end
 
       def get_moniker_from_page(page)
