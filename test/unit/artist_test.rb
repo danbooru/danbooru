@@ -115,6 +115,18 @@ class ArtistTest < ActiveSupport::TestCase
       assert_equal("kokoko", artist.wiki_page.body)
     end
 
+    should "not bump the wiki page when notes are unchanged" do
+      artist = FactoryGirl.create(:artist, name: "bkub", notes: "honk honk")
+      updater_name_was = artist.wiki_page.updater_name
+      updated_at_was = artist.wiki_page.updated_at
+
+      updater = FactoryGirl.create(:user)
+      CurrentUser.scoped(updater) { artist.update(notes: "honk honk") }
+
+      assert_equal(updater_name_was, artist.wiki_page.updater_name)
+      assert_equal(updated_at_was, artist.wiki_page.updated_at)
+    end
+
     should "normalize its name" do
       artist = FactoryGirl.create(:artist, :name => "  AAA BBB  ")
       assert_equal("aaa_bbb", artist.name)

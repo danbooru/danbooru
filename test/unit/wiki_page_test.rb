@@ -67,6 +67,21 @@ class WikiPageTest < ActiveSupport::TestCase
         assert_equal("hot_potato", matches.first.title)
       end
 
+      should "change the updater if the wiki changed" do
+        updater = FactoryGirl.create(:user)
+        CurrentUser.scoped(updater) { @wiki_page.update(title: "honk honk") }
+
+        assert_equal(updater.id, @wiki_page.updater_id)
+      end
+
+      should "not change the updater if the wiki didn't change" do
+        updater = FactoryGirl.create(:user)
+
+        assert_no_difference("@wiki_page.updater_id") do
+          CurrentUser.scoped(updater) { @wiki_page.update(title: "HOT POTATO") }
+        end
+      end
+
       should "create versions" do
         assert_difference("WikiPageVersion.count") do
           @wiki_page = FactoryGirl.create(:wiki_page, :title => "xxx")
