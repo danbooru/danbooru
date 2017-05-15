@@ -204,8 +204,8 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when finding pixiv artists" do
       setup do
-        FactoryGirl.create(:artist, :name => "masao",:url_string => "http://i2.pixiv.net/img04/img/syounen_no_uta/")
-        FactoryGirl.create(:artist, :name => "bkub", :url_string => "http://i1.pixiv.net/img01/img/bkubb/")
+        FactoryGirl.create(:artist, :name => "masao",:url_string => "http://www.pixiv.net/member.php?id=32777")
+        FactoryGirl.create(:artist, :name => "bkub", :url_string => "http://www.pixiv.net/member.php?id=9948")
         FactoryGirl.create(:artist, :name => "ryuura", :url_string => "http://www.pixiv.net/member.php?id=8678371")
       end
 
