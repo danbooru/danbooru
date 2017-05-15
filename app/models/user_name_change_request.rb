@@ -37,10 +37,6 @@ class UserNameChangeRequest < ActiveRecord::Base
     status == "pending"
   end
   
-  def desired_name=(name)
-    super(User.normalize_name(name))
-  end
-  
   def feedback
     UserFeedback.for_user(user_id).order("id desc")
   end

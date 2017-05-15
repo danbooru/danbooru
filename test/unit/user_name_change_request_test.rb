@@ -91,6 +91,13 @@ class UserNameChangeRequestTest < ActiveSupport::TestCase
           assert_equal(["Desired name already exists"], req.errors.full_messages)
         end
       end
+
+      should "not convert the desired name to lower case" do
+        uncr = FactoryGirl.create(:user_name_change_request, user: @requester, original_name: "provence.", desired_name: "Provence")
+        CurrentUser.scoped(@admin) { uncr.approve! }
+
+        assert_equal("Provence", @requester.name)
+      end
     end
   end
 end
