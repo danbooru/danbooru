@@ -13,6 +13,11 @@
       this.initialize_similar();
       $("#related-tags-button").trigger("click");
       $("#find-artist-button").trigger("click");
+
+      $("#toggle-artist-commentary").click(function(e) {
+        Danbooru.Upload.toggle_commentary();
+        e.preventDefault();
+      });
     }
 
     if ($("#iqdb-similar").length) {
@@ -105,6 +110,7 @@
 
     $("#upload_artist_commentary_title").val(data.artist_commentary.dtext_title);
     $("#upload_artist_commentary_desc").val(data.artist_commentary.dtext_description);
+    Danbooru.Upload.toggle_commentary();
 
     $("#source-info span#loading-data").hide();
     $("#source-info ul").show();
@@ -133,6 +139,16 @@
       $("#image-resize-to-window-link").click(Danbooru.Upload.update_scale);
     }
   }
+
+  Danbooru.Upload.toggle_commentary = function() {
+    if ($(".artist-commentary").is(":visible")) {
+      $("#toggle-artist-commentary").text("show »");
+    } else {
+      $("#toggle-artist-commentary").text("« hide");
+    }
+
+    $(".artist-commentary").slideToggle();
+  };
 })();
 
 $(function() {

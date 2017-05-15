@@ -29,3 +29,5 @@
 <% content_for(:page_title) do %>
   Comments - <%= Danbooru.config.app_name %>
 <% end %>
+
+<% content_for(:html_header, auto_discovery_link_tag(:atom, comments_url(:atom, search: params[:search]), title: "Comments")) %>

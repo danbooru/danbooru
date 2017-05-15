@@ -73,11 +73,13 @@
         <li><h1>Comments</h1></li>
         <li><%= link_to("Help", wiki_pages_path(:title => "help:comments")) %></li>
         <li><%= link_to("Listing", comments_path) %></li>
+        <li><%= link_to("RSS", comments_path(:atom)) %></li>
       </ul>
       <ul>
         <li><h1>Forum</h1></li>
         <li><%= link_to("Help", wiki_pages_path(:title => "help:forum")) %></li>
         <li><%= link_to("Listing", forum_topics_path) %></li>
+        <li><%= link_to("RSS", forum_topics_path(:atom)) %></li>
       </ul>
       <ul>
         <li><h1>Wiki</h1></li>

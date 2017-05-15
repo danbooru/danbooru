@@ -4,7 +4,7 @@ class CommentsController < ApplicationController
   skip_before_filter :api_check
 
   def index
-    if params[:group_by] == "comment"
+    if params[:group_by] == "comment" || request.format == Mime::ATOM
       index_by_comment
     elsif request.format == Mime::JS
       index_for_post
@@ -92,6 +92,10 @@ private
     @comments = Comment.search(params[:search]).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@comments) do |format|
       format.html {render :action => "index_by_comment"}
+      format.atom do
+        @comments = @comments.includes(:post, :creator).load
+        render :action => "index"
+      end
       format.xml do
         render :xml => @comments.to_xml(:root => "comments")
       end
