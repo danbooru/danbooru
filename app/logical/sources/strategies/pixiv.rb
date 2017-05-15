@@ -42,7 +42,7 @@ module Sources
       end
 
       def normalized_for_artist_finder?
-        url =~ %r!https?://img\.pixiv\.net/img/#{MONIKER}/?$!i
+        url =~ %r!\Ahttp://www\.pixiv\.net/member\.php\?id=[0-9]+\z/!
       end
 
       def normalizable_for_artist_finder?
@@ -50,15 +50,10 @@ module Sources
       end
 
       def normalize_for_artist_finder!
-        if has_moniker?
-          moniker = get_moniker_from_url
-        else
-          @illust_id = illust_id_from_url!
-          @metadata = get_metadata_from_papi(@illust_id)
-          moniker = @metadata.moniker
-        end
+        @illust_id = illust_id_from_url!
+        @metadata = get_metadata_from_papi(@illust_id)
 
-        "http://img.pixiv.net/img/#{moniker}/"
+        "http://www.pixiv.net/member.php?id=#{@metadata.user_id}/"
       end
 
       def get

@@ -23,7 +23,7 @@ class ArtistsControllerTest < ActionController::TestCase
       CurrentUser.ip_addr = "127.0.0.1"
       @artist = FactoryGirl.create(:artist, :notes => "message")
 
-      @masao = FactoryGirl.create(:artist, :name => "masao",   :url_string => "http://i2.pixiv.net/img04/img/syounen_no_uta/")
+      @masao = FactoryGirl.create(:artist, :name => "masao",   :url_string => "http://www.pixiv.net/member.php?id=32777")
       @artgerm = FactoryGirl.create(:artist, :name => "artgerm", :url_string => "http://artgerm.deviantart.com/")
     end
 
