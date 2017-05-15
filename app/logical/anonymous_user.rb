@@ -257,6 +257,10 @@ class AnonymousUser
     false
   end
 
+  def ban_expired?
+    false
+  end
+
   %w(member banned gold builder platinum moderator admin).each do |name|
     define_method("is_#{name}?") do
       false
