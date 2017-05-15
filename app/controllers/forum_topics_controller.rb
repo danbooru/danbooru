@@ -20,9 +20,15 @@ class ForumTopicsController < ApplicationController
 
   def index
     @query = ForumTopic.active.search(params[:search])
-    @forum_topics = @query.includes([:creator, :updater]).order("is_sticky DESC, updated_at DESC").paginate(params[:page], :limit => per_page, :search_count => params[:search])
+    @forum_topics = @query.order("is_sticky DESC, updated_at DESC").paginate(params[:page], :limit => per_page, :search_count => params[:search])
 
     respond_with(@forum_topics) do |format|
+      format.html do
+        @forum_topics = @forum_topics.includes(:creator, :updater).load
+      end
+      format.atom do
+        @forum_topics = @forum_topics.includes(:creator, :original_post).load
+      end
       format.json do
         render :json => @forum_topics.to_json
       end
@@ -37,8 +43,11 @@ class ForumTopicsController < ApplicationController
       @forum_topic.mark_as_read!(CurrentUser.user)
     end
     @forum_posts = ForumPost.search(:topic_id => @forum_topic.id).order("forum_posts.id").paginate(params[:page])
-    @forum_posts.each # hack to force rails to eager load
-    respond_with(@forum_topic)
+    respond_with(@forum_topic) do |format|
+      format.atom do
+        @forum_posts = @forum_posts.includes(:creator).load
+      end
+    end
   end
 
   def create

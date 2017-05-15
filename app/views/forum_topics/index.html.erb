@@ -22,3 +22,5 @@
 <% content_for(:page_title) do %>
   Forum - <%= Danbooru.config.app_name %>
 <% end %>
+
+<% content_for(:html_header, auto_discovery_link_tag(:atom, forum_topics_url(:atom), title: "Forum Topics")) %>

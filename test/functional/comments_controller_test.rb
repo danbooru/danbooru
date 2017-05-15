@@ -36,6 +36,11 @@ class CommentsControllerTest < ActionController::TestCase
         get :index, {:group_by => "comment"}
         assert_response :success
       end
+
+      should "render for atom feeds" do
+        get :index, {:format => "atom"}
+        assert_response :success
+      end
     end
 
     context "search action" do

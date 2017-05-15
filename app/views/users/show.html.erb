@@ -15,3 +15,6 @@
 <% content_for(:page_title) do %>
   User - <%= @presenter.name %> - <%= Danbooru.config.app_name %>
 <% end %>
+
+<% content_for(:html_header, auto_discovery_link_tag(:atom, comments_url(:atom, search: { post_tags_match: "user:#{@user.name}" }), title: "Comments on #{@user.name}'s uploads")) %>
+<% content_for(:html_header, auto_discovery_link_tag(:atom, comments_url(:atom, search: { post_tags_match: "commenter:#{@user.name}" }), title: "Comments on posts commented on by #{@user.name}")) %>
