@@ -79,7 +79,9 @@ module Sources
         @profile_url = get_profile_from_page(page)
         @pixiv_moniker = @metadata.moniker
         @zip_url, @ugoira_frame_data, @ugoira_content_type = get_zip_url_from_page(page)
-        @tags = @metadata.tags
+        @tags = @metadata.tags.map do |tag|
+          [tag, "https://www.pixiv.net/search.php?s_mode=s_tag_full&#{{word: tag}.to_param}"]
+        end
         @page_count = @metadata.page_count
         @artist_commentary_title = @metadata.artist_commentary_title
         @artist_commentary_desc = @metadata.artist_commentary_desc
@@ -296,30 +298,6 @@ module Sources
           content_type = data["mime_type"]
 
           return [zip_url, frame_data, content_type]
-        end
-      end
-
-      def get_tags_from_page(page)
-        # puts page.root.to_xhtml
-
-        links = page.search("ul.tags a.text").find_all do |node|
-          node["href"] =~ /search\.php/
-        end
-
-        original_flag = page.search("a.original-works")
-
-        if links.any?
-          links.map! do |node|
-            [node.inner_text, "http://www.pixiv.net" + node.attr("href")]
-          end
-
-          if original_flag.any?
-            links << ["オリジナル", "http://www.pixiv.net/search.php?s_mode=s_tag_full&word=%E3%82%AA%E3%83%AA%E3%82%B8%E3%83%8A%E3%83%AB"]
-          end
-
-          links
-        else
-          []
         end
       end
 
