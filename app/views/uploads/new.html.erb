@@ -69,14 +69,17 @@
           <%= f.text_field :parent_id %>
         </div>
 
-        <div>
+        <strong>Commentary</strong>
+        <a href="#" id="toggle-artist-commentary">show »</a>
+
+        <div class="artist-commentary" style="display: none;">
           <div class="input">
-            <%= f.label :artist_commentary_title, "Artist Commentary Title" %>
+            <%= f.label :artist_commentary_title, "Title" %>
             <%= f.text_field :artist_commentary_title %>
           </div>
 
           <div class="input">
-            <%= f.label :artist_commentary_desc, "Artist Commentary" %>
+            <%= f.label :artist_commentary_desc, "Description" %>
             <%= f.text_area :artist_commentary_desc, :size => "60x5" %>
           </div>
 
