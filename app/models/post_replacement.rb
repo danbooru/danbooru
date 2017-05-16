@@ -50,8 +50,8 @@ class PostReplacement < ActiveRecord::Base
       post.source = upload.source
       post.tag_string = upload.tag_string
 
-      post.comments.create!({creator: User.system, body: post.presenter.comment_replacement_message(creator), do_not_bump_post: true}, without_protection: true)
-      ModAction.log(post.presenter.modaction_replacement_message)
+      post.comments.create!({creator: User.system, body: comment_replacement_message, do_not_bump_post: true}, without_protection: true)
+      ModAction.log(modaction_replacement_message)
 
       post.save!
     end
@@ -88,5 +88,55 @@ class PostReplacement < ActiveRecord::Base
     end
   end
 
+  module PresenterMethods
+    def comment_replacement_message
+      "@#{creator.name} replaced this post with a new image:\n\n#{replacement_message}"
+    end
+
+    def modaction_replacement_message
+      "replaced post ##{post.id}:\n\n#{replacement_message}"
+    end
+
+    def replacement_message
+      linked_source = linked_source(post.source)
+      linked_source_was = linked_source(post.source_was)
+
+      <<-EOS.strip_heredoc
+        [table]
+          [tbody]
+            [tr]
+              [th]Old[/th]
+              [td]#{linked_source_was}[/td]
+              [td]#{post.md5_was}[/td]
+              [td]#{post.file_ext_was}[/td]
+              [td]#{post.image_width_was} x #{post.image_height_was}[/td]
+              [td]#{post.file_size_was.to_s(:human_size, precision: 4)}[/td]
+            [/tr]
+            [tr]
+              [th]New[/th]
+              [td]#{linked_source}[/td]
+              [td]#{post.md5}[/td]
+              [td]#{post.file_ext}[/td]
+              [td]#{post.image_width} x #{post.image_height}[/td]
+              [td]#{post.file_size.to_s(:human_size, precision: 4)}[/td]
+            [/tr]
+          [/tbody]
+        [/table]
+      EOS
+    end
+
+    def linked_source(source)
+      # truncate long sources in the middle: "www.pixiv.net...lust_id=23264933"
+      truncated_source = source.gsub(%r{\Ahttps?://}, "").truncate(64, omission: "...#{source.last(32)}")
+
+      if source =~ %r{\Ahttps?://}i
+        %("#{truncated_source}":[#{source}])
+      else
+        truncated_source
+      end
+    end
+  end
+
+  include PresenterMethods
   extend SearchMethods
 end
