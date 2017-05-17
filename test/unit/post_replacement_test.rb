@@ -102,6 +102,27 @@ class PostReplacementTest < ActiveSupport::TestCase
       end
     end
 
+    context "a post with notes" do
+      setup do
+        @post.update({image_width: 160, image_height: 164}, without_protection: true)
+        CurrentUser.scoped(@uploader, "127.0.0.1") do
+          @note = @post.notes.create(x: 80, y: 82, width: 80, height: 82, body: "test")
+        end
+      end
+
+      should "rescale the notes" do
+        assert_equal([80, 82, 80, 82], [@note.x, @note.y, @note.width, @note.height])
+
+        assert_difference("@replacer.note_versions.count") do
+          # replacement image is 80x82, so we're downscaling by 50% (160x164 -> 80x82).
+          @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
+          @note.reload
+        end
+
+        assert_equal([40, 41, 40, 41], [@note.x, @note.y, @note.width, @note.height])
+      end
+    end
+
     context "a post with a pixiv html source" do
       should "replace with the full size image" do
         @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")

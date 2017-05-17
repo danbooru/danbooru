@@ -17,11 +17,6 @@ class PostReplacement < ActiveRecord::Base
   end
 
   def process!
-    # TODO for posts with notes we need to rescale the notes if the dimensions change.
-    if post.notes.any?
-      raise NotImplementedError.new("Replacing images with notes not yet supported.")
-    end
-
     # TODO for ugoiras we need to replace the frame data.
     if post.is_ugoira?
       raise NotImplementedError.new("Replacing ugoira images not yet supported.")
@@ -49,6 +44,7 @@ class PostReplacement < ActiveRecord::Base
       post.file_size = upload.file_size
       post.source = upload.source
       post.tag_string = upload.tag_string
+      rescale_notes
 
       post.comments.create!({creator: User.system, body: comment_replacement_message, do_not_bump_post: true}, without_protection: true)
       ModAction.log(modaction_replacement_message)
@@ -60,6 +56,15 @@ class PostReplacement < ActiveRecord::Base
     # only after the transaction successfully commits.
     post.distribute_files
     post.update_iqdb_async
+  end
+
+  def rescale_notes
+    x_scale = post.image_width.to_f  / post.image_width_was.to_f
+    y_scale = post.image_height.to_f / post.image_height_was.to_f
+
+    post.notes.each do |note|
+      note.rescale!(x_scale, y_scale)
+    end
   end
 
   module SearchMethods
