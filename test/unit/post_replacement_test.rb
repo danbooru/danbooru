@@ -94,7 +94,11 @@ class PostReplacementTest < ActiveSupport::TestCase
 
         assert_not_nil(comment)
         assert_equal(User.system.id, comment.creator_id)
-        assert_match(/@#{@replacer.name} replaced this post/, comment.body)
+        assert_match(/replaced this post/, comment.body)
+      end
+
+      should "not send an @mention to the replacer" do
+        assert_equal(0, @replacer.dmails.size)
       end
     end
 

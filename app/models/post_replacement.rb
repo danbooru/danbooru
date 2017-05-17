@@ -90,7 +90,7 @@ class PostReplacement < ActiveRecord::Base
 
   module PresenterMethods
     def comment_replacement_message
-      "@#{creator.name} replaced this post with a new image:\n\n#{replacement_message}"
+      %("#{creator.name}":[/users/#{creator.id}] replaced this post with a new image:\n\n#{replacement_message})
     end
 
     def modaction_replacement_message
