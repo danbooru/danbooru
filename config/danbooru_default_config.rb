@@ -271,6 +271,10 @@ module Danbooru
       "help:appeal_notice"
     end
 
+    def replacement_notice_wiki_page
+      "help:replacement_notice"
+    end
+
     # The number of posts displayed per page.
     def posts_per_page
       20

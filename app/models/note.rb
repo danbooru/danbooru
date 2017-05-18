@@ -127,6 +127,14 @@ class Note < ActiveRecord::Base
     User.id_to_name(creator_id)
   end
 
+  def rescale!(x_scale, y_scale)
+    self.x *= x_scale
+    self.y *= y_scale
+    self.width *= x_scale
+    self.height *= y_scale
+    save!
+  end
+
   def update_post
     if self.changed?
       if Note.where(:is_active => true, :post_id => post_id).exists?

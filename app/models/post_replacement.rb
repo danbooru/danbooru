@@ -17,11 +17,6 @@ class PostReplacement < ActiveRecord::Base
   end
 
   def process!
-    # TODO for posts with notes we need to rescale the notes if the dimensions change.
-    if post.notes.any?
-      raise NotImplementedError.new("Replacing images with notes not yet supported.")
-    end
-
     # TODO for ugoiras we need to replace the frame data.
     if post.is_ugoira?
       raise NotImplementedError.new("Replacing ugoira images not yet supported.")
@@ -49,9 +44,10 @@ class PostReplacement < ActiveRecord::Base
       post.file_size = upload.file_size
       post.source = upload.source
       post.tag_string = upload.tag_string
+      rescale_notes
 
-      post.comments.create!({creator: User.system, body: post.presenter.comment_replacement_message(creator), do_not_bump_post: true}, without_protection: true)
-      ModAction.log(post.presenter.modaction_replacement_message)
+      post.comments.create!({creator: User.system, body: comment_replacement_message, do_not_bump_post: true}, without_protection: true)
+      ModAction.log(modaction_replacement_message)
 
       post.save!
     end
@@ -60,6 +56,15 @@ class PostReplacement < ActiveRecord::Base
     # only after the transaction successfully commits.
     post.distribute_files
     post.update_iqdb_async
+  end
+
+  def rescale_notes
+    x_scale = post.image_width.to_f  / post.image_width_was.to_f
+    y_scale = post.image_height.to_f / post.image_height_was.to_f
+
+    post.notes.each do |note|
+      note.rescale!(x_scale, y_scale)
+    end
   end
 
   module SearchMethods
@@ -88,5 +93,55 @@ class PostReplacement < ActiveRecord::Base
     end
   end
 
+  module PresenterMethods
+    def comment_replacement_message
+      %("#{creator.name}":[/users/#{creator.id}] replaced this post with a new image:\n\n#{replacement_message})
+    end
+
+    def modaction_replacement_message
+      "replaced post ##{post.id}:\n\n#{replacement_message}"
+    end
+
+    def replacement_message
+      linked_source = linked_source(post.source)
+      linked_source_was = linked_source(post.source_was)
+
+      <<-EOS.strip_heredoc
+        [table]
+          [tbody]
+            [tr]
+              [th]Old[/th]
+              [td]#{linked_source_was}[/td]
+              [td]#{post.md5_was}[/td]
+              [td]#{post.file_ext_was}[/td]
+              [td]#{post.image_width_was} x #{post.image_height_was}[/td]
+              [td]#{post.file_size_was.to_s(:human_size, precision: 4)}[/td]
+            [/tr]
+            [tr]
+              [th]New[/th]
+              [td]#{linked_source}[/td]
+              [td]#{post.md5}[/td]
+              [td]#{post.file_ext}[/td]
+              [td]#{post.image_width} x #{post.image_height}[/td]
+              [td]#{post.file_size.to_s(:human_size, precision: 4)}[/td]
+            [/tr]
+          [/tbody]
+        [/table]
+      EOS
+    end
+
+    def linked_source(source)
+      # truncate long sources in the middle: "www.pixiv.net...lust_id=23264933"
+      truncated_source = source.gsub(%r{\Ahttps?://}, "").truncate(64, omission: "...#{source.last(32)}")
+
+      if source =~ %r{\Ahttps?://}i
+        %("#{truncated_source}":[#{source}])
+      else
+        truncated_source
+      end
+    end
+  end
+
+  include PresenterMethods
   extend SearchMethods
 end
