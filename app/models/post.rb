@@ -1355,7 +1355,7 @@ class Post < ActiveRecord::Base
       end
 
       ModAction.log("permanently deleted post ##{id}")
-      delete!(:without_mod_action => true)
+      delete!("Permanently deleted post ##{id}", :without_mod_action => true)
       Post.without_timeout do
         give_favorites_to_parent
         update_children_on_destroy
@@ -1377,13 +1377,15 @@ class Post < ActiveRecord::Base
       ModAction.log("unbanned post ##{id}")
     end
 
-    def delete!(options = {})
+    def delete!(reason, options = {})
       if is_status_locked?
         self.errors.add(:is_status_locked, "; cannot delete post")
         return false
       end
 
       Post.transaction do
+        flag!(reason, is_deletion: true)
+
         self.is_deleted = true
         self.is_pending = false
         self.is_flagged = false
@@ -1398,11 +1400,7 @@ class Post < ActiveRecord::Base
         update_parent_on_save
 
         unless options[:without_mod_action]
-          if options[:reason]
-            ModAction.log("deleted post ##{id}, reason: #{options[:reason]}")
-          else
-            ModAction.log("deleted post ##{id}")
-          end
+          ModAction.log("deleted post ##{id}, reason: #{reason}")
         end
       end
     end
