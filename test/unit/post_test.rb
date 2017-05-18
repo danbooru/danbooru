@@ -80,7 +80,7 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "fail" do
-          @post.delete!
+          @post.delete!("test")
           assert_equal(["Is status locked ; cannot delete post"], @post.errors.full_messages)
           assert_equal(1, Post.where("id = ?", @post.id).count)
         end
@@ -89,7 +89,7 @@ class PostTest < ActiveSupport::TestCase
       context "with the banned_artist tag" do
         should "also ban the post" do
           post = FactoryGirl.create(:post, :tag_string => "banned_artist")
-          post.delete!
+          post.delete!("test")
           post.reload
           assert(post.is_banned?)
         end
@@ -100,7 +100,7 @@ class PostTest < ActiveSupport::TestCase
         post = FactoryGirl.create(:post, :tag_string => "aaa")
         assert_equal(1, Post.fast_count)
         assert_equal(1, Post.fast_count("aaa"))
-        post.delete!
+        post.delete!("test")
         assert_equal(1, Post.fast_count)
         assert_equal(1, Post.fast_count("aaa"))
       end
@@ -108,14 +108,14 @@ class PostTest < ActiveSupport::TestCase
       should "toggle the is_deleted flag" do
         post = FactoryGirl.create(:post)
         assert_equal(false, post.is_deleted?)
-        post.delete!
+        post.delete!("test")
         assert_equal(true, post.is_deleted?)
       end
 
       should "not decrement the tag counts" do
         post = FactoryGirl.create(:post, :tag_string => "aaa")
         assert_equal(1, Tag.find_by_name("aaa").post_count)
-        post.delete!
+        post.delete!("test")
         assert_equal(1, Tag.find_by_name("aaa").post_count)
       end
     end
@@ -209,7 +209,7 @@ class PostTest < ActiveSupport::TestCase
           c1 = FactoryGirl.create(:post, :parent_id => p1.id)
           user = FactoryGirl.create(:gold_user)
           c1.add_favorite!(user)
-          c1.delete!
+          c1.delete!("test")
           p1.reload
           assert(Favorite.exists?(:post_id => c1.id, :user_id => user.id))
           assert(!Favorite.exists?(:post_id => p1.id, :user_id => user.id))
@@ -220,7 +220,7 @@ class PostTest < ActiveSupport::TestCase
           c1 = FactoryGirl.create(:post, :parent_id => p1.id)
           user = FactoryGirl.create(:gold_user)
           c1.add_favorite!(user)
-          c1.delete!(:move_favorites => true)
+          c1.delete!("test", :move_favorites => true)
           p1.reload
           assert(!Favorite.exists?(:post_id => c1.id, :user_id => user.id), "Child should not still have favorites")
           assert(Favorite.exists?(:post_id => p1.id, :user_id => user.id), "Parent should have favorites")
@@ -229,7 +229,7 @@ class PostTest < ActiveSupport::TestCase
         should "not update the parent's has_children flag" do
           p1 = FactoryGirl.create(:post)
           c1 = FactoryGirl.create(:post, :parent_id => p1.id)
-          c1.delete!
+          c1.delete!("test")
           p1.reload
           assert(p1.has_children?, "Parent should have children")
         end
@@ -239,7 +239,7 @@ class PostTest < ActiveSupport::TestCase
         should "not remove the has_children flag" do
           p1 = FactoryGirl.create(:post)
           c1 = FactoryGirl.create(:post, :parent_id => p1.id)
-          p1.delete!
+          p1.delete!("test")
           p1.reload
           assert_equal(true, p1.has_children?)
         end
@@ -247,7 +247,7 @@ class PostTest < ActiveSupport::TestCase
         should "not remove the parent of that child" do
           p1 = FactoryGirl.create(:post)
           c1 = FactoryGirl.create(:post, :parent_id => p1.id)
-          p1.delete!
+          p1.delete!("test")
           c1.reload
           assert_not_nil(c1.parent)
         end
@@ -259,7 +259,7 @@ class PostTest < ActiveSupport::TestCase
           c1 = FactoryGirl.create(:post, :parent_id => p1.id)
           c2 = FactoryGirl.create(:post, :parent_id => p1.id)
           c3 = FactoryGirl.create(:post, :parent_id => p1.id)
-          p1.delete!
+          p1.delete!("test")
           c1.reload
           c2.reload
           c3.reload
@@ -275,7 +275,7 @@ class PostTest < ActiveSupport::TestCase
         new_user = FactoryGirl.create(:moderator_user)
         p1 = FactoryGirl.create(:post)
         c1 = FactoryGirl.create(:post, :parent_id => p1.id)
-        c1.delete!
+        c1.delete!("test")
         CurrentUser.scoped(new_user, "127.0.0.1") do
           c1.undelete!
         end
@@ -286,7 +286,7 @@ class PostTest < ActiveSupport::TestCase
       should "preserve the parent's has_children flag" do
         p1 = FactoryGirl.create(:post)
         c1 = FactoryGirl.create(:post, :parent_id => p1.id)
-        c1.delete!
+        c1.delete!("test")
         c1.undelete!
         p1.reload
         assert_not_nil(c1.parent_id)

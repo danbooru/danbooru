@@ -13,11 +13,10 @@ protected
     CurrentUser.scoped(User.system, "127.0.0.1") do
       Post.where("is_deleted = ? and is_pending = ? and created_at < ?", false, true, 3.days.ago).each do |post|
         begin
-          post.flag!("Unapproved in three days")
+          post.delete!("Unapproved in three days")
         rescue PostFlag::Error
           # swallow
         end
-        post.delete!
       end
     end
   end
@@ -27,11 +26,10 @@ protected
       Post.where("is_deleted = ? and is_flagged = ?", false, true).each do |post|
         if post.flags.unresolved.old.any?
           begin
-            post.flag!("Unapproved in three days after returning to moderation queue")
+            post.delete!("Unapproved in three days after returning to moderation queue")
           rescue PostFlag::Error
             # swallow
           end
-          post.delete!
         end
       end
     end
