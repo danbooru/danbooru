@@ -95,6 +95,17 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      context "that is still in cooldown after being flagged" do
+        should "succeed" do
+          post = FactoryGirl.create(:post)
+          post.flag!("test flag")
+          post.delete!("test deletion")
+
+          assert_equal(true, post.is_deleted)
+          assert_equal(2, post.flags.size)
+        end
+      end
+
       should "update the fast count" do
         Danbooru.config.stubs(:estimate_post_counts).returns(false)
         post = FactoryGirl.create(:post, :tag_string => "aaa")
