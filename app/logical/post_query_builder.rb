@@ -392,28 +392,28 @@ class PostQueryBuilder
       relation = relation.order("posts.id DESC")
 
     when "score", "score_desc"
-      relation = relation.order("posts.score DESC")
+      relation = relation.order("posts.score DESC, posts.id DESC")
 
     when "score_asc"
-      relation = relation.order("posts.score ASC")
+      relation = relation.order("posts.score ASC, posts.id ASC")
 
     when "favcount"
-      relation = relation.order("posts.fav_count DESC")
+      relation = relation.order("posts.fav_count DESC, posts.id DESC")
 
     when "favcount_asc"
-      relation = relation.order("posts.fav_count ASC")
+      relation = relation.order("posts.fav_count ASC, posts.id ASC")
 
     when "change", "change_desc"
-      relation = relation.order("posts.updated_at DESC")
+      relation = relation.order("posts.updated_at DESC, posts.id DESC")
 
     when "change_asc"
-      relation = relation.order("posts.updated_at ASC")
+      relation = relation.order("posts.updated_at ASC, posts.id ASC")
 
     when "comment", "comm"
-      relation = relation.order("posts.last_commented_at DESC NULLS LAST")
+      relation = relation.order("posts.last_commented_at DESC NULLS LAST, posts.id DESC")
 
     when "comment_asc", "comm_asc"
-      relation = relation.order("posts.last_commented_at ASC NULLS LAST")
+      relation = relation.order("posts.last_commented_at ASC NULLS LAST, posts.id ASC")
 
     when "comment_bumped"
       relation = relation.order("posts.last_comment_bumped_at DESC NULLS LAST")
