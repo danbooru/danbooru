@@ -419,7 +419,7 @@ class PostQueryBuilder
       relation = relation.order("posts.last_comment_bumped_at DESC NULLS LAST")
 
     when "comment_bumped_asc"
-      relation = relation.order("posts.last_comment_bumped_at ASC NULLS LAST")
+      relation = relation.order("posts.last_comment_bumped_at ASC NULLS FIRST")
 
     when "note"
       relation = relation.order("posts.last_noted_at DESC NULLS LAST")

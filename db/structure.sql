@@ -6896,14 +6896,14 @@ CREATE INDEX index_posts_on_image_width ON posts USING btree (image_width);
 -- Name: index_posts_on_last_comment_bumped_at; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_posts_on_last_comment_bumped_at ON posts USING btree (last_comment_bumped_at);
+CREATE INDEX index_posts_on_last_comment_bumped_at ON posts USING btree (last_comment_bumped_at DESC NULLS LAST);
 
 
 --
 -- Name: index_posts_on_last_noted_at; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_posts_on_last_noted_at ON posts USING btree (last_noted_at);
+CREATE INDEX index_posts_on_last_noted_at ON posts USING btree (last_noted_at DESC NULLS LAST);
 
 
 --
@@ -7544,4 +7544,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170428220448');
 INSERT INTO schema_migrations (version) VALUES ('20170512221200');
 
 INSERT INTO schema_migrations (version) VALUES ('20170515235205');
+
+INSERT INTO schema_migrations (version) VALUES ('20170519204506');
 
