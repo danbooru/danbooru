@@ -6599,6 +6599,13 @@ CREATE INDEX index_forum_topics_on_creator_id ON forum_topics USING btree (creat
 
 
 --
+-- Name: index_forum_topics_on_is_sticky_and_updated_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_forum_topics_on_is_sticky_and_updated_at ON forum_topics USING btree (is_sticky, updated_at);
+
+
+--
 -- Name: index_forum_topics_on_text_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7535,4 +7542,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170416224142');
 INSERT INTO schema_migrations (version) VALUES ('20170428220448');
 
 INSERT INTO schema_migrations (version) VALUES ('20170512221200');
+
+INSERT INTO schema_migrations (version) VALUES ('20170515235205');
 
