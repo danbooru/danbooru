@@ -104,7 +104,7 @@ class Dmail < ActiveRecord::Base
 
     def title_matches(query)
       query = "*#{query}*" unless query =~ /\*/
-      where("lower(dmails.title) LIKE ?", query.to_escaped_for_sql_like)
+      where("lower(dmails.title) LIKE ?", query.mb_chars.downcase.to_escaped_for_sql_like)
     end
 
     def search_message(query)
