@@ -20,9 +20,13 @@ module Sources::Strategies
       "Twitter"
     end
 
-    def get
+    def api_response
       status_id = status_id_from_url(url)
-      attrs = TwitterService.new.client.status(status_id).attrs
+      @api_response ||= TwitterService.new.client.status(status_id)
+    end
+
+    def get
+      attrs = api_response.attrs
       @artist_name = attrs[:user][:name]
       @profile_url = "https://twitter.com/" + attrs[:user][:screen_name]
       @image_url = image_urls.first
