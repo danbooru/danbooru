@@ -45,7 +45,7 @@ class ForumTopicsController < ApplicationController
     @forum_posts = ForumPost.search(:topic_id => @forum_topic.id).order("forum_posts.id").paginate(params[:page])
     respond_with(@forum_topic) do |format|
       format.atom do
-        @forum_posts = @forum_posts.includes(:creator).load
+        @forum_posts = @forum_posts.reverse_order.includes(:creator).load
       end
     end
   end
