@@ -163,6 +163,18 @@ module ApplicationHelper
     string += '</div>'
     string.html_safe
   end
+
+  def body_attributes(user = CurrentUser.user)
+    attributes = [:id, :name, :level, :level_string, :can_approve_posts?, :can_upload_free?]
+    attributes += User::Roles.map { |role| :"is_#{role}?" }
+
+    attributes.map do |attr|
+      name = attr.to_s.dasherize.delete("?")
+      value = user.send(attr)
+
+      %{data-user-#{name}="#{h(value)}"}
+    end.join(" ").html_safe
+  end
   
 protected
   def nav_link_match(controller, url)
