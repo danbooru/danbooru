@@ -129,7 +129,7 @@ a.blacklisted-active {
 }
 
 /* Flagged posts have red borders for approvers. */
-body[data-can-approve-posts="true"] .post-preview {
+body[data-user-can-approve-posts="true"] .post-preview {
   &.post-status-flagged img {
     border-color: $preview_flagged_color;
   }

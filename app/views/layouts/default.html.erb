@@ -69,7 +69,7 @@
   }
   </script>
 </head>
-<body lang="en" data-can-approve-posts="<%= CurrentUser.user.can_approve_posts? %>">
+<body lang="en" <%= body_attributes(CurrentUser.user) %>>
   <header id="top">
     <%= render "news_updates/listing" %>
 
