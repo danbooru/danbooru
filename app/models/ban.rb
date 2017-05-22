@@ -19,7 +19,7 @@ class Ban < ActiveRecord::Base
 
   def self.reason_matches(query)
     if query =~ /\*/
-      where("lower(bans.reason) LIKE ?", query.to_escaped_for_sql_like)
+      where("lower(bans.reason) LIKE ?", query.mb_chars.downcase.to_escaped_for_sql_like)
     else
       where("bans.reason @@ plainto_tsquery(?)", query)
     end

@@ -78,6 +78,9 @@ class DmailTest < ActiveSupport::TestCase
         matches = Dmail.search(title_matches: "x")
         assert_equal([dmail.id], matches.map(&:id))
 
+        matches = Dmail.search(title_matches: "X")
+        assert_equal([dmail.id], matches.map(&:id))
+
         matches = Dmail.search(message_matches: "xxx")
         assert_equal([dmail.id], matches.map(&:id))
 
