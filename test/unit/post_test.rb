@@ -86,6 +86,20 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      context "that is pending" do
+        setup do
+          @post = FactoryGirl.create(:post, is_pending: true)
+        end
+
+        should "succeed" do
+          @post.delete!("test")
+
+          assert_equal(true, @post.is_deleted)
+          assert_equal(1, @post.flags.size)
+          assert_match(/test/, @post.flags.last.reason)
+        end
+      end
+
       context "with the banned_artist tag" do
         should "also ban the post" do
           post = FactoryGirl.create(:post, :tag_string => "banned_artist")

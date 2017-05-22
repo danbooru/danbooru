@@ -64,6 +64,13 @@ class PostFlagTest < ActiveSupport::TestCase
         assert_equal(["Post is deleted"], @post_flag.errors.full_messages)
       end
 
+      should "not be able to flag a pending post" do
+        @post.update_columns(is_pending: true)
+        @flag = @post.flags.create(reason: "test")
+
+        assert_equal(["Post is pending and cannot be flagged"], @flag.errors.full_messages)
+      end
+
       should "not be able to flag a post in the cooldown period" do
         users = FactoryGirl.create_list(:user, 2, created_at: 2.weeks.ago)
         flag1 = FactoryGirl.create(:post_flag, post: @post, creator: users.first)
