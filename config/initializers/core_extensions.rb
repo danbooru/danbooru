@@ -2,7 +2,18 @@ module Danbooru
   module Extensions
     module String
       def to_escaped_for_sql_like
-        return self.gsub(/\\/, '\0\0').gsub(/(%|_)/, "\\\\\\1").gsub(/\*/, '%')
+        string = self.gsub(/%|_|\*|\\\*|\\\\|\\/) do |str|
+          case str
+          when '%'    then '\%'
+          when '_'    then '\_'
+          when '*'    then '%'
+          when '\*'   then '*'
+          when '\\\\' then '\\\\'
+          when '\\'   then '\\\\'
+          end
+        end
+
+        string
       end
 
       def to_escaped_for_tsquery_split
