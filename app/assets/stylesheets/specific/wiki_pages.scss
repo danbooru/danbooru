@@ -1,40 +1,19 @@
-div#c-wiki-pages, div#excerpt {
-  span.version {
-    color: #AAA;
-  }
-
-  div.notice {
-    font-size: 0.8em;
-    padding: 1em;
-    margin: 1em 0;
-  }
-  
-  del {
-    background: #FCC;
-    text-decoration: none;
-  }
-
-  ins {
-    background: #CFC;
-    text-decoration: none;
-  }
-
-  table {
-    margin-bottom: 1em;
-  }
-
-  #content {
-    margin-left: 15em;
-    padding-left: 1em;
-  }
-
-  .hint {
+div#c-wiki-pages {
+  form span.hint {
     display: block;
   }
 
-  .other-name {
-    background-color: #EEE;
-    padding: 3px;
-    border-radius: 3px;
+  #a-new {
+    div.notice {
+      font-size: 0.8em;
+      padding: 1em;
+      margin: 1em 0;
+    }
   }
+}
+
+.wiki-other-name {
+  background-color: #EEE;
+  padding: 3px;
+  border-radius: 3px;
 }

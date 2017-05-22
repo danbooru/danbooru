@@ -1,0 +1,11 @@
+div#c-post-events {
+  #a-index {
+    tr.resolved-true {
+      background: #DDD;
+    }
+
+    tr.resolved-false {
+      background: #FFF;
+    }
+  }
+}

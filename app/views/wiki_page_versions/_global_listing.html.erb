@@ -1,0 +1,38 @@
+<div id="p-global-listing">
+  <table width="100%" class="striped">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th width="3%">Del</th>
+        <th width="5%"></th>
+        <% if CurrentUser.is_moderator? %>
+          <th width="10%">IP Address</th>
+        <% end %>
+        <th width="26%">Last edited</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @wiki_page_versions.each do |wiki_page_version| %>
+        <tr>
+          <td class="category-<%= wiki_page_version.category_name %>">
+            <%= link_to wiki_page_version.title, wiki_page_version_path(wiki_page_version) %>
+          </td>
+          <td><%= wiki_page_version.is_deleted? ? "Y" : "" %></td>
+          <td><%= link_to "wiki", wiki_page_path(wiki_page_version.wiki_page_id) %></td>
+          <% if CurrentUser.is_moderator? %>
+            <td>
+              <%= link_to_ip wiki_page_version.updater_ip_addr %>
+            </td>
+          <% end %>
+          <td>
+            <%= compact_time(wiki_page_version.updated_at) %>
+            <% if wiki_page_version.updater %>
+              by
+              <%= link_to_user wiki_page_version.updater %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

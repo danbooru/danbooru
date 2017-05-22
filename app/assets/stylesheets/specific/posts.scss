@@ -482,30 +482,6 @@ div#c-post-versions, div#c-artist-versions {
     a {
       word-wrap: break-word
     }
-
-    tr.hilite {
-      background: $highlight_color;
-    }
-
-    ins, ins a {
-      color: green;
-      text-decoration: none;
-      margin-right: 0.5em;
-    }
-
-    ins.obsolete, ins.obsolete a {
-      color: darkGreen;
-    }
-
-    del, del a {
-      color: red;
-      text-decoration: line-through;
-      margin-right: 0.5em;
-    }
-
-    del.obsolete, del.obsolete a {
-      color: darkRed;
-    }
   }
 }
 

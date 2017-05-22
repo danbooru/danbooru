@@ -3,9 +3,13 @@
     <h1>IP Addresses</h1>
 
     <% if params[:search][:user_id].present? || params[:search][:user_name].present? %>
-      <%= render "ip_listing" %>
+      <div id="p-ip-listing">
+        <%= render "ip_listing" %>
+      </div>
     <% else %>
-      <%= render "user_listing" %>
+      <div id="p-user-listing">
+        <%= render "user_listing" %>
+      </div>
     <% end %>
   </div>
 </div>
