@@ -72,6 +72,10 @@ class ForumTopic < ActiveRecord::Base
       q = permitted
       return q if params.blank?
 
+      if params[:id].present?
+        q = q.where(id: params[:id].split(",").map(&:to_i))
+      end
+
       if params[:mod_only].present?
         q = q.where("min_level >= ?", MIN_LEVELS[:Moderator])
       end
