@@ -90,6 +90,7 @@ class PostPresenter < Presenter
       data-preview-file-url="#{post.preview_file_url}"
       data-source="#{h(post.source)}"
       data-normalized-source="#{h(post.normalized_source)}"
+      data-is-favorited="#{post.favorited_by?(CurrentUser.user.id)}"
     }.html_safe
   end
 
