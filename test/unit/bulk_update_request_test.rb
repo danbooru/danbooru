@@ -106,5 +106,18 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         assert_match(/\[REJECTED\]/, @topic.title)
       end
     end
+
+    context "when searching" do
+      setup do
+        @bur1 = FactoryGirl.create(:bulk_update_request, title: "foo", script: "create alias aaa -> bbb", user_id: @admin.id)
+        @bur2 = FactoryGirl.create(:bulk_update_request, title: "bar", script: "create implication bbb -> ccc", user_id: @admin.id)
+        @bur1.approve!(@admin)
+      end
+
+      should "work" do
+        assert_equal([@bur2.id, @bur1.id], BulkUpdateRequest.search.map(&:id))
+        assert_equal([@bur1.id], BulkUpdateRequest.search(user_name: @admin.name, approver_name: @admin.name, status: "approved").map(&:id))
+      end
+    end
   end
 end

@@ -46,7 +46,7 @@ class BulkUpdateRequestsController < ApplicationController
   end
 
   def index
-    @bulk_update_requests = BulkUpdateRequest.search(params[:search]).order("(case status when 'pending' then 0 when 'approved' then 1 else 2 end), id desc").paginate(params[:page], :limit => params[:limit])
+    @bulk_update_requests = BulkUpdateRequest.search(params[:search]).paginate(params[:page], :limit => params[:limit])
     respond_with(@bulk_update_requests)
   end
 
