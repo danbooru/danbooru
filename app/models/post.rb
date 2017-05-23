@@ -954,7 +954,7 @@ class Post < ActiveRecord::Base
     end
 
     def favorited_by?(user_id)
-      fav_string =~ /(?:\A| )fav:#{user_id}(?:\Z| )/
+      fav_string.split.include?("fav:#{user_id}")
     end
 
     def append_user_to_fav_string(user_id)
