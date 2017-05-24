@@ -43,6 +43,8 @@
 <% end %>
 
 <%= content_for(:html_header) do %>
+  <%= auto_discovery_link_tag(:atom, {format: :atom}, {title: @forum_topic.title}) %>
+
   <script>
     $(function() {
       $("#new-response-link").click(function(e) {
@@ -57,5 +59,3 @@
     });
   </script>
 <% end %>
-
-<% content_for(:html_header, auto_discovery_link_tag(:atom, forum_topics_url(@forum_topic, :atom), title: @forum_topic.title)) %>

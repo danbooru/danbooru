@@ -2,6 +2,7 @@ atom_feed do |feed|
   title = "Comments"
   title += " by #{params[:search][:creator_name]}" if params.dig(:search, :creator_name).present?
   title += " on #{params[:search][:post_tags_match]}" if params.dig(:search, :post_tags_match).present?
+  title += " on post ##{params[:search][:post_id]}" if params.dig(:search, :post_id).present?
 
   feed.title(title)
   feed.updated(@comments.first.try(:updated_at))
