@@ -40,10 +40,18 @@ class WikiPage < ActiveRecord::Base
       end
     end
 
-    def other_names_match(names)
-      names = names.map{|name| name.to_escaped_for_tsquery}
-      query_sql = names.join(" | ")
+    def other_names_equal(names)
+      query_sql = names.map(&:to_escaped_for_tsquery).join(" | ")
       where("other_names_index @@ to_tsquery('danbooru', E?)", query_sql)
+    end
+
+    def other_names_match(name)
+      if name =~ /\*/
+        subquery = WikiPage.from("unnest(string_to_array(other_names, ' ')) AS other_name").where("other_name ILIKE ?", name.to_escaped_for_sql_like)
+        where(id: subquery)
+      else
+        other_names_equal([name])
+      end
     end
 
     def search(params = {})
@@ -63,7 +71,7 @@ class WikiPage < ActiveRecord::Base
       end
 
       if params[:other_names_match].present?
-        q = q.other_names_match(params[:other_names_match].split(" "))
+        q = q.other_names_match(params[:other_names_match])
       end
 
       if params[:creator_name].present?

@@ -54,7 +54,7 @@ module Sources
           tag
         end
       end
-      WikiPage.other_names_match(untranslated_tags).map{|wiki_page| [wiki_page.title, wiki_page.category_name]}
+      WikiPage.other_names_equal(untranslated_tags).map{|wiki_page| [wiki_page.title, wiki_page.category_name]}
     end
 
     def to_h
