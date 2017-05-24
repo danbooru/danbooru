@@ -682,7 +682,7 @@ class Tag < ActiveRecord::Base
 
     def update_related_if_outdated
       if should_update_related?
-        if post_count < COSINE_SIMILARITY_RELATED_TAG_THRESHOLD && Delayed::Job.count < 200
+        if post_count < COSINE_SIMILARITY_RELATED_TAG_THRESHOLD
           delay(:queue => "default").update_related
         elsif post_count >= COSINE_SIMILARITY_RELATED_TAG_THRESHOLD
           key = Cache.sanitize(name)
