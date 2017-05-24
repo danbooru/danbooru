@@ -399,7 +399,7 @@ class Artist < ActiveRecord::Base
       else
         nil
       end
-    rescue
+    rescue Exception
       nil
     end
 
