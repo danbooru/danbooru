@@ -848,7 +848,7 @@ class PostTest < ActiveSupport::TestCase
           should "clear the source with source:none" do
             @post.update(:source => "foobar")
             @post.update(:tag_string => "source:none")
-            assert_nil(@post.source)
+            assert_equal("", @post.source)
           end
 
           should "set the pixiv id with source:https://img18.pixiv.net/img/evazion/14901720.png" do
@@ -1204,7 +1204,7 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "merge any parent, source, and rating changes that were made after loading the initial set" do
-          post = FactoryGirl.create(:post, :parent => nil, :source => nil, :rating => "q")
+          post = FactoryGirl.create(:post, :parent => nil, :source => "", :rating => "q")
           parent_post = FactoryGirl.create(:post)
 
           # user a changes rating to safe, adds parent
@@ -2349,7 +2349,7 @@ class PostTest < ActiveSupport::TestCase
     context "a post that has been updated" do
       setup do
         PostArchive.sqs_service.stubs(:merge?).returns(false)
-        @post = FactoryGirl.create(:post, :rating => "q", :tag_string => "aaa", :source => nil)
+        @post = FactoryGirl.create(:post, :rating => "q", :tag_string => "aaa", :source => "")
         @post.update_attributes(:tag_string => "aaa bbb ccc ddd")
         @post.update_attributes(:tag_string => "bbb xxx yyy", :source => "xyz")
         @post.update_attributes(:tag_string => "bbb mmm yyy", :source => "abc")
@@ -2362,7 +2362,7 @@ class PostTest < ActiveSupport::TestCase
 
         should "correctly revert all fields" do
           assert_equal("aaa bbb ccc ddd", @post.tag_string)
-          assert_nil(@post.source)
+          assert_equal("", @post.source)
           assert_equal("q", @post.rating)
         end
       end

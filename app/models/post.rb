@@ -818,7 +818,7 @@ class Post < ActiveRecord::Base
           end
 
         when /^source:none$/i
-          self.source = nil
+          self.source = ""
 
         when /^source:"(.*)"$/i
           self.source = $1
