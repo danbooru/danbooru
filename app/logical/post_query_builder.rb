@@ -175,7 +175,7 @@ class PostQueryBuilder
     # URLs unchanged.  This is to ease database load for Pixiv source searches.
     if q[:source]
       if q[:source] == "none%"
-        relation = relation.where("(posts.source = '' OR posts.source IS NULL)")
+        relation = relation.where("posts.source = ''")
       elsif q[:source] == "http%"
         relation = relation.where("(lower(posts.source) like ?)", "http%")
       elsif q[:source] =~ /^(?:https?:\/\/)?%\.?pixiv(?:\.net(?:\/img)?)?(?:%\/img\/|%\/|(?=%$))(.+)$/i
@@ -189,7 +189,7 @@ class PostQueryBuilder
 
     if q[:source_neg]
       if q[:source_neg] == "none%"
-        relation = relation.where("(posts.source != '' AND posts.source IS NOT NULL)")
+        relation = relation.where("posts.source != ''")
       elsif q[:source_neg] == "http%"
         relation = relation.where("(lower(posts.source) not like ?)", "http%")
       elsif q[:source_neg] =~ /^(?:https?:\/\/)?%\.?pixiv(?:\.net(?:\/img)?)?(?:%\/img\/|%\/|(?=%$))(.+)$/i

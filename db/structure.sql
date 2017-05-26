@@ -2773,7 +2773,7 @@ CREATE TABLE posts (
     up_score integer DEFAULT 0 NOT NULL,
     down_score integer DEFAULT 0 NOT NULL,
     score integer DEFAULT 0 NOT NULL,
-    source character varying,
+    source character varying DEFAULT ''::character varying NOT NULL,
     md5 character varying NOT NULL,
     rating character(1) DEFAULT 'q'::bpchar NOT NULL,
     is_note_locked boolean DEFAULT false NOT NULL,
@@ -7546,4 +7546,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170512221200');
 INSERT INTO schema_migrations (version) VALUES ('20170515235205');
 
 INSERT INTO schema_migrations (version) VALUES ('20170519204506');
+
+INSERT INTO schema_migrations (version) VALUES ('20170526183928');
 
