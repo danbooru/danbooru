@@ -1042,22 +1042,26 @@ class Post < ActiveRecord::Base
     def add_pool!(pool, force = false)
       return if belongs_to_pool?(pool)
       return if pool.is_deleted? && !force
-      reload
-      self.pool_string = "#{pool_string} pool:#{pool.id}".strip
-      set_pool_category_pseudo_tags
-      update_column(:pool_string, pool_string) unless new_record?
-      pool.add!(self)
+
+      with_lock do
+        self.pool_string = "#{pool_string} pool:#{pool.id}".strip
+        set_pool_category_pseudo_tags
+        update_column(:pool_string, pool_string) unless new_record?
+        pool.add!(self)
+      end
     end
 
     def remove_pool!(pool, force = false)
       return unless belongs_to_pool?(pool)
       return unless CurrentUser.user.can_remove_from_pools?
       return if pool.is_deleted? && !force
-      reload
-      self.pool_string = pool_string.gsub(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ").strip
-      set_pool_category_pseudo_tags
-      update_column(:pool_string, pool_string) unless new_record?
-      pool.remove!(self)
+
+      with_lock do
+        self.pool_string = pool_string.gsub(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ").strip
+        set_pool_category_pseudo_tags
+        update_column(:pool_string, pool_string) unless new_record?
+        pool.remove!(self)
+      end
     end
 
     def remove_from_all_pools

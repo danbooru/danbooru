@@ -246,9 +246,11 @@ class Pool < ActiveRecord::Base
     return if contains?(post.id)
     return if is_deleted?
 
-    update_attributes(:post_ids => add_number_to_string(post.id, post_ids), :post_count => post_count + 1)
-    post.add_pool!(self, true)
-    clear_post_id_array
+    with_lock do
+      update_attributes(:post_ids => add_number_to_string(post.id, post_ids), :post_count => post_count + 1)
+      post.add_pool!(self, true)
+      clear_post_id_array
+    end
   end
 
   def remove!(post)
@@ -256,9 +258,11 @@ class Pool < ActiveRecord::Base
     return unless CurrentUser.user.can_remove_from_pools?
     return if is_deleted?
 
-    update_attributes(:post_ids => remove_number_from_string(post.id, post_ids), :post_count => post_count - 1)
-    post.remove_pool!(self, true)
-    clear_post_id_array
+    with_lock do
+      update_attributes(:post_ids => remove_number_from_string(post.id, post_ids), :post_count => post_count - 1)
+      post.remove_pool!(self, true)
+      clear_post_id_array
+    end
   end
 
   def add_number_to_string(number, string)
