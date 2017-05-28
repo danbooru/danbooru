@@ -12,8 +12,6 @@ module Moderator
 
       CurrentUser.without_safe_mode do
         CurrentUser.scoped(updater, updater_ip_addr) do
-          ModAction.log("processed mass update: #{antecedent} -> #{consequent}")
-
           ::Post.tag_match(antecedent).where("true /* Moderator::TagBatchChange#perform */").find_each do |post|
             post.reload
             tags = (post.tag_array - normalized_antecedent + normalized_consequent).join(" ")
@@ -31,6 +29,8 @@ module Moderator
           end
         end
       end
+
+      ModAction.log("processed mass update: #{antecedent} -> #{consequent}")
     end
   end
 end
