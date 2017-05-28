@@ -25,7 +25,7 @@ module Moderator
           conds = [conds, *tags.map {|x| "%#{x.to_escaped_for_sql_like}%"}]
           if SavedSearch.enabled?
             SavedSearch.where(*conds).find_each do |ss|
-              ss.query = (ss.query_array - tags + [consequent]).uniq.join(" ")
+              ss.query = (ss.query.split - tags + [consequent]).uniq.join(" ")
               ss.save
             end
           end
