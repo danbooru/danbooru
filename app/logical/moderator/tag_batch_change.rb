@@ -12,8 +12,6 @@ module Moderator
 
       CurrentUser.without_safe_mode do
         CurrentUser.scoped(updater, updater_ip_addr) do
-          ModAction.log("processed mass update: #{antecedent} -> #{consequent}")
-
           ::Post.tag_match(antecedent).where("true /* Moderator::TagBatchChange#perform */").find_each do |post|
             post.reload
             tags = (post.tag_array - normalized_antecedent + normalized_consequent).join(" ")
@@ -25,12 +23,14 @@ module Moderator
           conds = [conds, *tags.map {|x| "%#{x.to_escaped_for_sql_like}%"}]
           if SavedSearch.enabled?
             SavedSearch.where(*conds).find_each do |ss|
-              ss.query = (ss.query_array - tags + [consequent]).uniq.join(" ")
+              ss.query = (ss.query.split - tags + [consequent]).uniq.join(" ")
               ss.save
             end
           end
         end
       end
+
+      ModAction.log("processed mass update: #{antecedent} -> #{consequent}")
     end
   end
 end
