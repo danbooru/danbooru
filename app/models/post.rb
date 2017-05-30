@@ -1593,6 +1593,17 @@ class Post < ActiveRecord::Base
       where("md5 >= ?", key).reorder("md5 asc").first
     end
 
+    def sample(query, sample_size)
+      CurrentUser.without_safe_mode do
+        tag_match(query).reorder(:md5).limit(sample_size)
+      end
+    end
+
+    # unflattens the tag_string into one tag per row.
+    def with_unflattened_tags
+      joins("CROSS JOIN unnest(string_to_array(tag_string, ' ')) AS tag")
+    end
+
     def pending
       where("is_pending = ?", true)
     end
