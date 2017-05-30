@@ -44,6 +44,7 @@ class Artist < ActiveRecord::Base
           url = File.dirname(url) + "/"
           break if url =~ /pixiv\.net\/(?:img\/)?$/i
           break if url =~ /lohas\.nicoseiga\.jp\/priv\/$/i
+          break if url =~ /nicovideo\.jp\/user\/illust/
           break if url =~ /(?:data|media)\.tumblr\.com\/[a-z0-9]+\/$/i
           break if url =~ /deviantart\.net\//i
           break if url =~ %r!\Ahttps?://(?:mobile\.)?twitter\.com/\Z!i

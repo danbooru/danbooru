@@ -1,6 +1,8 @@
 module Sources
   module Strategies
     class NicoSeiga < Base
+      extend Memoist
+      
       def self.url_match?(url)
         url =~ /^https?:\/\/(?:\w+\.)?nico(?:seiga|video)\.jp/
       end
@@ -25,8 +27,9 @@ module Sources
       def get
         page = load_page
 
-        @artist_name, @profile_url = get_profile_from_page(page)
+        @artist_name, @profile_url = get_profile_from_api
         @image_url = get_image_url_from_page(page)
+        @artist_commentary_title, @artist_commentary_desc = get_artist_commentary_from_api
 
         # Log out before getting the tags.
         # The reason for this is that if you're logged in and viewing a non-adult-rated work, the tags will be added with javascript after the page has loaded meaning we can't extract them easily.
@@ -47,11 +50,24 @@ module Sources
 
       def normalize_for_artist_finder!
         page = load_page
-        @artist_name, @profile_url = get_profile_from_page(page)
-        profile_url
+        @illust_id = get_illust_id_from_url
+        @artist_name, @profile_url = get_profile_from_api
+        @profile_url + "/"
       end
 
     protected
+
+      def api_client
+        NicoSeigaApiClient.new(get_illust_id_from_url)
+      end
+
+      def get_illust_id_from_url
+        if normalized_url =~ %r!http://seiga.nicovideo.jp/seiga/im(\d+)!
+          $1.to_i
+        else
+          nil
+        end
+      end
 
       def load_page
         page = agent.get(normalized_url)
@@ -66,18 +82,8 @@ module Sources
         page
       end
 
-      def get_profile_from_page(page)
-        links = page.search("li a").select {|x| x["href"] =~ /user\/illust/}
-
-        if links.any?
-          profile_url = "http://seiga.nicovideo.jp" + links[0]["href"]
-          artist_name = links[0].search("span")[0].children[0].text
-        else
-          profile_url = nil
-          artist_name = nil
-        end
-
-        return [artist_name, profile_url].compact
+      def get_profile_from_api
+        return [api_client.moniker, "http://seiga.nicovideo.jp/user/illust/#{api_client.user_id}"]
       end
 
       def get_image_url_from_page(page)
@@ -106,6 +112,10 @@ module Sources
         links.map do |node|
           [node.text, "http://seiga.nicovideo.jp" + node.attr("href")]
         end
+      end
+
+      def get_artist_commentary_from_api
+        [api_client.title, api_client.desc]
       end
 
       def normalized_url
@@ -163,6 +173,8 @@ module Sources
           mech
         end
       end
+
+      memoize :api_client
     end
   end
 end

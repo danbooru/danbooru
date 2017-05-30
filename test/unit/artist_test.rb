@@ -250,6 +250,16 @@ class ArtistTest < ActiveSupport::TestCase
       end
     end
 
+    context "when finding nico seiga artists" do
+      setup do
+        FactoryGirl.create(:artist, :name => "osamari", :url_string => "http://seiga.nicovideo.jp/user/illust/7017777")
+      end
+
+      should "find the artist by the profile" do
+        assert_artist_found("osamari", "http://seiga.nicovideo.jp/seiga/im4937663")
+      end
+    end
+
     context "when finding twitter artists" do
       setup do
         FactoryGirl.create(:artist, :name => "hammer_(sunset_beach)", :url_string => "http://twitter.com/hamaororon")

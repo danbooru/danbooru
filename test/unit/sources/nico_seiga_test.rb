@@ -21,6 +21,11 @@ module Sources
         assert_equal("osamari", @site_2.artist_name)
       end
 
+      should "get the artist commentary" do
+        assert_equal("コジコジ", @site_2.artist_commentary_title)
+        assert_equal("懐かしいですよね。テ また懐かしいものを ", @site_2.artist_commentary_desc)
+      end
+
       should "get the image url" do
         assert_match(/^http:\/\/lohas\.nicoseiga\.jp\/priv\//, @site_1.image_url)
         assert_match(/^http:\/\/lohas\.nicoseiga\.jp\/priv\//, @site_2.image_url)
