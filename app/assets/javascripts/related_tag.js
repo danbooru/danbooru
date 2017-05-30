@@ -12,6 +12,7 @@
 
   Danbooru.RelatedTag.initialize_buttons = function() {
     this.common_bind("#related-tags-button", "");
+    this.common_bind("#related-general-button", "general");
     this.common_bind("#related-artists-button", "artist");
     this.common_bind("#related-characters-button", "character");
     this.common_bind("#related-copyrights-button", "copyright");
