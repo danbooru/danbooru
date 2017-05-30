@@ -165,7 +165,7 @@ class PostFlag < ActiveRecord::Base
 
   def initialize_creator
     self.creator_id ||= CurrentUser.id
-    self.creator_ip_addr ||= CurrentUser.ip_addr
+    self.creator_ip_addr = CurrentUser.ip_addr if creator_ip_addr == "127.0.0.1" || creator_ip_addr.blank?
   end
 
   def resolve!

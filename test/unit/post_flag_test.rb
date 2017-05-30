@@ -7,7 +7,7 @@ class PostFlagTest < ActiveSupport::TestCase
         @alice = FactoryGirl.create(:gold_user)
       end
       CurrentUser.user = @alice
-      CurrentUser.ip_addr = "127.0.0.1"
+      CurrentUser.ip_addr = "127.0.0.2"
       @post = FactoryGirl.create(:post, :tag_string => "aaa")
     end
 
@@ -91,6 +91,7 @@ class PostFlagTest < ActiveSupport::TestCase
       should "initialize its creator" do
         @post_flag = PostFlag.create(:post => @post, :reason => "aaa", :is_resolved => false)
         assert_equal(@alice.id, @post_flag.creator_id)
+        assert_equal(IPAddr.new("127.0.0.2"), @post_flag.creator_ip_addr)
       end
     end
   end
