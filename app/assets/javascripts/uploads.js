@@ -98,7 +98,7 @@
     var new_artist_href = "/artists/new?other_names="
                         + encodeURIComponent(data.artist_name)
                         + "&urls="
-                        + encodeURIComponent([data.profile_url, data.image_url].join("\n"));
+                        + encodeURIComponent($.unique([data.profile_url, data.normalized_for_artist_finder_url]).join("\n"));
 
     $("#source-record").html($("<a>").attr("href", new_artist_href).text("Create New"));
 

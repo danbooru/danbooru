@@ -62,6 +62,7 @@ module Sources
         :artist_name => artist_name,
         :profile_url => profile_url,
         :image_url => image_url,
+        :normalized_for_artist_finder_url => normalize_for_artist_finder!,
         :tags => tags,
         :translated_tags => translated_tags,
         :danbooru_name => artist_record.try(:first).try(:name),
