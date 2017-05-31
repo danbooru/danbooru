@@ -54,6 +54,7 @@ module Sources
           tag
         end
       end
+      untranslated_tags.reject! {|x| x.blank?}
       WikiPage.other_names_equal(untranslated_tags).map{|wiki_page| [wiki_page.title, wiki_page.category_name]}
     end
 
