@@ -79,7 +79,7 @@ class TagSubscriptionTest < ActiveSupport::TestCase
 
       assert_equal(1, CurrentUser.user.subscriptions.size)
       assert_equal(3, CurrentUser.user.saved_searches.size)
-      assert_equal(["bar foo", "bar", "baz"], CurrentUser.user.saved_searches.pluck(:query))
+      assert_equal(["foo bar", "bar", "baz"], CurrentUser.user.saved_searches.pluck(:query))
       assert_equal([%w[artist_1]]*3, CurrentUser.user.saved_searches.pluck(:labels))
     end
   end

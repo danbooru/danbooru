@@ -84,7 +84,7 @@ module Sources
           pixiv_tags  = @site.tags.map(&:first)
           pixiv_links = @site.tags.map(&:last)
 
-          assert_equal(["漫画", "foo", "bar", "tag1", "tag2", "derp", "オリジナル"], pixiv_tags)
+          assert_equal(["漫画", "foo", "bar", "tag1", "tag2", "derp", "鉛筆", "色鉛筆", "シャープペンシル"], pixiv_tags)
           assert_contains(pixiv_links, /search\.php/)
         end
 

@@ -2113,7 +2113,7 @@ class PostTest < ActiveSupport::TestCase
       end
 
       assert_tag_match([post3, post1, post2], "order:comment_bumped")
-      assert_tag_match([post1, post3, post2], "order:comment_bumped_asc")
+      assert_tag_match([post2, post1, post3], "order:comment_bumped_asc")
     end
 
     should "return posts for a filesize search" do

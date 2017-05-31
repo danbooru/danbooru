@@ -17,7 +17,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("https://img.pawoo.net/media_attachments/files/000/128/953/original/4c0a06087b03343f.png?1492461815", @site.image_url)
+        assert_equal("https://img.pawoo.net/media_attachments/files/000/128/953/original/4c0a06087b03343f.png", @site.image_url)
       end
     end
   end
