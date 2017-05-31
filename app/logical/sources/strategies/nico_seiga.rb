@@ -41,7 +41,7 @@ module Sources
       end
 
       def normalized_for_artist_finder?
-        url =~ %r!https?://seiga\.nicovideo\.jp/user/illust/\d+!i
+        url =~ %r!https?://seiga\.nicovideo\.jp/user/illust/\d+/!i
       end
 
       def normalizable_for_artist_finder?
