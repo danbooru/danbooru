@@ -13,6 +13,7 @@ module PostVersionsHelper
     end
     diff[:unchanged_tags].each do |tag|
       html << '<span>' + link_to(wordbreakify(tag), posts_path(:tags => tag)) + '</span>'
+      html << " "
     end
 
     html << "</span>"
