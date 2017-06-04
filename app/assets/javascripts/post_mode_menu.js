@@ -138,7 +138,13 @@
     var $post = $("#post_" + post_id);
     $("#quick-edit-div").slideDown("fast");
     $("#quick-edit-form").attr("action", "/posts/" + post_id + ".json");
-    $("#post_tag_string").val($post.data("tags") + " ").focus().selectEnd().height($("#post_tag_string")[0].scrollHeight);
+    $("#post_tag_string").val($post.data("tags") + " ").focus().selectEnd();
+
+    /* Set height of tag edit box to fit content. */
+    $("#post_tag_string").height(80);  // min height: 80px.
+    var padding = $("#post_tag_string").innerHeight() - $("#post_tag_string").height();
+    var height = $("#post_tag_string").prop("scrollHeight") - padding;
+    $("#post_tag_string").height(height);
   }
 
   Danbooru.PostModeMenu.click = function(e) {
