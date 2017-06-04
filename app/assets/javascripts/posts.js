@@ -512,23 +512,18 @@
   }
 
   Danbooru.Post.approve = function(post_id) {
-    $.ajax({
-      type: "POST",
-      url: "/moderator/post/approval.json",
-      data: {"post_id": post_id},
-      dataType: "json",
-      success: function(data) {
-        if (!data.success) {
-          Danbooru.error("Error: " + data.reason);
-        } else {
-          var $post = $("#post_" + post_id);
-          if ($post.length) {
-            $post.data("flags", $post.data("flags").replace(/pending/, ""));
-            $post.removeClass("post-status-pending");
-          }
-          Danbooru.notice("Approved post #" + post_id);
-          $("#pending-approval-notice").hide();
-        }
+    $.post(
+      "/moderator/post/approval.json",
+      {"post_id": post_id}
+    ).fail(function(data) {
+      var message = $.map(data.responseJSON.errors, function(msg, attr) { return msg; }).join("; ");
+      Danbooru.error("Error: " + message);
+    }).done(function(data) {
+      var $post = $("#post_" + post_id);
+      if ($post.length) {
+        $post.data("flags", $post.data("flags").replace(/pending/, ""));
+        $post.removeClass("post-status-pending");
+        Danbooru.notice("Approved post #" + post_id);
       }
     });
   }

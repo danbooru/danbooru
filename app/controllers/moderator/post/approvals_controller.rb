@@ -9,7 +9,7 @@ module Moderator
         cookies.permanent[:moderated] = Time.now.to_i
         post = ::Post.find(params[:post_id])
         @approval = post.approve!
-        respond_with(@approval)
+        respond_with(:moderator, @approval)
       end
     end
   end
