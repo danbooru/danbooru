@@ -74,9 +74,21 @@ class ForumTopicsControllerTest < ActionController::TestCase
     end
 
     context "index action" do
+      setup do
+        @topic1 = FactoryGirl.create(:forum_topic, :is_sticky => true, :creator => @user, :original_post_attributes => {:body => "xxx"})
+        @topic2 = FactoryGirl.create(:forum_topic, :creator => @user, :original_post_attributes => {:body => "xxx"})
+      end
+
       should "list all forum topics" do
         get :index
         assert_response :success
+      end
+
+      should "not list stickied topics first for JSON responses" do
+        get :index, {format: :json}
+        forum_topics = JSON.parse(response.body)
+
+        assert_equal([@topic2.id, @topic1.id, @forum_topic.id], forum_topics.map {|t| t["id"]})
       end
 
       should "render for atom feed" do
