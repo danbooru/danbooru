@@ -174,6 +174,12 @@
         e.preventDefault();
       });
 
+      if (Danbooru.meta("current-user-can-approve-posts") === "true") {
+        Danbooru.keydown("shift+o", "approve", function(e) {
+          $("#quick-mod-approve").click();
+        });
+      }
+
       Danbooru.keydown("a", "prev_page", Danbooru.Post.nav_prev);
       Danbooru.keydown("d", "next_page", Danbooru.Post.nav_next);
       Danbooru.keydown("f", "favorite", Danbooru.Post.favorite);

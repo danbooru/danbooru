@@ -30,14 +30,6 @@
       });
     }
 
-    if ($("#c-posts").length && $("#a-show").length) {
-      Danbooru.keydown("shift+o", "approve", function(e) {
-        if (Danbooru.meta("current-user-can-approve-posts") === "true") {
-          Danbooru.Post.approve(Danbooru.meta("post-id"));
-        }
-      });
-    }
-
     if ($("#c-posts #a-index, #c-posts #a-show, #c-favorites #a-index").length) {
       Danbooru.keydown("r", "random", function(e) {
         $("#random-post")[0].click();
