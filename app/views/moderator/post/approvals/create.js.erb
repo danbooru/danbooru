@@ -8,7 +8,7 @@ $("#c-posts #approve").hide();
 $("#c-posts #disapprove").hide();
 $("#c-posts #flag").show();
 
-$("#pending-approval-notice").hide();
+$("#pending-approval-notice, .notice-flagged, .notice-appealed").hide();
 
 $("#c-moderator-post-queues #post-<%= @approval.post.id %>").hide();
 Danbooru.notice("Post was approved");
