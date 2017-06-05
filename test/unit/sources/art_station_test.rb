@@ -58,5 +58,17 @@ module Sources
         assert_equal("From Gantz.", @site.artist_commentary_desc)
       end
     end
+
+    context "The source site for a www.artstation.com/artwork/$slug page" do
+      setup do
+        @site = Sources::Site.new("https://www.artstation.com/artwork/cody-from-sf")
+        @site.get
+      end
+
+      should "get the image url" do
+        url = "https://cdna.artstation.com/p/assets/images/images/000/144/922/original/cassio-yoshiyaki-cody2backup2-yoshiyaki.jpg?1406314198"
+        assert_equal(url, @site.image_url)
+      end
+    end
   end
 end
