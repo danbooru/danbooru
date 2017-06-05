@@ -13,6 +13,7 @@ module ArtistVersionsHelper
     end
     diff[:unchanged_names].each do |name|
       html << '<span>' + h(name) + '</span>'
+      html << " "
     end
 
     html << "</span>"
