@@ -5,7 +5,7 @@
       <p class="byline">Find good anime art fast</p>
 
       <%= form_tag(posts_path, :method => :get) do %>
-        <%= text_field_tag "tags", "", :size => 50 %>
+        <%= text_field_tag "tags", "", :size => 50, :data => { :autocomplete => "tag-query" } %>
         <%= submit_tag "Search" %>
       <% end %>
     </header>
