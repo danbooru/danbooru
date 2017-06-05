@@ -3,11 +3,19 @@ module Sources::Strategies
     attr_reader :json, :image_urls
 
     def self.url_match?(url)
-      url =~ %r!^https?://\w+\.artstation\.com/artwork/[a-z0-9]+!i
+      self.project_id(url).present?
+    end
+
+    def self.project_id(url)
+      if url =~ %r!\Ahttps?://\w+\.artstation\.com/(?:artwork|projects)/(?<project_id>[a-z0-9]+)\z!i
+        $~[:project_id]
+      else
+        nil
+      end
     end
 
     def referer_url
-      if @referer_url =~ %r!^https?://\w+\.artstation\.com/artwork/[a-z0-9]+!i
+      if self.class.url_match?(@referer_url)
         @referer_url
       else
         @url
@@ -18,8 +26,16 @@ module Sources::Strategies
       "ArtStation"
     end
 
+    def project_id
+      self.class.project_id(referer_url)
+    end
+
+    def page_url
+      "https://www.artstation.com/artwork/#{project_id}"
+    end
+
     def api_url
-      url.sub(%r!^https?://\w+\.!, "https://www.").sub(%r!/artwork/!, "/projects/") + ".json"
+      "https://www.artstation.com/projects/#{project_id}.json"
     end
 
     def image_url
