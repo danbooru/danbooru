@@ -57,7 +57,7 @@ class AmazonBackup < ActiveRecord::Base
     Post.where("id >= ? and id <= ?", min_id, max_id).find_each do |post|
       if post.has_large?
         puts "large:#{post.id}"
-        key = "sample/sample-" + File.basename(post.large_file_path)
+        key = "sample/" + File.basename(post.large_file_path)
         f.call(key)
       end
 
@@ -108,7 +108,7 @@ class AmazonBackup < ActiveRecord::Base
 
       if post.has_large?
         puts "large:#{post.id}"
-        key = "sample/sample-" + File.basename(post.large_file_path)
+        key = "sample/" + File.basename(post.large_file_path)
         f.call(key)
       end
 
@@ -146,7 +146,7 @@ class AmazonBackup < ActiveRecord::Base
       end
 
       if File.exists?(post.large_file_path)
-        key = "sample/#{post.md5}.#{post.large_file_ext}"
+        key = "sample/#{Danbooru.config.large_image_prefix}#{post.md5}.#{post.large_file_ext}"
         body = open(post.large_file_path, "rb")
         client.put_object(bucket: bucket, key: key, body: body, acl: "public-read")
       end
