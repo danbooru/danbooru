@@ -8,7 +8,7 @@ module Downloads
           if test_original(original_url)
             url = original_url
           end
-        elsif url =~ %r!https?://\w+\.artstation\.com/artwork/!
+        else
           url, headers = rewrite_html_url(url, headers)
         end
 
@@ -22,6 +22,8 @@ module Downloads
       end
 
       def rewrite_html_url(url, headers)
+        return [url, headers] unless Sources::Strategies::ArtStation.url_match?(url)
+
         source = Sources::Site.new(url)
         source.get
         [source.image_url, headers]
