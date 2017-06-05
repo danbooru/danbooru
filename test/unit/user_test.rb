@@ -310,5 +310,17 @@ class UserTest < ActiveSupport::TestCase
         end
       end
     end
+
+    context "when searched by name" do
+      should "match wildcards" do
+        user1 = FactoryGirl.create(:user, :name => "foo")
+        user2 = FactoryGirl.create(:user, :name => "foo*bar")
+        user3 = FactoryGirl.create(:user, :name => "bar\*baz")
+
+        assert_equal([user2.id, user1.id], User.search(name: "foo*").map(&:id))
+        assert_equal([user2.id], User.search(name: "foo\*bar").map(&:id))
+        assert_equal([user3.id], User.search(name: "bar\\\*baz").map(&:id))
+      end
+    end
   end
 end
