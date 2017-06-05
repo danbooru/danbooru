@@ -57,7 +57,7 @@ class AmazonBackup < ActiveRecord::Base
     Post.where("id >= ? and id <= ?", min_id, max_id).find_each do |post|
       if post.has_large?
         puts "large:#{post.id}"
-        key = "sample/" + File.basename(post.large_file_path)
+        key = "sample/sample-" + File.basename(post.large_file_path)
         f.call(key)
       end
 
@@ -108,7 +108,7 @@ class AmazonBackup < ActiveRecord::Base
 
       if post.has_large?
         puts "large:#{post.id}"
-        key = "sample/" + File.basename(post.large_file_path)
+        key = "sample/sample-" + File.basename(post.large_file_path)
         f.call(key)
       end
 
@@ -136,19 +136,19 @@ class AmazonBackup < ActiveRecord::Base
         base64_md5 = Digest::MD5.base64digest(File.read(post.file_path))
         key = File.basename(post.file_path)
         body = open(post.file_path, "rb")
-        client.put_object(bucket: bucket, key: key, body: body, content_md5: base64_md5)
+        client.put_object(bucket: bucket, key: key, body: body, content_md5: base64_md5, acl: "public-read")
       end
 
       if post.has_preview? && File.exists?(post.preview_file_path)
         key = "preview/#{post.md5}.jpg"
         body = open(post.preview_file_path, "rb")
-        client.put_object(bucket: bucket, key: key, body: body)
+        client.put_object(bucket: bucket, key: key, body: body, acl: "public-read")
       end
 
       if File.exists?(post.large_file_path)
         key = "sample/#{post.md5}.#{post.large_file_ext}"
         body = open(post.large_file_path, "rb")
-        client.put_object(bucket: bucket, key: key, body: body)
+        client.put_object(bucket: bucket, key: key, body: body, acl: "public-read")
       end
 
       AmazonBackup.update_id(post.id)
