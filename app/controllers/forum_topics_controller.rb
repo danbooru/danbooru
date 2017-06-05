@@ -19,8 +19,11 @@ class ForumTopicsController < ApplicationController
   end
 
   def index
+    params[:search] ||= {}
+    params[:search][:order] ||= "sticky" if request.format == Mime::HTML
+
     @query = ForumTopic.active.search(params[:search])
-    @forum_topics = @query.order("is_sticky DESC, updated_at DESC").paginate(params[:page], :limit => per_page, :search_count => params[:search])
+    @forum_topics = @query.paginate(params[:page], :limit => per_page, :search_count => params[:search])
 
     respond_with(@forum_topics) do |format|
       format.html do

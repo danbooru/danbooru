@@ -68,9 +68,12 @@ class ForumTopic < ActiveRecord::Base
       where("min_level <= ?", CurrentUser.level)
     end
 
+    def sticky_first
+      order(is_sticky: :desc, updated_at: :desc)
+    end
+
     def search(params)
       q = permitted
-      return q if params.blank?
 
       if params[:id].present?
         q = q.where(id: params[:id].split(",").map(&:to_i))
@@ -90,6 +93,13 @@ class ForumTopic < ActiveRecord::Base
 
       if params[:title].present?
         q = q.where("title = ?", params[:title])
+      end
+
+      case params[:order]
+      when "sticky"
+        q = q.sticky_first
+      else
+        q = q.order(updated_at: :desc)
       end
 
       q
