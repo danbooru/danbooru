@@ -27,5 +27,18 @@ module Downloads
         assert_equal("https://cdna.artstation.com/p/assets/images/images/004/730/278/large/mendel-oh-dragonll.jpg", @download.source)
       end
     end
+
+    context "a download for a https://$artist.artstation.com/projects/$id page" do
+      setup do
+        @source = "https://dantewontdie.artstation.com/projects/YZK5q"
+        @tempfile = Tempfile.new("danbooru-test")
+        @download = Downloads::File.new(@source, @tempfile.path)
+        @download.download!
+      end
+
+      should "download the original image instead" do
+        assert_equal("https://cdna.artstation.com/p/assets/images/images/006/066/534/original/yinan-cui-reika.jpg?1495781565", @download.source)
+      end
+    end
   end
 end
