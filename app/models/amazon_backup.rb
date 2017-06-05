@@ -146,7 +146,7 @@ class AmazonBackup < ActiveRecord::Base
       end
 
       if File.exists?(post.large_file_path)
-        key = "large/#{post.md5}.#{post.large_file_ext}"
+        key = "sample/#{post.md5}.#{post.large_file_ext}"
         body = open(post.large_file_path, "rb")
         client.put_object(bucket: bucket, key: key, body: body)
       end

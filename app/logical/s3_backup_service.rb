@@ -20,7 +20,7 @@ protected
     when :preview
       "preview/#{File.basename(file_path)}"
     when :large
-      "large/#{File.basename(file_path)}"
+      "sample/#{File.basename(file_path)}"
     else
       raise ArgumentError.new("Unknown type: #{type}")
     end
@@ -29,7 +29,7 @@ protected
   def upload_to_s3(key, file_path)
     File.open(file_path, "rb") do |body|
       base64_md5 = Digest::MD5.base64digest(File.read(file_path))
-      client.put_object(bucket: bucket, key: key, body: body, content_md5: base64_md5)
+      client.put_object(acl: "public-read", bucket: bucket, key: key, body: body, content_md5: base64_md5)
     end
   end
 end
