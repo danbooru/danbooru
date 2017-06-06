@@ -23,7 +23,7 @@ module Sources
 
       should "get the artist commentary" do
         assert_equal("コジコジ", @site_2.artist_commentary_title)
-        assert_equal("懐かしいですよね。テ また懐かしいものを ", @site_2.artist_commentary_desc)
+        assert_equal("コジコジのドット絵\nこんなかわいらしい容姿で毒を吐くコジコジが堪らん（切実）", @site_2.artist_commentary_desc)
       end
 
       should "get the image url" do
