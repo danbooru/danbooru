@@ -5,7 +5,7 @@ module Sources
     attr_reader :url, :strategy
     delegate :get, :get_size, :site_name, :artist_name, 
       :profile_url, :image_url, :tags, :artist_record, :unique_id, 
-      :page_count, :file_url, :ugoira_frame_data, :ugoira_content_type, :image_urls,
+      :file_url, :ugoira_frame_data, :ugoira_content_type, :image_urls,
       :artist_commentary_title, :artist_commentary_desc,
       :dtext_artist_commentary_title, :dtext_artist_commentary_desc,
       :rewrite_thumbnails, :illust_id_from_url, :to => :strategy
@@ -63,13 +63,13 @@ module Sources
         :artist_name => artist_name,
         :profile_url => profile_url,
         :image_url => image_url,
+        :image_urls => image_urls,
         :normalized_for_artist_finder_url => normalize_for_artist_finder!,
         :tags => tags,
         :translated_tags => translated_tags,
         :danbooru_name => artist_record.try(:first).try(:name),
         :danbooru_id => artist_record.try(:first).try(:id),
         :unique_id => unique_id,
-        :page_count => page_count,
         :artist_commentary => {
           :title => artist_commentary_title,
           :description => artist_commentary_desc,

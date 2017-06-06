@@ -77,7 +77,7 @@ module Sources
         end
 
         should "get the page count" do
-          assert_equal(3, @site.page_count)
+          assert_equal(3, @site.image_urls.size)
         end
 
         should "get the tags" do
@@ -108,7 +108,7 @@ module Sources
         end
 
         should "get the page count" do
-          assert_equal(1, @site.page_count)
+          assert_equal(1, @site.image_urls.size)
         end
 
         should "get the full size image url" do
