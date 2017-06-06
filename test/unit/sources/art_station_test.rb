@@ -70,5 +70,17 @@ module Sources
         assert_equal(url, @site.image_url)
       end
     end
+
+    context "The source site for an ArtStation gallery" do
+      setup do
+        @site = Sources::Site.new("https://www.artstation.com/artwork/BDxrA")
+        @site.get
+      end
+
+      should "get only image urls, not video urls" do
+        urls = %w[https://cdnb.artstation.com/p/assets/images/images/006/037/253/original/astri-lohne-sjursen-eva.jpg?1495573664]
+        assert_equal(urls, @site.image_urls)
+      end
+    end
   end
 end

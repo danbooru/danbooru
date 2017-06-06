@@ -54,7 +54,8 @@ module Sources::Strategies
           @json = JSON.parse(resp.body)
           @artist_name = json["user"]["username"]
           @profile_url = json["user"]["permalink"]
-          @image_urls = json["assets"].map do |x| 
+          images = json["assets"].select { |asset| asset["asset_type"] == "image" }
+          @image_urls = images.map do |x|
             y, _, _ = image_url_rewriter.rewrite(x["image_url"], nil)
             y
           end
