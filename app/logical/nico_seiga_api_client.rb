@@ -28,15 +28,16 @@ class NicoSeigaApiClient
   end
 
   def parse_artist_xml_response(text)
-    doc = Nokogiri::Slop(text)
-    @moniker = doc.response.user.nickname.content
+    doc = Hash.from_xml(text)
+    @moniker = doc["response"]["user"]["nickname"]
   end
 
   def parse_illust_xml_response(text)
-    doc = Nokogiri::Slop(text)
-    @image_id = doc.response.image.id.content.to_i
-    @user_id = doc.response.image.user_id.content.to_i
-    @title = doc.response.image.title.content
-    @desc = [doc.response.image.description.try(:content), doc.response.image.summary.try(:content)].compact.join("\n\n")
+    doc = Hash.from_xml(text)
+    image = doc["response"]["image"]
+    @image_id = image["id"].to_i
+    @user_id = image["user_id"].to_i
+    @title = image["title"]
+    @desc = image["description"]
   end
 end
