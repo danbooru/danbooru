@@ -127,7 +127,7 @@ class ForumTopic < ActiveRecord::Base
         ForumTopicVisit.create(:user_id => user.id, :forum_topic_id => id, :last_read_at => updated_at)
       end
 
-      has_unread_topics = ForumTopic.active.where("forum_topics.updated_at >= ?", user.last_forum_read_at)
+      has_unread_topics = ForumTopic.permitted.active.where("forum_topics.updated_at >= ?", user.last_forum_read_at)
       .joins("left join forum_topic_visits on (forum_topic_visits.forum_topic_id = forum_topics.id and forum_topic_visits.user_id = #{user.id})")
       .where("(forum_topic_visits.id is null or forum_topic_visits.last_read_at < forum_topics.updated_at)")
       .exists?
