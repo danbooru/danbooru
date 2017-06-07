@@ -71,6 +71,19 @@ module Sources
       end
     end
 
+    context "The source site for a http://cdna.artstation.com/p/assets/... url" do
+      setup do
+        @url = "https://cdna.artstation.com/p/assets/images/images/006/029/978/large/amama-l-z.jpg"
+        @ref = "https://www.artstation.com/artwork/4BWW2"
+        @site = Sources::Site.new(@url, referer_url: @ref)
+        @site.get
+      end
+
+      should "fetch the source data" do
+        assert_equal("amama", @site.artist_name)
+      end
+    end
+
     context "The source site for an ArtStation gallery" do
       setup do
         @site = Sources::Site.new("https://www.artstation.com/artwork/BDxrA")
