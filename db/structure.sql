@@ -6893,6 +6893,20 @@ CREATE INDEX index_posts_on_image_width ON posts USING btree (image_width);
 
 
 --
+-- Name: index_posts_on_is_flagged; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_is_flagged ON posts USING btree (is_flagged) WHERE (is_flagged = true);
+
+
+--
+-- Name: index_posts_on_is_pending; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_is_pending ON posts USING btree (is_pending) WHERE (is_pending = true);
+
+
+--
 -- Name: index_posts_on_last_comment_bumped_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7548,4 +7562,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170515235205');
 INSERT INTO schema_migrations (version) VALUES ('20170519204506');
 
 INSERT INTO schema_migrations (version) VALUES ('20170526183928');
+
+INSERT INTO schema_migrations (version) VALUES ('20170608043651');
 
