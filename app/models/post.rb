@@ -528,6 +528,11 @@ class Post < ActiveRecord::Base
       # https://yande.re/sample/ceb6a12e87945413a95b90fada406f91/.jpg
       when %r{\Ahttps?://(?:ayase\.|yuno\.|files\.)?yande\.re/(?:image|jpeg|sample)/(?<md5>[a-z0-9]{32})(?:/yande\.re.*|/?\.(?:jpg|png))\Z}i
         "https://yande.re/post?tags=md5:#{$~[:md5]}"
+
+      # https://gfee_li.artstation.com/projects/XPGOD
+      # https://gfee_li.artstation.com/projects/asuka-7
+      when %r{\Ahttps?://\w+\.artstation.com/(?:artwork|projects)/(?<project_id>[a-z0-9-]+)\z/}i
+        "https://www.artstation.com/artwork/#{$~[:project_id]}"
         
       when %r{\Ahttps?://(?:o|image-proxy-origin)\.twimg\.com/\d/proxy\.jpg\?t=(\w+)&}i
         str = Base64.decode64($1)

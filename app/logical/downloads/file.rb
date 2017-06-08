@@ -57,7 +57,7 @@ module Downloads
     def after_download(src)
       src = fix_twitter_sources(src)
       if options[:referer_url].present?
-        src = set_source_to_referer(src)
+        src = set_source_to_referer(src, options[:referer_url])
       end
       src
     end
@@ -137,12 +137,13 @@ module Downloads
       end
     end
 
-    def set_source_to_referer(src)
+    def set_source_to_referer(src, referer)
       if Sources::Strategies::Nijie.url_match?(src) ||
          Sources::Strategies::Twitter.url_match?(src) ||
          Sources::Strategies::Tumblr.url_match?(src) ||
-         Sources::Strategies::Pawoo.url_match?(src)
-        strategy = Sources::Site.new(src, :referer_url => options[:referer_url])
+         Sources::Strategies::Pawoo.url_match?(src) ||
+         Sources::Strategies::ArtStation.url_match?(src) || Sources::Strategies::ArtStation.url_match?(referer)
+        strategy = Sources::Site.new(src, :referer_url => referer)
         strategy.referer_url
       else
         src

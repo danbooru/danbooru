@@ -14,12 +14,12 @@ module Sources
       [Strategies::PixivWhitecube, Strategies::Pixiv, Strategies::NicoSeiga, Strategies::DeviantArt, Strategies::ArtStation, Strategies::Nijie, Strategies::Twitter, Strategies::Tumblr, Strategies::Pawoo]
     end
 
-    def initialize(url, options = {})
+    def initialize(url, referer_url: nil)
       @url = url
 
       Site.strategies.each do |strategy|
-        if strategy.url_match?(url)
-          @strategy = strategy.new(url, options[:referer_url])
+        if strategy.url_match?(url) || strategy.url_match?(referer_url)
+          @strategy = strategy.new(url, referer_url)
           break
         end
       end

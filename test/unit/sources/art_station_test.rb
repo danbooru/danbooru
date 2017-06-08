@@ -58,5 +58,42 @@ module Sources
         assert_equal("From Gantz.", @site.artist_commentary_desc)
       end
     end
+
+    context "The source site for a www.artstation.com/artwork/$slug page" do
+      setup do
+        @site = Sources::Site.new("https://www.artstation.com/artwork/cody-from-sf")
+        @site.get
+      end
+
+      should "get the image url" do
+        url = "https://cdna.artstation.com/p/assets/images/images/000/144/922/original/cassio-yoshiyaki-cody2backup2-yoshiyaki.jpg?1406314198"
+        assert_equal(url, @site.image_url)
+      end
+    end
+
+    context "The source site for a http://cdna.artstation.com/p/assets/... url" do
+      setup do
+        @url = "https://cdna.artstation.com/p/assets/images/images/006/029/978/large/amama-l-z.jpg"
+        @ref = "https://www.artstation.com/artwork/4BWW2"
+        @site = Sources::Site.new(@url, referer_url: @ref)
+        @site.get
+      end
+
+      should "fetch the source data" do
+        assert_equal("amama", @site.artist_name)
+      end
+    end
+
+    context "The source site for an ArtStation gallery" do
+      setup do
+        @site = Sources::Site.new("https://www.artstation.com/artwork/BDxrA")
+        @site.get
+      end
+
+      should "get only image urls, not video urls" do
+        urls = %w[https://cdnb.artstation.com/p/assets/images/images/006/037/253/original/astri-lohne-sjursen-eva.jpg?1495573664]
+        assert_equal(urls, @site.image_urls)
+      end
+    end
   end
 end

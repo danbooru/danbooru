@@ -6,8 +6,11 @@ module Sources::Strategies
       self.project_id(url).present?
     end
 
+    # https://www.artstation.com/artwork/04XA4"
+    # https://dantewontdie.artstation.com/projects/YZK5q"
+    # https://www.artstation.com/artwork/cody-from-sf"
     def self.project_id(url)
-      if url =~ %r!\Ahttps?://\w+\.artstation\.com/(?:artwork|projects)/(?<project_id>[a-z0-9]+)\z!i
+      if url =~ %r!\Ahttps?://\w+\.artstation\.com/(?:artwork|projects)/(?<project_id>[a-z0-9-]+)\z!i
         $~[:project_id]
       else
         nil
@@ -51,7 +54,8 @@ module Sources::Strategies
           @json = JSON.parse(resp.body)
           @artist_name = json["user"]["username"]
           @profile_url = json["user"]["permalink"]
-          @image_urls = json["assets"].map do |x| 
+          images = json["assets"].select { |asset| asset["asset_type"] == "image" }
+          @image_urls = images.map do |x|
             y, _, _ = image_url_rewriter.rewrite(x["image_url"], nil)
             y
           end
