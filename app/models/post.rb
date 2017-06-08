@@ -1031,9 +1031,14 @@ class Post < ActiveRecord::Base
   module PoolMethods
     def pools
       @pools ||= begin
+        return Pool.none if pool_string.blank?
         pool_ids = pool_string.scan(/\d+/)
-        Pool.where(["is_deleted = false and id in (?)", pool_ids])
+        Pool.undeleted.where(id: pool_ids).series_first
       end
+    end
+
+    def has_active_pools?
+      pools.length > 0
     end
 
     def belongs_to_pool?(pool)

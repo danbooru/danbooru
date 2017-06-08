@@ -1,0 +1,5 @@
+<ul class="inline-pool-list">
+  <% pools.each do |pool| %>
+    <li><%= link_to pool.pretty_name, pool, :class => "pool-category-#{pool.category}" %></li>
+  <% end %>
+</ul>

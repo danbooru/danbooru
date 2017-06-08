@@ -13,45 +13,7 @@
       </div>
 
       <% @posts.each do |post| %>
-        <div id="post-<%= post.id %>" class="post mod-queue-preview <%= PostPresenter.preview_class(post) %>" <%= PostPresenter.data_attributes(post) %>>
-          <aside>
-            <%= link_to(image_tag(post.preview_file_url), post_path(post), :target => "_blank") %>
-          </aside>
-
-          <section>
-            <ul>
-              <li>
-                <h2>
-                  <%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :remote => true, :method => :post, :class => "approve-link" %> 
-                  | <%= link_to "Breaks Rules", moderator_post_disapproval_path(:post_id => post.id, :reason => "breaks_rules"), :remote => true, :method => :post, :class => "disapprove-link" %>
-                  | <%= link_to "Poor Quality", moderator_post_disapproval_path(:post_id => post.id, :reason => "poor_quality"), :remote => true, :method => :post, :class => "disapprove-link" %>
-                  | <%= link_to "No Interest", moderator_post_disapproval_path(:post_id => post.id, :reason => "disinterest"), :remote => true, :method => :post, :class => "disapprove-link" %>
-                  | <%= link_to "Detailed Rejection", "#", "data-post-id" => post.id, :class => "detailed-rejection-link" %>
-                </h2>
-              </li>
-              <li><strong>Rating</strong>: <%= post.pretty_rating %></li>
-              <li><strong>Score</strong>: <%= post.score %></li>
-              <li>
-                <strong>Size:</strong>
-                <%= number_to_human_size(post.file_size) %>
-                <% if post.has_dimensions? %>
-                  (<%= post.image_width %>x<%= post.image_height %>)
-                <% end %>
-              </li>
-              <li><strong>Uploader</strong>: <%= link_to_user(post.uploader) %> <%= time_ago_in_words_tagged(post.created_at) %></li>
-              <% if post.is_flagged? %>
-                <li><strong>Flagged</strong>: <%= post_flag_reasons(post) %></li>
-              <% end %>
-              <% if (post.is_flagged? || post.is_deleted?) && post.appeals.any? %>
-                <li><strong>Appeals</strong>: <%= post_appeal_reasons(post) %></li>
-              <% end %>
-              <li>
-                <strong>Hidden</strong>: <%= render "post_disapprovals/compact_counts", :disapprovals => post.disapprovals, :post => post %>
-              </li>
-              <li><strong>Tags</strong>: <%= post.tag_string %></li>
-            </ul>
-          </section>
-        </div>
+        <%= render "post", post: post %>
       <% end %>
     </div>
   </div>
