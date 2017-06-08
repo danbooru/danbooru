@@ -10,7 +10,7 @@ module Sources
   module Strategies
     class Base
       attr_reader :url, :referer_url
-      attr_reader :artist_name, :profile_url, :image_url, :tags, :page_count
+      attr_reader :artist_name, :profile_url, :image_url, :tags
       attr_reader :artist_commentary_title, :artist_commentary_desc
 
       def self.url_match?(url)
@@ -20,7 +20,6 @@ module Sources
       def initialize(url, referer_url = nil)
         @url = url
         @referer_url = referer_url
-        @page_count = 1
       end
 
       # No remote calls are made until this method is called.

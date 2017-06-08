@@ -102,7 +102,7 @@
 
     $("#source-record").html($("<a>").attr("href", new_artist_href).text("Create New"));
 
-    if (data.page_count > 1) {
+    if (data.image_urls.length > 1) {
       $("#gallery-warning").show();
     } else {
       $("#gallery-warning").hide();
