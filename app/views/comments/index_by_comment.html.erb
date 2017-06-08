@@ -2,6 +2,8 @@
   <div id="a-index">
     <h1>Comments</h1>
 
+    <%= render "posts/partials/common/inline_blacklist" %>
+
     <div class="comments-for-post">
       <div class="list-of-comments">
         <% @comments.each do |comment| %>
