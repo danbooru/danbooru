@@ -81,3 +81,11 @@ div#c-pool-orders, div#c-favorite-group-orders {
     }
   }
 }
+
+ul.inline-pool-list {
+  display: inline;
+
+  li {
+    display: inline;
+  }
+}

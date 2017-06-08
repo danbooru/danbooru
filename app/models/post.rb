@@ -1031,6 +1031,10 @@ class Post < ActiveRecord::Base
       end
     end
 
+    def has_active_pools?
+      pools.length > 0
+    end
+
     def belongs_to_pool?(pool)
       pool_string =~ /(?:\A| )pool:#{pool.id}(?:\Z| )/
     end
