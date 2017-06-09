@@ -153,5 +153,22 @@ class PostReplacementTest < ActiveSupport::TestCase
         assert_not(File.exists?(old_large_file_path))
       end
     end
+
+    context "a post that is replaced by a ugoira" do
+      should "save the frame data" do
+        @post.replace!(replacement_url: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
+        @post.reload
+
+        assert_equal(80, @post.image_width)
+        assert_equal(82, @post.image_height)
+        assert_equal(2804, @post.file_size)
+        assert_equal("zip", @post.file_ext)
+        assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post.md5)
+        assert_equal("cad1da177ef309bf40a117c17b8eecf5", Digest::MD5.file(@post.file_path).hexdigest)
+
+        assert_equal("https://i1.pixiv.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @post.source)
+        assert_equal([{"file"=>"000000.jpg", "delay"=>125}, {"file"=>"000001.jpg", "delay"=>125}], @post.pixiv_ugoira_frame_data.data)
+      end
+    end
   end
 end

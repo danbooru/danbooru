@@ -17,11 +17,6 @@ class PostReplacement < ActiveRecord::Base
   end
 
   def process!
-    # TODO for ugoiras we need to replace the frame data.
-    if post.is_ugoira?
-      raise NotImplementedError.new("Replacing ugoira images not yet supported.")
-    end
-
     # TODO images hosted on s3 need to be deleted from s3 instead of the local filesystem.
     if Danbooru.config.use_s3_proxy?(post)
       raise NotImplementedError.new("Replacing S3 hosted images not yet supported.")
@@ -45,6 +40,7 @@ class PostReplacement < ActiveRecord::Base
       post.source = upload.source
       post.tag_string = upload.tag_string
       rescale_notes
+      update_ugoira_frame_data(upload)
 
       post.comments.create!({creator: User.system, body: comment_replacement_message, do_not_bump_post: true}, without_protection: true)
       ModAction.log(modaction_replacement_message)
@@ -65,6 +61,11 @@ class PostReplacement < ActiveRecord::Base
     post.notes.each do |note|
       note.rescale!(x_scale, y_scale)
     end
+  end
+
+  def update_ugoira_frame_data(upload)
+    post.pixiv_ugoira_frame_data.destroy if post.pixiv_ugoira_frame_data.present?
+    upload.ugoira_service.save_frame_data(post) if post.is_ugoira?
   end
 
   module SearchMethods
