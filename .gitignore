@@ -9,6 +9,7 @@ db/*.sqlite3
 log/*.log
 tmp/*
 public/data
+public/assets
 vendor/cache/*.gem
 .sass-cache
 .DS_Store
