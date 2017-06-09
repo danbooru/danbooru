@@ -86,8 +86,8 @@
   Danbooru.ArtistCommentary.from_source = function(source) {
     return $.get("/source.json?url=" + encodeURIComponent(source)).then(function(data) {
       return {
-        original_title: data.artist_commentary.title,
-        original_description: data.artist_commentary.description,
+        original_title: data.artist_commentary.dtext_title,
+        original_description: data.artist_commentary.dtext_description,
         source: source,
       };
     });
