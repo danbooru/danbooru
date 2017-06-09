@@ -24,6 +24,7 @@ module Sources
 
       def get
         agent.get(URI.parse(normalized_url)) do |page|
+          page.encoding = "utf-8"
           @artist_name, @profile_url = get_profile_from_page(page)
           @image_url = get_image_url_from_page(page)
           @tags = get_tags_from_page(page)
