@@ -359,6 +359,14 @@ module Danbooru
       nil
     end
 
+    def deviantart_login
+      nil
+    end
+
+    def deviantart_password
+      nil
+    end
+
     def enable_dimension_autotagging
       true
     end

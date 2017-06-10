@@ -1,6 +1,8 @@
 module Sources
   module Strategies
     class DeviantArt < Base
+      DEVIANTART_SESSION_CACHE_KEY = "deviantart-session"
+
       def self.url_match?(url)
         url =~ /^https?:\/\/(?:.+?\.)?deviantart\.(?:com|net)/
       end
@@ -152,14 +154,47 @@ module Sources
       def agent
         @agent ||= begin
           mech = Mechanize.new
-          
+          auth, userinfo = session_cookies(mech)
+
           # This cookie needs to be set to allow viewing of mature works
           cookie = Mechanize::Cookie.new("agegate_state", "1")
           cookie.domain = ".deviantart.com"
           cookie.path = "/"
           mech.cookie_jar.add(cookie)
 
+          cookie = Mechanize::Cookie.new("auth", auth)
+          cookie.domain = ".deviantart.com"
+          cookie.path = "/"
+          mech.cookie_jar.add(cookie)
+
+          cookie = Mechanize::Cookie.new("userinfo", userinfo)
+          cookie.domain = ".deviantart.com"
+          cookie.path = "/"
+          mech.cookie_jar.add(cookie)
+
           mech
+        end
+      end
+
+      def session_cookies(mech)
+        Cache.get(DEVIANTART_SESSION_CACHE_KEY, 2.hours) do
+          page = mech.get("https://www.deviantart.com/users/login")
+          validate_key = page.search('input[name="validate_key"]').attribute("value").value
+          validate_token = page.search('input[name="validate_token"]').attribute("value").value
+
+          mech.post("https://www.deviantart.com/users/login", {
+            username: Danbooru.config.deviantart_login,
+            password: Danbooru.config.deviantart_password,
+            validate_key: validate_key,
+            validate_token: validate_token,
+            remember_me: 1,
+          })
+
+          auth = mech.cookies.find { |cookie| cookie.name == "auth" }.value
+          userinfo = mech.cookies.find { |cookie| cookie.name == "userinfo" }.value
+          mech.cookie_jar.clear
+
+          [auth, userinfo]
         end
       end
     end
