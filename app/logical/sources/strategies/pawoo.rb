@@ -20,7 +20,7 @@ module Sources::Strategies
     end
 
     def referer_url
-      @url
+      normalized_url
     end
 
     def site_name
@@ -28,11 +28,19 @@ module Sources::Strategies
     end
 
     def get
-      response = PawooApiClient.new.get_status(url)
+      response = PawooApiClient.new.get_status(normalized_url)
       @artist_name = response.account_name
       @profile_url = response.account_profile_url
       @image_url = response.image_urls.first
       @image_urls = response.image_urls
+    end
+
+    def normalized_url
+      if self.class.url_match?(@url)
+        @url
+      elsif self.class.url_match?(@referer_url)
+        @referer_url
+      end
     end
 
     def normalizable_for_artist_finder?
