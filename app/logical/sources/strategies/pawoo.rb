@@ -1,3 +1,16 @@
+# html page urls:
+#   https://pawoo.net/@evazion/19451018
+#   https://pawoo.net/web/statuses/19451018
+#
+# image urls:
+#   https://img.pawoo.net/media_attachments/files/001/297/997/small/c4272a09570757c2.png
+#   https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png
+#   https://pawoo.net/media/lU2uV7C1MMQSb1czwvg
+#
+# artist urls:
+#   https://pawoo.net/@evazion
+#   https://pawoo.net/web/accounts/47806
+
 module Sources::Strategies
   class Pawoo < Base
     attr_reader :image_urls
