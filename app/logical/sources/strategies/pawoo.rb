@@ -33,6 +33,9 @@ module Sources::Strategies
       @profile_url = response.account_profile_url
       @image_url = response.image_urls.first
       @image_urls = response.image_urls
+      @tags = response.tags
+      @artist_commentary_title = nil
+      @artist_commentary_desc = response.commentary
     end
 
     def normalized_url
