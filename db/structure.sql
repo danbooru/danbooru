@@ -2838,8 +2838,6 @@ CREATE TABLE saved_searches (
     id integer NOT NULL,
     user_id integer,
     query text,
-    name text,
-    category character varying,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     labels text[] DEFAULT '{}'::text[] NOT NULL
