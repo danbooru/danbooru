@@ -27,8 +27,12 @@ module Sources::Strategies
       "Pawoo"
     end
 
+    def api_response
+      @response ||= PawooApiClient.new.get_status(normalized_url)
+    end
+
     def get
-      response = PawooApiClient.new.get_status(normalized_url)
+      response = api_response
       @artist_name = response.account_name
       @profile_url = response.account_profile_url
       @image_url = response.image_urls.first
@@ -48,6 +52,35 @@ module Sources::Strategies
 
     def normalizable_for_artist_finder?
       true
+    end
+
+    def dtext_artist_commentary_desc
+      to_dtext(artist_commentary_desc)
+    end
+
+    def to_dtext(text)
+      html = Nokogiri::HTML.fragment(text)
+
+      dtext = html.children.map do |element|
+        case element.name
+        when "text"
+          element.content
+        when "p"
+          to_dtext(element.inner_html) + "\n\n"
+        when "a"
+          # don't include links to the toot itself.
+          media_urls = api_response.json["media_attachments"].map { |attr| attr["text_url"] }
+          next if element.attribute("href").value.in?(media_urls)
+
+          title = to_dtext(element.inner_html)
+          url = element.attributes["href"].value
+          %("#{title}":[#{url}])
+        else
+          to_dtext(element.inner_html)
+        end
+      end.join.strip
+
+      dtext
     end
   end
 end

@@ -19,6 +19,16 @@ module Sources
       should "get the image url" do
         assert_equal("https://img.pawoo.net/media_attachments/files/000/128/953/original/4c0a06087b03343f.png", @site.image_url)
       end
+
+      should "get the commentary" do
+        desc = '<p>a mind forever voyaging through strange seas of thought alone <a href="https://pawoo.net/media/9hJzXvwxVl1CezW0ecM" rel="nofollow noopener" target="_blank"><span class="invisible">https://</span><span class="ellipsis">pawoo.net/media/9hJzXvwxVl1Cez</span><span class="invisible">W0ecM</span></a></p>'
+        assert_equal(desc, @site.artist_commentary_desc)
+      end
+
+      should "get the dtext-ified commentary" do
+        desc = 'a mind forever voyaging through strange seas of thought alone'
+        assert_equal(desc, @site.dtext_artist_commentary_desc)
+      end
     end
 
     context "The source site for a https://pawoo.net/$user/$id url"  do
