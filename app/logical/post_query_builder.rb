@@ -236,6 +236,44 @@ class PostQueryBuilder
       has_constraints!
     end
 
+    if q[:flagger_ids_neg]
+      q[:flagger_ids_neg].each do |flagger_id|
+        relation = relation.where("posts.id NOT IN (?)", PostFlag.unscoped.search({:creator_id => flagger_id, :category => "normal"}).reorder("").select(:post_id).distinct)
+      end
+    end
+
+    if q[:flagger_ids]
+      q[:flagger_ids].each do |flagger_id|
+        if flagger_id == "any"
+          relation = relation.where('EXISTS (' + PostFlag.unscoped.search({:category => "normal"}).where('post_id = posts.id').reorder('').select('1').to_sql + ')')
+        elsif flagger_id == "none"
+          relation = relation.where('NOT EXISTS (' + PostFlag.unscoped.search({:category => "normal"}).where('post_id = posts.id').reorder('').select('1').to_sql + ')')
+        else
+          relation = relation.where("posts.id IN (?)", PostFlag.unscoped.search({:creator_id => flagger_id, :category => "normal"}).reorder("").select(:post_id).distinct)
+        end
+      end
+      has_constraints!
+    end
+
+    if q[:appealer_ids_neg]
+      q[:appealer_ids_neg].each do |appealer_id|
+        relation = relation.where("posts.id NOT IN (?)", PostAppeal.unscoped.where(creator_id: appealer_id).select(:post_id).distinct)
+      end
+    end
+
+    if q[:appealer_ids]
+      q[:appealer_ids].each do |appealer_id|
+        if appealer_id == "any"
+          relation = relation.where('EXISTS (' + PostAppeal.unscoped.where('post_id = posts.id').select('1').to_sql + ')')
+        elsif appealer_id == "none"
+          relation = relation.where('NOT EXISTS (' + PostAppeal.unscoped.where('post_id = posts.id').select('1').to_sql + ')')
+        else
+          relation = relation.where("posts.id IN (?)", PostAppeal.unscoped.where(creator_id: appealer_id).select(:post_id).distinct)
+        end
+      end
+      has_constraints!
+    end
+
     if q[:commenter_ids]
       q[:commenter_ids].each do |commenter_id|
         if commenter_id == "any"
