@@ -227,14 +227,10 @@
         if (text.match(/^ http/)) {
           text = text.substring(1, 1000);
           var $url = $("<a/>");
-          $url.text("open");
+          $url.text(text);
           $url.attr("href", text);
           $url.attr("target", "_blank");
-          var $li = $("<li/>");
-          $li.append(text + " [");
-          $li.append($url);
-          $li.append("]");
-          $ul.append($li);
+          $ul.append($("<li/>").html($url));
         } else {
           $ul.append($("<li/>").text(text));
         }
