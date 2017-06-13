@@ -38,6 +38,24 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       end
     end
 
+    context "for an aliased tag" do
+      setup do
+        @ta = FactoryGirl.create(:tag_alias, antecedent_name: "xyz", consequent_name: "aaa")
+        @wp = FactoryGirl.create(:wiki_page, title: "aaa", body: "blah [[foo|blah]] [[FOO]] [[bar]] blah")
+        @query = RelatedTagQuery.new("xyz", "")
+
+        Tag.named("aaa").first.update_related
+      end
+
+      should "take wiki tags from the consequent's wiki" do
+        assert_equal(%w[foo bar], @query.wiki_page_tags)
+      end
+
+      should "take related tags from the consequent tag" do
+        assert_equal(%w[aaa bbb ccc], @query.tags)
+      end
+    end
+
     context "for a pattern search" do
       setup do
         @query = RelatedTagQuery.new("a*", "")
