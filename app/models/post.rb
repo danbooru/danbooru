@@ -6,6 +6,7 @@ class Post < ActiveRecord::Base
   class DisapprovalError < Exception ; end
   class RevertError < Exception ; end
   class SearchError < Exception ; end
+  class DeletionError < Exception ; end
 
   before_validation :initialize_uploader, :on => :create
   before_validation :merge_old_changes
@@ -65,6 +66,12 @@ class Post < ActiveRecord::Base
 
     module ClassMethods
       def delete_files(post_id, file_path, large_file_path, preview_file_path)
+        post = Post.find(post_id)
+
+        if post.file_path == file_path || post.large_file_path == large_file_path || post.preview_file_path == preview_file_path
+          raise DeletionError.new("Files still in use; skipping deletion.")
+        end
+
         # the large file and the preview don't necessarily exist. if so errors will be ignored.
         FileUtils.rm_f(file_path)
         FileUtils.rm_f(large_file_path)
