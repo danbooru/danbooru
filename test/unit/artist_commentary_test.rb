@@ -60,6 +60,28 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
         @artcomm.reload
       end
 
+      should "not create new version if nothing changed" do
+        @artcomm.save
+        assert_equal(1, @post.artist_commentary.versions.size)
+      end
+
+      should "create a new version if outside merge window" do
+        travel_to(2.hours.from_now) do
+          @artcomm.update(original_title: "bar")
+
+          assert_equal(2, @post.artist_commentary.versions.size)
+          assert_equal("bar", @artcomm.versions.last.original_title)
+        end
+      end
+
+      should "merge with the previous version if inside merge window" do
+        @artcomm.update(original_title: "bar")
+        @artcomm.reload
+
+        assert_equal(1, @post.artist_commentary.versions.size)
+        assert_equal("bar", @artcomm.versions.last.original_title)
+      end
+
       should "trim whitespace from all fields" do
         # \u00A0 - nonbreaking space.
         @artcomm.update(

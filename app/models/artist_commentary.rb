@@ -8,6 +8,7 @@ class ArtistCommentary < ActiveRecord::Base
   validates_uniqueness_of :post_id
   belongs_to :post
   has_many :versions, lambda {order("artist_commentary_versions.id ASC")}, :class_name => "ArtistCommentaryVersion", :dependent => :destroy, :foreign_key => :post_id, :primary_key => :post_id
+  has_one :previous_version, lambda {order(id: :desc)}, :class_name => "ArtistCommentaryVersion", :foreign_key => :post_id, :primary_key => :post_id
   after_save :create_version
   after_commit :tag_post
 
@@ -54,8 +55,6 @@ class ArtistCommentary < ActiveRecord::Base
     end
   end
 
-  extend SearchMethods
-
   def trim_whitespace
     self.original_title = original_title.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
     self.translated_title = translated_title.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
@@ -73,32 +72,6 @@ class ArtistCommentary < ActiveRecord::Base
 
   def any_field_present?
     original_present? || translated_present?
-  end
-
-  def create_version
-    versions.create(
-      :post_id => post_id,
-      :original_title => original_title,
-      :original_description => original_description,
-      :translated_title => translated_title,
-      :translated_description => translated_description
-    )
-  end
-
-  def revert_to(version)
-    if post_id != version.post_id
-      raise RevertError.new("You cannot revert to a previous artist commentary of another post.")
-    end
-
-    self.original_description = version.original_description
-    self.original_title = version.original_title
-    self.translated_description = version.translated_description
-    self.translated_title = version.translated_title
-  end
-
-  def revert_to!(version)
-    revert_to(version)
-    save!
   end
 
   def tag_post
@@ -128,4 +101,57 @@ class ArtistCommentary < ActiveRecord::Base
 
     post.save if post.tag_string_changed?
   end
+
+  module VersionMethods
+    def create_version
+      return unless changed?
+
+      if merge_version?
+        merge_version
+      else
+        create_new_version
+      end
+    end
+
+    def merge_version?
+      previous_version && previous_version.updater == CurrentUser.user && previous_version.updated_at > 1.hour.ago
+    end
+
+    def merge_version
+      previous_version.update(
+        original_title: original_title,
+        original_description: original_description,
+        translated_title: translated_title,
+        translated_description: translated_description,
+      )
+    end
+
+    def create_new_version
+      versions.create(
+        :original_title => original_title,
+        :original_description => original_description,
+        :translated_title => translated_title,
+        :translated_description => translated_description
+      )
+    end
+
+    def revert_to(version)
+      if post_id != version.post_id
+        raise RevertError.new("You cannot revert to a previous artist commentary of another post.")
+      end
+
+      self.original_description = version.original_description
+      self.original_title = version.original_title
+      self.translated_description = version.translated_description
+      self.translated_title = version.translated_title
+    end
+
+    def revert_to!(version)
+      revert_to(version)
+      save!
+    end
+  end
+
+  extend SearchMethods
+  include VersionMethods
 end
