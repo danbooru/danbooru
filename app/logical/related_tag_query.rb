@@ -1,8 +1,8 @@
 class RelatedTagQuery
   attr_reader :query, :category
 
-  def initialize(query, category)
-    @query = query.strip
+  def initialize(query, category = nil)
+    @query = TagAlias.to_aliased(query.strip).join(" ")
     @category = category
   end
 
