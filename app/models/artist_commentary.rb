@@ -4,6 +4,7 @@ class ArtistCommentary < ActiveRecord::Base
   attr_accessor :remove_commentary_tag, :remove_commentary_request_tag, :remove_commentary_check_tag
   attr_accessor :add_commentary_tag, :add_commentary_request_tag, :add_commentary_check_tag
   attr_accessible :post_id, :original_description, :original_title, :translated_description, :translated_title, :remove_commentary_tag, :remove_commentary_request_tag, :add_commentary_tag, :add_commentary_request_tag, :add_commentary_check_tag, :remove_commentary_check_tag
+  before_validation :trim_whitespace
   validates_uniqueness_of :post_id
   belongs_to :post
   has_many :versions, lambda {order("artist_commentary_versions.id ASC")}, :class_name => "ArtistCommentaryVersion", :dependent => :destroy, :foreign_key => :post_id, :primary_key => :post_id
@@ -34,15 +35,15 @@ class ArtistCommentary < ActiveRecord::Base
       end
 
       if params[:original_present] == "yes"
-        q = q.where("(original_title is not null and original_title != '') or (original_description is not null and original_description != '')")
+        q = q.where("(original_title != '') or (original_description != '')")
       elsif params[:original_present] == "no"
-        q = q.where("(original_title is null or original_title = '') and (original_description is null or original_description = '')")
+        q = q.where("(original_title = '') and (original_description = '')")
       end
 
       if params[:translated_present] == "yes"
-        q = q.where("(translated_title is not null and translated_title != '') or (translated_description is not null and translated_description != '')")
+        q = q.where("(translated_title != '') or (translated_description != '')")
       elsif params[:translated_present] == "no"
-        q = q.where("(translated_title is null or translated_title = '') and (translated_description is null or translated_description = '')")
+        q = q.where("(translated_title = '') and (translated_description = '')")
       end
 
       if params[:post_tags_match].present?
@@ -54,6 +55,13 @@ class ArtistCommentary < ActiveRecord::Base
   end
 
   extend SearchMethods
+
+  def trim_whitespace
+    self.original_title = original_title.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
+    self.translated_title = translated_title.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
+    self.original_description = original_description.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
+    self.translated_description = translated_description.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
+  end
 
   def original_present?
     original_title.present? || original_description.present?

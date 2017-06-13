@@ -603,10 +603,10 @@ ALTER SEQUENCE api_keys_id_seq OWNED BY api_keys.id;
 CREATE TABLE artist_commentaries (
     id integer NOT NULL,
     post_id integer NOT NULL,
-    original_title text,
-    original_description text,
-    translated_title text,
-    translated_description text,
+    original_title text DEFAULT ''::text NOT NULL,
+    original_description text DEFAULT ''::text NOT NULL,
+    translated_title text DEFAULT ''::text NOT NULL,
+    translated_description text DEFAULT ''::text NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -7562,4 +7562,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170519204506');
 INSERT INTO schema_migrations (version) VALUES ('20170526183928');
 
 INSERT INTO schema_migrations (version) VALUES ('20170608043651');
+
+INSERT INTO schema_migrations (version) VALUES ('20170613200356');
 
