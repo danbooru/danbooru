@@ -170,5 +170,25 @@ class PostReplacementTest < ActiveSupport::TestCase
         assert_equal([{"file"=>"000000.jpg", "delay"=>125}, {"file"=>"000001.jpg", "delay"=>125}], @post.pixiv_ugoira_frame_data.data)
       end
     end
+
+    context "a post that is replaced to another file then replaced back to the original file" do
+      should "not delete the original files" do
+        @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
+        @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
+        @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
+
+        assert(File.exists?(@post.file_path))
+        assert(File.exists?(@post.preview_file_path))
+        assert(File.exists?(@post.large_file_path))
+
+        Timecop.travel(Time.now + PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
+          Delayed::Worker.new.work_off
+        end
+
+        assert(File.exists?(@post.file_path))
+        assert(File.exists?(@post.preview_file_path))
+        assert(File.exists?(@post.large_file_path))
+      end
+    end
   end
 end
