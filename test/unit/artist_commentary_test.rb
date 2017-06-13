@@ -52,5 +52,28 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
         assert_equal("foo", @artcomm.versions.last.original_title)
       end
     end
+
+    context "when updated" do
+      setup do
+        @post = FactoryGirl.create(:post)
+        @artcomm = FactoryGirl.create(:artist_commentary, post_id: @post.id)
+        @artcomm.reload
+      end
+
+      should "trim whitespace from all fields" do
+        # \u00A0 - nonbreaking space.
+        @artcomm.update(
+          original_title: "  foo\u00A0\t\n",
+          original_description: " foo\u00A0\t\n",
+          translated_title: "  foo\u00A0\t\n",
+          translated_description: "  foo\u00A0\n",
+        )
+
+        assert_equal("foo", @artcomm.original_title)
+        assert_equal("foo", @artcomm.original_description)
+        assert_equal("foo", @artcomm.translated_title)
+        assert_equal("foo", @artcomm.translated_description)
+      end
+    end
   end
 end

@@ -4,6 +4,7 @@ class ArtistCommentary < ActiveRecord::Base
   attr_accessor :remove_commentary_tag, :remove_commentary_request_tag, :remove_commentary_check_tag
   attr_accessor :add_commentary_tag, :add_commentary_request_tag, :add_commentary_check_tag
   attr_accessible :post_id, :original_description, :original_title, :translated_description, :translated_title, :remove_commentary_tag, :remove_commentary_request_tag, :add_commentary_tag, :add_commentary_request_tag, :add_commentary_check_tag, :remove_commentary_check_tag
+  before_validation :trim_whitespace
   validates_uniqueness_of :post_id
   belongs_to :post
   has_many :versions, lambda {order("artist_commentary_versions.id ASC")}, :class_name => "ArtistCommentaryVersion", :dependent => :destroy, :foreign_key => :post_id, :primary_key => :post_id
@@ -54,6 +55,13 @@ class ArtistCommentary < ActiveRecord::Base
   end
 
   extend SearchMethods
+
+  def trim_whitespace
+    self.original_title = original_title.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
+    self.translated_title = translated_title.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
+    self.original_description = original_description.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
+    self.translated_description = translated_description.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
+  end
 
   def original_present?
     original_title.present? || original_description.present?
