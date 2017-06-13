@@ -34,15 +34,15 @@ class ArtistCommentary < ActiveRecord::Base
       end
 
       if params[:original_present] == "yes"
-        q = q.where("(original_title is not null and original_title != '') or (original_description is not null and original_description != '')")
+        q = q.where("(original_title != '') or (original_description != '')")
       elsif params[:original_present] == "no"
-        q = q.where("(original_title is null or original_title = '') and (original_description is null or original_description = '')")
+        q = q.where("(original_title = '') and (original_description = '')")
       end
 
       if params[:translated_present] == "yes"
-        q = q.where("(translated_title is not null and translated_title != '') or (translated_description is not null and translated_description != '')")
+        q = q.where("(translated_title != '') or (translated_description != '')")
       elsif params[:translated_present] == "no"
-        q = q.where("(translated_title is null or translated_title = '') and (translated_description is null or translated_description = '')")
+        q = q.where("(translated_title = '') and (translated_description = '')")
       end
 
       if params[:post_tags_match].present?
