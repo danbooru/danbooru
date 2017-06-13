@@ -74,7 +74,7 @@ class PostArchive < ActiveRecord::Base
           "tags" => post.tag_string
         }
         msg = "add post version\n#{json.to_json}"
-        sqs_service.send_message(msg, message_group_id: "#{post.id}")
+        sqs_service.send_message(msg, message_group_id: "post:#{post.id}")
       end
     end
   end
