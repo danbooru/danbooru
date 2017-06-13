@@ -373,6 +373,15 @@ module Danbooru
       nil
     end
 
+    # http://tinysubversions.com/notes/mastodon-bot/
+    def pawoo_client_id
+      nil
+    end
+
+    def pawoo_client_secret
+      nil
+    end
+
     def enable_dimension_autotagging
       true
     end
