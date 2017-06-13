@@ -59,7 +59,7 @@ class PoolArchive < ActiveRecord::Base
       category: pool.category
     }
     msg = "add pool version\n#{json.to_json}"
-    sqs_service.send_message(msg)
+    sqs_service.send_message(msg, message_group_id: "#{pool.id}")
   end
 
   def build_diff(other = nil)
