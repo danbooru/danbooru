@@ -116,6 +116,10 @@ class AnonymousUser
     false
   end
 
+  def can_view_flagger?(flagger_id)
+    false
+  end
+
   def can_approve_posts?
     false
   end

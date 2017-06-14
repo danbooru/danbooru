@@ -24,6 +24,16 @@ class PostEvent
     type_name.first
   end
 
+  def is_creator_visible?(user = CurrentUser.user)
+    case event
+    when PostAppeal
+      true
+    when PostFlag
+      flag = event
+      user.can_view_flagger?(flag.creator_id)
+    end
+  end
+
   def attributes
     {
       "creator_id": nil,

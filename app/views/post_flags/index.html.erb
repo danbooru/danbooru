@@ -39,7 +39,7 @@
             </td>
             <td>
               <%= compact_time post_flag.created_at %>
-              <% if CurrentUser.user.is_moderator? %>
+              <% if CurrentUser.can_view_flagger?(post_flag.creator_id) %>
                 <br> by <%= link_to_user post_flag.creator %>
                 <%= link_to "»", post_flags_path(search: params[:search].merge(creator_name: post_flag.creator.name)) %>
               <% end %>
