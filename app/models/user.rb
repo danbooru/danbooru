@@ -545,6 +545,10 @@ class User < ActiveRecord::Base
       created_at <= 1.week.ago
     end
 
+    def can_view_flagger?(flagger_id)
+      CurrentUser.is_moderator? || flagger_id == CurrentUser.user.id
+    end
+
     def base_upload_limit
       if created_at >= 1.month.ago
         10

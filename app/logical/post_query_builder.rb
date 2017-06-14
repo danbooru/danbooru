@@ -238,7 +238,9 @@ class PostQueryBuilder
 
     if q[:flagger_ids_neg]
       q[:flagger_ids_neg].each do |flagger_id|
-        relation = relation.where("posts.id NOT IN (?)", PostFlag.unscoped.search({:creator_id => flagger_id, :category => "normal"}).reorder("").select(:post_id).distinct)
+        if CurrentUser.can_view_flagger?(flagger_id)
+          relation = relation.where("posts.id NOT IN (?)", PostFlag.unscoped.search({:creator_id => flagger_id, :category => "normal"}).reorder("").select(:post_id).distinct)
+        end
       end
     end
 
@@ -248,8 +250,8 @@ class PostQueryBuilder
           relation = relation.where('EXISTS (' + PostFlag.unscoped.search({:category => "normal"}).where('post_id = posts.id').reorder('').select('1').to_sql + ')')
         elsif flagger_id == "none"
           relation = relation.where('NOT EXISTS (' + PostFlag.unscoped.search({:category => "normal"}).where('post_id = posts.id').reorder('').select('1').to_sql + ')')
-        else
-          relation = relation.where("posts.id IN (?)", PostFlag.unscoped.search({:creator_id => flagger_id, :category => "normal"}).reorder("").select(:post_id).distinct)
+        elsif CurrentUser.can_view_flagger?(flagger_id)
+            relation = relation.where("posts.id IN (?)", PostFlag.unscoped.search({:creator_id => flagger_id, :category => "normal"}).reorder("").select(:post_id).distinct)
         end
       end
       has_constraints!

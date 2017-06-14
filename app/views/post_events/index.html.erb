@@ -6,9 +6,7 @@
       <thead>
         <tr>
           <th width="5%">Type</th>
-          <% if CurrentUser.is_moderator? %>
-            <th width="10%">Creator</th>
-          <% end %>
+          <th width="10%">Creator</th>
           <th>Reason</th>
           <th width="5%">Resolved?</th>
           <th width="15%">Date</th>
@@ -18,11 +16,13 @@
         <% @events.each do |event| %>
           <tr class="resolved-<%= event.is_resolved %>">
             <td><%= event.type_name %></td>
-            <% if CurrentUser.is_moderator? %>
-              <td>
+            <td>
+              <% if event.is_creator_visible? %>
                 <%= link_to_user event.creator %>
-              </td>
-            <% end %>
+              <% else %>
+                <i>hidden</i>
+              <% end %>
+            </td>
             <td><%= format_text event.reason, :ragel => true %></td>
             <td>
               <% if event.is_resolved %>

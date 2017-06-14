@@ -7,8 +7,11 @@ module PostFlagsHelper
       html << '<li>'
       html << DText.parse_inline(flag.reason).html_safe
 
-      if CurrentUser.is_moderator?
-        html << " - #{link_to_user(flag.creator)} (#{link_to_ip(flag.creator_ip_addr)})"
+      if CurrentUser.can_view_flagger?(flag.creator_id)
+        html << " - #{link_to_user(flag.creator)}"
+        if CurrentUser.is_moderator?
+           html << " (#{link_to_ip(flag.creator_ip_addr)})"
+        end
       end
 
       html << ' - ' + time_ago_in_words_tagged(flag.created_at)
