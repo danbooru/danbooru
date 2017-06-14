@@ -70,9 +70,9 @@ class PostFlag < ActiveRecord::Base
       end
 
       if params[:creator_name].present?
-        creator_id = User.name_to_id(params[:creator_name].strip)
-        if CurrentUser.can_view_flagger?(creator_id)
-          q = q.where("creator_id = ?", creator_id)
+        flagger_id = User.name_to_id(params[:creator_name].strip)
+        if CurrentUser.can_view_flagger?(flagger_id)
+          q = q.where("creator_id = ?", flagger_id)
         end
       end
 
