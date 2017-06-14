@@ -546,7 +546,7 @@ class User < ActiveRecord::Base
     end
 
     def can_view_flagger?(flagger_id)
-      CurrentUser.is_moderator? || flagger_id == CurrentUser.user.id
+      is_moderator? || flagger_id == id
     end
 
     def base_upload_limit
