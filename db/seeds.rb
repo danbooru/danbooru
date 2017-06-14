@@ -46,6 +46,38 @@ if User.count == 0
       :password => "password1",
       :password_confirmation => "password1"
     )
+
+    CurrentUser.user = user
+    User::Levels.constants.reject{|x| [:ADMIN, :BLOCKED].include?(x)}.each do |level|
+      newuser = User.create(
+      :name => level.to_s.downcase,
+      :password => "password1",
+      :password_confirmation => "password1"
+      )
+      newuser.promote_to!(User::Levels.const_get(level), {:skip_feedback => true, :skip_dmail => true})
+    end
+
+    newuser = User.create(
+      :name => "banned",
+      :password => "password1",
+      :password_confirmation => "password1"
+      )
+    Ban.create(:user_id => newuser.id, :reason => "from the start", :duration => 99999)
+
+    newuser = User.create(
+      :name => "uploader",
+      :password => "password1",
+      :password_confirmation => "password1"
+      )
+    newuser.promote_to!(User::Levels::BUILDER, {:can_upload_free => true, :skip_feedback => true, :skip_dmail => true})
+
+    newuser = User.create(
+      :name => "approver",
+      :password => "password1",
+      :password_confirmation => "password1"
+      )
+    newuser.promote_to!(User::Levels::BUILDER, {:can_approve_posts => true, :skip_feedback => true, :skip_dmail => true})
+
   end
 
   0.upto(10) do |i|
