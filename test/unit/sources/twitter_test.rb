@@ -35,6 +35,17 @@ module Sources
       end
     end
 
+    context "A twitter summary card from twitter" do
+      setup do
+        @site = Sources::Site.new("https://twitter.com/masayasuf/status/870734961778630656/photo/1")
+        @site.get
+      end
+
+      should "get the image url" do
+        assert_equal("https://pbs.twimg.com/media/DBV40M2UIAAHYlt.jpg:large", @site.image_url)
+      end
+    end
+
     context "The source site for a restricted twitter" do
       setup do
         @site = Sources::Site.new("https://mobile.twitter.com/Strangestone/status/556440271961858051")

@@ -52,7 +52,11 @@ class TwitterService
   end
 
   def extract_urls_for_card(attrs)
-    url = attrs.urls.map {|x| x.expanded_url}.reject {|x| x.host == "twitter.com"}.first
+    urls = attrs.urls.map {|x| x.expanded_url}
+    url = urls.reject {|x| x.host == "twitter.com"}.first
+    if url.nil?
+      url = urls.first
+    end
     [extract_og_image_from_page(url)].compact
   end
 
