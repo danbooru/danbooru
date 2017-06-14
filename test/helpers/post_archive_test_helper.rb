@@ -14,7 +14,7 @@ module PostArchiveTestHelper
 
   def mock_post_archive_service!
     mock_sqs_service = Class.new do
-      def send_message(msg)
+      def send_message(msg, *options)
         _, json = msg.split(/\n/)
         json = JSON.parse(json)
         json.delete("created_at")

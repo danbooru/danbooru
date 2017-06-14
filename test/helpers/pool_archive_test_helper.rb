@@ -1,7 +1,7 @@
 module PoolArchiveTestHelper
   def mock_pool_archive_service!
     mock_sqs_service = Class.new do
-      def send_message(msg)
+      def send_message(msg, *options)
         _, json = msg.split(/\n/)
         json = JSON.parse(json)
         prev = PoolArchive.where(pool_id: json["pool_id"]).order("id desc").first
