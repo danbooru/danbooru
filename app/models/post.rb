@@ -1715,12 +1715,6 @@ class Post < ActiveRecord::Base
     def remove_iqdb_async
       Post.remove_iqdb(id)
     end
-
-    def update_iqdb
-      if Post.iqdb_enabled? && Post.iqdb_enabled?
-        Post.iqdb_sqs_service.send_message("update\n#{id}\n#{complete_preview_file_url}")
-      end
-    end
   end
 
   module ValidationMethods
