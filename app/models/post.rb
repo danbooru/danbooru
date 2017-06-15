@@ -29,8 +29,8 @@ class Post < ActiveRecord::Base
   after_save :update_parent_on_save
   after_save :apply_post_metatags
   after_save :expire_essential_tag_string_cache
-  after_destroy :remove_iqdb_async
-  after_destroy :delete_files
+  after_commit :delete_files, :on => :destroy
+  after_commit :remove_iqdb_async, :on => :destroy
   after_commit :update_iqdb_async, :on => :create
   after_commit :notify_pubsub
 
@@ -65,11 +65,13 @@ class Post < ActiveRecord::Base
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def delete_files(post_id, file_path, large_file_path, preview_file_path)
-        post = Post.find(post_id)
+      def delete_files(post_id, file_path, large_file_path, preview_file_path, force: false)
+        unless force
+          post = Post.find(post_id)
 
-        if post.file_path == file_path || post.large_file_path == large_file_path || post.preview_file_path == preview_file_path
-          raise DeletionError.new("Files still in use; skipping deletion.")
+          if post.file_path == file_path || post.large_file_path == large_file_path || post.preview_file_path == preview_file_path
+            raise DeletionError.new("Files still in use; skipping deletion.")
+          end
         end
 
         # the large file and the preview don't necessarily exist. if so errors will be ignored.
@@ -84,7 +86,7 @@ class Post < ActiveRecord::Base
     end
 
     def delete_files
-      Post.delete_files(id, file_path, large_file_path, preview_file_path)
+      Post.delete_files(id, file_path, large_file_path, preview_file_path, force: true)
     end
 
     def distribute_files
@@ -1711,15 +1713,7 @@ class Post < ActiveRecord::Base
     end
 
     def remove_iqdb_async
-      if File.exists?(preview_file_path) && Post.iqdb_enabled?
-        Post.iqdb_sqs_service.send_message("remove\n#{id}")
-      end
-    end
-
-    def update_iqdb
-      if Post.iqdb_enabled? && Post.iqdb_enabled?
-        Post.iqdb_sqs_service.send_message("update\n#{id}\n#{complete_preview_file_url}")
-      end
+      Post.remove_iqdb(id)
     end
   end
 

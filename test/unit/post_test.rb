@@ -33,7 +33,32 @@ class PostTest < ActiveSupport::TestCase
   context "Deletion:" do
     context "Expunging a post" do
       setup do
-        @post = FactoryGirl.create(:post)
+        @upload = FactoryGirl.create(:jpg_upload)
+        @upload.process!
+        @post = @upload.post
+      end
+
+      should "delete the files" do
+        assert_equal(true, File.exists?(@post.preview_file_path))
+        assert_equal(true, File.exists?(@post.large_file_path))
+        assert_equal(true, File.exists?(@post.file_path))
+
+        TestAfterCommit.with_commits(true) do
+          @post.expunge!
+        end
+
+        assert_equal(false, File.exists?(@post.preview_file_path))
+        assert_equal(false, File.exists?(@post.large_file_path))
+        assert_equal(false, File.exists?(@post.file_path))
+      end
+
+      should "remove the post from iqdb" do
+        mock_iqdb_service!
+        Post.iqdb_sqs_service.expects(:send_message).with("remove\n#{@post.id}")
+
+        TestAfterCommit.with_commits(true) do
+          @post.expunge!
+        end
       end
 
       context "that is status locked" do
