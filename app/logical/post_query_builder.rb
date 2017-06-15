@@ -322,11 +322,19 @@ class PostQueryBuilder
 
     if q[:parent] == "none"
       relation = relation.where("posts.parent_id IS NULL")
-    elsif q[:parent_neg] == "none" || q[:parent] == "any"
+    elsif q[:parent] == "any"
       relation = relation.where("posts.parent_id IS NOT NULL")
     elsif q[:parent]
       relation = relation.where("(posts.id = ? or posts.parent_id = ?)", q[:parent].to_i, q[:parent].to_i)
       has_constraints!
+    end
+
+    if q[:parent_neg_ids]
+      neg_ids = q[:parent_neg_ids].map(&:to_i)
+      neg_ids.delete(0)
+      if neg_ids.present?
+        relation = relation.where("posts.id not in (?) and (posts.parent_id is null or posts.parent_id not in (?))", neg_ids, neg_ids)
+      end
     end
 
     if q[:child] == "none"
