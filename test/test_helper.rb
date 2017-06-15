@@ -48,6 +48,7 @@ class ActionController::TestCase
 end
 
 Delayed::Worker.delay_jobs = false
+TestAfterCommit.enabled = false
 
 require "helpers/reportbooru_helper"
 class ActiveSupport::TestCase

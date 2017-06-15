@@ -65,11 +65,13 @@ class Post < ActiveRecord::Base
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def delete_files(post_id, file_path, large_file_path, preview_file_path)
-        post = Post.find(post_id)
+      def delete_files(post_id, file_path, large_file_path, preview_file_path, force: false)
+        unless force
+          post = Post.find(post_id)
 
-        if post.file_path == file_path || post.large_file_path == large_file_path || post.preview_file_path == preview_file_path
-          raise DeletionError.new("Files still in use; skipping deletion.")
+          if post.file_path == file_path || post.large_file_path == large_file_path || post.preview_file_path == preview_file_path
+            raise DeletionError.new("Files still in use; skipping deletion.")
+          end
         end
 
         # the large file and the preview don't necessarily exist. if so errors will be ignored.
@@ -84,7 +86,7 @@ class Post < ActiveRecord::Base
     end
 
     def delete_files
-      Post.delete_files(id, file_path, large_file_path, preview_file_path)
+      Post.delete_files(id, file_path, large_file_path, preview_file_path, force: true)
     end
 
     def distribute_files

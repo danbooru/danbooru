@@ -33,7 +33,23 @@ class PostTest < ActiveSupport::TestCase
   context "Deletion:" do
     context "Expunging a post" do
       setup do
-        @post = FactoryGirl.create(:post)
+        @upload = FactoryGirl.create(:jpg_upload)
+        @upload.process!
+        @post = @upload.post
+      end
+
+      should "delete the files" do
+        assert_equal(true, File.exists?(@post.preview_file_path))
+        assert_equal(true, File.exists?(@post.large_file_path))
+        assert_equal(true, File.exists?(@post.file_path))
+
+        TestAfterCommit.with_commits(true) do
+          @post.expunge!
+        end
+
+        assert_equal(false, File.exists?(@post.preview_file_path))
+        assert_equal(false, File.exists?(@post.large_file_path))
+        assert_equal(false, File.exists?(@post.file_path))
       end
 
       context "that is status locked" do
