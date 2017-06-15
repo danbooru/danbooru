@@ -1,6 +1,6 @@
 require 'ostruct'
 
-class FavoriteGroup < ActiveRecord::Base
+class FavoriteGroup < ApplicationRecord
   validates_uniqueness_of :name, :case_sensitive => false, :scope => :creator_id
   validates_format_of :name, :with => /\A[^,]+\Z/, :message => "cannot have commas"
   belongs_to :creator, :class_name => "User"

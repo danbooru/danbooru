@@ -1,4 +1,4 @@
-class PostDisapproval < ActiveRecord::Base
+class PostDisapproval < ApplicationRecord
   DELETION_THRESHOLD = 1.month
 
   belongs_to :post

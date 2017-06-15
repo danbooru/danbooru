@@ -1,4 +1,4 @@
-class Ban < ActiveRecord::Base
+class Ban < ApplicationRecord
   after_create :update_feedback
   after_create :update_user_on_create
   after_create :create_mod_action

@@ -1,4 +1,4 @@
-class Comment < ActiveRecord::Base
+class Comment < ApplicationRecord
   include Mentionable
 
   validate :validate_post_exists, :on => :create

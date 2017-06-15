@@ -1,7 +1,7 @@
 require 'digest/sha1'
 require 'danbooru/has_bit_flags'
 
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   class Error < Exception ; end
   class PrivilegeError < Exception ; end
 

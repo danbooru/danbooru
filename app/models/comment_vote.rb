@@ -1,4 +1,4 @@
-class CommentVote < ActiveRecord::Base
+class CommentVote < ApplicationRecord
   class Error < Exception ; end
 
   belongs_to :comment

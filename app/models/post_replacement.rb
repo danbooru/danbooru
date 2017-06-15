@@ -1,4 +1,4 @@
-class PostReplacement < ActiveRecord::Base
+class PostReplacement < ApplicationRecord
   DELETION_GRACE_PERIOD = 30.days
 
   belongs_to :post

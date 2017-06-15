@@ -1,4 +1,4 @@
-class JanitorTrial < ActiveRecord::Base
+class JanitorTrial < ApplicationRecord
   belongs_to :user
   after_create :send_dmail
   after_create :promote_user

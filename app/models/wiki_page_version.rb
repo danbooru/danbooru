@@ -1,4 +1,4 @@
-class WikiPageVersion < ActiveRecord::Base
+class WikiPageVersion < ApplicationRecord
   belongs_to :wiki_page
   belongs_to :updater, :class_name => "User"
   belongs_to :artist

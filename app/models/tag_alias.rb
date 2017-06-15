@@ -1,4 +1,4 @@
-class TagAlias < ActiveRecord::Base
+class TagAlias < ApplicationRecord
   attr_accessor :skip_secondary_validations
 
   before_save :ensure_tags_exist

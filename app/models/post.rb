@@ -1,7 +1,7 @@
 require 'danbooru/has_bit_flags'
 require 'google/apis/pubsub_v1'
 
-class Post < ActiveRecord::Base
+class Post < ApplicationRecord
   class ApprovalError < Exception ; end
   class DisapprovalError < Exception ; end
   class RevertError < Exception ; end

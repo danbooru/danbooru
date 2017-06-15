@@ -1,4 +1,4 @@
-class PoolArchive < ActiveRecord::Base
+class PoolArchive < ApplicationRecord
 
   belongs_to :updater, :class_name => "User"
 

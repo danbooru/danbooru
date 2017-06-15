@@ -1,4 +1,4 @@
-class UserNameChangeRequest < ActiveRecord::Base
+class UserNameChangeRequest < ApplicationRecord
   validates_presence_of :user_id, :original_name, :desired_name
   validates_inclusion_of :status, :in => %w(pending approved rejected)
   belongs_to :user

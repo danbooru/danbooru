@@ -1,4 +1,4 @@
-class UserPasswordResetNonce < ActiveRecord::Base
+class UserPasswordResetNonce < ApplicationRecord
   validates_presence_of :email, :key
   validate :validate_existence_of_email
   before_validation :initialize_key, :on => :create

@@ -1,4 +1,4 @@
-class PostApproval < ActiveRecord::Base
+class PostApproval < ApplicationRecord
   belongs_to :user
   belongs_to :post, inverse_of: :approvals
 

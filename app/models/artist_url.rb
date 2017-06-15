@@ -1,4 +1,4 @@
-class ArtistUrl < ActiveRecord::Base
+class ArtistUrl < ApplicationRecord
   before_save :initialize_normalized_url, on: [ :create ]
   before_save :normalize
   validates_presence_of :url

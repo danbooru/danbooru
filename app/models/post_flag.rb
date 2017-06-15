@@ -1,4 +1,4 @@
-class PostFlag < ActiveRecord::Base
+class PostFlag < ApplicationRecord
   class Error < Exception ; end
 
   module Reasons

@@ -1,4 +1,4 @@
-class SuperVoter < ActiveRecord::Base
+class SuperVoter < ApplicationRecord
   MAGNITUDE = 3
   DURATION = 1.week
 

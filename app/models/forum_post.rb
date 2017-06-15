@@ -1,4 +1,4 @@
-class ForumPost < ActiveRecord::Base
+class ForumPost < ApplicationRecord
   include Mentionable
 
   attr_accessible :body, :topic_id, :as => [:member, :builder, :gold, :platinum, :admin, :moderator, :default]

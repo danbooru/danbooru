@@ -1,4 +1,4 @@
-class ForumTopic < ActiveRecord::Base
+class ForumTopic < ApplicationRecord
   CATEGORIES = {
     0 => "General",
     1 => "Tags",

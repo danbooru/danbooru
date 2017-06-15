@@ -1,4 +1,4 @@
-class ForumTopicVisit < ActiveRecord::Base
+class ForumTopicVisit < ApplicationRecord
   belongs_to :user
   belongs_to :forum_topic
   attr_accessible :user_id, :user, :forum_topic_id, :forum_topic, :last_read_at
