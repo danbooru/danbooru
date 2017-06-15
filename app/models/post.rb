@@ -29,8 +29,8 @@ class Post < ActiveRecord::Base
   after_save :update_parent_on_save
   after_save :apply_post_metatags
   after_save :expire_essential_tag_string_cache
-  after_destroy :remove_iqdb_async
-  after_destroy :delete_files
+  after_commit :delete_files, :on => :destroy
+  after_commit :remove_iqdb_async, :on => :destroy
   after_commit :update_iqdb_async, :on => :create
   after_commit :notify_pubsub
 
