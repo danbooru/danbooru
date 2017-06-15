@@ -1713,9 +1713,7 @@ class Post < ActiveRecord::Base
     end
 
     def remove_iqdb_async
-      if File.exists?(preview_file_path) && Post.iqdb_enabled?
-        Post.iqdb_sqs_service.send_message("remove\n#{id}")
-      end
+      Post.remove_iqdb(id)
     end
 
     def update_iqdb

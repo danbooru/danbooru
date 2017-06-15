@@ -16,6 +16,7 @@ module IqdbTestHelper
 
     service = mock_sqs_service.new
     Post.stubs(:iqdb_sqs_service).returns(service)
+    Post.stubs(:iqdb_enabled?).returns(true)
 
     Danbooru.config.stubs(:iqdbs_auth_key).returns("hunter2")
     Danbooru.config.stubs(:iqdbs_server).returns("http://localhost:3004")

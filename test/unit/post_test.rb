@@ -52,6 +52,15 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(false, File.exists?(@post.file_path))
       end
 
+      should "remove the post from iqdb" do
+        mock_iqdb_service!
+        Post.iqdb_sqs_service.expects(:send_message).with("remove\n#{@post.id}")
+
+        TestAfterCommit.with_commits(true) do
+          @post.expunge!
+        end
+      end
+
       context "that is status locked" do
         setup do
           @post.update_attributes({:is_status_locked => true}, :as => :admin)
