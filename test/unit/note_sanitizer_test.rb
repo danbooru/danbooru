@@ -11,5 +11,10 @@ class NoteSanitizerTest < ActiveSupport::TestCase
       body = '<p style="background-image: url(http://www.google.com);">test</p>'
       assert_equal("<p>test</p>", NoteSanitizer.sanitize(body))
     end
+
+    should "allow style attributes on every tag" do
+      body = '<p style="font-size: 1em;">test</p>'
+      assert_equal('<p style="font-size: 1em;">test</p>', NoteSanitizer.sanitize(body))
+    end
   end
 end

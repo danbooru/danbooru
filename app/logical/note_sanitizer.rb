@@ -1,17 +1,25 @@
 module NoteSanitizer
+  ALLOWED_ELEMENTS = %w(
+    code center tn h1 h2 h3 h4 h5 h6 a span div blockquote br p ul li ol em
+    strong small big b i font u s pre ruby rb rt rp
+  )
+
+  ALLOWED_ATTRIBUTES = {
+    :all => %w(style title),
+    "a" => %w(href),
+    "span" => %w(class),
+    "div" => %w(class align),
+    "p" => %w(class align),
+    "font" => %w(color size),
+  }
+
   def self.sanitize(text)
     text.gsub!(/<( |-|3|:|>|\Z)/, "&lt;\\1")
 
     Sanitize.clean(
       text,
-      :elements => %w(code center tn h1 h2 h3 h4 h5 h6 a span div blockquote br p ul li ol em strong small big b i font u s pre ruby rb rt rp),
-      :attributes => {
-        "a" => %w(href title style),
-        "span" => %w(class style),
-        "div" => %w(class style align),
-        "p" => %w(class style align),
-        "font" => %w(color size style)
-      },
+      :elements => ALLOWED_ELEMENTS,
+      :attributes => ALLOWED_ATTRIBUTES,
       :protocols => {
         "a" => {
           "href" => ["http", "https", :relative]
