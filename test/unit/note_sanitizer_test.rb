@@ -16,5 +16,10 @@ class NoteSanitizerTest < ActiveSupport::TestCase
       body = '<p style="font-size: 1em;">test</p>'
       assert_equal('<p style="font-size: 1em;">test</p>', NoteSanitizer.sanitize(body))
     end
+
+    should "mark links as nofollow" do
+      body = '<a href="http://www.google.com">google</a>'
+      assert_equal('<a href="http://www.google.com" rel="nofollow">google</a>', NoteSanitizer.sanitize(body))
+    end
   end
 end

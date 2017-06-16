@@ -59,6 +59,9 @@ module NoteSanitizer
       text,
       :elements => ALLOWED_ELEMENTS,
       :attributes => ALLOWED_ATTRIBUTES,
+      :add_attributes => {
+        "a" => { "rel" => "nofollow" },
+      },
       :protocols => {
         "a" => {
           "href" => ["http", "https", :relative]
