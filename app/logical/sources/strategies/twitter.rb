@@ -20,9 +20,13 @@ module Sources::Strategies
       "Twitter"
     end
 
-    def get
+    def api_response
       status_id = status_id_from_url(url)
-      attrs = TwitterService.new.client.status(status_id).attrs
+      @api_response ||= TwitterService.new.client.status(status_id)
+    end
+
+    def get
+      attrs = api_response.attrs
       @artist_name = attrs[:user][:name]
       @profile_url = "https://twitter.com/" + attrs[:user][:screen_name]
       @image_url = image_urls.first
@@ -40,6 +44,23 @@ module Sources::Strategies
 
     def normalizable_for_artist_finder?
       true
+    end
+
+    def dtext_artist_commentary_desc
+      url_replacements = Array(api_response.attrs[:entities][:urls]).map do |url:, expanded_url:, **attrs|
+        [url, expanded_url]
+      end
+      url_replacements += Array(api_response.attrs[:entities][:media]).map do |url:, expanded_url:, **attrs|
+        [url, ""]
+      end
+      url_replacements = url_replacements.to_h
+
+      desc = artist_commentary_desc
+      desc = CGI::unescapeHTML(desc)
+      desc = desc.gsub(%r!https?://t\.co/[^[:space:]]+!i, url_replacements)
+      desc = desc.gsub(%r!#([^[:space:]]+)!, '"#\\1":[https://twitter.com/hashtag/\\1]')
+      desc = desc.gsub(%r!@([a-zA-Z0-9_]+)!, '"@\\1":[https://twitter.com/\\1]')
+      desc.strip
     end
 
     def status_id_from_url(url)

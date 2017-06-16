@@ -89,5 +89,17 @@ module Sources
         end
       end
     end
+
+    context "A tweet" do
+      setup do
+        @site = Sources::Site.new("https://twitter.com/noizave/status/875768175136317440")
+        @site.get
+      end
+
+      should "convert urls, hashtags, and mentions to dtext" do
+        desc = 'test "#foo":[https://twitter.com/hashtag/foo] "#ホワイトデー":[https://twitter.com/hashtag/ホワイトデー] "@noizave":[https://twitter.com/noizave]\'s blah http://www.example.com <>& 😀'
+        assert_equal(desc, @site.dtext_artist_commentary_desc)
+      end
+    end
   end
 end
