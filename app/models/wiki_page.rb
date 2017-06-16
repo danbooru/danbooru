@@ -1,4 +1,4 @@
-class WikiPage < ActiveRecord::Base
+class WikiPage < ApplicationRecord
   class RevertError < Exception ; end
 
   before_save :normalize_title

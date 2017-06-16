@@ -1,4 +1,4 @@
-class Artist < ActiveRecord::Base
+class Artist < ApplicationRecord
   extend Memoist
   class RevertError < Exception ; end
 

@@ -1,4 +1,4 @@
-class PostAppeal < ActiveRecord::Base
+class PostAppeal < ApplicationRecord
   class Error < Exception ; end
 
   belongs_to :creator, :class_name => "User"

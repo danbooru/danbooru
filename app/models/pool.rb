@@ -1,6 +1,6 @@
 require 'ostruct'
 
-class Pool < ActiveRecord::Base
+class Pool < ApplicationRecord
   class RevertError < Exception ; end
 
   validates_uniqueness_of :name, :case_sensitive => false

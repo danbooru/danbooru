@@ -1,4 +1,4 @@
-class PostVersion < ActiveRecord::Base
+class PostVersion < ApplicationRecord
   belongs_to :post
   belongs_to :updater, :class_name => "User"
   before_validation :initialize_updater

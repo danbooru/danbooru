@@ -1,4 +1,4 @@
-class SavedSearch < ActiveRecord::Base
+class SavedSearch < ApplicationRecord
   module ListbooruMethods
     extend ActiveSupport::Concern
 

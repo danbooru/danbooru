@@ -1,4 +1,4 @@
-class TagSubscription < ActiveRecord::Base
+class TagSubscription < ApplicationRecord
   belongs_to :creator, :class_name => "User"
   before_validation :initialize_creator, :on => :create
   before_validation :initialize_post_ids, :on => :create

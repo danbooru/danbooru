@@ -1,4 +1,4 @@
-class UserFeedback < ActiveRecord::Base
+class UserFeedback < ApplicationRecord
   self.table_name = "user_feedback"
   belongs_to :user
   belongs_to :creator, :class_name => "User"

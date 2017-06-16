@@ -1,4 +1,4 @@
-class Note < ActiveRecord::Base
+class Note < ApplicationRecord
   class RevertError < Exception ; end
 
   attr_accessor :updater_id, :updater_ip_addr, :html_id

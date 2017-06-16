@@ -1,4 +1,4 @@
-class PostVote < ActiveRecord::Base
+class PostVote < ApplicationRecord
   class Error < Exception ; end
 
   belongs_to :post

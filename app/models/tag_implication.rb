@@ -1,4 +1,4 @@
-class TagImplication < ActiveRecord::Base
+class TagImplication < ApplicationRecord
   attr_accessor :skip_secondary_validations
 
   before_save :update_descendant_names

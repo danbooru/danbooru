@@ -1,4 +1,4 @@
-class BulkUpdateRequest < ActiveRecord::Base
+class BulkUpdateRequest < ApplicationRecord
   attr_accessor :reason, :skip_secondary_validations
 
   belongs_to :user

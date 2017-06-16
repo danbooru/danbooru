@@ -1,6 +1,6 @@
 require 'digest/sha1'
 
-class Dmail < ActiveRecord::Base
+class Dmail < ApplicationRecord
   with_options on: :create do
     validates_presence_of :to_id
     validates_presence_of :from_id

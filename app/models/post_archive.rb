@@ -1,4 +1,4 @@
-class PostArchive < ActiveRecord::Base
+class PostArchive < ApplicationRecord
   extend Memoist
 
   belongs_to :post

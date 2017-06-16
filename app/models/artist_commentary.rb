@@ -1,4 +1,4 @@
-class ArtistCommentary < ActiveRecord::Base
+class ArtistCommentary < ApplicationRecord
   class RevertError < Exception ; end
 
   attr_accessor :remove_commentary_tag, :remove_commentary_request_tag, :remove_commentary_check_tag
