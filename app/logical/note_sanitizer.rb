@@ -1,7 +1,7 @@
 module NoteSanitizer
   ALLOWED_ELEMENTS = %w(
     code center tn h1 h2 h3 h4 h5 h6 a span div blockquote br p ul li ol em
-    strong small big b i font u s pre ruby rb rt rp
+    strong small big b i font u s pre ruby rb rt rp rtc sub sup hr wbr
   )
 
   ALLOWED_ATTRIBUTES = {
