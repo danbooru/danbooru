@@ -199,7 +199,7 @@ GEM
     metaclass (0.0.4)
     method_source (0.8.2)
     mime-types (2.99.3)
-    mini_portile2 (2.1.0)
+    mini_portile2 (2.2.0)
     minitest (5.10.1)
     mocha (1.2.1)
       metaclass (~> 0.0.1)
@@ -218,11 +218,11 @@ GEM
     net-ssh (2.9.2)
     netrc (0.10.3)
     newrelic_rpm (3.13.0.299)
-    nokogiri (1.7.0.1)
-      mini_portile2 (~> 2.1.0)
-    nokogiri (1.7.0.1-x64-mingw32)
-      mini_portile2 (~> 2.1.0)
-    nokogumbo (1.2.0)
+    nokogiri (1.8.0)
+      mini_portile2 (~> 2.2.0)
+    nokogiri (1.8.0-x64-mingw32)
+      mini_portile2 (~> 2.2.0)
+    nokogumbo (1.4.13)
       nokogiri
     ntlm-http (0.1.1)
     oauth2 (1.3.0)
@@ -292,10 +292,10 @@ GEM
     rmagick (2.16.0)
     ruby-prof (0.15.8)
     rubyzip (1.1.7)
-    sanitize (3.1.2)
-      crass (~> 1.0.1)
+    sanitize (4.5.0)
+      crass (~> 1.0.2)
       nokogiri (>= 1.4.4)
-      nokogumbo (= 1.2.0)
+      nokogumbo (~> 1.4.1)
     sass (3.4.23)
     sass-rails (5.0.6)
       railties (>= 4.0.0, < 6)
@@ -387,6 +387,7 @@ PLATFORMS
   x64-mingw32
 
 DEPENDENCIES
+  addressable
   awesome_print
   aws-sdk (~> 2)
   bcrypt-ruby
@@ -429,7 +430,7 @@ DEPENDENCIES
   ruby-imagespec!
   ruby-prof
   rubyzip
-  sanitize (~> 3.1.0)
+  sanitize
   sass-rails
   shoulda-context
   shoulda-matchers
