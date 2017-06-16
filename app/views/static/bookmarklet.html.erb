@@ -1,16 +1,27 @@
 <div id="c-static">
-  <div id="a-boomkarklet">
+  <div id="a-bookmarklet">
     <h1>Bookmarklet</h1>
 
-    <p><%= link_to "Post to #{Danbooru.config.app_name}", "javascript:location.href='http://#{Danbooru.config.hostname}/uploads/new?url='+encodeURIComponent(location.href)+'&ref='+encodeURIComponent(document.referrer)" %></p>
+    <p><%= link_to "Post to #{Danbooru.config.app_name}", "javascript:location.href='#{request.protocol + request.host_with_port}/uploads/new?url='+encodeURIComponent(location.href)+'&ref='+encodeURIComponent(document.referrer)" %></p>
 
-    <p>Bookmark this link. Next time you are directly viewing an image (that is, the JPG/PNG/GIF file is in the URL bar) you can open this bookmarklet and you will be taken to the upload page. Depending on the site you are uploading from you may also see some options for fetching metadata.</p>
+    <p>Bookmark this link by dragging it to your browser's bookmarks toolbar.
+    Next time you are directly viewing an image (that is, the JPG/PNG/GIF file
+    is in the URL bar) use this bookmarklet to be taken to the upload page.</p>
+    
+    <p>The upload page will contain an image preview, along with the artist,
+    translated tags, and commentary, and it will also run a dupe check
+    automatically.</p>
 
-    <p>The bookmarklet can also intelligently fetch artist/tag data from specific sites like Pixiv, Nico Seiga, Twitter, DeviantArt, and others. If you wish to preserve an HTML link for the source, you can use the bookmarklet on the HTML page containing the image. The bookmarklet will find the image URL and automatically download the largest version.</p>
+    <p>The bookmarklet also works on the HTML page for most sites, including Pixiv,
+    Nico Seiga, Twitter, DeviantArt, and others. Use the bookmarklet on the
+    HTML page to have it automatically find and upload the best available image
+    for you.</p>
 
-    <p><%= link_to "Batch to #{Danbooru.config.app_name}", "javascript:location.href='http://#{Danbooru.config.hostname}/uploads/batch?url='+encodeURIComponent(location.href)" %></p>
+    <p><%= link_to "Batch to #{Danbooru.config.app_name}", "javascript:location.href='#{request.protocol + request.host_with_port}/uploads/batch?url='+encodeURIComponent(location.href)" %></p>
 
-    <p>Use this bookmarklet for Twitter and Pixiv galleries. Use it on the HTML page.</p>
+    <p>Use this bookmarklet on the HTML page of Twitter, Pixiv, or ArtStation
+    galleries. It will open a page containing every image in the gallery, ready
+    for upload.</p>
   </div>
 </div>
 
