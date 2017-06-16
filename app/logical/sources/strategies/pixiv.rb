@@ -107,6 +107,23 @@ module Sources
         @metadata.pages
       end
 
+      def self.to_dtext(text)
+        text = text.gsub(%r!https?://www\.pixiv\.net/member_illust\.php\?mode=medium&illust_id=([0-9]+)!i) do |match|
+          pixiv_id = $1
+          %(pixiv ##{pixiv_id} "»":[/posts?tags=pixiv:#{pixiv_id}])
+        end
+
+        text = text.gsub(%r!https?://www\.pixiv\.net/member\.php\?id=([0-9]+)!i) do |match|
+          member_id = $1
+          profile_url = "https://www.pixiv.net/member.php?id=#{member_id}"
+          search_params = {"search[url_matches]" => profile_url}.to_param
+
+          %("user/#{member_id}":[#{profile_url}] "»":[/artists?#{search_params}])
+        end
+
+        text
+      end
+
       def illust_id_from_url
         if sample_image? || full_image? || work_page?
           illust_id_from_url!
