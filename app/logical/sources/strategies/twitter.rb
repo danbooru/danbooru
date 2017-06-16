@@ -46,6 +46,23 @@ module Sources::Strategies
       true
     end
 
+    def dtext_artist_commentary_desc
+      url_replacements = Array(api_response.attrs[:entities][:urls]).map do |url:, expanded_url:, **attrs|
+        [url, expanded_url]
+      end
+      url_replacements += Array(api_response.attrs[:entities][:media]).map do |url:, expanded_url:, **attrs|
+        [url, ""]
+      end
+      url_replacements = url_replacements.to_h
+
+      desc = artist_commentary_desc
+      desc = CGI::unescapeHTML(desc)
+      desc = desc.gsub(%r!https?://t\.co/[^[:space:]]+!i, url_replacements)
+      desc = desc.gsub(%r!#([^[:space:]]+)!, '"#\\1":[https://twitter.com/hashtag/\\1]')
+      desc = desc.gsub(%r!@([a-zA-Z0-9_]+)!, '"@\\1":[https://twitter.com/\\1]')
+      desc.strip
+    end
+
     def status_id_from_url(url)
       if url =~ %r{^https?://(?:mobile\.)?twitter\.com/\w+/status/(\d+)}
         $1.to_i
