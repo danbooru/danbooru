@@ -393,7 +393,7 @@ class Upload < ApplicationRecord
 
   module DownloaderMethods
     def strip_source
-      source.try(:strip)
+      source.to_s.strip
     end
 
     # Determines whether the source is downloadable

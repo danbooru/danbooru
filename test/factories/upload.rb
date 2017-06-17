@@ -16,9 +16,11 @@ FactoryGirl.define do
 
     factory(:jpg_upload) do
       content_type "image/jpeg"
-      file_path do
-        FileUtils.cp("#{Rails.root}/test/files/test.jpg", "#{Rails.root}/tmp")
-        "#{Rails.root}/tmp/test.jpg"
+      file do
+        f = Tempfile.new
+        f.write(File.read("#{Rails.root}/test/files/test.jpg"))
+        f.seek(0)
+        f
       end
     end
 
