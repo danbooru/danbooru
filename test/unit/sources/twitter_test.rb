@@ -100,6 +100,15 @@ module Sources
         desc = 'test "#foo":[https://twitter.com/hashtag/foo] "#ホワイトデー":[https://twitter.com/hashtag/ホワイトデー] "@noizave":[https://twitter.com/noizave]\'s blah http://www.example.com <>& 😀'
         assert_equal(desc, @site.dtext_artist_commentary_desc)
       end
+
+      should "get the tags" do
+        tags = [
+          %w[foo https://twitter.com/hashtag/foo],
+          %w[ホワイトデー https://twitter.com/hashtag/ホワイトデー],
+        ]
+
+        assert_equal(tags, @site.tags)
+      end
     end
   end
 end

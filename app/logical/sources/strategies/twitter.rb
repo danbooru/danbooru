@@ -12,10 +12,6 @@ module Sources::Strategies
       end
     end
 
-    def tags
-      []
-    end
-
     def site_name
       "Twitter"
     end
@@ -32,6 +28,9 @@ module Sources::Strategies
       @image_url = image_urls.first
       @artist_commentary_title = ""
       @artist_commentary_desc = attrs[:text]
+      @tags = attrs[:entities][:hashtags].map do |text:, indices:|
+        [text, "https://twitter.com/hashtag/#{text}"]
+      end
     end
 
     def image_urls
