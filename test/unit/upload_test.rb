@@ -308,6 +308,14 @@ class UploadTest < ActiveSupport::TestCase
       assert_equal("completed", @upload.status)
     end
 
+    should "process completely for a null source" do
+      @upload = FactoryGirl.create(:jpg_upload, :source => nil)
+
+      assert_difference("Post.count") do
+        assert_nothing_raised {@upload.process!}
+      end
+    end
+
     should "delete the temporary file upon completion" do
       @upload = FactoryGirl.create(:source_upload,
         :rating => "s",
