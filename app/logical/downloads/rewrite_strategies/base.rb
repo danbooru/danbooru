@@ -5,6 +5,8 @@
 module Downloads
   module RewriteStrategies
     class Base
+      attr_reader :url
+
       def initialize(url = nil)
         @url = url
       end
