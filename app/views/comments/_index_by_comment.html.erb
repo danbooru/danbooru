@@ -1,4 +1,4 @@
-<div class="comments-for-post">
+<div id="p-index-by-comment" class="comments-for-post">
   <div class="list-of-comments">
     <% @comments.each do |comment| %>
       <% if CurrentUser.is_moderator? || !comment.is_deleted? %>
