@@ -81,7 +81,6 @@ private
     @posts = Post.where("last_comment_bumped_at IS NOT NULL").tag_match(params[:tags]).reorder("last_comment_bumped_at DESC NULLS LAST").paginate(params[:page], :limit => 5, :search_count => params[:search])
     @posts.each # hack to force rails to eager load
     respond_with(@posts) do |format|
-      format.html {render :action => "index_by_post"}
       format.xml do
         render :xml => @posts.to_xml(:root => "posts")
       end
@@ -91,10 +90,8 @@ private
   def index_by_comment
     @comments = Comment.search(params[:search]).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@comments) do |format|
-      format.html {render :action => "index_by_comment"}
       format.atom do
         @comments = @comments.includes(:post, :creator).load
-        render :action => "index"
       end
       format.xml do
         render :xml => @comments.to_xml(:root => "comments")

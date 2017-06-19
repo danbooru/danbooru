@@ -1,0 +1,21 @@
+<div id="p-index-by-comment" class="comments-for-post">
+  <div class="list-of-comments">
+    <% @comments.each do |comment| %>
+      <% if CurrentUser.is_moderator? || !comment.is_deleted? %>
+        <div id="post_<%= comment.post.id %>" class="post <%= PostPresenter.preview_class(comment.post) %>" <%= PostPresenter.data_attributes(comment.post) %>>
+          <div class="preview">
+            <% if comment.post.visible? %>
+              <%= link_to(image_tag(comment.post.preview_file_url), post_path(comment.post)) %>
+            <% end %>
+          </div>
+          <%= render :partial => "comments/partials/show/comment", :collection => [comment] %>
+          <div class="clearfix"></div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<%= numbered_paginator(@comments) %>
+
+<% content_for(:html_header, auto_discovery_link_tag(:atom, comments_url(:atom, search: params[:search]), title: "Comments")) %>

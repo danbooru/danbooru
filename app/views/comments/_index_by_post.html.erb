@@ -1,0 +1,29 @@
+<div id="p-index-by-post">
+  <% if !CurrentUser.user.is_builder? %>
+    <div style="margin-bottom: 1em;">
+      <h2>Before commenting, read the <%= link_to "how to comment guide", wiki_pages_path(:search => {:title => "howto:comment"}) %>.</h2>
+    </div>
+  <% end %>
+
+  <% if @posts.empty? %>
+    <%= render "post_sets/blank" %>
+  <% end %>
+
+  <% @posts.select {|x| x.visible?}.each do |post| %>
+    <% if CurrentUser.is_moderator? || post.comments.undeleted.exists? %>
+      <div id="post_<%= post.id %>" class="post <%= PostPresenter.preview_class(post) %>" <%= PostPresenter.data_attributes(post) %>>
+        <div class="preview">
+          <% if post.visible? %>
+            <%= link_to(image_tag(post.preview_file_url), post_path(post)) %>
+          <% end %>
+        </div>
+        <%= render "comments/partials/index/list", :post => post, :comments => post.comments.visible(CurrentUser.user).recent.reverse, :show_header => true %>
+        <div class="clearfix"></div>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+
+<%= numbered_paginator(@posts) %>
+
+<% content_for(:html_header, auto_discovery_link_tag(:atom, comments_url(:atom, search: { do_not_bump_post: true }), title: "Comments")) %>
