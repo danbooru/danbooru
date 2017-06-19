@@ -24,6 +24,10 @@ class WikiPage < ApplicationRecord
       where("title = ?", title.mb_chars.downcase.tr(" ", "_"))
     end
 
+    def title_in(titles)
+      where("title in (?)", titles.map{|x| x.mb_chars.downcase.tr(" ", "_")} )
+    end
+
     def active
       where("is_deleted = false")
     end

@@ -55,7 +55,9 @@ module Sources
         end
       end
       untranslated_tags.reject! {|x| x.blank?}
-      WikiPage.other_names_equal(untranslated_tags).map{|wiki_page| [wiki_page.title, wiki_page.category_name]}
+      wikis = WikiPage.title_in(untranslated_tags)
+      wikis += WikiPage.other_names_equal(untranslated_tags)
+      wikis.uniq.map{|wiki_page| [wiki_page.title, wiki_page.category_name]}
     end
 
     def to_h
