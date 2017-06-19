@@ -21,5 +21,12 @@ class NoteSanitizerTest < ActiveSupport::TestCase
       body = '<a href="http://www.google.com">google</a>'
       assert_equal('<a href="http://www.google.com" rel="nofollow">google</a>', NoteSanitizer.sanitize(body))
     end
+
+    should "rewrite absolute links to relative links" do
+      Danbooru.config.stubs(:hostnames).returns(%w[danbooru.donmai.us sonohara.donmai.us hijiribe.donmai.us])
+
+      body = '<a href="http://sonohara.donmai.us/posts?tags=touhou#dtext-intro">touhou</a>'
+      assert_equal('<a href="/posts?tags=touhou#dtext-intro" rel="nofollow">touhou</a>', NoteSanitizer.sanitize(body))
+    end
   end
 end

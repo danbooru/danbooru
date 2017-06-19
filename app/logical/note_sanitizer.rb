@@ -73,7 +73,20 @@ module NoteSanitizer
         at_rules: [],
         protocols: [],
         properties: ALLOWED_PROPERTIES,
-      }
+      },
+      :transformers => method(:relativize_links),
     )
+  end
+
+  def self.relativize_links(node:, **env)
+    return unless node.name == "a" && node.attribute("href")
+
+    href = node.attribute("href")
+    url  = Addressable::URI.parse(href.value).normalize
+
+    if url.authority.in?(Danbooru.config.hostnames)
+      url.site = nil
+      href.value = url.to_s
+    end
   end
 end
