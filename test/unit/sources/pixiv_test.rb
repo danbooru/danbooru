@@ -117,13 +117,18 @@ module Sources
       end
 
       context "fetching the commentary" do
-        setup do
-          get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=46337015")
-        end
-
         should "work when the description is blank" do
+          get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=46337015")
+
           assert_equal("Illustration (PNG) - foo & bar", @site.dtext_artist_commentary_title)
           assert_equal("", @site.dtext_artist_commentary_desc)
+        end
+
+        should "convert illust links and member links to dtext" do
+          get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=63421642")
+
+          dtext_desc = %(foo 【pixiv #46337015 "»":[/posts?tags=pixiv:46337015]】bar 【pixiv #14901720 "»":[/posts?tags=pixiv:14901720]】\r\n\r\nbaz【"user/83739":[https://www.pixiv.net/member.php?id=83739] "»":[/artists?search%5Burl_matches%5D=https%3A%2F%2Fwww.pixiv.net%2Fmember.php%3Fid%3D83739]】)
+          assert_equal(dtext_desc, @site.dtext_artist_commentary_desc)
         end
       end
     end
