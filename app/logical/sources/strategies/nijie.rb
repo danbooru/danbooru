@@ -39,9 +39,17 @@ module Sources
         @artist_name, @profile_url = get_profile_from_page(page)
         @image_url = get_image_url_from_page(page)
         @tags = get_tags_from_page(page)
+        @artist_commentary_title, @artist_commentary_desc = get_commentary_from_page(page)
       end
 
     protected
+
+      def get_commentary_from_page(page)
+        title = page.search("h2.illust_title").text
+        desc = page.search('meta[property="og:description"]').attr("content").value
+
+        [title, desc]
+      end
 
       def get_profile_from_page(page)
         links = page.search("a.name")
