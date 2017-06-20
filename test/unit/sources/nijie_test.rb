@@ -70,5 +70,22 @@ module Sources
         assert_equal("莚", @site.artist_name)
       end
     end
+
+    context "The source site for a nijie gallery" do
+      setup do
+        @site = Sources::Site.new("http://nijie.info/view.php?id=218856")
+        @site.get
+      end
+
+      should "get the dtext-ified commentary" do
+        desc = <<-EOS.strip_heredoc.chomp
+          foo [b]bold[/b] [i]italics[/i] [s]strike[/s] red\r
+          \r
+          http://nijie.info/view.php?id=218944
+        EOS
+
+        assert_equal(desc, @site.dtext_artist_commentary_desc)
+      end
+    end
   end
 end
