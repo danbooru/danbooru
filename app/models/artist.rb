@@ -49,6 +49,7 @@ class Artist < ApplicationRecord
           break if url =~ /deviantart\.net\//i
           break if url =~ %r!\Ahttps?://(?:mobile\.)?twitter\.com/\Z!i
           break if url =~ %r!pawoo\.net/(?:web/)?$!i
+          break if url =~ %r!\Ahttps?://(pic\d+\.)?nijie\.info/!i
         end
 
         artists.inject({}) {|h, x| h[x.name] = x; h}.values.slice(0, 20)
