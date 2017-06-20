@@ -9,7 +9,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("http://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
+        assert_equal("https://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
       end
 
       should "get the profile" do
@@ -40,7 +40,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("http://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
+        assert_equal("https://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
       end
 
       should "get the profile" do
@@ -59,7 +59,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("http://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
+        assert_equal("https://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
       end
 
       should "get the profile" do
@@ -75,6 +75,19 @@ module Sources
       setup do
         @site = Sources::Site.new("http://nijie.info/view.php?id=218856")
         @site.get
+      end
+
+      should "get the image urls" do
+        urls = %w[
+          https://pic03.nijie.info/nijie_picture/236014_20170620101426_0.png
+          https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png
+          https://pic01.nijie.info/nijie_picture/diff/main/218856_1_236014_20170620101330.png
+          https://pic01.nijie.info/nijie_picture/diff/main/218856_2_236014_20170620101331.png
+          https://pic03.nijie.info/nijie_picture/diff/main/218856_3_236014_20170620101331.png
+          https://pic03.nijie.info/nijie_picture/diff/main/218856_4_236014_20170620101333.png
+        ]
+
+        assert_equal(urls, @site.image_urls)
       end
 
       should "get the dtext-ified commentary" do
