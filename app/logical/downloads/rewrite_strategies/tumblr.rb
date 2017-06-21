@@ -34,11 +34,10 @@ module Downloads
         return [url, headers]
       end
 
+      # https://gs1.wac.edgecastcdn.net/8019B6/data.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_500.png
+      # => http://data.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_500.png
       def rewrite_cdn(url, headers)
-        if url =~ %r{https?://gs1\.wac\.edgecastcdn\.net/8019B6/data\.tumblr\.com/}
-          url.sub!("gs1.wac.edgecastcdn.net/8019B6/", "")
-        end
-
+        url.sub!(%r!\Ahttps?://gs1\.wac\.edgecastcdn\.net/8019B6/data\.tumblr\.com!i, "http://data.tumblr.com")
         return [url, headers]
       end
     end

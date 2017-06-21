@@ -16,5 +16,15 @@ module Downloads
         assert_downloaded(90_122, @source)
       end
     end
+
+    context "a download for a gs1.wac.edgecastcdn.net image" do
+      should "rewrite to the full tumblr version" do
+        @source = "https://gs1.wac.edgecastcdn.net/8019B6/data.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_500.png"
+        @rewrite = "http://data.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_1280.png"
+
+        assert_downloaded(34_060, @source)
+        assert_rewritten(@rewrite, @source)
+      end
+    end
   end
 end
