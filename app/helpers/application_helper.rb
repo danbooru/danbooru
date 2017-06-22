@@ -101,6 +101,14 @@ module ApplicationHelper
     time_tag(time.strftime("%Y-%m-%d %H:%M"), time)
   end
 
+  def external_link_to(url)
+    if url =~ %r!\Ahttps?://!i
+      link_to url, {}, {rel: :nofollow}
+    else
+      url
+    end
+  end
+
   def link_to_ip(ip)
     link_to ip, moderator_ip_addrs_path(:search => {:ip_addr => ip})
   end
