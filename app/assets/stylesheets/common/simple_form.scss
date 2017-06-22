@@ -66,3 +66,12 @@ form.inline-form {
     }
   }
 }
+
+div.ui-dialog {
+  div.input {
+    input[type="text"] {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+}

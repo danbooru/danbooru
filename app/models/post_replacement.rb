@@ -4,7 +4,7 @@ class PostReplacement < ApplicationRecord
   belongs_to :post
   belongs_to :creator, class_name: "User"
   before_validation :initialize_fields
-  attr_accessible :replacement_url
+  attr_accessor :replacement_file, :final_source
 
   def initialize_fields
     self.creator = CurrentUser.user
@@ -23,7 +23,7 @@ class PostReplacement < ApplicationRecord
     end
 
     transaction do
-      upload = Upload.create!(source: replacement_url, rating: post.rating, tag_string: post.tag_string)
+      upload = Upload.create!(file: replacement_file, source: replacement_url, rating: post.rating, tag_string: post.tag_string)
       upload.process_upload
       upload.update(status: "completed", post_id: post.id)
 
@@ -37,7 +37,7 @@ class PostReplacement < ApplicationRecord
       post.image_width = upload.image_width
       post.image_height = upload.image_height
       post.file_size = upload.file_size
-      post.source = upload.source
+      post.source = final_source.presence || upload.source
       post.tag_string = upload.tag_string
       rescale_notes
       update_ugoira_frame_data(upload)
@@ -69,6 +69,10 @@ class PostReplacement < ApplicationRecord
   end
 
   module SearchMethods
+    def post_tags_match(query)
+      PostQueryBuilder.new(query).build(self.joins(:post))
+    end
+
     def search(params = {})
       q = all
 
@@ -77,7 +81,7 @@ class PostReplacement < ApplicationRecord
       end
 
       if params[:creator_name].present?
-        q = q.where(creator_name: User.name_to_id(params[:creator_name]))
+        q = q.where(creator_id: User.name_to_id(params[:creator_name]))
       end
 
       if params[:id].present?
@@ -86,6 +90,10 @@ class PostReplacement < ApplicationRecord
 
       if params[:post_id].present?
         q = q.where(post_id: params[:post_id].split(",").map(&:to_i))
+      end
+
+      if params[:post_tags_match].present?
+        q = q.post_tags_match(params[:post_tags_match])
       end
 
       q = q.order("created_at DESC")
