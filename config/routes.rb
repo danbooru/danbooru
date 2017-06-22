@@ -196,6 +196,7 @@ Rails.application.routes.draw do
       get :diff
     end
   end
+  resources :post_replacements, :only => [:index, :new, :create]
   resources :posts do
     resources :events, :only => [:index], :controller => "post_events"
     resources :replacements, :only => [:index, :new, :create], :controller => "post_replacements"
@@ -217,7 +218,6 @@ Rails.application.routes.draw do
   end
   resources :post_appeals
   resources :post_flags
-  resources :post_replacements, :only => [:index, :new, :create]
   resources :post_versions, :only => [:index, :search] do
     member do
       put :undo
