@@ -4,8 +4,7 @@ class PostReplacement < ApplicationRecord
   belongs_to :post
   belongs_to :creator, class_name: "User"
   before_validation :initialize_fields
-  attr_accessible :replacement_url, :final_source
-  attr_accessor :final_source
+  attr_accessor :replacement_file, :final_source
 
   def initialize_fields
     self.creator = CurrentUser.user
@@ -24,7 +23,7 @@ class PostReplacement < ApplicationRecord
     end
 
     transaction do
-      upload = Upload.create!(source: replacement_url, rating: post.rating, tag_string: post.tag_string)
+      upload = Upload.create!(file: replacement_file, source: replacement_url, rating: post.rating, tag_string: post.tag_string)
       upload.process_upload
       upload.update(status: "completed", post_id: post.id)
 
