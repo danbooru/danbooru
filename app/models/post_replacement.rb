@@ -69,6 +69,10 @@ class PostReplacement < ApplicationRecord
   end
 
   module SearchMethods
+    def post_tags_match(query)
+      PostQueryBuilder.new(query).build(self.joins(:post))
+    end
+
     def search(params = {})
       q = all
 
@@ -86,6 +90,10 @@ class PostReplacement < ApplicationRecord
 
       if params[:post_id].present?
         q = q.where(post_id: params[:post_id].split(",").map(&:to_i))
+      end
+
+      if params[:post_tags_match].present?
+        q = q.post_tags_match(params[:post_tags_match])
       end
 
       q = q.order("created_at DESC")
