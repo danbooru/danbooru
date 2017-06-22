@@ -77,7 +77,7 @@ class PostReplacement < ApplicationRecord
       end
 
       if params[:creator_name].present?
-        q = q.where(creator_name: User.name_to_id(params[:creator_name]))
+        q = q.where(creator_id: User.name_to_id(params[:creator_name]))
       end
 
       if params[:id].present?
