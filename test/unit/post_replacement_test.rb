@@ -190,5 +190,15 @@ class PostReplacementTest < ActiveSupport::TestCase
         assert(File.exists?(@post.large_file_path))
       end
     end
+
+    context "a post when given a final_source" do
+      should "change the source to the final_source" do
+        replacement_url = "http://data.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_orwwptNBCE1wsfqepo1_raw.png"
+        final_source = "https://noizave.tumblr.com/post/162094447052"
+        @post.replace!(replacement_url: replacement_url, final_source: final_source)
+
+        assert_equal(final_source, @post.source)
+      end
+    end
   end
 end

@@ -4,7 +4,8 @@ class PostReplacement < ApplicationRecord
   belongs_to :post
   belongs_to :creator, class_name: "User"
   before_validation :initialize_fields
-  attr_accessible :replacement_url
+  attr_accessible :replacement_url, :final_source
+  attr_accessor :final_source
 
   def initialize_fields
     self.creator = CurrentUser.user
@@ -37,7 +38,7 @@ class PostReplacement < ApplicationRecord
       post.image_width = upload.image_width
       post.image_height = upload.image_height
       post.file_size = upload.file_size
-      post.source = upload.source
+      post.source = final_source.presence || upload.source
       post.tag_string = upload.tag_string
       rescale_notes
       update_ugoira_frame_data(upload)

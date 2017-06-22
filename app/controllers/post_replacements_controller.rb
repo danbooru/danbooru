@@ -23,6 +23,6 @@ class PostReplacementsController < ApplicationController
 
 private
   def create_params
-    params.require(:post_replacement).permit(:replacement_url)
+    params.require(:post_replacement).permit(:replacement_url, :final_source)
   end
 end
