@@ -166,6 +166,8 @@ GEM
       domain_name (~> 0.5)
     http-form_data (1.0.2)
     http_parser.rb (0.6.0)
+    httparty (0.15.5)
+      multi_xml (>= 0.5.2)
     httpclient (2.8.0)
     hurley (0.2)
     i18n (0.8.1)
@@ -412,6 +414,7 @@ DEPENDENCIES
   gctools
   google-api-client
   highline
+  httparty
   mechanize
   memcache-client
   memcache_mock
