@@ -1,5 +1,6 @@
 class ArtistCommentaryVersion < ApplicationRecord
   before_validation :initialize_updater
+  belongs_to :post
   belongs_to :updater, :class_name => "User"
   scope :for_user, lambda {|user_id| where("updater_id = ?", user_id)}
   attr_accessible :post_id, :original_title, :original_description, :translated_title, :translated_description
