@@ -4,15 +4,15 @@ Danbooru.error("Error: " + <%= @approval.errors.full_messages.join("; ").to_json
 
 <% else %>
 
-$("#c-posts #approve").hide();
-$("#c-posts #disapprove").hide();
-$("#c-posts #flag").show();
-
-$("#pending-approval-notice, .notice-flagged, .notice-appealed").hide();
-
-$("#c-moderator-post-queues #post-<%= @approval.post.id %>").hide();
 Danbooru.notice("Post was approved");
 
 Danbooru.ModQueue.increment_processed();
 
 <% end %>
+
+$("#c-posts #approve").hide();
+$("#c-posts #disapprove").hide();
+$("#c-posts #flag").show();
+
+$("#pending-approval-notice, .notice-flagged, .notice-appealed").hide();
+$("#c-moderator-post-queues #post-<%= @approval.post.id %>").hide();
