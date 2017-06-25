@@ -74,5 +74,15 @@ module Downloads
         assert_rewritten(@rewrite, @source)
       end
     end
+
+    context "a download for a *.tumblr.com/post/* html page" do
+      should "download the best available version" do
+        @source = "https://noizave.tumblr.com/post/162206271767"
+        @rewrite = "http://data.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_raw.png"
+
+        assert_downloaded(3_620, @source)
+        assert_rewritten(@rewrite, @source)
+      end
+    end
   end
 end
