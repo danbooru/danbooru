@@ -32,11 +32,15 @@
             </td>
             <td>
               <h3><%= h(commentary_version.original_title) %></h3>
-              <%= h(commentary_version.original_description) %>
+              <div class="prose">
+                <%= format_text(commentary_version.original_description) %>
+              </div>
             </td>
             <td>
               <h3><%= h(commentary_version.translated_title) %></h3>
-              <%= h(commentary_version.translated_description) %>
+              <div class="prose">
+                <%= format_text(commentary_version.translated_description) %>
+              </div>
             </td>
             <% if CurrentUser.is_moderator? %>
               <td>
