@@ -1,13 +1,8 @@
 <% if @approval.errors.any? %>
-
-Danbooru.error("Error: " + <%= @approval.errors.full_messages.join("; ").to_json.html_safe %>);
-
+  Danbooru.error("Error: " + <%= @approval.errors.full_messages.join("; ").to_json.html_safe %>);
 <% else %>
-
-Danbooru.notice("Post was approved");
-
-Danbooru.ModQueue.increment_processed();
-
+  Danbooru.notice("Post was approved");
+  Danbooru.ModQueue.increment_processed();
 <% end %>
 
 $("#c-posts #approve").hide();
