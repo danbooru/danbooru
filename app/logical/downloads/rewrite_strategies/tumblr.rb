@@ -10,6 +10,7 @@ module Downloads
       def rewrite(url, headers, data = {})
         url = rewrite_cdn(url)
         url = rewrite_samples(url, headers)
+        url = rewrite_html_pages(url)
 
         return [url, headers, data]
       end
@@ -54,6 +55,14 @@ module Downloads
       # => http://data.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_500.png
       def rewrite_cdn(url)
         url.sub!(%r!\Ahttps?://gs1\.wac\.edgecastcdn\.net/8019B6/data\.tumblr\.com!i, "http://data.tumblr.com")
+        url
+      end
+
+      def rewrite_html_pages(url)
+        if Sources::Strategies::Tumblr.url_match?(url)
+          url = Sources::Strategies::Tumblr.new(url).image_url
+        end
+
         url
       end
     end
