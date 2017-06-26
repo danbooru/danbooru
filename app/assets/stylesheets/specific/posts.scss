@@ -535,12 +535,8 @@ div#unapprove-dialog {
   }
 }
 
-.ui-widget #form {
-  font-size: 1em;
-
-  input, select, textarea, button {
-    font-size: 0.9em;
-  }
+textarea[data-autocomplete="tag-edit"] {
+  font-family: monospace;
 }
 
 #add-commentary-dialog {

@@ -26,7 +26,7 @@ class PostReplacementTest < ActiveSupport::TestCase
   context "Replacing" do
     setup do
       CurrentUser.scoped(@uploader, "127.0.0.2") do
-        upload = FactoryGirl.create(:jpg_upload, as_pending: "0")
+        upload = FactoryGirl.create(:jpg_upload, as_pending: "0", tag_string: "lowres tag1")
         upload.process!
         @post = upload.post
       end
@@ -35,7 +35,7 @@ class PostReplacementTest < ActiveSupport::TestCase
     context "a post from a generic source" do
       setup do
         @post.update(source: "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png")
-        @post.replace!(replacement_url: "https://www.google.com/intl/en_ALL/images/logo.gif")
+        @post.replace!(replacement_url: "https://www.google.com/intl/en_ALL/images/logo.gif", tags: "-tag1 tag2")
         @upload = Upload.last
         @mod_action = ModAction.last
       end
@@ -52,6 +52,7 @@ class PostReplacementTest < ActiveSupport::TestCase
         end
 
         should "update the attributes" do
+          assert_equal("lowres tag2", @post.tag_string)
           assert_equal(272, @post.image_width)
           assert_equal(92, @post.image_height)
           assert_equal(5969, @post.file_size)
