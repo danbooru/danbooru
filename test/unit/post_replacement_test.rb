@@ -134,6 +134,7 @@ class PostReplacementTest < ActiveSupport::TestCase
         assert_equal("4ceadc314938bc27f3574053a3e1459a", @post.md5)
         assert_equal("4ceadc314938bc27f3574053a3e1459a", Digest::MD5.file(@post.file_path).hexdigest)
         assert_equal("https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png", @post.source)
+        assert_equal("https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png", @post.replacements.last.replacement_url)
       end
 
       should "delete the old files after three days" do
@@ -196,9 +197,11 @@ class PostReplacementTest < ActiveSupport::TestCase
         Tempfile.open do |file|
           file.write(File.read("#{Rails.root}/test/files/test.png"))
           file.seek(0)
+          uploaded_file = ActionDispatch::Http::UploadedFile.new(tempfile: file, filename: "test.png")
 
-          @post.replace!(replacement_file: file, replacement_url: "")
+          @post.replace!(replacement_file: uploaded_file, replacement_url: "")
           assert_equal(@post.md5, Digest::MD5.file(file).hexdigest)
+          assert_equal("file://test.png", @post.replacements.last.replacement_url)
         end
       end
     end

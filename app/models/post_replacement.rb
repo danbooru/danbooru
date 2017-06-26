@@ -27,6 +27,12 @@ class PostReplacement < ApplicationRecord
       upload.process_upload
       upload.update(status: "completed", post_id: post.id)
 
+      if replacement_file.present?
+        update(replacement_url: "file://#{replacement_file.original_filename}")
+      else
+        update(replacement_url: upload.source)
+      end
+
       # queue the deletion *before* updating the post so that we use the old
       # md5/file_ext to delete the old files. if saving the post fails,
       # this is rolled back so the job won't run.
@@ -112,7 +118,7 @@ class PostReplacement < ApplicationRecord
     end
 
     def replacement_message
-      linked_source = linked_source(post.source)
+      linked_source = linked_source(replacement_url)
       linked_source_was = linked_source(post.source_was)
 
       <<-EOS.strip_heredoc
