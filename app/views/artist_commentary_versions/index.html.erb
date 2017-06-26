@@ -2,6 +2,8 @@
   <div id="a-index">
     <h1>Artist Commentary Changes</h1>
 
+    <%= render "posts/partials/common/inline_blacklist" %>
+
     <table width="100%" class="striped">
       <thead>
         <tr>
@@ -21,14 +23,24 @@
       <tbody>
         <% @commentary_versions.each do |commentary_version| %>
           <tr>
-            <td><%= link_to commentary_version.post_id, post_path(commentary_version.post_id) %></td>
+            <td>
+              <% if params.dig(:search, :post_id).present? %>
+                <%= link_to commentary_version.post_id, post_path(commentary_version.post_id) %>
+              <% else %>
+                <%= PostPresenter.preview(commentary_version.post, :tags => "status:any") %>
+              <% end %>
+            </td>
             <td>
               <h3><%= h(commentary_version.original_title) %></h3>
-              <%= h(commentary_version.original_description) %>
+              <div class="prose">
+                <%= format_text(commentary_version.original_description) %>
+              </div>
             </td>
             <td>
               <h3><%= h(commentary_version.translated_title) %></h3>
-              <%= h(commentary_version.translated_description) %>
+              <div class="prose">
+                <%= format_text(commentary_version.translated_description) %>
+              </div>
             </td>
             <% if CurrentUser.is_moderator? %>
               <td>
