@@ -103,7 +103,7 @@ module ApplicationHelper
 
   def external_link_to(url)
     if url =~ %r!\Ahttps?://!i
-      link_to url, {}, {rel: :nofollow}
+      link_to url, url, {rel: :nofollow}
     else
       url
     end
