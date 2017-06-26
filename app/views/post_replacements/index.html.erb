@@ -21,7 +21,7 @@
       <tbody>
         <% @post_replacements.each do |post_replacement| %>
           <tr>
-            <td><%= PostPresenter.preview(post_replacement.post) %></td>
+            <td><%= PostPresenter.preview(post_replacement.post, show_deleted: true) %></td>
             <td>
               <dl>
                 <dt>Original Source</dt>
