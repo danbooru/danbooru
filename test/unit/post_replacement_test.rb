@@ -26,7 +26,7 @@ class PostReplacementTest < ActiveSupport::TestCase
   context "Replacing" do
     setup do
       CurrentUser.scoped(@uploader, "127.0.0.2") do
-        upload = FactoryGirl.create(:jpg_upload, as_pending: "0")
+        upload = FactoryGirl.create(:jpg_upload, as_pending: "0", tag_string: "lowres tag1")
         upload.process!
         @post = upload.post
       end
@@ -35,7 +35,7 @@ class PostReplacementTest < ActiveSupport::TestCase
     context "a post from a generic source" do
       setup do
         @post.update(source: "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png")
-        @post.replace!(replacement_url: "https://www.google.com/intl/en_ALL/images/logo.gif")
+        @post.replace!(replacement_url: "https://www.google.com/intl/en_ALL/images/logo.gif", tags: "-tag1 tag2")
         @upload = Upload.last
         @mod_action = ModAction.last
       end
@@ -52,6 +52,7 @@ class PostReplacementTest < ActiveSupport::TestCase
         end
 
         should "update the attributes" do
+          assert_equal("lowres tag2", @post.tag_string)
           assert_equal(272, @post.image_width)
           assert_equal(92, @post.image_height)
           assert_equal(5969, @post.file_size)
@@ -134,6 +135,7 @@ class PostReplacementTest < ActiveSupport::TestCase
         assert_equal("4ceadc314938bc27f3574053a3e1459a", @post.md5)
         assert_equal("4ceadc314938bc27f3574053a3e1459a", Digest::MD5.file(@post.file_path).hexdigest)
         assert_equal("https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png", @post.source)
+        assert_equal("https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png", @post.replacements.last.replacement_url)
       end
 
       should "delete the old files after three days" do
@@ -196,9 +198,11 @@ class PostReplacementTest < ActiveSupport::TestCase
         Tempfile.open do |file|
           file.write(File.read("#{Rails.root}/test/files/test.png"))
           file.seek(0)
+          uploaded_file = ActionDispatch::Http::UploadedFile.new(tempfile: file, filename: "test.png")
 
-          @post.replace!(replacement_file: file, replacement_url: "")
+          @post.replace!(replacement_file: uploaded_file, replacement_url: "")
           assert_equal(@post.md5, Digest::MD5.file(file).hexdigest)
+          assert_equal("file://test.png", @post.replacements.last.replacement_url)
         end
       end
     end

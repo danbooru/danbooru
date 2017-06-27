@@ -392,6 +392,11 @@ module Danbooru
       true
     end
 
+    # Should return true if the given tag should be suggested for removal in the post replacement dialog box.
+    def remove_tag_after_replacement?(tag)
+      tag =~ /replaceme|.*_sample|resized|upscaled|downscaled|md5_mismatch|jpeg_artifacts/i
+    end
+
     def shared_dir_path
       "/var/www/danbooru2/shared"
     end

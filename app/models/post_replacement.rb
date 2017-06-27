@@ -4,11 +4,12 @@ class PostReplacement < ApplicationRecord
   belongs_to :post
   belongs_to :creator, class_name: "User"
   before_validation :initialize_fields
-  attr_accessor :replacement_file, :final_source
+  attr_accessor :replacement_file, :final_source, :tags
 
   def initialize_fields
     self.creator = CurrentUser.user
     self.original_url = post.source
+    self.tags = post.tag_string + " " + self.tags.to_s
   end
 
   def undo!
@@ -23,9 +24,15 @@ class PostReplacement < ApplicationRecord
     end
 
     transaction do
-      upload = Upload.create!(file: replacement_file, source: replacement_url, rating: post.rating, tag_string: post.tag_string)
+      upload = Upload.create!(file: replacement_file, source: replacement_url, rating: post.rating, tag_string: self.tags)
       upload.process_upload
       upload.update(status: "completed", post_id: post.id)
+
+      if replacement_file.present?
+        update(replacement_url: "file://#{replacement_file.original_filename}")
+      else
+        update(replacement_url: upload.source)
+      end
 
       # queue the deletion *before* updating the post so that we use the old
       # md5/file_ext to delete the old files. if saving the post fails,
@@ -112,7 +119,7 @@ class PostReplacement < ApplicationRecord
     end
 
     def replacement_message
-      linked_source = linked_source(post.source)
+      linked_source = linked_source(replacement_url)
       linked_source_was = linked_source(post.source_was)
 
       <<-EOS.strip_heredoc
@@ -148,6 +155,12 @@ class PostReplacement < ApplicationRecord
       else
         truncated_source
       end
+    end
+
+    def suggested_tags_for_removal
+      tags = post.tag_array.select { |tag| Danbooru.config.remove_tag_after_replacement?(tag) }
+      tags = tags.map { |tag| "-#{tag}" }
+      tags.join(" ")
     end
   end
 
