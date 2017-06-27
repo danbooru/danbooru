@@ -46,7 +46,7 @@ class TwitterService
       elsif resp.is_a?(Net::HTTPSuccess)
         doc = Nokogiri::HTML(resp.body)
         images = doc.css("meta[property='og:image']")
-        return images.first.attr("content")
+        return images.first.attr("content").sub(":large", ":orig")
       end
     end
   end

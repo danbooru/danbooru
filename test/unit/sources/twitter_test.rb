@@ -42,7 +42,18 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("https://pbs.twimg.com/media/DBV40M2UIAAHYlt.jpg:large", @site.image_url)
+        assert_equal("https://pbs.twimg.com/media/DBV40M2UIAAHYlt.jpg:orig", @site.image_url)
+      end
+    end
+
+    context "A twitter summary card from twitter with a :large image" do
+      setup do
+        @site = Sources::Site.new("https://twitter.com/aranobu/status/817736083567820800")
+        @site.get
+      end
+
+      should "get the image url" do
+        assert_equal("https://pbs.twimg.com/media/C1kt72yVEAEGpOv.jpg:orig", @site.image_url)
       end
     end
 
