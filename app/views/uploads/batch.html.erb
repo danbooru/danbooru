@@ -2,11 +2,23 @@
   <div id="a-new">
     <h1>Batch Upload</h1>
 
-    <ul id="links">
+    <section>
       <% @urls.each.with_index do |url, i| %>
-        <li><%= link_to "Image ##{i}", new_upload_path(:url => url, :ref => params[:url]), :target => "_blank" %></li>
+        <div class="upload-preview">
+          <p class="caption-top">
+            <%= link_to "Image ##{i}", new_upload_path(url: url, ref: params[:url]), target: "_blank" %>
+          </p>
+
+          <%= link_to new_upload_path(url: url, ref: params[:url]), target: "_blank" do %>
+            <% if ImageProxy.needs_proxy?(url) %>
+              <%= image_tag(image_proxy_uploads_path(url: url)) %>
+            <% else %>
+              <%= image_tag url %>
+            <% end %>
+          <% end %>
+        </div>
       <% end %>
-    </ul>
+    </section>
 
     <p><%= link_to "Open all links in new windows", "#", :id => "link" %></p>
   </div>
@@ -20,7 +32,7 @@
   <script type="text/javascript">
     $(function() {
       $("#link").click(function() {
-        $("#links a").each(function(i, v) {
+        $(".upload-preview > a").each(function(i, v) {
           window.open(v.href);
         });
       });

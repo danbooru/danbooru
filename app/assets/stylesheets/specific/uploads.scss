@@ -47,4 +47,28 @@ div#c-uploads {
       display: inline;
     }
   }
+
+  div.upload-preview {
+    display: inline-block;
+
+    > a {
+      width: 154px;
+      height: 154px;
+      margin: 0 10px 10px 0;
+      display: inline-block;
+
+      img {
+        margin: auto;
+        border: 2px solid transparent;
+
+        max-width: 154px;
+        max-height: 154px;
+      }
+    }
+
+    .caption-top {
+      font-size: 0.8em;
+      margin-bottom: 0;
+    }
+  }
 }
