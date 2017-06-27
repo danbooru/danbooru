@@ -55,32 +55,13 @@ module Sources::Strategies
     end
 
     def dtext_artist_commentary_desc
-      to_dtext(artist_commentary_desc)
-    end
-
-    def to_dtext(text)
-      html = Nokogiri::HTML.fragment(text)
-
-      dtext = html.children.map do |element|
-        case element.name
-        when "text"
-          element.content
-        when "p"
-          to_dtext(element.inner_html) + "\n\n"
-        when "a"
+      DText.from_html(artist_commentary_desc) do |element|
+        if element.name == "a"
           # don't include links to the toot itself.
           media_urls = api_response.json["media_attachments"].map { |attr| attr["text_url"] }
-          next if element.attribute("href").value.in?(media_urls)
-
-          title = to_dtext(element.inner_html)
-          url = element.attributes["href"].value
-          %("#{title}":[#{url}])
-        else
-          to_dtext(element.inner_html)
+          element["href"] = nil if element["href"].in?(media_urls)
         end
-      end.join.strip
-
-      dtext
+      end.strip
     end
   end
 end

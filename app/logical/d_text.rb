@@ -369,6 +369,53 @@ class DText
     s
   end
 
+  def self.from_html(text, &block)
+    html = Nokogiri::HTML.fragment(text)
+
+    dtext = html.children.map do |element|
+      block.call(element) if block.present?
+
+      case element.name
+      when "text"
+        element.content
+      when "br"
+        "\n"
+      when "p"
+        from_html(element.inner_html, &block) + "\n\n"
+      when "blockquote"
+        "[quote]#{from_html(element.inner_html, &block)}[/quote]" if element.inner_html.present?
+      when "small", "sub"
+        "[tn]#{from_html(element.inner_html, &block)}[/tn]" if element.inner_html.present?
+      when "b", "strong"
+        "[b]#{from_html(element.inner_html, &block)}[/b]" if element.inner_html.present?
+      when "i", "em"
+        "[i]#{from_html(element.inner_html, &block)}[/i]" if element.inner_html.present?
+      when "u"
+        "[u]#{from_html(element.inner_html, &block)}[/u]" if element.inner_html.present?
+      when "s", "strike"
+        "[s]#{from_html(element.inner_html, &block)}[/s]" if element.inner_html.present?
+      when "li"
+        "* #{from_html(element.inner_html, &block)}" if element.inner_html.present?
+      when "h1", "h2", "h3", "h4", "h5", "h6"
+        hN = element.name
+        title = from_html(element.inner_html, &block)
+        "#{hN}. #{title}\n"
+      when "a"
+        title = from_html(element.inner_html, &block)
+        url = element["href"]
+        %("#{title}":[#{url}]) if title.present? && url.present?
+      when "img"
+        element.attributes["title"] || element.attributes["alt"] || ""
+      when "comment"
+        # ignored
+      else
+        from_html(element.inner_html, &block)
+      end
+    end.join
+
+    dtext
+  end
+
   # extract the first paragraph `needle` occurs in.
   def self.excerpt(dtext, needle)
     dtext = dtext.gsub(/\r\n|\r|\n/, "\n")

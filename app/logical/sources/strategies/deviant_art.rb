@@ -36,47 +36,11 @@ module Sources
       end
 
       def self.to_dtext(text)
-        html = Nokogiri::HTML.fragment(text)
-
-        dtext = html.children.map do |element|
-          case element.name
-          when "text"
-            element.content
-          when "br"
-            "\n"
-          when "blockquote"
-            "[quote]#{to_dtext(element.inner_html)}[/quote]" if element.inner_html.present?
-          when "small", "sub"
-            "[tn]#{to_dtext(element.inner_html)}[/tn]" if element.inner_html.present?
-          when "b"
-            "[b]#{to_dtext(element.inner_html)}[/b]" if element.inner_html.present?
-          when "i"
-            "[i]#{to_dtext(element.inner_html)}[/i]" if element.inner_html.present?
-          when "u"
-            "[u]#{to_dtext(element.inner_html)}[/u]" if element.inner_html.present?
-          when "strike"
-            "[s]#{to_dtext(element.inner_html)}[/s]" if element.inner_html.present?
-          when "li"
-            "* #{to_dtext(element.inner_html)}" if element.inner_html.present?
-          when "h1", "h2", "h3", "h4", "h5", "h6"
-            hN = element.name
-            title = to_dtext(element.inner_html)
-            "#{hN}. #{title}\n"
-          when "a"
-            title = to_dtext(element.inner_html)
-            url = element.attributes["href"].value
-            url = url.gsub(%r!\Ahttps?://www\.deviantart\.com/users/outgoing\?!i, "")
-            %("#{title}":[#{url}]) if title.present?
-          when "img"
-            element.attributes["title"] || element.attributes["alt"] || ""
-          when "comment"
-            # ignored
-          else
-            to_dtext(element.inner_html)
+        DText.from_html(text) do |element|
+          if element.name == "a" && element["href"].present?
+            element["href"] = element["href"].gsub(%r!\Ahttps?://www\.deviantart\.com/users/outgoing\?!i, "")
           end
-        end.join
-
-        dtext
+        end
       end
 
     protected

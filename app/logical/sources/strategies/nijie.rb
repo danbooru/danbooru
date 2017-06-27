@@ -50,26 +50,9 @@ module Sources
 
     protected
 
-      # XXX: duplicated from strategies/deviant_art.rb.
       def self.to_dtext(text)
-        html = Nokogiri::HTML.fragment(text)
-
-        dtext = html.children.map do |element|
-          case element.name
-          when "text"
-            element.content
-          when "strong"
-            "[b]#{to_dtext(element.inner_html)}[/b]" if element.inner_html.present?
-          when "i"
-            "[i]#{to_dtext(element.inner_html)}[/i]" if element.inner_html.present?
-          when "s"
-            "[s]#{to_dtext(element.inner_html)}[/s]" if element.inner_html.present?
-          else
-            to_dtext(element.inner_html)
-          end
-        end.join
-
-        dtext
+        text = text.gsub(/\r\n|\r/, "<br>")
+        DText.from_html(text).strip
       end
 
       def get_commentary_from_page(page)
