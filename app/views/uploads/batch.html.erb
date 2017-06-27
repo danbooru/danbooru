@@ -10,7 +10,11 @@
           </p>
 
           <%= link_to new_upload_path(url: url, ref: params[:url]), target: "_blank" do %>
-            <%= image_tag url %>
+            <% if ImageProxy.needs_proxy?(url) %>
+              <%= image_tag(image_proxy_uploads_path(url: url)) %>
+            <% else %>
+              <%= image_tag url %>
+            <% end %>
           <% end %>
         </div>
       <% end %>
