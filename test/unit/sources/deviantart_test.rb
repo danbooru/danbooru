@@ -35,14 +35,11 @@ module Sources
       should "get the dtext-ified commentary" do
         desc = <<-EOS.strip_heredoc.chomp
           blah blah
-          
           "test link":[http://www.google.com]
-          
-
 
           h1. lol
 
-          
+
 
           [b]blah[/b] [i]blah[/i] [u]blah[/u] [s]blah[/s]
           herp derp
@@ -52,7 +49,6 @@ module Sources
           * one
           * two
           * three
-          
           
           * one
           * two

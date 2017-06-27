@@ -377,13 +377,13 @@ class DText
 
       case element.name
       when "text"
-        element.content
+        element.content.gsub(/(?:\r|\n)+$/, "")
       when "br"
         "\n"
-      when "p"
-        from_html(element.inner_html, &block) + "\n\n"
+      when "p", "ul", "ol"
+        from_html(element.inner_html, &block).strip + "\n\n"
       when "blockquote"
-        "[quote]#{from_html(element.inner_html, &block)}[/quote]" if element.inner_html.present?
+        "[quote]#{from_html(element.inner_html, &block).strip}[/quote]\n\n" if element.inner_html.present?
       when "small", "sub"
         "[tn]#{from_html(element.inner_html, &block)}[/tn]" if element.inner_html.present?
       when "b", "strong"
@@ -395,13 +395,13 @@ class DText
       when "s", "strike"
         "[s]#{from_html(element.inner_html, &block)}[/s]" if element.inner_html.present?
       when "li"
-        "* #{from_html(element.inner_html, &block)}" if element.inner_html.present?
+        "* #{from_html(element.inner_html, &block)}\n" if element.inner_html.present?
       when "h1", "h2", "h3", "h4", "h5", "h6"
         hN = element.name
         title = from_html(element.inner_html, &block)
-        "#{hN}. #{title}\n"
+        "#{hN}. #{title}\n\n"
       when "a"
-        title = from_html(element.inner_html, &block)
+        title = from_html(element.inner_html, &block).strip
         url = element["href"]
         %("#{title}":[#{url}]) if title.present? && url.present?
       when "img"
