@@ -12,6 +12,11 @@ class S3BackupService < BackupService
     upload_to_s3(key, file_path)
   end
 
+  def delete(file_path, type: nil)
+    key = s3_key(file_path, type)
+    delete_from_s3(key)
+  end
+
 protected
   def s3_key(file_path, type)
     case type
@@ -24,6 +29,12 @@ protected
     else
       raise ArgumentError.new("Unknown type: #{type}")
     end
+  end
+
+  def delete_from_s3(key)
+    client.delete_object(bucket: bucket, key: key)
+  rescue Aws::S3::Errors::NoSuchKey
+    # ignore
   end
 
   def upload_to_s3(key, file_path)

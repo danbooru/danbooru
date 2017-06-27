@@ -18,11 +18,6 @@ class PostReplacement < ApplicationRecord
   end
 
   def process!
-    # TODO images hosted on s3 need to be deleted from s3 instead of the local filesystem.
-    if Danbooru.config.use_s3_proxy?(post)
-      raise NotImplementedError.new("Replacing S3 hosted images not yet supported.")
-    end
-
     transaction do
       upload = Upload.create!(file: replacement_file, source: replacement_url, rating: post.rating, tag_string: self.tags)
       upload.process_upload

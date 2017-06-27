@@ -74,6 +74,10 @@ class Post < ApplicationRecord
           end
         end
 
+        backup_service.delete(file_path, type: :original)
+        backup_service.delete(large_file_path, type: :large)
+        backup_service.delete(preview_file_path, type: :preview)
+
         # the large file and the preview don't necessarily exist. if so errors will be ignored.
         FileUtils.rm_f(file_path)
         FileUtils.rm_f(large_file_path)
