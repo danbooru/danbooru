@@ -13,11 +13,13 @@ class SuperVoter < ApplicationRecord
 
   def self.init!
     prune!
-    report = PostVoteSimilarity.new(User.admins.first.id)
+    without_timeout do
+      report = PostVoteSimilarity.new(User.admins.first.id)
 
-    report.calculate_positive(15).each do |element|
-      unless SuperVoter.where("user_id = ?", element.user_id).exists?
-        SuperVoter.create(:user_id => element.user_id)
+      report.calculate_positive(15).each do |element|
+        unless SuperVoter.where("user_id = ?", element.user_id).exists?
+          SuperVoter.create(:user_id => element.user_id)
+        end
       end
     end
   end
