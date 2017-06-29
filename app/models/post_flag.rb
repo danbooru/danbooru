@@ -79,8 +79,10 @@ class PostFlag < ApplicationRecord
 
       if params[:creator_name].present?
         flagger_id = User.name_to_id(params[:creator_name].strip)
-        if CurrentUser.can_view_flagger?(flagger_id)
+        if flagger_id && CurrentUser.can_view_flagger?(flagger_id)
           q = q.where("creator_id = ?", flagger_id)
+        else
+          q = q.where("false")
         end
       end
 
