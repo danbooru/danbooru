@@ -239,7 +239,10 @@ class PostQueryBuilder
     if q[:flagger_ids_neg]
       q[:flagger_ids_neg].each do |flagger_id|
         if CurrentUser.can_view_flagger?(flagger_id)
-          relation = relation.where("posts.id NOT IN (?)", PostFlag.unscoped.search({:creator_id => flagger_id, :category => "normal"}).reorder("").select(:post_id).distinct)
+          post_ids = PostFlag.unscoped.search({:creator_id => flagger_id, :category => "normal"}).reorder("").pluck("distinct(post_id)")
+          if post_ids.any?
+            relation = relation.where("posts.id NOT IN (?)", post_ids)
+          end
         end
       end
     end
