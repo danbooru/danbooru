@@ -1,6 +1,5 @@
 require 'test_helper'
 require 'helpers/saved_search_test_helper'
-require 'fakeweb'
 
 class SavedSearchTest < ActiveSupport::TestCase
   include SavedSearchTestHelper
@@ -46,14 +45,10 @@ class SavedSearchTest < ActiveSupport::TestCase
   end
 
   context "Fetching the post ids for a search" do
-    teardown do
-      FakeWeb.clean_registry
-    end
-
     context "with a label" do
       setup do
         SavedSearch.expects(:queries_for).with(1, "blah").returns(%w(a b c))
-        FakeWeb.register_uri(:post, "http://localhost:3001/v2/search", :body => "1 2 3 4")
+        stub_request(:post, "http://localhost:3001/v2/search").to_return(:body => "1 2 3 4")
       end
 
       should "return a list of ids" do
@@ -65,7 +60,7 @@ class SavedSearchTest < ActiveSupport::TestCase
     context "without a label" do
       setup do
         SavedSearch.expects(:queries_for).with(1, nil).returns(%w(a b c))
-        FakeWeb.register_uri(:post, "http://localhost:3001/v2/search", :body => "1 2 3 4")
+        stub_request(:post, "http://localhost:3001/v2/search").to_return(:body => "1 2 3 4")
       end
 
       should "return a list of ids" do

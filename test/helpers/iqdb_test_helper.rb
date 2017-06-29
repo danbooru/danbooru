@@ -27,6 +27,6 @@ module IqdbTestHelper
     url = "http://localhost:3004/similar?key=hunter2&url=#{CGI.escape source}&ref"
     body = matches.map { |post| { post_id: post.id } }.to_json
 
-    FakeWeb.register_uri(:get, url, body: body)
+    stub_request(:get, url).to_return(body: body)
   end
 end
