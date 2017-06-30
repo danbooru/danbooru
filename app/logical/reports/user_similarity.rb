@@ -33,13 +33,11 @@ module Reports
       uri = URI.parse("#{Danbooru.config.reportbooru_server}/reports/#{endpoint}")
       uri.query = URI.encode_www_form(params)
 
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.is_a?(URI::HTTPS)) do |http|
-        resp = http.request_get(uri.request_uri)
-        if resp.is_a?(Net::HTTPSuccess)
-          resp.body
-        else
-          raise "HTTP error code: #{resp.code} #{resp.message}"
-        end
+      resp = HTTParty.get(uri)
+      if resp.success?
+        resp.body
+      else
+        raise "HTTP error code: #{resp.code} #{resp.message}"
       end
     end
   end

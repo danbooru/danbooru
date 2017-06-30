@@ -32,22 +32,12 @@ class TwitterService
     end.compact
   end
 
-  def extract_og_image_from_page(url, n = 5)
-    raise "too many redirects" if n == 0
-
-    Net::HTTP.start(url.host, url.port, :use_ssl => (url.normalized_scheme == "https")) do |http|
-      resp = http.request_get(url.request_uri)
-      if resp.is_a?(Net::HTTPMovedPermanently) && resp["Location"]
-        redirect_url = Addressable::URI.parse(resp["Location"])
-        redirect_url.host = url.host if redirect_url.host.nil?
-        redirect_url.scheme = url.scheme if redirect_url.scheme.nil?
-        redirect_url.port = url.port if redirect_url.port.nil?
-        return extract_og_image_from_page(redirect_url, n - 1)
-      elsif resp.is_a?(Net::HTTPSuccess)
-        doc = Nokogiri::HTML(resp.body)
-        images = doc.css("meta[property='og:image']")
-        return images.first.attr("content").sub(":large", ":orig")
-      end
+  def extract_og_image_from_page(url)
+    resp = HTTParty.get(url)
+    if resp.success?
+      doc = Nokogiri::HTML(resp.body)
+      images = doc.css("meta[property='og:image']")
+      return images.first.attr("content").sub(":large", ":orig")
     end
   end
 

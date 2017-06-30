@@ -17,14 +17,11 @@ class MissedSearchService
   def fetch_data
     Cache.get("ms", 1.minute) do
       url = URI.parse("#{Danbooru.config.reportbooru_server}/missed_searches")
-      response = ""
-      Net::HTTP.start(url.host, url.port, :use_ssl => url.is_a?(URI::HTTPS)) do |http|
-        http.read_timeout = 1
-        http.request_get(url.request_uri) do |res|
-          if res.is_a?(Net::HTTPSuccess)
-            response = res.body
-          end
-        end
+      response = HTTParty.get(url, timeout: 6)
+      if response.success?
+        response = response.body
+      else
+        response = ""
       end
       response.force_encoding("utf-8")
     end

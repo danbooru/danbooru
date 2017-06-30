@@ -31,12 +31,8 @@ module Downloads
       }
       @source, headers, @data = before_download(@source, headers, @data)
       url = URI.parse(@source)
-      Net::HTTP.start(url.host, url.port, :use_ssl => url.is_a?(URI::HTTPS)) do |http|
-        http.read_timeout = 3
-        http.request_head(url.request_uri, headers) do |res|
-          return res.content_length
-        end
-      end
+      res = HTTParty.head(url, timeout: 3)
+      res.content_length
     end
 
     def download!
@@ -94,30 +90,17 @@ module Downloads
         validate_local_hosts(url)
 
         begin
-          Net::HTTP.start(url.host, url.port, :use_ssl => url.is_a?(URI::HTTPS)) do |http|
-            http.read_timeout = 10
-            http.request_get(url.request_uri, headers) do |res|
-              case res
-              when Net::HTTPSuccess then
-                if max_size
-                  len = res["Content-Length"]
-                  raise Error.new("File is too large (#{len} bytes)") if len && len.to_i > max_size
-                end
-                yield(res)
-                return [src, datums]
-
-              when Net::HTTPRedirection then
-                if limit == 0 then
-                  raise Error.new("Too many redirects")
-                end
-                src = res["location"]
-                limit -= 1
-
-              else
-                raise Error.new("HTTP error code: #{res.code} #{res.message}")
-              end
-            end # http.request_get
-          end # http.start
+          res = HTTParty.get(url, timeout: 10, headers: headers)
+          if res.success?
+            if max_size
+              len = res["Content-Length"]
+              raise Error.new("File is too large (#{len} bytes)") if len && len.to_i > max_size
+            end
+            yield(res)
+            return [src, datums]
+          else
+            raise Error.new("HTTP error code: #{res.code} #{res.message}")
+          end
         rescue Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EIO, Errno::EHOSTUNREACH, Errno::ECONNREFUSED, IOError => x
           tries += 1
           if tries < 3

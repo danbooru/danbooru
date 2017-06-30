@@ -46,25 +46,22 @@ module Sources::Strategies
     end
 
     def get
-      uri = URI.parse(api_url)
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.is_a?(URI::HTTPS)) do |http|
-        resp = http.request_get(uri.request_uri)
-        image_url_rewriter = Downloads::RewriteStrategies::ArtStation.new
-        if resp.is_a?(Net::HTTPSuccess)
-          @json = JSON.parse(resp.body)
-          @artist_name = json["user"]["username"]
-          @profile_url = json["user"]["permalink"]
-          images = json["assets"].select { |asset| asset["asset_type"] == "image" }
-          @image_urls = images.map do |x|
-            y, _, _ = image_url_rewriter.rewrite(x["image_url"], nil)
-            y
-          end
-          @tags = json["tags"].map {|x| [x.downcase.tr(" ", "_"), "https://www.artstation.com/search?q=" + CGI.escape(x)]} if json["tags"]
-          @artist_commentary_title = json["title"]
-          @artist_commentary_desc = ActionView::Base.full_sanitizer.sanitize(json["description"])
-        else
-          raise "HTTP error code: #{resp.code} #{resp.message}"
+      resp = HTTParty.get(api_url)
+      image_url_rewriter = Downloads::RewriteStrategies::ArtStation.new
+      if resp.success?
+        @json = JSON.parse(resp.body)
+        @artist_name = json["user"]["username"]
+        @profile_url = json["user"]["permalink"]
+        images = json["assets"].select { |asset| asset["asset_type"] == "image" }
+        @image_urls = images.map do |x|
+          y, _, _ = image_url_rewriter.rewrite(x["image_url"], nil)
+          y
         end
+        @tags = json["tags"].map {|x| [x.downcase.tr(" ", "_"), "https://www.artstation.com/search?q=" + CGI.escape(x)]} if json["tags"]
+        @artist_commentary_title = json["title"]
+        @artist_commentary_desc = ActionView::Base.full_sanitizer.sanitize(json["description"])
+      else
+        raise "HTTP error code: #{resp.code} #{resp.message}"
       end
     end
   end

@@ -28,24 +28,22 @@ module Iqdb
         uri = URI.parse("#{Danbooru.config.iqdbs_server}/similar")
         uri.query = URI.encode_www_form(params)
 
-        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.is_a?(URI::HTTPS)) do |http|
-          resp = http.request_get(uri.request_uri)
-          if resp.is_a?(Net::HTTPSuccess)
-            json = JSON.parse(resp.body)
-            if json.is_a?(Array)
-              post_ids = json.map { |match| match["post_id"] }
-              posts = Post.find(post_ids)
+        resp = HTTParty.get(uri)
+        if resp.success?
+          json = JSON.parse(resp.body)
+          if json.is_a?(Array)
+            post_ids = json.map { |match| match["post_id"] }
+            posts = Post.find(post_ids)
 
-              @matches = json.map do |match|
-                post = posts.find { |post| post.id == match["post_id"] }
-                match.with_indifferent_access.merge({ post: post })
-              end
-            else
-              @matches = []
+            @matches = json.map do |match|
+              post = posts.find { |post| post.id == match["post_id"] }
+              match.with_indifferent_access.merge({ post: post })
             end
           else
-            raise "HTTP error code: #{resp.code} #{resp.message}"
+            @matches = []
           end
+        else
+          raise "HTTP error code: #{resp.code} #{resp.message}"
         end
       else
         raise NotImplementedError

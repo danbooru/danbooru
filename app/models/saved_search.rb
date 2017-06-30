@@ -28,18 +28,14 @@ class SavedSearch < ApplicationRecord
             "queries" => queries
           }.to_json
 
-          uri = URI.parse("#{Danbooru.config.listbooru_server}/v2/search")
+          uri = "#{Danbooru.config.listbooru_server}/v2/search"
 
-          body = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.is_a?(URI::HTTPS)) do |http|
-            resp = http.request_post(uri.request_uri, json)
-            if resp.is_a?(Net::HTTPSuccess)
-              resp.body
-            else
-              raise "HTTP error code: #{resp.code} #{resp.message}"
-            end
+          resp = HTTParty.post(uri, body: json)
+          if resp.success?
+            resp.body.to_s.scan(/\d+/).map(&:to_i)
+          else
+            raise "HTTP error code: #{resp.code} #{resp.message}"
           end
-
-          body.to_s.scan(/\d+/).map(&:to_i)
         end
       end
     end

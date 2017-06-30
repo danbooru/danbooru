@@ -174,7 +174,7 @@ class User < ApplicationRecord
     def update_remote_cache
       if name_changed?
         Danbooru.config.other_server_hosts.each do |server|
-          Net::HTTP.delete(URI.parse("http://#{server}/users/#{id}/cache"))
+          HTTParty.delete("http://#{server}/users/#{id}/cache")
         end
       end
     rescue Exception

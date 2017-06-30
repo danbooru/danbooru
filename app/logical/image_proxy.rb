@@ -16,19 +16,15 @@ class ImageProxy
       raise "Proxy not allowed for this site"
     end
 
-    uri = URI.parse(url)
     headers = {
       "Referer" => fake_referer_for(url),
       "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
     }
-
-    Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.is_a?(URI::HTTPS)) do |http|
-      resp = http.request_get(uri.request_uri, headers)
-      if resp.is_a?(Net::HTTPSuccess)
-        return resp
-      else
-        raise "HTTP error code: #{resp.code} #{resp.message}"
-      end
+    response = HTTParty.get(url, headers: headers)
+    if response.success?
+      return response
+    else
+      raise "HTTP error code: #{response.code} #{response.message}"
     end
   end
 end

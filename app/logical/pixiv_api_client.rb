@@ -137,13 +137,11 @@ class PixivApiClient
     url.query = URI.encode_www_form(params)
     json = nil
 
-    Net::HTTP.start(url.host, url.port, :use_ssl => true) do |http|
-      resp = http.request_get(url.request_uri, headers)
-      if resp.is_a?(Net::HTTPSuccess)
-        json = parse_api_json(resp.body)
-      else
-        raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{resp.body})")
-      end
+    resp = HTTParty.get(url)
+    if resp.success?
+      json = parse_api_json(resp.body)
+    else
+      raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{resp.body})")
     end
 
     WorksResponse.new(json["response"][0])
@@ -173,17 +171,14 @@ private
         "client_id" => CLIENT_ID,
         "client_secret" => CLIENT_SECRET
       }
-      url = URI.parse("https://oauth.secure.pixiv.net/auth/token")
+      url = "https://oauth.secure.pixiv.net/auth/token"
 
-      Net::HTTP.start(url.host, url.port, :use_ssl => true) do |http|
-        resp = http.request_post(url.request_uri, URI.encode_www_form(params), headers)
-
-        if resp.is_a?(Net::HTTPSuccess)
-          json = JSON.parse(resp.body)
-          access_token = json["response"]["access_token"]
-        else
-          raise Error.new("Pixiv API access token call failed (status=#{resp.code} body=#{resp.body})")
-        end
+      resp = HTTParty.post(url, body: params, headers: headers)
+      if resp.success?
+        json = JSON.parse(resp.body)
+        access_token = json["response"]["access_token"]
+      else
+        raise Error.new("Pixiv API access token call failed (status=#{resp.code} body=#{resp.body})")
       end
 
       access_token

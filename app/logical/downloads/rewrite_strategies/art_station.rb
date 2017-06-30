@@ -18,7 +18,7 @@ module Downloads
     protected
       def test_original(url)
         res = http_head_request(url, {})
-        res.is_a?(Net::HTTPSuccess)
+        res.success?
       end
 
       def rewrite_html_url(url, headers)

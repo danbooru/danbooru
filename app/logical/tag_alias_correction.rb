@@ -22,14 +22,11 @@ class TagAliasCorrection
   end
 
   def fill_hash!
-    Net::HTTP.start(hostname, 80) do |http|
-      http.request_get("/tag_aliases/#{tag_alias_id}/correction.json") do |res|
-        if res === Net::HTTPSuccess
-          json = JSON.parse(res.body)
-          statistics_hash["antecedent_cache"] = json["antecedent_cache"]
-          statistics_hash["consequent_cache"] = json["consequent_cache"]
-        end
-      end
+    res = HTTParty.get("http://#{hostname}/tag_aliases/#{tag_alias_id}/correction.json")
+    if res.success?
+      json = JSON.parse(res.body)
+      statistics_hash["antecedent_cache"] = json["antecedent_cache"]
+      statistics_hash["consequent_cache"] = json["consequent_cache"]
     end
   end
 

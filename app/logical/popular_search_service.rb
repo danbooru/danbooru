@@ -27,15 +27,12 @@ class PopularSearchService
     dates = date.strftime("%Y-%m-%d")
 
     Cache.get("ps-#{scale}-#{dates}", 1.minute) do
-      url = URI.parse("#{Danbooru.config.reportbooru_server}/hits/#{scale}?date=#{dates}")
-      response = ""
-      Net::HTTP.start(url.host, url.port, :use_ssl => url.is_a?(URI::HTTPS)) do |http|
-        http.read_timeout = 1
-        http.request_get(url.request_uri) do |res|
-          if res.is_a?(Net::HTTPSuccess)
-            response = res.body
-          end
-        end
+      url = "#{Danbooru.config.reportbooru_server}/hits/#{scale}?date=#{dates}"
+      response = HTTParty.get(url, timeout: 3)
+      if response.success?
+        response = response.body
+      else
+        response = ""
       end
       response
     end.to_s.force_encoding("utf-8")
