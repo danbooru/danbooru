@@ -417,6 +417,12 @@ module Danbooru
       false
     end
 
+    # for outgoing http requests, use these proxy settings:
+    def http_proxy_settings
+      # {http_proxyaddr: "", http_proxyport: "", http_proxyuser: nil, http_proxypass: nil}
+      nil
+    end
+
     # you should override this
     def email_key
       "zDMSATq0W3hmA5p3rKTgD"
