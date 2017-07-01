@@ -30,6 +30,7 @@ class ActiveSupport::TestCase
   setup do
     mock_popular_search_service!
     mock_missed_search_service!
+    WebMock.allow_net_connect!
   end
 
   teardown do
