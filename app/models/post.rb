@@ -74,6 +74,7 @@ class Post < ApplicationRecord
           end
         end
 
+        backup_service = Danbooru.config.backup_service
         backup_service.delete(file_path, type: :original)
         backup_service.delete(large_file_path, type: :large)
         backup_service.delete(preview_file_path, type: :preview)
