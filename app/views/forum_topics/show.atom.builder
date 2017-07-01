@@ -1,4 +1,4 @@
-atom_feed(root_url: forum_topic_path(@forum_topic, host: Danbooru.config.hostname, only_path: false)) do |feed|
+atom_feed(root_url: forum_topic_url(@forum_topic, host: Danbooru.config.hostname)) do |feed|
   feed.title(@forum_topic.title)
   feed.updated(@forum_topic.try(:updated_at))
 

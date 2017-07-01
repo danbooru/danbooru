@@ -1,4 +1,4 @@
-atom_feed(root_url: comments_path(host: Danbooru.config.hostname, only_path: false)) do |feed|
+atom_feed(root_url: comments_url(host: Danbooru.config.hostname)) do |feed|
   title = "Comments"
   title += " by #{params[:search][:creator_name]}" if params.dig(:search, :creator_name).present?
   title += " on #{params[:search][:post_tags_match]}" if params.dig(:search, :post_tags_match).present?
