@@ -3,12 +3,18 @@ require 'test_helper'
 class PostReplacementsControllerTest < ActionController::TestCase
   context "The post replacements controller" do
     setup do
+      Delayed::Worker.delay_jobs = true # don't delete the old images right away
+
       @user = FactoryGirl.create(:user, can_approve_posts: true, created_at: 1.month.ago)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
 
       @post = FactoryGirl.create(:post)
       @post_replacement = FactoryGirl.create(:post_replacement, post_id: @post.id)
+    end
+
+    teardown do
+      Delayed::Worker.delay_jobs = false
     end
 
     context "create action" do
@@ -24,6 +30,10 @@ class PostReplacementsControllerTest < ActionController::TestCase
         assert_difference("@post.replacements.size") do
           post :create, params, { user_id: @user.id }
           @post.reload
+
+          Timecop.travel(Time.now + PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
+            Delayed::Worker.new.work_off
+          end
         end
 
         assert_response :success
