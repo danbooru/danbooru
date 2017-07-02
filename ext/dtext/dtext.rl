@@ -295,16 +295,12 @@ inline := |*
   };
 
   basic_textile_link => {
-    if (is_boundary_c(fc)) {
-      sm->d = 2;
-      sm->b = true;
-    } else {
-      sm->d = 1;
-      sm->b = false;
-    }
+    const char* match_end = sm->b2 - 1;
+    const char* url_start = sm->b1;
+    const char* url_end = find_boundary_c(match_end);
 
     append(sm, true, "<a class=\"dtext-link dtext-external-link\" href=\"");
-    append_segment_html_escaped(sm, sm->b1, sm->b2 - sm->d);
+    append_segment_html_escaped(sm, url_start, url_end);
     append(sm, true, "\">");
 
     link_content_sm = init_machine(sm->a1, sm->a2 - sm->a1, false, true, false);
@@ -321,8 +317,8 @@ inline := |*
 
     append(sm, true, "</a>");
 
-    if (sm->b) {
-      append_c_html_escaped(sm, fc);
+    if (url_end < match_end) {
+      append_segment_html_escaped(sm, url_end + 1, match_end);
     }
   };
 
@@ -335,22 +331,18 @@ inline := |*
   };
 
   url => {
-    if (is_boundary_c(fc)) {
-      sm->b = true;
-      sm->d = 2;
-    } else {
-      sm->b = false;
-      sm->d = 1;
-    }
+    const char* match_end = sm->te - 1;
+    const char* url_start = sm->ts;
+    const char* url_end = find_boundary_c(match_end);
 
     append(sm, true, "<a href=\"");
-    append_segment_html_escaped(sm, sm->ts, sm->te - sm->d);
+    append_segment_html_escaped(sm, url_start, url_end);
     append(sm, true, "\">");
-    append_segment_html_escaped(sm, sm->ts, sm->te - sm->d);
+    append_segment_html_escaped(sm, url_start, url_end);
     append(sm, true, "</a>");
 
-    if (sm->b) {
-      append_c_html_escaped(sm, fc);
+    if (url_end < match_end) {
+      append_segment_html_escaped(sm, url_end + 1, match_end);
     }
   };
 
@@ -366,23 +358,19 @@ inline := |*
       append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
 
     } else {
-      if (is_boundary_c(fc)) {
-        sm->b = true;
-        sm->d = 2;
-      } else {
-        sm->b = false;
-        sm->d = 1;
-      }
+      const char* match_end = sm->a2 - 1;
+      const char* name_start = sm->a1;
+      const char* name_end = find_boundary_c(match_end);
 
       append(sm, true, "<a rel=\"nofollow\" href=\"/users?name=");
-      append_segment_uri_escaped(sm, sm->a1, sm->a2 - sm->d);
+      append_segment_uri_escaped(sm, name_start, name_end);
       append(sm, true, "\">");
       append_c(sm, '@');
-      append_segment_html_escaped(sm, sm->a1, sm->a2 - sm->d);
+      append_segment_html_escaped(sm, name_start, name_end);
       append(sm, true, "</a>");
 
-      if (sm->b) {
-        append_c_html_escaped(sm, fc);
+      if (name_end < match_end) {
+        append_segment_html_escaped(sm, name_end + 1, match_end);
       }
     }
   };
@@ -1281,8 +1269,20 @@ static void dstack_close_list(StateMachine * sm) {
   sm->list_nest = 0;
 }
 
-static inline bool is_boundary_c(char c) {
-  switch (c) {
+// Returns the preceding non-boundary character if `c` is a boundary character.
+// Otherwise, returns `c` if `c` is not a boundary character. Boundary characters
+// are trailing punctuation characters that should not be part of the matched text.
+static inline const char* find_boundary_c(const char* c) {
+  gunichar ch = g_utf8_get_char(g_utf8_prev_char(c + 1));
+  int offset = 0;
+
+  // Close punctuation: http://www.fileformat.info/info/unicode/category/Pe/list.htm
+  // U+3000 - U+303F: http://www.fileformat.info/info/unicode/block/cjk_symbols_and_punctuation/list.htm
+  if (g_unichar_type(ch) == G_UNICODE_CLOSE_PUNCTUATION || (ch >= 0x3000 && ch <= 0x303F)) {
+    offset = g_unichar_to_utf8(ch, NULL);
+  }
+
+  switch (*c) {
     case ':':
     case ';':
     case '.':
@@ -1293,10 +1293,10 @@ static inline bool is_boundary_c(char c) {
     case ']':
     case '<':
     case '>':
-      return true;
+      offset = 1;
   }
 
-  return false;
+  return c - offset;
 }
 
 /*
