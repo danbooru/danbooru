@@ -188,7 +188,7 @@
 })();
 
 $(document).ready(function() {
-  if ($("#c-moderator-post-queues").length) {
+  if ($("#blacklist-box").length == 0) {
     return;
   }
 
