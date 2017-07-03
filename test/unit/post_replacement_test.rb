@@ -216,5 +216,15 @@ class PostReplacementTest < ActiveSupport::TestCase
         assert_equal(final_source, @post.source)
       end
     end
+
+    context "a post when replaced with a HTML source" do
+      should "record the image URL as the replacement URL, not the HTML source" do
+        replacement_url = "https://twitter.com/nounproject/status/540944400767922176"
+        image_url = "http://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"
+        @post.replace!(replacement_url: replacement_url)
+
+        assert_equal(image_url, @post.replacements.last.replacement_url)
+      end
+    end
   end
 end

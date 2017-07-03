@@ -3,13 +3,16 @@ module Downloads
     class Error < Exception ; end
 
     attr_reader :data, :options
-    attr_accessor :source, :original_source, :content_type, :file_path
+    attr_accessor :source, :original_source, :downloaded_source, :content_type, :file_path
 
     def initialize(source, file_path, options = {})
       # source can potentially get rewritten in the course
       # of downloading a file, so check it again
       @source = source
       @original_source = source
+
+      # the URL actually downloaded after rewriting the original source.
+      @downloaded_source = nil
 
       # where to save the download
       @file_path = file_path
@@ -43,6 +46,7 @@ module Downloads
           response.read_body(out)
         end
       end
+      @downloaded_source = @source
       @source = after_download(@source)
     end
 

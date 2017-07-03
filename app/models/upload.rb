@@ -7,7 +7,7 @@ class Upload < ApplicationRecord
   attr_accessor :file, :image_width, :image_height, :file_ext, :md5, 
     :file_size, :as_pending, :artist_commentary_title, 
     :artist_commentary_desc, :include_artist_commentary,
-    :referer_url
+    :referer_url, :downloaded_source
   belongs_to :uploader, :class_name => "User"
   belongs_to :post
   before_validation :initialize_uploader, :on => :create
@@ -110,7 +110,7 @@ class Upload < ApplicationRecord
         update_attribute(:status, "processing")
         self.source = strip_source
         if is_downloadable?
-          self.source = download_from_source(temp_file_path)
+          self.downloaded_source, self.source = download_from_source(temp_file_path)
         end
         validate_file_exists
         self.content_type = file_header_to_content_type(file_path)
@@ -407,7 +407,7 @@ class Upload < ApplicationRecord
       download = Downloads::File.new(source, destination_path, :referer_url => referer_url)
       download.download!
       ugoira_service.load(download.data)
-      download.source
+      [download.downloaded_source, download.source]
     end
   end
 

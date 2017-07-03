@@ -26,7 +26,7 @@ class PostReplacement < ApplicationRecord
       if replacement_file.present?
         update(replacement_url: "file://#{replacement_file.original_filename}")
       else
-        update(replacement_url: upload.source)
+        update(replacement_url: upload.downloaded_source)
       end
 
       # queue the deletion *before* updating the post so that we use the old
