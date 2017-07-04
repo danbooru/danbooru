@@ -778,17 +778,29 @@ Danbooru.Note = {
         Danbooru.Note.Box.resize_inner_border($(note_box));
       });
     }
-  }
-}
+  },
 
-$(function() {
-  if ($("#c-posts").length && $("#a-show").length && $("#image").length && !$("video#image").length) {
+  initialize_all: function() {
+    if ($("#c-posts #a-show #image").length == 0 || $("video#image").length) {
+      return;
+    }
+
+    Danbooru.Note.embed = (Danbooru.meta("post-has-embedded-notes") === "true");
+    Danbooru.Note.load_all();
+
+    this.initialize_shortcuts();
+  },
+
+  initialize_shortcuts: function() {
     if ($("#note-locked-notice").length == 0) {
       $("#translate").click(Danbooru.Note.TranslationMode.toggle);
       Danbooru.keydown("n", "translation_mode", Danbooru.Note.TranslationMode.toggle);
     }
-    Danbooru.Note.embed = (Danbooru.meta("post-has-embedded-notes") === "true");
-    Danbooru.Note.load_all();
+
     $("#image").click(Danbooru.Note.Box.toggle_all);
-  }
+  },
+}
+
+$(function() {
+  Danbooru.Note.initialize_all();
 });
