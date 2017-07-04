@@ -92,6 +92,10 @@ div#note-container {
         vertical-align: middle;
       }
     }
+
+    &.note-box-highlighted {
+      outline: 2px solid $note_highlight_color;
+    }
   }
 }
 

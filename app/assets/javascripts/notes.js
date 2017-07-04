@@ -137,6 +137,14 @@ Danbooru.Note = {
       return $("#note-container div.note-box[data-id=" + id + "]");
     },
 
+    show_highlighted: function($note_box) {
+      var note_id = $note_box.data("id");
+
+      Danbooru.Note.Body.show(note_id);
+      $note_box.addClass("note-box-highlighted");
+      Danbooru.scroll_to($note_box);
+    },
+
     resize_inner_border: function($note_box) {
       var $inner_border = $note_box.find("div.note-box-inner-border");
       $inner_border.css({
@@ -789,6 +797,7 @@ Danbooru.Note = {
     Danbooru.Note.load_all();
 
     this.initialize_shortcuts();
+    this.initialize_highlight();
   },
 
   initialize_shortcuts: function() {
@@ -798,6 +807,15 @@ Danbooru.Note = {
     }
 
     $("#image").click(Danbooru.Note.Box.toggle_all);
+  },
+
+  initialize_highlight: function() {
+    var matches = window.location.hash.match(/^#note-(\d+)$/);
+
+    if (matches) {
+      var $note_box = Danbooru.Note.Box.find(matches[1]);
+      Danbooru.Note.Box.show_highlighted($note_box);
+    }
   },
 }
 
