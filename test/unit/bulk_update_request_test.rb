@@ -62,6 +62,35 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       end
     end
 
+    context "for an implication that is redundant with an existing implication" do
+      should "not validate" do
+        FactoryGirl.create(:tag_implication, :antecedent_name => "a", :consequent_name => "b")
+        FactoryGirl.create(:tag_implication, :antecedent_name => "b", :consequent_name => "c")
+        bur = FactoryGirl.build(:bulk_update_request, :script => "imply a -> c")
+        bur.save
+
+        assert_equal(["Error: a already implies c through another implication (create implication a -> c)"], bur.errors.full_messages)
+      end
+    end
+
+    context "for an implication that is redundant with another implication in the same BUR" do
+      setup do
+        FactoryGirl.create(:tag_implication, :antecedent_name => "b", :consequent_name => "c")
+        @bur = FactoryGirl.build(:bulk_update_request, :script => "imply a -> b\nimply a -> c")
+        @bur.save
+      end
+
+      should "not process" do
+        assert_no_difference("TagImplication.count") do
+          @bur.approve!(@admin)
+        end
+      end
+
+      should_eventually "not validate" do
+        assert_equal(["Error: a already implies c through another implication (create implication a -> c)"], @bur.errors.full_messages)
+      end
+    end
+
     context "with an associated forum topic" do
       setup do
         @topic = FactoryGirl.create(:forum_topic, :title => "[bulk] hoge")
