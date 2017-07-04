@@ -117,6 +117,7 @@ spoilers_open = '[spoiler'i 's'i? ']';
 spoilers_close = '[/spoiler'i 's'i? ']';
 
 post_id = 'post #'i digit+ >mark_a1 %mark_a2;
+note_id = 'note #'i digit+ >mark_a1 %mark_a2;
 forum_post_id = 'forum #'i digit+ >mark_a1 %mark_a2;
 forum_topic_id = 'topic #'i digit+ >mark_a1 %mark_a2;
 forum_topic_paged_id = 'topic #'i digit+ >mark_a1 %mark_a2 '/p' digit+ >mark_b1 %mark_b2;
@@ -142,6 +143,15 @@ inline := |*
     append_segment(sm, true, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append(sm, false, "post #");
+    append_segment(sm, false, sm->a1, sm->a2 - 1);
+    append(sm, true, "</a>");
+  };
+
+  note_id => {
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-note-id-link\" href=\"/notes/");
+    append_segment(sm, true, sm->a1, sm->a2 - 1);
+    append(sm, true, "\">");
+    append(sm, false, "note #");
     append_segment(sm, false, sm->a1, sm->a2 - 1);
     append(sm, true, "</a>");
   };
