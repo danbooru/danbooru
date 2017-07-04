@@ -369,6 +369,8 @@ Danbooru.Note = {
 
   Edit: {
     show: function($note_body) {
+      var id = $note_body.data("id");
+
       if (Danbooru.Note.editing) {
         return;
       }
@@ -393,7 +395,7 @@ Danbooru.Note = {
 
       $dialog = $('<div></div>');
       $dialog.append($textarea);
-      $dialog.data("id", $note_body.data("id"));
+      $dialog.data("id", id);
       $dialog.dialog({
         width: 360,
         height: 210,
@@ -415,7 +417,7 @@ Danbooru.Note = {
       $dialog.data("uiDialog")._title = function(title) {
         title.html(this.options.title); // Allow unescaped html in dialog title
       }
-      $dialog.dialog("option", "title", 'Edit note (<a href="/wiki_pages/help:notes">view help</a>)');
+      $dialog.dialog("option", "title", 'Edit note #' + id + ' (<a href="/wiki_pages/help:notes">view help</a>)');
 
       $dialog.on("dialogclose", function() {
         Danbooru.Note.editing = false;
