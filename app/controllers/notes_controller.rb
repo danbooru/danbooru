@@ -17,7 +17,9 @@ class NotesController < ApplicationController
 
   def show
     @note = Note.find(params[:id])
-    respond_with(@note)
+    respond_with(@note) do |format|
+      format.html { redirect_to(post_path(@note.post, anchor: "note-#{@note.id}")) }
+    end
   end
 
   def create
