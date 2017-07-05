@@ -102,8 +102,10 @@ utf8graph = (0x00..0x7F) & graph
 
 
 mention = '@' utf8graph+ >mark_a1 %mark_a2;
+delimited_mention = '<' mention :>> '>';
 
 url = 'http' 's'? '://' utf8graph+;
+delimited_url = '<' url :>> '>';
 internal_url = [/#] utf8graph+;
 basic_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':' (url | internal_url) >mark_b1 %mark_b2;
 bracketed_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':[' (url | internal_url) >mark_b1 %mark_b2 :>> ']';
@@ -354,6 +356,14 @@ inline := |*
     }
   };
 
+  delimited_url => {
+    append(sm, true, "<a href=\"");
+    append_segment_html_escaped(sm, sm->ts + 1, sm->te - 2);
+    append(sm, true, "\">");
+    append_segment_html_escaped(sm, sm->ts + 1, sm->te - 2);
+    append(sm, true, "</a>");
+  };
+
   # probably a tag. examples include @.@ and @_@
   '@' graph '@' => {
     append_segment_html_escaped(sm, sm->ts, sm->te - 1);
@@ -384,6 +394,17 @@ inline := |*
       if (sm->b) {
         append_c_html_escaped(sm, fc);
       }
+    }
+  };
+
+  delimited_mention => {
+    if (sm->f_mentions) {
+      append(sm, true, "<a rel=\"nofollow\" href=\"/users?name=");
+      append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
+      append(sm, true, "\">");
+      append_c(sm, '@');
+      append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
+      append(sm, true, "</a>");
     }
   };
 

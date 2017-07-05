@@ -302,10 +302,22 @@ class DTextTest < Minitest::Test
     assert_parse('<p>Should not parse 葉月@葉月</p>', "Should not parse 葉月@葉月")
   end
 
+  def test_delimited_mentions
+    dtext = '(blah <@evazion>).'
+    html = '<p>(blah <a rel="nofollow" href="/users?name=evazion">@evazion</a>).</p>'
+    assert_parse(html, dtext)
+  end
+
   def test_utf8_links
     assert_parse('<p><a class="dtext-link dtext-external-link" href="/posts?tags=approver:葉月">7893</a></p>', '"7893":/posts?tags=approver:葉月')
     assert_parse('<p><a class="dtext-link dtext-external-link" href="/posts?tags=approver:葉月">7893</a></p>', '"7893":[/posts?tags=approver:葉月]')
     assert_parse('<p><a href="http://danbooru.donmai.us/posts?tags=approver:葉月">http://danbooru.donmai.us/posts?tags=approver:葉月</a></p>', 'http://danbooru.donmai.us/posts?tags=approver:葉月')
+  end
+
+  def test_delimited_links
+    dtext = '(blah <https://en.wikipedia.org/wiki/Orange_(fruit)>).'
+    html = '<p>(blah <a href="https://en.wikipedia.org/wiki/Orange_(fruit)">https://en.wikipedia.org/wiki/Orange_(fruit)</a>).</p>'
+    assert_parse(html, dtext)
   end
 
   def test_nodtext
