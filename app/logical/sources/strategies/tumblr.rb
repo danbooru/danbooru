@@ -53,6 +53,10 @@ module Sources::Strategies
       end
     end
 
+    def dtext_artist_commentary_desc
+      DText.from_html(artist_commentary_desc).strip
+    end
+
     def image_url
       image_urls.first
     end

@@ -42,6 +42,26 @@ module Sources
         assert_equal(desc, @site.artist_commentary_desc)
       end
 
+      should "get the dtext-ified commentary" do
+        desc = <<-EOS.strip_heredoc.chomp
+          h2. header
+
+          plain [b]bold[/b] [i]italics[/i] [s]strike[/s]
+
+          * one
+          * two
+
+          * one
+          * two
+
+          [quote]quote[/quote]
+
+          "link":[http://www.google.com]
+        EOS
+
+        assert_equal(desc, @site.dtext_artist_commentary_desc)
+      end
+
       should "get the image url" do
         assert_equal("http://data.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_raw.png", @site.image_url)
       end
