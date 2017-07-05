@@ -18,6 +18,7 @@ class TagImplication < ApplicationRecord
   validates :forum_topic, presence: { message: "must exist" }, if: lambda { forum_topic_id.present? }
   validates_uniqueness_of :antecedent_name, :scope => :consequent_name
   validate :absence_of_circular_relation
+  validate :absence_of_transitive_relation
   validate :antecedent_is_not_aliased
   validate :consequent_is_not_aliased
   validate :antecedent_and_consequent_are_different
@@ -31,7 +32,7 @@ class TagImplication < ApplicationRecord
     module ClassMethods
       # assumes names are normalized
       def with_descendants(names)
-        (names + where("antecedent_name in (?) and status in (?)", names, ["active", "processing"]).map(&:descendant_names_array)).flatten.uniq
+        (names + active.where(antecedent_name: names).flat_map(&:descendant_names_array)).uniq
       end
 
       def automatic_tags_for(names)
@@ -48,7 +49,7 @@ class TagImplication < ApplicationRecord
 
           until children.empty?
             all.concat(children)
-            children = TagImplication.where("antecedent_name IN (?) and status in (?)", children, ["active", "processing"]).map(&:consequent_name)
+            children = TagImplication.active.where(antecedent_name: children).pluck(:consequent_name)
           end
         end.sort.uniq
       end
@@ -96,7 +97,7 @@ class TagImplication < ApplicationRecord
     end
 
     def active
-      where("status IN (?)", ["active", "processing"])
+      where(status: %w[active processing queued])
     end
 
     def search(params)
@@ -134,6 +135,16 @@ class TagImplication < ApplicationRecord
       if self.class.active.exists?(["antecedent_name = ? and consequent_name = ?", consequent_name, antecedent_name])
         self.errors[:base] << "Tag implication can not create a circular relation with another tag implication"
         false
+      end
+    end
+
+    # If we already have a -> b -> c, don't allow a -> c.
+    def absence_of_transitive_relation
+      # Find everything else the antecedent implies, not including the current implication.
+      implications = TagImplication.active.where("antecedent_name = ? and consequent_name != ?", antecedent_name, consequent_name)
+      implied_tags = implications.flat_map(&:descendant_names_array)
+      if implied_tags.include?(consequent_name)
+        self.errors[:base] << "#{antecedent_name} already implies #{consequent_name} through another implication"
       end
     end
 

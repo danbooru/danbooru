@@ -66,12 +66,21 @@ class TagImplicationTest < ActiveSupport::TestCase
       assert_equal("Tag implication can not create a circular relation with another tag implication", ti2.errors.full_messages.join(""))
     end
 
+    should "not validate when a transitive relation is created" do
+      ti_ab = FactoryGirl.create(:tag_implication, :antecedent_name => "a", :consequent_name => "b")
+      ti_bc = FactoryGirl.create(:tag_implication, :antecedent_name => "b", :consequent_name => "c")
+      ti_ac = FactoryGirl.build(:tag_implication, :antecedent_name => "a", :consequent_name => "c")
+      ti_ac.save
+
+      assert_equal("a already implies c through another implication", ti_ac.errors.full_messages.join(""))
+    end
+
     should "not allow for duplicates" do
       ti1 = FactoryGirl.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       ti2 = FactoryGirl.build(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       ti2.save
       assert(ti2.errors.any?, "Tag implication should not have validated.")
-      assert_equal("Antecedent name has already been taken", ti2.errors.full_messages.join(""))
+      assert_includes(ti2.errors.full_messages, "Antecedent name has already been taken")
     end
 
     should "not validate if its consequent is aliased to another tag" do
