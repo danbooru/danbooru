@@ -1,6 +1,6 @@
 class ArtistsController < ApplicationController
   respond_to :html, :xml, :json
-  before_filter :member_only, :except => [:index, :show, :banned]
+  before_filter :member_only, :except => [:index, :show, :show_or_new, :banned]
   before_filter :builder_only, :only => [:destroy]
   before_filter :admin_only, :only => [:ban, :unban]
   before_filter :load_artist, :only => [:ban, :unban, :show, :edit, :update, :destroy, :undelete]
@@ -96,7 +96,9 @@ class ArtistsController < ApplicationController
     if @artist
       redirect_to artist_path(@artist)
     else
-      redirect_to new_artist_path(:name => params[:name])
+      @artist = Artist.new(name: params[:name])
+      @post_set = PostSets::Artist.new(@artist)
+      respond_with(@artist)
     end
   end
 
