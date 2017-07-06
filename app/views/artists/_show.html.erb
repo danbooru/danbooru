@@ -1,0 +1,28 @@
+<div id="c-artists">
+  <div id="a-show">
+    <h1>Artist: <%= link_to @artist.pretty_name, posts_path(:tags => @artist.name), :class => "tag-type-#{@artist.category_name}" %></h1>
+
+    <% if @artist.notes.present? && @artist.visible? %>
+      <div class="prose">
+        <%= format_text(@artist.notes, :ragel => true, :disable_mentions => true) %>
+      </div>
+
+      <p><%= link_to "View wiki page", @artist.wiki_page %></p>
+    <% end %>
+
+    <%= yield %>
+
+    <div class="recent-posts">
+      <h1>Recent Posts</h1>
+      <div style="margin: 1em 0;">
+        <%= @post_set.presenter.post_previews_html(self) %>
+      </div>
+    </div>
+
+    <%= render "secondary_links" %>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  Artist - <%= @artist.name %> - <%= Danbooru.config.app_name %>
+<% end %>
