@@ -26,9 +26,4 @@ class PostFlagsController < ApplicationController
     @post_flag = PostFlag.find(params[:id])
     respond_with(@post_flag)
   end
-
-private
-  def check_privilege(post_flag)
-    raise User::PrivilegeError unless (post_flag.creator_id == CurrentUser.id || CurrentUser.is_moderator?)
-  end
 end
