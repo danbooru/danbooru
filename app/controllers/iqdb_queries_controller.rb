@@ -1,6 +1,5 @@
 # todo: move this to iqdbs
 class IqdbQueriesController < ApplicationController
-  before_filter :member_only
   respond_to :html, :json, :xml
 
   def index
