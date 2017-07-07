@@ -15,6 +15,7 @@ class BulkUpdateRequestsController < ApplicationController
   end
 
   def show
+    respond_with(@bulk_update_request)
   end
 
   def edit
