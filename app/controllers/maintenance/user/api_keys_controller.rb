@@ -1,7 +1,6 @@
 module Maintenance
   module User
     class ApiKeysController < ApplicationController
-      before_filter :member_only
       before_filter :check_privilege
       before_filter :authenticate!, :except => [:show]
       rescue_from ::SessionLoader::AuthenticationFailure, :with => :authentication_failed
