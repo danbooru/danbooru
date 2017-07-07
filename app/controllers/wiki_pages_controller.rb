@@ -1,6 +1,6 @@
 class WikiPagesController < ApplicationController
   respond_to :html, :xml, :json, :js
-  before_filter :member_only, :except => [:index, :show, :show_or_new]
+  before_filter :member_only, :except => [:index, :search, :show, :show_or_new]
   before_filter :builder_only, :only => [:destroy]
   before_filter :normalize_search_params, :only => [:index]
   
@@ -30,6 +30,9 @@ class WikiPagesController < ApplicationController
         render :xml => @wiki_pages.to_xml(:root => "wiki-pages")
       end
     end
+  end
+
+  def search
   end
 
   def show
