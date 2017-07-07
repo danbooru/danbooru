@@ -28,9 +28,6 @@ class PoolsController < ApplicationController
     @post_set = PostSets::PoolGallery.new(@pools)
   end
 
-  def search
-  end
-
   def show
     @pool = Pool.find(params[:id])
     @post_set = PostSets::Pool.new(@pool, params[:page])

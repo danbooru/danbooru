@@ -49,9 +49,6 @@ class ArtistsController < ApplicationController
     end
   end
 
-  def search
-  end
-
   def show
     @artist = Artist.find(params[:id])
     @post_set = PostSets::Artist.new(@artist)

@@ -27,9 +27,6 @@ class TagsController < ApplicationController
     end
   end
 
-  def search
-  end
-
   def show
     @tag = Tag.find(params[:id])
     respond_with(@tag)

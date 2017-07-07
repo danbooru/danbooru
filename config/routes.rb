@@ -53,7 +53,6 @@ Rails.application.routes.draw do
         get :popular
         get :searches
         get :missed_searches
-        get :hot
         get :intro
       end
     end
@@ -119,7 +118,6 @@ Rails.application.routes.draw do
   end
   resources :dmails, :only => [:new, :create, :index, :show, :destroy] do
     collection do
-      get :search
       post :mark_all_as_read
     end
   end
@@ -163,7 +161,6 @@ Rails.application.routes.draw do
       put :demote
     end
   end
-  resources :jobs
   resources :mod_actions
   resources :news_updates
   resources :notes do
@@ -253,7 +250,6 @@ Rails.application.routes.draw do
     end
   end
   resource :source, :only => [:show]
-  resources :super_voters, :only => [:index]
   resources :tags do
     resource :correction, :only => [:new, :create, :show], :controller => "tag_corrections"
     collection do
