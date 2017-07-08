@@ -2,7 +2,6 @@ module Maintenance
   module User
     class DmailFiltersController < ApplicationController
       before_filter :ensure_ownership
-      before_filter :member_only
       respond_to :html, :json, :xml
 
       def edit

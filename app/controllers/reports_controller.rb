@@ -1,5 +1,5 @@
 class ReportsController < ApplicationController
-  before_filter :member_only
+  before_filter :member_only, :except => [:upload_tags]
   before_filter :gold_only, :only => [:similar_users]
   before_filter :moderator_only, :only => [:post_versions, :post_versions_create]
 

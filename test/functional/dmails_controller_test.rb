@@ -62,6 +62,13 @@ class DmailsControllerTest < ActionController::TestCase
         assert_response :success
         assert_equal(0, assigns[:dmails].size)
       end
+
+      should "work for banned users" do
+        ban = FactoryGirl.create(:ban, :user => @user, :banner => FactoryGirl.create(:admin_user))
+        get :index, {:search => {:owner_id => @dmail.owner_id, :folder => "sent"}}, {:user_id => @dmail.owner_id}
+
+        assert_response :success
+      end
     end
 
     context "show action" do

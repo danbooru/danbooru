@@ -1,5 +1,4 @@
 class SavedSearchesController < ApplicationController
-  before_filter :member_only
   before_filter :check_availability
   respond_to :html, :xml, :json, :js
   

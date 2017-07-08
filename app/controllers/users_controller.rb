@@ -1,6 +1,5 @@
 class UsersController < ApplicationController
   respond_to :html, :xml, :json
-  before_filter :member_only, :only => [:edit, :update]
   skip_before_filter :api_check
 
   def new

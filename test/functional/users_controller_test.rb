@@ -124,6 +124,15 @@ class UsersControllerTest < ActionController::TestCase
           assert_equal(20, @user.level)
         end
       end
+
+      context "for a banned user" do
+        should "allow the user to edit their settings" do
+          @user = FactoryGirl.create(:banned_user)
+          post :update, {:id => @user.id, :user => {:favorite_tags => "xyz"}}, {:user_id => @user.id}
+
+          assert_equal("xyz", @user.reload.favorite_tags)
+        end
+      end
     end
   end
 end

@@ -42,7 +42,7 @@ class ArtistsControllerTest < ActionController::TestCase
       assert_redirected_to(@masao)
 
       get :show_or_new, { name: "nobody" }, { user_id: @user.id }
-      assert_redirected_to(new_artist_path(name: "nobody"))
+      assert_response :success
     end
 
     should "get the edit page" do
