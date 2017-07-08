@@ -2,7 +2,7 @@
   <div id="a-index">
     <h1>Note Changes</h1>
 
-    <table width="100%" class="striped">
+    <table width="100%" class="striped autofit">
       <thead>
         <tr>
           <th></th>
@@ -25,8 +25,11 @@
           <tr>
             <td></td>
             <td><%= link_to note_version.post_id, post_path(note_version.post_id) %></td>
-            <td><%= link_to "#{note_version.note_id}.#{note_version.version}", note_versions_path(:search => {:note_id => note_version.note_id}) %></td>
             <td>
+              <%= link_to "#{note_version.note_id}.#{note_version.version}", post_path(note_version.post_id, anchor: "note-#{note_version.note_id}") %>
+              <%= link_to "»", note_versions_path(search: {note_id: note_version.note_id}) %>
+            </td>
+            <td class="col-expand">
               <%= h(note_version.body) %>
               <% unless note_version.is_active? %>
                 <span class="inactive">(deleted)</span>

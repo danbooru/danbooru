@@ -2,10 +2,11 @@
   <div id="a-index">
     <h1>Notes</h1>
 
-    <table width="100%" class="striped">
+    <table width="100%" class="striped autofit">
       <thead>
         <tr>
           <th>Post</th>
+          <th>Note</th>
           <th>Created by</th>
           <th>Created at</th>
           <th>Body</th>
@@ -15,9 +16,13 @@
         <% @notes.each do |note| %>
           <tr>
             <td><%= link_to note.post_id, post_path(note.post_id) %></td>
+            <td>
+              <%= link_to "#{note.id}.#{note.version}", post_path(note.post_id, anchor: "note-#{note.id}") %>
+              <%= link_to "»", note_versions_path(search: {note_id: note.id}) %>
+            </td>
             <td><%= link_to_user note.creator %></td>
             <td><%= compact_time(note.created_at) %></td>
-            <td>
+            <td class="col-expand">
               <%= h(note.body) %>
               <% unless note.is_active? %>
                 <span class="inactive">(deleted)</span>
