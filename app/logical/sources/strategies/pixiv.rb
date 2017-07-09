@@ -56,6 +56,17 @@ module Sources
         "http://www.pixiv.net/member.php?id=#{@metadata.user_id}/"
       end
 
+      def translate_tag(tag)
+        normalized_tag = tag.gsub(/\A(\S+?)_?\d+users入り\Z/i, '\1')
+
+        translated_tags = super(normalized_tag)
+        if translated_tags.empty? && normalized_tag.include?("/")
+          translated_tags = normalized_tag.split("/").flat_map { |tag| super(tag) }
+        end
+
+        translated_tags
+      end
+
       def get
         return unless illust_id_from_url
         @illust_id = illust_id_from_url

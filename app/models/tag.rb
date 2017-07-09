@@ -787,6 +787,10 @@ class Tag < ApplicationRecord
   end
 
   module SearchMethods
+    def nonempty
+      where("tags.post_count > 0")
+    end
+
     def name_matches(name)
       where("tags.name LIKE ? ESCAPE E'\\\\'", name.mb_chars.downcase.to_escaped_for_sql_like)
     end
