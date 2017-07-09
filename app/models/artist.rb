@@ -540,18 +540,6 @@ class Artist < ApplicationRecord
     def hidden_attributes
       super + [:other_names_index]
     end
-
-    def legacy_api_hash
-      return {
-        :id => id,
-        :name => name,
-        :other_names => other_names,
-        :group_name => group_name,
-        :urls => artist_urls.map {|x| x.url},
-        :is_active => is_active?,
-        :updater_id => 0
-      }
-    end
   end
 
   include UrlMethods
