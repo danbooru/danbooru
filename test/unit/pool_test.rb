@@ -53,10 +53,6 @@ class PoolTest < ActiveSupport::TestCase
     should "be mapped to a pool id" do
       assert_equal(@pool.id, Pool.name_to_id(@pool.id.to_s))
     end
-
-    should "be mapped to its name" do
-      assert_equal(@pool.name, Pool.id_to_name(@pool.id))
-    end
   end
 
   context "Reverting a pool" do
@@ -315,18 +311,6 @@ class PoolTest < ActiveSupport::TestCase
     should "find the neighbors for the last post" do
       assert_equal(@p2.id, @p3_neighbors.previous)
       assert_nil(@p3_neighbors.next)
-    end
-  end
-
-  context "An anonymous pool" do
-    setup do
-      user = Timecop.travel(1.month.ago) {FactoryGirl.create(:user)}
-      CurrentUser.user = user
-    end
-
-    should "have a name starting with anon" do
-      pool = Pool.create_anonymous
-      assert_match(/^anon:\d+$/, pool.name)
     end
   end
 end

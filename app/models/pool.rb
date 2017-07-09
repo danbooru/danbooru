@@ -118,23 +118,6 @@ class Pool < ApplicationRecord
     end
   end
 
-  def self.id_to_name(id)
-    select_value_sql("SELECT name FROM pools WHERE id = ?", id)
-  end
-
-  def self.options
-    select_all_sql("SELECT id, name FROM pools WHERE is_active = true AND is_deleted = false ORDER BY name LIMIT 100").map {|x| [x["name"].tr("_", " "), x["id"]]}
-  end
-
-  def self.create_anonymous
-    Pool.new do |pool|
-      pool.name = "TEMP:#{Time.now.to_f}.#{rand(1_000_000)}"
-      pool.save
-      pool.name = "anon:#{pool.id}"
-      pool.save
-    end
-  end
-
   def self.normalize_name(name)
     name.gsub(/\s+/, "_")
   end
