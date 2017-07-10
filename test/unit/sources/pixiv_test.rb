@@ -84,7 +84,7 @@ module Sources
           pixiv_tags  = @site.tags.map(&:first)
           pixiv_links = @site.tags.map(&:last)
 
-          assert_equal(["漫画", "foo", "bar", "tag1", "tag2", "derp", "鉛筆", "色鉛筆", "シャープペンシル"], pixiv_tags)
+          assert_equal(%w[漫画 Fate/GrandOrder foo FOO 風景10users入り 伊19/陸奥 鉛筆], pixiv_tags)
           assert_contains(pixiv_links, /search\.php/)
         end
 
@@ -129,6 +129,67 @@ module Sources
 
           dtext_desc = %(foo 【pixiv #46337015 "»":[/posts?tags=pixiv:46337015]】bar 【pixiv #14901720 "»":[/posts?tags=pixiv:14901720]】\r\n\r\nbaz【"user/83739":[https://www.pixiv.net/member.php?id=83739] "»":[/artists?search%5Burl_matches%5D=https%3A%2F%2Fwww.pixiv.net%2Fmember.php%3Fid%3D83739]】)
           assert_equal(dtext_desc, @site.dtext_artist_commentary_desc)
+        end
+      end
+
+      context "translating the tags" do
+        setup do
+          CurrentUser.user = FactoryGirl.create(:user)
+          CurrentUser.ip_addr = "127.0.0.1"
+
+          tags = {
+            "comic" => "漫画",
+            "scenery" => "風景",
+            "i-19_(kantai_collection)" => "伊19",
+            "mutsu_(kantai_collection)" => "陸奥",
+            "fate/grand_order" => "Fate/GrandOrder",
+            "fate" => "",
+            "foo" => "",
+          }
+
+          tags.each do |tag, other_names|
+            FactoryGirl.create(:tag, name: tag, post_count: 1)
+            FactoryGirl.create(:wiki_page, title: tag, other_names: other_names)
+          end
+
+          @site = get_source("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46304614")
+          @tags = @site.tags.map(&:first)
+          @translated_tags = @site.translated_tags.map(&:first)
+        end
+
+        should "get the original tags" do
+          assert_equal(%w[漫画 Fate/GrandOrder foo FOO 風景10users入り 伊19/陸奥 鉛筆], @tags)
+        end
+
+        should "translate the tag if it matches a wiki other name" do
+          assert_includes(@tags, "漫画")
+          assert_includes(@translated_tags, "comic")
+        end
+
+        should "return the same tag if it doesn't match a wiki other name but it does match a tag" do
+          assert_includes(@tags, "foo")
+          assert_includes(@translated_tags, "foo")
+        end
+
+        should "not translate tags for digital media" do
+          assert_equal(false, @tags.include?("Photoshop"))
+        end
+
+        should "normalize 10users入り tags" do
+          assert_includes(@tags, "風景10users入り")
+          assert_includes(@translated_tags, "scenery")
+        end
+
+        should "split the base tag if it has no match" do
+          assert_includes(@tags, "伊19/陸奥")
+          assert_includes(@translated_tags, "i-19_(kantai_collection)")
+          assert_includes(@translated_tags, "mutsu_(kantai_collection)")
+        end
+
+        should "not split the base tag if it has a match" do
+          assert_includes(@tags, "Fate/GrandOrder")
+          assert_includes(@translated_tags, "fate/grand_order")
+          assert_equal(false, @translated_tags.grep("fate").any?)
         end
       end
     end

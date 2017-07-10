@@ -80,6 +80,23 @@ module Sources
         (@tags || []).uniq
       end
 
+      def translated_tags
+        translated_tags = tags.map(&:first).flat_map(&method(:translate_tag)).uniq.sort
+        translated_tags.map { |tag| [tag.name, tag.category] }
+      end
+
+      # Given a tag from the source site, should return an array of corresponding Danbooru tags.
+      def translate_tag(untranslated_tag)
+        translated_tags = Tag.where(name: WikiPage.active.other_names_equal([untranslated_tag]).uniq.select(:title))
+
+        if translated_tags.empty?
+          normalized_name = TagAlias.to_aliased([Tag.normalize_name(untranslated_tag)])
+          translated_tags = Tag.nonempty.where(name: normalized_name)
+        end
+
+        translated_tags
+      end
+
       # Should be set to a url for sites that prevent hotlinking, or left nil for sites that don't.
       def fake_referer
         nil

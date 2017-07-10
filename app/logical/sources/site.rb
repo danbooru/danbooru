@@ -8,7 +8,7 @@ module Sources
       :file_url, :ugoira_frame_data, :ugoira_content_type, :image_urls,
       :artist_commentary_title, :artist_commentary_desc,
       :dtext_artist_commentary_title, :dtext_artist_commentary_desc,
-      :rewrite_thumbnails, :illust_id_from_url, :to => :strategy
+      :rewrite_thumbnails, :illust_id_from_url, :translate_tag, :translated_tags, :to => :strategy
 
     def self.strategies
       [Strategies::PixivWhitecube, Strategies::Pixiv, Strategies::NicoSeiga, Strategies::DeviantArt, Strategies::ArtStation, Strategies::Nijie, Strategies::Twitter, Strategies::Tumblr, Strategies::Pawoo]
@@ -41,23 +41,6 @@ module Sources
       end
     rescue
       url
-    end
-
-    def translated_tags
-      untranslated_tags = tags
-      untranslated_tags = untranslated_tags.map(&:first)
-      untranslated_tags += untranslated_tags.grep(/\//).map {|x| x.split(/\//)}.flatten
-      untranslated_tags = untranslated_tags.map do |tag|
-        if tag =~ /\A(\S+?)_?\d+users入り\Z/
-          $1
-        else
-          tag
-        end
-      end
-      untranslated_tags.reject! {|x| x.blank?}
-      wikis = WikiPage.title_in(untranslated_tags)
-      wikis += WikiPage.other_names_equal(untranslated_tags)
-      wikis.uniq.map{|wiki_page| [wiki_page.title, wiki_page.category_name]}
     end
 
     def to_h
