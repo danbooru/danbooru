@@ -2305,38 +2305,6 @@ ALTER SEQUENCE janitor_trials_id_seq OWNED BY janitor_trials.id;
 
 
 --
--- Name: key_values; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE key_values (
-    id integer NOT NULL,
-    key character varying NOT NULL,
-    value text,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: key_values_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE key_values_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: key_values_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE key_values_id_seq OWNED BY key_values.id;
-
-
---
 -- Name: mod_actions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4224,13 +4192,6 @@ ALTER TABLE ONLY janitor_trials ALTER COLUMN id SET DEFAULT nextval('janitor_tri
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY key_values ALTER COLUMN id SET DEFAULT nextval('key_values_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE ONLY mod_actions ALTER COLUMN id SET DEFAULT nextval('mod_actions_id_seq'::regclass);
 
 
@@ -4607,14 +4568,6 @@ ALTER TABLE ONLY ip_bans
 
 ALTER TABLE ONLY janitor_trials
     ADD CONSTRAINT janitor_trials_pkey PRIMARY KEY (id);
-
-
---
--- Name: key_values_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY key_values
-    ADD CONSTRAINT key_values_pkey PRIMARY KEY (id);
 
 
 --
@@ -6632,13 +6585,6 @@ CREATE INDEX index_janitor_trials_on_user_id ON janitor_trials USING btree (user
 
 
 --
--- Name: index_key_values_on_key; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_key_values_on_key ON key_values USING btree (key);
-
-
---
 -- Name: index_news_updates_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7564,4 +7510,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170526183928');
 INSERT INTO schema_migrations (version) VALUES ('20170608043651');
 
 INSERT INTO schema_migrations (version) VALUES ('20170613200356');
+
+INSERT INTO schema_migrations (version) VALUES ('20170709190409');
 
