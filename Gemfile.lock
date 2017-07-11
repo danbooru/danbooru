@@ -15,9 +15,9 @@ GIT
 
 GIT
   remote: https://github.com/r888888888/dtext_rb.git
-  revision: 93cde168dd48b50da37d9378dc446ccee11db9d4
+  revision: dea55e6cc85b9a3c8fa8365d892e9d7b660b62d2
   specs:
-    dtext_rb (1.4.4)
+    dtext_rb (1.5.0)
       nokogiri (~> 1.6)
 
 GIT
