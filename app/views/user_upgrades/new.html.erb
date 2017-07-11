@@ -29,8 +29,8 @@
             <tr>
               <td>Tag Limit</td>
               <td>2</td>
-              <td>6</td>
-              <td>12</td>
+              <td><%= Danbooru.config.base_tag_query_limit %></td>
+              <td><%= Danbooru.config.base_tag_query_limit*2 %></td>
             </tr>
             <tr>
               <td>Favorite Limit</td>
@@ -39,16 +39,22 @@
               <td>Unlimited</td>
             </tr>
             <tr>
+              <td>Favorite Groups</td>
+              <td>3</td>
+              <td>5</td>
+              <td>10</td>
+            </tr>
+            <tr>
               <td>Page Limit</td>
               <td>1,000</td>
               <td>2,000</td>
               <td>5,000</td>
             </tr>
             <tr>
-              <td>Tag Subscriptions</td>
-              <td>No</td>
-              <td>Yes</td>
-              <td>Yes</td>
+              <td>Saved Searches</td>
+              <td>250</td>
+              <td>250</td>
+              <td>1,000</td>
             </tr>
             <tr>
               <td>See Censored Tags</td>
@@ -57,10 +63,16 @@
               <td>Yes</td>
             </tr>
             <tr>
-              <td>API Hourly Limit</td>
-              <td>3,000</td>
-              <td>10,000</td>
-              <td>20,000</td>
+              <td>Max API Requests Per Second</td>
+              <td>15</td>
+              <td>30</td>
+              <td>60</td>
+            </tr>
+            <tr>
+              <td>API Regen Per Second</td>
+              <td>1</td>
+              <td>2</td>
+              <td>4</td>
             </tr>
             <tr>
               <td>Database Timeout</td>
