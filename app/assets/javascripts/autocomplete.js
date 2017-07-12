@@ -93,7 +93,7 @@
     var prefixes = "-|~|general:|gen:|artist:|art:|copyright:|copy:|co:|character:|char:|ch:";
     var metatags = "order|-status|status|-rating|rating|-locked|locked|child|filetype|-filetype|" +
       "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-fav|fav|ordfav|" +
-      "sub|-pool|pool|ordpool|favgroup";
+      "sub|-pool|pool|ordpool|favgroup|-search|search";
 
     $fields_multiple.autocomplete({
       delay: 100,
@@ -182,6 +182,10 @@
         case "favgroup":
         case "-favgroup":
           Danbooru.Autocomplete.favorite_group_source(term, resp, metatag);
+          break;
+        case "search":
+        case "-search":
+          Danbooru.Autocomplete.saved_search_source(term, resp);
           break;
         default:
           Danbooru.Autocomplete.normal_source(term, resp);
@@ -418,6 +422,17 @@
           };
         }));
       }
+    });
+  }
+
+  Danbooru.Autocomplete.saved_search_source = function(term, resp) {
+    return Danbooru.SavedSearch.labels(term).success(function(labels) {
+      resp(labels.map(function(label) {
+        return {
+          label: label.replace(/_/g, " "),
+          value: "search:" + label,
+        };
+      }));
     });
   }
 })();
