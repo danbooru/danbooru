@@ -3,6 +3,8 @@
     <h1>Order Pool: <%= @pool.pretty_name %></h1>
     <p>Drag and drop the list below to determine ordering.</p>
 
+    <%= render "posts/partials/common/inline_blacklist" %>
+
     <ul id="sortable">
       <% @pool.posts(:limit => 1_000).each do |post| %>
         <li class="ui-state-default" id="pool[post_id_array]_<%= post.id %>">

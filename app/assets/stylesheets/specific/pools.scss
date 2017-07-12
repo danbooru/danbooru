@@ -66,7 +66,8 @@ div#c-pool-orders, div#c-favorite-group-orders {
         cursor: pointer;
         margin-right: 20px;
         margin-bottom: 20px;
-        width: 150px;
+        min-width: 150px;
+        min-height: 150px;
         padding: 10px;
         @include inline-block;
       }
