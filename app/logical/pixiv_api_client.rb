@@ -137,7 +137,7 @@ class PixivApiClient
     url.query = URI.encode_www_form(params)
     json = nil
 
-    resp = HTTParty.get(url)
+    resp = HTTParty.get(url, Danbooru.config.httparty_options)
     if resp.success?
       json = parse_api_json(resp.body)
     else
@@ -173,7 +173,7 @@ private
       }
       url = "https://oauth.secure.pixiv.net/auth/token"
 
-      resp = HTTParty.post(url, body: params, headers: headers)
+      resp = HTTParty.post(url, Danbooru.config.httparty_options.merge(body: params, headers: headers))
       if resp.success?
         json = JSON.parse(resp.body)
         access_token = json["response"]["access_token"]

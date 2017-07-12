@@ -46,7 +46,7 @@ module Sources::Strategies
     end
 
     def get
-      resp = HTTParty.get(api_url)
+      resp = HTTParty.get(api_url, Danbooru.config.httparty_options)
       image_url_rewriter = Downloads::RewriteStrategies::ArtStation.new
       if resp.success?
         @json = JSON.parse(resp.body)

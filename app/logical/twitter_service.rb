@@ -33,7 +33,7 @@ class TwitterService
   end
 
   def extract_og_image_from_page(url)
-    resp = HTTParty.get(url)
+    resp = HTTParty.get(url, Danbooru.config.httparty_options)
     if resp.success?
       doc = Nokogiri::HTML(resp.body)
       images = doc.css("meta[property='og:image']")

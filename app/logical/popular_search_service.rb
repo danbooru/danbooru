@@ -28,7 +28,7 @@ class PopularSearchService
 
     Cache.get("ps-#{scale}-#{dates}", 1.minute) do
       url = "#{Danbooru.config.reportbooru_server}/hits/#{scale}?date=#{dates}"
-      response = HTTParty.get(url, timeout: 3)
+      response = HTTParty.get(url, Danbooru.config.httparty_options.reverse_merge(timeout: 3))
       if response.success?
         response = response.body
       else

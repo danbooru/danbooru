@@ -30,7 +30,7 @@ class SavedSearch < ApplicationRecord
 
           uri = "#{Danbooru.config.listbooru_server}/v2/search"
 
-          resp = HTTParty.post(uri, body: json)
+          resp = HTTParty.post(uri, Danbooru.config.httparty_options.merge(body: json))
           if resp.success?
             resp.body.to_s.scan(/\d+/).map(&:to_i)
           else

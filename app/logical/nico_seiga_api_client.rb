@@ -9,7 +9,7 @@ class NicoSeigaApiClient
 
   def get_illust(id)
     uri = "#{BASE_URL}/illust/info?id=#{id}"
-    resp = HTTParty.get(uri)
+    resp = HTTParty.get(uri, Danbooru.config.httparty_options)
     if resp.success?
       parse_illust_xml_response(resp.body)
     end
@@ -17,7 +17,7 @@ class NicoSeigaApiClient
 
   def get_artist(id)
     uri = "#{BASE_URL}/user/info?id=#{id}"
-    resp = HTTParty.get(uri)
+    resp = HTTParty.get(uri, Danbooru.config.httparty_options)
     if resp.success?
       parse_artist_xml_response(resp.body)
     end

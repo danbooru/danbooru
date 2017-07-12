@@ -31,7 +31,7 @@ module Downloads
       }
       @source, headers, @data = before_download(@source, headers, @data)
       url = URI.parse(@source)
-      res = HTTParty.head(url, timeout: 3)
+      res = HTTParty.head(url, Danbooru.config.httparty_options.reverse_merge(timeout: 3))
       res.content_length
     end
 
@@ -90,7 +90,7 @@ module Downloads
         validate_local_hosts(url)
 
         begin
-          res = HTTParty.get(url, timeout: 10, headers: headers)
+          res = HTTParty.get(url, Danbooru.config.httparty_options.reverse_merge(timeout: 10, headers: headers))
           if res.success?
             if max_size
               len = res["Content-Length"]

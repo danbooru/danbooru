@@ -417,10 +417,10 @@ module Danbooru
       false
     end
 
-    # for outgoing http requests, use these proxy settings:
-    def http_proxy_settings
+    def httparty_options
+      # proxy example:
       # {http_proxyaddr: "", http_proxyport: "", http_proxyuser: nil, http_proxypass: nil}
-      nil
+      {}
     end
 
     # you should override this

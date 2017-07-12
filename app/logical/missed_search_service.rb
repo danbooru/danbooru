@@ -17,7 +17,7 @@ class MissedSearchService
   def fetch_data
     Cache.get("ms", 1.minute) do
       url = URI.parse("#{Danbooru.config.reportbooru_server}/missed_searches")
-      response = HTTParty.get(url, timeout: 6)
+      response = HTTParty.get(url, Danbooru.config.httparty_options.reverse_merge(timeout: 6))
       if response.success?
         response = response.body
       else

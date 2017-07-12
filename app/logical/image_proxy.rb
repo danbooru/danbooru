@@ -20,7 +20,7 @@ class ImageProxy
       "Referer" => fake_referer_for(url),
       "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
     }
-    response = HTTParty.get(url, headers: headers)
+    response = HTTParty.get(url, Danbooru.config.httparty_options.merge(headers: headers))
     if response.success?
       return response
     else

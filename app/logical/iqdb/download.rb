@@ -28,7 +28,7 @@ module Iqdb
         uri = URI.parse("#{Danbooru.config.iqdbs_server}/similar")
         uri.query = URI.encode_www_form(params)
 
-        resp = HTTParty.get(uri)
+        resp = HTTParty.get(uri, Danbooru.config.httparty_options)
         if resp.success?
           json = JSON.parse(resp.body)
           if json.is_a?(Array)

@@ -33,7 +33,7 @@ module Reports
       uri = URI.parse("#{Danbooru.config.reportbooru_server}/reports/#{endpoint}")
       uri.query = URI.encode_www_form(params)
 
-      resp = HTTParty.get(uri)
+      resp = HTTParty.get(uri, Danbooru.config.httparty_options)
       if resp.success?
         resp.body
       else

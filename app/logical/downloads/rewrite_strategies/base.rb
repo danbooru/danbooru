@@ -21,7 +21,7 @@ module Downloads
 
     protected
       def http_head_request(url, headers)
-        HTTParty.head(url, headers: headers)
+        HTTParty.head(url, Danbooru.config.httparty_options.merge(headers: headers))
       end
 
       def http_exists?(url, headers)
