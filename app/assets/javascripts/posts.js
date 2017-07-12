@@ -548,7 +548,6 @@
 
   Danbooru.Post.initialize_saved_searches = function() {
     $("#saved_search_labels").autocomplete({
-      minLength: 2,
       source: function(req, resp) {
         Danbooru.SavedSearch.labels(req.term).success(function(labels) {
           resp(labels.map(function(label) {
