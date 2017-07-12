@@ -16,24 +16,15 @@ class Cache
 
   def self.get(key, expiry_in_seconds = nil, &block)
     Rails.cache.fetch(key, expires_in: expiry_in_seconds, &block)
-  rescue => err
-    Rails.logger.debug { "MemCache Error: #{err.message}" }
-    nil
   end
 
   def self.put(key, value, expiry_in_seconds = nil)
     Rails.cache.write(key, value, expires_in: expiry_in_seconds)
     value
-  rescue => err
-    Rails.logger.debug { "MemCache Error: #{err.message}" }
-    nil
   end
 
   def self.delete(key)
     Rails.cache.delete(key)
-    nil
-  rescue => err
-    Rails.logger.debug { "MemCache Error: #{err.message}" }
     nil
   end
 
