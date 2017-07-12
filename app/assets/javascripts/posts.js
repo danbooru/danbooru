@@ -548,23 +548,15 @@
 
   Danbooru.Post.initialize_saved_searches = function() {
     $("#saved_search_labels").autocomplete({
-      minLength: 2,
       source: function(req, resp) {
-        $.ajax({
-          url: "/saved_searches/labels.json",
-          data: {
-            label: req.term
-          },
-          method: "get",
-          success: function(data) {
-            resp($.map(data, function(saved_search) {
-              return {
-                label: saved_search.replace(/_/g, " "),
-                value: saved_search
-              };
-            }));
-          }
-        })
+        Danbooru.SavedSearch.labels(req.term).success(function(labels) {
+          resp(labels.map(function(label) {
+            return {
+              label: label.replace(/_/g, " "),
+              value: label
+            };
+          }));
+        });
       }
     });
 

@@ -62,6 +62,19 @@ class SavedSearch < ApplicationRecord
     label.to_s.strip.downcase.gsub(/[[:space:]]/, "_")
   end
 
+  def self.search_labels(user_id, params)
+    labels = labels_for(user_id)
+
+    if params[:label].present?
+      query = Regexp.escape(params[:label]).gsub("\\*", ".*")
+      query = ".*#{query}.*" unless query.include?("*")
+      query = /\A#{query}\z/
+      labels = labels.grep(query)
+    end
+
+    labels
+  end
+
   def self.labels_for(user_id)
     Cache.get(cache_key(user_id)) do
       SavedSearch.where(user_id: user_id).order("label").pluck("distinct unnest(labels) as label")
