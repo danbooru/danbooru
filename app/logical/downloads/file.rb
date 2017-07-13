@@ -39,7 +39,7 @@ module Downloads
       @source, @data = http_get_streaming(@source, @data) do |response|
         self.content_type = response["Content-Type"]
         ::File.open(@file_path, "wb") do |out|
-          response.read_body(out)
+          out.write(response.body)
         end
       end
       @downloaded_source = @source
