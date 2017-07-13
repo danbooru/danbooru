@@ -15,7 +15,7 @@ module Downloads
 
       context "that fails" do
         setup do
-          Net::HTTP.stubs(:start).raises(Errno::ETIMEDOUT)
+          HTTParty.stubs(:get).raises(Errno::ETIMEDOUT)
         end
 
         should "retry three times" do
@@ -27,8 +27,7 @@ module Downloads
 
       should "stream a file from an HTTP source" do
         @download.http_get_streaming(@source) do |resp|
-          assert_equal("200", resp.code)
-          assert(resp["Content-Length"].to_i > 0, "File should be larger than 0 bytes")
+          assert(resp.size > 0)
         end
       end
 
@@ -65,8 +64,7 @@ module Downloads
 
       should "stream a file from an HTTPS source" do
         @download.http_get_streaming(@source) do |resp|
-          assert_equal("200", resp.code)
-          assert(resp["Content-Length"].to_i > 0, "File should be larger than 0 bytes")
+          assert(resp.size > 0)
         end
       end
     end

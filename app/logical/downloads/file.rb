@@ -36,10 +36,9 @@ module Downloads
     end
 
     def download!
-      @source, @data = http_get_streaming(@source, @data) do |response|
-        self.content_type = response["Content-Type"]
-        ::File.open(@file_path, "wb") do |out|
-          out.write(response.body)
+      ::File.open(@file_path, "wb") do |out|
+        @source, @data = http_get_streaming(@source, @data) do |response|
+          out.write(response)
         end
       end
       @downloaded_source = @source
@@ -69,7 +68,7 @@ module Downloads
       end
     end
 
-    def http_get_streaming(src, datums = {}, options = {})
+    def http_get_streaming(src, datums = {}, options = {}, &block)
       max_size = options[:max_size] || Danbooru.config.max_file_size
       max_size = nil if max_size == 0 # unlimited
       limit = 4
@@ -90,13 +89,16 @@ module Downloads
         validate_local_hosts(url)
 
         begin
-          res = HTTParty.get(url, Danbooru.config.httparty_options.reverse_merge(timeout: 10, headers: headers))
+          res = HTTParty.get(url, Danbooru.config.httparty_options.reverse_merge(stream_body: true, timeout: 10, headers: headers), &block)
+
           if res.success?
             if max_size
               len = res["Content-Length"]
               raise Error.new("File is too large (#{len} bytes)") if len && len.to_i > max_size
             end
-            yield(res)
+
+            @content_type = res["Content-Type"]
+
             return [src, datums]
           else
             raise Error.new("HTTP error code: #{res.code} #{res.message}")
