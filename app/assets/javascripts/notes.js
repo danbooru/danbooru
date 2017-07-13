@@ -141,6 +141,7 @@ Danbooru.Note = {
       var note_id = $note_box.data("id");
 
       Danbooru.Note.Body.show(note_id);
+      $(".note-box-highlighted").removeClass("note-box-highlighted");
       $note_box.addClass("note-box-highlighted");
       Danbooru.scroll_to($note_box);
     },
@@ -800,6 +801,7 @@ Danbooru.Note = {
 
     this.initialize_shortcuts();
     this.initialize_highlight();
+    $(window).on("hashchange", this.initialize_highlight);
   },
 
   initialize_shortcuts: function() {
