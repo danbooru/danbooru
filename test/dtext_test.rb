@@ -31,6 +31,10 @@ class DTextTest < Minitest::Test
     assert_equal('<p>hi @bob</p>', DTextRagel.parse("hi @bob", :disable_mentions => true))
   end
 
+  def test_nested_nonmention
+    assert_parse('<p>foo <strong>idolm@ster</strong> bar</p>', 'foo [b]idolm@ster[/b] bar')
+  end
+
   def test_sanitize_heart
     assert_parse('<p>&lt;3</p>', "<3")
   end
