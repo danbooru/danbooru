@@ -93,7 +93,7 @@
     var prefixes = "-|~|general:|gen:|artist:|art:|copyright:|copy:|co:|character:|char:|ch:";
     var metatags = "order|-status|status|-rating|rating|-locked|locked|child|filetype|-filetype|" +
       "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-fav|fav|ordfav|" +
-      "sub|-pool|pool|ordpool|favgroup|-search|search";
+      "-pool|pool|ordpool|favgroup|-search|search";
 
     $fields_multiple.autocomplete({
       delay: 100,

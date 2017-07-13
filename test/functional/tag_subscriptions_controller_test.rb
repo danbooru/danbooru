@@ -24,43 +24,6 @@ class TagSubscriptionsControllerTest < ActionController::TestCase
       end
     end
 
-    context "posts action" do
-      setup do
-        @tag_subscription = FactoryGirl.create(:tag_subscription, :name => "aaa")
-      end
-
-      should "list all visible tag subscriptions" do
-        get :posts, {:id => @tag_subscription.creator_id}
-        assert_response :success
-      end
-    end
-
-    context "edit action" do
-      setup do
-        @tag_subscription = FactoryGirl.create(:tag_subscription)
-      end
-
-      should "render" do
-        get :edit, {:id => @tag_subscription.id}, {:user_id => @user.id}
-        assert_response :success
-      end
-    end
-
-    context "new action" do
-      should "render" do
-        get :new, {}, {:user_id => @user.id}
-        assert_response :success
-      end
-    end
-
-    context "create action" do
-      should "not create a new tag subscription" do
-        assert_no_difference("TagSubscription.count") do
-          post :create, {:tag_subscription => {:name => "aaa", :tag_query => "bbb"}}, {:user_id => @user.id}
-        end
-      end
-    end
-
     context "destroy action" do
       setup do
         @tag_subscription = FactoryGirl.create(:tag_subscription)

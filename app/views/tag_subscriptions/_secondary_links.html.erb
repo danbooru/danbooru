@@ -6,7 +6,6 @@
     <% if @tag_subscription && !@tag_subscription.new_record? && @tag_subscription.editable_by?(CurrentUser.user) %>
       <li>|</li>
       <li><%= link_to "Show", tag_subscription_path(@tag_subscription) %></li>
-      <li><%= link_to "Edit", edit_tag_subscription_path(@tag_subscription) %></li>
       <li><%= link_to "Delete", tag_subscription_path(@tag_subscription, :method => :delete, :data => {:confirm => "Are you sure you want to delete this tag subscription?"}) %></li>
     <% end %>
   </menu>

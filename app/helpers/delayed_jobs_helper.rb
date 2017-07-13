@@ -13,9 +13,6 @@ module DelayedJobsHelper
     when "Moderator::TagBatchChange"
       "<strong>tag batch change</strong>"
 
-    when "TagSubscription.process"
-      "<strong>process tag subscription</strong>"
-
     when "Class#expire_cache"
       "<strong>expire post count cache</strong>"
 
@@ -39,9 +36,6 @@ module DelayedJobsHelper
 
     when "Tag#update_category_post_counts"
       "<strong>update category post counts</strong>"
-
-    when "Class#process"
-      "<strong>update tag subscription</strong>"
 
     when "Class#remove_iqdb"
       "<strong>remove from iqdb</strong>"
@@ -79,9 +73,6 @@ module DelayedJobsHelper
 
     when "Moderator::TagBatchChange"
       h(job.payload_object.antecedent) + " -> " + h(job.payload_object.consequent)
-
-    when "TagSubscription.process"
-      ""
 
     when "Class#expire_cache"
       h(job.payload_object.args.flatten.join(" "))
