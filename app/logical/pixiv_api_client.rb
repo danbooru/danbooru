@@ -133,18 +133,16 @@ class PixivApiClient
       "image_sizes" => "large",
       "include_stats" => "true"
     }
-    url = URI.parse("https://public-api.secure.pixiv.net/v#{API_VERSION}/works/#{illust_id.to_i}.json")
-    url.query = URI.encode_www_form(params)
-    json = nil
 
-    resp = HTTParty.get(url, Danbooru.config.httparty_options)
+    url = "https://public-api.secure.pixiv.net/v#{API_VERSION}/works/#{illust_id.to_i}.json"
+    resp = HTTParty.get(url, Danbooru.config.httparty_options.merge(query: params, headers: headers))
+
     if resp.success?
       json = parse_api_json(resp.body)
+      WorksResponse.new(json["response"][0])
     else
       raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{resp.body})")
     end
-
-    WorksResponse.new(json["response"][0])
   end
 
 private
