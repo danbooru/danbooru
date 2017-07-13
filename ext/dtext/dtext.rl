@@ -375,8 +375,7 @@ inline := |*
     if (!sm->f_mentions || (sm->a1 > sm->pb && sm->a1 - 1 > sm->pb && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n')) {
       // handle emails
       append_c(sm, '@');
-      append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
-
+      fexec sm->a1;
     } else {
       const char* match_end = sm->a2 - 1;
       const char* name_start = sm->a1;
