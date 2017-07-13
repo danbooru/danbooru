@@ -202,6 +202,20 @@ class DTextTest < Minitest::Test
     assert_parse('<p><a class="dtext-link dtext-external-link" href="#toc">test</a></p>', '"test":[#toc]')
   end
 
+  def test_auto_url_boundaries
+    assert_parse('<p>a （<a href="http://test.com">http://test.com</a>） b</p>', 'a （http://test.com） b')
+    assert_parse('<p>a 〜<a href="http://test.com">http://test.com</a>〜 b</p>', 'a 〜http://test.com〜 b')
+    assert_parse('<p>a <a href="http://test.com">http://test.com</a>　 b</p>', 'a http://test.com　 b')
+  end
+
+  def test_old_style_link_boundaries
+    assert_parse('<p>a 「<a class="dtext-link dtext-external-link" href="http://test.com">title</a>」 b</p>', 'a 「"title":http://test.com」 b')
+  end
+
+  def test_new_style_link_boundaries
+    assert_parse('<p>a 「<a class="dtext-link dtext-external-link" href="http://test.com">title</a>」 b</p>', 'a 「"title":[http://test.com]」 b')
+  end
+
   def test_lists_1
     assert_parse('<ul><li>a</li></ul>', '* a')
   end
@@ -306,6 +320,10 @@ class DTextTest < Minitest::Test
     assert_parse('<p>Should not parse 葉月@葉月</p>', "Should not parse 葉月@葉月")
   end
 
+  def test_mention_boundaries
+    assert_parse('<p>「hi <a rel="nofollow" href="/users?name=葉月">@葉月</a>」</p>', "「hi @葉月」")
+  end
+  
   def test_delimited_mentions
     dtext = '(blah <@evazion>).'
     html = '<p>(blah <a rel="nofollow" href="/users?name=evazion">@evazion</a>).</p>'
