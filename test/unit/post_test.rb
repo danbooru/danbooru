@@ -2019,14 +2019,6 @@ class PostTest < ActiveSupport::TestCase
     #   assert_equal(1, Post.tag_match("pixiv_novel_id:2156088").count)
     # end
 
-    should "return posts for a tag subscription search" do
-      post1 = FactoryGirl.create(:post, :tag_string => "aaa")
-      sub = FactoryGirl.create(:tag_subscription, :tag_query => "aaa", :name => "zzz")
-      TagSubscription.process_all
-      relation = Post.tag_match("sub:#{CurrentUser.name}")
-      assert_equal(1, relation.count)
-    end
-
     should "return posts for a search:<category> metatag" do
       post1 = FactoryGirl.create(:post, tag_string: "aaa")
       post2 = FactoryGirl.create(:post, tag_string: "bbb")

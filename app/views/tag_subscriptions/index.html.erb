@@ -9,7 +9,6 @@
         <tr>
           <th>Name</th>
           <th>Tag Query</th>
-          <th>Count</th>
           <th></th>
         </tr>
       </thead>
@@ -18,7 +17,6 @@
           <tr>
             <td><%= tag_subscription.pretty_name %></td>
             <td><%= tag_subscription.pretty_tag_query %></td>
-            <td><%= tag_subscription.post_id_array.size %></td>
             <td>
               <%= link_to "delete", tag_subscription_path(tag_subscription), :method => :delete, :data => {:confirm => "Are you sure you want to delete this subscription?"} %>
               | <%= link_to "migrate", migrate_tag_subscription_path(tag_subscription), :method => :post %>
