@@ -14,6 +14,9 @@
 
     <div class="recent-posts">
       <h1>Recent Posts</h1>
+
+      <%= render "posts/partials/common/inline_blacklist" %>
+
       <div style="margin: 1em 0;">
         <%= @post_set.presenter.post_previews_html(self) %>
       </div>
