@@ -1306,13 +1306,6 @@ class Post < ApplicationRecord
       end
     end
 
-    def validate_parent_does_not_have_a_parent
-      return if parent.nil?
-      if !parent.parent.nil?
-        errors.add(:parent, "can not have a parent")
-      end
-    end
-
     def update_parent_on_destroy
       Post.update_has_children_flag_for(parent_id) if parent_id
     end
