@@ -221,10 +221,6 @@ class FavoriteGroup < ApplicationRecord
     (post_count / CurrentUser.user.per_page.to_f).ceil
   end
 
-  def strip_name
-    self.name = name.to_s.strip
-  end
-
   def contains?(post_id)
     post_ids =~ /(?:\A| )#{post_id}(?:\Z| )/
   end
