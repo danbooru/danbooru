@@ -80,7 +80,6 @@ class PostsController < ApplicationController
   end
 
   def random
-    count = Post.fast_count(params[:tags], :statement_timeout => CurrentUser.user.statement_timeout)
     @post = Post.tag_match(params[:tags]).random
     raise ActiveRecord::RecordNotFound if @post.nil?
     respond_with(@post) do |format|
