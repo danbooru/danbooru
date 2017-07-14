@@ -40,10 +40,6 @@ class WikiPageVersion < ApplicationRecord
     Tag.category_for(title)
   end
 
-  def visible?
-    artist.blank? || !artist.is_banned? || CurrentUser.is_builder?
-  end
-
   def other_names_array
     other_names.to_s.scan(/\S+/)
   end
