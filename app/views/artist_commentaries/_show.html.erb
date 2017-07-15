@@ -15,7 +15,7 @@
   <section id="original-artist-commentary">
     <h3><%= artist_commentary.original_title %></h3>
     <div class="prose">
-      <%= format_text(artist_commentary.original_description, :ragel => true, :disable_mentions => true) %>
+      <%= format_text(artist_commentary.original_description, :disable_mentions => true) %>
     </div>
   </section>
 <% end %>
@@ -31,9 +31,9 @@
     </h3>
     <div class="prose">
       <% if artist_commentary.translated_description.present? %>
-        <%= format_text(artist_commentary.translated_description, :ragel => true, :disable_mentions => true) %>
+        <%= format_text(artist_commentary.translated_description, :disable_mentions => true) %>
       <% else %>
-        <span class="disabled"><%= format_text(artist_commentary.original_description, :ragel => true, :disable_mentions => true) %></span>
+        <span class="disabled"><%= format_text(artist_commentary.original_description, :disable_mentions => true) %></span>
       <% end %>
     </div>
   </section>

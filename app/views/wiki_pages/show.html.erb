@@ -22,7 +22,7 @@
             <p><%= wiki_page_other_names_list(@wiki_page) %></p>
           <% end %>
 
-          <%= format_text(@wiki_page.body, :ragel => true) %>
+          <%= format_text(@wiki_page.body) %>
 
           <% if @wiki_page.artist %>
             <p><%= link_to "View artist", @wiki_page.artist %></p>

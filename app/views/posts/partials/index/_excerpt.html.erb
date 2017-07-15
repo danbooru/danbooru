@@ -8,7 +8,7 @@
       <% if artist.visible? %>
         <% unless artist.notes.blank? %>
           <div class="prose">
-            <%= format_text(artist.notes, :ragel => true) %>
+            <%= format_text(artist.notes) %>
           </div>
         <% end %>
 
@@ -30,7 +30,7 @@
           <p><%= wiki_page_other_names_list(wiki_page) %></p>
         <% end %>
 
-        <%= format_text(wiki_page.presenter.excerpt, :ragel => true) %>
+        <%= format_text(wiki_page.presenter.excerpt) %>
         <%= wiki_page_alias_and_implication_list(wiki_page) %>
 
         <p class="links">
@@ -49,7 +49,7 @@
       </h4>
 
       <div id="description" class="prose">
-        <%= format_text(post_set.pool.description, :ragel => true) %>
+        <%= format_text(post_set.pool.description) %>
       </div>
 
       <p class="links">

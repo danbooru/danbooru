@@ -1,5 +1,5 @@
 <div class="ui-corner-all ui-state-error" id="ban-notice">
   <h1>Your account has been temporarily banned</h1>
-  <p>Reason: <%= format_text CurrentUser.user.recent_ban.reason, :ragel => true %></p>
+  <p>Reason: <%= format_text CurrentUser.user.recent_ban.reason %></p>
   <p>Your ban will expire in <%= time_ago_in_words(CurrentUser.user.recent_ban.expires_at) %></p>
 </div>
