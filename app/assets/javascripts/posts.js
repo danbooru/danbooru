@@ -43,16 +43,7 @@
     });
 
     $("#toggle-related-tags-link").click(function(e) {
-      var $related_tags = $("#related-tags");
-      if ($related_tags.is(":visible")) {
-        $related_tags.hide();
-        $(e.target).html("&raquo;");
-      } else {
-        $related_tags.show();
-        $("#related-tags-button").trigger("click");
-        $("#find-artist-button").trigger("click");
-        $(e.target).html("&laquo;");
-      }
+      Danbooru.RelatedTag.toggle();
       e.preventDefault();
     });
   }
@@ -121,8 +112,8 @@
   Danbooru.Post.close_edit_dialog = function(e, ui) {
     $("#form").appendTo($("#c-posts #edit,#c-uploads #a-new"));
     $("#edit-dialog").remove();
-    $("#related-tags").show();
-    $("#toggle-related-tags-link").html("&raquo;").hide();
+    Danbooru.RelatedTag.show();
+    $("#toggle-related-tags-link").hide();
     var $tag_string = $("#post_tag_string,#upload_tag_string");
     $("div.input").has($tag_string).prevAll().show();
     $("#open-edit-dialog").show();
