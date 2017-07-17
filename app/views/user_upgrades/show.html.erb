@@ -1,7 +1,7 @@
 <div id="c-user-upgrades">
   <div id="a-show">
     <% if flash[:success] %>
-      <h1>Congradulations!</h1>
+      <h1>Congratulations!</h1>
 
       <p>You are now a <%= CurrentUser.user.level_string %> level account. Thanks for supporting the site!</p>
       <p><%= link_to "Return to posts", posts_path %> </p>
