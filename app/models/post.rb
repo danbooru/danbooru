@@ -49,7 +49,7 @@ class Post < ApplicationRecord
   has_many :children, lambda {order("posts.id")}, :class_name => "Post", :foreign_key => "parent_id"
   has_many :approvals, :class_name => "PostApproval", :dependent => :destroy
   has_many :disapprovals, :class_name => "PostDisapproval", :dependent => :destroy
-  has_many :favorites, :dependent => :destroy
+  has_many :favorites
   has_many :replacements, class_name: "PostReplacement"
 
   if PostArchive.enabled?
