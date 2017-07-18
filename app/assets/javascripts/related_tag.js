@@ -287,6 +287,7 @@
   Danbooru.RelatedTag.show = function() {
     $("#related-tags").show()
     $("#toggle-related-tags-link").text("«");
+    $("#edit-dialog").height("auto");
   }
 
   Danbooru.RelatedTag.hide = function() {
