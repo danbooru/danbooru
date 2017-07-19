@@ -289,12 +289,12 @@ class User < ApplicationRecord
     end
 
     def add_favorite!(post)
-      Favorite.add(post, self)
+      Favorite.add(post: post, user: self)
       clean_favorite_count! if clean_favorite_count?
     end
 
     def remove_favorite!(post)
-      Favorite.remove(post, self)
+      Favorite.remove(post: post, user: self)
     end
 
     def favorite_groups

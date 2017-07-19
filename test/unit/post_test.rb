@@ -36,6 +36,7 @@ class PostTest < ActiveSupport::TestCase
         @upload = FactoryGirl.create(:jpg_upload)
         @upload.process!
         @post = @upload.post
+        Favorite.add(post: @post, user: @user)
       end
 
       should "delete the files" do
@@ -50,6 +51,14 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(false, File.exists?(@post.preview_file_path))
         assert_equal(false, File.exists?(@post.large_file_path))
         assert_equal(false, File.exists?(@post.file_path))
+      end
+
+      should "remove all favorites" do
+        TestAfterCommit.with_commits(true) do
+          @post.expunge!
+        end
+
+        assert_equal(0, Favorite.for_user(@user.id).where("post_id = ?", @post.id).count)
       end
 
       should "remove the post from iqdb" do

@@ -40,7 +40,7 @@ class UserDeletionTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = "127.0.0.1"
 
       @post = FactoryGirl.create(:post)
-      Favorite.add(@post, @user)
+      Favorite.add(post: @post, user: @user)
 
       @user.update_attributes(:email => "ted@danbooru.com")
 

@@ -982,7 +982,7 @@ class Post < ApplicationRecord
     end
 
     def add_favorite!(user)
-      Favorite.add(self, user)
+      Favorite.add(post: self, user: user)
       vote!("up", user) if user.is_voter?
     rescue PostVote::Error
     end
@@ -992,7 +992,7 @@ class Post < ApplicationRecord
     end
 
     def remove_favorite!(user)
-      Favorite.remove(self, user)
+      Favorite.remove(post: self, user: user)
       unvote!(user) if user.is_voter?
     rescue PostVote::Error
     end
@@ -1020,6 +1020,10 @@ class Post < ApplicationRecord
 
         groups.uniq
       end
+    end
+
+    def remove_from_favorites
+      Favorite.destroy_all(post_id: self.id)
     end
 
     def remove_from_fav_groups
@@ -1383,6 +1387,7 @@ class Post < ApplicationRecord
         decrement_tag_post_counts
         remove_from_all_pools
         remove_from_fav_groups
+        remove_from_favorites
         destroy
         update_parent_on_destroy
       end
