@@ -154,12 +154,13 @@
       if (Danbooru.RelatedTag.recent_ccs) {
         Danbooru.RelatedTag.build_ccs($dest);
       } else {
-        Danbooru.RelatedTag.fetch_ccs();
+        Danbooru.RelatedTag.recent_css = []; // semaphore to only make 1 call
+        Danbooru.RelatedTag.fetch_ccs($dest);
       }
     }
   }
 
-  Danbooru.RelatedTag.fetch_ccs = function() {
+  Danbooru.RelatedTag.fetch_ccs = function($dest) {
     $.getJSON(Danbooru.meta("ccs-server") + "/query", {
       "url": Danbooru.meta("image-url"),
       "ref": Danbooru.meta("image-ref"),
@@ -167,6 +168,7 @@
     }, function(data) {
       Danbooru.RelatedTag.recent_ccs = data.filter(function(x) {return x[0] > 0.5;});
       Danbooru.RelatedTag.recent_ccs = $.map(Danbooru.RelatedTag.recent_ccs, function(x) {console.log(x); return [x[1], 4];});
+      Danbooru.RelatedTag.build_css($dest);
     });
   }
 
