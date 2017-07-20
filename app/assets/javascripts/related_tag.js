@@ -170,7 +170,7 @@
         $("#ccs-related-tags-column").remove();
       }
       Danbooru.RelatedTag.recent_ccs = data.filter(function(x) {return x[0] > 0.5;});
-      Danbooru.RelatedTag.recent_ccs = $.map(Danbooru.RelatedTag.recent_ccs, function(x) {console.log(x); return [x[1], 0];});
+      Danbooru.RelatedTag.recent_ccs = $.map(Danbooru.RelatedTag.recent_ccs, function(x) {console.log(x); return [x[1], 4];});
     });
   }
 
