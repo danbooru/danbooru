@@ -151,6 +151,28 @@
       }
      $dest.append(Danbooru.RelatedTag.build_html("artist", tags, "artist", true));
     }
+    if (Danbooru.meta("ccs-server")) {
+      if (Danbooru.RelatedTag.recent_ccs) {
+        this.build_css($dest);
+      } else {
+        this.fetch_ccs();
+        this.build_css($dest);
+      }
+    }
+  }
+
+  Danbooru.RelatedTag.fetch_ccs = function() {
+    $.getJSON(Danbooru.meta("ccs-server") + "/query", {
+      "url": Danbooru.meta("image-url"),
+      "ref": Danbooru.meta("image-ref"),
+      "sig": Danbooru.meta("image-sig")
+    }, function(data) {
+      if ($("#ccs-related-tags-column").length) {
+        $("#ccs-related-tags-column").remove();
+      }
+      Danbooru.RelatedTag.recent_ccs = data.filter(function(x) {return x[0] > 0.5;});
+      Danbooru.RelatedTag.recent_ccs = $.map(Danbooru.RelatedTag.recent_ccs, function(x) {return x[1]});
+    });
   }
 
   Danbooru.RelatedTag.build_recent_and_frequent = function($dest) {
@@ -176,18 +198,7 @@
   }
 
   Danbooru.RelatedTag.build_ccs = function($dest) {
-    if (Danbooru.meta("ccs-server")) {
-      $.getJSON(Danbooru.meta("ccs-server") + "/query", {
-        "url": Danbooru.meta("image-url"),
-        "ref": Danbooru.meta("image-ref"),
-        "sig": Danbooru.meta("image-sig")
-      }, function(data) {
-        console.log("got ccs data: %o", data)
-        var char_tags = data.filter(function(x) {return x[0] > 0.5;});
-        char_tags = $.map(char_tags, function(x) {return x[1]});
-        $dest.append(Danbooru.RelatedTag.build_html("Guessed Characters", char_tags, "ccs"))
-      });
-    }
+    $dest.append(Danbooru.RelatedTag.build_html("Guessed Characters", this.recent_ccs, "ccs"))
   }
 
   Danbooru.RelatedTag.build_translated = function($dest) {
