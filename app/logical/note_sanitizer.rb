@@ -79,14 +79,15 @@ module NoteSanitizer
   end
 
   def self.relativize_links(node:, **env)
-    return unless node.name == "a" && node.attribute("href")
+    return unless node.name == "a" && node["href"].present?
 
-    href = node.attribute("href")
-    url  = Addressable::URI.parse(href.value).normalize
+    url = Addressable::URI.heuristic_parse(node["href"]).normalize
 
     if url.authority.in?(Danbooru.config.hostnames)
       url.site = nil
-      href.value = url.to_s
+      node["href"] = url.to_s
     end
+  rescue Addressable::URI::InvalidURIError
+    # do nothing for invalid urls
   end
 end

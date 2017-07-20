@@ -28,5 +28,10 @@ class NoteSanitizerTest < ActiveSupport::TestCase
       body = '<a href="http://sonohara.donmai.us/posts?tags=touhou#dtext-intro">touhou</a>'
       assert_equal('<a href="/posts?tags=touhou#dtext-intro" rel="nofollow">touhou</a>', NoteSanitizer.sanitize(body))
     end
+
+    should "not fail when rewriting bad links" do
+      body = %{<a href ="\nhttp!://www.google.com:12x3">google</a>}
+      assert_equal(%{<a rel="nofollow">google</a>}, NoteSanitizer.sanitize(body))
+    end
   end
 end
