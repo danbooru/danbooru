@@ -152,10 +152,10 @@
     }
     if (Danbooru.meta("ccs-server")) {
       if (Danbooru.RelatedTag.recent_ccs) {
-        this.build_css($dest);
+        Danbooru.RelatedTag.build_css($dest);
       } else {
-        this.fetch_ccs();
-        this.build_css($dest);
+        Danbooru.RelatedTag.fetch_ccs();
+        Danbooru.RelatedTag.build_css($dest);
       }
     }
   }
