@@ -126,7 +126,6 @@
 
     $dest.append(this.build_html(query, related_tags, "general"));
     this.build_translated($dest);
-    this.build_ccs($dest)
     if (wiki_page_tags.length) {
       $dest.append(Danbooru.RelatedTag.build_html("wiki:" + query, wiki_page_tags, "wiki"));
     }
@@ -171,7 +170,7 @@
         $("#ccs-related-tags-column").remove();
       }
       Danbooru.RelatedTag.recent_ccs = data.filter(function(x) {return x[0] > 0.5;});
-      Danbooru.RelatedTag.recent_ccs = $.map(Danbooru.RelatedTag.recent_ccs, function(x) {return x[1]});
+      Danbooru.RelatedTag.recent_ccs = $.map(Danbooru.RelatedTag.recent_ccs, function(x) {console.log(x); return x[1]});
     });
   }
 
@@ -198,7 +197,7 @@
   }
 
   Danbooru.RelatedTag.build_ccs = function($dest) {
-    $dest.append(Danbooru.RelatedTag.build_html("Guessed Characters", this.recent_ccs, "ccs"))
+    $dest.append(this.build_html("Guessed Characters", this.recent_ccs, "ccs"))
   }
 
   Danbooru.RelatedTag.build_translated = function($dest) {
