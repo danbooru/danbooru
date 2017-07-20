@@ -142,6 +142,8 @@ module Sources
 
       def session_cookies(mech)
         Cache.get(DEVIANTART_SESSION_CACHE_KEY, 2.hours) do
+          mech.request_headers = Danbooru.config.http_headers
+
           page = mech.get("https://www.deviantart.com/users/login")
           validate_key = page.search('input[name="validate_key"]').attribute("value").value
           validate_token = page.search('input[name="validate_token"]').attribute("value").value

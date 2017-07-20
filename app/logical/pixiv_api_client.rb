@@ -123,19 +123,18 @@ class PixivApiClient
   end
 
   def works(illust_id)
-    headers = {
+    headers = Danbooru.config.http_headers.merge(
       "Referer" => "http://www.pixiv.net",
-      "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}",
       "Content-Type" => "application/x-www-form-urlencoded",
       "Authorization" => "Bearer #{access_token}"
-    }
+    )
     params = {
       "image_sizes" => "large",
       "include_stats" => "true"
     }
 
     url = "https://public-api.secure.pixiv.net/v#{API_VERSION}/works/#{illust_id.to_i}.json"
-    resp = HTTParty.get(url, Danbooru.config.httparty_options.merge(query: params, headers: headers))
+    resp = HTTParty.get(url, Danbooru.config.httparty_options.deep_merge(query: params, headers: headers))
 
     if resp.success?
       json = parse_api_json(resp.body)
@@ -171,7 +170,7 @@ private
       }
       url = "https://oauth.secure.pixiv.net/auth/token"
 
-      resp = HTTParty.post(url, Danbooru.config.httparty_options.merge(body: params, headers: headers))
+      resp = HTTParty.post(url, Danbooru.config.httparty_options.deep_merge(body: params, headers: headers))
       if resp.success?
         json = JSON.parse(resp.body)
         access_token = json["response"]["access_token"]

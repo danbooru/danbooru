@@ -26,10 +26,7 @@ module Downloads
     end
 
     def size
-      headers = {
-        "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
-      }
-      @source, headers, @data = before_download(@source, headers, @data)
+      @source, _, @data = before_download(@source, @data)
       url = URI.parse(@source)
       res = HTTParty.head(url, Danbooru.config.httparty_options.reverse_merge(timeout: 3))
       res.content_length
@@ -45,7 +42,9 @@ module Downloads
       @source = after_download(@source)
     end
 
-    def before_download(url, headers, datums)
+    def before_download(url, datums)
+      headers = Danbooru.config.http_headers
+
       RewriteStrategies::Base.strategies.each do |strategy|
         url, headers, datums = strategy.new(url).rewrite(url, headers, datums)
       end
@@ -80,16 +79,14 @@ module Downloads
           raise Error.new("URL must be HTTP or HTTPS")
         end
 
-        headers = {
-          "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
-        }
-        src, headers, datums = before_download(src, headers, datums)
+        src, headers, datums = before_download(src, datums)
         url = URI.parse(src)
 
         validate_local_hosts(url)
 
         begin
-          res = HTTParty.get(url, Danbooru.config.httparty_options.reverse_merge(stream_body: true, timeout: 10, headers: headers), &block)
+          options = { stream_body: true, timeout: 10, headers: headers }
+          res = HTTParty.get(url, options.deep_merge(Danbooru.config.httparty_options), &block)
 
           if res.success?
             if max_size

@@ -6,19 +6,13 @@ class UploadsController < ApplicationController
     @upload = Upload.new
     @upload_notice_wiki = WikiPage.titled(Danbooru.config.upload_notice_wiki_page).first
     if params[:url]
-      @normalized_url = params[:url]
-      headers = default_headers()
-      data = {}
-
-      Downloads::RewriteStrategies::Base.strategies.each do |strategy|
-        @normalized_url, headers, data = strategy.new(@normalized_url).rewrite(@normalized_url, headers, data)
-      end
-
+      download = Downloads::File.new(params[:url], ".")
+      @normalized_url, _, _ = download.before_download(params[:url], {})
       @post = find_post_by_url(@normalized_url)
 
       begin
         @source = Sources::Site.new(params[:url], :referer_url => params[:ref])
-        @remote_size = Downloads::File.new(@normalized_url, ".").size
+        @remote_size = download.size
       rescue Exception
       end
     end
@@ -77,12 +71,6 @@ protected
     else
       Post.where(source: [params[:url], @normalized_url]).first
     end
-  end
-
-  def default_headers
-    {
-      "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}"
-    }
   end
 
   def save_recent_tags
