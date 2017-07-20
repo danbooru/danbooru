@@ -4,7 +4,7 @@
 
     <% if @artist.notes.present? && @artist.visible? %>
       <div class="prose">
-        <%= format_text(@artist.notes, :ragel => true, :disable_mentions => true) %>
+        <%= format_text(@artist.notes, :disable_mentions => true) %>
       </div>
 
       <p><%= link_to "View wiki page", @artist.wiki_page %></p>

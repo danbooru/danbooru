@@ -10,7 +10,7 @@ class WikiPagePresenter
   end
 
   def blurb
-    DText.strip(excerpt.to_s)
+    DTextRagel.parse_strip(excerpt.to_s)
   end
 
   # Produce a formatted page that shows the difference between two versions of a page.

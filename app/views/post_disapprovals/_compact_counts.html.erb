@@ -12,6 +12,6 @@
   <% end %>
 
   <% if disapprovals.map(&:message).any?(&:present?) %>
-    (messages: <%= disapprovals.map(&:message).select(&:present?).map { |msg| format_text(msg, ragel: true, inline: true) }.to_sentence.html_safe %>)
+    (messages: <%= disapprovals.map(&:message).select(&:present?).map { |msg| format_text(msg, inline: true) }.to_sentence.html_safe %>)
   <% end %>
 <% end %>

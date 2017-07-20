@@ -4,7 +4,7 @@ module PostAppealsHelper
     html << '<ul>'
 
     post.appeals.each do |appeal|
-      reason = DText.parse_inline(appeal.reason).html_safe
+      reason = format_text(appeal.reason, inline: true)
       user = link_to_user(appeal.creator)
       if CurrentUser.is_moderator?
         ip = "(#{link_to_ip(appeal.creator_ip_addr)})"

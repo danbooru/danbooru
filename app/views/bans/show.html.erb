@@ -4,7 +4,7 @@
     <ul style="margin-bottom: 1em;">
       <li><strong>User</strong>: <%= link_to_user(@ban.user) %></li>
       <li><strong>Expires</strong>: <%= compact_time @ban.expires_at %></li>
-      <li><strong>Reason</strong>: <%= format_text @ban.reason, :ragel => true %></li>
+      <li><strong>Reason</strong>: <%= format_text @ban.reason %></li>
     </ul>
 
     <%= form_tag(ban_path(@ban), :method => :delete) do %>

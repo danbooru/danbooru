@@ -1,5 +1,5 @@
 class DtextPreviewsController < ApplicationController
   def create
-    render :inline => "<%= format_text(params[:body], :ragel => true) %>"
+    render :inline => "<%= format_text(params[:body]) %>"
   end
 end

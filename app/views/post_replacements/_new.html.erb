@@ -1,4 +1,4 @@
-<%= format_text(WikiPage.titled(Danbooru.config.replacement_notice_wiki_page).first.try(&:body), ragel: true) %>
+<%= format_text(WikiPage.titled(Danbooru.config.replacement_notice_wiki_page).first.try(&:body)) %>
 
 <%= simple_form_for(post_replacement, url: post_replacements_path(post_id: post_replacement.post_id), method: :post) do |f| %>
   <%= f.input :replacement_file, label: "File", as: :file %>
