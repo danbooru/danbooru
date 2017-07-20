@@ -14,7 +14,7 @@ module DownloadTestHelper
     tempfile = Tempfile.new("danbooru-test")
     download = Downloads::File.new(test_source, tempfile.path)
 
-    rewritten_source, headers, _ = download.before_download(test_source, {}, {})
+    rewritten_source, _, _ = download.before_download(test_source, {})
     assert_equal(expected_source, rewritten_source, "Tested source URL: #{test_source}")
   end
 

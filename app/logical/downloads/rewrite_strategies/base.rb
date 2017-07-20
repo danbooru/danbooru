@@ -20,12 +20,8 @@ module Downloads
       end
 
     protected
-      def http_head_request(url, headers)
-        HTTParty.head(url, Danbooru.config.httparty_options.merge(headers: headers))
-      end
-
       def http_exists?(url, headers)
-        res = http_head_request(url, headers)
+        res = HTTParty.head(url, Danbooru.config.httparty_options.deep_merge(headers: headers))
         res.success?
       end
     end

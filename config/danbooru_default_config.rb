@@ -417,10 +417,20 @@ module Danbooru
       false
     end
 
+    # The default headers to be sent with outgoing http requests. Some external
+    # services will fail if you don't set a valid User-Agent.
+    def http_headers
+      {
+        "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}",
+      }
+    end
+
     def httparty_options
       # proxy example:
       # {http_proxyaddr: "", http_proxyport: "", http_proxyuser: nil, http_proxypass: nil}
-      {}
+      {
+        headers: Danbooru.config.http_headers,
+      }
     end
 
     # you should override this

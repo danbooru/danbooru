@@ -5,7 +5,7 @@ module Downloads
         # example: https://cdnb3.artstation.com/p/assets/images/images/003/716/071/large/aoi-ogata-hate-city.jpg?1476754974
         if url =~ %r!^https?://cdn\w*\.artstation\.com/p/assets/images/images/\d+/\d+/\d+/(?:medium|small|large)/!
           original_url, headers = rewrite_large_url(url, headers)
-          if test_original(original_url)
+          if http_exists?(original_url, headers)
             url = original_url
           end
         else
@@ -16,11 +16,6 @@ module Downloads
       end
 
     protected
-      def test_original(url)
-        res = http_head_request(url, {})
-        res.success?
-      end
-
       def rewrite_html_url(url, headers)
         return [url, headers] unless Sources::Strategies::ArtStation.url_match?(url)
 
