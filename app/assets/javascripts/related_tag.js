@@ -199,7 +199,9 @@
   }
 
   Danbooru.RelatedTag.build_ccs = function($dest) {
-    $dest.append(this.build_html("Guessed Characters", Danbooru.RelatedTag.recent_ccs, "ccs"))
+    if (Danbooru.RelatedTag.recent_ccs) {
+      $dest.append(this.build_html("Guessed Characters", Danbooru.RelatedTag.recent_ccs, "ccs"))
+    }
   }
 
   Danbooru.RelatedTag.build_translated = function($dest) {
