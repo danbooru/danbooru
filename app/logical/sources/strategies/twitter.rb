@@ -31,6 +31,7 @@ module Sources::Strategies
       @tags = attrs[:entities][:hashtags].map do |text:, indices:|
         [text, "https://twitter.com/hashtag/#{text}"]
       end
+    rescue Twitter::Error::Forbidden
     end
 
     def image_urls

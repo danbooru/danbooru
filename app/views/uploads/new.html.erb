@@ -141,4 +141,13 @@
   Upload - <%= Danbooru.config.app_name %>
 <% end %>
 
+<% if CurrentUser.is_moderator? && Danbooru.config.ccs_server.present? && @normalized_url %>
+  <% content_for(:html_header) do %>
+    <%= tag("meta", name: "ccs-server", content: Danbooru.config.ccs_server) %>
+    <%= tag("meta", name: "image-url", content: @normalized_url) %>
+    <%= tag("meta", name: "image-ref", content: ImageProxy.fake_referer_for(@normalized_url)) %>
+    <%= tag("meta", name: "image-sig", content: ccs_build_sig(@normalized_url)) %>
+  <% end %>
+<% end %>
+
 <%= render "posts/partials/common/secondary_links" %>
