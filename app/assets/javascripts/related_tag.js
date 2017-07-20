@@ -182,6 +182,7 @@
         "ref": Danbooru.meta("image-ref"),
         "sig": Danbooru.meta("image-sig")
       }, function(data) {
+        console.log("got ccs data: %o", data)
         var char_tags = data[0][1];
         $dest.append(this.build_html("Guessed Characters", char_tags, "ccs"))
       });
