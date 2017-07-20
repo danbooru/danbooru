@@ -155,7 +155,6 @@
         Danbooru.RelatedTag.build_ccs($dest);
       } else {
         Danbooru.RelatedTag.fetch_ccs();
-        Danbooru.RelatedTag.build_ccs($dest);
       }
     }
   }
@@ -166,9 +165,6 @@
       "ref": Danbooru.meta("image-ref"),
       "sig": Danbooru.meta("image-sig")
     }, function(data) {
-      if ($("#ccs-related-tags-column").length) {
-        $("#ccs-related-tags-column").remove();
-      }
       Danbooru.RelatedTag.recent_ccs = data.filter(function(x) {return x[0] > 0.5;});
       Danbooru.RelatedTag.recent_ccs = $.map(Danbooru.RelatedTag.recent_ccs, function(x) {console.log(x); return [x[1], 4];});
     });
@@ -197,7 +193,7 @@
   }
 
   Danbooru.RelatedTag.build_ccs = function($dest) {
-    $dest.append(this.build_html("Guessed Characters", this.recent_ccs, "ccs"))
+    $dest.append(this.build_html("Guessed Characters", Danbooru.RelatedTag.recent_ccs, "ccs"))
   }
 
   Danbooru.RelatedTag.build_translated = function($dest) {
