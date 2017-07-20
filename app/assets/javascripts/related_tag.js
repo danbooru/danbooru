@@ -126,6 +126,7 @@
 
     $dest.append(this.build_html(query, related_tags, "general"));
     this.build_translated($dest);
+    this.build_ccs($dest)
     if (wiki_page_tags.length) {
       $dest.append(Danbooru.RelatedTag.build_html("wiki:" + query, wiki_page_tags, "wiki"));
     }
@@ -171,6 +172,19 @@
       });
     } else {
       return [];
+    }
+  }
+
+  Danbooru.RelatedTag.build_ccs = function($dest) {
+    if (Danbooru.meta("ccs-server")) {
+      $.getJSON(Danbooru.meta("ccs-server") + "/query", {
+        "url": Danbooru.meta("image-url"),
+        "ref": Danbooru.meta("image-ref"),
+        "sig": Danbooru.meta("image-sig")
+      }, function(data) {
+        var char_tags = data[0][1];
+        $dest.append(this.build_html("Guessed Characters", char_tags, "ccs"))
+      });
     }
   }
 
