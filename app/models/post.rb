@@ -1051,12 +1051,12 @@ class Post < ApplicationRecord
       @pools ||= begin
         return Pool.none if pool_string.blank?
         pool_ids = pool_string.scan(/\d+/)
-        Pool.undeleted.where(id: pool_ids).series_first
+        Pool.where(id: pool_ids).series_first
       end
     end
 
     def has_active_pools?
-      pools.length > 0
+      pools.undeleted.length > 0
     end
 
     def belongs_to_pool?(pool)
@@ -1101,7 +1101,7 @@ class Post < ApplicationRecord
     def set_pool_category_pseudo_tags
       self.pool_string = (pool_string.scan(/\S+/) - ["pool:series", "pool:collection"]).join(" ")
 
-      pool_categories = pools.select("category").map(&:category)
+      pool_categories = pools.undeleted.pluck(:category)
       if pool_categories.include?("series")
         self.pool_string = "#{pool_string} pool:series".strip
       end

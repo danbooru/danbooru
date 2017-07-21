@@ -189,7 +189,7 @@ class PostPresenter < Presenter
   end
 
   def has_nav_links?(template)
-    (CurrentUser.user.enable_sequential_post_navigation && template.params[:tags].present? && template.params[:tags] !~ /(?:^|\s)(?:order|ordfav|ordpool):/) || @post.pools.any? || @post.favorite_groups(active_id=template.params[:favgroup_id]).any?
+    (CurrentUser.user.enable_sequential_post_navigation && template.params[:tags].present? && template.params[:tags] !~ /(?:^|\s)(?:order|ordfav|ordpool):/) || @post.pools.undeleted.any? || @post.favorite_groups(active_id=template.params[:favgroup_id]).any?
   end
 
   def post_footer_for_pool_html(template)
@@ -211,13 +211,13 @@ class PostPresenter < Presenter
       return if pool.nil?
       html += pool_link_html(template, pool, :include_rel => true)
 
-      other_pools = @post.pools.where("id <> ?", template.params[:pool_id]).series_first
+      other_pools = @post.pools.undeleted.where("id <> ?", template.params[:pool_id]).series_first
       other_pools.each do |other_pool|
         html += pool_link_html(template, other_pool)
       end
     else
       first = true
-      pools = @post.pools.series_first
+      pools = @post.pools.undeleted
       pools.each do |pool|
         if first && template.params[:tags].blank? && template.params[:favgroup_id].blank?
           html += pool_link_html(template, pool, :include_rel => true)
