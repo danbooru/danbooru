@@ -1314,17 +1314,14 @@ class Post < ApplicationRecord
     end
 
     def update_children_on_destroy
-      if children.size == 0
-        # do nothing
-      elsif children.size == 1
-        children.first.update_column(:parent_id, nil)
-      else
-        cached_children = children
-        eldest = cached_children[0]
-        siblings = cached_children[1..-1]
-        eldest.update_column(:parent_id, nil)
-        Post.where(:id => siblings.map(&:id)).update_all(:parent_id => eldest.id)
-      end
+      return unless children.present?
+
+      eldest = children[0]
+      siblings = children[1..-1]
+
+      eldest.update(parent_id: nil)
+      Post.where(id: siblings).find_each { |p| p.update(parent_id: eldest.id) }
+      # Post.where(id: siblings).update(parent_id: eldest.id) # XXX rails 5
     end
 
     def update_parent_on_save
