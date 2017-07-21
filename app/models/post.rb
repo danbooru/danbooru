@@ -1379,17 +1379,20 @@ class Post < ApplicationRecord
         return false
       end
 
-      ModAction.log("permanently deleted post ##{id}")
-      delete!("Permanently deleted post ##{id}", :without_mod_action => true)
-      Post.without_timeout do
-        give_favorites_to_parent
-        update_children_on_destroy
-        decrement_tag_post_counts
-        remove_from_all_pools
-        remove_from_fav_groups
-        remove_from_favorites
-        destroy
-        update_parent_on_destroy
+      transaction do
+        Post.without_timeout do
+          ModAction.log("permanently deleted post ##{id}")
+          delete!("Permanently deleted post ##{id}", :without_mod_action => true)
+
+          give_favorites_to_parent
+          update_children_on_destroy
+          decrement_tag_post_counts
+          remove_from_all_pools
+          remove_from_fav_groups
+          remove_from_favorites
+          destroy
+          update_parent_on_destroy
+        end
       end
     end
 
