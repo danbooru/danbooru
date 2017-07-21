@@ -1079,10 +1079,9 @@ class Post < ApplicationRecord
       end
     end
 
-    def remove_pool!(pool, force = false)
+    def remove_pool!(pool)
       return unless belongs_to_pool?(pool)
       return unless CurrentUser.user.can_remove_from_pools?
-      return if pool.is_deleted? && !force
 
       with_lock do
         self.pool_string = pool_string.gsub(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ").strip
