@@ -1283,17 +1283,8 @@ class Post < ApplicationRecord
     # - Move favorites to the first child.
     # - Reparent all children to the first child.
 
-    module ClassMethods
-      def update_has_children_flag_for(post_id)
-        return if post_id.nil?
-        has_children = Post.where("parent_id = ?", post_id).exists?
-        has_active_children = Post.where("parent_id = ? and is_deleted = ?", post_id, false).exists?
-        execute_sql("UPDATE posts SET has_children = ?, has_active_children = ? WHERE id = ?", has_children, has_active_children, post_id)
-      end
-    end
-
-    def self.included(m)
-      m.extend(ClassMethods)
+    def update_has_children_flag
+      update({has_children: children.exists?, has_active_children: children.undeleted.exists?}, without_protection: true)
     end
 
     def blank_out_nonexistent_parents
@@ -1310,7 +1301,7 @@ class Post < ApplicationRecord
     end
 
     def update_parent_on_destroy
-      Post.update_has_children_flag_for(parent_id) if parent_id
+      parent.update_has_children_flag if parent
     end
 
     def update_children_on_destroy
@@ -1325,14 +1316,10 @@ class Post < ApplicationRecord
     end
 
     def update_parent_on_save
-      if parent_id == parent_id_was
-        Post.update_has_children_flag_for(parent_id)
-      elsif !parent_id_was.nil?
-        Post.update_has_children_flag_for(parent_id)
-        Post.update_has_children_flag_for(parent_id_was)
-      else
-        Post.update_has_children_flag_for(parent_id)
-      end
+      return unless parent_id_changed? || is_deleted_changed?
+
+      parent.update_has_children_flag if parent.present?
+      Post.find(parent_id_was).update_has_children_flag if parent_id_was.present?
     end
 
     def give_favorites_to_parent
