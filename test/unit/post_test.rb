@@ -2085,6 +2085,8 @@ class PostTest < ActiveSupport::TestCase
 
     should "return posts ordered by a particular attribute" do
       posts = (1..2).map do |n|
+        tags = ["tagme", "gentag1 gentag2 artist:arttag char:chartag copy:copytag"]
+
         p = FactoryGirl.create(
           :post,
           score: n,
@@ -2093,6 +2095,7 @@ class PostTest < ActiveSupport::TestCase
           # posts[0] is portrait, posts[1] is landscape. posts[1].mpixels > posts[0].mpixels.
           image_height: 100*n*n,
           image_width: 100*(3-n)*n,
+          tag_string: tags[n-1],
         )
 
         FactoryGirl.create(:artist_commentary, post: p)
@@ -2112,6 +2115,11 @@ class PostTest < ActiveSupport::TestCase
       assert_tag_match(posts.reverse, "order:mpixels")
       assert_tag_match(posts.reverse, "order:portrait")
       assert_tag_match(posts.reverse, "order:filesize")
+      assert_tag_match(posts.reverse, "order:tagcount")
+      assert_tag_match(posts.reverse, "order:gentags")
+      assert_tag_match(posts.reverse, "order:arttags")
+      assert_tag_match(posts.reverse, "order:chartags")
+      assert_tag_match(posts.reverse, "order:copytags")
       assert_tag_match(posts.reverse, "order:rank")
 
       assert_tag_match(posts, "order:id_asc")
@@ -2125,6 +2133,11 @@ class PostTest < ActiveSupport::TestCase
       assert_tag_match(posts, "order:mpixels_asc")
       assert_tag_match(posts, "order:landscape")
       assert_tag_match(posts, "order:filesize_asc")
+      assert_tag_match(posts, "order:tagcount_asc")
+      assert_tag_match(posts, "order:gentags_asc")
+      assert_tag_match(posts, "order:arttags_asc")
+      assert_tag_match(posts, "order:chartags_asc")
+      assert_tag_match(posts, "order:copytags_asc")
     end
 
     should "return posts for order:comment_bumped" do
