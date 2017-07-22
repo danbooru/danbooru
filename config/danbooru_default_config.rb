@@ -571,6 +571,12 @@ module Danbooru
 
     def aws_sqs_archives_url
     end
+
+    def ccs_server
+    end
+
+    def ccs_key
+    end
   end
 
   class EnvironmentConfiguration
