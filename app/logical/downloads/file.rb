@@ -26,9 +26,9 @@ module Downloads
     end
 
     def size
-      @source, _, @data = before_download(@source, @data)
-      url = URI.parse(@source)
-      res = HTTParty.head(url, Danbooru.config.httparty_options.reverse_merge(timeout: 3))
+      @source, headers, @data = before_download(@source, @data)
+      options = { timeout: 3, headers: headers }.deep_merge(Danbooru.config.httparty_options)
+      res = HTTParty.head(@source, options)
       res.content_length
     end
 
