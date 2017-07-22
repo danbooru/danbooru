@@ -50,7 +50,7 @@ class Post < ApplicationRecord
   has_many :approvals, :class_name => "PostApproval", :dependent => :destroy
   has_many :disapprovals, :class_name => "PostDisapproval", :dependent => :destroy
   has_many :favorites
-  has_many :replacements, class_name: "PostReplacement"
+  has_many :replacements, class_name: "PostReplacement", :dependent => :destroy
 
   if PostArchive.enabled?
     has_many :versions, lambda {order("post_versions.updated_at ASC")}, :class_name => "PostArchive", :dependent => :destroy
@@ -1051,12 +1051,12 @@ class Post < ApplicationRecord
       @pools ||= begin
         return Pool.none if pool_string.blank?
         pool_ids = pool_string.scan(/\d+/)
-        Pool.undeleted.where(id: pool_ids).series_first
+        Pool.where(id: pool_ids).series_first
       end
     end
 
     def has_active_pools?
-      pools.length > 0
+      pools.undeleted.length > 0
     end
 
     def belongs_to_pool?(pool)
@@ -1079,10 +1079,9 @@ class Post < ApplicationRecord
       end
     end
 
-    def remove_pool!(pool, force = false)
+    def remove_pool!(pool)
       return unless belongs_to_pool?(pool)
       return unless CurrentUser.user.can_remove_from_pools?
-      return if pool.is_deleted? && !force
 
       with_lock do
         self.pool_string = pool_string.gsub(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ").strip
@@ -1101,7 +1100,7 @@ class Post < ApplicationRecord
     def set_pool_category_pseudo_tags
       self.pool_string = (pool_string.scan(/\S+/) - ["pool:series", "pool:collection"]).join(" ")
 
-      pool_categories = pools.select("category").map(&:category)
+      pool_categories = pools.undeleted.pluck(:category)
       if pool_categories.include?("series")
         self.pool_string = "#{pool_string} pool:series".strip
       end
@@ -1284,17 +1283,8 @@ class Post < ApplicationRecord
     # - Move favorites to the first child.
     # - Reparent all children to the first child.
 
-    module ClassMethods
-      def update_has_children_flag_for(post_id)
-        return if post_id.nil?
-        has_children = Post.where("parent_id = ?", post_id).exists?
-        has_active_children = Post.where("parent_id = ? and is_deleted = ?", post_id, false).exists?
-        execute_sql("UPDATE posts SET has_children = ?, has_active_children = ? WHERE id = ?", has_children, has_active_children, post_id)
-      end
-    end
-
-    def self.included(m)
-      m.extend(ClassMethods)
+    def update_has_children_flag
+      update({has_children: children.exists?, has_active_children: children.undeleted.exists?}, without_protection: true)
     end
 
     def blank_out_nonexistent_parents
@@ -1311,32 +1301,25 @@ class Post < ApplicationRecord
     end
 
     def update_parent_on_destroy
-      Post.update_has_children_flag_for(parent_id) if parent_id
+      parent.update_has_children_flag if parent
     end
 
     def update_children_on_destroy
-      if children.size == 0
-        # do nothing
-      elsif children.size == 1
-        children.first.update_column(:parent_id, nil)
-      else
-        cached_children = children
-        eldest = cached_children[0]
-        siblings = cached_children[1..-1]
-        eldest.update_column(:parent_id, nil)
-        Post.where(:id => siblings.map(&:id)).update_all(:parent_id => eldest.id)
-      end
+      return unless children.present?
+
+      eldest = children[0]
+      siblings = children[1..-1]
+
+      eldest.update(parent_id: nil)
+      Post.where(id: siblings).find_each { |p| p.update(parent_id: eldest.id) }
+      # Post.where(id: siblings).update(parent_id: eldest.id) # XXX rails 5
     end
 
     def update_parent_on_save
-      if parent_id == parent_id_was
-        Post.update_has_children_flag_for(parent_id)
-      elsif !parent_id_was.nil?
-        Post.update_has_children_flag_for(parent_id)
-        Post.update_has_children_flag_for(parent_id_was)
-      else
-        Post.update_has_children_flag_for(parent_id)
-      end
+      return unless parent_id_changed? || is_deleted_changed?
+
+      parent.update_has_children_flag if parent.present?
+      Post.find(parent_id_was).update_has_children_flag if parent_id_was.present?
     end
 
     def give_favorites_to_parent
@@ -1379,17 +1362,20 @@ class Post < ApplicationRecord
         return false
       end
 
-      ModAction.log("permanently deleted post ##{id}")
-      delete!("Permanently deleted post ##{id}", :without_mod_action => true)
-      Post.without_timeout do
-        give_favorites_to_parent
-        update_children_on_destroy
-        decrement_tag_post_counts
-        remove_from_all_pools
-        remove_from_fav_groups
-        remove_from_favorites
-        destroy
-        update_parent_on_destroy
+      transaction do
+        Post.without_timeout do
+          ModAction.log("permanently deleted post ##{id}")
+          delete!("Permanently deleted post ##{id}", :without_mod_action => true)
+
+          give_favorites_to_parent
+          update_children_on_destroy
+          decrement_tag_post_counts
+          remove_from_all_pools
+          remove_from_fav_groups
+          remove_from_favorites
+          destroy
+          update_parent_on_destroy
+        end
       end
     end
 

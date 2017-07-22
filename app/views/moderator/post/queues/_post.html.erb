@@ -35,7 +35,7 @@
       </li>
       <li><strong>Source</strong>: <%= post.source %></li>
       <% if post.has_active_pools? %>
-        <li><strong>Pools</strong>: <%= render "pools/inline_list", pools: post.pools %></li>
+        <li><strong>Pools</strong>: <%= render "pools/inline_list", pools: post.pools.undeleted %></li>
       <% end %>
       <li><strong>Tags</strong>: <%= post.presenter.inline_tag_list_html(self) %></li>
     </ul>

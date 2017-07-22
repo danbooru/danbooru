@@ -239,11 +239,10 @@ class Pool < ApplicationRecord
   def remove!(post)
     return unless contains?(post.id)
     return unless CurrentUser.user.can_remove_from_pools?
-    return if is_deleted?
 
     with_lock do
       update_attributes(:post_ids => remove_number_from_string(post.id, post_ids), :post_count => post_count - 1)
-      post.remove_pool!(self, true)
+      post.remove_pool!(self)
       clear_post_id_array
     end
   end
@@ -284,7 +283,7 @@ class Pool < ApplicationRecord
 
     removed.each do |post_id|
       post = Post.find(post_id)
-      post.remove_pool!(self, true)
+      post.remove_pool!(self)
     end
 
     normalize_post_ids
