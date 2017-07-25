@@ -2,7 +2,7 @@
   <ul>
     <li class="active">
       <%= link_to "&lsaquo;&thinsp;prev".html_safe, show_seq_post_path(post, :tags => params[:tags], :seq => "prev"), :rel => "prev nofollow", :class => "prev" %>
-      <span class="search-name">Search: <%= params[:tags] %></span>
+      <span class="search-name">Search: <%= params[:tags].presence || "status:any" %></span>
       <%= link_to "next&thinsp;&rsaquo;".html_safe, show_seq_post_path(post, :tags => params[:tags], :seq => "next"), :rel => "next nofollow", :class => "next" %>
     </li>
   </ul>

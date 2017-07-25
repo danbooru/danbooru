@@ -1,25 +1,20 @@
 class PostSearchContext
-  attr_reader :params, :post_id
+  extend Memoist
+  attr_reader :id, :seq, :tags
 
   def initialize(params)
-    @params = params
-    raise unless params[:seq].present?
-    raise unless params[:id].present?
-
-    @post_id = find_post_id
+    @id = params[:id].to_i
+    @seq = params[:seq]
+    @tags = params[:tags].presence || "status:any"
   end
 
-  def find_post_id
-    if params[:seq] == "prev"
-      post = Post.tag_match(params[:tags]).where("posts.id > ?", params[:id].to_i).reorder("posts.id asc").first
+  def post_id
+    if seq == "prev"
+      Post.tag_match(tags).where("posts.id > ?", id).reorder("posts.id asc").first.try(:id)
     else
-      post = Post.tag_match(params[:tags]).where("posts.id < ?", params[:id].to_i).reorder("posts.id desc").first
-    end
-
-    if post
-      post.id
-    else
-      nil
+      Post.tag_match(tags).where("posts.id < ?", id).reorder("posts.id desc").first.try(:id)
     end
   end
+
+  memoize :post_id
 end
