@@ -67,9 +67,11 @@ class Post < ApplicationRecord
     module ClassMethods
       def delete_files(post_id, file_path, large_file_path, preview_file_path, force: false)
         unless force
-          post = Post.find(post_id)
+          # XXX should pass in the md5 instead of parsing it.
+          preview_file_path =~ %r!/data/preview/(?:test\.)?([a-z0-9]{32})\.jpg\z!
+          md5 = $1
 
-          if post.file_path == file_path || post.large_file_path == large_file_path || post.preview_file_path == preview_file_path
+          if Post.where(md5: md5).exists?
             raise DeletionError.new("Files still in use; skipping deletion.")
           end
         end

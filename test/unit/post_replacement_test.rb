@@ -202,6 +202,27 @@ class PostReplacementTest < ActiveSupport::TestCase
       end
     end
 
+    context "two posts that have had their files swapped" do
+      should "not delete the still active files" do
+        @post1 = FactoryGirl.create(:post)
+        @post2 = FactoryGirl.create(:post)
+
+        # swap the images between @post1 and @post2.
+        @post1.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
+        @post2.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
+        @post2.replace!(replacement_url: "https://www.google.com/intl/en_ALL/images/logo.gif")
+        @post1.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
+        @post2.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
+
+        Timecop.travel(Time.now + PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
+          Delayed::Worker.new.work_off
+        end
+
+        assert(File.exists?(@post1.file_path))
+        assert(File.exists?(@post2.file_path))
+      end
+    end
+
     context "a post with an uploaded file" do
       should "work" do
         upload_file("#{Rails.root}/test/files/test.png", "test.png") do |file|
