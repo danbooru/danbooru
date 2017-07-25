@@ -14,7 +14,7 @@ module Downloads
       end
 
       should "capture the data" do
-        assert_equal("https://i1.pixiv.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @download.source)
+        assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @download.source)
         assert_equal([{"file"=>"000000.jpg", "delay"=>125}, {"file"=>"000001.jpg", "delay"=>125}], @download.data[:ugoira_frame_data])
       end
     end
@@ -117,7 +117,7 @@ module Downloads
       context "downloading a ugoira" do
         setup do
           @medium_page     = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364"
-          @zip_file        = "https://i1.pixiv.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip"
+          @zip_file        = "https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip"
           @file_size       = 2804
         end
 

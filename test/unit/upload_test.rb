@@ -278,7 +278,7 @@ class UploadTest < ActiveSupport::TestCase
       assert_equal("0d94800c4b520bf3d8adda08f95d31e2", post.md5)
       assert_equal(60, post.image_width)
       assert_equal(60, post.image_height)
-      assert_equal("https://i3.pixiv.net/img-zip-ugoira/img/2014/10/05/23/42/23/46378654_ugoira1920x1080.zip", post.source)
+      assert_equal("https://i.pximg.net/img-zip-ugoira/img/2014/10/05/23/42/23/46378654_ugoira1920x1080.zip", post.source)
       assert_operator(File.size(post.large_file_path), :>, 0)
       assert_operator(File.size(post.preview_file_path), :>, 0)
     end

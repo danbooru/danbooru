@@ -51,7 +51,7 @@ module Sources
         end
 
         should "get the file url" do
-          assert_equal("https://i1.pixiv.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @site.file_url)
+          assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @site.file_url)
         end
 
         should "capture the frame data" do
