@@ -4,6 +4,15 @@ require 'helpers/iqdb_test_helper'
 class PostReplacementTest < ActiveSupport::TestCase
   include IqdbTestHelper
 
+  def upload_file(path, filename, &block)
+    Tempfile.open do |file|
+      file.write(File.read(path))
+      file.seek(0)
+      uploaded_file = ActionDispatch::Http::UploadedFile.new(tempfile: file, filename: filename)
+      yield uploaded_file
+    end
+  end
+
   def setup
     mock_iqdb_service!
     Delayed::Worker.delay_jobs = true # don't delete the old images right away
@@ -168,7 +177,7 @@ class PostReplacementTest < ActiveSupport::TestCase
         assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post.md5)
         assert_equal("cad1da177ef309bf40a117c17b8eecf5", Digest::MD5.file(@post.file_path).hexdigest)
 
-        assert_equal("https://i1.pixiv.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @post.source)
+        assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @post.source)
         assert_equal([{"file"=>"000000.jpg", "delay"=>125}, {"file"=>"000001.jpg", "delay"=>125}], @post.pixiv_ugoira_frame_data.data)
       end
     end
@@ -195,13 +204,9 @@ class PostReplacementTest < ActiveSupport::TestCase
 
     context "a post with an uploaded file" do
       should "work" do
-        Tempfile.open do |file|
-          file.write(File.read("#{Rails.root}/test/files/test.png"))
-          file.seek(0)
-          uploaded_file = ActionDispatch::Http::UploadedFile.new(tempfile: file, filename: "test.png")
-
-          @post.replace!(replacement_file: uploaded_file, replacement_url: "")
-          assert_equal(@post.md5, Digest::MD5.file(file).hexdigest)
+        upload_file("#{Rails.root}/test/files/test.png", "test.png") do |file|
+          @post.replace!(replacement_file: file, replacement_url: "")
+          assert_equal(@post.md5, Digest::MD5.file(file.tempfile).hexdigest)
           assert_equal("file://test.png", @post.replacements.last.replacement_url)
         end
       end
@@ -224,6 +229,16 @@ class PostReplacementTest < ActiveSupport::TestCase
         @post.replace!(replacement_url: replacement_url)
 
         assert_equal(image_url, @post.replacements.last.replacement_url)
+      end
+    end
+
+    context "a post with the same file" do
+      should "not raise a duplicate error" do
+        upload_file("#{Rails.root}/test/files/test.jpg", "test.jpg") do |file|
+          assert_nothing_raised do
+            @post.replace!(replacement_file: file, replacement_url: "")
+          end
+        end
       end
     end
   end

@@ -7,7 +7,7 @@ class Upload < ApplicationRecord
   attr_accessor :file, :image_width, :image_height, :file_ext, :md5, 
     :file_size, :as_pending, :artist_commentary_title, 
     :artist_commentary_desc, :include_artist_commentary,
-    :referer_url, :downloaded_source
+    :referer_url, :downloaded_source, :replaced_post
   belongs_to :uploader, :class_name => "User"
   belongs_to :post
   before_validation :initialize_uploader, :on => :create
@@ -22,7 +22,7 @@ class Upload < ApplicationRecord
     :tag_string, :status, :backtrace, :post_id, :md5_confirmation, 
     :parent_id, :server, :artist_commentary_title,
     :artist_commentary_desc, :include_artist_commentary,
-    :referer_url
+    :referer_url, :replaced_post
 
   module ValidationMethods
     def uploader_is_not_limited
@@ -46,7 +46,10 @@ class Upload < ApplicationRecord
     # Because uploads are processed serially, there's no race condition here.
     def validate_md5_uniqueness
       md5_post = Post.find_by_md5(md5)
-      if md5_post
+
+      if md5_post && replaced_post
+        raise "duplicate: #{md5_post.id}" if replaced_post != md5_post
+      elsif md5_post
         raise "duplicate: #{md5_post.id}"
       end
     end
