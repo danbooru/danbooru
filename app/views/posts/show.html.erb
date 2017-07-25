@@ -177,7 +177,10 @@
     <meta name="twitter:site" content="<%= Danbooru.config.twitter_site %>">
     <meta name="twitter:title" content="<%= @post.presenter.humanized_essential_tag_string %> - <%= Danbooru.config.app_name %>">
     <meta name="twitter:description" content="<%= @post.presenter.humanized_tag_string %> - <%= Danbooru.config.app_name %>">
-    <meta name="twitter:image" content="http://<%= Danbooru.config.hostname %><%= @post.large_file_url %>">
+
+    <% if @post.visible? %>
+      <meta name="twitter:image" content="http://<%= Danbooru.config.hostname %><%= @post.large_file_url %>">
+    <% end %>
   <% end %>
 
   <%= auto_discovery_link_tag(:atom, comments_url(:atom, search: { post_id: @post.id }), title: "Comments for post ##{@post.id}") %>
