@@ -249,15 +249,6 @@ module Sources
         end
       end
 
-      def get_moniker_from_page(page)
-        # <a class="tab-feed" href="/stacc/gennmai-226">Feed</a>
-        stacc_link = page.search("a.tab-feed").first
-
-        if not stacc_link.nil?
-          stacc_link.attr("href").sub(%r!^/stacc/!i, '')
-        end
-      end
-
       def get_moniker_from_url
         case url
         when %r!#{IMG}/img/(#{MONIKER})!i
@@ -307,19 +298,6 @@ module Sources
           content_type = data["mime_type"]
 
           return [zip_url, frame_data, content_type]
-        end
-      end
-
-      def get_page_count_from_page(page)
-        elements = page.search("ul.meta li").find_all do |node|
-          node.text =~ /Manga|漫画|複数枚投稿|Multiple images/
-        end
-
-        if elements.any?
-          elements[0].text =~ /(?:Manga|漫画|複数枚投稿|Multiple images):? (\d+)P/
-          $1.to_i
-        else
-          1
         end
       end
 
