@@ -9,18 +9,6 @@ module Sources
     end
 
     context "in all cases" do
-      context "A whitecube page" do
-        setup do
-          @site = Sources::Site.new("https://www.pixiv.net/whitecube/user/277898/illust/59182257")
-          @site.get
-          @image_urls = @site.image_urls
-        end
-
-        should "get all the image urls" do
-          assert_equal(["https://i.pximg.net/img-original/img/2016/09/26/21/30/41/59182257_p0.jpg"], @image_urls)
-        end
-      end
-
       context "A touch page" do
         setup do
           @site = Sources::Site.new("http://touch.pixiv.net/member_illust.php?mode=medium&illust_id=59687915")
