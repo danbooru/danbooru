@@ -19,7 +19,14 @@ class PostReplacement < ApplicationRecord
 
   def process!
     transaction do
-      upload = Upload.create!(file: replacement_file, source: replacement_url, rating: post.rating, tag_string: self.tags)
+      upload = Upload.create!(
+        file: replacement_file,
+        source: replacement_url,
+        rating: post.rating,
+        tag_string: self.tags,
+        replaced_post: post,
+      )
+
       upload.process_upload
       upload.update(status: "completed", post_id: post.id)
 
