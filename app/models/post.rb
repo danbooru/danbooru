@@ -1548,7 +1548,7 @@ class Post < ApplicationRecord
       super(options)
     end
 
-    def to_legacy_json
+    def legacy_attributes
       hash = {
         "has_comments" => last_commented_at.present?,
         "parent_id" => parent_id,
@@ -1574,7 +1574,7 @@ class Post < ApplicationRecord
         hash["md5"] = md5
       end
 
-      hash.to_json
+      hash
     end
 
     def status

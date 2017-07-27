@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<posts>
-  <% @posts.each do |post| %>
-	  <post preview_url="<%= post.preview_file_url %>" file_size="<%= post.file_size %>" status="<%= post.status %>" score="<%= post.score %>" file_url="<%= post.file_url %>" height="<%= post.image_height %>" has_comments="<%= post.last_commented_at.present? %>" tags="<%= post.tag_string %>" source="<%= post.source %>" parent_id="<%= post.parent_id %>" created_at="<%= post.created_at.to_formatted_s(:db) %>" rating="<%= post.rating %>" has_notes="<%= post.last_noted_at.present? %>" id="<%= post.id %>" md5="<%= post.md5 %>" has_children="<%= post.has_children? %>" creator_id="<%= post.uploader_id %>" author="<%= post.uploader_name %>" width="<%= post.image_width %>"/>
-	<% end %>
-</posts>

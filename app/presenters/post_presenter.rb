@@ -66,7 +66,7 @@ class PostPresenter < Presenter
   end
 
   def self.data_attributes(post)
-    %{
+    attributes = %{
       data-id="#{post.id}"
       data-has-sound="#{post.has_tag?('video_with_sound|flash_with_sound')}"
       data-tags="#{h(post.tag_string)}"
@@ -83,15 +83,22 @@ class PostPresenter < Presenter
       data-views="#{post.view_count}"
       data-fav-count="#{post.fav_count}"
       data-pixiv-id="#{post.pixiv_id}"
-      data-md5="#{post.md5}"
       data-file-ext="#{post.file_ext}"
-      data-file-url="#{post.file_url}"
-      data-large-file-url="#{post.large_file_url}"
-      data-preview-file-url="#{post.preview_file_url}"
       data-source="#{h(post.source)}"
       data-normalized-source="#{h(post.normalized_source)}"
       data-is-favorited="#{post.favorited_by?(CurrentUser.user.id)}"
-    }.html_safe
+    }
+
+    if post.visible?
+      attributes += %{
+        data-md5="#{post.md5}"
+        data-file-url="#{post.file_url}"
+        data-large-file-url="#{post.large_file_url}"
+        data-preview-file-url="#{post.preview_file_url}"
+      }
+    end
+
+    attributes.html_safe
   end
 
   def initialize(post)

@@ -1,9 +1,21 @@
 class LegacyController < ApplicationController
   before_filter :member_only, :only => [:create_post]
+  respond_to :json, :xml
 
   def posts
     @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], format: "json")
-    @posts = @post_set.posts
+    @posts = @post_set.posts.map(&:legacy_attributes)
+
+    respond_with(@posts) do |format|
+      format.xml do
+        xml = Builder::XmlMarkup.new(indent: 2)
+        xml.instruct!
+        xml.posts do
+          @posts.each { |attrs| xml.post(attrs) }
+        end
+        render xml: xml.target!
+      end
+    end
   end
 
   def create_post
