@@ -11,7 +11,7 @@ module Sources
       :rewrite_thumbnails, :illust_id_from_url, :translate_tag, :translated_tags, :to => :strategy
 
     def self.strategies
-      [Strategies::PixivWhitecube, Strategies::Pixiv, Strategies::NicoSeiga, Strategies::DeviantArt, Strategies::ArtStation, Strategies::Nijie, Strategies::Twitter, Strategies::Tumblr, Strategies::Pawoo]
+      [Strategies::Pixiv, Strategies::NicoSeiga, Strategies::DeviantArt, Strategies::ArtStation, Strategies::Nijie, Strategies::Twitter, Strategies::Tumblr, Strategies::Pawoo]
     end
 
     def initialize(url, referer_url: nil)
