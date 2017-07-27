@@ -261,6 +261,14 @@ class PostReplacementTest < ActiveSupport::TestCase
           end
         end
       end
+
+      should "not queue a deletion or log a comment" do
+        upload_file("#{Rails.root}/test/files/test.jpg", "test.jpg") do |file|
+          assert_no_difference(["@post.comments.count", "ModAction.count"]) do
+            @post.replace!(replacement_file: file, replacement_url: "")
+          end
+        end
+      end
     end
   end
 end
