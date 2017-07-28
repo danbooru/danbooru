@@ -1972,6 +1972,17 @@ class PostTest < ActiveSupport::TestCase
       assert_tag_match(all - [flagged], "-status:active")
     end
 
+    should "respect the 'Deleted post filter' option when using the status:banned metatag" do
+      deleted = FactoryGirl.create(:post, is_deleted: true, is_banned: true)
+      undeleted = FactoryGirl.create(:post, is_banned: true)
+
+      CurrentUser.hide_deleted_posts = true
+      assert_tag_match([undeleted], "status:banned")
+
+      CurrentUser.hide_deleted_posts = false
+      assert_tag_match([undeleted, deleted], "status:banned")
+    end
+
     should "return posts for the filetype:<ext> metatag" do
       png = FactoryGirl.create(:post, file_ext: "png")
       jpg = FactoryGirl.create(:post, file_ext: "jpg")
