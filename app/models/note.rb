@@ -146,6 +146,7 @@ class Note < ApplicationRecord
   end
 
   def create_version
+    return unless versioned_attributes_changed?
     User.where(id: CurrentUser.id).update_all("note_update_count = note_update_count + 1")
     CurrentUser.reload
 
@@ -156,6 +157,10 @@ class Note < ApplicationRecord
       reload
       create_new_version
     end
+  end
+
+  def versioned_attributes_changed?
+    new_record? || x_changed? || y_changed? || width_changed? || height_changed? || is_active_changed? || body_changed?
   end
 
   def create_new_version

@@ -153,6 +153,14 @@ class NoteTest < ActiveSupport::TestCase
           assert_equal(["Post is note locked"], @note.errors.full_messages)
         end
       end
+
+      context "without making any changes" do
+        should "not create a new version" do
+          assert_no_difference("@note.versions.count") do
+            @note.save
+          end
+        end
+      end
     end
 
     context "when notes have been vandalized by one user" do
