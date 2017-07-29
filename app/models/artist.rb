@@ -5,7 +5,6 @@ class Artist < ApplicationRecord
   before_create :initialize_creator
   before_validation :normalize_name
   after_save :create_version
-  after_save :save_url_string
   after_save :categorize_tag
   after_save :update_wiki
   validates_uniqueness_of :name
@@ -64,37 +63,20 @@ class Artist < ApplicationRecord
       urls.map(&:url)
     end
 
-    def save_url_string
-      if @url_string
-        prev = url_array
-        curr = @url_string.scan(/\S+/).uniq
+    def url_string=(string)
+      @url_string_was = url_string
 
-        duplicates = prev.select{|url| prev.count(url) > 1}.uniq
-        duplicates.each do |url|
-          count = prev.count(url)
-          urls.where(:url => url).limit(count-1).destroy_all
-        end
-
-        (prev - curr).each do |url|
-          urls.where(:url => url).destroy_all
-        end
-
-        (curr - prev).each do |url|
-          urls.create(:url => url)
-        end
+      self.urls = string.split(/[[:space:]]+/).uniq.map do |url|
+        self.urls.find_or_initialize_by(url: url)
       end
     end
 
-    def url_string=(string)
-      @url_string = string
-    end
-
     def url_string
-      @url_string || url_array.join("\n")
+      url_array.join("\n")
     end
 
     def url_string_changed?
-      url_string.scan(/\S+/) != url_array
+      @url_string_was != url_string
     end
 
     def map_domain(x)
