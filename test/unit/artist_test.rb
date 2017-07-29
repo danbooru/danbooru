@@ -134,6 +134,13 @@ class ArtistTest < ActiveSupport::TestCase
       assert_equal(["http://aaa.com", "http://rembrandt.com/test.jpg"], artist.urls.map(&:to_s).sort)
     end
 
+    should "not allow invalid urls" do
+      artist = FactoryGirl.build(:artist, :url_string => "blah")
+
+      assert_equal(false, artist.valid?)
+      assert_equal(["'blah' must begin with http:// or https://"], artist.errors[:url])
+    end
+
     should "make sure old urls are deleted" do
       artist = FactoryGirl.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/test.jpg")
       artist.url_string = "http://not.rembrandt.com/test.jpg"
