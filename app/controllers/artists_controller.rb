@@ -62,6 +62,7 @@ class ArtistsController < ApplicationController
 
   def update
     @artist.update(params[:artist], :as => CurrentUser.role)
+    flash[:notice] = @artist.valid? ? "Artist updated" : @artist.errors.full_messages.join("; ")
     respond_with(@artist)
   end
 

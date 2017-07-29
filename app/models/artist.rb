@@ -10,6 +10,7 @@ class Artist < ApplicationRecord
   validates_uniqueness_of :name
   validate :validate_name
   validate :validate_wiki, :on => :create
+  after_validation :merge_validation_errors
   belongs_to :creator, :class_name => "User"
   has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
   has_many :urls, :dependent => :destroy, :class_name => "ArtistUrl"
@@ -534,6 +535,13 @@ class Artist < ApplicationRecord
   include BanMethods
   extend SearchMethods
   include ApiMethods
+
+  def merge_validation_errors
+    errors[:urls].clear
+    urls.select(&:invalid?).each do |url|
+      errors[:url] << url.errors.full_messages.join("; ")
+    end
+  end
 
   def status
     if is_banned? && is_active?
