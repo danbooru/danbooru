@@ -54,16 +54,29 @@ class TagRelationship < ApplicationRecord
       where("(antecedent_name like ? escape E'\\\\' or consequent_name like ? escape E'\\\\')", name.mb_chars.downcase.to_escaped_for_sql_like, name.mb_chars.downcase.to_escaped_for_sql_like)
     end
 
+    def status_matches(status)
+      status = status.downcase
+
+      if status == "approved"
+        where(status: %w[active processing queued])
+      else
+        where(status: status)
+      end
+    end
+
+    def pending_first
+      order("(case status when 'pending' then 1 when 'queued' then 2 when 'active' then 3 else 0 end), antecedent_name, consequent_name")
+    end
+
     def active
       where(status: %w[active processing queued])
     end
 
     def search(params)
-      q = where("true")
-      return q if params.blank?
+      q = all
 
       if params[:id].present?
-        q = q.where("id in (?)", params[:id].split(",").map(&:to_i))
+        q = q.where(id: params[:id].split(",").map(&:to_i))
       end
 
       if params[:name_matches].present?
@@ -71,16 +84,33 @@ class TagRelationship < ApplicationRecord
       end
 
       if params[:antecedent_name].present?
-        q = q.where("antecedent_name = ?", params[:antecedent_name])
+        q = q.where(antecedent_name: params[:antecedent_name].split)
       end
 
       if params[:consequent_name].present?
-        q = q.where("consequent_name = ?", params[:consequent_name])
+        q = q.where(consequent_name: params[:consequent_name].split)
       end
 
-      case params[:order]
+      if params[:status].present?
+        q = q.status_matches(params[:status])
+      end
+
+      if params[:category].present?
+        q = q.joins(:consequent_tag).where("tags.category": params[:category].split)
+      end
+
+      params[:order] ||= "status"
+      case params[:order].downcase
+      when "status"
+        q = q.pending_first
       when "created_at"
         q = q.order("created_at desc")
+      when "updated_at"
+        q = q.order("updated_at desc")
+      when "name"
+        q = q.order("antecedent_name asc, consequent_name asc")
+      when "tag_count"
+        q = q.joins(:consequent_tag).order("tags.post_count desc, antecedent_name asc, consequent_name asc")
       end
 
       q
