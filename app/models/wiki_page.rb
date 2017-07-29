@@ -10,6 +10,7 @@ class WikiPage < ApplicationRecord
   belongs_to :updater, :class_name => "User"
   validates_uniqueness_of :title, :case_sensitive => false
   validates_presence_of :title
+  validates_presence_of :body, :unless => -> { is_deleted? || other_names.present? }
   validate :validate_rename
   validate :validate_locker_is_builder
   validate :validate_not_locked
