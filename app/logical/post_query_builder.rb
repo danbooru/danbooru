@@ -84,6 +84,14 @@ class PostQueryBuilder
     relation
   end
 
+  def hide_deleted_posts?(q)
+    return false if CurrentUser.admin_mode?
+    return false if !CurrentUser.user.hide_deleted_posts?
+    return false if q[:status].in?(%w[deleted active])
+    return false if q[:status_neg].in?(%w[deleted active])
+    return true
+  end
+
   def build(relation = nil)
     unless query_string.is_a?(Hash)
       q = Tag.parse_query(query_string)
@@ -144,7 +152,9 @@ class PostQueryBuilder
       relation = relation.where("posts.is_banned = FALSE")
     elsif q[:status_neg] == "active"
       relation = relation.where("posts.is_pending = TRUE OR posts.is_deleted = TRUE OR posts.is_banned = TRUE")
-    elsif CurrentUser.user.hide_deleted_posts? && !CurrentUser.admin_mode?
+    end
+
+    if hide_deleted_posts?(q)
       relation = relation.where("posts.is_deleted = FALSE")
     end
 
