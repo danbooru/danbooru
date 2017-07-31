@@ -497,6 +497,36 @@ class PostQueryBuilder
     when "filesize_asc"
       relation = relation.order("posts.file_size ASC")
 
+    when "tagcount", "tagcount_desc"
+      relation = relation.order("posts.tag_count DESC")
+
+    when "tagcount_asc"
+      relation = relation.order("posts.tag_count ASC")
+
+    when "gentags", "gentags_desc"
+      relation = relation.order("posts.tag_count_general DESC")
+
+    when "gentags_asc"
+      relation = relation.order("posts.tag_count_general ASC")
+
+    when "arttags", "arttags_desc"
+      relation = relation.order("posts.tag_count_artist DESC")
+
+    when "arttags_asc"
+      relation = relation.order("posts.tag_count_artist ASC")
+
+    when "chartags", "chartags_desc"
+      relation = relation.order("posts.tag_count_character DESC")
+
+    when "chartags_asc"
+      relation = relation.order("posts.tag_count_character ASC")
+
+    when "copytags", "copytags_desc"
+      relation = relation.order("posts.tag_count_copyright DESC")
+
+    when "copytags_asc"
+      relation = relation.order("posts.tag_count_copyright ASC")
+
     when "rank"
       relation = relation.order("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 35000 DESC")
 
