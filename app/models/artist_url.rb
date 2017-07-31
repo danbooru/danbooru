@@ -2,6 +2,7 @@ class ArtistUrl < ApplicationRecord
   before_save :initialize_normalized_url, on: [ :create ]
   before_save :normalize
   validates_presence_of :url
+  validate :validate_url_format
   belongs_to :artist, :touch => true
   attr_accessible :url, :artist_id, :normalized_url
 
@@ -64,5 +65,12 @@ class ArtistUrl < ApplicationRecord
 
   def to_s
     url
+  end
+
+  def validate_url_format
+    uri = Addressable::URI.parse(url)
+    errors[:base] << "'#{url}' must begin with http:// or https://" if !uri.scheme.in?(%w[http https])
+  rescue Addressable::URI::InvalidURIError => error
+    errors[:base] << "'#{url}' is malformed: #{error}"
   end
 end

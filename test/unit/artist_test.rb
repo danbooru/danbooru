@@ -134,6 +134,13 @@ class ArtistTest < ActiveSupport::TestCase
       assert_equal(["http://aaa.com", "http://rembrandt.com/test.jpg"], artist.urls.map(&:to_s).sort)
     end
 
+    should "not allow invalid urls" do
+      artist = FactoryGirl.build(:artist, :url_string => "blah")
+
+      assert_equal(false, artist.valid?)
+      assert_equal(["'blah' must begin with http:// or https://"], artist.errors[:url])
+    end
+
     should "make sure old urls are deleted" do
       artist = FactoryGirl.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/test.jpg")
       artist.url_string = "http://not.rembrandt.com/test.jpg"
@@ -168,9 +175,14 @@ class ArtistTest < ActiveSupport::TestCase
       assert_equal(["minko"], Artist.find_all_by_url("http://minko.com/x/test.jpg").map(&:name))
     end
 
-    should "not allow duplicates" do
+    should "not find duplicates" do
       FactoryGirl.create(:artist, :name => "warhol", :url_string => "http://warhol.com/x/a/image.jpg\nhttp://warhol.com/x/b/image.jpg")
       assert_equal(["warhol"], Artist.find_all_by_url("http://warhol.com/x/test.jpg").map(&:name))
+    end
+
+    should "not include duplicate urls" do
+      artist = FactoryGirl.create(:artist, :url_string => "http://foo.com http://foo.com")
+      assert_equal(["http://foo.com"], artist.url_array)
     end
 
     should "hide deleted artists" do
@@ -406,6 +418,19 @@ class ArtistTest < ActiveSupport::TestCase
       artist.save
       tag.reload
       assert_equal(Tag.categories.artist, tag.category)
+    end
+
+    context "when updated" do
+      setup do
+        @artist = FactoryGirl.create(:artist)
+        @artist.stubs(:merge_version?).returns(false)
+      end
+
+      should "create a new version" do
+        assert_difference("@artist.versions.count") do
+          @artist.update(:url_string => "http://foo.com")
+        end
+      end
     end
   end
 end
