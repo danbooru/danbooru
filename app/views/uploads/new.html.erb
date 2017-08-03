@@ -141,7 +141,7 @@
   Upload - <%= Danbooru.config.app_name %>
 <% end %>
 
-<% if CurrentUser.is_builder? && Danbooru.config.ccs_server.present? && @normalized_url %>
+<% if CurrentUser.is_moderator? && Danbooru.config.ccs_server.present? && @normalized_url %>
   <% content_for(:html_header) do %>
     <%= tag("meta", name: "ccs-server", content: Danbooru.config.ccs_server) %>
     <%= tag("meta", name: "image-url", content: @normalized_url) %>
