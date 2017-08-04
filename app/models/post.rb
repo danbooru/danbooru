@@ -1025,7 +1025,9 @@ class Post < ApplicationRecord
     end
 
     def remove_from_favorites
-      Favorite.destroy_all(post_id: self.id)
+      favorites.find_each do |fav|
+        remove_favorite!(fav.user)
+      end
     end
 
     def remove_from_fav_groups

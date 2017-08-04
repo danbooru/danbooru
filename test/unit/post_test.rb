@@ -80,6 +80,13 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      should "decrement the user's favorite count" do
+        @post.add_favorite!(@post.uploader)
+        assert_difference(["@post.uploader.reload.favorite_count"], -1) do
+          @post.expunge!
+        end
+      end
+
       should "remove the post from iqdb" do
         mock_iqdb_service!
         Post.iqdb_sqs_service.expects(:send_message).with("remove\n#{@post.id}")
