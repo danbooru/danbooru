@@ -67,7 +67,7 @@ class Artist < ApplicationRecord
     def url_string=(string)
       @url_string_was = url_string
 
-      self.urls = string.split(/[[:space:]]+/).uniq.map do |url|
+      self.urls = string.scan(/[^[:space:]]+/).uniq.map do |url|
         self.urls.find_or_initialize_by(url: url)
       end
     end
