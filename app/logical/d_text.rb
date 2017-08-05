@@ -9,6 +9,16 @@ class DText
     "[quote]\n#{creator_name} said:\n\n#{stripped_body}\n[/quote]\n\n"
   end
 
+  def self.parse_mentions(text)
+    text = strip_blocks(text.to_s, "quote")
+
+    names = text.scan(MENTION_REGEXP).map do |mention|
+      mention.gsub(/(?:^\s*@)|(?:[:;,.!?\)\]<>]$)/, "")
+    end
+
+    names.uniq
+  end
+
   def self.strip_blocks(string, tag)
     n = 0
     stripped = ""
@@ -91,4 +101,3 @@ class DText
     excerpt
   end
 end
-

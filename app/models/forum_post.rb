@@ -27,7 +27,6 @@ class ForumPost < ApplicationRecord
   end
   mentionable(
     :message_field => :body, 
-    :user_field => :creator_id, 
     :title => lambda {|user_name| %{#{creator_name} mentioned you in topic ##{topic_id} (#{topic.title})}},
     :body => lambda {|user_name| %{@#{creator_name} mentioned you in topic ##{topic_id} ("#{topic.title}":[/forum_topics/#{topic_id}?page=#{forum_topic_page}]):\n\n[quote]\n#{DText.excerpt(body, "@"+user_name)}\n[/quote]\n}},
   )
