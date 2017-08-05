@@ -1,6 +1,6 @@
 <% if (position == "bottom" && CurrentUser.user.new_post_navigation_layout) || (position == "top" && !CurrentUser.user.new_post_navigation_layout) %>
   <div id="nav-links" class="ui-corner-all nav-notice">
-    <% if post.presenter.has_sequential_navigation?(self) %>
+    <% if post.presenter.has_sequential_navigation?(params) %>
       <%= render "posts/partials/show/search_seq", :post => post %>
     <% end %>
 

@@ -196,11 +196,13 @@ class PostPresenter < Presenter
   end
 
   def has_nav_links?(template)
-    has_sequential_navigation?(template) || @post.pools.undeleted.any? || @post.favorite_groups(active_id=template.params[:favgroup_id]).any?
+    has_sequential_navigation?(template.params) || @post.pools.undeleted.any? || @post.favorite_groups(active_id=template.params[:favgroup_id]).any?
   end
 
-  def has_sequential_navigation?(template)
-    CurrentUser.user.enable_sequential_post_navigation && template.params[:tags] !~ /(?:^|\s)(?:order|ordfav|ordpool):/i
+  def has_sequential_navigation?(params)
+    return false if params[:tags] =~ /(?:^|\s)(?:order|ordfav|ordpool):/i
+    return false if params[:pool_id].present? || params[:favgroup_id].present?
+    return CurrentUser.user.enable_sequential_post_navigation 
   end
 
   def post_footer_for_pool_html(template)
