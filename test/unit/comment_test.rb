@@ -20,6 +20,21 @@ class CommentTest < ActiveSupport::TestCase
         Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
       end
 
+      context "added in an edit" do
+        should "dmail the added user" do
+          @user1 = FactoryGirl.create(:user)
+          @user2 = FactoryGirl.create(:user)
+          @comment = FactoryGirl.create(:comment, :post_id => @post.id, :body => "@#{@user1.name}")
+
+          assert_no_difference("@user1.dmails.count") do
+            assert_difference("@user2.dmails.count") do
+              @comment.body = "@#{@user1.name} @#{@user2.name}"
+              @comment.save
+            end
+          end
+        end
+      end
+
       context "in a quote block" do
         setup do
           @user2 = FactoryGirl.create(:user, :created_at => 2.weeks.ago)
