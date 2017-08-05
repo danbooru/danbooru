@@ -23,6 +23,14 @@ class ArtistCommentary < ApplicationRecord
       PostQueryBuilder.new(query).build(self.joins(:post)).reorder("")
     end
 
+    def deleted
+      where(original_title: "", original_description: "", translated_title: "", translated_description: "")
+    end
+
+    def undeleted
+      where("original_title != '' OR original_description != '' OR translated_title != '' OR translated_description != ''")
+    end
+
     def search(params)
       q = where("true")
       params = {} if params.blank?
@@ -50,6 +58,9 @@ class ArtistCommentary < ApplicationRecord
       if params[:post_tags_match].present?
         q = q.post_tags_match(params[:post_tags_match])
       end
+
+      q = q.deleted if params[:is_deleted] == "yes"
+      q = q.undeleted if params[:is_deleted] == "no"
 
       q
     end
