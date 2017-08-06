@@ -20,7 +20,7 @@ class TwitterService
   def extract_urls_for_status(tweet)
     tweet.media.map do |obj|
       if obj.is_a?(Twitter::Media::Photo)
-        obj.media_url.to_s + ":orig"
+        obj.media_url_https.to_s + ":orig"
       elsif obj.is_a?(Twitter::Media::Video)
         video = obj.video_info.variants.select do |x|
           x.content_type == "video/mp4"
@@ -29,7 +29,7 @@ class TwitterService
           video.url.to_s
         end
       end
-    end.compact
+    end.compact.uniq
   end
 
   def extract_og_image_from_page(url)
@@ -50,20 +50,11 @@ class TwitterService
     [extract_og_image_from_page(url)].compact
   end
 
-  def image_urls(tweet_url)
-    tweet_url =~ %r{/status/(\d+)}
-    twitter_id = $1
-    tweet = client.status(twitter_id)
-    urls = []
-
+  def image_urls(tweet)
     if tweet.media.any?
-      urls = extract_urls_for_status(tweet)
+      extract_urls_for_status(tweet)
     elsif tweet.urls.any?
-      urls = extract_urls_for_card(tweet)
+      extract_urls_for_card(tweet)
     end
-
-    urls.uniq
-  rescue => e
-    []
   end
 end
