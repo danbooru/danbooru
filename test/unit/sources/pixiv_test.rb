@@ -47,6 +47,15 @@ module Sources
         end
       end
 
+      context "A https://i.pximg.net/img-zip/ugoira/* source" do
+        should "get the metadata" do
+          @site = Sources::Site.new("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip")
+          @site.get
+
+          assert_equal("uroobnad2", @site.artist_name)
+        end
+      end
+
       context "fetching source data for a new manga image" do
         setup do
           get_source("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46304614")
