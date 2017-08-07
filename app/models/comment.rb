@@ -22,7 +22,6 @@ class Comment < ApplicationRecord
   attr_accessible :is_sticky, :as => [:moderator, :admin]
   mentionable(
     :message_field => :body, 
-    :user_field => :creator_id, 
     :title => lambda {|user_name| "#{creator_name} mentioned you in a comment on post ##{post_id}"},
     :body => lambda {|user_name| "@#{creator_name} mentioned you in a \"comment\":/posts/#{post_id}#comment-#{id} on post ##{post_id}:\n\n[quote]\n#{DText.excerpt(body, "@"+user_name)}\n[/quote]\n"},
   )
