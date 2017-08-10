@@ -3,11 +3,10 @@ require 'ostruct'
 class Pool < ApplicationRecord
   class RevertError < Exception ; end
 
-  validates_uniqueness_of :name, :case_sensitive => false
-  validates_format_of :name, :with => /\A[^,]+\Z/, :message => "cannot have commas"
+  validates_uniqueness_of :name, :case_sensitive => false, :if => :name_changed?
+  validate :validate_name, :if => :name_changed?
   validates_inclusion_of :category, :in => %w(series collection)
   validate :updater_can_change_category
-  validate :name_does_not_conflict_with_metatags
   validate :updater_can_remove_posts
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
@@ -15,7 +14,6 @@ class Pool < ApplicationRecord
   before_validation :normalize_name
   before_validation :initialize_is_active, :on => :create
   before_validation :initialize_creator, :on => :create
-  before_validation :strip_name
   after_save :update_category_pseudo_tags_for_posts_async
   after_save :create_version
   after_create :synchronize!
@@ -119,7 +117,7 @@ class Pool < ApplicationRecord
   end
 
   def self.normalize_name(name)
-    name.gsub(/\s+/, "_")
+    name.gsub(/[_[:space:]]+/, "_").gsub(/\A_|_\z/, "")
   end
 
   def self.normalize_name_for_search(name)
@@ -138,7 +136,7 @@ class Pool < ApplicationRecord
     if name =~ /^\d+$/
       where("id = ?", name.to_i).first
     elsif name
-      where("lower(name) = ?", normalize_name(name).mb_chars.downcase).first
+      where("lower(name) = ?", normalize_name_for_search(name)).first
     else
       nil
     end
@@ -356,10 +354,6 @@ class Pool < ApplicationRecord
     super + [:creator_name]
   end
 
-  def strip_name
-    self.name = name.to_s.strip
-  end
-
   def update_category_pseudo_tags_for_posts_async
     if category_changed?
       delay(:queue => "default").update_category_pseudo_tags_for_posts
@@ -387,12 +381,14 @@ class Pool < ApplicationRecord
     end
   end
 
-  def name_does_not_conflict_with_metatags
-    if %w(any none series collection).include?(name.downcase.tr(" ", "_"))
-      errors[:base] << "Pools cannot have the following names: any, none, series, collection"
-      false
-    else
-      true
+  def validate_name
+    case name
+    when /\A(any|none|series|collection)\z/i
+      errors[:name] << "cannot be any of the following names: any, none, series, collection"
+    when /,/
+      errors[:name] << "cannot contain commas"
+    when ""
+      errors[:name] << "cannot be blank"
     end
   end
 

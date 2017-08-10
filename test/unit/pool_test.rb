@@ -249,13 +249,26 @@ class PoolTest < ActiveSupport::TestCase
     end
 
     should "normalize its name" do
-      @pool.update_attributes(:name => "A B")
+      @pool.update(:name => "  A  B  ")
+      assert_equal("A_B", @pool.name)
+
+      @pool.update(:name => "__A__B__")
       assert_equal("A_B", @pool.name)
     end
 
     should "normalize its post ids" do
       @pool.update_attributes(:post_ids => " 1  2 ")
       assert_equal("1 2", @pool.post_ids)
+    end
+
+    context "when validating names" do
+      should_not allow_value("foo,bar").for(:name)
+      should_not allow_value("___").for(:name)
+      should_not allow_value("   ").for(:name)
+
+      %w[any none series collection].each do |type|
+        should_not allow_value(type).for(:name)
+      end
     end
   end
 
