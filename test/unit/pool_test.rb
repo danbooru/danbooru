@@ -263,6 +263,8 @@ class PoolTest < ActiveSupport::TestCase
 
     context "when validating names" do
       should_not allow_value("foo,bar").for(:name)
+      should_not allow_value("foo*bar").for(:name)
+      should_not allow_value("123").for(:name)
       should_not allow_value("___").for(:name)
       should_not allow_value("   ").for(:name)
 

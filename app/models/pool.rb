@@ -387,8 +387,12 @@ class Pool < ApplicationRecord
       errors[:name] << "cannot be any of the following names: any, none, series, collection"
     when /,/
       errors[:name] << "cannot contain commas"
+    when /\*/
+      errors[:name] << "cannot contain asterisks"
     when ""
       errors[:name] << "cannot be blank"
+    when /\A[0-9]+\z/
+      errors[:name] << "cannot contain only digits"
     end
   end
 
