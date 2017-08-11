@@ -549,6 +549,28 @@ class User < ApplicationRecord
       is_moderator? || flagger_id == id
     end
 
+    def upload_limit
+      @upload_limit ||= [max_upload_limit - used_upload_slots, 0].max
+    end
+
+    def used_upload_slots
+      uploaded_count = Post.for_user(id).where("created_at >= ?", 24.hours.ago).count
+      uploaded_comic_count = Post.for_user(id).tag_match("comic").where("created_at >= ?", 24.hours.ago).count / 3
+      uploaded_count - uploaded_comic_count
+    end
+
+    def max_upload_limit
+      [(base_upload_limit * upload_limit_multiplier).ceil, 10].max
+    end
+
+    def upload_limit_multiplier
+      (1 - (adjusted_deletion_confidence / 15.0))
+    end
+
+    def adjusted_deletion_confidence
+      [deletion_confidence(60), 15].min
+    end
+
     def base_upload_limit
       if created_at >= 1.month.ago
         10
@@ -563,23 +585,8 @@ class User < ApplicationRecord
       end
     end
 
-    def max_upload_limit
-      dcon = [deletion_confidence(60), 15].min
-      [(base_upload_limit * (1 - (dcon / 15.0))).ceil, 10].max
-    end
-
-    def upload_limit
-      @upload_limit ||= begin
-        uploaded_count = Post.for_user(id).where("created_at >= ?", 24.hours.ago).count
-        uploaded_comic_count = Post.for_user(id).tag_match("comic").where("created_at >= ?", 24.hours.ago).count / 3
-        limit = max_upload_limit - (uploaded_count - uploaded_comic_count)
-
-        if limit < 0
-          limit = 0
-        end
-
-        limit
-      end
+    def next_free_upload_slot
+      (posts.where("created_at >= ?", 24.hours.ago).first.try(:created_at) || 24.hours.ago) + 24.hours
     end
 
     def tag_query_limit
@@ -934,5 +941,9 @@ class User < ApplicationRecord
     self.new_post_navigation_layout = true
     self.enable_sequential_post_navigation = true
     self.enable_auto_complete = true
+  end
+
+  def presenter
+    @presenter ||= UserPresenter.new(self)
   end
 end

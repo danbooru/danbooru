@@ -8,7 +8,7 @@
       </div>
 
       <% unless CurrentUser.can_upload_free? %>
-        <p>You can upload <strong><%= pluralize CurrentUser.upload_limit, "more post" %></strong> today.</p>
+        <p>Upload limit: <strong><%= CurrentUser.user.presenter.upload_limit(self) %></strong>.</p>
       <% end %>
 
       <%= render "image" %>
