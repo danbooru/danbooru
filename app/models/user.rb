@@ -585,6 +585,10 @@ class User < ApplicationRecord
       end
     end
 
+    def next_free_upload_slot
+      (posts.where("created_at >= ?", 24.hours.ago).first.try(:created_at) || 24.hours.ago) + 24.hours
+    end
+
     def tag_query_limit
       if is_platinum?
         Danbooru.config.base_tag_query_limit * 2

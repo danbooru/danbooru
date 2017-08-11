@@ -63,11 +63,12 @@ class UserPresenter
     end
   end
 
-  def upload_limit
+  def upload_limit(template)
     if user.can_upload_free?
       return "none"
     end
 
+    slots_tooltip = "Next free slot: #{template.time_ago_in_words(user.next_free_upload_slot)}"
     limit_tooltip = <<-EOS.strip_heredoc
       Base: #{user.base_upload_limit}
       Del. Rate: #{"%.2f" % user.adjusted_deletion_confidence}
@@ -75,7 +76,7 @@ class UserPresenter
       Upload Limit: #{user.base_upload_limit} * #{"%.2f" % user.upload_limit_multiplier} = #{user.max_upload_limit}
     EOS
 
-    %{#{user.used_upload_slots} / <abbr title="#{limit_tooltip}">#{user.upload_limit}</abbr>}.html_safe
+    %{<abbr title="#{slots_tooltip}">#{user.used_upload_slots}</abbr> / <abbr title="#{limit_tooltip}">#{user.max_upload_limit}</abbr>}.html_safe
   end
 
   def uploads

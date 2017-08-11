@@ -31,7 +31,7 @@
 
       <tr>
         <th>Upload Limit</th>
-        <td><%= presenter.upload_limit %> (<%= link_to "help", wiki_pages_path(title: "about:upload_limits") %>)</td>
+        <td><%= presenter.upload_limit(self) %> (<%= link_to "help", wiki_pages_path(title: "about:upload_limits") %>)</td>
       </tr>
 
       <tr>
