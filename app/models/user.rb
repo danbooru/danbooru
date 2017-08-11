@@ -942,4 +942,8 @@ class User < ApplicationRecord
     self.enable_sequential_post_navigation = true
     self.enable_auto_complete = true
   end
+
+  def presenter
+    @presenter ||= UserPresenter.new(self)
+  end
 end
