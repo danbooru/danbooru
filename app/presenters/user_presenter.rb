@@ -68,13 +68,14 @@ class UserPresenter
       return "none"
     end
 
-    dcon = [user.deletion_confidence(60), 15].min
-    multiplier = (1 - (dcon / 15.0))
-    max_count = [(user.base_upload_limit * multiplier).ceil, 5].max
-    uploaded_count = Post.for_user(user.id).where("created_at >= ?", 24.hours.ago).count
-    uploaded_comic_count = Post.for_user(user.id).tag_match("comic").where("created_at >= ?", 24.hours.ago).count / 3
+    limit_tooltip = <<-EOS.strip_heredoc
+      Base: #{user.base_upload_limit}
+      Del. Rate: #{"%.2f" % user.adjusted_deletion_confidence}
+      Multiplier: (1 - (#{"%.2f" % user.adjusted_deletion_confidence} / 15)) = #{user.upload_limit_multiplier}
+      Upload Limit: #{user.base_upload_limit} * #{"%.2f" % user.upload_limit_multiplier} = #{user.max_upload_limit}
+    EOS
 
-    "(#{user.base_upload_limit} * #{'%0.2f' % multiplier}) - #{uploaded_count - uploaded_comic_count} = #{user.upload_limit}"
+    %{#{user.used_upload_slots} / <abbr title="#{limit_tooltip}">#{user.upload_limit}</abbr>}.html_safe
   end
 
   def uploads
