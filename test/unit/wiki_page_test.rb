@@ -61,6 +61,11 @@ class WikiPageTest < ActiveSupport::TestCase
         assert_equal("hot_potato", @wiki_page.title)
       end
 
+      should "normalize its other names" do
+        @wiki_page.update(:other_names => "foo*bar baz baz 加賀（艦これ）")
+        assert(%w[foo*bar baz 加賀(艦これ)], @wiki_page.other_names_array)
+      end
+
       should "search by title" do
         matches = WikiPage.titled("hot potato")
         assert_equal(1, matches.count)

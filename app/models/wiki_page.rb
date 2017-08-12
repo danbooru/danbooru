@@ -170,7 +170,7 @@ class WikiPage < ApplicationRecord
   end
 
   def normalize_other_names
-    normalized_other_names = other_names.to_s.gsub(/\u3000/, " ").scan(/\S+/)
+    normalized_other_names = other_names.to_s.unicode_normalize(:nfkc).scan(/[^[:space:]]+/)
     self.other_names = normalized_other_names.uniq.join(" ")
   end
 
