@@ -4,6 +4,9 @@ module Sources
   class NijieTest < ActiveSupport::TestCase
     context "The source site for a nijie page" do
       setup do
+        CurrentUser.user = FactoryGirl.create(:user)
+        CurrentUser.ip_addr = "127.0.0.1"
+
         @site = Sources::Site.new("http://nijie.info/view.php?id=213043")
         @site.get
       end
@@ -22,6 +25,17 @@ module Sources
 
       should "get the tags" do
         assert_equal([["眼鏡", "http://nijie.info/search.php?word=%E7%9C%BC%E9%8F%A1"], ["リトルウィッチアカデミア", "http://nijie.info/search.php?word=%E3%83%AA%E3%83%88%E3%83%AB%E3%82%A6%E3%82%A3%E3%83%83%E3%83%81%E3%82%A2%E3%82%AB%E3%83%87%E3%83%9F%E3%82%A2"], ["アーシュラ先生", "http://nijie.info/search.php?word=%E3%82%A2%E3%83%BC%E3%82%B7%E3%83%A5%E3%83%A9%E5%85%88%E7%94%9F"]], @site.tags)
+      end
+
+      should "normalize （）characters in tags" do
+        FactoryGirl.create(:tag, :name => "kaga")
+        FactoryGirl.create(:wiki_page, :title => "kaga", :other_names => "加賀(艦これ)")
+
+        @site = Sources::Site.new("http://nijie.info/view.php?id=208316")
+        @site.get
+
+        assert_includes(@site.tags.map(&:first), "加賀（艦これ）")
+        assert_includes(@site.translated_tags.map(&:first), "kaga")
       end
 
       should "get the commentary" do

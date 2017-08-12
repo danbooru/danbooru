@@ -45,8 +45,8 @@ class WikiPage < ApplicationRecord
       end
     end
 
-    def other_names_equal(names)
-      query_sql = names.map(&:to_escaped_for_tsquery).join(" | ")
+    def other_names_equal(name)
+      query_sql = name.unicode_normalize(:nfkc).to_escaped_for_tsquery
       where("other_names_index @@ to_tsquery('danbooru', E?)", query_sql)
     end
 
@@ -55,7 +55,7 @@ class WikiPage < ApplicationRecord
         subquery = WikiPage.from("unnest(string_to_array(other_names, ' ')) AS other_name").where("other_name ILIKE ?", name.to_escaped_for_sql_like)
         where(id: subquery)
       else
-        other_names_equal([name])
+        other_names_equal(name)
       end
     end
 
