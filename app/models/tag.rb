@@ -820,9 +820,9 @@ class Tag < ApplicationRecord
       end
 
       if params[:has_wiki] == "yes"
-        q = q.joins(:wiki_page)
+        q = q.joins(:wiki_page).where("wiki_pages.is_deleted = false")
       elsif params[:has_wiki] == "no"
-        q = q.joins("LEFT JOIN wiki_pages ON tags.name = wiki_pages.title").where("wiki_pages.title IS NULL")
+        q = q.joins("LEFT JOIN wiki_pages ON tags.name = wiki_pages.title").where("wiki_pages.title IS NULL OR wiki_pages.is_deleted = true")
       end
 
       if params[:has_artist] == "yes"
