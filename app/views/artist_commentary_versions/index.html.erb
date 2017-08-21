@@ -33,7 +33,6 @@
             <td>
               <h3><%= h(commentary_version.original_title) %></h3>
               <div class="prose">
-                <%= format_text(commentary_version.original_description) %>
                 <%= format_text(commentary_version.original_description, :disable_mentions => true) %>
               </div>
             </td>
