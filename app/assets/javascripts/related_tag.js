@@ -174,6 +174,8 @@
       if (Danbooru.RelatedTag.recent_ccs.length) {
         Danbooru.RelatedTag.build_ccs($dest);
       }
+    }).fail(function() {
+      Danbooru.notice("Character classification service is not currently available");
     });
   }
 
