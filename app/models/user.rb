@@ -138,8 +138,13 @@ class User < ApplicationRecord
 
     module ClassMethods
       def name_to_id(name)
-        Cache.get("uni:#{Cache.sanitize(name)}", 4.hours) do
-          select_value_sql("SELECT id FROM users WHERE lower(name) = ?", name.mb_chars.downcase.tr(" ", "_").to_s)
+        Cache.get("uni:#{Cache.hash(name)}", 4.hours) do
+          val = select_value_sql("SELECT id FROM users WHERE lower(name) = ?", name.mb_chars.downcase.tr(" ", "_").to_s)
+          if val.present?
+            val.to_i
+          else
+            nil
+          end
         end
       end
 
@@ -168,7 +173,7 @@ class User < ApplicationRecord
 
     def update_cache
       Cache.put("uin:#{id}", name)
-      Cache.put("uni:#{Cache.sanitize(name)}", id)
+      Cache.put("uni:#{Cache.hash(name)}", id)
     end
 
     def update_remote_cache
