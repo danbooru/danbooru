@@ -310,7 +310,7 @@ module Sources
       end
 
       def work_page?
-        return true if url =~ %r!(?:#{WEB}|#{TOUCH})/member_illust\.php\?mode=(?:medium|big|manga|manga_big)&illust_id=\d+!i
+        return true if url =~ %r!(?:#{WEB}|#{TOUCH})/member_illust\.php! && url =~ %r!mode=(?:medium|big|manga|manga_big)! && url =~ %r!illust_id=\d+!
         return true if url =~ %r!(?:#{WEB}|#{TOUCH})/i/\d+$!i
         return false
       end

@@ -113,6 +113,20 @@ module Sources
         end
       end
 
+      context "fetching source for an illustration with swapped illust_id/mode parameters" do
+        setup do
+          get_source("https://www.pixiv.net/member_illust.php?illust_id=64476642&mode=medium")
+        end
+
+        should "get the page count" do
+          assert_equal(1, @site.image_urls.size)
+        end
+
+        should "get the full size image url" do
+          assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.image_url)
+        end        
+      end
+
       context "fetching the commentary" do
         should "work when the description is blank" do
           get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=46337015")
