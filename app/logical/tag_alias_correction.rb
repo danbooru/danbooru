@@ -14,8 +14,8 @@ class TagAliasCorrection
 
   def statistics_hash
     @statistics_hash ||= {
-      "antecedent_cache" => Cache.get("ta:" + Cache.sanitize(tag_alias.antecedent_name)),
-      "consequent_cache" => Cache.get("ta:" + Cache.sanitize(tag_alias.consequent_name)),
+      "antecedent_cache" => Cache.get("ta:" + Cache.hash(tag_alias.antecedent_name)),
+      "consequent_cache" => Cache.get("ta:" + Cache.hash(tag_alias.consequent_name)),
       "antecedent_count" => Tag.find_by_name(tag_alias.antecedent_name).try(:post_count),
       "consequent_count" => Tag.find_by_name(tag_alias.consequent_name).try(:post_count)
     }

@@ -20,7 +20,7 @@ class TagAlias < TagRelationship
 
     module ClassMethods
       def clear_cache_for(name)
-        Cache.delete("ta:#{Cache.sanitize(name)}")
+        Cache.delete("ta:#{Cache.hash(name)}")
       end
     end
 

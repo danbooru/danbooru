@@ -1,7 +1,7 @@
 class Cache
   def self.get_multi(keys, prefix)
     sanitized_key_to_key_hash = keys.map do |key|
-      ["#{prefix}:#{Cache.sanitize(key)}", key]
+      ["#{prefix}:#{Cache.hash(key)}", key]
     end.to_h
 
     sanitized_keys = sanitized_key_to_key_hash.keys

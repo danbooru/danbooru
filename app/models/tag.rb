@@ -99,7 +99,7 @@ class Tag < ApplicationRecord
         if options[:disable_caching]
           select_category_for(tag_name)
         else
-          Cache.get("tc:#{Cache.sanitize(tag_name)}") do
+          Cache.get("tc:#{Cache.hash(tag_name)}") do
             select_category_for(tag_name)
           end
         end
@@ -146,7 +146,7 @@ class Tag < ApplicationRecord
     end
 
     def update_category_cache
-      Cache.put("tc:#{Cache.sanitize(name)}", category, 1.hour)
+      Cache.put("tc:#{Cache.hash(name)}", category, 1.hour)
     end
   end
 
@@ -752,7 +752,7 @@ class Tag < ApplicationRecord
         if post_count < COSINE_SIMILARITY_RELATED_TAG_THRESHOLD
           delay(:queue => "default").update_related
         elsif post_count >= COSINE_SIMILARITY_RELATED_TAG_THRESHOLD
-          key = Cache.sanitize(name)
+          key = Cache.hash(name)
           cache_check = Cache.get("urt:#{key}")
 
           if cache_check

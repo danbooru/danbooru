@@ -1183,7 +1183,7 @@ class Post < ApplicationRecord
         tags = "#{tags} -status:deleted".strip
       end
 
-      "pfc:#{Cache.sanitize(tags)}"
+      "pfc:#{Cache.hash(tags)}"
     end
 
     def fast_count(tags = "", options = {})

@@ -13,8 +13,8 @@ class TagCorrection
 
   def statistics_hash
     @statistics_hash ||= {
-      "category_cache" => Cache.get("tc:" + Cache.sanitize(tag.name)),
-      "post_fast_count_cache" => Cache.get("pfc:" + Cache.sanitize(tag.name))
+      "category_cache" => Cache.get("tc:" + Cache.hash(tag.name)),
+      "post_fast_count_cache" => Cache.get("pfc:" + Cache.hash(tag.name))
     }
   end
 
