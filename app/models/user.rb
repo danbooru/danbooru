@@ -172,8 +172,8 @@ class User < ApplicationRecord
     end
 
     def update_cache
-      Cache.put("uin:#{id}", name)
-      Cache.put("uni:#{Cache.hash(name)}", id)
+      Cache.put("uin:#{id}", name, 4.hours)
+      Cache.put("uni:#{Cache.hash(name)}", id, 4.hours)
     end
 
     def update_remote_cache
