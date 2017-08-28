@@ -120,21 +120,23 @@ module Sources
           mech = Mechanize.new
           auth, userinfo = session_cookies(mech)
 
-          # This cookie needs to be set to allow viewing of mature works
-          cookie = Mechanize::Cookie.new("agegate_state", "1")
-          cookie.domain = ".deviantart.com"
-          cookie.path = "/"
-          mech.cookie_jar.add(cookie)
+          if auth
+            # This cookie needs to be set to allow viewing of mature works
+            cookie = Mechanize::Cookie.new("agegate_state", "1")
+            cookie.domain = ".deviantart.com"
+            cookie.path = "/"
+            mech.cookie_jar.add(cookie)
 
-          cookie = Mechanize::Cookie.new("auth", auth)
-          cookie.domain = ".deviantart.com"
-          cookie.path = "/"
-          mech.cookie_jar.add(cookie)
+            cookie = Mechanize::Cookie.new("auth", auth)
+            cookie.domain = ".deviantart.com"
+            cookie.path = "/"
+            mech.cookie_jar.add(cookie)
 
-          cookie = Mechanize::Cookie.new("userinfo", userinfo)
-          cookie.domain = ".deviantart.com"
-          cookie.path = "/"
-          mech.cookie_jar.add(cookie)
+            cookie = Mechanize::Cookie.new("userinfo", userinfo)
+            cookie.domain = ".deviantart.com"
+            cookie.path = "/"
+            mech.cookie_jar.add(cookie)
+          end
 
           mech
         end
@@ -145,6 +147,12 @@ module Sources
           mech.request_headers = Danbooru.config.http_headers
 
           page = mech.get("https://www.deviantart.com/users/login")
+
+          if page.search('div[class="g-recaptcha"]').any?
+            # we got captcha'd, have to abort
+            return nil
+          end
+
           validate_key = page.search('input[name="validate_key"]').attribute("value").value
           validate_token = page.search('input[name="validate_token"]').attribute("value").value
 
@@ -156,8 +164,8 @@ module Sources
             remember_me: 1,
           })
 
-          auth = mech.cookies.find { |cookie| cookie.name == "auth" }.value
-          userinfo = mech.cookies.find { |cookie| cookie.name == "userinfo" }.value
+          auth = mech.cookies.find { |cookie| cookie.name == "auth" }.try(:value)
+          userinfo = mech.cookies.find { |cookie| cookie.name == "userinfo" }.try(:value)
           mech.cookie_jar.clear
 
           [auth, userinfo]

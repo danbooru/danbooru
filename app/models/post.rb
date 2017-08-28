@@ -1367,7 +1367,7 @@ class Post < ApplicationRecord
       transaction do
         Post.without_timeout do
           ModAction.log("permanently deleted post ##{id}")
-          delete!("Permanently deleted post ##{id}", :without_mod_action => true)
+          #delete!("Permanently deleted post ##{id}", :without_mod_action => true)
 
           give_favorites_to_parent
           update_children_on_destroy
