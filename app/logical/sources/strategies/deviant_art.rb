@@ -118,7 +118,7 @@ module Sources
       def agent
         @agent ||= begin
           mech = Mechanize.new
-          auth, userinfo = session_cookies(mech)
+          auth, userinfo, auth_secure = session_cookies(mech)
 
           if auth
             # This cookie needs to be set to allow viewing of mature works
@@ -136,6 +136,13 @@ module Sources
             cookie.domain = ".deviantart.com"
             cookie.path = "/"
             mech.cookie_jar.add(cookie)
+            
+            if auth_secure
+              cookie = Mechanize::Cookie.new("auth_secure", auth_secure)
+              cookie.domain = ".deviantart.com"
+              cookie.path = "/"
+              mech.cookie_jar.add(cookie)
+            end
           end
 
           mech
@@ -166,9 +173,10 @@ module Sources
 
           auth = mech.cookies.find { |cookie| cookie.name == "auth" }.try(:value)
           userinfo = mech.cookies.find { |cookie| cookie.name == "userinfo" }.try(:value)
+          auth_secure = mech.cookies.find { |cookie| cookie.name == "auth_secure" }.try(:value)
           mech.cookie_jar.clear
 
-          [auth, userinfo]
+          [auth, userinfo, auth_secure]
         end
       end
     end
