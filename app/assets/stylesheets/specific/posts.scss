@@ -349,6 +349,10 @@ div#c-posts {
       font-weight: bold;
     }
 
+    #add-fav-button, #remove-fav-button {
+      margin-top: 1em;
+    }
+
     menu#post-sections {
       margin: 0;
       font-size: $h3_size;
