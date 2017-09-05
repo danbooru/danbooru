@@ -1,8 +1,10 @@
 <% if @error_msg %>
   Danbooru.error("<%= @error_msg %>");
 <% else %>
-  $("a#add-to-favorites").hide();
-  $("a#remove-from-favorites").show();
+  $("#add-to-favorites").hide();
+  $("#add-fav-button").hide();
+  $("#remove-from-favorites").show();
+  $("#remove-fav-button").show();
   $("#score-for-post-<%= @post.id %>").html(<%= @post.score %>);
   $("#favcount-for-post-<%= @post.id %>").html(<%= @post.fav_count %>);
   <% if CurrentUser.is_gold? %>

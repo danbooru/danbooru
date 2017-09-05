@@ -47,6 +47,8 @@
         <div id="note-preview"></div>
         <%= @post.presenter.image_html(self) %>
       </section>
+      <%= button_to "Favorite", favorites_path(post_id: @post.id), remote: true, method: :post, form: {id: "add-fav-button"} %>
+      <%= button_to "Unfavorite", favorite_path(@post), remote: true, method: :delete, form: {id: "remove-fav-button"} %>
 
       <section id="mark-as-translated-section" style="display: none;">
         <%= form_tag(mark_as_translated_post_path(@post), :class => "simple_form", :method => :put) do |f| %>

@@ -24,6 +24,7 @@
       this.initialize_post_image_resize_to_window_link();
       this.initialize_similar();
       this.initialize_replace_image_dialog();
+      this.initialize_fav_button();
 
       if ((Danbooru.meta("always-resize-images") === "true") || ((Danbooru.Cookie.get("dm") != "1") && (window.innerWidth <= 660))) {
         $("#image-resize-to-window-link").click();
@@ -246,6 +247,9 @@
       preview_link.html("show &raquo;");
       Danbooru.Cookie.put("show-relationship-previews", "0");
     }
+  }
+
+  Danbooru.Post.initialize_fav_button = function() {
   }
 
   Danbooru.Post.initialize_favlist = function() {
