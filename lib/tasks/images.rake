@@ -107,10 +107,11 @@ namespace :images do
     
   desc "Generate thumbnail-sized images of posts"
   task :generate_preview => :environment do
-    Post.where("image_width > ?", Danbooru.config.small_image_width).find_each do |post|
-      if post.is_image? && !File.exists?(post.preview_file_path)
+    width = 200
+    Post.where("image_width > ?", width).find_each do |post|
+      if post.is_image? #&& !File.exists?(post.preview_file_path)
         puts "resizing preview #{post.id}"
-        Danbooru.resize(post.file_path, post.preview_file_path, Danbooru.config.small_image_width, Danbooru.config.small_image_width, 90)
+        Danbooru.resize(post.file_path, post.preview_file_path, width, width, 90)
       end
     end
   end

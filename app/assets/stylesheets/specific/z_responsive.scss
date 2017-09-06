@@ -14,7 +14,7 @@
   }
 
   div#page {
-    padding: 0 2px;
+    padding: 0 0.25vw;
     > div /* div#c-$controller */ {
       > div /* div#a-$action */ {
         display: flex;
@@ -89,17 +89,22 @@
   }
 
   article.post-preview {
-    margin: 0 0 10px 0;
-    width: 48vw;
+    margin: 0 0 0.5vw 0;
+    width: 49.5vw;
+    height: 48.5vw;
     text-align: center;
     vertical-align: middle;
     display: inline-block;
+    border: none;
     a {
-      width: 48vw;
+      width: 49vw;
       display: block;
       margin: 0 auto;
     }
     img {
+      object-fit: contain;
+      width: 48.5vw;
+      height: 48.5vw;
       margin: 0 auto;
     }
   }
