@@ -101,7 +101,7 @@
       margin: 0 auto;
     }
     img {
-      object-fit: contain;
+      object-fit: cover;
       width: 48.5vw;
       height: 48.5vw;
       margin: 0 auto;
@@ -109,6 +109,15 @@
     }
     img.cropped {
       object-fit: cover;
+    }
+    &[data-tags~=animated]:before, &[data-file-ext=swf]:before, &[data-file-ext=webm]:before, &[data-file-ext=mp4]:before, &[data-file-ext=zip]:before {
+      left: 0.5vw;
+      @include animated-icon;
+    }
+
+    &[data-has-sound=true]:before {
+      left: 0.5vw;
+      @include sound-icon;
     }
   }
 
