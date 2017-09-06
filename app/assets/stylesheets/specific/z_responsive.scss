@@ -1,4 +1,4 @@
-@import "000_vars.scss";
+@import "../common/000_vars.scss";
 
 #desktop-version-link {
   display: none;
@@ -14,6 +14,7 @@
   }
 
   div#page {
+    padding: 0 2px;
     > div /* div#c-$controller */ {
       > div /* div#a-$action */ {
         display: flex;
@@ -88,13 +89,13 @@
   }
 
   article.post-preview {
-    margin: 15px 0;
-    width: 150px;
+    margin: 0 0 10px 0;
+    width: 48vw;
     text-align: center;
     vertical-align: middle;
     display: inline-block;
     a {
-      width: 150px;
+      width: 48vw;
       display: block;
       margin: 0 auto;
     }
