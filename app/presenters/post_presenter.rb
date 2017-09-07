@@ -32,7 +32,7 @@ class PostPresenter < Presenter
       tag_param = nil
     end
     html << %{<a href="#{path}/#{post.id}#{tag_param}">}
-    html << %{<img itemprop="thumbnailUrl" src="#{post.preview_file_url}" alt="#{h(post.tag_string)}">}
+    html << %{<img class="cropped-#{CurrentUser.cropped_thumbnails?}" itemprop="thumbnailUrl" src="#{post.preview_file_url}" alt="#{h(post.tag_string)}">}
     html << %{</a>}
 
     if options[:pool]

@@ -101,13 +101,13 @@
       margin: 0 auto;
     }
     img {
-      object-fit: cover;
+      object-fit: contain;
       width: 48.5vw;
       height: 48.5vw;
       margin: 0 auto;
       border: none;
     }
-    img.cropped {
+    img.cropped-true {
       object-fit: cover;
     }
     &[data-tags~=animated]:before, &[data-file-ext=swf]:before, &[data-file-ext=webm]:before, &[data-file-ext=mp4]:before, &[data-file-ext=zip]:before {
