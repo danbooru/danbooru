@@ -29,7 +29,9 @@ module PaginationHelper
     window = 4
 
     if records.current_page >= 2
-      html << "<li>" + link_to("<<", params.merge(:page => records.current_page - 1), :rel => "prev") + "</li>"
+      html << "<li class='arrow'>" + link_to("<<", params.merge(:page => records.current_page - 1), :rel => "prev") + "</li>"
+    else
+      html << "<li class='arrow'><span>" + "&lt;&lt;" + "</span></li>"
     end
 
     if records.total_pages <= (window * 2) + 5
@@ -67,7 +69,9 @@ module PaginationHelper
     end
 
     if records.current_page < records.total_pages && records.size > 0
-      html << "<li>" + link_to(">>", params.merge(:page => records.current_page + 1), :rel => "next") + "</li>"
+      html << "<li class='arrow'>" + link_to(">>", params.merge(:page => records.current_page + 1), :rel => "next") + "</li>"
+    else
+      html << "<li class='arrow'><span>" + "&gt;&gt;" + "</span></li>"
     end
 
     html << "</menu></div>"
@@ -85,15 +89,20 @@ module PaginationHelper
   def numbered_paginator_item(page, current_page)
     return "" if page.to_i > Danbooru.config.max_numbered_pages
 
-    html = "<li>"
+    html = []
     if page == "..."
+      html << "<li class='more'>"
       html << "..."
+      html << "</li>"      
     elsif page == current_page
+      html << "<li class='current-page'>"
       html << '<span>' + page.to_s + '</span>'
+      html << "</li>"
     else
+      html << "<li class='numbered-page'>"
       html << link_to(page, params.merge(:page => page))
+      html << "</li>"
     end
-    html << "</li>"
-    html.html_safe
+    html.join.html_safe
   end
 end
