@@ -45,7 +45,7 @@ class User < ApplicationRecord
     is_super_voter
     disable_tagged_filenames
     enable_recent_searches
-    cropped_thumbnails
+    disable_cropped_thumbnails
   )
 
   include Danbooru::HasBitFlags

@@ -257,7 +257,7 @@ class AnonymousUser
     false
   end
 
-  def cropped_thumbnails?
+  def disable_cropped_thumbnails?
     false
   end
 

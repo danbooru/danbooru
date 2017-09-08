@@ -74,6 +74,8 @@
 
         <%= f.input :disable_tagged_filenames, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
 
+        <%= f.input :disable_cropped_thumbnails, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
+
         <%= f.input :enable_recent_searches, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
 
         <%= f.input :favorite_tags, :label => "Frequent tags", :hint => "A list of tags that you use often. They will appear when using the list of Related Tags.", :input_html => { :rows => 5, :data => { :autocomplete => "tag-query" } } %>

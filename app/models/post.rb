@@ -57,7 +57,7 @@ class Post < ApplicationRecord
   end
 
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :old_parent_id, :old_source, :old_rating, :parent_id, :has_embedded_notes, :as => [:member, :builder, :gold, :platinum, :moderator, :admin, :default]
-  attr_accessible :is_rating_locked, :is_note_locked, :as => [:builder, :moderator, :admin]
+  attr_accessible :is_rating_locked, :is_note_locked, :has_cropped, :as => [:builder, :moderator, :admin]
   attr_accessible :is_status_locked, :as => [:admin]
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :view_count
 
@@ -171,7 +171,11 @@ class Post < ApplicationRecord
         return "/images/download-preview.png"
       end
 
-      "/data/preview/#{file_path_prefix}#{md5}.jpg"
+      if has_cropped? && !CurrentUser.disable_cropped_thumbnails?
+        "https://s3.amazonaws.com/#{Danbooru.config.aws_s3_bucket_name}/cropped/small/#{md5}.jpg"
+      else
+        "/data/preview/#{file_path_prefix}#{md5}.jpg"
+      end
     end
 
     def complete_preview_file_url
@@ -1767,6 +1771,7 @@ class Post < ApplicationRecord
 
   BOOLEAN_ATTRIBUTES = %w(
     has_embedded_notes
+    has_cropped
   )
   has_bit_flags BOOLEAN_ATTRIBUTES
 
