@@ -5,8 +5,6 @@
 
     <li><%= link_to "Random post", random_posts_path(:tags => params[:tags]), :id => "random-post", :rel => "nofollow" %></li>
 
-    <li><%= link_to "Mobile version", mobile_posts_path(:tags => params[:tags]) %></li>
-
     <li><%= link_to "Post count", posts_counts_path(:tags => params[:tags]) %></li>
   </ul>
 </section>
