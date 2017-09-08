@@ -339,7 +339,7 @@
       if ($(window).width() > 660) {
         var client_width = $(window).width() - $("#sidebar").width() - 75;
       } else {
-        var client_width = $(window).width() - 30;
+        var client_width = $(window).width() - 2;
       }
       var client_height = $(window).height();
 
