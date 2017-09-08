@@ -211,6 +211,13 @@ body[data-user-can-approve-posts="true"] .post-preview {
 }
 
 div#c-posts {
+  .fav-buttons {
+    font-size: 14pt;
+
+    input[type=submit] {
+      padding: 0.2em 0.5em;
+    }
+  }
 
   #ugoira-controls {
     div#seek-slider {
