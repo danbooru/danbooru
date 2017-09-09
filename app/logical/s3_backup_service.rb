@@ -8,24 +8,30 @@ class S3BackupService < BackupService
   end
 
   def backup(file_path, type: nil, **options)
-    key = s3_key(file_path, type)
-    upload_to_s3(key, file_path)
+    keys = s3_keys(file_path, type)
+    keys.each do |key|
+      upload_to_s3(key, file_path)
+    end
   end
 
   def delete(file_path, type: nil)
-    key = s3_key(file_path, type)
-    delete_from_s3(key)
+    keys = s3_keys(file_path, type)
+    keys.each do |key|
+      delete_from_s3(key)
+    end
   end
 
 protected
-  def s3_key(file_path, type)
+  def s3_keys(file_path, type)
+    name = File.basename(file_path)
+
     case type
     when :original
-      "#{File.basename(file_path)}"
+      [name]
     when :preview
-      "preview/#{File.basename(file_path)}"
+      ["preview/#{name}", "cropped/small/#{name}", "cropped/large/#{name}"]
     when :large
-      "sample/#{File.basename(file_path)}"
+      ["sample/#{name}"]
     else
       raise ArgumentError.new("Unknown type: #{type}")
     end

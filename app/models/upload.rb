@@ -142,6 +142,7 @@ class Upload < ApplicationRecord
         User.where(id: CurrentUser.id).update_all("post_upload_count = post_upload_count + 1")
         create_artist_commentary(post) if include_artist_commentary?
         ugoira_service.save_frame_data(post) if is_ugoira?
+        notify_cropper(post)
         update_attributes(:status => "completed", :post_id => post.id)
       else
         update_attribute(:status, "error: " + post.errors.full_messages.join(", "))
@@ -195,6 +196,13 @@ class Upload < ApplicationRecord
         if !uploader.can_upload_free? || upload_as_pending?
           p.is_pending = true
         end
+      end
+    end
+
+    def notify_cropper(post)
+      if Danbooru.config.aws_sqs_cropper_url && is_image?
+        sqs = SqsService.new(Danbooru.config.aws_sqs_cropper_url)
+        sqs.send_message("#{post.id},https://#{Danbooru.config.hostnames.first}/data/#{post.md5}.#{post.file_ext}")
       end
     end
   end
