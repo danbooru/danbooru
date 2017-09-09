@@ -202,7 +202,7 @@ class Upload < ApplicationRecord
     def notify_cropper(post)
       if Danbooru.config.aws_sqs_cropper_url && is_image?
         sqs = SqsService.new(Danbooru.config.aws_sqs_cropper_url)
-        sqs.send_message("#{post.id},https://#{Danbooru.config.hostnames.first}/data/#{post.md5}.#{post.file_ext}")
+        sqs.send_message("#{post.id},https://#{Danbooru.config.hostname}/data/#{post.md5}.#{post.file_ext}")
       end
     end
   end
