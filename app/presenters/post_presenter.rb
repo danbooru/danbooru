@@ -32,7 +32,14 @@ class PostPresenter < Presenter
       tag_param = nil
     end
     html << %{<a href="#{path}/#{post.id}#{tag_param}">}
-    html << %{<img itemprop="thumbnailUrl" src="#{post.preview_file_url}" alt="#{h(post.tag_string)}">}
+
+    if options[:show_cropped] && post.has_cropped?
+      src = post.cropped_file_url
+    else
+      src = post.preview_file_url
+    end
+
+    html << %{<img itemprop="thumbnailUrl" src="#{src}" alt="#{h(post.tag_string)}">}
     html << %{</a>}
 
     if options[:pool]
@@ -56,6 +63,7 @@ class PostPresenter < Presenter
 
   def self.preview_class(post, description = nil)
     klass = "post-preview"
+    klass << " large-cropped" if post.has_cropped? && options[:show_cropped]
     klass << " pooled" if description
     klass << " post-status-pending" if post.is_pending?
     klass << " post-status-flagged" if post.is_flagged?

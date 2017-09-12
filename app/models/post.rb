@@ -142,6 +142,15 @@ class Post < ApplicationRecord
        end
     end
 
+    # this is for the 640x320 version
+    def cropped_file_url
+      if Danbooru.config.use_s3_proxy?(self)
+        "/cached/data/cropped/large/#{md5}.jpg"
+      else
+        "/data/cropped/large/#{md5}.jpg"
+      end
+    end
+
     def large_file_url
       if has_large?
         if Danbooru.config.use_s3_proxy?(self)

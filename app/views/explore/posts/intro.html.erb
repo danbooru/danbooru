@@ -16,7 +16,7 @@
       <% @presenter.each do |tag, post_set| %>
         <div class="posts">
           <h2><%= link_to tag, posts_path(:tags => tag) %></h2>
-          <%= post_set.presenter.post_previews_html(self) %>
+          <%= post_set.presenter.post_previews_html(self, show_cropped: true) %>
           <div class="clearfix"></div>
         </div>
       <% end %>
