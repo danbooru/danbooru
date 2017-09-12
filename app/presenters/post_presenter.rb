@@ -21,7 +21,7 @@ class PostPresenter < Presenter
 
     path = options[:path_prefix] || "/posts"
 
-    html =  %{<article itemscope itemtype="http://schema.org/ImageObject" id="post_#{post.id}" class="#{preview_class(post, options[:pool])}" #{data_attributes(post)}>}
+    html =  %{<article itemscope itemtype="http://schema.org/ImageObject" id="post_#{post.id}" class="#{preview_class(post, options[:pool], options)}" #{data_attributes(post)}>}
     if options[:tags].present? && !CurrentUser.is_anonymous?
       tag_param = "?tags=#{CGI::escape(options[:tags])}"
     elsif options[:pool_id] || options[:pool]
@@ -61,7 +61,7 @@ class PostPresenter < Presenter
     html.html_safe
   end
 
-  def self.preview_class(post, description = nil)
+  def self.preview_class(post, description = nil, options = {})
     klass = "post-preview"
     klass << " large-cropped" if post.has_cropped? && options[:show_cropped]
     klass << " pooled" if description
