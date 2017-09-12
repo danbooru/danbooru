@@ -181,11 +181,7 @@ class Post < ApplicationRecord
       end
 
       if has_cropped? && !CurrentUser.disable_cropped_thumbnails?
-        if Danbooru.config.use_s3_proxy?(self)
-          "/cached/data/cropped/small/#{md5}.jpg"
-        else
-          "https://s3.amazonaws.com/#{Danbooru.config.aws_s3_bucket_name}/cropped/small/#{md5}.jpg"
-        end
+        "/cached/data/cropped/small/#{md5}.jpg"
       else
         "/data/preview/#{file_path_prefix}#{md5}.jpg"
       end
