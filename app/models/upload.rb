@@ -142,7 +142,7 @@ class Upload < ApplicationRecord
         User.where(id: CurrentUser.id).update_all("post_upload_count = post_upload_count + 1")
         create_artist_commentary(post) if include_artist_commentary?
         ugoira_service.save_frame_data(post) if is_ugoira?
-        #notify_cropper(post)
+        notify_cropper(post)
         update_attributes(:status => "completed", :post_id => post.id)
       else
         update_attribute(:status, "error: " + post.errors.full_messages.join(", "))
