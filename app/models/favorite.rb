@@ -17,14 +17,6 @@ class Favorite < ApplicationRecord
     end
   end
 
-  def self.purge_post(post_id, user_ids)
-    0.upto(99) do |uid|
-      Favorite.where("user_id % 100 = ?", uid).delete_all(post_id: post_id)
-    end
-
-    User.where(:id => user_ids).update_all("favorite_count = favorite_count - 1")
-  end
-
   def self.remove(user:, post: nil, post_id: nil)
     Favorite.transaction do
       if post && post_id.nil?
