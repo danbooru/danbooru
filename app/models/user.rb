@@ -560,8 +560,8 @@ class User < ApplicationRecord
     end
 
     def used_upload_slots
-      uploaded_count = Post.for_user(id).where("created_at >= ?", 24.hours.ago).count
-      uploaded_comic_count = Post.for_user(id).tag_match("comic").where("created_at >= ?", 24.hours.ago).count / 3
+      uploaded_count = Post.for_user(id).where("created_at >= ?", 23.hours.ago).count
+      uploaded_comic_count = Post.for_user(id).tag_match("comic").where("created_at >= ?", 23.hours.ago).count / 3
       uploaded_count - uploaded_comic_count
     end
 
