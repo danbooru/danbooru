@@ -92,7 +92,7 @@ namespace :images do
     post_id = ENV["id"]
 
     if post_id !~ /\d+/
-      raise "Usage: regen_img.rb POST_ID"
+      raise "Usage: regen id=n"
     end
 
     post = Post.find(post_id)
@@ -107,9 +107,15 @@ namespace :images do
     
   desc "Generate thumbnail-sized images of posts"
   task :generate_preview => :environment do
-    width = 200
-    Post.where("image_width > ?", width).find_each do |post|
-      if post.is_image? #&& !File.exists?(post.preview_file_path)
+    width = 150
+    post_id = ENV["id"]
+
+    if post_id !~ /\d+/
+      raise "Usage: generate_preview id=n"
+    end
+
+    Post.where(id: post_id).find_each do |post|
+      if post.is_image?
         puts "resizing preview #{post.id}"
         Danbooru.resize(post.file_path, post.preview_file_path, width, width, 90)
       end
@@ -118,8 +124,14 @@ namespace :images do
   
   desc "Generate large-sized images of posts"
   task :generate_large => :environment do
-    Post.where("image_width > ?", Danbooru.config.large_image_width).find_each do |post|
-      if post.is_image? && !File.exists?(post.large_file_path)
+    post_id = ENV["id"]
+
+    if post_id !~ /\d+/
+      raise "Usage: generate_large id=n"
+    end
+
+    Post.where(id: post_id).find_each do |post|
+      if post.is_image? && post.has_large?
         puts "resizing large #{post.id}"
         Danbooru.resize(post.file_path, post.large_file_path, Danbooru.config.large_image_width, nil, 90)
         post.distribute_files

@@ -212,7 +212,6 @@ class Upload < ApplicationRecord
     end
 
     def move_file
-      return if File.exists?(md5_file_path)
       FileUtils.mv(file_path, md5_file_path)
     end
 
