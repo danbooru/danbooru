@@ -2,6 +2,23 @@ require 'test_helper'
 
 module Downloads
   class FileTest < ActiveSupport::TestCase
+    context "A twitter video download" do
+      setup do
+        @source = "https://twitter.com/CincinnatiZoo/status/859073537713328129"
+        @tempfile = Tempfile.new("danbooru-test")
+        @download = Downloads::File.new(@source, @tempfile.path)
+      end
+
+      teardown do
+        @tempfile.close
+      end
+
+      should "preserve the twitter source" do
+        @download.download!
+        assert_equal("https://twitter.com/CincinnatiZoo/status/859073537713328129", @download.source)
+      end
+    end
+
     context "A post download" do
       setup do
         @source = "http://www.google.com/intl/en_ALL/images/logo.gif"
