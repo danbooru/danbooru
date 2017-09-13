@@ -286,17 +286,8 @@ class User < ApplicationRecord
       Favorite.where("user_id % 100 = #{id % 100} and user_id = #{id}").order("id desc")
     end
 
-    def clean_favorite_count?
-      favorite_count < 0 || Kernel.rand(100) < [Math.log(favorite_count, 2), 5].min
-    end
-
-    def clean_favorite_count!
-      update_column(:favorite_count, Favorite.for_user(id).count)
-    end
-
     def add_favorite!(post)
       Favorite.add(post: post, user: self)
-      clean_favorite_count! if clean_favorite_count?
     end
 
     def remove_favorite!(post)

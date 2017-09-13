@@ -61,6 +61,32 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(0, Favorite.for_user(@user.id).where("post_id = ?", @post.id).count)
       end
 
+      should "decrement the uploader's upload count" do
+        assert_difference("@post.uploader.reload.post_upload_count", -1) do
+          @post.expunge!
+        end
+      end
+
+      should "decrement the user's note update count" do
+        FactoryGirl.create(:note, post: @post)
+        assert_difference(["@post.uploader.reload.note_update_count"], -1) do
+          @post.expunge!
+        end
+      end
+
+      should "decrement the user's post update count" do
+        assert_difference(["@post.uploader.reload.post_update_count"], -1) do
+          @post.expunge!
+        end
+      end
+
+      should "decrement the user's favorite count" do
+        @post.add_favorite!(@post.uploader)
+        assert_difference(["@post.uploader.reload.favorite_count"], -1) do
+          @post.expunge!
+        end
+      end
+
       should "remove the post from iqdb" do
         mock_iqdb_service!
         Post.iqdb_sqs_service.expects(:send_message).with("remove\n#{@post.id}")
@@ -1162,11 +1188,13 @@ class PostTest < ActiveSupport::TestCase
         should "increment the updater's post_update_count" do
           PostArchive.sqs_service.stubs(:merge?).returns(false)
           post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
-          CurrentUser.reload
 
-          assert_difference("CurrentUser.post_update_count", 1) do
+          # XXX in the test environment the update count gets bumped twice: and
+          # once by Post#post_update_count, and once by the counter cache. in
+          # production the counter cache doesn't bump the count, because
+          # versions are created on a separate server.
+          assert_difference("CurrentUser.user.reload.post_update_count", 2) do
             post.update_attributes(:tag_string => "zzz")
-            CurrentUser.reload
           end
         end
 

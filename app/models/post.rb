@@ -36,7 +36,7 @@ class Post < ApplicationRecord
 
   belongs_to :updater, :class_name => "User"
   belongs_to :approver, :class_name => "User"
-  belongs_to :uploader, :class_name => "User"
+  belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
   belongs_to :parent, :class_name => "Post"
   has_one :upload, :dependent => :destroy
   has_one :artist_commentary, :dependent => :destroy
@@ -1038,7 +1038,9 @@ class Post < ApplicationRecord
     end
 
     def remove_from_favorites
-      Favorite.destroy_all(post_id: self.id)
+      favorites.find_each do |fav|
+        remove_favorite!(fav.user)
+      end
     end
 
     def remove_from_fav_groups

@@ -38,19 +38,6 @@ class UserTest < ActiveSupport::TestCase
       end
     end
 
-    context "favoriting a post" do
-      setup do
-        @user.update_column(:favorite_count, 999)
-        @user.stubs(:clean_favorite_count?).returns(true)
-        @post = FactoryGirl.create(:post)
-      end
-
-      should "periodically clean the favorite_count" do
-        @user.add_favorite!(@post)
-        assert_equal(1, @user.favorite_count)
-      end
-    end
-
     context "that has been invited by a mod" do
       setup do
         @mod = FactoryGirl.create(:moderator_user)
