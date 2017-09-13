@@ -180,11 +180,11 @@ class Post < ApplicationRecord
         return "/images/download-preview.png"
       end
 
-      if has_cropped? && !CurrentUser.disable_cropped_thumbnails?
-        "/cached/data/cropped/small/#{md5}.jpg"
-      else
+      # if has_cropped? && !CurrentUser.disable_cropped_thumbnails?
+      #   "/cached/data/cropped/small/#{md5}.jpg"
+      # else
         "/data/preview/#{file_path_prefix}#{md5}.jpg"
-      end
+      # end
     end
 
     def complete_preview_file_url
