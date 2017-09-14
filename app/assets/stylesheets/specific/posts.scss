@@ -77,6 +77,14 @@ a.blacklisted-active {
   font-style: italic;
 }
 
+#open-edit-dialog {
+  padding: 0;
+}
+
+#edit-dialog textarea {
+  margin-bottom: 0.25em;
+}
+
 .post-preview {
   img {
     border: 2px solid transparent;
@@ -223,7 +231,7 @@ div#c-posts {
     text-align: center;
 
     input[type=submit] {
-      padding: 0.2em 0.5em;
+      padding: 0.2em 0.75em;
     }
   }
 
@@ -399,6 +407,10 @@ div#c-posts {
 
     .pool-name, .search-name {
       word-wrap: break-word;
+    }
+
+    textarea {
+      margin-bottom: 0.25em;
     }
 
     #favlist {

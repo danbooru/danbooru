@@ -99,7 +99,7 @@
     });
 
     dialog.parent().mouseout(function(e) {
-      dialog.parent().css({"opacity": 0.6});
+      dialog.parent().css({"opacity": 0.6, "transition": "opacity .2s ease"});
     })
     .mouseover(function(e) {
       dialog.parent().css({"opacity": 1});

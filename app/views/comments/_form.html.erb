@@ -9,6 +9,6 @@
     <%= f.input :do_not_bump_post, :label => "No bump" %>
   <% end %>
   <% if CurrentUser.is_moderator? %>
-    <%= f.input :is_sticky, :label => "Post as moderator" %>
+    <%= f.input :is_sticky, :label => "Post as moderator", :for => "comment_is_sticky" %>
   <% end %>
 <% end %>

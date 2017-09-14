@@ -44,8 +44,8 @@
           <% else %>
             <%= f.text_field :source, :size => 50 %>
           <% end %>
-          <%= button_tag "Similar", :id => "similar-button", :type => "button" %>
-          <%= button_tag "Artist", :id => "find-artist-button", :type => "button" %>
+          <%= button_tag "Similar", :id => "similar-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
+          <%= button_tag "Artist", :id => "find-artist-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
           <span class="hint">You can enter a URL to have <%= Danbooru.config.app_name %> automatically download and process it</span>
         </div>
 
@@ -108,15 +108,15 @@
             <span id="open-edit-dialog" class="ui-icon ui-icon-arrow-1-ne" title="detach" style="display: none;"/>
           </div>
 
-          <%= button_tag "Related tags", :id => "related-tags-button", :type => "button" %>
-          <%= button_tag "General", :id => "related-general-button", :type => "button" %>
-          <%= button_tag "Artists", :id => "related-artists-button", :type => "button" %>
-          <%= button_tag "Characters", :id => "related-characters-button", :type => "button" %>
-          <%= button_tag "Copyrights", :id => "related-copyrights-button", :type => "button" %>
+          <%= button_tag "Related tags", :id => "related-tags-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
+          <%= button_tag "General", :id => "related-general-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
+          <%= button_tag "Artists", :id => "related-artists-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
+          <%= button_tag "Characters", :id => "related-characters-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
+          <%= button_tag "Copyrights", :id => "related-copyrights-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
         </div>
 
         <div class="input">
-          <%= submit_tag "Submit", :class => "large", :data => { :disable_with => "Submitting..." } %>
+          <%= submit_tag "Submit", :class => "large", :data => { :disable_with => "Submitting..." }, :class => "ui-button ui-widget ui-corner-all gradient" %>
         </div>
 
         <div id="artist-tags-container">

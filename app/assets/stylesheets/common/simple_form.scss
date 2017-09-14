@@ -6,6 +6,10 @@ form.simple_form {
       display: inline;
       vertical-align: middle;
       margin-left: 0.5em;
+
+      input {
+        margin-right: 0.25em;
+      }
     }
   }
 
