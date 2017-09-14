@@ -259,7 +259,11 @@
         if (text.match(/^ http/)) {
           text = text.substring(1, 1000);
           var $url = $("<a/>");
-          $url.text(text);
+          var desc = text.replace(/^https?:\/\//, "");
+          if (desc.length > 30) {
+            desc = desc.substring(0, 30) + "...";
+          }
+          $url.text(desc);
           $url.attr("href", text);
           $url.attr("target", "_blank");
           $ul.append($("<li/>").html($url));

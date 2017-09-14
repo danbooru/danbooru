@@ -59,7 +59,7 @@
     $("#form").appendTo(dialog);
     dialog.dialog({
       title: "Edit tags",
-      width: $(window).width() / 3,
+      width: $(window).width() * 0.6,
         position: {
           my: "right",
           at: "right-20",
