@@ -30,11 +30,13 @@
         | <%= link_to "Filter messages like these", edit_maintenance_user_dmail_filter_path(:dmail_id => @dmail.id) %>
         | <%= link_to "Permalink", dmail_path(@dmail, :key => @dmail.key), :title => "Use this URL to privately share with a moderator" %>
         <% if CurrentUser.is_gold? %>
-          <% if @dmail.is_spam? %>
-            | <%= link_to "Not spam", ham_dmail_path(@dmail) %>
-          <% else %>
-            | <%= link_to "Mark as spam", spam_dmail_path(@dmail) %>
-          <% end %>
+          <span id="spam-links">
+            <% if @dmail.is_spam? %>
+              | <%= link_to "Not spam", ham_dmail_path(@dmail), remote: :true, method: :post %>
+            <% else %>
+              | <%= link_to "Mark as spam", spam_dmail_path(@dmail), remote: :true, method: :post %>
+            <% end %>
+          </span>
         <% end %>
       </p>
     </div>
