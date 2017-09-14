@@ -15,6 +15,19 @@ class DmailTest < ActiveSupport::TestCase
       CurrentUser.user = nil
     end
 
+    context "spam" do
+      setup do
+        @recipient = FactoryGirl.create(:user)
+      end
+
+      should "not validate" do
+        assert_difference("Dmail.count", 2)do
+          dmail = Dmail.create_split(:to_id => @recipient.id, :title => "My video", :body => "hey Noneeditsonlyme.  My webcam see here http://bit.ly/2vTv9Ki")
+          assert(dmail.is_spam?)
+        end
+      end
+    end
+
     context "filter" do
       setup do
         @recipient = FactoryGirl.create(:user)

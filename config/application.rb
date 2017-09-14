@@ -30,6 +30,11 @@ module Danbooru
       config.x.git_hash = nil
     end
 
+    if ENV["DANBOORU_RAKISMET_KEY"]
+      config.rakismet.key = ENV["DANBOORU_RAKISMET_KEY"]
+      config.rakismet.url = ENV["DANBOORU_RAKISMET_URL"]
+    end
+
     config.after_initialize do
       Rails.application.routes.default_url_options = {
         host: Danbooru.config.hostname,

@@ -1,6 +1,8 @@
 require 'digest/sha1'
 
 class Dmail < ApplicationRecord
+  include Rakismet::Model
+
   with_options on: :create do
     validates_presence_of :to_id
     validates_presence_of :from_id
@@ -18,6 +20,18 @@ class Dmail < ApplicationRecord
   after_create :update_recipient
   after_create :send_dmail
 
+  rakismet_attrs author: :from_name, author_email: :from_email, content: :title_and_body, user_ip: :creator_ip_addr_str
+
+  concerning :SpamMethods do
+    def title_and_body
+      "#{title}\n\n#{body}"
+    end
+
+    def creator_ip_addr_str
+      creator_ip_addr.to_s
+    end
+  end
+
   module AddressMethods
     def to_name
       User.id_to_pretty_name(to_id)
@@ -27,6 +41,10 @@ class Dmail < ApplicationRecord
       User.id_to_pretty_name(from_id)
     end
 
+    def from_email
+      from.email
+    end
+
     def to_name=(name)
       self.to_id = User.name_to_id(name)
     end
@@ -34,6 +52,8 @@ class Dmail < ApplicationRecord
     def initialize_attributes
       self.from_id ||= CurrentUser.id
       self.creator_ip_addr ||= CurrentUser.ip_addr
+      self.is_spam = spam?
+      true
     end
   end
 
@@ -160,6 +180,12 @@ class Dmail < ApplicationRecord
         q = q.where("from_id = ?", params[:from_id].to_i)
       end
 
+      if params[:is_spam].present?
+        q = q.where("is_spam = ?", true)
+      else
+        q = q.where("is_spam = ?", false)
+      end
+
       if params[:read] == "true"
         q = q.where("is_read = true")
       elsif params[:read] == "false"
@@ -189,7 +215,7 @@ class Dmail < ApplicationRecord
   end
 
   def send_dmail
-    if to.receive_email_notifications? && to.email =~ /@/ && owner_id == to.id
+    if !is_spam? && to.receive_email_notifications? && to.email =~ /@/ && owner_id == to.id
       UserMailer.dmail_notice(self).deliver_now
     end
   end
@@ -230,5 +256,4 @@ class Dmail < ApplicationRecord
   def visible_to?(user, key)
     owner_id == user.id || (user.is_moderator? && key == self.key)
   end
-
 end

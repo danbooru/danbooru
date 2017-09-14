@@ -18,6 +18,10 @@ module DmailsHelper
     dmails_path(search: {from_id: CurrentUser.id}, folder: "sent", **params)
   end
 
+  def spam_dmails_path
+    dmails_path(search: {to_id: CurrentUser.id, is_spam: true}, folder: "spam")
+  end
+
   def received_dmails_path(params = {})
     dmails_path(search: {to_id: CurrentUser.id}, folder: "received", **params)
   end

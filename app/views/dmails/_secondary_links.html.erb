@@ -4,6 +4,7 @@
     <li><%= link_to "All", all_dmails_path(set_default_folder: true) %></li>
     <li><%= link_to "Received", received_dmails_path(set_default_folder: true) %></li>
     <li><%= link_to "Sent", sent_dmails_path(set_default_folder: true) %></li>
+    <li><%= link_to "Spam", spam_dmails_path %></li>
     <li>|</li>
     <li><%= link_to "New", new_dmail_path %></li>
     <li><%= link_to "Mark all as read", {:controller => "dmails", :action => "mark_all_as_read"}, :method => :post, :remote => true %></li>
