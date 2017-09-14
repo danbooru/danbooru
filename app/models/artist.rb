@@ -60,6 +60,10 @@ class Artist < ApplicationRecord
       memoize :domains
     end
 
+    def sorted_urls
+      urls.sort {|a, b| a.priority <=> b.priority}
+    end
+
     def url_array
       urls.map(&:url)
     end

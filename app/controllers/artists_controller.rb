@@ -102,7 +102,7 @@ class ArtistsController < ApplicationController
 
   def finder
     begin
-      @artists = Artist.url_matches(params[:url]).order("id desc").limit(20)
+      @artists = Artist.url_matches(params[:url]).order("id desc").limit(10)
       if @artists.empty? && params[:referer_url].present? && params[:referer_url] != params[:url]
         @artists = Artist.url_matches(params[:referer_url]).order("id desc").limit(20)
       end
@@ -112,10 +112,10 @@ class ArtistsController < ApplicationController
 
     respond_with(@artists) do |format|
       format.xml do
-        render :xml => @artists.to_xml(:include => [:urls], :root => "artists")
+        render :xml => @artists.to_xml(:include => [:sorted_urls], :root => "artists")
       end
       format.json do
-        render :json => @artists.to_json(:include => [:urls])
+        render :json => @artists.to_json(:include => [:sorted_urls])
       end
     end
   end

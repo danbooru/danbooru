@@ -53,6 +53,24 @@ class ArtistUrl < ApplicationRecord
     url = url.gsub(/^http:\/\/i\d+\.pixiv\.net\/img\d+/, "http://*.pixiv.net/img*")
   end
 
+  def priority
+    if normalized_url =~ /pixiv\.net\/member\.php/
+      10
+
+    elsif normalized_url =~ /seiga\.nicovideo\.jp\/user\/illust/
+      10
+
+    elsif normalized_url =~ /twitter\.com/ && normalized_url !~ /status/
+      10
+
+    elsif normalized_url =~ /tumblr|patreon|deviantart|artstation/
+      20
+
+    else
+      100
+    end
+  end
+
   def normalize
     if !Sources::Site.new(normalized_url).normalized_for_artist_finder?
       self.normalized_url = self.class.normalize(url)
