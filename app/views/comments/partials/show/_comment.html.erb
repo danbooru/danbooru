@@ -1,4 +1,4 @@
-<% if CurrentUser.is_moderator? || !comment.is_deleted? %>
+<% if CurrentUser.is_moderator? || (params[:search] && params[:search][:is_deleted] =~ /t/) || !comment.is_deleted? %>
   <a name="comment-<%= comment.id %>"></a>
   <article class="comment" data-post-id="<%= comment.post_id %>" data-comment-id="<%= comment.id %>" data-score="<%= comment.score %>" data-creator="<%= comment.creator_name %>" data-is-sticky="<%= comment.is_sticky %>">
     <div class="author">
