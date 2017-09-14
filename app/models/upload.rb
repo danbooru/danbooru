@@ -200,7 +200,7 @@ class Upload < ApplicationRecord
 
     def notify_cropper(post)
       if ImageCropper.enabled?
-        ImageCropper.notify(post)
+        # ImageCropper.notify(post)
       end
     end
   end
