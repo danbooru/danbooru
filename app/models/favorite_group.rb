@@ -172,18 +172,24 @@ class FavoriteGroup < ApplicationRecord
     self.post_count = post_id_array.size
   end
 
-  def add!(post)
-    return if contains?(post.id)
+  def add!(post_id)
+    return if contains?(post_id)
 
     clear_post_id_array
-    update_attributes(:post_ids => add_number_to_string(post.id, post_ids))
+    update_attributes(:post_ids => add_number_to_string(post_id, post_ids))
   end
 
-  def remove!(post)
-    return unless contains?(post.id)
+  def self.purge_post(post_id)
+    for_post(post_id).find_each do |group|
+      group.remove!(post_id)
+    end
+  end
+
+  def remove!(post_id)
+    return unless contains?(post_id)
 
     clear_post_id_array
-    update_attributes(:post_ids => remove_number_from_string(post.id, post_ids))
+    update_attributes(:post_ids => remove_number_from_string(post_id, post_ids))
   end
 
   def add_number_to_string(number, string)

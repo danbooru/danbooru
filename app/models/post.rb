@@ -36,7 +36,7 @@ class Post < ApplicationRecord
 
   belongs_to :updater, :class_name => "User"
   belongs_to :approver, :class_name => "User"
-  belongs_to :uploader, :class_name => "User"
+  belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
   belongs_to :parent, :class_name => "Post"
   has_one :upload, :dependent => :destroy
   has_one :artist_commentary, :dependent => :destroy
@@ -815,19 +815,19 @@ class Post < ApplicationRecord
 
         when /^-favgroup:(\d+)$/i
           favgroup = FavoriteGroup.where("id = ?", $1.to_i).for_creator(CurrentUser.user.id).first
-          favgroup.remove!(self) if favgroup
+          favgroup.remove!(id) if favgroup
 
         when /^-favgroup:(.+)$/i
           favgroup = FavoriteGroup.named($1).for_creator(CurrentUser.user.id).first
-          favgroup.remove!(self) if favgroup
+          favgroup.remove!(id) if favgroup
 
         when /^favgroup:(\d+)$/i
           favgroup = FavoriteGroup.where("id = ?", $1.to_i).for_creator(CurrentUser.user.id).first
-          favgroup.add!(self) if favgroup
+          favgroup.add!(id) if favgroup
 
         when /^favgroup:(.+)$/i
           favgroup = FavoriteGroup.named($1).for_creator(CurrentUser.user.id).first
-          favgroup.add!(self) if favgroup
+          favgroup.add!(id) if favgroup
         end
       end
     end
@@ -1038,13 +1038,14 @@ class Post < ApplicationRecord
     end
 
     def remove_from_favorites
-      Favorite.destroy_all(post_id: self.id)
+      Favorite.delete_all(post_id: id)
+      user_ids = fav_string.scan(/\d+/)
+      User.where(:id => user_ids).update_all("favorite_count = favorite_count - 1")
+      PostVote.where(post_id: id).delete_all
     end
 
     def remove_from_fav_groups
-      FavoriteGroup.for_post(id).find_each do |group|
-        group.remove!(self)
-      end
+      FavoriteGroup.delay.purge_post(id)
     end
   end
 
@@ -1380,7 +1381,6 @@ class Post < ApplicationRecord
       transaction do
         Post.without_timeout do
           ModAction.log("permanently deleted post ##{id}")
-          #delete!("Permanently deleted post ##{id}", :without_mod_action => true)
 
           give_favorites_to_parent
           update_children_on_destroy
