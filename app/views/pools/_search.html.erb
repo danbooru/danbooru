@@ -28,6 +28,15 @@
         </td>
       </tr>
 
+      <tr>
+        <th><label for="search_is_active">Status</th>
+        <td>
+          <div class="input">
+            <%= select "search", "is_active", ["", ["Active", "true"], ["Inactive", "false"]], :selected => params[:search][:is_active] %>
+          </div>
+        </td>
+      </tr>
+
       <% if path != gallery_pools_path %>
         <tr>
           <th><label for="search_category">Category</th>
