@@ -1,6 +1,7 @@
 class DmailsController < ApplicationController
   respond_to :html, :xml, :json
   before_filter :member_only, except: [:index, :show, :destroy, :mark_all_as_read]
+  before_filter :gold_only, only: [:ham, :spam]
 
   def new
     if params[:respond_to_id]
@@ -53,6 +54,18 @@ class DmailsController < ApplicationController
     end
     CurrentUser.user.has_mail = false
     CurrentUser.user.save
+  end
+
+  def spam
+    @dmail = Dmail.find(params[:id])
+    @dmail.update_column(:is_spam, true)
+    @dmail.spam!
+  end
+
+  def ham
+    @dmail = Dmail.find(params[:id])
+    @dmail.update_column(:is_spam, false)
+    @dmail.ham!
   end
 
 private
