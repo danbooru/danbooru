@@ -583,7 +583,7 @@ class User < ApplicationRecord
     end
 
     def next_free_upload_slot
-      (posts.where("created_at >= ?", 24.hours.ago).first.try(:created_at) || 24.hours.ago) + 24.hours
+      (posts.where("created_at >= ?", 23.hours.ago).first.try(:created_at) || 23.hours.ago) + 23.hours
     end
 
     def tag_query_limit
