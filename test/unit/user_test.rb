@@ -298,6 +298,20 @@ class UserTest < ActiveSupport::TestCase
       end
     end
 
+    context "that might be a sock puppet" do
+      setup do
+        @user = FactoryGirl.create(:user, last_ip_addr: "127.0.0.2")
+      end
+
+      should "not validate" do
+        CurrentUser.scoped(nil, "127.0.0.2") do
+          @user = FactoryGirl.build(:user)
+          @user.save
+          assert_equal(["Last ip addr was used recently for another account and cannot be reused for another day"], @user.errors.full_messages)
+        end
+      end
+    end
+
     context "when searched by name" do
       should "match wildcards" do
         user1 = FactoryGirl.create(:user, :name => "foo")

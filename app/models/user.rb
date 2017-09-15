@@ -64,6 +64,7 @@ class User < ApplicationRecord
   validates_presence_of :email, :if => lambda {|rec| rec.new_record? && Danbooru.config.enable_email_verification?}
   validates_presence_of :comment_threshold
   validate :validate_ip_addr_is_not_banned, :on => :create
+  validate :validate_sock_puppets, :on => :create
   before_validation :normalize_blacklisted_tags
   before_validation :set_per_page
   before_validation :normalize_email
@@ -884,15 +885,10 @@ class User < ApplicationRecord
     end
   end
 
-  module SockPuppetMethods
-    def notify_sock_puppets
-      sock_puppet_suspects.each do |user|
-      end
-    end
-
-    def sock_puppet_suspects
-      if last_ip_addr.present?
-        User.where(:last_ip_addr => last_ip_addr)
+  concerning :SockPuppetMethods do
+    def validate_sock_puppets
+      if User.where(last_ip_addr: CurrentUser.ip_addr).where("created_at > ?", 1.day.ago).exists?
+        errors.add(:last_ip_addr, "was used recently for another account and cannot be reused for another day")
       end
     end
   end
