@@ -176,6 +176,7 @@ class FavoriteGroup < ApplicationRecord
     return if contains?(post_id)
 
     clear_post_id_array
+    puts ">>> post_id=#{post_id} post_ids=#{post_ids.inspect}"
     update_attributes(:post_ids => add_number_to_string(post_id, post_ids))
   end
 

@@ -63,7 +63,7 @@ class FavoriteGroupsController < ApplicationController
     @favorite_group = FavoriteGroup.find(params[:id])
     check_privilege(@favorite_group)
     @post = Post.find(params[:post_id])
-    @favorite_group.add!(@post)
+    @favorite_group.add!(@post.id)
   end
 
 private
