@@ -52,7 +52,11 @@ class Dmail < ApplicationRecord
     def initialize_attributes
       self.from_id ||= CurrentUser.id
       self.creator_ip_addr ||= CurrentUser.ip_addr
-      self.is_spam = spam?
+      if CurrentUser.is_gold?
+        self.is_spam = false
+      else
+        self.is_spam = spam?
+      end
       true
     end
   end
