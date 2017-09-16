@@ -31,3 +31,7 @@ $(function() {
 });
 
 var Danbooru = {};
+
+var submitInvisibleRecaptchaForm = function () {
+  document.getElementById("signup-form").submit();
+};

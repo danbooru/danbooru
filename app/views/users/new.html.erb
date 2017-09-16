@@ -9,14 +9,13 @@
     <p>This includes favorites, uploads, and comments. Almost everything is public. So don't choose a name you don't want to be associated with.</p>
 
     <div id="p3">
-      <%= simple_form_for(@user) do |f| %>
+      <%= simple_form_for(@user, html: {id: "signup-form"}) do |f| %>
         <%= f.input :name, :as => :string %>
         <%= f.input :email, :required => false, :as => :email %>
         <%= f.input :password %>
         <%= f.input :password_confirmation %>
-        <%= f.button :submit, "Sign up", :data => { :disable_with => "Signing up..." } %>
 
-        <%= recaptcha_tags %>
+        <%= invisible_recaptcha_tags callback: 'submitInvisibleRecaptchaForm', text: 'Sign up' %>
       <% end %>
     </div>
   </div>
