@@ -278,6 +278,8 @@ GEM
     raindrops (0.17.0)
     rake (12.0.0)
     rakismet (1.5.4)
+    recaptcha (4.4.1)
+      json
     ref (2.0.0)
     representable (2.3.0)
       uber (~> 0.0.7)
@@ -434,6 +436,7 @@ DEPENDENCIES
   radix62 (~> 1.0.1)
   rails (~> 4.2.0)
   rakismet
+  recaptcha
   responders
   rmagick
   ruby-imagespec!
