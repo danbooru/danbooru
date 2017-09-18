@@ -338,7 +338,19 @@ inline := |*
     append(sm, true, "<a class=\"dtext-link dtext-external-link\" href=\"");
     append_segment_html_escaped(sm, sm->b1, sm->b2 - 1);
     append(sm, true, "\">");
-    append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
+
+    link_content_sm = init_machine(sm->a1, sm->a2 - sm->a1, false, true, false);
+    if (!parse_helper(link_content_sm)) {
+      g_debug("basic_textile_link: parse_helper failed");
+      g_propagate_error(&sm->error, link_content_sm->error);
+      free_machine(link_content_sm);
+      fbreak;
+    } else {
+      append(sm, true, link_content_sm->output->str);
+      free_machine(link_content_sm);
+      link_content_sm = NULL;
+    }
+
     append(sm, true, "</a>");
   };
 

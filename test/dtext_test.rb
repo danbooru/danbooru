@@ -195,6 +195,10 @@ class DTextTest < Minitest::Test
     assert_parse('<p><a class="dtext-link dtext-external-link" href="http://test.com">test</a></p>', '"test":[http://test.com]')
   end
 
+  def test_new_style_links_with_inline_tags
+    assert_parse('<p><a class="dtext-link dtext-external-link" href="http://test.com/(parentheses)"><em>test</em></a></p>', '"[i]test[/i]":[http://test.com/(parentheses)]')
+  end
+
   def test_new_style_links_with_parentheses
     assert_parse('<p><a class="dtext-link dtext-external-link" href="http://test.com/(parentheses)">test</a></p>', '"test":[http://test.com/(parentheses)]')
     assert_parse('<p>(<a class="dtext-link dtext-external-link" href="http://test.com/(parentheses)">test</a>)</p>', '("test":[http://test.com/(parentheses)])')
