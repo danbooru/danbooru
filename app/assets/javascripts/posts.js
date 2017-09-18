@@ -179,12 +179,6 @@
   }
 
   Danbooru.Post.initialize_links = function() {
-    $("#side-edit-link").click(function(e) {
-      $("#post-edit-link").trigger("click");
-      $("#post_tag_string").trigger("focus");
-      e.preventDefault();
-    });
-
     $("#copy-notes").click(function(e) {
       var current_post_id = $("meta[name=post-id]").attr("content");
       var other_post_id = parseInt(prompt("Enter the ID of the post to copy all notes to:"), 10);
