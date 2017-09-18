@@ -32,20 +32,6 @@ end
 new_new_spammers = Set.new(Dmail.where("from_id >= ? and title in (?) and from_id not in (?)", MIN_USER_ID, BAD_TITLES, (spammers + new_spammers).to_a).pluck(:from_id))
 
 combined_spammers = spammers + new_spammers + new_new_spammers
-User.without_timeout do
-  combined_spammers.each do |uid|
-    user = User.find(uid)
-    tag_change_count = PostArchive.where(updater_id: uid).count
-    vote_count = PostVote.where(user_id: uid).count
-    comment_count = Comment.where(creator_id: uid).count
-    dmail_count = Dmail.where(from_id: uid).count
-
-    if tag_change_count + vote_count + comment_count > 0
-      puts "#{user.name},#{uid},#{tag_change_count},#{vote_count},#{comment_count},#{dmail_count}"
-    end
-  end
-end
-
 combined_spammers.each do |uid|
   unless Ban.where(user_id: uid).exists?
     Ban.create(duration: 10000, reason: "Spam (automated ref f6147ace)", user_id: uid)
