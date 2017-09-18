@@ -55,8 +55,24 @@
   }
 
   form {
-    input[type=text], input[type=submit], select {
-      font-size: 1.5em;
+    input[type=text] {
+      vertical-align: top;
+      font-size: 24pt;
+      border: 1px solid #c5c5c5;
+    }
+
+    textarea {
+      vertical-align: top;
+      border: 1px solid #c5c5c5;
+    }
+
+    input[type=submit] {
+      font-size: 160%;
+    }
+
+    input[type=submit].tiny {
+      font-size: 120%;
+      vertical-align: top;
     }
   }
 
@@ -70,17 +86,17 @@
   }
 
   div.paginator {
-    font-size: 20pt;
+    font-size: 24pt;
     font-weight: bold;
-    text-align: left;
+    text-align: center;
     width: 100%;
     padding: 0;
     margin: 0;
     margin-top: 1em;
 
     li {
-      width: 30vw;
       display: inline-block;
+      margin: 0 0.25em;
 
       a, span {
         margin: 0;
@@ -104,26 +120,23 @@
 
   article.post-preview {
     margin: 0.5vw;
-    width: 32vw;
-    height: 32vw;
+    width: 48.5vw;
+    height: 48.5vw;
     text-align: center;
     vertical-align: middle;
     display: inline-block;
 
     a {
-      width: 32vw;
+      width: 48.5vw;
       display: block;
       margin: 0 auto;
     }
     img {
-      object-fit: cover;
-      width: 32vw;
-      height: 32vw;
+      object-fit: contain;
+      width: 48.5vw;
+      height: 48.5vw;
       margin: 0 auto;
       border: none !important;
-    }
-    img.cropped-true {
-      object-fit: cover;
     }
     &[data-tags~=animated]:before, &[data-file-ext=swf]:before, &[data-file-ext=webm]:before, &[data-file-ext=mp4]:before, &[data-file-ext=zip]:before {
       left: 0.5vw;
