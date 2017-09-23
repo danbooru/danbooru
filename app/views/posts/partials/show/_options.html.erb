@@ -2,19 +2,17 @@
   <li><%= link_to "Resize to window", "#", :id => "image-resize-to-window-link" %></li>
   <li><%= link_to "Favorite", favorites_path(:post_id => post.id), :remote => true, :method => :post, :id => "add-to-favorites", :title => "Shortcut is F" %></li>
   <li><%= link_to "Unfavorite", favorite_path(post), :remote => true, :method => :delete, :id => "remove-from-favorites" %></li>
-  <li><%= link_to "Edit", "#", :id => "side-edit-link" %></li>
   <li><%= link_to_if post.visible?, "Download", post.file_url, :download => post.presenter.humanized_essential_tag_string + " - " + post.file_name %></li>
-  <li id="random-post-list"><%= link_to "Random post", random_posts_path(:tags => params[:tags]), :id => "random-post" %></li>
   <li id="add-to-pool-list"><%= link_to "Add to pool", "#", :id => "pool" %></li>
   <% if post.is_note_locked? %>
     <li id="add-notes-list"><span id="note-locked-notice">Note locked</span></li>
   <% else %>
-    <li id="add-notes-list"><%= link_to "Add notes", "#", :id => "translate", :title => "Shortcut is N" %></li>
+    <li id="add-notes-list"><%= link_to "Add note", "#", :id => "translate", :title => "Shortcut is N" %></li>
   <% end %>
   <% if CurrentUser.is_builder? && post.has_notes? %>
-    <li id="copy-all-notes-list"><%= link_to "Copy all notes", "#", :id => "copy-notes" %></li>
+    <li id="copy-all-notes-list"><%= link_to "Copy notes", "#", :id => "copy-notes" %></li>
   <% end %>
-  <li id="add-artist-commentary-list"><%= link_to "Add artist commentary", "#", :id => "add-commentary" %></li>
+  <li id="add-artist-commentary-list"><%= link_to "Add commentary", "#", :id => "add-commentary" %></li>
   <li><%= link_to "Add to favorite group", "#", :id => "open-favgroup-dialog-link" %></li>
   <li><%= link_to "Find similar", iqdb_queries_path(:post_id => post.id), :method => :post, :remote => true %></li>
 
