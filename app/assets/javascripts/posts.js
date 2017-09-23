@@ -25,6 +25,7 @@
       this.initialize_post_image_resize_to_window_link();
       this.initialize_similar();
       this.initialize_replace_image_dialog();
+      this.initialize_gestures();
 
       if ((Danbooru.meta("always-resize-images") === "true") || ((Danbooru.Cookie.get("dm") != "1") && (window.innerWidth <= 660))) {
         $("#image-resize-to-window-link").click();
@@ -69,10 +70,10 @@
 
     $("body").hammer().bind("panend", function(e) {
       var percentage = e.gesture.deltaX / window.innerWidth;
-      if (hasPrev && percentage > 0.4) {
+      if (hasPrev && percentage > 0.3) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(150%)"});
         Danbooru.Post.nav_prev(e);
-      } else if (hasNext && percentage < -0.4) {
+      } else if (hasNext && percentage < -0.3) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(-150%)"});
         Danbooru.Post.nav_next(e);
       } else {
@@ -174,7 +175,9 @@
   }
 
   Danbooru.Post.nav_prev = function(e) {
-    if ($("#search-seq-nav").length) {
+    if ($("#a-show")) {
+      window.history.back();
+    } else if ($("#search-seq-nav").length) {
       var href = $("#search-seq-nav a[rel~=prev]").attr("href");
       if (href) {
         location.href = href;
