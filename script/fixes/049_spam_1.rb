@@ -48,7 +48,7 @@ end
 
 combined_spammers.each do |uid|
   unless Ban.where(user_id: uid).exists?
-    Ban.create(duration: 10000, reason: "Spam (automated ref f6147ace)", user_id: uid)
+    Ban.create!(duration: 10000, reason: "Spam (automated ref f6147ace)", user_id: uid)
     puts "banned #{uid}"
     sleep 1
   end

@@ -13,6 +13,7 @@
 
     if ($("#c-posts").length && $("#a-index").length) {
       this.initialize_excerpt();
+      this.initialize_gestures();
     }
 
     if ($("#c-posts").length && $("#a-show").length) {
@@ -24,6 +25,7 @@
       this.initialize_post_image_resize_to_window_link();
       this.initialize_similar();
       this.initialize_replace_image_dialog();
+      this.initialize_gestures();
 
       if ((Danbooru.meta("always-resize-images") === "true") || ((Danbooru.Cookie.get("dm") != "1") && (window.innerWidth <= 660))) {
         $("#image-resize-to-window-link").click();
@@ -33,6 +35,38 @@
     if ($("#image").length) {
       this.initialize_edit_dialog();
     }
+  }
+
+  Danbooru.Post.initialize_gestures = function() {
+    var hasNext = $("a[rel~=next]").length > 0;
+    var hasPrev = $("a[rel~=prev]").length > 0;
+
+    if (hasNext) {
+      $("body").hammer().bind("panleft", function(e) {
+        var percentage = 100 * e.gesture.deltaX / window.innerWidth;
+        $("body").css({"transition-duration": "0.1s", "transform": "translateX(" + percentage + "%)"});
+      });
+    }
+
+    if (hasPrev) {
+      $("body").hammer().bind("panright", function(e) {
+        var percentage = 100 * e.gesture.deltaX / window.innerWidth;
+        $("body").css({"transition-duration": "0.1s", "transform": "translateX(" + percentage + "%)"});
+      });
+    }
+
+    $("body").hammer().bind("panend", function(e) {
+      var percentage = e.gesture.deltaX / window.innerWidth;
+      if (hasPrev && percentage > 0.4) {
+        $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(150%)"});
+        Danbooru.Post.nav_prev(e);
+      } else if (hasNext && percentage < -0.4) {
+        $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(-150%)"});
+        Danbooru.Post.nav_next(e);
+      } else {
+        $("body").css({"transition-timing-function": "ease", "transition-duration": "0.5s", "transform": "none"});
+      }
+    });
   }
 
   Danbooru.Post.initialize_edit_dialog = function(e) {
@@ -133,8 +167,10 @@
       if (href) {
         location.href = href;
       }
+    } else if ($(".paginator a[rel~=prev]").length) {
+      location.href = $("a[rel~=prev]").attr("href");
     } else {
-      var href = $("#pool-nav a.active[rel=prev], #favgroup-nav a.active[rel=prev]").attr("href");
+      var href = $("#pool-nav a.active[rel~=prev], #favgroup-nav a.active[rel~=prev]").attr("href");
       if (href) {
         location.href = href;
       }
@@ -147,8 +183,10 @@
     if ($("#search-seq-nav").length) {
       var href = $("#search-seq-nav a[rel~=next]").attr("href");
       location.href = href;
+    } else if ($("a[rel~=next]").length) {
+      location.href = $("a[rel~=next]").attr("href");
     } else {
-      var href = $("#pool-nav a.active[rel=next], #favgroup-nav a.active[rel=next]").attr("href");
+      var href = $("#pool-nav a.active[rel~=next], #favgroup-nav a.active[rel~=next]").attr("href");
       if (href) {
         location.href = href;
       }
