@@ -37,6 +37,15 @@
   }
 
   Danbooru.Post.initialize_gestures = function() {
+    if (!window.matchMedia) {
+      return;
+    }
+    
+    var mq = window.matchMedia('@media all and (max-width: 660px)');
+    if (!mq.matches) {
+      return;
+    }
+
     var hasNext = $("a[rel~=next]").length > 0;
     var hasPrev = $("a[rel~=prev]").length > 0;
 
