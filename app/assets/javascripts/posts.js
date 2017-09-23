@@ -40,8 +40,8 @@
     if (!window.matchMedia) {
       return;
     }
-    
-    var mq = window.matchMedia('@media all and (max-width: 660px)');
+
+    var mq = window.matchMedia('(max-width: 660px)');
     if (!mq.matches) {
       return;
     }
