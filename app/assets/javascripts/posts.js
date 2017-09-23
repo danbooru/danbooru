@@ -175,7 +175,7 @@
   }
 
   Danbooru.Post.nav_prev = function(e) {
-    if ($("#a-show")) {
+    if ($("#a-show").length) {
       window.history.back();
     } else if ($("#search-seq-nav").length) {
       var href = $("#search-seq-nav a[rel~=prev]").attr("href");
