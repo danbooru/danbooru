@@ -25,7 +25,6 @@
       this.initialize_post_image_resize_to_window_link();
       this.initialize_similar();
       this.initialize_replace_image_dialog();
-      this.initialize_gestures();
 
       if ((Danbooru.meta("always-resize-images") === "true") || ((Danbooru.Cookie.get("dm") != "1") && (window.innerWidth <= 660))) {
         $("#image-resize-to-window-link").click();
@@ -44,14 +43,18 @@
     if (hasNext) {
       $("body").hammer().bind("panleft", function(e) {
         var percentage = 100 * e.gesture.deltaX / window.innerWidth;
-        $("body").css({"transition-duration": "0.1s", "transform": "translateX(" + percentage + "%)"});
+        if (percentage < -10) {
+          $("body").css({"transition-duration": "0.1s", "transform": "translateX(" + percentage + "%)"});
+        }
       });
     }
 
     if (hasPrev) {
       $("body").hammer().bind("panright", function(e) {
         var percentage = 100 * e.gesture.deltaX / window.innerWidth;
-        $("body").css({"transition-duration": "0.1s", "transform": "translateX(" + percentage + "%)"});
+        if (percentage > 10) {
+          $("body").css({"transition-duration": "0.1s", "transform": "translateX(" + percentage + "%)"});
+        }
       });
     }
 
