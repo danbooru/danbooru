@@ -50,9 +50,9 @@
     $("body").hammer().bind("pan", function(e) {
       var percentage = 100 * e.gesture.deltaX / window.innerWidth;
       if (percentage < -10) {
-        $("body").css({"transition-duration": "0.1s", "transform": "translateX(" + percentage + "%)"});
+        $("body").css({"transition-timing-function": "linear", "transition-duration": "0.1s", "transform": "translateX(" + percentage + "%)"});
       } else if (percentage > 10) {
-        $("body").css({"transition-duration": "0.1s", "transform": "translateX(" + percentage + "%)"});
+        $("body").css({"transition-timing-function": "linear", "transition-duration": "0.1s", "transform": "translateX(" + percentage + "%)"});
       }
     });
 
@@ -62,10 +62,10 @@
     $("body").hammer().bind("panend", function(e) {
       var percentage = e.gesture.deltaX / window.innerWidth;
       if (hasPrev && percentage > 0.3) {
-        $("body").css({"transition-timing-function": "linear", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(150%)"});
+        $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(150%)"});
         $.timeout(250).done(function() {Danbooru.Post.nav_prev(e)});
       } else if (hasNext && percentage < -0.3) {
-        $("body").css({"transition-timing-function": "linear", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(-150%)"});
+        $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(-150%)"});
         $.timeout(250).done(function() {Danbooru.Post.nav_next(e)});
       } else {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.5s", "transform": "none"});

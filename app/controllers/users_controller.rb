@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
   respond_to :html, :xml, :json
   skip_before_filter :api_check
+  before_filter :process_session_actions, only: [:update]
 
   def new
     @user = User.new
@@ -77,6 +78,16 @@ class UsersController < ApplicationController
   end
 
 private
+
+  def process_session_actions
+    if params[:user].has_key?(:desktop_mode)
+      if params[:user].delete(:desktop_mode) == "0"
+        cookies.delete(:dm)
+      else
+        cookies[:dm] = "1"
+      end
+    end
+  end
 
   def check_privilege(user)
     raise User::PrivilegeError unless (user.id == CurrentUser.id || CurrentUser.is_admin?)

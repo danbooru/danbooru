@@ -74,17 +74,23 @@
 
         <%= f.input :disable_tagged_filenames, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
 
-        <%= f.input :disable_cropped_thumbnails, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
-
-        <%= f.input :enable_recent_searches, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
-
-        <%= f.input :favorite_tags, :label => "Frequent tags", :hint => "A list of tags that you use often. They will appear when using the list of Related Tags.", :input_html => { :rows => 5, :data => { :autocomplete => "tag-query" } } %>
+        <%#= f.input :disable_cropped_thumbnails, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
 
         <div class="input text optional field_with_hint">
           <label class="text optional" for="user_dmail_filter_attributes_words">Dmail filter</label>
           <%= hidden_field_tag "user[dmail_filter_attributes][id]", @user.dmail_filter.try(:id) %>
           <%= text_field_tag "user[dmail_filter_attributes][words]", @user.dmail_filter.try(:words), :id => "user_dmail_filter_attributes_words", :class => "text optional", :size => 40 %>
           <span class="hint">A list of banned words (space delimited). Any dmail you receive with a banned word will automatically be deleted.</span>
+        </div>
+
+        <%= f.input :enable_recent_searches, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
+
+        <%= f.input :favorite_tags, :label => "Frequent tags", :hint => "A list of tags that you use often. They will appear when using the list of Related Tags.", :input_html => { :rows => 5, :data => { :autocomplete => "tag-query" } } %>
+
+        <div class="input select field_with_hint">
+          <label class="select optional" for="user_desktop_mode">Desktop mode</label>
+          <%= select_tag "user[desktop_mode]", options_for_select([["No", "0"], ["Yes", "1"]], cookies[:dm]), :class => "select optional" %>
+          <span class="hint">Force desktop version of site even on mobile.</span>
         </div>
 
         <%= f.input :custom_style, :label => "Custom <a href='http://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, :hint => "Style to apply to the whole site.", :input_html => {:size => "40x5"} %>
