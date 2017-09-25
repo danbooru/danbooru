@@ -69,7 +69,7 @@ configure the [Listbooru service](https://github.com/r888888888/listbooru).
 
 ### Archive Service
 
-In order to access versioned data for pools (and eventually posts) you will 
+In order to access versioned data for pools and posts you will 
 need to install and configure the [Archives service](https://github.com/r888888888/archives).
 
 ### Reportbooru Service
