@@ -49,9 +49,9 @@
 
     $("body").hammer().bind("pan", function(e) {
       var percentage = 100 * e.gesture.deltaX / window.innerWidth;
-      if (percentage < -10) {
+      if (percentage < -20 || e.gesture.velocityX <= -0.6) {
         $("body").css({"transition-timing-function": "linear", "transition-duration": "0.1s", "transform": "translateX(" + percentage + "%)"});
-      } else if (percentage > 10) {
+      } else if (percentage > 20 || e.gesture.velocityX >= 0.6) {
         $("body").css({"transition-timing-function": "linear", "transition-duration": "0.1s", "transform": "translateX(" + percentage + "%)"});
       }
     });
