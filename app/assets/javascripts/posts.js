@@ -50,7 +50,7 @@
     var hasNext = $("a[rel~=next]").length;
 
     $("body").hammer().bind("pan", function(e) {
-      if (Math.abs(e.gesture.deltaY) > 100) {
+      if (Math.abs(e.gesture.deltaY) > 50) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.5s", "transform": "none"});
         return;
       }
@@ -68,7 +68,7 @@
 
     $("body").hammer().bind("panend", function(e) {
       var percentage = e.gesture.deltaX / window.innerWidth;
-      if (Math.abs(e.gesture.deltaY) > 100) {
+      if (Math.abs(e.gesture.deltaY) > 50) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.5s", "transform": "none"});
       } else if (percentage > 0.3 && hasPrev) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(150%)"});
