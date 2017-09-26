@@ -46,27 +46,36 @@
     if (!mq.matches) {
       return;
     }
+    var hasPrev = $("a[rel~=prev]").length;
+    var hasNext = $("a[rel~=next]").length;
 
     $("body").hammer().bind("pan", function(e) {
+      if (Math.abs(e.gesture.deltaY) > 100) {
+        $("body").css({"transition-timing-function": "ease", "transition-duration": "0.5s", "transform": "none"});
+        return;
+      }
+      if (e.gesture.deltaX > 0 && !hasPrev) {
+        return;
+      }
+      if (e.gesture.deltaX < 0 && !hasNext) {
+        return;
+      }
       var percentage = 100 * e.gesture.deltaX / window.innerWidth;
-      if (percentage < -20 || e.gesture.velocityX <= -0.6) {
-        $("body").css({"transition-timing-function": "linear", "transition-duration": "0.1s", "transform": "translateX(" + percentage + "%)"});
-      } else if (percentage > 20 || e.gesture.velocityX >= 0.6) {
-        $("body").css({"transition-timing-function": "linear", "transition-duration": "0.1s", "transform": "translateX(" + percentage + "%)"});
+      if (Math.abs(percentage) > 10) {
+        $("body").css({"transition-duration": "0.1s", "transform": "translateX(" + percentage + "%)"});
       }
     });
 
-    var hasNext = $(".paginator a[rel~=next]").length > 0;
-    var hasPrev = $("#a-show").length || $(".paginator a[rel~=prev]").length > 0;
-
     $("body").hammer().bind("panend", function(e) {
       var percentage = e.gesture.deltaX / window.innerWidth;
-      if (hasPrev && percentage > 0.3) {
+      if (Math.abs(e.gesture.deltaY) > 100) {
+        $("body").css({"transition-timing-function": "ease", "transition-duration": "0.5s", "transform": "none"});
+      } else if (percentage > 0.3 && hasPrev) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(150%)"});
-        $.timeout(250).done(function() {Danbooru.Post.nav_prev(e)});
-      } else if (hasNext && percentage < -0.3) {
+        $.timeout(300).done(function() {Danbooru.Post.nav_prev(e)});
+      } else if (percentage < -0.3 && hasNext) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(-150%)"});
-        $.timeout(250).done(function() {Danbooru.Post.nav_next(e)});
+        $.timeout(300).done(function() {Danbooru.Post.nav_next(e)});
       } else {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.5s", "transform": "none"});
       }
