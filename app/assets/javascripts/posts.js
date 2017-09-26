@@ -57,7 +57,7 @@
       } else if ((percentage > 0.3 || (percentage > 0.1 && swipe)) && hasPrev) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(150%)"});
         $.timeout(300).done(function() {Danbooru.Post.swipe_prev(e)});
-      } else if (percentage < -0.3 || (percentage < -0.1 && swipe) && hasNext) {
+      } else if ((percentage < -0.3 || (percentage < -0.1 && swipe)) && hasNext) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(-150%)"});
         $.timeout(300).done(function() {Danbooru.Post.swipe_next(e)});
       }
