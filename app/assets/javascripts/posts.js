@@ -49,31 +49,15 @@
     var hasPrev = $("a[rel~=prev]").length;
     var hasNext = $("a[rel~=next]").length;
 
-    $("body").hammer().bind("pan", function(e) {
-      if (Math.abs(e.gesture.deltaY) > 50) {
-        $("body").css({"transition-timing-function": "ease", "transition-duration": "0.5s", "transform": "none"});
-        return;
-      }
-      if (e.gesture.deltaX > 0 && !hasPrev) {
-        return;
-      }
-      if (e.gesture.deltaX < 0 && !hasNext) {
-        return;
-      }
-      var percentage = 100 * e.gesture.deltaX / window.innerWidth;
-      if (Math.abs(percentage) > 10) {
-        $("body").css({"transition-duration": "0.1s", "transform": "translateX(" + percentage + "%)"});
-      }
-    });
-
     $("body").hammer().bind("panend", function(e) {
       var percentage = e.gesture.deltaX / window.innerWidth;
-      if (Math.abs(e.gesture.deltaY) > 50) {
-        $("body").css({"transition-timing-function": "ease", "transition-duration": "0.5s", "transform": "none"});
-      } else if (percentage > 0.3 && hasPrev) {
+      var swipe = Math.abs(e.gesture.velocityX) > 0.5;
+      if (Math.abs(e.gesture.deltaY) > 75) {
+        return;
+      } else if ((percentage > 0.3 || (percentage > 0.1 && swipe)) && hasPrev) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(150%)"});
         $.timeout(300).done(function() {Danbooru.Post.nav_prev(e)});
-      } else if (percentage < -0.3 && hasNext) {
+      } else if (percentage < -0.3 || (percentage < -0.1 && swipe) && hasNext) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(-150%)"});
         $.timeout(300).done(function() {Danbooru.Post.nav_next(e)});
       } else {
