@@ -47,7 +47,7 @@
       return;
     }
     var hasPrev = $("#a-show").length || $(".paginator a[rel~=prev]").length;
-    var hasNext = $(".paginator a[rel~=next]").length;
+    var hasNext = $("#a-index").length && $(".paginator a[rel~=next]").length;
 
     $("body").hammer().bind("panend", function(e) {
       var percentage = e.gesture.deltaX / window.innerWidth;
@@ -60,8 +60,6 @@
       } else if (percentage < -0.3 || (percentage < -0.1 && swipe) && hasNext) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(-150%)"});
         $.timeout(300).done(function() {Danbooru.Post.swipe_next(e)});
-      } else {
-        $("body").css({"transition-timing-function": "ease", "transition-duration": "0.5s", "transform": "none"});
       }
     });
   }
