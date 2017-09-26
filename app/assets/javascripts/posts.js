@@ -46,8 +46,8 @@
     if (!mq.matches) {
       return;
     }
-    var hasPrev = $("a[rel~=prev]").length;
-    var hasNext = $("a[rel~=next]").length;
+    var hasPrev = $("#a-show").length || $(".paginator a[rel~=prev]").length;
+    var hasNext = $(".paginator a[rel~=next]").length;
 
     $("body").hammer().bind("panend", function(e) {
       var percentage = e.gesture.deltaX / window.innerWidth;
@@ -56,10 +56,10 @@
         return;
       } else if ((percentage > 0.3 || (percentage > 0.1 && swipe)) && hasPrev) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(150%)"});
-        $.timeout(300).done(function() {Danbooru.Post.nav_prev(e)});
+        $.timeout(300).done(function() {Danbooru.Post.swipe_prev(e)});
       } else if (percentage < -0.3 || (percentage < -0.1 && swipe) && hasNext) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(-150%)"});
-        $.timeout(300).done(function() {Danbooru.Post.nav_next(e)});
+        $.timeout(300).done(function() {Danbooru.Post.swipe_next(e)});
       } else {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.5s", "transform": "none"});
       }
@@ -158,10 +158,18 @@
     });
   }
 
-  Danbooru.Post.nav_prev = function(e) {
+  Danbooru.Post.swipe_prev = function(e) {
     if ($("#a-show").length) {
       window.history.back();
-    } else if ($("#search-seq-nav").length) {
+    } if ($(".paginator a[rel~=prev]").length) {
+      location.href = $("a[rel~=prev]").attr("href");
+    }
+
+    e.preventDefault();
+  }
+
+  Danbooru.Post.nav_prev = function(e) {
+    if ($("#search-seq-nav").length) {
       var href = $("#search-seq-nav a[rel~=prev]").attr("href");
       if (href) {
         location.href = href;
@@ -189,6 +197,14 @@
       if (href) {
         location.href = href;
       }
+    }
+
+    e.preventDefault();
+  }
+
+  Danbooru.Post.swipe_next = function(e) {
+    if ($(".paginator a[rel~=next]").length) {
+      location.href = $(".paginator a[rel~=next]").attr("href");
     }
 
     e.preventDefault();
