@@ -401,7 +401,7 @@ class Tag < ApplicationRecord
         output[:include] << tag[1..-1].mb_chars.downcase
 
       elsif tag =~ /\*/
-        matches = Tag.name_matches(tag.downcase).select("name").limit(Danbooru.config.tag_query_limit).order("post_count DESC").map(&:name)
+        matches = Tag.name_matches(tag).select("name").limit(Danbooru.config.tag_query_limit).order("post_count DESC").map(&:name)
         matches = ["~no_matches~"] if matches.empty?
         output[:include] += matches
 
@@ -792,7 +792,7 @@ class Tag < ApplicationRecord
     end
 
     def name_matches(name)
-      where("tags.name LIKE ? ESCAPE E'\\\\'", name.mb_chars.downcase.to_escaped_for_sql_like)
+      where("tags.name LIKE ? ESCAPE E'\\\\'", normalize_name(name).to_escaped_for_sql_like)
     end
 
     def named(name)
@@ -804,11 +804,11 @@ class Tag < ApplicationRecord
       params = {} if params.blank?
 
       if params[:name_matches].present?
-        q = q.name_matches(params[:name_matches].strip.tr(" ", "_"))
+        q = q.name_matches(params[:name_matches])
       end
 
       if params[:name].present?
-        q = q.where("tags.name in (?)", params[:name].split(","))
+        q = q.where("tags.name": normalize_name(params[:name]).split(","))
       end
 
       if params[:category].present?
