@@ -27,7 +27,7 @@
       this.initialize_replace_image_dialog();
       this.initialize_gestures();
 
-      if ((Danbooru.meta("always-resize-images") === "true") || ((Danbooru.Cookie.get("dm") != "1") && (window.innerWidth <= 660))) {
+      if ((Danbooru.meta("always-resize-images") === "true") || ((Danbooru.Cookie.get("dm") !== "1") && (window.screen.width <= 660))) {
         $("#image-resize-to-window-link").click();
       }
     }
