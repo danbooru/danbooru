@@ -400,6 +400,9 @@
         $img.css("height", $img.data("original-height") * ratio);
         Danbooru.Post.resize_ugoira_controls();
         $("#image-container").css({overflow: "visible"});
+        if ($("body").data("hammer")) {
+          $("body").data("hammer").set({enable: true});
+        }
       }
     } else {
       $img.data("scale-factor", 1);
@@ -407,6 +410,9 @@
       $img.height($img.data("original-height"));
       Danbooru.Post.resize_ugoira_controls();
       $("#image-container").css({overflow: "scroll"});
+      if ($("body").data("hammer")) {
+        $("body").data("hammer").set({enable: false});
+      }
     }
 
     Danbooru.Note.Box.scale_all();
