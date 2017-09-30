@@ -61,7 +61,7 @@ class AnonymousUser
   end
 
   def always_resize_images?
-    false
+    true
   end
 
   def show_samples?

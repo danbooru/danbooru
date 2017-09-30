@@ -1,59 +1,62 @@
 <ul>
   <li><%= link_to "Resize to window", "#", :id => "image-resize-to-window-link" %></li>
-  <li><%= link_to "Favorite", favorites_path(:post_id => post.id), :remote => true, :method => :post, :id => "add-to-favorites", :title => "Shortcut is F" %></li>
-  <li><%= link_to "Unfavorite", favorite_path(post), :remote => true, :method => :delete, :id => "remove-from-favorites" %></li>
-  <li><%= link_to_if post.visible?, "Download", post.file_url, :download => post.presenter.humanized_essential_tag_string + " - " + post.file_name %></li>
-  <li id="add-to-pool-list"><%= link_to "Add to pool", "#", :id => "pool" %></li>
-  <% if post.is_note_locked? %>
-    <li id="add-notes-list"><span id="note-locked-notice">Note locked</span></li>
-  <% else %>
-    <li id="add-notes-list"><%= link_to "Add note", "#", :id => "translate", :title => "Shortcut is N" %></li>
-  <% end %>
-  <% if CurrentUser.is_builder? && post.has_notes? %>
-    <li id="copy-all-notes-list"><%= link_to "Copy notes", "#", :id => "copy-notes" %></li>
-  <% end %>
-  <li id="add-artist-commentary-list"><%= link_to "Add commentary", "#", :id => "add-commentary" %></li>
-  <li><%= link_to "Add to favorite group", "#", :id => "open-favgroup-dialog-link" %></li>
-  <li><%= link_to "Find similar", iqdb_queries_path(:post_id => post.id), :method => :post, :remote => true %></li>
 
-  <% if post.is_status_locked? %>
-    <li><span id="status-locked-notice">Status locked</span></li>
-  <% else %>
-    <% if !post.is_deleted? && !post.is_pending? %>
-      <li><%= link_to "Flag", new_post_flag_path(:post_id => post.id), :id => "flag" %></li>
+  <% if CurrentUser.is_member? %>
+    <li><%= link_to "Favorite", favorites_path(:post_id => post.id), :remote => true, :method => :post, :id => "add-to-favorites", :title => "Shortcut is F" %></li>
+    <li><%= link_to "Unfavorite", favorite_path(post), :remote => true, :method => :delete, :id => "remove-from-favorites" %></li>
+    <li><%= link_to_if post.visible?, "Download", post.file_url, :download => post.presenter.humanized_essential_tag_string + " - " + post.file_name %></li>
+    <li id="add-to-pool-list"><%= link_to "Add to pool", "#", :id => "pool" %></li>
+    <% if post.is_note_locked? %>
+      <li id="add-notes-list"><span id="note-locked-notice">Note locked</span></li>
+    <% else %>
+      <li id="add-notes-list"><%= link_to "Add note", "#", :id => "translate", :title => "Shortcut is N" %></li>
     <% end %>
-
-    <% if post.is_flagged? || post.is_deleted? %>
-      <li><%= link_to "Appeal", new_post_appeal_path(:post_id => post.id), :id => "appeal" %></li>
+    <% if CurrentUser.is_builder? && post.has_notes? %>
+      <li id="copy-all-notes-list"><%= link_to "Copy notes", "#", :id => "copy-notes" %></li>
     <% end %>
+    <li id="add-artist-commentary-list"><%= link_to "Add commentary", "#", :id => "add-commentary" %></li>
+    <li><%= link_to "Add to favorite group", "#", :id => "open-favgroup-dialog-link" %></li>
+    <li><%= link_to "Find similar", iqdb_queries_path(:post_id => post.id), :method => :post, :remote => true %></li>
 
-    <% if CurrentUser.can_approve_posts? %>
-      <% if post.is_deleted? %>
-        <li><%= link_to "Undelete", undelete_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "undelete", :data => { :confirm => "Are you sure you want to undelete this post?" } %></li>
-        <% if post.fav_count > 0 && post.parent_id %>
-          <li><%= link_to "Move favorites", confirm_move_favorites_moderator_post_post_path(:post_id => post.id) %></li>
+    <% if post.is_status_locked? %>
+      <li><span id="status-locked-notice">Status locked</span></li>
+    <% else %>
+      <% if !post.is_deleted? && !post.is_pending? %>
+        <li><%= link_to "Flag", new_post_flag_path(:post_id => post.id), :id => "flag" %></li>
+      <% end %>
+
+      <% if post.is_flagged? || post.is_deleted? %>
+        <li><%= link_to "Appeal", new_post_appeal_path(:post_id => post.id), :id => "appeal" %></li>
+      <% end %>
+
+      <% if CurrentUser.can_approve_posts? %>
+        <% if post.is_deleted? %>
+          <li><%= link_to "Undelete", undelete_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "undelete", :data => { :confirm => "Are you sure you want to undelete this post?" } %></li>
+          <% if post.fav_count > 0 && post.parent_id %>
+            <li><%= link_to "Move favorites", confirm_move_favorites_moderator_post_post_path(:post_id => post.id) %></li>
+          <% end %>
+        <% else %>
+          <li><%= link_to "Delete", confirm_delete_moderator_post_post_path(:post_id => post.id) %></li>
         <% end %>
-      <% else %>
-        <li><%= link_to "Delete", confirm_delete_moderator_post_post_path(:post_id => post.id) %></li>
-      <% end %>
 
-      <% if post.is_flagged? || post.is_pending? %>
-        <li><%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :remote => true, :method => :post, :id => "approve", :data => { :confirm => "Are you sure you want to approve this post?" } %></li>
-      <% else %>
-        <li><%= link_to "Hide from queue", moderator_post_disapproval_path(:post_id => post.id), :remote => true, :method => :post, :id => "disapprove" %></li>
-      <% end %>
+        <% if post.is_flagged? || post.is_pending? %>
+          <li><%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :remote => true, :method => :post, :id => "approve", :data => { :confirm => "Are you sure you want to approve this post?" } %></li>
+        <% else %>
+          <li><%= link_to "Hide from queue", moderator_post_disapproval_path(:post_id => post.id), :remote => true, :method => :post, :id => "disapprove" %></li>
+        <% end %>
 
-      <% if post.is_banned? %>
-        <li><%= link_to "Unban", unban_moderator_post_post_path(post), :method => :post %></li>
-      <% else %>
-        <li><%= link_to "Ban", confirm_ban_moderator_post_post_path(post) %></li>
-      <% end %>
+        <% if post.is_banned? %>
+          <li><%= link_to "Unban", unban_moderator_post_post_path(post), :method => :post %></li>
+        <% else %>
+          <li><%= link_to "Ban", confirm_ban_moderator_post_post_path(post) %></li>
+        <% end %>
 
-      <% if CurrentUser.is_admin? %>
-        <li><%= link_to "Expunge", expunge_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "expunge", :data => {:confirm => "This will permanently delete this post (meaning the file will be deleted). Are you sure you want to delete this post?"} %></li>
-      <% end %>
+        <% if CurrentUser.is_admin? %>
+          <li><%= link_to "Expunge", expunge_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "expunge", :data => {:confirm => "This will permanently delete this post (meaning the file will be deleted). Are you sure you want to delete this post?"} %></li>
+        <% end %>
 
-      <li><%= link_to "Replace Image", new_post_replacement_path(:post_id => post.id), :id => "replace-image" %></li>
+        <li><%= link_to "Replace Image", new_post_replacement_path(:post_id => post.id), :id => "replace-image" %></li>
+      <% end %>
     <% end %>
   <% end %>
 </ul>

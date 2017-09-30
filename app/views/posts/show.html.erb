@@ -14,12 +14,12 @@
         <%= render "posts/partials/show/information", :post => @post %>
       </section>
 
-      <% if CurrentUser.is_member? %>
-        <section id="post-options">
-          <h1>Options</h1>
-          <%= render "posts/partials/show/options", :post => @post %>
-        </section>
+      <section id="post-options">
+        <h1>Options</h1>
+        <%= render "posts/partials/show/options", :post => @post %>
+      </section>
 
+      <% if CurrentUser.is_member? %>
         <section id="post-history">
           <h1>History</h1>
           <ul>
