@@ -127,8 +127,8 @@
     display: inline-block;
 
     a {
-      width: 48.5vw;
-      display: block;
+      //width: 48.5vw;
+      //display: block;
       margin: 0 auto;
     }
     img {
@@ -139,12 +139,10 @@
       border: none !important;
     }
     &[data-tags~=animated]:before, &[data-file-ext=swf]:before, &[data-file-ext=webm]:before, &[data-file-ext=mp4]:before, &[data-file-ext=zip]:before {
-      left: 0.5vw;
       @include animated-icon;
     }
 
     &[data-has-sound=true]:before {
-      left: 0.5vw;
       @include sound-icon;
     }
   }
