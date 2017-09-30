@@ -38,6 +38,11 @@
   }
 
   Danbooru.Post.initialize_gestures = function() {
+    var $body = $("body");
+    if ($body.data("hammer")) {
+      return;
+    }
+
     if (!window.matchMedia) {
       return;
     }
@@ -394,12 +399,14 @@
         $img.css("width", $img.data("original-width") * ratio);
         $img.css("height", $img.data("original-height") * ratio);
         Danbooru.Post.resize_ugoira_controls();
+        $("#image-container").css({overflow: "visible"});
       }
     } else {
       $img.data("scale-factor", 1);
       $img.width($img.data("original-width"));
       $img.height($img.data("original-height"));
       Danbooru.Post.resize_ugoira_controls();
+      $("#image-container").css({overflow: "scroll"});
     }
 
     Danbooru.Note.Box.scale_all();
