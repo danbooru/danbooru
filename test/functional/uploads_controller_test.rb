@@ -28,6 +28,14 @@ class UploadsControllerTest < ActionController::TestCase
           assert_response :success
         end
       end
+
+      context "for pixiv ugoira galleries" do
+        should "render" do
+          get :batch, {:url => "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=59523577"}, {:user_id => @user.id}
+          assert_response :success
+          assert_no_match(/59523577_ugoira0\.jpg/, response.body)
+        end
+      end
     end
 
     context "new action" do
