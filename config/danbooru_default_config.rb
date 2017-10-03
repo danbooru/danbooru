@@ -569,6 +569,9 @@ module Danbooru
 
     def ccs_key
     end
+
+    def aws_sqs_cropper_url
+    end
   end
 
   class EnvironmentConfiguration
