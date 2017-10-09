@@ -2,6 +2,17 @@ require 'test_helper'
 
 module Sources
   class DeviantArtTest < ActiveSupport::TestCase
+    context "The source for a private DeviantArt image URL" do
+      setup do
+        @site = Sources::Site.new("https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png")
+        @site.get
+      end
+
+      should "work" do
+        assert_equal(["https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png"], @site.image_urls)
+      end
+    end
+
     context "The source for an DeviantArt artwork page" do
       setup do
         @site = Sources::Site.new("http://noizave.deviantart.com/art/test-post-please-ignore-685436408")

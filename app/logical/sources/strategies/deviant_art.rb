@@ -33,6 +33,11 @@ module Sources
           @artist_commentary_title = get_artist_commentary_title_from_page(page)
           @artist_commentary_desc = get_artist_commentary_desc_from_page(page)
         end
+      rescue Mechanize::ResponseCodeError
+        # try the normal url
+        if url =~ /\.(jpg|jpeg|png|gif)/
+          @image_url = url
+        end
       end
 
       def self.to_dtext(text)
