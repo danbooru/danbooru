@@ -25,11 +25,11 @@
             <td>
               <dl>
                 <dt>Original Source</dt>
-                <dd><%= external_link_to post_replacement.original_url %></dd>
+                <dd><%= external_link_to post_replacement.original_url, truncate: 64 %></dd>
                 <dt>Replacement Source</dt>
                 <dd>
                   <% if post_replacement.replacement_url.present? %>
-                    <%= external_link_to post_replacement.replacement_url %>
+                    <%= external_link_to post_replacement.replacement_url, truncate: 64 %>
                   <% else %>
                     <em>file</em>
                   <% end %>
