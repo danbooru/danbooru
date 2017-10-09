@@ -46,7 +46,6 @@
     if (!window.matchMedia) {
       return;
     }
-
     var mq = window.matchMedia('(max-width: 660px)');
     if (!mq.matches) {
       return;
@@ -54,7 +53,7 @@
     var hasPrev = $("#a-show").length || $(".paginator a[rel~=prev]").length;
     var hasNext = $("#a-index").length && $(".paginator a[rel~=next]").length;
 
-    $("body").hammer().bind("panend", function(e) {
+    $body.hammer().bind("panend", function(e) {
       var percentage = e.gesture.deltaX / window.innerWidth;
       var swipe = Math.abs(e.gesture.velocityX) > 0.6;
       if (Math.abs(e.gesture.deltaY) > 75) {
@@ -339,46 +338,38 @@
     $img.attr("title", $post.attr("data-tags") + " user:" + $post.attr("data-uploader").replace(/_/g, " ") + " rating:" + $post.data("rating") + score);
   }
 
-  Danbooru.Post.initialize_post_image_resize_links = function() {
-    $("#image-resize-link").click(function(e) {
-      var $link = $(e.target);
-      var $image = $("#image");
-      var $notice = $("#image-resize-notice");
-      $image.attr("src", $link.attr("href"));
-      $image.css("opacity", "0.25");
-      $image.width($image.data("original-width"));
-      $image.height($image.data("original-height"));        
-      $image.on("load", function() {
-        $image.css("opacity", "1");
-        $notice.hide();
-      });
-      $notice.children().eq(0).hide();
-      $notice.children().eq(1).show(); // Loading message
-      Danbooru.Note.Box.scale_all();
-      $image.data("scale-factor", 1);
-      e.preventDefault();
+  Danbooru.Post.expand_image = function(e) {
+    var $link = $(e.target);
+    var $image = $("#image");
+    var $notice = $("#image-resize-notice");
+    $image.attr("src", $link.attr("href"));
+    $image.css("opacity", "0.25");
+    $image.width($image.data("original-width"));
+    $image.height($image.data("original-height"));        
+    $image.on("load", function() {
+      $image.css("opacity", "1");
+      $notice.hide();
     });
+    $notice.children().eq(0).hide();
+    $notice.children().eq(1).show(); // Loading message
+    Danbooru.Note.Box.scale_all();
+    $image.data("scale-factor", 1);
+    if ($("body").data("hammer")) {
+      $("#image-container").css({overflow: "scroll"});
+      $("body").data("hammer").set({enable: false});
+    }
+    e.preventDefault();
+  }
+
+  Danbooru.Post.initialize_post_image_resize_links = function() {
+    $("#image-resize-link").click(Danbooru.Post.expand_image);
 
     if ($("#image-resize-notice").length) {
       Danbooru.keydown("v", "resize", function(e) {
         if ($("#image-resize-notice").is(":visible")) {
           $("#image-resize-link").click();
         } else {
-          var $image = $("#image");
-          var $notice = $("#image-resize-notice");
-          $image.attr("src", $("#image-container").data("large-file-url"));
-          $image.css("opacity", "0.25");
-          $image.width($image.data("large-width"));
-          $image.height($image.data("large-height")); 
-          $notice.children().eq(0).show();
-          $notice.children().eq(1).hide(); // Loading message
-          $image.on("load", function() {
-            $image.css("opacity", "1");
-            $notice.show();
-          });
-          Danbooru.Note.Box.scale_all();
-          $image.data("scale-factor", 1);
-          e.preventDefault();
+          Danbooru.Post.expand_image(e);
         }
       });
     }
@@ -399,8 +390,8 @@
         $img.css("width", $img.data("original-width") * ratio);
         $img.css("height", $img.data("original-height") * ratio);
         Danbooru.Post.resize_ugoira_controls();
-        $("#image-container").css({overflow: "visible"});
         if ($("body").data("hammer")) {
+          $("#image-container").css({overflow: "visible"});
           $("body").data("hammer").set({enable: true});
         }
       }
@@ -409,8 +400,8 @@
       $img.width($img.data("original-width"));
       $img.height($img.data("original-height"));
       Danbooru.Post.resize_ugoira_controls();
-      $("#image-container").css({overflow: "scroll"});
       if ($("body").data("hammer")) {
+        $("#image-container").css({overflow: "scroll"});
         $("body").data("hammer").set({enable: false});
       }
     }
