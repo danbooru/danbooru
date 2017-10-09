@@ -643,8 +643,8 @@ class PostTest < ActiveSupport::TestCase
           assert_equal(Tag.categories.copyright, Tag.find_by_name("abc").category)
         end
 
-        should "update the category cache of the tag" do
-          assert_equal(Tag.categories.copyright, Cache.get("tc:abc"))
+        should "1234 update the category cache of the tag" do
+          assert_equal(Tag.categories.copyright, Cache.get("tc:#{Cache.hash('abc')}"))
         end
 
         should "update the tag counts of the posts" do
@@ -734,21 +734,29 @@ class PostTest < ActiveSupport::TestCase
       end
 
       context "tagged with a metatag" do
-        context "for an alias cosplay tag" do
+
+        context "for typing a tag" do
           setup do
-            @alias = FactoryGirl.create(:tag_alias, antecedent_name: "hoge", consequent_name: "moge")
-            @post = FactoryGirl.create(:post, tag_string: "char:hoge_(cosplay)")
+            @post = FactoryGirl.create(:post, tag_string: "char:hoge")
             @tags = @post.tag_array
           end
 
-          should "add the cosplay tag" do
-            assert(@tags.include?("cosplay"))
+          should "change the type" do
+            assert(Tag.where(name: "hoge", category: 4).exists?, "expected 'moge' tag to be created as a character")
+          end
+        end
+
+        context "for typing an aliased tag" do
+          setup do
+            @alias = FactoryGirl.create(:tag_alias, antecedent_name: "hoge", consequent_name: "moge")
+            @post = FactoryGirl.create(:post, tag_string: "char:hoge")
+            @tags = @post.tag_array
           end
 
-          should "create the tag" do
-            assert(Tag.where(name: "someone_(cosplay)").exists?, "expected 'someone_(cosplay)' tag to be created")
-            assert(Tag.where(name: "someone_(cosplay)", category: 4).exists?, "expected 'someone_(cosplay)' tag to be created as character")
-            assert(Tag.where(name: "someone", category: 4).exists?, "expected 'someone' tag to be created")
+          should "change the type" do
+            assert_equal(["moge"], @tags)
+            assert(Tag.where(name: "moge", category: 0).exists?, "expected 'moge' tag to be created as a character")
+            assert(Tag.where(name: "hoge", category: 4).exists?, "expected 'moge' tag to be created as a character")
           end
         end
 

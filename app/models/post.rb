@@ -683,14 +683,14 @@ class Post < ApplicationRecord
 
     def normalize_tags
       normalized_tags = Tag.scan_tags(tag_string)
-      normalized_tags = filter_metatags(normalized_tags)
       normalized_tags = normalized_tags.map {|tag| tag.downcase}
+      normalized_tags = filter_metatags(normalized_tags)
       normalized_tags = remove_negated_tags(normalized_tags)
-      normalized_tags = %w(tagme) if normalized_tags.empty?
       normalized_tags = TagAlias.to_aliased(normalized_tags)
+      normalized_tags = %w(tagme) if normalized_tags.empty?
+      normalized_tags = TagImplication.with_descendants(normalized_tags)
       normalized_tags = Tag.create_for_list(add_automatic_tags(normalized_tags))
       normalized_tags = normalized_tags + Tag.create_for_list(TagImplication.automatic_tags_for(normalized_tags))
-      normalized_tags = TagImplication.with_descendants(normalized_tags)
       normalized_tags = normalized_tags.compact
       normalized_tags.sort!
       set_tag_string(normalized_tags.uniq.sort.join(" "))
@@ -765,9 +765,21 @@ class Post < ApplicationRecord
 
     def filter_metatags(tags)
       @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent|-parent|source|-?locked):/i}
+      tags = apply_categorization_metatags(tags)
       @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav|-fav|child|-favgroup|favgroup|upvote|downvote):/i}
       apply_pre_metatags
       return tags
+    end
+
+    def apply_categorization_metatags(tags)
+      tags.map do |x|
+        if x =~ Tag.categories.regexp
+          tag = Tag.find_or_create_by_name(x)
+          tag.name
+        else
+          x
+        end
+      end
     end
 
     def apply_post_metatags
@@ -827,6 +839,7 @@ class Post < ApplicationRecord
         when /^favgroup:(.+)$/i
           favgroup = FavoriteGroup.named($1).for_creator(CurrentUser.user.id).first
           favgroup.add!(id) if favgroup
+
         end
       end
     end
@@ -870,6 +883,7 @@ class Post < ApplicationRecord
 
         when /^(-?)locked:status$/i
           assign_attributes({ is_status_locked: $1 != "-" }, as: CurrentUser.role)
+
         end
       end
     end
