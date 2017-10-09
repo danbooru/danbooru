@@ -684,13 +684,12 @@ class Post < ApplicationRecord
     def normalize_tags
       normalized_tags = Tag.scan_tags(tag_string)
       normalized_tags = filter_metatags(normalized_tags)
-      normalized_tags = normalized_tags.map{|tag| tag.downcase}
+      normalized_tags = normalized_tags.map {|tag| tag.downcase}
       normalized_tags = remove_negated_tags(normalized_tags)
-      normalized_tags = normalized_tags.map {|x| Tag.find_or_create_by_name(x).name}
       normalized_tags = %w(tagme) if normalized_tags.empty?
       normalized_tags = TagAlias.to_aliased(normalized_tags)
-      normalized_tags = add_automatic_tags(normalized_tags)
-      normalized_tags = normalized_tags + TagImplication.automatic_tags_for(normalized_tags)
+      normalized_tags = Tag.create_for_list(add_automatic_tags(normalized_tags))
+      normalized_tags = normalized_tags + Tag.create_for_list(TagImplication.automatic_tags_for(normalized_tags))
       normalized_tags = TagImplication.with_descendants(normalized_tags)
       normalized_tags = normalized_tags.compact
       normalized_tags.sort!

@@ -194,6 +194,10 @@ class Tag < ApplicationRecord
       name.to_s.mb_chars.downcase.strip.tr(" ", "_").to_s
     end
 
+    def create_for_list(names)
+      names.map {|x| find_or_create_by_name(x).name}
+    end
+
     def find_or_create_by_name(name, options = {})
       name = normalize_name(name)
       category = nil
