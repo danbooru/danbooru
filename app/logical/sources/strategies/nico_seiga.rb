@@ -95,9 +95,9 @@ module Sources
           if page.is_a?(Mechanize::Image)
             return page.uri.to_s
           end
-          images = page.search("img").select {|x| x["src"] =~ /\/priv\//}
+          images = page.search("div.illust_view_big").select {|x| x["data-src"] =~ /\/priv\//}
           if images.any?
-            image_url = "http://lohas.nicoseiga.jp" + images[0]["src"]
+            image_url = "http://lohas.nicoseiga.jp" + images[0]["data-src"]
           end
         else
           image_url = nil
