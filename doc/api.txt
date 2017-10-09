@@ -74,7 +74,7 @@ h2. Update
 The base URL is PUT /posts/$id.json where $id is the post id.
 
 * [b]post[tag_string][/b] A space delimited list of tags.
-* [b]post[rating][/b] The rating for the post. Can be: safe, questionable, or explicit.
+* [b]post[rating][/b] The rating for the post. Can be: s (for safe), q (for questionable), or e (for explicit).
 * [b]post[source][/b] If this is a URL, Danbooru will download the file.
 * [b]post[parent_id][/b] The ID of the parent post.
 

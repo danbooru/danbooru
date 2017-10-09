@@ -66,7 +66,7 @@
 
     $("#recent-pools li").click(function(e) {
       e.preventDefault();
-      $("#pool_name").val($(this).html());
+      $("#pool_name").val($(this).attr("data-value"));
     });
   }
 
