@@ -734,6 +734,24 @@ class PostTest < ActiveSupport::TestCase
       end
 
       context "tagged with a metatag" do
+        context "for an alias cosplay tag" do
+          setup do
+            @alias = FactoryGirl.create(:tag_alias, antecedent_name: "hoge", consequent_name: "moge")
+            @post = FactoryGirl.create(:post, tag_string: "char:hoge_(cosplay)")
+            @tags = @post.tag_array
+          end
+
+          should "add the cosplay tag" do
+            assert(@tags.include?("cosplay"))
+          end
+
+          should "create the tag" do
+            assert(Tag.where(name: "someone_(cosplay)").exists?, "expected 'someone_(cosplay)' tag to be created")
+            assert(Tag.where(name: "someone_(cosplay)", category: 4).exists?, "expected 'someone_(cosplay)' tag to be created as character")
+            assert(Tag.where(name: "someone", category: 4).exists?, "expected 'someone' tag to be created")
+          end
+        end
+
         context "for a cosplay tag" do
           setup do
             @post = FactoryGirl.create(:post, tag_string: "char:someone_(cosplay)")
