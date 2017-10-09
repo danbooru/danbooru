@@ -114,11 +114,15 @@ class PixivApiClient
       @tags = json["tags"].reject {|x| x =~ /^http:/}
       @tags += json["tools"] - TOOLS_BLACKLIST
 
-      if json["metadata"]["zip_urls"]
-        @pages = json["metadata"]["zip_urls"]
-      elsif page_count > 1
-        @pages = json["metadata"]["pages"].map {|x| x["image_urls"]["large"]}
-      else
+      if json["metadata"]
+        if json["metadata"]["zip_urls"]
+          @pages = json["metadata"]["zip_urls"]
+        elsif page_count > 1
+          @pages = json["metadata"]["pages"].map {|x| x["image_urls"]["large"]}
+        end
+      end
+
+      if @pages.nil? && json["image_urls"]
         @pages = [json["image_urls"]["large"]]
       end
     end
