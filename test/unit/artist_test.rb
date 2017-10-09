@@ -28,7 +28,7 @@ class ArtistTest < ActiveSupport::TestCase
     should "should have a valid name" do
       @artist = Artist.new(:name => "-blah")
       @artist.save
-      assert_equal(["Name cannot begin with - or ~"], @artist.errors.full_messages)
+      assert_equal(["Name '-blah' cannot begin with a dash ('-')"], @artist.errors.full_messages)
     end
 
     context "with a matching tag alias" do

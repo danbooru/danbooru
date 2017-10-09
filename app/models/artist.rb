@@ -8,7 +8,7 @@ class Artist < ApplicationRecord
   after_save :categorize_tag
   after_save :update_wiki
   validates_uniqueness_of :name
-  validate :validate_name
+  validates :name, tag_name: true
   validate :validate_wiki, :on => :create
   after_validation :merge_validation_errors
   belongs_to :creator, :class_name => "User"
@@ -116,18 +116,6 @@ class Artist < ApplicationRecord
     module ClassMethods
       def normalize_name(name)
         name.to_s.mb_chars.downcase.strip.gsub(/ /, '_').to_s
-      end
-    end
-
-    def validate_name
-      if name =~ /^[-~]/
-        errors[:name] << "cannot begin with - or ~"
-        false
-      elsif name =~ /\*/
-        errors[:name] << "cannot contain *"
-        false
-      else
-        true
       end
     end
 
