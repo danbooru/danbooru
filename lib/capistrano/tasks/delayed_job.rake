@@ -6,7 +6,7 @@ namespace :delayed_job do
         within current_path do
           with rails_env: fetch(:rails_env) do
             hostname = capture("hostname").strip
-            execute :bundle, "exec", "script/delayed_job", "--queues=default,#{hostname}", "-n 2", "start"
+            execute :bundle, "exec", "script/delayed_job", "--queues=default,#{hostname}", "-n 4", "start"
           end
         end
       end

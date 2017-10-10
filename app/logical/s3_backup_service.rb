@@ -29,7 +29,7 @@ protected
     when :original
       [name]
     when :preview
-      ["preview/#{name}", "cropped/small/#{name}", "cropped/large/#{name}"]
+      ["preview/#{name}"]
     when :large
       ["sample/#{name}"]
     else
