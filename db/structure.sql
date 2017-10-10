@@ -5029,6 +5029,8 @@ CREATE INDEX index_comments_on_post_id ON comments USING btree (post_id);
 --
 
 CREATE INDEX index_delayed_jobs_on_run_at ON delayed_jobs USING btree (run_at);
+CREATE INDEX index_delayed_jobs_on_locked_by ON delayed_jobs USING btree (locked_by);
+CREATE INDEX index_delayed_jobs_on_locked_at ON delayed_jobs USING btree (locked_at);
 
 
 --

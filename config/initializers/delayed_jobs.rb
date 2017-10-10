@@ -3,7 +3,7 @@ require 'delayed/plugin'
 class DelayedJobTimeoutPlugin < ::Delayed::Plugin
   callbacks do |lifecycle|
     lifecycle.before(:execute) do |job|
-      job.class.connection.execute "set statement_timeout = 0"
+      Delayed::Job.connection.execute "set statement_timeout = 0"
     end
   end
 end
