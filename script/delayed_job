@@ -2,4 +2,5 @@
 
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'config', 'environment'))
 require 'delayed/command'
+Delayed::Job.connection.execute "set statement_timeout=0"
 Delayed::Command.new(ARGV).daemonize

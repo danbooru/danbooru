@@ -1,0 +1,17 @@
+<div id="c-reports">
+  <div id="a-down-voting-post-report">
+    <h1>Down Voting Post Report</h1>
+
+    <p>This report uses stastistical analysis to determine if a user's uploads are being targeted by an attacker. It will take some time to generate so you will receive a DMail with the results when it finishes.</p>
+
+    <%= form_tag(reports_down_voting_post_create_path) do %>
+      <%= hidden_field_tag "post_id", params[:post_id] %>
+      <%= submit_tag "Build" %>
+    <% end %>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  Down Voting Post Report - <%= Danbooru.config.app_name %>
+<% end %>
+

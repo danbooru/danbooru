@@ -1,2 +1,13 @@
+require 'delayed/plugin'
+
+class DelayedJobTimeoutPlugin < ::Delayed::Plugin
+  callbacks do |lifecycle|
+    lifecycle.before(:execute) do |job|
+      job.class.connection.execute "set statement_timeout = 0"
+    end
+  end
+end
+
 Delayed::Worker.default_queue_name = "default"
 Delayed::Worker.destroy_failed_jobs = false
+Delayed::Worker.plugins << DelayedJobTimeoutPlugin

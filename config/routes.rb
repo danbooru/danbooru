@@ -243,6 +243,8 @@ Rails.application.routes.draw do
   get "reports/upload_tags" => "reports#upload_tags"
   get "reports/post_versions" => "reports#post_versions"
   post "reports/post_versions_create" => "reports#post_versions_create"
+  get "reports/down_voting_post" => "reports#down_voting_post"
+  post "reports/down_voting_post_create" => "reports#down_voting_post_create"
   resources :saved_searches, :except => [:show] do
     collection do
       get :labels

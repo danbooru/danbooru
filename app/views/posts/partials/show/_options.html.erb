@@ -56,6 +56,10 @@
         <% end %>
 
         <li><%= link_to "Replace Image", new_post_replacement_path(:post_id => post.id), :id => "replace-image" %></li>
+
+        <% if CurrentUser.is_moderator? %>
+          <li><%= link_to "Down vote report", reports_down_voting_post_path(post_id: post.id) %></li>
+        <% end %>
       <% end %>
     <% end %>
   <% end %>
