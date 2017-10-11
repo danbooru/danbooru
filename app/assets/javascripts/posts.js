@@ -42,30 +42,28 @@
     if ($body.data("hammer")) {
       return;
     }
-
-    if (!window.matchMedia) {
+    if (!Danbooru.test_max_width(660)) {
       return;
     }
-    var mq = window.matchMedia('(max-width: 660px)');
-    if (!mq.matches) {
-      return;
-    }
+    $("#image-container").css({overflow: "visible"});
     var hasPrev = $("#a-show").length || $(".paginator a[rel~=prev]").length;
     var hasNext = $("#a-index").length && $(".paginator a[rel~=next]").length;
 
-    $body.hammer().bind("panend", function(e) {
-      var percentage = e.gesture.deltaX / window.innerWidth;
-      var swipe = Math.abs(e.gesture.velocityX) > 0.6;
-      if (Math.abs(e.gesture.deltaY) > 75) {
-        return;
-      } else if ((percentage > 0.4 || (percentage > 0.1 && swipe)) && hasPrev) {
+    $body.hammer({touchAction: 'pan-y', recognizers: [[Hammer.Swipe, { threshold: 20, velocity: 0.4, direction: Hammer.DIRECTION_HORIZONTAL }]]});
+
+    if (hasPrev) {
+      $body.hammer().on("swiperight", function(e) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(150%)"});
         $.timeout(300).done(function() {Danbooru.Post.swipe_prev(e)});
-      } else if ((percentage < -0.4 || (percentage < -0.1 && swipe)) && hasNext) {
+      });
+    }
+
+    if (hasNext) {
+      $body.hammer().on("swipeleft", function(e) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(-150%)"});
         $.timeout(300).done(function() {Danbooru.Post.swipe_next(e)});
-      }
-    });
+      });
+    }
   }
 
   Danbooru.Post.initialize_edit_dialog = function(e) {
@@ -205,7 +203,7 @@
   }
 
   Danbooru.Post.swipe_next = function(e) {
-    if ($(".paginator a[rel~=next]").length) {
+    if ($(".paginator a[rel~=next ]").length) {
       location.href = $(".paginator a[rel~=next]").attr("href");
     }
 
@@ -339,6 +337,11 @@
   }
 
   Danbooru.Post.expand_image = function(e) {
+    if (Danbooru.test_max_width(660)) {
+      // just do the default behavior
+      return;
+    }
+
     var $link = $(e.target);
     var $image = $("#image");
     var $notice = $("#image-resize-notice");
@@ -354,10 +357,6 @@
     $notice.children().eq(1).show(); // Loading message
     Danbooru.Note.Box.scale_all();
     $image.data("scale-factor", 1);
-    if ($("body").data("hammer")) {
-      $("#image-container").css({overflow: "scroll"});
-      $("body").data("hammer").set({enable: false});
-    }
     e.preventDefault();
   }
 
@@ -390,20 +389,12 @@
         $img.css("width", $img.data("original-width") * ratio);
         $img.css("height", $img.data("original-height") * ratio);
         Danbooru.Post.resize_ugoira_controls();
-        if ($("body").data("hammer")) {
-          $("#image-container").css({overflow: "visible"});
-          $("body").data("hammer").set({enable: true});
-        }
       }
     } else {
       $img.data("scale-factor", 1);
       $img.width($img.data("original-width"));
       $img.height($img.data("original-height"));
       Danbooru.Post.resize_ugoira_controls();
-      if ($("body").data("hammer")) {
-        $("#image-container").css({overflow: "scroll"});
-        $("body").data("hammer").set({enable: false});
-      }
     }
 
     Danbooru.Note.Box.scale_all();

@@ -3,6 +3,14 @@
     return $("meta[name=" + key + "]").attr("content");
   }
 
+  Danbooru.test_max_width = function(width) {
+    if (!window.matchMedia) {
+      return false;
+    }
+    var mq = window.matchMedia('(max-width: ' + width + 'px)');
+    return mq.matches;
+  }
+
   Danbooru.scrolling = false;
 
   Danbooru.scroll_to = function(element) {
