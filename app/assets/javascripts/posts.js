@@ -38,6 +38,8 @@
   }
 
   Danbooru.Post.initialize_gestures = function() {
+    return;
+    
     var $body = $("body");
     if ($body.data("hammer")) {
       return;
