@@ -37,30 +37,13 @@
     }
   }
 
-  Danbooru.Post.destroy_gestures = function() {
-    var $body = $("body");
-    if ($body.data("hammer")) {
-      $("#image-container").css({overflow: "scroll"});
-      $body.data("hammer").get("swipe").set({enable: false});
-      $body.data("hammer").toggleCssProps();
-    }
-  }
-
   Danbooru.Post.initialize_gestures = function() {
     $("#image-container").css({overflow: "visible"});
-
     var $body = $("body");
     if ($body.data("hammer")) {
-      $body.data("hammer").get("swipe").set({enable: true});
-      $body.data("hammer").toggleCssProps();
       return;
     }
-
-    if (!window.matchMedia) {
-      return;
-    }
-    var mq = window.matchMedia('(max-width: 660px)');
-    if (!mq.matches) {
+    if (!Danbooru.test_max_width(660)) {
       return;
     }
     var hasPrev = $("#a-show").length || $(".paginator a[rel~=prev]").length;
@@ -354,6 +337,11 @@
   }
 
   Danbooru.Post.expand_image = function(e) {
+    if (Danbooru.test_max_width(660)) {
+      // just do the default behavior
+      return;
+    }
+
     var $link = $(e.target);
     var $image = $("#image");
     var $notice = $("#image-resize-notice");
@@ -369,7 +357,6 @@
     $notice.children().eq(1).show(); // Loading message
     Danbooru.Note.Box.scale_all();
     $image.data("scale-factor", 1);
-    Danbooru.Post.destroy_gestures();
     e.preventDefault();
   }
 
@@ -402,14 +389,12 @@
         $img.css("width", $img.data("original-width") * ratio);
         $img.css("height", $img.data("original-height") * ratio);
         Danbooru.Post.resize_ugoira_controls();
-        Danbooru.Post.initialize_gestures();
       }
     } else {
       $img.data("scale-factor", 1);
       $img.width($img.data("original-width"));
       $img.height($img.data("original-height"));
       Danbooru.Post.resize_ugoira_controls();
-      Danbooru.Post.destroy_gestures();
     }
 
     Danbooru.Note.Box.scale_all();
