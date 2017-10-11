@@ -53,15 +53,15 @@
 
     if (hasPrev) {
       $body.hammer().on("swiperight", function(e) {
-        $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(150%)"});
-        $.timeout(300).done(function() {Danbooru.Post.swipe_prev(e)});
+        $("body").css({"transition-timing-function": "ease", "transition-duration": "0.2s", "opacity": "0", "transform": "translateX(150%)"});
+        $.timeout(200).done(function() {Danbooru.Post.swipe_prev(e)});
       });
     }
 
     if (hasNext) {
       $body.hammer().on("swipeleft", function(e) {
-        $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(-150%)"});
-        $.timeout(300).done(function() {Danbooru.Post.swipe_next(e)});
+        $("body").css({"transition-timing-function": "ease", "transition-duration": "0.2s", "opacity": "0", "transform": "translateX(-150%)"});
+        $.timeout(200).done(function() {Danbooru.Post.swipe_next(e)});
       });
     }
   }
