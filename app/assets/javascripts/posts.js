@@ -53,10 +53,7 @@
     var hasPrev = $("#a-show").length || $(".paginator a[rel~=prev]").length;
     var hasNext = $("#a-index").length && $(".paginator a[rel~=next]").length;
 
-    var $hammer = $body.data("hammer");
-    $hammer.get("press").set({enable: false});
-    $hammer.get("rotate").set({enable: false});
-    $hammer.get("tap").set({enable: false});
+    $body.hammer({recognizers: [[Hammer.Swipe, { threshold: 20, velocity: 0.4, direction: Hammer.DIRECTION_HORIZONTAL }]]});
 
     if (hasPrev) {
       $body.hammer().bind("swiperight", function(e) {
