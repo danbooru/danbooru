@@ -63,6 +63,7 @@
 
 <%= content_for(:html_header) do %>
   <link href="<%= posts_path(:format => 'atom', :tags => params[:tags]) %>" rel="alternate" title="ATOM" type="application/atom+xml" />
+  <%= content_tag(:link, nil, rel: "prefetch", href: posts_path(tags: params[:tags], page: (params[:page] || 1).to_i + 1), as: "html", crossorigin: "use-credentials") %>
   <% if @post_set.has_wiki? %>
     <meta name="description" content="<%= @post_set.wiki_page.presenter.blurb %>">
   <% else %>
