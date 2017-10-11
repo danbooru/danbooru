@@ -53,19 +53,19 @@
     var hasPrev = $("#a-show").length || $(".paginator a[rel~=prev]").length;
     var hasNext = $("#a-index").length && $(".paginator a[rel~=next]").length;
 
-    $body.hammer().bind("panend", function(e) {
-      var percentage = e.gesture.deltaX / window.innerWidth;
-      var swipe = Math.abs(e.gesture.velocityX) > 0.6;
-      if (Math.abs(e.gesture.deltaY) > 75) {
-        return;
-      } else if ((percentage > 0.4 || (percentage > 0.1 && swipe)) && hasPrev) {
+    if (hasPrev) {
+      $body.hammer().bind("swiperight", function(e) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(150%)"});
         $.timeout(300).done(function() {Danbooru.Post.swipe_prev(e)});
-      } else if ((percentage < -0.4 || (percentage < -0.1 && swipe)) && hasNext) {
+      });
+    }
+
+    if (hasNext) {
+      $body.hammer().bind("swipeleft", function(e) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(-150%)"});
         $.timeout(300).done(function() {Danbooru.Post.swipe_next(e)});
-      }
-    });
+      });
+    }
   }
 
   Danbooru.Post.initialize_edit_dialog = function(e) {
