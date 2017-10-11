@@ -53,6 +53,12 @@
     var hasPrev = $("#a-show").length || $(".paginator a[rel~=prev]").length;
     var hasNext = $("#a-index").length && $(".paginator a[rel~=next]").length;
 
+    var $hammer = $body.data("hammer");
+    $hammer.get("press").set({enable: false});
+    $hammer.get("rotate").set({enable: false});
+    $hammer.get("pan").set({enable: false});
+    $hammer.get("tap").set({enable: false});
+
     if (hasPrev) {
       $body.hammer().bind("swiperight", function(e) {
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(150%)"});
