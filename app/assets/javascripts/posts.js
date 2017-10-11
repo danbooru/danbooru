@@ -37,6 +37,17 @@
     }
   }
 
+  Danbooru.Post.destroy_gestures = function() {
+    var $body = $("body");
+    if ($body.data("hammer")) {
+      $body.off("swiperight");
+      $body.off("swipeleft");
+      $body.data("hammer").destroy();
+      $body.data("hammer", null);
+      // $("#image-container").css({overflow: "scroll"});
+    }
+  }
+
   Danbooru.Post.initialize_gestures = function() {
     var $body = $("body");
     if ($body.data("hammer")) {
@@ -53,6 +64,7 @@
     var hasPrev = $("#a-show").length || $(".paginator a[rel~=prev]").length;
     var hasNext = $("#a-index").length && $(".paginator a[rel~=next]").length;
 
+    // $("#image-container").css({overflow: "visible"});
     $body.hammer({touchAction: 'pan-y', recognizers: [[Hammer.Swipe, { threshold: 20, velocity: 0.4, direction: Hammer.DIRECTION_HORIZONTAL }]]});
 
     if (hasPrev) {
@@ -359,8 +371,7 @@
     Danbooru.Note.Box.scale_all();
     $image.data("scale-factor", 1);
     if ($("body").data("hammer")) {
-      $("#image-container").css({overflow: "scroll"});
-      $("body").data("hammer").set({enable: false});
+      Danbooru.Post.destroy_gestures();
     }
     e.preventDefault();
   }
@@ -394,20 +405,14 @@
         $img.css("width", $img.data("original-width") * ratio);
         $img.css("height", $img.data("original-height") * ratio);
         Danbooru.Post.resize_ugoira_controls();
-        if ($("body").data("hammer")) {
-          $("#image-container").css({overflow: "visible"});
-          $("body").data("hammer").set({enable: true});
-        }
+        Danbooru.Post.initialize_gestures();
       }
     } else {
       $img.data("scale-factor", 1);
       $img.width($img.data("original-width"));
       $img.height($img.data("original-height"));
       Danbooru.Post.resize_ugoira_controls();
-      if ($("body").data("hammer")) {
-        $("#image-container").css({overflow: "scroll"});
-        $("body").data("hammer").set({enable: false});
-      }
+      Danbooru.Post.destroy_gestures();
     }
 
     Danbooru.Note.Box.scale_all();
