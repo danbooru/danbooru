@@ -1,4 +1,22 @@
 module PostsHelper
+  def next_page_url
+    current_page = (params[:page] || 1).to_i
+    dup_params = params.dup
+    dup_params[:page] = current_page + 1
+    url_for(dup_params).html_safe
+  end
+
+  def prev_page_url
+    current_page = (params[:page] || 1).to_i
+    if current_page >= 2
+      dup_params = params.dup
+      dup_params[:page] = current_page - 1
+      url_for(dup_params).html_safe
+    else
+      nil
+    end
+  end
+
   def missed_post_search_count_js
     return nil unless Danbooru.config.enable_post_search_counts
     
