@@ -41,11 +41,8 @@
     var $body = $("body");
     if ($body.data("hammer")) {
       $("#image-container").css({overflow: "scroll"});
-      $body.off("swiperight");
-      $body.off("swipeleft");
-      $body.data("hammer").stop();
-      $body.data("hammer").destroy();
-      $body.removeData("hammer");
+      $body.data("hammer").get("swipe").set({enable: false});
+      $body.data("hammer").toggleCssProps();
     }
   }
 
@@ -54,6 +51,8 @@
 
     var $body = $("body");
     if ($body.data("hammer")) {
+      $body.data("hammer").get("swipe").set({enable: true});
+      $body.data("hammer").toggleCssProps();
       return;
     }
 
