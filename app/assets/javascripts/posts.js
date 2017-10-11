@@ -55,19 +55,19 @@
 
     $body.hammer({touchAction: 'auto', recognizers: [[Hammer.Swipe, { threshold: 20, velocity: 0.4, direction: Hammer.DIRECTION_HORIZONTAL }]]});
 
-    // if (hasPrev) {
-    //   $body.hammer().bind("swiperight", function(e) {
-    //     $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(150%)"});
-    //     $.timeout(300).done(function() {Danbooru.Post.swipe_prev(e)});
-    //   });
-    // }
+    if (hasPrev) {
+      $body.hammer().bind("swiperight", function(e) {
+        $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(150%)"});
+        $.timeout(300).done(function() {Danbooru.Post.swipe_prev(e)});
+      });
+    }
 
-    // if (hasNext) {
-    //   $body.hammer().bind("swipeleft", function(e) {
-    //     $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(-150%)"});
-    //     $.timeout(300).done(function() {Danbooru.Post.swipe_next(e)});
-    //   });
-    // }
+    if (hasNext) {
+      $body.hammer().bind("swipeleft", function(e) {
+        $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(-150%)"});
+        $.timeout(300).done(function() {Danbooru.Post.swipe_next(e)});
+      });
+    }
   }
 
   Danbooru.Post.initialize_edit_dialog = function(e) {
