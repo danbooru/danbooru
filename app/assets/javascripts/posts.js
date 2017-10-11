@@ -40,17 +40,17 @@
   Danbooru.Post.destroy_gestures = function() {
     var $body = $("body");
     if ($body.data("hammer")) {
-      $body.off("swiperight");
-      $body.off("swipeleft");
-      $body.data("hammer").destroy();
-      $body.data("hammer", null);
-      // $("#image-container").css({overflow: "scroll"});
+      $("#image-container").css({overflow: "scroll"});
+      $body.data("hammer").get("swipe").set({enable: false});
     }
   }
 
   Danbooru.Post.initialize_gestures = function() {
+    $("#image-container").css({overflow: "visible"});
+
     var $body = $("body");
     if ($body.data("hammer")) {
+      $body.data("hammer").get("swipe").set({enable: true});
       return;
     }
 
@@ -64,12 +64,10 @@
     var hasPrev = $("#a-show").length || $(".paginator a[rel~=prev]").length;
     var hasNext = $("#a-index").length && $(".paginator a[rel~=next]").length;
 
-    // $("#image-container").css({overflow: "visible"});
     $body.hammer({touchAction: 'pan-y', recognizers: [[Hammer.Swipe, { threshold: 20, velocity: 0.4, direction: Hammer.DIRECTION_HORIZONTAL }]]});
 
     if (hasPrev) {
       $body.hammer().on("swiperight", function(e) {
-        console.log("swipe right");
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(150%)"});
         $.timeout(300).done(function() {Danbooru.Post.swipe_prev(e)});
       });
@@ -77,7 +75,6 @@
 
     if (hasNext) {
       $body.hammer().on("swipeleft", function(e) {
-        console.log("swipe left");
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(-150%)"});
         $.timeout(300).done(function() {Danbooru.Post.swipe_next(e)});
       });
