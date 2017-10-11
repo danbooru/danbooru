@@ -56,7 +56,6 @@
     var $hammer = $body.data("hammer");
     $hammer.get("press").set({enable: false});
     $hammer.get("rotate").set({enable: false});
-    $hammer.get("pan").set({enable: false});
     $hammer.get("tap").set({enable: false});
 
     if (hasPrev) {
