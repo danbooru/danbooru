@@ -43,7 +43,8 @@
       $("#image-container").css({overflow: "scroll"});
       $body.off("swiperight");
       $body.off("swipeleft");
-      $body.data("hammer").stop().destroy();
+      $body.data("hammer").stop();
+      $body.data("hammer").destroy();
       $body.removeData("hammer");
     }
   }
