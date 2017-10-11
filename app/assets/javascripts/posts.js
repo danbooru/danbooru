@@ -68,7 +68,7 @@
     $body.hammer({touchAction: 'pan-y', recognizers: [[Hammer.Swipe, { threshold: 20, velocity: 0.4, direction: Hammer.DIRECTION_HORIZONTAL }]]});
 
     if (hasPrev) {
-      $body.hammer().bind("swiperight", function(e) {
+      $body.hammer().on("swiperight", function(e) {
         console.log("swipe right");
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(150%)"});
         $.timeout(300).done(function() {Danbooru.Post.swipe_prev(e)});
@@ -76,7 +76,7 @@
     }
 
     if (hasNext) {
-      $body.hammer().bind("swipeleft", function(e) {
+      $body.hammer().on("swipeleft", function(e) {
         console.log("swipe left");
         $("body").css({"transition-timing-function": "ease", "transition-duration": "0.3s", "opacity": "0", "transform": "translateX(-150%)"});
         $.timeout(300).done(function() {Danbooru.Post.swipe_next(e)});
@@ -221,7 +221,7 @@
   }
 
   Danbooru.Post.swipe_next = function(e) {
-    if ($(".paginator a[rel~=next]").length) {
+    if ($(".paginator a[rel~=next ]").length) {
       location.href = $(".paginator a[rel~=next]").attr("href");
     }
 
@@ -370,9 +370,7 @@
     $notice.children().eq(1).show(); // Loading message
     Danbooru.Note.Box.scale_all();
     $image.data("scale-factor", 1);
-    if ($("body").data("hammer")) {
-      Danbooru.Post.destroy_gestures();
-    }
+    Danbooru.Post.destroy_gestures();
     e.preventDefault();
   }
 
