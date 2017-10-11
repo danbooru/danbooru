@@ -368,7 +368,21 @@
         if ($("#image-resize-notice").is(":visible")) {
           $("#image-resize-link").click();
         } else {
-          Danbooru.Post.expand_image(e);
+          var $image = $("#image");
+          var $notice = $("#image-resize-notice");
+          $image.attr("src", $("#image-container").data("large-file-url"));
+          $image.css("opacity", "0.25");
+          $image.width($image.data("large-width"));
+          $image.height($image.data("large-height"));
+          $notice.children().eq(0).show();
+          $notice.children().eq(1).hide(); // Loading message
+          $image.on("load", function() {
+            $image.css("opacity", "1");
+            $notice.show();
+          });
+          Danbooru.Note.Box.scale_all();
+          $image.data("scale-factor", 1);
+          e.preventDefault();
         }
       });
     }
