@@ -6,7 +6,7 @@
   <link rel="top" title="<%= Danbooru.config.app_name %>" href="/">
   <%= csrf_meta_tag %>
   <% unless cookies[:dm] %>
-    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes,maximum-scale=5.0,minimum-scale=0.1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
   <% end %>
   <meta name="current-user-name" content="<%= CurrentUser.name %>">
   <meta name="current-user-id" content="<%= CurrentUser.id %>">
