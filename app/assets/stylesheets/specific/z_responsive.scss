@@ -4,8 +4,16 @@
   display: none;
 }
 
+#searchbox-redirect-link {
+  display: none;
+}
+
 @media screen and (max-width: 660px) {
   #desktop-version-link {
+    display: inline;
+  }
+
+  #searchbox-redirect-link {
     display: inline;
   }
 

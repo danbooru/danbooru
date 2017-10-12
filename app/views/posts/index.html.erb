@@ -32,6 +32,8 @@
         <% elsif @post_set.is_single_tag? && !@post_set.is_metatag_search? %>
           <li><%= link_to "Wiki", "#", :id => "show-excerpt-link" %></li>
         <% end %>
+
+        <li id="searchbox-redirect-link"><a href="#search-box">Search&raquo;</a></li>
       </menu>
 
       <%= render "posts/partials/index/edit" %>
