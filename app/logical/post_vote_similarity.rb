@@ -1,7 +1,7 @@
 require "set"
 
 class PostVoteSimilarity
-  THRESHOLD = 0.035
+  THRESHOLD = 0.05
 
   class Element
     attr_reader :user_id, :score

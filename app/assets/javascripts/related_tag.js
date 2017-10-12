@@ -57,8 +57,8 @@
     var $field = $("#upload_tag_string,#post_tag_string");
     var string = $field.val();
     var n = string.length;
-    var a = $field.get(0).selectionStart;
-    var b = $field.get(0).selectionStart;
+    var a = $field.prop('selectionStart');
+    var b = $field.prop('selectionStart');
 
     if ((a > 0) && (a < (n - 1)) && (!/\s/.test(string[a])) && (/\s/.test(string[a - 1]))) {
       // 4 is the only case where we need to scan forward. in all other cases we
@@ -289,12 +289,13 @@
     }
     $field.val($field.val().trim().replace(/ +/g, " ") + " ");
 
-    $field[0].selectionStart = $field.val().length;
     Danbooru.RelatedTag.update_selected();
     if (Danbooru.RelatedTag.recent_artist && $("#artist-tags-container").css("display") === "block") {
       Danbooru.RelatedTag.process_artist(Danbooru.RelatedTag.recent_artist);
     }
 
+    $field.focus();
+    $field.prop('selectionStart', $field.val().length);
     e.preventDefault();
   }
 
