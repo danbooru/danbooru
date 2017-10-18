@@ -37,6 +37,11 @@
       $(e.target).attr('rows', rows + 1);
       $(e.target).css("width", "100%");
     });
+
+    $("#tags").keydown("return", function(e) {
+      $("#search-box form").submit();
+      e.preventDefault();
+    });
   });
 </script>
 <% end %>
