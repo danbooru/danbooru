@@ -150,33 +150,6 @@
       }
      $dest.append(Danbooru.RelatedTag.build_html("artist", tags, "artist", true));
     }
-    if (Danbooru.meta("ccs-server")) {
-      if (Danbooru.RelatedTag.recent_ccs) {
-        if (Danbooru.RelatedTag.recent_ccs.length) {
-          Danbooru.RelatedTag.build_ccs($dest);
-        }
-      } else {
-        Danbooru.RelatedTag.recent_ccs = []; // semaphore to only make 1 call
-        Danbooru.RelatedTag.fetch_ccs($dest);
-      }
-    }
-  }
-
-  Danbooru.RelatedTag.fetch_ccs = function($dest) {
-    $.getJSON(Danbooru.meta("ccs-server") + "/query", {
-      "url": Danbooru.meta("image-url"),
-      "ref": Danbooru.meta("image-ref"),
-      "sig": Danbooru.meta("image-sig")
-    }, function(data) {
-      Danbooru.RelatedTag.recent_ccs = data.filter(function(x) {return x[0] > 0.25;});
-      Danbooru.RelatedTag.recent_ccs = $.map(Danbooru.RelatedTag.recent_ccs, function(x) {return [[x[1], 4]];});
-
-      if (Danbooru.RelatedTag.recent_ccs.length) {
-        Danbooru.RelatedTag.build_ccs($dest);
-      }
-    }).fail(function() {
-      Danbooru.notice("Character classification service is not currently available");
-    });
   }
 
   Danbooru.RelatedTag.build_recent_and_frequent = function($dest) {
@@ -198,12 +171,6 @@
       });
     } else {
       return [];
-    }
-  }
-
-  Danbooru.RelatedTag.build_ccs = function($dest) {
-    if (Danbooru.RelatedTag.recent_ccs) {
-      $dest.append(this.build_html("Guessed Characters", Danbooru.RelatedTag.recent_ccs, "ccs"))
     }
   }
 
