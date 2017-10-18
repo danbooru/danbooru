@@ -122,7 +122,12 @@
           return;
         }
 
-        var term = before_caret_text.match(/\S+/g).pop();
+        var term = before_caret_text.match(/\S+/g);
+        if (!term) {
+          return;
+        }
+
+        term = term.pop();
         var regexp = new RegExp("^(?:" + prefixes + ")(.*)$", "i");
         var match = term.match(regexp);
         if (match) {
