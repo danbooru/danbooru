@@ -218,7 +218,7 @@
   }
 
   Danbooru.Autocomplete.normal_source = function(term, resp) {
-    var key = "ac-" + term;
+    var key = "ac-" + term.replace(/\./g,'\uFFFF');
     if (this.enable_local_storage) {
       var cached = $.localStorage.get(key);
       if (cached) {
