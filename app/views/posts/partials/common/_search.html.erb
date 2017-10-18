@@ -6,7 +6,7 @@
 <section id="search-box">
   <h1>Search</h1>
   <%= form_tag(path, :method => "get") do %>
-    <%= text_area_tag("tags", tags, :rows => 1, :cols => 15, :id => tags_dom_id, :data => { :autocomplete => "tag-query" }) %>
+    <%= text_field_tag("tags", tags, :size => 30, :id => tags_dom_id, :data => { :autocomplete => "tag-query" }) %>
     <% if params[:raw] %>
       <%= hidden_field_tag :raw, params[:raw] %>
     <% end %>
@@ -29,19 +29,18 @@
   <% end %>
 </section>
 
-<%= content_for(:html_header) do %>
-<script>
-  $(function() {
-    $("#tags").scroll(function(e) {
-      var rows = parseInt($(e.target).attr("rows"));
-      $(e.target).attr('rows', rows + 1);
-      $(e.target).css("width", "100%");
+<% content_for(:html_header) do %>
+  <script>
+    $(function() {
+      $("#tags").on("keypress autocompleteclose", function(e) {
+        if (!$(this).data("fakeWidth")) {
+          $(this).data("fakeWidth", $('<span>').hide().appendTo(document.body));
+        }
+        var width = $(this).data("fakeWidth").text($(this).val()).css('font', $(this).css("font")).width() + 15;
+        if (width > $(this).width()) {
+          $(this).width(width);
+        }
+      });
     });
-
-    $("#tags").keydown("return", function(e) {
-      $("#search-box form").submit();
-      e.preventDefault();
-    });
-  });
-</script>
+  </script>
 <% end %>
