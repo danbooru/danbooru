@@ -3,6 +3,9 @@
 
   Danbooru.Autocomplete.AUTOCOMPLETE_VERSION = 1;
 
+  //Just under 5MB of 16-bit characters
+  Danbooru.Autocomplete.MAX_STORAGE_SIZE = 2500000;
+
   Danbooru.Autocomplete.initialize_all = function() {
     if (Danbooru.meta("enable-auto-complete") === "true") {
       Danbooru.Autocomplete.enable_local_storage = this.test_local_storage();
@@ -25,7 +28,8 @@
   Danbooru.Autocomplete.prune_local_storage = function() {
     if (this.enable_local_storage) {
       var cached_autocomplete_version = $.localStorage.get("danbooru-autocomplete-version");
-      if (cached_autocomplete_version !== this.AUTOCOMPLETE_VERSION || $.localStorage.keys().length > 4000) {
+      var current_cache_size = $.localStorage.keys().reduce( function(total, key) { return total + localStorage[key].length; }, 0);
+      if (cached_autocomplete_version !== this.AUTOCOMPLETE_VERSION || current_cache_size > this.MAX_STORAGE_SIZE) {
         $.each($.localStorage.keys(), function(i, key) {
           if (key.substr(0, 3) === "ac-") {
             $.localStorage.remove(key);
