@@ -261,8 +261,8 @@
       Danbooru.RelatedTag.process_artist(Danbooru.RelatedTag.recent_artist);
     }
 
-    $field.focus();
-    $field.prop('selectionStart', $field.val().length);
+    //The timeout is needed on Chrome since it will clobber the field attribute otherwise
+    setTimeout(function () { $field.prop('selectionStart', $field.val().length);}, 100);
     e.preventDefault();
   }
 
