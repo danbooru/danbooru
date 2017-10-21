@@ -683,6 +683,7 @@ class Post < ApplicationRecord
 
     def normalize_tags
       normalized_tags = Tag.scan_tags(tag_string)
+      normalized_tags = apply_casesensitive_metatags(normalized_tags)
       normalized_tags = normalized_tags.map {|tag| tag.downcase}
       normalized_tags = filter_metatags(normalized_tags)
       normalized_tags = remove_negated_tags(normalized_tags)
@@ -763,10 +764,34 @@ class Post < ApplicationRecord
       return tags
     end
 
+    def apply_casesensitive_metatags(tags)
+      casesensitive_metatags, tags = tags.partition {|x| x =~ /\A(?:source|newpool):/i}
+      if casesensitive_metatags.length > 0
+        case casesensitive_metatags[-1]
+        when /^source:none$/i
+          self.source = ""
+
+        when /^source:"(.*)"$/i
+          self.source = $1
+
+        when /^source:(.*)$/i
+          self.source = $1
+
+        when /^newpool:(.+)$/i
+          pool = Pool.find_by_name($1)
+          if pool.nil?
+            pool = Pool.create(:name => $1, :description => "This pool was automatically generated")
+          end
+          add_pool!(pool) if pool
+        end
+      end
+      return tags
+    end
+
     def filter_metatags(tags)
-      @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent|-parent|source|-?locked):/i}
+      @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent|-parent|-?locked):/i}
       tags = apply_categorization_metatags(tags)
-      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav|-fav|child|-favgroup|favgroup|upvote|downvote):/i}
+      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|fav|-fav|child|-favgroup|favgroup|upvote|downvote):/i}
       apply_pre_metatags
       return tags
     end
@@ -801,13 +826,6 @@ class Post < ApplicationRecord
 
         when /^pool:(.+)$/i
           pool = Pool.find_by_name($1)
-          add_pool!(pool) if pool
-
-        when /^newpool:(.+)$/i
-          pool = Pool.find_by_name($1)
-          if pool.nil?
-            pool = Pool.create(:name => $1, :description => "This pool was automatically generated")
-          end
           add_pool!(pool) if pool
 
         when /^fav:(.+)$/i
@@ -863,17 +881,8 @@ class Post < ApplicationRecord
             remove_parent_loops
           end
 
-        when /^source:none$/i
-          self.source = ""
-
-        when /^source:"(.*)"$/i
-          self.source = $1
-
-        when /^source:(.*)$/i
-          self.source = $1
-
         when /^rating:([qse])/i
-          self.rating = $1.downcase
+          self.rating = $1
 
         when /^(-?)locked:notes?$/i
           assign_attributes({ is_note_locked: $1 != "-" }, as: CurrentUser.role)
