@@ -17,7 +17,7 @@ module Moderator
       else
         @bulk_revert.delay(:queue => "default").process(@constraints)
         flash[:notice] = "Reverts queued"
-        redirect_to new_bulk_revert_path
+        redirect_to new_moderator_bulk_revert_path
       end
     end
 
