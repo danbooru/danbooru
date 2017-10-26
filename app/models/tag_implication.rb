@@ -51,7 +51,7 @@ class TagImplication < TagRelationship
     def update_descendant_names!
       clear_descendants_cache
       update_descendant_names
-      update({ :descendant_names => descendant_names }, :as => CurrentUser.role)
+      update_attribute(:descendant_names, descendant_names)
     end
 
     def update_descendant_names_for_parents
