@@ -4,8 +4,8 @@
 
     <%= simple_form_for @user do |f| %>
       <h2 id="edit-options">
-        <%= link_to "Basic settings", "#basic-settings", :class => "active" %> 
-        | <%= link_to "Advanced settings", "#advanced-settings" %> 
+        <%= link_to "Basic", "#basic-settings", :class => "active" %> 
+        | <%= link_to "Advanced", "#advanced-settings" %> 
         <% if CurrentUser.user.id == @user.id %>
           | <%= link_to "Change password", edit_user_password_path(:user_id => @user.id), :id => "change-password" %> 
           | <%= link_to "Delete account", maintenance_user_deletion_path, :id => "delete-account" %>
@@ -73,6 +73,8 @@
         <%= f.input :enable_privacy_mode, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
 
         <%= f.input :disable_tagged_filenames, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
+
+        <%= f.input :disable_mobile_gestures, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
 
         <%#= f.input :disable_cropped_thumbnails, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
 

@@ -25,6 +25,15 @@ class User < ApplicationRecord
     :verified,
   ]
 
+  # candidates for removal:
+  # - enable_post_navigation (disabled by 700)
+  # - new_post_navigation_layout (disabled by 1364)
+  # - enable_sequential_post_navigation (disabled by 680)
+  # - hide_deleted_posts (enabled by 1904)
+  # - disable_categorized_saved_searches (enabled by 2291)
+  # - disable_tagged_filenames (enabled by 387)
+  # - enable_recent_searches (enabled by 499)
+  # - disable_cropped_thumbnails (enabled by 22)
   BOOLEAN_ATTRIBUTES = %w(
     is_banned
     has_mail
@@ -46,13 +55,14 @@ class User < ApplicationRecord
     disable_tagged_filenames
     enable_recent_searches
     disable_cropped_thumbnails
+    disable_mobile_gestures
   )
 
   include Danbooru::HasBitFlags
   has_bit_flags BOOLEAN_ATTRIBUTES, :field => "bit_prefs"
 
   attr_accessor :password, :old_password
-  attr_accessible :dmail_filter_attributes, :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr, :time_zone, :default_image_size, :enable_sequential_post_navigation, :per_page, :hide_deleted_posts, :style_usernames, :enable_auto_complete, :custom_style, :show_deleted_children, :disable_categorized_saved_searches, :disable_tagged_filenames, :enable_recent_searches, :disable_cropped_thumbnails, :as => [:moderator, :gold, :platinum, :member, :anonymous, :default, :builder, :admin]
+  attr_accessible :dmail_filter_attributes, :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr, :time_zone, :default_image_size, :enable_sequential_post_navigation, :per_page, :hide_deleted_posts, :style_usernames, :enable_auto_complete, :custom_style, :show_deleted_children, :disable_categorized_saved_searches, :disable_tagged_filenames, :enable_recent_searches, :disable_cropped_thumbnails, :disable_mobile_gestures, :as => [:moderator, :gold, :platinum, :member, :anonymous, :default, :builder, :admin]
   attr_accessible :level, :as => :admin
 
   validates :name, user_name: true, on: :create

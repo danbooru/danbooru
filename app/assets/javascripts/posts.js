@@ -38,6 +38,9 @@
   }
 
   Danbooru.Post.initialize_gestures = function() {
+    if (Danbooru.meta("disable-mobile-gestures") === "true") {
+      return;
+    }
     var $body = $("body");
     if ($body.data("hammer")) {
       return;

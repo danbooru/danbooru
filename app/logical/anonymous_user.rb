@@ -261,6 +261,10 @@ class AnonymousUser
     false
   end
 
+  def disable_mobile_gestures?
+    false
+  end
+
   User::Roles.reject {|r| r == :anonymous}.each do |name|
     define_method("is_#{name}?") do
       false
