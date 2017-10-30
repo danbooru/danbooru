@@ -765,7 +765,9 @@ class Post < ApplicationRecord
     end
 
     def apply_casesensitive_metatags(tags)
-      casesensitive_metatags, tags = tags.partition {|x| x =~ /\A(?:source|newpool):/i}
+      casesensitive_metatags, tags = tags.partition {|x| x =~ /\A(?:source):/i}
+      #Reuse the following metatags after the post has been saved
+      casesensitive_metatags += tags.select {|x| x =~ /\A(?:newpool):/i}
       if casesensitive_metatags.length > 0
         case casesensitive_metatags[-1]
         when /^source:none$/i
@@ -782,7 +784,6 @@ class Post < ApplicationRecord
           if pool.nil?
             pool = Pool.create(:name => $1, :description => "This pool was automatically generated")
           end
-          add_pool!(pool) if pool
         end
       end
       return tags
@@ -791,7 +792,7 @@ class Post < ApplicationRecord
     def filter_metatags(tags)
       @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent|-parent|-?locked):/i}
       tags = apply_categorization_metatags(tags)
-      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|fav|-fav|child|-favgroup|favgroup|upvote|downvote):/i}
+      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav|-fav|child|-favgroup|favgroup|upvote|downvote):/i}
       apply_pre_metatags
       return tags
     end
@@ -825,6 +826,10 @@ class Post < ApplicationRecord
           add_pool!(pool) if pool
 
         when /^pool:(.+)$/i
+          pool = Pool.find_by_name($1)
+          add_pool!(pool) if pool
+
+        when /^newpool:(.+)$/i
           pool = Pool.find_by_name($1)
           add_pool!(pool) if pool
 
