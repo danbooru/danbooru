@@ -30,7 +30,7 @@
       });
     }
 
-    if ($("#c-posts #a-index, #c-posts #a-show, #c-favorites #a-index").length) {
+    if ($("#c-posts #a-index, #c-favorites #a-index").length) {
       Danbooru.keydown("r", "random", function(e) {
         $("#random-post")[0].click();
       });
