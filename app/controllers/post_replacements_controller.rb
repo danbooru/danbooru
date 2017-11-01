@@ -1,6 +1,6 @@
 class PostReplacementsController < ApplicationController
   respond_to :html, :xml, :json
-  before_filter :approver_only, except: [:index]
+  before_filter :moderator_only, except: [:index]
 
   def new
     @post = Post.find(params[:post_id])
