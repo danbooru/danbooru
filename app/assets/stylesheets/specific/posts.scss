@@ -211,6 +211,14 @@ body[data-user-can-approve-posts="true"] .post-preview {
   }
 }
 
+.category-5 a, a.tag-type-5, .ui-state-focus a.tag-type-5 {
+  color: #F80;
+
+  &:hover {
+    color: #FA6;
+  }
+}
+
 .category-banned a, a.tag-type-banned,, .ui-state-focus a.tag-type-banned {
   color: black;
   background-color: red;

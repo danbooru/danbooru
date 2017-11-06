@@ -265,6 +265,14 @@ module Danbooru
             "formatstr" => "drawn by %s"
           },
           "relatedtag" => "Artists"
+        },
+        "meta" => {
+          "category" => 5,
+          "short" => "meta",
+          "extra" => [],
+          "header" => "<h2>Meta</h2>",
+          "humanized" => nil,
+          "relatedtag" => nil
         }
       }
     end
@@ -304,12 +312,12 @@ module Danbooru
 
     #Sets the order of the split tag header list (presenters/tag_set_presenter.rb)
     def split_tag_header_list
-      @split_tag_header_list ||= ["copyright","character","artist","general"]
+      @split_tag_header_list ||= ["copyright","character","artist","general","meta"]
     end
 
     #Sets the order of the categorized tag string (presenters/post_presenter.rb)
     def categorized_tag_list
-      @categorized_tag_list ||= ["copyright","character","artist","general"]
+      @categorized_tag_list ||= ["copyright","character","artist","meta","general"]
     end
 
     #Sets the order of the related tag buttons (javascripts/related_tag.js)
