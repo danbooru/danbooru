@@ -118,10 +118,9 @@ class PostQueryBuilder
     relation = add_range_relation(q[:filesize], "posts.file_size", relation)
     relation = add_range_relation(q[:date], "posts.created_at", relation)
     relation = add_range_relation(q[:age], "posts.created_at", relation)
-    relation = add_range_relation(q[:general_tag_count], "posts.tag_count_general", relation)
-    relation = add_range_relation(q[:artist_tag_count], "posts.tag_count_artist", relation)
-    relation = add_range_relation(q[:copyright_tag_count], "posts.tag_count_copyright", relation)
-    relation = add_range_relation(q[:character_tag_count], "posts.tag_count_character", relation)
+    Danbooru.config.full_tag_config_info.each_key do |category|
+      relation = add_range_relation(q["#{category}_tag_count".to_sym], "posts.tag_count_#{category}", relation)
+    end
     relation = add_range_relation(q[:post_tag_count], "posts.tag_count", relation)
     relation = add_range_relation(q[:pixiv_id], "posts.pixiv_id", relation)
 
@@ -512,29 +511,11 @@ class PostQueryBuilder
     when "tagcount_asc"
       relation = relation.order("posts.tag_count ASC")
 
-    when "gentags", "gentags_desc"
-      relation = relation.order("posts.tag_count_general DESC")
+    when /(#{Danbooru.config.short_tag_name_mapping.keys.join("|")})tags(?:\Z|_desc)/
+      relation = relation.order("posts.tag_count_#{Danbooru.config.short_tag_name_mapping[$1]} DESC")
 
-    when "gentags_asc"
-      relation = relation.order("posts.tag_count_general ASC")
-
-    when "arttags", "arttags_desc"
-      relation = relation.order("posts.tag_count_artist DESC")
-
-    when "arttags_asc"
-      relation = relation.order("posts.tag_count_artist ASC")
-
-    when "chartags", "chartags_desc"
-      relation = relation.order("posts.tag_count_character DESC")
-
-    when "chartags_asc"
-      relation = relation.order("posts.tag_count_character ASC")
-
-    when "copytags", "copytags_desc"
-      relation = relation.order("posts.tag_count_copyright DESC")
-
-    when "copytags_asc"
-      relation = relation.order("posts.tag_count_copyright ASC")
+    when /(#{Danbooru.config.short_tag_name_mapping.keys.join("|")})tags_asc/
+      relation = relation.order("posts.tag_count_#{Danbooru.config.short_tag_name_mapping[$1]} ASC")
 
     when "rank"
       relation = relation.order("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 35000 DESC")

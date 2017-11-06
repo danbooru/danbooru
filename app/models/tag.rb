@@ -1,6 +1,7 @@
 class Tag < ApplicationRecord
   COSINE_SIMILARITY_RELATED_TAG_THRESHOLD = 1000
-  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-pool|pool|ordpool|-favgroup|favgroup|-fav|fav|ordfav|md5|-rating|rating|-locked|locked|width|height|mpixels|ratio|score|favcount|filesize|source|-source|id|-id|date|age|order|limit|-status|status|tagcount|gentags|arttags|chartags|copytags|parent|-parent|child|pixiv_id|pixiv|search|upvote|downvote|filetype|-filetype|flagger|-flagger|appealer|-appealer"
+  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-pool|pool|ordpool|-favgroup|favgroup|-fav|fav|ordfav|md5|-rating|rating|-locked|locked|width|height|mpixels|ratio|score|favcount|filesize|source|-source|id|-id|date|age|order|limit|-status|status|tagcount|parent|-parent|child|pixiv_id|pixiv|search|upvote|downvote|filetype|-filetype|flagger|-flagger|appealer|-appealer|" +
+    Danbooru.config.short_tag_name_mapping.keys.map {|x| "#{x}tags"}.join("|")
   SUBQUERY_METATAGS = "commenter|comm|noter|noteupdater|artcomm|flagger|-flagger|appealer|-appealer"
   attr_accessible :category, :as => [:moderator, :gold, :platinum, :member, :anonymous, :default, :builder, :admin]
   attr_accessible :is_locked, :as => [:moderator, :admin]
@@ -140,7 +141,8 @@ class Tag < ApplicationRecord
         Post.raw_tag_match(name).where("true /* Tag#update_category_post_counts */").find_each do |post|
           post.reload
           post.set_tag_counts
-          Post.where(:id => post.id).update_all(:tag_count => post.tag_count, :tag_count_general => post.tag_count_general, :tag_count_artist => post.tag_count_artist, :tag_count_copyright => post.tag_count_copyright, :tag_count_character => post.tag_count_character)
+          args = Hash[Danbooru.config.full_tag_config_info.keys.map {|x| ["tag_count_#{x}",post.send("tag_count_#{x}")]}].update(:tag_count => post.tag_count)
+          Post.where(:id => post.id).update_all(args)
         end
       end
     end
@@ -664,17 +666,8 @@ class Tag < ApplicationRecord
           when "tagcount"
             q[:post_tag_count] = parse_helper(g2)
 
-          when "gentags"
-            q[:general_tag_count] = parse_helper(g2)
-
-          when "arttags"
-            q[:artist_tag_count] = parse_helper(g2)
-
-          when "chartags"
-            q[:character_tag_count] = parse_helper(g2)
-
-          when "copytags"
-            q[:copyright_tag_count] = parse_helper(g2)
+          when /(#{Danbooru.config.short_tag_name_mapping.keys.join("|")})tags/
+            q["#{Danbooru.config.short_tag_name_mapping[$1]}_tag_count".to_sym] = parse_helper(g2)
 
           when "parent"
             q[:parent] = g2.downcase

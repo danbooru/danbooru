@@ -129,48 +129,24 @@ class PostPresenter < Presenter
     @post.humanized_essential_tag_string
   end
 
-  def categorized_tag_string
+  def categorized_tag_groups
     string = []
 
-    if @post.copyright_tags.any?
-      string << @post.copyright_tags.join(" ")
+    Danbooru.config.categorized_tag_list.each do |category|
+      if @post.typed_tags(category).any?
+        string << @post.typed_tags(category).join(" ")
+      end
     end
+    
+    string
+  end
 
-    if @post.character_tags.any?
-      string << @post.character_tags.join(" ")
-    end
-
-    if @post.artist_tags.any?
-      string << @post.artist_tags.join(" ")
-    end
-
-    if @post.general_tags.any?
-      string << @post.general_tags.join(" ")
-    end
-
-    string.join(" \n")
+  def categorized_tag_string
+    categorized_tag_groups.join(" \n")
   end
 
   def humanized_categorized_tag_string
-    string = []
-
-    if @post.copyright_tags.any?
-      string << @post.copyright_tags
-    end
-
-    if @post.character_tags.any?
-      string << @post.character_tags
-    end
-
-    if @post.artist_tags.any?
-      string << @post.artist_tags
-    end
-
-    if @post.general_tags.any?
-      string << @post.general_tags
-    end
-
-    string.flatten.slice(0, 25).join(", ").tr("_", " ")
+    categorized_tag_groups.flatten.slice(0, 25).join(", ").tr("_", " ")
   end
 
   def image_html(template)

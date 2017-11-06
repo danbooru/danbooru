@@ -214,31 +214,58 @@ module Danbooru
       "albert"
     end
 
+#TAG CONFIGURATION
+
     #Full tag configuration info for all tags
     def full_tag_config_info
       @full_tag_category_mapping ||= {
         "general" => {
           "category" => 0,
           "short" => "gen",
-          "extra" => []
+          "extra" => [],
+          "header" => "<h1>Tags</h1>",
+          "humanized" => nil
         },
         "character" => {
           "category" => 4,
           "short" => "char",
-          "extra" => ["ch"]
+          "extra" => ["ch"],
+          "header" => "<h2>Characters</h2>",
+          "humanized" => {
+            "slice" => 5,
+            "exclusion" => [],
+            "regexmap" => /^(.+?)(?:_\(.+\))?$/,
+            "formatstr" => "%s"
+          }
         },
         "copyright" => {
           "category" => 3,
           "short" => "copy",
-          "extra" => ["co"]
+          "extra" => ["co"],
+          "header" => "<h2>Copyrights</h2>",
+          "humanized" => {
+            "slice" => 5,
+            "exclusion" => [],
+            "regexmap" => //,
+            "formatstr" => "(%s)"
+          }
         },
         "artist" => {
           "category" => 1,
           "short" => "art",
-          "extra" => []
+          "extra" => [],
+          "header" => "<h2>Artist</h2>",
+          "humanized" => {
+            "slice" => 0,
+            "exclusion" => %w(banned_artist),
+            "regexmap" => //,
+            "formatstr" => "drawn by %s"
+          }
         }
       }
     end
+
+#TAG MAPPINGS
 
     # Returns a hash mapping various tag categories to a numerical value.
     def tag_category_mapping
@@ -258,6 +285,30 @@ module Danbooru
     def reverse_tag_category_mapping
       @reverse_tag_category_mapping ||= Hash[full_tag_config_info.map {|k,v| [v["category"],k]}]
     end
+
+    # Returns a hash mapping for the short name usage in metatags
+    def short_tag_name_mapping
+      @short_tag_name_mapping ||= Hash[full_tag_config_info.map {|k,v| [v["short"],k] }]
+    end
+
+#TAG ORDERS
+
+    #Sets the order of the humanized essential tag string (models/post.rb)
+    def humanized_tag_category_list
+      @humanized_tag_category_list ||= ["character","copyright","artist"]
+    end
+
+    #Sets the order of the split tag header list (presenters/tag_set_presenter.rb)
+    def split_tag_header_list
+      @split_tag_header_list ||= ["copyright","character","artist","general"]
+    end
+
+    #Sets the order of the categorized tag string (presenters/post_presenter.rb)
+    def categorized_tag_list
+      @categorized_tag_list ||= ["copyright","character","artist","general"]
+    end
+
+#END TAG
 
     # If enabled, users must verify their email addresses.
     def enable_email_verification?
