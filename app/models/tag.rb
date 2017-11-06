@@ -317,19 +317,19 @@ class Tag < ApplicationRecord
       when :filesize
         object =~ /\A(\d+(?:\.\d*)?|\d*\.\d+)([kKmM]?)[bB]?\Z/
 
-      	size = $1.to_f
-      	unit = $2
+        size = $1.to_f
+        unit = $2
 
-      	conversion_factor = case unit
-    	  when /m/i
-    	    1024 * 1024
-    	  when /k/i
-    	    1024
-    	  else
-    	    1
-  	    end
+        conversion_factor = case unit
+        when /m/i
+          1024 * 1024
+        when /k/i
+          1024
+        else
+          1
+        end
 
-  	    (size * conversion_factor).to_i
+        (size * conversion_factor).to_i
       end
     end
 
@@ -429,296 +429,298 @@ class Tag < ApplicationRecord
         q[:tag_count] += 1 unless token == "status:deleted" || token =~ /\Alimit:.+\Z/
 
         if token =~ /\A(#{METATAGS}):(.+)\Z/i
-          case $1.downcase
+          g1 = $1.downcase
+          g2 = $2
+          case g1
           when "-user"
             q[:uploader_id_neg] ||= []
-            user_id = User.name_to_id($2)
+            user_id = User.name_to_id(g2)
             q[:uploader_id_neg] << user_id unless user_id.blank?
 
           when "user"
-            user_id = User.name_to_id($2)
+            user_id = User.name_to_id(g2)
             q[:uploader_id] = user_id unless user_id.blank?
 
           when "-approver"
-            if $2 == "none"
+            if g2 == "none"
               q[:approver_id] = "any"
-            elsif $2 == "any"
+            elsif g2 == "any"
               q[:approver_id] = "none"
             else
               q[:approver_id_neg] ||= []
-              user_id = User.name_to_id($2)
+              user_id = User.name_to_id(g2)
               q[:approver_id_neg] << user_id unless user_id.blank?
             end
 
           when "approver"
-            if $2 == "none"
+            if g2 == "none"
               q[:approver_id] = "none"
-            elsif $2 == "any"
+            elsif g2 == "any"
               q[:approver_id] = "any"
             else
-              user_id = User.name_to_id($2)
+              user_id = User.name_to_id(g2)
               q[:approver_id] = user_id unless user_id.blank?
             end
 
           when "flagger"
             q[:flagger_ids] ||= []
 
-            if $2 == "none"
+            if g2 == "none"
               q[:flagger_ids] << "none"
-            elsif $2 == "any"
+            elsif g2 == "any"
               q[:flagger_ids] << "any"
             else
-              user_id = User.name_to_id($2)
+              user_id = User.name_to_id(g2)
               q[:flagger_ids] << user_id unless user_id.blank?
             end
 
           when "-flagger"
-            if $2 == "none"
+            if g2 == "none"
               q[:flagger_ids] ||= []
               q[:flagger_ids] << "any"
-            elsif $2 == "any"
+            elsif g2 == "any"
               q[:flagger_ids] ||= []
               q[:flagger_ids] << "none"
             else
               q[:flagger_ids_neg] ||= []
-              user_id = User.name_to_id($2)
+              user_id = User.name_to_id(g2)
               q[:flagger_ids_neg] << user_id unless user_id.blank?
             end
 
           when "appealer"
             q[:appealer_ids] ||= []
 
-            if $2 == "none"
+            if g2 == "none"
               q[:appealer_ids] << "none"
-            elsif $2 == "any"
+            elsif g2 == "any"
               q[:appealer_ids] << "any"
             else
-              user_id = User.name_to_id($2)
+              user_id = User.name_to_id(g2)
               q[:appealer_ids] << user_id unless user_id.blank?
             end
 
           when "-appealer"
-            if $2 == "none"
+            if g2 == "none"
               q[:appealer_ids] ||= []
               q[:appealer_ids] << "any"
-            elsif $2 == "any"
+            elsif g2 == "any"
               q[:appealer_ids] ||= []
               q[:appealer_ids] << "none"
             else
               q[:appealer_ids_neg] ||= []
-              user_id = User.name_to_id($2)
+              user_id = User.name_to_id(g2)
               q[:appealer_ids_neg] << user_id unless user_id.blank?
             end
 
           when "commenter", "comm"
             q[:commenter_ids] ||= []
 
-            if $2 == "none"
+            if g2 == "none"
               q[:commenter_ids] << "none"
-            elsif $2 == "any"
+            elsif g2 == "any"
               q[:commenter_ids] << "any"
             else
-              user_id = User.name_to_id($2)
+              user_id = User.name_to_id(g2)
               q[:commenter_ids] << user_id unless user_id.blank?
             end
 
           when "noter"
             q[:noter_ids] ||= []
 
-            if $2 == "none"
+            if g2 == "none"
               q[:noter_ids] << "none"
-            elsif $2 == "any"
+            elsif g2 == "any"
               q[:noter_ids] << "any"
             else
-              user_id = User.name_to_id($2)
+              user_id = User.name_to_id(g2)
               q[:noter_ids] << user_id unless user_id.blank?
             end
 
           when "noteupdater"
             q[:note_updater_ids] ||= []
-            user_id = User.name_to_id($2)
+            user_id = User.name_to_id(g2)
             q[:note_updater_ids] << user_id unless user_id.blank?
 
           when "artcomm"
             q[:artcomm_ids] ||= []
-            user_id = User.name_to_id($2)
+            user_id = User.name_to_id(g2)
             q[:artcomm_ids] << user_id unless user_id.blank?
 
           when "-pool"
-            if $2.downcase == "none"
+            if g2.downcase == "none"
               q[:pool] = "any"
-            elsif $2.downcase == "any"
+            elsif g2.downcase == "any"
               q[:pool] = "none"
-            elsif $2.downcase == "series"
+            elsif g2.downcase == "series"
               q[:tags][:exclude] << "pool:series"
-            elsif $2.downcase == "collection"
+            elsif g2.downcase == "collection"
               q[:tags][:exclude] << "pool:collection"
             else
-              q[:tags][:exclude] << "pool:#{Pool.name_to_id($2)}"
+              q[:tags][:exclude] << "pool:#{Pool.name_to_id(g2)}"
             end
 
           when "pool"
-            if $2.downcase == "none"
+            if g2.downcase == "none"
               q[:pool] = "none"
-            elsif $2.downcase == "any"
+            elsif g2.downcase == "any"
               q[:pool] = "any"
-            elsif $2.downcase == "series"
+            elsif g2.downcase == "series"
               q[:tags][:related] << "pool:series"
-            elsif $2.downcase == "collection"
+            elsif g2.downcase == "collection"
               q[:tags][:related] << "pool:collection"
-            elsif $2.include?("*")
-              pools = Pool.name_matches($2).select("id").limit(Danbooru.config.tag_query_limit).order("post_count DESC")
+            elsif g2.include?("*")
+              pools = Pool.name_matches(g2).select("id").limit(Danbooru.config.tag_query_limit).order("post_count DESC")
               q[:tags][:include] += pools.map {|pool| "pool:#{pool.id}"}
             else
-              q[:tags][:related] << "pool:#{Pool.name_to_id($2)}"
+              q[:tags][:related] << "pool:#{Pool.name_to_id(g2)}"
             end
 
           when "ordpool"
-            pool_id = Pool.name_to_id($2)
+            pool_id = Pool.name_to_id(g2)
             q[:tags][:related] << "pool:#{pool_id}"
             q[:ordpool] = pool_id
 
           when "-favgroup"
-            favgroup_id = FavoriteGroup.name_to_id($2)
+            favgroup_id = FavoriteGroup.name_to_id(g2)
             q[:favgroups_neg] ||= []
             q[:favgroups_neg] << favgroup_id
 
           when "favgroup"
-            favgroup_id = FavoriteGroup.name_to_id($2)
+            favgroup_id = FavoriteGroup.name_to_id(g2)
             q[:favgroups] ||= []
             q[:favgroups] << favgroup_id
 
           when "-fav"
-            q[:tags][:exclude] << "fav:#{User.name_to_id($2)}"
+            q[:tags][:exclude] << "fav:#{User.name_to_id(g2)}"
 
           when "fav"
-            q[:tags][:related] << "fav:#{User.name_to_id($2)}"
+            q[:tags][:related] << "fav:#{User.name_to_id(g2)}"
 
           when "ordfav"
-            user_id = User.name_to_id($2)
+            user_id = User.name_to_id(g2)
             q[:tags][:related] << "fav:#{user_id}"
             q[:ordfav] = user_id
 
           when "search"
             q[:saved_searches] ||= []
-            q[:saved_searches] << $2
+            q[:saved_searches] << g2
 
           when "md5"
-            q[:md5] = $2.downcase.split(/,/)
+            q[:md5] = g2.downcase.split(/,/)
 
           when "-rating"
-            q[:rating_negated] = $2.downcase
+            q[:rating_negated] = g2.downcase
 
           when "rating"
-            q[:rating] = $2.downcase
+            q[:rating] = g2.downcase
 
           when "-locked"
-            q[:locked_negated] = $2.downcase
+            q[:locked_negated] = g2.downcase
 
           when "locked"
-            q[:locked] = $2.downcase
+            q[:locked] = g2.downcase
 
           when "id"
-            q[:post_id] = parse_helper($2)
+            q[:post_id] = parse_helper(g2)
 
           when "-id"
-            q[:post_id_negated] = $2.to_i
+            q[:post_id_negated] = g2.to_i
 
           when "width"
-            q[:width] = parse_helper($2)
+            q[:width] = parse_helper(g2)
 
           when "height"
-            q[:height] = parse_helper($2)
+            q[:height] = parse_helper(g2)
 
           when "mpixels"
-            q[:mpixels] = parse_helper_fudged($2, :float)
+            q[:mpixels] = parse_helper_fudged(g2, :float)
 
           when "ratio"
-            q[:ratio] = parse_helper($2, :ratio)
+            q[:ratio] = parse_helper(g2, :ratio)
 
           when "score"
-            q[:score] = parse_helper($2)
+            q[:score] = parse_helper(g2)
 
           when "favcount"
-            q[:fav_count] = parse_helper($2)
+            q[:fav_count] = parse_helper(g2)
 
           when "filesize"
-      	    q[:filesize] = parse_helper_fudged($2, :filesize)
+            q[:filesize] = parse_helper_fudged(g2, :filesize)
 
           when "source"
-            src = $2.gsub(/\A"(.*)"\Z/, '\1')
+            src = g2.gsub(/\A"(.*)"\Z/, '\1')
             q[:source] = (src.to_escaped_for_sql_like + "%").gsub(/%+/, '%')
 
           when "-source"
-            src = $2.gsub(/\A"(.*)"\Z/, '\1')
+            src = g2.gsub(/\A"(.*)"\Z/, '\1')
             q[:source_neg] = (src.to_escaped_for_sql_like + "%").gsub(/%+/, '%')
 
           when "date"
-            q[:date] = parse_helper($2, :date)
+            q[:date] = parse_helper(g2, :date)
 
           when "age"
-            q[:age] = reverse_parse_helper(parse_helper($2, :age))
+            q[:age] = reverse_parse_helper(parse_helper(g2, :age))
 
           when "tagcount"
-            q[:post_tag_count] = parse_helper($2)
+            q[:post_tag_count] = parse_helper(g2)
 
           when "gentags"
-            q[:general_tag_count] = parse_helper($2)
+            q[:general_tag_count] = parse_helper(g2)
 
           when "arttags"
-            q[:artist_tag_count] = parse_helper($2)
+            q[:artist_tag_count] = parse_helper(g2)
 
           when "chartags"
-            q[:character_tag_count] = parse_helper($2)
+            q[:character_tag_count] = parse_helper(g2)
 
           when "copytags"
-            q[:copyright_tag_count] = parse_helper($2)
+            q[:copyright_tag_count] = parse_helper(g2)
 
           when "parent"
-            q[:parent] = $2.downcase
+            q[:parent] = g2.downcase
 
           when "-parent"
-            if $2.downcase == "none"
+            if g2.downcase == "none"
               q[:parent] = "any"
-            elsif $2.downcase == "any"
+            elsif g2.downcase == "any"
               q[:parent] = "none"
             else
               q[:parent_neg_ids] ||= []
-              q[:parent_neg_ids] << $2.downcase
+              q[:parent_neg_ids] << g2.downcase
             end
 
           when "child"
-            q[:child] = $2.downcase
+            q[:child] = g2.downcase
 
           when "order"
-            q[:order] = $2.downcase
+            q[:order] = g2.downcase
 
           when "limit"
             # Do nothing. The controller takes care of it.
 
           when "-status"
-            q[:status_neg] = $2.downcase
+            q[:status_neg] = g2.downcase
 
           when "status"
-            q[:status] = $2.downcase
+            q[:status] = g2.downcase
 
           when "filetype"
-            q[:filetype] = $2.downcase
+            q[:filetype] = g2.downcase
 
           when "-filetype"
-            q[:filetype_neg] = $2.downcase
+            q[:filetype_neg] = g2.downcase
 
           when "pixiv_id", "pixiv"
-            q[:pixiv_id] = parse_helper($2)
+            q[:pixiv_id] = parse_helper(g2)
 
           when "upvote"
             if CurrentUser.user.is_moderator?
-              q[:upvote] = User.name_to_id($2)
+              q[:upvote] = User.name_to_id(g2)
             end
 
           when "downvote"
             if CurrentUser.user.is_moderator?
-              q[:downvote] = User.name_to_id($2)
+              q[:downvote] = User.name_to_id(g2)
             end
 
           end
