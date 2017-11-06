@@ -214,44 +214,49 @@ module Danbooru
       "albert"
     end
 
+    #Full tag configuration info for all tags
+    def full_tag_config_info
+      @full_tag_category_mapping ||= {
+        "general" => {
+          "category" => 0,
+          "short" => "gen",
+          "extra" => []
+        },
+        "character" => {
+          "category" => 4,
+          "short" => "char",
+          "extra" => ["ch"]
+        },
+        "copyright" => {
+          "category" => 3,
+          "short" => "copy",
+          "extra" => ["co"]
+        },
+        "artist" => {
+          "category" => 1,
+          "short" => "art",
+          "extra" => []
+        }
+      }
+    end
+
     # Returns a hash mapping various tag categories to a numerical value.
-    # Be sure to update the reverse_tag_category_mapping also.
     def tag_category_mapping
-      @tag_category_mapping ||= {
-        "general" => 0,
-        "gen" => 0,
-
-        "artist" => 1,
-        "art" => 1,
-
-        "copyright" => 3,
-        "copy" => 3,
-        "co" => 3,
-
-        "character" => 4,
-        "char" => 4,
-        "ch" => 4
-      }
+      @tag_category_mapping ||= Hash[
+          full_tag_config_info.map {|k,v|  v["extra"].map {|y| [y,v["category"]]}}
+          .reduce([],:+)]
+        .update(Hash[full_tag_config_info.map {|k,v|  [v["short"],v["category"]]}])
+        .update( Hash[full_tag_config_info.map {|k,v| [k,v["category"]]}])
     end
 
+    # Returns a hash mapping more suited for views
     def canonical_tag_category_mapping
-      @canonical_tag_category_mapping ||= {
-        "General" => 0,
-        "Artist" => 1,
-        "Copyright" => 3,
-        "Character" => 4
-      }
+      @canonical_tag_category_mapping ||= Hash[full_tag_config_info.map {|k,v| [k.capitalize,v["category"]]}]
     end
 
-    # Returns a hash maping numerical category values to their
-    # string equivalent. Be sure to update the tag_category_mapping also.
+    # Returns a hash mapping numerical category values to their string equivalent.
     def reverse_tag_category_mapping
-      @reverse_tag_category_mapping ||= {
-        0 => "General",
-        1 => "Artist",
-        3 => "Copyright",
-        4 => "Character"
-      }
+      @reverse_tag_category_mapping ||= Hash[full_tag_config_info.map {|k,v| [v["category"],k]}]
     end
 
     # If enabled, users must verify their email addresses.

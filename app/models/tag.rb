@@ -27,7 +27,7 @@ class Tag < ApplicationRecord
 
   class CategoryMapping
     Danbooru.config.reverse_tag_category_mapping.each do |value, category|
-      define_method(category.downcase) do
+      define_method(category) do
         value
       end
     end
@@ -124,7 +124,7 @@ class Tag < ApplicationRecord
     end
 
     def category_name
-      Danbooru.config.reverse_tag_category_mapping[category]
+      Danbooru.config.reverse_tag_category_mapping[category].capitalize
     end
 
     def update_category_cache_for_all
