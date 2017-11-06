@@ -224,7 +224,8 @@ module Danbooru
           "short" => "gen",
           "extra" => [],
           "header" => "<h1>Tags</h1>",
-          "humanized" => nil
+          "humanized" => nil,
+          "relatedtag" => "General"
         },
         "character" => {
           "category" => 4,
@@ -236,7 +237,8 @@ module Danbooru
             "exclusion" => [],
             "regexmap" => /^(.+?)(?:_\(.+\))?$/,
             "formatstr" => "%s"
-          }
+          },
+          "relatedtag" => "Characters"
         },
         "copyright" => {
           "category" => 3,
@@ -248,7 +250,8 @@ module Danbooru
             "exclusion" => [],
             "regexmap" => //,
             "formatstr" => "(%s)"
-          }
+          },
+          "relatedtag" => "Copyrights"
         },
         "artist" => {
           "category" => 1,
@@ -260,7 +263,8 @@ module Danbooru
             "exclusion" => %w(banned_artist),
             "regexmap" => //,
             "formatstr" => "drawn by %s"
-          }
+          },
+          "relatedtag" => "Artists"
         }
       }
     end
@@ -306,6 +310,11 @@ module Danbooru
     #Sets the order of the categorized tag string (presenters/post_presenter.rb)
     def categorized_tag_list
       @categorized_tag_list ||= ["copyright","character","artist","general"]
+    end
+
+    #Sets the order of the related tag buttons (javascripts/related_tag.js)
+    def related_tag_button_list
+      @related_tag_button_list ||= ["general","artist","character","copyright"]
     end
 
 #END TAG

@@ -12,10 +12,9 @@
 
   Danbooru.RelatedTag.initialize_buttons = function() {
     this.common_bind("#related-tags-button", "");
-    this.common_bind("#related-general-button", "general");
-    this.common_bind("#related-artists-button", "artist");
-    this.common_bind("#related-characters-button", "character");
-    this.common_bind("#related-copyrights-button", "copyright");
+    $.each(JSON.parse(Danbooru.meta("related-tag-button-list")), function(i,category) {
+      Danbooru.RelatedTag.common_bind("#related-" + category + "-button", category);
+    });
     $("#find-artist-button").click(Danbooru.RelatedTag.find_artist);
   }
 

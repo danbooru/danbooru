@@ -109,10 +109,10 @@
           </div>
 
           <%= button_tag "Related tags", :id => "related-tags-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
-          <%= button_tag "General", :id => "related-general-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
-          <%= button_tag "Artists", :id => "related-artists-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
-          <%= button_tag "Characters", :id => "related-characters-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
-          <%= button_tag "Copyrights", :id => "related-copyrights-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
+
+          <% Danbooru.config.related_tag_button_list.each do |category| %>
+            <%= button_tag "#{Danbooru.config.full_tag_config_info[category]["relatedtag"]}", :id => "related-#{category}-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
+          <% end %>
         </div>
 
         <div class="input">
@@ -139,6 +139,10 @@
 
 <% content_for(:page_title) do %>
   Upload - <%= Danbooru.config.app_name %>
+<% end %>
+
+<% content_for(:html_header) do %>
+  <meta name="related-tag-button-list" content="<%= Danbooru.config.related_tag_button_list %>">
 <% end %>
 
 <%= render "posts/partials/common/secondary_links" %>

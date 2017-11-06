@@ -8,6 +8,8 @@
   <% unless cookies[:dm] %>
     <meta name="viewport" content="width=device-width,initial-scale=1">
   <% end %>
+  <meta name="tag-category-names" content="<%= Danbooru.config.tag_category_mapping.keys %>">
+  <meta name="short-tag-category-names" content="<%= Danbooru.config.short_tag_name_mapping.keys %>">
   <meta name="current-user-name" content="<%= CurrentUser.name %>">
   <meta name="current-user-id" content="<%= CurrentUser.id %>">
   <meta name="current-user-can-approve-posts" content="<%= CurrentUser.can_approve_posts? %>">
