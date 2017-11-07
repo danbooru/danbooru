@@ -13,6 +13,7 @@ class ApplicationController < ActionController::Base
   layout "default"
   force_ssl :if => :ssl_login?
   helper_method :show_moderation_notice?
+  before_filter :enable_cors
 
   rescue_from Exception, :with => :rescue_exception
   rescue_from User::PrivilegeError, :with => :access_denied
