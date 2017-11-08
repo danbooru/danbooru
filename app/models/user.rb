@@ -557,6 +557,10 @@ class User < ApplicationRecord
       is_moderator? || flagger_id == id
     end
 
+    def can_view_flagger_on_post?(flag)
+      (is_moderator? && flag.not_uploaded_by?(id)) || flag.creator_id == id
+    end
+
     def upload_limit
       @upload_limit ||= [max_upload_limit - used_upload_slots, 0].max
     end

@@ -120,6 +120,10 @@ class AnonymousUser
     false
   end
 
+  def can_view_flagger_on_post?(flag)
+    false
+  end
+
   def can_approve_posts?
     false
   end

@@ -73,13 +73,19 @@ class PostFlag < ApplicationRecord
         q = q.reason_matches(params[:reason_matches])
       end
 
-      if params[:creator_id].present? && CurrentUser.can_view_flagger?(params[:creator_id].to_i)
-        q = q.where("creator_id = ?", params[:creator_id].to_i)
+      if params[:creator_id].present?
+        if CurrentUser.can_view_flagger?(params[:creator_id].to_i)
+          q = q.where.not(post_id: CurrentUser.user.posts)
+          q = q.where("creator_id = ?", params[:creator_id].to_i)
+        else
+          q = q.where("false")
+        end
       end
 
       if params[:creator_name].present?
         flagger_id = User.name_to_id(params[:creator_name].strip)
         if flagger_id && CurrentUser.can_view_flagger?(flagger_id)
+          q = q.where.not(post_id: CurrentUser.user.posts)
           q = q.where("creator_id = ?", flagger_id)
         else
           q = q.where("false")
@@ -122,7 +128,7 @@ class PostFlag < ApplicationRecord
   module ApiMethods
     def hidden_attributes
       list = super
-      unless CurrentUser.is_moderator?
+      unless CurrentUser.can_view_flagger_on_post?(self)
         list += [:creator_id]
       end
       super + list
@@ -189,5 +195,13 @@ class PostFlag < ApplicationRecord
 
   def flag_count_for_creator
     PostFlag.where(:creator_id => creator_id).recent.count
+  end
+
+  def uploader_id
+    @uploader_id ||= Post.find(post_id).uploader_id
+  end
+
+  def not_uploaded_by?(userid)
+    uploader_id != userid
   end
 end

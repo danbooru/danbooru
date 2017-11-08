@@ -94,5 +94,26 @@ class PostFlagTest < ActiveSupport::TestCase
         assert_equal(IPAddr.new("127.0.0.2"), @post_flag.creator_ip_addr)
       end
     end
+
+    context "a moderator user" do
+      setup do
+        Timecop.travel(2.weeks.ago) do
+          @dave = FactoryGirl.create(:moderator_user)
+        end
+        CurrentUser.user = @dave
+      end
+
+      should "not be able to view flags on their own uploads" do
+        @modpost = FactoryGirl.create(:post, :tag_string => "mmm",:uploader_id => @dave.id)
+        CurrentUser.scoped(@alice) do
+          @flag1 = PostFlag.create(:post => @modpost, :reason => "aaa", :is_resolved => false)
+        end
+        assert_equal(false, @dave.can_view_flagger_on_post?(@flag1))
+        flag2 = PostFlag.search(:creator_id => @alice.id)
+        assert_equal(0, flag2.length)
+        flag3 = PostFlag.search({})
+        assert_nil(JSON.parse(flag3.to_json)[0]["creator_id"])
+      end
+    end
   end
 end
