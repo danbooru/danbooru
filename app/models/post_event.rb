@@ -30,7 +30,7 @@ class PostEvent
       true
     when PostFlag
       flag = event
-      user.can_view_flagger?(flag.creator_id)
+      user.can_view_flagger_on_post?(flag)
     end
   end
 

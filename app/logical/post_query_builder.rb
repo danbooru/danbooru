@@ -227,7 +227,7 @@ class PostQueryBuilder
     if q[:flagger_ids_neg]
       q[:flagger_ids_neg].each do |flagger_id|
         if CurrentUser.can_view_flagger?(flagger_id)
-          post_ids = PostFlag.unscoped.search({:creator_id => flagger_id, :category => "normal"}).reorder("").pluck("distinct(post_id)")
+          post_ids = PostFlag.unscoped.search({:creator_id => flagger_id, :category => "normal"}).reorder("").select {|flag| flag.not_uploaded_by?(CurrentUser.id)}.map {|flag| flag.post_id}.uniq
           if post_ids.any?
             relation = relation.where("posts.id NOT IN (?)", post_ids)
           end
@@ -242,7 +242,8 @@ class PostQueryBuilder
         elsif flagger_id == "none"
           relation = relation.where('NOT EXISTS (' + PostFlag.unscoped.search({:category => "normal"}).where('post_id = posts.id').reorder('').select('1').to_sql + ')')
         elsif CurrentUser.can_view_flagger?(flagger_id)
-            relation = relation.where("posts.id IN (?)", PostFlag.unscoped.search({:creator_id => flagger_id, :category => "normal"}).reorder("").select(:post_id).distinct)
+          post_ids = PostFlag.unscoped.search({:creator_id => flagger_id, :category => "normal"}).reorder("").select {|flag| flag.not_uploaded_by?(CurrentUser.id)}.map {|flag| flag.post_id}.uniq
+          relation = relation.where("posts.id IN (?)", post_ids)
         end
       end
     end
