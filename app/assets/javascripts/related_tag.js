@@ -2,7 +2,7 @@
   Danbooru.RelatedTag = {};
 
   Danbooru.RelatedTag.initialize_all = function() {
-    if ($("#c-posts").length || $("#c-uploads").length) {
+    if ($("#c-posts #a-show").length || $("#c-uploads #a-new").length) {
       this.initialize_buttons();
       $("#related-tags-container").hide();
       $("#artist-tags-container").hide();
