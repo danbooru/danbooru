@@ -218,7 +218,7 @@ class TagTest < ActiveSupport::TestCase
       should_not allow_value("café").for(:name).on(:create)
       should_not allow_value("東方").for(:name).on(:create)
 
-      metatags = Tag::METATAGS.split("|") + Tag::SUBQUERY_METATAGS.split("|") + Danbooru.config.tag_category_mapping.keys
+      metatags = Tag::METATAGS.split("|") + Tag::SUBQUERY_METATAGS.split("|") + TagCategory.mapping.keys
       metatags.split("|").each do |metatag|
         should_not allow_value("#{metatag}:foo").for(:name).on(:create)
       end

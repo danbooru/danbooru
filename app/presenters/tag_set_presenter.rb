@@ -25,10 +25,10 @@ class TagSetPresenter < Presenter
   def split_tag_list_html(template, options = {})
     html = ""
 
-    Danbooru.config.split_tag_header_list.each do |category|
+    TagCategory.split_header_list.each do |category|
       typetags = typed_tags(category)
       if typetags.any?
-        html << Danbooru.config.full_tag_config_info[category]["header"]
+        html << TagCategory.header_mapping[category]
         html << "<ul>"
         typetags.each do |tag|
           html << build_list_item(tag, template, options)
@@ -56,7 +56,7 @@ private
     @typed_tags ||= {}
     @typed_tags[name] ||= begin
       @tags.select do |tag|
-        categories[tag] == Danbooru.config.tag_category_mapping[name]
+        categories[tag] == TagCategory.mapping[name]
       end
     end
   end

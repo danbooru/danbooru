@@ -118,7 +118,7 @@ class PostQueryBuilder
     relation = add_range_relation(q[:filesize], "posts.file_size", relation)
     relation = add_range_relation(q[:date], "posts.created_at", relation)
     relation = add_range_relation(q[:age], "posts.created_at", relation)
-    Danbooru.config.full_tag_config_info.each_key do |category|
+    TagCategory.categories.each do |category|
       relation = add_range_relation(q["#{category}_tag_count".to_sym], "posts.tag_count_#{category}", relation)
     end
     relation = add_range_relation(q[:post_tag_count], "posts.tag_count", relation)
@@ -511,11 +511,11 @@ class PostQueryBuilder
     when "tagcount_asc"
       relation = relation.order("posts.tag_count ASC")
 
-    when /(#{Danbooru.config.short_tag_name_mapping.keys.join("|")})tags(?:\Z|_desc)/
-      relation = relation.order("posts.tag_count_#{Danbooru.config.short_tag_name_mapping[$1]} DESC")
+    when /(#{TagCategory.short_name_regex})tags(?:\Z|_desc)/
+      relation = relation.order("posts.tag_count_#{TagCategory.short_name_mapping[$1]} DESC")
 
-    when /(#{Danbooru.config.short_tag_name_mapping.keys.join("|")})tags_asc/
-      relation = relation.order("posts.tag_count_#{Danbooru.config.short_tag_name_mapping[$1]} ASC")
+    when /(#{TagCategory.short_name_regex})tags_asc/
+      relation = relation.order("posts.tag_count_#{TagCategory.short_name_mapping[$1]} ASC")
 
     when "rank"
       relation = relation.order("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 35000 DESC")

@@ -225,7 +225,7 @@ module Danbooru
           "extra" => [],
           "header" => "<h1>Tags</h1>",
           "humanized" => nil,
-          "relatedtag" => "General"
+          "relatedbutton" => "General"
         },
         "character" => {
           "category" => 4,
@@ -238,7 +238,7 @@ module Danbooru
             "regexmap" => /^(.+?)(?:_\(.+\))?$/,
             "formatstr" => "%s"
           },
-          "relatedtag" => "Characters"
+          "relatedbutton" => "Characters"
         },
         "copyright" => {
           "category" => 3,
@@ -251,7 +251,7 @@ module Danbooru
             "regexmap" => //,
             "formatstr" => "(%s)"
           },
-          "relatedtag" => "Copyrights"
+          "relatedbutton" => "Copyrights"
         },
         "artist" => {
           "category" => 1,
@@ -264,7 +264,7 @@ module Danbooru
             "regexmap" => //,
             "formatstr" => "drawn by %s"
           },
-          "relatedtag" => "Artists"
+          "relatedbutton" => "Artists"
         },
         "meta" => {
           "category" => 5,
@@ -272,35 +272,9 @@ module Danbooru
           "extra" => [],
           "header" => "<h2>Meta</h2>",
           "humanized" => nil,
-          "relatedtag" => nil
+          "relatedbutton" => nil
         }
       }
-    end
-
-#TAG MAPPINGS
-
-    # Returns a hash mapping various tag categories to a numerical value.
-    def tag_category_mapping
-      @tag_category_mapping ||= Hash[
-          full_tag_config_info.map {|k,v|  v["extra"].map {|y| [y,v["category"]]}}
-          .reduce([],:+)]
-        .update(Hash[full_tag_config_info.map {|k,v|  [v["short"],v["category"]]}])
-        .update( Hash[full_tag_config_info.map {|k,v| [k,v["category"]]}])
-    end
-
-    # Returns a hash mapping more suited for views
-    def canonical_tag_category_mapping
-      @canonical_tag_category_mapping ||= Hash[full_tag_config_info.map {|k,v| [k.capitalize,v["category"]]}]
-    end
-
-    # Returns a hash mapping numerical category values to their string equivalent.
-    def reverse_tag_category_mapping
-      @reverse_tag_category_mapping ||= Hash[full_tag_config_info.map {|k,v| [v["category"],k]}]
-    end
-
-    # Returns a hash mapping for the short name usage in metatags
-    def short_tag_name_mapping
-      @short_tag_name_mapping ||= Hash[full_tag_config_info.map {|k,v| [v["short"],k] }]
     end
 
 #TAG ORDERS

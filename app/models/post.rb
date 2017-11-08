@@ -626,11 +626,11 @@ class Post < ApplicationRecord
 
     def set_tag_counts
       self.tag_count = 0
-      Danbooru.config.full_tag_config_info.each_key {|x| set_tag_count(x,0)}
+      TagCategory.categories {|x| set_tag_count(x,0)}
       categories = Tag.categories_for(tag_array, :disable_caching => true)
       categories.each_value do |category|
         self.tag_count += 1
-        inc_tag_count(Danbooru.config.reverse_tag_category_mapping[category])
+        inc_tag_count(TagCategory.reverse_mapping[category])
       end
     end
 
@@ -913,7 +913,7 @@ class Post < ApplicationRecord
       @typed_tags ||= {}
       @typed_tags[name] ||= begin
         tag_array.select do |tag|
-          tag_categories[tag] == Danbooru.config.tag_category_mapping[name]
+          tag_categories[tag] == TagCategory.mapping[name]
         end
       end
     end
@@ -926,20 +926,19 @@ class Post < ApplicationRecord
       @humanized_essential_tag_string ||= Cache.get("hets-#{id}", 1.hour.to_i) do
         string = []
 
-        Danbooru.config.humanized_tag_category_list.each do |category|
-          humanizeddata = Danbooru.config.full_tag_config_info[category]["humanized"]
-          typetags = typed_tags(category) - humanizeddata["exclusion"]
-          if humanizeddata["slice"] > 0
-            typetags = typetags.slice(0,humanizeddata["slice"]) + (typetags.length > humanizeddata["slice"] ? ["others"] : [])
+        TagCategory.humanized_list.each do |category|
+          typetags = typed_tags(category) - TagCategory.humanized_mapping[category]["exclusion"]
+          if TagCategory.humanized_mapping[category]["slice"] > 0
+            typetags = typetags.slice(0,TagCategory.humanized_mapping[category]["slice"]) + (typetags.length > TagCategory.humanized_mapping[category]["slice"] ? ["others"] : [])
           end
-          if humanizeddata["regexmap"] != //
+          if TagCategory.humanized_mapping[category]["regexmap"] != //
             typetags = typetags.map do |tag|
-              tag.match(humanizeddata["regexmap"])[1]
+              tag.match(TagCategory.humanized_mapping[category]["regexmap"])[1]
             end
           end
           if typetags.any?
             if category != "copyright" || typed_tags("character").any?
-              string << humanizeddata["formatstr"] % typetags.to_sentence
+              string << TagCategory.humanized_mapping[category]["formatstr"] % typetags.to_sentence
             else
               string << typetags.to_sentence
             end
@@ -949,7 +948,7 @@ class Post < ApplicationRecord
       end
     end
 
-    Danbooru.config.full_tag_config_info.each_key do |category|
+    TagCategory.categories.each do |category|
       define_method("tag_string_#{category}") do
         typed_tags(category).join(" ")
       end
@@ -1140,7 +1139,7 @@ class Post < ApplicationRecord
   module CountMethods
     def fix_post_counts(post)
       post.set_tag_counts
-      args = Hash[Danbooru.config.full_tag_config_info.keys.map {|x| ["tag_count_#{x}",post.send("tag_count_#{x}")]}].update(:tag_count => post.tag_count)
+      args = Hash[TagCategory.categories.map {|x| ["tag_count_#{x}",post.send("tag_count_#{x}")]}].update(:tag_count => post.tag_count)
       post.update_columns(args)
     end
 
@@ -1523,7 +1522,7 @@ class Post < ApplicationRecord
     end
 
     def method_attributes
-      list = super + [:uploader_name, :has_large, :has_visible_children, :children_ids] + Danbooru.config.full_tag_config_info.keys.map {|x| "tag_string_#{x}".to_sym}
+      list = super + [:uploader_name, :has_large, :has_visible_children, :children_ids] + TagCategory.categories.map {|x| "tag_string_#{x}".to_sym}
       if visible?
         list += [:file_url, :large_file_url, :preview_file_url]
       end

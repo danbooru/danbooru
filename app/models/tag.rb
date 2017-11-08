@@ -1,7 +1,7 @@
 class Tag < ApplicationRecord
   COSINE_SIMILARITY_RELATED_TAG_THRESHOLD = 1000
   METATAGS = "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-pool|pool|ordpool|-favgroup|favgroup|-fav|fav|ordfav|md5|-rating|rating|-locked|locked|width|height|mpixels|ratio|score|favcount|filesize|source|-source|id|-id|date|age|order|limit|-status|status|tagcount|parent|-parent|child|pixiv_id|pixiv|search|upvote|downvote|filetype|-filetype|flagger|-flagger|appealer|-appealer|" +
-    Danbooru.config.short_tag_name_mapping.keys.map {|x| "#{x}tags"}.join("|")
+    TagCategory.short_name_list.map {|x| "#{x}tags"}.join("|")
   SUBQUERY_METATAGS = "commenter|comm|noter|noteupdater|artcomm|flagger|-flagger|appealer|-appealer"
   attr_accessible :category, :as => [:moderator, :gold, :platinum, :member, :anonymous, :default, :builder, :admin]
   attr_accessible :is_locked, :as => [:moderator, :admin]
@@ -27,18 +27,18 @@ class Tag < ApplicationRecord
   end
 
   class CategoryMapping
-    Danbooru.config.reverse_tag_category_mapping.each do |value, category|
+    TagCategory.reverse_mapping.each do |value, category|
       define_method(category) do
         value
       end
     end
 
     def regexp
-      @regexp ||= Regexp.compile(Danbooru.config.tag_category_mapping.keys.sort_by {|x| -x.size}.join("|"))
+      @regexp ||= Regexp.compile(TagCategory.mapping.keys.sort_by {|x| -x.size}.join("|"))
     end
 
     def value_for(string)
-      Danbooru.config.tag_category_mapping[string.to_s.downcase] || 0
+      TagCategory.mapping[string.to_s.downcase] || 0
     end
   end
 
@@ -125,7 +125,7 @@ class Tag < ApplicationRecord
     end
 
     def category_name
-      Danbooru.config.reverse_tag_category_mapping[category].capitalize
+      TagCategory.reverse_mapping[category].capitalize
     end
 
     def update_category_cache_for_all
@@ -141,7 +141,7 @@ class Tag < ApplicationRecord
         Post.raw_tag_match(name).where("true /* Tag#update_category_post_counts */").find_each do |post|
           post.reload
           post.set_tag_counts
-          args = Hash[Danbooru.config.full_tag_config_info.keys.map {|x| ["tag_count_#{x}",post.send("tag_count_#{x}")]}].update(:tag_count => post.tag_count)
+          args = Hash[TagCategory.categories {|x| ["tag_count_#{x}",post.send("tag_count_#{x}")]}].update(:tag_count => post.tag_count)
           Post.where(:id => post.id).update_all(args)
         end
       end
@@ -177,7 +177,7 @@ class Tag < ApplicationRecord
           counts = counts.to_a.select {|x| x[1] > trending_count_limit}
           counts = counts.map do |tag_name, recent_count|
             tag = Tag.find_or_create_by_name(tag_name)
-            if tag.category == Danbooru.config.tag_category_mapping["artist"]
+            if tag.category == Tag.categories.artist
               # we're not interested in artists in the trending list
               [tag_name, 0]
             else
@@ -666,8 +666,8 @@ class Tag < ApplicationRecord
           when "tagcount"
             q[:post_tag_count] = parse_helper(g2)
 
-          when /(#{Danbooru.config.short_tag_name_mapping.keys.join("|")})tags/
-            q["#{Danbooru.config.short_tag_name_mapping[$1]}_tag_count".to_sym] = parse_helper(g2)
+          when /(#{TagCategory.short_name_regex})tags/
+            q["#{TagCategory.short_name_mapping[$1]}_tag_count".to_sym] = parse_helper(g2)
 
           when "parent"
             q[:parent] = g2.downcase

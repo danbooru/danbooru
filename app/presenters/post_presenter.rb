@@ -132,7 +132,7 @@ class PostPresenter < Presenter
   def categorized_tag_groups
     string = []
 
-    Danbooru.config.categorized_tag_list.each do |category|
+    TagCategory.categorized_list.each do |category|
       if @post.typed_tags(category).any?
         string << @post.typed_tags(category).join(" ")
       end

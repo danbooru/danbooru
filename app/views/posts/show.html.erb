@@ -153,7 +153,7 @@
 <% end %>
 
 <% content_for(:html_header) do %>
-  <meta name="related-tag-button-list" content="<%= Danbooru.config.related_tag_button_list %>">
+  <meta name="related-tag-button-list" content="<%= TagCategory.related_button_list %>">
   <meta name="description" content="<%= @post.presenter.humanized_tag_string %>">
   <meta name="tags" content="<%= @post.tag_string %>">
   <meta name="favorites" content="<%= @post.fav_string %>">
