@@ -28,9 +28,9 @@
   Danbooru.Autocomplete.prune_local_storage = function() {
     if (this.enable_local_storage) {
       var cached_autocomplete_version = $.localStorage.get("danbooru-autocomplete-version");
-      var current_cache_size = $.localStorage.keys().reduce( function(total, key) { return total + localStorage[key].length; }, 0);
+      var current_cache_size = Object.keys(localStorage).reduce( function(total, key) { return total + localStorage[key].length; }, 0);
       if (cached_autocomplete_version !== this.AUTOCOMPLETE_VERSION || current_cache_size > this.MAX_STORAGE_SIZE) {
-        $.each($.localStorage.keys(), function(i, key) {
+        $.each(Object.keys(localStorage), function(i, key) {
           if (key.substr(0, 3) === "ac-") {
             $.localStorage.remove(key);
           }
