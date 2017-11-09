@@ -18,6 +18,7 @@ class Post < ApplicationRecord
   validates_uniqueness_of :md5, :on => :create
   validates_inclusion_of :rating, in: %w(s q e), message: "rating must be s, q, or e"
   validate :tag_names_are_valid
+  validate :added_tags_are_valid
   validate :post_is_not_its_own_parent
   validate :updater_can_change_rating
   before_save :update_tag_post_counts
@@ -590,6 +591,18 @@ class Post < ApplicationRecord
 
     def tag_array_was
       @tag_array_was ||= Tag.scan_tags(tag_string_was)
+    end
+
+    def tags
+      Tag.where(name: tag_array)
+    end
+
+    def tags_was
+      Tag.where(name: tag_array_was)
+    end
+
+    def added_tags
+      tags - tags_was
     end
 
     def decrement_tag_post_counts
@@ -1705,6 +1718,17 @@ class Post < ApplicationRecord
         tag.errors.messages.each do |attribute, messages|
           errors[:tag_string] << "tag #{attribute} #{messages.join(';')}"
         end
+      end
+    end
+
+    def added_tags_are_valid
+      new_tags = added_tags.select { |t| t.post_count <= 1 }
+      new_general_tags = new_tags.select { |t| t.category == Tag.categories.general }
+
+      if new_general_tags.present?
+        n = new_general_tags.size
+        tag_wiki_links = new_general_tags.map { |tag| "[[#{tag.name}]]" }
+        self.warnings[:base] << "Created #{n} new #{n == 1 ? "tag" : "tags"}: #{tag_wiki_links.join(", ")}"
       end
     end
   end
