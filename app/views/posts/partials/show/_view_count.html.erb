@@ -1,0 +1,9 @@
+<% if CurrentUser.user.is_moderator? %>
+<script type="text/javascript">
+  $(function() {
+    $.post("<%= Danbooru.config.reportbooru_server %>/post_views", {
+      msg: "<%= msg %>"
+    });
+  });
+</script>
+<% end %>

@@ -46,6 +46,14 @@ module PostsHelper
     return nil
   end
 
+  def post_view_count_js
+    return nil unless Danbooru.config.enable_post_search_counts
+
+    msg = "#{params[:id]},#{session.id}"
+    verifier = ActiveSupport::MessageVerifier.new(Danbooru.config.reportbooru_key, digest: "SHA256").generate(msg)
+    return render("posts/partials/index/view_count", msg: msg)
+  end
+
   def common_searches_html(user)
     return nil unless Danbooru.config.enable_post_search_counts
     return nil unless user.is_platinum?
