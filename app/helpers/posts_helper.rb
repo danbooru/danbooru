@@ -50,7 +50,7 @@ module PostsHelper
     return nil unless Danbooru.config.enable_post_search_counts
 
     msg = "#{params[:id]},#{session.id}"
-    msg = ActiveSupport::MessageVerifier.new(Danbooru.config.reportbooru_key, digest: "SHA256").generate(msg)
+    msg = ActiveSupport::MessageVerifier.new(Danbooru.config.reportbooru_key, serializer: JSON, digest: "SHA256").generate(msg)
     return render("posts/partials/show/view_count", msg: msg)
   end
 

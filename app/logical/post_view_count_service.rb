@@ -27,5 +27,7 @@ class PostViewCountService
     else
       return nil
     end
+  rescue JSON::ParserError
+    nil
   end
 end
