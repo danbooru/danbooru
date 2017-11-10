@@ -51,7 +51,7 @@ module PostsHelper
 
     msg = "#{params[:id]},#{session.id}"
     verifier = ActiveSupport::MessageVerifier.new(Danbooru.config.reportbooru_key, digest: "SHA256").generate(msg)
-    return render("posts/partials/index/view_count", msg: msg)
+    return render("posts/partials/show/view_count", msg: msg)
   end
 
   def common_searches_html(user)
