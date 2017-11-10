@@ -1,18 +1,18 @@
 # queries reportbooru to find popular post searches
 class PopularSearchService
-  attr_reader :date, :scale
+  attr_reader :date
 
   def self.enabled?
     Danbooru.config.reportbooru_server.present?
   end
 
-  def initialize(date, scale)
+  def initialize(date)
     if !PopularSearchService.enabled?
       raise NotImplementedError.new("the Reportbooru service isn't configured. Popular searches are not available.")
     end
 
     @date = date
-    @scale = scale
+    @scale = "day"
   end
 
   def each_search(limit = 100, &block)

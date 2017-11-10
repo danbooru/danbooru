@@ -10,7 +10,7 @@ module Explore
 
     def searches
       @date = params[:date] ? Date.parse(params[:date]) : Date.today
-      @search_service = PopularSearchService.new(@date, params[:scale] || "day")
+      @search_service = PopularSearchService.new(@date)
     end
 
     def missed_searches

@@ -20,17 +20,9 @@
     </table>
 
     <p style="margin-top: 2em;">
-      View by 
-      <%= link_to "day", searches_explore_posts_path(:date => params[:date], :scale => "day") %> | 
-      <%= link_to "month", searches_explore_posts_path(:date => params[:date], :scale => "month") %>.
+      <%= link_to "< Previous", searches_explore_posts_path(:date => 1.day.ago(@date)) %>
 
-      Back one 
-      <%= link_to "day", searches_explore_posts_path(:date => 1.day.ago(@date), :scale => params[:scale]) %> | 
-      <%= link_to "month", searches_explore_posts_path(:date => 1.month.ago(@date), :scale => params[:scale]) %>.
-
-      Forward one
-      <%= link_to "day", searches_explore_posts_path(:date => 1.day.since(@date), :scale => params[:scale]) %> | 
-      <%= link_to "month", searches_explore_posts_path(:date => 1.month.since(@date), :scale => params[:scale]) %>.
+      <%= link_to "Next >", searches_explore_posts_path(:date => 1.day.since(@date)) %>
     </p>
   </div>
 </div>
