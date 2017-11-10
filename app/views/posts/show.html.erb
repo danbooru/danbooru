@@ -148,6 +148,8 @@
   </div>
 </div>
 
+<%= post_view_count_js %>
+
 <% content_for(:page_title) do %>
   <%= @post.presenter.humanized_essential_tag_string %> - <%= Danbooru.config.app_name %>
 <% end %>
