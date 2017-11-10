@@ -10,7 +10,7 @@ class PostViewCountService
   end
 
   def fetch_count(post_id)
-    url = URI.parse("#{Danbooru.config.reportbooru_server}/post_views/#{post_id}?date=#{date}")
+    url = URI.parse("#{Danbooru.config.reportbooru_server}/post_views/#{post_id}")
     response = HTTParty.get(url, Danbooru.config.httparty_options.reverse_merge(timeout: 6))
     if response.success?
       return JSON.parse(response.body)

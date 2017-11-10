@@ -12,7 +12,6 @@ class PopularSearchService
     end
 
     @date = date
-    @scale = "day"
   end
 
   def each_search(limit = 100, &block)
@@ -26,8 +25,8 @@ class PopularSearchService
   def fetch_data
     dates = date.strftime("%Y-%m-%d")
 
-    Cache.get("ps-#{scale}-#{dates}", 1.minute) do
-      url = "#{Danbooru.config.reportbooru_server}/hits/#{scale}?date=#{dates}"
+    Cache.get("ps-day-#{dates}", 1.minute) do
+      url = "#{Danbooru.config.reportbooru_server}/hits/day?date=#{dates}"
       response = HTTParty.get(url, Danbooru.config.httparty_options.reverse_merge(timeout: 3))
       if response.success?
         response = response.body
