@@ -1,17 +1,19 @@
+<!--
 <section id="outer-recent-searches" style="display: none;">
   <h1>Recent Searches</h1>
   <ul id="recent-searches">
   </ul>
 </section>
+-->
 
 <script type="text/javascript">
   $(function() {
-    $.get("<%= Danbooru.config.reportbooru_server %>/user_searches", {
+    /*$.get("<%= Danbooru.config.reportbooru_server %>/user_searches", {
       uid: <%= user.id %>,
       sig: "<%= sig %>"
     }, function(data) {
       $("#recent-searches").html(data);
       $("#outer-recent-searches").show();
-    });
+    });*/
   });
 </script>
