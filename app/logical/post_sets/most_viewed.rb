@@ -3,7 +3,7 @@ module PostSets
     attr_reader :date
 
     def initialize(date)
-      @date = date.blank? ? Time.zone.now : Time.zone.parse(date)
+      @date = (date.blank? ? Time.zone.now : Time.zone.parse(date)).to_date
     end
 
     def posts
