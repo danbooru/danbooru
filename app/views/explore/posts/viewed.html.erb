@@ -1,0 +1,21 @@
+<div id="c-explore-posts">
+  <div id="a-popular">
+    <h1>Most Viewed: <%= @post_set.presenter.date %></h1>
+
+    <%= @post_set.presenter.nav_links(self) %>
+
+    <%= render "posts/partials/common/inline_blacklist" %>
+
+    <%= @post_set.presenter.post_previews_html(self) %>
+  </div>
+</div>
+
+<%= render "posts/partials/common/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Most Viewed - <%= Danbooru.config.app_name %>
+<% end %>
+
+<% content_for(:html_header) do %>
+  <meta name="description" content="The most viewed posts per day">
+<% end %>

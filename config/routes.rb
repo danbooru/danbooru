@@ -51,6 +51,7 @@ Rails.application.routes.draw do
     resources :posts do
       collection do
         get :popular
+        get :viewed
         get :searches
         get :missed_searches
         get :intro

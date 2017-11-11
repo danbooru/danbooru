@@ -4,7 +4,7 @@ class PostViewCountService
   end
 
   def initialize
-    if !MissedSearchService.enabled?
+    if !PostViewCountService.enabled?
       raise NotImplementedError.new("the Reportbooru service isn't configured. Missed searches are not available.")
     end
   end
@@ -29,5 +29,10 @@ class PostViewCountService
     end
   rescue JSON::ParserError
     nil
+  end
+
+  def popular_posts(date = Date.today)
+    ranking = fetch_rank(date)
+    ranking.map {|x| Post.find(x[0])}
   end
 end

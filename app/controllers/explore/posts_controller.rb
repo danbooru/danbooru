@@ -8,6 +8,12 @@ module Explore
       respond_with(@posts)
     end
 
+    def viewed
+      @post_set = PostSets::MostViewed.new(params[:date])
+      @posts = @post_set.posts
+      respond_with(@posts)
+    end
+
     def searches
       @date = params[:date] ? Date.parse(params[:date]) : Date.today
       @search_service = PopularSearchService.new(@date)
