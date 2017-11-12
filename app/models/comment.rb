@@ -40,11 +40,19 @@ class Comment < ApplicationRecord
     end
 
     def hidden(user)
-      where("score < ? and is_sticky = false", user.comment_threshold)
+      if user.is_moderator?
+        where("(score < ? and is_sticky = false) or is_deleted = true", user.comment_threshold)
+      else
+        where("score < ? and is_sticky = false", user.comment_threshold)
+      end
     end
 
     def visible(user)
-      where("score >= ? or is_sticky = true", user.comment_threshold)
+      if user.is_moderator?
+        where("(score >= ? or is_sticky = true) and is_deleted = false", user.comment_threshold)
+      else
+        where("score >= ? or is_sticky = true", user.comment_threshold)
+      end
     end
 
     def deleted
