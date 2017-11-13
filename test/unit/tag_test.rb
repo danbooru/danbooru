@@ -119,6 +119,10 @@ class TagTest < ActiveSupport::TestCase
       tag.update_category_cache_for_all
       assert_equal(Tag.categories.copyright, Cache.get("tc:#{Cache.hash(tag.name)}"))
     end
+
+    context "not be settable to an invalid category" do
+      should validate_inclusion_of(:category).in_array(TagCategory.category_ids)
+    end
   end
 
   context "A tag parser" do

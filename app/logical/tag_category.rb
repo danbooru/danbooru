@@ -45,6 +45,10 @@ class TagCategory
       @@categories ||= Danbooru.config.full_tag_config_info.keys
     end
 
+    def category_ids
+      @@categories ||= canonical_mapping.values
+    end
+
     def short_name_list
       @@short_name_list ||= short_name_mapping.keys
     end

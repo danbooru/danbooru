@@ -12,6 +12,7 @@ class Tag < ApplicationRecord
   has_many :consequent_implications, lambda {active}, :class_name => "TagImplication", :foreign_key => "consequent_name", :primary_key => "name"
 
   validates :name, uniqueness: true, tag_name: true, on: :create
+  validates_inclusion_of :category, in: TagCategory.category_ids
 
   module ApiMethods
     def to_legacy_json
