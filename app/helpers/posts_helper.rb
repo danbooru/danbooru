@@ -1,4 +1,8 @@
 module PostsHelper
+  def discover_mode?
+    params[:tags] =~ /order:rank/ || params[:action] =~ /searches|viewed/
+  end
+
   def next_page_url
     current_page = (params[:page] || 1).to_i
     dup_params = params.dup

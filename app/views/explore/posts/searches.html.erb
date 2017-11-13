@@ -1,6 +1,6 @@
 <div id="c-explore-posts">
   <div id="a-searches">
-    <h1>Popular Searches: <%= @search_service.date %> (by <%= @search_service.scale %>)</h1>
+    <h1>Popular Searches - <%= @search_service.date %></h1>
 
     <table class="striped" width="100%">
       <thead>
@@ -19,11 +19,12 @@
       </tbody>
     </table>
 
-    <p style="margin-top: 2em;">
-      <%= link_to "< Previous", searches_explore_posts_path(:date => 1.day.ago(@date)) %>
-
-      <%= link_to "Next >", searches_explore_posts_path(:date => 1.day.since(@date)) %>
-    </p>
+    <div class="paginator">
+      <menu>
+        <li><%= link_to "< Previous", searches_explore_posts_path(:date => 1.day.ago(@date).to_date), :class => "arrow" %></li>
+        <li><%= link_to "Next >", searches_explore_posts_path(:date => 1.day.since(@date).to_date), :class => "arrow" %></li>
+      </menu>
+    </div>
   </div>
 </div>
 

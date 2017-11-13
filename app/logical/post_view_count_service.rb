@@ -33,6 +33,6 @@ class PostViewCountService
 
   def popular_posts(date = Date.today)
     ranking = fetch_rank(date) || []
-    ranking.map {|x| Post.find(x[0])}
+    ranking.slice(0, 50).map {|x| Post.find(x[0])}
   end
 end

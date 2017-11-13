@@ -1,10 +1,21 @@
 <section id="related-box">
   <h1>Related</h1>
   <ul id="related-list">
-    <li><%= link_to "Deleted posts", posts_path(:tags => "#{params[:tags]} status:deleted"), :rel => "nofollow" %></li>
+    <% if discover_mode? %> 
+      <li id="secondary-links-posts-hot"><%= link_to "Hot", posts_path(:tags => "order:rank") %></li>
+      <li id="secondary-links-posts-popular"><%= link_to "Popular", popular_explore_posts_path %></li>
+      <% if PopularSearchService.enabled? %>
+        <li><%= link_to "Searches", searches_explore_posts_path %></li>
+      <% end %>
+      <% if PostViewCountService.enabled? %>
+        <li><%= link_to "Viewed", viewed_explore_posts_path %></li>
+      <% end %>
+    <% end %>
 
-    <li><%= link_to "Random post", random_posts_path(:tags => params[:tags]), :id => "random-post", :rel => "nofollow" %></li>
+    <li><%= link_to "Deleted", posts_path(:tags => "#{params[:tags]} status:deleted"), :rel => "nofollow" %></li>
 
-    <li><%= link_to "Post count", posts_counts_path(:tags => params[:tags]) %></li>
+    <li><%= link_to "Random", random_posts_path(:tags => params[:tags]), :id => "random-post", :rel => "nofollow" %></li>
+
+    <li><%= link_to "Count", posts_counts_path(:tags => params[:tags]) %></li>
   </ul>
 </section>

@@ -2,14 +2,10 @@
   <menu>
     <li><%= link_to "Listing", posts_path %></li>
     <li id="secondary-links-posts-upload" class="nonessential"><%= link_to "Upload", new_upload_path %></li>
-    <li id="secondary-links-posts-popular"><%= link_to "Popular", popular_explore_posts_path %></li>
-    <li id="secondary-links-posts-hot"><%= link_to "Hot", posts_path(:tags => "order:rank") %></li>
-    <% if PopularSearchService.enabled? %>
-      <li id="secondary-links-posts-searches"><%= link_to "Searches", searches_explore_posts_path %></li>
-    <% end %>
+    <li id="secondary-links-posts-hot"><%= link_to "Hot", posts_path(:tags => "order:rank", :d => "1") %></li>
     <% unless CurrentUser.is_anonymous? %>
       <li id="secondary-links-posts-favorites"><%= link_to "Favorites", favorites_path %></li>
-      <li id="secondary-links-posts-favorite-groups"><%= link_to "Favorite groups", favorite_groups_path %></li>
+      <li id="secondary-links-posts-favorite-groups"><%= link_to "Fav groups", favorite_groups_path %></li>
       <% if CurrentUser.has_saved_searches? %>
         <li id="secondary-links-posts-saved-searches"><%= link_to "Saved searches", posts_path(:tags => "search:all") %></li>
       <% end %>
