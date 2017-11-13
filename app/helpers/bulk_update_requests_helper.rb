@@ -22,7 +22,7 @@ module BulkUpdateRequestsHelper
       false
     end
 
-  rescue PG::QueryCanceled
+  rescue ActiveRecord::StatementInvalid
     false
   end
 
