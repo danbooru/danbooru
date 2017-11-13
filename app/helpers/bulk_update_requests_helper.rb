@@ -15,15 +15,9 @@ module BulkUpdateRequestsHelper
     when :remove_implication
       TagImplication.where(antecedent_name: antecedent, consequent_name: consequent, status: "deleted").exists? || !TagImplication.where(antecedent_name: antecedent, consequent_name: consequent).exists?
 
-    when :mass_update
-      !Post.raw_tag_match(antecedent).exists?
-
     else
       false
     end
-
-  rescue ActiveRecord::StatementInvalid
-    false
   end
 
   def failed?(command, antecedent, consequent)
