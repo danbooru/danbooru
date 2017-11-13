@@ -15,7 +15,7 @@
       <%= render "post", :post => @post %>
       <%= render "sources/info", :source => @source %>
 
-      <%= error_messages_for "upload" %>
+      <div id="client-errors" class="error-messages ui-state-error ui-corner-all" style="display:none"></div>
 
       <%= form_for(@upload, :html => {:multipart => true, :class => "simple_form", :id => "form"}) do |f| %>
         <%= hidden_field_tag :url, params[:url] %>
@@ -116,7 +116,7 @@
         </div>
 
         <div class="input">
-          <%= submit_tag "Submit", :class => "large", :data => { :disable_with => "Submitting..." }, :class => "ui-button ui-widget ui-corner-all gradient" %>
+          <%= submit_tag "Submit", :id => "submit-button", :class => "large", :class => "ui-button ui-widget ui-corner-all gradient" %>
         </div>
 
         <div id="artist-tags-container">
