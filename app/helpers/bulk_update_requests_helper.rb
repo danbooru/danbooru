@@ -22,7 +22,7 @@ module BulkUpdateRequestsHelper
       false
     end
 
-  rescue PG::QueryCanceled
+  rescue PG::QueryCanceled, PGError
     false
   end
 
