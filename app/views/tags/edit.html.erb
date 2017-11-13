@@ -6,7 +6,7 @@
       <% if @tag.is_locked? %>
         <p>This tag is category locked</p>
       <% else %>
-        <%= f.input :category, :collection => Danbooru.config.canonical_tag_category_mapping.to_a, :include_blank => false %>
+        <%= f.input :category, :collection => TagCategory.canonical_mapping.to_a, :include_blank => false %>
       <% end %>
 
       <% if CurrentUser.is_moderator? %>

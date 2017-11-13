@@ -8,6 +8,8 @@
   <% unless cookies[:dm] %>
     <meta name="viewport" content="width=device-width,initial-scale=1">
   <% end %>
+  <meta name="tag-category-names" content="<%= TagCategory.categories %>">
+  <meta name="short-tag-category-names" content="<%= TagCategory.short_name_list %>">
   <meta name="current-user-name" content="<%= CurrentUser.name %>">
   <meta name="current-user-id" content="<%= CurrentUser.id %>">
   <meta name="current-user-can-approve-posts" content="<%= CurrentUser.can_approve_posts? %>">

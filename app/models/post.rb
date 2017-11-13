@@ -616,30 +616,21 @@ class Post < ApplicationRecord
       Post.expire_cache_for_all([""]) if new_record? || id <= 100_000
     end
 
+    def set_tag_count(category,tagcount)
+      self.send("tag_count_#{category}=",tagcount)
+    end
+
+    def inc_tag_count(category)
+      set_tag_count(category,self.send("tag_count_#{category}") + 1)
+    end
+
     def set_tag_counts
       self.tag_count = 0
-      self.tag_count_general = 0
-      self.tag_count_artist = 0
-      self.tag_count_copyright = 0
-      self.tag_count_character = 0
-
+      TagCategory.categories {|x| set_tag_count(x,0)}
       categories = Tag.categories_for(tag_array, :disable_caching => true)
       categories.each_value do |category|
         self.tag_count += 1
-
-        case category
-        when Tag.categories.general
-          self.tag_count_general += 1
-
-        when Tag.categories.artist
-          self.tag_count_artist += 1
-
-        when Tag.categories.copyright
-          self.tag_count_copyright += 1
-
-        when Tag.categories.character
-          self.tag_count_character += 1
-        end
+        inc_tag_count(TagCategory.reverse_mapping[category])
       end
     end
 
@@ -918,31 +909,11 @@ class Post < ApplicationRecord
       @tag_categories ||= Tag.categories_for(tag_array)
     end
 
-    def copyright_tags
-      typed_tags("copyright")
-    end
-
-    def character_tags
-      typed_tags("character")
-    end
-
-    def artist_tags
-      typed_tags("artist")
-    end
-
-    def artist_tags_excluding_hidden
-      artist_tags - %w(banned_artist)
-    end
-
-    def general_tags
-      typed_tags("general")
-    end
-
     def typed_tags(name)
       @typed_tags ||= {}
       @typed_tags[name] ||= begin
         tag_array.select do |tag|
-          tag_categories[tag] == Danbooru.config.tag_category_mapping[name]
+          tag_categories[tag] == TagCategory.mapping[name]
         end
       end
     end
@@ -955,51 +926,35 @@ class Post < ApplicationRecord
       @humanized_essential_tag_string ||= Cache.get("hets-#{id}", 1.hour.to_i) do
         string = []
 
-        if character_tags.any?
-          chartags = character_tags.slice(0, 5)
-          if character_tags.length > 5
-            chartags << "others"
+        TagCategory.humanized_list.each do |category|
+          typetags = typed_tags(category) - TagCategory.humanized_mapping[category]["exclusion"]
+          if TagCategory.humanized_mapping[category]["slice"] > 0
+            typetags = typetags.slice(0,TagCategory.humanized_mapping[category]["slice"]) + (typetags.length > TagCategory.humanized_mapping[category]["slice"] ? ["others"] : [])
           end
-          chartags = chartags.map do |tag|
-            tag.match(/^(.+?)(?:_\(.+\))?$/)[1]
+          if TagCategory.humanized_mapping[category]["regexmap"] != //
+            typetags = typetags.map do |tag|
+              tag.match(TagCategory.humanized_mapping[category]["regexmap"])[1]
+            end
           end
-          string << chartags.to_sentence
-        end
-
-        if copyright_tags.any?
-          copytags = copyright_tags.slice(0, 5)
-          if copyright_tags.length > 5
-            copytags << "others"
+          if typetags.any?
+            if category != "copyright" || typed_tags("character").any?
+              string << TagCategory.humanized_mapping[category]["formatstr"] % typetags.to_sentence
+            else
+              string << typetags.to_sentence
+            end
           end
-          copytags = copytags.to_sentence
-          string << (character_tags.any? ? "(#{copytags})" : copytags)
         end
-
-        if artist_tags_excluding_hidden.any?
-          string << "drawn by"
-          string << artist_tags_excluding_hidden.to_sentence
-        end
-
         string.empty? ? "##{id}" : string.join(" ").tr("_", " ")
       end
     end
 
-    def tag_string_copyright
-      copyright_tags.join(" ")
-    end
-
-    def tag_string_character
-      character_tags.join(" ")
-    end
-
-    def tag_string_artist
-      artist_tags.join(" ")
-    end
-
-    def tag_string_general
-      general_tags.join(" ")
+    TagCategory.categories.each do |category|
+      define_method("tag_string_#{category}") do
+        typed_tags(category).join(" ")
+      end
     end
   end
+
 
   module FavoriteMethods
     def clean_fav_string?
@@ -1182,15 +1137,10 @@ class Post < ApplicationRecord
   end
 
   module CountMethods
-    def fix_post_counts
+    def fix_post_counts(post)
       post.set_tag_counts
-      post.update_columns(
-        :tag_count => post.tag_count,
-        :tag_count_general => post.tag_count_general,
-        :tag_count_artist => post.tag_count_artist,
-        :tag_count_copyright => post.tag_count_copyright,
-        :tag_count_character => post.tag_count_character
-      )
+      args = Hash[TagCategory.categories.map {|x| ["tag_count_#{x}",post.send("tag_count_#{x}")]}].update(:tag_count => post.tag_count)
+      post.update_columns(args)
     end
 
     def get_count_from_cache(tags)
@@ -1572,7 +1522,7 @@ class Post < ApplicationRecord
     end
 
     def method_attributes
-      list = super + [:uploader_name, :has_large, :tag_string_artist, :tag_string_character, :tag_string_copyright, :tag_string_general, :has_visible_children, :children_ids]
+      list = super + [:uploader_name, :has_large, :has_visible_children, :children_ids] + TagCategory.categories.map {|x| "tag_string_#{x}".to_sym}
       if visible?
         list += [:file_url, :large_file_url, :preview_file_url]
       end

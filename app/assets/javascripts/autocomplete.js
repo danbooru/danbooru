@@ -9,6 +9,7 @@
   Danbooru.Autocomplete.initialize_all = function() {
     if (Danbooru.meta("enable-auto-complete") === "true") {
       Danbooru.Autocomplete.enable_local_storage = this.test_local_storage();
+      this.update_static_metatags();
       this.initialize_tag_autocomplete();
       this.initialize_mention_autocomplete();
       this.prune_local_storage();
@@ -94,7 +95,7 @@
     var $fields_multiple = $('[data-autocomplete="tag-query"], [data-autocomplete="tag-edit"]');
     var $fields_single = $('[data-autocomplete="tag"]');
 
-    var prefixes = "-|~|general:|gen:|artist:|art:|copyright:|copy:|co:|character:|char:|ch:";
+    var prefixes = "-|~|" + $.map(JSON.parse(Danbooru.meta("tag-category-names")), function (category) { return category + ':'}).join('|');
     var metatags = "order|-status|status|-rating|rating|-locked|locked|child|filetype|-filetype|" +
       "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-fav|fav|ordfav|" +
       "-pool|pool|ordpool|favgroup|-search|search";
@@ -326,10 +327,6 @@
       "portrait", "landscape",
       "filesize", "filesize_asc",
       "tagcount", "tagcount_asc",
-      "gentags", "gentags_asc",
-      "arttags", "arttags_asc",
-      "chartags", "chartags_asc",
-      "copytags", "copytags_asc",
       "rank",
       "random"
     ],
@@ -348,6 +345,11 @@
     filetype: [
       "jpg", "png", "gif", "swf", "zip", "webm", "mp4"
     ],
+  }
+
+  //This must be done as a separate function as Danbooru.meta does not exist at program initialization
+  Danbooru.Autocomplete.update_static_metatags = function () {
+    Array.prototype.push.apply(Danbooru.Autocomplete.static_metatags.order,$.map(JSON.parse(Danbooru.meta("short-tag-category-names")), function(shorttag) { return [shorttag + "tags", shorttag + "tags_asc"]}));
   }
 
   Danbooru.Autocomplete.static_metatag_source = function(term, resp, metatag) {

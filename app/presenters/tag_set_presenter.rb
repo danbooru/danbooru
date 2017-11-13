@@ -25,40 +25,16 @@ class TagSetPresenter < Presenter
   def split_tag_list_html(template, options = {})
     html = ""
 
-    if copyright_tags.any?
-      html << '<h2>Copyrights</h2>'
-      html << "<ul>"
-      copyright_tags.keys.each do |tag|
-        html << build_list_item(tag, template, options)
+    TagCategory.split_header_list.each do |category|
+      typetags = typed_tags(category)
+      if typetags.any?
+        html << TagCategory.header_mapping[category]
+        html << "<ul>"
+        typetags.each do |tag|
+          html << build_list_item(tag, template, options)
+        end
+        html << "</ul>"
       end
-      html << "</ul>"
-    end
-
-    if character_tags.any?
-      html << '<h2>Characters</h2>'
-      html << "<ul>"
-      character_tags.keys.each do |tag|
-        html << build_list_item(tag, template, options)
-      end
-      html << "</ul>"
-    end
-
-    if artist_tags.any?
-      html << '<h2>Artist</h2>'
-      html << "<ul>"
-      artist_tags.keys.each do |tag|
-        html << build_list_item(tag, template, options)
-      end
-      html << "</ul>"
-    end
-
-    if general_tags.any?
-      html << '<h1>Tags</h1>'
-      html << "<ul>"
-      general_tags.keys.each do |tag|
-        html << build_list_item(tag, template, options)
-      end
-      html << "</ul>"
     end
 
     html.html_safe
@@ -76,20 +52,13 @@ class TagSetPresenter < Presenter
   end
 
 private
-  def general_tags
-    @general_tags ||= categories.select {|k, v| v == Tag.categories.general}
-  end
-
-  def copyright_tags
-    @copyright_tags ||= categories.select {|k, v| v == Tag.categories.copyright}
-  end
-
-  def character_tags
-    @character_tags ||= categories.select {|k, v| v == Tag.categories.character}
-  end
-
-  def artist_tags
-    @artist_tags ||= categories.select {|k, v| v == Tag.categories.artist}
+  def typed_tags(name)
+    @typed_tags ||= {}
+    @typed_tags[name] ||= begin
+      @tags.select do |tag|
+        categories[tag] == TagCategory.mapping[name]
+      end
+    end
   end
 
   def categories

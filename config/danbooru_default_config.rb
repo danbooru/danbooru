@@ -214,45 +214,92 @@ module Danbooru
       "albert"
     end
 
-    # Returns a hash mapping various tag categories to a numerical value.
-    # Be sure to update the reverse_tag_category_mapping also.
-    def tag_category_mapping
-      @tag_category_mapping ||= {
-        "general" => 0,
-        "gen" => 0,
+#TAG CONFIGURATION
 
-        "artist" => 1,
-        "art" => 1,
-
-        "copyright" => 3,
-        "copy" => 3,
-        "co" => 3,
-
-        "character" => 4,
-        "char" => 4,
-        "ch" => 4
+    #Full tag configuration info for all tags
+    def full_tag_config_info
+      @full_tag_category_mapping ||= {
+        "general" => {
+          "category" => 0,
+          "short" => "gen",
+          "extra" => [],
+          "header" => "<h1>Tags</h1>",
+          "humanized" => nil,
+          "relatedbutton" => "General"
+        },
+        "character" => {
+          "category" => 4,
+          "short" => "char",
+          "extra" => ["ch"],
+          "header" => "<h2>Characters</h2>",
+          "humanized" => {
+            "slice" => 5,
+            "exclusion" => [],
+            "regexmap" => /^(.+?)(?:_\(.+\))?$/,
+            "formatstr" => "%s"
+          },
+          "relatedbutton" => "Characters"
+        },
+        "copyright" => {
+          "category" => 3,
+          "short" => "copy",
+          "extra" => ["co"],
+          "header" => "<h2>Copyrights</h2>",
+          "humanized" => {
+            "slice" => 5,
+            "exclusion" => [],
+            "regexmap" => //,
+            "formatstr" => "(%s)"
+          },
+          "relatedbutton" => "Copyrights"
+        },
+        "artist" => {
+          "category" => 1,
+          "short" => "art",
+          "extra" => [],
+          "header" => "<h2>Artist</h2>",
+          "humanized" => {
+            "slice" => 0,
+            "exclusion" => %w(banned_artist),
+            "regexmap" => //,
+            "formatstr" => "drawn by %s"
+          },
+          "relatedbutton" => "Artists"
+        },
+        "meta" => {
+          "category" => 5,
+          "short" => "meta",
+          "extra" => [],
+          "header" => "<h2>Meta</h2>",
+          "humanized" => nil,
+          "relatedbutton" => nil
+        }
       }
     end
 
-    def canonical_tag_category_mapping
-      @canonical_tag_category_mapping ||= {
-        "General" => 0,
-        "Artist" => 1,
-        "Copyright" => 3,
-        "Character" => 4
-      }
+#TAG ORDERS
+
+    #Sets the order of the humanized essential tag string (models/post.rb)
+    def humanized_tag_category_list
+      @humanized_tag_category_list ||= ["character","copyright","artist"]
     end
 
-    # Returns a hash maping numerical category values to their
-    # string equivalent. Be sure to update the tag_category_mapping also.
-    def reverse_tag_category_mapping
-      @reverse_tag_category_mapping ||= {
-        0 => "General",
-        1 => "Artist",
-        3 => "Copyright",
-        4 => "Character"
-      }
+    #Sets the order of the split tag header list (presenters/tag_set_presenter.rb)
+    def split_tag_header_list
+      @split_tag_header_list ||= ["copyright","character","artist","general","meta"]
     end
+
+    #Sets the order of the categorized tag string (presenters/post_presenter.rb)
+    def categorized_tag_list
+      @categorized_tag_list ||= ["copyright","character","artist","meta","general"]
+    end
+
+    #Sets the order of the related tag buttons (javascripts/related_tag.js)
+    def related_tag_button_list
+      @related_tag_button_list ||= ["general","artist","character","copyright"]
+    end
+
+#END TAG
 
     # If enabled, users must verify their email addresses.
     def enable_email_verification?

@@ -2776,7 +2776,8 @@ CREATE TABLE posts (
     pixiv_id integer,
     last_commented_at timestamp without time zone,
     has_active_children boolean DEFAULT false,
-    bit_flags bigint DEFAULT 0 NOT NULL
+    bit_flags bigint DEFAULT 0 NOT NULL,
+    tag_count_meta integer DEFAULT 0 NOT NULL
 );
 
 
@@ -7517,4 +7518,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170613200356');
 INSERT INTO schema_migrations (version) VALUES ('20170709190409');
 
 INSERT INTO schema_migrations (version) VALUES ('20170914200122');
+
+INSERT INTO schema_migrations (version) VALUES ('20171106075030');
 

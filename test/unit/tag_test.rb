@@ -61,6 +61,7 @@ class TagTest < ActiveSupport::TestCase
       assert_equal(1, Tag.categories.artist)
       assert_equal(3, Tag.categories.copyright)
       assert_equal(4, Tag.categories.character)
+      assert_equal(5, Tag.categories.meta)
     end
 
     should "have a regular expression for matching category names and shortcuts" do
@@ -74,6 +75,7 @@ class TagTest < ActiveSupport::TestCase
       assert_match(regexp, "character")
       assert_match(regexp, "char")
       assert_match(regexp, "ch")
+      assert_match(regexp, "meta")
       assert_no_match(regexp, "c")
       assert_no_match(regexp, "woodle")
     end
@@ -83,6 +85,7 @@ class TagTest < ActiveSupport::TestCase
       assert_equal(0, Tag.categories.value_for("gen"))
       assert_equal(1, Tag.categories.value_for("artist"))
       assert_equal(1, Tag.categories.value_for("art"))
+      assert_equal(5, Tag.categories.value_for("meta"))
       assert_equal(0, Tag.categories.value_for("unknown"))
     end
   end
@@ -215,7 +218,7 @@ class TagTest < ActiveSupport::TestCase
       should_not allow_value("café").for(:name).on(:create)
       should_not allow_value("東方").for(:name).on(:create)
 
-      metatags = Tag::METATAGS.split("|") + Tag::SUBQUERY_METATAGS.split("|") + Danbooru.config.tag_category_mapping.keys
+      metatags = Tag::METATAGS.split("|") + Tag::SUBQUERY_METATAGS.split("|") + TagCategory.mapping.keys
       metatags.split("|").each do |metatag|
         should_not allow_value("#{metatag}:foo").for(:name).on(:create)
       end
