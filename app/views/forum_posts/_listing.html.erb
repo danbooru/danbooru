@@ -3,3 +3,13 @@
     <%= render "forum_posts/forum_post", :forum_post => forum_post %>
   <% end %>
 </div>
+
+<% content_for(:html_header) do %>
+  <style>
+    @media screen and (max-width: 660px) {
+      #a-show { padding: 1em 0.5em; }
+      div.list-of-forum-posts article div.author { width: auto; float: none; border-bottom: 1px solid #999; background: #F0F0F0; }
+      div.list-of-forum-posts article div.content { width: auto; float: none; margin-left: 0; }
+    }
+  </style>
+<% end %>

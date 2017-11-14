@@ -3,8 +3,8 @@
     <tr>
       <th>Title</th>
       <th>Creator</th>
-      <th>Updated by</th>
-      <th>Updated at</th>
+      <th class="updater">Updated by</th>
+      <th class="updated-at">Updated at</th>
     </tr>
   </thead>
   <tbody>
@@ -35,10 +35,19 @@
             <% end %>
           </td>
           <td><%= link_to_user topic.creator %></td>
-          <td><%= link_to_user topic.updater %></td>
-          <td><%= compact_time topic.updated_at %></td>
+          <td class="updater"><%= link_to_user topic.updater %></td>
+          <td class="updated-at"><%= compact_time topic.updated_at %></td>
         </tr>
       <% end %>
     <% end %>
   </tbody>
 </table>
+
+<% content_for(:html_header) do %>
+<style>
+  @media screen and (max-width: 660px) {
+    .updater { display: none; }
+    .updated-at { display: none; }
+  }
+</style>
+<% end %>

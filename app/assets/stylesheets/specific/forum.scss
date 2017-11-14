@@ -6,20 +6,27 @@ div.list-of-forum-posts {
   }
 
   article {
-    margin-bottom: 3em;
+    border: 1px solid #999;
+    margin: 1em 0em;
     word-wrap: break-word;
+    box-shadow: 1px 1px 2px #AAA;
 
     &:target {
       background-color: #FFC;
     }
 
     div.author {
+      padding: 1em 1em 0 1em;
       width: 12em;
       float: left;
-      margin-right: 2em;
+
+      time {
+        font-style: italic;
+      }
     }
 
     div.content {
+      padding: 1em;
       margin-left: 14em;
 
       menu {
