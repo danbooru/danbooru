@@ -46,7 +46,7 @@ class TagCategory
     end
 
     def category_ids
-      @@categories ||= canonical_mapping.values
+      @@category_ids ||= canonical_mapping.values
     end
 
     def short_name_list
