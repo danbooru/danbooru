@@ -626,7 +626,7 @@ class Post < ApplicationRecord
 
     def set_tag_counts
       self.tag_count = 0
-      TagCategory.categories {|x| set_tag_count(x,0)}
+      TagCategory.categories.each {|x| set_tag_count(x,0)}
       categories = Tag.categories_for(tag_array, :disable_caching => true)
       categories.each_value do |category|
         self.tag_count += 1
