@@ -223,7 +223,7 @@ module Danbooru
           "category" => 0,
           "short" => "gen",
           "extra" => [],
-          "header" => "<h1>Tags</h1>",
+          "header" => %{<h1 class="general-tag-list">Tags</h1>},
           "humanized" => nil,
           "relatedbutton" => "General"
         },
@@ -231,7 +231,7 @@ module Danbooru
           "category" => 4,
           "short" => "char",
           "extra" => ["ch"],
-          "header" => "<h2>Characters</h2>",
+          "header" => %{<h2 class="character-tag-list">Characters</h2>},
           "humanized" => {
             "slice" => 5,
             "exclusion" => [],
@@ -244,7 +244,7 @@ module Danbooru
           "category" => 3,
           "short" => "copy",
           "extra" => ["co"],
-          "header" => "<h2>Copyrights</h2>",
+          "header" => %{<h2 class="copyright-tag-list">Copyrights</h2>},
           "humanized" => {
             "slice" => 5,
             "exclusion" => [],
@@ -257,7 +257,7 @@ module Danbooru
           "category" => 1,
           "short" => "art",
           "extra" => [],
-          "header" => "<h2>Artist</h2>",
+          "header" => %{<h2 class="artist-tag-list">Artists</h2>},
           "humanized" => {
             "slice" => 0,
             "exclusion" => %w(banned_artist),
@@ -270,7 +270,7 @@ module Danbooru
           "category" => 5,
           "short" => "meta",
           "extra" => [],
-          "header" => "<h2>Meta</h2>",
+          "header" => %{<h2 class="meta-tag-list">Meta</h2>},
           "humanized" => nil,
           "relatedbutton" => nil
         }
