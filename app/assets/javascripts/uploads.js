@@ -13,7 +13,6 @@
       this.initialize_similar();
       this.initialize_shortcuts();
       $("#related-tags-button").trigger("click");
-      $("#find-artist-button").trigger("click");
 
       $("#toggle-artist-commentary").click(function(e) {
         Danbooru.Upload.toggle_commentary();
@@ -99,6 +98,7 @@
 
     $("#source-artist-profile").attr("href", data.profile_url).text(data.artist_name);
 
+    Danbooru.RelatedTag.process_artist(data.artists);
     Danbooru.RelatedTag.translated_tags = data.translated_tags;
     Danbooru.RelatedTag.build_all();
 
