@@ -1252,7 +1252,8 @@ class Post < ApplicationRecord
 
   module CacheMethods
     def expire_cache_for_all(tag_names)
-      Danbooru.config.all_server_hosts.each do |host|
+      expire_cache(tag_names)
+      Danbooru.config.other_server_hosts.each do |host|
         delay(:queue => host).expire_cache(tag_names)
       end
     end
