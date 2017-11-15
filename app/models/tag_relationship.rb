@@ -117,5 +117,29 @@ class TagRelationship < ApplicationRecord
     end
   end
 
+  module MessageMethods
+    def relationship
+      # "TagAlias" -> "tag alias", "TagImplication" -> "tag implication"
+      self.class.name.underscore.tr("_", " ")
+    end
+
+    def approval_message
+      "The #{relationship} [[#{antecedent_name}]] -> [[#{consequent_name}]] has been approved."
+    end
+
+    def failure_message(e = nil)
+      "The #{relationship} [[#{antecedent_name}]] -> [[#{consequent_name}]] failed during processing. Reason: #{e}"
+    end
+
+    def reject_message
+      "The #{relationship} [[#{antecedent_name}]] -> [[#{consequent_name}]] has been rejected."
+    end
+
+    def date_timestamp
+      Time.now.strftime("%Y-%m-%d")
+    end
+  end
+
   extend SearchMethods
+  include MessageMethods
 end

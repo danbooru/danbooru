@@ -43,24 +43,8 @@ class TagAlias < TagRelationship
       end
     end
 
-    def approval_message
-      "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has been approved."
-    end
-
-    def failure_message(e = nil)
-      "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) failed during processing. Reason: #{e}"
-    end
-
-    def reject_message
-      "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has been rejected."
-    end
-
     def conflict_message
       "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has conflicting wiki pages. [[#{consequent_name}]] should be updated to include information from [[#{antecedent_name}]] if necessary."
-    end
-
-    def date_timestamp
-      Time.now.strftime("%Y-%m-%d")
     end
   end
 
