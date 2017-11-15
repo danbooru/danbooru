@@ -739,6 +739,7 @@ class Tag < ApplicationRecord
   module RelationMethods
     def update_related
       return unless should_update_related?
+
       CurrentUser.scoped(User.first, "127.0.0.1") do
         self.related_tags = RelatedTagCalculator.calculate_from_sample_to_array(name).join(" ")
       end
@@ -748,20 +749,21 @@ class Tag < ApplicationRecord
     end
 
     def update_related_if_outdated
-      if should_update_related?
+      key = Cache.hash(name)
+
+      if Cache.get("urt:#{key}").nil? && should_update_related?
         if post_count < COSINE_SIMILARITY_RELATED_TAG_THRESHOLD
           delay(:queue => "default").update_related
         elsif post_count >= COSINE_SIMILARITY_RELATED_TAG_THRESHOLD
-          key = Cache.hash(name)
           cache_check = Cache.get("urt:#{key}")
 
           if cache_check
             sqs = SqsService.new(Danbooru.config.aws_sqs_reltagcalc_url)
             sqs.send_message("calculate #{name}")
-          else
-            Cache.put("urt:#{key}", true, 600)
           end
         end
+
+        Cache.put("urt:#{key}", true, 600) # mutex to prevent redundant updates
       end
     end
 
