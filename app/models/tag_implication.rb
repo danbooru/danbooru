@@ -148,7 +148,7 @@ class TagImplication < TagRelationship
           update_posts
           update({ :status => "active" }, :as => CurrentUser.role)
           update_descendant_names_for_parents
-          forum_updater.update(approval_message, "APPROVED") if update_topic
+          forum_updater.update(approval_message(approver), "APPROVED") if update_topic
         end
       rescue Exception => e
         if tries < 5
@@ -186,7 +186,7 @@ class TagImplication < TagRelationship
 
     def reject!
       update({ :status => "deleted", }, :as => CurrentUser.role)
-      forum_updater.update(reject_message, "REJECTED")
+      forum_updater.update(reject_message(CurrentUser.user), "REJECTED")
       destroy
     end
 

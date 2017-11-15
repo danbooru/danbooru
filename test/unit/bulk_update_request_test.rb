@@ -127,7 +127,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         @req.approver_id = @admin.id
 
         assert_difference("ForumPost.count") do
-          @req.reject!
+          @req.reject!(@admin)
         end
 
         @topic.reload

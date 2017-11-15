@@ -42,10 +42,6 @@ class TagAlias < TagRelationship
         delay(:queue => "default").process!(update_topic: update_topic)
       end
     end
-
-    def conflict_message
-      "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] (alias ##{id}) has conflicting wiki pages. [[#{consequent_name}]] should be updated to include information from [[#{antecedent_name}]] if necessary."
-    end
   end
 
   module ForumMethods
@@ -90,7 +86,7 @@ class TagAlias < TagRelationship
         clear_all_cache
         ensure_category_consistency
         update_posts
-        forum_updater.update(approval_message, "APPROVED") if update_topic
+        forum_updater.update(approval_message(approver), "APPROVED") if update_topic
         rename_wiki_and_artist
         update({ :status => "active", :post_count => consequent_tag.post_count }, :as => CurrentUser.role)
       end
@@ -227,7 +223,7 @@ class TagAlias < TagRelationship
   def reject!
     update({ :status => "deleted" }, :as => CurrentUser.role)
     clear_all_cache
-    forum_updater.update(reject_message, "REJECTED")
+    forum_updater.update(reject_message(CurrentUser.user), "REJECTED")
     destroy
   end
 

@@ -33,6 +33,6 @@ class ForumUpdater
   end
 
   def update_post(body)
-    forum_post.update(:body => "#{forum_post.body}\n\n#{body}")
+    forum_post.update(:body => "#{forum_post.body}\n\nEDIT: #{body}")
   end
 end
