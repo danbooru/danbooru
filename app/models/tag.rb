@@ -1,5 +1,5 @@
 class Tag < ApplicationRecord
-  COSINE_SIMILARITY_RELATED_TAG_THRESHOLD = 1000
+  COSINE_SIMILARITY_RELATED_TAG_THRESHOLD = 300
   METATAGS = "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-pool|pool|ordpool|-favgroup|favgroup|-fav|fav|ordfav|md5|-rating|rating|-locked|locked|width|height|mpixels|ratio|score|favcount|filesize|source|-source|id|-id|date|age|order|limit|-status|status|tagcount|parent|-parent|child|pixiv_id|pixiv|search|upvote|downvote|filetype|-filetype|flagger|-flagger|appealer|-appealer|" +
     TagCategory.short_name_list.map {|x| "#{x}tags"}.join("|")
   SUBQUERY_METATAGS = "commenter|comm|noter|noteupdater|artcomm|flagger|-flagger|appealer|-appealer"
@@ -754,13 +754,9 @@ class Tag < ApplicationRecord
       if Cache.get("urt:#{key}").nil? && should_update_related?
         if post_count < COSINE_SIMILARITY_RELATED_TAG_THRESHOLD
           delay(:queue => "default").update_related
-        elsif post_count >= COSINE_SIMILARITY_RELATED_TAG_THRESHOLD
-          cache_check = Cache.get("urt:#{key}")
-
-          if cache_check
-            sqs = SqsService.new(Danbooru.config.aws_sqs_reltagcalc_url)
-            sqs.send_message("calculate #{name}")
-          end
+        else
+          sqs = SqsService.new(Danbooru.config.aws_sqs_reltagcalc_url)
+          sqs.send_message("calculate #{name}")
         end
 
         Cache.put("urt:#{key}", true, 600) # mutex to prevent redundant updates
