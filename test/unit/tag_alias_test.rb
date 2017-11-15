@@ -66,11 +66,11 @@ class TagAliasTest < ActiveSupport::TestCase
       tag1 = FactoryGirl.create(:tag, :name => "aaa")
       tag2 = FactoryGirl.create(:tag, :name => "bbb")
       ta = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
-      assert_nil(Cache.get("ta:aaa"))
+      assert_nil(Cache.get("ta:#{Cache.hash("aaa")}"))
       TagAlias.to_aliased(["aaa"])
-      assert_equal("bbb", Cache.get("ta:aaa"))
+      assert_equal("bbb", Cache.get("ta:#{Cache.hash("aaa")}"))
       ta.destroy
-      assert_nil(Cache.get("ta:aaa"))
+      assert_nil(Cache.get("ta:#{Cache.hash("aaa")}"))
     end
 
     should "move saved searches" do
