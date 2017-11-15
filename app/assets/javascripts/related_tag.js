@@ -12,7 +12,13 @@
 
   Danbooru.RelatedTag.initialize_buttons = function() {
     this.common_bind("#related-tags-button", "");
-    $.each(JSON.parse(Danbooru.meta("related-tag-button-list")), function(i,category) {
+    var related_buttons;
+    try {
+      related_buttons = JSON.parse(Danbooru.meta("related-tag-button-list"));
+    } catch (e) {
+      related_buttons = [];
+    }
+    $.each(related_buttons, function(i,category) {
       Danbooru.RelatedTag.common_bind("#related-" + category + "-button", category);
     });
     $("#find-artist-button").click(Danbooru.RelatedTag.find_artist);
