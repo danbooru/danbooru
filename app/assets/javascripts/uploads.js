@@ -58,6 +58,10 @@
   }
 
   Danbooru.Upload.initialize_info_bookmarklet = function() {
+    $("#upload_source").change(function (e) {
+      $("#fetch-data-manual").click();
+    });
+
     $("#fetch-data-manual").click();
   }
 
@@ -66,11 +70,7 @@
       var source = $("#upload_source,#post_source").val();
       var referer = $("#upload_referer_url").val();
 
-      if (!/\S/.test(source)) {
-        Danbooru.error("Error: You must enter a URL into the source field to get its data");
-      } else if (!/^https?:\/\//.test(source)) {
-        Danbooru.error("Error: Source is not a URL");
-      } else {
+      if (/^https?:\/\//.test(source)) {
         $("#source-info span#loading-data").show();
         Danbooru.Upload.fetch_source_data(source, referer);
       }
