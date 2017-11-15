@@ -64,12 +64,8 @@ module Sources
         artist_name
       end
 
-      def artist_record
-        if artist_name.present?
-          Artist.other_names_match(artist_name)
-        else
-          nil
-        end
+      def artists
+        Artist.find_artists(url, referer_url)
       end
 
       def image_urls

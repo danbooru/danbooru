@@ -357,6 +357,18 @@ class Artist < ApplicationRecord
   end
 
   module SearchMethods
+    def find_artists(url, referer_url = nil)
+      artists = url_matches(url).order("id desc").limit(10)
+
+      if artists.empty? && referer_url.present? && referer_url != url
+        artists = url_matches(referer_url).order("id desc").limit(20)
+      end
+
+      artists
+    rescue PixivApiClient::Error => e
+      []
+    end
+
     def url_matches(string)
       matches = find_all_by_url(string).map(&:id)
 

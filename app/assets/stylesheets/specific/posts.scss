@@ -494,22 +494,6 @@ div#c-posts {
         color: gray;
       }
     }
-
-    div#source-info {
-      margin: 1em 0;
-      padding: 1em;
-      border: 1px solid gray;
-
-      p {
-        margin: 0;
-      }
-
-      ul {
-        a {
-          margin-right: 1em;
-        }
-      }
-    }
   }
 
   div#quick-edit-div {
@@ -525,6 +509,29 @@ div#c-post-versions, div#c-artist-versions {
   div#a-index {
     a {
       word-wrap: break-word
+    }
+  }
+}
+
+div#c-posts, div#c-uploads {
+  /* Fetch source data box */
+  div#source-info {
+    margin: 1em 0;
+    padding: 1em;
+    border: 1px solid gray;
+
+    p {
+      margin: 0;
+    }
+
+    > ul {
+      display: none;
+
+      .source-tags {
+        a {
+          margin-right: 1em;
+        }
+      }
     }
   }
 }
