@@ -9,7 +9,7 @@ module Moderator
     end
 
     def create
-      @bulk_revert = BulkRevert.new(@constraints)
+      @bulk_revert = BulkRevert.new
 
       if params[:commit] == "Test"
         @bulk_revert.preview

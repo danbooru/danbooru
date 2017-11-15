@@ -4,7 +4,9 @@ class BulkRevert
 
   class ConstraintTooGeneralError < Exception ; end
 
-  def process
+  def process(constraints)
+    @constraints = constraints
+    
     ModAction.log("#{CurrentUser.name} processed bulk revert for #{constraints.inspect}")
 
     find_post_versions.order("updated_at, id").each do |version|
@@ -12,8 +14,7 @@ class BulkRevert
     end
   end
 
-  def initialize(constraints)
-    @constraints = constraints
+  def initialize
   end
 
   def preview
