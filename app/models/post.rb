@@ -624,10 +624,10 @@ class Post < ApplicationRecord
       set_tag_count(category,self.send("tag_count_#{category}") + 1)
     end
 
-    def set_tag_counts
+    def set_tag_counts(disable_cache = true)
       self.tag_count = 0
       TagCategory.categories.each {|x| set_tag_count(x,0)}
-      categories = Tag.categories_for(tag_array, :disable_caching => true)
+      categories = Tag.categories_for(tag_array, :disable_caching => disable_cache)
       categories.each_value do |category|
         self.tag_count += 1
         inc_tag_count(TagCategory.reverse_mapping[category])
@@ -1138,9 +1138,11 @@ class Post < ApplicationRecord
 
   module CountMethods
     def fix_post_counts(post)
-      post.set_tag_counts
-      args = Hash[TagCategory.categories.map {|x| ["tag_count_#{x}",post.send("tag_count_#{x}")]}].update(:tag_count => post.tag_count)
-      post.update_columns(args)
+      post.set_tag_counts(false)
+      if post.changed?
+        args = Hash[TagCategory.categories.map {|x| ["tag_count_#{x}",post.send("tag_count_#{x}")]}].update(:tag_count => post.tag_count)
+        post.update_columns(args)
+      end
     end
 
     def get_count_from_cache(tags)
