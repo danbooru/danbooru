@@ -134,6 +134,12 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         @post.reload
         assert_match(/\[REJECTED\]/, @topic.title)
       end
+
+      should "not send @mention dmails to the approver" do
+        assert_no_difference("Dmail.count") do
+          @req.approve!(@admin)
+        end
+      end
     end
 
     context "when searching" do
