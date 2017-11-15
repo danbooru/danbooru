@@ -31,7 +31,9 @@ class TagAliasRequest
       @forum_topic = build_forum_topic(@tag_alias.id)
       @forum_topic.save
 
-      @tag_alias.update_attributes(forum_topic_id: @forum_topic.id, forum_post_id: @forum_topic.posts.first.id)
+      @tag_alias.forum_topic_id = @forum_topic.id
+      @tag_alias.forum_post_id = @forum_topic.posts.first.id
+      @tag_alias.save
     end
   end
 
