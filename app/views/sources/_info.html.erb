@@ -3,19 +3,13 @@
  -->
 
 <div id="source-info">
-  <% if source.try(:available?) %>
-    <p><%= link_to "Fetch source data", source_path(:format => "json", :url => source.referer_url), :id => "fetch-data-bookmarklet", :style => "display: none;" %></p>
-    <p><%= content_tag "span", "Loading #{source.site_name} data...", :id => "loading-data" %></p>
-  <% else %>
-    <p><%= link_to "Fetch source data", source_path(:format => "json"), :id => "fetch-data-manual" %></p>
-    <p><%= content_tag "span", "Loading source data...", :id => "loading-data", :style => "display: none;" %></p>
-  <% end %>
+  <p><%= link_to "Fetch source data", source_path(:format => "json"), :id => "fetch-data-manual" %></p>
+  <p><%= content_tag "span", "Loading source data...", :id => "loading-data", :style => "display: none;" %></p>
   <p id="remote-size" style="display: none;"></p>
   <p id="gallery-warning" style="display: none;"><%= content_tag "span", "Gallery. Tags may not apply to all images." %></p>
 
   <ul>
-    <li><strong>Artist</strong>: <span id="source-artist"></span></li>
-    <li><strong>Tags</strong>: <span id="source-tags"></span></li>
-    <li><strong>Record</strong>: <span id="source-record"></span></li>
+    <li><strong>Artist</strong>: <a id="source-artist-profile"></a> (<span id="source-danbooru-artists"></span>)</li>
+    <li class="source-tags"><strong>Tags</strong>: <span id="source-tags"></span></li>
   </ul>
 </div>

@@ -4,7 +4,7 @@
   </div>
 <% end %>
 
-<%= render "sources/info_for_post" %>
+<%= render "sources/info" %>
 
 <%= form_for(post, :html => {:class => "simple_form", :id => "form"}) do |f| %>
   <%= hidden_field_tag :tags_query, params[:tags] %>
