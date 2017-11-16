@@ -608,10 +608,10 @@ class Post < ApplicationRecord
 
       increment_tags = tag_array - tag_array_was
       if increment_tags.any?
-        Tag.delay(:queue => "default").increment_post_counts(increment_tags)
+        Tag.increment_post_counts(increment_tags)
       end
       if decrement_tags.any?
-        Tag.delay(:queue => "default").decrement_post_counts(decrement_tags)
+        Tag.decrement_post_counts(decrement_tags)
       end
       Post.expire_cache_for_all([""]) if new_record? || id <= 100_000
     end
