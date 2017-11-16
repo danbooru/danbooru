@@ -46,5 +46,11 @@ class TagAliasRequestTest < ActiveSupport::TestCase
         tar.create
       end
     end
+
+    should "save the forum post id" do
+      tar = TagAliasRequest.new(:antecedent_name => "aaa", :consequent_name => "bbb", :reason => "reason", :skip_secondary_validations => true)
+      tar.create
+      assert_equal(tar.forum_topic.posts.first.id, tar.tag_alias.forum_post.id)
+    end
   end
 end

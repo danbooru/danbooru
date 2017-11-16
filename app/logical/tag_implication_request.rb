@@ -31,7 +31,9 @@ class TagImplicationRequest
       @forum_topic = build_forum_topic(@tag_implication.id)
       @forum_topic.save
 
-      @tag_implication.update_attributes(:forum_topic_id => @forum_topic.id, :forum_post_id => @forum_topic.posts.first.id)
+      @tag_implication.forum_topic_id = @forum_topic.id
+      @tag_implication.forum_post_id = @forum_topic.posts.first.id
+      @tag_implication.save
     end
   end
 

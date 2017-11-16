@@ -95,13 +95,13 @@ class BulkUpdateRequest < ApplicationRecord
       CurrentUser.scoped(approver) do
         AliasAndImplicationImporter.new(script, forum_topic_id, "1", true).process!
         update({ :status => "approved", :approver_id => CurrentUser.id, :skip_secondary_validations => true }, :as => CurrentUser.role)
-        forum_updater.update("The \"bulk update request ##{id}\":/bulk_update_requests?search%5Bid%5D=#{id} has been approved.", "APPROVED")
+        forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.", "APPROVED")
       end
 
     rescue Exception => x
       self.approver = approver
       CurrentUser.scoped(approver) do
-        forum_updater.update("The \"Bulk update request ##{id}\":/bulk_update_requests?search%5Bid%5D=#{id} has failed: #{x.to_s}", "FAILED")
+        forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has failed: #{x.to_s}", "FAILED")
       end
     end
 
@@ -119,9 +119,13 @@ class BulkUpdateRequest < ApplicationRecord
       end
     end
 
-    def reject!
-      forum_updater.update("The \"bulk update request ##{id}\":/bulk_update_requests?search%5Bid%5D=#{id} has been rejected.", "REJECTED")
+    def reject!(rejector)
+      forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been rejected by @#{rejector.name}.", "REJECTED")
       update_attribute(:status, "rejected")
+    end
+
+    def bulk_update_request_link
+      %{"bulk update request ##{id}":/bulk_update_requests?search%5Bid%5D=#{id}}
     end
   end
 

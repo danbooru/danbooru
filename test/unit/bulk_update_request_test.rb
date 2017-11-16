@@ -127,12 +127,18 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         @req.approver_id = @admin.id
 
         assert_difference("ForumPost.count") do
-          @req.reject!
+          @req.reject!(@admin)
         end
 
         @topic.reload
         @post.reload
         assert_match(/\[REJECTED\]/, @topic.title)
+      end
+
+      should "not send @mention dmails to the approver" do
+        assert_no_difference("Dmail.count") do
+          @req.approve!(@admin)
+        end
       end
     end
 

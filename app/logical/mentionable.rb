@@ -9,7 +9,7 @@ module Mentionable
       @mentionable_options = options
 
       message_field = mentionable_option(:message_field)
-      after_save :queue_mention_messages, if: :"#{message_field}_changed?"
+      after_save :queue_mention_messages
     end
 
     def mentionable_option(key)
@@ -19,6 +19,9 @@ module Mentionable
 
   def queue_mention_messages
     message_field = self.class.mentionable_option(:message_field)
+    return if !send("#{message_field}_changed?")
+    return if self.skip_mention_notifications
+
     text = send(message_field)
     text_was = send("#{message_field}_was")
 

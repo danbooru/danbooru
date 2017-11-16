@@ -21,9 +21,10 @@ class ForumUpdater
   end
 
   def create_response(body)
-    forum_topic.posts.create(
-      :body => body
-    )
+    forum_topic.posts.create({
+      :body => body,
+      :skip_mention_notifications => true
+    }, :without_protection => true)
   end
 
   def update_title(title_tag)
@@ -33,6 +34,6 @@ class ForumUpdater
   end
 
   def update_post(body)
-    forum_post.update(:body => "#{forum_post.body}\n\n#{body}")
+    forum_post.update({:body => "#{forum_post.body}\n\nEDIT: #{body}", :skip_mention_notifications => true }, :without_protection => true)
   end
 end
