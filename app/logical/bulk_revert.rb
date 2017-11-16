@@ -4,12 +4,12 @@ class BulkRevert
 
   class ConstraintTooGeneralError < Exception ; end
 
-  def process(constraints)
+  def process(creator, constraints)
     @constraints = constraints
     
-    ModAction.log("Processed bulk revert for #{constraints.inspect}")
+    ModAction.log("Processed bulk revert for #{constraints.inspect} by #{creator.name}")
 
-    CurrentUser.scoped(User.system, "127.0.0.1") do
+    CurrentUser.scoped(creator) do
       ActiveRecord::Base.without_timeout do
         find_post_versions.order("updated_at, id").each do |version|
           version.undo!
