@@ -7,7 +7,7 @@ class BulkRevert
   def process(constraints)
     @constraints = constraints
     
-    ModAction.log("#{CurrentUser.name} processed bulk revert for #{constraints.inspect}")
+    ModAction.log("Processed bulk revert for #{constraints.inspect}")
 
     find_post_versions.order("updated_at, id").each do |version|
       version.undo!
