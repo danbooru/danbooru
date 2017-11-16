@@ -58,6 +58,9 @@ module DelayedJobsHelper
     when "Post.delete_files"
       "<strong>delete old files</strong>"
 
+    when "BulkRevert#process"
+      "<strong>bulk revert</strong>"
+
     else
       h(job.name)
     end
@@ -118,6 +121,9 @@ module DelayedJobsHelper
 
     when "Post.delete_files"
       %{<a href="/posts/#{job.payload_object.args.first}">post ##{job.payload_object.args.first}</a>}
+
+    when "BulkRevert#process"
+      h(job.payload_object.args.join(" "))
 
     else
       h(job.handler)
