@@ -43,8 +43,12 @@ class AliasAndImplicationImporter
       elsif line =~ /^(?:mass update|updating|update|change) (.+?) -> (.*)$/i
         [:mass_update, $1, $2]
 
+      elsif line =~ /^category (\S+) -> (#{Tag.categories.regexp})/
+        [:change_category, $1, $2]
+
       elsif line.strip.empty?
         # do nothing
+
       else
         raise "Unparseable line: #{line}"
       end
@@ -66,7 +70,7 @@ class AliasAndImplicationImporter
           raise "Error: #{tag_implication.errors.full_messages.join("; ")} (create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name})"
         end
 
-      when :remove_alias, :remove_implication, :mass_update
+      when :remove_alias, :remove_implication, :mass_update, :change_category
         # okay
 
       else
@@ -107,7 +111,13 @@ private
           tag_implication.destroy
 
         when :mass_update
-          Delayed::Job.enqueue(Moderator::TagBatchChange.new(token[1], token[2], CurrentUser.user, CurrentUser.ip_addr), :queue => "default")
+          Delayed::Job.enqueue(Moderator::TagBatchChange.new(token[1], token[2], CurrentUser.id, CurrentUser.ip_addr), :queue => "default")
+
+        when :change_category
+          tag = Tag.find_by_name(token[1])
+          tag.category = Tag.categories.value_for(token[2])
+          tag.save
+          tag.update_category_cache_for_all
 
         else
           raise "Unknown token: #{token[0]}"

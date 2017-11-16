@@ -149,7 +149,7 @@ class Tag < ApplicationRecord
     end
 
     def update_category_cache
-      Cache.put("tc:#{Cache.hash(name)}", category, 1.hour)
+      Cache.put("tc:#{Cache.hash(name)}", category, 3.hours)
     end
   end
 
@@ -221,7 +221,7 @@ class Tag < ApplicationRecord
           # next few lines if the category is changed.
           tag.update_category_cache
 
-          if category_id != tag.category && !tag.is_locked? && (CurrentUser.is_builder? || tag.post_count <= 50)
+          if category_id != tag.category && !tag.is_locked? && ((CurrentUser.is_builder? && tag.post_count < 10_000) || tag.post_count <= 50)
             tag.update_column(:category, category_id)
             tag.update_category_cache_for_all
           end

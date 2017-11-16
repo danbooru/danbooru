@@ -12,6 +12,20 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
+    context "category command" do
+      setup do
+        @tag = Tag.find_or_create_by_name("hello")
+        @list = "category hello -> artist\n"
+        @importer = AliasAndImplicationImporter.new(@list, nil)
+      end
+
+      should "work" do
+        @importer.process!
+        @tag.reload
+        assert_equal(Tag.categories.value_for("artist"), @tag.category)
+      end
+    end
+
     context "given a valid list" do
       setup do
         @list = "create alias abc -> def\ncreate implication aaa -> bbb\n"
