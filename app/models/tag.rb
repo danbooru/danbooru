@@ -59,12 +59,10 @@ class Tag < ApplicationRecord
 
       def increment_post_counts(tag_names)
         Tag.where(:name => tag_names).update_all("post_count = post_count + 1")
-        Post.expire_cache_for_all(tag_names)
       end
 
       def decrement_post_counts(tag_names)
         Tag.where(:name => tag_names).update_all("post_count = post_count - 1")
-        Post.expire_cache_for_all(tag_names)
       end
 
       def clean_up_negative_post_counts!

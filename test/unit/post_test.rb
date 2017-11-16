@@ -2378,92 +2378,66 @@ class PostTest < ActiveSupport::TestCase
       setup do
         Danbooru.config.stubs(:blank_tag_search_fast_count).returns(nil)
         Danbooru.config.stubs(:estimate_post_counts).returns(false)
+        FactoryGirl.create(:tag_alias, :antecedent_name => "alias", :consequent_name => "aaa")
+        FactoryGirl.create(:post, :tag_string => "aaa")
       end
 
-      context "with a primed cache" do
-        setup do
-          Cache.put("pfc:aaa", 0)
-          Cache.put("pfc:alias", 0)
-          Cache.put("pfc:width:50", 0)
-          Danbooru.config.stubs(:blank_tag_search_fast_count).returns(1_000_000)
-          FactoryGirl.create(:tag_alias, :antecedent_name => "alias", :consequent_name => "aaa")
-          FactoryGirl.create(:post, :tag_string => "aaa")
+      context "a blank search" do
+        should "should execute a search" do
+          Cache.delete(Post.count_cache_key(''))
+          Post.expects(:select_value_sql).with(kind_of(String), "").once.returns(nil)
+          Post.expects(:fast_count_search).with("", kind_of(Hash)).once.returns(1)
+          assert_equal(1, Post.fast_count(""))
         end
 
-        should "be counted correctly in fast_count" do
-          assert_equal(1, Post.count)
-          assert_equal(1, Post.fast_count(""))
-          assert_equal(1, Post.fast_count("aaa"))
+        should "set the value in cache" do
+          Post.expects(:set_count_in_cache).with("", kind_of(Integer)).once
+          Post.fast_count("")
+        end
+
+        context "with a primed cache" do
+          setup do
+            Cache.put(Post.count_cache_key(''), "100")
+          end
+
+          should "fetch the value from the cache" do
+            assert_equal(100, Post.fast_count(""))
+          end
+        end
+
+        should "translate an alias" do
           assert_equal(1, Post.fast_count("alias"))
+        end
+
+        should "return 0 for a nonexisting tag" do
           assert_equal(0, Post.fast_count("bbb"))
         end
-      end
 
-      should "increment the post count" do
-        assert_equal(0, Post.fast_count(""))
-        post = FactoryGirl.create(:post, :tag_string => "aaa bbb")
-        assert_equal(1, Post.fast_count(""))
-        assert_equal(1, Post.fast_count("aaa"))
-        assert_equal(1, Post.fast_count("bbb"))
-        assert_equal(0, Post.fast_count("ccc"))
+        context "in safe mode" do
+          setup do
+            CurrentUser.stubs(:safe_mode?).returns(true)
+          end
 
-        post.tag_string = "ccc"
-        post.save
+          should "execute a search" do
+            Post.expects(:select_value_sql).once.with(kind_of(String), "rating:s").returns(nil)
+            Post.expects(:fast_count_search).once.with("rating:s", kind_of(Hash)).returns(1)
+            assert_equal(1, Post.fast_count(""))
+          end
 
-        assert_equal(1, Post.fast_count(""))
-        assert_equal(0, Post.fast_count("aaa"))
-        assert_equal(0, Post.fast_count("bbb"))
-        assert_equal(1, Post.fast_count("ccc"))
-      end
-    end
+          should "set the value in cache" do
+            Post.expects(:set_count_in_cache).with("rating:s", kind_of(Integer)).once
+            Post.fast_count("")
+          end
 
-    context "The cache" do
-      context "when shared between users on danbooru/safebooru" do
-        setup do
-          Danbooru.config.stubs(:blank_tag_search_fast_count).returns(nil)
-          FactoryGirl.create(:post, :tag_string => "aaa bbb", :rating => "q")
-          FactoryGirl.create(:post, :tag_string => "aaa bbb", :rating => "s")
-          FactoryGirl.create(:post, :tag_string => "aaa bbb", :rating => "s")
-          CurrentUser.stubs(:safe_mode?).returns(true)
-          Post.fast_count("aaa")
-          CurrentUser.stubs(:safe_mode?).returns(false)
-          Post.fast_count("bbb")
-        end
+          context "with a primed cache" do
+            setup do
+              Cache.put(Post.count_cache_key('rating:s'), "100")
+            end
 
-        should "be accurate on danbooru" do
-          CurrentUser.stubs(:safe_mode?).returns(false)
-          assert_equal(3, Post.fast_count("aaa"))
-          assert_equal(3, Post.fast_count("bbb"))
-        end
-
-        should "be accurate on safebooru" do
-          CurrentUser.stubs(:safe_mode?).returns(true)
-          assert_equal(2, Post.fast_count("aaa"))
-          assert_equal(2, Post.fast_count("bbb"))
-        end
-      end
-
-      context "when shared between users with the deleted post filter on/off" do
-        setup do
-          FactoryGirl.create(:post, :tag_string => "aaa bbb", :is_deleted => true)
-          FactoryGirl.create(:post, :tag_string => "aaa bbb", :is_deleted => false)
-          FactoryGirl.create(:post, :tag_string => "aaa bbb", :is_deleted => false)
-          CurrentUser.user.stubs(:hide_deleted_posts?).returns(true)
-          Post.fast_count("aaa")
-          CurrentUser.user.stubs(:hide_deleted_posts?).returns(false)
-          Post.fast_count("bbb")
-        end
-
-        should "be accurate with the deleted post filter on" do
-          CurrentUser.user.stubs(:hide_deleted_posts?).returns(true)
-          assert_equal(2, Post.fast_count("aaa"))
-          assert_equal(2, Post.fast_count("bbb"))
-        end
-
-        should "be accurate with the deleted post filter off" do
-          CurrentUser.user.stubs(:hide_deleted_posts?).returns(false)
-          assert_equal(3, Post.fast_count("aaa"))
-          assert_equal(3, Post.fast_count("bbb"))
+            should "fetch the value from the cache" do
+              assert_equal(100, Post.fast_count(""))
+            end
+          end
         end
       end
     end
