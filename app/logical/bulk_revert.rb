@@ -9,8 +9,10 @@ class BulkRevert
     
     ModAction.log("Processed bulk revert for #{constraints.inspect}")
 
-    find_post_versions.order("updated_at, id").each do |version|
-      version.undo!
+    ActiveRecord::Base.without_timeout do
+      find_post_versions.order("updated_at, id").each do |version|
+        version.undo!
+      end
     end
   end
 
