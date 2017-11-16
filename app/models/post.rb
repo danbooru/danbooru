@@ -1454,7 +1454,7 @@ class Post < ApplicationRecord
     def notify_pubsub
       return unless Danbooru.config.google_api_project
 
-      PostUpdate.insert(id)
+      # PostUpdate.insert(id)
     end
   end
 
