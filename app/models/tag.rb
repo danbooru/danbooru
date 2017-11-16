@@ -141,12 +141,9 @@ class Tag < ApplicationRecord
       Post.with_timeout(30_000, nil, {:tags => name}) do
         Post.raw_tag_match(name).where("true /* Tag#update_category_post_counts */").find_each do |post|
           post.reload
-          # sometimes a post gets expunged
-          if post
-            post.set_tag_counts(false)
-            args = TagCategory.categories.map {|x| ["tag_count_#{x}",post.send("tag_count_#{x}")]}.to_h.update(:tag_count => post.tag_count)
-            Post.where(:id => post.id).update_all(args)
-          end
+          post.set_tag_counts(false)
+          args = TagCategory.categories.map {|x| ["tag_count_#{x}",post.send("tag_count_#{x}")]}.to_h.update(:tag_count => post.tag_count)
+          Post.where(:id => post.id).update_all(args)
         end
       end
     end

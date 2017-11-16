@@ -16,7 +16,7 @@ module Danbooru
           yield
         rescue ::ActiveRecord::StatementInvalid => x
           if Rails.env.production?
-            NewRelic::Agent.notice_error(x, :custom_params => new_relic_params.merge(:user_id => CurrentUser.user.id, :user_ip_addr => CurrentUser.ip_addr))
+            NewRelic::Agent.notice_error(x, :custom_params => new_relic_params.merge(:user_id => CurrentUser.id, :user_ip_addr => CurrentUser.ip_addr))
           end
           return default_value
         ensure
