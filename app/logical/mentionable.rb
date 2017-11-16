@@ -1,6 +1,10 @@
 module Mentionable
   extend ActiveSupport::Concern
 
+  included do
+    attr_accessor :skip_mention_notifications
+  end
+
   module ClassMethods
     # options:
     # - message_field
