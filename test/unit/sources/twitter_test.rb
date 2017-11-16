@@ -26,12 +26,12 @@ module Sources
 
     context "A twitter summary card" do
       setup do
-        @site = Sources::Site.new("https://twitter.com/NatGeo/status/787654447937847296")
+        @site = Sources::Site.new("https://twitter.com/NatGeo/status/931235536299274241")
         @site.get
       end
 
       should "get the image url" do
-        assert_equal("http://yourshot.nationalgeographic.com/u/fQYSUbVfts-T7odkrFJckdiFeHvab0GWOfzhj7tYdC0uglagsDcUxj3Tf7HBF3kZEj7S5m-zeDmZP6DBxBJlyJX_1mFp-hGf4JPt97xp0QJkwf4po1MmnZH73WC3a2Pa1Ky62C-v0cYXTur3-QwD3Pz5UI_cKIi81GABTXII8VwKUopxlNW2MYAR8kPYU2IoUhOjlvVefNcLYI74J-0IpI4tHDXE/", @site.image_url)
+        assert_equal("https://pmdvod.nationalgeographic.com/NG_Video/535/155/smpost_1510787765334.jpg", @site.image_url)
       end
     end
 
