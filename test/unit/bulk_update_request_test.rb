@@ -27,6 +27,10 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         @ti = TagImplication.where(:antecedent_name => "bar", :consequent_name => "baz").first
       end
 
+      should "reference the approver in the automated message" do
+        assert_match(Regexp.compile(@admin.name), @bur.forum_post.body)
+      end
+
       should "set the BUR approver" do
         assert_equal(@admin.id, @bur.approver.id)
       end
@@ -133,6 +137,11 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         @topic.reload
         @post.reload
         assert_match(/\[REJECTED\]/, @topic.title)
+      end
+
+      should "reference the rejector in the automated message" do
+        @req.reject!(@admin)
+        assert_match(Regexp.compile(@admin.name), @req.forum_post.body)
       end
 
       should "not send @mention dmails to the approver" do
