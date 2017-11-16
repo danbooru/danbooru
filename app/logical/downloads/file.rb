@@ -125,7 +125,7 @@ module Downloads
 
     def set_source_to_referer(src, referer)
       if Sources::Strategies::Nijie.url_match?(src) ||
-         Sources::Strategies::Twitter.url_match?(src) ||
+         Sources::Strategies::Twitter.url_match?(src) || Sources::Strategies::Twitter.url_match?(referer)
          Sources::Strategies::Pawoo.url_match?(src) ||
          Sources::Strategies::Tumblr.url_match?(src) || Sources::Strategies::Tumblr.url_match?(referer)
          Sources::Strategies::ArtStation.url_match?(src) || Sources::Strategies::ArtStation.url_match?(referer)
