@@ -3,11 +3,11 @@ module Sources::Strategies
     attr_reader :image_urls
 
     def self.url_match?(url)
-      url =~ %r!https?://(?:mobile\.)?twitter\.com/\w+/status/\d+! || url =~ %r{https?://pbs\.twimg\.com/media/}
+      self.status_id_from_url(url).present?
     end
 
     def referer_url
-      if @referer_url =~ %r!https?://(?:mobile\.)?twitter\.com/\w+/status/\d+! && @url =~ %r{https?://pbs\.twimg\.com/media/}
+      if self.class.url_match?(@referer_url)
         @referer_url
       else
         @url
@@ -19,7 +19,6 @@ module Sources::Strategies
     end
 
     def api_response
-      status_id = status_id_from_url(url)
       @api_response ||= TwitterService.new.client.status(status_id, tweet_mode: "extended")
     end
 
@@ -62,11 +61,15 @@ module Sources::Strategies
       desc.strip
     end
 
-    def status_id_from_url(url)
+    def status_id
+      self.class.status_id_from_url(referer_url)
+    end
+
+    def self.status_id_from_url(url)
       if url =~ %r{^https?://(?:mobile\.)?twitter\.com/\w+/status/(\d+)}
         $1.to_i
       else
-        raise Sources::Error.new("Couldn't get status ID from URL: #{url}")
+        nil
       end
     end
   end
