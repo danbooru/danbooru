@@ -162,13 +162,6 @@
         <% end %>
 
         <tr>
-          <th>Subscriptions</th>
-          <td>
-            <em>This feature has been disabled. <%= link_to "Migrate your tag subscriptions to saved searches", tag_subscriptions_path %>.</em>
-          </td>
-        </tr>
-
-        <tr>
           <th>API Key</th>
           <td>
             <%= link_to (CurrentUser.api_key ? "View" : "Generate"), user_api_key_path(CurrentUser.user) %>

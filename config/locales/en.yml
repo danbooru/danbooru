@@ -27,9 +27,6 @@ en:
       comment_vote:
         comment: "You"
         user_id: "You"
-      tag_subscription:
-        creator: "You"
-        creator_id: "You"
       upload:
         uploader: "You"
         uploader_id: "You"

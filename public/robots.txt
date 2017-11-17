@@ -45,7 +45,6 @@ Disallow: /tag_aliases
 Disallow: /tag_corrections
 Disallow: /tag_implication_requests
 Disallow: /tag_implications
-Disallow: /tag_subscriptions
 Disallow: /tags
 Disallow: /uploads
 Disallow: /user_feedback

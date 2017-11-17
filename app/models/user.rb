@@ -97,7 +97,6 @@ class User < ApplicationRecord
   has_one :dmail_filter
   has_one :super_voter
   has_one :token_bucket
-  has_many :subscriptions, lambda {order("tag_subscriptions.name")}, :class_name => "TagSubscription", :foreign_key => "creator_id"
   has_many :note_versions, :foreign_key => "updater_id"
   has_many :dmails, lambda {order("dmails.id desc")}, :foreign_key => "owner_id"
   has_many :saved_searches

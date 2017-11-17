@@ -216,15 +216,3 @@ if ForumTopic.count == 0
     end
   end
 end
-
-if TagSubscription.count == 0
-  puts "Creating tag subscriptions"
-  TagSubscription.create(:name => "0", :tag_query => Tag.order("random()").first.name)
-  1.upto(50) do |i|
-    CurrentUser.user = User.order("random()").first
-    TagSubscription.create(:name => i.to_s, :tag_query => Tag.order("random()").first.name)
-  end
-else
-  puts "Skipping tag subscriptions"
-end
-

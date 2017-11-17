@@ -276,11 +276,6 @@ Rails.application.routes.draw do
     end
   end
   resource :tag_implication_request, :only => [:new, :create]
-  resources :tag_subscriptions, :only => [:index, :destroy, :migrate]  do
-    member do
-      post :migrate
-    end
-  end
   resources :uploads do
     collection do
       get :batch
