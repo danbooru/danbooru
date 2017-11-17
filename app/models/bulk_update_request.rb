@@ -178,6 +178,9 @@ class BulkUpdateRequest < ApplicationRecord
       when :mass_update
         "mass update {{#{token[1]}}} -> #{token[2]}"
 
+      when :change_category
+        "category [[#{token[1]}]] -> #{token[2]}"
+
       else
         raise "Unknown token: #{token[0]}"
       end

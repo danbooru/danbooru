@@ -15,6 +15,10 @@ module BulkUpdateRequestsHelper
     when :remove_implication
       TagImplication.where(antecedent_name: antecedent, consequent_name: consequent, status: "deleted").exists? || !TagImplication.where(antecedent_name: antecedent, consequent_name: consequent).exists?
 
+    when :change_category
+      tag, category = antecedent, consequent
+      Tag.where(name: tag, category: Tag.categories.value_for(category)).exists?
+
     else
       false
     end
@@ -38,7 +42,7 @@ module BulkUpdateRequestsHelper
   def script_with_line_breaks(script)
     escaped_script = AliasAndImplicationImporter.tokenize(script).map do |cmd, arg1, arg2|
       case cmd
-      when :create_alias, :create_implication, :remove_alias, :remove_implication, :mass_update
+      when :create_alias, :create_implication, :remove_alias, :remove_implication, :mass_update, :change_category
         if approved?(cmd, arg1, arg2)
           btag = '<s class="approved">'
           etag = '</s>'
@@ -78,6 +82,11 @@ module BulkUpdateRequestsHelper
 
       when :mass_update
         "#{btag}mass update " + link_to(arg1, posts_path(:tags => arg1)) + " -&gt; " + link_to(arg2, posts_path(:tags => arg2)) + "#{etag}"
+
+      when :change_category
+        arg1_count = Tag.find_by_name(arg1).try(:post_count).to_i
+
+        "#{btag}category " + link_to(arg1, posts_path(:tags => arg1)) + " (#{arg1_count}) -&gt; (#{arg2})#{etag}"
 
       end
     end.join("\n")
