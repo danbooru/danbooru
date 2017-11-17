@@ -5,9 +5,6 @@ Rails.application.routes.draw do
     resource  :alias_and_implication_import, :only => [:new, :create]
     resource  :dashboard, :only => [:show]
   end
-  namespace :mobile do
-    resources :posts, :only => [:index, :show]
-  end
   namespace :moderator do
     resource :bulk_revert, :only => [:new, :create]
     resource :dashboard, :only => [:show]
@@ -329,8 +326,6 @@ Rails.application.routes.draw do
   resources :wpages, :controller => "wiki_pages"
   resources :ftopics, :controller => "forum_topics"
   resources :fposts, :controller => "forum_posts"
-  get "/m/posts", :controller => "mobile/posts", :action => "index"
-  get "/m/posts/:id", :controller => "mobile/posts", :action => "show"
 
   # legacy aliases
   get "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}&search[name]=#{CGI::escape(req.params[:name].to_s)}"}

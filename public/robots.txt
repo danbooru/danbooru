@@ -16,7 +16,6 @@ Disallow: /iqdb_queries
 Disallow: /ip_bans
 Disallow: /janitor_trials
 Disallow: /maintenance
-Disallow: /mobile/
 Disallow: /m/
 Disallow: /mod_actions
 Disallow: /moderator

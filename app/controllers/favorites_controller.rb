@@ -32,9 +32,6 @@ class FavoritesController < ApplicationController
     end
 
     respond_with(@post) do |format|
-      format.html do
-        redirect_to(mobile_post_path(@post))
-      end
       format.js
       format.json do
         if @post
@@ -51,16 +48,11 @@ class FavoritesController < ApplicationController
 
     if @post
       @post.remove_favorite!(CurrentUser.user)
-      path = mobile_post_path(@post)
     else
       Favorite.remove(post_id: params[:id], user: CurrentUser.user)
-      path = mobile_posts_path
     end
 
     respond_with(@post) do |format|
-      format.html do
-        redirect_to(path)
-      end
       format.js
       format.json do
         render :json => {:success => true}.to_json
