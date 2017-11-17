@@ -95,6 +95,16 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       end
     end
 
+    context "for a `category <tag> -> type` change" do
+      should "work" do
+        tag = Tag.find_or_create_by_name("tagme")
+        bur = FactoryGirl.create(:bulk_update_request, :script => "category tagme -> meta")
+        bur.approve!(@admin)
+
+        assert_equal(Tag.categories.meta, tag.reload.category)
+      end
+    end
+
     context "with an associated forum topic" do
       setup do
         @topic = FactoryGirl.create(:forum_topic, :title => "[bulk] hoge")
