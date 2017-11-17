@@ -56,7 +56,6 @@ class PostReplacement < ApplicationRecord
 
       if md5_changed
         post.comments.create!({creator: User.system, body: comment_replacement_message, do_not_bump_post: true}, without_protection: true)
-        ModAction.log(modaction_replacement_message)
       else
         post.queue_backup
       end
@@ -121,10 +120,6 @@ class PostReplacement < ApplicationRecord
   module PresenterMethods
     def comment_replacement_message
       %("#{creator.name}":[/users/#{creator.id}] replaced this post with a new image:\n\n#{replacement_message})
-    end
-
-    def modaction_replacement_message
-      "replaced post ##{post.id}:\n\n#{replacement_message}"
     end
 
     def replacement_message
