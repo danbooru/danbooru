@@ -46,7 +46,6 @@ class PostReplacementTest < ActiveSupport::TestCase
         @post.update(source: "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png")
         @post.replace!(replacement_url: "https://www.google.com/intl/en_ALL/images/logo.gif", tags: "-tag1 tag2")
         @upload = Upload.last
-        @mod_action = ModAction.last
       end
 
       context "that is then undone" do
@@ -93,10 +92,6 @@ class PostReplacementTest < ActiveSupport::TestCase
         assert_equal("127.0.0.2", @post.uploader_ip_addr.to_s)
         assert_equal(@uploader.id, @post.uploader_id)
         assert_equal(false, @post.is_pending)
-      end
-
-      should "log a mod action" do
-        assert_match(/replaced post ##{@post.id}/, @mod_action.description)
       end
 
       should "leave a system comment" do
@@ -264,7 +259,7 @@ class PostReplacementTest < ActiveSupport::TestCase
 
       should "not queue a deletion or log a comment" do
         upload_file("#{Rails.root}/test/files/test.jpg", "test.jpg") do |file|
-          assert_no_difference(["@post.comments.count", "ModAction.count"]) do
+          assert_no_difference(["@post.comments.count"]) do
             @post.replace!(replacement_file: file, replacement_url: "")
           end
         end
