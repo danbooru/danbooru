@@ -50,6 +50,12 @@ class PostPresenter < Presenter
       html << %{</p>}
     end
 
+    if options[:similarity]
+      html << %{<p class="desc">}
+      html << "Similarity: " + options[:similarity].to_s
+      html << %{</p>}
+    end
+
     if options[:size]
       html << %{<p class="desc">}
       html << post.file_size.to_formatted_s(:human_size)
