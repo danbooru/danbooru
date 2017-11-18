@@ -39,7 +39,9 @@ div#page {
 
     input[type=text] {
       width: 10em;
-      z-index: 1000;
+
+      /* ensure expanded search box renders above post thumbnails. */
+      z-index: 1;
       position: relative;
     }
   }
