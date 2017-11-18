@@ -1,6 +1,8 @@
 class ImageProxy
   def self.needs_proxy?(url)
     fake_referer_for(url).present?
+  rescue Sources::Site::NoStrategyError
+    false
   end
 
   def self.fake_referer_for(url)

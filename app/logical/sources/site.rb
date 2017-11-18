@@ -2,6 +2,8 @@
 
 module Sources
   class Site
+    class NoStrategyError < RuntimeError ; end
+
     attr_reader :url, :strategy
     delegate :get, :get_size, :site_name, :artist_name,
       :profile_url, :image_url, :tags, :artists, :unique_id,
@@ -22,6 +24,8 @@ module Sources
           @strategy = strategy.new(url, referer_url)
           break
         end
+
+        raise NoStrategyError.new
       end
     end
 
