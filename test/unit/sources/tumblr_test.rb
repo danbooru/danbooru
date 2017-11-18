@@ -109,8 +109,8 @@ module Sources
       end
 
       should "get the commentary" do
-        desc = '<p>description</p><figure data-orig-width="1152" data-orig-height="648" class="tmblr-full"><img src="https://68.media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_inline_os3134mABB1v11u29_540.png" data-orig-width="1152" data-orig-height="648"/></figure><figure class="tmblr-full" data-orig-height="273" data-orig-width="300" data-tumblr-attribution="skeleton-war-draft:nYQhsQFR8-n3brTTGanKzA:Ze6nYj1umLk8W"><img src="https://68.media.tumblr.com/34ed9d0ff4a21625981372291cb53040/tumblr_nv3hwpsZQY1uft51jo1_400.gif" data-orig-height="273" data-orig-width="300"/></figure>'
-        assert_equal(desc, @site.artist_commentary_desc)
+        desc = %r!<p>description</p><figure data-orig-width="1152" data-orig-height="648" class="tmblr-full"><img src="https://\d+.media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_inline_os3134mABB1v11u29_540.png" data-orig-width="1152" data-orig-height="648"/></figure><figure class="tmblr-full" data-orig-height="273" data-orig-width="300" data-tumblr-attribution="skeleton-war-draft:nYQhsQFR8-n3brTTGanKzA:Ze6nYj1umLk8W"><img src="https://\d+.media.tumblr.com/34ed9d0ff4a21625981372291cb53040/tumblr_nv3hwpsZQY1uft51jo1_400.gif" data-orig-height="273" data-orig-width="300"/></figure>!
+        assert_match(desc, @site.artist_commentary_desc)
       end
     end
 
@@ -130,10 +130,10 @@ module Sources
       end
 
       should "get the commentary" do
-        desc = '<p>description</p><figure class="tmblr-full" data-orig-height="3000" data-orig-width="3000"><img src="https://68.media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_inline_os2zhkfhY01v11u29_540.png" data-orig-height="3000" data-orig-width="3000"/></figure><figure class="tmblr-full" data-orig-height="3000" data-orig-width="3000"><img src="https://68.media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_inline_os2zkg02xH1v11u29_540.jpg" data-orig-height="3000" data-orig-width="3000"/></figure>'
+        desc = %r!<p>description</p><figure class="tmblr-full" data-orig-height="3000" data-orig-width="3000"><img src="https://\d+.media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_inline_os2zhkfhY01v11u29_540.png" data-orig-height="3000" data-orig-width="3000"/></figure><figure class="tmblr-full" data-orig-height="3000" data-orig-width="3000"><img src="https://\d+.media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_inline_os2zkg02xH1v11u29_540.jpg" data-orig-height="3000" data-orig-width="3000"/></figure>!
 
         assert_equal("test post", @site.artist_commentary_title)
-        assert_equal(desc, @site.artist_commentary_desc)
+        assert_match(desc, @site.artist_commentary_desc)
       end
     end
 
@@ -145,7 +145,7 @@ module Sources
 
       should "get the image urls" do
         urls = %w[
-          https://vtt.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4
+          https://vt.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4
           http://data.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_inline_os31dclyCR1v11u29_raw.png
         ]
 
