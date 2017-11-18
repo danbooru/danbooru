@@ -49,8 +49,8 @@
       </section>
 
       <div class="fav-buttons">
-        <%= button_to "Favorite", favorites_path(post_id: @post.id), remote: true, method: :post, form: {id: "add-fav-button"}, class: "ui-button ui-widget ui-corner-all gradient" %>
-        <%= button_to "Unfavorite", favorite_path(@post), remote: true, method: :delete, form: {id: "remove-fav-button"}, class: "ui-button ui-widget ui-corner-all gradient" %>
+        <%= button_to "Favorite", favorites_path(post_id: @post.id), remote: true, method: :post, form: {id: "add-fav-button"}, class: "ui-button ui-widget ui-corner-all gradient", data: {disable_with: "Favoriting..."} %>
+        <%= button_to "Unfavorite", favorite_path(@post), remote: true, method: :delete, form: {id: "remove-fav-button"}, class: "ui-button ui-widget ui-corner-all gradient", data: {disable_with: "Unfavoriting..."} %>
       </div>
 
       <section id="mark-as-translated-section" style="display: none;">
