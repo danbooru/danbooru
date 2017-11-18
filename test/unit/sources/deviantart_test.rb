@@ -20,7 +20,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("https://orig02.deviantart.net/7b5b/f/2017/160/c/5/test_post_please_ignore_by_noizave-dbc3a48.png", @site.image_url)
+        assert_match(%r!https://orig\d+.deviantart.net/7b5b/f/2017/160/c/5/test_post_please_ignore_by_noizave-dbc3a48.png!, @site.image_url)
       end
 
       should "get the profile" do
@@ -37,7 +37,7 @@ module Sources
 
       should "get the artist commentary" do
         title = "test post please ignore"
-        desc = "<div align=\"center\"><span>blah blah<br><div align=\"left\">\n<a class=\"external\" href=\"http://www.deviantart.com/users/outgoing?http://www.google.com\">test link</a><br>\n</div></span></div>\n<br><h1>lol</h1>\n<br><br><b>blah</b> <i>blah</i> <u>blah</u> <strike>blah</strike><br>herp derp<br><br><blockquote>this is a quote</blockquote>\n<ol>\n<li>one</li>\n<li>two</li>\n<li>three</li>\n</ol>\n<ul>\n<li>one</li>\n<li>two</li>\n<li>three</li>\n</ul>\n<img src=\"https://e.deviantart.net/emoticons/h/heart.gif\" alt=\"Heart\" style=\"width: 15px; height: 13px;\" data-embed-type=\"emoticon\" data-embed-id=\"357\">  "
+        desc = "<div align=\"center\"><span>blah blah<br><div align=\"left\">\n<a class=\"external\" href=\"https://www.deviantart.com/users/outgoing?http://www.google.com\">test link</a><br>\n</div></span></div>\n<br><h1>lol</h1>\n<br><br><b>blah</b> <i>blah</i> <u>blah</u> <strike>blah</strike><br>herp derp<br><br><blockquote>this is a quote</blockquote>\n<ol>\n<li>one</li>\n<li>two</li>\n<li>three</li>\n</ol>\n<ul>\n<li>one</li>\n<li>two</li>\n<li>three</li>\n</ul>\n<img src=\"https://e.deviantart.net/emoticons/h/heart.gif\" alt=\"Heart\" style=\"width: 15px; height: 13px;\" data-embed-type=\"emoticon\" data-embed-id=\"357\">  "
 
         assert_equal(title, @site.artist_commentary_title)
         assert_equal(desc, @site.artist_commentary_desc)
