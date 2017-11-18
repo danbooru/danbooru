@@ -44,6 +44,13 @@ module Sources
         DText.from_html(text) do |element|
           if element.name == "a" && element["href"].present?
             element["href"] = element["href"].gsub(%r!\Ahttps?://www\.deviantart\.com/users/outgoing\?!i, "")
+
+            # href may be missing the `http://` bit (ex: `inprnt.com`, `//inprnt.com`). Add it if missing.
+            uri = Addressable::URI.heuristic_parse(element["href"]) rescue nil
+            if uri.present?
+              uri.scheme ||= "http"
+              element["href"] = uri.to_s
+            end
           end
         end
       end

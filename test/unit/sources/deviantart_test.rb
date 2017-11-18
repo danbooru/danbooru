@@ -82,5 +82,14 @@ module Sources
         assert_equal("http://orig14.deviantart.net/cb25/f/2017/160/1/9/hidden_work_by_noizave-dbc3r29.png", @site.image_url)
       end
     end
+
+    context "A source with malformed links in the artist commentary" do
+      should "fix the links" do
+        @site = Sources::Site.new("https://teemutaiga.deviantart.com/art/Kisu-620666655")
+        @site.get
+
+        assert_match(%r!"Print available at Inprnt":\[http://www.inprnt.com/gallery/teemutaiga/kisu\]!, @site.dtext_artist_commentary_desc)
+      end
+    end
   end
 end
