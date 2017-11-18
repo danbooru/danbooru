@@ -15,17 +15,6 @@
     <% end %>
     <%= hidden_field_tag "ms", "1" %>
     <%= submit_tag "Go", :name => nil, :class => "ui-button ui-widget ui-corner-all tiny gradient" %>
-    <%= submit_tag "+", :id => "expand-search", "data-jq-dropdown" => "#search-dropdown", :class => "ui-button ui-widget ui-corner-all tiny gradient" %>
-    <div id="search-dropdown" class="jq-dropdown jq-dropdown-tip">
-      <ul class="jq-dropdown-menu">
-        <% if SavedSearch.enabled? && CurrentUser.show_saved_searches? %>
-          <li><%= link_to "Save search", saved_searches_path, :id => "save-search" %></li>
-        <% end %>
-
-        <li><%= link_to "Search wiki", wiki_pages_path, :id => "wiki-search" %></li>
-        <li><%= link_to "Search artists", artists_path, :id => "artist-search" %></li>
-      </ul>
-    </div>
   <% end %>
 </section>
 

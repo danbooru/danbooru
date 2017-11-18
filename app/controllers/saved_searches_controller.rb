@@ -22,7 +22,7 @@ class SavedSearchesController < ApplicationController
   end
 
   def create
-    @saved_search = saved_searches.create(:query => params[:saved_search_tags], :label_string => params[:saved_search_labels])
+    @saved_search = saved_searches.create!(:query => params[:saved_search_tags], :label_string => params[:saved_search_labels])
     if params[:saved_search_disable_labels]
       CurrentUser.disable_categorized_saved_searches = true
       CurrentUser.save

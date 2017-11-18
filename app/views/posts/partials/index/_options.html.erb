@@ -1,0 +1,8 @@
+<section id="options-box">
+  <h1>Options</h1>
+  <ul>
+    <% if SavedSearch.enabled? && CurrentUser.is_member? %>
+      <li><%= button_tag "Save search", id: "save-search", class: "ui-button ui-widget ui-corner-all gradient sub" %></li>
+    <% end %>
+  </ul>
+</section>

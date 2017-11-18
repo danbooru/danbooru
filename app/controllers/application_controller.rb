@@ -90,6 +90,7 @@ class ApplicationController < ActionController::Base
       flash[:notice] = "This feature isn't available: #{@exception.message}"
       respond_to do |fmt|
         fmt.html { redirect_to :back }
+        fmt.js { render nothing: true, status: 501 }
         fmt.json { render template: "static/error", status: 501 }
         fmt.xml  { render template: "static/error", status: 501 }
       end
