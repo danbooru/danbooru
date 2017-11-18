@@ -113,6 +113,7 @@ module Sources::Strategies
 
     module ApiMethods
       def client
+        raise NotImplementedError.new("Tumblr support is not available (API key not configured).") if Danbooru.config.tumblr_consumer_key.nil?
         ::TumblrApiClient.new(Danbooru.config.tumblr_consumer_key)
       end
 
