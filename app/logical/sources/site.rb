@@ -17,16 +17,14 @@ module Sources
     end
 
     def initialize(url, referer_url: nil)
-      @url = url
-
       Site.strategies.each do |strategy|
         if strategy.url_match?(url) || strategy.url_match?(referer_url)
           @strategy = strategy.new(url, referer_url)
-          break
+          return
         end
-
-        raise NoStrategyError.new
       end
+
+      raise NoStrategyError.new
     end
 
     def referer_url

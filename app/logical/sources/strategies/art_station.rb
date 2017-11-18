@@ -6,9 +6,9 @@ module Sources::Strategies
       self.project_id(url).present?
     end
 
-    # https://www.artstation.com/artwork/04XA4"
-    # https://dantewontdie.artstation.com/projects/YZK5q"
-    # https://www.artstation.com/artwork/cody-from-sf"
+    # https://www.artstation.com/artwork/04XA4
+    # https://dantewontdie.artstation.com/projects/YZK5q
+    # https://www.artstation.com/artwork/cody-from-sf
     def self.project_id(url)
       if url =~ %r!\Ahttps?://\w+\.artstation\.com/(?:artwork|projects)/(?<project_id>[a-z0-9-]+)\z!i
         $~[:project_id]

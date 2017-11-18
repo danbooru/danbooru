@@ -18,7 +18,6 @@ module Downloads
     protected
       def rewrite_html_url(url, headers)
         return [url, headers] unless Sources::Strategies::ArtStation.url_match?(url)
-
         source = Sources::Site.new(url)
         source.get
         [source.image_url, headers]
