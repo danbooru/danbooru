@@ -4,8 +4,8 @@ module Sources
   class Site
     class NoStrategyError < RuntimeError ; end
 
-    attr_reader :url, :strategy
-    delegate :get, :get_size, :site_name, :artist_name,
+    attr_reader :strategy
+    delegate :url, :get, :get_size, :site_name, :artist_name,
       :profile_url, :image_url, :tags, :artists, :unique_id,
       :file_url, :ugoira_frame_data, :ugoira_content_type, :image_urls,
       :artist_commentary_title, :artist_commentary_desc,
