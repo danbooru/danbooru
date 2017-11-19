@@ -65,6 +65,14 @@ module Sources
       should "get the image url" do
         assert_equal("http://data.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_raw.png", @site.image_url)
       end
+
+      should "get the artist" do
+        CurrentUser.user = FactoryGirl.create(:user)
+        CurrentUser.ip_addr = "127.0.0.1"
+
+        @artist = FactoryGirl.create(:artist, name: "noizave", url_string: "https://noizave.tumblr.com/")
+        assert_equal([@artist], @site.artists)
+      end
     end
 
     context "The source for a 'http://*.tumblr.com/image/*' image page" do
