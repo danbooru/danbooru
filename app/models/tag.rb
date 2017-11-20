@@ -783,6 +783,10 @@ class Tag < ApplicationRecord
   end
 
   module SearchMethods
+    def empty
+      where("tags.post_count <= 0")
+    end
+
     def nonempty
       where("tags.post_count > 0")
     end
