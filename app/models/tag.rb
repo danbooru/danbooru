@@ -415,6 +415,12 @@ class Tag < ApplicationRecord
       end
     end
 
+    # true if query is a single "simple" tag (not a metatag, negated tag, or wildcard tag).
+    def is_simple_tag?(query)
+      q = parse_query(query)
+      (scan_query(query).size == 1) && (q[:tags][:related].size == 1)
+    end
+
     def parse_query(query, options = {})
       q = {}
 
@@ -783,6 +789,10 @@ class Tag < ApplicationRecord
   end
 
   module SearchMethods
+    def empty
+      where("tags.post_count <= 0")
+    end
+
     def nonempty
       where("tags.post_count > 0")
     end
