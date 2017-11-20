@@ -2380,13 +2380,39 @@ class PostTest < ActiveSupport::TestCase
         Danbooru.config.stubs(:blank_tag_search_fast_count).returns(nil)
         Danbooru.config.stubs(:estimate_post_counts).returns(false)
         FactoryGirl.create(:tag_alias, :antecedent_name => "alias", :consequent_name => "aaa")
-        FactoryGirl.create(:post, :tag_string => "aaa")
+        FactoryGirl.create(:post, :tag_string => "aaa", "score" => 42)
+      end
+
+      context "a single basic tag" do
+        should "return the cached count" do
+          Tag.find_or_create_by_name("aaa").update_columns(post_count: 100)
+          assert_equal(100, Post.fast_count("aaa"))
+        end
+      end
+
+      context "a single metatag" do
+        should "return the correct cached count" do
+          FactoryGirl.build(:tag, name: "score:42", post_count: -100).save(validate: false)
+          Post.set_count_in_cache("score:42", 100)
+
+          assert_equal(100, Post.fast_count("score:42"))
+        end
+      end
+
+      context "a multi-tag search" do
+        should "return the cached count, if it exists" do
+          Post.set_count_in_cache("aaa score:42", 100)
+          assert_equal(100, Post.fast_count("aaa score:42"))
+        end
+
+        should "return the true count, if not cached" do
+          assert_equal(1, Post.fast_count("aaa score:42"))
+        end
       end
 
       context "a blank search" do
         should "should execute a search" do
           Cache.delete(Post.count_cache_key(''))
-          Post.expects(:select_value_sql).with(kind_of(String), "").once.returns(nil)
           Post.expects(:fast_count_search).with("", kind_of(Hash)).once.returns(1)
           assert_equal(1, Post.fast_count(""))
         end
@@ -2420,7 +2446,6 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "execute a search" do
-            Post.expects(:select_value_sql).once.with(kind_of(String), "rating:s").returns(nil)
             Post.expects(:fast_count_search).once.with("rating:s", kind_of(Hash)).returns(1)
             assert_equal(1, Post.fast_count(""))
           end

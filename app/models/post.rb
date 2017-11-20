@@ -1218,14 +1218,14 @@ class Post < ApplicationRecord
     end
 
     def get_count_from_cache(tags)
-      count = Cache.get(count_cache_key(tags)) # this will only have a value for multi-tag searches
-
-      if count.nil? && !tags.include?(" ")
+      if Tag.is_simple_tag?(tags)
         count = select_value_sql("SELECT post_count FROM tags WHERE name = ?", tags.to_s)
-        # set_count_in_cache(tags, count.to_i) if count
+      else
+        # this will only have a value for multi-tag searches or single metatag searches
+        count = Cache.get(count_cache_key(tags))
       end
 
-      count ? count.to_i : nil
+      count.try(:to_i)
     end
 
     def set_count_in_cache(tags, count, expiry = nil)
