@@ -9,11 +9,11 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("https://cdna.artstation.com/p/assets/images/images/000/705/368/original/jey-rain-one1.jpg", @site.image_url.sub(/\?\d+/, ""))
+        assert_equal("https://cdna.artstation.com/p/assets/images/images/000/705/368/large/jey-rain-one1.jpg", @site.image_url.sub(/\?\d+/, ""))
       end
 
       should "get the profile" do
-        assert_equal("https://www.artstation.com/artist/jeyrain", @site.profile_url)
+        assert_equal("https://www.artstation.com/jeyrain", @site.profile_url)
       end
 
       should "get the artist name" do
@@ -37,12 +37,12 @@ module Sources
       end
 
       should "get the image url" do
-        url = "https://cdna.artstation.com/p/assets/images/images/006/066/534/original/yinan-cui-reika.jpg?1495781565"
+        url = "https://cdna.artstation.com/p/assets/images/images/006/066/534/large/yinan-cui-reika.jpg?1495781565"
         assert_equal(url, @site.image_url)
       end
 
       should "get the profile" do
-        assert_equal("https://www.artstation.com/artist/dantewontdie", @site.profile_url)
+        assert_equal("https://www.artstation.com/dantewontdie", @site.profile_url)
       end
 
       should "get the artist name" do
@@ -66,7 +66,7 @@ module Sources
       end
 
       should "get the image url" do
-        url = "https://cdna.artstation.com/p/assets/images/images/000/144/922/original/cassio-yoshiyaki-cody2backup2-yoshiyaki.jpg?1406314198"
+        url = "https://cdna.artstation.com/p/assets/images/images/000/144/922/large/cassio-yoshiyaki-cody2backup2-yoshiyaki.jpg?1406314198"
         assert_equal(url, @site.image_url)
       end
     end
@@ -91,7 +91,7 @@ module Sources
       end
 
       should "get only image urls, not video urls" do
-        urls = %w[https://cdnb.artstation.com/p/assets/images/images/006/037/253/original/astri-lohne-sjursen-eva.jpg?1495573664]
+        urls = %w[https://cdnb.artstation.com/p/assets/images/images/006/037/253/large/astri-lohne-sjursen-eva.jpg?1495573664]
         assert_equal(urls, @site.image_urls)
       end
     end

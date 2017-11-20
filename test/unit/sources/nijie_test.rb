@@ -9,6 +9,7 @@ module Sources
 
         @site = Sources::Site.new("http://nijie.info/view.php?id=213043")
         @site.get
+        sleep(5)
       end
 
       should "get the image url" do

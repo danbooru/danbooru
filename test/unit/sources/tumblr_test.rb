@@ -93,7 +93,7 @@ module Sources
 
     context "The source for a 'http://*.media.tumblr.com/$hash/tumblr_$id_1280.jpg' image with a referer" do
       setup do
-        @url = "https://68.media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg"
+        @url = "https://78.media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg"
         @ref = "https://noizave.tumblr.com/post/162094447052"
         @site = Sources::Site.new(@url, referer_url: @ref)
         @site.get
@@ -139,7 +139,6 @@ module Sources
 
       should "get the commentary" do
         desc = %r!<p>description</p><figure class="tmblr-full" data-orig-height="3000" data-orig-width="3000"><img src="https://\d+.media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_inline_os2zhkfhY01v11u29_540.png" data-orig-height="3000" data-orig-width="3000"/></figure><figure class="tmblr-full" data-orig-height="3000" data-orig-width="3000"><img src="https://\d+.media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_inline_os2zkg02xH1v11u29_540.jpg" data-orig-height="3000" data-orig-width="3000"/></figure>!
-
         assert_equal("test post", @site.artist_commentary_title)
         assert_match(desc, @site.artist_commentary_desc)
       end
