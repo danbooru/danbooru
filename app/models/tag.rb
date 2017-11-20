@@ -427,7 +427,7 @@ class Tag < ApplicationRecord
       }
 
       scan_query(query).each do |token|
-        q[:tag_count] += 1 unless token == "status:deleted" || token =~ /\Alimit:.+\Z/
+        q[:tag_count] += 1 unless Danbooru.config.is_unlimited_tag?(token)
 
         if token =~ /\A(#{METATAGS}):(.+)\Z/i
           g1 = $1.downcase
