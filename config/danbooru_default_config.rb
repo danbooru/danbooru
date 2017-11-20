@@ -169,6 +169,11 @@ module Danbooru
       end
     end
 
+    # Return true if the given tag shouldn't count against the user's tag search limit.
+    def is_unlimited_tag?(tag)
+      !!(tag =~ /\A(-?status:deleted|rating:s.*|limit:.+)\z/i)
+    end
+
     # After this many pages, the paginator will switch to sequential mode.
     def max_numbered_pages
       1_000

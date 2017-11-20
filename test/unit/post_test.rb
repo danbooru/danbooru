@@ -2292,6 +2292,14 @@ class PostTest < ActiveSupport::TestCase
       end
     end
 
+    should "not count free tags against the user's search limit" do
+      post1 = FactoryGirl.create(:post, tag_string: "aaa bbb rating:s")
+
+      Danbooru.config.expects(:is_unlimited_tag?).with("rating:s").once.returns(true)
+      Danbooru.config.expects(:is_unlimited_tag?).with(anything).twice.returns(false)
+      assert_tag_match([post1], "aaa bbb rating:s")
+    end
+
     should "succeed for exclusive tag searches with no other tag" do
       post1 = FactoryGirl.create(:post, :rating => "s", :tag_string => "aaa")
       assert_nothing_raised do
@@ -2423,6 +2431,15 @@ class PostTest < ActiveSupport::TestCase
             Post.expects(:select_value_sql).once.with(kind_of(String), "rating:s").returns(nil)
             Post.expects(:fast_count_search).once.with("rating:s", kind_of(Hash)).returns(1)
             assert_equal(1, Post.fast_count(""))
+          end
+
+          should "not fail for a two tag search by a member" do
+            post1 = FactoryGirl.create(:post, tag_string: "aaa bbb rating:s")
+            post2 = FactoryGirl.create(:post, tag_string: "aaa bbb rating:e")
+
+            Danbooru.config.expects(:is_unlimited_tag?).with("rating:s").once.returns(true)
+            Danbooru.config.expects(:is_unlimited_tag?).with(anything).twice.returns(false)
+            assert_equal(1, Post.fast_count("aaa bbb"))
           end
 
           should "set the value in cache" do
