@@ -12,11 +12,31 @@ class PawooApiClient
     end
 
     def initialize(json)
-      @json = get
+      @json = json
     end
 
     def profile_url
       json["url"]
+    end
+
+    def account_name
+      json["username"]
+    end
+
+    def image_url
+      nil
+    end
+
+    def image_urls
+      []
+    end
+
+    def tags
+      []
+    end
+
+    def commentary
+      nil
     end
   end
 
@@ -32,7 +52,7 @@ class PawooApiClient
       @json = json
     end
 
-    def account_profile_url
+    def profile_url
       json["account"]["url"]
     end
 
@@ -60,9 +80,11 @@ class PawooApiClient
     end
   end
 
-  def get_status(url)
+  def get(url)
     if id = Status.is_match?(url)
       Status.new(JSON.parse(access_token.get("/api/v1/statuses/#{id}").body))
+    elsif id = Account.is_match?(url)
+      Account.new(JSON.parse(access_token.get("/api/v1/accounts/#{id}").body))
     else
       nil
     end

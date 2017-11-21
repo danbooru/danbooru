@@ -68,6 +68,7 @@ class FavoriteTest < ActiveSupport::TestCase
     end
 
     should "remove it from all favorite groups" do
+      assert_equal("#{@post.id}", @fav_group.post_ids)
       @post.expunge!
       @fav_group.reload
       assert_equal("", @fav_group.post_ids)

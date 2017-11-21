@@ -13,7 +13,7 @@ class PostDisapproval < ApplicationRecord
   scope :disinterest, lambda {where(:reason => ["disinterest", "legacy"])}
 
   def self.prune!
-    PostDisapproval.where("post_id in (select _.post_id from post_disapprovals _ where _.created_at < ?)", DELETION_THRESHOLD.ago)
+    PostDisapproval.where("post_id in (select _.post_id from post_disapprovals _ where _.created_at < ?)", DELETION_THRESHOLD.ago).delete_all
   end
 
   def self.dmail_messages!

@@ -1472,18 +1472,18 @@ class PostTest < ActiveSupport::TestCase
           end
 
           context "but doesn't have a pixiv id" do
-            should "not save the pixiv id" do
+            should "save the pixiv id" do
               @post.pixiv_id = 1234
               @post.update(source: "http://i1.pixiv.net/novel-cover-original/img/2016/11/03/20/10/58/7436075_f75af69f3eacd1656d3733c72aa959cf.jpg")
-              assert_nil(@post.pixiv_id)
+              assert_equal(7436075, @post.pixiv_id)
 
               @post.pixiv_id = 1234
               @post.update(source: "http://i2.pixiv.net/background/img/2016/10/30/12/27/30/7059005_da9946b806c10d391a81ed1117cd33d6.jpg")
-              assert_nil(@post.pixiv_id)
+              assert_equal(7059005, @post.pixiv_id)
 
               @post.pixiv_id = 1234
               @post.update(source: "http://i1.pixiv.net/img15/img/omega777/novel/2612734.jpg")
-              assert_nil(@post.pixiv_id)
+              assert_equal(2612734, @post.pixiv_id)
 
               @post.pixiv_id = 1234
               @post.update(source: "http://img08.pixiv.net/profile/nice/1408837.jpg")

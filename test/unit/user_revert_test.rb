@@ -3,6 +3,8 @@ require 'test_helper'
 class UserRevertTest < ActiveSupport::TestCase
   context "Reverting a user's changes" do
     setup do
+      User.any_instance.stubs(:validate_sock_puppets).returns(true)
+      
       @creator = FactoryGirl.create(:user)
       @user = FactoryGirl.create(:user)
       CurrentUser.user = @user

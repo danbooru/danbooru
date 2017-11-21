@@ -4,6 +4,8 @@ class DmailFilterTest < ActiveSupport::TestCase
   def setup
     super
 
+    User.any_instance.stubs(:validate_sock_puppets).returns(true)
+
     @receiver = FactoryGirl.create(:user)
     @sender = FactoryGirl.create(:user)
   end

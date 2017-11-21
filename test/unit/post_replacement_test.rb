@@ -14,6 +14,8 @@ class PostReplacementTest < ActiveSupport::TestCase
   end
 
   def setup
+    super
+
     mock_iqdb_service!
     Delayed::Worker.delay_jobs = true # don't delete the old images right away
 
@@ -27,6 +29,8 @@ class PostReplacementTest < ActiveSupport::TestCase
   end
 
   def teardown
+    super
+    
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
     Delayed::Worker.delay_jobs = false

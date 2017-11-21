@@ -1,7 +1,9 @@
 require 'test_helper'
 
 class PostPrunerTest < ActiveSupport::TestCase
-  setup do
+  def setup
+    super
+
     @user = FactoryGirl.create(:admin_user)
     CurrentUser.user = @user
     CurrentUser.ip_addr = "127.0.0.1"
@@ -21,7 +23,9 @@ class PostPrunerTest < ActiveSupport::TestCase
     PostPruner.new.prune!
   end
 
-  teardown do
+  def teardown
+    super
+    
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
   end

@@ -16,7 +16,7 @@ module Sources::Strategies
     attr_reader :image_urls
 
     def self.url_match?(url)
-      PawooApiClient::Status.is_match?(url)
+      PawooApiClient::Status.is_match?(url) || PawooApiClient::Account.is_match?(url)
     end
 
     def referer_url
@@ -28,13 +28,13 @@ module Sources::Strategies
     end
 
     def api_response
-      @response ||= PawooApiClient.new.get_status(normalized_url)
+      @response ||= PawooApiClient.new.get(normalized_url)
     end
 
     def get
       response = api_response
       @artist_name = response.account_name
-      @profile_url = response.account_profile_url
+      @profile_url = response.profile_url
       @image_url = response.image_urls.first
       @image_urls = response.image_urls
       @tags = response.tags
@@ -52,6 +52,11 @@ module Sources::Strategies
 
     def normalizable_for_artist_finder?
       true
+    end
+
+    def normalize_for_artist_finder!
+      get
+      @profile_url
     end
 
     def dtext_artist_commentary_desc

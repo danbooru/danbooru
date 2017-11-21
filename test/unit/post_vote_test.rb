@@ -3,7 +3,8 @@ require 'test_helper'
 class PostVoteTest < ActiveSupport::TestCase
   def setup
     super
-    
+
+    User.any_instance.stubs(:validate_sock_puppets).returns(true)
     @supervoter = FactoryGirl.create(:user, is_super_voter: true)
     @user = FactoryGirl.create(:user)
     CurrentUser.user = @user

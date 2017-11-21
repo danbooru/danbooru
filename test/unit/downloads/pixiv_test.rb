@@ -32,7 +32,7 @@ module Downloads
           @new_medium_thumbnail = "http://i1.pixiv.net/c/600x600/img-master/img/2010/11/30/08/39/58/14901720_p0_master1200.jpg"
           @new_full_size_image  = "http://i1.pixiv.net/img-original/img/2010/11/30/08/39/58/14901720_p0.png"
 
-          @file_size = 1_083
+          @file_size = 1261
         end
 
         should "work when using new URLs" do
@@ -135,7 +135,7 @@ module Downloads
       context "downloading a profile image" do
         should "download new profile images" do
           @file_url = "http://i2.pixiv.net/img130/profile/minono_aki/8733472.jpg"
-          @file_size = 23266
+          @file_size = 23_444
 
           assert_not_rewritten(@file_url)
           assert_downloaded(@file_size, @file_url)
@@ -146,7 +146,7 @@ module Downloads
       context "downloading a background image" do
         should "download the image" do
           @file_url = "http://i1.pixiv.net/background/img/2016/05/17/12/05/48/2074388_d4ac52034f7ca0af3e083d59fde7e97f.jpg"
-          @file_size = 386_500
+          @file_size = 386_678
 
           assert_not_rewritten(@file_url)
           assert_downloaded(@file_size, @file_url)

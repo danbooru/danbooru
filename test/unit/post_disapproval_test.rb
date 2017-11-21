@@ -1,6 +1,11 @@
 require 'test_helper'
 
 class PostDisapprovalTest < ActiveSupport::TestCase
+  def setup
+    super
+    User.any_instance.stubs(:validate_sock_puppets).returns(true)
+  end
+
   context "In all cases" do
     setup do
       @alice = FactoryGirl.create(:moderator_user)

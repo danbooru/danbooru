@@ -17,6 +17,7 @@ class DmailTest < ActiveSupport::TestCase
 
     context "spam" do
       setup do
+        Dmail.any_instance.stubs(:spam?).returns(true)
         @recipient = FactoryGirl.create(:user)
       end
 

@@ -173,6 +173,7 @@ class FavoriteGroup < ApplicationRecord
   end
 
   def add!(post_id)
+    post_id = post_id.id if post_id.is_a?(Post)
     return if contains?(post_id)
 
     clear_post_id_array
@@ -180,12 +181,14 @@ class FavoriteGroup < ApplicationRecord
   end
 
   def self.purge_post(post_id)
+    post_id = post_id.id if post_id.is_a?(Post)
     for_post(post_id).find_each do |group|
       group.remove!(post_id)
     end
   end
 
   def remove!(post_id)
+    post_id = post_id.id if post_id.is_a?(Post)
     return unless contains?(post_id)
 
     clear_post_id_array

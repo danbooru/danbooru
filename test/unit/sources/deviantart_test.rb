@@ -79,7 +79,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("http://orig14.deviantart.net/cb25/f/2017/160/1/9/hidden_work_by_noizave-dbc3r29.png", @site.image_url)
+        assert_match(%r!https://orig\d+\.deviantart\.net/cb25/f/2017/160/1/9/hidden_work_by_noizave-dbc3r29\.png!, @site.image_url)
       end
     end
 

@@ -4,7 +4,7 @@ class BulkRevert
 
   class ConstraintTooGeneralError < Exception ; end
 
-  def process(creator, constraints)
+  def process(creator, constraints = {})
     @constraints = constraints
     
     ModAction.log("Processed bulk revert for #{constraints.inspect} by #{creator.name}")
@@ -19,6 +19,7 @@ class BulkRevert
   end
 
   def initialize
+    @constraints = {}
   end
 
   def preview

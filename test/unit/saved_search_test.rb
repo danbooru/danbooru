@@ -6,12 +6,21 @@ class SavedSearchTest < ActiveSupport::TestCase
 
   def setup
     super
+    User.any_instance.stubs(:validate_sock_puppets).returns(true)
+    @user = FactoryGirl.create(:user)
+    CurrentUser.user = @user
+    CurrentUser.ip_addr = "127.0.0.1"
     mock_saved_search_service!
+  end
+
+  def teardown
+    super
+    CurrentUser.user = nil
+    CurrentUser.ip_addr = nil
   end
 
   context ".labels_for" do
     setup do
-      @user = FactoryGirl.create(:user)
       FactoryGirl.create(:saved_search, user: @user, label_string: "blah", query: "blah")
       FactoryGirl.create(:saved_search, user: @user, label_string: "zah", query: "blah")
     end
@@ -28,7 +37,6 @@ class SavedSearchTest < ActiveSupport::TestCase
 
   context ".queries_for" do
     setup do
-      @user = FactoryGirl.create(:user)
       FactoryGirl.create(:tag_alias, antecedent_name: "bbb", consequent_name: "ccc", creator: @user)
       FactoryGirl.create(:saved_search, user: @user, label_string: "blah", query: "aaa")
       FactoryGirl.create(:saved_search, user: @user, label_string: "zah", query: "CCC BBB AAA")
@@ -83,7 +91,6 @@ class SavedSearchTest < ActiveSupport::TestCase
 
   context "Creating a saved search" do
     setup do
-      @user = FactoryGirl.create(:gold_user)
       FactoryGirl.create(:tag_alias, antecedent_name: "zzz", consequent_name: "yyy", creator: @user)
       @saved_search = @user.saved_searches.create(:query => " ZZZ xxx ")
     end
@@ -108,7 +115,6 @@ class SavedSearchTest < ActiveSupport::TestCase
 
   context "Destroying a saved search" do
     setup do
-      @user = FactoryGirl.create(:gold_user)
       @saved_search = @user.saved_searches.create(:tag_query => "xxx")
       @saved_search.destroy
     end
@@ -122,6 +128,7 @@ class SavedSearchTest < ActiveSupport::TestCase
   context "A user with max saved searches" do
     setup do
       @user = FactoryGirl.create(:gold_user)
+      CurrentUser.user = @user
       User.any_instance.stubs(:max_saved_searches).returns(0)
       @saved_search = @user.saved_searches.create(:query => "xxx")
     end

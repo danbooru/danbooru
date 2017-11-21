@@ -17,7 +17,7 @@ class TagAliasCorrectionTest < ActiveSupport::TestCase
 
     context "with a bad cache and post counts" do
       setup do
-        Cache.put("ta:aaa", "zzz")
+        Cache.put("ta:#{Cache.hash('aaa')}", "zzz")
         Tag.where(:name => "aaa").update_all("post_count = -3")
         @correction = TagAliasCorrection.new(@tag_alias.id)
       end
@@ -46,7 +46,7 @@ class TagAliasCorrectionTest < ActiveSupport::TestCase
         end
 
         should "now have the correct cache" do
-          assert_equal("bbb", Cache.get("ta:aaa"))
+          assert_equal("bbb", Cache.get("ta:#{Cache.hash('aaa')}"))
         end
 
         should "now have the correct count" do

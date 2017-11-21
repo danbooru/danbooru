@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class PostArchiveTest < ActiveSupport::TestCase
+  include PoolArchiveTestHelper
+
   context "A post" do
     setup do
       Timecop.travel(1.month.ago) do
@@ -70,6 +72,7 @@ class PostArchiveTest < ActiveSupport::TestCase
 
     context "that is tagged with a pool:<name> metatag" do
       setup do
+        mock_pool_archive_service!
         @pool = FactoryGirl.create(:pool)
         @post = FactoryGirl.create(:post, tag_string: "tagme pool:#{@pool.id}")
       end
@@ -114,10 +117,11 @@ class PostArchiveTest < ActiveSupport::TestCase
       end
 
       should "not create a version if updating the post fails" do
-        @post.stubs(:apply_post_metatags).raises(NotImplementedError)
+        @post.stubs(:set_tag_counts).raises(NotImplementedError)
 
+        assert_equal(2, @post.versions.size)
         assert_raise(NotImplementedError) { @post.update(rating: "s") }
-        assert_equal(1, @post.versions.size)
+        assert_equal(2, @post.versions.size)
       end
 
       should "should create a version if the rating changes" do
