@@ -28,6 +28,8 @@ module Downloads
         end
 
         return [url, headers, data]
+      rescue PixivApiClient::BadIDError
+        return [url, headers, data]
       end
 
     protected
