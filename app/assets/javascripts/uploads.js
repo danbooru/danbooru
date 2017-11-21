@@ -12,6 +12,7 @@
       this.initialize_info_bookmarklet();
       this.initialize_similar();
       this.initialize_shortcuts();
+      this.initialize_submit();
       $("#related-tags-button").trigger("click");
 
       $("#toggle-artist-commentary").click(function(e) {
@@ -23,6 +24,28 @@
     if ($("#iqdb-similar").length) {
       this.initialize_iqdb_source();
     }
+  }
+
+  Danbooru.Upload.initialize_submit = function() {
+    $("#form").submit(function(e) {
+      var error_messages = [];
+      if (($("#upload_file").val() === "") && ($("#upload_source").val() === "")) {
+        error_messages.push("Must choose file or specify source");
+      }
+      if (!$("#upload_rating_s")[0].checked && !$("#upload_rating_q")[0].checked && !$("#upload_rating_e")[0].checked &&
+          ($("#upload_tag_string").val().search(/\brating:[sqe]/) < 0)) {
+        error_messages.push("Must specify a rating");
+      }
+      if (error_messages.length === 0) {
+        $("#submit-button")[0].setAttribute("disabled","true");
+        $("#submit-button")[0].setAttribute("value","Submitting...");
+        $("#client-errors").hide();
+      } else {
+        $("#client-errors")[0].innerHTML = "<strong>Error</strong>: " + error_messages.join(", ");
+        $("#client-errors").show();
+        e.preventDefault();
+      }
+    });
   }
 
   Danbooru.Upload.initialize_shortcuts = function() {
