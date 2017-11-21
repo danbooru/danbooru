@@ -74,11 +74,7 @@ class CurrentUser
   end
 
   def self.set_safe_mode(req)
-    if req.host =~ /safe/ || req.params[:safe_mode]
-      Thread.current[:safe_mode] = true
-    else
-      Thread.current[:safe_mode] = false
-    end
+    Thread.current[:safe_mode] = Danbooru.config.enable_safe_mode?(req, CurrentUser.user)
   end
 
   def self.method_missing(method, *params, &block)

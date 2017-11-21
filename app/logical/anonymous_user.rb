@@ -265,6 +265,10 @@ class AnonymousUser
     false
   end
 
+  def enable_safe_mode?
+    false
+  end
+
   User::Roles.reject {|r| r == :anonymous}.each do |name|
     define_method("is_#{name}?") do
       false
