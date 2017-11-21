@@ -43,8 +43,6 @@ module Downloads
         end
       end
 
-
-
       # Test a new illustration (one uploaded after 2014-09-30). New illustrations
       # must use /img-original/ for full size URLs. Old /imgXX/img/username/ style URLs
       # don't work for images uploaded after this date.
@@ -109,6 +107,27 @@ module Downloads
           assert_rewritten(@p1_full_size_image, @p1_large_thumbnail)
           assert_downloaded(@p0_file_size, @p0_large_thumbnail)
           assert_downloaded(@p1_file_size, @p1_large_thumbnail)
+        end
+      end
+
+      context "downloading a bad id image" do
+        setup do
+          @bad_id_full   = "https://i.pximg.net/img-original/img/2017/11/22/01/06/44/65991677_p0.png"
+          @bad_id_sample = "https://i.pximg.net/c/600x600/img-master/img/2017/11/22/01/06/44/65991677_p0_master1200.jpg"
+        end
+
+        should "not raise an error when rewriting the url" do
+          assert_nothing_raised { assert_not_rewritten(@bad_id_full) }
+        end
+
+        should_eventually "rewrite bad id samples to full size" do
+          assert_rewritten(@bad_id_full, @bad_id_sample)
+        end
+
+        # XXX This may fail someday. Pixiv doesn't delete bad id images right
+        # away, but they may be deleted eventually.
+        should "download the image" do
+          assert_downloaded(21440, @bad_id_full)
         end
       end
 

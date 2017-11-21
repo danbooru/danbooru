@@ -19,6 +19,7 @@ class PixivApiClient
   ]
 
   class Error < Exception ; end
+  class BadIDError < Error ; end
 
   class WorksResponse
     attr_reader :json, :pages, :name, :moniker, :user_id, :page_count, :tags
@@ -142,24 +143,17 @@ class PixivApiClient
     url = "https://public-api.secure.pixiv.net/v#{API_VERSION}/works/#{illust_id.to_i}.json"
     resp = HTTParty.get(url, Danbooru.config.httparty_options.deep_merge(query: params, headers: headers))
     body = resp.body.force_encoding("utf-8")
+    json = JSON.parse(body)
 
     if resp.success?
-      json = parse_api_json(body)
       WorksResponse.new(json["response"][0])
+    elsif json["status"] == "failure" && json.dig("errors", "system", "message") =~ /対象のイラストは見つかりませんでした。/
+      raise BadIDError.new("Pixiv ##{illust_id} not found: work was deleted, made private, or ID is invalid.")
     else
       raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
     end
-  end
-
-private
-  def parse_api_json(body)
-    json = JSON.parse(body)
-
-    if json["status"] != "success"
-      raise Error.new("Pixiv API call failed (status=#{json['status']} body=#{body})")
-    end
-
-    json
+  rescue JSON::ParserError
+    raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
   end
 
   def access_token

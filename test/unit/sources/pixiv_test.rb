@@ -127,6 +127,14 @@ module Sources
         end        
       end
 
+      context "fetching source data for a deleted work" do
+        should "raise a bad id error" do
+          assert_raise(::PixivApiClient::BadIDError) do
+            get_source("https://i.pximg.net/img-original/img/2017/11/22/01/06/44/65991677_p0.png")
+          end
+        end
+      end
+
       context "fetching the commentary" do
         should "work when the description is blank" do
           get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=65981746")
