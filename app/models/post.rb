@@ -286,14 +286,6 @@ class Post < ApplicationRecord
   end
 
   module ImageMethods
-    def device_scale
-      if large_image_width > 320
-        320.0 / (large_image_width + 10)
-      else
-        1.0
-      end
-    end
-
     def twitter_card_supported?
       image_width.to_i >= 280 && image_height.to_i >= 150
     end
