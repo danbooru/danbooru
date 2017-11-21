@@ -4,10 +4,18 @@ module Moderator
   class IpAddrsControllerTest < ActionController::TestCase
     context "The ip addrs controller" do
       setup do
+        PoolArchive.delete_all
+        PostArchive.delete_all
+        
         @user = FactoryGirl.create(:moderator_user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
         FactoryGirl.create(:comment)
+      end
+
+      teardown do
+        CurrentUser.user = nil
+        CurrentUser.ip_addr = nil
       end
 
       should "find by ip addr" do

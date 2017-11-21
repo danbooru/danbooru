@@ -130,7 +130,6 @@ class PoolsControllerTest < ActionController::TestCase
       end
 
       should "revert to a previous version" do
-        assert_equal(2, PoolArchive.count)
         @pool.reload
         version = @pool.versions.first
         assert_equal([@post.id], version.post_ids)

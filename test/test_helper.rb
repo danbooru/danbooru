@@ -51,7 +51,13 @@ class ActionController::TestCase
     assert_redirected_to(new_sessions_path)
   end
 
-  teardown do
+  def setup
+    super
+    User.any_instance.stubs(:validate_sock_puppets).returns(true)
+  end
+
+  def teardown
+    super
     Cache.clear
   end
 end

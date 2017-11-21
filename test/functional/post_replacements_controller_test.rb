@@ -5,7 +5,7 @@ class PostReplacementsControllerTest < ActionController::TestCase
     setup do
       Delayed::Worker.delay_jobs = true # don't delete the old images right away
 
-      @user = FactoryGirl.create(:user, can_approve_posts: true, created_at: 1.month.ago)
+      @user = FactoryGirl.create(:moderator_user, can_approve_posts: true, created_at: 1.month.ago)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
 
@@ -30,10 +30,10 @@ class PostReplacementsControllerTest < ActionController::TestCase
         assert_difference("@post.replacements.size") do
           post :create, params, { user_id: @user.id }
           @post.reload
+        end
 
-          Timecop.travel(Time.now + PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
-            Delayed::Worker.new.work_off
-          end
+        Timecop.travel(Time.now + PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
+          Delayed::Worker.new.work_off
         end
 
         assert_response :success

@@ -75,6 +75,14 @@ class UsersControllerTest < ActionController::TestCase
     end
 
     context "new action" do
+      setup do
+        ENV["RECAPTCHA_SITE_KEY"] = "x"
+      end
+
+      teardown do
+        ENV["RECAPTCHA_SITE_KEY"] = nil
+      end
+      
       should "render" do
         get :new
         assert_response :success
