@@ -27,8 +27,10 @@
             <% end %>
             <td><%= job.attempts %></td>
             <td class="col-expand">
-              <%= job.last_error.split(/\n/)[0] %>
-              <%= job.last_error.split(/\n/)[1..-1].grep(/releases/).join("\n") %>
+              <% if job.last_error %>
+                <%= job.last_error.split(/\n/)[0] %>
+                <%= job.last_error.split(/\n/)[1..-1].grep(/releases/).join("\n") %>
+              <% end %>
             </td>
             <td><%= time_ago_in_words_tagged(job.failed_at) if job.failed_at %></td>
             <td><%= time_ago_in_words_tagged(job.run_at) %></td>
