@@ -331,7 +331,7 @@ module Sources
         return true if url =~ %r!#{PXIMG}/img-original/img/#{TIMESTAMP}/\d+_\w+\.#{EXT}!i
 
         # http://i1.pixiv.net/img-zip-ugoira/img/2014/10/03/17/29/16/46323924_ugoira1920x1080.zip
-        return true if url =~ %r!#{I12}|#{PXIMG}/img-zip-ugoira/img/#{TIMESTAMP}/\d+_ugoira\d+x\d+\.zip$!i
+        return true if url =~ %r!(#{I12}|#{PXIMG})/img-zip-ugoira/img/#{TIMESTAMP}/\d+_ugoira\d+x\d+\.zip$!i
 
         return false
       end

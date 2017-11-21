@@ -156,7 +156,7 @@ module Downloads
       context "downloading a novel image" do
         should "download new novel images" do
           @file_url = "http://i1.pixiv.net/novel-cover-original/img/2016/11/03/20/10/58/7436075_f75af69f3eacd1656d3733c72aa959cf.jpg"
-          @file_size = 316_133
+          @file_size = 316_311
 
           assert_not_rewritten(@file_url)
           assert_downloaded(@file_size, @file_url)
