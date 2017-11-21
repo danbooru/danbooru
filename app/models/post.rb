@@ -254,7 +254,9 @@ class Post < ApplicationRecord
     end
 
     def has_preview?
-      is_image? || is_video? || is_ugoira?
+      # for video/ugoira we don't want to try and render a preview that
+      # might doesn't exist yet
+      is_image? || ((is_video? || is_ugoira?) && File.exists?(preview_file_path))
     end
 
     def has_dimensions?
