@@ -10,6 +10,9 @@ class PoolsController < ApplicationController
 
   def edit
     @pool = Pool.find(params[:id])
+    if @pool.is_deleted && !@pool.deletable_by?(CurrentUser.user)
+      raise User::PrivilegeError
+    end
     respond_with(@pool)
   end
 

@@ -8,6 +8,7 @@ class Pool < ApplicationRecord
   validates_inclusion_of :category, :in => %w(series collection)
   validate :updater_can_change_category
   validate :updater_can_remove_posts
+  validate :updater_can_edit_deleted
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
   before_validation :normalize_post_ids
@@ -209,6 +210,15 @@ class Pool < ApplicationRecord
 
   def deletable_by?(user)
     user.is_builder?
+  end
+
+  def updater_can_edit_deleted
+    if is_deleted? && !deletable_by?(CurrentUser.user)
+      errors[:base] << "You cannot update pools that are deleted"
+      false
+    else
+      true
+    end
   end
 
   def create_mod_action_for_delete
