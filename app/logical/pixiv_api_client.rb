@@ -141,12 +141,13 @@ class PixivApiClient
 
     url = "https://public-api.secure.pixiv.net/v#{API_VERSION}/works/#{illust_id.to_i}.json"
     resp = HTTParty.get(url, Danbooru.config.httparty_options.deep_merge(query: params, headers: headers))
+    body = resp.body.force_encoding("utf-8")
 
     if resp.success?
-      json = parse_api_json(resp.body)
+      json = parse_api_json(body)
       WorksResponse.new(json["response"][0])
     else
-      raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{resp.body})")
+      raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
     end
   end
 
@@ -177,11 +178,13 @@ private
       url = "https://oauth.secure.pixiv.net/auth/token"
 
       resp = HTTParty.post(url, Danbooru.config.httparty_options.deep_merge(body: params, headers: headers))
+      body = resp.body.force_encoding("utf-8")
+
       if resp.success?
-        json = JSON.parse(resp.body)
+        json = JSON.parse(body)
         access_token = json["response"]["access_token"]
       else
-        raise Error.new("Pixiv API access token call failed (status=#{resp.code} body=#{resp.body})")
+        raise Error.new("Pixiv API access token call failed (status=#{resp.code} body=#{body})")
       end
 
       access_token
