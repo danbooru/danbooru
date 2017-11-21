@@ -158,6 +158,28 @@ class TagTest < ActiveSupport::TestCase
       Tag.expects(:normalize_tags_in_query).returns(nil)
       assert_equal(["acb"], Tag.parse_query("a*b")[:tags][:include])
     end
+
+    should "parse single tags correctly" do
+      assert_equal(true, Tag.is_single_tag?("foo"))
+      assert_equal(true, Tag.is_single_tag?("-foo"))
+      assert_equal(true, Tag.is_single_tag?("~foo"))
+      assert_equal(true, Tag.is_single_tag?("foo*"))
+      assert_equal(true, Tag.is_single_tag?("fav:1234"))
+      assert_equal(true, Tag.is_single_tag?("pool:1234"))
+      assert_equal(true, Tag.is_single_tag?('source:"foo bar baz"'))
+      assert_equal(false, Tag.is_single_tag?("foo bar"))
+    end
+
+    should "parse simple tags correctly" do
+      assert_equal(true, Tag.is_simple_tag?("foo"))
+      assert_equal(false, Tag.is_simple_tag?("-foo"))
+      assert_equal(false, Tag.is_simple_tag?("~foo"))
+      assert_equal(false, Tag.is_simple_tag?("foo*"))
+      assert_equal(false, Tag.is_simple_tag?("fav:1234"))
+      assert_equal(false, Tag.is_simple_tag?("pool:1234"))
+      assert_equal(false, Tag.is_simple_tag?('source:"foo bar baz"'))
+      assert_equal(false, Tag.is_simple_tag?("foo bar"))
+    end
   end
 
   context "A tag" do

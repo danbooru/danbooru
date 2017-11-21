@@ -417,8 +417,27 @@ class Tag < ApplicationRecord
 
     # true if query is a single "simple" tag (not a metatag, negated tag, or wildcard tag).
     def is_simple_tag?(query)
-      q = parse_query(query)
-      (scan_query(query).size == 1) && (q[:tags][:related].size == 1)
+      is_single_tag?(query) && !is_metatag?(query) && !is_negated_tag?(query) && !is_optional_tag?(query) && !is_wildcard_tag?(query)
+    end
+
+    def is_single_tag?(query)
+      scan_query(query).size == 1
+    end
+
+    def is_metatag?(tag)
+      !!(tag =~ /\A(#{METATAGS}):(.+)\Z/i)
+    end
+
+    def is_negated_tag?(tag)
+      tag.starts_with?("-")
+    end
+
+    def is_optional_tag?(tag)
+      tag.starts_with?("~")
+    end
+
+    def is_wildcard_tag?(tag)
+      tag.include?("*")
     end
 
     def parse_query(query, options = {})

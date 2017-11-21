@@ -2405,6 +2405,13 @@ class PostTest < ActiveSupport::TestCase
 
           assert_equal(100, Post.fast_count("score:42"))
         end
+
+        should "return the correct cached count for a pool:<id> search" do
+          FactoryGirl.build(:tag, name: "pool:1234", post_count: -100).save(validate: false)
+          Post.set_count_in_cache("pool:1234", 100)
+
+          assert_equal(100, Post.fast_count("pool:1234"))
+        end
       end
 
       context "a multi-tag search" do
