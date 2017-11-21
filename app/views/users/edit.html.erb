@@ -47,6 +47,8 @@
         <% if CurrentUser.user.is_gold? %>
           <%= f.input :per_page, :label => "Posts per page", :as => :select, :collection => (1..100), :include_blank => false %>
         <% end %>
+
+        <%= f.input :enable_safe_mode, :label => "Safe mode", :hint => "Show only safe images. Hide questionable and explicit images.", :as => :select, :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
         
         <%= f.input :blacklisted_tags, :hint => "Put any tag combinations you never want to see here. Each combination should go on a separate line. <a href='/wiki_pages/help:blacklists'>View help.</a>".html_safe, :input_html => {:size => "40x5", :data => {:autocomplete => "tag-query"}} %>
       </fieldset>

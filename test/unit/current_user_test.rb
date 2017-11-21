@@ -23,8 +23,20 @@ class CurrentUserTest < ActiveSupport::TestCase
       req = mock()
       req.stubs(:host).returns("danbooru")
       req.stubs(:params).returns({})
+      CurrentUser.user = FactoryGirl.create(:user)
       CurrentUser.set_safe_mode(req)
       assert_equal(false, CurrentUser.safe_mode?)
+    end
+
+    should "return true if the user has enabled the safe mode account setting" do
+      req = mock
+      req.stubs(:host).returns("danbooru")
+      req.stubs(:params).returns({})
+
+      CurrentUser.user = FactoryGirl.create(:user, enable_safe_mode: true)
+      CurrentUser.set_safe_mode(req)
+
+      assert_equal(true, CurrentUser.safe_mode?)
     end
   end 
 
