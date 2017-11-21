@@ -132,7 +132,8 @@ module Sources
           %("user/#{member_id}":[#{profile_url}] "»":[/artists?#{search_params}])
         end
 
-        text
+        text = text.gsub(/\r\n|\r|\n/, "<br>")
+        DText.from_html(text)
       end
 
       def illust_id_from_url
