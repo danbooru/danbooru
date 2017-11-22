@@ -497,15 +497,15 @@ class Artist < ApplicationRecord
       end
 
       if params[:id].present?
-        q = q.where("id in (?)", params[:id].split(",").map(&:to_i))
+        q = q.where("artists.id in (?)", params[:id].split(",").map(&:to_i))
       end
 
       if params[:creator_name].present?
-        q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].tr(" ", "_").mb_chars.downcase)
+        q = q.where("artists.creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].tr(" ", "_").mb_chars.downcase)
       end
 
       if params[:creator_id].present?
-        q = q.where("creator_id = ?", params[:creator_id].to_i)
+        q = q.where("artists.creator_id = ?", params[:creator_id].to_i)
       end
 
       # XXX deprecated, remove at some point.
