@@ -89,6 +89,11 @@ class Post < ApplicationRecord
         RemoteFileManager.new(file_path).delete
         RemoteFileManager.new(large_file_path).delete
         RemoteFileManager.new(preview_file_path).delete
+
+        if Danbooru.config.cloudflare_key
+          md5, ext = File.basename(file_path).split(".")
+          CloudflareService.new.delete(md5, ext)
+        end
       end
     end
 
