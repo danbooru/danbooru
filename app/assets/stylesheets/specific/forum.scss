@@ -64,7 +64,7 @@ div#c-forum-topics {
   }
 
   span.locked-topic {
-    color: #666;
+    color: gray;
   }
 
   span.level-topic {
@@ -74,5 +74,13 @@ div#c-forum-topics {
   
   tr.forum-topic-row td:last-child {
     white-space: nowrap;
+  }
+}
+
+#c-forum-posts #a-index {
+  tr[data-topic-is-deleted="true"] .forum-post-topic-title::after,
+  tr[data-is-deleted="true"] .forum-post-excerpt::after {
+    content: " (deleted)";
+    color: gray;
   }
 }

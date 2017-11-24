@@ -12,13 +12,10 @@
       <tbody>
         <% @forum_posts.each do |forum_post| %>
           <% if CurrentUser.is_moderator? || !forum_post.is_deleted? %>
-            <tr>
-              <td><%= link_to forum_post.topic.title, forum_topic_path(forum_post.topic) %></td>
-              <td>
+            <tr id="forum-post-<%= forum_post.id %>" data-topic-is-deleted="<%= forum_post.topic.is_deleted? %>" data-is-deleted="<%= forum_post.is_deleted? %>">
+              <td class="forum-post-topic-title"><%= link_to forum_post.topic.title, forum_topic_path(forum_post.topic) %></td>
+              <td class="forum-post-excerpt">
                 <%= link_to truncate(forum_post.body, :length => 50), forum_post_path(forum_post) %>
-                <% if forum_post.is_deleted? %>
-                  (deleted)
-                <% end %>
               </td>
               <td><%= link_to_user forum_post.creator %></td>
               <td><%= time_ago_in_words_tagged forum_post.created_at %></td>
