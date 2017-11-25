@@ -19,6 +19,7 @@ class Post < ApplicationRecord
   validates_inclusion_of :rating, in: %w(s q e), message: "rating must be s, q, or e"
   validate :tag_names_are_valid
   validate :added_tags_are_valid
+  validate :has_artist_tag
   validate :has_copyright_tag
   validate :post_is_not_its_own_parent
   validate :updater_can_change_rating
@@ -1738,6 +1739,17 @@ class Post < ApplicationRecord
           self.warnings[:base] << "Artist [[#{tag.name}]] requires an artist entry. \"Create new artist entry\":[/artists/new?name=#{CGI::escape(tag.name)}]"
         end
       end
+    end
+
+    def has_artist_tag
+      return if !new_record?
+      return if source !~ %r!\Ahttps?://!
+      return if has_tag?("artist_request") || tags.any? { |t| t.category == Tag.categories.artist }
+
+      site = Sources::Site.new(source)
+      self.warnings[:base] << "Artist tag is required. Create a new tag with [[artist:<artist_name>]]. Ask on the forum if you need naming help"
+    rescue Sources::Site::NoStrategyError => e
+      # unrecognized source; do nothing.
     end
 
     def has_copyright_tag
