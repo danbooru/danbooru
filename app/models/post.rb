@@ -19,6 +19,7 @@ class Post < ApplicationRecord
   validates_inclusion_of :rating, in: %w(s q e), message: "rating must be s, q, or e"
   validate :tag_names_are_valid
   validate :added_tags_are_valid
+  validate :has_copyright_tag
   validate :post_is_not_its_own_parent
   validate :updater_can_change_rating
   before_save :update_tag_post_counts
@@ -1737,6 +1738,13 @@ class Post < ApplicationRecord
           self.warnings[:base] << "Artist [[#{tag.name}]] requires an artist entry. \"Create new artist entry\":[/artists/new?name=#{CGI::escape(tag.name)}]"
         end
       end
+    end
+
+    def has_copyright_tag
+      return if !new_record?
+      return if has_tag?("copyright_request") || tags.any? { |t| t.category == Tag.categories.copyright }
+
+      self.warnings[:base] << "Copyright tag is required. Consider adding [[copyright request]] or [[original]]"
     end
   end
   
