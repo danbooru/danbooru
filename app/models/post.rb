@@ -19,6 +19,7 @@ class Post < ApplicationRecord
   validates_inclusion_of :rating, in: %w(s q e), message: "rating must be s, q, or e"
   validate :tag_names_are_valid
   validate :added_tags_are_valid
+  validate :removed_tags_are_valid
   validate :has_artist_tag
   validate :has_copyright_tag
   validate :post_is_not_its_own_parent
@@ -648,12 +649,18 @@ class Post < ApplicationRecord
     end
 
     def merge_old_changes
+      @removed_tags = []
+
       if old_tag_string
         # If someone else committed changes to this post before we did,
         # then try to merge the tag changes together.
         current_tags = tag_array_was()
         new_tags = tag_array()
         old_tags = Tag.scan_tags(old_tag_string)
+
+        kept_tags = current_tags & new_tags
+        @removed_tags = old_tags - kept_tags
+
         set_tag_string(((current_tags + new_tags) - old_tags + (current_tags & new_tags)).uniq.sort.join(" "))
       end
 
@@ -702,10 +709,10 @@ class Post < ApplicationRecord
     end
 
     def remove_negated_tags(tags)
-      negated_tags, tags = tags.partition {|x| x =~ /\A-/i}
-      negated_tags = negated_tags.map {|x| x[1..-1]}
-      negated_tags = TagAlias.to_aliased(negated_tags)
-      return tags - negated_tags
+      @negated_tags, tags = tags.partition {|x| x =~ /\A-/i}
+      @negated_tags = @negated_tags.map {|x| x[1..-1]}
+      @negated_tags = TagAlias.to_aliased(@negated_tags)
+      return tags - @negated_tags
     end
 
     def add_automatic_tags(tags)
@@ -1738,6 +1745,16 @@ class Post < ApplicationRecord
         if tag.artist.blank?
           self.warnings[:base] << "Artist [[#{tag.name}]] requires an artist entry. \"Create new artist entry\":[/artists/new?name=#{CGI::escape(tag.name)}]"
         end
+      end
+    end
+
+    def removed_tags_are_valid
+      attempted_removed_tags = @removed_tags + @negated_tags
+      unremoved_tags = tag_array & attempted_removed_tags
+
+      if unremoved_tags.present?
+        unremoved_tags_list = unremoved_tags.map { |t| "[[#{t}]]" }.to_sentence
+        self.warnings[:base] << "#{unremoved_tags_list} could not be removed. Check for implications and try again"
       end
     end
 
