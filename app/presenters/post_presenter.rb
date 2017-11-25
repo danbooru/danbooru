@@ -52,7 +52,7 @@ class PostPresenter < Presenter
 
     if options[:similarity]
       html << %{<p class="desc">}
-      html << "Similarity: %#{options[:similarity].round}"
+      html << "Similarity: #{options[:similarity].round}%"
       html << %{</p>}
     end
 
