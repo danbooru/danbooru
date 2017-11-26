@@ -10,7 +10,7 @@ class BulkRevert
     ModAction.log("Processed bulk revert for #{constraints.inspect} by #{creator.name}")
 
     CurrentUser.scoped(creator) do
-      ActiveRecord::Base.without_timeout do
+      ApplicationRecord.without_timeout do
         find_post_versions.order("updated_at, id").each do |version|
           version.undo!
         end

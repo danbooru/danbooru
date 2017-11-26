@@ -43,6 +43,29 @@ class ApplicationRecord < ActiveRecord::Base
     end
   end
 
+  concerning :ActiveRecordExtensions do
+    class_methods do
+      def without_timeout
+        connection.execute("SET STATEMENT_TIMEOUT = 0") unless Rails.env == "test"
+        yield
+      ensure
+        connection.execute("SET STATEMENT_TIMEOUT = #{CurrentUser.user.try(:statement_timeout) || 3_000}") unless Rails.env == "test"
+      end
+
+      def with_timeout(n, default_value = nil, new_relic_params = {})
+        connection.execute("SET STATEMENT_TIMEOUT = #{n}") unless Rails.env == "test"
+        yield
+      rescue ::ActiveRecord::StatementInvalid => x
+        if Rails.env.production?
+          NewRelic::Agent.notice_error(x, :custom_params => new_relic_params.merge(:user_id => CurrentUser.id, :user_ip_addr => CurrentUser.ip_addr))
+        end
+        return default_value
+      ensure
+        connection.execute("SET STATEMENT_TIMEOUT = #{CurrentUser.user.try(:statement_timeout) || 3_000}") unless Rails.env == "test"
+      end
+    end
+  end
+
   concerning :PostgresExtensions do
     class_methods do
       def columns(*params)
