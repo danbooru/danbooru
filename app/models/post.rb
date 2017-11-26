@@ -1761,7 +1761,8 @@ class Post < ApplicationRecord
     def has_artist_tag
       return if !new_record?
       return if source !~ %r!\Ahttps?://!
-      return if has_tag?("artist_request") || tags.any? { |t| t.category == Tag.categories.artist }
+      return if has_tag?("artist_request") || has_tag?("official_art")
+      return if tags.any? { |t| t.category == Tag.categories.artist }
 
       site = Sources::Site.new(source)
       self.warnings[:base] << "Artist tag is required. Create a new tag with [[artist:<artist_name>]]. Ask on the forum if you need naming help"
