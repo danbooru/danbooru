@@ -49,6 +49,7 @@ class PostViewCountServiceTest < ActiveSupport::TestCase
 
     context "failure" do
       setup do
+        @date = "2000-01-01"
         stub_request(:get, "localhost:1234/post_views/rank").with(query: {"date" => @date}).to_return(body: "", status: 400)
       end
 
