@@ -33,7 +33,7 @@
         error_messages.push("Must choose file or specify source");
       }
       if (!$("#upload_rating_s")[0].checked && !$("#upload_rating_q")[0].checked && !$("#upload_rating_e")[0].checked &&
-          ($("#upload_tag_string").val().search(/\brating:[sqe]/) < 0)) {
+          ($("#upload_tag_string").val().search(/\brating:[sqe]/i) < 0)) {
         error_messages.push("Must specify a rating");
       }
       if (error_messages.length === 0) {
