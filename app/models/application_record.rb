@@ -43,5 +43,13 @@ class ApplicationRecord < ActiveRecord::Base
     end
   end
 
+  concerning :PostgresExtensions do
+    class_methods do
+      def columns(*params)
+        super.reject {|x| x.sql_type == "tsvector"}
+      end
+    end
+  end
+
   include ApiMethods
 end

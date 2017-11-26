@@ -1797,5 +1797,3 @@ class Post < ApplicationRecord
     ret
   end
 end
-
-Post.connection.extend(PostgresExtensions)
