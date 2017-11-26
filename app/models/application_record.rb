@@ -64,6 +64,16 @@ class ApplicationRecord < ActiveRecord::Base
         connection.execute("SET STATEMENT_TIMEOUT = #{CurrentUser.user.try(:statement_timeout) || 3_000}") unless Rails.env == "test"
       end
     end
+
+    %w(execute select_value select_values select_all).each do |method_name|
+      define_method("#{method_name}_sql") do |sql, *params|
+        self.class.connection.__send__(method_name, self.class.send(:sanitize_sql_array, [sql, *params]))
+      end
+
+      self.class.__send__(:define_method, "#{method_name}_sql") do |sql, *params|
+        connection.__send__(method_name, send(:sanitize_sql_array, [sql, *params]))
+      end
+    end
   end
 
   concerning :PostgresExtensions do
