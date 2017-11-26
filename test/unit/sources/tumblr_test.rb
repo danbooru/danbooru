@@ -152,7 +152,7 @@ module Sources
 
       should "get the image urls" do
         urls = %w[
-          https://vt.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4
+          https://vtt.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4
           http://data.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_inline_os31dclyCR1v11u29_raw.png
         ]
 
