@@ -149,6 +149,9 @@ class PoolTest < ActiveSupport::TestCase
 
       context "to a deleted pool" do
         setup do
+          # must be a builder to update deleted pools.
+          CurrentUser.user = FactoryGirl.create(:builder_user)
+
           @pool.update_attribute(:is_deleted, true)
           @pool.post_ids = "#{@pool.post_ids} #{@p2.id}"
           @pool.synchronize!

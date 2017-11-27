@@ -111,6 +111,9 @@ class PostTest < ActiveSupport::TestCase
 
       context "that belongs to a pool" do
         setup do
+          # must be a builder to update deleted pools. must be >1 week old to remove posts from pools.
+          CurrentUser.user = FactoryGirl.create(:builder_user, created_at: 1.month.ago)
+
           SqsService.any_instance.stubs(:send_message)
           @pool = FactoryGirl.create(:pool)
           @pool.add!(@post)
