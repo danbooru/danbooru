@@ -816,6 +816,18 @@ class Tag < ApplicationRecord
       where("tags.post_count > 0")
     end
 
+    # ref: https://www.postgresql.org/docs/current/static/pgtrgm.html#idm46428634524336
+    def order_similarity(name)
+      # trunc(3 * sim) reduces the similarity score from a range of 0.0 -> 1.0 to just 0, 1, or 2.
+      # This groups tags first by approximate similarity, then by largest tags within groups of similar tags.
+      order("trunc(3 * similarity(name, #{sanitize(name)})) DESC", "post_count DESC", "name DESC")
+    end
+
+    # ref: https://www.postgresql.org/docs/current/static/pgtrgm.html#idm46428634524336
+    def fuzzy_name_matches(name)
+      where("tags.name % ?", name)
+    end
+
     def name_matches(name)
       where("tags.name LIKE ? ESCAPE E'\\\\'", normalize_name(name).to_escaped_for_sql_like)
     end
@@ -827,6 +839,10 @@ class Tag < ApplicationRecord
     def search(params)
       q = where("true")
       params = {} if params.blank?
+
+      if params[:fuzzy_name_matches].present?
+        q = q.fuzzy_name_matches(params[:fuzzy_name_matches])
+      end
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
@@ -864,6 +880,8 @@ class Tag < ApplicationRecord
         q = q.reorder("id desc")
       when "count"
         q = q.reorder("post_count desc")
+      when "similarity"
+        q = q.order_similarity(params[:fuzzy_name_matches]) if params[:fuzzy_name_matches].present?
       else
         q = q.reorder("id desc")
       end
