@@ -890,21 +890,29 @@ class Tag < ApplicationRecord
     end
 
     def names_matches_with_aliases(name)
-      query1 = Tag.select("tags.name, tags.post_count, tags.category, null AS antecedent_name")
-        .search(:name_matches => name, :order => "count").limit(10)
+      name = normalize_name(name)
+      wildcard_name = name + '*'
 
-      name = name.mb_chars.downcase.to_escaped_for_sql_like
+      query1 = Tag.select("tags.name, tags.post_count, tags.category, null AS antecedent_name")
+        .search(:name_matches => wildcard_name, :order => "count").limit(10)
+
       query2 = TagAlias.select("tags.name, tags.post_count, tags.category, tag_aliases.antecedent_name")
         .joins("INNER JOIN tags ON tags.name = tag_aliases.consequent_name")
-        .where("tag_aliases.antecedent_name LIKE ? ESCAPE E'\\\\'", name)
+        .where("tag_aliases.antecedent_name LIKE ? ESCAPE E'\\\\'", wildcard_name.to_escaped_for_sql_like)
         .active
-        .where("tags.name NOT LIKE ? ESCAPE E'\\\\'", name)
+        .where("tags.name NOT LIKE ? ESCAPE E'\\\\'", wildcard_name.to_escaped_for_sql_like)
         .where("tag_aliases.post_count > 0")
         .order("tag_aliases.post_count desc")
         .limit(20) # Get 20 records even though only 10 will be displayed in case some duplicates get filtered out.
 
       sql_query = "((#{query1.to_sql}) UNION ALL (#{query2.to_sql})) AS unioned_query"
-      Tag.select("DISTINCT ON (name, post_count) *").from(sql_query).order("post_count desc").limit(10)
+      tags = Tag.select("DISTINCT ON (name, post_count) *").from(sql_query).order("post_count desc").limit(10)
+
+      if tags.empty?
+        tags = Tag.fuzzy_name_matches(name).order_similarity(name).nonempty.limit(10)
+      end
+
+      tags
     end
   end
 

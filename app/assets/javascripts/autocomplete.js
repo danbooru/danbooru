@@ -244,7 +244,7 @@
     $.ajax({
       url: "/tags/autocomplete.json",
       data: {
-        "search[name_matches]": term + "*"
+        "search[name_matches]": term
       },
       method: "get",
       success: function(data) {
