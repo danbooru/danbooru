@@ -44,7 +44,7 @@ class UsersController < ApplicationController
   def create
     @user = User.new(params[:user], :as => CurrentUser.role)
     @user.last_ip_addr = request.remote_ip
-    if verify_recaptcha(model: @user)
+    if !Danbooru.config.enable_recaptcha? || verify_recaptcha(model: @user)
       @user.save
       if @user.errors.empty?
         session[:user_id] = @user.id
