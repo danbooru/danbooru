@@ -1136,6 +1136,7 @@ class Post < ApplicationRecord
 
   module CountMethods
     def fast_count(tags = "", options = {})
+      tags = tags.to_s
       tags += " rating:s" if CurrentUser.safe_mode?
       tags += " -status:deleted" if CurrentUser.hide_deleted_posts? && tags !~ /(?:^|\s)(?:-)?status:.+/
       tags = Tag.normalize_query(tags)

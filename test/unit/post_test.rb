@@ -2461,11 +2461,15 @@ class PostTest < ActiveSupport::TestCase
         context "in safe mode" do
           setup do
             CurrentUser.stubs(:safe_mode?).returns(true)
+            FactoryGirl.create(:post, "rating" => "s")
           end
 
-          should "execute a search" do
-            Post.expects(:fast_count_search).once.with("rating:s", kind_of(Hash)).returns(1)
+          should "work for a blank search" do
             assert_equal(1, Post.fast_count(""))
+          end
+
+          should "work for a nil search" do
+            assert_equal(1, Post.fast_count(nil))
           end
 
           should "not fail for a two tag search by a member" do
