@@ -244,6 +244,11 @@ class CommentTest < ActiveSupport::TestCase
             @comment.update_attributes({:body => "nope"}, :as => :moderator)
           end
         end
+
+        should "credit the moderator as the updater" do
+          @comment.update({ body: "test" }, as: :moderator)
+          assert_equal(@mod.id, @comment.updater_id)
+        end
       end
 
       context "that is below the score threshold" do
