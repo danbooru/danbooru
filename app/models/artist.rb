@@ -31,6 +31,25 @@ class Artist < ApplicationRecord
     extend ActiveSupport::Concern
 
     module ClassMethods
+      # Subdomains are automatically included. e.g., "twitter.com" matches "www.twitter.com",
+      # "mobile.twitter.com" and any other subdomain of "twitter.com".
+      SITE_BLACKLIST = [
+        "deviantart.net",
+        "nicoseiga.jp",
+        /nicovideo\.jp\/user\/illust/,
+        "nijie.info",
+        "pawoo.net",
+        "pixiv.net",
+        "data.tumblr.com",
+        /\d+\.media\.tumblr\.com/i,
+        "twitter.com",
+      ]
+
+      SITE_BLACKLIST_REGEXP = Regexp.union(SITE_BLACKLIST.map do |domain|
+        domain = Regexp.escape(domain) if domain.is_a?(String)
+        %r!\Ahttps?://(?:[a-zA-Z0-9_-]+\.)*#{domain}/\z!i
+      end)
+
       def find_all_by_url(url)
         url = ArtistUrl.normalize(url)
         artists = []
@@ -42,14 +61,8 @@ class Artist < ApplicationRecord
           u = u.to_escaped_for_sql_like.gsub(/\*/, '%') + '%'
           artists += Artist.joins(:urls).where(["artists.is_active = TRUE AND artist_urls.normalized_url LIKE ? ESCAPE E'\\\\'", u]).limit(10).order("artists.name").all
           url = File.dirname(url) + "/"
-          break if url =~ /pixiv\.net\/(?:img\/)?$/i
-          break if url =~ /lohas\.nicoseiga\.jp\/priv\/$/i
-          break if url =~ /nicovideo\.jp\/user\/illust/
-          break if url =~ /(?:data|media)\.tumblr\.com\/[a-z0-9]+\/$/i
-          break if url =~ /deviantart\.net\//i
-          break if url =~ %r!\Ahttps?://(?:mobile\.)?twitter\.com/\Z!i
-          break if url =~ %r!pawoo\.net/(?:web/)?$!i
-          break if url =~ %r!\Ahttps?://(pic\d+\.)?nijie\.info/!i
+
+          break if url =~ SITE_BLACKLIST_REGEXP
         end
 
         artists.inject({}) {|h, x| h[x.name] = x; h}.values.slice(0, 20)
