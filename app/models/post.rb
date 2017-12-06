@@ -196,6 +196,14 @@ class Post < ApplicationRecord
       "http://#{Danbooru.config.hostname}#{preview_file_url}"
     end
 
+    def open_graph_image_url
+      if is_image? && has_large?
+        "http://#{Danbooru.config.hostname}#{large_file_url}"
+      else
+        complete_preview_file_url
+      end
+    end
+
     def file_url_for(user)
       if CurrentUser.mobile_mode?
         large_file_url
