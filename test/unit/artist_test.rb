@@ -15,6 +15,8 @@ class ArtistTest < ActiveSupport::TestCase
 
   context "An artist" do
     setup do
+      User.any_instance.stubs(:validate_sock_puppets).returns(true)
+
       user = Timecop.travel(1.month.ago) {FactoryGirl.create(:user)}
       CurrentUser.user = user
       CurrentUser.ip_addr = "127.0.0.1"
@@ -203,7 +205,7 @@ class ArtistTest < ActiveSupport::TestCase
         assert_artist_found("trixia", "http://trixdraws.deviantart.com/gallery/#/d722mrt")
       end
 
-      should_eventually "find the correct artist for image URLs" do
+      should "find the correct artist for image URLs" do
         assert_artist_found("artgerm", "http://th05.deviantart.net/fs71/200H/f/2014/150/d/c/peachy_princess_by_artgerm-d7k7tmu.jpg")
         assert_artist_found("artgerm", "http://th05.deviantart.net/fs71/PRE/f/2014/150/d/c/peachy_princess_by_artgerm-d7k7tmu.jpg")
         assert_artist_found("artgerm", "http://fc06.deviantart.net/fs71/f/2014/150/d/c/peachy_princess_by_artgerm-d7k7tmu.jpg")
@@ -211,6 +213,11 @@ class ArtistTest < ActiveSupport::TestCase
         assert_artist_found("trixia", "http://fc01.deviantart.net/fs71/i/2014/050/d/e/my_queen_by_trixdraws-d722mrt.jpg")
         assert_artist_found("trixia", "http://th01.deviantart.net/fs71/200H/i/2014/050/d/e/my_queen_by_trixdraws-d722mrt.jpg")
         assert_artist_found("trixia", "http://th09.deviantart.net/fs71/PRE/i/2014/050/d/e/my_queen_by_trixdraws-d722mrt.jpg")
+      end
+
+      should "return nothing for unknown deviantart artists" do
+        assert_artist_not_found("http://guweiz.deviantart.com/art/Battleship-551905391")
+        assert_artist_not_found("https://orig00.deviantart.net/7585/f/2015/219/a/5/battleship__by_guweiz-d94l8xb.png")
       end
     end
 
@@ -263,10 +270,17 @@ class ArtistTest < ActiveSupport::TestCase
     context "when finding nico seiga artists" do
       setup do
         FactoryGirl.create(:artist, :name => "osamari", :url_string => "http://seiga.nicovideo.jp/user/illust/7017777")
+        FactoryGirl.create(:artist, :name => "hakuro109", :url_string => "http://seiga.nicovideo.jp/user/illust/16265470")
       end
 
       should "find the artist by the profile" do
         assert_artist_found("osamari", "http://seiga.nicovideo.jp/seiga/im4937663")
+        assert_artist_found("hakuro109", "http://lohas.nicoseiga.jp/priv/b9ea863e691f3a648dee5582fd6911c30dc8acab/1510092103/6424205")
+      end
+
+      should "return nothing for unknown nico seiga artists" do
+        assert_artist_not_found("http://seiga.nicovideo.jp/seiga/im6605221")
+        assert_artist_not_found("http://lohas.nicoseiga.jp/priv/fd195b3405b19874c825eb4d81c9196086562c6b/1509089019/6605221")
       end
     end
 
@@ -335,6 +349,22 @@ class ArtistTest < ActiveSupport::TestCase
 
       should "return nothing for unknown nijie artists" do
         assert_artist_not_found("http://nijie.info/view.php?id=157953")
+      end
+    end
+
+    context "when finding tumblr artists" do
+      setup do
+        FactoryGirl.create(:artist, :name => "ilya_kuvshinov", :url_string => "http://kuvshinov-ilya.tumblr.com")
+        FactoryGirl.create(:artist, :name => "j.k.", :url_string => "https://jdotkdot5.tumblr.com")
+      end
+
+      should "find the artist" do
+        assert_artist_found("ilya_kuvshinov", "http://kuvshinov-ilya.tumblr.com/post/168641755845")
+        assert_artist_found("j.k.", "https://jdotkdot5.tumblr.com/post/168276640697")
+      end
+
+      should "return nothing for unknown tumblr artists" do
+        assert_artist_not_found("https://peptosis.tumblr.com/post/168162082005")
       end
     end
 
