@@ -790,6 +790,14 @@ class PostTest < ActiveSupport::TestCase
             assert(Tag.where(name: "someone_(cosplay)", category: 4).exists?, "expected 'someone_(cosplay)' tag to be created as character")
             assert(Tag.where(name: "someone", category: 4).exists?, "expected 'someone' tag to be created")
           end
+
+          should "apply aliases when the character tag is added" do
+            FactoryGirl.create(:tag_alias, antecedent_name: "jim", consequent_name: "james")
+            @post.add_tag("jim_(cosplay)")
+            @post.save
+
+            assert(@post.has_tag?("james"), "expected 'jim' to be aliased to 'james'")
+          end
         end
 
         context "for a parent" do

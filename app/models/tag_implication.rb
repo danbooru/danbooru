@@ -21,7 +21,7 @@ class TagImplication < TagRelationship
       end
 
       def automatic_tags_for(names)
-        tags = names.grep(/\A(.+)_\(cosplay\)\Z/) { "char:#{$1}" }
+        tags = names.grep(/\A(.+)_\(cosplay\)\Z/) { "char:#{TagAlias.to_aliased([$1]).first}" }
         tags << "cosplay" if tags.present?
         tags.uniq
       end
