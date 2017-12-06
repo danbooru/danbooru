@@ -1369,18 +1369,15 @@ class Post < ApplicationRecord
       Post.transaction do
         flag!(reason, is_deletion: true)
 
-        self.is_deleted = true
-        self.is_pending = false
-        self.is_flagged = false
-        self.is_banned = true if options[:ban] || has_tag?("banned_artist")
-        update_columns(
-          :is_deleted => is_deleted,
-          :is_pending => is_pending,
-          :is_flagged => is_flagged,
-          :is_banned => is_banned
-        )
+        update({
+          is_deleted: true,
+          is_pending: false,
+          is_flagged: false,
+          is_banned: is_banned || options[:ban] || has_tag?("banned_artist")
+        }, without_protection: true)
+
+        # XXX This must happen *after* the `is_deleted` flag is set to true (issue #3419).
         give_favorites_to_parent if options[:move_favorites]
-        update_parent_on_save
 
         unless options[:without_mod_action]
           ModAction.log("deleted post ##{id}, reason: #{reason}")

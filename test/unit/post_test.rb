@@ -353,6 +353,17 @@ class PostTest < ActiveSupport::TestCase
           p1.reload
           assert(p1.has_children?, "Parent should have children")
         end
+
+        should "clear the has_active_children flag when the 'move favorites' option is set" do
+          user = FactoryGirl.create(:gold_user)
+          p1 = FactoryGirl.create(:post)
+          c1 = FactoryGirl.create(:post, :parent_id => p1.id)
+          c1.add_favorite!(user)
+
+          assert_equal(true, p1.reload.has_active_children?)
+          c1.delete!("test", :move_favorites => true)
+          assert_equal(false, p1.reload.has_active_children?)
+        end
       end
 
       context "one child" do
