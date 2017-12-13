@@ -15,10 +15,10 @@ GIT
 
 GIT
   remote: https://github.com/r888888888/dtext_rb.git
-  revision: cde341011c0b7ceddcd0123c88bd67e1cdd9743c
+  revision: ebeb807f4a33fb212d306ef90e1bc113b3533c25
   specs:
-    dtext_rb (1.6.0)
-      nokogiri (~> 1.6)
+    dtext_rb (1.6.1)
+      nokogiri (~> 1.8)
 
 GIT
   remote: https://github.com/r888888888/ruby-imagespec.git
@@ -203,7 +203,7 @@ GEM
     metaclass (0.0.4)
     method_source (0.8.2)
     mime-types (2.99.3)
-    mini_portile2 (2.2.0)
+    mini_portile2 (2.3.0)
     minitest (5.10.1)
     mocha (1.2.1)
       metaclass (~> 0.0.1)
@@ -222,10 +222,10 @@ GEM
     net-ssh (2.9.2)
     netrc (0.10.3)
     newrelic_rpm (3.13.0.299)
-    nokogiri (1.8.0)
-      mini_portile2 (~> 2.2.0)
-    nokogiri (1.8.0-x64-mingw32)
-      mini_portile2 (~> 2.2.0)
+    nokogiri (1.8.1)
+      mini_portile2 (~> 2.3.0)
+    nokogiri (1.8.1-x64-mingw32)
+      mini_portile2 (~> 2.3.0)
     nokogumbo (1.4.13)
       nokogiri
     ntlm-http (0.1.1)
