@@ -148,6 +148,8 @@ class Upload < ApplicationRecord
       else
         update_attribute(:status, "error: " + post.errors.full_messages.join(", "))
       end
+
+      post
     end
 
     def process!(force = false)
@@ -155,7 +157,7 @@ class Upload < ApplicationRecord
       return if !force && status =~ /processing|completed|error/
 
       process_upload
-      create_post_from_upload
+      post = create_post_from_upload
 
     rescue Timeout::Error, Net::HTTP::Persistent::Error => x
       if @tries > 3
@@ -164,9 +166,11 @@ class Upload < ApplicationRecord
         @tries += 1
         retry
       end
+      nil
 
     rescue Exception => x
       update_attributes(:status => "error: #{x.class} - #{x.message}", :backtrace => x.backtrace.join("\n"))
+      nil
       
     ensure
       delete_temp_file

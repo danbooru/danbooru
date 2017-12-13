@@ -110,6 +110,10 @@ private
   def respond_with_post_after_update(post)
     respond_with(post) do |format|
       format.html do
+        if post.warnings.any?
+          flash[:notice] = post.warnings.full_messages.join(".\n \n")
+        end
+
         if post.errors.any?
           @error_message = post.errors.full_messages.join("; ")
           render :template => "static/error", :status => 500

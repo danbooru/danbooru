@@ -18,11 +18,12 @@ module Moderator
             post.update_attributes(:tag_string => tags)
           end
 
-          tags = Tag.scan_tags(antecedent, :strip_metatags => true)
-          conds = tags.map {|x| "query like ?"}.join(" AND ")
-          conds = [conds, *tags.map {|x| "%#{x.to_escaped_for_sql_like}%"}]
           if SavedSearch.enabled?
-            SavedSearch.where(*conds).find_each do |ss|
+            tags = Tag.scan_tags(antecedent, :strip_metatags => true)
+
+            # https://www.postgresql.org/docs/current/static/functions-array.html
+            saved_searches = SavedSearch.where("string_to_array(query, ' ') @> ARRAY[?]", tags)
+            saved_searches.find_each do |ss|
               ss.query = (ss.query.split - tags + [consequent]).uniq.join(" ")
               ss.save
             end

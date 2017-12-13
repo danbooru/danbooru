@@ -174,7 +174,7 @@
   <meta property="og:title" content="<%= @post.presenter.humanized_essential_tag_string %> - <%= Danbooru.config.app_name %>">
 
   <% if @post.visible? %>
-    <meta property="og:image" content="http://<%= Danbooru.config.hostname %><%= @post.large_file_url %>">
+    <meta property="og:image" content="<%= @post.open_graph_image_url %>">
   <% end %>
 
   <% if Danbooru.config.enable_post_search_counts %>
@@ -189,7 +189,7 @@
     <meta name="twitter:description" content="<%= @post.presenter.humanized_tag_string %> - <%= Danbooru.config.app_name %>">
 
     <% if @post.visible? %>
-      <meta name="twitter:image" content="http://<%= Danbooru.config.hostname %><%= @post.large_file_url %>">
+      <meta name="twitter:image" content="<%= @post.open_graph_image_url %>">
     <% end %>
   <% end %>
 

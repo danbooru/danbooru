@@ -10,20 +10,17 @@
     
     <li><%= link_to "Help", wiki_pages_path(:search => {:title => "help:wiki"}) %></li>
     
-    <% if @wiki_page %>
+    <% if @wiki_page && !@wiki_page.new_record? %>
       <li>|</li>
-      <li><%= link_to "Posts (#{Post.fast_count(@wiki_page.title)})", posts_path(:tags => @wiki_page.title) %></li>
-      <% unless @wiki_page.new_record? %>
-        <li><%= link_to "History", wiki_page_versions_path(:search => {:wiki_page_id => @wiki_page.id}) %></li>
-        <% if CurrentUser.is_member? %>
-          <li id="wiki-page-edit"><%= link_to "Edit", edit_wiki_page_path(@wiki_page) %></li>
-        <% end %>
-        <% if CurrentUser.is_builder? && !@wiki_page.is_deleted? %>
-          <li id="wiki-page-delete"><%= link_to "Delete", wiki_page_path(@wiki_page), :remote => true, :method => :delete, :data => {:confirm => "Are you sure you want to delete this wiki page?"} %></li>
-        <% end %>
+      <li><%= link_to "Posts (#{@wiki_page.tag.try(:post_count) || 0})", posts_path(:tags => @wiki_page.title) %></li>
+      <li><%= link_to "History", wiki_page_versions_path(:search => {:wiki_page_id => @wiki_page.id}) %></li>
+      <% if CurrentUser.is_member? %>
+        <li id="wiki-page-edit"><%= link_to "Edit", edit_wiki_page_path(@wiki_page) %></li>
       <% end %>
-    <% end %>
-    <% if @wiki_page_version %>
+      <% if CurrentUser.is_builder? && !@wiki_page.is_deleted? %>
+        <li id="wiki-page-delete"><%= link_to "Delete", wiki_page_path(@wiki_page), :remote => true, :method => :delete, :data => {:confirm => "Are you sure you want to delete this wiki page?"} %></li>
+      <% end %>
+    <% elsif @wiki_page_version %>
       <li>|</li>
       <li><%= link_to "Newest", wiki_page_path(@wiki_page_version.wiki_page_id) %></li>
       <% if CurrentUser.is_member? %>

@@ -84,5 +84,9 @@ class ApplicationRecord < ActiveRecord::Base
     end
   end
 
+  def warnings
+    @warnings ||= ActiveModel::Errors.new(self)
+  end
+
   include ApiMethods
 end
