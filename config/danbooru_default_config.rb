@@ -620,6 +620,18 @@ module Danbooru
     def aws_sqs_cropper_url
     end
 
+    # Use a recaptcha on the signup page to protect against spambots creating new accounts.
+    # https://developers.google.com/recaptcha/intro
+    def enable_recaptcha?
+      Rails.env.production? && Danbooru.config.recaptcha_site_key.present? && Danbooru.config.recaptcha_secret_key.present?
+    end
+
+    def recaptcha_site_key
+    end
+
+    def recaptcha_secret_key
+    end
+    
     # Akismet API key. Used for Dmail spam detection. http://akismet.com/signup/
     def rakismet_key
     end

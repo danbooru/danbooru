@@ -76,11 +76,7 @@ class UsersControllerTest < ActionController::TestCase
 
     context "new action" do
       setup do
-        ENV["RECAPTCHA_SITE_KEY"] = "x"
-      end
-
-      teardown do
-        ENV["RECAPTCHA_SITE_KEY"] = nil
+        Danbooru.config.stubs(:enable_recaptcha?).returns(false)
       end
       
       should "render" do

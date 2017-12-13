@@ -15,7 +15,11 @@
         <%= f.input :password %>
         <%= f.input :password_confirmation %>
 
-        <%= invisible_recaptcha_tags callback: 'submitInvisibleRecaptchaForm', text: 'Sign up' %>
+        <% if Danbooru.config.enable_recaptcha? %>
+          <%= invisible_recaptcha_tags callback: 'submitInvisibleRecaptchaForm', text: 'Sign up' %>
+        <% else %>
+          <%= f.submit "Sign up", :data => { :disable_with => "Signing up..." } %>
+        <% end %>
       <% end %>
     </div>
   </div>
