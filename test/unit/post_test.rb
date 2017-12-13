@@ -835,6 +835,25 @@ class PostTest < ActiveSupport::TestCase
           end
         end
 
+        context "for a favgroup" do
+          setup do
+            @favgroup = FactoryGirl.create(:favorite_group, creator: @user)
+            @post = FactoryGirl.create(:post, :tag_string => "aaa favgroup:#{@favgroup.id}")
+          end
+
+          should "add the post to the favgroup" do
+            assert_equal(1, @favgroup.reload.post_count)
+            assert_equal(true, !!@favgroup.contains?(@post.id))
+          end
+
+          should "remove the post from the favgroup" do
+            @post.update(:tag_string => "-favgroup:#{@favgroup.id}")
+
+            assert_equal(0, @favgroup.reload.post_count)
+            assert_equal(false, !!@favgroup.contains?(@post.id))
+          end
+        end
+
         context "for a pool" do
           setup do
             mock_pool_archive_service!

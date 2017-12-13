@@ -173,11 +173,13 @@ class FavoriteGroup < ApplicationRecord
   end
 
   def add!(post_id)
-    post_id = post_id.id if post_id.is_a?(Post)
-    return if contains?(post_id)
+    with_lock do
+      post_id = post_id.id if post_id.is_a?(Post)
+      return if contains?(post_id)
 
-    clear_post_id_array
-    update_attributes(:post_ids => add_number_to_string(post_id, post_ids))
+      clear_post_id_array
+      update_attributes(:post_ids => add_number_to_string(post_id, post_ids))
+    end
   end
 
   def self.purge_post(post_id)
@@ -188,11 +190,13 @@ class FavoriteGroup < ApplicationRecord
   end
 
   def remove!(post_id)
-    post_id = post_id.id if post_id.is_a?(Post)
-    return unless contains?(post_id)
+    with_lock do
+      post_id = post_id.id if post_id.is_a?(Post)
+      return unless contains?(post_id)
 
-    clear_post_id_array
-    update_attributes(:post_ids => remove_number_from_string(post_id, post_ids))
+      clear_post_id_array
+      update_attributes(:post_ids => remove_number_from_string(post_id, post_ids))
+    end
   end
 
   def add_number_to_string(number, string)
