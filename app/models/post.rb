@@ -1812,11 +1812,22 @@ class Post < ApplicationRecord
   )
   has_bit_flags BOOLEAN_ATTRIBUTES
 
+  def safeblocked?
+    CurrentUser.safe_mode? && (rating != "s" || has_tag?("toddlercon|toddler|diaper|tentacle|rape|bestiality|beastiality|lolita|loli|nude|shota|pussy|penis"))
+  end
+
+  def levelblocked?
+    !Danbooru.config.can_user_see_post?(CurrentUser.user, self)
+  end
+
+  def banblocked?
+    is_banned? && !CurrentUser.is_gold?
+  end
+
   def visible?
-    return false if !Danbooru.config.can_user_see_post?(CurrentUser.user, self)
-    return false if CurrentUser.safe_mode? && rating != "s"
-    return false if CurrentUser.safe_mode? && has_tag?("toddlercon|toddler|diaper|tentacle|rape|bestiality|beastiality|lolita|loli|nude|shota|pussy|penis")
-    return false if is_banned? && !CurrentUser.is_gold?
+    return false if safeblocked?
+    return false if levelblocked?
+    return false if banblocked?
     return true
   end
 

@@ -155,10 +155,19 @@ class PostPresenter < Presenter
     categorized_tag_groups.flatten.slice(0, 25).join(", ").tr("_", " ")
   end
 
+  def safe_mode_message(template)
+    html = ["This image is unavailable on safe mode (#{Danbooru.config.app_name}). Go to "]
+    html << template.link_to("Danbooru", "http://danbooru.donmai.us")
+    html << " or disable safe mode to view ("
+    html << template.link_to("learn more", template.wiki_pages_path(title: "help:user_settings"))
+    html << ")."
+    html.join.html_safe
+  end
+
   def image_html(template)
-    return template.content_tag("p", "The artist requested removal of this image") if @post.is_banned? && !CurrentUser.user.is_gold?
-    return template.content_tag("p", template.link_to("You need a gold account to see this image.", template.new_user_upgrade_path)) if !Danbooru.config.can_user_see_post?(CurrentUser.user, @post)
-    return template.content_tag("p", "This image is unavailable") if !@post.visible?
+    return template.content_tag("p", "The artist requested removal of this image") if @post.banblocked?
+    return template.content_tag("p", template.link_to("You need a gold account to see this image.", template.new_user_upgrade_path)) if @post.levelblocked?
+    return template.content_tag("p", safe_mode_message(template)) if @post.safeblocked?
 
     if @post.is_flash?
       template.render("posts/partials/show/flash", :post => @post)
