@@ -7009,6 +7009,13 @@ CREATE INDEX index_tags_on_name_pattern ON tags USING btree (name text_pattern_o
 
 
 --
+-- Name: index_tags_on_name_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tags_on_name_trgm ON tags USING gin (name gin_trgm_ops);
+
+
+--
 -- Name: index_token_buckets_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7520,4 +7527,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170709190409');
 INSERT INTO schema_migrations (version) VALUES ('20170914200122');
 
 INSERT INTO schema_migrations (version) VALUES ('20171106075030');
+
+INSERT INTO schema_migrations (version) VALUES ('20171127195124');
 

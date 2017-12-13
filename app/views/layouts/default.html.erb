@@ -112,7 +112,7 @@
     <% end %>
 
     <div class="ui-corner-all ui-state-highlight" id="notice" style="<%= "display: none;" unless flash[:notice] %>">
-      <span><%= flash[:notice] %></span>
+      <span><%= format_text(flash[:notice], inline: true) %>.</span>
       <a href="#" id="close-notice-link">close</a>
     </div>
 

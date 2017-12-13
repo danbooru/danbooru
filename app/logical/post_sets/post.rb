@@ -87,11 +87,15 @@ module PostSets
     end
 
     def banned_posts
-      posts.select(&:is_banned?)
+      posts.select { |p| p.banblocked? }
     end
 
     def censored_posts
-      hidden_posts - banned_posts
+      posts.select { |p| p.levelblocked? && !p.banblocked? }
+    end
+
+    def safe_posts
+      posts.select { |p| p.safeblocked? && !p.levelblocked? && !p.banblocked? }
     end
 
     def use_sequential_paginator?

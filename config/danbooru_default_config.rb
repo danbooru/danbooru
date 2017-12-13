@@ -631,6 +631,13 @@ module Danbooru
 
     def recaptcha_secret_key
     end
+    
+    # Akismet API key. Used for Dmail spam detection. http://akismet.com/signup/
+    def rakismet_key
+    end
+
+    def rakismet_url
+    end
   end
 
   class EnvironmentConfiguration

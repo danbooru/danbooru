@@ -182,8 +182,8 @@ class Comment < ApplicationRecord
   end
 
   def initialize_updater
-    self.updater_id ||= CurrentUser.user.id
-    self.updater_ip_addr ||= CurrentUser.ip_addr
+    self.updater_id = CurrentUser.user.id
+    self.updater_ip_addr = CurrentUser.ip_addr
   end
 
   def creator_name
@@ -260,5 +260,3 @@ class Comment < ApplicationRecord
     DText.quote(body, creator_name)
   end
 end
-
-Comment.connection.extend(PostgresExtensions)

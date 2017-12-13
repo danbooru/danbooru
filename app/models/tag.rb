@@ -6,6 +6,7 @@ class Tag < ApplicationRecord
   attr_accessible :category, :as => [:moderator, :gold, :platinum, :member, :anonymous, :default, :builder, :admin]
   attr_accessible :is_locked, :as => [:moderator, :admin]
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
+  has_one :artist, :foreign_key => "name", :primary_key => "name"
   has_one :antecedent_alias, lambda {active}, :class_name => "TagAlias", :foreign_key => "antecedent_name", :primary_key => "name"
   has_many :consequent_aliases, lambda {active}, :class_name => "TagAlias", :foreign_key => "consequent_name", :primary_key => "name"
   has_many :antecedent_implications, lambda {active}, :class_name => "TagImplication", :foreign_key => "antecedent_name", :primary_key => "name"
@@ -816,6 +817,18 @@ class Tag < ApplicationRecord
       where("tags.post_count > 0")
     end
 
+    # ref: https://www.postgresql.org/docs/current/static/pgtrgm.html#idm46428634524336
+    def order_similarity(name)
+      # trunc(3 * sim) reduces the similarity score from a range of 0.0 -> 1.0 to just 0, 1, or 2.
+      # This groups tags first by approximate similarity, then by largest tags within groups of similar tags.
+      order("trunc(3 * similarity(name, #{sanitize(name)})) DESC", "post_count DESC", "name DESC")
+    end
+
+    # ref: https://www.postgresql.org/docs/current/static/pgtrgm.html#idm46428634524336
+    def fuzzy_name_matches(name)
+      where("tags.name % ?", name)
+    end
+
     def name_matches(name)
       where("tags.name LIKE ? ESCAPE E'\\\\'", normalize_name(name).to_escaped_for_sql_like)
     end
@@ -827,6 +840,10 @@ class Tag < ApplicationRecord
     def search(params)
       q = where("true")
       params = {} if params.blank?
+
+      if params[:fuzzy_name_matches].present?
+        q = q.fuzzy_name_matches(params[:fuzzy_name_matches])
+      end
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
@@ -864,6 +881,8 @@ class Tag < ApplicationRecord
         q = q.reorder("id desc")
       when "count"
         q = q.reorder("post_count desc")
+      when "similarity"
+        q = q.order_similarity(params[:fuzzy_name_matches]) if params[:fuzzy_name_matches].present?
       else
         q = q.reorder("id desc")
       end
@@ -872,21 +891,29 @@ class Tag < ApplicationRecord
     end
 
     def names_matches_with_aliases(name)
-      query1 = Tag.select("tags.name, tags.post_count, tags.category, null AS antecedent_name")
-        .search(:name_matches => name, :order => "count").limit(10)
+      name = normalize_name(name)
+      wildcard_name = name + '*'
 
-      name = name.mb_chars.downcase.to_escaped_for_sql_like
+      query1 = Tag.select("tags.name, tags.post_count, tags.category, null AS antecedent_name")
+        .search(:name_matches => wildcard_name, :order => "count").limit(10)
+
       query2 = TagAlias.select("tags.name, tags.post_count, tags.category, tag_aliases.antecedent_name")
         .joins("INNER JOIN tags ON tags.name = tag_aliases.consequent_name")
-        .where("tag_aliases.antecedent_name LIKE ? ESCAPE E'\\\\'", name)
+        .where("tag_aliases.antecedent_name LIKE ? ESCAPE E'\\\\'", wildcard_name.to_escaped_for_sql_like)
         .active
-        .where("tags.name NOT LIKE ? ESCAPE E'\\\\'", name)
+        .where("tags.name NOT LIKE ? ESCAPE E'\\\\'", wildcard_name.to_escaped_for_sql_like)
         .where("tag_aliases.post_count > 0")
         .order("tag_aliases.post_count desc")
         .limit(20) # Get 20 records even though only 10 will be displayed in case some duplicates get filtered out.
 
       sql_query = "((#{query1.to_sql}) UNION ALL (#{query2.to_sql})) AS unioned_query"
-      Tag.select("DISTINCT ON (name, post_count) *").from(sql_query).order("post_count desc").limit(10)
+      tags = Tag.select("DISTINCT ON (name, post_count) *").from(sql_query).order("post_count desc").limit(10)
+
+      if tags.empty?
+        tags = Tag.fuzzy_name_matches(name).order_similarity(name).nonempty.limit(10)
+      end
+
+      tags
     end
   end
 
