@@ -18,6 +18,10 @@ class Post < ApplicationRecord
   validates_uniqueness_of :md5, :on => :create
   validates_inclusion_of :rating, in: %w(s q e), message: "rating must be s, q, or e"
   validate :tag_names_are_valid
+  validate :added_tags_are_valid
+  validate :removed_tags_are_valid
+  validate :has_artist_tag
+  validate :has_copyright_tag
   validate :post_is_not_its_own_parent
   validate :updater_can_change_rating
   before_save :update_tag_post_counts
@@ -600,6 +604,18 @@ class Post < ApplicationRecord
       @tag_array_was ||= Tag.scan_tags(tag_string_was)
     end
 
+    def tags
+      Tag.where(name: tag_array)
+    end
+
+    def tags_was
+      Tag.where(name: tag_array_was)
+    end
+
+    def added_tags
+      tags - tags_was
+    end
+
     def decrement_tag_post_counts
       Tag.where(:name => tag_array).update_all("post_count = post_count - 1") if tag_array.any?
     end
@@ -641,12 +657,18 @@ class Post < ApplicationRecord
     end
 
     def merge_old_changes
+      @removed_tags = []
+
       if old_tag_string
         # If someone else committed changes to this post before we did,
         # then try to merge the tag changes together.
         current_tags = tag_array_was()
         new_tags = tag_array()
         old_tags = Tag.scan_tags(old_tag_string)
+
+        kept_tags = current_tags & new_tags
+        @removed_tags = old_tags - kept_tags
+
         set_tag_string(((current_tags + new_tags) - old_tags + (current_tags & new_tags)).uniq.sort.join(" "))
       end
 
@@ -695,10 +717,10 @@ class Post < ApplicationRecord
     end
 
     def remove_negated_tags(tags)
-      negated_tags, tags = tags.partition {|x| x =~ /\A-/i}
-      negated_tags = negated_tags.map {|x| x[1..-1]}
-      negated_tags = TagAlias.to_aliased(negated_tags)
-      return tags - negated_tags
+      @negated_tags, tags = tags.partition {|x| x =~ /\A-/i}
+      @negated_tags = @negated_tags.map {|x| x[1..-1]}
+      @negated_tags = TagAlias.to_aliased(@negated_tags)
+      return tags - @negated_tags
     end
 
     def add_automatic_tags(tags)
@@ -1712,6 +1734,53 @@ class Post < ApplicationRecord
           errors[:tag_string] << "tag #{attribute} #{messages.join(';')}"
         end
       end
+    end
+
+    def added_tags_are_valid
+      new_tags = added_tags.select { |t| t.post_count <= 1 }
+      new_general_tags = new_tags.select { |t| t.category == Tag.categories.general }
+      new_artist_tags = new_tags.select { |t| t.category == Tag.categories.artist }
+
+      if new_general_tags.present?
+        n = new_general_tags.size
+        tag_wiki_links = new_general_tags.map { |tag| "[[#{tag.name}]]" }
+        self.warnings[:base] << "Created #{n} new #{n == 1 ? "tag" : "tags"}: #{tag_wiki_links.join(", ")}"
+      end
+
+      new_artist_tags.each do |tag|
+        if tag.artist.blank?
+          self.warnings[:base] << "Artist [[#{tag.name}]] requires an artist entry. \"Create new artist entry\":[/artists/new?name=#{CGI::escape(tag.name)}]"
+        end
+      end
+    end
+
+    def removed_tags_are_valid
+      attempted_removed_tags = @removed_tags + @negated_tags
+      unremoved_tags = tag_array & attempted_removed_tags
+
+      if unremoved_tags.present?
+        unremoved_tags_list = unremoved_tags.map { |t| "[[#{t}]]" }.to_sentence
+        self.warnings[:base] << "#{unremoved_tags_list} could not be removed. Check for implications and try again"
+      end
+    end
+
+    def has_artist_tag
+      return if !new_record?
+      return if source !~ %r!\Ahttps?://!
+      return if has_tag?("artist_request") || has_tag?("official_art")
+      return if tags.any? { |t| t.category == Tag.categories.artist }
+
+      site = Sources::Site.new(source)
+      self.warnings[:base] << "Artist tag is required. Create a new tag with [[artist:<artist_name>]]. Ask on the forum if you need naming help"
+    rescue Sources::Site::NoStrategyError => e
+      # unrecognized source; do nothing.
+    end
+
+    def has_copyright_tag
+      return if !new_record?
+      return if has_tag?("copyright_request") || tags.any? { |t| t.category == Tag.categories.copyright }
+
+      self.warnings[:base] << "Copyright tag is required. Consider adding [[copyright request]] or [[original]]"
     end
   end
   
