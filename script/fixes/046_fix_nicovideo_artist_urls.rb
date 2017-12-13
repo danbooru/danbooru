@@ -2,7 +2,7 @@
 
 require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'config', 'environment'))
 
-ActiveRecord::Base.without_timeout do
+ArtistUrl.without_timeout do
   ArtistUrl.where("normalized_url like ?", "\%nicovideo\%").find_each do |url|
     before = url.normalized_url
     url.normalize

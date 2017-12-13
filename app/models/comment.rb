@@ -260,5 +260,3 @@ class Comment < ApplicationRecord
     DText.quote(body, creator_name)
   end
 end
-
-Comment.connection.extend(PostgresExtensions)
