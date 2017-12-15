@@ -31,9 +31,9 @@ class Dmail < ApplicationRecord
       creator_ip_addr.to_s
     end
 
-    def spam?(sender = CurrentUser.user)
+    def spam?
       return false if Danbooru.config.rakismet_key.blank?
-      return false if sender.is_gold?
+      return false if from.is_gold?
       super()
     end
   end
@@ -58,7 +58,6 @@ class Dmail < ApplicationRecord
     def initialize_attributes
       self.from_id ||= CurrentUser.id
       self.creator_ip_addr ||= CurrentUser.ip_addr
-      self.is_spam = spam?(CurrentUser.user)
     end
   end
 
@@ -73,6 +72,7 @@ class Dmail < ApplicationRecord
           # recipient's copy
           copy = Dmail.new(params)
           copy.owner_id = copy.to_id
+          copy.is_spam = copy.spam?
           copy.save unless copy.to_id == copy.from_id
 
           # sender's copy
