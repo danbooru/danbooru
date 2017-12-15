@@ -49,6 +49,14 @@ module Sources
           @site_2.to_h
         end
       end
+
+      should "work for a https://lohas.nicoseiga.jp/thumb/${id}i url" do
+        site = Sources::Site.new("https://lohas.nicoseiga.jp/thumb/6844226i")
+        site.get
+
+        full_image_url = %r!https?://lohas.nicoseiga.jp/priv/[a-f0-9]{40}/[0-9]+/6844226!
+        assert_match(full_image_url, site.image_url)
+      end
     end
   end
 end
