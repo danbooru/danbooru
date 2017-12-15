@@ -1,6 +1,11 @@
 require 'digest/sha1'
 
 class Dmail < ApplicationRecord
+  # if a person sends spam to more than 10 users within a 24 hour window, automatically ban them for 3 days.
+  AUTOBAN_THRESHOLD = 10
+  AUTOBAN_WINDOW = 24.hours
+  AUTOBAN_DURATION = 3
+
   include Rakismet::Model
 
   with_options on: :create do
@@ -23,6 +28,23 @@ class Dmail < ApplicationRecord
   rakismet_attrs author: :from_name, author_email: :from_email, content: :title_and_body, user_ip: :creator_ip_addr_str
 
   concerning :SpamMethods do
+    class_methods do
+      def is_spammer?(user)
+        return false if user.is_gold?
+
+        spammed_users = sent_by(user).where(is_spam: true).where("created_at > ?", AUTOBAN_WINDOW.ago).distinct.count(:to_id)
+        spammed_users >= AUTOBAN_THRESHOLD
+      end
+
+      def ban_spammer(spammer)
+        spammer.bans.create! do |ban|
+          ban.banner = User.system
+          ban.reason = "Spambot."
+          ban.duration = AUTOBAN_DURATION
+        end
+      end
+    end
+
     def title_and_body
       "#{title}\n\n#{body}"
     end
@@ -80,6 +102,8 @@ class Dmail < ApplicationRecord
           copy.owner_id = copy.from_id
           copy.is_read = true
           copy.save
+
+          Dmail.ban_spammer(copy.from) if Dmail.is_spammer?(copy.from)
         end
 
         copy
@@ -119,6 +143,10 @@ class Dmail < ApplicationRecord
   end
   
   module SearchMethods
+    def sent_by(user)
+      where("dmails.from_id = ? AND dmails.owner_id != ?", user.id, user.id)
+    end
+
     def active
       where("is_deleted = ?", false)
     end
