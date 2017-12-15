@@ -177,7 +177,7 @@ class DmailTest < ActiveSupport::TestCase
     context "that is automated" do
       setup do
         @bot = FactoryGirl.create(:user)
-        Danbooru.config.stubs(:system_user).returns(@bot)
+        User.stubs(:system).returns(@bot)
       end
 
       should "only create a copy for the recipient" do

@@ -316,7 +316,7 @@ class User < ApplicationRecord
 
     module ClassMethods
       def system
-        Danbooru.config.system_user
+        User.find_by!(name: Danbooru.config.system_user)
       end
 
       def level_hash
@@ -366,7 +366,7 @@ class User < ApplicationRecord
     def promote_to_admin_if_first_user
       return if Rails.env.test?
 
-      if User.count == 0
+      if User.admins.count == 0
         self.level = Levels::ADMIN
         self.can_approve_posts = true
         self.can_upload_free = true

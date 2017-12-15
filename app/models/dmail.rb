@@ -86,7 +86,7 @@ class Dmail < ApplicationRecord
       end
 
       def create_automated(params)
-        dmail = Dmail.new(from: Danbooru.config.system_user, **params)
+        dmail = Dmail.new(from: User.system, **params)
         dmail.owner = dmail.to
         dmail.save
         dmail
@@ -234,7 +234,7 @@ class Dmail < ApplicationRecord
   end
 
   def is_automated?
-    from == Danbooru.config.system_user
+    from == User.system
   end
 
   def filtered?
