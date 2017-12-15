@@ -269,6 +269,10 @@ class AnonymousUser
     false
   end
 
+  def disable_responsive_mode?
+    false
+  end
+
   User::Roles.reject {|r| r == :anonymous}.each do |name|
     define_method("is_#{name}?") do
       false

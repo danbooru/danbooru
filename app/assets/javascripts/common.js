@@ -28,6 +28,17 @@ $(function() {
     $('#notice').fadeOut("fast");
     e.preventDefault();
   });
+
+  $("#desktop-version-link a").click(function() {
+    $.ajax("/users/" + Danbooru.meta("current-user-id"), {
+      method: "PUT",
+      data: {
+        "user[disable_responsive_mode]": "true"
+      }
+    }).success(function() {
+      location.reload();
+    });
+  });
 });
 
 var Danbooru = {};

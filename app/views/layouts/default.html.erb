@@ -5,7 +5,7 @@
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
   <link rel="top" title="<%= Danbooru.config.app_name %>" href="/">
   <%= csrf_meta_tag %>
-  <% unless cookies[:dm] %>
+  <% unless CurrentUser.disable_responsive_mode? %>
     <meta name="viewport" content="width=device-width,initial-scale=1">
   <% end %>
   <meta name="tag-category-names" content="<%= TagCategory.categories %>">

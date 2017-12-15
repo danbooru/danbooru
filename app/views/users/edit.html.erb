@@ -91,11 +91,7 @@
 
         <%= f.input :favorite_tags, :label => "Frequent tags", :hint => "A list of tags that you use often. They will appear when using the list of Related Tags.", :input_html => { :rows => 5, :data => { :autocomplete => "tag-query" } } %>
 
-        <div class="input select field_with_hint">
-          <label class="select optional" for="user_desktop_mode">Desktop mode</label>
-          <%= select_tag "user[desktop_mode]", options_for_select([["No", "0"], ["Yes", "1"]], cookies[:dm]), :class => "select optional" %>
-          <span class="hint">Force desktop version of site even on mobile.</span>
-        </div>
+        <%= f.input :disable_responsive_mode, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false, :hint => "Disable alternative layout for mobile and tablet" %>
 
         <%= f.input :custom_style, :label => "Custom <a href='http://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, :hint => "Style to apply to the whole site.", :input_html => {:size => "40x5"} %>
       </fieldset>
