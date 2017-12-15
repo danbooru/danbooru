@@ -10,7 +10,10 @@
     
     <li><%= link_to "Help", wiki_pages_path(:search => {:title => "help:wiki"}) %></li>
     
-    <% if @wiki_page && !@wiki_page.new_record? %>
+    <% if @wiki_page && @wiki_page.new_record? && @wiki_page.try(:tag).present? %>
+      <li>|</li>
+      <li><%= link_to "Posts (#{@wiki_page.tag.post_count})", posts_path(:tags => @wiki_page.title) %></li>
+    <% elsif @wiki_page && !@wiki_page.new_record? %>
       <li>|</li>
       <li><%= link_to "Posts (#{@wiki_page.tag.try(:post_count) || 0})", posts_path(:tags => @wiki_page.title) %></li>
       <li><%= link_to "History", wiki_page_versions_path(:search => {:wiki_page_id => @wiki_page.id}) %></li>
