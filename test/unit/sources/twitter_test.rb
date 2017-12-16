@@ -158,5 +158,15 @@ module Sources
         assert_equal(tags, @site.tags)
       end
     end
+
+    context "#normalize_for_artist_finder!" do
+      setup do
+        @site = Sources::Site.new("https://twitter.com/BLAH")
+      end
+
+      should "downcase the url" do
+        assert_equal("https://twitter.com/blah", @site.normalize_for_artist_finder!)
+      end
+    end
   end
 end
