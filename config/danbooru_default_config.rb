@@ -37,8 +37,10 @@ module Danbooru
     end
 
     # System actions, such as sending automated dmails, will be performed with this account.
+    # This account will be created automatically if it doesn't exist. It will
+    # be promoted to Moderator if it isn't already a Moderator.
     def system_user
-      User.find_by_name("DanbooruBot") || User.admins.first
+      "DanbooruBot"
     end
 
     def upload_feedback_topic

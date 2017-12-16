@@ -20,7 +20,7 @@ class PostReplacementTest < ActiveSupport::TestCase
     Delayed::Worker.delay_jobs = true # don't delete the old images right away
 
     @system = FactoryGirl.create(:user, created_at: 2.weeks.ago)
-    Danbooru.config.stubs(:system_user).returns(@system)
+    User.stubs(:system).returns(@system)
 
     @uploader = FactoryGirl.create(:user, created_at: 2.weeks.ago, can_upload_free: true)
     @replacer = FactoryGirl.create(:user, created_at: 2.weeks.ago, can_approve_posts: true)

@@ -28,7 +28,7 @@ class UserTest < ActiveSupport::TestCase
 
       should "send an automated dmail to the user" do
         bot = FactoryGirl.create(:user)
-        Danbooru.config.stubs(:system_user).returns(bot)
+        User.stubs(:system).returns(bot)
 
         assert_difference("Dmail.count", 1) do
           @user.promote_to!(User::Levels::GOLD)
