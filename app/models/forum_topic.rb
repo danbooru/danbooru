@@ -73,11 +73,8 @@ class ForumTopic < ApplicationRecord
     end
 
     def search(params)
-      q = permitted
-
-      if params[:id].present?
-        q = q.where(id: params[:id].split(",").map(&:to_i))
-      end
+      q = super
+      q = q.permitted
 
       if params[:mod_only].present?
         q = q.where("min_level >= ?", MIN_LEVELS[:Moderator])

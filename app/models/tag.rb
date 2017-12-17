@@ -838,7 +838,7 @@ class Tag < ApplicationRecord
     end
 
     def search(params)
-      q = where("true")
+      q = super
       params = {} if params.blank?
 
       if params[:fuzzy_name_matches].present?

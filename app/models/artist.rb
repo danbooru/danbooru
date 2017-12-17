@@ -426,7 +426,7 @@ class Artist < ApplicationRecord
     end
 
     def search(params)
-      q = where("true")
+      q = super
       params = {} if params.blank?
 
       case params[:name]
@@ -494,10 +494,6 @@ class Artist < ApplicationRecord
         q = q.banned
       elsif params[:is_banned] == "false"
         q = q.unbanned
-      end
-
-      if params[:id].present?
-        q = q.where("artists.id in (?)", params[:id].split(",").map(&:to_i))
       end
 
       if params[:creator_name].present?

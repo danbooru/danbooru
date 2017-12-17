@@ -50,15 +50,11 @@ class Pool < ApplicationRecord
     end
 
     def search(params)
-      q = where("true")
+      q = super
       params = {} if params.blank?
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
-      end
-
-      if params[:id].present?
-        q = q.where("pools.id in (?)", params[:id].split(","))
       end
 
       if params[:description_matches].present?

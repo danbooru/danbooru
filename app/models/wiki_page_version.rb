@@ -11,7 +11,7 @@ class WikiPageVersion < ApplicationRecord
     end
 
     def search(params)
-      q = where("true")
+      q = super
       return q if params.blank?
 
       if params[:updater_id].present?

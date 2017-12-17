@@ -32,7 +32,7 @@ class ArtistCommentary < ApplicationRecord
     end
 
     def search(params)
-      q = where("true")
+      q = super
       params = {} if params.blank?
 
       if params[:text_matches].present?

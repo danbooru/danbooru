@@ -1,6 +1,29 @@
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 
+  concerning :SearchMethods do
+    class_methods do
+      # range: "5", ">5", "<5", ">=5", "<=5", "5..10", "5,6,7"
+      def attribute_matches(attribute, range)
+        return all if range.blank?
+
+        column = column_for_attribute(attribute)
+        qualified_column = "#{table_name}.#{column.name}"
+        parsed_range = Tag.parse_helper(range, :integer)
+
+        PostQueryBuilder.new(nil).add_range_relation(parsed_range, qualified_column, self)
+      end
+
+      def search(params = {})
+        params ||= {}
+
+        q = all
+        q = q.attribute_matches(:id, params[:id])
+        q
+      end
+    end
+  end
+
   module ApiMethods
     extend ActiveSupport::Concern
 

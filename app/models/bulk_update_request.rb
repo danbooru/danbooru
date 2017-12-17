@@ -23,11 +23,7 @@ class BulkUpdateRequest < ApplicationRecord
 
   module SearchMethods
     def search(params = {})
-      q = where("true")
-
-      if params[:id].present?
-        q = q.where("id in (?)", params[:id].split(",").map(&:to_i))
-      end
+      q = super
 
       if params[:user_name].present?
         q = q.where(user_id: User.name_to_id(params[:user_name]))
