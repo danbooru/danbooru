@@ -15,5 +15,10 @@ class ApplicationRecordTest < ActiveSupport::TestCase
       assert_equal(@tags.reverse, Tag.search(id: "#{@tags[0].id}..#{@tags[2].id}"))
       assert_equal(@tags.reverse, Tag.search(id: @tags.map(&:id).join(",")))
     end
+
+    should "support the created_at and updated_at params" do
+      assert_equal(@tags.reverse, Tag.search(created_at: ">=#{@tags.first.created_at}"))
+      assert_equal(@tags.reverse, Tag.search(updated_at: ">=#{@tags.first.updated_at}"))
+    end
   end
 end

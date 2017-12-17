@@ -275,7 +275,7 @@ class Tag < ApplicationRecord
       when :float
         object.to_f
 
-      when :date
+      when :date, :datetime
         begin
           Time.zone.parse(object)
         rescue Exception

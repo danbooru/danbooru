@@ -9,7 +9,7 @@ class ApplicationRecord < ActiveRecord::Base
 
         column = column_for_attribute(attribute)
         qualified_column = "#{table_name}.#{column.name}"
-        parsed_range = Tag.parse_helper(range, :integer)
+        parsed_range = Tag.parse_helper(range, column.type)
 
         PostQueryBuilder.new(nil).add_range_relation(parsed_range, qualified_column, self)
       end
@@ -19,6 +19,8 @@ class ApplicationRecord < ActiveRecord::Base
 
         q = all
         q = q.attribute_matches(:id, params[:id])
+        q = q.attribute_matches(:created_at, params[:created_at]) if attribute_names.include?("created_at")
+        q = q.attribute_matches(:updated_at, params[:updated_at]) if attribute_names.include?("updated_at")
         q
       end
     end
