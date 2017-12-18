@@ -617,13 +617,31 @@ class Tag < ApplicationRecord
             q[:favgroups] << favgroup_id
 
           when "-fav"
+            favuser = User.find_by_name(g2)
+
+            if favuser.hide_favorites?
+              raise User::PrivilegeError.new
+            end
+
             q[:tags][:exclude] << "fav:#{User.name_to_id(g2)}"
 
           when "fav"
+            favuser = User.find_by_name(g2)
+
+            if favuser.hide_favorites?
+              raise User::PrivilegeError.new
+            end
+
             q[:tags][:related] << "fav:#{User.name_to_id(g2)}"
 
           when "ordfav"
             user_id = User.name_to_id(g2)
+            favuser = User.find(user_id)
+
+            if favuser.hide_favorites?
+              raise User::PrivilegeError.new
+            end
+
             q[:tags][:related] << "fav:#{user_id}"
             q[:ordfav] = user_id
 
