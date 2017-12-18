@@ -1,6 +1,8 @@
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 
+  include Danbooru::Paginator::ActiveRecordExtension
+
   concerning :SearchMethods do
     class_methods do
       # range: "5", ">5", "<5", ">=5", "<=5", "5..10", "5,6,7"

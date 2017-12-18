@@ -1,4 +1,3 @@
-require "danbooru_image_resizer/danbooru_image_resizer"
 require "tmpdir"
 
 class Upload < ApplicationRecord
@@ -273,7 +272,7 @@ class Upload < ApplicationRecord
 
       output_path = resized_file_path_for(width)
       if is_image?
-        Danbooru.resize(source_path, output_path, width, height, quality)
+        DanbooruImageResizer.resize(source_path, output_path, width, height, quality)
       elsif is_ugoira?
         if Delayed::Worker.delay_jobs
           # by the time this runs we'll have moved source_path to md5_file_path

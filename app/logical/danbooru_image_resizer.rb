@@ -1,4 +1,4 @@
-module Danbooru
+module DanbooruImageResizer
   def resize(read_path, write_path, width, height, resize_quality = 90)
     image = Magick::Image.read(read_path).first
     geometry = "#{width}x>"
