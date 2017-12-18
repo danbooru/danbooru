@@ -13,6 +13,7 @@ class FavoriteGroupsController < ApplicationController
 
   def show
     @favorite_group = FavoriteGroup.find(params[:id])
+    check_read_privilege(@favorite_group)
     @post_set = PostSets::FavoriteGroup.new(@favorite_group, params[:page])
     respond_with(@favorite_group)
   end
@@ -37,13 +38,13 @@ class FavoriteGroupsController < ApplicationController
 
   def edit
     @favorite_group = FavoriteGroup.find(params[:id])
-    check_privilege(@favorite_group)
+    check_write_privilege(@favorite_group)
     respond_with(@favorite_group)
   end
 
   def update
     @favorite_group = FavoriteGroup.find(params[:id])
-    check_privilege(@favorite_group)
+    check_write_privilege(@favorite_group)
     @favorite_group.update_attributes(params[:favorite_group])
     unless @favorite_group.errors.any?
       flash[:notice] = "Favorite group updated"
@@ -53,7 +54,7 @@ class FavoriteGroupsController < ApplicationController
 
   def destroy
     @favorite_group = FavoriteGroup.find(params[:id])
-    check_privilege(@favorite_group)
+    check_write_privilege(@favorite_group)
     @favorite_group.destroy
     flash[:notice] = "Favorite group deleted"
     redirect_to favorite_groups_path
@@ -61,13 +62,17 @@ class FavoriteGroupsController < ApplicationController
 
   def add_post
     @favorite_group = FavoriteGroup.find(params[:id])
-    check_privilege(@favorite_group)
+    check_write_privilege(@favorite_group)
     @post = Post.find(params[:post_id])
     @favorite_group.add!(@post.id)
   end
 
 private
-  def check_privilege(favgroup)
+  def check_write_privilege(favgroup)
     raise User::PrivilegeError unless favgroup.editable_by?(CurrentUser.user)
+  end
+
+  def check_read_privilege(favgroup)
+    raise User::PrivilegeError unless favgroup.viewable_by?(CurrentUser.user)
   end
 end

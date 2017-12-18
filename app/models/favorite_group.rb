@@ -241,4 +241,8 @@ class FavoriteGroup < ApplicationRecord
   def editable_by?(user)
     creator_id == user.id
   end
+
+  def viewable_by?(user)
+    creator_id == user.id || !creator.hide_favorites?
+  end
 end
