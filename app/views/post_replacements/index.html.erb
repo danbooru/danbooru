@@ -15,6 +15,8 @@
         <tr>
           <th width="1%">Post</th>
           <th>Source</th>
+          <th>MD5</th>
+          <th>Size</th>
           <th>Replacer</th>
         </tr>
       </thead>
@@ -36,6 +38,37 @@
                 </dd>
               </dl>
             </td>
+
+            <td>
+              <% if post_replacement.md5_was.present? && post_replacement.md5.present? %>
+                <dl>
+                  <dt>Original MD5</dt>
+                  <dd><%= post_replacement.md5_was %></dd>
+
+                  <dt>Replacement MD5</dt>
+                  <dd><%= post_replacement.md5 %></dd>
+                </dl>
+              <% end %>
+            </td>
+
+            <td>
+              <% if %i[image_width_was image_height_was file_size_was file_ext_was image_width image_height file_size file_ext].all? { |k| post_replacement[k].present? } %>
+                <dl>
+                  <dt>Original Size</dt>
+                  <dd>
+                    <%= post_replacement.image_width_was %>x<%= post_replacement.image_height_was %>
+                    (<%= post_replacement.file_size_was.to_s(:human_size, precision: 4) %>, <%= post_replacement.file_ext_was %>)
+                  </dd>
+
+                  <dt>Replacement Size</dt>
+                  <dd>
+                    <%= post_replacement.image_width %>x<%= post_replacement.image_height %>
+                    (<%= post_replacement.file_size.to_s(:human_size, precision: 4) %>, <%= post_replacement.file_ext %>)
+                  </dd>
+                </dl>
+              <% end %>
+            </td>
+
             <td>
               <%= compact_time post_replacement.created_at %>
               <br> by <%= link_to_user post_replacement.creator %>
