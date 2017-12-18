@@ -44,7 +44,8 @@ class PostAppeal < ApplicationRecord
     end
 
     def search(params)
-      q = order("post_appeals.id desc")
+      q = super
+      q = q.order("post_appeals.id desc")
       return q if params.blank?
 
       if params[:reason_matches].present?

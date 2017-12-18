@@ -89,7 +89,7 @@ class PostReplacement < ApplicationRecord
     end
 
     def search(params = {})
-      q = all
+      q = super
 
       if params[:creator_id].present?
         q = q.where(creator_id: params[:creator_id].split(",").map(&:to_i))
@@ -97,10 +97,6 @@ class PostReplacement < ApplicationRecord
 
       if params[:creator_name].present?
         q = q.where(creator_id: User.name_to_id(params[:creator_name]))
-      end
-
-      if params[:id].present?
-        q = q.where(id: params[:id].split(",").map(&:to_i))
       end
 
       if params[:post_id].present?

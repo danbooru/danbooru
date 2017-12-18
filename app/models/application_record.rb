@@ -1,6 +1,31 @@
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 
+  concerning :SearchMethods do
+    class_methods do
+      # range: "5", ">5", "<5", ">=5", "<=5", "5..10", "5,6,7"
+      def attribute_matches(attribute, range)
+        return all if range.blank?
+
+        column = column_for_attribute(attribute)
+        qualified_column = "#{table_name}.#{column.name}"
+        parsed_range = Tag.parse_helper(range, column.type)
+
+        PostQueryBuilder.new(nil).add_range_relation(parsed_range, qualified_column, self)
+      end
+
+      def search(params = {})
+        params ||= {}
+
+        q = all
+        q = q.attribute_matches(:id, params[:id])
+        q = q.attribute_matches(:created_at, params[:created_at]) if attribute_names.include?("created_at")
+        q = q.attribute_matches(:updated_at, params[:updated_at]) if attribute_names.include?("updated_at")
+        q
+      end
+    end
+  end
+
   module ApiMethods
     extend ActiveSupport::Concern
 

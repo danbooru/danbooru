@@ -42,7 +42,7 @@ class Note < ApplicationRecord
     end
 
     def search(params)
-      q = where("true")
+      q = super
       return q if params.blank?
 
       if params[:body_matches].present?

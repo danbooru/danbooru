@@ -44,7 +44,7 @@ class UserFeedback < ApplicationRecord
     end
 
     def search(params)
-      q = where("true")
+      q = super
       return q if params.blank?
 
       if params[:user_id].present?

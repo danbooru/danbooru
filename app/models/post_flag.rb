@@ -66,7 +66,8 @@ class PostFlag < ApplicationRecord
     end
 
     def search(params)
-      q = order("post_flags.id desc")
+      q = super
+      q = q.order("post_flags.id desc")
       return q if params.blank?
 
       if params[:reason_matches].present?

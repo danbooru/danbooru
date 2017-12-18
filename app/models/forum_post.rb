@@ -65,7 +65,8 @@ class ForumPost < ApplicationRecord
     end
 
     def search(params)
-      q = permitted
+      q = super
+      q = q.permitted
       return q if params.blank?
 
       if params[:creator_id].present?

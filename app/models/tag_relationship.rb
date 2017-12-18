@@ -73,11 +73,7 @@ class TagRelationship < ApplicationRecord
     end
 
     def search(params)
-      q = all
-
-      if params[:id].present?
-        q = q.where(id: params[:id].split(",").map(&:to_i))
-      end
+      q = super
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])

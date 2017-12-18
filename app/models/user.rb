@@ -813,7 +813,7 @@ class User < ApplicationRecord
     end
 
     def search(params)
-      q = where("true")
+      q = super
       return q if params.blank?
 
       if params[:name].present?
@@ -834,10 +834,6 @@ class User < ApplicationRecord
 
       if params[:level].present?
         q = q.where("level = ?", params[:level].to_i)
-      end
-
-      if params[:id].present?
-        q = q.where("id in (?)", params[:id].split(",").map(&:to_i))
       end
 
       bitprefs_length = BOOLEAN_ATTRIBUTES.length

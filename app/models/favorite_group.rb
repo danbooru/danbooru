@@ -34,7 +34,7 @@ class FavoriteGroup < ApplicationRecord
     end
 
     def search(params)
-      q = where("true")
+      q = super
       params = {} if params.blank?
 
       if params[:creator_id].present?
