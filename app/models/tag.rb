@@ -608,11 +608,23 @@ class Tag < ApplicationRecord
 
           when "-favgroup"
             favgroup_id = FavoriteGroup.name_to_id(g2)
+            favgroup = FavoriteGroup.find(favgroup_id)
+
+            if !favgroup.viewable_by?(CurrentUser.user)
+              raise User::PrivilegeError.new
+            end
+
             q[:favgroups_neg] ||= []
             q[:favgroups_neg] << favgroup_id
 
           when "favgroup"
             favgroup_id = FavoriteGroup.name_to_id(g2)
+            favgroup = FavoriteGroup.find(favgroup_id)
+
+            if !favgroup.viewable_by?(CurrentUser.user)
+              raise User::PrivilegeError.new
+            end
+
             q[:favgroups] ||= []
             q[:favgroups] << favgroup_id
 
