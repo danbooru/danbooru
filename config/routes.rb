@@ -195,7 +195,7 @@ Rails.application.routes.draw do
       get :diff
     end
   end
-  resources :post_replacements, :only => [:index, :new, :create]
+  resources :post_replacements, :only => [:index, :new, :create, :update]
   resources :posts do
     resources :events, :only => [:index], :controller => "post_events"
     resources :replacements, :only => [:index, :new, :create], :controller => "post_replacements"
