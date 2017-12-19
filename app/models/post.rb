@@ -712,12 +712,12 @@ class Post < ApplicationRecord
       normalized_tags = remove_negated_tags(normalized_tags)
       normalized_tags = TagAlias.to_aliased(normalized_tags)
       normalized_tags = %w(tagme) if normalized_tags.empty?
-      normalized_tags = TagImplication.with_descendants(normalized_tags)
-      normalized_tags = Tag.create_for_list(add_automatic_tags(normalized_tags))
+      normalized_tags = add_automatic_tags(normalized_tags)
       normalized_tags = normalized_tags + Tag.create_for_list(TagImplication.automatic_tags_for(normalized_tags))
-      normalized_tags = normalized_tags.compact
-      normalized_tags.sort!
-      set_tag_string(normalized_tags.uniq.sort.join(" "))
+      normalized_tags = TagImplication.with_descendants(normalized_tags)
+      normalized_tags = normalized_tags.compact.uniq.sort
+      normalized_tags = Tag.create_for_list(normalized_tags)
+      set_tag_string(normalized_tags.join(" "))
     end
 
     def remove_negated_tags(tags)

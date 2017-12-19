@@ -16,6 +16,7 @@ class PostTest < ActiveSupport::TestCase
     super
 
     Timecop.travel(2.weeks.ago) do
+      User.any_instance.stubs(:validate_sock_puppets).returns(true)
       @user = FactoryGirl.create(:user)
     end
     CurrentUser.user = @user
@@ -798,6 +799,14 @@ class PostTest < ActiveSupport::TestCase
 
             assert(@post.has_tag?("james"), "expected 'jim' to be aliased to 'james'")
           end
+
+          should "apply implications after the character tag is added" do
+            FactoryGirl.create(:tag_implication, antecedent_name: "jimmy", consequent_name: "jim")
+            @post.add_tag("jimmy_(cosplay)")
+            @post.save
+
+            assert(@post.has_tag?("jim"), "expected 'jimmy' to imply 'jim'")
+          end
         end
 
         context "for a parent" do
@@ -1211,6 +1220,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "with a .webm file extension" do
         setup do
+          FactoryGirl.create(:tag_implication, antecedent_name: "webm", consequent_name: "animated")
           @post.file_ext = "webm"
           @post.tag_string = ""
           @post.save
@@ -1218,6 +1228,10 @@ class PostTest < ActiveSupport::TestCase
 
         should "have the appropriate file type tag added automatically" do
           assert_match(/webm/, @post.tag_string)
+        end
+
+        should "apply implications after adding the file type tag" do
+          assert(@post.has_tag?("animated"), "expected 'webm' to imply 'animated'")
         end
       end
 
