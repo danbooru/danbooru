@@ -1,5 +1,3 @@
-require 'danbooru_image_resizer/danbooru_image_resizer'
-
 namespace :images do
   desc "Reset S3 + Storage Class"
   task :reset_s3, [:min_id, :max_id] => :environment do |t, args|
@@ -117,7 +115,7 @@ namespace :images do
     Post.where(id: post_id).find_each do |post|
       if post.is_image?
         puts "resizing preview #{post.id}"
-        Danbooru.resize(post.file_path, post.preview_file_path, width, width, 90)
+        DanbooruImageResizer.resize(post.file_path, post.preview_file_path, width, width, 90)
       end
     end
   end
@@ -133,7 +131,7 @@ namespace :images do
     Post.where(id: post_id).find_each do |post|
       if post.is_image? && post.has_large?
         puts "resizing large #{post.id}"
-        Danbooru.resize(post.file_path, post.large_file_path, Danbooru.config.large_image_width, nil, 90)
+        DanbooruImageResizer.resize(post.file_path, post.large_file_path, Danbooru.config.large_image_width, nil, 90)
         post.distribute_files
       end
     end

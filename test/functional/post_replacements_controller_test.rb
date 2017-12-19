@@ -43,6 +43,25 @@ class PostReplacementsControllerTest < ActionController::TestCase
       end
     end
 
+    context "update action" do
+      should "update the replacement" do
+        params = {
+          format: :json,
+          id: @post_replacement.id,
+          post_replacement: {
+            file_size_was: 23,
+            file_size: 42,
+          }
+        }
+
+        put :update, params, { user_id: @user.id }
+        @post_replacement.reload
+
+        assert_equal(23, @post_replacement.file_size_was)
+        assert_equal(42, @post_replacement.file_size)
+      end
+    end
+
     context "index action" do
       should "render" do
         get :index, {format: :json}

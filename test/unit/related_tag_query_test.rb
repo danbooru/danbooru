@@ -2,9 +2,27 @@ require 'test_helper'
 
 class RelatedTagQueryTest < ActiveSupport::TestCase
   setup do
+    User.any_instance.stubs(:validate_sock_puppets).returns(true)
     user = FactoryGirl.create(:user)
     CurrentUser.user = user
     CurrentUser.ip_addr = "127.0.0.1"
+  end
+
+  context "#other_wiki_category_tags" do
+    subject { RelatedTagQuery.new("copyright") }
+
+    setup do
+      @copyright = FactoryGirl.create(:copyright_tag, name: "copyright")
+      @wiki = FactoryGirl.create(:wiki_page, title: "copyright", body: "[[list_of_hoges]]")
+      @list_of_hoges = FactoryGirl.create(:wiki_page, title: "list_of_hoges", body: "[[alpha]] and [[beta]]")
+    end
+
+    should "return tags from the associated list wiki" do
+      result = subject.other_wiki_category_tags
+      assert_not_nil(result[0])
+      assert_not_nil(result[0]["wiki_page_tags"])
+      assert_equal(%w(alpha beta), result[0]["wiki_page_tags"].map(&:first))
+    end
   end
 
   context "a related tag query without a category constraint" do
@@ -24,7 +42,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       end
 
       should "render the json" do
-        assert_equal("{\"query\":\"aaa\",\"category\":\"\",\"tags\":[[\"aaa\",0],[\"bbb\",0],[\"ccc\",0]],\"wiki_page_tags\":[]}", @query.to_json)
+        assert_equal("{\"query\":\"aaa\",\"category\":\"\",\"tags\":[[\"aaa\",0],[\"bbb\",0],[\"ccc\",0]],\"wiki_page_tags\":[],\"other_wikis\":[]}", @query.to_json)
       end
     end
 

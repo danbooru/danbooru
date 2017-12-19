@@ -2667,7 +2667,17 @@ CREATE TABLE post_replacements (
     original_url text NOT NULL,
     replacement_url text NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    file_ext_was character varying,
+    file_size_was integer,
+    image_width_was integer,
+    image_height_was integer,
+    md5_was character varying,
+    file_ext character varying,
+    file_size integer,
+    image_width integer,
+    image_height integer,
+    md5 character varying
 );
 
 
@@ -7532,4 +7542,6 @@ INSERT INTO schema_migrations (version) VALUES ('20171106075030');
 INSERT INTO schema_migrations (version) VALUES ('20171127195124');
 
 INSERT INTO schema_migrations (version) VALUES ('20171219001521');
+
+INSERT INTO schema_migrations (version) VALUES ('20171218213037');
 

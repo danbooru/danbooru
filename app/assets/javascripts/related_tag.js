@@ -124,6 +124,7 @@
     var query = Danbooru.RelatedTag.recent_search.query;
     var related_tags = Danbooru.RelatedTag.recent_search.tags;
     var wiki_page_tags = Danbooru.RelatedTag.recent_search.wiki_page_tags;
+    var other_wikis = Danbooru.RelatedTag.recent_search.other_wikis;
     var $dest = $("#related-tags");
     $dest.empty();
 
@@ -134,6 +135,9 @@
     if (wiki_page_tags.length) {
       $dest.append(Danbooru.RelatedTag.build_html("wiki:" + query, wiki_page_tags, "wiki"));
     }
+    $.each(other_wikis, function(i,wiki) {
+      $dest.append(Danbooru.RelatedTag.build_html("wiki:" + wiki.title, wiki.wiki_page_tags, "otherwiki" + i.toString()));
+    });
     if (Danbooru.RelatedTag.recent_artists) {
       var tags = [];
       if (Danbooru.RelatedTag.recent_artists.length === 0) {
