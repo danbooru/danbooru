@@ -44,23 +44,7 @@ class UserPresenter
   end
 
   def posts_for_saved_search_category(category)
-    if !SavedSearch.enabled?
-      return Post.where("false")
-    end
-
-    ids = SavedSearch.post_ids(CurrentUser.user.id, category)
-
-    if ids.any?
-      arel = Post.where("id in (?)", ids.map(&:to_i)).order("id desc").limit(10)
-
-      if CurrentUser.user.hide_deleted_posts?
-        arel = arel.undeleted
-      end
-
-      arel
-    else
-      Post.where("false")
-    end
+    Post.tag_match("search:#{category}").limit(10)
   end
 
   def upload_limit(template)
@@ -80,15 +64,7 @@ class UserPresenter
   end
 
   def uploads
-    @uploads ||= begin
-      arel = Post.where("uploader_id = ?", user.id).order("id desc").limit(6)
-
-      if CurrentUser.user.hide_deleted_posts?
-        arel = arel.undeleted
-      end
-
-      arel
-    end
+    Post.tag_match("user:#{user.name}").limit(6)
   end
 
   def has_uploads?
@@ -96,15 +72,7 @@ class UserPresenter
   end
 
   def favorites
-    @favorites ||= begin
-      arel = user.favorites.limit(6).joins(:post).reorder("favorites.id desc")
-
-      if CurrentUser.user.hide_deleted_posts?
-        arel = arel.where("posts.is_deleted = false")
-      end
-
-      arel.map(&:post).compact
-    end
+    Post.tag_match("ordfav:#{user.name}").limit(6)
   end
 
   def has_favorites?
