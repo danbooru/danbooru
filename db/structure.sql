@@ -1044,7 +1044,8 @@ CREATE TABLE favorite_groups (
     post_ids text DEFAULT ''::text NOT NULL,
     post_count integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    is_public boolean DEFAULT false NOT NULL
 );
 
 
@@ -7529,4 +7530,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170914200122');
 INSERT INTO schema_migrations (version) VALUES ('20171106075030');
 
 INSERT INTO schema_migrations (version) VALUES ('20171127195124');
+
+INSERT INTO schema_migrations (version) VALUES ('20171219001521');
 

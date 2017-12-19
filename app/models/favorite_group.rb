@@ -11,7 +11,7 @@ class FavoriteGroup < ApplicationRecord
   validate :creator_can_create_favorite_groups, :on => :create
   validate :validate_number_of_posts
   before_save :update_post_count
-  attr_accessible :name, :post_ids, :post_id_array, :as => [:member, :gold, :platinum, :builder, :moderator, :admin, :default]
+  attr_accessible :name, :post_ids, :post_id_array, :is_public, :as => [:member, :gold, :platinum, :builder, :moderator, :admin, :default]
 
   module SearchMethods
     def for_creator(user_id)
@@ -33,27 +33,30 @@ class FavoriteGroup < ApplicationRecord
       where("name ilike ? escape E'\\\\'", name.to_escaped_for_sql_like)
     end
 
+    def hide_private(user,params)
+      if user.hide_favorites?
+        where("is_public = true")
+      elsif params[:is_public].present?
+        where("is_public = ?", params[:is_public])
+      else
+        where("true")
+      end
+    end
+
     def search(params)
       q = super
       params = {} if params.blank?
 
       if params[:creator_id].present?
         user = User.find(params[:creator_id])
-        
-        if user.hide_favorites?
-          raise User::PrivilegeError.new
-        end
-
+        q = q.hide_private(user,params)
         q = q.where("creator_id = ?", user.id)
       elsif params[:creator_name].present?
         user = User.find_by_name(params[:creator_name])
-
-        if user.hide_favorites?
-          raise User::PrivilegeError.new
-        end
-
+        q = q.hide_private(user,params)
         q = q.where("creator_id = ?", user.id)
       else
+        q = q.hide_private(CurrentUser.user,params)
         q = q.where("creator_id = ?", CurrentUser.user.id)
       end
 
@@ -243,6 +246,6 @@ class FavoriteGroup < ApplicationRecord
   end
 
   def viewable_by?(user)
-    creator_id == user.id || !creator.hide_favorites?
+    creator_id == user.id || !creator.hide_favorites? || is_public
   end
 end
