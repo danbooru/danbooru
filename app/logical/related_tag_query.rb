@@ -26,12 +26,26 @@ class RelatedTagQuery
     results
   end
 
+  def other_wiki_category_tags
+    if Tag.category_for(query) != Tag.categories.copyright
+      return []
+    end
+    listtags = (wiki_page.try(:tags) || []).select {|name| name =~ /^list_of_/i }
+    results = listtags.map do |name|
+      listlinks = WikiPage.titled(name).first.try(:tags) || []
+      if listlinks.length > 0
+        {"title" => name, "wiki_page_tags" => map_with_category_data(listlinks)}
+      end
+    end
+    results.reject {|list| list.nil?}
+  end
+
   def tags_for_html
     map_with_category_data(tags)
   end
 
   def to_json
-    {:query => query, :category => category, :tags => map_with_category_data(tags), :wiki_page_tags => map_with_category_data(wiki_page_tags)}.to_json
+    {:query => query, :category => category, :tags => map_with_category_data(tags), :wiki_page_tags => map_with_category_data(wiki_page_tags), :other_wikis => other_wiki_category_tags}.to_json
   end
 
 protected
