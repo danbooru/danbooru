@@ -3,13 +3,19 @@ class PostReplacement < ApplicationRecord
 
   belongs_to :post
   belongs_to :creator, class_name: "User"
-  before_validation :initialize_fields
+  before_validation :initialize_fields, on: :create
   attr_accessor :replacement_file, :final_source, :tags
 
   def initialize_fields
     self.creator = CurrentUser.user
     self.original_url = post.source
     self.tags = post.tag_string + " " + self.tags.to_s
+
+    self.file_ext_was =  post.file_ext
+    self.file_size_was = post.file_size
+    self.image_width_was = post.image_width
+    self.image_height_was = post.image_height
+    self.md5_was = post.md5
   end
 
   def undo!
@@ -32,9 +38,9 @@ class PostReplacement < ApplicationRecord
       md5_changed = (upload.md5 != post.md5)
 
       if replacement_file.present?
-        update(replacement_url: "file://#{replacement_file.original_filename}")
+        self.replacement_url = "file://#{replacement_file.original_filename}"
       else
-        update(replacement_url: upload.downloaded_source)
+        self.replacement_url = upload.downloaded_source
       end
 
       # queue the deletion *before* updating the post so that we use the old
@@ -44,6 +50,12 @@ class PostReplacement < ApplicationRecord
         Post.delay(queue: "default", run_at: Time.now + DELETION_GRACE_PERIOD).delete_files(post.id, post.file_path, post.large_file_path, post.preview_file_path)
       end
 
+      self.file_ext = upload.file_ext
+      self.file_size = upload.file_size
+      self.image_height = upload.image_height
+      self.image_width = upload.image_width
+      self.md5 = upload.md5
+
       post.md5 = upload.md5
       post.file_ext = upload.file_ext
       post.image_width = upload.image_width
@@ -51,6 +63,7 @@ class PostReplacement < ApplicationRecord
       post.file_size = upload.file_size
       post.source = final_source.presence || upload.source
       post.tag_string = upload.tag_string
+
       rescale_notes
       update_ugoira_frame_data(upload)
 
@@ -60,6 +73,7 @@ class PostReplacement < ApplicationRecord
         post.queue_backup
       end
 
+      save!
       post.save!
     end
 

@@ -30,7 +30,7 @@ class PostReplacementTest < ActiveSupport::TestCase
 
   def teardown
     super
-    
+
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
     Delayed::Worker.delay_jobs = false
@@ -49,6 +49,7 @@ class PostReplacementTest < ActiveSupport::TestCase
       setup do
         @post.update(source: "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png")
         @post.replace!(replacement_url: "https://www.google.com/intl/en_ALL/images/logo.gif", tags: "-tag1 tag2")
+        @replacement = @post.replacements.last
         @upload = Upload.last
       end
 
@@ -77,6 +78,22 @@ class PostReplacementTest < ActiveSupport::TestCase
 
       should "create a post replacement record" do
         assert_equal(@post.id, PostReplacement.last.post_id)
+      end
+
+      should "record the old file metadata" do
+        assert_equal(500, @replacement.image_width_was)
+        assert_equal(335, @replacement.image_height_was)
+        assert_equal(28086, @replacement.file_size_was)
+        assert_equal("jpg", @replacement.file_ext_was)
+        assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", @replacement.md5_was)
+      end
+
+      should "record the new file metadata" do
+        assert_equal(276, @replacement.image_width)
+        assert_equal(110, @replacement.image_height)
+        assert_equal(8558, @replacement.file_size)
+        assert_equal("gif", @replacement.file_ext)
+        assert_equal("e80d1c59a673f560785784fb1ac10959", @replacement.md5)
       end
 
       should "correctly update the attributes" do
