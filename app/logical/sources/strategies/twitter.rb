@@ -3,7 +3,7 @@ module Sources::Strategies
     attr_reader :image_urls
 
     def self.url_match?(url)
-      url =~ %r{^https?://(?:mobile\.)?twitter\.com}i
+      self.status_id_from_url(url).present?
     end
 
     def referer_url
