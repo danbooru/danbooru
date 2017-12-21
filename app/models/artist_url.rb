@@ -16,6 +16,10 @@ class ArtistUrl < ApplicationRecord
       url = url.gsub(/^http:\/\/blog-imgs-\d+-\w+\.fc2/, "http://blog.fc2")
       url = url.sub(%r!(http://seiga.nicovideo.jp/user/illust/\d+)\?.+!, '\1/')
       url = url.sub(%r!^http://pictures.hentai-foundry.com//!, "http://pictures.hentai-foundry.com/")
+
+      # the strategy won't always work for twitter because it looks for a status
+      url = url.downcase if url =~ /https?:\/\/(?:mobile\.)?twitter\.com/
+
       begin
         url = Sources::Site.new(url).normalize_for_artist_finder!
       rescue PixivApiClient::Error, Sources::Site::NoStrategyError

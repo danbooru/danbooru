@@ -3,6 +3,7 @@ require 'test_helper'
 class ArtistUrlTest < ActiveSupport::TestCase
   context "An artist url" do
     setup do
+      User.any_instance.stubs(:validate_sock_puppets)
       CurrentUser.user = FactoryGirl.create(:user)
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -26,6 +27,16 @@ class ArtistUrlTest < ActiveSupport::TestCase
       url = FactoryGirl.create(:artist_url, :url => "https://google.com")
       assert_equal("https://google.com", url.url)
       assert_equal("http://google.com/", url.normalized_url)
+    end
+
+    context "normalize twitter profile urls" do
+      setup do
+        @url = FactoryGirl.create(:artist_url, :url => "https://twitter.com/BLAH")
+      end
+
+      should "downcase the url" do
+        assert_equal("http://twitter.com/blah/", @url.normalized_url)
+      end
     end
 
     should "normalize fc2 urls" do
