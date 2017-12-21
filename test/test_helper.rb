@@ -64,3 +64,5 @@ end
 
 Delayed::Worker.delay_jobs = false
 TestAfterCommit.enabled = false
+
+Rails.application.load_seed
