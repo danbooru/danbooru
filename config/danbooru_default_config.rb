@@ -36,9 +36,10 @@ module Danbooru
       "webmaster@#{server_host}"
     end
 
-    # System actions, such as sending automated dmails, will be performed with this account.
-    # This account will be created automatically if it doesn't exist. It will
-    # be promoted to Moderator if it isn't already a Moderator.
+    # System actions, such as sending automated dmails, will be performed with
+    # this account. This account must have Moderator privileges.
+    #
+    # Run `rake db:seed` to create this account if it doesn't already exist in your install.
     def system_user
       "DanbooruBot"
     end
