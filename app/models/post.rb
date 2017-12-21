@@ -1741,7 +1741,7 @@ class Post < ApplicationRecord
     end
 
     def added_tags_are_valid
-      new_tags = added_tags.select { |t| t.post_count <= 1 }
+      new_tags = added_tags.select { |t| t.post_count <= 0 }
       new_general_tags = new_tags.select { |t| t.category == Tag.categories.general }
       new_artist_tags = new_tags.select { |t| t.category == Tag.categories.artist }
       repopulated_tags = new_tags.select { |t| (t.category != Tag.categories.general) && (t.category != Tag.categories.meta) && (t.created_at < 1.hour.ago) }
