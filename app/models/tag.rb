@@ -949,7 +949,8 @@ class Tag < ApplicationRecord
   end
 
   def editable_by?(user)
-    return true if !is_locked? && user.is_builder? && post_count < 10_000
+    return true if user.is_admin?
+    return true if !is_locked? && user.is_builder? && post_count < 1_000
     return true if !is_locked? && user.is_member? && post_count < 50
     return false
   end

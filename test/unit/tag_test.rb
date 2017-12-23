@@ -2,8 +2,8 @@ require 'test_helper'
 
 class TagTest < ActiveSupport::TestCase
   setup do
-    user = FactoryGirl.create(:builder_user)
-    CurrentUser.user = user
+    @builder = FactoryGirl.create(:builder_user)
+    CurrentUser.user = @builder
     CurrentUser.ip_addr = "127.0.0.1"
   end
 
@@ -204,6 +204,20 @@ class TagTest < ActiveSupport::TestCase
       Tag.find_or_create_by_name("artist:#{tag.name}")
       tag.reload
       assert_equal(0, tag.category)
+    end
+
+    should "not change category when the tag is too large to be changed by a builder" do
+      tag = FactoryGirl.create(:tag, post_count: 1001)
+      Tag.find_or_create_by_name("artist:#{tag.name}", creator: @builder)
+
+      assert_equal(0, tag.reload.category)
+    end
+
+    should "not change category when the tag is too large to be changed by a member" do
+      tag = FactoryGirl.create(:tag, post_count: 51)
+      Tag.find_or_create_by_name("artist:#{tag.name}", creator: FactoryGirl.create(:member_user))
+
+      assert_equal(0, tag.reload.category)
     end
 
     should "be created when one doesn't exist" do

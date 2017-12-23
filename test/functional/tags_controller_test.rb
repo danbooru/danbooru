@@ -73,6 +73,14 @@ class TagsControllerTest < ActionController::TestCase
         @tag.reload
         assert_equal(1, @tag.category)
       end
+
+      should "not change category when the tag is too large to be changed by a builder" do
+        @tag.update_columns(post_count: 1001)
+        post :update, {:id => @tag.id, :tag => {:category => "1"}}, {:user_id => @user.id}
+
+        assert_response :forbidden
+        assert_equal(0, @tag.reload.category)
+      end
     end
   end
 end
