@@ -218,7 +218,7 @@ class AnonymousUser
   end
 
   def custom_style
-    nil
+    ""
   end
 
   def show_deleted_children?

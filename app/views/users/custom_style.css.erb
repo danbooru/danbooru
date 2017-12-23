@@ -1,4 +1,4 @@
-<% CurrentUser.user.custom_style.split(/\r\n|\r|\n/).each do |line| %>
+<% CurrentUser.user.custom_style.to_s.split(/\r\n|\r|\n/).each do |line| %>
   <% if line =~ /^@import/ %>
     <%= raw(line) %>
   <% else %>
