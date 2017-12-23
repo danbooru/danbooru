@@ -15,6 +15,8 @@ class Tag < ApplicationRecord
   validates :name, uniqueness: true, tag_name: true, on: :create
   validates_inclusion_of :category, in: TagCategory.category_ids
 
+  after_save :update_category_cache_for_all, if: :category_changed?
+
   module ApiMethods
     def to_legacy_json
       return {
@@ -221,8 +223,7 @@ class Tag < ApplicationRecord
           tag.update_category_cache
 
           if category_id != tag.category && !tag.is_locked? && ((CurrentUser.is_builder? && tag.post_count < 10_000) || tag.post_count <= 50)
-            tag.update_column(:category, category_id)
-            tag.update_category_cache_for_all
+            tag.update_attribute(:category, category_id)
           end
         end
 

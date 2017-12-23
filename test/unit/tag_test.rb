@@ -112,11 +112,9 @@ class TagTest < ActiveSupport::TestCase
 
     should "reset its category after updating" do
       tag = FactoryGirl.create(:artist_tag)
-      tag.update_category_cache_for_all
       assert_equal(Tag.categories.artist, Cache.get("tc:#{Cache.hash(tag.name)}"))
 
       tag.update_attribute(:category, Tag.categories.copyright)
-      tag.update_category_cache_for_all
       assert_equal(Tag.categories.copyright, Cache.get("tc:#{Cache.hash(tag.name)}"))
     end
 
