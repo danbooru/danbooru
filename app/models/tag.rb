@@ -202,7 +202,7 @@ class Tag < ApplicationRecord
       names.map {|x| find_or_create_by_name(x).name}
     end
 
-    def find_or_create_by_name(name, options = {})
+    def find_or_create_by_name(name, creator: CurrentUser.user)
       name = normalize_name(name)
       category = nil
 
@@ -222,8 +222,8 @@ class Tag < ApplicationRecord
           # next few lines if the category is changed.
           tag.update_category_cache
 
-          if category_id != tag.category && !tag.is_locked? && ((CurrentUser.is_builder? && tag.post_count < 10_000) || tag.post_count <= 50)
-            tag.update_attribute(:category, category_id)
+          if tag.editable_by?(creator)
+            tag.update(category: category_id)
           end
         end
 
@@ -949,7 +949,9 @@ class Tag < ApplicationRecord
   end
 
   def editable_by?(user)
-    user.is_builder? || (user.is_member? && post_count <= 50)
+    return true if !is_locked? && user.is_builder? && post_count < 10_000
+    return true if !is_locked? && user.is_member? && post_count < 50
+    return false
   end
 
   include ApiMethods
