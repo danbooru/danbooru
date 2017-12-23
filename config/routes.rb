@@ -124,7 +124,7 @@ Rails.application.routes.draw do
     end
   end
   resource  :dtext_preview, :only => [:create]
-  resources :favorites
+  resources :favorites, :only => [:index, :create, :destroy]
   resources :favorite_groups do
     member do
       put :add_post
