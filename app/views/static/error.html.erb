@@ -1,4 +1,4 @@
-<% if CurrentUser.user.is_builder? && @exception.present? %>
+<% if CurrentUser.user.try(:is_builder?) && @exception.present? %>
   <h1><%= @exception.class.to_s %> exception raised</h1>
   <ul style="font-family: monospace; font-size: 1.2em; list-style-type: none;">
     <li><%= @exception.message.dup.force_encoding("utf-8") %></li>
