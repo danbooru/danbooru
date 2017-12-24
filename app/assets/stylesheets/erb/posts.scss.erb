@@ -179,45 +179,15 @@ body[data-user-can-approve-posts="true"] .post-preview {
   }
 }
 
-.category-0 a, a.tag-type-0, .ui-state-focus a.tag-type-0 {
-  color: $link_color;
+<% TagCategory.css_mapping.each do |category,cssmap| %>
+  .category-<%= category %> a, a.tag-type-<%= category %>, .ui-state-focus a.tag-type-<%= category %> {
+    color: <%= cssmap["color"] %>;
 
-  &:hover {
-    color: $link_hover_color;
+    &:hover {
+      color: <%= cssmap["hover"] %>;
+    }
   }
-}
-
-.category-1 a, a.tag-type-1, .ui-state-focus a.tag-type-1 {
-  color: #A00;
-
-  &:hover {
-    color: #B66;
-  }
-}
-
-.category-3 a, a.tag-type-3, .ui-state-focus a.tag-type-3 {
-  color: #A0A;
-
-  &:hover {
-    color: #B6B;
-  }
-}
-
-.category-4 a, a.tag-type-4, .ui-state-focus a.tag-type-4 {
-  color: #0A0;
-
-  &:hover {
-    color: #6B6;
-  }
-}
-
-.category-5 a, a.tag-type-5, .ui-state-focus a.tag-type-5 {
-  color: #F80;
-
-  &:hover {
-    color: #FA6;
-  }
-}
+<% end %>
 
 .category-banned a, a.tag-type-banned,, .ui-state-focus a.tag-type-banned {
   color: black;

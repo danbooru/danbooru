@@ -227,7 +227,11 @@ module Danbooru
           "extra" => [],
           "header" => %{<h1 class="general-tag-list">Tags</h1>},
           "humanized" => nil,
-          "relatedbutton" => "General"
+          "relatedbutton" => "General",
+          "css" => {
+            "color" => "$link_color",
+            "hover" => "$link_hover_color"
+          }
         },
         "character" => {
           "category" => 4,
@@ -240,7 +244,11 @@ module Danbooru
             "regexmap" => /^(.+?)(?:_\(.+\))?$/,
             "formatstr" => "%s"
           },
-          "relatedbutton" => "Characters"
+          "relatedbutton" => "Characters",
+          "css" => {
+            "color" => "#0A0",
+            "hover" => "#6B6"
+          }
         },
         "copyright" => {
           "category" => 3,
@@ -253,7 +261,11 @@ module Danbooru
             "regexmap" => //,
             "formatstr" => "(%s)"
           },
-          "relatedbutton" => "Copyrights"
+          "relatedbutton" => "Copyrights",
+          "css" => {
+            "color" => "#A0A",
+            "hover" => "#B6B"
+          }
         },
         "artist" => {
           "category" => 1,
@@ -266,7 +278,11 @@ module Danbooru
             "regexmap" => //,
             "formatstr" => "drawn by %s"
           },
-          "relatedbutton" => "Artists"
+          "relatedbutton" => "Artists",
+          "css" => {
+            "color" => "#A00",
+            "hover" => "#B66"
+          }
         },
         "meta" => {
           "category" => 5,
@@ -274,7 +290,11 @@ module Danbooru
           "extra" => [],
           "header" => %{<h2 class="meta-tag-list">Meta</h2>},
           "humanized" => nil,
-          "relatedbutton" => nil
+          "relatedbutton" => nil,
+          "css" => {
+            "color" => "#F80",
+            "hover" => "#FA6"
+          }
         }
       }
     end
