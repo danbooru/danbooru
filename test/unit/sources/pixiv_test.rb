@@ -217,6 +217,17 @@ module Sources
           assert_includes(@translated_tags, "fate/grand_order")
           assert_equal(false, @translated_tags.grep("fate").any?)
         end
+
+        should "apply aliases to translated tags" do
+          tohsaka_rin = FactoryGirl.create(:tag, name: "tohsaka_rin")
+          toosaka_rin = FactoryGirl.create(:tag, name: "toosaka_rin")
+
+          FactoryGirl.create(:wiki_page, title: "tohsaka_rin", other_names: "遠坂凛")
+          FactoryGirl.create(:wiki_page, title: "toosaka_rin", other_names: "遠坂凛")
+          FactoryGirl.create(:tag_alias, antecedent_name: "tohsaka_rin", consequent_name: "toosaka_rin")
+
+          assert_equal([toosaka_rin], @site.translate_tag("遠坂凛"))
+        end
       end
     end
   end
