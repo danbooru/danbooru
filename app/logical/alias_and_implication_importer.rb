@@ -117,7 +117,6 @@ private
           tag = Tag.find_by_name(token[1])
           tag.category = Tag.categories.value_for(token[2])
           tag.save
-          tag.update_category_cache_for_all
 
         else
           raise "Unknown token: #{token[0]}"
