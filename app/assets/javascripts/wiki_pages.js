@@ -2,7 +2,7 @@
   Danbooru.WikiPage = {};
 
   Danbooru.WikiPage.initialize_all = function() {
-    if ($("#c-wiki-pages").length) {
+    if ($("#c-wiki-pages,#c-wiki-page-versions").length) {
       if (Danbooru.meta("enable-auto-complete") === "true") {
         this.initialize_autocomplete();
       }
