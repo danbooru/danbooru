@@ -20,6 +20,10 @@ class ApplicationController < ActionController::Base
   rescue_from SessionLoader::AuthenticationFailure, :with => :authentication_failed
   rescue_from Danbooru::Paginator::PaginationError, :with => :render_pagination_limit
 
+  # This is raised on requests to `/blah.js`. Rails has already rendered StaticController#not_found
+  # here, so calling `rescue_exception` would cause a double render error.
+  rescue_from ActionController::InvalidCrossOriginRequest, :with => lambda {}
+
   protected
 
   def show_moderation_notice?
