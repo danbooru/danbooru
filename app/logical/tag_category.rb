@@ -34,9 +34,14 @@ class TagCategory
       @@header_mapping ||= Hash[Danbooru.config.full_tag_config_info.map {|k,v| [k,v["header"]]}]
     end
 
-    # Returns a hash mapping for related tag buttons (javascripts/related_tag.js)
+    # Returns a hash mapping for related tag buttons (javascripts/related_tag.js.erb)
     def related_button_mapping
       @@related_button_mapping ||= Hash[Danbooru.config.full_tag_config_info.map {|k,v| [k,v["relatedbutton"]]}]
+    end
+
+    # Returns a hash mapping for CSS (stylesheets/posts.scss.erb)
+    def css_mapping
+      @@css_mapping ||= Hash[Danbooru.config.full_tag_config_info.map {|k,v| [v["category"],v["css"]]}]
     end
   end
 
