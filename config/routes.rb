@@ -45,7 +45,7 @@ Rails.application.routes.draw do
     end
   end
   namespace :explore do
-    resources :posts do
+    resources :posts, :only => [] do
       collection do
         get :popular
         get :viewed
@@ -124,7 +124,7 @@ Rails.application.routes.draw do
     end
   end
   resource  :dtext_preview, :only => [:create]
-  resources :favorites
+  resources :favorites, :only => [:index, :create, :destroy]
   resources :favorite_groups do
     member do
       put :add_post
@@ -196,7 +196,7 @@ Rails.application.routes.draw do
     end
   end
   resources :post_replacements, :only => [:index, :new, :create, :update]
-  resources :posts do
+    resources :posts, :only => [:index, :show, :update] do
     resources :events, :only => [:index], :controller => "post_events"
     resources :replacements, :only => [:index, :new, :create], :controller => "post_replacements"
     resource :artist_commentary, :only => [:index, :show] do
