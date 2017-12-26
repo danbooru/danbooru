@@ -11,6 +11,8 @@ class SessionLoader
   end
 
   def load
+    CurrentUser.user = AnonymousUser.new
+
     if session[:user_id]
       load_session_user
     elsif cookie_password_hash_valid?
@@ -18,18 +20,13 @@ class SessionLoader
     else
       load_session_for_api
     end
-    
-    if CurrentUser.user
-      CurrentUser.user.unban! if CurrentUser.user.ban_expired?
-    else
-      CurrentUser.user = AnonymousUser.new
-    end
 
+    set_statement_timeout
     update_last_logged_in_at
     update_last_ip_addr
     set_time_zone
     store_favorite_tags_in_cookies
-    set_statement_timeout
+    CurrentUser.user.unban! if CurrentUser.user.ban_expired?
   end
 
 private
