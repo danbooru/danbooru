@@ -94,6 +94,7 @@ class Artist < ApplicationRecord
         "nicoseiga.jp",
         "nicoseiga.jp/priv", # http://lohas.nicoseiga.jp/priv/2017365fb6cfbdf47ad26c7b6039feb218c5e2d4/1498430264/6820259
         "nicovideo.jp",
+        "nicovideo.jp/user", # http://www.nicovideo.jp/user/317609
         "nicovideo.jp/user/illust", # http://seiga.nicovideo.jp/user/illust/29075429
         "nijie.info", # http://nijie.info/members.php?id=15235
         "patreon.com", # http://patreon.com/serafleur
