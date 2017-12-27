@@ -93,6 +93,22 @@ class UsersControllerTest < ActionController::TestCase
           assert_equal([], assigns(:user).errors.full_messages)
         end
       end
+
+      should "not allow registering multiple accounts with the same IP" do
+        User.any_instance.unstub(:validate_sock_puppets)
+        request.env["REMOTE_ADDR"] = "1.2.3.4"
+        CurrentUser.user = nil
+
+        post :create, {:user => {:name => "user", :password => "xxxxx1", :password_confirmation => "xxxxx1"}}, {}
+        session.clear
+        post :create, {:user => {:name => "dupe", :password => "xxxxx1", :password_confirmation => "xxxxx1"}}, {}
+
+        assert_equal(true, User.where(name: "user").exists?)
+        assert_equal(false, User.where(name: "dupe").exists?)
+
+        assert_equal(IPAddr.new("1.2.3.4"), User.find_by_name("user").last_ip_addr)
+        assert_match(/Sign up failed: Last ip addr was used recently/, flash[:notice])
+      end
     end
 
     context "edit action" do
