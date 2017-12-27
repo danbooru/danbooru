@@ -42,5 +42,10 @@ div.ui-dialog {
 }
 
 .ui-button:hover {
-  box-shadow: 1px 1px grey;  
+  box-shadow: 1px 1px grey;
+  transform: translateY(-1px);
+
+  &.gradient {
+    background: linear-gradient(#fefefe, #f0f0f0);
+  }
 }

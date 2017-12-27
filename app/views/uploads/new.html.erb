@@ -69,25 +69,27 @@
           <%= f.text_field :parent_id %>
         </div>
 
-        <strong>Commentary</strong>
-        <a href="#" id="toggle-artist-commentary">show »</a>
+        <div class="input">
+          <strong>Commentary</strong>
+          <a href="#" id="toggle-artist-commentary">show »</a>
 
-        <div class="artist-commentary" style="display: none;">
-          <div class="input">
-            <%= f.label :artist_commentary_title, "Title" %>
-            <%= f.text_field :artist_commentary_title %>
-          </div>
+          <div class="artist-commentary" style="display: none;">
+            <div class="input">
+              <%= f.label :artist_commentary_title, "Title" %>
+              <%= f.text_field :artist_commentary_title %>
+            </div>
 
-          <div class="input">
-            <%= f.label :artist_commentary_desc, "Description" %>
-            <%= f.text_area :artist_commentary_desc, :size => "60x5" %>
-          </div>
+            <div class="input">
+              <%= f.label :artist_commentary_desc, "Description" %>
+              <%= f.text_area :artist_commentary_desc, :size => "60x5" %>
+            </div>
 
-          <div class="input">
-            <label for="upload_include_artist_commentary">
-              <%= f.check_box :include_artist_commentary %>
-              Include Commentary
-            </label>
+            <div class="input">
+              <label for="upload_include_artist_commentary">
+                <%= f.check_box :include_artist_commentary %>
+                Include Commentary
+              </label>
+            </div>
           </div>
         </div>
 
