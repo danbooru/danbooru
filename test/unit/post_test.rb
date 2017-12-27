@@ -1636,6 +1636,11 @@ class PostTest < ActiveSupport::TestCase
         should "warn when missing a copyright tag" do
           assert_match(/Copyright tag is required/, @post.warnings.full_messages.join)
         end
+
+        should "warn when an upload doesn't have enough tags" do
+          post = FactoryGirl.create(:post, tag_string: "tagme")
+          assert_match(/Uploads must have at least \d+ general tags/, post.warnings.full_messages.join)
+        end
       end
     end
   end

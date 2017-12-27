@@ -22,6 +22,7 @@ class Post < ApplicationRecord
   validate :removed_tags_are_valid
   validate :has_artist_tag
   validate :has_copyright_tag
+  validate :has_enough_tags
   validate :post_is_not_its_own_parent
   validate :updater_can_change_rating
   before_save :update_tag_post_counts
@@ -1792,6 +1793,14 @@ class Post < ApplicationRecord
       return if has_tag?("copyright_request") || tags.any? { |t| t.category == Tag.categories.copyright }
 
       self.warnings[:base] << "Copyright tag is required. Consider adding [[copyright request]] or [[original]]"
+    end
+
+    def has_enough_tags
+      return if !new_record?
+
+      if tags.count { |t| t.category == Tag.categories.general } < 10
+        self.warnings[:base] << "Uploads must have at least 10 general tags. Read [[howto:tag]] for guidelines on tagging your uploads"
+      end
     end
   end
   
