@@ -1,0 +1,23 @@
+<p>
+  As a general rule, you should only approve of posts that you personally like. Posts that are not approved in three days will be automatically deleted. 
+</p>
+
+<p>
+  Posts with score -3 or lower are marked red.
+  Posts with score 3 or higher are marked green. 
+  Posts with the 
+    <%= link_to "hard translated", wiki_pages_path(title: "hard_translated") %>, 
+    <%= link_to "self upload", wiki_pages_path(title: "self_upload") %>, 
+    <%= link_to "nude filter", wiki_pages_path(title: "nude_filter") %>, 
+    <%= link_to "photoshop", wiki_pages_path(title: "photoshop") %>, or 
+    <%= link_to "screencap", wiki_pages_path(title: "screencap") %> 
+    tag are marked in yellow. 
+  Posts with the 
+    <%= link_to "duplicate", wiki_pages_path(title: "duplicate") %>, 
+    <%= link_to "image sample", wiki_pages_path(title: "image_sample") %>, 
+    <%= link_to "md5 mismatch", wiki_pages_path(title: "md5_mismatch") %>, 
+    <%= link_to "resized", wiki_pages_path(title: "resized") %>, 
+    <%= link_to "upscaled", wiki_pages_path(title: "upscaled") %>, or 
+    <%= link_to "downscaled", wiki_pages_path(title: "downscaled") %> 
+    tag are marked in light red.
+</p>

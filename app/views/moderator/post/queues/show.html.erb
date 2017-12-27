@@ -13,8 +13,10 @@
 
       <div id="moderation-guideline">
         <h1>Deletion Guidelines</h1>
+
+        <%= render "desc" %>
+
         <p>
-          As a general rule, you should only approve of posts that you personally like. Posts that are not approved in three days will be automatically deleted. Posts with score -3 or lower are marked red. Posts with score 3 or higher are marked green. Posts with the duplicate tag are marked in yellow.
           <% if params[:hidden] %>
             <%= link_to "View pending posts", moderator_post_queue_path(:query => params[:query], :hidden => nil) %>.
           <% else %>
