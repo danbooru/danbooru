@@ -14,10 +14,10 @@
 
       <%= submit_tag "Submit" %>
     <% end %>
-
-    <%= render "sessions/secondary_links" %>
   </div>
 </div>
+
+<%= render "sessions/secondary_links" %>
 
 <% content_for(:page_title) do %>
   Login Reminder - <%= Danbooru.config.app_name %>

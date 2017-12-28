@@ -1,7 +1,11 @@
 <%= error_messages_for("forum_post") %>
 
 <%= simple_form_for(forum_post) do |f| %>
-  <%= f.input :topic_id, :as => :hidden %>
+  <% if @forum_topic %>
+    <%= f.input :topic_id, :as => :hidden %>
+  <% else %>
+    <%= f.input :topic_id, :label => "Topic ID" %>
+  <% end %>
   <%= dtext_field "forum_post", "body", :classes => "autocomplete-mentions" %>
 
   <%= f.button :submit, "Submit", :data => { :disable_with => "Submitting..." } %>

@@ -1,19 +1,23 @@
-<h1>Tag Implication: <%= @tag_implication.antecedent_name %> -&gt; <%= @tag_implication.consequent_name %></h1>
+<div id="c-tag-implications">
+  <div id="a-show">
+    <h1>Tag Implication: <%= @tag_implication.antecedent_name %> -&gt; <%= @tag_implication.consequent_name %></h1>
 
-<ul>
-  <li><strong>From</strong> <%= link_to @tag_implication.antecedent_name, posts_path(:tags => @tag_implication.antecedent_name) %></li>
-  <li><strong>To</strong> <%= link_to @tag_implication.consequent_name, posts_path(:tags => @tag_implication.consequent_name) %></li>
-  <% if @tag_implication.forum_topic_id %>
-    <li><strong>Reference</strong> <%= link_to "topic ##{@tag_implication.forum_topic_id}", forum_topic_path(@tag_implication.forum_topic_id) %></li>
-  <% end %>
-  <li><strong>Creator</strong> <%= link_to_user @tag_implication.creator %></li>
-  <li><strong>Date</strong> <%= @tag_implication.created_at %></li>
-  <% if @tag_implication.respond_to?(:reason) && @tag_implication.reason.present? %>
-    <li><strong>Reason</strong> <%= format_text @tag_implication.reason %></li>
-  <% end %>
-</ul>
+    <ul>
+      <li><strong>From</strong> <%= link_to @tag_implication.antecedent_name, posts_path(:tags => @tag_implication.antecedent_name) %></li>
+      <li><strong>To</strong> <%= link_to @tag_implication.consequent_name, posts_path(:tags => @tag_implication.consequent_name) %></li>
+      <% if @tag_implication.forum_topic_id %>
+        <li><strong>Reference</strong> <%= link_to "topic ##{@tag_implication.forum_topic_id}", forum_topic_path(@tag_implication.forum_topic_id) %></li>
+      <% end %>
+      <li><strong>Creator</strong> <%= link_to_user @tag_implication.creator %></li>
+      <li><strong>Date</strong> <%= @tag_implication.created_at %></li>
+      <% if @tag_implication.respond_to?(:reason) && @tag_implication.reason.present? %>
+        <li><strong>Reason</strong> <%= format_text @tag_implication.reason %></li>
+      <% end %>
+    </ul>
+  </div>
+</div>
 
-<%= render "tag_implications/secondary_links" %>
+<%= render "secondary_links" %>
 
 <% content_for(:page_title) do %>
   Tag Implication - <%= Danbooru.config.app_name %>

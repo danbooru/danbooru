@@ -1,9 +1,13 @@
-<h1>Unsubscribe</h1>
+<div id="c-maintenance-user-email-notifications">
+  <div id="a-show">
+    <h1>Unsubscribe</h1>
 
-<p>Do you wish to stop receiving all email notifications?</p>
+    <p>Do you wish to stop receiving all email notifications?</p>
 
-<%= form_tag(maintenance_user_email_notification_path, :method => "delete") do %>
-  <%= hidden_field_tag "sig", params[:sig] %>
-  <%= hidden_field_tag "user_id", params[:user_id] %>
-  <%= submit_tag "Yes" %>
-<% end %>
+    <%= form_tag(maintenance_user_email_notification_path, :method => "delete") do %>
+      <%= hidden_field_tag "sig", params[:sig] %>
+      <%= hidden_field_tag "user_id", params[:user_id] %>
+      <%= submit_tag "Yes" %>
+    <% end %>
+  </div>
+</div>

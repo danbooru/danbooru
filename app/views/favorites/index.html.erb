@@ -37,12 +37,11 @@
         <%= sequential_paginator(@favorite_set.favorites) %>
       </div>
     </section>
-
-    <% content_for(:page_title) do %>
-      Favorites - <%= @user.pretty_name %> - <%= Danbooru.config.app_name %>
-    <% end %>
-
-    <%= render "posts/partials/common/secondary_links" %>
   </div>
 </div>
 
+<%= render "posts/partials/common/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Favorites - <%= @user.pretty_name %> - <%= Danbooru.config.app_name %>
+<% end %>

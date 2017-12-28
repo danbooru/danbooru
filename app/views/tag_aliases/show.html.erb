@@ -1,19 +1,23 @@
-<h1>Tag Alias: <%= @tag_alias.antecedent_name %> -&gt; <%= @tag_alias.consequent_name %></h1>
+<div id="c-tag-aliases">
+  <div id="a-show">
+    <h1>Tag Alias: <%= @tag_alias.antecedent_name %> -&gt; <%= @tag_alias.consequent_name %></h1>
 
-<ul>
-  <li><strong>From</strong> <%= link_to @tag_alias.antecedent_name, posts_path(:tags => @tag_alias.antecedent_name) %></li>
-  <li><strong>To</strong> <%= link_to @tag_alias.consequent_name, posts_path(:tags => @tag_alias.consequent_name) %></li>
-  <% if @tag_alias.forum_topic_id %>
-    <li><strong>Reference</strong> <%= link_to "topic ##{@tag_alias.forum_topic_id}", forum_topic_path(@tag_alias.forum_topic_id) %></li>
-  <% end %>
-  <li><strong>Creator</strong> <%= link_to_user @tag_alias.creator %></li>
-  <li><strong>Date</strong> <%= @tag_alias.created_at %></li>
-  <% if @tag_alias.respond_to?(:reason) && @tag_alias.reason.present? %>
-    <li><strong>Reason</strong> <%= format_text @tag_alias.reason %></li>
-  <% end %>
-</ul>
+    <ul>
+      <li><strong>From</strong> <%= link_to @tag_alias.antecedent_name, posts_path(:tags => @tag_alias.antecedent_name) %></li>
+      <li><strong>To</strong> <%= link_to @tag_alias.consequent_name, posts_path(:tags => @tag_alias.consequent_name) %></li>
+      <% if @tag_alias.forum_topic_id %>
+        <li><strong>Reference</strong> <%= link_to "topic ##{@tag_alias.forum_topic_id}", forum_topic_path(@tag_alias.forum_topic_id) %></li>
+      <% end %>
+      <li><strong>Creator</strong> <%= link_to_user @tag_alias.creator %></li>
+      <li><strong>Date</strong> <%= @tag_alias.created_at %></li>
+      <% if @tag_alias.respond_to?(:reason) && @tag_alias.reason.present? %>
+        <li><strong>Reason</strong> <%= format_text @tag_alias.reason %></li>
+      <% end %>
+    </ul>
+  </div>
+</div>
 
-<%= render "tag_aliases/secondary_links" %>
+<%= render "secondary_links" %>
 
 <% content_for(:page_title) do %>
   Tag Alias - <%= Danbooru.config.app_name %>

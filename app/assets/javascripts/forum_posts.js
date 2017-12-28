@@ -2,7 +2,7 @@
   Danbooru.ForumPost = {};
 
   Danbooru.ForumPost.initialize_all = function() {
-    if ($("#c-forum-topics #a-show").length) {;
+    if ($("#c-forum-topics #a-show,#c-forum-posts #a-show").length) {;
       this.initialize_edit_links();
 
       Danbooru.keydown("e", "edit", function(e) {

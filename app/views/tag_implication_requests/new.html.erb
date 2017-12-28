@@ -1,5 +1,5 @@
-<div id="c-tag-implications">
-  <div id="a-request-new">
+<div id="c-tag-implication-requests">
+  <div id="a-new">
     <h1>Tag Implication Request</h1>
 
     <%= error_messages_for :tag_implication_request %>
@@ -34,10 +34,10 @@
         <%= dtext_preview_button "tag_implication_request", "reason" %>
       </div>
     <% end %>
-
-    <%= render "tag_implications/secondary_links" %>
   </div>
 </div>
+
+<%= render "tag_implications/secondary_links" %>
 
 <% content_for(:page_title) do %>
   Tag Implication Request - <%= Danbooru.config.app_name %>

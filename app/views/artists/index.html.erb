@@ -28,10 +28,10 @@
     </table>
 
     <%= numbered_paginator(@artists) %>
-
-    <%= render "secondary_links" %>
   </div>
 </div>
+
+<%= render "secondary_links" %>
 
 <% content_for(:page_title) do %>
   Artists - <%= Danbooru.config.app_name %>

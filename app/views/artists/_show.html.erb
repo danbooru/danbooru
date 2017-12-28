@@ -21,10 +21,10 @@
         <%= @post_set.presenter.post_previews_html(self) %>
       </div>
     </div>
-
-    <%= render "secondary_links" %>
   </div>
 </div>
+
+<%= render "secondary_links" %>
 
 <% content_for(:page_title) do %>
   Artist - <%= @artist.name %> - <%= Danbooru.config.app_name %>
