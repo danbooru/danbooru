@@ -1,33 +1,35 @@
-<div>
-  <h1>Related tags</h1>
-  <section>
-    <%= form_tag(related_tag_path, :method => :get) do %>
-      <%= text_field_tag "query", params[:query], :data => { :autocomplete => "tag" } %>
-      <%= select_tag "category", options_for_select([""] + TagCategory.canonical_mapping.map{|x| [x.first, x.first.downcase]}, params[:category]) %>
-      <%= submit_tag "Show"%>
-    <% end %>
-  </section>
-  <% if params[:query].present? %>
+<div id="c-related-tags">
+  <div id="a-show">
+    <h1>Related tags</h1>
     <section>
-      <table class="striped">
-        <thead>
-          <tr>
-            <th>Name</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @query.tags_for_html.each do |tag, category| %>
-            <tr>
-              <td class="category-<%= category %>">
-                <%= link_to("?", show_or_new_wiki_pages_path(:title => tag)) %>
-                <%= link_to(tag, posts_path(:tags => tag)) %>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
+      <%= form_tag(related_tag_path, :method => :get) do %>
+        <%= text_field_tag "query", params[:query], :data => { :autocomplete => "tag" } %>
+        <%= select_tag "category", options_for_select([""] + TagCategory.canonical_mapping.map{|x| [x.first, x.first.downcase]}, params[:category]) %>
+        <%= submit_tag "Show"%>
+      <% end %>
     </section>
-   <% end %>
+    <% if params[:query].present? %>
+      <section>
+        <table class="striped">
+          <thead>
+            <tr>
+              <th>Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @query.tags_for_html.each do |tag, category| %>
+              <tr>
+                <td class="category-<%= category %>">
+                  <%= link_to("?", show_or_new_wiki_pages_path(:title => tag)) %>
+                  <%= link_to(tag, posts_path(:tags => tag)) %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </section>
+     <% end %>
+  </div>
 </div>
 
 <%= render "tags/secondary_links" %>

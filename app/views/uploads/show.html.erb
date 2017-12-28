@@ -1,41 +1,45 @@
-<h1>Upload #<%= @upload.id %></h1>
+<div id="c-uploads">
+  <div id="a-show">
+    <h1>Upload #<%= @upload.id %></h1>
 
-<ul>
-  <li>Date: <%= @upload.created_at %></li>
-  <li>Source: <%= @upload.source %></li>
-  <li>Tags: <%= @upload.tag_string %></li>
-</ul>
-
-<% if @upload.is_completed? %>
-  <p>This upload has finished processing. <%= link_to "View the post", post_path(@upload.post_id) %>.</p>
-<% elsif @upload.is_pending? %>
-  <p>This upload is waiting to be processed. Please wait a few seconds.</p>
-<% elsif @upload.is_processing? %>
-  <p>This upload is being processed. Please wait a few seconds.</p>
-<% elsif @upload.is_duplicate? %>
-  <p>This upload is a duplicate: <%= link_to "post ##{@upload.duplicate_post_id}", post_path(@upload.duplicate_post_id) %></p>
-<% else %>
-  <p>An error occurred: <%= @upload.status %></p>
-  <% if CurrentUser.user.is_builder? %>
     <ul>
-      <% @upload.backtrace.to_s.split(/\n/).each do |line| %>
-        <li><%= line %></li>
-      <% end %>
+      <li>Date: <%= @upload.created_at %></li>
+      <li>Source: <%= @upload.source %></li>
+      <li>Tags: <%= @upload.tag_string %></li>
     </ul>
-  <% end %>
-  <% if @upload.is_downloadable? %>
-    <%= form_tag(upload_path(@upload), :method => :put) do %>
-      <% submit_tag "Retry" %>
-    <% end %>
-  <% end %>
-<% end %>
 
-<p>
-  You can <%= link_to "upload another file", new_upload_path %> or <%= link_to "view your current uploads", uploads_path(:search => {:uploader_id => CurrentUser.id}) %>.
-  <% if CurrentUser.user.is_moderator? && @upload.is_pending? %>
-    <%= link_to "Force update", upload_path(@upload, :format => "js"), :remote => true, :method => :put %>.
-  <% end %>
-</p>
+    <% if @upload.is_completed? %>
+      <p>This upload has finished processing. <%= link_to "View the post", post_path(@upload.post_id) %>.</p>
+    <% elsif @upload.is_pending? %>
+      <p>This upload is waiting to be processed. Please wait a few seconds.</p>
+    <% elsif @upload.is_processing? %>
+      <p>This upload is being processed. Please wait a few seconds.</p>
+    <% elsif @upload.is_duplicate? %>
+      <p>This upload is a duplicate: <%= link_to "post ##{@upload.duplicate_post_id}", post_path(@upload.duplicate_post_id) %></p>
+    <% else %>
+      <p>An error occurred: <%= @upload.status %></p>
+      <% if CurrentUser.user.is_builder? %>
+        <ul>
+          <% @upload.backtrace.to_s.split(/\n/).each do |line| %>
+            <li><%= line %></li>
+          <% end %>
+        </ul>
+      <% end %>
+      <% if @upload.is_downloadable? %>
+        <%= form_tag(upload_path(@upload), :method => :put) do %>
+          <% submit_tag "Retry" %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <p>
+      You can <%= link_to "upload another file", new_upload_path %> or <%= link_to "view your current uploads", uploads_path(:search => {:uploader_id => CurrentUser.id}) %>.
+      <% if CurrentUser.user.is_moderator? && @upload.is_pending? %>
+        <%= link_to "Force update", upload_path(@upload, :format => "js"), :remote => true, :method => :put %>.
+      <% end %>
+    </p>
+  </div>
+</div>
 
 <%= render "posts/partials/common/secondary_links" %>
 

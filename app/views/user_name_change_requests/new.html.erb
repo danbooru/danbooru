@@ -1,20 +1,24 @@
-<h1>Name Change Request</h1>
+<div id="c-user-name-change-requests">
+  <div id="a-new">
+    <h1>Name Change Request</h1>
 
-<p>You can request a name change once per week. Your previous names will still
-be visible on your profile to other Danbooru members, but they won't be visible
-to search engines.</p>
+    <p>You can request a name change once per week. Your previous names will still
+    be visible on your profile to other Danbooru members, but they won't be visible
+    to search engines.</p>
 
-<%= error_messages_for "change_request" %>
+    <%= error_messages_for "change_request" %>
 
-<%= form_tag(user_name_change_requests_path, :class => "simple_form") do %>
-  <div class="input">
-    <label for="desired_name">Desired Name</label>
-    <%= text_field_tag "desired_name" %>
+    <%= form_tag(user_name_change_requests_path, :class => "simple_form") do %>
+      <div class="input">
+        <label for="desired_name">Desired Name</label>
+        <%= text_field_tag "desired_name" %>
+      </div>
+
+      <div class="input">
+        <%= submit_tag "Submit", :data => { :disable_with => "Submitting..." } %>
+      </div>
+    <% end %>
   </div>
-  
-  <div class="input">
-    <%= submit_tag "Submit", :data => { :disable_with => "Submitting..." } %>
-  </div>
-<% end %>
+</div>
 
 <%= render "secondary_links" %>

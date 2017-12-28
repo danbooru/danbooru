@@ -1,46 +1,48 @@
 <div id="c-user-name-change-requests">
-  <h1>Name Change Requests</h1>
-  
-  <table class="striped" width="100%">
-    <thead>
-      <tr>
-        <th>User</th>
-        <th>Request</th>
-        <th>Reason</th>
-        <th>Status</th>
-        <th>Date</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @change_requests.each do |change_request| %>
+  <div id="a-index">
+    <h1>Name Change Requests</h1>
+
+    <table class="striped" width="100%">
+      <thead>
         <tr>
-          <td><%= link_to_user change_request.user %></td>
-          <td>
-            <strong><%= change_request.original_name %></strong> ->
-            <strong><%= change_request.desired_name %></strong>
-          </td>
-          <td>
-            <% if CurrentUser.is_admin? || CurrentUser.user == change_request.user %>
-              <%= change_request.change_reason %>
-            <% end %>
-          </td>
-          <td>
-            <%= change_request.status %>
-            <% if change_request.approved? %>
-              by <%= link_to_user change_request.approver %>
-            <% elsif change_request.rejected? %>
-              for reason: <%= link_to change_request.rejection_reason %>
-            <% end %>
-          </td>
-          <td><%= compact_time change_request.created_at %></td>
-          <td><%= link_to "view", user_name_change_request_path(change_request) %></td>
+          <th>User</th>
+          <th>Request</th>
+          <th>Reason</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th></th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
-  
-  <%= numbered_paginator(@change_requests) %>
+      </thead>
+      <tbody>
+        <% @change_requests.each do |change_request| %>
+          <tr>
+            <td><%= link_to_user change_request.user %></td>
+            <td>
+              <strong><%= change_request.original_name %></strong> ->
+              <strong><%= change_request.desired_name %></strong>
+            </td>
+            <td>
+              <% if CurrentUser.is_admin? || CurrentUser.user == change_request.user %>
+                <%= change_request.change_reason %>
+              <% end %>
+            </td>
+            <td>
+              <%= change_request.status %>
+              <% if change_request.approved? %>
+                by <%= link_to_user change_request.approver %>
+              <% elsif change_request.rejected? %>
+                for reason: <%= link_to change_request.rejection_reason %>
+              <% end %>
+            </td>
+            <td><%= compact_time change_request.created_at %></td>
+            <td><%= link_to "view", user_name_change_request_path(change_request) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <%= numbered_paginator(@change_requests) %>
+  </div>
 </div>
 
 <%= render "secondary_links" %>
