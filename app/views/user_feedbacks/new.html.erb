@@ -14,10 +14,10 @@
       <%= f.button :submit, "Submit", :data => { :disable_with => "Submitting..." } %>
       <%= dtext_preview_button "user_feedback", "body" %>
     <% end %>
-
-    <%= render "secondary_links" %>
   </div>
 </div>
+
+<%= render "secondary_links" %>
 
 <% content_for(:page_title) do %>
   New Feedback - <%= Danbooru.config.app_name %>

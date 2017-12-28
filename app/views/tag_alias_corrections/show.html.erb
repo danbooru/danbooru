@@ -22,11 +22,11 @@
       <%= submit_tag "Fix" %>
       <%= submit_tag "Cancel" %>
     <% end %>
-
-    <%= render "tag_aliases/secondary_links" %>
-
-    <% content_for(:page_title) do %>
-      Tag Alias Correction - <%= Danbooru.config.app_name %>
-    <% end %>
   </div>
 </div>
+
+<%= render "tag_aliases/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Tag Alias Correction - <%= Danbooru.config.app_name %>
+<% end %>

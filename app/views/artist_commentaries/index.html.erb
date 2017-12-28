@@ -34,10 +34,10 @@
     </table>
 
     <%= numbered_paginator(@commentaries) %>
-
-    <%= render "secondary_links" %>
   </div>
 </div>
+
+<%= render "secondary_links" %>
 
 <% content_for(:page_title) do %>
   Artist Commentary - <%= Danbooru.config.app_name %>

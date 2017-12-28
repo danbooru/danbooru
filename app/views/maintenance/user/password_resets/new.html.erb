@@ -13,10 +13,10 @@
       </div>
       <%= submit_tag "Submit" %>
     <% end %>
-
-    <%= render "sessions/secondary_links" %>
   </div>
 </div>
+
+<%= render "sessions/secondary_links" %>
 
 <% content_for(:page_title) do %>
   Reset Password - <%= Danbooru.config.app_name %>

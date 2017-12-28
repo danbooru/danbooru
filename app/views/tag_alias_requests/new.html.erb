@@ -34,10 +34,10 @@
         <%= dtext_preview_button "tag_alias_request", "reason" %>
       </div>
     <% end %>
-
-    <%= render "tag_aliases/secondary_links" %>
   </div>
 </div>
+
+<%= render "tag_aliases/secondary_links" %>
 
 <% content_for(:page_title) do %>
   Tag Alias Request - <%= Danbooru.config.app_name %>

@@ -34,10 +34,10 @@
     </table>
 
     <%= numbered_paginator(@pools) %>
-
-    <%= render "secondary_links" %>
   </div>
 </div>
+
+<%= render "secondary_links" %>
 
 <% content_for(:page_title) do %>
   Pools - <%= Danbooru.config.app_name %>

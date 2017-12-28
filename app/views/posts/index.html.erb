@@ -41,19 +41,6 @@
       <%= render "posts/partials/index/posts", :post_set => @post_set %>
     </section>
     
-    <% content_for(:page_title) do %>
-      <% if @post_set.tag_string.present? %>
-        <%= @post_set.humanized_tag_string %> - <%= Danbooru.config.app_name %>
-      <% else %>
-        <%= Danbooru.config.app_name %>
-      <% end %>
-    <% end %>
-
-    <% if params[:tags] =~ /search:/ %>
-      <%= render "saved_searches/secondary_links" %>
-    <% else %>
-      <%= render "posts/partials/common/secondary_links" %>
-    <% end %>
 
     <%= post_search_count_js %>
 
@@ -62,6 +49,20 @@
     </div>
   </div>
 </div>
+
+<% if params[:tags] =~ /search:/ %>
+  <%= render "saved_searches/secondary_links" %>
+<% else %>
+  <%= render "posts/partials/common/secondary_links" %>
+<% end %>
+
+<% content_for(:page_title) do %>
+  <% if @post_set.tag_string.present? %>
+    <%= @post_set.humanized_tag_string %> - <%= Danbooru.config.app_name %>
+  <% else %>
+    <%= Danbooru.config.app_name %>
+  <% end %>
+<% end %>
 
 <%= content_for(:html_header) do %>
   <link href="<%= posts_path(:format => 'atom', :tags => params[:tags]) %>" rel="alternate" title="ATOM" type="application/atom+xml" />

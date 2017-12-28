@@ -14,11 +14,11 @@
         <li><strong>Reason</strong> <%= format_text @tag_alias.reason %></li>
       <% end %>
     </ul>
-
-    <%= render "tag_aliases/secondary_links" %>
-
-    <% content_for(:page_title) do %>
-      Tag Alias - <%= Danbooru.config.app_name %>
-    <% end %>
   </div>
 </div>
+
+<%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Tag Alias - <%= Danbooru.config.app_name %>
+<% end %>
