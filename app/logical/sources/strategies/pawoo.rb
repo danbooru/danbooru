@@ -56,7 +56,7 @@ module Sources::Strategies
 
     def normalize_for_artist_finder!
       get
-      @profile_url
+      @profile_url || @url
     end
 
     def dtext_artist_commentary_desc
