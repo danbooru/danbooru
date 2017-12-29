@@ -1646,11 +1646,14 @@ class Post < ApplicationRecord
       where("uploader_id = ?", user_id)
     end
 
-    def available_for_moderation(hidden)
+    def available_for_moderation(hidden, user = CurrentUser.user)
+      approved_posts = user.post_approvals.select(:post_id)
+      disapproved_posts = user.post_disapprovals.select(:post_id)
+
       if hidden.present?
-        where("posts.id IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id)
+        where("posts.uploader_id = ? OR posts.id IN (#{approved_posts.to_sql}) OR posts.id IN (#{disapproved_posts.to_sql})", user.id)
       else
-        where("posts.id NOT IN (SELECT pd.post_id FROM post_disapprovals pd WHERE pd.user_id = ?)", CurrentUser.id)
+        where.not(uploader: user).where.not(id: approved_posts).where.not(id: disapproved_posts)
       end
     end
 
