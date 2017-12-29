@@ -56,7 +56,10 @@ class UploadsController < ApplicationController
 
     if @upload.errors.empty?
       post = @upload.process!
-      flash[:notice] = post.warnings.full_messages.join(".\n \n") if post.present? && post.warnings.any?
+
+      if post.present? && post.valid? && post.warnings.any?
+        flash[:notice] = post.warnings.full_messages.join(".\n \n")
+      end
     end
 
     save_recent_tags
