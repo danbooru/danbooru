@@ -23,7 +23,7 @@ class Dmail < ApplicationRecord
   after_initialize :initialize_attributes, if: :new_record?
   before_create :auto_read_if_filtered
   after_create :update_recipient
-  after_create :send_dmail
+  after_commit :send_email, on: :create
 
   rakismet_attrs author: :from_name, author_email: :from_email, content: :title_and_body, user_ip: :creator_ip_addr_str
 
@@ -247,7 +247,7 @@ class Dmail < ApplicationRecord
     "[quote]\n#{from_name} said:\n\n#{body}\n[/quote]\n\n"
   end
 
-  def send_dmail
+  def send_email
     if !is_spam? && to.receive_email_notifications? && to.email =~ /@/ && owner_id == to.id
       UserMailer.dmail_notice(self).deliver_now
     end
