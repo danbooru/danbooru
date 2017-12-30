@@ -505,6 +505,10 @@ module Danbooru
       true
     end
 
+    def image_magick_srgb_profile_path
+      # "/usr/share/ghostscript/9.06/Resource/ColorSpace/sRGB"
+    end
+
     # For downloads, if the host matches any of these IPs, block it
     def banned_ip_for_download?(ip_addr)
       raise ArgumentError unless ip_addr.is_a?(IPAddr)
@@ -660,6 +664,16 @@ module Danbooru
     end
 
     def rakismet_url
+    end
+
+    # Cloudflare data
+    def cloudflare_email
+    end
+
+    def cloudflare_zone
+    end
+
+    def cloudflare_key
     end
   end
 
