@@ -1,0 +1,34 @@
+<div id="c-iqdb-queries">
+  <div id="a-check">
+    <h1>IQDB Queries</h1>
+    <section>
+      <%= form_tag(check_iqdb_queries_path, :method => :get, :class => "simple_form inline-form" ) do %>
+        <div class="input string optional">
+          <%= label_tag "url", "URL", class: "string optional" %>
+          <%= text_field_tag "url", params[:url] %>
+        </div>
+        <div class="input string optional">
+          <%= label_tag "post_id", "Post ID", class: "string optional" %>
+          <%= text_field_tag "post_id", params[:post_id] %>
+        </div>
+        <%= submit_tag "Check" %>
+      <% end %>
+    </section>
+    <% if params[:url].present? || params[:post_id].present? %>
+      <section>
+        <h2>Similar results</h2>
+        <% if @results.any? %>
+          <% @results.each do |match| %>
+            <%= PostPresenter.preview(match[:post], :tags => "status:any", :size => true, :similarity => match[:score]) %>
+          <% end %>
+        <% else %>
+          <p>No matches found</p>
+        <% end %>
+      </section>
+     <% end %>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  IQDB Queries - <%= Danbooru.config.app_name %>
+<% end %>
