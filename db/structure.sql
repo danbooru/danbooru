@@ -3010,8 +3010,8 @@ CREATE TABLE tags (
     category integer DEFAULT 0 NOT NULL,
     related_tags text,
     related_tags_updated_at timestamp without time zone,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     is_locked boolean DEFAULT false NOT NULL
 );
 
@@ -7541,7 +7541,9 @@ INSERT INTO schema_migrations (version) VALUES ('20171106075030');
 
 INSERT INTO schema_migrations (version) VALUES ('20171127195124');
 
+INSERT INTO schema_migrations (version) VALUES ('20171218213037');
+
 INSERT INTO schema_migrations (version) VALUES ('20171219001521');
 
-INSERT INTO schema_migrations (version) VALUES ('20171218213037');
+INSERT INTO schema_migrations (version) VALUES ('20171230220225');
 
