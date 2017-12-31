@@ -146,16 +146,7 @@ module PostSets
     end
 
     def hide_from_crawler?
-      return true if !is_single_tag?
-      return true if is_pattern_search?
-      return true if page.to_i > 1
-      return true if is_metatag_search?
-      false
-    end
-
-    def is_metatag_search?
-      # filter out some common metatags
-      tag_string =~ /(?:rating|user|fav|status|order|source|score|width|height):/
+      !is_simple_tag? || page.to_i > 1
     end
 
     def is_single_tag?
