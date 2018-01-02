@@ -16,7 +16,6 @@ class PostTest < ActiveSupport::TestCase
     super
 
     Timecop.travel(2.weeks.ago) do
-      User.any_instance.stubs(:validate_sock_puppets).returns(true)
       @user = FactoryGirl.create(:user)
     end
     CurrentUser.user = @user

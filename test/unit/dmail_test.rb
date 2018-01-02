@@ -3,7 +3,6 @@ require 'test_helper'
 class DmailTest < ActiveSupport::TestCase
   context "A dmail" do
     setup do
-      User.any_instance.stubs(:validate_sock_puppets).returns(true)
       @user = FactoryGirl.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "1.2.3.4"

@@ -1,11 +1,6 @@
 require 'test_helper'
 
 class BanTest < ActiveSupport::TestCase
-  def setup
-    super
-    User.any_instance.stubs(:validate_sock_puppets).returns(true)
-  end
-
   context "A ban" do
     context "created by an admin" do
       setup do

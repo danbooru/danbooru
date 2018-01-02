@@ -76,7 +76,7 @@ class User < ApplicationRecord
   validates_presence_of :email, :if => lambda {|rec| rec.new_record? && Danbooru.config.enable_email_verification?}
   validates_presence_of :comment_threshold
   validate :validate_ip_addr_is_not_banned, :on => :create
-  validate :validate_sock_puppets, :on => :create
+  validate :validate_sock_puppets, :on => :create, :if => lambda { Danbooru.config.enable_sock_puppet_validation? }
   before_validation :normalize_blacklisted_tags
   before_validation :set_per_page
   before_validation :normalize_email

@@ -15,8 +15,6 @@ class ArtistTest < ActiveSupport::TestCase
 
   context "An artist" do
     setup do
-      User.any_instance.stubs(:validate_sock_puppets).returns(true)
-
       user = Timecop.travel(1.month.ago) {FactoryGirl.create(:user)}
       CurrentUser.user = user
       CurrentUser.ip_addr = "127.0.0.1"

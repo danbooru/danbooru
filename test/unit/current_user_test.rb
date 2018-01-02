@@ -2,7 +2,6 @@ require 'test_helper'
 
 class CurrentUserTest < ActiveSupport::TestCase
   setup do
-    User.any_instance.stubs(:validate_sock_puppets).returns(true)
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
   end

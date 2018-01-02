@@ -563,6 +563,11 @@ module Danbooru
       false
     end
 
+    # disable this for tests
+    def enable_sock_puppet_validation?
+      true
+    end
+
     # reportbooru options - see https://github.com/r888888888/reportbooru
     def reportbooru_server
     end

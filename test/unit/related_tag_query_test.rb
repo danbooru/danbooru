@@ -2,7 +2,6 @@ require 'test_helper'
 
 class RelatedTagQueryTest < ActiveSupport::TestCase
   setup do
-    User.any_instance.stubs(:validate_sock_puppets).returns(true)
     user = FactoryGirl.create(:user)
     CurrentUser.user = user
     CurrentUser.ip_addr = "127.0.0.1"

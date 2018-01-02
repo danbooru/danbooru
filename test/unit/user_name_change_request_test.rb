@@ -3,7 +3,6 @@ require 'test_helper'
 class UserNameChangeRequestTest < ActiveSupport::TestCase
   context "in all cases" do
     setup do
-      User.any_instance.stubs(:validate_sock_puppets).returns(true)
       @admin = FactoryGirl.create(:admin_user)
       @requester = FactoryGirl.create(:user)
       CurrentUser.user = @requester

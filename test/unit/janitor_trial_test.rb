@@ -3,7 +3,6 @@ require 'test_helper'
 class JanitorTrialTest < ActiveSupport::TestCase
   context "A janitor trial" do
     setup do
-      User.any_instance.stubs(:validate_sock_puppets).returns(true)
       @admin = FactoryGirl.create(:admin_user)
       @user = FactoryGirl.create(:user)
       CurrentUser.user = @admin

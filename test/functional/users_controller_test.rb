@@ -95,7 +95,7 @@ class UsersControllerTest < ActionController::TestCase
       end
 
       should "not allow registering multiple accounts with the same IP" do
-        User.any_instance.unstub(:validate_sock_puppets)
+        Danbooru.config.unstub(:enable_sock_puppet_validation?)
         request.env["REMOTE_ADDR"] = "1.2.3.4"
         CurrentUser.user = nil
 

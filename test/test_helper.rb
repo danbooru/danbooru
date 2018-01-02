@@ -31,6 +31,7 @@ class ActiveSupport::TestCase
     mock_popular_search_service!
     mock_missed_search_service!
     WebMock.allow_net_connect!
+    Danbooru.config.stubs(:enable_sock_puppet_validation?).returns(false)
   end
 
   teardown do
@@ -53,7 +54,7 @@ class ActionController::TestCase
 
   def setup
     super
-    User.any_instance.stubs(:validate_sock_puppets).returns(true)
+    Danbooru.config.stubs(:enable_sock_puppet_validation?).returns(false)
   end
 
   def teardown
