@@ -138,27 +138,31 @@ class TagAliasTest < ActiveSupport::TestCase
     context "with an associated forum topic" do
       setup do
         @admin = FactoryGirl.create(:admin_user)
-        @topic = FactoryGirl.create(:forum_topic, :title => TagAliasRequest.topic_title("aaa", "bbb"))
-        @post = FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => TagAliasRequest.command_string("aaa", "bbb"))
-        @alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic, :status => "pending")
+        CurrentUser.scoped(@admin) do
+          @topic = FactoryGirl.create(:forum_topic, :title => TagAliasRequest.topic_title("aaa", "bbb"))
+          @post = FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => TagAliasRequest.command_string("aaa", "bbb"))
+          @alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic, :status => "pending")
+        end
       end
 
       context "and conflicting wiki pages" do
         setup do
-          @wiki1 = FactoryGirl.create(:wiki_page, :title => "aaa")
-          @wiki2 = FactoryGirl.create(:wiki_page, :title => "bbb")
-          @alias.approve!(approver: @admin)
+          CurrentUser.scoped(@admin) do
+            @wiki1 = FactoryGirl.create(:wiki_page, :title => "aaa")
+            @wiki2 = FactoryGirl.create(:wiki_page, :title => "bbb")
+            @alias.approve!(approver: @admin)
+          end
           @admin.reload # reload to get the forum post the approval created.
           @topic.reload
         end
 
         should "update the forum topic when approved" do
           assert_equal("[APPROVED] Tag alias: aaa -> bbb", @topic.title)
-          assert_match(/The tag alias .* been approved/m, @admin.forum_posts[-2].body)
+          assert_match(/The tag alias .* been approved/m, @topic.posts[-2].body)
         end
 
         should "warn about conflicting wiki pages when approved" do
-          assert_match(/has conflicting wiki pages/m, @admin.forum_posts[-1].body)
+          assert_match(/has conflicting wiki pages/m, @topic.posts[-1].body)
         end
       end
 
@@ -189,7 +193,7 @@ class TagAliasTest < ActiveSupport::TestCase
 
         assert_equal("[FAILED] Tag alias: aaa -> bbb", @topic.title)
         assert_match(/error: oh no/, @alias.status)
-        assert_match(/The tag alias .* failed during processing/, @admin.forum_posts.last.body)
+        assert_match(/The tag alias .* failed during processing/, @topic.posts.last.body)
       end
     end
   end

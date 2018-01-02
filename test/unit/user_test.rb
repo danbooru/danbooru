@@ -301,6 +301,7 @@ class UserTest < ActiveSupport::TestCase
     context "that might be a sock puppet" do
       setup do
         @user = FactoryGirl.create(:user, last_ip_addr: "127.0.0.2")
+        Danbooru.config.unstub(:enable_sock_puppet_validation?)
       end
 
       should "not validate" do
