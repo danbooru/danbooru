@@ -29,8 +29,8 @@
           <li><%= link_to "Pool", pool_path(@post_set.pool), :id => "show-excerpt-link" %></li>
         <% elsif @post_set.has_favgroup? %>
           <li><%= link_to "Favorite Group", favorite_group_path(@post_set.favgroup), :id => "show-excerpt-link" %></li>
-        <% elsif @post_set.is_single_tag? && !@post_set.is_metatag_search? %>
-          <li><%= link_to "Wiki", "#", :id => "show-excerpt-link" %></li>
+        <% elsif @post_set.has_blank_wiki? %>
+          <li><%= link_to "Wiki", new_wiki_page_path(wiki_page: { title: @post_set.tag_string }), id: "show-excerpt-link" %></li>
         <% end %>
 
         <li id="searchbox-redirect-link"><a href="#search-box">Search&raquo;</a></li>

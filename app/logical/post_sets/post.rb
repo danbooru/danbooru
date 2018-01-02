@@ -29,6 +29,10 @@ module PostSets
       is_single_tag? && ::WikiPage.titled(tag_string).exists? && wiki_page.visible?
     end
 
+    def has_blank_wiki?
+      is_simple_tag? && !has_wiki?
+    end
+
     def wiki_page
       if is_single_tag?
         ::WikiPage.titled(tag_string).first
@@ -142,20 +146,15 @@ module PostSets
     end
 
     def hide_from_crawler?
-      return true if !is_single_tag?
-      return true if is_pattern_search?
-      return true if page.to_i > 1
-      return true if is_metatag_search?
-      false
-    end
-
-    def is_metatag_search?
-      # filter out some common metatags
-      tag_string =~ /(?:rating|user|fav|status|order|source|score|width|height):/
+      !is_simple_tag? || page.to_i > 1
     end
 
     def is_single_tag?
       tag_array.size == 1
+    end
+
+    def is_simple_tag?
+      Tag.is_simple_tag?(tag_string)
     end
 
     def is_empty_tag?
