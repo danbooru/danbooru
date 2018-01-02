@@ -2,59 +2,11 @@
   <div id="a-index">
     <h1>Note Changes</h1>
 
-    <table width="100%" class="striped autofit">
-      <thead>
-        <tr>
-          <th></th>
-          <th width="5%">Post</th>
-          <th width="5%">Note</th>
-          <th>Body</th>
-          <th width="5%">Position</th>
-          <% if CurrentUser.is_moderator? %>
-            <th width="10%">IP Address</th>
-          <% end %>
-          <th width="10%">Edited By</th>
-          <th width="10%">Date</th>
-          <% if CurrentUser.is_member? %>
-            <th width="7%"></th>
-          <% end %>
-        </tr>
-      </thead>
-      <tbody>
-        <% @note_versions.each do |note_version| %>
-          <tr>
-            <td></td>
-            <td><%= link_to note_version.post_id, post_path(note_version.post_id) %></td>
-            <td>
-              <%= link_to "#{note_version.note_id}.#{note_version.version}", post_path(note_version.post_id, anchor: "note-#{note_version.note_id}") %>
-              <%= link_to "»", note_versions_path(search: {note_id: note_version.note_id}) %>
-            </td>
-            <td class="col-expand">
-              <%= h(note_version.body) %>
-              <% unless note_version.is_active? %>
-                <span class="inactive">(deleted)</span>
-              <% end %>
-              <%= note_version_body_diff_info(note_version) %>
-            </td>
-            <td>
-              <%= note_version_position_diff(note_version) %>
-            </td>
-            <% if CurrentUser.is_moderator? %>
-              <td>
-                <%= link_to_ip note_version.updater_ip_addr %>
-              </td>
-            <% end %>
-            <td><%= link_to_user note_version.updater %></td>
-            <td><%= compact_time note_version.updated_at %></td>
-            <% if CurrentUser.is_member? %>
-              <td>
-                <%= link_to "Revert to", revert_note_path(note_version.note_id, :version_id => note_version.id), :remote => true, :method => :put, :data => {:confirm => "Are you sure you want to revert to this version?"} %>
-              </td>
-            <% end %>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+    <% if params.dig(:search, :post_id).present? || params.dig(:search, :note_id).present? %>
+      <%= render "revert_listing" %>
+    <% else %>
+      <%= render "standard_listing" %>
+    <% end %>
 
     <%= numbered_paginator(@note_versions) %>
 

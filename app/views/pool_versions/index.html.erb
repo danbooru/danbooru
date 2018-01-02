@@ -2,46 +2,11 @@
   <div id="a-index">
     <h1>Pool History</h1>
 
-    <table width="100%" class="striped">
-      <thead>
-        <tr>
-          <th>Pool</th>
-          <th>Post Count</th>
-          <th>Changes</th>
-          <th>Desc Chg</th>
-          <th>Updater</th>
-          <% if CurrentUser.is_moderator? %>
-            <th>IP Address</th>
-          <% end %>
-          <th>Date</th>
-          <% if CurrentUser.is_member? %>
-            <th></th>
-          <% end %>
-        </tr>
-      </thead>
-      <tbody>
-        <% @pool_versions.each do |pool_version| %>
-          <tr>
-            <td><%= link_to pool_version.pretty_name, pool_path(pool_version.pool_id), :class => "pool-category-#{pool_version.pool.category}" %></td>
-            <td><%= link_to pool_version.post_ids.size, pool_versions_path(:search => {:pool_id => pool_version.pool_id}) %></td>
-            <td><%= pool_version_diff(pool_version) %></td>
-            <td><%= link_to_if pool_version.description_changed, pool_version.description_changed, diff_pool_version_path(pool_version.id) %></td>
-            <td><%= link_to_user pool_version.updater %></td>
-            <% if CurrentUser.is_moderator? %>
-              <td>
-                <%= link_to_ip pool_version.updater_ip_addr %>
-              </td>
-            <% end %>
-            <td><%= compact_time pool_version.updated_at %></td>
-            <% if CurrentUser.is_member? %>
-              <td>
-                <%= link_to "Revert to", revert_pool_path(pool_version.pool_id, :version_id => pool_version.id), :method => :put, :remote => true %>
-              </td>
-            <% end %>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+    <% if params.dig(:search, :pool_id).present? %>
+      <%= render "revert_listing" %>
+    <% else %>
+      <%= render "standard_listing" %>
+    <% end %>
 
     <%= numbered_paginator(@pool_versions) %>
   </div>

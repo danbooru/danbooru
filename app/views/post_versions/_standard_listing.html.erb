@@ -1,0 +1,54 @@
+<div id="p-standard-listing">
+  <table class="striped autofit">
+    <thead>
+      <tr>
+        <th width="5%">Post</th>
+        <th width="15%">Date</th>
+        <th width="10%">User</th>
+        <th width="5%">Rating</th>
+        <th width="5%">Parent</th>
+        <% if CurrentUser.is_moderator? %>
+          <th width="10%">IP Address</th>
+        <% end %>
+        <th>Tags</th>
+        <% if CurrentUser.is_member? %>
+          <th width="7%"></th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% @post_versions.each do |post_version| %>
+        <tr id="post-version-<%= post_version.id %>" <% if params[:hilite].to_i == post_version.id %>class="hilite"<% end %>>
+          <td>
+            <%= link_to("#{post_version.post_id}.#{post_version.id}", post_path(post_version.post_id)) %>
+            <%= link_to "»", post_versions_path(search: {post_id: post_version.post_id}) %>
+          </td>
+          <td><%= compact_time(post_version.updated_at) %></td>
+          <td>
+            <% if post_version.updater %>
+              <%= link_to_user(post_version.updater) %>
+            <% end %>
+          </td>
+          <td><%= post_version.rating %></td>
+          <td><%= post_version.parent_id %></td>
+          <% if CurrentUser.is_moderator? %>
+            <td>
+              <%= link_to_ip post_version.updater_ip_addr %>
+            </td>
+          <% end %>
+          <td><%= post_version_diff(post_version) %></td>
+          <% if CurrentUser.is_member? %>
+            <td>
+              <% if post_version.visible? %>
+                <% if post_version.version != 1 %>
+                  <%= link_to "Undo", undo_post_version_path(post_version), :method => :put, :remote => true %> |
+                <% end %>
+              <% end %>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
