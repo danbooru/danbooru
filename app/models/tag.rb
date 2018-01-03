@@ -943,7 +943,7 @@ class Tag < ApplicationRecord
       tags = Tag.select("DISTINCT ON (name, post_count) *").from(sql_query).order("post_count desc").limit(10)
 
       if tags.empty?
-        tags = Tag.fuzzy_name_matches(name).order_similarity(name).nonempty.limit(10)
+        tags = Tag.select("tags.name, tags.post_count, tags.category, null AS antecedent_name").fuzzy_name_matches(name).order_similarity(name).nonempty.limit(10)
       end
 
       tags
