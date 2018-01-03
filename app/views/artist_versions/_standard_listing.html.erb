@@ -22,7 +22,7 @@
               <%= link_to artist_version.name, artist_path(artist_version.artist_id) %>
               <%= link_to "»", artist_versions_path(search: {artist_id: artist_version.artist_id}) %>
             </td>
-            <td><%= artist_version_other_names_diff(artist_version) %></td>
+            <td class="col-expand"><%= artist_version_other_names_diff(artist_version) %></td>
             <td><%= artist_version.group_name %></td>
           <% else %>
             <td></td>

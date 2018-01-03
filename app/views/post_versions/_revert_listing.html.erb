@@ -33,7 +33,7 @@
               <%= link_to_ip post_version.updater_ip_addr %>
             </td>
           <% end %>
-          <td><%= post_version_diff(post_version) %></td>
+          <td class="col-expand"><%= post_version_diff(post_version) %></td>
           <% if CurrentUser.is_member? %>
             <td>
               <% if post_version.visible? %>
