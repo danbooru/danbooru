@@ -95,9 +95,7 @@
     var $fields_single = $('[data-autocomplete="tag"]');
 
     var prefixes = "-|~|" + "<%= TagCategory.mapping.keys.map {|category| category + ':'}.join('|') %>";
-    var metatags = "order|-status|status|-rating|rating|-locked|locked|child|filetype|-filetype|" +
-      "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-fav|fav|ordfav|" +
-      "-pool|pool|ordpool|favgroup|-search|search";
+    var metatags = "<%= Tag::METATAGS %>";
 
     $fields_multiple.autocomplete({
       delay: 100,
@@ -150,16 +148,34 @@
         }
 
         switch(metatag) {
+        case "md5":
+        case "width":
+        case "height":
+        case "mpixels":
+        case "ratio":
+        case "score":
+        case "favcount":
+        case "filesize":
+        case "source":
+        case "id":
+        case "date":
+        case "age":
+        case "limit":
+        case "tagcount":
+        case "pixiv_id":
+        case "pixiv":
+        <% TagCategory.short_name_list.each do |category| %>
+          case "<%= category %>tags":
+        <% end %>
+          return;
+
         case "order":
         case "status":
-        case "-status":
         case "rating":
-        case "-rating":
         case "locked":
-        case "-locked":
         case "child":
+        case "parent":
         case "filetype":
-        case "-filetype":
           Danbooru.Autocomplete.static_metatag_source(term, resp, metatag);
           return;
         }
@@ -170,30 +186,28 @@
 
         switch(metatag) {
         case "user":
-        case "-user":
         case "approver":
-        case "-approver":
         case "commenter":
         case "comm":
         case "noter":
         case "noteupdater":
         case "artcomm":
         case "fav":
-        case "-fav":
         case "ordfav":
+        case "appealer":
+        case "flagger":
+        case "upvote":
+        case "downvote":
           Danbooru.Autocomplete.user_source(term, resp, metatag);
           break;
         case "pool":
-        case "-pool":
         case "ordpool":
           Danbooru.Autocomplete.pool_source(term, resp, metatag);
           break;
         case "favgroup":
-        case "-favgroup":
           Danbooru.Autocomplete.favorite_group_source(term, resp, metatag);
           break;
         case "search":
-        case "-search":
           Danbooru.Autocomplete.saved_search_source(term, resp);
           break;
         default:
@@ -339,6 +353,9 @@
       "rating", "note", "status"
     ],
     child: [
+      "any", "none"
+    ],
+    parent: [
       "any", "none"
     ],
     filetype: [
