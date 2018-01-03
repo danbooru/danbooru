@@ -16,7 +16,21 @@ class CurrentUser
   end
 
   def self.as_admin(&block)
-    scoped(User.admins.first, "127.0.0.1", &block)
+    if block_given?
+      scoped(User.admins.first, "127.0.0.1", &block)
+    else
+      self.user = User.admins.first
+      self.ip_addr = "127.0.0.1"
+    end
+  end
+
+  def self.as_system(&block)
+    if block_given?
+      scoped(User.system, "127.0.0.1", &block)
+    else
+      self.user = User.system
+      self.ip_addr = "127.0.0.1"
+    end
   end
 
   def self.user=(user)

@@ -217,6 +217,10 @@ module Danbooru
       "albert"
     end
 
+    def image_server_host(post)
+      ""
+    end
+
 #TAG CONFIGURATION
 
     #Full tag configuration info for all tags

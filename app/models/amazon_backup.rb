@@ -1,3 +1,5 @@
+# donmai.us specific
+
 require 'base64'
 require 'digest/md5'
 

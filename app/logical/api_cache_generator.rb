@@ -1,3 +1,5 @@
+# donmai.us specific
+
 class ApiCacheGenerator
   def generate_tag_cache
     path = Danbooru.config.shared_dir_path
