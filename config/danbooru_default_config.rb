@@ -460,7 +460,7 @@ module Danbooru
 
     # Should return true if the given tag should be suggested for removal in the post replacement dialog box.
     def remove_tag_after_replacement?(tag)
-      tag =~ /replaceme|.*_sample|resized|upscaled|downscaled|md5_mismatch|jpeg_artifacts/i
+      tag =~ /replaceme|.*_sample|resized|upscaled|downscaled|md5_mismatch|jpeg_artifacts|corrupted_image/i
     end
 
     def shared_dir_path
