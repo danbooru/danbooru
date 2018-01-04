@@ -187,13 +187,13 @@ class Post < ApplicationRecord
     def open_graph_image_url
       if is_image?
         if has_large?
-          if Danbooru.config.image_server_host(self) =~ /http/
+          if Danbooru.config.build_large_file_url(self) =~ /http/
             large_file_url
           else
             "http://#{Danbooru.config.hostname}#{large_file_url}"
           end
         else
-          if Danbooru.config.image_server_host(self) =~ /http/
+          if Danbooru.config.build_file_url(self) =~ /http/
             file_url
           else
             "http://#{Danbooru.config.hostname}#{file_url}"
