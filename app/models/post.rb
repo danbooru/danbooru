@@ -145,7 +145,7 @@ class Post < ApplicationRecord
     end
 
     def file_url
-      "#{Danbooru.config.image_server_host(self)}/data/#{seo_tag_string}#{file_path_prefix}#{md5}.#{file_ext}"
+      Danbooru.config.build_file_url(self)
     end
 
     # this is for the 640x320 version
@@ -154,7 +154,7 @@ class Post < ApplicationRecord
 
     def large_file_url
       if has_large?
-        "#{Danbooru.config.image_server_host(self)}/data/sample/#{seo_tag_string}#{file_path_prefix}#{Danbooru.config.large_image_prefix}#{md5}.#{large_file_ext}"
+        Danbooru.config.build_large_file_url(self)
       else
         file_url
       end
