@@ -6,8 +6,8 @@ class ArtistCommentaryVersion < ApplicationRecord
   attr_accessible :post_id, :original_title, :original_description, :translated_title, :translated_description
 
   def self.search(params)
-    q = where("true")
-    params = {} if params.blank?
+    q = super
+    return q if params.blank?
 
     if params[:updater_id]
       q = q.where("updater_id = ?", params[:updater_id].to_i)

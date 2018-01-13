@@ -4,8 +4,8 @@ class ModAction < ApplicationRecord
   validates_presence_of :creator_id
   attr_accessible :description
 
-  def self.search(params = {})
-    q = where("true")
+  def self.search(params)
+    q = super
     return q if params.blank?
 
     if params[:creator_id].present?
