@@ -194,7 +194,7 @@ class TagImplication < TagRelationship
       implication = %Q("tag implication ##{id}":[#{Rails.application.routes.url_helpers.tag_implication_path(self)}]: [[#{antecedent_name}]] -> [[#{consequent_name}]])
 
       if id_changed?
-        ModAction.log("created #{status} #{implication}")
+        ModAction.log("created #{status} #{implication}",:tag_implication_create)
       else
         # format the changes hash more nicely.
         change_desc = changes.except(:updated_at).map do |attribute, values|
@@ -206,7 +206,7 @@ class TagImplication < TagRelationship
           end
         end.join(", ")
 
-        ModAction.log("updated #{implication}\n#{change_desc}")
+        ModAction.log("updated #{implication}\n#{change_desc}",:tag_implication_update)
       end
     end
 

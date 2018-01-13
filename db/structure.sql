@@ -2315,7 +2315,8 @@ CREATE TABLE mod_actions (
     creator_id integer NOT NULL,
     description text NOT NULL,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    category integer
 );
 
 
@@ -7546,4 +7547,6 @@ INSERT INTO schema_migrations (version) VALUES ('20171218213037');
 INSERT INTO schema_migrations (version) VALUES ('20171219001521');
 
 INSERT INTO schema_migrations (version) VALUES ('20171230220225');
+
+INSERT INTO schema_migrations (version) VALUES ('20180113211343');
 

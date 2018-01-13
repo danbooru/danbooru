@@ -126,6 +126,6 @@ class Ban < ApplicationRecord
   end
 
   def create_mod_action
-    ModAction.log(%{Banned "#{user_name}":/users/#{user_id} until #{expires_at}})
+    ModAction.log(%{Banned "#{user_name}":/users/#{user_id} until #{expires_at}},:user_ban)
   end
 end

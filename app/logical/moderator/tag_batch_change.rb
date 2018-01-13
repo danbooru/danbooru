@@ -31,7 +31,7 @@ module Moderator
         end
       end
 
-      ModAction.log("processed mass update: #{antecedent} -> #{consequent}")
+      ModAction.log("processed mass update: #{antecedent} -> #{consequent}",:mass_update)
     end
   end
 end

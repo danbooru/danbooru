@@ -7,10 +7,10 @@ class IpBan < ApplicationRecord
   validates_uniqueness_of :ip_addr, :if => lambda {|rec| rec.ip_addr =~ IP_ADDR_REGEX}
   attr_accessible :ip_addr, :reason
   after_create do |rec|
-    ModAction.log("#{CurrentUser.name} created ip ban for #{rec.ip_addr}")
+    ModAction.log("#{CurrentUser.name} created ip ban for #{rec.ip_addr}",:ip_ban_create)
   end
   after_destroy do |rec|
-    ModAction.log("#{CurrentUser.name} deleted ip ban for #{rec.ip_addr}")
+    ModAction.log("#{CurrentUser.name} deleted ip ban for #{rec.ip_addr}",:ip_ban_delete)
   end
 
   def self.is_banned?(ip_addr)

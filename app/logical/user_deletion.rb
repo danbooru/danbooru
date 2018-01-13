@@ -30,7 +30,7 @@ class UserDeletion
 private
   
   def create_mod_action
-    ModAction.log("user ##{user.id} deleted")
+    ModAction.log("user ##{user.id} deleted",:user_delete)
   end
 
   def clear_saved_searches

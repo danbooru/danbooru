@@ -218,11 +218,11 @@ class Pool < ApplicationRecord
   end
 
   def create_mod_action_for_delete
-    ModAction.log("deleted pool ##{id} (name: #{name})")
+    ModAction.log("deleted pool ##{id} (name: #{name})",:pool_delete)
   end
 
   def create_mod_action_for_undelete
-    ModAction.log("undeleted pool ##{id} (name: #{name})")
+    ModAction.log("undeleted pool ##{id} (name: #{name})",:pool_undelete)
   end
 
   def add!(post)

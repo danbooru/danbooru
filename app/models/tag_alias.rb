@@ -253,7 +253,7 @@ class TagAlias < TagRelationship
     alias_desc = %Q("tag alias ##{id}":[#{Rails.application.routes.url_helpers.tag_alias_path(self)}]: [[#{antecedent_name}]] -> [[#{consequent_name}]])
 
     if id_changed?
-      ModAction.log("created #{status} #{alias_desc}")
+      ModAction.log("created #{status} #{alias_desc}",:tag_alias_create)
     else
       # format the changes hash more nicely.
       change_desc = changes.except(:updated_at).map do |attribute, values|
@@ -265,7 +265,7 @@ class TagAlias < TagRelationship
         end
       end.join(", ")
 
-      ModAction.log("updated #{alias_desc}\n#{change_desc}")
+      ModAction.log("updated #{alias_desc}\n#{change_desc}",:tag_alias_update)
     end
   end
 end

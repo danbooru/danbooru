@@ -11,10 +11,10 @@ class UserFeedback < ApplicationRecord
   validate :user_is_not_creator
   after_create :create_dmail
   after_update(:if => lambda {|rec| CurrentUser.id != rec.creator_id}) do |rec|
-    ModAction.log(%{#{CurrentUser.name} updated user feedback for "#{rec.user_name}":/users/#{rec.user_id}})
+    ModAction.log(%{#{CurrentUser.name} updated user feedback for "#{rec.user_name}":/users/#{rec.user_id}},:user_feedback_update)
   end
   after_destroy(:if => lambda {|rec| CurrentUser.id != rec.creator_id}) do |rec|
-    ModAction.log(%{#{CurrentUser.name} deleted user feedback for "#{rec.user_name}":/users/#{rec.user_id}})
+    ModAction.log(%{#{CurrentUser.name} deleted user feedback for "#{rec.user_name}":/users/#{rec.user_id}},:user_feedback_delete)
   end
 
   module SearchMethods
