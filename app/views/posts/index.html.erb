@@ -72,7 +72,7 @@
     <%= content_tag :link, nil, rel: "prev", href: prev_page_url %>
   <% end %>
   <% if @post_set.has_wiki? %>
-    <meta name="description" content="<%= @post_set.wiki_page.presenter.blurb %>">
+    <meta name="description" content="<%= strip_dtext(@post_set.wiki_page.presenter.excerpt) %>">
   <% else %>
     <meta name="description" content="<%= Danbooru.config.description %>">
   <% end %>

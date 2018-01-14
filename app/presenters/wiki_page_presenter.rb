@@ -9,10 +9,6 @@ class WikiPagePresenter
     wiki_page.body
   end
 
-  def blurb
-    DTextRagel.parse_strip(excerpt.to_s)
-  end
-
   # Produce a formatted page that shows the difference between two versions of a page.
   def diff(other_version)
     pattern = Regexp.new('(?:<.+?>)|(?:[0-9_A-Za-z\x80-\xff]+[\x09\x20]?)|(?:[ \t]+)|(?:\r?\n)|(?:.+?)')

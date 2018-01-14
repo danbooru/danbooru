@@ -51,10 +51,12 @@ module ApplicationHelper
 
   def format_text(text, **options)
     raw DTextRagel.parse(text, **options)
+  rescue DTextRagel::Error => e
+    raw ""
   end
 
   def strip_dtext(text)
-    raw(DTextRagel.parse_strip(text))
+    format_text(text, strip: true)
   end
 
   def error_messages_for(instance_name)
