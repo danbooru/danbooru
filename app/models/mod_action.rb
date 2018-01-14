@@ -54,6 +54,14 @@ class ModAction < ApplicationRecord
       q = q.where("creator_id = ?", params[:creator_id].to_i)
     end
 
+    if params[:creator_name].present?
+      q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].mb_chars.downcase)
+    end
+
+    if params[:category].present?
+      q = q.attribute_matches(:category, params[:category])
+    end
+
     q
   end
 
