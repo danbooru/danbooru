@@ -225,10 +225,6 @@ class Pool < ApplicationRecord
     ModAction.log("undeleted pool ##{id} (name: #{name})")
   end
 
-  def create_mod_action_for_destroy
-    ModAction.log("permanently deleted pool ##{id} name=#{name} post_ids=#{post_ids}")
-  end
-
   def add!(post)
     return if contains?(post.id)
     return if is_deleted?
