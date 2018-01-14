@@ -484,6 +484,7 @@ class PostTest < ActiveSupport::TestCase
         should "create a mod action" do
           @post.undelete!
           assert_equal("undeleted post ##{@post.id}", ModAction.last.description)
+          assert_equal("post_undelete", ModAction.last.category)
         end
       end
 
@@ -496,6 +497,7 @@ class PostTest < ActiveSupport::TestCase
         should "create a mod action" do
           @post.approve!
           assert_equal("undeleted post ##{@post.id}", ModAction.last.description)
+          assert_equal("post_undelete", ModAction.last.category)
         end
       end
 
