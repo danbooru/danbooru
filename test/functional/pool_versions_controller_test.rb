@@ -1,9 +1,6 @@
 require 'test_helper'
-require 'helpers/pool_archive_test_helper'
 
 class PoolVersionsControllerTest < ActionController::TestCase
-  include PoolArchiveTestHelper
-
   context "The pool versions controller" do
     setup do
       mock_pool_archive_service!

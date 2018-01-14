@@ -1,11 +1,9 @@
 require 'test_helper'
-require 'helpers/post_archive_test_helper'
 
 class PostVersionsControllerTest < ActionController::TestCase
-  include PostArchiveTestHelper
-
   def setup
     super
+
     @user = FactoryGirl.create(:user)
     CurrentUser.user = @user
     CurrentUser.ip_addr = "127.0.0.1"
@@ -13,6 +11,7 @@ class PostVersionsControllerTest < ActionController::TestCase
 
   def teardown
     super
+
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
   end

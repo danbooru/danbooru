@@ -1,9 +1,6 @@
 require 'test_helper'
-require 'helpers/pool_archive_test_helper'
 
 class PoolsControllerTest < ActionController::TestCase
-  include PoolArchiveTestHelper
-
   context "The pools controller" do
     setup do
       Timecop.travel(1.month.ago) do

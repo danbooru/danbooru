@@ -1,11 +1,8 @@
 # encoding: utf-8
 
 require 'test_helper'
-require 'helpers/pool_archive_test_helper'
 
 class PoolTest < ActiveSupport::TestCase
-  include PoolArchiveTestHelper
-
   setup do
     Timecop.travel(1.month.ago) do
       @user = FactoryGirl.create(:user)

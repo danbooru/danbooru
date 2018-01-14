@@ -1,13 +1,6 @@
 require 'test_helper'
-require 'helpers/pool_archive_test_helper'
-require 'helpers/saved_search_test_helper'
-require 'helpers/iqdb_test_helper'
 
 class PostTest < ActiveSupport::TestCase
-  include PoolArchiveTestHelper
-  include SavedSearchTestHelper
-  include IqdbTestHelper
-
   def assert_tag_match(posts, query)
     assert_equal(posts.map(&:id), Post.tag_match(query).pluck(:id))
   end

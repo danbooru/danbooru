@@ -1,9 +1,6 @@
 require 'test_helper'
-require 'helpers/iqdb_test_helper'
 
 class IqdbQueriesControllerTest < ActionController::TestCase
-  include IqdbTestHelper
-
   context "The iqdb controller" do
     setup do
       @user = FactoryGirl.create(:user)

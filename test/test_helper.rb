@@ -14,7 +14,7 @@ require 'cache'
 require 'webmock/minitest'
 
 Dir[File.expand_path(File.dirname(__FILE__) + "/factories/*.rb")].each {|file| require file}
-Dir[File.expand_path(File.dirname(__FILE__) + "/helpers/*.rb")].each {|file| require file}
+Dir[File.expand_path(File.dirname(__FILE__) + "/test_helpers/*.rb")].each {|file| require file}
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
@@ -24,8 +24,12 @@ end
 
 class ActiveSupport::TestCase
   include PostArchiveTestHelper
+  include PoolArchiveTestHelper
   include ReportbooruHelper
   include DownloadTestHelper
+  include IqdbTestHelper
+  include SavedSearchTestHelper
+  include UploadTestHelper
 
   setup do
     mock_popular_search_service!
@@ -40,8 +44,6 @@ class ActiveSupport::TestCase
 end
 
 class ActionController::TestCase
-  include PostArchiveTestHelper
-
   def assert_authentication_passes(action, http_method, role, params, session)
     __send__(http_method, action, params, session.merge(:user_id => @users[role].id))
     assert_response :success

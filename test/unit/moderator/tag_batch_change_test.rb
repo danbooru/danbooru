@@ -1,10 +1,7 @@
 require "test_helper"
-require 'helpers/saved_search_test_helper'
 
 module Moderator
   class TagBatchChangeTest < ActiveSupport::TestCase
-    include SavedSearchTestHelper
-
     def setup
       super
       mock_saved_search_service!
