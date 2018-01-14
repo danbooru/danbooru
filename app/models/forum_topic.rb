@@ -28,6 +28,9 @@ class ForumTopic < ApplicationRecord
   validates :title, :length => {:maximum => 255}
   accepts_nested_attributes_for :original_post
   after_update :update_orignal_post
+  after_save(:if => lambda {|rec| rec.is_locked? && rec.is_locked_changed?}) do |rec|
+    ModAction.log("locked forum topic ##{id} (title: #{title})",:forum_topic_lock)
+  end
 
   module CategoryMethods
     extend ActiveSupport::Concern
@@ -152,6 +155,14 @@ class ForumTopic < ApplicationRecord
 
   def visible?(user)
     user.level >= min_level
+  end
+
+  def create_mod_action_for_delete
+    ModAction.log("deleted forum topic ##{id} (title: #{title})",:forum_topic_delete)
+  end
+
+  def create_mod_action_for_undelete
+    ModAction.log("undeleted forum topic ##{id} (title: #{title})",:forum_topic_undelete)
   end
 
   def initialize_is_deleted

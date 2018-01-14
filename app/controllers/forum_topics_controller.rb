@@ -67,6 +67,7 @@ class ForumTopicsController < ApplicationController
   def destroy
     check_privilege(@forum_topic)
     @forum_topic.delete!
+    @forum_topic.create_mod_action_for_delete
     flash[:notice] = "Topic deleted"
     respond_with(@forum_topic)
   end
@@ -74,6 +75,7 @@ class ForumTopicsController < ApplicationController
   def undelete
     check_privilege(@forum_topic)
     @forum_topic.undelete!
+    @forum_topic.create_mod_action_for_undelete
     flash[:notice] = "Topic undeleted"
     respond_with(@forum_topic)
   end
