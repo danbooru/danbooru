@@ -51,8 +51,8 @@ class ModAction < ApplicationRecord
     other: 2000
   }
 
-  def self.search(params = {})
-    q = where("true")
+  def self.search(params)
+    q = super
     return q if params.blank?
 
     if params[:creator_id].present?
