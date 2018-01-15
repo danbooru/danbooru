@@ -286,6 +286,10 @@ class DTextTest < Minitest::Test
     assert_parse("<table class=\"striped\"><thead><tr><th>header</th></tr></thead><tbody><tr><td><a class=\"dtext-link dtext-id-link dtext-post-id-link\" href=\"/posts/100\">post #100</a></td></tr></tbody></table>", "[table]\n[thead]\n[tr]\n[th]header[/th][/tr][/thead][tbody][tr][td]post #100[/td][/tr][/tbody][/table]")
   end
 
+  def test_unclosed_th
+    assert_parse('<table class="striped"><th>foo</th></table>', "[table][th]foo")
+  end
+
   def test_forum_links
     assert_parse('<p><a class="dtext-link dtext-id-link dtext-forum-topic-id-link" href="/forum_topics/1234?page=4">topic #1234/p4</a></p>', "topic #1234/p4")
   end
