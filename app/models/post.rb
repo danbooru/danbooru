@@ -1362,7 +1362,7 @@ class Post < ApplicationRecord
 
       transaction do
         Post.without_timeout do
-          ModAction.log("permanently deleted post ##{id}")
+          ModAction.log("permanently deleted post ##{id}",:post_permanent_delete)
 
           give_favorites_to_parent
           update_children_on_destroy
@@ -1378,12 +1378,12 @@ class Post < ApplicationRecord
 
     def ban!
       update_column(:is_banned, true)
-      ModAction.log("banned post ##{id}")
+      ModAction.log("banned post ##{id}",:post_ban)
     end
 
     def unban!
       update_column(:is_banned, false)
-      ModAction.log("unbanned post ##{id}")
+      ModAction.log("unbanned post ##{id}",:post_unban)
     end
 
     def delete!(reason, options = {})
@@ -1406,7 +1406,7 @@ class Post < ApplicationRecord
         give_favorites_to_parent if options[:move_favorites]
 
         unless options[:without_mod_action]
-          ModAction.log("deleted post ##{id}, reason: #{reason}")
+          ModAction.log("deleted post ##{id}, reason: #{reason}",:post_delete)
         end
       end
     end
@@ -1429,7 +1429,7 @@ class Post < ApplicationRecord
       self.approver_id = CurrentUser.id
       flags.each {|x| x.resolve!}
       save
-      ModAction.log("undeleted post ##{id}")
+      ModAction.log("undeleted post ##{id}",:post_undelete)
     end
 
     def replace!(params)

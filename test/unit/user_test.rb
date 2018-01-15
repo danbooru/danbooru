@@ -55,6 +55,7 @@ class UserTest < ActiveSupport::TestCase
           @user.invite!(User::Levels::BUILDER, "1")
         end
         assert_equal(%{"#{@user.name}":/users/#{@user.id} level changed Member -> Builder}, ModAction.last.description)
+        assert_equal("user_level", ModAction.last.category)
       end
     end
 

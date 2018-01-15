@@ -439,10 +439,10 @@ class User < ApplicationRecord
 
     def create_mod_action
       if level_changed?
-        ModAction.log(%{"#{name}":/users/#{id} level changed #{level_string_was} -> #{level_string}})
+        ModAction.log(%{"#{name}":/users/#{id} level changed #{level_string_was} -> #{level_string}},:user_level)
       end
     end
-    
+
     def set_per_page
       if per_page.nil? || !is_gold?
         self.per_page = Danbooru.config.posts_per_page
