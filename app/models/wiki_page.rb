@@ -190,6 +190,10 @@ class WikiPage < ApplicationRecord
     title.tr("_", " ")
   end
 
+  def wiki_page_changed?
+    title_changed? || body_changed? || is_locked_changed? || is_deleted_changed? || other_names_changed?
+  end
+
   def merge_version
     prev = versions.last
     prev.update_attributes(
@@ -219,7 +223,7 @@ class WikiPage < ApplicationRecord
   end
 
   def create_version
-    if title_changed? || body_changed? || is_locked_changed? || is_deleted_changed? || other_names_changed?
+    if wiki_page_changed?
       if merge_version?
         merge_version
       else
@@ -235,9 +239,11 @@ class WikiPage < ApplicationRecord
   def initialize_creator
     self.creator_id = CurrentUser.user.id
   end
-  
+
   def initialize_updater
-    self.updater_id = CurrentUser.user.id
+    if wiki_page_changed?
+      self.updater_id = CurrentUser.user.id
+    end
   end
 
   def post_set
