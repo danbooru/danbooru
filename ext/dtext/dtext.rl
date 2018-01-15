@@ -1081,6 +1081,7 @@ static void dstack_rewind(StateMachine * sm) {
     case BLOCK_NODTEXT: append_closing_p(sm); break;
     case BLOCK_CODE: append_block(sm, "</pre>"); break;
     case BLOCK_TD: append_block(sm, "</td>"); break;
+    case BLOCK_TH: append_block(sm, "</th>"); break;
 
     case INLINE_NODTEXT: break;
     case INLINE_B: append(sm, true, "</strong>"); break;
