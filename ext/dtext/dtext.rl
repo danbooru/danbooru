@@ -251,16 +251,8 @@ inline := |*
     append_segment_html_escaped(sm, url_start, url_end);
     append(sm, true, "\">");
 
-    link_content_sm = init_machine(sm->a1, sm->a2 - sm->a1, false, true, false);
-    if (!parse_helper(link_content_sm)) {
-      g_debug("basic_textile_link: parse_helper failed");
-      g_propagate_error(&sm->error, link_content_sm->error);
-      free_machine(link_content_sm);
-      fbreak;
-    } else {
-      append(sm, true, link_content_sm->output->str);
-      free_machine(link_content_sm);
-      link_content_sm = NULL;
+    if (!parse_inline(sm, sm->a1, sm->a2 - sm->a1)) {
+        fbreak;
     }
 
     append(sm, true, "</a>");
@@ -275,16 +267,8 @@ inline := |*
     append_segment_html_escaped(sm, sm->b1, sm->b2 - 1);
     append(sm, true, "\">");
 
-    link_content_sm = init_machine(sm->a1, sm->a2 - sm->a1, false, true, false);
-    if (!parse_helper(link_content_sm)) {
-      g_debug("basic_textile_link: parse_helper failed");
-      g_propagate_error(&sm->error, link_content_sm->error);
-      free_machine(link_content_sm);
-      fbreak;
-    } else {
-      append(sm, true, link_content_sm->output->str);
-      free_machine(link_content_sm);
-      link_content_sm = NULL;
+    if (!parse_inline(sm, sm->a1, sm->a2 - sm->a1)) {
+        fbreak;
     }
 
     append(sm, true, "</a>");
@@ -1239,8 +1223,22 @@ GQuark dtext_parse_error_quark() {
   return g_quark_from_static_string("dtext-parse-error-quark");
 }
 
+gboolean parse_inline(StateMachine* sm, const char* dtext, const ssize_t length) {
+    StateMachine* inline_sm = init_machine(dtext, length, sm->f_strip, true, sm->f_mentions);
+    gboolean success = parse_helper(inline_sm);
+
+    if (success) {
+      append(sm, true, inline_sm->output->str);
+    } else {
+      g_debug("parse_inline failed");
+      g_propagate_error(&sm->error, inline_sm->error);
+    }
+
+    free_machine(inline_sm);
+    return success;
+}
+
 gboolean parse_helper(StateMachine* sm) {
-  StateMachine* link_content_sm = NULL;
   const gchar* end = NULL;
 
   g_debug("start\n");
