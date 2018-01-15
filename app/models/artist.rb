@@ -382,7 +382,7 @@ class Artist < ApplicationRecord
         if @notes.present?
           create_wiki_page(body: @notes, title: name)
         end
-      elsif wiki_page.body != @notes || wiki_page.title != name
+      elsif (!@notes.nil? && (wiki_page.body != @notes)) || wiki_page.title != name
         # if anything changed, we need to update the wiki page
         wiki_page.body = @notes unless @notes.nil?
         wiki_page.title = name
