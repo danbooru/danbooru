@@ -1,10 +1,7 @@
 require 'test_helper'
-require 'helpers/pool_archive_test_helper'
 
 module PostSets
   class PoolTest < ActiveSupport::TestCase
-    include PoolArchiveTestHelper
-
     context "In all cases" do
       setup do
         @user = FactoryGirl.create(:user)

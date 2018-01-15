@@ -1,9 +1,6 @@
 require 'test_helper'
-require 'helpers/saved_search_test_helper'
 
 class SavedSearchTest < ActiveSupport::TestCase
-  include SavedSearchTestHelper
-
   def setup
     super
     @user = FactoryGirl.create(:user)

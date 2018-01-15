@@ -1,9 +1,6 @@
 require 'test_helper'
-require 'helpers/iqdb_test_helper'
 
 class PostReplacementTest < ActiveSupport::TestCase
-  include IqdbTestHelper
-
   def upload_file(path, filename, &block)
     Tempfile.open do |file|
       file.write(File.read(path))

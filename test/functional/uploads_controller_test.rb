@@ -1,9 +1,6 @@
 require 'test_helper'
-require 'helpers/iqdb_test_helper'
 
 class UploadsControllerTest < ActionController::TestCase
-  include IqdbTestHelper
-
   def setup
     super
     mock_iqdb_service!

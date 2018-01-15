@@ -1,9 +1,6 @@
 require 'test_helper'
-require 'helpers/post_archive_test_helper'
 
 class ReportsControllerTest < ActionController::TestCase
-  include PostArchiveTestHelper
-
   def setup
     super
 

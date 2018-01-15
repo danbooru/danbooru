@@ -1,9 +1,6 @@
 require 'test_helper'
-require 'helpers/saved_search_test_helper'
 
 class SavedSearchesControllerTest < ActionController::TestCase
-  include SavedSearchTestHelper
-
   context "The saved searches controller" do
     setup do
       @user = FactoryGirl.create(:user)
