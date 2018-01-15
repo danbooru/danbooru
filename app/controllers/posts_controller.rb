@@ -6,7 +6,9 @@ class PostsController < ApplicationController
   def index
     if params[:md5].present?
       @post = Post.find_by_md5(params[:md5])
-      redirect_to post_path(@post)
+      respond_with(@post) do |format|
+        format.html { redirect_to(@post) }
+      end
     else
       limit = params[:limit] || (params[:tags] =~ /(?:^|\s)limit:(\d+)(?:$|\s)/ && $1) || CurrentUser.user.per_page
       @random = params[:random] || params[:tags] =~ /(?:^|\s)order:random(?:$|\s)/
