@@ -201,45 +201,11 @@ inline := |*
   };
 
   basic_wiki_link => {
-    GString * segment = g_string_new_len(sm->a1, sm->a2 - sm->a1);
-    GString * lowercase_segment = NULL;
-    underscore_string(segment->str, segment->len);
-
-    if (g_utf8_validate(segment->str, -1, NULL)) {
-      lowercase_segment = g_string_new(g_utf8_strdown(segment->str, -1));
-    } else {
-      lowercase_segment = g_string_new(g_ascii_strdown(segment->str, -1));
-    }
-
-    append(sm, true, "<a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/show_or_new?title=");
-    append_segment_uri_escaped(sm, lowercase_segment->str, lowercase_segment->str + lowercase_segment->len - 1);
-    append(sm, true, "\">");
-    append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
-    append(sm, true, "</a>");
-
-    g_string_free(lowercase_segment, TRUE);
-    g_string_free(segment, TRUE);
+    append_wiki_link(sm, sm->a1, sm->a2 - sm->a1, sm->a1, sm->a2 - sm->a1);
   };
 
   aliased_wiki_link => {
-    GString * segment = g_string_new_len(sm->a1, sm->a2 - sm->a1);
-    GString * lowercase_segment = NULL;
-    underscore_string(segment->str, segment->len);
-
-    if (g_utf8_validate(segment->str, -1, NULL)) {
-      lowercase_segment = g_string_new(g_utf8_strdown(segment->str, -1));
-    } else {
-      lowercase_segment = g_string_new(g_ascii_strdown(segment->str, -1));
-    }
-
-    append(sm, true, "<a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/show_or_new?title=");
-    append_segment_uri_escaped(sm, lowercase_segment->str, lowercase_segment->str + lowercase_segment->len - 1);
-    append(sm, true, "\">");
-    append_segment_html_escaped(sm, sm->b1, sm->b2 - 1);
-    append(sm, true, "</a>");
-
-    g_string_free(lowercase_segment, TRUE);
-    g_string_free(segment, TRUE);
+    append_wiki_link(sm, sm->a1, sm->a2 - sm->a1, sm->b1, sm->b2 - sm->b1);
   };
 
   basic_textile_link => {
@@ -865,14 +831,6 @@ main := |*
 
 %% write data;
 
-static inline void underscore_string(char * str, size_t len) {
-  for (size_t i=0; i<len; ++i) {
-    if (str[i] == ' ') {
-      str[i] = '_';
-    }
-  }
-}
-
 static inline void dstack_push(StateMachine * sm, element_t element) {
   g_queue_push_tail(sm->dstack, GINT_TO_POINTER(element));
 }
@@ -969,6 +927,17 @@ static inline void append_link(StateMachine * sm, const char * title, const char
   append(sm, true, "\">");
   append(sm, false, title);
   append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
+  append(sm, true, "</a>");
+}
+
+static inline void append_wiki_link(StateMachine * sm, const char * tag, const size_t tag_len, const char * title, const size_t title_len) {
+  g_autofree gchar* lowercased_tag = g_utf8_strdown(tag, tag_len);
+  g_autoptr(GString) normalized_tag = g_string_new(g_strdelimit(lowercased_tag, " ", '_'));
+
+  append(sm, true, "<a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/show_or_new?title=");
+  append_segment_uri_escaped(sm, normalized_tag->str, normalized_tag->str + normalized_tag->len - 1);
+  append(sm, true, "\">");
+  append_segment_html_escaped(sm, title, title + title_len - 1);
   append(sm, true, "</a>");
 }
 
