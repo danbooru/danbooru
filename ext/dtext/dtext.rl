@@ -245,11 +245,7 @@ inline := |*
     const char* url_start = sm->ts;
     const char* url_end = find_boundary_c(match_end);
 
-    append(sm, true, "<a href=\"");
-    append_segment_html_escaped(sm, url_start, url_end);
-    append(sm, true, "\">");
-    append_segment_html_escaped(sm, url_start, url_end);
-    append(sm, true, "</a>");
+    append_url(sm, url_start, url_end, url_start, url_end);
 
     if (url_end < match_end) {
       append_segment_html_escaped(sm, url_end + 1, match_end);
@@ -257,11 +253,7 @@ inline := |*
   };
 
   delimited_url => {
-    append(sm, true, "<a href=\"");
-    append_segment_html_escaped(sm, sm->ts + 1, sm->te - 2);
-    append(sm, true, "\">");
-    append_segment_html_escaped(sm, sm->ts + 1, sm->te - 2);
-    append(sm, true, "</a>");
+    append_url(sm, sm->ts + 1, sm->te - 2, sm->ts + 1, sm->te - 2);
   };
 
   # probably a tag. examples include @.@ and @_@
@@ -921,6 +913,14 @@ static inline void append_link(StateMachine * sm, const char * title, const char
   append(sm, true, "\">");
   append(sm, false, title);
   append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
+  append(sm, true, "</a>");
+}
+
+static inline void append_url(StateMachine * sm, const char * url_start, const char * url_end, const char * title_start, const char * title_end) {
+  append(sm, true, "<a class=\"dtext-link dtext-external-link\" href=\"");
+  append_segment_html_escaped(sm, url_start, url_end);
+  append(sm, true, "\">");
+  append_segment_html_escaped(sm, title_start, title_end);
   append(sm, true, "</a>");
 }
 
