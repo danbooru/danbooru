@@ -222,7 +222,7 @@ module Danbooru
     end
 
     def build_large_file_url(post)
-      "/data/#{post.file_path_prefix}#{Danbooru.config.large_image_prefix}/#{post.md5}.#{post.large_file_ext}"
+      "/data/sample/#{post.file_path_prefix}#{Danbooru.config.large_image_prefix}#{post.md5}.#{post.large_file_ext}"
     end
 
 #TAG CONFIGURATION
