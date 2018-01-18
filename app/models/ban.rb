@@ -1,5 +1,5 @@
 class Ban < ApplicationRecord
-  after_create :update_feedback
+  after_create :create_feedback
   after_create :update_user_on_create
   after_create :create_mod_action
   after_destroy :update_user_on_destroy
@@ -87,16 +87,6 @@ class Ban < ApplicationRecord
     end
   end
 
-  def update_feedback
-    if user
-      feedback = user.feedback.build
-      feedback.category = "negative"
-      feedback.body = "Banned: #{reason}"
-      feedback.creator_id = banner_id
-      feedback.save
-    end
-  end
-
   def update_user_on_create
     user.update_attribute(:is_banned, true)
   end
@@ -122,11 +112,19 @@ class Ban < ApplicationRecord
     @duration
   end
 
+  def humanized_duration
+    ApplicationController.helpers.distance_of_time_in_words(created_at, expires_at)
+  end
+
   def expired?
     expires_at < Time.now
   end
 
+  def create_feedback
+    user.feedback.create(category: "negative", body: "Banned for #{humanized_duration}: #{reason}")
+  end
+
   def create_mod_action
-    ModAction.log(%{Banned "#{user_name}":/users/#{user_id} until #{expires_at}},:user_ban)
+    ModAction.log(%{Banned <@#{user_name}> for #{humanized_duration}: #{reason}},:user_ban)
   end
 end
