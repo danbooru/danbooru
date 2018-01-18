@@ -105,7 +105,7 @@ GEM
     capistrano3-unicorn (0.2.1)
       capistrano (~> 3.1, >= 3.1.0)
     chronic (0.10.2)
-    cityhash (0.8.1)
+    cityhash (0.9.0)
     coderay (1.1.1)
     colorize (0.7.7)
     crack (0.4.3)
