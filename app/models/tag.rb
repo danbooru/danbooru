@@ -950,6 +950,19 @@ class Tag < ApplicationRecord
     end
   end
 
+  def self.convert_cosplay_tags(tags)
+    cosplay_tags,other_tags = tags.partition {|tag| tag.match(/\A(.+)_\(cosplay\)\Z/) }
+    cosplay_tags.grep(/\A(.+)_\(cosplay\)\Z/) { "#{TagAlias.to_aliased([$1]).first}_(cosplay)" } + other_tags
+  end
+
+  def self.invalid_cosplay_tags(tags)
+    tags.grep(/\A(.+)_\(cosplay\)\Z/) {|match| [match,TagAlias.to_aliased([$1]).first] }.
+      select do |name|
+        tag = Tag.find_by_name(name[1])
+        !tag.nil? && tag.category != Tag.categories.character
+      end.map {|tag| tag[0]}
+  end
+
   def editable_by?(user)
     return true if user.is_admin?
     return true if !is_locked? && user.is_builder? && post_count < 1_000
