@@ -621,7 +621,7 @@ list := |*
 main := |*
   header_with_id => {
     char header = *sm->a1;
-    GString * id_name = g_string_new_len(sm->b1, sm->b2 - sm->b1);
+    g_autoptr(GString) id_name = g_string_new_len(sm->b1, sm->b2 - sm->b1);
     id_name = g_string_prepend(id_name, "dtext-");
 
     if (sm->f_inline) {
@@ -675,8 +675,6 @@ main := |*
     }
 
     sm->header_mode = true;
-    g_string_free(id_name, false);
-    id_name = NULL;
     fcall inline;
   };
 
@@ -1179,7 +1177,7 @@ StateMachine* init_machine(const char * src, size_t len, bool f_strip, bool f_in
 
 void free_machine(StateMachine * sm) {
   g_string_free(sm->output, TRUE);
-  g_array_free(sm->stack, FALSE);
+  g_array_unref(sm->stack);
   g_queue_free(sm->dstack);
   g_clear_error(&sm->error);
   g_free(sm);
@@ -1269,7 +1267,7 @@ int main(int argc, char* argv[]) {
     { NULL }
   };
 
-  GOptionContext* context = g_option_context_new("[FILE...]");
+  g_autoptr(GOptionContext) context = g_option_context_new("[FILE...]");
   g_option_context_add_main_entries(context, options, NULL);
 
   if (!g_option_context_parse(context, &argc, &argv, &error)) {
