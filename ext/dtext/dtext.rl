@@ -201,45 +201,11 @@ inline := |*
   };
 
   basic_wiki_link => {
-    GString * segment = g_string_new_len(sm->a1, sm->a2 - sm->a1);
-    GString * lowercase_segment = NULL;
-    underscore_string(segment->str, segment->len);
-
-    if (g_utf8_validate(segment->str, -1, NULL)) {
-      lowercase_segment = g_string_new(g_utf8_strdown(segment->str, -1));
-    } else {
-      lowercase_segment = g_string_new(g_ascii_strdown(segment->str, -1));
-    }
-
-    append(sm, true, "<a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/show_or_new?title=");
-    append_segment_uri_escaped(sm, lowercase_segment->str, lowercase_segment->str + lowercase_segment->len - 1);
-    append(sm, true, "\">");
-    append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
-    append(sm, true, "</a>");
-
-    g_string_free(lowercase_segment, TRUE);
-    g_string_free(segment, TRUE);
+    append_wiki_link(sm, sm->a1, sm->a2 - sm->a1, sm->a1, sm->a2 - sm->a1);
   };
 
   aliased_wiki_link => {
-    GString * segment = g_string_new_len(sm->a1, sm->a2 - sm->a1);
-    GString * lowercase_segment = NULL;
-    underscore_string(segment->str, segment->len);
-
-    if (g_utf8_validate(segment->str, -1, NULL)) {
-      lowercase_segment = g_string_new(g_utf8_strdown(segment->str, -1));
-    } else {
-      lowercase_segment = g_string_new(g_ascii_strdown(segment->str, -1));
-    }
-
-    append(sm, true, "<a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/show_or_new?title=");
-    append_segment_uri_escaped(sm, lowercase_segment->str, lowercase_segment->str + lowercase_segment->len - 1);
-    append(sm, true, "\">");
-    append_segment_html_escaped(sm, sm->b1, sm->b2 - 1);
-    append(sm, true, "</a>");
-
-    g_string_free(lowercase_segment, TRUE);
-    g_string_free(segment, TRUE);
+    append_wiki_link(sm, sm->a1, sm->a2 - sm->a1, sm->b1, sm->b2 - sm->b1);
   };
 
   basic_textile_link => {
@@ -655,7 +621,7 @@ list := |*
 main := |*
   header_with_id => {
     char header = *sm->a1;
-    GString * id_name = g_string_new_len(sm->b1, sm->b2 - sm->b1);
+    g_autoptr(GString) id_name = g_string_new_len(sm->b1, sm->b2 - sm->b1);
     id_name = g_string_prepend(id_name, "dtext-");
 
     if (sm->f_inline) {
@@ -709,8 +675,6 @@ main := |*
     }
 
     sm->header_mode = true;
-    g_string_free(id_name, false);
-    id_name = NULL;
     fcall inline;
   };
 
@@ -865,14 +829,6 @@ main := |*
 
 %% write data;
 
-static inline void underscore_string(char * str, size_t len) {
-  for (size_t i=0; i<len; ++i) {
-    if (str[i] == ' ') {
-      str[i] = '_';
-    }
-  }
-}
-
 static inline void dstack_push(StateMachine * sm, element_t element) {
   g_queue_push_tail(sm->dstack, GINT_TO_POINTER(element));
 }
@@ -949,22 +905,18 @@ static inline void append_segment_uri_escaped(StateMachine * sm, const char * a,
     return;
   }
 
-  char * segment1 = NULL;
-  char * segment2 = NULL;
-  GString * segment_string = g_string_new_len(a, b - a + 1);
+  g_autofree char * segment1 = NULL;
+  g_autofree char * segment2 = NULL;
+  g_autoptr(GString) segment_string = g_string_new_len(a, b - a + 1);
 
   segment1 = g_uri_escape_string(segment_string->str, NULL, TRUE);
   segment2 = g_markup_escape_text(segment1, -1);
   sm->output = g_string_append(sm->output, segment2);
-  g_string_free(segment_string, TRUE);
-  g_free(segment1);
-  g_free(segment2);
 }
 
 static inline void append_segment_html_escaped(StateMachine * sm, const char * a, const char * b) {
-  gchar * segment = g_markup_escape_text(a, b - a + 1);
+  g_autofree gchar * segment = g_markup_escape_text(a, b - a + 1);
   sm->output = g_string_append(sm->output, segment);
-  g_free(segment);
 }
 
 static inline void append_link(StateMachine * sm, const char * title, const char * ahref) {
@@ -973,6 +925,17 @@ static inline void append_link(StateMachine * sm, const char * title, const char
   append(sm, true, "\">");
   append(sm, false, title);
   append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
+  append(sm, true, "</a>");
+}
+
+static inline void append_wiki_link(StateMachine * sm, const char * tag, const size_t tag_len, const char * title, const size_t title_len) {
+  g_autofree gchar* lowercased_tag = g_utf8_strdown(tag, tag_len);
+  g_autoptr(GString) normalized_tag = g_string_new(g_strdelimit(lowercased_tag, " ", '_'));
+
+  append(sm, true, "<a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/show_or_new?title=");
+  append_segment_uri_escaped(sm, normalized_tag->str, normalized_tag->str + normalized_tag->len - 1);
+  append(sm, true, "\">");
+  append_segment_html_escaped(sm, title, title + title_len - 1);
   append(sm, true, "</a>");
 }
 
@@ -1214,7 +1177,7 @@ StateMachine* init_machine(const char * src, size_t len, bool f_strip, bool f_in
 
 void free_machine(StateMachine * sm) {
   g_string_free(sm->output, TRUE);
-  g_array_free(sm->stack, FALSE);
+  g_array_unref(sm->stack);
   g_queue_free(sm->dstack);
   g_clear_error(&sm->error);
   g_free(sm);
@@ -1261,13 +1224,11 @@ gboolean parse_helper(StateMachine* sm) {
 #ifdef CDTEXT
 
 static void parse_file(FILE* input, FILE* output, gboolean opt_strip, gboolean opt_inline, gboolean opt_mentions) {
-  char* dtext = NULL;
+  g_autofree char* dtext = NULL;
   size_t n = 0;
 
   ssize_t length = getdelim(&dtext, &n, '\0', input);
   if (length == -1) {
-    free(dtext);
-
     if (ferror(input)) {
       perror("getdelim failed");
       exit(1);
@@ -1288,7 +1249,6 @@ static void parse_file(FILE* input, FILE* output, gboolean opt_strip, gboolean o
     exit(1);
   }
 
-  free(dtext);
   free_machine(sm);
 }
 
@@ -1307,7 +1267,7 @@ int main(int argc, char* argv[]) {
     { NULL }
   };
 
-  GOptionContext* context = g_option_context_new("[FILE...]");
+  g_autoptr(GOptionContext) context = g_option_context_new("[FILE...]");
   g_option_context_add_main_entries(context, options, NULL);
 
   if (!g_option_context_parse(context, &argc, &argv, &error)) {
