@@ -949,22 +949,18 @@ static inline void append_segment_uri_escaped(StateMachine * sm, const char * a,
     return;
   }
 
-  char * segment1 = NULL;
-  char * segment2 = NULL;
-  GString * segment_string = g_string_new_len(a, b - a + 1);
+  g_autofree char * segment1 = NULL;
+  g_autofree char * segment2 = NULL;
+  g_autoptr(GString) segment_string = g_string_new_len(a, b - a + 1);
 
   segment1 = g_uri_escape_string(segment_string->str, NULL, TRUE);
   segment2 = g_markup_escape_text(segment1, -1);
   sm->output = g_string_append(sm->output, segment2);
-  g_string_free(segment_string, TRUE);
-  g_free(segment1);
-  g_free(segment2);
 }
 
 static inline void append_segment_html_escaped(StateMachine * sm, const char * a, const char * b) {
-  gchar * segment = g_markup_escape_text(a, b - a + 1);
+  g_autofree gchar * segment = g_markup_escape_text(a, b - a + 1);
   sm->output = g_string_append(sm->output, segment);
-  g_free(segment);
 }
 
 static inline void append_link(StateMachine * sm, const char * title, const char * ahref) {
@@ -1261,13 +1257,11 @@ gboolean parse_helper(StateMachine* sm) {
 #ifdef CDTEXT
 
 static void parse_file(FILE* input, FILE* output, gboolean opt_strip, gboolean opt_inline, gboolean opt_mentions) {
-  char* dtext = NULL;
+  g_autofree char* dtext = NULL;
   size_t n = 0;
 
   ssize_t length = getdelim(&dtext, &n, '\0', input);
   if (length == -1) {
-    free(dtext);
-
     if (ferror(input)) {
       perror("getdelim failed");
       exit(1);
@@ -1288,7 +1282,6 @@ static void parse_file(FILE* input, FILE* output, gboolean opt_strip, gboolean o
     exit(1);
   }
 
-  free(dtext);
   free_machine(sm);
 }
 
