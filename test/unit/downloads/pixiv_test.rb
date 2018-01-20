@@ -123,12 +123,6 @@ module Downloads
         should_eventually "rewrite bad id samples to full size" do
           assert_rewritten(@bad_id_full, @bad_id_sample)
         end
-
-        # XXX This may fail someday. Pixiv doesn't delete bad id images right
-        # away, but they may be deleted eventually.
-        should "download the image" do
-          assert_downloaded(21440, @bad_id_full)
-        end
       end
 
       context "downloading a ugoira" do
