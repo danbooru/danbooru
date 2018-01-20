@@ -1614,7 +1614,8 @@ class PostTest < ActiveSupport::TestCase
         should "warn when a tag removal failed due to implications or automatic tags" do
           ti = FactoryGirl.create(:tag_implication, antecedent_name: "cat", consequent_name: "animal")
           @post.reload
-          @post.update(old_tag_string: @post.tag_string, tag_string: "chen_(cosplay) chen cosplay cat animal")
+          @post.update(old_tag_string: @post.tag_string, tag_string: "chen_(cosplay) char:chen cosplay cat animal")
+          @post.warnings.clear
           @post.reload
           @post.update(old_tag_string: @post.tag_string, tag_string: "chen_(cosplay) chen cosplay cat -cosplay")
 
