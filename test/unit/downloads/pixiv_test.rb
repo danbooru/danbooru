@@ -145,8 +145,8 @@ module Downloads
 
       context "downloading a profile image" do
         should "download new profile images" do
-          @file_url = "http://i2.pixiv.net/img130/profile/minono_aki/8733472.jpg"
-          @file_size = 23_444
+          @file_url = "https://i.pximg.net/user-profile/img/2014/12/18/10/31/23/8733472_7dc7310db6cc37163af145d04499e411_170.jpg"
+          @file_size = 23_328
 
           assert_not_rewritten(@file_url)
           assert_downloaded(@file_size, @file_url)
