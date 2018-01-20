@@ -787,7 +787,10 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "apply aliases when the character tag is added" do
+            FactoryGirl.create(:tag, name: "jim", category: Tag.categories.general)
+            FactoryGirl.create(:tag, name: "james", category: Tag.categories.character)
             FactoryGirl.create(:tag_alias, antecedent_name: "jim", consequent_name: "james")
+
             @post.add_tag("jim_(cosplay)")
             @post.save
 
