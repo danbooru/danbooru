@@ -181,6 +181,10 @@ class AnonymousUser
     false
   end
 
+  def hide_favorites?
+    false
+  end
+
   def enable_sequential_post_navigation
     true
   end
