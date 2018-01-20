@@ -159,7 +159,7 @@ class ArtistsControllerTest < ActionController::TestCase
         end
 
         @wiki_page.reload
-        assert_equal(old_timestamp, @wiki_page.updated_at)
+        assert_equal(old_timestamp.to_i, @wiki_page.updated_at.to_i)
         assert_equal(old_updater_id, @wiki_page.updater_id)
       end
 
