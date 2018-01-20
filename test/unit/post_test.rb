@@ -2132,7 +2132,7 @@ class PostTest < ActiveSupport::TestCase
       assert_tag_match(all - [flagged], "-status:flagged")
       assert_tag_match(all - [deleted], "-status:deleted")
       assert_tag_match(all - [banned],  "-status:banned")
-      assert_tag_match(all - [flagged], "-status:active")
+      assert_tag_match(all, "-status:active")
     end
 
     should "respect the 'Deleted post filter' option when using the status:banned metatag" do
