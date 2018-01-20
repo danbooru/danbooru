@@ -57,7 +57,7 @@ module Sources
       end
 
       should "get the tags" do
-        assert_equal(%w[baz bar foo], @site.tags.map(&:first))
+        assert_equal(%w[foo bar baz], @site.tags.map(&:first))
       end
 
       should "get the commentary" do
