@@ -62,11 +62,12 @@
   }
 
   Danbooru.Upload.initialize_enter_on_tags = function() {
-    $("#upload_tag_string,#post_tag_string").on("keydown.danbooru.submit", null, "return", function(e) {
+    var $textarea = $("#upload_tag_string, #post_tag_string");
+    var $submit = $textarea.parents("form").find('input[type="submit"]');
+
+    $textarea.on("keydown.danbooru.submit", null, "return", function(e) {
       if (!Danbooru.autocompleting) {
-        $("#form").trigger("submit");
-        $("#quick-edit-form").trigger("submit");
-        $("#upload_tag_string,#post_tag_string").off(".submit");
+          $submit.click();
       }
 
       e.preventDefault();
