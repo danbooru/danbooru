@@ -361,14 +361,10 @@ inline := |*
   '[/tn]'i => {
     dstack_close_before_block(sm);
 
-    if (dstack_check(sm, BLOCK_TN)) {
-      dstack_pop(sm);
+    if (dstack_check(sm, INLINE_TN)) {
+      dstack_close_inline(sm, INLINE_TN, "</span>");
+    } else if (dstack_close_block(sm, BLOCK_TN, "</p>")) {
       fret;
-    } else if (dstack_check(sm, INLINE_TN)) {
-      dstack_pop(sm);
-      append(sm, true, "</span>");
-    } else {
-      append_block(sm, "[/tn]");
     }
   };
 

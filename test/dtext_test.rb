@@ -129,6 +129,14 @@ class DTextTest < Minitest::Test
     assert_parse("<p>h1#blah-&quot;blah. header</p>", "h1#blah-\"blah. header")
   end
 
+  def test_inline_tn
+    assert_parse('<p>foo <span class="tn">bar</span></p>', "foo [tn]bar[/tn]")
+  end
+
+  def test_block_tn
+    assert_parse('<p class="tn">bar</p>', "[tn]bar[/tn]")
+  end
+
   def test_quote_blocks
     assert_parse('<blockquote><p>test</p></blockquote>', "[quote]\ntest\n[/quote]")
   end
@@ -335,7 +343,7 @@ class DTextTest < Minitest::Test
   def test_mention_boundaries
     assert_parse('<p>「hi <a rel="nofollow" href="/users?name=葉月">@葉月</a>」</p>', "「hi @葉月」")
   end
-  
+
   def test_delimited_mentions
     dtext = '(blah <@evazion>).'
     html = '<p>(blah <a rel="nofollow" href="/users?name=evazion">@evazion</a>).</p>'
