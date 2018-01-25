@@ -1,8 +1,9 @@
 class AliasAndImplicationImporter
-  attr_accessor :text, :commands, :forum_id, :rename_aliased_pages, :skip_secondary_validations
+  attr_accessor :text, :commands, :forum_id, :forum_post, :rename_aliased_pages, :skip_secondary_validations
 
-  def initialize(text, forum_id, rename_aliased_pages = "0", skip_secondary_validations = true)
+  def initialize(text, forum_id, rename_aliased_pages = "0", skip_secondary_validations = true, forum_post = nil)
     @forum_id = forum_id
+    @forum_post = forum_post
     @text = text
     @rename_aliased_pages = rename_aliased_pages
     @skip_secondary_validations = skip_secondary_validations
@@ -59,13 +60,13 @@ class AliasAndImplicationImporter
     tokens.map do |token|
       case token[0]
       when :create_alias
-        tag_alias = TagAlias.new(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2], :skip_secondary_validations => skip_secondary_validations)
+        tag_alias = TagAlias.new(:forum_topic_id => forum_id, :forum_post_id => forum_post, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2], :skip_secondary_validations => skip_secondary_validations)
         unless tag_alias.valid?
           raise "Error: #{tag_alias.errors.full_messages.join("; ")} (create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name})"
         end
 
       when :create_implication
-        tag_implication = TagImplication.new(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2], :skip_secondary_validations => skip_secondary_validations)
+        tag_implication = TagImplication.new(:forum_topic_id => forum_id, :forum_post_id => forum_post, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2], :skip_secondary_validations => skip_secondary_validations)
         unless tag_implication.valid?
           raise "Error: #{tag_implication.errors.full_messages.join("; ")} (create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name})"
         end
@@ -86,7 +87,7 @@ private
       tokens.map do |token|
         case token[0]
         when :create_alias
-          tag_alias = TagAlias.create(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2], :skip_secondary_validations => skip_secondary_validations)
+          tag_alias = TagAlias.create(:forum_topic_id => forum_id, :forum_post_id => forum_post, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2], :skip_secondary_validations => skip_secondary_validations)
           unless tag_alias.valid?
             raise "Error: #{tag_alias.errors.full_messages.join("; ")} (create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name})"
           end
@@ -94,7 +95,7 @@ private
           tag_alias.approve!(approver: approver, update_topic: false)
 
         when :create_implication
-          tag_implication = TagImplication.create(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2], :skip_secondary_validations => skip_secondary_validations)
+          tag_implication = TagImplication.create(:forum_topic_id => forum_id, :forum_post_id => forum_post, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2], :skip_secondary_validations => skip_secondary_validations)
           unless tag_implication.valid?
             raise "Error: #{tag_implication.errors.full_messages.join("; ")} (create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name})"
           end
