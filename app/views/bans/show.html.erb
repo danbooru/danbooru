@@ -1,14 +1,21 @@
 <div id="c-bans">
   <div id="a-show">
-    <h1>Show Ban</h1>
+    <h1>Ban for <%= link_to_user(@ban.user) %></h1>
     <ul style="margin-bottom: 1em;">
-      <li><strong>User</strong>: <%= link_to_user(@ban.user) %></li>
+      <li><strong>Banner</strong>: <%= link_to_user(@ban.banner) %></li>
+      <li><strong>Created</strong>: <%= @ban.created_at %>
+        <% if @ban.updated_at > @ban.created_at %>
+          (<span class="tn">Updated <%= time_ago_in_words_tagged(@ban.updated_at) %></span>)
+        <% end %>
+      </li>
       <li><strong>Expires</strong>: <%= compact_time @ban.expires_at %></li>
       <li><strong>Reason</strong>: <%= format_text @ban.reason %></li>
     </ul>
 
-    <%= form_tag(ban_path(@ban), :method => :delete) do %>
-      <%= submit_tag "Unban" %>
+    <% if CurrentUser.is_moderator? %>
+      <%= form_tag(ban_path(@ban), :method => :delete) do %>
+        <%= submit_tag "Unban" %>
+      <% end %>
     <% end %>
   </div>
 </div>

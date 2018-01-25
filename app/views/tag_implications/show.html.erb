@@ -5,11 +5,28 @@
     <ul>
       <li><strong>From</strong> <%= link_to @tag_implication.antecedent_name, posts_path(:tags => @tag_implication.antecedent_name) %></li>
       <li><strong>To</strong> <%= link_to @tag_implication.consequent_name, posts_path(:tags => @tag_implication.consequent_name) %></li>
-      <% if @tag_implication.forum_topic_id %>
-        <li><strong>Reference</strong> <%= link_to "topic ##{@tag_implication.forum_topic_id}", forum_topic_path(@tag_implication.forum_topic_id) %></li>
+      <li><strong>Status</strong>: <%= @tag_implication.status %></li>
+      <% if @tag_implication.forum_topic_id || @tag_implication.forum_post_id %>
+        <li><strong>Reference</strong>:
+          <% if @tag_implication.forum_topic_id %>
+            <% if @tag_implication.forum_post_id && @tag_implication.forum_topic.posts.first.id != @tag_implication.forum_post_id %>
+              <%= link_to(@tag_implication.forum_topic.title, forum_topic_path(@tag_implication.forum_topic_id, :page => @tag_implication.forum_post.forum_topic_page, :anchor => "forum_post_#{@tag_implication.forum_post_id}")) %>
+            <% else %>
+              <%= link_to(@tag_implication.forum_topic.title, forum_topic_path(@tag_implication.forum_topic_id)) %>
+            <% end %>
+          <% end %>
+        </li>
       <% end %>
       <li><strong>Creator</strong> <%= link_to_user @tag_implication.creator %></li>
-      <li><strong>Date</strong> <%= @tag_implication.created_at %></li>
+      <% if @tag_implication.approver %>
+        <li><strong>Approver</strong>: <%= link_to_user @tag_implication.approver %></li>
+      <% end %>
+      <li>
+        <strong>Date</strong>: <%= compact_time @tag_implication.created_at %>
+        <% if @tag_implication.updated_at - @tag_implication.created_at > 5.minutes %>
+          (<span class="tn">Updated <%= time_ago_in_words_tagged(@tag_implication.updated_at) %></span>)
+        <% end %>
+      </li>
       <% if @tag_implication.respond_to?(:reason) && @tag_implication.reason.present? %>
         <li><strong>Reason</strong> <%= format_text @tag_implication.reason %></li>
       <% end %>

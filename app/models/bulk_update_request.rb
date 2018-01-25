@@ -156,6 +156,10 @@ class BulkUpdateRequest < ApplicationRecord
   include ApprovalMethods
   include ValidationMethods
 
+  def is_pending?
+    status == "pending"
+  end
+
   def editable?(user)
     user_id == user.id || user.is_builder?
   end

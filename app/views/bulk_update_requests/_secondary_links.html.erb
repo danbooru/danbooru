@@ -2,5 +2,15 @@
   <menu>
     <li><%= link_to "Listing", bulk_update_requests_path %></li>
     <li><%= link_to "New", new_bulk_update_request_path %></li>
+    <% if @bulk_update_request && !@bulk_update_request.new_record? %>
+      <% if @bulk_update_request.editable?(CurrentUser.user) %>
+        <li>|</li>
+        <li><%= link_to "Edit", edit_bulk_update_request_path(@bulk_update_request) %></li>
+        <li><%= link_to "Reject", bulk_update_request_path(@bulk_update_request), :method => :delete, :remote => true, :data => {:confirm => "Are you sure you want to reject this bulk update request?"} %></li>
+      <% end %>
+      <% if CurrentUser.is_admin? && @bulk_update_request.is_pending? %>
+        <li><%= link_to "Approve", approve_bulk_update_request_path(@bulk_update_request), :remote => true, :method => :post %></li>
+      <% end %>
+    <% end %>
   </menu>
 <% end %>

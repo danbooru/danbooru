@@ -11,5 +11,10 @@
     <% end %>
     <li><%= link_to "Listing", user_feedbacks_path %></li>
     <li><%= link_to "Search", search_user_feedbacks_path %></li>
+    <% if @user_feedback && !@user_feedback.new_record? && @user_feedback.editable_by?(CurrentUser.user) %>
+      <li>|</li>
+      <li><%= link_to "Edit", edit_user_feedback_path(@user_feedback) %></li>
+      <li><%= link_to "Delete", user_feedback_path(@user_feedback), :method => :delete, :data => {:confirm => "Are you sure you want to delete this user feedback?"} %></li>
+    <% end %>
   </menu>
 <% end %>
