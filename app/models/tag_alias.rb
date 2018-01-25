@@ -8,12 +8,6 @@ class TagAlias < TagRelationship
   validate :antecedent_and_consequent_are_different
   validate :consequent_has_wiki_page, :on => :create
   validate :mininum_antecedent_count, :on => :create
-  belongs_to :creator, :class_name => "User"
-  belongs_to :approver, :class_name => "User"
-  belongs_to :forum_topic
-  belongs_to :forum_post
-  attr_accessible :antecedent_name, :consequent_name, :forum_topic_id, :skip_secondary_validations
-  attr_accessible :status, :approver_id, :as => [:admin]
 
   module CacheMethods
     extend ActiveSupport::Concern
