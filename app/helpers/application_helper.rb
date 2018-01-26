@@ -160,7 +160,8 @@ module ApplicationHelper
   def dtext_preview_button(object, name, options = {})
     options[:input_id] ||= "#{object}_#{name}"
     options[:preview_id] ||= "dtext-preview"
-    submit_tag("Preview", "data-input-id" => options[:input_id], "data-preview-id" => options[:preview_id])
+    options[:inline] ||= false
+    submit_tag("Preview", "data-input-id" => options[:input_id], "data-preview-id" => options[:preview_id], "data-inline" => options[:inline])
   end
 
   def search_field(method, options = {})
