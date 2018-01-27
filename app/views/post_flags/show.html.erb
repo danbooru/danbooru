@@ -1,0 +1,50 @@
+<div id="c-post-flags">
+  <div id="a-show">
+    <h1>Show Flag</h1>
+    <div id="reason"><%= format_text @post_flag.reason, inline: true %></div>
+    <aside id="sidebar">
+      <h1>Flag Information</h1>
+      <section id="flag-information">
+        <ul>
+          <li><strong>Category</strong>: <%= @post_flag.category %></li>
+          <li><strong>Resolved</strong>: <%= @post_flag.is_resolved %></li>
+          <li><strong>Flagger</strong>:
+          <% if CurrentUser.can_view_flagger_on_post?(@post_flag) %>
+            <%= link_to_user @post_flag.creator %>
+          <% else %>
+            <em>hidden</em>
+          <% end %>
+          </li>
+          <li><strong>Date</strong>: <%= compact_time @post_flag.created_at %></li>
+        </ul>
+      </section>
+      <%= render "post_information", :post => @post_flag.post %>
+    </aside>
+    <section id="content" style="width:<%= @post_flag.post.large_image_width + 200 %>px">
+      <section itemscope itemtype="http://schema.org/ImageObject" id="image-container" <%= PostPresenter.data_attributes(@post_flag.post) %>>
+        <%= @post_flag.post.presenter.image_html(self) %>
+      </section>
+      <section id="relations" style="width:180px; max-height:<%= @post_flag.post.large_image_height %>px">
+        <% if @post_flag.post.parent_id && @post_flag.post.parent_exists? %>
+          <div class="relation-title">Parent relations</div>
+          <%= @parent_post_set.presenter.post_previews_html(self) %>
+        <% end %>
+        <% if @post_flag.post.has_visible_children? %>
+          <div class="relation-title">Child relations</div>
+          <%= @children_post_set.presenter.post_previews_html(self) %>
+        <% end %>
+      </section>
+    </section>
+    <div class="clearfix"></div>
+    <section id="post-event-history">
+      <h1>Flag &amp; Appeal History</h1>
+      <%= render "post_events/listing", :events => PostEvent.find_for_post(@post_flag.post_id) %>
+    </section>
+  </div>
+</div>
+
+<%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Post Flag - <%= Danbooru.config.app_name %>
+<% end %>

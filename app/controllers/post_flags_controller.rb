@@ -24,6 +24,8 @@ class PostFlagsController < ApplicationController
 
   def show
     @post_flag = PostFlag.find(params[:id])
+    @parent_post_set = PostSets::PostRelationship.new(@post_flag.post.parent_id, :include_deleted => true)
+    @children_post_set = PostSets::PostRelationship.new(@post_flag.post.id, :include_deleted => true)
     respond_with(@post_flag)
   end
 end

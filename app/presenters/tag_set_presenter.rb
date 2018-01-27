@@ -26,15 +26,23 @@ class TagSetPresenter < Presenter
     html = ""
 
     TagCategory.split_header_list.each do |category|
-      typetags = typed_tags(category)
-      if typetags.any?
-        html << TagCategory.header_mapping[category]
-        html << %{<ul class="#{category}-tag-list">}
-        typetags.each do |tag|
-          html << build_list_item(tag, template, options)
-        end
-        html << "</ul>"
+      html << category_list_html(template, category, options)
+    end
+
+    html.html_safe
+  end
+
+  def category_list_html(template, category, options = {})
+    html = ""
+
+    typetags = typed_tags(category)
+    if typetags.any?
+      html << TagCategory.header_mapping[category]
+      html << %{<ul class="#{category}-tag-list">}
+      typetags.each do |tag|
+        html << build_list_item(tag, template, options)
       end
+      html << "</ul>"
     end
 
     html.html_safe

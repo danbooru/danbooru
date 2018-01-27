@@ -2,40 +2,7 @@
   <div id="a-index">
     <h1>Flags &amp; Appeals</h1>
 
-    <table width="100%" class="striped">
-      <thead>
-        <tr>
-          <th width="5%">Type</th>
-          <th width="10%">Creator</th>
-          <th>Reason</th>
-          <th width="5%">Resolved?</th>
-          <th width="15%">Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @events.each do |event| %>
-          <tr class="resolved-<%= event.is_resolved %>">
-            <td><%= event.type_name %></td>
-            <td>
-              <% if event.is_creator_visible? %>
-                <%= link_to_user event.creator %>
-              <% else %>
-                <i>hidden</i>
-              <% end %>
-            </td>
-            <td><%= format_text event.reason, inline: true %></td>
-            <td>
-              <% if event.is_resolved %>
-                yes
-              <% else %>
-                no
-              <% end %>
-            </td>
-            <td><%= compact_time event.created_at %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+  <%= render "listing", :events => @events %>
   </div>
 </div>
 

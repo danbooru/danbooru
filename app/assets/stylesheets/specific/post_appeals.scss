@@ -1,5 +1,41 @@
+@import "../common/000_vars.scss";
+
 div#c-post-appeals {
   li {
     list-style-type: disc;
+  }
+
+  aside#sidebar #tag-list h2 {
+    font-size: $h4_size;
+  }
+
+  aside#sidebar > section > ul {
+    margin-bottom: 1em;
+  }
+
+  aside#sidebar > section > ul li {
+    list-style-type: none;
+  }
+
+  section#content > section {
+    float: left;
+  }
+
+  section#content div.relation-title {
+    float: left;
+    font-size: 120%;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  section#relations {
+    overflow-y: auto;
+    margin-left: 10px;
+  }
+
+  div#reason {
+    border: 1px solid #C0ECFC;
+    background: #D8F2FC;
+    margin-bottom: 10px;
   }
 }

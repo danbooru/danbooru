@@ -1,0 +1,56 @@
+<h1>Post Information</h1>
+<section id="tag-list">
+  <%= post.presenter.category_list_html(self,"artist") %>
+  <%= post.presenter.category_list_html(self,"meta") %>
+</section>
+<section id="post-information">
+  <ul itemscope itemtype="http://schema.org/ImageObject">
+    <li><strong>Uploader</strong>: <%= link_to_user post.uploader %></li>
+    <li><strong>Approver</strong>:
+      <% if post.approver %>
+        <%= link_to_user post.approver %>
+      <% else %>
+        <em>none</em>
+      <% end %>
+    </li>
+    <li><strong>Date</strong>: <%= compact_time post.created_at %></li>
+    <li><strong>ID</strong>: <%= link_to post.id, post_path(post) %></li>
+    <li>
+      <strong>Size</strong>: <%= link_to_if post.visible?, number_to_human_size(post.file_size), post.file_url %>
+      <% if post.has_dimensions? %>
+        (<span itemprop="width"><%= post.image_width %></span>x<span itemprop="height"><%= post.image_height %></span>)
+      <% end %>
+    </li>
+    <li><strong>Source</strong>: <%= post_source_tag(post) %></li>
+    <li><strong>Rating</strong>: <%= post.pretty_rating %></li>
+    <li><strong>Score</strong>: <%= post.score %></li>
+    <li><strong>Favorites</strong>: <%= post.fav_count %></li>
+    <li>
+      <strong>Status</strong>:
+      <% if post.is_pending? %>
+        Pending
+      <% end %>
+
+      <% if post.is_deleted? %>
+        Deleted
+      <% end %>
+
+      <% if post.is_flagged? %>
+        Flagged
+      <% end %>
+
+      <% if post.is_banned? %>
+        Banned
+      <% end %>
+
+      <% if !post.is_pending? && !post.is_flagged? && !post.is_deleted? && !post.is_banned? %>
+        Active
+      <% end %>
+    </li>
+  </ul>
+</section>
+<section id="buttons">
+  <% if CurrentUser.can_approve_posts? && (post.is_flagged? || post.is_pending?) %>
+    <%= button_to "Approve", moderator_post_approval_path(:post_id => post.id), remote: true, method: :post, form: {id: "approve-button"}, class: "ui-button ui-widget ui-corner-all gradient", data: {disable_with: "Approving..."} %>
+  <% end %>
+</section>

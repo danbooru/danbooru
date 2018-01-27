@@ -24,6 +24,8 @@ class PostAppealsController < ApplicationController
 
   def show
     @post_appeal = PostAppeal.find(params[:id])
+    @parent_post_set = PostSets::PostRelationship.new(@post_appeal.post.parent_id, :include_deleted => true)
+    @children_post_set = PostSets::PostRelationship.new(@post_appeal.post.id, :include_deleted => true)
     respond_with(@post_appeal)
   end
 end

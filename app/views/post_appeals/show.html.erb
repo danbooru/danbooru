@@ -1,0 +1,43 @@
+<div id="c-post-appeals">
+  <div id="a-show">
+    <h1>Show Appeal</h1>
+    <div id="reason"><%= format_text @post_appeal.reason, inline: true %></div>
+    <aside id="sidebar">
+      <h1>Appeal Information</h1>
+      <section id="appeal-information">
+        <ul>
+          <li><strong>Resolved</strong>: <%= @post_appeal.is_resolved %></li>
+          <li><strong>Appealer</strong>: <%= link_to_user @post_appeal.creator %></li>
+          <li><strong>Date</strong>: <%= compact_time @post_appeal.created_at %></li>
+        </ul>
+      </section>
+      <%= render "post_flags/post_information", :post => @post_appeal.post %>
+    </aside>
+    <section id="content" style="width:<%= @post_appeal.post.large_image_width + 200 %>px">
+      <section itemscope itemtype="http://schema.org/ImageObject" id="image-container" <%= PostPresenter.data_attributes(@post_appeal.post) %>>
+        <%= @post_appeal.post.presenter.image_html(self) %>
+      </section>
+      <section id="relations" style="width:180px; max-height:<%= @post_appeal.post.large_image_height %>px">
+        <% if @post_appeal.post.parent_id && @post_appeal.post.parent_exists? %>
+          <div class="relation-title">Parent relations</div>
+          <%= @parent_post_set.presenter.post_previews_html(self) %>
+        <% end %>
+        <% if @post_appeal.post.has_visible_children? %>
+          <div class="relation-title">Child relations</div>
+          <%= @children_post_set.presenter.post_previews_html(self) %>
+        <% end %>
+      </section>
+    </section>
+    <div class="clearfix"></div>
+    <section id="post-event-history">
+      <h1>Flag &amp; Appeal History</h1>
+      <%= render "post_events/listing", :events => PostEvent.find_for_post(@post_appeal.post_id) %>
+    </section>
+  </div>
+</div>
+
+<%= render "post_flags/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Post Appeal - <%= Danbooru.config.app_name %>
+<% end %>
