@@ -126,6 +126,7 @@ class Artist < ApplicationRecord
         "twitpic.com/photos", # http://twitpic.com/photos/Type10TK
         "twitter.com", # https://twitter.com/akkij0358
         "twitter.com/i/web/status", # https://twitter.com/i/web/status/943446161586733056
+        "twimg.com/media", # https://pbs.twimg.com/media/DUUUdD5VMAEuURz.jpg:orig
         "ustream.tv",
         "ustream.tv/channel", # http://www.ustream.tv/channel/633b
         "ustream.tv/user", # http://www.ustream.tv/user/kazaputi
