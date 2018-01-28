@@ -121,18 +121,32 @@ post_link = '{{' noncurly+ >mark_a1 %mark_a2 '}}';
 spoilers_open = '[spoiler'i 's'i? ']';
 spoilers_close = '[/spoiler'i 's'i? ']';
 
-post_id = 'post #'i digit+ >mark_a1 %mark_a2;
-note_id = 'note #'i digit+ >mark_a1 %mark_a2;
-forum_post_id = 'forum #'i digit+ >mark_a1 %mark_a2;
-forum_topic_id = 'topic #'i digit+ >mark_a1 %mark_a2;
-forum_topic_paged_id = 'topic #'i digit+ >mark_a1 %mark_a2 '/p' digit+ >mark_b1 %mark_b2;
-comment_id = 'comment #'i digit+ >mark_a1 %mark_a2;
-pool_id = 'pool #'i digit+ >mark_a1 %mark_a2;
-user_id = 'user #'i digit+ >mark_a1 %mark_a2;
-artist_id = 'artist #'i digit+ >mark_a1 %mark_a2;
-github_issue_id = 'issue #'i digit+ >mark_a1 %mark_a2;
-pixiv_id = 'pixiv #'i digit+ >mark_a1 %mark_a2;
-pixiv_paged_id = 'pixiv #'i digit+ >mark_a1 %mark_a2 '/p' digit+ >mark_b1 %mark_b2;
+id = digit+ >mark_a1 %mark_a2;
+page = digit+ >mark_b1 %mark_b2;
+
+post_id = 'post #'i id;
+post_appeal_id = 'appeal #'i id;
+post_flag_id = 'flag #'i id;
+note_id = 'note #'i id;
+forum_post_id = 'forum #'i id;
+forum_topic_id = 'topic #'i id;
+forum_topic_paged_id = 'topic #'i id '/p'i page;
+comment_id = 'comment #'i id;
+pool_id = 'pool #'i id;
+user_id = 'user #'i id;
+artist_id = 'artist #'i id;
+ban_id = 'ban #'i id;
+bulk_update_request_id = 'bur #'i id;
+tag_alias_id = 'alias #'i id;
+tag_implication_id = 'implication #'i id;
+favorite_group_id = 'favgroup #'i id;
+mod_action_id = 'mod action #'i id;
+user_feedback_id = 'feedback #'i id;
+wiki_page_id = 'wiki #'i id;
+
+github_issue_id = 'issue #'i id;
+pixiv_id = 'pixiv #'i id;
+pixiv_paged_id = 'pixiv #'i id '/p'i page;
 
 ws = ' ' | '\t';
 nonperiod = graph - ('.' | '"');
@@ -145,6 +159,14 @@ list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
 inline := |*
   post_id => {
     append_link(sm, "post #", "<a class=\"dtext-link dtext-id-link dtext-post-id-link\" href=\"/posts/");
+  };
+
+  post_appeal_id => {
+    append_link(sm, "appeal #", "<a class=\"dtext-link dtext-id-link dtext-post-appeal-id-link\" href=\"/post_appeals/");
+  };
+
+  post_flag_id => {
+    append_link(sm, "flag #", "<a class=\"dtext-link dtext-id-link dtext-post-flag-id-link\" href=\"/post_flags/");
   };
 
   note_id => {
@@ -177,6 +199,38 @@ inline := |*
 
   artist_id => {
     append_link(sm, "artist #", "<a class=\"dtext-link dtext-id-link dtext-artist-id-link\" href=\"/artists/");
+  };
+
+  ban_id => {
+    append_link(sm, "ban #", "<a class=\"dtext-link dtext-id-link dtext-ban-id-link\" href=\"/bans/");
+  };
+
+  bulk_update_request_id => {
+    append_link(sm, "BUR #", "<a class=\"dtext-link dtext-id-link dtext-bulk-update-request-id-link\" href=\"/bulk_update_requests/");
+  };
+
+  tag_alias_id => {
+    append_link(sm, "alias #", "<a class=\"dtext-link dtext-id-link dtext-tag-alias-id-link\" href=\"/tag_aliases/");
+  };
+
+  tag_implication_id => {
+    append_link(sm, "implication #", "<a class=\"dtext-link dtext-id-link dtext-tag-implication-id-link\" href=\"/tag_implications/");
+  };
+
+  favorite_group_id => {
+    append_link(sm, "favgroup #", "<a class=\"dtext-link dtext-id-link dtext-favorite-group-id-link\" href=\"/favorite_groups/");
+  };
+
+  mod_action_id => {
+    append_link(sm, "mod action #", "<a class=\"dtext-link dtext-id-link dtext-mod-action-id-link\" href=\"/mod_actions/");
+  };
+
+  user_feedback_id => {
+    append_link(sm, "feedback #", "<a class=\"dtext-link dtext-id-link dtext-user-feedback-id-link\" href=\"/user_feedbacks/");
+  };
+
+  wiki_page_id => {
+    append_link(sm, "wiki #", "<a class=\"dtext-link dtext-id-link dtext-wiki-page-id-link\" href=\"/wiki_pages/");
   };
 
   github_issue_id => {

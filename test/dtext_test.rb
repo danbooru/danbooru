@@ -2,6 +2,10 @@ require 'minitest/autorun'
 require 'dtext/dtext'
 
 class DTextTest < Minitest::Test
+  def assert_parse_id_link(class_name, url, input)
+    assert_parse(%{<p><a class="dtext-link dtext-id-link #{class_name}" href="#{url}">#{input}</a></p>}, input)
+  end
+
   def assert_parse(expected, input, **options)
     if expected.nil?
       assert_nil(DTextRagel.parse(input, **options))
@@ -300,6 +304,26 @@ class DTextTest < Minitest::Test
 
   def test_forum_links
     assert_parse('<p><a class="dtext-link dtext-id-link dtext-forum-topic-id-link" href="/forum_topics/1234?page=4">topic #1234/p4</a></p>', "topic #1234/p4")
+  end
+
+  def test_id_links
+    assert_parse_id_link("dtext-post-id-link", "/posts/1234", "post #1234")
+    assert_parse_id_link("dtext-post-appeal-id-link", "/post_appeals/1234", "appeal #1234")
+    assert_parse_id_link("dtext-post-flag-id-link", "/post_flags/1234", "flag #1234")
+    assert_parse_id_link("dtext-note-id-link", "/notes/1234", "note #1234")
+    assert_parse_id_link("dtext-forum-post-id-link", "/forum_posts/1234", "forum #1234")
+    assert_parse_id_link("dtext-forum-topic-id-link", "/forum_topics/1234", "topic #1234")
+    assert_parse_id_link("dtext-comment-id-link", "/comments/1234", "comment #1234")
+    assert_parse_id_link("dtext-pool-id-link", "/pools/1234", "pool #1234")
+    assert_parse_id_link("dtext-user-id-link", "/users/1234", "user #1234")
+    assert_parse_id_link("dtext-artist-id-link", "/artists/1234", "artist #1234")
+    assert_parse_id_link("dtext-ban-id-link", "/bans/1234", "ban #1234")
+    assert_parse_id_link("dtext-tag-alias-id-link", "/tag_aliases/1234", "alias #1234")
+    assert_parse_id_link("dtext-tag-implication-id-link", "/tag_implications/1234", "implication #1234")
+    assert_parse_id_link("dtext-favorite-group-id-link", "/favorite_groups/1234", "favgroup #1234")
+    assert_parse_id_link("dtext-mod-action-id-link", "/mod_actions/1234", "mod action #1234")
+    assert_parse_id_link("dtext-user-feedback-id-link", "/user_feedbacks/1234", "feedback #1234")
+    assert_parse_id_link("dtext-wiki-page-id-link", "/wiki_pages/1234", "wiki #1234")
   end
 
   def test_boundary_exploit
