@@ -148,12 +148,7 @@ inline := |*
   };
 
   note_id => {
-    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-note-id-link\" href=\"/notes/");
-    append_segment(sm, true, sm->a1, sm->a2 - 1);
-    append(sm, true, "\">");
-    append(sm, false, "note #");
-    append_segment(sm, false, sm->a1, sm->a2 - 1);
-    append(sm, true, "</a>");
+    append_link(sm, "note #", "<a class=\"dtext-link dtext-id-link dtext-note-id-link\" href=\"/notes/");
   };
 
   forum_post_id => {
