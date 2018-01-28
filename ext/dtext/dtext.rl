@@ -145,8 +145,14 @@ user_feedback_id = 'feedback #'i id;
 wiki_page_id = 'wiki #'i id;
 
 github_issue_id = 'issue #'i id;
+art_station_id = 'artstation #'i alnum+ >mark_a1 %mark_a2;
+deviant_art_id = 'deviantart #'i id;
+nijie_id = 'nijie #'i id;
+pawoo_id = 'pawoo #'i id;
 pixiv_id = 'pixiv #'i id;
 pixiv_paged_id = 'pixiv #'i id '/p'i page;
+seiga_id = 'seiga #'i id;
+twitter_id = 'twitter #'i id;
 
 ws = ' ' | '\t';
 nonperiod = graph - ('.' | '"');
@@ -237,12 +243,36 @@ inline := |*
     append_link(sm, "issue #", "<a class=\"dtext-link dtext-id-link dtext-github-id-link\" href=\"https://github.com/r888888888/danbooru/issues/");
   };
 
+  art_station_id => {
+    append_link(sm, "artstation #", "<a class=\"dtext-link dtext-id-link dtext-artstation-id-link\" href=\"https://www.artstation.com/artwork/");
+  };
+
+  deviant_art_id => {
+    append_link(sm, "deviantart #", "<a class=\"dtext-link dtext-id-link dtext-deviantart-id-link\" href=\"https://deviantart.com/deviation/");
+  };
+
+  nijie_id => {
+    append_link(sm, "nijie #", "<a class=\"dtext-link dtext-id-link dtext-nijie-id-link\" href=\"https://nijie.info/view.php?id=");
+  };
+
+  pawoo_id => {
+    append_link(sm, "pawoo #", "<a class=\"dtext-link dtext-id-link dtext-pawoo-id-link\" href=\"https://pawoo.net/web/statuses/");
+  };
+
   pixiv_id => {
     append_link(sm, "pixiv #", "<a class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=");
   };
 
   pixiv_paged_id => {
     append_paged_link(sm, "pixiv #", "<a class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=", "&page=");
+  };
+
+  seiga_id => {
+    append_link(sm, "seiga #", "<a class=\"dtext-link dtext-id-link dtext-seiga-id-link\" href=\"http://seiga.nicovideo.jp/seiga/im");
+  };
+
+  twitter_id => {
+    append_link(sm, "twitter #", "<a class=\"dtext-link dtext-id-link dtext-twitter-id-link\" href=\"https://twitter.com/i/web/status/");
   };
 
   post_link => {

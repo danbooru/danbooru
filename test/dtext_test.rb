@@ -324,6 +324,15 @@ class DTextTest < Minitest::Test
     assert_parse_id_link("dtext-mod-action-id-link", "/mod_actions/1234", "mod action #1234")
     assert_parse_id_link("dtext-user-feedback-id-link", "/user_feedbacks/1234", "feedback #1234")
     assert_parse_id_link("dtext-wiki-page-id-link", "/wiki_pages/1234", "wiki #1234")
+
+    assert_parse_id_link("dtext-github-id-link", "https://github.com/r888888888/danbooru/issues/1234", "issue #1234")
+    assert_parse_id_link("dtext-artstation-id-link", "https://www.artstation.com/artwork/A1", "artstation #A1")
+    assert_parse_id_link("dtext-deviantart-id-link", "https://deviantart.com/deviation/1234", "deviantart #1234")
+    assert_parse_id_link("dtext-nijie-id-link", "https://nijie.info/view.php?id=1234", "nijie #1234")
+    assert_parse_id_link("dtext-pawoo-id-link", "https://pawoo.net/web/statuses/1234", "pawoo #1234")
+    assert_parse_id_link("dtext-pixiv-id-link", "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=1234", "pixiv #1234")
+    assert_parse_id_link("dtext-seiga-id-link", "http://seiga.nicovideo.jp/seiga/im1234", "seiga #1234")
+    assert_parse_id_link("dtext-twitter-id-link", "https://twitter.com/i/web/status/1234", "twitter #1234")
   end
 
   def test_boundary_exploit
