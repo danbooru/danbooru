@@ -6,11 +6,13 @@ if defined?(Bundler)
 end
 Bundler.require(*Rails.groups)
 
+require_relative "danbooru_default_config"
+require_relative "danbooru_local_config"
+
 module Danbooru
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.1
-    
     config.active_record.schema_format = :sql
     config.encoding = "utf-8"
     config.filter_parameters += [:password]

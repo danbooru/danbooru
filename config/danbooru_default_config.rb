@@ -772,4 +772,10 @@ module Danbooru
       end
     end
   end
+
+  def config
+    @configuration ||= EnvironmentConfiguration.new
+  end
+
+  module_function :config
 end
