@@ -91,7 +91,7 @@ class UserFeedback < ApplicationRecord
 
   def create_dmail
     unless disable_dmail_notification
-      body = %{#{creator_name} created a "#{category} record":/user_feedbacks?search[user_id]=#{user_id} for your account. #{body}}
+      body = %{@#{creator_name} created a "#{category} record":/user_feedbacks?search[user_id]=#{user_id} for your account:\n\n#{self.body}}
       Dmail.create_automated(:to_id => user_id, :title => "Your user record has been updated", :body => body)
     end
   end
