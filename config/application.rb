@@ -26,6 +26,17 @@ module Danbooru
     config.action_mailer.perform_deliveries = true
     config.log_tags = [lambda {|req| "PID:#{Process.pid}"}]
     config.action_controller.action_on_unpermitted_parameters = :raise
+    config.force_ssl = true
+
+    if Rails.env.production? && Danbooru.config.ssl_options.present?
+      config.ssl_options = Danbooru.config.ssl_options
+    else
+      config.ssl_options = {
+        hsts: false,
+        secure_cookies: false,
+        redirect: { exclude: ->(request) { true } }
+      }
+    end
 
     if File.exists?("#{config.root}/REVISION")
       config.x.git_hash = File.read("#{config.root}/REVISION").strip
