@@ -43,7 +43,6 @@ class Note < ApplicationRecord
 
     def search(params)
       q = super
-      return q if params.blank?
 
       if params[:body_matches].present?
         q = q.body_matches(params[:body_matches])
@@ -71,7 +70,7 @@ class Note < ApplicationRecord
         q = q.where(creator_id: params[:creator_id].split(",").map(&:to_i))
       end
 
-      q
+      q.apply_default_order(params)
     end
   end
 

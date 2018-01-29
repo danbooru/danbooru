@@ -39,13 +39,16 @@ class FavoriteGroup < ApplicationRecord
       elsif params[:is_public].present?
         where("is_public = ?", params[:is_public])
       else
-        where("true")
+        all
       end
+    end
+
+    def default_order
+      order(updated_at: :desc)
     end
 
     def search(params)
       q = super
-      params = {} if params.blank?
 
       if params[:creator_id].present?
         user = User.find(params[:creator_id])
@@ -64,7 +67,7 @@ class FavoriteGroup < ApplicationRecord
         q = q.name_matches(params[:name_matches])
       end
 
-      q
+      q.apply_default_order(params)
     end
   end
 

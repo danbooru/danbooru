@@ -3,7 +3,7 @@ class ArtistCommentariesController < ApplicationController
   before_filter :member_only, :except => [:index, :show]
 
   def index
-    @commentaries = ArtistCommentary.search(params[:search]).order("artist_commentaries.id desc").paginate(params[:page], :limit => params[:limit])
+    @commentaries = ArtistCommentary.search(params[:search]).paginate(params[:page], :limit => params[:limit])
     respond_with(@commentaries) do |format|
       format.xml do
         render :xml => @commentaries.to_xml(:root => "artist-commentaries")

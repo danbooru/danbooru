@@ -536,7 +536,6 @@ class Artist < ApplicationRecord
 
     def search(params)
       q = super
-      params = {} if params.blank?
 
       case params[:name]
       when /^http/
@@ -581,18 +580,6 @@ class Artist < ApplicationRecord
         q = q.url_matches(params[:url_matches])
       end
 
-      params[:order] ||= params.delete(:sort)
-      case params[:order]
-      when "name"
-        q = q.order("artists.name")
-      when "updated_at"
-        q = q.order("artists.updated_at desc")
-      when "post_count"
-        q = q.includes(:tag).order("tags.post_count desc nulls last").references(:tags)
-      else
-        q = q.order("artists.id desc")
-      end
-
       if params[:is_active] == "true"
         q = q.active
       elsif params[:is_active] == "false"
@@ -622,6 +609,18 @@ class Artist < ApplicationRecord
         q = q.joins(:tag).where("tags.post_count > 0")
       elsif params[:has_tag] == "false"
         q = q.includes(:tag).where("tags.name IS NULL OR tags.post_count <= 0").references(:tags)
+      end
+
+      params[:order] ||= params.delete(:sort)
+      case params[:order]
+      when "name"
+        q = q.order("artists.name")
+      when "updated_at"
+        q = q.order("artists.updated_at desc")
+      when "post_count"
+        q = q.includes(:tag).order("tags.post_count desc nulls last").order("artists.name").references(:tags)
+      else
+        q = q.apply_default_order(params)
       end
 
       q

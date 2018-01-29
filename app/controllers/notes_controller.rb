@@ -6,7 +6,7 @@ class NotesController < ApplicationController
   end
 
   def index
-    @notes = Note.search(params[:search]).order("id desc").paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
+    @notes = Note.search(params[:search]).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@notes) do |format|
       format.html { @notes = @notes.includes(:creator) }
       format.xml do

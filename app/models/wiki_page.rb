@@ -59,9 +59,12 @@ class WikiPage < ApplicationRecord
       end
     end
 
+    def default_order
+      order(updated_at: :desc)
+    end
+
     def search(params = {})
       q = super
-      params = {} if params.blank?
 
       if params[:title].present?
         q = q.where("title LIKE ? ESCAPE E'\\\\'", params[:title].mb_chars.downcase.tr(" ", "_").to_escaped_for_sql_like)
@@ -95,14 +98,12 @@ class WikiPage < ApplicationRecord
 
       params[:order] ||= params.delete(:sort)
       case params[:order]
-      when "time"
-        q = q.order("updated_at desc")
       when "title"
         q = q.order("title")
       when "post_count"
         q = q.includes(:tag).order("tags.post_count desc nulls last").references(:tags)
       else
-        q = q.order("updated_at desc")
+        q = q.apply_default_order(params)
       end
 
       q

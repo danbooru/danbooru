@@ -131,7 +131,7 @@ class Comment < ApplicationRecord
       when "updated_at", "updated_at_desc"
         q = q.order("comments.updated_at DESC")
       else
-        q = q.order("comments.id DESC")
+        q = q.apply_default_order(params)
       end
 
       q

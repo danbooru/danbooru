@@ -187,7 +187,6 @@ class Dmail < ApplicationRecord
 
     def search(params)
       q = super
-      return q if params.blank?
 
       if params[:title_matches].present?
         q = q.title_matches(params[:title_matches])
@@ -225,7 +224,7 @@ class Dmail < ApplicationRecord
         q = q.unread
       end
 
-      q
+      q.apply_default_order(params)
     end
   end
 

@@ -16,6 +16,28 @@ class ApplicationRecord < ActiveRecord::Base
         PostQueryBuilder.new(nil).add_range_relation(parsed_range, qualified_column, self)
       end
 
+      def apply_default_order(params)
+        if params[:order] == "custom"
+          parse_ids = Tag.parse_helper(params[:id])
+          if parse_ids[0] == :in
+            return find_ordered(parse_ids[1])
+          end
+        end
+        return default_order
+      end
+
+      def default_order
+        order(id: :desc)
+      end
+
+      def find_ordered(ids)
+        order_clause = []
+        ids.each do |id|
+          order_clause << sanitize_sql_array(["ID=? DESC", id])
+        end
+        where(id: ids).order(order_clause.join(', '))
+      end
+
       def search(params = {})
         params ||= {}
 
@@ -23,6 +45,7 @@ class ApplicationRecord < ActiveRecord::Base
         q = q.attribute_matches(:id, params[:id])
         q = q.attribute_matches(:created_at, params[:created_at]) if attribute_names.include?("created_at")
         q = q.attribute_matches(:updated_at, params[:updated_at]) if attribute_names.include?("updated_at")
+
         q
       end
     end

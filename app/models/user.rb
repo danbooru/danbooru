@@ -815,7 +815,6 @@ class User < ApplicationRecord
 
     def search(params)
       q = super
-      return q if params.blank?
 
       if params[:name].present?
         q = q.name_matches(params[:name].mb_chars.downcase.strip.tr(" ", "_"))
@@ -873,18 +872,14 @@ class User < ApplicationRecord
       case params[:order]
       when "name"
         q = q.order("name")
-
       when "post_upload_count"
         q = q.order("post_upload_count desc")
-
       when "note_count"
         q = q.order("note_update_count desc")
-
       when "post_update_count"
         q = q.order("post_update_count desc")
-
       else
-        q = q.order("created_at desc")
+        q = q.apply_default_order(params)
       end
 
       q

@@ -67,7 +67,6 @@ class ForumPost < ApplicationRecord
     def search(params)
       q = super
       q = q.permitted
-      return q if params.blank?
 
       if params[:creator_id].present?
         q = q.where("forum_posts.creator_id = ?", params[:creator_id].to_i)
@@ -93,7 +92,7 @@ class ForumPost < ApplicationRecord
         q = q.joins(:topic).where("forum_topics.category_id = ?", params[:topic_category_id].to_i)
       end
 
-      q
+      q.apply_default_order(params)
     end
   end
 
