@@ -199,6 +199,10 @@ class DTextTest < Minitest::Test
     assert_parse('<p><a class="dtext-link dtext-external-link" href="http://test.com"><em>test</em></a></p>', '"[i]test[/i]":http://test.com')
   end
 
+  def test_old_style_links_with_nested_links
+    assert_parse('<p><a class="dtext-link dtext-external-link" href="http://test.com">post #1</a></p>', '"post #1":http://test.com')
+  end
+
   def test_old_style_links_with_special_entities
     assert_parse('<p>&quot;1&quot; <a class="dtext-link dtext-external-link" href="http://three.com">2 &amp; 3</a></p>', '"1" "2 & 3":http://three.com')
   end
@@ -209,6 +213,10 @@ class DTextTest < Minitest::Test
 
   def test_new_style_links_with_inline_tags
     assert_parse('<p><a class="dtext-link dtext-external-link" href="http://test.com/(parentheses)"><em>test</em></a></p>', '"[i]test[/i]":[http://test.com/(parentheses)]')
+  end
+
+  def test_new_style_links_with_nested_links
+    assert_parse('<p><a class="dtext-link dtext-external-link" href="http://test.com">post #1</a></p>', '"post #1":[http://test.com]')
   end
 
   def test_new_style_links_with_parentheses

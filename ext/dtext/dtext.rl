@@ -110,8 +110,8 @@ delimited_mention = '<' mention :>> '>';
 url = 'http' 's'? '://' utf8graph+;
 delimited_url = '<' url :>> '>';
 internal_url = [/#] utf8graph+;
-basic_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':' (url | internal_url) >mark_b1 %mark_b2;
-bracketed_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':[' (url | internal_url) >mark_b1 %mark_b2 :>> ']';
+basic_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':' (url | internal_url) >mark_b1 @mark_b2;
+bracketed_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':[' (url | internal_url) >mark_b1 @mark_b2 :>> ']';
 
 basic_wiki_link = '[[' (nonbracket nonpipebracket*) >mark_a1 %mark_a2 ']]';
 aliased_wiki_link = '[[' nonpipebracket+ >mark_a1 %mark_a2 '|' nonpipebracket+ >mark_b1 %mark_b2 ']]';
@@ -161,6 +161,18 @@ header_with_id = 'h'i [123456] >mark_a1 %mark_a2 '#' nonperiod+ >mark_b1 %mark_b
 aliased_expand = '[expand='i (nonbracket+ >mark_a1 %mark_a2) ']';
 
 list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
+
+basic_inline := |*
+  '[b]'i  => { dstack_open_inline(sm,  INLINE_B, "<strong>"); };
+  '[/b]'i => { dstack_close_inline(sm, INLINE_B, "</strong>"); };
+  '[i]'i  => { dstack_open_inline(sm,  INLINE_I, "<em>"); };
+  '[/i]'i => { dstack_close_inline(sm, INLINE_I, "</em>"); };
+  '[s]'i  => { dstack_open_inline(sm,  INLINE_S, "<s>"); };
+  '[/s]'i => { dstack_close_inline(sm, INLINE_S, "</s>"); };
+  '[u]'i  => { dstack_open_inline(sm,  INLINE_U, "<u>"); };
+  '[/u]'i => { dstack_close_inline(sm, INLINE_U, "</u>"); };
+  any => { append_c_html_escaped(sm, fc); };
+*|;
 
 inline := |*
   post_id => {
@@ -288,19 +300,13 @@ inline := |*
   };
 
   basic_textile_link => {
-    const char* match_end = sm->b2 - 1;
+    const char* match_end = sm->b2;
     const char* url_start = sm->b1;
     const char* url_end = find_boundary_c(match_end);
 
-    append(sm, true, "<a class=\"dtext-link dtext-external-link\" href=\"");
-    append_segment_html_escaped(sm, url_start, url_end);
-    append(sm, true, "\">");
-
-    if (!parse_inline(sm, sm->a1, sm->a2 - sm->a1)) {
-        fbreak;
+    if (!append_named_url(sm, url_start, url_end, sm->a1, sm->a2)) {
+      fbreak;
     }
-
-    append(sm, true, "</a>");
 
     if (url_end < match_end) {
       append_segment_html_escaped(sm, url_end + 1, match_end);
@@ -308,15 +314,9 @@ inline := |*
   };
 
   bracketed_textile_link => {
-    append(sm, true, "<a class=\"dtext-link dtext-external-link\" href=\"");
-    append_segment_html_escaped(sm, sm->b1, sm->b2 - 1);
-    append(sm, true, "\">");
-
-    if (!parse_inline(sm, sm->a1, sm->a2 - sm->a1)) {
-        fbreak;
+    if (!append_named_url(sm, sm->b1, sm->b2, sm->a1, sm->a2)) {
+      fbreak;
     }
-
-    append(sm, true, "</a>");
   };
 
   url => {
@@ -393,37 +393,14 @@ inline := |*
     fnext list;
   };
 
-  '[b]'i => {
-    dstack_open_inline(sm, INLINE_B, "<strong>");
-  };
-
-  '[/b]'i => {
-    dstack_close_inline(sm, INLINE_B, "</strong>");
-  };
-
-  '[i]'i => {
-    dstack_open_inline(sm, INLINE_I, "<em>");
-  };
-
-  '[/i]'i => {
-    dstack_close_inline(sm, INLINE_I, "</em>");
-  };
-
-  '[s]'i => {
-    dstack_open_inline(sm, INLINE_S, "<s>");
-  };
-
-  '[/s]'i => {
-    dstack_close_inline(sm, INLINE_S, "</s>");
-  };
-
-  '[u]'i => {
-    dstack_open_inline(sm, INLINE_U, "<u>");
-  };
-
-  '[/u]'i => {
-    dstack_close_inline(sm, INLINE_U, "</u>");
-  };
+  '[b]'i  => { dstack_open_inline(sm,  INLINE_B, "<strong>"); };
+  '[/b]'i => { dstack_close_inline(sm, INLINE_B, "</strong>"); };
+  '[i]'i  => { dstack_open_inline(sm,  INLINE_I, "<em>"); };
+  '[/i]'i => { dstack_close_inline(sm, INLINE_I, "</em>"); };
+  '[s]'i  => { dstack_open_inline(sm,  INLINE_S, "<s>"); };
+  '[/s]'i => { dstack_close_inline(sm, INLINE_S, "</s>"); };
+  '[u]'i  => { dstack_open_inline(sm,  INLINE_U, "<u>"); };
+  '[/u]'i => { dstack_close_inline(sm, INLINE_U, "</u>"); };
 
   '[tn]'i => {
     dstack_open_inline(sm, INLINE_TN, "<span class=\"tn\">");
@@ -1003,6 +980,22 @@ static inline void append_url(StateMachine * sm, const char * url_start, const c
   append(sm, true, "</a>");
 }
 
+static inline bool append_named_url(StateMachine * sm, const char * url_start, const char * url_end, const char * title_start, const char * title_end) {
+  g_autoptr(GString) parsed_title = parse_basic_inline(title_start, title_end - title_start, sm->f_strip);
+
+  if (!parsed_title) {
+    return false;
+  }
+
+  append(sm, true, "<a class=\"dtext-link dtext-external-link\" href=\"");
+  append_segment_html_escaped(sm, url_start, url_end);
+  append(sm, true, "\">");
+  append_segment(sm, false, parsed_title->str, parsed_title->str + parsed_title->len - 1);
+  append(sm, true, "</a>");
+
+  return true;
+}
+
 static inline void append_wiki_link(StateMachine * sm, const char * tag, const size_t tag_len, const char * title, const size_t title_len) {
   g_autofree gchar* lowercased_tag = g_utf8_strdown(tag, tag_len);
   g_autoptr(GString) normalized_tag = g_string_new(g_strdelimit(lowercased_tag, " ", '_'));
@@ -1222,7 +1215,7 @@ StateMachine* init_machine(const char * src, size_t len, bool f_strip, bool f_in
   sm->eof = sm->pe;
   sm->ts = NULL;
   sm->te = NULL;
-  sm->cs = 0;
+  sm->cs = dtext_start;
   sm->act = 0;
   sm->top = 0;
   output_length = len;
@@ -1262,19 +1255,19 @@ GQuark dtext_parse_error_quark() {
   return g_quark_from_static_string("dtext-parse-error-quark");
 }
 
-gboolean parse_inline(StateMachine* sm, const char* dtext, const ssize_t length) {
-    StateMachine* inline_sm = init_machine(dtext, length, sm->f_strip, true, sm->f_mentions);
-    gboolean success = parse_helper(inline_sm);
+GString* parse_basic_inline(const char* dtext, const ssize_t length, const bool f_strip) {
+    GString* output = NULL;
+    StateMachine* sm = init_machine(dtext, length, f_strip, true, false);
+    sm->cs = dtext_en_basic_inline;
 
-    if (success) {
-      append(sm, true, inline_sm->output->str);
+    if (parse_helper(sm)) {
+      output = g_string_new(sm->output->str);
     } else {
-      g_debug("parse_inline failed");
-      g_propagate_error(&sm->error, inline_sm->error);
+      g_debug("parse_basic_inline failed");
     }
 
-    free_machine(inline_sm);
-    return success;
+    free_machine(sm);
+    return output;
 }
 
 gboolean parse_helper(StateMachine* sm) {
@@ -1287,7 +1280,7 @@ gboolean parse_helper(StateMachine* sm) {
     return FALSE;
   }
 
-  %% write init;
+  %% write init nocs;
   %% write exec;
 
   dstack_close(sm);
