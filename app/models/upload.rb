@@ -495,7 +495,6 @@ class Upload < ApplicationRecord
 
     def search(params)
       q = super
-      return q if params.blank?
 
       if params[:uploader_id].present?
         q = q.uploaded_by(params[:uploader_id].to_i)
@@ -509,7 +508,7 @@ class Upload < ApplicationRecord
         q = q.where("source = ?", params[:source])
       end
 
-      q
+      q.apply_default_order(params)
     end
   end
 

@@ -121,9 +121,7 @@ class PostReplacement < ApplicationRecord
         q = q.post_tags_match(params[:post_tags_match])
       end
 
-      q = q.order("created_at DESC")
-
-      q
+      q.apply_default_order(params)
     end
   end
 

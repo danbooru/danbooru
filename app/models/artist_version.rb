@@ -15,7 +15,6 @@ class ArtistVersion < ApplicationRecord
 
     def search(params)
       q = super
-      return q if params.blank?
 
       if params[:name].present?
         q = q.where("name like ? escape E'\\\\'", params[:name].to_escaped_for_sql_like)
@@ -33,13 +32,6 @@ class ArtistVersion < ApplicationRecord
         q = q.where(artist_id: params[:artist_id].split(",").map(&:to_i))
       end
 
-      params[:order] ||= params.delete(:sort)
-      if params[:order] == "name"
-        q = q.reorder("name")
-      else
-        q = q.reorder("id desc")
-      end
-
       if params[:is_active] == "true"
         q = q.where("is_active = true")
       elsif params[:is_active] == "false"
@@ -50,6 +42,13 @@ class ArtistVersion < ApplicationRecord
         q = q.where("is_banned = true")
       elsif params[:is_banned] == "false"
         q = q.where("is_banned = false")
+      end
+
+      params[:order] ||= params.delete(:sort)
+      if params[:order] == "name"
+        q = q.order("artist_versions.name").default_order
+      else
+        q = q.apply_default_order(params)
       end
 
       q

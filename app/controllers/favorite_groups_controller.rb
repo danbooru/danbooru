@@ -3,7 +3,7 @@ class FavoriteGroupsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def index
-    @favorite_groups = FavoriteGroup.search(params[:search]).order("updated_at desc").paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
+    @favorite_groups = FavoriteGroup.search(params[:search]).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@favorite_groups) do |format|
       format.xml do
         render :xml => @favorite_groups.to_xml(:root => "favorite-groups")

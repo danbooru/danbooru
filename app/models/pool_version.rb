@@ -14,7 +14,6 @@ class PoolVersion < ApplicationRecord
 
     def search(params)
       q = super
-      return q if params.blank?
 
       if params[:updater_id].present?
         q = q.for_user(params[:updater_id].to_i)
@@ -28,7 +27,7 @@ class PoolVersion < ApplicationRecord
         q = q.where("pool_id = ?", params[:pool_id].to_i)
       end
 
-      q
+      q.apply_default_order(params)
     end
   end
 

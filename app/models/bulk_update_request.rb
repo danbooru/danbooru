@@ -22,6 +22,10 @@ class BulkUpdateRequest < ApplicationRecord
   scope :pending_first, lambda { order("(case status when 'pending' then 0 when 'approved' then 1 else 2 end)") }
 
   module SearchMethods
+    def default_order
+      pending_first.order(id: :desc)
+    end
+
     def search(params = {})
       q = super
 
@@ -63,8 +67,8 @@ class BulkUpdateRequest < ApplicationRecord
         q = q.order(updated_at: :desc)
       when "updated_at_asc"
         q = q.order(updated_at: :asc)
-      when "status_desc"
-        q = q.pending_first.order(id: :desc)
+      else
+        q = q.apply_default_order(params)
       end
 
       q

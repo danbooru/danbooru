@@ -45,7 +45,6 @@ class UserFeedback < ApplicationRecord
 
     def search(params)
       q = super
-      return q if params.blank?
 
       if params[:user_id].present?
         q = q.for_user(params[:user_id].to_i)
@@ -67,7 +66,7 @@ class UserFeedback < ApplicationRecord
         q = q.where("category = ?", params[:category])
       end
 
-      q
+      q.apply_default_order(params)
     end
   end
 

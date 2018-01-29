@@ -7,7 +7,6 @@ class ArtistCommentaryVersion < ApplicationRecord
 
   def self.search(params)
     q = super
-    return q if params.blank?
 
     if params[:updater_id]
       q = q.where("updater_id = ?", params[:updater_id].to_i)
@@ -17,7 +16,7 @@ class ArtistCommentaryVersion < ApplicationRecord
       q = q.where("post_id = ?", params[:post_id].to_i)
     end
 
-    q
+    q.apply_default_order(params)
   end
 
   def initialize_updater

@@ -57,7 +57,7 @@ class Ban < ApplicationRecord
     when "expires_at_desc"
       q = q.order("bans.expires_at desc")
     else
-      q = q.order("bans.id desc")
+      q = q.apply_default_order(params)
     end
 
     q

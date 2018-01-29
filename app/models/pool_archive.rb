@@ -16,7 +16,6 @@ class PoolArchive < ApplicationRecord
 
     def search(params)
       q = super
-      return q if params.blank?
 
       if params[:updater_id].present?
         q = q.where(updater_id: params[:updater_id].split(",").map(&:to_i))
@@ -30,7 +29,7 @@ class PoolArchive < ApplicationRecord
         q = q.where(pool_id: params[:pool_id].split(",").map(&:to_i))
       end
 
-      q
+      q.apply_default_order(params)
     end
   end
 

@@ -53,7 +53,6 @@ class ModAction < ApplicationRecord
 
   def self.search(params)
     q = super
-    return q if params.blank?
 
     if params[:creator_id].present?
       q = q.where("creator_id = ?", params[:creator_id].to_i)
@@ -67,7 +66,7 @@ class ModAction < ApplicationRecord
       q = q.attribute_matches(:category, params[:category])
     end
 
-    q
+    q.apply_default_order(params)
   end
 
   def category_id
