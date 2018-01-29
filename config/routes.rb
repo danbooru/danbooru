@@ -291,10 +291,6 @@ Rails.application.routes.draw do
       get :search
       get :custom_style
     end
-
-    member do
-      delete :cache
-    end
   end
   resource :user_upgrade, :only => [:new, :create, :show]
   resources :user_feedbacks do
