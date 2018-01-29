@@ -48,9 +48,9 @@
         "@context" : "http://schema.org",
         "@type" : "Organization",
         "name" : "<%= Danbooru.config.app_name %>",
-        "url" : "http://<%= Danbooru.config.hostname%>",
+        "url" : "<%= root_url %>",
         "sameAs" : [
-          "http://twitter.com/<%= Danbooru.config.twitter_site[1..-1] %>"
+          "https://twitter.com/<%= Danbooru.config.twitter_site[1..-1] %>"
         ]
       }
     </script>
@@ -59,10 +59,10 @@
   {
     "@context": "http://schema.org",
     "@type": "WebSite",
-    "url" : "http://<%= Danbooru.config.hostname %>",
+    "url" : "<%= root_url %>",
     "potentialAction": [{
       "@type": "SearchAction",
-      "target": "http://<%= Danbooru.config.hostname %>/posts?tags={search_term_string}",
+      "target": "<%= posts_url %>?tags={search_term_string}",
       "query-input": "required name=search_term_string"
     }]
   }
@@ -73,7 +73,7 @@
     "@type": "WebSite",
     "name": "<%= Danbooru.config.app_name %>",
     "alternateName": "<%= Danbooru.config.description %>",
-    "url" : "http://<%= Danbooru.config.hostname %>"
+    "url" : "<%= root_url %>"
   }
   </script>
 </head>
