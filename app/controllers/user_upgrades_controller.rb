@@ -1,7 +1,6 @@
 class UserUpgradesController < ApplicationController
   before_action :member_only, :only => [:new, :show]
   helper_method :user
-  force_ssl :if => :ssl_enabled?
   skip_before_action :verify_authenticity_token, only: [:create]
 
   def create
@@ -56,9 +55,5 @@ class UserUpgradesController < ApplicationController
     end
 
     redirect_to user_upgrade_path
-  end
-
-  def ssl_enabled?
-    !Rails.env.development? && !Rails.env.test?
   end
 end

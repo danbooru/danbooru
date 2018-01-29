@@ -11,7 +11,6 @@ class ApplicationController < ActionController::Base
   before_action :set_safe_mode
   # before_action :secure_cookies_check
   layout "default"
-  force_ssl :if => :ssl_login?
   helper_method :show_moderation_notice?
   before_action :enable_cors
 
@@ -30,10 +29,6 @@ class ApplicationController < ActionController::Base
 
   def show_moderation_notice?
     CurrentUser.can_approve_posts? && (cookies[:moderated].blank? || Time.at(cookies[:moderated].to_i) < 20.hours.ago)
-  end
-
-  def ssl_login?
-    cookies[:ssl_login].present?
   end
 
   def enable_cors
