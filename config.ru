@@ -11,9 +11,6 @@ if defined?(Unicorn) && Rails.env.production?
 
   # Max memory size (RSS) per worker
   #use Unicorn::WorkerKiller::Oom, (192*(1024**2)), (256*(1024**2))
-
-  require 'gctools/oobgc'
-  use GC::OOB::UnicornMiddleware
 end
 
 run Rails.application
