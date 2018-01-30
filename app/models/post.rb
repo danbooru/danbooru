@@ -1330,7 +1330,7 @@ class Post < ApplicationRecord
       Post.find(parent_id_was).update_has_children_flag if parent_id_was.present?
     end
 
-    def give_favorites_to_parent
+    def give_favorites_to_parent(options = {})
       return if parent.nil?
 
       transaction do
@@ -1338,6 +1338,10 @@ class Post < ApplicationRecord
           remove_favorite!(fav.user)
           parent.add_favorite!(fav.user)
         end
+      end
+
+      unless options[:without_mod_action]
+        ModAction.log("moved favorites from post ##{id} to post ##{parent.id}",:post_move_favorites)
       end
     end
 
@@ -1413,7 +1417,7 @@ class Post < ApplicationRecord
         }, without_protection: true)
 
         # XXX This must happen *after* the `is_deleted` flag is set to true (issue #3419).
-        give_favorites_to_parent if options[:move_favorites]
+        give_favorites_to_parent(options) if options[:move_favorites]
 
         unless options[:without_mod_action]
           ModAction.log("deleted post ##{id}, reason: #{reason}",:post_delete)
