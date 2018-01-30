@@ -23,7 +23,7 @@ class BansController < ApplicationController
   end
 
   def create
-    @ban = Ban.create(params[:ban])
+    @ban = Ban.create(ban_params(:create))
 
     if @ban.errors.any?
       render :action => "new"
@@ -34,7 +34,7 @@ class BansController < ApplicationController
 
   def update
     @ban = Ban.find(params[:id])
-    if @ban.update_attributes(params[:ban])
+    if @ban.update(ban_params(:update))
       redirect_to ban_path(@ban), :notice => "Ban updated"
     else
       render :action => "edit"
@@ -45,5 +45,14 @@ class BansController < ApplicationController
     @ban = Ban.find(params[:id])
     @ban.destroy
     redirect_to bans_path, :notice => "Ban destroyed"
+  end
+
+  private
+
+  def ban_params(context)
+    permitted_params = %i[reason duration expires_at]
+    permitted_params += %i[user_id user_name] if context == :create
+
+    params.require(:ban).permit(permitted_params)
   end
 end
