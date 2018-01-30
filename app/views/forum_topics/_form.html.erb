@@ -10,10 +10,6 @@
     </div>
 
     <%= f.simple_fields_for :original_post do |pf| %>
-      <% if !forum_topic.new_record? %>
-        <%= hidden_field_tag "forum_topic[original_post_attributes][topic_id]", forum_topic.id %>
-      <% end %>
-
       <%= dtext_field "forum_post", "body", :classes => "autocomplete-mentions", :input_name => "forum_topic[original_post_attributes][body]", :value => forum_topic.original_post.body, :input_id => "forum_post_body_for_#{forum_topic.original_post.id}", :preview_id => "dtext-preview-for-#{forum_topic.original_post.id}" %>
     <% end %>
 

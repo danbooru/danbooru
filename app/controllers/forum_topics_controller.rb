@@ -54,13 +54,13 @@ class ForumTopicsController < ApplicationController
   end
 
   def create
-    @forum_topic = ForumTopic.create(params[:forum_topic], :as => CurrentUser.role)
+    @forum_topic = ForumTopic.create(forum_topic_params(:create))
     respond_with(@forum_topic)
   end
 
   def update
     check_privilege(@forum_topic)
-    @forum_topic.update_attributes(params[:forum_topic], :as => CurrentUser.role)
+    @forum_topic.update(forum_topic_params(:update))
     respond_with(@forum_topic)
   end
 
@@ -157,5 +157,12 @@ private
 
       return false
     end
+  end
+
+  def forum_topic_params(context)
+    permitted_params = [:title, :category_id, { original_post_attributes: %i[id body] }]
+    permitted_params += %i[is_sticky is_locked min_level] if CurrentUser.is_moderator?
+
+    params.require(:forum_topic).permit(permitted_params)
   end
 end
