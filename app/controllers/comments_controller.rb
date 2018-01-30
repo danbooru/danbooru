@@ -23,12 +23,12 @@ class CommentsController < ApplicationController
   def update
     @comment = Comment.find(params[:id])
     check_privilege(@comment)
-    @comment.update(update_params, :as => CurrentUser.role)
+    @comment.update(comment_params(:update))
     respond_with(@comment, :location => post_path(@comment.post_id))
   end
 
   def create
-    @comment = Comment.create(create_params, :as => CurrentUser.role)
+    @comment = Comment.create(comment_params(:create))
     respond_with(@comment) do |format|
       format.html do
         if @comment.errors.any?
@@ -105,11 +105,12 @@ private
     end
   end
 
-  def create_params
-    params.require(:comment).permit(:post_id, :body, :do_not_bump_post, :is_sticky)
-  end
+  def comment_params(context)
+    permitted_params = %i[body]
+    permitted_params += %i[post_id do_not_bump_post] if context == :create
+    permitted_params += %i[is_deleted] if context == :update
+    permitted_params += %i[is_sticky] if CurrentUser.is_moderator?
 
-  def update_params
-    params.require(:comment).permit(:body, :is_deleted, :is_sticky)
+    params.require(:comment).permit(permitted_params)
   end
 end
