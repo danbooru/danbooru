@@ -1,8 +1,6 @@
 class ForumPost < ApplicationRecord
   include Mentionable
 
-  attr_accessible :body, :topic_id, :as => [:member, :builder, :gold, :platinum, :admin, :moderator, :default]
-  attr_accessible :is_locked, :is_sticky, :is_deleted, :as => [:admin, :moderator]
   attr_readonly :topic_id
   belongs_to :creator, :class_name => "User"
   belongs_to :updater, :class_name => "User"
@@ -179,12 +177,12 @@ class ForumPost < ApplicationRecord
   end
 
   def delete!
-    update_attributes({:is_deleted => true}, :as => CurrentUser.role)
+    update(is_deleted: true)
     update_topic_updated_at_on_delete
   end
 
   def undelete!
-    update_attributes({:is_deleted => false}, :as => CurrentUser.role)
+    update(is_deleted: false)
     update_topic_updated_at_on_undelete
   end
 
