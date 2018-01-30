@@ -13,8 +13,6 @@ class BulkUpdateRequest < ApplicationRecord
   validate :script_formatted_correctly
   validate :forum_topic_id_not_invalid
   validate :validate_script, :on => :create
-  attr_accessible :user_id, :forum_topic_id, :forum_post_id, :script, :title, :reason, :skip_secondary_validations
-  attr_accessible :status, :approver_id, :as => [:admin]
   before_validation :initialize_attributes, :on => :create
   before_validation :normalize_text
   after_create :create_forum_topic
@@ -94,7 +92,7 @@ class BulkUpdateRequest < ApplicationRecord
     def approve!(approver)
       CurrentUser.scoped(approver) do
         AliasAndImplicationImporter.new(script, forum_topic_id, "1", true).process!
-        update({ :status => "approved", :approver_id => CurrentUser.id, :skip_secondary_validations => true }, :as => CurrentUser.role)
+        update(status: "approved", approver: CurrentUser.user, skip_secondary_validations: true)
         forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.", "APPROVED")
       end
 
