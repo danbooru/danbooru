@@ -29,6 +29,7 @@ class ModAction < ApplicationRecord
     post_ban: 44,
     post_unban: 45,
     post_permanent_delete: 46,
+    post_move_favorites: 47,
     pool_delete: 62,
     pool_undelete: 63,
     artist_ban: 184,
