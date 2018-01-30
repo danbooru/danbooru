@@ -2,7 +2,6 @@ class NoteVersion < ApplicationRecord
   before_validation :initialize_updater
   belongs_to :updater, :class_name => "User", :counter_cache => "note_update_count"
   scope :for_user, lambda {|user_id| where("updater_id = ?", user_id)}
-  attr_accessible :note_id, :x, :y, :width, :height, :body, :updater_id, :updater_ip_addr, :is_active, :post_id, :html_id, :version
 
   def self.search(params)
     q = super

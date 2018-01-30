@@ -4,7 +4,6 @@ class ArtistUrl < ApplicationRecord
   validates_presence_of :url
   validate :validate_url_format
   belongs_to :artist, :touch => true
-  attr_accessible :url, :artist_id, :normalized_url
 
   def self.normalize(url)
     if url.nil?

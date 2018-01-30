@@ -2,7 +2,6 @@ class WikiPageVersion < ApplicationRecord
   belongs_to :wiki_page
   belongs_to :updater, :class_name => "User"
   belongs_to :artist
-  attr_accessible :wiki_page_id, :title, :body, :is_locked, :is_deleted, :updater_id, :updater_ip_addr, :version, :other_names
   delegate :visible?, :to => :wiki_page
 
   module SearchMethods
