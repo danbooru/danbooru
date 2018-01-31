@@ -23,7 +23,7 @@ class NotesController < ApplicationController
   end
 
   def create
-    @note = Note.create(create_params)
+    @note = Note.create(note_params(:create))
     respond_with(@note) do |fmt|
       fmt.json do
         if @note.errors.any?
@@ -37,7 +37,7 @@ class NotesController < ApplicationController
 
   def update
     @note = Note.find(params[:id])
-    @note.update_attributes(update_params)
+    @note.update(note_params(:update))
     respond_with(@note) do |format|
       format.json do
         if @note.errors.any?
@@ -62,12 +62,12 @@ class NotesController < ApplicationController
     respond_with(@note)
   end
 
-private
-  def update_params
-    params.require(:note).permit(:x, :y, :width, :height, :body)
-  end
+  private
 
-  def create_params
-    params.require(:note).permit(:x, :y, :width, :height, :body, :post_id, :html_id)
+  def note_params(context)
+    permitted_params = %i[x y width height body]
+    permitted_params += %i[post_id html_id] if context == :create
+
+    params.require(:note).permit(permitted_params)
   end
 end
