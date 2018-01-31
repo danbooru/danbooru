@@ -18,12 +18,18 @@ class PostAppealsController < ApplicationController
   end
 
   def create
-    @post_appeal = PostAppeal.create(params[:post_appeal])
+    @post_appeal = PostAppeal.create(post_appeal_params)
     respond_with(@post_appeal)
   end
 
   def show
     @post_appeal = PostAppeal.find(params[:id])
     respond_with(@post_appeal)
+  end
+
+  private
+
+  def post_appeal_params
+    params.require(:post_appeal).permit(%i[post_id reason])
   end
 end
