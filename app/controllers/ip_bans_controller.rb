@@ -7,7 +7,7 @@ class IpBansController < ApplicationController
   end
 
   def create
-    @ip_ban = IpBan.create(params[:ip_ban])
+    @ip_ban = IpBan.create(ip_ban_params)
     respond_with(@ip_ban, :location => ip_bans_path)
   end
 
@@ -21,5 +21,11 @@ class IpBansController < ApplicationController
     @ip_ban = IpBan.find(params[:id])
     @ip_ban.destroy
     respond_with(@ip_ban)
+  end
+
+  private
+
+  def ip_ban_params
+    params.require(:ip_ban).permit(%i[ip_addr reason])
   end
 end
