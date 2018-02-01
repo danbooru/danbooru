@@ -75,9 +75,9 @@ class UploadsController < ApplicationController
 protected
   def find_post_by_url(normalized_url)
     if normalized_url.nil?
-      Post.where(source: params[:url]).first
+      Post.where("SourcePattern(lower(posts.source)) = ?", params[:url]).first
     else
-      Post.where(source: [params[:url], @normalized_url]).first
+      Post.where("SourcePattern(lower(posts.source)) IN (?)", [params[:url], @normalized_url]).first
     end
   end
 
