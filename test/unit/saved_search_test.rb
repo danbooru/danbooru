@@ -111,7 +111,7 @@ class SavedSearchTest < ActiveSupport::TestCase
 
   context "Destroying a saved search" do
     setup do
-      @saved_search = @user.saved_searches.create(:tag_query => "xxx")
+      @saved_search = @user.saved_searches.create(query: "xxx")
       @saved_search.destroy
     end
 

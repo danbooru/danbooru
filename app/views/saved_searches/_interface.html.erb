@@ -1,14 +1,10 @@
 <% if SavedSearch.enabled? %>
   <div id="save-search-dialog" title="Save Search" style="display: none;">
-    <%= form_tag(saved_searches_path, :class => "simple_form", :remote => true) do %>
-      <%= hidden_field_tag "saved_search_tags", params[:tags] %>
 
-      <div class="input">
-        <label for="saved_search_labels">Label</label>
-        <%= text_field_tag "saved_search_labels", "" %>
-      </div>
-
-      <p><label><%= check_box_tag "saved_search_disable_labels" %> Disable labels</label></p>
+    <%= simple_form_for(SavedSearch.new, remote: true) do |f| %>
+      <%= f.input :query, as: :string, input_html: { value: params[:tags] } %>
+      <%= f.input :label_string, label: "Labels", hint: "A list of tags to help categorize this search. Space delimited." %>
+      <%= f.input :disable_labels, label: "Don't show this dialog again", as: :boolean %>
     <% end %>
   </div>
 <% end %>

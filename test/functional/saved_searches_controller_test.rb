@@ -18,10 +18,13 @@ class SavedSearchesControllerTest < ActionController::TestCase
 
     context "create action" do
       should "render" do
-        params = { saved_search_tags: "bkub", saved_search_labels: "artist" }
-
-        post :create, params, { user_id: @user.id }
+        post :create, { saved_search: { query: "bkub", label_string: "artist" }}, { user_id: @user.id }
         assert_response :redirect
+      end
+
+      should "disable labels when the disable_labels param is given" do
+        post :create, { saved_search: { query: "bkub", disable_labels: "1" }}, { user_id: @user.id }
+        assert_equal(true, @user.reload.disable_categorized_saved_searches)
       end
     end
 

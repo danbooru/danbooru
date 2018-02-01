@@ -43,10 +43,10 @@ class SavedSearch < ApplicationRecord
 
   include ListbooruMethods
 
+  attr_accessor :disable_labels
   belongs_to :user
   validates :query, :presence => true
   validate :validate_count
-  attr_accessible :query, :label_string
   before_create :update_user_on_create
   after_destroy :update_user_on_destroy
   after_save {|rec| Cache.delete(SavedSearch.cache_key(rec.user_id))}
@@ -127,5 +127,9 @@ class SavedSearch < ApplicationRecord
   def labels=(labels)
     labels = labels.map { |label| SavedSearch.normalize_label(label) }
     super(labels)
+  end
+
+  def disable_labels=(value)
+    CurrentUser.update(disable_categorized_saved_searches: true) if value == "1"
   end
 end
