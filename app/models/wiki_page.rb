@@ -12,10 +12,8 @@ class WikiPage < ApplicationRecord
   validates_presence_of :title
   validates_presence_of :body, :unless => -> { is_deleted? || other_names.present? }
   validate :validate_rename
-  validate :validate_locker_is_builder
   validate :validate_not_locked
   attr_accessor :skip_secondary_validations
-  attr_accessible :title, :body, :is_locked, :is_deleted, :other_names, :skip_secondary_validations
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, lambda {where(:is_active => true)}, :foreign_key => "name", :primary_key => "title"
   has_many :versions, lambda {order("wiki_page_versions.id ASC")}, :class_name => "WikiPageVersion", :dependent => :destroy
@@ -125,13 +123,6 @@ class WikiPage < ApplicationRecord
 
   def self.find_title_and_id(title)
     titled(title).select("title, id").first
-  end
-
-  def validate_locker_is_builder
-    if is_locked_changed? && !CurrentUser.is_builder?
-      errors.add(:is_locked, "can be modified by builders only")
-      return false
-    end
   end
 
   def validate_not_locked
