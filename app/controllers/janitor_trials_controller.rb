@@ -14,7 +14,7 @@ class JanitorTrialsController < ApplicationController
 
   def index
     @search = JanitorTrial.search(params[:search])
-    @janitor_trials = @search.order("id desc").paginate(params[:page], :limit => params[:limit])
+    @janitor_trials = @search.paginate(params[:page], :limit => params[:limit])
     respond_with(@janitor_trials)
   end
 

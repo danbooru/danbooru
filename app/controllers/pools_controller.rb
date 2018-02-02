@@ -27,7 +27,7 @@ class PoolsController < ApplicationController
 
   def gallery
     limit = params[:limit] || CurrentUser.user.per_page
-    @pools = Pool.series.search(params[:search]).order("updated_at desc").paginate(params[:page], :limit => limit, :search_count => params[:search])
+    @pools = Pool.series.search(params[:search]).reorder("updated_at desc").paginate(params[:page], :limit => limit, :search_count => params[:search])
     @post_set = PostSets::PoolGallery.new(@pools)
   end
 
