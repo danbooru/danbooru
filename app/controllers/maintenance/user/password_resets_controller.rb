@@ -6,7 +6,7 @@ module Maintenance
       end
 
       def create
-        @nonce = UserPasswordResetNonce.create(params[:nonce])
+        @nonce = UserPasswordResetNonce.create(nonce_params)
         if @nonce.errors.any?
           redirect_to new_maintenance_user_password_reset_path, :notice => @nonce.errors.full_messages.join("; ")
         else
@@ -28,6 +28,10 @@ module Maintenance
         else
           redirect_to new_maintenance_user_password_reset_path, :notice => "Invalid key"
         end
+      end
+
+      def nonce_params
+        params.require(:nonce).permit([:email])
       end
     end
   end
