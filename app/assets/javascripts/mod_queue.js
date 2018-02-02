@@ -56,23 +56,17 @@
   }
 
   Danbooru.ModQueue.detailed_rejection_dialog = function() {
-    $("#post_id").val($(this).data("post-id"));
+    $("#post_disapproval_post_id").val($(this).data("post-id"));
 
     $("#detailed-rejection-dialog").dialog({
       width: 500,
       buttons: {
         "Submit": function() {
-          var data = $("#detailed-rejection-form").serialize();
-          $.ajax({
-            type: "POST",
-            url: $("#detailed-rejection-form").attr("action"),
-            data: data,
-            dataType: "script"
-          });
-          $("#detailed-rejection-dialog").dialog("close");
+          $(this).find("form").submit();
+          $(this).dialog("close");
         },
         "Cancel": function() {
-          $("#detailed-rejection-dialog").dialog("close");
+          $(this).dialog("close");
         }
       }
     });
