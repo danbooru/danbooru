@@ -38,7 +38,7 @@ class PoolsController < ApplicationController
   end
 
   def create
-    @pool = Pool.create(params[:pool])
+    @pool = Pool.create(pool_params)
     flash[:notice] = @pool.valid? ? "Pool created" : @pool.errors.full_messages.join("; ")
     respond_with(@pool)
   end
@@ -46,7 +46,7 @@ class PoolsController < ApplicationController
   def update
     # need to do this in order for synchronize! to work correctly
     @pool = Pool.find(params[:id])
-    @pool.attributes = params[:pool]
+    @pool.attributes = pool_params
     @pool.synchronize
     @pool.save
     unless @pool.errors.any?
@@ -85,5 +85,12 @@ class PoolsController < ApplicationController
     respond_with(@pool) do |format|
       format.js
     end
+  end
+
+  private
+
+  def pool_params
+    permitted_params = %i[name description category is_active post_ids]
+    params.require(:pool).permit(permitted_params)
   end
 end
