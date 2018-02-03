@@ -42,8 +42,6 @@ class TagAliasTest < ActiveSupport::TestCase
 
       should_not allow_value(nil).for(:creator_id)
       should_not allow_value(-1).for(:creator_id).with_message("must exist", against: :creator)
-
-      should_not allow_mass_assignment_of(:status).as(:member)
     end
 
     should "populate the creator information" do

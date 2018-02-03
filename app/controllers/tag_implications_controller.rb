@@ -15,7 +15,7 @@ class TagImplicationsController < ApplicationController
     @tag_implication = TagImplication.find(params[:id])
 
     if @tag_implication.is_pending? && @tag_implication.editable_by?(CurrentUser.user)
-      @tag_implication.update_attributes(update_params)
+      @tag_implication.update(tag_implication_params)
     end
 
     respond_with(@tag_implication)
@@ -53,7 +53,7 @@ class TagImplicationsController < ApplicationController
 
 private
 
-  def update_params
-    params.require(:tag_implication).permit(:antecedent_name, :consequent_name, :forum_topic_id)
+  def tag_implication_params
+    params.require(:tag_implication).permit(%i[antecedent_name consequent_name forum_topic_id skip_secondary_validations])
   end
 end
