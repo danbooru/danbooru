@@ -20,7 +20,7 @@ module Moderator
 
       should "find by ip addr" do
         @search = IpAddrSearch.new(:ip_addr => "127.0.0.1")
-        assert_equal({@user => 1}, @search.execute)
+        assert_equal({@user => 1, @comment.post.uploader => 1}, @search.execute)
       end
 
       should "find by user id" do
