@@ -3,8 +3,6 @@ class Tag < ApplicationRecord
   METATAGS = "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-pool|pool|ordpool|-favgroup|favgroup|-fav|fav|ordfav|md5|-rating|rating|-locked|locked|width|height|mpixels|ratio|score|favcount|filesize|source|-source|id|-id|date|age|order|limit|-status|status|tagcount|parent|-parent|child|pixiv_id|pixiv|search|upvote|downvote|filetype|-filetype|flagger|-flagger|appealer|-appealer|" +
     TagCategory.short_name_list.map {|x| "#{x}tags"}.join("|")
   SUBQUERY_METATAGS = "commenter|comm|noter|noteupdater|artcomm|flagger|-flagger|appealer|-appealer"
-  attr_accessible :category, :as => [:moderator, :gold, :platinum, :member, :anonymous, :default, :builder, :admin]
-  attr_accessible :is_locked, :as => [:moderator, :admin]
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :artist, :foreign_key => "name", :primary_key => "name"
   has_one :antecedent_alias, lambda {active}, :class_name => "TagAlias", :foreign_key => "antecedent_name", :primary_key => "name"
