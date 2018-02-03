@@ -61,9 +61,6 @@ class Post < ApplicationRecord
     has_many :versions, lambda {order("post_versions.updated_at ASC")}, :class_name => "PostArchive", :dependent => :destroy
   end
 
-  attr_accessible :source, :rating, :tag_string, :old_tag_string, :old_parent_id, :old_source, :old_rating, :parent_id, :has_embedded_notes, :as => [:member, :builder, :gold, :platinum, :moderator, :admin, :default]
-  attr_accessible :is_rating_locked, :is_note_locked, :has_cropped, :as => [:builder, :moderator, :admin]
-  attr_accessible :is_status_locked, :as => [:admin]
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :view_count
 
   module FileMethods
@@ -915,13 +912,13 @@ class Post < ApplicationRecord
           self.rating = $1
 
         when /^(-?)locked:notes?$/i
-          assign_attributes({ is_note_locked: $1 != "-" }, as: CurrentUser.role)
+          self.is_note_locked = ($1 != "-" ) if CurrentUser.is_builder?
 
         when /^(-?)locked:rating$/i
-          assign_attributes({ is_rating_locked: $1 != "-" }, as: CurrentUser.role)
+          self.is_rating_locked = ($1 != "-" ) if CurrentUser.is_builder?
 
         when /^(-?)locked:status$/i
-          assign_attributes({ is_status_locked: $1 != "-" }, as: CurrentUser.role)
+          self.is_status_locked = ($1 != "-" ) if CurrentUser.is_admin?
 
         end
       end
@@ -1292,7 +1289,7 @@ class Post < ApplicationRecord
     # - Reparent all children to the first child.
 
     def update_has_children_flag
-      update({has_children: children.exists?, has_active_children: children.undeleted.exists?}, without_protection: true)
+      update(has_children: children.exists?, has_active_children: children.undeleted.exists?)
     end
 
     def blank_out_nonexistent_parents
@@ -1409,12 +1406,12 @@ class Post < ApplicationRecord
       Post.transaction do
         flag!(reason, is_deletion: true)
 
-        update({
+        update(
           is_deleted: true,
           is_pending: false,
           is_flagged: false,
           is_banned: is_banned || options[:ban] || has_tag?("banned_artist")
-        }, without_protection: true)
+        )
 
         # XXX This must happen *after* the `is_deleted` flag is set to true (issue #3419).
         give_favorites_to_parent(options) if options[:move_favorites]
