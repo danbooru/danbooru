@@ -43,6 +43,10 @@ class UserFeedback < ApplicationRecord
       end
     end
 
+    def default_order
+      order(created_at: :desc)
+    end
+
     def search(params)
       q = super
 
