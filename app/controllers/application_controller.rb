@@ -19,6 +19,7 @@ class ApplicationController < ActionController::Base
   rescue_from User::PrivilegeError, :with => :access_denied
   rescue_from SessionLoader::AuthenticationFailure, :with => :authentication_failed
   rescue_from Danbooru::Paginator::PaginationError, :with => :render_pagination_limit
+  rescue_from PG::ConnectionBad, with: :bad_db_connection
 
   # This is raised on requests to `/blah.js`. Rails has already rendered StaticController#not_found
   # here, so calling `rescue_exception` would cause a double render error.
@@ -45,6 +46,18 @@ class ApplicationController < ActionController::Base
     end
   end
   
+  def bad_db_connection
+    respond_to do |format|
+      format.json do
+        render json: {success: false, reason: "database is unavailable"}.to_json, status: 503
+      end
+
+      format.html do
+        render template: "static/service_unavailable", status: 503
+      end
+    end
+  end
+
   def api_check
     if !CurrentUser.is_anonymous? && !request.get? && !request.head?
       if CurrentUser.user.token_bucket.nil?
