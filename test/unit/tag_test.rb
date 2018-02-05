@@ -91,20 +91,6 @@ class TagTest < ActiveSupport::TestCase
   end
 
   context "A tag" do
-    should "be lockable by a moderator" do
-      @tag = FactoryGirl.create(:tag)
-      @tag.update_attributes({:is_locked => true}, :as => :moderator)
-      @tag.reload
-      assert_equal(true, @tag.is_locked?)
-    end
-
-    should "not be lockable by a user" do
-      @tag = FactoryGirl.create(:tag)
-      @tag.update_attributes({:is_locked => true}, :as => :member)
-      @tag.reload
-      assert_equal(false, @tag.is_locked?)
-    end
-
     should "know its category name" do
       @tag = FactoryGirl.create(:artist_tag)
       assert_equal("Artist", @tag.category_name)

@@ -80,7 +80,7 @@ class WikiPagesControllerTest < ActionController::TestCase
 
     context "new action" do
       should "render" do
-        get :new, {}, { user_id: @mod.id }
+        get :new, { wiki_page: { title: "test" }}, { user_id: @mod.id }
         assert_response :success
       end
     end
@@ -124,6 +124,11 @@ class WikiPagesControllerTest < ActionController::TestCase
         post :update, {:id => @wiki_page.id, :wiki_page => {:title => "bar", :skip_secondary_validations => "1"}}, {:user_id => @user.id}
 
         assert_equal("bar", @wiki_page.reload.title)
+      end
+
+      should "not allow non-Builders to delete wiki pages" do
+        put :update, { id: @wiki_page.id, wiki_page: { is_deleted: true }}, { user_id: @user.id }
+        assert_equal(false, @wiki_page.reload.is_deleted?)
       end
     end
 

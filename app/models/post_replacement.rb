@@ -68,7 +68,7 @@ class PostReplacement < ApplicationRecord
       update_ugoira_frame_data(upload)
 
       if md5_changed
-        post.comments.create!({creator: User.system, body: comment_replacement_message, do_not_bump_post: true}, without_protection: true)
+        post.comments.create!(creator: User.system, body: comment_replacement_message, do_not_bump_post: true)
       else
         post.queue_backup
       end

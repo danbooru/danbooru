@@ -46,10 +46,7 @@ class PostsController < ApplicationController
   def update
     @post = Post.find(params[:id])
 
-    if @post.visible?
-      @post.update_attributes(params[:post], :as => CurrentUser.role)
-    end
-
+    @post.update(post_params) if @post.visible?
     save_recent_tags
     respond_with_post_after_update(@post)
   end
@@ -130,5 +127,19 @@ private
         render :json => post.to_json
       end
     end
+  end
+
+  def post_params
+    permitted_params = %i[
+      tag_string old_tag_string
+      parent_id old_parent_id
+      source old_source
+      rating old_rating
+      has_embedded_notes
+    ]
+    permitted_params += %i[is_rating_locked is_note_locked] if CurrentUser.is_builder?
+    permitted_params += %i[is_status_locked] if CurrentUser.is_admin?
+
+    params.require(:post).permit(permitted_params)
   end
 end

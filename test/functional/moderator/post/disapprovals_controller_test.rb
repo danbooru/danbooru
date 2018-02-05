@@ -15,7 +15,7 @@ module Moderator
         context "create action" do
           should "render" do
             assert_difference("PostDisapproval.count", 1) do
-              post :create, {:post_id => @post.id, :format => "js"}, {:user_id => @admin.id}
+              post :create, { post_disapproval: { post_id: @post.id, reason: "breaks_rules" }, format: "js" }, { user_id: @admin.id }
             end
             assert_response :success
           end

@@ -31,6 +31,6 @@ class PostApproval < ApplicationRecord
     ModAction.log("undeleted post ##{post_id}",:post_undelete) if post.is_deleted
 
     post.flags.each(&:resolve!)
-    post.update({ approver: user, is_flagged: false, is_pending: false, is_deleted: false }, without_protection: true)
+    post.update(approver: user, is_flagged: false, is_pending: false, is_deleted: false)
   end
 end

@@ -35,12 +35,19 @@ class TagsController < ApplicationController
   def update
     @tag = Tag.find(params[:id])
     check_privilege(@tag)
-    @tag.update_attributes(params[:tag], :as => CurrentUser.role)
+    @tag.update(tag_params)
     respond_with(@tag)
   end
 
 private
   def check_privilege(tag)
     raise User::PrivilegeError unless tag.editable_by?(CurrentUser.user)
+  end
+
+  def tag_params
+    permitted_params = [:category]
+    permitted_params << :is_locked if CurrentUser.is_moderator?
+
+    params.require(:tag).permit(permitted_params)
   end
 end

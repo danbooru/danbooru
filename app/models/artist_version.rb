@@ -1,7 +1,6 @@
 class ArtistVersion < ApplicationRecord
   belongs_to :updater, :class_name => "User"
   belongs_to :artist
-  attr_accessible :artist_id, :name, :is_active, :other_names, :group_name, :url_string, :is_banned, :updater_id, :updater_ip_addr
   delegate :visible?, :to => :artist
 
   module SearchMethods

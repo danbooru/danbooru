@@ -18,7 +18,7 @@ class JanitorTrialsController < ApplicationController
   end
 
   def create
-    @janitor_trial = JanitorTrial.create(params[:janitor_trial])
+    @janitor_trial = JanitorTrial.create(janitor_trial_params)
     respond_with(@janitor_trial, :location => janitor_trials_path)
   end
 
@@ -40,5 +40,11 @@ class JanitorTrialsController < ApplicationController
 
   def test
     @tester = JanitorTrialTester.new(params[:janitor_trial][:user_name])
+  end
+
+  private
+
+  def janitor_trial_params
+    params.require(:janitor_trial).permit(%i[user_id user_name])
   end
 end

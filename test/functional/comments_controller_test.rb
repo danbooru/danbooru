@@ -90,7 +90,6 @@ class CommentsControllerTest < ActionController::TestCase
         should "fail if updater is not a moderator" do
           post :update, {:id => @comment.id, :comment => {:is_sticky => true}}, {:user_id => @user.id}
           assert_equal(false, @comment.reload.is_sticky)
-          assert_redirected_to @comment.post
         end
       end
 
@@ -105,21 +104,30 @@ class CommentsControllerTest < ActionController::TestCase
           id: @comment.id,
           comment: {
             body: "herp derp",
-            do_not_bump_post: true,
             is_deleted: true,
+          }
+        }
+
+        post :update, params, { :user_id => @comment.creator_id }
+
+        assert_equal("herp derp", @comment.reload.body)
+        assert_equal(true, @comment.is_deleted)
+        assert_redirected_to post_path(@post)
+      end
+
+      should "not allow changing do_not_bump_post or post_id" do
+        params = {
+          id: @comment.id,
+          comment: {
+            do_not_bump_post: true,
             post_id: FactoryGirl.create(:post).id,
           }
         }
 
         post :update, params, { :user_id => @comment.creator_id }
-        @comment.reload
 
-        assert_equal("herp derp", @comment.body)
-        assert_equal(false, @comment.do_not_bump_post)
-        assert_equal(true, @comment.is_deleted)
+        assert_equal(false, @comment.reload.do_not_bump_post)
         assert_equal(@post.id, @comment.post_id)
-
-        assert_redirected_to post_path(@post)
       end
     end
 

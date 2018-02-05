@@ -1,11 +1,10 @@
 class TagSubscription < ApplicationRecord
   belongs_to :creator, :class_name => "User"
-  attr_accessible :name, :tag_query, :post_ids, :is_public, :is_visible_on_profile
   validates_presence_of :name, :tag_query, :creator_id
 
   def migrate_to_saved_searches
     tag_query.split(/\r\n|\r|\n/).each do |query|
-      creator.saved_searches.create({query: query, labels: [name]}, without_protection: true)
+      creator.saved_searches.create(query: query, labels: [name])
     end
   end
 

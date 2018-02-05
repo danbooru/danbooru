@@ -6,13 +6,7 @@
   <section>
     <ul>
       <li>
-        <h2>
-          <%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :remote => true, :method => :post, :class => "approve-link" %> 
-          | <%= link_to "Breaks Rules", moderator_post_disapproval_path(:post_id => post.id, :reason => "breaks_rules"), :remote => true, :method => :post, :class => "disapprove-link" %>
-          | <%= link_to "Poor Quality", moderator_post_disapproval_path(:post_id => post.id, :reason => "poor_quality"), :remote => true, :method => :post, :class => "disapprove-link" %>
-          | <%= link_to "No Interest", moderator_post_disapproval_path(:post_id => post.id, :reason => "disinterest"), :remote => true, :method => :post, :class => "disapprove-link" %>
-          | <%= link_to "Detailed Rejection", "#", "data-post-id" => post.id, :class => "detailed-rejection-link" %>
-        </h2>
+        <h2><%= render "moderator/post/queues/quick_mod", post: post %></h2>
       </li>
       <li><strong>Rating</strong>: <%= post.pretty_rating %></li>
       <li><strong>Score</strong>: <%= post.score %></li>

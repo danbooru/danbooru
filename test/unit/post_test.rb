@@ -93,7 +93,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "that is status locked" do
         setup do
-          @post.update_attributes({:is_status_locked => true}, :as => :admin)
+          @post.update(is_status_locked: true)
         end
 
         should "not destroy the record" do
@@ -142,8 +142,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "that is status locked" do
         setup do
-          @post = FactoryGirl.create(:post)
-          @post.update_attributes({:is_status_locked => true}, :as => :admin)
+          @post = FactoryGirl.create(:post, is_status_locked: true)
         end
 
         should "fail" do
@@ -427,7 +426,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "that is status locked" do
         setup do
-          @post.update_attributes({:is_status_locked => true}, :as => :admin)
+          @post.update(is_status_locked: true)
         end
 
         should "not allow undeletion" do
@@ -578,8 +577,7 @@ class PostTest < ActiveSupport::TestCase
 
     context "A status locked post" do
       setup do
-        @post = FactoryGirl.create(:post)
-        @post.update_attributes({:is_status_locked => true}, :as => :admin)
+        @post = FactoryGirl.create(:post, is_status_locked: true)
       end
 
       should "not allow new flags" do
@@ -969,7 +967,7 @@ class PostTest < ActiveSupport::TestCase
 
           context "that is locked" do
             should "change the rating if locked in the same update" do
-              @post.update({ :tag_string => "rating:e", :is_rating_locked => true }, :as => :builder)
+              @post.update(tag_string: "rating:e", is_rating_locked: true)
 
               assert(@post.valid?)
               assert_equal("e", @post.reload.rating)
@@ -2596,7 +2594,7 @@ class PostTest < ActiveSupport::TestCase
       setup do
         @post = FactoryGirl.create(:post, :rating => "s")
         Timecop.travel(2.hours.from_now) do
-          @post.update({ :rating => "q", :is_rating_locked => true }, :as => :builder)
+          @post.update(rating: "q", is_rating_locked: true)
         end
       end
 
@@ -2610,7 +2608,7 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "revert the rating after unlocking" do
-        @post.update({ :rating => "e", :is_rating_locked => false }, :as => :builder)
+        @post.update(rating: "e", is_rating_locked: false)
         assert_nothing_raised do
           @post.revert_to!(@post.versions.first)
         end
@@ -2654,9 +2652,4 @@ class PostTest < ActiveSupport::TestCase
       end
     end
   end
-
-  context "Mass assignment: " do
-    should_not allow_mass_assignment_of(:last_noted_at).as(:member)
-  end
 end
-

@@ -4,7 +4,6 @@ class JanitorTrial < ApplicationRecord
   after_create :promote_user
   validates_presence_of :user
   before_validation :initialize_creator
-  attr_accessible :user_id, :user_name
   validates_inclusion_of :status, :in => %w(active inactive)
   before_validation :initialize_status
   validates_uniqueness_of :user_id

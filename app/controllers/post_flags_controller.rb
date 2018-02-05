@@ -18,12 +18,18 @@ class PostFlagsController < ApplicationController
   end
 
   def create
-    @post_flag = PostFlag.create(params[:post_flag].merge(:is_resolved => false))
+    @post_flag = PostFlag.create(post_flag_params)
     respond_with(@post_flag)
   end
 
   def show
     @post_flag = PostFlag.find(params[:id])
     respond_with(@post_flag)
+  end
+
+  private
+
+  def post_flag_params
+    params.require(:post_flag).permit(%i[post_id reason])
   end
 end

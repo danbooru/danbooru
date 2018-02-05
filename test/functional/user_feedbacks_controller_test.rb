@@ -17,7 +17,7 @@ class UserFeedbacksControllerTest < ActionController::TestCase
 
     context "new action" do
       should "render" do
-        get :new, {}, {:user_id => @critic.id}
+        get :new, { user_feedback: { user_id: @user.id } }, { user_id: @critic.id }
         assert_response :success
       end
     end
@@ -58,6 +58,16 @@ class UserFeedbacksControllerTest < ActionController::TestCase
           assert_not_nil(assigns(:user_feedback))
           assert_equal([], assigns(:user_feedback).errors.full_messages)
         end
+      end
+    end
+
+    context "update action" do
+      should "update the feedback" do
+        @feedback = FactoryGirl.create(:user_feedback, user: @user, category: "negative")
+        put :update, { id: @feedback.id, user_feedback: { category: "positive" }}, { user_id: @critic.id }
+
+        assert_redirected_to(@feedback)
+        assert("positive", @feedback.reload.category)
       end
     end
 

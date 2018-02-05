@@ -22,11 +22,7 @@ class SavedSearchesController < ApplicationController
   end
 
   def create
-    @saved_search = saved_searches.create!(:query => params[:saved_search_tags], :label_string => params[:saved_search_labels])
-    if params[:saved_search_disable_labels]
-      CurrentUser.disable_categorized_saved_searches = true
-      CurrentUser.save
-    end
+    @saved_search = saved_searches.create(saved_search_params)
     respond_with(@saved_search)
   end
 
@@ -42,11 +38,12 @@ class SavedSearchesController < ApplicationController
 
   def update
     @saved_search = saved_searches.find(params[:id])
-    @saved_search.update_attributes(params[:saved_search])
+    @saved_search.update(saved_search_params)
     respond_with(@saved_search, :location => saved_searches_path)
   end
 
-private
+  private
+
   def saved_searches
     CurrentUser.user.saved_searches
   end
@@ -55,5 +52,9 @@ private
     if !SavedSearch.enabled?
       raise NotImplementedError.new("Listbooru service is not configured. Saved searches are not available.")
     end
+  end
+
+  def saved_search_params
+    params.require(:saved_search).permit(%i[query label_string disable_labels])
   end
 end

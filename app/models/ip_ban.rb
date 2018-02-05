@@ -5,7 +5,6 @@ class IpBan < ApplicationRecord
   validates_presence_of :reason, :creator, :ip_addr
   validates_format_of :ip_addr, :with => IP_ADDR_REGEX
   validates_uniqueness_of :ip_addr, :if => lambda {|rec| rec.ip_addr =~ IP_ADDR_REGEX}
-  attr_accessible :ip_addr, :reason
   after_create do |rec|
     ModAction.log("#{CurrentUser.name} created ip ban for #{rec.ip_addr}",:ip_ban_create)
   end

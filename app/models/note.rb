@@ -14,7 +14,6 @@ class Note < ApplicationRecord
   after_save :update_post
   after_save :create_version
   validate :post_must_not_be_note_locked
-  attr_accessible :x, :y, :width, :height, :body, :updater_id, :updater_ip_addr, :is_active, :post_id, :post, :html_id
 
   module SearchMethods
     def active

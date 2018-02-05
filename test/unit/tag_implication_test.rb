@@ -40,10 +40,6 @@ class TagImplicationTest < ActiveSupport::TestCase
 
       should_not allow_value(nil).for(:creator_id)
       should_not allow_value(-1).for(:creator_id).with_message("must exist", against: :creator)
-
-      should_not allow_mass_assignment_of(:status).as(:member)
-      should_not allow_mass_assignment_of(:forum_topic).as(:member)
-      should_not allow_mass_assignment_of(:descendant_names).as(:member)
     end
 
     should "ignore pending implications when building descendant names" do

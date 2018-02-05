@@ -127,7 +127,7 @@ class PostReplacementTest < ActiveSupport::TestCase
 
     context "a post with notes" do
       setup do
-        @post.update({image_width: 160, image_height: 164}, without_protection: true)
+        @post.update(image_width: 160, image_height: 164)
         CurrentUser.scoped(@uploader, "127.0.0.1") do
           @note = @post.notes.create(x: 80, y: 82, width: 80, height: 82, body: "test")
         end

@@ -134,10 +134,7 @@ class PostsControllerTest < ActionController::TestCase
 
       should "ignore restricted params" do
         post :update, {:id => @post.id, :post => {:last_noted_at => 1.minute.ago}}, {:user_id => @user.id}
-        assert_redirected_to post_path(@post)
-
-        @post.reload
-        assert_nil(@post.last_noted_at)
+        assert_nil(@post.reload.last_noted_at)
       end
     end
 

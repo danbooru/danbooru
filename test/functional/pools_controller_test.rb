@@ -85,9 +85,16 @@ class PoolsControllerTest < ActionController::TestCase
       end
 
       should "update a pool" do
-        post :update, {:id => @pool.id, :pool => {:name => "xyz"}}, {:user_id => @user.id}
-        @pool.reload
-        assert_equal("xyz", @pool.name)
+        post :update, { id: @pool.id, pool: { name: "xyz", post_ids: @post.id.to_s }}, { user_id: @user.id }
+        assert_equal("xyz", @pool.reload.name)
+        assert_equal(@post.id.to_s, @pool.post_ids)
+      end
+
+      should "not allow updating unpermitted attributes" do
+        post :update, { id: @pool.id, pool: { is_deleted: true, post_count: -42 }}, { user_id: @user.id }
+
+        assert_equal(false, @pool.reload.is_deleted)
+        assert_equal(0, @pool.post_count)
       end
     end
 

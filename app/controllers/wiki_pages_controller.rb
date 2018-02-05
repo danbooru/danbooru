@@ -5,7 +5,7 @@ class WikiPagesController < ApplicationController
   before_filter :normalize_search_params, :only => [:index]
   
   def new
-    @wiki_page = WikiPage.new(params[:wiki_page])
+    @wiki_page = WikiPage.new(wiki_page_params)
     respond_with(@wiki_page)
   end
 
@@ -50,13 +50,13 @@ class WikiPagesController < ApplicationController
   end
 
   def create
-    @wiki_page = WikiPage.create(params[:wiki_page])
+    @wiki_page = WikiPage.create(wiki_page_params)
     respond_with(@wiki_page)
   end
 
   def update
     @wiki_page = WikiPage.find(params[:id])
-    @wiki_page.update_attributes(params[:wiki_page])
+    @wiki_page.update(wiki_page_params)
     respond_with(@wiki_page)
   end
 
@@ -85,11 +85,19 @@ class WikiPagesController < ApplicationController
     end
   end
 
-private
+  private
+
   def normalize_search_params
     if params[:title]
       params[:search] ||= {}
       params[:search][:title] = params.delete(:title)
     end
+  end
+
+  def wiki_page_params
+    permitted_params = %i[title body other_names skip_secondary_validations]
+    permitted_params += %i[is_locked is_deleted] if CurrentUser.is_builder?
+
+    params.require(:wiki_page).permit(permitted_params)
   end
 end

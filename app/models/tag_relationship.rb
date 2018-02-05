@@ -2,8 +2,6 @@ class TagRelationship < ApplicationRecord
   self.abstract_class = true
 
   attr_accessor :skip_secondary_validations
-  attr_accessible :antecedent_name, :consequent_name, :forum_topic_id, :skip_secondary_validations
-  attr_accessible :status, :approver_id, :as => [:admin]
 
   belongs_to :creator, :class_name => "User"
   belongs_to :approver, :class_name => "User"

@@ -64,9 +64,8 @@ class User < ApplicationRecord
   has_bit_flags BOOLEAN_ATTRIBUTES, :field => "bit_prefs"
 
   attr_accessor :password, :old_password
-  attr_accessible :dmail_filter_attributes, :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr, :time_zone, :default_image_size, :enable_sequential_post_navigation, :per_page, :hide_deleted_posts, :style_usernames, :enable_auto_complete, :custom_style, :show_deleted_children, :disable_categorized_saved_searches, :disable_tagged_filenames, :enable_recent_searches, :disable_cropped_thumbnails, :disable_mobile_gestures, :enable_safe_mode, :disable_responsive_mode, :as => [:moderator, :gold, :platinum, :member, :anonymous, :default, :builder, :admin]
-  attr_accessible :level, :as => :admin
 
+  after_initialize :initialize_attributes, if: :new_record?
   validates :name, user_name: true, on: :create
   validates_uniqueness_of :email, :case_sensitive => false, :if => lambda {|rec| rec.email.present? && rec.email_changed? }
   validates_length_of :password, :minimum => 5, :if => lambda {|rec| rec.new_record? || rec.password.present?}
@@ -82,7 +81,6 @@ class User < ApplicationRecord
   before_validation :normalize_email
   before_create :encrypt_password_on_create
   before_update :encrypt_password_on_update
-  before_create :initialize_default_boolean_attributes
   after_save :update_cache
   after_update :update_remote_cache
   before_create :promote_to_admin_if_first_user
@@ -916,10 +914,6 @@ class User < ApplicationRecord
   extend SearchMethods
   include StatisticsMethods
 
-  def initialize_default_image_size
-    self.default_image_size = "large"
-  end
-
   def can_update?(object, foreign_key = :user_id)
     is_moderator? || is_admin? || object.__send__(foreign_key) == id
   end
@@ -936,7 +930,8 @@ class User < ApplicationRecord
     !CurrentUser.is_admin? && enable_privacy_mode? && CurrentUser.user.id != id
   end
 
-  def initialize_default_boolean_attributes
+  def initialize_attributes
+    self.last_ip_addr ||= CurrentUser.ip_addr
     self.enable_post_navigation = true
     self.new_post_navigation_layout = true
     self.enable_sequential_post_navigation = true

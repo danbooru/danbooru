@@ -56,12 +56,12 @@ class ArtistsController < ApplicationController
   end
 
   def create
-    @artist = Artist.create(params[:artist], :as => CurrentUser.role)
+    @artist = Artist.create(artist_params)
     respond_with(@artist)
   end
 
   def update
-    @artist.update(params[:artist], :as => CurrentUser.role)
+    @artist.update(artist_params)
     flash[:notice] = @artist.valid? ? "Artist updated" : @artist.errors.full_messages.join("; ")
     respond_with(@artist)
   end
@@ -117,5 +117,12 @@ private
 
   def load_artist
     @artist = Artist.find(params[:id])
+  end
+
+  def artist_params
+    permitted_params = %i[name other_names other_names_comma group_name url_string notes]
+    permitted_params << :is_active if CurrentUser.is_builder?
+
+    params.require(:artist).permit(permitted_params)
   end
 end

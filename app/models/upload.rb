@@ -9,19 +9,19 @@ class Upload < ApplicationRecord
     :referer_url, :downloaded_source, :replaced_post
   belongs_to :uploader, :class_name => "User"
   belongs_to :post
-  before_validation :initialize_uploader, :on => :create
-  before_validation :initialize_status, :on => :create
+
+  before_validation :initialize_attributes
   before_create :convert_cgi_file
   after_destroy :delete_temp_file
   validate :uploader_is_not_limited, :on => :create
   validate :file_or_source_is_present, :on => :create
   validate :rating_given
-  attr_accessible :file, :image_width, :image_height, :file_ext, :md5, 
-    :file_size, :as_pending, :source, :file_path, :content_type, :rating, 
-    :tag_string, :status, :backtrace, :post_id, :md5_confirmation, 
-    :parent_id, :server, :artist_commentary_title,
-    :artist_commentary_desc, :include_artist_commentary,
-    :referer_url, :replaced_post
+
+  def initialize_attributes
+    self.uploader_id = CurrentUser.user.id
+    self.uploader_ip_addr = CurrentUser.ip_addr
+    self.server = Danbooru.config.server_host
+  end
 
   module ValidationMethods
     def uploader_is_not_limited
@@ -442,10 +442,6 @@ class Upload < ApplicationRecord
   end
 
   module StatusMethods
-    def initialize_status
-      self.status = "pending"
-    end
-
     def is_pending?
       status == "pending"
     end
@@ -468,11 +464,6 @@ class Upload < ApplicationRecord
   end
 
   module UploaderMethods
-    def initialize_uploader
-      self.uploader_id = CurrentUser.user.id
-      self.uploader_ip_addr = CurrentUser.ip_addr
-    end
-
     def uploader_name
       User.id_to_name(uploader_id)
     end

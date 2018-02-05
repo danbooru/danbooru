@@ -31,7 +31,6 @@ module Maintenance
             post :update, params, { :user_id => @user1.id }
 
             assert_not_equal("owned", @user2.reload.dmail_filter.try(&:words))
-            assert_redirected_to(@dmail)
           end
         end
       end

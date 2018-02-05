@@ -3,10 +3,9 @@ class ArtistCommentary < ApplicationRecord
 
   attr_accessor :remove_commentary_tag, :remove_commentary_request_tag, :remove_commentary_check_tag
   attr_accessor :add_commentary_tag, :add_commentary_request_tag, :add_commentary_check_tag
-  attr_accessible :post_id, :original_description, :original_title, :translated_description, :translated_title, :remove_commentary_tag, :remove_commentary_request_tag, :add_commentary_tag, :add_commentary_request_tag, :add_commentary_check_tag, :remove_commentary_check_tag
   before_validation :trim_whitespace
   validates_uniqueness_of :post_id
-  belongs_to :post
+  belongs_to :post, required: true
   has_many :versions, lambda {order("artist_commentary_versions.id ASC")}, :class_name => "ArtistCommentaryVersion", :dependent => :destroy, :foreign_key => :post_id, :primary_key => :post_id
   has_one :previous_version, lambda {order(id: :desc)}, :class_name => "ArtistCommentaryVersion", :foreign_key => :post_id, :primary_key => :post_id
   after_save :create_version

@@ -1,11 +1,16 @@
 class UserNameChangeRequest < ApplicationRecord
+  after_initialize :initialize_attributes, if: :new_record?
   validates_presence_of :user_id, :original_name, :desired_name
   validates_inclusion_of :status, :in => %w(pending approved rejected)
   belongs_to :user
   belongs_to :approver, :class_name => "User"
   validate :not_limited, :on => :create
   validates :desired_name, user_name: true
-  attr_accessible :status, :user_id, :original_name, :desired_name, :change_reason, :rejection_reason, :approver_id
+
+  def initialize_attributes
+    self.user_id ||= CurrentUser.user.id
+    self.original_name ||= CurrentUser.user.name
+  end
   
   def self.pending
     where(:status => "pending")

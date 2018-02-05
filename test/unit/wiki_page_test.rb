@@ -52,7 +52,7 @@ class WikiPageTest < ActiveSupport::TestCase
 
       should "not allow the is_locked attribute to be updated" do
         @wiki_page.update_attributes(:is_locked => true)
-        assert_equal(["Is locked can be modified by builders only", "Is locked and cannot be updated"], @wiki_page.errors.full_messages)
+        assert_equal(["Is locked and cannot be updated"], @wiki_page.errors.full_messages)
         @wiki_page.reload
         assert_equal(false, @wiki_page.is_locked?)
       end

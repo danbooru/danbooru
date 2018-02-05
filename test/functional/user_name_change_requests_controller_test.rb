@@ -21,6 +21,13 @@ class UserNameChangeRequestsControllerTest < ActionController::TestCase
         assert_response :success
       end
     end
+
+    context "create action" do
+      should "work" do
+        post :create, { user_name_change_request: { desired_name: "zun" }}, { user_id: @user.id }
+        assert_response :success
+      end
+    end
     
     context "show action" do
       should "render" do

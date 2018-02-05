@@ -18,7 +18,7 @@ class DelayedJobsController < ApplicationController
   def retry
     @job = Delayed::Job.find(params[:id])
     if !@job.locked_at?
-      @job.update({failed_at: nil, attempts: 0}, without_protection: true)
+      @job.update(failed_at: nil, attempts: 0)
     end
     respond_with(@job)
   end
