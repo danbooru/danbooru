@@ -1226,6 +1226,8 @@ class Post < ApplicationRecord
       end
 
       count ? count.to_i : nil
+    rescue PG::ConnectionBad
+      return nil
     end
 
     def fast_count_search_batched(tags, options)
@@ -1243,6 +1245,9 @@ class Post < ApplicationRecord
         end
       end
       sum
+
+    rescue PG::ConnectionBad
+      return nil
     end
 
     def fix_post_counts(post)
@@ -1673,7 +1678,11 @@ class Post < ApplicationRecord
       end
 
       if read_only
-        PostQueryBuilder.new(query).build(PostReadOnly.where("true"))
+        begin
+          PostQueryBuilder.new(query).build(PostReadOnly.where("true"))
+        rescue PG::ConnectionBad
+          PostQueryBuilder.new(query).build
+        end
       else
         PostQueryBuilder.new(query).build
       end
