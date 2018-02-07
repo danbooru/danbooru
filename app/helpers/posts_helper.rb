@@ -5,13 +5,13 @@ module PostsHelper
 
   def next_page_url
     current_page = (params[:page] || 1).to_i
-    url_for(nav_params.merge(page: current_page + 1)).html_safe
+    url_for(nav_params_for(current_page + 1)).html_safe
   end
 
   def prev_page_url
     current_page = (params[:page] || 1).to_i
     if current_page >= 2
-      url_for(nav_params.merge(page: current_page - 1)).html_safe
+      url_for(nav_params_for(current_page - 1)).html_safe
     else
       nil
     end
@@ -134,7 +134,8 @@ module PostsHelper
 
   private
 
-  def nav_params
-    params.to_unsafe_h # XXX
+  def nav_params_for(page)
+    query_params = params.except(:controller, :action, :id).merge(page: page).permit!
+    { params: query_params }
   end
 end

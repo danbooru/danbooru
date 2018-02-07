@@ -196,17 +196,19 @@ class ApplicationController < ActionController::Base
     @page_title = Danbooru.config.app_name + "/#{params[:controller]}"
   end
 
+  # Remove blank `search` params from the url.
+  #
+  # /tags?search[name]=touhou&search[category]=&search[order]=
+  # => /tags?search[name]=touhou
   def normalize_search
     if request.get?
       if params[:search].blank?
-        params[:search] = {}
+        params[:search] = ActionController::Parameters.new
       end
 
-      if params[:search].is_a?(Hash)
-        changed = params[:search].reject! {|k,v| v.blank?}
-        unless changed.nil?
-          redirect_to url_for(params)
-        end
+      if params[:search].is_a?(ActionController::Parameters) && params[:search].values.any?(&:blank?)
+        params[:search].reject! {|k,v| v.blank?}
+        redirect_to url_for(params: params.except(:controller, :action, :index).permit!)
       end
     end
   end
