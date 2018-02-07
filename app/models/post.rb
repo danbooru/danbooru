@@ -57,36 +57,14 @@ class Post < ApplicationRecord
   has_many :favorites
   has_many :replacements, class_name: "PostReplacement", :dependent => :destroy
 
-  if PostKeeperManager.enabled?
-    serialize :keeper_data, JSON
-  end
-
   if PostArchive.enabled?
     has_many :versions, lambda {order("post_versions.updated_at ASC")}, :class_name => "PostArchive", :dependent => :destroy
   end
 
   attr_accessible :source, :rating, :tag_string, :old_tag_string, :old_parent_id, :old_source, :old_rating, :parent_id, :has_embedded_notes, :as => [:member, :builder, :gold, :platinum, :moderator, :admin, :default]
-  attr_accessible :is_rating_locked, :is_note_locked, :has_cropped, :keeper_data, :as => [:builder, :moderator, :admin]
-  attr_accessible :is_status_locked, :keeper_data, :as => [:admin]
+  attr_accessible :is_rating_locked, :is_note_locked, :has_cropped, :as => [:builder, :moderator, :admin]
+  attr_accessible :is_status_locked, :as => [:admin]
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :view_count
-
-  concerning :KeeperMethods do
-    included do
-      before_create :initialize_keeper
-    end
-
-    def keeper_id
-      keeper_data ? keeper_data[:uid] : uploader_id
-    end
-
-    def keeper
-      User.find(keeper_id)
-    end
-
-    def initialize_keeper
-      self.keeper_data = {uid: uploader_id}
-    end
-  end
 
   module FileMethods
     extend ActiveSupport::Concern
@@ -653,11 +631,6 @@ class Post < ApplicationRecord
       end
       if decrement_tags.any?
         Tag.decrement_post_counts(decrement_tags)
-      end
-
-      if PostKeeperManager.enabled? && persisted?
-        # no need to do this check on the initial create
-        PostKeeperManager.queue_check(id)
       end
     end
 
