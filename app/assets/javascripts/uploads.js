@@ -66,10 +66,7 @@
     var $submit = $textarea.parents("form").find('input[type="submit"]');
 
     $textarea.on("keydown.danbooru.submit", null, "return", function(e) {
-      if (!Danbooru.autocompleting) {
-          $submit.click();
-      }
-
+      $submit.click();
       e.preventDefault();
     });
   }

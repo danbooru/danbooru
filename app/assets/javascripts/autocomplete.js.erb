@@ -59,6 +59,11 @@
         this.value += after_caret_text;
         this.selectionStart = this.selectionEnd = original_start;
 
+        // Prevent the enter key from submitting the tag edit form (Danbooru.Upload.initialize_enter_on_tags).
+        event.stopImmediatePropagation();
+        // Prevent the tab key from moving the focus to the next element.
+        event.preventDefault();
+
         return false;
       },
       source: function(req, resp) {
@@ -114,6 +119,8 @@
         this.value += after_caret_text;
         this.selectionStart = this.selectionEnd = original_start;
 
+        event.stopImmediatePropagation();
+        event.preventDefault();
         return false;
       },
       source: function(req, resp) {
@@ -215,16 +222,6 @@
           break;
         }
       }
-    });
-
-    $fields_multiple.on("autocompleteselect", function() {
-      Danbooru.autocompleting = true;
-    });
-
-    $fields_multiple.on("autocompleteclose", function() {
-      // this is needed otherwise the var is disabled by the time the
-      // keydown is triggered
-      setTimeout(function() {Danbooru.autocompleting = false;}, 100);
     });
 
     $fields_single.autocomplete({
