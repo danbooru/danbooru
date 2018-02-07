@@ -1,6 +1,9 @@
 <ul itemscope itemtype="http://schema.org/ImageObject">
   <li>ID: <%= post.id %></li>
-  <li>Uploader: <%= link_to_user(post.uploader) + "&nbsp;".html_safe + link_to("&raquo;".html_safe, posts_path(:tags => "user:#{post.uploader.name}"), :rel => "nofollow") %></li>
+  <li>Tagger: <%= link_to_user(post.keeper) %></li>
+  <% if CurrentUser.is_moderator? %>
+    <li>Uploader: <%= link_to_user(post.uploader) %></li>
+  <% end %>
   <li>
     Date: <%= link_to time_ago_in_words_tagged(post.created_at), posts_path(:tags => "date:#{post.created_at.to_date}"), :rel => "nofollow" %>
     <meta itemprop="uploadDate" content="<%= post.created_at.iso8601 %>">
