@@ -10,6 +10,10 @@ class PoolArchive < ApplicationRecord
   self.table_name = "pool_versions"
 
   module SearchMethods
+    def default_order
+      order(updated_at: :desc)
+    end
+
     def for_user(user_id)
       where("updater_id = ?", user_id)
     end
