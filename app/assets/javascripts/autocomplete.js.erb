@@ -109,6 +109,12 @@
         return false;
       },
       select: function(event, ui) {
+        var query = Danbooru.Autocomplete.parse_query(this.value, this.selectionStart);
+        if (event.key === "Enter" && query.term === ui.item.value) {
+          $(this).parents("form").submit();
+          return false;
+        }
+
         var before_caret_text = this.value.substring(0, this.selectionStart);
         var after_caret_text = this.value.substring(this.selectionStart);
         var prefixes = "-|~|" + "<%= TagCategory.mapping.keys.map {|category| category + ':'}.join('|') %>";
