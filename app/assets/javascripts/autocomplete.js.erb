@@ -6,6 +6,9 @@
   //Just under 5MB of 16-bit characters
   Danbooru.Autocomplete.MAX_STORAGE_SIZE = 2500000;
 
+  Danbooru.Autocomplete.PREFIXES = /^(-|~|<%= TagCategory.mapping.keys.map {|category| category + ':'}.join('|') %>)(.*)$/i;
+  Danbooru.Autocomplete.METATAGS = /^(<%= Tag::METATAGS %>):(.*)$/i;
+
   Danbooru.Autocomplete.initialize_all = function() {
     if (Danbooru.meta("enable-auto-complete") === "true") {
       Danbooru.Autocomplete.enable_local_storage = this.test_local_storage();
@@ -99,9 +102,6 @@
     var $fields_multiple = $('[data-autocomplete="tag-query"], [data-autocomplete="tag-edit"]');
     var $fields_single = $('[data-autocomplete="tag"]');
 
-    var prefixes = "-|~|" + "<%= TagCategory.mapping.keys.map {|category| category + ':'}.join('|') %>";
-    var metatags = "<%= Tag::METATAGS %>";
-
     $fields_multiple.autocomplete({
       delay: 100,
       autoFocus: true,
@@ -109,8 +109,15 @@
         return false;
       },
       select: function(event, ui) {
+        var query = Danbooru.Autocomplete.parse_query(this.value, this.selectionStart);
+        if (event.key === "Enter" && query.term === ui.item.value) {
+          $(this).parents("form").submit();
+          return false;
+        }
+
         var before_caret_text = this.value.substring(0, this.selectionStart);
         var after_caret_text = this.value.substring(this.selectionStart);
+        var prefixes = "-|~|" + "<%= TagCategory.mapping.keys.map {|category| category + ':'}.join('|') %>";
         var regexp = new RegExp("(" + prefixes + ")?\\S+$", "g");
         this.value = before_caret_text.replace(regexp, "$1" + ui.item.value + " ");
 
@@ -124,34 +131,13 @@
         return false;
       },
       source: function(req, resp) {
-        var before_caret_text = req.term.substring(0, this.element.get(0).selectionStart);
+        var query = Danbooru.Autocomplete.parse_query(req.term, this.element.get(0).selectionStart);
+        var metatag = query.metatag;
+        var term = query.term;
 
-        if (before_caret_text.match(/ $/)) {
+        if (!term) {
           this.close();
           return;
-        }
-
-        var term = before_caret_text.match(/\S+/g);
-        if (!term) {
-          return;
-        }
-
-        term = term.pop();
-        var regexp = new RegExp("^(?:" + prefixes + ")(.*)$", "i");
-        var match = term.match(regexp);
-        if (match) {
-          term = match[1];
-        }
-        if (term === "") {
-          return;
-        }
-
-        regexp = new RegExp("^(" + metatags + "):(.*)$", "i");
-        match = term.match(regexp);
-        var metatag;
-        if (match) {
-          metatag = match[1].toLowerCase();
-          term = match[2];
         }
 
         switch(metatag) {
@@ -176,7 +162,6 @@
         <% end %>
           resp([]);
           return;
-
         case "order":
         case "status":
         case "rating":
@@ -186,13 +171,6 @@
         case "filetype":
           Danbooru.Autocomplete.static_metatag_source(term, resp, metatag);
           return;
-        }
-
-        if (term === "") {
-          return;
-        }
-
-        switch(metatag) {
         case "user":
         case "approver":
         case "commenter":
@@ -279,6 +257,29 @@
       }
     });
   }
+
+  Danbooru.Autocomplete.parse_query = function(text, caret) {
+    var metatag = "";
+    var term = "";
+
+    var before_caret_text = text.substring(0, caret);
+    var match = before_caret_text.match(/\S+$/g);
+    if (match) {
+      term = match[0];
+    } else {
+      return {};
+    }
+
+    if (match = term.match(Danbooru.Autocomplete.PREFIXES)) {
+      metatag = match[1].toLowerCase();
+      term = match[2];
+    } else if (match = term.match(Danbooru.Autocomplete.METATAGS)) {
+      metatag = match[1].toLowerCase();
+      term = match[2];
+    }
+
+    return { metatag: metatag, term: term };
+  };
 
   Danbooru.Autocomplete.render_item = function(list, item) {
     var $link = $("<a/>");
