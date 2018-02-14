@@ -53,20 +53,10 @@
         return false;
       },
       select: function(event, ui) {
-        var before_caret_text = this.value.substring(0, this.selectionStart).replace(/\S+$/, ui.item.value + " ");
-        var after_caret_text = this.value.substring(this.selectionStart);
-        this.value = before_caret_text;
+        Danbooru.Autocomplete.insert_completion(this, ui.item.value);
 
-        // Preserve original caret position to prevent it from jumping to the end
-        var original_start = this.selectionStart;
-        this.value += after_caret_text;
-        this.selectionStart = this.selectionEnd = original_start;
-
-        // Prevent the enter key from submitting the tag edit form (Danbooru.Upload.initialize_enter_on_tags).
-        event.stopImmediatePropagation();
         // Prevent the tab key from moving the focus to the next element.
         event.preventDefault();
-
         return false;
       },
       source: function(req, resp) {
@@ -115,16 +105,7 @@
           return false;
         }
 
-        var before_caret_text = this.value.substring(0, this.selectionStart);
-        var after_caret_text = this.value.substring(this.selectionStart);
-        var prefixes = "-|~|" + "<%= TagCategory.mapping.keys.map {|category| category + ':'}.join('|') %>";
-        var regexp = new RegExp("(" + prefixes + ")?\\S+$", "g");
-        this.value = before_caret_text.replace(regexp, "$1" + ui.item.value + " ");
-
-        // Preserve original caret position to prevent it from jumping to the end
-        var original_start = this.selectionStart;
-        this.value += after_caret_text;
-        this.selectionStart = this.selectionEnd = original_start;
+        Danbooru.Autocomplete.insert_completion(this, ui.item.value);
 
         event.stopImmediatePropagation();
         event.preventDefault();
@@ -279,6 +260,20 @@
     }
 
     return { metatag: metatag, term: term };
+  };
+
+  // Update the input field with the item currently focused in the
+  // autocomplete menu, then position the caret just after the inserted completion.
+  Danbooru.Autocomplete.insert_completion = function(input, completion) {
+    var before_caret_text = input.value.substring(0, input.selectionStart).trim();
+    var after_caret_text = input.value.substring(input.selectionStart).trim();
+
+    var prefixes = "-|~|" + "<%= TagCategory.mapping.keys.map {|category| category + ':'}.join('|') %>";
+    var regexp = new RegExp("(" + prefixes + ")?\\S+$", "g");
+    before_caret_text = before_caret_text.replace(regexp, "$1") + completion + " ";
+
+    input.value = before_caret_text + after_caret_text;
+    input.selectionStart = input.selectionEnd = before_caret_text.length;
   };
 
   Danbooru.Autocomplete.render_item = function(list, item) {
