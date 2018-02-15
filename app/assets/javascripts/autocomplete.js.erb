@@ -45,18 +45,17 @@
 
   Danbooru.Autocomplete.initialize_mention_autocomplete = function() {
     var $fields = $(".autocomplete-mentions textarea");
+
+    $fields.on("keydown.danbooru.autocomplete.tab", null, "tab", Danbooru.Autocomplete.on_tab);
     $fields.autocomplete({
       delay: 500,
       minLength: 2,
-      autoFocus: true,
+      autoFocus: false,
       focus: function() {
         return false;
       },
       select: function(event, ui) {
         Danbooru.Autocomplete.insert_completion(this, ui.item.value);
-
-        // Prevent the tab key from moving the focus to the next element.
-        event.preventDefault();
         return false;
       },
       source: function(req, resp) {
@@ -92,23 +91,21 @@
     var $fields_multiple = $('[data-autocomplete="tag-query"], [data-autocomplete="tag-edit"]');
     var $fields_single = $('[data-autocomplete="tag"]');
 
+    $fields_multiple.on("keydown.danbooru.autocomplete.tab", null, "tab", Danbooru.Autocomplete.on_tab);
     $fields_multiple.autocomplete({
       delay: 100,
-      autoFocus: true,
+      autoFocus: false,
       focus: function() {
         return false;
       },
       select: function(event, ui) {
-        var query = Danbooru.Autocomplete.parse_query(this.value, this.selectionStart);
-        if (event.key === "Enter" && query.term === ui.item.value) {
-          $(this).parents("form").submit();
-          return false;
+        // Prevent Danbooru.Upload.initialize_enter_on_tags from running if the
+        // Enter key is used to select a tag from the autocomplete menu.
+        if (event.key === "Enter") {
+          event.stopImmediatePropagation();
         }
 
         Danbooru.Autocomplete.insert_completion(this, ui.item.value);
-
-        event.stopImmediatePropagation();
-        event.preventDefault();
         return false;
       },
       source: function(req, resp) {
@@ -274,6 +271,29 @@
 
     input.value = before_caret_text + after_caret_text;
     input.selectionStart = input.selectionEnd = before_caret_text.length;
+  };
+
+  // If we press tab while the autocomplete menu is open but nothing is
+  // focused, complete the first item and close the menu.
+  Danbooru.Autocomplete.on_tab = function(event) {
+    var input = this;
+    var autocomplete = $(input).autocomplete("instance");
+    var $autocomplete_menu = autocomplete.menu.element;
+
+    if (!$autocomplete_menu.is(":visible")) {
+      return;
+    }
+
+    if ($autocomplete_menu.has(".ui-state-focus").length === 0) {
+      var $first_item = $autocomplete_menu.find(".ui-menu-item").first();
+      var completion = $first_item.data().uiAutocompleteItem.value;
+
+      Danbooru.Autocomplete.insert_completion(input, completion);
+      autocomplete.close();
+    }
+
+    // Prevent the tab key from moving focus to the next element.
+    event.preventDefault();
   };
 
   Danbooru.Autocomplete.render_item = function(list, item) {
