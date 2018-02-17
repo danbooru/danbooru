@@ -3,7 +3,7 @@ module Downloads
     class Error < Exception ; end
 
     attr_reader :data, :options
-    attr_accessor :source, :original_source, :downloaded_source, :content_type, :file_path
+    attr_accessor :source, :original_source, :downloaded_source, :file_path
 
     def initialize(source, file_path, options = {})
       # source can potentially get rewritten in the course
@@ -36,9 +36,7 @@ module Downloads
       url, headers, @data = before_download(@source, @data)
 
       ::File.open(@file_path, "wb") do |out|
-        http_get_streaming(uncached_url(url, headers), headers) do |response|
-          out.write(response)
-        end
+        http_get_streaming(uncached_url(url, headers), out, headers)
       end
 
       @downloaded_source = url
@@ -70,10 +68,7 @@ module Downloads
       end
     end
 
-    def http_get_streaming(src, headers = {}, options = {}, &block)
-      max_size = options[:max_size] || Danbooru.config.max_file_size
-      max_size = nil if max_size == 0 # unlimited
-      limit = 4
+    def http_get_streaming(src, file, headers = {}, max_size: Danbooru.config.max_file_size)
       tries = 0
       url = URI.parse(src)
 
@@ -85,17 +80,17 @@ module Downloads
         validate_local_hosts(url)
 
         begin
+          size = 0
           options = { stream_body: true, timeout: 10, headers: headers }
-          res = HTTParty.get(url, options.deep_merge(Danbooru.config.httparty_options), &block)
+
+          res = HTTParty.get(url, options.deep_merge(Danbooru.config.httparty_options)) do |chunk|
+            size += chunk.size
+            raise Error.new("File is too large (max size: #{max_size})") if size > max_size && max_size > 0
+
+            file.write(chunk)
+          end
 
           if res.success?
-            if max_size
-              len = res["Content-Length"]
-              raise Error.new("File is too large (#{len} bytes)") if len && len.to_i > max_size
-            end
-
-            @content_type = res["Content-Type"]
-
             return
           else
             raise Error.new("HTTP error code: #{res.code} #{res.message}")

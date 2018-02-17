@@ -37,21 +37,14 @@ module Downloads
 
         should "retry three times" do
           assert_raises(Errno::ETIMEDOUT) do
-            @download.http_get_streaming(@source) {}
+            @download.http_get_streaming(@source, @tempfile)
           end
-        end
-      end
-
-      should "stream a file from an HTTP source" do
-        @download.http_get_streaming(@source) do |resp|
-          assert(resp.size > 0)
         end
       end
 
       should "throw an exception when the file is larger than the maximum" do
         assert_raise(Downloads::File::Error) do
-          @download.http_get_streaming(@source, {}, :max_size => 1) do |resp|
-          end
+          @download.http_get_streaming(@source, @tempfile, {}, max_size: 1)
         end
       end
 
@@ -60,29 +53,6 @@ module Downloads
         assert_equal(@source, @download.source)
         assert(::File.exists?(@tempfile.path), "temp file should exist")
         assert(::File.size(@tempfile.path) > 0, "should have data")
-      end
-
-      should "initialize the content type" do
-        @download.download!
-        assert_match(/image\/gif/, @download.content_type)
-      end
-    end
-
-    context "A post download with an HTTPS source" do
-      setup do
-        @source = "https://www.google.com/intl/en_ALL/images/logo.gif"
-        @tempfile = Tempfile.new("danbooru-test")
-        @download = Downloads::File.new(@source, @tempfile.path)
-      end
-
-      teardown do
-        @tempfile.close
-      end
-
-      should "stream a file from an HTTPS source" do
-        @download.http_get_streaming(@source) do |resp|
-          assert(resp.size > 0)
-        end
       end
     end
   end
