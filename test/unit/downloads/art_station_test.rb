@@ -28,6 +28,13 @@ module Downloads
       end
     end
 
+    context "a download for an ArtStation image hosted on CloudFlare" do
+      should "return the original file, not the polished file" do
+        @source = "https://cdnb.artstation.com/p/assets/images/images/003/716/071/large/aoi-ogata-hate-city.jpg?1476754974"
+        assert_downloaded(517_706, @source) # polished size: 502_052
+      end
+    end
+
     context "a download for a https://$artist.artstation.com/projects/$id page" do
       setup do
         @source = "https://dantewontdie.artstation.com/projects/YZK5q"

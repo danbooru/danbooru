@@ -36,7 +36,7 @@ module Downloads
       url, headers, @data = before_download(@source, @data)
 
       ::File.open(@file_path, "wb") do |out|
-        http_get_streaming(url, headers) do |response|
+        http_get_streaming(uncached_url(url, headers), headers) do |response|
           out.write(response)
         end
       end
@@ -131,6 +131,28 @@ module Downloads
         strategy.referer_url
       else
         src
+      end
+    end
+
+    private
+
+    # Prevent Cloudflare from potentially mangling the image. See issue #3528.
+    def uncached_url(url, headers = {})
+      url = Addressable::URI.parse(url)
+
+      if is_cloudflare?(url, headers)
+        url.query_values = (url.query_values || {}).merge(danbooru_no_cache: SecureRandom.uuid)
+      end
+
+      url
+    end
+
+    def is_cloudflare?(url, headers = {})
+      Cache.get("is_cloudflare:#{url.origin}", 4.hours) do
+        res = HTTParty.head(url, { headers: headers }.deep_merge(Danbooru.config.httparty_options))
+        raise Error.new("HTTP error code: #{res.code} #{res.message}") unless res.success?
+
+        res.key?("CF-Ray")
       end
     end
   end
