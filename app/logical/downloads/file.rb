@@ -36,7 +36,7 @@ module Downloads
       url, headers, @data = before_download(@source, @data)
 
       ::File.open(@file_path, "wb") do |out|
-        http_get_streaming(url, headers) do |response|
+        http_get_streaming(uncached_url(url), headers) do |response|
           out.write(response)
         end
       end
@@ -53,6 +53,13 @@ module Downloads
       end
 
       return [url, headers, datums]
+    end
+
+    # Prevent transparent proxies (namely Cloudflare) from potentially mangling the image. See issue #3528.
+    def uncached_url(url)
+      url = Addressable::URI.parse(url)
+      url.query_values = (url.query_values || {}).merge(danbooru_no_cache: SecureRandom.uuid)
+      url
     end
 
     def after_download(src)
