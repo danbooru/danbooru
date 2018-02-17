@@ -26,20 +26,23 @@ module Downloads
     end
 
     def size
-      @source, headers, @data = before_download(@source, @data)
+      url, headers, _ = before_download(@source, @data)
       options = { timeout: 3, headers: headers }.deep_merge(Danbooru.config.httparty_options)
-      res = HTTParty.head(@source, options)
+      res = HTTParty.head(url, options)
       res.content_length
     end
 
     def download!
+      url, headers, @data = before_download(@source, @data)
+
       ::File.open(@file_path, "wb") do |out|
-        @source, @data = http_get_streaming(@source, @data) do |response|
+        http_get_streaming(url, headers) do |response|
           out.write(response)
         end
       end
-      @downloaded_source = @source
-      @source = after_download(@source)
+
+      @downloaded_source = url
+      @source = after_download(url)
     end
 
     def before_download(url, datums)
@@ -67,7 +70,7 @@ module Downloads
       end
     end
 
-    def http_get_streaming(src, datums = {}, options = {}, &block)
+    def http_get_streaming(src, headers = {}, options = {}, &block)
       max_size = options[:max_size] || Danbooru.config.max_file_size
       max_size = nil if max_size == 0 # unlimited
       limit = 4
@@ -78,9 +81,6 @@ module Downloads
         unless url.is_a?(URI::HTTP) || url.is_a?(URI::HTTPS)
           raise Error.new("URL must be HTTP or HTTPS")
         end
-
-        src, headers, datums = before_download(src, datums)
-        url = URI.parse(src)
 
         validate_local_hosts(url)
 
@@ -96,7 +96,7 @@ module Downloads
 
             @content_type = res["Content-Type"]
 
-            return [src, datums]
+            return
           else
             raise Error.new("HTTP error code: #{res.code} #{res.message}")
           end
@@ -109,8 +109,6 @@ module Downloads
           end
         end
       end # while
-
-      [src, datums]
     end # def
 
     def fix_twitter_sources(src)
