@@ -187,7 +187,8 @@ module Danbooru
       1_000
     end
 
-    # Maximum size of an upload.
+    # Maximum size of an upload. If you change this, you must also change
+    # `client_max_body_size` in your nginx.conf.
     def max_file_size
       35.megabytes
     end
