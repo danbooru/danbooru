@@ -4,9 +4,6 @@
   Danbooru.Pool.initialize_all = function() {
     if ($("#c-pools").length) {
       this.initialize_shortcuts();
-      if (Danbooru.meta("enable-auto-complete") === "true") {
-        this.initialize_autocomplete_for("#search_name_matches,#quick_search_name_matches");
-      }
     }
 
     if ($("#c-posts").length && $("#a-show").length) {
@@ -18,46 +15,8 @@
     }
   }
 
-  Danbooru.Pool.initialize_autocomplete_for = function(selector) {
-    var $fields = $(selector);
-
-    $fields.autocomplete({
-      minLength: 1,
-      source: function(req, resp) {
-        $.ajax({
-          url: "/pools.json",
-          data: {
-            "search[name_matches]": req.term,
-            "limit": 10
-          },
-          method: "get",
-          success: function(data) {
-            resp($.map(data, function(pool) {
-              return {
-                label: pool.name.replace(/_/g, " "),
-                value: pool.name,
-                category: pool.category
-              };
-            }));
-          }
-        });
-      }
-    });
-
-    var render_pool = function(list, pool) {
-      var $link = $("<a/>").addClass("pool-category-" + pool.category).text(pool.label);
-      return $("<li/>").data("item.autocomplete", pool).append($link).appendTo(list);
-    };
-
-    $fields.each(function(i, field) {
-      $(field).data("uiAutocomplete")._renderItem = render_pool;
-    });
-  }
-
   Danbooru.Pool.initialize_add_to_pool_link = function() {
     $("#add-to-pool-dialog").dialog({autoOpen: false});
-
-    this.initialize_autocomplete_for("#add-to-pool-dialog input[type=text]");
 
     $("#pool").click(function(e) {
       e.preventDefault();

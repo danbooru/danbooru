@@ -13,7 +13,10 @@
     if (Danbooru.meta("enable-auto-complete") === "true") {
       Danbooru.Autocomplete.enable_local_storage = this.test_local_storage();
       this.initialize_tag_autocomplete();
-      this.initialize_mention_autocomplete();
+      this.initialize_mention_autocomplete($(".autocomplete-mentions textarea"));
+      this.initialize_artist_autocomplete($('[data-autocomplete="artist"]'));
+      this.initialize_pool_autocomplete($('[data-autocomplete="pool"]'));
+      this.initialize_wiki_autocomplete($('[data-autocomplete="wiki-page"]'));
       this.prune_local_storage();
     }
   }
@@ -43,9 +46,7 @@
     }
   }
 
-  Danbooru.Autocomplete.initialize_mention_autocomplete = function() {
-    var $fields = $(".autocomplete-mentions textarea");
-
+  Danbooru.Autocomplete.initialize_mention_autocomplete = function($fields) {
     $fields.on("keydown.danbooru.autocomplete.tab", null, "tab", Danbooru.Autocomplete.on_tab);
     $fields.autocomplete({
       delay: 500,
@@ -193,6 +194,111 @@
       $(field).data("uiAutocomplete")._renderItem = Danbooru.Autocomplete.render_item;
     });
   }
+
+  Danbooru.Autocomplete.initialize_artist_autocomplete = function($fields) {
+    $fields.autocomplete({
+      minLength: 1,
+      source: function(req, resp) {
+        $.ajax({
+          url: "/artists.json",
+          data: {
+            "search[name]": req.term + "*",
+            "search[is_active]": true,
+            "search[order]": "post_count",
+            "limit": 10
+          },
+          method: "get",
+          success: function(data) {
+            resp($.map(data, function(artist) {
+              return {
+                label: artist.name.replace(/_/g, " "),
+                value: artist.name
+              };
+            }));
+          }
+        });
+      }
+    });
+
+    var render_artist = function(list, artist) {
+      var $link = $("<a/>").addClass("tag-type-1").text(artist.label);
+      return $("<li/>").data("item.autocomplete", artist).append($link).appendTo(list);
+    };
+
+    $fields.each(function(i, field) {
+      $(field).data("uiAutocomplete")._renderItem = render_artist;
+    });
+  };
+
+  Danbooru.Autocomplete.initialize_pool_autocomplete = function($fields) {
+    $fields.autocomplete({
+      minLength: 1,
+      source: function(req, resp) {
+        $.ajax({
+          url: "/pools.json",
+          data: {
+            "search[name_matches]": req.term,
+            "limit": 10
+          },
+          method: "get",
+          success: function(data) {
+            resp($.map(data, function(pool) {
+              return {
+                label: pool.name.replace(/_/g, " "),
+                value: pool.name,
+                category: pool.category
+              };
+            }));
+          }
+        });
+      }
+    });
+
+    var render_pool = function(list, pool) {
+      var $link = $("<a/>").addClass("pool-category-" + pool.category).text(pool.label);
+      return $("<li/>").data("item.autocomplete", pool).append($link).appendTo(list);
+    };
+
+    $fields.each(function(i, field) {
+      $(field).data("uiAutocomplete")._renderItem = render_pool;
+    });
+  };
+
+  Danbooru.Autocomplete.initialize_wiki_autocomplete = function($fields) {
+    $fields.autocomplete({
+      minLength: 1,
+      source: function(req, resp) {
+        $.ajax({
+          url: "/wiki_pages.json",
+          data: {
+            "search[title]": req.term + "*",
+            "search[hide_deleted]": "Yes",
+            "search[order]": "post_count",
+            "limit": 10
+          },
+          method: "get",
+          success: function(data) {
+            resp($.map(data, function(wiki_page) {
+              return {
+                label: wiki_page.title.replace(/_/g, " "),
+                value: wiki_page.title,
+                category: wiki_page.category_name
+              };
+            }));
+          }
+        });
+      }
+    });
+
+    var render_wiki_page = function(list, wiki_page) {
+      var $link = $("<a/>").addClass("tag-type-" + wiki_page.category).text(wiki_page.label);
+      return $("<li/>").data("item.autocomplete", wiki_page).append($link).appendTo(list);
+    };
+
+    $fields.each(function(i, field) {
+      $(field).data("uiAutocomplete")._renderItem = render_wiki_page;
+    });
+  };
 
   Danbooru.Autocomplete.normal_source = function(term, resp) {
     var key = "ac-" + term.replace(/\./g,'\uFFFF');

@@ -3,7 +3,7 @@
 
   <div class="input">
     <label>Pool Name</label>
-    <span id="pool-name-container"><%= text_field_tag "pool_name", "", :size => 20 %></span>
+    <span id="pool-name-container"><%= text_field_tag "pool_name", "", :size => 20, :data => { autocomplete: "pool" } %></span>
     <span id="pool-name-hint" class="hint">Search for a pool containing (<%= link_to "see full list", all_select_pool_element_path, :remote => true %>)</span>
   </div>
 

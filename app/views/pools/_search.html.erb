@@ -5,7 +5,7 @@
         <th><label for="search_name_matches">Name</label></th>
         <td>
           <div class="input">
-            <%= text_field "search", "name_matches", :value => params[:search][:name_matches] %>
+            <%= text_field "search", "name_matches", :value => params[:search][:name_matches], :data => { autocomplete: "pool" } %>
           </div>
         </td>
       </tr>

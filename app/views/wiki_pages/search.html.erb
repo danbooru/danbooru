@@ -1,7 +1,7 @@
 <div id="c-wiki-pages">
   <div id="a-search">
     <%= form_tag(wiki_pages_path, :method => :get, :class => "simple_form") do %>
-      <%= search_field "title", :hint => "Use * for wildcard searches" %>
+      <%= search_field "title", :hint => "Use * for wildcard searches", :data => { :autocomplete => "wiki-page" } %>
       <%= search_field "creator_name" %>
       <%= search_field "body_matches", :label => "Body" %>
       <%= search_field "other_names_match", :label => "Other names", :hint => "Use * for wildcard searches" %>
