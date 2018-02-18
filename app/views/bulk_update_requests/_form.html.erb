@@ -37,7 +37,11 @@ category tag_name -> category_name
 
   <% if @bulk_update_request.new_record? %>
     <%= f.input :forum_topic_id, :hint => " (optional)" %>
+  <% elsif @bulk_update_request.persisted? && CurrentUser.is_admin? %>
+    <%= f.input :forum_topic_id %>
+    <%= f.input :forum_post_id %>
   <% end %>
+
   <%= f.button :submit, :value => "Submit", :data => { :disable_with => "Submitting..." } %>
   <%= dtext_preview_button "bulk_update_request", "reason" %>
 <% end %>
