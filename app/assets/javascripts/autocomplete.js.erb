@@ -11,6 +11,10 @@
 
   Danbooru.Autocomplete.initialize_all = function() {
     if (Danbooru.meta("enable-auto-complete") === "true") {
+      $.widget("ui.autocomplete", $.ui.autocomplete, {
+        _renderItem: Danbooru.Autocomplete.render_item,
+      });
+
       Danbooru.Autocomplete.enable_local_storage = this.test_local_storage();
       this.initialize_tag_autocomplete();
       this.initialize_mention_autocomplete($(".autocomplete-mentions textarea"));
@@ -189,10 +193,6 @@
         Danbooru.Autocomplete.normal_source(req.term, resp);
       }
     });
-
-    $.merge($fields_multiple, $fields_single).each(function(i, field) {
-      $(field).data("uiAutocomplete")._renderItem = Danbooru.Autocomplete.render_item;
-    });
   }
 
   Danbooru.Autocomplete.initialize_artist_autocomplete = function($fields) {
@@ -211,22 +211,15 @@
           success: function(data) {
             resp($.map(data, function(artist) {
               return {
+                type: "tag",
                 label: artist.name.replace(/_/g, " "),
-                value: artist.name
+                value: artist.name,
+                category: <%= Tag.categories.artist %>,
               };
             }));
           }
         });
       }
-    });
-
-    var render_artist = function(list, artist) {
-      var $link = $("<a/>").addClass("tag-type-1").text(artist.label);
-      return $("<li/>").data("item.autocomplete", artist).append($link).appendTo(list);
-    };
-
-    $fields.each(function(i, field) {
-      $(field).data("uiAutocomplete")._renderItem = render_artist;
     });
   };
 
@@ -234,33 +227,8 @@
     $fields.autocomplete({
       minLength: 1,
       source: function(req, resp) {
-        $.ajax({
-          url: "/pools.json",
-          data: {
-            "search[name_matches]": req.term,
-            "limit": 10
-          },
-          method: "get",
-          success: function(data) {
-            resp($.map(data, function(pool) {
-              return {
-                label: pool.name.replace(/_/g, " "),
-                value: pool.name,
-                category: pool.category
-              };
-            }));
-          }
-        });
-      }
-    });
-
-    var render_pool = function(list, pool) {
-      var $link = $("<a/>").addClass("pool-category-" + pool.category).text(pool.label);
-      return $("<li/>").data("item.autocomplete", pool).append($link).appendTo(list);
-    };
-
-    $fields.each(function(i, field) {
-      $(field).data("uiAutocomplete")._renderItem = render_pool;
+        Danbooru.Autocomplete.pool_source(req.term, resp);
+      },
     });
   };
 
@@ -280,6 +248,7 @@
           success: function(data) {
             resp($.map(data, function(wiki_page) {
               return {
+                type: "tag",
                 label: wiki_page.title.replace(/_/g, " "),
                 value: wiki_page.title,
                 category: wiki_page.category_name
@@ -288,15 +257,6 @@
           }
         });
       }
-    });
-
-    var render_wiki_page = function(list, wiki_page) {
-      var $link = $("<a/>").addClass("tag-type-" + wiki_page.category).text(wiki_page.label);
-      return $("<li/>").data("item.autocomplete", wiki_page).append($link).appendTo(list);
-    };
-
-    $fields.each(function(i, field) {
-      $(field).data("uiAutocomplete")._renderItem = render_wiki_page;
     });
   };
 
@@ -545,7 +505,7 @@
           return {
             type: "pool",
             label: pool.name.replace(/_/g, " "),
-            value: metatag + ":" + pool.name,
+            value: (metatag ? (metatag + ":" + pool.name) : pool.name),
             post_count: pool.post_count,
             category: pool.category
           };
