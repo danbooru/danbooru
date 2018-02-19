@@ -12,6 +12,16 @@
   Danbooru.Autocomplete.initialize_all = function() {
     if (Danbooru.meta("enable-auto-complete") === "true") {
       $.widget("ui.autocomplete", $.ui.autocomplete, {
+        options: {
+          delay: 100,
+          minLength: 1,
+          autoFocus: false,
+          focus: function() { return false; },
+        },
+        _create: function() {
+          this.element.on("keydown.danbooru.autocomplete.tab", null, "tab", Danbooru.Autocomplete.on_tab);
+          this._super();
+        },
         _renderItem: Danbooru.Autocomplete.render_item,
       });
 
@@ -51,14 +61,7 @@
   }
 
   Danbooru.Autocomplete.initialize_mention_autocomplete = function($fields) {
-    $fields.on("keydown.danbooru.autocomplete.tab", null, "tab", Danbooru.Autocomplete.on_tab);
     $fields.autocomplete({
-      delay: 500,
-      minLength: 2,
-      autoFocus: false,
-      focus: function() {
-        return false;
-      },
       select: function(event, ui) {
         Danbooru.Autocomplete.insert_completion(this, ui.item.value);
         return false;
@@ -96,13 +99,7 @@
     var $fields_multiple = $('[data-autocomplete="tag-query"], [data-autocomplete="tag-edit"]');
     var $fields_single = $('[data-autocomplete="tag"]');
 
-    $fields_multiple.on("keydown.danbooru.autocomplete.tab", null, "tab", Danbooru.Autocomplete.on_tab);
     $fields_multiple.autocomplete({
-      delay: 100,
-      autoFocus: false,
-      focus: function() {
-        return false;
-      },
       select: function(event, ui) {
         // Prevent Danbooru.Upload.initialize_enter_on_tags from running if the
         // Enter key is used to select a tag from the autocomplete menu.
@@ -187,8 +184,6 @@
     });
 
     $fields_single.autocomplete({
-      minLength: 1,
-      autoFocus: true,
       source: function(req, resp) {
         Danbooru.Autocomplete.normal_source(req.term, resp);
       }
@@ -197,7 +192,6 @@
 
   Danbooru.Autocomplete.initialize_artist_autocomplete = function($fields) {
     $fields.autocomplete({
-      minLength: 1,
       source: function(req, resp) {
         $.ajax({
           url: "/artists.json",
@@ -225,7 +219,6 @@
 
   Danbooru.Autocomplete.initialize_pool_autocomplete = function($fields) {
     $fields.autocomplete({
-      minLength: 1,
       source: function(req, resp) {
         Danbooru.Autocomplete.pool_source(req.term, resp);
       },
@@ -234,7 +227,6 @@
 
   Danbooru.Autocomplete.initialize_wiki_autocomplete = function($fields) {
     $fields.autocomplete({
-      minLength: 1,
       source: function(req, resp) {
         $.ajax({
           url: "/wiki_pages.json",
