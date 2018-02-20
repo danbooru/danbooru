@@ -251,7 +251,9 @@
     if (match = term.match(Danbooru.Autocomplete.PREFIXES)) {
       metatag = match[1].toLowerCase();
       term = match[2];
-    } else if (match = term.match(Danbooru.Autocomplete.METATAGS)) {
+    }
+    
+    if (match = term.match(Danbooru.Autocomplete.METATAGS)) {
       metatag = match[1].toLowerCase();
       term = match[2];
     }
