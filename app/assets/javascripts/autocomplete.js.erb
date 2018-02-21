@@ -11,9 +11,26 @@
 
   Danbooru.Autocomplete.initialize_all = function() {
     if (Danbooru.meta("enable-auto-complete") === "true") {
+      $.widget("ui.autocomplete", $.ui.autocomplete, {
+        options: {
+          delay: 100,
+          minLength: 1,
+          autoFocus: false,
+          focus: function() { return false; },
+        },
+        _create: function() {
+          this.element.on("keydown.danbooru.autocomplete.tab", null, "tab", Danbooru.Autocomplete.on_tab);
+          this._super();
+        },
+        _renderItem: Danbooru.Autocomplete.render_item,
+      });
+
       Danbooru.Autocomplete.enable_local_storage = this.test_local_storage();
       this.initialize_tag_autocomplete();
-      this.initialize_mention_autocomplete();
+      this.initialize_mention_autocomplete($(".autocomplete-mentions textarea"));
+      this.initialize_artist_autocomplete($('[data-autocomplete="artist"]'));
+      this.initialize_pool_autocomplete($('[data-autocomplete="pool"]'));
+      this.initialize_wiki_autocomplete($('[data-autocomplete="wiki-page"]'));
       this.prune_local_storage();
     }
   }
@@ -43,17 +60,8 @@
     }
   }
 
-  Danbooru.Autocomplete.initialize_mention_autocomplete = function() {
-    var $fields = $(".autocomplete-mentions textarea");
-
-    $fields.on("keydown.danbooru.autocomplete.tab", null, "tab", Danbooru.Autocomplete.on_tab);
+  Danbooru.Autocomplete.initialize_mention_autocomplete = function($fields) {
     $fields.autocomplete({
-      delay: 500,
-      minLength: 2,
-      autoFocus: false,
-      focus: function() {
-        return false;
-      },
       select: function(event, ui) {
         Danbooru.Autocomplete.insert_completion(this, ui.item.value);
         return false;
@@ -91,13 +99,7 @@
     var $fields_multiple = $('[data-autocomplete="tag-query"], [data-autocomplete="tag-edit"]');
     var $fields_single = $('[data-autocomplete="tag"]');
 
-    $fields_multiple.on("keydown.danbooru.autocomplete.tab", null, "tab", Danbooru.Autocomplete.on_tab);
     $fields_multiple.autocomplete({
-      delay: 100,
-      autoFocus: false,
-      focus: function() {
-        return false;
-      },
       select: function(event, ui) {
         // Prevent Danbooru.Upload.initialize_enter_on_tags from running if the
         // Enter key is used to select a tag from the autocomplete menu.
@@ -182,17 +184,73 @@
     });
 
     $fields_single.autocomplete({
-      minLength: 1,
-      autoFocus: true,
       source: function(req, resp) {
         Danbooru.Autocomplete.normal_source(req.term, resp);
       }
     });
-
-    $.merge($fields_multiple, $fields_single).each(function(i, field) {
-      $(field).data("uiAutocomplete")._renderItem = Danbooru.Autocomplete.render_item;
-    });
   }
+
+  Danbooru.Autocomplete.initialize_artist_autocomplete = function($fields) {
+    $fields.autocomplete({
+      source: function(req, resp) {
+        $.ajax({
+          url: "/artists.json",
+          data: {
+            "search[name]": req.term + "*",
+            "search[is_active]": true,
+            "search[order]": "post_count",
+            "limit": 10
+          },
+          method: "get",
+          success: function(data) {
+            resp($.map(data, function(artist) {
+              return {
+                type: "tag",
+                label: artist.name.replace(/_/g, " "),
+                value: artist.name,
+                category: <%= Tag.categories.artist %>,
+              };
+            }));
+          }
+        });
+      }
+    });
+  };
+
+  Danbooru.Autocomplete.initialize_pool_autocomplete = function($fields) {
+    $fields.autocomplete({
+      source: function(req, resp) {
+        Danbooru.Autocomplete.pool_source(req.term, resp);
+      },
+    });
+  };
+
+  Danbooru.Autocomplete.initialize_wiki_autocomplete = function($fields) {
+    $fields.autocomplete({
+      source: function(req, resp) {
+        $.ajax({
+          url: "/wiki_pages.json",
+          data: {
+            "search[title]": req.term + "*",
+            "search[hide_deleted]": "Yes",
+            "search[order]": "post_count",
+            "limit": 10
+          },
+          method: "get",
+          success: function(data) {
+            resp($.map(data, function(wiki_page) {
+              return {
+                type: "tag",
+                label: wiki_page.title.replace(/_/g, " "),
+                value: wiki_page.title,
+                category: wiki_page.category_name
+              };
+            }));
+          }
+        });
+      }
+    });
+  };
 
   Danbooru.Autocomplete.normal_source = function(term, resp) {
     var key = "ac-" + term.replace(/\./g,'\uFFFF');
@@ -441,7 +499,7 @@
           return {
             type: "pool",
             label: pool.name.replace(/_/g, " "),
-            value: metatag + ":" + pool.name,
+            value: (metatag ? (metatag + ":" + pool.name) : pool.name),
             post_count: pool.post_count,
             category: pool.category
           };
