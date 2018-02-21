@@ -5,12 +5,12 @@ class BulkUpdateRequestsController < ApplicationController
   before_filter :load_bulk_update_request, :except => [:new, :create, :index]
 
   def new
-    @bulk_update_request = BulkUpdateRequest.new(:user_id => CurrentUser.user.id)
+    @bulk_update_request = BulkUpdateRequest.new
     respond_with(@bulk_update_request)
   end
 
   def create
-    @bulk_update_request = BulkUpdateRequest.create(params[:bulk_update_request])
+    @bulk_update_request = BulkUpdateRequest.create(bur_params(:create))
     respond_with(@bulk_update_request, :location => bulk_update_requests_path)
   end
 
@@ -23,7 +23,7 @@ class BulkUpdateRequestsController < ApplicationController
 
   def update
     if @bulk_update_request.editable?(CurrentUser.user)
-      @bulk_update_request.update_attributes(params[:bulk_update_request])
+      @bulk_update_request.update(bur_params(:update))
       flash[:notice] = "Bulk update request updated"
       respond_with(@bulk_update_request, :location => bulk_update_requests_path)
     else
@@ -55,5 +55,13 @@ class BulkUpdateRequestsController < ApplicationController
 
   def load_bulk_update_request
     @bulk_update_request = BulkUpdateRequest.find(params[:id])
+  end
+
+  def bur_params(context)
+    permitted_params = %i[script skip_secondary_validations]
+    permitted_params += %i[title reason forum_topic_id] if context == :create
+    permitted_params += %i[forum_topic_id forum_post_id] if context == :update && CurrentUser.is_admin?
+
+    params.require(:bulk_update_request).permit(permitted_params)
   end
 end

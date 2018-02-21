@@ -1,7 +1,9 @@
 <%= simple_form_for(@bulk_update_request) do |f| %>
   <%= error_messages_for("bulk_update_request") %>
 
-  <%= f.input :title, :as => :string %>
+  <% if @bulk_update_request.new_record? %>
+    <%= f.input :title, :as => :string %>
+  <% end %>
 
   <div class="input">
     <label class="text optional" for="bulk_update_request_script">Script</label>
@@ -17,9 +19,11 @@ category tag_name -> category_name
     <%= text_area :bulk_update_request, :script, :size => "50x10" %>
   </div>
 
-  <div class="input">
-    <%= dtext_field "bulk_update_request", "reason", :name => "Reason" %>
-  </div>
+  <% if @bulk_update_request.new_record? %>
+    <div class="input">
+      <%= dtext_field "bulk_update_request", "reason", :name => "Reason" %>
+    </div>
+  <% end %>
 
   <% if @bulk_update_request.errors.any? %>
     <div class="input">
@@ -31,7 +35,13 @@ category tag_name -> category_name
     </div>
   <% end %>
 
-  <%= f.input :forum_topic_id, :hint => " (optional)" %>
+  <% if @bulk_update_request.new_record? %>
+    <%= f.input :forum_topic_id, :hint => " (optional)" %>
+  <% elsif @bulk_update_request.persisted? && CurrentUser.is_admin? %>
+    <%= f.input :forum_topic_id %>
+    <%= f.input :forum_post_id %>
+  <% end %>
+
   <%= f.button :submit, :value => "Submit", :data => { :disable_with => "Submitting..." } %>
   <%= dtext_preview_button "bulk_update_request", "reason" %>
 <% end %>
