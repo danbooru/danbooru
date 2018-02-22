@@ -26,23 +26,20 @@ module Downloads
     end
 
     def size
-      url, headers, _ = before_download(@source, @data)
+      @source, headers, @data = before_download(@source, @data)
       options = { timeout: 3, headers: headers }.deep_merge(Danbooru.config.httparty_options)
-      res = HTTParty.head(url, options)
+      res = HTTParty.head(@source, options)
       res.content_length
     end
 
     def download!
-      url, headers, @data = before_download(@source, @data)
-
       ::File.open(@file_path, "wb") do |out|
-        http_get_streaming(uncached_url(url), headers) do |response|
+        @source, @data = http_get_streaming(@source, @data) do |response|
           out.write(response)
         end
       end
-
-      @downloaded_source = url
-      @source = after_download(url)
+      @downloaded_source = @source
+      @source = after_download(@source)
     end
 
     def before_download(url, datums)
@@ -53,13 +50,6 @@ module Downloads
       end
 
       return [url, headers, datums]
-    end
-
-    # Prevent transparent proxies (namely Cloudflare) from potentially mangling the image. See issue #3528.
-    def uncached_url(url)
-      url = Addressable::URI.parse(url)
-      url.query_values = (url.query_values || {}).merge(danbooru_no_cache: SecureRandom.uuid)
-      url
     end
 
     def after_download(src)
@@ -77,7 +67,7 @@ module Downloads
       end
     end
 
-    def http_get_streaming(src, headers = {}, options = {}, &block)
+    def http_get_streaming(src, datums = {}, options = {}, &block)
       max_size = options[:max_size] || Danbooru.config.max_file_size
       max_size = nil if max_size == 0 # unlimited
       limit = 4
@@ -88,6 +78,9 @@ module Downloads
         unless url.is_a?(URI::HTTP) || url.is_a?(URI::HTTPS)
           raise Error.new("URL must be HTTP or HTTPS")
         end
+
+        src, headers, datums = before_download(src, datums)
+        url = URI.parse(src)
 
         validate_local_hosts(url)
 
@@ -103,7 +96,7 @@ module Downloads
 
             @content_type = res["Content-Type"]
 
-            return
+            return [src, datums]
           else
             raise Error.new("HTTP error code: #{res.code} #{res.message}")
           end
@@ -116,6 +109,8 @@ module Downloads
           end
         end
       end # while
+
+      [src, datums]
     end # def
 
     def fix_twitter_sources(src)
