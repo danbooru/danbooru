@@ -217,6 +217,10 @@ module Danbooru
       "albert"
     end
 
+    def archive_server_login
+      "danbooru"
+    end
+
     def build_file_url(post)
       "/data/#{post.file_path_prefix}/#{post.md5}.#{post.file_ext}"
     end

@@ -107,9 +107,16 @@ class Post < ApplicationRecord
     end
 
     def distribute_files
-      RemoteFileManager.new(file_path).distribute
-      RemoteFileManager.new(preview_file_path).distribute if has_preview?
-      RemoteFileManager.new(large_file_path).distribute if has_large?
+      if Danbooru.config.build_file_url(self) =~ /^http/
+        # this post is archived
+        RemoteFileManager.new(file_path).distribute_to_archive(Danbooru.config.build_file_url(self))
+        RemoteFileManager.new(preview_file_path).distribute if has_preview?
+        RemoteFileManager.new(large_file_path).distribute_to_archive(Danbooru.config.build_large_file_url(self)) if has_large?
+      else
+        RemoteFileManager.new(file_path).distribute
+        RemoteFileManager.new(preview_file_path).distribute if has_preview?
+        RemoteFileManager.new(large_file_path).distribute if has_large?
+      end
     end
 
     def file_path_prefix
