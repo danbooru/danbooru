@@ -35,6 +35,8 @@ module Sources::Strategies
       case post[:type]
       when "text", "link"
         post[:title]
+      when "answer"
+        post[:question]
       else
         nil
       end
@@ -48,6 +50,8 @@ module Sources::Strategies
         post[:description]
       when "photo", "video"
         post[:caption]
+      when "answer"
+        post[:answer]
       else
         nil
       end

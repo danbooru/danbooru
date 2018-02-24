@@ -22,7 +22,7 @@ module Sources
       end
 
       should "get the commentary" do
-        desc = <<-EOS.strip_heredoc.chomp
+        desc = <<~EOS.chomp
           <h2>header</h2>
 
           <hr><p>plain <b>bold</b> <i>italics</i> <strike>strike</strike></p>
@@ -43,7 +43,7 @@ module Sources
       end
 
       should "get the dtext-ified commentary" do
-        desc = <<-EOS.strip_heredoc.chomp
+        desc = <<~EOS.chomp
           h2. header
 
           plain [b]bold[/b] [i]italics[/i] [s]strike[/s]
@@ -157,6 +157,23 @@ module Sources
         ]
 
         assert_equal(urls, @site.image_urls)
+      end
+    end
+
+    context "The source for a 'http://*.tumblr.com/post/*' answer post with inline images" do
+      setup do
+        @site = Sources::Site.new("https://noizave.tumblr.com/post/171237880542/test-ask")
+        @site.get
+      end
+
+      should "get the image urls" do
+        urls = ["http://data.tumblr.com/cb481f031010e8ddad564b2150149c9a/tumblr_inline_p4nxoyLrSh1v11u29_raw.png"]
+        assert_equal(urls, @site.image_urls)
+      end
+
+      should "get the commentary" do
+        assert_equal("test ask", @site.artist_commentary_title)
+        assert_match("test answer", @site.artist_commentary_desc)
       end
     end
   end
