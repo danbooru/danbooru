@@ -113,7 +113,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       end
 
       should "handle errors gracefully" do
-        @req.stubs(:update).raises(RuntimeError.new("blah"))
+        @req.stubs(:update).raises(AliasAndImplicationImporter::Error.new("blah"))
         assert_difference("ForumPost.count", 1) do
           @req.approve!(@admin)
         end

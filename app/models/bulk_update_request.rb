@@ -96,7 +96,7 @@ class BulkUpdateRequest < ApplicationRecord
         forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.", "APPROVED")
       end
 
-    rescue Exception => x
+    rescue AliasAndImplicationImporter::Error => x
       self.approver = approver
       CurrentUser.scoped(approver) do
         forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has failed: #{x.to_s}", "FAILED")
