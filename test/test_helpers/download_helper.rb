@@ -15,7 +15,7 @@ module DownloadTestHelper
     download = Downloads::File.new(test_source, tempfile.path)
 
     rewritten_source, _, _ = download.before_download(test_source, {})
-    assert_equal(expected_source, rewritten_source, "Tested source URL: #{test_source}")
+    assert_match(expected_source, rewritten_source, "Tested source URL: #{test_source}")
   end
 
   def assert_not_rewritten(source)
