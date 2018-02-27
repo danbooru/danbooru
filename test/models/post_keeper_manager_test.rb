@@ -6,8 +6,6 @@ class PostKeeperManagerTest < ActiveSupport::TestCase
   context "#check_and_update" do
     setup do
       Timecop.travel(1.month.ago) do
-        @system = FactoryGirl.create(:user)
-        User.stubs(:system).returns(@system)
         @alice = FactoryGirl.create(:user)
         @bob = FactoryGirl.create(:user)
         @carol = FactoryGirl.create(:user)
@@ -39,8 +37,6 @@ class PostKeeperManagerTest < ActiveSupport::TestCase
   context "#check" do
     setup do
       Timecop.travel(1.month.ago) do
-        @system = FactoryGirl.create(:user)
-        User.stubs(:system).returns(@system)
         @alice = FactoryGirl.create(:user)
         @bob = FactoryGirl.create(:user)
         @carol = FactoryGirl.create(:user)
@@ -62,15 +58,10 @@ class PostKeeperManagerTest < ActiveSupport::TestCase
             @post.update_attributes(tag_string: "aaa bbb ccc")
           end
         end
-        CurrentUser.scoped(@carol) do
-          Timecop.travel(4.hours.from_now) do
-            @post.update_attributes(tag_string: "ccc ddd eee fff ggg")
-          end
-        end
       end
 
       should "find the most frequent tagger for a post" do
-        assert_equal(@carol.id, subject.check(@post))
+        assert_equal(@carol.id, subject.check(@post, @carol.id, %w(ddd eee fff ggg)))
       end
     end
   end

@@ -57,9 +57,7 @@ class Post < ApplicationRecord
   has_many :favorites
   has_many :replacements, class_name: "PostReplacement", :dependent => :destroy
 
-  if PostKeeperManager.enabled?
-    serialize :keeper_data, JSON
-  end
+  serialize :keeper_data, JSON
 
   if PostArchive.enabled?
     has_many :versions, lambda {order("post_versions.updated_at ASC")}, :class_name => "PostArchive", :dependent => :destroy
@@ -76,7 +74,11 @@ class Post < ApplicationRecord
     end
 
     def keeper_id
-      keeper_data ? keeper_data[:uid] : uploader_id
+      if PostKeeperManager.enabled?
+        keeper_data ? keeper_data["uid"] : uploader_id
+      else
+        uploader_id
+      end
     end
 
     def keeper
@@ -664,7 +666,7 @@ class Post < ApplicationRecord
 
       if PostKeeperManager.enabled? && persisted?
         # no need to do this check on the initial create
-        PostKeeperManager.queue_check(id)
+        PostKeeperManager.check_and_update(self, CurrentUser.id, increment_tags)
       end
     end
 

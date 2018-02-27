@@ -2,7 +2,7 @@ module PostSetPresenters
   class WikiPage < PostSetPresenters::Post
     def posts
       @post_set.posts
-    rescue ActiveRecord::StatementInvalid, PGError
+    rescue ActiveRecord::StatementInvalid, PG::Error
       []
     end
 

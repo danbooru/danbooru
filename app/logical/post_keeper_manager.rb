@@ -3,9 +3,70 @@ class PostKeeperManager
     PostArchive.enabled?
   end
 
-  def self.queue_check(post_id)
-    delay(queue: "default").check_and_update(post_id)
+  # these are all class methods to simplify interaction with delayedjob
+
+  # in general we want to call these methods synchronously because updating
+  # the keeper data with a delay defeats the purpose. but this relies on
+  # archive db being up; we don't want to block updates in case it goes down.
+  # so we need to permit async updates also.
+
+  def self.queue_check(post_id, updater_id, increment_tags)
+    delay(queue: "default").check_and_update(post_id, updater_id, increment_tags, false)
   end
+
+  def self.check_and_update(post, updater_id = nil, increment_tags = nil)
+    post = Post.find(post) unless post.is_a?(Post)
+    keeper_id = check(post, updater_id, increment_tags)
+    post.keeper_data = {uid: keeper_id}
+  end
+
+  # because post archives might get delayed, we need to pass along the most
+  # recently added tags inside the job. downside: this doesn't keep track of
+  # source or rating changes. this method changes no state.
+  def self.check(post, updater_id = nil, increment_tags = nil, enable_async = true)
+    if enable_async && !PostArchive.test_connection
+      # if archive is down, just queue this work and do it later
+      queue_check(post.id, updater_id, increment_tags)
+      return
+    end
+
+    changes = {}
+    final_tags = Set.new(post.tag_array)
+
+    # build a mapping of who added a tag first
+    PostArchive.where(post_id: post.id).order("updated_at").each do |pa|
+      pa.added_tags.each do |at|
+        if pa.updater_id
+          if !changes.has_key?(at) && final_tags.include?(at)
+            changes[at] = pa.updater_id 
+          end
+
+          if pa.source_changed? && pa.source == post.source
+            changes[" source"] = pa.updater_id
+          end
+        end
+      end
+    end
+
+    if updater_id && increment_tags.present?
+      increment_tags.each do |tag|
+        if !changes.has_key?(tag)
+          changes[tag] = updater_id
+        end
+      end
+    end
+
+    # add up how many changes each user has made
+    ranking = changes.values.uniq.inject({}) do |h, user_id|
+      h[user_id] = changes.select {|k, v| v == user_id}.size
+      h
+    end
+
+    ranking.max_by {|k, v| v}.try(:first)
+  end
+
+
+  # these methods are for reporting and are not used
 
   # in general, unweighted changes attribution 5% of the time,
   # weighted changes attribution 12% of the time at w=1000,
@@ -43,14 +104,6 @@ class PostKeeperManager
     # uploader_dist.each do |k, v|
     #   puts "  #{k}: #{v}"
     # end
-  end
-
-  def self.check_and_update(post_id)
-    post = Post.find(post_id)
-    keeper_id = check(post)
-    CurrentUser.as_system do
-      post.update_column(:keeper_data, {uid: keeper_id})
-    end
   end
 
   def self.print_weighted(post, w = 1000)
@@ -119,50 +172,4 @@ class PostKeeperManager
     ranking.max_by {|k, v| v}.first
   end
 
-  def self.check(post)
-    changes = {}
-    final_tags = Set.new(post.tag_array)
-
-    # build a mapping of who added a tag first
-    PostArchive.where(post_id: post.id).order("updated_at").each do |pa|
-      # Rails.logger.debug "archive #{pa.id}"
-      pa.added_tags.each do |at|
-        # Rails.logger.debug "  checking #{at}"
-        if pa.updater_id
-          if !changes.has_key?(at) && final_tags.include?(at)
-            # Rails.logger.debug "    adding #{at} for #{pa.updater_id}"
-            changes[at] = pa.updater_id 
-          end
-
-          if pa.source_changed? && pa.source == post.source
-            # Rails.logger.debug "    adding source for #{pa.updater_id}"
-            changes[" source"] = pa.updater_id
-          end
-        else
-          # Rails.logger.debug "    no updater"
-        end
-      end
-
-      # easy to double count trivial changes if a user is just fixing mistakes
-      # pa.removed_tags.each do |rt|
-      #   Rails.logger.debug "  checking -#{rt}"
-      #   if pa.updater_id
-      #     if !changes.has_key?("-#{rt}") && !final_tags.include?(rt)
-      #       Rails.logger.debug "    adding -#{rt} for #{pa.updater_id}"
-      #       changes["-#{rt}"] = pa.updater_id
-      #     end
-      #   else
-      #     Rails.logger.debug "    no updater"
-      #   end
-      # end
-    end
-
-    # add up how many changes each user has made
-    ranking = changes.values.uniq.inject({}) do |h, user_id|
-      h[user_id] = changes.select {|k, v| v == user_id}.size
-      h
-    end
-
-    ranking.max_by {|k, v| v}.first
-  end
 end
