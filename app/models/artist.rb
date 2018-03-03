@@ -97,6 +97,7 @@ class Artist < ApplicationRecord
         "nicovideo.jp/user", # http://www.nicovideo.jp/user/317609
         "nicovideo.jp/user/illust", # http://seiga.nicovideo.jp/user/illust/29075429
         "nijie.info", # http://nijie.info/members.php?id=15235
+        %r!nijie\.info/nijie_picture!i, # http://pic03.nijie.info/nijie_picture/32243_20150609224803_0.png
         "patreon.com", # http://patreon.com/serafleur
         "pawoo.net", # https://pawoo.net/@148nasuka
         "pawoo.net/web/accounts", # https://pawoo.net/web/accounts/228341
