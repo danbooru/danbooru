@@ -67,8 +67,6 @@ class PostFlag < ApplicationRecord
 
     def search(params)
       q = super
-      q = q.order("post_flags.id desc")
-      return q if params.blank?
 
       if params[:reason_matches].present?
         q = q.reason_matches(params[:reason_matches])
@@ -122,7 +120,7 @@ class PostFlag < ApplicationRecord
         q = q.duplicate
       end
 
-      q
+      q.apply_default_order(params)
     end
   end
 

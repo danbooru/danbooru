@@ -15,7 +15,6 @@ class PostVersion < ApplicationRecord
 
     def search(params)
       q = super
-      params = {} if params.blank?
 
       if params[:updater_name].present?
         q = q.updater_name(params[:updater_name])
@@ -33,7 +32,7 @@ class PostVersion < ApplicationRecord
         q = q.where("id <= ?", params[:start_id].to_i)
       end
 
-      q
+      q.apply_default_order(params)
     end
   end
 

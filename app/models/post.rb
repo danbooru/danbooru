@@ -107,9 +107,16 @@ class Post < ApplicationRecord
     end
 
     def distribute_files
-      RemoteFileManager.new(file_path).distribute
-      RemoteFileManager.new(preview_file_path).distribute if has_preview?
-      RemoteFileManager.new(large_file_path).distribute if has_large?
+      if Danbooru.config.build_file_url(self) =~ /^http/
+        # this post is archived
+        RemoteFileManager.new(file_path).distribute_to_archive(Danbooru.config.build_file_url(self))
+        RemoteFileManager.new(preview_file_path).distribute if has_preview?
+        RemoteFileManager.new(large_file_path).distribute_to_archive(Danbooru.config.build_large_file_url(self)) if has_large?
+      else
+        RemoteFileManager.new(file_path).distribute
+        RemoteFileManager.new(preview_file_path).distribute if has_preview?
+        RemoteFileManager.new(large_file_path).distribute if has_large?
+      end
     end
 
     def file_path_prefix
@@ -1226,6 +1233,8 @@ class Post < ApplicationRecord
       end
 
       count ? count.to_i : nil
+    rescue PG::ConnectionBad
+      return nil
     end
 
     def fast_count_search_batched(tags, options)
@@ -1243,6 +1252,9 @@ class Post < ApplicationRecord
         end
       end
       sum
+
+    rescue PG::ConnectionBad
+      return nil
     end
 
     def fix_post_counts(post)
@@ -1330,7 +1342,7 @@ class Post < ApplicationRecord
       Post.find(parent_id_was).update_has_children_flag if parent_id_was.present?
     end
 
-    def give_favorites_to_parent
+    def give_favorites_to_parent(options = {})
       return if parent.nil?
 
       transaction do
@@ -1338,6 +1350,10 @@ class Post < ApplicationRecord
           remove_favorite!(fav.user)
           parent.add_favorite!(fav.user)
         end
+      end
+
+      unless options[:without_mod_action]
+        ModAction.log("moved favorites from post ##{id} to post ##{parent.id}",:post_move_favorites)
       end
     end
 
@@ -1413,7 +1429,7 @@ class Post < ApplicationRecord
         }, without_protection: true)
 
         # XXX This must happen *after* the `is_deleted` flag is set to true (issue #3419).
-        give_favorites_to_parent if options[:move_favorites]
+        give_favorites_to_parent(options) if options[:move_favorites]
 
         unless options[:without_mod_action]
           ModAction.log("deleted post ##{id}, reason: #{reason}",:post_delete)
@@ -1669,7 +1685,11 @@ class Post < ApplicationRecord
       end
 
       if read_only
-        PostQueryBuilder.new(query).build(PostReadOnly.where("true"))
+        begin
+          PostQueryBuilder.new(query).build(PostReadOnly.where("true"))
+        rescue PG::ConnectionBad
+          PostQueryBuilder.new(query).build
+        end
       else
         PostQueryBuilder.new(query).build
       end

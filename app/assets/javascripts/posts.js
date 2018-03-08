@@ -27,7 +27,7 @@
       this.initialize_replace_image_dialog();
       this.initialize_gestures();
 
-      if ((Danbooru.meta("always-resize-images") === "true") || ((Danbooru.Cookie.get("dm") !== "1") && (window.screen.width <= 660))) {
+      if ((Danbooru.meta("always-resize-images") === "true") || (Danbooru.meta("viewport") && (window.screen.width <= 660))) {
         $("#image-resize-to-window-link").click();
       }
     }
@@ -630,7 +630,7 @@
         $.post(
           "/saved_searches.js",
           {
-            "saved_search_tags": $("#tags").attr("value")
+            "saved_search_tags": $("#tags").val()
           }
         );
       }

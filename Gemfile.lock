@@ -9,9 +9,9 @@ GIT
 
 GIT
   remote: https://github.com/r888888888/dtext_rb.git
-  revision: 89d56e932c4b195b0f9e89fffe7eb385332bcf8c
+  revision: e343c4572e7a72666123984679e6cf90badd473d
   specs:
-    dtext_rb (1.6.1)
+    dtext_rb (1.7.0)
       nokogiri (~> 1.8)
 
 GIT
@@ -130,7 +130,6 @@ GEM
     ffaker (2.8.1)
     ffi (1.9.18)
     ffi (1.9.18-x64-mingw32)
-    gctools (0.2.4)
     get_process_mem (0.2.1)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
@@ -424,7 +423,6 @@ DEPENDENCIES
   dtext_rb!
   factory_girl
   ffaker
-  gctools
   google-api-client
   highline
   httparty
@@ -471,4 +469,4 @@ DEPENDENCIES
   whenever
 
 BUNDLED WITH
-   1.16.0
+   1.16.1

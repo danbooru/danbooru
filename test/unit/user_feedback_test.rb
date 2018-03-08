@@ -16,9 +16,16 @@ class UserFeedbackTest < ActiveSupport::TestCase
       gold = FactoryGirl.create(:gold_user)
       member = FactoryGirl.create(:user)
 
+      dmail = <<~EOS.chomp
+        @#{gold.name} created a "positive record":/user_feedbacks?search[user_id]=#{user.id} for your account:
+
+        good job!
+      EOS
+
       CurrentUser.user = gold
       assert_difference("Dmail.count", 1) do
-        FactoryGirl.create(:user_feedback, :user => user)
+        FactoryGirl.create(:user_feedback, :user => user, :body => "good job!")
+        assert_equal(dmail, user.dmails.last.body)
       end
     end
     

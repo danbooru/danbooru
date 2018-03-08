@@ -43,9 +43,12 @@ class UserFeedback < ApplicationRecord
       end
     end
 
+    def default_order
+      order(created_at: :desc)
+    end
+
     def search(params)
       q = super
-      return q if params.blank?
 
       if params[:user_id].present?
         q = q.for_user(params[:user_id].to_i)
@@ -67,7 +70,7 @@ class UserFeedback < ApplicationRecord
         q = q.where("category = ?", params[:category])
       end
 
-      q
+      q.apply_default_order(params)
     end
   end
 
@@ -91,7 +94,7 @@ class UserFeedback < ApplicationRecord
 
   def create_dmail
     unless disable_dmail_notification
-      body = %{#{creator_name} created a "#{category} record":/user_feedbacks?search[user_id]=#{user_id} for your account. #{body}}
+      body = %{@#{creator_name} created a "#{category} record":/user_feedbacks?search[user_id]=#{user_id} for your account:\n\n#{self.body}}
       Dmail.create_automated(:to_id => user_id, :title => "Your user record has been updated", :body => body)
     end
   end

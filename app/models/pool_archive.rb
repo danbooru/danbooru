@@ -10,13 +10,16 @@ class PoolArchive < ApplicationRecord
   self.table_name = "pool_versions"
 
   module SearchMethods
+    def default_order
+      order(updated_at: :desc)
+    end
+
     def for_user(user_id)
       where("updater_id = ?", user_id)
     end
 
     def search(params)
       q = super
-      return q if params.blank?
 
       if params[:updater_id].present?
         q = q.where(updater_id: params[:updater_id].split(",").map(&:to_i))
@@ -30,7 +33,7 @@ class PoolArchive < ApplicationRecord
         q = q.where(pool_id: params[:pool_id].split(",").map(&:to_i))
       end
 
-      q
+      q.apply_default_order(params)
     end
   end
 

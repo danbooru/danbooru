@@ -65,8 +65,10 @@ module Sources::Strategies
       self.class.status_id_from_url(referer_url)
     end
 
+    # https://twitter.com/i/web/status/943446161586733056
+    # https://twitter.com/motty08111213/status/943446161586733056
     def self.status_id_from_url(url)
-      if url =~ %r{^https?://(?:mobile\.)?twitter\.com/\w+/status/(\d+)}
+      if url =~ %r{\Ahttps?://(?:mobile\.)?twitter\.com/(?:i/web|\w+)/status/(\d+)}i
         $1.to_i
       else
         nil

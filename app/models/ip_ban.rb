@@ -18,14 +18,13 @@ class IpBan < ApplicationRecord
   end
 
   def self.search(params)
-    q = where("true")
-    return q if params.blank?
+    q = super
 
     if params[:ip_addr].present?
       q = q.where("ip_addr = ?", params[:ip_addr])
     end
 
-    q
+    q.apply_default_order(params)
   end
 
   def self.query(user_ids)

@@ -10,8 +10,7 @@ class JanitorTrial < ApplicationRecord
   validates_uniqueness_of :user_id
 
   def self.search(params)
-    q = where("status = ?", "active")
-    return q if params.blank?
+    q = super.where(status: "active")
 
     if params[:user_name]
       q = q.where("user_id = (select _.id from users _ where lower(_.name) = ?)", params[:user_name].mb_chars.downcase)
@@ -21,7 +20,7 @@ class JanitorTrial < ApplicationRecord
       q = q.where("user_id = ?", params[:user_id].to_i)
     end
 
-    q
+    q.apply_default_order(params)
   end
 
   def self.message_candidates!

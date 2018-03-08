@@ -13,8 +13,6 @@ class BulkUpdateRequest < ApplicationRecord
   validate :script_formatted_correctly
   validate :forum_topic_id_not_invalid
   validate :validate_script, :on => :create
-  attr_accessible :user_id, :forum_topic_id, :forum_post_id, :script, :title, :reason, :skip_secondary_validations
-  attr_accessible :status, :approver_id, :as => [:admin]
   before_validation :initialize_attributes, :on => :create
   before_validation :normalize_text
   after_create :create_forum_topic
@@ -22,6 +20,10 @@ class BulkUpdateRequest < ApplicationRecord
   scope :pending_first, lambda { order("(case status when 'pending' then 0 when 'approved' then 1 else 2 end)") }
 
   module SearchMethods
+    def default_order
+      pending_first.order(id: :desc)
+    end
+
     def search(params = {})
       q = super
 
@@ -63,8 +65,8 @@ class BulkUpdateRequest < ApplicationRecord
         q = q.order(updated_at: :desc)
       when "updated_at_asc"
         q = q.order(updated_at: :asc)
-      when "status_desc"
-        q = q.pending_first.order(id: :desc)
+      else
+        q = q.apply_default_order(params)
       end
 
       q
@@ -88,13 +90,15 @@ class BulkUpdateRequest < ApplicationRecord
     end
 
     def approve!(approver)
-      CurrentUser.scoped(approver) do
-        AliasAndImplicationImporter.new(script, forum_topic_id, "1", true, forum_post_id).process!
-        update({ :status => "approved", :approver_id => CurrentUser.id, :skip_secondary_validations => true }, :as => CurrentUser.role)
-        forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.", "APPROVED")
+      transaction do
+        CurrentUser.scoped(approver) do
+          AliasAndImplicationImporter.new(script, forum_topic_id, "1", true, forum_post_id).process!
+          update(status: "approved", approver: CurrentUser.user, skip_secondary_validations: true)
+          forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.", "APPROVED")
+        end
       end
 
-    rescue Exception => x
+    rescue AliasAndImplicationImporter::Error => x
       self.approver = approver
       CurrentUser.scoped(approver) do
         forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has failed: #{x.to_s}", "FAILED")
@@ -116,8 +120,10 @@ class BulkUpdateRequest < ApplicationRecord
     end
 
     def reject!(rejector)
-      forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been rejected by @#{rejector.name}.", "REJECTED")
-      update_attribute(:status, "rejected")
+      transaction do
+        update(status: "rejected")
+        forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been rejected by @#{rejector.name}.", "REJECTED")
+      end
     end
 
     def bulk_update_request_link

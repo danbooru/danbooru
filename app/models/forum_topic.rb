@@ -75,6 +75,10 @@ class ForumTopic < ApplicationRecord
       order(is_sticky: :desc, updated_at: :desc)
     end
 
+    def default_order
+      order(updated_at: :desc)
+    end
+
     def search(params)
       q = super
       q = q.permitted
@@ -99,7 +103,7 @@ class ForumTopic < ApplicationRecord
       when "sticky"
         q = q.sticky_first
       else
-        q = q.order(updated_at: :desc)
+        q = q.apply_default_order(params)
       end
 
       q

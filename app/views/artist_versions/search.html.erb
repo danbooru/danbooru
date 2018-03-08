@@ -5,7 +5,7 @@
     <div id="search">
       <%= form_tag(artist_versions_path, :method => :get, :class => "simple_form") do %>
         <%= search_field "updater_name", :label => "User" %>
-        <%= search_field "name", :label => "Name" %>
+        <%= search_field "name", :label => "Name", :data => { autocomplete: "artist" } %>
         <%= submit_tag "Search" %>
       <% end %>
     </div>

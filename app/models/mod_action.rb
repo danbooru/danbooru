@@ -29,6 +29,7 @@ class ModAction < ApplicationRecord
     post_ban: 44,
     post_unban: 45,
     post_permanent_delete: 46,
+    post_move_favorites: 47,
     pool_delete: 62,
     pool_undelete: 63,
     artist_ban: 184,
@@ -53,7 +54,6 @@ class ModAction < ApplicationRecord
 
   def self.search(params)
     q = super
-    return q if params.blank?
 
     if params[:creator_id].present?
       q = q.where("creator_id = ?", params[:creator_id].to_i)
@@ -67,7 +67,7 @@ class ModAction < ApplicationRecord
       q = q.attribute_matches(:category, params[:category])
     end
 
-    q
+    q.apply_default_order(params)
   end
 
   def category_id

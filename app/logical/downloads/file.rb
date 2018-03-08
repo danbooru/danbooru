@@ -3,7 +3,7 @@ module Downloads
     class Error < Exception ; end
 
     attr_reader :data, :options
-    attr_accessor :source, :original_source, :downloaded_source, :content_type, :file_path
+    attr_accessor :source, :original_source, :downloaded_source, :file_path
 
     def initialize(source, file_path, options = {})
       # source can potentially get rewritten in the course
@@ -26,20 +26,21 @@ module Downloads
     end
 
     def size
-      @source, headers, @data = before_download(@source, @data)
+      url, headers, _ = before_download(@source, @data)
       options = { timeout: 3, headers: headers }.deep_merge(Danbooru.config.httparty_options)
-      res = HTTParty.head(@source, options)
+      res = HTTParty.head(url, options)
       res.content_length
     end
 
     def download!
+      url, headers, @data = before_download(@source, @data)
+
       ::File.open(@file_path, "wb") do |out|
-        @source, @data = http_get_streaming(@source, @data) do |response|
-          out.write(response)
-        end
+        http_get_streaming(uncached_url(url, headers), out, headers)
       end
-      @downloaded_source = @source
-      @source = after_download(@source)
+
+      @downloaded_source = url
+      @source = after_download(url)
     end
 
     def before_download(url, datums)
@@ -67,10 +68,7 @@ module Downloads
       end
     end
 
-    def http_get_streaming(src, datums = {}, options = {}, &block)
-      max_size = options[:max_size] || Danbooru.config.max_file_size
-      max_size = nil if max_size == 0 # unlimited
-      limit = 4
+    def http_get_streaming(src, file, headers = {}, max_size: Danbooru.config.max_file_size)
       tries = 0
       url = URI.parse(src)
 
@@ -79,24 +77,21 @@ module Downloads
           raise Error.new("URL must be HTTP or HTTPS")
         end
 
-        src, headers, datums = before_download(src, datums)
-        url = URI.parse(src)
-
         validate_local_hosts(url)
 
         begin
+          size = 0
           options = { stream_body: true, timeout: 10, headers: headers }
-          res = HTTParty.get(url, options.deep_merge(Danbooru.config.httparty_options), &block)
+
+          res = HTTParty.get(url, options.deep_merge(Danbooru.config.httparty_options)) do |chunk|
+            size += chunk.size
+            raise Error.new("File is too large (max size: #{max_size})") if size > max_size && max_size > 0
+
+            file.write(chunk)
+          end
 
           if res.success?
-            if max_size
-              len = res["Content-Length"]
-              raise Error.new("File is too large (#{len} bytes)") if len && len.to_i > max_size
-            end
-
-            @content_type = res["Content-Type"]
-
-            return [src, datums]
+            return
           else
             raise Error.new("HTTP error code: #{res.code} #{res.message}")
           end
@@ -109,8 +104,6 @@ module Downloads
           end
         end
       end # while
-
-      [src, datums]
     end # def
 
     def fix_twitter_sources(src)
@@ -133,6 +126,28 @@ module Downloads
         strategy.referer_url
       else
         src
+      end
+    end
+
+    private
+
+    # Prevent Cloudflare from potentially mangling the image. See issue #3528.
+    def uncached_url(url, headers = {})
+      url = Addressable::URI.parse(url)
+
+      if is_cloudflare?(url, headers)
+        url.query_values = (url.query_values || {}).merge(danbooru_no_cache: SecureRandom.uuid)
+      end
+
+      url
+    end
+
+    def is_cloudflare?(url, headers = {})
+      Cache.get("is_cloudflare:#{url.origin}", 4.hours) do
+        res = HTTParty.head(url, { headers: headers }.deep_merge(Danbooru.config.httparty_options))
+        raise Error.new("HTTP error code: #{res.code} #{res.message}") unless res.success?
+
+        res.key?("CF-Ray")
       end
     end
   end

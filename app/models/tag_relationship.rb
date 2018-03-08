@@ -72,6 +72,10 @@ class TagRelationship < ApplicationRecord
       where(status: %w[active processing queued])
     end
 
+    def default_order
+      pending_first
+    end
+
     def search(params)
       q = super
 
@@ -97,8 +101,6 @@ class TagRelationship < ApplicationRecord
 
       params[:order] ||= "status"
       case params[:order].downcase
-      when "status"
-        q = q.pending_first
       when "created_at"
         q = q.order("created_at desc")
       when "updated_at"
@@ -107,6 +109,8 @@ class TagRelationship < ApplicationRecord
         q = q.order("antecedent_name asc, consequent_name asc")
       when "tag_count"
         q = q.joins(:consequent_tag).order("tags.post_count desc, antecedent_name asc, consequent_name asc")
+      else
+        q = q.apply_default_order(params)
       end
 
       q

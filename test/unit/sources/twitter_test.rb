@@ -138,6 +138,17 @@ module Sources
       end
     end
 
+    context "The source site for a https://twitter.com/i/web/status/:id url" do
+      setup do
+        @site = Sources::Site.new("https://twitter.com/i/web/status/943446161586733056")
+        @site.get
+      end
+
+      should "fetch the source data" do
+        assert_equal("https://twitter.com/motty08111213", @site.profile_url)
+      end
+    end
+
     context "A tweet" do
       setup do
         @site = Sources::Site.new("https://twitter.com/noizave/status/875768175136317440")

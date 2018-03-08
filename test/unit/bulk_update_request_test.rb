@@ -112,15 +112,21 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         @req = FactoryGirl.create(:bulk_update_request, :script => "create alias AAA -> BBB", :forum_topic_id => @topic.id, :forum_post_id => @post.id, :title => "[bulk] hoge")
       end
 
-      should "handle errors gracefully" do
-        @req.stubs(:update).raises(RuntimeError.new("blah"))
+      should "gracefully handle validation errors during approval" do
+        @req.stubs(:update).raises(AliasAndImplicationImporter::Error.new("blah"))
         assert_difference("ForumPost.count", 1) do
           @req.approve!(@admin)
         end
 
-        @topic.reload
-        @post.reload
-        assert_match(/\[FAILED\]/, @topic.title)
+        assert_equal("pending", @req.reload.status)
+        assert_match(/\[FAILED\]/, @topic.reload.title)
+      end
+
+      should "leave the BUR pending if there is an unexpected error during approval" do
+        @req.forum_updater.stubs(:update).raises(RuntimeError.new("blah"))
+        assert_raises(RuntimeError) { @req.approve!(@admin) }
+
+        assert_equal("pending", @req.reload.status)
       end
 
       should "downcase the text" do

@@ -33,7 +33,6 @@ class ArtistCommentary < ApplicationRecord
 
     def search(params)
       q = super
-      params = {} if params.blank?
 
       if params[:text_matches].present?
         q = q.text_matches(params[:text_matches])
@@ -62,7 +61,7 @@ class ArtistCommentary < ApplicationRecord
       q = q.deleted if params[:is_deleted] == "yes"
       q = q.undeleted if params[:is_deleted] == "no"
 
-      q
+      q.apply_default_order(params)
     end
   end
 

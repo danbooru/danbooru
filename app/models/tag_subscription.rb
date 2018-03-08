@@ -40,7 +40,6 @@ class TagSubscription < ApplicationRecord
 
     def search(params)
       q = super
-      params = {} if params.blank?
 
       if params[:creator_id]
         q = q.where("creator_id = ?", params[:creator_id].to_i)
@@ -56,7 +55,7 @@ class TagSubscription < ApplicationRecord
 
       q = q.visible_to(CurrentUser.user)
 
-      q
+      q.apply_default_order(params)
     end
   end
 

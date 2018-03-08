@@ -32,7 +32,7 @@ class UploadsController < ApplicationController
 
   def index
     @search = Upload.search(params[:search])
-    @uploads = @search.order("id desc").paginate(params[:page], :limit => params[:limit])
+    @uploads = @search.paginate(params[:page], :limit => params[:limit])
     respond_with(@uploads) do |format|
       format.xml do
         render :xml => @uploads.to_xml(:root => "uploads")
@@ -75,9 +75,9 @@ class UploadsController < ApplicationController
 protected
   def find_post_by_url(normalized_url)
     if normalized_url.nil?
-      Post.where(source: params[:url]).first
+      Post.where("SourcePattern(lower(posts.source)) = ?", params[:url]).first
     else
-      Post.where(source: [params[:url], @normalized_url]).first
+      Post.where("SourcePattern(lower(posts.source)) IN (?)", [params[:url], @normalized_url]).first
     end
   end
 
