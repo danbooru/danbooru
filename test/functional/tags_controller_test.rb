@@ -40,6 +40,14 @@ class TagsControllerTest < ActionController::TestCase
           assert_response :success
         end
       end
+
+      context "with blank search parameters" do
+        should "strip the blank parameters with a redirect" do
+          get :index, { search: { name: "touhou", category: "" } }
+
+          assert_redirected_to tags_path(search: { name: "touhou" })
+        end
+      end
     end
 
     context "autocomplete action" do

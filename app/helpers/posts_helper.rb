@@ -5,17 +5,13 @@ module PostsHelper
 
   def next_page_url
     current_page = (params[:page] || 1).to_i
-    dup_params = params.dup
-    dup_params[:page] = current_page + 1
-    url_for(dup_params).html_safe
+    url_for(nav_params_for(current_page + 1)).html_safe
   end
 
   def prev_page_url
     current_page = (params[:page] || 1).to_i
     if current_page >= 2
-      dup_params = params.dup
-      dup_params[:page] = current_page - 1
-      url_for(dup_params).html_safe
+      url_for(nav_params_for(current_page - 1)).html_safe
     else
       nil
     end
@@ -134,5 +130,12 @@ module PostsHelper
     html << link_to("&laquo; hide".html_safe, "#", :id => "has-children-relationship-preview-link")
 
     html.html_safe
+  end
+
+  private
+
+  def nav_params_for(page)
+    query_params = params.except(:controller, :action, :id).merge(page: page).permit!
+    { params: query_params }
   end
 end
