@@ -131,6 +131,13 @@ class ApplicationRecord < ActiveRecord::Base
       def columns(*params)
         super.reject {|x| x.sql_type == "tsvector"}
       end
+
+      def test_connection
+        limit(1).select(:id)
+        return true
+      rescue PG::Error
+        return false
+      end
     end
   end
 

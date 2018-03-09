@@ -8,7 +8,7 @@ gem "sprockets-rails", :require => "sprockets/railtie"
 gem "uglifier"
 gem "therubyracer", :platforms => :ruby
 gem "rails", "~> 4.2.0"
-gem "pg"
+gem "pg", "0.21.0"
 gem "dalli", :platforms => :ruby
 gem "memcache-client", :platforms => [:mswin, :mingw, :x64_mingw]
 gem "tzinfo-data", :platforms => [:mswin, :mingw, :x64_mingw]
@@ -67,6 +67,7 @@ group :development, :test do
   gem 'awesome_print'
   gem 'pry-byebug'
   gem 'ruby-prof'
+  gem 'foreman'
 end
 
 group :test do

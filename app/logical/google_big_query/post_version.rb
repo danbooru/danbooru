@@ -20,6 +20,13 @@ module GoogleBigQuery
       "regexp_match(removed_tags, \"(?:^| )#{es}(?:$| )\")"
     end
 
+    def find_for_post(post_id, created_at)
+      post_id = post_id.to_i
+      btime = created_at.strftime("%Y-%m-%d 00:00:00", created_at)
+      etime = 1.day.from(created_at).strftime("%Y-%m-%d 00:00:00")
+      "select updater_id, added_tag from [danbooru_#{Rails.env}].post_versions_flat_part where _partitiontime >= #{btime} and _partitiontime <= #{etime} and post_id = #{post_id}"
+    end
+
     def find(user_id, added_tags, removed_tags, min_version_id, max_version_id, limit = 1_000)
       constraints = []
 
