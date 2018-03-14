@@ -172,7 +172,6 @@ class ApplicationController < ActionController::Base
   def reset_current_user
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
-    CurrentUser.mobile_mode = false
   end
 
   def set_started_at_session

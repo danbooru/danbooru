@@ -236,9 +236,7 @@ class Post < ApplicationRecord
     end
 
     def file_url_for(user)
-      if CurrentUser.mobile_mode?
-        large_file_url
-      elsif user.default_image_size == "large" && image_width > Danbooru.config.large_image_width
+      if user.default_image_size == "large" && image_width > Danbooru.config.large_image_width
         large_file_url
       else
         file_url
@@ -246,9 +244,7 @@ class Post < ApplicationRecord
     end
 
     def file_path_for(user)
-      if CurrentUser.mobile_mode?
-        large_file_path
-      elsif user.default_image_size == "large" && image_width > Danbooru.config.large_image_width
+      if user.default_image_size == "large" && image_width > Danbooru.config.large_image_width
         large_file_path
       else
         file_path
@@ -362,7 +358,7 @@ class Post < ApplicationRecord
     end
 
     def image_width_for(user)
-      if CurrentUser.mobile_mode? || user.default_image_size == "large"
+      if user.default_image_size == "large"
         large_image_width
       else
         image_width
@@ -370,7 +366,7 @@ class Post < ApplicationRecord
     end
 
     def image_height_for(user)
-      if CurrentUser.mobile_mode? || user.default_image_size == "large"
+      if user.default_image_size == "large"
         large_image_height
       else
         image_height

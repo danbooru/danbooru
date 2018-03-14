@@ -11,7 +11,6 @@ class CurrentUser
     ensure
       self.user = old_user
       self.ip_addr = old_ip_addr
-      self.mobile_mode = false
     end
   end
 
@@ -47,14 +46,6 @@ class CurrentUser
 
   def self.ip_addr
     Thread.current[:current_ip_addr]
-  end
-
-  def self.mobile_mode=(mode)
-    Thread.current[:mobile_mode] = mode
-  end
-
-  def self.mobile_mode?
-    Thread.current[:mobile_mode]
   end
 
   def self.id
