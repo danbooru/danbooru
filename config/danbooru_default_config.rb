@@ -222,6 +222,41 @@ module Danbooru
       "danbooru"
     end
 
+    # The method to use for storing image files.
+    def storage_manager
+      # Store files on the local filesystem.
+      # base_dir - where to store files (default: under public/data)
+      # base_url - where to serve files from (default: http://#{hostname}/data)
+      # hierarchical: false - store files in a single directory
+      # hierarchical: true - store files in a hierarchical directory structure, based on the MD5 hash
+      StorageManager::Local.new(base_dir: "#{Rails.root}/public/data", hierarchical: false)
+
+      # Store files on one or more remote host(s). Configure SSH settings in
+      # ~/.ssh_config or in the ssh_options param (ref: http://net-ssh.github.io/net-ssh/Net/SSH.html#method-c-start)
+      # StorageManager::SFTP.new("i1.example.com", "i2.example.com", base_dir: "/mnt/backup", hierarchical: false, ssh_options: {})
+
+      # Store files in an S3 bucket. The bucket must already exist and be
+      # writable by you. Configure your S3 settings in aws_region and
+      # aws_credentials below, or in the s3_options param (ref:
+      # https://docs.aws.amazon.com/sdkforruby/api/Aws/S3/Client.html#initialize-instance_method)
+      # StorageManager::S3.new("my_s3_bucket", base_url: "https://my_s3_bucket.s3.amazonaws.com/", s3_options: {})
+
+      # Select the storage method based on the post's id and type (preview, large, or original).
+      # StorageManager::Hybrid.new do |id, md5, file_ext, type|
+      #   ssh_options = { user: "danbooru" }
+      #
+      #   if type.in?([:large, :original]) && id.in?(0..850_000)
+      #     StorageManager::SFTP.new("raikou1.donmai.us", base_url: "https://raikou1.donmai.us", base_dir: "/path/to/files", hierarchical: true, ssh_options: ssh_options)
+      #   elsif type.in?([:large, :original]) && id.in?(850_001..2_000_000)
+      #     StorageManager::SFTP.new("raikou2.donmai.us", base_url: "https://raikou2.donmai.us", base_dir: "/path/to/files", hierarchical: true, ssh_options: ssh_options)
+      #   elsif type.in?([:large, :original]) && id.in?(2_000_001..3_000_000)
+      #     StorageManager::SFTP.new(*all_server_hosts, base_url: "https://hijiribe.donmai.us/data", ssh_options: ssh_options)
+      #   else
+      #     StorageManager::SFTP.new(*all_server_hosts, ssh_options: ssh_options)
+      #   end
+      # end
+    end
+
     def build_file_url(post)
       "/data/#{post.file_path_prefix}/#{post.md5}.#{post.file_ext}"
     end
@@ -611,6 +646,14 @@ module Danbooru
     end
 
     # AWS config options
+    def aws_region
+      "us-east-1"
+    end
+
+    def aws_credentials
+      Aws::Credentials.new(Danbooru.config.aws_access_key_id, Danbooru.config.aws_secret_access_key)
+    end
+
     def aws_access_key_id
     end
 
