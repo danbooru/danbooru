@@ -195,6 +195,13 @@ class UploadTest < ActiveSupport::TestCase
         assert_equal(post.id, @upload.post_id)
         assert_equal("completed", @upload.status)
       end
+
+      context "automatic tagging" do
+        should "tag animated png files" do
+          @upload = FactoryGirl.build(:upload, file_ext: "png", file: upload_file("test/files/apng/normal_apng.png"))
+          assert_equal("animated_png", @upload.automatic_tags)
+        end
+      end
     end
 
     should "process completely for a pixiv ugoira" do
@@ -210,6 +217,7 @@ class UploadTest < ActiveSupport::TestCase
       assert_equal(60, post.image_height)
       assert_equal("https://i.pximg.net/img-zip-ugoira/img/2014/10/05/23/42/23/46378654_ugoira1920x1080.zip", post.source)
       assert_nothing_raised { post.file(:original) }
+      assert_nothing_raised { post.file(:large) }
       assert_nothing_raised { post.file(:preview) }
     end
 
