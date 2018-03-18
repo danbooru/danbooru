@@ -80,10 +80,14 @@ class Upload < ApplicationRecord
       end
     end
 
-    def tag_audio
-      if is_video? && video.audio_channels.present?
-        self.tag_string = "#{tag_string} video_with_sound"
-      end
+    def automatic_tags
+      return "" unless Danbooru.config.enable_dimension_autotagging
+
+      tags = []
+      tags << "video_with_sound" if is_video_with_audio?
+      tags << "animated_gif" if is_animated_gif?
+      tags << "animated_png" if is_animated_png?
+      tags.join(" ")
     end
 
     def validate_video_duration
@@ -109,9 +113,9 @@ class Upload < ApplicationRecord
         calculate_hash(file_path)
         validate_md5_uniqueness
         validate_md5_confirmation
-        tag_audio
         validate_video_duration
         calculate_file_size(file_path)
+        self.tag_string = "#{tag_string} #{automatic_tags}"
         self.image_width, self.image_height = calculate_dimensions
         generate_resizes(file_path)
         move_file
@@ -219,8 +223,20 @@ class Upload < ApplicationRecord
       %w(webm mp4).include?(file_ext)
     end
 
+    def is_video_with_audio?
+      is_video? && video.audio_channels.present?
+    end
+
     def is_ugoira?
       %w(zip).include?(file_ext)
+    end
+
+    def is_animated_gif?
+      file_ext == "gif" && Magick::Image.ping(file_path).length > 1
+    end
+
+    def is_animated_png?
+      file_ext == "png" && APNGInspector.new(file_path).inspect!.animated?
     end
   end
 

@@ -86,7 +86,7 @@ class APNGInspector
     end
 
     @corrupted = !read_success || actl_corrupted
-    return !@corrupted
+    self
   end
 
   def corrupted?

@@ -255,24 +255,6 @@ class Post < ApplicationRecord
       file_ext =~ /jpg|jpeg|gif|png/i
     end
 
-    def is_animated_gif?
-      if file_ext =~ /gif/i && File.exists?(file_path)
-        return Magick::Image.ping(file_path).length > 1
-      else
-        return false
-      end
-    end
-    
-    def is_animated_png?
-      if file_ext =~ /png/i && File.exists?(file_path)
-        apng = APNGInspector.new(file_path)
-        apng.inspect!
-        return apng.animated?
-      else
-        return false
-      end
-    end
-
     def is_flash?
       file_ext =~ /swf/i
     end
@@ -765,7 +747,6 @@ class Post < ApplicationRecord
       return tags if !Danbooru.config.enable_dimension_autotagging
 
       tags -= %w(incredibly_absurdres absurdres highres lowres huge_filesize flash webm mp4)
-      tags -= %w(animated_gif animated_png) if new_record?
 
       if has_dimensions?
         if image_width >= 10_000 || image_height >= 10_000
@@ -792,14 +773,6 @@ class Post < ApplicationRecord
 
       if file_size >= 10.megabytes
         tags << "huge_filesize"
-      end
-
-      if is_animated_gif?
-        tags << "animated_gif"
-      end
-      
-      if is_animated_png?
-        tags << "animated_png"
       end
 
       if is_flash?
