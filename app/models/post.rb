@@ -93,40 +93,31 @@ class Post < ApplicationRecord
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def delete_files(post_id, file_path, large_file_path, preview_file_path, force: false)
-        unless force
-          # XXX should pass in the md5 instead of parsing it.
-          preview_file_path =~ %r!/data/preview/(?:test\.)?([a-z0-9]{32})\.jpg\z!
-          md5 = $1
-
-          if Post.where(md5: md5).exists?
-            raise DeletionError.new("Files still in use; skipping deletion.")
-          end
+      def delete_files(post_id, md5, file_ext, force: false)
+        if Post.where(md5: md5).exists? && !force
+          raise DeletionError.new("Files still in use; skipping deletion.")
         end
 
-        backup_service = Danbooru.config.backup_service
-        backup_service.delete(file_path, type: :original)
-        backup_service.delete(large_file_path, type: :large)
-        backup_service.delete(preview_file_path, type: :preview)
+        Danbooru.config.storage_manager.delete_file(post_id, md5, file_ext, :original)
+        Danbooru.config.storage_manager.delete_file(post_id, md5, file_ext, :large)
+        Danbooru.config.storage_manager.delete_file(post_id, md5, file_ext, :preview)
 
-        # the large file and the preview don't necessarily exist. if so errors will be ignored.
-        FileUtils.rm_f(file_path)
-        FileUtils.rm_f(large_file_path)
-        FileUtils.rm_f(preview_file_path)
-
-        RemoteFileManager.new(file_path).delete
-        RemoteFileManager.new(large_file_path).delete
-        RemoteFileManager.new(preview_file_path).delete
+        Danbooru.config.backup_storage_manager.delete_file(post_id, md5, file_ext, :original)
+        Danbooru.config.backup_storage_manager.delete_file(post_id, md5, file_ext, :large)
+        Danbooru.config.backup_storage_manager.delete_file(post_id, md5, file_ext, :preview)
 
         if Danbooru.config.cloudflare_key
-          md5, ext = File.basename(file_path).split(".")
-          CloudflareService.new.delete(md5, ext)
+          CloudflareService.new.delete(md5, file_ext)
         end
       end
     end
 
+    def queue_delete_files(grace_period)
+      Post.delay(queue: "default", run_at: Time.now + grace_period).delete_files(id, md5, file_ext)
+    end
+
     def delete_files
-      Post.delete_files(id, file_path, large_file_path, preview_file_path, force: true)
+      Post.delete_files(id, md5, file_ext, force: true)
     end
 
     def distribute_files(file, sample_file, preview_file)

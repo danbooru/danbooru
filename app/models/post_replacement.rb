@@ -49,7 +49,7 @@ class PostReplacement < ApplicationRecord
       # md5/file_ext to delete the old files. if saving the post fails,
       # this is rolled back so the job won't run.
       if md5_changed
-        Post.delay(queue: "default", run_at: Time.now + DELETION_GRACE_PERIOD).delete_files(post.id, post.file_path, post.large_file_path, post.preview_file_path)
+        post.queue_delete_files(DELETION_GRACE_PERIOD)
       end
 
       self.file_ext = upload.file_ext
