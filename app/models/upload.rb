@@ -10,7 +10,6 @@ class Upload < ApplicationRecord
   belongs_to :uploader, :class_name => "User"
   belongs_to :post
   before_validation :initialize_uploader, :on => :create
-  before_validation :initialize_status, :on => :create
   before_create :convert_cgi_file
   after_destroy :delete_temp_file
   validate :uploader_is_not_limited, :on => :create
@@ -53,12 +52,6 @@ class Upload < ApplicationRecord
       end
     end
 
-    def validate_file_exists
-      unless file_path && File.exists?(file_path)
-        raise "file does not exist"
-      end
-    end
-
     def validate_file_content_type
       unless is_valid_content_type?
         raise "invalid content type (only JPEG, PNG, GIF, SWF, MP4, and WebM files are allowed)"
@@ -71,12 +64,6 @@ class Upload < ApplicationRecord
 
     def validate_md5_confirmation
       if !md5_confirmation.blank? && md5_confirmation != md5
-        raise "md5 mismatch"
-      end
-    end
-
-    def validate_md5_confirmation_after_move
-      if !md5_confirmation.blank? && md5_confirmation != Digest::MD5.file(md5_file_path).hexdigest
         raise "md5 mismatch"
       end
     end
@@ -112,13 +99,12 @@ class Upload < ApplicationRecord
     def process_upload
       CurrentUser.scoped(uploader, uploader_ip_addr) do
         update_attribute(:status, "processing")
-        self.source = strip_source
+
+        self.source = source.to_s.strip
         if is_downloadable?
           self.downloaded_source, self.source = download_from_source(temp_file_path)
         end
-        validate_file_exists
-        self.content_type = file_header_to_content_type(file_path)
-        self.file_ext = content_type_to_file_ext(content_type)
+        self.file_ext = file_header_to_file_ext(file_path)
         validate_file_content_type
         calculate_hash(file_path)
         validate_md5_uniqueness
@@ -126,12 +112,9 @@ class Upload < ApplicationRecord
         tag_audio
         validate_video_duration
         calculate_file_size(file_path)
-        if has_dimensions?
-          calculate_dimensions(file_path)
-        end
+        self.image_width, self.image_height = calculate_dimensions
         generate_resizes(file_path)
         move_file
-        validate_md5_confirmation_after_move
         save
       end
     end
@@ -173,10 +156,6 @@ class Upload < ApplicationRecord
       
     ensure
       delete_temp_file
-    end
-
-    def async_conversion?
-      is_ugoira?
     end
 
     def ugoira_service
@@ -288,26 +267,16 @@ class Upload < ApplicationRecord
 
   module DimensionMethods
     # Figures out the dimensions of the image.
-    def calculate_dimensions(file_path)
+    def calculate_dimensions
       if is_video?
-        self.image_width = video.width
-        self.image_height = video.height
+        [video.width, video.height]
       elsif is_ugoira?
         ugoira_service.calculate_dimensions(file_path)
-        self.image_width = ugoira_service.width
-        self.image_height = ugoira_service.height
+        [ugoira_service.width, ugoira_service.height]
       else
-        File.open(file_path, "rb") do |file|
-          image_size = ImageSpec.new(file)
-          self.image_width = image_size.width
-          self.image_height = image_size.height
-        end
+        image_size = ImageSpec.new(file_path)
+        [image_size.width, image_size.height]
       end
-    end
-
-    # Does this file have image dimensions?
-    def has_dimensions?
-      %w(jpg gif png swf webm mp4 zip).include?(file_ext)
     end
   end
 
@@ -316,59 +285,24 @@ class Upload < ApplicationRecord
       file_ext =~ /jpg|gif|png|swf|webm|mp4|zip/
     end
 
-    def content_type_to_file_ext(content_type)
-      case content_type
-      when "image/jpeg"
+    def file_header_to_file_ext(file_path)
+      case File.read(file_path, 16)
+      when /^\xff\xd8/n
         "jpg"
-
-      when "image/gif"
+      when /^GIF87a/, /^GIF89a/
         "gif"
-
-      when "image/png"
+      when /^\x89PNG\r\n\x1a\n/n
         "png"
-
-      when "application/x-shockwave-flash"
+      when /^CWS/, /^FWS/, /^ZWS/
         "swf"
-
-      when "video/webm"
+      when /^\x1a\x45\xdf\xa3/n
         "webm"
-
-      when "video/mp4"
+      when /^....ftyp(?:isom|3gp5|mp42|MSNV|avc1)/
         "mp4"
-
-      when "application/zip"
+      when /^PK\x03\x04/
         "zip"
-
       else
         "bin"
-      end
-    end
-
-    def file_header_to_content_type(source_path)
-      case File.read(source_path, 16)
-      when /^\xff\xd8/n
-        "image/jpeg"
-
-      when /^GIF87a/, /^GIF89a/
-        "image/gif"
-
-      when /^\x89PNG\r\n\x1a\n/n
-        "image/png"
-
-      when /^CWS/, /^FWS/, /^ZWS/
-        "application/x-shockwave-flash"
-
-      when /^\x1a\x45\xdf\xa3/n
-        "video/webm"
-
-      when /^....ftyp(?:isom|3gp5|mp42|MSNV|avc1)/
-        "video/mp4"
-
-      when /^PK\x03\x04/
-        "application/zip"
-
-      else
-        "application/octet-stream"
       end
     end
   end
@@ -405,10 +339,6 @@ class Upload < ApplicationRecord
   end
 
   module DownloaderMethods
-    def strip_source
-      source.to_s.strip
-    end
-
     # Determines whether the source is downloadable
     def is_downloadable?
       source =~ /^https?:\/\// && file_path.blank?
@@ -442,10 +372,6 @@ class Upload < ApplicationRecord
   end
 
   module StatusMethods
-    def initialize_status
-      self.status = "pending"
-    end
-
     def is_pending?
       status == "pending"
     end
