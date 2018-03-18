@@ -130,38 +130,6 @@ class Post < ApplicationRecord
       backup_storage_manager.store_file(preview_file, self, :preview) if preview_file.present?
     end
 
-    def file_path_prefix
-      Rails.env == "test" ? "test." : ""
-    end
-
-    def file_path
-      "#{Rails.root}/public/data/#{file_path_prefix}#{md5}.#{file_ext}"
-    end
-
-    def large_file_path
-      if has_large?
-        "#{Rails.root}/public/data/sample/#{file_path_prefix}#{Danbooru.config.large_image_prefix}#{md5}.#{large_file_ext}"
-      else
-        file_path
-      end
-    end
-
-    def large_file_ext
-      if is_ugoira?
-        "webm"
-      else
-        "jpg"
-      end
-    end
-
-    def preview_file_path
-      "#{Rails.root}/public/data/preview/#{file_path_prefix}#{md5}.jpg"
-    end
-
-    def file_name
-      "#{file_path_prefix}#{md5}.#{file_ext}"
-    end
-
     def backup_storage_manager
       Danbooru.config.backup_storage_manager
     end
@@ -178,20 +146,12 @@ class Post < ApplicationRecord
       storage_manager.file_url(self, :original)
     end
 
-    # this is for the 640x320 version
-    def cropped_file_url
-    end
-
     def large_file_url
       storage_manager.file_url(self, :large)
     end
 
     def preview_file_url
       storage_manager.file_url(self, :preview)
-    end
-
-    def complete_preview_file_url
-      "http://#{Danbooru.config.hostname}#{preview_file_url}"
     end
 
     def open_graph_image_url
@@ -202,7 +162,7 @@ class Post < ApplicationRecord
           file_url
         end
       else
-        complete_preview_file_url
+        preview_file_url
       end
     end
 
@@ -211,14 +171,6 @@ class Post < ApplicationRecord
         large_file_url
       else
         file_url
-      end
-    end
-
-    def file_path_for(user)
-      if user.default_image_size == "large" && image_width > Danbooru.config.large_image_width
-        large_file_path
-      else
-        file_path
       end
     end
 
@@ -247,9 +199,7 @@ class Post < ApplicationRecord
     end
 
     def has_preview?
-      # for video/ugoira we don't want to try and render a preview that
-      # might doesn't exist yet
-      is_image? || ((is_video? || is_ugoira?) && File.exists?(preview_file_path))
+      is_image? || is_video? || is_ugoira?
     end
 
     def has_dimensions?
@@ -257,7 +207,7 @@ class Post < ApplicationRecord
     end
 
     def has_ugoira_webm?
-      created_at < 1.minute.ago || (File.exists?(preview_file_path) && File.size(preview_file_path) > 0)
+      true
     end
   end
 
@@ -1674,8 +1624,8 @@ class Post < ApplicationRecord
     end
 
     def update_iqdb_async
-      if File.exists?(preview_file_path) && Post.iqdb_enabled?
-        Post.iqdb_sqs_service.send_message("update\n#{id}\n#{complete_preview_file_url}")
+      if Post.iqdb_enabled?
+        Post.iqdb_sqs_service.send_message("update\n#{id}\n#{preview_file_url}")
       end
     end
 

@@ -135,6 +135,10 @@ class PostPresenter < Presenter
     @post.humanized_essential_tag_string
   end
 
+  def filename_for_download
+    "#{humanized_essential_tag_string} - #{@post.md5}.#{@post.file_ext}"
+  end
+
   def categorized_tag_groups
     string = []
 
