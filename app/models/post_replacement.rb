@@ -24,6 +24,8 @@ class PostReplacement < ApplicationRecord
   end
 
   def process!
+    upload = nil
+
     transaction do
       upload = Upload.create!(
         file: replacement_file,
@@ -79,7 +81,7 @@ class PostReplacement < ApplicationRecord
 
     # point of no return: these things can't be rolled back, so we do them
     # only after the transaction successfully commits.
-    post.distribute_files
+    upload.distribute_files(post)
     post.update_iqdb_async
   end
 

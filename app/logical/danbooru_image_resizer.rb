@@ -1,6 +1,6 @@
 module DanbooruImageResizer
-  def resize(read_path, write_path, width, height, resize_quality = 90)
-    image = Magick::Image.read(read_path).first
+  def resize(file, width, height, resize_quality = 90)
+    image = Magick::Image.read(file.path).first
     geometry = "#{width}x>"
 
     if width == Danbooru.config.small_image_width
@@ -17,14 +17,15 @@ module DanbooruImageResizer
     image = flatten(image, width, height)
     image.strip!
 
-    image.write(write_path) do
+    output_file = Tempfile.new(binmode: true)
+    image.write("jpeg:" + output_file.path) do
       self.quality = resize_quality
       # setting PlaneInterlace enables progressive encoding for JPEGs
       self.interlace = Magick::PlaneInterlace
     end
 
     image.destroy!
-    FileUtils.chmod(0664, write_path)
+    output_file
   end
 
   def flatten(image, width, height)

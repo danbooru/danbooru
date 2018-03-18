@@ -3,9 +3,9 @@ module Downloads
     class Error < Exception ; end
 
     attr_reader :data, :options
-    attr_accessor :source, :original_source, :downloaded_source, :file_path
+    attr_accessor :source, :original_source, :downloaded_source
 
-    def initialize(source, file_path, options = {})
+    def initialize(source, options = {})
       # source can potentially get rewritten in the course
       # of downloading a file, so check it again
       @source = source
@@ -13,9 +13,6 @@ module Downloads
 
       # the URL actually downloaded after rewriting the original source.
       @downloaded_source = nil
-
-      # where to save the download
-      @file_path = file_path
 
       # we sometimes need to capture data from the source page
       @data = {}
@@ -35,12 +32,13 @@ module Downloads
     def download!
       url, headers, @data = before_download(@source, @data)
 
-      ::File.open(@file_path, "wb") do |out|
-        http_get_streaming(uncached_url(url, headers), out, headers)
-      end
+      output_file = Tempfile.new(binmode: true)
+      http_get_streaming(uncached_url(url, headers), output_file, headers)
 
       @downloaded_source = url
       @source = after_download(url)
+
+      output_file
     end
 
     def before_download(url, datums)
@@ -91,7 +89,8 @@ module Downloads
           end
 
           if res.success?
-            return
+            file.rewind
+            return file
           else
             raise Error.new("HTTP error code: #{res.code} #{res.message}")
           end
