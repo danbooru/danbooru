@@ -99,20 +99,6 @@ module Danbooru
       true
     end
 
-    # What method to use to backup images.
-    #
-    # NullBackupService: Don't backup images at all.
-    #
-    # S3BackupService: Backup to Amazon S3. Must configure aws_access_key_id,
-    # aws_secret_access_key, and aws_s3_bucket_name. Bucket must exist and be writable.
-    def backup_service
-      if Rails.env.production?
-        S3BackupService.new
-      else
-        NullBackupService.new
-      end
-    end
-
     # What method to use to store images.
     # local_flat: Store every image in one directory.
     # local_hierarchy: Store every image in a hierarchical directory, based on the post's MD5 hash. On some file systems this may be faster.
@@ -257,6 +243,24 @@ module Danbooru
       # end
     end
 
+    # The method to use for backing up image files.
+    def backup_storage_manager
+      # Don't perform any backups.
+      StorageManager::Null.new
+
+      # Backup files to /mnt/backup on the local filesystem.
+      # StorageManager::Local.new(base_dir: "/mnt/backup", hierarchical: false)
+
+      # Backup files to /mnt/backup on a remote system. Configure SSH settings
+      # in ~/.ssh_config or in the ssh_options param (ref: http://net-ssh.github.io/net-ssh/Net/SSH.html#method-c-start)
+      # StorageManager::SFTP.new("www.example.com", base_dir: "/mnt/backup", ssh_options: {})
+
+      # Backup files to an S3 bucket. The bucket must already exist and be
+      # writable by you. Configure your S3 settings in aws_region and
+      # aws_credentials below, or in the s3_options param (ref:
+      # https://docs.aws.amazon.com/sdkforruby/api/Aws/S3/Client.html#initialize-instance_method)
+      # StorageManager::S3.new("my_s3_bucket_name", s3_options: {})
+    end
 
 #TAG CONFIGURATION
 

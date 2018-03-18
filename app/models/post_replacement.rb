@@ -71,8 +71,6 @@ class PostReplacement < ApplicationRecord
 
       if md5_changed
         post.comments.create!({creator: User.system, body: comment_replacement_message, do_not_bump_post: true}, without_protection: true)
-      else
-        post.queue_backup
       end
 
       save!
