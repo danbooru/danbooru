@@ -28,7 +28,7 @@ if [[ -z "$HOSTNAME" ]] ; then
   exit 1
 fi
 
-export RUBY_VERSION=2.3.1
+export RUBY_VERSION=2.5.0
 export GITHUB_INSTALL_SCRIPTS=https://raw.githubusercontent.com/r888888888/danbooru/master/script/install
 
 # Install packages
