@@ -4,13 +4,9 @@ module Downloads
   class PixivTest < ActiveSupport::TestCase
     context "An ugoira site for pixiv" do
       setup do
-        @tempfile = Tempfile.new("danbooru-test")
-        @download = Downloads::File.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364", @tempfile.path)
-        @download.download!
-      end
-
-      teardown do
-        @tempfile.unlink
+        @download = Downloads::File.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
+        @tempfile = @download.download!
+        @tempfile.close!
       end
 
       should "capture the data" do

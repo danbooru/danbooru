@@ -5,9 +5,7 @@ module Downloads
     context "a download for a (small) artstation image" do
       setup do
         @source = "https://cdnb3.artstation.com/p/assets/images/images/003/716/071/large/aoi-ogata-hate-city.jpg?1476754974"
-        @tempfile = Tempfile.new("danbooru-test")
-        @download = Downloads::File.new(@source, @tempfile.path)
-        @download.download!
+        @download = Downloads::File.new(@source)
       end
 
       should "download the large image instead" do
@@ -18,8 +16,7 @@ module Downloads
     context "for an image where an original does not exist" do
       setup do
         @source = "https://cdna.artstation.com/p/assets/images/images/004/730/278/large/mendel-oh-dragonll.jpg"
-        @tempfile = Tempfile.new("danbooru-test")
-        @download = Downloads::File.new(@source, @tempfile.path)
+        @download = Downloads::File.new(@source)
         @download.download!
       end
 
@@ -38,8 +35,7 @@ module Downloads
     context "a download for a https://$artist.artstation.com/projects/$id page" do
       setup do
         @source = "https://dantewontdie.artstation.com/projects/YZK5q"
-        @tempfile = Tempfile.new("danbooru-test")
-        @download = Downloads::File.new(@source, @tempfile.path)
+        @download = Downloads::File.new(@source)
         @download.download!
       end
 

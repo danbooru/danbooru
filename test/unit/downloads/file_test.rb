@@ -5,12 +5,7 @@ module Downloads
     context "A twitter video download" do
       setup do
         @source = "https://twitter.com/CincinnatiZoo/status/859073537713328129"
-        @tempfile = Tempfile.new("danbooru-test")
-        @download = Downloads::File.new(@source, @tempfile.path)
-      end
-
-      teardown do
-        @tempfile.close
+        @download = Downloads::File.new(@source)
       end
 
       should "preserve the twitter source" do
@@ -22,12 +17,8 @@ module Downloads
     context "A post download" do
       setup do
         @source = "http://www.google.com/intl/en_ALL/images/logo.gif"
+        @download = Downloads::File.new(@source)
         @tempfile = Tempfile.new("danbooru-test")
-        @download = Downloads::File.new(@source, @tempfile.path)
-      end
-
-      teardown do
-        @tempfile.close
       end
 
       context "that fails" do
@@ -49,10 +40,9 @@ module Downloads
       end
 
       should "store the file in the tempfile path" do
-        @download.download!
+        tempfile = @download.download!
         assert_equal(@source, @download.source)
-        assert(::File.exists?(@tempfile.path), "temp file should exist")
-        assert(::File.size(@tempfile.path) > 0, "should have data")
+        assert_operator(tempfile.size, :>, 0, "should have data")
       end
     end
   end

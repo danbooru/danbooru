@@ -45,6 +45,7 @@ class ActiveSupport::TestCase
   end
 
   teardown do
+    FileUtils.rm_rf(Danbooru.config.storage_manager.base_dir)
     Cache.clear
   end
 end

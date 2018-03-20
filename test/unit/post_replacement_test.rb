@@ -1,15 +1,6 @@
 require 'test_helper'
 
 class PostReplacementTest < ActiveSupport::TestCase
-  def upload_file(path, filename, &block)
-    Tempfile.open do |file|
-      file.write(File.read(path))
-      file.seek(0)
-      uploaded_file = ActionDispatch::Http::UploadedFile.new(tempfile: file, filename: filename)
-      yield uploaded_file
-    end
-  end
-
   def setup
     super
 
@@ -68,7 +59,7 @@ class PostReplacementTest < ActiveSupport::TestCase
           assert_equal(5969, @post.file_size)
           assert_equal("png", @post.file_ext)
           assert_equal("8f9327db2597fa57d2f42b4a6c5a9855", @post.md5)
-          assert_equal("8f9327db2597fa57d2f42b4a6c5a9855", Digest::MD5.file(@post.file_path).hexdigest)
+          assert_equal("8f9327db2597fa57d2f42b4a6c5a9855", Digest::MD5.file(@post.file).hexdigest)
           assert_equal("https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png", @post.source)
         end
       end
@@ -102,7 +93,7 @@ class PostReplacementTest < ActiveSupport::TestCase
         assert_equal(8558, @post.file_size)
         assert_equal("gif", @post.file_ext)
         assert_equal("e80d1c59a673f560785784fb1ac10959", @post.md5)
-        assert_equal("e80d1c59a673f560785784fb1ac10959", Digest::MD5.file(@post.file_path).hexdigest)
+        assert_equal("e80d1c59a673f560785784fb1ac10959", Digest::MD5.file(@post.file).hexdigest)
         assert_equal("https://www.google.com/intl/en_ALL/images/logo.gif", @post.source)
       end
 
@@ -155,18 +146,17 @@ class PostReplacementTest < ActiveSupport::TestCase
         assert_equal(16275, @post.file_size)
         assert_equal("png", @post.file_ext)
         assert_equal("4ceadc314938bc27f3574053a3e1459a", @post.md5)
-        assert_equal("4ceadc314938bc27f3574053a3e1459a", Digest::MD5.file(@post.file_path).hexdigest)
+        assert_equal("4ceadc314938bc27f3574053a3e1459a", Digest::MD5.file(@post.file).hexdigest)
         assert_equal("https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png", @post.source)
         assert_equal("https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png", @post.replacements.last.replacement_url)
       end
 
-      should "delete the old files after three days" do
-        old_file_path, old_preview_file_path, old_large_file_path = @post.file_path, @post.preview_file_path, @post.large_file_path
+      should "delete the old files after thirty days" do
+        old_file_path, old_preview_file_path = @post.file(:original).path, @post.file(:preview).path
         @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
 
         assert(File.exists?(old_file_path))
         assert(File.exists?(old_preview_file_path))
-        assert(File.exists?(old_large_file_path))
 
         Timecop.travel(Time.now + PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
           Delayed::Worker.new.work_off
@@ -174,7 +164,6 @@ class PostReplacementTest < ActiveSupport::TestCase
 
         assert_not(File.exists?(old_file_path))
         assert_not(File.exists?(old_preview_file_path))
-        assert_not(File.exists?(old_large_file_path))
       end
     end
 
@@ -188,7 +177,7 @@ class PostReplacementTest < ActiveSupport::TestCase
         assert_equal(2804, @post.file_size)
         assert_equal("zip", @post.file_ext)
         assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post.md5)
-        assert_equal("cad1da177ef309bf40a117c17b8eecf5", Digest::MD5.file(@post.file_path).hexdigest)
+        assert_equal("cad1da177ef309bf40a117c17b8eecf5", Digest::MD5.file(@post.file).hexdigest)
 
         assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @post.source)
         assert_equal([{"file"=>"000000.jpg", "delay"=>125}, {"file"=>"000001.jpg", "delay"=>125}], @post.pixiv_ugoira_frame_data.data)
@@ -201,17 +190,15 @@ class PostReplacementTest < ActiveSupport::TestCase
         @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
         @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
 
-        assert(File.exists?(@post.file_path))
-        assert(File.exists?(@post.preview_file_path))
-        assert(File.exists?(@post.large_file_path))
+        assert_nothing_raised { @post.file(:original) }
+        assert_nothing_raised { @post.file(:preview) }
 
         Timecop.travel(Time.now + PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
           Delayed::Worker.new.work_off
         end
 
-        assert(File.exists?(@post.file_path))
-        assert(File.exists?(@post.preview_file_path))
-        assert(File.exists?(@post.large_file_path))
+        assert_nothing_raised { @post.file(:original) }
+        assert_nothing_raised { @post.file(:preview) }
       end
     end
 
@@ -231,14 +218,14 @@ class PostReplacementTest < ActiveSupport::TestCase
           Delayed::Worker.new.work_off
         end
 
-        assert(File.exists?(@post1.file_path))
-        assert(File.exists?(@post2.file_path))
+        assert_nothing_raised { @post1.file(:original) }
+        assert_nothing_raised { @post2.file(:original) }
       end
     end
 
     context "a post with an uploaded file" do
       should "work" do
-        upload_file("#{Rails.root}/test/files/test.png", "test.png") do |file|
+        upload_file("test/files/test.png") do |file|
           @post.replace!(replacement_file: file, replacement_url: "")
           assert_equal(@post.md5, Digest::MD5.file(file.tempfile).hexdigest)
           assert_equal("file://test.png", @post.replacements.last.replacement_url)
@@ -268,7 +255,7 @@ class PostReplacementTest < ActiveSupport::TestCase
 
     context "a post with the same file" do
       should "not raise a duplicate error" do
-        upload_file("#{Rails.root}/test/files/test.jpg", "test.jpg") do |file|
+        upload_file("test/files/test.jpg") do |file|
           assert_nothing_raised do
             @post.replace!(replacement_file: file, replacement_url: "")
           end
@@ -276,7 +263,7 @@ class PostReplacementTest < ActiveSupport::TestCase
       end
 
       should "not queue a deletion or log a comment" do
-        upload_file("#{Rails.root}/test/files/test.jpg", "test.jpg") do |file|
+        upload_file("test/files/test.jpg") do |file|
           assert_no_difference(["@post.comments.count"]) do
             @post.replace!(replacement_file: file, replacement_url: "")
           end

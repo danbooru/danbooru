@@ -1,18 +1,14 @@
 module DownloadTestHelper
   def assert_downloaded(expected_filesize, source)
-    tempfile = Tempfile.new("danbooru-test")
-    download = Downloads::File.new(source, tempfile.path)
-
     assert_nothing_raised(Downloads::File::Error) do
-      download.download!
+      tempfile = Downloads::File.new(source).download!
+      assert_equal(expected_filesize, tempfile.size, "Tested source URL: #{source}")
+      tempfile.close!
     end
-
-    assert_equal(expected_filesize, tempfile.size, "Tested source URL: #{source}")
   end
 
   def assert_rewritten(expected_source, test_source)
-    tempfile = Tempfile.new("danbooru-test")
-    download = Downloads::File.new(test_source, tempfile.path)
+    download = Downloads::File.new(test_source)
 
     rewritten_source, _, _ = download.before_download(test_source, {})
     assert_match(expected_source, rewritten_source, "Tested source URL: #{test_source}")
