@@ -168,8 +168,16 @@ class Post < ApplicationRecord
       "#{file_path_prefix}#{md5}.#{file_ext}"
     end
 
+    def storage_manager
+      Danbooru.config.storage_manager
+    end
+
+    def file(type = :original)
+      storage_manager.open_file(self, type)
+    end
+
     def file_url
-      Danbooru.config.build_file_url(self)
+      storage_manager.file_url(self, :original)
     end
 
     # this is for the 640x320 version
@@ -177,31 +185,11 @@ class Post < ApplicationRecord
     end
 
     def large_file_url
-      if has_large?
-        Danbooru.config.build_large_file_url(self)
-      else
-        file_url
-      end
-    end
-
-    def seo_tag_string
-      if Danbooru.config.enable_seo_post_urls && !CurrentUser.user.disable_tagged_filenames?
-        "__#{seo_tags}__"
-      else
-        nil
-      end
-    end
-
-    def seo_tags
-      @seo_tags ||= humanized_essential_tag_string.gsub(/[^a-z0-9]+/, "_").gsub(/(?:^_+)|(?:_+$)/, "").gsub(/_{2,}/, "_")
+      storage_manager.file_url(self, :large)
     end
 
     def preview_file_url
-      if !has_preview?
-        return "/images/download-preview.png"
-      end
-
-      "/data/preview/#{file_path_prefix}#{md5}.jpg"
+      storage_manager.file_url(self, :preview)
     end
 
     def complete_preview_file_url
@@ -211,17 +199,9 @@ class Post < ApplicationRecord
     def open_graph_image_url
       if is_image?
         if has_large?
-          if Danbooru.config.build_large_file_url(self) =~ /http/
-            large_file_url
-          else
-            "http://#{Danbooru.config.hostname}#{large_file_url}"
-          end
+          large_file_url
         else
-          if Danbooru.config.build_file_url(self) =~ /http/
-            file_url
-          else
-            "http://#{Danbooru.config.hostname}#{file_url}"
-          end
+          file_url
         end
       else
         complete_preview_file_url
