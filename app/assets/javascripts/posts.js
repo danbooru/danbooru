@@ -336,7 +336,11 @@
     } else {
       score = " score:" + $post.data("score");
     }
-    $img.attr("title", $post.attr("data-tags") + " user:" + $post.attr("data-uploader").replace(/_/g, " ") + " rating:" + $post.data("rating") + score);
+    var uploader = " ";
+    if ($post.attr("data-uploader")) {
+      uploader += "user:" + $post.attr("data-uploader").replace(/_/g, " ");
+    }
+    $img.attr("title", $post.attr("data-tags") + uploader + " rating:" + $post.data("rating") + score);
   }
 
   Danbooru.Post.expand_image = function(e) {

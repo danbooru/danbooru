@@ -85,7 +85,6 @@ class PostPresenter < Presenter
       data-has-sound="#{post.has_tag?('video_with_sound|flash_with_sound')}"
       data-tags="#{h(post.tag_string)}"
       data-pools="#{post.pool_string}"
-      data-uploader="#{h(post.uploader_name)}"
       data-approver-id="#{post.approver_id}"
       data-rating="#{post.rating}"
       data-width="#{post.image_width}"
@@ -102,6 +101,12 @@ class PostPresenter < Presenter
       data-normalized-source="#{h(post.normalized_source)}"
       data-is-favorited="#{post.favorited_by?(CurrentUser.user.id)}"
     }
+
+    if CurrentUser.is_moderator?
+      attributes += %{
+        data-uploader="#{h(post.uploader_name)}"
+      }
+    end
 
     if post.visible?
       attributes += %{

@@ -1,6 +1,6 @@
 <ul itemscope itemtype="http://schema.org/ImageObject">
   <li>ID: <%= post.id %></li>
-  <li>Tagger: <%= link_to_user(post.keeper) %></li>
+  <li>Top Tagger: <%= link_to_user(post.keeper) %></li>
   <% if CurrentUser.is_moderator? %>
     <li>Uploader: <%= link_to_user(post.uploader) %></li>
   <% end %>
