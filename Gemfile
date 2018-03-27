@@ -18,7 +18,7 @@ gem "simple_form"
 gem "mechanize"
 gem "whenever", :require => false
 gem "sanitize"
-gem 'rmagick'
+gem 'ruby-vips'
 gem 'net-sftp'
 gem 'term-ansicolor', :require => "term/ansicolor"
 gem 'diff-lcs', :require => "diff/lcs/array"
