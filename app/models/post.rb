@@ -29,7 +29,6 @@ class Post < ApplicationRecord
   before_save :set_tag_counts
   before_save :set_pool_category_pseudo_tags
   before_create :autoban
-  after_save :queue_backup, if: :md5_changed?
   after_save :create_version
   after_save :update_parent_on_save
   after_save :apply_post_metatags
@@ -94,144 +93,76 @@ class Post < ApplicationRecord
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def delete_files(post_id, file_path, large_file_path, preview_file_path, force: false)
-        unless force
-          # XXX should pass in the md5 instead of parsing it.
-          preview_file_path =~ %r!/data/preview/(?:test\.)?([a-z0-9]{32})\.jpg\z!
-          md5 = $1
-
-          if Post.where(md5: md5).exists?
-            raise DeletionError.new("Files still in use; skipping deletion.")
-          end
+      def delete_files(post_id, md5, file_ext, force: false)
+        if Post.where(md5: md5).exists? && !force
+          raise DeletionError.new("Files still in use; skipping deletion.")
         end
 
-        backup_service = Danbooru.config.backup_service
-        backup_service.delete(file_path, type: :original)
-        backup_service.delete(large_file_path, type: :large)
-        backup_service.delete(preview_file_path, type: :preview)
+        Danbooru.config.storage_manager.delete_file(post_id, md5, file_ext, :original)
+        Danbooru.config.storage_manager.delete_file(post_id, md5, file_ext, :large)
+        Danbooru.config.storage_manager.delete_file(post_id, md5, file_ext, :preview)
 
-        # the large file and the preview don't necessarily exist. if so errors will be ignored.
-        FileUtils.rm_f(file_path)
-        FileUtils.rm_f(large_file_path)
-        FileUtils.rm_f(preview_file_path)
-
-        RemoteFileManager.new(file_path).delete
-        RemoteFileManager.new(large_file_path).delete
-        RemoteFileManager.new(preview_file_path).delete
+        Danbooru.config.backup_storage_manager.delete_file(post_id, md5, file_ext, :original)
+        Danbooru.config.backup_storage_manager.delete_file(post_id, md5, file_ext, :large)
+        Danbooru.config.backup_storage_manager.delete_file(post_id, md5, file_ext, :preview)
 
         if Danbooru.config.cloudflare_key
-          md5, ext = File.basename(file_path).split(".")
-          CloudflareService.new.delete(md5, ext)
+          CloudflareService.new.delete(md5, file_ext)
         end
       end
+    end
+
+    def queue_delete_files(grace_period)
+      Post.delay(queue: "default", run_at: Time.now + grace_period).delete_files(id, md5, file_ext)
     end
 
     def delete_files
-      Post.delete_files(id, file_path, large_file_path, preview_file_path, force: true)
+      Post.delete_files(id, md5, file_ext, force: true)
     end
 
-    def distribute_files
-      if Danbooru.config.build_file_url(self) =~ /^http/
-        # this post is archived
-        RemoteFileManager.new(file_path).distribute_to_archive(Danbooru.config.build_file_url(self))
-        RemoteFileManager.new(preview_file_path).distribute if has_preview?
-        RemoteFileManager.new(large_file_path).distribute_to_archive(Danbooru.config.build_large_file_url(self)) if has_large?
-      else
-        RemoteFileManager.new(file_path).distribute
-        RemoteFileManager.new(preview_file_path).distribute if has_preview?
-        RemoteFileManager.new(large_file_path).distribute if has_large?
-      end
+    def distribute_files(file, sample_file, preview_file)
+      storage_manager.store_file(file, self, :original)
+      storage_manager.store_file(sample_file, self, :large) if sample_file.present?
+      storage_manager.store_file(preview_file, self, :preview) if preview_file.present?
+
+      backup_storage_manager.store_file(file, self, :original)
+      backup_storage_manager.store_file(sample_file, self, :large) if sample_file.present?
+      backup_storage_manager.store_file(preview_file, self, :preview) if preview_file.present?
     end
 
-    def file_path_prefix
-      Rails.env == "test" ? "test." : ""
+    def backup_storage_manager
+      Danbooru.config.backup_storage_manager
     end
 
-    def file_path
-      "#{Rails.root}/public/data/#{file_path_prefix}#{md5}.#{file_ext}"
+    def storage_manager
+      Danbooru.config.storage_manager
     end
 
-    def large_file_path
-      if has_large?
-        "#{Rails.root}/public/data/sample/#{file_path_prefix}#{Danbooru.config.large_image_prefix}#{md5}.#{large_file_ext}"
-      else
-        file_path
-      end
-    end
-
-    def large_file_ext
-      if is_ugoira?
-        "webm"
-      else
-        "jpg"
-      end
-    end
-
-    def preview_file_path
-      "#{Rails.root}/public/data/preview/#{file_path_prefix}#{md5}.jpg"
-    end
-
-    def file_name
-      "#{file_path_prefix}#{md5}.#{file_ext}"
+    def file(type = :original)
+      storage_manager.open_file(self, type)
     end
 
     def file_url
-      Danbooru.config.build_file_url(self)
-    end
-
-    # this is for the 640x320 version
-    def cropped_file_url
+      storage_manager.file_url(self, :original)
     end
 
     def large_file_url
-      if has_large?
-        Danbooru.config.build_large_file_url(self)
-      else
-        file_url
-      end
-    end
-
-    def seo_tag_string
-      if Danbooru.config.enable_seo_post_urls && !CurrentUser.user.disable_tagged_filenames?
-        "__#{seo_tags}__"
-      else
-        nil
-      end
-    end
-
-    def seo_tags
-      @seo_tags ||= humanized_essential_tag_string.gsub(/[^a-z0-9]+/, "_").gsub(/(?:^_+)|(?:_+$)/, "").gsub(/_{2,}/, "_")
+      storage_manager.file_url(self, :large)
     end
 
     def preview_file_url
-      if !has_preview?
-        return "/images/download-preview.png"
-      end
-
-      "/data/preview/#{file_path_prefix}#{md5}.jpg"
-    end
-
-    def complete_preview_file_url
-      "http://#{Danbooru.config.hostname}#{preview_file_url}"
+      storage_manager.file_url(self, :preview)
     end
 
     def open_graph_image_url
       if is_image?
         if has_large?
-          if Danbooru.config.build_large_file_url(self) =~ /http/
-            large_file_url
-          else
-            "http://#{Danbooru.config.hostname}#{large_file_url}"
-          end
+          large_file_url
         else
-          if Danbooru.config.build_file_url(self) =~ /http/
-            file_url
-          else
-            "http://#{Danbooru.config.hostname}#{file_url}"
-          end
+          file_url
         end
       else
-        complete_preview_file_url
+        preview_file_url
       end
     end
 
@@ -243,34 +174,8 @@ class Post < ApplicationRecord
       end
     end
 
-    def file_path_for(user)
-      if user.default_image_size == "large" && image_width > Danbooru.config.large_image_width
-        large_file_path
-      else
-        file_path
-      end
-    end
-
     def is_image?
       file_ext =~ /jpg|jpeg|gif|png/i
-    end
-
-    def is_animated_gif?
-      if file_ext =~ /gif/i && File.exists?(file_path)
-        return Magick::Image.ping(file_path).length > 1
-      else
-        return false
-      end
-    end
-    
-    def is_animated_png?
-      if file_ext =~ /png/i && File.exists?(file_path)
-        apng = APNGInspector.new(file_path)
-        apng.inspect!
-        return apng.animated?
-      else
-        return false
-      end
     end
 
     def is_flash?
@@ -294,9 +199,7 @@ class Post < ApplicationRecord
     end
 
     def has_preview?
-      # for video/ugoira we don't want to try and render a preview that
-      # might doesn't exist yet
-      is_image? || ((is_video? || is_ugoira?) && File.exists?(preview_file_path))
+      is_image? || is_video? || is_ugoira?
     end
 
     def has_dimensions?
@@ -304,24 +207,7 @@ class Post < ApplicationRecord
     end
 
     def has_ugoira_webm?
-      created_at < 1.minute.ago || (File.exists?(preview_file_path) && File.size(preview_file_path) > 0)
-    end
-  end
-
-  module BackupMethods
-    extend ActiveSupport::Concern
-
-    def queue_backup
-      Post.delay(queue: "default", priority: -1).backup_file(file_path, id: id, type: :original)
-      Post.delay(queue: "default", priority: -1).backup_file(large_file_path, id: id, type: :large) if has_large?
-      Post.delay(queue: "default", priority: -1).backup_file(preview_file_path, id: id, type: :preview) if has_preview?
-    end
-
-    module ClassMethods
-      def backup_file(file_path, options = {})
-        backup_service = Danbooru.config.backup_service
-        backup_service.backup(file_path, options)
-      end
+      true
     end
   end
 
@@ -765,7 +651,6 @@ class Post < ApplicationRecord
       return tags if !Danbooru.config.enable_dimension_autotagging
 
       tags -= %w(incredibly_absurdres absurdres highres lowres huge_filesize flash webm mp4)
-      tags -= %w(animated_gif animated_png) if new_record?
 
       if has_dimensions?
         if image_width >= 10_000 || image_height >= 10_000
@@ -792,14 +677,6 @@ class Post < ApplicationRecord
 
       if file_size >= 10.megabytes
         tags << "huge_filesize"
-      end
-
-      if is_animated_gif?
-        tags << "animated_gif"
-      end
-      
-      if is_animated_png?
-        tags << "animated_png"
       end
 
       if is_flash?
@@ -1747,8 +1624,8 @@ class Post < ApplicationRecord
     end
 
     def update_iqdb_async
-      if File.exists?(preview_file_path) && Post.iqdb_enabled?
-        Post.iqdb_sqs_service.send_message("update\n#{id}\n#{complete_preview_file_url}")
+      if Post.iqdb_enabled?
+        Post.iqdb_sqs_service.send_message("update\n#{id}\n#{preview_file_url}")
       end
     end
 
@@ -1854,7 +1731,6 @@ class Post < ApplicationRecord
   end
   
   include FileMethods
-  include BackupMethods
   include ImageMethods
   include ApprovalMethods
   include PresenterMethods

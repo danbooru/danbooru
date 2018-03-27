@@ -49,7 +49,7 @@ protected
 
   def create_by_post
     @post = Post.find(params[:post_id])
-    @download = Iqdb::Download.new(@post.complete_preview_file_url)
+    @download = Iqdb::Download.new(@post.preview_file_url)
     @download.find_similar
     @results = @download.matches
   end

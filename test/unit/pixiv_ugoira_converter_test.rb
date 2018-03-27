@@ -3,9 +3,7 @@ require "test_helper"
 class PixivUgoiraConverterTest < ActiveSupport::TestCase
   context "An ugoira converter" do
     setup do
-      @zipped_body = "#{Rails.root}/test/fixtures/ugoira.zip"
-      @write_file = Tempfile.new("converted")
-      @preview_write_file = Tempfile.new("preview")
+      @zipfile = upload_file("test/fixtures/ugoira.zip").tempfile
       @frame_data = [
         {"file" => "000000.jpg", "delay" => 200},
         {"file" => "000001.jpg", "delay" => 200},
@@ -15,16 +13,11 @@ class PixivUgoiraConverterTest < ActiveSupport::TestCase
       ]
     end
 
-    teardown do
-      @write_file.unlink
-      @preview_write_file.unlink
-    end
-
     should "output to webm" do
-      @converter = PixivUgoiraConverter
-      @converter.convert(@zipped_body, @write_file.path, @preview_write_file.path, @frame_data)
-      assert_operator(File.size(@write_file.path), :>, 1_000)
-      assert_operator(File.size(@preview_write_file.path), :>, 0)
+      sample_file = PixivUgoiraConverter.generate_webm(@zipfile, @frame_data)
+      preview_file = PixivUgoiraConverter.generate_preview(@zipfile)
+      assert_operator(sample_file.size, :>, 1_000)
+      assert_operator(preview_file.size, :>, 0)
     end
   end
 end

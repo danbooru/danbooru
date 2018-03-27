@@ -1,0 +1,106 @@
+class StorageManager
+  class Error < StandardError; end
+
+  DEFAULT_BASE_URL = Rails.application.routes.url_helpers.root_url + "data"
+  DEFAULT_BASE_DIR = "#{Rails.root}/public/data"
+
+  attr_reader :base_url, :base_dir, :hierarchical, :tagged_filenames, :large_image_prefix
+
+  def initialize(base_url: DEFAULT_BASE_URL, base_dir: DEFAULT_BASE_DIR, hierarchical: false, tagged_filenames: Danbooru.config.enable_seo_post_urls, large_image_prefix: Danbooru.config.large_image_prefix)
+    @base_url = base_url.chomp("/")
+    @base_dir = base_dir
+    @hierarchical = hierarchical
+    @tagged_filenames = tagged_filenames
+    @large_image_prefix = large_image_prefix
+  end
+
+  # Store the given file at the given path. If a file already exists at that
+  # location it should be overwritten atomically. Either the file is fully
+  # written, or an error is raised and the original file is left unchanged. The
+  # file should never be in a partially written state.
+  def store(io, path)
+    raise NotImplementedError, "store not implemented"
+  end
+
+  # Delete the file at the given path. If the file doesn't exist, no error
+  # should be raised.
+  def delete(path)
+    raise NotImplementedError, "delete not implemented"
+  end
+
+  # Return a readonly copy of the file located at the given path.
+  def open(path)
+    raise NotImplementedError, "open not implemented"
+  end
+
+  def store_file(io, post, type)
+    store(io, file_path(post.md5, post.file_ext, type))
+  end
+
+  def delete_file(post_id, md5, file_ext, type)
+    delete(file_path(md5, file_ext, type))
+  end
+
+  def open_file(post, type)
+    open(file_path(post.md5, post.file_ext, type))
+  end
+
+  def file_url(post, type)
+    subdir = subdir_for(post.md5)
+    file = file_name(post.md5, post.file_ext, type)
+
+    if type == :preview && !post.has_preview?
+      "#{base_url}/images/download-preview.png"
+    elsif type == :preview
+      "#{base_url}/preview/#{subdir}#{file}"
+    elsif type == :large && post.has_large?
+      "#{base_url}/sample/#{subdir}#{seo_tags(post)}#{file}"
+    else
+      "#{base_url}/#{subdir}#{seo_tags(post)}#{file}"
+    end
+  end
+
+  protected
+
+  def file_path(md5, file_ext, type)
+    subdir = subdir_for(md5)
+    file = file_name(md5, file_ext, type)
+
+    case type
+    when :preview
+      "#{base_dir}/preview/#{subdir}#{file}"
+    when :large
+      "#{base_dir}/sample/#{subdir}#{file}"
+    when :original
+      "#{base_dir}/#{subdir}#{file}"
+    end
+  end
+
+  def file_name(md5, file_ext, type)
+    large_file_ext = (file_ext == "zip") ? "webm" : "jpg"
+
+    case type
+    when :preview
+      "#{md5}.jpg"
+    when :large
+      "#{large_image_prefix}#{md5}.#{large_file_ext}"
+    when :original
+      "#{md5}.#{file_ext}"
+    end
+  end
+
+  def subdir_for(md5)
+    if hierarchical
+      "#{md5[0..1]}/#{md5[2..3]}/"
+    else
+      ""
+    end
+  end
+
+  def seo_tags(post, user = CurrentUser.user)
+    return "" if !tagged_filenames || user.disable_tagged_filenames?
+
+    tags = post.humanized_essential_tag_string.gsub(/[^a-z0-9]+/, "_").gsub(/(?:^_+)|(?:_+$)/, "").gsub(/_{2,}/, "_")
+    "__#{tags}__"
+  end
+end

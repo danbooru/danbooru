@@ -5,9 +5,8 @@ module Downloads
     context "a download for a deviant art html page" do
       setup do
         @source = "http://starbitt.deviantart.com/art/09271X-636962118"
-        @tempfile = Tempfile.new("danbooru-test")
-        @download = Downloads::File.new(@source, @tempfile.path)
-        @download.download!
+        @download = Downloads::File.new(@source)
+        @tempfile = @download.download!
       end
 
       should "set the html page as the source" do

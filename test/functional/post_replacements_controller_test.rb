@@ -39,7 +39,7 @@ class PostReplacementsControllerTest < ActionController::TestCase
         assert_response :success
         assert_equal("https://www.google.com/intl/en_ALL/images/logo.gif", @post.source)
         assert_equal("e80d1c59a673f560785784fb1ac10959", @post.md5)
-        assert_equal("e80d1c59a673f560785784fb1ac10959", Digest::MD5.file(@post.file_path).hexdigest)
+        assert_equal("e80d1c59a673f560785784fb1ac10959", Digest::MD5.file(@post.file(:original)).hexdigest)
       end
     end
 

@@ -6,7 +6,7 @@ class UploadsController < ApplicationController
     @upload = Upload.new
     @upload_notice_wiki = WikiPage.titled(Danbooru.config.upload_notice_wiki_page).first
     if params[:url]
-      download = Downloads::File.new(params[:url], ".")
+      download = Downloads::File.new(params[:url])
       @normalized_url, _, _ = download.before_download(params[:url], {})
       @post = find_post_by_url(@normalized_url)
 

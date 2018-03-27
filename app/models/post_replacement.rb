@@ -24,6 +24,8 @@ class PostReplacement < ApplicationRecord
   end
 
   def process!
+    upload = nil
+
     transaction do
       upload = Upload.create!(
         file: replacement_file,
@@ -47,7 +49,7 @@ class PostReplacement < ApplicationRecord
       # md5/file_ext to delete the old files. if saving the post fails,
       # this is rolled back so the job won't run.
       if md5_changed
-        Post.delay(queue: "default", run_at: Time.now + DELETION_GRACE_PERIOD).delete_files(post.id, post.file_path, post.large_file_path, post.preview_file_path)
+        post.queue_delete_files(DELETION_GRACE_PERIOD)
       end
 
       self.file_ext = upload.file_ext
@@ -69,8 +71,6 @@ class PostReplacement < ApplicationRecord
 
       if md5_changed
         post.comments.create!({creator: User.system, body: comment_replacement_message, do_not_bump_post: true}, without_protection: true)
-      else
-        post.queue_backup
       end
 
       save!
@@ -79,7 +79,7 @@ class PostReplacement < ApplicationRecord
 
     # point of no return: these things can't be rolled back, so we do them
     # only after the transaction successfully commits.
-    post.distribute_files
+    upload.distribute_files(post)
     post.update_iqdb_async
   end
 

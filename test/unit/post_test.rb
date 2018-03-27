@@ -35,17 +35,15 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "delete the files" do
-        assert_equal(true, File.exists?(@post.preview_file_path))
-        assert_equal(true, File.exists?(@post.large_file_path))
-        assert_equal(true, File.exists?(@post.file_path))
+        assert_nothing_raised { @post.file(:preview) }
+        assert_nothing_raised { @post.file(:original) }
 
         TestAfterCommit.with_commits(true) do
           @post.expunge!
         end
 
-        assert_equal(false, File.exists?(@post.preview_file_path))
-        assert_equal(false, File.exists?(@post.large_file_path))
-        assert_equal(false, File.exists?(@post.file_path))
+        assert_raise(StandardError) { @post.file(:preview) }
+        assert_raise(StandardError) { @post.file(:original) }
       end
 
       should "remove all favorites" do

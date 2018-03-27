@@ -1,13 +1,9 @@
 class PixivUgoiraConverter
-  def self.convert(source_path, output_path, preview_path, frame_data)
-    folder = Zip::File.new(source_path)
-    write_webm(folder, output_path, frame_data)
-    write_preview(folder, preview_path)
-    RemoteFileManager.new(output_path).distribute
-    RemoteFileManager.new(preview_path).distribute
-  end
+  def self.generate_webm(ugoira_file, frame_data)
+    folder = Zip::File.new(ugoira_file.path)
+    output_file = Tempfile.new(binmode: true)
+    write_path = output_file.path
 
-  def self.write_webm(folder, write_path, frame_data)
     Dir.mktmpdir do |tmpdir|
       FileUtils.mkdir_p("#{tmpdir}/images")
       folder.each_with_index do |file, i|
@@ -64,14 +60,17 @@ class PixivUgoiraConverter
         return
       end
     end
+
+    output_file
   end
 
-  def self.write_preview(folder, path)
-    Dir.mktmpdir do |tmpdir|
-      file = folder.first
-      temp_path = File.join(tmpdir, file.name)
-      file.extract(temp_path)
-      DanbooruImageResizer.resize(temp_path, path, Danbooru.config.small_image_width, Danbooru.config.small_image_width, 85)
-    end
+  def self.generate_preview(ugoira_file)
+    file = Tempfile.new(binmode: true)
+    zipfile = Zip::File.new(ugoira_file.path)
+    zipfile.entries.first.extract(file.path) { true } #  'true' means overwrite the existing tempfile.
+
+    DanbooruImageResizer.resize(file, Danbooru.config.small_image_width, Danbooru.config.small_image_width, 85)
+  ensure
+    file.close!
   end
 end
