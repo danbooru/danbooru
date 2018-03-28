@@ -226,7 +226,17 @@ class Upload < ApplicationRecord
     end
 
     def is_animated_gif?
-      file_ext == "gif" && Magick::Image.ping(file.path).length > 1
+      return false if file_ext != "gif"
+
+      # Check whether the gif has multiple frames by trying to load the second frame.
+      result = Vips::Image.gifload(file.path, page: 1) rescue $ERROR_INFO
+      if result.is_a?(Vips::Image)
+        true
+      elsif result.is_a?(Vips::Error) && result.message.match?(/too few frames in GIF file/)
+        false
+      else
+        raise result
+      end
     end
 
     def is_animated_png?
@@ -245,7 +255,7 @@ class Upload < ApplicationRecord
         preview_file = DanbooruImageResizer.resize(file, Danbooru.config.small_image_width, Danbooru.config.small_image_width, 85)
 
         if image_width > Danbooru.config.large_image_width
-          sample_file = DanbooruImageResizer.resize(file, Danbooru.config.large_image_width, nil, 90)
+          sample_file = DanbooruImageResizer.resize(file, Danbooru.config.large_image_width, image_height, 90)
         end
       end
 

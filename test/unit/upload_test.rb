@@ -201,6 +201,16 @@ class UploadTest < ActiveSupport::TestCase
           @upload = FactoryGirl.build(:upload, file_ext: "png", file: upload_file("test/files/apng/normal_apng.png"))
           assert_equal("animated_png", @upload.automatic_tags)
         end
+
+        should "tag animated gif files" do
+          @upload = FactoryGirl.build(:upload, file_ext: "gif", file: upload_file("test/files/test-animated-86x52.gif"))
+          assert_equal("animated_gif", @upload.automatic_tags)
+        end
+
+        should "not tag static gif files" do
+          @upload = FactoryGirl.build(:upload, file_ext: "gif", file: upload_file("test/files/test-static-32x32.gif"))
+          assert_equal("", @upload.automatic_tags)
+        end
       end
     end
 

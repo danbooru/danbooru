@@ -303,8 +303,9 @@ GEM
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
     retriable (2.1.0)
-    rmagick (2.16.0)
     ruby-prof (0.17.0)
+    ruby-vips (2.0.9)
+      ffi (~> 1.9)
     rubyzip (1.2.1)
     safe_yaml (1.0.4)
     sanitize (4.5.0)
@@ -451,9 +452,9 @@ DEPENDENCIES
   rakismet
   recaptcha
   responders
-  rmagick
   ruby-imagespec!
   ruby-prof
+  ruby-vips
   rubyzip
   sanitize
   sass-rails
