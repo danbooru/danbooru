@@ -56,7 +56,7 @@ class StorageManager
     elsif type == :large && post.has_large?
       "#{base_url}/sample/#{subdir}#{seo_tags(post)}#{file}"
     else
-      "#{base_url}/#{subdir}#{seo_tags(post)}#{file}"
+      "#{base_url}/#{subdir}#{seo_tags(post)}#{post.md5}.#{post.file_ext}"
     end
   end
 

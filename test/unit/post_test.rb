@@ -2653,6 +2653,16 @@ class PostTest < ActiveSupport::TestCase
     end
   end
 
+  context "URLs:" do
+    should "generate the correct urls for animated gifs" do
+      @post = FactoryGirl.build(:post, md5: "deadbeef", file_ext: "gif", tag_string: "animated_gif")
+
+      assert_equal("http://localhost/data/preview/deadbeef.jpg", @post.preview_file_url)
+      assert_equal("http://localhost/data/deadbeef.gif", @post.large_file_url)
+      assert_equal("http://localhost/data/deadbeef.gif", @post.file_url)
+    end
+  end
+
   context "Mass assignment: " do
     should_not allow_mass_assignment_of(:last_noted_at).as(:member)
   end
