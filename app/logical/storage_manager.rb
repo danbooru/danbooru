@@ -1,17 +1,20 @@
 class StorageManager
   class Error < StandardError; end
 
-  DEFAULT_BASE_URL = Rails.application.routes.url_helpers.root_url + "data"
   DEFAULT_BASE_DIR = "#{Rails.root}/public/data"
 
   attr_reader :base_url, :base_dir, :hierarchical, :tagged_filenames, :large_image_prefix
 
-  def initialize(base_url: DEFAULT_BASE_URL, base_dir: DEFAULT_BASE_DIR, hierarchical: false, tagged_filenames: Danbooru.config.enable_seo_post_urls, large_image_prefix: Danbooru.config.large_image_prefix)
+  def initialize(base_url: default_base_url, base_dir: DEFAULT_BASE_DIR, hierarchical: false, tagged_filenames: Danbooru.config.enable_seo_post_urls, large_image_prefix: Danbooru.config.large_image_prefix)
     @base_url = base_url.chomp("/")
     @base_dir = base_dir
     @hierarchical = hierarchical
     @tagged_filenames = tagged_filenames
     @large_image_prefix = large_image_prefix
+  end
+
+  def default_base_url
+    Rails.application.routes.url_helpers.root_url + "data"
   end
 
   # Store the given file at the given path. If a file already exists at that
