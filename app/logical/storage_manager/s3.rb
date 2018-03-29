@@ -37,7 +37,7 @@ class StorageManager::S3 < StorageManager
 
   def open(path)
     file = Tempfile.new(binmode: true)
-    client.get_object(bucket: bucket: key: path, response_target: file)
+    client.get_object(bucket: bucket, key: path, response_target: file)
     file
   end
 end
