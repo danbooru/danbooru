@@ -66,6 +66,18 @@ class Upload < ApplicationRecord
       end
     end
 
+    def validate_dimensions
+      resolution = image_width * image_height
+
+      if resolution > Danbooru.config.max_image_resolution
+        raise "image resolution is too large (resolution: #{(resolution / 1_000_000.0).round(1)} megapixels (#{image_width}x#{image_height}); max: #{Danbooru.config.max_image_resolution / 1_000_000} megapixels)"
+      elsif image_width > Danbooru.config.max_image_width
+        raise "image width is too large (width: #{image_width}; max width: #{Danbooru.config.max_image_width})"
+      elsif image_height > Danbooru.config.max_image_height
+        raise "image height is too large (height: #{image_height}; max height: #{Danbooru.config.max_image_height})"
+      end
+    end
+
     def rating_given
       if rating.present?
         return true
@@ -120,6 +132,7 @@ class Upload < ApplicationRecord
 
         self.tag_string = "#{tag_string} #{automatic_tags}"
         self.image_width, self.image_height = calculate_dimensions
+        validate_dimensions
 
         save
       end

@@ -212,6 +212,15 @@ class UploadTest < ActiveSupport::TestCase
           assert_equal("", @upload.automatic_tags)
         end
       end
+
+      context "that is too large" do
+        should "should fail validation" do
+          Danbooru.config.stubs(:max_image_resolution).returns(31*31)
+          @upload = FactoryGirl.create(:upload, file: upload_file("test/files/test-static-32x32.gif"))
+          @upload.process!
+          assert_match(/image resolution is too large/, @upload.status)
+        end
+      end
     end
 
     should "process completely for a pixiv ugoira" do
