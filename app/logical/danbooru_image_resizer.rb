@@ -6,12 +6,44 @@ module DanbooruImageResizer
   # http://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegsave
   JPEG_OPTIONS = { background: 255, strip: true, interlace: true, optimize_coding: true }
 
+  # XXX libvips-8.4 on Debian doesn't support the `Vips::Image.thumbnail` method.
+  # On 8.4 we have to shell out to vipsthumbnail instead. Remove when Debian supports 8.5.
+  def self.resize(file, width, height, quality = 90)
+    if Vips.at_least_libvips?(8, 5)
+      resize_ruby(file, width, height, quality)
+    else
+      resize_shell(file, width, height, quality)
+    end
+  end
+
   # https://github.com/jcupitt/libvips/wiki/HOWTO----Image-shrinking
   # http://jcupitt.github.io/libvips/API/current/Using-vipsthumbnail.md.html
-  def self.resize(file, width, height, resize_quality = 90)
+  def self.resize_ruby(file, width, height, resize_quality)
     output_file = Tempfile.new
     resized_image = Vips::Image.thumbnail(file.path, width, height: height, **THUMBNAIL_OPTIONS)
     resized_image.jpegsave(output_file.path, Q: resize_quality, **JPEG_OPTIONS)
+
+    output_file
+  end
+
+  def self.resize_shell(file, width, height, quality)
+    output_file = Tempfile.new(["resize", ".jpg"])
+
+    # --size=WxH will upscale if the image is smaller than the target size.
+    # Fix the target size so that it's not bigger than the image.
+    image = Vips::Image.new_from_file(file.path)
+    target_width  = [image.width, width].min
+    target_height = [image.height, height].min
+
+    arguments = [
+      file.path,
+      "--eprofile=#{SRGB_PROFILE}",
+      "--size=#{target_width}x#{target_height}",
+      "--format=#{output_file.path}[Q=#{quality},background=255,strip,interlace,optimize_coding]"
+    ]
+
+    success = system("vipsthumbnail", *arguments)
+    raise RuntimeError, "vipsthumbnail failed (exit status: #{$?.exitstatus})" if !success
 
     output_file
   end
