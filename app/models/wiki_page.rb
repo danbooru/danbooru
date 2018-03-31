@@ -67,7 +67,7 @@ class WikiPage < ApplicationRecord
       q = super
 
       if params[:title].present?
-        q = q.where("title LIKE ? ESCAPE E'\\\\'", params[:title].mb_chars.downcase.tr(" ", "_").to_escaped_for_sql_like)
+        q = q.where("title LIKE ? ESCAPE E'\\\\'", params[:title].mb_chars.downcase.strip.tr(" ", "_").to_escaped_for_sql_like)
       end
 
       if params[:creator_id].present?
