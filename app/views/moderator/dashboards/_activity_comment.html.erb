@@ -11,7 +11,12 @@
   <tbody>
     <% @dashboard.comments.each do |activity| %>
       <tr>
-        <td><%= link_to activity.comment.body, post_path(activity.comment.post_id) %></td>
+        <td>
+          <%= link_to activity.comment.body, post_path(activity.comment.post_id) %>
+          <% if activity.comment.is_deleted? %>
+            <span class="inactive">(deleted)</span>
+          <% end %>
+        </td>
         <td><%= mod_link_to_user(activity.comment.creator, :negative) %></td>
         <td><%= activity.count %></td>
         <td><%= activity.comment.score %></td>
