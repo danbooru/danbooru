@@ -115,6 +115,7 @@
   // If the new description conflicts with the current description, merge them
   // by appending the new description onto the old one.
   Danbooru.ArtistCommentary.merge_commentaries = function(description, commentary) {
+    var post_source = $('#image-container').data().source;
     var normalized_source = $("#image-container").data().normalizedSource;
 
     if ((commentary.original_description && description) &&
@@ -124,7 +125,9 @@
         + "\n\nh6. " + (commentary.original_title || "Untitled")
         + "\n\n" + commentary.original_description
         + "\n\n[tn]\nSource: " + commentary.source + "\n[/tn]";
-    } else  {
+    } else if (commentary.source != post_source) {
+      return commentary.original_description + "\n\n[tn]\nSource: " + commentary.source + "\n[/tn]";
+    } else {
       return commentary.original_description || description;
     }
   };
