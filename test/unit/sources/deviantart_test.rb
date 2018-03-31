@@ -65,7 +65,7 @@ module Sources
           * two
           * three
           
-          Heart  
+          "Heart":[https://e.deviantart.net/emoticons/h/heart.gif]
         EOS
 
         assert_equal(desc, @site.dtext_artist_commentary_desc)

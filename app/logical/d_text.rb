@@ -83,7 +83,16 @@ class DText
         url = element["href"]
         %("#{title}":[#{url}]) if title.present? && url.present?
       when "img"
-        element.attributes["title"] || element.attributes["alt"] || ""
+        alt_text = element.attributes["title"] || element.attributes["alt"] || ""
+        src = element["src"]
+
+        if element.parent.name == "a"
+          alt_text
+        elsif alt_text.present? && src.present?
+          %("#{alt_text}":[#{src}]\n\n)
+        else
+          ""
+        end
       when "comment"
         # ignored
       else

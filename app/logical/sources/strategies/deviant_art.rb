@@ -52,7 +52,7 @@ module Sources
               element["href"] = uri.to_s
             end
           end
-        end
+        end.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
       end
 
     protected
