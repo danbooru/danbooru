@@ -42,6 +42,21 @@ module Sources
 
       def self.to_dtext(text)
         DText.from_html(text) do |element|
+          # Convert embedded thumbnails of journal posts to 'deviantart #123'
+          # links. Strip embedded thumbnails of image posts. Example:
+          # https://sa-dui.deviantart.com/art/Commission-Meinos-Kaen-695905927.
+          if element.name == "a" && element["data-sigil"] == "thumb"
+            element.name = "span"
+
+            # <a href="https://sa-dui.deviantart.com/journal/About-Commissions-223178193" data-sigil="thumb" class="thumb lit" ...>
+            if element["class"].split.include?("lit")
+              deviation_id = element["href"][%r!-(\d+)\z!, 1].to_i
+              element.content = "deviantart ##{deviation_id}"
+            else
+              element.content = ""
+            end
+          end
+
           if element.name == "a" && element["href"].present?
             element["href"] = element["href"].gsub(%r!\Ahttps?://www\.deviantart\.com/users/outgoing\?!i, "")
 
