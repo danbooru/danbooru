@@ -1415,29 +1415,31 @@ class Post < ApplicationRecord
     end
 
     def copy_notes_to(other_post)
-      if id == other_post.id
-        errors.add :base, "Source and destination posts are the same"
-        return false
-      end
-      unless has_notes?
-        errors.add :post, "has no notes"
-        return false
-      end
+      transaction do
+        if id == other_post.id
+          errors.add :base, "Source and destination posts are the same"
+          return false
+        end
+        unless has_notes?
+          errors.add :post, "has no notes"
+          return false
+        end
 
-      notes.active.each do |note|
-        note.copy_to(other_post)
-      end
+        notes.active.each do |note|
+          note.copy_to(other_post)
+        end
 
-      dummy = Note.new
-      if notes.active.length == 1
-        dummy.body = "Copied 1 note from post ##{id}."
-      else
-        dummy.body = "Copied #{notes.active.length} notes from post ##{id}."
+        dummy = Note.new
+        if notes.active.length == 1
+          dummy.body = "Copied 1 note from post ##{id}."
+        else
+          dummy.body = "Copied #{notes.active.length} notes from post ##{id}."
+        end
+        dummy.is_active = false
+        dummy.post_id = other_post.id
+        dummy.x = dummy.y = dummy.width = dummy.height = 0
+        dummy.save
       end
-      dummy.is_active = false
-      dummy.post_id = other_post.id
-      dummy.x = dummy.y = dummy.width = dummy.height = 0
-      dummy.save
     end
   end
 
