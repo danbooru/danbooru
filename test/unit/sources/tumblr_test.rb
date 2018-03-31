@@ -172,7 +172,7 @@ module Sources
       end
 
       should "get the commentary" do
-        assert_equal("test ask", @site.artist_commentary_title)
+        assert_equal("Anonymous asked: test ask", @site.artist_commentary_title)
         assert_match("test answer", @site.artist_commentary_desc)
       end
     end

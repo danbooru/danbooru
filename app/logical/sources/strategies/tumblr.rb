@@ -36,7 +36,7 @@ module Sources::Strategies
       when "text", "link"
         post[:title]
       when "answer"
-        post[:question]
+        "#{post[:asking_name]} asked: #{post[:question]}"
       else
         nil
       end
