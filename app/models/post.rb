@@ -8,6 +8,9 @@ class Post < ApplicationRecord
   class SearchError < Exception ; end
   class DeletionError < Exception ; end
 
+  # Tags to copy when copying notes.
+  NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation]
+
   before_validation :initialize_uploader, :on => :create
   before_validation :merge_old_changes
   before_validation :normalize_tags
@@ -1414,30 +1417,40 @@ class Post < ApplicationRecord
       last_noted_at.present?
     end
 
-    def copy_notes_to(other_post)
-      if id == other_post.id
-        errors.add :base, "Source and destination posts are the same"
-        return false
-      end
-      unless has_notes?
-        errors.add :post, "has no notes"
-        return false
-      end
+    def copy_notes_to(other_post, copy_tags: NOTE_COPY_TAGS)
+      transaction do
+        if id == other_post.id
+          errors.add :base, "Source and destination posts are the same"
+          return false
+        end
+        unless has_notes?
+          errors.add :post, "has no notes"
+          return false
+        end
 
-      notes.active.each do |note|
-        note.copy_to(other_post)
-      end
+        notes.active.each do |note|
+          note.copy_to(other_post)
+        end
 
-      dummy = Note.new
-      if notes.active.length == 1
-        dummy.body = "Copied 1 note from post ##{id}."
-      else
-        dummy.body = "Copied #{notes.active.length} notes from post ##{id}."
+        dummy = Note.new
+        if notes.active.length == 1
+          dummy.body = "Copied 1 note from post ##{id}."
+        else
+          dummy.body = "Copied #{notes.active.length} notes from post ##{id}."
+        end
+        dummy.is_active = false
+        dummy.post_id = other_post.id
+        dummy.x = dummy.y = dummy.width = dummy.height = 0
+        dummy.save
+
+        copy_tags.each do |tag|
+          other_post.remove_tag(tag)
+          other_post.add_tag(tag) if has_tag?(tag)
+        end
+
+        other_post.has_embedded_notes = has_embedded_notes
+        other_post.save
       end
-      dummy.is_active = false
-      dummy.post_id = other_post.id
-      dummy.x = dummy.y = dummy.width = dummy.height = 0
-      dummy.save
     end
   end
 
