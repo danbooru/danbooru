@@ -123,12 +123,12 @@ class TagImplication < TagRelationship
       return if skip_secondary_validations
 
       unless WikiPage.titled(consequent_name).exists?
-        self.errors[:base] = "The #{consequent_name} tag needs a corresponding wiki page"
+        self.errors[:base] << "The #{consequent_name} tag needs a corresponding wiki page"
         return false
       end
 
       unless WikiPage.titled(antecedent_name).exists?
-        self.errors[:base] = "The #{antecedent_name} tag needs a corresponding wiki page"
+        self.errors[:base] << "The #{antecedent_name} tag needs a corresponding wiki page"
         return false
       end
     end
@@ -144,9 +144,9 @@ class TagImplication < TagRelationship
 
       begin
         CurrentUser.scoped(approver) do
-          update({ :status => "processing" }, :as => CurrentUser.role)
+          update(status: "processing")
           update_posts
-          update({ :status => "active" }, :as => CurrentUser.role)
+          update(status: "active")
           update_descendant_names_for_parents
           forum_updater.update(approval_message(approver), "APPROVED") if update_topic
         end
@@ -158,7 +158,7 @@ class TagImplication < TagRelationship
         end
 
         forum_updater.update(failure_message(e), "FAILED") if update_topic
-        update({ :status => "error: #{e}" }, :as => CurrentUser.role)
+        update(status: "error: #{e}")
 
         if Rails.env.production?
           NewRelic::Agent.notice_error(e, :custom_params => {:tag_implication_id => id, :antecedent_name => antecedent_name, :consequent_name => consequent_name})
@@ -180,12 +180,12 @@ class TagImplication < TagRelationship
     end
 
     def approve!(approver: CurrentUser.user, update_topic: true)
-      update({ :status => "queued", :approver_id => approver.id }, :as => approver.role)
+      update(status: "queued", approver_id: approver.id)
       delay(:queue => "default").process!(update_topic: update_topic)
     end
 
     def reject!
-      update({ :status => "deleted", }, :as => CurrentUser.role)
+      update(status: "deleted")
       forum_updater.update(reject_message(CurrentUser.user), "REJECTED")
       destroy
     end
@@ -193,11 +193,11 @@ class TagImplication < TagRelationship
     def create_mod_action
       implication = %Q("tag implication ##{id}":[#{Rails.application.routes.url_helpers.tag_implication_path(self)}]: [[#{antecedent_name}]] -> [[#{consequent_name}]])
 
-      if id_changed?
+      if saved_change_to_id?
         ModAction.log("created #{status} #{implication}",:tag_implication_create)
       else
         # format the changes hash more nicely.
-        change_desc = changes.except(:updated_at).map do |attribute, values|
+        change_desc = saved_changes.except(:updated_at).map do |attribute, values|
           old, new = values[0], values[1]
           if old.nil?
             %Q(set #{attribute} to "#{new}")

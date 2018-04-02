@@ -1,12 +1,12 @@
 class CommentsController < ApplicationController
   respond_to :html, :xml, :json
-  before_filter :member_only, :except => [:index, :search, :show]
-  skip_before_filter :api_check
+  before_action :member_only, :except => [:index, :search, :show]
+  skip_before_action :api_check
 
   def index
-    if params[:group_by] == "comment" || request.format == Mime::ATOM
+    if params[:group_by] == "comment" || request.format == Mime::Type.lookup("application/atom+xml")
       index_by_comment
-    elsif request.format == Mime::JS
+    elsif request.format == Mime::Type.lookup("text/javascript")
       index_for_post
     else
       index_by_post
@@ -23,15 +23,17 @@ class CommentsController < ApplicationController
   def update
     @comment = Comment.find(params[:id])
     check_privilege(@comment)
-    @comment.update(update_params, :as => CurrentUser.role)
+    @comment.update(comment_params(:update))
     respond_with(@comment, :location => post_path(@comment.post_id))
   end
 
   def create
-    @comment = Comment.create(create_params, :as => CurrentUser.role)
+    @comment = Comment.create(comment_params(:create))
     respond_with(@comment) do |format|
       format.html do
-        if @comment.errors.any?
+        if @comment.post.nil?
+          redirect_to comments_path, notice: @comment.errors.full_messages.join("; ")
+        elsif @comment.errors.any?
           redirect_to post_path(@comment.post), :notice => @comment.errors.full_messages.join("; ")
         else
           redirect_to post_path(@comment.post), :notice => "Comment posted"
@@ -88,7 +90,7 @@ private
   end
 
   def index_by_comment
-    @comments = Comment.search(params[:search]).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
+    @comments = Comment.search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@comments) do |format|
       format.atom do
         @comments = @comments.includes(:post, :creator).load
@@ -105,11 +107,12 @@ private
     end
   end
 
-  def create_params
-    params.require(:comment).permit(:post_id, :body, :do_not_bump_post, :is_sticky)
-  end
+  def comment_params(context)
+    permitted_params = %i[body]
+    permitted_params += %i[post_id do_not_bump_post] if context == :create
+    permitted_params += %i[is_deleted] if context == :update
+    permitted_params += %i[is_sticky] if CurrentUser.is_moderator?
 
-  def update_params
-    params.require(:comment).permit(:body, :is_deleted, :is_sticky)
+    params.require(:comment).permit(permitted_params)
   end
 end

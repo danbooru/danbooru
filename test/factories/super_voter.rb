@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory(:super_voter) do
   end
 end

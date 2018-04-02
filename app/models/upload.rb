@@ -8,17 +8,19 @@ class Upload < ApplicationRecord
     :artist_commentary_desc, :include_artist_commentary,
     :referer_url, :downloaded_source, :replaced_post
   belongs_to :uploader, :class_name => "User"
-  belongs_to :post
-  before_validation :initialize_uploader, :on => :create
+
+  belongs_to :post, optional: true
+
+  before_validation :initialize_attributes
   validate :uploader_is_not_limited, :on => :create
   validate :file_or_source_is_present, :on => :create
   validate :rating_given
-  attr_accessible :file, :image_width, :image_height, :file_ext, :md5, 
-    :file_size, :as_pending, :source, :rating,
-    :tag_string, :status, :backtrace, :post_id, :md5_confirmation, 
-    :parent_id, :server, :artist_commentary_title,
-    :artist_commentary_desc, :include_artist_commentary,
-    :referer_url, :replaced_post
+
+  def initialize_attributes
+    self.uploader_id = CurrentUser.user.id
+    self.uploader_ip_addr = CurrentUser.ip_addr
+    self.server = Danbooru.config.server_host
+  end
 
   module ValidationMethods
     def uploader_is_not_limited
@@ -117,7 +119,7 @@ class Upload < ApplicationRecord
         self.source = source.to_s.strip
         if is_downloadable?
           self.downloaded_source, self.source, self.file = download_from_source(source, referer_url)
-        else
+        elsif self.file.respond_to?(:tempfile)
           self.file = self.file.tempfile
         end
 
@@ -245,7 +247,7 @@ class Upload < ApplicationRecord
       result = Vips::Image.gifload(file.path, page: 1) rescue $ERROR_INFO
       if result.is_a?(Vips::Image)
         true
-      elsif result.is_a?(Vips::Error) && result.message.match?(/too few frames in GIF file/)
+      elsif result.is_a?(Vips::Error) && result.message =~ /too few frames in GIF file/
         false
       else
         raise result
@@ -337,7 +339,7 @@ class Upload < ApplicationRecord
       source =~ /^https?:\/\// && file.blank?
     end
 
-    def download_from_source(source, referer_url)
+    def download_from_source(source, referer_url = nil)
       download = Downloads::File.new(source, referer_url: referer_url)
       file = download.download!
       ugoira_service.load(download.data)
@@ -369,11 +371,6 @@ class Upload < ApplicationRecord
   end
 
   module UploaderMethods
-    def initialize_uploader
-      self.uploader_id = CurrentUser.user.id
-      self.uploader_ip_addr = CurrentUser.ip_addr
-    end
-
     def uploader_name
       User.id_to_name(uploader_id)
     end

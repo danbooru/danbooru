@@ -1,4 +1,4 @@
-class AddMetadataToPostReplacements < ActiveRecord::Migration
+class AddMetadataToPostReplacements < ActiveRecord::Migration[4.2]
   def change
     PostReplacement.without_timeout do
       add_column :post_replacements, :file_ext_was, :string

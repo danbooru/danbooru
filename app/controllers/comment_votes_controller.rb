@@ -1,7 +1,7 @@
 class CommentVotesController < ApplicationController
   respond_to :js, :json, :xml
-  before_filter :member_only
-  skip_before_filter :api_check
+  before_action :member_only
+  skip_before_action :api_check
 
   def create
     @comment = Comment.find(params[:comment_id])

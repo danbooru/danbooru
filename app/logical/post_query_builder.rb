@@ -291,13 +291,13 @@ class PostQueryBuilder
 
     if q[:note_updater_ids]
       q[:note_updater_ids].each do |note_updater_id|
-        relation = relation.where("posts.id IN (?)", NoteVersion.unscoped.where("updater_id = ?", note_updater_id).select("post_id").uniq)
+        relation = relation.where("posts.id IN (?)", NoteVersion.unscoped.where("updater_id = ?", note_updater_id).select("post_id").distinct)
       end
     end
 
     if q[:artcomm_ids]
       q[:artcomm_ids].each do |artcomm_id|
-        relation = relation.where("posts.id IN (?)", ArtistCommentaryVersion.unscoped.where("updater_id = ?", artcomm_id).select("post_id").uniq)
+        relation = relation.where("posts.id IN (?)", ArtistCommentaryVersion.unscoped.where("updater_id = ?", artcomm_id).select("post_id").distinct)
       end
     end
 

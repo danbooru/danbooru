@@ -5,13 +5,13 @@ module PostSets
   class PostTest < ActiveSupport::TestCase
     context "In all cases" do
       setup do
-        @user = FactoryGirl.create(:user)
+        @user = FactoryBot.create(:user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
 
-        @post_1 = FactoryGirl.create(:post, :tag_string => "a")
-        @post_2 = FactoryGirl.create(:post, :tag_string => "b")
-        @post_3 = FactoryGirl.create(:post, :tag_string => "c")
+        @post_1 = FactoryBot.create(:post, :tag_string => "a")
+        @post_2 = FactoryBot.create(:post, :tag_string => "b")
+        @post_3 = FactoryBot.create(:post, :tag_string => "c")
       end
 
       teardown do
@@ -32,8 +32,8 @@ module PostSets
 
       context "a set for the 'a' tag query" do
         setup do
-          @post_4 = FactoryGirl.create(:post, :tag_string => "a")
-          @post_5 = FactoryGirl.create(:post, :tag_string => "a")
+          @post_4 = FactoryBot.create(:post, :tag_string => "a")
+          @post_5 = FactoryBot.create(:post, :tag_string => "a")
         end
 
         context "with no page" do
@@ -107,7 +107,7 @@ module PostSets
 
         context "for a gold user" do
           setup do
-            CurrentUser.user = FactoryGirl.create(:gold_user)
+            CurrentUser.user = FactoryBot.create(:gold_user)
           end
 
           should "pass" do
@@ -141,7 +141,7 @@ module PostSets
 
         context "that has a matching wiki page" do
           setup do
-            @wiki_page = FactoryGirl.create(:wiki_page, :title => "a")
+            @wiki_page = FactoryBot.create(:wiki_page, :title => "a")
           end
 
           should "find the wiki page" do
@@ -152,7 +152,7 @@ module PostSets
 
         context "that has a matching artist" do
           setup do
-            @artist = FactoryGirl.create(:artist, :name => "a")
+            @artist = FactoryBot.create(:artist, :name => "a")
           end
 
           should "find the artist" do

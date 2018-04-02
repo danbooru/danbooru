@@ -2,25 +2,25 @@ class Artist < ApplicationRecord
   extend Memoist
   class RevertError < Exception ; end
 
-  before_create :initialize_creator
+  attribute :url_string, :string, default: ""
   before_validation :normalize_name
   after_save :create_version
   after_save :categorize_tag
   after_save :update_wiki
+  after_save :save_urls
   validates_uniqueness_of :name
+  validates_associated :urls
   validates :name, tag_name: true
   validate :validate_wiki, :on => :create
   after_validation :merge_validation_errors
-  belongs_to :creator, :class_name => "User"
+  belongs_to_creator
   has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
   has_many :urls, :dependent => :destroy, :class_name => "ArtistUrl"
   has_many :versions, lambda {order("artist_versions.id ASC")}, :class_name => "ArtistVersion"
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :tag_alias, :foreign_key => "antecedent_name", :primary_key => "name"
   has_one :tag, :foreign_key => "name", :primary_key => "name"
-  attr_accessible :body, :notes, :name, :url_string, :other_names, :other_names_comma, :group_name, :notes, :as => [:member, :gold, :builder, :platinum, :moderator, :default, :admin]
-  attr_accessible :is_active, :as => [:builder, :moderator, :default, :admin]
-  attr_accessible :is_banned, :as => :admin
+  attribute :notes, :string
 
   scope :active, lambda { where(is_active: true) }
   scope :deleted, lambda { where(is_active: false) }
@@ -178,20 +178,10 @@ class Artist < ApplicationRecord
       urls.map(&:url)
     end
 
-    def url_string=(string)
-      @url_string_was = url_string
-
-      self.urls = string.scan(/[^[:space:]]+/).uniq.map do |url|
-        self.urls.find_or_initialize_by(url: url)
+    def save_urls
+      self.urls = url_string.scan(/[^[:space:]]+/).uniq.map do |url|
+        self.urls.find_or_create_by(url: url)
       end
-    end
-
-    def url_string
-      url_array.join("\n")
-    end
-
-    def url_string_changed?
-      @url_string_was != url_string
     end
 
     def map_domain(x)
@@ -258,7 +248,7 @@ class Artist < ApplicationRecord
 
   module VersionMethods
     def create_version(force=false)
-      if name_changed? || url_string_changed? || is_active_changed? || is_banned_changed? || other_names_changed? || group_name_changed? || notes_changed? || force
+      if saved_change_to_name? || saved_change_to_url_string? || saved_change_to_is_active? || saved_change_to_is_banned? || saved_change_to_other_names? || saved_change_to_group_name? || saved_change_to_notes? || force
         if merge_version?
           merge_version
         else
@@ -271,7 +261,7 @@ class Artist < ApplicationRecord
       ArtistVersion.create(
         :artist_id => id,
         :name => name,
-        :updater_id => CurrentUser.user.id,
+        :updater_id => CurrentUser.id,
         :updater_ip_addr => CurrentUser.ip_addr,
         :url_string => url_string,
         :is_active => is_active,
@@ -369,9 +359,9 @@ class Artist < ApplicationRecord
     end
 
     def update_wiki
-      if persisted? && name_changed? && name_was.present? && WikiPage.titled(name_was).exists?
+      if persisted? && saved_change_to_name? && attribute_before_last_save("name").present? && WikiPage.titled(attribute_before_last_save("name")).exists?
         # we're renaming the artist, so rename the corresponding wiki page
-        old_page = WikiPage.titled(name_was).first
+        old_page = WikiPage.titled(name_before_last_save).first
 
         if wiki_page.present?
           # a wiki page with the new name already exists, so update the content
@@ -383,7 +373,7 @@ class Artist < ApplicationRecord
       elsif wiki_page.nil?
         # if there are any notes, we need to create a new wiki page
         if @notes.present?
-          create_wiki_page(body: @notes, title: name)
+          wp = create_wiki_page(body: @notes, title: name)
         end
       elsif (!@notes.nil? && (wiki_page.body != @notes)) || wiki_page.title != name
         # if anything changed, we need to update the wiki page
@@ -415,7 +405,7 @@ class Artist < ApplicationRecord
     end
 
     def categorize_tag
-      if new_record? || name_changed?
+      if new_record? || saved_change_to_name?
         Tag.find_or_create_by_name("artist:#{name}")
       end
     end
@@ -664,10 +654,6 @@ class Artist < ApplicationRecord
     else
       "Deleted"
     end
-  end
-
-  def initialize_creator
-    self.creator_id = CurrentUser.user.id
   end
 
   def deletable_by?(user)

@@ -8,12 +8,6 @@ class TagAlias < TagRelationship
   validate :antecedent_and_consequent_are_different
   validate :consequent_has_wiki_page, :on => :create
   validate :mininum_antecedent_count, :on => :create
-  belongs_to :creator, :class_name => "User"
-  belongs_to :approver, :class_name => "User"
-  belongs_to :forum_topic
-  belongs_to :forum_post
-  attr_accessible :antecedent_name, :consequent_name, :forum_topic_id, :skip_secondary_validations
-  attr_accessible :status, :approver_id, :as => [:admin]
 
   module CacheMethods
     extend ActiveSupport::Concern
@@ -38,7 +32,7 @@ class TagAlias < TagRelationship
   module ApprovalMethods
     def approve!(update_topic: true, approver: CurrentUser.user)
       CurrentUser.scoped(approver) do
-        update({ :status => "queued", :approver_id => approver.id }, :as => CurrentUser.role)
+        update(status: "queued", approver_id: approver.id)
         delay(:queue => "default").process!(update_topic: update_topic)
       end
     end
@@ -80,7 +74,7 @@ class TagAlias < TagRelationship
 
     begin
       CurrentUser.scoped(approver) do
-        update({ :status => "processing" }, :as => CurrentUser.role)
+        update(status: "processing")
         move_aliases_and_implications
         move_saved_searches
         clear_all_cache
@@ -88,7 +82,7 @@ class TagAlias < TagRelationship
         update_posts
         forum_updater.update(approval_message(approver), "APPROVED") if update_topic
         rename_wiki_and_artist
-        update({ :status => "active", :post_count => consequent_tag.post_count }, :as => CurrentUser.role)
+        update(status: "active", post_count: consequent_tag.post_count)
       end
     rescue Exception => e
       if tries < 5
@@ -99,7 +93,7 @@ class TagAlias < TagRelationship
 
       CurrentUser.scoped(approver) do
         forum_updater.update(failure_message(e), "FAILED") if update_topic
-        update({ :status => "error: #{e}" }, :as => CurrentUser.role)
+        update(status: "error: #{e}")
       end
 
       if Rails.env.production?
@@ -220,7 +214,7 @@ class TagAlias < TagRelationship
   end
 
   def reject!
-    update({ :status => "deleted" }, :as => CurrentUser.role)
+    update(status: "deleted")
     clear_all_cache
     forum_updater.update(reject_message(CurrentUser.user), "REJECTED")
     destroy
@@ -230,7 +224,7 @@ class TagAlias < TagRelationship
     return if skip_secondary_validations
 
     unless WikiPage.titled(consequent_name).exists?
-      self.errors[:base] = "The #{consequent_name} tag needs a corresponding wiki page"
+      self.errors[:base] << "The #{consequent_name} tag needs a corresponding wiki page"
       return false
     end
   end
@@ -239,7 +233,7 @@ class TagAlias < TagRelationship
     return if skip_secondary_validations
 
     unless Post.fast_count(antecedent_name) >= 50
-      self.errors[:base] = "The #{antecedent_name} tag must have at least 50 posts for an alias to be created"
+      self.errors[:base] << "The #{antecedent_name} tag must have at least 50 posts for an alias to be created"
     end
   end
 
@@ -252,11 +246,11 @@ class TagAlias < TagRelationship
   def create_mod_action
     alias_desc = %Q("tag alias ##{id}":[#{Rails.application.routes.url_helpers.tag_alias_path(self)}]: [[#{antecedent_name}]] -> [[#{consequent_name}]])
 
-    if id_changed?
+    if saved_change_to_id?
       ModAction.log("created #{status} #{alias_desc}",:tag_alias_create)
     else
       # format the changes hash more nicely.
-      change_desc = changes.except(:updated_at).map do |attribute, values|
+      change_desc = saved_changes.except(:updated_at).map do |attribute, values|
         old, new = values[0], values[1]
         if old.nil?
           %Q(set #{attribute} to "#{new}")

@@ -3,7 +3,7 @@ require 'test_helper'
 class ApiKeyTest < ActiveSupport::TestCase
   context "in all cases a user" do
     setup do
-      @user = FactoryGirl.create(:gold_user, :name => "abcdef")
+      @user = FactoryBot.create(:gold_user, :name => "abcdef")
       @api_key = ApiKey.generate!(@user)
     end
 

@@ -16,7 +16,7 @@
     </thead>
     <tbody>
       <% @note_versions.each do |note_version| %>
-        <tr>
+        <tr id="note-version-<%= note_version.id%>">
           <td></td>
           <td>
             <%= link_to note_version.post_id, post_path(note_version.post_id) %>

@@ -1,23 +1,19 @@
 require 'test_helper'
 
-class ArtistCommentariesControllerTest < ActionController::TestCase
+class ArtistCommentariesControllerTest < ActionDispatch::IntegrationTest
   context "The artist commentaries controller" do
     setup do
-      @user = FactoryGirl.create(:user)
-      CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
+      @user = create(:user)
 
-      @commentary1 = FactoryGirl.create(:artist_commentary)
-      @commentary2 = FactoryGirl.create(:artist_commentary)
-    end
-
-    teardown do
-      CurrentUser.user = nil
+      as_user do
+        @commentary1 = create(:artist_commentary)
+        @commentary2 = create(:artist_commentary)
+      end
     end
 
     context "index action" do
       should "render" do
-        get :index
+        get artist_commentaries_path
         assert_response :success
       end
 
@@ -32,17 +28,17 @@ class ArtistCommentariesControllerTest < ActionController::TestCase
           }
         }
 
-        get :index, params
+        get artist_commentaries_path(params)
         assert_response :success
       end
     end
 
     context "show action" do
       should "render" do
-        get :show, { id: @commentary1.id }
+        get artist_commentary_path(@commentary1.id)
         assert_redirected_to(@commentary1.post)
 
-        get :show, { post_id: @commentary1.post_id }
+        get artist_commentary_path(post_id: @commentary1.post_id)
         assert_redirected_to(@commentary1.post)
       end
     end
@@ -52,12 +48,15 @@ class ArtistCommentariesControllerTest < ActionController::TestCase
         params = {
           artist_commentary: {
             original_title: "foo",
-            post_id: FactoryGirl.create(:post).id,
-          }
+            post_id: FactoryBot.create(:post).id,
+          },
+          format: "js"
         }
 
-        post :create_or_update, params, { user_id: @user.id }
-        assert_redirected_to(ArtistCommentary.find_by_post_id(params[:artist_commentary][:post_id]))
+        assert_difference("ArtistCommentary.count", 1) do
+          put_auth create_or_update_artist_commentaries_path(params), @user, as: :js
+        end
+        assert_response :success
       end
 
       should "render for update" do
@@ -65,11 +64,13 @@ class ArtistCommentariesControllerTest < ActionController::TestCase
           artist_commentary: {
             post_id: @commentary1.post_id,
             original_title: "foo",
-          }
+          },
+          format: "js"
         }
 
-        post :create_or_update, params, { user_id: @user.id }
-        assert_redirected_to(@commentary1)
+        put_auth create_or_update_artist_commentaries_path(params), @user
+        @commentary1.reload
+        assert_response :success
         assert_equal("foo", @commentary1.reload.original_title)
       end
     end
@@ -78,22 +79,20 @@ class ArtistCommentariesControllerTest < ActionController::TestCase
       should "work" do
         original_title = @commentary1.original_title
         @commentary1.update(original_title: "foo")
-
-        post :revert, { :id => @commentary1.post_id, :version_id => @commentary1.versions(true).first.id }, {:user_id => @user.id}
-        assert_redirected_to(@commentary1)
+        @commentary1.reload
+        put_auth revert_artist_commentary_path(@commentary1.post_id, version_id: @commentary1.versions.first.id, format: "js"), @user
+        assert_response :success
         assert_equal(original_title, @commentary1.reload.original_title)
       end
 
       should "return 404 when trying to revert a nonexistent commentary" do
-        post :revert, { :id => -1, :version_id => -1 }, {:user_id => @user.id}
-
+        put_auth revert_artist_commentary_path(-1, version_id: -1, format: "js"), @user
         assert_response 404
       end
 
       should "not allow reverting to a previous version of another artist commentary" do
-        post :revert, { :id => @commentary1.post_id, :version_id => @commentary2.versions(true).first.id }, {:user_id => @user.id}
+        put_auth revert_artist_commentary_path(@commentary1.post_id, version_id: @commentary2.versions.first.id, format: "js"), @user
         @commentary1.reload
-
         assert_not_equal(@commentary1.original_title, @commentary2.original_title)
         assert_response :missing
       end

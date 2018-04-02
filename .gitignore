@@ -24,3 +24,4 @@ danbooru.sublime-project
 danbooru.sublime-workspace
 script/scratch.*
 test/fixtures/vcr_cassettes
+.gitconfig

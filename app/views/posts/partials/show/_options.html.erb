@@ -42,7 +42,7 @@
         <% if post.is_flagged? || post.is_pending? %>
           <li><%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :remote => true, :method => :post, :id => "approve", :data => { :confirm => "Are you sure you want to approve this post?" } %></li>
         <% else %>
-          <li><%= link_to "Hide from queue", moderator_post_disapproval_path(:post_id => post.id), :remote => true, :method => :post, :id => "disapprove" %></li>
+          <li><%= link_to "Hide from queue", moderator_post_disapproval_path(post_disapproval: { post_id: post.id, reason: "disinterest" }), remote: true, method: :post, id: "disapprove" %></li>
         <% end %>
 
         <% if post.is_banned? %>

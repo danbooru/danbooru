@@ -1,10 +1,8 @@
 class UserFeedback < ApplicationRecord
   self.table_name = "user_feedback"
   belongs_to :user
-  belongs_to :creator, :class_name => "User"
-  before_validation :initialize_creator, :on => :create
-  attr_accessor :disable_dmail_notification
-  attr_accessible :body, :user_id, :category, :user_name, :disable_dmail_notification
+  belongs_to_creator
+  attribute :disable_dmail_notification, :boolean
   validates_presence_of :user, :creator, :body, :category
   validates_inclusion_of :category, :in => %w(positive negative neutral)
   validate :creator_is_gold
@@ -76,16 +74,8 @@ class UserFeedback < ApplicationRecord
 
   extend SearchMethods
 
-  def initialize_creator
-    self.creator_id ||= CurrentUser.id
-  end
-
   def user_name
     User.id_to_name(user_id)
-  end
-
-  def creator_name
-    User.id_to_name(creator_id)
   end
 
   def user_name=(name)

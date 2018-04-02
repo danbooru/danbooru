@@ -4,11 +4,11 @@ module Moderator
   class IpAddrSearchTest < ActiveSupport::TestCase
     context "an ip addr search" do
       setup do
-        @user = FactoryGirl.create(:user)
+        @user = FactoryBot.create(:user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
         Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
-        @comment = FactoryGirl.create(:comment)
+        @comment = FactoryBot.create(:comment)
         PoolArchive.stubs(:enabled?).returns(false)
         PostArchive.stubs(:enabled?).returns(false)
       end
@@ -20,7 +20,7 @@ module Moderator
 
       should "find by ip addr" do
         @search = IpAddrSearch.new(:ip_addr => "127.0.0.1")
-        assert_equal({@user => 1}, @search.execute)
+        assert_equal({@user => 1, @comment.post.uploader => 1}, @search.execute)
       end
 
       should "find by user id" do

@@ -1,10 +1,10 @@
 class PostVersionsController < ApplicationController
-  before_filter :member_only
-  before_filter :check_availabililty
+  before_action :member_only
+  before_action :check_availabililty
   respond_to :html, :xml, :json
 
   def index
-    @post_versions = PostArchive.includes(:updater, post: [:versions]).search(params[:search]).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
+    @post_versions = PostArchive.includes(:updater, post: [:versions]).search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@post_versions) do |format|
       format.xml do
         render :xml => @post_versions.to_xml(:root => "post-versions")

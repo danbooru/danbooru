@@ -14,6 +14,10 @@ class CurrentUser
     end
   end
 
+  def self.as(user, &block)
+    scoped(user, &block)
+  end
+
   def self.as_admin(&block)
     if block_given?
       scoped(User.admins.first, "127.0.0.1", &block)
@@ -83,10 +87,6 @@ class CurrentUser
   end
 
   def self.method_missing(method, *params, &block)
-    if user.respond_to?(method)
-      user.__send__(method, *params, &block)
-    else
-      super
-    end
+    user.__send__(method, *params, &block)
   end
 end

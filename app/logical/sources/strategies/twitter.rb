@@ -69,7 +69,7 @@ module Sources::Strategies
     # https://twitter.com/motty08111213/status/943446161586733056
     def self.status_id_from_url(url)
       if url =~ %r{\Ahttps?://(?:mobile\.)?twitter\.com/(?:i/web|\w+)/status/(\d+)}i
-        $1.to_i
+        $1
       else
         nil
       end

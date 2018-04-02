@@ -1,48 +1,50 @@
 require 'test_helper'
 
-class PoolVersionsControllerTest < ActionController::TestCase
+class PoolVersionsControllerTest < ActionDispatch::IntegrationTest
   context "The pool versions controller" do
     setup do
       mock_pool_archive_service!
       start_pool_archive_transaction
-      @user = FactoryGirl.create(:user)
-      CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
+      @user = create(:user)
     end
 
     teardown do
       rollback_pool_archive_transaction
-      CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
     end
 
     context "index action" do
       setup do
-        @pool = FactoryGirl.create(:pool)
-        @user_2 = FactoryGirl.create(:user)
-        @user_3 = FactoryGirl.create(:user)
+        as_user do
+          @pool = create(:pool)
+        end
+        @user_2 = create(:user)
+        @user_3 = create(:user)
 
         CurrentUser.scoped(@user_2, "1.2.3.4") do
-          @pool.update_attributes(:post_ids => "1 2")
+          @pool.update(:post_ids => "1 2")
         end
 
         CurrentUser.scoped(@user_3, "5.6.7.8") do
-          @pool.update_attributes(:post_ids => "1 2 3 4")
+          @pool.update(:post_ids => "1 2 3 4")
         end
+
+        @versions = @pool.versions
       end
 
       should "list all versions" do
-        get :index
+        get pool_versions_path
         assert_response :success
-        assert_not_nil(assigns(:pool_versions))
-        assert_equal(3, assigns(:pool_versions).size)
+        assert_select "#pool-version-#{@versions[0].id}"
+        assert_select "#pool-version-#{@versions[1].id}"
+        assert_select "#pool-version-#{@versions[2].id}"
       end
 
       should "list all versions that match the search criteria" do
-        get :index, {:search => {:updater_id => @user_2.id}}
+        get pool_versions_path, params: {:search => {:updater_id => @user_2.id}}
         assert_response :success
-        assert_not_nil(assigns(:pool_versions))
-        assert_equal(1, assigns(:pool_versions).size)
+        assert_select "#pool-version-#{@versions[0].id}", false
+        assert_select "#pool-version-#{@versions[1].id}"
+        assert_select "#pool-version-#{@versions[2].id}", false
       end
     end
   end

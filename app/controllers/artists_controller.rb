@@ -1,12 +1,12 @@
 class ArtistsController < ApplicationController
   respond_to :html, :xml, :json
-  before_filter :member_only, :except => [:index, :show, :show_or_new, :banned]
-  before_filter :builder_only, :only => [:destroy]
-  before_filter :admin_only, :only => [:ban, :unban]
-  before_filter :load_artist, :only => [:ban, :unban, :show, :edit, :update, :destroy, :undelete]
+  before_action :member_only, :except => [:index, :show, :show_or_new, :banned]
+  before_action :builder_only, :only => [:destroy]
+  before_action :admin_only, :only => [:ban, :unban]
+  before_action :load_artist, :only => [:ban, :unban, :show, :edit, :update, :destroy, :undelete]
 
   def new
-    @artist = Artist.new_with_defaults(params)
+    @artist = Artist.new_with_defaults(artist_params)
     respond_with(@artist)
   end
 
@@ -37,7 +37,6 @@ class ArtistsController < ApplicationController
   end
 
   def index
-    search_params = params[:search].present? ? params[:search] : params
     @artists = Artist.includes(:urls).search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@artists) do |format|
       format.xml do
@@ -56,12 +55,12 @@ class ArtistsController < ApplicationController
   end
 
   def create
-    @artist = Artist.create(params[:artist], :as => CurrentUser.role)
+    @artist = Artist.create(artist_params)
     respond_with(@artist)
   end
 
   def update
-    @artist.update(params[:artist], :as => CurrentUser.role)
+    @artist.update(artist_params)
     flash[:notice] = @artist.valid? ? "Artist updated" : @artist.errors.full_messages.join("; ")
     respond_with(@artist)
   end
@@ -117,5 +116,18 @@ private
 
   def load_artist
     @artist = Artist.find(params[:id])
+  end
+
+  def search_params
+    sp = params.fetch(:search, {})
+    sp[:name] = params[:name] if params[:name]
+    sp.permit!
+  end
+
+  def artist_params
+    permitted_params = %i[name other_names other_names_comma group_name url_string notes]
+    permitted_params << :is_active if CurrentUser.is_builder?
+
+    params.fetch(:artist, {}).permit(permitted_params)
   end
 end

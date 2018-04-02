@@ -3,7 +3,6 @@ class UserPasswordResetNonce < ApplicationRecord
   validate :validate_existence_of_email
   before_validation :initialize_key, :on => :create
   after_create :deliver_notice
-  attr_accessible :key, :nonce, :email
 
   def self.prune!
     destroy_all(["created_at < ?", 1.week.ago])

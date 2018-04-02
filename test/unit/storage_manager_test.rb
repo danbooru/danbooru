@@ -46,7 +46,7 @@ class StorageManagerTest < ActiveSupport::TestCase
 
     context "#store_file and #delete_file methods" do
       setup do
-        @post = FactoryGirl.create(:post, file_ext: "png")
+        @post = FactoryBot.create(:post, file_ext: "png")
 
         @storage_manager.store_file(StringIO.new("data"), @post, :preview)
         @storage_manager.store_file(StringIO.new("data"), @post, :large)
@@ -76,7 +76,7 @@ class StorageManagerTest < ActiveSupport::TestCase
 
     context "#file_url method" do
       should "return the correct urls" do
-        @post = FactoryGirl.create(:post, file_ext: "png")
+        @post = FactoryBot.create(:post, file_ext: "png")
         @storage_manager.stubs(:tagged_filenames).returns(false)
 
         assert_equal("/data/#{@post.md5}.png", @storage_manager.file_url(@post, :original))
@@ -88,8 +88,8 @@ class StorageManagerTest < ActiveSupport::TestCase
 
   context "StorageManager::Hybrid" do
     setup do
-      @post1 = FactoryGirl.build(:post, id: 1, file_ext: "png")
-      @post2 = FactoryGirl.build(:post, id: 2, file_ext: "png")
+      @post1 = FactoryBot.build(:post, id: 1, file_ext: "png")
+      @post2 = FactoryBot.build(:post, id: 2, file_ext: "png")
 
       @storage_manager = StorageManager::Hybrid.new do |id, md5, file_ext, type|
         if id.odd?

@@ -3,7 +3,7 @@ require 'test_helper'
 class SavedSearchTest < ActiveSupport::TestCase
   def setup
     super
-    @user = FactoryGirl.create(:user)
+    @user = FactoryBot.create(:user)
     CurrentUser.user = @user
     CurrentUser.ip_addr = "127.0.0.1"
     mock_saved_search_service!
@@ -17,8 +17,8 @@ class SavedSearchTest < ActiveSupport::TestCase
 
   context ".labels_for" do
     setup do
-      FactoryGirl.create(:saved_search, user: @user, label_string: "blah", query: "blah")
-      FactoryGirl.create(:saved_search, user: @user, label_string: "zah", query: "blah")
+      FactoryBot.create(:saved_search, user: @user, label_string: "blah", query: "blah")
+      FactoryBot.create(:saved_search, user: @user, label_string: "zah", query: "blah")
     end
 
     should "fetch the labels used by a user" do
@@ -27,16 +27,16 @@ class SavedSearchTest < ActiveSupport::TestCase
 
     should "expire when a search is updated" do
       Cache.expects(:delete).once
-      FactoryGirl.create(:saved_search, user: @user, query: "blah")
+      FactoryBot.create(:saved_search, user: @user, query: "blah")
     end
   end
 
   context ".queries_for" do
     setup do
-      FactoryGirl.create(:tag_alias, antecedent_name: "bbb", consequent_name: "ccc", creator: @user)
-      FactoryGirl.create(:saved_search, user: @user, label_string: "blah", query: "aaa")
-      FactoryGirl.create(:saved_search, user: @user, label_string: "zah", query: "CCC BBB AAA")
-      FactoryGirl.create(:saved_search, user: @user, label_string: "qux", query: " aaa  bbb  ccc ")
+      FactoryBot.create(:tag_alias, antecedent_name: "bbb", consequent_name: "ccc", creator: @user)
+      FactoryBot.create(:saved_search, user: @user, label_string: "blah", query: "aaa")
+      FactoryBot.create(:saved_search, user: @user, label_string: "zah", query: "CCC BBB AAA")
+      FactoryBot.create(:saved_search, user: @user, label_string: "qux", query: " aaa  bbb  ccc ")
     end
 
     should "fetch the queries used by a user for a label" do
@@ -87,7 +87,7 @@ class SavedSearchTest < ActiveSupport::TestCase
 
   context "Creating a saved search" do
     setup do
-      FactoryGirl.create(:tag_alias, antecedent_name: "zzz", consequent_name: "yyy", creator: @user)
+      FactoryBot.create(:tag_alias, antecedent_name: "zzz", consequent_name: "yyy", creator: @user)
       @saved_search = @user.saved_searches.create(:query => " ZZZ xxx ")
     end
 
@@ -111,7 +111,7 @@ class SavedSearchTest < ActiveSupport::TestCase
 
   context "Destroying a saved search" do
     setup do
-      @saved_search = @user.saved_searches.create(:tag_query => "xxx")
+      @saved_search = @user.saved_searches.create(query: "xxx")
       @saved_search.destroy
     end
 
@@ -123,7 +123,7 @@ class SavedSearchTest < ActiveSupport::TestCase
 
   context "A user with max saved searches" do
     setup do
-      @user = FactoryGirl.create(:gold_user)
+      @user = FactoryBot.create(:gold_user)
       CurrentUser.user = @user
       User.any_instance.stubs(:max_saved_searches).returns(0)
       @saved_search = @user.saved_searches.create(:query => "xxx")

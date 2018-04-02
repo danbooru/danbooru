@@ -1,13 +1,13 @@
 require 'test_helper'
 
-class DmailsControllerTest < ActionController::TestCase
+class DmailsControllerTest < ActionDispatch::IntegrationTest
   context "The dmails controller" do
     setup do
-      @user = FactoryGirl.create(:user)
-      @unrelated_user = FactoryGirl.create(:user)
-      CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
-      @dmail = FactoryGirl.create(:dmail, :owner => @user)
+      @user = create(:user)
+      @unrelated_user = create(:user)
+      as_user do
+        @dmail = create(:dmail, :owner => @user)
+      end
     end
 
     teardown do
@@ -17,55 +17,52 @@ class DmailsControllerTest < ActionController::TestCase
 
     context "new action" do
       should "get the page" do
-        get :new, {}, {:user_id => @user.id}
+        get_auth new_dmail_path, @user
         assert_response :success
       end
 
       context "with a respond_to_id" do
         should "check privileges" do
-          @user2 = FactoryGirl.create(:user)
-          get :new, {:respond_to_id => @dmail}, {:user_id => @user2.id}
+          @user2 = create(:user)
+          get_auth new_dmail_path, @user2, params: {:respond_to_id => @dmail.id}
           assert_response 403
         end
 
         should "prefill the fields" do
-          get :new, {:respond_to_id => @dmail}, {:user_id => @user.id}
+          get_auth new_dmail_path, @user, params: {:respond_to_id => @dmail.id}
           assert_response :success
-          assert_not_nil assigns(:dmail)
-          assert_equal(@dmail.from_id, assigns(:dmail).to_id)
         end
 
         context "and a forward flag" do
           should "not populate the to field" do
-            get :new, {:respond_to_id => @dmail, :forward => true}, {:user_id => @user.id}
+            get_auth new_dmail_path, @user, params: {:respond_to_id => @dmail.id, :forward => true}
             assert_response :success
-            assert_not_nil assigns(:dmail)
-            assert_nil(assigns(:dmail).to_id)
           end
         end
       end
     end
 
     context "index action" do
-      should "show dmails owned by the current user" do
-        get :index, {:search => {:owner_id => @dmail.owner_id, :folder => "sent"}}, {:user_id => @dmail.owner_id}
+      should "show dmails owned by the current user by sent" do
+        get_auth dmails_path, @user, params: {:search => {:owner_id => @dmail.owner_id, :folder => "sent"}}
         assert_response :success
-        assert_equal(1, assigns[:dmails].size)
+      end
 
-        get :index, {:search => {:owner_id => @dmail.owner_id, :folder => "received"}}, {:user_id => @dmail.owner_id}
+      should "show dmails owned by the current user by received" do
+        get_auth dmails_path, @user, params: {:search => {:owner_id => @dmail.owner_id, :folder => "received"}}
         assert_response :success
-        assert_equal(1, assigns[:dmails].size)
       end
 
       should "not show dmails not owned by the current user" do
-        get :index, {:search => {:owner_id => @dmail.owner_id}}, {:user_id => @unrelated_user.id}
+        get_auth dmails_path, @user, params: {:search => {:owner_id => @dmail.owner_id}}
         assert_response :success
-        assert_equal(0, assigns[:dmails].size)
       end
 
       should "work for banned users" do
-        ban = FactoryGirl.create(:ban, :user => @user, :banner => FactoryGirl.create(:admin_user))
-        get :index, {:search => {:owner_id => @dmail.owner_id, :folder => "sent"}}, {:user_id => @dmail.owner_id}
+        as(create(:admin_user)) do
+          create(:ban, :user => @user)
+        end
+        get_auth dmails_path, @dmail.owner, params: {:search => {:owner_id => @dmail.owner_id, :folder => "sent"}}
 
         assert_response :success
       end
@@ -73,25 +70,25 @@ class DmailsControllerTest < ActionController::TestCase
 
     context "show action" do
       should "show dmails owned by the current user" do
-        get :show, {:id => @dmail.id}, {:user_id => @dmail.owner_id}
+        get_auth dmail_path(@dmail), @dmail.owner
         assert_response :success
       end
 
       should "not show dmails not owned by the current user" do
-        get :show, {:id => @dmail.id}, {:user_id => @unrelated_user.id}
+        get_auth dmail_path(@dmail), @unrelated_user
         assert_response(403)
       end
     end
 
     context "create action" do
       setup do
-        @user_2 = FactoryGirl.create(:user)
+        @user_2 = create(:user)
       end
 
       should "create two messages, one for the sender and one for the recipient" do
         assert_difference("Dmail.count", 2) do
           dmail_attribs = {:to_id => @user_2.id, :title => "abc", :body => "abc"}
-          post :create, {:dmail => dmail_attribs}, {:user_id => @user.id}
+          post_auth dmails_path, @user, params: {:dmail => dmail_attribs}
           assert_redirected_to dmail_path(Dmail.last)
         end
       end
@@ -100,14 +97,14 @@ class DmailsControllerTest < ActionController::TestCase
     context "destroy action" do
       should "allow deletion if the dmail is owned by the current user" do
         assert_difference("Dmail.count", -1) do
-          post :destroy, {:id => @dmail.id}, {:user_id => @dmail.owner_id}
+          delete_auth dmail_path(@dmail), @user
           assert_redirected_to dmails_path
         end
       end
 
       should "not allow deletion if the dmail is not owned by the current user" do
         assert_difference("Dmail.count", 0) do
-          post :destroy, {:id => @dmail.id}, {:user_id => @unrelated_user.id}
+          delete_auth dmail_path(@dmail), @unrelated_user
         end
       end
     end

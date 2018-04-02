@@ -4,6 +4,7 @@ module Downloads
   class FileTest < ActiveSupport::TestCase
     context "A twitter video download" do
       setup do
+        skip "Twitter is not configured" unless Danbooru.config.twitter_api_key
         @source = "https://twitter.com/CincinnatiZoo/status/859073537713328129"
         @download = Downloads::File.new(@source)
       end

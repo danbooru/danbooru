@@ -1,5 +1,5 @@
 class TagAliasCorrectionsController < ApplicationController
-  before_filter :builder_only
+  before_action :builder_only
 
   def create
     @correction = TagAliasCorrection.new(params[:tag_alias_id])

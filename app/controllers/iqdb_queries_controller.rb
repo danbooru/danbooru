@@ -15,7 +15,7 @@ class IqdbQueriesController < ApplicationController
         fmt.js { render :layout => false, :action => "create_by_post" }
       end
     else
-      render :nothing => true, :status => 422
+      render plain: "", :status => 422
     end
   end
 

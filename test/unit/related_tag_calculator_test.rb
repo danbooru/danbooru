@@ -2,7 +2,7 @@ require 'test_helper'
 
 class RelatedTagCalculatorTest < ActiveSupport::TestCase
   setup do
-    user = FactoryGirl.create(:user)
+    user = FactoryBot.create(:user)
     CurrentUser.user = user
     CurrentUser.ip_addr = "127.0.0.1"
   end
@@ -15,9 +15,9 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
   context "A related tag calculator" do
     context "for a post set" do
       setup do
-        FactoryGirl.create(:post, :tag_string => "aaa bbb ccc ddd")
-        FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
-        FactoryGirl.create(:post, :tag_string => "aaa bbb")
+        FactoryBot.create(:post, :tag_string => "aaa bbb ccc ddd")
+        FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
+        FactoryBot.create(:post, :tag_string => "aaa bbb")
         @posts = Post.tag_match("aaa")
       end
 
@@ -28,27 +28,27 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
 
     should "calculate related tags for a tag" do
       posts = []
-      posts << FactoryGirl.create(:post, :tag_string => "aaa bbb ccc ddd")
-      posts << FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
-      posts << FactoryGirl.create(:post, :tag_string => "aaa bbb")
+      posts << FactoryBot.create(:post, :tag_string => "aaa bbb ccc ddd")
+      posts << FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
+      posts << FactoryBot.create(:post, :tag_string => "aaa bbb")
 
       assert_equal({"aaa" => 3, "bbb" => 3, "ccc" => 2, "ddd" => 1}, RelatedTagCalculator.calculate_from_sample("aaa", 10))
     end
 
     should "calculate related tags for multiple tag" do
       posts = []
-      posts << FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
-      posts << FactoryGirl.create(:post, :tag_string => "aaa bbb ccc ddd")
-      posts << FactoryGirl.create(:post, :tag_string => "aaa eee fff")
+      posts << FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
+      posts << FactoryBot.create(:post, :tag_string => "aaa bbb ccc ddd")
+      posts << FactoryBot.create(:post, :tag_string => "aaa eee fff")
 
       assert_equal({"aaa"=>2, "bbb"=>2, "ddd"=>1, "ccc"=>2}, RelatedTagCalculator.calculate_from_sample("aaa bbb", 10))
     end
 
     should "calculate typed related tags for a tag" do
       posts = []
-      posts << FactoryGirl.create(:post, :tag_string => "aaa bbb art:ccc copy:ddd")
-      posts << FactoryGirl.create(:post, :tag_string => "aaa bbb art:ccc")
-      posts << FactoryGirl.create(:post, :tag_string => "aaa bbb")
+      posts << FactoryBot.create(:post, :tag_string => "aaa bbb art:ccc copy:ddd")
+      posts << FactoryBot.create(:post, :tag_string => "aaa bbb art:ccc")
+      posts << FactoryBot.create(:post, :tag_string => "aaa bbb")
 
       assert_equal({"ccc" => 2}, RelatedTagCalculator.calculate_from_sample("aaa", 10, Tag.categories.artist))
       assert_equal({"ddd" => 1}, RelatedTagCalculator.calculate_from_sample("aaa", 10, Tag.categories.copyright))
@@ -56,9 +56,9 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
 
     should "convert a hash into string format" do
       posts = []
-      posts << FactoryGirl.create(:post, :tag_string => "aaa bbb ccc ddd")
-      posts << FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
-      posts << FactoryGirl.create(:post, :tag_string => "aaa bbb")
+      posts << FactoryBot.create(:post, :tag_string => "aaa bbb ccc ddd")
+      posts << FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
+      posts << FactoryBot.create(:post, :tag_string => "aaa bbb")
 
       tag = Tag.find_by_name("aaa")
       counts = RelatedTagCalculator.calculate_from_sample("aaa", 10)

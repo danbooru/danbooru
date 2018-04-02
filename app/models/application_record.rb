@@ -141,6 +141,41 @@ class ApplicationRecord < ActiveRecord::Base
     end
   end
 
+  concerning :UserMethods do
+    class_methods do
+      def belongs_to_creator(options = {})
+        class_eval do
+          belongs_to :creator, options.merge(class_name: "User")
+          before_validation(on: :create) do |rec| 
+            if rec.creator_id.nil?
+              rec.creator_id = CurrentUser.id
+              rec.creator_ip_addr = CurrentUser.ip_addr if rec.respond_to?(:creator_ip_addr=)
+              rec.ip_addr = CurrentUser.ip_addr if rec.respond_to?(:ip_addr=)
+            end
+          end
+
+          define_method :creator_name do
+            User.id_to_name(creator_id)
+          end
+        end
+      end
+
+      def belongs_to_updater(options = {})
+        class_eval do
+          belongs_to :updater, options.merge(class_name: "User")
+          before_validation do |rec|
+            rec.updater_id = CurrentUser.id
+            rec.updater_ip_addr = CurrentUser.ip_addr if rec.respond_to?(:updater_ip_addr=)
+          end
+
+          define_method :updater_name do
+            User.id_to_name(updater_id)
+          end
+        end
+      end
+    end
+  end
+
   def warnings
     @warnings ||= ActiveModel::Errors.new(self)
   end

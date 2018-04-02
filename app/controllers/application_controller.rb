@@ -1,25 +1,26 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
   helper :pagination
-  before_filter :reset_current_user
-  before_filter :set_current_user
-  after_filter :reset_current_user
-  before_filter :set_title
-  before_filter :normalize_search
-  before_filter :set_started_at_session
-  before_filter :api_check
-  before_filter :set_safe_mode
-  # before_filter :secure_cookies_check
+  before_action :reset_current_user
+  before_action :set_current_user
+  after_action :reset_current_user
+  before_action :set_title
+  before_action :normalize_search
+  before_action :set_started_at_session
+  before_action :api_check
+  before_action :set_safe_mode
+  # before_action :secure_cookies_check
   layout "default"
   force_ssl :if => :ssl_login?
   helper_method :show_moderation_notice?
-  before_filter :enable_cors
+  before_action :enable_cors
 
   rescue_from Exception, :with => :rescue_exception
   rescue_from User::PrivilegeError, :with => :access_denied
   rescue_from SessionLoader::AuthenticationFailure, :with => :authentication_failed
   rescue_from Danbooru::Paginator::PaginationError, :with => :render_pagination_limit
   rescue_from PG::ConnectionBad, with: :bad_db_connection
+  rescue_from ActionController::UnpermittedParameters, :with => :access_denied
 
   # This is raised on requests to `/blah.js`. Rails has already rendered StaticController#not_found
   # here, so calling `rescue_exception` would cause a double render error.
@@ -93,6 +94,13 @@ class ApplicationController < ActionController::Base
   def rescue_exception(exception)
     @exception = exception
 
+    if Rails.env.test? && ENV["DEBUG"]
+      puts "---"
+      STDERR.puts("#{exception.class} exception thrown: #{exception.message}")
+      exception.backtrace.each {|x| STDERR.puts(x)}
+      puts "---"
+    end
+
     if exception.is_a?(::ActiveRecord::StatementInvalid) && exception.to_s =~ /statement timeout/
       if Rails.env.production?
         NewRelic::Agent.notice_error(exception, :uri => request.original_url, :referer => request.referer, :request_params => params, :custom_params => {:user_id => CurrentUser.user.id, :user_ip_addr => CurrentUser.ip_addr})
@@ -159,7 +167,7 @@ class ApplicationController < ActionController::Base
         render :json => {:success => false, :reason => "access denied"}.to_json, :status => 403
       end
       fmt.js do
-        render :nothing => true, :status => 403
+        render js: "", :status => 403
       end
     end
   end
@@ -210,6 +218,10 @@ class ApplicationController < ActionController::Base
         redirect_to url_for(params: params.except(:controller, :action, :index).permit!)
       end
     end
+  end
+
+  def search_params
+    params.fetch(:search, {}).permit!
   end
 
   def set_safe_mode

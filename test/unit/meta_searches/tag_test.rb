@@ -4,11 +4,11 @@ module MetaSearches
   class TagTest < ActionMailer::TestCase
     context "The tag metasearch" do
       setup do
-        CurrentUser.user = FactoryGirl.create(:user)
+        CurrentUser.user = FactoryBot.create(:user)
         CurrentUser.ip_addr = "127.0.0.1"
-        FactoryGirl.create(:post, :tag_string => "xxx")
-        FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
-        FactoryGirl.create(:tag_implication, :antecedent_name => "ccc", :consequent_name => "ddd")
+        FactoryBot.create(:post, :tag_string => "xxx")
+        FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+        FactoryBot.create(:tag_implication, :antecedent_name => "ccc", :consequent_name => "ddd")
       end
 
       should "find the tag" do

@@ -1,14 +1,10 @@
 class ForumPost < ApplicationRecord
   include Mentionable
 
-  attr_accessible :body, :topic_id, :as => [:member, :builder, :gold, :platinum, :admin, :moderator, :default]
-  attr_accessible :is_locked, :is_sticky, :is_deleted, :as => [:admin, :moderator]
   attr_readonly :topic_id
-  belongs_to :creator, :class_name => "User"
-  belongs_to :updater, :class_name => "User"
+  belongs_to_creator
+  belongs_to_updater
   belongs_to :topic, :class_name => "ForumTopic"
-  before_validation :initialize_creator, :on => :create
-  before_validation :initialize_updater
   before_validation :initialize_is_deleted, :on => :create
   after_create :update_topic_updated_at_on_create
   after_update :update_topic_updated_at_on_update_for_original_posts
@@ -137,22 +133,22 @@ class ForumPost < ApplicationRecord
     return if topic.nil?
 
     if topic.is_locked?
-      errors.add(:topic, "is locked")
-      return false
-    else
-      return true
+      errors[:topic] << "is locked"
+      throw :abort
     end
   end
 
   def topic_id_not_invalid
     if topic_id && !topic
-      errors.add(:base, "Topic ID is invalid")
+      errors[:base] << "Topic ID is invalid"
+      return false
     end
   end
 
   def topic_is_not_restricted
     if topic && !topic.visible?(creator)
-      errors.add(:topic, "restricted")
+      errors[:topic] << "is restricted"
+      return false
     end
   end
 
@@ -179,12 +175,12 @@ class ForumPost < ApplicationRecord
   end
 
   def delete!
-    update_attributes({:is_deleted => true}, :as => CurrentUser.role)
+    update(is_deleted: true)
     update_topic_updated_at_on_delete
   end
 
   def undelete!
-    update_attributes({:is_deleted => false}, :as => CurrentUser.role)
+    update(is_deleted: false)
     update_topic_updated_at_on_undelete
   end
 
@@ -210,14 +206,6 @@ class ForumPost < ApplicationRecord
       ForumTopic.where(:id => topic.id).update_all("response_count = response_count - 1")
       topic.response_count -= 1
     end
-  end
-
-  def initialize_creator
-    self.creator_id = CurrentUser.id
-  end
-
-  def initialize_updater
-    self.updater_id = CurrentUser.id
   end
 
   def initialize_is_deleted

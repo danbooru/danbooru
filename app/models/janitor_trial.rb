@@ -3,8 +3,7 @@ class JanitorTrial < ApplicationRecord
   after_create :send_dmail
   after_create :promote_user
   validates_presence_of :user
-  before_validation :initialize_creator
-  attr_accessible :user_id, :user_name
+  belongs_to_creator
   validates_inclusion_of :status, :in => %w(active inactive)
   before_validation :initialize_status
   validates_uniqueness_of :user_id
@@ -55,10 +54,6 @@ class JanitorTrial < ApplicationRecord
 
   def initialize_status
     self.status = "active"
-  end
-
-  def initialize_creator
-    self.creator_id = CurrentUser.id
   end
 
   def user_name

@@ -1,9 +1,9 @@
 module Moderator
   module Post
     class PostsController < ApplicationController
-      before_filter :approver_only, :only => [:delete, :undelete, :move_favorites, :ban, :unban, :confirm_delete, :confirm_move_favorites, :confirm_ban]
-      before_filter :admin_only, :only => [:expunge]
-      skip_before_filter :api_check
+      before_action :approver_only, :only => [:delete, :undelete, :move_favorites, :ban, :unban, :confirm_delete, :confirm_move_favorites, :confirm_ban]
+      before_action :admin_only, :only => [:expunge]
+      skip_before_action :api_check
 
       respond_to :html, :json, :xml
 

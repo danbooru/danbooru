@@ -3,7 +3,7 @@ require 'test_helper'
 class TokenBucketTest < ActiveSupport::TestCase
   context "#add!" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       TokenBucket.create(user_id: @user.id, last_touched_at: 1.minute.ago, token_count: 0)
     end
 
@@ -17,7 +17,7 @@ class TokenBucketTest < ActiveSupport::TestCase
 
   context "#consume!" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       TokenBucket.create(user_id: @user.id, last_touched_at: 1.minute.ago, token_count: 1)
     end
 
@@ -31,7 +31,7 @@ class TokenBucketTest < ActiveSupport::TestCase
 
   context "#throttled?" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       TokenBucket.create(user_id: @user.id, last_touched_at: 1.minute.ago, token_count: 0)
     end
 

@@ -2,7 +2,7 @@ class NoteVersionsController < ApplicationController
   respond_to :html, :xml, :json
 
   def index
-    @note_versions = NoteVersion.search(params[:search]).paginate(params[:page], :limit => params[:limit])
+    @note_versions = NoteVersion.search(search_params).paginate(params[:page], :limit => params[:limit])
     respond_with(@note_versions) do |format|
       format.html { @note_versions = @note_versions.includes(:updater) }
       format.xml do

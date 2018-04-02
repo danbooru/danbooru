@@ -26,6 +26,9 @@ module PostArchiveTestHelper
         else
           json["added_tags"] = json["tags"].scan(/\S+/)
         end
+        json["parent_changed"] = (prev.nil? || json.key?("parent_id") && prev.parent_id != json["parent_id"])
+        json["source_changed"] = (prev.nil? || json.key?("source") && prev.source != json["source"])
+        json["rating_changed"] = (prev.nil? || json.key?("rating") && prev.rating != json["rating"])
         if merge?(prev, json)
           prev.update_columns(json)
         else

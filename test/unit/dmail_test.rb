@@ -3,24 +3,22 @@ require 'test_helper'
 class DmailTest < ActiveSupport::TestCase
   context "A dmail" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "1.2.3.4"
       ActionMailer::Base.delivery_method = :test
       ActionMailer::Base.perform_deliveries = true
       ActionMailer::Base.deliveries = []
-      TestAfterCommit.enabled = true
     end
 
     teardown do
       CurrentUser.user = nil
-      TestAfterCommit.enabled = false
     end
 
     context "spam" do
       setup do
         Dmail.any_instance.stubs(:spam?).returns(true)
-        @recipient = FactoryGirl.create(:user)
+        @recipient = FactoryBot.create(:user)
       end
 
       should "not validate" do
@@ -33,7 +31,7 @@ class DmailTest < ActiveSupport::TestCase
       should "autoban spammers after sending spam to N distinct users" do
         Dmail.any_instance.expects(:spam?).returns(true)
 
-        users = FactoryGirl.create_list(:user, Dmail::AUTOBAN_THRESHOLD)
+        users = FactoryBot.create_list(:user, Dmail::AUTOBAN_THRESHOLD)
         users.each do |user|
           Dmail.create_split(from: @user, to: user, title: "spam", body: "wonderful spam")
         end
@@ -47,9 +45,9 @@ class DmailTest < ActiveSupport::TestCase
 
     context "filter" do
       setup do
-        @recipient = FactoryGirl.create(:user)
+        @recipient = FactoryBot.create(:user)
         @recipient.create_dmail_filter(:words => "banned")
-        @dmail = FactoryGirl.build(:dmail, :title => "xxx", :owner => @recipient, :body => "banned word here", :to => @recipient, :from => @user)
+        @dmail = FactoryBot.build(:dmail, :title => "xxx", :owner => @recipient, :body => "banned word here", :to => @recipient, :from => @user)
       end
 
       should "detect banned words" do
@@ -68,8 +66,8 @@ class DmailTest < ActiveSupport::TestCase
       end
 
       should "be ignored when sender is a moderator" do
-        CurrentUser.scoped(FactoryGirl.create(:moderator_user), "127.0.0.1") do
-          @dmail = FactoryGirl.create(:dmail, :owner => @recipient, :body => "banned word here", :to => @recipient)
+        CurrentUser.scoped(FactoryBot.create(:moderator_user), "127.0.0.1") do
+          @dmail = FactoryBot.create(:dmail, :owner => @recipient, :body => "banned word here", :to => @recipient)
         end
 
         assert_equal(false, !!@recipient.dmail_filter.filtered?(@dmail))
@@ -94,7 +92,7 @@ class DmailTest < ActiveSupport::TestCase
       end
 
       should "not validate" do
-        dmail = FactoryGirl.build(:dmail, :title => "xxx", :owner => @user)
+        dmail = FactoryBot.build(:dmail, :title => "xxx", :owner => @user)
         dmail.save
         assert_equal(1, dmail.errors.size)
         assert_equal(["Sender is banned and cannot send messages"], dmail.errors.full_messages)
@@ -103,7 +101,7 @@ class DmailTest < ActiveSupport::TestCase
 
     context "search" do
       should "return results based on title contents" do
-        dmail = FactoryGirl.create(:dmail, :title => "xxx", :owner => @user)
+        dmail = FactoryBot.create(:dmail, :title => "xxx", :owner => @user)
 
         matches = Dmail.search(title_matches: "x")
         assert_equal([dmail.id], matches.map(&:id))
@@ -119,7 +117,7 @@ class DmailTest < ActiveSupport::TestCase
       end
 
       should "return results based on body contents" do
-        dmail = FactoryGirl.create(:dmail, :body => "xxx", :owner => @user)
+        dmail = FactoryBot.create(:dmail, :body => "xxx", :owner => @user)
         matches = Dmail.search_message("xxx")
         assert(matches.any?)
         matches = Dmail.search_message("aaa")
@@ -128,14 +126,14 @@ class DmailTest < ActiveSupport::TestCase
     end
 
     should "should parse user names" do
-      dmail = FactoryGirl.build(:dmail, :owner => @user)
+      dmail = FactoryBot.build(:dmail, :owner => @user)
       dmail.to_id = nil
       dmail.to_name = @user.name
       assert(dmail.to_id == @user.id)
     end
 
     should "construct a response" do
-      dmail = FactoryGirl.create(:dmail, :owner => @user)
+      dmail = FactoryBot.create(:dmail, :owner => @user)
       response = dmail.build_response
       assert_equal("Re: #{dmail.title}", response.title)
       assert_equal(dmail.from_id, response.to_id)
@@ -143,41 +141,41 @@ class DmailTest < ActiveSupport::TestCase
     end
 
     should "create a copy for each user" do
-      @new_user = FactoryGirl.create(:user)
+      @new_user = FactoryBot.create(:user)
       assert_difference("Dmail.count", 2) do
         Dmail.create_split(:to_id => @new_user.id, :title => "foo", :body => "foo")
       end
     end
 
     should "record the creator's ip addr" do
-      dmail = FactoryGirl.create(:dmail, owner: @user)
+      dmail = FactoryBot.create(:dmail, owner: @user)
       assert_equal(CurrentUser.ip_addr, dmail.creator_ip_addr.to_s)
     end
 
     should "send an email if the user wants it" do
-      user = FactoryGirl.create(:user, :receive_email_notifications => true)
+      user = FactoryBot.create(:user, :receive_email_notifications => true)
       assert_difference("ActionMailer::Base.deliveries.size", 1) do
-        FactoryGirl.create(:dmail, :to => user, :owner => user)
+        FactoryBot.create(:dmail, :to => user, :owner => user)
       end
     end
 
     should "create only one message for a split response" do
-      user = FactoryGirl.create(:user, :receive_email_notifications => true)
+      user = FactoryBot.create(:user, :receive_email_notifications => true)
       assert_difference("ActionMailer::Base.deliveries.size", 1) do
         Dmail.create_split(:to_id => user.id, :title => "foo", :body => "foo")
       end
     end
 
     should "be marked as read after the user reads it" do
-      dmail = FactoryGirl.create(:dmail, :owner => @user)
+      dmail = FactoryBot.create(:dmail, :owner => @user)
       assert(!dmail.is_read?)
       dmail.mark_as_read!
       assert(dmail.is_read?)
     end
 
     should "notify the recipient he has mail" do
-      @recipient = FactoryGirl.create(:user)
-      dmail = FactoryGirl.create(:dmail, :owner => @recipient)
+      @recipient = FactoryBot.create(:user)
+      dmail = FactoryBot.create(:dmail, :owner => @recipient)
       recipient = dmail.to
       recipient.reload
       assert(recipient.has_mail?)
@@ -192,7 +190,7 @@ class DmailTest < ActiveSupport::TestCase
 
     context "that is automated" do
       setup do
-        @bot = FactoryGirl.create(:user)
+        @bot = FactoryBot.create(:user)
         User.stubs(:system).returns(@bot)
       end
 

@@ -4,7 +4,7 @@ class UserDeletionTest < ActiveSupport::TestCase
   context "an invalid user deletion" do
     context "for an invalid password" do
       setup do
-        @user = FactoryGirl.create(:user)
+        @user = FactoryBot.create(:user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
         @deletion = UserDeletion.new(@user, "wrongpassword")
@@ -19,7 +19,7 @@ class UserDeletionTest < ActiveSupport::TestCase
 
     context "for an admin" do
       setup do
-        @user = FactoryGirl.create(:admin_user)
+        @user = FactoryBot.create(:admin_user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
         @deletion = UserDeletion.new(@user, "password")
@@ -35,11 +35,11 @@ class UserDeletionTest < ActiveSupport::TestCase
 
   context "a valid user deletion" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
 
-      @post = FactoryGirl.create(:post)
+      @post = FactoryBot.create(:post)
       Favorite.add(post: @post, user: @user)
 
       @user.update_attributes(:email => "ted@danbooru.com")

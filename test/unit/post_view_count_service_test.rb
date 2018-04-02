@@ -4,12 +4,12 @@ class PostViewCountServiceTest < ActiveSupport::TestCase
   def setup
     super
 
-    CurrentUser.user = FactoryGirl.create(:user)
+    CurrentUser.user = FactoryBot.create(:user)
     CurrentUser.ip_addr = "127.0.0.1"
 
     PostViewCountService.stubs(:enabled?).returns(true)
     Danbooru.config.stubs(:reportbooru_server).returns("http://localhost:1234")
-    @post = FactoryGirl.create(:post)
+    @post = FactoryBot.create(:post)
   end
 
   def teardown

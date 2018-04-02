@@ -1,20 +1,19 @@
 class Note < ApplicationRecord
   class RevertError < Exception ; end
 
-  attr_accessor :updater_id, :updater_ip_addr, :html_id
+  attribute :updater_id, :integer
+  attribute :updater_ip_addr, :inet
+  attr_accessor :html_id
   belongs_to :post
-  belongs_to :creator, :class_name => "User"
-  belongs_to :updater, :class_name => "User"
+  belongs_to_creator
+  belongs_to_updater
   has_many :versions, lambda {order("note_versions.id ASC")}, :class_name => "NoteVersion", :dependent => :destroy
-  before_validation :initialize_creator, :on => :create
-  before_validation :initialize_updater
   validates_presence_of :post_id, :creator_id, :updater_id, :x, :y, :width, :height, :body
   validate :post_must_exist
   validate :note_within_image
   after_save :update_post
   after_save :create_version
   validate :post_must_not_be_note_locked
-  attr_accessible :x, :y, :width, :height, :body, :updater_id, :updater_ip_addr, :is_active, :post_id, :post, :html_id
 
   module SearchMethods
     def active
@@ -87,15 +86,6 @@ class Note < ApplicationRecord
   extend SearchMethods
   include ApiMethods
 
-  def initialize_creator
-    self.creator_id ||= CurrentUser.id
-  end
-
-  def initialize_updater
-    self.updater_id = CurrentUser.id
-    self.updater_ip_addr = CurrentUser.ip_addr
-  end
-
   def post_must_exist
     if !Post.exists?(post_id)
       errors.add :post, "must exist"
@@ -122,10 +112,6 @@ class Note < ApplicationRecord
     Post.exists?(["id = ? AND is_note_locked = ?", post_id, true])
   end
 
-  def creator_name
-    User.id_to_name(creator_id)
-  end
-
   def rescale!(x_scale, y_scale)
     self.x *= x_scale
     self.y *= y_scale
@@ -135,7 +121,7 @@ class Note < ApplicationRecord
   end
 
   def update_post
-    if self.changed?
+    if self.saved_changes?
       if Note.where(:is_active => true, :post_id => post_id).exists?
         execute_sql("UPDATE posts SET last_noted_at = ? WHERE id = ?", updated_at, post_id)
       else
@@ -145,7 +131,7 @@ class Note < ApplicationRecord
   end
 
   def create_version
-    return unless versioned_attributes_changed?
+    return unless saved_change_to_versioned_attributes?
 
     if merge_version?
       merge_version
@@ -156,8 +142,8 @@ class Note < ApplicationRecord
     end
   end
 
-  def versioned_attributes_changed?
-    new_record? || x_changed? || y_changed? || width_changed? || height_changed? || is_active_changed? || body_changed?
+  def saved_change_to_versioned_attributes?
+    new_record? || saved_change_to_x? || saved_change_to_y? || saved_change_to_width? || saved_change_to_height? || saved_change_to_is_active? || saved_change_to_body?
   end
 
   def create_new_version
@@ -189,7 +175,7 @@ class Note < ApplicationRecord
 
   def merge_version?
     prev = versions.last
-    prev && prev.updater_id == CurrentUser.user.id && prev.updated_at > 1.hour.ago && !is_active_changed?
+    prev && prev.updater_id == CurrentUser.user.id && prev.updated_at > 1.hour.ago && !saved_change_to_is_active?
   end
 
   def revert_to(version)

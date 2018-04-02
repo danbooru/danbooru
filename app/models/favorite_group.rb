@@ -3,15 +3,13 @@ require 'ostruct'
 class FavoriteGroup < ApplicationRecord
   validates_uniqueness_of :name, :case_sensitive => false, :scope => :creator_id
   validates_format_of :name, :with => /\A[^,]+\Z/, :message => "cannot have commas"
-  belongs_to :creator, :class_name => "User"
+  belongs_to_creator
   before_validation :normalize_post_ids
   before_validation :normalize_name
-  before_validation :initialize_creator, :on => :create
   before_validation :strip_name
   validate :creator_can_create_favorite_groups, :on => :create
   validate :validate_number_of_posts
   before_save :update_post_count
-  attr_accessible :name, :post_ids, :post_id_array, :is_public, :as => [:member, :gold, :platinum, :builder, :moderator, :admin, :default]
 
   module SearchMethods
     def for_creator(user_id)
@@ -123,10 +121,6 @@ class FavoriteGroup < ApplicationRecord
     else
       nil
     end
-  end
-
-  def initialize_creator
-    self.creator_id ||= CurrentUser.id
   end
 
   def strip_name
