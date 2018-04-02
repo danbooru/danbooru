@@ -4,8 +4,8 @@ module Moderator
       RANDOM_COUNT = 12
       
       respond_to :html, :json
-      before_filter :approver_only
-      skip_before_filter :api_check
+      before_action :approver_only
+      skip_before_action :api_check
 
       def show
         cookies.permanent[:moderated] = Time.now.to_i

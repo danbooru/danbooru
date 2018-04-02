@@ -2,7 +2,6 @@ class PostVersion < ApplicationRecord
   belongs_to :post
   belongs_to :updater, :class_name => "User"
   before_validation :initialize_updater
-  attr_accessible :post_id, :is_status_locked, :is_rating_locked, :is_note_locked, :source, :rating, :tag_string, :old_tag_string, :old_parent_id, :old_source, :old_rating, :last_noted_at, :parent_id, :tags
 
   module SearchMethods
     def for_user(user_id)

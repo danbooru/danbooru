@@ -2,24 +2,22 @@ require "test_helper"
 
 module Maintenance
   module User
-    class DeletionsControllerTest < ActionController::TestCase
+    class DeletionsControllerTest < ActionDispatch::IntegrationTest
       context "in all cases" do
         setup do
-          @user = FactoryGirl.create(:user)
-          CurrentUser.user = @user
-          CurrentUser.ip_addr = "127.0.0.1"
+          @user = create(:user)
         end
 
         context "#show" do
           should "render" do
-            get :show, {}, {:user_id => @user.id}
+            get_auth maintenance_user_deletion_path, @user
             assert_response :success
           end
         end
 
         context "#destroy" do
           should "render" do
-            post :destroy, {:password => "password"}, {:user_id => @user.id}
+            delete_auth maintenance_user_deletion_path, @user, params: {:password => "password"}
             assert_redirected_to(posts_path)
           end
         end

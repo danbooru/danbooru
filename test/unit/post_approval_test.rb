@@ -3,13 +3,13 @@ require 'test_helper'
 class PostApprovalTest < ActiveSupport::TestCase
   context "a pending post" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
 
-      @post = FactoryGirl.create(:post, uploader_id: @user.id, is_pending: true)
+      @post = FactoryBot.create(:post, uploader_id: @user.id, is_pending: true)
 
-      @approver = FactoryGirl.create(:user)
+      @approver = FactoryBot.create(:user)
       @approver.can_approve_posts = true
       @approver.save
       CurrentUser.user = @approver
@@ -35,9 +35,9 @@ class PostApprovalTest < ActiveSupport::TestCase
 
       context "that is then flagged" do
         setup do
-          @user2 = FactoryGirl.create(:user)
-          @user3 = FactoryGirl.create(:user)
-          @approver2 = FactoryGirl.create(:user)
+          @user2 = FactoryBot.create(:user)
+          @user3 = FactoryBot.create(:user)
+          @approver2 = FactoryBot.create(:user)
           @approver2.can_approve_posts = true
           @approver2.save
         end

@@ -4,6 +4,7 @@ module Sources
   class TwitterTest < ActiveSupport::TestCase
     context "A video" do
       setup do
+        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Site.new("https://twitter.com/CincinnatiZoo/status/859073537713328129")
         @site.get
       end
@@ -15,6 +16,7 @@ module Sources
 
     context "An animated gif" do
       setup do
+        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Site.new("https://twitter.com/DaniStrawberry1/status/859435334765088769")
         @site.get
       end
@@ -26,6 +28,7 @@ module Sources
 
     context "A twitter summary card" do
       setup do
+        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Site.new("https://twitter.com/NatGeo/status/932700115936178177")
         @site.get
       end
@@ -37,6 +40,7 @@ module Sources
 
     context "A twitter summary card from twitter" do
       setup do
+        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Site.new("https://twitter.com/masayasuf/status/870734961778630656/photo/1")
         @site.get
       end
@@ -48,6 +52,7 @@ module Sources
 
     context "A twitter summary card from twitter with a :large image" do
       setup do
+        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Site.new("https://twitter.com/aranobu/status/817736083567820800")
         @site.get
       end
@@ -59,6 +64,7 @@ module Sources
 
     context "An extended tweet" do
       should "extract the correct image url" do
+        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Site.new("https://twitter.com/onsen_musume_jp/status/865534101918330881")
         @site.get
 
@@ -66,6 +72,7 @@ module Sources
       end
 
       should "extract all the image urls" do
+        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Site.new("https://twitter.com/aoimanabu/status/892370963630743552")
         @site.get
 
@@ -81,6 +88,7 @@ module Sources
 
     context "The source site for a restricted twitter" do
       setup do
+        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Site.new("https://mobile.twitter.com/Strangestone/status/556440271961858051")
         @site.get
       end
@@ -92,6 +100,7 @@ module Sources
 
     context "The source site for twitter" do
       setup do
+        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Site.new("https://mobile.twitter.com/nounproject/status/540944400767922176")
         @site.get
       end
@@ -125,6 +134,7 @@ module Sources
 
     context "The source site for a direct image and a referer" do
       setup do
+        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Site.new("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:large", referer_url: "https://twitter.com/nounproject/status/540944400767922176")
         @site.get
       end
@@ -140,6 +150,7 @@ module Sources
 
     context "The source site for a https://twitter.com/i/web/status/:id url" do
       setup do
+        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Site.new("https://twitter.com/i/web/status/943446161586733056")
         @site.get
       end
@@ -151,6 +162,7 @@ module Sources
 
     context "A tweet" do
       setup do
+        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Site.new("https://twitter.com/noizave/status/875768175136317440")
         @site.get
       end

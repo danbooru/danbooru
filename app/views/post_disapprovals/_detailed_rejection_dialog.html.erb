@@ -1,17 +1,9 @@
 <div id="detailed-rejection-dialog" title="Detailed Rejection" style="display: none;">
-  <%= form_tag(moderator_post_disapproval_path, :class => "simple_form", :id => "detailed-rejection-form") do %>
-    <%= hidden_field_tag "post_id", "x" %>
+  <p>You can supply a short message to the uploader explaining why you rejected this upload.</p>
 
-    <p>You can supply a short message to the uploader explaining why you rejected this upload.</p>
-
-    <div class="input">
-      <label>Reason</label>
-      <%= select_tag "reason", options_for_select([["Breaks Rules", "breaks_rules"], ["Poor Quality", "poor_quality"], ["No Interest", "disinterest"]]) %>
-    </div>
-
-    <div class="input">
-      <label>Message</label>
-      <%= text_field_tag "message" %>
-    </div>
+  <%= simple_form_for(PostDisapproval.new, url: moderator_post_disapproval_path, remote: true, id: "detailed-rejection-form") do |f| %>
+    <%= f.hidden_field :post_id, value: "x" %>
+    <%= f.input :reason, collection: [["Breaks Rules", "breaks_rules"], ["Poor Quality", "poor_quality"], ["No interest", "disinterest"]] %>
+    <%= f.input :message, as: :string %>
   <% end %>
 </div>

@@ -2,7 +2,6 @@ class Favorite < ApplicationRecord
   belongs_to :post
   belongs_to :user
   scope :for_user, lambda {|user_id| where("user_id % 100 = #{user_id.to_i % 100} and user_id = #{user_id.to_i}")}
-  attr_accessible :user_id, :post_id
 
   def self.add(post:, user:)
     Favorite.transaction do
@@ -26,7 +25,7 @@ class Favorite < ApplicationRecord
       User.where(:id => user.id).select("id").lock("FOR UPDATE NOWAIT").first
 
       return unless Favorite.for_user(user.id).where(:user_id => user.id, :post_id => post_id).exists?
-      Favorite.for_user(user.id).delete_all(post_id: post_id)
+      Favorite.for_user(user.id).where(post_id: post_id).delete_all
       Post.where(:id => post_id).update_all("fav_count = fav_count - 1")
       post.delete_user_from_fav_string(user.id) if post
       User.where(:id => user.id).update_all("favorite_count = favorite_count - 1")

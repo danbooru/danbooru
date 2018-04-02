@@ -1,7 +1,7 @@
 class RelatedTagsController < ApplicationController
   respond_to :json
   respond_to :html, :only=>[:show]
-  before_filter :require_reportbooru_key, only: [:update]
+  before_action :require_reportbooru_key, only: [:update]
 
   def show
     @query = RelatedTagQuery.new(params[:query].to_s.downcase, params[:category])

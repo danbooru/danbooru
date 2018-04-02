@@ -8,7 +8,6 @@ class PostAppeal < ApplicationRecord
   validate :validate_creator_is_not_limited
   before_validation :initialize_creator, :on => :create
   validates_uniqueness_of :creator_id, :scope => :post_id, :message => "have already appealed this post"
-  attr_accessible :post_id, :post, :reason
 
   module SearchMethods
     def reason_matches(query)

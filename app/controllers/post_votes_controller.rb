@@ -1,6 +1,6 @@
 class PostVotesController < ApplicationController
-  before_filter :voter_only
-  skip_before_filter :api_check
+  before_action :voter_only
+  skip_before_action :api_check
 
   def create
     @post = Post.find(params[:post_id])

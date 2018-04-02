@@ -14,6 +14,7 @@ class PixivUgoiraConverterTest < ActiveSupport::TestCase
     end
 
     should "output to webm" do
+      skip "ffmpeg is not installed" unless check_ffmpeg
       sample_file = PixivUgoiraConverter.generate_webm(@zipfile, @frame_data)
       preview_file = PixivUgoiraConverter.generate_preview(@zipfile)
       assert_operator(sample_file.size, :>, 1_000)

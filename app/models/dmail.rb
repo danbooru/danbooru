@@ -235,7 +235,7 @@ class Dmail < ApplicationRecord
 
   def validate_sender_is_not_banned
     if from.is_banned?
-      errors[:base] = "Sender is banned and cannot send messages"
+      errors[:base] << "Sender is banned and cannot send messages"
       return false
     else
       return true

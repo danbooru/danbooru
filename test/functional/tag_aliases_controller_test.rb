@@ -1,47 +1,46 @@
 require 'test_helper'
 
-class TagAliasesControllerTest < ActionController::TestCase
+class TagAliasesControllerTest < ActionDispatch::IntegrationTest
   context "The tag aliases controller" do
     setup do
-      @user = FactoryGirl.create(:admin_user)
-      CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
-    end
-
-    teardown do
-      CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
+      @user = create(:admin_user)
     end
 
     context "edit action" do
       setup do
-        @tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+        as_admin do
+          @tag_alias = create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+        end
       end
 
       should "render" do
-        get :edit, {:id => @tag_alias.id}
+        get_auth edit_tag_alias_path(@tag_alias), @user
         assert_response :success
       end
     end
 
     context "update action" do
       setup do
-        @tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+        as_admin do
+          @tag_alias = create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+        end
       end
 
       context "for a pending alias" do
         setup do
-          @tag_alias.update_attribute(:status, "pending")
+          as_admin do
+            @tag_alias.update(status: "pending")
+          end
         end
 
         should "succeed" do
-          post :update, {:id => @tag_alias.id, :tag_alias => {:antecedent_name => "xxx"}}, {:user_id => @user.id}
+          put_auth tag_alias_path(@tag_alias), @user, params: {:tag_alias => {:antecedent_name => "xxx"}}
           @tag_alias.reload
           assert_equal("xxx", @tag_alias.antecedent_name)
         end
 
         should "not allow changing the status" do
-          post :update, {:id => @tag_alias.id, :tag_alias => {:status => "active"}}, {:user_id => @user.id}
+          put_auth tag_alias_path(@tag_alias), @user, params: {:tag_alias => {:status => "active"}}
           @tag_alias.reload
           assert_equal("pending", @tag_alias.status)
         end
@@ -56,7 +55,7 @@ class TagAliasesControllerTest < ActionController::TestCase
         end
 
         should "fail" do
-          post :update, {:id => @tag_alias.id, :tag_alias => {:antecedent_name => "xxx"}}, {:user_id => @user.id}
+          put_auth tag_alias_path(@tag_alias), @user, params: {:tag_alias => {:antecedent_name => "xxx"}}
           @tag_alias.reload
           assert_equal("aaa", @tag_alias.antecedent_name)
         end
@@ -65,28 +64,32 @@ class TagAliasesControllerTest < ActionController::TestCase
 
     context "index action" do
       setup do
-        @tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+        as_admin do
+          @tag_alias = create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+        end
       end
 
       should "list all tag alias" do
-        get :index, {}, {:user_id => @user.id}
+        get_auth tag_aliases_path, @user
         assert_response :success
       end
 
       should "list all tag_alias (with search)" do
-        get :index, {:search => {:antecedent_name => "aaa"}}, {:user_id => @user.id}
+        get_auth tag_aliases_path, @user, params: {:search => {:antecedent_name => "aaa"}}
         assert_response :success
       end
     end
 
     context "destroy action" do
       setup do
-        @tag_alias = FactoryGirl.create(:tag_alias)
+        as_admin do
+          @tag_alias = create(:tag_alias)
+        end
       end
 
       should "destroy a tag_alias" do
         assert_difference("TagAlias.count", -1) do
-          post :destroy, {:id => @tag_alias.id}, {:user_id => @user.id}
+          delete_auth tag_alias_path(@tag_alias), @user
         end
       end
     end

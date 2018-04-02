@@ -1,23 +1,16 @@
 require 'test_helper'
 
-class TagImplicationRequestsControllerTest < ActionController::TestCase
+class TagImplicationRequestsControllerTest < ActionDispatch::IntegrationTest
   context "The tag implication request controller" do
     setup do
-      Timecop.travel(1.month.ago) do
-        @user = FactoryGirl.create(:user)
+      travel_to(1.month.ago) do
+        @user = create(:user)
       end
-      CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
-    end
-
-    teardown do
-      CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
     end
 
     context "new action" do
       should "render" do
-        get :new, {}, {:user_id => @user.id}
+        get_auth new_tag_implication_request_path, @user
         assert_response :success
       end
     end
@@ -25,7 +18,7 @@ class TagImplicationRequestsControllerTest < ActionController::TestCase
     context "create action" do
       should "create forum post" do
         assert_difference("ForumTopic.count", 1) do
-          post :create, {:tag_implication_request => {:antecedent_name => "aaa", :consequent_name => "bbb", :reason => "ccc", :skip_secondary_validations => true}}, {:user_id => @user.id}
+          post_auth tag_implication_request_path, @user, params: {:tag_implication_request => {:antecedent_name => "aaa", :consequent_name => "bbb", :reason => "ccc", :skip_secondary_validations => true}}
         end
         assert_redirected_to(forum_topic_path(ForumTopic.last))
       end
@@ -40,14 +33,10 @@ class TagImplicationRequestsControllerTest < ActionController::TestCase
           }
         }
 
-        post :create, params, {:user_id => @user.id}
-
-        tir = assigns(:tag_implication_request)
-        assert_redirected_to(forum_topic_path(tir.forum_topic))
-
-        assert("foo", tir.tag_implication.antecedent_name)
-        assert("bar", tir.tag_implication.consequent_name)
-        assert("pending", tir.tag_implication.status)
+        assert_difference("ForumTopic.count") do
+          post_auth tag_implication_request_path, @user, params: params
+        end
+        assert_redirected_to(forum_topic_path(ForumTopic.last))
       end
     end
   end

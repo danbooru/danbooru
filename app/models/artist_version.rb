@@ -1,7 +1,6 @@
 class ArtistVersion < ApplicationRecord
-  belongs_to :updater, :class_name => "User"
+  belongs_to_updater
   belongs_to :artist
-  attr_accessible :artist_id, :name, :is_active, :other_names, :group_name, :url_string, :is_banned, :updater_id, :updater_ip_addr
   delegate :visible?, :to => :artist
 
   module SearchMethods
@@ -105,9 +104,5 @@ class ArtistVersion < ApplicationRecord
 
   def previous
     ArtistVersion.where("artist_id = ? and created_at < ?", artist_id, created_at).order("created_at desc").first
-  end
-
-  def updater_name
-    User.id_to_name(updater_id)
   end
 end

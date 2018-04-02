@@ -1,5 +1,5 @@
 class UserUpgradesController < ApplicationController
-  before_filter :member_only, :only => [:new, :show]
+  before_action :member_only, :only => [:new, :show]
   helper_method :user
   force_ssl :if => :ssl_enabled?
   skip_before_action :verify_authenticity_token, only: [:create]

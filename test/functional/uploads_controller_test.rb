@@ -1,34 +1,24 @@
 require 'test_helper'
 
-class UploadsControllerTest < ActionController::TestCase
-  def setup
-    super
-    mock_iqdb_service!
-  end
-
+class UploadsControllerTest < ActionDispatch::IntegrationTest
   context "The uploads controller" do
     setup do
-      @user = FactoryGirl.create(:contributor_user)
-      CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
-    end
-
-    teardown do
-      CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
+      @user = create(:contributor_user)
+      mock_iqdb_service!
     end
 
     context "batch action" do
       context "for twitter galleries" do
         should "render" do
-          get :batch, {:url => "https://twitter.com/lvlln/status/567054278486151168"}, {:user_id => @user.id}
+          skip "Twitter keys are not set" unless Danbooru.config.twitter_api_key
+          get_auth batch_uploads_path, @user, params: {:url => "https://twitter.com/lvlln/status/567054278486151168"}
           assert_response :success
         end
       end
 
       context "for pixiv ugoira galleries" do
         should "render" do
-          get :batch, {:url => "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=59523577"}, {:user_id => @user.id}
+          get_auth batch_uploads_path, @user, params: {:url => "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=59523577"}
           assert_response :success
           assert_no_match(/59523577_ugoira0\.jpg/, response.body)
         end
@@ -37,46 +27,47 @@ class UploadsControllerTest < ActionController::TestCase
 
     context "new action" do
       should "render" do
-        get :new, {}, {:user_id => @user.id}
+        get_auth new_upload_path, @user
         assert_response :success
       end
 
       context "for a twitter post" do
-        setup do
-          get :new, {:url => "https://twitter.com/frappuccino/status/566030116182949888"}, {:user_id => @user.id}
-        end
-
         should "render" do
+          skip "Twitter keys are not set" unless Danbooru.config.twitter_api_key
+          get_auth new_upload_path, @user, params: {:url => "https://twitter.com/frappuccino/status/566030116182949888"}
           assert_response :success
         end
       end
 
       context "for a post that has already been uploaded" do
         setup do
-          @post = FactoryGirl.create(:post, :source => "aaa")
+          as_user do
+            @post = create(:post, :source => "aaa")
+          end
         end
 
         should "initialize the post" do
-          get :new, {:url => "aaa"}, {:user_id => @user.id}
+          get_auth new_upload_path, @user, params: {:url => "http://google.com/aaa"}
           assert_response :success
-          assert_not_nil(assigns(:post))
         end
       end
     end
 
     context "index action" do
       setup do
-        @upload = FactoryGirl.create(:source_upload)
+        as_user do
+          @upload = create(:source_upload)
+        end
       end
 
       should "render" do
-        get :index, {}, {:user_id => @user.id}
+        get_auth uploads_path, @user
         assert_response :success
       end
 
       context "with search parameters" do
         should "render" do
-          get :index, {:search => {:source => @upload.source}}, {:user_id => @user.id}
+          get_auth uploads_path, @user, params: {:search => {:source => @upload.source}}
           assert_response :success
         end
       end
@@ -84,11 +75,13 @@ class UploadsControllerTest < ActionController::TestCase
 
     context "show action" do
       setup do
-        @upload = FactoryGirl.create(:jpg_upload)
+        as_user do
+          @upload = create(:jpg_upload)
+        end
       end
 
       should "render" do
-        get :show, {:id => @upload.id}, {:user_id => @user.id}
+        get_auth upload_path(@upload), @user
         assert_response :success
       end
     end
@@ -97,19 +90,20 @@ class UploadsControllerTest < ActionController::TestCase
       should "create a new upload" do
         assert_difference("Upload.count", 1) do
           file = Rack::Test::UploadedFile.new("#{Rails.root}/test/files/test.jpg", "image/jpeg")
-          file.stubs(:tempfile).returns(file)
-          post :create, {:upload => {:file => file, :tag_string => "aaa", :rating => "q", :source => "aaa"}}, {:user_id => @user.id}
+          post_auth uploads_path, @user, params: {:upload => {:file => file, :tag_string => "aaa", :rating => "q", :source => "aaa"}}
         end
       end
     end
 
     context "update action" do
       setup do
-        @upload = FactoryGirl.create(:jpg_upload)
+        as_user do
+          @upload = create(:source_upload)
+        end
       end
 
       should "process an unapproval" do
-        post :update, {:id => @upload.id}, {:user_id => @user.id}
+        put_auth upload_path(@upload), @user
         @upload.reload
         assert_equal("completed", @upload.status)
       end

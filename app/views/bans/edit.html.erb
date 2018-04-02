@@ -1,7 +1,14 @@
 <div id="c-bans">
   <div id="a-edit">
     <h1>Edit Ban</h1>
-    <%= render "form", :ban => @ban %>
+
+    <%= simple_form_for(@ban) do |f| %>
+      <%= error_messages_for("ban") %>
+
+      <%= f.input :duration, :hint => "in days" %>
+      <%= f.input :reason %>
+      <%= f.button :submit, :value => "Ban" %>
+    <% end %>
   </div>
 </div>
 

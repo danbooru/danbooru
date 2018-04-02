@@ -4,8 +4,6 @@ require 'base64'
 require 'digest/md5'
 
 class AmazonBackup < ApplicationRecord
-  attr_accessible :last_id
-  
   def self.last_id
     first.last_id
   end

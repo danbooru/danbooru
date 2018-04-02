@@ -1,22 +1,17 @@
 require 'test_helper'
 
-class NoteVersionsControllerTest < ActionController::TestCase
+class NoteVersionsControllerTest < ActionDispatch::IntegrationTest
   context "The note versions controller" do
     setup do
-      @user = FactoryGirl.create(:user)
-      CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
-    end
-
-    teardown do
-      CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
+      @user = create(:user)
     end
 
     context "index action" do
       setup do
-        @note = FactoryGirl.create(:note)
-        @user_2 = FactoryGirl.create(:user)
+        as_user do
+          @note = create(:note)
+        end
+        @user_2 = create(:user)
 
         CurrentUser.scoped(@user_2, "1.2.3.4") do
           @note.update_attributes(:body => "1 2")
@@ -28,17 +23,13 @@ class NoteVersionsControllerTest < ActionController::TestCase
       end
 
       should "list all versions" do
-        get :index
+        get note_versions_path
         assert_response :success
-        assert_not_nil(assigns(:note_versions))
-        assert_equal(3, assigns(:note_versions).size)
       end
 
       should "list all versions that match the search criteria" do
-        get :index, {:search => {:updater_id => @user_2.id}}
+        get note_versions_path, params: {:search => {:updater_id => @user_2.id}}
         assert_response :success
-        assert_not_nil(assigns(:note_versions))
-        assert_equal(1, assigns(:note_versions).size)
       end
     end
   end

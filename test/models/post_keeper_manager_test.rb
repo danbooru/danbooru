@@ -6,14 +6,14 @@ class PostKeeperManagerTest < ActiveSupport::TestCase
   context "#check_and_update" do
     setup do
       Timecop.travel(1.month.ago) do
-        @alice = FactoryGirl.create(:user)
-        @bob = FactoryGirl.create(:user)
-        @carol = FactoryGirl.create(:user)
+        @alice = FactoryBot.create(:user)
+        @bob = FactoryBot.create(:user)
+        @carol = FactoryBot.create(:user)
       end
       PostArchive.sqs_service.stubs(:merge?).returns(false)
 
       CurrentUser.scoped(@alice) do
-        @post = FactoryGirl.create(:post)
+        @post = FactoryBot.create(:post)
       end
       CurrentUser.scoped(@bob) do
         Timecop.travel(2.hours.from_now) do
@@ -37,13 +37,13 @@ class PostKeeperManagerTest < ActiveSupport::TestCase
   context "#check" do
     setup do
       Timecop.travel(1.month.ago) do
-        @alice = FactoryGirl.create(:user)
-        @bob = FactoryGirl.create(:user)
-        @carol = FactoryGirl.create(:user)
+        @alice = FactoryBot.create(:user)
+        @bob = FactoryBot.create(:user)
+        @carol = FactoryBot.create(:user)
       end
 
       CurrentUser.scoped(@alice) do
-        @post = FactoryGirl.create(:post)
+        @post = FactoryBot.create(:post)
       end
     end
 

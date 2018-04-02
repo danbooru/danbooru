@@ -1,8 +1,8 @@
 module Moderator
   module Post
     class ApprovalsController < ApplicationController
-      before_filter :approver_only
-      skip_before_filter :api_check
+      before_action :approver_only
+      skip_before_action :api_check
       respond_to :json, :xml, :js
 
       def create

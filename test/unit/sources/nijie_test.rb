@@ -4,7 +4,7 @@ module Sources
   class NijieTest < ActiveSupport::TestCase
     context "The source site for a nijie page" do
       setup do
-        CurrentUser.user = FactoryGirl.create(:user)
+        CurrentUser.user = FactoryBot.create(:user)
         CurrentUser.ip_addr = "127.0.0.1"
 
         @site = Sources::Site.new("http://nijie.info/view.php?id=213043")
@@ -29,8 +29,8 @@ module Sources
       end
 
       should "normalize （）characters in tags" do
-        FactoryGirl.create(:tag, :name => "kaga")
-        FactoryGirl.create(:wiki_page, :title => "kaga", :other_names => "加賀(艦これ)")
+        FactoryBot.create(:tag, :name => "kaga")
+        FactoryBot.create(:wiki_page, :title => "kaga", :other_names => "加賀(艦これ)")
 
         @site = Sources::Site.new("http://nijie.info/view.php?id=208316")
         @site.get

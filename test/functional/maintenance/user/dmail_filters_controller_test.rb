@@ -2,24 +2,21 @@ require "test_helper"
 
 module Maintenance
   module User
-    class DmailFiltersControllerTest < ActionController::TestCase
+    class DmailFiltersControllerTest < ActionDispatch::IntegrationTest
       context "The dmail filters controller" do
         setup do
-          @user1 = FactoryGirl.create(:user)
-          @user2 = FactoryGirl.create(:user)
-          CurrentUser.user = @user1
-          CurrentUser.ip_addr = "127.0.0.1"
-        end
-
-        teardown do
-          CurrentUser.user = nil
-          CurrentUser.ip_addr = nil
+          @user1 = create(:user)
+          @user2 = create(:user)
         end
 
         context "update action" do
-          should "not allow a user to create a filter belonging to another user" do
-            @dmail = FactoryGirl.create(:dmail, :owner => @user1)
+          setup do
+            as(@user1) do
+              @dmail = create(:dmail, owner: @user1)
+            end
+          end
 
+          should "not allow a user to create a filter belonging to another user" do
             params = {
               :dmail_id => @dmail.id,
               :dmail_filter => {
@@ -28,10 +25,8 @@ module Maintenance
               }
             }
 
-            post :update, params, { :user_id => @user1.id }
-
+            put_auth maintenance_user_dmail_filter_path, @user1, params: params
             assert_not_equal("owned", @user2.reload.dmail_filter.try(&:words))
-            assert_redirected_to(@dmail)
           end
         end
       end

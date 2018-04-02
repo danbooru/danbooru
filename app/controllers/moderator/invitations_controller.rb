@@ -1,6 +1,6 @@
 module Moderator
   class InvitationsController < ApplicationController
-    before_filter :moderator_only
+    before_action :moderator_only
 
     def new
     end

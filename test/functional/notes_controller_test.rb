@@ -1,21 +1,17 @@
 require 'test_helper'
 
-class NotesControllerTest < ActionController::TestCase
+class NotesControllerTest < ActionDispatch::IntegrationTest
   context "The notes controller" do
     setup do
-      @user = FactoryGirl.create(:user)
-      CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
-      @note = FactoryGirl.create(:note, body: "000")
-    end
-
-    teardown do
-      CurrentUser.user = nil
+      @user = create(:user)
+      as_user do
+        @note = create(:note, body: "000")
+      end
     end
 
     context "index action" do
       should "list all notes" do
-        get :index
+        get notes_path
         assert_response :success
       end
 
@@ -32,14 +28,14 @@ class NotesControllerTest < ActionController::TestCase
           }
         }
 
-        get :index, params
+        get notes_path, params: params
         assert_response :success
       end
     end
 
     context "show action" do
       should "render" do
-        get :show, { id: @note.id, format: "json" }
+        get note_path(@note), params: { format: "json" }
         assert_response :success
       end
     end
@@ -47,53 +43,58 @@ class NotesControllerTest < ActionController::TestCase
     context "create action" do
       should "create a note" do
         assert_difference("Note.count", 1) do
-          @post = FactoryGirl.create(:post)
-          post :create, {:note => {:x => 0, :y => 0, :width => 10, :height => 10, :body => "abc", :post_id => @post.id}, :format => :json}, {:user_id => @user.id}
+          as_user do
+            @post = create(:post)
+          end
+          post_auth notes_path, @user, params: {:note => {:x => 0, :y => 0, :width => 10, :height => 10, :body => "abc", :post_id => @post.id}, :format => :json}
         end
       end
     end
 
     context "update action" do
       should "update a note" do
-        post :update, {:id => @note.id, :note => {:body => "xyz"}}, {:user_id => @user.id}
+        put_auth note_path(@note), @user, params: {:note => {:body => "xyz"}}
         assert_equal("xyz", @note.reload.body)
       end
 
       should "not allow changing the post id to another post" do
-        @other = FactoryGirl.create(:post)
-        post :update, {:format => "json", :id => @note.id, :note => {:post_id => @other.id}}, {:user_id => @user.id}
-
+        as(@admin) do
+          @other = create(:post)
+        end
+        put_auth note_path(@note), @user, params: {:format => "json", :id => @note.id, :note => {:post_id => @other.id}}
         assert_not_equal(@other.id, @note.reload.post_id)
       end
     end
 
     context "destroy action" do
       should "destroy a note" do
-        post :destroy, {:id => @note.id}, {:user_id => @user.id}
+        delete_auth note_path(@note), @user
         assert_equal(false, @note.reload.is_active?)
       end
     end
 
     context "revert action" do
       setup do
-        Timecop.travel(1.day.from_now) do
-          @note.update_attributes(:body => "111")
-        end
-        Timecop.travel(2.days.from_now) do
-          @note.update_attributes(:body => "222")
+        as_user do
+          travel_to(1.day.from_now) do
+            @note.update(:body => "111")
+          end
+          travel_to(2.days.from_now) do
+            @note.update(:body => "222")
+          end
         end
       end
 
       should "revert to a previous version" do
-        post :revert, {:id => @note.id, :version_id => @note.versions(true).first.id}, {:user_id => @user.id}
+        put_auth revert_note_path(@note), @user, params: {:version_id => @note.versions.first.id}
         assert_equal("000", @note.reload.body)
       end
 
       should "not allow reverting to a previous version of another note" do
-        @note2 = FactoryGirl.create(:note, :body => "note 2")
-
-        post :revert, { :id => @note.id, :version_id => @note2.versions(true).first.id }, {:user_id => @user.id}
-
+        as_user do
+          @note2 = create(:note, :body => "note 2")
+        end
+        put_auth revert_note_path(@note), @user, params: { :version_id => @note2.versions.first.id }
         assert_not_equal(@note.reload.body, @note2.body)
         assert_response :missing
       end

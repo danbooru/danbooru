@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory(:post) do
     sequence :md5 do |n|
       n.to_s

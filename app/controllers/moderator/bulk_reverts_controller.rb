@@ -1,7 +1,7 @@
 module Moderator
   class BulkRevertsController < ApplicationController
-    before_filter :moderator_only
-    before_filter :init_constraints
+    before_action :moderator_only
+    before_action :init_constraints
     helper PostVersionsHelper
     rescue_from BulkRevert::ConstraintTooGeneralError, :with => :tag_constraint_too_general
 

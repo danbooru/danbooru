@@ -1,11 +1,11 @@
 class ForumTopicsController < ApplicationController
   respond_to :html, :xml, :json
-  before_filter :member_only, :except => [:index, :show]
-  before_filter :moderator_only, :only => [:new_merge, :create_merge]
-  before_filter :normalize_search, :only => :index
-  before_filter :load_topic, :only => [:edit, :show, :update, :destroy, :undelete, :new_merge, :create_merge, :subscribe, :unsubscribe]
-  before_filter :check_min_level, :only => [:show, :edit, :update, :new_merge, :create_merge, :destroy, :undelete, :subscribe, :unsubscribe]
-  skip_before_filter :api_check
+  before_action :member_only, :except => [:index, :show]
+  before_action :moderator_only, :only => [:new_merge, :create_merge]
+  before_action :normalize_search, :only => :index
+  before_action :load_topic, :only => [:edit, :show, :update, :destroy, :undelete, :new_merge, :create_merge, :subscribe, :unsubscribe]
+  before_action :check_min_level, :only => [:show, :edit, :update, :new_merge, :create_merge, :destroy, :undelete, :subscribe, :unsubscribe]
+  skip_before_action :api_check
 
   def new
     @forum_topic = ForumTopic.new
@@ -20,9 +20,9 @@ class ForumTopicsController < ApplicationController
 
   def index
     params[:search] ||= {}
-    params[:search][:order] ||= "sticky" if request.format == Mime::HTML
+    params[:search][:order] ||= "sticky" if request.format == Mime::Type.lookup("text/html")
 
-    @query = ForumTopic.active.search(params[:search])
+    @query = ForumTopic.active.search(search_params)
     @forum_topics = @query.paginate(params[:page], :limit => per_page, :search_count => params[:search])
 
     respond_with(@forum_topics) do |format|
@@ -42,7 +42,7 @@ class ForumTopicsController < ApplicationController
   end
 
   def show
-    if request.format == Mime::HTML
+    if request.format == Mime::Type.lookup("text/html")
       @forum_topic.mark_as_read!(CurrentUser.user)
     end
     @forum_posts = ForumPost.search(:topic_id => @forum_topic.id).reorder("forum_posts.id").paginate(params[:page])
@@ -54,13 +54,13 @@ class ForumTopicsController < ApplicationController
   end
 
   def create
-    @forum_topic = ForumTopic.create(params[:forum_topic], :as => CurrentUser.role)
+    @forum_topic = ForumTopic.create(forum_topic_params(:create))
     respond_with(@forum_topic)
   end
 
   def update
     check_privilege(@forum_topic)
-    @forum_topic.update_attributes(params[:forum_topic], :as => CurrentUser.role)
+    @forum_topic.update(forum_topic_params(:update))
     respond_with(@forum_topic)
   end
 
@@ -147,15 +147,22 @@ private
         end
 
         fmt.json do
-          render :nothing => true, :status => 403
+          render json: nil, :status => 403
         end
 
         fmt.xml do
-          render :nothing => true, :status => 403
+          render xml: nil, :status => 403
         end
       end
 
       return false
     end
+  end
+
+  def forum_topic_params(context)
+    permitted_params = [:title, :category_id, { original_post_attributes: %i[id body] }]
+    permitted_params += %i[is_sticky is_locked min_level] if CurrentUser.is_moderator?
+
+    params.require(:forum_topic).permit(permitted_params)
   end
 end

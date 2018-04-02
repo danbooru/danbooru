@@ -15,7 +15,7 @@ class ArtistTest < ActiveSupport::TestCase
 
   context "An artist" do
     setup do
-      user = Timecop.travel(1.month.ago) {FactoryGirl.create(:user)}
+      user = Timecop.travel(1.month.ago) {FactoryBot.create(:user)}
       CurrentUser.user = user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -33,8 +33,8 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "with a matching tag alias" do
       setup do
-        @tag_alias = FactoryGirl.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
-        @artist = FactoryGirl.create(:artist, :name => "aaa")
+        @tag_alias = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+        @artist = FactoryBot.create(:artist, :name => "aaa")
       end
 
       should "know it has an alias" do
@@ -48,9 +48,9 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "that has been banned" do
       setup do
-        @post = FactoryGirl.create(:post, :tag_string => "aaa")
-        @artist = FactoryGirl.create(:artist, :name => "aaa")
-        @admin = FactoryGirl.create(:admin_user)
+        @post = FactoryBot.create(:post, :tag_string => "aaa")
+        @artist = FactoryBot.create(:artist, :name => "aaa")
+        @admin = FactoryBot.create(:admin_user)
         CurrentUser.scoped(@admin) { @artist.ban! }
         @post.reload
       end
@@ -88,7 +88,7 @@ class ArtistTest < ActiveSupport::TestCase
     should "create a new wiki page to store any note information" do
       artist = nil
       assert_difference("WikiPage.count") do
-        artist = FactoryGirl.create(:artist, :name => "aaa", :notes => "testing")
+        artist = FactoryBot.create(:artist, :name => "aaa", :notes => "testing")
       end
       assert_equal("testing", artist.notes)
       assert_equal("testing", artist.wiki_page.body)
@@ -97,8 +97,8 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when a wiki page with the same name already exists" do
       setup do
-        @wiki_page = FactoryGirl.create(:wiki_page, :title => "aaa")
-        @artist = FactoryGirl.build(:artist, :name => "aaa")
+        @wiki_page = FactoryBot.create(:wiki_page, :title => "aaa")
+        @artist = FactoryBot.build(:artist, :name => "aaa")
       end
 
       should "not validate" do
@@ -108,7 +108,7 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "update the wiki page when notes are assigned" do
-      artist = FactoryGirl.create(:artist, :name => "aaa", :notes => "testing")
+      artist = FactoryBot.create(:artist, :name => "aaa", :notes => "testing")
       artist.update_attribute(:notes, "kokoko")
       artist.reload
       assert_equal("kokoko", artist.notes)
@@ -116,33 +116,32 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "normalize its name" do
-      artist = FactoryGirl.create(:artist, :name => "  AAA BBB  ")
+      artist = FactoryBot.create(:artist, :name => "  AAA BBB  ")
       assert_equal("aaa_bbb", artist.name)
     end
 
     should "resolve ambiguous urls" do
-      bobross = FactoryGirl.create(:artist, :name => "bob_ross", :url_string => "http://artists.com/bobross/image.jpg")
-      bob = FactoryGirl.create(:artist, :name => "bob", :url_string => "http://artists.com/bob/image.jpg")
+      bobross = FactoryBot.create(:artist, :name => "bob_ross", :url_string => "http://artists.com/bobross/image.jpg")
+      bob = FactoryBot.create(:artist, :name => "bob", :url_string => "http://artists.com/bob/image.jpg")
       matches = Artist.find_all_by_url("http://artists.com/bob/test.jpg")
       assert_equal(1, matches.size)
       assert_equal("bob", matches.first.name)
     end
 
     should "parse urls" do
-      artist = FactoryGirl.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/test.jpg http://aaa.com")
+      artist = FactoryBot.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/test.jpg http://aaa.com")
       artist.reload
       assert_equal(["http://aaa.com", "http://rembrandt.com/test.jpg"], artist.urls.map(&:to_s).sort)
     end
 
     should "not allow invalid urls" do
-      artist = FactoryGirl.build(:artist, :url_string => "blah")
-
+      artist = FactoryBot.create(:artist, :url_string => "blah")
       assert_equal(false, artist.valid?)
-      assert_equal(["'blah' must begin with http:// or https://"], artist.errors[:url])
+      assert_equal(["Url must begin with http:// or https://"], artist.errors[:url])
     end
 
     should "make sure old urls are deleted" do
-      artist = FactoryGirl.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/test.jpg")
+      artist = FactoryBot.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/test.jpg")
       artist.url_string = "http://not.rembrandt.com/test.jpg"
       artist.save
       artist.reload
@@ -150,7 +149,7 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "not delete urls that have not changed" do
-      artist = FactoryGirl.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/test.jpg")
+      artist = FactoryBot.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/test.jpg")
       old_url_ids = ArtistUrl.order("id").pluck(&:id)
       artist.url_string = "http://rembrandt.com/test.jpg"
       artist.save
@@ -158,15 +157,15 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "ignore pixiv.net/ and pixiv.net/img/ url matches" do
-      a1 = FactoryGirl.create(:artist, :name => "yomosaka", :url_string => "http://i2.pixiv.net/img100/img/yomosaka/27618292.jpg")
-      a2 = FactoryGirl.create(:artist, :name => "niwatazumi_bf", :url_string => "http://i2.pixiv.net/img16/img/niwatazumi_bf/35488864_big_p6.jpg")
+      a1 = FactoryBot.create(:artist, :name => "yomosaka", :url_string => "http://i2.pixiv.net/img100/img/yomosaka/27618292.jpg")
+      a2 = FactoryBot.create(:artist, :name => "niwatazumi_bf", :url_string => "http://i2.pixiv.net/img16/img/niwatazumi_bf/35488864_big_p6.jpg")
       assert_equal([], Artist.find_all_by_url("http://i2.pixiv.net/img28/img/kyang692/35563903.jpg"))
     end
 
     should "find matches by url" do
-      a1 = FactoryGirl.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/x/test.jpg")
-      a2 = FactoryGirl.create(:artist, :name => "subway", :url_string => "http://subway.com/x/test.jpg")
-      a3 = FactoryGirl.create(:artist, :name => "minko", :url_string => "https://minko.com/x/test.jpg")
+      a1 = FactoryBot.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/x/test.jpg")
+      a2 = FactoryBot.create(:artist, :name => "subway", :url_string => "http://subway.com/x/test.jpg")
+      a3 = FactoryBot.create(:artist, :name => "minko", :url_string => "https://minko.com/x/test.jpg")
 
       assert_equal(["rembrandt"], Artist.find_all_by_url("http://rembrandt.com/x/test.jpg").map(&:name))
       assert_equal(["rembrandt"], Artist.find_all_by_url("http://rembrandt.com/x/another.jpg").map(&:name))
@@ -176,24 +175,24 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "not find duplicates" do
-      FactoryGirl.create(:artist, :name => "warhol", :url_string => "http://warhol.com/x/a/image.jpg\nhttp://warhol.com/x/b/image.jpg")
+      FactoryBot.create(:artist, :name => "warhol", :url_string => "http://warhol.com/x/a/image.jpg\nhttp://warhol.com/x/b/image.jpg")
       assert_equal(["warhol"], Artist.find_all_by_url("http://warhol.com/x/test.jpg").map(&:name))
     end
 
     should "not include duplicate urls" do
-      artist = FactoryGirl.create(:artist, :url_string => "http://foo.com http://foo.com")
+      artist = FactoryBot.create(:artist, :url_string => "http://foo.com http://foo.com")
       assert_equal(["http://foo.com"], artist.url_array)
     end
 
     should "hide deleted artists" do
-      FactoryGirl.create(:artist, :name => "warhol", :url_string => "http://warhol.com/a/image.jpg", :is_active => false)
+      FactoryBot.create(:artist, :name => "warhol", :url_string => "http://warhol.com/a/image.jpg", :is_active => false)
       assert_equal([], Artist.find_all_by_url("http://warhol.com/a/image.jpg").map(&:name))
     end
 
     context "when finding deviantart artists" do
       setup do
-        FactoryGirl.create(:artist, :name => "artgerm", :url_string => "http://artgerm.deviantart.com/")
-        FactoryGirl.create(:artist, :name => "trixia",  :url_string => "http://trixdraws.deviantart.com/")
+        FactoryBot.create(:artist, :name => "artgerm", :url_string => "http://artgerm.deviantart.com/")
+        FactoryBot.create(:artist, :name => "trixia",  :url_string => "http://trixdraws.deviantart.com/")
       end
 
       should "find the correct artist for page URLs" do
@@ -221,9 +220,9 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when finding pixiv artists" do
       setup do
-        FactoryGirl.create(:artist, :name => "masao",:url_string => "http://www.pixiv.net/member.php?id=32777")
-        FactoryGirl.create(:artist, :name => "bkub", :url_string => "http://www.pixiv.net/member.php?id=9948")
-        FactoryGirl.create(:artist, :name => "ryuura", :url_string => "http://www.pixiv.net/member.php?id=8678371")
+        FactoryBot.create(:artist, :name => "masao",:url_string => "http://www.pixiv.net/member.php?id=32777")
+        FactoryBot.create(:artist, :name => "bkub", :url_string => "http://www.pixiv.net/member.php?id=9948")
+        FactoryBot.create(:artist, :name => "ryuura", :url_string => "http://www.pixiv.net/member.php?id=8678371")
       end
 
       should "find the correct artist by looking up the profile url" do
@@ -267,8 +266,8 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when finding nico seiga artists" do
       setup do
-        FactoryGirl.create(:artist, :name => "osamari", :url_string => "http://seiga.nicovideo.jp/user/illust/7017777")
-        FactoryGirl.create(:artist, :name => "hakuro109", :url_string => "http://seiga.nicovideo.jp/user/illust/16265470")
+        FactoryBot.create(:artist, :name => "osamari", :url_string => "http://seiga.nicovideo.jp/user/illust/7017777")
+        FactoryBot.create(:artist, :name => "hakuro109", :url_string => "http://seiga.nicovideo.jp/user/illust/16265470")
       end
 
       should "find the artist by the profile" do
@@ -284,8 +283,9 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when finding twitter artists" do
       setup do
-        FactoryGirl.create(:artist, :name => "hammer_(sunset_beach)", :url_string => "http://twitter.com/hamaororon")
-        FactoryGirl.create(:artist, :name => "haruyama_kazunori",  :url_string => "https://twitter.com/kazuharoom")
+        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
+        FactoryBot.create(:artist, :name => "hammer_(sunset_beach)", :url_string => "http://twitter.com/hamaororon")
+        FactoryBot.create(:artist, :name => "haruyama_kazunori",  :url_string => "https://twitter.com/kazuharoom")
       end
 
       should "find the correct artist for twitter.com sources" do
@@ -317,8 +317,9 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when finding pawoo artists" do
       setup do
-        FactoryGirl.create(:artist, :name => "evazion", :url_string => "https://pawoo.net/@evazion")
-        FactoryGirl.create(:artist, :name => "yasumo01", :url_string => "https://pawoo.net/web/accounts/28816")
+        skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
+        FactoryBot.create(:artist, :name => "evazion", :url_string => "https://pawoo.net/@evazion")
+        FactoryBot.create(:artist, :name => "yasumo01", :url_string => "https://pawoo.net/web/accounts/28816")
       end
 
       should "find the artist" do
@@ -336,8 +337,8 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when finding nijie artists" do
       setup do
-        FactoryGirl.create(:artist, :name => "evazion", :url_string => "http://nijie.info/members.php?id=236014")
-        FactoryGirl.create(:artist, :name => "728995",  :url_string => "http://nijie.info/members.php?id=728995")
+        FactoryBot.create(:artist, :name => "evazion", :url_string => "http://nijie.info/members.php?id=236014")
+        FactoryBot.create(:artist, :name => "728995",  :url_string => "http://nijie.info/members.php?id=728995")
       end
 
       should "find the artist" do
@@ -352,8 +353,8 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when finding tumblr artists" do
       setup do
-        FactoryGirl.create(:artist, :name => "ilya_kuvshinov", :url_string => "http://kuvshinov-ilya.tumblr.com")
-        FactoryGirl.create(:artist, :name => "j.k.", :url_string => "https://jdotkdot5.tumblr.com")
+        FactoryBot.create(:artist, :name => "ilya_kuvshinov", :url_string => "http://kuvshinov-ilya.tumblr.com")
+        FactoryBot.create(:artist, :name => "j.k.", :url_string => "https://jdotkdot5.tumblr.com")
       end
 
       should "find the artist" do
@@ -367,19 +368,19 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "normalize its other names" do
-      artist = FactoryGirl.create(:artist, :name => "a1", :other_names_comma => "aaa, bbb, ccc ddd")
+      artist = FactoryBot.create(:artist, :name => "a1", :other_names_comma => "aaa, bbb, ccc ddd")
       assert_equal("aaa, bbb, ccc_ddd", artist.other_names_comma)
     end
 
     should "search on its name should return results" do
-      artist = FactoryGirl.create(:artist, :name => "artist")
+      artist = FactoryBot.create(:artist, :name => "artist")
       assert_not_nil(Artist.search(:name => "artist").first)
       assert_not_nil(Artist.search(:name_matches => "artist").first)
       assert_not_nil(Artist.search(:any_name_matches => "artist").first)
     end
 
     should "search on other names should return matches" do
-      artist = FactoryGirl.create(:artist, :name => "artist", :other_names_comma => "aaa, ccc ddd")
+      artist = FactoryBot.create(:artist, :name => "artist", :other_names_comma => "aaa, ccc ddd")
       assert_nil(Artist.other_names_match("artist").first)
       assert_not_nil(Artist.other_names_match("aaa").first)
       assert_not_nil(Artist.other_names_match("ccc_ddd").first)
@@ -391,8 +392,8 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "search on group name and return matches" do
-      cat_or_fish = FactoryGirl.create(:artist, :name => "cat_or_fish")
-      yuu = FactoryGirl.create(:artist, :name => "yuu", :group_name => "cat_or_fish")
+      cat_or_fish = FactoryBot.create(:artist, :name => "cat_or_fish")
+      yuu = FactoryBot.create(:artist, :name => "yuu", :group_name => "cat_or_fish")
       cat_or_fish.reload
       assert_equal("yuu", cat_or_fish.member_names)
       assert_not_nil(Artist.search(:name => "group:cat_or_fish").first)
@@ -402,20 +403,20 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "search on has_tag and return matches" do
-      post = FactoryGirl.create(:post, tag_string: "bkub")
-      bkub = FactoryGirl.create(:artist, name: "bkub")
-      none = FactoryGirl.create(:artist, name: "none")
+      post = FactoryBot.create(:post, tag_string: "bkub")
+      bkub = FactoryBot.create(:artist, name: "bkub")
+      none = FactoryBot.create(:artist, name: "none")
 
       assert_equal(bkub.id, Artist.search(has_tag: "true").first.id)
       assert_equal(none.id, Artist.search(has_tag: "false").first.id)
     end
 
     should "revert to prior versions" do
-      user = FactoryGirl.create(:user)
-      reverter = FactoryGirl.create(:user)
+      user = FactoryBot.create(:user)
+      reverter = FactoryBot.create(:user)
       artist = nil
       assert_difference("ArtistVersion.count") do
-        artist = FactoryGirl.create(:artist, :other_names => "yyy")
+        artist = FactoryBot.create(:artist, :other_names => "yyy")
       end
 
       assert_difference("ArtistVersion.count") do
@@ -433,15 +434,15 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "update the category of the tag when created" do
-      tag = FactoryGirl.create(:tag, :name => "abc")
-      artist = FactoryGirl.create(:artist, :name => "abc")
+      tag = FactoryBot.create(:tag, :name => "abc")
+      artist = FactoryBot.create(:artist, :name => "abc")
       tag.reload
       assert_equal(Tag.categories.artist, tag.category)
     end
 
     should "update the category of the tag when renamed" do
-      tag = FactoryGirl.create(:tag, :name => "def")
-      artist = FactoryGirl.create(:artist, :name => "abc")
+      tag = FactoryBot.create(:tag, :name => "def")
+      artist = FactoryBot.create(:artist, :name => "abc")
       artist.name = "def"
       artist.save
       tag.reload
@@ -450,12 +451,12 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when updated" do
       setup do
-        @artist = FactoryGirl.create(:artist)
+        @artist = FactoryBot.create(:artist)
         @artist.stubs(:merge_version?).returns(false)
       end
 
       should "create a new version" do
-        assert_difference("@artist.versions.count") do
+        assert_difference("ArtistVersion.count") do
           @artist.update(:url_string => "http://foo.com")
         end
       end

@@ -1,8 +1,8 @@
 module Maintenance
   module User
     class ApiKeysController < ApplicationController
-      before_filter :check_privilege
-      before_filter :authenticate!, :except => [:show]
+      before_action :check_privilege
+      before_action :authenticate!, :except => [:show]
       rescue_from ::SessionLoader::AuthenticationFailure, :with => :authentication_failed
       respond_to :html, :json, :xml
 

@@ -2,7 +2,7 @@ require 'test_helper'
 
 class ApplicationRecordTest < ActiveSupport::TestCase
   setup do
-    @tags = FactoryGirl.create_list(:tag, 3, post_count: 1)
+    @tags = FactoryBot.create_list(:tag, 3, post_count: 1)
   end
 
   context "ApplicationRecord#search" do

@@ -4,20 +4,20 @@ class PostPrunerTest < ActiveSupport::TestCase
   def setup
     super
 
-    @user = FactoryGirl.create(:admin_user)
+    @user = FactoryBot.create(:admin_user)
     CurrentUser.user = @user
     CurrentUser.ip_addr = "127.0.0.1"
 
     Timecop.travel(2.weeks.ago) do
-      @flagger = FactoryGirl.create(:gold_user)
+      @flagger = FactoryBot.create(:gold_user)
     end
-    @old_post = FactoryGirl.create(:post, :created_at => 5.days.ago, :is_pending => true)
-    @unresolved_flagged_post = FactoryGirl.create(:post, :is_flagged => true)
-    @resolved_flagged_post = FactoryGirl.create(:post, :is_flagged => true)
+    @old_post = FactoryBot.create(:post, :created_at => 5.days.ago, :is_pending => true)
+    @unresolved_flagged_post = FactoryBot.create(:post, :is_flagged => true)
+    @resolved_flagged_post = FactoryBot.create(:post, :is_flagged => true)
 
     CurrentUser.scoped(@flagger, "127.0.0.2") do
-      @unresolved_post_flag = FactoryGirl.create(:post_flag, :created_at => 5.days.ago, :is_resolved => false, :post_id => @unresolved_flagged_post.id)
-      @resolved_post_flag = FactoryGirl.create(:post_flag, :created_at => 5.days.ago, :is_resolved => true, :post_id => @resolved_flagged_post.id)
+      @unresolved_post_flag = FactoryBot.create(:post_flag, :created_at => 5.days.ago, :is_resolved => false, :post_id => @unresolved_flagged_post.id)
+      @resolved_post_flag = FactoryBot.create(:post_flag, :created_at => 5.days.ago, :is_resolved => true, :post_id => @resolved_flagged_post.id)
     end
 
     PostPruner.new.prune!

@@ -1,11 +1,11 @@
 class WikiPagesController < ApplicationController
   respond_to :html, :xml, :json, :js
-  before_filter :member_only, :except => [:index, :search, :show, :show_or_new]
-  before_filter :builder_only, :only => [:destroy]
-  before_filter :normalize_search_params, :only => [:index]
+  before_action :member_only, :except => [:index, :search, :show, :show_or_new]
+  before_action :builder_only, :only => [:destroy]
+  before_action :normalize_search_params, :only => [:index]
   
   def new
-    @wiki_page = WikiPage.new(params[:wiki_page])
+    @wiki_page = WikiPage.new(wiki_page_params)
     respond_with(@wiki_page)
   end
 
@@ -15,7 +15,7 @@ class WikiPagesController < ApplicationController
   end
 
   def index
-    @wiki_pages = WikiPage.search(params[:search]).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
+    @wiki_pages = WikiPage.search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@wiki_pages) do |format|
       format.html do
         if params[:page].nil? || params[:page].to_i == 1
@@ -50,13 +50,13 @@ class WikiPagesController < ApplicationController
   end
 
   def create
-    @wiki_page = WikiPage.create(params[:wiki_page])
+    @wiki_page = WikiPage.create(wiki_page_params)
     respond_with(@wiki_page)
   end
 
   def update
     @wiki_page = WikiPage.find(params[:id])
-    @wiki_page.update_attributes(params[:wiki_page])
+    @wiki_page.update(wiki_page_params)
     respond_with(@wiki_page)
   end
 
@@ -85,11 +85,19 @@ class WikiPagesController < ApplicationController
     end
   end
 
-private
+  private
+
   def normalize_search_params
     if params[:title]
       params[:search] ||= {}
       params[:search][:title] = params.delete(:title)
     end
+  end
+
+  def wiki_page_params
+    permitted_params = %i[title body other_names skip_secondary_validations]
+    permitted_params += %i[is_locked is_deleted] if CurrentUser.is_builder?
+
+    params.require(:wiki_page).permit(permitted_params)
   end
 end
