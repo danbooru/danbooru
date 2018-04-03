@@ -1,46 +1,38 @@
 require 'test_helper'
 
-class WikiPageVersionsControllerTest < ActionController::TestCase
+class WikiPageVersionsControllerTest < ActionDispatch::IntegrationTest
   context "The wiki page versions controller" do
     setup do
-      @user = FactoryGirl.create(:user)
-      CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
-
-      @wiki_page = FactoryGirl.create(:wiki_page)
-      @wiki_page.update_attributes(:body => "1 2")
-      @wiki_page.update_attributes(:body => "2 3")
-    end
-
-    teardown do
-      CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
+      @user = create(:user)
+      as_user do
+        @wiki_page = create(:wiki_page)
+        @wiki_page.update(:body => "1 2")
+        @wiki_page.update(:body => "2 3")
+      end
     end
 
     context "index action" do
       should "list all versions" do
-        get :index
+        get wiki_page_versions_path
         assert_response :success
-        assert_not_nil(assigns(:wiki_page_versions))
       end
 
       should "list all versions that match the search criteria" do
-        get :index, {:search => {:wiki_page_id => @wiki_page.id}}
+        get wiki_page_versions_path, params: {:search => {:wiki_page_id => @wiki_page.id}}
         assert_response :success
-        assert_not_nil(assigns(:wiki_page_versions))
       end
     end
 
     context "show action" do
       should "render" do
-        get :show, { id: @wiki_page.versions.first.id }
+        get wiki_page_version_path(@wiki_page.versions.first)
         assert_response :success
       end
     end
 
     context "diff action" do
       should "render" do
-        get :diff, { thispage: @wiki_page.versions.first.id, otherpage: @wiki_page.versions.last.id }
+        get diff_wiki_page_versions_path, params: { thispage: @wiki_page.versions.first.id, otherpage: @wiki_page.versions.last.id }
         assert_response :success
       end
     end

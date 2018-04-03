@@ -5,21 +5,17 @@ class Comment < ApplicationRecord
   validate :validate_creator_is_not_limited, :on => :create
   validates_format_of :body, :with => /\S/, :message => 'has no content'
   belongs_to :post
-  belongs_to :creator, :class_name => "User"
-  belongs_to :updater, :class_name => "User"
+  belongs_to_creator
+  belongs_to_updater
   has_many :votes, :class_name => "CommentVote", :dependent => :destroy
-  before_validation :initialize_creator, :on => :create
-  before_validation :initialize_updater
   after_create :update_last_commented_at_on_create
-  after_update(:if => lambda {|rec| (!rec.is_deleted? || !rec.is_deleted_changed?) && CurrentUser.id != rec.creator_id}) do |rec|
+  after_update(:if => lambda {|rec| (!rec.is_deleted? || !rec.saved_change_to_is_deleted?) && CurrentUser.id != rec.creator_id}) do |rec|
     ModAction.log("comment ##{rec.id} updated by #{CurrentUser.name}",:comment_update)
   end
-  after_save :update_last_commented_at_on_destroy, :if => lambda {|rec| rec.is_deleted? && rec.is_deleted_changed?}
-  after_save(:if => lambda {|rec| rec.is_deleted? && rec.is_deleted_changed? && CurrentUser.id != rec.creator_id}) do |rec|
+  after_save :update_last_commented_at_on_destroy, :if => lambda {|rec| rec.is_deleted? && rec.saved_change_to_is_deleted?}
+  after_save(:if => lambda {|rec| rec.is_deleted? && rec.saved_change_to_is_deleted? && CurrentUser.id != rec.creator_id}) do |rec|
     ModAction.log("comment ##{rec.id} deleted by #{CurrentUser.name}",:comment_delete)
   end
-  attr_accessible :body, :post_id, :do_not_bump_post, :is_deleted, :as => [:member, :gold, :platinum, :builder, :moderator, :admin]
-  attr_accessible :is_sticky, :as => [:moderator, :admin]
   mentionable(
     :message_field => :body, 
     :title => lambda {|user_name| "#{creator_name} mentioned you in a comment on post ##{post_id}"},
@@ -172,24 +168,6 @@ class Comment < ApplicationRecord
   extend SearchMethods
   include VoteMethods
 
-  def initialize_creator
-    self.creator_id ||= CurrentUser.user.id
-    self.ip_addr ||= CurrentUser.ip_addr
-  end
-
-  def initialize_updater
-    self.updater_id = CurrentUser.user.id
-    self.updater_ip_addr = CurrentUser.ip_addr
-  end
-
-  def creator_name
-    User.id_to_name(creator_id)
-  end
-
-  def updater_name
-    User.id_to_name(updater_id)
-  end
-
   def validate_post_exists
     errors.add(:post, "must exist") unless Post.exists?(post_id)
   end
@@ -245,11 +223,11 @@ class Comment < ApplicationRecord
   end
 
   def delete!
-    update({ :is_deleted => true }, :as => CurrentUser.role)
+    update(is_deleted: true)
   end
 
   def undelete!
-    update({ :is_deleted => false }, :as => CurrentUser.role)
+    update(is_deleted: false)
   end
 
   def quoted_response

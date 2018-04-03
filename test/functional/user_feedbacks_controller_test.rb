@@ -1,51 +1,48 @@
 require 'test_helper'
 
-class UserFeedbacksControllerTest < ActionController::TestCase
+class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
   context "The user feedbacks controller" do
     setup do
-      @user = FactoryGirl.create(:user)
-      @critic = FactoryGirl.create(:gold_user)
-      @mod = FactoryGirl.create(:moderator_user)
-      CurrentUser.user = @critic
-      CurrentUser.ip_addr = "127.0.0.1"
-    end
-
-    teardown do
-      CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
+      @user = create(:user)
+      @critic = create(:gold_user)
+      @mod = create(:moderator_user)
     end
 
     context "new action" do
       should "render" do
-        get :new, {}, {:user_id => @critic.id}
+        get_auth new_user_feedback_path, @critic, params: { user_feedback: { user_id: @user.id } }
         assert_response :success
       end
     end
 
     context "edit action" do
       setup do
-        @user_feedback = FactoryGirl.create(:user_feedback)
+        as(@critic) do
+          @user_feedback = create(:user_feedback, user: @user)
+        end
       end
 
       should "render" do
-        get :edit, {:id => @user_feedback.id}, {:user_id => @critic.id}
+        get_auth edit_user_feedback_path(@user_feedback), @critic
         assert_response :success
       end
     end
 
     context "index action" do
       setup do
-        @user_feedback = FactoryGirl.create(:user_feedback)
+        as(@critic) do
+          @user_feedback = create(:user_feedback, user: @user)
+        end
       end
 
       should "render" do
-        get :index, {}, {:user_id => @user.id}
+        get_auth user_feedbacks_path, @user
         assert_response :success
       end
 
       context "with search parameters" do
         should "render" do
-          get :index, {:search => {:user_id => @user.id}}, {:user_id => @critic.id}
+          get_auth user_feedbacks_path, @critic, params: {:search => {:user_id => @user.id}}
           assert_response :success
         end
       end
@@ -54,35 +51,50 @@ class UserFeedbacksControllerTest < ActionController::TestCase
     context "create action" do
       should "create a new feedback" do
         assert_difference("UserFeedback.count", 1) do
-          post :create, {:user_feedback => {:category => "positive", :user_name => @user.name, :body => "xxx"}}, {:user_id => @critic.id}
-          assert_not_nil(assigns(:user_feedback))
-          assert_equal([], assigns(:user_feedback).errors.full_messages)
+          post_auth user_feedbacks_path, @critic, params: {:user_feedback => {:category => "positive", :user_name => @user.name, :body => "xxx"}}
         end
+      end
+    end
+
+    context "update action" do
+      should "update the feedback" do
+        as(@critic) do
+          @feedback = create(:user_feedback, user: @user, category: "negative")
+        end
+        put_auth user_feedback_path(@feedback), @critic, params: { id: @feedback.id, user_feedback: { category: "positive" }}
+
+        assert_redirected_to(@feedback)
+        assert("positive", @feedback.reload.category)
       end
     end
 
     context "destroy action" do
       setup do
-        @user_feedback = FactoryGirl.create(:user_feedback, user: @user)
+        as(@critic) do
+          @user_feedback = create(:user_feedback, user: @user)
+        end
       end
 
       should "delete a feedback" do
         assert_difference "UserFeedback.count", -1 do
-          post :destroy, {:id => @user_feedback.id}, {:user_id => @critic.id}
+          delete_auth user_feedback_path(@user_feedback), @critic
         end
       end
 
       context "by a moderator" do
         should "allow deleting feedbacks given to other users" do
           assert_difference "UserFeedback.count", -1 do
-            post :destroy, {:id => @user_feedback.id}, {:user_id => @mod.id}
+            delete_auth user_feedback_path(@user_feedback), @mod
           end
         end
 
         should "not allow deleting feedbacks given to themselves" do
-          @user_feedback = FactoryGirl.create(:user_feedback, user: @mod)
+          as(@critic) do
+            @user_feedback = create(:user_feedback, user: @mod)
+          end
+
           assert_difference "UserFeedback.count", 0 do
-            post :destroy, {:id => @user_feedback.id}, {:user_id => @mod.id}
+            delete_auth user_feedback_path(@user_feedback), @mod
           end
         end
       end

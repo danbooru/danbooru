@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory(:forum_topic) do
     title {FFaker::Lorem.words.join(" ")}
     is_sticky false

@@ -1,5 +1,5 @@
 class LegacyController < ApplicationController
-  before_filter :member_only, :only => [:create_post]
+  before_action :member_only, :only => [:create_post]
   respond_to :json, :xml
 
   def posts
@@ -40,7 +40,7 @@ class LegacyController < ApplicationController
   end
 
   def artists
-    @artists = Artist.limit(100).search(params[:search]).paginate(params[:page])
+    @artists = Artist.limit(100).search(search_params).paginate(params[:page])
   end
 
   def unavailable

@@ -1,6 +1,6 @@
 module Admin
   class AliasAndImplicationImportsController < ApplicationController
-    before_filter :admin_only
+    before_action :admin_only
 
     def new
     end

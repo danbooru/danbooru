@@ -4,11 +4,11 @@ class PostFlagTest < ActiveSupport::TestCase
   context "In all cases" do
     setup do
       Timecop.travel(2.weeks.ago) do
-        @alice = FactoryGirl.create(:gold_user)
+        @alice = FactoryBot.create(:gold_user)
       end
       CurrentUser.user = @alice
       CurrentUser.ip_addr = "127.0.0.2"
-      @post = FactoryGirl.create(:post, :tag_string => "aaa")
+      @post = FactoryBot.create(:post, :tag_string => "aaa")
     end
 
     teardown do
@@ -19,7 +19,7 @@ class PostFlagTest < ActiveSupport::TestCase
     context "a basic user" do
       setup do
         Timecop.travel(2.weeks.ago) do
-          @bob = FactoryGirl.create(:user)
+          @bob = FactoryBot.create(:user)
         end
         CurrentUser.user = @bob
       end
@@ -72,18 +72,18 @@ class PostFlagTest < ActiveSupport::TestCase
       end
 
       should "not be able to flag a post in the cooldown period" do
-        users = FactoryGirl.create_list(:user, 2, created_at: 2.weeks.ago)
-        flag1 = FactoryGirl.create(:post_flag, post: @post, creator: users.first)
+        users = FactoryBot.create_list(:user, 2, created_at: 2.weeks.ago)
+        flag1 = FactoryBot.create(:post_flag, post: @post, creator: users.first)
         @post.approve!
 
         travel_to(PostFlag::COOLDOWN_PERIOD.from_now - 1.minute) do
-          flag2 = FactoryGirl.build(:post_flag, post: @post, creator: users.second)
+          flag2 = FactoryBot.build(:post_flag, post: @post, creator: users.second)
           assert(flag2.invalid?)
           assert_match(/cannot be flagged more than once/, flag2.errors[:post].join)
         end
 
         travel_to(PostFlag::COOLDOWN_PERIOD.from_now + 1.minute) do
-          flag3 = FactoryGirl.build(:post_flag, post: @post, creator: users.second)
+          flag3 = FactoryBot.build(:post_flag, post: @post, creator: users.second)
           assert(flag3.valid?)
         end
       end
@@ -98,13 +98,13 @@ class PostFlagTest < ActiveSupport::TestCase
     context "a moderator user" do
       setup do
         Timecop.travel(2.weeks.ago) do
-          @dave = FactoryGirl.create(:moderator_user)
+          @dave = FactoryBot.create(:moderator_user)
         end
         CurrentUser.user = @dave
       end
 
       should "not be able to view flags on their own uploads" do
-        @modpost = FactoryGirl.create(:post, :tag_string => "mmm",:uploader_id => @dave.id)
+        @modpost = FactoryBot.create(:post, :tag_string => "mmm",:uploader_id => @dave.id)
         CurrentUser.scoped(@alice) do
           @flag1 = PostFlag.create(:post => @modpost, :reason => "aaa", :is_resolved => false)
         end

@@ -15,7 +15,7 @@ class User < ApplicationRecord
     ADMIN = 50
   end
 
-  # Used for `before_filter :<role>_only`. Must have a corresponding `is_<role>?` method.
+  # Used for `before_action :<role>_only`. Must have a corresponding `is_<role>?` method.
   Roles = Levels.constants.map(&:downcase) + [
     :anonymous,
     :banned,
@@ -64,11 +64,10 @@ class User < ApplicationRecord
   has_bit_flags BOOLEAN_ATTRIBUTES, :field => "bit_prefs"
 
   attr_accessor :password, :old_password
-  attr_accessible :dmail_filter_attributes, :enable_privacy_mode, :enable_post_navigation, :new_post_navigation_layout, :password, :old_password, :password_confirmation, :password_hash, :email, :last_logged_in_at, :last_forum_read_at, :has_mail, :receive_email_notifications, :comment_threshold, :always_resize_images, :favorite_tags, :blacklisted_tags, :name, :ip_addr, :time_zone, :default_image_size, :enable_sequential_post_navigation, :per_page, :hide_deleted_posts, :style_usernames, :enable_auto_complete, :custom_style, :show_deleted_children, :disable_categorized_saved_searches, :disable_tagged_filenames, :enable_recent_searches, :disable_cropped_thumbnails, :disable_mobile_gestures, :enable_safe_mode, :disable_responsive_mode, :as => [:moderator, :gold, :platinum, :member, :anonymous, :default, :builder, :admin]
-  attr_accessible :level, :as => :admin
 
+  after_initialize :initialize_attributes, if: :new_record?
   validates :name, user_name: true, on: :create
-  validates_uniqueness_of :email, :case_sensitive => false, :if => lambda {|rec| rec.email.present? && rec.email_changed? }
+  validates_uniqueness_of :email, :case_sensitive => false, :if => lambda {|rec| rec.email.present? && rec.saved_change_to_email? }
   validates_length_of :password, :minimum => 5, :if => lambda {|rec| rec.new_record? || rec.password.present?}
   validates_inclusion_of :default_image_size, :in => %w(large original)
   validates_inclusion_of :per_page, :in => 1..100
@@ -82,7 +81,6 @@ class User < ApplicationRecord
   before_validation :normalize_email
   before_create :encrypt_password_on_create
   before_update :encrypt_password_on_update
-  before_create :initialize_default_boolean_attributes
   after_save :update_cache
   after_update :update_remote_cache
   before_create :promote_to_admin_if_first_user
@@ -105,7 +103,7 @@ class User < ApplicationRecord
   has_many :saved_searches
   has_many :forum_posts, lambda {order("forum_posts.created_at, forum_posts.id")}, :foreign_key => "creator_id"
   has_many :user_name_change_requests, lambda {visible.order("user_name_change_requests.created_at desc")}
-  belongs_to :inviter, :class_name => "User"
+  belongs_to :inviter, class_name: "User", optional: true
   after_update :create_mod_action
   accepts_nested_attributes_for :dmail_filter
 
@@ -191,7 +189,7 @@ class User < ApplicationRecord
     end
 
     def update_remote_cache
-      if name_changed?
+      if saved_change_to_name?
         Danbooru.config.other_server_hosts.each do |server|
           HTTParty.delete("http://#{server}/users/#{id}/cache", Danbooru.config.httparty_options)
         end
@@ -223,7 +221,7 @@ class User < ApplicationRecord
         self.bcrypt_password_hash = User.bcrypt(password)
         return true
       else
-        errors[:old_password] = "is incorrect"
+        errors[:old_password] << "is incorrect"
         return false
       end
     end
@@ -385,6 +383,10 @@ class User < ApplicationRecord
       level_string.downcase.to_sym
     end
 
+    def level_string_before_last_save
+      level_string(level_before_last_save)
+    end
+
     def level_string_was
       level_string(level_was)
     end
@@ -438,8 +440,8 @@ class User < ApplicationRecord
     end
 
     def create_mod_action
-      if level_changed?
-        ModAction.log(%{"#{name}":/users/#{id} level changed #{level_string_was} -> #{level_string}},:user_level)
+      if saved_change_to_level?
+        ModAction.log(%{"#{name}":/users/#{id} level changed #{level_string_before_last_save} -> #{level_string}},:user_level)
       end
     end
 
@@ -916,8 +918,8 @@ class User < ApplicationRecord
   extend SearchMethods
   include StatisticsMethods
 
-  def initialize_default_image_size
-    self.default_image_size = "large"
+  def as_current(&block)
+    CurrentUser.as(self, &block)
   end
 
   def can_update?(object, foreign_key = :user_id)
@@ -936,7 +938,8 @@ class User < ApplicationRecord
     !CurrentUser.is_admin? && enable_privacy_mode? && CurrentUser.user.id != id
   end
 
-  def initialize_default_boolean_attributes
+  def initialize_attributes
+    self.last_ip_addr ||= CurrentUser.ip_addr
     self.enable_post_navigation = true
     self.new_post_navigation_layout = true
     self.enable_sequential_post_navigation = true

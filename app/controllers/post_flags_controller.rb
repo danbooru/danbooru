@@ -1,5 +1,5 @@
 class PostFlagsController < ApplicationController
-  before_filter :member_only, :except => [:index, :show]
+  before_action :member_only, :except => [:index, :show]
   respond_to :html, :xml, :json, :js
 
   def new
@@ -8,7 +8,7 @@ class PostFlagsController < ApplicationController
   end
 
   def index
-    @post_flags = PostFlag.search(params[:search]).includes(:creator, post: [:flags, :uploader, :approver])
+    @post_flags = PostFlag.search(search_params).includes(:creator, post: [:flags, :uploader, :approver])
     @post_flags = @post_flags.paginate(params[:page], limit: params[:limit])
     respond_with(@post_flags) do |format|
       format.xml do
@@ -18,12 +18,18 @@ class PostFlagsController < ApplicationController
   end
 
   def create
-    @post_flag = PostFlag.create(params[:post_flag].merge(:is_resolved => false))
+    @post_flag = PostFlag.create(post_flag_params)
     respond_with(@post_flag)
   end
 
   def show
     @post_flag = PostFlag.find(params[:id])
     respond_with(@post_flag)
+  end
+
+  private
+
+  def post_flag_params
+    params.require(:post_flag).permit(%i[post_id reason])
   end
 end

@@ -20,7 +20,7 @@
               <span class="new">NEW</span>
             <% end %>
 
-            <%= link_to topic.title, forum_topic_path(topic) %>
+            <%= link_to topic.title, forum_topic_path(topic), class: "forum-post-link" %>
 
             <% if topic.response_count > Danbooru.config.posts_per_page %>
               <%= link_to "page #{topic.last_page}", forum_topic_path(topic, :page => topic.last_page), :class => "last-page" %>

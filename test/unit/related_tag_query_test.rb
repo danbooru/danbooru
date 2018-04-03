@@ -2,7 +2,7 @@ require 'test_helper'
 
 class RelatedTagQueryTest < ActiveSupport::TestCase
   setup do
-    user = FactoryGirl.create(:user)
+    user = FactoryBot.create(:user)
     CurrentUser.user = user
     CurrentUser.ip_addr = "127.0.0.1"
   end
@@ -11,9 +11,9 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
     subject { RelatedTagQuery.new("copyright") }
 
     setup do
-      @copyright = FactoryGirl.create(:copyright_tag, name: "copyright")
-      @wiki = FactoryGirl.create(:wiki_page, title: "copyright", body: "[[list_of_hoges]]")
-      @list_of_hoges = FactoryGirl.create(:wiki_page, title: "list_of_hoges", body: "[[alpha]] and [[beta]]")
+      @copyright = FactoryBot.create(:copyright_tag, name: "copyright")
+      @wiki = FactoryBot.create(:wiki_page, title: "copyright", body: "[[list_of_hoges]]")
+      @list_of_hoges = FactoryBot.create(:wiki_page, title: "list_of_hoges", body: "[[alpha]] and [[beta]]")
     end
 
     should "return tags from the associated list wiki" do
@@ -26,8 +26,8 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
 
   context "a related tag query without a category constraint" do
     setup do
-      @post_1 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
-      @post_2 = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc")
+      @post_1 = FactoryBot.create(:post, :tag_string => "aaa bbb")
+      @post_2 = FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
     end
 
     context "for a tag that already exists" do
@@ -57,8 +57,8 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
 
     context "for an aliased tag" do
       setup do
-        @ta = FactoryGirl.create(:tag_alias, antecedent_name: "xyz", consequent_name: "aaa")
-        @wp = FactoryGirl.create(:wiki_page, title: "aaa", body: "blah [[foo|blah]] [[FOO]] [[bar]] blah")
+        @ta = FactoryBot.create(:tag_alias, antecedent_name: "xyz", consequent_name: "aaa")
+        @wp = FactoryBot.create(:wiki_page, title: "aaa", body: "blah [[foo|blah]] [[FOO]] [[bar]] blah")
         @query = RelatedTagQuery.new("xyz", "")
 
         Tag.named("aaa").first.update_related
@@ -85,7 +85,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
 
     context "for a tag with a wiki page" do
       setup do
-        @wiki_page = FactoryGirl.create(:wiki_page, :title => "aaa", :body => "[[bbb]] [[ccc]]")
+        @wiki_page = FactoryBot.create(:wiki_page, :title => "aaa", :body => "[[bbb]] [[ccc]]")
         @query = RelatedTagQuery.new("aaa", "")
       end
 
@@ -97,9 +97,9 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
 
   context "a related tag query with a category constraint" do
     setup do
-      @post_1 = FactoryGirl.create(:post, :tag_string => "aaa bbb")
-      @post_2 = FactoryGirl.create(:post, :tag_string => "aaa art:ccc")
-      @post_3 = FactoryGirl.create(:post, :tag_string => "aaa copy:ddd")
+      @post_1 = FactoryBot.create(:post, :tag_string => "aaa bbb")
+      @post_2 = FactoryBot.create(:post, :tag_string => "aaa art:ccc")
+      @post_3 = FactoryBot.create(:post, :tag_string => "aaa copy:ddd")
       @query = RelatedTagQuery.new("aaa", "artist")
     end
 

@@ -1,6 +1,5 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory(:note) do
-    creator
     post
     x 1
     y 1

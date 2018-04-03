@@ -1,8 +1,7 @@
 class WikiPageVersion < ApplicationRecord
   belongs_to :wiki_page
-  belongs_to :updater, :class_name => "User"
-  belongs_to :artist
-  attr_accessible :wiki_page_id, :title, :body, :is_locked, :is_deleted, :updater_id, :updater_ip_addr, :version, :other_names
+  belongs_to_updater
+  belongs_to :artist, optional: true
   delegate :visible?, :to => :wiki_page
 
   module SearchMethods
@@ -26,10 +25,6 @@ class WikiPageVersion < ApplicationRecord
   end
 
   extend SearchMethods
-
-  def updater_name
-    User.id_to_name(updater_id)
-  end
 
   def pretty_title
     title.tr("_", " ")

@@ -1,8 +1,8 @@
 class BulkUpdateRequestsController < ApplicationController
   respond_to :html, :xml, :json, :js
-  before_filter :member_only, :except => [:index, :show]
-  before_filter :admin_only, :only => [:approve]
-  before_filter :load_bulk_update_request, :except => [:new, :create, :index]
+  before_action :member_only, :except => [:index, :show]
+  before_action :admin_only, :only => [:approve]
+  before_action :load_bulk_update_request, :except => [:new, :create, :index]
 
   def new
     @bulk_update_request = BulkUpdateRequest.new
@@ -47,7 +47,7 @@ class BulkUpdateRequestsController < ApplicationController
   end
 
   def index
-    @bulk_update_requests = BulkUpdateRequest.search(params[:search]).paginate(params[:page], :limit => params[:limit])
+    @bulk_update_requests = BulkUpdateRequest.search(search_params).paginate(params[:page], :limit => params[:limit])
     respond_with(@bulk_update_requests)
   end
 

@@ -9,10 +9,10 @@ module Moderator
 
     context "a tag batch change" do
       setup do
-        @user = FactoryGirl.create(:moderator_user)
+        @user = FactoryBot.create(:moderator_user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
-        @post = FactoryGirl.create(:post, :tag_string => "aaa")
+        @post = FactoryBot.create(:post, :tag_string => "aaa")
       end
 
       teardown do
@@ -28,7 +28,7 @@ module Moderator
       end
 
       should "move saved searches" do
-        ss = FactoryGirl.create(:saved_search, :user => @user, :query => "123 ... 456")
+        ss = FactoryBot.create(:saved_search, :user => @user, :query => "123 ... 456")
         tag_batch_change = TagBatchChange.new("...", "bbb", @user.id, "127.0.0.1")
         tag_batch_change.perform
 
@@ -36,7 +36,7 @@ module Moderator
       end
 
       should "move only saved searches that match the mass update exactly" do
-        ss = FactoryGirl.create(:saved_search, :user => @user, :query => "123 ... 456")
+        ss = FactoryBot.create(:saved_search, :user => @user, :query => "123 ... 456")
         tag_batch_change = TagBatchChange.new("1", "bbb", @user.id, "127.0.0.1")
         tag_batch_change.perform
 

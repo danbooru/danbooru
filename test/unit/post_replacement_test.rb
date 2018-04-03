@@ -7,11 +7,11 @@ class PostReplacementTest < ActiveSupport::TestCase
     mock_iqdb_service!
     Delayed::Worker.delay_jobs = true # don't delete the old images right away
 
-    @system = FactoryGirl.create(:user, created_at: 2.weeks.ago)
+    @system = FactoryBot.create(:user, created_at: 2.weeks.ago)
     User.stubs(:system).returns(@system)
 
-    @uploader = FactoryGirl.create(:user, created_at: 2.weeks.ago, can_upload_free: true)
-    @replacer = FactoryGirl.create(:user, created_at: 2.weeks.ago, can_approve_posts: true)
+    @uploader = FactoryBot.create(:user, created_at: 2.weeks.ago, can_upload_free: true)
+    @replacer = FactoryBot.create(:user, created_at: 2.weeks.ago, can_approve_posts: true)
     CurrentUser.user = @replacer
     CurrentUser.ip_addr = "127.0.0.1"
   end
@@ -27,7 +27,7 @@ class PostReplacementTest < ActiveSupport::TestCase
   context "Replacing" do
     setup do
       CurrentUser.scoped(@uploader, "127.0.0.2") do
-        upload = FactoryGirl.create(:jpg_upload, as_pending: "0", tag_string: "lowres tag1")
+        upload = FactoryBot.create(:jpg_upload, as_pending: "0", tag_string: "lowres tag1")
         upload.process!
         @post = upload.post
       end
@@ -118,7 +118,7 @@ class PostReplacementTest < ActiveSupport::TestCase
 
     context "a post with notes" do
       setup do
-        @post.update({image_width: 160, image_height: 164}, without_protection: true)
+        @post.update(image_width: 160, image_height: 164)
         CurrentUser.scoped(@uploader, "127.0.0.1") do
           @note = @post.notes.create(x: 80, y: 82, width: 80, height: 82, body: "test")
         end
@@ -169,6 +169,7 @@ class PostReplacementTest < ActiveSupport::TestCase
 
     context "a post that is replaced by a ugoira" do
       should "save the frame data" do
+        skip "ffmpeg not installed" unless check_ffmpeg
         @post.replace!(replacement_url: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
         @post.reload
 
@@ -186,6 +187,8 @@ class PostReplacementTest < ActiveSupport::TestCase
 
     context "a post that is replaced to another file then replaced back to the original file" do
       should "not delete the original files" do
+        skip "ffmpeg is not installed" unless check_ffmpeg
+        
         @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
         @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
         @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
@@ -204,8 +207,10 @@ class PostReplacementTest < ActiveSupport::TestCase
 
     context "two posts that have had their files swapped" do
       should "not delete the still active files" do
-        @post1 = FactoryGirl.create(:post)
-        @post2 = FactoryGirl.create(:post)
+        skip "ffmpeg is not installed" unless check_ffmpeg
+
+        @post1 = FactoryBot.create(:post)
+        @post2 = FactoryBot.create(:post)
 
         # swap the images between @post1 and @post2.
         @post1.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
@@ -245,6 +250,7 @@ class PostReplacementTest < ActiveSupport::TestCase
 
     context "a post when replaced with a HTML source" do
       should "record the image URL as the replacement URL, not the HTML source" do
+        skip "Twitter key not set" unless Danbooru.config.twitter_api_key
         replacement_url = "https://twitter.com/nounproject/status/540944400767922176"
         image_url = "https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"
         @post.replace!(replacement_url: replacement_url)

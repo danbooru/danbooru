@@ -1,6 +1,6 @@
 class DelayedJobsController < ApplicationController
   respond_to :html, :xml, :json, :js
-  before_filter :admin_only, except: [:index]
+  before_action :admin_only, except: [:index]
 
   def index
     @delayed_jobs = Delayed::Job.order("run_at asc").paginate(params[:page], :limit => params[:limit])
@@ -18,7 +18,7 @@ class DelayedJobsController < ApplicationController
   def retry
     @job = Delayed::Job.find(params[:id])
     if !@job.locked_at?
-      @job.update({failed_at: nil, attempts: 0}, without_protection: true)
+      @job.update(failed_at: nil, attempts: 0)
     end
     respond_with(@job)
   end

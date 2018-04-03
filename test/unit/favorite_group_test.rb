@@ -3,10 +3,10 @@ require 'test_helper'
 class FavoriteTest < ActiveSupport::TestCase
   def setup
     super
-    @user = FactoryGirl.create(:user)
+    @user = FactoryBot.create(:user)
     CurrentUser.user = @user
     CurrentUser.ip_addr = "127.0.0.1"
-    @fav_group = FactoryGirl.create(:favorite_group, creator: @user, name: "blah")
+    @fav_group = FactoryBot.create(:favorite_group, creator: @user, name: "blah")
   end
 
   def teardown
@@ -63,7 +63,7 @@ class FavoriteTest < ActiveSupport::TestCase
 
   context "expunging a post" do
     setup do
-      @post = FactoryGirl.create(:post)
+      @post = FactoryBot.create(:post)
       @fav_group.add!(@post)
     end
 

@@ -3,7 +3,7 @@ require 'test_helper'
 class BulkRevertTest < ActiveSupport::TestCase
   context "#find_post_versions" do
     subject do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       BulkRevert.new
     end
 

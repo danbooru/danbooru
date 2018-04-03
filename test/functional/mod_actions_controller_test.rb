@@ -1,10 +1,10 @@
 require 'test_helper'
 
-class ModActionsControllerTest < ActionController::TestCase
+class ModActionsControllerTest < ActionDispatch::IntegrationTest
   context "The mod actions controller" do
     context "index action" do
       should "work" do
-        get :index
+        get mod_actions_path
         assert_response :success
       end
     end

@@ -1,0 +1,7 @@
+<div class="quick-mod">
+  <%= link_to_if post.is_approvable?, "Approve", moderator_post_approval_path(post_id: post.id), id: "quick-mod-approve", method: :post, remote: true, class: "btn" %> |
+  <%= link_to "Breaks Rules", moderator_post_disapproval_path(post_disapproval: { post_id: post.id, reason: "breaks_rules" }), method: :post, remote: true, class: "btn" %> |
+  <%= link_to "Poor Quality", moderator_post_disapproval_path(post_disapproval: { post_id: post.id, reason: "poor_quality" }), method: :post, remote: true, class: "btn" %> |
+  <%= link_to "No Interest",  moderator_post_disapproval_path(post_disapproval: { post_id: post.id, reason: "disinterest" }), method: :post, remote: true, class: "btn" %> |
+  <%= link_to "Detailed Rejection", "#", "data-post-id" => post.id, class: "detailed-rejection-link btn" %>
+</div>

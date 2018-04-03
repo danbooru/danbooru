@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory(:user, aliases: [:creator, :updater]) do
     name {(rand(1_000_000) + 10).to_s}
     password "password"
@@ -15,7 +15,6 @@ FactoryGirl.define do
     factory(:banned_user) do
       transient { ban_duration 3 }
       is_banned true
-      after(:create) { |user, ctx| create(:ban, user: user, duration: ctx.ban_duration) }
     end
 
     factory(:member_user) do

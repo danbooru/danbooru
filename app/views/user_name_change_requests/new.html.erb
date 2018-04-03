@@ -8,15 +8,9 @@
 
     <%= error_messages_for "change_request" %>
 
-    <%= form_tag(user_name_change_requests_path, :class => "simple_form") do %>
-      <div class="input">
-        <label for="desired_name">Desired Name</label>
-        <%= text_field_tag "desired_name" %>
-      </div>
-
-      <div class="input">
-        <%= submit_tag "Submit", :data => { :disable_with => "Submitting..." } %>
-      </div>
+    <%= simple_form_for(@change_request) do |f| %>
+      <%= f.input :desired_name %>
+      <%= f.submit "Submit", data: { disable_with: "Submitting..." } %>
     <% end %>
   </div>
 </div>

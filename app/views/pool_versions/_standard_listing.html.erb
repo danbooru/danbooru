@@ -15,7 +15,7 @@
     </thead>
     <tbody>
       <% @pool_versions.each do |pool_version| %>
-        <tr>
+        <tr id="pool-version-<%= pool_version.id %>">
           <td><%= link_to pool_version.pretty_name, pool_path(pool_version.pool_id), :class => "pool-category-#{pool_version.pool.category}" %></td>
           <td><%= link_to pool_version.post_ids.size, pool_versions_path(:search => {:pool_id => pool_version.pool_id}) %></td>
           <td class="col-expand"><%= pool_version_diff(pool_version) %></td>

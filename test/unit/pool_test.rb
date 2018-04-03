@@ -5,7 +5,7 @@ require 'test_helper'
 class PoolTest < ActiveSupport::TestCase
   setup do
     Timecop.travel(1.month.ago) do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       CurrentUser.user = @user
     end
 
@@ -24,7 +24,7 @@ class PoolTest < ActiveSupport::TestCase
 
   context "A name" do
     setup do
-      @pool = FactoryGirl.create(:pool, :name => "xxx")
+      @pool = FactoryBot.create(:pool, :name => "xxx")
     end
 
     should "be mapped to a pool id" do
@@ -34,7 +34,7 @@ class PoolTest < ActiveSupport::TestCase
 
   context "A multibyte character name" do
     setup do
-      @mb_pool = FactoryGirl.create(:pool, :name => "àáâãäå")
+      @mb_pool = FactoryBot.create(:pool, :name => "àáâãäå")
     end
 
     should "be mapped to a pool id" do
@@ -44,7 +44,7 @@ class PoolTest < ActiveSupport::TestCase
 
   context "An id number" do
     setup do
-      @pool = FactoryGirl.create(:pool)
+      @pool = FactoryBot.create(:pool)
     end
 
     should "be mapped to a pool id" do
@@ -56,10 +56,10 @@ class PoolTest < ActiveSupport::TestCase
     setup do
       PoolArchive.stubs(:enabled?).returns(true)
 
-      @pool = FactoryGirl.create(:pool)
-      @p1 = FactoryGirl.create(:post)
-      @p2 = FactoryGirl.create(:post)
-      @p3 = FactoryGirl.create(:post)
+      @pool = FactoryBot.create(:pool)
+      @p1 = FactoryBot.create(:post)
+      @p2 = FactoryBot.create(:post)
+      @p3 = FactoryBot.create(:post)
       CurrentUser.scoped(@user, "1.2.3.4") do
         @pool.add!(@p1)
       end
@@ -104,9 +104,9 @@ class PoolTest < ActiveSupport::TestCase
 
   context "Updating a pool" do
     setup do
-      @pool = FactoryGirl.create(:pool)
-      @p1 = FactoryGirl.create(:post)
-      @p2 = FactoryGirl.create(:post)
+      @pool = FactoryBot.create(:pool)
+      @p1 = FactoryBot.create(:post)
+      @p2 = FactoryBot.create(:post)
     end
 
     context "by adding a new post" do
@@ -147,7 +147,7 @@ class PoolTest < ActiveSupport::TestCase
       context "to a deleted pool" do
         setup do
           # must be a builder to update deleted pools.
-          CurrentUser.user = FactoryGirl.create(:builder_user)
+          CurrentUser.user = FactoryBot.create(:builder_user)
 
           @pool.update_attribute(:is_deleted, true)
           @pool.post_ids = "#{@pool.post_ids} #{@p2.id}"
@@ -215,7 +215,7 @@ class PoolTest < ActiveSupport::TestCase
 
     should "create new versions for each distinct user" do
       assert_equal(1, @pool.versions.size)
-      user2 = Timecop.travel(1.month.ago) {FactoryGirl.create(:user)}
+      user2 = Timecop.travel(1.month.ago) {FactoryBot.create(:user)}
 
       CurrentUser.scoped(user2, "127.0.0.2") do
         @pool.post_ids = "#{@p1.id}"
@@ -262,24 +262,21 @@ class PoolTest < ActiveSupport::TestCase
     end
 
     context "when validating names" do
-      should_not allow_value("foo,bar").for(:name)
-      should_not allow_value("foo*bar").for(:name)
-      should_not allow_value("123").for(:name)
-      should_not allow_value("___").for(:name)
-      should_not allow_value("   ").for(:name)
-
-      %w[any none series collection].each do |type|
-        should_not allow_value(type).for(:name)
+      should "not be valid for bad names" do
+        ["foo,bar", "foo*bar", "123", "___", "   ", "any", "none", "series", "collection"].each do |bad_name|
+          pool = Pool.create(name: bad_name)
+          assert pool.invalid?
+        end
       end
     end
   end
 
   context "An existing pool" do
     setup do
-      @pool = FactoryGirl.create(:pool)
-      @p1 = FactoryGirl.create(:post)
-      @p2 = FactoryGirl.create(:post)
-      @p3 = FactoryGirl.create(:post)
+      @pool = FactoryBot.create(:pool)
+      @p1 = FactoryBot.create(:post)
+      @p2 = FactoryBot.create(:post)
+      @p3 = FactoryBot.create(:post)
       @pool.add!(@p1)
       @pool.add!(@p2)
       @pool.add!(@p3)

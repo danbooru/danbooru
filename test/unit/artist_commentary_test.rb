@@ -2,7 +2,7 @@ require 'test_helper'
 
 class ArtistCommentaryTest < ActiveSupport::TestCase
   setup do
-    user = FactoryGirl.create(:user)
+    user = FactoryBot.create(:user)
     CurrentUser.user = user
     CurrentUser.ip_addr = "127.0.0.1"
   end
@@ -13,21 +13,21 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
   end
 
   should "A post should not have more than one commentary" do
-    post = FactoryGirl.create(:post)
+    post = FactoryBot.create(:post)
 
     assert_raise(ActiveRecord::RecordInvalid) do
-      FactoryGirl.create(:artist_commentary, post_id: post.id)
-      FactoryGirl.create(:artist_commentary, post_id: post.id)
+      FactoryBot.create(:artist_commentary, post_id: post.id)
+      FactoryBot.create(:artist_commentary, post_id: post.id)
     end
   end
 
   context "An artist commentary" do
     context "when searched" do
       setup do
-        @post1 = FactoryGirl.create(:post, tag_string: "artcomm1")
-        @post2 = FactoryGirl.create(:post, tag_string: "artcomm2")
-        @artcomm1 = FactoryGirl.create(:artist_commentary, post_id: @post1.id, original_title: "foo", translated_title: "bar")
-        @artcomm2 = FactoryGirl.create(:artist_commentary, post_id: @post2.id, original_title: "", original_description: "", translated_title: "", translated_description: "")
+        @post1 = FactoryBot.create(:post, tag_string: "artcomm1")
+        @post2 = FactoryBot.create(:post, tag_string: "artcomm2")
+        @artcomm1 = FactoryBot.create(:artist_commentary, post_id: @post1.id, original_title: "foo", translated_title: "bar")
+        @artcomm2 = FactoryBot.create(:artist_commentary, post_id: @post2.id, original_title: "", original_description: "", translated_title: "", translated_description: "")
       end
 
       should "find the correct match" do
@@ -46,7 +46,7 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
 
     context "when created" do
       should "create a new version" do
-        @artcomm = FactoryGirl.create(:artist_commentary, original_title: "foo")
+        @artcomm = FactoryBot.create(:artist_commentary, original_title: "foo")
 
         assert_equal(1, @artcomm.versions.size)
         assert_equal("foo", @artcomm.versions.last.original_title)
@@ -55,8 +55,8 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
 
     context "when updated" do
       setup do
-        @post = FactoryGirl.create(:post)
-        @artcomm = FactoryGirl.create(:artist_commentary, post_id: @post.id)
+        @post = FactoryBot.create(:post)
+        @artcomm = FactoryBot.create(:artist_commentary, post_id: @post.id)
         @artcomm.reload
       end
 

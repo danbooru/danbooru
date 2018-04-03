@@ -36,6 +36,6 @@ protected
   end
 
   def prune_mod_actions!
-    ModAction.destroy_all(["creator_id = ? and description like ?", User.system.id, "deleted post %"])
+    ModAction.where(["creator_id = ? and description like ?", User.system.id, "deleted post %"]).destroy_all
   end
 end

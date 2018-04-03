@@ -1,7 +1,7 @@
 class DmailsController < ApplicationController
   respond_to :html, :xml, :json
-  before_filter :member_only, except: [:index, :show, :destroy, :mark_all_as_read]
-  before_filter :gold_only, only: [:ham, :spam]
+  before_action :member_only, except: [:index, :show, :destroy, :mark_all_as_read]
+  before_action :gold_only, only: [:ham, :spam]
 
   def new
     if params[:respond_to_id]
@@ -19,7 +19,7 @@ class DmailsController < ApplicationController
     if params[:folder] && params[:set_default_folder]
       cookies.permanent[:dmail_folder] = params[:folder]
     end
-    @query = Dmail.active.visible.search(params[:search])
+    @query = Dmail.active.visible.search(search_params)
     @dmails = @query.paginate(params[:page], :limit => params[:limit])
     respond_with(@dmails) do |format|
       format.xml do

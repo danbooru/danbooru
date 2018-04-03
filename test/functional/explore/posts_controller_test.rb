@@ -1,38 +1,39 @@
 require "test_helper"
 
 module Explore
-  class PostsControllerTest < ActionController::TestCase
+  class PostsControllerTest < ActionDispatch::IntegrationTest
     context "in all cases" do
       setup do
-        CurrentUser.user = FactoryGirl.create(:user)
-        CurrentUser.ip_addr = "127.0.0.1"
-        FactoryGirl.create(:post)
+        @user = create(:user)
+        as_user do
+          create(:post)
+        end
       end
 
       context "#popular" do
         should "render" do
-          get :popular
+          get popular_explore_posts_path
           assert_response :success
         end
       end
 
       context "#searches" do
         should "render" do
-          get :searches
+          get searches_explore_posts_path
           assert_response :success
         end
       end
 
       context "#missed_searches" do
         should "render" do
-          get :missed_searches
+          get missed_searches_explore_posts_path
           assert_response :success
         end
       end
 
       context "#intro" do
         should "render" do
-          get :intro
+          get intro_explore_posts_path
           assert_response :success
         end
       end

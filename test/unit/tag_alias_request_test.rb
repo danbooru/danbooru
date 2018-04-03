@@ -3,7 +3,7 @@ require 'test_helper'
 class TagAliasRequestTest < ActiveSupport::TestCase
   context "A tag alias request" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end

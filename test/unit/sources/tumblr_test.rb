@@ -2,6 +2,11 @@ require 'test_helper'
 
 module Sources
   class TumblrTest < ActiveSupport::TestCase
+    def setup
+      super
+      skip "Tumblr key is not configured" unless Danbooru.config.tumblr_consumer_key
+    end
+
     context "The source for a 'http://*.tumblr.com/post/*' photo post with a single image" do
       setup do
         @site = Sources::Site.new("https://noizave.tumblr.com/post/162206271767")
@@ -67,10 +72,10 @@ module Sources
       end
 
       should "get the artist" do
-        CurrentUser.user = FactoryGirl.create(:user)
+        CurrentUser.user = FactoryBot.create(:user)
         CurrentUser.ip_addr = "127.0.0.1"
 
-        @artist = FactoryGirl.create(:artist, name: "noizave", url_string: "https://noizave.tumblr.com/")
+        @artist = FactoryBot.create(:artist, name: "noizave", url_string: "https://noizave.tumblr.com/")
         assert_equal([@artist], @site.artists)
       end
     end

@@ -2,9 +2,9 @@ class BulkUpdateRequest < ApplicationRecord
   attr_accessor :reason, :skip_secondary_validations
 
   belongs_to :user
-  belongs_to :forum_topic
-  belongs_to :forum_post
-  belongs_to :approver, :class_name => "User"
+  belongs_to :forum_topic, optional: true
+  belongs_to :forum_post, optional: true
+  belongs_to :approver, optional: true, class_name: "User"
 
   validates_presence_of :user
   validates_presence_of :script
@@ -112,10 +112,12 @@ class BulkUpdateRequest < ApplicationRecord
     def create_forum_topic
       if forum_topic_id
         forum_post = forum_topic.posts.create(body: reason_with_link)
-        update_attributes(:forum_post_id => forum_post.id)
+        update(forum_post_id: forum_post.id)
       else
-        forum_topic = ForumTopic.create(:title => title, :category_id => 1, :original_post_attributes => {:body => reason_with_link})
-        update_attributes(:forum_topic_id => forum_topic.id, :forum_post_id => forum_topic.posts.first.id)
+        forum_topic = ForumTopic.create(title: title, category_id: 1, original_post_attributes: {body: reason_with_link})
+        puts forum_topic.errors.full_messages
+        puts forum_topic.original_post.errors.full_messages
+        update(forum_topic_id: forum_topic.id, forum_post_id: forum_topic.posts.first.id)
       end
     end
 
@@ -136,13 +138,13 @@ class BulkUpdateRequest < ApplicationRecord
       AliasAndImplicationImporter.tokenize(script)
       return true
     rescue StandardError => e
-      errors.add(:base, e.message)
+      errors[:base] << e.message
       return false
     end
 
     def forum_topic_id_not_invalid
       if forum_topic_id && !forum_topic
-        errors.add(:base, "Forum topic ID is invalid")
+        errors[:base] << "Forum topic ID is invalid"
       end
     end
 
@@ -150,7 +152,7 @@ class BulkUpdateRequest < ApplicationRecord
       begin
         AliasAndImplicationImporter.new(script, forum_topic_id, "1", skip_secondary_validations).validate!
       rescue RuntimeError => e
-        self.errors[:base] = e.message
+        self.errors[:base] << e.message
         return false
       end
 

@@ -1,5 +1,5 @@
 class UploadsController < ApplicationController
-  before_filter :member_only, except: [:index, :show]
+  before_action :member_only, except: [:index, :show]
   respond_to :html, :xml, :json, :js
 
   def new
@@ -31,7 +31,7 @@ class UploadsController < ApplicationController
   end
 
   def index
-    @search = Upload.search(params[:search])
+    @search = Upload.search(search_params)
     @uploads = @search.paginate(params[:page], :limit => params[:limit])
     respond_with(@uploads) do |format|
       format.xml do
@@ -52,7 +52,7 @@ class UploadsController < ApplicationController
   end
 
   def create
-    @upload = Upload.create(params[:upload].merge(:server => Socket.gethostname))
+    @upload = Upload.create(upload_params)
 
     if @upload.errors.empty?
       post = @upload.process!
@@ -72,7 +72,8 @@ class UploadsController < ApplicationController
     respond_with(@upload)
   end
 
-protected
+  private
+
   def find_post_by_url(normalized_url)
     if normalized_url.nil?
       Post.where("SourcePattern(lower(posts.source)) = ?", params[:url]).first
@@ -88,5 +89,15 @@ protected
       cookies[:recent_tags] = tags.join(" ")
       cookies[:recent_tags_with_categories] = Tag.categories_for(tags).to_a.flatten.join(" ")
     end
+  end
+
+  def upload_params
+    permitted_params = %i[
+      file source tag_string rating status parent_id artist_commentary_title
+      artist_commentary_desc include_artist_commentary referer_url
+      md5_confirmation as_pending 
+    ]
+
+    params.require(:upload).permit(permitted_params)
   end
 end
