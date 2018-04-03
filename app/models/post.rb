@@ -552,6 +552,9 @@ class Post < ApplicationRecord
       if PostKeeperManager.enabled? && persisted?
         # no need to do this check on the initial create
         PostKeeperManager.check_and_update(self, CurrentUser.id, increment_tags)
+
+        # run this again async to check for race conditions
+        PostKeeperManager.queue_check(self)
       end
     end
 
