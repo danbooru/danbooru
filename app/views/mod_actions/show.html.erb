@@ -1,0 +1,17 @@
+<div id="c-mod-actions">
+  <div id="a-index">
+    <h1>Show Mod Action</h1>
+    <ul style="margin-bottom: 1em;">
+      <li><strong>Creator</strong>: <%= link_to_user @mod_action.creator %></li>
+      <li><strong>Date</strong>: <%= compact_time @mod_action.created_at %></li>
+      <% if !@mod_action.category.nil? %>
+        <li><strong>Category</strong>: <%= @mod_action.category.tr("_"," ").capitalize %> (<%= @mod_action.category_id %>)</li>
+      <% end %>
+      <li><strong>Message</strong>: <%= format_text(@mod_action.description) %></li>
+    </ul>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  Mod Action - <%= @mod_action.category %> - <%= Danbooru.config.app_name %>
+<% end %>

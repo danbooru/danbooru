@@ -30,9 +30,10 @@
             <td><%= humanized_duration(ban.created_at, ban.expires_at) %></td>
             <td class="col-expand"><%= format_text ban.reason %></td>
             <td>
+              <%= link_to "Show", ban_path(ban) %>
               <% if CurrentUser.is_moderator? %>
-                <%= link_to "Edit", edit_ban_path(ban) %>
-                | <%= link_to "Delete", ban_path(ban), :method => :delete, :remote => true %>
+                | <%= link_to "Edit", edit_ban_path(ban) %>
+                | <%= link_to "Delete", ban_path(ban), :method => :delete, :data => {:confirm => "Are you sure you want to delete this user ban?"} %>
               <% end %>
             </td>
           </tr>

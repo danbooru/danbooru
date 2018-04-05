@@ -25,7 +25,7 @@
     });
   }
 
-  Danbooru.Dtext.call_preview = function(e, $button, $input, $preview) {
+  Danbooru.Dtext.call_preview = function(e, $button, $input, $preview, inline) {
     $button.val("Edit");
     $input.hide();
     $preview.text("Loading...").fadeIn("fast");
@@ -33,7 +33,8 @@
       type: "post",
       url: "/dtext_preview",
       data: {
-        body: $input.val()
+        body: $input.val(),
+        inline: inline
       },
       success: function(data) {
         $preview.html(data).fadeIn("fast");
@@ -52,9 +53,10 @@
     var $button = $(e.target);
     var $input = $("#" + $button.data("input-id"));
     var $preview = $("#" + $button.data("preview-id"));
+    var inline = $button.data("inline");
 
     if ($button.val().match(/preview/i)) {
-      Danbooru.Dtext.call_preview(e, $button, $input, $preview);
+      Danbooru.Dtext.call_preview(e, $button, $input, $preview, inline);
     } else {
       Danbooru.Dtext.call_edit(e, $button, $input, $preview);
     }

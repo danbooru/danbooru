@@ -1,0 +1,36 @@
+<div id="c-bulk-update-requests">
+  <div id="a-show">
+    <h1>Bulk Update Request: <%= @bulk_update_request.title %></h1>
+    <ul style="margin-bottom: 1em;">
+      <li><strong>Script</strong>: <%= format_text(@bulk_update_request.script_with_links) %></li>
+      <li><strong>Status</strong>: <%= @bulk_update_request.status %></li>
+      <% if @bulk_update_request.forum_topic_id || @bulk_update_request.forum_post_id %>
+        <li><strong>Reference</strong>:
+          <% if @bulk_update_request.forum_topic_id %>
+            <% if @bulk_update_request.forum_post_id && @bulk_update_request.forum_topic.posts.first.id != @bulk_update_request.forum_post_id %>
+              <%= link_to(@bulk_update_request.forum_topic.title, forum_topic_path(@bulk_update_request.forum_topic_id, :page => @bulk_update_request.forum_post.forum_topic_page, :anchor => "forum_post_#{@bulk_update_request.forum_post_id}")) %>
+            <% else %>
+              <%= link_to(@bulk_update_request.forum_topic.title, forum_topic_path(@bulk_update_request.forum_topic_id)) %>
+            <% end %>
+          <% end %>
+        </li>
+      <% end %>
+      <li><strong>Creator</strong>: <%= link_to_user @bulk_update_request.user %></li>
+      <% if @bulk_update_request.approver %>
+        <li><strong>Approver</strong>: <%= link_to_user @bulk_update_request.approver %></li>
+      <% end %>
+      <li>
+        <strong>Date</strong>: <%= compact_time @bulk_update_request.created_at %>
+        <% if @bulk_update_request.updated_at - @bulk_update_request.created_at > 5.minutes %>
+          (<span class="tn">Updated <%= time_ago_in_words_tagged(@bulk_update_request.updated_at) %></span>)
+        <% end %>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Bulk Update Request - <%= @bulk_update_request.title %> - <%= Danbooru.config.app_name %>
+<% end %>

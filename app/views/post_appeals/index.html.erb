@@ -10,16 +10,17 @@
           <th>Reason</th>
           <th width="1%">Appeals</th>
           <th width="5%">Resolved?</th>
-          <th width="15%">Uploaded</th>
-          <th width="15%">Appealed</th>
-          <th width="15%">Approver</th>
+          <th width="10%">Uploaded</th>
+          <th width="10%">Appealed</th>
+          <th width="10%">Approver</th>
+          <th width="10%"></th>
         </tr>
       </thead>
       <tbody>
         <% @post_appeals.each do |post_appeal| %>
           <tr>
             <td><%= PostPresenter.preview(post_appeal.post, :tags => "status:any") %></td>
-            <td><%= format_text post_appeal.reason %></td>
+            <td><%= format_text post_appeal.reason, inline: true %></td>
             <td>
               <%= link_to post_appeal.post.appeals.size, post_appeals_path(search: { post_id: post_appeal.post_id }) %>
             </td>
@@ -45,6 +46,12 @@
                 <%= link_to "»", post_appeals_path(search: params[:search].merge(post_tags_match: "#{params[:search][:post_tags_match]} approver:none".strip)) %>
               <% end %>
             </td>
+            <td>
+              <%= link_to "Show", post_appeal_path(post_appeal) %>
+              <% if CurrentUser.can_approve_posts? && (post_appeal.post.is_flagged? || post_appeal.post.is_pending?) %>
+                | <%= link_to "Approve", moderator_post_approval_path(:post_id => post_appeal.post.id), :remote => true, :method => :post, :id => "approve", :data => { :confirm => "Are you sure you want to approve this post?" } %>
+              <% end %>
+            </td>
           </tr>
         <% end %>
       </tbody>
@@ -53,6 +60,8 @@
     <%= numbered_paginator(@post_appeals) %>
   </div>
 </div>
+
+<%= render "post_flags/secondary_links" %>
 
 <% content_for(:page_title) do %>
   Appeals - <%= Danbooru.config.app_name %>

@@ -12,8 +12,9 @@ module PostAppealsHelper
         ip = ""
       end
       time = time_ago_in_words_tagged(appeal.created_at)
+      link = "[#{link_to("Show",post_appeal_path(appeal))}]"
 
-      html << "<li>#{reason} - #{user} #{ip} #{time}</li>"
+      html << "<li>#{reason} - #{user} #{ip} - #{time} #{link}</li>"
     end
 
     html << '</ul>'

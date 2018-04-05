@@ -4,7 +4,8 @@
       <th width="25%">From</th>
       <th width="25%">To</th>
       <th width="10%">Reference</th>
-      <th width="15%">Approver</th>
+      <th width="10%">Creator</th>
+      <th width="10%">Approver</th>
       <th width="5%">Status</th>
       <th width="15%"></th>
     </tr>
@@ -16,9 +17,14 @@
         <td class="category-<%= tag_implication.consequent_tag.try(:category) %>"><%= link_to tag_implication.consequent_name, posts_path(:tags => tag_implication.consequent_name) %> <span class="count"><%= tag_implication.consequent_tag.post_count rescue 0 %></span></td>
         <td>
           <% if tag_implication.forum_topic_id %>
-            <%= link_to tag_implication.forum_topic_id, forum_topic_path(tag_implication.forum_topic_id) %>
+            <% if tag_implication.forum_post_id && tag_implication.forum_topic.posts.first.id != tag_implication.forum_post_id %>
+              <%= link_to("#{tag_implication.forum_topic_id}.#{tag_implication.forum_post_id}", forum_topic_path(tag_implication.forum_topic_id, :page => tag_implication.forum_post.forum_topic_page, :anchor => "forum_post_#{tag_implication.forum_post_id}")) %>
+            <% else %>
+              <%= link_to(tag_implication.forum_topic_id, forum_topic_path(tag_implication.forum_topic_id)) %>
+            <% end %>
           <% end %>
         </td>
+        <td><%= link_to_user(tag_implication.creator) %></td>
         <td><%= link_to_user(tag_implication.approver) if tag_implication.approver %></td>
         <td id="tag-implication-status-for-<%= tag_implication.id %>"><%= tag_implication.status %></td>
         <td>

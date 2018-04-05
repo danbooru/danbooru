@@ -11,9 +11,10 @@
           <th width="1%">Flags</th>
           <th width="1%">Category</th>
           <th width="1%">Resolved?</th>
-          <th width="15%">Uploaded</th>
-          <th width="15%">Flagged</th>
-          <th width="15%">Approver</th>
+          <th width="10%">Uploaded</th>
+          <th width="10%">Flagged</th>
+          <th width="10%">Approver</th>
+          <th width="10%"></th>
         </tr>
       </thead>
       <tbody>
@@ -21,7 +22,7 @@
           <tr class="resolved-<%= post_flag.is_resolved? %>">
             <td><%= PostPresenter.preview(post_flag.post, :tags => "status:any") %></td>
             <td>
-              <%= format_text post_flag.reason %>
+              <%= format_text post_flag.reason, inline: true %>
             </td>
             <td>
               <%= link_to post_flag.post.flags.size, post_flags_path(search: { post_id: post_flag.post_id }) %>
@@ -53,10 +54,18 @@
                 <%= link_to "»", post_flags_path(search: params[:search].merge(post_tags_match: "#{params[:search][:post_tags_match]} approver:none".strip)) %>
               <% end %>
             </td>
+            <td>
+              <%= link_to "Show", post_flag_path(post_flag) %>
+              <% if CurrentUser.can_approve_posts? && (post_flag.post.is_flagged? || post_flag.post.is_pending?) %>
+                | <%= link_to "Approve", moderator_post_approval_path(:post_id => post_flag.post.id), :remote => true, :method => :post, :id => "approve", :data => { :confirm => "Are you sure you want to approve this post?" } %>
+              <% end %>
+            </td>
           </tr>
         <% end %>
       </tbody>
     </table>
+
+<%= render "secondary_links" %>
 
     <%= numbered_paginator(@post_flags) %>
   </div>

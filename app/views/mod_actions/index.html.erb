@@ -7,9 +7,10 @@
     <table class="striped" width="100%">
       <thead>
         <tr>
-          <th>Date</th>
-          <th>User</th>
+          <th width="10%">Date</th>
+          <th width="10%">User</th>
           <th>Message</th>
+          <th width="5%"></th>
         </tr>
       </thead>
       <tbody>
@@ -18,6 +19,7 @@
             <td><%= compact_time mod_action.created_at %></td>
             <td><%= link_to_user mod_action.creator %></td>
             <td><%= format_text(mod_action.description) %></td>
+            <td><%= link_to "Show", mod_action_path(mod_action) %></td>
           </tr>
         <% end %>
       </tbody>

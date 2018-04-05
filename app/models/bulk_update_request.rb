@@ -92,7 +92,7 @@ class BulkUpdateRequest < ApplicationRecord
     def approve!(approver)
       transaction do
         CurrentUser.scoped(approver) do
-          AliasAndImplicationImporter.new(script, forum_topic_id, "1", true).process!
+          AliasAndImplicationImporter.new(script, forum_topic_id, "1", true, forum_post_id).process!
           update(status: "approved", approver: CurrentUser.user, skip_secondary_validations: true)
           forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.", "APPROVED")
         end
@@ -148,7 +148,7 @@ class BulkUpdateRequest < ApplicationRecord
 
     def validate_script
       begin
-        AliasAndImplicationImporter.new(script, forum_topic_id, "1", skip_secondary_validations).validate!
+        AliasAndImplicationImporter.new(script, forum_topic_id, "1", skip_secondary_validations, forum_post_id).validate!
       rescue RuntimeError => e
         self.errors[:base] = e.message
         return false
@@ -161,6 +161,10 @@ class BulkUpdateRequest < ApplicationRecord
   extend SearchMethods
   include ApprovalMethods
   include ValidationMethods
+
+  def is_pending?
+    status == "pending"
+  end
 
   def editable?(user)
     user_id == user.id || user.is_builder?

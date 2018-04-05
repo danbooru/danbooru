@@ -1,3 +1,5 @@
+@import "../common/000_vars.scss";
+
 div#c-post-flags {
   li {
     list-style-type: disc;
@@ -9,5 +11,39 @@ div#c-post-flags {
 
   tr.resolved-false {
     background: #FFF !important;
+  }
+
+  aside#sidebar #tag-list h2 {
+    font-size: $h4_size;
+  }
+
+  aside#sidebar > section > ul {
+    margin-bottom: 1em;
+  }
+
+  aside#sidebar > section > ul li {
+    list-style-type: none;
+  }
+
+  section#content > section {
+    float: left;
+  }
+
+  section#content div.relation-title {
+    float: left;
+    font-size: 120%;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  section#relations {
+    overflow-y: auto;
+    margin-left: 10px;
+  }
+
+  div#reason {
+    border: 1px solid #FCC0C0;
+    background: #FCD9D8;
+    margin-bottom: 10px;
   }
 }
