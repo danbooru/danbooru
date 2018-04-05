@@ -10,7 +10,7 @@ class PostKeeperManager
   # archive db being up; we don't want to block updates in case it goes down.
   # so we need to permit async updates also.
 
-  def self.queue_check(post_id, updater_id)
+  def self.queue_check(post_id, updater_id = nil)
     delay(queue: "default", run_at: 1.minute.from_now).check_and_update(post_id)
   end
 
