@@ -1,6 +1,6 @@
 <%= content_tag(:object, :width => post.image_width, :height => post.image_height) do %>
-  <%= tag :params, :name => "movie", :value => post.file_url %>
-  <%= tag :embed, :src => post.file_url, :width => post.image_width, :height => post.image_height, :allowScriptAccess => "never" %>
+  <%= tag :params, :name => "movie", :value => post.tagged_file_url %>
+  <%= tag :embed, :src => post.tagged_file_url, :width => post.image_width, :height => post.image_height, :allowScriptAccess => "never" %>
 <% end %>
 
-<p><%= link_to "Save this flash (right click and save)", post.file_url %></p>
+<p><%= link_to "Save this flash (right click and save)", post.tagged_file_url %></p>

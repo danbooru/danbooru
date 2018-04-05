@@ -78,7 +78,7 @@
 
 <% if post.visible? && post.has_large? && !post.is_ugoira? %>
   <div class="ui-corner-all ui-state-highlight notice notice-resized" id="image-resize-notice" style="<%= CurrentUser.default_image_size == "original" ? "display: none;" : "" %>">
-    <span>Resized to <%= number_to_percentage post.resize_percentage.floor, :precision => 0 %> of original (<%= link_to "view original", post.file_url, :id => "image-resize-link" %>)</span>
+    <span>Resized to <%= number_to_percentage post.resize_percentage.floor, :precision => 0 %> of original (<%= link_to "view original", post.tagged_file_url, :id => "image-resize-link" %>)</span>
     <span style="display: none;">Loading...</span>
   </div>
 <% end %>
