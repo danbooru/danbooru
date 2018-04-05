@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <feed xmlns="http://www.w3.org/2005/Atom">
-	<title><%= Danbooru.config.app_name %><% if !params[:tags].blank? %>: <%= params[:tags] %><% end %></title>
-	<link href="http://<%= Danbooru.config.hostname %>/posts.atom?tags=<%= params[:tags] %>" rel="self"/>
-  <link href="http://<%= Danbooru.config.hostname %>/posts?tags=<%= params[:tags] %>" rel="alternate"/>
-  <id>http://<%= Danbooru.config.hostname %>/posts.atom?tags=<%= params[:tags] %></id>
+  <title><%= Danbooru.config.app_name %><% if !params[:tags].blank? %>: <%= params[:tags] %><% end %></title>
+  <link href="<%= posts_url(tags: params[:tags], format: :atom) %>" rel="self"/>
+  <link href="<%= posts_url(tags: params[:tags]) %>" rel="alternate"/>
+  <id><%= posts_url(tags: params[:tags], format: :atom) %></id>
   <% if @posts.any? %>
     <updated><%= @posts[0].created_at.gmtime.xmlschema %></updated>
   <% end %>
@@ -13,18 +13,18 @@
   <% Danbooru.config.select_posts_visible_to_user(CurrentUser.user, @posts).each do |post| %>
     <entry>
       <title><%= post.presenter.humanized_essential_tag_string %></title>
-      <link href="http://<%= Danbooru.config.hostname %>/posts/<%= post.id %>" rel="alternate"/>
+      <link href="<%= post_url(post) %>" rel="alternate"/>
       <% if post.source =~ %r{\Ahttps?://} %>
         <link href="<%= post.source %>" rel="related"/>
       <% end %>
-      <id>http://<%= Danbooru.config.hostname %>/posts/<%= post.id %></id>
+      <id><%= post_url(post) %></id>
       <updated><%= post.created_at.gmtime.xmlschema %></updated>
       <summary><%= post.tag_string %></summary>
       <content type="xhtml">
         <div xmlns="http://www.w3.org/1999/xhtml">
-          <a href="http://<%= Danbooru.config.hostname %>/posts/<%= post.id %>">
-            <img src="http://<%= Danbooru.config.hostname %><%= post.preview_file_url %>"/>
-          </a>
+          <%= link_to post_url(post) do %>
+            <%= image_tag post.preview_file_url %>
+          <% end %>
           <p><%= post.tag_string %></p>
         </div>
       </content>
