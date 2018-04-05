@@ -554,7 +554,7 @@ class Post < ApplicationRecord
         PostKeeperManager.check_and_update(self, CurrentUser.id, increment_tags)
 
         # run this again async to check for race conditions
-        PostKeeperManager.queue_check(self)
+        PostKeeperManager.queue_check(self, CurrentUser.id)
       end
     end
 
