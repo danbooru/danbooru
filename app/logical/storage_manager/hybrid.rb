@@ -17,7 +17,7 @@ class StorageManager::Hybrid < StorageManager
     submanager[post.id, post.md5, post.file_ext, type].open_file(post, type)
   end
 
-  def file_url(post, type)
-    submanager[post.id, post.md5, post.file_ext, type].file_url(post, type)
+  def file_url(post, type, **options)
+    submanager[post.id, post.md5, post.file_ext, type].file_url(post, type, **options)
   end
 end
