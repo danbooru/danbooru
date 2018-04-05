@@ -145,6 +145,14 @@ class Post < ApplicationRecord
       storage_manager.open_file(self, type)
     end
 
+    def tagged_file_url
+      storage_manager.file_url(self, :original, tagged_filenames: !CurrentUser.user.disable_tagged_filenames?)
+    end
+
+    def tagged_large_file_url
+      storage_manager.file_url(self, :large, tagged_filenames: !CurrentUser.user.disable_tagged_filenames?)
+    end
+
     def file_url
       storage_manager.file_url(self, :original)
     end
@@ -171,9 +179,9 @@ class Post < ApplicationRecord
 
     def file_url_for(user)
       if user.default_image_size == "large" && image_width > Danbooru.config.large_image_width
-        large_file_url
+        tagged_large_file_url
       else
-        file_url
+        tagged_file_url
       end
     end
 

@@ -29,7 +29,7 @@
   </div>
   <p id="save-video-link">
     <% if post.has_ugoira_webm? %>
-      <%= link_to "Save as video (right click and save)", post.large_file_url %>
+      <%= link_to "Save as video (right click and save)", post.tagged_large_file_url %>
     <% else %>
       WebM conversion pending
     <% end %>

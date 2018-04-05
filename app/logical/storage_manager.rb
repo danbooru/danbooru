@@ -48,18 +48,19 @@ class StorageManager
     open(file_path(post.md5, post.file_ext, type))
   end
 
-  def file_url(post, type)
+  def file_url(post, type, tagged_filenames: false)
     subdir = subdir_for(post.md5)
     file = file_name(post.md5, post.file_ext, type)
+    seo_tags = seo_tags(post) if tagged_filenames
 
     if type == :preview && !post.has_preview?
       "#{base_url}/images/download-preview.png"
     elsif type == :preview
       "#{base_url}/preview/#{subdir}#{file}"
     elsif type == :large && post.has_large?
-      "#{base_url}/sample/#{subdir}#{seo_tags(post)}#{file}"
+      "#{base_url}/sample/#{subdir}#{seo_tags}#{file}"
     else
-      "#{base_url}/#{subdir}#{seo_tags(post)}#{post.md5}.#{post.file_ext}"
+      "#{base_url}/#{subdir}#{seo_tags}#{post.md5}.#{post.file_ext}"
     end
   end
 
@@ -100,8 +101,8 @@ class StorageManager
     end
   end
 
-  def seo_tags(post, user = CurrentUser.user)
-    return "" if !tagged_filenames || user.disable_tagged_filenames?
+  def seo_tags(post)
+    return "" if !tagged_filenames
 
     tags = post.humanized_essential_tag_string.gsub(/[^a-z0-9]+/, "_").gsub(/(?:^_+)|(?:_+$)/, "").gsub(/_{2,}/, "_")
     "__#{tags}__"
