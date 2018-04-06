@@ -23,21 +23,25 @@ class StorageManager::S3 < StorageManager
     super(**options)
   end
 
+  def key(path)
+    path.sub(/^.+?data\//, "")
+  end
+
   def store(io, path)
     data = io.read
     base64_md5 = Digest::MD5.base64digest(data)
-    client.put_object(bucket: bucket, key: path, body: data, content_md5: base64_md5, **DEFAULT_PUT_OPTIONS)
+    client.put_object(bucket: bucket, key: key(path), body: data, content_md5: base64_md5, **DEFAULT_PUT_OPTIONS)
   end
 
   def delete(path)
-    client.delete_object(bucket: bucket, key: path)
+    client.delete_object(bucket: bucket, key: key(path))
   rescue Aws::S3::Errors::NoSuchKey
     # ignore
   end
 
   def open(path)
     file = Tempfile.new(binmode: true)
-    client.get_object(bucket: bucket, key: path, response_target: file)
+    client.get_object(bucket: bucket, key: key(path), response_target: file)
     file
   end
 end
