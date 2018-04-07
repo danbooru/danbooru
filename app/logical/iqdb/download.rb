@@ -1,12 +1,10 @@
 module Iqdb
   class Download
-    attr_reader :source, :download, :matches
-
-    def initialize(source)
-      @source = source
+    def self.enabled?
+      Danbooru.config.iqdbs_server.present? && Danbooru.config.iqdbs_auth_key.present?
     end
 
-    def get_referer(url)
+    def self.get_referer(url)
       headers = {}
       datums = {}
 
@@ -17,7 +15,7 @@ module Iqdb
       [url, headers["Referer"]]
     end
 
-    def find_similar
+    def self.find_similar(source)
       if Danbooru.config.iqdbs_server
         url, ref = get_referer(source)
         params = {
@@ -35,18 +33,18 @@ module Iqdb
             post_ids = json.map { |match| match["post_id"] }
             posts = Post.find(post_ids)
 
-            @matches = json.map do |match|
+            json.map do |match|
               post = posts.find { |post| post.id == match["post_id"] }
               match.with_indifferent_access.merge({ post: post })
             end
           else
-            @matches = []
+            []
           end
         else
           raise "HTTP error code: #{resp.code} #{resp.message}"
         end
       else
-        raise NotImplementedError
+        raise NotImplementedError, "the IQDBs service isn't configured. Similarity searches are not available." unless enabled?
       end
     end
   end

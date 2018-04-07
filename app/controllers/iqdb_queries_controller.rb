@@ -3,31 +3,16 @@ class IqdbQueriesController < ApplicationController
   respond_to :html, :json, :xml
 
   def show
-    server_check
-    if params[:url]
-      create_by_url
-      respond_with(@results) do |fmt|
-        fmt.html { render :layout => false, :action => "create_by_url" }
-      end
-    elsif params[:post_id]
-      create_by_post
-      respond_with(@results) do |fmt|
-        fmt.js { render :layout => false, :action => "create_by_post" }
-      end
-    else
-      render :nothing => true, :status => 422
+    @results = find_similar
+
+    respond_with(@results) do |fmt|
+      fmt.html { render :layout => false, :action => "create_by_url" }
+      fmt.js { render :layout => false, :action => "create_by_post" }
     end
   end
 
   def check
-    server_check
-    if params[:url].present?
-      create_by_url
-    elsif params[:post_id].present?
-      create_by_post
-    else
-      @results = []
-    end
+    @results = find_similar
     respond_with(@results)
   end
 
@@ -35,22 +20,10 @@ class IqdbQueriesController < ApplicationController
   alias_method :create, :show
 
 protected
-  def server_check
-    if !Danbooru.config.iqdbs_server
-      raise NotImplementedError.new("the IQDBs service isn't configured. Similarity searches are not available.")
-    end
-  end
+  def find_similar
+    return [] if params[:url].blank? && params[:post_id].blank?
 
-  def create_by_url
-    @download = Iqdb::Download.new(params[:url])
-    @download.find_similar
-    @results = @download.matches
-  end
-
-  def create_by_post
-    @post = Post.find(params[:post_id])
-    @download = Iqdb::Download.new(@post.preview_file_url)
-    @download.find_similar
-    @results = @download.matches
+    params[:url] = Post.find(params[:post_id]).preview_file_url if params[:post_id].present?
+    Iqdb::Download.find_similar(params[:url])
   end
 end
