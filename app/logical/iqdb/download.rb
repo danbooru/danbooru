@@ -1,5 +1,7 @@
 module Iqdb
   class Download
+    class Error < StandardError; end
+
     def self.enabled?
       Danbooru.config.iqdbs_server.present? && Danbooru.config.iqdbs_auth_key.present?
     end
@@ -31,17 +33,17 @@ module Iqdb
       raise "HTTP error code: #{resp.code} #{resp.message}" unless resp.success?
 
       json = JSON.parse(resp.body)
-      if json.is_a?(Array)
-        post_ids = json.map { |match| match["post_id"] }
-        posts = Post.find(post_ids)
+      raise "IQDB error: #{json["error"]}" unless json.is_a?(Array)
 
-        json.map do |match|
-          post = posts.find { |post| post.id == match["post_id"] }
-          match.with_indifferent_access.merge({ post: post })
-        end
-      else
-        []
+      post_ids = json.map { |match| match["post_id"] }
+      posts = Post.find(post_ids)
+
+      json.map do |match|
+        post = posts.find { |post| post.id == match["post_id"] }
+        match.with_indifferent_access.merge({ post: post })
       end
+    rescue => e
+      raise Error, { message: e.message, iqdb_response: json }
     end
   end
 end
