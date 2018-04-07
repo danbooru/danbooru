@@ -264,6 +264,44 @@ class UploadTest < ActiveSupport::TestCase
       assert_equal("completed", @upload.status)
     end
 
+    should "process completely for a .webm" do
+      upload = FactoryGirl.create(:upload, rating: "s", file: upload_file("test/files/test-512x512.webm"))
+
+      assert_difference("Post.count") do
+        assert_nothing_raised { upload.process! }
+      end
+
+      post = Post.last
+      assert_includes(post.tag_array, "webm")
+      assert_equal("webm", upload.file_ext)
+      assert_equal(12345, upload.file_size)
+      assert_equal(512, upload.image_width)
+      assert_equal(512, upload.image_height)
+      assert_equal("34dd2489f7aaa9e57eda1b996ff26ff7", upload.md5)
+
+      assert_nothing_raised { post.file(:preview) }
+      assert_nothing_raised { post.file(:original) }
+    end
+
+    should "process completely for a .mp4" do
+      upload = FactoryGirl.create(:upload, rating: "s", file: upload_file("test/files/test-300x300.mp4"))
+
+      assert_difference("Post.count") do
+        assert_nothing_raised { upload.process! }
+      end
+
+      post = Post.last
+      assert_includes(post.tag_array, "mp4")
+      assert_equal("mp4", upload.file_ext)
+      assert_equal(18677, upload.file_size)
+      assert_equal(300, upload.image_width)
+      assert_equal(300, upload.image_height)
+      assert_equal("865c93102cad3e8a893d6aac6b51b0d2", upload.md5)
+
+      assert_nothing_raised { post.file(:preview) }
+      assert_nothing_raised { post.file(:original) }
+    end
+
     should "process completely for a null source" do
       @upload = FactoryGirl.create(:jpg_upload, :source => nil)
 
