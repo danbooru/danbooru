@@ -260,7 +260,7 @@ class Upload < ApplicationRecord
   module ResizerMethods
     def generate_resizes
       if is_video?
-        preview_file = generate_video_preview_for(video, width, height)
+        preview_file = generate_video_preview_for(video, Danbooru.config.small_image_width, Danbooru.config.small_image_width)
       elsif is_ugoira?
         preview_file = PixivUgoiraConverter.generate_preview(file)
         sample_file = PixivUgoiraConverter.generate_webm(file, ugoira_service.frame_data)
