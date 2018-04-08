@@ -1648,7 +1648,7 @@ class Post < ApplicationRecord
     end
 
     def update_iqdb_async
-      if Post.iqdb_enabled?
+      if Post.iqdb_enabled? && has_preview?
         Post.iqdb_sqs_service.send_message("update\n#{id}\n#{preview_file_url}")
       end
     end
