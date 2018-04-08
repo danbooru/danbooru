@@ -13,7 +13,7 @@ class StorageManager::Hybrid < StorageManager
     submanager[post_id, md5, file_ext, type].delete_file(post_id, md5, file_ext, type)
   end
 
-  def open_file(io, post, type)
+  def open_file(post, type)
     submanager[post.id, post.md5, post.file_ext, type].open_file(post, type)
   end
 
