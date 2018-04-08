@@ -752,7 +752,7 @@ module Danbooru
     end
 
     def method_missing(method, *args)
-      var = ENV["DANBOORU_#{method.to_s.upcase}"]
+      var = ENV["DANBOORU_#{method.to_s.upcase.chomp("?")}"]
 
       if var.present?
         var
