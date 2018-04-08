@@ -83,6 +83,16 @@ class StorageManagerTest < ActiveSupport::TestCase
         assert_equal("/data/sample/sample-#{@post.md5}.jpg", @storage_manager.file_url(@post, :large))
         assert_equal("/data/preview/#{@post.md5}.jpg", @storage_manager.file_url(@post, :preview))
       end
+
+      should "return the correct url for flash files" do
+        @post = FactoryGirl.create(:post, file_ext: "swf")
+
+        @storage_manager.stubs(:base_url).returns("/data")
+        assert_equal("/images/download-preview.png", @storage_manager.file_url(@post, :preview))
+
+        @storage_manager.stubs(:base_url).returns("http://localhost/data")
+        assert_equal("http://localhost/images/download-preview.png", @storage_manager.file_url(@post, :preview))
+      end
     end
   end
 

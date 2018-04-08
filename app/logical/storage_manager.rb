@@ -54,7 +54,7 @@ class StorageManager
     seo_tags = seo_tags(post) if tagged_filenames
 
     if type == :preview && !post.has_preview?
-      "#{base_url}/images/download-preview.png"
+      "#{root_url}/images/download-preview.png"
     elsif type == :preview
       "#{base_url}/preview/#{subdir}#{file}"
     elsif type == :large && post.has_large?
@@ -65,6 +65,12 @@ class StorageManager
   end
 
   protected
+
+  def root_url
+    origin = Addressable::URI.parse(base_url).origin
+    origin = "" if origin == "null" # base_url was relative
+    origin
+  end
 
   def file_path(md5, file_ext, type)
     subdir = subdir_for(md5)
