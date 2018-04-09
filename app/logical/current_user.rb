@@ -48,6 +48,14 @@ class CurrentUser
     Thread.current[:current_ip_addr]
   end
 
+  def self.root_url
+    Thread.current[:current_root_url] || "http://#{Danbooru.config.hostname}/"
+  end
+
+  def self.root_url=(root_url)
+    Thread.current[:current_root_url] = root_url
+  end
+
   def self.id
     if user.nil?
       nil
