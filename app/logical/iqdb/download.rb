@@ -1,12 +1,12 @@
 module Iqdb
   class Download
-    attr_reader :source, :download, :matches
+    class Error < StandardError; end
 
-    def initialize(source)
-      @source = source
+    def self.enabled?
+      Danbooru.config.iqdbs_server.present? && Danbooru.config.iqdbs_auth_key.present?
     end
 
-    def get_referer(url)
+    def self.get_referer(url)
       headers = {}
       datums = {}
 
@@ -17,37 +17,33 @@ module Iqdb
       [url, headers["Referer"]]
     end
 
-    def find_similar
-      if Danbooru.config.iqdbs_server
-        url, ref = get_referer(source)
-        params = {
-          "key" => Danbooru.config.iqdbs_auth_key,
-          "url" => url,
-          "ref" => ref
-        }
-        uri = URI.parse("#{Danbooru.config.iqdbs_server}/similar")
-        uri.query = URI.encode_www_form(params)
+    def self.find_similar(source)
+      raise NotImplementedError, "the IQDBs service isn't configured. Similarity searches are not available." unless enabled?
 
-        resp = HTTParty.get(uri, Danbooru.config.httparty_options)
-        if resp.success?
-          json = JSON.parse(resp.body)
-          if json.is_a?(Array)
-            post_ids = json.map { |match| match["post_id"] }
-            posts = Post.find(post_ids)
+      url, ref = get_referer(source)
+      params = {
+        "key" => Danbooru.config.iqdbs_auth_key,
+        "url" => url,
+        "ref" => ref
+      }
+      uri = URI.parse("#{Danbooru.config.iqdbs_server}/similar")
+      uri.query = URI.encode_www_form(params)
 
-            @matches = json.map do |match|
-              post = posts.find { |post| post.id == match["post_id"] }
-              match.with_indifferent_access.merge({ post: post })
-            end
-          else
-            @matches = []
-          end
-        else
-          raise "HTTP error code: #{resp.code} #{resp.message}"
-        end
-      else
-        raise NotImplementedError
+      resp = HTTParty.get(uri, Danbooru.config.httparty_options)
+      raise "HTTP error code: #{resp.code} #{resp.message}" unless resp.success?
+
+      json = JSON.parse(resp.body)
+      raise "IQDB error: #{json["error"]}" unless json.is_a?(Array)
+
+      post_ids = json.map { |match| match["post_id"] }
+      posts = Post.find(post_ids)
+
+      json.map do |match|
+        post = posts.find { |post| post.id == match["post_id"] }
+        match.with_indifferent_access.merge({ post: post })
       end
+    rescue => e
+      raise Error, { message: e.message, iqdb_response: json }
     end
   end
 end
