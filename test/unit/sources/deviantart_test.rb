@@ -13,6 +13,13 @@ module Sources
       end
     end
 
+    context "The source for a download-disabled DeviantArt artwork page" do
+      should "get the image url" do
+        @site = Sources::Site.new("https://noizave.deviantart.com/art/test-no-download-697415967")
+        assert_equal(["https://img00.deviantart.net/56ee/i/2017/219/2/3/test__no_download_by_noizave-dbj81lr.jpg"], @site.image_urls)
+      end
+    end
+
     context "The source for an DeviantArt artwork page" do
       setup do
         @site = Sources::Site.new("http://noizave.deviantart.com/art/test-post-please-ignore-685436408")
@@ -20,11 +27,11 @@ module Sources
       end
 
       should "get the image url" do
-        assert_match(%r!https://orig\d+.deviantart.net/7b5b/f/2017/160/c/5/test_post_please_ignore_by_noizave-dbc3a48.png!, @site.image_url)
+        assert_match(%r!https://origin-orig.deviantart.net/7b5b/f/2017/160/c/5/test_post_please_ignore_by_noizave-dbc3a48.png!, @site.image_url)
       end
 
       should "get the profile" do
-        assert_equal("https://noizave.deviantart.com/", @site.profile_url)
+        assert_equal("https://noizave.deviantart.com", @site.profile_url)
       end
 
       should "get the artist name" do
@@ -37,7 +44,7 @@ module Sources
 
       should "get the artist commentary" do
         title = "test post please ignore"
-        desc = "<div align=\"center\"><span>blah blah<br><div align=\"left\">\n<a class=\"external\" href=\"https://www.deviantart.com/users/outgoing?http://www.google.com\">test link</a><br>\n</div></span></div>\n<br><h1>lol</h1>\n<br><br><b>blah</b> <i>blah</i> <u>blah</u> <strike>blah</strike><br>herp derp<br><br><blockquote>this is a quote</blockquote>\n<ol>\n<li>one</li>\n<li>two</li>\n<li>three</li>\n</ol>\n<ul>\n<li>one</li>\n<li>two</li>\n<li>three</li>\n</ul>\n<img src=\"https://e.deviantart.net/emoticons/h/heart.gif\" alt=\"Heart\" style=\"width: 15px; height: 13px;\" data-embed-type=\"emoticon\" data-embed-id=\"357\">  "
+        desc = "<div align=\"center\"><span>blah blah<br /><div align=\"left\"><a class=\"external\" href=\"https://www.deviantart.com/users/outgoing?http://www.google.com\">test link</a><br /></div></span></div><br /><h1>lol</h1><br /><br /><b>blah</b>&nbsp;<i>blah</i>&nbsp;<u>blah</u>&nbsp;<strike>blah</strike><br />herp derp<br /><br /><blockquote>this is a quote</blockquote><ol><li>one</li><li>two</li><li>three</li></ol><ul><li>one</li><li>two</li><li>three</li></ul><img src=\"https://e.deviantart.net/emoticons/h/heart.gif\" alt=\"Heart\" style=\"width: 15px; height: 13px;\" data-embed-type=\"emoticon\" data-embed-id=\"357\">&nbsp;&nbsp;"
 
         assert_equal(title, @site.artist_commentary_title)
         assert_equal(desc, @site.artist_commentary_desc)
@@ -79,7 +86,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_match(%r!https://orig\d+\.deviantart\.net/cb25/f/2017/160/1/9/hidden_work_by_noizave-dbc3r29\.png!, @site.image_url)
+        assert_match(%r!https://origin-orig\.deviantart\.net/cb25/f/2017/160/1/9/hidden_work_by_noizave-dbc3r29\.png!, @site.image_url)
       end
     end
 

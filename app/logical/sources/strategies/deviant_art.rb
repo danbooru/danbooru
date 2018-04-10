@@ -1,7 +1,7 @@
 module Sources
   module Strategies
     class DeviantArt < Base
-      DEVIANTART_SESSION_CACHE_KEY = "deviantart-session"
+      extend Memoist
 
       def self.url_match?(url)
         url =~ /^https?:\/\/(?:.+?\.)?deviantart\.(?:com|net)/
@@ -20,28 +20,15 @@ module Sources
       end
 
       def unique_id
-        profile_url =~ /https?:\/\/(.+?)\.deviantart\.com/
-        "deviantart" + $1
+        artist_name
       end
 
       def get
-        agent.get(URI.parse(normalized_url)) do |page|
-          page.encoding = "utf-8"
-          @artist_name, @profile_url = get_profile_from_page(page)
-          @image_url = get_image_url_from_page(page)
-          @tags = get_tags_from_page(page)
-          @artist_commentary_title = get_artist_commentary_title_from_page(page)
-          @artist_commentary_desc = get_artist_commentary_desc_from_page(page)
-        end
-      rescue Mechanize::ResponseCodeError
-        # try the normal url
-        if url =~ /\.(jpg|jpeg|png|gif)/
-          @image_url = url
-        end
+        # no-op
       end
 
-      def self.to_dtext(text)
-        DText.from_html(text) do |element|
+      def dtext_artist_commentary_desc
+        DText.from_html(artist_commentary_desc) do |element|
           # Convert embedded thumbnails of journal posts to 'deviantart #123'
           # links. Strip embedded thumbnails of image posts. Example:
           # https://sa-dui.deviantart.com/art/Commission-Meinos-Kaen-695905927.
@@ -70,63 +57,50 @@ module Sources
         end.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
       end
 
-    protected
+      def artist_name
+        api_metadata.dig(:author, :username)
+      end
 
-      def get_profile_from_page(page)
-        links = page.search("div.dev-title-container a.username")
+      def profile_url
+        "https://#{artist_name.downcase}.deviantart.com"
+      end
 
-        if links.any?
-          profile_url = links[0]["href"]
-          artist_name = links[0].text
+      def image_url
+        # work is deleted, use image url as given by user.
+        if uuid.nil?
+          url
+        # work is downloadable
+        elsif api_deviation[:is_downloadable] && api_deviation[:download_filesize] != api_deviation.dig(:content, :filesize)
+          src = api_download[:src]
+          src.gsub!(%r!\Ahttps?://s3\.amazonaws\.com/!i, "https://")
+          src.gsub!(/\?.*\z/, "") # strip s3 query params
+
+          src
+        # work isn't downloadable, or download size is same as regular size.
+        elsif api_deviation.present?
+          api_deviation.dig(:content, :src)
         else
-          profile_url = nil
-          artist_name = nil
-        end
-
-        return [artist_name, profile_url].compact
-      end
-
-      def get_image_url_from_page(page)
-        download_link = page.link_with(:class => /dev-page-download/)
-
-        if download_link
-          download_link.click.uri.to_s # need to follow the redirect now to get the full size url, following it later seems to not work.
-        else
-          image = page.search("div.dev-view-deviation img.dev-content-full")
-
-          if image.any?
-            image[0]["src"]
-          else
-            nil
-          end
+          raise "couldn't find image url"
         end
       end
 
-      def get_tags_from_page(page)
-        links = page.search("a.discoverytag")
+      def tags
+        return [] if api_metadata.blank?
 
-        links.map do |node|
-          [node.attr("data-canonical-tag"), node.attr("href")]
+        api_metadata[:tags].map do |tag|
+          [tag[:tag_name], "https://www.deviantart.com/tag/#{tag[:tag_name]}"]
         end
       end
 
-      def get_artist_commentary_title_from_page(page)
-        title = page.search("div.dev-title-container a").find_all do |node|
-          node["data-ga_click_event"] =~ /description_title/
-        end
-
-        if title.any?
-          title[0].inner_text
-        end
+      def artist_commentary_title
+        api_metadata[:title]
       end
 
-      def get_artist_commentary_desc_from_page(page)
-        desc = page.search("div.dev-description div.text.block")
-
-        if desc.any?
-          desc[0].children.to_s
-        end
+      def artist_commentary_desc
+        api_metadata[:description]
       end
+
+      protected
 
       def normalized_url
         @normalized_url ||= begin
@@ -142,70 +116,44 @@ module Sources
         end
       end
 
-      def agent
-        @agent ||= begin
-          mech = Mechanize.new
-          auth, userinfo, auth_secure = session_cookies(mech)
-
-          if auth
-            # This cookie needs to be set to allow viewing of mature works
-            cookie = Mechanize::Cookie.new("agegate_state", "1")
-            cookie.domain = ".deviantart.com"
-            cookie.path = "/"
-            mech.cookie_jar.add(cookie)
-
-            cookie = Mechanize::Cookie.new("auth", auth)
-            cookie.domain = ".deviantart.com"
-            cookie.path = "/"
-            mech.cookie_jar.add(cookie)
-
-            cookie = Mechanize::Cookie.new("userinfo", userinfo)
-            cookie.domain = ".deviantart.com"
-            cookie.path = "/"
-            mech.cookie_jar.add(cookie)
-            
-            if auth_secure
-              cookie = Mechanize::Cookie.new("auth_secure", auth_secure)
-              cookie.domain = ".deviantart.com"
-              cookie.path = "/"
-              mech.cookie_jar.add(cookie)
-            end
-          end
-
-          mech
-        end
+      def page
+        resp = HTTParty.get(normalized_url, Danbooru.config.httparty_options)
+        Nokogiri::HTML(resp.body)
       end
 
-      def session_cookies(mech)
-        Cache.get(DEVIANTART_SESSION_CACHE_KEY, 2.hours) do
-          mech.request_headers = Danbooru.config.http_headers
+      # Scrape UUID from <meta property="da:appurl" content="DeviantArt://deviation/12F08C5D-A3A4-338C-2F1A-7E4E268C0E8B">
+      # For private works the UUID will be nil.
+      def uuid
+        meta = page.search('meta[property="da:appurl"]').first
+        return nil if meta.nil?
 
-          page = mech.get("https://www.deviantart.com/users/login")
-
-          if page.search('div[class="g-recaptcha"]').any?
-            # we got captcha'd, have to abort
-            return nil
-          end
-
-          validate_key = page.search('input[name="validate_key"]').attribute("value").value
-          validate_token = page.search('input[name="validate_token"]').attribute("value").value
-
-          mech.post("https://www.deviantart.com/users/login", {
-            username: Danbooru.config.deviantart_login,
-            password: Danbooru.config.deviantart_password,
-            validate_key: validate_key,
-            validate_token: validate_token,
-            remember_me: 1,
-          })
-
-          auth = mech.cookies.find { |cookie| cookie.name == "auth" }.try(:value)
-          userinfo = mech.cookies.find { |cookie| cookie.name == "userinfo" }.try(:value)
-          auth_secure = mech.cookies.find { |cookie| cookie.name == "auth_secure" }.try(:value)
-          mech.cookie_jar.clear
-
-          [auth, userinfo, auth_secure]
-        end
+        appurl = meta["content"]
+        uuid = appurl[%r!\ADeviantArt://deviation/(.*)\z!, 1]
+        uuid
       end
+
+      def api_client
+        api_client = DeviantArtApiClient.new(Danbooru.config.deviantart_client_id, Danbooru.config.deviantart_client_secret, Danbooru.config.httparty_options)
+        api_client.access_token = Cache.get("da-access-token", 55.minutes) { api_client.access_token.to_hash }
+        api_client
+      end
+
+      def api_deviation
+        return {} if uuid.nil?
+        api_client.deviation(uuid)
+      end
+
+      def api_metadata
+        return {} if uuid.nil?
+        api_client.metadata(uuid)[:metadata].first
+      end
+
+      def api_download
+        return {} if uuid.nil?
+        api_client.download(uuid)
+      end
+
+      memoize :page, :uuid, :api_client, :api_deviation, :api_metadata, :api_download
     end
   end
 end
