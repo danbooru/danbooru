@@ -487,11 +487,12 @@ module Danbooru
       nil
     end
 
-    def deviantart_login
+    # Register at https://www.deviantart.com/developers/.
+    def deviantart_client_id
       nil
     end
 
-    def deviantart_password
+    def deviantart_client_secret
       nil
     end
 
