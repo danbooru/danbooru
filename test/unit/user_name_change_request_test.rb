@@ -3,8 +3,8 @@ require 'test_helper'
 class UserNameChangeRequestTest < ActiveSupport::TestCase
   context "in all cases" do
     setup do
-      @admin = FactoryGirl.create(:admin_user)
-      @requester = FactoryGirl.create(:user)
+      @admin = FactoryBot.create(:admin_user)
+      @requester = FactoryBot.create(:user)
       CurrentUser.user = @requester
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -93,7 +93,7 @@ class UserNameChangeRequestTest < ActiveSupport::TestCase
       end
 
       should "not convert the desired name to lower case" do
-        uncr = FactoryGirl.create(:user_name_change_request, user: @requester, original_name: "provence.", desired_name: "Provence")
+        uncr = FactoryBot.create(:user_name_change_request, user: @requester, original_name: "provence.", desired_name: "Provence")
         CurrentUser.scoped(@admin) { uncr.approve! }
 
         assert_equal("Provence", @requester.name)

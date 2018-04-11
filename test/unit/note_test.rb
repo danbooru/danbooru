@@ -3,7 +3,7 @@ require 'test_helper'
 class NoteTest < ActiveSupport::TestCase
   context "In all cases" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -15,8 +15,8 @@ class NoteTest < ActiveSupport::TestCase
 
     context "#merge_version" do
       setup do
-        @post = FactoryGirl.create(:post)
-        @note = FactoryGirl.create(:note, :post => @post)
+        @post = FactoryBot.create(:post)
+        @note = FactoryBot.create(:note, :post => @post)
       end
 
       should "not increment version" do
@@ -28,8 +28,8 @@ class NoteTest < ActiveSupport::TestCase
 
     context "for a post that already has a note" do
       setup do
-        @post = FactoryGirl.create(:post)
-        @note = FactoryGirl.create(:note, :post => @post)
+        @post = FactoryBot.create(:post)
+        @note = FactoryBot.create(:note, :post => @post)
       end
 
       context "when the note is deleted the post" do
@@ -46,29 +46,29 @@ class NoteTest < ActiveSupport::TestCase
 
     context "creating a note" do
       setup do
-        @post = FactoryGirl.create(:post, :image_width => 1000, :image_height => 1000)
+        @post = FactoryBot.create(:post, :image_width => 1000, :image_height => 1000)
       end
 
       should "not validate if the note is outside the image" do
-        @note = FactoryGirl.build(:note, :x => 1001, :y => 500, :post => @post)
+        @note = FactoryBot.build(:note, :x => 1001, :y => 500, :post => @post)
         @note.save
         assert_equal(["Note must be inside the image"], @note.errors.full_messages)
       end
 
       should "not validate if the note is larger than the image" do
-        @note = FactoryGirl.build(:note, :x => 500, :y => 500, :height => 501, :width => 500, :post => @post)
+        @note = FactoryBot.build(:note, :x => 500, :y => 500, :height => 501, :width => 500, :post => @post)
         @note.save
         assert_equal(["Note must be inside the image"], @note.errors.full_messages)
       end
 
       should "not validate if the post does not exist" do
-        @note = FactoryGirl.build(:note, :x => 500, :y => 500, :post_id => -1)
+        @note = FactoryBot.build(:note, :x => 500, :y => 500, :post_id => -1)
         @note.save
         assert_equal(["Post must exist"], @note.errors.full_messages)
       end
 
       should "not validate if the body is blank" do
-        @note = FactoryGirl.build(:note, body: "   ")
+        @note = FactoryBot.build(:note, body: "   ")
 
         assert_equal(false, @note.valid?)
         assert_equal(["Body can't be blank"], @note.errors.full_messages)
@@ -77,7 +77,7 @@ class NoteTest < ActiveSupport::TestCase
       should "create a version" do
         assert_difference("NoteVersion.count", 1) do
           Timecop.travel(1.day.from_now) do
-            @note = FactoryGirl.create(:note, :post => @post)
+            @note = FactoryBot.create(:note, :post => @post)
           end
         end
 
@@ -89,7 +89,7 @@ class NoteTest < ActiveSupport::TestCase
 
       should "update the post's last_noted_at field" do
         assert_nil(@post.last_noted_at)
-        @note = FactoryGirl.create(:note, :post => @post)
+        @note = FactoryBot.create(:note, :post => @post)
         @post.reload
         assert_not_nil(@post.last_noted_at)
       end
@@ -101,7 +101,7 @@ class NoteTest < ActiveSupport::TestCase
 
         should "fail" do
           assert_difference("Note.count", 0) do
-            @note = FactoryGirl.build(:note, :post => @post)
+            @note = FactoryBot.build(:note, :post => @post)
             @note.save
           end
           assert_equal(["Post is note locked"], @note.errors.full_messages)
@@ -111,8 +111,8 @@ class NoteTest < ActiveSupport::TestCase
 
     context "updating a note" do
       setup do
-        @post = FactoryGirl.create(:post, :image_width => 1000, :image_height => 1000)
-        @note = FactoryGirl.create(:note, :post => @post)
+        @post = FactoryBot.create(:post, :image_width => 1000, :image_height => 1000)
+        @note = FactoryBot.create(:note, :post => @post)
         @note.stubs(:merge_version?).returns(false)
       end
 
@@ -165,8 +165,8 @@ class NoteTest < ActiveSupport::TestCase
 
     context "when notes have been vandalized by one user" do
       setup do
-        @vandal = FactoryGirl.create(:user)
-        @note = FactoryGirl.create(:note, :x => 5, :y => 5)
+        @vandal = FactoryBot.create(:user)
+        @note = FactoryBot.create(:note, :x => 5, :y => 5)
         CurrentUser.scoped(@vandal, "127.0.0.1") do
           @note.update_attributes(:x => 10, :y => 10)
         end
@@ -191,7 +191,7 @@ class NoteTest < ActiveSupport::TestCase
 
     context "searching for a note" do
       setup do
-        @note = FactoryGirl.create(:note, :body => "aaa")
+        @note = FactoryBot.create(:note, :body => "aaa")
       end
 
       context "where the body contains the string 'aaa'" do

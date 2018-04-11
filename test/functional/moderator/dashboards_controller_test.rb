@@ -1,130 +1,141 @@
 require 'test_helper'
 
 module Moderator
-  class DashboardsControllerTest < ActionController::TestCase
+  class DashboardsControllerTest < ActionDispatch::IntegrationTest
     context "The moderator dashboards controller" do
       setup do
-        @admin = FactoryGirl.create(:admin_user)
-        CurrentUser.user = @admin
-        CurrentUser.ip_addr = "127.0.0.1"
+        travel_to(1.month.ago) do
+          @user = create(:gold_user)
+        end
+        @admin = create(:admin_user)
         Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
       end
 
       context "show action" do
         context "for mod actions" do
           setup do
-            @mod_action = FactoryGirl.create(:mod_action)
+            as(@admin) do
+              @mod_action = create(:mod_action)
+            end
           end
 
           should "render" do
-            assert_equal(1, ModAction.count)
-            get :show, {}, {:user_id => @admin.id}
+            get_auth moderator_dashboard_path, @admin
             assert_response :success
           end
         end
 
         context "for user feedbacks" do
           setup do
-            @feedback = FactoryGirl.create(:user_feedback)
+            as(@user) do
+              @feedback = create(:user_feedback)
+            end
           end
 
           should "render" do
-            assert_equal(1, UserFeedback.count)
-            get :show, {}, {:user_id => @admin.id}
+            get_auth moderator_dashboard_path, @admin
             assert_response :success
           end
         end
 
         context "for wiki pages" do
           setup do
-            @wiki_page = FactoryGirl.create(:wiki_page)
+            as(@user) do
+              @wiki_page = create(:wiki_page)
+            end
           end
 
           should "render" do
-            assert_equal(1, WikiPageVersion.count)
-            get :show, {}, {:user_id => @admin.id}
+            get_auth moderator_dashboard_path, @admin
             assert_response :success
           end
         end
 
         context "for tags and uploads" do
           setup do
-            @post = FactoryGirl.create(:post)
+            as(@user) do
+              @post = create(:post)
+            end
           end
 
           should "render" do
-            assert_equal(1, PostArchive.count)
-            get :show, {}, {:user_id => @admin.id}
+            get_auth moderator_dashboard_path, @admin
             assert_response :success
           end
         end
 
         context "for notes"do
           setup do
-            @post = FactoryGirl.create(:post)
-            @note = FactoryGirl.create(:note, :post_id => @post.id)
+            as(@user) do
+              @post = create(:post)
+              @note = create(:note, :post_id => @post.id)
+            end
           end
 
           should "render" do
-            assert_equal(1, NoteVersion.count)
-            get :show, {}, {:user_id => @admin.id}
+            get_auth moderator_dashboard_path, @admin
             assert_response :success
           end
         end
 
         context "for comments" do
           setup do
-            @users = (0..5).map {FactoryGirl.create(:user)}
+            @users = (0..5).map {create(:user)}
 
-            CurrentUser.scoped(@users[0], "1.2.3.4") do
-              @comment = FactoryGirl.create(:comment)
+            CurrentUser.as(@users[0]) do
+              @comment = create(:comment)
             end
 
             @users.each do |user|
-              CurrentUser.scoped(user, "1.2.3.4") do
+              CurrentUser.as(user) do
                 @comment.vote!(-1)
               end
             end
           end
 
           should "render" do
-            get :show, {}, {:user_id => @admin.id}
+            get_auth moderator_dashboard_path, @admin
             assert_response :success
           end
         end
 
         context "for artists" do
           setup do
-            @artist = FactoryGirl.create(:artist)
+            as(@user) do
+              @artist = create(:artist)
+            end
           end
 
           should "render" do
-            get :show, {}, {:user_id => @admin.id}
-            assert_equal(1, ArtistVersion.count)
+            get_auth moderator_dashboard_path, @admin
             assert_response :success
           end
         end
 
         context "for flags" do
           setup do
-            @post = FactoryGirl.create(:post)
-            @post.flag!("blah")
+            as(@user) do
+              @post = create(:post)
+              @post.flag!("blah")
+            end
           end
 
           should "render" do
-            get :show, {}, {:user_id => @admin.id}
+            get_auth moderator_dashboard_path, @admin
             assert_response :success
           end
         end
 
         context "for appeals" do
           setup do
-            @post = FactoryGirl.create(:post, :is_deleted => true)
-            @post.appeal!("blah")
+            as(@user) do
+              @post = create(:post, :is_deleted => true)
+              @post.appeal!("blah")
+            end
           end
 
           should "render" do
-            get :show, {}, {:user_id => @admin.id}
+            get_auth moderator_dashboard_path, @admin
             assert_response :success
           end
         end

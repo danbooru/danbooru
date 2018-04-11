@@ -4,6 +4,7 @@ module Sources
   class PawooTest < ActiveSupport::TestCase
     context "The source site for a https://pawoo.net/web/status/$id url"  do
       setup do
+        skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
         @site = Sources::Site.new("https://pawoo.net/web/statuses/1202176")
         @site.get
       end
@@ -33,6 +34,7 @@ module Sources
 
     context "The source site for a https://pawoo.net/$user/$id url"  do
       setup do
+        skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
         @site = Sources::Site.new("https://pawoo.net/@evazion/19451018")
         @site.get
       end
@@ -84,6 +86,7 @@ module Sources
 
     context "The source site for a https://img.pawoo.net/ url"  do
       setup do
+        skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
         @url = "https://img.pawoo.net/media_attachments/files/001/298/028/original/55a6fd252778454b.mp4"
         @ref = "https://pawoo.net/@evazion/19451018"
         @site = Sources::Site.new(@url, referer_url: @ref)

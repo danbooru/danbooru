@@ -1,5 +1,5 @@
 class TagImplicationsController < ApplicationController
-  before_filter :admin_only, :only => [:new, :create, :approve]
+  before_action :admin_only, :only => [:new, :create, :approve]
   respond_to :html, :xml, :json, :js
 
   def show
@@ -15,14 +15,14 @@ class TagImplicationsController < ApplicationController
     @tag_implication = TagImplication.find(params[:id])
 
     if @tag_implication.is_pending? && @tag_implication.editable_by?(CurrentUser.user)
-      @tag_implication.update_attributes(update_params)
+      @tag_implication.update(tag_implication_params)
     end
 
     respond_with(@tag_implication)
   end
 
   def index
-    @tag_implications = TagImplication.search(params[:search]).paginate(params[:page], :limit => params[:limit])
+    @tag_implications = TagImplication.search(search_params).paginate(params[:page], :limit => params[:limit])
     respond_with(@tag_implications) do |format|
       format.xml do
         render :xml => @tag_implications.to_xml(:root => "tag-implications")
@@ -53,7 +53,7 @@ class TagImplicationsController < ApplicationController
 
 private
 
-  def update_params
-    params.require(:tag_implication).permit(:antecedent_name, :consequent_name, :forum_topic_id)
+  def tag_implication_params
+    params.require(:tag_implication).permit(%i[antecedent_name consequent_name forum_topic_id skip_secondary_validations])
   end
 end

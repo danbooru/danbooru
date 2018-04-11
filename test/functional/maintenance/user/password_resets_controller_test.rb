@@ -2,30 +2,23 @@ require "test_helper"
 
 module Maintenance
   module User
-    class PasswordResetsControllerTest < ActionController::TestCase
+    class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
       context "A password resets controller" do
         setup do
-          @user = FactoryGirl.create(:user, :email => "abc@com.net")
-          CurrentUser.user = nil
-          CurrentUser.ip_addr = "127.0.0.1"
+          @user = create(:user, :email => "abc@com.net")
           ActionMailer::Base.delivery_method = :test
           ActionMailer::Base.deliveries.clear
         end
 
-        teardown do
-          CurrentUser.user = nil
-          CurrentUser.ip_addr = nil
-        end
-
         should "render the new page" do
-          get :new
+          get new_maintenance_user_password_reset_path
           assert_response :success
         end
 
         context "create action" do
           context "given invalid parameters" do
             setup do
-              post :create, {:nonce => {:email => ""}}
+              post maintenance_user_password_reset_path, params: {:nonce => {:email => ""}}
             end
 
             should "not create a new nonce" do
@@ -43,7 +36,7 @@ module Maintenance
 
           context "given valid parameters" do
             setup do
-              post :create, {:nonce => {:email => @user.email}}
+              post maintenance_user_password_reset_path, params: {:nonce => {:email => @user.email}}
             end
 
             should "create a new nonce" do
@@ -63,7 +56,7 @@ module Maintenance
         context "edit action" do
           context "with invalid parameters" do
             setup do
-              get :edit, :email => "a@b.c"
+              get edit_maintenance_user_password_reset_path, params: {:email => "a@b.c"}
             end
 
             should "succeed silently" do
@@ -73,10 +66,10 @@ module Maintenance
 
           context "with valid parameters" do
             setup do
-              @user = FactoryGirl.create(:user)
-              @nonce = FactoryGirl.create(:user_password_reset_nonce, :email => @user.email)
+              @user = create(:user)
+              @nonce = create(:user_password_reset_nonce, :email => @user.email)
               ActionMailer::Base.deliveries.clear
-              get :edit, :email => @nonce.email, :key => @nonce.key
+              get edit_maintenance_user_password_reset_path, params: {:email => @nonce.email, :key => @nonce.key}
             end
 
             should "succeed" do
@@ -86,23 +79,13 @@ module Maintenance
         end
 
         context "update action" do
-          context "with invalid parameters" do
-            setup do
-              get :update
-            end
-
-            should "fail" do
-              assert_redirected_to new_maintenance_user_password_reset_path
-            end
-          end
-
           context "with valid parameters" do
             setup do
-              @user = FactoryGirl.create(:user)
-              @nonce = FactoryGirl.create(:user_password_reset_nonce, :email => @user.email)
+              @user = create(:user)
+              @nonce = create(:user_password_reset_nonce, :email => @user.email)
               ActionMailer::Base.deliveries.clear
               @old_password = @user.bcrypt_password_hash
-              post :update, :email => @nonce.email, :key => @nonce.key
+              put maintenance_user_password_reset_path, params: {:email => @nonce.email, :key => @nonce.key}
             end
 
             should "succeed" do

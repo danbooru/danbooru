@@ -1,8 +1,6 @@
 class NoteVersion < ApplicationRecord
-  before_validation :initialize_updater
-  belongs_to :updater, :class_name => "User", :counter_cache => "note_update_count"
+  belongs_to_updater :counter_cache => "note_update_count"
   scope :for_user, lambda {|user_id| where("updater_id = ?", user_id)}
-  attr_accessible :note_id, :x, :y, :width, :height, :body, :updater_id, :updater_ip_addr, :is_active, :post_id, :html_id, :version
 
   def self.search(params)
     q = super
@@ -22,16 +20,7 @@ class NoteVersion < ApplicationRecord
     q.apply_default_order(params)
   end
 
-  def initialize_updater
-    self.updater_id = CurrentUser.id
-    self.updater_ip_addr = CurrentUser.ip_addr
-  end
-
   def previous
     NoteVersion.where("note_id = ? and updated_at < ?", note_id, updated_at).order("updated_at desc").first
-  end
-
-  def updater_name
-    User.id_to_name(updater_id)
   end
 end

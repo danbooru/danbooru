@@ -1,6 +1,6 @@
 class PostReplacementsController < ApplicationController
   respond_to :html, :xml, :json
-  before_filter :moderator_only, except: [:index]
+  before_action :moderator_only, except: [:index]
 
   def new
     @post = Post.find(params[:post_id])
@@ -23,7 +23,7 @@ class PostReplacementsController < ApplicationController
 
   def index
     params[:search][:post_id] = params.delete(:post_id) if params.has_key?(:post_id)
-    @post_replacements = PostReplacement.search(params[:search]).paginate(params[:page], limit: params[:limit])
+    @post_replacements = PostReplacement.search(search_params).paginate(params[:page], limit: params[:limit])
 
     respond_with(@post_replacements)
   end

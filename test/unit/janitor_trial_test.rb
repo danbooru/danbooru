@@ -3,8 +3,8 @@ require 'test_helper'
 class JanitorTrialTest < ActiveSupport::TestCase
   context "A janitor trial" do
     setup do
-      @admin = FactoryGirl.create(:admin_user)
-      @user = FactoryGirl.create(:user)
+      @admin = FactoryBot.create(:admin_user)
+      @user = FactoryBot.create(:user)
       CurrentUser.user = @admin
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -30,7 +30,7 @@ class JanitorTrialTest < ActiveSupport::TestCase
 
     context "upon demotion" do
       setup do
-        @janitor_trial = FactoryGirl.create(:janitor_trial, :user_id => @user.id)
+        @janitor_trial = FactoryBot.create(:janitor_trial, :user_id => @user.id)
       end
 
       should "create a negative feedback record" do
@@ -48,7 +48,7 @@ class JanitorTrialTest < ActiveSupport::TestCase
 
     context "upon promotion" do
       setup do
-        @janitor_trial = FactoryGirl.create(:janitor_trial, :user_id => @user.id)
+        @janitor_trial = FactoryBot.create(:janitor_trial, :user_id => @user.id)
       end
 
       should "destroy the trial object" do

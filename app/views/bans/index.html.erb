@@ -20,11 +20,11 @@
           <tr id="ban-<%= ban.id %>" data-expired="<%= ban.expired? %>">
             <td>
               <%= link_to_user(ban.user) %>
-              <%= link_to "»", bans_path(search: params[:search].merge(user_name: ban.user.name)) %>
+              <%= link_to "»", bans_path(search: search_params.merge(user_name: ban.user.name)) %>
             </td>
             <td>
               <%= link_to_user(ban.banner) %>
-              <%= link_to "»", bans_path(search: params[:search].merge(banner_name: ban.banner.name)) %>
+              <%= link_to "»", bans_path(search: search_params.merge(banner_name: ban.banner.name)) %>
             </td>
             <td><%= time_ago_in_words_tagged(ban.created_at) %></td>
             <td><%= humanized_duration(ban.created_at, ban.expires_at) %></td>

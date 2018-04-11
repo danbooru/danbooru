@@ -1,13 +1,16 @@
-require File.expand_path('../boot', __FILE__)
+require_relative 'boot'
 require 'rails/all'
 
 if defined?(Bundler)
   Bundler.require(:default, Rails.env)
 end
+Bundler.require(*Rails.groups)
 
 module Danbooru
   class Application < Rails::Application
-
+    # Initialize configuration defaults for originally generated Rails version.
+    config.load_defaults 5.1
+    
     config.active_record.schema_format = :sql
     config.encoding = "utf-8"
     config.filter_parameters += [:password]
@@ -20,7 +23,7 @@ module Danbooru
     config.action_mailer.smtp_settings = {:enable_starttls_auto => false}
     config.action_mailer.perform_deliveries = true
     config.log_tags = [lambda {|req| "PID:#{Process.pid}"}]
-    config.active_record.raise_in_transactional_callbacks = true
+    config.action_controller.action_on_unpermitted_parameters = :raise
 
     if File.exists?("#{config.root}/REVISION")
       config.x.git_hash = File.read("#{config.root}/REVISION").strip

@@ -3,7 +3,6 @@
 <% else %>
   Danbooru.notice("Vote saved");
   $("#score-for-post-<%= @post.id %>").html(<%= @post.score %>);
+  $("#vote-links-for-post-<%= @post.id %>").hide();
+  $("#unvote-link-for-post-<%= @post.id %>").show();
 <% end %>
-
-$("#vote-links-for-post-<%= @post.id %>").hide();
-$("#unvote-link-for-post-<%= @post.id %>").show();

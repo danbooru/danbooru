@@ -3,7 +3,7 @@ require 'test_helper'
 class TagImplicationRequestTest < ActiveSupport::TestCase
   context "A tag implication request" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
     end

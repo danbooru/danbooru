@@ -4,13 +4,13 @@ module PostSets
   class FavoriteTest < ActiveSupport::TestCase
     context "In all cases" do
       setup do
-        @user = FactoryGirl.create(:user)
+        @user = FactoryBot.create(:user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
 
-        @post_1 = FactoryGirl.create(:post)
-        @post_2 = FactoryGirl.create(:post)
-        @post_3 = FactoryGirl.create(:post)
+        @post_1 = FactoryBot.create(:post)
+        @post_2 = FactoryBot.create(:post)
+        @post_3 = FactoryBot.create(:post)
         @post_2.add_favorite!(@user)
         @post_1.add_favorite!(@user)
         @post_3.add_favorite!(@user)
@@ -24,13 +24,11 @@ module PostSets
       context "a favorite set for before the most recent post" do
         setup do
           id = ::Favorite.where(:user_id => @user.id, :post_id => @post_3.id).first.id
-          ::Favorite.stubs(:records_per_page).returns(1)
-          @set = PostSets::Favorite.new(@user.id, "b#{id}")
+          @set = PostSets::Favorite.new(@user.id, "b#{id}", limit: 1)
         end
 
         context "a sequential paginator" do
           should "return the second most recent element" do
-            assert_equal(1, @set.posts.size)
             assert_equal(@post_1.id, @set.posts.first.id)
           end
 
@@ -50,7 +48,6 @@ module PostSets
 
         context "a sequential paginator" do
           should "return the second most recent element" do
-            assert_equal(1, @set.posts.size)
             assert_equal(@post_1.id, @set.posts.first.id)
           end
 
@@ -70,7 +67,6 @@ module PostSets
 
         context "a sequential paginator" do
           should "return the third most recent element" do
-            assert_equal(1, @set.posts.size)
             assert_equal(@post_2.id, @set.posts.first.id)
           end
 
@@ -90,7 +86,6 @@ module PostSets
 
         context "a sequential paginator" do
           should "return the most recent element" do
-            assert_equal(1, @set.posts.size)
             assert_equal(@post_3.id, @set.posts.first.id)
           end
 
@@ -109,7 +104,6 @@ module PostSets
 
         context "a numbered paginator" do
           should "return the second most recent element" do
-            assert_equal(1, @set.posts.size)
             assert_equal(@post_1.id, @set.posts.first.id)
           end
 
@@ -127,7 +121,6 @@ module PostSets
         end
 
         should "return the most recent element" do
-          assert_equal(1, @set.posts.size)
           assert_equal(@post_3.id, @set.posts.first.id)
         end
 

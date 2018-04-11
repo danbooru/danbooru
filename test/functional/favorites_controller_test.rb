@@ -1,59 +1,51 @@
 require 'test_helper'
 
-class FavoritesControllerTest < ActionController::TestCase
+class FavoritesControllerTest < ActionDispatch::IntegrationTest
   context "The favorites controller" do
     setup do
-      @user = FactoryGirl.create(:user)
-      CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
-    end
-
-    teardown do
-      CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
+      @user = create(:user)
     end
 
     context "index action" do
       setup do
-        @post = FactoryGirl.create(:post)
+        @post = create(:post)
         @post.add_favorite!(@user)
       end
 
       context "with a specified tags parameter" do
         should "redirect to the posts controller" do
-          get :index, {:tags => "fav:#{@user.name} abc"}, {:user_id => @user}
+          get_auth favorites_path, @user, params: {:tags => "fav:#{@user.name} abc"}
           assert_redirected_to(posts_path(:tags => "fav:#{@user.name} abc"))
         end
       end
 
       should "display the current user's favorites" do
-        get :index, {}, {:user_id => @user.id}
+        get_auth favorites_path, @user
         assert_response :success
-        assert_not_nil(assigns(:favorite_set))
       end
     end
 
     context "create action" do
       setup do
-        @post = FactoryGirl.create(:post)
+        @post = create(:post)
       end
 
       should "create a favorite for the current user" do
         assert_difference("Favorite.count", 1) do
-          post :create, {:format => "js", :post_id => @post.id}, {:user_id => @user.id}
+          post_auth favorites_path, @user, params: {:format => "js", :post_id => @post.id}
         end
       end
     end
 
     context "destroy action" do
       setup do
-        @post = FactoryGirl.create(:post)
+        @post = create(:post)
         @post.add_favorite!(@user)
       end
 
       should "remove the favorite from the current user" do
         assert_difference("Favorite.count", -1) do
-          post :destroy, {:format => "js", :id => @post.id}, {:user_id => @user.id}
+          delete_auth favorite_path(@post.id), @user, params: {:format => "js"}
         end
       end
     end

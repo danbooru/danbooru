@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory(:tag) do
     name {"#{FFaker::Name.first_name.downcase}#{rand(1000)}"}
     post_count 0

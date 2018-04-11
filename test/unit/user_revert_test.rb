@@ -3,23 +3,18 @@ require 'test_helper'
 class UserRevertTest < ActiveSupport::TestCase
   context "Reverting a user's changes" do
     setup do
-      @creator = FactoryGirl.create(:user)
-      @user = FactoryGirl.create(:user)
-      CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
+      @creator = create(:user)
+      @user = create(:user)
 
       CurrentUser.scoped(@creator) do
-        @parent = FactoryGirl.create(:post)
-        @post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
+        @parent = create(:post)
+        @post = create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
       end
 
       @post.stubs(:merge_version?).returns(false)
-      @post.update_attributes(:tag_string => "bbb ccc xxx", :source => "", :rating => "e")
-    end
-
-    teardown do
-      CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
+      CurrentUser.scoped(@user) do
+        @post.update(:tag_string => "bbb ccc xxx", :source => "", :rating => "e")
+      end
     end
 
     subject { UserRevert.new(@user.id) }
@@ -32,7 +27,9 @@ class UserRevertTest < ActiveSupport::TestCase
 
     context "when processed" do
       setup do
-        subject.process
+        CurrentUser.as(@user) do
+          subject.process
+        end
         @post.reload
       end
 

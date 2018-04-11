@@ -1,43 +1,27 @@
 require 'test_helper'
 
-class ReportsControllerTest < ActionController::TestCase
-  def setup
-    super
-
-    CurrentUser.user = FactoryGirl.create(:mod_user)
-    CurrentUser.ip_addr = "127.0.0.1"
-    session[:user_id] = CurrentUser.user.id
-
-    @users = FactoryGirl.create_list(:contributor_user, 2)
-    @posts = @users.map { |u| FactoryGirl.create(:post, uploader: u) }
-  end
-
-  def teardown
-    super
-
-    CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
-    session[:user_id] = nil
-  end
-
+class ReportsControllerTest < ActionDispatch::IntegrationTest
   context "The reports controller" do
-    context "uploads action" do
-      should "render" do
-        get :uploads
-        assert_response :success
+    setup do
+      @mod = create(:mod_user)
+      @users = FactoryBot.create_list(:contributor_user, 2)
+      @posts = @users.map do |u| 
+        as(u) do
+          create(:post)
+        end
       end
     end
 
-    context "similar_users action" do
+    context "uploads action" do
       should "render" do
-        #get :similar_users
-        #assert_response :success
+        get_auth reports_uploads_path, @mod
+        assert_response :success
       end
     end
 
     context "post_versions action" do
       should "render" do
-        get :post_versions
+        get_auth reports_post_versions_path, @mod
         assert_response :success
       end
     end

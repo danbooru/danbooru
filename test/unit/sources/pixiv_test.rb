@@ -160,7 +160,7 @@ module Sources
 
       context "translating the tags" do
         setup do
-          CurrentUser.user = FactoryGirl.create(:user)
+          CurrentUser.user = FactoryBot.create(:user)
           CurrentUser.ip_addr = "127.0.0.1"
 
           tags = {
@@ -174,8 +174,8 @@ module Sources
           }
 
           tags.each do |tag, other_names|
-            FactoryGirl.create(:tag, name: tag, post_count: 1)
-            FactoryGirl.create(:wiki_page, title: tag, other_names: other_names)
+            FactoryBot.create(:tag, name: tag, post_count: 1)
+            FactoryBot.create(:wiki_page, title: tag, other_names: other_names)
           end
 
           @site = get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=65981746")
@@ -219,12 +219,12 @@ module Sources
         end
 
         should "apply aliases to translated tags" do
-          tohsaka_rin = FactoryGirl.create(:tag, name: "tohsaka_rin")
-          toosaka_rin = FactoryGirl.create(:tag, name: "toosaka_rin")
+          tohsaka_rin = FactoryBot.create(:tag, name: "tohsaka_rin")
+          toosaka_rin = FactoryBot.create(:tag, name: "toosaka_rin")
 
-          FactoryGirl.create(:wiki_page, title: "tohsaka_rin", other_names: "遠坂凛")
-          FactoryGirl.create(:wiki_page, title: "toosaka_rin", other_names: "遠坂凛")
-          FactoryGirl.create(:tag_alias, antecedent_name: "tohsaka_rin", consequent_name: "toosaka_rin")
+          FactoryBot.create(:wiki_page, title: "tohsaka_rin", other_names: "遠坂凛")
+          FactoryBot.create(:wiki_page, title: "toosaka_rin", other_names: "遠坂凛")
+          FactoryBot.create(:tag_alias, antecedent_name: "tohsaka_rin", consequent_name: "toosaka_rin")
 
           assert_equal([toosaka_rin], @site.translate_tag("遠坂凛"))
         end

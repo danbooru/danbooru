@@ -3,19 +3,15 @@ class WikiPage < ApplicationRecord
 
   before_save :normalize_title
   before_save :normalize_other_names
-  before_validation :initialize_creator, :on => :create
-  before_validation :initialize_updater
   after_save :create_version
-  belongs_to :creator, :class_name => "User"
-  belongs_to :updater, :class_name => "User"
+  belongs_to_creator
+  belongs_to_updater
   validates_uniqueness_of :title, :case_sensitive => false
   validates_presence_of :title
   validates_presence_of :body, :unless => -> { is_deleted? || other_names.present? }
   validate :validate_rename
-  validate :validate_locker_is_builder
   validate :validate_not_locked
   attr_accessor :skip_secondary_validations
-  attr_accessible :title, :body, :is_locked, :is_deleted, :other_names, :skip_secondary_validations
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, lambda {where(:is_active => true)}, :foreign_key => "name", :primary_key => "title"
   has_many :versions, lambda {order("wiki_page_versions.id ASC")}, :class_name => "WikiPageVersion", :dependent => :destroy
@@ -127,13 +123,6 @@ class WikiPage < ApplicationRecord
     titled(title).select("title, id").first
   end
 
-  def validate_locker_is_builder
-    if is_locked_changed? && !CurrentUser.is_builder?
-      errors.add(:is_locked, "can be modified by builders only")
-      return false
-    end
-  end
-
   def validate_not_locked
     if is_locked? && !CurrentUser.is_builder?
       errors.add(:is_locked, "and cannot be updated")
@@ -142,7 +131,7 @@ class WikiPage < ApplicationRecord
   end
 
   def validate_rename
-    return if !title_changed? || skip_secondary_validations
+    return if !will_save_change_to_title? || skip_secondary_validations
 
     tag_was = Tag.find_by_name(Tag.normalize_name(title_was))
     if tag_was.present? && tag_was.post_count > 0
@@ -179,10 +168,6 @@ class WikiPage < ApplicationRecord
     @skip_secondary_validations = (value == true || value == "1")
   end
 
-  def creator_name
-    User.id_to_name(creator_id)
-  end
-
   def category_name
     Tag.category_for(title)
   end
@@ -192,7 +177,7 @@ class WikiPage < ApplicationRecord
   end
 
   def wiki_page_changed?
-    title_changed? || body_changed? || is_locked_changed? || is_deleted_changed? || other_names_changed?
+    saved_change_to_title? || saved_change_to_body? || saved_change_to_is_locked? || saved_change_to_is_deleted? || saved_change_to_other_names?
   end
 
   def merge_version
@@ -230,20 +215,6 @@ class WikiPage < ApplicationRecord
       else
         create_new_version
       end
-    end
-  end
-  
-  def updater_name
-    User.id_to_name(updater_id)
-  end
-
-  def initialize_creator
-    self.creator_id = CurrentUser.user.id
-  end
-
-  def initialize_updater
-    if wiki_page_changed?
-      self.updater_id = CurrentUser.user.id
     end
   end
 

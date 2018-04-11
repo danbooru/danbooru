@@ -1,7 +1,7 @@
 class PoolsController < ApplicationController
   respond_to :html, :xml, :json, :js
-  before_filter :member_only, :except => [:index, :show, :gallery]
-  before_filter :builder_only, :only => [:destroy]
+  before_action :member_only, :except => [:index, :show, :gallery]
+  before_action :builder_only, :only => [:destroy]
 
   def new
     @pool = Pool.new
@@ -17,7 +17,7 @@ class PoolsController < ApplicationController
   end
 
   def index
-    @pools = Pool.search(params[:search]).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
+    @pools = Pool.search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@pools) do |format|
       format.xml do
         render :xml => @pools.to_xml(:root => "pools")
@@ -27,7 +27,7 @@ class PoolsController < ApplicationController
 
   def gallery
     limit = params[:limit] || CurrentUser.user.per_page
-    @pools = Pool.series.search(params[:search]).reorder("updated_at desc").paginate(params[:page], :limit => limit, :search_count => params[:search])
+    @pools = Pool.series.search(search_params).reorder("updated_at desc").paginate(params[:page], :limit => limit, :search_count => params[:search])
     @post_set = PostSets::PoolGallery.new(@pools)
   end
 
@@ -38,7 +38,7 @@ class PoolsController < ApplicationController
   end
 
   def create
-    @pool = Pool.create(params[:pool])
+    @pool = Pool.create(pool_params)
     flash[:notice] = @pool.valid? ? "Pool created" : @pool.errors.full_messages.join("; ")
     respond_with(@pool)
   end
@@ -46,7 +46,7 @@ class PoolsController < ApplicationController
   def update
     # need to do this in order for synchronize! to work correctly
     @pool = Pool.find(params[:id])
-    @pool.attributes = params[:pool]
+    @pool.attributes = pool_params
     @pool.synchronize
     @pool.save
     unless @pool.errors.any?
@@ -85,5 +85,12 @@ class PoolsController < ApplicationController
     respond_with(@pool) do |format|
       format.js
     end
+  end
+
+  private
+
+  def pool_params
+    permitted_params = %i[name description category is_active post_ids]
+    params.require(:pool).permit(permitted_params)
   end
 end

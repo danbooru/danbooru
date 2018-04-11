@@ -3,7 +3,7 @@ require 'test_helper'
 class AliasAndImplicationImporterTest < ActiveSupport::TestCase
   context "The alias and implication importer" do
     setup do
-      CurrentUser.user = FactoryGirl.create(:admin_user)
+      CurrentUser.user = FactoryBot.create(:admin_user)
       CurrentUser.ip_addr = "127.0.0.1"
     end
 
@@ -66,9 +66,9 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
     end
 
     should "rename an aliased tag's artist entry and wiki page" do
-      tag1 = FactoryGirl.create(:tag, :name => "aaa", :category => 1)
-      tag2 = FactoryGirl.create(:tag, :name => "bbb")
-      artist = FactoryGirl.create(:artist, :name => "aaa", :notes => "testing")
+      tag1 = FactoryBot.create(:tag, :name => "aaa", :category => 1)
+      tag2 = FactoryBot.create(:tag, :name => "bbb")
+      artist = FactoryBot.create(:artist, :name => "aaa", :notes => "testing")
       @importer = AliasAndImplicationImporter.new("create alias aaa -> bbb", "", "1")
       @importer.process!
       artist.reload

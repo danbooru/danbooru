@@ -2,7 +2,6 @@ class ModAction < ApplicationRecord
   belongs_to :creator, :class_name => "User"
   before_validation :initialize_creator, :on => :create
   validates_presence_of :creator_id
-  attr_accessible :description, :category
 
   #####DIVISIONS#####
   #Groups:     0-999

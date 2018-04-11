@@ -7,8 +7,6 @@ CurrentUser.ip_addr = "127.0.0.1"
 
 ArtistCommentary.without_timeout do
   ArtistCommentary.transaction do
-    # binding.pry
-
     artcomms = ArtistCommentary.where(%(
          original_title         ~ '^[[:space:]]|[[:space:]]$'
       OR translated_title       ~ '^[[:space:]]|[[:space:]]$'

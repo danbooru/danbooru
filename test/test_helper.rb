@@ -20,9 +20,32 @@ Dotenv.load(Rails.root + ".env.local")
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
+    with.test_framework :minitest
     with.library :rails
   end
 end
+
+module TestHelpers
+  def create(factory_bot_model, params = {})
+    record = FactoryBot.build(factory_bot_model, params)
+    record.save
+    raise ActiveRecord::RecordInvalid.new(record) if record.errors.any?
+    record
+  end
+
+  def as(user, &block)
+    CurrentUser.as(user, &block)
+  end
+
+  def as_user(&block)
+    CurrentUser.as(@user, &block)
+  end
+
+  def as_admin(&block)
+    CurrentUser.as_admin(&block)
+  end
+end
+
 
 class ActiveSupport::TestCase
   include PostArchiveTestHelper
@@ -32,6 +55,7 @@ class ActiveSupport::TestCase
   include IqdbTestHelper
   include SavedSearchTestHelper
   include UploadTestHelper
+  include TestHelpers
 
   setup do
     mock_popular_search_service!
@@ -50,15 +74,32 @@ class ActiveSupport::TestCase
   end
 end
 
-class ActionController::TestCase
-  def assert_authentication_passes(action, http_method, role, params, session)
-    __send__(http_method, action, params, session.merge(:user_id => @users[role].id))
-    assert_response :success
+class ActionDispatch::IntegrationTest
+  include PostArchiveTestHelper
+  include PoolArchiveTestHelper
+  include TestHelpers
+
+  def method_authenticated(method_name, url, user, options)
+    Thread.current[:test_user_id] = user.id
+    self.send(method_name, url, options)
+  ensure
+    Thread.current[:test_user_id] = nil
   end
 
-  def assert_authentication_fails(action, http_method, role)
-    __send__(http_method, action, params, session.merge(:user_id => @users[role].id))
-    assert_redirected_to(new_sessions_path)
+  def get_auth(url, user, options = {})
+    method_authenticated(:get, url, user, options)
+  end
+
+  def post_auth(url, user, options = {})
+    method_authenticated(:post, url, user, options)
+  end
+
+  def put_auth(url, user, options = {})
+    method_authenticated(:put, url, user, options)
+  end
+
+  def delete_auth(url, user, options = {})
+    method_authenticated(:delete, url, user, options)
   end
 
   def setup
@@ -73,6 +114,5 @@ class ActionController::TestCase
 end
 
 Delayed::Worker.delay_jobs = false
-TestAfterCommit.enabled = false
 
 Rails.application.load_seed

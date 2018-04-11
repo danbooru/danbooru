@@ -3,10 +3,10 @@ require 'test_helper'
 class ForumPostTest < ActiveSupport::TestCase
   context "A forum post" do
     setup do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @topic = FactoryGirl.create(:forum_topic)
+      @topic = FactoryBot.create(:forum_topic)
     end
 
     teardown do
@@ -17,32 +17,32 @@ class ForumPostTest < ActiveSupport::TestCase
     context "that mentions a user" do
       context "in a quote block" do
         setup do
-          @user2 = FactoryGirl.create(:user)
+          @user2 = FactoryBot.create(:user)
         end
 
         should "not create a dmail" do
           assert_difference("Dmail.count", 0) do
-            FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => "[quote]@#{@user2.name}[/quote]")
+            FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => "[quote]@#{@user2.name}[/quote]")
           end
 
           assert_difference("Dmail.count", 0) do
-            FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => "[quote]@#{@user2.name}[/quote] blah [quote]@#{@user2.name}[/quote]")
+            FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => "[quote]@#{@user2.name}[/quote] blah [quote]@#{@user2.name}[/quote]")
           end
 
           assert_difference("Dmail.count", 0) do
-            FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => "[quote][quote]@#{@user2.name}[/quote][/quote]")
+            FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => "[quote][quote]@#{@user2.name}[/quote][/quote]")
           end
 
           assert_difference("Dmail.count", 1) do
-            FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => "[quote]@#{@user2.name}[/quote] @#{@user2.name}")
+            FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => "[quote]@#{@user2.name}[/quote] @#{@user2.name}")
           end
         end
       end
 
       context "outside a quote block" do
         setup do
-          @user2 = FactoryGirl.create(:user)
-          @post = FactoryGirl.build(:forum_post, :topic_id => @topic.id, :body => "Hey @#{@user2.name} check this out!")
+          @user2 = FactoryBot.create(:user)
+          @post = FactoryBot.build(:forum_post, :topic_id => @topic.id, :body => "Hey @#{@user2.name} check this out!")
         end
 
         should "create a dmail" do
@@ -67,16 +67,16 @@ class ForumPostTest < ActiveSupport::TestCase
         Danbooru.config.stubs(:posts_per_page).returns(3)
         @posts = []
         9.times do
-          @posts << FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
+          @posts << FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
         end
         Timecop.travel(2.seconds.from_now) do
-          @posts << FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
+          @posts << FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
         end
       end
 
       context "that is deleted" do
         setup do
-          CurrentUser.user = FactoryGirl.create(:moderator_user)
+          CurrentUser.user = FactoryBot.create(:moderator_user)
         end
         
         should "update the topic's updated_at timestamp" do
@@ -104,7 +104,7 @@ class ForumPostTest < ActiveSupport::TestCase
 
     context "belonging to a locked topic" do
       setup do
-        @post = FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => "zzz")
+        @post = FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => "zzz")
         @topic.update_attribute(:is_locked, true)
         @post.reload
       end
@@ -116,15 +116,16 @@ class ForumPostTest < ActiveSupport::TestCase
       end
 
       should "not be deletable" do
-        @post.destroy
-        assert_equal(1, ForumPost.count)
+        assert_difference("ForumPost.count", 0) do
+          @post.destroy
+        end
       end
     end
 
     should "update the topic when created" do
       @original_topic_updated_at = @topic.updated_at
       Timecop.travel(1.second.from_now) do
-        post = FactoryGirl.create(:forum_post, :topic_id => @topic.id)
+        post = FactoryBot.create(:forum_post, :topic_id => @topic.id)
       end
       @topic.reload
       assert_not_equal(@original_topic_updated_at.to_s, @topic.updated_at.to_s)
@@ -133,7 +134,7 @@ class ForumPostTest < ActiveSupport::TestCase
     should "update the topic when updated only for the original post" do
       posts = []
       3.times do
-        posts << FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
+        posts << FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
       end
       
       # updating the original post
@@ -151,20 +152,20 @@ class ForumPostTest < ActiveSupport::TestCase
     end
 
     should "be searchable by body content" do
-      post = FactoryGirl.create(:forum_post, :topic_id => @topic.id, :body => "xxx")
+      post = FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => "xxx")
       assert_equal(1, ForumPost.body_matches("xxx").count)
       assert_equal(0, ForumPost.body_matches("aaa").count)
     end
 
     should "initialize its creator" do
-      post = FactoryGirl.create(:forum_post, :topic_id => @topic.id)
+      post = FactoryBot.create(:forum_post, :topic_id => @topic.id)
       assert_equal(@user.id, post.creator_id)
     end
 
     context "updated by a second user" do
       setup do
-        @post = FactoryGirl.create(:forum_post, :topic_id => @topic.id)
-        @second_user = FactoryGirl.create(:user)
+        @post = FactoryBot.create(:forum_post, :topic_id => @topic.id)
+        @second_user = FactoryBot.create(:user)
         CurrentUser.user = @second_user
       end
 

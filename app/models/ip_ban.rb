@@ -1,11 +1,9 @@
 class IpBan < ApplicationRecord
   IP_ADDR_REGEX = /\A(?:[0-9]{1,3}\.){3}[0-9]{1,3}\Z/
-  belongs_to :creator, :class_name => "User"
-  before_validation :initialize_creator, :on => :create
+  belongs_to_creator
   validates_presence_of :reason, :creator, :ip_addr
   validates_format_of :ip_addr, :with => IP_ADDR_REGEX
   validates_uniqueness_of :ip_addr, :if => lambda {|rec| rec.ip_addr =~ IP_ADDR_REGEX}
-  attr_accessible :ip_addr, :reason
   after_create do |rec|
     ModAction.log("#{CurrentUser.name} created ip ban for #{rec.ip_addr}",:ip_ban_create)
   end
@@ -43,9 +41,5 @@ class IpBan < ApplicationRecord
 
   def self.count_by_ip_addr(table, user_ids, user_id_field = "user_id", ip_addr_field = "ip_addr")
     select_all_sql("SELECT #{ip_addr_field}, count(*) FROM #{table} WHERE #{user_id_field} IN (?) GROUP BY #{ip_addr_field} ORDER BY count(*) DESC", user_ids).to_hash
-  end
-
-  def initialize_creator
-    self.creator_id = CurrentUser.id
   end
 end

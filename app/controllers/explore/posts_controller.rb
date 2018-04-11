@@ -1,7 +1,7 @@
 module Explore
   class PostsController < ApplicationController
     respond_to :html, :xml, :json
-    before_filter :set_date, only: [:searches, :viewed]
+    before_action :set_date, only: [:searches, :viewed]
 
     def popular
       @post_set = PostSets::Popular.new(params[:date], params[:scale])

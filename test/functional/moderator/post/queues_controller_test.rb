@@ -2,26 +2,26 @@ require 'test_helper'
 
 module Moderator
   module Post
-    class QueuesControllerTest < ActionController::TestCase
+    class QueuesControllerTest < ActionDispatch::IntegrationTest
       context "The moderator post queues controller" do
         setup do
-          @admin = FactoryGirl.create(:admin_user)
-          CurrentUser.user = @admin
-          CurrentUser.ip_addr = "127.0.0.1"
-
-          @post = FactoryGirl.create(:post, :is_pending => true)
+          @admin = create(:admin_user)
+          @user = create(:user)
+          as_user do
+            @post = create(:post, :is_pending => true)
+          end
         end
 
         context "show action" do
           should "render" do
-            get :show, {}, {:user_id => @admin.id}
+            get_auth moderator_post_queue_path, @admin
             assert_response :success
           end
         end
 
         context "random action" do
           should "render" do
-            get :random, {}, {:user_id => @admin.id}
+            get_auth moderator_post_queue_path, @admin
             assert_response :success
           end
         end

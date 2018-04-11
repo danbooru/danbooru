@@ -3,24 +3,22 @@ require 'ostruct'
 class Pool < ApplicationRecord
   class RevertError < Exception ; end
 
-  validates_uniqueness_of :name, :case_sensitive => false, :if => :name_changed?
-  validate :validate_name, :if => :name_changed?
+  attribute :updater_id, :integer
+  validates_uniqueness_of :name, :case_sensitive => false, :if => :saved_change_to_name?
+  validate :validate_name, :if => :saved_change_to_name?
   validates_inclusion_of :category, :in => %w(series collection)
   validate :updater_can_change_category
   validate :updater_can_remove_posts
   validate :updater_can_edit_deleted
-  belongs_to :creator, :class_name => "User"
-  belongs_to :updater, :class_name => "User"
+  belongs_to_creator
+  belongs_to_updater
   before_validation :normalize_post_ids
   before_validation :normalize_name
   before_validation :initialize_is_active, :on => :create
-  before_validation :initialize_creator, :on => :create
   after_save :update_category_pseudo_tags_for_posts_async
   after_save :create_version
   after_create :synchronize!
   before_destroy :create_mod_action_for_destroy
-  attr_accessible :name, :description, :post_ids, :post_id_array, :post_count, :is_active, :category, :as => [:member, :gold, :platinum, :moderator, :admin, :default]
-  attr_accessible :is_deleted, :as => [:builder, :moderator, :admin]
 
   module SearchMethods
     def deleted
@@ -163,10 +161,6 @@ class Pool < ApplicationRecord
     self.is_active = true if is_active.nil?
   end
 
-  def initialize_creator
-    self.creator_id = CurrentUser.id
-  end
-
   def normalize_name
     self.name = Pool.normalize_name(name)
   end
@@ -195,7 +189,6 @@ class Pool < ApplicationRecord
     self.post_ids = version.post_ids.join(" ")
     self.name = version.name
     self.description = version.description
-
     synchronize!
   end
 
@@ -244,6 +237,7 @@ class Pool < ApplicationRecord
     return unless CurrentUser.user.can_remove_from_pools?
 
     with_lock do
+      reload
       update_attributes(:post_ids => remove_number_from_string(post.id, post_ids), :post_count => post_count - 1)
       post.remove_pool!(self)
       clear_post_id_array
@@ -296,7 +290,7 @@ class Pool < ApplicationRecord
 
   def synchronize!
     synchronize
-    save if post_ids_changed?
+    save if will_save_change_to_post_ids?
   end
 
   def post_id_array
@@ -306,15 +300,18 @@ class Pool < ApplicationRecord
   def post_id_array=(array)
     self.post_ids = array.join(" ")
     clear_post_id_array
+    self
   end
 
   def post_id_array_was
-    @post_id_array_was ||= post_ids_was.scan(/\d+/).map(&:to_i)
+    old_post_ids = post_ids_before_last_save || post_ids_was
+    @post_id_array_was ||= old_post_ids.to_s.scan(/\d+/).map(&:to_i)
   end
 
   def clear_post_id_array
     @post_id_array = nil
     @post_id_array_was = nil
+    self
   end
 
   def neighbors(post)
@@ -353,6 +350,7 @@ class Pool < ApplicationRecord
     super
     @neighbor_posts = nil
     clear_post_id_array
+    self
   end
 
   def method_attributes
@@ -360,7 +358,7 @@ class Pool < ApplicationRecord
   end
 
   def update_category_pseudo_tags_for_posts_async
-    if category_changed?
+    if saved_change_to_category?
       delay(:queue => "default").update_category_pseudo_tags_for_posts
     end
   end
@@ -378,7 +376,7 @@ class Pool < ApplicationRecord
   end
 
   def updater_can_change_category
-    if category_changed? && !category_changeable_by?(CurrentUser.user)
+    if saved_change_to_category? && !category_changeable_by?(CurrentUser.user)
       errors[:base] << "You cannot change the category of pools with greater than 100 posts"
       false
     else

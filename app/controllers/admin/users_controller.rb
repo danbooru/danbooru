@@ -1,6 +1,6 @@
 module Admin
   class UsersController < ApplicationController
-    before_filter :moderator_only
+    before_action :moderator_only
 
     def edit
       @user = User.find(params[:id])

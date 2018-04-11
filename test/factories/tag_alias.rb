@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :tag_alias do
     antecedent_name "aaa"
     consequent_name "bbb"
@@ -8,7 +8,7 @@ FactoryGirl.define do
 
     after(:create) do |tag_alias|
       unless tag_alias.status == "pending"
-        approver = FactoryGirl.create(:admin_user) unless approver.present?
+        approver = FactoryBot.create(:admin_user) unless approver.present?
         tag_alias.approve!(approver: approver)
       end
     end

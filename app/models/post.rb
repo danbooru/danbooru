@@ -41,10 +41,10 @@ class Post < ApplicationRecord
   after_commit :update_iqdb_async, :on => :create
   after_commit :notify_pubsub
 
-  belongs_to :updater, :class_name => "User"
-  belongs_to :approver, :class_name => "User"
+  belongs_to :updater, :class_name => "User", optional: true # this is handled in versions
+  belongs_to :approver, class_name: "User", optional: true
   belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
-  belongs_to :parent, :class_name => "Post"
+  belongs_to :parent, class_name: "Post", optional: true
   has_one :upload, :dependent => :destroy
   has_one :artist_commentary, :dependent => :destroy
   has_one :pixiv_ugoira_frame_data, :class_name => "PixivUgoiraFrameData", :dependent => :destroy
@@ -60,14 +60,6 @@ class Post < ApplicationRecord
   has_many :replacements, class_name: "PostReplacement", :dependent => :destroy
 
   serialize :keeper_data, JSON
-
-  if PostArchive.enabled?
-    has_many :versions, lambda {order("post_versions.updated_at ASC")}, :class_name => "PostArchive", :dependent => :destroy
-  end
-
-  attr_accessible :source, :rating, :tag_string, :old_tag_string, :old_parent_id, :old_source, :old_rating, :parent_id, :has_embedded_notes, :as => [:member, :builder, :gold, :platinum, :moderator, :admin, :default]
-  attr_accessible :is_rating_locked, :is_note_locked, :has_cropped, :keeper_data, :as => [:builder, :moderator, :admin]
-  attr_accessible :is_status_locked, :keeper_data, :as => [:admin]
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :view_count
 
   concerning :KeeperMethods do
@@ -82,7 +74,7 @@ class Post < ApplicationRecord
         uploader_id
       end
     end
-
+  
     def keeper
       User.find(keeper_id)
     end
@@ -91,6 +83,12 @@ class Post < ApplicationRecord
       self.keeper_data = {uid: uploader_id}
     end
   end
+
+  if PostArchive.enabled?
+    has_many :versions, lambda {order("post_versions.updated_at ASC")}, :class_name => "PostArchive", :dependent => :destroy
+  end
+
+  attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :view_count
 
   module FileMethods
     extend ActiveSupport::Concern
@@ -521,7 +519,7 @@ class Post < ApplicationRecord
     end
 
     def tag_array_was
-      @tag_array_was ||= Tag.scan_tags(tag_string_was)
+      @tag_array_was ||= Tag.scan_tags(tag_string_before_last_save || tag_string_was)
     end
 
     def tags
@@ -606,15 +604,15 @@ class Post < ApplicationRecord
         old_parent_id = old_parent_id.to_i
       end
       if old_parent_id == parent_id
-        self.parent_id = parent_id_was
+        self.parent_id = parent_id_before_last_save || parent_id_was
       end
 
       if old_source == source.to_s
-        self.source = source_was
+        self.source = source_before_last_save || source_was
       end
 
       if old_rating == rating
-        self.rating = rating_was
+        self.rating = rating_before_last_save || rating_was
       end
     end
 
@@ -838,13 +836,13 @@ class Post < ApplicationRecord
           self.rating = $1
 
         when /^(-?)locked:notes?$/i
-          assign_attributes({ is_note_locked: $1 != "-" }, as: CurrentUser.role)
+          self.is_note_locked = ($1 != "-" ) if CurrentUser.is_builder?
 
         when /^(-?)locked:rating$/i
-          assign_attributes({ is_rating_locked: $1 != "-" }, as: CurrentUser.role)
+          self.is_rating_locked = ($1 != "-" ) if CurrentUser.is_builder?
 
         when /^(-?)locked:status$/i
-          assign_attributes({ is_status_locked: $1 != "-" }, as: CurrentUser.role)
+          self.is_status_locked = ($1 != "-" ) if CurrentUser.is_admin?
 
         end
       end
@@ -977,7 +975,7 @@ class Post < ApplicationRecord
     end
 
     def remove_from_favorites
-      Favorite.delete_all(post_id: id)
+      Favorite.where(post_id: id).delete_all
       user_ids = fav_string.scan(/\d+/)
       User.where(:id => user_ids).update_all("favorite_count = favorite_count - 1")
       PostVote.where(post_id: id).delete_all
@@ -1175,7 +1173,7 @@ class Post < ApplicationRecord
 
     def fix_post_counts(post)
       post.set_tag_counts(false)
-      if post.changed?
+      if post.changes_saved?
         args = Hash[TagCategory.categories.map {|x| ["tag_count_#{x}",post.send("tag_count_#{x}")]}].update(:tag_count => post.tag_count)
         post.update_columns(args)
       end
@@ -1220,7 +1218,7 @@ class Post < ApplicationRecord
     # - Reparent all children to the first child.
 
     def update_has_children_flag
-      update({has_children: children.exists?, has_active_children: children.undeleted.exists?}, without_protection: true)
+      update(has_children: children.exists?, has_active_children: children.undeleted.exists?)
     end
 
     def blank_out_nonexistent_parents
@@ -1252,10 +1250,10 @@ class Post < ApplicationRecord
     end
 
     def update_parent_on_save
-      return unless parent_id_changed? || is_deleted_changed?
+      return unless saved_change_to_parent_id? || saved_change_to_is_deleted?
 
       parent.update_has_children_flag if parent.present?
-      Post.find(parent_id_was).update_has_children_flag if parent_id_was.present?
+      Post.find(parent_id_before_last_save).update_has_children_flag if parent_id_before_last_save.present?
     end
 
     def give_favorites_to_parent(options = {})
@@ -1337,12 +1335,12 @@ class Post < ApplicationRecord
       Post.transaction do
         flag!(reason, is_deletion: true)
 
-        update({
+        update(
           is_deleted: true,
           is_pending: false,
           is_flagged: false,
           is_banned: is_banned || options[:ban] || has_tag?("banned_artist")
-        }, without_protection: true)
+        )
 
         # XXX This must happen *after* the `is_deleted` flag is set to true (issue #3419).
         give_favorites_to_parent(options) if options[:move_favorites]
@@ -1385,9 +1383,13 @@ class Post < ApplicationRecord
 
   module VersionMethods
     def create_version(force = false)
-      if new_record? || rating_changed? || source_changed? || parent_id_changed? || tag_string_changed? || force
+      if new_record? || saved_change_to_watched_attributes? || force
         create_new_version
       end
+    end
+
+    def saved_change_to_watched_attributes?
+      saved_change_to_rating? || saved_change_to_source? || saved_change_to_parent_id? || saved_change_to_tag_string?
     end
 
     def merge_version?

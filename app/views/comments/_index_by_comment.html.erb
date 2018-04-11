@@ -18,4 +18,4 @@
 
 <%= numbered_paginator(@comments) %>
 
-<% content_for(:html_header, auto_discovery_link_tag(:atom, comments_url(:atom, search: params[:search]), title: "Comments")) %>
+<% content_for(:html_header, auto_discovery_link_tag(:atom, comments_url(format: "atom"), title: "Comments")) %>

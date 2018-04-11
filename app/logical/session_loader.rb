@@ -14,7 +14,9 @@ class SessionLoader
     CurrentUser.user = AnonymousUser.new
     CurrentUser.ip_addr = request.remote_ip
 
-    if session[:user_id]
+    if Rails.env.test? && Thread.current[:test_user_id]
+      load_for_test(Thread.current[:test_user_id])
+    elsif session[:user_id]
       load_session_user
     elsif cookie_password_hash_valid?
       load_cookie_user
@@ -31,6 +33,11 @@ class SessionLoader
   end
 
 private
+
+  def load_for_test(user_id)
+    CurrentUser.user = User.find(user_id)
+    CurrentUser.ip_addr = "127.0.0.1"
+  end
   
   def set_statement_timeout
     timeout = CurrentUser.user.statement_timeout

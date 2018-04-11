@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory(:wiki_page) do
     creator :factory => :user
     title {FFaker::Lorem.words.join(" ")}

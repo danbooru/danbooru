@@ -23,7 +23,7 @@ class CurrentUserTest < ActiveSupport::TestCase
       req = mock()
       req.stubs(:host).returns("danbooru")
       req.stubs(:params).returns({})
-      CurrentUser.user = FactoryGirl.create(:user)
+      CurrentUser.user = FactoryBot.create(:user)
       CurrentUser.set_safe_mode(req)
       assert_equal(false, CurrentUser.safe_mode?)
     end
@@ -33,7 +33,7 @@ class CurrentUserTest < ActiveSupport::TestCase
       req.stubs(:host).returns("danbooru")
       req.stubs(:params).returns({})
 
-      CurrentUser.user = FactoryGirl.create(:user, enable_safe_mode: true)
+      CurrentUser.user = FactoryBot.create(:user, enable_safe_mode: true)
       CurrentUser.set_safe_mode(req)
 
       assert_equal(true, CurrentUser.safe_mode?)
@@ -42,7 +42,7 @@ class CurrentUserTest < ActiveSupport::TestCase
 
   context "The current user" do
     should "be set only within the scope of the block" do
-      user = FactoryGirl.create(:user)
+      user = FactoryBot.create(:user)
 
       assert_nil(CurrentUser.user)
       assert_nil(CurrentUser.ip_addr)
@@ -58,8 +58,8 @@ class CurrentUserTest < ActiveSupport::TestCase
 
   context "A scoped current user" do
     should "reset the current user after the block has exited" do
-      user1 = FactoryGirl.create(:user)
-      user2 = FactoryGirl.create(:user)
+      user1 = FactoryBot.create(:user)
+      user2 = FactoryBot.create(:user)
       CurrentUser.user = user1
       CurrentUser.scoped(user2, nil) do
         assert_equal(user2.id, CurrentUser.user.id)
@@ -68,8 +68,8 @@ class CurrentUserTest < ActiveSupport::TestCase
     end
 
     should "reset the current user even if an exception is thrown" do
-      user1 = FactoryGirl.create(:user)
-      user2 = FactoryGirl.create(:user)
+      user1 = FactoryBot.create(:user)
+      user2 = FactoryBot.create(:user)
       CurrentUser.user = user1
       assert_raises(RuntimeError) do
         CurrentUser.scoped(user2, nil) do

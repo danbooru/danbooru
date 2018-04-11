@@ -3,7 +3,7 @@ require 'test_helper'
 class BulkUpdateRequestTest < ActiveSupport::TestCase
   context "a bulk update request" do
     setup do
-      @admin = FactoryGirl.create(:admin_user)
+      @admin = FactoryBot.create(:admin_user)
       CurrentUser.user = @admin
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -20,7 +20,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           create implication bar -> baz
         )
 
-        @bur = FactoryGirl.create(:bulk_update_request, :script => @script)
+        @bur = FactoryBot.create(:bulk_update_request, :script => @script)
         @bur.approve!(@admin)
 
         @ta = TagAlias.where(:antecedent_name => "foo", :consequent_name => "bar").first
@@ -54,8 +54,8 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
     context "that has an invalid alias" do
       setup do
-        @alias1 = FactoryGirl.create(:tag_alias)
-        @req = FactoryGirl.build(:bulk_update_request, :script => "create alias bbb -> aaa")
+        @alias1 = FactoryBot.create(:tag_alias)
+        @req = FactoryBot.build(:bulk_update_request, :script => "create alias bbb -> aaa")
       end
 
       should "not validate" do
@@ -68,9 +68,9 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
     context "for an implication that is redundant with an existing implication" do
       should "not validate" do
-        FactoryGirl.create(:tag_implication, :antecedent_name => "a", :consequent_name => "b")
-        FactoryGirl.create(:tag_implication, :antecedent_name => "b", :consequent_name => "c")
-        bur = FactoryGirl.build(:bulk_update_request, :script => "imply a -> c")
+        FactoryBot.create(:tag_implication, :antecedent_name => "a", :consequent_name => "b")
+        FactoryBot.create(:tag_implication, :antecedent_name => "b", :consequent_name => "c")
+        bur = FactoryBot.build(:bulk_update_request, :script => "imply a -> c")
         bur.save
 
         assert_equal(["Error: a already implies c through another implication (create implication a -> c)"], bur.errors.full_messages)
@@ -79,8 +79,8 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
     context "for an implication that is redundant with another implication in the same BUR" do
       setup do
-        FactoryGirl.create(:tag_implication, :antecedent_name => "b", :consequent_name => "c")
-        @bur = FactoryGirl.build(:bulk_update_request, :script => "imply a -> b\nimply a -> c")
+        FactoryBot.create(:tag_implication, :antecedent_name => "b", :consequent_name => "c")
+        @bur = FactoryBot.build(:bulk_update_request, :script => "imply a -> b\nimply a -> c")
         @bur.save
       end
 
@@ -98,7 +98,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
     context "for a `category <tag> -> type` change" do
       should "work" do
         tag = Tag.find_or_create_by_name("tagme")
-        bur = FactoryGirl.create(:bulk_update_request, :script => "category tagme -> meta")
+        bur = FactoryBot.create(:bulk_update_request, :script => "category tagme -> meta")
         bur.approve!(@admin)
 
         assert_equal(Tag.categories.meta, tag.reload.category)
@@ -107,9 +107,9 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
     context "with an associated forum topic" do
       setup do
-        @topic = FactoryGirl.create(:forum_topic, :title => "[bulk] hoge")
-        @post = FactoryGirl.create(:forum_post, :topic_id => @topic.id)
-        @req = FactoryGirl.create(:bulk_update_request, :script => "create alias AAA -> BBB", :forum_topic_id => @topic.id, :forum_post_id => @post.id, :title => "[bulk] hoge")
+        @topic = FactoryBot.create(:forum_topic, :title => "[bulk] hoge")
+        @post = FactoryBot.create(:forum_post, :topic_id => @topic.id)
+        @req = FactoryBot.create(:bulk_update_request, :script => "create alias AAA -> BBB", :forum_topic_id => @topic.id, :forum_post_id => @post.id, :title => "[bulk] hoge")
       end
 
       should "gracefully handle validation errors during approval" do
@@ -169,8 +169,8 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
     context "when searching" do
       setup do
-        @bur1 = FactoryGirl.create(:bulk_update_request, title: "foo", script: "create alias aaa -> bbb", user_id: @admin.id)
-        @bur2 = FactoryGirl.create(:bulk_update_request, title: "bar", script: "create implication bbb -> ccc", user_id: @admin.id)
+        @bur1 = FactoryBot.create(:bulk_update_request, title: "foo", script: "create alias aaa -> bbb", user_id: @admin.id)
+        @bur2 = FactoryBot.create(:bulk_update_request, title: "bar", script: "create implication bbb -> ccc", user_id: @admin.id)
         @bur1.approve!(@admin)
       end
 

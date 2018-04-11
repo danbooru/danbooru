@@ -5,7 +5,7 @@ module Maintenance
     class LoginReminderMailerTest < ActionMailer::TestCase
       context "The login reminder mailer" do
         setup do
-          @user = FactoryGirl.create(:user)
+          @user = FactoryBot.create(:user)
         end
 
         should "send the notice" do

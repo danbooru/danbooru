@@ -1,41 +1,36 @@
 require 'test_helper'
 
-class PostFlagsControllerTest < ActionController::TestCase
+class PostFlagsControllerTest < ActionDispatch::IntegrationTest
   context "The post flags controller" do
     setup do
-      Timecop.travel(2.weeks.ago) do
-        @user = FactoryGirl.create(:user)
+      travel_to(2.weeks.ago) do
+        @user = create(:user)
       end
-      CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
-    end
-
-    teardown do
-      CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
     end
 
     context "new action" do
       should "render" do
-        get :new, {}, {:user_id => @user.id}
+        get_auth new_post_flag_path, @user
         assert_response :success
       end
     end
 
     context "index action" do
       setup do
-        @post = FactoryGirl.create(:post)
-        @post_flag = FactoryGirl.create(:post_flag, :post => @post)
+        @user.as_current do
+          @post = create(:post)
+          @post_flag = create(:post_flag, :post => @post)
+        end
       end
 
       should "render" do
-        get :index, {}, {:user_id => @user.id}
+        get_auth post_flags_path, @user
         assert_response :success
       end
 
       context "with search parameters" do
         should "render" do
-          get :index, {:search => {:post_id => @post_flag.post_id}}, {:user_id => @user.id}
+          get_auth post_flags_path, @user, params: {:search => {:post_id => @post_flag.post_id}}
           assert_response :success
         end
       end
@@ -43,14 +38,16 @@ class PostFlagsControllerTest < ActionController::TestCase
 
     context "create action" do
       setup do
-        @post = FactoryGirl.create(:post)
+        @user.as_current do
+          @post = create(:post)
+        end
       end
 
       should "create a new flag" do
         assert_difference("PostFlag.count", 1) do
-          post :create, {:format => "js", :post_flag => {:post_id => @post.id, :reason => "xxx"}}, {:user_id => @user.id}
-          assert_not_nil(assigns(:post_flag))
-          assert_equal([], assigns(:post_flag).errors.full_messages)
+          assert_difference("PostFlag.count") do
+            post_auth post_flags_path, @user, params: {:format => "js", :post_flag => {:post_id => @post.id, :reason => "xxx"}}
+          end
         end
       end
     end

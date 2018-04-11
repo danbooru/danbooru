@@ -9,7 +9,6 @@ class CommentVote < ApplicationRecord
   validate :validate_user_can_vote
   validate :validate_comment_can_be_down_voted
   validates_inclusion_of :score, :in => [-1, 1], :message => "must be 1 or -1"
-  attr_accessible :comment_id, :user_id, :score
 
   def self.prune!
     where("created_at < ?", 14.days.ago).delete_all

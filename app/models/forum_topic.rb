@@ -11,15 +11,11 @@ class ForumTopic < ApplicationRecord
     Admin: User::Levels::ADMIN,
   }
 
-  attr_accessible :title, :original_post_attributes, :category_id, :as => [:member, :builder, :gold, :platinum, :moderator, :admin, :default]
-  attr_accessible :is_sticky, :is_locked, :is_deleted, :min_level, :as => [:admin, :moderator]
-  belongs_to :creator, :class_name => "User"
-  belongs_to :updater, :class_name => "User"
+  belongs_to_creator
+  belongs_to_updater
   has_many :posts, lambda {order("forum_posts.id asc")}, :class_name => "ForumPost", :foreign_key => "topic_id", :dependent => :destroy
-  has_one :original_post, lambda {order("forum_posts.id asc")}, :class_name => "ForumPost", :foreign_key => "topic_id"
+  has_one :original_post, lambda {order("forum_posts.id asc")}, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
   has_many :subscriptions, :class_name => "ForumSubscription"
-  before_validation :initialize_creator, :on => :create
-  before_validation :initialize_updater
   before_validation :initialize_is_deleted, :on => :create
   validates_presence_of :title, :creator_id
   validates_associated :original_post
@@ -28,7 +24,7 @@ class ForumTopic < ApplicationRecord
   validates :title, :length => {:maximum => 255}
   accepts_nested_attributes_for :original_post
   after_update :update_orignal_post
-  after_save(:if => lambda {|rec| rec.is_locked? && rec.is_locked_changed?}) do |rec|
+  after_save(:if => lambda {|rec| rec.is_locked? && rec.saved_change_to_is_locked?}) do |rec|
     ModAction.log("locked forum topic ##{id} (title: #{title})",:forum_topic_lock)
   end
 
@@ -173,14 +169,6 @@ class ForumTopic < ApplicationRecord
     self.is_deleted = false if is_deleted.nil?
   end
 
-  def initialize_creator
-    self.creator_id = CurrentUser.id
-  end
-
-  def initialize_updater
-    self.updater_id = CurrentUser.id
-  end
-
   def page_for(post_id)
     (posts.where("id < ?", post_id).count / Danbooru.config.posts_per_page.to_f).ceil
   end
@@ -216,11 +204,11 @@ class ForumTopic < ApplicationRecord
   end
 
   def delete!
-    update_attributes({:is_deleted => true}, :as => CurrentUser.role)
+    update(is_deleted: true)
   end
 
   def undelete!
-    update_attributes({:is_deleted => false}, :as => CurrentUser.role)
+    update(is_deleted: false)
   end
 
   def update_orignal_post

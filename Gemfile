@@ -2,13 +2,12 @@ source 'https://rubygems.org/'
 
 gem 'dotenv-rails', :require => "dotenv/rails-now"
 
-gem 'protected_attributes'
 gem "sass-rails"
 gem "sprockets-rails", :require => "sprockets/railtie"
 gem "uglifier"
 gem "therubyracer", :platforms => :ruby
-gem "rails", "~> 4.2.0"
-gem "pg", "0.21.0"
+gem "rails", "~> 5.1"
+gem "pg"
 gem "dalli", :platforms => :ruby
 gem "memcache-client", :platforms => [:mswin, :mingw, :x64_mingw]
 gem "tzinfo-data", :platforms => [:mswin, :mingw, :x64_mingw]
@@ -22,9 +21,9 @@ gem 'ruby-vips'
 gem 'net-sftp'
 gem 'term-ansicolor', :require => "term/ansicolor"
 gem 'diff-lcs', :require => "diff/lcs/array"
-gem 'bcrypt-ruby', :require => "bcrypt"
+gem 'bcrypt', :require => "bcrypt"
 gem 'statistics2'
-gem 'capistrano', '~> 3.4.0'
+gem 'capistrano', '~> 3.10'
 gem 'capistrano-rails'
 gem 'capistrano-rbenv'
 gem 'radix62', '~> 1.0.1'
@@ -48,6 +47,8 @@ gem 'addressable'
 gem 'httparty'
 gem 'rakismet'
 gem 'recaptcha', require: "recaptcha/rails"
+gem 'activemodel-serializers-xml'
+gem 'ptools'
 
 # needed for looser jpeg header compat
 gem 'ruby-imagespec', :require => "image_spec", :git => "https://github.com/r888888888/ruby-imagespec.git", :branch => "exif-fixes"
@@ -68,16 +69,16 @@ group :development, :test do
   gem 'pry-byebug'
   gem 'ruby-prof'
   gem 'foreman'
+  gem 'listen'
 end
 
 group :test do
   gem "shoulda-context"
   gem "shoulda-matchers"
-  gem "factory_girl"
+  gem "factory_bot"
   gem "mocha", :require => "mocha/setup"
   gem "ffaker"
   gem "simplecov", :require => false
   gem "timecop"
   gem "webmock"
-  gem "test_after_commit" # XXX remove me after upgrading to rails 5.
 end

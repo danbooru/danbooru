@@ -2,7 +2,7 @@ class WikiPageVersionsController < ApplicationController
   respond_to :html, :xml, :json
 
   def index
-    @wiki_page_versions = WikiPageVersion.search(params[:search]).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
+    @wiki_page_versions = WikiPageVersion.search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@wiki_page_versions) do |format|
       format.xml do
         render :xml => @wiki_page_versions.to_xml(:root => "wiki-page-versions")

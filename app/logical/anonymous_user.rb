@@ -230,7 +230,7 @@ class AnonymousUser
   end
 
   def saved_searches
-    []
+    SavedSearch.where(false)
   end
 
   def has_saved_searches?

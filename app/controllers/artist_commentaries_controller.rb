@@ -1,9 +1,9 @@
 class ArtistCommentariesController < ApplicationController
   respond_to :html, :xml, :json, :js
-  before_filter :member_only, :except => [:index, :show]
+  before_action :member_only, :except => [:index, :show]
 
   def index
-    @commentaries = ArtistCommentary.search(params[:search]).paginate(params[:page], :limit => params[:limit])
+    @commentaries = ArtistCommentary.search(search_params).paginate(params[:page], :limit => params[:limit])
     respond_with(@commentaries) do |format|
       format.xml do
         render :xml => @commentaries.to_xml(:root => "artist-commentaries")
@@ -24,14 +24,8 @@ class ArtistCommentariesController < ApplicationController
   end
 
   def create_or_update
-    @artist_commentary = ArtistCommentary.find_by_post_id(params[:artist_commentary][:post_id])
-
-    if @artist_commentary
-      @artist_commentary.update_attributes(params[:artist_commentary])
-    else
-      @artist_commentary = ArtistCommentary.create(params[:artist_commentary])
-    end
-
+    @artist_commentary = ArtistCommentary.find_or_initialize_by(post_id: params.dig(:artist_commentary, :post_id))
+    @artist_commentary.update(commentary_params)
     respond_with(@artist_commentary)
   end
 
@@ -39,6 +33,15 @@ class ArtistCommentariesController < ApplicationController
     @artist_commentary = ArtistCommentary.find_by_post_id!(params[:id])
     @version = @artist_commentary.versions.find(params[:version_id])
     @artist_commentary.revert_to!(@version)
-    respond_with(@artist_commentary)
+  end
+
+private
+
+  def commentary_params
+    params.fetch(:artist_commentary, {}).except(:post_id).permit(%i[
+      original_description original_title translated_description translated_title
+      remove_commentary_tag remove_commentary_request_tag remove_commentary_check_tag
+      add_commentary_tag add_commentary_request_tag add_commentary_check_tag
+    ])
   end
 end

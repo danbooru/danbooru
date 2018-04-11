@@ -6,7 +6,7 @@ class PostArchiveTest < ActiveSupport::TestCase
   context "A post" do
     setup do
       Timecop.travel(1.month.ago) do
-        @user = FactoryGirl.create(:user)
+        @user = FactoryBot.create(:user)
       end
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
@@ -20,7 +20,7 @@ class PostArchiveTest < ActiveSupport::TestCase
     context "#undo" do
       setup do
         PostArchive.sqs_service.stubs(:merge?).returns(false)
-        @post = FactoryGirl.create(:post, :tag_string => "1")
+        @post = FactoryBot.create(:post, :tag_string => "1")
         @post.update_attributes(:tag_string => "1 2")
         @post.update_attributes(:tag_string => "2 3")
       end
@@ -37,7 +37,7 @@ class PostArchiveTest < ActiveSupport::TestCase
     context "that has multiple versions: " do
       setup do
         PostArchive.sqs_service.stubs(:merge?).returns(false)
-        @post = FactoryGirl.create(:post, :tag_string => "1")
+        @post = FactoryBot.create(:post, :tag_string => "1")
         @post.update_attributes(:tag_string => "1 2")
         @post.update_attributes(:tag_string => "2 3")
       end
@@ -56,8 +56,8 @@ class PostArchiveTest < ActiveSupport::TestCase
 
     context "that has been created" do
       setup do
-        @parent = FactoryGirl.create(:post)
-        @post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc", :rating => "e", :parent => @parent, :source => "xyz")
+        @parent = FactoryBot.create(:post)
+        @post = FactoryBot.create(:post, :tag_string => "aaa bbb ccc", :rating => "e", :parent => @parent, :source => "xyz")
       end
 
       should "also create a version" do
@@ -73,8 +73,8 @@ class PostArchiveTest < ActiveSupport::TestCase
     context "that is tagged with a pool:<name> metatag" do
       setup do
         mock_pool_archive_service!
-        @pool = FactoryGirl.create(:pool)
-        @post = FactoryGirl.create(:post, tag_string: "tagme pool:#{@pool.id}")
+        @pool = FactoryBot.create(:pool)
+        @post = FactoryBot.create(:post, tag_string: "tagme pool:#{@pool.id}")
       end
 
       should "create a version" do
@@ -88,8 +88,8 @@ class PostArchiveTest < ActiveSupport::TestCase
 
     context "that should be merged" do
       setup do
-        @parent = FactoryGirl.create(:post)
-        @post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
+        @parent = FactoryBot.create(:post)
+        @post = FactoryBot.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
       end
 
       should "delete the previous version" do
@@ -103,7 +103,7 @@ class PostArchiveTest < ActiveSupport::TestCase
     context "that has been updated" do
       setup do
         PostArchive.sqs_service.stubs(:merge?).returns(false)
-        @post = FactoryGirl.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
+        @post = FactoryBot.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
         @post.update_attributes(:tag_string => "bbb ccc xxx", :source => "")
       end
 
@@ -140,7 +140,7 @@ class PostArchiveTest < ActiveSupport::TestCase
 
       should "should create a version if the parent changes" do
         assert_difference("@post.versions.size", 1) do
-          @parent = FactoryGirl.create(:post)
+          @parent = FactoryBot.create(:post)
           @post.update(parent_id: @parent.id)
           assert_equal(@parent.id, @post.versions.sort_by(&:id).last.parent_id)
         end

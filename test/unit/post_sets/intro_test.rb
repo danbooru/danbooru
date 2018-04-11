@@ -5,13 +5,13 @@ module PostSets
   class IntroTest < ActiveSupport::TestCase
     context "In all cases" do
       setup do
-        @user = FactoryGirl.create(:user)
+        @user = FactoryBot.create(:user)
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
 
-        @post_1 = FactoryGirl.create(:post, :tag_string => "a")
-        @post_2 = FactoryGirl.create(:post, :tag_string => "b")
-        @post_3 = FactoryGirl.create(:post, :tag_string => "c")
+        @post_1 = FactoryBot.create(:post, :tag_string => "a")
+        @post_2 = FactoryBot.create(:post, :tag_string => "b")
+        @post_3 = FactoryBot.create(:post, :tag_string => "c")
       end
 
       teardown do
@@ -21,8 +21,8 @@ module PostSets
 
       context "a set for the 'a' tag query" do
         setup do
-          @post_4 = FactoryGirl.create(:post, :tag_string => "a", :fav_count => 5)
-          @post_5 = FactoryGirl.create(:post, :tag_string => "a", :fav_count => 5)
+          @post_4 = FactoryBot.create(:post, :tag_string => "a", :fav_count => 5)
+          @post_5 = FactoryBot.create(:post, :tag_string => "a", :fav_count => 5)
         end
 
         context "with no page" do

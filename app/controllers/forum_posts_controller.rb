@@ -1,9 +1,9 @@
 class ForumPostsController < ApplicationController
   respond_to :html, :xml, :json, :js
-  before_filter :member_only, :except => [:index, :show, :search]
-  before_filter :load_post, :only => [:edit, :show, :update, :destroy, :undelete]
-  before_filter :check_min_level, :only => [:edit, :show, :update, :destroy, :undelete]
-  skip_before_filter :api_check
+  before_action :member_only, :except => [:index, :show, :search]
+  before_action :load_post, :only => [:edit, :show, :update, :destroy, :undelete]
+  before_action :check_min_level, :only => [:edit, :show, :update, :destroy, :undelete]
+  skip_before_action :api_check
   
   def new
     if params[:topic_id]
@@ -24,7 +24,7 @@ class ForumPostsController < ApplicationController
   end
 
   def index
-    @query = ForumPost.search(params[:search])
+    @query = ForumPost.search(search_params)
     @forum_posts = @query.includes(:topic).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@forum_posts) do |format|
       format.xml do
@@ -45,14 +45,14 @@ class ForumPostsController < ApplicationController
   end
 
   def create
-    @forum_post = ForumPost.create(params[:forum_post])
+    @forum_post = ForumPost.create(forum_post_params(:create))
     page = @forum_post.topic.last_page if @forum_post.topic.last_page > 1
     respond_with(@forum_post, :location => forum_topic_path(@forum_post.topic, :page => page))
   end
 
   def update
     check_privilege(@forum_post)
-    @forum_post.update_attributes(params[:forum_post])
+    @forum_post.update(forum_post_params(:update))
     page = @forum_post.forum_topic_page if @forum_post.forum_topic_page > 1
     respond_with(@forum_post, :location => forum_topic_path(@forum_post.topic, :page => page, :anchor => "forum_post_#{@forum_post.id}"))
   end
@@ -84,11 +84,11 @@ private
         end
 
         fmt.json do
-          render :nothing => true, :status => 403
+          render json: nil, :status => 403
         end
 
         fmt.xml do
-          render :nothing => true, :status => 403
+          render xml: nil, :status => 403
         end
       end
 
@@ -100,5 +100,12 @@ private
     if !forum_post.editable_by?(CurrentUser.user)
       raise User::PrivilegeError
     end
+  end
+
+  def forum_post_params(context)
+    permitted_params = [:body]
+    permitted_params += [:topic_id] if context == :create
+
+    params.require(:forum_post).permit(permitted_params)
   end
 end

@@ -1,96 +1,91 @@
 require 'test_helper'
 
-class ForumPostsControllerTest < ActionController::TestCase
+class ForumPostsControllerTest < ActionDispatch::IntegrationTest
   context "The forum posts controller" do
     setup do
-      @user = FactoryGirl.create(:user)
-      CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
-      @other_user = FactoryGirl.create(:user)
-      @mod = FactoryGirl.create(:moderator_user)
-      @forum_topic = FactoryGirl.create(:forum_topic, :title => "my forum topic", :creator => @user)
-      @forum_post = FactoryGirl.create(:forum_post, :topic_id => @forum_topic.id, :body => "xxx")
-    end
-
-    teardown do
-      CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
+      @user = create(:user)
+      @other_user = create(:user)
+      @mod = create(:moderator_user)
+      as_user do
+        @forum_topic = create(:forum_topic, :title => "my forum topic")
+        @forum_post = create(:forum_post, :topic_id => @forum_topic.id, :body => "xxx")
+      end
     end
 
     context "index action" do
       should "list all forum posts" do
-        get :index
+        get forum_posts_path
         assert_response :success
       end
 
       context "with search conditions" do
         should "list all matching forum posts" do
-          get :index, {:search => {:body_matches => "xxx"}}
+          get forum_posts_path, params: {:search => {:body_matches => "xxx"}}
           assert_response :success
-          assert_equal(1, assigns(:forum_posts).size)
+          assert_select "#forum-post-#{@forum_post.id}"
         end
 
         should "list nothing for when the search matches nothing" do
-          get :index, {:search => {:body_matches => "bababa"}}
+          get forum_posts_path, params: {:search => {:body_matches => "bababa"}}
           assert_response :success
-          assert_equal(0, assigns(:forum_posts).size)
+          assert_select "#forum-post-#{@forum_post.id}", false
         end
 
         should "list by creator id" do
-          get :index, {:search => {:creator_id => @user.id}}
+          get forum_posts_path, params: {:search => {:creator_id => @user.id}}
           assert_response :success
-          assert_equal(1, assigns(:forum_posts).size)
+          assert_select "#forum-post-#{@forum_post.id}"
         end
       end
 
       context "with private topics" do
         setup do
-          CurrentUser.user = @mod
-          @mod_topic = FactoryGirl.create(:mod_up_forum_topic)
-          @mod_posts = 2.times.map do
-            FactoryGirl.create(:forum_post, :topic_id => @mod_topic.id)
+          as(@mod) do
+            @mod_topic = create(:mod_up_forum_topic)
+            @mod_posts = 2.times.map do
+              create(:forum_post, :topic_id => @mod_topic.id)
+            end
           end
           @mod_post_ids = ([@forum_post] + @mod_posts).map(&:id).reverse
         end
 
         should "list only permitted posts for members" do
-          CurrentUser.user = @user
-          get :index, {}, { :user_id => @user.id }
+          get forum_posts_path
 
           assert_response :success
-          assert_equal([@forum_post.id], assigns(:forum_posts).map(&:id))
+          assert_select "#forum-post-#{@forum_post.id}"
+          assert_select "#forum-post-#{@mod_posts[0].id}", false
         end
 
         should "list only permitted posts for mods" do
-          CurrentUser.user = @mod
-          get :index, {}, { :user_id => @mod.id }
+          get_auth forum_posts_path, @mod
 
           assert_response :success
-          assert_equal(@mod_post_ids, assigns(:forum_posts).map(&:id))
+          assert_select "#forum-post-#{@mod_posts[0].id}"
         end
       end
     end
 
     context "edit action" do
       should "render if the editor is the creator of the topic" do
-        get :edit, {:id => @forum_post.id}, {:user_id => @user.id}
+        get_auth edit_forum_post_path(@forum_post), @user
         assert_response :success
       end
 
       should "render if the editor is a moderator" do
-        get :edit, {:id => @forum_post.id}, {:user_id => @mod.id}
+        get_auth edit_forum_post_path(@forum_post), @mod
         assert_response :success
       end
 
       should "fail if the editor is not the creator of the topic and is not a moderator" do
-        get :edit, {:id => @forum_post.id}, {:user_id => @other_user.id}
+        get_auth edit_forum_post_path(@forum_post), @other_user
         assert_response(403)
       end
     end
 
     context "new action" do
       should "render" do
-        get :new, {}, {:user_id => @user.id, :topic_id => @forum_topic.id}, {:user_id => @user.id}
+        get_auth new_forum_post_path, @user, params: {:topic_id => @forum_topic.id}
         assert_response :success
       end
     end
@@ -98,7 +93,7 @@ class ForumPostsControllerTest < ActionController::TestCase
     context "create action" do
       should "create a new forum post" do
         assert_difference("ForumPost.count", 1) do
-          post :create, {:forum_post => {:body => "xaxaxa", :topic_id => @forum_topic.id}}, {:user_id => @user.id}
+          post_auth forum_posts_path, @user, params: {:forum_post => {:body => "xaxaxa", :topic_id => @forum_topic.id}}
         end
 
         forum_post = ForumPost.last
@@ -108,8 +103,7 @@ class ForumPostsControllerTest < ActionController::TestCase
 
     context "destroy action" do
       should "destroy the posts" do
-        CurrentUser.user = @mod
-        post :destroy, {:id => @forum_post.id}, {:user_id => @mod.id}
+        delete_auth forum_post_path(@forum_post), @mod
         assert_redirected_to(forum_post_path(@forum_post))
         @forum_post.reload
         assert_equal(true, @forum_post.is_deleted?)
@@ -118,12 +112,13 @@ class ForumPostsControllerTest < ActionController::TestCase
 
     context "undelete action" do
       setup do
-        @forum_post.update_attribute(:is_deleted, true)
+        as(@mod) do
+          @forum_post.update(is_deleted: true)
+        end
       end
 
       should "restore the post" do
-        CurrentUser.user = @mod
-        post :undelete, {:id => @forum_post.id}, {:user_id => @mod.id}
+        post_auth undelete_forum_post_path(@forum_post), @mod
         assert_redirected_to(forum_post_path(@forum_post))
         @forum_post.reload
         assert_equal(false, @forum_post.is_deleted?)

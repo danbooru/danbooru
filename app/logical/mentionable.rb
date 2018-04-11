@@ -23,11 +23,11 @@ module Mentionable
 
   def queue_mention_messages
     message_field = self.class.mentionable_option(:message_field)
-    return if !send("#{message_field}_changed?")
+    return if !send(:saved_change_to_attribute?, message_field)
     return if self.skip_mention_notifications
 
     text = send(message_field)
-    text_was = send("#{message_field}_was")
+    text_was = send(:attribute_before_last_save, message_field)
 
     names = DText.parse_mentions(text) - DText.parse_mentions(text_was)
 
