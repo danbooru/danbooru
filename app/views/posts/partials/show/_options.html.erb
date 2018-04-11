@@ -4,7 +4,7 @@
   <% if CurrentUser.is_member? %>
     <li><%= link_to "Favorite", favorites_path(:post_id => post.id), :remote => true, :method => :post, :id => "add-to-favorites", :title => "Shortcut is F" %></li>
     <li><%= link_to "Unfavorite", favorite_path(post), :remote => true, :method => :delete, :id => "remove-from-favorites" %></li>
-    <li><%= link_to_if post.visible?, "Download", post.tagged_file_url, download: post.presenter.filename_for_download %></li>
+    <li><%= link_to_if post.visible?, "Download", post.tagged_file_url + "?download=1", download: post.presenter.filename_for_download %></li>
     <li id="add-to-pool-list"><%= link_to "Add to pool", "#", :id => "pool" %></li>
     <% if post.is_note_locked? %>
       <li id="add-notes-list"><span id="note-locked-notice">Note locked</span></li>
