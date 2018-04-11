@@ -88,8 +88,6 @@ class Post < ApplicationRecord
     has_many :versions, lambda {order("post_versions.updated_at ASC")}, :class_name => "PostArchive", :dependent => :destroy
   end
 
-  attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :view_count
-
   module FileMethods
     extend ActiveSupport::Concern
 
