@@ -5,7 +5,7 @@ class UserPasswordResetNonce < ApplicationRecord
   after_create :deliver_notice
 
   def self.prune!
-    destroy_all(["created_at < ?", 1.week.ago])
+    where("created_at < ?", 1.week.ago).destroy_all
   end
 
   def deliver_notice
