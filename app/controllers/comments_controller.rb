@@ -108,8 +108,8 @@ private
   end
 
   def comment_params(context)
-    permitted_params = %i[body]
-    permitted_params += %i[post_id do_not_bump_post] if context == :create
+    permitted_params = %i[body post_id]
+    permitted_params += %i[do_not_bump_post] if context == :create
     permitted_params += %i[is_deleted] if context == :update
     permitted_params += %i[is_sticky] if CurrentUser.is_moderator?
 
