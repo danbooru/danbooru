@@ -304,23 +304,14 @@ class Artist < ApplicationRecord
 
   module FactoryMethods
     def new_with_defaults(params)
-      Artist.new.tap do |artist|
-        if params[:name]
-          artist.name = params[:name]
+      Artist.new(params).tap do |artist|
+        if artist.name.present?
           post = CurrentUser.without_safe_mode do
             Post.tag_match("source:http #{artist.name}").where("true /* Artist.new_with_defaults */").first
           end
           unless post.nil? || post.source.blank?
             artist.url_string = post.source
           end
-        end
-
-        if params[:other_names]
-          artist.other_names = params[:other_names]
-        end
-
-        if params[:urls]
-          artist.url_string = params[:urls]
         end
       end
     end
