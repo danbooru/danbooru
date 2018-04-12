@@ -3,7 +3,7 @@ namespace :images do
   task :distribute, [:min_id, :max_id] => :environment do |t, args|
     min_id = args[:min_id]
     max_id = args[:max_id]
-    lsm = StorageManager::Local.new(base_url: "https://danbooru.donmai.us/data", base_dir: "/var/www/danbooru2/shared/public/data", hierarchical: false)
+    lsm = StorageManager::Local.new(base_url: "https://danbooru.donmai.us/data", base_dir: "/var/www/danbooru2/shared/data", hierarchical: false)
     sftpsm = StorageManager::SFTP.new(*Danbooru.config.all_server_hosts, base_url: "https://danbooru.donmai.us/data")
 
     Post.where("id between ? and ?", min_id, max_id).find_each do |post|
