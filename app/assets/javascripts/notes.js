@@ -463,7 +463,6 @@ Danbooru.Note = {
     },
 
     success_handler: function(data, status, xhr) {
-      window.console.log("succes");
       if (data.html_id) { // new note
         var $note_body = Danbooru.Note.Body.find(data.html_id);
         var $note_box = Danbooru.Note.Box.find(data.html_id);
