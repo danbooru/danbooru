@@ -446,7 +446,6 @@ Danbooru.Note = {
           width: $note_box.width() / ratio,
           height: $note_box.height() / ratio,
           body: $note_body.data("original-body"),
-          post_id: Danbooru.meta("post-id")
         }
       }
 
