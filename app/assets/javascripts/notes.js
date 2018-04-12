@@ -446,6 +446,7 @@ Danbooru.Note = {
           width: $note_box.width() / ratio,
           height: $note_box.height() / ratio,
           body: $note_body.data("original-body"),
+          post_id: Danbooru.meta("post-id")
         }
       }
 
@@ -458,10 +459,11 @@ Danbooru.Note = {
     },
 
     error_handler: function(xhr, status, exception) {
-      Danbooru.error("Error: " + xhr.responseJSON.reasons.join("; "));
+      Danbooru.error("Error: " + (xhr.responseJSON.reason || xhr.responseJSON.reasons.join("; ")));
     },
 
     success_handler: function(data, status, xhr) {
+      window.console.log("succes");
       if (data.html_id) { // new note
         var $note_body = Danbooru.Note.Body.find(data.html_id);
         var $note_box = Danbooru.Note.Box.find(data.html_id);
