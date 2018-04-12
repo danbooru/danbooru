@@ -64,8 +64,6 @@ class StorageManager
     end
   end
 
-  protected
-
   def root_url
     origin = Addressable::URI.parse(base_url).origin
     origin = "" if origin == "null" # base_url was relative

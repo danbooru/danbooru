@@ -1,4 +1,18 @@
 namespace :images do
+  desc "Distribute posts to all servers via SFTP"
+  task :distribute, [:min_id, :max_id] => :environment do |t, args|
+    min_id = args[:min_id]
+    max_id = args[:max_id]
+    lsm = StorageManager::Local.new(base_url: "https://danbooru.donmai.us/data", base_dir: "/var/www/danbooru2/shared/public/data", hierarchical: false)
+    sftpsm = StorageManager::SFTP.new(*Danbooru.config.all_server_hosts, base_url: "https://danbooru.donmai.us/data")
+
+    Post.where("id between ? and ?", min_id, max_id).find_each do |post|
+      sftpsm.store_file(lsm.open_file(post, :original), post, :original)
+      sftpsm.store_file(lsm.open_file(post, :large), post, :large) if post.has_large?
+      sftpsm.store_file(lsm.open_file(post, :preview), post, :preview) if post.has_preview?
+    end
+  end
+
   desc "Reset S3 + Storage Class"
   task :reset_s3, [:min_id, :max_id] => :environment do |t, args|
     min_id = args[:min_id] # 1
