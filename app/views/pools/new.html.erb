@@ -10,7 +10,7 @@
       <%= f.input :post_ids, :label => "Posts" %>
       <%= f.input :category, :collection => ["series", "collection"], :include_blank => true, :selected => "", :required => true %>
       <%= f.input :is_active %>
-      <%= f.button :submit, "Submit", :data => { :disable_with => "Submitting..." } %>
+      <%= f.button :submit, "Submit" %>
       <%= dtext_preview_button "pool", "description" %>
     <% end %>
   </div>

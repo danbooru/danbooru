@@ -11,7 +11,7 @@
       <%= f.input :user_name, :label => "User" %>
       <%= f.input :category, :collection => ["positive", "neutral", "negative"], :include_blank => false %>
       <%= dtext_field "user_feedback", "body" %>
-      <%= f.button :submit, "Submit", :data => { :disable_with => "Submitting..." } %>
+      <%= f.button :submit, "Submit" %>
       <%= dtext_preview_button "user_feedback", "body" %>
     <% end %>
   </div>

@@ -4,7 +4,7 @@
 
     <%= simple_form_for(@news_update) do |f| %>
       <%= f.input :message, :hint => "Use HTML for formatting", :input_html => {:size => "30x5"} %>
-      <%= f.button :submit, "Submit", :data => { :disable_with => "Submitting..." } %>
+      <%= f.button :submit, "Submit" %>
     <% end %>
   </div>
 </div>

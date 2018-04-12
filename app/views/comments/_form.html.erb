@@ -3,7 +3,7 @@
 <%= simple_form_for(comment, :html => {:class => "edit_comment"}) do |f| %>
   <%= f.hidden_field :post_id %>
   <%= dtext_field "comment", "body", :classes => "autocomplete-mentions", :value => comment.body, :input_id => "comment_body_for_#{comment.id}", :preview_id => "dtext-preview-for-#{comment.id}" %>
-  <%= f.button :submit, "Submit", :data => { :disable_with => "Submitting..." } %>
+  <%= f.button :submit, "Submit" %>
   <%= dtext_preview_button "comment", "body", :input_id => "comment_body_for_#{comment.id}", :preview_id => "dtext-preview-for-#{comment.id}" %>
   <% if comment.new_record? %>
     <%= f.input :do_not_bump_post, :label => "No bump" %>

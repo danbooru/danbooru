@@ -7,7 +7,7 @@
     <%= simple_form_for(@favorite_group) do |f| %>
       <%= f.input :name, :as => :string, :required => true %>
       <%= f.input :post_ids, :label => "Posts" %>
-      <%= f.button :submit, "Submit", :data => { :disable_with => "Submitting..." } %>
+      <%= f.button :submit, "Submit" %>
     <% end %>
   </div>
 </div>
