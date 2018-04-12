@@ -4,7 +4,7 @@ class BansController < ApplicationController
   helper_method :search_params
 
   def new
-    @ban = Ban.new(params[:ban])
+    @ban = Ban.new(ban_params(:create))
   end
 
   def edit
