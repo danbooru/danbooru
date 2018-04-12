@@ -74,6 +74,7 @@ module Sources
           src = api_download[:src]
           src.gsub!(%r!\Ahttps?://s3\.amazonaws\.com/!i, "https://")
           src.gsub!(/\?.*\z/, "") # strip s3 query params
+          src.gsub!(%r!\Ahttps://origin-orig\.deviantart\.net!, "http://origin-orig.deviantart.net") # https://origin-orig.devianart.net doesn't work
 
           src
         # work isn't downloadable, or download size is same as regular size.
