@@ -636,7 +636,9 @@
         $.post(
           "/saved_searches.js",
           {
-            "saved_search_tags": $("#tags").val()
+            "saved_search": {
+              "query": $("#tags").val()
+            }
           }
         );
       }
