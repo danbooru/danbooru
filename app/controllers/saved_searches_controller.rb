@@ -55,6 +55,6 @@ class SavedSearchesController < ApplicationController
   end
 
   def saved_search_params
-    params.require(:saved_search).permit(%i[query label_string disable_labels])
+    params.fetch(:saved_search, {}).permit(%i[query label_string disable_labels])
   end
 end
