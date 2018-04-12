@@ -73,8 +73,6 @@ class PostReplacement < ApplicationRecord
         CurrentUser.as(User.system) do
           post.comments.create!(body: comment_replacement_message, do_not_bump_post: true)
         end
-      else
-        post.queue_backup
       end
 
       save!
