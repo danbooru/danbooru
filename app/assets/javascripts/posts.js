@@ -223,7 +223,7 @@
 
       if (Danbooru.meta("current-user-can-approve-posts") === "true") {
         Danbooru.keydown("shift+o", "approve", function(e) {
-          $("#quick-mod-approve").click();
+          $(".approve-link").click();
         });
       }
 
