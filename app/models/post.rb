@@ -370,7 +370,7 @@ class Post < ApplicationRecord
       # http://fc08.deviantart.net/files/f/2007/120/c/9/Cool_Like_Me_by_47ness.jpg
       # http://fc08.deviantart.net/images3/i/2004/088/8/f/Blackrose_for_MuzicFreq.jpg
       # http://img04.deviantart.net/720b/i/2003/37/9/6/princess_peach.jpg
-      when %r{\Ahttps?://(?:fc|th|pre|orig|img|prnt)\d{2}\.deviantart\.net/.+/(?<title>[a-z0-9_]+)_by_(?<artist>[a-z0-9_]+)-d(?<id>[a-z0-9]+)\.}i
+      when %r{\Ahttps?://(?:(?:fc|th|pre|orig|img|prnt)\d{2}|origin-orig)\.deviantart\.net/.+/(?<title>[a-z0-9_]+)_by_(?<artist>[a-z0-9_]+)-d(?<id>[a-z0-9]+)\.}i
         artist = $~[:artist].dasherize
         title = $~[:title].titleize.strip.squeeze(" ").tr(" ", "-")
         id = $~[:id].to_i(36)
