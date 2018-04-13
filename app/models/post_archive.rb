@@ -2,7 +2,7 @@ class PostArchive < ApplicationRecord
   extend Memoist
 
   belongs_to :post
-  belongs_to :updater, class_name: "User", counter_cache: "post_update_count"
+  belongs_to_updater counter_cache: "post_update_count"
 
   def self.enabled?
     Danbooru.config.aws_sqs_archives_url.present?
