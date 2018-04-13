@@ -191,6 +191,7 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when finding deviantart artists" do
       setup do
+        skip "deviant art is not configured" unless Danbooru.config.deviantart_client_id.present?
         FactoryBot.create(:artist, :name => "artgerm", :url_string => "http://artgerm.deviantart.com/")
         FactoryBot.create(:artist, :name => "trixia",  :url_string => "http://trixdraws.deviantart.com/")
       end
@@ -459,6 +460,18 @@ class ArtistTest < ActiveSupport::TestCase
         assert_difference("ArtistVersion.count") do
           @artist.update(:url_string => "http://foo.com")
         end
+      end
+    end
+
+    context "that is deleted" do
+      setup do
+        @artist = create(:artist, url_string: "https://google.com")
+        @artist.update_attribute(:is_active, false)
+        @artist.reload
+      end
+
+      should "preserve the url string" do
+        assert_equal(1, @artist.urls.count)
       end
     end
   end

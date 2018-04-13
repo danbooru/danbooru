@@ -2,7 +2,7 @@ class Artist < ApplicationRecord
   extend Memoist
   class RevertError < Exception ; end
 
-  attribute :url_string, :string, default: ""
+  attribute :url_string, :string, default: nil
   before_validation :normalize_name
   after_save :create_version
   after_save :categorize_tag
@@ -179,8 +179,10 @@ class Artist < ApplicationRecord
     end
 
     def save_urls
-      self.urls = url_string.scan(/[^[:space:]]+/).uniq.map do |url|
-        self.urls.find_or_create_by(url: url)
+      if url_string && saved_change_to_url_string?
+        self.urls = url_string.scan(/[^[:space:]]+/).uniq.map do |url|
+          self.urls.find_or_create_by(url: url)
+        end
       end
     end
 
@@ -263,7 +265,7 @@ class Artist < ApplicationRecord
         :name => name,
         :updater_id => CurrentUser.id,
         :updater_ip_addr => CurrentUser.ip_addr,
-        :url_string => url_string,
+        :url_string => url_string || url_array.join("\n"),
         :is_active => is_active,
         :is_banned => is_banned,
         :other_names => other_names,
@@ -275,7 +277,7 @@ class Artist < ApplicationRecord
       prev = versions.last
       prev.update_attributes(
         :name => name,
-        :url_string => url_string,
+        :url_string => url_string || url_array.join("\n"),
         :is_active => is_active,
         :is_banned => is_banned,
         :other_names => other_names,
