@@ -1468,6 +1468,9 @@ class Post < ApplicationRecord
   module ApiMethods
     def hidden_attributes
       list = super + [:tag_index]
+      unless CurrentUser.is_moderator?
+        list += [:fav_string]
+      end
       if !visible?
         list += [:md5, :file_ext]
       end
