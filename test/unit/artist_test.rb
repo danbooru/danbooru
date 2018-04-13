@@ -128,6 +128,11 @@ class ArtistTest < ActiveSupport::TestCase
       assert_equal("bob", matches.first.name)
     end
 
+    should "have a non-empty url string" do
+      artist = FactoryBot.create(:artist, name: "bkub", :url_string => "http://a.com http://b.com")
+      assert_equal("http://aaa.com\nhttp://b.com", artist.reload.url_string)
+    end
+
     should "parse urls" do
       artist = FactoryBot.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/test.jpg http://aaa.com")
       artist.reload
@@ -451,7 +456,7 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when updated" do
       setup do
-        @artist = FactoryBot.create(:artist)
+        @artist = FactoryBot.create(:artist, url_string: "http://a.com http://b.com")
         @artist.stubs(:merge_version?).returns(false)
       end
 
@@ -459,6 +464,16 @@ class ArtistTest < ActiveSupport::TestCase
         assert_difference("ArtistVersion.count") do
           @artist.update(:url_string => "http://foo.com")
         end
+      end
+
+      should "added urls to the url_string" do
+        @artist.update(url_string: "http://a.com http://b.com http://c.com")
+        assert_equal("http://a.com\nhttp://b.com\nhttp://c.com", @artist.reload.url_string)
+      end
+
+      should "remove urls from the url_string" do
+        @artist.update(url_string: "http://a.com")
+        assert_equal("http://a.com", @artist.reload.url_string)
       end
     end
   end
