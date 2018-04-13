@@ -25,11 +25,6 @@
           <% end %>
         </ul>
       <% end %>
-      <% if @upload.is_downloadable? %>
-        <%= form_tag(upload_path(@upload), :method => :put) do %>
-          <% submit_tag "Retry" %>
-        <% end %>
-      <% end %>
     <% end %>
 
     <p>

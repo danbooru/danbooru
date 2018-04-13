@@ -66,12 +66,6 @@ class UploadsController < ApplicationController
     respond_with(@upload)
   end
 
-  def update
-    @upload = Upload.find(params[:id])
-    @upload.process!
-    respond_with(@upload)
-  end
-
   private
 
   def find_post_by_url(normalized_url)

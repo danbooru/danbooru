@@ -94,19 +94,5 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
     end
-
-    context "update action" do
-      setup do
-        as_user do
-          @upload = create(:source_upload)
-        end
-      end
-
-      should "process an unapproval" do
-        put_auth upload_path(@upload), @user
-        @upload.reload
-        assert_equal("completed", @upload.status)
-      end
-    end
   end
 end
