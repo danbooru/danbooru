@@ -98,6 +98,6 @@ class WikiPagesController < ApplicationController
     permitted_params = %i[title body other_names skip_secondary_validations]
     permitted_params += %i[is_locked is_deleted] if CurrentUser.is_builder?
 
-    params.require(:wiki_page).permit(permitted_params)
+    params.fetch(:wiki_page, {}).permit(permitted_params)
   end
 end
