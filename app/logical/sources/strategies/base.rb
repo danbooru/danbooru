@@ -83,6 +83,8 @@ module Sources
 
       # Given a tag from the source site, should return an array of corresponding Danbooru tags.
       def translate_tag(untranslated_tag)
+        return [] if untranslated_tag.blank?
+
         translated_tag_names = WikiPage.active.other_names_equal(untranslated_tag).uniq.pluck(:title)
         translated_tag_names = TagAlias.to_aliased(translated_tag_names)
         translated_tags = Tag.where(name: translated_tag_names)

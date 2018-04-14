@@ -228,6 +228,15 @@ module Sources
 
           assert_equal([toosaka_rin], @site.translate_tag("遠坂凛"))
         end
+
+        should "not translate '1000users入り' to '1'" do
+          FactoryBot.create(:tag, name: "1", post_count: 1)
+          source = get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=60665428")
+          tags = %w[Fate/GrandOrder グランブルーファンタジー 手袋 1000users入り]
+
+          assert_equal(tags.sort, source.tags.map(&:first).sort)
+          assert_equal(["fate/grand_order"], source.translated_tags.map(&:first))
+        end
       end
     end
   end

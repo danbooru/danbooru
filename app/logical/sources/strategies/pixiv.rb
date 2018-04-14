@@ -57,7 +57,7 @@ module Sources
       end
 
       def translate_tag(tag)
-        normalized_tag = tag.gsub(/\A(\S+?)_?\d+users入り\Z/i, '\1')
+        normalized_tag = tag.gsub(/\d+users入り\z/i, "")
 
         translated_tags = super(normalized_tag)
         if translated_tags.empty? && normalized_tag.include?("/")
