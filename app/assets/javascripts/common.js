@@ -39,11 +39,6 @@ $(function() {
       location.reload();
     });
   });
-
-  // triggered by rails when a `link_to ..., remote: true` call fails.
-  $(document).on("ajax:error", function (event, xhr, status, error) {
-    Danbooru.error("Error: " + xhr.status + " " + xhr.statusText);
-  });
 });
 
 var Danbooru = {};
