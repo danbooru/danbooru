@@ -1,4 +1,4 @@
-class AddIpAddrIndexesToTables < ActiveRecord::Migration
+class AddIpAddrIndexesToTables < ActiveRecord::Migration[4.2]
   def change
     reversible { execute "set statement_timeout = 0" }
     add_index :wiki_page_versions, :updater_ip_addr

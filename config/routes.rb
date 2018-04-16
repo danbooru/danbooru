@@ -132,6 +132,7 @@ Rails.application.routes.draw do
     resource :order, :only => [:edit], :controller => "favorite_group_orders"
   end
   resources :forum_posts do
+    resource :votes, controller: "forum_post_votes"
     member do
       post :undelete
     end

@@ -5,6 +5,8 @@ en:
   hello: "Hello world"
   activerecord:
     attributes:
+      forum_post_vote:
+        creator_id: "Your vote"
       post:
         approver: "You"
         approver_id: "You"

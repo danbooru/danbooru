@@ -1,3 +1,5 @@
+<%- # original_forum_post_id: used to accelerate #is_original_post? calls %>
+
 <% if forum_post.visible?(CurrentUser.user) %>
   <article class="forum-post" id="forum_post_<%= forum_post.id %>" data-forum-post-id="<%= forum_post.id %>" data-creator="<%= forum_post.creator.name %>">
     <div class="author">
@@ -23,7 +25,7 @@
         <% if CurrentUser.is_member? && @forum_topic %>
           <li><%= link_to "Quote", new_forum_post_path(:post_id => forum_post.id), :method => :get, :remote => true %></li>
         <% end %>
-        <% if CurrentUser.is_moderator? && !forum_post.is_original_post? %>
+        <% if CurrentUser.is_moderator? && !forum_post.is_original_post?(original_forum_post_id) %>
           <% if forum_post.is_deleted %>
             <li><%= link_to "Undelete", undelete_forum_post_path(forum_post.id), :method => :post, :remote => true %></li>
           <% else %>
@@ -31,7 +33,7 @@
           <% end %>
         <% end %>
         <% if forum_post.editable_by?(CurrentUser.user) %>
-          <% if forum_post.is_original_post? %>
+          <% if forum_post.is_original_post?(original_forum_post_id) %>
             <li><%= link_to "Edit", edit_forum_topic_path(forum_post.topic), :id => "edit_forum_topic_link_#{forum_post.topic.id}", :class => "edit_forum_topic_link" %></li>
           <% else %>
             <li><%= link_to "Edit", edit_forum_post_path(forum_post.id), :id => "edit_forum_post_link_#{forum_post.id}", :class => "edit_forum_post_link" %></li>
@@ -42,9 +44,14 @@
         <% else %>
           <li><%= link_to "Permalink", forum_post_path(forum_post) %></li>
         <% end %>
+        <% if forum_post.is_original_post?(original_forum_post_id) %>
+          <ul class="votes" id="forum-post-votes-for-<%= forum_post.id %>">
+            <%= render "forum_post_votes/list", votes: forum_post.votes, forum_post: forum_post %>
+          </ul>
+        <% end %>
       </menu>
       <% if forum_post.editable_by?(CurrentUser.user) %>
-        <% if forum_post.is_original_post? %>
+        <% if forum_post.is_original_post?(original_forum_post_id) %>
           <%= render "forum_topics/form", :forum_topic => forum_post.topic %>
         <% else %>
           <%= render "forum_posts/partials/edit/form", :forum_post => forum_post %>

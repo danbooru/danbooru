@@ -1,4 +1,4 @@
-class AddCreatedAtIndexToVersions < ActiveRecord::Migration
+class AddCreatedAtIndexToVersions < ActiveRecord::Migration[4.2]
   def change
     ApplicationRecord.without_timeout do
       add_index :note_versions, :created_at

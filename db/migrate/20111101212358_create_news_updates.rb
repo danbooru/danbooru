@@ -1,4 +1,4 @@
-class CreateNewsUpdates < ActiveRecord::Migration
+class CreateNewsUpdates < ActiveRecord::Migration[4.2]
   def change
     create_table :news_updates do |t|
       t.column :message, :text, :null => false

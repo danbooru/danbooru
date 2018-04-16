@@ -1,4 +1,4 @@
-class CreateTagImplications < ActiveRecord::Migration
+class CreateTagImplications < ActiveRecord::Migration[4.2]
   def self.up
     create_table :tag_implications do |t|
       t.column :antecedent_name, :string, :null => false

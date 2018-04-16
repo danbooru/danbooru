@@ -1,4 +1,4 @@
-class CreateUserPasswordResetNonces < ActiveRecord::Migration
+class CreateUserPasswordResetNonces < ActiveRecord::Migration[4.2]
   def change
     create_table :user_password_reset_nonces do |t|
       t.column :key, :string, :null => false

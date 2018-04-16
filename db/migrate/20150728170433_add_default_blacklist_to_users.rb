@@ -1,4 +1,4 @@
-class AddDefaultBlacklistToUsers < ActiveRecord::Migration
+class AddDefaultBlacklistToUsers < ActiveRecord::Migration[4.2]
   def self.up
     execute "set statement_timeout = 0"
     blacklist = ["spoilers", "guro", "scat", "furry -rating:s"].join("\n")

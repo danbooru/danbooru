@@ -1,4 +1,4 @@
-class ChangeSourcePatternIndexOnPosts < ActiveRecord::Migration
+class ChangeSourcePatternIndexOnPosts < ActiveRecord::Migration[4.2]
   def up
     execute "set statement_timeout = 0"
     execute "DROP INDEX index_posts_on_pixiv_suffix"

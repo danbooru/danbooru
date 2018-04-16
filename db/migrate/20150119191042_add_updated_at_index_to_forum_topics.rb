@@ -1,4 +1,4 @@
-class AddUpdatedAtIndexToForumTopics < ActiveRecord::Migration
+class AddUpdatedAtIndexToForumTopics < ActiveRecord::Migration[4.2]
   def up
     execute "set statement_timeout = 0"
     add_index :forum_topics, :updated_at

@@ -1,4 +1,4 @@
-class CreateUserFeedback < ActiveRecord::Migration
+class CreateUserFeedback < ActiveRecord::Migration[4.2]
   def self.up
     create_table :user_feedback do |t|
       t.column :user_id, :integer, :null => false

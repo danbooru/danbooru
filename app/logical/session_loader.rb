@@ -79,7 +79,8 @@ private
   end
 
   def load_session_user
-    CurrentUser.user = User.find_by_id(session[:user_id])
+    user = User.find_by_id(session[:user_id])
+    CurrentUser.user = user if user
   end
 
   def load_cookie_user

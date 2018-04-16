@@ -1,4 +1,4 @@
-class CreatePostVotes < ActiveRecord::Migration
+class CreatePostVotes < ActiveRecord::Migration[4.2]
   def self.up
     create_table :post_votes do |t|
       t.column :post_id, :integer, :null => false

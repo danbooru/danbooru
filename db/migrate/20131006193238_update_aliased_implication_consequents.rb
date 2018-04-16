@@ -1,4 +1,4 @@
-class UpdateAliasedImplicationConsequents < ActiveRecord::Migration
+class UpdateAliasedImplicationConsequents < ActiveRecord::Migration[4.2]
   def change
     execute "set statement_timeout = 0"
     TagImplication.find_each do |ti|

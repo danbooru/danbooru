@@ -1,4 +1,4 @@
-class AddUpdatedAtAndIdIndexToPostVersions < ActiveRecord::Migration
+class AddUpdatedAtAndIdIndexToPostVersions < ActiveRecord::Migration[4.2]
   def self.up
     execute "set statement_timeout = 0"
     remove_index :post_versions, :updated_at

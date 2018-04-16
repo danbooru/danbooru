@@ -5,6 +5,7 @@ class DailyMaintenance
     TagPruner.new.prune!
     Upload.where('created_at < ?', 1.day.ago).delete_all
     Delayed::Job.where('created_at < ?', 45.days.ago).delete_all
+    #ForumPostVote.where("created_at < ?", 90.days.ago).delete_all
     PostVote.prune!
     CommentVote.prune!
     ApiCacheGenerator.new.generate_tag_cache
@@ -15,5 +16,7 @@ class DailyMaintenance
     Tag.clean_up_negative_post_counts!
     SuperVoter.init!
     TokenBucket.prune!
+    TagChangeRequestPruner.warn_all
+    TagChangeRequestPruner.reject_all
   end
 end

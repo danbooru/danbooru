@@ -1,4 +1,4 @@
-class CreatePosts < ActiveRecord::Migration
+class CreatePosts < ActiveRecord::Migration[4.2]
   def self.up
     create_table :posts do |t|
       t.timestamps

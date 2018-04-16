@@ -1,4 +1,4 @@
-class CreateAdvertisementHits < ActiveRecord::Migration
+class CreateAdvertisementHits < ActiveRecord::Migration[4.2]
   def self.up
     create_table :advertisement_hits do |t|
       t.column :advertisement_id, :integer, :null => false

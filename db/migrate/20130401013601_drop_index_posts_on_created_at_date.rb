@@ -1,4 +1,4 @@
-class DropIndexPostsOnCreatedAtDate < ActiveRecord::Migration
+class DropIndexPostsOnCreatedAtDate < ActiveRecord::Migration[4.2]
   def up
     execute "set statement_timeout = 0"
     execute "drop index index_posts_on_created_at_date"

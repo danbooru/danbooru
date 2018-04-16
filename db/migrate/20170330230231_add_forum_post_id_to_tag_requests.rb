@@ -1,4 +1,4 @@
-class AddForumPostIdToTagRequests < ActiveRecord::Migration
+class AddForumPostIdToTagRequests < ActiveRecord::Migration[4.2]
   def change
   	ApplicationRecord.without_timeout do
   		add_column :tag_aliases, :forum_post_id, :integer
