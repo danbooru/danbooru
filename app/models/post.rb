@@ -69,7 +69,7 @@ class Post < ApplicationRecord
 
     def keeper_id
       if PostKeeperManager.enabled?
-        keeper_data ? keeper_data["uid"] : uploader_id
+        (keeper_data && keeper_data["uid"]) ? keeper_data["uid"] : uploader_id
       else
         uploader_id
       end
