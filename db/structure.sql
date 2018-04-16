@@ -2104,6 +2104,39 @@ ALTER SEQUENCE public.favorites_id_seq OWNED BY public.favorites.id;
 
 
 --
+-- Name: forum_post_votes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.forum_post_votes (
+    id bigint NOT NULL,
+    forum_post_id integer NOT NULL,
+    creator_id integer NOT NULL,
+    score integer NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: forum_post_votes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.forum_post_votes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: forum_post_votes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.forum_post_votes_id_seq OWNED BY public.forum_post_votes.id;
+
+
+--
 -- Name: forum_posts; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4167,6 +4200,13 @@ ALTER TABLE ONLY public.favorites_99 ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
+-- Name: forum_post_votes id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.forum_post_votes ALTER COLUMN id SET DEFAULT nextval('public.forum_post_votes_id_seq'::regclass);
+
+
+--
 -- Name: forum_posts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4551,6 +4591,14 @@ ALTER TABLE ONLY public.favorites
 
 
 --
+-- Name: forum_post_votes forum_post_votes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.forum_post_votes
+    ADD CONSTRAINT forum_post_votes_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: forum_posts forum_posts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4708,6 +4756,14 @@ ALTER TABLE ONLY public.posts
 
 ALTER TABLE ONLY public.saved_searches
     ADD CONSTRAINT saved_searches_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.schema_migrations
+    ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
 
 
 --
@@ -5049,20 +5105,6 @@ CREATE INDEX index_comments_on_ip_addr ON public.comments USING btree (ip_addr);
 --
 
 CREATE INDEX index_comments_on_post_id ON public.comments USING btree (post_id);
-
-
---
--- Name: index_delayed_jobs_on_locked_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_delayed_jobs_on_locked_at ON public.delayed_jobs USING btree (locked_at);
-
-
---
--- Name: index_delayed_jobs_on_locked_by; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_delayed_jobs_on_locked_by ON public.delayed_jobs USING btree (locked_by);
 
 
 --
@@ -6529,6 +6571,20 @@ CREATE INDEX index_favorites_9_on_user_id ON public.favorites_9 USING btree (use
 
 
 --
+-- Name: index_forum_post_votes_on_forum_post_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_forum_post_votes_on_forum_post_id ON public.forum_post_votes USING btree (forum_post_id);
+
+
+--
+-- Name: index_forum_post_votes_on_forum_post_id_and_creator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_forum_post_votes_on_forum_post_id_and_creator_id ON public.forum_post_votes USING btree (forum_post_id, creator_id);
+
+
+--
 -- Name: index_forum_posts_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6935,6 +6991,13 @@ CREATE INDEX index_posts_on_pixiv_id ON public.posts USING btree (pixiv_id) WHER
 
 
 --
+-- Name: index_posts_on_source; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_source ON public.posts USING btree (lower((source)::text));
+
+
+--
 -- Name: index_posts_on_source_pattern; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6953,6 +7016,13 @@ CREATE INDEX index_posts_on_tags_index ON public.posts USING gin (tag_index);
 --
 
 CREATE INDEX index_posts_on_uploader_id ON public.posts USING btree (uploader_id);
+
+
+--
+-- Name: index_posts_on_uploader_ip_addr; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_uploader_ip_addr ON public.posts USING btree (uploader_ip_addr);
 
 
 --
@@ -7194,13 +7264,6 @@ CREATE INDEX index_wiki_pages_on_updated_at ON public.wiki_pages USING btree (up
 
 
 --
--- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING btree (version);
-
-
---
 -- Name: favorites insert_favorites_trigger; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -7428,6 +7491,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20171230220225'),
 ('20180113211343'),
 ('20180116001101'),
-('20180403231351');
+('20180403231351'),
+('20180413224239');
 
 

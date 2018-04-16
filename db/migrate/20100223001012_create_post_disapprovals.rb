@@ -1,4 +1,4 @@
-class CreatePostDisapprovals < ActiveRecord::Migration
+class CreatePostDisapprovals < ActiveRecord::Migration[4.2]
   def self.up
     create_table :post_disapprovals do |t|
       t.column :user_id, :integer, :null => false

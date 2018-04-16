@@ -1,4 +1,4 @@
-class ChangeIpAddrToInetOnPostAppeals < ActiveRecord::Migration
+class ChangeIpAddrToInetOnPostAppeals < ActiveRecord::Migration[4.2]
   def up
     execute "set statement_timeout = 0"
     change_column_null :post_appeals, :creator_ip_addr, true

@@ -1,4 +1,4 @@
-class AddCreatorIdAndPostIdIndexesToCommentsAndNotes < ActiveRecord::Migration
+class AddCreatorIdAndPostIdIndexesToCommentsAndNotes < ActiveRecord::Migration[4.2]
   def self.up
     execute "set statement_timeout = 0"
     remove_index :comments, :creator_id

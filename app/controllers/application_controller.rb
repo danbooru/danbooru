@@ -115,7 +115,7 @@ class ApplicationController < ActionController::Base
         fmt.xml  { render template: "static/error", status: 501 }
       end
     else
-      render :template => "static/error", :status => 500
+      render :template => "static/error", :status => 500, :layout => "blank"
     end
   end
 

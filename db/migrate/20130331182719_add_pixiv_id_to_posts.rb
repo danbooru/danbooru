@@ -1,4 +1,4 @@
-class AddPixivIdToPosts < ActiveRecord::Migration
+class AddPixivIdToPosts < ActiveRecord::Migration[4.2]
   def up
     execute "set statement_timeout = 0"
     add_column :posts, :pixiv_id, :integer

@@ -1,4 +1,4 @@
-class DropPoolVersions < ActiveRecord::Migration
+class DropPoolVersions < ActiveRecord::Migration[4.2]
   def up
   	drop_table :pool_versions
   end

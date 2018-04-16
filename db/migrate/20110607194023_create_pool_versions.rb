@@ -1,4 +1,4 @@
-class CreatePoolVersions < ActiveRecord::Migration
+class CreatePoolVersions < ActiveRecord::Migration[4.2]
   def up
     create_table :pool_versions do |t|
       t.column :pool_id, :integer

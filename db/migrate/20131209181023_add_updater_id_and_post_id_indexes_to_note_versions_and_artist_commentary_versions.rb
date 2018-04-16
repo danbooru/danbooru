@@ -1,4 +1,4 @@
-class AddUpdaterIdAndPostIdIndexesToNoteVersionsAndArtistCommentaryVersions < ActiveRecord::Migration
+class AddUpdaterIdAndPostIdIndexesToNoteVersionsAndArtistCommentaryVersions < ActiveRecord::Migration[4.2]
   def self.up
     execute "set statement_timeout = 0"
     remove_index :note_versions, :updater_id

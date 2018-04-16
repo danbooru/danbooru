@@ -1,4 +1,4 @@
-class DropKeyValues < ActiveRecord::Migration
+class DropKeyValues < ActiveRecord::Migration[4.2]
   def up
     drop_table :key_values
   end

@@ -1,4 +1,4 @@
-class AddLastCommentBumpedAtToPosts < ActiveRecord::Migration
+class AddLastCommentBumpedAtToPosts < ActiveRecord::Migration[4.2]
   def self.up
     execute "SET statement_timeout = 0"
 

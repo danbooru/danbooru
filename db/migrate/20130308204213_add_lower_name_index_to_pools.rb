@@ -1,4 +1,4 @@
-class AddLowerNameIndexToPools < ActiveRecord::Migration
+class AddLowerNameIndexToPools < ActiveRecord::Migration[4.2]
   def self.up
     execute "create index index_pools_on_lower_name on pools (lower(name))"
   end

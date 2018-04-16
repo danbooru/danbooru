@@ -1,4 +1,4 @@
-class CreateForumTopics < ActiveRecord::Migration
+class CreateForumTopics < ActiveRecord::Migration[4.2]
   def self.up
     create_table :forum_topics do |t|
       t.column :creator_id, :integer, :null => false

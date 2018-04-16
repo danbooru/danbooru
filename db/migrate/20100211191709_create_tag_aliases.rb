@@ -1,4 +1,4 @@
-class CreateTagAliases < ActiveRecord::Migration
+class CreateTagAliases < ActiveRecord::Migration[4.2]
   def self.up
     create_table :tag_aliases do |t|
       t.column :antecedent_name, :string, :null => false

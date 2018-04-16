@@ -1,4 +1,4 @@
-class CreateSuperVoters < ActiveRecord::Migration
+class CreateSuperVoters < ActiveRecord::Migration[4.2]
   def change
     create_table :super_voters do |t|
       t.integer :user_id

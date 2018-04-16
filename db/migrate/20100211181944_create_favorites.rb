@@ -1,4 +1,4 @@
-class CreateFavorites < ActiveRecord::Migration
+class CreateFavorites < ActiveRecord::Migration[4.2]
   TABLE_COUNT = 100
 
   def self.up

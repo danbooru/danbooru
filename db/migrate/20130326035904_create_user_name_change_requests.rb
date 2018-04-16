@@ -1,4 +1,4 @@
-class CreateUserNameChangeRequests < ActiveRecord::Migration
+class CreateUserNameChangeRequests < ActiveRecord::Migration[4.2]
   def up
     create_table :user_name_change_requests do |t|
       t.string :status, :null => false, :default => "pending"
