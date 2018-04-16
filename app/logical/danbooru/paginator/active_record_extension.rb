@@ -37,17 +37,17 @@ module Danbooru
             c = c.where("#{table_name}.id < ?", before_id.to_i)
           end
 
-          c.reorder("#{table_name}.id desc").tap do |obj|
-            obj.extend(SequentialCollectionExtension)
-            obj.sequential_paginator_mode = :before
-          end
+          c = c.reorder("#{table_name}.id desc")
+          c = c.extending(SequentialCollectionExtension)
+          c.sequential_paginator_mode = :before
+          c
         end
 
         def paginate_sequential_after(after_id)
-          limit(records_per_page + 1).where("#{table_name}.id > ?", after_id.to_i).reorder("#{table_name}.id asc").tap do |obj|
-            obj.extend(SequentialCollectionExtension)
-            obj.sequential_paginator_mode = :after
-          end
+          c = limit(records_per_page + 1).where("#{table_name}.id > ?", after_id.to_i).reorder("#{table_name}.id asc")
+          c = c.extending(SequentialCollectionExtension)
+          c.sequential_paginator_mode = :after
+          c
         end
 
         def paginate_numbered(page)
@@ -57,8 +57,7 @@ module Danbooru
             raise ::Danbooru::Paginator::PaginationError.new("You cannot go beyond page #{Danbooru.config.max_numbered_pages}. Please narrow your search terms.")
           end
 
-          limit(records_per_page).offset((page - 1) * records_per_page).tap do |obj|
-            obj.extend(NumberedCollectionExtension)
+          extending(NumberedCollectionExtension).limit(records_per_page).offset((page - 1) * records_per_page).tap do |obj|
             if records_per_page > 0
               obj.total_pages = (obj.total_count.to_f / records_per_page).ceil
             else
