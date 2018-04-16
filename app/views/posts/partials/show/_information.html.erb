@@ -12,7 +12,7 @@
     <li>Approver: <%= link_to_user(post.approver) %></li>
   <% end %>
   <li>
-    Size: <%= link_to_if post.visible?, number_to_human_size(post.file_size), post.tagged_file_url + "?download=1" %>
+    Size: <%= link_to_if post.visible?, number_to_human_size(post.file_size), post.tagged_file_url %>
     <% if post.has_dimensions? %>
       (<span itemprop="width"><%= post.image_width %></span>x<span itemprop="height"><%= post.image_height %></span>)
     <% end %>
