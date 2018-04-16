@@ -1,4 +1,4 @@
-class ChangeSourceToNonNullOnPosts < ActiveRecord::Migration
+class ChangeSourceToNonNullOnPosts < ActiveRecord::Migration[4.2]
   def up
     Post.without_timeout do
       change_column_null(:posts, :source, false, "")

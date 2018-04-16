@@ -1,4 +1,4 @@
-class CreatePostApprovals < ActiveRecord::Migration
+class CreatePostApprovals < ActiveRecord::Migration[4.2]
   def change
     create_table :post_approvals do |t|
     	t.integer :user_id, null: false

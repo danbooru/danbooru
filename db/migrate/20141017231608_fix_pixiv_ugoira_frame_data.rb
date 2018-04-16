@@ -1,4 +1,4 @@
-class FixPixivUgoiraFrameData < ActiveRecord::Migration
+class FixPixivUgoiraFrameData < ActiveRecord::Migration[4.2]
   def change
     change_table :pixiv_ugoira_frame_data do |t|
       t.change :data,         :text,   :null => false

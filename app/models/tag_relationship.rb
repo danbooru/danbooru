@@ -1,6 +1,9 @@
 class TagRelationship < ApplicationRecord
   self.abstract_class = true
 
+  EXPIRY = 60
+  EXPIRY_WARNING = 55
+
   attr_accessor :skip_secondary_validations
 
   belongs_to_creator
@@ -9,6 +12,10 @@ class TagRelationship < ApplicationRecord
   belongs_to :forum_topic, optional: true
   has_one :antecedent_tag, :class_name => "Tag", :foreign_key => "name", :primary_key => "antecedent_name"
   has_one :consequent_tag, :class_name => "Tag", :foreign_key => "name", :primary_key => "consequent_name"
+
+  scope :expired, ->{where("created_at < ?", EXPIRY.days.ago)}
+  scope :old, ->{where("created_at >= ? and created_at < ?", EXPIRY.days.ago, EXPIRY_WARNING.days.ago)}
+  scope :pending, ->{where(status: "pending")}
 
   before_validation :initialize_creator, :on => :create
   before_validation :normalize_names

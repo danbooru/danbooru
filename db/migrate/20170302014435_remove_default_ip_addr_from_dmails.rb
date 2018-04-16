@@ -1,4 +1,4 @@
-class RemoveDefaultIpAddrFromDmails < ActiveRecord::Migration
+class RemoveDefaultIpAddrFromDmails < ActiveRecord::Migration[4.2]
   def up
     change_column_default(:dmails, :creator_ip_addr, nil)
   end

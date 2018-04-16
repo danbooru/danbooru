@@ -1,4 +1,4 @@
-class AddAntecedentNamePatternIndexAndPostCountToTagAliases < ActiveRecord::Migration
+class AddAntecedentNamePatternIndexAndPostCountToTagAliases < ActiveRecord::Migration[4.2]
   def up
     execute "set statement_timeout = 0"
     execute "create index index_tag_aliases_on_antecedent_name_pattern on tag_aliases (antecedent_name text_pattern_ops)"

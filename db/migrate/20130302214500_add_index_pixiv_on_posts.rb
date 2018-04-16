@@ -1,4 +1,4 @@
-class AddIndexPixivOnPosts < ActiveRecord::Migration
+class AddIndexPixivOnPosts < ActiveRecord::Migration[4.2]
   def up
     execute "set statement_timeout = 0"
     execute "CREATE INDEX index_posts_on_pixiv_suffix ON posts USING btree

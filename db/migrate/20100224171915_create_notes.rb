@@ -1,4 +1,4 @@
-class CreateNotes < ActiveRecord::Migration
+class CreateNotes < ActiveRecord::Migration[4.2]
   def self.up
     create_table :notes do |t|
       t.column :creator_id, :integer, :null => false

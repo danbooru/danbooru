@@ -1,4 +1,4 @@
-class AddTagsToSavedSearches < ActiveRecord::Migration
+class AddTagsToSavedSearches < ActiveRecord::Migration[4.2]
   def change
   	execute "set statement_timeout = 0"
   	add_column :saved_searches, :labels, "text", array: true, null: false, default: []

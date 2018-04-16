@@ -1,4 +1,4 @@
-class CreatePixivUgoiraFrameData < ActiveRecord::Migration
+class CreatePixivUgoiraFrameData < ActiveRecord::Migration[4.2]
   def change
     create_table :pixiv_ugoira_frame_data do |t|
       t.integer :post_id

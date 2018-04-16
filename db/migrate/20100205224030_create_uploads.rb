@@ -1,4 +1,4 @@
-class CreateUploads < ActiveRecord::Migration
+class CreateUploads < ActiveRecord::Migration[4.2]
   def self.up
     create_table :uploads do |t|
       t.column :source, :string

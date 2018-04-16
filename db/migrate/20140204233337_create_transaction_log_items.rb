@@ -1,4 +1,4 @@
-class CreateTransactionLogItems < ActiveRecord::Migration
+class CreateTransactionLogItems < ActiveRecord::Migration[4.2]
   def change
     create_table :transaction_log_items do |t|
       t.string :category

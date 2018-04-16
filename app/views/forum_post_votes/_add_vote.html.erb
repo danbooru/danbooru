@@ -1,0 +1,11 @@
+<%-
+# forum_post
+%>
+
+<li>
+  <%= link_to content_tag(:i, nil, class: "far fa-thumbs-up"), forum_post_votes_path(forum_post_id: forum_post.id, format: "js"), remote: true, method: :post, data: {params: "forum_post_vote[score]=1"}, title: "Vote up" %>
+
+  <%= link_to content_tag(:i, nil, class: "far fa-meh"), forum_post_votes_path(forum_post_id: forum_post.id, format: "js"), remote: true, method: :post, data: {params: "forum_post_vote[score]=0"}, title: "Vote meh" %>
+
+  <%= link_to content_tag(:i, nil, class: "far fa-thumbs-down"), forum_post_votes_path(forum_post_id: forum_post.id, format: "js"), remote: true, method: :post, data: {params: "forum_post_vote[score]=-1"}, title: "Vote down" %>
+</li>

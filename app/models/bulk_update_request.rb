@@ -18,6 +18,9 @@ class BulkUpdateRequest < ApplicationRecord
   after_create :create_forum_topic
 
   scope :pending_first, lambda { order("(case status when 'pending' then 0 when 'approved' then 1 else 2 end)") }
+  scope :pending, ->{where(status: "pending")}
+  scope :expired, ->{where("created_at < ?", TagRelationship::EXPIRY.days.ago)}
+  scope :old, ->{where("created_at between ? and ?", TagRelationship::EXPIRY.days.ago, TagRelationship::EXPIRY_WARNING.days.ago)}
 
   module SearchMethods
     def default_order
@@ -121,7 +124,7 @@ class BulkUpdateRequest < ApplicationRecord
       end
     end
 
-    def reject!(rejector)
+    def reject!(rejector = User.system)
       transaction do
         update(status: "rejected")
         forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been rejected by @#{rejector.name}.", "REJECTED")

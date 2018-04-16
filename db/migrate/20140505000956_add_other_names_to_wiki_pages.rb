@@ -1,4 +1,4 @@
-class AddOtherNamesToWikiPages < ActiveRecord::Migration
+class AddOtherNamesToWikiPages < ActiveRecord::Migration[4.2]
   def change
     add_column :wiki_pages, :other_names, :text
     add_column :wiki_pages, :other_names_index, :tsvector

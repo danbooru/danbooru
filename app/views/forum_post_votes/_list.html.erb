@@ -1,0 +1,16 @@
+<%- 
+# votes 
+# forum_post
+%>
+
+<% votes.by(CurrentUser.user.id).each do |vote| %>
+  <%= render "forum_post_votes/vote", vote: vote, forum_post: forum_post %>
+<% end %>
+
+<% votes.excluding(CurrentUser.user.id).each do |vote| %>
+  <%= render "forum_post_votes/vote", vote: vote, forum_post: forum_post %>
+<% end %>
+
+<% if !votes.by(CurrentUser.user.id).exists? %>
+  <%= render "forum_post_votes/add_vote", vote: votes.by(CurrentUser.user.id).first, forum_post: forum_post %>
+<% end %>

@@ -9,6 +9,6 @@
 //= require jquery.qtip.js
 //= require ugoira_player.js
 //= require stupidtable.js
-//= require rails.js
+//= require rails-ujs
 //= require common.js
 //= require_tree .

@@ -1,4 +1,4 @@
-class CreateIpBans < ActiveRecord::Migration
+class CreateIpBans < ActiveRecord::Migration[4.2]
   def self.up
     create_table :ip_bans do |t|
       t.column :creator_id, :integer, :null => false

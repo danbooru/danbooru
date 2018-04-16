@@ -1,4 +1,4 @@
-class CreateForumTopicVisits < ActiveRecord::Migration
+class CreateForumTopicVisits < ActiveRecord::Migration[4.2]
   def change
     create_table :forum_topic_visits do |t|
       t.integer :user_id

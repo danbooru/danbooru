@@ -1,4 +1,4 @@
-class CreateBulkUpdateRequests < ActiveRecord::Migration
+class CreateBulkUpdateRequests < ActiveRecord::Migration[4.2]
   def change
     create_table :bulk_update_requests do |t|
       t.integer :user_id, :null => false

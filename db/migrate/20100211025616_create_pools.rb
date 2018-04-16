@@ -1,4 +1,4 @@
-class CreatePools < ActiveRecord::Migration
+class CreatePools < ActiveRecord::Migration[4.2]
   def self.up
     create_table :pools do |t|
       t.column :name, :string

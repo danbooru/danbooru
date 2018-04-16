@@ -1,4 +1,4 @@
-class CreateDmailFilters < ActiveRecord::Migration
+class CreateDmailFilters < ActiveRecord::Migration[4.2]
   def change
     create_table :dmail_filters do |t|
       t.integer :user_id, :null => false

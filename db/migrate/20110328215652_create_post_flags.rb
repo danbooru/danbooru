@@ -1,4 +1,4 @@
-class CreatePostFlags < ActiveRecord::Migration
+class CreatePostFlags < ActiveRecord::Migration[4.2]
   def self.up
     create_table :post_flags do |t|
       t.column :post_id, :integer, :null => false

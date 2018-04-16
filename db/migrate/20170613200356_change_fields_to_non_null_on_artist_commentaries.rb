@@ -1,4 +1,4 @@
-class ChangeFieldsToNonNullOnArtistCommentaries < ActiveRecord::Migration
+class ChangeFieldsToNonNullOnArtistCommentaries < ActiveRecord::Migration[4.2]
   def up
     ArtistCommentary.without_timeout do
       change_column_null(:artist_commentaries, :original_title, false, "")
