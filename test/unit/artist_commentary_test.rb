@@ -60,6 +60,11 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
         @artcomm.reload
       end
 
+      should "add tags if requested" do
+        @artcomm.update(translated_title: "bar", add_commentary_tag: "1")
+        assert_equal(true, @post.reload.has_tag?("commentary"))
+      end
+
       should "not create new version if nothing changed" do
         @artcomm.save
         assert_equal(1, @post.artist_commentary.versions.size)

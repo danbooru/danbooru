@@ -108,7 +108,7 @@ class ArtistCommentary < ApplicationRecord
       post.add_tag("check_commentary")
     end
 
-    post.save if post.saved_change_to_tag_string?
+    post.save if post.tag_string_changed?
   end
 
   module VersionMethods
