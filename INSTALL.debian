@@ -35,7 +35,7 @@ export GITHUB_INSTALL_SCRIPTS=https://raw.githubusercontent.com/r888888888/danbo
 echo "* Installing packages..."
 LIBSSL_DEV_PKG=$( verlt `lsb_release -sr` 9.0 && echo libssl-dev || echo libssl1.0-dev )
 apt-get update
-apt-get -y install build-essential automake $LIBSSL_DEV_PKG libxml2-dev libxslt-dev ncurses-dev sudo libreadline-dev flex bison ragel memcached libmemcached-dev git curl libcurl4-openssl-dev libvips-dev libvips-tools sendmail-bin sendmail postgresql postgresql-contrib libpq-dev postgresql-server-dev-all nginx ssh coreutils ffmpeg mkvtoolnix
+apt-get -y install build-essential automake $LIBSSL_DEV_PKG libxml2-dev libxslt-dev ncurses-dev sudo libreadline-dev flex bison ragel memcached libmemcached-dev git curl libcurl4-openssl-dev libvips-dev libvips-tools sendmail-bin sendmail postgresql postgresql-contrib libpq-dev postgresql-server-dev-all nginx ssh coreutils ffmpeg mkvtoolnix libvips42 libvips-tools libvips-dev 
 
 if [ $? -ne 0 ]; then
   echo "* Error installing packages; aborting"
