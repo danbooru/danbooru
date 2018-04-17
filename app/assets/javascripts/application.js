@@ -1,6 +1,4 @@
 //= require hammer.min.js
-//= require jquery-2.2.4.js
-//= require jquery-migrate-1.4.1.js
 //= require jquery-ui-1.11.2.min.js
 //= require jquery.hotkeys.js
 //= require jquery.timeout.js
