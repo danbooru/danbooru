@@ -57,6 +57,6 @@ class UserFeedbacksController < ApplicationController
     permitted_params = %i[body category]
     permitted_params += %i[user_id user_name] if context == :create
 
-    params.require(:user_feedback).permit(permitted_params)
+    params.fetch(:user_feedback, {}).permit(permitted_params)
   end
 end
