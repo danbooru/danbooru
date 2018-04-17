@@ -522,7 +522,7 @@ module Danbooru
 
     # Posts with these tags will be highlighted yellow in the modqueue.
     def modqueue_quality_warning_tags
-      %w[hard_translated self_upload nude_filter photoshop screencap]
+      %w[hard_translated self_upload nude_filter third-party_edit screencap]
     end
 
     # Posts with these tags will be highlighted red in the modqueue.
