@@ -520,6 +520,16 @@ module Danbooru
       tag =~ /replaceme|.*_sample|resized|upscaled|downscaled|md5_mismatch|jpeg_artifacts|corrupted_image/i
     end
 
+    # Posts with these tags will be highlighted yellow in the modqueue.
+    def modqueue_quality_warning_tags
+      %w[hard_translated self_upload nude_filter photoshop screencap]
+    end
+
+    # Posts with these tags will be highlighted red in the modqueue.
+    def modqueue_sample_warning_tags
+      %w[duplicate image_sample md5_mismatch resized upscaled downscaled]
+    end
+
     def shared_dir_path
       "/var/www/danbooru2/shared"
     end

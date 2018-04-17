@@ -1,4 +1,4 @@
-@import "../common/000_vars.scss";
+@import "../../common/000_vars.scss";
 
 div#c-moderator-post-queues {
   div.post {
@@ -25,22 +25,17 @@ div#c-moderator-post-queues {
       width: 800px;
     }
 
-    &[data-tags~="hard_translated"],
-    &[data-tags~="self_upload"],
-    &[data-tags~="nude_filter"],
-    &[data-tags~="photoshop"],
-    &[data-tags~="screencap"] {
-      background-color: $preview_quality_warning_color;
-    }
+    <% Danbooru.config.modqueue_quality_warning_tags.each do |tag| %>
+      &[data-tags~="<%= tag %>"] {
+        background-color: $preview_quality_warning_color;
+      }
+    <% end %>
 
-    &[data-tags~="duplicate"],
-    &[data-tags~="image_sample"],
-    &[data-tags~="md5_mismatch"],
-    &[data-tags~="resized"],
-    &[data-tags~="upscaled"],
-    &[data-tags~="downscaled"] {
-      background-color: $preview_sample_warning_color;
-    }
+    <% Danbooru.config.modqueue_sample_warning_tags.each do |tag| %>
+      &[data-tags~="<%= tag %>"] {
+        background-color: $preview_sample_warning_color;
+      }
+    <% end %>
 
     &[data-tags~=animated], &[data-file-ext=swf], &[data-file-ext=webm], &[data-file-ext=zip], &[data-file-ext=mp4] {
       aside:before {
