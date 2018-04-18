@@ -58,11 +58,12 @@ module Sources
       end
 
       def artist_name
-        api_metadata.dig(:author, :username)
+        api_metadata.dig(:author, :username).try(&:downcase)
       end
 
       def profile_url
-        "https://#{artist_name.downcase}.deviantart.com"
+        return "" if uuid.nil?
+        "https://#{artist_name}.deviantart.com"
       end
 
       def image_url
@@ -118,8 +119,10 @@ module Sources
       end
 
       def page
-        resp = HTTParty.get(normalized_url, Danbooru.config.httparty_options)
-        Nokogiri::HTML(resp.body)
+        options = Danbooru.config.httparty_options.deep_merge(format: :plain, headers: { "Accept-Encoding" => "gzip" })
+        resp = HTTParty.get(normalized_url, **options)
+        body = Zlib.gunzip(resp.body)
+        Nokogiri::HTML(body)
       end
 
       # Scrape UUID from <meta property="da:appurl" content="DeviantArt://deviation/12F08C5D-A3A4-338C-2F1A-7E4E268C0E8B">

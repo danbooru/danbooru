@@ -20,6 +20,16 @@ module Sources
       end
     end
 
+    context "The source for a DeviantArt image url" do
+      should "fetch the source data" do
+        @site = Sources::Site.new("https://pre00.deviantart.net/b5e6/th/pre/f/2016/265/3/5/legend_of_galactic_heroes_by_hideyoshi-daihpha.jpg")
+
+        assert_equal("hideyoshi", @site.artist_name)
+        assert_equal("https://hideyoshi.deviantart.com", @site.profile_url)
+        assert_equal("https://orig00.deviantart.net/9e1f/f/2016/265/3/5/legend_of_galactic_heroes_by_hideyoshi-daihpha.jpg", @site.image_url)
+      end
+    end
+
     context "The source for an DeviantArt artwork page" do
       setup do
         @site = Sources::Site.new("http://noizave.deviantart.com/art/test-post-please-ignore-685436408")
@@ -27,7 +37,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_match(%r!https://origin-orig.deviantart.net/7b5b/f/2017/160/c/5/test_post_please_ignore_by_noizave-dbc3a48.png!, @site.image_url)
+        assert_match(%r!https?://origin-orig.deviantart.net/7b5b/f/2017/160/c/5/test_post_please_ignore_by_noizave-dbc3a48.png!, @site.image_url)
       end
 
       should "get the profile" do
@@ -86,7 +96,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_match(%r!https://origin-orig\.deviantart\.net/cb25/f/2017/160/1/9/hidden_work_by_noizave-dbc3r29\.png!, @site.image_url)
+        assert_match(%r!https?://origin-orig\.deviantart\.net/cb25/f/2017/160/1/9/hidden_work_by_noizave-dbc3r29\.png!, @site.image_url)
       end
     end
 
