@@ -128,7 +128,7 @@
         artist: {
           name: data.unique_id,
           other_names: data.artist_name,
-          url_string: $.unique([data.profile_url, data.normalized_for_artist_finder_url]).join("\n")
+          url_string: $.uniqueSort([data.profile_url, data.normalized_for_artist_finder_url]).join("\n")
         }
       });
 
