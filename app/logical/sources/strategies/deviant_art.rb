@@ -62,7 +62,7 @@ module Sources
       end
 
       def profile_url
-        return "" if uuid.nil?
+        return "" if artist_name.blank?
         "https://#{artist_name}.deviantart.com"
       end
 
