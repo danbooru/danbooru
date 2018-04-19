@@ -29,15 +29,10 @@ class CommentsController < ApplicationController
 
   def create
     @comment = Comment.create(comment_params(:create))
+    flash[:notice] = @comment.valid? ? "Comment posted" : @comment.errors.full_messages.join("; ")
     respond_with(@comment) do |format|
       format.html do
-        if @comment.post.nil?
-          redirect_to comments_path, notice: @comment.errors.full_messages.join("; ")
-        elsif @comment.errors.any?
-          redirect_to post_path(@comment.post), :notice => @comment.errors.full_messages.join("; ")
-        else
-          redirect_to post_path(@comment.post), :notice => "Comment posted"
-        end
+        redirect_back fallback_location: (@comment.post || comments_path)
       end
     end
   end
