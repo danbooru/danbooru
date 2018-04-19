@@ -198,6 +198,26 @@ module Danbooru
       1.week.ago
     end
 
+    # Permanently redirect all HTTP requests to HTTPS.
+    #
+    # https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
+    # http://api.rubyonrails.org/classes/ActionDispatch/SSL.html
+    def ssl_options
+      {
+        redirect: { exclude: ->(request) { request.subdomain == "insecure" } },
+        hsts: {
+          expires: 1.year,
+          preload: true,
+          subdomains: false,
+        },
+      }
+    end
+
+    # Disable the forced use of HTTPS.
+    # def ssl_options
+    #   false
+    # end
+
     # The name of the server the app is hosted on.
     def server_host
       Socket.gethostname
@@ -772,4 +792,10 @@ module Danbooru
       end
     end
   end
+
+  def config
+    @configuration ||= EnvironmentConfiguration.new
+  end
+
+  module_function :config
 end

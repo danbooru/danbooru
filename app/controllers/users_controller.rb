@@ -71,12 +71,6 @@ class UsersController < ApplicationController
     respond_with(@user, location: edit_user_path(@user))
   end
 
-  def cache
-    @user = User.find(params[:id])
-    @user.update_cache
-    render plain: ""
-  end
-
   private
 
   def check_privilege(user)

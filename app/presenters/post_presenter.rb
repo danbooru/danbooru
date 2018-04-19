@@ -168,7 +168,7 @@ class PostPresenter < Presenter
 
   def safe_mode_message(template)
     html = ["This image is unavailable on safe mode (#{Danbooru.config.app_name}). Go to "]
-    html << template.link_to("Danbooru", "http://danbooru.donmai.us")
+    html << template.link_to("Danbooru", "http://danbooru.donmai.us") # XXX don't hardcode.
     html << " or disable safe mode to view ("
     html << template.link_to("learn more", template.wiki_pages_path(title: "help:user_settings"))
     html << ")."

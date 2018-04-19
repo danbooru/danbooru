@@ -191,7 +191,7 @@ class User < ApplicationRecord
     def update_remote_cache
       if saved_change_to_name?
         Danbooru.config.other_server_hosts.each do |server|
-          HTTParty.delete("http://#{server}/users/#{id}/cache", Danbooru.config.httparty_options)
+          delay(queue: server).update_cache
         end
       end
     rescue Exception
