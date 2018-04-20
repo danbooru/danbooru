@@ -3,7 +3,7 @@ class PostPresenter < Presenter
 
   def self.preview(post, options = {})
     if post.nil?
-      return "Expunged"
+      return "<em>none</em>".html_safe
     end
 
     if !options[:show_deleted] && post.is_deleted? && options[:tags] !~ /status:(?:all|any|deleted|banned)/ && !options[:raw]

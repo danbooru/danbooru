@@ -1,25 +1,65 @@
 <div id="c-uploads">
   <div id="a-index">
     <%= render "uploads/search" %>
+    <%= render "posts/partials/common/inline_blacklist" %>
 
-    <table width="100%" class="striped">
+    <table width="100%" class="striped autofit">
       <thead>
         <tr>
-          <th></th>
+          <th>Upload</th>
+          <th>Info</th>
           <th>Uploader</th>
           <th>Status</th>
-          <th>Date</th>
-          <th>Tags</th>
         </tr>
       </thead>
       <tbody>
         <% @uploads.each do |upload| %>
           <tr>
-            <td><%= link_to upload.id, upload_path(upload) %></td>
-            <td><%= link_to_user upload.uploader %></td>
-            <td><%= upload.presenter.status(self) %></td>
-            <td><%= compact_time upload.created_at %></td>
-            <td><%= upload.tag_string %></td>
+            <td>
+              <%= PostPresenter.preview(upload.post, tags: "user:#{upload.uploader_name}", show_deleted: true) %>
+            </td>
+            <td class="col-expand upload-info">
+              <span class="info">
+                <strong>Upload</strong>
+                <%= link_to "##{upload.id}", upload %>
+              </span>
+
+              <span class="info">
+                <strong>Rating</strong>
+                <%= upload.rating %>
+              </span>
+
+              <% if upload.post.present? %>
+                <span class="info">
+                  <strong>Size</strong>
+                  <%= link_to "#{upload.post.file_size.to_s(:human_size, precision: 4)} #{upload.post.file_ext}", upload.post.file_url %>
+                  <% if upload.post.has_dimensions? %>
+                    (<%= upload.post.image_width %>x<%= upload.post.image_height %>)
+                  <% end %>
+                </span>
+              <% end %>
+              <br>
+
+              <span class="info">
+                <strong>Source</strong>
+                <%= link_to_if (upload.source =~ %r!\Ahttps?://!i), (upload.source.presence || content_tag(:em, "none")), upload.source %>
+                <%= link_to "»", uploads_path(search: params[:search].merge(source_matches: upload.source)) %>
+              </span>
+              <br>
+
+              <span class="info">
+                <strong>Tags</strong>
+                <%= TagSetPresenter.new(upload.tag_string.split).inline_tag_list(self) %>
+              </span>
+            </td>
+            <td>
+              <%= link_to_user upload.uploader %>
+              <%= link_to "»", uploads_path(search: params[:search].merge(uploader_name: upload.uploader_name)) %>
+              <br><%= time_ago_in_words_tagged  upload.created_at %>
+            </td>
+            <td class="col-normal">
+              <%= link_to upload.presenter.status(self), uploads_path(search: params[:search].merge(status: upload.status)) %>
+            </td>
           </tr>
         <% end %>
       </tbody>

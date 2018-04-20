@@ -37,8 +37,7 @@ class UploadsController < ApplicationController
   end
 
   def index
-    @search = Upload.search(search_params)
-    @uploads = @search.paginate(params[:page], :limit => params[:limit])
+    @uploads = Upload.search(search_params).includes(:post, :uploader).paginate(params[:page], :limit => params[:limit])
     respond_with(@uploads) do |format|
       format.xml do
         render :xml => @uploads.to_xml(:root => "uploads")
