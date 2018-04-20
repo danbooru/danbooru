@@ -1,0 +1,8 @@
+<%= simple_form_for(:search, url: uploads_path, method: :get, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+  <%= f.input :uploader_name, label: "Uploader", input_html: { value: params[:search][:uploader_name] } %>
+  <%= f.input :post_tags_match, label: "Post Tags", input_html: { value: params[:search][:post_tags_match] } %>
+  <%= f.input :source_matches, label: "Source", input_html: { value: params[:search][:source_matches] } %>
+  <%= f.input :status, collection: [%w[Completed completed], %w[Processing processing], %w[Pending pending], %w[Duplicate *duplicate*], %w[Error error*]], include_blank: true, selected: params[:search][:status] %>
+
+  <%= f.submit "Search" %>
+<% end %>

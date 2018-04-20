@@ -20,9 +20,15 @@ class UploadsController < ApplicationController
   end
 
   def batch
-    @source = Sources::Site.new(params[:url], :referer_url => params[:ref])
-    @source.get
-    @urls = @source.image_urls
+    @url = params.dig(:batch, :url) || params[:url]
+    @source = nil
+
+    if @url
+      @source = Sources::Site.new(@url, :referer_url => params[:ref])
+      @source.get
+    end
+
+    respond_with(@source)
   end
 
   def image_proxy
@@ -31,8 +37,7 @@ class UploadsController < ApplicationController
   end
 
   def index
-    @search = Upload.search(search_params)
-    @uploads = @search.paginate(params[:page], :limit => params[:limit])
+    @uploads = Upload.search(search_params).includes(:post, :uploader).paginate(params[:page], :limit => params[:limit])
     respond_with(@uploads) do |format|
       format.xml do
         render :xml => @uploads.to_xml(:root => "uploads")

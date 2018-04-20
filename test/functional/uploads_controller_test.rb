@@ -23,6 +23,13 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           assert_no_match(/59523577_ugoira0\.jpg/, response.body)
         end
       end
+
+      context "for a blank source" do
+        should "render" do
+          get_auth batch_uploads_path, @user
+          assert_response :success
+        end
+      end
     end
 
     context "new action" do
@@ -56,18 +63,28 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       setup do
         as_user do
-          @upload = create(:source_upload)
+          @upload = create(:source_upload, tag_string: "foo bar")
         end
       end
 
       should "render" do
-        get_auth uploads_path, @user
+        get uploads_path
         assert_response :success
       end
 
       context "with search parameters" do
         should "render" do
-          get_auth uploads_path, @user, params: {:search => {:source => @upload.source}}
+          search_params = {
+            uploader_name: @upload.uploader_name,
+            source_matches: @upload.source,
+            rating: @upload.rating,
+            has_post: "yes",
+            post_tags_match: @upload.tag_string,
+            status: @upload.status,
+            server: @upload.server,
+          }
+
+          get uploads_path, params: { search: search_params }
           assert_response :success
         end
       end
