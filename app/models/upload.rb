@@ -391,19 +391,65 @@ class Upload < ApplicationRecord
       where(:status => "pending")
     end
 
+    def post_tags_match(query)
+      PostQueryBuilder.new(query).build(self.joins(:post)).reorder("")
+    end
+
     def search(params)
       q = super
 
       if params[:uploader_id].present?
-        q = q.uploaded_by(params[:uploader_id].to_i)
+        q = q.attribute_matches(:uploader_id, params[:uploader_id])
       end
 
       if params[:uploader_name].present?
-        q = q.where("uploader_id = (select _.id from users _ where lower(_.name) = ?)", params[:uploader_name].mb_chars.downcase)
+        q = q.where(uploader_id: User.name_to_id(params[:uploader_name]))
       end
 
       if params[:source].present?
-        q = q.where("source = ?", params[:source])
+        q = q.where(source: params[:source])
+      end
+
+      if params[:source_matches].present?
+        q = q.where("uploads.source LIKE ? ESCAPE E'\\\\'", params[:source_matches].to_escaped_for_sql_like)
+      end
+
+      if params[:rating].present?
+        q = q.where(rating: params[:rating])
+      end
+
+      if params[:parent_id].present?
+        q = q.attribute_matches(:rating, params[:parent_id])
+      end
+
+      if params[:post_id].present?
+        q = q.attribute_matches(:post_id, params[:post_id])
+      end
+
+      if params[:has_post] == "yes"
+        q = q.where.not(post_id: nil)
+      elsif params[:has_post] == "no"
+        q = q.where(post_id: nil)
+      end
+
+      if params[:post_tags_match].present?
+        q = q.post_tags_match(params[:post_tags_match])
+      end
+
+      if params[:status].present?
+        q = q.where("uploads.status LIKE ? ESCAPE E'\\\\'", params[:status].to_escaped_for_sql_like)
+      end
+
+      if params[:backtrace].present?
+        q = q.where("uploads.backtrace LIKE ? ESCAPE E'\\\\'", params[:backtrace].to_escaped_for_sql_like)
+      end
+
+      if params[:tag_string].present?
+        q = q.where("uploads.tag_string LIKE ? ESCAPE E'\\\\'", params[:tag_string].to_escaped_for_sql_like)
+      end
+
+      if params[:server].present?
+        q = q.where(server: params[:server])
       end
 
       q.apply_default_order(params)
