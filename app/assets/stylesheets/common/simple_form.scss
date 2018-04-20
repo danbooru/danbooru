@@ -71,6 +71,17 @@ form.inline-form {
   }
 }
 
+form.one-line-form {
+  > input, > div.input {
+    display: inline;
+
+    label {
+      display: inline;
+      margin-right: 1em;
+    }
+  }
+}
+
 div.ui-dialog {
   div.input {
     input[type="text"] {

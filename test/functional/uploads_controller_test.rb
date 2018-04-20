@@ -23,6 +23,13 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           assert_no_match(/59523577_ugoira0\.jpg/, response.body)
         end
       end
+
+      context "for a blank source" do
+        should "render" do
+          get_auth batch_uploads_path, @user
+          assert_response :success
+        end
+      end
     end
 
     context "new action" do

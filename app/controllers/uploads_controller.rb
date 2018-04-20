@@ -20,9 +20,15 @@ class UploadsController < ApplicationController
   end
 
   def batch
-    @source = Sources::Site.new(params[:url], :referer_url => params[:ref])
-    @source.get
-    @urls = @source.image_urls
+    @url = params.dig(:batch, :url) || params[:url]
+    @source = nil
+
+    if @url
+      @source = Sources::Site.new(@url, :referer_url => params[:ref])
+      @source.get
+    end
+
+    respond_with(@source)
   end
 
   def image_proxy
