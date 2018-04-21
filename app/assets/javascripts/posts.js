@@ -398,7 +398,8 @@
   Danbooru.Post.resize_image_to_window = function($img) {
     if (($img.data("scale-factor") === 1) || ($img.data("scale-factor") === undefined)) {
       if ($(window).width() > 660) {
-        var client_width = $(window).width() - $("#sidebar").width() - 75;
+        var sidebar_width = $("#sidebar").width() || 0;
+        var client_width = $(window).width() - sidebar_width - 75;
       } else {
         var client_width = $(window).width() - 2;
       }
