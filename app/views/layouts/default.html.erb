@@ -31,14 +31,7 @@
   <% if CurrentUser.user.custom_style.present? %>
     <%= stylesheet_link_tag custom_style_users_path, :media => "screen" %>
   <% end %>
-  <script
-  src="https://code.jquery.com/jquery-3.3.1.min.js"
-  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-  crossorigin="anonymous"></script>
-  <script
-  src="https://code.jquery.com/jquery-migrate-3.0.1.min.js"
-  integrity="sha256-F0O1TmEa4I8N24nY0bya59eP6svWcshqX1uzwaWC4F4="
-  crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
   <%= javascript_include_tag "application" %>
   <%= raw Danbooru.config.custom_html_header_content %>
   <%= yield :html_header %>
