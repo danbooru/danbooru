@@ -6,7 +6,7 @@ gem "sass-rails"
 gem "sprockets-rails", :require => "sprockets/railtie"
 gem "uglifier"
 gem "therubyracer", :platforms => :ruby
-gem "rails", "~> 5.1"
+gem "rails", "~> 5.2"
 gem "pg"
 gem "dalli", :platforms => :ruby
 gem "memcache-client", :platforms => [:mswin, :mingw, :x64_mingw]
