@@ -253,10 +253,9 @@ class Dmail < ApplicationRecord
   end
 
   def mark_as_read!
-    update_column(:is_read, true)
-
-    unless Dmail.where(:is_read => false, :owner_id => CurrentUser.user.id).exists?
-      CurrentUser.user.update_attribute(:has_mail, false)
+    owner.dmails.unread.count.tap do |unread_count|
+      update_column(:is_read, true)
+      owner.update(has_mail: (unread_count > 0), unread_dmail_count: unread_count)
     end
   end
 
@@ -276,7 +275,7 @@ class Dmail < ApplicationRecord
 
   def update_recipient
     if owner_id != CurrentUser.user.id && !is_deleted? && !is_read?
-      to.update_attribute(:has_mail, true)
+      to.update(has_mail: true, unread_dmail_count: to.dmails.unread.count)
     end
   end
   

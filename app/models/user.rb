@@ -928,7 +928,7 @@ class User < ApplicationRecord
 
   def dmail_count
     if has_mail?
-      "(#{dmails.unread.count})"
+      "(#{unread_dmail_count})"
     else
       ""
     end

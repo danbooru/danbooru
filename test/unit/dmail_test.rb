@@ -174,18 +174,20 @@ class DmailTest < ActiveSupport::TestCase
     end
 
     should "notify the recipient he has mail" do
-      @recipient = FactoryBot.create(:user)
-      dmail = FactoryBot.create(:dmail, :owner => @recipient)
-      recipient = dmail.to
+      recipient = FactoryBot.create(:user)
+      Dmail.create_split(title: "hello", body: "hello", to_id: recipient.id)
+      dmail = Dmail.where(owner_id: recipient.id).last
       recipient.reload
       assert(recipient.has_mail?)
+      assert_equal(1, recipient.unread_dmail_count)
 
       CurrentUser.scoped(recipient) do
         dmail.mark_as_read!
       end
 
       recipient.reload
-      assert(!recipient.has_mail?)
+      refute(recipient.has_mail?)
+      assert_equal(0, recipient.unread_dmail_count)
     end
 
     context "that is automated" do
