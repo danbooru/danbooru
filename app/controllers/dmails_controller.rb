@@ -52,8 +52,7 @@ class DmailsController < ApplicationController
     Dmail.visible.unread.each do |x|
       x.update_column(:is_read, true)
     end
-    CurrentUser.user.has_mail = false
-    CurrentUser.user.save
+    CurrentUser.user.update(has_mail: false, unread_dmail_count: 0)
   end
 
   def spam
