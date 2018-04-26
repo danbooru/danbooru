@@ -1,4 +1,4 @@
-class CreateTagSubscriptions < ActiveRecord::Migration
+class CreateTagSubscriptions < ActiveRecord::Migration[4.2]
   def self.up
     create_table :tag_subscriptions do |t|
       t.column :creator_id, :integer, :null => false

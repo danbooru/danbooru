@@ -1,0 +1,14 @@
+<%-
+# vote
+# forum_post
+%>
+
+<li class="vote-score-<%= vote.vote_type %>">
+  <% if vote.creator_id == CurrentUser.id %>
+    <%= link_to content_tag(:i, nil, class: "far #{vote.fa_class}"), forum_post_votes_path(forum_post_id: forum_post.id, format: "js"), remote: true, method: :delete %>
+    <%= link_to_user vote.creator %>
+  <% else %>
+    <%= content_tag(:i, nil, class: "far #{vote.fa_class}") %>
+    <%= link_to_user vote.creator %>
+  <% end %>
+</li>

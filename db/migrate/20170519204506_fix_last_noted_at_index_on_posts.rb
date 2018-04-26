@@ -1,4 +1,4 @@
-class FixLastNotedAtIndexOnPosts < ActiveRecord::Migration
+class FixLastNotedAtIndexOnPosts < ActiveRecord::Migration[4.2]
   def up
     Post.without_timeout do
       remove_index :posts, column: :last_comment_bumped_at

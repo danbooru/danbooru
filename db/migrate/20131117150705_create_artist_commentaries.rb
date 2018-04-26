@@ -1,4 +1,4 @@
-class CreateArtistCommentaries < ActiveRecord::Migration
+class CreateArtistCommentaries < ActiveRecord::Migration[4.2]
   def self.up
     create_table :artist_commentaries do |t|
       t.integer :post_id, :null => false

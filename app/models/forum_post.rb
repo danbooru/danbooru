@@ -5,6 +5,7 @@ class ForumPost < ApplicationRecord
   belongs_to_creator
   belongs_to_updater
   belongs_to :topic, :class_name => "ForumTopic"
+  has_many :votes, class_name: "ForumPostVote"
   before_validation :initialize_is_deleted, :on => :create
   after_create :update_topic_updated_at_on_create
   after_update :update_topic_updated_at_on_update_for_original_posts
@@ -128,6 +129,10 @@ class ForumPost < ApplicationRecord
     end
   end
 
+  def voted?(user, score)
+    votes.where(creator_id: user.id, score: score).exists?
+  end
+
   def validate_topic_is_unlocked
     return if CurrentUser.is_moderator?
     return if topic.nil?
@@ -228,8 +233,12 @@ class ForumPost < ApplicationRecord
     ((ForumPost.where("topic_id = ? and created_at <= ?", topic_id, created_at).count) / Danbooru.config.posts_per_page.to_f).ceil
   end
 
-  def is_original_post?
-    ForumPost.exists?(["id = ? and id = (select _.id from forum_posts _ where _.topic_id = ? order by _.id asc limit 1)", id, topic_id])
+  def is_original_post?(original_post_id = nil)
+    if original_post_id
+      return id == original_post_id
+    else
+      ForumPost.exists?(["id = ? and id = (select _.id from forum_posts _ where _.topic_id = ? order by _.id asc limit 1)", id, topic_id])
+    end
   end
 
   def delete_topic_if_original_post

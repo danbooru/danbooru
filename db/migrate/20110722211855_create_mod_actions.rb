@@ -1,4 +1,4 @@
-class CreateModActions < ActiveRecord::Migration
+class CreateModActions < ActiveRecord::Migration[4.2]
   def change
     create_table :mod_actions do |t|
       t.column :creator_id, :integer, :null => false

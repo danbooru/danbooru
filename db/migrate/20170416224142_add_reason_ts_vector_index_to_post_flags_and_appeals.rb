@@ -1,4 +1,4 @@
-class AddReasonTsVectorIndexToPostFlagsAndAppeals < ActiveRecord::Migration
+class AddReasonTsVectorIndexToPostFlagsAndAppeals < ActiveRecord::Migration[4.2]
   def up
     execute "SET statement_timeout = 0"
     execute "CREATE INDEX index_post_flags_on_reason_tsvector ON post_flags USING gin (to_tsvector('pg_catalog.english', reason))"

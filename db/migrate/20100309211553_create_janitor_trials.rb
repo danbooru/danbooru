@@ -1,4 +1,4 @@
-class CreateJanitorTrials < ActiveRecord::Migration
+class CreateJanitorTrials < ActiveRecord::Migration[4.2]
   def self.up
     create_table :janitor_trials do |t|
       t.column :creator_id, :integer, :null => false

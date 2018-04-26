@@ -1,4 +1,4 @@
-class CreateArtists < ActiveRecord::Migration
+class CreateArtists < ActiveRecord::Migration[4.2]
   def self.up
     create_table :artists do |t|
       t.column :name, :string, :null => false

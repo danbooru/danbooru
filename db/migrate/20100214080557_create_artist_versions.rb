@@ -1,4 +1,4 @@
-class CreateArtistVersions < ActiveRecord::Migration
+class CreateArtistVersions < ActiveRecord::Migration[4.2]
   def self.up
     create_table :artist_versions do |t|
       t.column :artist_id, :integer, :null => false

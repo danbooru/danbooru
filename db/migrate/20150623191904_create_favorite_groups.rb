@@ -1,4 +1,4 @@
-class CreateFavoriteGroups < ActiveRecord::Migration
+class CreateFavoriteGroups < ActiveRecord::Migration[4.2]
   def self.up
     create_table :favorite_groups do |t|
       t.text :name, :null => false

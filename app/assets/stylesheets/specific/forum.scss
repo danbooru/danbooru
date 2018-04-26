@@ -5,8 +5,28 @@ div.list-of-forum-posts {
     word-wrap: break-word;
     box-shadow: 1px 1px 2px #AAA;
 
+    a.voted {
+      font-weight: bold;
+    }
+    
+    span.desc {
+      color: grey;
+    }
+
     &:target {
       background-color: #FFC;
+    }
+
+    .vote-score-up {
+      color: green;
+    }
+
+    .vote-score-meh {
+      color: goldenrod;
+    }
+
+    .vote-score-down {
+      color: red;
     }
 
     div.author {
@@ -25,6 +45,10 @@ div.list-of-forum-posts {
 
       menu {
         margin-top: 0.5em;
+
+        ul.votes {
+          margin: 0.5em 0;
+        }
 
         li {
           margin-right: 1em;

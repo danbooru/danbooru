@@ -1,4 +1,4 @@
-class CreateForumSubscriptions < ActiveRecord::Migration
+class CreateForumSubscriptions < ActiveRecord::Migration[4.2]
   def change
     create_table :forum_subscriptions do |t|
       t.integer :user_id

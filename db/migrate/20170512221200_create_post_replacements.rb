@@ -1,4 +1,4 @@
-class CreatePostReplacements < ActiveRecord::Migration
+class CreatePostReplacements < ActiveRecord::Migration[4.2]
   def change
     create_table :post_replacements do |t|
     	t.integer :post_id, null: false

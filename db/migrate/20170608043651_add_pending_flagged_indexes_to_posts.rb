@@ -1,4 +1,4 @@
-class AddPendingFlaggedIndexesToPosts < ActiveRecord::Migration
+class AddPendingFlaggedIndexesToPosts < ActiveRecord::Migration[4.2]
   def change
     Post.without_timeout do
       add_index :posts, :is_pending, where: "is_pending = true"

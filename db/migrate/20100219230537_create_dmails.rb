@@ -1,4 +1,4 @@
-class CreateDmails < ActiveRecord::Migration
+class CreateDmails < ActiveRecord::Migration[4.2]
   def self.up
     create_table :dmails do |t|
       t.column :owner_id, :integer, :null => false
