@@ -128,7 +128,7 @@ class ApplicationController < ActionController::Base
   def authentication_failed
     respond_to do |fmt|
       fmt.html do
-        render :text => "authentication failed", :status => 401
+        render :plain => "authentication failed", :status => 401
       end
 
       fmt.xml do

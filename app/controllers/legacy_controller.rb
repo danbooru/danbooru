@@ -44,7 +44,7 @@ class LegacyController < ApplicationController
   end
 
   def unavailable
-    render :text => "this resource is no longer available", :status => 410
+    render :plain => "this resource is no longer available", :status => 410
   end
 
 private

@@ -37,7 +37,7 @@
       $.get("/related_tag.json", {
         "query": Danbooru.RelatedTag.current_tag(),
         "category": category
-      }).success(Danbooru.RelatedTag.process_response);
+      }, Danbooru.RelatedTag.process_response);
       $("#artist-tags-container").hide();
       e.preventDefault();
     });
@@ -273,7 +273,7 @@
     $("#artist-tags").html("<em>Loading...</em>");
     var url = $("#upload_source,#post_source");
     var referer_url = $("#upload_referer_url");
-    $.get("/artists/finder.json", {"url": url.val(), "referer_url": referer_url.val()}).success(Danbooru.RelatedTag.process_artist);
+    $.get("/artists/finder.json", {"url": url.val(), "referer_url": referer_url.val()}, Danbooru.RelatedTag.process_artist);
     e.preventDefault();
   }
 
