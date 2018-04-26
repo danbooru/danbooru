@@ -66,12 +66,6 @@ div#c-comments {
         margin-right: 0.3em;
       }
 
-      div.list-of-tags {
-        a {
-          margin-right: 0.5em;
-        }
-      }
-
       div.notices {
         margin: 1em 0;
       }
@@ -132,12 +126,6 @@ div#c-comments {
 
     div.post.blacklisted.blacklisted-active {
       display: none;
-    }
-    
-    div.list-of-tags {
-      span {
-        display: inline-block;
-      }
     }
   }
 }

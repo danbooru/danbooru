@@ -1,5 +1,6 @@
 class PostPresenter < Presenter
   attr_reader :pool, :next_post_in_pool
+  delegate :tag_list_html, :split_tag_list_html, :inline_tag_list_html, :split_inline_tag_list_html, to: :tag_set_presenter
 
   def self.preview(post, options = {})
     if post.nil?
@@ -162,10 +163,6 @@ class PostPresenter < Presenter
     categorized_tag_groups.join(" \n")
   end
 
-  def humanized_categorized_tag_string
-    categorized_tag_groups.flatten.slice(0, 25).join(", ").tr("_", " ")
-  end
-
   def safe_mode_message(template)
     html = ["This image is unavailable on safe mode (#{Danbooru.config.app_name}). Go to "]
     html << template.link_to("Danbooru", "https://danbooru.donmai.us") # XXX don't hardcode.
@@ -191,18 +188,6 @@ class PostPresenter < Presenter
     elsif @post.is_image?
       template.render("posts/partials/show/image", :post => @post)
     end
-  end
-
-  def tag_list_html(template, options = {})
-    tag_set_presenter.tag_list_html(template, options.merge(:show_extra_links => CurrentUser.user.is_gold?))
-  end
-
-  def split_tag_list_html(template, options = {})
-    tag_set_presenter.split_tag_list_html(template, options.merge(:show_extra_links => CurrentUser.user.is_gold?))
-  end
-
-  def inline_tag_list_html(template)
-    tag_set_presenter.inline_tag_list(template)
   end
 
   def has_nav_links?(template)

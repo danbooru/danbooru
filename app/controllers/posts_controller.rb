@@ -31,7 +31,10 @@ class PostsController < ApplicationController
     include_deleted = @post.is_deleted? || (@post.parent_id.present? && @post.parent.is_deleted?) || CurrentUser.user.show_deleted_children?
     @parent_post_set = PostSets::PostRelationship.new(@post.parent_id, :include_deleted => include_deleted)
     @children_post_set = PostSets::PostRelationship.new(@post.id, :include_deleted => include_deleted)
-    respond_with(@post)
+
+    respond_with(@post) do |format|
+      format.html.tooltip { render layout: false }
+    end
   end
 
   def show_seq

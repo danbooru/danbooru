@@ -1,0 +1,33 @@
+<% TagCategory.css_mapping.each do |category,cssmap| %>
+  .category-<%= category %> a, a.tag-type-<%= category %>, .ui-state-focus a.tag-type-<%= category %> {
+    color: <%= cssmap["color"] %>;
+
+    &:hover {
+      color: <%= cssmap["hover"] %>;
+    }
+  }
+<% end %>
+
+.category-banned a, a.tag-type-banned, .ui-state-focus a.tag-type-banned {
+  color: black;
+  background-color: red;
+}
+
+.inline-tag-list {
+  ul {
+    display: inline;
+
+    li {
+      display: inline;
+      margin-right: 0.5em;
+    }
+  }
+}
+
+.split-inline-tag-list {
+  @extend .inline-tag-list;
+
+  ul {
+    display: block;
+  }
+}

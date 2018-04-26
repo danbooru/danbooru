@@ -1,0 +1,51 @@
+Danbooru.PostTooltip = {};
+
+Danbooru.PostTooltip.render_tooltip = function (event, qtip) {
+  var post_id = $(event.target).parents("[data-id]").data("id");
+
+  return $.get("/posts/" + post_id, { variant: "tooltip" }).done(function () {
+    qtip.elements.tooltip.removeClass("post-tooltip-loading");
+  });
+};
+
+// http://qtip2.com/options
+Danbooru.PostTooltip.QTIP_OPTIONS = {
+  style: "qtip-light post-tooltip",
+  content: Danbooru.PostTooltip.render_tooltip,
+  overwrite: false,
+  position: {
+    my: "top left",
+    at: "bottom left",
+    target: "mouse",
+    viewport: $(window),
+    adjust: {
+      mouse: false,
+      y: 25,
+      method: "shift",
+    },
+  },
+  show: {
+    solo: true,
+    delay: 300,
+    effect: false,
+    ready: true,
+    event: "mouseenter",
+  },
+  hide: {
+    delay: 50,
+    fixed: true,
+    effect: false,
+    event: "mouseleave",
+  },
+  events: {
+    show: function (event, qtip) { qtip.elements.tooltip.addClass("post-tooltip-loading"); },
+  },
+};
+
+Danbooru.PostTooltip.initialize = function () {
+  $(document).on("mouseenter", ".post-preview img", function (event) {
+    $(this).qtip(Danbooru.PostTooltip.QTIP_OPTIONS, event);
+  });
+};
+
+$(document).ready(Danbooru.PostTooltip.initialize);

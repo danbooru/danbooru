@@ -1,0 +1,12 @@
+.post-tooltip {
+  max-width: 660px;
+  border-color: #767676;
+
+  .qtip-content {
+    padding: 4px 6px;
+  }
+
+  &.post-tooltip-loading {
+    display: none !important;
+  }
+}

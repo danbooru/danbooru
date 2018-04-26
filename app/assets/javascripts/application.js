@@ -6,6 +6,7 @@
 //= require jquery.storageapi.js
 //= require jquery.dropdown.min.js
 //= require jquery.hammer.js
+//= require jquery.qtip.js
 //= require ugoira_player.js
 //= require stupidtable.js
 //= require rails.js
