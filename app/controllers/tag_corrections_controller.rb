@@ -1,5 +1,5 @@
 class TagCorrectionsController < ApplicationController
-  before_action :builder_only
+  before_action :builder_only, only: [:new, :create]
 
   def new
     @correction = TagCorrection.new(params[:tag_id])

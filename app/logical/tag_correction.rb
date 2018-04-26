@@ -19,7 +19,7 @@ class TagCorrection
   end
 
   def fill_hash!
-    res = HTTParty.get("http://#{hostname}/tags/#{tag_id}/correction.json", Danbooru.config.httparty_options)
+    res = HTTParty.get("https://#{hostname}.#{Danbooru.config.domain}/tags/#{tag_id}/correction.json", Danbooru.config.httparty_options)
     if res.success?
       json = JSON.parse(res.body)
       statistics_hash["category_cache"] = json["category_cache"]

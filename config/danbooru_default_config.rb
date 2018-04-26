@@ -20,6 +20,10 @@ module Danbooru
       "Find good anime art fast"
     end
 
+    def domain
+      "donmai.us"
+    end
+
     # The canonical hostname of the site.
     def hostname
       Socket.gethostname
