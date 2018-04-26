@@ -22,16 +22,16 @@ class TagSetPresenter < Presenter
     html.html_safe
   end
 
-  def split_tag_list_html(template, options = {})
+  def split_tag_list_html(template, category_list: TagCategory.split_header_list, headers: true, **options)
     html = ""
 
-    TagCategory.split_header_list.each do |category|
+    category_list.each do |category|
       typetags = typed_tags(category)
       if typetags.any?
-        html << TagCategory.header_mapping[category]
+        html << TagCategory.header_mapping[category] if headers
         html << %{<ul class="#{category}-tag-list">}
         typetags.each do |tag|
-          html << build_list_item(tag, template, options)
+          html << build_list_item(tag, template, **options)
         end
         html << "</ul>"
       end
@@ -41,7 +41,7 @@ class TagSetPresenter < Presenter
   end
 
   # compact (horizontal) list, as seen in the /comments index.
-  def inline_tag_list(template)
+  def inline_tag_list_html(template)
     @tags.map do |tag_name|
       <<-EOS
         <span class="category-#{categories[tag_name]}">
@@ -51,7 +51,8 @@ class TagSetPresenter < Presenter
     end.join.html_safe
   end
 
-private
+  private
+
   def typed_tags(name)
     @typed_tags ||= {}
     @typed_tags[name] ||= begin
@@ -72,34 +73,33 @@ private
     end
   end
 
-  def build_list_item(tag, template, options)
+  def build_list_item(tag, template, name_only: false, humanize_tags: true, show_extra_links: CurrentUser.is_gold?)
     html = ""
     html << %{<li class="category-#{categories[tag]}">}
     current_query = template.params[:tags] || ""
 
-    unless options[:name_only]
+    unless name_only
       if categories[tag] == Tag.categories.artist
         html << %{<a class="wiki-link" href="/artists/show_or_new?name=#{u(tag)}">?</a> }
       else
         html << %{<a class="wiki-link" href="/wiki_pages/show_or_new?title=#{u(tag)}">?</a> }
       end
 
-      if CurrentUser.user.is_gold? && current_query.present?
+      if show_extra_links && current_query.present?
         html << %{<a rel="nofollow" href="/posts?tags=#{u(current_query)}+#{u(tag)}" class="search-inc-tag">+</a> }
         html << %{<a rel="nofollow" href="/posts?tags=#{u(current_query)}+-#{u(tag)}" class="search-exl-tag">&ndash;</a> }
       end
     end
 
-    humanized_tag = tag.tr("_", " ")
-    path = options[:path_prefix] || "/posts"
+    humanized_tag = humanize_tags ? tag.tr("_", " ") : tag
     if categories[tag] == Tag.categories.artist
       itemprop = 'itemprop="author"'
     else
       itemprop = nil
     end
-    html << %{<a class="search-tag" #{itemprop} href="#{path}?tags=#{u(tag)}">#{h(humanized_tag)}</a> }
+    html << %{<a class="search-tag" #{itemprop} href="/posts?tags=#{u(tag)}">#{h(humanized_tag)}</a> }
 
-    unless options[:name_only]
+    unless name_only
       if counts[tag].to_i >= 10_000
         post_count = "#{counts[tag].to_i / 1_000}k"
       elsif counts[tag].to_i >= 1_000
