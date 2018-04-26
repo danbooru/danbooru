@@ -9,6 +9,7 @@ class ApplicationController < ActionController::Base
   before_action :set_started_at_session
   before_action :api_check
   before_action :set_safe_mode
+  before_action :set_variant
   # before_action :secure_cookies_check
   layout "default"
   helper_method :show_moderation_notice?
@@ -182,6 +183,10 @@ class ApplicationController < ActionController::Base
     if session[:started_at].blank?
       session[:started_at] = Time.now
     end
+  end
+
+  def set_variant
+    request.variant = params[:variant].try(:to_sym)
   end
 
   User::Roles.each do |role|
