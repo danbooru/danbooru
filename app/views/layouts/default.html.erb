@@ -27,11 +27,13 @@
   <meta name="disable-labeled-saved-searches" content="<%= CurrentUser.disable_categorized_saved_searches? %>">
   <%= content_tag(:meta, nil, name: "disable-mobile-gestures", content: CurrentUser.disable_mobile_gestures?) %>
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" integrity="sha256-rByPlHULObEjJ6XQxW/flG2r+22R5dKiAoef+aXWfik=" crossorigin="anonymous" />
   <%= stylesheet_link_tag "application", :media => "screen" %>
   <% if CurrentUser.user.custom_style.present? %>
     <%= stylesheet_link_tag custom_style_users_path, :media => "screen" %>
   <% end %>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha256-KM512VNnjElC30ehFwehXjx1YCHPiQkOPmqnrWtpccM=" crossorigin="anonymous"></script>
   <%= javascript_include_tag "application" %>
   <%= raw Danbooru.config.custom_html_header_content %>
   <%= yield :html_header %>
