@@ -52,6 +52,17 @@ class PoolTest < ActiveSupport::TestCase
     end
   end
 
+  context "Creating a pool" do
+    setup do
+      @posts = FactoryBot.create_list(:post, 5)
+      @pool = FactoryBot.create(:pool, post_ids: @posts.map(&:id).join(" "))
+    end
+
+    should "initialize the post count" do
+      assert_equal(@posts.size, @pool.post_count)
+    end
+  end
+
   context "Reverting a pool" do
     setup do
       PoolArchive.stubs(:enabled?).returns(true)
@@ -112,6 +123,18 @@ class PoolTest < ActiveSupport::TestCase
     context "by adding a new post" do
       setup do
         @pool.add!(@p1)
+      end
+
+      context "by #attributes=" do
+        setup do
+          @pool.attributes = {post_ids: [@p1, @p2].map(&:id).join(" ")}
+          @pool.synchronize
+          @pool.save
+        end
+
+        should "initialize the post count" do
+          assert_equal(2, @pool.post_count)
+        end
       end
 
       should "add the post to the pool" do
