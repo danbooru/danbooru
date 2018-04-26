@@ -4,8 +4,6 @@
   Danbooru.Post.pending_update_count = 0;
 
   Danbooru.Post.initialize_all = function() {
-    this.initialize_post_previews();
-
     if ($("#c-posts").length) {
       this.initialize_shortcuts();
       this.initialize_saved_searches();
@@ -321,28 +319,6 @@
     });
   }
 
-  Danbooru.Post.initialize_post_previews = function() {
-    $(".post-preview").each(function(i, v) {
-      Danbooru.Post.initialize_title_for(v);
-    });
-  }
-
-  Danbooru.Post.initialize_title_for = function(post) {
-    var $post = $(post);
-    var $img = $post.find("img");
-    var score = null;
-    if ($post.data("views")) {
-      score = " views:" + $post.data("views");
-    } else {
-      score = " score:" + $post.data("score");
-    }
-    var uploader = " ";
-    if ($post.attr("data-uploader")) {
-      uploader += "user:" + $post.attr("data-uploader").replace(/_/g, " ");
-    }
-    $img.attr("title", $post.attr("data-tags") + uploader + " rating:" + $post.data("rating") + score);
-  }
-
   Danbooru.Post.expand_image = function(e) {
     if (Danbooru.test_max_width(660)) {
       // just do the default behavior
@@ -519,7 +495,6 @@
     if (data.has_visible_children) {
       $post.addClass("post-status-has-children");
     }
-    Danbooru.Post.initialize_title_for($post);
   }
 
   Danbooru.Post.vote = function(score, id) {
