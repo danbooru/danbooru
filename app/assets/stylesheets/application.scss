@@ -6,5 +6,5 @@
 // directory and load them explicitly to work around this.
 // https://github.com/rails/sass-rails/issues/185
 @import "specific/*";
-@import "specific/erb/posts";
 @import "specific/erb/mod_queue";
+@import "common/erb/tags";

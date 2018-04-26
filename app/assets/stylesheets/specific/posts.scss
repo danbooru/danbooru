@@ -1,4 +1,4 @@
-@import "../../common/000_vars.scss";
+@import "../common/000_vars.scss";
 
 article.post-preview {
   height: 154px;
@@ -177,21 +177,6 @@ body[data-user-can-approve-posts="true"] .post-preview {
     margin: 0;
     padding: 5px 5px 10px;
   }
-}
-
-<% TagCategory.css_mapping.each do |category,cssmap| %>
-  .category-<%= category %> a, a.tag-type-<%= category %>, .ui-state-focus a.tag-type-<%= category %> {
-    color: <%= cssmap["color"] %>;
-
-    &:hover {
-      color: <%= cssmap["hover"] %>;
-    }
-  }
-<% end %>
-
-.category-banned a, a.tag-type-banned,, .ui-state-focus a.tag-type-banned {
-  color: black;
-  background-color: red;
 }
 
 .post-count {

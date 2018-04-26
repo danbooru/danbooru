@@ -41,14 +41,9 @@ class TagSetPresenter < Presenter
   end
 
   # compact (horizontal) list, as seen in the /comments index.
-  def inline_tag_list_html(template)
-    @tags.map do |tag_name|
-      <<-EOS
-        <span class="category-#{categories[tag_name]}">
-          #{template.link_to(tag_name.tr("_", " "), template.posts_path(tags: tag_name))}
-        </span>
-      EOS
-    end.join.html_safe
+  def inline_tag_list_html(template, classes: "inline-tag-list", **options)
+    html = split_tag_list_html(template, category_list: TagCategory.categorized_list, headers: false, name_only: true, humanize_tags: true, **options)
+    template.tag.span(html, class: classes)
   end
 
   private
