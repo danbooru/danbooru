@@ -2,6 +2,7 @@
 
 <div class="post-tooltip-metatags">
   <%= link_to_search "user:#{@post.uploader_name}" if CurrentUser.is_moderator? %>
+  <%= link_to "toptagger:#{@post.keeper.name}", user_path(@post.keeper) %>
   <%= link_to_search "rating:#{@post.pretty_rating.downcase}" %>
   <%= link_to_search "score:#{@post.score}" %>
 </div>
