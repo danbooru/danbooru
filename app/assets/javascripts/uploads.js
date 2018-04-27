@@ -8,7 +8,7 @@
     }
 
     if ($("#c-uploads").length) {
-      $("#image").load(this.initialize_image);
+      $("#image").on("load", this.initialize_image);
       this.initialize_info_bookmarklet();
       this.initialize_similar();
       this.initialize_shortcuts();
