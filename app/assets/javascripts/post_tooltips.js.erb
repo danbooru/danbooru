@@ -8,6 +8,8 @@ Danbooru.PostTooltip.render_tooltip = function (event, qtip) {
   });
 };
 
+Danbooru.PostTooltip.POST_SELECTOR = "*:not(.ui-sortable-handle) > .post-preview img";
+
 // http://qtip2.com/options
 Danbooru.PostTooltip.QTIP_OPTIONS = {
   style: "qtip-light post-tooltip",
@@ -43,7 +45,7 @@ Danbooru.PostTooltip.QTIP_OPTIONS = {
 };
 
 Danbooru.PostTooltip.initialize = function () {
-  $(document).on("mouseenter", ".post-preview img", function (event) {
+  $(document).on("mouseenter", Danbooru.PostTooltip.POST_SELECTOR, function (event) {
     $(this).qtip(Danbooru.PostTooltip.QTIP_OPTIONS, event);
   });
 };
