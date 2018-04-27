@@ -115,11 +115,6 @@
         var metatag = query.metatag;
         var term = query.term;
 
-        if (!term) {
-          this.close();
-          return;
-        }
-
         switch(metatag) {
         case "md5":
         case "width":
