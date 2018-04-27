@@ -29,13 +29,14 @@ $(function() {
     e.preventDefault();
   });
 
-  $("#desktop-version-link a").click(function() {
-    $.ajax("/users/" + Danbooru.meta("current-user-id"), {
+  $("#desktop-version-link a").click(function(e) {
+    e.preventDefault();
+    $.ajax("/users/" + Danbooru.meta("current-user-id") + ".json", {
       method: "PUT",
       data: {
         "user[disable_responsive_mode]": "true"
       }
-    }).success(function() {
+    }).then(function() {
       location.reload();
     });
   });
