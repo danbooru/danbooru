@@ -1,4 +1,5 @@
 set :output, "/var/log/whenever.log"
+env "MAILTO", "webmaster@danbooru.donmai.us"
 
 every 1.hour do
   runner "UploadErrorChecker.new.check!"
@@ -9,9 +10,6 @@ every 1.day do
 end
 
 every 1.day, :at => "1:00 am" do
-  # command "cd /var/www/danbooru2/current ; script/donmai/backup_db"
-  # command "cd /var/www/danbooru2/current ; bundle exec ruby script/donmai/backup_db_to_s3"
-  # command "cd /var/www/danbooru2/current ; script/donmai/prune_backup_dbs"
   command "psql --set statement_timeout=0 -hdbserver -c \"vacuum analyze;\" danbooru2"
 end
 
@@ -21,14 +19,4 @@ end
 
 every 1.month, :at => "2:00 am" do
   runner "MonthlyMaintenance.new.run"
-end
-
-if environment == "production"
-  # every 30.minutes do
-  #   runner "PostUpdate.push"
-  # end
-
-  # every 1.hour do
-  #   runner "AmazonBackup.execute"
-  # end
 end
