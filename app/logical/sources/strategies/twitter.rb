@@ -7,11 +7,15 @@ module Sources::Strategies
     end
 
     def referer_url
-      if self.class.url_match?(@referer_url)
-        @referer_url
-      else
-        @url
-      end
+      normalized_url
+    end
+
+    def normalized_url
+      "https://twitter.com/#{artist_name}/status/#{status_id}"
+    end
+
+    def artist_name
+      api_response.attrs[:user][:screen_name]
     end
 
     def site_name
@@ -24,7 +28,6 @@ module Sources::Strategies
 
     def get
       attrs = api_response.attrs
-      @artist_name = attrs[:user][:name]
       @profile_url = "https://twitter.com/" + attrs[:user][:screen_name]
       @image_urls = TwitterService.new.image_urls(api_response)
       @image_url = @image_urls.first
@@ -62,7 +65,7 @@ module Sources::Strategies
     end
 
     def status_id
-      self.class.status_id_from_url(referer_url)
+      self.class.status_id_from_url(@url) || self.class.status_id_from_url(@referer_url)
     end
 
     # https://twitter.com/i/web/status/943446161586733056
