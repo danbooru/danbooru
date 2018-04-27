@@ -922,9 +922,11 @@ class Post < ApplicationRecord
       update_column(:fav_count, fav_count)
     end
 
-    def favorited_by?(user_id)
+    def favorited_by?(user_id = CurrentUser.id)
       !!(fav_string =~ /(?:\A| )fav:#{user_id}(?:\Z| )/)
     end
+
+    alias_method :is_favorited?, :favorited_by?
 
     def append_user_to_fav_string(user_id)
       update_column(:fav_string, (fav_string + " fav:#{user_id}").strip)
@@ -1478,7 +1480,7 @@ class Post < ApplicationRecord
     end
 
     def method_attributes
-      list = super + [:uploader_name, :has_large, :has_visible_children, :children_ids] + TagCategory.categories.map {|x| "tag_string_#{x}".to_sym}
+      list = super + [:uploader_name, :has_large, :has_visible_children, :children_ids, :is_favorited?] + TagCategory.categories.map {|x| "tag_string_#{x}".to_sym}
       if visible?
         list += [:file_url, :large_file_url, :preview_file_url]
       end
