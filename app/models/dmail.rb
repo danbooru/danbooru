@@ -114,8 +114,8 @@ class Dmail < ApplicationRecord
           dmail = Dmail.new(from: User.system, **params)
           dmail.owner = dmail.to
           dmail.save
+          dmail
         end
-        dmail
       end
     end
 
