@@ -10,4 +10,4 @@
   <br>
 <% end %>
 
-<p><%= link_to "View topic", forum_topic_path(@forum_topic, :page => @forum_topic.last_page, :host => Danbooru.config.hostname, :only_path => false) %> | <%= link_to "Unsubscribe", maintenance_user_email_notification_url(:user_id => @user.id, :sig => email_sig(@user), :host => Danbooru.config.hostname, :only_path => false) %></p>
+<p><%= link_to "View topic", forum_topic_url(@forum_topic, :page => @forum_topic.last_page, :host => Danbooru.config.hostname, :only_path => false) %> | <%= link_to "Unsubscribe", maintenance_user_email_notification_url(:user_id => @user.id, :sig => email_sig(@user), :host => Danbooru.config.hostname, :only_path => false) %></p>

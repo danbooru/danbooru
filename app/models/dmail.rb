@@ -110,9 +110,11 @@ class Dmail < ApplicationRecord
       end
 
       def create_automated(params)
-        dmail = Dmail.new(from: User.system, **params)
-        dmail.owner = dmail.to
-        dmail.save
+        CurrentUser.as_system do
+          dmail = Dmail.new(from: User.system, **params)
+          dmail.owner = dmail.to
+          dmail.save
+        end
         dmail
       end
     end

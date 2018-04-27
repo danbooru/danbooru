@@ -1,9 +1,6 @@
 require_relative 'boot'
 require 'rails/all'
 
-if defined?(Bundler)
-  Bundler.require(:default, Rails.env)
-end
 Bundler.require(*Rails.groups)
 
 require_relative "danbooru_default_config"
