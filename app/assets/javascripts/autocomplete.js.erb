@@ -344,7 +344,7 @@
       return;
     }
 
-    if ($autocomplete_menu.has(".ui-state-focus").length === 0) {
+    if ($autocomplete_menu.has(".ui-state-active").length === 0) {
       var $first_item = $autocomplete_menu.find(".ui-menu-item").first();
       var completion = $first_item.data().uiAutocompleteItem.value;
 
@@ -358,6 +358,7 @@
 
   Danbooru.Autocomplete.render_item = function(list, item) {
     var $link = $("<a/>");
+    var $menu_item = $("<div/>").append($link);
 
     if (item.antecedent) {
       var antecedent = item.antecedent.replace(/_/g, " ");
@@ -396,7 +397,7 @@
       $link.addClass("pool-category-" + item.category);
     }
 
-    return $("<li/>").data("item.autocomplete", item).append($link).appendTo(list);
+    return $("<li/>").data("item.autocomplete", item).append($menu_item).appendTo(list);
   };
 
   Danbooru.Autocomplete.static_metatags = {

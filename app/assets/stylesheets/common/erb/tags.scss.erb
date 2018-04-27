@@ -1,5 +1,5 @@
 <% TagCategory.css_mapping.each do |category,cssmap| %>
-  .category-<%= category %> a, a.tag-type-<%= category %>, .ui-state-focus a.tag-type-<%= category %> {
+  .category-<%= category %> a, a.tag-type-<%= category %>, .ui-state-active a.tag-type-<%= category %> {
     color: <%= cssmap["color"] %>;
 
     &:hover {
@@ -8,7 +8,7 @@
   }
 <% end %>
 
-.category-banned a, a.tag-type-banned, .ui-state-focus a.tag-type-banned {
+.category-banned a, a.tag-type-banned, .ui-state-active a.tag-type-banned {
   color: black;
   background-color: red;
 }
