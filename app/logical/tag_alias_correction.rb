@@ -22,7 +22,7 @@ class TagAliasCorrection
   end
 
   def fill_hash!
-    res = HTTParty.get("http://#{hostname}/tag_aliases/#{tag_alias_id}/correction.json", Danbooru.config.httparty_options)
+    res = HTTParty.get("https://#{hostname}.#{Danbooru.config.domain}/tag_aliases/#{tag_alias_id}/correction.json", Danbooru.config.httparty_options)
     if res.success?
       json = JSON.parse(res.body)
       statistics_hash["antecedent_cache"] = json["antecedent_cache"]
