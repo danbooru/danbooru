@@ -73,10 +73,10 @@
       var commentary = Danbooru.ArtistCommentary.from_post_id(id);
     }
 
-    commentary.then(Danbooru.ArtistCommentary.fill_commentary).done(function (success) {
+    commentary.then(Danbooru.ArtistCommentary.fill_commentary).then(function (success) {
       var message = success ? "Artist commentary copied." : "Artist commentary copied; conflicting fields ignored.";
       Danbooru.notice(message);
-    }).fail(function () {
+    }).catch(function () {
       Danbooru.notice("Fetching artist commentary failed.");
     });
 

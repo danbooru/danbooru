@@ -485,7 +485,7 @@ Danbooru.Note = {
       var text = $textarea.val();
       $note_body.data("original-body", text);
       Danbooru.Note.Body.set_text($note_body, $note_box, "Loading...");
-      $.get("/note_previews.json", {body: text}).success(function(data) {
+      $.get("/note_previews.json", {body: text}).then(function(data) {
         Danbooru.Note.Body.set_text($note_body, $note_box, data.body);
         Danbooru.Note.Box.resize_inner_border($note_box);
         $note_body.show();
@@ -518,7 +518,7 @@ Danbooru.Note = {
       var $note_box = Danbooru.Note.Box.find(id);
       $note_box.find(".note-box-inner-border").addClass("unsaved");
       Danbooru.Note.Body.set_text($note_body, $note_box, "Loading...");
-      $.get("/note_previews.json", {body: text}).success(function(data) {
+      $.get("/note_previews.json", {body: text}).then(function(data) {
         Danbooru.Note.Body.set_text($note_body, $note_box, data.body);
         $note_body.show();
       });

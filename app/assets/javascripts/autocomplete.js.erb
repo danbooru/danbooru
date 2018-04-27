@@ -530,7 +530,7 @@
   }
 
   Danbooru.Autocomplete.saved_search_source = function(term, resp) {
-    return Danbooru.SavedSearch.labels(term).success(function(labels) {
+    return Danbooru.SavedSearch.labels(term).then(function(labels) {
       resp(labels.map(function(label) {
         return {
           label: label.replace(/_/g, " "),

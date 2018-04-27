@@ -101,14 +101,11 @@
   }
 
   Danbooru.Upload.fetch_source_data = function(url, referer_url) {
-    var xhr = $.getJSON("/source.json", { url: url, ref: referer_url });
-
-    xhr.success(Danbooru.Upload.fill_source_info);
-    xhr.fail(function(data) {
-      $("#source-info span#loading-data").html("Error: " + data.responseJSON["message"])
-    });
-
-    return xhr;
+    return $.getJSON("/source.json", { url: url, ref: referer_url })
+      .then(Danbooru.Upload.fill_source_info)
+      .catch(function(data) {
+        $("#source-info span#loading-data").html("Error: " + data.responseJSON["message"])
+      });
   }
 
   Danbooru.Upload.fill_source_info = function(data) {
