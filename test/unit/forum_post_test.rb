@@ -14,6 +14,17 @@ class ForumPostTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
+    context "#votable?" do
+      setup do
+        @post = FactoryBot.build(:forum_post, :topic_id => @topic.id, :body => "[[aaa]] -> [[bbb]]")
+        @tag_alias = FactoryBot.create(:tag_alias, forum_post: @post)
+      end
+
+      should "be true for a post associated with a tag alias" do
+        assert(@post.votable?)
+      end
+    end
+
     context "that mentions a user" do
       context "in a quote block" do
         setup do

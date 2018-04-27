@@ -44,7 +44,7 @@
         <% else %>
           <li><%= link_to "Permalink", forum_post_path(forum_post) %></li>
         <% end %>
-        <% if forum_post.is_original_post?(original_forum_post_id) %>
+        <% if forum_post.votable? %>
           <ul class="votes" id="forum-post-votes-for-<%= forum_post.id %>">
             <%= render "forum_post_votes/list", votes: forum_post.votes, forum_post: forum_post %>
           </ul>

@@ -6,6 +6,8 @@ class ForumPost < ApplicationRecord
   belongs_to_updater
   belongs_to :topic, :class_name => "ForumTopic"
   has_many :votes, class_name: "ForumPostVote"
+  has_one :tag_relationship
+  has_one :bulk_update_request
   before_validation :initialize_is_deleted, :on => :create
   after_create :update_topic_updated_at_on_create
   after_update :update_topic_updated_at_on_update_for_original_posts
@@ -127,6 +129,11 @@ class ForumPost < ApplicationRecord
     else
       new
     end
+  end
+
+  def votable?
+    # shortcut to eliminate posts that are probably not tag change requests
+    body.match(/->/) && (bulk_update_request.present? || tag_relationship.present?) && created_at >= TagRelationship::EXPIRY.days.ago
   end
 
   def voted?(user, score)
