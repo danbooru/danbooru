@@ -1,3 +1,11 @@
+.ui-widget {
+  font-family: $base_font_family;
+
+  input, select, textarea, button {
+    font-family: $base_font_family;
+  }
+}
+
 div.ui-dialog {
   height: auto! important;
   overflow: visible;
