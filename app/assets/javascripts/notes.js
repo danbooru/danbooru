@@ -405,7 +405,9 @@ Danbooru.Note = {
           at: "right-20",
           of: window
         },
-        dialogClass: "note-edit-dialog",
+        classes: {
+          "ui-dialog": "note-edit-dialog",
+        },
         title: "Edit note",
         buttons: {
           "Save": Danbooru.Note.Edit.save,
