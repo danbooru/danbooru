@@ -1,6 +1,8 @@
-<%= @post.presenter.split_inline_tag_list_html(self) %>
+<div class="post-tooltip-body">
+  <%= @post.presenter.inline_tag_list_html(self) %>
+</div>
 
-<div class="post-tooltip-metatags">
+<div class="post-tooltip-footer">
   <%= link_to_search "user:#{@post.uploader_name}" if CurrentUser.is_moderator? %>
   <%= link_to "toptagger:#{@post.keeper.name}", user_path(@post.keeper) %>
   <%= link_to_search "rating:#{@post.pretty_rating.downcase}" %>

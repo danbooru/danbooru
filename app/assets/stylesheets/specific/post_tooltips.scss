@@ -1,10 +1,21 @@
+$tooltip-width: 965px;
+$tooltip-height: 160px;
+
 .post-tooltip {
-  max-width: 660px;
+  max-width: $tooltip-width;
+  box-sizing: border-box;
+  line-height: 16px;
+
   border-color: #767676;
   box-shadow: 1px 1px 2px #666;
 
   .qtip-content {
     padding: 4px 6px;
+
+    .post-tooltip-body {
+      max-height: $tooltip-height;
+      overflow-y: auto;
+    }
   }
 
   &.post-tooltip-loading {
