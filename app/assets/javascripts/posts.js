@@ -558,7 +558,7 @@
 
   Danbooru.Post.favorite = function (e) {
     if ($("#add-to-favorites").is(":visible")) {
-      $("#add-to-favorites").click();
+      $("#add-to-favorites")[0].click();
     } else {
       if (Danbooru.meta("current-user-id") == "") {
         Danbooru.notice("You must be logged in to favorite posts");
