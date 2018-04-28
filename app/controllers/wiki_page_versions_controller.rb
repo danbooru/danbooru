@@ -17,7 +17,7 @@ class WikiPageVersionsController < ApplicationController
 
   def diff
     if params[:thispage].blank? || params[:otherpage].blank?
-      redirect_to :back, :notice => "You must select two versions to diff"
+      redirect_back fallback_location: wiki_pages_path, notice: "You must select two versions to diff"
       return
     end
 

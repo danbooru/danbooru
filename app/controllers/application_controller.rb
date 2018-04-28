@@ -110,7 +110,7 @@ class ApplicationController < ActionController::Base
     elsif exception.is_a?(NotImplementedError)
       flash[:notice] = "This feature isn't available: #{@exception.message}"
       respond_to do |fmt|
-        fmt.html { redirect_to :back }
+        fmt.html { redirect_back fallback_location: root_path }
         fmt.js { render nothing: true, status: 501 }
         fmt.json { render template: "static/error", status: 501 }
         fmt.xml  { render template: "static/error", status: 501 }
