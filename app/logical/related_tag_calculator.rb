@@ -63,7 +63,7 @@ class RelatedTagCalculator
         posts_with_tags = posts_with_tags.joins("JOIN tags ON tags.name = tag").where("tags.category" => category_constraint)
       end
 
-      counts = posts_with_tags.order("count(*) DESC").limit(max_results).group("tag").count
+      counts = posts_with_tags.order("count_all DESC").limit(max_results).group("tag").count(:all)
       counts
     end
   end
