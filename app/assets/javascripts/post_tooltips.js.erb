@@ -3,9 +3,18 @@ Danbooru.PostTooltip = {};
 Danbooru.PostTooltip.render_tooltip = function (event, qtip) {
   var post_id = $(event.target).parents("[data-id]").data("id");
 
-  return $.get("/posts/" + post_id, { variant: "tooltip" }).done(function () {
+  $.get("/posts/" + post_id, { variant: "tooltip" }).then(function (html) {
+    qtip.set("content.text", html);
     qtip.elements.tooltip.removeClass("post-tooltip-loading");
   });
+};
+
+// Hide the tooltip the first time it is shown, while we wait on the ajax call to complete.
+Danbooru.PostTooltip.on_show = function (event, qtip) {
+  if (!qtip.cache.hasBeenShown) {
+    qtip.elements.tooltip.addClass("post-tooltip-loading");
+    qtip.cache.hasBeenShown = true;
+  }
 };
 
 Danbooru.PostTooltip.POST_SELECTOR = "*:not(.ui-sortable-handle) > .post-preview img";
@@ -40,7 +49,7 @@ Danbooru.PostTooltip.QTIP_OPTIONS = {
     event: "unfocus mouseleave",
   },
   events: {
-    show: function (event, qtip) { qtip.elements.tooltip.addClass("post-tooltip-loading"); },
+    show: Danbooru.PostTooltip.on_show,
   },
 };
 
