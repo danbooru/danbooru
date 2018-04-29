@@ -56,7 +56,11 @@ Danbooru.PostTooltip.QTIP_OPTIONS = {
 
 Danbooru.PostTooltip.initialize = function () {
   $(document).on("mouseenter", Danbooru.PostTooltip.POST_SELECTOR, function (event) {
-    $(this).qtip(Danbooru.PostTooltip.QTIP_OPTIONS, event);
+    if (Danbooru.PostTooltip.disabled()) {
+      $(this).qtip("disable");
+    } else {
+      $(this).qtip(Danbooru.PostTooltip.QTIP_OPTIONS, event);
+    }
   });
 
   // Hide tooltips when clicking thumbnails.
@@ -65,6 +69,10 @@ Danbooru.PostTooltip.initialize = function () {
 
 Danbooru.PostTooltip.hide = function (event) {
   $(".post-tooltip:visible").qtip("hide");
+};
+
+Danbooru.PostTooltip.disabled = function (event) {
+  return Danbooru.meta("disable-post-tooltips") === "true";
 };
 
 $(document).ready(Danbooru.PostTooltip.initialize);

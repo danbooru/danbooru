@@ -277,6 +277,10 @@ class AnonymousUser
     false
   end
 
+  def disable_post_tooltips?
+    false
+  end
+
   User::Roles.reject {|r| r == :anonymous}.each do |name|
     define_method("is_#{name}?") do
       false

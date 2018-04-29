@@ -40,7 +40,8 @@ class PostPresenter < Presenter
       src = post.preview_file_url
     end
 
-    html << %{<img itemprop="thumbnailUrl" src="#{src}" alt="#{h(post.tag_string)}">}
+    tooltip = "#{post.tag_string} rating:#{post.rating} score:#{post.score}"
+    html << %{<img itemprop="thumbnailUrl" src="#{src}" title="#{h(tooltip)}" alt="#{h(post.tag_string)}">}
     html << %{</a>}
 
     if options[:pool]
