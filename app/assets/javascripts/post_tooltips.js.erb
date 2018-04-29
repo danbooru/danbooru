@@ -37,7 +37,7 @@ Danbooru.PostTooltip.QTIP_OPTIONS = {
     delay: 50,
     fixed: true,
     effect: false,
-    event: "mouseleave",
+    event: "unfocus mouseleave",
   },
   events: {
     show: function (event, qtip) { qtip.elements.tooltip.addClass("post-tooltip-loading"); },
@@ -48,6 +48,13 @@ Danbooru.PostTooltip.initialize = function () {
   $(document).on("mouseenter", Danbooru.PostTooltip.POST_SELECTOR, function (event) {
     $(this).qtip(Danbooru.PostTooltip.QTIP_OPTIONS, event);
   });
+
+  // Hide tooltips when clicking thumbnails.
+  $(document).on("click", Danbooru.PostTooltip.POST_SELECTOR, Danbooru.PostTooltip.hide);
+};
+
+Danbooru.PostTooltip.hide = function (event) {
+  $(".post-tooltip:visible").qtip("hide");
 };
 
 $(document).ready(Danbooru.PostTooltip.initialize);
