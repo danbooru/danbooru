@@ -65,6 +65,11 @@ Danbooru.PostTooltip.initialize = function () {
 
   // Hide tooltips when clicking thumbnails.
   $(document).on("click", Danbooru.PostTooltip.POST_SELECTOR, Danbooru.PostTooltip.hide);
+
+  // Disable tooltips on touch devices. https://developer.mozilla.org/en-US/docs/Web/API/Touch_events/Supporting_both_TouchEvent_and_MouseEvent
+  Danbooru.PostTooltip.isTouching = false;
+  $(document).on("touchstart", function (event) { Danbooru.PostTooltip.isTouching = true; });
+  $(document).on("touchend",   function (event) { Danbooru.PostTooltip.isTouching = false; });
 };
 
 Danbooru.PostTooltip.hide = function (event) {
@@ -72,7 +77,7 @@ Danbooru.PostTooltip.hide = function (event) {
 };
 
 Danbooru.PostTooltip.disabled = function (event) {
-  return Danbooru.meta("disable-post-tooltips") === "true";
+  return Danbooru.PostTooltip.isTouching || Danbooru.meta("disable-post-tooltips") === "true";
 };
 
 $(document).ready(Danbooru.PostTooltip.initialize);
