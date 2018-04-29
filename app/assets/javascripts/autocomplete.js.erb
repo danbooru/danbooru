@@ -62,6 +62,9 @@
 
   Danbooru.Autocomplete.initialize_mention_autocomplete = function($fields) {
     $fields.autocomplete({
+      search: function() {
+        $(this).data("ui-autocomplete").menu.bindings = $();
+      },
       select: function(event, ui) {
         Danbooru.Autocomplete.insert_completion(this, ui.item.value);
         return false;
@@ -100,6 +103,11 @@
     var $fields_single = $('[data-autocomplete="tag"]');
 
     $fields_multiple.autocomplete({
+      search: function() {
+        if ($(this).data("ui-autocomplete")) {
+          $(this).data("ui-autocomplete").menu.bindings = $();
+        }
+      },
       select: function(event, ui) {
         // Prevent Danbooru.Upload.initialize_enter_on_tags from running if the
         // Enter key is used to select a tag from the autocomplete menu.
@@ -184,6 +192,9 @@
     });
 
     $fields_single.autocomplete({
+      search: function() {
+        $(this).data("ui-autocomplete").menu.bindings = $();
+      },
       source: function(req, resp) {
         Danbooru.Autocomplete.normal_source(req.term, resp);
       }
@@ -192,6 +203,9 @@
 
   Danbooru.Autocomplete.initialize_artist_autocomplete = function($fields) {
     $fields.autocomplete({
+      search: function() {
+        $(this).data("ui-autocomplete").menu.bindings = $();
+      },
       source: function(req, resp) {
         $.ajax({
           url: "/artists.json",
@@ -219,6 +233,9 @@
 
   Danbooru.Autocomplete.initialize_pool_autocomplete = function($fields) {
     $fields.autocomplete({
+      search: function() {
+        $(this).data("ui-autocomplete").menu.bindings = $();
+      },
       source: function(req, resp) {
         Danbooru.Autocomplete.pool_source(req.term, resp);
       },
@@ -227,6 +244,9 @@
 
   Danbooru.Autocomplete.initialize_wiki_autocomplete = function($fields) {
     $fields.autocomplete({
+      search: function() {
+        $(this).data("ui-autocomplete").menu.bindings = $();
+      },
       source: function(req, resp) {
         $.ajax({
           url: "/wiki_pages.json",

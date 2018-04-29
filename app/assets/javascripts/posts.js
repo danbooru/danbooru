@@ -576,6 +576,9 @@
 
   Danbooru.Post.initialize_saved_searches = function() {
     $("#new_saved_search #saved_search_label_string").autocomplete({
+      search: function() {
+        $(this).data("ui-autocomplete").menu.bindings = $();
+      },
       source: function(req, resp) {
         Danbooru.SavedSearch.labels(req.term).then(function(labels) {
           resp(labels.map(function(label) {
