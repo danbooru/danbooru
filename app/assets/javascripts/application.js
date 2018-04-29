@@ -1,7 +1,6 @@
 //= require hammer.min.js
 //= require jquery.hotkeys.js
 //= require jquery.timeout.js
-//= require jquery-ui-autocomplete-1.11.2.js
 //= require jquery.storageapi.js
 //= require jquery.dropdown.min.js
 //= require jquery.hammer.js
