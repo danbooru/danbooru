@@ -1,6 +1,51 @@
 $tooltip-width: 965px;
 $tooltip-height: 160px;
 
+@mixin thin-scrollbar {
+  &::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  &::-webkit-scrollbar-button {
+    width: 0px;
+    height: 0px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #999999;
+    border: 0px none #FFFFFF;
+    border-radius: 0px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #AAAAAA;
+  }
+
+  &::-webkit-scrollbar-thumb:active {
+    background: #AAAAAA;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #EEEEEE;
+    border: 0px none #ffffff;
+    border-radius: 0px;
+  }
+
+  &::-webkit-scrollbar-track:hover {
+    background: #EEEEEE;
+  }
+
+  &::-webkit-scrollbar-track:active {
+    background: #EEEEEE;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+
 .post-tooltip {
   max-width: $tooltip-width;
   box-sizing: border-box;
@@ -13,6 +58,7 @@ $tooltip-height: 160px;
     padding: 4px 6px;
 
     .post-tooltip-body {
+      @include thin-scrollbar;
       max-height: $tooltip-height;
       overflow-y: auto;
     }
