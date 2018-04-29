@@ -1,5 +1,5 @@
 <div class="post-tooltip-body">
-  <%= @post.presenter.inline_tag_list_html(self) %>
+  <%= @post.presenter.inline_tag_list_html(self, humanize_tags: false) %>
 </div>
 
 <div class="post-tooltip-footer">

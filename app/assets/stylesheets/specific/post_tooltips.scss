@@ -61,6 +61,10 @@ $tooltip-height: 160px;
       @include thin-scrollbar;
       max-height: $tooltip-height;
       overflow-y: auto;
+
+      li {
+        margin-right: 0;
+      }
     }
   }
 
