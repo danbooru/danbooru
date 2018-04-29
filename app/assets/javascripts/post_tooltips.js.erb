@@ -63,7 +63,8 @@ Danbooru.PostTooltip.initialize = function () {
     }
   });
 
-  // Hide tooltips when clicking thumbnails.
+  // Hide tooltips when pressing keys or clicking thumbnails.
+  $(document).on("keydown", Danbooru.PostTooltip.hide);
   $(document).on("click", Danbooru.PostTooltip.POST_SELECTOR, Danbooru.PostTooltip.hide);
 
   // Disable tooltips on touch devices. https://developer.mozilla.org/en-US/docs/Web/API/Touch_events/Supporting_both_TouchEvent_and_MouseEvent
@@ -73,6 +74,11 @@ Danbooru.PostTooltip.initialize = function () {
 };
 
 Danbooru.PostTooltip.hide = function (event) {
+  // Hide on any key except control (user may be control-clicking link inside tooltip).
+  if (event.type === "keydown" && event.ctrlKey === true) {
+    return;
+  }
+
   $(".post-tooltip:visible").qtip("hide");
 };
 
