@@ -83,6 +83,8 @@ Danbooru.PostTooltip.initialize = function () {
     Danbooru.PostTooltip.lostFocus = true;
   });
 
+  $(document).on("click", ".post-tooltip-disable", Danbooru.PostTooltip.on_disable_tooltips);
+
   // Hide tooltips when pressing keys or clicking thumbnails.
   $(document).on("keydown", Danbooru.PostTooltip.hide);
   $(document).on("click", Danbooru.PostTooltip.POST_SELECTOR, Danbooru.PostTooltip.hide);
@@ -104,6 +106,24 @@ Danbooru.PostTooltip.hide = function (event) {
 
 Danbooru.PostTooltip.disabled = function (event) {
   return Danbooru.PostTooltip.isTouching || Danbooru.meta("disable-post-tooltips") === "true";
+};
+
+Danbooru.PostTooltip.on_disable_tooltips = function (event) {
+  event.preventDefault();
+  $(event.target).parents(".qtip").qtip("hide");
+
+  if (Danbooru.meta("current-user-id") === "") {
+    Danbooru.notice('<a href="/session/new">Login</a> to disable tooltips permanently');
+    return;
+  }
+
+  $.ajax("/users/" + Danbooru.meta("current-user-id") + ".json", {
+    method: "PUT",
+    data: { "user[disable_post_tooltips]": "true" },
+  }).then(function() {
+    Danbooru.notice("Tooltips disabled; check your account settings to re-enable.");
+    location.reload();
+  });
 };
 
 $(document).ready(Danbooru.PostTooltip.initialize);

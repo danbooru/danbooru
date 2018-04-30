@@ -66,6 +66,13 @@ $tooltip-height: 112px;
         margin-right: 0;
       }
     }
+
+    .post-tooltip-footer {
+      .post-tooltip-disable {
+        float: right;
+        margin-top: 2px;
+      }
+    }
   }
 
   &:not(:hover) a {
