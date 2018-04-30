@@ -9,7 +9,6 @@ Danbooru.PostTooltip.render_tooltip = function (event, qtip) {
 
     // Hide the tooltip if the user stopped hovering before the ajax request completed.
     if (Danbooru.PostTooltip.lostFocus) {
-      console.log("hiding");
       qtip.hide();
     }
   });
@@ -31,16 +30,25 @@ Danbooru.PostTooltip.QTIP_OPTIONS = {
   content: Danbooru.PostTooltip.render_tooltip,
   overwrite: false,
   position: {
+    viewport: true,
+    my: "bottom left",
+    at: "top left",
+    effect: false,
+    adjust: {
+      y: -2,
+      method: "shift",
+    },
+    /* Position tooltip beneath mouse.
     my: "top left",
     at: "bottom left",
     target: "mouse",
-    // `viewport: $(window)` is better, but it requires jquery-migrate until https://github.com/qTip2/qTip2/issues/797 is fixed.
     viewport: true,
     adjust: {
       mouse: false,
       y: 25,
       method: "shift",
     },
+    */
   },
   show: {
     solo: true,
@@ -50,10 +58,10 @@ Danbooru.PostTooltip.QTIP_OPTIONS = {
     event: "mouseenter",
   },
   hide: {
-    delay: 50,
+    delay: 150,
     fixed: true,
     effect: false,
-    event: "unfocus mouseleave",
+    event: "unfocus click mouseleave",
   },
   events: {
     show: Danbooru.PostTooltip.on_show,

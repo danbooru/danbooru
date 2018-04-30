@@ -69,6 +69,6 @@ $tooltip-height: 160px;
   }
 
   &.post-tooltip-loading {
-    display: none !important;
+    visibility: hidden;
   }
 }
