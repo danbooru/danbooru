@@ -1,8 +1,8 @@
 class ArtistCommentary < ApplicationRecord
   class RevertError < Exception ; end
 
-  attr_accessor :remove_commentary_tag, :remove_commentary_request_tag, :remove_commentary_check_tag
-  attr_accessor :add_commentary_tag, :add_commentary_request_tag, :add_commentary_check_tag
+  attr_accessor :remove_commentary_tag, :remove_commentary_request_tag, :remove_commentary_check_tag, :remove_partial_commentary_tag
+  attr_accessor :add_commentary_tag, :add_commentary_request_tag, :add_commentary_check_tag, :add_partial_commentary_tag
   before_validation :trim_whitespace
   validates_uniqueness_of :post_id
   belongs_to :post, required: true
@@ -106,6 +106,14 @@ class ArtistCommentary < ApplicationRecord
 
     if add_commentary_check_tag == "1"
       post.add_tag("check_commentary")
+    end
+
+    if remove_partial_commentary_tag == "1"
+      post.remove_tag("partial_commentary")
+    end
+
+    if add_partial_commentary_tag == "1"
+      post.add_tag("partial_commentary")
     end
 
     post.save if post.tag_string_changed?

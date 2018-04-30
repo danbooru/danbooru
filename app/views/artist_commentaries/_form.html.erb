@@ -80,4 +80,20 @@
       </label>
     </div>  
   <% end %>
+
+  <% if post.has_tag?("partial_commentary") %>
+    <div class="input">
+      <label>
+        <%= check_box :artist_commentary, :remove_partial_commentary_tag %>
+        Remove <em>partial_commentary</em> tag
+      </label>
+    </div>
+  <% else %>
+    <div class="input">
+      <label>
+        <%= check_box :artist_commentary, :add_partial_commentary_tag %>
+        Add <em>partial_commentary</em> tag
+      </label>
+    </div>  
+  <% end %>
 <% end %>
