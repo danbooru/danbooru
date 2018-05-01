@@ -7,6 +7,8 @@ env:
     - BUILD_DIR=/build
     - PACKAGES="ruby2.5 ruby2.5-dev ruby-switch bundler libglib2.0-dev zlib1g-dev git sudo postgresql-9.5 postgresql-server-dev-9.5 libvips-dev libvips-tools ffmpeg mkvtoolnix"
     - DATABASE_URL="postgresql:///danbooru_test?template=template0"
+    - SECRET_TOKEN="xxx"
+    - SESSION_SECRET_KEY="xxx"
 
 services:
   - docker
@@ -17,7 +19,10 @@ before_install:
 install:
   - docker exec -t test-container bash -c "
     cd $BUILD_DIR;
-    apt-add-repository ppa:brightbox/ruby-ng;
+    apt-get update;
+    apt-get install -y tzdata software-properties-common;
+    cp /usr/share/zoneinfo/America/Los_Angeles /etc/localtime;
+    apt-add-repository -y ppa:brightbox/ruby-ng;
     apt-get update;
     apt-get install -y $PACKAGES;
 
@@ -26,14 +31,16 @@ install:
     createdb --echo --template=template0 danbooru_test;
 
     cp script/install/danbooru_local_config.rb.templ config/danbooru_local_config.rb;
+    cp script/install/database.yml.templ config/database.yml;
     ruby-switch --set ruby2.5
 
     git clone https://github.com/r888888888/test_parser.git $BUILD_DIR/test_parser;
     cd $BUILD_DIR/test_parser;
     make install;
+    mkdir ~/.danbooru;
     "
 
 script:
   - docker exec -t test-container bash -c "
     cd $BUILD_DIR;
-    bundle install && bundle exec rake"
+    bundle install && bin/rake"
