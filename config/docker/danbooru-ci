@@ -1,0 +1,9 @@
+# This sets up a docker container suitable for use with Travis CI
+
+FROM r888888888/danbooru-base
+
+USER root
+COPY . /app
+RUN chown -R danbooru:danbooru .
+USER danbooru
+RUN bundle install > /dev/null

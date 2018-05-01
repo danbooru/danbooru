@@ -73,7 +73,7 @@ class SavedSearch < ApplicationRecord
 
   def self.labels_for(user_id)
     Cache.get(cache_key(user_id)) do
-      SavedSearch.where(user_id: user_id).order("label").pluck("distinct unnest(labels) as label")
+      SavedSearch.where(user_id: user_id).order("label").pluck(Arel.sql("distinct unnest(labels) as label"))
     end
   end
 

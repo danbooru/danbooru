@@ -58,6 +58,7 @@ class ActiveSupport::TestCase
   include TestHelpers
 
   setup do
+    Socket.stubs(:gethostname).returns("www.example.com")
     mock_popular_search_service!
     mock_missed_search_service!
     WebMock.allow_net_connect!
@@ -104,6 +105,7 @@ class ActionDispatch::IntegrationTest
 
   def setup
     super
+    Socket.stubs(:gethostname).returns("www.example.com")
     Danbooru.config.stubs(:enable_sock_puppet_validation?).returns(false)
   end
 

@@ -38,7 +38,7 @@ class Pool < ApplicationRecord
     end
 
     def series_first
-      order("(case pools.category when 'series' then 0 else 1 end), pools.name")
+      order(Arel.sql("(case pools.category when 'series' then 0 else 1 end), pools.name"))
     end
 
     def name_matches(name)

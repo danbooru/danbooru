@@ -7,7 +7,7 @@ module Moderator
             .where("posts.created_at > ?", min_date)
             .where("users.level <= ?", max_level)
             .group(:uploader)
-            .order("count(*) desc")
+            .order(Arel.sql("count(*) desc"))
             .limit(10)
             .count
             .map { |user, count| new(user, count) }

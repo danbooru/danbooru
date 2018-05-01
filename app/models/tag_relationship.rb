@@ -70,7 +70,7 @@ class TagRelationship < ApplicationRecord
     end
 
     def pending_first
-      order("(case status when 'pending' then 1 when 'queued' then 2 when 'active' then 3 else 0 end), antecedent_name, consequent_name")
+      order(Arel.sql("(case status when 'pending' then 1 when 'queued' then 2 when 'active' then 3 else 0 end), antecedent_name, consequent_name"))
     end
 
     def active

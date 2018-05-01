@@ -9,7 +9,7 @@ module Moderator
             .where("users.level <= ?", max_level)
             .group(:comment)
             .having("count(*) >= 3")
-            .order("count(*) desc")
+            .order(Arel.sql("count(*) desc"))
             .limit(10)
             .count
             .map { |comment, count| new(comment, count) }
