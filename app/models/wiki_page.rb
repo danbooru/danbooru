@@ -82,13 +82,13 @@ class WikiPage < ApplicationRecord
         q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].tr(" ", "_").mb_chars.downcase)
       end
 
-      if params[:hide_deleted] =~ /y/i
+      if params[:hide_deleted].to_s.truthy?
         q = q.where("is_deleted = false")
       end
 
-      if params[:other_names_present] == "yes"
+      if params[:other_names_present].to_s.truthy?
         q = q.where("other_names is not null and other_names != ''")
-      elsif params[:other_names_present] == "no"
+      elsif params[:other_names_present].to_s.falsy?
         q = q.where("other_names is null or other_names = ''")
       end
 
@@ -165,7 +165,7 @@ class WikiPage < ApplicationRecord
   end
 
   def skip_secondary_validations=(value)
-    @skip_secondary_validations = (value == true || value == "1")
+    @skip_secondary_validations = value.to_s.truthy?
   end
 
   def category_name

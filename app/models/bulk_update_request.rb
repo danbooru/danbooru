@@ -205,10 +205,6 @@ class BulkUpdateRequest < ApplicationRecord
   end
 
   def skip_secondary_validations=(v)
-    if v == "1" or v == true
-      @skip_secondary_validations = true
-    else
-      @skip_secondary_validations = false
-    end
+    @skip_secondary_validations = v.to_s.truthy?
   end
 end

@@ -65,11 +65,8 @@ class PostAppeal < ApplicationRecord
         q = q.post_tags_match(params[:post_tags_match])
       end
 
-      if params[:is_resolved] == "true"
-        q = q.resolved
-      elsif params[:is_resolved] == "false"
-        q = q.unresolved
-      end
+      q = q.resolved if params[:is_resolved].to_s.truthy?
+      q = q.unresolved if params[:is_resolved].to_s.falsy?
 
       q.apply_default_order(params)
     end

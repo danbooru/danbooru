@@ -887,19 +887,19 @@ class Tag < ApplicationRecord
         q = q.where("category = ?", params[:category])
       end
 
-      if params[:hide_empty].blank? || params[:hide_empty] != "no"
+      if params[:hide_empty].blank? || params[:hide_empty].to_s.truthy?
         q = q.where("post_count > 0")
       end
 
-      if params[:has_wiki] == "yes"
+      if params[:has_wiki].to_s.truthy?
         q = q.joins(:wiki_page).where("wiki_pages.is_deleted = false")
-      elsif params[:has_wiki] == "no"
+      elsif params[:has_wiki].to_s.falsy?
         q = q.joins("LEFT JOIN wiki_pages ON tags.name = wiki_pages.title").where("wiki_pages.title IS NULL OR wiki_pages.is_deleted = true")
       end
 
-      if params[:has_artist] == "yes"
+      if params[:has_artist].to_s.truthy?
         q = q.joins("INNER JOIN artists ON tags.name = artists.name").where("artists.is_active = true")
-      elsif params[:has_artist] == "no"
+      elsif params[:has_artist].to_s.falsy?
         q = q.joins("LEFT JOIN artists ON tags.name = artists.name").where("artists.name IS NULL OR artists.is_active = false")
       end
 

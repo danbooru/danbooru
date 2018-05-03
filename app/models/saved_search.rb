@@ -130,10 +130,6 @@ class SavedSearch < ApplicationRecord
   end
 
   def disable_labels=(value)
-    CurrentUser.update(disable_categorized_saved_searches: true) if value == "1"
-  end
-
-  def disable_labels=(value)
-    CurrentUser.update(disable_categorized_saved_searches: true) if value == "1"
+    CurrentUser.update(disable_categorized_saved_searches: true) if value.to_s.truthy?
   end
 end

@@ -171,6 +171,10 @@ class Dmail < ApplicationRecord
       end
     end
 
+    def read
+      where(is_read: true)
+    end
+
     def unread
       where("is_read = false and is_deleted = false")
     end
@@ -220,11 +224,8 @@ class Dmail < ApplicationRecord
         q = q.where("is_spam = ?", false)
       end
 
-      if params[:read] == "true"
-        q = q.where("is_read = true")
-      elsif params[:read] == "false"
-        q = q.unread
-      end
+      q = q.read if params[:read].to_s.truthy?
+      q = q.unread if params[:read].to_s.falsy?
 
       q.apply_default_order(params)
     end

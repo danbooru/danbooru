@@ -587,13 +587,13 @@ class Artist < ApplicationRecord
       end
 
       # XXX deprecated, remove at some point.
-      if params[:empty_only] == "true"
+      if params[:empty_only].to_s.truthy?
         params[:has_tag] = "false"
       end
 
-      if params[:has_tag] == "true"
+      if params[:has_tag].to_s.truthy?
         q = q.joins(:tag).where("tags.post_count > 0")
-      elsif params[:has_tag] == "false"
+      elsif params[:has_tag].to_s.falsy?
         q = q.includes(:tag).where("tags.name IS NULL OR tags.post_count <= 0").references(:tags)
       end
 

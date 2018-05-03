@@ -1820,28 +1820,20 @@ class Post < ApplicationRecord
   end
 
   def mark_as_translated(params)
-    tags = self.tag_array.dup
+    add_tag("check_translation") if params["check_translation"].to_s.truthy?
+    remove_tag("check_translation") if params["check_translation"].to_s.falsy?
 
-    if params["check_translation"] == "1"
-      tags << "check_translation"
-    elsif params["check_translation"] == "0"
-      tags -= ["check_translation"]
-    end
-    if params["partially_translated"] == "1"
-      tags << "partially_translated"
-    elsif params["partially_translated"] == "0"
-      tags -= ["partially_translated"]
-    end
+    add_tag("partially_translated") if params["partially_translated"].to_s.truthy?
+    remove_tag("partially_translated") if params["partially_translated"].to_s.falsy?
 
-    if params["check_translation"] == "1" || params["partially_translated"] == "1"
-      tags << "translation_request"
-      tags -= ["translated"]
+    if has_tag?("check_translation") || has_tag?("partially_translated")
+      add_tag("translation_request")
+      remove_tag("translated")
     else
-      tags << "translated"
-      tags -= ["translation_request"]
+      add_tag("translated")
+      remove_tag("translation_request")
     end
 
-    self.tag_string = tags.join(" ")
     save
   end
 
