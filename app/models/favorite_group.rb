@@ -42,7 +42,7 @@ class FavoriteGroup < ApplicationRecord
     end
 
     def default_order
-      order(updated_at: :desc)
+      order(name: :asc)
     end
 
     def search(params)

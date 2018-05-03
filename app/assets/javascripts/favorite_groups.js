@@ -38,7 +38,7 @@
   }
 
   Danbooru.FavoriteGroup.add_to_favgroup = function(e) {
-    var favgroup_index = String.fromCharCode(e.which);
+    var favgroup_index = (e.key === "0") ? "10" : e.key;
     var link = $("#add-to-favgroup-" + favgroup_index + ":visible");
     if (link.length) {
       link.click();
