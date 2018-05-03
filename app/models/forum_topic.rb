@@ -95,6 +95,10 @@ class ForumTopic < ApplicationRecord
         q = q.where("title = ?", params[:title])
       end
 
+      q = q.attribute_matches(:is_sticky, params[:is_sticky])
+      q = q.attribute_matches(:is_locked, params[:is_locked])
+      q = q.attribute_matches(:is_deleted, params[:is_deleted])
+
       case params[:order]
       when "sticky"
         q = q.sticky_first

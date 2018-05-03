@@ -218,11 +218,10 @@ class Dmail < ApplicationRecord
         q = q.where("from_id = ?", params[:from_id].to_i)
       end
 
-      if params[:is_spam].present?
-        q = q.where("is_spam = ?", true)
-      else
-        q = q.where("is_spam = ?", false)
-      end
+      params[:is_spam] = false unless params[:is_spam].present?
+      q = q.attribute_matches(:is_spam, params[:is_spam])
+      q = q.attribute_matches(:is_read, params[:is_read])
+      q = q.attribute_matches(:is_deleted, params[:is_deleted])
 
       q = q.read if params[:read].to_s.truthy?
       q = q.unread if params[:read].to_s.falsy?

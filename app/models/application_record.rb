@@ -5,10 +5,34 @@ class ApplicationRecord < ActiveRecord::Base
 
   concerning :SearchMethods do
     class_methods do
-      # range: "5", ">5", "<5", ">=5", "<=5", "5..10", "5,6,7"
-      def attribute_matches(attribute, range)
-        return all if range.blank?
+      def attribute_matches(attribute, value)
+        return all if value.nil?
 
+        column = column_for_attribute(attribute)
+        case column.sql_type_metadata.type
+        when :boolean
+          boolean_attribute_matches(attribute, value)
+        when :integer, :datetime
+          numeric_attribute_matches(attribute, value)
+        else
+          raise ArgumentError, "unhandled attribute type"
+        end
+      end
+
+      def boolean_attribute_matches(attribute, value)
+        if value.to_s.truthy?
+          value = true
+        elsif value.to_s.falsy?
+          value = false
+        else
+          raise ArgumentError, "value must be truthy or falsy"
+        end
+
+        where(attribute => value)
+      end
+
+      # range: "5", ">5", "<5", ">=5", "<=5", "5..10", "5,6,7"
+      def numeric_attribute_matches(attribute, range)
         column = column_for_attribute(attribute)
         qualified_column = "#{table_name}.#{column.name}"
         parsed_range = Tag.parse_helper(range, column.type)
