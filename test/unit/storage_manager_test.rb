@@ -85,7 +85,7 @@ class StorageManagerTest < ActiveSupport::TestCase
       end
 
       should "return the correct url for flash files" do
-        @post = FactoryGirl.create(:post, file_ext: "swf")
+        @post = FactoryBot.create(:post, file_ext: "swf")
 
         @storage_manager.stubs(:base_url).returns("/data")
         assert_equal("/images/download-preview.png", @storage_manager.file_url(@post, :preview))
