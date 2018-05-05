@@ -9,15 +9,16 @@ class PostEventsControllerTest < ActionDispatch::IntegrationTest
 
     as_user do
       @post = create(:post)
-      @post_flag = PostFlag.create(:post => @post, :reason => "aaa", :is_resolved => false)
-      @post_appeal = PostAppeal.create(:post => @post, :reason => "aaa")
+      @post.flag!("aaa")
+      @post.appeal!("aaa")
+      @post.approve!(@mod)
     end
   end
 
   context "get /posts/:post_id/events" do
     should "render" do
       get_auth post_events_path(post_id: @post.id), @user
-      assert_response :ok      
+      assert_response :ok
     end
 
     should "render for mods" do
