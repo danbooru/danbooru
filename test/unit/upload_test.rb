@@ -57,30 +57,17 @@ class UploadTest < ActiveSupport::TestCase
         should "discover the dimensions for a GIF" do
           @upload = FactoryBot.create(:upload, file: upload_file("test/files/test.gif"))
           assert_equal([400, 400], @upload.calculate_dimensions)
-          @upload = FactoryBot.create(:upload, :file_path => "#{Rails.root}/test/files/compressed.swf")
-          @upload.calculate_dimensions
-          assert_equal(607, @upload.image_width)
-          assert_equal(756, @upload.image_height)
         end
       end
 
       context "content type calculator" do
         should "know how to parse jpeg, png, gif, and swf file headers" do
           @upload = FactoryBot.create(:jpg_upload)
-          assert_equal("image/jpeg", @upload.file_header_to_content_type("#{Rails.root}/test/files/test.jpg"))
-          assert_equal("image/gif", @upload.file_header_to_content_type("#{Rails.root}/test/files/test.gif"))
-          assert_equal("image/png", @upload.file_header_to_content_type("#{Rails.root}/test/files/test.png"))
-          assert_equal("application/x-shockwave-flash", @upload.file_header_to_content_type("#{Rails.root}/test/files/compressed.swf"))
-          assert_equal("application/octet-stream", @upload.file_header_to_content_type("#{Rails.root}/README.md"))
-        end
-
-        should "know how to parse jpeg, png, gif, and swf content types" do
-          @upload = FactoryBot.create(:jpg_upload)
-          assert_equal("jpg", @upload.content_type_to_file_ext("image/jpeg"))
-          assert_equal("gif", @upload.content_type_to_file_ext("image/gif"))
-          assert_equal("png", @upload.content_type_to_file_ext("image/png"))
-          assert_equal("swf", @upload.content_type_to_file_ext("application/x-shockwave-flash"))
-          assert_equal("bin", @upload.content_type_to_file_ext(""))
+          assert_equal("jpg", @upload.file_header_to_file_ext(File.open("#{Rails.root}/test/files/test.jpg")))
+          assert_equal("gif", @upload.file_header_to_file_ext(File.open("#{Rails.root}/test/files/test.gif")))
+          assert_equal("png", @upload.file_header_to_file_ext(File.open("#{Rails.root}/test/files/test.png")))
+          assert_equal("swf", @upload.file_header_to_file_ext(File.open("#{Rails.root}/test/files/compressed.swf")))
+          assert_equal("bin", @upload.file_header_to_file_ext(File.open("#{Rails.root}/README.md")))
         end
       end
 
@@ -97,7 +84,6 @@ class UploadTest < ActiveSupport::TestCase
           setup do
             @url = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654"
             @upload = FactoryBot.create(:source_upload, :source => @url, :tag_string => "ugoira")
-            @output_file = Tempfile.new("download")
           end
 
           should "process successfully" do
@@ -105,15 +91,6 @@ class UploadTest < ActiveSupport::TestCase
             assert_operator(output_file.size, :>, 1_000)
             assert_equal("zip", @upload.file_header_to_file_ext(output_file))
           end
-        end
-
-        should "initialize the final path after downloading a file" do
-          @upload = FactoryBot.create(:source_upload)
-          path = "#{Rails.root}/tmp/test.download.jpg"
-          assert_nothing_raised {@upload.download_from_source(path)}
-          assert(File.exists?(path))
-          assert_equal(8558, File.size(path))
-          assert_equal(path, @upload.file_path)
         end
       end
 
@@ -151,21 +128,17 @@ class UploadTest < ActiveSupport::TestCase
       context "hash calculator" do
         should "caculate the hash" do
           @upload = FactoryBot.create(:jpg_upload)
-          @upload.calculate_hash(@upload.file_path)
+          @upload.process_upload
           assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", @upload.md5)
         end
       end
 
       context "resizer" do
         should "generate several resized versions of the image" do
-          @upload = FactoryBot.create(:large_jpg_upload)
-          @upload.calculate_hash(@upload.file_path)
-          @upload.calculate_dimensions(@upload.file_path)
-          assert_nothing_raised {@upload.generate_resizes(@upload.file_path)}
-          assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.small_image_width)))
-          assert(File.size(@upload.resized_file_path_for(Danbooru.config.small_image_width)) > 0)
-          assert(File.exists?(@upload.resized_file_path_for(Danbooru.config.large_image_width)))
-          assert(File.size(@upload.resized_file_path_for(Danbooru.config.large_image_width)) > 0)
+          @upload = FactoryBot.create(:upload, file_ext: "jpg", image_width: 1356, image_height: 911, file: upload_file("test/files/test-large.jpg"))
+          preview_file, sample_file = @upload.generate_resizes
+          assert_operator(preview_file.size, :>, 1_000)
+          assert_operator(sample_file.size, :>, 1_000)
         end
       end
 
@@ -180,13 +153,10 @@ class UploadTest < ActiveSupport::TestCase
       context "with an artist commentary" do
         setup do
           @upload = FactoryBot.create(:source_upload,
-            :rating => "s",
-            :uploader_ip_addr => "127.0.0.1",
-            :tag_string => "hoge foo"
-            )
-          @upload.include_artist_commentary = "1"
-          @upload.artist_commentary_title = ""
-          @upload.artist_commentary_desc = "blah"
+            include_artist_commentary: "1",
+            artist_commentary_title: "",
+            artist_commentary_desc: "blah",
+          )
         end
 
         should "create an artist commentary when processed" do
@@ -250,13 +220,8 @@ class UploadTest < ActiveSupport::TestCase
 
     should "process completely for a pixiv ugoira" do
       skip "ffmpeg is not installed" unless check_ffmpeg
-      
-      @upload = FactoryBot.create(:source_upload,
-        :source => "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654",
-        :rating => "s",
-        :uploader_ip_addr => "127.0.0.1",
-        :tag_string => "hoge foo"
-        )
+      @upload = FactoryBot.create(:source_upload, source: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46378654")
+
       assert_difference(["PixivUgoiraFrameData.count", "Post.count"]) do
         @upload.process!
         assert_equal([], @upload.errors.full_messages)
@@ -268,7 +233,6 @@ class UploadTest < ActiveSupport::TestCase
       assert_equal(60, post.image_height)
       assert_equal("https://i.pximg.net/img-zip-ugoira/img/2014/10/05/23/42/23/46378654_ugoira1920x1080.zip", post.source)
       assert_nothing_raised { post.file(:original) }
-      assert_nothing_raised { post.file(:large) }
       assert_nothing_raised { post.file(:preview) }
     end
 
@@ -340,17 +304,6 @@ class UploadTest < ActiveSupport::TestCase
       assert_difference("Post.count") do
         assert_nothing_raised {@upload.process!}
       end
-    end
-
-    should "delete the temporary file upon completion" do
-      @upload = FactoryBot.create(:source_upload,
-        :rating => "s",
-        :uploader_ip_addr => "127.0.0.1",
-        :tag_string => "hoge foo"
-      )
-
-      @upload.process!
-      assert(!File.exists?(@upload.temp_file_path))
     end
   end
 end
