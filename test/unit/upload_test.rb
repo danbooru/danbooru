@@ -305,5 +305,15 @@ class UploadTest < ActiveSupport::TestCase
         assert_nothing_raised {@upload.process!}
       end
     end
+
+    context "on timeout errors" do
+      should "leave the upload in an error state" do
+        HTTParty.stubs(:get).raises(Net::ReadTimeout)
+        @upload = FactoryBot.create(:source_upload)
+        @upload.process!
+
+        assert_match(/\Aerror/, @upload.status)
+      end
+    end
   end
 end

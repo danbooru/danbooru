@@ -94,7 +94,7 @@ module Downloads
           else
             raise Error.new("HTTP error code: #{res.code} #{res.message}")
           end
-        rescue Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EIO, Errno::EHOSTUNREACH, Errno::ECONNREFUSED, IOError => x
+        rescue Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EIO, Errno::EHOSTUNREACH, Errno::ECONNREFUSED, Timeout::Error, IOError => x
           tries += 1
           if tries < 3
             retry
