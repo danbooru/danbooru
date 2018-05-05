@@ -28,7 +28,7 @@ module Downloads
         end
 
         return [url, headers, data]
-      rescue PixivApiClient::BadIDError
+      rescue PixivApiClient::BadIDError, Sources::Site::NoStrategyError
         return [url, headers, data]
       end
 

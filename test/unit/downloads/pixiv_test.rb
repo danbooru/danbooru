@@ -169,6 +169,16 @@ module Downloads
           assert_downloaded(@file_size, @file_url)
         end
       end
+
+      context "downloading a pixiv fanbox image" do
+        should "work" do
+          @file_url = "https://fanbox.pixiv.net/images/post/31757/w/1200/0CdXtgr4al3t43gQG4NZLnpQ.jpeg"
+          @file_size = 200_239
+
+          assert_not_rewritten(@file_url)
+          assert_downloaded(@file_size, @file_url)
+        end
+      end
     end
   end
 end
