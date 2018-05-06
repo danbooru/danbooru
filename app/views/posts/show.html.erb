@@ -155,7 +155,6 @@
 <% content_for(:html_header) do %>
   <meta name="description" content="<%= @post.presenter.humanized_tag_string %>">
   <meta name="tags" content="<%= @post.tag_string %>">
-  <meta name="favorites" content="<%= @post.fav_string %>">
   <meta name="pools" content="<%= @post.pool_string %>">
   <meta name="post-id" content="<%= @post.id %>">
   <% if CurrentUser.can_approve_posts? %>
