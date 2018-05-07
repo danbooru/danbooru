@@ -1,6 +1,6 @@
-$tooltip-max-width: 164px * 4 - 10; // 4 thumbnails wide.
-$tooltip-min-width: 164px * 2 - 10; // 2 thumbnails wide.
-$tooltip-height: 112px;
+$tooltip-line-height: 16px;
+$tooltip-body-height: $tooltip-line-height * 6; // 6 lines high.
+$tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
 
 @mixin thin-scrollbar {
   &::-webkit-scrollbar {
@@ -48,10 +48,11 @@ $tooltip-height: 112px;
 
 
 .post-tooltip {
-  max-width: $tooltip-max-width;
-  min-width: $tooltip-min-width;
+  max-width: $tooltip-width;
+  min-width: $tooltip-width;
   box-sizing: border-box;
-  line-height: 16px;
+  font-size: 11px;
+  line-height: $tooltip-line-height;
   border-color: #767676;
 
   .qtip-content {
@@ -59,7 +60,7 @@ $tooltip-height: 112px;
 
     .post-tooltip-body {
       @include thin-scrollbar;
-      max-height: $tooltip-height;
+      max-height: $tooltip-body-height;
       overflow-y: auto;
 
       li {
