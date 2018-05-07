@@ -56,7 +56,11 @@ $tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
   border-color: #767676;
 
   .qtip-content {
-    padding: 4px 6px;
+    padding: 0;
+
+    > * {
+      padding: 2px 6px;
+    }
 
     .post-tooltip-body {
       @include thin-scrollbar;
@@ -68,16 +72,41 @@ $tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
       }
     }
 
-    .post-tooltip-footer {
-      .post-tooltip-disable {
-        float: right;
-        margin-top: 2px;
+    .post-tooltip-header {
+      background-color: $menu_color;
+      display: flex;
+      white-space: nowrap;
+      overflow: hidden;
+
+      .post-tooltip-header-left {
+        flex: 1;
       }
+
+      .post-tooltip-header-right {
+        flex: 1;
+        text-align: right;
+      }
+
+      .fa-xs {
+        vertical-align: baseline;
+      }
+
+      .post-tooltip-disable {
+        margin-left: 0.5em;
+      }
+    }
+
+    .post-tooltip-info {
+      margin-left: 0.5em;
+      color: #555;
+      font-size: 10px;
     }
   }
 
-  &:not(:hover) a {
-    color: #666666;
+  &:not(:hover) {
+    a, span {
+      color: #777 !important;
+    }
   }
 
   &.post-tooltip-loading {

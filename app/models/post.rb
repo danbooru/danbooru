@@ -509,6 +509,15 @@ class Post < ApplicationRecord
         source
       end
     end
+
+    def source_domain
+      return "" unless source =~ %r!\Ahttps?://!i
+
+      url = Addressable::URI.parse(normalized_source)
+      url.domain
+    rescue
+      ""
+    end
   end
 
   module TagMethods
