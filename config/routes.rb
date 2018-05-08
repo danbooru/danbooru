@@ -220,6 +220,7 @@ Rails.application.routes.draw do
   end
   resources :post_appeals
   resources :post_flags
+  resources :post_approvals, only: [:index]
   resources :post_versions, :only => [:index, :search] do
     member do
       put :undo

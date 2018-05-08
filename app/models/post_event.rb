@@ -4,11 +4,11 @@ class PostEvent
   include ActiveModel::Serializers::Xml
 
   attr_accessor :event
-  delegate :creator, :creator_id, :reason, :is_resolved, :created_at, to: :event
+  delegate :created_at, to: :event
 
   def self.find_for_post(post_id)
     post = Post.find(post_id)
-    (post.appeals + post.flags).sort_by(&:created_at).reverse.map { |e| new(event: e) }
+    (post.appeals + post.flags + post.approvals).sort_by(&:created_at).reverse.map { |e| new(event: e) }
   end
 
   def type_name
@@ -17,6 +17,8 @@ class PostEvent
       "flag"
     when PostAppeal
       "appeal"
+    when PostApproval
+      "approval"
     end
   end
 
@@ -24,9 +26,25 @@ class PostEvent
     type_name.first
   end
 
+  def reason
+    event.try(:reason) || ""
+  end
+
+  def is_resolved
+    event.try(:is_resolved) || false
+  end
+
+  def creator_id
+    event.try(:creator_id) || event.try(:user_id)
+  end
+
+  def creator
+    event.try(:creator) || event.try(:user)
+  end
+
   def is_creator_visible?(user = CurrentUser.user)
     case event
-    when PostAppeal
+    when PostAppeal, PostApproval
       true
     when PostFlag
       flag = event

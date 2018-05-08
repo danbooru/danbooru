@@ -1,15 +1,14 @@
 <div id="c-post-events">
   <div id="a-index">
-    <h1>Flags &amp; Appeals</h1>
+    <h1>Post Events</h1>
 
-    <table width="100%" class="striped">
+    <table width="100%" class="striped autofit">
       <thead>
         <tr>
-          <th width="5%">Type</th>
-          <th width="10%">Creator</th>
-          <th>Reason</th>
-          <th width="5%">Resolved?</th>
-          <th width="15%">Date</th>
+          <th>Type</th>
+          <th>User</th>
+          <th>Description</th>
+          <th>Resolved?</th>
         </tr>
       </thead>
       <tbody>
@@ -22,16 +21,10 @@
               <% else %>
                 <i>hidden</i>
               <% end %>
+              <br><%= time_ago_in_words_tagged event.created_at %>
             </td>
-            <td><%= format_text event.reason %></td>
-            <td>
-              <% if event.is_resolved %>
-                yes
-              <% else %>
-                no
-              <% end %>
-            </td>
-            <td><%= compact_time event.created_at %></td>
+            <td class="col-expand"><%= format_text event.reason %></td>
+            <td><%= event.is_resolved %></td>
           </tr>
         <% end %>
       </tbody>
