@@ -41,15 +41,15 @@ class ArtistCommentary < ApplicationRecord
         q = q.where(post_id: params[:post_id].split(",").map(&:to_i))
       end
 
-      if params[:original_present] == "yes"
+      if params[:original_present].to_s.truthy?
         q = q.where("(original_title != '') or (original_description != '')")
-      elsif params[:original_present] == "no"
+      elsif params[:original_present].to_s.falsy?
         q = q.where("(original_title = '') and (original_description = '')")
       end
 
-      if params[:translated_present] == "yes"
+      if params[:translated_present].to_s.truthy?
         q = q.where("(translated_title != '') or (translated_description != '')")
-      elsif params[:translated_present] == "no"
+      elsif params[:translated_present].to_s.falsy?
         q = q.where("(translated_title = '') and (translated_description = '')")
       end
 
@@ -84,37 +84,17 @@ class ArtistCommentary < ApplicationRecord
   end
 
   def tag_post
-    if remove_commentary_tag == "1"
-      post.remove_tag("commentary")
-    end
+    post.remove_tag("commentary") if remove_commentary_tag.to_s.truthy?
+    post.add_tag("commentary") if add_commentary_tag.to_s.truthy?
 
-    if add_commentary_tag == "1"
-      post.add_tag("commentary")
-    end
+    post.remove_tag("commentary_request") if remove_commentary_request_tag.to_s.truthy?
+    post.add_tag("commentary_request") if add_commentary_request_tag.to_s.truthy?
 
-    if remove_commentary_request_tag == "1"
-      post.remove_tag("commentary_request")
-    end
+    post.remove_tag("check_commentary") if remove_commentary_check_tag.to_s.truthy?
+    post.add_tag("check_commentary") if add_commentary_check_tag.to_s.truthy?
 
-    if add_commentary_request_tag == "1"
-      post.add_tag("commentary_request")
-    end
-
-    if remove_commentary_check_tag == "1"
-      post.remove_tag("check_commentary")
-    end
-
-    if add_commentary_check_tag == "1"
-      post.add_tag("check_commentary")
-    end
-
-    if remove_partial_commentary_tag == "1"
-      post.remove_tag("partial_commentary")
-    end
-
-    if add_partial_commentary_tag == "1"
-      post.add_tag("partial_commentary")
-    end
+    post.remove_tag("partial_commentary") if remove_partial_commentary_tag.to_s.truthy?
+    post.add_tag("partial_commentary") if add_partial_commentary_tag.to_s.truthy?
 
     post.save if post.tag_string_changed?
   end

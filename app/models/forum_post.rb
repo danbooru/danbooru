@@ -92,6 +92,8 @@ class ForumPost < ApplicationRecord
         q = q.joins(:topic).where("forum_topics.category_id = ?", params[:topic_category_id].to_i)
       end
 
+      q = q.attribute_matches(:is_deleted, params[:is_deleted])
+
       q.apply_default_order(params)
     end
   end

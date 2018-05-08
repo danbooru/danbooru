@@ -47,11 +47,7 @@ class Note < ApplicationRecord
         q = q.body_matches(params[:body_matches])
       end
 
-      if params[:is_active] == "true"
-        q = q.active
-      elsif params[:is_active] == "false"
-        q = q.where("is_active = false")
-      end
+      q = q.attribute_matches(:is_active, params[:is_active])
 
       if params[:post_id].present?
         q = q.where(post_id: params[:post_id].split(",").map(&:to_i))

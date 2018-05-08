@@ -31,17 +31,8 @@ class ArtistVersion < ApplicationRecord
         q = q.where(artist_id: params[:artist_id].split(",").map(&:to_i))
       end
 
-      if params[:is_active] == "true"
-        q = q.where("is_active = true")
-      elsif params[:is_active] == "false"
-        q = q.where("is_active = false")
-      end
-
-      if params[:is_banned] == "true"
-        q = q.where("is_banned = true")
-      elsif params[:is_banned] == "false"
-        q = q.where("is_banned = false")
-      end
+      q = q.attribute_matches(:is_active, params[:is_active])
+      q = q.attribute_matches(:is_banned, params[:is_banned])
 
       params[:order] ||= params.delete(:sort)
       if params[:order] == "name"

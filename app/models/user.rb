@@ -843,10 +843,10 @@ class User < ApplicationRecord
       [:can_approve_posts, :can_upload_free, :is_super_voter].each do |x|
         if params[x].present?
           attr_idx = BOOLEAN_ATTRIBUTES.index(x.to_s)
-          if params[x] == "true"
+          if params[x].to_s.truthy?
             bitprefs_include ||= "0"*bitprefs_length
             bitprefs_include[attr_idx] = '1'
-          elsif params[x] == "false"
+          elsif params[x].to_s.falsy?
             bitprefs_exclude ||= "0"*bitprefs_length
             bitprefs_exclude[attr_idx] = '1'
           end
@@ -865,7 +865,7 @@ class User < ApplicationRecord
                     {:len => bitprefs_length, :bits => bitprefs_exclude})
       end
 
-      if params[:current_user_first] == "true" && !CurrentUser.is_anonymous?
+      if params[:current_user_first].to_s.truthy? && !CurrentUser.is_anonymous?
         q = q.order("id = #{CurrentUser.user.id.to_i} desc")
       end
       

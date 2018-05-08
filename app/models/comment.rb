@@ -59,22 +59,6 @@ class Comment < ApplicationRecord
       where("comments.is_deleted = false")
     end
 
-    def sticky
-      where("comments.is_sticky = true")
-    end
-
-    def unsticky
-      where("comments.is_sticky = false")
-    end
-
-    def bumping
-      where("comments.do_not_bump_post = false")
-    end
-
-    def nonbumping
-      where("comments.do_not_bump_post = true")
-    end
-
     def post_tags_match(query)
       PostQueryBuilder.new(query).build(self.joins(:post)).reorder("")
     end
@@ -110,14 +94,9 @@ class Comment < ApplicationRecord
         q = q.for_creator(params[:creator_id].to_i)
       end
 
-      q = q.deleted if params[:is_deleted] == "true"
-      q = q.undeleted if params[:is_deleted] == "false"
-
-      q = q.sticky if params[:is_sticky] == "true"
-      q = q.unsticky if params[:is_sticky] == "false"
-
-      q = q.nonbumping if params[:do_not_bump_post] == "true"
-      q = q.bumping if params[:do_not_bump_post] == "false"
+      q = q.attribute_matches(:is_deleted, params[:is_deleted])
+      q = q.attribute_matches(:is_sticky, params[:is_sticky])
+      q = q.attribute_matches(:do_not_bump_post, params[:do_not_bump_post])
 
       case params[:order]
       when "post_id", "post_id_desc"

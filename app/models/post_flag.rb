@@ -98,11 +98,7 @@ class PostFlag < ApplicationRecord
         q = q.post_tags_match(params[:post_tags_match])
       end
 
-      if params[:is_resolved] == "true"
-        q = q.resolved
-      elsif params[:is_resolved] == "false"
-        q = q.unresolved
-      end
+      q = q.attribute_matches(:is_resolved, params[:is_resolved])
 
       case params[:category]
       when "normal"

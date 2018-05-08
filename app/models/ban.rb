@@ -47,10 +47,8 @@ class Ban < ApplicationRecord
       q = q.reason_matches(params[:reason_matches])
     end
 
-    case params[:expired]
-    when "true"  then q = q.expired
-    when "false" then q = q.unexpired
-    end
+    q = q.expired if params[:expired].to_s.truthy?
+    q = q.unexpired if params[:expired].to_s.falsy?
 
     case params[:order]
     when "expires_at_desc"

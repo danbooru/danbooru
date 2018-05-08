@@ -17,6 +17,8 @@ class NoteVersion < ApplicationRecord
       q = q.where(note_id: params[:note_id].split(",").map(&:to_i))
     end
 
+    q = q.attribute_matches(:is_active, params[:is_active])
+
     q.apply_default_order(params)
   end
 

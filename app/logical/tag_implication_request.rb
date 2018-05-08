@@ -75,10 +75,6 @@ class TagImplicationRequest
   end
 
   def skip_secondary_validations=(v)
-    if v == "1" or v == true or v =~ /t/
-      @skip_secondary_validations = true
-    else
-      @skip_secondary_validations = false
-    end
+    @skip_secondary_validations = v.to_s.truthy?
   end
 end
