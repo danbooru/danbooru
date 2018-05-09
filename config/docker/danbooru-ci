@@ -3,7 +3,6 @@
 FROM r888888888/danbooru-base
 
 USER root
-RUN apt-get install -y ffmpeg
 COPY . /app
 RUN chown -R danbooru:danbooru .
 USER danbooru

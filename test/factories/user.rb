@@ -1,6 +1,8 @@
 FactoryBot.define do
   factory(:user, aliases: [:creator, :updater]) do
-    name {(rand(1_000_000) + 10).to_s}
+    sequence :name do |n|
+      "user#{n}"
+    end
     password "password"
     password_hash {User.sha1("password")}
     email {FFaker::Internet.email}
