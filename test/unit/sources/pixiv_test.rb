@@ -8,13 +8,6 @@ module Sources
       @site
     end
 
-    def teardown
-      super
-
-      # need to reset the connection
-      Sources::Strategies::Pixiv.new("http://www.pixiv.net").agent.shutdown
-    end
-
     context "in all cases" do
       context "A touch page" do
         setup do

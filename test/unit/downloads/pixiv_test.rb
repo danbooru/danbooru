@@ -2,13 +2,6 @@ require 'test_helper'
 
 module Downloads
   class PixivTest < ActiveSupport::TestCase
-    def teardown
-      super
-
-      # need to reset the connection
-      Sources::Strategies::Pixiv.new("http://www.pixiv.net").agent.shutdown
-    end
-
     context "An ugoira site for pixiv" do
       setup do
         @download = Downloads::File.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
