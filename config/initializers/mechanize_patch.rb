@@ -1,6 +1,11 @@
 require 'mechanize'
 
 if Rails.env.test?
+  # something about the root certs on the travis ci image causes Mechanize
+  # to intermittently fail. this is a monkey patch to reset the connection
+  # after every request to avoid dealing wtiht he issue.
+  #
+  # from http://scottwb.com/blog/2013/11/09/defeating-the-infamous-mechanize-too-many-connection-resets-bug/
   class Mechanize::HTTP::Agent
     MAX_RESET_RETRIES = 10
 
