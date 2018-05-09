@@ -264,7 +264,8 @@ class UploadTest < ActiveSupport::TestCase
       upload = FactoryBot.create(:upload, rating: "s", file: upload_file("test/files/test-512x512.webm"))
 
       assert_difference("Post.count") do
-        assert_nothing_raised { upload.process! }
+        upload.process!
+        assert_equal("completed", upload.status)
       end
 
       post = Post.last
@@ -283,7 +284,8 @@ class UploadTest < ActiveSupport::TestCase
       upload = FactoryBot.create(:upload, rating: "s", file: upload_file("test/files/test-300x300.mp4"))
 
       assert_difference("Post.count") do
-        assert_nothing_raised { upload.process! }
+        upload.process!
+        assert_equal("completed", upload.status)
       end
 
       post = Post.last

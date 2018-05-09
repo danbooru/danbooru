@@ -2089,7 +2089,7 @@ class PostTest < ActiveSupport::TestCase
     end
 
     should "return posts for the date:<d> metatag" do
-      post = FactoryBot.create(:post, created_at: Time.parse("2017-01-01"))
+      post = FactoryBot.create(:post, created_at: Time.parse("2017-01-01 12:00"))
 
       assert_tag_match([post], "date:2017-01-01")
     end
@@ -2621,9 +2621,13 @@ class PostTest < ActiveSupport::TestCase
       setup do
         PostArchive.sqs_service.stubs(:merge?).returns(false)
         @post = FactoryBot.create(:post, :rating => "q", :tag_string => "aaa", :source => "")
-        @post.update_attributes(:tag_string => "aaa bbb ccc ddd")
-        @post.update_attributes(:tag_string => "bbb xxx yyy", :source => "xyz")
-        @post.update_attributes(:tag_string => "bbb mmm yyy", :source => "abc")
+        @post.reload
+        @post.update(:tag_string => "aaa bbb ccc ddd")
+        @post.reload
+        @post.update(:tag_string => "bbb xxx yyy", :source => "xyz")
+        @post.reload
+        @post.update(:tag_string => "bbb mmm yyy", :source => "abc")
+        @post.reload
       end
 
       context "and then reverted to an early version" do

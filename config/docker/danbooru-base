@@ -1,5 +1,3 @@
-# This sets up a docker container suitable for use with Travis CI
-
 FROM ruby:2.5.1-slim-stretch
 
 RUN apt-get update
