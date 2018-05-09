@@ -1,11 +1,12 @@
 require 'test_helper'
-require 'resolv-replace'
 
 module Sources
   class PixivTest < ActiveSupport::TestCase
     def get_source(source)
       @site = Sources::Site.new(source)
       @site.get
+
+      # need to reset the connection
       @site.strategy.agent.shutdown
       @site
     end
