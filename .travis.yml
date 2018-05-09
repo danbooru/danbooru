@@ -4,7 +4,9 @@ language: bash
 
 env:
   global:
-    - DOCKER_COMPOSE_VERSION=1.21.1 
+    - DOCKER_COMPOSE_VERSION=1.21.1
+    - PGHOST
+    - PGPORT
 
 before_install:
   - sudo rm /usr/local/bin/docker-compose
@@ -13,10 +15,10 @@ before_install:
   - sudo mv docker-compose /usr/local/bin
 
 install:
-  - env | egrep 'DANBOORU|RAILS|DATABASE_URL|SECRET' > .env.test
+  - env | egrep 'DEBUG|DANBOORU|RAILS|DATABASE_URL|SECRET' > .env.test
   - docker-compose -f config/docker/compose.yml up -d web
-  - docker-compose -f config/docker/compose.yml exec archives dockerize -wait tcp://db:5432 bash -l -c 'cd /app ; bundle exec rake db:create ; bundle exec rake db:migrate'
-  - docker-compose -f config/docker/compose.yml exec web dockerize -wait tcp://db:5432 bash -l -c 'cd /app ; bin/rake db:create ; bin/rake db:migrate'
+  - docker-compose -f config/docker/compose.yml exec archives dockerize -wait tcp://$PGHOST:$PGPORT bash -l -c 'cd /app ; bundle exec rake db:create ; bundle exec rake db:migrate'
+  - docker-compose -f config/docker/compose.yml exec web dockerize -wait tcp://$PGHOST:$PGPORT bash -l -c 'cd /app ; bin/rake db:create ; bin/rake db:migrate'
 
 script:
   - docker-compose -f config/docker/compose.yml exec web bin/rake test

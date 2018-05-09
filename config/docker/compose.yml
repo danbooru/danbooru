@@ -5,7 +5,7 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_PASSWORD=73e1ac2e91eb52a9981d09fca561aac3
+      - POSTGRES_PASSWORD
   memcached:
     image: memcached:alpine
     ports:
@@ -15,9 +15,9 @@ services:
     image: r888888888/archives
     command: sleep 1d
     environment:
-      - POSTGRES_HOST=db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=73e1ac2e91eb52a9981d09fca561aac3
+      - POSTGRES_HOST
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
       - RAILS_ENV
       - AMAZON_KEY
       - AMAZON_SQS_REGION
@@ -28,11 +28,12 @@ services:
       - db
   web:
     environment:
-      - SECRET_TOKEN=73e1ac2e91eb52a9981d09fca561aac3
-      - SESSION_SECRET_KEY=73e1ac2e91eb52a9981d09fca561aac3
+      - SECRET_TOKEN
+      - SESSION_SECRET_KEY
       - RAILS_ENV
       - DATABASE_URL
       - RO_DATABASE_URL
+      - DEBUG
       - ARCHIVE_DATABASE_URL
       - DANBOORU_MEMCACHED_SERVERS
       - DANBOORU_AWS_SQS_ARCHIVE_URL
