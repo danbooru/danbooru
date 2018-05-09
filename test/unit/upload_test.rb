@@ -96,17 +96,17 @@ class UploadTest < ActiveSupport::TestCase
 
       context "determining if a file is downloadable" do
         should "classify HTTP sources as downloadable" do
-          @upload = FactoryBot.create(:source_upload, :source => "http://www.example.com/1.jpg")
+          @upload = FactoryBot.create(:source_upload, :source => "http://www.google.com/1.jpg")
           assert_not_nil(@upload.is_downloadable?)
         end
 
         should "classify HTTPS sources as downloadable" do
-          @upload = FactoryBot.create(:source_upload, :source => "https://www.example.com/1.jpg")
+          @upload = FactoryBot.create(:source_upload, :source => "https://www.google.com/1.jpg")
           assert_not_nil(@upload.is_downloadable?)
         end
 
         should "classify non-HTTP/HTTPS sources as not downloadable" do
-          @upload = FactoryBot.create(:source_upload, :source => "ftp://www.example.com/1.jpg")
+          @upload = FactoryBot.create(:source_upload, :source => "ftp://www.google.com/1.jpg")
           assert_nil(@upload.is_downloadable?)
         end
       end

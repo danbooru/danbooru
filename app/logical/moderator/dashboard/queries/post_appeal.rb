@@ -7,7 +7,7 @@ module Moderator
             .deleted
             .where("post_appeals.created_at > ?", min_date)
             .group(:id)
-            .order("count(*) desc")
+            .order(Arel.sql("count(*) desc"))
             .limit(10)
         end
       end

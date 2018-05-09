@@ -1,46 +1,25 @@
-sudo: enabled
+sudo: required
+dist: trusty
 language: bash
 
 env:
   global:
-    - DISTRO=ubuntu:16.04
-    - BUILD_DIR=/build
-    - PACKAGES="ruby2.5 ruby2.5-dev ruby-switch bundler libglib2.0-dev zlib1g-dev git sudo postgresql-9.5 postgresql-server-dev-9.5 libvips-dev libvips-tools ffmpeg mkvtoolnix"
-    - DATABASE_URL="postgresql:///danbooru_test?template=template0"
-    - SECRET_TOKEN="xxx"
-    - SESSION_SECRET_KEY="xxx"
-
-services:
-  - docker
+    - DOCKER_COMPOSE_VERSION=1.21.1 
 
 before_install:
-  - docker run -d --name test-container -v $(pwd):$BUILD_DIR $DISTRO sleep 1d
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
 
 install:
-  - docker exec -t test-container bash -c "
-    cd $BUILD_DIR;
-    apt-get update;
-    apt-get install -y tzdata software-properties-common;
-    cp /usr/share/zoneinfo/America/Los_Angeles /etc/localtime;
-    apt-add-repository -y ppa:brightbox/ruby-ng;
-    apt-get update;
-    apt-get install -y $PACKAGES;
-
-    service postgresql start;
-    sudo -u postgres createuser --echo --superuser root;
-    createdb --echo --template=template0 danbooru_test;
-
-    cp script/install/danbooru_local_config.rb.templ config/danbooru_local_config.rb;
-    cp script/install/database.yml.templ config/database.yml;
-    ruby-switch --set ruby2.5
-
-    git clone https://github.com/r888888888/test_parser.git $BUILD_DIR/test_parser;
-    cd $BUILD_DIR/test_parser;
-    make install;
-    mkdir ~/.danbooru;
-    "
+  - env | egrep 'DANBOORU|RAILS|DATABASE_URL|SECRET' > .env.test
+  - docker-compose -f config/docker/compose.yml up -d web
+  - docker-compose -f config/docker/compose.yml exec archives dockerize -wait tcp://db:5432 bash -l -c 'cd /app ; bundle exec rake db:create ; bundle exec rake db:migrate'
+  - docker-compose -f config/docker/compose.yml exec web dockerize -wait tcp://db:5432 bash -l -c 'cd /app ; bin/rake db:create ; bin/rake db:migrate'
 
 script:
-  - docker exec -t test-container bash -c "
-    cd $BUILD_DIR;
-    bundle install && bin/rake"
+  - docker-compose -f config/docker/compose.yml exec web bin/rake test
+
+after_script:
+  - docker-compose -f config/docker/compose.yml down

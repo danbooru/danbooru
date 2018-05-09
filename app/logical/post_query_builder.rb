@@ -363,7 +363,7 @@ class PostQueryBuilder
 
     if q[:ordpool].present?
       pool_id = q[:ordpool].to_i
-      relation = relation.order("position(' '||posts.id||' ' in ' '||(select post_ids from pools where id = #{pool_id})||' ')")
+      relation = relation.order(Arel.sql("position(' '||posts.id||' ' in ' '||(select post_ids from pools where id = #{pool_id})||' ')"))
     end
 
     if q[:favgroups_neg].present?
@@ -479,20 +479,20 @@ class PostQueryBuilder
       relation = relation.order("artist_commentaries.updated_at ASC")
 
     when "mpixels", "mpixels_desc"
-      relation = relation.where("posts.image_width is not null and posts.image_height is not null")
+      relation = relation.where(Arel.sql("posts.image_width is not null and posts.image_height is not null"))
       # Use "w*h/1000000", even though "w*h" would give the same result, so this can use
       # the posts_mpixels index.
-      relation = relation.order("posts.image_width * posts.image_height / 1000000.0 DESC")
+      relation = relation.order(Arel.sql("posts.image_width * posts.image_height / 1000000.0 DESC"))
 
     when "mpixels_asc"
       relation = relation.where("posts.image_width is not null and posts.image_height is not null")
-      relation = relation.order("posts.image_width * posts.image_height / 1000000.0 ASC")
+      relation = relation.order(Arel.sql("posts.image_width * posts.image_height / 1000000.0 ASC"))
 
     when "portrait"
-      relation = relation.order("1.0 * posts.image_width / GREATEST(1, posts.image_height) ASC")
+      relation = relation.order(Arel.sql("1.0 * posts.image_width / GREATEST(1, posts.image_height) ASC"))
 
     when "landscape"
-      relation = relation.order("1.0 * posts.image_width / GREATEST(1, posts.image_height) DESC")
+      relation = relation.order(Arel.sql("1.0 * posts.image_width / GREATEST(1, posts.image_height) DESC"))
 
     when "filesize", "filesize_desc"
       relation = relation.order("posts.file_size DESC")
@@ -513,7 +513,7 @@ class PostQueryBuilder
       relation = relation.order("posts.tag_count_#{TagCategory.short_name_mapping[$1]} ASC")
 
     when "rank"
-      relation = relation.order("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 35000 DESC")
+      relation = relation.order(Arel.sql("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 35000 DESC"))
 
     when "custom"
       if q[:post_id].present? && q[:post_id][0] == :in

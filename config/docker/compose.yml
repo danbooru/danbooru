@@ -1,0 +1,59 @@
+version: '3'
+services:
+  db:
+    image: r888888888/postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=73e1ac2e91eb52a9981d09fca561aac3
+  memcached:
+    image: memcached:alpine
+    ports:
+      - "11211:11211"
+    command: memcached
+  archives:
+    image: r888888888/archives
+    command: sleep 1d
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=73e1ac2e91eb52a9981d09fca561aac3
+      - RAILS_ENV
+      - AMAZON_KEY
+      - AMAZON_SQS_REGION
+      - AMAZON_SECRET
+      - SQS_ARCHIVES_URL
+      - RUN
+    depends_on:
+      - db
+  web:
+    environment:
+      - SECRET_TOKEN=73e1ac2e91eb52a9981d09fca561aac3
+      - SESSION_SECRET_KEY=73e1ac2e91eb52a9981d09fca561aac3
+      - RAILS_ENV
+      - DATABASE_URL
+      - RO_DATABASE_URL
+      - ARCHIVE_DATABASE_URL
+      - DANBOORU_MEMCACHED_SERVERS
+      - DANBOORU_AWS_SQS_ARCHIVE_URL
+      - DANBOORU_PIXIV_LOGIN
+      - DANBOORU_PIXIV_PASSWORD
+      - DANBOORU_TWITTER_API_KEY
+      - DANBOORU_TWITTER_API_SECRET
+      - DANBOORU_AWS_ACCESS_KEY_ID
+      - DANBOORU_AWS_SECRET_ACCESS_KEY
+      - DANBOORU_AWS_SQS_REGION
+      - DANBOORU_NIJIE_LOGIN
+      - DANBOORU_NIJIE_PASSWORD
+      - DANBOORU_NICO_SEIGA_LOGIN
+      - DANBOORU_NICO_SEIGA_PASSWORD
+    build: 
+      context: ../..
+      dockerfile: config/docker/danbooru-ci
+    command: sleep 1d
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - memcached
+      - archives
