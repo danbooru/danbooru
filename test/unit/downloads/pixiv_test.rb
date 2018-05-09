@@ -6,7 +6,7 @@ module Downloads
       super
 
       # need to reset the connection
-      Sources::Strategies::Pixiv.new.agent.shutdown
+      Sources::Strategies::Pixiv.new("http://www.pixiv.net").agent.shutdown
     end
 
     context "An ugoira site for pixiv" do

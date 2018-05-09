@@ -5,10 +5,14 @@ module Sources
     def get_source(source)
       @site = Sources::Site.new(source)
       @site.get
+      @site
+    end
+
+    def teardown
+      super
 
       # need to reset the connection
-      @site.strategy.agent.shutdown
-      @site
+      Sources::Strategies::Pixiv.new("http://www.pixiv.net").agent.shutdown
     end
 
     context "in all cases" do
