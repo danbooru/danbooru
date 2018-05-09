@@ -15,6 +15,11 @@ class PostKeeperManager
   end
 
   def self.check_and_update(post, updater_id = nil, increment_tags = nil)
+    check_and_assign(post, updater_id, increment_tags)
+    post.update_column(:keeper_data, post.keeper_data)
+  end
+
+  def self.check_and_assign(post, updater_id = nil, increment_tags = nil)
     post = Post.find(post) unless post.is_a?(Post)
     keeper_id = check(post, updater_id, increment_tags)
     post.keeper_data = {uid: keeper_id}

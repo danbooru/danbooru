@@ -73,19 +73,24 @@ class PoolTest < ActiveSupport::TestCase
       @p3 = FactoryBot.create(:post)
       CurrentUser.scoped(@user, "1.2.3.4") do
         @pool.add!(@p1)
+        @pool.reload
       end
       CurrentUser.scoped(@user, "1.2.3.5") do
         @pool.add!(@p2)
+        @pool.reload
       end
       CurrentUser.scoped(@user, "1.2.3.6") do
         @pool.add!(@p3)
+        @pool.reload
       end
       CurrentUser.scoped(@user, "1.2.3.7") do
         @pool.remove!(@p1)
+        @pool.reload
       end
       CurrentUser.scoped(@user, "1.2.3.8") do
         version = @pool.versions[1]
         @pool.revert_to!(version)
+        @pool.reload
       end
     end
 

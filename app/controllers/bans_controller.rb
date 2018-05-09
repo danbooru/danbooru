@@ -54,6 +54,6 @@ class BansController < ApplicationController
     permitted_params = %i[reason duration expires_at]
     permitted_params += %i[user_id user_name] if context == :create
 
-    params.require(:ban).permit(permitted_params)
+    params.fetch(:ban, {}).permit(permitted_params)
   end
 end

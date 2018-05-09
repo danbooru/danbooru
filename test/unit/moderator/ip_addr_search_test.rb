@@ -11,6 +11,7 @@ module Moderator
         @comment = FactoryBot.create(:comment)
         PoolArchive.stubs(:enabled?).returns(false)
         PostArchive.stubs(:enabled?).returns(false)
+        @user.reload
       end
 
       teardown do

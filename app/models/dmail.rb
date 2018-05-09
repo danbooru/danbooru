@@ -255,8 +255,8 @@ class Dmail < ApplicationRecord
   end
 
   def mark_as_read!
+    update_column(:is_read, true)
     owner.dmails.unread.count.tap do |unread_count|
-      update_column(:is_read, true)
       owner.update(has_mail: (unread_count > 0), unread_dmail_count: unread_count)
     end
   end

@@ -44,6 +44,7 @@ class PoolElementsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "do nothing if the post is not a member of the pool" do
+        @pool.reload
         as_user do
           @pool.remove!(@post)
         end

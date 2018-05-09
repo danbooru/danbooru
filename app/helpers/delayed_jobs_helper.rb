@@ -1,7 +1,7 @@
 module DelayedJobsHelper
   def print_name(job)
     case job.name
-    when "PostKeeperManager.check_and_update"
+    when "PostKeeperManager.check_and_assign"
       "<strong>update post tagger</strong>"
 
     when "Tag.increment_post_counts"
@@ -71,7 +71,7 @@ module DelayedJobsHelper
 
   def print_handler(job)
     case job.name
-    when "PostKeeperManager.check_and_update"
+    when "PostKeeperManager.check_and_assign"
       ""
 
     when "Tag.increment_post_counts", "Tag.decrement_post_counts"

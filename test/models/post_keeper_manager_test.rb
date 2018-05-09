@@ -3,7 +3,7 @@ require 'test_helper'
 class PostKeeperManagerTest < ActiveSupport::TestCase
   subject { PostKeeperManager }
 
-  context "#check_and_update" do
+  context "#check_and_assign" do
     setup do
       Timecop.travel(1.month.ago) do
         @alice = FactoryBot.create(:user)
@@ -17,19 +17,21 @@ class PostKeeperManagerTest < ActiveSupport::TestCase
       end
       CurrentUser.scoped(@bob) do
         Timecop.travel(2.hours.from_now) do
-          @post.update_attributes(tag_string: "aaa bbb ccc")
+          @post.reload
+          @post.update(tag_string: "aaa bbb ccc")
         end
       end
       CurrentUser.scoped(@carol) do
         Timecop.travel(4.hours.from_now) do
-          @post.update_attributes(tag_string: "ccc ddd eee fff ggg")
+          @post.reload
+          @post.update(tag_string: "ccc ddd eee fff ggg")
         end
       end
     end
 
     should "update the post" do
-      subject.check_and_update(@post.id)
-      @post.reload
+      assert_equal(3, @post.versions.count)
+      subject.check_and_assign(@post)
       assert_equal({"uid" => @carol.id}, @post.keeper_data)
     end
   end

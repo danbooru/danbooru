@@ -2,6 +2,11 @@ require 'test_helper'
 
 module Sources
   class DeviantArtTest < ActiveSupport::TestCase
+    def setup
+      super
+      skip "DeviantArt API keys not set" unless Danbooru.config.deviantart_client_id.present?
+    end
+
     context "The source for a private DeviantArt image URL" do
       setup do
         @site = Sources::Site.new("https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png")
