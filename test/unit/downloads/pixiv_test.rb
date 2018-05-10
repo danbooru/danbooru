@@ -2,6 +2,16 @@ require 'test_helper'
 
 module Downloads
   class PixivTest < ActiveSupport::TestCase
+    def setup
+      super
+      load_pixiv_tokens!
+    end
+
+    def teardown
+      save_pixiv_tokens!
+      super
+    end
+
     context "An ugoira site for pixiv" do
       setup do
         @download = Downloads::File.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")

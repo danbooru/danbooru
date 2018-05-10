@@ -48,6 +48,7 @@ services:
       - DANBOORU_NIJIE_PASSWORD
       - DANBOORU_NICO_SEIGA_LOGIN
       - DANBOORU_NICO_SEIGA_PASSWORD
+      - DANBOORU_PERSIST_PIXIV_SESSION
     build: 
       context: ../..
       dockerfile: config/docker/danbooru-ci

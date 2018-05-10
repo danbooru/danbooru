@@ -154,6 +154,9 @@ class PixivApiClient
     else
       raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
     end
+  rescue Net::OpenTimeout
+    sleep(5)
+    retry
   rescue JSON::ParserError
     raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
   end
@@ -173,7 +176,7 @@ class PixivApiClient
       }
       url = "https://oauth.secure.pixiv.net/auth/token"
 
-      resp = HTTParty.post(url, Danbooru.config.httparty_options.deep_merge(timeout: 20, body: params, headers: headers))
+      resp = HTTParty.post(url, Danbooru.config.httparty_options.deep_merge(body: params, headers: headers))
       body = resp.body.force_encoding("utf-8")
 
       if resp.success?
