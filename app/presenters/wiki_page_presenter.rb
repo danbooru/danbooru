@@ -19,7 +19,7 @@ class WikiPagePresenter
     cbo = Diff::LCS::ContextDiffCallbacks.new
     diffs = thisarr.diff(otharr, cbo)
 
-    escape_html = lambda {|str| str.gsub(/&/,'&amp;').gsub(/</,'&lt;').gsub(/>/,'&gt;')}
+    escape_html = ->(str) {str.gsub(/&/,'&amp;').gsub(/</,'&lt;').gsub(/>/,'&gt;')}
 
     output = thisarr;
     output.each { |q| q.replace(CGI.escape_html(q)) }

@@ -7,10 +7,10 @@ class PostDisapproval < ApplicationRecord
   validates_uniqueness_of :post_id, :scope => [:user_id], :message => "have already hidden this post"
   validates_inclusion_of :reason, :in => %w(legacy breaks_rules poor_quality disinterest)
 
-  scope :with_message, lambda {where("message is not null and message <> ''")}
-  scope :breaks_rules, lambda {where(:reason => "breaks_rules")}
-  scope :poor_quality, lambda {where(:reason => "poor_quality")}
-  scope :disinterest, lambda {where(:reason => ["disinterest", "legacy"])}
+  scope :with_message, -> {where("message is not null and message <> ''")}
+  scope :breaks_rules, -> {where(:reason => "breaks_rules")}
+  scope :poor_quality, -> {where(:reason => "poor_quality")}
+  scope :disinterest, -> {where(:reason => ["disinterest", "legacy"])}
 
   def initialize_attributes
     self.user_id ||= CurrentUser.user.id

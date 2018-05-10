@@ -1,7 +1,7 @@
 class ArtistCommentaryVersion < ApplicationRecord
   belongs_to :post
   belongs_to_updater
-  scope :for_user, lambda {|user_id| where("updater_id = ?", user_id)}
+  scope :for_user, ->(user_id) {where("updater_id = ?", user_id)}
 
   def self.search(params)
     q = super

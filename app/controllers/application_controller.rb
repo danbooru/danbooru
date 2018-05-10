@@ -24,7 +24,7 @@ class ApplicationController < ActionController::Base
 
   # This is raised on requests to `/blah.js`. Rails has already rendered StaticController#not_found
   # here, so calling `rescue_exception` would cause a double render error.
-  rescue_from ActionController::InvalidCrossOriginRequest, :with => lambda {}
+  rescue_from ActionController::InvalidCrossOriginRequest, with: -> {}
 
   protected
 

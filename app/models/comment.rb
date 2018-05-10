@@ -9,17 +9,17 @@ class Comment < ApplicationRecord
   belongs_to_updater
   has_many :votes, :class_name => "CommentVote", :dependent => :destroy
   after_create :update_last_commented_at_on_create
-  after_update(:if => lambda {|rec| (!rec.is_deleted? || !rec.saved_change_to_is_deleted?) && CurrentUser.id != rec.creator_id}) do |rec|
+  after_update(:if => ->(rec) {(!rec.is_deleted? || !rec.saved_change_to_is_deleted?) && CurrentUser.id != rec.creator_id}) do |rec|
     ModAction.log("comment ##{rec.id} updated by #{CurrentUser.name}",:comment_update)
   end
-  after_save :update_last_commented_at_on_destroy, :if => lambda {|rec| rec.is_deleted? && rec.saved_change_to_is_deleted?}
-  after_save(:if => lambda {|rec| rec.is_deleted? && rec.saved_change_to_is_deleted? && CurrentUser.id != rec.creator_id}) do |rec|
+  after_save :update_last_commented_at_on_destroy, :if => ->(rec) {rec.is_deleted? && rec.saved_change_to_is_deleted?}
+  after_save(:if => ->(rec) {rec.is_deleted? && rec.saved_change_to_is_deleted? && CurrentUser.id != rec.creator_id}) do |rec|
     ModAction.log("comment ##{rec.id} deleted by #{CurrentUser.name}",:comment_delete)
   end
   mentionable(
     :message_field => :body, 
-    :title => lambda {|user_name| "#{creator_name} mentioned you in a comment on post ##{post_id}"},
-    :body => lambda {|user_name| "@#{creator_name} mentioned you in a \"comment\":/posts/#{post_id}#comment-#{id} on post ##{post_id}:\n\n[quote]\n#{DText.excerpt(body, "@"+user_name)}\n[/quote]\n"},
+    :title => ->(user_name) {"#{creator_name} mentioned you in a comment on post ##{post_id}"},
+    :body => ->(user_name) {"@#{creator_name} mentioned you in a \"comment\":/posts/#{post_id}#comment-#{id} on post ##{post_id}:\n\n[quote]\n#{DText.excerpt(body, "@"+user_name)}\n[/quote]\n"},
   )
 
   module SearchMethods

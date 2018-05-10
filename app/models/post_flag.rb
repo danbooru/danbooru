@@ -19,9 +19,9 @@ class PostFlag < ApplicationRecord
   before_save :update_post
   attr_accessor :is_deletion
 
-  scope :by_users, lambda { where.not(creator: User.system) }
-  scope :by_system, lambda { where(creator: User.system) }
-  scope :in_cooldown, lambda { by_users.where("created_at >= ?", COOLDOWN_PERIOD.ago) }
+  scope :by_users, -> { where.not(creator: User.system) }
+  scope :by_system, -> { where(creator: User.system) }
+  scope :in_cooldown, -> { by_users.where("created_at >= ?", COOLDOWN_PERIOD.ago) }
 
   module SearchMethods
     def reason_matches(query)

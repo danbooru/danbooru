@@ -13,8 +13,8 @@ class ForumTopic < ApplicationRecord
 
   belongs_to_creator
   belongs_to_updater
-  has_many :posts, lambda {order("forum_posts.id asc")}, :class_name => "ForumPost", :foreign_key => "topic_id", :dependent => :destroy
-  has_one :original_post, lambda {order("forum_posts.id asc")}, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
+  has_many :posts, -> {order("forum_posts.id asc")}, :class_name => "ForumPost", :foreign_key => "topic_id", :dependent => :destroy
+  has_one :original_post, -> {order("forum_posts.id asc")}, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
   has_many :subscriptions, :class_name => "ForumSubscription"
   before_validation :initialize_is_deleted, :on => :create
   validates_presence_of :title, :creator_id
@@ -24,7 +24,7 @@ class ForumTopic < ApplicationRecord
   validates :title, :length => {:maximum => 255}
   accepts_nested_attributes_for :original_post
   after_update :update_orignal_post
-  after_save(:if => lambda {|rec| rec.is_locked? && rec.saved_change_to_is_locked?}) do |rec|
+  after_save(:if => ->(rec) {rec.is_locked? && rec.saved_change_to_is_locked?}) do |rec|
     ModAction.log("locked forum topic ##{id} (title: #{title})",:forum_topic_lock)
   end
 

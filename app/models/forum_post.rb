@@ -19,16 +19,16 @@ class ForumPost < ApplicationRecord
   validate :topic_is_not_restricted, :on => :create
   before_destroy :validate_topic_is_unlocked
   after_save :delete_topic_if_original_post
-  after_update(:if => lambda {|rec| rec.updater_id != rec.creator_id}) do |rec|
+  after_update(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |rec|
     ModAction.log("#{CurrentUser.name} updated forum ##{rec.id}",:forum_post_update)
   end
-  after_destroy(:if => lambda {|rec| rec.updater_id != rec.creator_id}) do |rec|
+  after_destroy(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |rec|
     ModAction.log("#{CurrentUser.name} deleted forum ##{rec.id}",:forum_post_delete)
   end
   mentionable(
     :message_field => :body, 
-    :title => lambda {|user_name| %{#{creator_name} mentioned you in topic ##{topic_id} (#{topic.title})}},
-    :body => lambda {|user_name| %{@#{creator_name} mentioned you in topic ##{topic_id} ("#{topic.title}":[/forum_topics/#{topic_id}?page=#{forum_topic_page}]):\n\n[quote]\n#{DText.excerpt(body, "@"+user_name)}\n[/quote]\n}},
+    :title => ->(user_name) {%{#{creator_name} mentioned you in topic ##{topic_id} (#{topic.title})}},
+    :body => ->(user_name) {%{@#{creator_name} mentioned you in topic ##{topic_id} ("#{topic.title}":[/forum_topics/#{topic_id}?page=#{forum_topic_page}]):\n\n[quote]\n#{DText.excerpt(body, "@"+user_name)}\n[/quote]\n}},
   )
 
   module SearchMethods

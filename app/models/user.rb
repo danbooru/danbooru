@@ -68,15 +68,15 @@ class User < ApplicationRecord
 
   after_initialize :initialize_attributes, if: :new_record?
   validates :name, user_name: true, on: :create
-  validates_uniqueness_of :email, :case_sensitive => false, :if => lambda {|rec| rec.email.present? && rec.saved_change_to_email? }
-  validates_length_of :password, :minimum => 5, :if => lambda {|rec| rec.new_record? || rec.password.present?}
+  validates_uniqueness_of :email, :case_sensitive => false, :if => ->(rec) { rec.email.present? && rec.saved_change_to_email? }
+  validates_length_of :password, :minimum => 5, :if => ->(rec) { rec.new_record? || rec.password.present?}
   validates_inclusion_of :default_image_size, :in => %w(large original)
   validates_inclusion_of :per_page, :in => 1..100
   validates_confirmation_of :password
-  validates_presence_of :email, :if => lambda {|rec| rec.new_record? && Danbooru.config.enable_email_verification?}
+  validates_presence_of :email, :if => ->(rec) { rec.new_record? && Danbooru.config.enable_email_verification?}
   validates_presence_of :comment_threshold
   validate :validate_ip_addr_is_not_banned, :on => :create
-  validate :validate_sock_puppets, :on => :create, :if => lambda { Danbooru.config.enable_sock_puppet_validation? }
+  validate :validate_sock_puppets, :on => :create, :if => -> { Danbooru.config.enable_sock_puppet_validation? }
   before_validation :normalize_blacklisted_tags
   before_validation :set_per_page
   before_validation :normalize_email
@@ -92,19 +92,19 @@ class User < ApplicationRecord
   has_many :post_approvals, :dependent => :destroy
   has_many :post_disapprovals, :dependent => :destroy
   has_many :post_votes
-  has_many :bans, lambda {order("bans.id desc")}
-  has_one :recent_ban, lambda {order("bans.id desc")}, :class_name => "Ban"
+  has_many :bans, -> {order("bans.id desc")}
+  has_one :recent_ban, -> {order("bans.id desc")}, :class_name => "Ban"
 
   has_one :api_key
   has_one :dmail_filter
   has_one :super_voter
   has_one :token_bucket
   has_many :note_versions, :foreign_key => "updater_id"
-  has_many :dmails, lambda {order("dmails.id desc")}, :foreign_key => "owner_id"
+  has_many :dmails, -> {order("dmails.id desc")}, :foreign_key => "owner_id"
   has_many :saved_searches
-  has_many :forum_posts, lambda {order("forum_posts.created_at, forum_posts.id")}, :foreign_key => "creator_id"
-  has_many :user_name_change_requests, lambda {visible.order("user_name_change_requests.created_at desc")}
-  has_many :favorite_groups, lambda {order(name: :asc)}, foreign_key: :creator_id
+  has_many :forum_posts, -> {order("forum_posts.created_at, forum_posts.id")}, :foreign_key => "creator_id"
+  has_many :user_name_change_requests, -> {visible.order("user_name_change_requests.created_at desc")}
+  has_many :favorite_groups, -> {order(name: :asc)}, foreign_key: :creator_id
   belongs_to :inviter, class_name: "User", optional: true
   after_update :create_mod_action
   accepts_nested_attributes_for :dmail_filter

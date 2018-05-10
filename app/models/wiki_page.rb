@@ -13,8 +13,8 @@ class WikiPage < ApplicationRecord
   validate :validate_not_locked
   attr_accessor :skip_secondary_validations
   has_one :tag, :foreign_key => "name", :primary_key => "title"
-  has_one :artist, lambda {where(:is_active => true)}, :foreign_key => "name", :primary_key => "title"
-  has_many :versions, lambda {order("wiki_page_versions.id ASC")}, :class_name => "WikiPageVersion", :dependent => :destroy
+  has_one :artist, -> {where(:is_active => true)}, :foreign_key => "name", :primary_key => "title"
+  has_many :versions, -> {order("wiki_page_versions.id ASC")}, :class_name => "WikiPageVersion", :dependent => :destroy
 
   module SearchMethods
     def titled(title)

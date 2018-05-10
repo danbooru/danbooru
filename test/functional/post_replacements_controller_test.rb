@@ -26,7 +26,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           }
         }
 
-        assert_difference(lambda { @post.replacements.size }) do
+        assert_difference(-> { @post.replacements.size }) do
           post_auth post_replacements_path, @user, params: params
           @post.reload
         end

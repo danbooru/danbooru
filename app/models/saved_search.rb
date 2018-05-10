@@ -52,7 +52,7 @@ class SavedSearch < ApplicationRecord
   after_save {|rec| Cache.delete(SavedSearch.cache_key(rec.user_id))}
   after_destroy {|rec| Cache.delete(SavedSearch.cache_key(rec.user_id))}
   before_validation :normalize
-  scope :labeled, lambda {|label| where("labels @> string_to_array(?, '~~~~')", label)}
+  scope :labeled, ->(label) { where("labels @> string_to_array(?, '~~~~')", label)}
 
   def self.normalize_label(label)
     label.to_s.strip.downcase.gsub(/[[:space:]]/, "_")
