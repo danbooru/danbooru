@@ -567,7 +567,7 @@ class Post < ApplicationRecord
         PostKeeperManager.check_and_assign(self, CurrentUser.id, increment_tags)
 
         # run this again async to check for race conditions
-        PostKeeperManager.queue_check(self, CurrentUser.id)
+        PostKeeperManager.queue_check(id, CurrentUser.id)
       end
     end
 
