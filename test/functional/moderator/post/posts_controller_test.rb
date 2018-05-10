@@ -71,13 +71,15 @@ module Moderator
             users = FactoryBot.create_list(:user, 2)
             users.each do |u| 
               @child.add_favorite!(u)
+              @child.reload
             end
 
             post_auth move_favorites_moderator_post_post_path(@child.id), @admin, params: { commit: "Submit" }
             assert_redirected_to(@child)
+            @parent.reload
             as(@admin) do
-              assert_equal(users, @parent.reload.favorited_users)
-              assert_equal([], @child.reload.favorited_users)
+              assert_equal(users, @parent.favorited_users)
+              assert_equal([], @child.favorited_users)
             end
           end
         end
