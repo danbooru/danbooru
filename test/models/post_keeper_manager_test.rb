@@ -3,6 +3,25 @@ require 'test_helper'
 class PostKeeperManagerTest < ActiveSupport::TestCase
   subject { PostKeeperManager }
 
+  context "#check_and_update" do
+    context "when the connection is bad" do
+      setup do
+        @user = FactoryBot.create(:user)
+        as(@user) do
+          @post = FactoryBot.create(:post)
+        end
+        @post.stubs(:update_column).raises(ActiveRecord::StatementInvalid.new("can't get socket descriptor post_versions"))
+      end
+
+      should "retry" do
+        PostArchive.connection.expects(:reconnect!)
+        assert_raises(ActiveRecord::StatementInvalid) do
+          subject.check_and_update(@post)        
+        end
+      end
+    end
+  end
+
   context "#check_and_assign" do
     setup do
       Timecop.travel(1.month.ago) do
