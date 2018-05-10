@@ -11,6 +11,12 @@ class PostArchive < ApplicationRecord
   establish_connection (ENV["ARCHIVE_DATABASE_URL"] || "archive_#{Rails.env}".to_sym) if enabled?
   self.table_name = "post_versions"
 
+  def self.check_for_retry(msg)
+    if msg =~ /can't get socket descriptor/ && msg =~ /post_versions/
+      connection.reconnect!
+    end
+  end
+
   module SearchMethods
     def for_user(user_id)
       if user_id
