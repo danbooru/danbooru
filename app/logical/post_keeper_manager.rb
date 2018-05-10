@@ -15,6 +15,7 @@ class PostKeeperManager
   end
 
   def self.check_and_update(post, updater_id = nil, increment_tags = nil)
+    post = Post.find(post) unless post.is_a?(Post)
     check_and_assign(post, updater_id, increment_tags)
     post.update_column(:keeper_data, post.keeper_data)
   rescue ActiveRecord::StatementInvalid => e
