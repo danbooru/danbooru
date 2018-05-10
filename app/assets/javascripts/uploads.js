@@ -8,7 +8,11 @@
     }
 
     if ($("#c-uploads").length) {
-      $("#image").on("load", this.initialize_image);
+      if ($("#image").prop("complete")) {
+        this.initialize_image();
+      } else {
+        $("#image").on("load error", this.initialize_image);
+      }
       this.initialize_info_bookmarklet();
       this.initialize_similar();
       this.initialize_shortcuts();
@@ -165,16 +169,22 @@
 
   Danbooru.Upload.initialize_image = function() {
     var $image = $("#image");
-    if ($image.length) {
-      var width = $image.width();
-      var height = $image.height();
-      $image.data("original-width", width);
-      $image.data("original-height", height);
-      Danbooru.Post.resize_image_to_window($image);
-      Danbooru.Post.initialize_post_image_resize_to_window_link();
-      Danbooru.Upload.update_scale();
-      $("#image-resize-to-window-link").click(Danbooru.Upload.update_scale);
+    if (!$image.length) {
+      return;
     }
+    var width = $image.width();
+    var height = $image.height();
+    if (!width || !height) {
+      // try again later
+      $.timeout(100).done(function() {Danbooru.Upload.initialize_image()});
+      return;
+    }
+    $image.data("original-width", width);
+    $image.data("original-height", height);
+    Danbooru.Post.resize_image_to_window($image);
+    Danbooru.Post.initialize_post_image_resize_to_window_link();
+    Danbooru.Upload.update_scale();
+    $("#image-resize-to-window-link").click(Danbooru.Upload.update_scale);
   }
 
   Danbooru.Upload.toggle_commentary = function() {
