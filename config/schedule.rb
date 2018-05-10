@@ -5,6 +5,10 @@ every 1.hour do
   runner "UploadErrorChecker.new.check!"
 end
 
+every 1.hour do
+  runner "DelayedJobErrorChecker.new.check!"
+end
+
 every 1.day do
   runner "DailyMaintenance.new.run"
 end
