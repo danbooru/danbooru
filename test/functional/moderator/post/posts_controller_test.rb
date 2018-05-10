@@ -77,9 +77,10 @@ module Moderator
             post_auth move_favorites_moderator_post_post_path(@child.id), @admin, params: { commit: "Submit" }
             assert_redirected_to(@child)
             @parent.reload
+            @child.reload
             as(@admin) do
-              assert_equal(users, @parent.favorited_users)
-              assert_equal([], @child.favorited_users)
+              assert_equal(users.map(&:id).sort, @parent.favorited_users.map(&:id).sort)
+              assert_equal([], @child.favorited_users.map(&:id))
             end
           end
         end
