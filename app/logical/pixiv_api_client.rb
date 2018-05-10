@@ -1,3 +1,5 @@
+require 'resolv-replace'
+
 class PixivApiClient
   API_VERSION = "1"
   CLIENT_ID = "bYGKuGVw91e0NMfPGp44euvGt59s"
@@ -171,7 +173,7 @@ class PixivApiClient
       }
       url = "https://oauth.secure.pixiv.net/auth/token"
 
-      resp = HTTParty.post(url, Danbooru.config.httparty_options.deep_merge(body: params, headers: headers))
+      resp = HTTParty.post(url, Danbooru.config.httparty_options.deep_merge(timeout: 20, body: params, headers: headers))
       body = resp.body.force_encoding("utf-8")
 
       if resp.success?

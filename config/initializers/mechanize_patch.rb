@@ -42,12 +42,14 @@ if Rails.env.test?
 
         # Pass on the error if we've tried too many times.
         if retry_count >= MAX_RESET_RETRIES
-          puts "**** WARN: Mechanize retried connection reset #{MAX_RESET_RETRIES} times and never succeeded: #{action}"
+          print "R"
+          #puts "**** WARN: Mechanize retried connection reset #{MAX_RESET_RETRIES} times and never succeeded: #{action}"
           raise
         end
 
         # Otherwise, shutdown the persistent HTTP connection and try again.
-        puts "**** WARN: Mechanize retrying connection reset error: #{action}"
+        print "R"
+        #puts "**** WARN: Mechanize retrying connection reset error: #{action}"
         retry_count += 1
         self.http.shutdown
         retry
