@@ -185,5 +185,9 @@ class PixivApiClient
 
       access_token
     end
+
+  rescue Net::OpenTimeout
+    sleep(5)
+    retry
   end
 end
