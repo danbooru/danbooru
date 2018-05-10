@@ -42,7 +42,9 @@ module Moderator
             as_user do
               @post.update(is_deleted: true)
             end
-            post_auth undelete_moderator_post_post_path(@post), @admin, params: {:format => "js"}
+            assert_difference(-> { PostApproval.count }, 1) do
+              post_auth undelete_moderator_post_post_path(@post), @admin, params: {:format => "js"}
+            end
 
             assert_response :success
             assert(!@post.reload.is_deleted?)
