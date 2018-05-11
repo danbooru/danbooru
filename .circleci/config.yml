@@ -35,19 +35,20 @@ jobs:
           command: env | egrep 'DEBUG|DANBOORU|RAILS|DATABASE_URL|SECRET' > .env.test
       - run:
           name: Build and Start Docker containers
-          command: docker-compose -f config/docker/compose.yml up -d web
+          command: |
+            docker-compose -f config/docker/compose.yml up -d web
       - run:
           name: Run database migrations
           command: |
             docker-compose -f config/docker/compose.yml exec archives dockerize -wait tcp://$PGHOST:$PGPORT bash -l -c 'cd /app ; bundle exec rake db:create ; bundle exec rake db:migrate'
             docker-compose -f config/docker/compose.yml exec web dockerize -wait tcp://$PGHOST:$PGPORT bash -l -c 'cd /app ; bin/rake db:create ; bin/rake db:migrate'
-      - run: 
-          name: Run tests
+      - run:
+          name: Test splitting
           command: |
-            sudo curl -o /usr/local/bin/circleci https://circle-downloads.s3.amazonaws.com/releases/build_agent_wrapper/circleci && chmod +x /usr/local/bin/circleci
-            circleci tests glob "test/**/*_test.rb" | circleci tests split | docker-compose -f config/docker/compose.yml exec web bin/rails test
+            circleci tests glob test/**/*_test.rb | circleci tests split | xargs -I{} docker-compose -f config/docker/compose.yml exec -T web bash -l -c 'cd /app ; bin/rails test {}'
+            docker cp docker_web_1:/app/test/reports /tmp
       - store_test_results:
-          path: test/reports
+          path: /tmp/reports
       - run: 
           name: Teardown
           command: docker-compose -f config/docker/compose.yml down
