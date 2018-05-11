@@ -49,6 +49,9 @@ services:
       - DANBOORU_NICO_SEIGA_LOGIN
       - DANBOORU_NICO_SEIGA_PASSWORD
       - DANBOORU_PERSIST_PIXIV_SESSION
+      - CIRCLE_NODE_TOTAL
+      - CIRCLE_NODE_INDEX
+      - CIRCLE_BUILD_IMAGE
     build: 
       context: ../..
       dockerfile: config/docker/danbooru-ci
