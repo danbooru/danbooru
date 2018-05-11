@@ -11,6 +11,7 @@ defaults: &defaults
 jobs:
   build:
     <<: *defaults
+    parallelism: 5
     steps:
       - checkout
       - setup_remote_docker
@@ -42,7 +43,8 @@ jobs:
             docker-compose -f config/docker/compose.yml exec web dockerize -wait tcp://$PGHOST:$PGPORT bash -l -c 'cd /app ; bin/rake db:create ; bin/rake db:migrate'
       - run: 
           name: Run tests
-          command: docker-compose -f config/docker/compose.yml exec web bin/rails t
+          command: |
+            docker-compose -f config/docker/compose.yml exec web bash -c 'circleci tests glob "test/**/*_test.rb" | circleci tests split | xargs bin/rails test'
       - store_test_results:
           path: test/reports
       - run: 
