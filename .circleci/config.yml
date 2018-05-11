@@ -44,9 +44,8 @@ jobs:
       - run: 
           name: Run tests
           command: |
-            docker-compose -f config/docker/compose.yml exec web bash -c 'curl -o /tmp/circleci https://circle-downloads.s3.amazonaws.com/releases/build_agent_wrapper/circleci && chmod +x /tmp/circleci'
-            docker-compose -f config/docker/compose.yml exec web bash -c '/tmp/circleci tests glob "test/**/*_test.rb" | /tmp/circleci tests split | xargs echo'
-            docker-compose -f config/docker/compose.yml exec web bash -c '/tmp/circleci tests glob "test/**/*_test.rb" | /tmp/circleci tests split | xargs bin/rails test'
+            sudo curl -o /usr/local/bin/circleci https://circle-downloads.s3.amazonaws.com/releases/build_agent_wrapper/circleci && chmod +x /usr/local/bin/circleci
+            circleci tests glob "test/**/*_test.rb" | circleci tests split | docker-compose -f config/docker/compose.yml exec web bin/rails test
       - store_test_results:
           path: test/reports
       - run: 
