@@ -1,0 +1,50 @@
+version: 2
+
+defaults: &defaults
+  working_directory: ~/app
+  docker:
+    - image: buildpack-deps:trusty
+      environment:
+        DOCKER_VERSION: 18.03.1-ce
+        DOCKER_COMPOSE_VERSION: 1.21.1
+
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install Docker
+          command: |
+            set -x
+            curl -L -o /tmp/docker-${DOCKER_VERSION}.tgz https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz
+            tar -xz -C /tmp -f /tmp/docker-${DOCKER_VERSION}.tgz
+            chmod +x /tmp/docker/*
+            mv /tmp/docker/* /usr/bin
+      - run: 
+          name: Install Docker Compose
+          command: |
+            sudo rm -f /usr/local/bin/docker-compose
+            curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+            chmod +x docker-compose
+            sudo mv docker-compose /usr/local/bin
+      - run: 
+          name: Create .env.test file
+          command: env | egrep 'DEBUG|DANBOORU|RAILS|DATABASE_URL|SECRET' > .env.test
+      - run:
+          name: Build and Start Docker containers
+          command: docker-compose -f config/docker/compose.yml up -d web
+      - run:
+          name: Run database migrations
+          command: |
+            docker-compose -f config/docker/compose.yml exec archives dockerize -wait tcp://$PGHOST:$PGPORT bash -l -c 'cd /app ; bundle exec rake db:create ; bundle exec rake db:migrate'
+            docker-compose -f config/docker/compose.yml exec web dockerize -wait tcp://$PGHOST:$PGPORT bash -l -c 'cd /app ; bin/rake db:create ; bin/rake db:migrate'
+      - run: 
+          name: Run tests
+          command: docker-compose -f config/docker/compose.yml exec web bin/rails t
+      - store_test_results:
+          path: test/reports
+      - run: 
+          name: Teardown
+          command: docker-compose -f config/docker/compose.yml down
