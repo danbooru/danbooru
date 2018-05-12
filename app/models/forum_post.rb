@@ -134,6 +134,10 @@ class ForumPost < ApplicationRecord
     end
   end
 
+  def tag_change_request
+    bulk_update_request || tag_alias || tag_implication
+  end
+
   def votable?
     # shortcut to eliminate posts that are probably not tag change requests
     body =~ /->/ && (bulk_update_request.present? || tag_alias.present? || tag_implication.present?) && created_at >= TagRelationship::EXPIRY.days.ago

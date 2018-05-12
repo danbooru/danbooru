@@ -45,6 +45,9 @@ jobs:
       - run:
           name: Test splitting
           command: |
+            ping -c 5 public-api.secure.pixiv.net
+            ping -c 5 oauth.secure.pixiv.net
+            ping -c 5 www.pixiv.net
             circleci tests glob test/**/*_test.rb | circleci tests split | xargs -I{} docker-compose -f config/docker/compose.yml exec -T web bash -l -c 'cd /app ; bin/rails test {}'
             docker cp docker_web_1:/app/test/reports /tmp
       - store_test_results:

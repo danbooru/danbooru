@@ -155,7 +155,7 @@ class PixivApiClient
       raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
     end
   rescue Net::OpenTimeout
-    print "R"
+    print "R" if Rails.env.test?
     sleep(5)
     retry
   rescue JSON::ParserError
@@ -191,7 +191,7 @@ class PixivApiClient
     end
 
   rescue Net::OpenTimeout
-    print "R"
+    print "R" if Rails.env.test?
     sleep(5)
     retry
   end

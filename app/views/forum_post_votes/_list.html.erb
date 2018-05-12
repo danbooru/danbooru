@@ -11,6 +11,6 @@
   <%= render "forum_post_votes/vote", vote: vote, forum_post: forum_post %>
 <% end %>
 
-<% if !votes.by(CurrentUser.user.id).exists? %>
+<% if forum_post.tag_change_request.is_pending? && !votes.by(CurrentUser.user.id).exists? %>
   <%= render "forum_post_votes/add_vote", vote: votes.by(CurrentUser.user.id).first, forum_post: forum_post %>
 <% end %>

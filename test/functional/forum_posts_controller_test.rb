@@ -8,7 +8,45 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
       @mod = create(:moderator_user)
       as_user do
         @forum_topic = create(:forum_topic, :title => "my forum topic")
-        @forum_post = create(:forum_post, :topic_id => @forum_topic.id, :body => "xxx")
+        @forum_post = create(:forum_post, :topic_id => @forum_topic.id, :body => "alias xxx -> yyy")
+      end
+    end
+
+    context "with votes" do
+      setup do
+        as_user do
+          as(@user) do
+            @tag_alias = create(:tag_alias, forum_post: @forum_post, status: "pending")
+            @vote = create(:forum_post_vote, forum_post: @forum_post, score: 1)
+          end
+        end
+      end
+
+      should "render the vote links" do
+        get_auth forum_topic_path(@forum_topic), @mod
+        assert_select "a[title='Vote up']"
+      end
+
+      should "render existing votes" do
+        get_auth forum_topic_path(@forum_topic), @mod
+        assert_select "li.vote-score-up"
+      end
+
+      context "after the alias is rejected" do
+        setup do
+          as(@mod) do
+            @tag_alias.reject!
+          end
+          get_auth forum_topic_path(@forum_topic), @mod
+        end
+
+        should "hide the vote links" do
+          assert_select "a[title='Vote up']"
+        end
+
+        should "still render existing votes" do
+          assert_select "li.vote-score-up"
+        end
       end
     end
 
