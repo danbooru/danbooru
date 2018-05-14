@@ -154,9 +154,6 @@ class PixivApiClient
     else
       raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
     end
-  rescue Net::OpenTimeout
-    sleep(5)
-    retry
   rescue JSON::ParserError
     raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
   end
@@ -188,9 +185,5 @@ class PixivApiClient
 
       access_token
     end
-
-  rescue Net::OpenTimeout
-    sleep(5)
-    retry
   end
 end
