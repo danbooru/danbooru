@@ -4,8 +4,12 @@ class SourcesControllerTest < ActionDispatch::IntegrationTest
   context "The sources controller" do
     context "show action" do
       should "work for a pixiv URL" do
-        get source_path, params: { url: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=14901720", format: "json" }
-        assert_response :success
+        begin
+          get source_path, params: { url: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=14901720", format: "json" }
+          assert_response :success
+        rescue Net::OpenTimeout
+          skip "Remote connection failed to Pixiv failed"
+        end
       end
 
       should "work for a direct twitter URL with referer" do

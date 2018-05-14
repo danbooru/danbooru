@@ -2,15 +2,39 @@ require 'test_helper'
 
 class ArtistTest < ActiveSupport::TestCase
   def assert_artist_found(expected_name, source_url)
-    artists = Artist.url_matches(source_url).to_a
+    tries = 0
 
-    assert_equal(1, artists.size)
-    assert_equal(expected_name, artists.first.name, "Testing URL: #{source_url}")
+    begin
+      artists = Artist.url_matches(source_url).to_a
+
+      assert_equal(1, artists.size)
+      assert_equal(expected_name, artists.first.name, "Testing URL: #{source_url}")
+    rescue Net::OpenTimeout, PixivApiClient::Error
+      tries += 1
+      if tries == 3
+        skip "Remote connection failed for #{source_url}"
+      else
+        sleep(tries ** 2)
+        retry
+      end
+    end
   end
 
   def assert_artist_not_found(source_url)
-    artists = Artist.url_matches(source_url).to_a
-    assert_equal(0, artists.size, "Testing URL: #{source_url}")
+    tries = 0
+
+    begin
+      artists = Artist.url_matches(source_url).to_a
+      assert_equal(0, artists.size, "Testing URL: #{source_url}")
+    rescue Net::OpenTimeout
+      tries += 1
+      if tries == 3
+        skip "Remote connection failed for #{source_url}"
+      else
+        sleep(tries ** 2)
+        retry
+      end
+    end
   end
 
   context "An artist" do
@@ -157,8 +181,8 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "ignore pixiv.net/ and pixiv.net/img/ url matches" do
-      a1 = FactoryBot.create(:artist, :name => "yomosaka", :url_string => "http://i2.pixiv.net/img100/img/yomosaka/27618292.jpg")
-      a2 = FactoryBot.create(:artist, :name => "niwatazumi_bf", :url_string => "http://i2.pixiv.net/img16/img/niwatazumi_bf/35488864_big_p6.jpg")
+      a1 = FactoryBot.create(:artist, :name => "yomosaka", :url_string => "http://i2.pixiv.net/img18/img/evazion/14901720.png")
+      a2 = FactoryBot.create(:artist, :name => "niwatazumi_bf", :url_string => "http://i2.pixiv.net/img18/img/evazion/14901720_big_p0.png")
       assert_equal([], Artist.find_all_by_url("http://i2.pixiv.net/img28/img/kyang692/35563903.jpg"))
     end
 
@@ -261,7 +285,9 @@ class ArtistTest < ActiveSupport::TestCase
       end
 
       should "find nothing for bad IDs" do
-        assert_artist_not_found("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=32049358")
+        assert_raises(PixivApiClient::BadIDError) do
+          assert_artist_not_found("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=32049358")
+        end
       end
     end
 

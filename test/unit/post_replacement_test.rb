@@ -127,61 +127,77 @@ class PostReplacementTest < ActiveSupport::TestCase
       should "rescale the notes" do
         assert_equal([80, 82, 80, 82], [@note.x, @note.y, @note.width, @note.height])
 
-        assert_difference("@replacer.note_versions.count") do
-          # replacement image is 80x82, so we're downscaling by 50% (160x164 -> 80x82).
-          @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
-          @note.reload
-        end
+        begin
+          assert_difference("@replacer.note_versions.count") do
+            # replacement image is 80x82, so we're downscaling by 50% (160x164 -> 80x82).
+            @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
+            @note.reload
+          end
 
-        assert_equal([40, 41, 40, 41], [@note.x, @note.y, @note.width, @note.height])
+          assert_equal([40, 41, 40, 41], [@note.x, @note.y, @note.width, @note.height])
+        rescue Net::OpenTimeout
+          skip "Remote connection to Pixiv failed"
+        end
       end
     end
 
     context "a post with a pixiv html source" do
       should "replace with the full size image" do
-        @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
+        begin
+          @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
 
-        assert_equal(80, @post.image_width)
-        assert_equal(82, @post.image_height)
-        assert_equal(16275, @post.file_size)
-        assert_equal("png", @post.file_ext)
-        assert_equal("4ceadc314938bc27f3574053a3e1459a", @post.md5)
-        assert_equal("4ceadc314938bc27f3574053a3e1459a", Digest::MD5.file(@post.file).hexdigest)
-        assert_equal("https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png", @post.source)
-        assert_equal("https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png", @post.replacements.last.replacement_url)
+          assert_equal(80, @post.image_width)
+          assert_equal(82, @post.image_height)
+          assert_equal(16275, @post.file_size)
+          assert_equal("png", @post.file_ext)
+          assert_equal("4ceadc314938bc27f3574053a3e1459a", @post.md5)
+          assert_equal("4ceadc314938bc27f3574053a3e1459a", Digest::MD5.file(@post.file).hexdigest)
+          assert_equal("https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png", @post.source)
+          assert_equal("https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png", @post.replacements.last.replacement_url)
+        rescue Net::OpenTimeout
+          skip "Remote connection to Pixiv failed"
+        end
       end
 
       should "delete the old files after thirty days" do
-        old_file_path, old_preview_file_path = @post.file(:original).path, @post.file(:preview).path
-        @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
+        begin
+          old_file_path, old_preview_file_path = @post.file(:original).path, @post.file(:preview).path
+          @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
 
-        assert(File.exists?(old_file_path))
-        assert(File.exists?(old_preview_file_path))
+          assert(File.exists?(old_file_path))
+          assert(File.exists?(old_preview_file_path))
 
-        Timecop.travel(Time.now + PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
-          Delayed::Worker.new.work_off
+          Timecop.travel(Time.now + PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
+            Delayed::Worker.new.work_off
+          end
+
+          assert_not(File.exists?(old_file_path))
+          assert_not(File.exists?(old_preview_file_path))
+        rescue Net::OpenTimeout
+          skip "Remote connection to Pixiv failed"
         end
-
-        assert_not(File.exists?(old_file_path))
-        assert_not(File.exists?(old_preview_file_path))
       end
     end
 
     context "a post that is replaced by a ugoira" do
       should "save the frame data" do
         skip "ffmpeg not installed" unless check_ffmpeg
-        @post.replace!(replacement_url: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
-        @post.reload
+        begin
+          @post.replace!(replacement_url: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
+          @post.reload
 
-        assert_equal(80, @post.image_width)
-        assert_equal(82, @post.image_height)
-        assert_equal(2804, @post.file_size)
-        assert_equal("zip", @post.file_ext)
-        assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post.md5)
-        assert_equal("cad1da177ef309bf40a117c17b8eecf5", Digest::MD5.file(@post.file).hexdigest)
+          assert_equal(80, @post.image_width)
+          assert_equal(82, @post.image_height)
+          assert_equal(2804, @post.file_size)
+          assert_equal("zip", @post.file_ext)
+          assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post.md5)
+          assert_equal("cad1da177ef309bf40a117c17b8eecf5", Digest::MD5.file(@post.file).hexdigest)
 
-        assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @post.source)
-        assert_equal([{"file"=>"000000.jpg", "delay"=>125}, {"file"=>"000001.jpg", "delay"=>125}], @post.pixiv_ugoira_frame_data.data)
+          assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @post.source)
+          assert_equal([{"file"=>"000000.jpg", "delay"=>125}, {"file"=>"000001.jpg", "delay"=>125}], @post.pixiv_ugoira_frame_data.data)
+        rescue Net::OpenTimeout
+          skip "Remote connection to Pixiv failed"
+        end
       end
     end
 
@@ -189,19 +205,23 @@ class PostReplacementTest < ActiveSupport::TestCase
       should "not delete the original files" do
         skip "ffmpeg is not installed" unless check_ffmpeg
         
-        @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
-        @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
-        @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
+        begin
+          @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
+          @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
+          @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
 
-        assert_nothing_raised { @post.file(:original) }
-        assert_nothing_raised { @post.file(:preview) }
+          assert_nothing_raised { @post.file(:original) }
+          assert_nothing_raised { @post.file(:preview) }
 
-        Timecop.travel(Time.now + PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
-          Delayed::Worker.new.work_off
+          Timecop.travel(Time.now + PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
+            Delayed::Worker.new.work_off
+          end
+
+          assert_nothing_raised { @post.file(:original) }
+          assert_nothing_raised { @post.file(:preview) }
+        rescue Net::OpenTimeout
+          skip "Remote connection to Pixiv failed"
         end
-
-        assert_nothing_raised { @post.file(:original) }
-        assert_nothing_raised { @post.file(:preview) }
       end
     end
 
@@ -213,18 +233,22 @@ class PostReplacementTest < ActiveSupport::TestCase
         @post2 = FactoryBot.create(:post)
 
         # swap the images between @post1 and @post2.
-        @post1.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
-        @post2.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
-        @post2.replace!(replacement_url: "https://www.google.com/intl/en_ALL/images/logo.gif")
-        @post1.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
-        @post2.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
+        begin
+          @post1.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
+          @post2.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
+          @post2.replace!(replacement_url: "https://www.google.com/intl/en_ALL/images/logo.gif")
+          @post1.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
+          @post2.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
 
-        Timecop.travel(Time.now + PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
-          Delayed::Worker.new.work_off
+          Timecop.travel(Time.now + PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
+            Delayed::Worker.new.work_off
+          end
+
+          assert_nothing_raised { @post1.file(:original) }
+          assert_nothing_raised { @post2.file(:original) }
+        rescue Net::OpenTimeout
+          skip "Remote connection to Pixiv failed"
         end
-
-        assert_nothing_raised { @post1.file(:original) }
-        assert_nothing_raised { @post2.file(:original) }
       end
     end
 

@@ -2,44 +2,32 @@ require 'test_helper'
 
 class ArtistsControllerTest < ActionDispatch::IntegrationTest
   def assert_artist_found(expected_artist, source_url = nil)
-    tries = 0
-
-    begin
-      if source_url
-        get_auth finder_artists_path(format: "json", url: source_url), @user
-      end
-      assert_response :success
-      json = JSON.parse(response.body)
-      assert_equal(1, json.size, "Testing URL: #{source_url}")
-      assert_equal(expected_artist, json[0]["name"])
-    rescue Net::OpenTimeout
-      tries += 1
-      if tries == 3
+    if source_url
+      get_auth finder_artists_path(format: "json", url: source_url), @user
+      puts response.body
+      if response.body =~ /Net::OpenTimeout/
         skip "Remote connection to #{source_url} failed"
-      else
-        sleep(tries ** 2)
-        retry
+        return
       end
     end
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_equal(1, json.size, "Testing URL: #{source_url}")
+    assert_equal(expected_artist, json[0]["name"])
   end
 
   def assert_artist_not_found(source_url)
     tries = 0
 
-    begin
-      get_auth finder_artists_path(format: "json", url: source_url), @user
-      assert_response :success
-      json = JSON.parse(response.body)
-      assert_equal(0, json.size, "Testing URL: #{source_url}")
-    rescue Net::OpenTimeout
-      tries += 1
-      if tries == 3
-        skip "Remote connection to #{source_url} failed"
-      else
-        sleep(tries ** 2)
-        retry
-      end
+    get_auth finder_artists_path(format: "json", url: source_url), @user
+    if response.body =~ /Net::OpenTimeout/
+      skip "Remote connection to #{source_url} failed"
+      return
     end
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_equal(0, json.size, "Testing URL: #{source_url}")
   end
 
   context "An artists controller" do
