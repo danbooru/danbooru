@@ -7,6 +7,16 @@ class ApiKeyTest < ActiveSupport::TestCase
       @api_key = ApiKey.generate!(@user)
     end
 
+    should "regenerate the key" do
+      assert_changes(-> { @api_key.key }) do
+        @api_key.regenerate!
+      end
+    end
+
+    should "generate a unique key" do
+      assert_not_nil(@api_key.key)
+    end
+
     should "authenticate via api key" do
       assert_not_nil(User.authenticate_api_key(@user.name, @api_key.key))
     end

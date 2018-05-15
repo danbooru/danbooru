@@ -13,7 +13,7 @@ class UserPasswordResetNonceTest < ActiveSupport::TestCase
       end
 
       should "populate the key with a random string" do
-        assert_equal(32, @nonce.key.size)
+        assert_equal(24, @nonce.key.size)
       end
 
       should "reset the password when reset" do

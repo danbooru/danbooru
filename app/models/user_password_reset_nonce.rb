@@ -1,7 +1,7 @@
 class UserPasswordResetNonce < ApplicationRecord
-  validates_presence_of :email, :key
+  has_secure_token :key
+  validates_presence_of :email
   validate :validate_existence_of_email
-  before_validation :initialize_key, :on => :create
   after_create :deliver_notice
 
   def self.prune!
@@ -10,10 +10,6 @@ class UserPasswordResetNonce < ApplicationRecord
 
   def deliver_notice
     Maintenance::User::PasswordResetMailer.reset_request(user, self).deliver_now
-  end
-
-  def initialize_key
-    self.key = SecureRandom.hex(16)
   end
 
   def validate_existence_of_email
