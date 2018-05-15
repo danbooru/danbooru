@@ -139,8 +139,7 @@ class ForumPost < ApplicationRecord
   end
 
   def votable?
-    # shortcut to eliminate posts that are probably not tag change requests
-    body =~ /->/ && (bulk_update_request.present? || tag_alias.present? || tag_implication.present?) && created_at >= TagRelationship::EXPIRY.days.ago
+    body.to_s.match?(/->/)
   end
 
   def voted?(user, score)

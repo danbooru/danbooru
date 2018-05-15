@@ -15,10 +15,9 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
     context "with votes" do
       setup do
         as_user do
-          as(@user) do
-            @tag_alias = create(:tag_alias, forum_post: @forum_post, status: "pending")
-            @vote = create(:forum_post_vote, forum_post: @forum_post, score: 1)
-          end
+          @tag_alias = create(:tag_alias, forum_post: @forum_post, status: "pending")
+          @vote = create(:forum_post_vote, forum_post: @forum_post, score: 1)
+          @forum_post.reload
         end
       end
 
@@ -41,7 +40,7 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "hide the vote links" do
-          assert_select "a[title='Vote up']"
+          assert_select "a[title='Vote up']", false
         end
 
         should "still render existing votes" do
