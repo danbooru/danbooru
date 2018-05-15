@@ -50,7 +50,7 @@
     var hasPrev = $("#a-show").length || $(".paginator a[rel~=prev]").length;
     var hasNext = $("#a-index").length && $(".paginator a[rel~=next]").length;
 
-    $body.hammer({touchAction: 'pan-y', recognizers: [[Hammer.Swipe, { threshold: 20, velocity: 0.4, direction: Hammer.DIRECTION_HORIZONTAL }]]});
+    $body.hammer({touchAction: 'pan-y', recognizers: [[Hammer.Swipe, { threshold: 20, velocity: 0.4, direction: Hammer.DIRECTION_HORIZONTAL }]], inputClass: Hammer.TouchInput});
 
     if (hasPrev) {
       $body.hammer().on("swiperight", function(e) {
