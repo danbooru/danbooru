@@ -504,20 +504,6 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(post.approver_id, CurrentUser.id)
       end
 
-      context "that was uploaded by person X" do
-        setup do
-          @post = FactoryBot.create(:post)
-          @post.flag!("reason")
-        end
-
-        should "not allow person X to approve that post" do
-          approval = @post.approve!(@post.uploader)
-
-          assert(@post.invalid?)
-          assert_includes(approval.errors.full_messages, "You cannot approve a post you uploaded")
-        end
-      end
-
       context "that was previously approved by person X" do
         setup do
           @user = FactoryBot.create(:moderator_user, :name => "xxx")
