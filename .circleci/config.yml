@@ -47,7 +47,7 @@ jobs:
 
           name: Run tests
           command: |
-            circleci tests glob test/**/*_test.rb | circleci tests split | xargs -I{} docker-compose -f config/docker/compose.yml exec -T web bash -l -c 'cd /app ; bin/rails test --no-ci-clean {}'
+            circleci tests glob test/**/*_test.rb | circleci tests split --split-by=timings | xargs -I{} docker-compose -f config/docker/compose.yml exec -T web bash -l -c 'cd /app ; bin/rails test --no-ci-clean {}'
             docker cp docker_web_1:/app/test/reports /tmp
       - store_test_results:
           path: /tmp/reports
