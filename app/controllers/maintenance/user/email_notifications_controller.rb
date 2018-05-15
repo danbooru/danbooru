@@ -22,9 +22,9 @@ module Maintenance
       end
 
       def validate_sig
-        digest = OpenSSL::Digest.new("sha256")
-        calc_sig = OpenSSL::HMAC.hexdigest(digest, Danbooru.config.email_key, params[:user_id].to_s)
-        if calc_sig != params[:sig]
+        verifier = ActiveSupport::MessageVerifier.new(Danbooru.config.email_key, digest: "SHA256", serializer: JSON)
+        calculated_sig = verifier.generate(params[:user_id].to_s)
+        if calculated_sig != params[:sig]
           raise VerificationError.new
         end
       end

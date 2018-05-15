@@ -19,8 +19,8 @@ module Reports
     end
 
     def generate_sig
-      digest = OpenSSL::Digest.new("sha256")
-      OpenSSL::HMAC.hexdigest(digest, Danbooru.config.reportbooru_key, "#{min_date},#{max_date},#{queries}")
+      verifier = ActiveSupport::MessageVerifier.new(Danbooru.config.reportbooru_key, serializer: JSON, digest: "SHA256")
+      verifier.generate("#{min_date},#{max_date},#{queries}")
     end
   end
 end
