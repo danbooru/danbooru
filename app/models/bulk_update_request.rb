@@ -205,4 +205,16 @@ class BulkUpdateRequest < ApplicationRecord
   def skip_secondary_validations=(v)
     @skip_secondary_validations = v.to_s.truthy?
   end
+
+  def is_pending?
+    status == "pending"
+  end
+
+  def is_approved?
+    status == "approved"
+  end
+
+  def is_rejected?
+    status == "rejected"
+  end
 end
