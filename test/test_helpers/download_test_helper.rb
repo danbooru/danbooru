@@ -3,19 +3,10 @@ require 'ptools'
 module DownloadTestHelper
   def assert_downloaded(expected_filesize, source)
     download = Downloads::File.new(source)
-    @retry_count = 0
-    begin
-      tempfile = download.download!
-    rescue Net::OpenTimeout
-      @retry_count += 1
-      if @retry_count == 3
-        skip "Remote connection to #{source} failed"
-      else
-        sleep(@retry_count ** 2)
-        retry
-      end
-    end
+    tempfile = download.download!
     assert_equal(expected_filesize, tempfile.size, "Tested source URL: #{source}")
+  rescue Net::OpenTimeout
+    skip "Remote connection to #{source} failed"
   end
 
   def assert_rewritten(expected_source, test_source)

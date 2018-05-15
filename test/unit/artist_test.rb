@@ -2,39 +2,19 @@ require 'test_helper'
 
 class ArtistTest < ActiveSupport::TestCase
   def assert_artist_found(expected_name, source_url)
-    tries = 0
+    artists = Artist.url_matches(source_url).to_a
 
-    begin
-      artists = Artist.url_matches(source_url).to_a
-
-      assert_equal(1, artists.size)
-      assert_equal(expected_name, artists.first.name, "Testing URL: #{source_url}")
-    rescue Net::OpenTimeout, PixivApiClient::Error
-      tries += 1
-      if tries == 3
-        skip "Remote connection failed for #{source_url}"
-      else
-        sleep(tries ** 2)
-        retry
-      end
-    end
+    assert_equal(1, artists.size)
+    assert_equal(expected_name, artists.first.name, "Testing URL: #{source_url}")
+  rescue Net::OpenTimeout, PixivApiClient::Error
+    skip "Remote connection failed for #{source_url}"
   end
 
   def assert_artist_not_found(source_url)
-    tries = 0
-
-    begin
-      artists = Artist.url_matches(source_url).to_a
-      assert_equal(0, artists.size, "Testing URL: #{source_url}")
-    rescue Net::OpenTimeout
-      tries += 1
-      if tries == 3
-        skip "Remote connection failed for #{source_url}"
-      else
-        sleep(tries ** 2)
-        retry
-      end
-    end
+    artists = Artist.url_matches(source_url).to_a
+    assert_equal(0, artists.size, "Testing URL: #{source_url}")
+  rescue Net::OpenTimeout
+    skip "Remote connection failed for #{source_url}"
   end
 
   context "An artist" do
