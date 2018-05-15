@@ -21,7 +21,9 @@ class ArtistUrl < ApplicationRecord
 
       begin
         url = Sources::Site.new(url).normalize_for_artist_finder!
-      rescue PixivApiClient::Error, Sources::Site::NoStrategyError
+      rescue PixivApiClient::Error
+        raise if Rails.env.test?
+      rescue Sources::Site::NoStrategyError
       end
       url = url.gsub(/\/+\Z/, "")
       url + "/"

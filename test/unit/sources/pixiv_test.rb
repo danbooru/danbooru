@@ -4,13 +4,26 @@ module Sources
   class PixivTest < ActiveSupport::TestCase
     def get_source(source)
       @site = Sources::Site.new(source)
-      @site.get
+
+      begin
+        @site.get
+      rescue Net::OpenTimeout
+        @retry_count += 1
+        if @retry_count == 3
+          skip "Could not connect to Pixiv"
+        else
+          sleep(@retry_count ** 2)
+          retry
+        end
+      end
+
       @site
     end
 
     def setup
       super
       load_pixiv_tokens!
+      @retry_count = 0
     end
 
     def teardown

@@ -484,6 +484,9 @@ class Artist < ApplicationRecord
       else
         nil
       end
+    rescue Net::OpenTimeout
+      raise if Rails.env.test?
+      nil
     rescue Exception
       nil
     end
