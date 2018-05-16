@@ -22,6 +22,10 @@ class PoolsController < ApplicationController
       format.xml do
         render :xml => @pools.to_xml(:root => "pools")
       end
+      format.json do
+        render json: @pool.to_json
+        expires_in 7.days
+      end
     end
   end
 

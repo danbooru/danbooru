@@ -3,9 +3,6 @@
 
   Danbooru.Autocomplete.AUTOCOMPLETE_VERSION = 1;
 
-  //Just under 5MB of 16-bit characters
-  Danbooru.Autocomplete.MAX_STORAGE_SIZE = 2500000;
-
   Danbooru.Autocomplete.PREFIXES = /^(-|~|<%= TagCategory.mapping.keys.map {|category| category + ':'}.join('|') %>)(.*)$/i;
   Danbooru.Autocomplete.METATAGS = /^(<%= Tag::METATAGS %>):(.*)$/i;
 
@@ -25,7 +22,7 @@
         _renderItem: Danbooru.Autocomplete.render_item,
       });
 
-      Danbooru.Autocomplete.enable_local_storage = this.test_local_storage();
+      Danbooru.Autocomplete.enable_local_storage = false;
       this.initialize_tag_autocomplete();
       this.initialize_mention_autocomplete($(".autocomplete-mentions textarea"));
       this.initialize_artist_autocomplete($('[data-autocomplete="artist"]'));
@@ -35,29 +32,13 @@
     }
   }
 
-  Danbooru.Autocomplete.test_local_storage = function() {
-    try {
-      $.localStorage.set("test", "test");
-      $.localStorage.remove("test");
-      return true;
-    } catch(e) {
-      return false;
-    }
-  }
-
+  // todo: remove eventually
   Danbooru.Autocomplete.prune_local_storage = function() {
-    if (this.enable_local_storage) {
-      var cached_autocomplete_version = $.localStorage.get("danbooru-autocomplete-version");
-      var current_cache_size = Object.keys(localStorage).reduce( function(total, key) { return total + localStorage[key].length; }, 0);
-      if (cached_autocomplete_version !== this.AUTOCOMPLETE_VERSION || current_cache_size > this.MAX_STORAGE_SIZE) {
-        $.each(Object.keys(localStorage), function(i, key) {
-          if (key.substr(0, 3) === "ac-") {
-            $.localStorage.remove(key);
-          }
-        });
-        $.localStorage.set("danbooru-autocomplete-version", this.AUTOCOMPLETE_VERSION);
+    $.each(Object.keys(localStorage), function(i, key) {
+      if (key.substr(0, 3) === "ac-") {
+        $.localStorage.remove(key);
       }
-    }
+    });
   }
 
   Danbooru.Autocomplete.initialize_mention_autocomplete = function($fields) {
@@ -274,17 +255,6 @@
 
   Danbooru.Autocomplete.normal_source = function(term, resp) {
     var key = "ac-" + term.replace(/\./g,'\uFFFF');
-    if (this.enable_local_storage) {
-      var cached = $.localStorage.get(key);
-      if (cached) {
-        if (Date.parse(cached.expires) < new Date().getTime()) {
-          $.localStorage.remove(key);
-        } else {
-          resp(cached.value);
-          return;
-        }
-      }
-    }
 
     $.ajax({
       url: "/tags/autocomplete.json",
@@ -304,11 +274,6 @@
           };
         });
 
-        if (Danbooru.Autocomplete.enable_local_storage) {
-          var expiry = new Date();
-          expiry.setDate(expiry.getDate() + 7);
-          $.localStorage.set(key, {"value": d, "expires": expiry});
-        }
         resp(d);
       }
     });
