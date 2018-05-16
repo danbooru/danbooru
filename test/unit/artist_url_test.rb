@@ -12,6 +12,13 @@ class ArtistUrlTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
+    should "allow urls to be marked as inactive" do
+      url = FactoryBot.create(:artist_url, :url => "-http://monet.com")
+      assert_equal("http://monet.com", url.url)
+      assert_equal("http://monet.com/", url.normalized_url)
+      refute(url.is_active?)
+    end
+
     should "always add a trailing slash when normalized" do
       url = FactoryBot.create(:artist_url, :url => "http://monet.com")
       assert_equal("http://monet.com", url.url)

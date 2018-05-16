@@ -1,4 +1,5 @@
 class ArtistUrl < ApplicationRecord
+  before_validation :parse_prefix
   before_save :initialize_normalized_url, on: [ :create ]
   before_save :normalize
   validates_presence_of :url
@@ -58,6 +59,13 @@ class ArtistUrl < ApplicationRecord
     url = url.gsub(/^http:\/\/i\d+\.pixiv\.net\/img\d+/, "http://*.pixiv.net/img*")
   end
 
+  def parse_prefix
+    if url && url[0] == "-"
+      self.url = url[1..-1]
+      self.is_active = false
+    end
+  end
+
   def priority
     if normalized_url =~ /pixiv\.net\/member\.php/
       10
@@ -89,7 +97,11 @@ class ArtistUrl < ApplicationRecord
   end
 
   def to_s
-    url
+    if is_active?
+      url
+    else
+      "-#{url}"
+    end
   end
 
   def validate_url_format

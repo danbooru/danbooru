@@ -683,7 +683,8 @@ CREATE TABLE public.artist_urls (
     url text NOT NULL,
     normalized_url text NOT NULL,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    is_active boolean DEFAULT true NOT NULL
 );
 
 
@@ -7494,6 +7495,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20180116001101'),
 ('20180403231351'),
 ('20180413224239'),
-('20180425194016');
+('20180425194016'),
+('20180516222413');
 
 

@@ -142,7 +142,11 @@
           tags.push(["BANNED_ARTIST", "banned"]);
         }
         $.each(Danbooru.RelatedTag.recent_artists[0].sorted_urls, function(i, url) {
-          tags.push([" " + url.url, 0]);
+          var x = url.url;
+          if (!url.is_active) {
+            x = "-" + x;
+          }
+          tags.push([" " + x, 0]);
         });
       } else if (Danbooru.RelatedTag.recent_artists.length >= 10) {
         tags.push([" none", 0]);
@@ -226,7 +230,15 @@
         );
       } else {
         var text = tag[0];
-        if (text.match(/^ http/)) {
+        if (text.match(/^ -http/)) {
+          text = text.substring(1, 1000);
+          var desc = text.replace(/^-https?:\/\//, "");
+          if (desc.length > 30) {
+            desc = desc.substring(0, 30) + "...";
+          }
+          var $del = $("<del/>").html(desc);
+          $ul.append($("<li/>").html($del));
+        } else if (text.match(/^ http/)) {
           text = text.substring(1, 1000);
           var $url = $("<a/>");
           var desc = text.replace(/^https?:\/\//, "");
