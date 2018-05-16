@@ -484,7 +484,7 @@ class Artist < ApplicationRecord
       else
         nil
       end
-    rescue Net::OpenTimeout
+    rescue Net::OpenTimeout, PixivApiClient::Error
       raise if Rails.env.test?
       nil
     rescue Exception

@@ -87,9 +87,13 @@ class UploadTest < ActiveSupport::TestCase
           end
 
           should "process successfully" do
-            _, _, output_file = @upload.download_from_source(@url, "")
-            assert_operator(output_file.size, :>, 1_000)
-            assert_equal("zip", @upload.file_header_to_file_ext(output_file))
+            begin
+              _, _, output_file = @upload.download_from_source(@url, "")
+              assert_operator(output_file.size, :>, 1_000)
+              assert_equal("zip", @upload.file_header_to_file_ext(output_file))
+            rescue Net::OpenTimeout
+              skip "Remote connection to #{@url} failed"
+            end
           end
         end
       end

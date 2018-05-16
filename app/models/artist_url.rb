@@ -21,7 +21,7 @@ class ArtistUrl < ApplicationRecord
 
       begin
         url = Sources::Site.new(url).normalize_for_artist_finder!
-      rescue PixivApiClient::Error
+      rescue Net::OpenTimeout, PixivApiClient::Error
         raise if Rails.env.test?
       rescue Sources::Site::NoStrategyError
       end
