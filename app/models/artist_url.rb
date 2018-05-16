@@ -74,7 +74,7 @@ class ArtistUrl < ApplicationRecord
       10
 
     elsif normalized_url =~ /twitter\.com/ && normalized_url !~ /status/
-      10
+      15
 
     elsif normalized_url =~ /tumblr|patreon|deviantart|artstation/
       20
