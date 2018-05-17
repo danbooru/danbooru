@@ -173,6 +173,10 @@ class Post < ApplicationRecord
       storage_manager.file_path(md5, file_ext, :preview)
     end
 
+    def crop_file_url
+      storage_manager.file_url(self, :crop)
+    end
+
     def open_graph_image_url
       if is_image?
         if has_large?

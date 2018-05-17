@@ -1,6 +1,7 @@
 $(function() {
   $("#maintoggle").click(function() {
     $('#nav').toggle();
-    $('#maintoggle').toggleClass('toggler-active');
+    $('#maintoggle-on').toggle();
+    $('#maintoggle-off').toggle();
   });
 });

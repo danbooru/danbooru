@@ -92,6 +92,8 @@ class User < ApplicationRecord
   has_many :post_approvals, :dependent => :destroy
   has_many :post_disapprovals, :dependent => :destroy
   has_many :post_votes
+  has_many :post_archives
+  has_many :note_versions
   has_many :bans, -> {order("bans.id desc")}
   has_one :recent_ban, -> {order("bans.id desc")}, :class_name => "Ban"
 

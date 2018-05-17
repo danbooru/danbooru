@@ -93,19 +93,20 @@ else
   user = User.find_by_name("albert")
 end
 
-CurrentUser.user = User.admins.first
+CurrentUser.as_admin
 
 if Upload.count == 0
   puts "Creating uploads"
-  1.upto(100) do |i|
+  1.upto(50) do |i|
     color1 = rand(4096).to_s(16)
     color2 = rand(4096).to_s(16)
     width = rand(2000) + 100
     height = rand(2000) + 100
-    url = "http://ipsumimage.appspot.com/#{width}x#{height}"
-    tags = rand_sentence(12).scan(/[a-z]+/).join(" ")
+    url = "http://ipsumimage.appspot.com/#{width}x#{height},#{color1}"
+    tags = rand(1_000_000_000).to_s.scan(/../).join(" ")
 
-    Upload.create!(:source => url, :content_type => "image/gif", :rating => "q", :tag_string => tags, :server => Socket.gethostname)
+    service = UploadService.new(source: url, tag_string: tags, rating: "s")
+    service.start!
   end
 else
   puts "Skipping uploads"
