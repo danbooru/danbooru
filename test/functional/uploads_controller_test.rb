@@ -38,6 +38,15 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      context "with a url" do
+        should "preprocess" do
+          assert_difference(-> { Upload.count }) do
+            get_auth new_upload_path, @user, params: {:url => "http://www.google.com/intl/en_ALL/images/logo.gif"}
+            assert_response :success
+          end
+        end
+      end
+
       context "for a twitter post" do
         should "render" do
           skip "Twitter keys are not set" unless Danbooru.config.twitter_api_key
@@ -49,13 +58,15 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       context "for a post that has already been uploaded" do
         setup do
           as_user do
-            @post = create(:post, :source => "aaa")
+            @post = create(:post, :source => "http://google.com/aaa")
           end
         end
 
         should "initialize the post" do
-          get_auth new_upload_path, @user, params: {:url => "http://google.com/aaa"}
-          assert_response :success
+          assert_difference(-> { Upload.count }, 0) do
+            get_auth new_upload_path, @user, params: {:url => "http://google.com/aaa"}
+            assert_response :success
+          end
         end
       end
     end
