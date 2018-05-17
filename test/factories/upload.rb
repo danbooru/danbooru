@@ -14,6 +14,14 @@ FactoryBot.define do
       source "http://www.google.com/intl/en_ALL/images/logo.gif"
     end
 
+    factory(:ugoira_upload) do
+      file do
+        f = Tempfile.new
+        IO.copy_stream("#{Rails.root}/test/fixtures/ugoira.zip", f.path)
+        ActionDispatch::Http::UploadedFile.new(tempfile: f, filename: "ugoira.zip")
+      end
+    end
+
     factory(:jpg_upload) do
       file do
         f = Tempfile.new
