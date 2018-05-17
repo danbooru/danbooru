@@ -12,7 +12,7 @@
       <p>This upload has finished processing. <%= link_to "View the post", post_path(@upload.post_id) %>.</p>
     <% elsif @upload.is_pending? %>
       <p>This upload is waiting to be processed. Please wait a few seconds.</p>
-    <% elsif @upload.is_processing? %>
+    <% elsif @upload.is_processing? || @upload.is_preprocessing? || @upload.is_preprocessed? %>
       <p>This upload is being processed. Please wait a few seconds.</p>
     <% elsif @upload.is_duplicate? %>
       <p>This upload is a duplicate: <%= link_to "post ##{@upload.duplicate_post_id}", post_path(@upload.duplicate_post_id) %></p>
@@ -42,7 +42,7 @@
   Upload - <%= Danbooru.config.app_name %>
 <% end %>
 
-<% if @upload.is_pending? || @upload.is_processing? %>
+<% if @upload.is_pending? || @upload.is_processing? || @upload.is_preprocessing? || @upload.is_preprocessed? %>
   <% content_for(:html_header) do %>
     <meta http-equiv="refresh" content="2">
   <% end %>
