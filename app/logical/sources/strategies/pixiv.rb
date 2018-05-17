@@ -143,6 +143,7 @@ module Sources
           nil
         end
       rescue Sources::Error
+        raise if Rails.env.test?
         nil
       end
 
