@@ -236,7 +236,7 @@
           if (desc.length > 30) {
             desc = desc.substring(0, 30) + "...";
           }
-          var $del = $("<del/>").html(desc);
+          var $del = $("<del/>").text(desc);
           $ul.append($("<li/>").html($del));
         } else if (text.match(/^ http/)) {
           text = text.substring(1, 1000);
