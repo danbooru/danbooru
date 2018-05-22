@@ -29,6 +29,10 @@ class WikiPagesController < ApplicationController
       format.xml do
         render :xml => @wiki_pages.to_xml(:root => "wiki-pages")
       end
+      format.json do
+        render json: @wiki_pages.to_json
+        expires_in params[:expiry].to_i.days if params[:expiry]
+      end
     end
   end
 

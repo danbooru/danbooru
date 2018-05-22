@@ -19,6 +19,7 @@ class TagsController < ApplicationController
 
   def autocomplete
     @tags = Tag.names_matches_with_aliases(params[:search][:name_matches])
+    expires_in 7.days
 
     respond_with(@tags) do |format|
       format.xml do
