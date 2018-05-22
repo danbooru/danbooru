@@ -28,8 +28,8 @@ class UsersController < ApplicationController
           render :xml => @users.to_xml(:root => "users")
         end
         format.json do
-          render json: @user.to_json
-          expires_in 7.days
+          render json: @users.to_json
+          expires_in params[:expiry].to_i.days if params[:expiry]
         end
       end
     end

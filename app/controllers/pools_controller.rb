@@ -24,7 +24,7 @@ class PoolsController < ApplicationController
       end
       format.json do
         render json: @pool.to_json
-        expires_in 7.days
+        expires_in params[:expiry].to_i.days if params[:expiry]
       end
     end
   end

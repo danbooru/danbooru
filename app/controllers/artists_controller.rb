@@ -44,7 +44,7 @@ class ArtistsController < ApplicationController
       end
       format.json do
         render :json => @artists.to_json(:include => [:urls])
-        expires_in 7.days
+        expires_in params[:expiry].to_i.days if params[:expiry]
       end
     end
   end
@@ -109,7 +109,7 @@ class ArtistsController < ApplicationController
       end
       format.json do
         render :json => @artists.to_json(:include => [:sorted_urls])
-        expires_in 7.days
+        expires_in params[:expiry].to_i.days if params[:expiry]
       end
     end
   end

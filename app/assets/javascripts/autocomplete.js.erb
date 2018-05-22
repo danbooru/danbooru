@@ -194,7 +194,8 @@
             "search[name]": req.term + "*",
             "search[is_active]": true,
             "search[order]": "post_count",
-            "limit": 10
+            "limit": 10,
+            "expiry": 7
           },
           method: "get",
           success: function(data) {
@@ -235,7 +236,8 @@
             "search[title]": req.term + "*",
             "search[hide_deleted]": "Yes",
             "search[order]": "post_count",
-            "limit": 10
+            "limit": 10,
+            "expiry": 7
           },
           method: "get",
           success: function(data) {
@@ -259,7 +261,8 @@
     $.ajax({
       url: "/tags/autocomplete.json",
       data: {
-        "search[name_matches]": term
+        "search[name_matches]": term,
+        "expiry": 7
       },
       method: "get",
       success: function(data) {
