@@ -95,7 +95,7 @@ module Sources
         is_manga = @page_count > 1
 
         if !@zip_url
-          @image_url = get_image_url_from_page(page, is_manga)
+          @image_url = image_urls.first
         end
       end
 
