@@ -29,6 +29,12 @@ class ArtistTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
+    should "parse inactive urls" do
+      @artist = Artist.create(name: "blah", url_string: "-http://monet.com")
+      assert_equal(["-http://monet.com"], @artist.urls.map(&:to_s))
+      refute(@artist.urls[0].is_active?)
+    end
+
     should "should have a valid name" do
       @artist = Artist.new(:name => "-blah")
       @artist.save
