@@ -57,6 +57,8 @@ class StorageManager
       "#{root_url}/images/download-preview.png"
     elsif type == :preview
       "#{base_url}/preview/#{subdir}#{file}"
+    elsif type == :crop
+      "#{base_url}/crop/#{subdir}#{file}"
     elsif type == :large && post.has_large?
       "#{base_url}/sample/#{subdir}#{seo_tags}#{file}"
     else
@@ -77,6 +79,8 @@ class StorageManager
     case type
     when :preview
       "#{base_dir}/preview/#{subdir}#{file}"
+    when :crop
+      "#{base_dir}/crop/#{subdir}#{file}"
     when :large
       "#{base_dir}/sample/#{subdir}#{file}"
     when :original
@@ -89,6 +93,8 @@ class StorageManager
 
     case type
     when :preview
+      "#{md5}.jpg"
+    when :crop
       "#{md5}.jpg"
     when :large
       "#{large_image_prefix}#{md5}.#{large_file_ext}"
