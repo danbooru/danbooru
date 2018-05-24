@@ -35,6 +35,13 @@ class ArtistTest < ActiveSupport::TestCase
       refute(@artist.urls[0].is_active?)
     end
 
+    should "not allow duplicate active+inactive urls" do
+      @artist = Artist.create(name: "blah", url_string: "-http://monet.com\nhttp://monet.com")
+      assert_equal(1, @artist.urls.count)
+      assert_equal(["-http://monet.com"], @artist.urls.map(&:to_s))
+      refute(@artist.urls[0].is_active?)      
+    end
+
     should "should have a valid name" do
       @artist = Artist.new(:name => "-blah")
       @artist.save

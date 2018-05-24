@@ -2,7 +2,7 @@ class ArtistUrl < ApplicationRecord
   before_validation :parse_prefix
   before_save :initialize_normalized_url, on: [ :create ]
   before_save :normalize
-  validates_presence_of :url
+  validates :url, presence: true, uniqueness: true
   validate :validate_url_format
   belongs_to :artist, :touch => true
 
