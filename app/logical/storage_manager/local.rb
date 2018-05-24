@@ -5,6 +5,7 @@ class StorageManager::Local < StorageManager
     temp_path = dest_path + "-" + SecureRandom.uuid + ".tmp"
 
     FileUtils.mkdir_p(File.dirname(temp_path))
+    io.rewind
     bytes_copied = IO.copy_stream(io, temp_path)
     raise Error, "store failed: #{bytes_copied}/#{io.size} bytes copied" if bytes_copied != io.size
 
