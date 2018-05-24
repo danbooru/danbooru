@@ -35,7 +35,7 @@ class PostPresenter < Presenter
     html << %{<a href="#{path}/#{post.id}#{tag_param}">}
 
     if options[:show_cropped] && post.has_cropped?
-      src = post.cropped_file_url
+      src = post.crop_file_url
     else
       src = post.preview_file_url
     end

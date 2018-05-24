@@ -130,21 +130,23 @@ class UploadService
     def self.generate_resizes(file, upload)
       if upload.is_video?
         video = FFMPEG::Movie.new(file.path)
+        crop_file = generate_video_preview_for(video, Danbooru.config.small_image_width, Danbooru.config.small_image_width)
         preview_file = generate_video_preview_for(video, Danbooru.config.small_image_width, Danbooru.config.small_image_width)
 
       elsif upload.is_ugoira?
         preview_file = PixivUgoiraConverter.generate_preview(file)
+        crop_file = PixivUgoiraConverter.generate_crop(file)
         sample_file = PixivUgoiraConverter.generate_webm(file, upload.context["ugoira"]["frame_data"])
 
       elsif upload.is_image?
         preview_file = DanbooruImageResizer.resize(file, Danbooru.config.small_image_width, Danbooru.config.small_image_width, 85)
-
+        crop_file = DanbooruImageResizer.crop(file, Danbooru.config.small_image_width, 85)
         if upload.image_width > Danbooru.config.large_image_width
           sample_file = DanbooruImageResizer.resize(file, Danbooru.config.large_image_width, upload.image_height, 90)
         end
       end
 
-      [preview_file, sample_file]
+      [preview_file, crop_file, sample_file]
     end
 
     def self.generate_video_preview_for(video, width, height)
@@ -155,7 +157,7 @@ class UploadService
         width = (height * dimension_ratio).to_i
       end
 
-      output_file = Tempfile.new(binmode: true)
+      output_file = Tempfile.new(["video-preview", ".jpg"], binmode: true)
       video.screenshot(output_file.path, {:seek_time => 0, :resolution => "#{width}x#{height}"})
       output_file
     end
@@ -178,14 +180,16 @@ class UploadService
 
       upload.tag_string = "#{upload.tag_string} #{Utils.automatic_tags(upload, file)}"
 
-      preview_file, sample_file = Utils.generate_resizes(file, upload)
+      preview_file, crop_file, sample_file = Utils.generate_resizes(file, upload)
 
       begin
         Utils.distribute_files(file, upload, :original)
         Utils.distribute_files(sample_file, upload, :large) if sample_file.present?
         Utils.distribute_files(preview_file, upload, :preview) if preview_file.present?
+        Utils.distribute_files(crop_file, upload, :crop) if crop_file.present?
       ensure
         preview_file.try(:close!)
+        crop_file.try(:close!)
         sample_file.try(:close!)
       end
 
@@ -583,13 +587,13 @@ class UploadService
       )
     end
 
-    notify_cropper(@post) if ImageCropper.enabled?
     upload.update(status: "completed", post_id: @post.id)
     @post
   end
 
   def convert_to_post(upload)
     Post.new.tap do |p|
+      p.has_cropped = true
       p.tag_string = upload.tag_string
       p.md5 = upload.md5
       p.file_ext = upload.file_ext
@@ -606,9 +610,5 @@ class UploadService
         p.is_pending = true
       end
     end
-  end
-
-  def notify_cropper(post)
-    # ImageCropper.notify(post)
   end
 end
