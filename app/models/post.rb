@@ -85,7 +85,7 @@ class Post < ApplicationRecord
   end
 
   if PostArchive.enabled?
-    has_many :versions, -> {order("post_versions.updated_at ASC")}, :class_name => "PostArchive", :dependent => :destroy
+    has_many :versions, -> { Rails.env.test? ? order("post_versions.updated_at ASC, post_versions.id ASC") : order("post_versions.updated_at ASC") }, :class_name => "PostArchive", :dependent => :destroy
   end
 
   module FileMethods
