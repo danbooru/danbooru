@@ -42,10 +42,12 @@ module Downloads
     end
 
     def before_download(url, datums)
+      original_url = url
       headers = Danbooru.config.http_headers
 
       RewriteStrategies::Base.strategies.each do |strategy|
         url, headers, datums = strategy.new(url).rewrite(url, headers, datums)
+        url = original_url if url.nil?
       end
 
       return [url, headers, datums]
