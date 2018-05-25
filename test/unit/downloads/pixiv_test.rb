@@ -21,7 +21,12 @@ module Downloads
 
       should "capture the data" do
         assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @download.source)
-        assert_equal([{"file"=>"000000.jpg", "delay"=>125}, {"file"=>"000001.jpg", "delay"=>125}], @download.data[:ugoira_frame_data])
+        assert_equal(2, @download.data[:ugoira_frame_data].size)
+        if @download.data[:ugoira_frame_data][0]["file"]
+          assert_equal([{"file"=>"000000.jpg", "delay"=>125}, {"file"=>"000001.jpg", "delay"=>125}], @download.data[:ugoira_frame_data])
+        else
+          assert_equal([{"delay_msec"=>125}, {"delay_msec"=>125}], @download.data[:ugoira_frame_data])
+        end
       end
     end
 

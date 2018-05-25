@@ -84,7 +84,7 @@ module Sources
         @artist_name = @metadata.name
         @profile_url = "http://www.pixiv.net/member.php?id=#{@metadata.user_id}"
         @pixiv_moniker = @metadata.moniker
-        @zip_url, @ugoira_frame_data, @ugoira_content_type = get_zip_url_from_page(page)
+        @zip_url, @ugoira_frame_data, @ugoira_content_type = get_zip_url_from_api
         @tags = @metadata.tags.map do |tag|
           [tag, "https://www.pixiv.net/search.php?s_mode=s_tag_full&#{{word: tag}.to_param}"]
         end
@@ -95,8 +95,8 @@ module Sources
         is_manga = @page_count > 1
 
         if !@zip_url
-          @image_url = get_image_url_from_page(page, @page_count > 1)
-          #@image_url = image_urls.first
+          page = manga_page_from_url(@url).to_i
+          @image_url = image_urls[page]
         end
       end
 
@@ -283,6 +283,31 @@ module Sources
           element = elements.first
           thumbnail_url = element.attr("src") || element.attr("data-src")
           return rewrite_thumbnails(thumbnail_url, is_manga)
+        end
+
+        if page.body =~ /"original":"(https:.+?)"/
+          return $1.gsub(/\\\//, '/')
+        end
+      end
+
+      def get_zip_url_from_api
+        if @metadata.pages.is_a?(Hash) && @metadata.pages["ugoira600x600"]
+          zip_url = @metadata.pages["ugoira600x600"].sub("_ugoira600x600.zip", "_ugoira1920x1080.zip")
+          frame_data = @metadata.json["metadata"]["frames"]
+          content_type = nil
+          
+          case @metadata.json["image_urls"].to_s
+          when /\.jpg/
+            content_type = "image/jpeg"
+
+          when /\.png/
+            content_type = "image/png"
+
+          when /\.gif/
+            content_type = "image/gif"
+          end
+
+          return [zip_url, frame_data, content_type]
         end
       end
 
