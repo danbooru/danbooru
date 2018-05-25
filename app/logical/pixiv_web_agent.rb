@@ -53,7 +53,7 @@ class PixivWebAgent
       if mech.current_page.body =~ /"error":false/
         cookie = mech.cookies.select {|x| x.name == SESSION_COOKIE_KEY}.first
         if cookie
-          Cache.put(SESSION_CACHE_KEY, cookie.value, 1.month)
+          Cache.put(SESSION_CACHE_KEY, cookie.value, 1.week)
         end
       end
 
@@ -61,7 +61,7 @@ class PixivWebAgent
         mech.get("https://comic.pixiv.net") do |page|
           cookie = mech.cookies.select {|x| x.name == COMIC_SESSION_COOKIE_KEY}.first
           if cookie
-            Cache.put(COMIC_SESSION_CACHE_KEY, cookie.value, 1.month)
+            Cache.put(COMIC_SESSION_CACHE_KEY, cookie.value, 1.week)
           end
         end
       rescue Net::HTTPServiceUnavailable
