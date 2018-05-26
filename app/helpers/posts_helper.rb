@@ -23,8 +23,8 @@ module PostsHelper
     if params[:ms] == "1" && @post_set.post_count == 0 && @post_set.is_single_tag?
       session_id = session.id
       verifier = ActiveSupport::MessageVerifier.new(Danbooru.config.reportbooru_key, serializer: JSON, digest: "SHA256")
-      sig = verifier.generate(",#{session_id}")
-      return render("posts/partials/index/missed_search_count", session_id: session_id, sig: sig)
+      sig = verifier.generate("#{params[:tags]},#{session_id}")
+      return render("posts/partials/index/missed_search_count", sig: sig)
     end
   end
 
@@ -39,7 +39,7 @@ module PostsHelper
         value = session.id
         verifier = ActiveSupport::MessageVerifier.new(Danbooru.config.reportbooru_key, serializer: JSON, digest: "SHA256")
         sig = verifier.generate("#{key},#{value}")
-        return render("posts/partials/index/search_count", key: key, value: value, sig: sig)
+        return render("posts/partials/index/search_count", sig: sig)
       end
     end
 
@@ -61,7 +61,7 @@ module PostsHelper
 
     key = "uid"
     value = user.id
-    verifier = ActiveSupport::MessageVerifier.new(Danbooru.config.reportbooru_key, serializer: JSON, digest: "SHA256")
+    verifier = ActiveSupporist::MessageVerifier.new(Danbooru.config.reportbooru_key, serializer: JSON, digest: "SHA256")
     sig = verifier.generate("#{key},#{value}")
     render("users/common_searches", user: user, sig: sig)
   end

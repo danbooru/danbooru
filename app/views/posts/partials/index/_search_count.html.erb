@@ -1,11 +1,6 @@
 <script type="text/javascript">
   $(function() {
-    $.post("<%= Danbooru.config.reportbooru_server %>/hits", {
-      key: "<%= key %>",
-      value: "<%= value %>",
-      <% if CurrentUser.user.is_platinum? %>
-        uid: <%= CurrentUser.user.id %>,
-      <% end %>
+    $.post("<%= Danbooru.config.reportbooru_server %>/post_searches", {
       sig: "<%= sig %>"
     });
   });

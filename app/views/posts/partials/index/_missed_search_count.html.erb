@@ -2,8 +2,6 @@
   $(function() {
     var tags = $("#tags").val();
     $.post("<%= Danbooru.config.reportbooru_server %>/missed_searches", {
-      session_id: "<%= session_id %>",
-      tags: tags,
       sig: "<%= sig %>"
     });
   });

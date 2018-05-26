@@ -26,7 +26,7 @@ class PopularSearchService
     dates = date.strftime("%Y-%m-%d")
 
     Cache.get("ps-day-#{dates}", 1.minute) do
-      url = "#{Danbooru.config.reportbooru_server}/hits/day?date=#{dates}"
+      url = "#{Danbooru.config.reportbooru_server}/post_searches/day?date=#{dates}"
       response = HTTParty.get(url, Danbooru.config.httparty_options.reverse_merge(timeout: 3))
       if response.success?
         response = response.body
