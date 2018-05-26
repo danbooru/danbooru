@@ -16,7 +16,7 @@
   </div>
   <%= f.input :other_names_comma, :hint => "Separate with commas", :as => :text, :label => "Other names" %>
   <%= f.input :group_name %>
-  <%= f.input :url_string, :label => "URLs", :as => :text, :input_html => {:size => "50x5", :value => params.dig(:artist, :url_string) || @artist.urls.join("\n")} %>
+  <%= f.input :url_string, :label => "URLs", :as => :text, :input_html => {:size => "50x5", :value => params.dig(:artist, :url_string) || @artist.urls.join("\n")}, :hint => "You can prefix a URL with - to mark it as dead." %>
 
   <%= dtext_field "artist", "notes" %>
   <%= f.button :submit, "Submit" %>
