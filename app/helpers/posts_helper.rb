@@ -61,7 +61,7 @@ module PostsHelper
 
     key = "uid"
     value = user.id
-    verifier = ActiveSupporist::MessageVerifier.new(Danbooru.config.reportbooru_key, serializer: JSON, digest: "SHA256")
+    verifier = ActiveSupport::MessageVerifier.new(Danbooru.config.reportbooru_key, serializer: JSON, digest: "SHA256")
     sig = verifier.generate("#{key},#{value}")
     render("users/common_searches", user: user, sig: sig)
   end
