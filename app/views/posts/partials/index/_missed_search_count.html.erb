@@ -1,6 +1,5 @@
 <script type="text/javascript">
   $(function() {
-    var tags = $("#tags").val();
     $.post("<%= Danbooru.config.reportbooru_server %>/missed_searches", {
       sig: "<%= sig %>"
     });
