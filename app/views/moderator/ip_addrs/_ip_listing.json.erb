@@ -1,0 +1,1 @@
+<%= raw @results.map {|ip_addr, count| {ip_addr: ip_addr.to_s, count: count}}.to_json %>
