@@ -15,11 +15,11 @@ class PopularSearchService
   end
 
   def each_search(limit = 100, &block)
-    fetch_data.to_s.scan(/(.+?) (\d+)\.0\n/).slice(0, limit).each(&block)
+    JSON.parse(fetch_data.to_s).slice(0, limit).each(&block)
   end
 
   def tags
-    fetch_data.to_s.scan(/(.+?) (\d+)\.0\n/).map {|x| x[0]}
+    JSON.parse(fetch_data.to_s).map {|x| x[0]}
   end
 
   def fetch_data
