@@ -17,7 +17,6 @@ class RelatedTagsController < ApplicationController
     @tag.related_tags = params[:related_tags]
     @tag.related_tags_updated_at = Time.now
     @tag.save
-
-    render nothing: true
+    head :ok
   end
 end
