@@ -81,6 +81,7 @@ Rails.application.routes.draw do
       get :finder
     end
   end
+  resources :artist_urls, only: [:update]
   resources :artist_versions, :only => [:index] do
     collection do
       get :search
