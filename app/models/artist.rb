@@ -181,11 +181,9 @@ class Artist < ApplicationRecord
     def save_urls
       if url_string && saved_change_to_url_string?
         Artist.transaction do
+          self.urls.clear
           self.urls = url_string.scan(/[^[:space:]]+/).uniq.map do |url|
-            # need to do these shenanigans to properly handle prefixes
-            aurl = self.urls.find_or_create_by(url: ArtistUrl.strip_prefixes(url))
-            aurl.update(url: url)
-            aurl
+            self.urls.find_or_create_by(url: url)
           end
         end
       end
