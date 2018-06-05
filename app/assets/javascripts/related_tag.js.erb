@@ -7,6 +7,7 @@
       $("#related-tags-container").hide();
       $("#artist-tags-container").hide();
       $("#upload_tag_string,#post_tag_string").keyup(Danbooru.RelatedTag.update_selected);
+      $("body").on("click", "#artist-related-tags-column a.del", Danbooru.RelatedTag.disable_artist_url)
     }
   }
 
@@ -236,19 +237,26 @@
           if (desc.length > 30) {
             desc = desc.substring(0, 30) + "...";
           }
-          var $del = $("<del/>").text(desc);
-          $ul.append($("<li/>").html($del));
+          $ul.append(
+            $("<li>").append(
+              $("<del>").text(desc)
+            )
+          );
         } else if (text.match(/^ http/)) {
           text = text.substring(1, 1000);
-          var $url = $("<a/>");
           var desc = text.replace(/^https?:\/\//, "");
           if (desc.length > 30) {
             desc = desc.substring(0, 30) + "...";
           }
-          $url.text(desc);
-          $url.attr("href", text);
-          $url.attr("target", "_blank");
-          $ul.append($("<li/>").html($url));
+          $ul.append(
+            $("<li>").append([
+              $("<a>").text(desc).attr("href", text).attr("target", "_blank"),
+              " ",
+              $("<a>").attr("href", text).addClass("del").append(
+                $("<i>").addClass("fas fa-minus-circle")
+              )
+            ])
+          );
         } else {
           $ul.append($("<li/>").text(text));
         }
@@ -286,7 +294,9 @@
     var url = $("#upload_source,#post_source");
     var referer_url = $("#upload_referer_url");
     $.get("/artists/finder.json", {"url": url.val(), "referer_url": referer_url.val()}, Danbooru.RelatedTag.process_artist);
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();      
+    }
   }
 
   Danbooru.RelatedTag.process_artist = function(data) {
@@ -313,6 +323,28 @@
   Danbooru.RelatedTag.hide = function() {
     $("#related-tags").hide();
     $("#toggle-related-tags-link").text("»");
+  }
+
+  Danbooru.RelatedTag.disable_artist_url = function(e) {
+    var url = e.currentTarget.href;
+    console.log("clicked %o", url);
+    $.each(Danbooru.RelatedTag.recent_artists[0].sorted_urls, function(k, v) {
+      if (v["normalized_url"] === url || v["url"] === url) {
+        if (!confirm("This will mark the URL as inactive. Continue?")) {
+          return;
+        }
+        
+        $.ajax("/artist_urls/" + v["id"], {
+          method: "PUT",
+          data: {
+            artist_url: {
+              is_active: false
+            }
+          }
+        }).done(Danbooru.RelatedTag.find_artist);
+      }
+    });
+    return false;
   }
 })();
 
