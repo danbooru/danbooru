@@ -327,7 +327,6 @@
 
   Danbooru.RelatedTag.disable_artist_url = function(e) {
     var url = e.currentTarget.href;
-    console.log("clicked %o", url);
     $.each(Danbooru.RelatedTag.recent_artists[0].sorted_urls, function(k, v) {
       if (v["normalized_url"] === url || v["url"] === url) {
         if (!confirm("This will mark the URL as inactive. Continue?")) {

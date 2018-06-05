@@ -199,7 +199,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
     should "undelete an artist" do
       @builder = create(:builder_user)
-      post_auth undelete_artist_path(@artist.id), @builder
+      put_auth artist_path(@artist.id), @builder, params: {artist: {is_active: true}}
       assert_redirected_to(artist_path(@artist.id))
       assert_equal(true, @artist.reload.is_active)
     end
