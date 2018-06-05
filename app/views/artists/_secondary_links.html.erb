@@ -15,9 +15,9 @@
       <li><%= link_to "History", artist_versions_path(:search => {:artist_id => @artist.id}) %></li>
       <% if @artist.deletable_by?(CurrentUser.user) %>
         <% if @artist.is_active? %>
-          <li id="artist-delete"><%= link_to "Delete", artist_path(@artist), :method => :delete, :data => {:confirm => "Are you sure you want to delete this artist?"} %></li>
+          <li id="artist-delete"><%= link_to "Delete", artist_path(@artist), method: :delete, data: {confirm: "Are you sure you want to delete this artist?"} %></li>
         <% else %>
-          <li><%= link_to "Undelete", undelete_artist_path(@artist), :method => :post, :data => {:confirm => "Are you sure you want to undelete this artist?"} %></li>
+          <li><%= link_to "Undelete", artist_path(@artist), method: :put, data: {confirm: "Are you sure you want to undelete this artist?", params: {"artist[is_active]" => true}} %></li>
         <% end %>
       <% end %>
       <% if CurrentUser.is_admin? %>

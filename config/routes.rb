@@ -74,7 +74,6 @@ Rails.application.routes.draw do
       put :revert
       put :ban
       put :unban
-      post :undelete
     end
     collection do
       get :show_or_new

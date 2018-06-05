@@ -74,14 +74,6 @@ class ArtistsController < ApplicationController
     redirect_to(artist_path(@artist), :notice => "Artist deleted")
   end
 
-  def undelete
-    if !@artist.deletable_by?(CurrentUser.user)
-      raise User::PrivilegeError
-    end
-    @artist.update_attribute(:is_active, true)
-    redirect_to(artist_path(@artist), :notice => "Artist undeleted")
-  end
-
   def revert
     @artist = Artist.find(params[:id])
     @version = @artist.versions.find(params[:version_id])
