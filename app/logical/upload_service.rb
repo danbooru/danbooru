@@ -57,6 +57,19 @@ class UploadService
       end
     end
 
+    def self.delete_file(md5, file_ext)
+      if Post.where(md5: md5).exists?
+        return
+      end
+
+      Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :original)
+      Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :large)
+      Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :preview)
+      Danbooru.config.backup_storage_manager.delete_file(nil, md5, file_ext, :original)
+      Danbooru.config.backup_storage_manager.delete_file(nil, md5, file_ext, :large)
+      Danbooru.config.backup_storage_manager.delete_file(nil, md5, file_ext, :preview)
+    end
+
     def self.calculate_ugoira_dimensions(source_path)
       folder = Zip::File.new(source_path)
       Tempfile.open("ugoira-dim-") do |tempfile|
@@ -146,6 +159,12 @@ class UploadService
       ensure
         preview_file.try(:close!)
         sample_file.try(:close!)
+      end
+
+      # in case this upload never finishes processing, we need to delete the
+      # distributed files in the future
+      Danbooru.config.other_server_hosts.each do |host|
+        UploadService::Utils.delay(queue: host, run_at: 10.minutes.from_now).delete_file(upload.md5, upload.file_ext)
       end
     end
 
