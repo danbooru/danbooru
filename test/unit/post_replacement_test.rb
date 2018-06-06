@@ -27,8 +27,9 @@ class PostReplacementTest < ActiveSupport::TestCase
   context "Replacing" do
     setup do
       CurrentUser.scoped(@uploader, "127.0.0.2") do
-        upload = FactoryBot.create(:jpg_upload, as_pending: "0", tag_string: "lowres tag1")
-        upload.process!
+        attributes = FactoryBot.attributes_for(:jpg_upload, as_pending: "0", tag_string: "lowres tag1")
+        service = UploadService.new(attributes)
+        upload = service.start!
         @post = upload.post
       end
     end
@@ -65,6 +66,7 @@ class PostReplacementTest < ActiveSupport::TestCase
       end
 
       should "create a post replacement record" do
+        binding.pry
         assert_equal(@post.id, PostReplacement.last.post_id)
       end
 
