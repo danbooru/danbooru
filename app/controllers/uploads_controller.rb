@@ -1,10 +1,11 @@
 class UploadsController < ApplicationController
   before_action :member_only, except: [:index, :show]
   respond_to :html, :xml, :json, :js
+  skip_before_action :verify_authenticity_token, only: [:preprocess]
 
   def new
     @upload_notice_wiki = WikiPage.titled(Danbooru.config.upload_notice_wiki_page).first
-    @upload, @post, @source, @normalized_url, @remote_size = UploadService::ControllerHelper.prepare(params[:url], params[:ref])
+    @upload, @post, @source, @normalized_url, @remote_size = UploadService::ControllerHelper.prepare(params[:url], nil, params[:ref])
     respond_with(@upload)
   end
 
@@ -37,6 +38,11 @@ class UploadsController < ApplicationController
         end
       end
     end
+  end
+
+  def preprocess
+    @upload, @post, @source, @normalized_url, @remote_size = UploadService::ControllerHelper.prepare(params[:url], params[:file], params[:ref])
+    render body: nil
   end
 
   def create

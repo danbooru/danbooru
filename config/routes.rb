@@ -279,6 +279,7 @@ Rails.application.routes.draw do
   resource :tag_implication_request, :only => [:new, :create]
   resources :uploads do
     collection do
+      post :preprocess
       get :batch
       get :image_proxy
     end

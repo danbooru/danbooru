@@ -34,6 +34,37 @@ div#c-uploads {
     div.field_with_errors {
       display: inline;
     }
+
+    #filedropzone {
+      border: 4px dashed #DDD;
+      padding: 10px;
+      max-width: 700px;
+      min-height: 50px;
+
+      &.error {
+        background-color: #f2dede;
+      }
+
+      &.success {
+        background-color: #dff0d8;
+      }
+    }
+
+    .dz-preview {
+      margin-bottom: 1em;
+    }
+
+    .dz-progress {
+      height: 20px;
+      width: 300px;
+      border: 1px solid #CCC;
+
+      .dz-upload {
+        background-color: #F5F5FF;
+        display: block;
+        height: 20px;
+      }
+    }
   }
 
   div#a-index {

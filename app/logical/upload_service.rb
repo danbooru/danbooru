@@ -1,9 +1,11 @@
 class UploadService
   module ControllerHelper
-    def self.prepare(url, ref = nil)
+    def self.prepare(url, file = nil, ref = nil)
       upload = Upload.new
 
       if url
+        # this gets called from UploadsController#new so we need
+        # to preprocess async
         Preprocessor.new(source: url).delay(queue: "default").start!(CurrentUser.user.id)
 
         download = Downloads::File.new(url)
@@ -21,6 +23,9 @@ class UploadService
         end
 
         return [upload, post, source, normalized_url, remote_size]
+      elsif file
+        # this gets called via XHR so we can process sync
+        Preprocessor.new(file: file).start!((CurrentUser.user.id))
       end
 
       return [upload]
@@ -216,12 +221,26 @@ class UploadService
       params[:source]
     end
 
+    def md5
+      params[:md5_confirmation]
+    end
+
     def in_progress?
-      Upload.where(status: "preprocessing", source: source).exists?
+      if source.present?
+        Upload.where(status: "preprocessing", source: source).exists?
+      elsif md5.present?
+        Upload.where(status: "preprocessing", md5: md5).exists?
+      else
+        false
+      end
     end
 
     def predecessor
-      Upload.where(status: ["preprocessed", "preprocessing"], source: source).first
+      if source.present?
+        Upload.where(status: ["preprocessed", "preprocessing"], source: source).first
+      elsif md5.present?
+        Upload.where(status: ["preprocessed", "preprocessing"], md5: md5).first
+      end
     end
 
     def completed?
@@ -229,20 +248,22 @@ class UploadService
     end
 
     def start!(uploader_id)
-      if !Utils.is_downloadable?(source)
-        return
-      end
+      if source.present?
+        if !Utils.is_downloadable?(source)
+          return
+        end
 
-      if Post.where(source: source).exists?
-        return
-      end
+        if Post.where(source: source).exists?
+          return
+        end
 
-      if Upload.where(source: source, status: "completed").exists?
-        return
-      end
+        if Upload.where(source: source, status: "completed").exists?
+          return
+        end
 
-      if Upload.where(source: source).where("status like ?", "error%").exists?
-        return
+        if Upload.where(source: source).where("status like ?", "error%").exists?
+          return
+        end
       end
 
       params[:rating] ||= "q"
@@ -254,13 +275,17 @@ class UploadService
         upload.update(status: "preprocessing")
 
         begin
-          file = download_from_source(source, referer_url: upload.referer_url) do |context|
-            upload.downloaded_source = context[:downloaded_source]
-            upload.source = context[:source]
+          if source.present?
+            file = download_from_source(source, referer_url: upload.referer_url) do |context|
+              upload.downloaded_source = context[:downloaded_source]
+              upload.source = context[:source]
 
-            if context[:ugoira]
-              upload.context = { ugoira: context[:ugoira] }
+              if context[:ugoira]
+                upload.context = { ugoira: context[:ugoira] }
+              end
             end
+          elsif params[:file].present?
+            file = params[:file]
           end
 
           Utils.process_file(upload, file)
