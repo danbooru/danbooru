@@ -1,9 +1,11 @@
 class UploadService
   module ControllerHelper
-    def self.prepare(url, ref = nil)
+    def self.prepare(url: nil, file: nil, ref: nil)
       upload = Upload.new
 
       if url
+        # this gets called from UploadsController#new so we need
+        # to preprocess async
         Preprocessor.new(source: url).delay(queue: "default").start!(CurrentUser.user.id)
 
         download = Downloads::File.new(url)
@@ -21,6 +23,9 @@ class UploadService
         end
 
         return [upload, post, source, normalized_url, remote_size]
+      elsif file
+        # this gets called via XHR so we can process sync
+        Preprocessor.new(file: file).start!((CurrentUser.user.id))
       end
 
       return [upload]
@@ -216,12 +221,26 @@ class UploadService
       params[:source]
     end
 
+    def md5
+      params[:md5_confirmation]
+    end
+
     def in_progress?
-      Upload.where(status: "preprocessing", source: source).exists?
+      if source.present?
+        Upload.where(status: "preprocessing", source: source).exists?
+      elsif md5.present?
+        Upload.where(status: "preprocessing", md5: md5).exists?
+      else
+        false
+      end
     end
 
     def predecessor
-      Upload.where(status: ["preprocessed", "preprocessing"], source: source).first
+      if source.present?
+        Upload.where(status: ["preprocessed", "preprocessing"], source: source).first
+      elsif md5.present?
+        Upload.where(status: ["preprocessed", "preprocessing"], md5: md5).first
+      end
     end
 
     def completed?
@@ -229,20 +248,22 @@ class UploadService
     end
 
     def start!(uploader_id)
-      if !Utils.is_downloadable?(source)
-        return
-      end
+      if source.present?
+        if !Utils.is_downloadable?(source)
+          return
+        end
 
-      if Post.where(source: source).exists?
-        return
-      end
+        if Post.where(source: source).exists?
+          return
+        end
 
-      if Upload.where(source: source, status: "completed").exists?
-        return
-      end
+        if Upload.where(source: source, status: "completed").exists?
+          return
+        end
 
-      if Upload.where(source: source).where("status like ?", "error%").exists?
-        return
+        if Upload.where(source: source).where("status like ?", "error%").exists?
+          return
+        end
       end
 
       params[:rating] ||= "q"
@@ -254,13 +275,17 @@ class UploadService
         upload.update(status: "preprocessing")
 
         begin
-          file = download_from_source(source, referer_url: upload.referer_url) do |context|
-            upload.downloaded_source = context[:downloaded_source]
-            upload.source = context[:source]
+          if source.present?
+            file = download_from_source(source, referer_url: upload.referer_url) do |context|
+              upload.downloaded_source = context[:downloaded_source]
+              upload.source = context[:source]
 
-            if context[:ugoira]
-              upload.context = { ugoira: context[:ugoira] }
+              if context[:ugoira]
+                upload.context = { ugoira: context[:ugoira] }
+              end
             end
+          elsif params[:file].present?
+            file = params[:file]
           end
 
           Utils.process_file(upload, file)
@@ -303,6 +328,128 @@ class UploadService
       yield(context)
 
       return file
+    end
+  end
+
+  class Replacer
+    attr_reader :post, :replacement
+
+    def initialize(post:, replacement:)
+      @post = post
+      @replacement = replacement
+    end
+
+    def comment_replacement_message(post, replacement)
+      %("#{replacement.creator.name}":[/users/#{replacement.creator.id}] replaced this post with a new image:\n\n#{replacement_message(post, replacement)})
+    end
+
+    def replacement_message(post, replacement)
+      linked_source = linked_source(replacement.replacement_url)
+      linked_source_was = linked_source(post.source_was)
+
+      <<-EOS.strip_heredoc
+        [table]
+          [tbody]
+            [tr]
+              [th]Old[/th]
+              [td]#{linked_source_was}[/td]
+              [td]#{post.md5_was}[/td]
+              [td]#{post.file_ext_was}[/td]
+              [td]#{post.image_width_was} x #{post.image_height_was}[/td]
+              [td]#{post.file_size_was.human_size(precision: 4)}[/td]
+            [/tr]
+            [tr]
+              [th]New[/th]
+              [td]#{linked_source}[/td]
+              [td]#{post.md5}[/td]
+              [td]#{post.file_ext}[/td]
+              [td]#{post.image_width} x #{post.image_height}[/td]
+              [td]#{post.file_size.human_size(precision: 4)}[/td]
+            [/tr]
+          [/tbody]
+        [/table]
+      EOS
+    end
+
+    def linked_source(source)
+      return nil if source.nil?
+
+      # truncate long sources in the middle: "www.pixiv.net...lust_id=23264933"
+      truncated_source = source.gsub(%r{\Ahttps?://}, "").truncate(64, omission: "...#{source.last(32)}")
+
+      if source =~ %r{\Ahttps?://}i
+        %("#{truncated_source}":[#{source}])
+      else
+        truncated_source
+      end
+    end
+
+    def suggested_tags_for_removal
+      tags = post.tag_array.select { |tag| Danbooru.config.remove_tag_after_replacement?(tag) }
+      tags = tags.map { |tag| "-#{tag}" }
+      tags.join(" ")
+    end
+
+    def process!
+      preprocessor = Preprocessor.new(
+        rating: post.rating,
+        tag_string: replacement.tags,
+        source: replacement.replacement_url,
+        file: replacement.replacement_file
+      )
+      upload = preprocessor.start!(CurrentUser.id)
+      upload = preprocessor.finish!
+      md5_changed = upload.md5 != post.md5
+
+      if replacement.replacement_file.present?
+        replacement.replacement_url = "file://#{replacement.replacement_file.original_filename}"
+      elsif upload.downloaded_source.present?
+        replacement.replacement_url = upload.downloaded_source
+      end
+
+      if md5_changed
+        post.queue_delete_files(PostReplacement::DELETION_GRACE_PERIOD)
+      end
+
+      replacement.file_ext = upload.file_ext
+      replacement.file_size = upload.file_size
+      replacement.image_height = upload.image_height
+      replacement.image_width = upload.image_width
+      replacement.md5 = upload.md5
+
+      post.md5 = upload.md5
+      post.file_ext = upload.file_ext
+      post.image_width = upload.image_width
+      post.image_height = upload.image_height
+      post.file_size = upload.file_size
+      post.source = upload.source
+      post.tag_string = upload.tag_string
+
+      rescale_notes(post)
+      update_ugoira_frame_data(post, upload)
+
+      if md5_changed
+        CurrentUser.as(User.system) do
+          post.comments.create!(body: comment_replacement_message(post, replacement), do_not_bump_post: true)
+        end
+      end
+
+      replacement.save!
+      post.save!
+    end
+
+    def rescale_notes(post)
+      x_scale = post.image_width.to_f  / post.image_width_was.to_f
+      y_scale = post.image_height.to_f / post.image_height_was.to_f
+
+      post.notes.each do |note|
+        note.rescale!(x_scale, y_scale)
+      end
+    end
+
+    def update_ugoira_frame_data(post, upload)
+      post.pixiv_ugoira_frame_data.destroy if post.pixiv_ugoira_frame_data.present?
+      upload.ugoira_service.save_frame_data(post) if post.is_ugoira?
     end
   end
 
@@ -370,7 +517,7 @@ class UploadService
     @post = convert_to_post(upload)
     @post.save!
 
-    @upload.update(status: "error: " + @post.errors.full_messages.join(", "))
+    upload.update(status: "error: " + @post.errors.full_messages.join(", "))
 
     if upload.context && upload.context["ugoira"]
       PixivUgoiraFrameData.create(

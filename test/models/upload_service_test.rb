@@ -326,7 +326,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       should "work for a jpeg" do
         @service = subject.new(source: @jpeg)
-        @upload = @service.start!
+        @upload = @service.start!(CurrentUser.id)
         assert_equal("preprocessed", @upload.status)
         assert_not_nil(@upload.md5)
         assert_equal("jpg", @upload.file_ext)
@@ -339,7 +339,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       should "work for an ugoira" do
         @service = subject.new(source: @ugoira)
-        @upload = @service.start!
+        @upload = @service.start!(CurrentUser.id)
         assert_equal("preprocessed", @upload.status)
         assert_not_nil(@upload.md5)
         assert_equal("zip", @upload.file_ext)
@@ -351,7 +351,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       should "work for a video" do
         @service = subject.new(source: @video)
-        @upload = @service.start!
+        @upload = @service.start!(CurrentUser.id)
         assert_equal("preprocessed", @upload.status)
         assert_not_nil(@upload.md5)
         assert_equal("mp4", @upload.file_ext)
@@ -368,11 +368,108 @@ class UploadServiceTest < ActiveSupport::TestCase
         
         should "leave the upload in an error state" do
           @service = subject.new(source: @video)
-          @upload = @service.start!
+          @upload = @service.start!(CurrentUser.id)
           assert_match(/error:/, @upload.status)
         end
       end
 
+    end
+  end
+
+  context "::Replacer" do
+    context "for a file replacement" do
+      setup do
+        @new_file = upload_file("test/files/test.jpg")
+        travel_to(1.month.ago) do
+          @user = FactoryBot.create(:user)
+        end
+        as_user do
+          @post = FactoryBot.create(:post)
+          @post.stubs(:queue_delete_files)
+          @replacement = FactoryBot.create(:post_replacement, post: @post, replacement_url: "", replacement_file: @new_file)
+        end
+      end      
+
+      subject { UploadService::Replacer.new(post: @post, replacement: @replacement) }
+
+      context "#process!" do
+        should "create a new upload" do
+          assert_difference(-> { Upload.count }) do
+            as_user { subject.process! }
+          end
+        end
+
+        should "create a comment" do
+          assert_difference(-> { @post.comments.count }) do
+            as_user { subject.process! }
+            @post.reload
+          end
+        end
+
+        should "not create a new post" do
+          assert_difference(-> { Post.count }, 0) do
+            as_user { subject.process! }
+          end
+        end
+
+        should "update the post's MD5" do
+          assert_changes(-> { @post.md5 }) do
+            as_user { subject.process! }
+            @post.reload
+          end
+        end
+      end
+    end
+
+    context "for a source replacement" do
+      setup do
+        @new_url = "https://upload.wikimedia.org/wikipedia/commons/c/c5/Moraine_Lake_17092005.jpg"
+        travel_to(1.month.ago) do
+          @user = FactoryBot.create(:user)
+        end
+        as_user do
+          @post = FactoryBot.create(:post)
+          @post.stubs(:queue_delete_files)
+          @replacement = FactoryBot.create(:post_replacement, post: @post, replacement_url: @new_url)
+        end
+      end
+
+      subject { UploadService::Replacer.new(post: @post, replacement: @replacement) }
+
+      context "#process!" do
+        should "create a new upload" do
+          assert_difference(-> { Upload.count }) do
+            as_user { subject.process! }
+          end
+        end
+
+        should "create a comment" do
+          assert_difference(-> { @post.comments.count }) do
+            as_user { subject.process! }
+            @post.reload
+          end
+        end
+
+        should "not create a new post" do
+          assert_difference(-> { Post.count }, 0) do
+            as_user { subject.process! }
+          end
+        end
+
+        should "update the post's MD5" do
+          assert_changes(-> { @post.md5 }) do
+            as_user { subject.process! }
+            @post.reload
+          end
+        end
+
+        should "update the post's source" do
+          assert_changes(-> { @post.source }, nil, from: @post.source, to: @new_url) do
+            as_user { subject.process! }
+            @post.reload
+          end
+        end
+      end
     end
   end
 
@@ -450,7 +547,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
     context "with a preprocessed predecessor" do
       setup do
-        @predecessor = FactoryBot.create(:source_upload, status: "preprocessed", source: @source, image_height: 0, image_width: 0, file_ext: "jpg")
+        @predecessor = FactoryBot.create(:source_upload, status: "preprocessed", source: @source, file_size: 0, md5: "something", image_height: 0, image_width: 0, file_ext: "jpg")
         @tags = 'hello world'
       end
 
