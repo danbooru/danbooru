@@ -302,8 +302,8 @@ class UploadService
       end
     end
 
-    def finish!
-      pred = self.predecessor()
+    def finish!(upload = nil)
+      pred = upload || self.predecessor()
       pred.attributes = self.params
       pred.status = "completed"
       pred.save
@@ -356,7 +356,7 @@ class UploadService
               [td]#{post.md5_was}[/td]
               [td]#{post.file_ext_was}[/td]
               [td]#{post.image_width_was} x #{post.image_height_was}[/td]
-              [td]#{post.file_size_was.human_size(precision: 4)}[/td]
+              [td]#{post.file_size_was.to_s(:human_size, precision: 4)}[/td]
             [/tr]
             [tr]
               [th]New[/th]
@@ -364,7 +364,7 @@ class UploadService
               [td]#{post.md5}[/td]
               [td]#{post.file_ext}[/td]
               [td]#{post.image_width} x #{post.image_height}[/td]
-              [td]#{post.file_size.human_size(precision: 4)}[/td]
+              [td]#{post.file_size.to_s(:human_size, precision: 4)}[/td]
             [/tr]
           [/tbody]
         [/table]
@@ -384,10 +384,10 @@ class UploadService
       end
     end
 
-    def suggested_tags_for_removal
-      tags = post.tag_array.select { |tag| Danbooru.config.remove_tag_after_replacement?(tag) }
-      tags = tags.map { |tag| "-#{tag}" }
-      tags.join(" ")
+    def undo!
+      undo_replacement = post.replacements.create(replacement_url: replacement.original_url)
+      undoer = Replacer.new(post: post, replacement: undo_replacement)
+      undoer.process!
     end
 
     def process!
@@ -398,9 +398,9 @@ class UploadService
         file: replacement.replacement_file
       )
       upload = preprocessor.start!(CurrentUser.id)
-      upload = preprocessor.finish!
+      upload = preprocessor.finish!(upload)
       md5_changed = upload.md5 != post.md5
-
+      
       if replacement.replacement_file.present?
         replacement.replacement_url = "file://#{replacement.replacement_file.original_filename}"
       elsif upload.downloaded_source.present?
@@ -422,10 +422,9 @@ class UploadService
       post.image_width = upload.image_width
       post.image_height = upload.image_height
       post.file_size = upload.file_size
-      post.source = upload.source
+      post.source = upload.downloaded_source || upload.source
       post.tag_string = upload.tag_string
 
-      rescale_notes(post)
       update_ugoira_frame_data(post, upload)
 
       if md5_changed
@@ -434,22 +433,38 @@ class UploadService
         end
       end
 
+      if replacement.final_source.present?
+        post.update(source: replacement.final_source)
+      end
+
       replacement.save!
       post.save!
+
+      rescale_notes(post)
     end
 
     def rescale_notes(post)
-      x_scale = post.image_width.to_f  / post.image_width_was.to_f
-      y_scale = post.image_height.to_f / post.image_height_was.to_f
+      x_scale = post.image_width.to_f  / post.image_width_before_last_save.to_f
+      y_scale = post.image_height.to_f / post.image_height_before_last_save.to_f
 
       post.notes.each do |note|
+        note.reload
         note.rescale!(x_scale, y_scale)
       end
     end
 
     def update_ugoira_frame_data(post, upload)
       post.pixiv_ugoira_frame_data.destroy if post.pixiv_ugoira_frame_data.present?
-      upload.ugoira_service.save_frame_data(post) if post.is_ugoira?
+
+      unless post.is_ugoira?
+        return
+      end
+
+      PixivUgoiraFrameData.create(
+        post_id: post.id,
+        data: upload.context["ugoira"]["frame_data"],
+        content_type: upload.context["ugoira"]["content_type"]
+      )
     end
   end
 

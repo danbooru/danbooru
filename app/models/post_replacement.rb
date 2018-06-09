@@ -18,43 +18,40 @@ class PostReplacement < ApplicationRecord
     self.md5_was = post.md5
   end
 
-  def undo!
-    undo_replacement = post.replacements.create(replacement_url: original_url)
-    undo_replacement.process!
-  end
-
-  def update_ugoira_frame_data(upload)
-    post.pixiv_ugoira_frame_data.destroy if post.pixiv_ugoira_frame_data.present?
-    upload.ugoira_service.save_frame_data(post) if post.is_ugoira?
-  end
-
-  module SearchMethods
-    def post_tags_match(query)
-      PostQueryBuilder.new(query).build(self.joins(:post))
-    end
-
-    def search(params = {})
-      q = super
-
-      if params[:creator_id].present?
-        q = q.where(creator_id: params[:creator_id].split(",").map(&:to_i))
+  concerning :Search do
+    class_methods do
+      def post_tags_match(query)
+        PostQueryBuilder.new(query).build(self.joins(:post))
       end
 
-      if params[:creator_name].present?
-        q = q.where(creator_id: User.name_to_id(params[:creator_name]))
-      end
+      def search(params = {})
+        q = super
 
-      if params[:post_id].present?
-        q = q.where(post_id: params[:post_id].split(",").map(&:to_i))
-      end
+        if params[:creator_id].present?
+          q = q.where(creator_id: params[:creator_id].split(",").map(&:to_i))
+        end
 
-      if params[:post_tags_match].present?
-        q = q.post_tags_match(params[:post_tags_match])
-      end
+        if params[:creator_name].present?
+          q = q.where(creator_id: User.name_to_id(params[:creator_name]))
+        end
 
-      q.apply_default_order(params)
+        if params[:post_id].present?
+          q = q.where(post_id: params[:post_id].split(",").map(&:to_i))
+        end
+
+        if params[:post_tags_match].present?
+          q = q.post_tags_match(params[:post_tags_match])
+        end
+
+        q.apply_default_order(params)
+      end
     end
   end
 
-  extend SearchMethods
+  def suggested_tags_for_removal
+    tags = post.tag_array.select { |tag| Danbooru.config.remove_tag_after_replacement?(tag) }
+    tags = tags.map { |tag| "-#{tag}" }
+    tags.join(" ")
+  end
+
 end
