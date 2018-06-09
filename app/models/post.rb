@@ -1396,7 +1396,8 @@ class Post < ApplicationRecord
     def replace!(params)
       transaction do
         replacement = replacements.create(params)
-        replacement.process!
+        processor = UploadService::Replacer.new(post: self, replacement: replacement)
+        processor.process!
         replacement
       end
     end

@@ -28,8 +28,7 @@ class PostTest < ActiveSupport::TestCase
   context "Deletion:" do
     context "Expunging a post" do
       setup do
-        @upload = FactoryBot.create(:jpg_upload)
-        @upload.process!
+        @upload = UploadService.new(FactoryBot.attributes_for(:jpg_upload)).start!
         @post = @upload.post
         Favorite.add(post: @post, user: @user)
       end
@@ -2674,6 +2673,21 @@ class PostTest < ActiveSupport::TestCase
       should "rescale notes" do
         note = @dst.notes.active.first
         assert_equal([20, 20, 20, 20], [note.x, note.y, note.width, note.height])
+      end
+    end
+  end
+
+  context "#replace!" do
+    subject { @post.replace!(tags: "something", replacement_url: "https://danbooru.donmai.us/data/preview/download.png") }
+
+    setup do
+      @post = FactoryBot.create(:post)
+      @post.stubs(:queue_delete_files)
+    end
+
+    should "update the post" do
+      assert_changes(-> { @post.md5 }) do
+        subject
       end
     end
   end

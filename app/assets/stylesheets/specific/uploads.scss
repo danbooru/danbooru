@@ -41,11 +41,18 @@ div#c-uploads {
       max-width: 700px;
       min-height: 50px;
 
+      .placeholder {
+        font-style: italic;
+        color: #333;
+      }
+
       &.error {
+        border-color: darken(#f2dede, 30%);
         background-color: #f2dede;
       }
 
       &.success {
+        border-color: darken(#dff0d8, 30%);
         background-color: #dff0d8;
       }
     }
