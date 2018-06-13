@@ -114,6 +114,10 @@ class Upload < ApplicationRecord
       status =~ /duplicate/
     end
 
+    def is_errored?
+      status =~ /error:/
+    end
+
     def duplicate_post_id
       @duplicate_post_id ||= status[/duplicate: (\d+)/, 1]
     end

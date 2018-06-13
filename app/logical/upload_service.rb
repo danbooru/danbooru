@@ -148,6 +148,11 @@ class UploadService
       upload.file_size = file.size
       upload.md5 = Digest::MD5.file(file.path).hexdigest
 
+      if Post.where(md5: upload.md5).exists?
+        # abort early if this post already exists
+        raise Upload::Error.new("Post with MD5 #{upload.md5} already exists")
+      end
+
       Utils.calculate_dimensions(upload, file) do |width, height|
         upload.image_width = width
         upload.image_height = height
@@ -398,7 +403,9 @@ class UploadService
         file: replacement.replacement_file
       )
       upload = preprocessor.start!(CurrentUser.id)
+      return if upload.is_errored?
       upload = preprocessor.finish!(upload)
+      return if upload.is_errored?
       md5_changed = upload.md5 != post.md5
       
       if replacement.replacement_file.present?
