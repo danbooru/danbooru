@@ -4,11 +4,11 @@ class UploadServiceTest < ActiveSupport::TestCase
   UGOIRA_CONTEXT = {
     "ugoira" => {
       "frame_data" => [
-        {"file" => "000000.jpg", "delay" => 200},
         {"file" => "000001.jpg", "delay" => 200},
         {"file" => "000002.jpg", "delay" => 200},
         {"file" => "000003.jpg", "delay" => 200},
-        {"file" => "000004.jpg", "delay" => 250}
+        {"file" => "000004.jpg", "delay" => 200},
+        {"file" => "000005.jpg", "delay" => 250}
       ],
       "content_type" => "image/jpeg"
     }
@@ -644,7 +644,7 @@ class UploadServiceTest < ActiveSupport::TestCase
             assert_equal("cad1da177ef309bf40a117c17b8eecf5", Digest::MD5.file(@post.file).hexdigest)
 
             assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @post.source)
-            assert_equal([{"delay"=>125, "file"=>"000001.jpg"}, {"delay"=>125,"file"=>"000002.jpg"}], @post.pixiv_ugoira_frame_data.data)
+            assert_equal([{"delay"=>125, "file"=>"000000.jpg"}, {"delay"=>125,"file"=>"000001.jpg"}], @post.pixiv_ugoira_frame_data.data)
           rescue Net::OpenTimeout
             skip "Remote connection to Pixiv failed"
           end
