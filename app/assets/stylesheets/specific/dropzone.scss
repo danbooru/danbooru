@@ -1,0 +1,41 @@
+#filedropzone {
+  border: 4px dashed #DDD;
+  padding: 0;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+
+  .placeholder {
+    font-style: italic;
+    color: #333;
+    height: 100%;
+  }
+
+  &.error {
+    border-color: darken(#f2dede, 30%);
+    background-color: #f2dede;
+  }
+
+  &.success {
+    border-color: darken(#dff0d8, 30%);
+    background-color: #dff0d8;
+  }
+}
+
+.dz-preview {
+  margin-bottom: 1em;
+}
+
+.dz-progress {
+  height: 20px;
+  width: 300px;
+  border: 1px solid #CCC;
+
+  .dz-upload {
+    background-color: #F5F5FF;
+    display: block;
+    height: 20px;
+  }
+}

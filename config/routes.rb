@@ -154,9 +154,7 @@ Rails.application.routes.draw do
     resource :visit, :controller => "forum_topic_visits"
   end
   resources :ip_bans
-  resource :iqdb_queries, :only => [:create, :show, :check] do
-    get :check
-  end
+  resource :iqdb_queries, :only => [:show]
   resources :janitor_trials do
     collection do
       get :test
