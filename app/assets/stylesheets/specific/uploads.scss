@@ -37,13 +37,17 @@ div#c-uploads {
 
     #filedropzone {
       border: 4px dashed #DDD;
-      padding: 10px;
-      max-width: 700px;
-      min-height: 50px;
+      padding: 0;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
 
       .placeholder {
         font-style: italic;
         color: #333;
+        height: 100%;
       }
 
       &.error {

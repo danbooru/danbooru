@@ -33,13 +33,13 @@
           </div>
         <% end %>
 
-        <div class="input">
+        <div class="input fallback">
           <%= f.label :file %>
           <%= f.file_field :file, :size => 50 %>
         </div>
 
         <div class="input" id="filedropzone">
-          <span class="placeholder">Drag and drop a file here</span>
+          <div class="placeholder"><span>Drag and drop a file here</span></div>
         </div>
 
         <div class="input">
@@ -173,6 +173,7 @@
         acceptedFiles: "image/jpeg,image/png,image/gif",
         previewTemplate: '<div class="dz-preview dz-file-preview"><div class="dz-details"><div class="dz-filename"><span data-dz-name></span></div><div class="dz-size" data-dz-size></div></div><div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div><div class="dz-error-message"><span data-dz-errormessage></span></div></div>',
         init: function() {
+          $(".fallback").hide();
           this.on("drop", function(event) {
             $("#filedropzone .placeholder").hide();
           });
