@@ -7,7 +7,7 @@ class PixivUgoiraFrameData < ApplicationRecord
     
     if data[0]["delay_msec"]
       self.data = data.map.with_index do |datum, i|
-        filename = "%06d.jpg" % [i + 1]
+        filename = "%06d.jpg" % [i]
         {"delay" => datum["delay_msec"], "file" => filename}
       end
     end
