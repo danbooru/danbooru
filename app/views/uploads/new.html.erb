@@ -21,6 +21,7 @@
         <%= hidden_field_tag :url, params[:url] %>
         <%= hidden_field_tag :ref, params[:ref] %>
         <%= hidden_field_tag :normalized_url, @normalized_url %>
+        <%= f.hidden_field :md5_confirmation %>
         <%= f.hidden_field :referer_url, :value => @source.try(:referer_url) %>
 
         <% if CurrentUser.can_upload_free? %>
@@ -32,9 +33,13 @@
           </div>
         <% end %>
 
-        <div class="input">
+        <div class="input fallback">
           <%= f.label :file %>
           <%= f.file_field :file, :size => 50 %>
+        </div>
+
+        <div class="input" id="filedropzone">
+          <div class="placeholder"><span>Drag and drop a file here</span></div>
         </div>
 
         <div class="input">
@@ -106,15 +111,15 @@
         <div class="input">
           <div>
             <%= f.label :tag_string, "Tags" %>
-            <%= f.text_area :tag_string, :size => "60x5", :data => { :autocomplete => "tag-edit" } %>
+            <%= f.text_area :tag_string, :size => "60x5", :spellcheck => false, :data => { :autocomplete => "tag-edit" } %>
             <span id="open-edit-dialog" class="ui-icon ui-icon-arrow-1-ne" title="detach" style="display: none;"/>
           </div>
 
           <%= button_tag "Related tags", :id => "related-tags-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
 
-        <% TagCategory.related_button_list.each do |category| %>
-          <%= button_tag "#{TagCategory.related_button_mapping[category]}", :id => "related-#{category}-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
-        <% end %>
+          <% TagCategory.related_button_list.each do |category| %>
+            <%= button_tag "#{TagCategory.related_button_mapping[category]}", :id => "related-#{category}-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
+          <% end %>
         </div>
 
         <div class="input">
@@ -141,6 +146,57 @@
 
 <% content_for(:page_title) do %>
   Upload - <%= Danbooru.config.app_name %>
+<% end %>
+
+<% content_for(:html_header) do %>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.4.0/min/dropzone.min.js"></script>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js"></script>
+  <script>
+    $(function() {
+      var enabled = true;
+
+      if (!window.FileReader) {
+        enabled = false;
+      }
+
+      if (!enabled) {
+        $("#filedropzone").remove();
+        return;
+      }
+
+      $("#filedropzone").dropzone({ 
+        paramName: "file", 
+        url: "/uploads/preprocess", 
+        createImageThumbnails: false,
+        addRemoveLinks: false,
+        maxFiles: 1,
+        acceptedFiles: "image/jpeg,image/png,image/gif",
+        previewTemplate: '<div class="dz-preview dz-file-preview"><div class="dz-details"><div class="dz-filename"><span data-dz-name></span></div><div class="dz-size" data-dz-size></div></div><div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div><div class="dz-error-message"><span data-dz-errormessage></span></div></div>',
+        init: function() {
+          $(".fallback").hide();
+          this.on("drop", function(event) {
+            $("#filedropzone .placeholder").hide();
+          });
+          this.on("complete", function(file) {
+            $("#filedropzone .dz-progress").hide();
+          });
+          this.on("addedfile", function(file) {
+            var reader = new FileReader()
+            reader.addEventListener("loadend", function() {
+              $("#upload_md5_confirmation").val(CryptoJS.MD5(CryptoJS.enc.Latin1.parse(this.result)).toString());
+            });
+            reader.readAsBinaryString(file);
+          });
+          this.on("success", function(file) {
+            $("#filedropzone").addClass("success");
+          });
+          this.on("error", function(file, msg) {
+            $("#filedropzone").addClass("error");
+          });
+        }
+      });
+    });
+  </script>
 <% end %>
 
 <%= render "uploads/secondary_links" %>

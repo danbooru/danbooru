@@ -471,9 +471,10 @@ div#c-post-versions, div#c-artist-versions {
 div#c-posts, div#c-uploads {
   /* Fetch source data box */
   div#source-info {
+    border-radius: 4px;
     margin: 1em 0;
     padding: 1em;
-    border: 1px solid gray;
+    border: 1px solid #666;
 
     p {
       margin: 0;

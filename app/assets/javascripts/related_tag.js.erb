@@ -34,7 +34,6 @@
       $dest.empty();
       Danbooru.RelatedTag.build_recent_and_frequent($dest);
       $dest.append("<em>Loading...</em>");
-      $("#related-tags-container").show();
       $.get("/related_tag.json", {
         "query": Danbooru.RelatedTag.current_tag(),
         "category": category
@@ -93,6 +92,9 @@
   }
 
   Danbooru.RelatedTag.process_response = function(data) {
+    if (data.tags.length || data.wiki_page_tags.length || data.other_wikis.length) {
+      $("#related-tags-container").show();
+    }
     Danbooru.RelatedTag.recent_search = data;
     Danbooru.RelatedTag.build_all();
   }
