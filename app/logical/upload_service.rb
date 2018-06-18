@@ -101,9 +101,11 @@ class UploadService
 
     def self.distribute_files(file, record, type)
       # need to do this for hybrid storage manager
-      record.id = nil
+      post = Post.new
+      post.md5 = record.md5
+      post.file_ext = record.file_ext
       [Danbooru.config.storage_manager, Danbooru.config.backup_storage_manager].each do |sm|
-        sm.store_file(file, record, type)
+        sm.store_file(file, post, type)
       end
     end
 
