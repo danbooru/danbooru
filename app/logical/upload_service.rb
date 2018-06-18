@@ -100,6 +100,8 @@ class UploadService
     end
 
     def self.distribute_files(file, record, type)
+      # need to do this for hybrid storage manager
+      record.id = nil
       [Danbooru.config.storage_manager, Danbooru.config.backup_storage_manager].each do |sm|
         sm.store_file(file, record, type)
       end
@@ -291,8 +293,10 @@ class UploadService
           return
         end
 
-        if Post.where(source: source).exists?
-          return
+        CurrentUser.as_system do
+          if Post.tag_match("source:#{source}").exists?
+            return
+          end
         end
 
         if Upload.where(source: source, status: "completed").exists?
