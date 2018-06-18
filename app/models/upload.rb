@@ -59,7 +59,7 @@ class Upload < ApplicationRecord
   validates :image_height, numericality: { less_than_or_equal_to: Danbooru.config.max_image_height }, allow_nil: true
   validates :image_width, numericality: { less_than_or_equal_to: Danbooru.config.max_image_width }, allow_nil: true
   validates :rating, inclusion: { in: %w(q e s) }, allow_nil: true
-  validates :md5, confirmation: true
+  validates :md5, confirmation: true, if: -> (rec) { rec.md5_confirmation.present? }
   validates :file_ext, format: { with: /jpg|gif|png|swf|webm|mp4|zip/ }, allow_nil: true
   validates_with Validator
   serialize :context, JSON

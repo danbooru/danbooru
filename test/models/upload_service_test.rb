@@ -275,19 +275,16 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
       end
     end
-  end
 
-  context "::Preprocessor" do
-    subject { UploadService::Preprocessor }
-
-    context "#download_from_source" do
+    context ".download_from_source" do
       setup do
-        @jpeg = "https://upload.wikimedia.org/wikipedia/commons/c/c5/Moraine_Lake_17092005.jpg"
-        @ugoira = "https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip"
+        @ugoira_source = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364"
+        @jpeg_source = "https://upload.wikimedia.org/wikipedia/commons/c/c5/Moraine_Lake_17092005.jpg"
+        @upload = Upload.new
       end
 
       should "work on a jpeg" do
-        file = subject.new({}).download_from_source(@jpeg) do |context|
+        file = subject.download_from_source(@jpeg_source) do |context|
           assert_not_nil(context[:downloaded_source])
           assert_not_nil(context[:source])
         end
@@ -297,7 +294,7 @@ class UploadServiceTest < ActiveSupport::TestCase
       end
 
       should "work on an ugoira url" do
-        file = subject.new({}).download_from_source(@ugoira, referer_url: "https://www.pixiv.net") do |context|
+        file = subject.download_from_source(@ugoira_source, referer_url: "https://www.pixiv.net") do |context|
           assert_not_nil(context[:downloaded_source])
           assert_not_nil(context[:source])
           assert_not_nil(context[:ugoira])
@@ -306,7 +303,17 @@ class UploadServiceTest < ActiveSupport::TestCase
         assert_operator(File.size(file.path), :>, 0)
         file.close
       end
+
+      should "initialize fields on the upload" do
+        subject.download_for_upload(@ugoira_source, @upload)
+        assert_not_nil(@upload.source)
+        assert_not_nil(@upload.context)
+      end
     end
+  end
+
+  context "::Preprocessor" do
+    subject { UploadService::Preprocessor }
 
     context "#start!" do
       setup do

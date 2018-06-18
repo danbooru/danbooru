@@ -213,6 +213,39 @@ class UploadService
       tags << "animated_png" if is_animated_png?(upload, file)
       tags.join(" ")
     end
+
+    def self.download_from_source(source, referer_url: nil)
+      download = Downloads::File.new(source, referer_url: referer_url)
+      file = download.download!
+      context = {
+        downloaded_source: download.downloaded_source,
+        source: download.source
+      }
+
+      if download.data[:is_ugoira]
+        context[:ugoira] = {
+          frame_data: download.data[:ugoira_frame_data],
+          content_type: download.data[:ugoira_content_type]
+        }
+      end
+
+      yield(context)
+
+      return file
+    end
+
+    def self.download_for_upload(source, upload)
+      file = download_from_source(source, referer_url: upload.referer_url) do |context|
+        upload.downloaded_source = context[:downloaded_source]
+        upload.source = context[:source]
+
+        if context[:ugoira]
+          upload.context = { ugoira: context[:ugoira] }
+        end
+      end
+
+      return file
+    end
   end
 
   class Preprocessor
@@ -281,14 +314,7 @@ class UploadService
 
         begin
           if source.present?
-            file = download_from_source(source, referer_url: upload.referer_url) do |context|
-              upload.downloaded_source = context[:downloaded_source]
-              upload.source = context[:source]
-
-              if context[:ugoira]
-                upload.context = { ugoira: context[:ugoira] }
-              end
-            end
+            file = Utils.download_for_upload(source, upload)
           elsif params[:file].present?
             file = params[:file]
           end
@@ -313,26 +339,6 @@ class UploadService
       pred.status = "completed"
       pred.save
       return pred
-    end
-
-    def download_from_source(source, referer_url: nil)
-      download = Downloads::File.new(source, referer_url: referer_url)
-      file = download.download!
-      context = {
-        downloaded_source: download.downloaded_source,
-        source: download.source
-      }
-
-      if download.data[:is_ugoira]
-        context[:ugoira] = {
-          frame_data: download.data[:ugoira_frame_data],
-          content_type: download.data[:ugoira_content_type]
-        }
-      end
-
-      yield(context)
-
-      return file
     end
   end
 
@@ -506,10 +512,12 @@ class UploadService
 
       @upload.update(status: "processing")
 
+      if @upload.file.nil? && source.present?
+        @upload.file = Utils.download_for_upload(source, @upload)
+      end
+
       if @upload.file.present?
         Utils.process_file(upload, @upload.file)
-      else
-        # sources will be handled in preprocessing now
       end
 
       @upload.save!
