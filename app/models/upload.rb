@@ -52,7 +52,7 @@ class Upload < ApplicationRecord
   belongs_to :uploader, :class_name => "User"
   belongs_to :post, optional: true
 
-  before_validation :initialize_attributes
+  before_validation :initialize_attributes, on: :create
   before_validation :assign_rating_from_tags
   validate :uploader_is_not_limited, on: :create
   # validates :source, format: { with: /\Ahttps?/ }, if: ->(record) {record.file.blank?}, on: :create
