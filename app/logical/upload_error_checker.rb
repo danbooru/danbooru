@@ -4,7 +4,7 @@ require 'mail'
 
 class UploadErrorChecker
   def check!
-    uploads = Upload.where("status like 'error%' and status not like 'error: RuntimeError - duplicate%' and created_at >= ?", 1.hour.ago)
+    uploads = Upload.where("status like 'error%' and status not like 'error: Upload::Error - Post with MD5%' and status not like 'error: RuntimeError - duplicate%' and created_at >= ?", 1.hour.ago)
     if uploads.size > 5
       mail = Mail.new do
         from "webmaster@danbooru.donmai.us"

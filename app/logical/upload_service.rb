@@ -4,16 +4,18 @@ class UploadService
       upload = Upload.new
 
       if url
-        # this gets called from UploadsController#new so we need
-        # to preprocess async
-        Preprocessor.new(source: url).delay(queue: "default").start!(CurrentUser.user.id)
-
         download = Downloads::File.new(url)
         normalized_url, _, _ = download.before_download(url, {})
         post = if normalized_url.nil?
           Post.where("SourcePattern(lower(posts.source)) = ?", url).first
         else
           Post.where("SourcePattern(lower(posts.source)) IN (?)", [url, normalized_url]).first
+        end
+
+        if post.nil?
+          # this gets called from UploadsController#new so we need
+          # to preprocess async
+          Preprocessor.new(source: url).delay(queue: "default").start!(CurrentUser.user.id)
         end
 
         begin
@@ -62,9 +64,13 @@ class UploadService
       end
     end
 
-    def self.delete_file(md5, file_ext)
+    def self.delete_file(md5, file_ext, upload_id = nil)
       if Post.where(md5: md5).exists?
         return
+      end
+
+      if upload_id
+        Upload.find(upload_id).update(status: "preprocessed + deleted")
       end
 
       Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :original)
@@ -178,7 +184,7 @@ class UploadService
       # in case this upload never finishes processing, we need to delete the
       # distributed files in the future
       Danbooru.config.other_server_hosts.each do |host|
-        UploadService::Utils.delay(queue: host, run_at: 10.minutes.from_now).delete_file(upload.md5, upload.file_ext)
+        UploadService::Utils.delay(queue: host, run_at: 10.minutes.from_now).delete_file(upload.md5, upload.file_ext, upload.id)
       end
     end
 
