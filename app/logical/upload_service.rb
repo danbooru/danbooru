@@ -66,6 +66,12 @@ class UploadService
 
     def self.delete_file(md5, file_ext, upload_id = nil)
       if Post.where(md5: md5).exists?
+        if upload_id
+          CurrentUser.as_system do
+            Upload.find(upload_id).update(status: "preprocessed + dup #{md5}")
+          end
+        end
+        
         return
       end
 
