@@ -70,7 +70,9 @@ class UploadService
       end
 
       if upload_id
-        Upload.find(upload_id).update(status: "preprocessed + deleted")
+        CurrentUser.as_system do
+          Upload.find(upload_id).update(status: "preprocessed + deleted")
+        end
       end
 
       Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :original)
