@@ -1,0 +1,78 @@
+<div id="c-iqdb-queries">
+  <div id="a-check">
+    <h1>Similar Images Search</h1>
+    <section>
+      <p>You can upload a file or paste a URL to perform an image similarity search with every upload on <%= Danbooru.config.app_name %>. Note that this page will redirect you to <%= link_to "IQDBS", Danbooru.config.iqdbs_server %>. You will be redirected back here once the search is executed.</p>
+
+      <%= form_tag("#{Danbooru.config.iqdbs_server}/similar", method: :post, class: "simple_form", multipart: true ) do %>
+        <%= hidden_field_tag "callback", iqdb_queries_url %>
+
+        <div class="input string optional">
+          <%= label_tag "url", "URL", class: "string optional" %>
+          <%= text_field_tag "url", params[:url] %>
+        </div>
+
+        <div class="input string optional fallback">
+          <%= label_tag "file", "File", class: "string optional" %>
+          <%= file_field_tag :file, :size => 50 %>
+        </div>
+
+        <div id="filedropzone">
+          <span class="hint">Drag and drop a file here</span>
+        </div>
+
+        <%= submit_tag "Search" %>
+      <% end %>
+    </section>
+
+    <% if @matches %>
+      <section>
+        <h2>Similar results</h2>
+        <% if @matches.any? %>
+          <% @matches.each do |post, score| %>
+            <%= PostPresenter.preview(post, :tags => "status:any", :size => true, :similarity => score) %>
+          <% end %>
+        <% else %>
+          <p>No matches found</p>
+        <% end %>
+      </section>
+    <% end %>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  Similar Images Search - <%= Danbooru.config.app_name %>
+<% end %>
+
+<% content_for(:html_header) do %>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.4.0/min/dropzone.min.js"></script>
+  <script>
+    $(function() {
+      $("#filedropzone").dropzone({ 
+        paramName: "file", 
+        url: "/iqdb_queries", 
+        createImageThumbnails: false,
+        addRemoveLinks: false,
+        maxFiles: 1,
+        acceptedFiles: "image/jpeg,image/png,image/gif",
+        previewTemplate: '<div class="dz-preview dz-file-preview"><div class="dz-details"><div class="dz-filename"><span data-dz-name></span></div><div class="dz-size" data-dz-size></div></div><div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div><div class="dz-error-message"><span data-dz-errormessage></span></div></div>',
+        init: function() {
+          $(".fallback").hide();
+          
+          this.on("drop", function(event) {
+            $("#filedropzone .placeholder").hide();
+          });
+          this.on("complete", function(file) {
+            $("#filedropzone .dz-progress").hide();
+          });
+          this.on("success", function(file) {
+            $("#filedropzone").addClass("success");
+          });
+          this.on("error", function(file, msg) {
+            $("#filedropzone").addClass("error");
+          });
+        }
+      });
+    });
+  </script>
+<% end %>
