@@ -322,11 +322,10 @@ class UploadService
       params[:tag_string] ||= "tagme"
 
       CurrentUser.as(User.find(uploader_id)) do
-        upload = Upload.create!(params)
-
-        upload.update(status: "preprocessing")
-
         begin
+          upload = Upload.create!(params)
+          upload.update(status: "preprocessing")
+
           if source.present?
             file = Utils.download_for_upload(source, upload)
           elsif params[:file].present?
