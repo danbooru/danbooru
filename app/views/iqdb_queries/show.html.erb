@@ -50,7 +50,7 @@
     $(function() {
       $("#filedropzone").dropzone({ 
         paramName: "file", 
-        url: "/iqdb_queries", 
+        url: "<%= Danbooru.config.iqdbs_server %>/similar",
         createImageThumbnails: false,
         addRemoveLinks: false,
         maxFiles: 1,
