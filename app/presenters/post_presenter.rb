@@ -35,13 +35,16 @@ class PostPresenter < Presenter
     html << %{<a href="#{path}/#{post.id}#{tag_param}">}
 
     if options[:show_cropped] && post.has_cropped? && !CurrentUser.user.disable_cropped_thumbnails?
-      src = post.crop_file_url
+      srcset = ["#{post.crop_file_url} 1x", "#{post.preview_file_url} 2x"].join(", ")
+      sizes = ["(max-width: 480px) #{Danbooru.config.small_image_width}px", "(min-width: 480px) 480px"].join(", ")
     else
-      src = post.preview_file_url
+      srcset = nil
+      sizes = nil
     end
 
+    src = post.preview_file_url
     tooltip = "#{post.tag_string} rating:#{post.rating} score:#{post.score}"
-    html << %{<img itemprop="thumbnailUrl" src="#{src}" title="#{h(tooltip)}" alt="#{h(post.tag_string)}">}
+    html << %{<img itemprop="thumbnailUrl" srcset="#{srcset}" sizes="#{sizes}" src="#{src}" title="#{h(tooltip)}" alt="#{h(post.tag_string)}">}
     html << %{</a>}
 
     if options[:pool]
