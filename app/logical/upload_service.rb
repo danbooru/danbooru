@@ -354,6 +354,10 @@ class UploadService
 
     def finish!(upload = nil)
       pred = upload || self.predecessor()
+
+      # regardless of who initialized the upload, credit should goto whoever submitted the form
+      pred.initialize_attributes
+
       pred.attributes = self.params
       pred.status = "completed"
       pred.save
