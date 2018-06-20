@@ -124,7 +124,7 @@ class UploadService
     end
 
     def self.is_downloadable?(source)
-      source.match?(/^https?:\/\//)
+      source =~ /^https?:\/\//
     end
 
     def self.generate_resizes(file, upload)
