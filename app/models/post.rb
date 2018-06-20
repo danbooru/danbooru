@@ -40,7 +40,6 @@ class Post < ApplicationRecord
   after_commit :remove_iqdb_async, :on => :destroy
   after_commit :update_iqdb_async, :on => :create
   after_commit :notify_pubsub
-  after_create {|rec| rec.uploader.increment!(:post_upload_count)}
 
   belongs_to :updater, :class_name => "User", optional: true # this is handled in versions
   belongs_to :approver, class_name: "User", optional: true

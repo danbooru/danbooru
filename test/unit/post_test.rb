@@ -1823,6 +1823,13 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(user2.id, post.uploader_id)
         assert_equal(user2.name, post.uploader_name)
       end
+
+      should "increment the uploaders post_upload_count" do
+        assert_difference(-> { CurrentUser.user.post_upload_count }) do
+          post = FactoryBot.create(:post, uploader: CurrentUser.user)
+          CurrentUser.user.reload
+        end
+      end
     end
   end
 

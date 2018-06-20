@@ -29,13 +29,6 @@ class UploadTest < ActiveSupport::TestCase
           assert_equal(["You have reached your upload limit for the day"], @upload.errors.full_messages)
         end
       end
-
-      should "increment the uploaders post_upload_count" do
-        assert_difference(-> { CurrentUser.user.post_upload_count }) do
-          FactoryBot.create(:source_upload)
-          CurrentUser.user.reload
-        end
-      end
     end
   end
 end
