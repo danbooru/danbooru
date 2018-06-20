@@ -154,7 +154,11 @@ Rails.application.routes.draw do
     resource :visit, :controller => "forum_topic_visits"
   end
   resources :ip_bans
-  resource :iqdb_queries, :only => [:show]
+  resource :iqdb_queries, :only => [:show]  do
+    collection do
+      get :check, to: redirect {|path_params, req| "/iqdb_queries?#{req.query_string}"}
+    end
+  end
   resources :janitor_trials do
     collection do
       get :test

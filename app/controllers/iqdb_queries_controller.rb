@@ -3,14 +3,18 @@ class IqdbQueriesController < ApplicationController
 
   def show
     if params[:url]
-      url = URI::HTTP.build(host: Danbooru.config.iqdbs_server, path: "/similar", query: URI.encode_www_form({callback: iqdb_queries_url, url: params[:url]}))
+      url = URI.parse(Danbooru.config.iqdbs_server)
+      url.path = "/similar"
+      url.query = {callback: iqdb_queries_url, url: params[:url]}.to_query
       redirect_to url.to_s
       return
     end
 
     if params[:post_id]
       post = Post.find(params[:post_id])
-      url = URI::HTTP.build(host: Danbooru.config.iqdbs_server, path: "/similar", query: URI.encode_www_form({callback: iqdb_queries_url, url: post.preview_file_url}))
+      url = URI.parse(Danbooru.config.iqdbs_server)
+      url.path = "/similar"
+      url.query = {callback: iqdb_queries_url, url: post.preview_file_url}.to_query
       redirect_to url.to_s
       return      
     end
