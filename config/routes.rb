@@ -57,6 +57,7 @@ Rails.application.routes.draw do
   end
   namespace :maintenance do
     namespace :user do
+      resource :count_fixes, only: [:new, :create]
       resource :email_notification, :only => [:show, :destroy]
       resource :password_reset, :only => [:new, :create, :edit, :update]
       resource :login_reminder, :only => [:new, :create]

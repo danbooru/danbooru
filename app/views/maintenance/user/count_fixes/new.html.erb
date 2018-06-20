@@ -1,0 +1,15 @@
+<div id="c-maintenance-user-count-fixes">
+  <div id="a-new">
+    <h1>Refresh Counts</h1>
+
+    <p>If you believe the upload counts on your profile are incorrect, you can request a refresh to recalculate the counts.</p>
+
+    <%= form_tag(maintenance_user_count_fixes_path) do %>
+      <%= submit_tag "Continue" %>
+    <% end %>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  Refresh Counts - <%= Danbooru.config.app_name %>
+<% end %>

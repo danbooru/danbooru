@@ -772,6 +772,16 @@ class User < ApplicationRecord
     def negative_feedback_count
       feedback.negative.count
     end
+
+    def refresh_counts!
+      self.class.without_timeout do
+        update(
+          post_upload_count: Post.for_user(id).count,
+          post_update_count: PostArchive.for_user(id).count,
+          note_update_count: NoteVersion.for_user(id).count
+        )
+      end
+    end
   end
 
   module SearchMethods
