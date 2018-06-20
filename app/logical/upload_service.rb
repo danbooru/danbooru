@@ -304,11 +304,7 @@ class UploadService
     end
 
     def start!(uploader_id)
-      if source.present?
-        if !Utils.is_downloadable?(source)
-          return
-        end
-
+      if Utils.is_downloadable?(source)
         CurrentUser.as_system do
           if Post.tag_match("source:#{source}").exists?
             return

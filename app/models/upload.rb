@@ -63,7 +63,6 @@ class Upload < ApplicationRecord
   validates :file_ext, format: { with: /jpg|gif|png|swf|webm|mp4|zip/ }, allow_nil: true
   validates_with Validator
   serialize :context, JSON
-  after_create {|rec| rec.uploader.increment!(:post_upload_count)}
 
   def initialize_attributes
     self.uploader_id = CurrentUser.user.id
