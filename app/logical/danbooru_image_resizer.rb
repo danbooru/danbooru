@@ -75,7 +75,7 @@ module DanbooruImageResizer
     arguments = [
       file.path,
       "--eprofile=#{SRGB_PROFILE}",
-      "--crop=none",
+      "--crop",
       "--size=#{length}",
       "--format=#{output_file.path}[Q=#{quality},background=255,strip,interlace,optimize_coding]"
     ]
