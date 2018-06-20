@@ -1,9 +1,0 @@
-<% if @results.any? %>
-  <h3>Similar</h3>
-  <% @results.each do |match| %>
-    <%= PostPresenter.preview(match[:post], :tags => "status:any", :size => true, :similarity => match[:score]) %>
-  <% end %>
-<% else %>
-  <h3>Similar</h3>
-  <p>No matches found</p>
-<% end %>
