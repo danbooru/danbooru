@@ -16,7 +16,7 @@
         <% @uploads.each do |upload| %>
           <tr>
             <td>
-              <%= PostPresenter.preview(upload.post, tags: "user:#{upload.uploader_name}", show_deleted: true, show_cropped: true) %>
+              <%= PostPresenter.preview(upload.post, tags: "user:#{upload.uploader_name}", show_deleted: true) %>
             </td>
             <td class="col-expand upload-info">
               <span class="info">
