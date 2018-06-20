@@ -17,10 +17,6 @@
           <%= file_field_tag :file, :size => 50 %>
         </div>
 
-        <div id="filedropzone">
-          <span class="hint">Drag and drop a file here</span>
-        </div>
-
         <%= submit_tag "Search" %>
       <% end %>
     </section>
@@ -44,36 +40,3 @@
   Similar Images Search - <%= Danbooru.config.app_name %>
 <% end %>
 
-<% content_for(:html_header) do %>
-  <script async src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.4.0/min/dropzone.min.js"></script>
-  <script>
-    $(function() {
-      $("#filedropzone").dropzone({ 
-        paramName: "file", 
-        url: "<%= Danbooru.config.iqdbs_server %>/similar",
-        method: "post",
-        createImageThumbnails: false,
-        addRemoveLinks: false,
-        maxFiles: 1,
-        acceptedFiles: "image/jpeg,image/png,image/gif",
-        previewTemplate: '<div class="dz-preview dz-file-preview"><div class="dz-details"><div class="dz-filename"><span data-dz-name></span></div><div class="dz-size" data-dz-size></div></div><div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div><div class="dz-error-message"><span data-dz-errormessage></span></div></div>',
-        init: function() {
-          $(".fallback").hide();
-          
-          this.on("drop", function(event) {
-            $("#filedropzone .placeholder").hide();
-          });
-          this.on("complete", function(file) {
-            $("#filedropzone .dz-progress").hide();
-          });
-          this.on("success", function(file) {
-            $("#filedropzone").addClass("success");
-          });
-          this.on("error", function(file, msg) {
-            $("#filedropzone").addClass("error");
-          });
-        }
-      });
-    });
-  </script>
-<% end %>
