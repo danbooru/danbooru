@@ -282,7 +282,7 @@ class UploadService
     end
 
     def in_progress?
-      if source.present?
+      if Utils.is_downloadable?(source)
         Upload.where(status: "preprocessing", source: source).exists?
       elsif md5.present?
         Upload.where(status: "preprocessing", md5: md5).exists?
@@ -292,7 +292,7 @@ class UploadService
     end
 
     def predecessor
-      if source.present?
+      if Utils.is_downloadable?(source)
         Upload.where(status: ["preprocessed", "preprocessing"], source: source).first
       elsif md5.present?
         Upload.where(status: ["preprocessed", "preprocessing"], md5: md5).first
@@ -535,7 +535,7 @@ class UploadService
 
       @upload.update(status: "processing")
 
-      if @upload.file.nil? && source.present?
+      if @upload.file.nil? && Utils.is_downloadable?(source)
         @upload.file = Utils.download_for_upload(source, @upload)
       end
 
