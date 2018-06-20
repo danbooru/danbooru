@@ -144,6 +144,7 @@ module Downloads
     end
 
     def is_cloudflare?(url, headers = {})
+      return false
       Cache.get("is_cloudflare:#{url.origin}", 4.hours) do
         res = HTTParty.head(url, { headers: headers }.deep_merge(Danbooru.config.httparty_options))
         raise Error.new("HTTP error code: #{res.code} #{res.message}") unless res.success?
