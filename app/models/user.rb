@@ -775,10 +775,10 @@ class User < ApplicationRecord
 
     def refresh_counts!
       self.class.without_timeout do
-        update(
+        User.where(id: id).update_all(
           post_upload_count: Post.for_user(id).count,
           post_update_count: PostArchive.for_user(id).count,
-          note_update_count: NoteVersion.for_user(id).count
+          note_update_count: NoteVersion.where(updater_id: id).count
         )
       end
     end
