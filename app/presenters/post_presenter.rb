@@ -21,8 +21,15 @@ class PostPresenter < Presenter
     end
 
     path = options[:path_prefix] || "/posts"
+    if CurrentUser.id == 1 && options[:show_cropped] && post.has_cropped? && !CurrentUser.user.disable_cropped_thumbnails?
+      src = post.crop_file_url
+      imgClass = "cropped"
+    else
+      src = post.preview_file_url
+      imgClass = nil
+    end
 
-    html =  %{<article itemscope itemtype="http://schema.org/ImageObject" id="post_#{post.id}" class="#{preview_class(post, options[:pool], options)}" #{data_attributes(post)}>}
+    html =  %{<article itemscope itemtype="http://schema.org/ImageObject" id="post_#{post.id}" class="#{imgClass} #{preview_class(post, options[:pool], options)}" #{data_attributes(post)}>}
     if options[:tags].present? && !CurrentUser.is_anonymous?
       tag_param = "?tags=#{CGI::escape(options[:tags])}"
     elsif options[:pool_id] || options[:pool]
@@ -33,14 +40,6 @@ class PostPresenter < Presenter
       tag_param = nil
     end
     html << %{<a href="#{path}/#{post.id}#{tag_param}">}
-
-    if CurrentUser.id == 1 && options[:show_cropped] && post.has_cropped? && !CurrentUser.user.disable_cropped_thumbnails?
-      src = post.crop_file_url
-      imgClass = "cropped"
-    else
-      src = post.preview_file_url
-      imgClass = nil
-    end
 
     tooltip = "#{post.tag_string} rating:#{post.rating} score:#{post.score}"
     html << %{<img class="#{imgClass}" itemprop="thumbnailUrl" src="#{src}" title="#{h(tooltip)}" alt="#{h(post.tag_string)}">}
