@@ -154,7 +154,7 @@
 
   Danbooru.Post.initialize_similar = function() {
     $("#similar-button").click(function(e) {
-      $.post("/iqdb_queries", {"url": $("#post_source").val()}).done(function(html) {$("#iqdb-similar").html(html).show()});
+      $.post("/iqdb_queries/preview", {"url": $("#post_source").val()}).done(function(html) {$("#iqdb-similar").html(html).show()});
       e.preventDefault();
     });
   }
