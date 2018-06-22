@@ -26,4 +26,12 @@ class IqdbQueriesController < ApplicationController
 
     respond_with(@matches)
   end
+
+  def preview
+    url = URI.parse(Danbooru.config.iqdbs_server)
+    url.path = "/similar"
+    url.query = {url: params[:url]}.to_query
+    @results = HTTParty.get(url.to_s).parsed_response
+    render layout: false
+  end
 end
