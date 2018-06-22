@@ -29,7 +29,8 @@ module PaginationHelper
     window = 4
 
     if records.current_page >= 2
-      html << "<li class='arrow'>" + link_to("<<", nav_params_for(records.current_page - 1), :rel => "prev") + "</li>"
+      html << "<li class='arrow'>" + link_to("<<", nav_params_for(1), :rel => "first") + "</li>"
+      html << "<li class='arrow'>" + link_to("<", nav_params_for(records.current_page - 1), :rel => "prev") + "</li>"
     else
       html << "<li class='arrow'><span>" + "&lt;&lt;" + "</span></li>"
     end
@@ -69,7 +70,8 @@ module PaginationHelper
     end
 
     if records.current_page < records.total_pages && records.size > 0
-      html << "<li class='arrow'>" + link_to(">>", nav_params_for(records.current_page + 1), :rel => "next") + "</li>"
+      html << "<li class='arrow'>" + link_to(">", nav_params_for(records.current_page + 1), :rel => "next") + "</li>"
+      html << "<li class='arrow'>" + link_to(">>", nav_params_for(records.total_pages), :rel => "last") + "</li>"
     else
       html << "<li class='arrow'><span>" + "&gt;&gt;" + "</span></li>"
     end
