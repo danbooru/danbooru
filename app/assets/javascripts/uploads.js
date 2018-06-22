@@ -61,7 +61,7 @@
 
   Danbooru.Upload.initialize_iqdb_source = function() {
     if (/^https?:\/\//.test($("#normalized_url").val())) {
-      $.post("/iqdb_queries", {"url": $("#normalized_url").val()}).done(function(html) {$("#iqdb-similar").html(html)});
+      $.get("/iqdb_queries/preview", {"url": $("#normalized_url").val()}).done(function(html) {$("#iqdb-similar").html(html)});
     }
   }
 
@@ -77,7 +77,7 @@
 
   Danbooru.Upload.initialize_similar = function() {
     $("#similar-button").click(function(e) {
-      $.post("/iqdb_queries", {"url": $("#upload_source").val()}).done(function(html) {$("#iqdb-similar").html(html).show()});
+      $.get("/iqdb_queries/preview", {"url": $("#upload_source").val()}).done(function(html) {$("#iqdb-similar").html(html).show()});
       e.preventDefault();
     });
   }
