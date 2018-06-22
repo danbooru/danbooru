@@ -34,14 +34,16 @@ class PostPresenter < Presenter
     end
     html << %{<a href="#{path}/#{post.id}#{tag_param}">}
 
-    if options[:show_cropped] && post.has_cropped?
-      src = post.cropped_file_url
+    if CurrentUser.id == 1 && options[:show_cropped] && post.has_cropped? && !CurrentUser.user.disable_cropped_thumbnails?
+      src = post.crop_file_url
+      imgClass = "cropped"
     else
       src = post.preview_file_url
+      imgClass = nil
     end
 
     tooltip = "#{post.tag_string} rating:#{post.rating} score:#{post.score}"
-    html << %{<img itemprop="thumbnailUrl" src="#{src}" title="#{h(tooltip)}" alt="#{h(post.tag_string)}">}
+    html << %{<img class="#{imgClass}" itemprop="thumbnailUrl" src="#{src}" title="#{h(tooltip)}" alt="#{h(post.tag_string)}">}
     html << %{</a>}
 
     if options[:pool]
@@ -71,7 +73,7 @@ class PostPresenter < Presenter
 
   def self.preview_class(post, description = nil, options = {})
     klass = "post-preview"
-    klass << " large-cropped" if post.has_cropped? && options[:show_cropped]
+    # klass << " large-cropped" if post.has_cropped? && options[:show_cropped]
     klass << " pooled" if description
     klass << " post-status-pending" if post.is_pending?
     klass << " post-status-flagged" if post.is_flagged?

@@ -88,7 +88,12 @@
     <%= render "news_updates/listing" %>
 
     <h1><%= link_to Danbooru.config.app_name, "/" %></h1>
-    <span id="maintoggle"> ☰ </span> <!-- Maybe icon would be better, I'm not sure -->
+    
+    <div id="maintoggle">
+      <a href="#"><i id="maintoggle-on" class="fas fa-bars"></i></a>
+      <a href="#"><i id="maintoggle-off" class="fas fa-times" style="display: none;"></i></a>
+    </div>
+    
     <nav id="nav">
       <%= render "layouts/main_links" %>
       <%= yield :secondary_links %>

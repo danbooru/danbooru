@@ -13,8 +13,8 @@
     <% if params[:random] %>
       <%= hidden_field_tag :random, params[:random] %>
     <% end %>
-    <%= hidden_field_tag "ms", "1" %>
     <%= submit_tag "Go", :name => nil, :class => "ui-button ui-widget ui-corner-all tiny gradient" %>
+    <%= hidden_field_tag "ms", "1" %>
   <% end %>
 </section>
 

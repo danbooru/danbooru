@@ -15,7 +15,6 @@ class PostTest < ActiveSupport::TestCase
     CurrentUser.ip_addr = "127.0.0.1"
     mock_saved_search_service!
     mock_pool_archive_service!
-    ImageCropper.stubs(:enabled?).returns(false)
   end
 
   def teardown
