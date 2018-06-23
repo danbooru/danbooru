@@ -53,7 +53,7 @@ class CurrentUser
   end
 
   def self.root_url
-    Thread.current[:current_root_url] || "http://#{Danbooru.config.hostname}/"
+    Thread.current[:current_root_url] || "https://#{Danbooru.config.hostname}/"
   end
 
   def self.root_url=(root_url)
