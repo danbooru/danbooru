@@ -16,7 +16,7 @@
     <% end %>
     <li id="add-artist-commentary-list"><%= link_to "Add commentary", "#", :id => "add-commentary" %></li>
     <li><%= link_to "Add to favorite group", "#", :id => "open-favgroup-dialog-link" %></li>
-    <li><%= link_to "Find similar", iqdb_queries_path(:post_id => post.id), :method => :post, :remote => true %></li>
+    <li><%= link_to "Find similar", iqdb_queries_path(:post_id => post.id) %></li>
 
     <% if post.is_status_locked? %>
       <li><span id="status-locked-notice">Status locked</span></li>

@@ -21,18 +21,7 @@
       <% end %>
     </section>
 
-    <% if @matches %>
-      <section>
-        <h2>Similar results</h2>
-        <% if @matches.any? %>
-          <% @matches.each do |post, score| %>
-            <%= PostPresenter.preview(post, :tags => "status:any", :size => true, :similarity => score) %>
-          <% end %>
-        <% else %>
-          <p>No matches found</p>
-        <% end %>
-      </section>
-    <% end %>
+    <%= render "iqdb_queries/matches" %>
   </div>
 </div>
 
