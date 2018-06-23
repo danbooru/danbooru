@@ -17,7 +17,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           @params = { url: @url }
           @mocked_response = [{
             "post" => @posts[0],
-            "id" => @posts[0].id,
+            "post_id" => @posts[0].id,
             "score" => 1
           }]
         end
@@ -35,7 +35,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           @url = @posts[0].preview_file_url
           @mocked_response = [{
             "post" => @posts[0],
-            "id" => @posts[0].id,
+            "post_id" => @posts[0].id,
             "score" => 1
           }]
         end
@@ -49,7 +49,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
 
       context "with matches" do
         setup do
-          json = @posts.map {|x| {"id" => x.id, "score" => 1}}.to_json          
+          json = @posts.map {|x| {"post_id" => x.id, "score" => 1}}.to_json          
           @params = { matches: json }
         end
 

@@ -12,7 +12,7 @@ class IqdbProxy
   def self.decorate_posts(json)
     json.map do |x|
       begin
-        x["post"] = Post.find(x["id"])
+        x["post"] = Post.find(x["post_id"])
         x
       rescue ActiveRecord::RecordNotFound
         nil
