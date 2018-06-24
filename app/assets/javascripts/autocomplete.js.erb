@@ -10,7 +10,7 @@
     if (Danbooru.meta("enable-auto-complete") === "true") {
       $.widget("ui.autocomplete", $.ui.autocomplete, {
         options: {
-          delay: 100,
+          delay: 0,
           minLength: 1,
           autoFocus: false,
           focus: function() { return false; },
@@ -22,23 +22,12 @@
         _renderItem: Danbooru.Autocomplete.render_item,
       });
 
-      Danbooru.Autocomplete.enable_local_storage = false;
       this.initialize_tag_autocomplete();
       this.initialize_mention_autocomplete($(".autocomplete-mentions textarea"));
       this.initialize_artist_autocomplete($('[data-autocomplete="artist"]'));
       this.initialize_pool_autocomplete($('[data-autocomplete="pool"]'));
       this.initialize_wiki_autocomplete($('[data-autocomplete="wiki-page"]'));
-      this.prune_local_storage();
     }
-  }
-
-  // todo: remove eventually
-  Danbooru.Autocomplete.prune_local_storage = function() {
-    $.each(Object.keys(localStorage), function(i, key) {
-      if (key.substr(0, 3) === "ac-") {
-        $.localStorage.remove(key);
-      }
-    });
   }
 
   Danbooru.Autocomplete.initialize_mention_autocomplete = function($fields) {
@@ -346,21 +335,21 @@
 
   Danbooru.Autocomplete.render_item = function(list, item) {
     var $link = $("<a/>");
-    var $menu_item = $("<div/>").append($link);
+    $link.text(item.label);
+    $link.attr("href", "/posts?tags=" + encodeURIComponent(item.value));
+    $link.click(function(e) {
+      e.preventDefault();
+    });
 
     if (item.antecedent) {
       var antecedent = item.antecedent.replace(/_/g, " ");
       var arrow = $("<span/>").html(" &rarr; ").addClass("autocomplete-arrow");
       var antecedent_element = $("<span/>").text(antecedent).addClass("autocomplete-antecedent");
-      $link.append(antecedent_element);
-      $link.append(arrow);
+      $link.append([
+        arrow,
+        antecedent_element
+      ]);
     }
-
-    $link.append(document.createTextNode(item.label));
-    $link.attr("href", "/posts?tags=" + encodeURIComponent(item.value));
-    $link.click(function(e) {
-      e.preventDefault();
-    });
 
     if (item.post_count !== undefined) {
       var count;
@@ -385,6 +374,7 @@
       $link.addClass("pool-category-" + item.category);
     }
 
+    var $menu_item = $("<div/>").append($link);
     return $("<li/>").data("item.autocomplete", item).append($menu_item).appendTo(list);
   };
 

@@ -1,5 +1,4 @@
 //= require hammer.js
-//= require jquery.storageapi.js
 //= require jquery.dropdown.js
 //= require stupidtable.js
 //= require jquery.qtip.js
