@@ -303,6 +303,9 @@
 
   Danbooru.RelatedTag.process_artist = function(data) {
     Danbooru.RelatedTag.recent_artists = data;
+    if (data.length) {
+      $("#related-tags-container").show();
+    }
     Danbooru.RelatedTag.build_all();
   }
 
