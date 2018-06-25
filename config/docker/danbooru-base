@@ -1,37 +1,39 @@
 FROM ruby:2.5.1-slim-stretch
 
-RUN apt-get update
 ENV DOCKERIZE_VERSION v0.6.1
-RUN apt-get -y install wget
-RUN wget -q https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-RUN apt-get -y install -qq apt-utils build-essential automake libssl-dev libxml2-dev libxslt-dev ncurses-dev sudo libreadline-dev flex bison ragel memcached libmemcached-dev git curl libcurl4-openssl-dev imagemagick libmagickcore-dev libmagickwand-dev sendmail-bin sendmail postgresql-client libpq-dev nginx ssh coreutils ffmpeg mkvtoolnix emacs24-nox telnet && \
-  apt-get clean
-# need to install 8.6 for smartcrop
-RUN cd /tmp && \
-  wget -q https://github.com/jcupitt/libvips/releases/download/v8.6.4/vips-8.6.4.tar.gz && \
-  tar xzf vips-8.6.4.tar.gz && \
-  cd vips-8.6.4 && \
-  ./configure && \
+ENV VIPS_VERSION 8.6.4
+
+RUN apt-get update && \
+  apt-get -y install wget && \
+  wget -q https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && \
+  tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz  && \
+  rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && \
+  apt-get -y install -qq apt-utils build-essential automake libssl-dev libxml2-dev libxslt-dev ncurses-dev sudo libreadline-dev flex bison ragel memcached libmemcached-dev git curl libcurl4-openssl-dev imagemagick libmagickcore-dev libmagickwand-dev sendmail-bin sendmail postgresql-client libpq-dev nginx ssh coreutils ffmpeg mkvtoolnix emacs24-nox telnet && \
+  apt-get clean && \
+  cd /tmp && \
+  wget -q https://github.com/jcupitt/libvips/releases/download/v$VIPS_VERSION/vips-$VIPS_VERSION.tar.gz && \
+  tar xzf vips-$VIPS_VERSION.tar.gz && \
+  cd vips-$VIPS_VERSION && \
+  ./configure --prefix=/usr && \
   make install && \
   ldconfig && \
   cd /tmp && \
-  rm -rf vips-8.6.4
-RUN useradd -ms /bin/bash danbooru -u 1000
-RUN mkdir /app
-RUN mkdir -p /var/www/danbooru/shared/data
-RUN mkdir -p /var/www/danbooru/shared/data/preview
-RUN mkdir -p /var/www/danbooru/shared/data/sample
+  rm -rf vips-$VIPS_VERSION && \
+  useradd -ms /bin/bash danbooru -u 1000 && \
+  mkdir /app && \
+  mkdir -p /var/www/danbooru/shared/data && \
+  mkdir -p /var/www/danbooru/shared/data/preview && \
+  mkdir -p /var/www/danbooru/shared/data/crop && \
+  mkdir -p /var/www/danbooru/shared/data/sample 
 COPY . /app
-RUN chown -R danbooru:danbooru /app
-RUN chown -R danbooru:danbooru /var/www/danbooru
-RUN mkdir /var/run/danbooru
-RUN chown danbooru:danbooru /var/run/danbooru
+RUN chown -R danbooru:danbooru /app && \
+  chown -R danbooru:danbooru /var/www/danbooru && \
+  mkdir /var/run/danbooru && \
+  chown danbooru:danbooru /var/run/danbooru 
 EXPOSE 3000
 USER danbooru
-RUN echo 'gem: --no-document' > ~/.gemrc
-RUN gem install bundler --quiet
+RUN echo 'gem: --no-document' > ~/.gemrc && \
+  gem install bundler --quiet
 WORKDIR /app
 RUN bundle install
 COPY script/install/database.yml.templ /app/config/database.yml
