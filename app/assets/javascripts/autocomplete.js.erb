@@ -345,9 +345,9 @@
       var antecedent = item.antecedent.replace(/_/g, " ");
       var arrow = $("<span/>").html(" &rarr; ").addClass("autocomplete-arrow");
       var antecedent_element = $("<span/>").text(antecedent).addClass("autocomplete-antecedent");
-      $link.append([
-        arrow,
-        antecedent_element
+      $link.prepend([
+        antecedent_element,
+        arrow
       ]);
     }
 
