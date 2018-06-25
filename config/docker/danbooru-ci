@@ -2,6 +2,8 @@
 
 FROM r888888888/danbooru-base
 
+ENV PATH $PATH:/usr/local/bin
+
 USER root
 COPY . /app
 RUN chown -R danbooru:danbooru .
