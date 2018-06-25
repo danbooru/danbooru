@@ -311,16 +311,16 @@ class UploadService
       if Utils.is_downloadable?(source)
         CurrentUser.as_system do
           if Post.tag_match("source:#{source}").exists?
-            return
+            raise ActiveRecord::RecordNotUnique.new("A post with source #{source} already exists")
           end
         end
 
         if Upload.where(source: source, status: "completed").exists?
-          return
+          raise ActiveRecord::RecordNotUnique.new("A completed upload with source #{source} already exists")
         end
 
         if Upload.where(source: source).where("status like ?", "error%").exists?
-          return
+          raise ActiveRecord::RecordNotUnique.new("An errored upload with source #{source} already exists")
         end
       end
 
