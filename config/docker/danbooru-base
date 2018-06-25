@@ -8,6 +8,15 @@ RUN wget -q https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VE
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 RUN apt-get -y install -qq apt-utils build-essential automake libssl-dev libxml2-dev libxslt-dev ncurses-dev sudo libreadline-dev flex bison ragel memcached libmemcached-dev git curl libcurl4-openssl-dev imagemagick libmagickcore-dev libmagickwand-dev sendmail-bin sendmail postgresql-client libpq-dev nginx ssh coreutils ffmpeg mkvtoolnix emacs24-nox telnet libvips42 libvips-tools libvips-dev && \
   apt-get clean
+# need to install 8.6 for smartcrop
+RUN cd /tmp && \
+  wget -q https://github.com/jcupitt/libvips/releases/download/v8.6.4/vips-8.6.4.tar.gz && \
+  tar xzf vips-8.6.4.tar.gz && \
+  cd vips-8.6.4 && \
+  ./configure && \
+  make install && \
+  cd /tmp && \
+  rm -rf vips-8.6.4
 RUN useradd -ms /bin/bash danbooru -u 1000
 RUN mkdir /app
 RUN mkdir -p /var/www/danbooru/shared/data
