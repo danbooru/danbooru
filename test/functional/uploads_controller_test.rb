@@ -32,6 +32,16 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "preprocess action" do      
+      should "prefer the file over the source when preprocessing" do
+        file = Rack::Test::UploadedFile.new("#{Rails.root}/test/files/test.jpg", "image/jpeg")
+        post_auth preprocess_uploads_path, @user, params: {:url => "http://www.google.com/intl/en_ALL/images/logo.gif", :file => file}
+        assert_response :success
+        Delayed::Worker.new.work_off
+        assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", Upload.last.md5)
+      end
+    end
+
     context "new action" do
       should "render" do
         get_auth new_upload_path, @user

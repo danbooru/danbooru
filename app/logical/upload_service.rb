@@ -3,7 +3,7 @@ class UploadService
     def self.prepare(url: nil, file: nil, ref: nil)
       upload = Upload.new
 
-      if url
+      if Utils.is_downloadable?(url) && file.nil?
         download = Downloads::File.new(url)
         normalized_url, _, _ = download.before_download(url, {})
         post = if normalized_url.nil?
