@@ -4,7 +4,6 @@
   Danbooru.RelatedTag.initialize_all = function() {
     if ($("#c-posts #a-show").length || $("#c-uploads #a-new").length) {
       this.initialize_buttons();
-      $("#related-tags-container").hide();
       $("#artist-tags-container").hide();
       $("#upload_tag_string,#post_tag_string").keyup(Danbooru.RelatedTag.update_selected);
       $("body").on("click", "#artist-related-tags-column a.del", Danbooru.RelatedTag.disable_artist_url)
@@ -92,9 +91,6 @@
   }
 
   Danbooru.RelatedTag.process_response = function(data) {
-    if (data.tags.length || data.wiki_page_tags.length || data.other_wikis.length) {
-      $("#related-tags-container").show();
-    }
     Danbooru.RelatedTag.recent_search = data;
     Danbooru.RelatedTag.build_all();
   }
@@ -303,9 +299,6 @@
 
   Danbooru.RelatedTag.process_artist = function(data) {
     Danbooru.RelatedTag.recent_artists = data;
-    if (data.length) {
-      $("#related-tags-container").show();
-    }
     Danbooru.RelatedTag.build_all();
   }
 
