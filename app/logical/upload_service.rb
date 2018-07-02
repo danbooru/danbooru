@@ -355,6 +355,12 @@ class UploadService
       pred.initialize_attributes
 
       pred.attributes = self.params
+
+      # if a file was uploaded after the preprocessing occurred,
+      # then process the file and overwrite whatever the preprocessor
+      # did
+      Utils.process_file(pred, pred.file) if pred.file.present?
+
       pred.status = "completed"
       pred.save
       return pred
