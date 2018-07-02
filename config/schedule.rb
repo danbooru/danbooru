@@ -1,5 +1,5 @@
 set :output, "/var/log/whenever.log"
-env "MAILTO", "webmaster@danbooru.donmai.us"
+#env "MAILTO", "webmaster@danbooru.donmai.us"
 
 every 1.hour do
   runner "UploadErrorChecker.new.check!"

@@ -7,9 +7,11 @@ class DelayedJobErrorChecker
     errors = Delayed::Job.where("last_error is not null").limit(100).pluck(:last_error).map {|x| x[0..100]}
     if errors.size == 100
       mail = Mail.new do
-        from "webmaster@danbooru.donmai.us"
-        to "r888888888@gmail.com"
-        subject "[danbooru] Delayed job error count at #{errors}"
+        from Danbooru.config.contact_email
+        to Danbooru.config.contact_email
+        CurrentUser.as_system do
+          subject "[#{Danbooru.config.app_name}] Delayed job error count at #{errors}"
+        end
         body errors.uniq.join("\n")
       end
       mail.delivery_method :sendmail
