@@ -168,11 +168,6 @@ class UploadService
       upload.file_size = file.size
       upload.md5 = Digest::MD5.file(file.path).hexdigest
 
-      if Post.where(md5: upload.md5).exists?
-        # abort early if this post already exists
-        raise Upload::Error.new("Post with MD5 #{upload.md5} already exists")
-      end
-
       Utils.calculate_dimensions(upload, file) do |width, height|
         upload.image_width = width
         upload.image_height = height
@@ -271,9 +266,10 @@ class UploadService
   end
 
   class Preprocessor
-    attr_reader :params
+    attr_reader :params, :original_post_id
 
     def initialize(params)
+      @original_post_id = params.delete(:original_post_id) || -1
       @params = params
     end
 
@@ -310,7 +306,7 @@ class UploadService
     def start!(uploader_id)
       if Utils.is_downloadable?(source)
         CurrentUser.as_system do
-          if Post.tag_match("source:#{source}").exists?
+          if Post.tag_match("source:#{source}").where.not(id: original_post_id).exists?
             raise ActiveRecord::RecordNotUnique.new("A post with source #{source} already exists")
           end
         end
@@ -328,8 +324,8 @@ class UploadService
       params[:tag_string] ||= "tagme"
 
       CurrentUser.as(User.find(uploader_id)) do
+        upload = Upload.create!(params)
         begin
-          upload = Upload.create!(params)
           upload.update(status: "preprocessing")
 
           if source.present?
@@ -429,7 +425,8 @@ class UploadService
         rating: post.rating,
         tag_string: replacement.tags,
         source: replacement.replacement_url,
-        file: replacement.replacement_file
+        file: replacement.replacement_file,
+        original_post_id: post.id
       )
       upload = preprocessor.start!(CurrentUser.id)
       return if upload.is_errored?

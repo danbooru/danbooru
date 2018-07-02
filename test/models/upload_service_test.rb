@@ -472,12 +472,14 @@ class UploadServiceTest < ActiveSupport::TestCase
 
     context "for a source replacement" do
       setup do
-        @new_url = "https://upload.wikimedia.org/wikipedia/commons/c/c5/Moraine_Lake_17092005.jpg"
+        @new_url = "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"
+        @new_md5 = "d34e4cf0a437a5d65f8e82b7bcd02606"
         travel_to(1.month.ago) do
           @user = FactoryBot.create(:user)
         end
         as_user do
-          @post = FactoryBot.create(:post, uploader_ip_addr: "127.0.0.2")
+          @post_md5 = "710fd9cba4ef37260f9152ffa9d154d8"
+          @post = FactoryBot.create(:post, source: "https://raikou1.donmai.us/71/0f/#{@post_md5}.png", file_ext: "png", md5: @post_md5, uploader_ip_addr: "127.0.0.2")
           @post.stubs(:queue_delete_files)
           @replacement = FactoryBot.create(:post_replacement, post: @post, replacement_url: @new_url)
         end
@@ -485,22 +487,34 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       subject { UploadService::Replacer.new(post: @post, replacement: @replacement) }
 
-      context "when an upload with the same source already exists" do
+      context "when replacing with its own source" do
+        should "work" do
+          as_user { @post.replace!(replacement_url: @post.source) }
+          assert_equal(@post_md5, @post.md5)
+          assert_match(/#{@post_md5}/, @post.file_path)
+        end
+      end
+
+      context "when an upload with the same MD5 already exists" do
         setup do
-          @post = FactoryBot.create(:post, source: @new_url)
+          @post.update(md5: @new_md5)
+          as_user do
+            @post2 = FactoryBot.create(:post)
+            @post2.stubs(:queue_delete_files)
+          end
         end
 
         should "throw an error" do
           assert_raises(ActiveRecord::RecordNotUnique) do
-            as_user { @post.replace!(replacement_url: @new_url) }
+            as_user { @post2.replace!(replacement_url: @new_url) }
           end
         end
       end
 
       context "a post when given a final_source" do
         should "change the source to the final_source" do
-          replacement_url = "http://data.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_orwwptNBCE1wsfqepo1_raw.png"
-          final_source = "https://noizave.tumblr.com/post/162094447052"
+          replacement_url = "https://raikou1.donmai.us/fd/b4/fdb47f79fb8da82e66eeb1d84a1cae8d.jpg"
+          final_source = "https://raikou1.donmai.us/71/0f/710fd9cba4ef37260f9152ffa9d154d8.png"
 
           as_user { @post.replace!(replacement_url: replacement_url, final_source: final_source) }
 
