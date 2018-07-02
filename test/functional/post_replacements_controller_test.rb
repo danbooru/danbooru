@@ -7,7 +7,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
 
       @user = create(:moderator_user, can_approve_posts: true, created_at: 1.month.ago)
       @user.as_current do
-        @post = create(:post)
+        @post = create(:post, source: "https://google.com")
         @post_replacement = create(:post_replacement, post: @post)
       end
     end
@@ -22,7 +22,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           format: :json,
           post_id: @post.id,
           post_replacement: {
-            replacement_url: "https://www.google.com/intl/en_ALL/images/logo.gif",
+            replacement_url: "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg",
           }
         }
 
@@ -36,9 +36,9 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
         end
 
         assert_response :success
-        assert_equal("https://www.google.com/intl/en_ALL/images/logo.gif", @post.source)
-        assert_equal("e80d1c59a673f560785784fb1ac10959", @post.md5)
-        assert_equal("e80d1c59a673f560785784fb1ac10959", Digest::MD5.file(@post.file(:original)).hexdigest)
+        assert_equal("https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg", @post.source)
+        assert_equal("d34e4cf0a437a5d65f8e82b7bcd02606", @post.md5)
+        assert_equal("d34e4cf0a437a5d65f8e82b7bcd02606", Digest::MD5.file(@post.file(:original)).hexdigest)
       end
     end
 
