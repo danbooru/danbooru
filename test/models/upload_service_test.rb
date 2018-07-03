@@ -162,9 +162,14 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         should "generate a preview and a video" do
-          preview, sample = subject.generate_resizes(@file, @upload)
+          preview, crop, sample = subject.generate_resizes(@file, @upload)
           assert_operator(File.size(preview.path), :>, 0)
+          assert_operator(File.size(crop.path), :>, 0)
           assert_operator(File.size(sample.path), :>, 0)
+          assert_equal(60, ImageSpec.new(preview.path).width)
+          assert_equal(60, ImageSpec.new(preview.path).height)
+          assert_equal(150, ImageSpec.new(crop.path).width)
+          assert_equal(150, ImageSpec.new(crop.path).height)
           preview.close
           preview.unlink
           sample.close
@@ -186,10 +191,17 @@ class UploadServiceTest < ActiveSupport::TestCase
           end
 
           should "generate a video" do
-            preview, sample = subject.generate_resizes(@file, @upload)
+            preview, crop, sample = subject.generate_resizes(@file, @upload)
             assert_operator(File.size(preview.path), :>, 0)
+            assert_operator(File.size(crop.path), :>, 0)
+            assert_equal(150, ImageSpec.new(preview.path).width)
+            assert_equal(150, ImageSpec.new(preview.path).height)
+            assert_equal(150, ImageSpec.new(crop.path).width)
+            assert_equal(150, ImageSpec.new(crop.path).height)
             preview.close
             preview.unlink
+            crop.close
+            crop.unlink
           end
         end
 
@@ -202,10 +214,17 @@ class UploadServiceTest < ActiveSupport::TestCase
           end
 
           should "generate a video" do
-            preview, sample = subject.generate_resizes(@file, @upload)
+            preview, crop, sample = subject.generate_resizes(@file, @upload)
             assert_operator(File.size(preview.path), :>, 0)
+            assert_operator(File.size(crop.path), :>, 0)
+            assert_equal(150, ImageSpec.new(preview.path).width)
+            assert_equal(150, ImageSpec.new(preview.path).height)
+            assert_equal(150, ImageSpec.new(crop.path).width)
+            assert_equal(150, ImageSpec.new(crop.path).height)
             preview.close
             preview.unlink
+            crop.close
+            crop.unlink
           end
         end
       end
@@ -230,8 +249,9 @@ class UploadServiceTest < ActiveSupport::TestCase
           end
 
           should "generate a preview" do
-            preview, sample = subject.generate_resizes(@file, @upload)
+            preview, crop, sample = subject.generate_resizes(@file, @upload)
             assert_operator(File.size(preview.path), :>, 0)
+            assert_operator(File.size(crop.path), :>, 0)
             assert_operator(File.size(sample.path), :>, 0)
             preview.close
             preview.unlink
@@ -246,8 +266,9 @@ class UploadServiceTest < ActiveSupport::TestCase
           end
 
           should "generate a preview" do
-            preview, sample = subject.generate_resizes(@file, @upload)
+            preview, crop, sample = subject.generate_resizes(@file, @upload)
             assert_operator(File.size(preview.path), :>, 0)
+            assert_operator(File.size(crop.path), :>, 0)
             assert_operator(File.size(sample.path), :>, 0)
             preview.close
             preview.unlink
@@ -262,8 +283,9 @@ class UploadServiceTest < ActiveSupport::TestCase
           end
 
           should "generate a preview" do
-            preview, sample = subject.generate_resizes(@file, @upload)
+            preview, crop, sample = subject.generate_resizes(@file, @upload)
             assert_operator(File.size(preview.path), :>, 0)
+            assert_operator(File.size(crop.path), :>, 0)
             assert_operator(File.size(sample.path), :>, 0)
             preview.close
             preview.unlink

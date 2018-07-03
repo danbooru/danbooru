@@ -130,7 +130,7 @@ class UploadService
     def self.generate_resizes(file, upload)
       if upload.is_video?
         video = FFMPEG::Movie.new(file.path)
-        crop_file = generate_video_preview_for(video, Danbooru.config.small_image_width, Danbooru.config.small_image_width)
+        crop_file = generate_video_crop_for(video, Danbooru.config.small_image_width)
         preview_file = generate_video_preview_for(video, Danbooru.config.small_image_width, Danbooru.config.small_image_width)
 
       elsif upload.is_ugoira?
@@ -147,6 +147,14 @@ class UploadService
       end
 
       [preview_file, crop_file, sample_file]
+    end
+
+    def self.generate_video_crop_for(video, width)
+      vp = Tempfile.new(["video-preview", ".jpg"], binmode: true)
+      video.screenshot(vp.path, {:seek_time => 0, :resolution => "#{video.width}x#{video.height}"})
+      crop = DanbooruImageResizer.crop(vp, width, 85)
+      vp.close
+      return crop
     end
 
     def self.generate_video_preview_for(video, width, height)
