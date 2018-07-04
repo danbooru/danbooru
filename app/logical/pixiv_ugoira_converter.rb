@@ -69,7 +69,7 @@ class PixivUgoiraConverter
     zipfile = Zip::File.new(ugoira_file.path)
     zipfile.entries.first.extract(file.path) { true } #  'true' means overwrite the existing tempfile.
 
-    DanbooruImageResizer.crop(file, Danbooru.config.small_image_width, 85)
+    DanbooruImageResizer.crop(file, Danbooru.config.small_image_width, Danbooru.config.small_image_width, 85)
   ensure
     file.close!
   end

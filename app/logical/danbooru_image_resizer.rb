@@ -17,11 +17,11 @@ module DanbooruImageResizer
     end
   end
 
-  def self.crop(file, length, quality = 90)
+  def self.crop(file, width, height, quality = 90)
     if Vips.at_least_libvips?(8, 5)
-      crop_ruby(file, length, quality)
+      crop_ruby(file, width, height, quality)
     else
-      crop_shell(file, length, quality)
+      crop_shell(file, width, height, quality)
     end    
   end
 
@@ -35,9 +35,9 @@ module DanbooruImageResizer
     output_file
   end
 
-  def self.crop_ruby(file, length, resize_quality)
+  def self.crop_ruby(file, width, height, resize_quality)
     output_file = Tempfile.new
-    resized_image = Vips::Image.thumbnail(file.path, length, height: length, **CROP_OPTIONS)
+    resized_image = Vips::Image.thumbnail(file.path, width, height: height, **CROP_OPTIONS)
     resized_image.jpegsave(output_file.path, Q: resize_quality, **JPEG_OPTIONS)
 
     output_file
@@ -65,7 +65,7 @@ module DanbooruImageResizer
     output_file
   end
 
-  def self.crop_shell(file, length, quality)
+  def self.crop_shell(file, width, height, quality)
     output_file = Tempfile.new(["crop", ".jpg"])
 
     # --size=WxH will upscale if the image is smaller than the target size.
@@ -76,7 +76,7 @@ module DanbooruImageResizer
       file.path,
       "--eprofile=#{SRGB_PROFILE}",
       "--smartcrop=attention",
-      "--size=#{length}",
+      "--size=#{width}x#{height}",
       "--format=#{output_file.path}[Q=#{quality},background=255,strip,interlace,optimize_coding]"
     ]
 

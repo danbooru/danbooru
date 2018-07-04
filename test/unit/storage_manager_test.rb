@@ -7,6 +7,42 @@ class StorageManagerTest < ActiveSupport::TestCase
     CurrentUser.ip_addr = "127.0.0.1"
   end
 
+  context "StorageManager::Match" do
+    setup do
+      @storage_manager = StorageManager::Match.new do |matcher|
+        matcher.add_manager(type: :crop) do
+          "crop"
+        end
+
+        matcher.add_manager(type: [:large, :original]) do
+          "large or original"
+        end
+
+        matcher.add_manager(id: 1..100) do
+          "first"
+        end
+
+        matcher.add_manager(id: 101..200, type: :preview) do
+          "preview"
+        end
+
+        matcher.add_manager({}) do
+          "default"
+        end
+      end
+    end
+
+    should "find the different matches" do
+      assert_equal("large or original", @storage_manager.find(type: :original))
+      assert_equal("crop", @storage_manager.find(type: :crop))
+      assert_equal("large or original", @storage_manager.find(type: :large))
+      assert_equal("preview", @storage_manager.find(type: :preview, id: 150))
+      assert_equal("default", @storage_manager.find(type: :preview, id: 1000))
+      assert_equal("crop", @storage_manager.find(type: :crop, id: 1_000))
+      assert_equal("large or original", @storage_manager.find(type: :large, id: 1_000))
+    end
+  end
+
   context "StorageManager::Local" do
     setup do
       @storage_manager = StorageManager::Local.new(base_dir: BASE_DIR, base_url: "/data")

@@ -140,7 +140,7 @@ class UploadService
 
       elsif upload.is_image?
         preview_file = DanbooruImageResizer.resize(file, Danbooru.config.small_image_width, Danbooru.config.small_image_width, 85)
-        crop_file = DanbooruImageResizer.crop(file, Danbooru.config.small_image_width, 85)
+        crop_file = DanbooruImageResizer.crop(file, Danbooru.config.small_image_width, Danbooru.config.small_image_width, 85)
         if upload.image_width > Danbooru.config.large_image_width
           sample_file = DanbooruImageResizer.resize(file, Danbooru.config.large_image_width, upload.image_height, 90)
         end
@@ -152,7 +152,7 @@ class UploadService
     def self.generate_video_crop_for(video, width)
       vp = Tempfile.new(["video-preview", ".jpg"], binmode: true)
       video.screenshot(vp.path, {:seek_time => 0, :resolution => "#{video.width}x#{video.height}"})
-      crop = DanbooruImageResizer.crop(vp, width, 85)
+      crop = DanbooruImageResizer.crop(vp, width, width, 85)
       vp.close
       return crop
     end
