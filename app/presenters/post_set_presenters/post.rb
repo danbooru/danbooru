@@ -11,6 +11,10 @@ module PostSetPresenters
       @tag_set_presenter ||= TagSetPresenter.new(related_tags)
     end
 
+    def post_previews_html(template, options = {})
+      super(template, options.merge(show_cropped: true))
+    end
+
     def related_tags
       if post_set.is_pattern_search?
         pattern_tags

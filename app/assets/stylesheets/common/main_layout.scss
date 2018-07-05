@@ -38,11 +38,15 @@ div#page {
     }
 
     input[type=text] {
-      width: 10em;
-
       /* ensure expanded search box renders above post thumbnails. */
       z-index: 1;
       position: relative;
+    }
+
+    button[type=submit] {
+      padding: 2px 6px;
+      background: #EEE;
+      border-left: none;
     }
   }
 

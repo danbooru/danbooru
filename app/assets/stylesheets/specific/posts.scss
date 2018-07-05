@@ -4,7 +4,6 @@ article.post-preview {
   height: 154px;
   width: 154px;
   margin: 0 10px 10px 0;
-  float: left;
   overflow: hidden;
   text-align: center;
   @include inline-block;
@@ -24,13 +23,6 @@ article.post-preview {
 
   img {
     margin: auto;
-  }
-
-  &.large-cropped {
-    height: auto;
-    weidth: auto;
-    float: none;
-    display: block;
   }
 
   &[data-tags~=animated]:before, &[data-file-ext=swf]:before, &[data-file-ext=webm]:before, &[data-file-ext=mp4]:before, &[data-file-ext=zip]:before {
@@ -171,7 +163,6 @@ body[data-user-can-approve-posts="true"] .post-preview {
   white-space: nowrap;
   
   article.post-preview {
-    float: none;
     width: auto;
     border: none;
     margin: 0;
@@ -314,13 +305,6 @@ div#c-posts {
   }
 
   div#a-index {
-    div#jlist-rss-ads-for-show {
-      float: right;
-      position: absolute;
-      top: 0;
-      right: 10px;
-    }
-
     menu#post-sections {
       margin-bottom: 0.5em;
       font-size: $h3_size;
