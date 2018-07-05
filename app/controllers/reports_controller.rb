@@ -24,6 +24,13 @@ class ReportsController < ApplicationController
     @upload_reports = Reports::UploadTags.includes(versions: { post: :versions }).for_user(params[:user_id]).order("id desc").paginate(params[:page], :limit => params[:limit])
   end
 
+  def flag_targeting
+  end
+
+  def flag_targeting_create(user_id)
+
+  end
+
   def down_voting_post
   end
 

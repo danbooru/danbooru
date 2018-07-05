@@ -8,13 +8,13 @@ class PostFlag < ApplicationRecord
   end
 
   COOLDOWN_PERIOD = 3.days
+  CREATION_THRESHOLD = 10 # in 30 days
 
-  belongs_to :creator, :class_name => "User"
+  belongs_to_creator :class_name => "User"
   belongs_to :post
-  validates_presence_of :reason, :creator_id, :creator_ip_addr
-  validate :validate_creator_is_not_limited
+  validates_presence_of :reason
+  validate :validate_creator_is_not_limited, on: :create
   validate :validate_post
-  before_validation :initialize_creator, :on => :create
   validates_uniqueness_of :creator_id, :scope => :post_id, :on => :create, :unless => :is_deletion, :message => "have already flagged this post"
   before_save :update_post
   attr_accessor :is_deletion
@@ -156,6 +156,14 @@ class PostFlag < ApplicationRecord
   def validate_creator_is_not_limited
     return if is_deletion
 
+    if PostFlag.for_creator(creator_id).where("created_at > ?", 30.days.ago).count >= CREATION_THRESHOLD
+      report = Reports::PostFlags.new(user_id: post.uploader_id, date_range: 90.days.ago)
+
+      if report.attackers.include?(creator_id)
+        errors[:creator] << "cannot flag posts uploaded by this user"
+      end
+    end
+
     if CurrentUser.can_approve_posts?
       # do nothing
     elsif creator.created_at > 1.week.ago
@@ -176,11 +184,6 @@ class PostFlag < ApplicationRecord
     errors[:post] << "is pending and cannot be flagged" if post.is_pending? && !is_deletion
     errors[:post] << "is locked and cannot be flagged" if post.is_status_locked?
     errors[:post] << "is deleted" if post.is_deleted?
-  end
-
-  def initialize_creator
-    self.creator_id ||= CurrentUser.id
-    self.creator_ip_addr = CurrentUser.ip_addr if creator_ip_addr == "127.0.0.1" || creator_ip_addr.blank?
   end
 
   def resolve!
