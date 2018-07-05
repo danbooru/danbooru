@@ -136,34 +136,26 @@
     }
   }
 
+  #posts #posts-container {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
   article.post-preview {
-    margin: 0.5vw;
-    width: 48vw;
-    height: 48vw;    
+    float: none;
+    margin: 0; 
     text-align: center;
     vertical-align: middle;
     display: inline-block;
 
-    &.cropped {
-      width: 32vw;
-      height: 32vw;    
-    }
-
     a {
-      //width: 48.5vw;
-      //display: block;
       margin: 0 auto;
     }
 
     img {
-      //object-fit: contain;
-      margin: 0 auto;
       border: none !important;
-
-      &.cropped {
-        width: 32vw;
-        height: 32vw;
-      }
     }
 
     &[data-tags~=animated]:before, &[data-file-ext=swf]:before, &[data-file-ext=webm]:before, &[data-file-ext=mp4]:before, &[data-file-ext=zip]:before {
@@ -172,6 +164,19 @@
 
     &[data-has-sound=true]:before {
       @include sound-icon;
+    }
+  }
+
+  .user-disable-cropped-false {
+    article {
+      width: 30vw;
+      height: 30vw;
+      margin: 1vw;
+    }
+
+    img {
+      width: 30vw;
+      height: 30vw;
     }
   }
 
