@@ -15,7 +15,7 @@ class UploadService
         if post.nil?
           # this gets called from UploadsController#new so we need
           # to preprocess async
-          Preprocessor.new(source: url).delay(queue: "default").start!(CurrentUser.user.id)
+          Preprocessor.new(source: url).delay(priority: -1, queue: "default").delayed_start(CurrentUser.id)
         end
 
         begin
@@ -27,7 +27,7 @@ class UploadService
         return [upload, post, source, normalized_url, remote_size]
       elsif file
         # this gets called via XHR so we can process sync
-        Preprocessor.new(file: file).start!((CurrentUser.user.id))
+        Preprocessor.new(file: file).delayed_start(CurrentUser.id)
       end
 
       return [upload]
@@ -199,7 +199,7 @@ class UploadService
       # in case this upload never finishes processing, we need to delete the
       # distributed files in the future
       Danbooru.config.other_server_hosts.each do |host|
-        UploadService::Utils.delay(queue: host, run_at: 30.minutes.from_now).delete_file(upload.md5, upload.file_ext, upload.id)
+        UploadService::Utils.delay(priority: -1, queue: host, run_at: 30.minutes.from_now).delete_file(upload.md5, upload.file_ext, upload.id)
       end
     end
 
@@ -311,7 +311,16 @@ class UploadService
       predecessor.present?
     end
 
-    def start!(uploader_id)
+    def delayed_start(uploader_id)
+      CurrentUser.as(uploader_id) do
+        start!
+      end
+
+    rescue ActiveRecord::RecordNotUnique
+      return
+    end
+
+    def start!
       if Utils.is_downloadable?(source)
         CurrentUser.as_system do
           if Post.tag_match("source:#{source}").where.not(id: original_post_id).exists?
@@ -331,29 +340,27 @@ class UploadService
       params[:rating] ||= "q"
       params[:tag_string] ||= "tagme"
 
-      CurrentUser.as(User.find(uploader_id)) do
-        upload = Upload.create!(params)
-        begin
-          upload.update(status: "preprocessing")
+      upload = Upload.create!(params)
+      begin
+        upload.update(status: "preprocessing")
 
-          if source.present?
-            file = Utils.download_for_upload(source, upload)
-          elsif params[:file].present?
-            file = params[:file]
-          end
-
-          Utils.process_file(upload, file)
-
-          upload.rating = params[:rating]
-          upload.tag_string = params[:tag_string]
-          upload.status = "preprocessed"
-          upload.save!
-        rescue Exception => x
-          upload.update(status: "error: #{x.class} - #{x.message}", backtrace: x.backtrace.join("\n"))
+        if source.present?
+          file = Utils.download_for_upload(source, upload)
+        elsif params[:file].present?
+          file = params[:file]
         end
 
-        return upload
+        Utils.process_file(upload, file)
+
+        upload.rating = params[:rating]
+        upload.tag_string = params[:tag_string]
+        upload.status = "preprocessed"
+        upload.save!
+      rescue Exception => x
+        upload.update(status: "error: #{x.class} - #{x.message}", backtrace: x.backtrace.join("\n"))
       end
+
+      return upload
     end
 
     def finish!(upload = nil)
@@ -442,7 +449,7 @@ class UploadService
         file: replacement.replacement_file,
         original_post_id: post.id
       )
-      upload = preprocessor.start!(CurrentUser.id)
+      upload = preprocessor.start!
       return if upload.is_errored?
       upload = preprocessor.finish!(upload)
       return if upload.is_errored?
@@ -521,7 +528,7 @@ class UploadService
     @params = params
   end
 
-  def scoped_start(uploader_id)
+  def delayed_start(uploader_id)
     CurrentUser.as(uploader_id) do
       start!
     end
@@ -533,7 +540,7 @@ class UploadService
     preprocessor = Preprocessor.new(params)
 
     if preprocessor.in_progress?
-      delay(queue: "default", run_at: 5.seconds.from_now).scoped_start(CurrentUser.id)
+      delay(queue: "default", priority: -1, run_at: 5.seconds.from_now).delayed_start(CurrentUser.id)
       return preprocessor.predecessor
     end
 

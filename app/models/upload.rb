@@ -65,7 +65,7 @@ class Upload < ApplicationRecord
   serialize :context, JSON
 
   def initialize_attributes
-    self.uploader_id = CurrentUser.user.id
+    self.uploader_id = CurrentUser.id
     self.uploader_ip_addr = CurrentUser.ip_addr
     self.server = Danbooru.config.server_host
   end

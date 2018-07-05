@@ -348,7 +348,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       should "work for a jpeg" do
         @service = subject.new(source: @jpeg)
-        @upload = @service.start!(CurrentUser.id)
+        @upload = @service.start!
         assert_equal("preprocessed", @upload.status)
         assert_not_nil(@upload.md5)
         assert_equal("jpg", @upload.file_ext)
@@ -361,7 +361,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       should "work for an ugoira" do
         @service = subject.new(source: @ugoira)
-        @upload = @service.start!(CurrentUser.id)
+        @upload = @service.start!
         assert_equal("preprocessed", @upload.status)
         assert_not_nil(@upload.md5)
         assert_equal("zip", @upload.file_ext)
@@ -373,7 +373,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       should "work for a video" do
         @service = subject.new(source: @video)
-        @upload = @service.start!(CurrentUser.id)
+        @upload = @service.start!
         assert_equal("preprocessed", @upload.status)
         assert_not_nil(@upload.md5)
         assert_equal("mp4", @upload.file_ext)
@@ -390,7 +390,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         
         should "leave the upload in an error state" do
           @service = subject.new(source: @video)
-          @upload = @service.start!(CurrentUser.id)
+          @upload = @service.start!
           assert_match(/error:/, @upload.status)
         end
       end
