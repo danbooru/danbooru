@@ -521,11 +521,17 @@ class UploadService
     @params = params
   end
 
+  def scoped_start(uploader_id)
+    CurrentUser.as(uploader_id) do
+      start!
+    end
+  end
+
   def start!
     preprocessor = Preprocessor.new(params)
 
     if preprocessor.in_progress?
-      delay(queue: "default", run_at: 5.seconds.from_now).start!
+      delay(queue: "default", run_at: 5.seconds.from_now).scoped_start(CurrentUser.id)
       return preprocessor.predecessor
     end
 
