@@ -162,15 +162,15 @@ class Post < ApplicationRecord
     end
 
     def file_path
-      storage_manager.file_path(md5, file_ext, :original)
+      storage_manager.file_path(self, file_ext, :original)
     end
 
     def large_file_path
-      storage_manager.file_path(md5, file_ext, :large)
+      storage_manager.file_path(self, file_ext, :large)
     end
 
     def preview_file_path
-      storage_manager.file_path(md5, file_ext, :preview)
+      storage_manager.file_path(self, file_ext, :preview)
     end
 
     def crop_file_url
