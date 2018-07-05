@@ -29,9 +29,9 @@ module PaginationHelper
     window = 4
 
     if records.current_page >= 2
-      html << "<li class='arrow'>" + link_to("<<", nav_params_for(records.current_page - 1), :rel => "prev") + "</li>"
+      html << "<li class='arrow'>" + link_to(content_tag(:i, nil, class: "fas fa-chevron-left"), nav_params_for(records.current_page - 1), :rel => "prev") + "</li>"
     else
-      html << "<li class='arrow'><span>" + "&lt;&lt;" + "</span></li>"
+      html << "<li class='arrow'><span>" + content_tag(:i, nil, class: "fas fa-chevron-left") + "</span></li>"
     end
 
     if records.total_pages <= (window * 2) + 5
@@ -69,9 +69,9 @@ module PaginationHelper
     end
 
     if records.current_page < records.total_pages && records.size > 0
-      html << "<li class='arrow'>" + link_to(">>", nav_params_for(records.current_page + 1), :rel => "next") + "</li>"
+      html << "<li class='arrow'>" + link_to(content_tag(:i, nil, class: "fas fa-chevron-right"), nav_params_for(records.current_page + 1), :rel => "next") + "</li>"
     else
-      html << "<li class='arrow'><span>" + "&gt;&gt;" + "</span></li>"
+      html << "<li class='arrow'><span>" + content_tag(:i, nil, class: "fas fa-chevron-right") + "</span></li>"
     end
 
     html << "</menu></div>"
@@ -92,7 +92,7 @@ module PaginationHelper
     html = []
     if page == "..."
       html << "<li class='more'>"
-      html << "..."
+      html << content_tag(:i, nil, class: "fas fa-ellipsis-h")
       html << "</li>"      
     elsif page == current_page
       html << "<li class='current-page'>"
